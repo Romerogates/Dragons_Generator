@@ -19,7 +19,7 @@ services:
       dockerfile: Dockerfile
     ports:
       # Mappe le port 4200 de ton PC vers le port 80 du conteneur Nginx
-      - "4200:80"
+      - "80:80"
     depends_on:
       - dragons-api
     networks:
