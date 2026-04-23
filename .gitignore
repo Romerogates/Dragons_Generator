@@ -1,0 +1,76 @@
+# --- General ---
+.DS_Store
+Thumbs.db
+*.log
+
+# --- IDEs & Editors ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# --- ANGULAR / NODE ---
+node_modules/
+dist/
+tmp/
+/out-tsc/
+bazel-out/
+
+# Angular specific
+.angular/
+.browserslistrc
+
+# Test coverage
+coverage/
+
+# Environment files (Security)
+.env
+.env.local
+
+# Yarn / NPM logs
+yarn-debug.log*
+yarn-error.log*
+npm-debug.log*
+pnpm-debug.log*
+
+# --- DOTNET / C# ---
+# Build results
+[Bb]in/
+[Oo]bj/
+
+# User-specific files
+*.user
+*.userprefs
+*.lock.json
+_i
+_y
+
+# Visual Studio specific
+.vs/
+*.suo
+*.cache
+*.ntvs*
+*.njsproj
+*.sln.docstates
+
+# User Secrets (Security)
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# Rider
+.idea/.idea.*/
+
+# NuGet
+*.nupkg
+*.snupkg
+# The packages folder can generally be ignored because of Package Restore
+**/packages/*
+# except build/, which is used as an MSBuild target.
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
