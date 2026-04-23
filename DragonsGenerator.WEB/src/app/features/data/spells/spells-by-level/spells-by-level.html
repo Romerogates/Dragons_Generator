@@ -46,20 +46,24 @@
   <section class="w-full relative z-20 px-4 max-w-7xl mx-auto flex flex-col items-center mt-10">
     @if (error(); as errorMsg) {
       <div
-        class="p-4 bg-red-950/50 border border-red-900 rounded-xl text-center shadow-lg w-full max-w-lg"
+        class="p-4 bg-red-950/50 border border-red-900 rounded-xl text-center shadow-lg w-full max-lg"
       >
         <p class="text-red-400 font-medium">{{ errorMsg }}</p>
       </div>
     } @else if (spells() === null) {
       <div class="flex flex-col items-center justify-center py-20 animate-pulse text-fuchsia-500">
-        <span class="text-6xl mb-4">🪄</span>
+        <span class="text-6xl mb-4"
+          ><iconify-icon icon="fluent-emoji:magic-wand"></iconify-icon
+        ></span>
         <p class="text-lg font-serif tracking-widest uppercase text-slate-400">
           Recherche des incantations...
         </p>
       </div>
     } @else if (spells()!.length === 0) {
       <div class="col-span-full py-24 text-center">
-        <span class="text-6xl mb-6 block opacity-30">🕸️</span>
+        <span class="text-6xl mb-6 block opacity-30"
+          ><iconify-icon icon="fluent-emoji:spider-web"></iconify-icon
+        ></span>
         <p class="text-slate-500 text-sm italic">
           Aucun sort n'est connu à ce niveau de puissance.
         </p>
@@ -79,8 +83,9 @@
             <div
               class="absolute -top-4 -right-4 text-8xl opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-500"
             >
-              {{ getSchoolIcon(spell.school) }}
+              <iconify-icon [icon]="getSchoolIcon(spell.school)"></iconify-icon>
             </div>
+
             <div class="p-6 flex flex-col h-full relative z-10">
               <header class="flex justify-between items-start mb-2">
                 <h2
@@ -92,7 +97,9 @@
                     >{{ spell.name }}</a
                   >
                 </h2>
-                <span class="text-2xl drop-shadow-md ml-4">{{ getSchoolIcon(spell.school) }}</span>
+                <span class="text-2xl drop-shadow-md ml-4"
+                  ><iconify-icon [icon]="getSchoolIcon(spell.school)"></iconify-icon
+                ></span>
               </header>
               <div class="mb-4 flex flex-wrap items-center gap-2">
                 <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">

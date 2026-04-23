@@ -9,7 +9,9 @@
 
     @if (spell() === undefined) {
       <div class="flex flex-col items-center justify-center py-32 animate-pulse text-fuchsia-500">
-        <span class="text-6xl mb-6">🪄</span>
+        <span class="text-6xl mb-6"
+          ><iconify-icon icon="fluent-emoji:magic-wand"></iconify-icon
+        ></span>
         <p class="text-lg font-serif tracking-widest uppercase text-slate-400">
           Déchiffrement des runes...
         </p>
@@ -17,8 +19,8 @@
     } @else if (notFound()) {
       <div class="flex flex-col items-center justify-center py-32 text-center">
         <span class="text-7xl mb-6 drop-shadow-[0_0_20px_rgba(220,38,38,0.4)] animate-pulse"
-          >🔥</span
-        >
+          ><iconify-icon icon="fluent-emoji:fire"></iconify-icon
+        ></span>
         <h2
           class="text-3xl md:text-4xl font-bold text-red-500 font-serif tracking-widest uppercase mb-4"
         >
@@ -41,9 +43,9 @@
       </div>
     } @else if (spell(); as s) {
       <header class="text-center mb-12">
-        <span class="text-5xl drop-shadow-md mb-4 block cursor-default">{{
-          getSchoolIcon(s.school)
-        }}</span>
+        <span class="text-5xl drop-shadow-md mb-4 block cursor-default"
+          ><iconify-icon [icon]="getSchoolIcon(s.school)"></iconify-icon
+        ></span>
         <h1
           class="text-4xl md:text-6xl font-extrabold text-fuchsia-400 font-serif tracking-wide mb-6 drop-shadow-lg"
         >
@@ -71,19 +73,28 @@
             @if (s.isRitual) {
               <span
                 class="bg-emerald-950/40 text-emerald-400 border border-emerald-900/50 px-3 py-1 rounded text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1"
-                ><span class="text-sm">📖</span> Rituel</span
+                ><span class="text-sm"
+                  ><iconify-icon icon="fluent-emoji:open-book"></iconify-icon
+                ></span>
+                Rituel</span
               >
             }
             @if (s.isConcentration) {
               <span
                 class="bg-amber-950/40 text-amber-400 border border-amber-900/50 px-3 py-1 rounded text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1"
-                ><span class="text-sm">🧠</span> Concentration</span
+                ><span class="text-sm"
+                  ><iconify-icon icon="fluent-emoji:brain"></iconify-icon
+                ></span>
+                Concentration</span
               >
             }
             @if (s.isCorrupted) {
               <span
                 class="bg-rose-950/40 text-rose-400 border border-rose-900/50 px-3 py-1 rounded text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1"
-                ><span class="text-sm">☠️</span> Corrompu</span
+                ><span class="text-sm"
+                  ><iconify-icon icon="fluent-emoji:skull-and-crossbones"></iconify-icon
+                ></span>
+                Corrompu</span
               >
             }
           </div>
@@ -104,7 +115,10 @@
                 <dt
                   class="text-[10px] uppercase tracking-widest text-fuchsia-600 font-bold mb-1 flex items-center gap-2"
                 >
-                  <span class="text-sm">⏳</span> Temps d'incantation
+                  <span class="text-sm"
+                    ><iconify-icon icon="fluent-emoji:hourglass-done"></iconify-icon
+                  ></span>
+                  Temps d'incantation
                 </dt>
                 <dd class="text-sm text-slate-200 font-medium">{{ formatMeta(s.castingTime) }}</dd>
               </div>
@@ -113,7 +127,10 @@
                 <dt
                   class="text-[10px] uppercase tracking-widest text-sky-600 font-bold mb-1 flex items-center gap-2"
                 >
-                  <span class="text-sm">📏</span> Portée
+                  <span class="text-sm"
+                    ><iconify-icon icon="fluent-emoji:straight-ruler"></iconify-icon
+                  ></span>
+                  Portée
                 </dt>
                 <dd class="text-sm text-slate-200 font-medium">{{ formatMeta(s.range) }}</dd>
               </div>
@@ -122,7 +139,10 @@
                 <dt
                   class="text-[10px] uppercase tracking-widest text-emerald-600 font-bold mb-1 flex items-center gap-2"
                 >
-                  <span class="text-sm">⏱️</span> Durée
+                  <span class="text-sm"
+                    ><iconify-icon icon="fluent-emoji:stopwatch"></iconify-icon
+                  ></span>
+                  Durée
                 </dt>
                 <dd class="text-sm text-slate-200 font-medium">{{ formatMeta(s.duration) }}</dd>
               </div>
@@ -131,7 +151,10 @@
                 <dt
                   class="text-[10px] uppercase tracking-widest text-amber-600 font-bold mb-2 flex items-center gap-2"
                 >
-                  <span class="text-sm">🧪</span> Composantes
+                  <span class="text-sm"
+                    ><iconify-icon icon="fluent-emoji:test-tube"></iconify-icon
+                  ></span>
+                  Composantes
                 </dt>
                 <dd
                   class="text-xs text-slate-300 leading-relaxed bg-[#171b22] p-3 rounded-lg border border-slate-700/50"
@@ -169,13 +192,16 @@
             <div
               class="absolute -top-6 -right-6 text-9xl opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-500"
             >
-              {{ getSchoolIcon(s.school) }}
+              <iconify-icon [icon]="getSchoolIcon(s.school)"></iconify-icon>
             </div>
 
             <h2
               class="relative z-10 text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-3"
             >
-              <span class="text-fuchsia-500">📜</span> Description
+              <span class="text-fuchsia-500"
+                ><iconify-icon icon="fluent-emoji:scroll"></iconify-icon
+              ></span>
+              Description
             </h2>
 
             <p
@@ -192,7 +218,10 @@
               <h2
                 class="text-sm font-black text-fuchsia-500 uppercase tracking-widest mb-3 flex items-center gap-2"
               >
-                <span class="text-lg">⚡</span> Aux niveaux supérieurs
+                <span class="text-lg"
+                  ><iconify-icon icon="fluent-emoji:high-voltage"></iconify-icon
+                ></span>
+                Aux niveaux supérieurs
               </h2>
               <p class="text-sm text-slate-300 leading-relaxed italic">
                 {{ s.higherLevels }}
@@ -205,7 +234,10 @@
               <h2
                 class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-3"
               >
-                <span class="text-sky-500">⚙️</span> Options Modulaires
+                <span class="text-sky-500"
+                  ><iconify-icon icon="fluent-emoji:gear"></iconify-icon
+                ></span>
+                Options Modulaires
               </h2>
 
               <div class="space-y-4">

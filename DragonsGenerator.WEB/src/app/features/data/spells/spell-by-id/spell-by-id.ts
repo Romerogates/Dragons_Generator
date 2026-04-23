@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+  CUSTOM_ELEMENTS_SCHEMA,
+} from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of, switchMap } from 'rxjs';
@@ -11,6 +17,7 @@ import { Spell } from '@core/models/Spells/spell';
   imports: [RouterLink],
   templateUrl: './spell-by-id.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
 })
 export class SpellById {
   private dataService = inject(DataService);
@@ -59,17 +66,17 @@ export class SpellById {
     return level === 0 ? 'Tour de magie' : `Niveau ${level}`;
   }
 
-  /** Associe un émoji selon l'école de magie pour styliser l'en-tête */
+  /** Associe une icône Iconify selon l'école de magie pour styliser l'en-tête */
   getSchoolIcon(school: string): string {
     const s = school.toLowerCase();
-    if (s.includes('abjuration')) return '🛡️';
-    if (s.includes('évocation') || s.includes('evocation')) return '💥';
-    if (s.includes('nécromancie') || s.includes('necromancie')) return '💀';
-    if (s.includes('illusion')) return '👁️';
-    if (s.includes('transmutation')) return '🦋';
-    if (s.includes('divination')) return '🔮';
-    if (s.includes('enchantement')) return '✨';
-    if (s.includes('invocation') || s.includes('conjuration')) return '🌀';
-    return '🪄';
+    if (s.includes('abjuration')) return 'fluent-emoji:shield';
+    if (s.includes('évocation') || s.includes('evocation')) return 'fluent-emoji:collision';
+    if (s.includes('nécromancie') || s.includes('necromancie')) return 'fluent-emoji:skull';
+    if (s.includes('illusion')) return 'fluent-emoji:eye';
+    if (s.includes('transmutation')) return 'fluent-emoji:butterfly';
+    if (s.includes('divination')) return 'fluent-emoji:crystal-ball';
+    if (s.includes('enchantement')) return 'fluent-emoji:sparkles';
+    if (s.includes('invocation') || s.includes('conjuration')) return 'fluent-emoji:cyclone';
+    return 'fluent-emoji:magic-wand';
   }
 }

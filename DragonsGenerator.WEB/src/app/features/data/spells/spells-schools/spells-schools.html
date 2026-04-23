@@ -27,14 +27,18 @@
       </div>
     } @else if (schools() === null) {
       <div class="flex flex-col items-center justify-center py-20 animate-pulse text-fuchsia-500">
-        <span class="text-6xl mb-4">🪄</span>
+        <span class="text-6xl mb-4"
+          ><iconify-icon icon="fluent-emoji:magic-wand"></iconify-icon
+        ></span>
         <p class="text-lg font-serif tracking-widest uppercase text-slate-400">
           Analyse des flux arcaniques...
         </p>
       </div>
     } @else if (schools()!.length === 0) {
       <div class="col-span-full py-20 text-center">
-        <span class="text-6xl mb-6 block opacity-30">🕸️</span>
+        <span class="text-6xl mb-6 block opacity-30"
+          ><iconify-icon icon="fluent-emoji:spider-web"></iconify-icon
+        ></span>
         <p class="text-slate-500 italic font-serif text-lg">
           Aucune école de magie n'est consignée ici.
         </p>
@@ -59,13 +63,13 @@
             <div
               class="absolute -top-4 -right-4 text-7xl opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-500"
             >
-              {{ getSchoolIcon(school) }}
+              <iconify-icon [icon]="getSchoolIcon(school)"></iconify-icon>
             </div>
 
             <span
               class="text-5xl mb-4 drop-shadow-[0_0_15px_rgba(217,70,239,0.2)] group-hover:scale-110 transition-transform origin-bottom relative z-10"
             >
-              {{ getSchoolIcon(school) }}
+              <iconify-icon [icon]="getSchoolIcon(school)"></iconify-icon>
             </span>
 
             <h2

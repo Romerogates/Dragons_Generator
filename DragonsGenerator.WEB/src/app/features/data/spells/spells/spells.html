@@ -46,13 +46,14 @@
           routerLink="/spells/schools"
           class="px-5 py-2.5 bg-[#1b2028] border border-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-300 hover:bg-[#1f242e] hover:border-fuchsia-500 hover:text-fuchsia-400 transition-all shadow-lg flex items-center gap-2"
         >
-          <span>👁️</span> Écoles de Magie
+          <span><iconify-icon icon="fluent-emoji:eye"></iconify-icon></span> Écoles de Magie
         </a>
         <a
           routerLink="/spells/level/0"
           class="px-5 py-2.5 bg-[#1b2028] border border-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-300 hover:bg-[#1f242e] hover:border-sky-500 hover:text-sky-400 transition-all shadow-lg flex items-center gap-2"
         >
-          <span>📈</span> Parcourir par Niveau
+          <span><iconify-icon icon="fluent-emoji:chart-increasing"></iconify-icon></span> Parcourir
+          par Niveau
         </a>
       </div>
 
@@ -63,8 +64,8 @@
         <div class="relative flex items-center">
           <span
             class="absolute left-6 text-slate-500 text-lg group-focus-within:text-fuchsia-400 transition-colors"
-            >🔍</span
-          >
+            ><iconify-icon icon="fluent-emoji:magnifying-glass-tilted-right"></iconify-icon
+          ></span>
           <input
             type="search"
             placeholder="Rechercher un sortilège (ex: Boule de feu)..."
@@ -83,8 +84,8 @@
         class="flex flex-col items-center justify-center py-20 text-center bg-[#1b2028]/90 backdrop-blur-lg border border-red-900/50 rounded-3xl shadow-2xl w-full max-w-lg"
       >
         <span class="text-7xl mb-6 drop-shadow-[0_0_20px_rgba(220,38,38,0.4)] animate-pulse"
-          >🔥</span
-        >
+          ><iconify-icon icon="fluent-emoji:fire"></iconify-icon
+        ></span>
         <h2 class="text-2xl font-bold text-red-500 font-serif tracking-widest uppercase mb-4">
           Déchirure de la Toile
         </h2>
@@ -92,7 +93,9 @@
       </div>
     } @else if (spells() === null) {
       <div class="flex flex-col items-center justify-center py-20 animate-pulse text-fuchsia-500">
-        <span class="text-6xl mb-4">🪄</span>
+        <span class="text-6xl mb-4"
+          ><iconify-icon icon="fluent-emoji:magic-wand"></iconify-icon
+        ></span>
         <p class="text-lg font-serif tracking-widest uppercase text-slate-400">
           Déchiffrement des runes...
         </p>
@@ -112,7 +115,7 @@
             <div
               class="absolute -top-4 -right-4 text-8xl opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-500"
             >
-              {{ getSchoolIcon(spell.school) }}
+              <iconify-icon [icon]="getSchoolIcon(spell.school)"></iconify-icon>
             </div>
 
             <div class="p-6 flex flex-col h-full relative z-10">
@@ -128,7 +131,9 @@
                   </a>
                 </h2>
                 <div class="flex-shrink-0 ml-4 flex flex-col items-end">
-                  <span class="text-2xl drop-shadow-md">{{ getSchoolIcon(spell.school) }}</span>
+                  <span class="text-2xl drop-shadow-md"
+                    ><iconify-icon [icon]="getSchoolIcon(spell.school)"></iconify-icon
+                  ></span>
                 </div>
               </header>
 
@@ -224,7 +229,9 @@
           </article>
         } @empty {
           <div class="col-span-full py-24 text-center">
-            <span class="text-6xl mb-6 block opacity-30">🕸️</span>
+            <span class="text-6xl mb-6 block opacity-30"
+              ><iconify-icon icon="fluent-emoji:spider-web"></iconify-icon
+            ></span>
             <h3 class="text-slate-300 font-serif text-2xl font-bold tracking-wide mb-2">
               Recherche vaine
             </h3>
