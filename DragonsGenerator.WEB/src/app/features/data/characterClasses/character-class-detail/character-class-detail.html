@@ -1,0 +1,187 @@
+@let c = cls();
+
+@if (c) {
+  <article class="class">
+    <header class="class__header">
+      <a routerLink="/classes/summary" class="class__back">← Retour aux classes</a>
+      <h1>{{ c.name }}</h1>
+      <p class="class__meta">
+        Dé de vie <strong>d{{ c.data.hit_die }}</strong> · Caractéristiques principales
+        <strong>{{ c.data.primary_abilities.join(', ') }}</strong>
+      </p>
+    </header>
+
+    <section class="class__section">
+      <h2>Maîtrises</h2>
+      <ul>
+        <li><strong>Armures :</strong> {{ c.data.proficiencies.armor.join(', ') || '—' }}</li>
+        <li><strong>Armes :</strong> {{ c.data.proficiencies.weapons.join(', ') }}</li>
+        <li>
+          <strong>Jets de sauvegarde :</strong> {{ c.data.proficiencies.saving_throws.join(', ') }}
+        </li>
+        <li>
+          <strong>Compétences :</strong>
+          {{ c.data.proficiencies.skills.count }} au choix parmi
+          {{ c.data.proficiencies.skills.options.join(', ') }}
+        </li>
+      </ul>
+    </section>
+
+    @if (c.data.spellcasting; as sc) {
+      <section class="class__section">
+        <h2>Incantation</h2>
+        <p>
+          Caractéristique : <strong>{{ sc.ability }}</strong>
+        </p>
+        @if (sc.focus) {
+          <p>Focaliseur : {{ sc.focus }}</p>
+        }
+        @if (sc.ritual) {
+          <p>Rituels autorisés</p>
+        }
+      </section>
+    }
+
+    <section class="class__section">
+      <h2>Équipement de départ</h2>
+      <ol class="equipment">
+        @for (slot of c.data.starting_equipment; track slot.slot) {
+          <li>
+            @if (slot.description) {
+              <p>{{ slot.description }}</p>
+            }
+            @if (slot.fixed) {
+              <ul>
+                @for (item of slot.fixed; track item.id) {
+                  <li>{{ item.qty }}× {{ item.id }}</li>
+                }
+              </ul>
+            }
+            @if (slot.alternatives) {
+              <ul class="alternatives">
+                @for (alt of slot.alternatives; track $index) {
+                  <li>
+                    @for (item of alt; track item.id) {
+                      <span>{{ item.qty }}× {{ item.id }}</span>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+          </li>
+        }
+      </ol>
+    </section>
+
+    <section class="class__section">
+      <h2>Progression</h2>
+      <table class="progression">
+        <thead>
+          <tr>
+            <th>Niv.</th>
+            <th>Bonus</th>
+            <th>Aptitudes</th>
+            <th>Ressources</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (lvl of c.data.progression; track lvl.level) {
+            <tr>
+              <td>{{ lvl.level }}</td>
+              <td>+{{ lvl.prof_bonus }}</td>
+              <td>
+                @if (lvl.features.length) {
+                  {{ lvl.features.join(', ') }}
+                } @else {
+                  —
+                }
+              </td>
+              <td>
+                @if (lvl.resources) {
+                  @for (entry of lvl.resources | keyvalue; track entry.key) {
+                    <div>{{ entry.key }} : {{ entry.value }}</div>
+                  }
+                } @else {
+                  —
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </section>
+
+    @if (c.data.features_details?.length) {
+      <section class="class__section">
+        <h2>Aptitudes détaillées</h2>
+        @for (feat of c.data.features_details; track feat.id) {
+          <details>
+            <summary>{{ feat.name }}</summary>
+            <p>{{ feat.desc }}</p>
+          </details>
+        }
+      </section>
+    }
+
+    @if (c.data.subclasses?.length) {
+      <section class="class__section">
+        <h2>Sous-classes</h2>
+        @for (sub of c.data.subclasses; track sub.id) {
+          <details>
+            <summary>{{ sub.name }}</summary>
+            @if (sub.desc) {
+              <p>{{ sub.desc }}</p>
+            }
+            @if (sub.features?.length) {
+              <ul>
+                @for (f of sub.features; track f.id) {
+                  <li>
+                    <strong>{{ f.name }}</strong> — {{ f.desc }}
+                  </li>
+                }
+              </ul>
+            }
+          </details>
+        }
+      </section>
+    }
+
+    @if (c.data.ki_powers?.length) {
+      <section class="class__section">
+        <h2>Dons du Ki</h2>
+        @for (k of c.data.ki_powers; track k.id) {
+          <details>
+            <summary>{{ k.name }}</summary>
+            <p>{{ k.desc }}</p>
+          </details>
+        }
+      </section>
+    }
+
+    @if (c.data.pact_boons?.length) {
+      <section class="class__section">
+        <h2>Faveurs de pacte</h2>
+        @for (p of c.data.pact_boons; track p.id) {
+          <details>
+            <summary>{{ p.name }}</summary>
+            <p>{{ p.desc }}</p>
+          </details>
+        }
+      </section>
+    }
+
+    @if (c.data.invocations?.length) {
+      <section class="class__section">
+        <h2>Invocations occultes</h2>
+        @for (inv of c.data.invocations; track inv.id) {
+          <details>
+            <summary>{{ inv.name }}</summary>
+            <p>{{ inv.desc }}</p>
+          </details>
+        }
+      </section>
+    }
+  </article>
+} @else {
+  <p>Chargement…</p>
+}

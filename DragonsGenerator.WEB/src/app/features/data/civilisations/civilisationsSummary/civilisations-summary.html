@@ -1,0 +1,50 @@
+<div>
+  <h1>Atlas des Civilisations</h1>
+  <p>Découvrez les peuples qui peuplent votre monde.</p>
+</div>
+
+@if (isLoading()) {
+  <div>
+    <p>Ouverture des registres...</p>
+  </div>
+} @else {
+  <div>
+    @for (civ of civilisations(); track civ.id) {
+      <div>
+        <header>
+          <h2>{{ civ.name }}</h2>
+          <small>ID: {{ civ.id }}</small>
+        </header>
+
+        <div>
+          <p><strong>Dés :</strong> {{ civ.diceMin }} à {{ civ.diceMax }}</p>
+
+          @if (civ.isCosmopolitan) {
+            <p>🌍 <em>Cosmopolite</em></p>
+          } @else {
+            <p>🛡️ <em>Homogène</em></p>
+          }
+        </div>
+
+        <div>
+          <strong>Espèces principales :</strong>
+          <ul>
+            @for (espece of civ.primarySpecies; track espece) {
+              <li>{{ espece }}</li>
+            } @empty {
+              <li><em>Données inconnues</em></li>
+            }
+          </ul>
+        </div>
+
+        <div>
+          <button [routerLink]="['/civilisations', civ.id]">Voir les détails</button>
+        </div>
+      </div>
+    } @empty {
+      <div>
+        <p>Le monde est encore vierge. Aucune civilisation n'a été trouvée.</p>
+      </div>
+    }
+  </div>
+}

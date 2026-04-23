@@ -1,0 +1,268 @@
+<div
+  class="relative w-full h-[calc(100vh-64px)] flex flex-col items-center justify-start animate-fade-in pt-4 pb-2 select-none overflow-hidden"
+>
+  @if (loading()) {
+    <div
+      class="flex justify-center items-center p-12 bg-[#1b2028] border border-slate-700 rounded-xl w-full max-w-lg mt-20"
+    >
+      <div
+        class="w-8 h-8 border-4 border-amber-500/30 border-t-amber-500 rounded-full animate-spin"
+      ></div>
+    </div>
+  }
+
+  @if (error(); as err) {
+    <div
+      class="p-4 mt-20 bg-red-950/50 border border-red-900 rounded-xl text-center shadow-lg w-full max-w-lg"
+    >
+      <p class="text-red-400 font-medium">{{ err }}</p>
+    </div>
+  }
+
+  @if (!loading() && !error()) {
+    @if (selectedCiv()) {
+      <button
+        class="absolute top-4 left-4 md:top-6 md:left-6 z-50 text-sm font-semibold text-slate-400 hover:text-amber-400 transition-colors flex items-center gap-2 px-3 py-2 md:px-4 bg-[#1b2028] rounded-lg border border-slate-700 hover:border-amber-500/50 shadow-lg"
+        (click)="clearSelection()"
+      >
+        <span class="sm:hidden">← Atlas</span>
+        <span class="hidden sm:inline">← Retour à l'Atlas d'Eana</span>
+      </button>
+    }
+
+    <div class="text-center shrink-0 w-full max-w-4xl mx-auto px-4 mb-2 z-10">
+      <h2
+        class="text-3xl sm:text-4xl font-extrabold text-amber-500 mb-1 drop-shadow-md tracking-wide font-serif truncate"
+      >
+        L'Atlas d'Eana
+      </h2>
+      <p class="text-slate-400 text-sm max-w-xl mx-auto italic truncate">
+        {{
+          selectedCiv()
+            ? 'Consultez les archives de la région sélectionnée.'
+            : 'Cliquez sur la carte pour explorer les différentes civilisations.'
+        }}
+      </p>
+    </div>
+
+    @if (!selectedCiv()) {
+      <div class="w-full flex-grow flex flex-col items-center justify-center min-h-0 px-4 py-2">
+        <div
+          class="relative w-full max-w-5xl aspect-video bg-[#171b22] border-2 border-slate-700 hover:border-amber-700/50 rounded-xl shadow-2xl overflow-hidden group max-h-full"
+        >
+          <img
+            src="Carte.jpg"
+            alt="Carte d'Eana"
+            class="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-90 transition-opacity duration-700 pointer-events-none"
+          />
+
+          @for (civ of allCivilizations(); track civ.id) {
+            <div
+              class="absolute transform -translate-x-1/2 -translate-y-1/2 z-10 hover:z-50 group/pin"
+              [style.top.%]="getMapCoordinates(civ.id).y"
+              [style.left.%]="getMapCoordinates(civ.id).x"
+            >
+              <button
+                class="relative w-10 h-10 flex items-center justify-center bg-[#1b2028]/90 border-2 border-amber-500/80 rounded-full text-lg shadow-[0_0_15px_rgba(245,158,11,0.5)] hover:scale-125 hover:border-amber-400 hover:bg-slate-800 transition-all duration-300"
+                (click)="selectCiv(civ.id)"
+              >
+                {{ getIconForCiv(civ.id) }}
+              </button>
+
+              <div
+                class="absolute left-1/2 -translate-x-1/2 w-max max-w-[220px] bg-[#020617]/95 border border-amber-600/50 p-3 rounded-lg opacity-0 group-hover/pin:opacity-100 transition-all duration-300 pointer-events-none shadow-2xl backdrop-blur-md"
+                [ngClass]="
+                  getMapCoordinates(civ.id).y < 35
+                    ? 'top-full mt-3 group-hover/pin:translate-y-1'
+                    : 'bottom-full mb-3 group-hover/pin:-translate-y-1'
+                "
+              >
+                <p
+                  class="text-amber-400 font-bold text-sm uppercase tracking-wider text-center border-b border-slate-700 pb-1 mb-1"
+                >
+                  {{ civ.name }}
+                </p>
+                <p
+                  class="text-[10px] text-slate-300 text-center italic line-clamp-2 leading-relaxed"
+                >
+                  {{ civ.lore.fullDescription }}
+                </p>
+
+                @if (getMapCoordinates(civ.id).y < 35) {
+                  <div
+                    class="absolute bottom-full left-1/2 -translate-x-1/2 border-[6px] border-transparent border-b-[#020617]/95"
+                  ></div>
+                  <div
+                    class="absolute bottom-full left-1/2 -translate-x-1/2 border-[7px] border-transparent border-b-amber-600/50 -z-10 mb-[1px]"
+                  ></div>
+                } @else {
+                  <div
+                    class="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-[#020617]/95"
+                  ></div>
+                  <div
+                    class="absolute top-full left-1/2 -translate-x-1/2 border-[7px] border-transparent border-t-amber-600/50 -z-10 mt-[1px]"
+                  ></div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="shrink-0 mb-4 flex justify-center w-full animate-fade-in">
+        <button
+          class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-400 transition-colors bg-[#1b2028] px-6 py-2 rounded-full border border-slate-700 shadow-lg"
+          (click)="prevStep()"
+        >
+          ← Étape précédente
+        </button>
+      </div>
+    }
+
+    @if (selectedCiv(); as civ) {
+      <div
+        class="w-full max-w-4xl flex-grow bg-[#171b22] border-2 border-slate-700 rounded-xl shadow-2xl relative overflow-hidden animate-fade-in mt-2 mb-4 mx-4 flex flex-col min-h-0"
+      >
+        <div
+          class="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-amber-500/20 rounded-tl-xl pointer-events-none z-10"
+        ></div>
+        <div
+          class="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-amber-500/20 rounded-tr-xl pointer-events-none z-10"
+        ></div>
+
+        <div class="flex-grow overflow-y-auto custom-scrollbar p-6 md:p-10 flex flex-col">
+          <div class="flex flex-col items-center mb-10 border-b border-slate-700 pb-8 relative">
+            <span class="text-6xl drop-shadow-[0_0_15px_rgba(245,158,11,0.2)] mb-4">
+              {{ getIconForCiv(civ.id) }}
+            </span>
+            <h3
+              class="text-4xl font-bold text-amber-500 font-serif tracking-widest uppercase text-center"
+            >
+              {{ civ.name }}
+            </h3>
+          </div>
+
+          <div class="mb-10 bg-[#1b2028] p-6 rounded-lg border border-slate-700/50 shadow-inner">
+            <p class="text-sm text-slate-300 leading-loose text-justify italic">
+              {{ civ.lore.fullDescription }}
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+            <div class="flex flex-col gap-4">
+              <h4
+                class="text-lg font-bold text-slate-100 border-b border-amber-600/50 pb-2 font-serif flex items-center gap-2"
+              >
+                <span class="text-amber-500">👥</span> Peuples Habitants
+              </h4>
+
+              <div class="bg-[#1b2028] p-4 rounded border border-slate-700/30">
+                <span
+                  class="block text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1"
+                  >Peuples Majoritaires</span
+                >
+                <span class="text-sm text-emerald-400 font-medium">{{
+                  primarySpecies().join(', ')
+                }}</span>
+              </div>
+
+              @if (secondarySpecies().length > 0) {
+                <div class="bg-[#1b2028] p-4 rounded border border-slate-700/30">
+                  <span
+                    class="block text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1"
+                    >Minoritaires</span
+                  >
+                  <span class="text-sm text-slate-300">{{ secondarySpecies().join(', ') }}</span>
+                </div>
+              }
+
+              @if (civ.demographics.isCosmopolitan) {
+                <div class="bg-amber-900/10 p-4 rounded border border-amber-700/30">
+                  <span
+                    class="block text-[10px] text-amber-500 uppercase tracking-widest font-bold mb-1"
+                    >Cosmopolite</span
+                  >
+                  <span class="text-sm text-amber-400"
+                    >Cette région brasse d'innombrables cultures.</span
+                  >
+                </div>
+              }
+            </div>
+
+            <div class="flex flex-col gap-4">
+              <h4
+                class="text-lg font-bold text-slate-100 border-b border-amber-600/50 pb-2 font-serif flex items-center gap-2"
+              >
+                <span class="text-amber-500">📜</span> Culture & Savoir
+              </h4>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div class="bg-[#1b2028] p-4 rounded border border-slate-700/30">
+                  <span
+                    class="block text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1"
+                    >Langues</span
+                  >
+                  <span class="text-sm text-slate-200">{{ officialLanguages().join(', ') }}</span>
+                </div>
+                <div class="bg-[#1b2028] p-4 rounded border border-slate-700/30">
+                  <span
+                    class="block text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1"
+                    >Écritures</span
+                  >
+                  <span class="text-sm text-slate-200">{{ writingSystems().join(', ') }}</span>
+                </div>
+              </div>
+
+              @if (civ.lore.geographyTags.length > 0) {
+                <div class="mt-2">
+                  <span
+                    class="block text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-2"
+                    >Géographie</span
+                  >
+                  <div class="flex flex-wrap gap-2">
+                    @for (tag of civ.lore.geographyTags; track tag) {
+                      <span
+                        class="px-3 py-1 bg-slate-900 text-[11px] text-amber-500/80 rounded border border-slate-700 shadow-sm"
+                      >
+                        #{{ tag }}
+                      </span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="mt-auto pt-8 border-t-2 border-slate-700 flex flex-col items-center shrink-0">
+            @if (!isConfirmed()) {
+              <p class="text-sm text-slate-400 mb-4 italic text-center">
+                Avez-vous décidé de faire de cette contrée la vôtre ?
+              </p>
+              <button
+                class="px-14 py-4 rounded-xl text-sm font-black uppercase tracking-widest text-slate-900 bg-amber-500 hover:bg-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.2)] transition-all transform hover:scale-105 active:scale-95"
+                (click)="confirmSelection()"
+              >
+                Forger ses origines
+              </button>
+            } @else {
+              <div class="flex flex-col items-center gap-4">
+                <div
+                  class="inline-flex items-center gap-3 px-6 py-3 bg-emerald-950/40 text-emerald-400 border border-emerald-800/50 rounded-lg text-sm font-black uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.1)]"
+                >
+                  <span class="text-lg">✓</span> Terre natale confirmée
+                </div>
+              </div>
+            }
+
+            <button
+              class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-400 transition-colors bg-[#1b2028] px-6 py-2 rounded-full border border-slate-700 mt-6 shadow-lg"
+              (click)="prevStep()"
+            >
+              ← Étape précédente
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>

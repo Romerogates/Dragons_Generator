@@ -1,0 +1,53 @@
+<section class="species-summary">
+  <header class="page-header">
+    <h1>Résumé des espèces</h1>
+    <p class="subtitle">Vue compacte des principales caractéristiques</p>
+  </header>
+
+  @if (isLoading()) {
+    <p class="loading">Chargement…</p>
+  } @else if (error()) {
+    <p class="error">{{ error() }}</p>
+  } @else if (summaries().length === 0) {
+    <p class="empty">Aucune espèce trouvée.</p>
+  } @else {
+    <p class="count">{{ summaries().length }} espèce(s)</p>
+
+    <div class="table-wrapper">
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Taille</th>
+            <th>Vitesse</th>
+            <th>Vision nocturne</th>
+            <th>Sous-espèces jouables</th>
+            <th>Détails</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of summaries(); track s.id) {
+            <tr>
+              <td>
+                <a [routerLink]="['/species', s.id]">{{ s.name }}</a>
+              </td>
+              <td>{{ s.size }}</td>
+              <td>{{ s.speedM }} m</td>
+              <td>
+                @if (s.darkvisionM > 0) {
+                  {{ s.darkvisionM }} m
+                } @else {
+                  —
+                }
+              </td>
+              <td>{{ s.playableSubspeciesCount }}</td>
+              <td>
+                <a class="link" [routerLink]="['/species', s.id]">Voir →</a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

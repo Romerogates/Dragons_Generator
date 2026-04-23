@@ -1,0 +1,127 @@
+<div
+  class="relative w-full flex flex-col items-center animate-fade-in py-6 sm:py-10 select-none min-h-[65vh]"
+>
+  <!-- En-tête -->
+  <div class="text-center mb-6 w-full px-4">
+    <h2 class="text-4xl font-extrabold text-amber-500 mb-2 drop-shadow-md tracking-wide font-serif">
+      Registre du Héros
+    </h2>
+    <p class="text-slate-400 text-xs max-w-xl mx-auto italic">
+      La légende est forgée. Voici l'aperçu de ta fiche.
+    </p>
+  </div>
+
+  <!-- === ZONE DE PREVIEW PDF === -->
+  <div class="w-full max-w-3xl px-4 flex flex-col gap-3 pb-4">
+    <!-- Barre d'outils du viewer -->
+    <div
+      class="flex items-center justify-between bg-[#1b2028] border border-slate-700 rounded-xl px-4 py-2.5 shadow-md"
+    >
+      <div class="flex items-center gap-2">
+        <span
+          class="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.6)]"
+        ></span>
+        <span class="text-xs font-black uppercase tracking-widest text-slate-400">
+          Aperçu de la fiche
+        </span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button
+          class="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-amber-400 transition-colors bg-[#171b22] px-3 py-1.5 rounded-lg border border-slate-700"
+          [disabled]="isLoadingPreview()"
+          (click)="goToStep(8)"
+        >
+          ✏️ Modifier
+        </button>
+        <button
+          class="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-sky-400 transition-colors bg-[#171b22] px-3 py-1.5 rounded-lg border border-slate-700 disabled:opacity-40"
+          [disabled]="isLoadingPreview() || !pdfPreviewUrl()"
+          (click)="openFullscreen()"
+        >
+          ⛶ Plein écran
+        </button>
+      </div>
+    </div>
+
+    <!-- Viewer -->
+    <div
+      class="relative w-full rounded-xl overflow-hidden border border-slate-700 shadow-2xl bg-[#0f1117]"
+      style="height: 75vh"
+    >
+      <!-- Loading -->
+      @if (isLoadingPreview()) {
+        <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[#0f1117]">
+          <div
+            class="w-12 h-12 rounded-full border-4 border-slate-700 border-t-amber-500 animate-spin"
+          ></div>
+          <p class="text-slate-400 text-xs font-black uppercase tracking-widest animate-pulse">
+            Génération en cours…
+          </p>
+        </div>
+      }
+
+      <!-- iFrame PDF -->
+      @if (!isLoadingPreview() && pdfPreviewUrl()) {
+        <iframe
+          [src]="pdfPreviewUrl()"
+          class="w-full h-full border-0"
+          title="Aperçu de la fiche personnage"
+          type="application/pdf"
+        ></iframe>
+      }
+
+      <!-- Erreur -->
+      @if (!isLoadingPreview() && !pdfPreviewUrl()) {
+        <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0f1117]">
+          <span class="text-3xl">⚠️</span>
+          <p class="text-slate-400 text-xs text-center max-w-xs">
+            L'aperçu n'a pas pu être généré. Tu peux quand même sauvegarder et exporter le PDF.
+          </p>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination info (cosmétique) -->
+    @if (!isLoadingPreview() && pdfPreviewUrl()) {
+      <p class="text-center text-[10px] text-slate-600 italic">
+        Utilise la molette ou les flèches du viewer pour naviguer entre les pages
+      </p>
+    }
+  </div>
+
+  <!-- === ACTIONS === -->
+  <div
+    class="mt-4 flex flex-col sm:flex-row justify-center items-center gap-4 w-full max-w-3xl px-4 border-t border-slate-800/50 pt-8"
+  >
+    <button
+      class="px-10 py-4 rounded-xl text-xs font-black uppercase tracking-widest bg-emerald-600 text-white shadow-[0_0_25px_rgba(16,185,129,0.3)] hover:bg-emerald-500 hover:scale-105 active:scale-95 transition-all w-full sm:w-auto"
+      (click)="saveCharacter()"
+    >
+      💾 {{ isEditMode() ? 'Mettre à jour' : 'Sauvegarder le héros' }}
+    </button>
+
+    <button
+      class="px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 hover:text-white hover:border-slate-500 transition-all w-full sm:w-auto disabled:opacity-40"
+      [disabled]="isLoadingPreview()"
+      (click)="downloadPdf()"
+    >
+      📄 Télécharger PDF
+    </button>
+
+    <button
+      class="px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest bg-amber-500 text-slate-900 shadow-[0_0_15px_rgba(245,158,11,0.2)] hover:bg-amber-400 hover:scale-105 transition-all w-full sm:w-auto"
+      (click)="createAnother()"
+    >
+      ✨ Créer un nouveau
+    </button>
+  </div>
+
+  <div class="flex justify-center mt-4">
+    <button
+      class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-400 transition-colors bg-[#1b2028] px-6 py-2 rounded-full border border-slate-700 shadow-lg"
+      (click)="prevStep()"
+    >
+      ← Revenir à l'étape précédente
+    </button>
+  </div>
+</div>

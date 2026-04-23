@@ -1,0 +1,239 @@
+<div
+  class="w-full flex flex-col animate-fade-in select-none bg-[#171b22] text-slate-300 min-h-screen pb-20"
+>
+  <section
+    class="relative w-full flex flex-col items-center justify-center overflow-hidden border-b border-slate-800 pt-16 pb-12 md:pt-24 md:pb-16"
+  >
+    <div
+      class="absolute inset-0 z-0 bg-[#0a0d13] opacity-90"
+      style="
+        background-image: radial-gradient(
+          circle at 50% 50%,
+          rgba(217, 70, 239, 0.08) 2px,
+          transparent 2px
+        );
+        background-size: 40px 40px;
+      "
+    ></div>
+    <div
+      class="absolute inset-0 z-0 bg-gradient-to-b from-transparent via-[#171b22]/80 to-[#171b22]"
+    ></div>
+
+    <div class="relative z-10 flex flex-col items-center text-center px-4 w-full max-w-4xl">
+      <div class="flex items-center gap-6 mb-8 w-full">
+        <div class="h-px flex-grow bg-gradient-to-r from-transparent to-slate-700"></div>
+        <h1
+          class="text-4xl md:text-6xl font-extrabold text-slate-100 font-serif tracking-widest uppercase drop-shadow-2xl text-center"
+        >
+          Le Grimoire
+          <span
+            class="text-fuchsia-500 bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-400 to-fuchsia-600"
+            >Arcanique</span
+          >
+        </h1>
+        <div class="h-px flex-grow bg-gradient-to-l from-transparent to-slate-700"></div>
+      </div>
+
+      <p
+        class="text-sm md:text-base text-slate-400 italic mb-8 max-w-xl leading-relaxed font-serif"
+      >
+        Des simples tours de magie aux rituels capables de plier la réalité. Manipulez la Toile
+        selon votre volonté.
+      </p>
+
+      <div class="flex flex-wrap justify-center gap-4 mb-8">
+        <a
+          routerLink="/spells/schools"
+          class="px-5 py-2.5 bg-[#1b2028] border border-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-300 hover:bg-[#1f242e] hover:border-fuchsia-500 hover:text-fuchsia-400 transition-all shadow-lg flex items-center gap-2"
+        >
+          <span>👁️</span> Écoles de Magie
+        </a>
+        <a
+          routerLink="/spells/level/0"
+          class="px-5 py-2.5 bg-[#1b2028] border border-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-300 hover:bg-[#1f242e] hover:border-sky-500 hover:text-sky-400 transition-all shadow-lg flex items-center gap-2"
+        >
+          <span>📈</span> Parcourir par Niveau
+        </a>
+      </div>
+
+      <div class="relative w-full max-w-lg group">
+        <div
+          class="absolute inset-0 bg-fuchsia-500/20 blur-[30px] rounded-full group-focus-within:bg-fuchsia-500/30 transition-colors duration-700"
+        ></div>
+        <div class="relative flex items-center">
+          <span
+            class="absolute left-6 text-slate-500 text-lg group-focus-within:text-fuchsia-400 transition-colors"
+            >🔍</span
+          >
+          <input
+            type="search"
+            placeholder="Rechercher un sortilège (ex: Boule de feu)..."
+            [value]="search()"
+            (input)="onSearch($any($event.target).value)"
+            class="w-full bg-[#1b2028]/80 backdrop-blur-md border-2 border-slate-700 rounded-full py-4 pl-14 pr-6 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-fuchsia-500/70 focus:ring-1 focus:ring-fuchsia-500/50 shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="w-full relative z-20 px-4 max-w-7xl mx-auto flex flex-col items-center mt-10">
+    @if (error(); as errorMsg) {
+      <div
+        class="flex flex-col items-center justify-center py-20 text-center bg-[#1b2028]/90 backdrop-blur-lg border border-red-900/50 rounded-3xl shadow-2xl w-full max-w-lg"
+      >
+        <span class="text-7xl mb-6 drop-shadow-[0_0_20px_rgba(220,38,38,0.4)] animate-pulse"
+          >🔥</span
+        >
+        <h2 class="text-2xl font-bold text-red-500 font-serif tracking-widest uppercase mb-4">
+          Déchirure de la Toile
+        </h2>
+        <p class="text-slate-400 italic">{{ errorMsg }}</p>
+      </div>
+    } @else if (spells() === null) {
+      <div class="flex flex-col items-center justify-center py-20 animate-pulse text-fuchsia-500">
+        <span class="text-6xl mb-4">🪄</span>
+        <p class="text-lg font-serif tracking-widest uppercase text-slate-400">
+          Déchiffrement des runes...
+        </p>
+      </div>
+    } @else {
+      <div class="w-full flex justify-between items-end mb-6 border-b border-slate-800 pb-2">
+        <p class="text-fuchsia-500/80 text-[10px] font-black uppercase tracking-widest">
+          {{ filteredSpells().length }} sort(s) invoqué(s)
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+        @for (spell of filteredSpells(); track spell.id) {
+          <article
+            class="bg-[#1b2028] rounded-2xl border border-slate-800 shadow-xl group hover:border-fuchsia-500/50 transition-all duration-300 hover:-translate-y-1 flex flex-col overflow-hidden relative"
+          >
+            <div
+              class="absolute -top-4 -right-4 text-8xl opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-500"
+            >
+              {{ getSchoolIcon(spell.school) }}
+            </div>
+
+            <div class="p-6 flex flex-col h-full relative z-10">
+              <header class="flex justify-between items-start mb-2">
+                <h2
+                  class="text-xl font-bold text-fuchsia-400 font-serif tracking-wide leading-tight group-hover:text-fuchsia-300 transition-colors"
+                >
+                  <a
+                    [routerLink]="['/spells', spell.id]"
+                    class="hover:underline decoration-fuchsia-500/30 underline-offset-4"
+                  >
+                    {{ spell.name }}
+                  </a>
+                </h2>
+                <div class="flex-shrink-0 ml-4 flex flex-col items-end">
+                  <span class="text-2xl drop-shadow-md">{{ getSchoolIcon(spell.school) }}</span>
+                </div>
+              </header>
+
+              <div class="mb-4 flex flex-wrap items-center gap-2">
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  {{ spell.level === 0 ? 'Tour de magie' : 'Niveau ' + spell.level }}
+                  <span class="mx-1 text-slate-700">|</span>
+                  {{ spell.school }}
+                </span>
+              </div>
+
+              <div class="flex flex-wrap gap-2 mb-6">
+                @if (spell.isRitual) {
+                  <span
+                    class="bg-emerald-950/40 text-emerald-400 border border-emerald-900/50 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider"
+                    >Rituel</span
+                  >
+                }
+                @if (spell.isConcentration) {
+                  <span
+                    class="bg-amber-950/40 text-amber-400 border border-amber-900/50 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider"
+                    >Concentration</span
+                  >
+                }
+                @if (spell.isCorrupted) {
+                  <span
+                    class="bg-rose-950/40 text-rose-400 border border-rose-900/50 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider"
+                    >Corrompu</span
+                  >
+                }
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 mb-6 mt-auto">
+                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
+                  <span class="text-[8px] text-slate-500 uppercase tracking-widest font-bold mb-0.5"
+                    >Incantation</span
+                  >
+                  <span class="text-xs text-slate-300 font-medium">{{
+                    formatMeta(spell.castingTime)
+                  }}</span>
+                </div>
+                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
+                  <span class="text-[8px] text-slate-500 uppercase tracking-widest font-bold mb-0.5"
+                    >Portée</span
+                  >
+                  <span class="text-xs text-slate-300 font-medium">{{
+                    formatMeta(spell.range)
+                  }}</span>
+                </div>
+                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
+                  <span class="text-[8px] text-slate-500 uppercase tracking-widest font-bold mb-0.5"
+                    >Durée</span
+                  >
+                  <span class="text-xs text-slate-300 font-medium">{{
+                    formatMeta(spell.duration)
+                  }}</span>
+                </div>
+                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
+                  <span class="text-[8px] text-slate-500 uppercase tracking-widest font-bold mb-0.5"
+                    >Composantes</span
+                  >
+                  <span class="text-xs text-fuchsia-400 font-bold tracking-widest">{{
+                    formatComponents(spell.components)
+                  }}</span>
+                </div>
+              </div>
+
+              <p class="text-xs text-slate-400 leading-relaxed italic line-clamp-3 mb-6">
+                {{ spell.description }}
+              </p>
+
+              @if (spell.classes.length > 0) {
+                <div class="border-t border-slate-800 pt-4 mb-4">
+                  <span
+                    class="text-[9px] font-black uppercase tracking-widest text-slate-600 block mb-1"
+                    >Invocateurs</span
+                  >
+                  <p class="text-[10px] text-slate-400 uppercase tracking-wider">
+                    {{ spell.classes.join(' · ') }}
+                  </p>
+                </div>
+              }
+
+              <footer class="mt-auto">
+                <a
+                  [routerLink]="['/spells', spell.id]"
+                  class="w-full block text-center bg-fuchsia-950/20 hover:bg-fuchsia-900/40 text-fuchsia-500 border border-fuchsia-900/30 rounded-lg py-2 text-[10px] font-black uppercase tracking-widest transition-colors"
+                >
+                  Déchiffrer le sort
+                </a>
+              </footer>
+            </div>
+          </article>
+        } @empty {
+          <div class="col-span-full py-24 text-center">
+            <span class="text-6xl mb-6 block opacity-30">🕸️</span>
+            <h3 class="text-slate-300 font-serif text-2xl font-bold tracking-wide mb-2">
+              Recherche vaine
+            </h3>
+            <p class="text-slate-500 text-sm italic">
+              Aucun sort ne correspond à ces mots de pouvoir.
+            </p>
+          </div>
+        }
+      </div>
+    }
+  </section>
+</div>

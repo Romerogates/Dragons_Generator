@@ -1,0 +1,54 @@
+<div class="spells-summary-page">
+  <header class="page-header">
+    <h1>Sorts — Résumé</h1>
+    @if (spells(); as list) {
+      <span class="count">{{ list.length }} sort{{ list.length > 1 ? 's' : '' }}</span>
+    }
+  </header>
+
+  @if (error(); as errorMsg) {
+    <div class="state state--error">{{ errorMsg }}</div>
+  } @else if (spells() === null) {
+    <div class="state state--loading">Chargement…</div>
+  } @else if (spells()!.length === 0) {
+    <div class="state state--empty">Aucun sort trouvé.</div>
+  } @else {
+    <table class="spells-table">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Niveau</th>
+          <th>École</th>
+          <th>Propriétés</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (spell of spells(); track spell.id) {
+          <tr>
+            <td>
+              <a [routerLink]="['/spells', spell.id]">{{ spell.name }}</a>
+            </td>
+            <td>{{ spell.level }}</td>
+            <td class="school">{{ spell.school }}</td>
+            <td>
+              <ul class="badges">
+                @if (spell.isRitual) {
+                  <li class="badge badge--ritual">Rituel</li>
+                }
+                @if (spell.isConcentration) {
+                  <li class="badge badge--concentration">Concentration</li>
+                }
+                @if (spell.isCorrupted) {
+                  <li class="badge badge--corrupted">Corrompu</li>
+                }
+                @if (!spell.isRitual && !spell.isConcentration && !spell.isCorrupted) {
+                  <li class="badge badge--none">—</li>
+                }
+              </ul>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

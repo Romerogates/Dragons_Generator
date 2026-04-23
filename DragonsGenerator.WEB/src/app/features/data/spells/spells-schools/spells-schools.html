@@ -1,0 +1,81 @@
+<div class="w-full min-h-screen bg-[#171b22] flex flex-col animate-fade-in select-none pb-20">
+  <section class="w-full py-16 px-4 max-w-6xl mx-auto flex flex-col items-center">
+    <div class="w-full max-w-5xl mb-8">
+      <a
+        routerLink="/spells"
+        class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-fuchsia-500 transition-colors group"
+      >
+        <span class="group-hover:-translate-x-1 transition-transform">←</span> Retour au Grimoire
+      </a>
+    </div>
+
+    <div class="flex items-center gap-6 mb-12 w-full max-w-3xl">
+      <div class="h-px flex-grow bg-gradient-to-r from-transparent to-slate-700"></div>
+      <h1
+        class="text-3xl md:text-4xl font-bold text-slate-200 font-serif tracking-widest uppercase drop-shadow-md text-center"
+      >
+        Les Écoles de <span class="text-fuchsia-500">Magie</span>
+      </h1>
+      <div class="h-px flex-grow bg-gradient-to-l from-transparent to-slate-700"></div>
+    </div>
+
+    @if (error(); as errorMsg) {
+      <div
+        class="p-4 bg-red-950/50 border border-red-900 rounded-xl text-center shadow-lg w-full max-w-lg"
+      >
+        <p class="text-red-400 font-medium">{{ errorMsg }}</p>
+      </div>
+    } @else if (schools() === null) {
+      <div class="flex flex-col items-center justify-center py-20 animate-pulse text-fuchsia-500">
+        <span class="text-6xl mb-4">🪄</span>
+        <p class="text-lg font-serif tracking-widest uppercase text-slate-400">
+          Analyse des flux arcaniques...
+        </p>
+      </div>
+    } @else if (schools()!.length === 0) {
+      <div class="col-span-full py-20 text-center">
+        <span class="text-6xl mb-6 block opacity-30">🕸️</span>
+        <p class="text-slate-500 italic font-serif text-lg">
+          Aucune école de magie n'est consignée ici.
+        </p>
+      </div>
+    } @else {
+      <div
+        class="w-full max-w-5xl flex justify-between items-end mb-6 border-b border-slate-800 pb-2"
+      >
+        <p class="text-fuchsia-500/80 text-[10px] font-black uppercase tracking-widest">
+          {{ schools()!.length }} école(s) identifiée(s)
+        </p>
+      </div>
+
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-5xl"
+      >
+        @for (school of schools(); track school) {
+          <a
+            [routerLink]="['/spells/school', school]"
+            class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl group hover:border-fuchsia-500/50 hover:bg-[#1f242e] transition-all duration-300 hover:-translate-y-2 flex flex-col items-center text-center relative overflow-hidden"
+          >
+            <div
+              class="absolute -top-4 -right-4 text-7xl opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-500"
+            >
+              {{ getSchoolIcon(school) }}
+            </div>
+
+            <span
+              class="text-5xl mb-4 drop-shadow-[0_0_15px_rgba(217,70,239,0.2)] group-hover:scale-110 transition-transform origin-bottom relative z-10"
+            >
+              {{ getSchoolIcon(school) }}
+            </span>
+
+            <h2
+              class="text-lg font-bold text-slate-300 font-serif tracking-widest uppercase group-hover:text-fuchsia-400 transition-colors relative z-10"
+            >
+              {{ school }}
+            </h2>
+          </a>
+        }
+      </div>
+    }
+  </section>
+</div>

@@ -1,0 +1,229 @@
+<div class="w-full min-h-screen bg-[#171b22] text-slate-300 animate-fade-in select-none pb-20">
+  <div class="max-w-5xl mx-auto px-4 pt-10">
+    <a
+      routerLink="/spells"
+      class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-fuchsia-500 transition-colors mb-8 group"
+    >
+      <span class="group-hover:-translate-x-1 transition-transform">←</span> Retour au Grimoire
+    </a>
+
+    @if (spell() === undefined) {
+      <div class="flex flex-col items-center justify-center py-32 animate-pulse text-fuchsia-500">
+        <span class="text-6xl mb-6">🪄</span>
+        <p class="text-lg font-serif tracking-widest uppercase text-slate-400">
+          Déchiffrement des runes...
+        </p>
+      </div>
+    } @else if (notFound()) {
+      <div class="flex flex-col items-center justify-center py-32 text-center">
+        <span class="text-7xl mb-6 drop-shadow-[0_0_20px_rgba(220,38,38,0.4)] animate-pulse"
+          >🔥</span
+        >
+        <h2
+          class="text-3xl md:text-4xl font-bold text-red-500 font-serif tracking-widest uppercase mb-4"
+        >
+          Sortilège Perdu
+        </h2>
+        <p class="text-lg text-slate-400 italic max-w-md leading-relaxed mb-8">
+          Cette page a été arrachée du grimoire ou n'a jamais existé.
+        </p>
+        <a
+          routerLink="/spells"
+          class="px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all border border-slate-700 shadow-lg hover:-translate-y-1"
+          >Fermer ce livre</a
+        >
+      </div>
+    } @else if (error(); as errorMsg) {
+      <div
+        class="p-4 bg-red-950/50 border border-red-900 rounded-xl text-center shadow-lg w-full max-w-lg mx-auto mt-10"
+      >
+        <p class="text-red-400 font-medium">{{ errorMsg }}</p>
+      </div>
+    } @else if (spell(); as s) {
+      <header class="text-center mb-12">
+        <span class="text-5xl drop-shadow-md mb-4 block cursor-default">{{
+          getSchoolIcon(s.school)
+        }}</span>
+        <h1
+          class="text-4xl md:text-6xl font-extrabold text-fuchsia-400 font-serif tracking-wide mb-6 drop-shadow-lg"
+        >
+          {{ s.name }}
+        </h1>
+
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <a
+            [routerLink]="['/spells/level', s.level]"
+            class="bg-[#1b2028] text-slate-300 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider border border-slate-700 shadow-inner hover:border-fuchsia-500 hover:text-fuchsia-400 transition-colors"
+          >
+            {{ levelLabel(s.level) }}
+          </a>
+          <span class="text-slate-700">•</span>
+          <a
+            [routerLink]="['/spells/school', s.school]"
+            class="bg-[#1b2028] text-slate-300 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider border border-slate-700 shadow-inner hover:border-fuchsia-500 hover:text-fuchsia-400 transition-colors"
+          >
+            {{ s.school }}
+          </a>
+        </div>
+
+        @if (s.isRitual || s.isConcentration || s.isCorrupted) {
+          <div class="flex justify-center gap-3 mt-6">
+            @if (s.isRitual) {
+              <span
+                class="bg-emerald-950/40 text-emerald-400 border border-emerald-900/50 px-3 py-1 rounded text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1"
+                ><span class="text-sm">📖</span> Rituel</span
+              >
+            }
+            @if (s.isConcentration) {
+              <span
+                class="bg-amber-950/40 text-amber-400 border border-amber-900/50 px-3 py-1 rounded text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1"
+                ><span class="text-sm">🧠</span> Concentration</span
+              >
+            }
+            @if (s.isCorrupted) {
+              <span
+                class="bg-rose-950/40 text-rose-400 border border-rose-900/50 px-3 py-1 rounded text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1"
+                ><span class="text-sm">☠️</span> Corrompu</span
+              >
+            }
+          </div>
+        }
+      </header>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="col-span-1 flex flex-col gap-6">
+          <section class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800 shadow-xl relative">
+            <h2
+              class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-5"
+            >
+              Paramètres d'Incantation
+            </h2>
+
+            <dl class="space-y-5">
+              <div>
+                <dt
+                  class="text-[10px] uppercase tracking-widest text-fuchsia-600 font-bold mb-1 flex items-center gap-2"
+                >
+                  <span class="text-sm">⏳</span> Temps d'incantation
+                </dt>
+                <dd class="text-sm text-slate-200 font-medium">{{ formatMeta(s.castingTime) }}</dd>
+              </div>
+
+              <div>
+                <dt
+                  class="text-[10px] uppercase tracking-widest text-sky-600 font-bold mb-1 flex items-center gap-2"
+                >
+                  <span class="text-sm">📏</span> Portée
+                </dt>
+                <dd class="text-sm text-slate-200 font-medium">{{ formatMeta(s.range) }}</dd>
+              </div>
+
+              <div>
+                <dt
+                  class="text-[10px] uppercase tracking-widest text-emerald-600 font-bold mb-1 flex items-center gap-2"
+                >
+                  <span class="text-sm">⏱️</span> Durée
+                </dt>
+                <dd class="text-sm text-slate-200 font-medium">{{ formatMeta(s.duration) }}</dd>
+              </div>
+
+              <div class="pt-4 border-t border-slate-800/50">
+                <dt
+                  class="text-[10px] uppercase tracking-widest text-amber-600 font-bold mb-2 flex items-center gap-2"
+                >
+                  <span class="text-sm">🧪</span> Composantes
+                </dt>
+                <dd
+                  class="text-xs text-slate-300 leading-relaxed bg-[#171b22] p-3 rounded-lg border border-slate-700/50"
+                >
+                  {{ formatComponents(s.components) }}
+                </dd>
+              </div>
+            </dl>
+          </section>
+
+          @if (s.classes.length > 0) {
+            <section class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800 shadow-xl">
+              <h2
+                class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-4"
+              >
+                Invocateurs Capables
+              </h2>
+              <div class="flex flex-wrap gap-2">
+                @for (className of s.classes; track className) {
+                  <span
+                    class="bg-slate-900 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold tracking-wider"
+                  >
+                    {{ className }}
+                  </span>
+                }
+              </div>
+            </section>
+          }
+        </div>
+
+        <div class="col-span-1 lg:col-span-2 flex flex-col gap-8">
+          <section
+            class="bg-[#1b2028] p-8 md:p-10 rounded-3xl border border-slate-800 shadow-xl relative overflow-hidden group hover:border-fuchsia-500/30 transition-colors"
+          >
+            <div
+              class="absolute -top-6 -right-6 text-9xl opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-500"
+            >
+              {{ getSchoolIcon(s.school) }}
+            </div>
+
+            <h2
+              class="relative z-10 text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-3"
+            >
+              <span class="text-fuchsia-500">📜</span> Description
+            </h2>
+
+            <p
+              class="relative z-10 text-sm md:text-base text-slate-300 leading-relaxed whitespace-pre-wrap"
+            >
+              {{ s.description }}
+            </p>
+          </section>
+
+          @if (s.higherLevels) {
+            <section
+              class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl relative border-t-4 border-t-fuchsia-900/50"
+            >
+              <h2
+                class="text-sm font-black text-fuchsia-500 uppercase tracking-widest mb-3 flex items-center gap-2"
+              >
+                <span class="text-lg">⚡</span> Aux niveaux supérieurs
+              </h2>
+              <p class="text-sm text-slate-300 leading-relaxed italic">
+                {{ s.higherLevels }}
+              </p>
+            </section>
+          }
+
+          @if (s.modularOptions.length > 0) {
+            <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl">
+              <h2
+                class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-3"
+              >
+                <span class="text-sky-500">⚙️</span> Options Modulaires
+              </h2>
+
+              <div class="space-y-4">
+                @for (option of s.modularOptions; track option.name) {
+                  <article
+                    class="bg-[#171b22] border border-slate-700/50 p-5 rounded-xl hover:border-sky-500/30 transition-colors"
+                  >
+                    <h3 class="text-sm font-bold text-sky-400 mb-2 font-serif">
+                      {{ option.name }}
+                    </h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">{{ option.description }}</p>
+                  </article>
+                }
+              </div>
+            </section>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

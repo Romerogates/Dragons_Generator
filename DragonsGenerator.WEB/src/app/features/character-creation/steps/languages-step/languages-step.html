@@ -1,0 +1,201 @@
+<div
+  class="relative w-full flex flex-col items-center animate-fade-in py-4 sm:py-8 select-none justify-center min-h-[65vh]"
+>
+  <div class="text-center mb-8 w-full px-4 mt-2">
+    <h2 class="text-3xl font-extrabold text-amber-500 mb-1 drop-shadow-md tracking-wide font-serif">
+      Langues & Dialectes
+    </h2>
+    <p class="text-slate-400 text-xs max-w-xl mx-auto italic">
+      Maîtrisez la langue de vos ancêtres ou découvrez de nouveaux horizons.
+    </p>
+  </div>
+
+  @if (loading()) {
+    <div
+      class="flex justify-center items-center p-8 bg-[#1b2028] border border-slate-700 rounded-xl w-full max-w-lg shadow-lg"
+    >
+      <div
+        class="w-8 h-8 border-4 border-amber-500/30 border-t-amber-500 rounded-full animate-spin"
+      ></div>
+    </div>
+  }
+
+  @if (!loading() && !error()) {
+    <div class="w-full max-w-6xl px-4 flex flex-col items-center pb-8">
+      <div class="w-full flex flex-col items-center mb-10">
+        <div class="flex items-center gap-6 mb-8 w-full max-w-3xl">
+          <div
+            class="h-px flex-grow bg-gradient-to-r from-transparent via-emerald-900/50 to-slate-700"
+          ></div>
+          <h3 class="text-base font-bold text-emerald-500 font-serif tracking-widest uppercase">
+            Langues Connues
+          </h3>
+          <div
+            class="h-px flex-grow bg-gradient-to-l from-transparent via-emerald-900/50 to-slate-700"
+          ></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 w-full max-w-4xl">
+          @for (lang of currentLanguages(); track lang.name) {
+            <div class="relative w-full group transition-all duration-300">
+              <div
+                class="absolute -inset-2 bg-emerald-500/10 rounded-2xl blur-xl transition-opacity duration-300 pointer-events-none"
+                [ngClass]="lang.isLocked ? 'opacity-100' : 'opacity-50'"
+              ></div>
+
+              <div
+                class="relative flex flex-col h-full p-1.5 rounded-xl bg-[#171b22] border border-emerald-500/40 shadow-lg"
+              >
+                <div
+                  class="w-full h-full border border-slate-700/30 rounded-lg flex flex-col p-4 bg-[#1b2028]"
+                >
+                  <div class="flex justify-between items-start mb-3 gap-2">
+                    <div class="flex flex-col">
+                      <span class="text-lg font-bold text-slate-100 font-serif tracking-wide">{{
+                        lang.name
+                      }}</span>
+                      <span
+                        class="text-[9px] font-black uppercase tracking-widest mt-0.5"
+                        [ngClass]="lang.isLocked ? 'text-emerald-500/80' : 'text-amber-500/80'"
+                        >Origine : {{ lang.source }}</span
+                      >
+                    </div>
+                    <div class="flex items-center gap-2">
+                      @if (lang.data) {
+                        <button
+                          class="w-7 h-7 rounded-lg bg-[#171b22] border border-slate-700 flex items-center justify-center text-xs text-slate-400 hover:text-amber-400"
+                          (click)="toggleDetail(lang.data!.id)"
+                        >
+                          {{ isExpanded(lang.data!.id) ? '▲' : '▼' }}
+                        </button>
+                      }
+                      @if (!lang.isLocked) {
+                        <button
+                          class="w-7 h-7 rounded-lg bg-red-950/30 border border-red-900/50 flex items-center justify-center text-xs text-red-500 hover:text-red-400"
+                          (click)="removeLanguage(lang.name)"
+                        >
+                          ✕
+                        </button>
+                      }
+                    </div>
+                  </div>
+
+                  @if (lang.data) {
+                    <div class="flex flex-wrap gap-2 mt-auto">
+                      <span
+                        class="bg-[#171b22] border border-slate-700/50 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest shadow-inner"
+                        [ngClass]="{
+                          'text-slate-400': lang.data!.category === 'base',
+                          'text-cyan-400 border-cyan-900/50': lang.data!.category === 'exotique',
+                          'text-red-400 border-red-900/50': lang.data!.category === 'secret',
+                        }"
+                      >
+                        {{ lang.data!.category }}
+                      </span>
+                    </div>
+
+                    @if (isExpanded(lang.data!.id)) {
+                      <div
+                        class="mt-4 pt-3 border-t border-slate-800/80 flex flex-col gap-3 animate-[fadeIn_0.2s_ease]"
+                      >
+                        <p class="text-[11px] text-slate-300 italic leading-relaxed text-justify">
+                          "{{ lang.data!.lore.fullDescription }}"
+                        </p>
+                        <div class="flex flex-col gap-1.5 mt-1 text-[10px]">
+                          <div class="flex gap-2">
+                            <span class="font-black text-slate-500 uppercase w-16">Locuteurs</span
+                            ><span class="text-slate-300">{{ speakersLabel(lang.data!) }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      @if (bonusCount() > 0) {
+        <div class="w-full flex flex-col items-center mt-4">
+          <div class="flex items-center gap-6 mb-6 w-full max-w-3xl">
+            <div
+              class="h-px flex-grow bg-gradient-to-r from-transparent via-amber-900/50 to-slate-700"
+            ></div>
+            <h3 class="text-base font-bold text-amber-500 font-serif tracking-widest uppercase">
+              Langues Bonus
+            </h3>
+            <div
+              class="h-px flex-grow bg-gradient-to-l from-transparent via-amber-900/50 to-slate-700"
+            ></div>
+          </div>
+
+          <div class="flex justify-center w-full mb-8">
+            <div
+              class="px-6 py-2.5 rounded-full border text-[10px] font-black uppercase tracking-widest flex items-center gap-3 shadow-lg"
+              [ngClass]="
+                remainingPicks() === 0
+                  ? 'bg-emerald-950/30 text-emerald-400 border-emerald-800/50'
+                  : 'bg-[#1b2028] text-amber-500 border-amber-900/50'
+              "
+            >
+              @if (remainingPicks() === 0) {
+                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span> Sélection
+                Complète ({{ bonusCount() }} / {{ bonusCount() }})
+              } @else {
+                <span class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span> Encore
+                {{ remainingPicks() }} à choisir
+              }
+            </div>
+          </div>
+
+          @if (remainingPicks() > 0) {
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full max-w-5xl">
+              @for (lang of availableBaseLanguages(); track lang.id) {
+                <button
+                  class="w-full px-4 py-3 rounded-xl border text-left flex flex-col gap-1 transition-all group/btn bg-[#171b22] border-slate-800 hover:border-amber-500/50 hover:bg-[#1b2028] shadow-md"
+                  (click)="addLanguage(lang.name)"
+                >
+                  <div class="flex justify-between items-center w-full">
+                    <span
+                      class="text-sm font-bold font-serif tracking-wide text-slate-200 group-hover/btn:text-amber-400"
+                      >{{ lang.name }}</span
+                    >
+                    <span class="text-amber-500 opacity-0 group-hover/btn:opacity-100">+</span>
+                  </div>
+                  <span
+                    class="text-[9px] text-slate-500 font-bold tracking-wider truncate uppercase"
+                    >{{ speakersLabel(lang) }}</span
+                  >
+                </button>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <div class="mt-12 flex flex-col items-center gap-4 animate-[fadeIn_0.5s_ease] w-full">
+        <button
+          class="px-14 py-4 rounded-xl text-sm font-black uppercase tracking-widest transition-all"
+          [ngClass]="
+            remainingPicks() === 0
+              ? 'bg-emerald-500 text-slate-950 hover:bg-emerald-400 hover:scale-105 active:scale-95 shadow-[0_0_25px_rgba(16,185,129,0.3)]'
+              : 'bg-slate-800 text-slate-500 opacity-50 cursor-not-allowed'
+          "
+          [disabled]="remainingPicks() > 0"
+          (click)="confirm()"
+        >
+          Inscrire ces langues au registre
+        </button>
+
+        <button
+          class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-400 transition-colors bg-[#1b2028] px-6 py-2 rounded-full border border-slate-700 mt-2"
+          (click)="prevStep()"
+        >
+          ← Revenir en arrière
+        </button>
+      </div>
+    </div>
+  }
+</div>

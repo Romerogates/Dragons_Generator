@@ -1,0 +1,491 @@
+<div
+  class="w-full min-h-screen bg-[#171b22] flex flex-col animate-fade-in select-none pb-20 relative"
+>
+  <section class="w-full py-16 px-4 max-w-6xl mx-auto flex flex-col items-center">
+    <header class="w-full flex flex-col items-center mb-16">
+      <div class="flex items-center gap-6 mb-8 w-full max-w-3xl">
+        <div class="h-px flex-grow bg-gradient-to-r from-transparent to-slate-700"></div>
+        <h1
+          class="text-3xl md:text-4xl font-bold text-slate-200 font-serif tracking-widest uppercase drop-shadow-md text-center"
+        >
+          Classes de <span class="text-amber-500">Héros</span>
+        </h1>
+        <div class="h-px flex-grow bg-gradient-to-l from-transparent to-slate-700"></div>
+      </div>
+
+      <div class="relative w-full max-w-md group">
+        <span
+          class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg group-focus-within:text-amber-500 transition-colors"
+          >🔍</span
+        >
+        <input
+          type="search"
+          placeholder="Rechercher une classe (ex: Guerrier)..."
+          [value]="search()"
+          (input)="onSearch($any($event.target).value)"
+          class="w-full bg-[#1b2028] border border-slate-700 rounded-full py-3 pl-12 pr-6 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 shadow-inner transition-all"
+        />
+      </div>
+    </header>
+
+    <div class="w-full space-y-12">
+      @for (cls of filtered(); track cls.id) {
+        <article
+          class="class-card bg-[#1b2028] rounded-3xl border border-slate-800 shadow-2xl overflow-hidden group relative"
+        >
+          <div
+            class="absolute top-0 right-0 text-9xl opacity-5 pointer-events-none -translate-y-4 translate-x-4"
+          >
+            ⚔️
+          </div>
+
+          <header
+            class="p-8 md:p-10 border-b border-slate-800 bg-gradient-to-b from-[#1f242e] to-transparent relative z-10"
+          >
+            <h2
+              class="text-4xl md:text-5xl font-extrabold text-amber-500 font-serif tracking-wide mb-4 drop-shadow-md"
+            >
+              {{ cls.name }}
+            </h2>
+
+            <div class="flex flex-wrap gap-4">
+              <div
+                class="bg-rose-950/30 border border-rose-900/50 px-4 py-2 rounded-xl flex items-center gap-3"
+              >
+                <span class="text-2xl drop-shadow-md">🎲</span>
+                <div>
+                  <span
+                    class="block text-[9px] text-rose-500/80 font-black uppercase tracking-widest"
+                    >Dé de vie</span
+                  >
+                  <span class="text-rose-400 font-bold text-lg leading-none"
+                    >d{{ cls.data.hit_die }}</span
+                  >
+                </div>
+              </div>
+
+              <div
+                class="bg-emerald-950/30 border border-emerald-900/50 px-4 py-2 rounded-xl flex items-center gap-3"
+              >
+                <span class="text-2xl drop-shadow-md">✨</span>
+                <div>
+                  <span
+                    class="block text-[9px] text-emerald-500/80 font-black uppercase tracking-widest"
+                    >Caractéristiques Clés</span
+                  >
+                  <span
+                    class="text-emerald-400 font-bold text-sm leading-none uppercase tracking-wider"
+                  >
+                    {{ cls.data.primary_abilities.join(', ') }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <div class="p-8 md:p-10 grid grid-cols-1 lg:grid-cols-2 gap-10 relative z-10">
+            <div class="space-y-8">
+              <section>
+                <h3
+                  class="text-lg font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-3 mb-4 flex items-center gap-2"
+                >
+                  <span class="text-amber-500">🛡️</span> Maîtrises
+                </h3>
+                <ul class="space-y-3">
+                  <li class="bg-[#171b22] border border-slate-700/50 rounded-lg p-3 flex flex-col">
+                    <span
+                      class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1"
+                      >Armures</span
+                    >
+                    <span class="text-sm text-slate-300">{{
+                      cls.data.proficiencies.armor.join(', ') || 'Aucune'
+                    }}</span>
+                  </li>
+                  <li class="bg-[#171b22] border border-slate-700/50 rounded-lg p-3 flex flex-col">
+                    <span
+                      class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1"
+                      >Armes</span
+                    >
+                    <span class="text-sm text-slate-300">{{
+                      cls.data.proficiencies.weapons.join(', ') || 'Aucune'
+                    }}</span>
+                  </li>
+                  <li class="bg-[#171b22] border border-slate-700/50 rounded-lg p-3 flex flex-col">
+                    <span
+                      class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1"
+                      >Jets de Sauvegarde</span
+                    >
+                    <span
+                      class="text-sm text-slate-300 uppercase tracking-wider font-bold text-amber-500/80"
+                      >{{ cls.data.proficiencies.saving_throws.join(', ') }}</span
+                    >
+                  </li>
+                  <li class="bg-[#171b22] border border-slate-700/50 rounded-lg p-3 flex flex-col">
+                    <span
+                      class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1"
+                      >Compétences ({{ cls.data.proficiencies.skills.count }} au choix)</span
+                    >
+                    <span class="text-sm text-slate-300 leading-relaxed">{{
+                      cls.data.proficiencies.skills.options.join(', ')
+                    }}</span>
+                  </li>
+                </ul>
+              </section>
+
+              @if (cls.data.spellcasting; as sc) {
+                <section
+                  class="bg-fuchsia-950/20 border border-fuchsia-900/30 rounded-2xl p-6 relative overflow-hidden"
+                >
+                  <div class="absolute top-2 right-2 text-6xl opacity-10 pointer-events-none">
+                    🪄
+                  </div>
+                  <h3
+                    class="text-lg font-bold text-fuchsia-400 font-serif tracking-widest uppercase mb-4 relative z-10"
+                  >
+                    Incantation
+                  </h3>
+                  <div class="grid grid-cols-2 gap-4 relative z-10">
+                    <div>
+                      <span
+                        class="block text-[10px] text-fuchsia-500/70 font-black uppercase tracking-widest mb-1"
+                        >Caractéristique Magique</span
+                      >
+                      <strong class="text-sm text-fuchsia-300 uppercase tracking-wider">{{
+                        sc.ability
+                      }}</strong>
+                    </div>
+                    @if (sc.focus) {
+                      <div>
+                        <span
+                          class="block text-[10px] text-fuchsia-500/70 font-black uppercase tracking-widest mb-1"
+                          >Focaliseur</span
+                        >
+                        <span class="text-sm text-fuchsia-300">{{ sc.focus }}</span>
+                      </div>
+                    }
+                    @if (sc.ritual) {
+                      <div
+                        class="col-span-2 mt-2 inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-fuchsia-400 bg-fuchsia-950/50 px-3 py-1.5 rounded-lg w-max border border-fuchsia-900/50"
+                      >
+                        <span>📖</span> Rituels Autorisés
+                      </div>
+                    }
+                  </div>
+                </section>
+              }
+            </div>
+
+            <div class="space-y-8">
+              <section>
+                <h3
+                  class="text-lg font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-3 mb-4 flex items-center gap-2"
+                >
+                  <span class="text-amber-500">🎒</span> Équipement de départ
+                </h3>
+                <ul class="space-y-4">
+                  @for (slot of cls.data.starting_equipment; track slot.slot) {
+                    <li class="bg-[#171b22] border border-slate-700/50 p-4 rounded-xl">
+                      @if (slot.description) {
+                        <p class="text-sm text-slate-300 italic mb-2">"{{ slot.description }}"</p>
+                      }
+
+                      @if (slot.fixed) {
+                        <ul class="space-y-1">
+                          @for (item of slot.fixed; track item.id) {
+                            <li
+                              class="text-sm text-emerald-400 font-medium flex items-center gap-2"
+                            >
+                              <span
+                                class="text-[10px] bg-emerald-950/50 px-1.5 py-0.5 rounded text-emerald-500"
+                                >{{ item.qty }}×</span
+                              >
+                              {{ item.id }}
+                            </li>
+                          }
+                        </ul>
+                      }
+
+                      @if (slot.alternatives) {
+                        <div class="mt-2 pt-2 border-t border-slate-800/50">
+                          <span
+                            class="block text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-2"
+                            >Un choix parmi :</span
+                          >
+                          <ul class="space-y-2">
+                            @for (alt of slot.alternatives; track $index) {
+                              <li
+                                class="text-sm text-slate-300 flex flex-wrap items-center gap-2 before:content-['•'] before:text-amber-500"
+                              >
+                                @for (item of alt; track item.id; let isLast = $last) {
+                                  <span>
+                                    <span class="text-xs text-slate-500">{{ item.qty }}×</span>
+                                    {{ item.id }}
+                                    @if (!isLast) {
+                                      <span class="text-slate-600 ml-1">+</span>
+                                    }
+                                  </span>
+                                }
+                              </li>
+                            }
+                          </ul>
+                        </div>
+                      }
+                    </li>
+                  }
+                </ul>
+              </section>
+            </div>
+
+            <section class="col-span-1 lg:col-span-2 mt-4">
+              <h3
+                class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-2"
+              >
+                <span class="text-amber-500">📈</span> Progression de Classe
+              </h3>
+
+              <div
+                class="overflow-x-auto rounded-xl border border-slate-700 shadow-inner custom-scrollbar bg-[#171b22]"
+              >
+                <table class="w-full text-left text-sm text-slate-400 whitespace-nowrap">
+                  <thead
+                    class="bg-[#1b2028] text-[10px] font-black uppercase tracking-widest text-amber-500 border-b-2 border-slate-700"
+                  >
+                    <tr>
+                      <th class="px-6 py-4">Niv.</th>
+                      <th class="px-6 py-4">Bonus</th>
+                      <th class="px-6 py-4 w-full">Aptitudes</th>
+                      <th class="px-6 py-4">Ressources</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-800/50">
+                    @for (lvl of cls.data.progression; track lvl.level) {
+                      <tr class="hover:bg-[#1b2028] transition-colors">
+                        <td class="px-6 py-3 font-bold text-slate-200">{{ lvl.level }}</td>
+                        <td class="px-6 py-3 text-emerald-400 font-bold">+{{ lvl.prof_bonus }}</td>
+                        <td class="px-6 py-3 text-slate-300 whitespace-normal min-w-[200px]">
+                          @if (lvl.features.length) {
+                            {{ lvl.features.join(', ') }}
+                          } @else {
+                            <span class="opacity-30">—</span>
+                          }
+                        </td>
+                        <td class="px-6 py-3">
+                          @if (lvl.resources) {
+                            <div class="flex flex-col gap-1">
+                              @for (entry of lvl.resources | keyvalue; track entry.key) {
+                                <span
+                                  class="text-xs bg-slate-800/50 px-2 py-1 rounded text-slate-300 border border-slate-700/50"
+                                >
+                                  <strong class="text-amber-500/80 mr-1">{{ entry.key }}:</strong>
+                                  {{ entry.value }}
+                                </span>
+                              }
+                            </div>
+                          } @else {
+                            <span class="opacity-30">—</span>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <div class="col-span-1 lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
+              @if (cls.data.features_details?.length) {
+                <section>
+                  <h3 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">
+                    Détail des Aptitudes
+                  </h3>
+                  <div class="space-y-3">
+                    @for (feat of cls.data.features_details; track feat.id) {
+                      <details
+                        class="group/details bg-[#171b22] border border-slate-700/50 rounded-xl overflow-hidden"
+                      >
+                        <summary
+                          class="cursor-pointer p-4 text-sm font-bold text-amber-500 hover:bg-[#1b2028] list-none flex items-center gap-3 transition-colors"
+                        >
+                          <span
+                            class="group-open/details:rotate-90 transition-transform text-xs text-slate-500"
+                            >▶</span
+                          >
+                          {{ feat.name }}
+                        </summary>
+                        <div
+                          class="p-4 pt-0 border-t border-slate-800/50 mt-2 text-sm text-slate-300 leading-relaxed bg-[#1b2028]/30"
+                        >
+                          <p>{{ feat.desc }}</p>
+                        </div>
+                      </details>
+                    }
+                  </div>
+                </section>
+              }
+
+              @if (cls.data.subclasses?.length) {
+                <section>
+                  <h3 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">
+                    Voies & Archétypes
+                  </h3>
+                  <div class="space-y-3">
+                    @for (sub of cls.data.subclasses; track sub.id) {
+                      <details
+                        class="group/details bg-[#171b22] border border-slate-700/50 rounded-xl overflow-hidden"
+                      >
+                        <summary
+                          class="cursor-pointer p-4 text-sm font-bold text-indigo-400 hover:bg-[#1b2028] list-none flex items-center gap-3 transition-colors"
+                        >
+                          <span
+                            class="group-open/details:rotate-90 transition-transform text-xs text-slate-500"
+                            >▶</span
+                          >
+                          {{ sub.name }}
+                        </summary>
+                        <div class="p-4 pt-0 border-t border-slate-800/50 mt-2 bg-[#1b2028]/30">
+                          @if (sub.desc) {
+                            <p class="text-sm text-slate-400 italic mb-4">"{{ sub.desc }}"</p>
+                          }
+                          @if (sub.features?.length) {
+                            <ul class="space-y-3">
+                              @for (f of sub.features; track f.id) {
+                                <li class="text-sm text-slate-300 leading-relaxed">
+                                  <strong class="text-indigo-300 block mb-1 font-serif">{{
+                                    f.name
+                                  }}</strong>
+                                  <span class="text-slate-400">{{ f.desc }}</span>
+                                </li>
+                              }
+                            </ul>
+                          }
+                        </div>
+                      </details>
+                    }
+                  </div>
+                </section>
+              }
+
+              <div class="space-y-8 col-span-1 md:col-span-2 lg:col-span-1">
+                @if (cls.data.ki_powers?.length) {
+                  <section>
+                    <h3 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">
+                      Disciplines du Ki
+                    </h3>
+                    <div class="space-y-2">
+                      @for (k of cls.data.ki_powers; track k.id) {
+                        <details
+                          class="group/details bg-[#171b22] border border-slate-700/50 rounded-lg"
+                        >
+                          <summary
+                            class="cursor-pointer p-3 text-xs font-bold text-sky-400 hover:bg-[#1b2028] list-none flex items-center gap-2"
+                          >
+                            <span
+                              class="group-open/details:rotate-90 transition-transform text-[10px] text-slate-500"
+                              >▶</span
+                            >
+                            {{ k.name }}
+                          </summary>
+                          <p class="p-3 pt-0 text-xs text-slate-400 leading-relaxed">
+                            {{ k.desc }}
+                          </p>
+                        </details>
+                      }
+                    </div>
+                  </section>
+                }
+
+                @if (cls.data.pact_boons?.length) {
+                  <section>
+                    <h3 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">
+                      Faveurs de Pacte
+                    </h3>
+                    <div class="space-y-2">
+                      @for (p of cls.data.pact_boons; track p.id) {
+                        <details
+                          class="group/details bg-[#171b22] border border-slate-700/50 rounded-lg"
+                        >
+                          <summary
+                            class="cursor-pointer p-3 text-xs font-bold text-rose-400 hover:bg-[#1b2028] list-none flex items-center gap-2"
+                          >
+                            <span
+                              class="group-open/details:rotate-90 transition-transform text-[10px] text-slate-500"
+                              >▶</span
+                            >
+                            {{ p.name }}
+                          </summary>
+                          <p class="p-3 pt-0 text-xs text-slate-400 leading-relaxed">
+                            {{ p.desc }}
+                          </p>
+                        </details>
+                      }
+                    </div>
+                  </section>
+                }
+
+                @if (cls.data.invocations?.length) {
+                  <section>
+                    <h3 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">
+                      Invocations Occultes
+                    </h3>
+                    <div class="space-y-2">
+                      @for (inv of cls.data.invocations; track inv.id) {
+                        <details
+                          class="group/details bg-[#171b22] border border-slate-700/50 rounded-lg"
+                        >
+                          <summary
+                            class="cursor-pointer p-3 text-xs font-bold text-fuchsia-400 hover:bg-[#1b2028] list-none flex items-center gap-2"
+                          >
+                            <span
+                              class="group-open/details:rotate-90 transition-transform text-[10px] text-slate-500"
+                              >▶</span
+                            >
+                            {{ inv.name }}
+                          </summary>
+                          <p class="p-3 pt-0 text-xs text-slate-400 leading-relaxed">
+                            {{ inv.desc }}
+                          </p>
+                        </details>
+                      }
+                    </div>
+                  </section>
+                }
+              </div>
+            </div>
+          </div>
+        </article>
+      } @empty {
+        <div
+          class="flex flex-col items-center justify-center py-32 text-center bg-[#1b2028] rounded-3xl border border-slate-800 shadow-xl w-full"
+        >
+          <span class="text-7xl mb-6 opacity-30">🛡️</span>
+          <h2 class="text-2xl font-bold text-slate-400 font-serif tracking-widest uppercase mb-4">
+            Aucune classe trouvée
+          </h2>
+          <p class="text-slate-500 italic">Essayez de modifier vos termes de recherche.</p>
+        </div>
+      }
+    </div>
+  </section>
+
+  @if (filtered().length > 1) {
+    <div
+      class="hidden sm:flex fixed right-4 md:right-8 top-1/2 -translate-y-1/2 flex-col gap-3 z-50"
+    >
+      <button
+        (click)="scrollTo('up')"
+        class="w-12 h-12 flex items-center justify-center bg-[#1b2028]/80 backdrop-blur-md border border-slate-700 hover:border-amber-500 rounded-full shadow-[0_0_15px_rgba(0,0,0,0.5)] text-slate-400 hover:text-amber-500 hover:bg-[#1f242e] transition-all duration-300 hover:-translate-y-1 group"
+        title="Classe précédente"
+      >
+        <span class="block text-lg group-hover:-translate-y-0.5 transition-transform">▲</span>
+      </button>
+
+      <button
+        (click)="scrollTo('down')"
+        class="w-12 h-12 flex items-center justify-center bg-[#1b2028]/80 backdrop-blur-md border border-slate-700 hover:border-amber-500 rounded-full shadow-[0_0_15px_rgba(0,0,0,0.5)] text-slate-400 hover:text-amber-500 hover:bg-[#1f242e] transition-all duration-300 hover:translate-y-1 group"
+        title="Classe suivante"
+      >
+        <span class="block text-lg group-hover:translate-y-0.5 transition-transform">▼</span>
+      </button>
+    </div>
+  }
+</div>

@@ -1,0 +1,410 @@
+<div
+  class="relative w-full flex flex-col items-center animate-fade-in py-6 sm:py-10 select-none justify-center min-h-[65vh]"
+>
+  <div class="text-center mb-8 w-full px-4">
+    <h2 class="text-4xl font-extrabold text-amber-500 mb-2 drop-shadow-md tracking-wide font-serif">
+      Grimoire & Incantations
+    </h2>
+    <p class="text-slate-400 text-xs max-w-xl mx-auto italic">
+      Canalisez les flux arcaniques, divins ou primordiaux. Les mots ont un pouvoir, choisissez les
+      vôtres.
+    </p>
+  </div>
+
+  @if (loading()) {
+    <div
+      class="flex justify-center items-center p-8 bg-[#1b2028] border border-slate-700 rounded-xl w-full max-w-lg shadow-lg"
+    >
+      <div
+        class="w-8 h-8 border-4 border-fuchsia-500/30 border-t-fuchsia-500 rounded-full animate-spin"
+      ></div>
+    </div>
+  }
+
+  @if (error(); as err) {
+    <div
+      class="p-4 mb-4 bg-red-950/50 border border-red-900 rounded-xl text-center shadow-lg w-full max-w-lg"
+    >
+      <p class="text-red-400 text-sm font-medium">{{ err }}</p>
+    </div>
+  }
+
+  @if (!loading() && !error() && quota(); as q) {
+    <div class="w-full max-w-5xl px-4 flex flex-col items-center pb-8">
+      <div
+        class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-[#1b2028] p-4 sm:p-6 rounded-2xl border border-slate-800 shadow-xl mb-12 w-full"
+      >
+        <div
+          class="flex flex-col items-center justify-center border-r border-slate-800/50 last:border-0"
+        >
+          <span
+            class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1 text-center"
+            >Incantation</span
+          >
+          <span class="text-xl font-serif text-amber-500">{{ spellcastingAbility() }}</span>
+        </div>
+        <div
+          class="flex flex-col items-center justify-center border-r border-slate-800/50 last:border-0"
+        >
+          <span
+            class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1 text-center"
+            >DD Sauvegarde</span
+          >
+          <span class="text-xl font-serif text-emerald-400">{{ spellSaveDC() }}</span>
+        </div>
+        <div
+          class="flex flex-col items-center justify-center border-r border-slate-800/50 last:border-0"
+        >
+          <span
+            class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1 text-center"
+            >Bonus d'Attaque</span
+          >
+          <span class="text-xl font-serif text-emerald-400">{{
+            fmtBonus(spellAttackBonus())
+          }}</span>
+        </div>
+        <div class="flex flex-col items-center justify-center">
+          <span
+            class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1 text-center"
+            >Mode</span
+          >
+          <span
+            class="text-[10px] font-black text-fuchsia-400/90 text-center uppercase tracking-widest"
+            >{{ q.modeLabel }}</span
+          >
+        </div>
+      </div>
+
+      <div class="w-full mb-12">
+        <div class="flex items-center gap-6 mb-6 w-full">
+          <div
+            class="h-px flex-grow bg-gradient-to-r from-transparent via-slate-700 to-slate-700"
+          ></div>
+          <h3
+            class="text-lg font-bold text-slate-200 font-serif tracking-widest text-center uppercase drop-shadow-md"
+          >
+            Sorts Mineurs (Tours de Magie)
+          </h3>
+          <div
+            class="h-px flex-grow bg-gradient-to-l from-transparent via-slate-700 to-slate-700"
+          ></div>
+        </div>
+
+        <div class="flex justify-center w-full mb-8">
+          <div
+            class="px-6 py-2.5 rounded-full border text-[10px] font-black uppercase tracking-widest flex items-center gap-3 shadow-lg transition-colors"
+            [ngClass]="
+              cantripsRemaining() === 0
+                ? 'bg-emerald-950/30 text-emerald-400 border-emerald-800/50'
+                : 'bg-[#1b2028] text-amber-500 border-amber-900/50'
+            "
+          >
+            @if (cantripsRemaining() === 0) {
+              <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
+              Maîtrise Complète ({{ selectedCantrips().size }} / {{ q.cantrips }})
+            } @else {
+              <span class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
+              Encore {{ cantripsRemaining() }} mineur(s) à apprendre
+            }
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          @for (spell of availableCantrips(); track spell.id) {
+            <div
+              class="relative w-full group transition-all duration-300"
+              [ngClass]="{
+                'opacity-40 grayscale pointer-events-none':
+                  !canSelectCantrip(spell.id) && !isCantripSelected(spell.id),
+              }"
+              (click)="canSelectCantrip(spell.id) ? toggleCantrip(spell.id) : null"
+            >
+              <div
+                class="absolute -inset-2 rounded-2xl blur-xl transition-opacity duration-300 pointer-events-none"
+                [ngClass]="getGlowClasses(spell.school, isCantripSelected(spell.id))"
+              ></div>
+
+              <div
+                class="relative flex flex-col h-full p-1.5 rounded-xl bg-[#171b22] transition-all duration-300 cursor-pointer"
+                [ngClass]="getCardClasses(spell.school, isCantripSelected(spell.id))"
+              >
+                <div
+                  class="w-full h-full border border-slate-700/30 rounded-lg flex flex-col p-4 bg-[#1b2028]"
+                >
+                  <div class="flex justify-between items-start mb-2 gap-2">
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="w-5 h-5 rounded border flex items-center justify-center shrink-0 transition-colors shadow-inner"
+                        [ngClass]="getCheckboxClasses(spell.school, isCantripSelected(spell.id))"
+                      >
+                        @if (isCantripSelected(spell.id)) {
+                          <span class="text-[12px] leading-none">✓</span>
+                        }
+                      </div>
+                      <span
+                        class="text-sm font-bold font-serif tracking-wide leading-tight transition-colors"
+                        [ngClass]="getTextClasses(spell.school, isCantripSelected(spell.id))"
+                      >
+                        {{ spell.name }}
+                      </span>
+                    </div>
+                    <button
+                      class="w-6 h-6 rounded bg-[#171b22] border border-slate-700 flex items-center justify-center text-[10px] text-slate-400 hover:text-amber-400 hover:border-amber-500/50 transition-all shadow-inner shrink-0"
+                      (click)="toggleExpand(spell.id); $event.stopPropagation()"
+                    >
+                      {{ isExpanded(spell.id) ? '▲' : '▼' }}
+                    </button>
+                  </div>
+
+                  <div class="flex flex-wrap gap-2 mt-2">
+                    <span
+                      class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest shadow-inner border"
+                      [ngClass]="getBadgeClasses(spell.school)"
+                    >
+                      {{ schoolLabel(spell.school) }}
+                    </span>
+                    @if (spell.isConcentration) {
+                      <span
+                        class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-fuchsia-950/40 text-fuchsia-400 border border-fuchsia-900/50 shadow-inner"
+                      >
+                        👁 Conc.
+                      </span>
+                    }
+                    @if (spell.isRitual) {
+                      <span
+                        class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-amber-950/40 text-amber-500 border border-amber-900/50 shadow-inner"
+                      >
+                        🕯 Rituel
+                      </span>
+                    }
+                    @if (spell.isCorrupted) {
+                      <span
+                        class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-red-950/50 text-red-400 border border-red-900/50 shadow-inner"
+                      >
+                        ⚠ Corrompu
+                      </span>
+                    }
+                  </div>
+
+                  @if (isExpanded(spell.id)) {
+                    <div
+                      class="mt-4 pt-3 border-t border-slate-800/80 flex flex-col gap-3 animate-[fadeIn_0.2s_ease]"
+                    >
+                      <div
+                        class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] text-slate-400 font-medium tracking-wide"
+                      >
+                        <span title="Temps d'incantation">⏱ {{ castTimeLabel(spell) }}</span>
+                        <span title="Portée">📏 {{ rangeLabel(spell) }}</span>
+                        <span title="Composantes">🖐 {{ componentsLabel(spell) }}</span>
+                        <span title="Durée">⏳ {{ durationLabel(spell) }}</span>
+                      </div>
+                      <p class="text-[11px] text-slate-300 leading-relaxed text-justify mt-1">
+                        {{ spell.description }}
+                      </p>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      @if (spellsToChoose() > 0) {
+        <div id="section-level-1" class="w-full mb-12">
+          <div class="flex items-center gap-6 mb-6 w-full">
+            <div
+              class="h-px flex-grow bg-gradient-to-r from-transparent via-slate-700 to-slate-700"
+            ></div>
+            <h3
+              class="text-lg font-bold text-slate-200 font-serif tracking-widest text-center uppercase drop-shadow-md"
+            >
+              Sorts de Niveau 1
+            </h3>
+            <div
+              class="h-px flex-grow bg-gradient-to-l from-transparent via-slate-700 to-slate-700"
+            ></div>
+          </div>
+
+          <div class="flex justify-center w-full mb-8">
+            <div
+              class="px-6 py-2.5 rounded-full border text-[10px] font-black uppercase tracking-widest flex items-center gap-3 shadow-lg transition-colors"
+              [ngClass]="
+                spellsRemaining() === 0
+                  ? 'bg-emerald-950/30 text-emerald-400 border-emerald-800/50'
+                  : 'bg-[#1b2028] text-amber-500 border-amber-900/50'
+              "
+            >
+              @if (spellsRemaining() === 0) {
+                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
+                Sélection Complète ({{ selectedSpells().size }} / {{ spellsToChoose() }})
+              } @else {
+                <span class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
+                Encore {{ spellsRemaining() }} sort(s) à retenir
+              }
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            @for (spell of availableLevel1(); track spell.id) {
+              <div
+                class="relative w-full group transition-all duration-300"
+                [ngClass]="{
+                  'opacity-40 grayscale pointer-events-none':
+                    !canSelectSpell(spell.id) && !isSpellSelected(spell.id),
+                }"
+                (click)="canSelectSpell(spell.id) ? toggleSpell(spell.id) : null"
+              >
+                <div
+                  class="absolute -inset-2 rounded-2xl blur-xl transition-opacity duration-300 pointer-events-none"
+                  [ngClass]="getGlowClasses(spell.school, isSpellSelected(spell.id))"
+                ></div>
+
+                <div
+                  class="relative flex flex-col h-full p-1.5 rounded-xl bg-[#171b22] transition-all duration-300 cursor-pointer"
+                  [ngClass]="getCardClasses(spell.school, isSpellSelected(spell.id))"
+                >
+                  <div
+                    class="w-full h-full border border-slate-700/30 rounded-lg flex flex-col p-4 bg-[#1b2028]"
+                  >
+                    <div class="flex justify-between items-start mb-2 gap-2">
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="w-5 h-5 rounded border flex items-center justify-center shrink-0 transition-colors shadow-inner"
+                          [ngClass]="getCheckboxClasses(spell.school, isSpellSelected(spell.id))"
+                        >
+                          @if (isSpellSelected(spell.id)) {
+                            <span class="text-[12px] leading-none">✓</span>
+                          }
+                        </div>
+                        <span
+                          class="text-sm font-bold font-serif tracking-wide leading-tight transition-colors"
+                          [ngClass]="getTextClasses(spell.school, isSpellSelected(spell.id))"
+                        >
+                          {{ spell.name }}
+                        </span>
+                      </div>
+                      <button
+                        class="w-6 h-6 rounded bg-[#171b22] border border-slate-700 flex items-center justify-center text-[10px] text-slate-400 hover:text-amber-400 hover:border-amber-500/50 transition-all shadow-inner shrink-0"
+                        (click)="toggleExpand(spell.id); $event.stopPropagation()"
+                      >
+                        {{ isExpanded(spell.id) ? '▲' : '▼' }}
+                      </button>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mt-2">
+                      <span
+                        class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest shadow-inner border"
+                        [ngClass]="getBadgeClasses(spell.school)"
+                      >
+                        {{ schoolLabel(spell.school) }}
+                      </span>
+                      @if (spell.isConcentration) {
+                        <span
+                          class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-fuchsia-950/40 text-fuchsia-400 border border-fuchsia-900/50 shadow-inner"
+                          >👁 Conc.</span
+                        >
+                      }
+                      @if (spell.isRitual) {
+                        <span
+                          class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-amber-950/40 text-amber-500 border border-amber-900/50 shadow-inner"
+                          >🕯 Rituel</span
+                        >
+                      }
+                      @if (spell.isCorrupted) {
+                        <span
+                          class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-red-950/50 text-red-400 border border-red-900/50 shadow-inner"
+                          >⚠ Corrompu</span
+                        >
+                      }
+                    </div>
+
+                    @if (isExpanded(spell.id)) {
+                      <div
+                        class="mt-4 pt-3 border-t border-slate-800/80 flex flex-col gap-3 animate-[fadeIn_0.2s_ease]"
+                      >
+                        <div
+                          class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] text-slate-400 font-medium tracking-wide"
+                        >
+                          <span title="Temps d'incantation">⏱ {{ castTimeLabel(spell) }}</span>
+                          <span title="Portée">📏 {{ rangeLabel(spell) }}</span>
+                          <span title="Composantes">🖐 {{ componentsLabel(spell) }}</span>
+                          <span title="Durée">⏳ {{ durationLabel(spell) }}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-300 leading-relaxed text-justify mt-1">
+                          {{ spell.description }}
+                        </p>
+                        @if (spell.higherLevels) {
+                          <div class="bg-slate-900/50 p-2 rounded border border-slate-800">
+                            <span
+                              class="text-[9px] font-black text-amber-500 uppercase tracking-widest block mb-1"
+                              >À plus haut niveau</span
+                            >
+                            <p class="text-[11px] text-slate-400">{{ spell.higherLevels }}</p>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (q.isPrepared && spellsToChoose() === 0) {
+        <div
+          class="mb-12 flex flex-col items-center gap-3 bg-[#171b22] px-6 py-5 rounded-xl border border-slate-800 shadow-lg text-center max-w-xl"
+        >
+          <span class="text-3xl opacity-80 drop-shadow-md">🙏</span>
+          <p class="text-xs text-slate-300 italic leading-relaxed font-serif">
+            "Votre foi ou votre lien avec la nature vous octroie la connaissance absolue."
+          </p>
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-black mt-2">
+            Vous avez accès à toute la liste de sorts de votre classe. Vous préparerez ceux de votre
+            choix après un repos long.
+          </p>
+        </div>
+      }
+
+      <div class="mt-4 flex flex-col items-center gap-4 animate-[fadeIn_0.5s_ease] w-full">
+        @if (!isConfirmed()) {
+          <button
+            id="btn-confirm-magic"
+            class="px-14 py-4 rounded-xl text-sm font-black uppercase tracking-widest shadow-[0_0_25px_rgba(192,38,211,0.3)] transition-all"
+            [ngClass]="
+              selectionComplete()
+                ? 'bg-fuchsia-600 text-white hover:bg-fuchsia-500 hover:scale-105 active:scale-95'
+                : 'bg-slate-800 text-slate-500 opacity-50 cursor-not-allowed'
+            "
+            [disabled]="!selectionComplete()"
+            (click)="confirm()"
+          >
+            Sceller le Grimoire
+          </button>
+        } @else {
+          <div
+            class="px-6 py-2.5 bg-emerald-950/30 text-emerald-400 border border-emerald-800/50 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-3 shadow-[0_0_15px_rgba(16,185,129,0.1)] mb-2"
+          >
+            <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
+            Sorts mémorisés
+          </div>
+          <button
+            class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-500 transition-colors bg-[#1b2028] px-5 py-2 rounded-full border border-slate-700"
+            (click)="clearSelection()"
+          >
+            Déchirer les pages (Modifier)
+          </button>
+        }
+
+        <button
+          class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-400 transition-colors bg-[#1b2028] px-6 py-2 rounded-full border border-slate-700 mt-2"
+          (click)="prevStep()"
+        >
+          ← Étape précédente
+        </button>
+      </div>
+    </div>
+  }
+</div>

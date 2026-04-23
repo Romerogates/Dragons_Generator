@@ -1,0 +1,156 @@
+<div class="w-full min-h-screen bg-[#171b22] text-slate-300 animate-fade-in select-none pb-20">
+  <div class="max-w-5xl mx-auto px-4 pt-10">
+    <a
+      routerLink="/civilisations"
+      class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-amber-500 transition-colors mb-8 group"
+    >
+      <span class="group-hover:-translate-x-1 transition-transform">←</span> Retour au Grimoire
+    </a>
+
+    @if (isLoading()) {
+      <div class="flex flex-col items-center justify-center py-32 animate-pulse text-amber-500">
+        <span class="text-6xl mb-6">📜</span>
+        <p class="text-lg font-serif tracking-widest uppercase text-slate-400">
+          Recherche dans les archives...
+        </p>
+      </div>
+    } @else if (civilisation(); as civ) {
+      <header class="text-center mb-14">
+        <h1
+          class="text-5xl md:text-6xl font-extrabold text-amber-500 font-serif tracking-wide mb-3 drop-shadow-lg"
+        >
+          {{ civ.name }}
+        </h1>
+        <p class="text-[10px] font-black uppercase tracking-widest text-slate-600">
+          Identifiant d'archive : {{ civ.id }}
+        </p>
+      </header>
+
+      <section
+        class="bg-[#1b2028] p-8 md:p-10 rounded-3xl border border-slate-800 shadow-xl mb-8 relative overflow-hidden group hover:border-amber-500/30 transition-colors"
+      >
+        <div class="absolute top-0 right-0 p-8 text-9xl opacity-5 pointer-events-none">📖</div>
+
+        <h2
+          class="relative z-10 text-2xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-3"
+        >
+          <span class="text-amber-500">Histoire & Description</span>
+        </h2>
+
+        <p class="relative z-10 text-base md:text-lg text-slate-400 leading-relaxed mb-6">
+          {{ civ.lore.fullDescription }}
+        </p>
+
+        @if (civ.lore.geographyTags.length > 0) {
+          <div
+            class="relative z-10 flex flex-wrap items-center gap-3 mt-8 pt-6 border-t border-slate-800/50"
+          >
+            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500"
+              >Géographie</span
+            >
+            @for (tag of civ.lore.geographyTags; track tag) {
+              <span
+                class="bg-emerald-950/30 text-emerald-400 border border-emerald-900/50 px-3 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider"
+              >
+                {{ tag }}
+              </span>
+            }
+          </div>
+        }
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <section
+          class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl group hover:border-amber-500/30 transition-colors"
+        >
+          <h2
+            class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-3"
+          >
+            <span class="text-emerald-500">👥</span> Démographie
+          </h2>
+
+          <div class="mb-6">
+            <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">
+              Espèces Primaires
+            </h3>
+            <div class="flex flex-wrap gap-2">
+              @for (espece of civ.demographics.primarySpecies; track espece.id) {
+                <span
+                  class="bg-[#171b22] border border-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg shadow-inner"
+                >
+                  {{ espece.label }}
+                </span>
+              } @empty {
+                <span class="text-sm italic text-slate-600">Aucune espèce primaire recensée.</span>
+              }
+            </div>
+          </div>
+
+          @if (civ.demographics.isCosmopolitan) {
+            <div
+              class="bg-fuchsia-900/10 border border-fuchsia-900/30 p-4 rounded-xl flex items-start gap-4 mt-6"
+            >
+              <span class="text-2xl">🌍</span>
+              <div>
+                <p class="text-sm font-bold text-fuchsia-400 mb-1">Cité Cosmopolite</p>
+                <p class="text-xs text-fuchsia-300/60 leading-relaxed">
+                  Diverses cultures et peuples s'y côtoient et s'entremêlent harmonieusement.
+                </p>
+              </div>
+            </div>
+          }
+        </section>
+
+        <section
+          class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl group hover:border-amber-500/30 transition-colors"
+        >
+          <h2
+            class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-3"
+          >
+            <span class="text-sky-500">🗣️</span> Linguistique
+          </h2>
+
+          <div>
+            <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">
+              Langues Officielles
+            </h3>
+            <div class="flex flex-wrap gap-2">
+              @for (langue of civ.linguistics.officialLanguages; track langue.id) {
+                <span
+                  class="bg-[#171b22] border border-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg shadow-inner"
+                >
+                  {{ langue.label }}
+                </span>
+              } @empty {
+                <span class="text-sm italic text-slate-600"
+                  >Aucune langue officielle répertoriée.</span
+                >
+              }
+            </div>
+          </div>
+        </section>
+      </div>
+    } @else {
+      <div class="flex flex-col items-center justify-center py-32 text-center">
+        <span class="text-7xl mb-6 drop-shadow-[0_0_20px_rgba(220,38,38,0.4)] animate-pulse"
+          >🐉</span
+        >
+        <h2
+          class="text-3xl md:text-4xl font-bold text-red-500 font-serif tracking-widest uppercase mb-4"
+        >
+          Archives Détruites
+        </h2>
+        <p class="text-lg text-slate-400 italic max-w-md leading-relaxed mb-8">
+          Les parchemins sont en cendres. Cette civilisation n'existe pas ou a été ravagée par un
+          Dragon Ancien !
+        </p>
+        <a
+          routerLink="/civilisations"
+          class="px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition-all border border-slate-700 hover:border-slate-500 shadow-lg hover:-translate-y-1"
+        >
+          Fuir cette zone
+        </a>
+      </div>
+    }
+  </div>
+</div>

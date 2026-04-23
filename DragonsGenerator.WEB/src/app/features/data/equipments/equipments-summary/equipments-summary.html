@@ -1,0 +1,41 @@
+<section class="equipments-summary">
+  <h1>Résumé des équipements</h1>
+
+  @if (loading()) {
+    <p>Chargement…</p>
+  } @else if (error()) {
+    <p class="error">{{ error() }}</p>
+  } @else {
+    <p class="count">{{ summaries().length }} équipement(s)</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Type</th>
+          <th>Sous-type</th>
+          <th>Coût</th>
+          <th>Poids (kg)</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (s of summaries(); track s.id) {
+          <tr>
+            <td>
+              <a [routerLink]="['/data/equipments', s.id]">{{ s.name }}</a>
+            </td>
+            <td>{{ s.type }}</td>
+            <td>{{ s.subtype ?? '—' }}</td>
+            <td>
+              @if (s.cost.v !== null) {
+                {{ s.cost.v }} {{ s.cost.u }}
+              } @else {
+                —
+              }
+            </td>
+            <td>{{ s.wKg ?? '—' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

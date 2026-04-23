@@ -1,0 +1,134 @@
+<div class="relative w-full flex flex-col items-center animate-fade-in pb-4 select-none">
+  <div class="absolute top-2 left-0 z-50">
+    <button
+      class="text-sm font-semibold text-slate-400 hover:text-amber-400 transition-colors flex items-center gap-2 px-3 py-2 md:px-4 bg-[#1b2028] rounded-lg border border-slate-700 hover:border-amber-500/50 shadow-lg animate-fade-in"
+      (click)="prevStep()"
+    >
+      <span class="sm:hidden">← Retour</span>
+      <span class="hidden sm:inline">← Étape précédente</span>
+    </button>
+  </div>
+
+  <div class="text-center mb-4 w-full px-4 mt-2">
+    <h2 class="text-3xl font-extrabold text-amber-500 mb-1 drop-shadow-md tracking-wide font-serif">
+      Savoirs & Maîtrises
+    </h2>
+    <p class="text-slate-400 text-xs max-w-xl mx-auto italic">
+      Enchâssez les talents que votre héros a développés au cours de sa formation.
+    </p>
+  </div>
+
+  <div class="w-full max-w-6xl px-4 flex flex-col gap-5">
+    <div
+      class="flex flex-col items-center gap-2 p-3 bg-[#171b22] border-2 border-slate-700/80 rounded-2xl shadow-lg relative overflow-hidden"
+    >
+      <div
+        class="absolute inset-0 bg-emerald-500/10 blur-xl transition-opacity duration-700"
+        [ngClass]="remaining() === 0 ? 'opacity-100' : 'opacity-0'"
+      ></div>
+
+      <span
+        class="text-[9px] uppercase tracking-widest font-black z-10"
+        [ngClass]="remaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
+      >
+        {{ remaining() === 0 ? 'Talents verrouillés ✓' : 'Emplacements de maîtrise' }}
+      </span>
+
+      <div class="flex flex-wrap justify-center gap-3 z-10">
+        @for (skill of selectedSkillsDetails(); track skill.id) {
+          <button
+            class="relative w-12 h-12 rounded-full border-2 border-emerald-500 bg-emerald-900/40 shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center justify-center group hover:scale-105 hover:border-red-500 hover:bg-red-900/40 transition-all"
+            (click)="toggle(skill.id)"
+          >
+            <span class="text-xl group-hover:hidden">{{ skill.icon }}</span>
+            <span class="text-xl hidden group-hover:block text-red-500">×</span>
+          </button>
+        }
+        @for (empty of emptySlots(); track $index) {
+          <div
+            class="w-12 h-12 rounded-full border-2 border-slate-700 border-dashed bg-[#1b2028] opacity-50 flex items-center justify-center"
+          >
+            <span class="w-2 h-2 rounded-full bg-slate-800"></span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 items-start">
+      @for (group of groupedSkills(); track group.name) {
+        <div
+          class="bg-[#171b22] border border-slate-700/60 rounded-xl overflow-hidden shadow-md flex flex-col"
+        >
+          <div
+            class="bg-[#1b2028] px-2 py-1.5 border-b border-slate-700/50 flex items-center justify-center gap-2"
+          >
+            <span class="text-sm">{{ group.icon }}</span>
+            <span class="text-[9px] font-black uppercase tracking-widest {{ group.colorClass }}">
+              {{ group.name }}
+            </span>
+          </div>
+
+          <div class="p-1.5 flex flex-col gap-1">
+            @for (skill of group.skills; track skill.id) {
+              <button
+                class="flex items-center justify-between w-full py-1 px-2 rounded border transition-all duration-150 group/btn"
+                [ngClass]="{
+                  'border-emerald-500/50 bg-emerald-900/20': isSelected(skill.id),
+                  'border-transparent hover:bg-[#1b2028] hover:border-slate-600':
+                    !isSelected(skill.id) && canSelect(skill.id),
+                  'opacity-30 cursor-not-allowed grayscale': !canSelect(skill.id),
+                }"
+                [disabled]="!canSelect(skill.id)"
+                (click)="toggle(skill.id)"
+              >
+                <div class="flex items-center gap-2 overflow-hidden">
+                  <span
+                    class="text-xs shrink-0"
+                    [ngClass]="{
+                      'opacity-100': isSelected(skill.id),
+                      'opacity-40': !isSelected(skill.id),
+                    }"
+                  >
+                    {{ skill.icon }}
+                  </span>
+                  <span
+                    class="text-[11px] font-bold truncate"
+                    [ngClass]="isSelected(skill.id) ? 'text-emerald-400' : 'text-slate-300'"
+                  >
+                    {{ skill.label }}
+                  </span>
+                </div>
+
+                <div
+                  class="text-[9px] font-black px-1 rounded ml-1"
+                  [ngClass]="
+                    isSelected(skill.id)
+                      ? 'bg-emerald-500 text-slate-950'
+                      : 'bg-slate-800 text-slate-500'
+                  "
+                >
+                  {{ getModifierForSkill(skill.id) }}
+                </div>
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="mt-2">
+      <button
+        class="w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest shadow-md transition-all transform hover:-translate-y-0.5 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+        [ngClass]="
+          remaining() === 0
+            ? 'bg-emerald-500 text-slate-900 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:bg-emerald-400'
+            : 'bg-slate-700 text-slate-500'
+        "
+        [disabled]="remaining() !== 0"
+        (click)="confirmSelection()"
+      >
+        Valider les compétences
+      </button>
+    </div>
+  </div>
+</div>

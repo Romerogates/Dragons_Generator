@@ -1,0 +1,98 @@
+@if (showDraftPrompt()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in p-4"
+  >
+    <div
+      class="bg-[#1b2028] border border-slate-700 rounded-2xl shadow-2xl max-w-md w-full p-8 flex flex-col items-center gap-6"
+    >
+      <div
+        class="w-14 h-14 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-2xl"
+      >
+        📜
+      </div>
+
+      <div class="text-center">
+        <h2 class="text-xl font-bold text-amber-500 font-serif mb-2">Brouillon retrouvé</h2>
+        <p class="text-slate-400 text-sm">Un personnage est en cours de création :</p>
+        <p
+          class="text-slate-200 font-serif text-base mt-2 bg-[#171b22] px-4 py-2 rounded-lg border border-slate-700/50"
+        >
+          {{ builder.draftSummary() }}
+        </p>
+        <p class="text-slate-500 text-xs mt-2 italic">
+          Étape {{ builder.currentStep() }} / {{ builder.totalSteps() }}
+        </p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 w-full">
+        <button
+          class="flex-1 px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest bg-amber-500 text-slate-900 hover:bg-amber-400 hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+          (click)="resumeDraft()"
+        >
+          ▶ Reprendre
+        </button>
+        <button
+          class="flex-1 px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 hover:text-white hover:border-slate-500 transition-all"
+          (click)="startFresh()"
+        >
+          ✨ Recommencer
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<div class="max-w-5xl mx-auto px-4 min-h-[calc(100vh-64px)] flex flex-col justify-center">
+  <div class="w-full animate-fade-in">
+    @switch (builder.currentStep()) {
+      @case (1) {
+        <app-species-step />
+      }
+      @case (2) {
+        <app-civilization-step />
+      }
+      @case (3) {
+        <app-class-step />
+      }
+      @case (4) {
+        <app-abilities-step />
+      }
+      @case (5) {
+        <app-skills-step />
+      }
+      @case (6) {
+        <app-equipment-step />
+      }
+      @case (7) {
+        <app-languages-step />
+      }
+      @case (8) {
+        @if (builder.creation().hasSpellcasting) {
+          <app-magic-step />
+        } @else {
+          <app-identity-step />
+        }
+      }
+      @case (9) {
+        @if (builder.creation().hasSpellcasting) {
+          <app-identity-step />
+        } @else {
+          <app-summary-step />
+        }
+      }
+      @case (10) {
+        <app-summary-step />
+      }
+      @default {
+        <div
+          class="flex items-center justify-center min-h-[300px] border-2 border-dashed border-slate-700 rounded-xl bg-slate-900/50"
+        >
+          <p class="text-slate-500 font-mono text-center">
+            Le chemin est obscurci...<br />
+            <span class="text-xs">(Étape {{ builder.currentStep() }} introuvable)</span>
+          </p>
+        </div>
+      }
+    }
+  </div>
+</div>

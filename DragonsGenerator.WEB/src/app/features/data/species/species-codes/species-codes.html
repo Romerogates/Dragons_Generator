@@ -1,0 +1,70 @@
+<section class="species-codes">
+  <header class="page-header">
+    <h1>Codes des espèces</h1>
+    <p class="subtitle">
+      Référence des abréviations utilisées pour les tailles et les caractéristiques
+    </p>
+  </header>
+
+  @if (isLoading()) {
+    <p class="loading">Chargement…</p>
+  } @else if (error()) {
+    <p class="error">{{ error() }}</p>
+  } @else {
+    <div class="codes-grid">
+      <!-- ===== TAILLES ===== -->
+      <section class="codes-block">
+        <h2>Tailles ({{ sizeCodes().length }})</h2>
+        @if (sizeCodes().length === 0) {
+          <p class="empty">Aucun code de taille.</p>
+        } @else {
+          <table class="codes-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Libellé</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entry of sizeCodes(); track entry.code) {
+                <tr>
+                  <td>
+                    <code>{{ entry.code }}</code>
+                  </td>
+                  <td>{{ entry.label }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </section>
+
+      <!-- ===== CARACTÉRISTIQUES ===== -->
+      <section class="codes-block">
+        <h2>Caractéristiques ({{ abilityCodes().length }})</h2>
+        @if (abilityCodes().length === 0) {
+          <p class="empty">Aucun code de caractéristique.</p>
+        } @else {
+          <table class="codes-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Libellé</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entry of abilityCodes(); track entry.code) {
+                <tr>
+                  <td>
+                    <code>{{ entry.code }}</code>
+                  </td>
+                  <td>{{ entry.label }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </section>
+    </div>
+  }
+</section>

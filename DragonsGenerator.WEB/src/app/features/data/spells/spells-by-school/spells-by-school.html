@@ -1,0 +1,181 @@
+<div
+  class="w-full flex flex-col animate-fade-in select-none bg-[#171b22] text-slate-300 min-h-screen pb-20"
+>
+  <section
+    class="w-full pt-12 pb-8 px-4 max-w-7xl mx-auto flex flex-col items-center border-b border-slate-800 bg-[#0a0d13]/50 relative overflow-hidden"
+  >
+    <div class="w-full relative z-10 mb-6">
+      <a
+        routerLink="/spells"
+        class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-fuchsia-500 transition-colors group"
+      >
+        <span class="group-hover:-translate-x-1 transition-transform">←</span> Retour au Grimoire
+      </a>
+    </div>
+
+    <div class="relative z-10 flex flex-col items-center text-center w-full max-w-4xl">
+      <div class="flex items-center gap-6 mb-8 w-full">
+        <div class="h-px flex-grow bg-gradient-to-r from-transparent to-slate-700"></div>
+        <h1
+          class="text-3xl md:text-5xl font-extrabold text-slate-100 font-serif tracking-widest uppercase drop-shadow-2xl text-center"
+        >
+          École : <span class="text-fuchsia-500">{{ school() }}</span>
+        </h1>
+        <div class="h-px flex-grow bg-gradient-to-l from-transparent to-slate-700"></div>
+      </div>
+
+      @if (schools().length > 0) {
+        <nav class="flex flex-wrap justify-center gap-3">
+          @for (s of schools(); track s) {
+            <a
+              [routerLink]="['/spells/school', s]"
+              class="px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md border flex items-center gap-2"
+              [ngClass]="
+                s === school()
+                  ? 'bg-fuchsia-500 text-slate-900 border-fuchsia-400 scale-105 shadow-[0_0_15px_rgba(217,70,239,0.4)]'
+                  : 'bg-[#1b2028] text-slate-400 border-slate-700 hover:border-fuchsia-500/50 hover:text-fuchsia-400'
+              "
+            >
+              <span class="text-base">{{ getSchoolIcon(s) }}</span>
+              {{ s }}
+            </a>
+          }
+        </nav>
+      }
+    </div>
+  </section>
+
+  <section class="w-full relative z-20 px-4 max-w-7xl mx-auto flex flex-col items-center mt-10">
+    @if (error(); as errorMsg) {
+      <div
+        class="p-4 bg-red-950/50 border border-red-900 rounded-xl text-center shadow-lg w-full max-w-lg"
+      >
+        <p class="text-red-400 font-medium">{{ errorMsg }}</p>
+      </div>
+    } @else if (spells() === null) {
+      <div class="flex flex-col items-center justify-center py-20 animate-pulse text-fuchsia-500">
+        <span class="text-6xl mb-4">🪄</span>
+        <p class="text-lg font-serif tracking-widest uppercase text-slate-400">
+          Recherche des incantations...
+        </p>
+      </div>
+    } @else if (spells()!.length === 0) {
+      <div class="col-span-full py-24 text-center">
+        <span class="text-6xl mb-6 block opacity-30">🕸️</span>
+        <p class="text-slate-500 text-sm italic">
+          Cette école de magie ne possède aucun sort référencé.
+        </p>
+      </div>
+    } @else {
+      <div class="w-full flex justify-between items-end mb-6 border-b border-slate-800 pb-2">
+        <p class="text-fuchsia-500/80 text-[10px] font-black uppercase tracking-widest">
+          {{ spells()!.length }} sort(s) répertorié(s)
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+        @for (spell of spells(); track spell.id) {
+          <article
+            class="bg-[#1b2028] rounded-2xl border border-slate-800 shadow-xl group hover:border-fuchsia-500/50 transition-all duration-300 hover:-translate-y-1 flex flex-col overflow-hidden relative"
+          >
+            <div
+              class="absolute -top-4 -right-4 text-8xl opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-500"
+            >
+              {{ getSchoolIcon(spell.school) }}
+            </div>
+            <div class="p-6 flex flex-col h-full relative z-10">
+              <header class="flex justify-between items-start mb-2">
+                <h2
+                  class="text-xl font-bold text-fuchsia-400 font-serif tracking-wide leading-tight group-hover:text-fuchsia-300 transition-colors"
+                >
+                  <a
+                    [routerLink]="['/spells', spell.id]"
+                    class="hover:underline decoration-fuchsia-500/30 underline-offset-4"
+                    >{{ spell.name }}</a
+                  >
+                </h2>
+                <span class="text-2xl drop-shadow-md ml-4">{{ getSchoolIcon(spell.school) }}</span>
+              </header>
+              <div class="mb-4 flex flex-wrap items-center gap-2">
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  {{ spell.level === 0 ? 'Tour de magie' : 'Niveau ' + spell.level }}
+                </span>
+              </div>
+              <div class="flex flex-wrap gap-2 mb-6">
+                @if (spell.isRitual) {
+                  <span
+                    class="bg-emerald-950/40 text-emerald-400 border border-emerald-900/50 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider"
+                    >Rituel</span
+                  >
+                }
+                @if (spell.isConcentration) {
+                  <span
+                    class="bg-amber-950/40 text-amber-400 border border-amber-900/50 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider"
+                    >Concentration</span
+                  >
+                }
+                @if (spell.isCorrupted) {
+                  <span
+                    class="bg-rose-950/40 text-rose-400 border border-rose-900/50 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider"
+                    >Corrompu</span
+                  >
+                }
+              </div>
+              <div class="grid grid-cols-2 gap-2 mb-6 mt-auto">
+                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
+                  <span class="text-[8px] text-slate-500 uppercase tracking-widest font-bold mb-0.5"
+                    >Incantation</span
+                  ><span class="text-xs text-slate-300 font-medium">{{
+                    formatMeta(spell.castingTime)
+                  }}</span>
+                </div>
+                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
+                  <span class="text-[8px] text-slate-500 uppercase tracking-widest font-bold mb-0.5"
+                    >Portée</span
+                  ><span class="text-xs text-slate-300 font-medium">{{
+                    formatMeta(spell.range)
+                  }}</span>
+                </div>
+                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
+                  <span class="text-[8px] text-slate-500 uppercase tracking-widest font-bold mb-0.5"
+                    >Durée</span
+                  ><span class="text-xs text-slate-300 font-medium">{{
+                    formatMeta(spell.duration)
+                  }}</span>
+                </div>
+                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
+                  <span class="text-[8px] text-slate-500 uppercase tracking-widest font-bold mb-0.5"
+                    >Composantes</span
+                  ><span class="text-xs text-fuchsia-400 font-bold tracking-widest">{{
+                    formatComponents(spell.components)
+                  }}</span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed italic line-clamp-3 mb-6">
+                {{ spell.description }}
+              </p>
+              @if (spell.classes.length > 0) {
+                <div class="border-t border-slate-800 pt-4 mb-4">
+                  <span
+                    class="text-[9px] font-black uppercase tracking-widest text-slate-600 block mb-1"
+                    >Invocateurs</span
+                  >
+                  <p class="text-[10px] text-slate-400 uppercase tracking-wider">
+                    {{ spell.classes.join(' · ') }}
+                  </p>
+                </div>
+              }
+              <footer class="mt-auto">
+                <a
+                  [routerLink]="['/spells', spell.id]"
+                  class="w-full block text-center bg-fuchsia-950/20 hover:bg-fuchsia-900/40 text-fuchsia-500 border border-fuchsia-900/30 rounded-lg py-2 text-[10px] font-black uppercase tracking-widest transition-colors"
+                  >Déchiffrer le sort</a
+                >
+              </footer>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </section>
+</div>

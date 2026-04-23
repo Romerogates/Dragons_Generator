@@ -1,0 +1,189 @@
+<div class="w-full min-h-screen bg-[#171b22] text-slate-300 animate-fade-in select-none pb-20">
+  <div class="max-w-4xl mx-auto px-4 pt-10">
+    <a
+      routerLink="/equipments"
+      class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-amber-500 transition-colors mb-8 group"
+    >
+      <span class="group-hover:-translate-x-1 transition-transform">←</span> Retour à l'Arsenal
+    </a>
+
+    @if (loading()) {
+      <div class="flex flex-col items-center justify-center py-32 animate-pulse text-amber-500">
+        <span class="text-6xl mb-6">🔍</span>
+        <p class="text-lg font-serif tracking-widest uppercase text-slate-400">
+          Expertise de l'objet en cours...
+        </p>
+      </div>
+    } @else if (error()) {
+      <div class="flex flex-col items-center justify-center py-32 text-center">
+        <span class="text-7xl mb-6 drop-shadow-[0_0_20px_rgba(220,38,38,0.4)] animate-pulse"
+          >🔥</span
+        >
+        <h2 class="text-3xl font-bold text-red-500 font-serif tracking-widest uppercase mb-4">
+          Erreur d'Expertise
+        </h2>
+        <p class="text-lg text-slate-400 italic max-w-md leading-relaxed mb-8">{{ error() }}</p>
+        <a
+          routerLink="/equipments"
+          class="px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all border border-slate-700 shadow-lg hover:-translate-y-1"
+          >Retourner au marché</a
+        >
+      </div>
+    } @else if (equipment(); as eq) {
+      <header class="text-center mb-12">
+        <h1
+          class="text-5xl md:text-6xl font-extrabold text-amber-500 font-serif tracking-wide mb-4 drop-shadow-lg"
+        >
+          {{ eq.name }}
+        </h1>
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <a
+            [routerLink]="['/equipments/type', eq.type.toLowerCase()]"
+            class="bg-slate-800 text-slate-300 px-3 py-1.5 rounded-md text-xs font-black uppercase tracking-wider border border-slate-700 shadow-inner hover:border-amber-500 hover:text-amber-400 transition-colors cursor-pointer"
+            title="Voir tous les objets de la catégorie {{ translateType(eq.type) }}"
+          >
+            {{ translateType(eq.type) }}
+          </a>
+
+          <span class="text-slate-500 text-xs font-bold italic">
+            {{ translateSubtype(eq.subtype) }}
+          </span>
+        </div>
+      </header>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="col-span-1 flex flex-col gap-8">
+          <section
+            class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800 shadow-xl group hover:border-amber-500/30 transition-colors relative overflow-hidden"
+          >
+            <div
+              class="absolute -top-4 -right-4 text-6xl opacity-5 pointer-events-none group-hover:scale-110 transition-transform"
+            >
+              🏷️
+            </div>
+
+            <h2
+              class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-4"
+            >
+              Identification
+            </h2>
+
+            <dl class="space-y-4">
+              <div>
+                <dt class="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-1">
+                  Identifiant d'archive
+                </dt>
+                <dd
+                  class="text-xs text-slate-400 font-mono bg-[#171b22] px-2 py-1 rounded border border-slate-700/50 break-all"
+                >
+                  {{ eq.id }}
+                </dd>
+              </div>
+
+              <div>
+                <dt class="text-[10px] uppercase tracking-widest text-amber-600/80 font-bold mb-1">
+                  Valeur Marchande
+                </dt>
+                <dd class="text-lg font-medium text-amber-500">
+                  @if (eq.cost.v !== null) {
+                    {{ eq.cost.v }} <span class="text-xs uppercase font-bold">{{ eq.cost.u }}</span>
+                  } @else {
+                    <span class="text-sm text-slate-500 italic">Inestimable / Non vendu</span>
+                  }
+                </dd>
+              </div>
+
+              <div>
+                <dt
+                  class="text-[10px] uppercase tracking-widest text-emerald-600/80 font-bold mb-1"
+                >
+                  Encombrement (Poids)
+                </dt>
+                <dd class="text-base font-medium text-emerald-400">
+                  @if (eq.wKg !== null) {
+                    {{ eq.wKg }} <span class="text-xs opacity-70">kg</span>
+                  } @else {
+                    <span class="text-sm text-slate-500 italic">Négligeable</span>
+                  }
+                </dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+
+        <div class="col-span-1 md:col-span-2 flex flex-col gap-8">
+          @if (eq.data) {
+            @if ($any(eq.data).desc) {
+              <section
+                class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl relative group hover:border-slate-500/30 transition-colors"
+              >
+                <div class="absolute top-0 right-0 p-6 text-6xl opacity-5 pointer-events-none">
+                  📜
+                </div>
+                <h2
+                  class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-4"
+                >
+                  Description
+                </h2>
+                <p class="text-sm md:text-base text-slate-300 leading-relaxed italic">
+                  "{{ $any(eq.data).desc }}"
+                </p>
+              </section>
+            }
+
+            @if (dataEntries(eq.data).length > 0) {
+              <section
+                class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl group hover:border-emerald-500/30 transition-colors"
+              >
+                <h2
+                  class="text-sm font-black text-emerald-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-6 flex items-center gap-2"
+                >
+                  <span class="text-lg">⚙️</span> Caractéristiques Techniques
+                </h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  @for (entry of dataEntries(eq.data); track entry.key) {
+                    <div
+                      class="bg-[#171b22] border border-slate-700/50 rounded-xl p-4 flex flex-col"
+                    >
+                      <dt
+                        class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-2"
+                      >
+                        {{ entry.key }}
+                      </dt>
+                      <dd class="text-sm text-slate-200 font-medium">
+                        @if (formatValue(entry.value) === 'Oui') {
+                          <span
+                            class="bg-red-950/40 text-red-400 border border-red-900/50 px-2 py-1 rounded text-[10px] uppercase font-bold tracking-wider"
+                          >
+                            Applicable
+                          </span>
+                        } @else if (formatValue(entry.value) === 'Non') {
+                          <span
+                            class="bg-emerald-950/40 text-emerald-400 border border-emerald-900/50 px-2 py-1 rounded text-[10px] uppercase font-bold tracking-wider"
+                          >
+                            Non applicable
+                          </span>
+                        } @else {
+                          {{ formatValue(entry.value) }}
+                        }
+                      </dd>
+                    </div>
+                  }
+                </div>
+              </section>
+            }
+          } @else {
+            <div
+              class="flex items-center justify-center h-full bg-[#1b2028]/50 border border-slate-800 border-dashed rounded-3xl p-8"
+            >
+              <p class="text-slate-500 italic text-sm text-center">
+                Aucune caractéristique technique supplémentaire pour cet objet.
+              </p>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,225 @@
+<div
+  class="relative w-full flex flex-col items-center pb-8 select-none min-h-[65vh] justify-center"
+>
+  <div class="text-center mb-5 w-full px-4 mt-2">
+    <h2 class="text-2xl font-extrabold text-amber-500 mb-1 drop-shadow-md tracking-wide font-serif">
+      Arsenal de Départ
+    </h2>
+    <p class="text-slate-400 text-xs max-w-xl mx-auto italic">
+      Forgez votre paquetage en choisissant les reliques de votre destin.
+    </p>
+  </div>
+
+  @if (loading()) {
+    <div class="flex items-center justify-center py-12">
+      <div
+        class="w-7 h-7 border-2 border-slate-700 border-t-amber-500 rounded-full animate-spin"
+      ></div>
+    </div>
+  }
+
+  @if (error(); as err) {
+    <div class="text-red-400 text-sm text-center py-8">{{ err }}</div>
+  }
+
+  @if (!loading() && !error()) {
+    <div
+      class="flex items-center gap-2 mb-7 bg-[#1b2028] px-4 py-2 rounded-full border border-slate-700 shadow-lg"
+    >
+      @for (s of resolvedSlots(); track s.slotNumber; let i = $index) {
+        <button
+          class="w-8 h-2 rounded-full transition-all duration-500 cursor-pointer"
+          [ngClass]="{
+            'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)] scale-110':
+              i === activeSlotIndex(),
+            'bg-emerald-500':
+              (selectedAlternatives().has(s.slotNumber) || s.isFixed) && i !== activeSlotIndex(),
+            'bg-slate-700':
+              i > activeSlotIndex() && !selectedAlternatives().has(s.slotNumber) && !s.isFixed,
+          }"
+          (click)="activeSlotIndex.set(i)"
+        ></button>
+      }
+    </div>
+
+    <div class="w-full max-w-5xl px-4 flex flex-col items-center">
+      @if (currentSlot(); as slot) {
+        <div class="w-full flex flex-col items-center animate-fade-in">
+          <div class="flex items-center gap-4 mb-7 w-full max-w-3xl">
+            <div class="h-px flex-grow bg-gradient-to-r from-transparent to-slate-700"></div>
+            <h3
+              class="text-xs font-black uppercase tracking-[0.3em] text-amber-600/80 text-center whitespace-nowrap"
+            >
+              {{ slot.description || 'Choix ' + slot.slotNumber }}
+            </h3>
+            <div class="h-px flex-grow bg-gradient-to-l from-transparent to-slate-700"></div>
+          </div>
+
+          @if (slot.isFixed) {
+            <div
+              class="bg-[#171b22] border-2 border-emerald-500/30 p-7 rounded-2xl text-center shadow-2xl max-w-md w-full"
+            >
+              <p class="text-emerald-400 font-bold mb-4 uppercase tracking-widest text-[10px]">
+                Équipement automatique reçu
+              </p>
+              <div class="flex flex-col gap-3">
+                @for (item of slot.fixedItems; track item.ref.id) {
+                  <div class="flex items-center justify-center gap-3 text-slate-200 font-bold">
+                    <span class="text-2xl">{{ getIconForItem(item) }}</span>
+                    <span>
+                      {{ itemName(item) }}
+                      @if (item.ref.qty > 1) {
+                        <span class="text-slate-500 ml-1">×{{ item.ref.qty }}</span>
+                      }
+                    </span>
+                  </div>
+                }
+              </div>
+
+              @if (activeSlotIndex() < resolvedSlots().length - 1) {
+                <button
+                  (click)="nextSlot()"
+                  class="mt-7 px-8 py-2.5 bg-amber-500 text-slate-900 font-black rounded-lg hover:bg-amber-400 transition-all uppercase tracking-widest text-xs shadow-lg flex items-center justify-center gap-2 mx-auto"
+                >
+                  <span>Choix suivant</span>
+                  <span class="text-lg leading-none">➔</span>
+                </button>
+              }
+            </div>
+          }
+
+          @if (!slot.isFixed && slot.alternatives.length > 0) {
+            <div class="flex flex-wrap justify-center gap-6 w-full">
+              @for (alt of slot.alternatives; track alt.index) {
+                <div
+                  class="relative flex flex-col w-full sm:w-[320px] p-5 rounded-2xl border-2 transition-all duration-300 bg-[#171b22] group cursor-pointer"
+                  [ngClass]="{
+                    'border-emerald-500 bg-emerald-950/20 shadow-[0_0_25px_rgba(16,185,129,0.2)] scale-[1.03] z-20':
+                      selectedAlternatives().get(slot.slotNumber) === alt.index,
+                    'border-slate-800 hover:border-amber-500/40 hover:bg-[#1b2028] opacity-60 hover:opacity-100':
+                      selectedAlternatives().get(slot.slotNumber) !== alt.index,
+                  }"
+                  (click)="selectAlternative(alt.index)"
+                >
+                  <div class="flex flex-col gap-4 mb-6">
+                    @for (item of alt.items; track item.ref.id; let itemIdx = $index) {
+                      <div class="flex flex-col gap-2">
+                        <div class="flex items-center gap-3">
+                          <div
+                            class="w-11 h-11 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-2xl shadow-inner group-hover:scale-110 transition-transform shrink-0"
+                          >
+                            {{ getIconForItem(item) }}
+                          </div>
+                          <div class="flex flex-col overflow-hidden">
+                            <span class="text-sm font-bold text-slate-100 leading-tight">
+                              {{ item.isCategory ? item.categoryLabel : itemName(item) }}
+                            </span>
+                            @if (item.ref.qty > 1) {
+                              <span
+                                class="text-[10px] text-slate-500 font-bold uppercase tracking-widest"
+                              >
+                                Quantité : {{ item.ref.qty }}
+                              </span>
+                            }
+                            @if (!item.isCategory && item.equipment) {
+                              <span class="text-[10px] text-amber-500/70 mt-0.5 italic">
+                                {{ eqDetail(item.equipment) }}
+                              </span>
+                            }
+                          </div>
+                        </div>
+
+                        @if (
+                          item.isCategory &&
+                          selectedAlternatives().get(slot.slotNumber) === alt.index
+                        ) {
+                          <div
+                            class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1"
+                            (click)="$event.stopPropagation()"
+                          >
+                            @for (eq of item.categoryItems; track eq.id) {
+                              <button
+                                class="w-full h-full px-2.5 py-2 rounded-lg border text-[10px] font-bold transition-all text-left leading-tight break-words disabled:opacity-30 disabled:cursor-not-allowed flex items-center"
+                                [ngClass]="
+                                  categoryChoices().get(
+                                    slot.slotNumber + '-' + alt.index + '-' + itemIdx
+                                  ) === eq.id
+                                    ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md'
+                                    : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:bg-slate-800 hover:text-amber-400'
+                                "
+                                [disabled]="
+                                  isAlreadyPicked(slot.slotNumber, alt.index, itemIdx, eq.id)
+                                "
+                                (click)="
+                                  $event.stopPropagation(); selectFromCategory(itemIdx, eq.id)
+                                "
+                                [title]="eq.name"
+                              >
+                                {{ eq.name }}
+                              </button>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  <div class="mt-auto pt-3 border-t border-slate-800/50 flex justify-center">
+                    <span
+                      class="text-[10px] font-black uppercase tracking-[0.15em] transition-colors"
+                      [ngClass]="
+                        selectedAlternatives().get(slot.slotNumber) === alt.index
+                          ? 'text-emerald-400'
+                          : 'text-slate-500 group-hover:text-amber-500'
+                      "
+                    >
+                      {{
+                        selectedAlternatives().get(slot.slotNumber) === alt.index
+                          ? 'Sélectionné ✓'
+                          : 'Choisir ce paquet'
+                      }}
+                    </span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <div class="mt-12 flex flex-col items-center gap-4 w-full">
+        @if (selectionComplete()) {
+          <div
+            class="px-6 py-2.5 bg-emerald-950/30 text-emerald-400 border border-emerald-800/50 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-3 shadow-[0_0_15px_rgba(16,185,129,0.1)] mb-2"
+          >
+            <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
+            Inventaire complet et prêt
+          </div>
+          <button
+            class="px-14 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-amber-500 text-slate-950 shadow-[0_0_25px_rgba(245,158,11,0.3)] hover:bg-amber-400 hover:scale-105 active:scale-95 transition-all"
+            (click)="confirm()"
+          >
+            Forger l'équipement
+          </button>
+        }
+
+        <div class="flex flex-wrap justify-center gap-4 mt-2">
+          @if (activeSlotIndex() > 0 && !selectionComplete()) {
+            <button
+              (click)="prevSlot()"
+              class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-500 transition-colors bg-[#1b2028] px-6 py-2 rounded-full border border-slate-700"
+            >
+              ↑ Choix précédent
+            </button>
+          }
+          <button
+            (click)="prevStep()"
+            class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-400 transition-colors bg-[#1b2028] px-6 py-2 rounded-full border border-slate-700"
+          >
+            ← Revenir aux Compétences
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,40 @@
+<section class="classes">
+  <header class="classes__header">
+    <h1>Classes</h1>
+    <input
+      type="search"
+      placeholder="Rechercher une classe…"
+      [value]="search()"
+      (input)="onSearch($any($event.target).value)"
+    />
+  </header>
+
+  @if (filtered().length) {
+    <ul class="classes__grid">
+      @for (cls of filtered(); track cls.id) {
+        <li class="class-card">
+          <a [routerLink]="['/classes', cls.id]" class="class-card__link">
+            <h2 class="class-card__name">{{ cls.name }}</h2>
+
+            <dl class="class-card__meta">
+              <div>
+                <dt>Dé de vie</dt>
+                <dd>d{{ cls.hitDie }}</dd>
+              </div>
+              <div>
+                <dt>Caractéristiques</dt>
+                <dd>{{ cls.primaryAbilities.join(', ') }}</dd>
+              </div>
+            </dl>
+
+            @if (cls.hasSpellcasting) {
+              <span class="class-card__badge">Lanceur de sorts</span>
+            }
+          </a>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="classes__empty">Aucune classe trouvée.</p>
+  }
+</section>
