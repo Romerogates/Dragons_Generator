@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
@@ -18,6 +18,7 @@ interface FeatureItem {
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './home.html',
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
 })
 export class Home implements OnInit {
   savedCharactersCount = 0;
@@ -34,25 +35,25 @@ export class Home implements OnInit {
       title: 'Création Guidée',
       description:
         "Un assistant immersif pour forger votre héros, du choix de l'espèce jusqu'à l'équipement final.",
-      icon: '🧙‍♂️',
+      icon: 'fluent-emoji:man-mage', // 🧙‍♂️
     },
     {
       title: 'Fiches de Héros',
       description:
         'Générez et visualisez vos fiches de personnages avec toutes leurs aptitudes et sorts.',
-      icon: '📜',
+      icon: 'fluent-emoji:scroll', // 📜
     },
     {
       title: 'Sauvegarde Magique',
       description:
         'Vos héros sont stockés en sécurité dans votre grimoire local. Ne perdez jamais un destin.',
-      icon: '💾',
+      icon: 'fluent-emoji:floppy-disk', // 💾
     },
     {
       title: 'Grimoire de Règles',
       description:
         "Accédez instantanément aux détails des sorts, de l'équipement et des langues d'Eana.",
-      icon: '📚',
+      icon: 'fluent-emoji:books', // 📚
     },
   ];
 

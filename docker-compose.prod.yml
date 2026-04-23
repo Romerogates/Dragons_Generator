@@ -18,8 +18,11 @@ services:
       context: ./DragonsGenerator.WEB
       dockerfile: Dockerfile
     ports:
-      # Mappe le port 4200 de ton PC vers le port 80 du conteneur Nginx
       - "80:80"
+      - "443:443" # NOUVEAU : On ouvre la porte pour le HTTPS
+    volumes:
+      # NOUVEAU : On donne à Nginx l'accès (en lecture seule 'ro') à tes nouveaux certificats
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - dragons-api
     networks:
