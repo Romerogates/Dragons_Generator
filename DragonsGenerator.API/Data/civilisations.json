@@ -1,0 +1,559 @@
+[
+  {
+    "id": "civ-acoatl",
+    "name": "Acoatl",
+    "randomization": { "dice_min": 1, "dice_max": 2 },
+    "demographics": {
+      "primary_species": [
+        { "id": "sp-humain", "label": "Humains" },
+        { "id": "sp-aldaron", "label": "Aldarons" },
+        { "id": "sp-halfelin-pied-sur", "label": "Halfelins pieds-sûrs" }
+      ],
+      "secondary_species": [],
+      "is_cosmopolitan": false,
+      "cosmopolitan_zones": ["comptoirs côtiers"],
+      "social_roles": [
+        { "id": "role-marchand", "label": "Marchands (comptoirs)" },
+        { "id": "role-mercenaire", "label": "Mercenaires (comptoirs)" }
+      ]
+    },
+    "linguistics": {
+      "official_languages": [{ "id": "lg-runasimi", "label": "Runasimi" }],
+      "additional_languages_spoken": false,
+      "writing_systems": [{ "id": "wr-culture-orale", "label": "Culture orale" }]
+    },
+    "lore": {
+      "full_description": "Acoatl est une contrée encore très largement inconnue et inexplorée — qu'y a-t-il d'ailleurs derrière les montagnes volcaniques, loin, à l'ouest ? — à laquelle on accède via des comptoirs établis sur des rivages insalubres, infestés de moustiques et de caïmans. Les étrangers viennent ici en quête d'aventures ; ils rêvent de l'or et de la magie des ruines des cités dans les hauteurs. Dans l'immense plaine de la forêt émeraude, les habitants des tribus locales sont prudents : ils connaissent les légendes sur les cruels tyrans qui gouvernaient autrefois, luttaient et s'entredéchiraient, rêvant de pouvoir absolu et d'immortalité. Mais ce n'est pas tout, car on raconte que les cénotes renferment les portes vers d'autres mondes… Le nom de cette contrée signifie « dragon » dans la langue des tribus pieds-sûrs locales : les pionniers racontent que ces créatures sont particulièrement nombreuses dans cette région.",
+      "threat_ids": ["threat-tyrans-cruels", "threat-dragons"],
+      "geography_tags": ["montagnes-volcaniques", "comptoirs", "rivages-insalubres", "foret-emeraude", "cenotes"]
+    }
+  },
+  {
+    "id": "civ-ajagar",
+    "name": "Ajagar",
+    "randomization": { "dice_min": 3, "dice_max": 7 },
+    "demographics": {
+      "primary_species": [
+        { "id": "sp-humain", "label": "Humains" },
+        { "id": "sp-aldaron", "label": "Aldarons (jungles)" }
+      ],
+      "secondary_species": [{ "id": "sp-tous", "label": "Tous les peuples (grandes villes côtières)" }],
+      "is_cosmopolitan": true,
+      "cosmopolitan_zones": ["grandes villes côtières"],
+      "social_roles": []
+    },
+    "linguistics": {
+      "official_languages": [{ "id": "lg-baashan", "label": "Baashan" }],
+      "additional_languages_spoken": false,
+      "writing_systems": [{ "id": "wr-elfique", "label": "Elfique" }]
+    },
+    "lore": {
+      "full_description": "De riches cités dirigées par des rajahs prospèrent grâce au commerce des ressources précieuses de l'Ajagar : épices, bois rares, joyaux, ivoire… Au sein de cette culture, de nombreux seigneurs rivalisent pour dominer leurs voisins, lançant des troupes d'éléphants de guerre ou des assassins armés de katars empoisonnés. Dans les jungles luxuriantes reposent les ruines de royaumes autrefois superbes et orgueilleux, désormais abandonnés aux tigres et aux boas. Plus haut, près des neiges éternelles des sommets impassibles, des sages s'adonnent à la méditation et cherchent à mieux connaître le monde.",
+      "threat_ids": ["threat-rajahs-rivaux", "threat-assassins", "threat-tigres", "threat-boas"],
+      "geography_tags": ["jungles-luxuriantes", "villes-cotieres", "ruines", "neiges-eternelles", "sommets"]
+    }
+  },
+  {
+    "id": "civ-arolavie",
+    "name": "Arolavie",
+    "randomization": { "dice_min": 8, "dice_max": 12 },
+    "demographics": {
+      "primary_species": [
+        { "id": "sp-humain", "label": "Humains" },
+        { "id": "sp-nain-gardien", "label": "Nains gardiens" },
+        { "id": "sp-aldaron", "label": "Aldarons (forêts)" }
+      ],
+      "secondary_species": [{ "id": "sp-tous", "label": "Autres peuples (rares, via routes marchandes)" }],
+      "is_cosmopolitan": false,
+      "cosmopolitan_zones": [],
+      "social_roles": []
+    },
+    "linguistics": {
+      "official_languages": [{ "id": "lg-arolave", "label": "Arolave" }],
+      "additional_languages_spoken": false,
+      "writing_systems": [{ "id": "wr-cyfand", "label": "Cyfand" }]
+    },
+    "lore": {
+      "full_description": "Située au nord-est du Cyfandir, l'Arolavie aux vastes forêts demeure mystérieuse à bien des égards. En grande partie sauvage, elle est bordée par des forêts sacrées ou taboues, sur sa frontière nord. Les farouches fées n'écoutent que les druides qui connaissent les secrets de l'antique pacte qui les lie. Le royaume est dirigé par une dynastie de reines, les karalievae. Ces femmes redoutables défendent leurs terres contre les attaques éclair de Lothrienne ou du Septentrion, les incursions du Chancre jaillissant des Drakenbergen et les assauts des pirates de la mer Usvalia. Elles ne manquent pas non plus de surveiller les ombres qui s'agitent autour des colonies des rivages du fleuve Golostarogo ou dans les bas-fonds de la grouillante cité de Moromiek, reprise de haute lutte à l'ennemi. Pour tout cela, elles savent pouvoir s'appuyer sur la garde lunaire, une légion composée de volontaires qui s'engagent en formulant un vœu que l'Arolavie exaucera au terme de leur service — plus ou moins long ou dangereux en fonction de la nature du vœu.",
+      "threat_ids": ["threat-lothrienne", "threat-septentrion", "threat-chancre", "threat-pirates-usvalia"],
+      "geography_tags": ["vastes-forets", "forets-sacrees", "frontiere-nord", "fleuve-golostarogo", "moromiek"]
+    }
+  },
+  {
+    "id": "civ-iles-barbaresques",
+    "name": "Barbaresques (Îles)",
+    "randomization": { "dice_min": 13, "dice_max": 22 },
+    "demographics": {
+      "primary_species": [{ "id": "sp-tous", "label": "Tous les peuples" }],
+      "secondary_species": [],
+      "is_cosmopolitan": true,
+      "cosmopolitan_zones": ["archipel entier"],
+      "social_roles": [{ "id": "role-immigre", "label": "Population composée d'immigrés de tous horizons" }]
+    },
+    "linguistics": {
+      "official_languages": [{ "id": "lg-kalam", "label": "Kalam" }],
+      "additional_languages_spoken": true,
+      "writing_systems": [{ "id": "wr-abjad-kalam", "label": "Abjad kalam" }],
+      "additional_writing_systems_used": true
+    },
+    "lore": {
+      "full_description": "Pirates ! Corsaires ! Flibustiers ! De l'extérieur, les Îles Barbaresques semblent n'être peuplées que de ces marginaux et de leurs (trop nombreux) complices. En réalité, les premiers seigneurs pirates sont progressivement devenus des chefs de ports et de cités, fondant pour ainsi dire des cités-États, dont une partie importante de l'économie est prédatrice. La vente du sucre et du cacao de leurs îles leur suffit rarement, et ils gagnent bien plus — et plus vite — par d'autres moyens : piraterie, commerce d'esclaves, mercenariat. Les actuels habitants des Îles Barbaresques connaissent très mal — quand ils n'ignorent pas purement et simplement — le passé de leurs terres. Ne faudrait-il pas s'inquiéter des rites étranges accomplis par certains à la tombée de la nuit ?",
+      "threat_ids": ["threat-piraterie", "threat-commerce-esclaves", "threat-rites-etranges"],
+      "geography_tags": ["archipel", "ports", "cites-etats"]
+    }
+  },
+  {
+    "id": "civ-cite-franche",
+    "name": "Cité Franche",
+    "randomization": { "dice_min": 23, "dice_max": 43 },
+    "demographics": {
+      "primary_species": [
+        { "id": "sp-humain", "label": "Humains" },
+        { "id": "sp-nain-batisseur", "label": "Nains bâtisseurs" },
+        { "id": "sp-halfelin-pied-leger", "label": "Halfelins pieds-légers" },
+        { "id": "sp-gnome-des-roches", "label": "Gnomes des roches" }
+      ],
+      "secondary_species": [{ "id": "sp-tous", "label": "Tous les peuples" }],
+      "is_cosmopolitan": true,
+      "cosmopolitan_zones": ["ville entière"],
+      "social_roles": []
+    },
+    "linguistics": {
+      "official_languages": [{ "id": "lg-cyfand", "label": "Cyfand" }],
+      "additional_languages_spoken": true,
+      "writing_systems": [{ "id": "wr-cyfand", "label": "Cyfand" }]
+    },
+    "lore": {
+      "full_description": "La Cité Franche est probablement la plus grande ville d'Eana. Port situé à l'embouchure du fleuve Dispende, elle est ouverte sur les mers de l'ouest, du sud et de l'est. Cette puissance marchande majeure a su établir des comptoirs et des alliances dans la plupart des pays et a imposé ses normes (monnaie, alphabet…). La ville elle-même, dirigée par un conseil de citoyens, est partagée en quartiers souvent fortement marqués par une communauté (elfes d'Ellerìna, halfelins de la Myetée…). Riche, contrastée, inégalitaire, bruyante, épicée, déconcertante, violente et multiculturelle : la Cité Franche est le point de départ par défaut de vos aventures.",
+      "threat_ids": [],
+      "geography_tags": ["metropole", "port", "embouchure-dispende", "quartiers-communautaires"],
+      "notable_features": [
+        "Plus grande ville d'Eana",
+        "Port à l'embouchure du fleuve Dispende",
+        "Ouverte sur les mers ouest, sud et est",
+        "Dirigée par un conseil de citoyens",
+        "A imposé sa monnaie et son alphabet",
+        "Quartiers communautaires (elfes d'Ellerìna, halfelins de la Myetée)",
+        "Point de départ par défaut des aventures"
+      ]
+    }
+  },
+  {
+    "id": "civ-cyrillane",
+    "name": "Cyrillane",
+    "randomization": { "dice_min": 44, "dice_max": 53 },
+    "demographics": {
+      "primary_species": [
+        { "id": "sp-humain", "label": "Humains" },
+        { "id": "sp-nain-batisseur", "label": "Nains bâtisseurs" },
+        { "id": "sp-gnome-des-roches", "label": "Gnomes des roches" }
+      ],
+      "secondary_species": [{ "id": "sp-tous", "label": "Tous les autres peuples (grandes villes)" }],
+      "is_cosmopolitan": true,
+      "cosmopolitan_zones": ["grandes villes"],
+      "social_roles": []
+    },
+    "linguistics": {
+      "official_languages": [{ "id": "lg-cyrillan", "label": "Cyrillan" }],
+      "additional_languages_spoken": false,
+      "writing_systems": [{ "id": "wr-cyfand", "label": "Cyfand" }]
+    },
+    "lore": {
+      "full_description": "Jusqu'à récemment, l'empire cyrillan était le principal rival de la Cité Franche. Dirigé depuis des siècles par une dynastie brillante, mais miné par de graves inégalités et une corruption endémique, il s'est effondré comme un château de cartes. Aujourd'hui, le pays est déchiré entre les nombreuses factions qui se disputent sa dépouille : sectes autoproclamées libératrices et adeptes de Tamerakh le destructeur, généraux loyalistes, chefs de guerre opportunistes associés de très près aux guildes de voleurs, dragons noirs… Dans l'ombre, un être maléfique et calculateur attend son heure : la liche Mégare de Cyrillane, ancienne princesse contrainte à la clandestinité suite à ses crimes innommables.",
+      "threat_ids": [
+        "threat-tamerakh",
+        "threat-generaux-loyalistes",
+        "threat-chefs-de-guerre",
+        "threat-guildes-de-voleurs",
+        "threat-dragons-noirs",
+        "threat-liche-megare"
+      ],
+      "geography_tags": ["empire-dechu", "grandes-villes"]
+    }
+  },
+  {
+    "id": "civ-drakenbergen",
+    "name": "Drakenbergen",
+    "randomization": { "dice_min": 54, "dice_max": 62 },
+    "demographics": {
+      "primary_species": [
+        { "id": "sp-humain", "label": "Humains (surface)" },
+        { "id": "sp-nain-batisseur", "label": "Nains bâtisseurs (surface)" },
+        { "id": "sp-gnome-des-roches", "label": "Gnomes des roches (surface)" },
+        { "id": "sp-halfelin-pied-leger", "label": "Halfelins pieds-légers (surface)" },
+        { "id": "sp-nain-gardien", "label": "Nains gardiens (mines)" }
+      ],
+      "secondary_species": [{ "id": "sp-tous", "label": "Gens de toutes espèces (routes marchandes)" }],
+      "is_cosmopolitan": true,
+      "cosmopolitan_zones": ["routes marchandes"],
+      "social_roles": [],
+      "hostile_populations": [
+        { "id": "sp-kobold", "label": "Kobolds (communautés éparpillées)" },
+        { "id": "sp-gobelin", "label": "Gobelins (communautés éparpillées)" },
+        { "id": "sp-gobelours", "label": "Gobelours (communautés éparpillées)" }
+      ]
+    },
+    "linguistics": {
+      "official_languages": [
+        { "id": "lg-cyfand", "label": "Cyfand" },
+        { "id": "lg-nain", "label": "Nain" }
+      ],
+      "additional_languages_spoken": false,
+      "writing_systems": [
+        { "id": "wr-cyfand", "label": "Cyfand" },
+        { "id": "wr-runique", "label": "Runique" }
+      ]
+    },
+    "lore": {
+      "full_description": "Les monts draconiques, ou Drakenbergen, sont un vaste massif montagneux partagé en d'innombrables communautés et fort d'une riche histoire qui se lit dans les ruines majestueuses. On y trouve aussi bien de minuscules royaumes féodaux, que des communautés audacieuses, établis dans des vallées sauvages. Le seul véritable point commun est la présence des nains qui ont bâti dans le sous-sol des mines, des villes et des forteresses depuis des milliers d'années. Responsables de la tenue des routes et sécurisant les voies marchandes, ils permettent à la vie de se maintenir malgré les dangers et à la civilisation de la Cité Franche de pénétrer dans des régions reculées. Malgré tous leurs efforts, le Chancre s'insinue régulièrement jusqu'à la surface pour ravager et préparer ses conquêtes. Cette abomination n'est pas la seule menace : les raids des drows et des marchands d'esclaves duergars sont tout autant redoutés. À la surface, des communautés kobolds, gobelines et gobelours éparpillées vivotent de rapines tandis que de grands prédateurs aériens — hippogriffes, griffons, jeunes dragons… — sont à l'affût de proies savoureuses.",
+      "threat_ids": [
+        "threat-chancre",
+        "threat-drow",
+        "threat-duergar",
+        "threat-kobold",
+        "threat-gobelin",
+        "threat-gobelours",
+        "threat-hippogriffe",
+        "threat-griffon",
+        "threat-dragon"
+      ],
+      "geography_tags": ["massif-montagneux", "mines", "villes-souterraines", "forteresses", "vallees-sauvages", "ruines"]
+    }
+  },
+  {
+    "id": "civ-ellerina",
+    "name": "Ellerìna",
+    "randomization": { "dice_min": 63, "dice_max": 65 },
+    "demographics": {
+      "primary_species": [{ "id": "sp-elenion", "label": "Elenions" }],
+      "secondary_species": [
+        { "id": "sp-demi-elfe", "label": "Demi-elfes (résidents minoritaires)" },
+        { "id": "sp-aldaron", "label": "Aldarons (résidents minoritaires)" },
+        { "id": "sp-tous", "label": "Autres peuples (cantonnés à Varnaïrello, commerce/études)" }
+      ],
+      "is_cosmopolitan": false,
+      "cosmopolitan_zones": ["Varnaïrello (uniquement commerce et études)"],
+      "social_roles": []
+    },
+    "linguistics": {
+      "official_languages": [{ "id": "lg-elfique", "label": "Elfique" }],
+      "additional_languages_spoken": false,
+      "writing_systems": [{ "id": "wr-elfique", "label": "Elfique" }]
+    },
+    "lore": {
+      "full_description": "Les elenions ne partagent volontiers leurs terres qu'avec ceux de leur sang. Leur royaume est immense et totalement méconnu de l'extérieur. Les étrangers savent seulement que s'y trouvent d'abondantes richesses et de grandes sources de magie. On prétend aussi que la terre des géants des tempêtes se trouverait de l'autre côté de la vaste île des elfes et que là-bas, tout serait proportionnel à ces êtres : les bois, les forteresses, le bétail… D'Ellerìna, on ne connaît généralement que la capitale Varnaïrello, blanche cité, image de la perfection en toute chose. Les secrets des elfes sont bien gardés, car une si vive lumière ne va pas sans zones d'ombre.",
+      "threat_ids": ["threat-geants-des-tempetes", "threat-secrets-elfiques"],
+      "geography_tags": ["ile", "varnairello", "sources-de-magie"]
+    }
+  },
+  {
+    "id": "civ-iles-eoliennes",
+    "name": "Éoliennes (Îles)",
+    "randomization": { "dice_min": 66, "dice_max": 71 },
+    "demographics": {
+      "primary_species": [
+        { "id": "sp-gnome-des-roches", "label": "Gnomes des roches" },
+        { "id": "sp-humain", "label": "Humains" }
+      ],
+      "secondary_species": [
+        { "id": "sp-tous", "label": "Autres peuples (individus installés par curiosité ou par goût)" }
+      ],
+      "is_cosmopolitan": false,
+      "cosmopolitan_zones": [],
+      "social_roles": []
+    },
+    "linguistics": {
+      "official_languages": [{ "id": "lg-gnome", "label": "Gnome" }],
+      "additional_languages_spoken": false,
+      "writing_systems": [{ "id": "wr-cyfand", "label": "Cyfand" }]
+    },
+    "lore": {
+      "full_description": "Fabuleuses îles volantes, les Éoliennes forment un monde de merveilles où l'on voyage en néfélytre. Selon l'altitude, les vents, les nuages et les aménagements, les îlots peuvent prendre des aspects très divers. On peut y passer des années en ne croisant jamais personne, se croire seul au monde. D'autres, bien conscients de l'extérieur, explorent cette région mystérieuse et luttent contre des pirates des airs — à moins qu'il ne s'agisse de découvrir l'entrée vers le Plan Astral ?",
+      "threat_ids": ["threat-pirates-des-airs"],
+      "geography_tags": ["iles-volantes", "nefelytre", "plan-astral"]
+    }
+  },
+  {
+    "id": "civ-inframonde",
+    "name": "Inframonde",
+    "randomization": { "dice_min": 72, "dice_max": 72 },
+    "demographics": {
+      "primary_species": [
+        { "id": "sp-nain-gardien", "label": "Nains gardiens" },
+        { "id": "sp-nain-batisseur", "label": "Nains bâtisseurs" },
+        { "id": "sp-drow", "label": "Drows" },
+        { "id": "sp-duergar", "label": "Duergars" },
+        { "id": "sp-svirfnebelin", "label": "Svirfnebelins" },
+        { "id": "sp-torve", "label": "Torves" },
+        { "id": "sp-sidhe", "label": "Sidhes" }
+      ],
+      "secondary_species": [],
+      "is_cosmopolitan": false,
+      "cosmopolitan_zones": [],
+      "social_roles": [{ "id": "role-esclave", "label": "Autres peuples réduits en esclavage" }]
+    },
+    "linguistics": {
+      "official_languages": [{ "id": "lg-commun-des-profondeurs", "label": "Commun des profondeurs" }],
+      "additional_languages_spoken": true,
+      "writing_systems": [{ "id": "wr-elfique-modifie", "label": "Elfique (modifié)" }]
+    },
+    "lore": {
+      "full_description": "L'Inframonde est largement méconnu, même de ceux qui sont habitués à y évoluer. Immédiatement près de la surface se trouvent les mines, les forteresses, les prisons et certains temples. Plus profond, on découvre les cités drows, duergares et svirfnebelines, cherchant tous à survivre et se répandre dans un environnement très dangereux. Ils n'hésitent souvent pas à faire appel à des puissances infernales ou à des divinités inquiétantes pour l'emporter. Dans les abîmes les plus insondables se trouvent les nids chancreux les plus anciens et les plus puissants, une menace pour tout Eana.",
+      "threat_ids": [
+        "threat-chancre",
+        "threat-drow",
+        "threat-duergar",
+        "threat-puissances-infernales",
+        "threat-divinites-inquietantes"
+      ],
+      "geography_tags": ["profondeurs-abyssales", "mines", "forteresses", "prisons", "temples", "cites-souterraines"]
+    }
+  },
+  {
+    "id": "civ-kaan",
+    "name": "Kaan",
+    "randomization": { "dice_min": 73, "dice_max": 76 },
+    "demographics": {
+      "primary_species": [
+        { "id": "sp-humain", "label": "Humains" },
+        { "id": "sp-merosi", "label": "Merosis" },
+        { "id": "sp-orc", "label": "Orcs" },
+        { "id": "sp-gobelin", "label": "Gobelins" },
+        { "id": "sp-gobelours", "label": "Gobelours" },
+        { "id": "sp-hobgobelin", "label": "Hobgobelins" },
+        { "id": "sp-kobold", "label": "Kobolds" },
+        { "id": "sp-ulkani", "label": "Ulkani" }
+      ],
+      "secondary_species": [{ "id": "sp-tous", "label": "Autres peuples (cités côtières)" }],
+      "is_cosmopolitan": false,
+      "cosmopolitan_zones": ["cités côtières"],
+      "social_roles": [],
+      "horde_allies": [
+        { "id": "sp-geant-des-collines", "label": "Géants des collines (participent aux Hordes)" }
+      ]
+    },
+    "linguistics": {
+      "official_languages": [
+        { "id": "lg-kaani", "label": "Kaani" },
+        { "id": "lg-gobelin", "label": "Gobelin" }
+      ],
+      "additional_languages_spoken": false,
+      "writing_systems": [{ "id": "wr-santak", "label": "Santak" }]
+    },
+    "lore": {
+      "full_description": "Le cœur de l'empire kaani est composé d'une immense steppe où vivent des clans d'éleveurs et de guerriers. Il arrive qu'un chef se distingue et commence à rassembler une Horde composée d'humains, de merosis, d'orcs, d'hobgobelins, de gobelins, de géants des collines et de bien d'autres… avant de partir à la conquête du monde. Le premier et plus célèbre chef de Horde fut le terrible Tamerakh. On dit qu'il sacrifia sa capitale tout entière pour devenir un dieu. La gloire des Kaanis varie au gré des siècles. Aujourd'hui la capitale se trouve dans une ville côtière et la dynastie régnante prépare certainement ses prochaines guerres glorieuses.",
+      "threat_ids": ["threat-tamerakh", "threat-horde", "threat-dynastie-conquerante"],
+      "geography_tags": ["steppe", "ville-cotiere"]
+    }
+  },
+  {
+    "id": "civ-lothrienne",
+    "name": "Lothrienne",
+    "randomization": { "dice_min": 77, "dice_max": 82 },
+    "demographics": {
+      "primary_species": [
+        { "id": "sp-humain", "label": "Humains" },
+        { "id": "sp-nain-batisseur", "label": "Nains bâtisseurs" }
+      ],
+      "secondary_species": [
+        { "id": "sp-aldaron", "label": "Aldarons (quelques-uns)" },
+        { "id": "sp-sidhe", "label": "Sidhes (quelques-uns)" }
+      ],
+      "is_cosmopolitan": false,
+      "cosmopolitan_zones": [],
+      "social_roles": []
+    },
+    "linguistics": {
+      "official_languages": [{ "id": "lg-lothrien", "label": "Lothrien" }],
+      "additional_languages_spoken": false,
+      "writing_systems": [{ "id": "wr-cyfand", "label": "Cyfand" }]
+    },
+    "lore": {
+      "full_description": "Coincée entre les Drakenbergen et le Septentrion, la Lothrienne est un royaume féodal rude, dans lequel chaque seigneur lutte âprement pour la survie de son domaine. La magie de cette contrée est très faible en dehors des royaumes féeriques dirigés par un roi fée irascible connu pour prendre souvent la forme d'un ours lorsqu'il se rend parmi les hommes. Les menaces sont essentiellement humaines : pirates remontant le fleuve, ambitions des maisons nobles, communautés obscurantistes craignant la magie et les druides, pillards barbares… Le surnaturel s'immisce insidieusement avec la propagation de la desvérie, maladie du sommeil et des rêves, annonciatrice de plus grands maux.",
+      "threat_ids": [
+        "threat-roi-fee",
+        "threat-pirates-fluviaux",
+        "threat-maisons-nobles",
+        "threat-communautes-obscurantistes",
+        "threat-pillards-barbares",
+        "threat-desverie"
+      ],
+      "geography_tags": ["royaume-feodal", "royaumes-feeriques", "fleuve"]
+    }
+  },
+  {
+    "id": "civ-mibu",
+    "name": "Mibu",
+    "randomization": { "dice_min": 83, "dice_max": 88 },
+    "demographics": {
+      "primary_species": [{ "id": "sp-humain", "label": "Humains" }],
+      "secondary_species": [],
+      "is_cosmopolitan": false,
+      "cosmopolitan_zones": ["principaux comptoirs"],
+      "social_roles": [{ "id": "role-marchand", "label": "Marchands d'autres peuples (comptoirs)" }]
+    },
+    "linguistics": {
+      "official_languages": [{ "id": "lg-inkulomo", "label": "Inkulomo" }],
+      "additional_languages_spoken": false,
+      "writing_systems": [
+        { "id": "wr-tumiit", "label": "Tumiit" },
+        { "id": "wr-cyfand", "label": "Cyfand" },
+        { "id": "wr-abjad-kalam", "label": "Abjad kalam" },
+        { "id": "wr-ecritures-secretes", "label": "Écritures secrètes" }
+      ]
+    },
+    "lore": {
+      "full_description": "Bandiko-Mibu, la « terre de Mibu », est un continent tropical où alternent des savanes, des forêts équatoriales impénétrables, des cours d'eau indomptables et des canyons à couper le souffle. Ces terres sont partagées entre de grands royaumes d'une richesse folle, et d'innombrables chefferies et tribus. Sur les côtes, les cités marchandes importent quantité d'esclaves, transportés par les pirates barbaresques pour venir servir dans les mines d'or et de diamant ou dans les carrières. Parmi les puissants souverains qui les exploitent, on compte des reines immortelles et des tueurs de géants. Ces êtres sont d'ailleurs omniprésents dans les mythes et auraient gouverné toutes ces terres autrefois, depuis les sommets des tepuys.",
+      "threat_ids": [
+        "threat-pirates-barbaresques",
+        "threat-esclavage",
+        "threat-reines-immortelles",
+        "threat-tueurs-de-geants"
+      ],
+      "geography_tags": ["continent-tropical", "savanes", "forets-equatoriales", "cours-d-eau", "canyons", "tepuys"]
+    }
+  },
+  {
+    "id": "civ-rachamangekr",
+    "name": "Rachamangekr",
+    "randomization": { "dice_min": 89, "dice_max": 89 },
+    "demographics": {
+      "primary_species": [
+        { "id": "sp-drakeide", "label": "Drakéides" },
+        { "id": "sp-humain", "label": "Humains" }
+      ],
+      "secondary_species": [{ "id": "sp-tous", "label": "Tous les peuples (grandes villes)" }],
+      "is_cosmopolitan": true,
+      "cosmopolitan_zones": ["grandes villes"],
+      "social_roles": []
+    },
+    "linguistics": {
+      "official_languages": [{ "id": "lg-karphud", "label": "Karphûd" }],
+      "additional_languages_spoken": false,
+      "writing_systems": [
+        { "id": "wr-elfique-adapte", "label": "Elfique (adapté)" },
+        { "id": "wr-draconique", "label": "Draconique" }
+      ]
+    },
+    "lore": {
+      "full_description": "Rachamangekr est le plus grand et le plus puissant de tous les royaumes encore dirigés par une noblesse drakéide. On y prône la loi du dragon selon la plus pure tradition. Le pays est riche de ses ressources agricoles tropicales, d'une culture raffinée, de paysages splendides. Les aventuriers luttent contre les pirates barbaresques et s'efforcent d'endiguer la menace constante des dragons-tortues. Dans les jungles profondes, des ermites et des ensorceleurs de la lignée des dragons étudient les vestiges, tout particulièrement en quête de traces de la civilisation des Voyageurs.",
+      "threat_ids": ["threat-pirates-barbaresques", "threat-dragons-tortues", "threat-civilisation-des-voyageurs"],
+      "geography_tags": ["royaume", "jungles-profondes", "vestiges"]
+    }
+  },
+  {
+    "id": "civ-royaumes-des-sables",
+    "name": "Royaumes des Sables",
+    "randomization": { "dice_min": 90, "dice_max": 95 },
+    "demographics": {
+      "primary_species": [{ "id": "sp-humain", "label": "Humains" }],
+      "secondary_species": [{ "id": "sp-tous", "label": "Tous les peuples (cités cosmopolites des côtes)" }],
+      "is_cosmopolitan": true,
+      "cosmopolitan_zones": ["cités côtières"],
+      "social_roles": []
+    },
+    "linguistics": {
+      "official_languages": [{ "id": "lg-kalam", "label": "Kalam" }],
+      "additional_languages_spoken": false,
+      "writing_systems": [{ "id": "wr-abjad-kalam", "label": "Abjad kalam" }]
+    },
+    "lore": {
+      "full_description": "Les Royaumes des Sables sont multiples : des cités-États, des oasis de djinns, des nomades du désert, des royaumes puissants et rivaux… S'ils divergent par leur organisation politique, ils partagent beaucoup sur le plan culturel, en particulier une langue, une écriture, un système monétaire et des mythes. Dans ces contrées, l'injustice crue des villes côtoie le merveilleux d'un désert implacable, aussi riche de trésors que de monstres prêts à dévorer l'imprudent. L'aventure mêle caravanes, temples perdus, dragons bleus, esclaves, djinns, lamies, conquêtes, trahisons et amours impossibles.",
+      "threat_ids": ["threat-djinns", "threat-dragons-bleus", "threat-lamies", "threat-injustice"],
+      "geography_tags": ["cites-etats", "oasis", "desert", "temples-perdus"]
+    }
+  },
+  {
+    "id": "civ-septentrion",
+    "name": "Septentrion",
+    "randomization": { "dice_min": 96, "dice_max": 97 },
+    "demographics": {
+      "primary_species": [{ "id": "sp-humain", "label": "Humains" }],
+      "secondary_species": [{ "id": "sp-aldaron", "label": "Aldarons (quelques-uns)" }],
+      "is_cosmopolitan": false,
+      "cosmopolitan_zones": [],
+      "social_roles": []
+    },
+    "linguistics": {
+      "official_languages": [{ "id": "lg-nordique", "label": "Nordique" }],
+      "additional_languages_spoken": false,
+      "writing_systems": [{ "id": "wr-culture-orale", "label": "Culture orale" }]
+    },
+    "lore": {
+      "full_description": "Une vie rude et libre, ainsi pourrait-on résumer l'existence dans le Septentrion, vaste territoire peu peuplé tout au nord du Cyfandir et du Kaan. Entre la toundra, la taïga, les montagnes, les vallées abritées et les marais, on découvre une grande diversité de paysages, de flore et de faune, mais aussi de mœurs. Certaines tribus vivent selon les préceptes sages de leurs druides, d'autres mènent une existence brutale, allant souvent prendre par la force ce qui leur manque. Vivre dans le Septentrion, c'est d'abord apprendre à résister à un environnement parmi les plus dangereux d'Eana. Il faut aussi savoir défendre sa vie contre les autres tribus, les fauves, les remorhazs, les géants des glaces, les dragons blancs… Par prudence, on évite généralement de s'approcher des ruines boréales, de peur de libérer sur le monde de nouveaux périls.",
+      "threat_ids": [
+        "threat-tribus-brutales",
+        "threat-fauves",
+        "threat-remorhaz",
+        "threat-geant-des-glaces",
+        "threat-dragon-blanc",
+        "threat-ruines-boreales"
+      ],
+      "geography_tags": ["toundra", "taiga", "montagnes", "marais", "vallees"]
+    }
+  },
+  {
+    "id": "civ-shi-huang",
+    "name": "Shi-huang",
+    "randomization": { "dice_min": 98, "dice_max": 98 },
+    "demographics": {
+      "primary_species": [{ "id": "sp-humain", "label": "Humains" }],
+      "secondary_species": [{ "id": "sp-tous", "label": "Autres peuples (dans les cités)" }],
+      "is_cosmopolitan": true,
+      "cosmopolitan_zones": ["cités"],
+      "social_roles": [],
+      "historical_rulers": [
+        { "id": "sp-geant", "label": "Géants (anciens dirigeants, disparus)" },
+        { "id": "sp-drakeide", "label": "Drakéides (noblesse en exil après révolution)" }
+      ]
+    },
+    "linguistics": {
+      "official_languages": [{ "id": "lg-shi-huang", "label": "Shi-huang" }],
+      "additional_languages_spoken": false,
+      "writing_systems": [{ "id": "wr-draconique-adapte", "label": "Draconique adapté en syllabaire" }]
+    },
+    "lore": {
+      "full_description": "Riche culture millénaire, Shi-huang fut dirigée par des géants puis par des drakéides. Ces dynasties s'effondrèrent et laissèrent la place à des royaumes humains raffinés. C'est dans cette culture qu'apparurent les premiers moines-guerriers théorisant l'usage du ki. Les habitants du Shi-huang doivent se montrer vigilants. Outre les luttes entre les royaumes, leurs frontières montagneuses sont peuplées de monstres. Si pour l'instant, le sceau qui ferme l'Inframonde profond les protège du Chancre, le Plan Éthéré en revanche est étonnamment proche et permet aux fantômes de prospérer.",
+      "threat_ids": [
+        "threat-luttes-inter-royaumes",
+        "threat-monstres-montagneux",
+        "threat-chancre",
+        "threat-fantomes",
+        "threat-plan-ethere"
+      ],
+      "geography_tags": ["royaumes-humains", "frontieres-montagneuses"]
+    }
+  },
+  {
+    "id": "civ-torea",
+    "name": "Torea",
+    "randomization": { "dice_min": 99, "dice_max": 100 },
+    "demographics": {
+      "primary_species": [{ "id": "sp-humain", "label": "Humains" }],
+      "secondary_species": [],
+      "is_cosmopolitan": false,
+      "cosmopolitan_zones": ["principaux comptoirs"],
+      "social_roles": [{ "id": "role-marchand", "label": "Marchands d'autres peuples (comptoirs)" }],
+      "underwater_populations": [
+        { "id": "sp-merrien", "label": "Merriens (cités sous-marines de corail)" }
+      ]
+    },
+    "linguistics": {
+      "official_languages": [{ "id": "lg-aupuniwi", "label": "Aupuniwi" }],
+      "additional_languages_spoken": false,
+      "writing_systems": [{ "id": "wr-tumiit", "label": "Tumiit" }]
+    },
+    "lore": {
+      "full_description": "Torea est une contrée paradisiaque : voir ses atolls de sable blanc et ses barrières de corail laisse une marque indélébile dans l'esprit du voyageur. Son nom est aussi celui d'un oiseau sacré multicolore, typique de cette région du monde. À la surface des eaux et des terres vivent les navigateurs, marchands et cultivateurs humains, répartis en une multitude de communautés, tribus et civilisations. Sous les flots évoluent les merriens, peuple mystérieux, capable de respirer sous l'eau et de nager avec aisance grâce à une queue de poisson. Ils édifient des cités fastueuses de corail et de perles. Ces contrées paradisiaques sont pourtant menacées de multiples périls et derrière ces apparences idylliques se cachent des menaces mortelles. Depuis les profondeurs abyssales viennent les ravageurs du Chancre menés par la Reine Noyée. Les exécrables merrows, pour leur part, mettent tout en œuvre pour accomplir le cauchemar du prince démon Ouxounouël. Des pirates et marchands d'esclaves des Îles Barbaresques viennent prélever leur part de richesses et de vies, tarissant parfois des communautés entières. Désespérés, certains habitants de ces contrées se réfugient dans des cultes monstrueux qui les rapprochent d'êtres abjects et leur permettent de se défendre en usant de sombres pouvoirs.",
+      "threat_ids": [
+        "threat-chancre",
+        "threat-reine-noyee",
+        "threat-merrows",
+        "threat-ouxounouel",
+        "threat-pirates-barbaresques",
+        "threat-cultes-monstrueux"
+      ],
+      "geography_tags": ["atolls", "barrieres-de-corail", "ocean", "cites-de-corail"]
+    }
+  }
+]

@@ -1,0 +1,1787 @@
+{
+  "schema_version": "1.1",
+  "source_book": "Dragons - Livre de base: Aventuriers",
+  "language": "fr",
+  "description": "Espèces jouables normalisées pour la génération de personnages de jeu de rôle.",
+  "size_codes": {
+    "TP": "Très Petit",
+    "P": "Petit",
+    "M": "Moyen",
+    "G": "Grand"
+  },
+  "ability_codes": {
+    "str": "Force",
+    "dex": "Dextérité",
+    "con": "Constitution",
+    "int": "Intelligence",
+    "wis": "Sagesse",
+    "cha": "Charisme"
+  },
+  "species": [
+    {
+      "id": "sp-drakeide",
+      "name": "Drakéide",
+      "name_alt": [],
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "26-28"
+      },
+      "flavor": {
+        "summary": "Couverts d'écailles évoquant leur affiliation à l'une des dix espèces de véritables dragons, les drakéides sont des êtres à la fois puissants et charismatiques. Naissant dans des œufs au terme d'une année de maturation, ils bénéficient d'un développement rapide dans leur jeune âge.",
+        "culture": "Il existe deux grands types de sociétés drakéides : des gardiens reclus de savoirs antiques vivant dans des lieux isolés (failles, grottes, jungles, volcans), et des drakéides fiers de leurs origines qui forment encore la noblesse de nombreux territoires insulaires en régions tropicales et équatoriales. Ces royaumes draconiques, autrefois dirigés par des Dragons-rois, sont aujourd'hui menacés par la jungle et en déclin.",
+        "origins": "Les mythes drakéides décrivent leur espèce comme créée par les dragons pour protéger des sites sacrés. Contrairement aux demi-dragons, ils pondent des œufs sans difficulté mais vivent généralement moins longtemps, succombant souvent avant 80 ans.",
+        "lore_notes": [
+          "Les seuls drakéides connus évoluent dans les régions chaudes d'Eana. Aucune lignée blanche ou argentée n'est aujourd'hui connue, anomalie peut-être due à la chute de la civilisation boréale."
+        ]
+      },
+      "base_stats": {
+        "ability_score_increase": {
+          "str": 2,
+          "cha": 1
+        },
+        "speed_m": 9,
+        "size": "M",
+        "darkvision_m": 0,
+        "height": {
+          "range_m": "1.80m+",
+          "desc": "Les drakéides sont plus grands et plus lourds que les humains. Leur taille dépasse largement les 1,80 m."
+        },
+        "weight": {
+          "range_kg": "110kg+",
+          "desc": "Leur poids dépasse largement les 110 kg."
+        },
+        "age": {
+          "maturity_years": 15,
+          "lifespan_years": 80,
+          "desc": "Le développement des jeunes drakéides est fulgurant. Ils marchent quelques heures après être sortis de l'œuf et sont aussi grands et formés que des humains de dix ans alors qu'ils n'en ont que trois. Ils atteignent l'âge adulte à quinze ans et leur longévité moyenne est de 80 années."
+        },
+        "alignment": {
+          "tendency": "Loyal",
+          "desc": "Les drakéides sont généralement d'alignement loyal. Les drakéides chromatiques (blanc, bleu, noir, rouge, vert) tendent plus fréquemment vers le Mal et la tyrannie, tandis que les drakéides métalliques (airain, bronze, cuivre, argent, or) penchent plutôt vers le Bien."
+        }
+      },
+      "traits": [
+        {
+          "id": "trait-souvenir-anciens",
+          "name": "Souvenir des Anciens",
+          "desc": "Vous avez intuitivement la maîtrise des artefacts des Anciens, tels les ateaks des Voyageurs. Votre sang de dragon suffit souvent pour les activer. Les drakéides peuvent tenter de les utiliser par un test de Charisme (Artefacts des Anciens).",
+          "mechanics": {
+            "type": "custom_proficiency",
+            "name": "Artefacts des Anciens",
+            "ability": "cha"
+          }
+        },
+        {
+          "id": "trait-souffle",
+          "name": "Souffle",
+          "desc": "Vous pouvez souffler une énergie destructrice au prix d'une action. Votre héritage draconique détermine la taille, la forme et le type de dégâts. Les créatures prises dans la zone effectuent un jet de sauvegarde (caractéristique déterminée par l'héritage). En cas d'échec elles subissent les dégâts complets ; en cas de réussite, la moitié. Une fois utilisé, le souffle ne peut plus être employé avant un repos court ou long.",
+          "mechanics": {
+            "action_type": "action",
+            "save_dc_formula": "8 + mod_con + bonus_maitrise",
+            "save_effect_success": "half_damage",
+            "damage_by_level": [
+              {
+                "min_level": 1,
+                "dice": "2d6"
+              },
+              {
+                "min_level": 6,
+                "dice": "3d6"
+              },
+              {
+                "min_level": 11,
+                "dice": "4d6"
+              },
+              {
+                "min_level": 16,
+                "dice": "5d6"
+              }
+            ],
+            "reset": "short_or_long_rest",
+            "shape_and_type_from": "heritage_draconique"
+          }
+        },
+        {
+          "id": "trait-resistance-draconique",
+          "name": "Résistance aux dégâts",
+          "desc": "Vous bénéficiez d'une résistance aux dégâts du type associé à votre héritage draconique.",
+          "mechanics": {
+            "type": "damage_resistance",
+            "damage_type_from": "heritage_draconique"
+          }
+        }
+      ],
+      "creation_choices": [
+        {
+          "id": "choice-heritage-draconique",
+          "name": "Héritage Draconique",
+          "desc": "L'un de vos ancêtres était un dragon. Choisissez un type de dragon, qui détermine votre souffle et votre résistance aux dégâts.",
+          "type": "single_select",
+          "choice_count": 1,
+          "options": [
+            {
+              "id": "drag-airain",
+              "name": "Airain",
+              "damage_type": "feu",
+              "area": {
+                "shape": "ligne",
+                "length_m": 9,
+                "width_m": 1.5
+              },
+              "save": "dex"
+            },
+            {
+              "id": "drag-argent",
+              "name": "Argent",
+              "damage_type": "froid",
+              "area": {
+                "shape": "cone",
+                "length_m": 4.5
+              },
+              "save": "con",
+              "note": "Lignée aujourd'hui disparue ou inconnue sur Eana."
+            },
+            {
+              "id": "drag-blanc",
+              "name": "Blanc",
+              "damage_type": "froid",
+              "area": {
+                "shape": "cone",
+                "length_m": 4.5
+              },
+              "save": "con",
+              "note": "Lignée aujourd'hui disparue ou inconnue sur Eana."
+            },
+            {
+              "id": "drag-bleu",
+              "name": "Bleu",
+              "damage_type": "foudre",
+              "area": {
+                "shape": "ligne",
+                "length_m": 9,
+                "width_m": 1.5
+              },
+              "save": "dex"
+            },
+            {
+              "id": "drag-bronze",
+              "name": "Bronze",
+              "damage_type": "foudre",
+              "area": {
+                "shape": "ligne",
+                "length_m": 9,
+                "width_m": 1.5
+              },
+              "save": "dex"
+            },
+            {
+              "id": "drag-cuivre",
+              "name": "Cuivre",
+              "damage_type": "acide",
+              "area": {
+                "shape": "ligne",
+                "length_m": 9,
+                "width_m": 1.5
+              },
+              "save": "dex"
+            },
+            {
+              "id": "drag-noir",
+              "name": "Noir",
+              "damage_type": "acide",
+              "area": {
+                "shape": "ligne",
+                "length_m": 9,
+                "width_m": 1.5
+              },
+              "save": "dex"
+            },
+            {
+              "id": "drag-or",
+              "name": "Or",
+              "damage_type": "feu",
+              "area": {
+                "shape": "cone",
+                "length_m": 4.5
+              },
+              "save": "dex"
+            },
+            {
+              "id": "drag-rouge",
+              "name": "Rouge",
+              "damage_type": "feu",
+              "area": {
+                "shape": "cone",
+                "length_m": 4.5
+              },
+              "save": "dex"
+            },
+            {
+              "id": "drag-vert",
+              "name": "Vert",
+              "damage_type": "poison",
+              "area": {
+                "shape": "cone",
+                "length_m": 4.5
+              },
+              "save": "con"
+            }
+          ]
+        }
+      ],
+      "languages": {
+        "fixed": [
+          "lg-commun",
+          "lg-draconique"
+        ],
+        "choice_count": 0,
+        "notes": "Le draconique est considéré comme l'une des plus anciennes langues et demeure très présent dans l'étude de la magie."
+      },
+      "subspecies": [],
+      "optional_rules": []
+    },
+    {
+      "id": "sp-elfe",
+      "name": "Elfes",
+      "name_alt": [],
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "33-38"
+      },
+      "flavor": {
+        "summary": "De l'avis général, les elfes constituent l'espèce la plus gracieuse et la plus empreinte de dignité. Ils ont en commun de longues oreilles pointues très reconnaissables et une silhouette souvent nerveuse. Les traits de leurs visages sont fins et tracés nettement, parfois avec un peu de dureté.",
+        "culture": "Les elfes sont répartis en plusieurs sous-espèces aux cultures très différentes : elenions (elfes de lumière) organisés en sociétés complexes, aldarons (elfes de sève) vivant en forêts en clans semi-nomades, et drows habitant les profondeurs de la terre.",
+        "lore_notes": [
+          "La transe est une capacité à double tranchant : très avantageuse dans des conditions calmes, handicapante dans un environnement hostile car elle nécessite une grande concentration et doit être accomplie d'une traite."
+        ]
+      },
+      "base_stats": {
+        "ability_score_increase": {
+          "dex": 2
+        },
+        "speed_m": 9,
+        "size": "M",
+        "darkvision_m": 18,
+        "height": {
+          "range_m": "1.50m - 1.80m",
+          "desc": "Les elfes mesurent généralement entre 1,50 m et 1,80 m, et sont souvent très sveltes."
+        },
+        "weight": {
+          "desc": "Silhouette souvent nerveuse et svelte."
+        },
+        "age": {
+          "maturity_years": 16,
+          "adulthood_cultural_years": 100,
+          "lifespan_years": 750,
+          "desc": "Bien que les elfes atteignent la maturité physique à un âge comparable à celui des humains, cette étape ne constitue pas le passage à l'âge adulte selon la perception elfique. La période de 16 à 100 ans constitue une longue « adolescence ». L'espérance de vie est d'environ 750 ans."
+        },
+        "alignment": {
+          "tendency": "Variable selon sous-espèce",
+          "desc": "Les elfes de la surface tendent vers la Neutralité ou le Bien ; les drows oscillent entre la Neutralité et le Mal. Les elenions penchent vers la Loi, tandis que les aldarons et drows ont des comportements inspirés par le Chaos."
+        }
+      },
+      "traits": [
+        {
+          "id": "trait-vision-noir-elfe",
+          "name": "Vision dans le noir",
+          "desc": "Guetteur nocturne, vous êtes doté d'une vision supérieure dans les ténèbres et la pénombre. Dans un rayon de 18 m, vous voyez en conditions de lumière faible comme s'il s'agissait de lumière vive, et dans l'obscurité comme si la zone était faiblement éclairée (nuances de gris).",
+          "mechanics": {
+            "type": "darkvision",
+            "range_m": 18
+          }
+        },
+        {
+          "id": "trait-sens-aiguises",
+          "name": "Sens aiguisés",
+          "desc": "Vous bénéficiez de la maîtrise de la compétence Perception.",
+          "mechanics": {
+            "type": "skill_proficiency",
+            "skills": [
+              "perception"
+            ]
+          }
+        },
+        {
+          "id": "trait-heritage-feerique",
+          "name": "Héritage féerique",
+          "desc": "Vous bénéficiez d'un avantage aux jets de sauvegarde contre l'état préjudiciable charmé, et aucune magie ne peut vous endormir.",
+          "mechanics": {
+            "advantage_on_saves": [
+              "charmed"
+            ],
+            "immunity": [
+              "magical_sleep"
+            ]
+          }
+        },
+        {
+          "id": "trait-transe",
+          "name": "Transe",
+          "desc": "Les elfes n'ont pas besoin de dormir. Au lieu de cela, ils entrent dans une profonde méditation de 4 heures par jour qui leur confère les mêmes bénéfices qu'un sommeil de 8 heures pour un humain. La transe doit être accomplie d'une traite pour être pleinement efficiente. Entrer en transe dans un environnement hostile requiert un test de Sagesse (Transe).",
+          "mechanics": {
+            "replaces": "long_rest_sleep",
+            "duration_hours": 4,
+            "equivalent_to": "8h_sommeil_humain",
+            "requires_uninterrupted": true,
+            "hostile_environment_check": {
+              "ability": "wis",
+              "skill": "transe"
+            }
+          }
+        }
+      ],
+      "creation_choices": [
+        {
+          "id": "choice-langue-commune-elfe",
+          "name": "Langue commune",
+          "desc": "Les elfes de la surface parlent le commun, les drows pratiquent son équivalent des profondeurs.",
+          "type": "single_select",
+          "choice_count": 1,
+          "options": [
+            {
+              "id": "lg-commun",
+              "name": "Commun"
+            },
+            {
+              "id": "lg-commun-profondeurs",
+              "name": "Commun des profondeurs"
+            }
+          ]
+        }
+      ],
+      "languages": {
+        "fixed": [
+          "lg-elfique"
+        ],
+        "choice_count": 0,
+        "notes": "L'elfique est une langue douce et élégante. Elle constitue parfois une koinè dans les cours et les académies de nombreux royaumes."
+      },
+      "subspecies": [
+        {
+          "id": "sub-elenion",
+          "name": "Elfes de lumière (Elenions)",
+          "playable": true,
+          "flavor": "On reconnaît les elenions à un teint clair, laiteux ou rosé, qui s'harmonise avec des chevelures argentées, dorées, platine ou blondes. Les yeux sont grands, avec des iris dans des teintes froides : gris, bleu, vert ou violet. Les elenions sont volontiers guerriers ou magiciens.",
+          "ability_score_increase": {
+            "int": 1
+          },
+          "traits": [
+            {
+              "id": "trait-formation-martiale-elfique-elenion",
+              "name": "Formation martiale elfique",
+              "desc": "Vous bénéficiez de la maîtrise de l'épée longue, de l'épée courte, de l'arc court et de l'arc long.",
+              "mechanics": {
+                "type": "weapon_proficiency",
+                "weapons": [
+                  "epee-longue",
+                  "epee-courte",
+                  "arc-court",
+                  "arc-long"
+                ]
+              }
+            }
+          ],
+          "creation_choices": [
+            {
+              "id": "choice-sort-mineur-elenion",
+              "name": "Sort mineur",
+              "desc": "Vous connaissez un sort mineur de la liste de sorts du magicien. L'Intelligence est la caractéristique magique correspondante.",
+              "type": "spell_select",
+              "choice_count": 1,
+              "spell_list": "magicien",
+              "spell_level": 0,
+              "spellcasting_ability": "int"
+            },
+            {
+              "id": "choice-outil-elenion",
+              "name": "Raffinement",
+              "desc": "Issu d'une culture portée vers les arts, vous maîtrisez un outil au choix.",
+              "type": "single_select",
+              "choice_count": 1,
+              "options": [
+                {
+                  "id": "tl-necessaire-de-calligraphe",
+                  "name": "Nécessaire de calligraphe"
+                },
+                {
+                  "id": "tl-necessaire-de-peintre",
+                  "name": "Nécessaire de peintre"
+                },
+                {
+                  "id": "tl-outils-de-bijoutier",
+                  "name": "Outils de bijoutier"
+                },
+                {
+                  "id": "tl-outils-de-tisserand",
+                  "name": "Outils de tisserand"
+                },
+                {
+                  "id": "tl-flute",
+                  "name": "Flûte",
+                  "category": "instrument"
+                },
+                {
+                  "id": "tl-luth",
+                  "name": "Luth",
+                  "category": "instrument"
+                },
+                {
+                  "id": "tl-lyre",
+                  "name": "Lyre",
+                  "category": "instrument"
+                },
+                {
+                  "id": "tl-viole",
+                  "name": "Viole",
+                  "category": "instrument"
+                }
+              ]
+            },
+            {
+              "id": "choice-langue-supp-elenion",
+              "name": "Langue supplémentaire",
+              "desc": "Vous parlez, lisez et écrivez une langue supplémentaire de votre choix.",
+              "type": "language_select",
+              "choice_count": 1
+            }
+          ]
+        },
+        {
+          "id": "sub-aldaron",
+          "name": "Elfes de sève (Aldarons)",
+          "playable": true,
+          "flavor": "Le physique des aldarons paraît entrer en résonance avec leur environnement. Leur teint est doré, hâlé voire olivâtre, tandis que les chevelures ont les couleurs des feuillages d'automne. Les aldarons sont le plus souvent rôdeurs, parfois druides.",
+          "ability_score_increase": {
+            "con": 1
+          },
+          "traits": [
+            {
+              "id": "trait-formation-martiale-elfique-aldaron",
+              "name": "Formation martiale elfique",
+              "desc": "Vous bénéficiez de la maîtrise de l'épée longue, de l'épée courte, de l'arc court et de l'arc long.",
+              "mechanics": {
+                "type": "weapon_proficiency",
+                "weapons": [
+                  "epee-longue",
+                  "epee-courte",
+                  "arc-court",
+                  "arc-long"
+                ]
+              }
+            },
+            {
+              "id": "trait-murmures-foret",
+              "name": "Murmures de la forêt",
+              "desc": "Au prix d'une action, vous faites souffler pendant au plus 1 minute un vent froid et inquiétant qui semble murmurer des paroles menaçantes dans un rayon de 18 m. Simultanément, vous pouvez éteindre ou allumer une petite source de lumière (torches, lanterne, bougie ou petits feux de camp). Vous devez effectuer un repos court ou long avant de pouvoir de nouveau utiliser cette aptitude.",
+              "mechanics": {
+                "action_type": "action",
+                "range_m": 18,
+                "duration": "1 minute",
+                "reset": "short_or_long_rest"
+              }
+            }
+          ],
+          "creation_choices": [
+            {
+              "id": "choice-outil-aldaron",
+              "name": "Vie sauvage",
+              "desc": "Vous maîtrisez un outil au choix parmi les suivants.",
+              "type": "single_select",
+              "choice_count": 1,
+              "options": [
+                {
+                  "id": "tl-outils-de-tanneur",
+                  "name": "Outils de tanneur"
+                },
+                {
+                  "id": "tl-outils-de-sculpteur-sur-bois",
+                  "name": "Outils de sculpteur sur bois"
+                },
+                {
+                  "id": "tl-outils-de-tisserand",
+                  "name": "Outils de tisserand"
+                }
+              ]
+            }
+          ],
+          "languages": {
+            "fixed": [
+              "lg-sylvestre"
+            ],
+            "choice_count": 0
+          }
+        },
+        {
+          "id": "sub-drow",
+          "name": "Drows",
+          "playable": false,
+          "playable_notes": "Les drows sont apparus après la guerre de l'Aube et ne font pas partie des peuples piliers. Ils sont par défaut des ennemis des PJ. Le meneur peut néanmoins accepter des PJ drows ; un PJ drow évoluant à la surface devra affronter beaucoup de préjugés et d'hostilité.",
+          "flavor": "Les drows ont un teint bleu nuit à noir, une chevelure blanche à argentée, et des yeux rouges, parfois pourpres ou dorés. Ce peuple est très mal connu à la surface et craint de tous ceux qui n'ignorent pas son existence.",
+          "ability_score_increase": {},
+          "traits": [],
+          "creation_choices": []
+        }
+      ],
+      "optional_rules": []
+    },
+    {
+      "id": "sp-gnome",
+      "name": "Gnomes",
+      "name_alt": [],
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "39-41"
+      },
+      "flavor": {
+        "summary": "Petits, inventifs et curieux, les gnomes sont connus pour leur intelligence vive, leur imagination débordante et leur goût pour la mécanique, la magie et les innovations en tout genre.",
+        "culture": "Les gnomes s'organisent en corporations et cherchent à conquérir de nouveaux marchés avec leurs automates, mécanismes ingénieux, potions cosmétiques et luminaires élégants. Ils travaillent parfois aux côtés des nains bâtisseurs. Les gnomes du haut de leurs îles volantes sont des marchands téméraires.",
+        "lore_notes": [
+          "Les gnomes furent des artificiers cruciaux durant la guerre de l'Aube, posant des explosifs dans les galeries souterraines pour écraser les troupes du Chancre. Beaucoup ne revinrent jamais ; certains se transformèrent en svirfnebelins."
+        ]
+      },
+      "base_stats": {
+        "ability_score_increase": {
+          "int": 2
+        },
+        "speed_m": 7.5,
+        "size": "P",
+        "darkvision_m": 18,
+        "height": {
+          "range_m": "0.90m - 1.20m",
+          "desc": "Les gnomes mesurent entre 90 cm et 1,20 m."
+        },
+        "weight": {
+          "range_kg": "20kg",
+          "desc": "Leur poids est d'environ 20 kg."
+        },
+        "age": {
+          "maturity_years": 40,
+          "lifespan_years": 350,
+          "lifespan_max_years": 500,
+          "desc": "Les gnomes se développent au même rythme que les humains, même si l'âge adulte s'affirme plutôt aux alentours de la quarantaine. Ils atteignent souvent 350 ans, voire un demi-millénaire."
+        },
+        "alignment": {
+          "tendency": "Bon",
+          "desc": "Les gnomes sont souvent bons. Ceux qui tendent vers la Loi sont plutôt érudits, ingénieurs, chercheurs, sages, investigateurs ou inventeurs. Ceux qui se laissent tenter par le Chaos sont ménestrels, filous, vagabonds ou joailliers novateurs."
+        }
+      },
+      "traits": [
+        {
+          "id": "trait-vision-noir-gnome",
+          "name": "Vision dans le noir",
+          "desc": "Né de la terre, vous êtes doté d'une vision supérieure dans les ténèbres et la pénombre. Dans un rayon de 18 m, vous voyez en conditions de lumière faible comme s'il s'agissait de lumière vive, et dans l'obscurité comme si la zone était faiblement éclairée (nuances de gris).",
+          "mechanics": {
+            "type": "darkvision",
+            "range_m": 18
+          }
+        },
+        {
+          "id": "trait-ruse-gnome",
+          "name": "Ruse gnome",
+          "desc": "Vous bénéficiez d'un avantage à tous les jets de sauvegarde d'Intelligence, de Sagesse et de Charisme contre la magie.",
+          "mechanics": {
+            "advantage_on_saves_vs_magic": [
+              "int",
+              "wis",
+              "cha"
+            ]
+          }
+        }
+      ],
+      "creation_choices": [
+        {
+          "id": "choice-langue-regionale-gnome",
+          "name": "Langue de résidence",
+          "desc": "Les gnomes de la surface parlent le commun, ceux de l'Inframonde le commun des profondeurs.",
+          "type": "single_select",
+          "choice_count": 1,
+          "options": [
+            {
+              "id": "lg-commun",
+              "name": "Commun"
+            },
+            {
+              "id": "lg-commun-profondeurs",
+              "name": "Commun des profondeurs"
+            }
+          ]
+        }
+      ],
+      "languages": {
+        "fixed": [
+          "lg-gnome"
+        ],
+        "choice_count": 0,
+        "notes": "La langue gnome recourt à l'alphabet nain. La littérature gnome est connue pour ses manuels techniques de fabrication d'engins et pour ses sorts utilitaires ou d'illusion."
+      },
+      "subspecies": [
+        {
+          "id": "sub-gnome-roches",
+          "name": "Gnomes des roches",
+          "playable": true,
+          "flavor": "Les gnomes des roches sont inventifs et adroits. Leur allure est parfois qualifiée de « mignonne ». Leur teint est clair, leurs yeux dans les nuances de bleu, gris, mauve et parfois d'étranges teintes irisées. Leurs chevelures sont assorties, allant de l'argenté au blond pâle.",
+          "ability_score_increase": {
+            "dex": 1
+          },
+          "traits": [
+            {
+              "id": "trait-artificier",
+              "name": "Artificier",
+              "desc": "Chaque fois que vous effectuez un test d'Intelligence (Histoire) lié aux objets magiques, aux ustensiles alchimiques et aux appareils technologiques, on considère que vous êtes doté de la maîtrise de la compétence Histoire en appliquant même le double de votre bonus de maîtrise au test.",
+              "mechanics": {
+                "skill_context_double_proficiency": {
+                  "skill": "histoire",
+                  "context": "objets_magiques_alchimie_technologie"
+                }
+              }
+            },
+            {
+              "id": "trait-bricoleur",
+              "name": "Bricoleur",
+              "desc": "Vous bénéficiez de la maîtrise des outils de rétameur. En vous servant de cet équipement, vous pouvez fabriquer un objet mécanique de taille TP (CA 5, 1 pv), au prix d'une heure de travail et de 10 po de matériaux. L'objet cesse de fonctionner au bout de 24 heures (sauf si vous passez une heure à le réparer) ou lorsque vous le démontez. Vous ne pouvez disposer simultanément de plus de dispositifs opérationnels que votre bonus d'Intelligence.",
+              "mechanics": {
+                "tool_proficiency": [
+                  "tl-outils-de-retameur"
+                ],
+                "object_creation": {
+                  "size": "TP",
+                  "ac": 5,
+                  "hp": 1,
+                  "cost_gp": 10,
+                  "time_h": 1,
+                  "max_active": "bonus_intelligence",
+                  "lifespan_h": 24
+                }
+              }
+            }
+          ],
+          "creation_choices": [
+            {
+              "id": "choice-pilote-gnome",
+              "name": "Pilote",
+              "desc": "Vous gagnez une maîtrise d'outil au choix parmi les suivants.",
+              "type": "single_select",
+              "choice_count": 1,
+              "options": [
+                {
+                  "id": "tl-vehicules-terrestres",
+                  "name": "Véhicules terrestres"
+                },
+                {
+                  "id": "tl-vehicules-maritimes",
+                  "name": "Véhicules maritimes"
+                },
+                {
+                  "id": "tl-vehicules-aeriens",
+                  "name": "Véhicules aériens"
+                }
+              ]
+            },
+            {
+              "id": "choice-objet-mecanique-initial",
+              "name": "Invention initiale",
+              "desc": "Choisissez un type d'objet mécanique que vous savez fabriquer.",
+              "type": "single_select",
+              "choice_count": 1,
+              "options": [
+                {
+                  "id": "mech-jouet",
+                  "name": "Jouet mécanique",
+                  "desc": "Cet animal, monstre ou personnage mécanique se déplace de 1,50 m à chacun de vos tours de jeu lorsque vous le posez au sol. La direction est aléatoire et l'objet produit des sons qui rappellent la créature représentée."
+                },
+                {
+                  "id": "mech-amorceur",
+                  "name": "Amorceur",
+                  "desc": "Cet appareil produit une petite flamme permettant d'allumer une bougie, une torche ou un feu de camp. Son utilisation se fait au prix d'une action."
+                },
+                {
+                  "id": "mech-boite-musique",
+                  "name": "Boîte à musique",
+                  "desc": "Lorsque vous l'ouvrez, cette boîte produit toujours la même mélodie, à volume mesuré. Elle s'arrête quand elle atteint la fin ou quand on la ferme."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "sub-svirfnebelin",
+          "name": "Svirfnebelins",
+          "playable": false,
+          "playable_notes": "Les svirfnebelins sont apparus après la guerre de l'Aube et ne font pas partie des peuples piliers. Il peut néanmoins exister sur Eana des aventuriers svirfnebelins.",
+          "flavor": "Cousins de l'Inframonde des gnomes des roches, au teint gris à bleu nuit voire noir, aux cheveux gris ou blancs. Contrairement aux autres peuples de l'Inframonde (drows, duergars), les svirfnebelins n'ont pas de penchant pour le Mal.",
+          "ability_score_increase": {},
+          "traits": [],
+          "creation_choices": []
+        }
+      ],
+      "optional_rules": []
+    },
+    {
+      "id": "sp-halfelin",
+      "name": "Halfelins",
+      "name_alt": [],
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "42-44"
+      },
+      "flavor": {
+        "summary": "De petite taille, le plus souvent pieds nus et portant de confortables vêtements, les halfelins sont parfois pris de loin pour des enfants. Dotés fréquemment d'un solide bon sens, ils ne se laissent pas impressionner par les difficultés et savent profiter des nombreux petits bonheurs de la vie.",
+        "culture": "Les halfelins vivent presque toujours en marge des royaumes humains et ont développé une culture propre, dont leurs célèbres demeures semi-enterrées au toit herbeux. Ils se distinguent par leur talent pour l'agriculture, semblant capables de transformer un désert en oasis.",
+        "lore_notes": [
+          "Les pieds-légers sont de discrets médiateurs, ayant notamment obtenu la Myetée comme récompense de leur rôle tampon entre humains et elfes.",
+          "Les pieds-sûrs sont des nomades des forêts tropicales et équatoriales, parfois cannibales, reconnus pour toujours payer leurs dettes — en vengeance ou en gratitude."
+        ]
+      },
+      "base_stats": {
+        "ability_score_increase": {
+          "dex": 2
+        },
+        "speed_m": 7.5,
+        "size": "P",
+        "darkvision_m": 0,
+        "height": {
+          "range_m": "0.90m",
+          "desc": "Les halfelins mesurent 90 cm en moyenne."
+        },
+        "weight": {
+          "range_kg": "20kg",
+          "desc": "Leur poids est d'environ 20 kg."
+        },
+        "age": {
+          "maturity_years": 20,
+          "lifespan_years": 150,
+          "desc": "Les halfelins atteignent l'âge adulte au bout de vingt années et vivent généralement un bon siècle et demi."
+        },
+        "alignment": {
+          "tendency": "Loyal",
+          "desc": "Les halfelins sont majoritairement loyaux de par leur attachement aux traditions et à leur communauté. La distinction se fait entre ceux préoccupés du bien d'autrui, et ceux qui ne voient pas de raison de s'en soucier du moment que tout va bien pour eux."
+        }
+      },
+      "traits": [
+        {
+          "id": "trait-chanceux",
+          "name": "Chanceux",
+          "desc": "Lorsque vous obtenez un 1 sur le d20 d'un jet d'attaque, d'un test de caractéristique ou d'un jet de sauvegarde, vous pouvez relancer le dé. C'est alors le résultat du second jet qui compte.",
+          "mechanics": {
+            "trigger": "d20_result_1",
+            "action": "reroll_once",
+            "applies_to": [
+              "attack_roll",
+              "ability_check",
+              "saving_throw"
+            ]
+          }
+        },
+        {
+          "id": "trait-vaillant",
+          "name": "Vaillant",
+          "desc": "Vous bénéficiez d'un avantage aux jets de sauvegarde contre l'effet préjudiciable effrayé.",
+          "mechanics": {
+            "advantage_on_saves": [
+              "frightened"
+            ]
+          }
+        },
+        {
+          "id": "trait-agilite-halfeline",
+          "name": "Agilité halfeline",
+          "desc": "Vous pouvez vous déplacer dans tout espace occupé par une créature dont la catégorie de taille est au moins d'un cran supérieure à la vôtre.",
+          "mechanics": {
+            "movement_through_larger_creatures": true,
+            "min_size_difference": 1
+          }
+        }
+      ],
+      "creation_choices": [
+        {
+          "id": "choice-langue-supp-halfelin",
+          "name": "Langue supplémentaire",
+          "desc": "Vous parlez, lisez et écrivez le commun et une autre langue au choix.",
+          "type": "language_select",
+          "choice_count": 1
+        }
+      ],
+      "languages": {
+        "fixed": [
+          "lg-commun"
+        ],
+        "choice_count": 1,
+        "notes": "Il n'y a pas vraiment de langue halfeline, tout au plus des expressions et un accent, de sorte qu'il semble s'agir d'un dialecte de la langue dominante locale."
+      },
+      "subspecies": [
+        {
+          "id": "sub-pieds-legers",
+          "name": "Pieds-légers",
+          "playable": true,
+          "flavor": "Les pieds-légers sont de discrets héros, capables d'éviter de nombreux problèmes d'un sourire chaleureux ou en se faisant oublier. Après une jeunesse un peu aventureuse, ils rejoignent souvent leur terre natale. Les pieds-légers sont souvent roublards ou bardes.",
+          "ability_score_increase": {
+            "cha": 1
+          },
+          "traits": [
+            {
+              "id": "trait-discretion-naturelle",
+              "name": "Discrétion naturelle",
+              "desc": "Il vous suffit d'être derrière une créature dont la catégorie de taille est au moins d'un cran supérieure à la vôtre pour pouvoir tenter de vous cacher.",
+              "mechanics": {
+                "hide_behind_larger": true,
+                "min_size_difference": 1
+              }
+            }
+          ],
+          "creation_choices": [
+            {
+              "id": "choice-outil-pieds-legers",
+              "name": "Richesse de la terre",
+              "desc": "Vous gagnez une maîtrise au choix parmi les outils liés à l'art de vivre.",
+              "type": "single_select",
+              "choice_count": 1,
+              "options": [
+                {
+                  "id": "tl-outils-de-la-ferme",
+                  "name": "Outils de la ferme"
+                },
+                {
+                  "id": "tl-necessaire-de-brasseur",
+                  "name": "Nécessaire de brasseur"
+                },
+                {
+                  "id": "tl-ustensiles-de-cuisinier",
+                  "name": "Ustensiles de cuisinier"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "sub-pieds-surs",
+          "name": "Pieds-sûrs",
+          "playable": true,
+          "flavor": "Les pieds-sûrs sont moins connus, presque une légende par endroits. Au teint hâlé sombre, aux cheveux bouclés à frisés, ce sont les habitants nomades des forêts tropicales et équatoriales. Les pieds-sûrs sont souvent rôdeurs ou barbares, parfois druides.",
+          "ability_score_increase": {
+            "con": 1
+          },
+          "traits": [
+            {
+              "id": "trait-harmonie-sauvage",
+              "name": "Harmonie sauvage",
+              "desc": "Vous recevez la maîtrise de la compétence Survie.",
+              "mechanics": {
+                "type": "skill_proficiency",
+                "skills": [
+                  "survie"
+                ]
+              }
+            },
+            {
+              "id": "trait-guerre-tribale",
+              "name": "Guerre tribale",
+              "desc": "Vous bénéficiez de la maîtrise de l'arc court, du filet, de la lance et de la sarbacane.",
+              "mechanics": {
+                "type": "weapon_proficiency",
+                "weapons": [
+                  "arc-court",
+                  "filet",
+                  "lance",
+                  "sarbacane"
+                ]
+              }
+            }
+          ],
+          "creation_choices": []
+        }
+      ],
+      "optional_rules": []
+    },
+    {
+      "id": "sp-humain",
+      "name": "Humains",
+      "name_alt": [],
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "45-47"
+      },
+      "flavor": {
+        "summary": "Les humains sont les plus grands voyageurs et explorateurs d'Eana. Ils s'adaptent à tous types de milieux : déserts de sable ou de glace, forêts tempérées ou équatoriales, rivages océaniques ou marais. Leur aspect se transforme au fil des millénaires passés dans un environnement.",
+        "culture": "À l'aise en mer, dans les villes et dans les campagnes, les humains sont irrésistiblement attirés par les défis. L'aventurier humain exprime la quintessence du goût du risque et de la quête du dépassement de soi.",
+        "lore_notes": [
+          "Souvent partagés entre un désir de grandeur et une aspiration aux plaisirs simples, les humains quittent parfois un monde heureux pour devenir quelqu'un, avant de revenir dans leur foyer.",
+          "Plus que d'autres espèces, les humains s'attachent à de grands idéaux qu'ils défendent envers et contre tout."
+        ]
+      },
+      "base_stats": {
+        "ability_score_increase": {
+          "str": 1,
+          "dex": 1,
+          "con": 1,
+          "int": 1,
+          "wis": 1,
+          "cha": 1
+        },
+        "speed_m": 9,
+        "size": "M",
+        "darkvision_m": 0,
+        "height": {
+          "range_m": "1.50m - 1.80m+",
+          "desc": "Les humains affichent des tailles et carrures très variables, certains atteignant tout juste 1,50 m quand d'autres dépassent largement 1,80 m."
+        },
+        "weight": {
+          "desc": "Carrures très variables."
+        },
+        "age": {
+          "maturity_years": 18,
+          "lifespan_years": 90,
+          "desc": "Les humains atteignent l'âge adulte vers dix-huit ans et vivent généralement moins d'un siècle."
+        },
+        "alignment": {
+          "tendency": "Aucun",
+          "desc": "Aucun alignement ne se détache chez les humains, capables du meilleur comme du pire."
+        }
+      },
+      "traits": [
+        {
+          "id": "trait-adaptabilite",
+          "name": "Adaptabilité",
+          "desc": "Les humains sont connus pour leur capacité à s'adapter plus rapidement à de nouvelles situations. Lorsque vous consacrez du temps à un apprentissage (par exemple une langue ou un outil), vous êtes capable d'acquérir cette maîtrise plus rapidement. Sitôt que vous parvenez à la moitié du temps total requis, vous effectuez un test d'Intelligence DD 15 par mois. Si vous le réussissez, vous acquérez la maîtrise plus tôt que prévu. Votre capacité d'adaptation n'influe que sur le temps consacré : vous devez toujours dépenser autant d'argent pour financer vos études.",
+          "mechanics": {
+            "trigger": "halfway_through_training",
+            "check": {
+              "ability": "int",
+              "dc": 15,
+              "frequency": "monthly"
+            },
+            "effect": "acquire_proficiency_early",
+            "cost_unchanged": true
+          }
+        }
+      ],
+      "creation_choices": [
+        {
+          "id": "choice-langue-supp-humain",
+          "name": "Langues supplémentaires",
+          "desc": "Vous parlez, lisez et écrivez le commun et deux langues supplémentaires de votre choix.",
+          "type": "language_select",
+          "choice_count": 2
+        }
+      ],
+      "languages": {
+        "fixed": [
+          "lg-commun"
+        ],
+        "choice_count": 2
+      },
+      "subspecies": [],
+      "optional_rules": []
+    },
+    {
+      "id": "sp-melesse",
+      "name": "Melessës",
+      "name_alt": [
+        "Demi-elfes"
+      ],
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "49-50"
+      },
+      "flavor": {
+        "summary": "Les melessës partagent certaines qualités des elfes et en présentent d'autres, propres à leur espèce. Connus pour leur ouverture sur le monde et leur curiosité, chaque melessë a un aspect unique qui exprime à sa manière le métissage. Leurs traits tendent à être fins, et leurs oreilles assez pointues. Leurs cheveux sont volontiers décrits comme soyeux.",
+        "culture": "Très présents dans la marine et comme agents dans les cours nobles, les melessës sont considérés comme des intermédiaires entre deux mondes. Leur aisance en société leur permet de se voir facilement confier des missions d'importance. Aidés par leur charisme naturel, ils voyagent librement à travers le monde mais ont du mal à désigner un lieu comme étant leur foyer.",
+        "lore_notes": [
+          "Sur Eana, la dénomination « demi-elfe » est commune mais considérée comme péjorative. Le terme « melessë » (d'un mot elfique évoquant l'amour) est ainsi souvent préféré, car l'on dit que les demi-elfes naissent de la passion."
+        ]
+      },
+      "base_stats": {
+        "ability_score_increase": {
+          "cha": 2
+        },
+        "flexible_asi": {
+          "count": 2,
+          "value": 1,
+          "excluded": [
+            "cha"
+          ]
+        },
+        "speed_m": 9,
+        "size": "M",
+        "darkvision_m": 18,
+        "height": {
+          "range_m": "1.50m - 1.80m",
+          "desc": "Les melessës présentent une carrure proche de celle des humains, mesurant entre 1,50 m et 1,80 m."
+        },
+        "weight": {
+          "desc": "Carrure proche de celle des humains."
+        },
+        "age": {
+          "maturity_years": 20,
+          "lifespan_years": 180,
+          "desc": "Les melessës se développent au même rythme que les humains, pour atteindre l'âge adulte aux alentours de 20 ans. Ils vivent toutefois bien plus longtemps, nombre d'entre eux dépassant les 180 ans."
+        },
+        "alignment": {
+          "tendency": "Non-loyal",
+          "desc": "Les melessës sont portés à se sentir entre deux mondes. Ils ont souvent du mal avec l'idée d'une seule norme et sont rarement d'alignement loyal, préférant adapter leur attitude aux circonstances."
+        }
+      },
+      "traits": [
+        {
+          "id": "trait-vision-noir-melesse",
+          "name": "Vision dans le noir",
+          "desc": "Grâce à votre sang elfique, vous êtes doté d'une vision supérieure dans les ténèbres et la pénombre. Dans un rayon de 18 m, vous voyez en conditions de lumière faible comme s'il s'agissait de lumière vive, et dans l'obscurité comme si la zone était faiblement éclairée (nuances de gris).",
+          "mechanics": {
+            "type": "darkvision",
+            "range_m": 18
+          }
+        },
+        {
+          "id": "trait-heritage-feerique-melesse",
+          "name": "Héritage féerique",
+          "desc": "Vous bénéficiez d'un avantage aux jets de sauvegarde contre l'état préjudiciable charmé et aucune magie ne peut vous endormir.",
+          "mechanics": {
+            "advantage_on_saves": [
+              "charmed"
+            ],
+            "immunity": [
+              "magical_sleep"
+            ]
+          }
+        },
+        {
+          "id": "trait-polyvalence",
+          "name": "Polyvalence",
+          "desc": "Vous gagnez la maîtrise de deux compétences de votre choix ainsi que la maîtrise d'un type d'outils au choix.",
+          "mechanics": {
+            "grants_choices": [
+              "choice-competences-melesse",
+              "choice-outils-melesse"
+            ]
+          }
+        }
+      ],
+      "creation_choices": [
+        {
+          "id": "choice-stats-melesse",
+          "name": "Augmentation de caractéristique (flexible)",
+          "desc": "Choisissez deux valeurs de caractéristique (autres que le Charisme) à augmenter de 1.",
+          "type": "ability_score_select",
+          "choice_count": 2,
+          "value_per_choice": 1,
+          "excluded": [
+            "cha"
+          ]
+        },
+        {
+          "id": "choice-competences-melesse",
+          "name": "Compétences",
+          "desc": "Choisissez deux compétences à maîtriser.",
+          "type": "skill_select",
+          "choice_count": 2
+        },
+        {
+          "id": "choice-outils-melesse",
+          "name": "Maîtrise d'outils ou véhicules",
+          "desc": "Choisissez un instrument de musique, un instrument de navigation, un outil d'artisan ou un type de véhicule.",
+          "type": "single_select",
+          "choice_count": 1,
+          "option_groups": [
+            {
+              "group": "Instruments de navigation",
+              "options": [
+                {
+                  "id": "tl-instruments-de-navigation",
+                  "name": "Instruments de navigation"
+                }
+              ]
+            },
+            {
+              "group": "Instruments de musique",
+              "options": [
+                {
+                  "id": "tl-flute",
+                  "name": "Flûte"
+                },
+                {
+                  "id": "tl-luth",
+                  "name": "Luth"
+                },
+                {
+                  "id": "tl-lyre",
+                  "name": "Lyre"
+                },
+                {
+                  "id": "tl-viole",
+                  "name": "Viole"
+                },
+                {
+                  "id": "tl-tambour",
+                  "name": "Tambour"
+                },
+                {
+                  "id": "tl-cor",
+                  "name": "Cor"
+                },
+                {
+                  "id": "tl-cornemuse",
+                  "name": "Cornemuse"
+                },
+                {
+                  "id": "tl-dulcimer",
+                  "name": "Dulcimer"
+                },
+                {
+                  "id": "tl-flute-de-pan",
+                  "name": "Flûte de Pan"
+                },
+                {
+                  "id": "tl-bombarde",
+                  "name": "Bombarde"
+                }
+              ]
+            },
+            {
+              "group": "Outils d'artisan",
+              "options": [
+                {
+                  "id": "tl-outils-de-forgeron",
+                  "name": "Outils de forgeron"
+                },
+                {
+                  "id": "tl-outils-de-macon",
+                  "name": "Outils de maçon"
+                },
+                {
+                  "id": "tl-outils-de-menuisier",
+                  "name": "Outils de menuisier"
+                },
+                {
+                  "id": "tl-outils-de-potier",
+                  "name": "Outils de potier"
+                },
+                {
+                  "id": "tl-outils-de-tanneur",
+                  "name": "Outils de tanneur"
+                },
+                {
+                  "id": "tl-outils-de-tisserand",
+                  "name": "Outils de tisserand"
+                },
+                {
+                  "id": "tl-outils-de-verrier",
+                  "name": "Outils de verrier"
+                },
+                {
+                  "id": "tl-outils-de-bijoutier",
+                  "name": "Outils de bijoutier"
+                },
+                {
+                  "id": "tl-outils-de-cordonnier",
+                  "name": "Outils de cordonnier"
+                },
+                {
+                  "id": "tl-outils-de-sculpteur-sur-bois",
+                  "name": "Outils de sculpteur sur bois"
+                }
+              ]
+            },
+            {
+              "group": "Véhicules",
+              "options": [
+                {
+                  "id": "tl-vehicules-terrestres",
+                  "name": "Véhicules terrestres"
+                },
+                {
+                  "id": "tl-vehicules-maritimes",
+                  "name": "Véhicules maritimes"
+                },
+                {
+                  "id": "tl-vehicules-aeriens",
+                  "name": "Véhicules aériens"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "choice-langue-supp-melesse",
+          "name": "Langues supplémentaires",
+          "desc": "Vous parlez, lisez et écrivez deux langues supplémentaires de votre choix.",
+          "type": "language_select",
+          "choice_count": 2
+        }
+      ],
+      "languages": {
+        "fixed": [
+          "lg-commun",
+          "lg-elfique"
+        ],
+        "choice_count": 2
+      },
+      "subspecies": [],
+      "optional_rules": []
+    },
+    {
+      "id": "sp-merosis",
+      "name": "Merosis",
+      "name_alt": [
+        "Demi-orcs"
+      ],
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "51-53"
+      },
+      "flavor": {
+        "summary": "Les merosis présentent certains traits hérités de leurs ancêtres orcs. Bien que les autres peuples associent volontiers les merosis à la laideur, leur métissage peut produire une beauté harmonieuse, avec des chevelures aux teintes d'écorce, une peau mate et des yeux aux reflets fauves.",
+        "culture": "La culture clanique kaani influence nombre de merosis qui cherchent à se distinguer par des hauts faits. Ils se promettent parfois de revenir sur leurs terres natales pour vaincre les plus grands guerriers et devenir chef de tribu. Ce désir de tester sa valeur peut prendre la forme d'un goût exacerbé du risque et des défis extraordinaires.",
+        "lore_notes": [
+          "Les merosis ont une espérance de vie plus courte, rarement plus de soixante-dix ans. Ce qui aurait pu être pris pour une malédiction est abordé avec philosophie : « il vaut mieux mourir en ayant intensément vécu que traverser les siècles dans la tiédeur ».",
+          "Le terme « demi-orc » est fréquemment dépréciatif. Dans l'empire Kaan, on parle de « merosis », un mot évoquant l'héritage double de cette espèce.",
+          "Les philosophes merosis (Dame Khutga, Seigneur Tsunsny, Poétesse Yulduz) ont marqué l'histoire d'Eana avec des concepts proches de l'épicurisme, du stoïcisme et de l'hédonisme."
+        ]
+      },
+      "base_stats": {
+        "ability_score_increase": {
+          "str": 2,
+          "con": 1
+        },
+        "speed_m": 9,
+        "size": "M",
+        "darkvision_m": 18,
+        "height": {
+          "range_m": "1.50m - 1.80m+",
+          "desc": "Les merosis se montrent plus imposants que les humains, leur taille allant de 1,50 m à bien plus de 1,80 m."
+        },
+        "weight": {
+          "desc": "Plus imposants et robustes que les standards humains."
+        },
+        "age": {
+          "maturity_years": 14,
+          "lifespan_years": 70,
+          "lifespan_max_years": 75,
+          "desc": "Les merosis se développent un peu plus vite que les humains, la maturité physique étant atteinte à 14 ans. Ils vieillissent également plus rapidement et ont peu d'espoir de dépasser les soixante-quinze années."
+        },
+        "alignment": {
+          "tendency": "Chaotique",
+          "desc": "L'héritage orc leur a légué une certaine propension au Chaos, un goût de la liberté et de la vie au jour le jour. Cette attitude n'est pas incompatible avec un fort sens de l'honneur et de la parole donnée. Leur attachement fort à leur communauté peut les rendre indifférents au sort des étrangers."
+        }
+      },
+      "traits": [
+        {
+          "id": "trait-vision-noir-merosis",
+          "name": "Vision dans le noir",
+          "desc": "Grâce à votre sang orc, vous êtes doté d'une vision supérieure dans les ténèbres et la pénombre. Dans un rayon de 18 m, vous voyez en conditions de lumière faible comme s'il s'agissait de lumière vive, et dans l'obscurité comme si la zone était faiblement éclairée (nuances de gris).",
+          "mechanics": {
+            "type": "darkvision",
+            "range_m": 18
+          }
+        },
+        {
+          "id": "trait-patibulaire",
+          "name": "Patibulaire",
+          "desc": "Vous gagnez la maîtrise de la compétence Intimidation.",
+          "mechanics": {
+            "type": "skill_proficiency",
+            "skills": [
+              "intimidation"
+            ]
+          }
+        },
+        {
+          "id": "trait-resistance-acharnee",
+          "name": "Résistance acharnée",
+          "desc": "Lorsque vous tombez à 0 point de vie du fait de dégâts, mais que vous n'êtes pas tué sur le coup, vous pouvez choisir de conserver 1 point de vie. Vous ne pouvez pas réutiliser cette aptitude avant d'avoir terminé un repos long.",
+          "mechanics": {
+            "trigger": "drop_to_0_hp_not_killed_outright",
+            "effect": "keep_1_hp",
+            "reset": "long_rest"
+          }
+        },
+        {
+          "id": "trait-sauvagerie",
+          "name": "Sauvagerie",
+          "desc": "Lorsque vous réussissez un coup critique avec une attaque d'arme de corps à corps, vous pouvez lancer l'un des dés de dégâts de l'arme une fois de plus pour l'ajouter aux dégâts supplémentaires du coup critique.",
+          "mechanics": {
+            "trigger": "critical_hit_melee_weapon",
+            "effect": "extra_weapon_damage_die"
+          }
+        }
+      ],
+      "creation_choices": [],
+      "languages": {
+        "fixed": [
+          "lg-commun",
+          "lg-kaani"
+        ],
+        "choice_count": 0
+      },
+      "subspecies": [],
+      "civilization_links": [
+        {
+          "id": "civ-kaan",
+          "name": "Kaan",
+          "desc": "La plupart des merosis vivent dans l'empire kaani ou dans les contrées qui lui appartinrent."
+        }
+      ],
+      "optional_rules": [
+        {
+          "id": "rule-resistance-acharnee-blessures",
+          "name": "Résistance acharnée (variante Blessures)",
+          "desc": "Si le meneur utilise les règles relatives aux blessures, Résistance acharnée fait passer le merosi immédiatement et automatiquement de l'état « mourant » à 1 point de vie, assorti de 5 niveaux de fatigue, mais en étant conscient. L'adrénaline fait ignorer la douleur et les malus dus à la fatigue durant autant de tours que son bonus de Constitution (minimum 1). Cette aptitude ne peut pas être réutilisée avant d'avoir terminé un repos court.",
+          "mechanics": {
+            "requires_rule": "blessures",
+            "effect": "dying_to_1_hp_conscious",
+            "fatigue_levels_added": 5,
+            "ignore_pain_duration_rounds": "max(1, bonus_con)",
+            "reset": "short_rest"
+          }
+        }
+      ]
+    },
+    {
+      "id": "sp-nain",
+      "name": "Nains",
+      "name_alt": [
+        "Dvaergen"
+      ],
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "29-32"
+      },
+      "flavor": {
+        "summary": "Les nains sont les derniers remparts contre les ravageurs du Chancre. Loyaux, méticuleux et attachés aux traditions, ils excellent dans l'artisanat et la guerre. Leurs clans sont structurés et hiérarchisés.",
+        "culture": "Les nains bâtisseurs se sont répandus bien au-delà du Dvaergejord, le domaine des nains. Artisans de renom, ils se regroupent en guildes, confréries et corporations. Certains ont abandonné le travail manuel au profit du commerce au long cours ou d'activités bancaires. Ils ont la réputation d'être méticuleux et durs en affaires, et sont fréquemment présents dans les coulisses du pouvoir.",
+        "lore_notes": [
+          "Les jeunes artisans s'engagent souvent pour plusieurs années d'aventures au cours desquelles ils découvrent le monde et forgent leur réputation.",
+          "Les duergars, cousins maléfiques des nains, se seraient volontairement tournés vers le Mal et sont incapables de quitter l'Inframonde. Ils ne font pas partie des peuples piliers."
+        ]
+      },
+      "base_stats": {
+        "ability_score_increase": {
+          "con": 2
+        },
+        "speed_m": 7.5,
+        "speed_notes": "Votre vitesse de déplacement n'est pas réduite lorsque vous portez une armure lourde.",
+        "speed_not_reduced_by_heavy_armor": true,
+        "size": "M",
+        "darkvision_m": 18,
+        "height": {
+          "range_m": "1.20m - 1.50m",
+          "desc": "Les nains mesurent entre 1,20 m et 1,50 m."
+        },
+        "weight": {
+          "range_kg": "70kg",
+          "desc": "Leur poids moyen est de 70 kg."
+        },
+        "age": {
+          "maturity_years": 50,
+          "lifespan_years": 350,
+          "desc": "Les nains se développent au même rythme que les humains, mais on les considère comme jeunes tant qu'ils n'ont pas atteint la cinquantaine. La longévité moyenne de l'espèce est de 350 ans."
+        },
+        "alignment": {
+          "tendency": "Loyal Bon",
+          "desc": "La plupart des nains sont loyaux, convaincus des vertus d'une société bien structurée. Ils tendent également vers le Bien. Leur sens de l'équité est très poussé."
+        }
+      },
+      "traits": [
+        {
+          "id": "trait-vision-noir-nain",
+          "name": "Vision dans le noir",
+          "desc": "Habitué à vivre sous terre, vous êtes doté d'une vision supérieure dans les ténèbres et la pénombre. Dans un rayon de 18 m, vous voyez en conditions de lumière faible comme s'il s'agissait de lumière vive, et dans l'obscurité comme si la zone était faiblement éclairée (nuances de gris).",
+          "mechanics": {
+            "type": "darkvision",
+            "range_m": 18
+          }
+        },
+        {
+          "id": "trait-resistance-naine",
+          "name": "Résistance naine",
+          "desc": "Vous bénéficiez d'un avantage aux jets de sauvegarde contre le poison et d'une résistance aux dégâts de poison.",
+          "mechanics": {
+            "advantage_on_saves_vs": [
+              "poison"
+            ],
+            "damage_resistance": [
+              "poison"
+            ]
+          }
+        },
+        {
+          "id": "trait-formation-martiale-naine",
+          "name": "Formation martiale naine",
+          "desc": "Vous bénéficiez de la maîtrise de la hachette, de la hache d'armes, du marteau léger et du marteau de guerre.",
+          "mechanics": {
+            "type": "weapon_proficiency",
+            "weapons": [
+              "hachette",
+              "hache-darmes",
+              "marteau-leger",
+              "marteau-de-guerre"
+            ]
+          }
+        },
+        {
+          "id": "trait-sens-pierre",
+          "name": "Sens de la pierre",
+          "desc": "Chaque fois que vous effectuez un test d'Intelligence (Histoire) lié aux origines d'un travail de maçonnerie, on considère que vous êtes doté de la maîtrise de la compétence Histoire en appliquant même le double de votre bonus de maîtrise au test.",
+          "mechanics": {
+            "skill_context_double_proficiency": {
+              "skill": "histoire",
+              "context": "maconnerie"
+            }
+          }
+        }
+      ],
+      "creation_choices": [
+        {
+          "id": "choice-maitrise-outils-nain",
+          "name": "Maîtrise d'outils",
+          "desc": "Vous bénéficiez de la maîtrise d'un type d'outils d'artisan de votre choix.",
+          "type": "single_select",
+          "choice_count": 1,
+          "options": [
+            {
+              "id": "tl-necessaire-de-brasseur",
+              "name": "Nécessaire de brasseur"
+            },
+            {
+              "id": "tl-outils-de-forgeron",
+              "name": "Outils de forgeron"
+            },
+            {
+              "id": "tl-outils-de-macon",
+              "name": "Outils de maçon"
+            }
+          ]
+        },
+        {
+          "id": "choice-langue-regionale-nain",
+          "name": "Langue de résidence",
+          "desc": "Si vous vivez à la surface, vous connaissez le commun ; si vous vivez dans l'Inframonde, le commun des profondeurs.",
+          "type": "single_select",
+          "choice_count": 1,
+          "options": [
+            {
+              "id": "lg-commun",
+              "name": "Commun"
+            },
+            {
+              "id": "lg-commun-profondeurs",
+              "name": "Commun des profondeurs"
+            }
+          ]
+        }
+      ],
+      "languages": {
+        "fixed": [
+          "lg-nain"
+        ],
+        "choice_count": 0,
+        "notes": "Le nain regorge de consonnes dures et gutturales, intonations qui transparaissent quel que soit l'idiome employé par le locuteur."
+      },
+      "subspecies": [
+        {
+          "id": "sub-nain-gardien",
+          "name": "Nains gardiens",
+          "playable": true,
+          "flavor": "Les nains gardiens sont les premiers exposés aux dangers de l'Inframonde. Leur teint est clair, parfois pâle à force d'être éloigné du soleil, tandis que leur regard brille du feu ardent de leur détermination. Leur chevelure et leur barbe sont souvent épaisses et abondantes, aux teintes évoquant les minéraux et les métaux.",
+          "ability_score_increase": {
+            "wis": 1
+          },
+          "traits": [
+            {
+              "id": "trait-gardien",
+              "name": "Gardien",
+              "desc": "Vous acquérez la maîtrise des boucliers.",
+              "mechanics": {
+                "type": "armor_proficiency",
+                "armors": [
+                  "bouclier"
+                ]
+              }
+            },
+            {
+              "id": "trait-resistance-corruption",
+              "name": "Résistance à la corruption",
+              "desc": "Vous bénéficiez d'un avantage aux jets de sauvegarde visant à résister à la folie et aux sorts corrompus. Tous les sorts utilisés par une créature liée au Chancre sont considérés comme corrompus.",
+              "mechanics": {
+                "advantage_on_saves_vs": [
+                  "folie",
+                  "sorts_corrompus"
+                ]
+              }
+            }
+          ],
+          "creation_choices": []
+        },
+        {
+          "id": "sub-nain-batisseur",
+          "name": "Nains bâtisseurs",
+          "playable": true,
+          "flavor": "Les nains bâtisseurs sont dotés d'une grande intelligence mise au service de l'artisanat, et d'une résistance remarquable. Leur teint est plus accentué, rosé, doré ou mat. Leur chevelure et barbe sont souvent plus raides.",
+          "ability_score_increase": {
+            "int": 1
+          },
+          "traits": [
+            {
+              "id": "trait-maitre-artisan",
+              "name": "Maître artisan",
+              "desc": "Vous bénéficiez d'un avantage aux tests de caractéristique associés à un type d'outils parmi ceux dont vous avez la maîtrise.",
+              "mechanics": {
+                "advantage_on_tool_checks": "one_chosen_tool_proficiency"
+              }
+            },
+            {
+              "id": "trait-robustesse-naine",
+              "name": "Robustesse naine",
+              "desc": "Vos points de vie maximums augmentent de 1. Cette augmentation se répète à chaque nouveau niveau acquis.",
+              "mechanics": {
+                "hp_bonus_per_level": 1
+              }
+            }
+          ],
+          "creation_choices": []
+        },
+        {
+          "id": "sub-duergar",
+          "name": "Duergars",
+          "playable": false,
+          "playable_notes": "Les duergars sont apparus après la guerre de l'Aube et ne font pas partie des peuples piliers. Il peut exister sur Eana des aventuriers duergars.",
+          "flavor": "Les duergars sont les cousins maléfiques des nains. Leur peau est souvent grise, parfois noire. Ils se seraient volontairement tournés vers le Mal pour en tirer des capacités surnaturelles, mais au prix d'une dépendance aux ténèbres qui les rend incapables de quitter l'Inframonde.",
+          "ability_score_increase": {},
+          "traits": [],
+          "creation_choices": []
+        }
+      ],
+      "optional_rules": []
+    },
+    {
+      "id": "sp-tieffelin",
+      "name": "Tieffelins",
+      "name_alt": [],
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "54-57"
+      },
+      "flavor": {
+        "summary": "Les tieffelins partagent un certain nombre de traits résultant tantôt de leur ascendance diabolique ou démoniaque, tantôt d'une influence maléfique subie par la mère au cours de la grossesse. Tous les tieffelins ne naissent pas du fait de l'intervention directe d'un fiélon : il suffit qu'une femme enceinte soit exposée à de la magie noire.",
+        "culture": "Le tieffelin est toujours contraint de se positionner à l'égard de son géniteur fiélon et de l'humanité. La mère d'un tieffelin est profondément marquée par cette expérience.",
+        "lore_notes": [
+          "Les tieffelins savent intuitivement parler la langue de leur géniteur fiélon, parfois même avant celle de leur parent humain.",
+          "Xonim, l'ambivalente Dame de la Nuit, affectionne les tieffelins et exaucerait volontiers leurs prières. Mais ses présents sont-ils dénués de contrepartie ?",
+          "Un tieffelin peut n'avoir qu'une apparence subtilement étrange : yeux de fauve, chevelure atypique, canines prononcées."
+        ]
+      },
+      "base_stats": {
+        "ability_score_increase": {
+          "int": 1,
+          "cha": 2
+        },
+        "speed_m": 9,
+        "size": "M",
+        "darkvision_m": 18,
+        "height": {
+          "range_m": "1.50m - 1.80m",
+          "desc": "La taille et la carrure des tieffelins sont tout à fait comparables à celles des humains."
+        },
+        "weight": {
+          "desc": "Comparable à la carrure humaine."
+        },
+        "age": {
+          "maturity_years": 18,
+          "lifespan_years": 100,
+          "desc": "Les tieffelins se développent au même rythme que les humains, mais vivent en moyenne quelques années de plus."
+        },
+        "alignment": {
+          "tendency": "Tranché (non-neutre)",
+          "desc": "Les tieffelins disposent du même libre arbitre que les autres espèces humanoïdes et choisissent librement le Bien ou le Mal. Ils prennent souvent des décisions tranchées pour se positionner face à leur géniteur, évitant généralement les positionnements neutres."
+        }
+      },
+      "traits": [
+        {
+          "id": "trait-vision-noir-tieffelin",
+          "name": "Vision dans le noir",
+          "desc": "Grâce à votre héritage fiélon, vous êtes doté d'une vision supérieure dans les ténèbres et la pénombre. Dans un rayon de 18 m, vous voyez en conditions de lumière faible comme s'il s'agissait de lumière vive, et dans l'obscurité comme si la zone était faiblement éclairée (nuances de gris).",
+          "mechanics": {
+            "type": "darkvision",
+            "range_m": 18
+          }
+        },
+        {
+          "id": "trait-resistance-fielonne",
+          "name": "Résistance fiélonne",
+          "desc": "Vous bénéficiez d'une résistance aux dégâts de feu.",
+          "mechanics": {
+            "damage_resistance": [
+              "feu"
+            ]
+          }
+        },
+        {
+          "id": "trait-heritier-des-tenebres",
+          "name": "Héritier des ténèbres",
+          "desc": "Vous connaissez le sort mineur thaumaturgie. Lorsque vous atteignez le niveau 3, vous pouvez lancer une fois le sort réprimande maléfique comme sort de 2e niveau (capacité regagnée après un repos long). Au niveau 5, vous pouvez lancer une fois le sort ténèbres (capacité regagnée après un repos long). Le Charisme est la caractéristique magique associée à ces sorts.",
+          "mechanics": {
+            "spellcasting_ability": "cha",
+            "spells": [
+              {
+                "level_required": 1,
+                "spell": "thaumaturgie",
+                "spell_level": 0,
+                "freq": "at_will"
+              },
+              {
+                "level_required": 3,
+                "spell": "réprimande maléfique",
+                "cast_as_level": 2,
+                "freq": "1/long_rest"
+              },
+              {
+                "level_required": 5,
+                "spell": "ténèbres",
+                "cast_as_level": 3,
+                "freq": "1/long_rest"
+              }
+            ]
+          }
+        }
+      ],
+      "creation_choices": [
+        {
+          "id": "choice-ancetre-tieffelin",
+          "name": "Nature du géniteur",
+          "desc": "Choisissez si vous êtes lié aux diables ou aux démons. Le meneur détermine la nature exacte du géniteur.",
+          "type": "single_select",
+          "choice_count": 1,
+          "options": [
+            {
+              "id": "anc-diable",
+              "name": "Diables",
+              "grants_language": "lg-diabolique",
+              "geniteurs_possibles": [
+                {
+                  "id": "gen-hospodar",
+                  "name": "Hospodar",
+                  "desc": "Dirigeant diabolique se manifestant via une hypostase. L'enfant fait l'objet de toutes ses attentions et est comme un messie pour les sectateurs."
+                },
+                {
+                  "id": "gen-turtanu",
+                  "name": "Turtânu (Diantrefosse)",
+                  "desc": "Ne s'accouplent qu'à l'occasion de rituels rares et requérant de grands pouvoirs. Le rejeton est l'équivalent d'un prince pour les sectateurs."
+                },
+                {
+                  "id": "gen-qarnu",
+                  "name": "Qarnu (Diable cornu)",
+                  "desc": "Géniteur le plus commun, à l'origine du stéréotype des cornes et de la queue. Ces tieffelins sont plus libres de leur destinée que d'autres."
+                },
+                {
+                  "id": "gen-harharru",
+                  "name": "Harharru (Diable des chaînes)",
+                  "desc": "Inspirateurs des bourreaux et geôliers. Ces tieffelins ne bénéficient pas d'une grande estime parmi les diables."
+                }
+              ]
+            },
+            {
+              "id": "anc-demon",
+              "name": "Démons",
+              "grants_language": "lg-demoniaque",
+              "geniteurs_possibles": [
+                {
+                  "id": "gen-prince",
+                  "name": "Prince",
+                  "desc": "Peuvent s'accoupler grâce à une hypostase. Leurs motivations sont peu évidentes."
+                },
+                {
+                  "id": "gen-marilith",
+                  "name": "Marilith",
+                  "desc": "Démon serpentiforme au service de Liridem ou Akhlitôl. Le tieffelin est marqué par des écailles de serpent, parfois une langue fourchue."
+                },
+                {
+                  "id": "gen-glabrezu",
+                  "name": "Glabrezu",
+                  "desc": "Conseiller perfide. Ses rejetons bénéficient d'aide et de conseils, avant d'être sacrifiés. Souvent confondus avec ceux des diables cornus."
+                },
+                {
+                  "id": "gen-incube-succube",
+                  "name": "Incube/Succube",
+                  "desc": "Sèment des tieffelins par accident. Leurs rejetons sont réputés pour leur beauté et peuvent passer pour des humains."
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "languages": {
+        "fixed": [
+          "lg-commun"
+        ],
+        "choice_count": 0,
+        "grants_from_choice": {
+          "choice_id": "choice-ancetre-tieffelin",
+          "desc": "Vous connaissez intuitivement la langue de votre géniteur (diabolique ou démoniaque) selon votre ascendance."
+        }
+      },
+      "subspecies": [],
+      "optional_rules": [
+        {
+          "id": "rule-sombres-instincts",
+          "name": "Sombres instincts",
+          "desc": "La nature profonde des fiélons lie les tieffelins au Mal. Quand le tieffelin est en danger ou soumis à la tentation, une bête intérieure essaie de prendre un instant le contrôle pour lui faire commettre une mauvaise action. Le tieffelin doit effectuer un JS Sagesse DD 5. En cas d'échec, la bête intervient avec une action supplémentaire gratuite dictée par elle. Une fois utilisée, la bête ne peut agir à nouveau avant un repos long.",
+          "mechanics": {
+            "trigger": "danger_or_temptation",
+            "save": {
+              "ability": "wis",
+              "dc": 5
+            },
+            "failure_effect": "extra_free_action_controlled_by_beast",
+            "reset": "long_rest"
+          }
+        },
+        {
+          "id": "rule-priere-xonim",
+          "name": "Prière à Xonim",
+          "desc": "Vous adressez une prière à Xonim, la dangereuse protectrice des tieffelins. Selon les circonstances : effacer vos traces, masquer votre odeur, attirer les chiens sur une fausse piste, provoquer un heureux hasard, détourner l'attention d'une sentinelle. Vous bénéficiez d'un avantage au test de Dextérité (Discrétion) et vos adversaires subissent un désavantage au test de Sagesse (Perception). Capacité regagnée après un repos long.",
+          "mechanics": {
+            "action_type": "action",
+            "self_bonus": {
+              "advantage_on": [
+                "dex_discretion"
+              ]
+            },
+            "enemy_malus": {
+              "disadvantage_on": [
+                "wis_perception"
+              ]
+            },
+            "reset": "long_rest"
+          }
+        },
+        {
+          "id": "rule-imprevisibilite-tieffelins",
+          "name": "Imprévisibilité des tieffelins",
+          "desc": "Règle optionnelle permettant au meneur de personnaliser la liste des sorts innés du tieffelin pour refléter les particularités de son géniteur fiélon. Au niveau 1 : un sort mineur. Au niveau 3 : un sort du 1er niveau lancé comme avec un emplacement de 2e niveau (1/repos long). Au niveau 5 : un sort du 2e niveau lancé comme avec un emplacement de 3e niveau (1/repos long). Le Charisme est la caractéristique magique associée.",
+          "mechanics": {
+            "replaces_trait": "trait-heritier-des-tenebres",
+            "spellcasting_ability": "cha",
+            "spells_custom_by_gm": true,
+            "progression": [
+              {
+                "level_required": 1,
+                "spell_level": 0,
+                "freq": "at_will"
+              },
+              {
+                "level_required": 3,
+                "spell_level": 1,
+                "cast_as_level": 2,
+                "freq": "1/long_rest"
+              },
+              {
+                "level_required": 5,
+                "spell_level": 2,
+                "cast_as_level": 3,
+                "freq": "1/long_rest"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

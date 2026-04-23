@@ -1,0 +1,2527 @@
+[
+  {
+    "id": "mnt-ane-ou-mule",
+    "name": "Âne ou mule",
+    "type": "MOUNT",
+    "subtype": "ANIMAL",
+    "cost": {
+      "v": 8,
+      "u": "po"
+    },
+    "w_kg": null,
+    "data": {
+      "speed": "12 m",
+      "cap_kg": 210,
+      "desc": "Vitesse de déplacement : 12 m. Charge maximale : 210 kg. [cite: 1081]"
+    }
+  },
+  {
+    "id": "mnt-cheval-de-selle",
+    "name": "Cheval de selle",
+    "type": "MOUNT",
+    "subtype": "ANIMAL",
+    "cost": {
+      "v": 75,
+      "u": "po"
+    },
+    "w_kg": null,
+    "data": {
+      "speed": "18 m",
+      "cap_kg": 240,
+      "desc": "Vitesse de déplacement : 18 m. Charge maximale : 240 kg. [cite: 1081]"
+    }
+  },
+  {
+    "id": "mnt-destrier",
+    "name": "Destrier",
+    "type": "MOUNT",
+    "subtype": "ANIMAL",
+    "cost": {
+      "v": 400,
+      "u": "po"
+    },
+    "w_kg": null,
+    "data": {
+      "speed": "18 m",
+      "cap_kg": 270,
+      "desc": "Vitesse de déplacement : 18 m. Charge maximale : 270 kg. [cite: 1081]"
+    }
+  },
+  {
+    "id": "vhc-barque",
+    "name": "Barque",
+    "type": "VEHICLE",
+    "subtype": "WATER",
+    "cost": {
+      "v": 50,
+      "u": "po"
+    },
+    "w_kg": 50,
+    "data": {
+      "speed": "2.25 km/h",
+      "desc": "Vitesse : 2,25 km/h. Poids : 50 kg. Si vous descendez le courant, ajoutez la vitesse de ce dernier (généralement 4,5 km/h). [cite: 1075, 1077, 1085]"
+    }
+  },
+  {
+    "id": "vhc-char",
+    "name": "Char",
+    "type": "VEHICLE",
+    "subtype": "LAND",
+    "cost": {
+      "v": 250,
+      "u": "po"
+    },
+    "w_kg": 50,
+    "data": {
+      "desc": "Véhicule terrestre léger. [cite: 1086]"
+    }
+  },
+  {
+    "id": "vhc-charrette",
+    "name": "Charrette",
+    "type": "VEHICLE",
+    "subtype": "LAND",
+    "cost": {
+      "v": 15,
+      "u": "po"
+    },
+    "w_kg": 100,
+    "data": {
+      "desc": "Véhicule terrestre de transport. [cite: 1086]"
+    }
+  },
+  {
+    "id": "vhc-chariot",
+    "name": "Chariot",
+    "type": "VEHICLE",
+    "subtype": "LAND",
+    "cost": {
+      "v": 35,
+      "u": "po"
+    },
+    "w_kg": 200,
+    "data": {
+      "desc": "Véhicule attelé. Poids : 200 kg. [cite: 1086]"
+    }
+  },
+  {
+    "id": "vhc-galere",
+    "name": "Galère",
+    "type": "VEHICLE",
+    "subtype": "WATER",
+    "cost": {
+      "v": 30000,
+      "u": "po"
+    },
+    "w_kg": null,
+    "data": {
+      "speed": "6 km/h",
+      "desc": "Vitesse de déplacement : 6 km/h. [cite: 1085]"
+    }
+  },
+  {
+    "id": "wp-arbalete-de-poing",
+    "name": "Arbalète de poing",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_RANGED",
+    "cost": {
+      "v": 75,
+      "u": "po"
+    },
+    "w_kg": 1.5,
+    "data": {
+      "dmg_d": "1d6",
+      "dmg_t": "perforant",
+      "props": [
+        "prop-legere",
+        "prop-projectiles-9-36",
+        "prop-rechargement"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-arbalete-legere",
+    "name": "Arbalète légère",
+    "type": "WEAPON",
+    "subtype": "SIMPLE_RANGED",
+    "cost": {
+      "v": 25,
+      "u": "po"
+    },
+    "w_kg": 2.5,
+    "data": {
+      "dmg_d": "1d8",
+      "dmg_t": "perforant",
+      "props": [
+        "prop-deux-mains",
+        "prop-projectiles-24-96",
+        "prop-rechargement"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-arbalete-lourde",
+    "name": "Arbalète lourde",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_RANGED",
+    "cost": {
+      "v": 50,
+      "u": "po"
+    },
+    "w_kg": 9,
+    "data": {
+      "dmg_d": "1d10",
+      "dmg_t": "perforant",
+      "props": [
+        "prop-deux-mains",
+        "prop-lourde",
+        "prop-projectiles-30-120",
+        "prop-rechargement"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-arc-court",
+    "name": "Arc court",
+    "type": "WEAPON",
+    "subtype": "SIMPLE_RANGED",
+    "cost": {
+      "v": 25,
+      "u": "po"
+    },
+    "w_kg": 1.5,
+    "data": {
+      "dmg_d": "1d6",
+      "dmg_t": "perforant",
+      "props": [
+        "prop-deux-mains",
+        "prop-projectiles-24-96"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-arc-long",
+    "name": "Arc long",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_RANGED",
+    "cost": {
+      "v": 50,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "dmg_d": "1d8",
+      "dmg_t": "perforant",
+      "props": [
+        "prop-deux-mains",
+        "prop-lourde",
+        "prop-projectiles-45-180"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-baton-de-combat",
+    "name": "Bâton de combat",
+    "type": "WEAPON",
+    "subtype": "SIMPLE_MELEE",
+    "cost": {
+      "v": 2,
+      "u": "pa"
+    },
+    "w_kg": 2,
+    "data": {
+      "dmg_d": "1d6",
+      "dmg_t": "contondant",
+      "props": [
+        "prop-polyvalente-1d8"
+      ],
+      "desc": "Cette arme peut aussi bien s'utiliser à une main qu'à deux mains. Le dé entre parenthèses indique les dégâts à deux mains."
+    }
+  },
+  {
+    "id": "wp-ceste",
+    "name": "Ceste",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_MELEE",
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "dmg_d": "1d6",
+      "dmg_t": "contondant",
+      "props": [
+        "prop-legere",
+        "prop-speciale"
+      ],
+      "desc": "Fixé au poing (ne peut être désarmé). Sur coup critique : cible étourdie si échec JS CON (DD = dégâts). Désavantage aux tests de DEX tant qu'il est porté."
+    }
+  },
+  {
+    "id": "wp-cimeterre",
+    "name": "Cimeterre",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_MELEE",
+    "cost": {
+      "v": 25,
+      "u": "po"
+    },
+    "w_kg": 1.5,
+    "data": {
+      "dmg_d": "1d6",
+      "dmg_t": "tranchant",
+      "props": [
+        "prop-finesse",
+        "prop-legere"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-dague",
+    "name": "Dague",
+    "type": "WEAPON",
+    "subtype": "SIMPLE_MELEE",
+    "cost": {
+      "v": 2,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "dmg_d": "1d4",
+      "dmg_t": "perforant",
+      "props": [
+        "prop-finesse",
+        "prop-lancer-6-18",
+        "prop-legere"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-epee-a-deux-mains",
+    "name": "Épée à deux mains",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_MELEE",
+    "cost": {
+      "v": 50,
+      "u": "po"
+    },
+    "w_kg": 3,
+    "data": {
+      "dmg_d": "2d6",
+      "dmg_t": "tranchant",
+      "props": [
+        "prop-deux-mains",
+        "prop-lourde"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-epee-courte",
+    "name": "Épée courte",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_MELEE",
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "dmg_d": "1d6",
+      "dmg_t": "perforant",
+      "props": [
+        "prop-finesse",
+        "prop-legere"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-epee-longue",
+    "name": "Épée longue",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_MELEE",
+    "cost": {
+      "v": 15,
+      "u": "po"
+    },
+    "w_kg": 1.5,
+    "data": {
+      "dmg_d": "1d8",
+      "dmg_t": "tranchant",
+      "props": [
+        "prop-polyvalente-1d10"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-filet",
+    "name": "Filet",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_RANGED",
+    "cost": {
+      "v": 1,
+      "u": "po"
+    },
+    "w_kg": 1.5,
+    "data": {
+      "dmg_d": null,
+      "dmg_t": null,
+      "props": [
+        "prop-lancer-1-50-4-50",
+        "prop-speciale"
+      ],
+      "desc": "Entrave créature G ou inférieure. Sans effet sur amorphes ou TG+. Libération : test FOR DD 10 ou 5 dégâts tranchants (CA 10). Une seule attaque par action/bonus/réaction."
+    }
+  },
+  {
+    "id": "wp-fleau-darmes",
+    "name": "Fléau d'armes",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_MELEE",
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "dmg_d": "1d8",
+      "dmg_t": "contondant",
+      "props": [],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-flechette",
+    "name": "Fléchette",
+    "type": "WEAPON",
+    "subtype": "SIMPLE_RANGED",
+    "cost": {
+      "v": 5,
+      "u": "pc"
+    },
+    "w_kg": 0.125,
+    "data": {
+      "dmg_d": "1d4",
+      "dmg_t": "perforant",
+      "props": [
+        "prop-finesse",
+        "prop-lancer-6-18"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-fouet",
+    "name": "Fouet",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_MELEE",
+    "cost": {
+      "v": 2,
+      "u": "po"
+    },
+    "w_kg": 1.5,
+    "data": {
+      "dmg_d": "1d4",
+      "dmg_t": "tranchant",
+      "props": [
+        "prop-allonge",
+        "prop-finesse"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-fronde",
+    "name": "Fronde",
+    "type": "WEAPON",
+    "subtype": "SIMPLE_RANGED",
+    "cost": {
+      "v": 1,
+      "u": "pa"
+    },
+    "w_kg": null,
+    "data": {
+      "dmg_d": "1d4",
+      "dmg_t": "contondant",
+      "props": [
+        "prop-projectiles-9-36"
+      ],
+      "desc": "Une fronde doit être chargée pour infliger des dégâts quand elle est utilisée au corps à corps."
+    }
+  },
+  {
+    "id": "wp-gourdin",
+    "name": "Gourdin",
+    "type": "WEAPON",
+    "subtype": "SIMPLE_MELEE",
+    "cost": {
+      "v": 1,
+      "u": "pa"
+    },
+    "w_kg": 1,
+    "data": {
+      "dmg_d": "1d4",
+      "dmg_t": "contondant",
+      "props": [
+        "prop-legere"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-grande-hache",
+    "name": "Grande hache",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_MELEE",
+    "cost": {
+      "v": 30,
+      "u": "po"
+    },
+    "w_kg": 3.5,
+    "data": {
+      "dmg_d": "1d12",
+      "dmg_t": "tranchant",
+      "props": [
+        "prop-deux-mains",
+        "prop-lourde"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-guisarme",
+    "name": "Guisarme",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_MELEE",
+    "cost": {
+      "v": 20,
+      "u": "po"
+    },
+    "w_kg": 3,
+    "data": {
+      "dmg_d": "1d10",
+      "dmg_t": "tranchant",
+      "props": [
+        "prop-allonge",
+        "prop-deux-mains",
+        "prop-lourde"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-hache-darmes",
+    "name": "Hache d'armes",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_MELEE",
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 2,
+    "data": {
+      "dmg_d": "1d8",
+      "dmg_t": "tranchant",
+      "props": [
+        "prop-polyvalente-1d10"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-hachette",
+    "name": "Hachette",
+    "type": "WEAPON",
+    "subtype": "SIMPLE_MELEE",
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "dmg_d": "1d6",
+      "dmg_t": "tranchant",
+      "props": [
+        "prop-lancer-6-18",
+        "prop-legere"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-hallebarde",
+    "name": "Hallebarde",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_MELEE",
+    "cost": {
+      "v": 20,
+      "u": "po"
+    },
+    "w_kg": 3,
+    "data": {
+      "dmg_d": "1d10",
+      "dmg_t": "tranchant",
+      "props": [
+        "prop-allonge",
+        "prop-deux-mains",
+        "prop-lourde"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-javeline",
+    "name": "Javeline",
+    "type": "WEAPON",
+    "subtype": "SIMPLE_MELEE",
+    "cost": {
+      "v": 5,
+      "u": "pa"
+    },
+    "w_kg": 1,
+    "data": {
+      "dmg_d": "1d6",
+      "dmg_t": "perforant",
+      "props": [
+        "prop-lancer-9-36"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-lance",
+    "name": "Lance",
+    "type": "WEAPON",
+    "subtype": "SIMPLE_MELEE",
+    "cost": {
+      "v": 1,
+      "u": "po"
+    },
+    "w_kg": 1.5,
+    "data": {
+      "dmg_d": "1d6",
+      "dmg_t": "perforant",
+      "props": [
+        "prop-lancer-6-18",
+        "prop-polyvalente-1d8"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-lance-darcon",
+    "name": "Lance d'arçon",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_MELEE",
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 3,
+    "data": {
+      "dmg_d": "1d12",
+      "dmg_t": "perforant",
+      "props": [
+        "prop-allonge",
+        "prop-speciale"
+      ],
+      "desc": "Désavantage contre cible à 1,50 m. Se manie à deux mains sauf si le porteur est sur une monture."
+    }
+  },
+  {
+    "id": "wp-maillet",
+    "name": "Maillet",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_MELEE",
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 5,
+    "data": {
+      "dmg_d": "2d6",
+      "dmg_t": "contondant",
+      "props": [
+        "prop-deux-mains",
+        "prop-lourde"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-marteau-de-guerre",
+    "name": "Marteau de guerre",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_MELEE",
+    "cost": {
+      "v": 15,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "dmg_d": "1d8",
+      "dmg_t": "contondant",
+      "props": [
+        "prop-polyvalente-1d10"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-marteau-leger",
+    "name": "Marteau léger",
+    "type": "WEAPON",
+    "subtype": "SIMPLE_MELEE",
+    "cost": {
+      "v": 2,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "dmg_d": "1d4",
+      "dmg_t": "contondant",
+      "props": [
+        "prop-lancer-6-18",
+        "prop-legere"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-masse-darmes",
+    "name": "Masse d'armes",
+    "type": "WEAPON",
+    "subtype": "SIMPLE_MELEE",
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 2,
+    "data": {
+      "dmg_d": "1d6",
+      "dmg_t": "contondant",
+      "props": [],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-massue",
+    "name": "Massue",
+    "type": "WEAPON",
+    "subtype": "SIMPLE_MELEE",
+    "cost": {
+      "v": 2,
+      "u": "pa"
+    },
+    "w_kg": 5,
+    "data": {
+      "dmg_d": "1d8",
+      "dmg_t": "contondant",
+      "props": [
+        "prop-deux-mains"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-morgenstern",
+    "name": "Morgenstern",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_MELEE",
+    "cost": {
+      "v": 15,
+      "u": "po"
+    },
+    "w_kg": 2,
+    "data": {
+      "dmg_d": "1d8",
+      "dmg_t": "perforant",
+      "props": [],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-pic-de-guerre",
+    "name": "Pic de guerre",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_MELEE",
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "dmg_d": "1d8",
+      "dmg_t": "perforant",
+      "props": [],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-pique",
+    "name": "Pique",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_MELEE",
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 9,
+    "data": {
+      "dmg_d": "1d10",
+      "dmg_t": "perforant",
+      "props": [
+        "prop-allonge",
+        "prop-deux-mains",
+        "prop-lourde"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-propulseur",
+    "name": "Propulseur",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_RANGED",
+    "cost": {
+      "v": 3,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "dmg_d": null,
+      "dmg_t": null,
+      "props": [
+        "prop-rechargement",
+        "prop-projectiles-24-96",
+        "prop-speciale"
+      ],
+      "desc": "Permet de lancer des javelines. Dégâts de la javeline projetée : 1d8 + mod. FOR."
+    }
+  },
+  {
+    "id": "wp-rapiere",
+    "name": "Rapière",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_MELEE",
+    "cost": {
+      "v": 25,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "dmg_d": "1d8",
+      "dmg_t": "perforant",
+      "props": [
+        "prop-finesse"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-sarbacane",
+    "name": "Sarbacane",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_RANGED",
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "dmg_d": "1",
+      "dmg_t": "perforant",
+      "props": [
+        "prop-projectiles-7-50-30",
+        "prop-rechargement"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-serpe",
+    "name": "Serpe",
+    "type": "WEAPON",
+    "subtype": "SIMPLE_MELEE",
+    "cost": {
+      "v": 1,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "dmg_d": "1d4",
+      "dmg_t": "tranchant",
+      "props": [
+        "prop-legere"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "wp-trident",
+    "name": "Trident",
+    "type": "WEAPON",
+    "subtype": "MARTIAL_MELEE",
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 2,
+    "data": {
+      "dmg_d": "1d6",
+      "dmg_t": "perforant",
+      "props": [
+        "prop-lancer-6-18",
+        "prop-polyvalente-1d8"
+      ],
+      "desc": null
+    }
+  },
+  {
+    "id": "tl-bombarde",
+    "name": "Bombarde",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 2,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "desc": "Instrument de musique[cite: 501]."
+    }
+  },
+  {
+    "id": "tl-cor",
+    "name": "Cor",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 3,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "desc": "Instrument de musique[cite: 501]."
+    }
+  },
+  {
+    "id": "tl-cornemuse",
+    "name": "Cornemuse",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 30,
+      "u": "po"
+    },
+    "w_kg": 3,
+    "data": {
+      "desc": "Instrument de musique[cite: 501]."
+    }
+  },
+  {
+    "id": "tl-des",
+    "name": "Dés",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 1,
+      "u": "pa"
+    },
+    "w_kg": null,
+    "data": {
+      "desc": "Matériel de jeu[cite: 516]."
+    }
+  },
+  {
+    "id": "tl-dulcimer",
+    "name": "Dulcimer",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 25,
+      "u": "po"
+    },
+    "w_kg": 5,
+    "data": {
+      "desc": "Instrument de musique[cite: 501]."
+    }
+  },
+  {
+    "id": "tl-echecs",
+    "name": "Échecs",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 1,
+      "u": "po"
+    },
+    "w_kg": 0.25,
+    "data": {
+      "desc": "Matériel de jeu[cite: 516]."
+    }
+  },
+  {
+    "id": "tl-flute",
+    "name": "Flûte",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 2,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "desc": "Instrument de musique[cite: 501]."
+    }
+  },
+  {
+    "id": "tl-flute-de-pan",
+    "name": "Flûte de Pan",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 12,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "desc": "Instrument de musique[cite: 501]."
+    }
+  },
+  {
+    "id": "tl-go",
+    "name": "Go",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 1,
+      "u": "po"
+    },
+    "w_kg": 0.25,
+    "data": {
+      "desc": "Matériel de jeu[cite: 516]."
+    }
+  },
+  {
+    "id": "tl-instruments-de-navigation",
+    "name": "Instruments de navigation",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 25,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "desc": "Sert à la navigation maritime. Permet d'établir une route, lire des cartes et éviter de se perdre en mer[cite: 504, 505, 506]."
+    }
+  },
+  {
+    "id": "tl-jeu-de-cartes",
+    "name": "Jeu de cartes",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 5,
+      "u": "pa"
+    },
+    "w_kg": null,
+    "data": {
+      "desc": "Matériel de jeu[cite: 516]."
+    }
+  },
+  {
+    "id": "tl-luth",
+    "name": "Luth",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 35,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "desc": "Instrument de musique[cite: 501]."
+    }
+  },
+  {
+    "id": "tl-lyre",
+    "name": "Lyre",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 30,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "desc": "Instrument de musique[cite: 501]."
+    }
+  },
+  {
+    "id": "tl-necessaire-dalchimiste",
+    "name": "Nécessaire d'alchimiste",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 100,
+      "u": "po"
+    },
+    "w_kg": 4,
+    "data": {
+      "desc": "Outils d'artisan associé aux apothicaires[cite: 584]."
+    }
+  },
+  {
+    "id": "tl-necessaire-de-brasseur",
+    "name": "Nécessaire de brasseur",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 20,
+      "u": "po"
+    },
+    "w_kg": 4.5,
+    "data": {
+      "desc": "Outils d'artisan associé aux vignerons et distillateurs[cite: 584]."
+    }
+  },
+  {
+    "id": "tl-necessaire-de-calligraphe",
+    "name": "Nécessaire de calligraphe",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 2.5,
+    "data": {
+      "desc": "Outils d'artisan associé aux miniaturistes et scribes[cite: 584]."
+    }
+  },
+  {
+    "id": "tl-necessaire-de-cartographe",
+    "name": "Nécessaire de cartographe",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 15,
+      "u": "po"
+    },
+    "w_kg": 3,
+    "data": {
+      "desc": "Outils d'artisan associé aux architectes et dessinateurs[cite: 584]."
+    }
+  },
+  {
+    "id": "tl-necessaire-de-deguisement",
+    "name": "Nécessaire de déguisement",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 25,
+      "u": "po"
+    },
+    "w_kg": 1.5,
+    "data": {
+      "desc": "Maquillage, teinture et accessoires pour modifier l'apparence[cite: 557, 558, 559]."
+    }
+  },
+  {
+    "id": "tl-necessaire-de-faussaire",
+    "name": "Nécessaire de faussaire",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 15,
+      "u": "po"
+    },
+    "w_kg": 2.5,
+    "data": {
+      "desc": "Instruments pour la contrefaçon de documents. Illégal[cite: 561, 562, 563]."
+    }
+  },
+  {
+    "id": "tl-necessaire-dempoisonneur",
+    "name": "Nécessaire d'empoisonneur",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 50,
+      "u": "po"
+    },
+    "w_kg": 2,
+    "data": {
+      "desc": "Équipement pour fabriquer des poisons. Illégal[cite: 545, 546, 547]."
+    }
+  },
+  {
+    "id": "tl-necessaire-de-peintre",
+    "name": "Nécessaire de peintre",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 2.5,
+    "data": {
+      "desc": "Outils d'artisan associé aux dessinateurs[cite: 584]."
+    }
+  },
+  {
+    "id": "tl-necessaire-dherboristerie",
+    "name": "Nécessaire d'herboristerie",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 1.5,
+    "data": {
+      "desc": "Ustensiles pour préparer remèdes et potions. Indispensable pour thériaques et potions de guérison[cite: 552, 553, 555]."
+    }
+  },
+  {
+    "id": "tl-osselets",
+    "name": "Osselets",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 1,
+      "u": "pc"
+    },
+    "w_kg": null,
+    "data": {
+      "desc": "Matériel de jeu[cite: 516]."
+    }
+  },
+  {
+    "id": "tl-outils-de-bijoutier",
+    "name": "Outils de bijoutier",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 25,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "desc": "Outils d'artisan pour joaillier[cite: 584]."
+    }
+  },
+  {
+    "id": "tl-outils-de-cordonnier",
+    "name": "Outils de cordonnier",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 2.5,
+    "data": {
+      "desc": "Outils d'artisan associé aux savetiers et bottiers[cite: 584]."
+    }
+  },
+  {
+    "id": "tl-outils-de-forgeron",
+    "name": "Outils de forgeron",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 20,
+      "u": "po"
+    },
+    "w_kg": 4,
+    "data": {
+      "desc": "Outils d'artisan pour armurier[cite: 584]."
+    }
+  },
+  {
+    "id": "tl-outils-de-la-ferme",
+    "name": "Outils de la ferme",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 1,
+      "u": "po"
+    },
+    "w_kg": 10,
+    "data": {
+      "desc": "Nécessaire pour cultiver et élever du bétail. Comprend bêche, houe, faux, etc.[cite: 565, 566]."
+    }
+  },
+  {
+    "id": "tl-outils-de-macon",
+    "name": "Outils de maçon",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 4,
+    "data": {
+      "desc": "Outils d'artisan associé aux architectes, bâtisseurs et ingénieurs[cite: 584]."
+    }
+  },
+  {
+    "id": "tl-outils-de-menuisier",
+    "name": "Outils de menuisier",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 8,
+      "u": "po"
+    },
+    "w_kg": 3,
+    "data": {
+      "desc": "Outils d'artisan associé aux charpentiers et au travail du bois[cite: 584]."
+    }
+  },
+  {
+    "id": "tl-outils-de-potier",
+    "name": "Outils de potier",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 1.5,
+    "data": {
+      "desc": "Outils d'artisan associé à la céramique et l'émail[cite: 584]."
+    }
+  },
+  {
+    "id": "tl-outils-de-retameur",
+    "name": "Outils de rétameur",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 50,
+      "u": "po"
+    },
+    "w_kg": 5,
+    "data": {
+      "desc": "Outils d'artisan associé aux bricoleurs et inventeurs[cite: 584]."
+    }
+  },
+  {
+    "id": "tl-outils-de-sculpteur-sur-bois",
+    "name": "Outils de sculpteur sur bois",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 1,
+      "u": "po"
+    },
+    "w_kg": 2.5,
+    "data": {
+      "desc": "Outils d'artisan associé à la sculpture sur os, ivoire et bas-reliefs[cite: 584]."
+    }
+  },
+  {
+    "id": "tl-outils-de-tanneur",
+    "name": "Outils de tanneur",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 2.5,
+    "data": {
+      "desc": "Outils d'artisan associé au travail du cuir et à la maroquinerie[cite: 584]."
+    }
+  },
+  {
+    "id": "tl-outils-de-tisserand",
+    "name": "Outils de tisserand",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 1,
+      "u": "po"
+    },
+    "w_kg": 2.5,
+    "data": {
+      "desc": "Outils d'artisan associé au travail du tissu, couturier et tailleur[cite: 584]."
+    }
+  },
+  {
+    "id": "tl-outils-de-verrier",
+    "name": "Outils de verrier",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 30,
+      "u": "po"
+    },
+    "w_kg": 2.5,
+    "data": {
+      "desc": "Outils d'artisan associé aux souffleurs et vitriers[cite: 584]."
+    }
+  },
+  {
+    "id": "tl-outils-de-voleur",
+    "name": "Outils de voleur",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 25,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "desc": "Sert à désamorcer des pièges ou crocheter des serrures. Rare et illégal[cite: 588, 589, 590]."
+    }
+  },
+  {
+    "id": "tl-tambour",
+    "name": "Tambour",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 6,
+      "u": "po"
+    },
+    "w_kg": 1.5,
+    "data": {
+      "desc": "Instrument de musique[cite: 501]."
+    }
+  },
+  {
+    "id": "tl-ustensiles-de-cuisinier",
+    "name": "Ustensiles de cuisinier",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 1,
+      "u": "po"
+    },
+    "w_kg": 4,
+    "data": {
+      "desc": "Outils d'artisan associé aux pâtissiers, rôtisseurs, sauciers, boulangers, etc[cite: 584]."
+    }
+  },
+  {
+    "id": "tl-viole",
+    "name": "Viole",
+    "type": "TOOL",
+    "subtype": null,
+    "cost": {
+      "v": 30,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "desc": "Instrument de musique[cite: 501]."
+    }
+  },
+  {
+    "id": "sv-hebergement-aise",
+    "name": "Hébergement - Aisé",
+    "type": "SERVICE",
+    "subtype": null,
+    "cost": {
+      "v": 8,
+      "u": "pa"
+    },
+    "w_kg": null,
+    "data": {
+      "desc": "Prix d'une nuitée en auberge pour un confort aisé. [cite: 956, 964]"
+    }
+  },
+  {
+    "id": "sv-repas-modeste",
+    "name": "Repas (par jour) - Modeste",
+    "type": "SERVICE",
+    "subtype": null,
+    "cost": {
+      "v": 3,
+      "u": "pa"
+    },
+    "w_kg": null,
+    "data": {
+      "desc": "Coût de nourriture journalier pour un train de vie modeste à la Cité Franche. [cite: 943, 975]"
+    }
+  },
+  {
+    "id": "sv-vin-grand-cru",
+    "name": "Vin (bouteille grand cru)",
+    "type": "SERVICE",
+    "subtype": null,
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": null,
+    "data": {
+      "desc": "Boisson servie en auberge. [cite: 954]"
+    }
+  },
+  {
+    "id": "gr-acide-fiole",
+    "name": "Acide (fiole)",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 25,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "desc": "Action pour répandre (1,50 m) ou lancer (6 m)[cite: 816]. Attaque à distance (arme improvisée), inflige 2d6 dégâts d'acide[cite: 817, 818]."
+    }
+  },
+  {
+    "id": "gr-amulette",
+    "name": "Amulette",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": null,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "desc": "Symbole sacré orné du symbole d'une divinité. Utilisable comme focaliseur magique par un prêtre ou un paladin. [cite: 934, 935, 937]"
+    }
+  },
+  {
+    "id": "gr-attirail-de-peche",
+    "name": "Attirail de pêche",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 1,
+      "u": "po"
+    },
+    "w_kg": 2,
+    "data": {
+      "desc": "Comprend une canne à pêche, une ligne en fil de soie, des bouchons en liège, des hameçons en acier, des plombs, des leurres et un filet à mailles serrées[cite: 629]. Pour fabriquer une nasse, prévoit une journée de travail et un test de Sagesse (Survie) DD 15[cite: 632, 633]."
+    }
+  },
+  {
+    "id": "gr-baguette-dif",
+    "name": "Baguette d'if",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": null,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "desc": "Focaliseur druidique. Les objets sacrés sont hors du commerce et s'obtiennent par donation ou service. [cite: 915, 931]"
+    }
+  },
+  {
+    "id": "gr-barre-a-mine",
+    "name": "Barre à mine",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 2,
+      "u": "po"
+    },
+    "w_kg": 5,
+    "data": {
+      "desc": "Mesure au moins 1 m et sert à creuser des trous dans des roches dures ou à déchausser des pierres[cite: 635]."
+    }
+  },
+  {
+    "id": "gr-belier-portatif",
+    "name": "Bélier portatif",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 4,
+      "u": "po"
+    },
+    "w_kg": 17.5,
+    "data": {
+      "desc": "Confère un bonus de +4 au test de Force pour enfoncer une porte[cite: 641]. Si un autre personnage aide, le porteur bénéficie d'un avantage au test[cite: 642]."
+    }
+  },
+  {
+    "id": "gr-billes-1000",
+    "name": "Billes (sac de 1000)",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 7,
+      "u": "po"
+    },
+    "w_kg": 7,
+    "data": {
+      "desc": "Action pour répandre sur une zone carrée de 3 m de côté[cite: 646]. JS Dextérité DD 10 ou chute à terre, sauf si déplacement à moitié de VD[cite: 647, 648]."
+    }
+  },
+  {
+    "id": "gr-bougie",
+    "name": "Bougie",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 5,
+      "u": "pc"
+    },
+    "w_kg": null,
+    "data": {
+      "desc": "Émet une lumière vive dans un rayon de 1,50 m et une lumière faible sur 1,50 m de plus pendant 1 heure[cite: 698, 699]."
+    }
+  },
+  {
+    "id": "gr-bouteille-en-verre",
+    "name": "Bouteille en verre",
+    "type": "GEAR",
+    "subtype": "CONTAINER",
+    "cost": {
+      "v": 2,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "cap_kg": 0.75,
+      "desc": "Capacité : 75 cl. [cite: 664]"
+    }
+  },
+  {
+    "id": "gr-cadenas",
+    "name": "Cadenas",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "desc": "Fourni avec une clef. Crochetage possible via test de Dextérité DD 15 (outils de voleur)[cite: 650, 651]."
+    }
+  },
+  {
+    "id": "gr-carnet-de-notes",
+    "name": "Carnet de notes",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 5,
+      "u": "pa"
+    },
+    "w_kg": 0.25,
+    "data": {
+      "desc": "Papier de bonne qualité, 120 pages. [cite: 900]"
+    }
+  },
+  {
+    "id": "gr-chaine-3m",
+    "name": "Chaîne (3 m)",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 5,
+    "data": {
+      "desc": "10 points de vie. Peut être brisée avec un test de Force DD 20[cite: 653, 654]."
+    }
+  },
+  {
+    "id": "gr-chausse-trappes-20",
+    "name": "Chausse-trappes (20)",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 1,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "desc": "Action pour couvrir une zone de 1,50 m de côté[cite: 657]. JS Dextérité DD 15 ou 1 dégât perforant et réduction de VD de 3 m[cite: 658, 659]."
+    }
+  },
+  {
+    "id": "gr-coffre",
+    "name": "Coffre",
+    "type": "GEAR",
+    "subtype": "CONTAINER",
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 12.5,
+    "data": {
+      "cap_kg": 150,
+      "desc": "Capacité : 360 l / 150 kg d'équipement. [cite: 664]"
+    }
+  },
+  {
+    "id": "gr-eau-benite",
+    "name": "Eau bénite (flasque)",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 25,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "dmg_d": "2d6",
+      "dmg_t": "radiant",
+      "desc": "Action pour répandre (1,50 m) ou lancer (6 m). Attaque à distance contre une créature (arme improvisée). Les fiélons et morts-vivants subissent 2d6 dégâts radiants. [cite: 917, 923, 925]"
+    }
+  },
+  {
+    "id": "gr-etui-a-parchemins",
+    "name": "Étui à parchemins",
+    "type": "GEAR",
+    "subtype": "CONTAINER",
+    "cost": {
+      "v": 1,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "cap_kg": null,
+      "desc": "Étui cylindrique en cuir pouvant contenir dix feuilles de papier enroulées ou cinq parchemins. [cite: 901, 903]"
+    }
+  },
+  {
+    "id": "gr-feu-gregeois",
+    "name": "Feu grégeois (flasque)",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 50,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "desc": "S'embrase au contact de l'air[cite: 824]. Attaque à distance (6 m), inflige 1d4 dégâts de feu au début de chaque tour de la cible. DD 10 DEX pour éteindre[cite: 825, 827, 828]."
+    }
+  },
+  {
+    "id": "gr-grappin",
+    "name": "Grappin",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 2,
+      "u": "po"
+    },
+    "w_kg": 2,
+    "data": {
+      "desc": "Utilisé pour l'escalade[cite: 624]."
+    }
+  },
+  {
+    "id": "gr-grimoire",
+    "name": "Grimoire",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 50,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "desc": "Indispensable pour les magiciens. Épais volume relié de cuir contenant 350 pages de vélin vierge. [cite: 904, 906]"
+    }
+  },
+  {
+    "id": "gr-lanterne-a-capote",
+    "name": "Lanterne à capote",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "desc": "Lumière vive rayon 9 m, faible sur 9 m de plus pendant 6h par flasque d'huile[cite: 717, 718]. Capote rabattable pour limiter l'éclairage (lumière faible rayon 1,50 m)[cite: 719]."
+    }
+  },
+  {
+    "id": "gr-lanterne-sourde",
+    "name": "Lanterne sourde",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "desc": "Émet un cône de lumière vive de 18 m et de lumière faible sur 18 m de plus pendant 6 heures[cite: 729, 730]."
+    }
+  },
+  {
+    "id": "gr-materiel-descalade",
+    "name": "Matériel d'escalade",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 25,
+      "u": "po"
+    },
+    "w_kg": 6,
+    "data": {
+      "desc": "Comprend pitons, crampons, gants et harnais[cite: 738]. Permet de s'assurer pour ne pas tomber de plus de 7,50 m sous le point d'ancrage[cite: 739, 740]."
+    }
+  },
+  {
+    "id": "gr-menottes",
+    "name": "Menottes",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 2,
+      "u": "po"
+    },
+    "w_kg": 3,
+    "data": {
+      "desc": "Pour créatures de taille P ou M[cite: 743]. Test de Dextérité DD 20 pour s'extraire ou Force DD 20 pour briser. 15 points de vie[cite: 752, 753]."
+    }
+  },
+  {
+    "id": "gr-necessaire-a-feu",
+    "name": "Nécessaire à feu",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 5,
+      "u": "pa"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "desc": "Silex, pierre à briquet et amorce[cite: 755]. Allumer une torche ou combustible prend 1 action, un feu de camp 1 minute[cite: 756]."
+    }
+  },
+  {
+    "id": "gr-piege-a-loups",
+    "name": "Piège à loups",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 12.5,
+    "data": {
+      "desc": "JS Dextérité DD 13 ou 1d4 dégâts perforants et immobilisation[cite: 767]. Libération possible par test Force DD 13. Chaque échec inflige 1 dégât perforant[cite: 770, 771]."
+    }
+  },
+  {
+    "id": "gr-potion-de-guerison",
+    "name": "Potion de guérison",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 50,
+      "u": "po"
+    },
+    "w_kg": 0.25,
+    "data": {
+      "desc": "Liquide rouge magique. Récupère 2d4+2 points de vie. Boire ou administrer demande une action[cite: 867, 868]."
+    }
+  },
+  {
+    "id": "gr-rations-2j",
+    "name": "Rations (2 journées)",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 5,
+      "u": "pa"
+    },
+    "w_kg": 1,
+    "data": {
+      "desc": "Nourriture déshydratée pour les longs voyages (viande séchée, fruits secs, biscuits, noix)[cite: 776]."
+    }
+  },
+  {
+    "id": "gr-sac-daventurier",
+    "name": "Sac d'aventurier",
+    "type": "GEAR",
+    "subtype": "CONTAINER",
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 21.5,
+    "data": {
+      "desc": "Un sac à dos, un sac de couchage, une gamelle, un nécessaire à feu, 10 torches, 10 jours de rations, une outre. Une corde en chanvre de 15 m est attachée au flanc du sac. [cite: 28, 29, 30]"
+    }
+  },
+  {
+    "id": "gr-sac-de-bateleur",
+    "name": "Sac de bateleur",
+    "type": "GEAR",
+    "subtype": "CONTAINER",
+    "cost": {
+      "v": 40,
+      "u": "po"
+    },
+    "w_kg": 13.5,
+    "data": {
+      "desc": "Un sac à dos, un sac de couchage, 2 costumes de scène, 5 bougies, 5 jours de rations, une outre, un nécessaire de déguisement. [cite: 39, 40]"
+    }
+  },
+  {
+    "id": "gr-sac-de-cambrioleur",
+    "name": "Sac de cambrioleur",
+    "type": "GEAR",
+    "subtype": "CONTAINER",
+    "cost": {
+      "v": 20,
+      "u": "po"
+    },
+    "w_kg": 30,
+    "data": {
+      "desc": "Un sac à dos, un sac de 1 000 billes, 3 m de ficelle, une cloche, 5 bougies, un pied-de-biche, un marteau, 10 pitons, une lanterne à capote, 2 flasques d'huile, 5 jours de rations, un nécessaire à feu, une outre. Une corde en chanvre de 15 m est attachée au flanc du sac. [cite: 42, 43, 44]"
+    }
+  },
+  {
+    "id": "gr-sac-de-diplomate",
+    "name": "Sac de diplomate",
+    "type": "GEAR",
+    "subtype": "CONTAINER",
+    "cost": {
+      "v": 39,
+      "u": "po"
+    },
+    "w_kg": 18,
+    "data": {
+      "desc": "Un coffre, 2 étuis à parchemins, une tenue raffinée, une bouteille d'encre, une plume d'écriture, une lampe, 2 flasques d'huile, 5 feuilles de papier, un flacon de parfum, de la cire à cacheter, un savon. [cite: 46, 47, 48]"
+    }
+  },
+  {
+    "id": "gr-sac-de-religieux",
+    "name": "Sac de religieux",
+    "type": "GEAR",
+    "subtype": "CONTAINER",
+    "cost": {
+      "v": 22,
+      "u": "po"
+    },
+    "w_kg": 10,
+    "data": {
+      "desc": "Un sac à dos, une couverture, 10 bougies, un nécessaire à feu, une sébile, 2 morceaux d'encens, un encensoir, une tenue liturgique, 2 jours de rations et une outre. [cite: 50, 51]"
+    }
+  },
+  {
+    "id": "gr-sac-derudit",
+    "name": "Sac d'érudit",
+    "type": "GEAR",
+    "subtype": "CONTAINER",
+    "cost": {
+      "v": 40,
+      "u": "po"
+    },
+    "w_kg": 3,
+    "data": {
+      "desc": "Un sac à dos, un livre savant, une bouteille d'encre, une plume d'écriture, dix feuilles de parchemin, un petit sac de sable, un petit couteau. [cite: 32, 33]"
+    }
+  },
+  {
+    "id": "gr-sac-dexplorateur",
+    "name": "Sac d'explorateur",
+    "type": "GEAR",
+    "subtype": "CONTAINER",
+    "cost": {
+      "v": 12,
+      "u": "po"
+    },
+    "w_kg": 23.5,
+    "data": {
+      "desc": "Un sac à dos, un pied-de-biche, un marteau, 10 pitons, 10 torches, un nécessaire à feu, 10 jours de rations et une outre. Une corde en chanvre de 15 m est attachée au flanc du sac. [cite: 35, 36, 37]"
+    }
+  },
+  {
+    "id": "gr-sac-en-toile-de-jute",
+    "name": "Sac en toile de jute",
+    "type": "GEAR",
+    "subtype": "CONTAINER",
+    "cost": {
+      "v": 1,
+      "u": "pc"
+    },
+    "w_kg": 0.25,
+    "data": {
+      "cap_kg": 30,
+      "desc": "Capacité : 30 l / 30 kg d'équipement. [cite: 664]"
+    }
+  },
+  {
+    "id": "gr-selle-de-guerre",
+    "name": "Selle de guerre",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 20,
+      "u": "po"
+    },
+    "w_kg": 15,
+    "data": {
+      "desc": "Soutient le cavalier. Confère un avantage aux tests pour éviter de tomber de selle. [cite: 1070, 1071, 1086]"
+    }
+  },
+  {
+    "id": "gr-trousse-de-guerisseur",
+    "name": "Trousse de guérisseur",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 1.5,
+    "data": {
+      "desc": "10 utilisations. Permet de stabiliser une créature à 0 pv sans test de Sagesse (Médecine)[cite: 877, 880]."
+    }
+  },
+  {
+    "id": "ar-armure-decailles",
+    "name": "Armure d'écailles",
+    "type": "ARMOR",
+    "subtype": "MEDIUM",
+    "cost": {
+      "v": 50,
+      "u": "po"
+    },
+    "w_kg": 22.5,
+    "data": {
+      "ac": 14,
+      "str_req": 12,
+      "stealth_dis": true,
+      "desc": "Tunique et jambières en cuir renforcées de plaques de métal se chevauchant comme des écailles de poisson. Comprend des gantelets[cite: 427, 458]. Désavantage aux tests de Force (Athlétisme) pour nager et de Dextérité (Acrobaties)[cite: 424, 427]."
+    }
+  },
+  {
+    "id": "ar-armure-de-cuir",
+    "name": "Armure de cuir",
+    "type": "ARMOR",
+    "subtype": "LIGHT",
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 5,
+    "data": {
+      "ac": 11,
+      "stealth_dis": false,
+      "desc": "Cuirasse et épaulières en cuir bouilli durci."
+    }
+  },
+  {
+    "id": "ar-armure-de-cuir-cloutee",
+    "name": "Armure de cuir cloutée",
+    "type": "ARMOR",
+    "subtype": "LIGHT",
+    "cost": {
+      "v": 45,
+      "u": "po"
+    },
+    "w_kg": 6.5,
+    "data": {
+      "ac": 12,
+      "stealth_dis": false,
+      "desc": "Cuir épais mais souple renforcé de rivets ou clous."
+    }
+  },
+  {
+    "id": "ar-armure-de-peau",
+    "name": "Armure de peau",
+    "type": "ARMOR",
+    "subtype": "MEDIUM",
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 6,
+    "data": {
+      "ac": 12,
+      "stealth_dis": false,
+      "desc": "Couches de peaux d'animaux et fourrures."
+    }
+  },
+  {
+    "id": "ar-armure-de-plaques",
+    "name": "Armure de plaques",
+    "type": "ARMOR",
+    "subtype": "MEDIUM",
+    "cost": {
+      "v": 750,
+      "u": "po"
+    },
+    "w_kg": 20,
+    "data": {
+      "ac": 15,
+      "str_req": 12,
+      "stealth_dis": true,
+      "desc": "Série de plaques ajustées couvrant l'essentiel du corps, avec de simples jambières[cite: 427, 464, 465]. Désavantage aux tests de Force (Athlétisme) pour nager et de Dextérité (Acrobaties)[cite: 424, 427]."
+    }
+  },
+  {
+    "id": "ar-armure-matelassee",
+    "name": "Armure matelassée",
+    "type": "ARMOR",
+    "subtype": "LIGHT",
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 4,
+    "data": {
+      "ac": 11,
+      "stealth_dis": true,
+      "desc": "Constituée de plusieurs épaisseurs de tissu rembourré."
+    }
+  },
+  {
+    "id": "ar-bouclier",
+    "name": "Bouclier",
+    "type": "ARMOR",
+    "subtype": "SHIELD",
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 3,
+    "data": {
+      "ac": 2,
+      "stealth_dis": false,
+      "desc": "Améliore de 2 la classe d'armure. Occupe une main[cite: 416, 427, 430]. Désavantage aux tests de Force (Athlétisme) pour nager et de Dextérité (Acrobaties)[cite: 431]."
+    }
+  },
+  {
+    "id": "ar-broigne",
+    "name": "Broigne",
+    "type": "ARMOR",
+    "subtype": "HEAVY",
+    "cost": {
+      "v": 30,
+      "u": "po"
+    },
+    "w_kg": 20,
+    "data": {
+      "ac": 14,
+      "str_req": 12,
+      "stealth_dis": true,
+      "desc": "Armure de cuir sur laquelle sont cousus d'épais anneaux métalliques[cite: 427, 472]. Désavantage aux tests de Force (Athlétisme) pour nager et de Dextérité (Acrobaties)[cite: 424, 427]."
+    }
+  },
+  {
+    "id": "ar-chemise-de-mailles",
+    "name": "Chemise de mailles",
+    "type": "ARMOR",
+    "subtype": "MEDIUM",
+    "cost": {
+      "v": 50,
+      "u": "po"
+    },
+    "w_kg": 10,
+    "data": {
+      "ac": 13,
+      "stealth_dis": false,
+      "desc": "Anneaux métalliques entrelacés portés entre deux couches de vêtement."
+    }
+  },
+  {
+    "id": "ar-clibanion",
+    "name": "Clibanion",
+    "type": "ARMOR",
+    "subtype": "HEAVY",
+    "cost": {
+      "v": 200,
+      "u": "po"
+    },
+    "w_kg": 30,
+    "data": {
+      "ac": 17,
+      "str_req": 15,
+      "stealth_dis": true,
+      "desc": "Bandes de métal verticales rivetées sur une tunique de cuir, avec articulations en cotte de mailles[cite: 427, 479, 480]. Désavantage aux tests de Force (Athlétisme) pour nager et de Dextérité (Acrobaties)[cite: 424, 427]."
+    }
+  },
+  {
+    "id": "ar-cotte-de-mailles",
+    "name": "Cotte de mailles",
+    "type": "ARMOR",
+    "subtype": "HEAVY",
+    "cost": {
+      "v": 75,
+      "u": "po"
+    },
+    "w_kg": 27.5,
+    "data": {
+      "ac": 16,
+      "str_req": 14,
+      "stealth_dis": true,
+      "desc": "Anneaux de métal entrelacés portés sur une tunique matelassée. Comprend des gantelets[cite: 427, 476, 477]. Désavantage aux tests de Force (Athlétisme) pour nager et de Dextérité (Acrobaties)[cite: 424, 427]."
+    }
+  },
+  {
+    "id": "ar-cuirasse",
+    "name": "Cuirasse",
+    "type": "ARMOR",
+    "subtype": "MEDIUM",
+    "cost": {
+      "v": 400,
+      "u": "po"
+    },
+    "w_kg": 10,
+    "data": {
+      "ac": 14,
+      "str_req": null,
+      "stealth_dis": false,
+      "desc": "Pièce de métal ajustée portée sur du cuir souple, protégeant le torse et l'abdomen[cite: 427, 461]."
+    }
+  },
+  {
+    "id": "ar-harnois",
+    "name": "Harnois",
+    "type": "ARMOR",
+    "subtype": "HEAVY",
+    "cost": {
+      "v": 1500,
+      "u": "po"
+    },
+    "w_kg": 32.5,
+    "data": {
+      "ac": 18,
+      "str_req": 15,
+      "stealth_dis": true,
+      "desc": "Assemblage de plaques de métal façonnées sur mesure. Comprend gantelets, heaume et tunique rembourrée[cite: 427, 483, 484]. Désavantage aux tests de Force (Athlétisme) pour nager et de Dextérité (Acrobaties)[cite: 424, 427]."
+    }
+  },
+  {
+    "id": "mnt-chameau",
+    "name": "Chameau",
+    "type": "MOUNT",
+    "subtype": "ANIMAL",
+    "cost": {
+      "v": 50,
+      "u": "po"
+    },
+    "w_kg": null,
+    "data": {
+      "speed": "15 m",
+      "cap_kg": 240,
+      "desc": "Vitesse de déplacement : 15 m. Charge maximale : 240 kg."
+    }
+  },
+  {
+    "id": "mnt-cheval-de-trait",
+    "name": "Cheval de trait",
+    "type": "MOUNT",
+    "subtype": "ANIMAL",
+    "cost": {
+      "v": 50,
+      "u": "po"
+    },
+    "w_kg": null,
+    "data": {
+      "speed": "12 m",
+      "cap_kg": 270,
+      "desc": "Vitesse de déplacement : 12 m. Charge maximale : 270 kg."
+    }
+  },
+  {
+    "id": "mnt-elephant",
+    "name": "Éléphant",
+    "type": "MOUNT",
+    "subtype": "ANIMAL",
+    "cost": {
+      "v": 200,
+      "u": "po"
+    },
+    "w_kg": null,
+    "data": {
+      "speed": "12 m",
+      "cap_kg": 660,
+      "desc": "Vitesse de déplacement : 12 m. Charge maximale : 660 kg."
+    }
+  },
+  {
+    "id": "mnt-molosse",
+    "name": "Molosse",
+    "type": "MOUNT",
+    "subtype": "ANIMAL",
+    "cost": {
+      "v": 25,
+      "u": "po"
+    },
+    "w_kg": null,
+    "data": {
+      "speed": "12 m",
+      "cap_kg": 97.5,
+      "desc": "Vitesse de déplacement : 12 m. Charge maximale : 97,5 kg."
+    }
+  },
+  {
+    "id": "mnt-poney",
+    "name": "Poney",
+    "type": "MOUNT",
+    "subtype": "ANIMAL",
+    "cost": {
+      "v": 30,
+      "u": "po"
+    },
+    "w_kg": null,
+    "data": {
+      "speed": "12 m",
+      "cap_kg": 112.5,
+      "desc": "Vitesse de déplacement : 12 m. Charge maximale : 112,5 kg."
+    }
+  },
+  {
+    "id": "vhc-barge",
+    "name": "Barge",
+    "type": "VEHICLE",
+    "subtype": "WATER",
+    "cost": {
+      "v": 3000,
+      "u": "po"
+    },
+    "w_kg": null,
+    "data": {
+      "speed": "1.5 km/h",
+      "desc": "Vitesse : 1,5 km/h."
+    }
+  },
+  {
+    "id": "vhc-drakkar",
+    "name": "Drakkar",
+    "type": "VEHICLE",
+    "subtype": "WATER",
+    "cost": {
+      "v": 10000,
+      "u": "po"
+    },
+    "w_kg": null,
+    "data": {
+      "speed": "4.5 km/h",
+      "desc": "Vitesse : 4,5 km/h."
+    }
+  },
+  {
+    "id": "vhc-navire-de-guerre",
+    "name": "Navire de guerre",
+    "type": "VEHICLE",
+    "subtype": "WATER",
+    "cost": {
+      "v": 25000,
+      "u": "po"
+    },
+    "w_kg": null,
+    "data": {
+      "speed": "3.75 km/h",
+      "desc": "Vitesse : 3,75 km/h."
+    }
+  },
+  {
+    "id": "vhc-voilier",
+    "name": "Voilier",
+    "type": "VEHICLE",
+    "subtype": "WATER",
+    "cost": {
+      "v": 10000,
+      "u": "po"
+    },
+    "w_kg": null,
+    "data": {
+      "speed": "3 km/h",
+      "desc": "Vitesse : 3 km/h."
+    }
+  },
+  {
+    "id": "vhc-nefelytre",
+    "name": "Nefélytre",
+    "type": "VEHICLE",
+    "subtype": "AIR",
+    "cost": {
+      "v": 3000,
+      "u": "po"
+    },
+    "w_kg": null,
+    "data": {
+      "speed": "30 km/h",
+      "desc": "Véhicule aérien gnome de l'archipel éolien. Vitesse : 30 km/h."
+    }
+  },
+  {
+    "id": "vhc-boursouffleuse",
+    "name": "Boursouffleuse",
+    "type": "VEHICLE",
+    "subtype": "AIR",
+    "cost": {
+      "v": 10000,
+      "u": "po"
+    },
+    "w_kg": null,
+    "data": {
+      "speed": "15 km/h",
+      "desc": "Véhicule aérien gnome de l'archipel éolien. Vitesse : 15 km/h."
+    }
+  },
+  {
+    "id": "vhc-coche",
+    "name": "Coche",
+    "type": "VEHICLE",
+    "subtype": "LAND",
+    "cost": {
+      "v": 100,
+      "u": "po"
+    },
+    "w_kg": 300,
+    "data": {
+      "desc": "Voiture attelée couverte. Poids : 300 kg."
+    }
+  },
+  {
+    "id": "gr-barde",
+    "name": "Barde",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": null,
+      "u": "po"
+    },
+    "w_kg": null,
+    "data": {
+      "desc": "Armure destinée à protéger une monture. Tous les types d'armures sont disponibles. Prix : quadruple de l'armure humanoïde équivalente. Poids : double de l'armure humanoïde équivalente."
+    }
+  },
+  {
+    "id": "gr-ecurie-jour",
+    "name": "Écurie (par jour)",
+    "type": "SERVICE",
+    "subtype": null,
+    "cost": {
+      "v": 5,
+      "u": "pa"
+    },
+    "w_kg": null,
+    "data": {
+      "desc": "Prix journalier pour l'hébergement d'une monture à l'écurie."
+    }
+  },
+  {
+    "id": "gr-fonte",
+    "name": "Fonte",
+    "type": "GEAR",
+    "subtype": "CONTAINER",
+    "cost": {
+      "v": 4,
+      "u": "po"
+    },
+    "w_kg": 4,
+    "data": {
+      "desc": "Sacoche de selle."
+    }
+  },
+  {
+    "id": "gr-fourrage-jour",
+    "name": "Fourrage (par jour)",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 5,
+      "u": "pc"
+    },
+    "w_kg": 5,
+    "data": {
+      "desc": "Nourriture journalière pour une monture."
+    }
+  },
+  {
+    "id": "gr-mors-et-bride",
+    "name": "Mors et bride",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 2,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "desc": "Harnachement de tête pour diriger une monture."
+    }
+  },
+  {
+    "id": "gr-selle-dequitation",
+    "name": "Selle d'équitation",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 12.5,
+    "data": {
+      "desc": "Selle standard pour monter à cheval."
+    }
+  },
+  {
+    "id": "gr-selle-de-bat",
+    "name": "Selle de bât",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 7.5,
+    "data": {
+      "desc": "Permet de charger des biens sur une bête de somme."
+    }
+  },
+  {
+    "id": "gr-selle-speciale",
+    "name": "Selle spéciale",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 60,
+      "u": "po"
+    },
+    "w_kg": 20,
+    "data": {
+      "desc": "Indispensable pour chevaucher une monture aquatique ou volante."
+    }
+  },
+  {
+    "id": "vhc-traineau",
+    "name": "Traîneau",
+    "type": "VEHICLE",
+    "subtype": "LAND",
+    "cost": {
+      "v": 20,
+      "u": "po"
+    },
+    "w_kg": 150,
+    "data": {
+      "desc": "Véhicule attelé pour la neige et la glace. Poids : 150 kg."
+    }
+  }
+]

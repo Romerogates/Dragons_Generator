@@ -1,0 +1,2150 @@
+{
+  "x-generator": "NSwag v14.6.3.0 (NJsonSchema v11.5.2.0 (Newtonsoft.Json v13.0.0.0))",
+  "openapi": "3.0.0",
+  "info": {
+    "title": "DragonsGenerator API",
+    "version": "v1"
+  },
+  "paths": {
+    "/writing-systems/{id}": {
+      "get": {
+        "tags": [
+          "Writing-Systems"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsWritingSystemsGetWritingSystemByIdEndpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DragonsGeneratorAPIModelsWritingSystem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/writing-systems/type/{type}": {
+      "get": {
+        "tags": [
+          "Writing-Systems"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsWritingSystemsGetWritingSystemsByTypeEndpoint",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIModelsWritingSystem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/writing-systems": {
+      "get": {
+        "tags": [
+          "Writing-Systems"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsWritingSystemsGetWritingSystemsEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIModelsWritingSystem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/writing-systems/summary": {
+      "get": {
+        "tags": [
+          "Writing-Systems"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsWritingSystemsGetWritingSystemsSummaryEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIEndpointsWritingSystemsWritingSystemSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/writing-systems/types": {
+      "get": {
+        "tags": [
+          "Writing-Systems"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsWritingSystemsGetWritingSystemTypesEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spells/{id}": {
+      "get": {
+        "tags": [
+          "Spells"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsSpellsGetSpellByIdEndpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DragonsGeneratorAPIModelsSpell"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spells/level/{level}": {
+      "get": {
+        "tags": [
+          "Spells"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsSpellsGetSpellsByLevelEndpoint",
+        "parameters": [
+          {
+            "name": "level",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIModelsSpell"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spells/school/{school}": {
+      "get": {
+        "tags": [
+          "Spells"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsSpellsGetSpellsBySchoolEndpoint",
+        "parameters": [
+          {
+            "name": "school",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIModelsSpell"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spells/schools": {
+      "get": {
+        "tags": [
+          "Spells"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsSpellsGetSpellSchoolsEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spells": {
+      "get": {
+        "tags": [
+          "Spells"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsSpellsGetSpellsEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIModelsSpell"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spells/summary": {
+      "get": {
+        "tags": [
+          "Spells"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsSpellsGetSpellsSummaryEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIEndpointsSpellsSpellSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/species/{id}": {
+      "get": {
+        "tags": [
+          "Species"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsSpeciesGetSpeciesByIdEndpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DragonsGeneratorAPIModelsSpecies"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/species/codes": {
+      "get": {
+        "tags": [
+          "Species"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsSpeciesGetSpeciesCodesEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DragonsGeneratorAPIEndpointsSpeciesSpeciesCodesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/species": {
+      "get": {
+        "tags": [
+          "Species"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsSpeciesGetSpeciesEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIModelsSpecies"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/species/summary": {
+      "get": {
+        "tags": [
+          "Species"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsSpeciesGetSpeciesSummaryEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIEndpointsSpeciesSpeciesSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/languages/{id}": {
+      "get": {
+        "tags": [
+          "Languages"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsLanguagesGetLanguageByIdEndpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DragonsGeneratorAPIModelsLanguage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/languages/categories": {
+      "get": {
+        "tags": [
+          "Languages"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsLanguagesGetLanguageCategoriesEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/languages/category/{category}": {
+      "get": {
+        "tags": [
+          "Languages"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsLanguagesGetLanguagesByCategoryEndpoint",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIModelsLanguage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/languages": {
+      "get": {
+        "tags": [
+          "Languages"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsLanguagesGetLanguagesEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIModelsLanguage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/languages/summary": {
+      "get": {
+        "tags": [
+          "Languages"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsLanguagesGetLanguagesSummaryEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIEndpointsLanguagesLanguageSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/equipments/{id}": {
+      "get": {
+        "tags": [
+          "Equipments"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsEquipmentsGetEquipmentByIdEndpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DragonsGeneratorAPIModelsEquipment"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/equipments/subtype/{subtype}": {
+      "get": {
+        "tags": [
+          "Equipments"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsEquipmentsGetEquipmentsBySubtypeEndpoint",
+        "parameters": [
+          {
+            "name": "subtype",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIModelsEquipment"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/equipments/type/{type}": {
+      "get": {
+        "tags": [
+          "Equipments"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsEquipmentsGetEquipmentsByTypeEndpoint",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIModelsEquipment"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/equipments": {
+      "get": {
+        "tags": [
+          "Equipments"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsEquipmentsGetEquipmentsEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIModelsEquipment"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/equipments/summary": {
+      "get": {
+        "tags": [
+          "Equipments"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsEquipmentsGetEquipmentsSummaryEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIEndpointsEquipmentsEquipmentSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/equipments/subtypes": {
+      "get": {
+        "tags": [
+          "Equipments"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsEquipmentsGetEquipmentSubtypesEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/equipments/types": {
+      "get": {
+        "tags": [
+          "Equipments"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsEquipmentsGetEquipmentTypesEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/classes/{id}": {
+      "get": {
+        "tags": [
+          "Classes"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsClassesGetClassByIdEndpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DragonsGeneratorAPIModelsCharacterClass"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/classes": {
+      "get": {
+        "tags": [
+          "Classes"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsClassesGetClassesEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIModelsCharacterClass"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/classes/summary": {
+      "get": {
+        "tags": [
+          "Classes"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsClassesGetClassesSummaryEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIEndpointsClassesClassSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/civilisations/{id}": {
+      "get": {
+        "tags": [
+          "Civilisations"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsCivilisationsGetCivilisationByIdEndpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DragonsGeneratorAPIModelsCivilisation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/civilisations": {
+      "get": {
+        "tags": [
+          "Civilisations"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsCivilisationsGetCivilisationsEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIModelsCivilisation"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/civilisations/summary": {
+      "get": {
+        "tags": [
+          "Civilisations"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsCivilisationsGetCivilisationsSummaryEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DragonsGeneratorAPIEndpointsCivilisationsCivilisationSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/civilisations/random": {
+      "get": {
+        "tags": [
+          "Civilisations"
+        ],
+        "operationId": "DragonsGeneratorAPIEndpointsCivilisationsGetRandomCivilisationEndpoint",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DragonsGeneratorAPIModelsCivilisation"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DragonsGeneratorAPIModelsWritingSystem": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "usedByLanguages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsLanguageReference"
+            }
+          },
+          "description": {
+            "type": "string"
+          },
+          "specialFeatures": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "signsCountRange": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DragonsGeneratorAPIModelsSignsCountRange"
+              }
+            ]
+          },
+          "readingDifficulty": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DragonsGeneratorAPIModelsReadingDifficulty"
+              }
+            ]
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsLanguageReference": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsSignsCountRange": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "min": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "max": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsReadingDifficulty": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "rareWordsCheck": {
+            "type": "string",
+            "nullable": true
+          },
+          "obscurePassagesCheck": {
+            "type": "string",
+            "nullable": true
+          },
+          "decipherNote": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "DragonsGeneratorAPIEndpointsWritingSystemsGetWritingSystemByIdRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DragonsGeneratorAPIEndpointsWritingSystemsGetWritingSystemsByTypeRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DragonsGeneratorAPIEndpointsWritingSystemsWritingSystemSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "languagesCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hasReadingDifficulty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsSpell": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "school": {
+            "type": "string"
+          },
+          "castingTime": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsCastingTime"
+          },
+          "range": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsSpellRange"
+          },
+          "duration": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsSpellDuration"
+          },
+          "components": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsSpellComponents"
+          },
+          "isRitual": {
+            "type": "boolean"
+          },
+          "isConcentration": {
+            "type": "boolean"
+          },
+          "isCorrupted": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string"
+          },
+          "modularOptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsModularOption"
+            }
+          },
+          "classes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "higherLevels": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsCastingTime": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "nullable": true
+          },
+          "unit": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsSpellRange": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "nullable": true
+          },
+          "unit": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsSpellDuration": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "nullable": true
+          },
+          "unit": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsSpellComponents": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "v": {
+            "type": "boolean"
+          },
+          "s": {
+            "type": "boolean"
+          },
+          "m": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsModularOption": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "DragonsGeneratorAPIEndpointsSpellsGetSpellByIdRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DragonsGeneratorAPIEndpointsSpellsGetSpellsByLevelRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DragonsGeneratorAPIEndpointsSpellsGetSpellsBySchoolRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DragonsGeneratorAPIEndpointsSpellsSpellSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "school": {
+            "type": "string"
+          },
+          "isRitual": {
+            "type": "boolean"
+          },
+          "isConcentration": {
+            "type": "boolean"
+          },
+          "isCorrupted": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsSpecies": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nameAlt": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsSource"
+          },
+          "flavor": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsFlavor"
+          },
+          "baseStats": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsBaseStats"
+          },
+          "traits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsTrait"
+            }
+          },
+          "creationChoices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsCreationChoice"
+            }
+          },
+          "languages": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsLanguages"
+          },
+          "subspecies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsSubspecies"
+            }
+          },
+          "optionalRules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsOptionalRule"
+            }
+          },
+          "civilizationLinks": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsCivilizationLink"
+            }
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsSource": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "book": {
+            "type": "string"
+          },
+          "pages": {
+            "type": "string"
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsFlavor": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "summary": {
+            "type": "string"
+          },
+          "culture": {
+            "type": "string",
+            "nullable": true
+          },
+          "origins": {
+            "type": "string",
+            "nullable": true
+          },
+          "loreNotes": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsBaseStats": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "abilityScoreIncrease": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "speedM": {
+            "type": "number",
+            "format": "double"
+          },
+          "size": {
+            "type": "string"
+          },
+          "darkvisionM": {
+            "type": "number",
+            "format": "double"
+          },
+          "height": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsHeight"
+          },
+          "weight": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsWeight"
+          },
+          "age": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsAge"
+          },
+          "alignment": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsAlignment"
+          },
+          "flexibleAsi": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DragonsGeneratorAPIModelsFlexibleAsi"
+              }
+            ]
+          },
+          "speedNotes": {
+            "type": "string",
+            "nullable": true
+          },
+          "speedNotReducedByHeavyArmor": {
+            "type": "boolean",
+            "nullable": true
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsHeight": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "desc": {
+            "type": "string"
+          },
+          "rangeM": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsWeight": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "desc": {
+            "type": "string"
+          },
+          "rangeKg": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsAge": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "maturityYears": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lifespanYears": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "desc": {
+            "type": "string"
+          },
+          "adulthoodCulturalYears": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "lifespanMaxYears": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsAlignment": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tendency": {
+            "type": "string"
+          },
+          "desc": {
+            "type": "string"
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsFlexibleAsi": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "value": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "excluded": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsTrait": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "desc": {
+            "type": "string"
+          },
+          "mechanics": {
+            "nullable": true
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsCreationChoice": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "desc": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "choiceCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "options": {
+            "nullable": true
+          },
+          "optionGroups": {
+            "nullable": true
+          },
+          "spellList": {
+            "type": "string",
+            "nullable": true
+          },
+          "spellLevel": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "spellcastingAbility": {
+            "type": "string",
+            "nullable": true
+          },
+          "valuePerChoice": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "excluded": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsLanguages": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "fixed": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "choiceCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "grantsFromChoice": {
+            "nullable": true
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsSubspecies": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "playable": {
+            "type": "boolean"
+          },
+          "flavor": {
+            "type": "string"
+          },
+          "abilityScoreIncrease": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "traits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsTrait"
+            }
+          },
+          "creationChoices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsCreationChoice"
+            }
+          },
+          "playableNotes": {
+            "type": "string",
+            "nullable": true
+          },
+          "languages": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DragonsGeneratorAPIModelsLanguages"
+              }
+            ]
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsOptionalRule": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "desc": {
+            "type": "string"
+          },
+          "mechanics": {
+            "nullable": true
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsCivilizationLink": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "desc": {
+            "type": "string"
+          }
+        }
+      },
+      "DragonsGeneratorAPIEndpointsSpeciesGetSpeciesByIdRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DragonsGeneratorAPIEndpointsSpeciesSpeciesCodesResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "sizeCodes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "abilityCodes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "DragonsGeneratorAPIEndpointsSpeciesSpeciesSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "size": {
+            "type": "string"
+          },
+          "speedM": {
+            "type": "number",
+            "format": "double"
+          },
+          "darkvisionM": {
+            "type": "number",
+            "format": "double"
+          },
+          "playableSubspeciesCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsLanguage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "linguistics": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsLanguageLinguistics"
+          },
+          "speakers": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsLanguageSpeakers"
+          },
+          "lore": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsLanguageLore"
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsLanguageLinguistics": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "writingSystems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsLanguageWritingSystem"
+            }
+          },
+          "isOralOnly": {
+            "type": "boolean"
+          },
+          "writingNotes": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsLanguageWritingSystem": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsLanguageSpeakers": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "primary": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsSpeakerRef"
+            }
+          },
+          "regions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isExtinct": {
+            "type": "boolean",
+            "nullable": true
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsSpeakerRef": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsLanguageLore": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "fullDescription": {
+            "type": "string"
+          },
+          "sonority": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "DragonsGeneratorAPIEndpointsLanguagesGetLanguageByIdRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DragonsGeneratorAPIEndpointsLanguagesGetLanguagesByCategoryRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DragonsGeneratorAPIEndpointsLanguagesLanguageSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "isOralOnly": {
+            "type": "boolean"
+          },
+          "writingSystemsCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsEquipment": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "cost": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsCost"
+          },
+          "data": {
+            "nullable": true
+          },
+          "subtype": {
+            "type": "string",
+            "nullable": true
+          },
+          "wKg": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsCost": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "v": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "u": {
+            "type": "string"
+          }
+        }
+      },
+      "DragonsGeneratorAPIEndpointsEquipmentsGetEquipmentByIdRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DragonsGeneratorAPIEndpointsEquipmentsGetEquipmentsBySubtypeRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DragonsGeneratorAPIEndpointsEquipmentsGetEquipmentsByTypeRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DragonsGeneratorAPIEndpointsEquipmentsEquipmentSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "subtype": {
+            "type": "string",
+            "nullable": true
+          },
+          "cost": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsCost"
+          },
+          "wKg": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsCharacterClass": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "data": {}
+        }
+      },
+      "DragonsGeneratorAPIEndpointsClassesGetClassByIdRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DragonsGeneratorAPIEndpointsClassesClassSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "hitDie": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "primaryAbilities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hasSpellcasting": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsCivilisation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "randomization": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsRandomization"
+          },
+          "demographics": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsDemographics"
+          },
+          "linguistics": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsLinguistics"
+          },
+          "lore": {
+            "$ref": "#/components/schemas/DragonsGeneratorAPIModelsLore"
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsRandomization": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "diceMin": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "diceMax": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsDemographics": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "primarySpecies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsSpeciesRef"
+            }
+          },
+          "secondarySpecies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsSpeciesRef"
+            }
+          },
+          "isCosmopolitan": {
+            "type": "boolean"
+          },
+          "cosmopolitanZones": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "socialRoles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsRoleRef"
+            }
+          },
+          "hostilePopulations": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsSpeciesRef"
+            }
+          },
+          "hordeAllies": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsSpeciesRef"
+            }
+          },
+          "historicalRulers": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsSpeciesRef"
+            }
+          },
+          "underwaterPopulations": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsSpeciesRef"
+            }
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsSpeciesRef": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsRoleRef": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsLinguistics": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "officialLanguages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsLanguageRef"
+            }
+          },
+          "additionalLanguagesSpoken": {
+            "type": "boolean"
+          },
+          "writingSystems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DragonsGeneratorAPIModelsWritingSystemRef"
+            }
+          },
+          "additionalWritingSystemsUsed": {
+            "type": "boolean",
+            "nullable": true
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsLanguageRef": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsWritingSystemRef": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      },
+      "DragonsGeneratorAPIModelsLore": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "fullDescription": {
+            "type": "string"
+          },
+          "threatIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "geographyTags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "notableFeatures": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "DragonsGeneratorAPIEndpointsCivilisationsGetCivilisationByIdRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DragonsGeneratorAPIEndpointsCivilisationsCivilisationSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "diceMin": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "diceMax": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isCosmopolitan": {
+            "type": "boolean"
+          },
+          "primarySpecies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "JWTBearerAuth": {
+        "type": "http",
+        "description": "Enter a JWT token to authorize the requests...",
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

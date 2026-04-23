@@ -1,0 +1,127 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Antho\\Pro-Code\\FORMATION\\Project-Dragons\\Dragons_Generator\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{B260AC13-FC61-D527-7B26-D44FEB890B1A}|DragonsGenerator.API\\DragonsGenerator.API.csproj|c:\\users\\antho\\pro-code\\formation\\project-dragons\\dragons_generator\\dragonsgenerator.api\\endpoints\\characters\\generatebackstoryendpoint.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B260AC13-FC61-D527-7B26-D44FEB890B1A}|DragonsGenerator.API\\DragonsGenerator.API.csproj|solutionrelative:dragonsgenerator.api\\endpoints\\characters\\generatebackstoryendpoint.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B260AC13-FC61-D527-7B26-D44FEB890B1A}|DragonsGenerator.API\\DragonsGenerator.API.csproj|c:\\users\\antho\\pro-code\\formation\\project-dragons\\dragons_generator\\dragonsgenerator.api\\endpoints\\civilisations\\getcivilisationbyidendpoint.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B260AC13-FC61-D527-7B26-D44FEB890B1A}|DragonsGenerator.API\\DragonsGenerator.API.csproj|solutionrelative:dragonsgenerator.api\\endpoints\\civilisations\\getcivilisationbyidendpoint.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B260AC13-FC61-D527-7B26-D44FEB890B1A}|DragonsGenerator.API\\DragonsGenerator.API.csproj|c:\\users\\antho\\pro-code\\formation\\project-dragons\\dragons_generator\\dragonsgenerator.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B260AC13-FC61-D527-7B26-D44FEB890B1A}|DragonsGenerator.API\\DragonsGenerator.API.csproj|solutionrelative:dragonsgenerator.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B260AC13-FC61-D527-7B26-D44FEB890B1A}|DragonsGenerator.API\\DragonsGenerator.API.csproj|c:\\users\\antho\\pro-code\\formation\\project-dragons\\dragons_generator\\dragonsgenerator.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{B260AC13-FC61-D527-7B26-D44FEB890B1A}|DragonsGenerator.API\\DragonsGenerator.API.csproj|solutionrelative:dragonsgenerator.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B260AC13-FC61-D527-7B26-D44FEB890B1A}|DragonsGenerator.API\\DragonsGenerator.API.csproj|c:\\users\\antho\\pro-code\\formation\\project-dragons\\dragons_generator\\dragonsgenerator.api\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{B260AC13-FC61-D527-7B26-D44FEB890B1A}|DragonsGenerator.API\\DragonsGenerator.API.csproj|solutionrelative:dragonsgenerator.api\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "GetCivilisationByIdEndpoint.cs",
+              "DocumentMoniker": "C:\\Users\\Antho\\Pro-Code\\FORMATION\\Project-Dragons\\Dragons_Generator\\DragonsGenerator.API\\Endpoints\\Civilisations\\GetCivilisationByIdEndpoint.cs",
+              "RelativeDocumentMoniker": "DragonsGenerator.API\\Endpoints\\Civilisations\\GetCivilisationByIdEndpoint.cs",
+              "ToolTip": "C:\\Users\\Antho\\Pro-Code\\FORMATION\\Project-Dragons\\Dragons_Generator\\DragonsGenerator.API\\Endpoints\\Civilisations\\GetCivilisationByIdEndpoint.cs",
+              "RelativeToolTip": "DragonsGenerator.API\\Endpoints\\Civilisations\\GetCivilisationByIdEndpoint.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-22T14:21:13.193Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\Antho\\Pro-Code\\FORMATION\\Project-Dragons\\Dragons_Generator\\DragonsGenerator.API\\appsettings.json",
+              "RelativeDocumentMoniker": "DragonsGenerator.API\\appsettings.json",
+              "ToolTip": "C:\\Users\\Antho\\Pro-Code\\FORMATION\\Project-Dragons\\Dragons_Generator\\DragonsGenerator.API\\appsettings.json",
+              "RelativeToolTip": "DragonsGenerator.API\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-04-22T13:16:47.217Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "appsettings.Development.json",
+              "DocumentMoniker": "C:\\Users\\Antho\\Pro-Code\\FORMATION\\Project-Dragons\\Dragons_Generator\\DragonsGenerator.API\\appsettings.Development.json",
+              "RelativeDocumentMoniker": "DragonsGenerator.API\\appsettings.Development.json",
+              "ToolTip": "C:\\Users\\Antho\\Pro-Code\\FORMATION\\Project-Dragons\\Dragons_Generator\\DragonsGenerator.API\\appsettings.Development.json",
+              "RelativeToolTip": "DragonsGenerator.API\\appsettings.Development.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-04-22T13:16:44.556Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "GenerateBackstoryEndpoint.cs",
+              "DocumentMoniker": "C:\\Users\\Antho\\Pro-Code\\FORMATION\\Project-Dragons\\Dragons_Generator\\DragonsGenerator.API\\Endpoints\\Characters\\GenerateBackstoryEndpoint.cs",
+              "RelativeDocumentMoniker": "DragonsGenerator.API\\Endpoints\\Characters\\GenerateBackstoryEndpoint.cs",
+              "ToolTip": "C:\\Users\\Antho\\Pro-Code\\FORMATION\\Project-Dragons\\Dragons_Generator\\DragonsGenerator.API\\Endpoints\\Characters\\GenerateBackstoryEndpoint.cs",
+              "RelativeToolTip": "DragonsGenerator.API\\Endpoints\\Characters\\GenerateBackstoryEndpoint.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAiwCIAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-22T13:16:32.944Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{0ad07096-bba9-4900-a651-0598d26f6d24}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Antho\\Pro-Code\\FORMATION\\Project-Dragons\\Dragons_Generator\\DragonsGenerator.API\\Program.cs",
+              "RelativeDocumentMoniker": "DragonsGenerator.API\\Program.cs",
+              "ToolTip": "C:\\Users\\Antho\\Pro-Code\\FORMATION\\Project-Dragons\\Dragons_Generator\\DragonsGenerator.API\\Program.cs",
+              "RelativeToolTip": "DragonsGenerator.API\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABwAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-18T10:11:47.015Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 187,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
