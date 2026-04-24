@@ -2523,5 +2523,270 @@
     "data": {
       "desc": "Véhicule attelé pour la neige et la glace. Poids : 150 kg."
     }
+  },
+  {
+    "id": "it-fa-baguette",
+    "name": "Baguette (focaliseur)",
+    "type": "GEAR",
+    "subtype": "ARCANE_FOCUS",
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "desc": "Focaliseur arcanique. Peut remplacer les composantes matérielles d'un sort.",
+      "focusType": "arcane"
+    }
+  },
+  {
+    "id": "it-fa-baton",
+    "name": "Bâton (focaliseur)",
+    "type": "GEAR",
+    "subtype": "ARCANE_FOCUS",
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 2,
+    "data": {
+      "desc": "Focaliseur arcanique. Peut remplacer les composantes matérielles d'un sort.",
+      "focusType": "arcane"
+    }
+  },
+  {
+    "id": "it-fa-cristal",
+    "name": "Cristal (focaliseur)",
+    "type": "GEAR",
+    "subtype": "ARCANE_FOCUS",
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "desc": "Focaliseur arcanique. Peut remplacer les composantes matérielles d'un sort.",
+      "focusType": "arcane"
+    }
+  },
+  {
+    "id": "it-fa-orbe",
+    "name": "Orbe (focaliseur)",
+    "type": "GEAR",
+    "subtype": "ARCANE_FOCUS",
+    "cost": {
+      "v": 20,
+      "u": "po"
+    },
+    "w_kg": 1.5,
+    "data": {
+      "desc": "Focaliseur arcanique. Peut remplacer les composantes matérielles d'un sort.",
+      "focusType": "arcane"
+    }
+  },
+  {
+    "id": "it-fa-sceptre",
+    "name": "Sceptre (focaliseur)",
+    "type": "GEAR",
+    "subtype": "ARCANE_FOCUS",
+    "cost": {
+      "v": 10,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "desc": "Focaliseur arcanique. Peut remplacer les composantes matérielles d'un sort.",
+      "focusType": "arcane"
+    }
+  },
+  {
+    "id": "it-fd-baton-dif",
+    "name": "Bâton d'if (focaliseur druidique)",
+    "type": "GEAR",
+    "subtype": "DRUIDIC_FOCUS",
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 2,
+    "data": {
+      "desc": "Focaliseur druidique. Peut remplacer les composantes matérielles d'un sort de druide.",
+      "focusType": "druidic"
+    }
+  },
+  {
+    "id": "it-fd-totem",
+    "name": "Totem (focaliseur druidique)",
+    "type": "GEAR",
+    "subtype": "DRUIDIC_FOCUS",
+    "cost": {
+      "v": 1,
+      "u": "po"
+    },
+    "w_kg": 0,
+    "data": {
+      "desc": "Focaliseur druidique. Peut remplacer les composantes matérielles d'un sort de druide.",
+      "focusType": "druidic"
+    }
+  },
+  {
+    "id": "it-fd-branche-de-gui",
+    "name": "Branche de gui (focaliseur druidique)",
+    "type": "GEAR",
+    "subtype": "DRUIDIC_FOCUS",
+    "cost": {
+      "v": 1,
+      "u": "po"
+    },
+    "w_kg": 0,
+    "data": {
+      "desc": "Focaliseur druidique. Peut remplacer les composantes matérielles d'un sort de druide.",
+      "focusType": "druidic"
+    }
+  },
+  {
+    "id": "it-ss-amulette",
+    "name": "Amulette (symbole sacré)",
+    "type": "GEAR",
+    "subtype": "HOLY_SYMBOL",
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "desc": "Symbole sacré. Peut remplacer les composantes matérielles d'un sort de prêtre ou de paladin.",
+      "focusType": "holy"
+    }
+  },
+  {
+    "id": "it-ss-embleme",
+    "name": "Emblème (symbole sacré)",
+    "type": "GEAR",
+    "subtype": "HOLY_SYMBOL",
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 0,
+    "data": {
+      "desc": "Symbole sacré gravé ou peint sur un bouclier. Peut remplacer les composantes matérielles.",
+      "focusType": "holy"
+    }
+  },
+  {
+    "id": "it-ss-reliquaire",
+    "name": "Reliquaire (symbole sacré)",
+    "type": "GEAR",
+    "subtype": "HOLY_SYMBOL",
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "desc": "Symbole sacré sous forme de reliquaire. Peut remplacer les composantes matérielles.",
+      "focusType": "holy"
+    }
+  },
+  {
+    "id": "it-sacoche-a-composantes",
+    "name": "Sacoche à composantes",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 25,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "desc": "Petite sacoche de cuir étanche contenant toutes les composantes matérielles nécessaires pour lancer vos sorts, à l'exception des composantes qui ont un coût spécifique."
+    }
+  },
+  {
+    "id": "it-grimoire",
+    "name": "Grimoire",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 50,
+      "u": "po"
+    },
+    "w_kg": 1.5,
+    "data": {
+      "desc": "Indispensable au magicien. Contient les sorts recopiés. 100 pages, chaque sort occupe 1 page par niveau de sort."
+    }
+  },
+  {
+    "id": "it-carquois-20-fleches",
+    "name": "Carquois (20 flèches)",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 1,
+      "u": "po"
+    },
+    "w_kg": 1,
+    "data": {
+      "desc": "Carquois contenant 20 flèches."
+    }
+  },
+  {
+    "id": "it-carquois-20-carreaux",
+    "name": "Étui à carreaux (20 carreaux)",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 1,
+      "u": "po"
+    },
+    "w_kg": 0.75,
+    "data": {
+      "desc": "Étui contenant 20 carreaux d'arbalète."
+    }
+  },
+  {
+    "id": "it-fleches",
+    "name": "Flèches (20)",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 1,
+      "u": "po"
+    },
+    "w_kg": 0.5,
+    "data": {
+      "desc": "Lot de 20 flèches."
+    }
+  },
+  {
+    "id": "it-carreaux",
+    "name": "Carreaux (20)",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": {
+      "v": 1,
+      "u": "po"
+    },
+    "w_kg": 0.75,
+    "data": {
+      "desc": "Lot de 20 carreaux d'arbalète."
+    }
+  },
+  {
+    "id": "ar-bouclier-de-bois",
+    "name": "Bouclier de bois",
+    "type": "ARMOR",
+    "subtype": "SHIELD",
+    "cost": {
+      "v": 5,
+      "u": "po"
+    },
+    "w_kg": 3,
+    "data": {
+      "ac": 2,
+      "stealth_dis": false,
+      "desc": "Bouclier en bois. +2 CA. Utilisable par les druides (pas de métal)."
+    }
   }
 ]

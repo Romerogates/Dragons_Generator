@@ -4,15 +4,24 @@
     "name": "Barbare",
     "data": {
       "hit_die": 12,
-      "primary_abilities": [ "Force", "Constitution" ],
+      "primary_abilities": [
+        "Force",
+        "Constitution"
+      ],
       "proficiencies": {
         "armor": [
           "category-light-armor",
           "category-medium-armor",
           "ar-bouclier"
         ],
-        "weapons": [ "category-simple-weapons", "category-martial-weapons" ],
-        "saving_throws": [ "Force", "Constitution" ],
+        "weapons": [
+          "category-simple-weapons",
+          "category-martial-weapons"
+        ],
+        "saving_throws": [
+          "Force",
+          "Constitution"
+        ],
         "skills": {
           "count": 2,
           "options": [
@@ -103,7 +112,10 @@
         {
           "level": 1,
           "prof_bonus": 2,
-          "features": [ "feat-rage", "feat-defense-sans-armure" ],
+          "features": [
+            "feat-rage",
+            "feat-defense-sans-armure"
+          ],
           "resources": {
             "Rages": "2",
             "Dégâts de rage": "+2"
@@ -112,7 +124,10 @@
         {
           "level": 2,
           "prof_bonus": 2,
-          "features": [ "feat-attaque-debridee", "feat-sens-du-danger" ],
+          "features": [
+            "feat-attaque-debridee",
+            "feat-sens-du-danger"
+          ],
           "resources": {
             "Rages": "2",
             "Dégâts de rage": "+2"
@@ -121,7 +136,9 @@
         {
           "level": 3,
           "prof_bonus": 2,
-          "features": [ "feat-voie-primale" ],
+          "features": [
+            "feat-voie-primale"
+          ],
           "resources": {
             "Rages": "3",
             "Dégâts de rage": "+2"
@@ -130,7 +147,9 @@
         {
           "level": 4,
           "prof_bonus": 2,
-          "features": [ "feat-augmentation-de-caracteristique" ],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "Rages": "3",
             "Dégâts de rage": "+2"
@@ -160,7 +179,9 @@
         {
           "level": 7,
           "prof_bonus": 3,
-          "features": [ "feat-instinct-fauve" ],
+          "features": [
+            "feat-instinct-fauve"
+          ],
           "resources": {
             "Rages": "4",
             "Dégâts de rage": "+2"
@@ -169,7 +190,9 @@
         {
           "level": 8,
           "prof_bonus": 3,
-          "features": [ "feat-augmentation-de-caracteristique" ],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "Rages": "4",
             "Dégâts de rage": "+2"
@@ -178,7 +201,9 @@
         {
           "level": 9,
           "prof_bonus": 4,
-          "features": [ "feat-brutalite-critique" ],
+          "features": [
+            "feat-brutalite-critique"
+          ],
           "resources": {
             "Rages": "4",
             "Dégâts de rage": "+3"
@@ -196,7 +221,9 @@
         {
           "level": 11,
           "prof_bonus": 4,
-          "features": [ "feat-rage-acharnee" ],
+          "features": [
+            "feat-rage-acharnee"
+          ],
           "resources": {
             "Rages": "4",
             "Dégâts de rage": "+3"
@@ -205,7 +232,9 @@
         {
           "level": 12,
           "prof_bonus": 4,
-          "features": [ "feat-augmentation-de-caracteristique" ],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "Rages": "5",
             "Dégâts de rage": "+3"
@@ -219,7 +248,9 @@
             "Rages": "5",
             "Dégâts de rage": "+3"
           },
-          "feature_upgrades": [ "feat-brutalite-critique" ]
+          "feature_upgrades": [
+            "feat-brutalite-critique"
+          ]
         },
         {
           "level": 14,
@@ -233,7 +264,9 @@
         {
           "level": 15,
           "prof_bonus": 5,
-          "features": [ "feat-rage-persistante" ],
+          "features": [
+            "feat-rage-persistante"
+          ],
           "resources": {
             "Rages": "5",
             "Dégâts de rage": "+3"
@@ -242,7 +275,9 @@
         {
           "level": 16,
           "prof_bonus": 5,
-          "features": [ "feat-augmentation-de-caracteristique" ],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "Rages": "5",
             "Dégâts de rage": "+4"
@@ -256,12 +291,16 @@
             "Rages": "6",
             "Dégâts de rage": "+4"
           },
-          "feature_upgrades": [ "feat-brutalite-critique" ]
+          "feature_upgrades": [
+            "feat-brutalite-critique"
+          ]
         },
         {
           "level": 18,
           "prof_bonus": 6,
-          "features": [ "feat-puissance-implacable" ],
+          "features": [
+            "feat-puissance-implacable"
+          ],
           "resources": {
             "Rages": "6",
             "Dégâts de rage": "+4"
@@ -270,7 +309,9 @@
         {
           "level": 19,
           "prof_bonus": 6,
-          "features": [ "feat-augmentation-de-caracteristique" ],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "Rages": "6",
             "Dégâts de rage": "+4"
@@ -279,7 +320,9 @@
         {
           "level": 20,
           "prof_bonus": 6,
-          "features": [ "feat-champion-primal" ],
+          "features": [
+            "feat-champion-primal"
+          ],
           "resources": {
             "Rages": "Illimitées",
             "Dégâts de rage": "+4"
@@ -453,9 +496,13 @@
     "name": "Barde",
     "data": {
       "hit_die": 8,
-      "primary_abilities": ["Charisme"],
+      "primary_abilities": [
+        "Charisme"
+      ],
       "proficiencies": {
-        "armor": ["category-light-armor"],
+        "armor": [
+          "category-light-armor"
+        ],
         "weapons": [
           "wp-arbalete-de-poing",
           "category-simple-weapons",
@@ -466,16 +513,25 @@
         ],
         "tools": {
           "count": 3,
-          "options": ["category-musical-instruments"]
+          "options": [
+            "category-musical-instruments"
+          ]
         },
-        "saving_throws": ["Dextérité", "Charisme"],
+        "saving_throws": [
+          "Dextérité",
+          "Charisme"
+        ],
         "skills": {
           "count": 3,
-          "options": ["any"]
+          "options": [
+            "any"
+          ]
         },
         "languages": {
           "count": 2,
-          "options": ["category-common-languages"]
+          "options": [
+            "category-common-languages"
+          ]
         }
       },
       "starting_equipment": [
@@ -572,7 +628,10 @@
         {
           "level": 1,
           "prof_bonus": 2,
-          "features": ["spl-incantation-bardique", "spl-inspiration-bardique"],
+          "features": [
+            "spl-incantation-bardique",
+            "spl-inspiration-bardique"
+          ],
           "resources": {
             "cantrips_known": 2,
             "spells_known": 4,
@@ -608,7 +667,10 @@
         {
           "level": 2,
           "prof_bonus": 2,
-          "features": ["feat-touche-a-tout", "spl-chant-reparateur"],
+          "features": [
+            "feat-touche-a-tout",
+            "spl-chant-reparateur"
+          ],
           "resources": {
             "cantrips_known": 2,
             "spells_known": 5,
@@ -634,7 +696,10 @@
         {
           "level": 3,
           "prof_bonus": 2,
-          "features": ["feat-college-bardique", "feat-expertise"],
+          "features": [
+            "feat-college-bardique",
+            "feat-expertise"
+          ],
           "resources": {
             "cantrips_known": 2,
             "spells_known": 6,
@@ -672,7 +737,9 @@
         {
           "level": 4,
           "prof_bonus": 2,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 3,
             "spells_known": 7,
@@ -709,8 +776,12 @@
         {
           "level": 5,
           "prof_bonus": 3,
-          "features": ["spl-fontaine-dinspiration"],
-          "feature_upgrades": ["spl-inspiration-bardique"],
+          "features": [
+            "spl-fontaine-dinspiration"
+          ],
+          "feature_upgrades": [
+            "spl-inspiration-bardique"
+          ],
           "resources": {
             "cantrips_known": 3,
             "spells_known": 8,
@@ -738,7 +809,9 @@
         {
           "level": 6,
           "prof_bonus": 3,
-          "features": ["spl-contre-charme"],
+          "features": [
+            "spl-contre-charme"
+          ],
           "resources": {
             "cantrips_known": 3,
             "spells_known": 9,
@@ -795,7 +868,9 @@
         {
           "level": 8,
           "prof_bonus": 3,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 3,
             "spells_known": 11,
@@ -825,7 +900,9 @@
           "level": 9,
           "prof_bonus": 4,
           "features": [],
-          "feature_upgrades": ["spl-chant-reparateur"],
+          "feature_upgrades": [
+            "spl-chant-reparateur"
+          ],
           "resources": {
             "cantrips_known": 3,
             "spells_known": 12,
@@ -855,8 +932,13 @@
         {
           "level": 10,
           "prof_bonus": 4,
-          "features": ["spl-secrets-magiques"],
-          "feature_upgrades": ["spl-inspiration-bardique", "feat-expertise"],
+          "features": [
+            "spl-secrets-magiques"
+          ],
+          "feature_upgrades": [
+            "spl-inspiration-bardique",
+            "feat-expertise"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spells_known": 14,
@@ -949,7 +1031,9 @@
         {
           "level": 12,
           "prof_bonus": 4,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spells_known": 15,
@@ -967,7 +1051,9 @@
           "level": 13,
           "prof_bonus": 5,
           "features": [],
-          "feature_upgrades": ["spl-chant-reparateur"],
+          "feature_upgrades": [
+            "spl-chant-reparateur"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spells_known": 16,
@@ -1043,7 +1129,9 @@
           "level": 15,
           "prof_bonus": 5,
           "features": [],
-          "feature_upgrades": ["spl-inspiration-bardique"],
+          "feature_upgrades": [
+            "spl-inspiration-bardique"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spells_known": 19,
@@ -1076,7 +1164,9 @@
         {
           "level": 16,
           "prof_bonus": 5,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spells_known": 19,
@@ -1096,7 +1186,9 @@
           "level": 17,
           "prof_bonus": 6,
           "features": [],
-          "feature_upgrades": ["spl-chant-reparateur"],
+          "feature_upgrades": [
+            "spl-chant-reparateur"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spells_known": 20,
@@ -1175,7 +1267,9 @@
         {
           "level": 19,
           "prof_bonus": 6,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spells_known": 22,
@@ -1195,7 +1289,9 @@
         {
           "level": 20,
           "prof_bonus": 6,
-          "features": ["spl-inspiration-superieure"],
+          "features": [
+            "spl-inspiration-superieure"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spells_known": 22,
@@ -1362,7 +1458,9 @@
     "name": "Druide",
     "data": {
       "hit_die": 8,
-      "primary_abilities": ["Sagesse"],
+      "primary_abilities": [
+        "Sagesse"
+      ],
       "proficiencies": {
         "armor": [
           "category-light-armor",
@@ -1381,12 +1479,19 @@
           "wp-lance",
           "wp-masse-darmes"
         ],
-        "tools": ["tl-necessaire-dherboristerie"],
+        "tools": [
+          "tl-necessaire-dherboristerie"
+        ],
         "languages": {
           "count": 1,
-          "options": ["any-exotic"]
+          "options": [
+            "any-exotic"
+          ]
         },
-        "saving_throws": ["Intelligence", "Sagesse"],
+        "saving_throws": [
+          "Intelligence",
+          "Sagesse"
+        ],
         "skills": {
           "count": 2,
           "options": [
@@ -1452,7 +1557,7 @@
               "qty": 1
             },
             {
-              "id": "it-focaliseur-druidique",
+              "id": "category-druidic-focus",
               "qty": 1
             }
           ]
@@ -1470,7 +1575,10 @@
         {
           "level": 1,
           "prof_bonus": 2,
-          "features": ["feat-druidique", "spl-incantation-druidique"],
+          "features": [
+            "feat-druidique",
+            "spl-incantation-druidique"
+          ],
           "resources": {
             "cantrips_known": 2,
             "spell_slots": {
@@ -1493,7 +1601,10 @@
         {
           "level": 2,
           "prof_bonus": 2,
-          "features": ["spl-forme-sauvage", "feat-cercle-druidique"],
+          "features": [
+            "spl-forme-sauvage",
+            "feat-cercle-druidique"
+          ],
           "resources": {
             "cantrips_known": 2,
             "spell_slots": {
@@ -1516,8 +1627,12 @@
         {
           "level": 4,
           "prof_bonus": 2,
-          "features": ["feat-augmentation-de-caracteristique"],
-          "feature_upgrades": ["spl-forme-sauvage"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
+          "feature_upgrades": [
+            "spl-forme-sauvage"
+          ],
           "resources": {
             "cantrips_known": 3,
             "spell_slots": {
@@ -1581,8 +1696,12 @@
         {
           "level": 8,
           "prof_bonus": 3,
-          "features": ["feat-augmentation-de-caracteristique"],
-          "feature_upgrades": ["spl-forme-sauvage"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
+          "feature_upgrades": [
+            "spl-forme-sauvage"
+          ],
           "resources": {
             "cantrips_known": 3,
             "spell_slots": {
@@ -1654,7 +1773,9 @@
         {
           "level": 12,
           "prof_bonus": 4,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spell_slots": {
@@ -1722,7 +1843,9 @@
         {
           "level": 16,
           "prof_bonus": 5,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spell_slots": {
@@ -1759,7 +1882,10 @@
         {
           "level": 18,
           "prof_bonus": 6,
-          "features": ["feat-corps-intemporel", "feat-sorts-bestiaux"],
+          "features": [
+            "feat-corps-intemporel",
+            "feat-sorts-bestiaux"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spell_slots": {
@@ -1778,7 +1904,9 @@
         {
           "level": 19,
           "prof_bonus": 6,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spell_slots": {
@@ -1797,7 +1925,9 @@
         {
           "level": 20,
           "prof_bonus": 6,
-          "features": ["feat-archidruide"],
+          "features": [
+            "feat-archidruide"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spell_slots": {
@@ -1930,7 +2060,10 @@
             ],
             "terrain_spells": {
               "desert": {
-                "3": ["spl-flou", "spl-silence"],
+                "3": [
+                  "spl-flou",
+                  "spl-silence"
+                ],
                 "5": [
                   "spl-creation-de-nourriture-et-d-eau",
                   "spl-protection-contre-l-energie"
@@ -1939,52 +2072,118 @@
                   "spl-fletrissement-vegetal",
                   "spl-terrain-hallucinatoire"
                 ],
-                "9": ["spl-fleau-d-insectes", "spl-mur-de-pierre"]
+                "9": [
+                  "spl-fleau-d-insectes",
+                  "spl-mur-de-pierre"
+                ]
               },
               "foret": {
-                "3": ["spl-pattes-d-araignee", "spl-peau-d-ecorce"],
-                "5": ["spl-appel-de-la-foudre", "spl-croissance-vegetale"],
-                "7": ["spl-divination", "spl-liberte-de-mouvement"],
+                "3": [
+                  "spl-pattes-d-araignee",
+                  "spl-peau-d-ecorce"
+                ],
+                "5": [
+                  "spl-appel-de-la-foudre",
+                  "spl-croissance-vegetale"
+                ],
+                "7": [
+                  "spl-divination",
+                  "spl-liberte-de-mouvement"
+                ],
                 "9": [
                   "spl-communion-avec-la-nature",
                   "spl-voyage-par-les-arbres"
                 ]
               },
               "littoral": {
-                "3": ["spl-image-miroir", "spl-marche-de-brume"],
-                "5": ["spl-marche-sur-l-onde", "spl-respiration-aquatique"],
-                "7": ["spl-controle-de-l-eau", "spl-liberte-de-mouvement"],
-                "9": ["spl-invocation-d-elementaire", "spl-scrutation"]
+                "3": [
+                  "spl-image-miroir",
+                  "spl-marche-de-brume"
+                ],
+                "5": [
+                  "spl-marche-sur-l-onde",
+                  "spl-respiration-aquatique"
+                ],
+                "7": [
+                  "spl-controle-de-l-eau",
+                  "spl-liberte-de-mouvement"
+                ],
+                "9": [
+                  "spl-invocation-d-elementaire",
+                  "spl-scrutation"
+                ]
               },
               "marecage": {
-                "3": ["spl-fleche-acide", "spl-tenebres"],
-                "5": ["spl-marche-sur-l-onde", "spl-nuage-nauseabond"],
+                "3": [
+                  "spl-fleche-acide",
+                  "spl-tenebres"
+                ],
+                "5": [
+                  "spl-marche-sur-l-onde",
+                  "spl-nuage-nauseabond"
+                ],
                 "7": [
                   "spl-liberte-de-mouvement",
                   "spl-localisation-de-creature"
                 ],
-                "9": ["spl-fleau-d-insectes", "spl-scrutation"]
+                "9": [
+                  "spl-fleau-d-insectes",
+                  "spl-scrutation"
+                ]
               },
               "montagne": {
-                "3": ["spl-croissance-d-epines", "spl-pattes-d-araignee"],
-                "5": ["spl-eclair", "spl-fusion-dans-la-pierre"],
-                "7": ["spl-faconnage-de-la-pierre", "spl-peau-de-pierre"],
-                "9": ["spl-mur-de-pierre", "spl-passe-muraille"]
+                "3": [
+                  "spl-croissance-d-epines",
+                  "spl-pattes-d-araignee"
+                ],
+                "5": [
+                  "spl-eclair",
+                  "spl-fusion-dans-la-pierre"
+                ],
+                "7": [
+                  "spl-faconnage-de-la-pierre",
+                  "spl-peau-de-pierre"
+                ],
+                "9": [
+                  "spl-mur-de-pierre",
+                  "spl-passe-muraille"
+                ]
               },
               "prairie": {
-                "3": ["spl-invisibilite", "spl-passage-sans-trace"],
-                "5": ["spl-lumiere-du-jour", "spl-rapidite"],
-                "7": ["spl-divination", "spl-liberte-de-mouvement"],
-                "9": ["spl-fleau-d-insectes", "spl-songe"]
+                "3": [
+                  "spl-invisibilite",
+                  "spl-passage-sans-trace"
+                ],
+                "5": [
+                  "spl-lumiere-du-jour",
+                  "spl-rapidite"
+                ],
+                "7": [
+                  "spl-divination",
+                  "spl-liberte-de-mouvement"
+                ],
+                "9": [
+                  "spl-fleau-d-insectes",
+                  "spl-songe"
+                ]
               },
               "region-polaire": {
                 "3": [
                   "spl-croissance-d-epines",
                   "spl-immobilisation-de-personne"
                 ],
-                "5": ["spl-lenteur", "spl-tempete-de-neige"],
-                "7": ["spl-liberte-de-mouvement", "spl-tempete-de-grele"],
-                "9": ["spl-communion-avec-la-nature", "spl-cone-de-froid"]
+                "5": [
+                  "spl-lenteur",
+                  "spl-tempete-de-neige"
+                ],
+                "7": [
+                  "spl-liberte-de-mouvement",
+                  "spl-tempete-de-grele"
+                ],
+                "9": [
+                  "spl-communion-avec-la-nature",
+                  "spl-cone-de-froid"
+                ]
               }
             }
           },
@@ -2035,14 +2234,23 @@
               }
             ],
             "trance_spells": {
-              "2": ["spl-alarme", "spl-purification-de-nourriture-et-d-eau"],
-              "4": ["spl-restauration-partielle"],
+              "2": [
+                "spl-alarme",
+                "spl-purification-de-nourriture-et-d-eau"
+              ],
+              "4": [
+                "spl-restauration-partielle"
+              ],
               "6": [
                 "spl-communication-avec-les-morts",
                 "spl-delivrance-des-maledictions"
               ],
-              "8": ["spl-divination"],
-              "10": ["spl-restauration-supreme"]
+              "8": [
+                "spl-divination"
+              ],
+              "10": [
+                "spl-restauration-supreme"
+              ]
             }
           }
         ]
@@ -2054,7 +2262,9 @@
     "name": "Ensorceleur",
     "data": {
       "hit_die": 6,
-      "primary_abilities": ["Charisme"],
+      "primary_abilities": [
+        "Charisme"
+      ],
       "proficiencies": {
         "armor": [],
         "weapons": [
@@ -2065,7 +2275,10 @@
           "wp-fronde"
         ],
         "tools": [],
-        "saving_throws": ["Constitution", "Charisme"],
+        "saving_throws": [
+          "Constitution",
+          "Charisme"
+        ],
         "skills": {
           "count": 2,
           "options": [
@@ -2107,13 +2320,13 @@
           "alternatives": [
             [
               {
-                "id": "gr-sacoche-a-composantes",
+                "id": "it-sacoche-a-composantes",
                 "qty": 1
               }
             ],
             [
               {
-                "id": "it-focaliseur-arcanique",
+                "id": "category-arcane-focus",
                 "qty": 1
               }
             ]
@@ -2162,7 +2375,10 @@
         {
           "level": 1,
           "prof_bonus": 2,
-          "features": ["spl-sorts-ensorceleur", "feat-atavisme"],
+          "features": [
+            "spl-sorts-ensorceleur",
+            "feat-atavisme"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spells_known": 2,
@@ -2199,7 +2415,10 @@
         {
           "level": 2,
           "prof_bonus": 2,
-          "features": ["spl-reserve-arcanique", "spl-magie-modulable"],
+          "features": [
+            "spl-reserve-arcanique",
+            "spl-magie-modulable"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spells_known": 3,
@@ -2226,7 +2445,9 @@
         {
           "level": 3,
           "prof_bonus": 2,
-          "features": ["spl-metamagie"],
+          "features": [
+            "spl-metamagie"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spells_known": 4,
@@ -2272,7 +2493,9 @@
         {
           "level": 4,
           "prof_bonus": 2,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 5,
             "spells_known": 5,
@@ -2398,7 +2621,9 @@
         {
           "level": 8,
           "prof_bonus": 3,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 5,
             "spells_known": 9,
@@ -2460,7 +2685,9 @@
           "level": 10,
           "prof_bonus": 4,
           "features": [],
-          "feature_upgrades": ["spl-metamagie"],
+          "feature_upgrades": [
+            "spl-metamagie"
+          ],
           "resources": {
             "cantrips_known": 6,
             "spells_known": 11,
@@ -2551,7 +2778,9 @@
         {
           "level": 12,
           "prof_bonus": 4,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 6,
             "spells_known": 12,
@@ -2655,7 +2884,9 @@
         {
           "level": 16,
           "prof_bonus": 5,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 6,
             "spells_known": 14,
@@ -2676,7 +2907,9 @@
           "level": 17,
           "prof_bonus": 6,
           "features": [],
-          "feature_upgrades": ["spl-metamagie"],
+          "feature_upgrades": [
+            "spl-metamagie"
+          ],
           "resources": {
             "cantrips_known": 6,
             "spells_known": 15,
@@ -2750,7 +2983,9 @@
         {
           "level": 19,
           "prof_bonus": 6,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 6,
             "spells_known": 15,
@@ -2771,7 +3006,9 @@
         {
           "level": 20,
           "prof_bonus": 6,
-          "features": ["spl-restauration-ensorcelee"],
+          "features": [
+            "spl-restauration-ensorcelee"
+          ],
           "resources": {
             "cantrips_known": 6,
             "spells_known": 15,
@@ -3047,12 +3284,24 @@
     "name": "Guerrier",
     "data": {
       "hit_die": 10,
-      "primary_abilities": ["Force", "Dextérité"],
+      "primary_abilities": [
+        "Force",
+        "Dextérité"
+      ],
       "proficiencies": {
-        "armor": ["category-all-armor", "ar-bouclier"],
-        "weapons": ["category-simple-weapons", "category-martial-weapons"],
+        "armor": [
+          "category-all-armor",
+          "ar-bouclier"
+        ],
+        "weapons": [
+          "category-simple-weapons",
+          "category-martial-weapons"
+        ],
         "tools": [],
-        "saving_throws": ["Force", "Constitution"],
+        "saving_throws": [
+          "Force",
+          "Constitution"
+        ],
         "skills": {
           "count": 2,
           "options": [
@@ -3211,57 +3460,80 @@
         {
           "level": 1,
           "prof_bonus": 2,
-          "features": ["feat-style-de-combat", "feat-second-souffle"]
+          "features": [
+            "feat-style-de-combat",
+            "feat-second-souffle"
+          ]
         },
         {
           "level": 2,
           "prof_bonus": 2,
-          "features": ["feat-fougue"]
+          "features": [
+            "feat-fougue"
+          ]
         },
         {
           "level": 3,
           "prof_bonus": 2,
-          "features": ["feat-archetype-martial"]
+          "features": [
+            "feat-archetype-martial"
+          ]
         },
         {
           "level": 4,
           "prof_bonus": 2,
-          "features": ["feat-augmentation-de-caracteristique"]
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ]
         },
         {
           "level": 5,
           "prof_bonus": 3,
-          "features": ["feat-attaque-supplementaire"]
+          "features": [
+            "feat-attaque-supplementaire"
+          ]
         },
         {
           "level": 6,
           "prof_bonus": 3,
-          "features": ["feat-augmentation-de-caracteristique"]
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ]
         },
         {
           "level": 7,
           "prof_bonus": 3,
-          "features": ["feat-aptitude-darchetype"]
+          "features": [
+            "feat-aptitude-darchetype"
+          ]
         },
         {
           "level": 8,
           "prof_bonus": 3,
-          "features": ["feat-augmentation-de-caracteristique"]
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ]
         },
         {
           "level": 9,
           "prof_bonus": 4,
-          "features": ["feat-inflexible"]
+          "features": [
+            "feat-inflexible"
+          ]
         },
         {
           "level": 10,
           "prof_bonus": 4,
-          "features": ["feat-aptitude-darchetype"]
+          "features": [
+            "feat-aptitude-darchetype"
+          ]
         },
         {
           "level": 11,
           "prof_bonus": 4,
-          "features": ["feat-attaque-supplementaire"],
+          "features": [
+            "feat-attaque-supplementaire"
+          ],
           "resources": {
             "extra_attacks": 2
           }
@@ -3269,47 +3541,66 @@
         {
           "level": 12,
           "prof_bonus": 4,
-          "features": ["feat-augmentation-de-caracteristique"]
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ]
         },
         {
           "level": 13,
           "prof_bonus": 5,
-          "features": ["feat-inflexible"]
+          "features": [
+            "feat-inflexible"
+          ]
         },
         {
           "level": 14,
           "prof_bonus": 5,
-          "features": ["feat-augmentation-de-caracteristique"]
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ]
         },
         {
           "level": 15,
           "prof_bonus": 5,
-          "features": ["feat-aptitude-darchetype"]
+          "features": [
+            "feat-aptitude-darchetype"
+          ]
         },
         {
           "level": 16,
           "prof_bonus": 5,
-          "features": ["feat-augmentation-de-caracteristique"]
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ]
         },
         {
           "level": 17,
           "prof_bonus": 6,
-          "features": ["feat-fougue", "feat-inflexible"]
+          "features": [
+            "feat-fougue",
+            "feat-inflexible"
+          ]
         },
         {
           "level": 18,
           "prof_bonus": 6,
-          "features": ["feat-aptitude-darchetype"]
+          "features": [
+            "feat-aptitude-darchetype"
+          ]
         },
         {
           "level": 19,
           "prof_bonus": 6,
-          "features": ["feat-augmentation-de-caracteristique"]
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ]
         },
         {
           "level": 20,
           "prof_bonus": 6,
-          "features": ["feat-attaque-supplementaire"],
+          "features": [
+            "feat-attaque-supplementaire"
+          ],
           "resources": {
             "extra_attacks": 3
           }
@@ -3451,9 +3742,15 @@
     "name": "Lettré",
     "data": {
       "hit_die": 8,
-      "primary_abilities": [ "Intelligence", "Sagesse" ],
+      "primary_abilities": [
+        "Intelligence",
+        "Sagesse"
+      ],
       "proficiencies": {
-        "armor": [ "ar-armure-matelassee", "ar-armure-de-cuir" ],
+        "armor": [
+          "ar-armure-matelassee",
+          "ar-armure-de-cuir"
+        ],
         "weapons": [
           "wp-dague",
           "wp-baton-de-combat",
@@ -3461,16 +3758,25 @@
         ],
         "tools": {
           "count": 3,
-          "options": [ "any-tools" ]
+          "options": [
+            "any-tools"
+          ]
         },
-        "saving_throws": [ "Intelligence", "Sagesse" ],
+        "saving_throws": [
+          "Intelligence",
+          "Sagesse"
+        ],
         "skills": {
           "count": 3,
-          "options": [ "any-skills" ]
+          "options": [
+            "any-skills"
+          ]
         },
         "languages": {
           "count": 3,
-          "options": [ "any-languages" ]
+          "options": [
+            "any-languages"
+          ]
         }
       },
       "starting_equipment": [
@@ -3601,7 +3907,9 @@
         {
           "level": 1,
           "prof_bonus": 2,
-          "features": [ "feat-besace-a-astuces" ],
+          "features": [
+            "feat-besace-a-astuces"
+          ],
           "resources": {
             "Points d'astuce": 4,
             "astuces_known": 3
@@ -3610,7 +3918,9 @@
         {
           "level": 2,
           "prof_bonus": 2,
-          "features": [ "feat-don" ],
+          "features": [
+            "feat-don"
+          ],
           "resources": {
             "Points d'astuce": 5,
             "astuces_known": 3
@@ -3632,7 +3942,9 @@
         {
           "level": 4,
           "prof_bonus": 2,
-          "features": [ "feat-augmentation-de-caracteristique" ],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "Points d'astuce": 6,
             "astuces_known": 3
@@ -3641,7 +3953,9 @@
         {
           "level": 5,
           "prof_bonus": 3,
-          "features": [ "feat-astuce-supp" ],
+          "features": [
+            "feat-astuce-supp"
+          ],
           "resources": {
             "Points d'astuce": 7,
             "astuces_known": 4
@@ -3650,7 +3964,10 @@
         {
           "level": 6,
           "prof_bonus": 3,
-          "features": [ "feat-aptitude-de-marotte", "feat-don" ],
+          "features": [
+            "feat-aptitude-de-marotte",
+            "feat-don"
+          ],
           "resources": {
             "Points d'astuce": 8,
             "astuces_known": 4
@@ -3659,7 +3976,9 @@
         {
           "level": 7,
           "prof_bonus": 3,
-          "features": [ "feat-bidouille" ],
+          "features": [
+            "feat-bidouille"
+          ],
           "resources": {
             "Points d'astuce": 8,
             "astuces_known": 4
@@ -3668,7 +3987,9 @@
         {
           "level": 8,
           "prof_bonus": 3,
-          "features": [ "feat-augmentation-de-caracteristique" ],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "Points d'astuce": 9,
             "astuces_known": 4
@@ -3677,7 +3998,10 @@
         {
           "level": 9,
           "prof_bonus": 4,
-          "features": [ "feat-astuce-supp", "feat-conquete-methodique-2" ],
+          "features": [
+            "feat-astuce-supp",
+            "feat-conquete-methodique-2"
+          ],
           "resources": {
             "Points d'astuce": 10,
             "astuces_known": 5
@@ -3686,7 +4010,10 @@
         {
           "level": 10,
           "prof_bonus": 4,
-          "features": [ "feat-aptitude-de-marotte", "feat-don" ],
+          "features": [
+            "feat-aptitude-de-marotte",
+            "feat-don"
+          ],
           "resources": {
             "Points d'astuce": 11,
             "astuces_known": 5
@@ -3695,7 +4022,9 @@
         {
           "level": 11,
           "prof_bonus": 4,
-          "features": [ "feat-astuce-supp" ],
+          "features": [
+            "feat-astuce-supp"
+          ],
           "resources": {
             "Points d'astuce": 12,
             "astuces_known": 6
@@ -3704,7 +4033,9 @@
         {
           "level": 12,
           "prof_bonus": 4,
-          "features": [ "feat-augmentation-de-caracteristique" ],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "Points d'astuce": 13,
             "astuces_known": 6
@@ -3713,7 +4044,9 @@
         {
           "level": 13,
           "prof_bonus": 5,
-          "features": [ "feat-conquete-methodique-3" ],
+          "features": [
+            "feat-conquete-methodique-3"
+          ],
           "resources": {
             "Points d'astuce": 14,
             "astuces_known": 6
@@ -3722,7 +4055,9 @@
         {
           "level": 14,
           "prof_bonus": 5,
-          "features": [ "feat-don" ],
+          "features": [
+            "feat-don"
+          ],
           "resources": {
             "Points d'astuce": 14,
             "astuces_known": 6
@@ -3731,7 +4066,9 @@
         {
           "level": 15,
           "prof_bonus": 5,
-          "features": [ "feat-astuce-supp" ],
+          "features": [
+            "feat-astuce-supp"
+          ],
           "resources": {
             "Points d'astuce": 15,
             "astuces_known": 7
@@ -3740,7 +4077,9 @@
         {
           "level": 16,
           "prof_bonus": 5,
-          "features": [ "feat-augmentation-de-caracteristique" ],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "Points d'astuce": 16,
             "astuces_known": 7
@@ -3749,7 +4088,9 @@
         {
           "level": 17,
           "prof_bonus": 6,
-          "features": [ "feat-aptitude-de-marotte" ],
+          "features": [
+            "feat-aptitude-de-marotte"
+          ],
           "resources": {
             "Points d'astuce": 17,
             "astuces_known": 7
@@ -3758,7 +4099,10 @@
         {
           "level": 18,
           "prof_bonus": 6,
-          "features": [ "feat-astuce-supp", "feat-don" ],
+          "features": [
+            "feat-astuce-supp",
+            "feat-don"
+          ],
           "resources": {
             "Points d'astuce": 18,
             "astuces_known": 8
@@ -3767,7 +4111,9 @@
         {
           "level": 19,
           "prof_bonus": 6,
-          "features": [ "feat-augmentation-de-caracteristique" ],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "Points d'astuce": 19,
             "astuces_known": 8
@@ -3776,7 +4122,9 @@
         {
           "level": 20,
           "prof_bonus": 6,
-          "features": [ "feat-besace-dabondance" ],
+          "features": [
+            "feat-besace-dabondance"
+          ],
           "resources": {
             "Points d'astuce": 20,
             "astuces_known": 8
@@ -3888,7 +4236,9 @@
     "name": "Magicien",
     "data": {
       "hit_die": 6,
-      "primary_abilities": ["Intelligence"],
+      "primary_abilities": [
+        "Intelligence"
+      ],
       "proficiencies": {
         "armor": [],
         "weapons": [
@@ -3906,7 +4256,10 @@
             "tl-necessaire-de-cartographe"
           ]
         },
-        "saving_throws": ["Intelligence", "Sagesse"],
+        "saving_throws": [
+          "Intelligence",
+          "Sagesse"
+        ],
         "skills": {
           "count": 2,
           "options": [
@@ -3921,7 +4274,9 @@
         },
         "languages": {
           "count": 1,
-          "options": ["any-exotic"],
+          "options": [
+            "any-exotic"
+          ],
           "note": "Langues utiles au magicien : elfique, kaani, draconique (textes arcaniques), démoniaque/diabolique (magie noire)."
         }
       },
@@ -3932,7 +4287,7 @@
           "alternatives": [
             [
               {
-                "id": "wp-baton",
+                "id": "wp-baton-de-combat",
                 "qty": 1
               }
             ],
@@ -3956,7 +4311,7 @@
             ],
             [
               {
-                "id": "it-focaliseur-arcanique",
+                "id": "category-arcane-focus",
                 "qty": 1
               }
             ]
@@ -4041,7 +4396,9 @@
         {
           "level": 2,
           "prof_bonus": 2,
-          "features": ["feat-tradition-arcanique"],
+          "features": [
+            "feat-tradition-arcanique"
+          ],
           "resources": {
             "cantrips_known": 3,
             "spell_slots": {
@@ -4092,7 +4449,9 @@
         {
           "level": 4,
           "prof_bonus": 2,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spell_slots": {
@@ -4210,7 +4569,9 @@
         {
           "level": 8,
           "prof_bonus": 3,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spell_slots": {
@@ -4336,7 +4697,9 @@
         {
           "level": 12,
           "prof_bonus": 4,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 5,
             "spell_slots": {
@@ -4460,7 +4823,9 @@
         {
           "level": 16,
           "prof_bonus": 5,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 5,
             "spell_slots": {
@@ -4525,7 +4890,9 @@
         {
           "level": 18,
           "prof_bonus": 6,
-          "features": ["spl-maitrise-des-sorts"],
+          "features": [
+            "spl-maitrise-des-sorts"
+          ],
           "resources": {
             "cantrips_known": 5,
             "spell_slots": {
@@ -4558,7 +4925,9 @@
         {
           "level": 19,
           "prof_bonus": 6,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 5,
             "spell_slots": {
@@ -4591,7 +4960,9 @@
         {
           "level": 20,
           "prof_bonus": 6,
-          "features": ["spl-sorts-attitres"],
+          "features": [
+            "spl-sorts-attitres"
+          ],
           "resources": {
             "cantrips_known": 5,
             "spell_slots": {
@@ -4953,7 +5324,10 @@
     "name": "Moine",
     "data": {
       "hit_die": 8,
-      "primary_abilities": ["Dextérité", "Sagesse"],
+      "primary_abilities": [
+        "Dextérité",
+        "Sagesse"
+      ],
       "proficiencies": {
         "armor": [],
         "weapons": [
@@ -4971,7 +5345,10 @@
           ],
           "note": "Certains monastères peuvent enseigner des outils spécialisés (empoisonneur, calligraphie)."
         },
-        "saving_throws": ["Force", "Dextérité"],
+        "saving_throws": [
+          "Force",
+          "Dextérité"
+        ],
         "skills": {
           "count": 2,
           "options": [
@@ -5047,7 +5424,10 @@
         {
           "level": 1,
           "prof_bonus": 2,
-          "features": ["feat-defense-sans-armure", "feat-arts-martiaux"],
+          "features": [
+            "feat-defense-sans-armure",
+            "feat-arts-martiaux"
+          ],
           "resources": {
             "ki_points": 0,
             "unarmored_movement_bonus_m": 0,
@@ -5057,7 +5437,10 @@
         {
           "level": 2,
           "prof_bonus": 2,
-          "features": ["spl-ki", "feat-deplacement-sans-armure"],
+          "features": [
+            "spl-ki",
+            "feat-deplacement-sans-armure"
+          ],
           "resources": {
             "ki_points": 2,
             "unarmored_movement_bonus_m": 3,
@@ -5093,8 +5476,13 @@
         {
           "level": 5,
           "prof_bonus": 3,
-          "features": ["feat-attaque-supplementaire", "spl-coup-etourdissant"],
-          "feature_upgrades": ["feat-arts-martiaux"],
+          "features": [
+            "feat-attaque-supplementaire",
+            "spl-coup-etourdissant"
+          ],
+          "feature_upgrades": [
+            "feat-arts-martiaux"
+          ],
           "resources": {
             "ki_points": 5,
             "unarmored_movement_bonus_m": 3,
@@ -5104,8 +5492,12 @@
         {
           "level": 6,
           "prof_bonus": 3,
-          "features": ["feat-attaques-ki"],
-          "feature_upgrades": ["feat-deplacement-sans-armure"],
+          "features": [
+            "feat-attaques-ki"
+          ],
+          "feature_upgrades": [
+            "feat-deplacement-sans-armure"
+          ],
           "resources": {
             "ki_points": 6,
             "unarmored_movement_bonus_m": 4.5,
@@ -5115,7 +5507,10 @@
         {
           "level": 7,
           "prof_bonus": 3,
-          "features": ["feat-esquive-totale", "feat-serenite"],
+          "features": [
+            "feat-esquive-totale",
+            "feat-serenite"
+          ],
           "resources": {
             "ki_points": 7,
             "unarmored_movement_bonus_m": 4.5,
@@ -5125,7 +5520,9 @@
         {
           "level": 8,
           "prof_bonus": 3,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "ki_points": 8,
             "unarmored_movement_bonus_m": 4.5,
@@ -5136,7 +5533,9 @@
           "level": 9,
           "prof_bonus": 4,
           "features": [],
-          "feature_upgrades": ["feat-deplacement-sans-armure"],
+          "feature_upgrades": [
+            "feat-deplacement-sans-armure"
+          ],
           "resources": {
             "ki_points": 9,
             "unarmored_movement_bonus_m": 4.5,
@@ -5146,8 +5545,12 @@
         {
           "level": 10,
           "prof_bonus": 4,
-          "features": ["feat-purete-physique"],
-          "feature_upgrades": ["feat-deplacement-sans-armure"],
+          "features": [
+            "feat-purete-physique"
+          ],
+          "feature_upgrades": [
+            "feat-deplacement-sans-armure"
+          ],
           "resources": {
             "ki_points": 10,
             "unarmored_movement_bonus_m": 6,
@@ -5158,7 +5561,9 @@
           "level": 11,
           "prof_bonus": 4,
           "features": [],
-          "feature_upgrades": ["feat-arts-martiaux"],
+          "feature_upgrades": [
+            "feat-arts-martiaux"
+          ],
           "resources": {
             "ki_points": 11,
             "unarmored_movement_bonus_m": 6,
@@ -5168,7 +5573,9 @@
         {
           "level": 12,
           "prof_bonus": 4,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "ki_points": 12,
             "unarmored_movement_bonus_m": 6,
@@ -5178,7 +5585,9 @@
         {
           "level": 13,
           "prof_bonus": 5,
-          "features": ["feat-langue-du-soleil-et-de-la-lune"],
+          "features": [
+            "feat-langue-du-soleil-et-de-la-lune"
+          ],
           "resources": {
             "ki_points": 13,
             "unarmored_movement_bonus_m": 6,
@@ -5188,8 +5597,12 @@
         {
           "level": 14,
           "prof_bonus": 5,
-          "features": ["feat-ame-de-diamant"],
-          "feature_upgrades": ["feat-deplacement-sans-armure"],
+          "features": [
+            "feat-ame-de-diamant"
+          ],
+          "feature_upgrades": [
+            "feat-deplacement-sans-armure"
+          ],
           "resources": {
             "ki_points": 14,
             "unarmored_movement_bonus_m": 7.5,
@@ -5199,7 +5612,9 @@
         {
           "level": 15,
           "prof_bonus": 5,
-          "features": ["feat-corps-intemporel"],
+          "features": [
+            "feat-corps-intemporel"
+          ],
           "resources": {
             "ki_points": 15,
             "unarmored_movement_bonus_m": 7.5,
@@ -5209,7 +5624,9 @@
         {
           "level": 16,
           "prof_bonus": 5,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "ki_points": 16,
             "unarmored_movement_bonus_m": 7.5,
@@ -5220,7 +5637,9 @@
           "level": 17,
           "prof_bonus": 6,
           "features": [],
-          "feature_upgrades": ["feat-arts-martiaux"],
+          "feature_upgrades": [
+            "feat-arts-martiaux"
+          ],
           "resources": {
             "ki_points": 17,
             "unarmored_movement_bonus_m": 7.5,
@@ -5230,8 +5649,12 @@
         {
           "level": 18,
           "prof_bonus": 6,
-          "features": ["spl-desertion-de-l-ame"],
-          "feature_upgrades": ["feat-deplacement-sans-armure"],
+          "features": [
+            "spl-desertion-de-l-ame"
+          ],
+          "feature_upgrades": [
+            "feat-deplacement-sans-armure"
+          ],
           "resources": {
             "ki_points": 18,
             "unarmored_movement_bonus_m": 9,
@@ -5241,7 +5664,9 @@
         {
           "level": 19,
           "prof_bonus": 6,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "ki_points": 19,
             "unarmored_movement_bonus_m": 9,
@@ -5251,7 +5676,9 @@
         {
           "level": 20,
           "prof_bonus": 6,
-          "features": ["feat-perfection-de-l-etre"],
+          "features": [
+            "feat-perfection-de-l-etre"
+          ],
           "resources": {
             "ki_points": 20,
             "unarmored_movement_bonus_m": 9,
@@ -5483,12 +5910,24 @@
     "name": "Paladin",
     "data": {
       "hit_die": 10,
-      "primary_abilities": ["Force", "Charisme"],
+      "primary_abilities": [
+        "Force",
+        "Charisme"
+      ],
       "proficiencies": {
-        "armor": ["category-all-armor", "ar-bouclier"],
-        "weapons": ["category-simple-weapons", "category-martial-weapons"],
+        "armor": [
+          "category-all-armor",
+          "ar-bouclier"
+        ],
+        "weapons": [
+          "category-simple-weapons",
+          "category-martial-weapons"
+        ],
         "tools": [],
-        "saving_throws": ["Sagesse", "Charisme"],
+        "saving_throws": [
+          "Sagesse",
+          "Charisme"
+        ],
         "skills": {
           "count": 2,
           "options": [
@@ -5570,7 +6009,7 @@
               "qty": 1
             },
             {
-              "id": "it-symbole-sacre",
+              "id": "category-holy-symbol",
               "qty": 1
             }
           ]
@@ -5606,7 +6045,10 @@
         {
           "level": 1,
           "prof_bonus": 2,
-          "features": ["spl-sens-divin", "spl-imposition-des-mains"],
+          "features": [
+            "spl-sens-divin",
+            "spl-imposition-des-mains"
+          ],
           "resources": {
             "Mains": "5 PV"
           }
@@ -5644,7 +6086,9 @@
         {
           "level": 4,
           "prof_bonus": 2,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "Mains": "20 PV",
             "spell_slots": {
@@ -5655,7 +6099,9 @@
         {
           "level": 5,
           "prof_bonus": 3,
-          "features": ["feat-attaque-supplementaire"],
+          "features": [
+            "feat-attaque-supplementaire"
+          ],
           "resources": {
             "Mains": "25 PV",
             "spell_slots": {
@@ -5667,7 +6113,9 @@
         {
           "level": 6,
           "prof_bonus": 3,
-          "features": ["spl-aura-de-protection"],
+          "features": [
+            "spl-aura-de-protection"
+          ],
           "resources": {
             "Mains": "30 PV",
             "spell_slots": {
@@ -5679,7 +6127,9 @@
         {
           "level": 7,
           "prof_bonus": 3,
-          "features": ["spl-aptitude-de-serment"],
+          "features": [
+            "spl-aptitude-de-serment"
+          ],
           "resources": {
             "Mains": "35 PV",
             "spell_slots": {
@@ -5691,7 +6141,9 @@
         {
           "level": 8,
           "prof_bonus": 3,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "Mains": "40 PV",
             "spell_slots": {
@@ -5716,7 +6168,9 @@
         {
           "level": 10,
           "prof_bonus": 4,
-          "features": ["spl-aura-de-courage"],
+          "features": [
+            "spl-aura-de-courage"
+          ],
           "resources": {
             "Mains": "50 PV",
             "spell_slots": {
@@ -5729,7 +6183,9 @@
         {
           "level": 11,
           "prof_bonus": 4,
-          "features": ["spl-chatiment-divin-ameliore"],
+          "features": [
+            "spl-chatiment-divin-ameliore"
+          ],
           "resources": {
             "Mains": "55 PV",
             "spell_slots": {
@@ -5742,7 +6198,9 @@
         {
           "level": 12,
           "prof_bonus": 4,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "Mains": "60 PV",
             "spell_slots": {
@@ -5769,7 +6227,9 @@
         {
           "level": 14,
           "prof_bonus": 5,
-          "features": ["spl-touche-purificatrice"],
+          "features": [
+            "spl-touche-purificatrice"
+          ],
           "resources": {
             "Mains": "70 PV",
             "spell_slots": {
@@ -5783,7 +6243,9 @@
         {
           "level": 15,
           "prof_bonus": 5,
-          "features": ["spl-aptitude-de-serment"],
+          "features": [
+            "spl-aptitude-de-serment"
+          ],
           "resources": {
             "Mains": "75 PV",
             "spell_slots": {
@@ -5797,7 +6259,9 @@
         {
           "level": 16,
           "prof_bonus": 5,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "Mains": "80 PV",
             "spell_slots": {
@@ -5826,7 +6290,9 @@
         {
           "level": 18,
           "prof_bonus": 6,
-          "features": ["spl-amelioration-daura"],
+          "features": [
+            "spl-amelioration-daura"
+          ],
           "resources": {
             "Mains": "90 PV",
             "spell_slots": {
@@ -5841,7 +6307,9 @@
         {
           "level": 19,
           "prof_bonus": 6,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "Mains": "95 PV",
             "spell_slots": {
@@ -5856,7 +6324,9 @@
         {
           "level": 20,
           "prof_bonus": 6,
-          "features": ["spl-aptitude-de-serment"],
+          "features": [
+            "spl-aptitude-de-serment"
+          ],
           "resources": {
             "Mains": "100 PV",
             "spell_slots": {
@@ -5914,10 +6384,22 @@
                 "spl-protection-contre-le-mal-et-le-bien",
                 "spl-sanctuaire"
               ],
-              "5": ["spl-restauration-partielle", "spl-zone-de-verite"],
-              "9": ["spl-dissipation-de-la-magie", "spl-signal-desperance"],
-              "13": ["spl-liberte-de-mouvement", "spl-protecteur-de-la-foi"],
-              "17": ["spl-colonne-de-feu", "spl-communion"]
+              "5": [
+                "spl-restauration-partielle",
+                "spl-zone-de-verite"
+              ],
+              "9": [
+                "spl-dissipation-de-la-magie",
+                "spl-signal-desperance"
+              ],
+              "13": [
+                "spl-liberte-de-mouvement",
+                "spl-protecteur-de-la-foi"
+              ],
+              "17": [
+                "spl-colonne-de-feu",
+                "spl-communion"
+              ]
             },
             "principes": [
               "Honnêteté. Ne ment pas ni ne triche. Ta parole est une promesse.",
@@ -5970,11 +6452,26 @@
               }
             ],
             "oath_spells": {
-              "3": ["spl-deguisement", "spl-imprecation"],
-              "5": ["spl-serres-du-corbeau", "spl-vision-dans-le-noir"],
-              "9": ["spl-antidetection", "spl-rapidite"],
-              "13": ["spl-confusion", "spl-terrain-hallucinatoire"],
-              "17": ["spl-cercle-de-teleportation", "spl-communion"]
+              "3": [
+                "spl-deguisement",
+                "spl-imprecation"
+              ],
+              "5": [
+                "spl-serres-du-corbeau",
+                "spl-vision-dans-le-noir"
+              ],
+              "9": [
+                "spl-antidetection",
+                "spl-rapidite"
+              ],
+              "13": [
+                "spl-confusion",
+                "spl-terrain-hallucinatoire"
+              ],
+              "17": [
+                "spl-cercle-de-teleportation",
+                "spl-communion"
+              ]
             },
             "principes": [
               "Plusieurs chemins mènent à ta destination. La ruse aboutit parfois là où la force ne donnerait pas de résultats.",
@@ -6020,9 +6517,18 @@
               }
             ],
             "oath_spells": {
-              "3": ["spl-bouclier-de-la-foi", "spl-heroisme"],
-              "5": ["spl-appel-de-destrier", "spl-chatiment-fletrissant"],
-              "9": ["spl-protection-contre-lenergie", "spl-rapidite"],
+              "3": [
+                "spl-bouclier-de-la-foi",
+                "spl-heroisme"
+              ],
+              "5": [
+                "spl-appel-de-destrier",
+                "spl-chatiment-fletrissant"
+              ],
+              "9": [
+                "spl-protection-contre-lenergie",
+                "spl-rapidite"
+              ],
               "13": [
                 "spl-liberte-de-mouvement",
                 "spl-protection-contre-la-mort"
@@ -6056,16 +6562,23 @@
     "name": "Prêtre",
     "data": {
       "hit_die": 8,
-      "primary_abilities": ["Sagesse"],
+      "primary_abilities": [
+        "Sagesse"
+      ],
       "proficiencies": {
         "armor": [
           "category-light-armor",
           "category-medium-armor",
           "ar-bouclier"
         ],
-        "weapons": ["category-simple-weapons"],
+        "weapons": [
+          "category-simple-weapons"
+        ],
         "tools": [],
-        "saving_throws": ["Sagesse", "Charisme"],
+        "saving_throws": [
+          "Sagesse",
+          "Charisme"
+        ],
         "skills": {
           "count": 2,
           "options": [
@@ -6078,7 +6591,9 @@
         },
         "languages": {
           "count": 1,
-          "options": ["any-exotic"]
+          "options": [
+            "any-exotic"
+          ]
         }
       },
       "starting_equipment": [
@@ -6174,7 +6689,7 @@
               "qty": 1
             },
             {
-              "id": "it-symbole-sacre",
+              "id": "category-holy-symbol",
               "qty": 1
             }
           ]
@@ -6192,7 +6707,10 @@
         {
           "level": 1,
           "prof_bonus": 2,
-          "features": ["spl-incantation-divine", "spl-domaine-divin"],
+          "features": [
+            "spl-incantation-divine",
+            "spl-domaine-divin"
+          ],
           "resources": {
             "cantrips_known": 3,
             "spell_slots": {
@@ -6215,7 +6733,9 @@
         {
           "level": 2,
           "prof_bonus": 2,
-          "features": ["spl-conduit-divin"],
+          "features": [
+            "spl-conduit-divin"
+          ],
           "resources": {
             "cantrips_known": 3,
             "spell_slots": {
@@ -6238,7 +6758,9 @@
         {
           "level": 4,
           "prof_bonus": 2,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spell_slots": {
@@ -6262,7 +6784,9 @@
         {
           "level": 5,
           "prof_bonus": 3,
-          "features": ["feat-destruction-morts-vivants"],
+          "features": [
+            "feat-destruction-morts-vivants"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spell_slots": {
@@ -6276,7 +6800,9 @@
           "level": 6,
           "prof_bonus": 3,
           "features": [],
-          "feature_upgrades": ["spl-conduit-divin"],
+          "feature_upgrades": [
+            "spl-conduit-divin"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spell_slots": {
@@ -6303,8 +6829,12 @@
         {
           "level": 8,
           "prof_bonus": 3,
-          "features": ["feat-augmentation-de-caracteristique"],
-          "feature_upgrades": ["feat-destruction-morts-vivants"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
+          "feature_upgrades": [
+            "feat-destruction-morts-vivants"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spell_slots": {
@@ -6333,7 +6863,9 @@
         {
           "level": 10,
           "prof_bonus": 4,
-          "features": ["spl-intervention-divine"],
+          "features": [
+            "spl-intervention-divine"
+          ],
           "resources": {
             "cantrips_known": 5,
             "spell_slots": {
@@ -6361,7 +6893,9 @@
           "level": 11,
           "prof_bonus": 4,
           "features": [],
-          "feature_upgrades": ["feat-destruction-morts-vivants"],
+          "feature_upgrades": [
+            "feat-destruction-morts-vivants"
+          ],
           "resources": {
             "cantrips_known": 5,
             "spell_slots": {
@@ -6377,7 +6911,9 @@
         {
           "level": 12,
           "prof_bonus": 4,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 5,
             "spell_slots": {
@@ -6411,7 +6947,9 @@
           "level": 14,
           "prof_bonus": 5,
           "features": [],
-          "feature_upgrades": ["feat-destruction-morts-vivants"],
+          "feature_upgrades": [
+            "feat-destruction-morts-vivants"
+          ],
           "resources": {
             "cantrips_known": 5,
             "spell_slots": {
@@ -6446,7 +6984,9 @@
         {
           "level": 16,
           "prof_bonus": 5,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 5,
             "spell_slots": {
@@ -6465,7 +7005,9 @@
           "level": 17,
           "prof_bonus": 6,
           "features": [],
-          "feature_upgrades": ["feat-destruction-morts-vivants"],
+          "feature_upgrades": [
+            "feat-destruction-morts-vivants"
+          ],
           "resources": {
             "cantrips_known": 5,
             "spell_slots": {
@@ -6485,7 +7027,9 @@
           "level": 18,
           "prof_bonus": 6,
           "features": [],
-          "feature_upgrades": ["spl-conduit-divin"],
+          "feature_upgrades": [
+            "spl-conduit-divin"
+          ],
           "resources": {
             "cantrips_known": 5,
             "spell_slots": {
@@ -6504,7 +7048,9 @@
         {
           "level": 19,
           "prof_bonus": 6,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 5,
             "spell_slots": {
@@ -6524,7 +7070,9 @@
           "level": 20,
           "prof_bonus": 6,
           "features": [],
-          "feature_upgrades": ["spl-intervention-divine"],
+          "feature_upgrades": [
+            "spl-intervention-divine"
+          ],
           "resources": {
             "cantrips_known": 5,
             "spell_slots": {
@@ -6626,15 +7174,35 @@
               }
             ],
             "domain_spells": {
-              "1": ["spl-blessure", "spl-simulacre-de-vie"],
-              "3": ["spl-cecite-surdite", "spl-rayon-affaiblissant"],
-              "5": ["spl-baiser-du-vampire", "spl-malediction"],
-              "7": ["spl-confusion", "spl-fletrissement"],
-              "9": ["spl-contagion", "spl-domination-de-personne"]
+              "1": [
+                "spl-blessure",
+                "spl-simulacre-de-vie"
+              ],
+              "3": [
+                "spl-cecite-surdite",
+                "spl-rayon-affaiblissant"
+              ],
+              "5": [
+                "spl-baiser-du-vampire",
+                "spl-malediction"
+              ],
+              "7": [
+                "spl-confusion",
+                "spl-fletrissement"
+              ],
+              "9": [
+                "spl-contagion",
+                "spl-domination-de-personne"
+              ]
             },
             "bonus_proficiencies": {
-              "armor": ["category-heavy-armor"],
-              "skills": ["skill-intimidation", "skill-tromperie"]
+              "armor": [
+                "category-heavy-armor"
+              ],
+              "skills": [
+                "skill-intimidation",
+                "skill-tromperie"
+              ]
             }
           },
           {
@@ -6680,15 +7248,35 @@
               }
             ],
             "domain_spells": {
-              "1": ["spl-repli-expeditif", "spl-saut"],
-              "3": ["spl-amelioration-de-caracteristique", "spl-peau-d-ecorce"],
-              "5": ["spl-protection-contre-l-energie", "spl-rapidite"],
-              "7": ["spl-liberte-de-mouvement", "spl-peau-de-pierre"],
-              "9": ["spl-immobilisation-de-monstre", "spl-restauration-supreme"]
+              "1": [
+                "spl-repli-expeditif",
+                "spl-saut"
+              ],
+              "3": [
+                "spl-amelioration-de-caracteristique",
+                "spl-peau-d-ecorce"
+              ],
+              "5": [
+                "spl-protection-contre-l-energie",
+                "spl-rapidite"
+              ],
+              "7": [
+                "spl-liberte-de-mouvement",
+                "spl-peau-de-pierre"
+              ],
+              "9": [
+                "spl-immobilisation-de-monstre",
+                "spl-restauration-supreme"
+              ]
             },
             "bonus_proficiencies": {
-              "weapons": ["category-martial-weapons"],
-              "skills": ["skill-acrobaties", "skill-athletisme"]
+              "weapons": [
+                "category-martial-weapons"
+              ],
+              "skills": [
+                "skill-acrobaties",
+                "skill-athletisme"
+              ]
             }
           },
           {
@@ -6734,14 +7322,32 @@
               }
             ],
             "domain_spells": {
-              "1": ["spl-deguisement", "spl-imprecation"],
-              "3": ["spl-invisibilite", "spl-silence"],
-              "5": ["spl-antidetection", "spl-communication-avec-les-morts"],
-              "7": ["spl-divination", "spl-protection-contre-la-mort"],
-              "9": ["spl-faux-semblant", "spl-quete"]
+              "1": [
+                "spl-deguisement",
+                "spl-imprecation"
+              ],
+              "3": [
+                "spl-invisibilite",
+                "spl-silence"
+              ],
+              "5": [
+                "spl-antidetection",
+                "spl-communication-avec-les-morts"
+              ],
+              "7": [
+                "spl-divination",
+                "spl-protection-contre-la-mort"
+              ],
+              "9": [
+                "spl-faux-semblant",
+                "spl-quete"
+              ]
             },
             "bonus_proficiencies": {
-              "skills": ["skill-arcanes", "skill-tromperie"]
+              "skills": [
+                "skill-arcanes",
+                "skill-tromperie"
+              ]
             }
           },
           {
@@ -6787,18 +7393,39 @@
               }
             ],
             "domain_spells": {
-              "1": ["spl-charme-personne", "spl-mot-de-guerison"],
-              "3": ["spl-amelioration-de-caracteristique", "spl-augure"],
-              "5": ["spl-delivrance-des-maledictions", "spl-don-des-langues"],
-              "7": ["spl-divination", "spl-protecteur-de-la-foi"],
-              "9": ["spl-mythes-et-legendes", "spl-sanctification"]
+              "1": [
+                "spl-charme-personne",
+                "spl-mot-de-guerison"
+              ],
+              "3": [
+                "spl-amelioration-de-caracteristique",
+                "spl-augure"
+              ],
+              "5": [
+                "spl-delivrance-des-maledictions",
+                "spl-don-des-langues"
+              ],
+              "7": [
+                "spl-divination",
+                "spl-protecteur-de-la-foi"
+              ],
+              "9": [
+                "spl-mythes-et-legendes",
+                "spl-sanctification"
+              ]
             },
             "bonus_proficiencies": {
-              "skills": ["skill-persuasion"],
-              "expertise": ["skill-persuasion"],
+              "skills": [
+                "skill-persuasion"
+              ],
+              "expertise": [
+                "skill-persuasion"
+              ],
               "languages": {
                 "count": 3,
-                "options": ["any-2-common-1-exotic"]
+                "options": [
+                  "any-2-common-1-exotic"
+                ]
               }
             }
           },
@@ -6845,14 +7472,32 @@
               }
             ],
             "domain_spells": {
-              "1": ["spl-repli-expeditif", "spl-sanctuaire"],
-              "3": ["spl-immobilisation-de-personne", "spl-marche-de-brume"],
-              "5": ["spl-lenteur", "spl-rapidite"],
-              "7": ["spl-liberte-de-mouvement", "spl-porte-dimensionnelle"],
-              "9": ["spl-immobilisation-de-monstre", "spl-mythes-et-legendes"]
+              "1": [
+                "spl-repli-expeditif",
+                "spl-sanctuaire"
+              ],
+              "3": [
+                "spl-immobilisation-de-personne",
+                "spl-marche-de-brume"
+              ],
+              "5": [
+                "spl-lenteur",
+                "spl-rapidite"
+              ],
+              "7": [
+                "spl-liberte-de-mouvement",
+                "spl-porte-dimensionnelle"
+              ],
+              "9": [
+                "spl-immobilisation-de-monstre",
+                "spl-mythes-et-legendes"
+              ]
             },
             "bonus_proficiencies": {
-              "skills": ["skill-arcanes", "skill-histoire"]
+              "skills": [
+                "skill-arcanes",
+                "skill-histoire"
+              ]
             }
           },
           {
@@ -6898,17 +7543,31 @@
               }
             ],
             "domain_spells": {
-              "1": ["spl-benediction", "spl-soins"],
-              "3": ["spl-arme-spirituelle", "spl-restauration-mineure"],
-              "5": ["spl-retour-a-la-vie", "spl-signal-d-esperance"],
+              "1": [
+                "spl-benediction",
+                "spl-soins"
+              ],
+              "3": [
+                "spl-arme-spirituelle",
+                "spl-restauration-mineure"
+              ],
+              "5": [
+                "spl-retour-a-la-vie",
+                "spl-signal-d-esperance"
+              ],
               "7": [
                 "spl-protecteur-de-la-foi",
                 "spl-protection-contre-la-mort"
               ],
-              "9": ["spl-rappel-a-la-vie", "spl-soins-de-groupe"]
+              "9": [
+                "spl-rappel-a-la-vie",
+                "spl-soins-de-groupe"
+              ]
             },
             "bonus_proficiencies": {
-              "armor": ["category-heavy-armor"]
+              "armor": [
+                "category-heavy-armor"
+              ]
             }
           },
           {
@@ -6954,17 +7613,32 @@
               }
             ],
             "domain_spells": {
-              "1": ["spl-disque-flottant", "spl-grand-pas"],
-              "3": ["spl-messager-animal", "spl-passage-sans-trace"],
-              "5": ["spl-marche-sur-l-onde", "spl-vol"],
+              "1": [
+                "spl-disque-flottant",
+                "spl-grand-pas"
+              ],
+              "3": [
+                "spl-messager-animal",
+                "spl-passage-sans-trace"
+              ],
+              "5": [
+                "spl-marche-sur-l-onde",
+                "spl-vol"
+              ],
               "7": [
                 "spl-bannissement",
                 "spl-invocation-d-elementaires-mineurs"
               ],
-              "9": ["spl-telekinesie", "spl-voyage-par-les-arbres"]
+              "9": [
+                "spl-telekinesie",
+                "spl-voyage-par-les-arbres"
+              ]
             },
             "bonus_proficiencies": {
-              "skills": ["skill-arcanes", "skill-nature"]
+              "skills": [
+                "skill-arcanes",
+                "skill-nature"
+              ]
             }
           }
         ]
@@ -6976,9 +7650,13 @@
     "name": "Roublard",
     "data": {
       "hit_die": 8,
-      "primary_abilities": ["Dextérité"],
+      "primary_abilities": [
+        "Dextérité"
+      ],
       "proficiencies": {
-        "armor": ["category-light-armor"],
+        "armor": [
+          "category-light-armor"
+        ],
         "weapons": [
           "category-simple-weapons",
           "wp-arbalete-de-poing",
@@ -6986,8 +7664,13 @@
           "wp-epee-longue",
           "wp-rapiere"
         ],
-        "tools": ["tl-outils-de-voleur"],
-        "saving_throws": ["Dextérité", "Intelligence"],
+        "tools": [
+          "tl-outils-de-voleur"
+        ],
+        "saving_throws": [
+          "Dextérité",
+          "Intelligence"
+        ],
         "skills": {
           "count": 4,
           "options": [
@@ -7191,7 +7874,9 @@
         {
           "level": 2,
           "prof_bonus": 2,
-          "features": ["feat-roublardise"],
+          "features": [
+            "feat-roublardise"
+          ],
           "resources": {
             "sneak_attack": "1d6"
           }
@@ -7199,7 +7884,9 @@
         {
           "level": 3,
           "prof_bonus": 2,
-          "features": ["feat-archetype-roublard"],
+          "features": [
+            "feat-archetype-roublard"
+          ],
           "resources": {
             "sneak_attack": "2d6"
           }
@@ -7207,7 +7894,9 @@
         {
           "level": 4,
           "prof_bonus": 2,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "sneak_attack": "2d6"
           }
@@ -7215,7 +7904,9 @@
         {
           "level": 5,
           "prof_bonus": 3,
-          "features": ["feat-esquive-instinctive"],
+          "features": [
+            "feat-esquive-instinctive"
+          ],
           "resources": {
             "sneak_attack": "3d6"
           }
@@ -7223,7 +7914,9 @@
         {
           "level": 6,
           "prof_bonus": 3,
-          "features": ["feat-expertise"],
+          "features": [
+            "feat-expertise"
+          ],
           "resources": {
             "sneak_attack": "3d6"
           }
@@ -7231,7 +7924,9 @@
         {
           "level": 7,
           "prof_bonus": 3,
-          "features": ["feat-esquive-totale"],
+          "features": [
+            "feat-esquive-totale"
+          ],
           "resources": {
             "sneak_attack": "4d6"
           }
@@ -7239,7 +7934,9 @@
         {
           "level": 8,
           "prof_bonus": 3,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "sneak_attack": "4d6"
           }
@@ -7247,7 +7944,9 @@
         {
           "level": 9,
           "prof_bonus": 4,
-          "features": ["feat-aptitude-darchetype"],
+          "features": [
+            "feat-aptitude-darchetype"
+          ],
           "resources": {
             "sneak_attack": "5d6"
           }
@@ -7255,7 +7954,9 @@
         {
           "level": 10,
           "prof_bonus": 4,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "sneak_attack": "5d6"
           }
@@ -7263,7 +7964,9 @@
         {
           "level": 11,
           "prof_bonus": 4,
-          "features": ["feat-savoir-faire"],
+          "features": [
+            "feat-savoir-faire"
+          ],
           "resources": {
             "sneak_attack": "6d6"
           }
@@ -7271,7 +7974,9 @@
         {
           "level": 12,
           "prof_bonus": 4,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "sneak_attack": "6d6"
           }
@@ -7279,7 +7984,9 @@
         {
           "level": 13,
           "prof_bonus": 5,
-          "features": ["feat-aptitude-darchetype"],
+          "features": [
+            "feat-aptitude-darchetype"
+          ],
           "resources": {
             "sneak_attack": "7d6"
           }
@@ -7287,7 +7994,9 @@
         {
           "level": 14,
           "prof_bonus": 5,
-          "features": ["feat-perception-aveugle"],
+          "features": [
+            "feat-perception-aveugle"
+          ],
           "resources": {
             "sneak_attack": "7d6"
           }
@@ -7295,7 +8004,9 @@
         {
           "level": 15,
           "prof_bonus": 5,
-          "features": ["feat-esprit-fuyant"],
+          "features": [
+            "feat-esprit-fuyant"
+          ],
           "resources": {
             "sneak_attack": "8d6"
           }
@@ -7303,7 +8014,9 @@
         {
           "level": 16,
           "prof_bonus": 5,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "sneak_attack": "8d6"
           }
@@ -7311,7 +8024,9 @@
         {
           "level": 17,
           "prof_bonus": 6,
-          "features": ["feat-aptitude-darchetype"],
+          "features": [
+            "feat-aptitude-darchetype"
+          ],
           "resources": {
             "sneak_attack": "9d6"
           }
@@ -7319,7 +8034,9 @@
         {
           "level": 18,
           "prof_bonus": 6,
-          "features": ["feat-insaisissable"],
+          "features": [
+            "feat-insaisissable"
+          ],
           "resources": {
             "sneak_attack": "9d6"
           }
@@ -7327,7 +8044,9 @@
         {
           "level": 19,
           "prof_bonus": 6,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "sneak_attack": "10d6"
           }
@@ -7335,7 +8054,9 @@
         {
           "level": 20,
           "prof_bonus": 6,
-          "features": ["feat-verni"],
+          "features": [
+            "feat-verni"
+          ],
           "resources": {
             "sneak_attack": "10d6"
           }
@@ -7465,16 +8186,27 @@
     "name": "Rôdeur",
     "data": {
       "hit_die": 10,
-      "primary_abilities": ["Dextérité", "Sagesse"],
+      "primary_abilities": [
+        "Dextérité",
+        "Sagesse"
+      ],
       "proficiencies": {
         "armor": [
           "category-light-armor",
           "category-medium-armor",
           "ar-bouclier"
         ],
-        "weapons": ["category-simple-weapons", "category-martial-weapons"],
-        "tools": ["tl-necessaire-dherboristerie"],
-        "saving_throws": ["Force", "Dextérité"],
+        "weapons": [
+          "category-simple-weapons",
+          "category-martial-weapons"
+        ],
+        "tools": [
+          "tl-necessaire-dherboristerie"
+        ],
+        "saving_throws": [
+          "Force",
+          "Dextérité"
+        ],
         "skills": {
           "count": 3,
           "options": [
@@ -7571,12 +8303,18 @@
         {
           "level": 1,
           "prof_bonus": 2,
-          "features": ["feat-ennemi-jure", "feat-explorateur-ne"]
+          "features": [
+            "feat-ennemi-jure",
+            "feat-explorateur-ne"
+          ]
         },
         {
           "level": 2,
           "prof_bonus": 2,
-          "features": ["feat-style-de-combat", "spl-sorts-rodeur"],
+          "features": [
+            "feat-style-de-combat",
+            "spl-sorts-rodeur"
+          ],
           "resources": {
             "spells_known": 2,
             "spell_slots": {
@@ -7644,7 +8382,9 @@
         {
           "level": 4,
           "prof_bonus": 2,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "spells_known": 3,
             "spell_slots": {
@@ -7655,8 +8395,12 @@
         {
           "level": 5,
           "prof_bonus": 3,
-          "features": ["feat-attaque-supplementaire"],
-          "feature_upgrades": ["feat-explorateur-ne"],
+          "features": [
+            "feat-attaque-supplementaire"
+          ],
+          "feature_upgrades": [
+            "feat-explorateur-ne"
+          ],
           "resources": {
             "spells_known": 4,
             "spell_slots": {
@@ -7683,7 +8427,9 @@
           "level": 6,
           "prof_bonus": 3,
           "features": [],
-          "feature_upgrades": ["feat-ennemi-jure"],
+          "feature_upgrades": [
+            "feat-ennemi-jure"
+          ],
           "resources": {
             "spells_known": 4,
             "spell_slots": {
@@ -7736,8 +8482,12 @@
         {
           "level": 9,
           "prof_bonus": 4,
-          "features": ["spl-attaque-de-precision"],
-          "feature_upgrades": ["feat-explorateur-ne"],
+          "features": [
+            "spl-attaque-de-precision"
+          ],
+          "feature_upgrades": [
+            "feat-explorateur-ne"
+          ],
           "resources": {
             "spells_known": 6,
             "spell_slots": {
@@ -7764,7 +8514,9 @@
         {
           "level": 10,
           "prof_bonus": 4,
-          "features": ["feat-mimetisme"],
+          "features": [
+            "feat-mimetisme"
+          ],
           "resources": {
             "spells_known": 6,
             "spell_slots": {
@@ -7804,7 +8556,9 @@
         {
           "level": 12,
           "prof_bonus": 4,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "spells_known": 7,
             "spell_slots": {
@@ -7818,7 +8572,9 @@
           "level": 13,
           "prof_bonus": 5,
           "features": [],
-          "feature_upgrades": ["feat-explorateur-ne"],
+          "feature_upgrades": [
+            "feat-explorateur-ne"
+          ],
           "resources": {
             "spells_known": 8,
             "spell_slots": {
@@ -7846,8 +8602,13 @@
         {
           "level": 14,
           "prof_bonus": 5,
-          "features": ["feat-disparition"],
-          "feature_upgrades": ["feat-ennemi-jure", "feat-mimetisme"],
+          "features": [
+            "feat-disparition"
+          ],
+          "feature_upgrades": [
+            "feat-ennemi-jure",
+            "feat-mimetisme"
+          ],
           "resources": {
             "spells_known": 8,
             "spell_slots": {
@@ -7889,7 +8650,9 @@
         {
           "level": 16,
           "prof_bonus": 5,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "spells_known": 9,
             "spell_slots": {
@@ -7904,7 +8667,9 @@
           "level": 17,
           "prof_bonus": 6,
           "features": [],
-          "feature_upgrades": ["feat-explorateur-ne"],
+          "feature_upgrades": [
+            "feat-explorateur-ne"
+          ],
           "resources": {
             "spells_known": 10,
             "spell_slots": {
@@ -7933,7 +8698,9 @@
         {
           "level": 18,
           "prof_bonus": 6,
-          "features": ["feat-perception-sauvage"],
+          "features": [
+            "feat-perception-sauvage"
+          ],
           "resources": {
             "spells_known": 10,
             "spell_slots": {
@@ -7948,7 +8715,9 @@
         {
           "level": 19,
           "prof_bonus": 6,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "spells_known": 11,
             "spell_slots": {
@@ -7977,7 +8746,9 @@
         {
           "level": 20,
           "prof_bonus": 6,
-          "features": ["feat-tueur-implacable"],
+          "features": [
+            "feat-tueur-implacable"
+          ],
           "resources": {
             "spells_known": 11,
             "spell_slots": {
@@ -8357,12 +9128,21 @@
     "name": "Sorcier",
     "data": {
       "hit_die": 8,
-      "primary_abilities": ["Charisme"],
+      "primary_abilities": [
+        "Charisme"
+      ],
       "proficiencies": {
-        "armor": ["category-light-armor"],
-        "weapons": ["category-simple-weapons"],
+        "armor": [
+          "category-light-armor"
+        ],
+        "weapons": [
+          "category-simple-weapons"
+        ],
         "tools": [],
-        "saving_throws": ["Sagesse", "Charisme"],
+        "saving_throws": [
+          "Sagesse",
+          "Charisme"
+        ],
         "skills": {
           "count": 2,
           "options": [
@@ -8411,7 +9191,7 @@
             ],
             [
               {
-                "id": "it-focaliseur-arcanique",
+                "id": "category-arcane-focus",
                 "qty": 1
               }
             ]
@@ -8467,7 +9247,10 @@
         {
           "level": 1,
           "prof_bonus": 2,
-          "features": ["feat-suzerain", "spl-magie-de-pacte"],
+          "features": [
+            "feat-suzerain",
+            "spl-magie-de-pacte"
+          ],
           "resources": {
             "cantrips_known": 2,
             "spells_known": 2,
@@ -8505,7 +9288,9 @@
         {
           "level": 2,
           "prof_bonus": 2,
-          "features": ["spl-manifestations-occultes"],
+          "features": [
+            "spl-manifestations-occultes"
+          ],
           "resources": {
             "cantrips_known": 2,
             "spells_known": 3,
@@ -8542,7 +9327,9 @@
         {
           "level": 3,
           "prof_bonus": 2,
-          "features": ["feat-faveur-du-pacte"],
+          "features": [
+            "feat-faveur-du-pacte"
+          ],
           "resources": {
             "cantrips_known": 2,
             "spells_known": 4,
@@ -8583,7 +9370,9 @@
         {
           "level": 4,
           "prof_bonus": 2,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 3,
             "spells_known": 5,
@@ -8723,7 +9512,9 @@
         {
           "level": 8,
           "prof_bonus": 3,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 3,
             "spells_known": 9,
@@ -8814,7 +9605,9 @@
         {
           "level": 11,
           "prof_bonus": 4,
-          "features": ["spl-arcane"],
+          "features": [
+            "spl-arcane"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spells_known": 11,
@@ -8842,7 +9635,9 @@
         {
           "level": 12,
           "prof_bonus": 4,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spells_known": 11,
@@ -8866,7 +9661,9 @@
           "level": 13,
           "prof_bonus": 5,
           "features": [],
-          "feature_upgrades": ["spl-arcane"],
+          "feature_upgrades": [
+            "spl-arcane"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spells_known": 12,
@@ -8909,7 +9706,9 @@
           "level": 15,
           "prof_bonus": 5,
           "features": [],
-          "feature_upgrades": ["spl-arcane"],
+          "feature_upgrades": [
+            "spl-arcane"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spells_known": 13,
@@ -8946,7 +9745,9 @@
         {
           "level": 16,
           "prof_bonus": 5,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spells_known": 13,
@@ -8961,7 +9762,9 @@
           "level": 17,
           "prof_bonus": 6,
           "features": [],
-          "feature_upgrades": ["spl-arcane"],
+          "feature_upgrades": [
+            "spl-arcane"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spells_known": 14,
@@ -9012,7 +9815,9 @@
         {
           "level": 19,
           "prof_bonus": 6,
-          "features": ["feat-augmentation-de-caracteristique"],
+          "features": [
+            "feat-augmentation-de-caracteristique"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spells_known": 15,
@@ -9040,7 +9845,9 @@
         {
           "level": 20,
           "prof_bonus": 6,
-          "features": ["feat-maitre-de-l-occulte"],
+          "features": [
+            "feat-maitre-de-l-occulte"
+          ],
           "resources": {
             "cantrips_known": 4,
             "spells_known": 15,
@@ -9201,38 +10008,92 @@
             },
             "expanded_spell_lists": {
               "askinos": {
-                "1": ["spl-injonction", "spl-rire-affreux"],
-                "2": ["spl-immobilisation-de-personne", "spl-toile-d-araignee"],
-                "3": ["spl-malediction", "spl-tempete-de-neige"],
-                "4": ["spl-tempete-de-grele", "spl-tentacules-noirs"],
-                "5": ["spl-cone-de-froid", "spl-domination-de-personne"]
+                "1": [
+                  "spl-injonction",
+                  "spl-rire-affreux"
+                ],
+                "2": [
+                  "spl-immobilisation-de-personne",
+                  "spl-toile-d-araignee"
+                ],
+                "3": [
+                  "spl-malediction",
+                  "spl-tempete-de-neige"
+                ],
+                "4": [
+                  "spl-tempete-de-grele",
+                  "spl-tentacules-noirs"
+                ],
+                "5": [
+                  "spl-cone-de-froid",
+                  "spl-domination-de-personne"
+                ]
               },
               "methridanou": {
-                "1": ["spl-injonction", "spl-simulacre-de-vie"],
-                "2": ["spl-croissance-d-epines", "spl-metal-brulant"],
-                "3": ["spl-animation-des-morts", "spl-glyphe-de-garde"],
-                "4": ["spl-faconnage-de-la-pierre", "spl-metamorphose"],
-                "5": ["spl-animation-d-objets", "spl-main-du-mage"]
+                "1": [
+                  "spl-injonction",
+                  "spl-simulacre-de-vie"
+                ],
+                "2": [
+                  "spl-croissance-d-epines",
+                  "spl-metal-brulant"
+                ],
+                "3": [
+                  "spl-animation-des-morts",
+                  "spl-glyphe-de-garde"
+                ],
+                "4": [
+                  "spl-faconnage-de-la-pierre",
+                  "spl-metamorphose"
+                ],
+                "5": [
+                  "spl-animation-d-objets",
+                  "spl-main-du-mage"
+                ]
               },
               "liridem_nisgriph_ntadadiph": {
-                "1": ["spl-deguisement", "spl-injonction"],
+                "1": [
+                  "spl-deguisement",
+                  "spl-injonction"
+                ],
                 "2": [
                   "spl-detection-de-pensees",
                   "spl-modification-d-apparence"
                 ],
-                "3": ["spl-communication-a-distance", "spl-malediction"],
-                "4": ["spl-assassin-imaginaire", "spl-confusion"],
+                "3": [
+                  "spl-communication-a-distance",
+                  "spl-malediction"
+                ],
+                "4": [
+                  "spl-assassin-imaginaire",
+                  "spl-confusion"
+                ],
                 "5": [
                   "spl-domination-de-personne",
                   "spl-modification-de-memoire"
                 ]
               },
               "akhlitol_gegaor_karathaan": {
-                "1": ["spl-heroisme", "spl-marque-du-chasseur"],
-                "2": ["spl-agrandissement-rapetissement", "spl-arme-magique"],
-                "3": ["spl-protection-contre-l-energie", "spl-rapidite"],
-                "4": ["spl-insecte-geant", "spl-metamorphose"],
-                "5": ["spl-brume-mortelle", "spl-fleau-d-insectes"]
+                "1": [
+                  "spl-heroisme",
+                  "spl-marque-du-chasseur"
+                ],
+                "2": [
+                  "spl-agrandissement-rapetissement",
+                  "spl-arme-magique"
+                ],
+                "3": [
+                  "spl-protection-contre-l-energie",
+                  "spl-rapidite"
+                ],
+                "4": [
+                  "spl-insecte-geant",
+                  "spl-metamorphose"
+                ],
+                "5": [
+                  "spl-brume-mortelle",
+                  "spl-fleau-d-insectes"
+                ]
               }
             }
           },
@@ -9267,14 +10128,26 @@
               }
             ],
             "expanded_spell_list": {
-              "1": ["spl-couleurs-dansantes", "spl-vague-de-tonnerre"],
-              "2": ["spl-bourrasque", "spl-flou"],
-              "3": ["spl-clignotement", "spl-mur-de-vent"],
+              "1": [
+                "spl-couleurs-dansantes",
+                "spl-vague-de-tonnerre"
+              ],
+              "2": [
+                "spl-bourrasque",
+                "spl-flou"
+              ],
+              "3": [
+                "spl-clignotement",
+                "spl-mur-de-vent"
+              ],
               "4": [
                 "spl-invocation-d-elementaires-mineurs",
                 "spl-liberte-de-mouvement"
               ],
-              "5": ["spl-double-illusoire", "spl-invocation-d-elementaire"]
+              "5": [
+                "spl-double-illusoire",
+                "spl-invocation-d-elementaire"
+              ]
             }
           }
         ]
