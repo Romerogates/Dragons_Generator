@@ -40,6 +40,192 @@ const GRIMOIRE_IMAGES: Record<SpellcastingKind, string> = {
   fighter_eldritch_knight: '/images/sheets/grimoires/grimoire-guerrier-rodeur-paladin.jpg',
 };
 
+// ---------------------------------------------------------------------------
+// Coordonnées BASE (côté gauche) — partagées par tous les casters standards
+// ⚠️ ESTIMATIONS — à calibrer avec le PDF réel
+// ---------------------------------------------------------------------------
+interface GrimoireBaseCoords {
+  nameX: number;
+  nameY: number;
+  abilityX: number;
+  abilityY: number;
+  saveDCX: number;
+  saveDCY: number;
+  attackModX: number;
+  attackModY: number;
+  cantripY: number;
+  cantripXStart: number;
+  cantripSpacing: number;
+  slotXStart: number;
+  slotSpacing: number;
+  slotRows: { y: number; maxCircles: number }[];
+  spellTableStartY: number;
+  spellTableRowH: number;
+  spellTableMaxRows: number;
+  colPrepared: number;
+  colName: number;
+  colEffect: number;
+  colPage: number;
+}
+
+const BASE_COORDS: GrimoireBaseCoords = {
+  nameX: 130,
+  nameY: 160,
+  abilityX: 94,
+  abilityY: 241,
+  saveDCX: 110,
+  saveDCY: 325,
+  attackModX: 110,
+  attackModY: 405,
+  cantripY: 220,
+  cantripXStart: 260,
+  cantripSpacing: 15,
+  slotXStart: 261,
+  slotSpacing: 15,
+  slotRows: [
+    { y: 255, maxCircles: 4 }, // 1er
+    { y: 250, maxCircles: 3 }, // 2e  ← vérifier, semble inversé avec le 1er
+    { y: 274, maxCircles: 3 }, // 3e
+    { y: 296, maxCircles: 3 }, // 4e
+    { y: 318, maxCircles: 3 }, // 5e
+    { y: 340, maxCircles: 2 }, // 6e
+    { y: 362, maxCircles: 2 }, // 7e
+    { y: 384, maxCircles: 1 }, // 8e
+    { y: 406, maxCircles: 1 }, // 9e
+  ],
+  spellTableStartY: 491,
+  spellTableRowH: 45,
+  spellTableMaxRows: 15,
+  colPrepared: 82,
+  colName: 95,
+  colEffect: 276,
+  colPage: 530,
+};
+
+// ---------------------------------------------------------------------------
+// Coordonnées PANNEAU DROIT — une config par grimoire
+// Chaque grimoire a ses propres positions pour l'encart de classe.
+// ⚠️ ESTIMATIONS — à calibrer avec le PDF réel
+// ---------------------------------------------------------------------------
+
+// Barde : "Magie Bardique" → Collège bardique, Focaliseur arcanique
+const PANEL_BARD = {
+  line1X: 450, // Collège bardique (valeur)
+  line1Y: 255,
+  line2X: 450, // Focaliseur arcanique (valeur)
+  line2Y: 310,
+};
+
+// Mage : "Magie Arcanique" → Tradition arcanique, Focaliseur arcanique
+const PANEL_WIZARD = {
+  line1X: 450, // Tradition arcanique (valeur)
+  line1Y: 250,
+  line2X: 450, // Focaliseur arcanique (valeur)
+  line2Y: 305,
+};
+
+// Prêtre : "Magie Divine" → Divinité–Domaine, Focaliseur arcanique, Conduits divins
+const PANEL_CLERIC = {
+  line1X: 450, // Divinité — Domaine (valeur)
+  line1Y: 250,
+  line2X: 450, // Focaliseur arcanique (valeur)
+  line2Y: 305,
+  channelsStartY: 370, // Conduits divins : première ligne
+  channelsSpacing: 22,
+  channelsX: 450,
+};
+
+// Druide : "Magie druidique" → Cercle, Focaliseur, cases à cocher, notes
+const PANEL_DRUID = {
+  line1X: 450, // Cercle druidique (valeur)
+  line1Y: 245,
+  line2X: 450, // Focaliseur arcanique (valeur)
+  line2Y: 300,
+  circleSpellsCheckX: 443, // case "Sorts de cercle"
+  circleSpellsCheckY: 345,
+  mysticTranceCheckX: 443, // case "Transe mystique"
+  mysticTranceCheckY: 368,
+  notesX: 440,
+  notesStartY: 410,
+  notesSpacing: 22,
+};
+
+// Sorcier : "Sorcellerie" → Suzerain, Pacte, Focaliseur, Manifestations occultes
+const PANEL_WARLOCK = {
+  line1X: 450, // Suzerain (valeur)
+  line1Y: 248,
+  line2X: 450, // Pacte (valeur)
+  line2Y: 295,
+  line3X: 450, // Focaliseur arcanique (valeur)
+  line3Y: 345,
+  invocationsX: 450, // Manifestations occultes (titre)
+  invocationsStartY: 400,
+  invocationsSpacing: 18,
+};
+
+// Ensorceleur : "Ensorcellement" → Atavisme, Focaliseur, Points arcaniques, Métamagie
+const PANEL_SORCERER = {
+  line1X: 450, // Atavisme (valeur)
+  line1Y: 245,
+  line2X: 450, // Focaliseur arcanique (valeur)
+  line2Y: 300,
+  pointsLabelX: 440, // Points arcaniques (valeur dans l'ovale)
+  pointsValueX: 530,
+  pointsY: 350,
+  metamagicX: 440,
+  metamagicStartY: 395,
+  metamagicSpacing: 22,
+};
+
+// ---------------------------------------------------------------------------
+// Coordonnées GRIMOIRE MARTIAL (Guerrier / Rôdeur / Paladin)
+// Layout complètement différent
+// ⚠️ ESTIMATIONS — à calibrer avec le PDF réel
+// ---------------------------------------------------------------------------
+const GRP_COORDS = {
+  nameX: 150,
+  nameY: 300,
+  // Aptitudes magiques — cases à cocher (haut-droite)
+  rodeurCheckX: 665,
+  rodeurCheckY: 300,
+  paladinCheckX: 665,
+  paladinCheckY: 330,
+  guerrierCheckX: 665,
+  guerrierCheckY: 360,
+  // DD / Mod commun Rôdeur+Paladin
+  saveDCX: 470,
+  saveDCY: 340,
+  attackModX: 545,
+  attackModY: 340,
+  // Rôdeur
+  rodeurSortsConnusX: 100,
+  rodeurSortsConnusY: 205,
+  rodeurFocaliseurX: 70,
+  rodeurFocaliseurY: 420,
+  // Paladin
+  paladinSermentX: 310,
+  paladinSermentY: 185,
+  paladinOathSpellsX: 310,
+  paladinOathSpellsYs: [432, 457, 482, 507, 532],
+  // Guerrier Élu arcanique
+  guerrierArmeSoeurX: 195,
+  guerrierArmeSoeurY: 575,
+  guerrierIntX: 175,
+  guerrierIntY: 610,
+  guerrierSagX: 175,
+  guerrierSagY: 635,
+  guerrierChaX: 175,
+  guerrierChaY: 660,
+  guerrierMagicIntCheckX: 180,
+  guerrierMagicIntCheckY: 718,
+  guerrierMagicChaCheckX: 180,
+  guerrierMagicChaCheckY: 738,
+  guerrierSaveDCX: 520,
+  guerrierSaveDCY: 725,
+  guerrierAttackModX: 520,
+  guerrierAttackModY: 785,
+};
+
 @Injectable({
   providedIn: 'root',
 })
@@ -495,7 +681,7 @@ export class PdfGeneratorService {
   }
 
   // =========================================================================
-  // PAGE 5 — GRIMOIRE
+  // PAGE 5 — GRIMOIRE (dispatcher)
   // =========================================================================
 
   private drawGrimoire(pdf: jsPDF, c: Character): void {
@@ -503,73 +689,87 @@ export class PdfGeneratorService {
     const dark = '#2c1810';
     pdf.setTextColor(dark);
     const sc = c.spellcasting;
-    const fmt = (n: number) => this.formatBonus(n);
 
+    // Les martiaux ont un layout complètement différent
     if (sc.kind === 'ranger' || sc.kind === 'paladin' || sc.kind === 'fighter_eldritch_knight') {
       this.drawGrimoireGRP(pdf, c);
       return;
     }
 
-    // === LAYOUT COMMUN ===
+    // === PARTIE GAUCHE : commune à tous les casters standards ===
+    this.drawGrimoireBase(pdf, c);
+
+    // === PARTIE DROITE : spécifique à chaque classe ===
+    this.drawGrimoirePanel(pdf, sc);
+  }
+
+  // =========================================================================
+  // GRIMOIRE — Base commune (côté gauche + table de sorts)
+  // =========================================================================
+
+  private drawGrimoireBase(pdf: jsPDF, c: Character): void {
+    if (!c.spellcasting) return;
+    const sc = c.spellcasting;
+    const fmt = (n: number) => this.formatBonus(n);
+    const B = BASE_COORDS;
+
+    // Nom du personnage
     pdf.setFontSize(15);
-    this.text(pdf, c.name, 130, 160);
+    this.text(pdf, c.name, B.nameX, B.nameY);
 
+    // Caractéristique d'incantation (dans l'ovale)
     pdf.setFontSize(10);
-    this.text(pdf, sc.ability, 94, 241);
+    this.text(pdf, sc.ability, B.abilityX, B.abilityY);
 
+    // DD sauvegarde (dans l'ovale)
     pdf.setFontSize(12);
-    this.text(pdf, String(sc.spellSaveDC), 110, 325);
+    this.text(pdf, String(sc.spellSaveDC), B.saveDCX, B.saveDCY);
 
+    // Modificateur d'attaque (dans l'ovale)
     pdf.setFontSize(12);
-    this.text(pdf, fmt(sc.spellAttackBonus), 110, 405);
+    this.text(pdf, fmt(sc.spellAttackBonus), B.attackModX, B.attackModY);
 
+    // Cercles sorts mineurs
     this.drawCantripCircles(pdf, sc);
+
+    // Cercles emplacements de sorts
     this.drawSpellSlotCircles(pdf, sc);
-    this.drawGrimoireClassPanel(pdf, sc);
+
+    // Table des sorts
     this.drawSpellTable(pdf, c);
   }
 
   // =========================================================================
-  // GRIMOIRE — Cercles sorts mineurs & emplacements
+  // GRIMOIRE — Cercles sorts mineurs
   // =========================================================================
 
   private drawCantripCircles(pdf: jsPDF, sc: CharacterSpellcasting): void {
-    const circleY = 220;
-    const circleXStart = 260;
-    const circleSpacing = 15;
+    const B = BASE_COORDS;
     const totalCircles = 5;
     const radius = 2.5;
     const known = sc.cantrips.max;
 
     for (let i = 0; i < totalCircles; i++) {
       if (i < known) {
-        this.drawFilledCircle(pdf, circleXStart + i * circleSpacing, circleY, radius);
+        this.drawFilledCircle(pdf, B.cantripXStart + i * B.cantripSpacing, B.cantripY, radius);
       }
     }
   }
 
+  // =========================================================================
+  // GRIMOIRE — Cercles emplacements de sorts
+  // =========================================================================
+
   private drawSpellSlotCircles(pdf: jsPDF, sc: CharacterSpellcasting): void {
-    const slotRows: { y: number; maxCircles: number }[] = [
-      { y: 255, maxCircles: 4 }, // 1er
-      { y: 250, maxCircles: 3 }, // 2e
-      { y: 274, maxCircles: 3 }, // 3e
-      { y: 296, maxCircles: 3 }, // 4e
-      { y: 318, maxCircles: 3 }, // 5e
-      { y: 340, maxCircles: 2 }, // 6e
-      { y: 362, maxCircles: 2 }, // 7e
-      { y: 384, maxCircles: 1 }, // 8e
-      { y: 406, maxCircles: 1 }, // 9e
-    ];
-    const circleXStart = 261;
-    const circleSpacing = 15;
+    const B = BASE_COORDS;
     const radius = 2.5;
 
-    for (let lvl = 0; lvl < slotRows.length; lvl++) {
-      const row = slotRows[lvl];
+    for (let lvl = 0; lvl < B.slotRows.length; lvl++) {
+      const row = B.slotRows[lvl];
       const slot = sc.spellSlots.find((s) => s.level === lvl + 1);
       const available = slot ? slot.max : 0;
       for (let i = 0; i < Math.min(available, row.maxCircles); i++) {
-        this.drawFilledCircle(pdf, circleXStart + i * circleSpacing, row.y, radius);
+        this.drawFilledCircle(pdf, B.slotXStart + i * B.slotSpacing, row.y, radius);
       }
     }
   }
@@ -580,36 +780,29 @@ export class PdfGeneratorService {
 
   private drawSpellTable(pdf: jsPDF, c: Character): void {
     if (!c.knownSpells || c.knownSpells.length === 0) return;
+    const B = BASE_COORDS;
 
-    const colPrepared = 82;
-    const colName = 95;
-    const colEffect = 276;
-    const colPage = 530;
-    const effectWidthMm = pxToMmX(colPage - colEffect - 15);
-
-    const startY = 491;
-    const rowH = 45;
-    const maxRows = 15;
+    const effectWidthMm = pxToMmX(B.colPage - B.colEffect - 15);
 
     const sorted = [...c.knownSpells].sort(
       (a, b) => a.level - b.level || a.name.localeCompare(b.name),
     );
 
-    sorted.slice(0, maxRows).forEach((spell, i) => {
-      const y = startY + i * rowH;
+    sorted.slice(0, B.spellTableMaxRows).forEach((spell, i) => {
+      const y = B.spellTableStartY + i * B.spellTableRowH;
 
       if (spell.alwaysPrepared || spell.prepared) {
-        this.drawFilledCircle(pdf, colPrepared, y - 2, 1.8);
+        this.drawFilledCircle(pdf, B.colPrepared, y - 2, 1.8);
       }
 
       pdf.setFontSize(10);
-      this.text(pdf, spell.name, colName, y);
+      this.text(pdf, spell.name, B.colName, y);
 
       if (spell.effectSummary) {
         pdf.setFontSize(7);
         const lines = pdf.splitTextToSize(spell.effectSummary, effectWidthMm);
         const lineH = 8;
-        const effectX = pxToMmX(colEffect);
+        const effectX = pxToMmX(B.colEffect);
         const effectY = pxToMmY(y) - 1;
         lines.slice(0, 2).forEach((line: string, li: number) => {
           pdf.text(line, effectX, effectY + li * lineH + 1);
@@ -618,86 +811,214 @@ export class PdfGeneratorService {
 
       if (spell.pageRef) {
         pdf.setFontSize(7);
-        this.text(pdf, spell.pageRef, colPage, y);
+        this.text(pdf, spell.pageRef, B.colPage, y);
       }
     });
   }
 
   // =========================================================================
-  // GRIMOIRE — Panneau droit (infos classe)
+  // GRIMOIRE — Panneau droit (dispatch par kind)
+  // Chaque grimoire a ses propres coordonnées.
   // =========================================================================
 
-  private drawGrimoireClassPanel(pdf: jsPDF, sc: CharacterSpellcasting): void {
-    const panelX = 450;
-    const line1Y = 255;
-    const line2Y = 310;
+  private drawGrimoirePanel(pdf: jsPDF, sc: CharacterSpellcasting): void {
     pdf.setFontSize(15);
 
     switch (sc.kind) {
       case 'bard':
-        if (sc.bardicCollege) this.text(pdf, sc.bardicCollege, panelX, line1Y);
-        if (sc.focus) this.text(pdf, sc.focus, panelX, line2Y);
+        this.drawPanelBard(pdf, sc);
         break;
       case 'wizard':
-        if (sc.arcaneTradition) this.text(pdf, sc.arcaneTradition, panelX, line1Y);
-        if (sc.focus) this.text(pdf, sc.focus, panelX, line2Y);
-        break;
-      case 'sorcerer':
-        if (sc.atavism) this.text(pdf, sc.atavism, panelX, line1Y);
-        if (sc.focus) this.text(pdf, sc.focus, panelX, line2Y);
-        if (sc.sorceryPoints) {
-          this.text(pdf, `${sc.sorceryPoints.current}/${sc.sorceryPoints.max}`, panelX + 50, 300);
-        }
-        if (sc.metamagic.length > 0) {
-          pdf.setFontSize(8);
-          sc.metamagic.forEach((mm, i) => {
-            if (i < 5) this.text(pdf, mm, panelX, 340 + i * 18);
-          });
-        }
-        break;
-      case 'warlock':
-        if (sc.patron) this.text(pdf, sc.patron, panelX, line1Y);
-        if (sc.pact) this.text(pdf, sc.pact, panelX, line2Y);
-        if (sc.focus) this.text(pdf, sc.focus, panelX, 300);
-        if (sc.eldritchInvocations.length > 0) {
-          pdf.setFontSize(8);
-          sc.eldritchInvocations.forEach((inv, i) => {
-            if (i < 6) this.text(pdf, inv, panelX, 340 + i * 18);
-          });
-        }
+        this.drawPanelWizard(pdf, sc);
         break;
       case 'cleric':
-        if (sc.deity && sc.domain) {
-          this.text(pdf, `${sc.deity} — ${sc.domain}`, panelX, line1Y);
-        } else {
-          if (sc.deity) this.text(pdf, sc.deity, panelX, line1Y);
-          if (sc.domain) this.text(pdf, sc.domain, panelX, line1Y);
-        }
-        if (sc.focus) this.text(pdf, sc.focus, panelX, line2Y);
-        if (sc.divineChannels.length > 0) {
-          pdf.setFontSize(8);
-          sc.divineChannels.forEach((ch, i) => {
-            if (i < 4) {
-              this.text(
-                pdf,
-                `${ch.name} (${ch.uses.current}/${ch.uses.max})`,
-                panelX,
-                310 + i * 18,
-              );
-            }
-          });
-        }
+        this.drawPanelCleric(pdf, sc);
         break;
       case 'druid':
-        if (sc.druidCircle) this.text(pdf, sc.druidCircle, panelX, line1Y);
-        if (sc.focus) this.text(pdf, sc.focus, panelX, line2Y);
-        if (sc.circleSpells.length > 0) {
-          pdf.setFontSize(8);
-          sc.circleSpells.forEach((sp, i) => {
-            if (i < 6) this.text(pdf, sp, panelX, 310 + i * 18);
-          });
-        }
+        this.drawPanelDruid(pdf, sc);
         break;
+      case 'warlock':
+        this.drawPanelWarlock(pdf, sc);
+        break;
+      case 'sorcerer':
+        this.drawPanelSorcerer(pdf, sc);
+        break;
+    }
+  }
+
+  // --- BARDE ---
+  private drawPanelBard(pdf: jsPDF, sc: Extract<CharacterSpellcasting, { kind: 'bard' }>): void {
+    const P = PANEL_BARD;
+    pdf.setFontSize(15);
+
+    if (sc.bardicCollege) {
+      this.text(pdf, sc.bardicCollege, P.line1X, P.line1Y);
+    }
+    if (sc.focus) {
+      this.text(pdf, sc.focus, P.line2X, P.line2Y);
+    }
+  }
+
+  // --- MAGE ---
+  private drawPanelWizard(
+    pdf: jsPDF,
+    sc: Extract<CharacterSpellcasting, { kind: 'wizard' }>,
+  ): void {
+    const P = PANEL_WIZARD;
+    pdf.setFontSize(15);
+
+    if (sc.arcaneTradition) {
+      this.text(pdf, sc.arcaneTradition, P.line1X, P.line1Y);
+    }
+    if (sc.focus) {
+      this.text(pdf, sc.focus, P.line2X, P.line2Y);
+    }
+  }
+
+  // --- PRÊTRE ---
+  private drawPanelCleric(
+    pdf: jsPDF,
+    sc: Extract<CharacterSpellcasting, { kind: 'cleric' }>,
+  ): void {
+    const P = PANEL_CLERIC;
+    pdf.setFontSize(15);
+
+    // Divinité — Domaine
+    if (sc.deity && sc.domain) {
+      this.text(pdf, `${sc.deity} — ${sc.domain}`, P.line1X, P.line1Y);
+    } else {
+      if (sc.deity) this.text(pdf, sc.deity, P.line1X, P.line1Y);
+      if (sc.domain) this.text(pdf, sc.domain, P.line1X, P.line1Y);
+    }
+
+    // Focaliseur arcanique
+    if (sc.focus) {
+      this.text(pdf, sc.focus, P.line2X, P.line2Y);
+    }
+
+    // Conduits divins
+    if (sc.divineChannels.length > 0) {
+      pdf.setFontSize(8);
+      sc.divineChannels.forEach(
+        (ch: { name: string; uses: { current: number; max: number } }, i: number) => {
+          if (i < 4) {
+            this.text(
+              pdf,
+              `${ch.name} (${ch.uses.current}/${ch.uses.max})`,
+              P.channelsX,
+              P.channelsStartY + i * P.channelsSpacing,
+            );
+          }
+        },
+      );
+    }
+  }
+
+  // --- DRUIDE ---
+  private drawPanelDruid(pdf: jsPDF, sc: Extract<CharacterSpellcasting, { kind: 'druid' }>): void {
+    const P = PANEL_DRUID;
+    pdf.setFontSize(15);
+
+    // Cercle druidique
+    if (sc.druidCircle) {
+      this.text(pdf, sc.druidCircle, P.line1X, P.line1Y);
+    }
+
+    // Focaliseur arcanique
+    if (sc.focus) {
+      this.text(pdf, sc.focus, P.line2X, P.line2Y);
+    }
+
+    // Cases à cocher
+    if (sc.circleSpells && sc.circleSpells.length > 0) {
+      this.drawFilledCircle(pdf, P.circleSpellsCheckX, P.circleSpellsCheckY, 1.8);
+    }
+    if (sc.mysticTranceAvailable) {
+      this.drawFilledCircle(pdf, P.mysticTranceCheckX, P.mysticTranceCheckY, 1.8);
+    }
+
+    // Sorts de cercle (lignes de notes)
+    if (sc.circleSpells && sc.circleSpells.length > 0) {
+      pdf.setFontSize(8);
+      sc.circleSpells.forEach((sp: string, i: number) => {
+        if (i < 6) {
+          this.text(pdf, sp, P.notesX, P.notesStartY + i * P.notesSpacing);
+        }
+      });
+    }
+  }
+
+  // --- SORCIER (Warlock) ---
+  private drawPanelWarlock(
+    pdf: jsPDF,
+    sc: Extract<CharacterSpellcasting, { kind: 'warlock' }>,
+  ): void {
+    const P = PANEL_WARLOCK;
+    pdf.setFontSize(15);
+
+    // Suzerain (patron)
+    if (sc.patron) {
+      this.text(pdf, sc.patron, P.line1X, P.line1Y);
+    }
+
+    // Pacte
+    if (sc.pact) {
+      this.text(pdf, sc.pact, P.line2X, P.line2Y);
+    }
+
+    // Focaliseur arcanique
+    if (sc.focus) {
+      this.text(pdf, sc.focus, P.line3X, P.line3Y);
+    }
+
+    // Manifestations occultes (invocations)
+    if (sc.eldritchInvocations.length > 0) {
+      pdf.setFontSize(8);
+      sc.eldritchInvocations.forEach((inv: string, i: number) => {
+        if (i < 6) {
+          this.text(pdf, inv, P.invocationsX, P.invocationsStartY + i * P.invocationsSpacing);
+        }
+      });
+    }
+  }
+
+  // --- ENSORCELEUR ---
+  private drawPanelSorcerer(
+    pdf: jsPDF,
+    sc: Extract<CharacterSpellcasting, { kind: 'sorcerer' }>,
+  ): void {
+    const P = PANEL_SORCERER;
+    pdf.setFontSize(15);
+
+    // Atavisme (origine)
+    if (sc.atavism) {
+      this.text(pdf, sc.atavism, P.line1X, P.line1Y);
+    }
+
+    // Focaliseur arcanique
+    if (sc.focus) {
+      this.text(pdf, sc.focus, P.line2X, P.line2Y);
+    }
+
+    // Points arcaniques
+    if (sc.sorceryPoints) {
+      pdf.setFontSize(12);
+      this.text(
+        pdf,
+        `${sc.sorceryPoints.current}/${sc.sorceryPoints.max}`,
+        P.pointsValueX,
+        P.pointsY,
+      );
+    }
+
+    // Métamagie
+    if (sc.metamagic.length > 0) {
+      pdf.setFontSize(8);
+      sc.metamagic.forEach((mm: string, i: number) => {
+        if (i < 5) {
+          this.text(pdf, mm, P.metamagicX, P.metamagicStartY + i * P.metamagicSpacing);
+        }
+      });
     }
   }
 
@@ -711,28 +1032,30 @@ export class PdfGeneratorService {
     const dark = '#2c1810';
     pdf.setTextColor(dark);
     const fmt = (n: number) => this.formatBonus(n);
+    const G = GRP_COORDS;
 
+    // Nom du personnage
     pdf.setFontSize(15);
-    this.text(pdf, c.name, 150, 300);
+    this.text(pdf, c.name, G.nameX, G.nameY);
 
+    // DD / Mod commun
     pdf.setFontSize(14);
-    this.text(pdf, String(sc.spellSaveDC), 470, 340);
-    this.text(pdf, fmt(sc.spellAttackBonus), 545, 340);
+    this.text(pdf, String(sc.spellSaveDC), G.saveDCX, G.saveDCY);
+    this.text(pdf, fmt(sc.spellAttackBonus), G.attackModX, G.attackModY);
 
     switch (sc.kind) {
       case 'ranger': {
         pdf.setFontSize(14);
-        this.text(pdf, String(sc.knownSpellsCount), 100, 205);
+        this.text(pdf, String(sc.knownSpellsCount), G.rodeurSortsConnusX, G.rodeurSortsConnusY);
         pdf.setFontSize(10);
-        if (sc.focus) this.text(pdf, sc.focus, 70, 420);
+        if (sc.focus) this.text(pdf, sc.focus, G.rodeurFocaliseurX, G.rodeurFocaliseurY);
         break;
       }
       case 'paladin': {
         pdf.setFontSize(10);
-        if (sc.oath) this.text(pdf, sc.oath, 310, 185);
+        if (sc.oath) this.text(pdf, sc.oath, G.paladinSermentX, G.paladinSermentY);
         if (sc.oathSpells.length > 0) {
           pdf.setFontSize(9);
-          const oathYs = [432, 457, 482, 507, 532];
           sc.oathSpells.forEach((o, i) => {
             if (i < 5) {
               const spells = o.spells.join(', ');
@@ -740,8 +1063,8 @@ export class PdfGeneratorService {
               this.text(
                 pdf,
                 spells.length > maxLen ? spells.substring(0, maxLen) + '…' : spells,
-                310,
-                oathYs[i],
+                G.paladinOathSpellsX,
+                G.paladinOathSpellsYs[i],
               );
             }
           });
@@ -751,18 +1074,36 @@ export class PdfGeneratorService {
       case 'fighter_eldritch_knight': {
         pdf.setFontSize(10);
         if (sc.soulWeapon) {
-          this.text(pdf, sc.soulWeapon.name, 195, 575);
+          this.text(pdf, sc.soulWeapon.name, G.guerrierArmeSoeurX, G.guerrierArmeSoeurY);
           pdf.setFontSize(9);
-          this.text(pdf, String(sc.soulWeapon.bondedAbilityModifiers.intelligence), 175, 610);
-          this.text(pdf, String(sc.soulWeapon.bondedAbilityModifiers.sagesse), 175, 635);
-          this.text(pdf, String(sc.soulWeapon.bondedAbilityModifiers.charisme), 175, 660);
+          this.text(
+            pdf,
+            String(sc.soulWeapon.bondedAbilityModifiers.intelligence),
+            G.guerrierIntX,
+            G.guerrierIntY,
+          );
+          this.text(
+            pdf,
+            String(sc.soulWeapon.bondedAbilityModifiers.sagesse),
+            G.guerrierSagX,
+            G.guerrierSagY,
+          );
+          this.text(
+            pdf,
+            String(sc.soulWeapon.bondedAbilityModifiers.charisme),
+            G.guerrierChaX,
+            G.guerrierChaY,
+          );
         }
         pdf.setFontSize(8);
-        if (sc.magicAbility === 'Intelligence') this.drawFilledCircle(pdf, 180, 718, 1.5);
-        else if (sc.magicAbility === 'Charisme') this.drawFilledCircle(pdf, 180, 738, 1.5);
+        if (sc.magicAbility === 'Intelligence') {
+          this.drawFilledCircle(pdf, G.guerrierMagicIntCheckX, G.guerrierMagicIntCheckY, 1.5);
+        } else if (sc.magicAbility === 'Charisme') {
+          this.drawFilledCircle(pdf, G.guerrierMagicChaCheckX, G.guerrierMagicChaCheckY, 1.5);
+        }
         pdf.setFontSize(14);
-        this.text(pdf, String(sc.spellSaveDC), 520, 725);
-        this.text(pdf, fmt(sc.spellAttackBonus), 520, 785);
+        this.text(pdf, String(sc.spellSaveDC), G.guerrierSaveDCX, G.guerrierSaveDCY);
+        this.text(pdf, fmt(sc.spellAttackBonus), G.guerrierAttackModX, G.guerrierAttackModY);
         break;
       }
     }

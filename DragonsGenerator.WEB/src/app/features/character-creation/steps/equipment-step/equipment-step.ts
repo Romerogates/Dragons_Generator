@@ -93,6 +93,26 @@ const CATEGORY_FILTERS: Record<
     label: 'Instrument de musique',
   },
   'category-tools': { type: 'TOOL', label: "Outil d'artisan" },
+  'category-simple-melee-weapons': {
+    type: 'WEAPON',
+    subtypes: ['SIMPLE_MELEE'],
+    label: 'Arme courante de corps à corps',
+  },
+  'category-arcane-focus': {
+    type: 'GEAR',
+    subtypes: ['ARCANE_FOCUS'],
+    label: 'Focaliseur arcanique',
+  },
+  'category-druidic-focus': {
+    type: 'GEAR',
+    subtypes: ['DRUIDIC_FOCUS'],
+    label: 'Focaliseur druidique',
+  },
+  'category-holy-symbol': {
+    type: 'GEAR',
+    subtypes: ['HOLY_SYMBOL'],
+    label: 'Symbole sacré',
+  },
 };
 
 @Component({
@@ -262,10 +282,13 @@ export class EquipmentStep implements OnInit {
 
   // === Helpers ===
   getIconForItem(item: ResolvedItem): string {
-    if (item.isCategory)
-      return item.ref.id.includes('weapon')
-        ? 'fluent-emoji:crossed-swords'
-        : 'fluent-emoji:hammer-and-wrench';
+    if (item.isCategory) {
+      const id = item.ref.id;
+      if (id.includes('weapon')) return 'fluent-emoji:crossed-swords';
+      if (id.includes('focus') || id.includes('holy-symbol')) return 'fluent-emoji:sparkles';
+      if (id.includes('instrument')) return 'fluent-emoji:violin';
+      return 'fluent-emoji:hammer-and-wrench';
+    }
     return item.equipment?.type === 'WEAPON'
       ? 'fluent-emoji:crossed-swords'
       : 'fluent-emoji:package';

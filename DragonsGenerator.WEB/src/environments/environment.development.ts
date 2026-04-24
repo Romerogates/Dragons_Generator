@@ -1,5 +1,5 @@
-// environment.development.ts
 export const environment = {
   production: false,
-  apiUrl: '/api',
+  // Ajoute bien l'URL complète avec le bon port
+  apiUrl: 'http://localhost:5117',
 };
