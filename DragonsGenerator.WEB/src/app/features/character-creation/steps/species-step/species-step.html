@@ -104,7 +104,7 @@
                       class="text-7xl mb-6 mt-4 transition-transform duration-300 drop-shadow-lg"
                       [ngClass]="{ 'scale-125': i === normalizedIndex() }"
                     >
-                      {{ card.icon }}
+                      <iconify-icon [icon]="card.icon"></iconify-icon>
                     </div>
 
                     <h3

@@ -40,7 +40,9 @@
             class="relative w-12 h-12 rounded-full border-2 border-emerald-500 bg-emerald-900/40 shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center justify-center group hover:scale-105 hover:border-red-500 hover:bg-red-900/40 transition-all"
             (click)="toggle(skill.id)"
           >
-            <span class="text-xl group-hover:hidden">{{ skill.icon }}</span>
+            <span class="text-xl group-hover:hidden"
+              ><iconify-icon [icon]="skill.icon"></iconify-icon
+            ></span>
             <span class="text-xl hidden group-hover:block text-red-500">×</span>
           </button>
         }
@@ -62,7 +64,7 @@
           <div
             class="bg-[#1b2028] px-2 py-1.5 border-b border-slate-700/50 flex items-center justify-center gap-2"
           >
-            <span class="text-sm">{{ group.icon }}</span>
+            <span class="text-sm"><iconify-icon [icon]="group.icon"></iconify-icon></span>
             <span class="text-[9px] font-black uppercase tracking-widest {{ group.colorClass }}">
               {{ group.name }}
             </span>
@@ -89,7 +91,7 @@
                       'opacity-40': !isSelected(skill.id),
                     }"
                   >
-                    {{ skill.icon }}
+                    <iconify-icon [icon]="skill.icon"></iconify-icon>
                   </span>
                   <span
                     class="text-[11px] font-bold truncate"

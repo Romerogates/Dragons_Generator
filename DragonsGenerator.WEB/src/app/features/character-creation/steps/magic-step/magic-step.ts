@@ -7,6 +7,7 @@ import {
   signal,
   computed,
   ChangeDetectionStrategy,
+  CUSTOM_ELEMENTS_SCHEMA, // <-- Ajout de l'import
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
@@ -115,6 +116,7 @@ const SCHOOL_LABELS: Record<string, string> = {
   imports: [CommonModule],
   templateUrl: './magic-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
 })
 export class MagicStep implements OnInit {
   private http = inject(HttpClient);

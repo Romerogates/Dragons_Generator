@@ -1,6 +1,12 @@
 // features/character-creation/steps/skills-step/skills-step.ts
 
-import { Component, inject, computed, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  inject,
+  computed,
+  ChangeDetectionStrategy,
+  CUSTOM_ELEMENTS_SCHEMA,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CharacterBuilderService } from '../../../../core/services/character-builder.service';
 import { type AbilityKey } from '../../../../core/models/Character/character';
@@ -25,70 +31,110 @@ const SKILL_MAP: Record<string, SkillInfo> = {
     id: 'skill-acrobaties',
     label: 'Acrobaties',
     ability: 'Dextérité',
-    icon: '🤸',
+    icon: 'fluent-emoji:person-cartwheeling',
   },
-  'skill-arcanes': { id: 'skill-arcanes', label: 'Arcanes', ability: 'Intelligence', icon: '🔮' },
-  'skill-athletisme': { id: 'skill-athletisme', label: 'Athlétisme', ability: 'Force', icon: '💪' },
+  'skill-arcanes': {
+    id: 'skill-arcanes',
+    label: 'Arcanes',
+    ability: 'Intelligence',
+    icon: 'fluent-emoji:crystal-ball',
+  },
+  'skill-athletisme': {
+    id: 'skill-athletisme',
+    label: 'Athlétisme',
+    ability: 'Force',
+    icon: 'fluent-emoji:flexed-biceps',
+  },
   'skill-discretion': {
     id: 'skill-discretion',
     label: 'Discrétion',
     ability: 'Dextérité',
-    icon: '🥷',
+    icon: 'fluent-emoji:ninja',
   },
-  'skill-dressage': { id: 'skill-dressage', label: 'Dressage', ability: 'Sagesse', icon: '🐺' },
+  'skill-dressage': {
+    id: 'skill-dressage',
+    label: 'Dressage',
+    ability: 'Sagesse',
+    icon: 'fluent-emoji:wolf',
+  },
   'skill-escamotage': {
     id: 'skill-escamotage',
     label: 'Escamotage',
     ability: 'Dextérité',
-    icon: '🪙',
+    icon: 'fluent-emoji:coin',
   },
   'skill-histoire': {
     id: 'skill-histoire',
     label: 'Histoire',
     ability: 'Intelligence',
-    icon: '📜',
+    icon: 'fluent-emoji:scroll',
   },
   'skill-intimidation': {
     id: 'skill-intimidation',
     label: 'Intimidation',
     ability: 'Charisme',
-    icon: '💢',
+    icon: 'fluent-emoji:anger-symbol',
   },
-  'skill-intuition': { id: 'skill-intuition', label: 'Intuition', ability: 'Sagesse', icon: '👁️' },
+  'skill-intuition': {
+    id: 'skill-intuition',
+    label: 'Intuition',
+    ability: 'Sagesse',
+    icon: 'fluent-emoji:eye',
+  },
   'skill-investigation': {
     id: 'skill-investigation',
     label: 'Investigation',
     ability: 'Intelligence',
-    icon: '🔍',
+    icon: 'fluent-emoji:magnifying-glass-tilted-right',
   },
-  'skill-medecine': { id: 'skill-medecine', label: 'Médecine', ability: 'Sagesse', icon: '⚕️' },
-  'skill-nature': { id: 'skill-nature', label: 'Nature', ability: 'Intelligence', icon: '🌿' },
+  'skill-medecine': {
+    id: 'skill-medecine',
+    label: 'Médecine',
+    ability: 'Sagesse',
+    icon: 'fluent-emoji:medical-symbol',
+  },
+  'skill-nature': {
+    id: 'skill-nature',
+    label: 'Nature',
+    ability: 'Intelligence',
+    icon: 'fluent-emoji:herb',
+  },
   'skill-perception': {
     id: 'skill-perception',
     label: 'Perception',
     ability: 'Sagesse',
-    icon: '👂',
+    icon: 'fluent-emoji:ear',
   },
   'skill-persuasion': {
     id: 'skill-persuasion',
     label: 'Persuasion',
     ability: 'Charisme',
-    icon: '🤝',
+    icon: 'fluent-emoji:handshake',
   },
   'skill-religion': {
     id: 'skill-religion',
     label: 'Religion',
     ability: 'Intelligence',
-    icon: '📿',
+    icon: 'fluent-emoji:prayer-beads',
   },
   'skill-representation': {
     id: 'skill-representation',
     label: 'Représentation',
     ability: 'Charisme',
-    icon: '🎭',
+    icon: 'fluent-emoji:performing-arts',
   },
-  'skill-survie': { id: 'skill-survie', label: 'Survie', ability: 'Sagesse', icon: '🏕️' },
-  'skill-tromperie': { id: 'skill-tromperie', label: 'Tromperie', ability: 'Charisme', icon: '🃏' },
+  'skill-survie': {
+    id: 'skill-survie',
+    label: 'Survie',
+    ability: 'Sagesse',
+    icon: 'fluent-emoji:camping',
+  },
+  'skill-tromperie': {
+    id: 'skill-tromperie',
+    label: 'Tromperie',
+    ability: 'Charisme',
+    icon: 'fluent-emoji:joker',
+  },
 };
 
 @Component({
@@ -97,6 +143,7 @@ const SKILL_MAP: Record<string, SkillInfo> = {
   imports: [CommonModule],
   templateUrl: './skills-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
 })
 export class SkillsStep {
   readonly builder = inject(CharacterBuilderService);
@@ -117,11 +164,36 @@ export class SkillsStep {
   readonly groupedSkills = computed<SkillGroup[]>(() => {
     const available = this.availableSkills();
     const groups: Omit<SkillGroup, 'skills'>[] = [
-      { name: 'Force', abilityKey: 'force', icon: '💪', colorClass: 'text-red-400' },
-      { name: 'Dextérité', abilityKey: 'dexterite', icon: '🤸', colorClass: 'text-orange-400' },
-      { name: 'Intelligence', abilityKey: 'intelligence', icon: '🧠', colorClass: 'text-blue-400' },
-      { name: 'Sagesse', abilityKey: 'sagesse', icon: '👁️', colorClass: 'text-emerald-400' },
-      { name: 'Charisme', abilityKey: 'charisme', icon: '🗣️', colorClass: 'text-purple-400' },
+      {
+        name: 'Force',
+        abilityKey: 'force',
+        icon: 'fluent-emoji:flexed-biceps',
+        colorClass: 'text-red-400',
+      },
+      {
+        name: 'Dextérité',
+        abilityKey: 'dexterite',
+        icon: 'fluent-emoji:person-cartwheeling',
+        colorClass: 'text-orange-400',
+      },
+      {
+        name: 'Intelligence',
+        abilityKey: 'intelligence',
+        icon: 'fluent-emoji:brain',
+        colorClass: 'text-blue-400',
+      },
+      {
+        name: 'Sagesse',
+        abilityKey: 'sagesse',
+        icon: 'fluent-emoji:eye',
+        colorClass: 'text-emerald-400',
+      },
+      {
+        name: 'Charisme',
+        abilityKey: 'charisme',
+        icon: 'fluent-emoji:speaking-head',
+        colorClass: 'text-purple-400',
+      },
     ];
 
     return groups

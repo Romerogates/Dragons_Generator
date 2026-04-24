@@ -7,6 +7,7 @@ import {
   signal,
   computed,
   ChangeDetectionStrategy,
+  CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataService } from '../../../../core/services/data.service';
@@ -130,6 +131,7 @@ const COMBAT_STYLES: CombatStyleOption[] = [
   imports: [CommonModule],
   templateUrl: './class-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class ClassStep implements OnInit {
   private dataService = inject(DataService);
@@ -255,7 +257,7 @@ export class ClassStep implements OnInit {
           desc: sub.desc ?? '',
           stats: `Niveau d'obtention : 1`,
           badge: 'Voie',
-          icon: '🔮',
+          icon: 'fluent-emoji:crystal-ball',
         }));
 
       case 'combat_style':
@@ -264,7 +266,7 @@ export class ClassStep implements OnInit {
           title: style.name,
           desc: style.desc,
           badge: 'Style',
-          icon: '⚔️',
+          icon: 'fluent-emoji:crossed-swords',
         }));
 
       case 'sub_choice': {
@@ -275,7 +277,7 @@ export class ClassStep implements OnInit {
           title: this.getSubChoiceLabel(choice.type, opt),
           desc: 'Une option conférant des capacités uniques à votre personnage.',
           badge: 'Option',
-          icon: '✨',
+          icon: 'fluent-emoji:sparkles',
         }));
       }
     }
@@ -505,21 +507,21 @@ export class ClassStep implements OnInit {
 
   getIconForClass(id: string): string {
     const icons: Record<string, string> = {
-      'cls-barbare': '🪓',
-      'cls-barde': '🪕',
-      'cls-druide': '🌿',
-      'cls-ensorceleur': '✨',
-      'cls-guerrier': '⚔️',
-      'cls-lettre': '📚',
-      'cls-magicien': '📖',
-      'cls-moine': '🥋',
-      'cls-paladin': '🛡️',
-      'cls-pretre': '⚕️',
-      'cls-rodeur': '🏹',
-      'cls-roublard': '🗡️',
-      'cls-sorcier': '👁️',
+      'cls-barbare': 'fluent-emoji:axe',
+      'cls-barde': 'fluent-emoji:banjo',
+      'cls-druide': 'fluent-emoji:herb',
+      'cls-ensorceleur': 'fluent-emoji:sparkles',
+      'cls-guerrier': 'fluent-emoji:crossed-swords',
+      'cls-lettre': 'fluent-emoji:books',
+      'cls-magicien': 'fluent-emoji:open-book',
+      'cls-moine': 'fluent-emoji:martial-arts-uniform',
+      'cls-paladin': 'fluent-emoji:shield',
+      'cls-pretre': 'fluent-emoji:medical-symbol',
+      'cls-rodeur': 'fluent-emoji:bow-and-arrow',
+      'cls-roublard': 'fluent-emoji:dagger',
+      'cls-sorcier': 'fluent-emoji:eye',
     };
-    return icons[id] || '👤';
+    return icons[id] || 'fluent-emoji:bust-in-silhouette';
   }
 
   getClassDescription(cls: CharacterClass): string {

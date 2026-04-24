@@ -1,6 +1,6 @@
 // features/character-creation/steps/abilities-step/abilities-step.ts
 
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CharacterBuilderService } from '@core/services/character-builder.service';
 import {
@@ -24,6 +24,7 @@ interface AbilityRow {
   imports: [CommonModule],
   templateUrl: './abilities-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class AbilitiesStep {
   readonly builder = inject(CharacterBuilderService);
@@ -31,15 +32,15 @@ export class AbilitiesStep {
   // === Icônes d'ambiance pour les caractéristiques ===
   getIconForAbility(key: AbilityKey): string {
     const icons: Record<AbilityKey, string> = {
-      force: '💪',
-      dexterite: '🤸',
-      constitution: '🛡️',
-      intelligence: '🧠',
-      sagesse: '👁️',
-      charisme: '🗣️',
+      force: 'fluent-emoji:flexed-biceps',
+      dexterite: 'fluent-emoji:person-cartwheeling',
+      constitution: 'fluent-emoji:shield',
+      intelligence: 'fluent-emoji:brain',
+      sagesse: 'fluent-emoji:eye',
+      charisme: 'fluent-emoji:speaking-head',
     };
 
-    return icons[key] || '✧';
+    return icons[key] || 'fluent-emoji:sparkles';
   }
 
   readonly abilities: AbilityRow[] = ABILITY_KEYS.map((key) => ({

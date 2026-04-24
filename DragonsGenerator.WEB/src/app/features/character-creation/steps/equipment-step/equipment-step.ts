@@ -7,6 +7,7 @@ import {
   signal,
   computed,
   ChangeDetectionStrategy,
+  CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataService } from '../../../../core/services/data.service';
@@ -100,6 +101,7 @@ const CATEGORY_FILTERS: Record<
   imports: [CommonModule],
   templateUrl: './equipment-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class EquipmentStep implements OnInit {
   private dataService = inject(DataService);
@@ -260,8 +262,13 @@ export class EquipmentStep implements OnInit {
 
   // === Helpers ===
   getIconForItem(item: ResolvedItem): string {
-    if (item.isCategory) return item.ref.id.includes('weapon') ? '⚔️' : '🛠️';
-    return item.equipment?.type === 'WEAPON' ? '⚔️' : '📦';
+    if (item.isCategory)
+      return item.ref.id.includes('weapon')
+        ? 'fluent-emoji:crossed-swords'
+        : 'fluent-emoji:hammer-and-wrench';
+    return item.equipment?.type === 'WEAPON'
+      ? 'fluent-emoji:crossed-swords'
+      : 'fluent-emoji:package';
   }
 
   itemName(item: ResolvedItem): string {

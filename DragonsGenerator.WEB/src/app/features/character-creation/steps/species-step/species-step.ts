@@ -8,6 +8,7 @@ import {
   computed,
   effect,
   ChangeDetectionStrategy,
+  CUSTOM_ELEMENTS_SCHEMA, // <-- Ajout de l'import
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataService } from '@core/services/data.service';
@@ -49,6 +50,7 @@ interface ChoiceOptionView {
   imports: [CommonModule],
   templateUrl: './species-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
 })
 export class SpeciesStep implements OnInit {
   private dataService = inject(DataService);
@@ -143,28 +145,29 @@ export class SpeciesStep implements OnInit {
     }
   });
 
+  // Modification ici pour renvoyer les codes Iconify
   getIconForSpecies(id: string): string {
     switch (id) {
       case 'sp-drakeide':
-        return '🐉';
+        return 'fluent-emoji:dragon-face';
       case 'sp-elfe':
-        return '🏹';
+        return 'fluent-emoji:bow-and-arrow';
       case 'sp-nain':
-        return '🪓';
+        return 'fluent-emoji:axe';
       case 'sp-humain':
-        return '🛡️';
+        return 'fluent-emoji:shield';
       case 'sp-halfelin':
-        return '🍀';
+        return 'fluent-emoji:four-leaf-clover';
       case 'sp-melesse':
-        return '✨';
+        return 'fluent-emoji:sparkles';
       case 'sp-merosi':
-        return '💀';
+        return 'fluent-emoji:skull';
       case 'sp-tieffelin':
-        return '🔥';
+        return 'fluent-emoji:fire';
       case 'sp-gnome':
-        return '⚙️';
+        return 'fluent-emoji:gear';
       default:
-        return '👤';
+        return 'fluent-emoji:bust-in-silhouette';
     }
   }
 
@@ -188,7 +191,7 @@ export class SpeciesStep implements OnInit {
           stats: this.hasSubspeciesAsi(sub)
             ? this.formatApiAsi(sub.abilityScoreIncrease)
             : undefined,
-          icon: '🧬',
+          icon: 'fluent-emoji:dna', // Modification Iconify
           badge: '—',
         }));
       case 'choice': {
@@ -201,7 +204,7 @@ export class SpeciesStep implements OnInit {
           stats: opt.damageType
             ? `${opt.damageType}${opt.areaShape ? ` · ${opt.areaShape} ${opt.areaLengthM}m` : ''}`
             : opt.note,
-          icon: '✨',
+          icon: 'fluent-emoji:sparkles', // Modification Iconify
           badge: '—',
         }));
       }

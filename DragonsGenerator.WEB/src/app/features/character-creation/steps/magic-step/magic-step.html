@@ -165,23 +165,24 @@
                     </span>
                     @if (spell.isConcentration) {
                       <span
-                        class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-fuchsia-950/40 text-fuchsia-400 border border-fuchsia-900/50 shadow-inner"
+                        class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-fuchsia-950/40 text-fuchsia-400 border border-fuchsia-900/50 shadow-inner flex items-center gap-1"
                       >
-                        👁 Conc.
+                        <iconify-icon icon="fluent-emoji:brain"></iconify-icon> Conc.
                       </span>
                     }
                     @if (spell.isRitual) {
                       <span
-                        class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-amber-950/40 text-amber-500 border border-amber-900/50 shadow-inner"
+                        class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-amber-950/40 text-amber-500 border border-amber-900/50 shadow-inner flex items-center gap-1"
                       >
-                        🕯 Rituel
+                        <iconify-icon icon="fluent-emoji:open-book"></iconify-icon> Rituel
                       </span>
                     }
                     @if (spell.isCorrupted) {
                       <span
-                        class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-red-950/50 text-red-400 border border-red-900/50 shadow-inner"
+                        class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-red-950/50 text-red-400 border border-red-900/50 shadow-inner flex items-center gap-1"
                       >
-                        ⚠ Corrompu
+                        <iconify-icon icon="fluent-emoji:skull-and-crossbones"></iconify-icon>
+                        Corrompu
                       </span>
                     }
                   </div>
@@ -193,10 +194,22 @@
                       <div
                         class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] text-slate-400 font-medium tracking-wide"
                       >
-                        <span title="Temps d'incantation">⏱ {{ castTimeLabel(spell) }}</span>
-                        <span title="Portée">📏 {{ rangeLabel(spell) }}</span>
-                        <span title="Composantes">🖐 {{ componentsLabel(spell) }}</span>
-                        <span title="Durée">⏳ {{ durationLabel(spell) }}</span>
+                        <span title="Temps d'incantation" class="flex items-center gap-1"
+                          ><iconify-icon icon="fluent-emoji:hourglass-done"></iconify-icon>
+                          {{ castTimeLabel(spell) }}</span
+                        >
+                        <span title="Portée" class="flex items-center gap-1"
+                          ><iconify-icon icon="fluent-emoji:straight-ruler"></iconify-icon>
+                          {{ rangeLabel(spell) }}</span
+                        >
+                        <span title="Composantes" class="flex items-center gap-1"
+                          ><iconify-icon icon="fluent-emoji:test-tube"></iconify-icon>
+                          {{ componentsLabel(spell) }}</span
+                        >
+                        <span title="Durée" class="flex items-center gap-1"
+                          ><iconify-icon icon="fluent-emoji:stopwatch"></iconify-icon>
+                          {{ durationLabel(spell) }}</span
+                        >
                       </div>
                       <p class="text-[11px] text-slate-300 leading-relaxed text-justify mt-1">
                         {{ spell.description }}
@@ -301,20 +314,21 @@
                       </span>
                       @if (spell.isConcentration) {
                         <span
-                          class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-fuchsia-950/40 text-fuchsia-400 border border-fuchsia-900/50 shadow-inner"
-                          >👁 Conc.</span
+                          class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-fuchsia-950/40 text-fuchsia-400 border border-fuchsia-900/50 shadow-inner flex items-center gap-1"
+                          ><iconify-icon icon="fluent-emoji:brain"></iconify-icon> Conc.</span
                         >
                       }
                       @if (spell.isRitual) {
                         <span
-                          class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-amber-950/40 text-amber-500 border border-amber-900/50 shadow-inner"
-                          >🕯 Rituel</span
+                          class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-amber-950/40 text-amber-500 border border-amber-900/50 shadow-inner flex items-center gap-1"
+                          ><iconify-icon icon="fluent-emoji:open-book"></iconify-icon> Rituel</span
                         >
                       }
                       @if (spell.isCorrupted) {
                         <span
-                          class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-red-950/50 text-red-400 border border-red-900/50 shadow-inner"
-                          >⚠ Corrompu</span
+                          class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-red-950/50 text-red-400 border border-red-900/50 shadow-inner flex items-center gap-1"
+                          ><iconify-icon icon="fluent-emoji:skull-and-crossbones"></iconify-icon>
+                          Corrompu</span
                         >
                       }
                     </div>
@@ -326,10 +340,22 @@
                         <div
                           class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] text-slate-400 font-medium tracking-wide"
                         >
-                          <span title="Temps d'incantation">⏱ {{ castTimeLabel(spell) }}</span>
-                          <span title="Portée">📏 {{ rangeLabel(spell) }}</span>
-                          <span title="Composantes">🖐 {{ componentsLabel(spell) }}</span>
-                          <span title="Durée">⏳ {{ durationLabel(spell) }}</span>
+                          <span title="Temps d'incantation" class="flex items-center gap-1"
+                            ><iconify-icon icon="fluent-emoji:hourglass-done"></iconify-icon>
+                            {{ castTimeLabel(spell) }}</span
+                          >
+                          <span title="Portée" class="flex items-center gap-1"
+                            ><iconify-icon icon="fluent-emoji:straight-ruler"></iconify-icon>
+                            {{ rangeLabel(spell) }}</span
+                          >
+                          <span title="Composantes" class="flex items-center gap-1"
+                            ><iconify-icon icon="fluent-emoji:test-tube"></iconify-icon>
+                            {{ componentsLabel(spell) }}</span
+                          >
+                          <span title="Durée" class="flex items-center gap-1"
+                            ><iconify-icon icon="fluent-emoji:stopwatch"></iconify-icon>
+                            {{ durationLabel(spell) }}</span
+                          >
                         </div>
                         <p class="text-[11px] text-slate-300 leading-relaxed text-justify mt-1">
                           {{ spell.description }}
@@ -357,7 +383,9 @@
         <div
           class="mb-12 flex flex-col items-center gap-3 bg-[#171b22] px-6 py-5 rounded-xl border border-slate-800 shadow-lg text-center max-w-xl"
         >
-          <span class="text-3xl opacity-80 drop-shadow-md">🙏</span>
+          <span class="text-3xl opacity-80 drop-shadow-md"
+            ><iconify-icon icon="fluent-emoji:folded-hands"></iconify-icon
+          ></span>
           <p class="text-xs text-slate-300 italic leading-relaxed font-serif">
             "Votre foi ou votre lien avec la nature vous octroie la connaissance absolue."
           </p>

@@ -7,6 +7,7 @@ import {
   signal,
   computed,
   ChangeDetectionStrategy,
+  CUSTOM_ELEMENTS_SCHEMA, // <-- Ajout de l'import
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
@@ -44,6 +45,7 @@ const CLASS_GRANTED_LANGUAGES: Record<string, string> = {
   imports: [CommonModule],
   templateUrl: './languages-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
 })
 export class LanguagesStep implements OnInit {
   private http = inject(HttpClient);

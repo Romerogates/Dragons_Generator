@@ -1,6 +1,13 @@
 // features/character-creation/character-creation.component.ts
 
-import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+  CUSTOM_ELEMENTS_SCHEMA,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CharacterBuilderService } from '../../core/services/character-builder.service';
@@ -35,6 +42,7 @@ import { MagicStep } from './steps/magic-step/magic-step';
   ],
   templateUrl: './character-creation.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
 })
 export class CharacterCreation implements OnInit {
   readonly builder = inject(CharacterBuilderService);

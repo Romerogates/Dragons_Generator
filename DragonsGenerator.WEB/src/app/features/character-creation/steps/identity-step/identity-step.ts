@@ -1,6 +1,14 @@
 // features/character-creation/steps/identity-step/identity-step.ts
 
-import { Component, inject, computed, ChangeDetectionStrategy, signal } from '@angular/core';
+import {
+  Component,
+  inject,
+  computed,
+  ChangeDetectionStrategy,
+  signal,
+  OnInit,
+  CUSTOM_ELEMENTS_SCHEMA,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -16,8 +24,9 @@ import { DataService } from '@core/services/data.service';
   imports: [CommonModule, FormsModule],
   templateUrl: './identity-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
 })
-export class IdentityStep {
+export class IdentityStep implements OnInit {
   readonly builder = inject(CharacterBuilderService);
   readonly dataService = inject(DataService);
   readonly alignments = ALIGNMENTS;
@@ -34,13 +43,19 @@ export class IdentityStep {
     const cr = this.c();
     const parts: string[] = [];
     if (cr.speciesName) {
-      parts.push(cr.subspeciesName ? `${cr.speciesName} (${cr.subspeciesName})` : cr.speciesName);
+      parts.push(cr.speciesName);
     }
-    if (cr.className) parts.push(cr.className);
-    return parts.join(' · ') || 'Personnage';
+    if (cr.className) {
+      parts.push(cr.className);
+    }
+    return parts.join(' · ') || 'Aventurier Inconnu';
   });
 
-  /** Met à jour les champs de l'identité. */
+  ngOnInit(): void {
+    // Fait défiler la page tout en haut de manière fluide à l'arrivée sur l'étape
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   updateField(field: keyof IdentitySelection, value: string): void {
     this.builder.setIdentity({ [field]: value });
   }
@@ -82,7 +97,7 @@ export class IdentityStep {
         },
         error: (err) => {
           console.error('Erreur IA:', err);
-          this.generationError.set("L'IA est momentanément indisponible.");
+          this.generationError.set("L'inspiration vous échappe pour le moment.");
           this.isGenerating.set(false);
         },
       });
