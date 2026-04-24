@@ -1,6 +1,13 @@
 // features/characters/characters.component.ts
 
-import { Component, OnInit, inject, ChangeDetectionStrategy, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  ChangeDetectionStrategy,
+  signal,
+  CUSTOM_ELEMENTS_SCHEMA,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { PdfGeneratorService } from '@core/services/pdf-generator.service';
@@ -12,6 +19,7 @@ import type { Character } from '../../core/models/Character/character';
   imports: [CommonModule, RouterLink],
   templateUrl: './characters.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
 })
 export class Characters implements OnInit {
   private pdfService = inject(PdfGeneratorService);
@@ -88,35 +96,36 @@ export class Characters implements OnInit {
   // === UI HELPERS ===
 
   getClassIcon(className: string): string {
-    if (!className) return '⚔️';
+    if (!className) return 'fluent-emoji:crossed-swords';
     const name = String(className).toLowerCase();
 
-    if (name.includes('barbare')) return '🪓';
-    if (name.includes('barde')) return '🎵';
-    if (name.includes('druide')) return '🌿';
-    if (name.includes('ensorceleur')) return '✨';
-    if (name.includes('magicien') || name.includes('lettré')) return '🔮';
-    if (name.includes('moine')) return '👊';
-    if (name.includes('paladin')) return '🛡️';
-    if (name.includes('prêtre')) return '✝️';
-    if (name.includes('rôdeur')) return '🏹';
-    if (name.includes('roublard')) return '🗡️';
-    if (name.includes('sorcier')) return '👁️';
-    return '⚔️';
+    if (name.includes('barbare')) return 'fluent-emoji:axe';
+    if (name.includes('barde')) return 'fluent-emoji:musical-note';
+    if (name.includes('druide')) return 'fluent-emoji:herb';
+    if (name.includes('ensorceleur')) return 'fluent-emoji:sparkles';
+    if (name.includes('magicien') || name.includes('lettré')) return 'fluent-emoji:crystal-ball';
+    if (name.includes('moine')) return 'fluent-emoji:oncoming-fist';
+    if (name.includes('paladin')) return 'fluent-emoji:shield';
+    if (name.includes('prêtre')) return 'fluent-emoji:latin-cross';
+    if (name.includes('rôdeur')) return 'fluent-emoji:bow-and-arrow';
+    if (name.includes('roublard')) return 'fluent-emoji:dagger';
+    if (name.includes('sorcier')) return 'fluent-emoji:eye';
+    return 'fluent-emoji:crossed-swords';
   }
 
   getSpeciesIcon(speciesName: string): string {
-    if (!speciesName) return '👤';
+    if (!speciesName) return 'fluent-emoji:bust-in-silhouette';
     const name = String(speciesName).toLowerCase();
 
-    if (name.includes('elfe')) return '🧝';
-    if (name.includes('nain')) return '⛏️';
-    if (name.includes('halfelin')) return '🍀';
-    if (name.includes('gnome')) return '🔧';
-    if (name.includes('drakéide')) return '🐲';
-    if (name.includes('tieffelin') || name.includes('mélancolia')) return '😈';
-    if (name.includes('demi-orc') || name.includes('orc')) return '👹';
-    return '👤';
+    if (name.includes('elfe')) return 'fluent-emoji:elf';
+    if (name.includes('nain')) return 'fluent-emoji:pick';
+    if (name.includes('halfelin')) return 'fluent-emoji:four-leaf-clover';
+    if (name.includes('gnome')) return 'fluent-emoji:wrench';
+    if (name.includes('drakéide')) return 'fluent-emoji:dragon-face';
+    if (name.includes('tieffelin') || name.includes('mélancolia'))
+      return 'fluent-emoji:smiling-face-with-horns';
+    if (name.includes('demi-orc') || name.includes('orc')) return 'fluent-emoji:ogre';
+    return 'fluent-emoji:bust-in-silhouette';
   }
 
   formatDate(dateString: string): string {

@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+  CUSTOM_ELEMENTS_SCHEMA,
+} from '@angular/core';
 import { CommonModule, KeyValuePipe } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DataService } from '@core/services/data.service';
@@ -9,6 +16,7 @@ import { DataService } from '@core/services/data.service';
   imports: [CommonModule, KeyValuePipe],
   templateUrl: './character-classes.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
 })
 export class CharacterClasses {
   private readonly dataService = inject(DataService);

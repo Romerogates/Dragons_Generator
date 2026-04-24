@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+  signal,
+  CUSTOM_ELEMENTS_SCHEMA,
+} from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DataService } from '@core/services/data.service';
 
@@ -11,6 +18,7 @@ import { Civilisation } from '@core/models/Civilisations/civilisations';
   imports: [RouterLink],
   templateUrl: './civilisation-by-id.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
 })
 export class CivilisationById implements OnInit {
   // J'ai ajouté 'Component' au nom pour les bonnes pratiques

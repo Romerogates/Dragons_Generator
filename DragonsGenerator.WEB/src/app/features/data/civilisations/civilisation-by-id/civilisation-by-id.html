@@ -9,7 +9,7 @@
 
     @if (isLoading()) {
       <div class="flex flex-col items-center justify-center py-32 animate-pulse text-amber-500">
-        <span class="text-6xl mb-6">📜</span>
+        <span class="text-6xl mb-6"><iconify-icon icon="fluent-emoji:scroll"></iconify-icon></span>
         <p class="text-lg font-serif tracking-widest uppercase text-slate-400">
           Recherche dans les archives...
         </p>
@@ -29,7 +29,9 @@
       <section
         class="bg-[#1b2028] p-8 md:p-10 rounded-3xl border border-slate-800 shadow-xl mb-8 relative overflow-hidden group hover:border-amber-500/30 transition-colors"
       >
-        <div class="absolute top-0 right-0 p-8 text-9xl opacity-5 pointer-events-none">📖</div>
+        <div class="absolute top-0 right-0 p-8 text-9xl opacity-5 pointer-events-none">
+          <iconify-icon icon="fluent-emoji:open-book"></iconify-icon>
+        </div>
 
         <h2
           class="relative z-10 text-2xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-3"
@@ -66,7 +68,10 @@
           <h2
             class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-3"
           >
-            <span class="text-emerald-500">👥</span> Démographie
+            <span class="text-emerald-500"
+              ><iconify-icon icon="fluent-emoji:busts-in-silhouette"></iconify-icon
+            ></span>
+            Démographie
           </h2>
 
           <div class="mb-6">
@@ -90,7 +95,9 @@
             <div
               class="bg-fuchsia-900/10 border border-fuchsia-900/30 p-4 rounded-xl flex items-start gap-4 mt-6"
             >
-              <span class="text-2xl">🌍</span>
+              <span class="text-2xl"
+                ><iconify-icon icon="fluent-emoji:globe-showing-europe-africa"></iconify-icon
+              ></span>
               <div>
                 <p class="text-sm font-bold text-fuchsia-400 mb-1">Cité Cosmopolite</p>
                 <p class="text-xs text-fuchsia-300/60 leading-relaxed">
@@ -107,7 +114,10 @@
           <h2
             class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-3"
           >
-            <span class="text-sky-500">🗣️</span> Linguistique
+            <span class="text-sky-500"
+              ><iconify-icon icon="fluent-emoji:speaking-head"></iconify-icon
+            ></span>
+            Linguistique
           </h2>
 
           <div>
@@ -133,8 +143,8 @@
     } @else {
       <div class="flex flex-col items-center justify-center py-32 text-center">
         <span class="text-7xl mb-6 drop-shadow-[0_0_20px_rgba(220,38,38,0.4)] animate-pulse"
-          >🐉</span
-        >
+          ><iconify-icon icon="fluent-emoji:dragon"></iconify-icon
+        ></span>
         <h2
           class="text-3xl md:text-4xl font-bold text-red-500 font-serif tracking-widest uppercase mb-4"
         >
