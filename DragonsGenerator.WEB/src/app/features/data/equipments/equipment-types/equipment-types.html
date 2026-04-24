@@ -21,7 +21,9 @@
 
     @if (loading()) {
       <div class="flex flex-col items-center justify-center py-20 animate-pulse text-amber-500">
-        <span class="text-6xl mb-4">📁</span>
+        <span class="text-6xl mb-4"
+          ><iconify-icon icon="fluent-emoji:file-folder"></iconify-icon
+        ></span>
         <p class="text-lg font-serif tracking-widest uppercase text-slate-400">
           Inventaire des étals en cours...
         </p>
@@ -38,13 +40,13 @@
             <div
               class="absolute -top-4 -right-4 text-7xl opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-500"
             >
-              {{ getTypeIcon(t) }}
+              <iconify-icon [icon]="getTypeIcon(t)"></iconify-icon>
             </div>
 
             <span
               class="text-5xl mb-4 drop-shadow-[0_0_15px_rgba(245,158,11,0.2)] group-hover:scale-110 transition-transform origin-bottom relative z-10"
             >
-              {{ getTypeIcon(t) }}
+              <iconify-icon [icon]="getTypeIcon(t)"></iconify-icon>
             </span>
             <h2
               class="text-lg font-bold text-slate-300 font-serif tracking-widest uppercase group-hover:text-amber-400 transition-colors relative z-10"

@@ -5,6 +5,7 @@ import {
   inject,
   signal,
   OnInit,
+  CUSTOM_ELEMENTS_SCHEMA, // <-- Ajout du schéma
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -17,6 +18,7 @@ import { Equipment } from '@core/models/Equipments/equipment';
   imports: [CommonModule, RouterLink],
   templateUrl: './equipments-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
 })
 export class EquipmentsList implements OnInit {
   private readonly dataService = inject(DataService);
@@ -67,23 +69,25 @@ export class EquipmentsList implements OnInit {
   }
 
   /**
-   * Retourne une icône stylisée basée sur les vrais Enums (EquipmentType & EquipmentSubtype)
+   * Retourne une icône Iconify stylisée basée sur les vrais Enums (EquipmentType & EquipmentSubtype)
    */
   getTypeIcon(eq: Equipment): string {
     switch (eq.type) {
       case 'WEAPON':
-        return eq.subtype?.includes('RANGED') ? '🏹' : '⚔️';
+        return eq.subtype?.includes('RANGED')
+          ? 'fluent-emoji:bow-and-arrow'
+          : 'fluent-emoji:crossed-swords';
       case 'ARMOR':
-        return eq.subtype === 'SHIELD' ? '🛡️' : '🪖';
+        return eq.subtype === 'SHIELD' ? 'fluent-emoji:shield' : 'fluent-emoji:military-helmet';
       case 'MOUNT':
         const nameMount = eq.name.toLowerCase();
-        if (nameMount.includes('éléphant')) return '🐘';
-        if (nameMount.includes('chameau')) return '🐫';
-        return '🐎';
+        if (nameMount.includes('éléphant')) return 'fluent-emoji:elephant';
+        if (nameMount.includes('chameau')) return 'fluent-emoji:camel';
+        return 'fluent-emoji:horse';
       case 'VEHICLE':
-        if (eq.subtype === 'WATER') return '⛵';
-        if (eq.subtype === 'AIR') return '☁️';
-        return '🛒'; // Véhicules terrestres
+        if (eq.subtype === 'WATER') return 'fluent-emoji:sailboat';
+        if (eq.subtype === 'AIR') return 'fluent-emoji:cloud';
+        return 'fluent-emoji:shopping-cart'; // Véhicules terrestres
       case 'TOOL':
         const nameTool = eq.name.toLowerCase();
         // Instruments de musique
@@ -91,13 +95,13 @@ export class EquipmentsList implements OnInit {
           nameTool.includes('instrument') ||
           nameTool.match(/luth|flûte|tambour|cor|lyre|cornemuse/)
         )
-          return '🪕';
+          return 'fluent-emoji:banjo';
         // Jeux
         if (nameTool.includes('jeu') || nameTool.includes('dés') || nameTool.includes('échecs'))
-          return '🎲';
-        return '🛠️';
+          return 'fluent-emoji:game-die';
+        return 'fluent-emoji:hammer-and-wrench';
       case 'GEAR':
-        if (eq.subtype === 'CONTAINER') return '🎒';
+        if (eq.subtype === 'CONTAINER') return 'fluent-emoji:backpack';
         const nameGear = eq.name.toLowerCase();
         // Alchimie et potions
         if (
@@ -106,21 +110,21 @@ export class EquipmentsList implements OnInit {
           nameGear.includes('acide') ||
           nameGear.includes('feu grégeois')
         )
-          return '🧪';
+          return 'fluent-emoji:test-tube';
         // Papiers et magie
         if (
           nameGear.includes('parchemin') ||
           nameGear.includes('grimoire') ||
           nameGear.includes('carnet')
         )
-          return '📜';
-        return '🧭'; // Matériel générique
+          return 'fluent-emoji:scroll';
+        return 'fluent-emoji:compass'; // Matériel générique
       case 'SERVICE':
         if (eq.name.toLowerCase().includes('repas') || eq.name.toLowerCase().includes('vin'))
-          return '🍺';
-        return '🛏️';
+          return 'fluent-emoji:beer-mug';
+        return 'fluent-emoji:bed';
       default:
-        return '🎒';
+        return 'fluent-emoji:backpack';
     }
   }
 

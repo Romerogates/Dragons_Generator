@@ -16,7 +16,7 @@
 
     @if (isLoading()) {
       <div class="flex flex-col items-center justify-center py-20 animate-pulse text-amber-500">
-        <span class="text-6xl mb-4">🧬</span>
+        <span class="text-6xl mb-4"><iconify-icon icon="fluent-emoji:dna"></iconify-icon></span>
         <p class="text-lg font-serif tracking-widest uppercase text-slate-400">
           Étude des généalogies...
         </p>
@@ -42,7 +42,7 @@
             <div
               class="absolute -top-6 -right-6 text-8xl opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-500"
             >
-              🧬
+              <iconify-icon icon="fluent-emoji:dna"></iconify-icon>
             </div>
 
             <div class="p-6 md:p-8 flex flex-col flex-grow relative z-10">
@@ -68,22 +68,25 @@
 
               <div class="grid grid-cols-2 gap-3 mb-6">
                 <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
-                  <span class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1"
-                    >📏 Taille</span
+                  <span
+                    class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1 flex items-center gap-1"
+                    ><iconify-icon icon="fluent-emoji:straight-ruler"></iconify-icon> Taille</span
                   >
                   <span class="text-xs text-slate-200 font-medium">{{ sp.baseStats.size }}</span>
                 </div>
                 <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
-                  <span class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1"
-                    >🏃 Vitesse</span
+                  <span
+                    class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1 flex items-center gap-1"
+                    ><iconify-icon icon="fluent-emoji:person-running"></iconify-icon> Vitesse</span
                   >
                   <span class="text-xs text-slate-200 font-medium"
                     >{{ sp.baseStats.speedM }} m</span
                   >
                 </div>
                 <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
-                  <span class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1"
-                    >👁️ Vision</span
+                  <span
+                    class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1 flex items-center gap-1"
+                    ><iconify-icon icon="fluent-emoji:eye"></iconify-icon> Vision</span
                   >
                   <span class="text-xs text-slate-200 font-medium">
                     @if (sp.baseStats.darkvisionM > 0) {
@@ -94,8 +97,10 @@
                   </span>
                 </div>
                 <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
-                  <span class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1"
-                    >⏳ Longévité</span
+                  <span
+                    class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1 flex items-center gap-1"
+                    ><iconify-icon icon="fluent-emoji:hourglass-done"></iconify-icon>
+                    Longévité</span
                   >
                   <span class="text-xs text-slate-200 font-medium"
                     >{{ sp.baseStats.age.lifespanYears }} ans</span
@@ -104,8 +109,10 @@
                 <div
                   class="col-span-2 bg-emerald-950/20 border border-emerald-900/30 rounded-lg p-2 flex flex-col"
                 >
-                  <span class="text-[9px] text-emerald-600 uppercase tracking-widest font-bold mb-1"
-                    >✨ Bonus de carac.</span
+                  <span
+                    class="text-[9px] text-emerald-600 uppercase tracking-widest font-bold mb-1 flex items-center gap-1"
+                    ><iconify-icon icon="fluent-emoji:sparkles"></iconify-icon> Bonus de
+                    carac.</span
                   >
                   <span class="text-xs text-emerald-400 font-bold">{{
                     formatAsi(sp.baseStats.abilityScoreIncrease)

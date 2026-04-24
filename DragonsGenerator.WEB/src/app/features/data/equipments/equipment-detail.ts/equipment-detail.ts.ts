@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+  OnInit,
+  CUSTOM_ELEMENTS_SCHEMA,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DataService } from '@core/services/data.service';
@@ -10,6 +17,7 @@ import { Equipment } from '@core/models/Equipments/equipment';
   imports: [CommonModule, RouterLink],
   templateUrl: './equipment-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
 })
 export class EquipmentDetail implements OnInit {
   private dataService = inject(DataService);

@@ -9,7 +9,7 @@
 
     @if (isLoading()) {
       <div class="flex flex-col items-center justify-center py-32 animate-pulse text-amber-500">
-        <span class="text-6xl mb-6">🧬</span>
+        <span class="text-6xl mb-6"><iconify-icon icon="fluent-emoji:dna"></iconify-icon></span>
         <p class="text-lg font-serif tracking-widest uppercase text-slate-400">
           Analyse de la lignée en cours...
         </p>
@@ -17,8 +17,8 @@
     } @else if (error()) {
       <div class="flex flex-col items-center justify-center py-32 text-center">
         <span class="text-7xl mb-6 drop-shadow-[0_0_20px_rgba(220,38,38,0.4)] animate-pulse"
-          >☠️</span
-        >
+          ><iconify-icon icon="fluent-emoji:skull-and-crossbones"></iconify-icon
+        ></span>
         <h2
           class="text-3xl md:text-4xl font-bold text-red-500 font-serif tracking-widest uppercase mb-4"
         >
@@ -55,7 +55,9 @@
       <section
         class="bg-[#1b2028] p-8 md:p-10 rounded-3xl border border-slate-800 shadow-xl mb-8 relative overflow-hidden group hover:border-amber-500/30 transition-colors"
       >
-        <div class="absolute top-0 right-0 p-8 text-9xl opacity-5 pointer-events-none">📖</div>
+        <div class="absolute top-0 right-0 p-8 text-9xl opacity-5 pointer-events-none">
+          <iconify-icon icon="fluent-emoji:open-book"></iconify-icon>
+        </div>
 
         <h2
           class="relative z-10 text-2xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-3"
@@ -73,7 +75,8 @@
               <h3
                 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-3 flex items-center gap-2"
               >
-                <span>🏛️</span> Culture
+                <span><iconify-icon icon="fluent-emoji:classical-building"></iconify-icon></span>
+                Culture
               </h3>
               <p class="text-sm text-slate-400 leading-relaxed">{{ sp.flavor.culture }}</p>
             </div>
@@ -83,7 +86,7 @@
               <h3
                 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-3 flex items-center gap-2"
               >
-                <span>🌱</span> Origines
+                <span><iconify-icon icon="fluent-emoji:seedling"></iconify-icon></span> Origines
               </h3>
               <p class="text-sm text-slate-400 leading-relaxed">{{ sp.flavor.origins }}</p>
             </div>
@@ -112,7 +115,10 @@
         <h2
           class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-3"
         >
-          <span class="text-emerald-500">📊</span> Caractéristiques Communes
+          <span class="text-emerald-500"
+            ><iconify-icon icon="fluent-emoji:bar-chart"></iconify-icon
+          ></span>
+          Caractéristiques Communes
         </h2>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -197,12 +203,14 @@
               Mensurations
             </dt>
             <dd class="text-xs text-slate-400 leading-relaxed">
-              <span class="text-slate-300"
-                >📏 <strong>{{ sp.baseStats.height.rangeM || 'Variable' }}</strong></span
+              <span class="text-slate-300 flex items-center gap-1"
+                ><iconify-icon icon="fluent-emoji:straight-ruler"></iconify-icon>
+                <strong>{{ sp.baseStats.height.rangeM || 'Variable' }}</strong></span
               >
               : {{ sp.baseStats.height.desc }}<br />
-              <span class="text-slate-300 mt-1 inline-block"
-                >⚖️ <strong>{{ sp.baseStats.weight.rangeKg || 'Variable' }}</strong></span
+              <span class="text-slate-300 mt-1 inline-flex items-center gap-1"
+                ><iconify-icon icon="fluent-emoji:balance-scale"></iconify-icon>
+                <strong>{{ sp.baseStats.weight.rangeKg || 'Variable' }}</strong></span
               >
               : {{ sp.baseStats.weight.desc }}
             </dd>
@@ -244,7 +252,10 @@
               <h2
                 class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-3"
               >
-                <span class="text-amber-500">✨</span> Traits Inné(s) ({{ sp.traits.length }})
+                <span class="text-amber-500"
+                  ><iconify-icon icon="fluent-emoji:sparkles"></iconify-icon
+                ></span>
+                Traits Inné(s) ({{ sp.traits.length }})
               </h2>
 
               <div class="space-y-6">
@@ -283,7 +294,10 @@
             <h2
               class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-3"
             >
-              <span class="text-sky-500">🗣️</span> Langues
+              <span class="text-sky-500"
+                ><iconify-icon icon="fluent-emoji:speaking-head"></iconify-icon
+              ></span>
+              Langues
             </h2>
 
             <div class="space-y-4">
@@ -307,7 +321,9 @@
                 <div
                   class="bg-sky-950/20 border border-sky-900/30 rounded-xl p-4 flex items-center gap-3"
                 >
-                  <span class="text-2xl">🌍</span>
+                  <span class="text-2xl"
+                    ><iconify-icon icon="fluent-emoji:globe-showing-europe-africa"></iconify-icon
+                  ></span>
                   <div>
                     <span
                       class="block text-[10px] text-sky-500 uppercase tracking-widest font-bold mb-1"
@@ -352,9 +368,10 @@
               <h2
                 class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-3"
               >
-                <span class="text-fuchsia-500">🛠️</span> Choix de Création ({{
-                  sp.creationChoices.length
-                }})
+                <span class="text-fuchsia-500"
+                  ><iconify-icon icon="fluent-emoji:hammer-and-wrench"></iconify-icon
+                ></span>
+                Choix de Création ({{ sp.creationChoices.length }})
               </h2>
 
               <div class="space-y-6">
@@ -458,7 +475,10 @@
           <h2
             class="text-2xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-8 flex items-center gap-3"
           >
-            <span class="text-indigo-500">🧬</span> Sous-espèces ({{ sp.subspecies.length }})
+            <span class="text-indigo-500"
+              ><iconify-icon icon="fluent-emoji:dna"></iconify-icon
+            ></span>
+            Sous-espèces ({{ sp.subspecies.length }})
           </h2>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -555,7 +575,10 @@
             <h2
               class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-3"
             >
-              <span class="text-amber-600">🏰</span> Liens Civilisationnels
+              <span class="text-amber-600"
+                ><iconify-icon icon="fluent-emoji:castle"></iconify-icon
+              ></span>
+              Liens Civilisationnels
             </h2>
             <div class="space-y-4">
               @for (link of sp.civilizationLinks; track link.id) {
@@ -575,7 +598,10 @@
             <h2
               class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-3"
             >
-              <span class="text-slate-500">⚙️</span> Règles Optionnelles
+              <span class="text-slate-500"
+                ><iconify-icon icon="fluent-emoji:gear"></iconify-icon
+              ></span>
+              Règles Optionnelles
             </h2>
             <div class="space-y-4">
               @for (rule of sp.optionalRules; track rule.id) {

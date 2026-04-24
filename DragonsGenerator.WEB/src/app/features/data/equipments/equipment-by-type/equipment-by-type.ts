@@ -5,6 +5,7 @@ import {
   signal,
   computed,
   OnInit,
+  CUSTOM_ELEMENTS_SCHEMA, // <-- Ajout du schéma
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -17,6 +18,7 @@ import { Equipment } from '@core/models/Equipments/equipment';
   imports: [CommonModule, RouterLink],
   templateUrl: './equipment-by-type.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
 })
 export class EquipmentsByType implements OnInit {
   private dataService = inject(DataService);
@@ -119,21 +121,27 @@ export class EquipmentsByType implements OnInit {
   getTypeIcon(eq: Equipment): string {
     switch (eq.type) {
       case 'WEAPON':
-        return eq.subtype?.includes('RANGED') ? '🏹' : '⚔️';
+        return eq.subtype?.includes('RANGED')
+          ? 'fluent-emoji:bow-and-arrow'
+          : 'fluent-emoji:crossed-swords';
       case 'ARMOR':
-        return eq.subtype === 'SHIELD' ? '🛡️' : '🪖';
+        return eq.subtype === 'SHIELD' ? 'fluent-emoji:shield' : 'fluent-emoji:military-helmet';
       case 'MOUNT':
-        return '🐎';
+        return 'fluent-emoji:horse';
       case 'VEHICLE':
-        return eq.subtype === 'WATER' ? '⛵' : eq.subtype === 'AIR' ? '☁️' : '🛒';
+        return eq.subtype === 'WATER'
+          ? 'fluent-emoji:sailboat'
+          : eq.subtype === 'AIR'
+            ? 'fluent-emoji:cloud'
+            : 'fluent-emoji:shopping-cart';
       case 'TOOL':
-        return '🛠️';
+        return 'fluent-emoji:hammer-and-wrench';
       case 'GEAR':
-        return eq.subtype === 'CONTAINER' ? '🎒' : '🧭';
+        return eq.subtype === 'CONTAINER' ? 'fluent-emoji:backpack' : 'fluent-emoji:compass';
       case 'SERVICE':
-        return '🍺';
+        return 'fluent-emoji:beer-mug';
       default:
-        return '🎒';
+        return 'fluent-emoji:backpack';
     }
   }
 }
