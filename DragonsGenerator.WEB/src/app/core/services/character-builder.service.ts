@@ -2,7 +2,6 @@
 
 import { Injectable, signal, computed, effect } from '@angular/core';
 import {
-  // Types principaux
   Character,
   CharacterCreation,
   CharacterSpellcasting,
@@ -17,8 +16,7 @@ import {
   EquipmentSlot,
   Currency,
   SpellInstance,
-
-  // Constantes
+  CatalogRef,
   ABILITY_POINT_COSTS,
   STARTING_POINTS,
   DEFAULT_ABILITY_SCORE,
@@ -27,17 +25,13 @@ import {
   CURRENT_SCHEMA_VERSION,
   ABILITY_KEY_TO_LABEL,
   ABILITY_LABEL_TO_KEY,
-
-  // Helpers
   getAbilityModifier,
   formatModifier,
 } from '../models/Character/character';
 
 // =============================================================================
-// DTOs - interfaces pour les setters (pas de couplage avec les types catalogue)
+// DTOs
 // =============================================================================
-// Les composants d'étape convertissent les données du catalogue en ces DTOs
-// avant d'appeler le service. Ça découple le service de l'API.
 
 export interface SpeciesSelection {
   speciesId: string;
@@ -60,6 +54,36 @@ export interface CivilizationSelection {
   civilizationName: string;
   languages: string[];
   writingSystems: string[];
+}
+
+export interface BackgroundSelection {
+  backgroundId: string;
+  backgroundName: string;
+  backgroundPreset: boolean;
+
+  // Champs gardés temporairement pour la rétrocompatibilité avec background-step
+  skills: string[];
+  tools: string[];
+
+  // NOUVEAU : Transmission des règles de maîtrises (choix possibles)
+  proficiencies?: any;
+
+  languages: string[];
+  bonusLanguageCount: number;
+  equipmentSlots: EquipmentSlot[];
+  equipment: EquipmentInstance[];
+  currency: Currency;
+  privilegeId: string | null;
+  privilegeName: string | null;
+  privilegeDesc: string | null;
+  selectedHandicaps: string[];
+  handicapCompensationType: string | null;
+  backgroundText: string;
+  traits?: string;
+  ideal?: string;
+  bonds?: string;
+  flaws?: string;
+  handicap?: string;
 }
 
 export interface ClassSelection {
@@ -98,7 +122,14 @@ export interface IdentitySelection {
 // ÉTAT INITIAL
 // =============================================================================
 
-const INITIAL_CREATION_STATE: CharacterCreation = {
+// Extension locale pour intégrer les slots d'historique et les règles de maîtrises
+export type ExtendedCharacterCreation = CharacterCreation & {
+  backgroundEquipmentSlots?: EquipmentSlot[];
+  toolEquipmentSlots?: EquipmentSlot[]; // Les slots générés par les choix d'outils
+  backgroundProficiencies?: any; // Les règles de sélection d'historique
+};
+
+const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   // Étape 1 - Espèce
   speciesId: null,
   speciesName: null,
@@ -119,7 +150,25 @@ const INITIAL_CREATION_STATE: CharacterCreation = {
   civilizationLanguages: [],
   civilizationWritingSystems: [],
 
-  // Étape 3 - Classe
+  // Étape 3 - Historique
+  backgroundId: null,
+  backgroundName: null,
+  backgroundPreset: false,
+  backgroundSkills: [],
+  backgroundTools: [],
+  backgroundProficiencies: null,
+  backgroundLanguages: [],
+  backgroundEquipment: [],
+  backgroundEquipmentSlots: [],
+  toolEquipmentSlots: [],
+  backgroundCurrency: { cuivre: 0, argent: 0, or: 0, platine: 0 },
+  privilegeId: null,
+  privilegeName: null,
+  privilegeDesc: null,
+  selectedHandicaps: [],
+  handicapCompensationType: null,
+
+  // Étape 4 - Classe
   classId: null,
   className: null,
   subclassId: null,
@@ -137,7 +186,7 @@ const INITIAL_CREATION_STATE: CharacterCreation = {
   classFeatures: [],
   startingEquipmentSlots: [],
 
-  // Étape 4 - Caractéristiques
+  // Étape 5 - Caractéristiques
   baseAbilities: {
     force: DEFAULT_ABILITY_SCORE,
     dexterite: DEFAULT_ABILITY_SCORE,
@@ -148,18 +197,18 @@ const INITIAL_CREATION_STATE: CharacterCreation = {
   },
   pointsRemaining: STARTING_POINTS,
 
-  // Étape 5 - Compétences
+  // Étape 6 - Compétences
   selectedSkills: [],
 
-  // Étape 6 - Équipement
+  // Étape 7 - Équipement
   selectedEquipment: [],
   currency: { cuivre: 0, argent: 0, or: 0, platine: 0 },
 
-  // Étape 7 - Langues
+  // Étape 8 - Langues
   languages: [],
   bonusLanguageCount: 0,
 
-  // Étape 8 - Identité
+  // Étape 9 - Identité
   name: '',
   description: '',
   background: '',
@@ -171,7 +220,7 @@ const INITIAL_CREATION_STATE: CharacterCreation = {
   handicap: '',
   story: '',
 
-  // Étape 9 - Magie (conditionnel)
+  // Étape 10 - Magie (conditionnel)
   spellcastingDetails: {},
 };
 
@@ -179,7 +228,7 @@ const INITIAL_CREATION_STATE: CharacterCreation = {
 // PERSISTENCE
 // =============================================================================
 
-const STORAGE_KEY = 'dragon_character_builder_v2';
+const STORAGE_KEY = 'dragon_character_builder_v4';
 
 interface StoredState {
   character: CharacterCreation;
@@ -198,23 +247,13 @@ interface EditingRef {
 
 @Injectable({ providedIn: 'root' })
 export class CharacterBuilderService {
-  // =========================================================================
-  // STATE
-  // =========================================================================
-
-  /** État brut du personnage en cours de création. */
-  readonly creation = signal<CharacterCreation>(structuredClone(INITIAL_CREATION_STATE));
-
-  /** Étape courante (1-indexed). */
+  // On utilise notre type étendu ici
+  readonly creation = signal<ExtendedCharacterCreation>(structuredClone(INITIAL_CREATION_STATE));
   readonly currentStep = signal<number>(1);
-
-  /** Référence au personnage en cours d'édition (null = création neuve). */
   private readonly editingRef = signal<EditingRef | null>(null);
 
   constructor() {
     this.loadFromStorage();
-
-    // Sauvegarde automatique à chaque changement
     effect(() => {
       const data: StoredState = {
         character: this.creation(),
@@ -226,40 +265,36 @@ export class CharacterBuilderService {
   }
 
   // =========================================================================
-  // COMPUTED - Dérivées réactives
+  // COMPUTED
   // =========================================================================
 
-  /** Liste des étapes (dynamique : l'étape magie n'apparaît que si la classe lance des sorts). */
   readonly steps = computed(() => {
     const base = [
       { number: 1, title: 'Espèce', icon: '🧬' },
       { number: 2, title: 'Civilisation', icon: '🏰' },
-      { number: 3, title: 'Classe', icon: '⚔️' },
-      { number: 4, title: 'Caractéristiques', icon: '📊' },
-      { number: 5, title: 'Compétences', icon: '🎯' },
-      { number: 6, title: 'Équipement', icon: '🎒' },
-      { number: 7, title: 'Langues', icon: '🗣️' },
+      { number: 3, title: 'Historique', icon: '📖' },
+      { number: 4, title: 'Classe', icon: '⚔️' },
+      { number: 5, title: 'Caractéristiques', icon: '📊' },
+      { number: 6, title: 'Savoirs & Maîtrises', icon: '🎯' }, // Renommé
+      { number: 7, title: 'Équipement', icon: '🎒' },
+      { number: 8, title: 'Langues', icon: '🗣️' },
     ];
 
     if (this.creation().hasSpellcasting) {
-      base.push({ number: 8, title: 'Magie', icon: '✨' });
+      base.push({ number: 9, title: 'Magie', icon: '✨' });
+      base.push({ number: 10, title: 'Identité', icon: '📜' });
+      base.push({ number: 11, title: 'Récapitulatif', icon: '✅' });
+    } else {
       base.push({ number: 9, title: 'Identité', icon: '📜' });
       base.push({ number: 10, title: 'Récapitulatif', icon: '✅' });
-    } else {
-      base.push({ number: 8, title: 'Identité', icon: '📜' });
-      base.push({ number: 9, title: 'Récapitulatif', icon: '✅' });
     }
 
     return base;
   });
 
-  /** Nombre total d'étapes. */
   readonly totalSteps = computed(() => this.steps().length);
-
-  /** Numéro de l'étape récapitulative (9 ou 10 selon la classe). */
   readonly summaryStep = computed(() => this.totalSteps());
 
-  /** Scores finaux = base + bonus raciaux. */
   readonly finalAbilities = computed<AbilityScores>(() => {
     const c = this.creation();
     const base = c.baseAbilities;
@@ -274,7 +309,6 @@ export class CharacterBuilderService {
     };
   });
 
-  /** Modificateurs dérivés des scores finaux. */
   readonly abilityModifiers = computed<AbilityScores>(() => {
     const a = this.finalAbilities();
     return {
@@ -287,50 +321,45 @@ export class CharacterBuilderService {
     };
   });
 
-  /** PV max au niveau 1 = dé de vie max + mod Constitution. */
   readonly hitPointsMax = computed<number>(() => {
     return this.creation().hitDie + this.abilityModifiers().constitution;
   });
 
-  /** Seuil de blessure = moitié des PV max, arrondi au supérieur. */
   readonly woundThreshold = computed<number>(() => {
     return Math.ceil(this.hitPointsMax() / 2);
   });
 
-  /** CA de base (sans armure) = 10 + mod Dextérité. */
   readonly baseArmorClass = computed<number>(() => {
     return 10 + this.abilityModifiers().dexterite;
   });
 
-  /** Initiative = mod Dextérité. */
   readonly initiative = computed<number>(() => {
     return this.abilityModifiers().dexterite;
   });
 
-  /** Perception passive = 10 + mod Sagesse + maîtrise si Perception sélectionnée. */
   readonly passivePerception = computed<number>(() => {
     const mods = this.abilityModifiers();
-    const hasPerception = this.creation().selectedSkills.includes('Perception');
+    // Prend en compte les compétences de classe ET d'historique
+    const hasPerception =
+      this.creation().selectedSkills.includes('skill-perception') ||
+      this.creation().backgroundSkills.includes('skill-perception');
     return 10 + mods.sagesse + (hasPerception ? 2 : 0);
   });
 
-  /** Validation de l'étape courante. */
   readonly isCurrentStepValid = computed<boolean>(() => {
     return this.isStepValid(this.currentStep());
   });
 
-  /** Indique s'il y a un brouillon en cours avec de la progression. */
   readonly hasPendingDraft = computed<boolean>(() => {
-    const c = this.creation();
-    return c.speciesId !== null;
+    return this.creation().speciesId !== null;
   });
 
-  /** Résumé du brouillon pour l'affichage dans l'overlay. */
   readonly draftSummary = computed<string>(() => {
     const c = this.creation();
     const parts: string[] = [];
     if (c.name) parts.push(c.name);
     if (c.speciesName) parts.push(c.speciesName);
+    if (c.backgroundName) parts.push(c.backgroundName);
     if (c.className) parts.push(c.className);
     return parts.length > 0 ? parts.join(' · ') : 'Brouillon en cours';
   });
@@ -341,7 +370,6 @@ export class CharacterBuilderService {
 
   isStepValid(step: number): boolean {
     const c = this.creation();
-    const summaryNum = this.summaryStep();
 
     switch (step) {
       case 1:
@@ -349,26 +377,25 @@ export class CharacterBuilderService {
       case 2:
         return c.civilizationId !== null;
       case 3:
-        return c.classId !== null;
+        return c.backgroundId !== null;
       case 4:
-        return c.pointsRemaining >= 0;
+        return c.classId !== null;
       case 5:
-        return c.selectedSkills.length === c.skillChooseCount;
+        return c.pointsRemaining >= 0;
       case 6:
-        return true; // L'équipement est optionnel (on peut garder le starter)
+        return true; // Validé en direct sur le composant des maîtrises
       case 7:
-        return c.languages.length > 0;
+        return true;
       case 8:
-        // Magie (si lanceur) ou Identité (sinon)
-        if (c.hasSpellcasting) return true; // magie toujours valide pour l'instant
-        return c.name.trim().length > 0; // identité
-
+        return c.languages.length > 0;
       case 9:
-        // Identité (si lanceur) ou Récap (sinon)
-        if (c.hasSpellcasting) return c.name.trim().length > 0;
-        return true; // récap
+        if (c.hasSpellcasting) return true;
+        return c.name.trim().length > 0;
       case 10:
-        return true; // récapitulatif avec magie
+        if (c.hasSpellcasting) return c.name.trim().length > 0;
+        return true;
+      case 11:
+        return true;
       default:
         return false;
     }
@@ -379,44 +406,67 @@ export class CharacterBuilderService {
   // =========================================================================
 
   setSpecies(selection: SpeciesSelection): void {
-    this.creation.update((c) => ({
-      ...c,
-      speciesId: selection.speciesId,
-      speciesName: selection.speciesName,
-      subspeciesId: selection.subspeciesId,
-      subspeciesName: selection.subspeciesName,
-      racialBonuses: selection.racialBonuses,
-      speciesTraits: selection.traits,
-      speciesSpeed: selection.speed,
-      speciesSize: selection.size,
-      speciesLanguages: selection.languages,
-      speciesResistances: selection.resistances,
-      hasDarkvision: selection.hasDarkvision,
-      darkvisionRadius: selection.darkvisionRadius,
-      bonusLanguageCount: selection.bonusLanguageCount,
-      // Mettre à jour les langues agrégées
-      languages: [...new Set([...selection.languages, ...c.civilizationLanguages])],
-    }));
+    this.creation.update((c) => {
+      const cAny = c as any;
+      const prevSpBonus = cAny._spBonusLang || 0;
+      const newBonusTotal =
+        (c.bonusLanguageCount || 0) - prevSpBonus + selection.bonusLanguageCount;
+
+      const newState: any = {
+        ...c,
+        speciesId: selection.speciesId,
+        speciesName: selection.speciesName,
+        subspeciesId: selection.subspeciesId,
+        subspeciesName: selection.subspeciesName,
+        racialBonuses: selection.racialBonuses,
+        speciesTraits: selection.traits,
+        speciesSpeed: selection.speed,
+        speciesSize: selection.size,
+        speciesLanguages: selection.languages,
+        speciesResistances: selection.resistances,
+        hasDarkvision: selection.hasDarkvision,
+        darkvisionRadius: selection.darkvisionRadius,
+        bonusLanguageCount: newBonusTotal,
+        languages: [
+          ...new Set([
+            ...selection.languages,
+            ...c.civilizationLanguages,
+            ...c.backgroundLanguages,
+          ]),
+        ],
+      };
+
+      newState._spBonusLang = selection.bonusLanguageCount;
+      return newState as ExtendedCharacterCreation;
+    });
   }
 
   clearSpecies(): void {
-    this.creation.update((c) => ({
-      ...c,
-      speciesId: null,
-      speciesName: null,
-      subspeciesId: null,
-      subspeciesName: null,
-      racialBonuses: {},
-      speciesTraits: [],
-      speciesSpeed: 9,
-      speciesSize: 'M' as Size,
-      speciesLanguages: [],
-      speciesResistances: [],
-      hasDarkvision: false,
-      darkvisionRadius: 0,
-      bonusLanguageCount: 0,
-      languages: [...c.civilizationLanguages],
-    }));
+    this.creation.update((c) => {
+      const cAny = c as any;
+      const prevSpBonus = cAny._spBonusLang || 0;
+
+      const newState: any = {
+        ...c,
+        speciesId: null,
+        speciesName: null,
+        subspeciesId: null,
+        subspeciesName: null,
+        racialBonuses: {},
+        speciesTraits: [],
+        speciesSpeed: 9,
+        speciesSize: 'M' as Size,
+        speciesLanguages: [],
+        speciesResistances: [],
+        hasDarkvision: false,
+        darkvisionRadius: 0,
+        bonusLanguageCount: (c.bonusLanguageCount || 0) - prevSpBonus,
+        languages: [...new Set([...c.civilizationLanguages, ...c.backgroundLanguages])],
+      };
+
+      newState._spBonusLang = 0;
+      return newState as ExtendedCharacterCreation;
+    });
   }
 
   // =========================================================================
@@ -430,7 +480,9 @@ export class CharacterBuilderService {
       civilizationName: selection.civilizationName,
       civilizationLanguages: selection.languages,
       civilizationWritingSystems: selection.writingSystems,
-      languages: [...new Set([...c.speciesLanguages, ...selection.languages])],
+      languages: [
+        ...new Set([...c.speciesLanguages, ...selection.languages, ...c.backgroundLanguages]),
+      ],
     }));
   }
 
@@ -441,12 +493,99 @@ export class CharacterBuilderService {
       civilizationName: null,
       civilizationLanguages: [],
       civilizationWritingSystems: [],
-      languages: [...c.speciesLanguages],
+      languages: [...new Set([...c.speciesLanguages, ...c.backgroundLanguages])],
     }));
   }
 
   // =========================================================================
-  // ÉTAPE 3 - CLASSE
+  // ÉTAPE 3 - HISTORIQUE
+  // =========================================================================
+
+  setBackground(selection: BackgroundSelection): void {
+    this.creation.update((c) => {
+      const cAny = c as any;
+      const prevBgBonus = cAny._bgBonusLang || 0;
+      const newBonusTotal =
+        (c.bonusLanguageCount || 0) - prevBgBonus + selection.bonusLanguageCount;
+
+      const newState: ExtendedCharacterCreation = {
+        ...c,
+        backgroundId: selection.backgroundId,
+        backgroundName: selection.backgroundName,
+        backgroundPreset: selection.backgroundPreset,
+
+        // On sauvegarde les RÈGLES de l'historique
+        backgroundProficiencies: selection.proficiencies ?? null,
+
+        // On réinitialise les choix, ils seront faits à l'étape 6
+        backgroundSkills: [],
+        backgroundTools: [],
+        toolEquipmentSlots: [],
+
+        backgroundLanguages: [],
+        backgroundEquipment: [],
+        backgroundEquipmentSlots: selection.equipmentSlots,
+        backgroundCurrency: selection.currency,
+        privilegeId: selection.privilegeId,
+        privilegeName: selection.privilegeName,
+        privilegeDesc: selection.privilegeDesc,
+        selectedHandicaps: selection.selectedHandicaps,
+        handicapCompensationType: selection.handicapCompensationType,
+        background: selection.backgroundText || c.background,
+        traits: selection.traits || c.traits,
+        ideal: selection.ideal || c.ideal,
+        bonds: selection.bonds || c.bonds,
+        flaws: selection.flaws || c.flaws,
+        handicap: selection.handicap || c.handicap,
+        bonusLanguageCount: newBonusTotal,
+        languages: [...new Set([...c.speciesLanguages, ...c.civilizationLanguages])],
+      };
+
+      (newState as any)._bgBonusLang = selection.bonusLanguageCount;
+      return newState;
+    });
+  }
+
+  clearBackground(): void {
+    this.creation.update((c) => {
+      const cAny = c as any;
+      const prevBgBonus = cAny._bgBonusLang || 0;
+
+      const newState: ExtendedCharacterCreation = {
+        ...c,
+        backgroundId: null,
+        backgroundName: null,
+        backgroundPreset: false,
+        backgroundSkills: [],
+        backgroundTools: [],
+        backgroundProficiencies: null,
+        backgroundLanguages: [],
+        backgroundEquipment: [],
+        backgroundEquipmentSlots: [],
+        toolEquipmentSlots: [],
+        backgroundCurrency: { cuivre: 0, argent: 0, or: 0, platine: 0 },
+        privilegeId: null,
+        privilegeName: null,
+        privilegeDesc: null,
+        selectedHandicaps: [],
+        handicapCompensationType: null,
+        background: '',
+        traits: '',
+        ideal: '',
+        bonds: '',
+        flaws: '',
+        handicap: '',
+        bonusLanguageCount: (c.bonusLanguageCount || 0) - prevBgBonus,
+        languages: [...new Set([...c.speciesLanguages, ...c.civilizationLanguages])],
+      };
+
+      (newState as any)._bgBonusLang = 0;
+      return newState;
+    });
+  }
+
+  // =========================================================================
+  // ÉTAPE 4 - CLASSE
   // =========================================================================
 
   setClass(selection: ClassSelection): void {
@@ -468,7 +607,6 @@ export class CharacterBuilderService {
       skillChooseCount: selection.skillChooseCount,
       classFeatures: selection.classFeatures,
       startingEquipmentSlots: selection.startingEquipmentSlots,
-      // Reset des étapes suivantes qui dépendent de la classe
       selectedSkills: [],
       selectedEquipment: [],
       spellcastingDetails: {},
@@ -501,24 +639,41 @@ export class CharacterBuilderService {
   }
 
   // =========================================================================
-  // ÉTAPE 4 - CARACTÉRISTIQUES (Point Buy)
+  // ÉTAPE 6 - SAVOIRS & MAÎTRISES (NOUVEAU)
+  // =========================================================================
+
+  setProficiencies(
+    classSkills: string[],
+    bgSkills: string[],
+    bgTools: string[],
+    toolSlots: EquipmentSlot[],
+  ): void {
+    this.creation.update(
+      (c) =>
+        ({
+          ...c,
+          selectedSkills: classSkills,
+          backgroundSkills: bgSkills,
+          backgroundTools: bgTools,
+          toolEquipmentSlots: toolSlots,
+        }) as ExtendedCharacterCreation,
+    );
+  }
+
+  // =========================================================================
+  // ÉTAPE 5 - CARACTÉRISTIQUES
   // =========================================================================
 
   setAbilityScore(key: AbilityKey, value: number): void {
     if (value < MIN_ABILITY_SCORE || value > MAX_ABILITY_SCORE) return;
-
     const c = this.creation();
-    const currentValue = c.baseAbilities[key];
-    const currentCost = ABILITY_POINT_COSTS[currentValue] ?? 0;
+    const currentCost = ABILITY_POINT_COSTS[c.baseAbilities[key]] ?? 0;
     const newCost = ABILITY_POINT_COSTS[value] ?? 0;
-    const pointsDiff = currentCost - newCost;
-
-    if (c.pointsRemaining + pointsDiff < 0) return;
-
+    if (c.pointsRemaining + currentCost - newCost < 0) return;
     this.creation.update((state) => ({
       ...state,
       baseAbilities: { ...state.baseAbilities, [key]: value },
-      pointsRemaining: state.pointsRemaining + pointsDiff,
+      pointsRemaining: state.pointsRemaining + currentCost - newCost,
     }));
   }
 
@@ -548,7 +703,7 @@ export class CharacterBuilderService {
   }
 
   // =========================================================================
-  // ÉTAPE 5 - COMPÉTENCES
+  // MÉTHODES UTILITAIRES (Compétences, Équipements, Langues...)
   // =========================================================================
 
   toggleSkill(skill: string): void {
@@ -566,10 +721,6 @@ export class CharacterBuilderService {
   clearSkills(): void {
     this.creation.update((c) => ({ ...c, selectedSkills: [] }));
   }
-
-  // =========================================================================
-  // ÉTAPE 6 - ÉQUIPEMENT
-  // =========================================================================
 
   setEquipment(items: EquipmentInstance[]): void {
     this.creation.update((c) => ({ ...c, selectedEquipment: items }));
@@ -596,10 +747,6 @@ export class CharacterBuilderService {
     }));
   }
 
-  // =========================================================================
-  // ÉTAPE 7 - LANGUES
-  // =========================================================================
-
   setLanguages(languages: string[]): void {
     this.creation.update((c) => ({ ...c, languages }));
   }
@@ -618,17 +765,9 @@ export class CharacterBuilderService {
     }));
   }
 
-  // =========================================================================
-  // ÉTAPE 8 - IDENTITÉ
-  // =========================================================================
-
   setIdentity(identity: IdentitySelection): void {
     this.creation.update((c) => ({ ...c, ...identity }));
   }
-
-  // =========================================================================
-  // ÉTAPE 9 (conditionnel) - MAGIE
-  // =========================================================================
 
   setSpellcastingDetails(details: Record<string, unknown>): void {
     this.creation.update((c) => ({ ...c, spellcastingDetails: details }));
@@ -673,15 +812,12 @@ export class CharacterBuilderService {
     return this.editingRef()?.createdAt ?? null;
   }
 
-  /** Charger un personnage sauvegardé dans le wizard pour édition. */
   loadForEdit(savedCharacter: Character): void {
     this.editingRef.set({
       id: savedCharacter.id,
       createdAt: savedCharacter.createdAt,
     });
 
-    // On reconstruit un CharacterCreation à partir du Character
-    // (perd certaines infos calculées, mais garde ce qui est éditable)
     const species = savedCharacter.species;
     this.creation.set({
       speciesId: species.id,
@@ -704,6 +840,23 @@ export class CharacterBuilderService {
       civilizationLanguages: [],
       civilizationWritingSystems: savedCharacter.proficiencies.writingSystems,
 
+      backgroundId: savedCharacter.backgroundRef?.id ?? null,
+      backgroundName: savedCharacter.backgroundRef?.label ?? null,
+      backgroundPreset: savedCharacter.backgroundRef !== null,
+      backgroundSkills: [],
+      backgroundTools: [],
+      backgroundProficiencies: null, // Sera vide en édition
+      backgroundLanguages: [],
+      backgroundEquipment: [],
+      backgroundEquipmentSlots: [],
+      toolEquipmentSlots: [],
+      backgroundCurrency: { cuivre: 0, argent: 0, or: 0, platine: 0 },
+      privilegeId: savedCharacter.privilegeRef?.id ?? null,
+      privilegeName: savedCharacter.privilegeRef?.name ?? null,
+      privilegeDesc: savedCharacter.privilegeRef?.desc ?? null,
+      selectedHandicaps: [],
+      handicapCompensationType: null,
+
       classId: savedCharacter.classes[0]?.classId ?? null,
       className: savedCharacter.classes[0]?.classLabel ?? null,
       subclassId: savedCharacter.classes[0]?.subclassId ?? null,
@@ -725,12 +878,9 @@ export class CharacterBuilderService {
 
       baseAbilities: savedCharacter.abilities,
       pointsRemaining: 0,
-
       selectedSkills: savedCharacter.proficiencies.skills,
-
       selectedEquipment: savedCharacter.equipment,
       currency: savedCharacter.currency,
-
       languages: savedCharacter.proficiencies.languages,
       bonusLanguageCount: 0,
 
@@ -745,7 +895,6 @@ export class CharacterBuilderService {
       handicap: savedCharacter.personality.handicap,
       story: savedCharacter.personality.story,
 
-      // Reconstruire spellcastingDetails depuis knownSpells
       spellcastingDetails:
         savedCharacter.knownSpells.length > 0
           ? {
@@ -771,15 +920,12 @@ export class CharacterBuilderService {
           : {},
     });
 
-    // Aller au récapitulatif
     this.currentStep.set(this.summaryStep());
   }
 
-  /** Vérifier s'il y a un perso à éditer dans le localStorage (navigation depuis /characters). */
   checkForEditMode(): void {
     const editData = localStorage.getItem('dragons-edit-character');
     if (!editData) return;
-
     try {
       const character: Character = JSON.parse(editData);
       this.loadForEdit(character);
@@ -802,7 +948,7 @@ export class CharacterBuilderService {
   }
 
   // =========================================================================
-  // BUILD - Transforme CharacterCreation → Character
+  // BUILD
   // =========================================================================
 
   build(): Character {
@@ -812,30 +958,33 @@ export class CharacterBuilderService {
     const hpMax = this.hitPointsMax();
     const now = new Date().toISOString();
 
-    // --- Spellcasting ---
     const spellcasting = this.buildSpellcasting(c, modifiers);
-
-    // --- Features agrégées ---
     const features: FeatureInstance[] = [...c.speciesTraits, ...c.classFeatures];
-
-    // --- Attaques (dérivées de l'équipement arme) ---
     const attacks = this.buildAttacks(c.selectedEquipment, modifiers);
 
-    // --- Charge ---
-    const totalWeight = c.selectedEquipment.reduce(
-      (sum, item) => sum + (item.wKg ?? 0) * item.qty,
-      0,
-    );
+    // L'équipement physique provient de selectedEquipment.
+    // backgroundEquipment est maintenant déprécié mais conservé pour compatibilité.
+    const allEquipment = [...c.selectedEquipment, ...c.backgroundEquipment];
+    const totalWeight = allEquipment.reduce((sum, item) => sum + (item.wKg ?? 0) * item.qty, 0);
     const maxCarry = abilities.force * 7.5;
 
+    // La monnaie de l'historique a été configurée dans l'étape 3
+    const mergedCurrency: Currency = {
+      cuivre: c.currency.cuivre + c.backgroundCurrency.cuivre,
+      argent: c.currency.argent + c.backgroundCurrency.argent,
+      or: c.currency.or + c.backgroundCurrency.or,
+      platine: c.currency.platine + c.backgroundCurrency.platine,
+    };
+
+    // Les outils d'historique choisis à l'étape 6 sont agrégés ici
+    const allTools = [...new Set([...c.toolProficiencies, ...c.backgroundTools])];
+
     return {
-      // Méta
       id: this.editingRef()?.id ?? crypto.randomUUID(),
       createdAt: this.editingRef()?.createdAt ?? now,
       updatedAt: now,
       schemaVersion: CURRENT_SCHEMA_VERSION,
 
-      // Identité
       name: c.name,
       species: {
         id: c.speciesId!,
@@ -846,6 +995,12 @@ export class CharacterBuilderService {
       },
       size: c.speciesSize,
       civilization: { id: c.civilizationId!, label: c.civilizationName! },
+
+      backgroundRef: c.backgroundId ? { id: c.backgroundId, label: c.backgroundName! } : null,
+      privilegeRef: c.privilegeId
+        ? { id: c.privilegeId, name: c.privilegeName!, desc: c.privilegeDesc! }
+        : null,
+
       classes: [
         {
           classId: c.classId!,
@@ -858,12 +1013,10 @@ export class CharacterBuilderService {
       totalLevel: 1,
       experience: 0,
 
-      // Caractéristiques
       abilities,
       abilityModifiers: modifiers,
       proficiencyBonus: 2,
 
-      // Combat
       vitality: {
         hitPointsMax: hpMax,
         hitPointsCurrent: hpMax,
@@ -875,9 +1028,9 @@ export class CharacterBuilderService {
         inspiration: false,
       },
       defense: {
-        armorClass: this.computeArmorClass(c.selectedEquipment, modifiers),
-        armorType: this.findEquippedArmorName(c.selectedEquipment),
-        hasShield: c.selectedEquipment.some(
+        armorClass: this.computeArmorClass(allEquipment, modifiers),
+        armorType: this.findEquippedArmorName(allEquipment),
+        hasShield: allEquipment.some(
           (e) => e.equipped && e.name.toLowerCase().includes('bouclier'),
         ),
         resistances: c.speciesResistances,
@@ -889,7 +1042,6 @@ export class CharacterBuilderService {
       initiative: modifiers.dexterite,
       attacks,
 
-      // Mouvement / Sens
       movement: {
         walk: c.speciesSpeed,
         climb: Math.floor(c.speciesSpeed / 2),
@@ -903,22 +1055,20 @@ export class CharacterBuilderService {
         darkvisionRadius: c.darkvisionRadius,
       },
 
-      // Maîtrises
       proficiencies: {
         armor: c.armorProficiencies,
         weapons: c.weaponProficiencies,
-        tools: c.toolProficiencies,
+        tools: allTools,
         savingThrows: c.savingThrows,
-        skills: c.selectedSkills,
+        skills: [...new Set([...c.selectedSkills, ...c.backgroundSkills])],
         expertiseSkills: [],
         languages: c.languages,
         writingSystems: c.civilizationWritingSystems,
       },
       features,
 
-      // Équipement
-      equipment: c.selectedEquipment,
-      currency: c.currency,
+      equipment: allEquipment,
+      currency: mergedCurrency,
       carryCapacity: {
         currentKg: Math.round(totalWeight * 10) / 10,
         maxKg: maxCarry,
@@ -932,18 +1082,15 @@ export class CharacterBuilderService {
               : 'normal',
       },
 
-      // Incantation
       spellcasting,
       knownSpells: this.buildKnownSpells(c),
-
-      // Divers
       ammunition: [],
       notes: '',
 
-      // Roleplay
       personality: {
         description: c.description,
         background: c.background,
+        backgroundId: c.backgroundId,
         story: c.story,
         awakened: false,
         ideal: c.ideal,
@@ -962,26 +1109,17 @@ export class CharacterBuilderService {
   // BUILD HELPERS (privés)
   // =========================================================================
 
-  /** Construit le bloc spellcasting typé selon le kind. */
   private buildSpellcasting(
     c: CharacterCreation,
     modifiers: AbilityScores,
   ): CharacterSpellcasting | null {
     if (!c.hasSpellcasting || !c.spellcastingKind || !c.spellcastingAbility) return null;
-
     const abilityKey = ABILITY_LABEL_TO_KEY[c.spellcastingAbility];
     const spellMod = modifiers[abilityKey] ?? 0;
     const details = c.spellcastingDetails as
-      | {
-          cantrips?: unknown[];
-          spells?: unknown[];
-        }
+      | { cantrips?: unknown[]; spells?: unknown[] }
       | undefined;
-
-    // Nombre de cantrips choisis
     const cantripCount = Array.isArray(details?.cantrips) ? details.cantrips.length : 0;
-
-    // Emplacements de sorts au niveau 1 par classe
     const LEVEL1_SLOTS: Record<string, { level: number; max: number }[]> = {
       bard: [{ level: 1, max: 2 }],
       wizard: [{ level: 1, max: 2 }],
@@ -989,19 +1127,15 @@ export class CharacterBuilderService {
       cleric: [{ level: 1, max: 2 }],
       druid: [{ level: 1, max: 2 }],
       warlock: [{ level: 1, max: 1 }],
-      ranger: [{ level: 1, max: 0 }], // Sorts au niv 2
-      paladin: [{ level: 1, max: 0 }], // Sorts au niv 2
-      fighter_eldritch_knight: [{ level: 1, max: 0 }], // Sorts au niv 3
+      ranger: [{ level: 1, max: 0 }],
+      paladin: [{ level: 1, max: 0 }],
+      fighter_eldritch_knight: [{ level: 1, max: 0 }],
     };
-
-    // Détecter le focaliseur depuis l'équipement
     const focus = this.detectFocus(c);
-
     const slots = (LEVEL1_SLOTS[c.spellcastingKind] ?? [{ level: 1, max: 2 }]).map((s) => ({
       ...s,
       used: 0,
     }));
-
     const base = {
       ability: c.spellcastingAbility,
       spellSaveDC: 8 + 2 + spellMod,
@@ -1010,7 +1144,6 @@ export class CharacterBuilderService {
       spellSlots: slots,
       cantrips: { max: cantripCount, used: 0 },
     };
-
     switch (c.spellcastingKind) {
       case 'wizard':
         return {
@@ -1076,9 +1209,8 @@ export class CharacterBuilderService {
     }
   }
 
-  /** Détecte un focaliseur dans l'équipement sélectionné. */
   private detectFocus(c: CharacterCreation): string | null {
-    const INSTRUMENT_KEYWORDS = [
+    const KEYWORDS = [
       'luth',
       'lyre',
       'flûte',
@@ -1089,26 +1221,24 @@ export class CharacterBuilderService {
       'cornemuse',
       'bombarde',
       'dulcimer',
+      'baguette',
+      'orbe',
+      'bâton',
+      'cristal',
+      'focaliseur',
+      'symbole sacré',
+      'reliquaire',
+      'amulette',
+      'totem',
+      'gui',
     ];
-    const ARCANE_FOCUS_KEYWORDS = ['baguette', 'orbe', 'bâton', 'cristal', 'focaliseur'];
-    const HOLY_KEYWORDS = ['symbole sacré', 'reliquaire', 'amulette'];
-    const DRUID_KEYWORDS = ['totem', 'bâton', 'gui'];
-
     for (const eq of c.selectedEquipment) {
       const name = eq.name.toLowerCase();
-      // Instruments (barde)
-      if (INSTRUMENT_KEYWORDS.some((k) => name.includes(k))) return eq.name;
-      // Focaliseurs arcaniques (mage, ensorceleur, sorcier)
-      if (ARCANE_FOCUS_KEYWORDS.some((k) => name.includes(k))) return eq.name;
-      // Symbole sacré (prêtre)
-      if (HOLY_KEYWORDS.some((k) => name.includes(k))) return eq.name;
-      // Focaliseur druidique
-      if (DRUID_KEYWORDS.some((k) => name.includes(k))) return eq.name;
+      if (KEYWORDS.some((k) => name.includes(k))) return eq.name;
     }
     return null;
   }
 
-  /** Construit knownSpells à partir de spellcastingDetails. */
   private buildKnownSpells(c: CharacterCreation): SpellInstance[] {
     const details = c.spellcastingDetails as
       | {
@@ -1128,13 +1258,10 @@ export class CharacterBuilderService {
           }[];
         }
       | undefined;
-
     if (!details) return [];
-
     const result: SpellInstance[] = [];
-
-    if (details.cantrips) {
-      for (const s of details.cantrips) {
+    if (details.cantrips)
+      for (const s of details.cantrips)
         result.push({
           refId: s.refId,
           name: s.name,
@@ -1142,11 +1269,8 @@ export class CharacterBuilderService {
           prepared: true,
           effectSummary: s.effectSummary,
         });
-      }
-    }
-
-    if (details.spells) {
-      for (const s of details.spells) {
+    if (details.spells)
+      for (const s of details.spells)
         result.push({
           refId: s.refId,
           name: s.name,
@@ -1154,21 +1278,13 @@ export class CharacterBuilderService {
           prepared: true,
           effectSummary: s.effectSummary,
         });
-      }
-    }
-
     return result;
   }
 
-  /** Dérive les attaques à partir de l'équipement qui a des données d'arme. */
   private buildAttacks(equipment: EquipmentInstance[], modifiers: AbilityScores): Attack[] {
-    const profBonus = 2; // Niveau 1
-
+    const profBonus = 2;
     return equipment
-      .filter((eq) => {
-        const cd = eq.customData as { isWeapon?: boolean } | undefined;
-        return cd?.isWeapon === true;
-      })
+      .filter((eq) => (eq.customData as { isWeapon?: boolean })?.isWeapon === true)
       .map((eq) => {
         const wd = eq.customData as {
           damage: string;
@@ -1176,74 +1292,49 @@ export class CharacterBuilderService {
           properties: string[];
           subtype: string | null;
         };
-
         const props = wd.properties.map((p) => p.toLowerCase());
         const isRanged = props.some((p) => p.includes('projectile') || p.includes('lancer'));
         const isFinesse = props.some((p) => p.includes('finesse'));
-
-        // Déterminer le modificateur de caractéristique
-        let abilityMod: number;
-        if (isRanged) {
-          abilityMod = modifiers.dexterite;
-        } else if (isFinesse) {
-          abilityMod = Math.max(modifiers.force, modifiers.dexterite);
-        } else {
-          abilityMod = modifiers.force;
-        }
-
-        // Bonus d'attaque = mod + maîtrise (on suppose maîtrise pour les armes sélectionnées)
+        let abilityMod = isRanged
+          ? modifiers.dexterite
+          : isFinesse
+            ? Math.max(modifiers.force, modifiers.dexterite)
+            : modifiers.force;
         const attackBonus = abilityMod + profBonus;
-
-        // Dégâts = dés + mod
         const dmgMod = abilityMod >= 0 ? `+${abilityMod}` : `${abilityMod}`;
-        const damage = `${wd.damage}${dmgMod}`;
-
-        // Portée
         const rangeProp = wd.properties.find(
           (p) => p.toLowerCase().includes('projectile') || p.toLowerCase().includes('lancer'),
         );
-        const range = isRanged ? (rangeProp ?? 'Distance') : 'Corps à corps';
-
         return {
           name: eq.name,
           source: 'weapon' as const,
           refId: eq.refId,
           attackBonus,
-          damage,
+          damage: `${wd.damage}${dmgMod}`,
           damageType: wd.damageType,
-          range,
+          range: isRanged ? (rangeProp ?? 'Distance') : 'Corps à corps',
           properties: wd.properties,
         };
       });
   }
 
-  /** Calcule la CA à partir de l'armure équipée. */
   private computeArmorClass(equipment: EquipmentInstance[], modifiers: AbilityScores): number {
-    // Par défaut : 10 + Dex. À affiner quand on aura les données d'armure.
     return 10 + modifiers.dexterite;
   }
 
-  /** Trouve le nom de l'armure portée. */
   private findEquippedArmorName(equipment: EquipmentInstance[]): string {
-    const armor = equipment.find((e) => e.equipped && e.location === 'equipped');
-    // Heuristique simple pour l'instant
-    return armor?.name ?? 'Aucune';
+    return equipment.find((e) => e.equipped && e.location === 'equipped')?.name ?? 'Aucune';
   }
-
-  // =========================================================================
-  // UTILITAIRES EXPOSÉS
-  // =========================================================================
 
   getModifier(score: number): number {
     return getAbilityModifier(score);
   }
-
   formatMod(score: number): string {
     return formatModifier(getAbilityModifier(score));
   }
 
   // =========================================================================
-  // PERSISTENCE (localStorage)
+  // PERSISTENCE
   // =========================================================================
 
   private saveToStorage(data: StoredState): void {
@@ -1258,9 +1349,8 @@ export class CharacterBuilderService {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (!stored) return;
-
       const parsed: StoredState = JSON.parse(stored);
-      if (parsed.character) this.creation.set(parsed.character);
+      if (parsed.character) this.creation.set(parsed.character as any);
       if (parsed.step) this.currentStep.set(parsed.step);
       if (parsed.editing) this.editingRef.set(parsed.editing);
     } catch (e) {

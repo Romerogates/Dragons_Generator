@@ -1,4 +1,6 @@
-<div class="relative w-full flex flex-col items-center animate-fade-in pb-4 select-none">
+<div
+  class="relative w-full flex flex-col items-center animate-fade-in pb-8 select-none min-h-[65vh] justify-center"
+>
   <div class="absolute top-2 left-0 z-50">
     <button
       class="text-sm font-semibold text-slate-400 hover:text-amber-400 transition-colors flex items-center gap-2 px-3 py-2 md:px-4 bg-[#1b2028] rounded-lg border border-slate-700 hover:border-amber-500/50 shadow-lg animate-fade-in"
@@ -9,127 +11,284 @@
     </button>
   </div>
 
-  <div class="text-center mb-4 w-full px-4 mt-2">
-    <h2 class="text-3xl font-extrabold text-amber-500 mb-1 drop-shadow-md tracking-wide font-serif">
-      Savoirs & Maîtrises
+  <div class="text-center mb-8 w-full px-4 mt-2">
+    <h2
+      class="text-3xl font-extrabold text-amber-500 mb-1 drop-shadow-md tracking-wide font-serif flex justify-center items-center gap-3"
+    >
+      <iconify-icon icon="fluent-emoji:direct-hit"></iconify-icon> Savoirs & Maîtrises
     </h2>
     <p class="text-slate-400 text-xs max-w-xl mx-auto italic">
-      Enchâssez les talents que votre héros a développés au cours de sa formation.
+      Enchâssez les talents et les maîtrises que votre héros a développés au cours de sa formation
+      et de son passé.
     </p>
   </div>
 
-  <div class="w-full max-w-6xl px-4 flex flex-col gap-5">
-    <div
-      class="flex flex-col items-center gap-2 p-3 bg-[#171b22] border-2 border-slate-700/80 rounded-2xl shadow-lg relative overflow-hidden"
-    >
-      <div
-        class="absolute inset-0 bg-emerald-500/10 blur-xl transition-opacity duration-700"
-        [ngClass]="remaining() === 0 ? 'opacity-100' : 'opacity-0'"
-      ></div>
+  <div class="w-full max-w-4xl px-4 flex flex-col gap-8">
+    <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+      <div class="flex justify-between items-center mb-2">
+        <h4
+          class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
+        >
+          <iconify-icon icon="fluent-emoji:crossed-swords"></iconify-icon> Compétences de Classe
+        </h4>
+        <span
+          class="text-[10px] font-black uppercase tracking-widest transition-colors duration-300"
+          [ngClass]="classSkillsRemaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
+        >
+          {{ selectedClassSkills().length }} / {{ classSkillChooseCount() }}
+        </span>
+      </div>
+      <p class="text-xs text-slate-500 mb-5">
+        Choisissez {{ classSkillChooseCount() }} compétence(s) liées à votre vocation.
+      </p>
 
-      <span
-        class="text-[9px] uppercase tracking-widest font-black z-10"
-        [ngClass]="remaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
-      >
-        {{ remaining() === 0 ? 'Talents verrouillés ✓' : 'Emplacements de maîtrise' }}
-      </span>
-
-      <div class="flex flex-wrap justify-center gap-3 z-10">
-        @for (skill of selectedSkillsDetails(); track skill.id) {
+      <div class="flex flex-wrap gap-3">
+        @for (skill of classSkillOptions(); track skill.id) {
           <button
-            class="relative w-12 h-12 rounded-full border-2 border-emerald-500 bg-emerald-900/40 shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center justify-center group hover:scale-105 hover:border-red-500 hover:bg-red-900/40 transition-all"
-            (click)="toggle(skill.id)"
+            class="px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition-all duration-200 flex items-center gap-2"
+            [ngClass]="
+              selectedClassSkills().includes(skill.id)
+                ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
+                : selectedBgSkills().includes(skill.id)
+                  ? 'bg-emerald-950/30 border-emerald-800/50 text-emerald-400/50 cursor-not-allowed'
+                  : classSkillsRemaining() === 0
+                    ? 'bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed opacity-40'
+                    : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+            "
+            [disabled]="
+              (!selectedClassSkills().includes(skill.id) && classSkillsRemaining() === 0) ||
+              selectedBgSkills().includes(skill.id)
+            "
+            (click)="toggleClassSkill(skill.id)"
           >
-            <span class="text-xl group-hover:hidden"
-              ><iconify-icon [icon]="skill.icon"></iconify-icon
-            ></span>
-            <span class="text-xl hidden group-hover:block text-red-500">×</span>
+            <iconify-icon [icon]="skill.icon"></iconify-icon>
+            {{ skill.label }}
+            <span
+              class="text-[10px] ml-1 px-1.5 rounded transition-colors"
+              [ngClass]="
+                selectedClassSkills().includes(skill.id)
+                  ? 'bg-emerald-600 text-emerald-950'
+                  : 'bg-slate-800 text-slate-400'
+              "
+            >
+              {{ getModifierForSkill(skill.id) }}
+            </span>
           </button>
-        }
-        @for (empty of emptySlots(); track $index) {
-          <div
-            class="w-12 h-12 rounded-full border-2 border-slate-700 border-dashed bg-[#1b2028] opacity-50 flex items-center justify-center"
-          >
-            <span class="w-2 h-2 rounded-full bg-slate-800"></span>
-          </div>
         }
       </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 items-start">
-      @for (group of groupedSkills(); track group.name) {
-        <div
-          class="bg-[#171b22] border border-slate-700/60 rounded-xl overflow-hidden shadow-md flex flex-col"
+    <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+      <div class="flex justify-between items-center mb-2">
+        <h4
+          class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
         >
-          <div
-            class="bg-[#1b2028] px-2 py-1.5 border-b border-slate-700/50 flex items-center justify-center gap-2"
-          >
-            <span class="text-sm"><iconify-icon [icon]="group.icon"></iconify-icon></span>
-            <span class="text-[9px] font-black uppercase tracking-widest {{ group.colorClass }}">
-              {{ group.name }}
-            </span>
-          </div>
+          <iconify-icon icon="fluent-emoji:scroll"></iconify-icon> Compétences d'Historique
+        </h4>
+        <span
+          class="text-[10px] font-black uppercase tracking-widest transition-colors duration-300"
+          [ngClass]="bgSkillsRemaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
+        >
+          {{ selectedBgSkills().length }} / {{ bgSkillChooseCount() }}
+        </span>
+      </div>
+      <p class="text-xs text-slate-500 mb-5">
+        Choisissez {{ bgSkillChooseCount() }} compétence(s) issues de votre passé.
+      </p>
 
-          <div class="p-1.5 flex flex-col gap-1">
-            @for (skill of group.skills; track skill.id) {
-              <button
-                class="flex items-center justify-between w-full py-1 px-2 rounded border transition-all duration-150 group/btn"
-                [ngClass]="{
-                  'border-emerald-500/50 bg-emerald-900/20': isSelected(skill.id),
-                  'border-transparent hover:bg-[#1b2028] hover:border-slate-600':
-                    !isSelected(skill.id) && canSelect(skill.id),
-                  'opacity-30 cursor-not-allowed grayscale': !canSelect(skill.id),
-                }"
-                [disabled]="!canSelect(skill.id)"
-                (click)="toggle(skill.id)"
+      @if (!isCustomBg()) {
+        <div class="flex flex-wrap gap-3">
+          @for (skill of bgSkillOptions(); track skill.id) {
+            <button
+              class="px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition-all duration-200 flex items-center gap-2"
+              [ngClass]="
+                selectedBgSkills().includes(skill.id)
+                  ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
+                  : selectedClassSkills().includes(skill.id)
+                    ? 'bg-emerald-950/30 border-emerald-800/50 text-emerald-400/50 cursor-not-allowed'
+                    : bgSkillsRemaining() === 0
+                      ? 'bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed opacity-40'
+                      : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+              "
+              [disabled]="
+                (!selectedBgSkills().includes(skill.id) && bgSkillsRemaining() === 0) ||
+                selectedClassSkills().includes(skill.id)
+              "
+              (click)="toggleBgSkill(skill.id)"
+            >
+              <iconify-icon [icon]="skill.icon"></iconify-icon>
+              {{ skill.label }}
+              <span
+                class="text-[10px] ml-1 px-1.5 rounded transition-colors"
+                [ngClass]="
+                  selectedBgSkills().includes(skill.id)
+                    ? 'bg-emerald-600 text-emerald-950'
+                    : 'bg-slate-800 text-slate-400'
+                "
               >
-                <div class="flex items-center gap-2 overflow-hidden">
-                  <span
-                    class="text-xs shrink-0"
-                    [ngClass]="{
-                      'opacity-100': isSelected(skill.id),
-                      'opacity-40': !isSelected(skill.id),
-                    }"
-                  >
-                    <iconify-icon [icon]="skill.icon"></iconify-icon>
-                  </span>
-                  <span
-                    class="text-[11px] font-bold truncate"
-                    [ngClass]="isSelected(skill.id) ? 'text-emerald-400' : 'text-slate-300'"
-                  >
-                    {{ skill.label }}
-                  </span>
-                </div>
-
-                <div
-                  class="text-[9px] font-black px-1 rounded ml-1"
-                  [ngClass]="
-                    isSelected(skill.id)
-                      ? 'bg-emerald-500 text-slate-950'
-                      : 'bg-slate-800 text-slate-500'
-                  "
+                {{ getModifierForSkill(skill.id) }}
+              </span>
+            </button>
+          }
+        </div>
+      } @else {
+        @if (selectedBgSkills().length > 0) {
+          <div class="flex flex-wrap gap-2 mb-4">
+            @for (skill of selectedBgSkills(); track skill) {
+              <span
+                class="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-950/30 border border-emerald-800/50 rounded-full text-emerald-400 text-xs font-bold"
+              >
+                {{ prettifySkill(skill) }}
+                <button
+                  class="text-emerald-600 hover:text-red-400 transition-colors text-sm leading-none"
+                  (click)="removeCustomBgSkill(skill)"
                 >
-                  {{ getModifierForSkill(skill.id) }}
-                </div>
-              </button>
+                  ✕
+                </button>
+              </span>
             }
           </div>
-        </div>
+        }
+        @if (bgSkillsRemaining() > 0) {
+          <div class="flex gap-3">
+            <select
+              [ngModel]="customSkillInput()"
+              (ngModelChange)="customSkillInput.set($event)"
+              class="flex-1 bg-[#171b22] border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-all appearance-none cursor-pointer"
+            >
+              <option value="" disabled selected>Sélectionnez une compétence...</option>
+              @for (skill of bgSkillOptions(); track skill.id) {
+                <option
+                  [value]="skill.id"
+                  [disabled]="
+                    selectedClassSkills().includes(skill.id) ||
+                    selectedBgSkills().includes(skill.id)
+                  "
+                >
+                  {{ skill.label }}
+                </option>
+              }
+            </select>
+            <button
+              class="px-5 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-500 text-xs font-black uppercase tracking-widest hover:bg-amber-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              [disabled]="!customSkillInput()"
+              (click)="addCustomBgSkill()"
+            >
+              Ajouter
+            </button>
+          </div>
+        }
       }
     </div>
 
-    <div class="mt-2">
+    @if (bgToolChoiceGroups().length > 0 || isCustomBg()) {
+      <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+        <div class="flex justify-between items-center mb-2">
+          <h4
+            class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
+          >
+            <iconify-icon icon="fluent-emoji:hammer-and-wrench"></iconify-icon> Maîtrises d'outils
+            et véhicules
+          </h4>
+          @if (isCustomBg()) {
+            <span
+              class="text-[10px] font-black uppercase tracking-widest transition-colors duration-300"
+              [ngClass]="customBgToolsRemaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
+            >
+              {{ selectedBgTools().length }} / {{ customBgToolMax() }}
+            </span>
+          }
+        </div>
+
+        @if (isCustomBg()) {
+          <p class="text-xs text-slate-500 mb-5">
+            Deux maîtrises à répartir librement entre outils et véhicules. (Les langues se
+            choisissent à l'étape suivante).
+          </p>
+          @if (selectedBgTools().length > 0) {
+            <div class="flex flex-wrap gap-2 mb-4">
+              @for (tool of selectedBgTools(); track tool) {
+                <span
+                  class="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-950/30 border border-emerald-800/50 rounded-full text-emerald-400 text-xs font-bold"
+                >
+                  {{ prettifyTool({ id: tool }) }}
+                  <button
+                    class="text-emerald-600 hover:text-red-400 transition-colors text-sm leading-none"
+                    (click)="removeCustomBgTool(tool)"
+                  >
+                    ✕
+                  </button>
+                </span>
+              }
+            </div>
+          }
+          @if (customBgToolsRemaining() > 0) {
+            <div class="flex gap-3">
+              <input
+                type="text"
+                [ngModel]="customToolInput()"
+                (ngModelChange)="customToolInput.set($event)"
+                (keydown.enter)="addCustomBgTool()"
+                placeholder="Outil ou véhicule..."
+                class="flex-1 bg-[#171b22] border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-all"
+              />
+              <button
+                class="px-5 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-500 text-xs font-black uppercase tracking-widest hover:bg-amber-500/20 transition-all"
+                (click)="addCustomBgTool()"
+              >
+                Ajouter
+              </button>
+            </div>
+          }
+        } @else {
+          @for (group of bgToolChoiceGroups(); track group.groupIndex) {
+            <p class="text-xs text-slate-500 mb-4 mt-3">
+              Choisissez {{ group.chooseCount }} maîtrise{{ group.chooseCount > 1 ? 's' : '' }}.
+              @if (group.note) {
+                <span class="italic text-slate-600 ml-1">{{ group.note }}</span>
+              }
+            </p>
+            <div class="flex flex-wrap gap-3 mb-4">
+              @for (opt of group.options; track opt.key) {
+                <button
+                  class="px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition-all duration-200"
+                  [ngClass]="
+                    opt.selected
+                      ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
+                      : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+                  "
+                  (click)="toggleBgTool(opt.key, group)"
+                >
+                  {{ opt.label }}
+                </button>
+              }
+            </div>
+          }
+        }
+      </div>
+    }
+
+    <div class="mt-4 flex flex-col items-center gap-4 w-full">
+      @if (isSelectionComplete()) {
+        <div
+          class="px-6 py-2.5 bg-emerald-950/30 text-emerald-400 border border-emerald-800/50 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-3 shadow-[0_0_15px_rgba(16,185,129,0.1)]"
+        >
+          <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
+          Savoirs et maîtrises définis
+        </div>
+      }
+
       <button
-        class="w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest shadow-md transition-all transform hover:-translate-y-0.5 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+        class="px-14 py-4 rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-lg"
         [ngClass]="
-          remaining() === 0
-            ? 'bg-emerald-500 text-slate-900 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:bg-emerald-400'
-            : 'bg-slate-700 text-slate-500'
+          isSelectionComplete()
+            ? 'bg-amber-500 text-slate-950 hover:bg-amber-400 hover:scale-105 shadow-[0_0_25px_rgba(245,158,11,0.3)]'
+            : 'bg-slate-800 text-slate-500 opacity-50 cursor-not-allowed'
         "
-        [disabled]="remaining() !== 0"
+        [disabled]="!isSelectionComplete()"
         (click)="confirmSelection()"
       >
-        Valider les compétences
+        Forger les maîtrises
       </button>
     </div>
   </div>

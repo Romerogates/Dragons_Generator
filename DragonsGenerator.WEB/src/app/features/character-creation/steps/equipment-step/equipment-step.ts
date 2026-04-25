@@ -92,6 +92,13 @@ const CATEGORY_FILTERS: Record<
     ],
     label: 'Instrument de musique',
   },
+  // NOUVEAU : Matériel de jeu et véhicules
+  'category-gaming-sets': {
+    type: 'TOOL',
+    ids: ['tl-des', 'tl-echecs', 'tl-go', 'tl-jeu-de-cartes', 'tl-osselets'],
+    label: 'Matériel de jeu',
+  },
+  'category-vehicles': { type: 'VEHICLE', label: 'Véhicule' },
   'category-tools': { type: 'TOOL', label: "Outil d'artisan" },
   'category-simple-melee-weapons': {
     type: 'WEAPON',
@@ -147,7 +154,13 @@ export class EquipmentStep implements OnInit {
   readonly resolvedSlots = computed<ResolvedSlot[]>(() => {
     const map = this.catalogMap();
     if (map.size === 0) return [];
-    const rawSlots = this.builder.creation().startingEquipmentSlots as RawSlot[];
+
+    // NOUVEAU : Fusion des slots de Classe et d'Historique
+    const cAny = this.builder.creation() as any;
+    const rawSlots: RawSlot[] = [
+      ...(this.builder.creation().startingEquipmentSlots ?? []),
+      ...(cAny.backgroundEquipmentSlots ?? []),
+    ];
 
     return rawSlots.map((raw) => {
       const isFixed = !!raw.fixed && (!raw.alternatives || raw.alternatives.length === 0);
@@ -287,6 +300,8 @@ export class EquipmentStep implements OnInit {
       if (id.includes('weapon')) return 'fluent-emoji:crossed-swords';
       if (id.includes('focus') || id.includes('holy-symbol')) return 'fluent-emoji:sparkles';
       if (id.includes('instrument')) return 'fluent-emoji:violin';
+      if (id.includes('gaming') || id.includes('game')) return 'fluent-emoji:game-die';
+      if (id.includes('vehicle')) return 'fluent-emoji:horse';
       return 'fluent-emoji:hammer-and-wrench';
     }
     return item.equipment?.type === 'WEAPON'

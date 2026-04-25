@@ -1,0 +1,320 @@
+<div
+  class="relative w-full flex flex-col items-center animate-fade-in py-6 sm:py-10 select-none justify-center min-h-[65vh]"
+>
+  <div class="text-center mb-10 w-full px-4">
+    <h2
+      class="text-4xl font-extrabold text-amber-500 mb-4 drop-shadow-md tracking-wide font-serif flex items-center justify-center gap-3"
+    >
+      <iconify-icon icon="fluent-emoji:scroll"></iconify-icon> Historique
+    </h2>
+    <div
+      class="inline-flex items-center gap-3 px-6 py-2 bg-[#171b22] border border-slate-800 rounded-full shadow-lg"
+    >
+      <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+      <span class="text-slate-300 text-xs font-black uppercase tracking-widest">
+        {{ charSummary() }}
+      </span>
+      <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="flex items-center justify-center py-12">
+      <div
+        class="w-7 h-7 border-2 border-slate-700 border-t-amber-500 rounded-full animate-spin"
+      ></div>
+    </div>
+  }
+
+  @if (error(); as err) {
+    <div class="text-red-400 text-sm text-center py-8">{{ err }}</div>
+  }
+
+  @if (!loading() && !error() && phase() === 'pick') {
+    <div class="w-full max-w-5xl px-4">
+      <p class="text-slate-400 text-sm text-center mb-8 italic max-w-2xl mx-auto">
+        Choisissez l'historique qui définit le passé de votre personnage. Il détermine vos savoirs,
+        votre équipement de départ et un privilège unique.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        @for (bg of backgrounds(); track bg.id) {
+          <button
+            class="group relative flex flex-col p-6 rounded-2xl border-2 transition-all duration-300 bg-[#171b22] text-left cursor-pointer hover:border-amber-500/50 hover:bg-[#1b2028] hover:scale-[1.02]"
+            [ngClass]="{
+              'border-emerald-500 bg-emerald-950/20 shadow-[0_0_25px_rgba(16,185,129,0.15)]':
+                selectedBgId() === bg.id,
+              'border-slate-800': selectedBgId() !== bg.id,
+            }"
+            (click)="selectBackground(bg.id)"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform"
+            >
+              <iconify-icon [icon]="bgIcon(bg.id)"></iconify-icon>
+            </div>
+            <h3 class="text-lg font-bold text-slate-100 mb-2 font-serif">{{ bg.name }}</h3>
+            <p class="text-xs text-slate-400 leading-relaxed line-clamp-3">
+              {{ bg.data.flavor.summary }}
+            </p>
+            <div class="mt-auto pt-4">
+              <span
+                class="text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full"
+                [ngClass]="
+                  bg.data.preset
+                    ? 'bg-amber-500/10 text-amber-500 border border-amber-500/30'
+                    : 'bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/30'
+                "
+              >
+                {{ bg.data.preset ? "Prêt à l'emploi" : 'Personnalisé' }}
+              </span>
+            </div>
+          </button>
+        }
+      </div>
+
+      <div class="flex justify-center mt-10">
+        <button
+          class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-400 transition-colors bg-[#1b2028] px-6 py-2 rounded-full border border-slate-700"
+          (click)="prevStep()"
+        >
+          ← Étape précédente
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (!loading() && !error() && phase() === 'configure' && selectedBg(); as bg) {
+    <div class="w-full max-w-4xl px-4 flex flex-col gap-8 pb-8 animate-fade-in">
+      <button
+        class="self-start text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-400 transition-colors bg-[#1b2028] px-5 py-2 rounded-full border border-slate-700 flex items-center gap-2"
+        (click)="backToPick()"
+      >
+        ← Changer d'historique
+      </button>
+
+      <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+        <div class="flex items-start gap-5 mb-6">
+          <div
+            class="w-14 h-14 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-3xl shrink-0"
+          >
+            <iconify-icon [icon]="bgIcon(bg.id)"></iconify-icon>
+          </div>
+          <div>
+            <h3 class="text-2xl font-bold text-amber-500 font-serif">{{ bg.name }}</h3>
+            <p class="text-sm text-slate-400 mt-1 leading-relaxed">{{ bg.data.flavor.summary }}</p>
+          </div>
+        </div>
+
+        @if (!isCustom() && bg.data.privilege.name) {
+          <div class="bg-amber-500/5 border border-amber-500/20 rounded-xl p-5 mt-2">
+            <p
+              class="text-[10px] font-black uppercase tracking-widest text-amber-600 mb-2 flex items-center gap-2"
+            >
+              <iconify-icon icon="fluent-emoji:key"></iconify-icon> Privilège :
+              {{ bg.data.privilege.name }}
+            </p>
+            <p class="text-xs text-slate-300 leading-relaxed">{{ bg.data.privilege.desc }}</p>
+          </div>
+        }
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div
+          class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl flex flex-col"
+        >
+          <h4
+            class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-4 flex items-center gap-2"
+          >
+            <iconify-icon icon="fluent-emoji:direct-hit"></iconify-icon> Savoirs & Maîtrises
+          </h4>
+          <div
+            class="flex-1 px-4 py-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex flex-col justify-center"
+          >
+            <p class="text-xs text-slate-300 leading-relaxed mb-3">Cet historique vous octroie :</p>
+            <ul
+              class="list-disc list-inside text-sm text-amber-400 font-bold space-y-1.5 ml-2 mb-4"
+            >
+              @if (maxSkills() > 0) {
+                <li>{{ maxSkills() }} compétence(s)</li>
+              }
+              @if (hasToolFixed() || hasToolChoices() || isCustom()) {
+                <li>Des maîtrises d'outils ou véhicules</li>
+              }
+              @if (maxLanguages() > 0) {
+                <li>{{ maxLanguages() }} langue(s) supplémentaire(s)</li>
+              }
+            </ul>
+            <p class="text-xs text-slate-400 italic mt-auto flex items-start gap-2">
+              <span class="text-amber-500"
+                ><iconify-icon icon="fluent-emoji:information"></iconify-icon
+              ></span>
+              Vous ferez ces choix lors des étapes ultérieures dédiées.
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl flex flex-col"
+        >
+          <h4
+            class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-4 flex items-center gap-2"
+          >
+            <iconify-icon icon="fluent-emoji:backpack"></iconify-icon> Équipement de départ
+          </h4>
+          <div
+            class="flex-1 px-4 py-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex flex-col justify-center"
+          >
+            <p class="text-xs text-slate-300 leading-relaxed mb-4">
+              Vous recevrez un paquetage de départ contenant des objets liés à votre passé, ainsi
+              que les outils de votre métier.
+            </p>
+            @if (selectedData()!.equipment.currency.or) {
+              <div
+                class="px-3 py-2 bg-slate-900/50 border border-amber-500/30 rounded-lg inline-flex items-center gap-2 self-start mb-4"
+              >
+                <span class="text-lg"><iconify-icon icon="fluent-emoji:coin"></iconify-icon></span>
+                <span class="text-sm text-amber-400 font-bold"
+                  >{{ selectedData()!.equipment.currency.or }} pièces d'or</span
+                >
+              </div>
+            }
+            <p class="text-xs text-slate-400 italic mt-auto flex items-start gap-2">
+              <span class="text-amber-500"
+                ><iconify-icon icon="fluent-emoji:information"></iconify-icon
+              ></span>
+              Vous forgerez cet inventaire lors de l'étape Équipement.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      @if (isCustom()) {
+        <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+          <h4
+            class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-1 flex items-center gap-2"
+          >
+            <iconify-icon icon="fluent-emoji:key"></iconify-icon> Privilège personnalisé
+          </h4>
+          <p class="text-xs text-slate-500 mb-5">
+            Définissez un avantage narratif unique reflétant le vécu de votre personnage.
+          </p>
+          <div class="flex flex-col gap-4">
+            <input
+              type="text"
+              [ngModel]="customPrivilegeName()"
+              (ngModelChange)="customPrivilegeName.set($event)"
+              placeholder="Nom du privilège..."
+              class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-all"
+            />
+            <textarea
+              [ngModel]="customPrivilegeDesc()"
+              (ngModelChange)="customPrivilegeDesc.set($event)"
+              rows="3"
+              placeholder="Décrivez l'effet de votre privilège..."
+              class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-all resize-none custom-scrollbar"
+            ></textarea>
+          </div>
+        </div>
+      }
+
+      @if (hasPersonalityTables()) {
+        <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+          <h4
+            class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-1 flex items-center gap-2"
+          >
+            <iconify-icon icon="fluent-emoji:game-die"></iconify-icon> Particularités
+            <span class="text-slate-600 normal-case tracking-normal font-normal">(optionnel)</span>
+          </h4>
+          <p class="text-xs text-slate-500 mb-6">Lancez les dés ou choisissez manuellement.</p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            @for (tableType of personalityTableKeys; track tableType) {
+              @if (getTable(tableType); as table) {
+                <div class="flex flex-col gap-3">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-300 flex items-center gap-2">
+                      <iconify-icon [icon]="tableIcon(tableType)"></iconify-icon>
+                      {{ tableLabel(tableType) }}
+                    </span>
+                    <button
+                      class="px-3 py-1 rounded-lg bg-fuchsia-950/40 text-fuchsia-400 border border-fuchsia-900/50 text-[9px] font-black uppercase tracking-widest hover:bg-fuchsia-900/60 transition-all flex items-center gap-1.5"
+                      (click)="rollOnTable(tableType)"
+                    >
+                      <iconify-icon icon="fluent-emoji:game-die"></iconify-icon> {{ table.die }}
+                    </button>
+                  </div>
+                  @if (getSelectedText(tableType); as result) {
+                    <div
+                      class="px-4 py-3 bg-emerald-950/20 border border-emerald-800/40 rounded-xl text-xs text-emerald-300 leading-relaxed animate-fade-in"
+                    >
+                      {{ result }}
+                    </div>
+                  }
+                  <div class="flex flex-col gap-1.5 max-h-40 overflow-y-auto pr-1 custom-scrollbar">
+                    @for (entry of table.entries; track entry.roll) {
+                      <button
+                        class="w-full text-left px-3 py-2 rounded-lg text-[11px] leading-snug transition-all border"
+                        [ngClass]="
+                          isEntrySelected(tableType, entry.text)
+                            ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-300'
+                            : 'bg-slate-900/50 border-slate-800 text-slate-400 hover:border-amber-500/30 hover:text-slate-300'
+                        "
+                        (click)="pickEntry(tableType, entry.text)"
+                      >
+                        <span class="text-slate-600 font-bold mr-1.5">{{ entry.roll }}.</span>
+                        {{ entry.text }}
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      }
+
+      <div class="mt-4 flex flex-col items-center gap-4 w-full">
+        @if (!isConfigValid()) {
+          @for (msg of validationMessages(); track msg) {
+            <div
+              class="px-6 py-2 bg-red-950/20 border border-red-900/50 rounded-full flex items-center gap-3"
+            >
+              <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
+              <span class="text-[10px] font-black uppercase tracking-widest text-red-400/90">{{
+                msg
+              }}</span>
+            </div>
+          }
+        } @else {
+          <div
+            class="px-6 py-2.5 bg-emerald-950/30 text-emerald-400 border border-emerald-800/50 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-3 shadow-[0_0_15px_rgba(16,185,129,0.1)]"
+          >
+            <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
+            Historique prêt
+          </div>
+        }
+
+        <button
+          class="px-14 py-4 rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-lg"
+          [ngClass]="
+            isConfigValid()
+              ? 'bg-amber-500 text-slate-950 hover:bg-amber-400 hover:scale-105 shadow-[0_0_25px_rgba(245,158,11,0.3)]'
+              : 'bg-slate-800 text-slate-500 opacity-50 cursor-not-allowed'
+          "
+          [disabled]="!isConfigValid()"
+          (click)="confirm()"
+        >
+          Valider l'Historique
+        </button>
+
+        <button
+          class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-400 transition-colors bg-[#1b2028] px-6 py-2 rounded-full border border-slate-700 mt-2"
+          (click)="prevStep()"
+        >
+          ← Étape précédente
+        </button>
+      </div>
+    </div>
+  }
+</div>

@@ -14,6 +14,12 @@ import { EquipmentSummary } from '@core/models/Equipments/equipment-summary';
 import { Spell } from '@core/models/Spells/spell';
 import { SpellSummary } from '@core/models/Spells/spell-summary';
 import { GenerateBackstoryRequest, GenerateBackstoryResponse } from '../models/Character/backstory';
+import { Background } from '../models/Backgrounds/background';
+import { BackgroundSummary } from '../models/Backgrounds/background-summary';
+import { Handicap } from '../models/Handicaps/handicap';
+import { HandicapRules } from '../models/Handicaps/handicap-rules';
+import { LanguageSummary } from '../models/Languages/language-summary';
+import { Language } from '../models/Languages/language';
 
 @Injectable({
   providedIn: 'root',
@@ -98,5 +104,51 @@ export class DataService {
   generateBackstory(request: GenerateBackstoryRequest): Observable<GenerateBackstoryResponse> {
     // Fait correspondre la route avec ton endpoint C# : /api/characters/generate-backstory
     return this.http.post<GenerateBackstoryResponse>(`${this.apiUrl}/generate-backstory`, request);
+  }
+
+  getBackgrounds(): Observable<Background[]> {
+    return this.http.get<Background[]>(`${this.apiUrl}/backgrounds`);
+  }
+  getBackgroundsSummary(): Observable<BackgroundSummary[]> {
+    return this.http.get<BackgroundSummary[]>(`${this.apiUrl}/backgrounds/summary`);
+  }
+  getBackgroundById(id: string): Observable<Background> {
+    return this.http.get<Background>(`${this.apiUrl}/backgrounds/${id}`);
+  }
+
+  // === Handicaps ===
+  getHandicaps(): Observable<Handicap[]> {
+    return this.http.get<Handicap[]>(`${this.apiUrl}/handicaps`);
+  }
+  getHandicapById(id: string): Observable<Handicap> {
+    return this.http.get<Handicap>(`${this.apiUrl}/handicaps/${id}`);
+  }
+  getHandicapRules(): Observable<HandicapRules> {
+    return this.http.get<HandicapRules>(`${this.apiUrl}/handicaps/rules`);
+  }
+
+  /** Récupère la liste complète et détaillée de toutes les langues */
+  getLanguages(): Observable<Language[]> {
+    return this.http.get<Language[]>(`${this.apiUrl}/languages`);
+  }
+
+  /** Récupère un résumé allégé de toutes les langues */
+  getLanguagesSummary(): Observable<LanguageSummary[]> {
+    return this.http.get<LanguageSummary[]>(`${this.apiUrl}/languages/summary`);
+  }
+
+  /** Récupère les détails d'une langue spécifique via son ID */
+  getLanguageById(id: string): Observable<Language> {
+    return this.http.get<Language>(`${this.apiUrl}/languages/${id}`);
+  }
+
+  /** Récupère la liste des catégories de langues disponibles (base, exotique, etc.) */
+  getLanguageCategories(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/languages/categories`);
+  }
+
+  /** Récupère toutes les langues appartenant à une catégorie spécifique */
+  getLanguagesByCategory(category: string): Observable<Language[]> {
+    return this.http.get<Language[]>(`${this.apiUrl}/languages/category/${category}`);
   }
 }

@@ -635,8 +635,21 @@ export class PdfGeneratorService {
     pdf.setFontSize(10);
     const p = c.personality;
 
-    if (p.description) this.text(pdf, p.description, 38, 72);
-    if (p.background) this.text(pdf, p.background, 37, 137);
+    // ───────────────────────────────────────────────────────────────────────
+    // NOUVEAU : On utilise this.textWrapped pour que les textes longs
+    // reviennent automatiquement à la ligne.
+    // ───────────────────────────────────────────────────────────────────────
+
+    if (p.description) {
+      // 90mm de large, 4.5mm de hauteur de ligne
+      this.textWrapped(pdf, p.description, 38, 72, 90, 4.5);
+    }
+
+    if (p.background) {
+      // 90mm de large, 4.5mm de hauteur de ligne
+      this.textWrapped(pdf, p.background, 37, 137, 120, 8);
+    }
+
     if (p.ideal) this.text(pdf, p.ideal, 402, 127);
     if (p.traits) this.text(pdf, p.traits, 402, 199);
     if (p.alignment) this.text(pdf, p.alignment, 402, 270);
@@ -651,6 +664,7 @@ export class PdfGeneratorService {
         .replace(/\n/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
+      // Ta configuration d'origine pour l'histoire
       this.textWrapped(pdf, cleanedStory, 72, 441, 97, 8.4);
     }
   }

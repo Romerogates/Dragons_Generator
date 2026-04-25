@@ -2,23 +2,26 @@
 
 import {
   Component,
+  OnInit,
   inject,
+  signal,
   computed,
   ChangeDetectionStrategy,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { CharacterBuilderService } from '../../../../core/services/character-builder.service';
-import { type AbilityKey } from '../../../../core/models/Character/character';
+import { type AbilityKey, EquipmentSlot } from '../../../../core/models/Character/character';
 
-interface SkillInfo {
+export interface SkillInfo {
   id: string;
   label: string;
   ability: string;
   icon: string;
 }
 
-interface SkillGroup {
+export interface SkillGroup {
   name: string;
   abilityKey: AbilityKey;
   icon: string;
@@ -26,7 +29,7 @@ interface SkillGroup {
   skills: SkillInfo[];
 }
 
-const SKILL_MAP: Record<string, SkillInfo> = {
+export const SKILL_MAP: Record<string, SkillInfo> = {
   'skill-acrobaties': {
     id: 'skill-acrobaties',
     label: 'Acrobaties',
@@ -140,95 +143,180 @@ const SKILL_MAP: Record<string, SkillInfo> = {
 @Component({
   selector: 'app-skills-step',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './skills-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class SkillsStep {
+export class SkillsStep implements OnInit {
   readonly builder = inject(CharacterBuilderService);
 
-  readonly availableSkills = computed(() => {
+  // === ÉTATS LOCAUX ===
+  readonly selectedClassSkills = signal<string[]>([]);
+  readonly selectedBgSkills = signal<string[]>([]);
+  readonly selectedBgTools = signal<string[]>([]);
+
+  // Pour les historiques personnalisés
+  readonly customSkillInput = signal<string>('');
+  readonly customToolInput = signal<string>('');
+
+  ngOnInit(): void {
+    const c = this.builder.creation();
+    this.selectedClassSkills.set([...c.selectedSkills]);
+    this.selectedBgSkills.set([...c.backgroundSkills]);
+    this.selectedBgTools.set([...c.backgroundTools]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // === COMPÉTENCES DE CLASSE ===
+  readonly classSkillChooseCount = computed(() => this.builder.creation().skillChooseCount || 0);
+
+  readonly classSkillOptions = computed(() => {
     const options = this.builder.creation().skillOptions;
-    if (!options || options.length === 0) {
-      return Object.values(SKILL_MAP);
-    }
-    // "any" ou "any-skills" = toutes les compétences (Barde, Lettré)
-    if (options.some((o) => o === 'any' || o === 'any-skills')) {
+    if (
+      !options ||
+      options.length === 0 ||
+      options.some((o) => o === 'any' || o === 'any-skills')
+    ) {
       return Object.values(SKILL_MAP);
     }
     return options.map((id) => SKILL_MAP[id]).filter((s) => !!s);
   });
 
-  // === REGROUPEMENT PAR CARACTÉRISTIQUE (Comme sur la feuille) ===
-  readonly groupedSkills = computed<SkillGroup[]>(() => {
-    const available = this.availableSkills();
-    const groups: Omit<SkillGroup, 'skills'>[] = [
-      {
-        name: 'Force',
-        abilityKey: 'force',
-        icon: 'fluent-emoji:flexed-biceps',
-        colorClass: 'text-red-400',
-      },
-      {
-        name: 'Dextérité',
-        abilityKey: 'dexterite',
-        icon: 'fluent-emoji:person-cartwheeling',
-        colorClass: 'text-orange-400',
-      },
-      {
-        name: 'Intelligence',
-        abilityKey: 'intelligence',
-        icon: 'fluent-emoji:brain',
-        colorClass: 'text-blue-400',
-      },
-      {
-        name: 'Sagesse',
-        abilityKey: 'sagesse',
-        icon: 'fluent-emoji:eye',
-        colorClass: 'text-emerald-400',
-      },
-      {
-        name: 'Charisme',
-        abilityKey: 'charisme',
-        icon: 'fluent-emoji:speaking-head',
-        colorClass: 'text-purple-400',
-      },
-    ];
+  readonly classSkillsRemaining = computed(() =>
+    Math.max(0, this.classSkillChooseCount() - this.selectedClassSkills().length),
+  );
 
-    return groups
-      .map((g) => ({
-        ...g,
-        skills: available.filter((s) => s.ability === g.name),
-      }))
-      .filter((g) => g.skills.length > 0);
-  });
-
-  readonly chooseCount = computed(() => this.builder.creation().skillChooseCount || 0);
-  readonly selectedCount = computed(() => this.builder.creation().selectedSkills.length);
-  readonly remaining = computed(() => Math.max(0, this.chooseCount() - this.selectedCount()));
-
-  readonly selectedSkillsDetails = computed<SkillInfo[]>(() => {
-    return this.builder
-      .creation()
-      .selectedSkills.map((id) => SKILL_MAP[id])
-      .filter((s) => !!s);
-  });
-
-  readonly emptySlots = computed<number[]>(() => {
-    return Array(this.remaining()).fill(0);
-  });
-
-  isSelected(skillId: string): boolean {
-    return this.builder.creation().selectedSkills.includes(skillId);
+  toggleClassSkill(skillId: string): void {
+    const current = this.selectedClassSkills();
+    if (current.includes(skillId)) {
+      this.selectedClassSkills.update((arr) => arr.filter((id) => id !== skillId));
+    } else if (
+      current.length < this.classSkillChooseCount() &&
+      !this.selectedBgSkills().includes(skillId)
+    ) {
+      this.selectedClassSkills.update((arr) => [...arr, skillId]);
+    }
   }
 
-  canSelect(skillId: string): boolean {
-    return this.isSelected(skillId) || this.selectedCount() < this.chooseCount();
+  // === COMPÉTENCES D'HISTORIQUE ===
+  readonly bgProf = computed(() => (this.builder.creation() as any).backgroundProficiencies);
+  readonly isCustomBg = computed(() => this.builder.creation().backgroundPreset === false);
+
+  readonly bgSkillChooseCount = computed(() => {
+    if (this.isCustomBg()) return 2;
+    return this.bgProf()?.skills?.chooseCount ?? this.bgProf()?.skills?.choose_count ?? 0;
+  });
+
+  readonly bgSkillOptions = computed(() => {
+    if (this.isCustomBg()) return Object.values(SKILL_MAP);
+    const opts = this.bgProf()?.skills?.options;
+    if (!opts || opts === 'any' || opts.includes('any')) return Object.values(SKILL_MAP);
+    return opts.map((id: string) => SKILL_MAP[id]).filter((s: any) => !!s);
+  });
+
+  readonly bgSkillsRemaining = computed(() =>
+    Math.max(0, this.bgSkillChooseCount() - this.selectedBgSkills().length),
+  );
+
+  toggleBgSkill(skillId: string): void {
+    const current = this.selectedBgSkills();
+    if (current.includes(skillId)) {
+      this.selectedBgSkills.update((arr) => arr.filter((id) => id !== skillId));
+    } else if (
+      current.length < this.bgSkillChooseCount() &&
+      !this.selectedClassSkills().includes(skillId)
+    ) {
+      this.selectedBgSkills.update((arr) => [...arr, skillId]);
+    }
   }
 
-  toggle(skillId: string): void {
-    this.builder.toggleSkill(skillId);
+  addCustomBgSkill(): void {
+    const skill = this.customSkillInput().trim();
+    if (!skill) return;
+    if (this.selectedBgSkills().length >= this.bgSkillChooseCount()) return;
+    if (this.selectedBgSkills().includes(skill) || this.selectedClassSkills().includes(skill))
+      return;
+    this.selectedBgSkills.update((arr) => [...arr, skill]);
+    this.customSkillInput.set('');
+  }
+
+  removeCustomBgSkill(skill: string): void {
+    this.selectedBgSkills.update((arr) => arr.filter((x) => x !== skill));
+  }
+
+  // === OUTILS D'HISTORIQUE ===
+  readonly bgToolChoiceGroups = computed(() => {
+    if (this.isCustomBg()) return [];
+    const choose = this.bgProf()?.tools?.choose || [];
+    return choose.map((group: any, gi: number) => ({
+      groupIndex: gi,
+      chooseCount: group.chooseCount || group.choose_count || 1,
+      note: group.note,
+      options: (group.options || group.category_options || []).map((opt: any) => {
+        const ref = typeof opt === 'string' ? { type: opt, any: true } : opt;
+        const key = this.toolRefKey(ref);
+        return {
+          key,
+          label: this.prettifyTool(ref),
+          selected: this.selectedBgTools().includes(key),
+        };
+      }),
+    }));
+  });
+
+  toggleBgTool(toolKey: string, group: any): void {
+    const current = this.selectedBgTools();
+    if (current.includes(toolKey)) {
+      this.selectedBgTools.update((arr) => arr.filter((x) => x !== toolKey));
+    } else {
+      const selectedInGroup = group.options.filter((o: any) => current.includes(o.key)).length;
+      if (selectedInGroup < group.chooseCount) {
+        this.selectedBgTools.update((arr) => [...arr, toolKey]);
+      }
+    }
+  }
+
+  // Historique Custom : 2 outils max par défaut
+  readonly customBgToolMax = computed(() => 2);
+  readonly customBgToolsRemaining = computed(() =>
+    Math.max(0, this.customBgToolMax() - this.selectedBgTools().length),
+  );
+
+  addCustomBgTool(): void {
+    const tool = this.customToolInput().trim();
+    if (!tool) return;
+    if (this.selectedBgTools().length >= this.customBgToolMax()) return;
+    if (this.selectedBgTools().includes(tool)) return;
+    this.selectedBgTools.update((arr) => [...arr, tool]);
+    this.customToolInput.set('');
+  }
+
+  removeCustomBgTool(tool: string): void {
+    this.selectedBgTools.update((arr) => arr.filter((x) => x !== tool));
+  }
+
+  // === VALIDATION ===
+  readonly isSelectionComplete = computed(() => {
+    if (this.classSkillsRemaining() > 0) return false;
+    if (this.bgSkillsRemaining() > 0) return false;
+
+    if (this.isCustomBg()) {
+      if (this.customBgToolsRemaining() > 0) return false;
+    } else {
+      for (const group of this.bgToolChoiceGroups()) {
+        const selected = group.options.filter((o: any) => o.selected).length;
+        if (selected < group.chooseCount) return false;
+      }
+    }
+    return true;
+  });
+
+  // === HELPERS & REGROUPEMENT POUR L'AFFICHAGE ===
+  isSkillSelected(skillId: string): boolean {
+    return (
+      this.selectedClassSkills().includes(skillId) || this.selectedBgSkills().includes(skillId)
+    );
   }
 
   getModifierForSkill(skillId: string): string {
@@ -238,9 +326,8 @@ export class SkillsStep {
     if (!abilityKey) return '+0';
 
     const mod = this.builder.abilityModifiers()[abilityKey] ?? 0;
-    const prof = this.isSelected(skillId) ? 2 : 0;
+    const prof = this.isSkillSelected(skillId) ? 2 : 0;
     const total = mod + prof;
-
     return total >= 0 ? `+${total}` : `${total}`;
   }
 
@@ -256,7 +343,120 @@ export class SkillsStep {
     return reverseMap[label] ?? null;
   }
 
+  prettifySkill(id: string): string {
+    return (
+      SKILL_MAP[id]?.label ??
+      id
+        .replace(/^skill-/, '')
+        .replace(/-/g, ' ')
+        .replace(/\b\w/g, (c) => c.toUpperCase())
+    );
+  }
+
+  prettifyTool(ref: any): string {
+    if (ref.any) {
+      const labels: Record<string, string> = {
+        instrument: 'Instrument de musique (au choix)',
+        gameSet: 'Matériel de jeu (au choix)',
+        game_set: 'Matériel de jeu (au choix)',
+        tool: "Outil d'artisan (au choix)",
+        vehicle: 'Véhicule (au choix)',
+        language: 'Langue (ignoré ici)',
+      };
+      return labels[ref.type] ?? ref.type;
+    }
+    if (ref.id) {
+      const MAP: Record<string, string> = {
+        'tl-necessaire-de-calligraphie': 'Nécessaire de calligraphie',
+        'tl-necessaire-de-cartographe': 'Nécessaire de cartographe',
+        'tl-necessaire-dherboristerie': "Nécessaire d'herboristerie",
+        'tl-necessaire-dalchimiste': "Nécessaire d'alchimiste",
+        'tl-necessaire-de-deguisement': 'Nécessaire de déguisement',
+        'tl-necessaire-de-faussaire': 'Nécessaire de faussaire',
+        'tl-outils-de-voleur': 'Outils de voleur',
+        'tl-vehicules-terrestres': 'Véhicules terrestres',
+      };
+      return (
+        MAP[ref.id] ??
+        ref.id
+          .replace(/^tl-/, '')
+          .replace(/-/g, ' ')
+          .replace(/\b\w/g, (c: any) => c.toUpperCase())
+      );
+    }
+    return ref.type;
+  }
+
+  toolRefKey(ref: any): string {
+    if (ref.id) return ref.id;
+    return `${ref.type}-any`;
+  }
+
+  // === NAVIGATION ET SAUVEGARDE ===
   confirmSelection(): void {
+    const c = this.builder.creation();
+    const bgProf = (c as any).backgroundProficiencies;
+    const isCustom = c.backgroundPreset === false;
+
+    // 1. Génération des slots d'équipement liés aux outils d'historique
+    const givesToolsAsEq =
+      bgProf?.equipment?.fromToolProficiency ||
+      bgProf?.equipment?.from_tool_proficiency ||
+      isCustom;
+    const bgSlots: EquipmentSlot[] = [];
+    let slotIndex = 200; // On commence à 200 pour éviter toute collision avec l'équipement fixe (100) ou de classe (1)
+
+    if (givesToolsAsEq) {
+      const toolsToGive = [
+        ...(bgProf?.tools?.fixed?.map((t: any) => t.id || t.type + '-any') ?? []),
+        ...this.selectedBgTools(),
+      ];
+
+      for (const tool of toolsToGive) {
+        if (!tool || tool.includes('language')) continue; // Les langues ne sont pas du matériel physique
+
+        if (tool === 'instrument-any' || tool === 'instrument') {
+          bgSlots.push({
+            slot: slotIndex++,
+            description: 'Instrument de musique (Maîtrise)',
+            alternatives: [[{ id: 'category-musical-instruments', qty: 1 }]],
+          });
+        } else if (tool === 'gameSet-any' || tool === 'game_set-any' || tool === 'game_set') {
+          bgSlots.push({
+            slot: slotIndex++,
+            description: 'Matériel de jeu (Maîtrise)',
+            alternatives: [[{ id: 'category-gaming-sets', qty: 1 }]],
+          });
+        } else if (tool === 'tool-any' || tool === 'tool') {
+          bgSlots.push({
+            slot: slotIndex++,
+            description: "Outil d'artisan (Maîtrise)",
+            alternatives: [[{ id: 'category-tools', qty: 1 }]],
+          });
+        } else if (tool === 'vehicle-any' || tool === 'vehicle') {
+          bgSlots.push({
+            slot: slotIndex++,
+            description: 'Véhicule (Maîtrise)',
+            alternatives: [[{ id: 'category-vehicles', qty: 1 }]],
+          });
+        } else {
+          bgSlots.push({
+            slot: slotIndex++,
+            description: this.prettifySkill(tool) || 'Outil',
+            fixed: [{ id: tool, qty: 1 }],
+          });
+        }
+      }
+    }
+
+    // 2. Sauvegarde centralisée
+    this.builder.setProficiencies(
+      this.selectedClassSkills(),
+      this.selectedBgSkills(),
+      this.selectedBgTools(),
+      bgSlots,
+    );
+
     this.builder.nextStep();
   }
 

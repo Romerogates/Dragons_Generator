@@ -23,6 +23,7 @@ import { LanguagesStep } from './steps/languages-step/languages-step';
 import { IdentityStep } from './steps/identity-step/identity-step';
 import { SummaryStep } from './steps/summary-step/summary-step';
 import { MagicStep } from './steps/magic-step/magic-step';
+import { BackgroundStep } from './steps/background-step/background-step';
 
 @Component({
   selector: 'app-character-creation',
@@ -31,6 +32,7 @@ import { MagicStep } from './steps/magic-step/magic-step';
     CommonModule,
     SpeciesStep,
     CivilizationStep,
+    BackgroundStep,
     ClassStep,
     AbilitiesStep,
     SkillsStep,

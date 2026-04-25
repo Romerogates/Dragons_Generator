@@ -24,7 +24,7 @@ import { DataService } from '@core/services/data.service';
   imports: [CommonModule, FormsModule],
   templateUrl: './identity-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class IdentityStep implements OnInit {
   readonly builder = inject(CharacterBuilderService);
@@ -38,26 +38,33 @@ export class IdentityStep implements OnInit {
   /** Raccourci vers l'état actuel de la création. */
   readonly c = computed(() => this.builder.creation());
 
-  /** Résumé contextuel (Race · Classe). */
-  readonly charSummary = computed(() => {
-    const cr = this.c();
-    const parts: string[] = [];
-    if (cr.speciesName) {
-      parts.push(cr.speciesName);
-    }
-    if (cr.className) {
-      parts.push(cr.className);
-    }
-    return parts.join(' · ') || 'Aventurier Inconnu';
-  });
-
   ngOnInit(): void {
-    // Fait défiler la page tout en haut de manière fluide à l'arrivée sur l'étape
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  updateField(field: keyof IdentitySelection, value: string): void {
+  /** Résumé du personnage pour le header. */
+  readonly charSummary = computed(() => {
+    const cr = this.c();
+    const parts: string[] = [];
+    if (cr.speciesName) parts.push(cr.speciesName);
+    if (cr.className) parts.push(cr.className);
+    if (cr.backgroundName) parts.push(cr.backgroundName);
+    return parts.join(' · ') || 'Aventurier';
+  });
+
+  /** Met à jour un champ d'identité dans le builder. */
+  updateIdentity(field: keyof IdentitySelection, value: string): void {
     this.builder.setIdentity({ [field]: value });
+  }
+
+  /** Navigation vers l'étape suivante (Récapitulatif). */
+  confirm(): void {
+    this.builder.nextStep();
+  }
+
+  /** Retour vers l'étape précédente. */
+  prevStep(): void {
+    this.builder.previousStep();
   }
 
   /** Appelle l'API pour générer l'histoire. */
@@ -97,19 +104,9 @@ export class IdentityStep implements OnInit {
         },
         error: (err) => {
           console.error('Erreur IA:', err);
-          this.generationError.set("L'inspiration vous échappe pour le moment.");
+          this.generationError.set("L'inspiration cosmique est momentanément indisponible.");
           this.isGenerating.set(false);
         },
       });
-  }
-
-  confirm(): void {
-    if (this.c().name.trim()) {
-      this.builder.nextStep();
-    }
-  }
-
-  prevStep(): void {
-    this.builder.previousStep();
   }
 }

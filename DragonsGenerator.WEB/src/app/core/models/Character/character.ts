@@ -511,6 +511,7 @@ export interface Personality {
   handicap: string;
   madness: string; // Folies
   corruption: CorruptionTracker;
+  backgroundId: string | null; // NOUVEAU - référence structurée vers l'historique
 }
 
 // =============================================================================
@@ -529,6 +530,8 @@ export interface Character {
   species: SpeciesRef;
   size: Size;
   civilization: CatalogRef;
+  backgroundRef: CatalogRef | null;
+  privilegeRef: { id: string; name: string; desc: string } | null;
   classes: ClassRef[]; // Tableau pour rester ouvert au multiclassage futur. Longueur 1 au niveau 1.
   totalLevel: number;
   experience: number;
@@ -600,7 +603,22 @@ export interface CharacterCreation {
   civilizationLanguages: string[];
   civilizationWritingSystems: string[];
 
-  // Étape 3 - Classe
+  // Étape 3 - Historique (NOUVEAU)
+  backgroundId: string | null;
+  backgroundName: string | null;
+  backgroundPreset: boolean;
+  backgroundSkills: string[];
+  backgroundTools: string[];
+  backgroundLanguages: string[];
+  backgroundEquipment: EquipmentInstance[];
+  backgroundCurrency: Currency;
+  privilegeId: string | null;
+  privilegeName: string | null;
+  privilegeDesc: string | null;
+  selectedHandicaps: string[];
+  handicapCompensationType: string | null;
+
+  // Étape 4 - Classe (anciennement 3)
   classId: string | null;
   className: string | null;
   subclassId: string | null;
@@ -616,28 +634,27 @@ export interface CharacterCreation {
   skillOptions: string[];
   skillChooseCount: number;
   classFeatures: FeatureInstance[];
-  /** Choix d'équipement de départ à résoudre (type importé du catalogue). */
   startingEquipmentSlots: EquipmentSlot[];
 
-  // Étape 4 - Caractéristiques
+  // Étape 5 - Caractéristiques (anciennement 4)
   baseAbilities: AbilityScores;
   pointsRemaining: number;
 
-  // Étape 5 - Compétences
+  // Étape 6 - Compétences (anciennement 5)
   selectedSkills: string[];
 
-  // Étape 6 - Équipement
+  // Étape 7 - Équipement (anciennement 6)
   selectedEquipment: EquipmentInstance[];
   currency: Currency;
 
-  // Étape 7 - Langues
+  // Étape 8 - Langues (anciennement 7)
   languages: string[];
   bonusLanguageCount: number;
 
-  // Étape 8 - Identité / Roleplay
+  // Étape 9 - Identité (anciennement 8)
   name: string;
   description: string;
-  background: string;
+  background: string; // texte libre (résumé affiché sur la fiche)
   alignment: string;
   traits: string;
   ideal: string;
@@ -646,7 +663,7 @@ export interface CharacterCreation {
   handicap: string;
   story: string;
 
-  // Étape 9 - Spécifique magie (champs variables selon la classe)
+  // Étape 10 - Magie (conditionnel, anciennement 9)
   spellcastingDetails: Record<string, unknown>;
 }
 

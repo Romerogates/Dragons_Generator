@@ -53,35 +53,38 @@
         <app-civilization-step />
       }
       @case (3) {
-        <app-class-step />
+        <app-background-step />
       }
       @case (4) {
-        <app-abilities-step />
+        <app-class-step />
       }
       @case (5) {
-        <app-skills-step />
+        <app-abilities-step />
       }
       @case (6) {
-        <app-equipment-step />
+        <app-skills-step />
       }
       @case (7) {
-        <app-languages-step />
+        <app-equipment-step />
       }
       @case (8) {
+        <app-languages-step />
+      }
+      @case (9) {
         @if (builder.creation().hasSpellcasting) {
           <app-magic-step />
         } @else {
           <app-identity-step />
         }
       }
-      @case (9) {
+      @case (10) {
         @if (builder.creation().hasSpellcasting) {
           <app-identity-step />
         } @else {
           <app-summary-step />
         }
       }
-      @case (10) {
+      @case (11) {
         <app-summary-step />
       }
       @default {
