@@ -35,6 +35,14 @@ interface CardOption {
   badge?: string;
   icon: string;
 }
+interface FeatureJson {
+  id: string;
+  name: string;
+  level: number;
+  desc: string;
+  rechargeType?: 'unlimited' | 'short_rest' | 'long_rest' | 'special';
+  uses?: { formula: string };
+}
 
 type Phase = 'class' | 'subclass' | 'combat_style' | 'sub_choice';
 
@@ -48,7 +56,7 @@ interface SubclassOption {
   id: string;
   name: string;
   desc: string;
-  features: { id: string; name: string; level: number; desc: string }[];
+  features: FeatureJson[]; // ← remplace l'ancien inline type
   sub_choices?: SubChoice[];
   [key: string]: unknown;
 }
@@ -420,11 +428,15 @@ export class ClassStep implements OnInit {
     const prof = cls.data.proficiencies;
 
     const features: FeatureInstance[] = [];
-    const prog = cls.data.progression.find((p) => p.level === 1);
+    const prog = cls.data.progression.find((p: any) => p.level === 1);
+
+    // --- Features de classe (niveau 1) ---
     if (prog?.features) {
-      prog.features.forEach((id) => {
-        const feat = cls.data.features_details?.find((f) => f.id === id);
-        if (feat)
+      prog.features.forEach((id: string) => {
+        const feat = cls.data.features_details?.find((f: any) => f.id === id) as
+          | FeatureJson
+          | undefined;
+        if (feat) {
           features.push({
             refId: feat.id,
             name: feat.name,
@@ -432,10 +444,13 @@ export class ClassStep implements OnInit {
             source: 'class',
             sourceDetail: `${cls.name} 1`,
             level: 1,
+            uses: this.buildFeatureUses(feat),
           });
+        }
       });
     }
 
+    // --- Features de sous-classe (niveau 1) ---
     if (sub) {
       sub.features
         .filter((f) => f.level <= 1)
@@ -447,10 +462,12 @@ export class ClassStep implements OnInit {
             source: 'subclass',
             sourceDetail: `${sub.name} 1`,
             level: 1,
+            uses: this.buildFeatureUses(feat),
           });
         });
     }
 
+    // --- Style de combat (inchangé, pas de uses) ---
     const combatStyle = COMBAT_STYLES.find((s) => s.id === this.selectedCombatStyleId());
     if (combatStyle) {
       features.push({
@@ -463,6 +480,7 @@ export class ClassStep implements OnInit {
       });
     }
 
+    // --- Le reste de la méthode est identique ---
     const selection: ClassSelection = {
       classId: cls.id,
       className: cls.name,
@@ -484,7 +502,6 @@ export class ClassStep implements OnInit {
 
     this.builder.setClass(selection);
 
-    // Passe à l'étape suivante instantanément (léger délai pour laisser le builder se mettre à jour)
     setTimeout(() => {
       this.builder.nextStep();
     }, 150);
@@ -536,5 +553,60 @@ export class ClassStep implements OnInit {
 
   getSubChoiceLabel(choiceType: string, value: string): string {
     return value.charAt(0).toUpperCase() + value.slice(1).replace(/-/g, ' ');
+  }
+  /**
+   * Convertit les champs rechargeType/uses du JSON en FeatureInstance.uses.
+   * Pour le niveau 1, on résout les formules simples.
+   * Les formules complexes (table:X, etc.) seront résolues plus tard.
+   */
+  private buildFeatureUses(feat: FeatureJson): FeatureInstance['uses'] | undefined {
+    // Pas de rechargeType ou unlimited sans uses → pas de bloc uses
+    if (!feat.rechargeType) return undefined;
+    if (feat.rechargeType === 'unlimited' && !feat.uses) return undefined;
+
+    const recharge = feat.rechargeType as 'unlimited' | 'short_rest' | 'long_rest';
+
+    // Si pas de uses défini mais rechargeType limité → on ne connaît pas le max
+    // (ex: Rage acharnée = short_rest sans compteur propre)
+    if (!feat.uses) {
+      return { max: 0, current: 0, recharge };
+    }
+
+    const formula = feat.uses.formula;
+    let max = 0;
+
+    // Résolution des formules simples
+    if (/^\d+$/.test(formula)) {
+      // Nombre fixe : "1", "2", "3"
+      max = parseInt(formula, 10);
+    } else if (formula.startsWith('table:')) {
+      // table:Rages → lire dans progression[level].resources
+      const resourceKey = formula.replace('table:', '');
+      const cls = this.selectedClass();
+      if (cls) {
+        const prog = cls.data.progression?.find((p: any) => p.level === 1);
+        const val = prog?.resources?.[resourceKey];
+        if (val !== undefined) {
+          const parsed = parseInt(String(val), 10);
+          max = isNaN(parsed) ? 0 : parsed;
+        }
+      }
+    } else if (formula === 'proficiency_bonus') {
+      max = 2; // Au niveau 1, toujours 2
+    } else if (formula === 'charisma_mod_min1' || formula === 'wisdom_mod_min1') {
+      // On ne connaît pas encore les caractéristiques à cette étape
+      // On stocke 0 et le PDF/la fiche recalculera
+      max = 0;
+    } else if (formula === '1+charisma_mod') {
+      max = 0; // Idem, sera recalculé
+    } else if (formula === 'monk_level' || formula === 'sorcerer_level') {
+      max = 1; // Niveau 1
+    } else if (formula === 'paladin_level*5') {
+      max = 5; // Niveau 1 × 5
+    }
+    // Pour les formules spéciales (1_per_rage, shared:conduit_divin, etc.)
+    // on garde max = 0, elles seront interprétées côté affichage
+
+    return { max, current: max, recharge };
   }
 }

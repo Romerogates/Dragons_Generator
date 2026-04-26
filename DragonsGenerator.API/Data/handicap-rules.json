@@ -1,0 +1,25 @@
+﻿{
+  "max_handicaps": 2,
+  "compensation": {
+    "one_handicap": {
+      "options": [
+        {
+          "type": "ability_increase",
+          "value": 1
+        },
+        {
+          "type": "extra_proficiencies",
+          "count": 2
+        }
+      ]
+    },
+    "two_handicaps": {
+      "options": [
+        {
+          "type": "feat",
+          "note": "Un don au choix, sous réserve de remplir les prérequis. Le meneur peut limiter la liste."
+        }
+      ]
+    }
+  }
+}

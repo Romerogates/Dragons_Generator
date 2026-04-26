@@ -132,11 +132,7 @@
     "data": {
       "dmg_d": "1d6",
       "dmg_t": "perforant",
-      "props": [
-        "prop-legere",
-        "prop-projectiles-9-36",
-        "prop-rechargement"
-      ],
+      "props": ["prop-legere", "prop-projectiles-9-36", "prop-rechargement"],
       "desc": null
     }
   },
@@ -196,10 +192,7 @@
     "data": {
       "dmg_d": "1d6",
       "dmg_t": "perforant",
-      "props": [
-        "prop-deux-mains",
-        "prop-projectiles-24-96"
-      ],
+      "props": ["prop-deux-mains", "prop-projectiles-24-96"],
       "desc": null
     }
   },
@@ -216,11 +209,7 @@
     "data": {
       "dmg_d": "1d8",
       "dmg_t": "perforant",
-      "props": [
-        "prop-deux-mains",
-        "prop-lourde",
-        "prop-projectiles-45-180"
-      ],
+      "props": ["prop-deux-mains", "prop-lourde", "prop-projectiles-45-180"],
       "desc": null
     }
   },
@@ -237,9 +226,7 @@
     "data": {
       "dmg_d": "1d6",
       "dmg_t": "contondant",
-      "props": [
-        "prop-polyvalente-1d8"
-      ],
+      "props": ["prop-polyvalente-1d8"],
       "desc": "Cette arme peut aussi bien s'utiliser à une main qu'à deux mains. Le dé entre parenthèses indique les dégâts à deux mains."
     }
   },
@@ -256,10 +243,7 @@
     "data": {
       "dmg_d": "1d6",
       "dmg_t": "contondant",
-      "props": [
-        "prop-legere",
-        "prop-speciale"
-      ],
+      "props": ["prop-legere", "prop-speciale"],
       "desc": "Fixé au poing (ne peut être désarmé). Sur coup critique : cible étourdie si échec JS CON (DD = dégâts). Désavantage aux tests de DEX tant qu'il est porté."
     }
   },
@@ -276,10 +260,7 @@
     "data": {
       "dmg_d": "1d6",
       "dmg_t": "tranchant",
-      "props": [
-        "prop-finesse",
-        "prop-legere"
-      ],
+      "props": ["prop-finesse", "prop-legere"],
       "desc": null
     }
   },
@@ -296,11 +277,7 @@
     "data": {
       "dmg_d": "1d4",
       "dmg_t": "perforant",
-      "props": [
-        "prop-finesse",
-        "prop-lancer-6-18",
-        "prop-legere"
-      ],
+      "props": ["prop-finesse", "prop-lancer-6-18", "prop-legere"],
       "desc": null
     }
   },
@@ -317,10 +294,7 @@
     "data": {
       "dmg_d": "2d6",
       "dmg_t": "tranchant",
-      "props": [
-        "prop-deux-mains",
-        "prop-lourde"
-      ],
+      "props": ["prop-deux-mains", "prop-lourde"],
       "desc": null
     }
   },
@@ -337,10 +311,7 @@
     "data": {
       "dmg_d": "1d6",
       "dmg_t": "perforant",
-      "props": [
-        "prop-finesse",
-        "prop-legere"
-      ],
+      "props": ["prop-finesse", "prop-legere"],
       "desc": null
     }
   },
@@ -357,9 +328,7 @@
     "data": {
       "dmg_d": "1d8",
       "dmg_t": "tranchant",
-      "props": [
-        "prop-polyvalente-1d10"
-      ],
+      "props": ["prop-polyvalente-1d10"],
       "desc": null
     }
   },
@@ -376,10 +345,7 @@
     "data": {
       "dmg_d": null,
       "dmg_t": null,
-      "props": [
-        "prop-lancer-1-50-4-50",
-        "prop-speciale"
-      ],
+      "props": ["prop-lancer-1-50-4-50", "prop-speciale"],
       "desc": "Entrave créature G ou inférieure. Sans effet sur amorphes ou TG+. Libération : test FOR DD 10 ou 5 dégâts tranchants (CA 10). Une seule attaque par action/bonus/réaction."
     }
   },
@@ -413,10 +379,7 @@
     "data": {
       "dmg_d": "1d4",
       "dmg_t": "perforant",
-      "props": [
-        "prop-finesse",
-        "prop-lancer-6-18"
-      ],
+      "props": ["prop-finesse", "prop-lancer-6-18"],
       "desc": null
     }
   },
@@ -433,10 +396,7 @@
     "data": {
       "dmg_d": "1d4",
       "dmg_t": "tranchant",
-      "props": [
-        "prop-allonge",
-        "prop-finesse"
-      ],
+      "props": ["prop-allonge", "prop-finesse"],
       "desc": null
     }
   },
@@ -453,9 +413,7 @@
     "data": {
       "dmg_d": "1d4",
       "dmg_t": "contondant",
-      "props": [
-        "prop-projectiles-9-36"
-      ],
+      "props": ["prop-projectiles-9-36"],
       "desc": "Une fronde doit être chargée pour infliger des dégâts quand elle est utilisée au corps à corps."
     }
   },
@@ -472,9 +430,7 @@
     "data": {
       "dmg_d": "1d4",
       "dmg_t": "contondant",
-      "props": [
-        "prop-legere"
-      ],
+      "props": ["prop-legere"],
       "desc": null
     }
   },
@@ -491,10 +447,7 @@
     "data": {
       "dmg_d": "1d12",
       "dmg_t": "tranchant",
-      "props": [
-        "prop-deux-mains",
-        "prop-lourde"
-      ],
+      "props": ["prop-deux-mains", "prop-lourde"],
       "desc": null
     }
   },
@@ -511,11 +464,7 @@
     "data": {
       "dmg_d": "1d10",
       "dmg_t": "tranchant",
-      "props": [
-        "prop-allonge",
-        "prop-deux-mains",
-        "prop-lourde"
-      ],
+      "props": ["prop-allonge", "prop-deux-mains", "prop-lourde"],
       "desc": null
     }
   },
@@ -532,9 +481,7 @@
     "data": {
       "dmg_d": "1d8",
       "dmg_t": "tranchant",
-      "props": [
-        "prop-polyvalente-1d10"
-      ],
+      "props": ["prop-polyvalente-1d10"],
       "desc": null
     }
   },
@@ -551,10 +498,7 @@
     "data": {
       "dmg_d": "1d6",
       "dmg_t": "tranchant",
-      "props": [
-        "prop-lancer-6-18",
-        "prop-legere"
-      ],
+      "props": ["prop-lancer-6-18", "prop-legere"],
       "desc": null
     }
   },
@@ -571,11 +515,7 @@
     "data": {
       "dmg_d": "1d10",
       "dmg_t": "tranchant",
-      "props": [
-        "prop-allonge",
-        "prop-deux-mains",
-        "prop-lourde"
-      ],
+      "props": ["prop-allonge", "prop-deux-mains", "prop-lourde"],
       "desc": null
     }
   },
@@ -592,9 +532,7 @@
     "data": {
       "dmg_d": "1d6",
       "dmg_t": "perforant",
-      "props": [
-        "prop-lancer-9-36"
-      ],
+      "props": ["prop-lancer-9-36"],
       "desc": null
     }
   },
@@ -611,10 +549,7 @@
     "data": {
       "dmg_d": "1d6",
       "dmg_t": "perforant",
-      "props": [
-        "prop-lancer-6-18",
-        "prop-polyvalente-1d8"
-      ],
+      "props": ["prop-lancer-6-18", "prop-polyvalente-1d8"],
       "desc": null
     }
   },
@@ -631,10 +566,7 @@
     "data": {
       "dmg_d": "1d12",
       "dmg_t": "perforant",
-      "props": [
-        "prop-allonge",
-        "prop-speciale"
-      ],
+      "props": ["prop-allonge", "prop-speciale"],
       "desc": "Désavantage contre cible à 1,50 m. Se manie à deux mains sauf si le porteur est sur une monture."
     }
   },
@@ -651,10 +583,7 @@
     "data": {
       "dmg_d": "2d6",
       "dmg_t": "contondant",
-      "props": [
-        "prop-deux-mains",
-        "prop-lourde"
-      ],
+      "props": ["prop-deux-mains", "prop-lourde"],
       "desc": null
     }
   },
@@ -671,9 +600,7 @@
     "data": {
       "dmg_d": "1d8",
       "dmg_t": "contondant",
-      "props": [
-        "prop-polyvalente-1d10"
-      ],
+      "props": ["prop-polyvalente-1d10"],
       "desc": null
     }
   },
@@ -690,10 +617,7 @@
     "data": {
       "dmg_d": "1d4",
       "dmg_t": "contondant",
-      "props": [
-        "prop-lancer-6-18",
-        "prop-legere"
-      ],
+      "props": ["prop-lancer-6-18", "prop-legere"],
       "desc": null
     }
   },
@@ -727,9 +651,7 @@
     "data": {
       "dmg_d": "1d8",
       "dmg_t": "contondant",
-      "props": [
-        "prop-deux-mains"
-      ],
+      "props": ["prop-deux-mains"],
       "desc": null
     }
   },
@@ -780,11 +702,7 @@
     "data": {
       "dmg_d": "1d10",
       "dmg_t": "perforant",
-      "props": [
-        "prop-allonge",
-        "prop-deux-mains",
-        "prop-lourde"
-      ],
+      "props": ["prop-allonge", "prop-deux-mains", "prop-lourde"],
       "desc": null
     }
   },
@@ -801,11 +719,7 @@
     "data": {
       "dmg_d": null,
       "dmg_t": null,
-      "props": [
-        "prop-rechargement",
-        "prop-projectiles-24-96",
-        "prop-speciale"
-      ],
+      "props": ["prop-rechargement", "prop-projectiles-24-96", "prop-speciale"],
       "desc": "Permet de lancer des javelines. Dégâts de la javeline projetée : 1d8 + mod. FOR."
     }
   },
@@ -822,9 +736,7 @@
     "data": {
       "dmg_d": "1d8",
       "dmg_t": "perforant",
-      "props": [
-        "prop-finesse"
-      ],
+      "props": ["prop-finesse"],
       "desc": null
     }
   },
@@ -841,10 +753,7 @@
     "data": {
       "dmg_d": "1",
       "dmg_t": "perforant",
-      "props": [
-        "prop-projectiles-7-50-30",
-        "prop-rechargement"
-      ],
+      "props": ["prop-projectiles-7-50-30", "prop-rechargement"],
       "desc": null
     }
   },
@@ -861,9 +770,7 @@
     "data": {
       "dmg_d": "1d4",
       "dmg_t": "tranchant",
-      "props": [
-        "prop-legere"
-      ],
+      "props": ["prop-legere"],
       "desc": null
     }
   },
@@ -880,10 +787,7 @@
     "data": {
       "dmg_d": "1d6",
       "dmg_t": "perforant",
-      "props": [
-        "prop-lancer-6-18",
-        "prop-polyvalente-1d8"
-      ],
+      "props": ["prop-lancer-6-18", "prop-polyvalente-1d8"],
       "desc": null
     }
   },
@@ -2787,6 +2691,193 @@
       "ac": 2,
       "stealth_dis": false,
       "desc": "Bouclier en bois. +2 CA. Utilisable par les druides (pas de métal)."
+    }
+  },
+  {
+    "id": "gr-vetements-ordinaires",
+    "name": "Vêtements ordinaires",
+    "type": "GEAR",
+    "subtype": "CLOTHING",
+    "cost": { "v": 5, "u": "pa" },
+    "w_kg": 1.5,
+    "data": {
+      "desc": "Tenue simple et fonctionnelle du quotidien."
+    }
+  },
+  {
+    "id": "gr-vetements-de-voyage",
+    "name": "Vêtements de voyage",
+    "type": "GEAR",
+    "subtype": "CLOTHING",
+    "cost": { "v": 2, "u": "po" },
+    "w_kg": 2,
+    "data": {
+      "desc": "Vêtements résistants et pratiques adaptés aux longs déplacements."
+    }
+  },
+  {
+    "id": "gr-vetements-raffines",
+    "name": "Vêtements raffinés",
+    "type": "GEAR",
+    "subtype": "CLOTHING",
+    "cost": { "v": 15, "u": "po" },
+    "w_kg": 3,
+    "data": {
+      "desc": "Tenue élégante en tissus de qualité, adaptée aux cercles de la haute société."
+    }
+  },
+  {
+    "id": "gr-vetements-liturgiques",
+    "name": "Vêtements liturgiques",
+    "type": "GEAR",
+    "subtype": "CLOTHING",
+    "cost": { "v": 1, "u": "po" },
+    "w_kg": 2,
+    "data": {
+      "desc": "Robes ou tenue de cérémonie religieuse portée lors des offices."
+    }
+  },
+  {
+    "id": "gr-costume-de-scene",
+    "name": "Costume de scène",
+    "type": "GEAR",
+    "subtype": "CLOTHING",
+    "cost": { "v": 5, "u": "po" },
+    "w_kg": 2,
+    "data": {
+      "desc": "Tenue bariolée et voyante destinée aux représentations artistiques."
+    }
+  },
+  {
+    "id": "gr-vetement-voyant",
+    "name": "Vêtement ou ustensile voyant et singulier",
+    "type": "GEAR",
+    "subtype": "CLOTHING",
+    "cost": { "v": 2, "u": "po" },
+    "w_kg": 1,
+    "data": {
+      "desc": "Accessoire vestimentaire ostentatoire servant à affirmer sa prestance (cicatrice exhibée, cape colorée, bijou clinquant, etc.)."
+    }
+  },
+  {
+    "id": "gr-livre-de-prieres",
+    "name": "Livre de prières",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": { "v": 1, "u": "po" },
+    "w_kg": 0.25,
+    "data": {
+      "desc": "Recueil de prières, psaumes et textes sacrés d'une religion donnée."
+    }
+  },
+  {
+    "id": "gr-batons-encens",
+    "name": "Bâtons d'encens",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": { "v": 1, "u": "pa" },
+    "w_kg": null,
+    "data": {
+      "desc": "Bâtonnet d'encens parfumé utilisé dans les rituels religieux. Prix et poids par bâton."
+    }
+  },
+  {
+    "id": "gr-couverture",
+    "name": "Couverture",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": { "v": 5, "u": "pa" },
+    "w_kg": 1.5,
+    "data": {
+      "desc": "Couverture épaisse en laine ou en fourrure pour se protéger du froid."
+    }
+  },
+  {
+    "id": "gr-encre-et-plume",
+    "name": "Bouteille d'encre et plume d'écriture",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": { "v": 1, "u": "po" },
+    "w_kg": null,
+    "data": {
+      "desc": "Bouteille d'encre (50 ml) accompagnée d'une plume d'écriture."
+    }
+  },
+  {
+    "id": "gr-parchemins-vierges",
+    "name": "Parchemins vierges (10 feuilles)",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": { "v": 2, "u": "pa" },
+    "w_kg": null,
+    "data": {
+      "desc": "Feuilles de parchemin ou vélin vierges prêtes à l'écriture."
+    }
+  },
+  {
+    "id": "gr-livre",
+    "name": "Livre",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": { "v": 1, "u": "po" },
+    "w_kg": 0.25,
+    "data": {
+      "desc": "Ouvrage relié pouvant contenir poésie, histoire, connaissances ou diagrammes."
+    }
+  },
+  {
+    "id": "gr-faux-papiers",
+    "name": "Faux papiers divers",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": { "v": null, "u": null },
+    "w_kg": null,
+    "data": {
+      "desc": "Ensemble de documents contrefaits : lettres de change, sauf-conduits périmés, permis bidons. Illégal."
+    }
+  },
+  {
+    "id": "gr-grigris-ornementaux",
+    "name": "Divers grigris ornementaux",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": { "v": null, "u": null },
+    "w_kg": 0.5,
+    "data": {
+      "desc": "Petits objets rituels, amulettes, plumes, ossements ou pierres portés comme ornements ésotériques."
+    }
+  },
+  {
+    "id": "gr-sauf-conduit",
+    "name": "Sauf-conduit",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": { "v": null, "u": null },
+    "w_kg": null,
+    "data": {
+      "desc": "Document officiel autorisant le porteur à se déplacer ou à exercer une activité dans un territoire donné."
+    }
+  },
+  {
+    "id": "gr-sauf-conduits-et-lettres",
+    "name": "Divers sauf-conduits et lettres de recommandation",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": { "v": null, "u": null },
+    "w_kg": null,
+    "data": {
+      "desc": "Ensemble de documents officiels et de lettres de recommandation témoignant de votre rang et de votre réseau."
+    }
+  },
+  {
+    "id": "gr-souvenir",
+    "name": "Souvenir personnel",
+    "type": "GEAR",
+    "subtype": null,
+    "cost": { "v": null, "u": null },
+    "w_kg": 0.25,
+    "data": {
+      "desc": "Objet cher à vos yeux, en lien avec votre passé (souvenir de chasse, relique familiale, trophée, etc.)."
     }
   }
 ]

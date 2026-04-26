@@ -1,0 +1,45 @@
+﻿[
+  {
+    "id": "hdc-corrompu",
+    "name": "Corrompu",
+    "data": {
+      "desc": "Vous subissez 3 points de corruption permanente dès la création.",
+      "mechanics": {
+        "corruption_permanent": 3
+      },
+      "module": "noirceur"
+    }
+  },
+  {
+    "id": "hdc-essence-vulnerable",
+    "name": "Essence vulnérable",
+    "data": {
+      "desc": "Lorsque vous remplissez les 4 premières cases d'une ligne du tableau de corruption, la 5e case est automatiquement remplie par un point de corruption temporaire.",
+      "stackable": true,
+      "stacked_name": "Essence anémiée",
+      "stacked_desc": "Lorsque vous remplissez les 3 premières cases d'une ligne, la 4e et la 5e sont automatiquement remplies.",
+      "module": "noirceur"
+    }
+  },
+  {
+    "id": "hdc-integrite-derisoire",
+    "name": "Intégrité dérisoire",
+    "data": {
+      "desc": "Vous subissez un désavantage aux jets de sauvegarde visant à résister à la corruption, à l'horreur et à la folie.",
+      "mechanics": {
+        "disadvantage_on_saves": [ "corruption", "horreur", "folie" ]
+      },
+      "module": "noirceur"
+    }
+  },
+  {
+    "id": "hdc-vulnerable",
+    "name": "Vulnérable",
+    "data": {
+      "desc": "Vous souffrez d'une vulnérabilité à un type de dégâts au choix parmi : acide, feu, foudre, froid, poison ou tonnerre.",
+      "mechanics": {
+        "vulnerability_choice": [ "acide", "feu", "foudre", "froid", "poison", "tonnerre" ]
+      }
+    }
+  }
+]

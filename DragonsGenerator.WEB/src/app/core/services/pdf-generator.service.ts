@@ -139,8 +139,8 @@ const PANEL_CLERIC = {
 const PANEL_DRUID = {
   line1X: 450, // Cercle druidique (valeur)
   line1Y: 245,
-  line2X: 450, // Focaliseur arcanique (valeur)
-  line2Y: 300,
+  line2X: 435, // Focaliseur arcanique (valeur)
+  line2Y: 268,
   circleSpellsCheckX: 443, // case "Sorts de cercle"
   circleSpellsCheckY: 345,
   mysticTranceCheckX: 443, // case "Transe mystique"
@@ -224,6 +224,63 @@ const GRP_COORDS = {
   guerrierSaveDCY: 725,
   guerrierAttackModX: 520,
   guerrierAttackModY: 785,
+};
+
+// ---------------------------------------------------------------------------
+// Coordonnées PAGE 2 — Aptitudes
+// ⚠️ ESTIMATIONS — à calibrer avec le PDF réel
+// ---------------------------------------------------------------------------
+const PAGE2 = {
+  // --- Armures & Armes (haut-gauche) ---
+  armorX: 125,
+  armorYs: [100, 124],
+  weaponX: 125,
+  weaponYs: [148, 172],
+
+  // --- Résistances & immunités (haut-droite) ---
+  resX: 380,
+  resYs: [100, 124, 148, 172, 194],
+
+  // --- Outils & véhicules (colonne milieu) ---
+  toolX: 204,
+  // --- Langues (colonne droite) ---
+  langX: 396,
+  // Lignes partagées outils/langues (zone "Usage illimité")
+  middleYs: [255, 277, 299, 320, 342, 364, 386, 408, 430, 452],
+
+  // --- Features "Usage illimité" (colonne gauche) ---
+  unlimitedNameX: 15,
+  unlimitedUsesX: 170,
+  unlimitedStartY: 255,
+  unlimitedLineH: 22,
+  unlimitedMaxLines: 10,
+
+  // --- Features "Regain en repos court" (sous la zone illimitée) ---
+  shortRestNameX: 15,
+  shortRestUsesX: 170,
+  shortRestStartY: 530,
+  shortRestLineH: 22,
+  shortRestMaxLines: 4,
+  // Colonne droite repos court (pour débordement)
+  shortRestCol2NameX: 204,
+  shortRestCol2UsesX: 360,
+
+  // --- Features "Regain en repos long" ---
+  longRestNameX: 15,
+  longRestUsesX: 170,
+  longRestStartY: 645,
+  longRestLineH: 22,
+  longRestMaxLines: 6,
+  // Colonne droite repos long
+  longRestCol2NameX: 204,
+  longRestCol2UsesX: 360,
+
+  // --- Emplacements de sorts (parchemin bas-droite) ---
+  spellSlotX: 474,
+  spellSlotStartY: 546,
+  spellSlotRowH: 22,
+  spellSlotCircleSpacing: 15,
+  spellSlotMaxPerRow: [4, 3, 3, 3, 3, 2, 2, 1, 1],
 };
 
 @Injectable({
@@ -585,43 +642,226 @@ export class PdfGeneratorService {
   private drawPage2(pdf: jsPDF, c: Character): void {
     const dark = '#2c1810';
     pdf.setTextColor(dark);
+
+    // ── 1. Armures ──
+    this.drawPage2Proficiencies(pdf, c);
+
+    // ── 2. Résistances & immunités ──
+    this.drawPage2Resistances(pdf, c);
+
+    // ── 3. Outils & Langues ──
+    this.drawPage2ToolsAndLanguages(pdf, c);
+
+    // ── 4. Features dispatchées par rechargeType ──
+    this.drawPage2Features(pdf, c);
+
+    // ── 5. Emplacements de sorts ──
+    if (c.spellcasting) {
+      this.drawPage2SpellSlots(pdf, c.spellcasting);
+    }
+  }
+
+  // =========================================================================
+  // PAGE 2 — Sous-méthodes
+  // =========================================================================
+
+  /**
+   * Armures & Armes (haut-gauche, inchangé).
+   */
+  private drawPage2Proficiencies(pdf: jsPDF, c: Character): void {
+    const P = PAGE2;
     pdf.setFontSize(15);
 
-    const armors = c.proficiencies.armor;
-    if (armors[0]) this.text(pdf, this.prettify(armors[0]), 125, 100);
-    if (armors[1]) this.text(pdf, this.prettify(armors[1]), 125, 124);
+    c.proficiencies.armor.slice(0, 2).forEach((a, i) => {
+      this.text(pdf, this.prettify(a), P.armorX, P.armorYs[i]);
+    });
 
-    const weapons = c.proficiencies.weapons;
-    if (weapons[0]) this.text(pdf, this.prettify(weapons[0]), 125, 148);
-    if (weapons[1]) this.text(pdf, this.prettify(weapons[1]), 125, 172);
+    c.proficiencies.weapons.slice(0, 2).forEach((w, i) => {
+      this.text(pdf, this.prettify(w), P.weaponX, P.weaponYs[i]);
+    });
+  }
 
-    const resTops = [100, 124, 148, 172, 194];
-    let resIndex = 0;
+  /**
+   * Résistances & immunités (haut-droite).
+   * Inclut la darkvision, les résistances d'espèce, et les immunités.
+   */
+  private drawPage2Resistances(pdf: jsPDF, c: Character): void {
+    const P = PAGE2;
+    pdf.setFontSize(15);
+
+    const entries: string[] = [];
+
     if (c.senses.hasDarkvision) {
-      this.text(pdf, `Vision dans le noir (${c.senses.darkvisionRadius}m)`, 380, resTops[resIndex]);
-      resIndex++;
+      entries.push(`Vision dans le noir (${c.senses.darkvisionRadius}m)`);
     }
-    c.defense.resistances.forEach((res, i) => {
-      if (resIndex + i < 5) this.text(pdf, res, 375, resTops[resIndex + i]);
-    });
 
+    c.defense.resistances.forEach((r) => entries.push(`Rés. ${r}`));
+    c.defense.immunities.forEach((im) => entries.push(`Imm. ${im}`));
+    c.defense.conditionImmunities.forEach((ci) => entries.push(`Imm. ${ci}`));
+
+    entries.slice(0, P.resYs.length).forEach((entry, i) => {
+      this.text(pdf, entry, P.resX, P.resYs[i]);
+    });
+  }
+
+  /**
+   * Outils & véhicules (colonne milieu) + Langues (colonne droite).
+   */
+  private drawPage2ToolsAndLanguages(pdf: jsPDF, c: Character): void {
+    const P = PAGE2;
     pdf.setFontSize(10);
-    const traitTops = [255, 277, 299, 320, 342, 364, 386, 408, 430, 452];
-    const racialFeatures = c.features.filter(
-      (f) => f.source === 'species' || f.source === 'subspecies',
+
+    c.proficiencies.tools.slice(0, P.middleYs.length).forEach((tool, i) => {
+      this.text(pdf, this.prettify(tool), P.toolX, P.middleYs[i]);
+    });
+
+    c.proficiencies.languages.slice(0, P.middleYs.length).forEach((lang, i) => {
+      this.text(pdf, this.prettify(lang), P.langX, P.middleYs[i]);
+    });
+  }
+
+  /**
+   * Dispatcher toutes les features dans les 3 sections de la page 2 :
+   * - Usage illimité (unlimited + passives)
+   * - Regain en repos court (short_rest)
+   * - Regain en repos long (long_rest)
+   */
+  private drawPage2Features(pdf: jsPDF, c: Character): void {
+    const P = PAGE2;
+
+    // On exclut les features "techniques" qui n'ont pas d'intérêt sur la fiche
+    const EXCLUDED_IDS = new Set([
+      'feat-augmentation-de-caracteristique',
+      'feat-voie-primale',
+      'feat-archetype-martial',
+      'feat-tradition-monastique',
+      'feat-archetype-roublard',
+      'feat-archetype-de-rodeur',
+      'feat-college-bardique',
+      'feat-cercle-druidique',
+      'feat-tradition-arcanique',
+      'feat-serment-sacre',
+      'feat-domaine-divin',
+      'feat-atavisme',
+      'feat-suzerain',
+      'feat-faveur-du-pacte',
+      'feat-marotte',
+      'feat-aptitude-darchetype',
+    ]);
+
+    const allFeatures = c.features.filter((f) => !EXCLUDED_IDS.has(f.refId ?? ''));
+
+    // Trier par source : species/subspecies d'abord, puis class/subclass
+    const sortBySource = (a: any, b: any) => {
+      const order: Record<string, number> = {
+        species: 0,
+        subspecies: 1,
+        class: 2,
+        subclass: 3,
+      };
+      return (order[a.source] ?? 9) - (order[b.source] ?? 9);
+    };
+
+    const unlimited = allFeatures
+      .filter((f) => !f.uses || !f.uses.recharge || f.uses.recharge === 'unlimited')
+      .sort(sortBySource);
+
+    const shortRest = allFeatures
+      .filter((f) => f.uses?.recharge === 'short_rest')
+      .sort(sortBySource);
+
+    const longRest = allFeatures.filter((f) => f.uses?.recharge === 'long_rest').sort(sortBySource);
+
+    // --- Section "Usage illimité" ---
+    this.drawFeatureLines(
+      pdf,
+      unlimited,
+      P.unlimitedNameX,
+      P.unlimitedUsesX,
+      P.unlimitedStartY,
+      P.unlimitedLineH,
+      P.unlimitedMaxLines,
     );
-    racialFeatures.forEach((feat, i) => {
-      if (i < 10) this.text(pdf, feat.name, 15, traitTops[i]);
-    });
 
-    const toolTops = [255, 277, 299, 320, 342, 364, 386, 408, 430, 452];
-    c.proficiencies.tools.forEach((tool, i) => {
-      if (i < 10) this.text(pdf, this.prettify(tool), 204, toolTops[i]);
-    });
+    // --- Section "Regain en repos court" ---
+    this.drawFeatureLines(
+      pdf,
+      shortRest,
+      P.shortRestNameX,
+      P.shortRestUsesX,
+      P.shortRestStartY,
+      P.shortRestLineH,
+      P.shortRestMaxLines,
+    );
 
-    const langTops = [255, 277, 299, 320, 342, 364, 386, 408, 430, 452];
-    c.proficiencies.languages.forEach((lang, i) => {
-      if (i < 10) this.text(pdf, this.prettify(lang), 396, langTops[i]);
+    // --- Section "Regain en repos long" ---
+    this.drawFeatureLines(
+      pdf,
+      longRest,
+      P.longRestNameX,
+      P.longRestUsesX,
+      P.longRestStartY,
+      P.longRestLineH,
+      P.longRestMaxLines,
+    );
+  }
+
+  /**
+   * Dessine une liste de features avec nom + cercles d'utilisation.
+   */
+  private drawFeatureLines(
+    pdf: jsPDF,
+    features: any[],
+    nameX: number,
+    usesX: number,
+    startY: number,
+    lineH: number,
+    maxLines: number,
+  ): void {
+    pdf.setFontSize(10);
+
+    features.slice(0, maxLines).forEach((feat, i) => {
+      const y = startY + i * lineH;
+
+      // Nom de l'aptitude
+      let label = feat.name;
+
+      // Si uses avec max connu > 0, ajouter le compteur textuel
+      if (feat.uses && feat.uses.max > 0 && feat.uses.max <= 20) {
+        label += ` (×${feat.uses.max})`;
+      }
+
+      this.text(pdf, label, nameX, y);
+
+      // Dessiner des cercles cochables si l'aptitude a un nombre d'utilisations
+      if (feat.uses && feat.uses.max > 0 && feat.uses.max <= 10) {
+        const circleRadius = 2;
+        const circleSpacing = 11;
+        for (let u = 0; u < feat.uses.max; u++) {
+          this.drawEmptyCircle(pdf, usesX + u * circleSpacing, y - 2, circleRadius);
+        }
+      }
+    });
+  }
+
+  /**
+   * Cercles d'emplacements de sorts (parchemin bas-droite de la page 2).
+   */
+  private drawPage2SpellSlots(pdf: jsPDF, sc: CharacterSpellcasting): void {
+    const P = PAGE2;
+    const radius = 2.8;
+
+    sc.spellSlots.forEach((slot) => {
+      const rowIdx = slot.level - 1;
+      if (rowIdx < 0 || rowIdx > 8) return;
+
+      const y = P.spellSlotStartY + rowIdx * P.spellSlotRowH;
+      const maxCircles = P.spellSlotMaxPerRow[rowIdx];
+      const available = Math.min(slot.max, maxCircles);
+
+      for (let i = 0; i < available; i++) {
+        this.drawFilledCircle(pdf, P.spellSlotX + i * P.spellSlotCircleSpacing, y, radius);
+      }
     });
   }
 
@@ -931,7 +1171,7 @@ export class PdfGeneratorService {
   // --- DRUIDE ---
   private drawPanelDruid(pdf: jsPDF, sc: Extract<CharacterSpellcasting, { kind: 'druid' }>): void {
     const P = PANEL_DRUID;
-    pdf.setFontSize(15);
+    pdf.setFontSize(12);
 
     // Cercle druidique
     if (sc.druidCircle) {

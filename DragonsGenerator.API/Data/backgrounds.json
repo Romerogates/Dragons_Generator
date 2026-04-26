@@ -1,0 +1,2102 @@
+﻿[
+  {
+    "id": "bg-acolyte",
+    "name": "Acolyte",
+    "data": {
+      "preset": true,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "87-88"
+      },
+      "flavor": {
+        "summary": "Vous avez passé votre vie à servir dans un temple dédié à un dieu ou un panthéon. Intermédiaire entre le royaume du sacré et le monde des mortels, vous participez aux rites et offrandes censés mener les fidèles en présence du divin.",
+        "adventure_hook": "Qu'est-ce qui vous a poussé à quitter le service du temple pour la vie d'aventurier ?"
+      },
+      "proficiencies": {
+        "skills": {
+          "chooseCount": 2,
+          "options": ["skill-intuition", "skill-religion", "skill-persuasion"]
+        },
+        "tools": {
+          "fixed": [],
+          "choose": [
+            {
+              "chooseCount": 1,
+              "options": [
+                {
+                  "type": "instrument",
+                  "any": true
+                },
+                {
+                  "type": "tool",
+                  "id": "tl-necessaire-de-calligraphie"
+                }
+              ]
+            }
+          ]
+        },
+        "languages": { "choiceCount": 2 }
+      },
+      "equipment": {
+        "fixed": [
+          {
+            "id": "it-ss-amulette",
+            "name": "Symbole sacré (amulette)",
+            "qty": 1,
+            "location": "equipped"
+          },
+          {
+            "id": "gr-livre-de-prieres",
+            "name": "Livre de prières",
+            "qty": 1,
+            "location": "backpack"
+          },
+          {
+            "id": "gr-batons-encens",
+            "name": "Bâtons d'encens",
+            "qty": 5,
+            "location": "backpack"
+          },
+          {
+            "id": "gr-vetements-liturgiques",
+            "name": "Vêtements liturgiques",
+            "qty": 1,
+            "location": "equipped"
+          }
+        ],
+        "currency": { "or": 15 }
+      },
+      "privilege": {
+        "id": "priv-refuge-du-fidele",
+        "name": "Refuge du fidèle",
+        "desc": "En tant qu'acolyte, vous bénéficiez du respect de ceux qui partagent votre foi. Vous et vos compagnons pouvez espérer recevoir soins et assistance gratuits dans un temple, un sanctuaire ou toute autre implantation de votre religion, à condition que vous puissiez les pourvoir. Le soutien de vos coreligionnaires vous est acquis pour vous assurer un train de vie modeste."
+      },
+      "personality_tables": {
+        "traits": {
+          "die": "1d8",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "J'idolâtre un héros de ma foi et ne cesse de me référer à ses actes et à son exemple."
+            },
+            {
+              "roll": 2,
+              "text": "Je sais trouver un terrain d'entente entre les pires ennemis et faire naître de l'empathie entre eux."
+            },
+            {
+              "roll": 3,
+              "text": "Le moindre événement est pour moi signe d'un dessein supérieur."
+            },
+            {
+              "roll": 4,
+              "text": "Rien ne saurait ébranler mon optimisme."
+            },
+            {
+              "roll": 5,
+              "text": "Dès que je le peux, je cite les textes sacrés (ou les déforme)."
+            },
+            {
+              "roll": 6,
+              "text": "Je suis tolérant (ou intolérant) envers les autres croyances et respecte (ou condamne) le culte des autres dieux."
+            },
+            {
+              "roll": 7,
+              "text": "J'ai connu les charmes de la bonne chère et de la haute société dans le temple de ma communauté."
+            },
+            {
+              "roll": 8,
+              "text": "J'ai passé tellement de temps au temple que j'ai peu d'expérience des rapports avec le monde extérieur."
+            }
+          ]
+        },
+        "ideals": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Tradition. Il faut préserver et perpétuer les rites et les sacrifices ancestraux.",
+              "alignment": "loyal"
+            },
+            {
+              "roll": 2,
+              "text": "Charité. J'essaie toujours d'aider ceux qui sont dans le besoin, quoi qu'il m'en coûte.",
+              "alignment": "bon"
+            },
+            {
+              "roll": 3,
+              "text": "Changement. Nous devons contribuer aux transformations que les dieux apportent constamment au monde.",
+              "alignment": "chaotique"
+            },
+            {
+              "roll": 4,
+              "text": "Pouvoir. J'espère gravir les échelons de la hiérarchie de mon temple.",
+              "alignment": "loyal"
+            },
+            {
+              "roll": 5,
+              "text": "Foi. J'ai confiance en mon dieu. Il guide mes pas et tout ira bien tant que je serai fidèle.",
+              "alignment": "tout alignement"
+            },
+            {
+              "roll": 6,
+              "text": "Aspiration. Je cherche à me montrer digne de la bienveillance de mon dieu par mes actes.",
+              "alignment": "tout alignement"
+            }
+          ]
+        },
+        "bonds": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Je suis prêt à tout pour récupérer une relique ancienne de ma foi, perdue depuis longtemps."
+            },
+            {
+              "roll": 2,
+              "text": "Un jour, je me vengerai de la hiérarchie corrompue du temple qui m'a qualifié d'hérétique."
+            },
+            {
+              "roll": 3,
+              "text": "Je dois ma vie au prêtre qui m'a recueilli quand mes parents sont morts."
+            },
+            {
+              "roll": 4,
+              "text": "Tout ce que je fais, je le fais pour le petit peuple."
+            },
+            {
+              "roll": 5,
+              "text": "Je ferai tout pour protéger le temple dans lequel j'ai servi."
+            },
+            {
+              "roll": 6,
+              "text": "Je cherche à préserver un texte sacré que mes ennemis considèrent comme hérétique et veulent détruire."
+            }
+          ]
+        },
+        "flaws": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Je juge les autres sévèrement. Et moi encore plus sévèrement."
+            },
+            {
+              "roll": 2,
+              "text": "J'accorde trop de confiance à ceux qui exercent un pouvoir au sein de la hiérarchie de mon temple."
+            },
+            {
+              "roll": 3,
+              "text": "Ma piété me pousse parfois à accorder une confiance aveugle à ceux qui professent la même foi que moi."
+            },
+            {
+              "roll": 4,
+              "text": "Je suis inflexible dans ma pensée."
+            },
+            {
+              "roll": 5,
+              "text": "Je suis méfiant envers les étrangers et je m'attends au pire de leur part."
+            },
+            {
+              "roll": 6,
+              "text": "Une fois que j'ai fixé un objectif, je deviens obsédé par celui-ci au détriment de tout le reste."
+            }
+          ]
+        }
+      },
+      "handicaps_compatible": [
+        "hdc-corrompu",
+        "hdc-essence-vulnerable",
+        "hdc-vulnerable"
+      ]
+    }
+  },
+  {
+    "id": "bg-larron",
+    "name": "Larron",
+    "data": {
+      "preset": true,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "97-98"
+      },
+      "flavor": {
+        "summary": "Vous frayez avec des gens peu recommandables depuis un certain bout de temps.",
+        "adventure_hook": "Qu'est-ce qui vous distingue des criminels ordinaires et vous a mené sur la voie de l'aventure ?"
+      },
+      "proficiencies": {
+        "skills": {
+          "chooseCount": 2,
+          "options": [
+            "skill-discretion",
+            "skill-escamotage",
+            "skill-intimidation",
+            "skill-tromperie"
+          ]
+        },
+        "tools": {
+          "fixed": [
+            {
+              "type": "tool",
+              "id": "tl-outils-de-voleur"
+            }
+          ],
+          "choose": [
+            {
+              "chooseCount": 1,
+              "options": [
+                {
+                  "type": "tool",
+                  "id": "tl-necessaire-de-deguisement"
+                },
+                {
+                  "type": "tool",
+                  "id": "tl-necessaire-de-faussaire"
+                },
+                {
+                  "type": "game_set",
+                  "any": true
+                }
+              ]
+            }
+          ]
+        },
+        "languages": { "choiceCount": 0 }
+      },
+      "equipment": {
+        "fixed": [
+          {
+            "id": "gr-vetements-ordinaires",
+            "name": "Vêtements ordinaires",
+            "qty": 1,
+            "location": "equipped"
+          },
+          {
+            "id": "gr-faux-papiers",
+            "name": "Faux papiers divers",
+            "qty": 1,
+            "location": "backpack"
+          }
+        ],
+        "from_tool_proficiency": true,
+        "currency": { "or": 15 }
+      },
+      "privilege": {
+        "id": "priv-connaissance-du-milieu",
+        "name": "Connaissance du milieu",
+        "desc": "Vous savez renifler l'odeur de la corruption. La plupart des communautés abritent leur lot de criminels et de représentants véreux de l'autorité. Vous ne pouvez pas automatiquement définir si un individu donné a trempé dans ce genre d'affaires, mais vous pouvez rapidement trouver des personnes corrompues avec lesquelles entamer des négociations ou des conversations orientées."
+      },
+      "personality_tables": {
+        "traits": {
+          "die": "1d8",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "J'aime instaurer un certain malaise quand je rencontre quelqu'un, lui faire sentir que je représente une menace."
+            },
+            {
+              "roll": 2,
+              "text": "J'ai besoin de sonder les gens, de percer à jour leurs intentions par quelques remarques et questions bien choisies."
+            },
+            {
+              "roll": 3,
+              "text": "Je suis très soupe au lait, en plus d'être rancunier."
+            },
+            {
+              "roll": 4,
+              "text": "Les gens bien m'ennuient, j'aime la compagnie des canailles."
+            },
+            {
+              "roll": 5,
+              "text": "Breloques, étoffes chatoyantes, démarche chaloupée ; j'affiche mon opulence, que mes poches soient pleines ou vides."
+            },
+            {
+              "roll": 6,
+              "text": "Ils sont rares ceux qui savent qui je suis vraiment : il faut toujours que je joue un rôle."
+            },
+            {
+              "roll": 7,
+              "text": "J'aime le risque et, jusqu'ici, c'est réciproque."
+            },
+            {
+              "roll": 8,
+              "text": "Ton narquois, sourcil haussé : j'ai toujours l'air de me moquer, même quand ce n'est pas méchant."
+            }
+          ]
+        },
+        "ideals": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Liberté. Les règles sont faites pour être transgressées.",
+              "alignment": "chaotique"
+            },
+            {
+              "roll": 2,
+              "text": "Charité. Il faut bien redistribuer les richesses d'une manière ou d'une autre.",
+              "alignment": "bon"
+            },
+            {
+              "roll": 3,
+              "text": "Pouvoir. Tous les moyens sont bons pour accumuler fortune et influence.",
+              "alignment": "mauvais"
+            },
+            {
+              "roll": 4,
+              "text": "Structure. La hiérarchie et l'honneur assurent la prospérité du monde clandestin.",
+              "alignment": "loyal"
+            },
+            {
+              "roll": 5,
+              "text": "Chienlit. Le chaos est mon allié et nul ne mérite le droit d'imposer son ordre.",
+              "alignment": "chaotique"
+            },
+            {
+              "roll": 6,
+              "text": "Rédemption. J'espère un jour pouvoir me racheter.",
+              "alignment": "tout alignement"
+            }
+          ]
+        },
+        "bonds": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "J'essaie de rembourser une dette ancienne envers un bienfaiteur généreux."
+            },
+            {
+              "roll": 2,
+              "text": "Mes gains mal acquis sont destinés à aider ma famille."
+            },
+            {
+              "roll": 3,
+              "text": "Quelque chose de précieux m'a été volé et je compte bien le récupérer."
+            },
+            {
+              "roll": 4,
+              "text": "Je ne reculerai devant rien pour devenir le roi de la pègre."
+            },
+            {
+              "roll": 5,
+              "text": "Je ferai payer ceux qui m'ont trahi."
+            },
+            {
+              "roll": 6,
+              "text": "J'ai rejoint la pègre pour protéger quelqu'un qui m'est cher."
+            }
+          ]
+        },
+        "flaws": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Quand je m'ennuie, je cherche à faire dégénérer la situation."
+            },
+            {
+              "roll": 2,
+              "text": "Si je ne mens pas effrontément au moins une fois par jour, je dors mal."
+            },
+            {
+              "roll": 3,
+              "text": "Je ne pense pas toujours à la sécurité des autres."
+            },
+            {
+              "roll": 4,
+              "text": "J'ai une fâcheuse tendance à tomber amoureux de représentants de l'autorité officielle."
+            },
+            {
+              "roll": 5,
+              "text": "Je résiste mal à l'appel de l'ivresse quand je m'attarde dans une taverne ou à une fête."
+            },
+            {
+              "roll": 6,
+              "text": "Une voyante m'a dit que tous mes vœux seraient exaucés quand j'aurais tué un certain nombre d'innocents ; il m'arrive de la croire."
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "bg-animiste",
+    "name": "Animiste",
+    "data": {
+      "preset": true,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "89-90"
+      },
+      "flavor": {
+        "summary": "Tout le monde ne vous croit pas, mais pour vous cela ne fait aucun doute : vous savez communiquer avec les esprits. Les esprits animaux, l'esprit de chaque objet, l'esprit de la tempête et de la rivière, peut-être aussi l'esprit des morts.",
+        "adventureHook": "Votre don est-il accepté par votre communauté, ou vous a-t-il valu brimades et suspicion ?"
+      },
+      "proficiencies": {
+        "skills": {
+          "chooseCount": 2,
+          "options": [
+            "skill-intuition",
+            "skill-perception",
+            "skill-persuasion",
+            "skill-religion"
+          ]
+        },
+        "tools": {
+          "fixed": [],
+          "choose": [
+            {
+              "chooseCount": 1,
+              "options": [
+                {
+                  "type": "tool",
+                  "id": "tl-necessaire-dherboristerie"
+                },
+                {
+                  "type": "tool",
+                  "id": "tl-necessaire-dalchimiste"
+                }
+              ]
+            }
+          ]
+        },
+        "languages": { "choiceCount": 1 }
+      },
+      "equipment": {
+        "fixed": [
+          {
+            "id": "gr-vetements-de-voyage",
+            "name": "Vêtements de voyage",
+            "qty": 1,
+            "location": "equipped"
+          },
+          {
+            "id": "gr-grigris-ornementaux",
+            "name": "Divers grigris ornementaux",
+            "qty": 1,
+            "location": "equipped"
+          }
+        ],
+        "currency": { "or": 15 }
+      },
+      "privilege": {
+        "id": "priv-attrait-esoterisme",
+        "name": "L'attrait de l'ésotérisme",
+        "desc": "Quelle que soit la communauté, vous trouvez toujours des personnes prêtes à vous écouter et à s'intéresser à vos expériences spirituelles. Vous pouvez compter sur l'accueil et l'assistance d'une partie de la population, tant que vous leur apportez ce qu'elle attend de vous."
+      },
+      "personalityTables": {
+        "traits": {
+          "die": "1d8",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "J'écarquille souvent les yeux, mais c'est pour mieux voir les esprits qui rôdent autour de chacun."
+            },
+            {
+              "roll": 2,
+              "text": "Mes éclats de rire tonitruants font parfois sursauter les gens, y compris ceux qui me connaissent bien."
+            },
+            {
+              "roll": 3,
+              "text": "Parfois, je m'emporte à l'évocation d'entités ou de concepts, avant de me rendre compte que je suis le seul à pouvoir saisir la portée de ces vérités."
+            },
+            {
+              "roll": 4,
+              "text": "Une métaphore vaut mieux qu'un long discours et toutes les phrases ne méritent pas d'être terminées."
+            },
+            {
+              "roll": 5,
+              "text": "Les gens me croient bourré de tics et de manies, alors que je ne fais que communiquer avec l'au-delà."
+            },
+            {
+              "roll": 6,
+              "text": "Quand les autres cèdent à la panique et que l'adversité est la plus forte, j'éprouve une grande sérénité."
+            },
+            {
+              "roll": 7,
+              "text": "Mes habitudes alimentaires ou hygiéniques étonnent, voire révulsent la plupart des gens."
+            },
+            {
+              "roll": 8,
+              "text": "Cet être parle de lui à la troisième personne, comme il le fait pour tout le monde, du reste."
+            }
+          ]
+        },
+        "ideals": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Emprise. Les esprits me permettent d'influencer autrui et de dominer les faibles.",
+              "alignment": "mauvais"
+            },
+            {
+              "roll": 2,
+              "text": "Protection. Chaque chose a une âme, mais certaines sont malintentionnées et je dois en prémunir les innocents.",
+              "alignment": "bon"
+            },
+            {
+              "roll": 3,
+              "text": "Harmonie. L'équilibre et la hiérarchie des âmes et des esprits doivent être rétablis.",
+              "alignment": "loyal"
+            },
+            {
+              "roll": 4,
+              "text": "Flamme. Certaines entités cherchent à museler les âmes les plus créatives, qu'il faut libérer coûte que coûte.",
+              "alignment": "chaotique"
+            },
+            {
+              "roll": 5,
+              "text": "Compromis. Il faut veiller à ce qu'aucune forme de conscience ne prenne le pas sur les autres.",
+              "alignment": "neutre"
+            },
+            {
+              "roll": 6,
+              "text": "Illumination. Ce don de communion avec les esprits est parfois un fardeau, mais un fardeau que je porte sur la voie de la révélation.",
+              "alignment": "tout alignement"
+            }
+          ]
+        },
+        "bonds": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Une entité revient régulièrement me hanter ; tant qu'elle restera plus forte que moi, je ne pourrai la défier."
+            },
+            {
+              "roll": 2,
+              "text": "Je dois laver l'honneur de mes ancêtres par l'exemplarité de mon existence."
+            },
+            {
+              "roll": 3,
+              "text": "L'esprit de ma tribu ne me répond plus et je dois comprendre pourquoi."
+            },
+            {
+              "roll": 4,
+              "text": "Plus jeune, j'ai fait une promesse secrète que je sais devoir regretter un jour."
+            },
+            {
+              "roll": 5,
+              "text": "Une personne au moins est convaincue que je suis à l'origine de ses malheurs et compte me le faire payer."
+            },
+            {
+              "roll": 6,
+              "text": "Je dois retrouver une relique en lien avec un esprit : je suis certain que l'avenir du monde en dépend."
+            }
+          ]
+        },
+        "flaws": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "J'ai contracté une dépendance à une substance censée faciliter ma communion avec les âmes."
+            },
+            {
+              "roll": 2,
+              "text": "Parfois, je voudrais détruire le corps de ceux qui doutent du souffle spirituel, ne serait-ce que pour leur prouver que l'âme est immortelle."
+            },
+            {
+              "roll": 3,
+              "text": "Les esprits m'apparaissent plus réels que les vivants, qui m'intéressent de moins en moins."
+            },
+            {
+              "roll": 4,
+              "text": "Je n'hésite pas à surjouer ma complicité avec le spirituel pour impressionner et je commence à douter de mon talent."
+            },
+            {
+              "roll": 5,
+              "text": "On dit que tous ceux qui ont le don finissent mal. J'ai parfois l'impression de ne plus être moi-même."
+            },
+            {
+              "roll": 6,
+              "text": "J'ai commis des forfaits que je ne peux avouer au service de ce que personne ne peut comprendre."
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "bg-bohemien",
+    "name": "Bohémien",
+    "data": {
+      "preset": true,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "90-91"
+      },
+      "flavor": {
+        "summary": "Toujours sur la route, d'une ville à l'autre, de fête en festival. Votre communauté est ambulante, nomade, rassemblée autour de roulottes bariolées et de spectacles entêtants. Vous ne concevez pas la vie sans art, sans divertissement.",
+        "adventureHook": "Pourquoi avez-vous quitté la caravane pour l'aventure ?"
+      },
+      "proficiencies": {
+        "skills": {
+          "chooseCount": 2,
+          "options": [
+            "skill-dressage",
+            "skill-escamotage",
+            "skill-representation",
+            "skill-survie"
+          ]
+        },
+        "tools": {
+          "fixed": [],
+          "choose": [
+            {
+              "chooseCount": 1,
+              "options": [
+                {
+                  "type": "tool",
+                  "any": true
+                },
+                {
+                  "type": "instrument",
+                  "any": true
+                },
+                {
+                  "type": "gameSet",
+                  "any": true
+                }
+              ]
+            }
+          ]
+        },
+        "languages": { "choiceCount": 1 }
+      },
+      "equipment": {
+        "fixed": [
+          {
+            "id": "gr-costume-de-scene",
+            "name": "Costume de scène",
+            "qty": 1,
+            "location": "equipped"
+          },
+          {
+            "id": "gr-vetements-de-voyage",
+            "name": "Vêtements de voyage",
+            "qty": 1,
+            "location": "backpack"
+          },
+          {
+            "id": "gr-sauf-conduit",
+            "name": "Sauf-conduit pour se produire devant un seigneur",
+            "qty": 1,
+            "location": "backpack"
+          }
+        ],
+        "fromToolProficiency": true,
+        "currency": { "or": 5 }
+      },
+      "privilege": {
+        "id": "priv-famille-chaque-ville",
+        "name": "Une famille dans chaque ville",
+        "desc": "Quelle que soit la communauté dans laquelle vous vous rendez, vous pouvez compter sur la présence locale de votre ethnie. Vous trouverez toujours du soutien, notamment de personnes débrouillardes et généreuses, capables de vous aider à sortir d'un mauvais pas."
+      },
+      "personalityTables": {
+        "traits": {
+          "die": "1d8",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Je m'efforce de donner une bonne image de moi quand j'arrive quelque part."
+            },
+            {
+              "roll": 2,
+              "text": "Mes journées font alterner périodes d'activité intense et détente."
+            },
+            {
+              "roll": 3,
+              "text": "Je passe rarement plus de quelques minutes sans chanter, conter, danser ou jouer."
+            },
+            {
+              "roll": 4,
+              "text": "L'entraide rythme spontanément mes journées, du moins avec mes compagnons."
+            },
+            {
+              "roll": 5,
+              "text": "Je sympathise facilement avec les gens, sans forcément que cela m'engage."
+            },
+            {
+              "roll": 6,
+              "text": "Tout espace public est pour moi prétexte à entrer en scène et faire valoir mes talents."
+            },
+            {
+              "roll": 7,
+              "text": "Je suis toujours partant, quelle que soit l'entreprise, au mépris du danger."
+            },
+            {
+              "roll": 8,
+              "text": "Ce n'est pas trahir la vérité que de l'embellir et de la rendre plus vivante."
+            }
+          ]
+        },
+        "ideals": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Fête. La vie est trop courte pour ne pas la passer dans la joie.",
+              "alignment": "chaotique"
+            },
+            {
+              "roll": 2,
+              "text": "Héritage. L'art de mes ancêtres ne doit pas disparaître.",
+              "alignment": "loyal"
+            },
+            {
+              "roll": 3,
+              "text": "Liberté. Nul ne doit entraver la route de ceux qui voyagent.",
+              "alignment": "chaotique"
+            },
+            {
+              "roll": 4,
+              "text": "Famille. Rien ne passe avant la communauté.",
+              "alignment": "bon"
+            },
+            {
+              "roll": 5,
+              "text": "Profit. Chaque spectacle a un prix et il est juste de le recevoir.",
+              "alignment": "neutre"
+            },
+            {
+              "roll": 6,
+              "text": "Révélation. Mon art doit toucher l'âme et éveiller les consciences.",
+              "alignment": "tout alignement"
+            }
+          ]
+        },
+        "bonds": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Ma roulotte est tout ce qui me reste de ma famille d'origine."
+            },
+            {
+              "roll": 2,
+              "text": "J'ai été banni de ma troupe et je cherche à y revenir."
+            },
+            {
+              "roll": 3,
+              "text": "Un membre de ma communauté a disparu et je le cherche."
+            },
+            {
+              "roll": 4,
+              "text": "Je dois prouver ma valeur à l'ancien de ma troupe."
+            },
+            {
+              "roll": 5,
+              "text": "Un seigneur m'a offert sa protection et je lui dois fidélité."
+            },
+            {
+              "roll": 6,
+              "text": "Je porte un secret qui concerne toute ma communauté."
+            }
+          ]
+        },
+        "flaws": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Je ne peux m'empêcher de dérober de petits objets qui me plaisent."
+            },
+            {
+              "roll": 2,
+              "text": "Je suis incapable de résister à un défi, surtout s'il y a un public."
+            },
+            {
+              "roll": 3,
+              "text": "Ma fierté m'empêche d'accepter la critique."
+            },
+            {
+              "roll": 4,
+              "text": "Je méprise secrètement les sédentaires."
+            },
+            {
+              "roll": 5,
+              "text": "J'ai du mal à prendre quoi que ce soit au sérieux."
+            },
+            {
+              "roll": 6,
+              "text": "Ma générosité compulsive me laisse souvent sans le sou."
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "bg-condottiere",
+    "name": "Condottiere",
+    "data": {
+      "preset": true,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "91-92"
+      },
+      "flavor": {
+        "summary": "Vous n'êtes pas du genre discret. Vous affichez cette lueur dans le regard et ce sourire en coin qui informent chacun qu'il vaut mieux ne pas vous chercher de noises. Vous savez vous battre et vos prouesses animent les discussions des auberges locales.",
+        "adventureHook": "Vos exploits sont-ils réels ou quelque peu embellis par la rumeur ?"
+      },
+      "proficiencies": {
+        "skills": {
+          "chooseCount": 2,
+          "options": [
+            "skill-acrobaties",
+            "skill-athletisme",
+            "skill-intimidation"
+          ]
+        },
+        "tools": {
+          "fixed": [
+            {
+              "type": "vehicle",
+              "id": "tl-vehicules-terrestres"
+            }
+          ],
+          "choose": [
+            {
+              "chooseCount": 1,
+              "options": [
+                {
+                  "type": "gameSet",
+                  "any": true
+                }
+              ]
+            }
+          ]
+        },
+        "languages": { "choiceCount": 0 }
+      },
+      "equipment": {
+        "fixed": [
+          {
+            "id": "gr-vetements-de-voyage",
+            "name": "Vêtements de voyage",
+            "qty": 1,
+            "location": "equipped"
+          },
+          {
+            "id": "gr-vetement-voyant",
+            "name": "Vêtement ou ustensile voyant et singulier",
+            "qty": 1,
+            "location": "equipped"
+          }
+        ],
+        "fromToolProficiency": true,
+        "currency": { "or": 15 }
+      },
+      "privilege": {
+        "id": "priv-autorite-naturelle",
+        "name": "Autorité naturelle",
+        "desc": "Votre assurance est telle que les gens vous craignent ou vous respectent facilement, notamment dans les lieux où l'aplomb physique est un atout. On vous laisse généralement en paix et les gens sont plutôt bienveillants à votre égard."
+      },
+      "personalityTables": {
+        "traits": {
+          "die": "1d8",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Je m'efforce de donner une bonne image de moi quand j'arrive quelque part."
+            },
+            {
+              "roll": 2,
+              "text": "Mes journées font alterner périodes d'activité intense et détente."
+            },
+            {
+              "roll": 3,
+              "text": "Je passe rarement plus de quelques minutes sans m'entraîner."
+            },
+            {
+              "roll": 4,
+              "text": "L'entraide rythme spontanément mes journées."
+            },
+            {
+              "roll": 5,
+              "text": "Je sympathise facilement avec les gens, sans forcément que cela m'engage."
+            },
+            {
+              "roll": 6,
+              "text": "Tout combat est pour moi l'occasion de prouver ma valeur."
+            },
+            {
+              "roll": 7,
+              "text": "Je suis toujours partant, quelle que soit l'entreprise, au mépris du danger."
+            },
+            {
+              "roll": 8,
+              "text": "Ce n'est pas trahir la vérité que de l'embellir et de la rendre plus vivante."
+            }
+          ]
+        },
+        "ideals": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Honneur. Le combat a ses règles et je les respecte.",
+              "alignment": "loyal"
+            },
+            {
+              "roll": 2,
+              "text": "Protection. Les forts doivent protéger les faibles.",
+              "alignment": "bon"
+            },
+            {
+              "roll": 3,
+              "text": "Gloire. Mon nom doit résonner dans les légendes.",
+              "alignment": "chaotique"
+            },
+            {
+              "roll": 4,
+              "text": "Discipline. Seul l'entraînement mène à la perfection.",
+              "alignment": "loyal"
+            },
+            {
+              "roll": 5,
+              "text": "Profit. Mes talents ont un prix et je compte bien le percevoir.",
+              "alignment": "neutre"
+            },
+            {
+              "roll": 6,
+              "text": "Défi. Je cherche toujours un adversaire plus fort.",
+              "alignment": "tout alignement"
+            }
+          ]
+        },
+        "bonds": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Je dois venger un compagnon d'armes tombé à cause de ma négligence."
+            },
+            {
+              "roll": 2,
+              "text": "Mon arme a une histoire et je ne m'en séparerai jamais."
+            },
+            {
+              "roll": 3,
+              "text": "Je recherche un adversaire légendaire pour l'affronter."
+            },
+            {
+              "roll": 4,
+              "text": "Je protège un village qui ne peut se défendre seul."
+            },
+            {
+              "roll": 5,
+              "text": "Mon ancien mentor attend que je prouve ma valeur."
+            },
+            {
+              "roll": 6,
+              "text": "J'ai une dette d'honneur envers un seigneur."
+            }
+          ]
+        },
+        "flaws": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Je sous-estime systématiquement mes adversaires."
+            },
+            {
+              "roll": 2,
+              "text": "Je ne supporte pas qu'on me contredise en public."
+            },
+            {
+              "roll": 3,
+              "text": "Je ne sais pas refuser un défi, même suicidaire."
+            },
+            {
+              "roll": 4,
+              "text": "Mon arrogance m'a déjà coûté des amitiés."
+            },
+            {
+              "roll": 5,
+              "text": "Je fais passer ma gloire personnelle avant la sécurité du groupe."
+            },
+            {
+              "roll": 6,
+              "text": "J'ai tendance à régler les problèmes par la force."
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "bg-erudit",
+    "name": "Érudit",
+    "data": {
+      "preset": true,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "93-94"
+      },
+      "flavor": {
+        "summary": "Pour beaucoup, vous êtes un puits de science, mais vous savez surtout que celle-ci n'est pas infuse. Vous avez consacré votre vie à l'étude, amassant des connaissances dans des domaines variés et cherchant toujours à en apprendre davantage.",
+        "adventureHook": "Quelle question obsédante vous a poussé à quitter votre bibliothèque ?"
+      },
+      "proficiencies": {
+        "skills": {
+          "chooseCount": 2,
+          "options": [
+            "skill-arcanes",
+            "skill-histoire",
+            "skill-investigation",
+            "skill-nature",
+            "skill-religion"
+          ]
+        },
+        "tools": {
+          "fixed": [],
+          "choose": [
+            {
+              "chooseCount": 1,
+              "options": [
+                {
+                  "type": "tool",
+                  "id": "tl-necessaire-de-calligraphie"
+                },
+                {
+                  "type": "tool",
+                  "id": "tl-necessaire-de-cartographe"
+                }
+              ]
+            }
+          ]
+        },
+        "languages": { "choiceCount": 1 }
+      },
+      "equipment": {
+        "fixed": [
+          {
+            "id": "gr-vetements-ordinaires",
+            "name": "Vêtements ordinaires",
+            "qty": 1,
+            "location": "equipped"
+          },
+          {
+            "id": "gr-livre",
+            "name": "Livre de référence sur votre domaine de prédilection",
+            "qty": 1,
+            "location": "backpack"
+          },
+          {
+            "id": "gr-encre-et-plume",
+            "name": "Bouteille d'encre et plume",
+            "qty": 1,
+            "location": "backpack"
+          },
+          {
+            "id": "gr-parchemins-vierges",
+            "name": "Parchemins vierges (10 feuilles)",
+            "qty": 1,
+            "location": "backpack"
+          }
+        ],
+        "fromToolProficiency": true,
+        "currency": { "or": 15 }
+      },
+      "privilege": {
+        "id": "priv-expertise-reconnue",
+        "name": "Expertise reconnue",
+        "desc": "Vous savez où et auprès de qui trouver les informations dont vous avez besoin. Bibliothèques, universités, monastères et sages — vous connaissez les circuits du savoir et savez qui interroger pour obtenir des réponses fiables."
+      },
+      "personalityTables": {
+        "traits": {
+          "die": "1d8",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "J'utilise des mots complexes pour impressionner mon auditoire."
+            },
+            {
+              "roll": 2,
+              "text": "J'ai lu un livre sur presque tous les sujets et je ne me prive pas de le faire savoir."
+            },
+            {
+              "roll": 3,
+              "text": "Je suis patient avec les ignorants, mais je déteste la bêtise assumée."
+            },
+            {
+              "roll": 4,
+              "text": "J'ai toujours un carnet sur moi pour prendre des notes."
+            },
+            {
+              "roll": 5,
+              "text": "Je me perds facilement dans mes pensées."
+            },
+            {
+              "roll": 6,
+              "text": "Je suis convaincu que chaque problème a une solution logique."
+            },
+            {
+              "roll": 7,
+              "text": "Je cite souvent des auteurs, parfois de manière un peu pédante."
+            },
+            {
+              "roll": 8,
+              "text": "Je préfère observer et analyser avant d'agir."
+            }
+          ]
+        },
+        "ideals": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Connaissance. Le savoir est la plus grande richesse.",
+              "alignment": "neutre"
+            },
+            {
+              "roll": 2,
+              "text": "Partage. Le savoir doit bénéficier à tous.",
+              "alignment": "bon"
+            },
+            {
+              "roll": 3,
+              "text": "Pouvoir. L'information, c'est le pouvoir, et je le garde.",
+              "alignment": "mauvais"
+            },
+            {
+              "roll": 4,
+              "text": "Logique. Les émotions ne doivent jamais altérer le jugement.",
+              "alignment": "loyal"
+            },
+            {
+              "roll": 5,
+              "text": "Découverte. L'inconnu est la plus grande source de motivation.",
+              "alignment": "chaotique"
+            },
+            {
+              "roll": 6,
+              "text": "Perfection. On peut toujours approfondir sa compréhension.",
+              "alignment": "tout alignement"
+            }
+          ]
+        },
+        "bonds": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "J'appartiens à une faction secrète qui compte sur mes connaissances."
+            },
+            {
+              "roll": 2,
+              "text": "J'ai pu apprendre tout ce que je sais grâce au soutien d'un individu qui m'inspire admiration ou dégoût."
+            },
+            {
+              "roll": 3,
+              "text": "Mon domaine d'expertise est encore considéré comme mineur : il ne doit pas le rester."
+            },
+            {
+              "roll": 4,
+              "text": "Une question m'obsède et je me mets dans les situations les plus délicates pour y répondre."
+            },
+            {
+              "roll": 5,
+              "text": "Mon maître attend beaucoup de moi. Je ne supporterai pas de le décevoir."
+            },
+            {
+              "roll": 6,
+              "text": "Certaines vérités ne sont pas bonnes à dire, je dois m'assurer qu'elles restent tues."
+            }
+          ]
+        },
+        "flaws": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Je méprise ceux qui ne partagent pas ma soif d'apprendre."
+            },
+            {
+              "roll": 2,
+              "text": "Je me fais facilement manipuler par la flatterie intellectuelle."
+            },
+            {
+              "roll": 3,
+              "text": "Je suis tellement absorbé par mes études que j'en oublie le monde réel."
+            },
+            {
+              "roll": 4,
+              "text": "Je considère que toute information a un prix et je ne donne rien gratuitement."
+            },
+            {
+              "roll": 5,
+              "text": "Ma curiosité me pousse parfois à franchir des limites éthiques."
+            },
+            {
+              "roll": 6,
+              "text": "Je suis incapable d'admettre que j'ai tort."
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "bg-explorateur",
+    "name": "Explorateur des terres sauvages",
+    "data": {
+      "preset": true,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "95-96"
+      },
+      "flavor": {
+        "summary": "Vous ne comptez plus les lieues parcourues, les forêts traversées et les montagnes gravies, mais gardez un souvenir vivace de chaque terre foulée. L'horizon a su chaque jour vous offrir un visage nouveau.",
+        "adventureHook": "L'appât du gain ou la soif de découverte a-t-il fini par gonfler vos ambitions ?"
+      },
+      "proficiencies": {
+        "skills": {
+          "chooseCount": 2,
+          "options": [
+            "skill-athletisme",
+            "skill-dressage",
+            "skill-nature",
+            "skill-survie"
+          ]
+        },
+        "tools": {
+          "fixed": [
+            {
+              "type": "vehicle",
+              "id": "tl-vehicules-terrestres"
+            }
+          ],
+          "choose": []
+        },
+        "languages": { "choiceCount": 1 }
+      },
+      "equipment": {
+        "fixed": [
+          {
+            "id": "wp-baton-de-combat",
+            "name": "Bâton",
+            "qty": 1,
+            "location": "equipped"
+          },
+          {
+            "id": "gr-piege-a-loups",
+            "name": "Piège à loups",
+            "qty": 1,
+            "location": "backpack"
+          },
+          {
+            "id": "gr-souvenir",
+            "name": "Objet cher à vos yeux (souvenir de chasse)",
+            "qty": 1,
+            "location": "backpack"
+          },
+          {
+            "id": "gr-vetements-de-voyage",
+            "name": "Vêtements de voyage",
+            "qty": 1,
+            "location": "equipped"
+          }
+        ],
+        "currency": { "or": 5 }
+      },
+      "privilege": {
+        "id": "priv-belle-etoile",
+        "name": "À la belle étoile",
+        "desc": "La nécessité et l'expérience vous ont appris à vivre sans toit. Vous savez vous mettre à l'abri des pires intempéries, identifier les meilleurs sites naturels pour reposer vos jambes fourbues et trouver de quoi vous sustenter vous et quatre compagnons quand vous évoluez en milieu naturel."
+      },
+      "personalityTables": {
+        "traits": {
+          "die": "1d8",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "J'aime contempler le paysage en silence avant de me mettre en route."
+            },
+            {
+              "roll": 2,
+              "text": "Je suis toujours le premier debout et le dernier couché."
+            },
+            {
+              "roll": 3,
+              "text": "Je m'émerveille de chaque nouvel animal ou plante que je rencontre."
+            },
+            {
+              "roll": 4,
+              "text": "J'aime exagérer mon côté homme ou femme de la nature."
+            },
+            {
+              "roll": 5,
+              "text": "Je supporte très mal les gens qui persistent à parler fort hors des villes."
+            },
+            {
+              "roll": 6,
+              "text": "Je ne vaux pas tripette si je dois veiller au-delà d'une certaine heure."
+            },
+            {
+              "roll": 7,
+              "text": "Je renifle l'air et goûte l'eau partout où j'arrive."
+            },
+            {
+              "roll": 8,
+              "text": "Je marque mon passage discrètement pour retrouver mon chemin."
+            }
+          ]
+        },
+        "ideals": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Nature. La civilisation est une corruption de l'ordre naturel.",
+              "alignment": "neutre"
+            },
+            {
+              "roll": 2,
+              "text": "Découverte. Chaque terre inexplorée cache des merveilles.",
+              "alignment": "chaotique"
+            },
+            {
+              "roll": 3,
+              "text": "Protection. Les terres sauvages doivent être préservées.",
+              "alignment": "bon"
+            },
+            {
+              "roll": 4,
+              "text": "Survie. Seuls les plus adaptés méritent de perdurer.",
+              "alignment": "neutre"
+            },
+            {
+              "roll": 5,
+              "text": "Guidage. Mon devoir est de conduire les autres en sécurité.",
+              "alignment": "loyal"
+            },
+            {
+              "roll": 6,
+              "text": "Solitude. La vraie liberté se trouve loin de la foule.",
+              "alignment": "tout alignement"
+            }
+          ]
+        },
+        "bonds": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Mon village compte sur moi pour le sauver du malheur qui l'a frappé."
+            },
+            {
+              "roll": 2,
+              "text": "Des bonnes âmes m'ont sorti d'un mauvais pas et je compte perpétuer cette générosité."
+            },
+            {
+              "roll": 3,
+              "text": "Je m'ennuie dès que je reste plus de quelques jours au même endroit."
+            },
+            {
+              "roll": 4,
+              "text": "Je suis animé par l'espoir de trouver un jour la terre de mes rêves."
+            },
+            {
+              "roll": 5,
+              "text": "Je suis issu d'une famille respectée et je me garde de lui faire du tort."
+            },
+            {
+              "roll": 6,
+              "text": "La foi guide mes pas."
+            }
+          ]
+        },
+        "flaws": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Je suis très mal à l'aise en milieu urbain."
+            },
+            {
+              "roll": 2,
+              "text": "Je fais plus confiance aux animaux qu'aux gens."
+            },
+            {
+              "roll": 3,
+              "text": "Je prends des risques inconsidérés pour explorer un lieu inconnu."
+            },
+            {
+              "roll": 4,
+              "text": "Je suis têtu et je refuse de changer d'itinéraire."
+            },
+            {
+              "roll": 5,
+              "text": "Je ne supporte pas d'être enfermé."
+            },
+            {
+              "roll": 6,
+              "text": "Ma mauvaise hygiène rebute souvent mes compagnons."
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "bg-notable",
+    "name": "Notable",
+    "data": {
+      "preset": true,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "99-100"
+      },
+      "flavor": {
+        "summary": "Bien des gens auraient aimé grandir dans un environnement aussi favorable que le vôtre. Membre de la noblesse, de la haute bourgeoisie ou d'une importante famille de notables, vous n'avez manqué de rien. Mais votre voix semble compter plus que celle des autres.",
+        "adventureHook": "Qu'est-ce qui vous a poussé à quitter le confort de votre rang ?"
+      },
+      "proficiencies": {
+        "skills": {
+          "chooseCount": 2,
+          "options": ["skill-histoire", "skill-intuition", "skill-persuasion"]
+        },
+        "tools": {
+          "fixed": [],
+          "choose": [
+            {
+              "chooseCount": 1,
+              "options": [
+                {
+                  "type": "instrument",
+                  "any": true
+                },
+                {
+                  "type": "gameSet",
+                  "any": true
+                }
+              ]
+            }
+          ]
+        },
+        "languages": { "choiceCount": 1 }
+      },
+      "equipment": {
+        "fixed": [
+          {
+            "id": "gr-vetements-raffines",
+            "name": "Vêtements raffinés",
+            "qty": 1,
+            "location": "equipped"
+          },
+          {
+            "id": "gr-sauf-conduits-et-lettres",
+            "name": "Divers sauf-conduits et lettres de recommandation",
+            "qty": 1,
+            "location": "backpack"
+          }
+        ],
+        "fromToolProficiency": true,
+        "currency": { "or": 25 }
+      },
+      "privilege": {
+        "id": "priv-voix-au-chapitre",
+        "name": "Voix au chapitre",
+        "desc": "Dans la plupart des contextes civilisés, vous n'aurez aucun mal à faire valoir votre avis. Même lorsque votre héritage n'est pas connu localement, les gens reconnaissent en vous la prestance des bien-nés. Vous pourrez obtenir une audience auprès des autorités locales dans des délais plus brefs que la normale."
+      },
+      "personalityTables": {
+        "traits": {
+          "die": "1d8",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Je suis un privilégié, mais je m'efforce de bien traiter les petites gens."
+            },
+            {
+              "roll": 2,
+              "text": "Je ne me détends que lorsque l'affaire est bouclée."
+            },
+            {
+              "roll": 3,
+              "text": "J'aime partager ma sagesse avec mon prochain."
+            },
+            {
+              "roll": 4,
+              "text": "Je suis dur en affaires ; je n'occuperais pas cette place sans cela."
+            },
+            {
+              "roll": 5,
+              "text": "J'affiche une mine optimiste en toutes circonstances."
+            },
+            {
+              "roll": 6,
+              "text": "Les miséreux et les ignares me mettent mal à l'aise."
+            },
+            {
+              "roll": 7,
+              "text": "J'ai tendance à vouloir tout contrôler."
+            },
+            {
+              "roll": 8,
+              "text": "Je rappelle simplement quelles sont les règles de bonne conduite."
+            }
+          ]
+        },
+        "ideals": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Civilisation. Il faut préserver nos traditions des ravages de la barbarie.",
+              "alignment": "loyal"
+            },
+            {
+              "roll": 2,
+              "text": "Charité. Si j'ai plus que le nécessaire, c'est pour le partager.",
+              "alignment": "bon"
+            },
+            {
+              "roll": 3,
+              "text": "Agitation. L'autorité séculaire n'a plus lieu d'être.",
+              "alignment": "chaotique"
+            },
+            {
+              "roll": 4,
+              "text": "Pouvoir. Je dois me hisser dans la hiérarchie.",
+              "alignment": "loyal"
+            },
+            {
+              "roll": 5,
+              "text": "Cupidité. Il n'y a pas de riches sans pauvres, et j'ai choisi mon camp.",
+              "alignment": "mauvais"
+            },
+            {
+              "roll": 6,
+              "text": "Notoriété. Le respect de la communauté protège les miens.",
+              "alignment": "tout alignement"
+            }
+          ]
+        },
+        "bonds": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "J'ai dû pactiser avec un individu, et cette alliance jetterait l'opprobre sur les miens si elle était révélée."
+            },
+            {
+              "roll": 2,
+              "text": "J'ai perdu de vue mon amour de jeunesse, mais ma flamme est toujours aussi vive."
+            },
+            {
+              "roll": 3,
+              "text": "Je traquerai sans relâche ceux qui ont ruiné ma famille."
+            },
+            {
+              "roll": 4,
+              "text": "Quand on reconnaît mes origines, je dois leur faire honneur."
+            },
+            {
+              "roll": 5,
+              "text": "Je dois tout ou presque à un notable qui n'est pas de ma famille."
+            },
+            {
+              "roll": 6,
+              "text": "Je revaudrai aux miens les sacrifices qu'ils ont consentis."
+            }
+          ]
+        },
+        "flaws": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Je reste un incorrigible séducteur."
+            },
+            {
+              "roll": 2,
+              "text": "Je suis un panier percé."
+            },
+            {
+              "roll": 3,
+              "text": "J'ai facilement tendance à traiter les autres comme mes laquais."
+            },
+            {
+              "roll": 4,
+              "text": "Je ne peux m'empêcher de dénigrer les autres quand ils ne sont pas là."
+            },
+            {
+              "roll": 5,
+              "text": "Quand les choses traînent en longueur, je suis irascible."
+            },
+            {
+              "roll": 6,
+              "text": "Je supporte de moins en moins les riches, et ça commence à se sentir."
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "bg-reclus",
+    "name": "Reclus",
+    "data": {
+      "preset": true,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "101-102"
+      },
+      "flavor": {
+        "summary": "Aussi loin que remonte votre mémoire, vous avez préféré la solitude. Ermite, moine contemplatif ou simple solitaire, vous avez passé une longue période en retrait du monde, méditant et cherchant l'illumination.",
+        "adventureHook": "Qu'est-ce qui vous a arraché à votre réclusion pour rejoindre l'aventure ?"
+      },
+      "proficiencies": {
+        "skills": {
+          "chooseCount": 2,
+          "options": [
+            "skill-medecine",
+            "skill-religion",
+            "skill-survie",
+            "skill-nature"
+          ]
+        },
+        "tools": {
+          "fixed": [
+            {
+              "type": "tool",
+              "id": "tl-necessaire-dherboristerie"
+            }
+          ],
+          "choose": []
+        },
+        "languages": { "choiceCount": 1 }
+      },
+      "equipment": {
+        "fixed": [
+          {
+            "id": "gr-vetements-ordinaires",
+            "name": "Vêtements ordinaires",
+            "qty": 1,
+            "location": "equipped"
+          },
+          {
+            "id": "gr-couverture",
+            "name": "Couverture",
+            "qty": 1,
+            "location": "backpack"
+          },
+          {
+            "id": "tl-necessaire-dherboristerie",
+            "name": "Nécessaire d'herboristerie",
+            "qty": 1,
+            "location": "backpack"
+          }
+        ],
+        "currency": { "or": 5 }
+      },
+      "privilege": {
+        "id": "priv-sixieme-sens",
+        "name": "Sixième sens",
+        "desc": "La solitude et le silence vous distillent parfois des fulgurances, des prémonitions. Souvent, vous ne les comprenez que trop tard. Il vous arrive toutefois de suivre votre instinct pour vous rendre compte que vous aviez vu juste. Votre meneur estimera quand vous fournir ces bribes d'indices."
+      },
+      "personalityTables": {
+        "traits": {
+          "die": "1d8",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Je suis d'une patience infinie, tant qu'on me laisse dans mes pensées."
+            },
+            {
+              "roll": 2,
+              "text": "Je rase chaque jour tous les poils de mon corps."
+            },
+            {
+              "roll": 3,
+              "text": "La vie en société et ses contraintes me semblent absurdes."
+            },
+            {
+              "roll": 4,
+              "text": "Je ne réagis qu'après plusieurs secondes quand on m'adresse la parole."
+            },
+            {
+              "roll": 5,
+              "text": "Je n'élève jamais la voix et mes mouvements restent posés."
+            },
+            {
+              "roll": 6,
+              "text": "Je laisse la nature veiller sur mon corps sans chercher à l'altérer."
+            },
+            {
+              "roll": 7,
+              "text": "Je suis souvent en avance ou en retard, car j'ai peu la notion du temps."
+            },
+            {
+              "roll": 8,
+              "text": "Mes journées sont ponctuées de divers rituels."
+            }
+          ]
+        },
+        "ideals": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Salut. La sagesse et la compassion sauveront le monde.",
+              "alignment": "bon"
+            },
+            {
+              "roll": 2,
+              "text": "Illumination. Je suis engagé sur la bonne voie et serai bientôt prêt pour l'ultime étape.",
+              "alignment": "tout alignement"
+            },
+            {
+              "roll": 3,
+              "text": "Raison. Le recueillement est le seul moyen d'ignorer les influences qui sèment la confusion.",
+              "alignment": "loyal"
+            },
+            {
+              "roll": 4,
+              "text": "Refuge. Les préoccupations du monde ne sont qu'une source de souffrance.",
+              "alignment": "neutre"
+            },
+            {
+              "roll": 5,
+              "text": "Cynisme. La morale et les conventions sociales ne sont que des outils pour asservir les faibles.",
+              "alignment": "mauvais"
+            },
+            {
+              "roll": 6,
+              "text": "Maturité. La plus profonde des solitudes m'a appris la nécessité de la compagnie.",
+              "alignment": "tout alignement"
+            }
+          ]
+        },
+        "bonds": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Je cherche l'illumination et rien ne m'en détournera."
+            },
+            {
+              "roll": 2,
+              "text": "Un lieu sacré et secret dépend de ma protection."
+            },
+            {
+              "roll": 3,
+              "text": "J'ai découvert un secret terrible pendant ma réclusion."
+            },
+            {
+              "roll": 4,
+              "text": "Mon ancien maître m'a confié une mission avant de disparaître."
+            },
+            {
+              "roll": 5,
+              "text": "Je suis entré en réclusion pour fuir une responsabilité."
+            },
+            {
+              "roll": 6,
+              "text": "Ma réclusion m'a permis de comprendre un danger qui menace le monde."
+            }
+          ]
+        },
+        "flaws": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Je me désintéresse totalement du confort matériel des autres."
+            },
+            {
+              "roll": 2,
+              "text": "J'ai chaque jour plus de mal à ne pas quitter mes compagnons pour aller retrouver ma vie de reclus."
+            },
+            {
+              "roll": 3,
+              "text": "Toute cette méditation m'a permis de réprimer mon vice inavouable, mais pas de le vaincre."
+            },
+            {
+              "roll": 4,
+              "text": "Je ne comprends pas toujours pourquoi les gens tiennent tant à leur dérisoire existence."
+            },
+            {
+              "roll": 5,
+              "text": "Je ne connais que l'excès, que ce soit dans la privation ou la consommation."
+            },
+            {
+              "roll": 6,
+              "text": "Les gens croient que je médite quand mon regard se perd dans le vide, mais ils ne se doutent pas des idées sinistres qui animent parfois mon esprit."
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "bg-survivant",
+    "name": "Survivant",
+    "data": {
+      "preset": true,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "102-103"
+      },
+      "flavor": {
+        "summary": "Aussi loin que remonte votre mémoire, vous avez toujours été cerné par le sang et la mort. Les conflits ont emporté nombre de vos proches et vous ont dépouillé plus d'une fois, mais ils vous ont finalement épargné.",
+        "adventureHook": "Qu'est-ce qui vous pousse à continuer malgré tout ce que vous avez traversé ?"
+      },
+      "proficiencies": {
+        "skills": {
+          "chooseCount": 2,
+          "options": [
+            "skill-athletisme",
+            "skill-intuition",
+            "skill-investigation",
+            "skill-perception",
+            "skill-survie"
+          ]
+        },
+        "tools": {
+          "fixed": [],
+          "choose": [
+            {
+              "chooseCount": 1,
+              "options": [
+                {
+                  "type": "tool",
+                  "any": true
+                },
+                {
+                  "type": "vehicle",
+                  "any": true
+                },
+                {
+                  "type": "tool",
+                  "id": "tl-necessaire-dherboristerie"
+                }
+              ]
+            }
+          ]
+        },
+        "languages": { "choiceCount": 1 }
+      },
+      "equipment": {
+        "fixed": [
+          {
+            "id": "gr-vetements-ordinaires",
+            "name": "Vêtements ordinaires",
+            "qty": 1,
+            "location": "equipped"
+          },
+          {
+            "id": "gr-souvenir",
+            "name": "Souvenir de votre communauté d'origine",
+            "qty": 1,
+            "location": "backpack"
+          }
+        ],
+        "fromToolProficiency": true,
+        "currency": { "or": 5 }
+      },
+      "privilege": {
+        "id": "priv-entre-les-gouttes",
+        "name": "Entre les gouttes",
+        "desc": "Votre expérience des guerres et des calamités vous a appris à déceler les signes précurseurs d'un danger mortel et à vous mettre à l'abri. En région de combats ou menacée par des catastrophes, vous savez trouver les itinéraires les moins exposés et les refuges les plus sûrs."
+      },
+      "personalityTables": {
+        "traits": {
+          "die": "1d8",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Je ne verse jamais dans l'optimisme. C'est même plutôt le contraire."
+            },
+            {
+              "roll": 2,
+              "text": "Ma meilleure arme contre l'horreur ? Le sens de la dérision."
+            },
+            {
+              "roll": 3,
+              "text": "Je m'efforce de désamorcer les conflits inutiles, bien conscient que la plupart le sont."
+            },
+            {
+              "roll": 4,
+              "text": "Je me méfie de tout le monde jusqu'à ce qu'on ait prouvé sa loyauté."
+            },
+            {
+              "roll": 5,
+              "text": "Je protège les enfants et les innocents avec une détermination farouche."
+            },
+            {
+              "roll": 6,
+              "text": "Je mange chaque repas comme si c'était le dernier."
+            },
+            {
+              "roll": 7,
+              "text": "Je dors toujours avec une arme à portée de main."
+            },
+            {
+              "roll": 8,
+              "text": "Je reste calme dans les situations de crise, c'est après que je m'effondre."
+            }
+          ]
+        },
+        "ideals": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Résilience. Ce qui ne me tue pas me rend plus fort.",
+              "alignment": "tout alignement"
+            },
+            {
+              "roll": 2,
+              "text": "Protection. Plus jamais je ne laisserai quelqu'un souffrir si je peux l'empêcher.",
+              "alignment": "bon"
+            },
+            {
+              "roll": 3,
+              "text": "Pragmatisme. La survie exige parfois des choix difficiles.",
+              "alignment": "neutre"
+            },
+            {
+              "roll": 4,
+              "text": "Vengeance. Ceux qui ont causé tant de malheur doivent payer.",
+              "alignment": "chaotique"
+            },
+            {
+              "roll": 5,
+              "text": "Ordre. Seule une structure solide peut prévenir le chaos qui mène au désastre.",
+              "alignment": "loyal"
+            },
+            {
+              "roll": 6,
+              "text": "Liberté. Les lois n'ont pas empêché les catastrophes ; je ne compte que sur moi.",
+              "alignment": "chaotique"
+            }
+          ]
+        },
+        "bonds": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Je cherche des survivants de ma communauté d'origine."
+            },
+            {
+              "roll": 2,
+              "text": "J'ai juré de rebâtir ce qui a été détruit."
+            },
+            {
+              "roll": 3,
+              "text": "Un compagnon de malheur m'a sauvé la vie et je lui dois tout."
+            },
+            {
+              "roll": 4,
+              "text": "Je porte un objet qui appartenait à quelqu'un que j'ai perdu."
+            },
+            {
+              "roll": 5,
+              "text": "Je refuse de fuir à nouveau, quoi qu'il arrive."
+            },
+            {
+              "roll": 6,
+              "text": "Je veux comprendre pourquoi le malheur s'est abattu sur nous."
+            }
+          ]
+        },
+        "flaws": {
+          "die": "1d6",
+          "entries": [
+            {
+              "roll": 1,
+              "text": "Je suis hanté par des cauchemars récurrents."
+            },
+            {
+              "roll": 2,
+              "text": "Je panique dans les espaces clos ou les foules."
+            },
+            {
+              "roll": 3,
+              "text": "Je thésaurise compulsivement la nourriture et les ressources."
+            },
+            {
+              "roll": 4,
+              "text": "J'ai du mal à m'attacher aux gens, de peur de les perdre."
+            },
+            {
+              "roll": 5,
+              "text": "Ma méfiance frôle parfois la paranoïa."
+            },
+            {
+              "roll": 6,
+              "text": "Je réagis avec une violence disproportionnée quand je me sens menacé."
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "bg-custom",
+    "name": "Personnalisé",
+    "data": {
+      "preset": false,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "66-86"
+      },
+      "flavor": {
+        "summary": "Créez votre propre historique en suivant les six étapes de conception.",
+        "adventure_hook": null
+      },
+      "proficiencies": {
+        "skills": {
+          "choose_count": 2,
+          "options": "any"
+        },
+        "tools": {
+          "fixed": [],
+          "choose": [
+            {
+              "choose_count": 2,
+              "category_options": [
+                "tool",
+                "instrument",
+                "game_set",
+                "vehicle",
+                "language"
+              ],
+              "note": "Deux maîtrises à répartir librement entre outils, véhicules et langues."
+            }
+          ]
+        },
+        "languages": {
+          "choiceCount": 0,
+          "note": "Les langues sont comptées dans les maîtrises complémentaires ci-dessus."
+        }
+      },
+      "equipment": {
+        "fixed": [],
+        "custom": true,
+        "budget_rules": {
+          "desc": "L'équipement d'historique comprend : les outils maîtrisés, un souvenir, des vêtements, et une bourse.",
+          "currency_range": {
+            "min": 5,
+            "max": 25
+          }
+        }
+      },
+      "privilege": {
+        "id": null,
+        "name": null,
+        "desc": null,
+        "custom": true,
+        "guidelines": "Définissez un avantage narratif unique reflétant le vécu de votre personnage."
+      },
+      "personality_tables": null
+    }
+  }
+]
