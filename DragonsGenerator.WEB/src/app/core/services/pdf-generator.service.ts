@@ -392,9 +392,16 @@ export class PdfGeneratorService {
     yPx: number,
     maxWidthMm: number,
     lineHeightMm: number = 4,
+    maxLines?: number, // <-- Ajout du paramètre optionnel
   ): void {
     if (!text) return;
-    const lines = pdf.splitTextToSize(text, maxWidthMm);
+    let lines = pdf.splitTextToSize(text, maxWidthMm);
+
+    // Si une limite de lignes est définie, on coupe le tableau
+    if (maxLines && maxLines > 0) {
+      lines = lines.slice(0, maxLines);
+    }
+
     let currentY = pxToMmY(yPx);
     lines.forEach((line: string) => {
       pdf.text(line, pxToMmX(xPx), currentY);
@@ -875,27 +882,27 @@ export class PdfGeneratorService {
     pdf.setFontSize(10);
     const p = c.personality;
 
-    // ───────────────────────────────────────────────────────────────────────
-    // NOUVEAU : On utilise this.textWrapped pour que les textes longs
-    // reviennent automatiquement à la ligne.
-    // ───────────────────────────────────────────────────────────────────────
-
     if (p.description) {
       // 90mm de large, 4.5mm de hauteur de ligne
-      this.textWrapped(pdf, p.description, 38, 72, 90, 4.5);
+      this.textWrapped(pdf, p.description, 38, 72, 90, 8.5, 2);
     }
 
     if (p.background) {
-      // 90mm de large, 4.5mm de hauteur de ligne
-      this.textWrapped(pdf, p.background, 37, 137, 120, 8);
+      // 120mm de large, 8mm de hauteur de ligne
+      this.textWrapped(pdf, p.background, 37, 137, 120, 8, 4);
     }
 
-    if (p.ideal) this.text(pdf, p.ideal, 402, 127);
-    if (p.traits) this.text(pdf, p.traits, 402, 199);
-    if (p.alignment) this.text(pdf, p.alignment, 402, 270);
-    if (p.bonds) this.text(pdf, p.bonds, 402, 316);
-    if (p.flaws) this.text(pdf, p.flaws, 402, 388);
-    if (p.handicap) this.text(pdf, p.handicap, 402, 459);
+    // NOUVEAU : Application de textWrapped pour la colonne de droite (Idéal, Traits, etc.)
+    // Largeur estimée ~55mm pour ne pas déborder, hauteur de ligne 4.5mm
+    const rightColMaxWidth = 65;
+    const rightColLineH = 8.5;
+
+    if (p.ideal) this.textWrapped(pdf, p.ideal, 402, 127, rightColMaxWidth, rightColLineH, 2);
+    if (p.traits) this.textWrapped(pdf, p.traits, 402, 199, rightColMaxWidth, rightColLineH, 2);
+    if (p.alignment) this.text(pdf, p.alignment, 402, 270); // Alignement (court)
+    if (p.bonds) this.textWrapped(pdf, p.bonds, 402, 316, rightColMaxWidth, rightColLineH, 2);
+    if (p.flaws) this.textWrapped(pdf, p.flaws, 402, 388, rightColMaxWidth, rightColLineH, 2);
+    if (p.handicap) this.textWrapped(pdf, p.handicap, 402, 459, rightColMaxWidth, rightColLineH);
 
     if (p.story) {
       pdf.setFontSize(8);
@@ -904,7 +911,6 @@ export class PdfGeneratorService {
         .replace(/\n/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
-      // Ta configuration d'origine pour l'histoire
       this.textWrapped(pdf, cleanedStory, 72, 441, 97, 8.4);
     }
   }
