@@ -21,7 +21,7 @@ import {
   PersonalityTable,
   PersonalityTableWithAlignment,
 } from '@core/models/Backgrounds/background';
-import { Currency, EquipmentSlot } from '@core/models/Character/character';
+import { Currency, EquipmentSlot, EquipmentInstance } from '@core/models/Character/character';
 
 // ─── Types locaux ────────────────────────────────────────────────────────────
 
@@ -270,21 +270,26 @@ export class BackgroundStep implements OnInit {
     const data = this.selectedData();
     if (!bg || !data) return;
 
-    const bgSlots: EquipmentSlot[] = [];
-    let slotIndex = 100;
+    // ── Items fixes → EquipmentInstance[] ──
+    const fixedEquipment: EquipmentInstance[] = (data.equipment?.fixed ?? []).map((item: any) => ({
+      instanceId: crypto.randomUUID(),
+      refId: item.id,
+      name: item.name,
+      qty: item.qty ?? 1,
+      location: item.location ?? 'backpack',
+      equipped: item.location === 'equipped',
+      wKg: null,
+      customData: undefined,
+    }));
 
-    if (data.equipment.fixed && data.equipment.fixed.length > 0) {
-      bgSlots.push({
-        slot: slotIndex++,
-        description: `Équipement d'historique (${bg.name})`,
-        fixed: data.equipment.fixed.map((item: any) => ({ id: item.id, qty: item.qty })),
-      });
-    }
+    // ── Slots à choix (fromToolProficiency) → EquipmentSlot[] ──
+    // Ce sont les slots interactifs, générés plus tard selon les outils maîtrisés
+    const choiceSlots: EquipmentSlot[] = [];
 
     const bgCurrency: Currency = {
       cuivre: 0,
       argent: 0,
-      or: data.equipment.currency?.or ?? 0,
+      or: data.equipment?.currency?.or ?? 0,
       platine: 0,
     };
 
@@ -297,8 +302,13 @@ export class BackgroundStep implements OnInit {
       proficiencies: data.proficiencies,
       languages: [],
       bonusLanguageCount: this.isCustom() ? 0 : this.maxLanguages(),
-      equipment: [],
-      equipmentSlots: bgSlots,
+
+      // ── NOUVEAU : items fixes injectés directement ──
+      equipment: fixedEquipment,
+
+      // ── Seuls les slots à choix restent ici ──
+      equipmentSlots: choiceSlots,
+
       currency: bgCurrency,
       privilegeId: this.isCustom() ? 'priv-custom' : data.privilege.id,
       privilegeName: this.isCustom() ? this.customPrivilegeName() || null : data.privilege.name,
@@ -306,10 +316,6 @@ export class BackgroundStep implements OnInit {
       selectedHandicaps: [],
       handicapCompensationType: null,
 
-      // ---------------------------------------------------------------------
-      // LA CORRECTION EST ICI :
-      // On associe le nom de l'historique et sa description séparés par un ":"
-      // ---------------------------------------------------------------------
       backgroundText: data.preset
         ? `${bg.name} : ${data.flavor.summary}`
         : `${this.customPrivilegeName() || 'Historique Personnalisé'} : ${this.customPrivilegeDesc()}`,

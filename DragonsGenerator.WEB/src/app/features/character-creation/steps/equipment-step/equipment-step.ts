@@ -1,5 +1,3 @@
-// features/character-creation/steps/equipment-step/equipment-step.ts
-
 import {
   Component,
   OnInit,
@@ -14,7 +12,6 @@ import { DataService } from '../../../../core/services/data.service';
 import { CharacterBuilderService } from '../../../../core/services/character-builder.service';
 import type { EquipmentInstance } from '../../../../core/models/Character/character';
 
-// --- Interfaces DTO ---
 export interface EquipmentRaw {
   id: string;
   name: string;
@@ -29,6 +26,7 @@ interface ItemRef {
   id: string;
   qty: number;
 }
+
 interface RawSlot {
   slot: number;
   description?: string;
@@ -58,7 +56,6 @@ interface ResolvedSlot {
   alternatives: ResolvedAlternative[];
 }
 
-// --- Filtres de Catégories ---
 const CATEGORY_FILTERS: Record<
   string,
   { type: string; subtypes?: string[]; ids?: string[]; label: string }
@@ -92,7 +89,6 @@ const CATEGORY_FILTERS: Record<
     ],
     label: 'Instrument de musique',
   },
-  // NOUVEAU : Matériel de jeu et véhicules
   'category-gaming-sets': {
     type: 'TOOL',
     ids: ['tl-des', 'tl-echecs', 'tl-go', 'tl-jeu-de-cartes', 'tl-osselets'],
@@ -138,12 +134,9 @@ export class EquipmentStep implements OnInit {
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
 
-  // État local des sélections
   readonly pickedAlt = signal<Map<number, number>>(new Map());
   readonly pickedCategory = signal<Map<string, string>>(new Map());
   readonly activeSlotIndex = signal(0);
-
-  // === Computed ===
 
   private readonly catalogMap = computed(() => {
     const m = new Map<string, EquipmentRaw>();
@@ -155,7 +148,6 @@ export class EquipmentStep implements OnInit {
     const map = this.catalogMap();
     if (map.size === 0) return [];
 
-    // NOUVEAU : Fusion des slots de Classe et d'Historique
     const cAny = this.builder.creation() as any;
     const rawSlots: RawSlot[] = [
       ...(this.builder.creation().startingEquipmentSlots ?? []),
@@ -197,7 +189,6 @@ export class EquipmentStep implements OnInit {
     return true;
   });
 
-  // === Lifecycle ===
   ngOnInit(): void {
     this.dataService.getEquipments().subscribe({
       next: (items) => {
@@ -211,7 +202,6 @@ export class EquipmentStep implements OnInit {
     });
   }
 
-  // === Actions ===
   nextSlot(): void {
     if (this.activeSlotIndex() < this.resolvedSlots().length - 1) {
       this.activeSlotIndex.update((i) => i + 1);
@@ -227,7 +217,6 @@ export class EquipmentStep implements OnInit {
     if (!slot) return;
     this.pickedAlt.update((m) => new Map(m).set(slot.slotNumber, altIdx));
 
-    // Nettoyage des anciens choix de catégories du slot
     this.pickedCategory.update((m) => {
       const n = new Map(m);
       for (const k of n.keys()) if (k.startsWith(`${slot.slotNumber}-`)) n.delete(k);
@@ -293,7 +282,6 @@ export class EquipmentStep implements OnInit {
     this.builder.previousStep();
   }
 
-  // === Helpers ===
   getIconForItem(item: ResolvedItem): string {
     if (item.isCategory) {
       const id = item.ref.id;
@@ -376,4 +364,12 @@ export class EquipmentStep implements OnInit {
           : undefined,
     };
   }
+
+  readonly backgroundFixedItems = computed<EquipmentInstance[]>(() => {
+    return (this.builder.creation() as any).backgroundEquipment ?? [];
+  });
+
+  readonly backgroundName = computed<string | null>(() => {
+    return this.builder.creation().backgroundName;
+  });
 }

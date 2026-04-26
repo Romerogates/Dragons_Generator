@@ -1,5 +1,3 @@
-// core/services/character-builder.service.ts
-
 import { Injectable, signal, computed, effect } from '@angular/core';
 import {
   Character,
@@ -29,10 +27,6 @@ import {
   formatModifier,
 } from '../models/Character/character';
 
-// =============================================================================
-// DTOs
-// =============================================================================
-
 export interface SpeciesSelection {
   speciesId: string;
   speciesName: string;
@@ -60,14 +54,9 @@ export interface BackgroundSelection {
   backgroundId: string;
   backgroundName: string;
   backgroundPreset: boolean;
-
-  // Champs gardés temporairement pour la rétrocompatibilité avec background-step
   skills: string[];
   tools: string[];
-
-  // NOUVEAU : Transmission des règles de maîtrises (choix possibles)
   proficiencies?: any;
-
   languages: string[];
   bonusLanguageCount: number;
   equipmentSlots: EquipmentSlot[];
@@ -118,19 +107,13 @@ export interface IdentitySelection {
   story?: string;
 }
 
-// =============================================================================
-// ÉTAT INITIAL
-// =============================================================================
-
-// Extension locale pour intégrer les slots d'historique et les règles de maîtrises
 export type ExtendedCharacterCreation = CharacterCreation & {
   backgroundEquipmentSlots?: EquipmentSlot[];
-  toolEquipmentSlots?: EquipmentSlot[]; // Les slots générés par les choix d'outils
-  backgroundProficiencies?: any; // Les règles de sélection d'historique
+  toolEquipmentSlots?: EquipmentSlot[];
+  backgroundProficiencies?: any;
 };
 
 const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
-  // Étape 1 - Espèce
   speciesId: null,
   speciesName: null,
   subspeciesId: null,
@@ -144,13 +127,11 @@ const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   hasDarkvision: false,
   darkvisionRadius: 0,
 
-  // Étape 2 - Civilisation
   civilizationId: null,
   civilizationName: null,
   civilizationLanguages: [],
   civilizationWritingSystems: [],
 
-  // Étape 3 - Historique
   backgroundId: null,
   backgroundName: null,
   backgroundPreset: false,
@@ -168,7 +149,6 @@ const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   selectedHandicaps: [],
   handicapCompensationType: null,
 
-  // Étape 4 - Classe
   classId: null,
   className: null,
   subclassId: null,
@@ -186,7 +166,6 @@ const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   classFeatures: [],
   startingEquipmentSlots: [],
 
-  // Étape 5 - Caractéristiques
   baseAbilities: {
     force: DEFAULT_ABILITY_SCORE,
     dexterite: DEFAULT_ABILITY_SCORE,
@@ -197,18 +176,14 @@ const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   },
   pointsRemaining: STARTING_POINTS,
 
-  // Étape 6 - Compétences
   selectedSkills: [],
 
-  // Étape 7 - Équipement
   selectedEquipment: [],
   currency: { cuivre: 0, argent: 0, or: 0, platine: 0 },
 
-  // Étape 8 - Langues
   languages: [],
   bonusLanguageCount: 0,
 
-  // Étape 9 - Identité
   name: '',
   description: '',
   background: '',
@@ -220,13 +195,8 @@ const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   handicap: '',
   story: '',
 
-  // Étape 10 - Magie (conditionnel)
   spellcastingDetails: {},
 };
-
-// =============================================================================
-// PERSISTENCE
-// =============================================================================
 
 const STORAGE_KEY = 'dragon_character_builder_v4';
 
@@ -241,13 +211,8 @@ interface EditingRef {
   createdAt: string;
 }
 
-// =============================================================================
-// SERVICE
-// =============================================================================
-
 @Injectable({ providedIn: 'root' })
 export class CharacterBuilderService {
-  // On utilise notre type étendu ici
   readonly creation = signal<ExtendedCharacterCreation>(structuredClone(INITIAL_CREATION_STATE));
   readonly currentStep = signal<number>(1);
   private readonly editingRef = signal<EditingRef | null>(null);
@@ -264,10 +229,6 @@ export class CharacterBuilderService {
     });
   }
 
-  // =========================================================================
-  // COMPUTED
-  // =========================================================================
-
   readonly steps = computed(() => {
     const base = [
       { number: 1, title: 'Espèce', icon: '🧬' },
@@ -275,7 +236,7 @@ export class CharacterBuilderService {
       { number: 3, title: 'Historique', icon: '📖' },
       { number: 4, title: 'Classe', icon: '⚔️' },
       { number: 5, title: 'Caractéristiques', icon: '📊' },
-      { number: 6, title: 'Savoirs & Maîtrises', icon: '🎯' }, // Renommé
+      { number: 6, title: 'Savoirs & Maîtrises', icon: '🎯' },
       { number: 7, title: 'Équipement', icon: '🎒' },
       { number: 8, title: 'Langues', icon: '🗣️' },
     ];
@@ -339,7 +300,6 @@ export class CharacterBuilderService {
 
   readonly passivePerception = computed<number>(() => {
     const mods = this.abilityModifiers();
-    // Prend en compte les compétences de classe ET d'historique
     const hasPerception =
       this.creation().selectedSkills.includes('skill-perception') ||
       this.creation().backgroundSkills.includes('skill-perception');
@@ -364,10 +324,6 @@ export class CharacterBuilderService {
     return parts.length > 0 ? parts.join(' · ') : 'Brouillon en cours';
   });
 
-  // =========================================================================
-  // VALIDATION PAR ÉTAPE
-  // =========================================================================
-
   isStepValid(step: number): boolean {
     const c = this.creation();
 
@@ -383,7 +339,7 @@ export class CharacterBuilderService {
       case 5:
         return c.pointsRemaining >= 0;
       case 6:
-        return true; // Validé en direct sur le composant des maîtrises
+        return true;
       case 7:
         return true;
       case 8:
@@ -400,10 +356,6 @@ export class CharacterBuilderService {
         return false;
     }
   }
-
-  // =========================================================================
-  // ÉTAPE 1 - ESPÈCE
-  // =========================================================================
 
   setSpecies(selection: SpeciesSelection): void {
     this.creation.update((c) => {
@@ -469,10 +421,6 @@ export class CharacterBuilderService {
     });
   }
 
-  // =========================================================================
-  // ÉTAPE 2 - CIVILISATION
-  // =========================================================================
-
   setCivilization(selection: CivilizationSelection): void {
     this.creation.update((c) => ({
       ...c,
@@ -497,10 +445,6 @@ export class CharacterBuilderService {
     }));
   }
 
-  // =========================================================================
-  // ÉTAPE 3 - HISTORIQUE
-  // =========================================================================
-
   setBackground(selection: BackgroundSelection): void {
     this.creation.update((c) => {
       const cAny = c as any;
@@ -513,18 +457,15 @@ export class CharacterBuilderService {
         backgroundId: selection.backgroundId,
         backgroundName: selection.backgroundName,
         backgroundPreset: selection.backgroundPreset,
-
-        // On sauvegarde les RÈGLES de l'historique
         backgroundProficiencies: selection.proficiencies ?? null,
-
-        // On réinitialise les choix, ils seront faits à l'étape 6
         backgroundSkills: [],
         backgroundTools: [],
         toolEquipmentSlots: [],
-
         backgroundLanguages: [],
-        backgroundEquipment: [],
+
+        backgroundEquipment: selection.equipment,
         backgroundEquipmentSlots: selection.equipmentSlots,
+
         backgroundCurrency: selection.currency,
         privilegeId: selection.privilegeId,
         privilegeName: selection.privilegeName,
@@ -584,10 +525,6 @@ export class CharacterBuilderService {
     });
   }
 
-  // =========================================================================
-  // ÉTAPE 4 - CLASSE
-  // =========================================================================
-
   setClass(selection: ClassSelection): void {
     this.creation.update((c) => ({
       ...c,
@@ -638,10 +575,6 @@ export class CharacterBuilderService {
     }));
   }
 
-  // =========================================================================
-  // ÉTAPE 6 - SAVOIRS & MAÎTRISES (NOUVEAU)
-  // =========================================================================
-
   setProficiencies(
     classSkills: string[],
     bgSkills: string[],
@@ -659,10 +592,6 @@ export class CharacterBuilderService {
         }) as ExtendedCharacterCreation,
     );
   }
-
-  // =========================================================================
-  // ÉTAPE 5 - CARACTÉRISTIQUES
-  // =========================================================================
 
   setAbilityScore(key: AbilityKey, value: number): void {
     if (value < MIN_ABILITY_SCORE || value > MAX_ABILITY_SCORE) return;
@@ -701,10 +630,6 @@ export class CharacterBuilderService {
       pointsRemaining: STARTING_POINTS,
     }));
   }
-
-  // =========================================================================
-  // MÉTHODES UTILITAIRES (Compétences, Équipements, Langues...)
-  // =========================================================================
 
   toggleSkill(skill: string): void {
     this.creation.update((c) => {
@@ -773,10 +698,6 @@ export class CharacterBuilderService {
     this.creation.update((c) => ({ ...c, spellcastingDetails: details }));
   }
 
-  // =========================================================================
-  // NAVIGATION
-  // =========================================================================
-
   nextStep(): void {
     const total = this.totalSteps();
     if (this.currentStep() < total && this.isCurrentStepValid()) {
@@ -795,10 +716,6 @@ export class CharacterBuilderService {
       this.currentStep.set(step);
     }
   }
-
-  // =========================================================================
-  // MODE ÉDITION
-  // =========================================================================
 
   get isEditMode(): boolean {
     return this.editingRef() !== null;
@@ -845,7 +762,7 @@ export class CharacterBuilderService {
       backgroundPreset: savedCharacter.backgroundRef !== null,
       backgroundSkills: [],
       backgroundTools: [],
-      backgroundProficiencies: null, // Sera vide en édition
+      backgroundProficiencies: null,
       backgroundLanguages: [],
       backgroundEquipment: [],
       backgroundEquipmentSlots: [],
@@ -936,20 +853,12 @@ export class CharacterBuilderService {
     }
   }
 
-  // =========================================================================
-  // RESET
-  // =========================================================================
-
   reset(): void {
     this.creation.set(structuredClone(INITIAL_CREATION_STATE));
     this.currentStep.set(1);
     this.editingRef.set(null);
     this.clearStorage();
   }
-
-  // =========================================================================
-  // BUILD
-  // =========================================================================
 
   build(): Character {
     const c = this.creation();
@@ -962,13 +871,10 @@ export class CharacterBuilderService {
     const features: FeatureInstance[] = [...c.speciesTraits, ...c.classFeatures];
     const attacks = this.buildAttacks(c.selectedEquipment, modifiers);
 
-    // L'équipement physique provient de selectedEquipment.
-    // backgroundEquipment est maintenant déprécié mais conservé pour compatibilité.
     const allEquipment = [...c.selectedEquipment, ...c.backgroundEquipment];
     const totalWeight = allEquipment.reduce((sum, item) => sum + (item.wKg ?? 0) * item.qty, 0);
     const maxCarry = abilities.force * 7.5;
 
-    // La monnaie de l'historique a été configurée dans l'étape 3
     const mergedCurrency: Currency = {
       cuivre: c.currency.cuivre + c.backgroundCurrency.cuivre,
       argent: c.currency.argent + c.backgroundCurrency.argent,
@@ -976,7 +882,6 @@ export class CharacterBuilderService {
       platine: c.currency.platine + c.backgroundCurrency.platine,
     };
 
-    // Les outils d'historique choisis à l'étape 6 sont agrégés ici
     const allTools = [...new Set([...c.toolProficiencies, ...c.backgroundTools])];
 
     return {
@@ -1104,10 +1009,6 @@ export class CharacterBuilderService {
       },
     };
   }
-
-  // =========================================================================
-  // BUILD HELPERS (privés)
-  // =========================================================================
 
   private buildSpellcasting(
     c: CharacterCreation,
@@ -1329,13 +1230,10 @@ export class CharacterBuilderService {
   getModifier(score: number): number {
     return getAbilityModifier(score);
   }
+
   formatMod(score: number): string {
     return formatModifier(getAbilityModifier(score));
   }
-
-  // =========================================================================
-  // PERSISTENCE
-  // =========================================================================
 
   private saveToStorage(data: StoredState): void {
     try {

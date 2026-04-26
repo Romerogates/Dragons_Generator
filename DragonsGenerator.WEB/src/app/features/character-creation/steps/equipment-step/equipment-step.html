@@ -23,6 +23,58 @@
   }
 
   @if (!loading() && !error()) {
+    @if (backgroundFixedItems().length > 0) {
+      <div class="w-full max-w-5xl px-4 mb-8 animate-fade-in">
+        <div class="flex items-center gap-4 mb-4 w-full">
+          <div class="h-px flex-grow bg-gradient-to-r from-transparent to-slate-700"></div>
+          <h3
+            class="text-xs font-black uppercase tracking-[0.3em] text-emerald-500/80 text-center whitespace-nowrap"
+          >
+            Paquetage — {{ backgroundName() }}
+          </h3>
+          <div class="h-px flex-grow bg-gradient-to-l from-transparent to-slate-700"></div>
+        </div>
+        <div class="bg-[#171b22] border border-emerald-500/20 rounded-2xl p-5 shadow-xl">
+          <p
+            class="text-emerald-400/70 font-bold uppercase tracking-widest text-[9px] mb-4 text-center"
+          >
+            Équipement automatique reçu via votre historique
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            @for (item of backgroundFixedItems(); track item.instanceId) {
+              <div
+                class="flex items-center gap-3 bg-[#1b2028] rounded-xl px-4 py-3 border border-slate-800"
+              >
+                <div
+                  class="w-9 h-9 rounded-lg bg-emerald-950/30 border border-emerald-800/30 flex items-center justify-center text-xl shrink-0"
+                >
+                  <iconify-icon icon="fluent-emoji:package"></iconify-icon>
+                </div>
+                <div class="flex flex-col overflow-hidden">
+                  <span class="text-sm font-bold text-slate-200 leading-tight truncate">
+                    {{ item.name }}
+                  </span>
+                  @if (item.qty > 1) {
+                    <span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+                      Quantité : {{ item.qty }}
+                    </span>
+                  }
+                  @if (item.location === 'equipped') {
+                    <span class="text-[9px] text-amber-500/60 uppercase tracking-widest">
+                      Équipé
+                    </span>
+                  }
+                </div>
+                <div class="ml-auto">
+                  <span class="w-2 h-2 bg-emerald-500/50 rounded-full block"></span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
     <div
       class="flex items-center gap-2 mb-7 bg-[#1b2028] px-4 py-2 rounded-full border border-slate-700 shadow-lg"
     >
