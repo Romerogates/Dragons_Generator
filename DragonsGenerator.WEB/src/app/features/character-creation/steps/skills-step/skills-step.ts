@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DataService } from '@core/services/data.service';
 import { CharacterBuilderService } from '../../../../core/services/character-builder.service';
 import { type AbilityKey, EquipmentSlot } from '../../../../core/models/Character/character';
 
@@ -151,6 +152,13 @@ export const SKILL_MAP: Record<string, SkillInfo> = {
 export class SkillsStep implements OnInit {
   readonly builder = inject(CharacterBuilderService);
 
+  private readonly dataService = inject(DataService);
+
+  // Catalogue d'équipements chargé
+  readonly toolCatalog = signal<
+    { id: string; name: string; type: string; subtype: string | null }[]
+  >([]);
+
   // === ÉTATS LOCAUX ===
   readonly selectedClassSkills = signal<string[]>([]);
   readonly selectedBgSkills = signal<string[]>([]);
@@ -158,7 +166,6 @@ export class SkillsStep implements OnInit {
 
   // Pour les historiques personnalisés
   readonly customSkillInput = signal<string>('');
-  readonly customToolInput = signal<string>('');
 
   ngOnInit(): void {
     const c = this.builder.creation();
@@ -166,6 +173,17 @@ export class SkillsStep implements OnInit {
     this.selectedBgSkills.set([...c.backgroundSkills]);
     this.selectedBgTools.set([...c.backgroundTools]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Charger le catalogue d'outils
+    this.dataService.getEquipments().subscribe({
+      next: (items: any[]) => {
+        this.toolCatalog.set(
+          items
+            .filter((e) => e.type === 'TOOL' || e.type === 'VEHICLE')
+            .map((e) => ({ id: e.id, name: e.name, type: e.type, subtype: e.subtype })),
+        );
+      },
+    });
   }
 
   // === COMPÉTENCES DE CLASSE ===
@@ -283,17 +301,56 @@ export class SkillsStep implements OnInit {
     Math.max(0, this.customBgToolMax() - this.selectedBgTools().length),
   );
 
-  addCustomBgTool(): void {
-    const tool = this.customToolInput().trim();
-    if (!tool) return;
-    if (this.selectedBgTools().length >= this.customBgToolMax()) return;
-    if (this.selectedBgTools().includes(tool)) return;
-    this.selectedBgTools.update((arr) => [...arr, tool]);
-    this.customToolInput.set('');
+  // === CATALOGUE D'OUTILS GROUPÉS ===
+
+  readonly toolGroups = computed(() => {
+    const catalog = this.toolCatalog();
+    if (catalog.length === 0) return [];
+
+    const INSTRUMENT_IDS = [
+      'tl-bombarde',
+      'tl-cor',
+      'tl-cornemuse',
+      'tl-dulcimer',
+      'tl-flute',
+      'tl-flute-de-pan',
+      'tl-luth',
+      'tl-lyre',
+      'tl-tambour',
+      'tl-viole',
+    ];
+    const GAME_IDS = ['tl-des', 'tl-echecs', 'tl-go', 'tl-jeu-de-cartes', 'tl-osselets'];
+
+    const instruments = catalog.filter((t) => INSTRUMENT_IDS.includes(t.id));
+    const games = catalog.filter((t) => GAME_IDS.includes(t.id));
+    const vehicles = catalog.filter((t) => t.type === 'VEHICLE');
+    const artisan = catalog.filter(
+      (t) =>
+        t.type === 'TOOL' &&
+        !INSTRUMENT_IDS.includes(t.id) &&
+        !GAME_IDS.includes(t.id) &&
+        !['tl-outils-de-voleur', 'tl-necessaire-dempoisonneur'].includes(t.id),
+    );
+
+    return [
+      { label: "Outils d'artisan", icon: 'fluent-emoji:hammer-and-wrench', items: artisan },
+      { label: 'Instruments de musique', icon: 'fluent-emoji:violin', items: instruments },
+      { label: 'Matériel de jeu', icon: 'fluent-emoji:game-die', items: games },
+      { label: 'Véhicules', icon: 'fluent-emoji:horse', items: vehicles },
+    ].filter((g) => g.items.length > 0);
+  });
+
+  isToolSelected(toolId: string): boolean {
+    return this.selectedBgTools().includes(toolId);
   }
 
-  removeCustomBgTool(tool: string): void {
-    this.selectedBgTools.update((arr) => arr.filter((x) => x !== tool));
+  toggleCustomBgTool(toolId: string): void {
+    const current = this.selectedBgTools();
+    if (current.includes(toolId)) {
+      this.selectedBgTools.update((arr) => arr.filter((x) => x !== toolId));
+    } else if (current.length < this.customBgToolMax()) {
+      this.selectedBgTools.update((arr) => [...arr, toolId]);
+    }
   }
 
   // === VALIDATION ===
@@ -317,6 +374,11 @@ export class SkillsStep implements OnInit {
     return (
       this.selectedClassSkills().includes(skillId) || this.selectedBgSkills().includes(skillId)
     );
+  }
+  getToolName(toolId: string): string {
+    const found = this.toolCatalog().find((t) => t.id === toolId);
+    if (found) return found.name;
+    return this.prettifyTool({ id: toolId });
   }
 
   getModifierForSkill(skillId: string): string {

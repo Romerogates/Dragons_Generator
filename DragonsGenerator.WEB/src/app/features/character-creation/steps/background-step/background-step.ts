@@ -56,6 +56,13 @@ export class BackgroundStep implements OnInit {
   // ── Custom background ──
   readonly customPrivilegeName = signal('');
   readonly customPrivilegeDesc = signal('');
+  // ── Custom background (ajouter après les signaux existants) ──
+  readonly customBgName = signal('');
+  readonly customGold = signal(15);
+  readonly customTrait = signal('');
+  readonly customIdeal = signal('');
+  readonly customBond = signal('');
+  readonly customFlaw = signal('');
 
   // ── Personnalité (tables) ──
   readonly rolledTrait = signal<string | null>(null);
@@ -149,8 +156,11 @@ export class BackgroundStep implements OnInit {
     const msgs: string[] = [];
 
     if (this.isCustom()) {
+      if (!this.customBgName().trim()) {
+        msgs.push('Donnez un nom à votre historique personnalisé.');
+      }
       if (!this.customPrivilegeName().trim() || !this.customPrivilegeDesc().trim()) {
-        msgs.push(`Définissez un nom et une description pour votre privilège personnalisé.`);
+        msgs.push('Définissez un nom et une description pour votre privilège personnalisé.');
       }
     }
 
@@ -197,6 +207,12 @@ export class BackgroundStep implements OnInit {
     this.selectedBgId.set(bgId);
     this.customPrivilegeName.set('');
     this.customPrivilegeDesc.set('');
+    this.customBgName.set('');
+    this.customGold.set(15);
+    this.customTrait.set('');
+    this.customIdeal.set('');
+    this.customBond.set('');
+    this.customFlaw.set('');
     this.rolledTrait.set(null);
     this.rolledIdeal.set(null);
     this.rolledBond.set(null);
@@ -270,7 +286,8 @@ export class BackgroundStep implements OnInit {
     const data = this.selectedData();
     if (!bg || !data) return;
 
-    // ── Items fixes → EquipmentInstance[] ──
+    const isCustom = this.isCustom();
+
     const fixedEquipment: EquipmentInstance[] = (data.equipment?.fixed ?? []).map((item: any) => ({
       instanceId: crypto.randomUUID(),
       refId: item.id,
@@ -282,48 +299,43 @@ export class BackgroundStep implements OnInit {
       customData: undefined,
     }));
 
-    // ── Slots à choix (fromToolProficiency) → EquipmentSlot[] ──
-    // Ce sont les slots interactifs, générés plus tard selon les outils maîtrisés
     const choiceSlots: EquipmentSlot[] = [];
 
-    const bgCurrency: Currency = {
-      cuivre: 0,
-      argent: 0,
-      or: data.equipment?.currency?.or ?? 0,
-      platine: 0,
-    };
+    const goldAmount = isCustom ? this.customGold() : (data.equipment?.currency?.or ?? 0);
+    const bgCurrency: Currency = { cuivre: 0, argent: 0, or: goldAmount, platine: 0 };
+
+    const bgName = isCustom ? this.customBgName().trim() || 'Personnalisé' : bg.name;
+
+    // Personnalité : tables pour presets, texte libre pour custom
+    const traits = isCustom ? this.customTrait() || undefined : (this.rolledTrait() ?? undefined);
+    const ideal = isCustom ? this.customIdeal() || undefined : (this.rolledIdeal() ?? undefined);
+    const bonds = isCustom ? this.customBond() || undefined : (this.rolledBond() ?? undefined);
+    const flaws = isCustom ? this.customFlaw() || undefined : (this.rolledFlaw() ?? undefined);
 
     const selection: BackgroundSelection = {
       backgroundId: bg.id,
-      backgroundName: bg.name,
+      backgroundName: bgName,
       backgroundPreset: data.preset,
       skills: [],
       tools: [],
       proficiencies: data.proficiencies,
       languages: [],
-      bonusLanguageCount: this.isCustom() ? 0 : this.maxLanguages(),
-
-      // ── NOUVEAU : items fixes injectés directement ──
+      bonusLanguageCount: isCustom ? 0 : this.maxLanguages(),
       equipment: fixedEquipment,
-
-      // ── Seuls les slots à choix restent ici ──
       equipmentSlots: choiceSlots,
-
       currency: bgCurrency,
-      privilegeId: this.isCustom() ? 'priv-custom' : data.privilege.id,
-      privilegeName: this.isCustom() ? this.customPrivilegeName() || null : data.privilege.name,
-      privilegeDesc: this.isCustom() ? this.customPrivilegeDesc() || null : data.privilege.desc,
+      privilegeId: isCustom ? 'priv-custom' : data.privilege.id,
+      privilegeName: isCustom ? this.customPrivilegeName() || null : data.privilege.name,
+      privilegeDesc: isCustom ? this.customPrivilegeDesc() || null : data.privilege.desc,
       selectedHandicaps: [],
       handicapCompensationType: null,
-
-      backgroundText: data.preset
-        ? `${bg.name} : ${data.flavor.summary}`
-        : `${this.customPrivilegeName() || 'Historique Personnalisé'} : ${this.customPrivilegeDesc()}`,
-
-      traits: this.rolledTrait() ?? undefined,
-      ideal: this.rolledIdeal() ?? undefined,
-      bonds: this.rolledBond() ?? undefined,
-      flaws: this.rolledFlaw() ?? undefined,
+      backgroundText: isCustom
+        ? `${bgName} : ${this.customPrivilegeDesc()}`
+        : `${bg.name} : ${data.flavor.summary}`,
+      traits,
+      ideal,
+      bonds,
+      flaws,
     };
 
     this.builder.setBackground(selection);

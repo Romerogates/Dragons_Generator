@@ -258,11 +258,11 @@ const PAGE2 = {
   // --- Features "Regain en repos court" (sous la zone illimitée) ---
   shortRestNameX: 20,
   shortRestUsesX: 210,
-  shortRestStartY: 530,
+  shortRestStartY: 525,
   shortRestLineH: 22,
   shortRestMaxLines: 4,
   // Colonne droite repos court (pour débordement)
-  shortRestCol2NameX: 204,
+  shortRestCol2NameX: 205,
   shortRestCol2UsesX: 360,
 
   // --- Features "Regain en repos long" ---

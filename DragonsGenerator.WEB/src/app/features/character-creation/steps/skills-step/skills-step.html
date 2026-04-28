@@ -202,19 +202,20 @@
 
         @if (isCustomBg()) {
           <p class="text-xs text-slate-500 mb-5">
-            Deux maîtrises à répartir librement entre outils et véhicules. (Les langues se
-            choisissent à l'étape suivante).
+            Choisissez {{ customBgToolMax() }} maîtrise(s) parmi les outils, instruments, jeux ou
+            véhicules ci-dessous.
           </p>
+
           @if (selectedBgTools().length > 0) {
-            <div class="flex flex-wrap gap-2 mb-4">
-              @for (tool of selectedBgTools(); track tool) {
+            <div class="flex flex-wrap gap-2 mb-5">
+              @for (toolId of selectedBgTools(); track toolId) {
                 <span
                   class="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-950/30 border border-emerald-800/50 rounded-full text-emerald-400 text-xs font-bold"
                 >
-                  {{ prettifyTool({ id: tool }) }}
+                  {{ getToolName(toolId) }}
                   <button
                     class="text-emerald-600 hover:text-red-400 transition-colors text-sm leading-none"
-                    (click)="removeCustomBgTool(tool)"
+                    (click)="toggleCustomBgTool(toolId)"
                   >
                     ✕
                   </button>
@@ -222,22 +223,33 @@
               }
             </div>
           }
-          @if (customBgToolsRemaining() > 0) {
-            <div class="flex gap-3">
-              <input
-                type="text"
-                [ngModel]="customToolInput()"
-                (ngModelChange)="customToolInput.set($event)"
-                (keydown.enter)="addCustomBgTool()"
-                placeholder="Outil ou véhicule..."
-                class="flex-1 bg-[#171b22] border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-all"
-              />
-              <button
-                class="px-5 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-500 text-xs font-black uppercase tracking-widest hover:bg-amber-500/20 transition-all"
-                (click)="addCustomBgTool()"
-              >
-                Ajouter
-              </button>
+
+          @for (group of toolGroups(); track group.label) {
+            <div class="mb-5">
+              <div class="flex items-center gap-2 mb-3">
+                <iconify-icon [icon]="group.icon" class="text-lg"></iconify-icon>
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                  {{ group.label }}
+                </span>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                @for (tool of group.items; track tool.id) {
+                  <button
+                    class="px-3 py-2 rounded-xl border-2 text-xs font-bold transition-all duration-200"
+                    [ngClass]="
+                      isToolSelected(tool.id)
+                        ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
+                        : customBgToolsRemaining() === 0 && !isToolSelected(tool.id)
+                          ? 'bg-slate-900 border-slate-800 text-slate-600 opacity-40 cursor-not-allowed'
+                          : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+                    "
+                    [disabled]="customBgToolsRemaining() === 0 && !isToolSelected(tool.id)"
+                    (click)="toggleCustomBgTool(tool.id)"
+                  >
+                    {{ tool.name }}
+                  </button>
+                }
+              </div>
             </div>
           }
         } @else {

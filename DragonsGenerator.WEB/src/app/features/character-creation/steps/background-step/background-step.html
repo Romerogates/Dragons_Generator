@@ -93,6 +93,7 @@
         ← Changer d'historique
       </button>
 
+      <!-- ═══ EN-TÊTE ═══ -->
       <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
         <div class="flex items-start gap-5 mb-6">
           <div
@@ -100,9 +101,25 @@
           >
             <iconify-icon [icon]="bgIcon(bg.id)"></iconify-icon>
           </div>
-          <div>
-            <h3 class="text-2xl font-bold text-amber-500 font-serif">{{ bg.name }}</h3>
-            <p class="text-sm text-slate-400 mt-1 leading-relaxed">{{ bg.data.flavor.summary }}</p>
+          <div class="flex-1">
+            @if (isCustom()) {
+              <input
+                type="text"
+                [ngModel]="customBgName()"
+                (ngModelChange)="customBgName.set($event)"
+                placeholder="Nom de votre historique..."
+                class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-xl font-bold text-amber-500 font-serif focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-all placeholder:text-amber-500/30"
+              />
+              <p class="text-sm text-slate-400 mt-2 leading-relaxed">
+                Créez un historique sur mesure : choisissez vos savoirs, votre équipement et
+                définissez un privilège unique.
+              </p>
+            } @else {
+              <h3 class="text-2xl font-bold text-amber-500 font-serif">{{ bg.name }}</h3>
+              <p class="text-sm text-slate-400 mt-1 leading-relaxed">
+                {{ bg.data.flavor.summary }}
+              </p>
+            }
           </div>
         </div>
 
@@ -119,6 +136,7 @@
         }
       </div>
 
+      <!-- ═══ SAVOIRS & ÉQUIPEMENT (2 colonnes) ═══ -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div
           class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl flex flex-col"
@@ -135,20 +153,25 @@
             <ul
               class="list-disc list-inside text-sm text-amber-400 font-bold space-y-1.5 ml-2 mb-4"
             >
-              @if (maxSkills() > 0) {
-                <li>{{ maxSkills() }} compétence(s)</li>
-              }
-              @if (hasToolFixed() || hasToolChoices() || isCustom()) {
-                <li>Des maîtrises d'outils ou véhicules</li>
-              }
-              @if (maxLanguages() > 0) {
-                <li>{{ maxLanguages() }} langue(s) supplémentaire(s)</li>
+              @if (isCustom()) {
+                <li>2 compétences (au choix)</li>
+                <li>2 maîtrises (outils, véhicules ou langues)</li>
+              } @else {
+                @if (maxSkills() > 0) {
+                  <li>{{ maxSkills() }} compétence(s)</li>
+                }
+                @if (hasToolFixed() || hasToolChoices()) {
+                  <li>Des maîtrises d'outils ou véhicules</li>
+                }
+                @if (maxLanguages() > 0) {
+                  <li>{{ maxLanguages() }} langue(s) supplémentaire(s)</li>
+                }
               }
             </ul>
             <p class="text-xs text-slate-400 italic mt-auto flex items-start gap-2">
-              <span class="text-amber-500"
-                ><iconify-icon icon="fluent-emoji:information"></iconify-icon
-              ></span>
+              <span class="text-amber-500">
+                <iconify-icon icon="fluent-emoji:information"></iconify-icon>
+              </span>
               Vous ferez ces choix lors des étapes ultérieures dédiées.
             </p>
           </div>
@@ -165,30 +188,62 @@
           <div
             class="flex-1 px-4 py-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex flex-col justify-center"
           >
-            <p class="text-xs text-slate-300 leading-relaxed mb-4">
-              Vous recevrez un paquetage de départ contenant des objets liés à votre passé, ainsi
-              que les outils de votre métier.
-            </p>
-            @if (selectedData()!.equipment.currency.or) {
-              <div
-                class="px-3 py-2 bg-slate-900/50 border border-amber-500/30 rounded-lg inline-flex items-center gap-2 self-start mb-4"
-              >
-                <span class="text-lg"><iconify-icon icon="fluent-emoji:coin"></iconify-icon></span>
-                <span class="text-sm text-amber-400 font-bold"
-                  >{{ selectedData()!.equipment.currency.or }} pièces d'or</span
-                >
+            @if (isCustom()) {
+              <p class="text-xs text-slate-300 leading-relaxed mb-4">
+                Votre paquetage comprendra vos outils maîtrisés, un souvenir, des vêtements et une
+                bourse.
+              </p>
+              <div class="flex flex-col gap-3">
+                <label class="text-xs font-bold text-slate-300 flex items-center justify-between">
+                  <span class="flex items-center gap-2">
+                    <iconify-icon icon="fluent-emoji:coin"></iconify-icon>
+                    Bourse de départ
+                  </span>
+                  <span class="text-amber-400 font-black text-sm">{{ customGold() }} po</span>
+                </label>
+                <input
+                  type="range"
+                  [min]="5"
+                  [max]="25"
+                  [step]="1"
+                  [ngModel]="customGold()"
+                  (ngModelChange)="customGold.set($event)"
+                  class="w-full accent-amber-500 cursor-pointer"
+                />
+                <div class="flex justify-between text-[9px] text-slate-600 font-bold">
+                  <span>5 po (modeste)</span>
+                  <span>25 po (aisé)</span>
+                </div>
               </div>
+            } @else {
+              <p class="text-xs text-slate-300 leading-relaxed mb-4">
+                Vous recevrez un paquetage de départ contenant des objets liés à votre passé, ainsi
+                que les outils de votre métier.
+              </p>
+              @if (selectedData()!.equipment.currency.or) {
+                <div
+                  class="px-3 py-2 bg-slate-900/50 border border-amber-500/30 rounded-lg inline-flex items-center gap-2 self-start mb-4"
+                >
+                  <span class="text-lg">
+                    <iconify-icon icon="fluent-emoji:coin"></iconify-icon>
+                  </span>
+                  <span class="text-sm text-amber-400 font-bold">
+                    {{ selectedData()!.equipment.currency.or }} pièces d'or
+                  </span>
+                </div>
+              }
+              <p class="text-xs text-slate-400 italic mt-auto flex items-start gap-2">
+                <span class="text-amber-500">
+                  <iconify-icon icon="fluent-emoji:information"></iconify-icon>
+                </span>
+                Vous forgerez cet inventaire lors de l'étape Équipement.
+              </p>
             }
-            <p class="text-xs text-slate-400 italic mt-auto flex items-start gap-2">
-              <span class="text-amber-500"
-                ><iconify-icon icon="fluent-emoji:information"></iconify-icon
-              ></span>
-              Vous forgerez cet inventaire lors de l'étape Équipement.
-            </p>
           </div>
         </div>
       </div>
 
+      <!-- ═══ PRIVILÈGE PERSONNALISÉ (custom only) ═══ -->
       @if (isCustom()) {
         <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
           <h4
@@ -218,7 +273,8 @@
         </div>
       }
 
-      @if (hasPersonalityTables()) {
+      <!-- ═══ PERSONNALITÉ — Tables pour presets ═══ -->
+      @if (!isCustom() && hasPersonalityTables()) {
         <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
           <h4
             class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-1 flex items-center gap-2"
@@ -274,6 +330,76 @@
         </div>
       }
 
+      <!-- ═══ PERSONNALITÉ — Texte libre pour custom ═══ -->
+      @if (isCustom()) {
+        <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+          <h4
+            class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-1 flex items-center gap-2"
+          >
+            <iconify-icon icon="fluent-emoji:writing-hand"></iconify-icon> Personnalité
+            <span class="text-slate-600 normal-case tracking-normal font-normal">(optionnel)</span>
+          </h4>
+          <p class="text-xs text-slate-500 mb-6">
+            Décrivez librement les traits qui définissent votre personnage.
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="flex flex-col gap-2">
+              <label class="text-xs font-bold text-slate-300 flex items-center gap-2">
+                <iconify-icon icon="fluent-emoji:smiling-face-with-halo"></iconify-icon>
+                Traits de personnalité
+              </label>
+              <textarea
+                [ngModel]="customTrait()"
+                (ngModelChange)="customTrait.set($event)"
+                rows="2"
+                placeholder="Ex : Je suis toujours optimiste, même dans les pires situations..."
+                class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-xs text-slate-200 focus:outline-none focus:border-amber-500/50 transition-all resize-none custom-scrollbar"
+              ></textarea>
+            </div>
+            <div class="flex flex-col gap-2">
+              <label class="text-xs font-bold text-slate-300 flex items-center gap-2">
+                <iconify-icon icon="fluent-emoji:glowing-star"></iconify-icon>
+                Idéal
+              </label>
+              <textarea
+                [ngModel]="customIdeal()"
+                (ngModelChange)="customIdeal.set($event)"
+                rows="2"
+                placeholder="Ex : Liberté. Chacun devrait pouvoir vivre comme il l'entend..."
+                class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-xs text-slate-200 focus:outline-none focus:border-amber-500/50 transition-all resize-none custom-scrollbar"
+              ></textarea>
+            </div>
+            <div class="flex flex-col gap-2">
+              <label class="text-xs font-bold text-slate-300 flex items-center gap-2">
+                <iconify-icon icon="fluent-emoji:handshake"></iconify-icon>
+                Obligations
+              </label>
+              <textarea
+                [ngModel]="customBond()"
+                (ngModelChange)="customBond.set($event)"
+                rows="2"
+                placeholder="Ex : Je dois protéger le village qui m'a recueilli..."
+                class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-xs text-slate-200 focus:outline-none focus:border-amber-500/50 transition-all resize-none custom-scrollbar"
+              ></textarea>
+            </div>
+            <div class="flex flex-col gap-2">
+              <label class="text-xs font-bold text-slate-300 flex items-center gap-2">
+                <iconify-icon icon="fluent-emoji:broken-heart"></iconify-icon>
+                Failles
+              </label>
+              <textarea
+                [ngModel]="customFlaw()"
+                (ngModelChange)="customFlaw.set($event)"
+                rows="2"
+                placeholder="Ex : Je fais confiance trop facilement aux inconnus..."
+                class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-xs text-slate-200 focus:outline-none focus:border-amber-500/50 transition-all resize-none custom-scrollbar"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ═══ VALIDATION ═══ -->
       <div class="mt-4 flex flex-col items-center gap-4 w-full">
         @if (!isConfigValid()) {
           @for (msg of validationMessages(); track msg) {
