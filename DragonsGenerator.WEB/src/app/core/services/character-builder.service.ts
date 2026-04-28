@@ -1127,13 +1127,16 @@ export class CharacterBuilderService {
       'bâton',
       'cristal',
       'focaliseur',
+      'sceptre',
       'symbole sacré',
       'reliquaire',
       'amulette',
+      'emblème',
       'totem',
       'gui',
     ];
-    for (const eq of c.selectedEquipment) {
+    const allEquip = [...c.selectedEquipment, ...((c as any).backgroundEquipment ?? [])];
+    for (const eq of allEquip) {
       const name = eq.name.toLowerCase();
       if (KEYWORDS.some((k) => name.includes(k))) return eq.name;
     }

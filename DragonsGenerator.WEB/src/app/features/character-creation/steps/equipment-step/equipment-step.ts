@@ -178,6 +178,13 @@ export class EquipmentStep implements OnInit {
     const alts = this.pickedAlt();
     const cats = this.pickedCategory();
     for (const slot of this.resolvedSlots()) {
+      // Vérifier les catégories dans les items fixes
+      for (let i = 0; i < slot.fixedItems.length; i++) {
+        if (slot.fixedItems[i].isCategory && !cats.has(`${slot.slotNumber}-fixed-${i}`)) {
+          return false;
+        }
+      }
+      // Vérifier les alternatives
       if (slot.isFixed) continue;
       const altIdx = alts.get(slot.slotNumber);
       if (altIdx === undefined) return false;
@@ -252,10 +259,19 @@ export class EquipmentStep implements OnInit {
     const result: EquipmentInstance[] = [];
 
     this.resolvedSlots().forEach((slot) => {
-      slot.fixedItems.forEach((item) => {
-        const inst = this.toInstance(item, map, this.pickedCategory(), slot.slotNumber, -1, -1);
+      // Items fixes — résoudre les catégories via pickedCategory
+      slot.fixedItems.forEach((item, i) => {
+        const inst = this.toInstance(
+          item,
+          map,
+          this.pickedCategory(),
+          slot.slotNumber,
+          -1, // altIdx = -1 pour les fixes
+          i,
+        );
         if (inst) result.push(inst);
       });
+      // Alternatives
       if (!slot.isFixed) {
         const altIdx = this.pickedAlt().get(slot.slotNumber);
         if (altIdx !== undefined) {
@@ -341,9 +357,14 @@ export class EquipmentStep implements OnInit {
     altIdx: number,
     itemIdx: number,
   ): EquipmentInstance | null {
-    const eq = item.isCategory
-      ? map.get(cats.get(`${slot}-${altIdx}-${itemIdx}`)!)
-      : item.equipment;
+    let eq: EquipmentRaw | undefined;
+    if (item.isCategory) {
+      // Clé "fixed" ou clé alternative classique
+      const key = altIdx === -1 ? `${slot}-fixed-${itemIdx}` : `${slot}-${altIdx}-${itemIdx}`;
+      eq = map.get(cats.get(key)!);
+    } else {
+      eq = item.equipment ?? undefined;
+    }
     if (!eq) return null;
     return {
       instanceId: crypto.randomUUID(),
@@ -372,4 +393,9 @@ export class EquipmentStep implements OnInit {
   readonly backgroundName = computed<string | null>(() => {
     return this.builder.creation().backgroundName;
   });
+
+  selectFromFixedCategory(slotNumber: number, itemIdx: number, eqId: string): void {
+    const key = `${slotNumber}-fixed-${itemIdx}`;
+    this.pickedCategory.update((m) => new Map(m).set(key, eqId));
+  }
 }

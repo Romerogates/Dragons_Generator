@@ -167,8 +167,8 @@ const PANEL_WARLOCK = {
 const PANEL_SORCERER = {
   line1X: 450, // Atavisme (valeur)
   line1Y: 245,
-  line2X: 450, // Focaliseur arcanique (valeur)
-  line2Y: 300,
+  line2X: 435, // Focaliseur arcanique (valeur)
+  line2Y: 280,
   pointsLabelX: 440, // Points arcaniques (valeur dans l'ovale)
   pointsValueX: 530,
   pointsY: 350,
@@ -242,7 +242,7 @@ const PAGE2 = {
   resYs: [100, 124, 148, 172, 194],
 
   // --- Outils & véhicules (colonne milieu) ---
-  toolX: 204,
+  toolX: 210,
   // --- Langues (colonne droite) ---
   langX: 396,
   // Lignes partagées outils/langues (zone "Usage illimité")
@@ -256,8 +256,8 @@ const PAGE2 = {
   unlimitedMaxLines: 10,
 
   // --- Features "Regain en repos court" (sous la zone illimitée) ---
-  shortRestNameX: 15,
-  shortRestUsesX: 170,
+  shortRestNameX: 20,
+  shortRestUsesX: 210,
   shortRestStartY: 530,
   shortRestLineH: 22,
   shortRestMaxLines: 4,
@@ -266,9 +266,9 @@ const PAGE2 = {
   shortRestCol2UsesX: 360,
 
   // --- Features "Regain en repos long" ---
-  longRestNameX: 15,
-  longRestUsesX: 170,
-  longRestStartY: 645,
+  longRestNameX: 20,
+  longRestUsesX: 210,
+  longRestStartY: 670,
   longRestLineH: 22,
   longRestMaxLines: 6,
   // Colonne droite repos long
@@ -466,7 +466,8 @@ export class PdfGeneratorService {
    * "category-simple-weapons" → "Armes courantes"
    */
   private prettify(id: string): string {
-    const CATEGORY_LABELS: Record<string, string> = {
+    const LABELS: Record<string, string> = {
+      // Catégories
       'category-simple-weapons': 'Armes courantes',
       'category-simple-melee-weapons': 'Armes courantes CàC',
       'category-simple-ranged-weapons': 'Armes courantes à distance',
@@ -479,22 +480,59 @@ export class PdfGeneratorService {
       'category-shield': 'Boucliers',
       'category-all-armor': 'Toutes armures',
       'category-tools': 'Outils',
+      // Outils & instruments
+      'tl-necessaire-dalchimiste': "Nécessaire. d'alchimiste",
+      'tl-necessaire-de-brasseur': 'Nécessaire de brasseur',
+      'tl-necessaire-de-calligraphe': 'Nécessaire de calligraphe',
+      'tl-necessaire-de-calligraphie': 'Nécessaire de calligraphie',
+      'tl-necessaire-de-cartographe': 'Nécessaire de cartographe',
+      'tl-necessaire-de-deguisement': 'Nécessaire de déguisement',
+      'tl-necessaire-de-faussaire': 'Nécessaire de faussaire',
+      'tl-necessaire-dempoisonneur': "Nécessaire d'empoisonneur",
+      'tl-necessaire-de-peintre': 'Nécessaire de peintre',
+      'tl-necessaire-dherboristerie': "Nécessaire d'herboristerie",
+      'tl-outils-de-bijoutier': 'Outils de bijoutier',
+      'tl-outils-de-cordonnier': 'Outils de cordonnier',
+      'tl-outils-de-forgeron': 'Outils de forgeron',
+      'tl-outils-de-la-ferme': 'Outils de la ferme',
+      'tl-outils-de-macon': 'Outils de maçon',
+      'tl-outils-de-menuisier': 'Outils de menuisier',
+      'tl-outils-de-potier': 'Outils de potier',
+      'tl-outils-de-retameur': 'Outils de rétameur',
+      'tl-outils-de-sculpteur-sur-bois': 'Outils de sculpteur',
+      'tl-outils-de-tanneur': 'Outils de tanneur',
+      'tl-outils-de-tisserand': 'Outils de tisserand',
+      'tl-outils-de-verrier': 'Outils de verrier',
+      'tl-outils-de-voleur': 'Outils de voleur',
+      'tl-ustensiles-de-cuisinier': 'Ustensiles de cuisinier',
+      'tl-instruments-de-navigation': 'Instr. de navigation',
+      'tl-bombarde': 'Bombarde',
+      'tl-cor': 'Cor',
+      'tl-cornemuse': 'Cornemuse',
+      'tl-dulcimer': 'Dulcimer',
+      'tl-flute': 'Flûte',
+      'tl-flute-de-pan': 'Flûte de Pan',
+      'tl-luth': 'Luth',
+      'tl-lyre': 'Lyre',
+      'tl-tambour': 'Tambour',
+      'tl-viole': 'Viole',
+      'tl-des': 'Dés',
+      'tl-echecs': 'Échecs',
+      'tl-go': 'Go',
+      'tl-jeu-de-cartes': 'Jeu de cartes',
+      'tl-osselets': 'Osselets',
+      // Véhicules
+      'tl-vehicules-terrestres': 'Véhicules terrestres',
+      'tl-vehicules-maritimes': 'Véhicules maritimes',
     };
 
-    if (CATEGORY_LABELS[id]) return CATEGORY_LABELS[id];
+    if (LABELS[id]) return LABELS[id];
 
+    // Fallback générique
     return id
       .replace(/^(lg|wp|ar|gr|tl|it|mnt|vhc)-/, '')
       .replace(/-/g, ' ')
-      .replace(/\b\w/g, (c) => c.toUpperCase())
-      .replace(/\bepee\b/gi, 'Épée')
-      .replace(/\barbalete\b/gi, 'Arbalète')
-      .replace(/\bflechette\b/gi, 'Fléchette')
-      .replace(/\bmatelassee\b/gi, 'Matelassée')
-      .replace(/\bcloutee\b/gi, 'Cloutée')
-      .replace(/\becailles\b/gi, 'Écailles')
-      .replace(/\bderudit\b/gi, "d'Érudit")
-      .replace(/\bdaventurier\b/gi, "d'Aventurier");
+      .replace(/\b\w/g, (c) => c.toUpperCase());
   }
 
   // =========================================================================
@@ -1183,6 +1221,8 @@ export class PdfGeneratorService {
     if (sc.druidCircle) {
       this.text(pdf, sc.druidCircle, P.line1X, P.line1Y);
     }
+
+    pdf.setFontSize(10);
 
     // Focaliseur arcanique
     if (sc.focus) {

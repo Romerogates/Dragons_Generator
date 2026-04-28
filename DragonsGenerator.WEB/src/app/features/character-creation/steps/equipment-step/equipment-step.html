@@ -115,17 +115,40 @@
                 Équipement automatique reçu
               </p>
               <div class="flex flex-col gap-3">
-                @for (item of slot.fixedItems; track item.ref.id) {
-                  <div class="flex items-center justify-center gap-3 text-slate-200 font-bold">
-                    <span class="text-2xl"
-                      ><iconify-icon [icon]="getIconForItem(item)"></iconify-icon
-                    ></span>
-                    <span>
-                      {{ itemName(item) }}
-                      @if (item.ref.qty > 1) {
-                        <span class="text-slate-500 ml-1">×{{ item.ref.qty }}</span>
-                      }
-                    </span>
+                @for (item of slot.fixedItems; track item.ref.id; let itemIdx = $index) {
+                  <div class="flex flex-col items-center gap-2">
+                    <div class="flex items-center justify-center gap-3 text-slate-200 font-bold">
+                      <span class="text-2xl">
+                        <iconify-icon [icon]="getIconForItem(item)"></iconify-icon>
+                      </span>
+                      <span>
+                        {{ itemName(item) }}
+                        @if (item.ref.qty > 1) {
+                          <span class="text-slate-500 ml-1">×{{ item.ref.qty }}</span>
+                        }
+                      </span>
+                    </div>
+
+                    @if (item.isCategory) {
+                      <div
+                        class="mt-1 grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-h-52 overflow-y-auto pr-1"
+                      >
+                        @for (eq of item.categoryItems; track eq.id) {
+                          <button
+                            class="w-full px-2.5 py-2 rounded-lg border text-[10px] font-bold transition-all text-left leading-tight break-words flex items-center"
+                            [ngClass]="
+                              categoryChoices().get(slot.slotNumber + '-fixed-' + itemIdx) === eq.id
+                                ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md'
+                                : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:bg-slate-800 hover:text-amber-400'
+                            "
+                            (click)="selectFromFixedCategory(slot.slotNumber, itemIdx, eq.id)"
+                            [title]="eq.name"
+                          >
+                            {{ eq.name }}
+                          </button>
+                        }
+                      </div>
+                    }
                   </div>
                 }
               </div>
