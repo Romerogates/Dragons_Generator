@@ -498,6 +498,7 @@ export interface CorruptionTracker {
 export interface Personality {
   // Colonne de gauche
   description: string; // Description physique / portrait
+  sex: 'M' | 'F' | 'X';
   background: string; // Historique
   story: string; // Épopée (texte long, multi-paragraphe)
 
@@ -653,6 +654,7 @@ export interface CharacterCreation {
 
   // Étape 9 - Identité (anciennement 8)
   name: string;
+  sex: 'M' | 'F' | 'X';
   description: string;
   background: string; // texte libre (résumé affiché sur la fiche)
   alignment: string;

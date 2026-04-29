@@ -96,6 +96,7 @@ export interface ClassSelection {
 
 export interface IdentitySelection {
   name?: string;
+  sex?: 'M' | 'F' | 'X'; // <-- AJOUTÉ
   description?: string;
   background?: string;
   alignment?: string;
@@ -185,6 +186,8 @@ const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   bonusLanguageCount: 0,
 
   name: '',
+  sex: 'X' as const,
+
   description: '',
   background: '',
   alignment: '',
@@ -802,6 +805,7 @@ export class CharacterBuilderService {
       bonusLanguageCount: 0,
 
       name: savedCharacter.name,
+      sex: savedCharacter.personality.sex ?? 'X',
       description: savedCharacter.personality.description,
       background: savedCharacter.personality.background,
       alignment: savedCharacter.personality.alignment,
@@ -994,6 +998,7 @@ export class CharacterBuilderService {
 
       personality: {
         description: c.description,
+        sex: c.sex, // <-- AJOUTÉ
         background: c.background,
         backgroundId: c.backgroundId,
         story: c.story,

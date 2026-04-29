@@ -6,6 +6,8 @@ namespace Dragons.Api.Endpoints.Characters;
 public record GenerateBackstoryRequest
 {
     public required string Name { get; init; }
+    public required string Sex { get; init; }   // <-- AJOUTÉ ("M", "F", "X")
+
     public required string SpeciesName { get; init; }
     public string? SubspeciesName { get; init; }
     public required string CivilizationName { get; init; }
@@ -40,6 +42,12 @@ public class GenerateBackstoryEndpoint : Endpoint<GenerateBackstoryRequest, Gene
     {
         var apiKey = _config["Groq:ApiKey"];
         var client = _httpClientFactory.CreateClient();
+        var sexLabel = req.Sex switch
+        {
+            "M" => "Masculin",
+            "F" => "Féminin",
+            _ => "Non défini"
+        };
 
         var prompt = $"""
     Tu es un maître du jeu expert en jeux de rôle fantasy.
@@ -49,6 +57,7 @@ public class GenerateBackstoryEndpoint : Endpoint<GenerateBackstoryRequest, Gene
     
     PERSONNAGE:
     - Nom: {req.Name}
+    - Sexe: {sexLabel}
     - Espèce: {req.SpeciesName}{(req.SubspeciesName != null ? $" ({req.SubspeciesName})" : "")}
     - Civilisation: {req.CivilizationName}
     - Classe: {req.ClassName}

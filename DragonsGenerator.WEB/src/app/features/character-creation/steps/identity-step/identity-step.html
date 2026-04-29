@@ -26,7 +26,7 @@
         <iconify-icon icon="fluent-emoji:label"></iconify-icon> Identité de base
       </h4>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="space-y-2">
           <label class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter ml-1"
             >Nom du personnage</label
@@ -38,6 +38,20 @@
             placeholder="Ex: Valerius l'Audacieux"
             class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-all"
           />
+        </div>
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter ml-1"
+            >Sexe</label
+          >
+          <select
+            [ngModel]="c().sex"
+            (ngModelChange)="updateIdentity('sex', $event)"
+            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-all cursor-pointer appearance-none"
+          >
+            <option value="X">Indéfini</option>
+            <option value="M">Masculin</option>
+            <option value="F">Féminin</option>
+          </select>
         </div>
 
         <div class="space-y-2">

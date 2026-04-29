@@ -87,6 +87,7 @@ export class IdentityStep implements OnInit {
     this.dataService
       .generateBackstory({
         name: char.name,
+        sex: char.sex, // <-- AJOUTÉ
         speciesName: char.speciesName,
         subspeciesName: char.subspeciesName,
         civilizationName: char.civilizationName ?? 'Inconnue',

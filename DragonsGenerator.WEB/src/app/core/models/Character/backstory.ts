@@ -1,5 +1,6 @@
 export interface GenerateBackstoryRequest {
   name: string;
+  sex: 'M' | 'F' | 'X'; // <-- AJOUTÉ
   speciesName: string;
   subspeciesName?: string | null;
   civilizationName: string;
