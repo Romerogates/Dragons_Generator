@@ -230,10 +230,7 @@
         }
       ],
       "languages": {
-        "fixed": [
-          "lg-commun",
-          "lg-draconique"
-        ],
+        "fixed": ["lg-commun", "lg-draconique"],
         "choice_count": 0,
         "notes": "Le draconique est considéré comme l'une des plus anciennes langues et demeure très présent dans l'étude de la magie."
       },
@@ -296,9 +293,7 @@
           "desc": "Vous bénéficiez de la maîtrise de la compétence Perception.",
           "mechanics": {
             "type": "skill_proficiency",
-            "skills": [
-              "perception"
-            ]
+            "skills": ["perception"]
           }
         },
         {
@@ -306,12 +301,8 @@
           "name": "Héritage féerique",
           "desc": "Vous bénéficiez d'un avantage aux jets de sauvegarde contre l'état préjudiciable charmé, et aucune magie ne peut vous endormir.",
           "mechanics": {
-            "advantage_on_saves": [
-              "charmed"
-            ],
-            "immunity": [
-              "magical_sleep"
-            ]
+            "advantage_on_saves": ["charmed"],
+            "immunity": ["magical_sleep"]
           }
         },
         {
@@ -343,16 +334,14 @@
               "name": "Commun"
             },
             {
-              "id": "lg-commun-profondeurs",
+              "id": "lg-commun-des-profondeurs",
               "name": "Commun des profondeurs"
             }
           ]
         }
       ],
       "languages": {
-        "fixed": [
-          "lg-elfique"
-        ],
+        "fixed": ["lg-elfique"],
         "choice_count": 0,
         "notes": "L'elfique est une langue douce et élégante. Elle constitue parfois une koinè dans les cours et les académies de nombreux royaumes."
       },
@@ -505,9 +494,7 @@
             }
           ],
           "languages": {
-            "fixed": [
-              "lg-sylvestre"
-            ],
+            "fixed": ["lg-sylvestre"],
             "choice_count": 0
           }
         },
@@ -580,11 +567,7 @@
           "name": "Ruse gnome",
           "desc": "Vous bénéficiez d'un avantage à tous les jets de sauvegarde d'Intelligence, de Sagesse et de Charisme contre la magie.",
           "mechanics": {
-            "advantage_on_saves_vs_magic": [
-              "int",
-              "wis",
-              "cha"
-            ]
+            "advantage_on_saves_vs_magic": ["int", "wis", "cha"]
           }
         }
       ],
@@ -608,9 +591,7 @@
         }
       ],
       "languages": {
-        "fixed": [
-          "lg-gnome"
-        ],
+        "fixed": ["lg-gnome"],
         "choice_count": 0,
         "notes": "La langue gnome recourt à l'alphabet nain. La littérature gnome est connue pour ses manuels techniques de fabrication d'engins et pour ses sorts utilitaires ou d'illusion."
       },
@@ -640,9 +621,7 @@
               "name": "Bricoleur",
               "desc": "Vous bénéficiez de la maîtrise des outils de rétameur. En vous servant de cet équipement, vous pouvez fabriquer un objet mécanique de taille TP (CA 5, 1 pv), au prix d'une heure de travail et de 10 po de matériaux. L'objet cesse de fonctionner au bout de 24 heures (sauf si vous passez une heure à le réparer) ou lorsque vous le démontez. Vous ne pouvez disposer simultanément de plus de dispositifs opérationnels que votre bonus d'Intelligence.",
               "mechanics": {
-                "tool_proficiency": [
-                  "tl-outils-de-retameur"
-                ],
+                "tool_proficiency": ["tl-outils-de-retameur"],
                 "object_creation": {
                   "size": "TP",
                   "ac": 5,
@@ -765,11 +744,7 @@
           "mechanics": {
             "trigger": "d20_result_1",
             "action": "reroll_once",
-            "applies_to": [
-              "attack_roll",
-              "ability_check",
-              "saving_throw"
-            ]
+            "applies_to": ["attack_roll", "ability_check", "saving_throw"]
           }
         },
         {
@@ -777,9 +752,7 @@
           "name": "Vaillant",
           "desc": "Vous bénéficiez d'un avantage aux jets de sauvegarde contre l'effet préjudiciable effrayé.",
           "mechanics": {
-            "advantage_on_saves": [
-              "frightened"
-            ]
+            "advantage_on_saves": ["frightened"]
           }
         },
         {
@@ -802,9 +775,7 @@
         }
       ],
       "languages": {
-        "fixed": [
-          "lg-commun"
-        ],
+        "fixed": ["lg-commun"],
         "choice_count": 1,
         "notes": "Il n'y a pas vraiment de langue halfeline, tout au plus des expressions et un accent, de sorte qu'il semble s'agir d'un dialecte de la langue dominante locale."
       },
@@ -867,9 +838,7 @@
               "desc": "Vous recevez la maîtrise de la compétence Survie.",
               "mechanics": {
                 "type": "skill_proficiency",
-                "skills": [
-                  "survie"
-                ]
+                "skills": ["survie"]
               }
             },
             {
@@ -878,12 +847,7 @@
               "desc": "Vous bénéficiez de la maîtrise de l'arc court, du filet, de la lance et de la sarbacane.",
               "mechanics": {
                 "type": "weapon_proficiency",
-                "weapons": [
-                  "arc-court",
-                  "filet",
-                  "lance",
-                  "sarbacane"
-                ]
+                "weapons": ["arc-court", "filet", "lance", "sarbacane"]
               }
             }
           ],
@@ -964,9 +928,7 @@
         }
       ],
       "languages": {
-        "fixed": [
-          "lg-commun"
-        ],
+        "fixed": ["lg-commun"],
         "choice_count": 2
       },
       "subspecies": [],
@@ -975,9 +937,7 @@
     {
       "id": "sp-melesse",
       "name": "Melessës",
-      "name_alt": [
-        "Demi-elfes"
-      ],
+      "name_alt": ["Demi-elfes"],
       "source": {
         "book": "Dragons - Livre de base: Aventuriers",
         "pages": "49-50"
@@ -996,9 +956,7 @@
         "flexible_asi": {
           "count": 2,
           "value": 1,
-          "excluded": [
-            "cha"
-          ]
+          "excluded": ["cha"]
         },
         "speed_m": 9,
         "size": "M",
@@ -1035,12 +993,8 @@
           "name": "Héritage féerique",
           "desc": "Vous bénéficiez d'un avantage aux jets de sauvegarde contre l'état préjudiciable charmé et aucune magie ne peut vous endormir.",
           "mechanics": {
-            "advantage_on_saves": [
-              "charmed"
-            ],
-            "immunity": [
-              "magical_sleep"
-            ]
+            "advantage_on_saves": ["charmed"],
+            "immunity": ["magical_sleep"]
           }
         },
         {
@@ -1063,9 +1017,7 @@
           "type": "ability_score_select",
           "choice_count": 2,
           "value_per_choice": 1,
-          "excluded": [
-            "cha"
-          ]
+          "excluded": ["cha"]
         },
         {
           "id": "choice-competences-melesse",
@@ -1208,10 +1160,7 @@
         }
       ],
       "languages": {
-        "fixed": [
-          "lg-commun",
-          "lg-elfique"
-        ],
+        "fixed": ["lg-commun", "lg-elfique"],
         "choice_count": 2
       },
       "subspecies": [],
@@ -1220,9 +1169,7 @@
     {
       "id": "sp-merosis",
       "name": "Merosis",
-      "name_alt": [
-        "Demi-orcs"
-      ],
+      "name_alt": ["Demi-orcs"],
       "source": {
         "book": "Dragons - Livre de base: Aventuriers",
         "pages": "51-53"
@@ -1278,9 +1225,7 @@
           "desc": "Vous gagnez la maîtrise de la compétence Intimidation.",
           "mechanics": {
             "type": "skill_proficiency",
-            "skills": [
-              "intimidation"
-            ]
+            "skills": ["intimidation"]
           }
         },
         {
@@ -1305,10 +1250,7 @@
       ],
       "creation_choices": [],
       "languages": {
-        "fixed": [
-          "lg-commun",
-          "lg-kaani"
-        ],
+        "fixed": ["lg-commun", "lg-kaani"],
         "choice_count": 0
       },
       "subspecies": [],
@@ -1337,9 +1279,7 @@
     {
       "id": "sp-nain",
       "name": "Nains",
-      "name_alt": [
-        "Dvaergen"
-      ],
+      "name_alt": ["Dvaergen"],
       "source": {
         "book": "Dragons - Livre de base: Aventuriers",
         "pages": "29-32"
@@ -1394,12 +1334,8 @@
           "name": "Résistance naine",
           "desc": "Vous bénéficiez d'un avantage aux jets de sauvegarde contre le poison et d'une résistance aux dégâts de poison.",
           "mechanics": {
-            "advantage_on_saves_vs": [
-              "poison"
-            ],
-            "damage_resistance": [
-              "poison"
-            ]
+            "advantage_on_saves_vs": ["poison"],
+            "damage_resistance": ["poison"]
           }
         },
         {
@@ -1469,9 +1405,7 @@
         }
       ],
       "languages": {
-        "fixed": [
-          "lg-nain"
-        ],
+        "fixed": ["lg-nain"],
         "choice_count": 0,
         "notes": "Le nain regorge de consonnes dures et gutturales, intonations qui transparaissent quel que soit l'idiome employé par le locuteur."
       },
@@ -1491,9 +1425,7 @@
               "desc": "Vous acquérez la maîtrise des boucliers.",
               "mechanics": {
                 "type": "armor_proficiency",
-                "armors": [
-                  "bouclier"
-                ]
+                "armors": ["bouclier"]
               }
             },
             {
@@ -1501,10 +1433,7 @@
               "name": "Résistance à la corruption",
               "desc": "Vous bénéficiez d'un avantage aux jets de sauvegarde visant à résister à la folie et aux sorts corrompus. Tous les sorts utilisés par une créature liée au Chancre sont considérés comme corrompus.",
               "mechanics": {
-                "advantage_on_saves_vs": [
-                  "folie",
-                  "sorts_corrompus"
-                ]
+                "advantage_on_saves_vs": ["folie", "sorts_corrompus"]
               }
             }
           ],
@@ -1608,9 +1537,7 @@
           "name": "Résistance fiélonne",
           "desc": "Vous bénéficiez d'une résistance aux dégâts de feu.",
           "mechanics": {
-            "damage_resistance": [
-              "feu"
-            ]
+            "damage_resistance": ["feu"]
           }
         },
         {
@@ -1708,9 +1635,7 @@
         }
       ],
       "languages": {
-        "fixed": [
-          "lg-commun"
-        ],
+        "fixed": ["lg-commun"],
         "choice_count": 0,
         "grants_from_choice": {
           "choice_id": "choice-ancetre-tieffelin",
@@ -1740,14 +1665,10 @@
           "mechanics": {
             "action_type": "action",
             "self_bonus": {
-              "advantage_on": [
-                "dex_discretion"
-              ]
+              "advantage_on": ["dex_discretion"]
             },
             "enemy_malus": {
-              "disadvantage_on": [
-                "wis_perception"
-              ]
+              "disadvantage_on": ["wis_perception"]
             },
             "reset": "long_rest"
           }

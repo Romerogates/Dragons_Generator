@@ -68,12 +68,37 @@
       "primary": [
         { "id": "civ-cite-franche", "label": "Cité Franche" },
         { "id": "sp-halfelin-pied-leger", "label": "Halfelins pieds-légers" },
-        { "id": "civ-drakenbergen", "label": "Drakenbergen (communautés de surface)" }
+        {
+          "id": "civ-drakenbergen",
+          "label": "Drakenbergen (communautés de surface)"
+        }
       ],
-      "regions": ["Cité Franche", "communautés halfelines pieds-légers", "surface des Drakenbergen"]
+      "regions": [
+        "Cité Franche",
+        "communautés halfelines pieds-légers",
+        "surface des Drakenbergen"
+      ]
     },
     "lore": {
       "full_description": "Langue véhiculaire majeure, souvent utilisée comme 'Commun' dans les régions centrales du Cyfandir."
+    }
+  },
+  {
+    "id": "lg-commun",
+    "name": "Commun",
+    "category": "base",
+    "linguistics": {
+      "writing_systems": [
+        { "id": "wr-cyfand", "label": "Cyfand", "type": "alphabet" }
+      ],
+      "is_oral_only": false
+    },
+    "speakers": {
+      "primary": [{ "id": "civ-cyfandir", "label": "Cyfandir" }],
+      "regions": ["Majorité des civilisations de surface"]
+    },
+    "lore": {
+      "full_description": "Lingua franca des peuples de la surface, le commun est parlé dans la plupart des royaumes et comptoirs commerciaux d'Eana."
     }
   },
   {
@@ -235,8 +260,16 @@
     "category": "base",
     "linguistics": {
       "writing_systems": [
-        { "id": "wr-elfique-adapte", "label": "Elfique (adapté)", "type": "alphabet" },
-        { "id": "wr-draconique", "label": "Draconique", "type": "ideogramme-syllabaire" }
+        {
+          "id": "wr-elfique-adapte",
+          "label": "Elfique (adapté)",
+          "type": "alphabet"
+        },
+        {
+          "id": "wr-draconique",
+          "label": "Draconique",
+          "type": "ideogramme-syllabaire"
+        }
       ],
       "is_oral_only": false
     },
@@ -308,7 +341,11 @@
     "category": "base",
     "linguistics": {
       "writing_systems": [
-        { "id": "wr-culture-orale", "label": "Aucun (culture orale)", "type": "oral" }
+        {
+          "id": "wr-culture-orale",
+          "label": "Aucun (culture orale)",
+          "type": "oral"
+        }
       ],
       "is_oral_only": true
     },
@@ -330,7 +367,11 @@
     "category": "base",
     "linguistics": {
       "writing_systems": [
-        { "id": "wr-draconique-adapte", "label": "Draconique adapté en syllabaire", "type": "syllabaire" }
+        {
+          "id": "wr-draconique-adapte",
+          "label": "Draconique adapté en syllabaire",
+          "type": "syllabaire"
+        }
       ],
       "is_oral_only": false
     },
@@ -595,7 +636,11 @@
     "category": "secret",
     "linguistics": {
       "writing_systems": [
-        { "id": "wr-metaphores-orales", "label": "Métaphores orales", "type": "jargon" }
+        {
+          "id": "wr-metaphores-orales",
+          "label": "Métaphores orales",
+          "type": "jargon"
+        }
       ],
       "is_oral_only": true,
       "writing_notes": "Technique d'expression poétique greffée sur une langue support. Deux druides sans langue commune ne peuvent pas communiquer."
