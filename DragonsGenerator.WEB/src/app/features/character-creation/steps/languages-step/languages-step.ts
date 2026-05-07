@@ -107,6 +107,7 @@ export class LanguagesStep implements OnInit {
       next: (langs: LanguageRaw[]) => {
         this.allLanguages.set(langs);
         this.loading.set(false);
+        this.normalizeLanguageIds(langs); // ← AVANT les ensure
         this.ensureClassLanguage();
         this.ensureLockedLanguages();
       },
@@ -175,6 +176,41 @@ export class LanguagesStep implements OnInit {
     const current = new Set(this.builder.creation().languages);
     for (const lang of this.lockedLanguages()) {
       if (!current.has(lang)) this.builder.addLanguage(lang);
+    }
+  }
+
+  /**
+   * Corrige les IDs ("lg-commun") en noms ("Commun") dans l'état du builder.
+   * Gère les données persistées dans le localStorage qui contiennent encore des IDs.
+   */
+  private normalizeLanguageIds(langs: LanguageRaw[]): void {
+    const idToName = new Map<string, string>();
+    langs.forEach((l) => idToName.set(l.id, l.name));
+
+    const resolve = (s: string) => idToName.get(s) ?? s;
+
+    const c = this.builder.creation();
+    const newSpeciesLangs = c.speciesLanguages.map(resolve);
+    const newCivLangs = c.civilizationLanguages.map(resolve);
+    const newBgLangs = c.backgroundLanguages.map(resolve);
+    const newAll = [...new Set(c.languages.map(resolve))];
+
+    // Ne met à jour que si quelque chose a changé
+    const changed =
+      newSpeciesLangs.some((l, i) => l !== c.speciesLanguages[i]) ||
+      newCivLangs.some((l, i) => l !== c.civilizationLanguages[i]) ||
+      newBgLangs.some((l, i) => l !== c.backgroundLanguages[i]) ||
+      newAll.length !== c.languages.length ||
+      newAll.some((l, i) => l !== c.languages[i]);
+
+    if (changed) {
+      this.builder.creation.update((state) => ({
+        ...state,
+        speciesLanguages: newSpeciesLangs,
+        civilizationLanguages: newCivLangs,
+        backgroundLanguages: newBgLangs,
+        languages: newAll,
+      }));
     }
   }
 }
