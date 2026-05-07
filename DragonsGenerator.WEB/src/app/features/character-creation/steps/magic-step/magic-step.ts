@@ -1,5 +1,4 @@
 // features/character-creation/steps/magic-step/magic-step.ts
-
 import {
   Component,
   OnInit,
@@ -7,13 +6,13 @@ import {
   signal,
   computed,
   ChangeDetectionStrategy,
-  CUSTOM_ELEMENTS_SCHEMA, // <-- Ajout de l'import
+  CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { CharacterBuilderService } from '../../../../core/services/character-builder.service';
-import { environment } from '../../../../../environments/environment';
-import type { SpellcastingKind, AbilityKey } from '../../../../core/models/Character/character';
+import { DataService } from '@core/services/data.service';
+import { CharacterBuilderService } from '@core/services/character-builder.service';
+import type { Spell } from '@core/models/Spells/spell';
+import type { SpellcastingKind, AbilityKey } from '@core/models/Character/character';
 
 // ============================================================================
 // TYPES
@@ -116,20 +115,18 @@ const SCHOOL_LABELS: Record<string, string> = {
   imports: [CommonModule],
   templateUrl: './magic-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class MagicStep implements OnInit {
-  private http = inject(HttpClient);
+  private dataService = inject(DataService); // ← était HttpClient
   readonly builder = inject(CharacterBuilderService);
 
-  readonly allSpells = signal<SpellRaw[]>([]);
+  readonly allSpells = signal<Spell[]>([]); // ← était SpellRaw[]
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly expandedSpellId = signal<string | null>(null);
 
-  /** IDs des cantrips sélectionnés. */
   readonly selectedCantrips = signal<Set<string>>(new Set());
-  /** IDs des sorts niv 1 sélectionnés. */
   readonly selectedSpells = signal<Set<string>>(new Set());
 
   // === Computed ===
@@ -211,8 +208,9 @@ export class MagicStep implements OnInit {
 
   ngOnInit(): void {
     this.loading.set(true);
-    this.http.get<SpellRaw[]>(`${environment.apiUrl}/spells`).subscribe({
-      next: (spells: SpellRaw[]) => {
+    this.dataService.getSpells().subscribe({
+      // ← était this.http.get<SpellRaw[]>(...)
+      next: (spells) => {
         this.allSpells.set(spells);
         this.loading.set(false);
         this.restoreFromBuilder();
@@ -352,7 +350,7 @@ export class MagicStep implements OnInit {
   /**
    * Construit un résumé compact du sort pour la colonne "Effet" du grimoire.
    */
-  private extractEffect(raw: SpellRaw | undefined): string {
+  private extractEffect(raw: Spell | undefined): string {
     if (!raw) return '';
 
     const parts: string[] = [];
@@ -420,19 +418,19 @@ export class MagicStep implements OnInit {
     return SCHOOL_LABELS[school] ?? school;
   }
 
-  castTimeLabel(s: SpellRaw): string {
+  castTimeLabel(s: Spell): string {
     if (!s.castingTime.amount && !s.castingTime.unit) return '—';
     return `${s.castingTime.amount ?? ''} ${s.castingTime.unit ?? ''}`.trim();
   }
 
-  rangeLabel(s: SpellRaw): string {
+  rangeLabel(s: Spell): string {
     if (!s.range.amount && !s.range.unit) return 'Personnel';
     if (s.range.amount === 'personnelle') return 'Personnel';
     if (s.range.amount === 'contact') return 'Contact';
     return `${s.range.amount ?? ''}${s.range.unit ? ' ' + s.range.unit : ''}`.trim() || '—';
   }
 
-  componentsLabel(s: SpellRaw): string {
+  componentsLabel(s: Spell): string {
     const parts: string[] = [];
     if (s.components.v) parts.push('V');
     if (s.components.s) parts.push('S');
@@ -440,7 +438,7 @@ export class MagicStep implements OnInit {
     return parts.join(', ') || '—';
   }
 
-  durationLabel(s: SpellRaw): string {
+  durationLabel(s: Spell): string {
     if (!s.duration.amount && !s.duration.unit) return 'Instantané';
     if (s.duration.amount === 'instantanee' || s.duration.amount === 'instantanée')
       return 'Instantané';

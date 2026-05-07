@@ -7,32 +7,12 @@ import {
   signal,
   computed,
   ChangeDetectionStrategy,
-  CUSTOM_ELEMENTS_SCHEMA, // <-- Ajout de l'import
+  CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { CharacterBuilderService } from '../../../../core/services/character-builder.service';
-import { environment } from '../../../../../environments/environment';
-
-export interface LanguageRaw {
-  id: string;
-  name: string;
-  category: string;
-  linguistics: {
-    writingSystems: { id: string; label: string; type: string }[];
-    isOralOnly: boolean;
-    writingNotes: string | null;
-  };
-  speakers: {
-    primary: { id: string; label: string }[];
-    regions: string[];
-    isExtinct: boolean | null;
-  };
-  lore: {
-    fullDescription: string;
-    sonority: string | null;
-  };
-}
+import { DataService } from '@core/services/data.service';
+import { CharacterBuilderService } from '@core/services/character-builder.service';
+import type { Language } from '@core/models/Languages/language';
 
 const CLASS_GRANTED_LANGUAGES: Record<string, string> = {
   'cls-druide': 'Langue des druides',
@@ -45,13 +25,13 @@ const CLASS_GRANTED_LANGUAGES: Record<string, string> = {
   imports: [CommonModule],
   templateUrl: './languages-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class LanguagesStep implements OnInit {
-  private http = inject(HttpClient);
+  private dataService = inject(DataService);
   readonly builder = inject(CharacterBuilderService);
 
-  readonly allLanguages = signal<LanguageRaw[]>([]);
+  readonly allLanguages = signal<Language[]>([]);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly expandedId = signal<string | null>(null);
@@ -75,14 +55,14 @@ export class LanguagesStep implements OnInit {
     Math.max(0, this.bonusCount() - this.chosenBonusLanguages().length),
   );
 
-  readonly availableBaseLanguages = computed<LanguageRaw[]>(() => {
+  readonly availableBaseLanguages = computed<Language[]>(() => {
     const taken = new Set(this.builder.creation().languages);
     return this.allLanguages()
       .filter((l) => l.category === 'base' && !taken.has(l.name) && !l.speakers.isExtinct)
       .sort((a, b) => a.name.localeCompare(b.name));
   });
 
-  readonly availableExoticLanguages = computed<LanguageRaw[]>(() => {
+  readonly availableExoticLanguages = computed<Language[]>(() => {
     const taken = new Set(this.builder.creation().languages);
     return this.allLanguages()
       .filter((l) => l.category === 'exotique' && !taken.has(l.name) && !l.speakers.isExtinct)
@@ -90,7 +70,7 @@ export class LanguagesStep implements OnInit {
   });
 
   readonly currentLanguages = computed(() => {
-    const map = new Map<string, LanguageRaw>();
+    const map = new Map<string, Language>();
     this.allLanguages().forEach((l) => map.set(l.name, l));
     const locked = new Set(this.lockedLanguages());
     return this.builder.creation().languages.map((name) => ({
@@ -103,11 +83,11 @@ export class LanguagesStep implements OnInit {
 
   ngOnInit(): void {
     this.loading.set(true);
-    this.http.get<LanguageRaw[]>(`${environment.apiUrl}/languages`).subscribe({
-      next: (langs: LanguageRaw[]) => {
+    this.dataService.getLanguages().subscribe({
+      next: (langs) => {
         this.allLanguages.set(langs);
         this.loading.set(false);
-        this.normalizeLanguageIds(langs); // ← AVANT les ensure
+        this.normalizeLanguageIds(langs);
         this.ensureClassLanguage();
         this.ensureLockedLanguages();
       },
@@ -144,58 +124,37 @@ export class LanguagesStep implements OnInit {
     return 'Bonus';
   }
 
-  writingLabel(lang: LanguageRaw): string {
+  writingLabel(lang: Language): string {
     if (lang.linguistics.isOralOnly) return 'Oral uniquement';
     return lang.linguistics.writingSystems.map((w) => w.label).join(', ');
   }
 
-  speakersLabel(lang: LanguageRaw): string {
+  speakersLabel(lang: Language): string {
     return lang.speakers.primary.map((s) => s.label).join(', ');
   }
 
-  /** Navigation autonome : Valider */
   confirm(): void {
     if (this.remainingPicks() === 0) {
       this.builder.nextStep();
     }
   }
 
-  /** Navigation autonome : Retour */
   prevStep(): void {
     this.builder.previousStep();
   }
 
-  private ensureClassLanguage(): void {
-    const classLang = CLASS_GRANTED_LANGUAGES[this.builder.creation().classId ?? ''];
-    if (classLang && !this.builder.creation().languages.includes(classLang)) {
-      this.builder.addLanguage(classLang);
-    }
-  }
-
-  private ensureLockedLanguages(): void {
-    const current = new Set(this.builder.creation().languages);
-    for (const lang of this.lockedLanguages()) {
-      if (!current.has(lang)) this.builder.addLanguage(lang);
-    }
-  }
-
-  /**
-   * Corrige les IDs ("lg-commun") en noms ("Commun") dans l'état du builder.
-   * Gère les données persistées dans le localStorage qui contiennent encore des IDs.
-   */
-  private normalizeLanguageIds(langs: LanguageRaw[]): void {
+  private normalizeLanguageIds(langs: Language[]): void {
     const idToName = new Map<string, string>();
     langs.forEach((l) => idToName.set(l.id, l.name));
 
     const resolve = (s: string) => idToName.get(s) ?? s;
-
     const c = this.builder.creation();
+
     const newSpeciesLangs = c.speciesLanguages.map(resolve);
     const newCivLangs = c.civilizationLanguages.map(resolve);
     const newBgLangs = c.backgroundLanguages.map(resolve);
     const newAll = [...new Set(c.languages.map(resolve))];
 
-    // Ne met à jour que si quelque chose a changé
     const changed =
       newSpeciesLangs.some((l, i) => l !== c.speciesLanguages[i]) ||
       newCivLangs.some((l, i) => l !== c.civilizationLanguages[i]) ||
@@ -211,6 +170,20 @@ export class LanguagesStep implements OnInit {
         backgroundLanguages: newBgLangs,
         languages: newAll,
       }));
+    }
+  }
+
+  private ensureClassLanguage(): void {
+    const classLang = CLASS_GRANTED_LANGUAGES[this.builder.creation().classId ?? ''];
+    if (classLang && !this.builder.creation().languages.includes(classLang)) {
+      this.builder.addLanguage(classLang);
+    }
+  }
+
+  private ensureLockedLanguages(): void {
+    const current = new Set(this.builder.creation().languages);
+    for (const lang of this.lockedLanguages()) {
+      if (!current.has(lang)) this.builder.addLanguage(lang);
     }
   }
 }
