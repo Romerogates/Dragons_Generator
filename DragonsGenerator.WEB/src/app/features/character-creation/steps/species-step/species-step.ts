@@ -10,6 +10,9 @@ import {
   ChangeDetectionStrategy,
   CUSTOM_ELEMENTS_SCHEMA, // <-- Ajout de l'import
 } from '@angular/core';
+import { forkJoin } from 'rxjs';
+import type { LanguageSummary } from '@core/models/Languages/language-summary';
+
 import { CommonModule } from '@angular/common';
 import { DataService } from '@core/services/data.service';
 import {
@@ -62,6 +65,7 @@ export class SpeciesStep implements OnInit {
   readonly selectedSpeciesId = signal<string | null>(null);
   readonly selectedSubspeciesId = signal<string | null>(null);
   readonly choiceAnswers = signal<Map<string, string[]>>(new Map());
+  readonly languageIdToName = signal<Map<string, string>>(new Map());
 
   // --- CARROUSEL & 3D ---
   readonly currentIndex = signal(0);
@@ -233,8 +237,13 @@ export class SpeciesStep implements OnInit {
     const species = this.selectedSpecies();
     const sub = this.selectedSubspecies();
     if (!species) return [];
-    const langs = [...species.languages.fixed];
-    if (sub?.languages?.fixed) langs.push(...sub.languages.fixed);
+
+    const langMap = this.languageIdToName();
+    const resolve = (s: string) => langMap.get(s) ?? s;
+
+    const langs = species.languages.fixed.map(resolve);
+    if (sub?.languages?.fixed) langs.push(...sub.languages.fixed.map(resolve));
+
     const answers = this.choiceAnswers();
     for (const choice of this.allCreationChoices()) {
       if (choice.type === 'single_select' && Array.isArray(choice.options)) {
@@ -242,8 +251,13 @@ export class SpeciesStep implements OnInit {
         if (selectedIds) {
           for (const raw of choice.options) {
             const opt = raw as Record<string, unknown>;
-            if (selectedIds.includes(opt['id'] as string) && opt['grants_language']) {
-              langs.push(opt['grants_language'] as string);
+            if (selectedIds.includes(opt['id'] as string)) {
+              if (opt['grants_language']) {
+                langs.push(resolve(opt['grants_language'] as string));
+              }
+              if ((opt['id'] as string)?.startsWith('lg-')) {
+                langs.push((opt['name'] as string) ?? resolve(opt['id'] as string));
+              }
             }
           }
         }
@@ -309,7 +323,29 @@ export class SpeciesStep implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadSpecies();
+    this.loading.set(true);
+
+    forkJoin({
+      species: this.dataService.getSpecies(),
+      languages: this.dataService.getLanguagesSummary(),
+    }).subscribe({
+      next: ({ species, languages }) => {
+        this.allSpecies.set(species);
+
+        // Map id → name pour résoudre les IDs de langues du JSON espèces
+        const map = new Map<string, string>();
+        languages.forEach((l) => map.set(l.id, l.name));
+        this.languageIdToName.set(map);
+
+        this.loading.set(false);
+      },
+      error: () => {
+        this.error.set('Impossible de charger les données.');
+        this.loading.set(false);
+      },
+    });
+
+    // Restauration de l'état si on revient sur cette étape
     const current = this.builder.creation();
     if (current.speciesId) {
       this.selectedSpeciesId.set(current.speciesId);
