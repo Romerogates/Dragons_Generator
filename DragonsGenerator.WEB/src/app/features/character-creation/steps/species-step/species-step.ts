@@ -241,28 +241,35 @@ export class SpeciesStep implements OnInit {
     const langMap = this.languageIdToName();
     const resolve = (s: string) => langMap.get(s) ?? s;
 
+    // 1. Langues fixes de l'espèce (IDs dans le JSON → résoudre en noms)
     const langs = species.languages.fixed.map(resolve);
     if (sub?.languages?.fixed) langs.push(...sub.languages.fixed.map(resolve));
 
+    // 2. Langues issues des creation choices
     const answers = this.choiceAnswers();
     for (const choice of this.allCreationChoices()) {
       if (choice.type === 'single_select' && Array.isArray(choice.options)) {
         const selectedIds = answers.get(choice.id);
-        if (selectedIds) {
-          for (const raw of choice.options) {
-            const opt = raw as Record<string, unknown>;
-            if (selectedIds.includes(opt['id'] as string)) {
-              if (opt['grants_language']) {
-                langs.push(resolve(opt['grants_language'] as string));
-              }
-              if ((opt['id'] as string)?.startsWith('lg-')) {
-                langs.push((opt['name'] as string) ?? resolve(opt['id'] as string));
-              }
-            }
+        if (!selectedIds) continue;
+
+        for (const raw of choice.options) {
+          const opt = raw as Record<string, unknown>;
+          const optId = opt['id'] as string;
+
+          if (!selectedIds.includes(optId)) continue;
+
+          // Cas 1 : l'option a un grants_language explicite
+          if (opt['grants_language']) {
+            langs.push(resolve(opt['grants_language'] as string));
+          }
+          // Cas 2 : l'option EST une langue (id commence par "lg-")
+          else if (optId?.startsWith('lg-')) {
+            langs.push((opt['name'] as string) ?? resolve(optId));
           }
         }
       }
     }
+
     return [...new Set(langs)];
   });
 
