@@ -760,8 +760,11 @@ export class PdfGeneratorService {
       this.text(pdf, this.prettify(tool), P.toolX, P.middleYs[i]);
     });
 
-    c.proficiencies.languages.slice(0, P.middleYs.length).forEach((lang, i) => {
-      this.text(pdf, this.prettify(lang), P.langX, P.middleYs[i]);
+    // Dédupliquer les langues après prettify pour éviter les doublons ID/nom
+    const uniqueLanguages = [...new Set(c.proficiencies.languages.map((l) => this.prettify(l)))];
+
+    uniqueLanguages.slice(0, P.middleYs.length).forEach((lang, i) => {
+      this.text(pdf, lang, P.langX, P.middleYs[i]);
     });
   }
 

@@ -384,9 +384,9 @@ export class CharacterBuilderService {
         bonusLanguageCount: newBonusTotal,
         languages: [
           ...new Set([
-            ...selection.languages,
-            ...c.civilizationLanguages,
-            ...c.backgroundLanguages,
+            ...selection.languages.map((l) => this.normalizeLanguageName(l)),
+            ...c.civilizationLanguages.map((l) => this.normalizeLanguageName(l)),
+            ...c.backgroundLanguages.map((l) => this.normalizeLanguageName(l)),
           ]),
         ],
       };
@@ -416,7 +416,12 @@ export class CharacterBuilderService {
         hasDarkvision: false,
         darkvisionRadius: 0,
         bonusLanguageCount: (c.bonusLanguageCount || 0) - prevSpBonus,
-        languages: [...new Set([...c.civilizationLanguages, ...c.backgroundLanguages])],
+        languages: [
+          ...new Set([
+            ...c.civilizationLanguages.map((l) => this.normalizeLanguageName(l)),
+            ...c.backgroundLanguages.map((l) => this.normalizeLanguageName(l)),
+          ]),
+        ],
       };
 
       newState._spBonusLang = 0;
@@ -432,7 +437,11 @@ export class CharacterBuilderService {
       civilizationLanguages: selection.languages,
       civilizationWritingSystems: selection.writingSystems,
       languages: [
-        ...new Set([...c.speciesLanguages, ...selection.languages, ...c.backgroundLanguages]),
+        ...new Set([
+          ...c.speciesLanguages.map((l) => this.normalizeLanguageName(l)),
+          ...selection.languages.map((l) => this.normalizeLanguageName(l)),
+          ...c.backgroundLanguages.map((l) => this.normalizeLanguageName(l)),
+        ]),
       ],
     }));
   }
@@ -444,7 +453,12 @@ export class CharacterBuilderService {
       civilizationName: null,
       civilizationLanguages: [],
       civilizationWritingSystems: [],
-      languages: [...new Set([...c.speciesLanguages, ...c.backgroundLanguages])],
+      languages: [
+        ...new Set([
+          ...c.speciesLanguages.map((l) => this.normalizeLanguageName(l)),
+          ...c.backgroundLanguages.map((l) => this.normalizeLanguageName(l)),
+        ]),
+      ],
     }));
   }
 
@@ -482,7 +496,12 @@ export class CharacterBuilderService {
         flaws: selection.flaws || c.flaws,
         handicap: selection.handicap || c.handicap,
         bonusLanguageCount: newBonusTotal,
-        languages: [...new Set([...c.speciesLanguages, ...c.civilizationLanguages])],
+        languages: [
+          ...new Set([
+            ...c.speciesLanguages.map((l) => this.normalizeLanguageName(l)),
+            ...c.civilizationLanguages.map((l) => this.normalizeLanguageName(l)),
+          ]),
+        ],
       };
 
       (newState as any)._bgBonusLang = selection.bonusLanguageCount;
@@ -1267,5 +1286,16 @@ export class CharacterBuilderService {
 
   private clearStorage(): void {
     localStorage.removeItem(STORAGE_KEY);
+  }
+
+  private normalizeLanguageName(lang: string): string {
+    // Si c'est un ID (commence par "lg-"), on le convertit en nom lisible
+    if (lang.startsWith('lg-')) {
+      return lang
+        .replace(/^lg-/, '')
+        .replace(/-/g, ' ')
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+    return lang;
   }
 }
