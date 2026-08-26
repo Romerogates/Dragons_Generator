@@ -2,14 +2,24 @@
   <div class="w-full max-w-md bg-[#1b2028] border border-slate-800 rounded-2xl p-8 shadow-xl">
     <h1 class="font-serif text-2xl font-bold text-amber-500 mb-1 text-center">Créer un compte</h1>
     <p class="text-xs text-slate-400 text-center mb-6 italic">
-      Un email de confirmation sera envoyé.
+      @if (saveIntent()) {
+        Crée un compte pour sauvegarder ton héros et y accéder partout.
+      } @else {
+        Un email de confirmation sera envoyé.
+      }
     </p>
 
     @if (success()) {
       <p class="text-sm text-emerald-400 text-center mb-4">
-        Compte créé. Ouvrez le lien reçu par email pour activer votre compte, puis connectez-vous.
+        Compte créé. Ouvre le lien reçu par email pour activer ton compte, puis connecte-toi —
+        ton héros sera alors enregistré automatiquement.
       </p>
-      <a routerLink="/login" class="wizard-nav-primary w-full text-center block">Aller à la connexion</a>
+      <a
+        routerLink="/login"
+        [queryParams]="loginQueryParams"
+        class="wizard-nav-primary w-full text-center block"
+        >Aller à la connexion</a
+      >
     } @else {
       <form class="flex flex-col gap-4" (ngSubmit)="submit()">
         <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
@@ -51,7 +61,9 @@
       </form>
       <p class="mt-4 text-center text-xs text-slate-400">
         Déjà un compte ?
-        <a routerLink="/login" class="text-amber-500 hover:underline">Connexion</a>
+        <a routerLink="/login" [queryParams]="loginQueryParams" class="text-amber-500 hover:underline"
+          >Connexion</a
+        >
       </p>
     }
   </div>

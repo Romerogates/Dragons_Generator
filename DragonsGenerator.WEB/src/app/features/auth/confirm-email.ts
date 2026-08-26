@@ -9,6 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
+import { PendingCharacterSaveService } from '@core/services/pending-character-save.service';
 
 @Component({
   selector: 'app-confirm-email',
@@ -22,10 +23,22 @@ import { AuthService } from '@core/services/auth.service';
           <p class="text-slate-400 text-sm">Vérification…</p>
         } @else if (ok()) {
           <p class="text-emerald-400 text-sm mb-4">{{ message() }}</p>
-          <a routerLink="/login" class="wizard-nav-primary inline-block">Se connecter</a>
+          @if (hasPendingSave()) {
+            <p class="text-slate-400 text-xs mb-4">
+              Connecte-toi pour enregistrer le héros en attente dans ton compte.
+            </p>
+          }
+          <a
+            routerLink="/login"
+            [queryParams]="loginQueryParams"
+            class="wizard-nav-primary inline-block"
+            >Se connecter</a
+          >
         } @else {
           <p class="text-red-400 text-sm mb-4">{{ message() }}</p>
-          <a routerLink="/register" class="text-amber-500 text-xs hover:underline">Réessayer l'inscription</a>
+          <a routerLink="/register" class="text-amber-500 text-xs hover:underline"
+            >Réessayer l'inscription</a
+          >
         }
       </div>
     </div>
@@ -36,12 +49,20 @@ import { AuthService } from '@core/services/auth.service';
 export class ConfirmEmailPage implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
+  private readonly pendingSave = inject(PendingCharacterSaveService);
 
   readonly loading = signal(true);
   readonly ok = signal(false);
   readonly message = signal('');
+  readonly hasPendingSave = signal(false);
+  loginQueryParams: Record<string, string> = { returnUrl: '/characters' };
 
   ngOnInit(): void {
+    if (this.pendingSave.hasPending()) {
+      this.hasPendingSave.set(true);
+      this.loginQueryParams = { returnUrl: '/characters', intent: 'save' };
+    }
+
     const token = this.route.snapshot.queryParamMap.get('token') ?? '';
     if (!token) {
       this.loading.set(false);

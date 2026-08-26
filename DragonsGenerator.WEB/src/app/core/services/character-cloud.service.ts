@@ -70,9 +70,8 @@ export class CharacterCloudService {
     }
     return this.list().pipe(
       switchMap((summaries) => {
-        if (!summaries.length) return of(this.readLocal());
+        if (!summaries.length) return of([] as unknown[]);
         const loads = summaries.map((s) => this.get(s.id));
-        // charge séquentiellement via forkJoin-like reduce
         return loads.reduce(
           (acc$, req) =>
             acc$.pipe(
@@ -90,9 +89,7 @@ export class CharacterCloudService {
         );
       }),
       tap((merged) => {
-        if (merged.length) {
-          localStorage.setItem('dragons-characters', JSON.stringify(merged));
-        }
+        localStorage.setItem('dragons-characters', JSON.stringify(merged));
       }),
       catchError(() => of(this.readLocal())),
     );

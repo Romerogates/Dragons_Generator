@@ -3,12 +3,14 @@ import {
   ChangeDetectionStrategy,
   inject,
   signal,
+  OnInit,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
+import { PendingCharacterSaveService } from '@core/services/pending-character-save.service';
 
 @Component({
   selector: 'app-login',
@@ -18,9 +20,11 @@ import { AuthService } from '@core/services/auth.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class LoginPage {
+export class LoginPage implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly pendingSave = inject(PendingCharacterSaveService);
 
   email = '';
   password = '';
@@ -28,14 +32,35 @@ export class LoginPage {
   readonly loading = signal(false);
   readonly forgotSent = signal(false);
   readonly mode = signal<'login' | 'forgot'>('login');
+  readonly saveIntent = signal(false);
+
+  private returnUrl = '/characters';
+
+  ngOnInit(): void {
+    const q = this.route.snapshot.queryParamMap;
+    this.returnUrl = q.get('returnUrl') || '/characters';
+    this.saveIntent.set(q.get('intent') === 'save' || this.pendingSave.hasPending());
+  }
 
   submitLogin(): void {
     this.error.set(null);
     this.loading.set(true);
     this.auth.login(this.email.trim(), this.password).subscribe({
       next: () => {
-        this.loading.set(false);
-        void this.router.navigateByUrl('/characters');
+        this.pendingSave.flushIfPossible().subscribe({
+          next: (saved) => {
+            this.loading.set(false);
+            if (saved) {
+              void this.router.navigateByUrl('/character-sheet');
+            } else {
+              void this.router.navigateByUrl(this.returnUrl);
+            }
+          },
+          error: () => {
+            this.loading.set(false);
+            void this.router.navigateByUrl(this.returnUrl);
+          },
+        });
       },
       error: (err) => {
         this.loading.set(false);

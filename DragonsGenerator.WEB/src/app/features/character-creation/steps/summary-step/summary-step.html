@@ -56,10 +56,17 @@
     </button>
     <button
       type="button"
-      class="px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-emerald-600 text-white shadow-md hover:bg-emerald-500 transition-[colors,transform,opacity,box-shadow] duration-200"
+      class="px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-emerald-600 text-white shadow-md hover:bg-emerald-500 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-50"
       (click)="saveCharacter()"
+      [disabled]="saving()"
     >
-      {{ isEditMode() ? 'Mettre à jour' : 'Sauvegarder le héros' }}
+      @if (saving()) {
+        Sauvegarde…
+      } @else if (isEditMode()) {
+        Mettre à jour
+      } @else {
+        Sauvegarder le héros
+      }
     </button>
     <button
       type="button"
@@ -73,4 +80,62 @@
       Créer un nouveau
     </button>
   </nav>
+
+  @if (saveError(); as err) {
+    <p class="text-center text-sm text-red-400 px-4">{{ err }}</p>
+  }
+
+  @if (!isLoggedIn()) {
+    <p class="text-center text-[11px] text-slate-500 px-4 max-w-md">
+      La sauvegarde enregistre ton héros dans ton compte (accessible partout). Le PDF reste
+      téléchargeable sans compte.
+    </p>
+  }
 </div>
+
+@if (showAuthGate()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-fade-in"
+  >
+    <div
+      class="bg-[#1b2028] border border-slate-700 rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 flex flex-col gap-5"
+    >
+      <div class="text-center">
+        <div
+          class="mx-auto w-14 h-14 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-3xl mb-4"
+        >
+          <iconify-icon icon="fluent-emoji:locked-with-key"></iconify-icon>
+        </div>
+        <h3 class="text-xl font-bold text-amber-500 font-serif mb-2">Compte requis</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">
+          Pour sauvegarder <span class="text-slate-200 font-serif">{{ character().name }}</span> et y
+          accéder depuis n’importe où, crée un compte ou connecte-toi. Ton héros sera conservé le
+          temps de l’inscription.
+        </p>
+      </div>
+      <div class="flex flex-col gap-2">
+        <button
+          type="button"
+          class="w-full px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest bg-amber-500 text-slate-900 hover:bg-amber-400 transition-colors"
+          (click)="goRegister()"
+        >
+          Créer un compte
+        </button>
+        <button
+          type="button"
+          class="w-full px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest bg-slate-800 text-slate-200 border border-slate-700 hover:border-amber-500/50 transition-colors"
+          (click)="goLogin()"
+        >
+          J’ai déjà un compte
+        </button>
+        <button
+          type="button"
+          class="w-full px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-300"
+          (click)="closeAuthGate()"
+        >
+          Annuler
+        </button>
+      </div>
+    </div>
+  </div>
+}

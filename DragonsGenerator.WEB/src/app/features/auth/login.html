@@ -2,7 +2,11 @@
   <div class="w-full max-w-md bg-[#1b2028] border border-slate-800 rounded-2xl p-8 shadow-xl">
     <h1 class="font-serif text-2xl font-bold text-amber-500 mb-1 text-center">Connexion</h1>
     <p class="text-xs text-slate-400 text-center mb-6 italic">
-      Accédez à vos héros et au support.
+      @if (saveIntent()) {
+        Connecte-toi pour enregistrer ton héros dans ton compte.
+      } @else {
+        Accédez à vos héros et au support.
+      }
     </p>
 
     @if (mode() === 'login') {
@@ -45,7 +49,14 @@
         <button type="button" class="text-amber-500 hover:underline" (click)="mode.set('forgot')">
           Mot de passe oublié ?
         </button>
-        <a routerLink="/register" class="hover:text-amber-400">Créer un compte</a>
+        <a
+          routerLink="/register"
+          [queryParams]="
+            saveIntent() ? { returnUrl: '/characters', intent: 'save' } : { returnUrl: '/characters' }
+          "
+          class="hover:text-amber-400"
+          >Créer un compte</a
+        >
       </div>
     } @else {
       @if (forgotSent()) {

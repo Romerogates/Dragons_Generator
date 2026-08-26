@@ -13,6 +13,7 @@ import { Router, RouterLink } from '@angular/router';
 import { PdfGeneratorService } from '@core/services/pdf-generator.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
 import { AuthService } from '@core/services/auth.service';
+import { PendingCharacterSaveService } from '@core/services/pending-character-save.service';
 import type { Character } from '../../core/models/Character/character';
 
 @Component({
@@ -28,19 +29,38 @@ export class Characters implements OnInit {
   private router = inject(Router);
   private cloud = inject(CharacterCloudService);
   private auth = inject(AuthService);
+  private pendingSave = inject(PendingCharacterSaveService);
 
   readonly characters = signal<any[]>([]);
   readonly characterToDelete = signal<any | null>(null);
+  readonly isLoggedIn = this.auth.isLoggedIn;
+  readonly loading = signal(true);
 
   ngOnInit(): void {
-    if (this.auth.isLoggedIn()) {
-      this.cloud.syncFromCloud().subscribe({
-        next: (list) => this.applyList(list as any[]),
-        error: () => this.loadCharacters(),
-      });
-    } else {
-      this.loadCharacters();
+    if (!this.auth.isLoggedIn()) {
+      this.loading.set(false);
+      this.characters.set([]);
+      return;
     }
+
+    this.pendingSave.flushIfPossible().subscribe({
+      next: () => this.reloadFromCloud(),
+      error: () => this.reloadFromCloud(),
+    });
+  }
+
+  private reloadFromCloud(): void {
+    this.loading.set(true);
+    this.cloud.syncFromCloud().subscribe({
+      next: (list) => {
+        this.applyList(list as any[]);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loadCharacters();
+        this.loading.set(false);
+      },
+    });
   }
 
   private applyList(parsed: any[]): void {

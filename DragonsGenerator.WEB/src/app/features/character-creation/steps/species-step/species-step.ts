@@ -3,9 +3,13 @@
 import {
   Component,
   OnInit,
+  OnDestroy,
+  afterNextRender,
   inject,
   signal,
   computed,
+  viewChild,
+  ElementRef,
   ChangeDetectionStrategy,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
@@ -57,14 +61,28 @@ interface ChoiceOptionView {
     class: 'flex flex-1 flex-col min-h-0 w-full',
   },
 })
-export class SpeciesStep implements OnInit {
+export class SpeciesStep implements OnInit, OnDestroy {
   private dataService = inject(DataService);
   readonly builder = inject(CharacterBuilderService);
 
-  /** Carousel card width + gap (keep in sync with species-step.html). */
-  readonly cardWidthPx = 320;
+  private readonly carouselViewport = viewChild<ElementRef<HTMLElement>>('carouselViewport');
+  private resizeObserver: ResizeObserver | null = null;
+
+  /** Largeur carte + gap — mesurés / adaptés au viewport (mobile). */
   readonly cardGapPx = 32;
-  readonly cardStridePx = 352; // 320 + 32
+  readonly cardWidthPx = signal(288);
+  readonly viewportWidthPx = signal(360);
+  readonly cardStridePx = computed(() => this.cardWidthPx() + this.cardGapPx);
+
+  /**
+   * Décalage du track pour centrer la carte active dans le viewport visible.
+   * (Ne pas utiliser translateX(%) : le % se base sur la largeur du track, pas de l’écran.)
+   */
+  readonly trackOffsetPx = computed(() => {
+    const vw = this.viewportWidthPx();
+    const cw = this.cardWidthPx();
+    return vw / 2 - cw / 2 - this.currentIndex() * this.cardStridePx();
+  });
 
   readonly allSpecies = signal<Species[]>([]);
   readonly loading = signal(true);
@@ -76,6 +94,10 @@ export class SpeciesStep implements OnInit {
 
   // --- CARROUSEL & 3D ---
   readonly currentIndex = signal(0);
+
+  constructor() {
+    afterNextRender(() => this.bindCarouselMetrics());
+  }
 
   readonly normalizedIndex = computed(() => {
     const total = this.currentCards().length;
@@ -408,12 +430,39 @@ export class SpeciesStep implements OnInit {
 
         this.restoreFromBuilder();
         this.loading.set(false);
+        // Viewport peut apparaître après le chargement
+        queueMicrotask(() => this.bindCarouselMetrics());
       },
       error: () => {
         this.error.set('Impossible de charger les données.');
         this.loading.set(false);
       },
     });
+  }
+
+  ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = null;
+  }
+
+  private bindCarouselMetrics(): void {
+    const el = this.carouselViewport()?.nativeElement;
+    if (!el) return;
+
+    this.resizeObserver?.disconnect();
+    this.measureCarousel(el);
+    this.resizeObserver = new ResizeObserver(() => this.measureCarousel(el));
+    this.resizeObserver.observe(el);
+  }
+
+  private measureCarousel(el: HTMLElement): void {
+    const vw = el.clientWidth;
+    if (vw <= 0) return;
+    this.viewportWidthPx.set(vw);
+    // Marge pour les flèches ; carte max 20rem desktop / ~18rem mobile
+    const maxCard = vw >= 640 ? 320 : 288;
+    const fitted = Math.min(maxCard, Math.max(240, vw - 88));
+    this.cardWidthPx.set(Math.round(fitted));
   }
 
   private restoreFromBuilder(): void {
@@ -831,6 +880,6 @@ export class SpeciesStep implements OnInit {
     if (total === 0) return '0px';
 
     const wraps = Math.floor((this.currentIndex() - index + total / 2) / total);
-    return `${wraps * total * this.cardStridePx}px`;
+    return `${wraps * total * this.cardStridePx()}px`;
   }
 }

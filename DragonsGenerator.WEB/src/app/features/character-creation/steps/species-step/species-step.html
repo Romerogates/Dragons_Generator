@@ -39,36 +39,32 @@
       </div>
     </div>
 
-    <div class="relative w-full max-w-7xl flex-1 flex items-center justify-center">
+    <div class="relative w-full max-w-7xl mx-auto flex-1 flex items-center justify-center min-w-0">
       <button
         type="button"
         (click)="prevCard()"
-        class="absolute left-1 sm:left-2 md:left-4 z-40 p-3 md:p-4 rounded-full bg-[#171b22]/95 border border-slate-700 text-amber-500 hover:border-amber-500 active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-150 shadow-2xl"
+        class="absolute left-0.5 sm:left-2 md:left-4 z-40 p-2.5 sm:p-3 md:p-4 rounded-full bg-[#171b22]/95 border border-slate-700 text-amber-500 hover:border-amber-500 active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-150 shadow-2xl"
         aria-label="Carte précédente"
       >
-        <span class="text-xl sm:text-2xl md:text-3xl">◀</span>
+        <span class="text-lg sm:text-2xl md:text-3xl">◀</span>
       </button>
 
-      <div class="w-full overflow-hidden px-10 sm:px-14 py-4 sm:py-8">
+      <div
+        #carouselViewport
+        class="w-full max-w-full overflow-hidden py-4 sm:py-8 min-w-0"
+      >
         <div
-          class="flex transition-transform duration-200 ease-out gap-8 items-stretch"
-          [style.transform]="
-            'translateX(calc(50% - ' +
-            cardWidthPx / 2 +
-            'px - (' +
-            currentIndex() +
-            ' * ' +
-            cardStridePx +
-            'px)))'
-          "
+          class="flex transition-transform duration-200 ease-out gap-8 items-stretch will-change-transform"
+          [style.transform]="'translateX(' + trackOffsetPx() + 'px)'"
         >
           @for (card of currentCards(); track card.id; let i = $index) {
             <div
-              class="relative w-72 sm:w-80 h-[min(440px,62dvh)] sm:h-[440px] cursor-pointer group transition-[transform,opacity,filter] duration-200 shrink-0"
+              class="relative h-[min(420px,58dvh)] sm:h-[440px] cursor-pointer group transition-[transform,opacity,filter] duration-200 shrink-0"
+              [style.width.px]="cardWidthPx()"
               [style.left]="getWrapOffset(i)"
               [ngClass]="{
-                'scale-[1.04] z-30 opacity-100': i === normalizedIndex(),
-                'scale-90 z-10 opacity-40 sm:opacity-35 grayscale-[0.25] pointer-events-none sm:pointer-events-auto':
+                'z-30 opacity-100 scale-100 sm:scale-[1.04]': i === normalizedIndex(),
+                'scale-[0.88] sm:scale-90 z-10 opacity-0 sm:opacity-35 grayscale-[0.25] pointer-events-none sm:pointer-events-auto':
                   i !== normalizedIndex(),
               }"
               style="perspective: 1000px"
@@ -190,10 +186,10 @@
       <button
         type="button"
         (click)="nextCard()"
-        class="absolute right-1 sm:right-2 md:right-4 z-40 p-3 md:p-4 rounded-full bg-[#171b22]/95 border border-slate-700 text-amber-500 hover:border-amber-500 active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-150 shadow-2xl"
+        class="absolute right-0.5 sm:right-2 md:right-4 z-40 p-2.5 sm:p-3 md:p-4 rounded-full bg-[#171b22]/95 border border-slate-700 text-amber-500 hover:border-amber-500 active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-150 shadow-2xl"
         aria-label="Carte suivante"
       >
-        <span class="text-xl sm:text-2xl md:text-3xl">▶</span>
+        <span class="text-lg sm:text-2xl md:text-3xl">▶</span>
       </button>
     </div>
 

@@ -9,14 +9,18 @@
         Mes <span class="text-amber-500">Héros</span>
       </h1>
       <p class="text-slate-400 text-sm italic">
-        {{ characters().length }} destinée{{ characters().length > 1 ? 's' : '' }} forgée{{
-          characters().length > 1 ? 's' : ''
-        }}
-        dans le grimoire.
+        @if (!isLoggedIn()) {
+          Tes héros cloud, accessibles partout.
+        } @else {
+          {{ characters().length }} destinée{{ characters().length > 1 ? 's' : '' }} forgée{{
+            characters().length > 1 ? 's' : ''
+          }}
+          dans le grimoire.
+        }
       </p>
     </div>
 
-    @if (characters().length > 0) {
+    @if (isLoggedIn() && characters().length > 0) {
       <a
         routerLink="/create"
         class="px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-emerald-600 text-white shadow-md hover:bg-emerald-500 hover:scale-[1.02] active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-200 flex items-center gap-2"
@@ -27,7 +31,44 @@
     }
   </header>
 
-  @if (characters().length === 0) {
+  @if (!isLoggedIn()) {
+    <div
+      class="flex flex-col items-center justify-center flex-grow bg-[#1b2028] border border-dashed border-slate-700 rounded-3xl p-12 text-center shadow-inner"
+    >
+      <span class="text-6xl mb-6 opacity-80 drop-shadow-lg"
+        ><iconify-icon icon="fluent-emoji:locked-with-key"></iconify-icon
+      ></span>
+      <h2 class="text-2xl font-bold text-slate-200 font-serif tracking-widest uppercase mb-3">
+        Compte requis
+      </h2>
+      <p class="text-slate-400 mb-8 max-w-md leading-relaxed">
+        Connecte-toi pour voir tes héros sauvegardés dans le cloud — accessibles depuis n’importe
+        quel appareil.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <a
+          routerLink="/login"
+          [queryParams]="{ returnUrl: '/characters' }"
+          class="px-10 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-amber-500 text-slate-950 shadow-md hover:bg-amber-400 transition-colors"
+        >
+          Se connecter
+        </a>
+        <a
+          routerLink="/register"
+          [queryParams]="{ returnUrl: '/characters' }"
+          class="px-10 py-4 rounded-xl text-sm font-black uppercase tracking-widest border border-slate-600 text-slate-200 hover:border-amber-500/50 transition-colors"
+        >
+          Créer un compte
+        </a>
+      </div>
+    </div>
+  } @else if (loading()) {
+    <div class="flex justify-center py-20">
+      <div
+        class="w-10 h-10 border-4 border-amber-500/30 border-t-amber-500 rounded-full animate-spin"
+      ></div>
+    </div>
+  } @else if (characters().length === 0) {
     <div
       class="flex flex-col items-center justify-center flex-grow bg-[#1b2028] border border-dashed border-slate-700 rounded-3xl p-12 text-center shadow-inner"
     >
