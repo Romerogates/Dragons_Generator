@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-livre",
+  "name": "Livre",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 1,
+    "unit": "po"
+  },
+  "weight_kg": 0.25,
+  "description": "Ouvrage relié pouvant contenir poésie, histoire, connaissances ou diagrammes."
+}

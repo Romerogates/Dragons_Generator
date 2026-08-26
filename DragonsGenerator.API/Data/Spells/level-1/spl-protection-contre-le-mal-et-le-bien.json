@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-protection-contre-le-mal-et-le-bien",
+  "name": "Protection contre le Mal et le Bien",
+  "level": 1,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(de l'eau bénite ou de la poudre d'argent et de fer"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": true,
+  "classes": [
+    "cls-magicien",
+    "cls-paladin",
+    "cls-pretre",
+    "cls-sorcier"
+  ],
+  "description": "Tant que persiste le sort, une créature consentante que vous touchez est protégée contre certains types de créatures : aberrations, célestes, élémentaires, fées, fiélons, morts-vivants ou ravageurs du Chancre. La protection offre plusieurs avantages. Les créatures de ces types subissent un désavantage aux jets d'attaque contre la cible. Par ailleurs, la cible ne peut pas être charmée, effrayée ou possédée par ces créatures. Si la cible est déjà charmée, effrayée ou possédée par une telle créature, elle bénéficie d'un avantage à tout nouveau jet de sauvegarde contre l'effet concerné.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 1ᵉʳ.",
+  "modular_options": []
+}

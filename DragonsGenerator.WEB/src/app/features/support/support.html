@@ -1,0 +1,77 @@
+<div class="max-w-3xl mx-auto px-4 py-10">
+  <h1 class="font-serif text-3xl font-bold text-amber-500 mb-2">Support</h1>
+  <p class="text-sm text-slate-400 mb-8">
+    Décrivez un bug ou une question. Joignez idéalement le PDF de fiche personnage pour nous aider
+    à reproduire le problème.
+  </p>
+
+  <form
+    class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6 flex flex-col gap-4 mb-10"
+    (ngSubmit)="submit()"
+  >
+    <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+      Sujet
+      <input
+        required
+        [(ngModel)]="subject"
+        name="subject"
+        class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-amber-500"
+      />
+    </label>
+    <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+      Message
+      <textarea
+        required
+        rows="5"
+        [(ngModel)]="message"
+        name="message"
+        class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-amber-500"
+      ></textarea>
+    </label>
+    <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+      Fichier (PDF de fiche recommandé)
+      <input
+        type="file"
+        accept=".pdf,image/*"
+        (change)="onFile($event)"
+        class="mt-2 block w-full text-xs text-slate-400"
+      />
+    </label>
+
+    @if (error()) {
+      <p class="text-sm text-red-400">{{ error() }}</p>
+    }
+    @if (success()) {
+      <p class="text-sm text-emerald-400">{{ success() }}</p>
+    }
+
+    <button type="submit" class="wizard-nav-primary self-start" [disabled]="loading()">
+      {{ loading() ? 'Envoi…' : 'Ouvrir un ticket' }}
+    </button>
+  </form>
+
+  <h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-3">Mes tickets</h2>
+  <div class="flex flex-col gap-3">
+    @for (t of tickets(); track t.id) {
+      <div class="bg-[#171b22] border border-slate-800 rounded-xl p-4">
+        <div class="flex justify-between gap-2 mb-1">
+          <span class="font-bold text-amber-400 text-sm">{{ t.subject }}</span>
+          <span class="text-[10px] uppercase tracking-wider text-slate-500">{{ t.status }}</span>
+        </div>
+        <p class="text-xs text-slate-400 whitespace-pre-wrap">{{ t.message }}</p>
+        @if (t.attachmentOriginalName) {
+          <a
+            class="text-xs text-sky-400 hover:underline mt-2 inline-block"
+            [href]="t.attachmentUrl || '#'"
+            target="_blank"
+            rel="noopener"
+          >
+            Pièce jointe : {{ t.attachmentOriginalName }}
+          </a>
+        }
+      </div>
+    } @empty {
+      <p class="text-xs text-slate-500">Aucun ticket pour le moment.</p>
+    }
+  </div>
+</div>

@@ -1,17 +1,14 @@
-﻿
+﻿using DragonsGenerator.API.Common;
+using FastEndpoints;
 
 namespace DragonsGenerator.API.Endpoints.Languages;
 
-public record LanguageSummary(
-    string Id,
-    string Name,
-    string Category,
-    bool IsOralOnly,
-    int WritingSystemsCount
-);
-
-public class GetLanguagesSummaryEndpoint : EndpointWithoutRequest<List<LanguageSummary>>
+public class GetLanguagesSummaryEndpoint : EndpointWithoutRequest<List<LanguageSummaryDto>>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetLanguagesSummaryEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/languages/summary");
@@ -20,18 +17,7 @@ public class GetLanguagesSummaryEndpoint : EndpointWithoutRequest<List<LanguageS
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var languages = await JsonDataLoader.LoadAsync<List<Language>>("languages.json", ct);
-
-        var summaries = languages?
-            .Select(l => new LanguageSummary(
-                Id: l.Id,
-                Name: l.Name,
-                Category: l.Category,
-                IsOralOnly: l.Linguistics.IsOralOnly,
-                WritingSystemsCount: l.Linguistics.WritingSystems.Count
-            ))
-            .ToList() ?? [];
-
+        var summaries = await _repo.GetLanguagesSummaryAsync(ct);
         await Send.OkAsync(summaries, ct);
     }
 }

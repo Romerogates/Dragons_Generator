@@ -1,0 +1,1367 @@
+{
+  "id": "cls-paladin",
+  "schema_version": "3.0",
+  "name": "Paladin",
+  "flavor": {
+    "summary": "Guerrier sacré lié par un serment solennel, le paladin canalise la puissance divine pour détecter et combattre le mal, soigner ses alliés d'un simple contact et rayonner d'auras de protection.",
+    "lore_note": "Sur Eana, un paladin qui défaille risque la corruption par le Chancre : sa magie se teinte de nécrotique, des cauchemars le hantent, et des marques chancreuses apparaissent sur son corps, le conduisant à terme vers la transformation en ravageur ou en prince du Chancre."
+  },
+  "hit_die": "1d10",
+  "hp_at_level_1": 10,
+  "hp_per_level_average": 6,
+  "primary_abilities": [
+    "str",
+    "cha"
+  ],
+  "saving_throw_proficiencies": [
+    "wis",
+    "cha"
+  ],
+  "armor_proficiencies": [
+    "ar-light",
+    "ar-medium",
+    "ar-heavy",
+    "ar-shield"
+  ],
+  "weapon_proficiencies": [
+    "wp-simple",
+    "wp-martial"
+  ],
+  "tool_proficiencies": [],
+  "choice_pools": [
+    {
+      "id": "choice-skills-cls-paladin",
+      "name": "Compétences de classe",
+      "type": "skill_proficiency",
+      "allow_choice": true,
+      "quantity": 2,
+      "pool": [
+        "skill-athletisme",
+        "skill-discretion",
+        "skill-dressage",
+        "skill-intimidation",
+        "skill-intuition",
+        "skill-investigation",
+        "skill-medecine",
+        "skill-persuasion",
+        "skill-religion"
+      ]
+    },
+    {
+      "id": "choice-combat-style-cls-paladin",
+      "name": "Style de combat",
+      "type": "fighting_style",
+      "allow_choice": true,
+      "quantity": 1,
+      "unlocks_at_level": 2,
+      "unique": true,
+      "note": "Si une autre source octroie ce choix, choisir impérativement un style différent.",
+      "pool": [
+        "style-armes-a-deux-mains",
+        "style-defense",
+        "style-duel",
+        "style-protection"
+      ]
+    },
+    {
+      "id": "choice-equipment-slot1-cls-paladin",
+      "name": "Armement principal",
+      "type": "starting_equipment",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        [
+          "wp-arme-de-guerre",
+          "ar-bouclier"
+        ],
+        [
+          "wp-arme-de-guerre",
+          "wp-arme-de-guerre"
+        ]
+      ]
+    },
+    {
+      "id": "choice-equipment-slot2-cls-paladin",
+      "name": "Armement secondaire",
+      "type": "starting_equipment",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        [
+          "wp-javeline-x5"
+        ],
+        [
+          "wp-arme-courante-corps-a-corps"
+        ]
+      ]
+    },
+    {
+      "id": "choice-equipment-slot3-cls-paladin",
+      "name": "Sac d'équipement",
+      "type": "starting_equipment",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        [
+          "gr-sac-de-religieux"
+        ],
+        [
+          "gr-sac-daventurier"
+        ]
+      ]
+    }
+  ],
+  "spellcasting": {
+    "enabled": true,
+    "spell_list": "paladin",
+    "focus_options": [
+      "tl-symbole-sacre",
+      "tl-focaliseur-personnel"
+    ],
+    "prepared_formula": "cha_mod + floor(paladin_level / 2)",
+    "prepared_minimum": 1,
+    "recovery": "long_rest",
+    "unlocks_at_level": 2,
+    "preparation_time_rule": "1 minute par niveau de sort préparé (prière et méditation)",
+    "type": "prepared",
+    "ability": "cha",
+    "spell_dc_formula": "8 + proficiency_bonus + cha_mod",
+    "spell_attack_formula": "proficiency_bonus + cha_mod"
+  },
+  "starting_equipment": {
+    "fixed": [
+      {
+        "id": "ar-cotte-de-mailles",
+        "qty": 1
+      },
+      {
+        "id": "tl-symbole-sacre",
+        "qty": 1
+      }
+    ],
+    "choice_pools": []
+  },
+  "progression": [
+    {
+      "level": 1,
+      "features": [
+        "feat-perception-divine",
+        "feat-imposition-des-mains"
+      ],
+      "resources": {
+        "imposition_pool": 5
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 2,
+      "features": [
+        "feat-style-de-combat-paladin",
+        "feat-sorts-paladin",
+        "feat-chatiment-divin"
+      ],
+      "resources": {
+        "imposition_pool": 10,
+        "spell_slots": {
+          "1": 2
+        }
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 3,
+      "features": [
+        "feat-sante-divine",
+        "feat-serment-sacre"
+      ],
+      "resources": {
+        "imposition_pool": 15,
+        "spell_slots": {
+          "1": 3
+        }
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 4,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "imposition_pool": 20,
+        "spell_slots": {
+          "1": 3
+        }
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 5,
+      "features": [
+        "feat-attaque-supplementaire"
+      ],
+      "resources": {
+        "imposition_pool": 25,
+        "spell_slots": {
+          "1": 4,
+          "2": 2
+        }
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 6,
+      "features": [
+        "feat-aura-de-protection"
+      ],
+      "resources": {
+        "imposition_pool": 30,
+        "spell_slots": {
+          "1": 4,
+          "2": 2
+        }
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 7,
+      "features": [
+        "feat-subcls-paladin-lv7"
+      ],
+      "resources": {
+        "imposition_pool": 35,
+        "spell_slots": {
+          "1": 4,
+          "2": 3
+        }
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 8,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "imposition_pool": 40,
+        "spell_slots": {
+          "1": 4,
+          "2": 3
+        }
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 9,
+      "features": [],
+      "resources": {
+        "imposition_pool": 45,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 2
+        }
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 10,
+      "features": [
+        "feat-aura-de-courage"
+      ],
+      "resources": {
+        "imposition_pool": 50,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 2
+        }
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 11,
+      "features": [
+        "feat-chatiment-divin-ameliore"
+      ],
+      "resources": {
+        "imposition_pool": 55,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3
+        }
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 12,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "imposition_pool": 60,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3
+        }
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 13,
+      "features": [],
+      "resources": {
+        "imposition_pool": 65,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 1
+        }
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 14,
+      "features": [
+        "feat-contact-purificateur"
+      ],
+      "resources": {
+        "imposition_pool": 70,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 1
+        }
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 15,
+      "features": [
+        "feat-subcls-paladin-lv15"
+      ],
+      "resources": {
+        "imposition_pool": 75,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 2
+        }
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 16,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "imposition_pool": 80,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 2
+        }
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 17,
+      "features": [],
+      "resources": {
+        "imposition_pool": 85,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 1
+        }
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 18,
+      "features": [
+        "feat-amelioration-des-auras"
+      ],
+      "resources": {
+        "imposition_pool": 90,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 1
+        }
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 19,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "imposition_pool": 95,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2
+        }
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 20,
+      "features": [
+        "feat-subcls-paladin-lv20"
+      ],
+      "resources": {
+        "imposition_pool": 100,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2
+        }
+      },
+      "proficiency_bonus": 6
+    }
+  ],
+  "features_details": [
+    {
+      "id": "feat-perception-divine",
+      "name": "Perception divine",
+      "unlocks_at_level": 1,
+      "recharge": "long_rest",
+      "uses": {
+        "formula": "1 + cha_mod"
+      },
+      "action_type": "action",
+      "flavor": {
+        "summary": "Jusqu'à la fin de votre prochain tour, vous percevez la position et le type de tout céleste, fiélon, ravageur du Chancre et mort-vivant dans un rayon de 18 m, ainsi que les zones sanctifiées ou profanées.",
+        "lore_note": "La proximité du mal agresse les sens du paladin comme la pire des odeurs ; l'aura du Bien résonne telle la plus douce des musiques."
+      },
+      "mechanics": {
+        "range_m": 18,
+        "duration": "until_end_of_next_turn",
+        "detects": [
+          "celeste",
+          "fielon",
+          "ravageur-du-chancre",
+          "mort-vivant",
+          "zone-sanctifiee",
+          "zone-profanee"
+        ],
+        "reveals": [
+          "position",
+          "type"
+        ],
+        "does_not_reveal": [
+          "identity"
+        ],
+        "blocked_by": [
+          "full_cover"
+        ]
+      }
+    },
+    {
+      "id": "feat-imposition-des-mains",
+      "name": "Imposition des mains",
+      "unlocks_at_level": 1,
+      "recharge": "long_rest",
+      "uses": {
+        "pool_label": "imposition_pool",
+        "pool_formula": "paladin_level * 5"
+      },
+      "action_type": "action",
+      "flavor": {
+        "summary": "Votre sainteté se manifeste par un contact guérisseur. Vous gérez une réserve de puissance curatrice (5 × niveau) rechargée au repos long.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "applications": [
+          {
+            "name": "Soin",
+            "cost_from_pool": "variable",
+            "effect": "Restaure un nombre de PV inférieur ou égal au solde disponible."
+          },
+          {
+            "name": "Guérison ou neutralisation",
+            "cost_from_pool": 5,
+            "effect": "Guérit une maladie ou neutralise un poison. Cumulable : 5 PV par affection distincte."
+          }
+        ],
+        "exclusions": [
+          "mort-vivant",
+          "creature-artificielle"
+        ]
+      }
+    },
+    {
+      "id": "feat-style-de-combat-paladin",
+      "name": "Style de combat",
+      "unlocks_at_level": 2,
+      "recharge": "passive",
+      "action_type": null,
+      "flavor": {
+        "summary": "Spécialisation dans un style de combat martial. Ne peut jamais être repris pour choisir le même style une seconde fois.",
+        "lore_note": null
+      },
+      "choice_pool_ref": "choice-combat-style-cls-paladin"
+    },
+    {
+      "id": "feat-sorts-paladin",
+      "name": "Sorts",
+      "unlocks_at_level": 2,
+      "recharge": "passive",
+      "action_type": null,
+      "flavor": {
+        "summary": "Le paladin apprend à puiser dans la magie divine par la prière et la méditation. La préparation quotidienne des sorts requiert 1 minute par niveau de sort.",
+        "lore_note": null
+      },
+      "spellcasting_ref": "spellcasting"
+    },
+    {
+      "id": "feat-chatiment-divin",
+      "name": "Châtiment divin",
+      "unlocks_at_level": 2,
+      "recharge": "at_will",
+      "action_type": "no_action",
+      "flavor": {
+        "summary": "En touchant une créature avec une attaque au corps à corps, vous pouvez dépenser un emplacement de sort pour infliger des dégâts radiants supplémentaires.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "trigger": "melee_weapon_attack_hit",
+        "cost": "spell_slot",
+        "damage_type": "radiant",
+        "damage_dice_by_slot_level": {
+          "1": "2d8",
+          "2": "3d8",
+          "3": "4d8",
+          "4": "5d8",
+          "5": "5d8"
+        },
+        "maximum_dice": "5d8",
+        "bonus_damage_condition": {
+          "target_is": [
+            "mort-vivant",
+            "ravageur-du-chancre",
+            "fielon"
+          ],
+          "extra_dice": "1d8"
+        }
+      }
+    },
+    {
+      "id": "feat-sante-divine",
+      "name": "Santé divine",
+      "unlocks_at_level": 3,
+      "recharge": "passive",
+      "action_type": null,
+      "flavor": {
+        "summary": "La magie divine qui coule dans vos veines vous immunise contre les maladies et renforce votre résistance psychique face à la corruption et à la folie.",
+        "lore_note": "En cas de corruption par le Chancre, l'avantage aux jets contre la folie et la corruption est perdu."
+      },
+      "mechanics": {
+        "immunities": [
+          "disease"
+        ],
+        "advantages": [
+          {
+            "type": "saving_throw",
+            "target": "corruption",
+            "condition": null
+          },
+          {
+            "type": "saving_throw",
+            "target": "folie",
+            "condition": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "feat-serment-sacre",
+      "name": "Serment sacré",
+      "unlocks_at_level": 3,
+      "recharge": "passive",
+      "action_type": null,
+      "flavor": {
+        "summary": "Vous prononcez le serment qui vous lie irrévocablement : Serment de dévotion, Serment du corbeau ou Serment de l'errant.",
+        "lore_note": "Le serment octroie le Conduit divin et des aptitudes aux niveaux 3, 7, 15 et 20, ainsi que des sorts de serment toujours préparés."
+      },
+      "subclass_selection_ref": "subclasses",
+      "grants_conduit_divin": true,
+      "conduit_divin_recharge": "short_rest",
+      "conduit_divin_dd_formula": "8 + prof_bonus + cha_mod"
+    },
+    {
+      "id": "feat-augmentation-de-caracteristique",
+      "name": "Augmentation de caractéristique",
+      "unlocks_at_level": 4,
+      "additional_levels": [
+        8,
+        12,
+        16,
+        19
+      ],
+      "recharge": "passive",
+      "action_type": null,
+      "flavor": {
+        "summary": "Augmentez une caractéristique de 2, ou deux caractéristiques de 1 chacune. Maximum 20.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "options": [
+          {
+            "type": "single_stat_increase",
+            "amount": 2
+          },
+          {
+            "type": "two_stats_increase",
+            "amount": 1
+          }
+        ],
+        "stat_cap": 20
+      }
+    },
+    {
+      "id": "feat-attaque-supplementaire",
+      "name": "Attaque supplémentaire",
+      "unlocks_at_level": 5,
+      "recharge": "passive",
+      "action_type": null,
+      "flavor": {
+        "summary": "Vous pouvez attaquer deux fois au lieu d'une lorsque vous entreprnez l'action Attaquer.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "attacks_per_action": 2
+      }
+    },
+    {
+      "id": "feat-aura-de-protection",
+      "name": "Aura de protection",
+      "unlocks_at_level": 6,
+      "recharge": "passive",
+      "action_type": null,
+      "flavor": {
+        "summary": "Vous et vos alliés proches bénéficiez d'un bonus à tous les jets de sauvegarde égal à votre modificateur de Charisme (minimum +1).",
+        "lore_note": null
+      },
+      "mechanics": {
+        "range_m_initial": 3,
+        "range_m_improved": 9,
+        "range_improves_at_level": 18,
+        "bonus_formula": "max(1, cha_mod)",
+        "bonus_type": "saving_throw",
+        "condition": "must_be_conscious",
+        "affects": [
+          "self",
+          "friendly_creatures"
+        ]
+      }
+    },
+    {
+      "id": "feat-aura-de-courage",
+      "name": "Aura de courage",
+      "unlocks_at_level": 10,
+      "recharge": "passive",
+      "action_type": null,
+      "flavor": {
+        "summary": "Vous et vos alliés proches ne pouvez pas être effrayés tant que vous êtes conscient.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "range_m_initial": 3,
+        "range_m_improved": 9,
+        "range_improves_at_level": 18,
+        "immunity": "frightened",
+        "condition": "must_be_conscious",
+        "affects": [
+          "self",
+          "friendly_creatures"
+        ]
+      }
+    },
+    {
+      "id": "feat-chatiment-divin-ameliore",
+      "name": "Châtiment divin amélioré",
+      "unlocks_at_level": 11,
+      "recharge": "passive",
+      "action_type": null,
+      "flavor": {
+        "summary": "La force de votre vertu irradie dans vos coups : chaque touche au corps à corps inflige 1d8 dégâts radiants supplémentaires.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "trigger": "melee_weapon_attack_hit",
+        "bonus_damage_dice": "1d8",
+        "damage_type": "radiant",
+        "stacks_with": "feat-chatiment-divin",
+        "note": "Les dégâts des deux aptitudes s'additionnent si les deux sont utilisées sur la même attaque."
+      }
+    },
+    {
+      "id": "feat-contact-purificateur",
+      "name": "Contact purificateur",
+      "unlocks_at_level": 14,
+      "recharge": "long_rest",
+      "uses": {
+        "formula": "max(1, cha_mod)"
+      },
+      "action_type": "action",
+      "flavor": {
+        "summary": "Mettez fin à un sort affectant une créature consentante que vous touchez, ou vous-même.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "target": "self_or_willing_creature_touched",
+        "effect": "end_one_spell_effect"
+      }
+    },
+    {
+      "id": "feat-amelioration-des-auras",
+      "name": "Amélioration des Auras",
+      "unlocks_at_level": 18,
+      "recharge": "passive",
+      "action_type": null,
+      "flavor": {
+        "summary": "La portée de toutes vos auras de classe et de sous-classe passe à 9 m.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "modifies_features": [
+          "feat-aura-de-protection",
+          "feat-aura-de-courage",
+          "feat-aura-de-devotion"
+        ],
+        "new_range_m": 9
+      }
+    },
+    {
+      "id": "feat-subcls-paladin-lv7",
+      "name": "Aptitude de serment (niveau 7)",
+      "unlocks_at_level": 7,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Aptitude octroyée par le serment sacré choisi au niveau 7. Résolution dynamique via l'ID de sous-classe active.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_feature_delegate",
+        "delegate_to_subclass": true,
+        "at_level": 7
+      }
+    },
+    {
+      "id": "feat-subcls-paladin-lv15",
+      "name": "Aptitude de serment (niveau 15)",
+      "unlocks_at_level": 15,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Aptitude octroyée par le serment sacré choisi au niveau 15. Résolution dynamique via l'ID de sous-classe active.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_feature_delegate",
+        "delegate_to_subclass": true,
+        "at_level": 15
+      }
+    },
+    {
+      "id": "feat-subcls-paladin-lv20",
+      "name": "Aptitude de serment (niveau 20)",
+      "unlocks_at_level": 20,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Aptitude octroyée par le serment sacré choisi au niveau 20. Résolution dynamique via l'ID de sous-classe active.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_feature_delegate",
+        "delegate_to_subclass": true,
+        "at_level": 20
+      }
+    }
+  ],
+  "subclasses": {
+    "name": "Serment sacré",
+    "choice_label": "Prononcez votre serment",
+    "unlocks_at_level": 3,
+    "subclass_feature_levels": [
+      3,
+      7,
+      15,
+      20
+    ],
+    "progression_placeholder_ids": {
+      "lv7": "feat-subcls-paladin-lv7",
+      "lv15": "feat-subcls-paladin-lv15",
+      "lv20": "feat-subcls-paladin-lv20"
+    },
+    "options": [
+      {
+        "id": "subcls-serment-de-devotion",
+        "name": "Serment de dévotion",
+        "flavor": {
+          "summary": "Le paladin de dévotion incarne les plus purs idéaux de justice, de vertu et d'ordre. Les anges (serviteurs immaculés du Bien) sont ses modèles.",
+          "lore_note": "Parfois appelés cavaliers royaux, chevaliers blancs ou guerriers saints. Beaucoup vénèrent une divinité de la loi et de l'ordre."
+        },
+        "principes": [
+          "Honnêteté : Ne ment pas ni ne triche. Ta parole est une promesse.",
+          "Courage : Ne crains jamais l'action, mais ne néglige pas la mesure.",
+          "Compassion : Aide ton prochain, protège le faible et châtie ceux qui le menacent.",
+          "Honneur : Traite justement autrui et guide-le par l'honneur et la grâce de tes actes.",
+          "Devoir : Assume tes actes et leurs conséquences, protège ceux que l'on t'a confiés."
+        ],
+        "bonus_spells_granted": [
+          {
+            "level_unlocked": 3,
+            "always_prepared": true,
+            "spells": [
+              "spl-protection-contre-le-mal-et-le-bien",
+              "spl-sanctuaire"
+            ]
+          },
+          {
+            "level_unlocked": 5,
+            "always_prepared": true,
+            "spells": [
+              "spl-restauration-partielle",
+              "spl-zone-de-verite"
+            ]
+          },
+          {
+            "level_unlocked": 9,
+            "always_prepared": true,
+            "spells": [
+              "spl-dissipation-de-la-magie",
+              "spl-signal-desperance"
+            ]
+          },
+          {
+            "level_unlocked": 13,
+            "always_prepared": true,
+            "spells": [
+              "spl-liberte-de-mouvement",
+              "spl-protecteur-de-la-foi"
+            ]
+          },
+          {
+            "level_unlocked": 17,
+            "always_prepared": true,
+            "spells": [
+              "spl-colonne-de-feu",
+              "spl-communion"
+            ]
+          }
+        ],
+        "features_details": [
+          {
+            "id": "feat-conduit-divin-arme-sacree",
+            "name": "Conduit divin : Arme sacrée",
+            "unlocks_at_level": 3,
+            "recharge": "short_rest",
+            "action_type": "action",
+            "flavor": {
+              "summary": "Chargez d'énergie positive une arme tenue pendant 1 minute, ajoutant votre modificateur de Charisme aux jets d'attaque (minimum +1).",
+              "lore_note": null
+            },
+            "mechanics": {
+              "duration_rounds": 10,
+              "bonus_attack_formula": "max(1, cha_mod)",
+              "grants_magical_property": true,
+              "light_bright_m": 6,
+              "light_dim_m": 6,
+              "ends_early_if": [
+                "weapon_no_longer_held",
+                "unconscious",
+                "voluntary_end"
+              ]
+            }
+          },
+          {
+            "id": "feat-conduit-divin-renvoi-de-limpie",
+            "name": "Conduit divin : Renvoi de l'impie",
+            "unlocks_at_level": 3,
+            "recharge": "short_rest",
+            "action_type": "action",
+            "flavor": {
+              "summary": "Brandissez votre symbole sacré pour forcer fiélons, ravageurs et morts-vivants voisins à fuir pendant 1 minute.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "range_m": 9,
+              "targets": [
+                "mort-vivant",
+                "ravageur-du-chancre",
+                "fielon"
+              ],
+              "saving_throw": {
+                "type": "wis",
+                "dd_ref": "conduit_divin_dd",
+                "on_fail": "frightened_1_minute"
+              },
+              "frightened_behavior": "must_move_away_max_distance_no_reaction_action_only_dash_or_dodge",
+              "duration_rounds": 10,
+              "ends_early_if": [
+                "damage_taken"
+              ]
+            }
+          },
+          {
+            "id": "feat-aura-de-devotion",
+            "name": "Aura de dévotion",
+            "unlocks_at_level": 7,
+            "recharge": "passive",
+            "action_type": null,
+            "flavor": {
+              "summary": "Vous et vos alliés proches ne pouvez pas être charmés tant que vous êtes conscient.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "range_m_initial": 3,
+              "range_m_improved": 9,
+              "range_improves_at_level": 18,
+              "immunity": "charmed",
+              "condition": "must_be_conscious",
+              "affects": [
+                "self",
+                "friendly_creatures"
+              ]
+            }
+          },
+          {
+            "id": "feat-purete-spirituelle",
+            "name": "Pureté spirituelle",
+            "unlocks_at_level": 15,
+            "recharge": "passive",
+            "action_type": null,
+            "flavor": {
+              "summary": "Vous êtes en permanence sous les effets équivalents du sort Protection contre le Mal et le Bien.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "permanent_effect_ref": "spl-protection-contre-le-mal-et-le-bien"
+            }
+          },
+          {
+            "id": "feat-nimbe-sacre",
+            "name": "Nimbe sacré",
+            "unlocks_at_level": 20,
+            "recharge": "long_rest",
+            "uses": {
+              "formula": "1"
+            },
+            "action_type": "action",
+            "flavor": {
+              "summary": "Produisez une aura solaire de 9 m pendant 1 minute : 10 dégâts radiants aux ennemis en début de leur tour, avantage contre les sorts de fiélons, ravageurs et morts-vivants.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "duration_rounds": 10,
+              "light_bright_m": 9,
+              "light_dim_m": 9,
+              "damage_on_enemy_turn_start": {
+                "amount": 10,
+                "type": "radiant"
+              },
+              "advantages": [
+                {
+                  "type": "saving_throw",
+                  "target": "spells",
+                  "condition": "lancés par fiélons, ravageurs du Chancre ou morts-vivants"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "subcls-serment-du-corbeau",
+        "name": "Serment du corbeau",
+        "flavor": {
+          "summary": "Paladin inquisiteur, plus à l'aise dans l'ombre, qui traque les criminels et châtie le mal dans le secret des nuits urbaines. La ruse prime sur la force.",
+          "lore_note": "Dans de nombreuses cités, on nomme corbeaux ces justiciers solitaires. Certains finissent par succomber à la tentation qu'ils abhorrent, rongés par leurs années à regarder l'abysse."
+        },
+        "principes": [
+          "Plusieurs chemins mènent à ta destination. La ruse aboutit parfois là où la force ne donnerait pas de résultats.",
+          "Frapper comme la foudre. Ne préviens pas tes ennemis de l'imminence du combat. Mets-les à terre avant qu'ils aient le temps de répliquer.",
+          "La fin justifie les moyens. Tant que la fin est juste et que les moyens n'impliquent pas des actes pires encore que ceux que l'on châtie.",
+          "Regarder l'abysse. Ne recule pas devant la noirceur du monde. Endurcis ton âme, elle n'en sera que plus forte."
+        ],
+        "bonus_spells_granted": [
+          {
+            "level_unlocked": 3,
+            "always_prepared": true,
+            "spells": [
+              "spl-deguisement",
+              "spl-imprecation"
+            ]
+          },
+          {
+            "level_unlocked": 5,
+            "always_prepared": true,
+            "spells": [
+              "spl-serres-du-corbeau",
+              "spl-vision-dans-le-noir"
+            ]
+          },
+          {
+            "level_unlocked": 9,
+            "always_prepared": true,
+            "spells": [
+              "spl-antidetection",
+              "spl-rapidite"
+            ]
+          },
+          {
+            "level_unlocked": 13,
+            "always_prepared": true,
+            "spells": [
+              "spl-confusion",
+              "spl-terrain-hallucinatoire"
+            ]
+          },
+          {
+            "level_unlocked": 17,
+            "always_prepared": true,
+            "spells": [
+              "spl-cercle-de-teleportation",
+              "spl-communion"
+            ]
+          }
+        ],
+        "features_details": [
+          {
+            "id": "feat-justicier-des-ombres",
+            "name": "Justicier des ombres",
+            "unlocks_at_level": 3,
+            "recharge": "passive",
+            "action_type": null,
+            "flavor": {
+              "summary": "Vous gagnez la maîtrise de Discrétion ou Investigation. Si vous possédiez déjà les deux, doublez votre bonus de maîtrise pour l'une d'elles.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "grant_type": "proficiency_or_expertise",
+              "choice_pool": [
+                "skill-discretion",
+                "skill-investigation"
+              ]
+            }
+          },
+          {
+            "id": "feat-conduit-divin-aura-furtive",
+            "name": "Conduit divin : Aura furtive",
+            "unlocks_at_level": 3,
+            "recharge": "short_rest",
+            "action_type": "bonus_action",
+            "flavor": {
+              "summary": "Passez inaperçu jusqu'à la fin de votre tour : vous êtes considéré comme caché sans être invisible.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "duration": "until_end_of_turn",
+              "effect": "hidden_not_truly_invisible",
+              "counter_detection": {
+                "for": "creatures_with_see_invisible",
+                "saving_throw": "wis"
+              }
+            }
+          },
+          {
+            "id": "feat-conduit-divin-repousser-le-mal",
+            "name": "Conduit divin : Repousser le Mal",
+            "unlocks_at_level": 3,
+            "recharge": "short_rest",
+            "action_type": "action",
+            "flavor": {
+              "summary": "Présentez votre symbole divin pour effrayer les être mauvais à 9 m. Le MJ effectue les jets en secret, même pour les non-mauvais, afin de conserver le doute.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "range_m": 9,
+              "targets": [
+                "humanoide",
+                "fee",
+                "ravageur-du-chancre",
+                "fielon"
+              ],
+              "target_size_max": "M",
+              "target_alignment_required": "evil",
+              "saving_throw": {
+                "type": "wis",
+                "dd_ref": "conduit_divin_dd",
+                "on_fail": "frightened_1_minute",
+                "gm_rolls_in_secret": true
+              },
+              "duration_rounds": 10
+            }
+          },
+          {
+            "id": "feat-parade-impitoyable",
+            "name": "Parade impitoyable",
+            "unlocks_at_level": 7,
+            "recharge": "at_will",
+            "action_type": "reaction",
+            "flavor": {
+              "summary": "Quand un ennemi rate une attaque de corps à corps contre vous, redirigez immédiatement cette attaque vers une autre cible à 1,5 m de l'attaquant.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "enemy_melee_attack_misses_self",
+              "effect": "redirect_attack_to_target_within_1_5m_of_attacker",
+              "redirect_roll_modifier": "disadvantage"
+            }
+          },
+          {
+            "id": "feat-exploiter-les-faiblesses",
+            "name": "Exploiter les faiblesses",
+            "unlocks_at_level": 15,
+            "recharge": "short_rest",
+            "action_type": null,
+            "flavor": {
+              "summary": "Après 2 rounds d'observation passive d'un adversaire, choisissez chaque tour : avantage à vos attaques contre lui, ou désavantage à ses attaques contre vous.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "activation": "observe_target_2_rounds_no_action_required",
+              "max_observed_simultaneously": 1,
+              "per_turn_choice": [
+                "advantage_on_own_attacks_against_target",
+                "target_has_disadvantage_on_attacks_against_self"
+              ]
+            }
+          },
+          {
+            "id": "feat-absolution-des-tenebres",
+            "name": "Absolution des ténèbres",
+            "unlocks_at_level": 20,
+            "recharge": "long_rest",
+            "uses": {
+              "formula": "1"
+            },
+            "action_type": "action",
+            "flavor": {
+              "summary": "Générez une zone d'obscurité magique de 9 m pendant 1 minute. Les créatures mauvaises y subissent un désavantage aux jets de Sagesse et Charisme.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "duration_rounds": 10,
+              "darkness_radius_m": 9,
+              "suppresses_nonmagical_light": true,
+              "darkvision_penetrates": false,
+              "see_through_darkness": {
+                "self": true,
+                "designated_allies_count": 4
+              },
+              "evil_creatures_in_zone": [
+                "disadvantage_wis_saving_throws",
+                "disadvantage_cha_saving_throws"
+              ]
+            }
+          },
+          {
+            "id": "feat-ailes-de-la-nuit",
+            "name": "Ailes de la nuit",
+            "unlocks_at_level": 20,
+            "recharge": "short_rest",
+            "uses": {
+              "formula": "1"
+            },
+            "action_type": "bonus_action",
+            "flavor": {
+              "summary": "Faites apparaître des ailes noires magiques, obtenant une vitesse de vol égale à votre vitesse de marche pendant 1 heure.",
+              "lore_note": "Ces ailes tangibles, semblables à des ailes de corbeau, fonctionnent même en armure lourde."
+            },
+            "mechanics": {
+              "duration_minutes": 60,
+              "fly_speed": "equal_to_walk_speed",
+              "works_in_heavy_armor": true,
+              "end_early_action_type": "bonus_action"
+            }
+          }
+        ]
+      },
+      {
+        "id": "subcls-serment-de-lerrant",
+        "name": "Serment de l'errant",
+        "flavor": {
+          "summary": "Chevalier sans attache parcourant le monde, acceptant les quêtes impossibles, protégeant les faibles avec une téméraire insouciance. Son nom aspire à figurer dans les chansons de geste.",
+          "lore_note": null
+        },
+        "principes": [
+          "Premier à l'assaut, dernier à la retraite. La bravoure au combat est au cœur de l'idéal chevaleresque de l'errant.",
+          "Protéger la veuve et l'orphelin. Ne jamais détourner les yeux de la détresse d'autrui. Le fort a le devoir de veiller sur le faible.",
+          "Le monde pour maison. Ce sont les paysans qui s'attachent à la terre. L'errant va où l'aventure l'appelle.",
+          "L'acier plutôt que l'or. Richesse, luxe et confort émoussent l'âme. Une vie frugale entretient la force du corps et de l'esprit."
+        ],
+        "bonus_spells_granted": [
+          {
+            "level_unlocked": 3,
+            "always_prepared": true,
+            "spells": [
+              "spl-bouclier-de-la-foi",
+              "spl-heroisme"
+            ]
+          },
+          {
+            "level_unlocked": 5,
+            "always_prepared": true,
+            "spells": [
+              "spl-appel-de-destrier",
+              "spl-chatiment-fletrissant"
+            ]
+          },
+          {
+            "level_unlocked": 9,
+            "always_prepared": true,
+            "spells": [
+              "spl-protection-contre-lenergie",
+              "spl-rapidite"
+            ]
+          },
+          {
+            "level_unlocked": 13,
+            "always_prepared": true,
+            "spells": [
+              "spl-liberte-de-mouvement",
+              "spl-protection-contre-la-mort"
+            ]
+          },
+          {
+            "level_unlocked": 17,
+            "always_prepared": true,
+            "spells": [
+              "spl-dissipation-du-mal-et-du-bien",
+              "spl-immobilisation-de-monstre"
+            ]
+          }
+        ],
+        "features_details": [
+          {
+            "id": "feat-conduit-divin-fait-darmes",
+            "name": "Conduit divin : Fait d'armes",
+            "unlocks_at_level": 3,
+            "recharge": "short_rest",
+            "action_type": "bonus_action",
+            "flavor": {
+              "summary": "Transformez immédiatement en coup critique une attaque de corps à corps que vous venez de réussir.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "after_successful_melee_attack_this_turn",
+              "effect": "convert_hit_to_critical_hit"
+            }
+          },
+          {
+            "id": "feat-conduit-divin-sans-peur-et-sans-reproche",
+            "name": "Conduit divin : Sans peur et sans reproche",
+            "unlocks_at_level": 3,
+            "recharge": "short_rest",
+            "action_type": "bonus_action",
+            "flavor": {
+              "summary": "Pendant 1 minute, bénéficiez d'un avantage à tous vos jets de sauvegarde.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "duration_rounds": 10,
+              "advantages": [
+                {
+                  "type": "saving_throw",
+                  "target": "all",
+                  "condition": null
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-voie-du-chevalier-errant",
+            "name": "Voie du chevalier errant",
+            "unlocks_at_level": 7,
+            "recharge": "passive",
+            "action_type": null,
+            "flavor": {
+              "summary": "Résistance à la fatigue et puissants bonus à la monture invoquée via Appel de destrier.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "fatigue_level_effective_reduction": 1,
+              "fatigue_death_threshold": 7,
+              "mount_benefits": {
+                "spell_ref": "spl-appel-de-destrier",
+                "casting_time_override": "action",
+                "mount_hp_bonus_formula": "paladin_level",
+                "mount_hp_starts_at_maximum": true,
+                "mount_armor_initial_ac": 16,
+                "mount_armor_improved_ac": 18,
+                "mount_armor_improves_at_level": 14,
+                "mount_can_attack_at_paladin_initiative": true,
+                "mount_attack_uses_paladin_prof_bonus": true
+              }
+            }
+          },
+          {
+            "id": "feat-pourfendeur-de-monstres",
+            "name": "Pourfendeur de monstres",
+            "unlocks_at_level": 15,
+            "recharge": "passive",
+            "action_type": null,
+            "flavor": {
+              "summary": "Contre les créatures de taille Grande ou supérieure, les dés de Châtiment divin passent à d10 et peuvent être relancés sur 1 ou 2.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "condition": "target_size_large_or_greater",
+              "modifies_features": [
+                "feat-chatiment-divin",
+                "feat-chatiment-divin-ameliore"
+              ],
+              "upgraded_die": "d10",
+              "reroll_on": [
+                1,
+                2
+              ],
+              "keep_reroll": true
+            }
+          },
+          {
+            "id": "feat-heros-de-legende",
+            "name": "Héros de légende",
+            "unlocks_at_level": 20,
+            "recharge": "long_rest",
+            "uses": {
+              "formula": "1"
+            },
+            "action_type": "action",
+            "flavor": {
+              "summary": "Pendant 1 minute, vous gagnez chaque tour des PV temporaires (2 × cha_mod) et une inspiration gratuite à garder ou offrir à un allié visible.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "duration_rounds": 10,
+              "per_turn_temp_hp_formula": "cha_mod * 2",
+              "per_turn_free_inspiration": 1,
+              "inspiration_can_transfer_to_visible_ally": true
+            }
+          }
+        ]
+      }
+    ],
+    "level_unlocked": 3
+  }
+}

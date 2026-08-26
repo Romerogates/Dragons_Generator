@@ -1,0 +1,42 @@
+{
+  "schema_version": "2.0",
+  "id": "don-ambidextre",
+  "name": "Ambidextre",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [
+    {
+      "type": "class_feature",
+      "feature": "attaque_supplementaire",
+      "description": "Aptitude de classe : Attaque supplémentaire"
+    }
+  ],
+  "ability_score_increase": {
+    "ability": "DEX",
+    "value": 1,
+    "max": 20
+  },
+  "description": "Votre adresse vous permet de réaliser des manœuvres éblouissantes avec deux armes. +1 Dextérité (max 20). Aisance à deux armes : quand vous attaquez avec deux armes légères, vous pouvez effectuer deux attaques avec la deuxième au lieu d'une (action bonus). Synchronie : si vous bénéficiez d'un avantage et que le plus faible des deux dés aurait touché, vous pouvez jouer votre réaction pour infliger les dégâts de la deuxième arme.",
+  "benefits": [
+    {
+      "type": "ability_score_increase",
+      "ability": "DEX",
+      "value": 1
+    },
+    {
+      "type": "two_weapon_fighting",
+      "note": "Deux attaques avec la deuxième arme au lieu d'une"
+    },
+    {
+      "type": "reaction_bonus_damage",
+      "condition": "avantage + plus faible dé touche",
+      "note": "Dégâts de la deuxième arme en réaction"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "combat",
+    "deux-armes",
+    "dextérité"
+  ]
+}

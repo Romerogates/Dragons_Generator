@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-gemellite-avilissante",
+  "name": "Gémellité avilissante",
+  "level": 5,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "de la mie du pain et du sang que vous mélangez pendant l'incantation"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": true,
+  "classes": [
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Choisissez deux créatures que vous voyez à portée, situées dans un rayon de 1,50 m l'une de l'autre. Chacune effectue un JS Charisme. Ce sort est sans effet sur les créatures dont les points de vie actuels sont supérieurs à 50 ou réduits à 0, de même que sur les métamorphes et sur les créatures immunisées contre l'état charmé. Une créature peut choisir de rater volontairement son jet de sauvegarde. En cas de réussite au JS, la cible subit 5d6 dégâts psychiques. En cas d'échec, la cible est charmée par vous tant que le sort persiste. Si les deux créatures ratent leur jet de sauvegarde et n'ont pas plus de deux catégories de taille d'écart, elles sont attirées irrésistiblement l'une vers l'autre et leurs chairs se soudent dans une fusion abominable. Les deux cibles ne forment désormais plus qu'une créature occupant un seul espace. Si leurs catégories de taille diffèrent, la plus petite rejoint l'espace de l'autre. Si elles sont de même taille, déterminez au hasard laquelle rejoint l'espace de l'autre. Si la fusion opère, vous créez une chimère gémellaire, un ravageur du Chancre effrayant. ## Les effets du charme Que la fusion ait opéré ou non, une créature charmée par ce sort partage avec vous un lien télépathique tant qu'elle reste dans un rayon de 18 m de vous, vous permettant de lui donner des ordres à la mesure de son intellect, sans avoir besoin de parler une même langue. La créature charmée vous voit comme un ami et fait de son mieux pour combler vos désirs, quitte à se mettre en danger, mais si vous lui formulez une requête suicidaire ou manifestement irraisonnable, le sort prend fin.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, vous pouvez affecter des créatures dotées de 10 pv de plus par niveau d'emplacement au-dessus du 5e. En outre, avec un emplacement du 7e ou 8e niveau, la durée du sort passe à 10 minutes. Avec un emplacement du 9e niveau, elle passe à une heure.",
+  "modular_options": []
+}

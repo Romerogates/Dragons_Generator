@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-tempete-de-feu",
+  "name": "Tempête de feu",
+  "level": 7,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 45,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-pretre"
+  ],
+  "description": "Une tempête de flammes ronflantes apparaît dans un lieu de votre choix à portée. Jusqu'à dix cubes de 3 m d'arête disposés comme vous le souhaitez constituent cette zone d'effet. Chaque cube doit cependant avoir au moins une face adjacente à un autre cube. Toute créature située dans la zone doit effectuer un JS Dextérité et subit 7d10 dégâts de feu en cas d'échec, la moitié en cas de réussite. Le feu endommage les objets situés dans la zone et embrase les objets inflammables qui ne sont ni portés ni transportés. Si vous le souhaitez, le sort peut épargner la flore située dans la zone.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 8e niveau ou supérieur, les dégâts augmentent de 1d10 par niveau d'emplacement au-dessus du 7e.",
+  "modular_options": []
+}

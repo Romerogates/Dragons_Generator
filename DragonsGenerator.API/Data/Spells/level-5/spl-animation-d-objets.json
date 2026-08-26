@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-animation-d-objets",
+  "name": "Animation d'objets",
+  "level": 5,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Decorative element Les objets prennent vie sur votre ordre. Choisissez jusqu'à dix objets non magiques situés à portée. Ces objets ne doivent être ni portés ni transportés. Les cibles de taille M comptent comme deux objets ; celles de taille G, comme quatre objets ; et celles de taille TG, comme huit objets. Il est impossible d'animer un objet d'une catégorie de taille supérieure à TG. Chaque cible s'anime et devient une créature sous votre contrôle tant que le sort persiste et qu'elle n'est pas tombée à 0 point de vie. Au prix d'une action bonus, vous pouvez diriger mentalement toute créature que vous avez créée au moyen de ce sort, pourvu qu'elle se situe dans un rayon de 150 m de vous (si vous en contrôlez plusieurs, vous pouvez en diriger autant que vous le voulez en leur donnant le même ordre). Vous décidez de l'action que la créature va entreprendre et où elle va se déplacer à son tour de jeu suivant, ou vous lancez un ordre général, comme garder une pièce ou un couloir précis. Sans ordre de votre part, la créature se contente de se défendre contre les créatures hostiles. Une fois l'instruction donnée, la créature s'y conforme jusqu'à ce que sa tâche soit remplie. ## Profil des objets animés +8 pour toucher, 1d4 + 4 dégâts +6 pour toucher, 1d8 + 2 dégâts +5 pour toucher, 2d6 + 1 dégâts +6 pour toucher, 2d10 + 2 dégâts +8 pour toucher, 2d12 + 4 dégâts Un objet animé est une créature artificielle dont la CA, les points de vie, les attaques, la Force et la Dextérité découlent directement de sa catégorie de taille. Ses autres caractéristiques sont : Constitution 10, Intelligence et Sagesse 3, et Charisme 1. Sa VD est de 9 m. Si l'objet n'a pas de pieds ou d'appendices pour se déplacer, il dispose d'une VD en vol de 9 m avec la faculté de vol stationnaire. Si l'objet est fixé à une surface ou à un objet de plus grande taille, comme une chaîne scellée à un mur, sa VD est égale à 0. Dans tous les cas, il dispose de la vision aveugle sur un rayon de 9 m (aucune vision au-delà de ce rayon). Quand il tombe à 0 point de vie, il retrouve sa forme inerte d'origine, qui subit les dégâts restants. Si vous ordonnez à un objet d'attaquer, il peut effectuer une attaque de corps à corps contre une créature située dans un rayon de 1,50 m de lui. Il porte une attaque de coup avec un bonus au jet d'attaque et des dégâts contondants déterminés par sa catégorie de taille. Le meneur peut décider qu'un objet spécifique inflige des dégâts tranchants ou perforants si sa forme s'y prête.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, vous pouvez animer deux objets supplémentaires par niveau d'emplacement au-dessus du 5e.",
+  "modular_options": []
+}

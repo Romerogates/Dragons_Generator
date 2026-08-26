@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-tempete-de-grele",
+  "name": "Tempête de grêle",
+  "level": 4,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 90,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une pincée de poussière et quelques gouttes d'eau"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Un déluge de grêlons s'abat dans un cylindre de 6 m de rayon et de 12 m de haut centré sur un point situé à portée. Toute créature prise dans la zone doit effectuer un JS Dextérité et subit 2d8 dégâts contondants et 4d6 dégâts de froid en cas d'échec, la moitié en cas de réussite. La grêle transforme la zone d'effet en terrain dif ficile jusqu'à la fin de votre tour de jeu suivant.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, les dégâts contondants augmentent de 1d8 par niveau d'emplacement au-dessus du 4e.",
+  "modular_options": []
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "ski-persuasion",
+  "name": "Persuasion",
+  "ability": "CHA",
+  "description": "Lorsque vous tentez d'influencer une personne ou un groupe d'individus avec tact, entregent ou affabilité, le meneur peut vous demander d'effectuer un test de Charisme (Persuasion). D'une manière générale, un tel test intervient quand vous êtes sincère, que vous cherchez à vous rapprocher de quelqu'un, à présenter cordialement une requête ou à vous conduire avec bienséance. C'est par exemple le cas lorsque vous demandez une audience royale auprès du chambellan, que vous négociez un accord de paix entre des tribus en guerre ou que vous cherchez à exalter une foule de villageois.",
+  "examples": [
+    "Demander une audience royale auprès du chambellan.",
+    "Négocier un accord de paix entre des tribus en guerre.",
+    "Exalter une foule de villageois."
+  ],
+  "passive_check": false,
+  "source": "livre_de_base"
+}

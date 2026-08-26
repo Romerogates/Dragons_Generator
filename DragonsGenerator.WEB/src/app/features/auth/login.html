@@ -1,0 +1,84 @@
+<div class="min-h-[70vh] flex items-center justify-center px-4 py-10">
+  <div class="w-full max-w-md bg-[#1b2028] border border-slate-800 rounded-2xl p-8 shadow-xl">
+    <h1 class="font-serif text-2xl font-bold text-amber-500 mb-1 text-center">Connexion</h1>
+    <p class="text-xs text-slate-400 text-center mb-6 italic">
+      Accédez à vos héros et au support.
+    </p>
+
+    @if (mode() === 'login') {
+      <form class="flex flex-col gap-4" (ngSubmit)="submitLogin()">
+        <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+          Email
+          <input
+            type="email"
+            required
+            [(ngModel)]="email"
+            name="email"
+            class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 outline-none"
+          />
+        </label>
+        <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+          Mot de passe
+          <input
+            type="password"
+            required
+            [(ngModel)]="password"
+            name="password"
+            class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 outline-none"
+          />
+        </label>
+
+        @if (error()) {
+          <p class="text-sm text-red-400">{{ error() }}</p>
+        }
+
+        <button
+          type="submit"
+          class="wizard-nav-primary w-full"
+          [disabled]="loading()"
+        >
+          {{ loading() ? 'Connexion…' : 'Se connecter' }}
+        </button>
+      </form>
+
+      <div class="mt-4 flex flex-col gap-2 text-center text-xs text-slate-400">
+        <button type="button" class="text-amber-500 hover:underline" (click)="mode.set('forgot')">
+          Mot de passe oublié ?
+        </button>
+        <a routerLink="/register" class="hover:text-amber-400">Créer un compte</a>
+      </div>
+    } @else {
+      @if (forgotSent()) {
+        <p class="text-sm text-emerald-400 text-center">
+          Si un compte existe, un email de réinitialisation a été envoyé.
+        </p>
+      } @else {
+        <form class="flex flex-col gap-4" (ngSubmit)="submitForgot()">
+          <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+            Email du compte
+            <input
+              type="email"
+              required
+              [(ngModel)]="email"
+              name="emailForgot"
+              class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 outline-none"
+            />
+          </label>
+          @if (error()) {
+            <p class="text-sm text-red-400">{{ error() }}</p>
+          }
+          <button type="submit" class="wizard-nav-primary w-full" [disabled]="loading()">
+            Envoyer le lien
+          </button>
+        </form>
+      }
+      <button
+        type="button"
+        class="mt-4 w-full text-xs text-slate-400 hover:text-amber-400"
+        (click)="mode.set('login'); forgotSent.set(false)"
+      >
+        ← Retour connexion
+      </button>
+    }
+  </div>
+</div>

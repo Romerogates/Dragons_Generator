@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "sv-vin-grand-cru",
+  "name": "Vin (bouteille grand cru)",
+  "category": "service",
+  "subcategory": null,
+  "cost": {
+    "value": 10,
+    "unit": "po"
+  },
+  "weight_kg": null,
+  "description": "Boisson servie en auberge."
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-retour-a-la-vie",
+  "name": "Retour à la vie",
+  "level": 3,
+  "school": "necromancie",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(des diamants d'une valeur totale d'au moins 300 po"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-paladin",
+    "cls-pretre"
+  ],
+  "description": "Logo and icons Icon Vous rendez la vie à une créature morte au cours de la dernière minute. Elle est ressuscitée avec 1 point de vie. Si elle avait 6 niveaux de fatigue ou plus, elle revient à la vie avec 5 niveaux de fatigue. Ce sort ne permet pas de ressusciter une créature morte de vieillesse et ne fait pas repousser les parties du corps.",
+  "modular_options": []
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-selle-de-bat",
+  "name": "Selle de bât",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 5,
+    "unit": "po"
+  },
+  "weight_kg": 7.5,
+  "description": "Permet de charger des biens sur une bête de somme."
+}

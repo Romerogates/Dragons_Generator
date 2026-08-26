@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-eclair-multiple",
+  "name": "Éclair multiple",
+  "level": 6,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 45,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(un peu de fourrure ; un morceau d'ambre"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Vous créez un éclair qui file droit vers une cible de votre choix que vous voyez à portée. Trois éclairs jaillissent alors de cette cible vers un maximum de trois autres cibles, qui doivent se situer dans un rayon de 9 m de la première. Une cible peut être une créature ou un objet, et ne peut être ciblée que par un seul des éclairs. Chaque cible doit effectuer un JS Dextérité et subit 10d8 dégâts de foudre en cas d'échec, la moitié en cas de réussite.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau ou supérieur, un éclair supplémentaire jaillit de la première cible vers une autre par niveau d'emplacement au-dessus du 6e.",
+  "modular_options": []
+}

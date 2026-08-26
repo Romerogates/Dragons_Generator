@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-grappin",
+  "name": "Grappin",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 2,
+    "unit": "po"
+  },
+  "weight_kg": 2,
+  "description": "Utilisé pour l'escalade."
+}

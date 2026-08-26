@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "don-vigoureux",
+  "name": "Vigoureux",
+  "requires_magic": false,
+  "category": "survival",
+  "prerequisites": [],
+  "ability_score_increase": {
+    "ability": "CON",
+    "value": 1,
+    "max": 20
+  },
+  "description": "+1 Constitution (max 20). +2 aux tests de Constitution et aux JS de Constitution. Les jets de sauvegarde contre la mort réussissent sur 8 ou plus (au lieu de 10+).",
+  "benefits": [
+    {
+      "type": "ability_score_increase",
+      "ability": "CON",
+      "value": 1
+    },
+    {
+      "type": "check_save_bonus",
+      "ability": "CON",
+      "value": 2
+    },
+    {
+      "type": "death_save_threshold",
+      "succeed_on": 8
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "constitution",
+    "endurance",
+    "survie"
+  ]
+}

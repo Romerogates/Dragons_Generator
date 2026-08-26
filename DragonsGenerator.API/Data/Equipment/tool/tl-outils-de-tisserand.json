@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "tl-outils-de-tisserand",
+  "name": "Outils de tisserand",
+  "category": "tool",
+  "subcategory": "artisan_tool",
+  "cost": {
+    "value": 1,
+    "unit": "po"
+  },
+  "weight_kg": 2.5,
+  "description": "Outils d'artisan associé au travail du tissu, couturier et tailleur."
+}

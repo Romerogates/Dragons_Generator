@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-arme-imperieuse",
+  "name": "Arme impérieuse",
+  "level": 5,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action_bonus"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-paladin"
+  ],
+  "description": "Votre arme de corps à corps assène l'autorité suprême de votre divinité. Chaque fois que vous touchez une cible avec cette arme avant la fin du sort, vous lui infligez des dégâts psychiques supplémentaires égaux au double de votre modificateur de caractéristique magique et l'obligez à réussir un JS Sagesse sous peine de se retrouver étourdie jusqu'au début de son tour de jeu suivant.",
+  "modular_options": []
+}

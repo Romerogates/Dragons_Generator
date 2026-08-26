@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-belier-portatif",
+  "name": "Bélier portatif",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 4,
+    "unit": "po"
+  },
+  "weight_kg": 17.5,
+  "description": "Confère un bonus de +4 au test de Force pour enfoncer une porte. Si un autre personnage aide, le porteur bénéficie d'un avantage au test."
+}

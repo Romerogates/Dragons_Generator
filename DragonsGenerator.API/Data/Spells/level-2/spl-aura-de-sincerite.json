@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-aura-de-sincerite",
+  "name": "Aura de sincérité",
+  "level": 2,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": {
+      "shape": "rayon",
+      "radius_m": 9
+    }
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-paladin"
+  ],
+  "description": "Aura de sincérité O00 Une énergie de franchise et de confiance émane de vous dans un rayon de 9 m. L'aura se déplace avec vous tant que le sort persiste, et vous en restez le centre. Toute créature comprise dans l'aura (y compris vous) subit un désavantage aux tests de caractéristique associés à la Tromperie et bénéficie d'un avantage à ceux associés à l'Intuition.",
+  "modular_options": []
+}

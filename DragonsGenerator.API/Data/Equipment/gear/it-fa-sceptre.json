@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "it-fa-sceptre",
+  "name": "Sceptre (focaliseur)",
+  "category": "gear",
+  "subcategory": "arcane_focus",
+  "cost": {
+    "value": 10,
+    "unit": "po"
+  },
+  "weight_kg": 1,
+  "description": "Focaliseur arcanique. Peut remplacer les composantes matérielles d'un sort."
+}

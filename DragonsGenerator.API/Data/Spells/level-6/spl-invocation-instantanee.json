@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-invocation-instantanee",
+  "name": "Invocation instantanée",
+  "level": 6,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "permanent",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un saphir d'une valeur minimale de 1 000 po"
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien"
+  ],
+  "description": "Vous touchez un objet ne pesant pas plus de 5 kg et d'une longueur maximale de 1,80 m. Ce sort y laisse une marque et inscrit le nom de l'objet sur le saphir utilisé comme composante matérielle (la marque et le nom sont invisibles). Chaque fois que vous lancez ce sort, vous devez utiliser un saphir différent. Par la suite, vous pouvez prononcer le nom de l'objet et briser le saphir au prix d'une action. L'objet apparaît instantanément dans votre main, quelles que soient les distances physiques et planaires qui vous en séparent, et le sort prend fin.",
+  "modular_options": []
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-vision-aveugle",
+  "name": "Vision aveugle",
+  "level": 4,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un mille-pattes desséché"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-magicien",
+    "cls-rodeur",
+    "cls-sorcier"
+  ],
+  "description": "Logo, icon, and stamp Icon, logo, and stamp Icon, photograph, and stamp D ous touchez une créature consentante et lui conférez la faculté de percevoir l'environnement sans recourir à la vue. La cible gagne la vision aveugle sur 18 m pour toute la durée du sort.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 4e.",
+  "modular_options": []
+}

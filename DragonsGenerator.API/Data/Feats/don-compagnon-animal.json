@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "don-compagnon-animal",
+  "name": "Compagnon animal",
+  "requires_magic": false,
+  "category": "survival",
+  "prerequisites": [
+    {
+      "type": "proficiency",
+      "proficiency_type": "skill",
+      "value": "Dressage",
+      "description": "Maîtrise de Dressage"
+    }
+  ],
+  "description": "Vous forgez un lien profond avec un animal (gorille, loup, ours noir, panthère ou sanglier — FP ½ max, taille P ou M). Après une semaine de bons soins, il vous obéit fidèlement. Son Intelligence monte à 4 si inférieure. Ses PV max = moitié des vôtres (si inférieurs). Il agit selon vos instructions en combat (un seul tour d'attaque).",
+  "benefits": [
+    {
+      "type": "animal_companion",
+      "eligible_beasts": [
+        "gorille",
+        "loup",
+        "ours noir",
+        "panthère",
+        "sanglier"
+      ],
+      "max_cr": 0.5,
+      "max_size": "M"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "animal",
+    "compagnon",
+    "nature"
+  ]
+}

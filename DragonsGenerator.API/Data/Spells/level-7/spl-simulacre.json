@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-simulacre",
+  "name": "Simulacre",
+  "level": 7,
+  "school": "illusion",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": {
+      "shape": "rayon",
+      "radius_m": 9
+    }
+  },
+  "duration": {
+    "type": "normal",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien"
+  ],
+  "description": "Vous façonnez un double illusoire d'une bête ou d'un humanoïde restant à portée du début à la fin de l'incantation du sort. Ce double est une créature, partiellement réelle et formée de neige ou de glace, qui peut entreprendre des actions et être affecté comme une créature normale. Il ressemble à l'original, mais c'est une créature artificielle dotée de la moitié des points de vie de la créature originale et il apparaît sans équipement. Pour le reste, l'illusion utilise le profil de la créature qu'elle reproduit. Le simulacre est amical envers vous et les créatures que vous désignez. Il obéit à vos ordres oraux, se déplace et agit à votre tour de jeu au combat, conformément à vos souhaits. Le simulacre n'a aucune faculté d'apprentissage, il ne gagne pas de niveaux ni de capacités, et ne récupère pas d'emplacements de sort. S'il est blessé, vous pouvez le réparer dans un laboratoire d'alchimie au moyen d'herbes rares et de minéraux d'une valeur de 100 po par point de vie récupéré. Le double persiste jusqu'à ce qu'il tombe à 0 point de vie, moment auquel il se retransforme en neige et fond instantanément. Si vous relancez ce sort, tout double actif que vous avez déjà créé est aussitôt détruit. ### Les secrets du simulacre Les secrets du simulacre sont des caractéristiques peu connues de ce sort. Pour les connaître, il faut réussir un test d'Intelligence (Arcanes) DD 20 au moment où le sort est appris. Il est également possible de les apprendre ultérieurement par des recherches. ### Les composantes matérielles Les grandes quantités de neige et de glace requises comme composantes matérielles sont typiques des sorts conçus à l'époque de la civilisation boréale. D'autres variantes de simulacre existent dans des contrées qui ne connaissent pas d'hivers froids. Dans ces territoires, la neige et la glace sont remplacées par de l'argile en poudre ou de la farine mêlée d'eau. ### L'origine de l'étincelle de vie du simulacre Même si le simulacre est incapable d'évolution, il est animé d'une intelligence qui n'est pas uniquement le fait de la magie du lanceur de sorts. Celle-ci provient d'une âme errant dans le Plan Éthéré que le sort arrache à sa destination finale. Le simulacre manifeste une personnalité propre qui s'affirme au fil du temps, partiellement influencée par son existence passée. Un simulacre particulièrement ancien (de l'ordre de plusieurs mois) peut aller jusqu'à se poser des questions sur son identité. Le meneur détermine comment a trépassé l'être dont l'âme anime le simulacre. Le caractère du simulacre dépendra de la personnalité du défunt, des circonstances de sa mort et de la manière dont le simulacre est utilisé. ### Les actions impossibles à un simulacre De nombreuses caractéristiques individuelles ne peuvent être copiées par un simulacre : l'imagination, la rhétorique, la ruse, la pédagogie, la planification, la créativité, l'inspiration artistique, la croyance, l'Éveil à la magie, etc. ### Simulacre de vie Nécromancie du 1ᵉʳ niveau Vous vous renforcez au moyen d'un semblant de vie nécromantique, ce qui vous fait gagner 1d4 + 4 points de vie temporaires pour toute la durée du sort. ### Soif de sang Nécromancie du 4e niveau Une énergie vampirique émane de vous dans un rayon de 9 m. L'aura se déplace avec vous tant que le sort persiste, et vous en restez le centre. Une fois par round, quand vous voyez une créature de taille P ou supérieure comprise dans la zone subir des dégâts contondants, perforants ou tranchants, vous pouvez récupérer un nombre de points de vie égal à la moitié des dégâts en question. Les créatures dont le type est l'un des suivants ne vous permettent pas d'activer cet effet : créature artificielle, élémentaire, mort-vivant, plante et vase.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, le rayon d'effet augmente de 3 m par niveau d'emplacement au-dessus du 4e.",
+  "modular_options": []
+}

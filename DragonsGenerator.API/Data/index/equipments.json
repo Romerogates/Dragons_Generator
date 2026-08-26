@@ -1,0 +1,2630 @@
+{
+  "schema_version": "2.0",
+  "description": "Index des équipements (armes, armures, outils, objets, montures, véhicules, services). Chaque entrée référence son fichier JSON dans Equipment/<category>/.",
+  "stats": {
+    "total": 195,
+    "by_category": {
+      "armor": 14,
+      "gear": 78,
+      "mount": 8,
+      "service": 4,
+      "tool": 39,
+      "vehicle": 13,
+      "weapon": 39
+    }
+  },
+  "items": [
+    {
+      "id": "ar-armure-decailles",
+      "name": "Armure d'écailles",
+      "category": "armor",
+      "subcategory": "medium",
+      "cost": {
+        "value": 50,
+        "unit": "po"
+      },
+      "weight_kg": 22.5,
+      "file": "Equipment/armor/ar-armure-decailles.json",
+      "ac_base": 14,
+      "str_required": 12,
+      "stealth_disadvantage": true
+    },
+    {
+      "id": "ar-armure-de-cuir",
+      "name": "Armure de cuir",
+      "category": "armor",
+      "subcategory": "light",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 5,
+      "file": "Equipment/armor/ar-armure-de-cuir.json",
+      "ac_base": 11,
+      "str_required": null,
+      "stealth_disadvantage": false
+    },
+    {
+      "id": "ar-armure-de-cuir-cloutee",
+      "name": "Armure de cuir cloutée",
+      "category": "armor",
+      "subcategory": "light",
+      "cost": {
+        "value": 45,
+        "unit": "po"
+      },
+      "weight_kg": 6.5,
+      "file": "Equipment/armor/ar-armure-de-cuir-cloutee.json",
+      "ac_base": 12,
+      "str_required": null,
+      "stealth_disadvantage": false
+    },
+    {
+      "id": "ar-armure-de-peau",
+      "name": "Armure de peau",
+      "category": "armor",
+      "subcategory": "medium",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 6,
+      "file": "Equipment/armor/ar-armure-de-peau.json",
+      "ac_base": 12,
+      "str_required": null,
+      "stealth_disadvantage": false
+    },
+    {
+      "id": "ar-armure-de-plaques",
+      "name": "Armure de plaques",
+      "category": "armor",
+      "subcategory": "medium",
+      "cost": {
+        "value": 750,
+        "unit": "po"
+      },
+      "weight_kg": 20,
+      "file": "Equipment/armor/ar-armure-de-plaques.json",
+      "ac_base": 15,
+      "str_required": 12,
+      "stealth_disadvantage": true
+    },
+    {
+      "id": "ar-armure-matelassee",
+      "name": "Armure matelassée",
+      "category": "armor",
+      "subcategory": "light",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 4,
+      "file": "Equipment/armor/ar-armure-matelassee.json",
+      "ac_base": 11,
+      "str_required": null,
+      "stealth_disadvantage": true
+    },
+    {
+      "id": "ar-bouclier",
+      "name": "Bouclier",
+      "category": "armor",
+      "subcategory": "shield",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 3,
+      "file": "Equipment/armor/ar-bouclier.json",
+      "ac_base": 2,
+      "str_required": null,
+      "stealth_disadvantage": false
+    },
+    {
+      "id": "ar-bouclier-de-bois",
+      "name": "Bouclier de bois",
+      "category": "armor",
+      "subcategory": "shield",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 3,
+      "file": "Equipment/armor/ar-bouclier-de-bois.json",
+      "ac_base": 2,
+      "str_required": null,
+      "stealth_disadvantage": false
+    },
+    {
+      "id": "ar-broigne",
+      "name": "Broigne",
+      "category": "armor",
+      "subcategory": "heavy",
+      "cost": {
+        "value": 30,
+        "unit": "po"
+      },
+      "weight_kg": 20,
+      "file": "Equipment/armor/ar-broigne.json",
+      "ac_base": 14,
+      "str_required": 12,
+      "stealth_disadvantage": true
+    },
+    {
+      "id": "ar-chemise-de-mailles",
+      "name": "Chemise de mailles",
+      "category": "armor",
+      "subcategory": "medium",
+      "cost": {
+        "value": 50,
+        "unit": "po"
+      },
+      "weight_kg": 10,
+      "file": "Equipment/armor/ar-chemise-de-mailles.json",
+      "ac_base": 13,
+      "str_required": null,
+      "stealth_disadvantage": false
+    },
+    {
+      "id": "ar-clibanion",
+      "name": "Clibanion",
+      "category": "armor",
+      "subcategory": "heavy",
+      "cost": {
+        "value": 200,
+        "unit": "po"
+      },
+      "weight_kg": 30,
+      "file": "Equipment/armor/ar-clibanion.json",
+      "ac_base": 17,
+      "str_required": 15,
+      "stealth_disadvantage": true
+    },
+    {
+      "id": "ar-cotte-de-mailles",
+      "name": "Cotte de mailles",
+      "category": "armor",
+      "subcategory": "heavy",
+      "cost": {
+        "value": 75,
+        "unit": "po"
+      },
+      "weight_kg": 27.5,
+      "file": "Equipment/armor/ar-cotte-de-mailles.json",
+      "ac_base": 16,
+      "str_required": 14,
+      "stealth_disadvantage": true
+    },
+    {
+      "id": "ar-cuirasse",
+      "name": "Cuirasse",
+      "category": "armor",
+      "subcategory": "medium",
+      "cost": {
+        "value": 400,
+        "unit": "po"
+      },
+      "weight_kg": 10,
+      "file": "Equipment/armor/ar-cuirasse.json",
+      "ac_base": 14,
+      "str_required": null,
+      "stealth_disadvantage": false
+    },
+    {
+      "id": "ar-harnois",
+      "name": "Harnois",
+      "category": "armor",
+      "subcategory": "heavy",
+      "cost": {
+        "value": 1500,
+        "unit": "po"
+      },
+      "weight_kg": 32.5,
+      "file": "Equipment/armor/ar-harnois.json",
+      "ac_base": 18,
+      "str_required": 15,
+      "stealth_disadvantage": true
+    },
+    {
+      "id": "gr-acide-fiole",
+      "name": "Acide (fiole)",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 25,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/gr-acide-fiole.json"
+    },
+    {
+      "id": "gr-amulette",
+      "name": "Amulette",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": null,
+        "unit": "po",
+        "note": "Objet trouvé ou hérité, prix variable"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/gr-amulette.json"
+    },
+    {
+      "id": "it-ss-amulette",
+      "name": "Amulette (symbole sacré)",
+      "category": "gear",
+      "subcategory": "holy_symbol",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/it-ss-amulette.json"
+    },
+    {
+      "id": "gr-attirail-de-peche",
+      "name": "Attirail de pêche",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 2,
+      "file": "Equipment/gear/gr-attirail-de-peche.json"
+    },
+    {
+      "id": "it-fa-baguette",
+      "name": "Baguette (focaliseur)",
+      "category": "gear",
+      "subcategory": "arcane_focus",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/it-fa-baguette.json"
+    },
+    {
+      "id": "gr-baguette-dif",
+      "name": "Baguette d'if",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": null,
+        "unit": "po",
+        "note": "Objet artisanal, prix variable"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/gr-baguette-dif.json"
+    },
+    {
+      "id": "gr-barde",
+      "name": "Barde",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": null,
+        "unit": "po",
+        "note": "Prix variable selon le type de barde"
+      },
+      "weight_kg": null,
+      "file": "Equipment/gear/gr-barde.json"
+    },
+    {
+      "id": "gr-barre-a-mine",
+      "name": "Barre à mine",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 2,
+        "unit": "po"
+      },
+      "weight_kg": 5,
+      "file": "Equipment/gear/gr-barre-a-mine.json"
+    },
+    {
+      "id": "it-fa-baton",
+      "name": "Bâton (focaliseur)",
+      "category": "gear",
+      "subcategory": "arcane_focus",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 2,
+      "file": "Equipment/gear/it-fa-baton.json"
+    },
+    {
+      "id": "it-fd-baton-dif",
+      "name": "Bâton d'if (focaliseur druidique)",
+      "category": "gear",
+      "subcategory": "druidic_focus",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 2,
+      "file": "Equipment/gear/it-fd-baton-dif.json"
+    },
+    {
+      "id": "gr-batons-encens",
+      "name": "Bâtons d'encens",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "pa"
+      },
+      "weight_kg": null,
+      "file": "Equipment/gear/gr-batons-encens.json"
+    },
+    {
+      "id": "gr-belier-portatif",
+      "name": "Bélier portatif",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 4,
+        "unit": "po"
+      },
+      "weight_kg": 17.5,
+      "file": "Equipment/gear/gr-belier-portatif.json"
+    },
+    {
+      "id": "gr-billes-1000",
+      "name": "Billes (sac de 1000)",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 7,
+        "unit": "po"
+      },
+      "weight_kg": 7,
+      "file": "Equipment/gear/gr-billes-1000.json"
+    },
+    {
+      "id": "gr-bougie",
+      "name": "Bougie",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 5,
+        "unit": "pc"
+      },
+      "weight_kg": null,
+      "file": "Equipment/gear/gr-bougie.json"
+    },
+    {
+      "id": "gr-encre-et-plume",
+      "name": "Bouteille d'encre et plume d'écriture",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": null,
+      "file": "Equipment/gear/gr-encre-et-plume.json"
+    },
+    {
+      "id": "gr-bouteille-en-verre",
+      "name": "Bouteille en verre",
+      "category": "gear",
+      "subcategory": "container",
+      "cost": {
+        "value": 2,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/gear/gr-bouteille-en-verre.json"
+    },
+    {
+      "id": "it-fd-branche-de-gui",
+      "name": "Branche de gui (focaliseur druidique)",
+      "category": "gear",
+      "subcategory": "druidic_focus",
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 0,
+      "file": "Equipment/gear/it-fd-branche-de-gui.json"
+    },
+    {
+      "id": "gr-cadenas",
+      "name": "Cadenas",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/gr-cadenas.json"
+    },
+    {
+      "id": "gr-carnet-de-notes",
+      "name": "Carnet de notes",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 5,
+        "unit": "pa"
+      },
+      "weight_kg": 0.25,
+      "file": "Equipment/gear/gr-carnet-de-notes.json"
+    },
+    {
+      "id": "it-carquois-20-fleches",
+      "name": "Carquois (20 flèches)",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/gear/it-carquois-20-fleches.json"
+    },
+    {
+      "id": "it-carreaux",
+      "name": "Carreaux (20)",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 0.75,
+      "file": "Equipment/gear/it-carreaux.json"
+    },
+    {
+      "id": "gr-chaine-3m",
+      "name": "Chaîne (3 m)",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 5,
+      "file": "Equipment/gear/gr-chaine-3m.json"
+    },
+    {
+      "id": "gr-chausse-trappes-20",
+      "name": "Chausse-trappes (20)",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/gear/gr-chausse-trappes-20.json"
+    },
+    {
+      "id": "gr-coffre",
+      "name": "Coffre",
+      "category": "gear",
+      "subcategory": "container",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 12.5,
+      "file": "Equipment/gear/gr-coffre.json"
+    },
+    {
+      "id": "gr-costume-de-scene",
+      "name": "Costume de scène",
+      "category": "gear",
+      "subcategory": "clothing",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 2,
+      "file": "Equipment/gear/gr-costume-de-scene.json"
+    },
+    {
+      "id": "gr-couverture",
+      "name": "Couverture",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 5,
+        "unit": "pa"
+      },
+      "weight_kg": 1.5,
+      "file": "Equipment/gear/gr-couverture.json"
+    },
+    {
+      "id": "it-fa-cristal",
+      "name": "Cristal (focaliseur)",
+      "category": "gear",
+      "subcategory": "arcane_focus",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/it-fa-cristal.json"
+    },
+    {
+      "id": "gr-grigris-ornementaux",
+      "name": "Divers grigris ornementaux",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": null,
+        "unit": "po",
+        "note": "Artisanat, prix variable"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/gr-grigris-ornementaux.json"
+    },
+    {
+      "id": "gr-sauf-conduits-et-lettres",
+      "name": "Divers sauf-conduits et lettres de recommandation",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": null,
+        "unit": "po",
+        "note": "Document officiel, non vendu"
+      },
+      "weight_kg": null,
+      "file": "Equipment/gear/gr-sauf-conduits-et-lettres.json"
+    },
+    {
+      "id": "gr-eau-benite",
+      "name": "Eau bénite (flasque)",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 25,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/gr-eau-benite.json"
+    },
+    {
+      "id": "it-ss-embleme",
+      "name": "Emblème (symbole sacré)",
+      "category": "gear",
+      "subcategory": "holy_symbol",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 0,
+      "file": "Equipment/gear/it-ss-embleme.json"
+    },
+    {
+      "id": "it-carquois-20-carreaux",
+      "name": "Étui à carreaux (20 carreaux)",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 0.75,
+      "file": "Equipment/gear/it-carquois-20-carreaux.json"
+    },
+    {
+      "id": "gr-etui-a-parchemins",
+      "name": "Étui à parchemins",
+      "category": "gear",
+      "subcategory": "container",
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/gr-etui-a-parchemins.json"
+    },
+    {
+      "id": "gr-faux-papiers",
+      "name": "Faux papiers divers",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": null,
+        "unit": "po",
+        "note": "Illégal, prix variable"
+      },
+      "weight_kg": null,
+      "file": "Equipment/gear/gr-faux-papiers.json"
+    },
+    {
+      "id": "gr-feu-gregeois",
+      "name": "Feu grégeois (flasque)",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 50,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/gr-feu-gregeois.json"
+    },
+    {
+      "id": "it-fleches",
+      "name": "Flèches (20)",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/it-fleches.json"
+    },
+    {
+      "id": "gr-fonte",
+      "name": "Fonte",
+      "category": "gear",
+      "subcategory": "container",
+      "cost": {
+        "value": 4,
+        "unit": "po"
+      },
+      "weight_kg": 4,
+      "file": "Equipment/gear/gr-fonte.json"
+    },
+    {
+      "id": "gr-fourrage-jour",
+      "name": "Fourrage (par jour)",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 5,
+        "unit": "pc"
+      },
+      "weight_kg": 5,
+      "file": "Equipment/gear/gr-fourrage-jour.json"
+    },
+    {
+      "id": "gr-grappin",
+      "name": "Grappin",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 2,
+        "unit": "po"
+      },
+      "weight_kg": 2,
+      "file": "Equipment/gear/gr-grappin.json"
+    },
+    {
+      "id": "gr-grimoire",
+      "name": "Grimoire",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 50,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/gear/gr-grimoire.json"
+    },
+    {
+      "id": "it-grimoire",
+      "name": "Grimoire",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 50,
+        "unit": "po"
+      },
+      "weight_kg": 1.5,
+      "file": "Equipment/gear/it-grimoire.json"
+    },
+    {
+      "id": "gr-lanterne-a-capote",
+      "name": "Lanterne à capote",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/gear/gr-lanterne-a-capote.json"
+    },
+    {
+      "id": "gr-lanterne-sourde",
+      "name": "Lanterne sourde",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/gear/gr-lanterne-sourde.json"
+    },
+    {
+      "id": "gr-livre",
+      "name": "Livre",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 0.25,
+      "file": "Equipment/gear/gr-livre.json"
+    },
+    {
+      "id": "gr-livre-de-prieres",
+      "name": "Livre de prières",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 0.25,
+      "file": "Equipment/gear/gr-livre-de-prieres.json"
+    },
+    {
+      "id": "gr-materiel-descalade",
+      "name": "Matériel d'escalade",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 25,
+        "unit": "po"
+      },
+      "weight_kg": 6,
+      "file": "Equipment/gear/gr-materiel-descalade.json"
+    },
+    {
+      "id": "gr-menottes",
+      "name": "Menottes",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 2,
+        "unit": "po"
+      },
+      "weight_kg": 3,
+      "file": "Equipment/gear/gr-menottes.json"
+    },
+    {
+      "id": "gr-mors-et-bride",
+      "name": "Mors et bride",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 2,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/gr-mors-et-bride.json"
+    },
+    {
+      "id": "gr-necessaire-a-feu",
+      "name": "Nécessaire à feu",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 5,
+        "unit": "pa"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/gr-necessaire-a-feu.json"
+    },
+    {
+      "id": "it-fa-orbe",
+      "name": "Orbe (focaliseur)",
+      "category": "gear",
+      "subcategory": "arcane_focus",
+      "cost": {
+        "value": 20,
+        "unit": "po"
+      },
+      "weight_kg": 1.5,
+      "file": "Equipment/gear/it-fa-orbe.json"
+    },
+    {
+      "id": "gr-parchemins-vierges",
+      "name": "Parchemins vierges (10 feuilles)",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 2,
+        "unit": "pa"
+      },
+      "weight_kg": null,
+      "file": "Equipment/gear/gr-parchemins-vierges.json"
+    },
+    {
+      "id": "gr-piege-a-loups",
+      "name": "Piège à loups",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 12.5,
+      "file": "Equipment/gear/gr-piege-a-loups.json"
+    },
+    {
+      "id": "gr-potion-de-guerison",
+      "name": "Potion de guérison",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 50,
+        "unit": "po"
+      },
+      "weight_kg": 0.25,
+      "file": "Equipment/gear/gr-potion-de-guerison.json"
+    },
+    {
+      "id": "gr-rations-2j",
+      "name": "Rations (2 journées)",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 5,
+        "unit": "pa"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/gear/gr-rations-2j.json"
+    },
+    {
+      "id": "it-ss-reliquaire",
+      "name": "Reliquaire (symbole sacré)",
+      "category": "gear",
+      "subcategory": "holy_symbol",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/gear/it-ss-reliquaire.json"
+    },
+    {
+      "id": "gr-sac-daventurier",
+      "name": "Sac d'aventurier",
+      "category": "gear",
+      "subcategory": "container",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 21.5,
+      "file": "Equipment/gear/gr-sac-daventurier.json"
+    },
+    {
+      "id": "gr-sac-derudit",
+      "name": "Sac d'érudit",
+      "category": "gear",
+      "subcategory": "container",
+      "cost": {
+        "value": 40,
+        "unit": "po"
+      },
+      "weight_kg": 3,
+      "file": "Equipment/gear/gr-sac-derudit.json"
+    },
+    {
+      "id": "gr-sac-dexplorateur",
+      "name": "Sac d'explorateur",
+      "category": "gear",
+      "subcategory": "container",
+      "cost": {
+        "value": 12,
+        "unit": "po"
+      },
+      "weight_kg": 23.5,
+      "file": "Equipment/gear/gr-sac-dexplorateur.json"
+    },
+    {
+      "id": "gr-sac-de-bateleur",
+      "name": "Sac de bateleur",
+      "category": "gear",
+      "subcategory": "container",
+      "cost": {
+        "value": 40,
+        "unit": "po"
+      },
+      "weight_kg": 13.5,
+      "file": "Equipment/gear/gr-sac-de-bateleur.json"
+    },
+    {
+      "id": "gr-sac-de-cambrioleur",
+      "name": "Sac de cambrioleur",
+      "category": "gear",
+      "subcategory": "container",
+      "cost": {
+        "value": 20,
+        "unit": "po"
+      },
+      "weight_kg": 30,
+      "file": "Equipment/gear/gr-sac-de-cambrioleur.json"
+    },
+    {
+      "id": "gr-sac-de-diplomate",
+      "name": "Sac de diplomate",
+      "category": "gear",
+      "subcategory": "container",
+      "cost": {
+        "value": 39,
+        "unit": "po"
+      },
+      "weight_kg": 18,
+      "file": "Equipment/gear/gr-sac-de-diplomate.json"
+    },
+    {
+      "id": "gr-sac-de-religieux",
+      "name": "Sac de religieux",
+      "category": "gear",
+      "subcategory": "container",
+      "cost": {
+        "value": 22,
+        "unit": "po"
+      },
+      "weight_kg": 10,
+      "file": "Equipment/gear/gr-sac-de-religieux.json"
+    },
+    {
+      "id": "gr-sac-en-toile-de-jute",
+      "name": "Sac en toile de jute",
+      "category": "gear",
+      "subcategory": "container",
+      "cost": {
+        "value": 1,
+        "unit": "pc"
+      },
+      "weight_kg": 0.25,
+      "file": "Equipment/gear/gr-sac-en-toile-de-jute.json"
+    },
+    {
+      "id": "it-sacoche-a-composantes",
+      "name": "Sacoche à composantes",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 25,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/gear/it-sacoche-a-composantes.json"
+    },
+    {
+      "id": "gr-sauf-conduit",
+      "name": "Sauf-conduit",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": null,
+        "unit": "po",
+        "note": "Document officiel, non vendu"
+      },
+      "weight_kg": null,
+      "file": "Equipment/gear/gr-sauf-conduit.json"
+    },
+    {
+      "id": "it-fa-sceptre",
+      "name": "Sceptre (focaliseur)",
+      "category": "gear",
+      "subcategory": "arcane_focus",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/gear/it-fa-sceptre.json"
+    },
+    {
+      "id": "gr-selle-dequitation",
+      "name": "Selle d'équitation",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 12.5,
+      "file": "Equipment/gear/gr-selle-dequitation.json"
+    },
+    {
+      "id": "gr-selle-de-bat",
+      "name": "Selle de bât",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 7.5,
+      "file": "Equipment/gear/gr-selle-de-bat.json"
+    },
+    {
+      "id": "gr-selle-de-guerre",
+      "name": "Selle de guerre",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 20,
+        "unit": "po"
+      },
+      "weight_kg": 15,
+      "file": "Equipment/gear/gr-selle-de-guerre.json"
+    },
+    {
+      "id": "gr-selle-speciale",
+      "name": "Selle spéciale",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 60,
+        "unit": "po"
+      },
+      "weight_kg": 20,
+      "file": "Equipment/gear/gr-selle-speciale.json"
+    },
+    {
+      "id": "gr-souvenir",
+      "name": "Souvenir personnel",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": null,
+        "unit": "po",
+        "note": "Objet personnel, prix variable"
+      },
+      "weight_kg": 0.25,
+      "file": "Equipment/gear/gr-souvenir.json"
+    },
+    {
+      "id": "it-fd-totem",
+      "name": "Totem (focaliseur druidique)",
+      "category": "gear",
+      "subcategory": "druidic_focus",
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 0,
+      "file": "Equipment/gear/it-fd-totem.json"
+    },
+    {
+      "id": "gr-trousse-de-guerisseur",
+      "name": "Trousse de guérisseur",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 1.5,
+      "file": "Equipment/gear/gr-trousse-de-guerisseur.json"
+    },
+    {
+      "id": "gr-vetement-voyant",
+      "name": "Vêtement ou ustensile voyant et singulier",
+      "category": "gear",
+      "subcategory": "clothing",
+      "cost": {
+        "value": 2,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/gear/gr-vetement-voyant.json"
+    },
+    {
+      "id": "gr-vetements-de-voyage",
+      "name": "Vêtements de voyage",
+      "category": "gear",
+      "subcategory": "clothing",
+      "cost": {
+        "value": 2,
+        "unit": "po"
+      },
+      "weight_kg": 2,
+      "file": "Equipment/gear/gr-vetements-de-voyage.json"
+    },
+    {
+      "id": "gr-vetements-liturgiques",
+      "name": "Vêtements liturgiques",
+      "category": "gear",
+      "subcategory": "clothing",
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 2,
+      "file": "Equipment/gear/gr-vetements-liturgiques.json"
+    },
+    {
+      "id": "gr-vetements-ordinaires",
+      "name": "Vêtements ordinaires",
+      "category": "gear",
+      "subcategory": "clothing",
+      "cost": {
+        "value": 5,
+        "unit": "pa"
+      },
+      "weight_kg": 1.5,
+      "file": "Equipment/gear/gr-vetements-ordinaires.json"
+    },
+    {
+      "id": "gr-vetements-raffines",
+      "name": "Vêtements raffinés",
+      "category": "gear",
+      "subcategory": "clothing",
+      "cost": {
+        "value": 15,
+        "unit": "po"
+      },
+      "weight_kg": 3,
+      "file": "Equipment/gear/gr-vetements-raffines.json"
+    },
+    {
+      "id": "mnt-ane-ou-mule",
+      "name": "Âne ou mule",
+      "category": "mount",
+      "subcategory": "animal",
+      "cost": {
+        "value": 8,
+        "unit": "po"
+      },
+      "weight_kg": null,
+      "file": "Equipment/mount/mnt-ane-ou-mule.json"
+    },
+    {
+      "id": "mnt-chameau",
+      "name": "Chameau",
+      "category": "mount",
+      "subcategory": "animal",
+      "cost": {
+        "value": 50,
+        "unit": "po"
+      },
+      "weight_kg": null,
+      "file": "Equipment/mount/mnt-chameau.json"
+    },
+    {
+      "id": "mnt-cheval-de-selle",
+      "name": "Cheval de selle",
+      "category": "mount",
+      "subcategory": "animal",
+      "cost": {
+        "value": 75,
+        "unit": "po"
+      },
+      "weight_kg": null,
+      "file": "Equipment/mount/mnt-cheval-de-selle.json"
+    },
+    {
+      "id": "mnt-cheval-de-trait",
+      "name": "Cheval de trait",
+      "category": "mount",
+      "subcategory": "animal",
+      "cost": {
+        "value": 50,
+        "unit": "po"
+      },
+      "weight_kg": null,
+      "file": "Equipment/mount/mnt-cheval-de-trait.json"
+    },
+    {
+      "id": "mnt-destrier",
+      "name": "Destrier",
+      "category": "mount",
+      "subcategory": "animal",
+      "cost": {
+        "value": 400,
+        "unit": "po"
+      },
+      "weight_kg": null,
+      "file": "Equipment/mount/mnt-destrier.json"
+    },
+    {
+      "id": "mnt-elephant",
+      "name": "Éléphant",
+      "category": "mount",
+      "subcategory": "animal",
+      "cost": {
+        "value": 200,
+        "unit": "po"
+      },
+      "weight_kg": null,
+      "file": "Equipment/mount/mnt-elephant.json"
+    },
+    {
+      "id": "mnt-molosse",
+      "name": "Molosse",
+      "category": "mount",
+      "subcategory": "animal",
+      "cost": {
+        "value": 25,
+        "unit": "po"
+      },
+      "weight_kg": null,
+      "file": "Equipment/mount/mnt-molosse.json"
+    },
+    {
+      "id": "mnt-poney",
+      "name": "Poney",
+      "category": "mount",
+      "subcategory": "animal",
+      "cost": {
+        "value": 30,
+        "unit": "po"
+      },
+      "weight_kg": null,
+      "file": "Equipment/mount/mnt-poney.json"
+    },
+    {
+      "id": "gr-ecurie-jour",
+      "name": "Écurie (par jour)",
+      "category": "service",
+      "subcategory": null,
+      "cost": {
+        "value": 5,
+        "unit": "pa"
+      },
+      "weight_kg": null,
+      "file": "Equipment/service/gr-ecurie-jour.json"
+    },
+    {
+      "id": "sv-hebergement-aise",
+      "name": "Hébergement - Aisé",
+      "category": "service",
+      "subcategory": null,
+      "cost": {
+        "value": 8,
+        "unit": "pa"
+      },
+      "weight_kg": null,
+      "file": "Equipment/service/sv-hebergement-aise.json"
+    },
+    {
+      "id": "sv-repas-modeste",
+      "name": "Repas (par jour) - Modeste",
+      "category": "service",
+      "subcategory": null,
+      "cost": {
+        "value": 3,
+        "unit": "pa"
+      },
+      "weight_kg": null,
+      "file": "Equipment/service/sv-repas-modeste.json"
+    },
+    {
+      "id": "sv-vin-grand-cru",
+      "name": "Vin (bouteille grand cru)",
+      "category": "service",
+      "subcategory": null,
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": null,
+      "file": "Equipment/service/sv-vin-grand-cru.json"
+    },
+    {
+      "id": "tl-bombarde",
+      "name": "Bombarde",
+      "category": "tool",
+      "subcategory": "instrument",
+      "cost": {
+        "value": 2,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/tool/tl-bombarde.json"
+    },
+    {
+      "id": "tl-cor",
+      "name": "Cor",
+      "category": "tool",
+      "subcategory": "instrument",
+      "cost": {
+        "value": 3,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/tool/tl-cor.json"
+    },
+    {
+      "id": "tl-cornemuse",
+      "name": "Cornemuse",
+      "category": "tool",
+      "subcategory": "instrument",
+      "cost": {
+        "value": 30,
+        "unit": "po"
+      },
+      "weight_kg": 3,
+      "file": "Equipment/tool/tl-cornemuse.json"
+    },
+    {
+      "id": "tl-des",
+      "name": "Dés",
+      "category": "tool",
+      "subcategory": "gaming_set",
+      "cost": {
+        "value": 1,
+        "unit": "pa"
+      },
+      "weight_kg": null,
+      "file": "Equipment/tool/tl-des.json"
+    },
+    {
+      "id": "tl-dulcimer",
+      "name": "Dulcimer",
+      "category": "tool",
+      "subcategory": "instrument",
+      "cost": {
+        "value": 25,
+        "unit": "po"
+      },
+      "weight_kg": 5,
+      "file": "Equipment/tool/tl-dulcimer.json"
+    },
+    {
+      "id": "tl-echecs",
+      "name": "Échecs",
+      "category": "tool",
+      "subcategory": "gaming_set",
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 0.25,
+      "file": "Equipment/tool/tl-echecs.json"
+    },
+    {
+      "id": "tl-flute",
+      "name": "Flûte",
+      "category": "tool",
+      "subcategory": "instrument",
+      "cost": {
+        "value": 2,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/tool/tl-flute.json"
+    },
+    {
+      "id": "tl-flute-de-pan",
+      "name": "Flûte de Pan",
+      "category": "tool",
+      "subcategory": "instrument",
+      "cost": {
+        "value": 12,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/tool/tl-flute-de-pan.json"
+    },
+    {
+      "id": "tl-go",
+      "name": "Go",
+      "category": "tool",
+      "subcategory": "gaming_set",
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 0.25,
+      "file": "Equipment/tool/tl-go.json"
+    },
+    {
+      "id": "tl-instruments-de-navigation",
+      "name": "Instruments de navigation",
+      "category": "tool",
+      "subcategory": "navigation",
+      "cost": {
+        "value": 25,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/tool/tl-instruments-de-navigation.json"
+    },
+    {
+      "id": "tl-jeu-de-cartes",
+      "name": "Jeu de cartes",
+      "category": "tool",
+      "subcategory": "gaming_set",
+      "cost": {
+        "value": 5,
+        "unit": "pa"
+      },
+      "weight_kg": null,
+      "file": "Equipment/tool/tl-jeu-de-cartes.json"
+    },
+    {
+      "id": "tl-luth",
+      "name": "Luth",
+      "category": "tool",
+      "subcategory": "instrument",
+      "cost": {
+        "value": 35,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/tool/tl-luth.json"
+    },
+    {
+      "id": "tl-lyre",
+      "name": "Lyre",
+      "category": "tool",
+      "subcategory": "instrument",
+      "cost": {
+        "value": 30,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/tool/tl-lyre.json"
+    },
+    {
+      "id": "tl-necessaire-dalchimiste",
+      "name": "Nécessaire d'alchimiste",
+      "category": "tool",
+      "subcategory": "artisan_tool",
+      "cost": {
+        "value": 100,
+        "unit": "po"
+      },
+      "weight_kg": 4,
+      "file": "Equipment/tool/tl-necessaire-dalchimiste.json"
+    },
+    {
+      "id": "tl-necessaire-dempoisonneur",
+      "name": "Nécessaire d'empoisonneur",
+      "category": "tool",
+      "subcategory": "special_kit",
+      "cost": {
+        "value": 50,
+        "unit": "po"
+      },
+      "weight_kg": 2,
+      "file": "Equipment/tool/tl-necessaire-dempoisonneur.json"
+    },
+    {
+      "id": "tl-necessaire-dherboristerie",
+      "name": "Nécessaire d'herboristerie",
+      "category": "tool",
+      "subcategory": "special_kit",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 1.5,
+      "file": "Equipment/tool/tl-necessaire-dherboristerie.json"
+    },
+    {
+      "id": "tl-necessaire-de-brasseur",
+      "name": "Nécessaire de brasseur",
+      "category": "tool",
+      "subcategory": "artisan_tool",
+      "cost": {
+        "value": 20,
+        "unit": "po"
+      },
+      "weight_kg": 4.5,
+      "file": "Equipment/tool/tl-necessaire-de-brasseur.json"
+    },
+    {
+      "id": "tl-necessaire-de-calligraphe",
+      "name": "Nécessaire de calligraphe",
+      "category": "tool",
+      "subcategory": "artisan_tool",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 2.5,
+      "file": "Equipment/tool/tl-necessaire-de-calligraphe.json"
+    },
+    {
+      "id": "tl-necessaire-de-cartographe",
+      "name": "Nécessaire de cartographe",
+      "category": "tool",
+      "subcategory": "artisan_tool",
+      "cost": {
+        "value": 15,
+        "unit": "po"
+      },
+      "weight_kg": 3,
+      "file": "Equipment/tool/tl-necessaire-de-cartographe.json"
+    },
+    {
+      "id": "tl-necessaire-de-deguisement",
+      "name": "Nécessaire de déguisement",
+      "category": "tool",
+      "subcategory": "special_kit",
+      "cost": {
+        "value": 25,
+        "unit": "po"
+      },
+      "weight_kg": 1.5,
+      "file": "Equipment/tool/tl-necessaire-de-deguisement.json"
+    },
+    {
+      "id": "tl-necessaire-de-faussaire",
+      "name": "Nécessaire de faussaire",
+      "category": "tool",
+      "subcategory": "special_kit",
+      "cost": {
+        "value": 15,
+        "unit": "po"
+      },
+      "weight_kg": 2.5,
+      "file": "Equipment/tool/tl-necessaire-de-faussaire.json"
+    },
+    {
+      "id": "tl-necessaire-de-peintre",
+      "name": "Nécessaire de peintre",
+      "category": "tool",
+      "subcategory": "artisan_tool",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 2.5,
+      "file": "Equipment/tool/tl-necessaire-de-peintre.json"
+    },
+    {
+      "id": "tl-osselets",
+      "name": "Osselets",
+      "category": "tool",
+      "subcategory": "gaming_set",
+      "cost": {
+        "value": 1,
+        "unit": "pc"
+      },
+      "weight_kg": null,
+      "file": "Equipment/tool/tl-osselets.json"
+    },
+    {
+      "id": "tl-outils-de-bijoutier",
+      "name": "Outils de bijoutier",
+      "category": "tool",
+      "subcategory": "artisan_tool",
+      "cost": {
+        "value": 25,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/tool/tl-outils-de-bijoutier.json"
+    },
+    {
+      "id": "tl-outils-de-cordonnier",
+      "name": "Outils de cordonnier",
+      "category": "tool",
+      "subcategory": "artisan_tool",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 2.5,
+      "file": "Equipment/tool/tl-outils-de-cordonnier.json"
+    },
+    {
+      "id": "tl-outils-de-forgeron",
+      "name": "Outils de forgeron",
+      "category": "tool",
+      "subcategory": "artisan_tool",
+      "cost": {
+        "value": 20,
+        "unit": "po"
+      },
+      "weight_kg": 4,
+      "file": "Equipment/tool/tl-outils-de-forgeron.json"
+    },
+    {
+      "id": "tl-outils-de-la-ferme",
+      "name": "Outils de la ferme",
+      "category": "tool",
+      "subcategory": "artisan_tool",
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 10,
+      "file": "Equipment/tool/tl-outils-de-la-ferme.json"
+    },
+    {
+      "id": "tl-outils-de-macon",
+      "name": "Outils de maçon",
+      "category": "tool",
+      "subcategory": "artisan_tool",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 4,
+      "file": "Equipment/tool/tl-outils-de-macon.json"
+    },
+    {
+      "id": "tl-outils-de-menuisier",
+      "name": "Outils de menuisier",
+      "category": "tool",
+      "subcategory": "artisan_tool",
+      "cost": {
+        "value": 8,
+        "unit": "po"
+      },
+      "weight_kg": 3,
+      "file": "Equipment/tool/tl-outils-de-menuisier.json"
+    },
+    {
+      "id": "tl-outils-de-potier",
+      "name": "Outils de potier",
+      "category": "tool",
+      "subcategory": "artisan_tool",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 1.5,
+      "file": "Equipment/tool/tl-outils-de-potier.json"
+    },
+    {
+      "id": "tl-outils-de-retameur",
+      "name": "Outils de rétameur",
+      "category": "tool",
+      "subcategory": "artisan_tool",
+      "cost": {
+        "value": 50,
+        "unit": "po"
+      },
+      "weight_kg": 5,
+      "file": "Equipment/tool/tl-outils-de-retameur.json"
+    },
+    {
+      "id": "tl-outils-de-sculpteur-sur-bois",
+      "name": "Outils de sculpteur sur bois",
+      "category": "tool",
+      "subcategory": "artisan_tool",
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 2.5,
+      "file": "Equipment/tool/tl-outils-de-sculpteur-sur-bois.json"
+    },
+    {
+      "id": "tl-outils-de-tanneur",
+      "name": "Outils de tanneur",
+      "category": "tool",
+      "subcategory": "artisan_tool",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 2.5,
+      "file": "Equipment/tool/tl-outils-de-tanneur.json"
+    },
+    {
+      "id": "tl-outils-de-tisserand",
+      "name": "Outils de tisserand",
+      "category": "tool",
+      "subcategory": "artisan_tool",
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 2.5,
+      "file": "Equipment/tool/tl-outils-de-tisserand.json"
+    },
+    {
+      "id": "tl-outils-de-verrier",
+      "name": "Outils de verrier",
+      "category": "tool",
+      "subcategory": "artisan_tool",
+      "cost": {
+        "value": 30,
+        "unit": "po"
+      },
+      "weight_kg": 2.5,
+      "file": "Equipment/tool/tl-outils-de-verrier.json"
+    },
+    {
+      "id": "tl-outils-de-voleur",
+      "name": "Outils de voleur",
+      "category": "tool",
+      "subcategory": "thieves_tools",
+      "cost": {
+        "value": 25,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/tool/tl-outils-de-voleur.json"
+    },
+    {
+      "id": "tl-tambour",
+      "name": "Tambour",
+      "category": "tool",
+      "subcategory": "instrument",
+      "cost": {
+        "value": 6,
+        "unit": "po"
+      },
+      "weight_kg": 1.5,
+      "file": "Equipment/tool/tl-tambour.json"
+    },
+    {
+      "id": "tl-ustensiles-de-cuisinier",
+      "name": "Ustensiles de cuisinier",
+      "category": "tool",
+      "subcategory": "artisan_tool",
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 4,
+      "file": "Equipment/tool/tl-ustensiles-de-cuisinier.json"
+    },
+    {
+      "id": "tl-viole",
+      "name": "Viole",
+      "category": "tool",
+      "subcategory": "instrument",
+      "cost": {
+        "value": 30,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/tool/tl-viole.json"
+    },
+    {
+      "id": "vhc-barge",
+      "name": "Barge",
+      "category": "vehicle",
+      "subcategory": "water",
+      "cost": {
+        "value": 3000,
+        "unit": "po"
+      },
+      "weight_kg": null,
+      "file": "Equipment/vehicle/vhc-barge.json"
+    },
+    {
+      "id": "vhc-barque",
+      "name": "Barque",
+      "category": "vehicle",
+      "subcategory": "water",
+      "cost": {
+        "value": 50,
+        "unit": "po"
+      },
+      "weight_kg": 50,
+      "file": "Equipment/vehicle/vhc-barque.json"
+    },
+    {
+      "id": "vhc-boursouffleuse",
+      "name": "Boursouffleuse",
+      "category": "vehicle",
+      "subcategory": "air",
+      "cost": {
+        "value": 10000,
+        "unit": "po"
+      },
+      "weight_kg": null,
+      "file": "Equipment/vehicle/vhc-boursouffleuse.json"
+    },
+    {
+      "id": "vhc-char",
+      "name": "Char",
+      "category": "vehicle",
+      "subcategory": "land",
+      "cost": {
+        "value": 250,
+        "unit": "po"
+      },
+      "weight_kg": 50,
+      "file": "Equipment/vehicle/vhc-char.json"
+    },
+    {
+      "id": "vhc-chariot",
+      "name": "Chariot",
+      "category": "vehicle",
+      "subcategory": "land",
+      "cost": {
+        "value": 35,
+        "unit": "po"
+      },
+      "weight_kg": 200,
+      "file": "Equipment/vehicle/vhc-chariot.json"
+    },
+    {
+      "id": "vhc-charrette",
+      "name": "Charrette",
+      "category": "vehicle",
+      "subcategory": "land",
+      "cost": {
+        "value": 15,
+        "unit": "po"
+      },
+      "weight_kg": 100,
+      "file": "Equipment/vehicle/vhc-charrette.json"
+    },
+    {
+      "id": "vhc-coche",
+      "name": "Coche",
+      "category": "vehicle",
+      "subcategory": "land",
+      "cost": {
+        "value": 100,
+        "unit": "po"
+      },
+      "weight_kg": 300,
+      "file": "Equipment/vehicle/vhc-coche.json"
+    },
+    {
+      "id": "vhc-drakkar",
+      "name": "Drakkar",
+      "category": "vehicle",
+      "subcategory": "water",
+      "cost": {
+        "value": 10000,
+        "unit": "po"
+      },
+      "weight_kg": null,
+      "file": "Equipment/vehicle/vhc-drakkar.json"
+    },
+    {
+      "id": "vhc-galere",
+      "name": "Galère",
+      "category": "vehicle",
+      "subcategory": "water",
+      "cost": {
+        "value": 30000,
+        "unit": "po"
+      },
+      "weight_kg": null,
+      "file": "Equipment/vehicle/vhc-galere.json"
+    },
+    {
+      "id": "vhc-navire-de-guerre",
+      "name": "Navire de guerre",
+      "category": "vehicle",
+      "subcategory": "water",
+      "cost": {
+        "value": 25000,
+        "unit": "po"
+      },
+      "weight_kg": null,
+      "file": "Equipment/vehicle/vhc-navire-de-guerre.json"
+    },
+    {
+      "id": "vhc-nefelytre",
+      "name": "Nefélytre",
+      "category": "vehicle",
+      "subcategory": "air",
+      "cost": {
+        "value": 3000,
+        "unit": "po"
+      },
+      "weight_kg": null,
+      "file": "Equipment/vehicle/vhc-nefelytre.json"
+    },
+    {
+      "id": "vhc-traineau",
+      "name": "Traîneau",
+      "category": "vehicle",
+      "subcategory": "land",
+      "cost": {
+        "value": 20,
+        "unit": "po"
+      },
+      "weight_kg": 150,
+      "file": "Equipment/vehicle/vhc-traineau.json"
+    },
+    {
+      "id": "vhc-voilier",
+      "name": "Voilier",
+      "category": "vehicle",
+      "subcategory": "water",
+      "cost": {
+        "value": 10000,
+        "unit": "po"
+      },
+      "weight_kg": null,
+      "file": "Equipment/vehicle/vhc-voilier.json"
+    },
+    {
+      "id": "wp-arbalete-de-poing",
+      "name": "Arbalète de poing",
+      "category": "weapon",
+      "subcategory": "martial_ranged",
+      "cost": {
+        "value": 75,
+        "unit": "po"
+      },
+      "weight_kg": 1.5,
+      "file": "Equipment/weapon/wp-arbalete-de-poing.json",
+      "damage_dice": "1d6",
+      "damage_type": "perforant",
+      "properties": [
+        "prop-legere",
+        "prop-projectiles-9-36",
+        "prop-rechargement"
+      ]
+    },
+    {
+      "id": "wp-arbalete-legere",
+      "name": "Arbalète légère",
+      "category": "weapon",
+      "subcategory": "simple_ranged",
+      "cost": {
+        "value": 25,
+        "unit": "po"
+      },
+      "weight_kg": 2.5,
+      "file": "Equipment/weapon/wp-arbalete-legere.json",
+      "damage_dice": "1d8",
+      "damage_type": "perforant",
+      "properties": [
+        "prop-deux-mains",
+        "prop-projectiles-24-96",
+        "prop-rechargement"
+      ]
+    },
+    {
+      "id": "wp-arbalete-lourde",
+      "name": "Arbalète lourde",
+      "category": "weapon",
+      "subcategory": "martial_ranged",
+      "cost": {
+        "value": 50,
+        "unit": "po"
+      },
+      "weight_kg": 9,
+      "file": "Equipment/weapon/wp-arbalete-lourde.json",
+      "damage_dice": "1d10",
+      "damage_type": "perforant",
+      "properties": [
+        "prop-deux-mains",
+        "prop-lourde",
+        "prop-projectiles-30-120",
+        "prop-rechargement"
+      ]
+    },
+    {
+      "id": "wp-arc-court",
+      "name": "Arc court",
+      "category": "weapon",
+      "subcategory": "simple_ranged",
+      "cost": {
+        "value": 25,
+        "unit": "po"
+      },
+      "weight_kg": 1.5,
+      "file": "Equipment/weapon/wp-arc-court.json",
+      "damage_dice": "1d6",
+      "damage_type": "perforant",
+      "properties": [
+        "prop-deux-mains",
+        "prop-projectiles-24-96"
+      ]
+    },
+    {
+      "id": "wp-arc-long",
+      "name": "Arc long",
+      "category": "weapon",
+      "subcategory": "martial_ranged",
+      "cost": {
+        "value": 50,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/weapon/wp-arc-long.json",
+      "damage_dice": "1d8",
+      "damage_type": "perforant",
+      "properties": [
+        "prop-deux-mains",
+        "prop-lourde",
+        "prop-projectiles-45-180"
+      ]
+    },
+    {
+      "id": "wp-baton-de-combat",
+      "name": "Bâton de combat",
+      "category": "weapon",
+      "subcategory": "simple_melee",
+      "cost": {
+        "value": 2,
+        "unit": "pa"
+      },
+      "weight_kg": 2,
+      "file": "Equipment/weapon/wp-baton-de-combat.json",
+      "damage_dice": "1d6",
+      "damage_type": "contondant",
+      "properties": [
+        "prop-polyvalente-1d8"
+      ]
+    },
+    {
+      "id": "wp-ceste",
+      "name": "Ceste",
+      "category": "weapon",
+      "subcategory": "martial_melee",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/weapon/wp-ceste.json",
+      "damage_dice": "1d6",
+      "damage_type": "contondant",
+      "properties": [
+        "prop-legere",
+        "prop-speciale"
+      ]
+    },
+    {
+      "id": "wp-cimeterre",
+      "name": "Cimeterre",
+      "category": "weapon",
+      "subcategory": "martial_melee",
+      "cost": {
+        "value": 25,
+        "unit": "po"
+      },
+      "weight_kg": 1.5,
+      "file": "Equipment/weapon/wp-cimeterre.json",
+      "damage_dice": "1d6",
+      "damage_type": "tranchant",
+      "properties": [
+        "prop-finesse",
+        "prop-legere"
+      ]
+    },
+    {
+      "id": "wp-dague",
+      "name": "Dague",
+      "category": "weapon",
+      "subcategory": "simple_melee",
+      "cost": {
+        "value": 2,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/weapon/wp-dague.json",
+      "damage_dice": "1d4",
+      "damage_type": "perforant",
+      "properties": [
+        "prop-finesse",
+        "prop-lancer-6-18",
+        "prop-legere"
+      ]
+    },
+    {
+      "id": "wp-epee-a-deux-mains",
+      "name": "Épée à deux mains",
+      "category": "weapon",
+      "subcategory": "martial_melee",
+      "cost": {
+        "value": 50,
+        "unit": "po"
+      },
+      "weight_kg": 3,
+      "file": "Equipment/weapon/wp-epee-a-deux-mains.json",
+      "damage_dice": "2d6",
+      "damage_type": "tranchant",
+      "properties": [
+        "prop-deux-mains",
+        "prop-lourde"
+      ]
+    },
+    {
+      "id": "wp-epee-courte",
+      "name": "Épée courte",
+      "category": "weapon",
+      "subcategory": "martial_melee",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/weapon/wp-epee-courte.json",
+      "damage_dice": "1d6",
+      "damage_type": "perforant",
+      "properties": [
+        "prop-finesse",
+        "prop-legere"
+      ]
+    },
+    {
+      "id": "wp-epee-longue",
+      "name": "Épée longue",
+      "category": "weapon",
+      "subcategory": "martial_melee",
+      "cost": {
+        "value": 15,
+        "unit": "po"
+      },
+      "weight_kg": 1.5,
+      "file": "Equipment/weapon/wp-epee-longue.json",
+      "damage_dice": "1d8",
+      "damage_type": "tranchant",
+      "properties": [
+        "prop-polyvalente-1d10"
+      ]
+    },
+    {
+      "id": "wp-filet",
+      "name": "Filet",
+      "category": "weapon",
+      "subcategory": "martial_ranged",
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 1.5,
+      "file": "Equipment/weapon/wp-filet.json",
+      "damage_dice": null,
+      "damage_type": null,
+      "properties": [
+        "prop-lancer-1-50-4-50",
+        "prop-speciale"
+      ]
+    },
+    {
+      "id": "wp-fleau-darmes",
+      "name": "Fléau d'armes",
+      "category": "weapon",
+      "subcategory": "martial_melee",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/weapon/wp-fleau-darmes.json",
+      "damage_dice": "1d8",
+      "damage_type": "contondant",
+      "properties": []
+    },
+    {
+      "id": "wp-flechette",
+      "name": "Fléchette",
+      "category": "weapon",
+      "subcategory": "simple_ranged",
+      "cost": {
+        "value": 5,
+        "unit": "pc"
+      },
+      "weight_kg": 0.125,
+      "file": "Equipment/weapon/wp-flechette.json",
+      "damage_dice": "1d4",
+      "damage_type": "perforant",
+      "properties": [
+        "prop-finesse",
+        "prop-lancer-6-18"
+      ]
+    },
+    {
+      "id": "wp-fouet",
+      "name": "Fouet",
+      "category": "weapon",
+      "subcategory": "martial_melee",
+      "cost": {
+        "value": 2,
+        "unit": "po"
+      },
+      "weight_kg": 1.5,
+      "file": "Equipment/weapon/wp-fouet.json",
+      "damage_dice": "1d4",
+      "damage_type": "tranchant",
+      "properties": [
+        "prop-allonge",
+        "prop-finesse"
+      ]
+    },
+    {
+      "id": "wp-fronde",
+      "name": "Fronde",
+      "category": "weapon",
+      "subcategory": "simple_ranged",
+      "cost": {
+        "value": 1,
+        "unit": "pa"
+      },
+      "weight_kg": null,
+      "file": "Equipment/weapon/wp-fronde.json",
+      "damage_dice": "1d4",
+      "damage_type": "contondant",
+      "properties": [
+        "prop-projectiles-9-36"
+      ]
+    },
+    {
+      "id": "wp-gourdin",
+      "name": "Gourdin",
+      "category": "weapon",
+      "subcategory": "simple_melee",
+      "cost": {
+        "value": 1,
+        "unit": "pa"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/weapon/wp-gourdin.json",
+      "damage_dice": "1d4",
+      "damage_type": "contondant",
+      "properties": [
+        "prop-legere"
+      ]
+    },
+    {
+      "id": "wp-grande-hache",
+      "name": "Grande hache",
+      "category": "weapon",
+      "subcategory": "martial_melee",
+      "cost": {
+        "value": 30,
+        "unit": "po"
+      },
+      "weight_kg": 3.5,
+      "file": "Equipment/weapon/wp-grande-hache.json",
+      "damage_dice": "1d12",
+      "damage_type": "tranchant",
+      "properties": [
+        "prop-deux-mains",
+        "prop-lourde"
+      ]
+    },
+    {
+      "id": "wp-guisarme",
+      "name": "Guisarme",
+      "category": "weapon",
+      "subcategory": "martial_melee",
+      "cost": {
+        "value": 20,
+        "unit": "po"
+      },
+      "weight_kg": 3,
+      "file": "Equipment/weapon/wp-guisarme.json",
+      "damage_dice": "1d10",
+      "damage_type": "tranchant",
+      "properties": [
+        "prop-allonge",
+        "prop-deux-mains",
+        "prop-lourde"
+      ]
+    },
+    {
+      "id": "wp-hache-darmes",
+      "name": "Hache d'armes",
+      "category": "weapon",
+      "subcategory": "martial_melee",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 2,
+      "file": "Equipment/weapon/wp-hache-darmes.json",
+      "damage_dice": "1d8",
+      "damage_type": "tranchant",
+      "properties": [
+        "prop-polyvalente-1d10"
+      ]
+    },
+    {
+      "id": "wp-hachette",
+      "name": "Hachette",
+      "category": "weapon",
+      "subcategory": "simple_melee",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/weapon/wp-hachette.json",
+      "damage_dice": "1d6",
+      "damage_type": "tranchant",
+      "properties": [
+        "prop-lancer-6-18",
+        "prop-legere"
+      ]
+    },
+    {
+      "id": "wp-hallebarde",
+      "name": "Hallebarde",
+      "category": "weapon",
+      "subcategory": "martial_melee",
+      "cost": {
+        "value": 20,
+        "unit": "po"
+      },
+      "weight_kg": 3,
+      "file": "Equipment/weapon/wp-hallebarde.json",
+      "damage_dice": "1d10",
+      "damage_type": "tranchant",
+      "properties": [
+        "prop-allonge",
+        "prop-deux-mains",
+        "prop-lourde"
+      ]
+    },
+    {
+      "id": "wp-javeline",
+      "name": "Javeline",
+      "category": "weapon",
+      "subcategory": "simple_melee",
+      "cost": {
+        "value": 5,
+        "unit": "pa"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/weapon/wp-javeline.json",
+      "damage_dice": "1d6",
+      "damage_type": "perforant",
+      "properties": [
+        "prop-lancer-9-36"
+      ]
+    },
+    {
+      "id": "wp-lance",
+      "name": "Lance",
+      "category": "weapon",
+      "subcategory": "simple_melee",
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 1.5,
+      "file": "Equipment/weapon/wp-lance.json",
+      "damage_dice": "1d6",
+      "damage_type": "perforant",
+      "properties": [
+        "prop-lancer-6-18",
+        "prop-polyvalente-1d8"
+      ]
+    },
+    {
+      "id": "wp-lance-darcon",
+      "name": "Lance d'arçon",
+      "category": "weapon",
+      "subcategory": "martial_melee",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 3,
+      "file": "Equipment/weapon/wp-lance-darcon.json",
+      "damage_dice": "1d12",
+      "damage_type": "perforant",
+      "properties": [
+        "prop-allonge",
+        "prop-speciale"
+      ]
+    },
+    {
+      "id": "wp-maillet",
+      "name": "Maillet",
+      "category": "weapon",
+      "subcategory": "martial_melee",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 5,
+      "file": "Equipment/weapon/wp-maillet.json",
+      "damage_dice": "2d6",
+      "damage_type": "contondant",
+      "properties": [
+        "prop-deux-mains",
+        "prop-lourde"
+      ]
+    },
+    {
+      "id": "wp-marteau-de-guerre",
+      "name": "Marteau de guerre",
+      "category": "weapon",
+      "subcategory": "martial_melee",
+      "cost": {
+        "value": 15,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/weapon/wp-marteau-de-guerre.json",
+      "damage_dice": "1d8",
+      "damage_type": "contondant",
+      "properties": [
+        "prop-polyvalente-1d10"
+      ]
+    },
+    {
+      "id": "wp-marteau-leger",
+      "name": "Marteau léger",
+      "category": "weapon",
+      "subcategory": "simple_melee",
+      "cost": {
+        "value": 2,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/weapon/wp-marteau-leger.json",
+      "damage_dice": "1d4",
+      "damage_type": "contondant",
+      "properties": [
+        "prop-lancer-6-18",
+        "prop-legere"
+      ]
+    },
+    {
+      "id": "wp-masse-darmes",
+      "name": "Masse d'armes",
+      "category": "weapon",
+      "subcategory": "simple_melee",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 2,
+      "file": "Equipment/weapon/wp-masse-darmes.json",
+      "damage_dice": "1d6",
+      "damage_type": "contondant",
+      "properties": []
+    },
+    {
+      "id": "wp-massue",
+      "name": "Massue",
+      "category": "weapon",
+      "subcategory": "simple_melee",
+      "cost": {
+        "value": 2,
+        "unit": "pa"
+      },
+      "weight_kg": 5,
+      "file": "Equipment/weapon/wp-massue.json",
+      "damage_dice": "1d8",
+      "damage_type": "contondant",
+      "properties": [
+        "prop-deux-mains"
+      ]
+    },
+    {
+      "id": "wp-morgenstern",
+      "name": "Morgenstern",
+      "category": "weapon",
+      "subcategory": "martial_melee",
+      "cost": {
+        "value": 15,
+        "unit": "po"
+      },
+      "weight_kg": 2,
+      "file": "Equipment/weapon/wp-morgenstern.json",
+      "damage_dice": "1d8",
+      "damage_type": "perforant",
+      "properties": []
+    },
+    {
+      "id": "wp-pic-de-guerre",
+      "name": "Pic de guerre",
+      "category": "weapon",
+      "subcategory": "martial_melee",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/weapon/wp-pic-de-guerre.json",
+      "damage_dice": "1d8",
+      "damage_type": "perforant",
+      "properties": []
+    },
+    {
+      "id": "wp-pique",
+      "name": "Pique",
+      "category": "weapon",
+      "subcategory": "martial_melee",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 9,
+      "file": "Equipment/weapon/wp-pique.json",
+      "damage_dice": "1d10",
+      "damage_type": "perforant",
+      "properties": [
+        "prop-allonge",
+        "prop-deux-mains",
+        "prop-lourde"
+      ]
+    },
+    {
+      "id": "wp-propulseur",
+      "name": "Propulseur",
+      "category": "weapon",
+      "subcategory": "martial_ranged",
+      "cost": {
+        "value": 3,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/weapon/wp-propulseur.json",
+      "damage_dice": null,
+      "damage_type": null,
+      "properties": [
+        "prop-rechargement",
+        "prop-projectiles-24-96",
+        "prop-speciale"
+      ]
+    },
+    {
+      "id": "wp-rapiere",
+      "name": "Rapière",
+      "category": "weapon",
+      "subcategory": "martial_melee",
+      "cost": {
+        "value": 25,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/weapon/wp-rapiere.json",
+      "damage_dice": "1d8",
+      "damage_type": "perforant",
+      "properties": [
+        "prop-finesse"
+      ]
+    },
+    {
+      "id": "wp-sarbacane",
+      "name": "Sarbacane",
+      "category": "weapon",
+      "subcategory": "martial_ranged",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/weapon/wp-sarbacane.json",
+      "damage_dice": "1",
+      "damage_type": "perforant",
+      "properties": [
+        "prop-projectiles-7-50-30",
+        "prop-rechargement"
+      ]
+    },
+    {
+      "id": "wp-serpe",
+      "name": "Serpe",
+      "category": "weapon",
+      "subcategory": "simple_melee",
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/weapon/wp-serpe.json",
+      "damage_dice": "1d4",
+      "damage_type": "tranchant",
+      "properties": [
+        "prop-legere"
+      ]
+    },
+    {
+      "id": "wp-trident",
+      "name": "Trident",
+      "category": "weapon",
+      "subcategory": "martial_melee",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 2,
+      "file": "Equipment/weapon/wp-trident.json",
+      "damage_dice": "1d6",
+      "damage_type": "perforant",
+      "properties": [
+        "prop-lancer-6-18",
+        "prop-polyvalente-1d8"
+      ]
+    }
+  ]
+}

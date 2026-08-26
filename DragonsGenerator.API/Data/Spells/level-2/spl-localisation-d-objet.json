@@ -1,0 +1,39 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-localisation-d-objet",
+  "name": "Localisation d'objet",
+  "level": 2,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une brindille fourchue"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-magicien",
+    "cls-paladin",
+    "cls-pretre",
+    "cls-rodeur"
+  ],
+  "description": "D Décrivez ou nommez un objet qui vous est familier. Vous découvrez la direction dans laquelle se trouve la cible, tant qu'elle se situe dans un rayon de 300 m de vous. Si elle se déplace, vous savez dans quelle direction elle progresse. Ce sort permet de localiser un objet précis que vous connaissez, sous réserve que vous l'ayez déjà vu de près (dans un rayon de 9 m) au moins une fois. Ce sort permet aussi de localiser l'objet d'un genre spécifique le plus proche, comme un type d'habit, de bijou, de meuble, d'outil ou d'arme. Ce sort ne permet pas de localiser un objet si une épaisseur de plomb, aussi fine soit-elle, coupe le chemin le plus direct qui vous en sépare. Les frontières éthérées et l'Interdit de Mort mettent ce sort en échec.",
+  "modular_options": []
+}

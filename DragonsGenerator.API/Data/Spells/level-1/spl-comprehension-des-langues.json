@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-comprehension-des-langues",
+  "name": "Compréhension des langues",
+  "level": 1,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une pincée de suie et de sel"
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Vous comprenez toute langue orale que vous entendez pour toute la durée du sort. Vous comprenez aussi les écrits que vous voyez, sous réserve que vous touchiez la surface sur laquelle ils figurent. Cela ne vous rend pas capable d'écrire ou de parler d'autres langues. Il vous faut 1 minute environ pour lire une page de texte. Ce sort ne décode pas les messages secrets contenus dans un texte ou un glyphe, comme un sceau magique, qui ne fait pas partie d'une langue écrite. Tout document marqué d'un Interdit de Mort ne peut être lu grâce à ce sort.",
+  "modular_options": []
+}

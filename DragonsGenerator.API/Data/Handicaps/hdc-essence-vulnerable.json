@@ -1,0 +1,11 @@
+{
+  "schema_version": "2.0",
+  "id": "hdc-essence-vulnerable",
+  "name": "Essence vulnérable",
+  "source": "module:noirceur",
+  "description": "Lorsque vous remplissez les 4 premières cases d'une ligne du tableau de corruption, la 5e case est automatiquement remplie par un point de corruption temporaire.",
+  "mechanics": {},
+  "stackable": true,
+  "stacked_name": "Essence anémiée",
+  "stacked_desc": "Lorsque vous remplissez les 3 premières cases d'une ligne, la 4e et la 5e sont automatiquement remplies."
+}

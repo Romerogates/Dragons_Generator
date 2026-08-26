@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-croissance-d-epines",
+  "name": "Croissance d'épines",
+  "level": 2,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 45,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "sept épines acérées ou sept brindilles taillées en pointe"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-rodeur"
+  ],
+  "description": "Le sol se couvre de pointes et d'épines sur un rayon de 6 m centré sur un point situé à portée. La zone devient un terrain difficile pour toute la durée du sort. Quand une créature s'y déplace ou y entre, elle subit 2d4 dégâts perforants par tranche de 1,50 m parcourus. La zone paraît naturelle, car elle bénéficie d'un camouflage magique. Toute créature qui ne voit pas la zone au moment de l'incantation doit réussir un test de Sagesse (Perception) assorti de votre DD de sauvegarde des sorts pour comprendre que le terrain est dangereux avant de s'y aventurer.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, les dégâts augmentent de 1d4 par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "2.0",
+  "id": "ar-cotte-de-mailles",
+  "name": "Cotte de mailles",
+  "category": "armor",
+  "subcategory": "heavy",
+  "cost": {
+    "value": 75,
+    "unit": "po"
+  },
+  "weight_kg": 27.5,
+  "ac_base": 16,
+  "dex_modifier": {
+    "type": "none"
+  },
+  "max_dex_bonus": null,
+  "str_required": 14,
+  "stealth_disadvantage": true,
+  "description": "Anneaux de métal entrelacés portés sur une tunique matelassée. Comprend des gantelets. Désavantage aux tests de Force (Athlétisme) pour nager et de Dextérité (Acrobaties)."
+}

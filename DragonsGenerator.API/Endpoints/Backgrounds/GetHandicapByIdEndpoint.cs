@@ -11,6 +11,10 @@ public class GetHandicapByIdRequest
 
 public class GetHandicapByIdEndpoint : Endpoint<GetHandicapByIdRequest, Handicap>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetHandicapByIdEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/handicaps/{id}");
@@ -19,10 +23,7 @@ public class GetHandicapByIdEndpoint : Endpoint<GetHandicapByIdRequest, Handicap
 
     public override async Task HandleAsync(GetHandicapByIdRequest req, CancellationToken ct)
     {
-        var handicaps = await JsonDataLoader.LoadAsync<List<Handicap>>("handicaps.json", ct);
-
-        var handicap = handicaps?.FirstOrDefault(h =>
-            string.Equals(h.Id, req.Id, StringComparison.OrdinalIgnoreCase));
+        var handicap = await _repo.GetHandicapByIdAsync(req.Id, ct);
 
         if (handicap is null)
         {
@@ -32,5 +33,4 @@ public class GetHandicapByIdEndpoint : Endpoint<GetHandicapByIdRequest, Handicap
 
         await Send.OkAsync(handicap, ct);
     }
-
 }

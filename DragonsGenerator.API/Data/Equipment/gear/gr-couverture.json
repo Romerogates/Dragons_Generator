@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-couverture",
+  "name": "Couverture",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 5,
+    "unit": "pa"
+  },
+  "weight_kg": 1.5,
+  "description": "Couverture épaisse en laine ou en fourrure pour se protéger du froid."
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-mot-de-rappel",
+  "name": "Mot de rappel",
+  "level": 6,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 1.5,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "Vous et jusqu'à cinq créatures consentantes vous téléportez instantanément vers un sanctuaire préalablement choisi. Vous et les créatures qui se téléportent en votre compagnie apparaissez dans l'espace inoccupé le plus proche du lieu désigné au moment de la préparation de votre sanctuaire (cf. ci-dessous). Si vous lancez ce sort sans avoir préalablement préparé un sanctuaire, le sort n'a aucun effet. Vous devez désigner un sanctuaire en lançant ce sort en un lieu, comme par exemple un temple dédié ou étroitement lié à votre divinité. Si vous tentez de le jeter de la sorte dans une zone qui n'a aucun rapport avec votre dieu, le sort n'a aucun effet.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau ou supérieur, chaque niveau d'emplacement au-dessus du 6e vous permet de téléporter deux créatures consentantes supplémentaires et augmente la portée de 3 m.",
+  "modular_options": []
+}

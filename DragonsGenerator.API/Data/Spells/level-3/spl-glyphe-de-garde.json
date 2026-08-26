@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-glyphe-de-garde",
+  "name": "Glyphe de garde",
+  "level": 3,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "heure"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "permanent",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(encens et poudre de diamant d'une valeur minimale de 200 po"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien",
+    "cls-pretre"
+  ],
+  "description": "Au moment de l'incantation, vous inscrivez un glyphe qui affecte d'autres créatures ou produit un effet de zone, sur une surface (comme une table ou une section de sol ou de mur) ou dans un objet qui peut être refermé (comme un livre, un parchemin ou un coffre) pour l'y dissimuler. Le glyphe peut couvrir une zone de 3 m de diamètre maximum. Si la surface ou l'objet s'éloigne de plus de 3 m de l'endroit où vous avez lancé le sort, le glyphe est brisé et le sort prend fin sans être déclenché. Le glyphe est presque invisible et il faut réussir un test d'Intelligence (Investigation) assorti de votre DD de sauvegarde des sorts pour le détecter. Vous fixez les conditions de déclenchement du glyphe au moment de l'incantation. Pour les inscriptions sur une surface, le déclenchement le plus courant consiste à se tenir sur le glyphe ou à le toucher, à retirer un objet qui le recouvre, à s'en approcher à une certaine distance, ou à manipuler l'objet sur lequel il a été écrit. Pour les inscriptions dans un objet, le déclenchement le plus courant consiste à ouvrir cet objet, à s'en approcher à une certaine distance, à le voir ou à le lire. Une fois le glyphe déclenché, le sort prend fin. Vous pouvez affiner les conditions de déclenchement pour que le sort s'active en certaines circonstances seulement ou en fonction de paramètres physiques précis (taille ou poids, par exemple), selon un type de créature (par exemple, les aberrations ou les drows) ou d'alignement. Vous pouvez aussi fixer des conditions qui éviteront à certaines créatures d'activer le glyphe, à l'aide d'un mot de passe prononcé à voix haute, par exemple. Au moment de l'écriture du glyphe, choisissez runes explosives ou glyphe à sort. Runes explosives. Une fois déclenché, le glyphe explose. L'effet prend la forme d'une sphère d'énergie magique de 6 m de rayon qui est centrée sur le glyphe et contourne les coins. Chaque créature située dans la zone doit effectuer un JS Dextérité et subit 5d8 dégâts d'acide, de feu, de foudre, de froid ou de tonnerre (à votre convenance au moment de l'incantation) en cas d'échec, la moitié en cas de réussite. Glyphe à sort. Vous pouvez stocker un sort préparé du 3e niveau ou inférieur dans le glyphe au moment de l'incantation. Ce sort doit cibler une seule créature ou une zone. Il n'a aucun effet immédiat quand il est jeté de la sorte. S'il affecte une cible, cette dernière est la créature qui a déclenché le glyphe. S'il affecte une zone, elle est centrée sur cette créature. Si le sort convoque des créatures hostiles ou crée des objets ou pièges délétères, ils apparaissent au plus près de l'intrus et l'attaquent. Si le sort exige normalement de la concentration, il persiste en fait jusqu'à la fin de sa durée maximale.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, les dégâts des runes explosives augmentent de 1d8 par niveau d'emplacement au-dessus du 3e. Si vous créez un glyphe à sort, vous pouvez stocker n'importe quel sort d'un niveau inférieur ou égal à l'emplacement utilisé pour le glyphe de garde.",
+  "modular_options": []
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-coercition-planaire",
+  "name": "Coercition planaire",
+  "level": 5,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "heure"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 24,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(un joyau d'une valeur minimale de 1 000 po"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-magicien",
+    "cls-pretre"
+  ],
+  "description": "Logo and icon Icon Avec ce sort, vous tentez de lier un céleste, un élémentaire, une fée ou un fiélon à votre service. La créature doit se situer à portée durant toute l'incantation (la procédure la plus courante consiste à la convoquer au centre d'un cercle magique inversé pour la prendre au piège). Au terme de l'incantation, la cible doit effectuer un JS Charisme. En cas d'échec, elle est obligée de vous servir pour toute la durée du sort. Si la créature a été convoquée ou créée par un autre sort, la durée de celui-ci est allongée pour correspondre à celle de cette abjuration. Une créature liée doit suivre vos instructions au mieux de ses capacités. Vous pouvez lui ordonner de vous accompagner en aventure, de garder un lieu ou de délivrer un message. Elle obéit à vos ordres à la lettre, mais si elle vous est hostile, elle tentera de jouer sur les mots pour remplir ses propres objectifs. Si la créature mène à bien vos instructions avant la fin du sort, elle vous rejoint pour vous en faire part si vous vous situez sur le même plan d'existence. Si vous êtes sur un autre plan, elle regagne l'endroit où vous l'avez liée et y reste tant que le sort persiste.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, la durée passe à 10 jours (6e niveau), 30 jours (7e niveau), 180 jours (8e niveau), ou 1 an et 1 jour (9e niveau).",
+  "modular_options": []
+}

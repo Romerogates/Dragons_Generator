@@ -1,0 +1,128 @@
+{
+  "schema_version": "2.0",
+  "id": "sp-merosis",
+  "name": "Merosis",
+  "name_alt": [
+    "Demi-orcs"
+  ],
+  "playable": true,
+  "requires_subspecies": false,
+  "source": {
+    "book": "Dragons - Livre de base: Aventuriers",
+    "pages": "51-54"
+  },
+  "flavor": {
+    "summary": "Les merosis présentent certains traits hérités de leurs ancêtres orcs. Bien que les autres peuples les associent à la laideur, leur métissage peut produire une beauté harmonieuse, avec des chevelures aux teintes d'écorce, une peau mate et des yeux aux reflets fauves.",
+    "culture": "La culture clanique kaani influence nombre de merosis qui cherchent à se distinguer par des hauts faits. Ce désir de tester sa valeur peut prendre la forme d'un goût exacerbé du risque et des défis extraordinaires.",
+    "lore_notes": [
+      "Les merosis ont une espérance de vie plus courte, rarement plus de soixante-dix ans. Ce qui pourrait être pris pour une malédiction est abordé avec philosophie : il vaut mieux mourir en ayant intensément vécu.",
+      "Le terme 'demi-orc' est fréquemment dépréciatif. Dans l'empire Kaan, on parle de 'merosis', un mot évoquant l'héritage double de cette espèce.",
+      "Les philosophes merosis (Dame Khutga, Seigneur Tsunsny, Poétesse Yulduz) ont marqué l'histoire d'Eana avec des concepts proches de l'épicurisme, du stoïcisme et de l'hédonisme."
+    ]
+  },
+  "base_stats": {
+    "ability_score_increase": {
+      "str": 2,
+      "con": 1
+    },
+    "speed": {
+      "base_m": 9,
+      "not_reduced_by_heavy_armor": false
+    },
+    "size": "M",
+    "darkvision_m": 18,
+    "age": {
+      "maturity_years": 14,
+      "lifespan_years": 70,
+      "lifespan_max_years": 75,
+      "flavor": "Maturité physique à 14 ans. Espérance de vie rarement supérieure à 75 ans."
+    },
+    "alignment": {
+      "tendency": "Chaotique",
+      "flavor": "L'héritage orc leur a légué un goût de la liberté. Cette attitude n'est pas incompatible avec un fort sens de l'honneur et de la parole donnée."
+    }
+  },
+  "traits": [
+    {
+      "id": "trait-vision-noir-merosis",
+      "name": "Vision dans le noir",
+      "flavor": {
+        "desc": "Grâce à votre sang orc, vous êtes doté d'une vision supérieure dans les ténèbres et la pénombre. Dans un rayon de 18 m, vous voyez en lumière faible comme en lumière vive, et dans l'obscurité comme en lumière faible (nuances de gris)."
+      },
+      "mechanics": {
+        "type": "darkvision",
+        "range_m": 18
+      }
+    },
+    {
+      "id": "trait-patibulaire",
+      "name": "Patibulaire",
+      "flavor": {
+        "desc": "Vous gagnez la maîtrise de la compétence Intimidation."
+      },
+      "mechanics": {
+        "type": "skill_proficiency",
+        "grants": [
+          "skill-intimidation"
+        ]
+      }
+    },
+    {
+      "id": "trait-resistance-acharnee",
+      "name": "Résistance acharnée",
+      "flavor": {
+        "desc": "Lorsque vous tombez à 0 point de vie du fait de dégâts, mais que vous n'êtes pas tué sur le coup, vous pouvez choisir de conserver 1 point de vie. Capacité regagnée après un repos long."
+      },
+      "mechanics": {
+        "type": "death_defiance",
+        "trigger": "drop_to_0_hp_not_killed_outright",
+        "effect": "maintain_1_hp",
+        "recharge": "long_rest"
+      }
+    },
+    {
+      "id": "trait-sauvagerie",
+      "name": "Sauvagerie",
+      "flavor": {
+        "desc": "Lorsque vous réussissez un coup critique avec une attaque d'arme de corps à corps, vous pouvez lancer l'un des dés de dégâts de l'arme une fois de plus pour l'ajouter aux dégâts supplémentaires du coup critique."
+      },
+      "mechanics": {
+        "type": "critical_hit_bonus",
+        "trigger": "critical_hit_melee_weapon",
+        "effect": "add_extra_weapon_damage_die",
+        "extra_dice_count": 1
+      }
+    }
+  ],
+  "creation_choices": [],
+  "languages": {
+    "fixed": [
+      "lg-commun",
+      "lg-kaani"
+    ],
+    "choices": []
+  },
+  "civilization_links": [
+    {
+      "id": "civ-kaan",
+      "desc": "La plupart des merosis vivent dans l'empire kaani ou dans les contrées qui lui appartinrent par le passé."
+    }
+  ],
+  "subspecies": [],
+  "optional_rules": [
+    {
+      "id": "rule-resistance-acharnee-blessures",
+      "name": "Résistance acharnée (variante règles Blessures)",
+      "flavor": {
+        "desc": "Si le MJ utilise les règles de Blessures, Résistance acharnée fait passer le merosi de l'état mourant à 1 PV conscient, assorti de 5 niveaux de fatigue. L'adrénaline fait ignorer douleur et malus de fatigue durant un nombre de tours égal au bonus de Constitution (minimum 1)."
+      },
+      "mechanics": {
+        "requires_optional_rule": "regles_blessures",
+        "effect": "dying_to_1_hp_conscious",
+        "fatigue_levels_added": 5,
+        "ignore_pain_duration_rounds_formula": "max(1, modificateur_con)",
+        "recharge": "short_rest"
+      }
+    }
+  ]
+}

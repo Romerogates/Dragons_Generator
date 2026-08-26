@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-festin-des-heros",
+  "name": "Festin des héros",
+  "level": 6,
+  "school": "invocation",
+  "casting_time": {
+    "value": 10,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(un calice serti de pierres précieuses d'une valeur minimale de 1 000 po"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-pretre"
+  ],
+  "description": "Spell icons for 6th level invocation Vous faites apparaître un grand festin, avec mets et boissons de choix. Le repas s'étend sur 1 heure, au bout de laquelle il disparaît et ses effets se font ressentir. Jusqu'à douze créatures peuvent y participer. Une créature qui y prend part en tire plusieurs bénéfices : elle est débarrassée de toutes les maladies et de tous les poisons qui l'affectent, est immunisée contre le poison et l'état préjudiciable effrayé, et bénéficie d'un avantage aux",
+  "modular_options": []
+}

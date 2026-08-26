@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "ski-perception",
+  "name": "Perception",
+  "ability": "SAG",
+  "description": "Vos tests de Sagesse (Perception) vous permettent de détecter une présence par la vue, l'ouïe ou un autre sens. Ils évaluent la qualité de votre discernement de l'environnement et l'acuité de vos sens. Vous pouvez ainsi tenter d'écouter une conversation, accroupi sous une fenêtre ouverte ou l'oreille collée contre une porte fermée, ou rester à l'affût des pas furtifs de monstres dans la forêt. Vous pouvez aussi chercher à mieux discerner ce qui est voilé, dissimulé ou difficile à viser, qu'il s'agisse d'orcs en embuscade sur le bord de la route, de malfrats tapis dans les ténèbres d'une ruelle ou de la simple lueur d'une bougie filtrant sous une porte close.",
+  "examples": [
+    "Écouter une conversation sous une fenêtre ou contre une porte fermée.",
+    "Rester à l'affût des pas furtifs de monstres dans la forêt.",
+    "Discerner des embuscades, des malfrats dissimulés ou une lueur de bougie sous une porte."
+  ],
+  "passive_check": true,
+  "source": "livre_de_base"
+}

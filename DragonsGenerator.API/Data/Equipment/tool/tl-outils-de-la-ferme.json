@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "tl-outils-de-la-ferme",
+  "name": "Outils de la ferme",
+  "category": "tool",
+  "subcategory": "artisan_tool",
+  "cost": {
+    "value": 1,
+    "unit": "po"
+  },
+  "weight_kg": 10,
+  "description": "Nécessaire pour cultiver et élever du bétail. Comprend bêche, houe, faux, etc.."
+}

@@ -45,6 +45,8 @@ export interface BackgroundProficiencies {
 }
 
 export interface BackgroundSkillChoice {
+  /** Compétences automatiquement accordées (ex. Acolyte : Intuition + Religion). */
+  fixed?: string[];
   chooseCount: number;
   /** Liste d'IDs ou "any" pour l'historique personnalisé. */
   options: string[] | 'any';
@@ -86,6 +88,8 @@ export interface BackgroundEquipment {
   /** Si true, l'équipement est libre (historique personnalisé). */
   custom?: boolean;
   budgetRules?: BackgroundBudgetRules;
+  /** Choix d'équipement (livre vs moulin, etc.). */
+  choose?: any[];
 }
 
 export interface BackgroundBudgetRules {

@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "id": "mnt-destrier",
+  "name": "Destrier",
+  "category": "mount",
+  "subcategory": "animal",
+  "cost": {
+    "value": 400,
+    "unit": "po"
+  },
+  "weight_kg": null,
+  "speed": "18 m",
+  "capacity_kg": 270,
+  "description": "Vitesse de déplacement : 18 m. Charge maximale : 270 kg."
+}

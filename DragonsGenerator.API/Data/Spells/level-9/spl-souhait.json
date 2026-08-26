@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-souhait",
+  "name": "Souhait",
+  "level": 9,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Jouhait est le sort le plus puissant qu'un mortel puisse jeter. Il vous suffit de l'exprimer à haute voix pour modifier la trame de la réalité. ## Imitation d'un sort L'usage le plus courant consiste à reproduire n'importe quel sort du 8e niveau ou inférieur, sans qu'il soit nécessaire d'en remplir les conditions (y compris le coût en composantes). Le sort prend tout simplement effet. ## Effets communs Une autre possibilité consiste à produire l'un des effets suivants, à votre convenance : Créer un objet non magique dont la valeur ne dépasse pas 25 000 po. Aucune des dimensions de l'objet ne peut dépasser 90 m, et il apparaît par terre, dans un espace inoccupé que vous voyez. Permettre à un maximum de vingt créatures que vous voyez de récupérer tous leurs points de vie, et mettre un terme à tous les effets qu'elles subissent, sur le principe du sort restauration suprême. Conférer à un maximum de dix créatures que vous voyez une résistance à un type de dégâts de votre choix. Conférer à un maximum de dix créatures que vous voyez une immunité contre un sort ou effet magique unique pendant 8 heures. Par exemple, vous et vos Privation de sommeil",
+  "modular_options": []
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-appel-de-la-foudre",
+  "name": "Appel de la foudre",
+  "level": 3,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide"
+  ],
+  "description": "Un nuage d'orage apparaît. Il a la forme d'un cylindre de 3 m de haut et de 18 m de rayon centré sur un point que vous voyez situé à portée juste au-dessus de vous. Le sort échoue si vous n'êtes pas en mesure de voir un point où le nuage pourrait se matérialiser (par exemple, si vous êtes dans une pièce trop petite pour l'accueillir). Au moment de l'incantation, choisissez un point que vous voyez sous le nuage. Un éclair s'abat du nuage vers ce point. Toute créature située dans un rayon de 1,50 m de ce point doit alors effectuer un JS Dextérité et subit 3d10 dégâts de foudre en cas d'échec, la moitié en cas de réussite. Tant que le sort persiste, vous pouvez, au prix d'une action à chacun de vos tours de jeu, jeter un nouvel éclair en ciblant le même point ou un autre. Si vous êtes dehors et par temps orageux au moment de l'incantation, le sort vous permet de contrôler l'orage plutôt que d'en créer un nouveau. Par ce temps, les dégâts du sort augmentent de 1d10.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, les dégâts augmentent de 1d10 par niveau d'emplacement au-dessus du 3e.",
+  "modular_options": []
+}

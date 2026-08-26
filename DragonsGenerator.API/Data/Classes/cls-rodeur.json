@@ -1,0 +1,1522 @@
+{
+  "id": "cls-rodeur",
+  "schema_version": "3.0",
+  "name": "Rôdeur",
+  "flavor": {
+    "summary": "Guerrier des terres sauvages maîtrisant la traque, la survie et une magie liée à la nature. Il désigne des ennemis jurés et des terrains de prédilection pour maximiser son efficacité, et forge un lien profond avec un compagnon animal.",
+    "lore_note": "Aventuriers rompus aux milieux les plus rudes, les rôdeurs défendent les peuples libres contre les menaces du Chancre ou servent de guides et mercenaires dans les terres d'Eana. Leur magie n'est qu'un outil forgé par l'expérience, non une vocation divine."
+  },
+  "hit_die": "1d10",
+  "hp_at_level_1": 10,
+  "hp_per_level_average": 6,
+  "primary_abilities": [
+    "dex",
+    "wis"
+  ],
+  "saving_throw_proficiencies": [
+    "str",
+    "dex"
+  ],
+  "armor_proficiencies": [
+    "ar-light",
+    "ar-medium",
+    "ar-shield"
+  ],
+  "weapon_proficiencies": [
+    "wp-simple",
+    "wp-martial"
+  ],
+  "tool_proficiencies": [
+    "tl-necessaire-herboristerie"
+  ],
+  "choice_pools": [
+    {
+      "id": "choice-skills-cls-rodeur",
+      "name": "Compétences de classe",
+      "type": "skill_proficiency",
+      "allow_choice": true,
+      "quantity": 3,
+      "unlock_level": 1,
+      "pool": [
+        "skill-athletisme",
+        "skill-discretion",
+        "skill-dressage",
+        "skill-intuition",
+        "skill-investigation",
+        "skill-nature",
+        "skill-perception",
+        "skill-survie"
+      ]
+    },
+    {
+      "id": "choice-style-combat-cls-rodeur",
+      "name": "Style de combat",
+      "type": "feature_option",
+      "allow_choice": true,
+      "quantity": 1,
+      "unlock_level": 2,
+      "replace_on_duplicate": true,
+      "pool": [
+        "style-archerie-rodeur",
+        "style-combat-deux-armes-rodeur",
+        "style-defense-rodeur",
+        "style-duel-rodeur"
+      ]
+    },
+    {
+      "id": "choice-ennemi-jure-initial",
+      "name": "Ennemi juré initial",
+      "type": "enemy_type",
+      "allow_choice": true,
+      "quantity": 1,
+      "unlock_level": 1,
+      "pool": [
+        "ennemi-anciens",
+        "ennemi-astraux",
+        "ennemi-creations-magiques",
+        "ennemi-dragons",
+        "ennemi-especes-humanoides",
+        "ennemi-etres-naturels",
+        "ennemi-fees",
+        "ennemi-fielons",
+        "ennemi-monstruosites",
+        "ennemi-morts-vivants",
+        "ennemi-ravageurs-chancre"
+      ]
+    },
+    {
+      "id": "choice-terrain-initial",
+      "name": "Terrains de prédilection initiaux",
+      "type": "terrain_preference",
+      "allow_choice": true,
+      "quantity": 2,
+      "unlock_level": 1,
+      "pool": [
+        "terrain-astral",
+        "terrain-desert-chaud",
+        "terrain-ethere",
+        "terrain-feerie-et-demi-plans",
+        "terrain-foret-temperee",
+        "terrain-foret-equatoriale",
+        "terrain-inframonde",
+        "terrain-littoral-et-mer",
+        "terrain-marecage-zones-humides",
+        "terrain-melancolia",
+        "terrain-montagne-et-canyons",
+        "terrain-prairie-et-savane",
+        "terrain-region-polaire",
+        "terrain-urbain-et-ruines",
+        "terrain-volcans-et-fournaise"
+      ]
+    },
+    {
+      "id": "choice-equip-armure-cls-rodeur",
+      "name": "Armure de départ",
+      "type": "equipment",
+      "allow_choice": true,
+      "quantity": 1,
+      "unlock_level": 1,
+      "pool": [
+        "ar-armure-decailles",
+        "ar-armure-de-cuir"
+      ]
+    },
+    {
+      "id": "choice-equip-armes-cls-rodeur",
+      "name": "Armes de corps à corps de départ",
+      "type": "equipment",
+      "allow_choice": true,
+      "quantity": 1,
+      "unlock_level": 1,
+      "pool": [
+        {
+          "id": "wp-epee-courte",
+          "qty": 2
+        },
+        {
+          "id": "wp-simple-melee-category",
+          "qty": 2,
+          "is_category": true
+        }
+      ]
+    },
+    {
+      "id": "choice-equip-sac-cls-rodeur",
+      "name": "Sac de départ",
+      "type": "equipment",
+      "allow_choice": true,
+      "quantity": 1,
+      "unlock_level": 1,
+      "pool": [
+        "gr-sac-explorateur",
+        "gr-sac-aventurier"
+      ]
+    }
+  ],
+  "spellcasting": {
+    "max_spell_level": 5,
+    "unlock_level": 2,
+    "spell_attack_formula": "proficiency_bonus + wis_mod",
+    "recharge": "long_rest",
+    "cantrips": false,
+    "notes": "À chaque montée de niveau, 1 sort connu peut être remplacé par un autre sort de rôdeur du même niveau ou inférieur.",
+    "type": "known",
+    "ability": "wis",
+    "spell_dc_formula": "8 + proficiency_bonus + wis_mod"
+  },
+  "starting_equipment": {
+    "fixed": [
+      {
+        "id": "wp-arc-long",
+        "qty": 1
+      },
+      {
+        "id": "it-carquois-20-fleches",
+        "qty": 1
+      }
+    ],
+    "choice_pools": []
+  },
+  "progression": [
+    {
+      "level": 1,
+      "features": [
+        "feat-ennemi-jure",
+        "feat-explorateur-ne"
+      ],
+      "resources": {
+        "spells_known": 0,
+        "terrain_count": 2,
+        "enemy_count": 1
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 2,
+      "features": [
+        "feat-style-de-combat-rodeur",
+        "feat-spellcasting-rodeur"
+      ],
+      "resources": {
+        "spells_known": 2,
+        "terrain_count": 2,
+        "enemy_count": 1,
+        "spell_slots": {
+          "1": 2
+        }
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 3,
+      "features": [
+        "feat-archetype-de-rodeur",
+        "feat-lien-animal",
+        "feat-vigilance-primitive"
+      ],
+      "resources": {
+        "spells_known": 3,
+        "terrain_count": 2,
+        "enemy_count": 1,
+        "spell_slots": {
+          "1": 3
+        }
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 4,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "spells_known": 3,
+        "terrain_count": 2,
+        "enemy_count": 1,
+        "spell_slots": {
+          "1": 3
+        }
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 5,
+      "features": [
+        "feat-attaque-supplementaire",
+        "feat-amelioration-explorateur-ne"
+      ],
+      "level_up_choice_pools": [
+        {
+          "id": "choice-terrain-lv5",
+          "name": "Nouveau terrain de prédilection (niv 5)",
+          "type": "terrain_preference",
+          "quantity": 1,
+          "pool_ref": "choice-terrain-initial"
+        }
+      ],
+      "resources": {
+        "spells_known": 4,
+        "terrain_count": 3,
+        "enemy_count": 1,
+        "spell_slots": {
+          "1": 4,
+          "2": 2
+        }
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 6,
+      "features": [
+        "feat-amelioration-ennemi-jure"
+      ],
+      "level_up_choice_pools": [
+        {
+          "id": "choice-ennemi-lv6",
+          "name": "Nouvel ennemi juré (niv 6)",
+          "type": "enemy_type",
+          "quantity": 1,
+          "pool_ref": "choice-ennemi-jure-initial"
+        },
+        {
+          "id": "choice-langue-ennemi-lv6",
+          "name": "Langue associée à l'ennemi juré (niv 6)",
+          "type": "language_proficiency",
+          "quantity": 1,
+          "condition_note": "Doit être parlée par l'ennemi juré choisi au même niveau."
+        }
+      ],
+      "resources": {
+        "spells_known": 4,
+        "terrain_count": 3,
+        "enemy_count": 2,
+        "spell_slots": {
+          "1": 4,
+          "2": 2
+        }
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 7,
+      "features": [
+        "feat-aptitude-archetype-rodeur"
+      ],
+      "resources": {
+        "spells_known": 5,
+        "terrain_count": 3,
+        "enemy_count": 2,
+        "spell_slots": {
+          "1": 4,
+          "2": 3
+        }
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 8,
+      "features": [
+        "feat-augmentation-de-caracteristique",
+        "feat-foulee-tellurique"
+      ],
+      "resources": {
+        "spells_known": 5,
+        "terrain_count": 3,
+        "enemy_count": 2,
+        "spell_slots": {
+          "1": 4,
+          "2": 3
+        }
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 9,
+      "features": [
+        "feat-attaque-de-precision",
+        "feat-amelioration-explorateur-ne"
+      ],
+      "level_up_choice_pools": [
+        {
+          "id": "choice-terrain-lv9",
+          "name": "Nouveau terrain de prédilection (niv 9)",
+          "type": "terrain_preference",
+          "quantity": 1,
+          "pool_ref": "choice-terrain-initial"
+        }
+      ],
+      "resources": {
+        "spells_known": 6,
+        "terrain_count": 4,
+        "enemy_count": 2,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 2
+        }
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 10,
+      "features": [
+        "feat-mimetisme"
+      ],
+      "resources": {
+        "spells_known": 6,
+        "terrain_count": 4,
+        "enemy_count": 2,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 2
+        }
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 11,
+      "features": [
+        "feat-aptitude-archetype-rodeur"
+      ],
+      "resources": {
+        "spells_known": 7,
+        "terrain_count": 4,
+        "enemy_count": 2,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3
+        }
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 12,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "spells_known": 7,
+        "terrain_count": 4,
+        "enemy_count": 2,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3
+        }
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 13,
+      "features": [
+        "feat-amelioration-explorateur-ne"
+      ],
+      "level_up_choice_pools": [
+        {
+          "id": "choice-terrain-lv13",
+          "name": "Nouveau terrain de prédilection (niv 13)",
+          "type": "terrain_preference",
+          "quantity": 1,
+          "pool_ref": "choice-terrain-initial"
+        }
+      ],
+      "resources": {
+        "spells_known": 8,
+        "terrain_count": 5,
+        "enemy_count": 2,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 1
+        }
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 14,
+      "features": [
+        "feat-amelioration-ennemi-jure",
+        "feat-mimetisme-amelioration",
+        "feat-disparition"
+      ],
+      "level_up_choice_pools": [
+        {
+          "id": "choice-ennemi-lv14",
+          "name": "Nouvel ennemi juré (niv 14)",
+          "type": "enemy_type",
+          "quantity": 1,
+          "pool_ref": "choice-ennemi-jure-initial"
+        },
+        {
+          "id": "choice-langue-ennemi-lv14",
+          "name": "Langue associée à l'ennemi juré (niv 14)",
+          "type": "language_proficiency",
+          "quantity": 1,
+          "condition_note": "Doit être parlée par l'ennemi juré choisi au même niveau."
+        }
+      ],
+      "resources": {
+        "spells_known": 8,
+        "terrain_count": 5,
+        "enemy_count": 3,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 1
+        }
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 15,
+      "features": [
+        "feat-aptitude-archetype-rodeur"
+      ],
+      "resources": {
+        "spells_known": 9,
+        "terrain_count": 5,
+        "enemy_count": 3,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 2
+        }
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 16,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "spells_known": 9,
+        "terrain_count": 5,
+        "enemy_count": 3,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 2
+        }
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 17,
+      "features": [
+        "feat-amelioration-explorateur-ne"
+      ],
+      "level_up_choice_pools": [
+        {
+          "id": "choice-terrain-lv17",
+          "name": "Nouveau terrain de prédilection (niv 17)",
+          "type": "terrain_preference",
+          "quantity": 1,
+          "pool_ref": "choice-terrain-initial"
+        }
+      ],
+      "resources": {
+        "spells_known": 10,
+        "terrain_count": 6,
+        "enemy_count": 3,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 1
+        }
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 18,
+      "features": [
+        "feat-perception-sauvage"
+      ],
+      "resources": {
+        "spells_known": 10,
+        "terrain_count": 6,
+        "enemy_count": 3,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 1
+        }
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 19,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "spells_known": 11,
+        "terrain_count": 6,
+        "enemy_count": 3,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2
+        }
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 20,
+      "features": [
+        "feat-tueur-implacable"
+      ],
+      "resources": {
+        "spells_known": 11,
+        "terrain_count": 6,
+        "enemy_count": 3,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2
+        }
+      },
+      "proficiency_bonus": 6
+    }
+  ],
+  "features_details": [
+    {
+      "id": "feat-ennemi-jure",
+      "name": "Ennemi juré",
+      "unlocks_at_level": 1,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Expérience acquise en traquant ou chassant un type d'adversaire spécifique.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Choisissez 1 type d'ennemi juré (voir pool choice-ennemi-jure-initial). Contre cet ennemi : avantage aux tests de Sagesse (Survie) pour suivre sa piste, avantage aux tests d'Intelligence pour se remémorer des informations à son sujet, bonus aux jets de dégâts égal au bonus de maîtrise. Apprenez également 1 langue parlée par cet ennemi (si applicable). Nouveaux ennemis jurés et langues aux niveaux 6 et 14.",
+        "advantages": [
+          {
+            "type": "skill_check",
+            "target": "wis",
+            "skill": "skill-survie",
+            "condition": "pour suivre la piste d'un ennemi juré"
+          },
+          {
+            "type": "skill_check",
+            "target": "int",
+            "condition": "pour se remémorer des informations sur un ennemi juré"
+          }
+        ],
+        "damage_bonus": {
+          "formula": "proficiency_bonus",
+          "condition": "contre les ennemis jurés"
+        },
+        "enemy_types_pool_ref": "choice-ennemi-jure-initial"
+      }
+    },
+    {
+      "id": "feat-explorateur-ne",
+      "name": "Explorateur-né",
+      "unlocks_at_level": 1,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Maîtrise exceptionnelle d'un type d'environnement.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Choisissez 2 terrains de prédilection (voir pool choice-terrain-initial). Dans votre terrain : bonus de maîtrise doublé aux tests d'Intelligence et de Sagesse pour les compétences maîtrisées. Après 1h dans ce terrain : terrains difficiles non magiques sans coût de déplacement, orientation surnaturelle impossible, vigilance en voyage, avantage aux jets d'initiative, déplacement discret seul à vitesse normale, fourrage x2, traque révèle nombre exact / taille / date de passage. Nouveau terrain au choix aux niveaux 5, 9, 13 et 17.",
+        "proficiency_bonus_multiplier": {
+          "multiplier": 2,
+          "applies_to": [
+            "int",
+            "wis"
+          ],
+          "condition": "compétences maîtrisées en rapport avec le terrain de prédilection"
+        },
+        "terrain_count_resource": "terrain_count"
+      }
+    },
+    {
+      "id": "feat-style-de-combat-rodeur",
+      "name": "Style de combat",
+      "unlocks_at_level": 2,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Spécialisation dans un style de combat au choix. Choix unique, remplacé si l'occasion se représente.",
+        "lore_note": null
+      },
+      "choice_pool_ref": "choice-style-combat-cls-rodeur",
+      "options": [
+        {
+          "id": "style-archerie-rodeur",
+          "name": "Archerie",
+          "mechanics": {
+            "attack_bonus": {
+              "value": 2,
+              "weapon_type": "ranged"
+            }
+          }
+        },
+        {
+          "id": "style-combat-deux-armes-rodeur",
+          "name": "Combat à deux armes",
+          "mechanics": {
+            "description": "Lorsque vous combattez avec deux armes, ajoutez votre modificateur de caractéristique aux dégâts de la seconde attaque."
+          }
+        },
+        {
+          "id": "style-defense-rodeur",
+          "name": "Défense",
+          "mechanics": {
+            "ac_bonus": {
+              "value": 1,
+              "condition": "tant que vous portez une armure"
+            }
+          }
+        },
+        {
+          "id": "style-duel-rodeur",
+          "name": "Duel",
+          "mechanics": {
+            "damage_bonus": {
+              "value": 2,
+              "condition": "arme de corps à corps tenue à une main, aucune autre arme"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "feat-spellcasting-rodeur",
+      "name": "Sorts",
+      "unlocks_at_level": 2,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Accès à la magie naturelle via des emplacements de sort. Caractéristique magique : Sagesse.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Débloque l'accès au système de sorts. Voir la clé 'spellcasting' de la classe pour les formules de DD et d'attaque. Les emplacements sont récupérés sur repos long. Consultation de la table 'resources' pour le nombre d'emplacements par niveau de sort."
+      }
+    },
+    {
+      "id": "feat-archetype-de-rodeur",
+      "name": "Archétype de rôdeur",
+      "unlocks_at_level": 3,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Choix d'un idéal : Chasseur, Explorateur de l'Inframonde ou Ombre urbaine. Octroie des aptitudes aux niveaux 3, 7, 11 et 15.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Sélectionnez une sous-classe parmi les entrées 'subclasses'. Les aptitudes d'archétype aux niveaux 7, 11 et 15 sont référencées par 'feat-aptitude-archetype-rodeur' dans la table de progression et résolues par le moteur via la sous-classe active du personnage."
+      }
+    },
+    {
+      "id": "feat-lien-animal",
+      "name": "Lien animal",
+      "unlocks_at_level": 3,
+      "recharge": "at_will",
+      "flavor": {
+        "summary": "Don Compagnon animal gratuit + activation de pouvoirs liés via des emplacements de sort.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Vous recevez gratuitement le don Compagnon animal (sans prérequis de Dressage). Au prix d'une action bonus, si votre compagnon est visible dans un rayon de 18 m, dépensez un emplacement de sort pour activer le pouvoir correspondant à son niveau pendant 1 minute.",
+        "resource_cost": {
+          "type": "spell_slot",
+          "min_level": 1
+        },
+        "action_cost": "bonus_action",
+        "duration_minutes": 1,
+        "tiers": [
+          {
+            "slot_level": 1,
+            "effect": "Lien télépathique à 18 m. L'animal ajoute votre bonus de maîtrise à sa CA et ses jets de dégâts."
+          },
+          {
+            "slot_level": 2,
+            "effect": "Les attaques de l'animal sont magiques. Il ajoute (proficiency_bonus - 2) à ses jets d'attaque, jets de sauvegarde et tests. S'applique également aux dégâts contre vos ennemis jurés."
+          },
+          {
+            "slot_level": 3,
+            "effect": "Résistance aux dégâts contondants, perforants et tranchants. (Ombre des égouts : invulnérabilité au lieu de résistance pour une nuée.)"
+          },
+          {
+            "slot_level": 4,
+            "effect": "L'animal récupère 10 PV au début de chacun de ses tours (si ses PV sont supérieurs à 0)."
+          },
+          {
+            "slot_level": 5,
+            "effect": "L'animal est invisible pour tous sauf vous. Il peut se téléporter (équivalent marche de brume)."
+          }
+        ]
+      }
+    },
+    {
+      "id": "feat-vigilance-primitive",
+      "name": "Vigilance primitive",
+      "unlocks_at_level": 3,
+      "recharge": "at_will",
+      "flavor": {
+        "summary": "Concentration totale sur l'environnement pour détecter des types de créatures à grande distance.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Au prix d'une action, dépensez un emplacement de sort. Pendant 1 minute × niveau d'emplacement dépensé, percevez la présence (pas la position ni le nombre) des types de créatures suivants dans un rayon de 1,5 km (9 km sur votre terrain de prédilection) : aberrations, célestes, dragons, élémentaires, fées, fiélons, ravageurs du Chancre, morts-vivants.",
+        "resource_cost": {
+          "type": "spell_slot",
+          "min_level": 1
+        },
+        "action_cost": "action",
+        "duration_formula": "1_minute_per_slot_level",
+        "detection_radius_km": 1.5,
+        "detection_radius_favored_terrain_km": 9,
+        "detectable_types": [
+          "aberrations",
+          "celestes",
+          "dragons",
+          "elementaires",
+          "fees",
+          "fielons",
+          "ravageurs-chancre",
+          "morts-vivants"
+        ]
+      }
+    },
+    {
+      "id": "feat-augmentation-de-caracteristique",
+      "name": "Augmentation de caractéristique",
+      "unlocks_at_level": 4,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Augmentation de caractéristique aux niveaux 4, 8, 12, 16 et 19.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Augmentez de 2 une valeur de caractéristique, ou de 1 deux valeurs distinctes. Maximum 20 par voie de cette aptitude.",
+        "recurrence_levels": [
+          4,
+          8,
+          12,
+          16,
+          19
+        ]
+      }
+    },
+    {
+      "id": "feat-attaque-supplementaire",
+      "name": "Attaque supplémentaire",
+      "unlocks_at_level": 5,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Deux attaques lors de l'action Attaquer.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "attacks_per_action": 2
+      }
+    },
+    {
+      "id": "feat-amelioration-explorateur-ne",
+      "name": "Amélioration d'Explorateur-né",
+      "unlocks_at_level": 5,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Débloque un nouveau terrain de prédilection aux niveaux 5, 9, 13 et 17.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Choisissez un nouveau terrain de prédilection dans le pool 'choice-terrain-initial'. Consultez 'terrain_count' dans les resources de progression pour le total courant.",
+        "recurrence_levels": [
+          5,
+          9,
+          13,
+          17
+        ],
+        "choice_pool_ref": "choice-terrain-initial",
+        "choice_quantity_per_occurrence": 1
+      }
+    },
+    {
+      "id": "feat-amelioration-ennemi-jure",
+      "name": "Amélioration d'Ennemi juré",
+      "unlocks_at_level": 6,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Nouvel ennemi juré et langue associée aux niveaux 6 et 14.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Choisissez un nouvel ennemi juré et apprenez une langue parlée par cet ennemi (si applicable). Consultez 'enemy_count' dans les resources de progression pour le total courant.",
+        "recurrence_levels": [
+          6,
+          14
+        ],
+        "choice_pool_ref": "choice-ennemi-jure-initial",
+        "choice_quantity_per_occurrence": 1
+      }
+    },
+    {
+      "id": "feat-aptitude-archetype-rodeur",
+      "name": "Aptitude d'archétype",
+      "unlocks_at_level": 7,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Marqueur de progression résolu dynamiquement par la sous-classe active du personnage.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Le moteur injecte la feature de la sous-classe active correspondant au niveau courant (7, 11 ou 15). Voir 'subclasses[].features_details[]' pour les détails par archétype.",
+        "recurrence_levels": [
+          7,
+          11,
+          15
+        ],
+        "resolved_by": "active_subclass"
+      }
+    },
+    {
+      "id": "feat-foulee-tellurique",
+      "name": "Foulée tellurique",
+      "unlocks_at_level": 8,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Traversée des terrains naturels sans entrave.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Les terrains difficiles non magiques ne coûtent pas de déplacement supplémentaire. Vous traversez la végétation non magique sans être ralenti ni subir de dégâts non magiques.",
+        "advantages": [
+          {
+            "type": "saving_throw",
+            "target": "dex",
+            "condition": "contre les effets magiques de flore entravante (ex : enchevêtrement)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "feat-attaque-de-precision",
+      "name": "Attaque de précision",
+      "unlocks_at_level": 9,
+      "recharge": "at_will",
+      "flavor": {
+        "summary": "Frappe ciblée alimentée par un emplacement de sort pour infliger des dégâts supplémentaires magiques.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Lorsque vous touchez une créature visible avec une attaque d'arme, dépensez un emplacement de sort. L'arme est considérée comme magique pour cette attaque. Infligez des dégâts supplémentaires du même type que l'arme.",
+        "resource_cost": {
+          "type": "spell_slot",
+          "min_level": 1
+        },
+        "damage_formula": {
+          "base": "2d8",
+          "per_extra_slot_level": "1d8",
+          "max": "5d8",
+          "bonus_vs_favored_enemy": "1d8"
+        }
+      }
+    },
+    {
+      "id": "feat-mimetisme",
+      "name": "Mimétisme",
+      "unlocks_at_level": 10,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Dissimulation parfaite dans le terrain de prédilection en restant immobile.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Lorsque vous tentez de vous cacher à votre tour dans votre terrain de prédilection et restez immobile sans autre action jusqu'à la fin de votre tour, ajoutez +10 au test de Dextérité (Discrétion). Ce résultat persiste tant que vous restez immobile (jusqu'à 10 minutes). Votre compagnon animal en bénéficie également.",
+        "stealth_bonus": {
+          "value": 10,
+          "condition": "dans le terrain de prédilection, rester immobile sans autre action"
+        },
+        "applies_to_companion": true
+      }
+    },
+    {
+      "id": "feat-mimetisme-amelioration",
+      "name": "Amélioration de Mimétisme",
+      "unlocks_at_level": 14,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Extension du Mimétisme à un allié proche.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Vous pouvez désormais faire bénéficier une créature consentante de taille M ou inférieure dans un rayon de 1,50 m du bonus +10 à la Discrétion de votre Mimétisme, sous les mêmes conditions.",
+        "extends_feat": "feat-mimetisme",
+        "ally_radius_m": 1.5,
+        "ally_max_size": "M"
+      }
+    },
+    {
+      "id": "feat-disparition",
+      "name": "Disparition",
+      "unlocks_at_level": 14,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Se cacher devient une action bonus. Piste indétectable sans magie.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Vous pouvez entreprendre l'action Se cacher au prix d'une action bonus. On ne peut remonter votre piste sans moyens magiques, sauf si vous avez expressément laissé des traces.",
+        "action_cost": "bonus_action",
+        "action_type": "hide"
+      }
+    },
+    {
+      "id": "feat-perception-sauvage",
+      "name": "Perception sauvage",
+      "unlocks_at_level": 18,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Sens affûtés permettant d'attaquer sans voir et de localiser les créatures invisibles.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Lorsque vous attaquez une créature que vous ne voyez pas, vous ne subissez pas de désavantage aux jets d'attaque. Vous connaissez la position de toute créature invisible dans un rayon de 9 m (sauf si vous êtes aveuglé ou assourdi, ou si la créature utilise d'autres moyens de dissimulation).",
+        "blindsight_radius_m": 9,
+        "no_disadvantage_vs_unseen": true
+      }
+    },
+    {
+      "id": "feat-tueur-implacable",
+      "name": "Tueur implacable",
+      "unlocks_at_level": 20,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Ajout du modificateur de Sagesse à une attaque ou un jet de dégâts contre un ennemi juré à chaque tour.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "À chacun de vos tours, ajoutez votre modificateur de Sagesse à un seul jet d'attaque OU à un seul jet de dégâts d'une attaque contre un ennemi juré. La décision doit être prise avant ou après le jet, mais avant l'application des effets.",
+        "bonus_formula": "wis_mod",
+        "applies_to": [
+          "attack_roll",
+          "damage_roll"
+        ],
+        "max_per_turn": 1,
+        "condition": "contre un ennemi juré"
+      }
+    }
+  ],
+  "subclasses": {
+    "name": "Conclave",
+    "level_unlocked": 3,
+    "subclass_feature_levels": [
+      3,
+      7,
+      11,
+      15
+    ],
+    "options": [
+      {
+        "id": "subcls-chasseur",
+        "name": "Chasseur",
+        "class_id": "cls-rodeur",
+        "unlocks_at_level": 3,
+        "archetype_levels": [
+          3,
+          7,
+          11,
+          15
+        ],
+        "flavor": {
+          "summary": "Rempart entre la civilisation et les terreurs du monde sauvage. Techniques spéciales contre toutes formes de menaces.",
+          "lore_note": null
+        },
+        "features_details": [
+          {
+            "id": "feat-proie-du-chasseur",
+            "name": "Proie du chasseur",
+            "unlocks_at_level": 3,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Technique de prédilection parmi trois options offensives.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Choisissez une des trois options suivantes.",
+              "choice_quantity": 1,
+              "options": [
+                {
+                  "id": "proie-fleau-de-la-horde",
+                  "name": "Fléau de la horde",
+                  "description": "Une fois par tour, lors d'une attaque d'arme, effectuez une attaque supplémentaire avec la même arme contre une créature différente dans un rayon de 1,50 m de la première cible (à portée)."
+                },
+                {
+                  "id": "proie-gout-du-sang",
+                  "name": "Goût du sang",
+                  "description": "Lorsque vous touchez une créature avec une attaque d'arme, elle subit 1d8 dégâts supplémentaires si elle n'était pas à ses PV maximums. Une seule fois par tour."
+                },
+                {
+                  "id": "proie-tueur-de-geants",
+                  "name": "Tueur de géants",
+                  "description": "Lorsqu'une créature de taille G ou supérieure dans un rayon de 1,50 m rate son attaque contre vous, jouez votre réaction pour l'attaquer immédiatement après cet échec (à condition de la voir).",
+                  "action_cost": "reaction"
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-tactique-defensive",
+            "name": "Tactique défensive",
+            "unlocks_at_level": 7,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Option défensive parmi trois techniques.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Choisissez une des trois options suivantes.",
+              "choice_quantity": 1,
+              "options": [
+                {
+                  "id": "tact-carapace-reactive",
+                  "name": "Carapace réactive",
+                  "description": "Lorsqu'une créature vous touche avec une attaque, bénéficiez d'un bonus de +4 à la CA contre toutes ses attaques consécutives jusqu'à la fin de son tour.",
+                  "ac_bonus": 4
+                },
+                {
+                  "id": "tact-cauchemar-de-la-horde",
+                  "name": "Cauchemar de la horde",
+                  "description": "Les attaques d'opportunité qui vous ciblent subissent un désavantage.",
+                  "disadvantages": [
+                    {
+                      "type": "attack_roll",
+                      "condition": "attaques d'opportunité contre vous"
+                    }
+                  ]
+                },
+                {
+                  "id": "tact-volonte-de-fer",
+                  "name": "Volonté de fer",
+                  "description": "Avantage aux jets de sauvegarde contre l'état préjudiciable effrayé.",
+                  "advantages": [
+                    {
+                      "type": "saving_throw",
+                      "condition": "contre l'état effrayé"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-attaques-multiples-chasseur",
+            "name": "Attaques multiples",
+            "unlocks_at_level": 11,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Technique d'attaque de zone parmi deux options.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Choisissez une des deux options suivantes.",
+              "choice_quantity": 1,
+              "options": [
+                {
+                  "id": "mult-attaque-en-rotation",
+                  "name": "Attaque en rotation",
+                  "description": "Au prix de votre action, effectuez une attaque de corps à corps contre toutes les créatures souhaitées dans un rayon de 1,50 m de vous (un jet d'attaque par cible).",
+                  "action_cost": "action",
+                  "aoe_radius_m": 1.5,
+                  "type": "melee"
+                },
+                {
+                  "id": "mult-volee",
+                  "name": "Volée",
+                  "description": "Au prix de votre action, effectuez une attaque à distance contre toutes les créatures souhaitées dans un rayon de 3 m d'un point visible à portée de votre arme (un jet d'attaque par cible, munitions requises).",
+                  "action_cost": "action",
+                  "aoe_radius_m": 3,
+                  "type": "ranged"
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-defense-du-chasseur",
+            "name": "Défense du chasseur",
+            "unlocks_at_level": 15,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Technique défensive ultime parmi trois options.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Choisissez une des trois options suivantes.",
+              "choice_quantity": 1,
+              "options": [
+                {
+                  "id": "def-esquive-instinctive",
+                  "name": "Esquive instinctive",
+                  "description": "Lorsqu'un assaillant visible vous touche, jouez votre réaction pour réduire de moitié les dégâts subis.",
+                  "action_cost": "reaction"
+                },
+                {
+                  "id": "def-esquive-totale",
+                  "name": "Esquive totale",
+                  "description": "Lorsqu'un effet vous autorise un JS de Dextérité pour réduire les dégâts de moitié : succès = 0 dégâts, échec = moitié des dégâts.",
+                  "advantages": [
+                    {
+                      "type": "saving_throw",
+                      "target": "dex",
+                      "condition": "effets de zone avec demi-dégâts"
+                    }
+                  ]
+                },
+                {
+                  "id": "def-revirement",
+                  "name": "Revirement",
+                  "description": "Lorsqu'une créature hostile vous rate au corps à corps, jouez votre réaction pour la forcer à répéter la même attaque contre une autre cible de votre choix (pas elle-même).",
+                  "action_cost": "reaction"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "subcls-explorateur-inframonde",
+        "name": "Explorateur de l'Inframonde",
+        "class_id": "cls-rodeur",
+        "unlocks_at_level": 3,
+        "archetype_levels": [
+          3,
+          7,
+          11,
+          15
+        ],
+        "flavor": {
+          "summary": "Aventurier forgé dans les galeries infinies de l'Inframonde, guide et cartographe des profondeurs.",
+          "lore_note": null
+        },
+        "features_details": [
+          {
+            "id": "feat-habitue-des-tunnels",
+            "name": "Habitué des tunnels",
+            "unlocks_at_level": 3,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Maîtrise de l'Inframonde et de ses habitants.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Vous parlez, lisez et écrivez le commun des profondeurs. Avantage aux tests de caractéristique d'interaction sociale avec des habitants de l'Inframonde. Avantage aux tests de Sagesse (Perception) et d'Intelligence (Investigation) pour détecter pièges et passages secrets. Pas de désavantage aux tests de Sagesse (Perception) dans une zone légèrement voilée.",
+              "languages_granted": [
+                "lang-commun-des-profondeurs"
+              ],
+              "advantages": [
+                {
+                  "type": "skill_check",
+                  "target": "cha",
+                  "condition": "interaction sociale avec des habitants de l'Inframonde"
+                },
+                {
+                  "type": "skill_check",
+                  "target": "wis",
+                  "skill": "skill-perception",
+                  "condition": "pour détecter pièges ou passages secrets"
+                },
+                {
+                  "type": "skill_check",
+                  "target": "int",
+                  "skill": "skill-investigation",
+                  "condition": "pour détecter pièges ou passages secrets"
+                }
+              ],
+              "negates_disadvantage": [
+                {
+                  "type": "skill_check",
+                  "skill": "skill-perception",
+                  "condition": "zone légèrement voilée"
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-jeu-de-jambes",
+            "name": "Jeu de jambes",
+            "unlocks_at_level": 3,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Déplacement au cœur de la mêlée sans provoquer d'attaques d'opportunité.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "À chaque tour, déplacez-vous d'une distance fixe au prix d'une action bonus sans provoquer d'attaque d'opportunité. Distance progressive selon le niveau.",
+              "action_cost": "bonus_action",
+              "movement_by_level": [
+                {
+                  "level": 3,
+                  "distance_m": 1.5
+                },
+                {
+                  "level": 7,
+                  "distance_m": 3
+                },
+                {
+                  "level": 11,
+                  "distance_m": "speed"
+                }
+              ],
+              "no_opportunity_attack": true
+            }
+          },
+          {
+            "id": "feat-maitre-des-tunnels",
+            "name": "Maître des tunnels",
+            "unlocks_at_level": 7,
+            "recharge": "short_rest",
+            "flavor": {
+              "summary": "Talent martial ou de domination adapté aux entrailles de la terre.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Choisissez une des deux options suivantes.",
+              "choice_quantity": 1,
+              "options": [
+                {
+                  "id": "maitre-ascendant-surnaturel",
+                  "name": "Ascendant surnaturel",
+                  "description": "Produisez l'équivalent du sort domination d'animal, applicable aussi aux monstruosités dont la valeur d'Intelligence ne dépasse pas 3. Utilisation unique par repos court ou long. Au niveau 11, durée passe à 1 heure.",
+                  "recharge": "short_rest",
+                  "uses": 1,
+                  "upgrade_at_level": {
+                    "level": 11,
+                    "effect": "duration_1_hour"
+                  }
+                },
+                {
+                  "id": "maitre-contre-vermine",
+                  "name": "Contre la vermine",
+                  "description": "Quand plusieurs ennemis sont à 1,50 m de vous, bonus aux jets d'attaque et aux jets de dégâts égal au nombre de ces ennemis moins 1. Au niveau 11, ce bonus s'applique aussi à votre CA.",
+                  "recharge": "passive",
+                  "bonus_formula": "adjacent_enemies_count - 1",
+                  "upgrade_at_level": {
+                    "level": 11,
+                    "effect": "also_applies_to_ac"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-adaptation-martiale",
+            "name": "Adaptation martiale",
+            "unlocks_at_level": 11,
+            "recharge": "short_rest",
+            "flavor": {
+              "summary": "Apprentissage des erreurs en combat pour améliorer progressivement la précision contre une même cible.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Chaque fois que vous ratez une créature spécifique avec une attaque d'arme, bénéficiez d'un bonus cumulatif de +1 aux jets d'attaque suivants contre cette créature. Bonus perdus au repos court ou long. De plus, vos attaques d'arme infligent des coups critiques sur un résultat de 19 ou 20.",
+              "stacking_attack_bonus": {
+                "per_miss": 1,
+                "applies_to": "same_specific_creature",
+                "reset_on": "short_rest"
+              },
+              "critical_hit_range": [
+                19,
+                20
+              ]
+            }
+          },
+          {
+            "id": "feat-oeil-des-profondeurs",
+            "name": "Œil des profondeurs",
+            "unlocks_at_level": 15,
+            "recharge": "short_rest",
+            "flavor": {
+              "summary": "Prédateur ultime des profondeurs, avec sens ou efficacité critique améliorée.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Choisissez une des deux options suivantes.",
+              "choice_quantity": 1,
+              "options": [
+                {
+                  "id": "oeil-critique-redondant",
+                  "name": "Critique redondant",
+                  "description": "Quand vous réussissez un coup critique contre une créature, toutes vos attaques d'arme suivantes contre cette même créature sont automatiquement critiques si elles sont réussies. Bénéfice perdu au repos court ou long.",
+                  "recharge": "short_rest"
+                },
+                {
+                  "id": "oeil-vision-aveugle",
+                  "name": "Vision aveugle",
+                  "description": "Vous bénéficiez de la vision aveugle dans un rayon de 18 m.",
+                  "recharge": "passive",
+                  "blindsight_radius_m": 18
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "subcls-ombre-urbaine",
+        "name": "Ombre urbaine",
+        "class_id": "cls-rodeur",
+        "unlocks_at_level": 3,
+        "archetype_levels": [
+          3,
+          7,
+          11,
+          15
+        ],
+        "flavor": {
+          "summary": "Rôdeur adapté aux zones marginales des grandes villes : égouts, bidonvilles, décharges. Magie naturelle sous forme urbaine, symbiose avec la vermine.",
+          "lore_note": "Certains vivent parmi les détritus, vénérant insectes et pourriture comme étapes du cycle naturel. D'autres subsistent dans les égouts et deviennent les alliés des multitudes de rats."
+        },
+        "features_details": [
+          {
+            "id": "feat-ennemi-jure-citadin",
+            "name": "Ennemi juré citadin",
+            "unlocks_at_level": 3,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Extension automatique de l'ennemi juré aux citadins de grandes villes.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Ajoutez automatiquement comme ennemi juré les citadins et habitants des grandes villes (toute espèce ayant vécu la majeure partie de son existence dans une grande ville d'Eana). Toutes les aptitudes d'Ennemi juré s'y appliquent. Le Meneur définit ce qui constitue une grande ville.",
+              "extends_feat": "feat-ennemi-jure",
+              "enemy_type_granted": "ennemi-citadins"
+            }
+          },
+          {
+            "id": "feat-connaissance-de-la-rue",
+            "name": "Connaissance de la rue",
+            "unlocks_at_level": 3,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Maîtrise de l'argot des voleurs et de compétences urbaines.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Vous parlez l'argot des voleurs. Acquérez 2 maîtrises au choix parmi la liste. Si vous possédez déjà la maîtrise, votre bonus de maîtrise est doublé pour les tests associés.",
+              "languages_granted": [
+                "lang-argot-des-voleurs"
+              ]
+            },
+            "choice_pools": [
+              {
+                "id": "choice-competences-ombre-urbaine-lv3",
+                "name": "Connaissance de la rue : maîtrises",
+                "type": "skill_or_tool_proficiency",
+                "allow_choice": true,
+                "quantity": 2,
+                "expertise_if_already_proficient": true,
+                "pool": [
+                  "skill-acrobaties",
+                  "skill-discretion",
+                  "skill-intimidation",
+                  "skill-intuition",
+                  "skill-investigation",
+                  "skill-persuasion",
+                  "skill-tromperie",
+                  "tl-outils-de-voleur"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "feat-ombre-mouvante",
+            "name": "Ombre mouvante",
+            "unlocks_at_level": 7,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Agilité et discrétion accrues, vision dans le noir.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Bénéficiez des effets du sort vivacité (vous seul, quel que soit le niveau). Au prix d'une action bonus, choisissez : Chercher, Foncer ou Se cacher. Acquérez la vision dans le noir à 18 m.",
+              "action_cost": "bonus_action",
+              "bonus_actions_allowed": [
+                "chercher",
+                "foncer",
+                "se-cacher"
+              ],
+              "darkvision_radius_m": 18
+            }
+          },
+          {
+            "id": "feat-ombre-des-egouts",
+            "name": "Ombre des égouts",
+            "unlocks_at_level": 11,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Symbiose avec la vermine urbaine comme compagnon animal aux règles spéciales.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Ajoutez aux compagnons animaux disponibles : nuée de chauves-souris, nuée de corbeaux, nuée d'insectes, nuée de rats. Règles spéciales pour ces nuées : (1) Forger le lien en 1 repos long dans un milieu approprié. (2) Si la nuée occupe votre espace lors de votre déplacement, elle vous accompagne sans coût de déplacement. (3) Réaction pour subir la moitié des dégâts non psychiques (la nuée subit l'autre moitié). (4) Lien animal niveau 3 modifié : invulnérabilité contondant/perforant/tranchant pendant 1 min au lieu de résistance.",
+              "companion_types_added": [
+                "nuee-chauves-souris",
+                "nuee-corbeaux",
+                "nuee-insectes",
+                "nuee-rats"
+              ],
+              "special_rules": {
+                "bond_formation": "long_rest_in_appropriate_environment",
+                "movement": "free_if_sharing_space",
+                "damage_split": {
+                  "trigger": "reaction",
+                  "player_takes": "half",
+                  "swarm_takes": "half",
+                  "damage_types_excluded": [
+                    "psychic"
+                  ]
+                },
+                "lien_animal_slot3_override": "immunity_bpc_instead_of_resistance"
+              }
+            }
+          },
+          {
+            "id": "feat-ombre-immortelle",
+            "name": "Ombre immortelle",
+            "unlocks_at_level": 15,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "La vermine urbaine devient ange-gardien : immunités et résistance à la mort.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Tant que votre compagnon animal est une nuée vivante occupant votre espace : vous êtes immunisé contre les poisons et les maladies. De plus, lorsque vous tombez à 0 PV, vous ne mourez qu'à 5 échecs aux jets de sauvegarde contre la mort (au lieu de 3). Si vous obtenez 3 réussites (ou un 20) avec déjà 3-4 échecs, votre état se stabilise mais vous restez à 0 PV et ne pouvez pas récupérer de PV (y compris magie) pendant 1d20 heures. Si la nuée meurt ou quitte votre espace après votre 3ème échec et avant votre stabilisation, vous mourez.",
+              "conditions": {
+                "requires": "companion_is_living_swarm_in_same_space"
+              },
+              "immunities_while_active": [
+                "poison",
+                "disease"
+              ],
+              "death_save_failure_threshold": 5,
+              "stabilization_exception": {
+                "trigger": "3_successes_or_nat20_with_3_or_4_failures",
+                "effect": "stable_at_0hp_no_hp_recovery",
+                "duration": "1d20_hours",
+                "fail_condition": "swarm_dies_or_leaves_space"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

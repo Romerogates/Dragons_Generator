@@ -1,0 +1,25 @@
+{
+  "schema_version": "2.0",
+  "id": "act-esquiver",
+  "name": "Esquiver",
+  "action_cost": "action",
+  "category": "standard",
+  "description": "Vous cherchez uniquement à éviter les attaques. Jusqu'au début de votre tour de jeu suivant, tous les jets d'attaque contre vous subissent un désavantage lorsque l'attaquant vous est visible, et vous bénéficiez d'un avantage aux jets de sauvegarde de Dextérité.",
+  "mechanics": {
+    "duration": "Jusqu'au début du tour de jeu suivant",
+    "effects": {
+      "attacks_against_you": {
+        "modifier": "désavantage",
+        "condition": "attaquant visible"
+      },
+      "dexterity_saves": {
+        "modifier": "avantage"
+      }
+    },
+    "ends_if": [
+      "neutralisé",
+      "VD réduite à 0"
+    ]
+  },
+  "source": "livre_de_base"
+}

@@ -1,0 +1,46 @@
+{
+  "schema_version": "2.0",
+  "id": "don-maitre-des-poisons",
+  "name": "Maître des poisons",
+  "requires_magic": false,
+  "category": "survival",
+  "prerequisites": [],
+  "ability_score_increase": {
+    "ability": "DEX_or_INT",
+    "value": 1,
+    "max": 20
+  },
+  "description": "+1 Dextérité ou Intelligence (max 20). Avantage aux tests du nécessaire d'empoisonneur (+ maîtrise si absente). Détecter les poisons non magiques à 1,5 m (action). Améliorer un poison en 1 heure (10 % de sa valeur en ingrédients : DD de sauvegarde +bonus de maîtrise ; une fois par poison). Quand vous ratez un jet contre un poison, vous pouvez jouer votre réaction pour le retenter.",
+  "benefits": [
+    {
+      "type": "ability_score_increase",
+      "ability": "DEX ou INT",
+      "value": 1
+    },
+    {
+      "type": "advantage_on_tool",
+      "tool": "nécessaire d'empoisonneur"
+    },
+    {
+      "type": "detect_poison",
+      "range_m": 1.5,
+      "action": "action"
+    },
+    {
+      "type": "enhance_poison",
+      "cost": "10% valeur poison",
+      "effect": "DD +bonus_maitrise"
+    },
+    {
+      "type": "reroll_save",
+      "condition": "raté un JS contre poison",
+      "action": "réaction"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "poison",
+    "artisanat",
+    "dextérité"
+  ]
+}

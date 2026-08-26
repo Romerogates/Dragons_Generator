@@ -80,9 +80,9 @@
     >
       @for (s of resolvedSlots(); track s.slotNumber; let i = $index) {
         <button
-          class="w-8 h-2 rounded-full transition-all duration-500 cursor-pointer"
+          class="w-8 h-2 rounded-full transition-[colors,transform,opacity,box-shadow] duration-200 cursor-pointer"
           [ngClass]="{
-            'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)] scale-110':
+            'bg-amber-500 shadow-sm scale-[1.02]':
               i === activeSlotIndex(),
             'bg-emerald-500':
               (selectedAlternatives().has(s.slotNumber) || s.isFixed) && i !== activeSlotIndex(),
@@ -135,7 +135,7 @@
                       >
                         @for (eq of item.categoryItems; track eq.id) {
                           <button
-                            class="w-full px-2.5 py-2 rounded-lg border text-[10px] font-bold transition-all text-left leading-tight break-words flex items-center"
+                            class="w-full px-2.5 py-2 rounded-lg border text-[10px] font-bold transition-[colors,transform,opacity,box-shadow] duration-200 text-left leading-tight break-words flex items-center"
                             [ngClass]="
                               categoryChoices().get(slot.slotNumber + '-fixed-' + itemIdx) === eq.id
                                 ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md'
@@ -156,7 +156,7 @@
               @if (activeSlotIndex() < resolvedSlots().length - 1) {
                 <button
                   (click)="nextSlot()"
-                  class="mt-7 px-8 py-2.5 bg-amber-500 text-slate-900 font-black rounded-lg hover:bg-amber-400 transition-all uppercase tracking-widest text-xs shadow-lg flex items-center justify-center gap-2 mx-auto"
+                  class="mt-7 px-8 py-2.5 bg-amber-500 text-slate-900 font-black rounded-lg hover:bg-amber-400 transition-[colors,transform,opacity,box-shadow] duration-200 uppercase tracking-widest text-xs shadow-lg flex items-center justify-center gap-2 mx-auto"
                 >
                   <span>Choix suivant</span>
                   <span class="text-lg leading-none">➔</span>
@@ -169,9 +169,9 @@
             <div class="flex flex-wrap justify-center gap-6 w-full">
               @for (alt of slot.alternatives; track alt.index) {
                 <div
-                  class="relative flex flex-col w-full sm:w-[320px] p-5 rounded-2xl border-2 transition-all duration-300 bg-[#171b22] group cursor-pointer"
+                  class="perf-card relative flex flex-col w-full sm:w-[320px] p-5 rounded-2xl border-2 transition-[colors,transform,opacity,box-shadow] duration-200 bg-[#171b22] group cursor-pointer"
                   [ngClass]="{
-                    'border-emerald-500 bg-emerald-950/20 shadow-[0_0_25px_rgba(16,185,129,0.2)] scale-[1.03] z-20':
+                    'border-emerald-500 bg-emerald-950/20 shadow-md scale-[1.01] z-20':
                       selectedAlternatives().get(slot.slotNumber) === alt.index,
                     'border-slate-800 hover:border-amber-500/40 hover:bg-[#1b2028] opacity-60 hover:opacity-100':
                       selectedAlternatives().get(slot.slotNumber) !== alt.index,
@@ -183,7 +183,7 @@
                       <div class="flex flex-col gap-2">
                         <div class="flex items-center gap-3">
                           <div
-                            class="w-11 h-11 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-2xl shadow-inner group-hover:scale-110 transition-transform shrink-0"
+                            class="w-11 h-11 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-2xl shadow-inner group-hover:scale-[1.01] transition-transform shrink-0"
                           >
                             <iconify-icon [icon]="getIconForItem(item)"></iconify-icon>
                           </div>
@@ -216,7 +216,7 @@
                           >
                             @for (eq of item.categoryItems; track eq.id) {
                               <button
-                                class="w-full h-full px-2.5 py-2 rounded-lg border text-[10px] font-bold transition-all text-left leading-tight break-words disabled:opacity-30 disabled:cursor-not-allowed flex items-center"
+                                class="w-full h-full px-2.5 py-2 rounded-lg border text-[10px] font-bold transition-[colors,transform,opacity,box-shadow] duration-200 text-left leading-tight break-words disabled:opacity-30 disabled:cursor-not-allowed flex items-center"
                                 [ngClass]="
                                   categoryChoices().get(
                                     slot.slotNumber + '-' + alt.index + '-' + itemIdx
@@ -267,35 +267,29 @@
       <div class="mt-12 flex flex-col items-center gap-4 w-full">
         @if (selectionComplete()) {
           <div
-            class="px-6 py-2.5 bg-emerald-950/30 text-emerald-400 border border-emerald-800/50 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-3 shadow-[0_0_15px_rgba(16,185,129,0.1)] mb-2"
+            class="px-6 py-2.5 bg-emerald-950/30 text-emerald-400 border border-emerald-800/50 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-3 shadow-sm mb-2"
           >
-            <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
+            <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
             Inventaire complet et prêt
           </div>
           <button
-            class="px-14 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-amber-500 text-slate-950 shadow-[0_0_25px_rgba(245,158,11,0.3)] hover:bg-amber-400 hover:scale-105 active:scale-95 transition-all"
+            class="px-14 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-amber-500 text-slate-950 shadow-md hover:bg-amber-400 hover:scale-[1.02] active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-200"
             (click)="confirm()"
           >
             Forger l'équipement
           </button>
         }
 
-        <div class="flex flex-wrap justify-center gap-4 mt-2">
+        <nav class="wizard-step-nav">
           @if (activeSlotIndex() > 0 && !selectionComplete()) {
-            <button
-              (click)="prevSlot()"
-              class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-500 transition-colors bg-[#1b2028] px-6 py-2 rounded-full border border-slate-700"
-            >
+            <button type="button" class="wizard-nav-secondary" (click)="prevSlot()">
               ↑ Choix précédent
             </button>
           }
-          <button
-            (click)="prevStep()"
-            class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-400 transition-colors bg-[#1b2028] px-6 py-2 rounded-full border border-slate-700"
-          >
-            ← Revenir aux Compétences
+          <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
+            ← Étape précédente
           </button>
-        </div>
+        </nav>
       </div>
     </div>
   }

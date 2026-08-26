@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-creation-de-morts-vivants",
+  "name": "Création de morts-vivants",
+  "level": 6,
+  "school": "necromancie",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 3,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(un pot d'argile rempli de terre sépulcrale"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien",
+    "cls-pretre",
+    "cls-sorcier"
+  ],
+  "description": "Vous ne pouvez lancer ce sort que la nuit. Choisissez jusqu'à trois cadavres d'humanoïdes de taille M ou P situés à portée. Chacun de ces cadavres devient une goule sous votre contrôle. Le profil de ces créatures est inclus dans (chapitre Les Égarés de l'Éther). Au prix d'une action bonus à chacun de vos tours de jeu, vous pouvez mentalement diriger toute créature que vous avez animée avec ce sort sous réserve qu'elle se situe dans un rayon de 36 m de vous (si vous en contrôlez plusieurs, vous pouvez en diriger autant que vous le voulez en leur donnant le même ordre). Vous décidez l'action que la créature va entreprendre et où elle va se déplacer à son tour de jeu suivant, ou lancez un ordre général, comme garder une pièce ou un couloir précis. Sans ordre de votre part, la créature se contente de se défendre contre les créatures hostiles. Une fois l'ordre donné, la créature le suit jusqu'à ce que sa tâche soit remplie. La créature reste sous votre contrôle pendant 24 heures, après quoi elle cesse d'obéir aux ordres que vous lui avez donnés. Pour maintenir votre contrôle sur la créature pendant 24 heures de plus, vous devez relancer le sort sur elle avant que la période de 24 heures en cours ne soit révolue. En usant du sort de la sorte, vous réaffirmez votre contrôle sur un maximum de trois créatures plutôt que d'en animer de nouvelles.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau ou supérieur, vous animez ou réaffirmez votre contrôle sur quatre goules. Quand vous jetez ce sort en utilisant un emplacement de sort du 8e niveau ou supérieur, vous animez ou réaffirmez votre contrôle sur cinq goules, deux blêmes ou deux réprouvés. Quand vous jetez ce sort en utilisant un emplacement de sort du 9e niveau ou supérieur, vous animez ou réaffirmez votre contrôle sur six goules, trois blêmes ou réprouvés, ou deux momies.",
+  "modular_options": []
+}

@@ -1,0 +1,247 @@
+{
+  "schema_version": "2.0",
+  "id": "sp-tieffelin",
+  "name": "Tieffelins",
+  "name_alt": [],
+  "playable": true,
+  "requires_subspecies": false,
+  "source": {
+    "book": "Dragons - Livre de base: Aventuriers",
+    "pages": "54-57"
+  },
+  "flavor": {
+    "summary": "Les tieffelins partagent des traits résultant tantôt de leur ascendance diabolique ou démoniaque, tantôt d'une influence maléfique subie par la mère au cours de la grossesse. Tous les tieffelins ne naissent pas de l'intervention directe d'un fiélon.",
+    "culture": "Le tieffelin est toujours contraint de se positionner à l'égard de son géniteur fiélon et de l'humanité. Leurs motivations peuvent être liées à leur éducation ou l'expérience du rejet par la société.",
+    "lore_notes": [
+      "Les tieffelins savent intuitivement parler la langue de leur géniteur fiélon, parfois même avant celle de leur parent humain.",
+      "Xonim est l'ambivalente Dame de la Nuit, déesse magicienne. Elle affectionne les tieffelins et exaucerait volontiers leurs prières. Mais ses présents sont-ils vraiment dénués de contrepartie ?",
+      "Les tieffelins naissent exclusivement de femmes humaines et sont eux-mêmes fréquemment stériles."
+    ]
+  },
+  "base_stats": {
+    "ability_score_increase": {
+      "int": 1,
+      "cha": 2
+    },
+    "speed": {
+      "base_m": 9,
+      "not_reduced_by_heavy_armor": false
+    },
+    "size": "M",
+    "darkvision_m": 18,
+    "age": {
+      "maturity_years": 18,
+      "lifespan_years": 100,
+      "flavor": "Développement humain, vivent en moyenne quelques années de plus."
+    },
+    "alignment": {
+      "tendency": "Tranché (non-neutre)",
+      "flavor": "Libres de choisir le Bien ou le Mal, ils prennent souvent des décisions tranchées, évitant généralement les positionnements neutres."
+    }
+  },
+  "traits": [
+    {
+      "id": "trait-vision-noir-tieffelin",
+      "name": "Vision dans le noir",
+      "flavor": {
+        "desc": "Grâce à votre héritage fiélon, vous êtes doté d'une vision supérieure dans les ténèbres et la pénombre. Dans un rayon de 18 m, vous voyez en lumière faible comme en lumière vive, et dans l'obscurité comme en lumière faible (nuances de gris)."
+      },
+      "mechanics": {
+        "type": "darkvision",
+        "range_m": 18
+      }
+    },
+    {
+      "id": "trait-resistance-fielonne",
+      "name": "Résistance fiélonne",
+      "flavor": {
+        "desc": "Vous bénéficiez d'une résistance aux dégâts de feu."
+      },
+      "mechanics": {
+        "type": "damage_resistance",
+        "resistances": [
+          "damage-feu"
+        ]
+      }
+    },
+    {
+      "id": "trait-heritier-des-tenebres",
+      "name": "Héritier des ténèbres",
+      "flavor": {
+        "desc": "Vous connaissez le sort mineur thaumaturgie. Au niveau 3, vous pouvez lancer une fois réprimande maléfique comme sort de 2e niveau (repos long). Au niveau 5, vous pouvez lancer une fois ténèbres (repos long). Le Charisme est la caractéristique magique associée."
+      },
+      "mechanics": {
+        "type": "innate_spellcasting",
+        "spellcasting_ability": "cha",
+        "innate_spells": [
+          {
+            "unlocks_at_level": 1,
+            "spell_id": "spl-thaumaturgie",
+            "cast_as_spell_level": 0,
+            "recharge": "at_will",
+            "dice": null
+          },
+          {
+            "unlocks_at_level": 3,
+            "spell_id": "spl-reprimande-malevique",
+            "cast_as_spell_level": 2,
+            "recharge": "long_rest",
+            "dice": {
+              "quantity": 3,
+              "faces": 10,
+              "modifier": 0
+            }
+          },
+          {
+            "unlocks_at_level": 5,
+            "spell_id": "spl-tenebres",
+            "cast_as_spell_level": 3,
+            "recharge": "long_rest",
+            "dice": null
+          }
+        ]
+      }
+    }
+  ],
+  "creation_choices": [
+    {
+      "id": "choice-ancetre-tieffelin",
+      "name": "Nature du géniteur",
+      "flavor": {
+        "desc": "Choisissez si vous êtes lié aux diables ou aux démons. Le MJ détermine la nature exacte du géniteur. Votre choix détermine également la langue fiélonne que vous connaissez intuitivement."
+      },
+      "type": "fiend_ancestry",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        {
+          "id": "gen-diable",
+          "name": "Diables",
+          "grants_language": "lg-diabolique",
+          "options": [
+            {
+              "id": "gen-diable-cornu",
+              "name": "Diable cornu",
+              "desc": "Seigneur autoritaire. Rejetons souvent ambitieux et inflexibles."
+            },
+            {
+              "id": "gen-succube-incube",
+              "name": "Succube / Incube",
+              "desc": "Sèment des tieffelins par accident. Rejetons réputés pour leur beauté, pouvant passer pour des humains."
+            }
+          ]
+        },
+        {
+          "id": "gen-demon",
+          "name": "Démons",
+          "grants_language": "lg-demoniaque",
+          "options": [
+            {
+              "id": "gen-glabrezu",
+              "name": "Glabrezu",
+              "desc": "Conseiller perfide. Rejetons bénéficient d'aide avant d'être sacrifiés. Physiquement confondus avec les tieffelins de diable cornu."
+            },
+            {
+              "id": "gen-incube-succube",
+              "name": "Incube / Succube",
+              "desc": "Sèment des tieffelins par accident. Rejetons réputés pour leur beauté."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "languages": {
+    "fixed": [
+      "lg-commun"
+    ],
+    "choices": [
+      {
+        "id": "choice-langue-fielonne-auto",
+        "allow_choice": true,
+        "quantity": 1,
+        "pool": [
+          "lg-diabolique",
+          "lg-demoniaque"
+        ],
+        "note": "Automatiquement déterminé par le choix de l'ancêtre (gen-diable → lg-diabolique, gen-demon → lg-demoniaque). Connaissance intuitive."
+      }
+    ]
+  },
+  "subspecies": [],
+  "optional_rules": [
+    {
+      "id": "rule-sombres-instincts",
+      "name": "Sombres instincts",
+      "flavor": {
+        "desc": "Quand le tieffelin est en danger ou soumis à la tentation, une bête intérieure malveillante essaie de prendre le contrôle pour lui faire commettre une mauvaise action. Une fois que la bête a agi, elle est incapable de le refaire avant un repos long."
+      },
+      "mechanics": {
+        "trigger": "danger_or_temptation",
+        "save": {
+          "ability": "wis",
+          "dc": 5
+        },
+        "failure_effect": "extra_free_action_dictated_by_beast",
+        "recharge": "long_rest"
+      }
+    },
+    {
+      "id": "rule-priere-xonim",
+      "name": "Prière à Xonim",
+      "flavor": {
+        "desc": "Vous adressez une prière (action) à Xonim, dangereuse protectrice des tieffelins. Effets selon les circonstances : effacer vos traces, masquer votre odeur, attirer les poursuivants sur une fausse piste, provoquer un heureux hasard, détourner l'attention d'une sentinelle. Capacité regagnée après un repos long."
+      },
+      "mechanics": {
+        "action_type": "action",
+        "self_bonus": {
+          "advantages": [
+            {
+              "type": "skill",
+              "target": "skill-discretion",
+              "condition": "toujours (ce tour)"
+            }
+          ]
+        },
+        "enemy_penalty": {
+          "disadvantages": [
+            {
+              "type": "skill",
+              "target": "skill-perception",
+              "condition": "contre vous (ce tour)"
+            }
+          ]
+        },
+        "recharge": "long_rest"
+      }
+    },
+    {
+      "id": "rule-imprevisibilite-tieffelins",
+      "name": "Imprévisibilité des tieffelins",
+      "flavor": {
+        "desc": "Le MJ peut personnaliser la liste des sorts innés du tieffelin pour refléter les particularités de son géniteur fiélon, remplaçant le trait Héritier des ténèbres. Principes : un sort mineur au niveau 1 ; au niveau 3, un sort de niveau 1 lancé comme emplacement de niveau 2 (repos long) ; au niveau 5, un sort de niveau 2 lancé comme emplacement de niveau 3 (repos long). Charisme est la caractéristique magique."
+      },
+      "mechanics": {
+        "replaces_trait": "trait-heritier-des-tenebres",
+        "customization_by": "geniteur_type",
+        "innate_spell_slots": [
+          {
+            "unlocks_at_level": 1,
+            "slot_spell_level": 0,
+            "recharge": "at_will"
+          },
+          {
+            "unlocks_at_level": 3,
+            "slot_spell_level": 2,
+            "recharge": "long_rest"
+          },
+          {
+            "unlocks_at_level": 5,
+            "slot_spell_level": 3,
+            "recharge": "long_rest"
+          }
+        ]
+      }
+    }
+  ]
+}

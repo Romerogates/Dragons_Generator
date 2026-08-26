@@ -1,0 +1,23 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-fronde",
+  "name": "Fronde",
+  "category": "weapon",
+  "subcategory": "simple_ranged",
+  "cost": {
+    "value": 1,
+    "unit": "pa"
+  },
+  "weight_kg": null,
+  "damage_dice": "1d4",
+  "damage_type": "contondant",
+  "properties": [
+    "prop-projectiles-9-36"
+  ],
+  "throw_range": null,
+  "ammo_range": {
+    "normal": 9,
+    "long": 36
+  },
+  "description": "Une fronde doit être chargée pour infliger des dégâts quand elle est utilisée au corps à corps."
+}

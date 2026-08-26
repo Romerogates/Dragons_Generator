@@ -1,91 +1,275 @@
 <nav
-  class="w-full bg-[#1b2028]/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 shadow-xl"
+  class="w-full bg-[#1b2028]/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50"
 >
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between items-center h-16">
-      <a routerLink="/" class="flex items-center gap-3 group">
+    <div class="flex items-center justify-between gap-4 h-16">
+      <!-- Brand -->
+      <a
+        routerLink="/"
+        class="flex items-center gap-2.5 group shrink-0"
+        (click)="closeMenus()"
+      >
         <img
           src="dragon_512x512.png"
-          alt="Logo Dragons"
-          class="h-8 w-8 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.8)] group-hover:scale-110 transition-transform"
+          alt=""
+          class="h-8 w-8 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.55)] group-hover:scale-[1.01] transition-transform"
         />
-
         <span
-          class="font-serif font-bold text-lg text-slate-100 group-hover:text-amber-500 transition-colors tracking-wide"
+          class="font-serif font-bold text-base sm:text-lg text-slate-100 group-hover:text-amber-400 transition-colors tracking-wide"
         >
-          Dragons <span class="text-amber-600">Generator</span>
+          Dragons <span class="text-amber-500">Generator</span>
         </span>
       </a>
 
-      <div class="hidden md:flex items-center gap-8 h-full">
-        <a
-          routerLink="/"
-          routerLinkActive="text-amber-400 border-amber-500"
-          [routerLinkActiveOptions]="{ exact: true }"
-          class="h-full flex items-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-amber-400 border-b-2 border-transparent transition-all px-1"
-        >
-        </a>
+      <!-- Desktop + actions -->
+      <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+        <!-- Desktop primary links -->
+        <div class="hidden lg:flex items-center gap-1">
+          <a
+            routerLink="/create"
+            routerLinkActive="text-amber-400"
+            class="h-10 flex items-center px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-amber-400 hover:bg-slate-800/60 transition-colors"
+            (click)="closeMenus()"
+          >
+            Forger
+          </a>
+
+          <div class="relative" data-codex-menu>
+            <button
+              type="button"
+              class="h-10 flex items-center gap-1.5 px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] transition-colors"
+              [class]="
+                codexOpen() || isCodexActive()
+                  ? 'text-amber-400 bg-amber-950/25'
+                  : 'text-slate-400 hover:text-amber-400 hover:bg-slate-800/60'
+              "
+              [attr.aria-expanded]="codexOpen()"
+              aria-haspopup="true"
+              (click)="toggleCodex($event)"
+            >
+              Codex
+              <span
+                class="text-[10px] transition-transform duration-200 inline-block"
+                [class.rotate-180]="codexOpen()"
+                >▾</span
+              >
+            </button>
+
+            @if (codexOpen()) {
+              <div
+                class="absolute top-full right-0 pt-2 z-50"
+                role="menu"
+              >
+                <div
+                  class="w-80 rounded-2xl border border-slate-700/80 bg-[#171b22] shadow-[0_20px_50px_rgba(0,0,0,0.55)] p-2 grid grid-cols-1 gap-0.5"
+                >
+                  @for (link of codexLinks; track link.path) {
+                    <a
+                      [routerLink]="link.path"
+                      routerLinkActive="bg-amber-950/35 text-amber-400 border-amber-900/40"
+                      class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-300 hover:bg-slate-800/80 hover:text-amber-300 border border-transparent transition-colors"
+                      role="menuitem"
+                      (click)="closeMenus()"
+                    >
+                      <span class="text-lg leading-none w-6 text-center shrink-0"
+                        ><iconify-icon [icon]="link.icon"></iconify-icon
+                      ></span>
+                      <span class="font-medium tracking-wide">{{ link.label }}</span>
+                    </a>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
         <a
           routerLink="/create"
-          routerLinkActive="text-amber-400 border-amber-500"
-          class="h-full flex items-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-amber-400 border-b-2 border-transparent transition-all px-1"
+          class="hidden sm:inline-flex lg:hidden items-center px-3 py-2 rounded-full text-[10px] font-black uppercase tracking-widest text-amber-400 border border-amber-900/50 bg-amber-950/20 hover:border-amber-500/50 transition-colors"
+          (click)="closeMenus()"
         >
-          Forger un Héros
+          Forger
         </a>
-        <a
-          routerLink="/species"
-          routerLinkActive="text-amber-400 border-amber-500"
-          class="h-full flex items-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-amber-400 border-b-2 border-transparent transition-all px-1"
-        >
-          Especes
-        </a>
-        <a
-          routerLink="/classes"
-          routerLinkActive="text-amber-400 border-amber-500"
-          class="h-full flex items-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-amber-400 border-b-2 border-transparent transition-all px-1"
-        >
-          Classes
-        </a>
-        <a
-          routerLink="civilisations"
-          routerLinkActive="text-amber-400 border-amber-500"
-          class="h-full flex items-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-amber-400 border-b-2 border-transparent transition-all px-1"
-        >
-          civilisations
-        </a>
-        <a
-          routerLink="equipments"
-          routerLinkActive="text-amber-400 border-amber-500"
-          class="h-full flex items-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-amber-400 border-b-2 border-transparent transition-all px-1"
-        >
-          Equipements
-        </a>
-        <a
-          routerLink="spells"
-          routerLinkActive="text-amber-400 border-amber-500"
-          class="h-full flex items-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-amber-400 border-b-2 border-transparent transition-all px-1"
-        >
-          Sortilèges
-        </a>
-      </div>
 
-      <div class="flex items-center">
         <a
           routerLink="/characters"
-          class="flex items-center gap-3 bg-[#171b22] border border-slate-700 hover:border-emerald-500/50 px-5 py-2.5 rounded-full shadow-inner group transition-all"
+          class="flex items-center gap-2 bg-[#171b22] border border-slate-700 hover:border-emerald-500/50 px-3 sm:px-4 py-2 rounded-full shadow-inner group transition-[colors,transform,opacity,box-shadow] duration-200"
+          (click)="closeMenus()"
         >
           <span
             class="text-[10px] font-black uppercase tracking-widest text-slate-300 group-hover:text-emerald-400"
-            >Mes Héros</span
+            >Héros</span
           >
-          @if (savedCount > 0) {
+          @if (savedCount() > 0) {
             <span
-              class="bg-emerald-950 text-emerald-400 text-[10px] font-black px-2 py-0.5 rounded-full border border-emerald-900 shadow-sm"
-              >{{ savedCount }}</span
+              class="bg-emerald-950 text-emerald-400 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full border border-emerald-900"
+              >{{ savedCount() }}</span
             >
           }
         </a>
+
+        <div class="relative hidden sm:block" data-account-menu>
+          <button
+            type="button"
+            class="h-10 flex items-center gap-1.5 px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-amber-400 hover:bg-slate-800/60 transition-colors"
+            (click)="toggleAccount($event)"
+          >
+            {{ auth.isLoggedIn() ? (auth.user()?.displayName || 'Compte') : 'Compte' }}
+            <span class="text-[9px]">▾</span>
+          </button>
+          @if (accountOpen()) {
+            <div
+              class="absolute right-0 mt-2 w-48 rounded-xl border border-slate-700 bg-[#171b22] shadow-xl py-2 z-50"
+            >
+              @if (auth.isLoggedIn()) {
+                <a
+                  routerLink="/support"
+                  class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
+                  (click)="closeMenus()"
+                  >Support</a
+                >
+                @if (auth.isAdmin()) {
+                  <a
+                    routerLink="/admin"
+                    class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
+                    (click)="closeMenus()"
+                    >Admin</a
+                  >
+                }
+                <button
+                  type="button"
+                  class="w-full text-left px-4 py-2 text-xs text-red-400 hover:bg-slate-800"
+                  (click)="logout()"
+                >
+                  Déconnexion
+                </button>
+              } @else {
+                <a
+                  routerLink="/login"
+                  class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
+                  (click)="closeMenus()"
+                  >Connexion</a
+                >
+                <a
+                  routerLink="/register"
+                  class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
+                  (click)="closeMenus()"
+                  >Créer un compte</a
+                >
+              }
+            </div>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl border border-slate-700 text-slate-300 hover:text-amber-400 hover:border-amber-700/50 transition-colors"
+          [attr.aria-expanded]="mobileOpen()"
+          aria-label="Ouvrir le menu"
+          (click)="toggleMobile()"
+        >
+          @if (mobileOpen()) {
+            <span class="text-lg leading-none">✕</span>
+          } @else {
+            <span class="flex flex-col gap-1.5 w-4">
+              <span class="block h-0.5 w-full bg-current rounded-full"></span>
+              <span class="block h-0.5 w-full bg-current rounded-full"></span>
+              <span class="block h-0.5 w-full bg-current rounded-full"></span>
+            </span>
+          }
+        </button>
       </div>
     </div>
   </div>
+
+  <!-- Mobile panel -->
+  @if (mobileOpen()) {
+    <div
+      class="lg:hidden border-t border-slate-800 bg-[#171b22]/98 backdrop-blur-md max-h-[calc(100vh-4rem)] overflow-y-auto"
+    >
+      <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-1">
+        <a
+          routerLink="/create"
+          routerLinkActive="bg-amber-950/30 text-amber-400 border-amber-900/40"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+          (click)="closeMenus()"
+        >
+          <span class="text-xl"><iconify-icon icon="fluent-emoji:hammer-and-pick"></iconify-icon></span>
+          <span class="text-sm font-bold tracking-wide">Forger un héros</span>
+        </a>
+
+        <a
+          routerLink="/characters"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+          (click)="closeMenus()"
+        >
+          <span class="text-xl"><iconify-icon icon="fluent-emoji:busts-in-silhouette"></iconify-icon></span>
+          <span class="text-sm font-bold tracking-wide">Mes héros</span>
+        </a>
+
+        @if (auth.isLoggedIn()) {
+          <a
+            routerLink="/support"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+            (click)="closeMenus()"
+          >
+            <span class="text-xl"><iconify-icon icon="fluent-emoji:envelope"></iconify-icon></span>
+            <span class="text-sm font-bold tracking-wide">Support</span>
+          </a>
+          @if (auth.isAdmin()) {
+            <a
+              routerLink="/admin"
+              class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+              (click)="closeMenus()"
+            >
+              <span class="text-xl"><iconify-icon icon="fluent-emoji:shield"></iconify-icon></span>
+              <span class="text-sm font-bold tracking-wide">Admin</span>
+            </a>
+          }
+          <button
+            type="button"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-slate-800/70 text-left"
+            (click)="logout()"
+          >
+            <span class="text-sm font-bold tracking-wide">Déconnexion</span>
+          </button>
+        } @else {
+          <a
+            routerLink="/login"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+            (click)="closeMenus()"
+          >
+            <span class="text-sm font-bold tracking-wide">Connexion</span>
+          </a>
+          <a
+            routerLink="/register"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+            (click)="closeMenus()"
+          >
+            <span class="text-sm font-bold tracking-wide">Créer un compte</span>
+          </a>
+        }
+
+        <p
+          class="px-4 pt-4 pb-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500"
+        >
+          Codex
+        </p>
+
+        @for (link of codexLinks; track link.path) {
+          <a
+            [routerLink]="link.path"
+            routerLinkActive="bg-amber-950/30 text-amber-400 border-amber-900/40"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-300 hover:bg-slate-800/70 transition-colors"
+            (click)="closeMenus()"
+          >
+            <span class="text-xl w-7 text-center"
+              ><iconify-icon [icon]="link.icon"></iconify-icon
+            ></span>
+            <span class="text-sm font-medium tracking-wide">{{ link.label }}</span>
+          </a>
+        }
+      </div>
+    </div>
+  }
 </nav>

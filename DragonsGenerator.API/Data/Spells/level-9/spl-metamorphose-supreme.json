@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-metamorphose-supreme",
+  "name": "Métamorphose suprême",
+  "level": 9,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(une goutte de mercure"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "C Choisissez une créature ou un objet non magique que vous voyez à portée. La créature doit avoir au moins 1 point de vie. Vous transformez une créature en une autre créature, une créature en un objet non magique, ou un objet en une créature (dans ce cas, l'objet ne doit être ni porté ni transporté par une autre créature). La transformation persiste pour toute la durée du sort, ou jusqu'à ce que la cible tombe à 0 point de vie ou meure. Si vous vous concentrez sur ce sort pour toute sa durée, la transformation persiste jusqu'à ce qu'elle soit dissipée par magie. Ce sort n'a aucun effet sur les métamorphes et les créatures à 0 point de vie. Une créature non consentante peut effectuer un JS Sagesse. En cas de réussite, elle n'est pas affectée par le sort. ## Créature en créature La nouvelle forme peut être de n'importe quelle espèce d'un facteur de puissance inférieur ou égal à celui de la cible (ou à son niveau si elle n'a pas de FP). Le profil de la cible, y compris ses valeurs de caractéristique mentales, est remplacé par celui de la nouvelle forme. En revanche, elle conserve son alignement et sa personnalité. La cible a les points de vie de sa nouvelle forme, mais elle retrouve les points de vie qu'elle avait avant sa transformation lorsqu'elle recouvre sa forme normale. Dans le cas où elle tombe à 0 point de vie, les dégâts en excès sont reportés sur sa nouvelle forme. Tant que ces dégâts ne font pas eux aussi tomber les points de vie de la forme normale à 0, la créature reste consciente. La créature est limitée dans ses actions par la nature de sa nouvelle forme, et elle ne peut ni parler, ni lancer de sorts, ni entreprendre d'action nécessitant des mains ou le don de parole, à moins bien évidemment que la nouvelle forme en soit capable. L'équipement de la cible fusionne avec elle, mais elle ne peut pas l'activer, s'en servir ou en profiter d'une quelconque manière. ## Objet en créature Vous transformez un objet en n'importe quelle espèce de créature, tant que la taille de celle-ci ne dépasse pas celle de l'objet et que le FP de la créature est inférieur ou égal à 9. La créature se montre amicale avec vous et vos compagnons. Elle agit à chacun de vos tours de jeu, mais c'est à vous de décider ses actions et déplacements. Le meneur dispose du profil de la créature et résout ses actions et déplacements. Si le sort devient permanent, vous ne contrôlez plus la créature. Elle peut rester amicale avec vous, en fonction du sort que vous lui avez réservé. ## Créature en objet Tout ce qu'une créature transformée en objet porte et transporte fusionne avec elle. Le profil de la cible est remplacé par celui de l'objet. En outre, quand le sort prend fin et qu'elle recouvre son aspect normal, la créature n'a aucun souvenir du temps passé sous cette forme.",
+  "modular_options": []
+}

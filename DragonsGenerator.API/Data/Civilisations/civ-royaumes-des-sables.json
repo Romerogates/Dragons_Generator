@@ -1,0 +1,58 @@
+{
+  "schema_version": "2.0",
+  "id": "civ-royaumes-des-sables",
+  "name": "Royaumes des Sables",
+  "randomization": {
+    "dice": "d100",
+    "min": 90,
+    "max": 95
+  },
+  "demographics": {
+    "primary_species": [
+      {
+        "id": "sp-humain",
+        "label": "Humains"
+      }
+    ],
+    "secondary_species": [
+      {
+        "id": "sp-tous",
+        "label": "Tous les peuples (cités cosmopolites des côtes)"
+      }
+    ],
+    "is_cosmopolitan": true,
+    "cosmopolitan_zones": [
+      "cités côtières"
+    ],
+    "social_roles": [],
+    "peoples_note": "Humains principalement. Tous les peuples représentés dans les cités cosmopolites côtières."
+  },
+  "official_languages": [
+    {
+      "id": "lg-kalam",
+      "label": "Kalam"
+    }
+  ],
+  "multilingual": false,
+  "writing_systems": [
+    {
+      "id": "wr-abjad-kalam",
+      "label": "Abjad kalam",
+      "type": "abjad"
+    }
+  ],
+  "is_oral_only": false,
+  "description": "Les Royaumes des Sables sont multiples : des cités-États, des oasis de djinns, des nomades du désert, des royaumes puissants et rivaux… S'ils divergent par leur organisation politique, ils partagent beaucoup sur le plan culturel, en particulier une langue, une écriture, un système monétaire et des mythes. Dans ces contrées, l'injustice crue des villes côtoie le merveilleux d'un désert implacable, aussi riche de trésors que de monstres prêts à dévorer l'imprudent. L'aventure mêle caravanes, temples perdus, dragons bleus, esclaves, djinns, lamies, conquêtes, trahisons et amours impossibles.",
+  "geography_tags": [
+    "cites-etats",
+    "oasis",
+    "desert",
+    "temples-perdus"
+  ],
+  "threat_ids": [
+    "threat-djinns",
+    "threat-dragons-bleus",
+    "threat-lamies",
+    "threat-injustice"
+  ]
+}

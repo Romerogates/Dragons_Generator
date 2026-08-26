@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-telekinesie",
+  "name": "Télékinésie",
+  "level": 5,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Vous êtes capable de déplacer et de manipuler des créatures et objets par la simple force de l'esprit. Au moment de l'incantation, et au prix d'une action à chaque round pour toute la durée du sort, vous pouvez exercer votre pouvoir sur une créature ou un objet que vous voyez à portée (reportez-vous à l'effet correspondant ci-dessous). Vous pouvez affecter la même cible d'un round à l'autre ou en choisir une nouvelle, mais si vous en changez, la précédente n'est plus affectée par le sort. ## Créature Vous tentez de déplacer une créature de taille TG ou inférieure. Effectuez un test de caractéristique magique opposé à un test de Force de la cible. Si vous le remportez, vous déplacez la créature jusqu'à 9 m dans la direction de votre choix, y compris verticalement, sans pouvoir lui faire quitter la portée du sort cependant. Jusqu'à la fin de votre tour de jeu suivant, la créature est entravée par votre poigne télékinétique. Une créature déplacée verticalement est suspendue dans les airs. Aux rounds suivants, vous pouvez tenter de maintenir votre poigne télékinétique sur la créature en répétant le test opposé au prix d'une action. Vous tentez de déplacer un objet ne pesant pas plus de 500 kg. S'il n'est ni porté ni transporté, vous le déplacez automatiquement jusqu'à 9 m dans la direction de votre choix, sans pouvoir lui faire quitter la portée du sort cependant. Si l'objet est porté ou transporté par une créature, vous devez effectuer un test de caractéristique magique opposé à un test de Force de cette créature. Si vous le remportez, vous la privez de l'objet ciblé, que vous pouvez déplacer jusqu'à 9 m dans la direction de votre choix, sans pouvoir lui faire quitter la portée du sort cependant. Vous contrôlez les objets comme si vous les teniez en main. Vous pouvez donc manipuler un outil simple, ouvrir une porte ou un coffre, ranger un objet dans un coffre ou l'en sortir, verser le contenu d'une fiole, etc.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, chaque niveau d'emplacement au-dessus du 5e augmente le poids de l'objet transportable de 500 kg et la portée du sort de 9 m.",
+  "modular_options": []
+}

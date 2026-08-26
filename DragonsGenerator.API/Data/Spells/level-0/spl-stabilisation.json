@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-stabilisation",
+  "name": "Stabilisation",
+  "level": 0,
+  "school": "necromancie",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "Stabilisation logo Stabilisation icon Jous touchez une créature vivante qui a 0 point de vie. Elle est maintenant dans un état stable. Ce sort n'a aucun effet sur les créatures artificielles et les morts-vivants. La sphère ne pèse rien et ses dimensions suffisent tout juste pour contenir la cible. Une créature enfermée peut pousser contre les parois au prix d'une action afin de faire avancer la sphère à la moitié de sa vitesse de déplacement. La sphère peut également être déplacée par d'autres créatures. Un sort de désintégration qui cible la sphère la détruit sans nuire à ce qui s'y trouve. Stabilisation illustration Stabilisation icon Lorsque vous atteignez le niveau 11, vous pouvez lancer stabilisation au prix d'une action bonus. Stabilisation illustration",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, chaque niveau d'emplacement au-dessus du 4e augmente la portée de 3 m et la durée de 1 minute.",
+  "modular_options": []
+}

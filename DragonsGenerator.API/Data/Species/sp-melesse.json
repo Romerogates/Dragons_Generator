@@ -1,0 +1,198 @@
+{
+  "schema_version": "2.0",
+  "id": "sp-melesse",
+  "name": "Melessës",
+  "name_alt": [
+    "Demi-elfes"
+  ],
+  "playable": true,
+  "requires_subspecies": false,
+  "source": {
+    "book": "Dragons - Livre de base: Aventuriers",
+    "pages": "49-51"
+  },
+  "flavor": {
+    "summary": "Ayant des ancêtres elfes et humains, les melessës sont connus pour être souvent gracieux et très volontaires. Chaque melessë a un aspect unique qui exprime à sa manière le métissage. Leurs traits tendent à être fins, leurs oreilles assez pointues, leurs cheveux volontiers décrits comme soyeux.",
+    "culture": "À l'aise dans de nombreuses cultures, les melessës évoluent dans l'entre-deux des sociétés humaines et elfiques. Leur aisance en société leur permet de se voir confier des missions d'importance.",
+    "lore_notes": [
+      "Sur Eana, 'demi-elfe' est considéré comme péjoratif. Le terme 'melessë' (d'un mot elfique évoquant l'amour) est souvent préféré, car l'on dit que les demi-elfes naissent de la passion.",
+      "Les melessës vivent bien plus longtemps que les humains, nombre d'entre eux dépassant les 180 ans."
+    ]
+  },
+  "base_stats": {
+    "ability_score_increase": {
+      "cha": 2
+    },
+    "speed": {
+      "base_m": 9,
+      "not_reduced_by_heavy_armor": false
+    },
+    "size": "M",
+    "darkvision_m": 18,
+    "age": {
+      "maturity_years": 20,
+      "lifespan_years": 180,
+      "flavor": "Développement humain, adultes vers 20 ans, mais longévité atteignant 180 ans."
+    },
+    "alignment": {
+      "tendency": "Non-loyal",
+      "flavor": "Portés à se sentir entre deux mondes, ils préfèrent adapter leur attitude aux circonstances."
+    }
+  },
+  "traits": [
+    {
+      "id": "trait-vision-noir-melesse",
+      "name": "Vision dans le noir",
+      "flavor": {
+        "desc": "Grâce à votre sang elfique, vous êtes doté d'une vision supérieure dans les ténèbres et la pénombre. Dans un rayon de 18 m, vous voyez en lumière faible comme en lumière vive, et dans l'obscurité comme en lumière faible (nuances de gris)."
+      },
+      "mechanics": {
+        "type": "darkvision",
+        "range_m": 18
+      }
+    },
+    {
+      "id": "trait-heritage-feerique-melesse",
+      "name": "Héritage féerique",
+      "flavor": {
+        "desc": "Vous bénéficiez d'un avantage aux jets de sauvegarde contre l'état préjudiciable charmé et aucune magie ne peut vous endormir."
+      },
+      "mechanics": {
+        "type": "compound",
+        "advantages": [
+          {
+            "type": "saving_throw",
+            "target": "any",
+            "condition": "contre l'état condition-charme"
+          }
+        ],
+        "immunities": [
+          "condition-sommeil-magique"
+        ]
+      }
+    },
+    {
+      "id": "trait-polyvalence",
+      "name": "Polyvalence",
+      "flavor": {
+        "desc": "Vous gagnez la maîtrise de deux compétences de votre choix ainsi que la maîtrise d'un type d'outils au choix. Ces maîtrises reflètent votre historique atypique. Vous pouvez les choisir après avoir déterminé votre historique."
+      },
+      "mechanics": {
+        "type": "proficiency_bundle",
+        "resolved_by_choices": [
+          "choice-competences-polyvalence",
+          "choice-outil-polyvalence"
+        ]
+      }
+    }
+  ],
+  "creation_choices": [
+    {
+      "id": "choice-asi-flexible-melesse",
+      "name": "Augmentation de caractéristique flexible",
+      "flavor": {
+        "desc": "Choisissez deux caractéristiques autres que le Charisme. Chacune augmente de 1."
+      },
+      "type": "ability_score_increase",
+      "allow_choice": true,
+      "quantity": 2,
+      "value_per_pick": 1,
+      "pool": [
+        "str",
+        "dex",
+        "con",
+        "int",
+        "wis"
+      ],
+      "excluded_from_pool": [
+        "cha"
+      ]
+    },
+    {
+      "id": "choice-competences-polyvalence",
+      "name": "Compétences (Polyvalence)",
+      "flavor": {
+        "desc": "Choisissez deux compétences parmi toutes les compétences disponibles."
+      },
+      "type": "skill_proficiency",
+      "allow_choice": true,
+      "quantity": 2,
+      "pool": [
+        "any"
+      ]
+    },
+    {
+      "id": "choice-outil-polyvalence",
+      "name": "Outil (Polyvalence)",
+      "flavor": {
+        "desc": "Choisissez un outil parmi les catégories suivantes."
+      },
+      "type": "tool_proficiency",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        {
+          "id": "tl-instrument-de-musique",
+          "name": "Instrument de musique (un instrument au choix)",
+          "category": "instrument_de_musique"
+        },
+        {
+          "id": "tl-instruments-navigation",
+          "name": "Instruments de navigation",
+          "category": "navigation"
+        },
+        {
+          "id": "tl-outils-artisan",
+          "name": "Outils d'artisan (un type au choix)",
+          "category": "artisan"
+        },
+        {
+          "id": "tl-vehicules-terrestres",
+          "name": "Véhicules terrestres",
+          "category": "vehicule"
+        },
+        {
+          "id": "tl-vehicules-maritimes",
+          "name": "Véhicules maritimes",
+          "category": "vehicule"
+        },
+        {
+          "id": "tl-vehicules-aeriens",
+          "name": "Véhicules aériens",
+          "category": "vehicule"
+        }
+      ]
+    },
+    {
+      "id": "choice-langues-supp-melesse",
+      "name": "Langues supplémentaires",
+      "flavor": {
+        "desc": "Vous parlez, lisez et écrivez deux langues supplémentaires de votre choix."
+      },
+      "type": "language",
+      "allow_choice": true,
+      "quantity": 2,
+      "pool": [
+        "any"
+      ]
+    }
+  ],
+  "languages": {
+    "fixed": [
+      "lg-commun",
+      "lg-elfique"
+    ],
+    "choices": [
+      {
+        "id": "choice-langues-supp-melesse",
+        "allow_choice": true,
+        "quantity": 2,
+        "pool": [
+          "any"
+        ]
+      }
+    ]
+  },
+  "subspecies": [],
+  "optional_rules": []
+}

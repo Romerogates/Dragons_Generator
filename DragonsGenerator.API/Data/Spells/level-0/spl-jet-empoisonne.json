@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-jet-empoisonne",
+  "name": "Jet empoisonné",
+  "level": 0,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 3,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Une bouffée de gaz délétère jaillit de votre paume tendue vers une créature que vous voyez à portée. La créature doit réussir un JS Constitution sous peine de subir 1d12 dégâts de poison. Les dégâts de ce sort augmentent de 1d12 quand vous atteignez le niveau 5 (2d12), le niveau 11 (3d12) et le niveau 17 (4d12). Lame de feu Lenteur Évocation du 2e niveau Transmutation du 3e niveau Temps d'incantation : 1 action bonus Temps d'incantation : 1 action Portée : personnelle Portée : 36 m Composantes : V, G, M (une feuille de Composantes : V, G, M (une goutte de mélasse) sumac) Dur ... placement de sort au-dessus du 3e vous permet de cibler deux créatures supplémentaires. du 4e niveau ou supérieur, les dégâts aug mentent de 1d6 par tranche de deux niveaux d'emplacement au-dessus du 2e. 210 Anthony Martin Romero (Order #44468918)",
+  "modular_options": []
+}

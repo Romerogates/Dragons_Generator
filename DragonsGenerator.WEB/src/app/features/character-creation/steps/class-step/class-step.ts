@@ -6,6 +6,7 @@ import {
   inject,
   signal,
   computed,
+  effect,
   ChangeDetectionStrategy,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
@@ -16,6 +17,19 @@ import {
   ClassSelection,
 } from '../../../../core/services/character-builder.service';
 import type { CharacterClass } from '../../../../core/models/CharacterClasses/character-class';
+import { normalizeCharacterClasses } from '@core/utils/class-data.adapter';
+import { getClassIcon } from '@core/utils/class-icons';
+import { formatGameIds, labelForGameId } from '@core/utils/game-id-labels';
+import { metamagicLabel } from '@core/data/metamagic-labels.data';
+import {
+  resolveFeatureUses,
+  extractScalarResources,
+} from '@core/utils/feature-uses.util';
+import { annotateAuraDesc } from '@core/utils/aura-range.util';
+import {
+  extractProgressionChoices,
+  type ProgressionChoiceDef,
+} from '@core/utils/progression-choices.util';
 import type {
   Ability,
   FeatureInstance,
@@ -41,10 +55,25 @@ interface FeatureJson {
   level: number;
   desc: string;
   rechargeType?: 'unlimited' | 'short_rest' | 'long_rest' | 'special';
-  uses?: { formula: string };
+  recharge?: string;
+  uses?:
+    | number
+    | {
+        formula?: string;
+        base?: number;
+        source_column?: string;
+        null_means_unlimited?: boolean;
+        upgrades?: { at_level: number; value: number }[];
+      };
+  mechanics?: {
+    points_formula?: string;
+    uses_key?: string;
+    upgrades?: { at_level: number; uses?: number; value?: number }[];
+  };
+  resolves_to_choice_pool?: string;
 }
 
-type Phase = 'class' | 'subclass' | 'combat_style' | 'sub_choice';
+type Phase = 'class' | 'subclass' | 'combat_style' | 'sub_choice' | 'prog_choice';
 
 interface SubclassesConfig {
   name: string;
@@ -56,7 +85,7 @@ interface SubclassOption {
   id: string;
   name: string;
   desc: string;
-  features: FeatureJson[]; // ← remplace l'ancien inline type
+  features: FeatureJson[];
   sub_choices?: SubChoice[];
   [key: string]: unknown;
 }
@@ -76,6 +105,123 @@ interface CombatStyleOption {
   desc: string;
 }
 
+/** Niveau d'obtention du style de combat par classe (fallback si absent des features). */
+const COMBAT_STYLE_UNLOCK_LEVEL: Record<string, number> = {
+  'cls-guerrier': 1,
+  'cls-paladin': 2,
+  'cls-rodeur': 2,
+};
+
+/** Fallback noms/descriptions si features_details absents. */
+const COMBAT_STYLE_FALLBACK: Record<string, CombatStyleOption> = {
+  'style-archerie': {
+    id: 'style-archerie',
+    name: 'Archerie',
+    desc: "Bonus de +2 aux jets d'attaque avec des armes à distance.",
+  },
+  'feat-style-archerie': {
+    id: 'feat-style-archerie',
+    name: 'Archerie',
+    desc: "Bonus de +2 aux jets d'attaque avec des armes à distance.",
+  },
+  'style-armes-deux-mains': {
+    id: 'style-armes-deux-mains',
+    name: 'Armes à deux mains',
+    desc: "Relancez les 1 et 2 sur les dés de dégâts d'une arme à deux mains ou polyvalente.",
+  },
+  'style-armes-a-deux-mains': {
+    id: 'style-armes-a-deux-mains',
+    name: 'Armes à deux mains',
+    desc: "Relancez les 1 et 2 sur les dés de dégâts d'une arme à deux mains ou polyvalente.",
+  },
+  'feat-style-armes-deux-mains': {
+    id: 'feat-style-armes-deux-mains',
+    name: 'Armes à deux mains',
+    desc: "Relancez les 1 et 2 sur les dés de dégâts d'une arme à deux mains ou polyvalente.",
+  },
+  'style-combat-deux-armes': {
+    id: 'style-combat-deux-armes',
+    name: 'Combat à deux armes',
+    desc: 'Ajoutez votre modificateur de caractéristique aux dégâts de la seconde attaque.',
+  },
+  'feat-style-combat-deux-armes': {
+    id: 'feat-style-combat-deux-armes',
+    name: 'Combat à deux armes',
+    desc: 'Ajoutez votre modificateur de caractéristique aux dégâts de la seconde attaque.',
+  },
+  'style-defense': {
+    id: 'style-defense',
+    name: 'Défense',
+    desc: 'Bonus de +1 à la CA tant que vous portez une armure.',
+  },
+  'feat-style-defense': {
+    id: 'feat-style-defense',
+    name: 'Défense',
+    desc: 'Bonus de +1 à la CA tant que vous portez une armure.',
+  },
+  'style-duel': {
+    id: 'style-duel',
+    name: 'Duel',
+    desc: 'Bonus de +2 aux dégâts avec une arme de corps à corps tenue seule.',
+  },
+  'feat-style-duel': {
+    id: 'feat-style-duel',
+    name: 'Duel',
+    desc: 'Bonus de +2 aux dégâts avec une arme de corps à corps tenue seule.',
+  },
+  'style-protection': {
+    id: 'style-protection',
+    name: 'Protection',
+    desc: 'Imposez un désavantage à une attaque ciblant un allié à 1,50 m (bouclier requis).',
+  },
+  'feat-style-protection': {
+    id: 'feat-style-protection',
+    name: 'Protection',
+    desc: 'Imposez un désavantage à une attaque ciblant un allié à 1,50 m (bouclier requis).',
+  },
+  'style-archerie-rodeur': {
+    id: 'style-archerie-rodeur',
+    name: 'Archerie',
+    desc: "Bonus de +2 aux jets d'attaque avec des armes à distance.",
+  },
+  'style-combat-deux-armes-rodeur': {
+    id: 'style-combat-deux-armes-rodeur',
+    name: 'Combat à deux armes',
+    desc: 'Ajoutez votre modificateur de caractéristique aux dégâts de la seconde attaque.',
+  },
+  'style-defense-rodeur': {
+    id: 'style-defense-rodeur',
+    name: 'Défense',
+    desc: 'Bonus de +1 à la CA tant que vous portez une armure.',
+  },
+  'style-duel-rodeur': {
+    id: 'style-duel-rodeur',
+    name: 'Duel',
+    desc: 'Bonus de +2 aux dégâts avec une arme de corps à corps tenue seule.',
+  },
+};
+
+function isFightingStylePool(pool: { id?: string; name?: string; type?: string }): boolean {
+  const blob = `${pool.id ?? ''} ${pool.name ?? ''} ${pool.type ?? ''}`.toLowerCase();
+  return (
+    blob.includes('style-combat') ||
+    blob.includes('combat-style') ||
+    blob.includes('fighting_style') ||
+    blob.includes('style de combat')
+  );
+}
+
+function isConcreteCombatStyleId(id: string): boolean {
+  if (!id) return false;
+  if (id.includes('style-de-combat')) return false;
+  if (id.includes('style-de-combat-supplementaire')) return false;
+  return (
+    id.startsWith('style-') ||
+    id.startsWith('feat-style-') ||
+    /style-(archerie|defense|duel|protection|armes|combat)/.test(id)
+  );
+}
+
 // ============================================================================
 // CONSTANTES
 // ============================================================================
@@ -89,45 +235,18 @@ const CLASS_SPELLCASTING: Record<string, { kind: SpellcastingKind; ability: Abil
   'cls-lettre': null,
   'cls-magicien': { kind: 'wizard', ability: 'Intelligence' },
   'cls-moine': null,
-  'cls-paladin': null,
+  'cls-paladin': { kind: 'paladin', ability: 'Charisme' },
   'cls-pretre': { kind: 'cleric', ability: 'Sagesse' },
-  'cls-rodeur': null,
+  'cls-rodeur': { kind: 'ranger', ability: 'Sagesse' },
   'cls-roublard': null,
   'cls-sorcier': { kind: 'warlock', ability: 'Charisme' },
 };
 
-const COMBAT_STYLES: CombatStyleOption[] = [
-  {
-    id: 'style-archerie',
-    name: 'Archerie',
-    desc: "Bonus de +2 aux jets d'attaque avec des armes à distance.",
-  },
-  {
-    id: 'style-armes-deux-mains',
-    name: 'Armes à deux mains',
-    desc: "Relancez les 1 et 2 sur les dés de dégâts d'une arme à deux mains ou polyvalente.",
-  },
-  {
-    id: 'style-combat-deux-armes',
-    name: 'Combat à deux armes',
-    desc: 'Ajoutez votre modificateur de caractéristique aux dégâts de la seconde attaque.',
-  },
-  {
-    id: 'style-defense',
-    name: 'Défense',
-    desc: 'Bonus de +1 à la CA tant que vous portez une armure.',
-  },
-  {
-    id: 'style-duel',
-    name: 'Duel',
-    desc: 'Bonus de +2 aux dégâts avec une arme de corps à corps tenue seule.',
-  },
-  {
-    id: 'style-protection',
-    name: 'Protection',
-    desc: 'Imposez un désavantage à une attaque ciblant un allié à 1,50 m (bouclier requis).',
-  },
-];
+/** Niveau à partir duquel l'incantation de classe est active. */
+const SPELLCASTING_FROM_LEVEL: Record<string, number> = {
+  'cls-paladin': 2,
+  'cls-rodeur': 2,
+};
 
 // ============================================================================
 // COMPOSANT
@@ -140,10 +259,17 @@ const COMBAT_STYLES: CombatStyleOption[] = [
   templateUrl: './class-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  host: {
+    class: 'flex flex-1 flex-col min-h-0 w-full',
+  },
 })
 export class ClassStep implements OnInit {
   private dataService = inject(DataService);
   readonly builder = inject(CharacterBuilderService);
+
+  readonly cardWidthPx = 320;
+  readonly cardGapPx = 32;
+  readonly cardStridePx = 352;
 
   // === State de la classe ===
   readonly allClasses = signal<CharacterClass[]>([]);
@@ -152,15 +278,19 @@ export class ClassStep implements OnInit {
 
   readonly selectedClassId = signal<string | null>(null);
   readonly selectedSubclassId = signal<string | null>(null);
-  readonly selectedCombatStyleId = signal<string | null>(null);
-  readonly subChoiceAnswers = signal<Map<string, string>>(new Map());
+  /** Styles de combat choisis (1, ou 2 pour Champion niv.10+). */
+  readonly selectedCombatStyleIds = signal<string[]>([]);
+  /** Réponses aux sub_choices (plusieurs options possibles par pool). */
+  readonly subChoiceAnswers = signal<Map<string, string[]>>(new Map());
+  /** Réponses aux choix de progression (ennemi, terrain, métamagie, pacte, etc.). */
+  readonly progChoiceAnswers = signal<Map<string, string[]>>(new Map());
 
   // === State du Carrousel 3D ===
   readonly currentIndex = signal(0);
   readonly flippedCards = signal<Set<string>>(new Set());
   readonly transitioning = signal(false);
-
-  readonly combatStyles = COMBAT_STYLES;
+  /** Figé la phase pendant la confirmation pour éviter un flash de cartes. */
+  private readonly holdPhase = signal<Phase | null>(null);
 
   // === Computed ===
   readonly selectedClass = computed<CharacterClass | null>(() => {
@@ -171,12 +301,20 @@ export class ClassStep implements OnInit {
   readonly subclassesConfig = computed<SubclassesConfig | null>(() => {
     const cls = this.selectedClass();
     if (!cls?.data.subclasses) return null;
-    return cls.data.subclasses as unknown as SubclassesConfig;
+    const raw = cls.data.subclasses as unknown as SubclassesConfig & {
+      unlocked_at_level?: number;
+    };
+    return {
+      ...raw,
+      level_unlocked: raw.level_unlocked ?? raw.unlocked_at_level ?? 3,
+    };
   });
+
+  readonly targetLevel = computed(() => this.builder.targetLevel());
 
   readonly requiresSubclass = computed(() => {
     const config = this.subclassesConfig();
-    return config !== null && config.level_unlocked <= 1;
+    return config !== null && config.level_unlocked <= this.targetLevel();
   });
 
   readonly subclassOptions = computed<SubclassOption[]>(() => {
@@ -193,29 +331,136 @@ export class ClassStep implements OnInit {
   readonly activeSubChoices = computed<SubChoice[]>(() => {
     const sub = this.selectedSubclass();
     if (!sub?.sub_choices) return [];
-    return sub.sub_choices.filter((sc) => sc.level_required <= 1);
+    return sub.sub_choices.filter((sc) => sc.level_required <= this.targetLevel());
   });
 
   readonly nextUnresolvedSubChoice = computed<SubChoice | null>(() => {
     for (const sc of this.activeSubChoices()) {
-      if (!this.subChoiceAnswers().has(sc.id)) return sc;
+      const picked = this.subChoiceAnswers().get(sc.id) ?? [];
+      if (picked.length < (sc.count || 1)) return sc;
     }
     return null;
   });
 
-  readonly requiresCombatStyle = computed(() => this.selectedClassId() === 'cls-guerrier');
+  /** Choix de progression ≤20 (hors deferred expertise/ASI). */
+  readonly activeProgChoices = computed<ProgressionChoiceDef[]>(() => {
+    const cls = this.selectedClass();
+    if (!cls) return [];
+    const answers = this.progChoiceAnswers();
+    const prelim = extractProgressionChoices(cls, this.targetLevel());
+    let pactBoonId: string | null = null;
+    for (const c of prelim) {
+      if (c.type === 'pact_boon') {
+        const picks = answers.get(c.id) ?? [];
+        if (picks[0]) pactBoonId = picks[0];
+        break;
+      }
+    }
+    return extractProgressionChoices(cls, this.targetLevel(), undefined, { pactBoonId }).filter(
+      (c) => !c.deferred,
+    );
+  });
+
+  readonly nextUnresolvedProgChoice = computed<ProgressionChoiceDef | null>(() => {
+    for (const pc of this.activeProgChoices()) {
+      const picked = this.progChoiceAnswers().get(pc.id) ?? [];
+      if (picked.length < (pc.count || 1)) return pc;
+    }
+    return null;
+  });
+
+  /** Styles de combat tirés des choice_pools de la classe (guerrier / paladin / rôdeur). */
+  readonly availableCombatStyles = computed<CombatStyleOption[]>(() => {
+    const cls = this.selectedClass();
+    if (!cls) return [];
+    const data = cls.data as Record<string, unknown>;
+    const pools = (data['choice_pools'] as any[]) ?? [];
+    const pool = pools.find((p) => isFightingStylePool(p));
+    if (!pool?.pool?.length) return [];
+
+    const details = (cls.data.features_details ?? []) as FeatureJson[];
+    return (pool.pool as string[]).map((id) => {
+      const feat = details.find((f) => f.id === id);
+      const fallback = COMBAT_STYLE_FALLBACK[id];
+      const rawName = feat?.name ?? fallback?.name ?? id;
+      const name = rawName.replace(/^Style de combat\s*:\s*/i, '').trim();
+      return {
+        id,
+        name,
+        desc: feat?.desc || fallback?.desc || 'Style de combat martial.',
+      };
+    });
+  });
+
+  readonly combatStyleUnlockLevel = computed(() => {
+    const cls = this.selectedClass();
+    if (!cls) return 99;
+    if (COMBAT_STYLE_UNLOCK_LEVEL[cls.id]) return COMBAT_STYLE_UNLOCK_LEVEL[cls.id];
+    const details = (cls.data.features_details ?? []) as FeatureJson[];
+    const grant = details.find(
+      (f) =>
+        typeof f.resolves_to_choice_pool === 'string' &&
+        /style|combat|fighting/i.test(f.resolves_to_choice_pool),
+    );
+    return grant?.level ?? 99;
+  });
+
+  readonly requiresCombatStyle = computed(
+    () =>
+      this.availableCombatStyles().length > 0 &&
+      this.combatStyleUnlockLevel() <= this.targetLevel(),
+  );
+
+  /** Nombre de styles à choisir (2 si aptitude Champion « style supplémentaire » ≤ niveau). */
+  readonly combatStyleRequiredCount = computed(() => {
+    if (!this.requiresCombatStyle()) return 0;
+    let n = 1;
+    const lvl = this.targetLevel();
+    const sub = this.selectedSubclass();
+    const extraSub = sub?.features?.find(
+      (f: any) =>
+        f.id === 'feat-style-de-combat-supplementaire' ||
+        /combat-supplementaire|style.*supplementaire/i.test(String(f.id)),
+    );
+    if (extraSub && (extraSub.level ?? 10) <= lvl) n = 2;
+    const cls = this.selectedClass();
+    const extraCls = (cls?.data?.features_details ?? []).find(
+      (f: any) =>
+        f.id === 'feat-style-de-combat-supplementaire' ||
+        /combat-supplementaire|style.*supplementaire/i.test(String(f.id ?? '')),
+    ) as { unlocks_at_level?: number; level?: number } | undefined;
+    const extraLvl = Number(extraCls?.['unlocks_at_level'] ?? extraCls?.level ?? 10);
+    if (extraCls && extraLvl <= lvl) n = 2;
+    return n;
+  });
+
+  readonly combatStylesComplete = computed(
+    () => this.selectedCombatStyleIds().length >= this.combatStyleRequiredCount(),
+  );
 
   // --- GESTION DES PHASES ---
   readonly currentPhase = computed<Phase>(() => {
-    if (!this.selectedClassId()) return 'class';
-    if (this.requiresSubclass() && !this.selectedSubclassId()) return 'subclass';
-    if (this.requiresCombatStyle() && !this.selectedCombatStyleId()) return 'combat_style';
-    if (this.nextUnresolvedSubChoice()) return 'sub_choice';
+    const held = this.holdPhase();
+    if (held) return held;
 
-    // Si tout est fini, on affiche le dernier choix pour que ça ait l'air propre
+    if (!this.selectedClassId()) return 'class';
+    // Style de combat avant sous-classe (souvent niv.1–2 vs sous-classe niv.3+)
+    // sauf 2e style Champion qui arrive après sous-classe
+    if (this.requiresCombatStyle() && this.selectedCombatStyleIds().length === 0)
+      return 'combat_style';
+    if (this.requiresSubclass() && !this.selectedSubclassId()) return 'subclass';
+    if (
+      this.requiresCombatStyle() &&
+      this.selectedCombatStyleIds().length < this.combatStyleRequiredCount()
+    )
+      return 'combat_style';
+    if (this.nextUnresolvedSubChoice()) return 'sub_choice';
+    if (this.nextUnresolvedProgChoice()) return 'prog_choice';
+
+    if (this.activeProgChoices().length > 0) return 'prog_choice';
     if (this.activeSubChoices().length > 0) return 'sub_choice';
-    if (this.requiresCombatStyle()) return 'combat_style';
     if (this.requiresSubclass()) return 'subclass';
+    if (this.requiresCombatStyle()) return 'combat_style';
     return 'class';
   });
 
@@ -227,8 +472,20 @@ export class ClassStep implements OnInit {
         return this.subclassesConfig()?.name ?? 'Spécialisation';
       case 'combat_style':
         return 'Style de Combat';
-      case 'sub_choice':
-        return this.nextUnresolvedSubChoice()?.label ?? 'Faites votre choix';
+      case 'sub_choice': {
+        const choice = this.nextUnresolvedSubChoice();
+        if (!choice) return 'Faites votre choix';
+        const picked = this.subChoiceAnswers().get(choice.id)?.length ?? 0;
+        const need = choice.count || 1;
+        return need > 1 ? `${choice.label} (${picked}/${need})` : choice.label;
+      }
+      case 'prog_choice': {
+        const choice = this.nextUnresolvedProgChoice();
+        if (!choice) return 'Faites votre choix';
+        const picked = this.progChoiceAnswers().get(choice.id)?.length ?? 0;
+        const need = choice.count || 1;
+        return need > 1 ? `${choice.label} (${picked}/${need})` : choice.label;
+      }
     }
   });
 
@@ -239,9 +496,13 @@ export class ClassStep implements OnInit {
       case 'subclass':
         return `Affinez les pouvoirs de votre ${this.selectedClass()?.name}.`;
       case 'combat_style':
-        return 'Sélectionnez votre approche martiale de prédilection.';
+        return this.combatStyleRequiredCount() > 1
+          ? `Choisissez ${this.combatStyleRequiredCount()} styles (${this.selectedCombatStyleIds().length}/${this.combatStyleRequiredCount()}).`
+          : 'Sélectionnez votre approche martiale de prédilection.';
       case 'sub_choice':
         return 'Cette option personnalisera les aptitudes de votre sous-classe.';
+      case 'prog_choice':
+        return 'Choisissez les options de progression débloquées par votre classe.';
     }
   });
 
@@ -253,7 +514,7 @@ export class ClassStep implements OnInit {
           id: c.id,
           title: c.name,
           desc: this.getClassDescription(c),
-          stats: `Sauvegardes : ${c.data.proficiencies.saving_throws?.join(', ')}`,
+          stats: `Sauvegardes : ${c.data.proficiencies?.saving_throws?.join(', ') ?? '—'}`,
           badge: `Dés de vie : 1d${c.data.hit_die}`,
           icon: this.getIconForClass(c.id),
         }));
@@ -263,42 +524,78 @@ export class ClassStep implements OnInit {
           id: sub.id,
           title: sub.name,
           desc: sub.desc ?? '',
-          stats: `Niveau d'obtention : 1`,
+          stats: `Niveau d'obtention : ${this.subclassesConfig()?.level_unlocked ?? '—'}`,
           badge: 'Voie',
           icon: 'fluent-emoji:crystal-ball',
         }));
 
-      case 'combat_style':
-        return this.combatStyles.map((style) => ({
+      case 'combat_style': {
+        const picked = new Set(this.selectedCombatStyleIds());
+        return this.availableCombatStyles().map((style) => ({
           id: style.id,
           title: style.name,
           desc: style.desc,
-          badge: 'Style',
+          badge: picked.has(style.id) ? 'Sélectionné' : 'Style',
           icon: 'fluent-emoji:crossed-swords',
         }));
+      }
 
       case 'sub_choice': {
         const choice = this.nextUnresolvedSubChoice();
         if (!choice) return [];
+        const picked = new Set(this.subChoiceAnswers().get(choice.id) ?? []);
         return choice.options.map((opt) => ({
           id: opt,
           title: this.getSubChoiceLabel(choice.type, opt),
-          desc: 'Une option conférant des capacités uniques à votre personnage.',
-          badge: 'Option',
+          desc: this.getSubChoiceDescription(opt),
+          badge: picked.has(opt) ? 'Sélectionné' : 'Option',
           icon: 'fluent-emoji:sparkles',
         }));
+      }
+
+      case 'prog_choice': {
+        const choice = this.nextUnresolvedProgChoice();
+        if (!choice) return [];
+        const picked = new Set(this.progChoiceAnswers().get(choice.id) ?? []);
+        const takenElsewhere = this.idsTakenInOtherProgChoices(choice.id);
+        return choice.options
+          .filter((opt) => picked.has(opt.id) || !takenElsewhere.has(opt.id))
+          .map((opt) => ({
+            id: opt.id,
+            title: opt.name,
+            desc: opt.desc || this.getSubChoiceDescription(opt.id),
+            badge: picked.has(opt.id) ? 'Sélectionné' : 'Option',
+            icon: 'fluent-emoji:sparkles',
+          }));
       }
     }
   });
 
   readonly selectionComplete = computed(() => {
     if (!this.selectedClass()) return false;
+    if (this.requiresCombatStyle() && !this.combatStylesComplete()) return false;
     if (this.requiresSubclass() && !this.selectedSubclass()) return false;
-    if (this.requiresCombatStyle() && !this.selectedCombatStyleId()) return false;
     for (const sc of this.activeSubChoices()) {
-      if (!this.subChoiceAnswers().has(sc.id)) return false;
+      const picked = this.subChoiceAnswers().get(sc.id) ?? [];
+      if (picked.length < (sc.count || 1)) return false;
+    }
+    for (const pc of this.activeProgChoices()) {
+      const picked = this.progChoiceAnswers().get(pc.id) ?? [];
+      if (picked.length < (pc.count || 1)) return false;
     }
     return true;
+  });
+
+  /** Re-applique les aptitudes si le niveau change alors que la classe est déjà choisie. */
+  private lastAppliedLevel: number | null = null;
+  private readonly _resyncOnLevel = effect(() => {
+    const level = this.targetLevel();
+    const ready = this.selectionComplete();
+    const hasClass = !!this.builder.creation().classId;
+    if (!ready || !hasClass) return;
+    if (this.lastAppliedLevel === level) return;
+    this.lastAppliedLevel = level;
+    this.applySelectionToBuilder();
   });
 
   ngOnInit(): void {
@@ -307,6 +604,12 @@ export class ClassStep implements OnInit {
     if (current.classId) {
       this.selectedClassId.set(current.classId);
       if (current.subclassId) this.selectedSubclassId.set(current.subclassId);
+      const styleFeats = (current.classFeatures ?? []).filter((f) =>
+        isConcreteCombatStyleId(f.refId ?? ''),
+      );
+      if (styleFeats.length) {
+        this.selectedCombatStyleIds.set(styleFeats.map((f) => f.refId!).filter(Boolean));
+      }
     }
   }
 
@@ -315,7 +618,7 @@ export class ClassStep implements OnInit {
     const total = this.currentCards().length;
     if (total === 0) return '0px';
     const wraps = Math.floor((this.currentIndex() - index + total / 2) / total);
-    return `${wraps * total * 288}px`;
+    return `${wraps * total * this.cardStridePx}px`;
   }
 
   normalizedIndex(): number {
@@ -346,7 +649,7 @@ export class ClassStep implements OnInit {
     });
   }
 
-  // === LOGIQUE DE CLIC ULTRA-RAPIDE ===
+  // === LOGIQUE DE CLIC ===
   pickCard(cardId: string): void {
     const index = this.currentCards().findIndex((c) => c.id === cardId);
 
@@ -362,149 +665,340 @@ export class ClassStep implements OnInit {
 
     const phaseBeforeClick = this.currentPhase();
 
-    // Application instantanée des choix (plus de timeout pour la logique interne)
     switch (phaseBeforeClick) {
       case 'class':
         if (this.selectedClassId() !== cardId) {
           this.selectedSubclassId.set(null);
-          this.selectedCombatStyleId.set(null);
+          this.selectedCombatStyleIds.set([]);
           this.subChoiceAnswers.set(new Map());
+          this.progChoiceAnswers.set(new Map());
           this.builder.clearClass();
+          this.lastAppliedLevel = null;
         }
+        this.holdPhase.set(null);
         this.selectedClassId.set(cardId);
         break;
       case 'subclass':
         if (this.selectedSubclassId() !== cardId) {
           this.subChoiceAnswers.set(new Map());
         }
+        this.holdPhase.set(null);
         this.selectedSubclassId.set(cardId);
         break;
       case 'combat_style':
-        this.selectedCombatStyleId.set(cardId);
+        this.holdPhase.set(null);
+        this.selectedCombatStyleIds.update((ids) => {
+          const need = this.combatStyleRequiredCount();
+          const prev = [...ids];
+          const idx = prev.indexOf(cardId);
+          if (idx >= 0) {
+            prev.splice(idx, 1);
+            return prev;
+          }
+          if (need <= 1) return [cardId];
+          if (prev.length < need) return [...prev, cardId];
+          prev.shift();
+          prev.push(cardId);
+          return prev;
+        });
         break;
       case 'sub_choice': {
         const choice = this.nextUnresolvedSubChoice();
         if (choice) {
+          this.holdPhase.set(null);
           this.subChoiceAnswers.update((m) => {
             const newMap = new Map(m);
-            newMap.set(choice.id, cardId);
+            const need = choice.count || 1;
+            const prev = [...(newMap.get(choice.id) ?? [])];
+            const idx = prev.indexOf(cardId);
+            if (idx >= 0) {
+              prev.splice(idx, 1);
+            } else if (need <= 1) {
+              newMap.set(choice.id, [cardId]);
+              return newMap;
+            } else if (prev.length < need) {
+              prev.push(cardId);
+            } else {
+              prev.shift();
+              prev.push(cardId);
+            }
+            newMap.set(choice.id, prev);
             return newMap;
           });
         }
         break;
       }
+      case 'prog_choice': {
+        const choice = this.nextUnresolvedProgChoice();
+        if (choice) {
+          this.holdPhase.set(null);
+          this.progChoiceAnswers.update((m) => {
+            const newMap = new Map(m);
+            const need = choice.count || 1;
+            const prev = [...(newMap.get(choice.id) ?? [])];
+            const idx = prev.indexOf(cardId);
+            if (idx >= 0) {
+              prev.splice(idx, 1);
+            } else if (need <= 1) {
+              newMap.set(choice.id, [cardId]);
+              return this.trimInvalidProgPicks(newMap);
+            } else if (prev.length < need) {
+              prev.push(cardId);
+            } else {
+              prev.shift();
+              prev.push(cardId);
+            }
+            newMap.set(choice.id, prev);
+            return this.trimInvalidProgPicks(newMap);
+          });
+        }
+        break;
+      }
     }
 
     this.flippedCards.set(new Set());
 
-    // Si la sélection est terminée
     if (this.selectionComplete()) {
+      this.holdPhase.set(phaseBeforeClick);
       this.confirmSelection();
-    } else {
-      // On reset l'animation de slide *seulement* si on passe à une nouvelle phase
-      if (phaseBeforeClick !== this.currentPhase()) {
-        this.currentIndex.set(0);
-      }
+    } else if (phaseBeforeClick !== this.currentPhase()) {
+      this.currentIndex.set(0);
     }
   }
 
   clearSelection(): void {
+    this.holdPhase.set(null);
     this.selectedClassId.set(null);
     this.selectedSubclassId.set(null);
-    this.selectedCombatStyleId.set(null);
+    this.selectedCombatStyleIds.set([]);
     this.subChoiceAnswers.set(new Map());
+    this.progChoiceAnswers.set(new Map());
+    this.lastAppliedLevel = null;
     this.builder.clearClass();
     this.flippedCards.set(new Set());
     this.currentIndex.set(0);
   }
 
-  // === CONFIRMATION INSTANTANÉE ===
+  prevStep(): void {
+    this.builder.previousStep();
+  }
+
+  // === CONFIRMATION ===
   confirmSelection(): void {
-    const cls = this.selectedClass();
-    if (!cls || !this.selectionComplete()) return;
-
-    const sub = this.selectedSubclass();
-    const spellInfo = CLASS_SPELLCASTING[cls.id] ?? null;
-    const prof = cls.data.proficiencies;
-
-    const features: FeatureInstance[] = [];
-    const prog = cls.data.progression.find((p: any) => p.level === 1);
-
-    // --- Features de classe (niveau 1) ---
-    if (prog?.features) {
-      prog.features.forEach((id: string) => {
-        const feat = cls.data.features_details?.find((f: any) => f.id === id) as
-          | FeatureJson
-          | undefined;
-        if (feat) {
-          features.push({
-            refId: feat.id,
-            name: feat.name,
-            desc: feat.desc,
-            source: 'class',
-            sourceDetail: `${cls.name} 1`,
-            level: 1,
-            uses: this.buildFeatureUses(feat),
-          });
-        }
-      });
+    if (!this.applySelectionToBuilder()) {
+      this.holdPhase.set(null);
+      return;
     }
-
-    // --- Features de sous-classe (niveau 1) ---
-    if (sub) {
-      sub.features
-        .filter((f) => f.level <= 1)
-        .forEach((feat) => {
-          features.push({
-            refId: feat.id,
-            name: feat.name,
-            desc: feat.desc,
-            source: 'subclass',
-            sourceDetail: `${sub.name} 1`,
-            level: 1,
-            uses: this.buildFeatureUses(feat),
-          });
-        });
-    }
-
-    // --- Style de combat (inchangé, pas de uses) ---
-    const combatStyle = COMBAT_STYLES.find((s) => s.id === this.selectedCombatStyleId());
-    if (combatStyle) {
-      features.push({
-        refId: combatStyle.id,
-        name: `Style : ${combatStyle.name}`,
-        desc: combatStyle.desc,
-        source: 'class',
-        sourceDetail: `${cls.name} 1`,
-        level: 1,
-      });
-    }
-
-    // --- Le reste de la méthode est identique ---
-    const selection: ClassSelection = {
-      classId: cls.id,
-      className: cls.name,
-      subclassId: sub?.id,
-      subclassName: sub?.name,
-      hitDie: cls.data.hit_die,
-      hasSpellcasting: spellInfo !== null,
-      spellcastingKind: spellInfo?.kind ?? null,
-      spellcastingAbility: spellInfo?.ability ?? null,
-      savingThrows: (prof.saving_throws ?? []) as Ability[],
-      armorProficiencies: prof.armor ?? [],
-      weaponProficiencies: prof.weapons ?? [],
-      toolProficiencies: Array.isArray(prof.tools) ? prof.tools : [],
-      skillOptions: Array.isArray(prof.skills?.options) ? prof.skills.options : [],
-      skillChooseCount: prof.skills?.count ?? 0,
-      classFeatures: features,
-      startingEquipmentSlots: cls.data.starting_equipment ?? [],
-    };
-
-    this.builder.setClass(selection);
-
+    this.lastAppliedLevel = this.targetLevel();
     setTimeout(() => {
       this.builder.nextStep();
+      this.holdPhase.set(null);
     }, 150);
+  }
+
+  /** Construit et pousse la sélection de classe vers le builder (sans avancer d'étape). */
+  private applySelectionToBuilder(): boolean {
+    try {
+      const cls = this.selectedClass();
+      if (!cls || !this.selectionComplete()) return false;
+
+      const sub = this.selectedSubclass();
+      const spellInfo = this.resolveSpellcasting(cls);
+      const prof = cls.data.proficiencies;
+
+      const features: FeatureInstance[] = [];
+      const targetLevel = this.targetLevel();
+      const progression = (cls.data.progression ?? []) as {
+        level: number;
+        features?: string[];
+        resources?: Record<string, unknown>;
+      }[];
+      const profBonus = this.builder.proficiencyBonus();
+
+      for (const prog of progression) {
+        if (prog.level < 1 || prog.level > targetLevel) continue;
+        for (const id of prog.features ?? []) {
+          const feat = cls.data.features_details?.find((f: any) => f.id === id) as
+            | FeatureJson
+            | undefined;
+          if (!feat) continue;
+          // Remplacé par le style concret choisi
+          if (
+            feat.resolves_to_choice_pool ||
+            /style-de-combat(?!-supplementaire)/i.test(feat.id) ||
+            feat.id.includes('style-de-combat-guerrier') ||
+            feat.id.includes('style-de-combat-paladin') ||
+            feat.id.includes('style-de-combat-rodeur') ||
+            feat.id === 'feat-style-de-combat-guerrier'
+          ) {
+            continue;
+          }
+          if (features.some((f) => f.refId === feat.id)) continue;
+          features.push({
+            refId: feat.id,
+            name: feat.name,
+            desc: annotateAuraDesc(feat as any, targetLevel),
+            source: 'class',
+            sourceDetail: `${cls.name} ${prog.level}`,
+            level: prog.level,
+            uses: resolveFeatureUses(feat, cls, targetLevel, profBonus),
+          });
+        }
+      }
+
+      if (sub) {
+        sub.features
+          .filter((f) => f.level <= targetLevel)
+          .forEach((feat) => {
+            if (feat.resolves_to_choice_pool) return;
+            if (features.some((f) => f.refId === feat.id)) return;
+            features.push({
+              refId: feat.id,
+              name: feat.name,
+              desc: annotateAuraDesc(feat as any, targetLevel),
+              source: 'subclass',
+              sourceDetail: `${sub.name} ${feat.level}`,
+              level: feat.level,
+              uses: resolveFeatureUses(feat, cls, targetLevel, profBonus),
+            });
+          });
+
+        // Injecte les options de sub_choices sélectionnées (coups bas, école, etc.)
+        for (const sc of this.activeSubChoices()) {
+          const picks = this.subChoiceAnswers().get(sc.id) ?? [];
+          for (const pickId of picks) {
+            const fromSub = sub.features.find((f) => f.id === pickId);
+            const fromClass = (cls.data.features_details ?? []).find(
+              (f: any) => f.id === pickId,
+            ) as FeatureJson | undefined;
+            const feat = fromSub ?? fromClass;
+            if (!feat || features.some((f) => f.refId === feat.id)) continue;
+            features.push({
+              refId: feat.id,
+              name: feat.name,
+              desc: annotateAuraDesc(feat as any, targetLevel),
+              source: 'subclass',
+              sourceDetail: `${sub.name} · ${sc.label}`,
+              level: feat.level || sc.level_required,
+              uses: resolveFeatureUses(feat, cls, targetLevel, profBonus),
+            });
+          }
+        }
+      }
+
+      for (const styleId of this.selectedCombatStyleIds()) {
+        const combatStyle = this.availableCombatStyles().find((s) => s.id === styleId);
+        if (!combatStyle) continue;
+        features.push({
+          refId: combatStyle.id,
+          name: `Style : ${combatStyle.name}`,
+          desc: combatStyle.desc,
+          source: 'class',
+          sourceDetail: `${cls.name} ${this.combatStyleUnlockLevel()}`,
+          level: this.combatStyleUnlockLevel(),
+        });
+      }
+
+      const progAtLevel = progression.find((p) => p.level === targetLevel);
+      const classProgressionResources = extractScalarResources(progAtLevel?.resources);
+
+      const data = cls.data as Record<string, unknown>;
+      const selection: ClassSelection = {
+        classId: cls.id,
+        className: cls.name,
+        subclassId: sub?.id,
+        subclassName: sub?.name,
+        hitDie: cls.data.hit_die,
+        hpAtLevel1:
+          typeof data['hp_at_level_1'] === 'number' ? data['hp_at_level_1'] : cls.data.hit_die,
+        hpPerLevelAverage:
+          typeof data['hp_per_level_average'] === 'number'
+            ? data['hp_per_level_average']
+            : Math.floor(cls.data.hit_die / 2) + 1,
+        hasSpellcasting: spellInfo !== null,
+        spellcastingKind: spellInfo?.kind ?? null,
+        spellcastingAbility: spellInfo?.ability ?? null,
+        savingThrows: (prof.saving_throws ?? []) as Ability[],
+        armorProficiencies: prof.armor ?? [],
+        weaponProficiencies: prof.weapons ?? [],
+        toolProficiencies: Array.isArray(prof.tools) ? prof.tools : [],
+        skillOptions: Array.isArray(prof.skills?.options) ? prof.skills.options : [],
+        skillChooseCount: prof.skills?.count ?? 0,
+        classFeatures: features,
+        startingEquipmentSlots: cls.data.starting_equipment ?? [],
+        classProgressionResources,
+      };
+
+      this.builder.setClass(selection, { preserveProgress: !!this.builder.creation().classId });
+
+      const classChoiceAnswers: Record<string, string[]> = {};
+      const metamagic: string[] = [];
+      const invocations: string[] = [];
+      let pactBoon: string | null = null;
+      const extraFeatures: FeatureInstance[] = [];
+
+      for (const choice of this.activeProgChoices()) {
+        const picks = this.progChoiceAnswers().get(choice.id) ?? [];
+        classChoiceAnswers[choice.id] = picks;
+
+        if (choice.type === 'metamagic') metamagic.push(...picks);
+        if (choice.type === 'invocation') invocations.push(...picks);
+        if (choice.type === 'pact_boon' && picks[0]) pactBoon = picks[0];
+
+        for (const pickId of picks) {
+          if (extraFeatures.some((f) => f.refId === pickId)) continue;
+          const opt = choice.options.find((o) => o.id === pickId);
+          const feat = this.resolveOptionFeature(pickId);
+          extraFeatures.push({
+            refId: pickId,
+            name: feat?.name ?? opt?.name ?? pickId,
+            desc: feat?.desc ?? opt?.desc ?? '',
+            source: 'class',
+            sourceDetail: `${cls.name} · ${choice.label}`,
+            level: feat?.level ?? 1,
+            uses: feat ? resolveFeatureUses(feat, cls, targetLevel, profBonus) : undefined,
+          });
+        }
+
+        for (const fid of choice.fixedFeatureIds ?? []) {
+          if (extraFeatures.some((f) => f.refId === fid)) continue;
+          const feat = this.resolveOptionFeature(fid);
+          extraFeatures.push({
+            refId: fid,
+            name: feat?.name ?? fid,
+            desc: feat?.desc ?? '',
+            source: 'class',
+            sourceDetail: `${cls.name} · ${choice.label}`,
+            level: feat?.level ?? 1,
+            uses: feat ? resolveFeatureUses(feat, cls, targetLevel, profBonus) : undefined,
+          });
+        }
+      }
+
+      this.builder.setClassProgressionChoices({
+        classChoiceAnswers,
+        metamagicOptions: metamagic,
+        eldritchInvocations: invocations,
+        pactBoon,
+        extraFeatures,
+      });
+
+      return true;
+    } catch (err) {
+      console.error('[class-step] applySelectionToBuilder failed', err);
+      return false;
+    }
+  }
+
+  private resolveSpellcasting(
+    cls: CharacterClass,
+  ): { kind: SpellcastingKind; ability: Ability } | null {
+    const fromLevel = SPELLCASTING_FROM_LEVEL[cls.id] ?? 1;
+    if (this.targetLevel() < fromLevel) return null;
+    return (
+      CLASS_SPELLCASTING[cls.id] ??
+      ((cls.data as any).spellcasting ? this.inferSpellcasting(cls) : null)
+    );
   }
 
   // === HELPERS ===
@@ -512,7 +1006,7 @@ export class ClassStep implements OnInit {
     this.loading.set(true);
     this.dataService.getClasses().subscribe({
       next: (classes) => {
-        this.allClasses.set(classes);
+        this.allClasses.set(normalizeCharacterClasses(classes));
         this.loading.set(false);
       },
       error: () => {
@@ -523,90 +1017,160 @@ export class ClassStep implements OnInit {
   }
 
   getIconForClass(id: string): string {
-    const icons: Record<string, string> = {
-      'cls-barbare': 'fluent-emoji:axe',
-      'cls-barde': 'fluent-emoji:banjo',
-      'cls-druide': 'fluent-emoji:herb',
-      'cls-ensorceleur': 'fluent-emoji:sparkles',
-      'cls-guerrier': 'fluent-emoji:crossed-swords',
-      'cls-lettre': 'fluent-emoji:books',
-      'cls-magicien': 'fluent-emoji:open-book',
-      'cls-moine': 'fluent-emoji:martial-arts-uniform',
-      'cls-paladin': 'fluent-emoji:shield',
-      'cls-pretre': 'fluent-emoji:medical-symbol',
-      'cls-rodeur': 'fluent-emoji:bow-and-arrow',
-      'cls-roublard': 'fluent-emoji:dagger',
-      'cls-sorcier': 'fluent-emoji:eye',
-    };
-    return icons[id] || 'fluent-emoji:bust-in-silhouette';
+    return getClassIcon(id);
   }
 
   getClassDescription(cls: CharacterClass): string {
-    const spell = CLASS_SPELLCASTING[cls.id]
-      ? 'Maîtrise les arts arcaniques ou divins. '
-      : 'Spécialiste des aptitudes martiales ou physiques. ';
-    const weapons = cls.data.proficiencies.weapons?.length
-      ? `Manie : ${cls.data.proficiencies.weapons.length > 2 ? 'Diverses armes martiales et courantes' : cls.data.proficiencies.weapons.join(', ')}.`
+    const spell =
+      CLASS_SPELLCASTING[cls.id] || (cls.data as any).spellcasting
+        ? 'Maîtrise les arts arcaniques ou divins. '
+        : 'Spécialiste des aptitudes martiales ou physiques. ';
+    const weapons = cls.data.proficiencies?.weapons?.length
+      ? `Manie : ${
+          cls.data.proficiencies.weapons.length > 2
+            ? 'Diverses armes martiales et courantes'
+            : formatGameIds(cls.data.proficiencies.weapons)
+        }.`
       : '';
     return `${spell}${weapons}`;
   }
 
-  getSubChoiceLabel(choiceType: string, value: string): string {
-    return value.charAt(0).toUpperCase() + value.slice(1).replace(/-/g, ' ');
+  private inferSpellcasting(
+    cls: CharacterClass,
+  ): { kind: SpellcastingKind; ability: Ability } | null {
+    const abilityRaw = (cls.data as any).spellcasting?.ability as string | undefined;
+    const abilityMap: Record<string, Ability> = {
+      cha: 'Charisme',
+      wis: 'Sagesse',
+      int: 'Intelligence',
+    };
+    const ability = abilityRaw ? abilityMap[abilityRaw.toLowerCase()] : undefined;
+    const kind = CLASS_SPELLCASTING[cls.id]?.kind;
+    if (kind && ability) return { kind, ability };
+    return null;
   }
-  /**
-   * Convertit les champs rechargeType/uses du JSON en FeatureInstance.uses.
-   * Pour le niveau 1, on résout les formules simples.
-   * Les formules complexes (table:X, etc.) seront résolues plus tard.
-   */
-  private buildFeatureUses(feat: FeatureJson): FeatureInstance['uses'] | undefined {
-    // Pas de rechargeType ou unlimited sans uses → pas de bloc uses
-    if (!feat.rechargeType) return undefined;
-    if (feat.rechargeType === 'unlimited' && !feat.uses) return undefined;
 
-    const recharge = feat.rechargeType as 'unlimited' | 'short_rest' | 'long_rest';
-
-    // Si pas de uses défini mais rechargeType limité → on ne connaît pas le max
-    // (ex: Rage acharnée = short_rest sans compteur propre)
-    if (!feat.uses) {
-      return { max: 0, current: 0, recharge };
+  getSubChoiceLabel(choiceType: string, value: string): string {
+    if (value.startsWith('meta-')) return metamagicLabel(value);
+    const fromFeatures = this.resolveOptionFeature(value);
+    if (fromFeatures?.name) {
+      return fromFeatures.name.replace(/^Style de combat\s*:\s*/i, '').trim();
     }
+    if (/^(ennemi|enemy|terrain|dragon|skill)-/.test(value)) {
+      const labeled = labelForGameId(value);
+      if (labeled && labeled !== value) return labeled;
+    }
+    const labeled = labelForGameId(value);
+    if (labeled && labeled !== value) return labeled;
+    const pretty = value
+      .replace(/^feat-/, '')
+      .replace(/^style-/, '')
+      .replace(/-/g, ' ');
+    return pretty.charAt(0).toUpperCase() + pretty.slice(1);
+  }
 
-    const formula = feat.uses.formula;
-    let max = 0;
+  getSubChoiceDescription(value: string): string {
+    if (value.startsWith('meta-')) {
+      return `Option de métamagie : ${metamagicLabel(value)}.`;
+    }
+    return (
+      this.resolveOptionFeature(value)?.desc ||
+      'Une option conférant des capacités uniques à votre personnage.'
+    );
+  }
 
-    // Résolution des formules simples
-    if (/^\d+$/.test(formula)) {
-      // Nombre fixe : "1", "2", "3"
-      max = parseInt(formula, 10);
-    } else if (formula.startsWith('table:')) {
-      // table:Rages → lire dans progression[level].resources
-      const resourceKey = formula.replace('table:', '');
-      const cls = this.selectedClass();
-      if (cls) {
-        const prog = cls.data.progression?.find((p: any) => p.level === 1);
-        const val = prog?.resources?.[resourceKey];
-        if (val !== undefined) {
-          const parsed = parseInt(String(val), 10);
-          max = isNaN(parsed) ? 0 : parsed;
-        }
+  private resolveOptionFeature(id: string): FeatureJson | undefined {
+    const cls = this.selectedClass();
+    const fromClass = (cls?.data.features_details ?? []).find((f: any) => f.id === id) as
+      | FeatureJson
+      | undefined;
+    if (fromClass) return fromClass;
+    return this.selectedSubclass()?.features.find((f) => f.id === id);
+  }
+
+  /** IDs déjà choisis dans d'autres pools feature_selection (ex. astuces lettré). */
+  private idsTakenInOtherProgChoices(exceptChoiceId: string): Set<string> {
+    const taken = new Set<string>();
+    const featureChoiceIds = new Set(
+      this.activeProgChoices()
+        .filter((c) => c.type === 'feature_selection')
+        .map((c) => c.id),
+    );
+    if (!featureChoiceIds.has(exceptChoiceId)) return taken;
+    for (const [id, picks] of this.progChoiceAnswers()) {
+      if (id === exceptChoiceId || !featureChoiceIds.has(id)) continue;
+      for (const p of picks) taken.add(p);
+    }
+    return taken;
+  }
+
+  /** Après changement de pacte : retire les invocations / options devenues invalides. */
+  private trimInvalidProgPicks(answers: Map<string, string[]>): Map<string, string[]> {
+    const cls = this.selectedClass();
+    if (!cls) return answers;
+
+    let pactBoonId: string | null = null;
+    const prelim = extractProgressionChoices(cls, this.targetLevel());
+    for (const c of prelim) {
+      if (c.type === 'pact_boon') {
+        pactBoonId = answers.get(c.id)?.[0] ?? null;
+        break;
       }
-    } else if (formula === 'proficiency_bonus') {
-      max = 2; // Au niveau 1, toujours 2
-    } else if (formula === 'charisma_mod_min1' || formula === 'wisdom_mod_min1') {
-      // On ne connaît pas encore les caractéristiques à cette étape
-      // On stocke 0 et le PDF/la fiche recalculera
-      max = 0;
-    } else if (formula === '1+charisma_mod') {
-      max = 0; // Idem, sera recalculé
-    } else if (formula === 'monk_level' || formula === 'sorcerer_level') {
-      max = 1; // Niveau 1
-    } else if (formula === 'paladin_level*5') {
-      max = 5; // Niveau 1 × 5
     }
-    // Pour les formules spéciales (1_per_rage, shared:conduit_divin, etc.)
-    // on garde max = 0, elles seront interprétées côté affichage
 
-    return { max, current: max, recharge };
+    const choices = extractProgressionChoices(cls, this.targetLevel(), undefined, {
+      pactBoonId,
+    }).filter((c) => !c.deferred);
+    let changed = false;
+    const newMap = new Map(answers);
+
+    // Dédup global feature_selection (lettré astuces, etc.)
+    const seenFeatureIds = new Set<string>();
+    for (const c of choices) {
+      if (c.type !== 'feature_selection') continue;
+      const picks = [...(newMap.get(c.id) ?? [])];
+      const kept: string[] = [];
+      for (const p of picks) {
+        if (seenFeatureIds.has(p)) {
+          changed = true;
+          continue;
+        }
+        seenFeatureIds.add(p);
+        kept.push(p);
+      }
+      if (kept.length !== picks.length) newMap.set(c.id, kept);
+    }
+
+    for (const c of choices) {
+      const picks = newMap.get(c.id) ?? [];
+      if (picks.length === 0) continue;
+      const valid = new Set(c.options.map((o) => o.id));
+      let trimmed = picks.filter((id) => valid.has(id));
+      // Dédup inter-pools uniquement pour feature_selection (astuces lettré…)
+      if (c.type === 'feature_selection') {
+        const takenElsewhere = new Set<string>();
+        for (const other of choices) {
+          if (other.id === c.id || other.type !== 'feature_selection') continue;
+          for (const p of newMap.get(other.id) ?? []) takenElsewhere.add(p);
+        }
+        trimmed = trimmed.filter((id) => !takenElsewhere.has(id));
+      }
+      if (trimmed.length !== picks.length) {
+        newMap.set(c.id, trimmed);
+        changed = true;
+      }
+    }
+    return changed ? newMap : answers;
+  }
+
+  /**
+   * @deprecated Utiliser resolveFeatureUses (feature-uses.util) — conservé pour compat.
+   */
+  private buildFeatureUses(
+    feat: FeatureJson,
+    cls: CharacterClass,
+    level: number,
+  ): FeatureInstance['uses'] | undefined {
+    return resolveFeatureUses(feat, cls, level, this.builder.proficiencyBonus());
   }
 }

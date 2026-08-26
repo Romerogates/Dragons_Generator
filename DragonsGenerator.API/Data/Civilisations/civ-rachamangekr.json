@@ -1,0 +1,65 @@
+{
+  "schema_version": "2.0",
+  "id": "civ-rachamangekr",
+  "name": "Rachamangekr",
+  "randomization": {
+    "dice": "d100",
+    "min": 89,
+    "max": 89
+  },
+  "demographics": {
+    "primary_species": [
+      {
+        "id": "sp-drakeide",
+        "label": "Drakéides"
+      },
+      {
+        "id": "sp-humain",
+        "label": "Humains"
+      }
+    ],
+    "secondary_species": [
+      {
+        "id": "sp-tous",
+        "label": "Tous les peuples (grandes villes)"
+      }
+    ],
+    "is_cosmopolitan": true,
+    "cosmopolitan_zones": [
+      "grandes villes"
+    ],
+    "social_roles": [],
+    "peoples_note": "Drakéides et Humains principalement. Tous les peuples dans les grandes villes."
+  },
+  "official_languages": [
+    {
+      "id": "lg-karphud",
+      "label": "Karphûd"
+    }
+  ],
+  "multilingual": false,
+  "writing_systems": [
+    {
+      "id": "wr-elfique",
+      "label": "Elfique (adapté)",
+      "type": "alphabet"
+    },
+    {
+      "id": "wr-draconique",
+      "label": "Draconique",
+      "type": "ideogramme-syllabaire"
+    }
+  ],
+  "is_oral_only": false,
+  "description": "Rachamangekr est le plus grand et le plus puissant de tous les royaumes encore dirigés par une noblesse drakéide. On y prône la loi du dragon selon la plus pure tradition. Le pays est riche de ses ressources agricoles tropicales, d'une culture raffinée, de paysages splendides. Les aventuriers luttent contre les pirates barbaresques et s'efforcent d'endiguer la menace constante des dragons-tortues. Dans les jungles profondes, des ermites et des ensorceleurs de la lignée des dragons étudient les vestiges, tout particulièrement en quête de traces de la civilisation des Voyageurs.",
+  "geography_tags": [
+    "royaume",
+    "jungles-profondes",
+    "vestiges"
+  ],
+  "threat_ids": [
+    "threat-pirates-barbaresques",
+    "threat-dragons-tortues",
+    "threat-civilisation-des-voyageurs"
+  ]
+}

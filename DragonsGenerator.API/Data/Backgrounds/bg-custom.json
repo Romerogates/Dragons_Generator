@@ -1,0 +1,45 @@
+{
+  "schema_version": "2.0",
+  "id": "bg-custom",
+  "name": "Personnalisé",
+  "source": {
+    "book": "Dragons - Livre de base: Aventuriers",
+    "pages": "66-86"
+  },
+  "flavor": {
+    "summary": "Créez votre propre historique en suivant les six étapes de conception."
+  },
+  "proficiencies": {
+    "skills": {
+      "fixed": [],
+      "choose": {
+        "count": 2,
+        "options": "any"
+      }
+    },
+    "tools": {
+      "fixed": [],
+      "choose": {
+        "count": 2,
+        "options": [
+          "tool",
+          "instrument",
+          "game_set",
+          "vehicle",
+          "language"
+        ]
+      }
+    },
+    "languages": {
+      "fixed": [],
+      "choose_count": 0
+    }
+  },
+  "equipment": {
+    "fixed": [],
+    "choose": [],
+    "currency": {}
+  },
+  "privilege": null,
+  "personality_tables": null
+}

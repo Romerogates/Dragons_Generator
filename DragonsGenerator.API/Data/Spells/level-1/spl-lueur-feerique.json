@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-lueur-feerique",
+  "name": "Lueur féerique",
+  "level": 1,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide"
+  ],
+  "description": "Une lueur bleue, verte ou violette (à votre convenance) entoure tous les objets situés dans un cube de 6 m d'arête. Toute créature située dans la zone au moment de l'incantation est entourée elle aussi si elle rate un JS Dextérité. Pour toute la durée du sort, les créatures et les objets affectés dégagent une lumière faible sur un rayon de 3 m. Les jets d'attaque effectués contre une créature ou un objet ainsi affecté bénéficient d'un avantage, sous réserve que les attaquants le voient. Enfin, la créature ou l'objet affecté ne peut pas être invisible.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, l'arête du cube augmente (si vous le souhaitez) de 1,50 m par niveau d'emplacement au-dessus du 1ᵉʳ.",
+  "modular_options": []
+}

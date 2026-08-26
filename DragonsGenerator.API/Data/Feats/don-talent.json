@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "don-talent",
+  "name": "Talent",
+  "requires_magic": false,
+  "category": "exploration",
+  "prerequisites": [],
+  "description": "Vous recevez 4 points à dépenser parmi : (1 pt) maîtrise de compétence, maîtrise d'outils, 2 langues communes, maîtrise d'une catégorie d'armes précise ; (2 pts) maîtrise d'un JS, 1 langue exotique, +1 à une carac. (max 20), maîtrise d'armures (légères→intermédiaires→lourdes), expertise (doublement), +1 aux jets d'attaque (catégorie), 2 sorts mineurs d'une classe. Les points non dépensés sont perdus.",
+  "benefits": [
+    {
+      "type": "flexible_points",
+      "total": 4,
+      "options_1pt": [
+        "compétence",
+        "outil",
+        "2 langues communes",
+        "catégorie d'arme"
+      ],
+      "options_2pts": [
+        "JS",
+        "langue exotique",
+        "+1 carac",
+        "armures",
+        "expertise",
+        "attaque +1",
+        "2 sorts mineurs"
+      ]
+    }
+  ],
+  "repeatable": true,
+  "tags": [
+    "polyvalent",
+    "maîtrise",
+    "progression"
+  ]
+}

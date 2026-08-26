@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-voyage-par-les-arbres",
+  "name": "Voyage par les arbres",
+  "level": 5,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-rodeur"
+  ],
+  "description": "J Vous pouvez entrer dans un arbre et ressortir par un autre, de la même espèce, situé dans un rayon de 150 m. Les deux arbres doivent être vivants et au moins de la même taille que vous. Vous commencez par entrer dans un arbre au prix de 1,50 m de déplacement et savez aussitôt où se trouvent tous les autres arbres de la même espèce dans un rayon de 150 m. Dans le cadre du déplacement utilisé pour entrer dans le premier, vous pouvez passer dans un autre, ou juste ressortir par le même. Vous apparaissez dans un espace de votre choix dans un rayon de 1,50 m de l'arbre de destination, au prix de 1,50 m de plus. Si votre quota de déplacement est insuffisant, vous réapparaissez dans un rayon de 1,50 m de l'arbre par lequel vous êtes entré. Vous pouvez utiliser ce mode de transport une fois par round pour toute la durée du sort et devez terminer chacun de vos tours de jeu en dehors d'un arbre. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, vous pouvez entrer et sortir par n'importe quelle essence d'arbre et la durée augmente de 1 minute par niveau d'emplacement au-dessus du 5e.",
+  "modular_options": []
+}

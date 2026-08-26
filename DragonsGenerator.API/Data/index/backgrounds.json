@@ -1,0 +1,197 @@
+{
+  "schema_version": "2.0",
+  "description": "Index des historiques. Chaque entrée référence le fichier JSON de détail dans Backgrounds/.",
+  "source_book": "Dragons - Livre de base: Aventuriers",
+  "language": "fr",
+  "backgrounds": [
+    {
+      "id": "bg-acolyte",
+      "name": "Acolyte",
+      "file": "Backgrounds/bg-acolyte.json",
+      "schema_version": "2.0",
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "87-88"
+      },
+      "preset": true,
+      "skills_fixed": [
+        "skill-intuition",
+        "skill-religion"
+      ],
+      "skills_choose": null,
+      "has_personality_tables": true
+    },
+    {
+      "id": "bg-larron",
+      "name": "Larron",
+      "file": "Backgrounds/bg-larron.json",
+      "schema_version": "2.0",
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "97-98"
+      },
+      "preset": true,
+      "skills_fixed": [],
+      "skills_choose": {
+        "count": 2,
+        "options_count": 4
+      },
+      "has_personality_tables": true
+    },
+    {
+      "id": "bg-animiste",
+      "name": "Animiste",
+      "file": "Backgrounds/bg-animiste.json",
+      "schema_version": "2.0",
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "89-90"
+      },
+      "preset": true,
+      "skills_fixed": [],
+      "skills_choose": {
+        "count": 2,
+        "options_count": 4
+      },
+      "has_personality_tables": true
+    },
+    {
+      "id": "bg-bohemien",
+      "name": "Bohémien",
+      "file": "Backgrounds/bg-bohemien.json",
+      "schema_version": "2.0",
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "90-91"
+      },
+      "preset": true,
+      "skills_fixed": [],
+      "skills_choose": {
+        "count": 2,
+        "options_count": 4
+      },
+      "has_personality_tables": true
+    },
+    {
+      "id": "bg-condottiere",
+      "name": "Condottiere",
+      "file": "Backgrounds/bg-condottiere.json",
+      "schema_version": "2.0",
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "91-92"
+      },
+      "preset": true,
+      "skills_fixed": [],
+      "skills_choose": {
+        "count": 2,
+        "options_count": 3
+      },
+      "has_personality_tables": true
+    },
+    {
+      "id": "bg-erudit",
+      "name": "Érudit",
+      "file": "Backgrounds/bg-erudit.json",
+      "schema_version": "2.0",
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "93-94"
+      },
+      "preset": true,
+      "skills_fixed": [
+        "skill-histoire"
+      ],
+      "skills_choose": {
+        "count": 1,
+        "options_count": 3
+      },
+      "has_personality_tables": true
+    },
+    {
+      "id": "bg-explorateur",
+      "name": "Explorateur des terres sauvages",
+      "file": "Backgrounds/bg-explorateur.json",
+      "schema_version": "2.0",
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "95-96"
+      },
+      "preset": true,
+      "skills_fixed": [],
+      "skills_choose": {
+        "count": 2,
+        "options_count": 4
+      },
+      "has_personality_tables": true
+    },
+    {
+      "id": "bg-notable",
+      "name": "Notable",
+      "file": "Backgrounds/bg-notable.json",
+      "schema_version": "2.0",
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "99-100"
+      },
+      "preset": true,
+      "skills_fixed": [],
+      "skills_choose": {
+        "count": 2,
+        "options_count": 3
+      },
+      "has_personality_tables": true
+    },
+    {
+      "id": "bg-reclus",
+      "name": "Reclus",
+      "file": "Backgrounds/bg-reclus.json",
+      "schema_version": "2.0",
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "101-102"
+      },
+      "preset": true,
+      "skills_fixed": [],
+      "skills_choose": {
+        "count": 2,
+        "options_count": 5
+      },
+      "has_personality_tables": true
+    },
+    {
+      "id": "bg-survivant",
+      "name": "Survivant",
+      "file": "Backgrounds/bg-survivant.json",
+      "schema_version": "2.0",
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "102-103"
+      },
+      "preset": true,
+      "skills_fixed": [],
+      "skills_choose": {
+        "count": 2,
+        "options_count": 5
+      },
+      "has_personality_tables": true
+    },
+    {
+      "id": "bg-custom",
+      "name": "Personnalisé",
+      "file": "Backgrounds/bg-custom.json",
+      "schema_version": "2.0",
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "66-86"
+      },
+      "preset": false,
+      "skills_fixed": [],
+      "skills_choose": {
+        "count": 2,
+        "options_count": 3
+      },
+      "has_personality_tables": null
+    }
+  ]
+}

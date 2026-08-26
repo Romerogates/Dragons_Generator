@@ -1,0 +1,39 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-bourrasque",
+  "name": "Bourrasque",
+  "level": 2,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": {
+      "shape": "ligne",
+      "length_m": 18
+    }
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Une ligne de vent fort de 18 m de long et de 3 m de large jaillit de votre personne dans une direction que vous choisissez et persiste jusqu'à la fin du sort. Chaque créature qui commence son tour de jeu dans la ligne doit réussir un JS Force sous peine d'être repoussée de 4,50 m dans la direction de la ligne. Toute créature prise dans la ligne doit dépenser le double du déplacement qu'elle effectue quand elle se rapproche de vous. La bourrasque dissipe les gaz et vapeurs, et souffle les bougies, torches et autres flammes non protégées dans la zone. Les flammes protégées, comme celles des lanternes, vacillent violemment et ont 50 % de chance de s'éteindre. Tant que le sort persiste, vous pouvez à chacun de vos tours de jeu changer la direction dans laquelle la ligne jaillit de votre personne, au prix d'une action bonus.",
+  "modular_options": []
+}

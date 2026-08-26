@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "ski-religion",
+  "name": "Religion",
+  "ability": "INT",
+  "description": "Vos tests d'Intelligence (Religion) évaluent votre faculté à vous rappeler les divinités, les rites et les prières, les hiérarchies cléricales, les symboles religieux et les pratiques des sectes secrètes. Tout ce qui relève de la métaphysique est également accessible par cette compétence : cycle des âmes, motivations et modes d'action des fiélons, conditions d'apparition des morts-vivants…",
+  "examples": [
+    "Se rappeler les divinités, rites, prières et hiérarchies cléricales.",
+    "Identifier des symboles religieux ou des pratiques de sectes secrètes.",
+    "Connaître le cycle des âmes, les fiélons ou les conditions d'apparition des morts-vivants."
+  ],
+  "passive_check": false,
+  "source": "livre_de_base"
+}

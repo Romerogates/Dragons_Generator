@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-champ-d-antimagie",
+  "name": "Champ d'antimagie",
+  "level": 8,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une pincée de poudre de fer ou de limaille"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien",
+    "cls-pretre"
+  ],
+  "description": "Une sphère d'antimagie invisible de 3 m de rayon vous entoure. Cette zone fait fi des énergies magiques qui baignent l'univers. Aucun sort ne peut y être lancé, les créatures invoquées y disparaissent, et même les objets magiques y deviennent ordinaires. La sphère se déplace avec vous tant que le sort persiste, et vous en restez le centre. Exception faite de l'œuvre d'un artefact ou d'un dieu, les sorts et autres effets magiques sont réprimés dans la sphère et ne peuvent pas la pénétrer. Un emplacement utilisé pour lancer un sort réprimé est dépensé. Tant qu'il est réprimé, un effet ne fonctionne pas, mais le temps qu'il y passe est tout de même décompté de sa durée. Effets ciblés. Les sorts et effets magiques, comme projectile magique et charme-personne, qui ciblent une créature ou un objet dans la sphère n'ont aucun effet sur cette cible. Zones de magie. La zone d'un autre sort ou effet magique, comme boule de feu, ne peut pas pénétrer la sphère. Si celle-ci chevauche une zone de magie, la partie de la zone couverte par la sphère est réprimée. Par exemple, les flammes créées par un mur de feu sont réprimées dans la sphère, ce qui crée une brèche dans le mur si le chevauchement est assez important. Sorts. Tout sort ou effet magique affectant une créature ou un objet se situant dans la sphère est réprimé. Objets magiques. Les propriétés et pouvoirs des objets magiques sont réprimés dans la sphère. Par exemple, une épée longue +1 y fonctionnera comme une épée longue non magique. Les propriétés et pouvoirs d'une arme magique sont réprimés quand cette dernière est utilisée contre une cible située dans la sphère ou maniée par un attaquant situé dans la sphère. Si une arme ou munition magique quitte entièrement la sphère (par exemple, si vous tirez une flèche magique ou lancez une lance magique sur une cible située en dehors de la sphère), la magie de l'objet n'est plus réprimée au moment même où elle en sort. Déplacements magiques. La téléportation et les déplacements planaires ne fonctionnent pas dans la sphère, qu'elle soit le départ ou la destination du déplacement magique en question. Un portail ouvrant sur un autre lieu, monde ou plan d'existence, ainsi qu'une ouverture sur un espace extradimensionnel comme celui que peut créer le sort corde enchantée, se referment tant qu'ils sont dans la sphère. Créatures et objets. Les créatures et objets invoqués ou créés par magie s'évanouissent temporairement dans la sphère. Une telle créature réapparaît instantanément lorsque l'espace qu'elle occupait n'est plus dans la sphère. Dissipation de la magie. Les sorts et effets magiques comme dissipation de la magie n'ont aucun effet sur la sphère. De même, les sphères créées par plusieurs sorts de champ d'antimagie ne s'annulent pas entre elles.",
+  "modular_options": []
+}

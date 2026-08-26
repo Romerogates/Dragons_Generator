@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-communication-avec-les-animaux",
+  "name": "Communication avec les animaux",
+  "level": 1,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-rodeur"
+  ],
+  "description": "Ce sort vous permet de comprendre les bêtes et de communiquer avec elles verbalement. Les connaissances et la conscience de nombreuses bêtes sont limitées par leur intelligence, mais elles pourront au moins vous donner des informations sur des monstres et lieux des environs, notamment ce qu'ils sont en mesure de percevoir ou ont perçu au cours de la journée écoulée. À la discrétion du meneur, vous pourrez peut-être persuader une bête de vous rendre un petit service. ## Des échanges complexes L'intelligence animale Si votre meneur utilise cette option, les limites du sort dépendent du type d'animal auquel vous vous adressez. La plupart des amphibiens, arthropodes, mollusques, poissons et reptiles : vous pouvez seulement leur transmettre des messages simples correspondant à leur expérience quotidienne et à leurs besoins primaires, tels que « danger ! », « danger là-bas ? », « pas de danger », « nourriture là-bas », « nourriture là-bas ? », etc. Ces animaux sont généralement incapables de concevoir des notions abstraites telles que le passé ou le futur, de sorte que les réponses ne peuvent porter que sur le présent. Ils sont incapables de mentir. Oiseaux, mammifères, céphalopodes et toute bête dont l'Intelligence est au moins égale à 2 : ces animaux ont des capacités cognitives plus élaborées et proches de celles des espèces humanoïdes. Les plus intelligents sont capables de ruses élaborées : faire semblant d'être blessé ; dissimuler des informations (comme l'emplacement de nourriture) ; attirer délibérément un rival dans un lieu rendu dangereux par la présence d'un prédateur, etc. Ils peuvent comprendre des mécanismes rudimentaires et collaborer pour atteindre un but. Un animal social peut accepter d'aider gratuitement toute personne qu'il considère comme faisant partie de son groupe. Les animaux solitaires ne rendent de services que s'ils en bénéficient, typiquement en échange de nourriture - une partie donnée avant, et une après. Tromper et manipuler l'animal L'éthique des druides et des rôdeurs est stricte : leurs pouvoirs proviennent d'Eana et expriment un aspect de l'équilibre du monde naturel. Si vous utilisez ce sort pour nuire à votre interlocuteur animal, par exemple en l'incitant délibérément à chercher de la nourriture dans un lieu piégé, l'harmonique du sort devient corrompue.",
+  "modular_options": []
+}

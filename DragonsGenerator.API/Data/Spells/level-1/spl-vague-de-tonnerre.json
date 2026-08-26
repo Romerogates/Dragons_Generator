@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-vague-de-tonnerre",
+  "name": "Vague de tonnerre",
+  "level": 1,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Vous produisez une vague de force particulièrement bruyante. Toute créature prise dans un cube de 4,50 m dont vous êtes l'origine doit effectuer un JS Constitution. En cas d'échec, la cible subit 2d8 dégâts de tonnerre et vous la repoussez de 3 m. En cas de réussite, les dégâts sont réduits de moitié et elle n'est pas repoussée. Par ailleurs, vous repoussez automatiquement de 3 m les objets non fixés qui sont entièrement pris dans la zone d'effet, et le sort produit un coup de tonnerre audible dans un rayon de 90 m.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, les dégâts augmentent de 1d8 par niveau d'emplacement au-dessus du 1ᵉʳ.",
+  "modular_options": []
+}

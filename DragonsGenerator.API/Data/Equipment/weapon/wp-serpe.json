@@ -1,0 +1,20 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-serpe",
+  "name": "Serpe",
+  "category": "weapon",
+  "subcategory": "simple_melee",
+  "cost": {
+    "value": 1,
+    "unit": "po"
+  },
+  "weight_kg": 1,
+  "damage_dice": "1d4",
+  "damage_type": "tranchant",
+  "properties": [
+    "prop-legere"
+  ],
+  "throw_range": null,
+  "ammo_range": null,
+  "description": null
+}

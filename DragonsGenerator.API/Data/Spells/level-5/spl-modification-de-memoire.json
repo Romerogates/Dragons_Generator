@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-modification-de-memoire",
+  "name": "Modification de mémoire",
+  "level": 5,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien"
+  ],
+  "description": "Vous tentez de modifier les souvenirs d'une autre créature que vous voyez, qui doit effectuer un JS Sagesse. Si vous la combattez, elle bénéficie d'un avantage au jet de sauvegarde. En cas d'échec, elle est charmée par vos soins pendant toute la durée du sort. La cible charmée est neutralisée et inconsciente de son environnement, mais elle vous entend. Si elle subit des dégâts ou est la cible d'un autre sort, cet enchantement prend fin et aucun de ses souvenirs n'est modifié. Tant que ce charme persiste, vous pouvez modifier les souvenirs que la cible a d'un événement s'étant déroulé au cours des 24 dernières heures et s'étant étalé sur un maximum de 10 minutes. Vous pouvez les éliminer à jamais, lui permettre de s'en rappeler très précisément, modifier certains détails, ou créer un souvenir d'un événement tout autre. Vous devez parler à la cible pour lui décrire en quoi ses souvenirs sont modifiés, et elle doit être à même de comprendre votre langue pour qu'ils s'installent durablement. Son esprit se charge ensuite de combler les trous de votre description. Si le sort prend fin avant que vous ayez fini de détailler les souvenirs modifiés, la mémoire de la créature n'est pas altérée. Sans cela, les souvenirs modifiés se figent à la fin du sort. Une mémoire modifiée ne change pas forcément le comportement d'une créature, notamment si ces souvenirs sont en contradiction avec ses penchants naturels, son alignement ou ses croyances. Un souvenir dont l'altération paraît illogique, comme un bain d'acide qu'elle aurait particulièrement apprécié, est révoqué et passe pour un mauvais rêve, par exemple. Au meneur de décider si un souvenir modifié est trop absurde pour affecter sérieusement une créature. Le sort délivrance des malédictions ou restauration suprême lancé sur la cible lui permet de retrouver la mémoire.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, vous pouvez modifier les souvenirs que la cible a d'un événement remontant à 7 jours (6e niveau), 30 jours (7e niveau), 1 an (8e niveau), ou aussi longtemps que vous le souhaitez (9e niveau).",
+  "modular_options": []
+}

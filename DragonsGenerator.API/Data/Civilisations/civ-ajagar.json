@@ -1,0 +1,63 @@
+{
+  "schema_version": "2.0",
+  "id": "civ-ajagar",
+  "name": "Ajagar",
+  "randomization": {
+    "dice": "d100",
+    "min": 3,
+    "max": 7
+  },
+  "demographics": {
+    "primary_species": [
+      {
+        "id": "sp-humain",
+        "label": "Humains"
+      },
+      {
+        "id": "sp-aldaron",
+        "label": "Aldarons (jungles)"
+      }
+    ],
+    "secondary_species": [
+      {
+        "id": "sp-tous",
+        "label": "Tous les peuples (grandes villes côtières)"
+      }
+    ],
+    "is_cosmopolitan": true,
+    "cosmopolitan_zones": [
+      "grandes villes côtières"
+    ],
+    "social_roles": [],
+    "peoples_note": "Humains, Aldarons (dans les jungles). Tous les peuples dans les grandes villes côtières."
+  },
+  "official_languages": [
+    {
+      "id": "lg-baashan",
+      "label": "Baashan"
+    }
+  ],
+  "multilingual": false,
+  "writing_systems": [
+    {
+      "id": "wr-elfique",
+      "label": "Elfique",
+      "type": "alphabet"
+    }
+  ],
+  "is_oral_only": false,
+  "description": "De riches cités dirigées par des rajahs prospèrent grâce au commerce des ressources précieuses de l'Ajagar : épices, bois rares, joyaux, ivoire… Au sein de cette culture, de nombreux seigneurs rivalisent pour dominer leurs voisins, lançant des troupes d'éléphants de guerre ou des assassins armés de katars empoisonnés. Dans les jungles luxuriantes reposent les ruines de royaumes autrefois superbes et orgueilleux, désormais abandonnés aux tigres et aux boas. Plus haut, près des neiges éternelles des sommets impassibles, des sages s'adonnent à la méditation et cherchent à mieux connaître le monde.",
+  "geography_tags": [
+    "jungles-luxuriantes",
+    "villes-cotieres",
+    "ruines",
+    "neiges-eternelles",
+    "sommets"
+  ],
+  "threat_ids": [
+    "threat-rajahs-rivaux",
+    "threat-assassins",
+    "threat-tigres",
+    "threat-boas"
+  ]
+}

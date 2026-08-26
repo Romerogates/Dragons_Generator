@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "id": "vhc-coche",
+  "name": "Coche",
+  "category": "vehicle",
+  "subcategory": "land",
+  "cost": {
+    "value": 100,
+    "unit": "po"
+  },
+  "weight_kg": 300,
+  "speed": null,
+  "capacity_kg": null,
+  "description": "Voiture attelée couverte. Poids : 300 kg."
+}

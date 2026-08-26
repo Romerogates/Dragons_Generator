@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-metal-brulant",
+  "name": "Métal brûlant",
+  "level": 2,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un morceau de fer et une flamme"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide"
+  ],
+  "description": "Logo, icon, and stamp Icon, photograph, and other Choisissez un objet en métal manufacturé, comme une arme ou une armure lourde ou intermédiaire, que vous voyez à portée. L'objet est chauffé au rouge. Toute créature en contact physique avec lui subit 2d8 dégâts de feu au moment de l'incantation. Tant que le sort persiste, vous pouvez de nouveau infliger ces dégâts à chacun de vos tours de jeu suivants au prix d'une action bonus. Si une créature tient ou porte l'objet et en subit les dégâts, elle doit réussir un JS Constitution sous peine de le lâcher si elle le peut. Si elle ne le lâche pas, elle subit un désavantage aux jets d'attaque et tests de caractéristique jusqu'au début de votre tour de jeu suivant.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, les dégâts augmentent de 1d8 par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

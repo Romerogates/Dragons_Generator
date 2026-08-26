@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "it-sacoche-a-composantes",
+  "name": "Sacoche à composantes",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 25,
+    "unit": "po"
+  },
+  "weight_kg": 1,
+  "description": "Petite sacoche de cuir étanche contenant toutes les composantes matérielles nécessaires pour lancer vos sorts, à l'exception des composantes qui ont un coût spécifique."
+}

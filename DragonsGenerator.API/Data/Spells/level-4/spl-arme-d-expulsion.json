@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-arme-d-expulsion",
+  "name": "Arme d'expulsion",
+  "level": 4,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action_bonus"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-paladin"
+  ],
+  "description": "Jotre arme de corps à corps s'imprègne de l'interdit de votre divinité. Chaque fois que vous touchez une cible avec cette arme avant la fin du sort, vous lui infligez des dégâts de force supplémentaires égaux au double de votre modificateur de caractéristique magique et l'obligez à réussir un JS Force sous peine d'être éloignée de 3 m de vous et de se retrouver à terre. Engineering drawing",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, les dégâts supplémentaires sont égaux au triple de votre modificateur de caractéristique magique.",
+  "modular_options": []
+}

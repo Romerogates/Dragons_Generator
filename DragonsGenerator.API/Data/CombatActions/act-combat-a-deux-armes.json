@@ -1,0 +1,16 @@
+{
+  "schema_version": "2.0",
+  "id": "act-combat-a-deux-armes",
+  "name": "Combat à deux armes",
+  "action_cost": "bonus_action",
+  "category": "bonus",
+  "description": "Lorsque vous entreprenez l'action Attaquer avec une arme légère de corps à corps à une main, attaque bonus avec une autre arme légère de corps à corps dans l'autre main.",
+  "mechanics": {
+    "prerequisite": "Action Attaquer avec arme légère de corps à corps à une main",
+    "cost": "action bonus",
+    "second_weapon": "Arme légère de corps à corps en main secondaire",
+    "damage": "Modificateur de caractéristique non appliqué aux dégâts (sauf s'il est négatif)",
+    "thrown": "Si l'arme a la propriété lancer, peut être projetée au lieu d'une attaque de corps à corps"
+  },
+  "source": "livre_de_base"
+}

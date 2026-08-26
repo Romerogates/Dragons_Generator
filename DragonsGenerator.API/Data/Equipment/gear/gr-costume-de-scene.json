@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-costume-de-scene",
+  "name": "Costume de scène",
+  "category": "gear",
+  "subcategory": "clothing",
+  "cost": {
+    "value": 5,
+    "unit": "po"
+  },
+  "weight_kg": 2,
+  "description": "Tenue bariolée et voyante destinée aux représentations artistiques."
+}

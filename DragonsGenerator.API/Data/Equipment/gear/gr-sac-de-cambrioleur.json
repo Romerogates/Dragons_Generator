@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-sac-de-cambrioleur",
+  "name": "Sac de cambrioleur",
+  "category": "gear",
+  "subcategory": "container",
+  "cost": {
+    "value": 20,
+    "unit": "po"
+  },
+  "weight_kg": 30,
+  "description": "Un sac à dos, un sac de 1 000 billes, 3 m de ficelle, une cloche, 5 bougies, un pied-de-biche, un marteau, 10 pitons, une lanterne à capote, 2 flasques d'huile, 5 jours de rations, un nécessaire à feu, une outre. Une corde en chanvre de 15 m est attachée au flanc du sac."
+}

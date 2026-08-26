@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-baguette-dif",
+  "name": "Baguette d'if",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": null,
+    "unit": "po",
+    "note": "Objet artisanal, prix variable"
+  },
+  "weight_kg": 0.5,
+  "description": "Focaliseur druidique. Les objets sacrés sont hors du commerce et s'obtiennent par donation ou service."
+}

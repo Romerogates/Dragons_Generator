@@ -1,0 +1,20 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-draconique",
+  "name": "Draconique",
+  "category": "exotique",
+  "typical_speakers": [
+    "Dragons",
+    "Drakéides"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-draconique",
+      "label": "Draconique",
+      "type": "ideogramme-syllabaire"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [],
+  "description": "Langue aux sonorités rugueuses évoquant cris et grognements. Deux formes : celle des dragons (dont les mots graves résonnent en infrasons sur des kilomètres) et celle des humanoïdes. À l'écrit, elles se confondent. Seule langue restant parfaitement intelligible, qu'on la murmure ou qu'on la hurle."
+}

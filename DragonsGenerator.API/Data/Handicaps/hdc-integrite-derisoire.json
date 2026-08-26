@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "hdc-integrite-derisoire",
+  "name": "Intégrité dérisoire",
+  "source": "module:noirceur",
+  "description": "Vous subissez un désavantage aux jets de sauvegarde visant à résister à la corruption, à l'horreur et à la folie.",
+  "mechanics": {
+    "disadvantage_on_saves": [
+      "corruption",
+      "horreur",
+      "folie"
+    ]
+  }
+}

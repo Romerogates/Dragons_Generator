@@ -1,0 +1,199 @@
+{
+  "schema_version": "2.0",
+  "id": "bg-animiste",
+  "name": "Animiste",
+  "source": {
+    "book": "Dragons - Livre de base: Aventuriers",
+    "pages": "89-90"
+  },
+  "flavor": {
+    "summary": "Tout le monde ne vous croit pas, mais pour vous cela ne fait aucun doute : vous savez communiquer avec les esprits. Les esprits animaux, l'esprit de chaque objet, l'esprit de la tempête et de la rivière, peut-être aussi l'esprit des morts."
+  },
+  "proficiencies": {
+    "skills": {
+      "fixed": [],
+      "choose": {
+        "count": 2,
+        "options": [
+          "skill-intuition",
+          "skill-perception",
+          "skill-persuasion",
+          "skill-religion"
+        ]
+      }
+    },
+    "tools": {
+      "fixed": [],
+      "choose": {
+        "count": 1,
+        "options": [
+          {
+            "type": "tool",
+            "id": "tl-necessaire-dherboristerie",
+            "name": "tl-necessaire-dherboristerie"
+          },
+          {
+            "type": "tool",
+            "id": "tl-necessaire-dalchimiste",
+            "name": "tl-necessaire-dalchimiste"
+          }
+        ]
+      }
+    },
+    "languages": {
+      "fixed": [],
+      "choose_count": 1
+    }
+  },
+  "equipment": {
+    "fixed": [
+      {
+        "id": "gr-vetements-de-voyage",
+        "name": "Vêtements de voyage",
+        "qty": 1,
+        "location": "equipped"
+      },
+      {
+        "id": "gr-grigris-ornementaux",
+        "name": "Divers grigris ornementaux",
+        "qty": 1,
+        "location": "equipped"
+      }
+    ],
+    "choose": [],
+    "currency": {
+      "or": 15
+    }
+  },
+  "privilege": {
+    "id": "priv-attrait-esoterisme",
+    "name": "L'attrait de l'ésotérisme",
+    "desc": "Quelle que soit la communauté, vous trouvez toujours des personnes prêtes à vous écouter et à s'intéresser à vos expériences spirituelles. Vous pouvez compter sur l'accueil et l'assistance d'une partie de la population, tant que vous leur apportez ce qu'elle attend de vous."
+  },
+  "personality_tables": {
+    "traits": {
+      "die": "1d8",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "J’écarquille souvent les yeux, mais c’est pour mieux voir les esprits qui rôdent autour de chacun."
+        },
+        {
+          "roll": 2,
+          "text": "Mes éclats de rire tonitruants font parfois sursauter les gens, y compris ceux qui me connaissent bien."
+        },
+        {
+          "roll": 3,
+          "text": "Parfois, je m’emporte à l’évocation d’entités ou de concepts, avant de me rendre compte que je suis le seul à pouvoir saisir la portée de ces vérités."
+        },
+        {
+          "roll": 4,
+          "text": "Une métaphore vaut mieux qu’un long discours et toutes les phrases ne méritent pas d’être terminées."
+        },
+        {
+          "roll": 5,
+          "text": "Les gens me croient bourré de tics et de manies, alors que je ne fais que communiquer avec l’au-delà et exorciser les démons."
+        },
+        {
+          "roll": 6,
+          "text": "Quand les autres cèdent à la panique et que l’adversité est la plus forte, j’éprouve une grande sérénité."
+        },
+        {
+          "roll": 7,
+          "text": "Mes habitudes alimentaires ou hygiéniques étonnent, voire révulsent la plupart des gens."
+        },
+        {
+          "roll": 8,
+          "text": "Cet être parle de lui à la troisième personne, comme il le fait pour tout le monde, du reste."
+        }
+      ]
+    },
+    "ideals": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Emprise. Les esprits me permettent d’influencer autrui et de dominer les faibles. (mauvais)"
+        },
+        {
+          "roll": 2,
+          "text": "Protection. Chaque chose a une âme, mais certaines sont malintentionnées et je dois en prémunir les innocents. (bon)"
+        },
+        {
+          "roll": 3,
+          "text": "Harmonie. L’équilibre et la hiérarchie des âmes et des esprits doivent être rétablis pour que l’univers s’épanouisse. (loyal)"
+        },
+        {
+          "roll": 4,
+          "text": "Flamme. Certaines entités cherchent à museler les âmes les plus créatives, qu’il faut libérer coûte que coûte. (chaotique)"
+        },
+        {
+          "roll": 5,
+          "text": "Compromis. Il faut veiller à ce qu’aucune forme de conscience ne prenne le pas sur les autres, l’avenir du monde en dépend. (neutre)"
+        },
+        {
+          "roll": 6,
+          "text": "Illumination. Ce don de communion avec les esprits est parfois un fardeau, mais un fardeau que je porte sur la voie de la révélation. (tout alignement)"
+        }
+      ]
+    },
+    "bonds": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Une entité revient régulièrement me hanter ; tant qu’elle restera plus forte que moi, je ne pourrai la défier."
+        },
+        {
+          "roll": 2,
+          "text": "Je dois laver l’honneur de mes ancêtres par l’exemplarité de mon existence."
+        },
+        {
+          "roll": 3,
+          "text": "L’esprit de ma tribu ne me répond plus et je dois comprendre pourquoi."
+        },
+        {
+          "roll": 4,
+          "text": "Plus jeune, j’ai fait une promesse secrète que je sais devoir regretter un jour."
+        },
+        {
+          "roll": 5,
+          "text": "Une personne au moins est convaincue que je suis à l’origine de ses malheurs et compte me le faire payer."
+        },
+        {
+          "roll": 6,
+          "text": "Je dois retrouver une relique en lien avec un esprit : je suis certain que l’avenir du monde en dépend."
+        }
+      ]
+    },
+    "flaws": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "J’ai contracté une dépendance à une substance censée faciliter ma communion avec les âmes."
+        },
+        {
+          "roll": 2,
+          "text": "Parfois, je voudrais détruire le corps de ceux qui doutent du souffle spirituel, ne serait-ce que pour leur prouver que l’âme est immortelle."
+        },
+        {
+          "roll": 3,
+          "text": "Les esprits m’apparaissent plus réels que les « vivants », qui m’intéressent de moins en moins."
+        },
+        {
+          "roll": 4,
+          "text": "Je n’hésite pas à surjouer ma complicité avec le spirituel pour impressionner et je commence à douter de mon talent : ne serais-je qu’un imposteur ?"
+        },
+        {
+          "roll": 5,
+          "text": "On dit que tous ceux qui ont le don finissent mal. J’en ai effectivement vu se perdre sur cette voie tortueuse et j’ai parfois l’impression de ne plus être moi-même. Le pire, c’est que je ne m’en effraie même pas."
+        },
+        {
+          "roll": 6,
+          "text": "J’ai commis des forfaits que je ne peux avouer au service de ce que personne ne peut comprendre, et je suis prêt à en perpétrer d’autres."
+        }
+      ]
+    }
+  }
+}

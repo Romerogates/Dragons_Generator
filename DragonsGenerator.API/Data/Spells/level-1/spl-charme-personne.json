@@ -1,0 +1,39 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-charme-personne",
+  "name": "Charme-personne",
+  "level": 1,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Vous tentez de charmer un humanoïde que vous voyez à portée. La cible doit effectuer un JS Sagesse et bénéficie pour cela d'un avantage si vous ou vos compagnons la combattez. En cas d'échec, elle est charmée par vos soins tant que le sort persiste ou jusqu'à ce vous ou vos compagnons lui nuisiez. La créature charmée vous voit comme un ami. Quand le sort prend fin, la créature sait que vous l'avez charmée.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 1ᵉʳ. Les créatures doivent se situer dans un rayon de 9 m les unes des autres quand vous les ciblez.",
+  "modular_options": []
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-arme-psychique",
+  "name": "Arme psychique",
+  "level": 0,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action_bonus"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-sorcier"
+  ],
+  "description": "Vous manifestez dans vos mains une arme de pure énergie psychique. Choisissez la nature de l'arme parmi celles dont vous avez la maîtrise. Vous effectuez vos jets d'attaque et de dégâts comme vous le feriez avec l'arme dont l'aspect est reproduit, si ce n'est que l'arme psychique inflige des dégâts de type psychique. Par exemple, vous pourrez attaquer avec une dague en utilisant votre modificateur de Force ou de Dextérité, et elle infligera un nombre de dégâts psychiques égal à 1d4 + votre modificateur de Force ou de Dextérité. Dès que vous cessez de tenir une arme psychique, elle se dissipe. ## Arme spirituelle Évocation du 2e niveau Une arme spectrale flottante apparaît à portée et persiste pour toute la durée du sort ou jusqu'à ce que vous relanciez ce sort. Au moment de l'incantation, vous pouvez effectuer une attaque de sort de corps à corps contre une créature située dans un rayon de 1,50 m de l'arme. En cas de réussite, la cible subit des dégâts de force égaux à 1d8 + votre modifica teur de caractéristique magique. Au prix d'une action bonus à votre tour de jeu, vous pouvez déplacer l'arme jusqu'à 6 m et répé ter l'attaque contre une créature située dans un rayon de 1,50 m de celle-ci. L'arme prend la forme de votre choix. Signature and handwritten notes ## Arme vengeresse Évocation du 2e niveau Jotre arme de corps à corps exprime l'ire de votre divinité. Chaque fois que vous touchez une cible avec cette arme avant la fin du sort, vous lui infligez des dégâts psychiques supplémentaires égaux à votre modificateur de caractéristique magique. La cible doit également réussir un JS Sagesse sous peine de se retrouver effrayée par vous tant que le sort persiste. À la fin de chacun de ses tours de jeu, la créa ture peut effectuer un JS Sagesse pour raffermir sa détermination et ne plus être effrayée par vous.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, les dégâts supplémentaires sont égaux au double de votre modificateur de caractéristique magique.",
+  "modular_options": []
+}

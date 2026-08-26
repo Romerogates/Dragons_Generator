@@ -1,4 +1,6 @@
-﻿
+﻿using DragonsGenerator.API.Common;
+using DragonsGenerator.API.Models;
+using FastEndpoints;
 
 namespace DragonsGenerator.API.Endpoints.Languages;
 
@@ -9,6 +11,10 @@ public class GetLanguageByIdRequest
 
 public class GetLanguageByIdEndpoint : Endpoint<GetLanguageByIdRequest, Language>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetLanguageByIdEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/languages/{id}");
@@ -17,10 +23,7 @@ public class GetLanguageByIdEndpoint : Endpoint<GetLanguageByIdRequest, Language
 
     public override async Task HandleAsync(GetLanguageByIdRequest req, CancellationToken ct)
     {
-        var languages = await JsonDataLoader.LoadAsync<List<Language>>("languages.json", ct);
-
-        var language = languages?.FirstOrDefault(l =>
-            string.Equals(l.Id, req.Id, StringComparison.OrdinalIgnoreCase));
+        var language = await _repo.GetLanguageByIdAsync(req.Id, ct);
 
         if (language is null)
         {

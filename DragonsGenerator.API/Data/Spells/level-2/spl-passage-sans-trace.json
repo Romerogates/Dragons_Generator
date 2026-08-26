@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-passage-sans-trace",
+  "name": "Passage sans trace",
+  "level": 2,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "les cendres d'une feuille de gui et une brindille d'épicéa"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-rodeur"
+  ],
+  "description": "Un voile d'ombre et de silence se dégage de vous, vous protégeant vous et vos compagnons de toute détection. Pour toute la durée du sort, chaque créature que vous choisissez dans un rayon de 9 m de vous (vous y compris) bénéficie d'un bonus de +10 aux tests de Dextérité (Discrétion) et ne peut être pistée que par des moyens magiques. Une créature qui bénéficie de ce bonus ne laisse aucune trace derrière elle. Le sort détection des traces contrecarre les effets de passage sans trace.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, la durée augmente de 1 heure par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

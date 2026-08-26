@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-cimeterre",
+  "name": "Cimeterre",
+  "category": "weapon",
+  "subcategory": "martial_melee",
+  "cost": {
+    "value": 25,
+    "unit": "po"
+  },
+  "weight_kg": 1.5,
+  "damage_dice": "1d6",
+  "damage_type": "tranchant",
+  "properties": [
+    "prop-finesse",
+    "prop-legere"
+  ],
+  "throw_range": null,
+  "ammo_range": null,
+  "description": null
+}

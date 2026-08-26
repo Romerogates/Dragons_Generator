@@ -1,4 +1,6 @@
-﻿
+﻿using DragonsGenerator.API.Common;
+using DragonsGenerator.API.Models;
+using FastEndpoints;
 
 namespace DragonsGenerator.API.Endpoints.Species;
 
@@ -9,6 +11,10 @@ public class GetSpeciesByIdRequest
 
 public class GetSpeciesByIdEndpoint : Endpoint<GetSpeciesByIdRequest, Models.Species>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetSpeciesByIdEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/species/{id}");
@@ -17,10 +23,7 @@ public class GetSpeciesByIdEndpoint : Endpoint<GetSpeciesByIdRequest, Models.Spe
 
     public override async Task HandleAsync(GetSpeciesByIdRequest req, CancellationToken ct)
     {
-        var data = await JsonDataLoader.LoadAsync<SpeciesData>("species.json", ct);
-
-        var species = data?.Species.FirstOrDefault(s =>
-            string.Equals(s.Id, req.Id, StringComparison.OrdinalIgnoreCase));
+        var species = await _repo.GetSpeciesByIdAsync(req.Id, ct);
 
         if (species is null)
         {

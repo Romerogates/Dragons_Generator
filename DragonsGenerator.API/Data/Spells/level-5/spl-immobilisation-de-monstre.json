@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-immobilisation-de-monstre",
+  "name": "Immobilisation de monstre",
+  "level": 5,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 27,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un petit morceau de fer droit"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Choisissez une créature que vous voyez à portée. La cible doit réussir un JS Sagesse sous peine d'être paralysée pour toute la durée du sort. Cet enchantement n'a aucun effet sur les morts-vivants. À la fin de chacun de ses tours de jeu, la cible a droit à un nouveau JS Sagesse. En cas de réussite, le sort prend fin la concernant.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 5e. Les créatures doivent se situer dans un rayon de 9 m les unes des autres quand vous les ciblez.",
+  "modular_options": []
+}

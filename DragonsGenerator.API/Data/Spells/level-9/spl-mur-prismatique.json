@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-mur-prismatique",
+  "name": "Mur prismatique",
+  "level": 9,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 10,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(de l'encens pour une valeur d'au moins 250 po"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien"
+  ],
+  "description": "Logo and icon Un mur vertical et opaque de lumière multicolore et scintillante apparaît, centré sur un point que vous voyez à portée. Ses dimensions sont les suivantes : jusqu'à 27 m de long, 9 m de haut et 2,5 cm d'épaisseur. Autre possibilité, vous pouvez lui donner la forme d'une sphère 9 m de diamètre maximum centrée sur un point que vous choisissez à portée. Le mur persiste pour toute la durée du sort. Si vous le positionnez de sorte qu'il traverse l'espace occupé par une créature, le sort échoue, et votre action ainsi que l'emplacement de sort sont perdus. Le mur dégage une lumière vive sur un rayon de 30 m et une lumière faible sur 30 m de plus. Vous et les créatures que vous avez désignées au moment de l'incantation pouvez le traverser et rester à côté sans rien en craindre. Si une autre créature qui le voit se rapproche à moins de 6 m du mur ou commence son tour de jeu à une telle distance, elle doit réussir un JS Constitution sous peine d'être aveu-glée pendant 1 minute. Ce mur est constitué de sept couches de différentes couleurs. Quand une créature s'avance dans le mur ou tente de le traverser, elle subit les effets de ses couches un par un. Elle doit ainsi réussir un JS Dextérité pour chaque couche, sous peine d'être affectée par ses propriétés (cf. ci-dessous). Le mur peut être détruit, une couche après l'autre, de la rouge à la violette, par des moyens bien spécifiques. Une fois détruite, une couche le reste pour toute la durée du sort. Un champ d'antimagie est sans effet sur un mur prismatique. 1. Rouge. La créature subit 10d6 dégâts de feu en cas d'échec, la moitié en cas de réussite. Cette couche arrête les attaques à distance non magiques. On peut la détruire en lui infligeant au moins 25 dégâts de froid. 2. Orange. La créature subit 10d6 dégâts d'acide en cas d'échec, la moitié en cas de réussite. Cette couche arrête les attaques à distance magiques. Un vent fort suffit pour la détruire. 3. Jaune. La créature subit 10d6 dégâts de foudre en cas d'échec, la moitié en cas de réussite. On peut détruire cette couche en lui infligeant au moins 60 dégâts de force. 4. Vert. La cible subit 10d6 dégâts de poison, la moitié en cas de réussite. Le sort passe-muraille, ou un autre sort de niveau égal ou supérieur capable d'ouvrir un portail sur une surface solide, détruit cette couche. 5. Bleu. La cible subit 10d6 dégâts de froid, la moitié en cas de réussite. On peut détruire cette couche en lui infligeant au moins 25 dégâts de feu. 6. Indigo. En cas d'échec, la cible est entravée. Ensuite, elle doit effectuer un JS Constitution à la fin de chacun de ses tours de jeu. Si elle en réussit trois, le sort prend fin. Si elle en rate trois, elle est à jamais pétrifiée. Les réussites et échecs ne doivent pas nécessairement être consécutifs. Notez-les jusqu'à ce que la cible en obtienne trois d'un type ou d'un autre. Cette couche arrête les sorts. Elle est détruite par la lumière vive du sort lumière du jour ou de tout sort analogue de niveau égal ou supérieur. 7. Violet. En cas d'échec, la cible est aveuglée. Ensuite, elle doit effectuer un JS Sagesse au début de votre tour de jeu suivant. En cas de réussite, la cécité prend fin. En cas d'échec, la créature est transportée vers un autre plan d'existence au choix du meneur et n'est plus aveuglée. En règle générale, une créature est bannie vers son plan d'origine si elle ne s'y trouve pas déjà, vers le Plan Astral ou Éthéré dans le cas contraire. Cette couche est la seule que détruit le sort dissipation de la magie ou tout sort analogue de niveau égal ou supérieur capable de mettre fin aux sorts et effets magiques. ## Mythes et légendes Nommez ou décrivez une personne, un endroit ou un objet. Le sort vous dévoile les grandes lignes de ce qu'il faut savoir sur la cible citée. Il peut s'agir de récits actuels, d'histoires oubliées ou de connaissances secrètes qui n'ont jamais connu une large diffusion. Si la chose que vous nommez n'est pas d'importance légendaire, vous ne gagnez aucune information. Plus nombreux sont les renseignements dont vous disposez déjà sur la cible, plus ceux que vous glanerez seront précis et détaillés. Les informations acquises sont exactes, mais peuvent avoir un sens figuré. Par exemple, si vous détenez une mystérieuse hache magique, voici le genre d'information que le sort pourra vous donner : « Malheur au félon qui pose la main sur la hache, car même son manche tranche les chairs des scélérats. Seul un véritable Enfant de la Pierre, féru et bien-aimé de Forgeron, peut éveiller ses véritables pouvoirs, et uniquement avec le mot sacré Rudnogg sur les lèvres. » ## D'où proviennent les réponses ? Vous recevez la réponse de défunts dont la majorité réside dans le domaine de Mort. Ces êtres ne sont pas autorisés à répondre si un Interdit de Mort frappe le sujet, auquel cas vous êtes averti, les composantes du sort ne sont pas détruites et l'emplacement de sort n'est pas dépensé.",
+  "modular_options": []
+}

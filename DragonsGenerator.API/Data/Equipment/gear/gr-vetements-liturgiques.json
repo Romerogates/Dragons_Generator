@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-vetements-liturgiques",
+  "name": "Vêtements liturgiques",
+  "category": "gear",
+  "subcategory": "clothing",
+  "cost": {
+    "value": 1,
+    "unit": "po"
+  },
+  "weight_kg": 2,
+  "description": "Robes ou tenue de cérémonie religieuse portée lors des offices."
+}

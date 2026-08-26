@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "tl-outils-de-sculpteur-sur-bois",
+  "name": "Outils de sculpteur sur bois",
+  "category": "tool",
+  "subcategory": "artisan_tool",
+  "cost": {
+    "value": 1,
+    "unit": "po"
+  },
+  "weight_kg": 2.5,
+  "description": "Outils d'artisan associé à la sculpture sur os, ivoire et bas-reliefs."
+}

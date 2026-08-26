@@ -1,0 +1,198 @@
+{
+  "schema_version": "2.0",
+  "id": "bg-erudit",
+  "name": "Érudit",
+  "source": {
+    "book": "Dragons - Livre de base: Aventuriers",
+    "pages": "93-94"
+  },
+  "flavor": {
+    "summary": "Pour beaucoup, vous êtes un puits de science, mais vous savez surtout que celle-ci n'est pas infuse. Vous avez consacré votre vie à l'étude, amassant des connaissances dans des domaines variés et cherchant toujours à en apprendre davantage."
+  },
+  "proficiencies": {
+    "skills": {
+      "fixed": [
+        "skill-histoire"
+      ],
+      "choose": {
+        "count": 1,
+        "options": [
+          "skill-arcanes",
+          "skill-nature",
+          "skill-religion"
+        ]
+      }
+    },
+    "tools": {
+      "fixed": [],
+      "choose": null
+    },
+    "languages": {
+      "fixed": [],
+      "choose_count": 1
+    }
+  },
+  "equipment": {
+    "fixed": [
+      {
+        "id": "gr-vetements-ordinaires",
+        "name": "Vêtements ordinaires",
+        "qty": 1,
+        "location": "equipped"
+      },
+      {
+        "id": "gr-livre",
+        "name": "Livre de référence sur votre domaine de prédilection",
+        "qty": 1,
+        "location": "backpack"
+      },
+      {
+        "id": "gr-encre-et-plume",
+        "name": "Bouteille d'encre et plume",
+        "qty": 1,
+        "location": "backpack"
+      },
+      {
+        "id": "gr-parchemins-vierges",
+        "name": "Parchemins vierges (10 feuilles)",
+        "qty": 1,
+        "location": "backpack"
+      }
+    ],
+    "choose": [],
+    "currency": {
+      "or": 15
+    }
+  },
+  "privilege": {
+    "id": "priv-expertise-reconnue",
+    "name": "Expertise reconnue",
+    "desc": "Vous savez où et auprès de qui trouver les informations dont vous avez besoin. Bibliothèques, universités, monastères et sages — vous connaissez les circuits du savoir et savez qui interroger pour obtenir des réponses fiables."
+  },
+  "personality_tables": {
+    "traits": {
+      "die": "1d8",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Je vois des analogies partout : quoi qu’il advienne, une métaphore s’impose à mon esprit."
+        },
+        {
+          "roll": 2,
+          "text": "Équilibre. Le meilleur moyen d’éviter qu’un camp ne domine tous les autres consiste à connaître tous leurs secrets. (neutre)"
+        },
+        {
+          "roll": 3,
+          "text": "Je ne peux m’empêcher de corriger les erreurs linguistiques et sémantiques d’autrui."
+        },
+        {
+          "roll": 4,
+          "text": "Raison. Ne pas céder à la hargne ni à la pitié, toujours se fier à la logique. (loyal)"
+        },
+        {
+          "roll": 5,
+          "text": "J’aime partager mon savoir ; bizarrement, cela agace parfois les gens."
+        },
+        {
+          "roll": 6,
+          "text": "Influence. Le savoir est la clef du pouvoir. (mauvais)"
+        },
+        {
+          "roll": 7,
+          "text": "Ma curiosité est insatiable : il faut que je sache tout, surtout quand le sujet m’est inconnu."
+        },
+        {
+          "roll": 8,
+          "text": "Infini. Je m’enivre dans le bouillonnement intarissable des flots de la connaissance. (chaotique)"
+        }
+      ]
+    },
+    "ideals": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Je souffre mal celles et ceux qui se fient à leur « intuition » ; je ne connais que la raison."
+        },
+        {
+          "roll": 2,
+          "text": "Transmission. Quand mon prochain en saura autant que moi, le monde se portera mieux. (bon)"
+        },
+        {
+          "roll": 3,
+          "text": "Je suis d’une extrême patience avec les insultes et, malgré cela, ils se vexent."
+        },
+        {
+          "roll": 4,
+          "text": "Illumination. Un jour, le savoir accumulé sera tel que nous nous extrairons de notre condition. (tout alignement)"
+        },
+        {
+          "roll": 5,
+          "text": "Je suis facilement distrait quand on aborde des questions d’ordre pratique."
+        },
+        {
+          "roll": 6,
+          "text": "Je suis toujours étonné quand les gens ne maîtrisent pas les notions les plus élémentaires et je leur fais savoir."
+        }
+      ]
+    },
+    "bonds": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "J'appartiens à une faction secrète qui compte sur mes connaissances pour renseigner ses membres à travers le monde."
+        },
+        {
+          "roll": 2,
+          "text": "J'ai pu apprendre tout ce que je sais aujourd'hui grâce au soutien d'un individu ou d'un groupe qui m'inspire par ailleurs de l'admiration ou du dégoût."
+        },
+        {
+          "roll": 3,
+          "text": "Mon domaine d'expertise est encore considéré comme mineur : il ne doit pas le rester."
+        },
+        {
+          "roll": 4,
+          "text": "Une question m'obsède et je me mets dans les situations les plus délicates pour tenter d'y répondre."
+        },
+        {
+          "roll": 5,
+          "text": "Mon maître attend beaucoup de moi. Je ne supporterai pas de le décevoir."
+        },
+        {
+          "roll": 6,
+          "text": "Certaines vérités ne sont pas bonnes à dire, je dois m'assurer qu'elles restent tues."
+        }
+      ]
+    },
+    "flaws": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Écouter des inepties sur un sujet que je maîtrise est au-dessus de mes forces."
+        },
+        {
+          "roll": 2,
+          "text": "On dit que j'accepte pas d'avoir tort, mais on oublie surtout que j'ai toujours raison."
+        },
+        {
+          "roll": 3,
+          "text": "Je pardonne trop facilement à quiconque peut m'instruire."
+        },
+        {
+          "roll": 4,
+          "text": "Parfois, très rarement, je ne sais pas... alors, je mens."
+        },
+        {
+          "roll": 5,
+          "text": "Quand un consensus s'établit trop vite, il faut que mon esprit de contradiction s'exprime."
+        },
+        {
+          "roll": 6,
+          "text": "J'ai horriblement peur de la mort et je compte la retarder le plus longtemps possible... voire éternellement."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-soins-de-groupe",
+  "name": "Soins de groupe",
+  "level": 5,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-pretre",
+    "cls-rodeur"
+  ],
+  "description": "Une vague d'énergie vulnéraire jaillit d'un point de votre choix situé à portée. Choisissez jusqu'à six créatures situées dans une sphère de 9 m de rayon centrée sur ce point. Chaque cible récupère un nombre de points de vie égal à 3d8 + votre modificateur de caractéristique magique. Ce sort n'a aucun effet sur les créatures artificielles et les morts-vivants.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, les soins augmentent de 1d8 par niveau d'emplacement au-dessus du 5e.",
+  "modular_options": []
+}

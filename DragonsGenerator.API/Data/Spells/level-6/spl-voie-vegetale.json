@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-voie-vegetale",
+  "name": "Voie végétale",
+  "level": 6,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une plume d'oiseau"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide"
+  ],
+  "description": "Ce sort crée un lien magique entre une plante inanimée de taille G ou supérieure située à portée et une autre plante, qui peut se trouver à n'importe quelle distance mais obligatoirement sur le même plan d'existence. Vous devez avoir vu ou touché la plante de destination au moins une fois. Pour toute la durée, n'importe quelle créature peut entrer dans la plante ciblée et ressortir par l'autre au prix de 1,50 m de déplacement. Martin Romero (Order #44468918) D Vous touchez une créature consentante. La cible gagne une VD en vol de 18 m pour toute la durée du sort. Quand le sort prend fin, la cible tombe si elle était encore en l'air, à moins qu'elle ne puisse empêcher sa chute.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 3e.",
+  "modular_options": []
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-carnet-de-notes",
+  "name": "Carnet de notes",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 5,
+    "unit": "pa"
+  },
+  "weight_kg": 0.25,
+  "description": "Papier de bonne qualité, 120 pages."
+}

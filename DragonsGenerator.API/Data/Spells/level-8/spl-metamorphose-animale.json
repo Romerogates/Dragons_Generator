@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-metamorphose-animale",
+  "name": "Métamorphose animale",
+  "level": 8,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 24,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide"
+  ],
+  "description": "Votre magie vous permet de transformer des créatures en bêtes. Choisissez autant de créatures consentantes que vous le souhaitez, pourvu que vous les voyiez et qu'elles se situent à portée. Chaque cible est transformée en bête de taille G ou inférieure d'un facteur de puissance maximal de 4. À chacun de vos tours de jeu, vous pourrez donner de nouvelles formes aux créatures affectées au prix d'une action. La transformation persiste pour toute la durée du sort pour chaque cible, sauf pour celles qui tombent à 0 point de vie ou meurent. Vous pouvez choisir une forme distincte pour chaque cible. Le profil des cibles est remplacé par celui des bêtes choisies, mais elles conservent néanmoins leur alignement ainsi que leurs valeurs d'Intelligence, de Sagesse et de Charisme. Une cible a les points de vie de sa nouvelle forme, mais elle retrouve les points de vie qu'elle avait avant sa transformation lorsqu'elle recouvre sa forme normale. Dans le cas où elle tombe à 0 point de vie, les dégâts en excès sont reportés sur sa forme normale. Tant que ces dégâts ne font pas eux aussi tomber les points de vie de la forme normale à 0, la créature reste consciente. La créature est limitée dans ses actions par la nature de sa nouvelle forme, et elle ne peut ni parler ni lancer de sorts. L'équipement de la cible se transforme lui aussi en fusionnant avec elle, mais elle ne peut pas l'activer, s'en servir ou en profiter d'une quelconque manière.",
+  "modular_options": []
+}

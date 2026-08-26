@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-don-de-conscience",
+  "name": "Don de conscience",
+  "level": 5,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 8,
+    "unit": "heure"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(une agate d'une valeur minimale de 1 000 po"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide"
+  ],
+  "description": "Après avoir consacré le temps d'incantation à tracer des sentiers magiques au sein d'une pierre précieuse, vous touchez une bête ou une plante de taille TG ou inférieure. La cible doit être dénuée de valeur d'Intelligence ou en avoir une de 3 ou moins. Elle gagne une Intelligence de 10 et la faculté de parler une langue que vous connaissez. Si la cible est une plante, elle gagne aussi la faculté d'animer ses branches, racines, lianes, etc. ainsi que des sens comparables à ceux d'un humain. Votre meneur choisit un profil adapté à la plante éveillée, comme celui de l'arbuste animé ou de l'arbre animé. La cible est charmée par vos soins pendant 30 jours, ou jusqu'à ce que vous ou vos compagnons lui nuisiez d'une manière ou d'une autre. Quand l'état charmé prend fin, la créature choisit si oui ou non elle reste amicale en fonction du traitement que vous lui avez réservé lorsqu'elle était sous votre emprise. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, vous pouvez animer une créature supplémentaire par niveau d'emplacement au-dessus du 5e. Icon",
+  "modular_options": []
+}

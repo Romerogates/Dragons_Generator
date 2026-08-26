@@ -1,0 +1,23 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-gnome",
+  "name": "Gnome",
+  "category": "base",
+  "typical_speakers": [
+    "Gnomes",
+    "Habitants de l'archipel éolien"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-cyfand",
+      "label": "Cyfand",
+      "type": "alphabet"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [
+    "Îles Éoliennes",
+    "communautés gnomes dispersées"
+  ],
+  "description": "Langue des communautés gnomes et de l'archipel éolien. Elle s'écrit avec l'alphabet cyfand."
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-geyser-corrosif",
+  "name": "Geyser corrosif",
+  "level": 3,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 27,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une goutte de bave de crapaud"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Une perle acide jaillit de votre doigt et s'écrase sur le sol en un point à portée où elle produit une immense gerbe acide. Chaque créature prise dans un cylindre de 3 m de rayon et 12 m de haut centré sur ce point doit effectuer un JS Dextérité et subit 8d6 dégâts d'acide en cas d'échec, la moitié en cas de réussite. En cas de marge d'échec de 5 ou plus, la créature voit toutes les armes et armures non magiques qu'elle porte acquérir la propriété fragile.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, les dégâts augmentent de 1d6 par niveau d'emplacement au-dessus du 3e.",
+  "modular_options": []
+}

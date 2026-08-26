@@ -1,0 +1,18 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-fleau-darmes",
+  "name": "Fléau d'armes",
+  "category": "weapon",
+  "subcategory": "martial_melee",
+  "cost": {
+    "value": 10,
+    "unit": "po"
+  },
+  "weight_kg": 1,
+  "damage_dice": "1d8",
+  "damage_type": "contondant",
+  "properties": [],
+  "throw_range": null,
+  "ammo_range": null,
+  "description": null
+}

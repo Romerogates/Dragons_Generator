@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-fonte",
+  "name": "Fonte",
+  "category": "gear",
+  "subcategory": "container",
+  "cost": {
+    "value": 4,
+    "unit": "po"
+  },
+  "weight_kg": 4,
+  "description": "Sacoche de selle."
+}

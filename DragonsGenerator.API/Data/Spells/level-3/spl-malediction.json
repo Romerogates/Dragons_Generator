@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-malediction",
+  "name": "Malédiction",
+  "level": 3,
+  "school": "necromancie",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien",
+    "cls-pretre"
+  ],
+  "description": "Vous touchez une créature, qui doit réussir un JS Sagesse sous peine d'être maudite pour toute la durée du sort. Au moment de l'incantation, choisissez la nature de la malédiction parmi les effets suivants : Choisissez une valeur de caractéristique. Tant qu'elle est maudite, la cible subit un désavantage aux tests de caractéristique et JS associés à la caractéristique choisie. Tant qu'elle est maudite, la cible subit un désavantage aux jets d'attaque contre vous. Tant qu'elle est maudite, la cible doit effectuer un JS Sagesse au début de chacun de ses tours de jeu. En cas d'échec, elle perd son action du tour et ne fait rien. Tant que la cible est maudite, vos attaques et sorts lui infligent 1d8 dégâts nécrotiques supplémentaires. Le sort délivrance des malédictions met fin à cet effet. À la discrétion du meneur, vous pourrez choisir un autre effet de malédiction, qui ne devra cependant pas être plus puissant que ceux qui sont détaillés ci-dessus. Le meneur a le dernier mot en la matière. l'utiliser pour manipuler un objet, ouvrir une porte ou un contenant non verrouillé, ranger ou sortir un objet d'un contenant ouvert, ou verser le contenu d'une fiole. Vous pouvez la déplacer jusqu'à 9 m chaque fois que vous l'utilisez. Enfin, la main ne peut pas attaquer ni activer d'objet magique ou porter de charge supérieure à 5 kg. Aux niveaux 5, 11 et 17 vous bénéficiez respectivement de 2, 3 et 4 mains. Par ailleurs, au niveau 11, le poids maximum transportable par une main passe à 10 kg. Au niveau 17, les mains persistent jusqu'à ce que vous vous en éloigniez de 18 m. Quoi qu'il arrive, vous ne pouvez les contrôler que si vous êtes à moins de 9 m : les mains ne font autrement que poursuivre l'action précédemment entamée.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau, la durée est concentration, jusqu'à 10 minutes. Quand vous jetez ce sort en utilisant un emplacement de sort du 5e ou 6e niveau, la durée est de 8 heures. Quand vous jetez ce sort en utilisant un emplacement de sort du 7e ou 8e niveau, la durée est de 24 heures. Quand vous jetez ce sort en utilisant un emplacement de sort du 9e niveau, le sort persiste jusqu'à ce qu'il soit dissipé. En utilisant un emplacement de sort du 5e niveau ou supérieur, la durée ne nécessite plus de concentration.",
+  "modular_options": []
+}

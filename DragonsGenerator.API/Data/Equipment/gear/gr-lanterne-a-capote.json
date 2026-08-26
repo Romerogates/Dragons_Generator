@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-lanterne-a-capote",
+  "name": "Lanterne à capote",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 5,
+    "unit": "po"
+  },
+  "weight_kg": 1,
+  "description": "Lumière vive rayon 9 m, faible sur 9 m de plus pendant 6h par flasque d'huile. Capote rabattable pour limiter l'éclairage (lumière faible rayon 1,50 m)."
+}

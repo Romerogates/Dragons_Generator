@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-eclair-tracant",
+  "name": "Éclair traçant",
+  "level": 1,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "round"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "Un rayon lumineux file en direction d'une cible de votre choix située à portée. Effectuez une attaque de sort à distance contre la cible. En cas de réussite, elle subit 4d6 dégâts radiants, et le prochain jet d'attaque effectué contre elle avant la fin de votre tour de jeu suivant bénéficie d'un avantage en raison de la lumière faible qu'elle dégage pendant ce laps de temps.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, les dégâts augmentent de 1d6 par niveau d'emplacement au-dessus du 1ᵉʳ.",
+  "modular_options": []
+}

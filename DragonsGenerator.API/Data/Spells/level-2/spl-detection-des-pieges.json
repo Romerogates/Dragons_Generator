@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-detection-des-pieges",
+  "name": "Détection des pièges",
+  "level": 2,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-pretre",
+    "cls-rodeur"
+  ],
+  "description": "Vous détectez la présence des pièges situés à portée. Au regard de ce sort, un piège inclut tout ce qui peut déclencher un effet soudain ou inattendu que vous considérez comme néfaste ou indésirable, et expressément conçu comme tel par son créateur. Cette divination permettra donc de détecter une zone affectée par une alarme, un glyphe de garde ou un piège mécanique, mais ne révélera pas un sol fragile, un plafond instable ou des sables mouvants. Ce sort signale simplement la présence d'un piège. Vous ne découvrez pas la position de chaque piège, mais êtes conscient de la nature du danger que le piège détecté représente. Ce sort ne peut percer une frontière éthérée (cf. chapitre Géomagie).",
+  "modular_options": []
+}

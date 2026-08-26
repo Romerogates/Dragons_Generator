@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-scrutation",
+  "name": "Scrutation",
+  "level": 5,
+  "school": "divination",
+  "casting_time": {
+    "value": 10,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(un focaliseur d'une valeur minimale de 1 000 po"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-magicien",
+    "cls-pretre",
+    "cls-sorcier"
+  ],
+  "description": "Logo/Icon Icon Vous voyez et entendez une créature spécifique que vous choisissez pourvu qu'elle se trouve sur le même plan d'existence que vous. La cible doit effectuer un JS Sagesse, modifié en fonction de la connaissance que vous en avez et des liens physiques qui vous unissent. Si une cible sait que vous lancez ce sort, elle peut délibérément rater son jet de sauvegarde si elle veut être observée. En cas de réussite, la cible n'est pas affectée et vous ne pouvez pas réutiliser ce sort contre elle pendant 24 heures. En cas d'échec, le sort génère un capteur invisible dans un rayon de 3 m de la cible. Vous voyez et entendez au travers de ce capteur comme si vous étiez à sa place. Le capteur se déplace avec la cible de manière à rester dans un rayon de 3 m de celle-ci pour toute la durée du sort. Une créature capable de voir des objets invisibles perçoit le capteur comme un orbe lumineux de la taille de votre poing.",
+  "modular_options": []
+}

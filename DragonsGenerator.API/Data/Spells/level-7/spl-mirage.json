@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-mirage",
+  "name": "Mirage",
+  "level": 7,
+  "school": "illusion",
+  "casting_time": {
+    "value": 10,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "vue",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 10,
+    "unit": "jour"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-magicien"
+  ],
+  "description": "V Vous ciblez une zone de 1,5 km de côté maximum afin d'en modifier l'apparence, les bruits, les odeurs et même les sensations. Sa forme générale reste cependant la même. Un champ ou une route pourra ressembler à un marais, une colline, une crevasse ou quelque autre terrain difficile ou infranchissable. Une mare pourra ressembler à une prairie verdoyante ; un précipice, à une pente douce ; un ravin rocailleux, à une belle route large. Vous pouvez également modifier l'apparence des bâtiments ou en ajouter s'il n'y en a pas. En revanche, le sort ne permet pas de déguiser, dissimuler ou ajouter des créatures. L'illusion inclut des éléments auditifs, visuels, tactiles et olfactifs, et peut donc transformer un sol dégagé en terrain difficile, et vice versa, ou gêner les déplacements dans la zone. Tout élément du terrain illusoire (comme une pierre ou une branche) qui quitte la zone disparaît aussitôt. Les créatures douées de vision lucide voient le terrain tel qu'il est vraiment. Néanmoins, les autres éléments de l'illusion restent en place. Cela veut dire qu'une telle créature est consciente de la présence de l'illusion, mais qu'elle peut quand même interagir physiquement avec celle-ci. ② Regarder de loin et pressentir ## la supercherie Le mirage fait effet sur toute personne qui le voit, même de très loin : vision d'un camp militaire illusoire installé dans une vallée, d'une oasis au milieu du désert, d'une île dans l'océan, d'un dangereux maelstrom à contourner, etc. Observer la zone de l'illusion avec attention donne la possibilité de la percer. La créature doit cependant avoir une raison de soupçonner la supercherie, par exemple si elle sait que personne n'habite normalement par ici, qu'il devrait y avoir une rivière, que sa carte ne correspond pas avec ce qu'elle voit, etc. Un test d'Intelligence (Investigation) contre votre DD de sauvegarde des sorts permet d'être averti de l'usage de magie.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 8e niveau ou supérieur, la taille du mirage augmente de 1,5 km de côté (si vous le souhaitez) par niveau d'emplacement au-dessus du 7e.",
+  "modular_options": []
+}

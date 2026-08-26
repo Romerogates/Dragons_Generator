@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-enchevetrement",
+  "name": "Enchevêtrement",
+  "level": 1,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 27,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide"
+  ],
+  "description": "Des racines, des lianes, des buissons épais et des herbes folles jaillissent du sol dans une zone carrée de 6 m de côté à partir d'un point situé à portée. Le sol de la zone est un terrain difficile pour toute la durée du sort. Une créature située dans la zone au moment de l'incantation doit réussir un JS Force sous peine d'être entravée par la flore tant que le sort persiste. Une créature entravée de la sorte peut, au prix de son action, effectuer un test de Force assorti de votre DD de sauvegarde des sorts. En cas de réussite, elle se libère. Les plantes invoquées se flétrissent quand le sort prend fin. mente de 3 m de côté (si vous le souhaitez) et la durée de 2 minutes par niveau d'emplacement au-dessus du 1ᵉʳ. Quand vous utilisez un emplacement du 5e niveau ou supérieur et que vous restez concentré jusqu'à la fin du sort, les plantes invoquées persistent (sans pour autant continuer à entraver les créatures qui les traversent) jusqu'à ce qu'elles succombent normalement - du fait du froid, du manque d'eau, de l'obscurité ou d'autres facteurs. ## L'origine des plantesenchevêtrées Les plantes jaillissent à partir des graines, germes et semences présents à l'état naturel dans le sol. Sur un terrain dont le sol ne contient aucune vie végétale potentielle, le sort ne peut faire effet. Toutefois, vous pouvez jeter au préalable des semences en guise de composante matérielle que le sort consommera. Ces graines pousseront vigoureusement, et les plantes qui en seront issues s'enchevêtreront. Si vous souhaitez faire pousser un enchevêtrement d'une essence en particulier - par exemple une espèce donnée de ronces - vous pouvez également utiliser un sac de ses graines comme composante de sort. Ces plantes s'ajouteront à celles qui figuraient naturellement dans le sol.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, l'espace affecté aug",
+  "modular_options": []
+}

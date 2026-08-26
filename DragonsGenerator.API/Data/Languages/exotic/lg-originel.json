@@ -1,0 +1,27 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-originel",
+  "name": "Originel",
+  "category": "exotique",
+  "typical_speakers": [
+    "Élémentaires (aérien, aquatique, igné, terreux)"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-mandala",
+      "label": "Mandala",
+      "type": "mandala"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [
+    "Plans élémentaires"
+  ],
+  "description": "Langue primale des élémentaires. Ses sonorités douces et entêtantes évoquent le vent, les échos, les vibrations et les résonances minérales. Chaque élémentaire s'exprime avec la nature de son essence. L'originel inclut quatre dialectes : aérien, aquatique, igné et terreux. Système d'écriture : mandala.",
+  "dialects": [
+    "aérien",
+    "aquatique",
+    "igné",
+    "terreux"
+  ]
+}

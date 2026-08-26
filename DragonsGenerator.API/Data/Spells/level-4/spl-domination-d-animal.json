@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-domination-d-animal",
+  "name": "Domination d'animal",
+  "level": 4,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-rodeur"
+  ],
+  "description": "Vous tentez d'envoûter une bête que vous voyez à portée. Celle-ci doit réussir un JS Sagesse sous peine d'être charmée par vos soins pour toute la durée du sort. Si vous ou des créatures qui vous sont amicales la combattez, elle bénéficie d'un avantage au jet de sauvegarde. Aussi longtemps que la bête est charmée, vous disposez avec elle d'un lien télépathique si vous vous trouvez sur le même plan d'existence. Tant que vous êtes conscient, vous pouvez utiliser ce lien télépathique pour lui donner des ordres (aucune action nécessaire) auxquels elle obéit de son mieux. Les ordres doivent être simples, comme « Attaque cette créature », « Va là-bas » ou « Va chercher ». Si la cible parvient à exécuter son ordre et que vous ne lui en donnez pas de nouveau, elle se défend et se protège du mieux qu'elle le peut. Au prix d'une action, vous pouvez prendre le contrôle total de la cible. Jusqu'à la fin de votre tour de jeu suivant, la créature n'entreprend que les actions que vous choisissez et ne fait rien que vous ne lui autorisiez. Pendant tout ce temps, vous pouvez aussi lui faire jouer des réactions, mais vous devez pour cela utiliser vos propres réactions. Chaque fois que la cible subit des dégâts, elle effectue un nouveau JS Sagesse contre le sort. En cas de réussite, le sort prend fin. ### Une variante non corrompue des dominations d'animal, de monstre ou de personne Les enchanteurs sont étroitement concernés par la corruption qui s'insinue dans leurs sorts. Des rumeurs dans les milieux arcaniques font état de méthodes d'utilisation non corrompues des sorts domination d'animal, domination de monstre et domination de personne. Ce savoir peu répandu implique les deux contraintes suivantes : Une faible fréquence d'utilisation du sort (au jugement du meneur). Un usage visant uniquement à éviter des conséquences plus graves (comme un déferlement de violence), et qui ne compromet pas la cible physiquement, mentalement ou moralement. Parmi les arcanistes, certains estiment que l'existence de ces variantes non corrompues n'a aucun fondement réel. Certains avancent même qu'il ne s'agirait que d'une manière d'inciter des naïfs à se risquer à manier une magie néfaste.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau, la durée maximale passe à 10 minutes. Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau, la durée maximale passe à 1 heure. Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau ou supérieur, la durée maximale passe à 8 heures.",
+  "modular_options": []
+}

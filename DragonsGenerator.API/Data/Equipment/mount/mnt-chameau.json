@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "id": "mnt-chameau",
+  "name": "Chameau",
+  "category": "mount",
+  "subcategory": "animal",
+  "cost": {
+    "value": 50,
+    "unit": "po"
+  },
+  "weight_kg": null,
+  "speed": "15 m",
+  "capacity_kg": 240,
+  "description": "Vitesse de déplacement : 15 m. Charge maximale : 240 kg."
+}

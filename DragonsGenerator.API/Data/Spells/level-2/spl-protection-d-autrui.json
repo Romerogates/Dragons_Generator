@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-protection-d-autrui",
+  "name": "Protection d'autrui",
+  "level": 2,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(deux anneaux en platine d'une valeur minimale de 50 po pièce"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "Protection O0 Ce sort protège une créature consentante que vous touchez et noue un lien mystique entre vous et elle tant que le sort persiste. Aussi longtemps que la cible se situe dans un rayon de 18 m de vous, elle bénéficie d'un bonus de +1 à la CA et aux jets de sauvegarde, ainsi que d'une résistance à tous les dégâts. En outre, chaque fois qu'elle subit des dégâts, vous en subissez autant. Le sort prend fin si vous tombez à 0 point de vie, si plus de 18 m vous séparent de la cible ou si le sort est relancé sur une des deux créatures. Enfin, vous pouvez le révoquer au prix d'une action.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, vous pouvez vous éloigner de 18 m supplémentaires de la cible, le bonus à la CA et aux jets de sauvegarde augmente de +1, et la durée du sort augmente de 1 heure par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

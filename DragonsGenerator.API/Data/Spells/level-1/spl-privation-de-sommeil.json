@@ -1,0 +1,40 @@
+﻿{
+    "schema_version":  "2.0",
+    "guid":  null,
+    "id":  "spl-privation-de-sommeil",
+    "name":  "Privation de sommeil",
+    "level":  1,
+    "school":  "enchantement",
+    "casting_time":  {
+                         "value":  1,
+                         "unit":  "action"
+                     },
+    "range":  {
+                  "type":  "personnelle",
+                  "distance_m":  null,
+                  "area":  null
+              },
+    "duration":  {
+                     "type":  "instantane",
+                     "value":  null,
+                     "unit":  null
+                 },
+    "components":  {
+                       "v":  false,
+                       "s":  false,
+                       "m":  null
+                   },
+    "is_ritual":  false,
+    "is_concentration":  false,
+    "is_corrupted":  false,
+    "classes":  [
+                    "cls-magicien",
+                    "cls-barde",
+                    "cls-sorcier"
+                ],
+    "description":  "",
+    "higher_levels":  null,
+    "modular_options":  [
+
+                        ]
+}

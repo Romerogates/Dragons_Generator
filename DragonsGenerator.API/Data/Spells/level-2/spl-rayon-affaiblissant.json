@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-rayon-affaiblissant",
+  "name": "Rayon affaiblissant",
+  "level": 2,
+  "school": "necromancie",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Rayon affaiblissant icon Un rayon noir d'énergie affaiblissant part de votre doigt tendu vers une créature située à portée. Effectuez une attaque de sort à distance contre la cible. En cas de réussite, pour la durée du sort, la cible n'inflige que la moitié des dégâts avec ses attaques d'arme basées sur la Force. À la fin de chacun de ses tours de jeu, la cible peut effectuer un JS Constitution contre le sort. En cas de réussite, le sort prend fin.",
+  "modular_options": []
+}

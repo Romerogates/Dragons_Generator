@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-lumieres-dansantes",
+  "name": "Lumières dansantes",
+  "level": 0,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Vous créez jusqu'à quatre lumières de la taille de torches à portée. Celles-ci peuvent prendre la forme de torches, de lanternes ou d'orbes lumineux qui planent dans les airs pour toute la durée du sort. Vous pouvez aussi combiner ces quatre lumières en une forme luisante vaguement humanoïde de taille M. Quel que soit votre choix, chacune produit une lumière faible dans un rayon de 3 m. Au prix d'une action bonus à votre tour de jeu, vous pouvez déplacer ces lumières jusqu'à 18 m vers un nouvel endroit situé à portée. Si l'une de ces lumières s'éloigne de plus de 6 m de toutes les autres, elle disparaît. Au niveau 5, à votre tour de jeu, vous pouvez déplacer les lumières dansantes sans recourir à une action bonus une fois par tour. Au niveau 11, vous n'avez plus besoin de vous concentrer pour maintenir le sort et vous pouvez faire varier l'intensité, l'aspect et la couleur de chaque lumière indépendamment. Une fois que vous avez atteint le niveau 17, au lancement de lumières dansantes, vous pouvez désigner jusqu'à 6 créatures qui, outre les créatures douées de vision lucide, seront les seules à percevoir la lumière.",
+  "modular_options": []
+}

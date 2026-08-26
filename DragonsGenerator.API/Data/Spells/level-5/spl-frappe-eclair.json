@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-frappe-eclair",
+  "name": "Frappe éclair",
+  "level": 5,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Vous tournez sur vous-même et vous téléportez dans un espace inoccupé que vous voyez dans un rayon de 18 m. Effectuez aussitôt une attaque de sort au corps à corps contre chaque créature de votre choix à portée de votre allonge. Une attaque réussie inflige 6d10 dégâts de force à la cible. Une fois les attaques effectuées, vous pouvez instantanément réintégrer l'espace que vous occupiez à l'incantation.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, les dégâts augmentent de 1d10 par niveau d'emplacement au-dessus du 5e.",
+  "modular_options": []
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "ski-representation",
+  "name": "Représentation",
+  "ability": "CHA",
+  "description": "Vos tests de Charisme (Représentation) évaluent votre faculté à ravir un public par l'intermédiaire de pièces musicales ou théâtrales, de danses, de contes ou autre forme de divertissement.",
+  "examples": [
+    "Interpréter une pièce musicale ou théâtrale devant un public.",
+    "Danser ou conter des histoires pour divertir.",
+    "Captiver une foule par une forme de spectacle."
+  ],
+  "passive_check": false,
+  "source": "livre_de_base"
+}

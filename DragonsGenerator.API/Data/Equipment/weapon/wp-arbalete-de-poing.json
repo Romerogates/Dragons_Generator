@@ -1,0 +1,25 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-arbalete-de-poing",
+  "name": "Arbalète de poing",
+  "category": "weapon",
+  "subcategory": "martial_ranged",
+  "cost": {
+    "value": 75,
+    "unit": "po"
+  },
+  "weight_kg": 1.5,
+  "damage_dice": "1d6",
+  "damage_type": "perforant",
+  "properties": [
+    "prop-legere",
+    "prop-projectiles-9-36",
+    "prop-rechargement"
+  ],
+  "throw_range": null,
+  "ammo_range": {
+    "normal": 9,
+    "long": 36
+  },
+  "description": null
+}

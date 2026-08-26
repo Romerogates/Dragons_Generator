@@ -1,0 +1,140 @@
+<div class="max-w-6xl mx-auto px-4 py-10">
+  <h1 class="font-serif text-3xl font-bold text-amber-500 mb-2">Administration</h1>
+  <p class="text-xs text-slate-400 mb-6">
+    Les mots de passe ne sont jamais visibles (hashés). Vous pouvez en définir un nouveau ou envoyer
+    un mail de réinitialisation.
+  </p>
+
+  @if (message()) {
+    <p class="text-sm text-emerald-400 mb-3">{{ message() }}</p>
+  }
+  @if (error()) {
+    <p class="text-sm text-red-400 mb-3">{{ error() }}</p>
+  }
+
+  <div class="flex gap-2 mb-6">
+    <button
+      type="button"
+      class="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider border"
+      [class.border-amber-500]="tab() === 'users'"
+      [class.text-amber-400]="tab() === 'users'"
+      [class.border-slate-700]="tab() !== 'users'"
+      (click)="tab.set('users')"
+    >
+      Comptes
+    </button>
+    <button
+      type="button"
+      class="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider border"
+      [class.border-amber-500]="tab() === 'tickets'"
+      [class.text-amber-400]="tab() === 'tickets'"
+      [class.border-slate-700]="tab() !== 'tickets'"
+      (click)="tab.set('tickets')"
+    >
+      Support
+    </button>
+  </div>
+
+  @if (tab() === 'users') {
+    <div class="flex flex-col gap-4">
+      @for (u of users(); track u.id) {
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <div class="flex flex-wrap justify-between gap-2 mb-3">
+            <div>
+              <div class="text-sm font-bold text-slate-100">{{ u.displayName }}</div>
+              <div class="text-[10px] text-slate-500">
+                {{ u.characterCount }} perso(s) · créé {{ u.createdAt | date: 'short' }}
+              </div>
+            </div>
+            <span class="text-[10px] uppercase tracking-wider text-violet-400">{{ u.role }}</span>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-3 text-xs">
+            <label class="text-slate-500"
+              >Email
+              <input
+                class="mt-1 w-full rounded bg-[#171b22] border border-slate-700 px-2 py-1.5 text-slate-100"
+                [(ngModel)]="edits[u.id].email"
+                [name]="'email-' + u.id"
+              />
+            </label>
+            <label class="text-slate-500"
+              >Pseudo
+              <input
+                class="mt-1 w-full rounded bg-[#171b22] border border-slate-700 px-2 py-1.5 text-slate-100"
+                [(ngModel)]="edits[u.id].displayName"
+                [name]="'name-' + u.id"
+              />
+            </label>
+            <label class="text-slate-500"
+              >Rôle
+              <select
+                class="mt-1 w-full rounded bg-[#171b22] border border-slate-700 px-2 py-1.5 text-slate-100"
+                [(ngModel)]="edits[u.id].role"
+                [name]="'role-' + u.id"
+              >
+                <option value="User">User</option>
+                <option value="Admin">Admin</option>
+              </select>
+            </label>
+            <label class="text-slate-500"
+              >Nouveau mot de passe
+              <input
+                type="password"
+                placeholder="laisser vide pour ne pas changer"
+                class="mt-1 w-full rounded bg-[#171b22] border border-slate-700 px-2 py-1.5 text-slate-100"
+                [(ngModel)]="edits[u.id].newPassword"
+                [name]="'pwd-' + u.id"
+              />
+            </label>
+          </div>
+          <p class="text-[10px] text-slate-600 mt-2">{{ u.passwordStatus }}</p>
+          <label class="flex items-center gap-2 text-xs text-slate-400 mt-2">
+            <input type="checkbox" [(ngModel)]="edits[u.id].emailConfirmed" [name]="'conf-' + u.id" />
+            Email confirmé
+          </label>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <button type="button" class="wizard-nav-primary text-xs px-3 py-1.5" (click)="saveUser(u.id)">
+              Enregistrer
+            </button>
+            <button
+              type="button"
+              class="text-xs px-3 py-1.5 rounded-lg border border-slate-600 text-slate-300 hover:border-sky-500"
+              (click)="sendReset(u.id)"
+            >
+              Envoyer mail d'oubli
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="flex flex-col gap-3">
+      @for (t of tickets(); track t.id) {
+        <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4">
+          <div class="flex justify-between gap-2">
+            <span class="font-bold text-amber-400 text-sm">{{ t.subject }}</span>
+            <span class="text-[10px] text-slate-500">{{ t.userEmail }}</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-2 whitespace-pre-wrap">{{ t.message }}</p>
+          @if (t.attachmentUrl) {
+            <a
+              class="text-xs text-sky-400 hover:underline mt-2 inline-block"
+              [href]="t.attachmentUrl || '#'"
+              target="_blank"
+              >{{ t.attachmentOriginalName || 'Pièce jointe' }}</a
+            >
+          }
+          <div class="flex gap-2 mt-3">
+            <button type="button" class="text-[10px] uppercase border border-slate-600 px-2 py-1 rounded" (click)="setTicketStatus(t.id, 'open')">Open</button>
+            <button type="button" class="text-[10px] uppercase border border-slate-600 px-2 py-1 rounded" (click)="setTicketStatus(t.id, 'in_progress')">En cours</button>
+            <button type="button" class="text-[10px] uppercase border border-slate-600 px-2 py-1 rounded" (click)="setTicketStatus(t.id, 'closed')">Fermé</button>
+            <span class="text-[10px] text-slate-500 self-center">{{ t.status }}</span>
+          </div>
+        </div>
+      } @empty {
+        <p class="text-xs text-slate-500">Aucun ticket.</p>
+      }
+    </div>
+  }
+</div>

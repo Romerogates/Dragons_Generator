@@ -10,6 +10,11 @@ import {
 import { CommonModule } from '@angular/common';
 import { DataService } from '../../../../core/services/data.service';
 import { CharacterBuilderService } from '../../../../core/services/character-builder.service';
+import {
+  CATEGORY_FILTERS,
+  normalizeEquipments,
+  resolveEquipmentRefId,
+} from '@core/utils/equipment.utils';
 import type { EquipmentInstance } from '../../../../core/models/Character/character';
 
 export interface EquipmentRaw {
@@ -55,68 +60,6 @@ interface ResolvedSlot {
   fixedItems: ResolvedItem[];
   alternatives: ResolvedAlternative[];
 }
-
-const CATEGORY_FILTERS: Record<
-  string,
-  { type: string; subtypes?: string[]; ids?: string[]; label: string }
-> = {
-  'category-simple-weapons': {
-    type: 'WEAPON',
-    subtypes: ['SIMPLE_MELEE', 'SIMPLE_RANGED'],
-    label: 'Arme courante',
-  },
-  'category-martial-weapons': {
-    type: 'WEAPON',
-    subtypes: ['MARTIAL_MELEE', 'MARTIAL_RANGED'],
-    label: 'Arme de guerre',
-  },
-  'category-light-armor': { type: 'ARMOR', subtypes: ['LIGHT'], label: 'Armure légère' },
-  'category-medium-armor': { type: 'ARMOR', subtypes: ['MEDIUM'], label: 'Armure intermédiaire' },
-  'category-shield': { type: 'ARMOR', subtypes: ['SHIELD'], label: 'Bouclier' },
-  'category-musical-instruments': {
-    type: 'TOOL',
-    ids: [
-      'tl-bombarde',
-      'tl-cor',
-      'tl-cornemuse',
-      'tl-dulcimer',
-      'tl-flute',
-      'tl-flute-de-pan',
-      'tl-luth',
-      'tl-lyre',
-      'tl-tambour',
-      'tl-viole',
-    ],
-    label: 'Instrument de musique',
-  },
-  'category-gaming-sets': {
-    type: 'TOOL',
-    ids: ['tl-des', 'tl-echecs', 'tl-go', 'tl-jeu-de-cartes', 'tl-osselets'],
-    label: 'Matériel de jeu',
-  },
-  'category-vehicles': { type: 'VEHICLE', label: 'Véhicule' },
-  'category-tools': { type: 'TOOL', label: "Outil d'artisan" },
-  'category-simple-melee-weapons': {
-    type: 'WEAPON',
-    subtypes: ['SIMPLE_MELEE'],
-    label: 'Arme courante de corps à corps',
-  },
-  'category-arcane-focus': {
-    type: 'GEAR',
-    subtypes: ['ARCANE_FOCUS'],
-    label: 'Focaliseur arcanique',
-  },
-  'category-druidic-focus': {
-    type: 'GEAR',
-    subtypes: ['DRUIDIC_FOCUS'],
-    label: 'Focaliseur druidique',
-  },
-  'category-holy-symbol': {
-    type: 'GEAR',
-    subtypes: ['HOLY_SYMBOL'],
-    label: 'Symbole sacré',
-  },
-};
 
 @Component({
   selector: 'app-equipment-step',
@@ -199,7 +142,7 @@ export class EquipmentStep implements OnInit {
   ngOnInit(): void {
     this.dataService.getEquipments().subscribe({
       next: (items) => {
-        this.catalog.set(items as unknown as EquipmentRaw[]);
+        this.catalog.set(normalizeEquipments(items) as unknown as EquipmentRaw[]);
         this.loading.set(false);
       },
       error: () => {
@@ -322,7 +265,8 @@ export class EquipmentStep implements OnInit {
   }
 
   private resolve(ref: ItemRef, map: Map<string, EquipmentRaw>): ResolvedItem {
-    const filter = CATEGORY_FILTERS[ref.id];
+    const resolvedId = resolveEquipmentRefId(ref.id);
+    const filter = CATEGORY_FILTERS[resolvedId];
     if (filter) {
       const items = filter.ids
         ? filter.ids.map((id) => map.get(id)).filter((e): e is EquipmentRaw => !!e)
@@ -333,7 +277,7 @@ export class EquipmentStep implements OnInit {
           );
 
       return {
-        ref,
+        ref: { ...ref, id: resolvedId },
         isCategory: true,
         equipment: null,
         categoryLabel: filter.label,
@@ -341,9 +285,9 @@ export class EquipmentStep implements OnInit {
       };
     }
     return {
-      ref,
+      ref: { ...ref, id: resolvedId },
       isCategory: false,
-      equipment: map.get(ref.id) ?? null,
+      equipment: map.get(resolvedId) ?? null,
       categoryLabel: null,
       categoryItems: [],
     };
@@ -359,30 +303,48 @@ export class EquipmentStep implements OnInit {
   ): EquipmentInstance | null {
     let eq: EquipmentRaw | undefined;
     if (item.isCategory) {
-      // Clé "fixed" ou clé alternative classique
       const key = altIdx === -1 ? `${slot}-fixed-${itemIdx}` : `${slot}-${altIdx}-${itemIdx}`;
       eq = map.get(cats.get(key)!);
     } else {
       eq = item.equipment ?? undefined;
     }
     if (!eq) return null;
+
+    const data = (eq.data ?? {}) as Record<string, any>;
+    const isArmor = eq.type === 'ARMOR';
+    const isShield = isArmor && eq.subtype === 'SHIELD';
+    const isWeapon = eq.type === 'WEAPON';
+
+    let customData: Record<string, unknown> | undefined;
+    if (isWeapon) {
+      customData = {
+        isWeapon: true,
+        damage: data['dmg_d'] ?? data['damage_dice'],
+        damageType: data['dmg_t'] ?? data['damage_type'],
+        properties: data['props'] ?? data['properties'] ?? [],
+        subtype: eq.subtype,
+      };
+    } else if (isArmor) {
+      customData = {
+        isArmor: !isShield,
+        isShield,
+        ac: data['ac'] ?? data['ac_base'] ?? (isShield ? 2 : 10),
+        dexModifier: data['dex_modifier'],
+        maxDexBonus: data['max_dex_bonus'] ?? null,
+        stealthDis: data['stealth_dis'] ?? data['stealth_disadvantage'] ?? false,
+        subtype: eq.subtype,
+      };
+    }
+
     return {
       instanceId: crypto.randomUUID(),
       refId: eq.id,
       name: eq.name,
       qty: item.ref.qty,
-      location: 'at_hand',
-      equipped: false,
+      location: isArmor ? 'equipped' : 'at_hand',
+      equipped: isArmor,
       wKg: eq.wKg,
-      customData:
-        eq.type === 'WEAPON'
-          ? {
-              isWeapon: true,
-              damage: (eq.data as any).dmg_d,
-              damageType: (eq.data as any).dmg_t,
-              properties: (eq.data as any).props ?? [],
-            }
-          : undefined,
+      customData,
     };
   }
 

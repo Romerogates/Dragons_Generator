@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "it-ss-reliquaire",
+  "name": "Reliquaire (symbole sacré)",
+  "category": "gear",
+  "subcategory": "holy_symbol",
+  "cost": {
+    "value": 5,
+    "unit": "po"
+  },
+  "weight_kg": 1,
+  "description": "Symbole sacré sous forme de reliquaire. Peut remplacer les composantes matérielles."
+}

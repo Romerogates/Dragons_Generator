@@ -1,0 +1,332 @@
+{
+  "schema_version": "2.0",
+  "id": "sp-elfe",
+  "name": "Elfes",
+  "name_alt": [],
+  "playable": true,
+  "requires_subspecies": true,
+  "source": {
+    "book": "Dragons - Livre de base: Aventuriers",
+    "pages": "33-38"
+  },
+  "flavor": {
+    "summary": "De l'avis général, les elfes constituent l'espèce la plus gracieuse et la plus empreinte de dignité. Ils ont en commun de longues oreilles pointues et une silhouette nerveuse. Les traits de leurs visages sont fins et tracés nettement.",
+    "culture": "Les elfes sont répartis en sous-espèces aux cultures très différentes : elenions (elfes de lumière) organisés en sociétés complexes, aldarons (elfes de sève) vivant en forêts en clans semi-nomades, et drows habitant les profondeurs de la terre.",
+    "lore_notes": [
+      "La transe est une capacité à double tranchant : très avantageuse dans des conditions calmes, handicapante dans un environnement hostile car elle doit être accomplie d'une traite.",
+      "Les drows sont apparus durant la guerre de l'Aube. Ces anciens elenions partis combattre le Chancre aux côtés des nains disparurent dans les profondeurs et réapparurent pervertis. C'est une grande honte pour les elenions.",
+      "Les enfants elfes commencent à souffrir de cauchemars terribles entre 5 et 7 ans. La transe doit leur être enseignée rapidement — sans elle, certains meurent dans leur sommeil."
+    ]
+  },
+  "base_stats": {
+    "ability_score_increase": {
+      "dex": 2
+    },
+    "speed": {
+      "base_m": 9,
+      "not_reduced_by_heavy_armor": false
+    },
+    "size": "M",
+    "darkvision_m": 18,
+    "age": {
+      "maturity_years": 16,
+      "adulthood_cultural_years": 100,
+      "lifespan_years": 750,
+      "flavor": "Maturité physique à 16 ans, mais la période 16-100 ans constitue une longue 'adolescence' selon les standards elfiques. Espérance de vie de 750 ans."
+    },
+    "alignment": {
+      "tendency": "Variable selon sous-espèce",
+      "flavor": "Les elfes de surface tendent vers la Neutralité ou le Bien. Elenions penchent vers la Loi ; aldarons et drows ont des comportements plus chaotiques."
+    }
+  },
+  "traits": [
+    {
+      "id": "trait-vision-noir-elfe",
+      "name": "Vision dans le noir",
+      "flavor": {
+        "desc": "Guetteur nocturne, vous êtes doté d'une vision supérieure dans les ténèbres et la pénombre. Dans un rayon de 18 m, vous voyez en lumière faible comme en lumière vive, et dans l'obscurité comme en lumière faible (nuances de gris)."
+      },
+      "mechanics": {
+        "type": "darkvision",
+        "range_m": 18
+      }
+    },
+    {
+      "id": "trait-sens-aiguises",
+      "name": "Sens aiguisés",
+      "flavor": {
+        "desc": "Vous bénéficiez de la maîtrise de la compétence Perception."
+      },
+      "mechanics": {
+        "type": "skill_proficiency",
+        "grants": [
+          "skill-perception"
+        ]
+      }
+    },
+    {
+      "id": "trait-heritage-feerique",
+      "name": "Héritage féerique",
+      "flavor": {
+        "desc": "Vous bénéficiez d'un avantage aux jets de sauvegarde contre l'état préjudiciable charmé, et aucune magie ne peut vous endormir."
+      },
+      "mechanics": {
+        "type": "compound",
+        "advantages": [
+          {
+            "type": "saving_throw",
+            "target": "any",
+            "condition": "contre l'état condition-charme"
+          }
+        ],
+        "immunities": [
+          "condition-sommeil-magique"
+        ]
+      }
+    },
+    {
+      "id": "trait-transe",
+      "name": "Transe",
+      "flavor": {
+        "desc": "Les elfes n'ont pas besoin de dormir. Ils entrent dans une profonde méditation à raison de 4 heures par jour, conférant les bénéfices d'un sommeil de 8 heures. La transe doit être accomplie d'une traite. Entrer en transe dans un environnement hostile requiert un test de Sagesse (Transe)."
+      },
+      "mechanics": {
+        "type": "special_rest",
+        "replaces": "long_rest_sleep",
+        "duration_hours": 4,
+        "equivalent_benefit": "8h_sommeil",
+        "requires_uninterrupted": true,
+        "hostile_environment_check": {
+          "ability": "wis",
+          "skill": "transe"
+        }
+      }
+    }
+  ],
+  "creation_choices": [
+    {
+      "id": "choice-langue-commune-elfe",
+      "name": "Langue commune",
+      "flavor": {
+        "desc": "Les elfes de la surface parlent le commun ; les drows pratiquent son équivalent des profondeurs."
+      },
+      "type": "language",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        "lg-commun",
+        "lg-commun-des-profondeurs"
+      ]
+    }
+  ],
+  "languages": {
+    "fixed": [
+      "lg-elfique"
+    ],
+    "choices": [
+      {
+        "id": "choice-langue-commune-elfe",
+        "allow_choice": true,
+        "quantity": 1,
+        "pool": [
+          "lg-commun",
+          "lg-commun-des-profondeurs"
+        ]
+      }
+    ]
+  },
+  "subspecies": [
+    {
+      "id": "sp-elfe-elenion",
+      "name": "Elfes de lumière (Elenions)",
+      "playable": true,
+      "flavor": {
+        "desc": "On reconnaît les elenions à un teint clair, laiteux ou rosé, avec des chevelures argentées, dorées, platine ou blondes. Leurs yeux sont grands, avec des iris dans des teintes froides : gris, bleu, vert ou violet. Ils sont volontiers guerriers ou magiciens, ces voies étant culturellement valorisées."
+      },
+      "ability_score_increase": {
+        "int": 1
+      },
+      "traits": [
+        {
+          "id": "trait-formation-martiale-elenion",
+          "name": "Formation martiale elfique",
+          "flavor": {
+            "desc": "Vous bénéficiez de la maîtrise de l'épée longue, de l'épée courte, de l'arc court et de l'arc long."
+          },
+          "mechanics": {
+            "type": "weapon_proficiency",
+            "grants": [
+              "epee-longue",
+              "epee-courte",
+              "arc-court",
+              "arc-long"
+            ]
+          }
+        }
+      ],
+      "creation_choices": [
+        {
+          "id": "choice-sort-mineur-elenion",
+          "name": "Sort mineur de magicien",
+          "flavor": {
+            "desc": "Issu d'une culture portée vers les arts arcaniques, vous connaissez un sort mineur de la liste du magicien au choix. L'Intelligence est la caractéristique magique correspondante."
+          },
+          "type": "spell",
+          "allow_choice": true,
+          "quantity": 1,
+          "pool": [
+            "any_wizard_cantrip"
+          ],
+          "spellcasting_ability": "int",
+          "spell_level": 0,
+          "recharge": "at_will"
+        },
+        {
+          "id": "choice-outil-elenion",
+          "name": "Raffinement culturel",
+          "flavor": {
+            "desc": "Issu d'une culture portée vers les arts, vous maîtrisez un outil au choix parmi les suivants."
+          },
+          "type": "tool_proficiency",
+          "allow_choice": true,
+          "quantity": 1,
+          "pool": [
+            {
+              "id": "tl-necessaire-de-calligraphe",
+              "name": "Nécessaire de calligraphe"
+            },
+            {
+              "id": "tl-necessaire-de-peintre",
+              "name": "Nécessaire de peintre"
+            },
+            {
+              "id": "tl-outils-de-bijoutier",
+              "name": "Outils de bijoutier"
+            },
+            {
+              "id": "tl-outils-de-tisserand",
+              "name": "Outils de tisserand"
+            },
+            {
+              "id": "tl-flute",
+              "name": "Flûte",
+              "category": "instrument_de_musique"
+            },
+            {
+              "id": "tl-luth",
+              "name": "Luth",
+              "category": "instrument_de_musique"
+            },
+            {
+              "id": "tl-lyre",
+              "name": "Lyre",
+              "category": "instrument_de_musique"
+            },
+            {
+              "id": "tl-viole",
+              "name": "Viole",
+              "category": "instrument_de_musique"
+            }
+          ]
+        },
+        {
+          "id": "choice-langue-supp-elenion",
+          "name": "Langue supplémentaire",
+          "flavor": {
+            "desc": "Vous parlez, lisez et écrivez une langue supplémentaire de votre choix."
+          },
+          "type": "language",
+          "allow_choice": true,
+          "quantity": 1,
+          "pool": [
+            "any"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sp-elfe-aldaron",
+      "name": "Elfes de sève (Aldarons)",
+      "playable": true,
+      "flavor": {
+        "desc": "Le physique des aldarons semble entrer en résonance avec leur environnement. Teint doré, hâlé ou olivâtre, chevelures aux couleurs des feuillages d'automne (vert, jaune, orange flamboyant, rouge, brun). Yeux souvent sombres, anthracite voire noirs. Ils sont le plus souvent rôdeurs, parfois druides."
+      },
+      "ability_score_increase": {
+        "con": 1
+      },
+      "traits": [
+        {
+          "id": "trait-formation-martiale-aldaron",
+          "name": "Formation martiale elfique",
+          "flavor": {
+            "desc": "Vous bénéficiez de la maîtrise de l'épée longue, de l'épée courte, de l'arc court et de l'arc long."
+          },
+          "mechanics": {
+            "type": "weapon_proficiency",
+            "grants": [
+              "epee-longue",
+              "epee-courte",
+              "arc-court",
+              "arc-long"
+            ]
+          }
+        },
+        {
+          "id": "trait-murmures-foret",
+          "name": "Murmures de la forêt",
+          "flavor": {
+            "desc": "Au prix d'une action, vous faites souffler pendant au plus 1 minute un vent froid et inquiétant qui semble murmurer des paroles menaçantes dans un rayon de 18 m. Simultanément, vous pouvez éteindre ou allumer une petite source de lumière (torches, lanterne, bougie, petits feux de camp). Capacité regagnée après un repos court ou long."
+          },
+          "mechanics": {
+            "type": "active_ability",
+            "action_type": "action",
+            "range_m": 18,
+            "duration": {
+              "value": 1,
+              "unit": "minutes"
+            },
+            "secondary_effect": "toggle_small_light_source",
+            "recharge": "short_or_long_rest"
+          }
+        }
+      ],
+      "creation_choices": [
+        {
+          "id": "choice-outil-aldaron",
+          "name": "Vie sauvage",
+          "flavor": {
+            "desc": "La vie dans les campements nécessite de savoir fabriquer des objets courants. Vous maîtrisez un outil au choix parmi les suivants."
+          },
+          "type": "tool_proficiency",
+          "allow_choice": true,
+          "quantity": 1,
+          "pool": [
+            "tl-outils-de-tanneur",
+            "tl-outils-de-sculpteur-sur-bois",
+            "tl-outils-de-tisserand"
+          ]
+        }
+      ],
+      "languages": {
+        "fixed": [
+          "lg-sylvestre"
+        ],
+        "choices": [],
+        "note": "Le sylvestre s'ajoute aux langues héritées de l'espèce parente."
+      }
+    },
+    {
+      "id": "sp-elfe-drow",
+      "name": "Drows",
+      "playable": false,
+      "playable_notes": "Les drows sont apparus après la guerre de l'Aube et ne font pas partie des peuples piliers. Ils sont par défaut des ennemis des PJ. Le MJ peut néanmoins accepter des PJ drows ; un drow évoluant à la surface devra affronter préjugés et hostilité.",
+      "flavor": {
+        "desc": "Les drows sont immédiatement reconnaissables : teint du bleu nuit au noir, chevelure blanche à argentée, yeux rouges (parfois pourpres ou dorés). Ce peuple est très mal connu à la surface et craint de tous ceux qui n'ignorent pas son existence."
+      },
+      "ability_score_increase": {},
+      "traits": [],
+      "creation_choices": []
+    }
+  ],
+  "optional_rules": []
+}

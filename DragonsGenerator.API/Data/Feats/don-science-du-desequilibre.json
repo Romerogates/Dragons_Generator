@@ -1,0 +1,31 @@
+{
+  "schema_version": "2.0",
+  "id": "don-science-du-desequilibre",
+  "name": "Science du déséquilibre",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [],
+  "description": "Vous pouvez substituer votre Dextérité à la Force pour les tests de lutte et de bousculade. Une fois par tour, quand vous réussissez une attaque à mains nues, vous pouvez jouer votre réaction pour tenter gratuitement une bousculade ou une lutte contre la cible.",
+  "benefits": [
+    {
+      "type": "ability_substitution",
+      "replace": "STR",
+      "with": "DEX",
+      "activities": [
+        "lutte",
+        "bousculade"
+      ]
+    },
+    {
+      "type": "reaction",
+      "trigger": "attaque à mains nues réussie (1/tour)",
+      "effect": "lutte ou bousculade gratuite"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "lutte",
+    "dextérité",
+    "corps-à-corps"
+  ]
+}

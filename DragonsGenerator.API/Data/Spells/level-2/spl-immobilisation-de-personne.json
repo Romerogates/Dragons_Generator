@@ -1,0 +1,40 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-immobilisation-de-personne",
+  "name": "Immobilisation de personne",
+  "level": 2,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un petit morceau de fer droit"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-pretre",
+    "cls-sorcier"
+  ],
+  "description": "Choisissez un humanoïde que vous voyez à portée. La cible doit réussir un JS Sagesse sous peine d'être paralysée pour toute la durée du sort. À la fin de chacun de ses tours de jeu, la cible a droit à un nouveau JS Sagesse. En cas de réussite, le sort prend fin la concernant.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, vous pouvez cibler un humanoïde supplémentaire par niveau d'emplacement au-dessus du 2e. Les humanoïdes doivent se situer dans un rayon de 9 m les uns des autres quand vous les ciblez.",
+  "modular_options": []
+}

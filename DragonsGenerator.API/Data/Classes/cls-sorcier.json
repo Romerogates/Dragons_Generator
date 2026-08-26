@@ -1,0 +1,1334 @@
+{
+  "id": "cls-sorcier",
+  "schema_version": "3.0",
+  "name": "Sorcier",
+  "flavor": {
+    "summary": "Lançeur de sorts ayant pactisé avec une entité d'outre-monde pour accéder à une magie interdite et impérissable.",
+    "lore_note": "Beaucoup tentent de dompter ce pouvoir pour le combattre. Souvent, quand le sorcier est assez puissant pour s'y opposer, il est déjà acquis corps et âme à son Suzerain."
+  },
+  "hit_die": "1d8",
+  "hp_at_level_1": 8,
+  "hp_per_level_average": 5,
+  "primary_abilities": [
+    "cha"
+  ],
+  "saving_throw_proficiencies": [
+    "wis",
+    "cha"
+  ],
+  "armor_proficiencies": [
+    "ar-light"
+  ],
+  "weapon_proficiencies": [
+    "wp-simple"
+  ],
+  "tool_proficiencies": [],
+  "choice_pools": [
+    {
+      "id": "choice-skills-cls-sorcier",
+      "name": "Compétences de classe",
+      "type": "skill_proficiency",
+      "allow_choice": true,
+      "quantity": 2,
+      "pool": [
+        "skill-arcanes",
+        "skill-histoire",
+        "skill-intimidation",
+        "skill-investigation",
+        "skill-nature",
+        "skill-religion",
+        "skill-tromperie"
+      ]
+    },
+    {
+      "id": "choice-language-cls-sorcier",
+      "name": "Langue exotique",
+      "type": "language_proficiency",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        "lang-exotic"
+      ],
+      "note": "Une langue exotique au choix parmi : elfique, kaani, draconique, démoniaque, diabolique, céleste, etc."
+    },
+    {
+      "id": "choice-equip-a-cls-sorcier",
+      "name": "Équipement A",
+      "type": "equipment",
+      "allow_choice": true,
+      "quantity": 1,
+      "options": [
+        {
+          "option_id": "equip-a1",
+          "items": [
+            "wp-arbalete-legere",
+            "gr-carreaux-x20"
+          ]
+        },
+        {
+          "option_id": "equip-a2",
+          "items": [
+            "wp-simple"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "choice-equip-b-cls-sorcier",
+      "name": "Équipement B",
+      "type": "equipment",
+      "allow_choice": true,
+      "quantity": 1,
+      "options": [
+        {
+          "option_id": "equip-b1",
+          "items": [
+            "tl-sacoche-composantes"
+          ]
+        },
+        {
+          "option_id": "equip-b2",
+          "items": [
+            "tl-focaliseur-arcanique"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "choice-equip-c-cls-sorcier",
+      "name": "Équipement C",
+      "type": "equipment",
+      "allow_choice": true,
+      "quantity": 1,
+      "options": [
+        {
+          "option_id": "equip-c1",
+          "items": [
+            "gr-sac-erudit"
+          ]
+        },
+        {
+          "option_id": "equip-c2",
+          "items": [
+            "gr-sac-explorateur"
+          ]
+        }
+      ]
+    }
+  ],
+  "spellcasting": {
+    "type": "known",
+    "ability": "cha",
+    "spell_list_class": "cls-sorcier",
+    "is_ritual_caster": false,
+    "starts_at_level": 1,
+    "focus_options": [
+      "tl-focaliseur-arcanique"
+    ],
+    "allows_swap_on_levelup": true,
+    "spell_dc_formula": "8 + prof_bonus + cha_mod",
+    "spell_attack_formula": "prof_bonus + cha_mod",
+    "pact_magic": {
+      "description": "Tous les emplacements de sort sont du même niveau (colonne Niveau d'emplacement). Récupérés après un repos court OU long.",
+      "recharge": "short_or_long_rest",
+      "slots_unified_level": true,
+      "allow_spell_replacement_on_levelup": true
+    }
+  },
+  "starting_equipment": {
+    "fixed": [
+      {
+        "id": "ar-cuir",
+        "qty": 1
+      },
+      {
+        "id": "wp-simple",
+        "qty": 1
+      },
+      {
+        "id": "wp-dague",
+        "qty": 1
+      },
+      {
+        "id": "wp-dague",
+        "qty": 1
+      }
+    ],
+    "choice_pools": []
+  },
+  "progression": [
+    {
+      "level": 1,
+      "features": [
+        "feat-suzerain",
+        "feat-magie-de-pacte"
+      ],
+      "resources": {
+        "cantrips_known": 2,
+        "spells_known": 2,
+        "pact_slots_count": 1,
+        "pact_slot_level": 1,
+        "invocations_known": 0,
+        "arcanes_count": 0
+      },
+      "cantrip_choices": [
+        {
+          "id": "cls-sorcier-cantrips-niv1",
+          "type": "cantrip",
+          "count": 2,
+          "filter": {
+            "spell_level": 0,
+            "class": "cls-sorcier"
+          }
+        }
+      ],
+      "spell_choices": [
+        {
+          "id": "cls-sorcier-sorts-niv1",
+          "type": "spell",
+          "count": 2,
+          "filter": {
+            "spell_level_min": 1,
+            "spell_level_max": 1,
+            "class": "cls-sorcier"
+          },
+          "allow_replacement": false
+        }
+      ],
+      "subclass_choices": [
+        {
+          "id": "cls-sorcier-suzerain-niv1",
+          "type": "subclass",
+          "count": 1,
+          "label": "Choisissez votre Suzerain",
+          "options": [
+            "subcls-seigneur-fielon",
+            "subcls-seigneur-sauvage"
+          ]
+        }
+      ],
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 2,
+      "features": [
+        "feat-manifestations-occultes"
+      ],
+      "resources": {
+        "cantrips_known": 2,
+        "spells_known": 3,
+        "pact_slots_count": 2,
+        "pact_slot_level": 1,
+        "invocations_known": 2,
+        "arcanes_count": 0
+      },
+      "spell_choices": [
+        {
+          "id": "cls-sorcier-sorts-niv2",
+          "type": "spell",
+          "count": 1,
+          "filter": {
+            "spell_level_min": 1,
+            "spell_level_max": 1,
+            "class": "cls-sorcier"
+          },
+          "allow_replacement": true
+        }
+      ],
+      "invocation_choices": [
+        {
+          "id": "cls-sorcier-invocations-niv2",
+          "type": "invocation",
+          "count": 2,
+          "label": "Choisissez 2 manifestations occultes",
+          "pool": "invocations_catalogue",
+          "allow_replacement": true
+        }
+      ],
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 3,
+      "features": [
+        "feat-faveur-du-pacte"
+      ],
+      "resources": {
+        "cantrips_known": 2,
+        "spells_known": 4,
+        "pact_slots_count": 2,
+        "pact_slot_level": 2,
+        "invocations_known": 2,
+        "arcanes_count": 0
+      },
+      "spell_choices": [
+        {
+          "id": "cls-sorcier-sorts-niv3",
+          "type": "spell",
+          "count": 1,
+          "filter": {
+            "spell_level_min": 1,
+            "spell_level_max": 2,
+            "class": "cls-sorcier"
+          },
+          "allow_replacement": true
+        }
+      ],
+      "pact_boon_choices": [
+        {
+          "id": "cls-sorcier-faveur-pacte-niv3",
+          "type": "pact_boon",
+          "count": 1,
+          "label": "Choisissez votre Faveur du pacte",
+          "options": [
+            "pact-boon-chaine",
+            "pact-boon-lame",
+            "pact-boon-tome"
+          ]
+        }
+      ],
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 4,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "cantrips_known": 3,
+        "spells_known": 5,
+        "pact_slots_count": 2,
+        "pact_slot_level": 2,
+        "invocations_known": 2,
+        "arcanes_count": 0
+      },
+      "cantrip_choices": [
+        {
+          "id": "cls-sorcier-cantrip-niv4",
+          "type": "cantrip",
+          "count": 1,
+          "filter": {
+            "spell_level": 0,
+            "class": "cls-sorcier"
+          }
+        }
+      ],
+      "spell_choices": [
+        {
+          "id": "cls-sorcier-sorts-niv4",
+          "type": "spell",
+          "count": 1,
+          "filter": {
+            "spell_level_min": 1,
+            "spell_level_max": 2,
+            "class": "cls-sorcier"
+          },
+          "allow_replacement": true
+        }
+      ],
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 5,
+      "features": [],
+      "resources": {
+        "cantrips_known": 3,
+        "spells_known": 6,
+        "pact_slots_count": 2,
+        "pact_slot_level": 3,
+        "invocations_known": 3,
+        "arcanes_count": 0
+      },
+      "spell_choices": [
+        {
+          "id": "cls-sorcier-sorts-niv5",
+          "type": "spell",
+          "count": 1,
+          "filter": {
+            "spell_level_min": 1,
+            "spell_level_max": 3,
+            "class": "cls-sorcier"
+          },
+          "allow_replacement": true
+        }
+      ],
+      "invocation_choices": [
+        {
+          "id": "cls-sorcier-invocations-niv5",
+          "type": "invocation",
+          "count": 1,
+          "label": "Choisissez 1 manifestation occulte supplémentaire",
+          "pool": "invocations_catalogue",
+          "allow_replacement": true
+        }
+      ],
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 6,
+      "features": [
+        "feat-aptitude-suzerain-6"
+      ],
+      "subclass_feature_trigger": true,
+      "resources": {
+        "cantrips_known": 3,
+        "spells_known": 7,
+        "pact_slots_count": 2,
+        "pact_slot_level": 3,
+        "invocations_known": 3,
+        "arcanes_count": 0
+      },
+      "spell_choices": [
+        {
+          "id": "cls-sorcier-sorts-niv6",
+          "type": "spell",
+          "count": 1,
+          "filter": {
+            "spell_level_min": 1,
+            "spell_level_max": 3,
+            "class": "cls-sorcier"
+          },
+          "allow_replacement": true
+        }
+      ],
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 7,
+      "features": [],
+      "resources": {
+        "cantrips_known": 3,
+        "spells_known": 8,
+        "pact_slots_count": 2,
+        "pact_slot_level": 4,
+        "invocations_known": 4,
+        "arcanes_count": 0
+      },
+      "spell_choices": [
+        {
+          "id": "cls-sorcier-sorts-niv7",
+          "type": "spell",
+          "count": 1,
+          "filter": {
+            "spell_level_min": 1,
+            "spell_level_max": 4,
+            "class": "cls-sorcier"
+          },
+          "allow_replacement": true
+        }
+      ],
+      "invocation_choices": [
+        {
+          "id": "cls-sorcier-invocations-niv7",
+          "type": "invocation",
+          "count": 1,
+          "label": "Choisissez 1 manifestation occulte supplémentaire",
+          "pool": "invocations_catalogue",
+          "allow_replacement": true
+        }
+      ],
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 8,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "cantrips_known": 3,
+        "spells_known": 9,
+        "pact_slots_count": 2,
+        "pact_slot_level": 4,
+        "invocations_known": 4,
+        "arcanes_count": 0
+      },
+      "spell_choices": [
+        {
+          "id": "cls-sorcier-sorts-niv8",
+          "type": "spell",
+          "count": 1,
+          "filter": {
+            "spell_level_min": 1,
+            "spell_level_max": 4,
+            "class": "cls-sorcier"
+          },
+          "allow_replacement": true
+        }
+      ],
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 9,
+      "features": [],
+      "resources": {
+        "cantrips_known": 3,
+        "spells_known": 10,
+        "pact_slots_count": 2,
+        "pact_slot_level": 5,
+        "invocations_known": 5,
+        "arcanes_count": 0
+      },
+      "spell_choices": [
+        {
+          "id": "cls-sorcier-sorts-niv9",
+          "type": "spell",
+          "count": 1,
+          "filter": {
+            "spell_level_min": 1,
+            "spell_level_max": 5,
+            "class": "cls-sorcier"
+          },
+          "allow_replacement": true
+        }
+      ],
+      "invocation_choices": [
+        {
+          "id": "cls-sorcier-invocations-niv9",
+          "type": "invocation",
+          "count": 1,
+          "label": "Choisissez 1 manifestation occulte supplémentaire",
+          "pool": "invocations_catalogue",
+          "allow_replacement": true
+        }
+      ],
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 10,
+      "features": [
+        "feat-aptitude-suzerain-10"
+      ],
+      "subclass_feature_trigger": true,
+      "resources": {
+        "cantrips_known": 4,
+        "spells_known": 10,
+        "pact_slots_count": 2,
+        "pact_slot_level": 5,
+        "invocations_known": 5,
+        "arcanes_count": 0
+      },
+      "cantrip_choices": [
+        {
+          "id": "cls-sorcier-cantrip-niv10",
+          "type": "cantrip",
+          "count": 1,
+          "filter": {
+            "spell_level": 0,
+            "class": "cls-sorcier"
+          }
+        }
+      ],
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 11,
+      "features": [
+        "feat-arcane"
+      ],
+      "resources": {
+        "cantrips_known": 4,
+        "spells_known": 11,
+        "pact_slots_count": 3,
+        "pact_slot_level": 5,
+        "invocations_known": 5,
+        "arcanes_count": 1
+      },
+      "spell_choices": [
+        {
+          "id": "cls-sorcier-sorts-niv11",
+          "type": "spell",
+          "count": 1,
+          "filter": {
+            "spell_level_min": 1,
+            "spell_level_max": 5,
+            "class": "cls-sorcier"
+          },
+          "allow_replacement": true
+        }
+      ],
+      "arcane_choices": [
+        {
+          "id": "cls-sorcier-arcane-niv11",
+          "type": "arcane_spell",
+          "count": 1,
+          "label": "Choisissez 1 sort du 6e niveau comme sort d'arcane",
+          "filter": {
+            "spell_level": 6,
+            "class": "cls-sorcier"
+          }
+        }
+      ],
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 12,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "cantrips_known": 4,
+        "spells_known": 11,
+        "pact_slots_count": 3,
+        "pact_slot_level": 5,
+        "invocations_known": 6,
+        "arcanes_count": 1
+      },
+      "invocation_choices": [
+        {
+          "id": "cls-sorcier-invocations-niv12",
+          "type": "invocation",
+          "count": 1,
+          "label": "Choisissez 1 manifestation occulte supplémentaire",
+          "pool": "invocations_catalogue",
+          "allow_replacement": true
+        }
+      ],
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 13,
+      "features": [
+        "feat-arcane"
+      ],
+      "resources": {
+        "cantrips_known": 4,
+        "spells_known": 12,
+        "pact_slots_count": 3,
+        "pact_slot_level": 5,
+        "invocations_known": 6,
+        "arcanes_count": 2
+      },
+      "spell_choices": [
+        {
+          "id": "cls-sorcier-sorts-niv13",
+          "type": "spell",
+          "count": 1,
+          "filter": {
+            "spell_level_min": 1,
+            "spell_level_max": 5,
+            "class": "cls-sorcier"
+          },
+          "allow_replacement": true
+        }
+      ],
+      "arcane_choices": [
+        {
+          "id": "cls-sorcier-arcane-niv13",
+          "type": "arcane_spell",
+          "count": 1,
+          "label": "Choisissez 1 sort du 7e niveau comme sort d'arcane",
+          "filter": {
+            "spell_level": 7,
+            "class": "cls-sorcier"
+          }
+        }
+      ],
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 14,
+      "features": [
+        "feat-aptitude-suzerain-14"
+      ],
+      "subclass_feature_trigger": true,
+      "resources": {
+        "cantrips_known": 4,
+        "spells_known": 12,
+        "pact_slots_count": 3,
+        "pact_slot_level": 5,
+        "invocations_known": 6,
+        "arcanes_count": 2
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 15,
+      "features": [
+        "feat-arcane"
+      ],
+      "resources": {
+        "cantrips_known": 4,
+        "spells_known": 13,
+        "pact_slots_count": 3,
+        "pact_slot_level": 5,
+        "invocations_known": 7,
+        "arcanes_count": 3
+      },
+      "spell_choices": [
+        {
+          "id": "cls-sorcier-sorts-niv15",
+          "type": "spell",
+          "count": 1,
+          "filter": {
+            "spell_level_min": 1,
+            "spell_level_max": 5,
+            "class": "cls-sorcier"
+          },
+          "allow_replacement": true
+        }
+      ],
+      "invocation_choices": [
+        {
+          "id": "cls-sorcier-invocations-niv15",
+          "type": "invocation",
+          "count": 1,
+          "label": "Choisissez 1 manifestation occulte supplémentaire",
+          "pool": "invocations_catalogue",
+          "allow_replacement": true
+        }
+      ],
+      "arcane_choices": [
+        {
+          "id": "cls-sorcier-arcane-niv15",
+          "type": "arcane_spell",
+          "count": 1,
+          "label": "Choisissez 1 sort du 8e niveau comme sort d'arcane",
+          "filter": {
+            "spell_level": 8,
+            "class": "cls-sorcier"
+          }
+        }
+      ],
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 16,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "cantrips_known": 4,
+        "spells_known": 13,
+        "pact_slots_count": 3,
+        "pact_slot_level": 5,
+        "invocations_known": 7,
+        "arcanes_count": 3
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 17,
+      "features": [
+        "feat-arcane"
+      ],
+      "resources": {
+        "cantrips_known": 4,
+        "spells_known": 14,
+        "pact_slots_count": 4,
+        "pact_slot_level": 5,
+        "invocations_known": 7,
+        "arcanes_count": 4
+      },
+      "spell_choices": [
+        {
+          "id": "cls-sorcier-sorts-niv17",
+          "type": "spell",
+          "count": 1,
+          "filter": {
+            "spell_level_min": 1,
+            "spell_level_max": 5,
+            "class": "cls-sorcier"
+          },
+          "allow_replacement": true
+        }
+      ],
+      "arcane_choices": [
+        {
+          "id": "cls-sorcier-arcane-niv17",
+          "type": "arcane_spell",
+          "count": 1,
+          "label": "Choisissez 1 sort du 9e niveau comme sort d'arcane",
+          "filter": {
+            "spell_level": 9,
+            "class": "cls-sorcier"
+          }
+        }
+      ],
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 18,
+      "features": [],
+      "resources": {
+        "cantrips_known": 4,
+        "spells_known": 14,
+        "pact_slots_count": 4,
+        "pact_slot_level": 5,
+        "invocations_known": 8,
+        "arcanes_count": 4
+      },
+      "invocation_choices": [
+        {
+          "id": "cls-sorcier-invocations-niv18",
+          "type": "invocation",
+          "count": 1,
+          "label": "Choisissez 1 manifestation occulte supplémentaire",
+          "pool": "invocations_catalogue",
+          "allow_replacement": true
+        }
+      ],
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 19,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "cantrips_known": 4,
+        "spells_known": 15,
+        "pact_slots_count": 4,
+        "pact_slot_level": 5,
+        "invocations_known": 8,
+        "arcanes_count": 4
+      },
+      "spell_choices": [
+        {
+          "id": "cls-sorcier-sorts-niv19",
+          "type": "spell",
+          "count": 1,
+          "filter": {
+            "spell_level_min": 1,
+            "spell_level_max": 5,
+            "class": "cls-sorcier"
+          },
+          "allow_replacement": true
+        }
+      ],
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 20,
+      "features": [
+        "feat-maitre-de-l-occulte"
+      ],
+      "resources": {
+        "cantrips_known": 4,
+        "spells_known": 15,
+        "pact_slots_count": 4,
+        "pact_slot_level": 5,
+        "invocations_known": 8,
+        "arcanes_count": 4
+      },
+      "proficiency_bonus": 6
+    }
+  ],
+  "features_details": [
+    {
+      "id": "feat-suzerain",
+      "name": "Suzerain",
+      "unlocks_at_level": 1,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Vous pactisez avec un être d'outre-monde (Seigneur Fiélon ou Seigneur Sauvage). Ce choix octroie des aptitudes aux niveaux 1, 6, 10 et 14.",
+        "lore_note": "Ces entités accordent un pouvoir considérable au prix d'une allégeance rarement négociable."
+      }
+    },
+    {
+      "id": "feat-magie-de-pacte",
+      "name": "Magie de pacte",
+      "unlocks_at_level": 1,
+      "recharge": "short_or_long_rest",
+      "flavor": {
+        "summary": "Système de sort unique : tous vos emplacements de sort sont du même niveau (croissant avec votre niveau). Récupération sur repos court OU long. Le Charisme est votre caractéristique magique.",
+        "lore_note": null
+      },
+      "spellcasting_ability": "cha",
+      "spell_save_dc_formula": "8 + prof_bonus + cha_mod",
+      "spell_attack_formula": "prof_bonus + cha_mod"
+    },
+    {
+      "id": "feat-manifestations-occultes",
+      "name": "Manifestations occultes",
+      "unlocks_at_level": 2,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Au niveau 2, apprenez 2 manifestations occultes. Nombre croissant selon la table. Lors de chaque montée de niveau, remplacement d'une manifestation par une autre possible (prérequis à remplir).",
+        "lore_note": "Des bribes de savoir interdit déclenchant l'Éveil à des facultés magiques impérissables."
+      }
+    },
+    {
+      "id": "feat-faveur-du-pacte",
+      "name": "Faveur du pacte",
+      "unlocks_at_level": 3,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Au niveau 3, choisissez une Faveur du pacte : Pacte de la chaîne, Pacte de la lame, ou Pacte du tome.",
+        "lore_note": null
+      }
+    },
+    {
+      "id": "feat-augmentation-de-caracteristique",
+      "name": "Augmentation de caractéristique",
+      "unlocks_at_level": 4,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "+2 à une caractéristique ou +1 à deux caractéristiques. Maximum 20. Se reproduit aux niveaux 4, 8, 12, 16 et 19.",
+        "lore_note": null
+      }
+    },
+    {
+      "id": "feat-arcane",
+      "name": "Arcane",
+      "unlocks_at_level": 11,
+      "recharge": "long_rest",
+      "flavor": {
+        "summary": "Votre Suzerain vous confie un secret magique : un sort de haut niveau lançable une fois par repos long sans emplacement. Une utilisation par sort d'arcane appris. Toutes les utilisations récupérées sur repos long.",
+        "lore_note": null
+      },
+      "arcane_progression": [
+        {
+          "unlocks_at_level": 11,
+          "spell_level": 6
+        },
+        {
+          "unlocks_at_level": 13,
+          "spell_level": 7
+        },
+        {
+          "unlocks_at_level": 15,
+          "spell_level": 8
+        },
+        {
+          "unlocks_at_level": 17,
+          "spell_level": 9
+        }
+      ]
+    },
+    {
+      "id": "feat-maitre-de-l-occulte",
+      "name": "Maître de l'occulte",
+      "unlocks_at_level": 20,
+      "recharge": "long_rest",
+      "uses": 1,
+      "flavor": {
+        "summary": "Passez 1 minute à solliciter votre Suzerain pour récupérer tous les emplacements de sort de Magie de pacte dépensés. Une fois par repos long.",
+        "lore_note": null
+      }
+    },
+    {
+      "id": "feat-aptitude-suzerain-6",
+      "name": "Aptitude de Suzerain (niveau 6)",
+      "unlocks_at_level": 6,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Aptitude conférée par le Suzerain choisi au niveau 6.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_feature_delegate",
+        "delegate_to_subclass": true,
+        "at_level": 6
+      }
+    },
+    {
+      "id": "feat-aptitude-suzerain-10",
+      "name": "Aptitude de Suzerain (niveau 10)",
+      "unlocks_at_level": 10,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Aptitude conférée par le Suzerain choisi au niveau 10.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_feature_delegate",
+        "delegate_to_subclass": true,
+        "at_level": 10
+      }
+    },
+    {
+      "id": "feat-aptitude-suzerain-14",
+      "name": "Aptitude de Suzerain (niveau 14)",
+      "unlocks_at_level": 14,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Aptitude conférée par le Suzerain choisi au niveau 14.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_feature_delegate",
+        "delegate_to_subclass": true,
+        "at_level": 14
+      }
+    }
+  ],
+  "subclasses": {
+    "label": "Suzerain",
+    "level_unlocked": 1,
+    "feature_levels": [
+      1,
+      6,
+      10,
+      14
+    ],
+    "options": [
+      {
+        "id": "subcls-seigneur-fielon",
+        "name": "Le seigneur fiélon",
+        "flavor": {
+          "summary": "Un pacte avec un fiélon des Plans Inférieurs (démons chaotiques mauvais ou diables loyaux mauvais). Ces entités ne souhaitent que corrompre et détruire.",
+          "lore_note": "Les diables portent le titre d'hospodar (rang supérieur dans la hiérarchie diabolique)."
+        },
+        "sub_identity_choice": {
+          "id": "choice-seigneur-fielon-identite",
+          "type": "fielon_lord",
+          "level_required": 1,
+          "count": 1,
+          "label": "Choisissez votre seigneur fiélon",
+          "options": [
+            {
+              "id": "lord-akhlitol",
+              "name": "Akhlitôl la vengeresse",
+              "type": "demon",
+              "expanded_spell_list_key": "akhlitol_gegaor_karathaan"
+            },
+            {
+              "id": "lord-gegaor",
+              "name": "Gegaôr la bête furieuse",
+              "type": "demon",
+              "expanded_spell_list_key": "akhlitol_gegaor_karathaan"
+            },
+            {
+              "id": "lord-liridem",
+              "name": "Liridem l'amer",
+              "type": "demon",
+              "expanded_spell_list_key": "liridem_nisgriph_ntadadiph"
+            },
+            {
+              "id": "lord-nisgriph",
+              "name": "Nisgriph le prince des mensonges",
+              "type": "demon",
+              "expanded_spell_list_key": "liridem_nisgriph_ntadadiph"
+            },
+            {
+              "id": "lord-askinos",
+              "name": "Hospodar Askinos le buveur de douleur",
+              "type": "devil",
+              "expanded_spell_list_key": "askinos"
+            },
+            {
+              "id": "lord-ntadadiph",
+              "name": "Hospodar Ntadadiph le cauchemar",
+              "type": "devil",
+              "expanded_spell_list_key": "liridem_nisgriph_ntadadiph"
+            },
+            {
+              "id": "lord-karathaan",
+              "name": "Hospodar Karathaan le seigneur de guerre",
+              "type": "devil",
+              "expanded_spell_list_key": "akhlitol_gegaor_karathaan"
+            },
+            {
+              "id": "lord-methridanou",
+              "name": "Hospodar Methridanou le modeleur",
+              "type": "devil",
+              "expanded_spell_list_key": "methridanou"
+            }
+          ]
+        },
+        "expanded_spell_lists": {
+          "akhlitol_gegaor_karathaan": {
+            "1": [
+              "spl-heroisme",
+              "spl-marque-du-chasseur"
+            ],
+            "2": [
+              "spl-agrandissement-rapetissement",
+              "spl-arme-magique"
+            ],
+            "3": [
+              "spl-protection-contre-l-energie",
+              "spl-rapidite"
+            ],
+            "4": [
+              "spl-insecte-geant",
+              "spl-metamorphose"
+            ],
+            "5": [
+              "spl-brume-mortelle",
+              "spl-fleau-d-insectes"
+            ]
+          },
+          "liridem_nisgriph_ntadadiph": {
+            "1": [
+              "spl-deguisement",
+              "spl-injonction"
+            ],
+            "2": [
+              "spl-detection-de-pensees",
+              "spl-modification-d-apparence"
+            ],
+            "3": [
+              "spl-communication-a-distance",
+              "spl-malediction"
+            ],
+            "4": [
+              "spl-assassin-imaginaire",
+              "spl-confusion"
+            ],
+            "5": [
+              "spl-domination-de-personne",
+              "spl-modification-de-memoire"
+            ]
+          },
+          "askinos": {
+            "1": [
+              "spl-injonction",
+              "spl-rire-affreux"
+            ],
+            "2": [
+              "spl-immobilisation-de-personne",
+              "spl-toile-d-araignee"
+            ],
+            "3": [
+              "spl-malediction",
+              "spl-tempete-de-neige"
+            ],
+            "4": [
+              "spl-tempete-de-grele",
+              "spl-tentacules-noirs"
+            ],
+            "5": [
+              "spl-cone-de-froid",
+              "spl-domination-de-personne"
+            ]
+          },
+          "methridanou": {
+            "1": [
+              "spl-injonction",
+              "spl-simulacre-de-vie"
+            ],
+            "2": [
+              "spl-croissance-d-epines",
+              "spl-metal-brulant"
+            ],
+            "3": [
+              "spl-animation-des-morts",
+              "spl-glyphe-de-garde"
+            ],
+            "4": [
+              "spl-faconnage-de-la-pierre",
+              "spl-metamorphose"
+            ],
+            "5": [
+              "spl-animation-d-objets",
+              "spl-main-du-mage"
+            ]
+          }
+        },
+        "features": [
+          {
+            "id": "feat-faveur-de-l-obscur",
+            "name": "Faveur de l'obscur",
+            "unlocks_at_level": 1,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Chaque fois que vous réduisez une créature hostile à 0 PV, vous gagnez des PV temporaires égaux à votre modificateur de Charisme + votre niveau de sorcier (minimum 1).",
+              "lore_note": null
+            },
+            "temp_hp_formula": "cha_mod + class_level",
+            "temp_hp_minimum": 1,
+            "trigger": "enemy_reduced_to_zero_hp"
+          },
+          {
+            "id": "feat-fortune-de-l-obscur",
+            "name": "Fortune de l'obscur",
+            "unlocks_at_level": 6,
+            "recharge": "short_rest",
+            "uses": 1,
+            "flavor": {
+              "summary": "Lorsque vous effectuez un test de caractéristique ou un jet de sauvegarde, vous pouvez ajouter 1d10 au résultat. Décision prise après avoir lancé le dé mais avant les conséquences. Une fois par repos court ou long.",
+              "lore_note": null
+            },
+            "bonus_die": "1d10",
+            "timing": "after_roll_before_outcome"
+          },
+          {
+            "id": "feat-resistance-fielonne",
+            "name": "Résistance fiélonne",
+            "unlocks_at_level": 10,
+            "recharge": "short_or_long_rest",
+            "flavor": {
+              "summary": "À la fin de chaque repos court ou long, choisissez un type de dégâts. Vous êtes résistant à ce type jusqu'au prochain choix. Les armes magiques ou en argent contournent cette résistance.",
+              "lore_note": null
+            },
+            "resistance_type": "player_choice_on_rest",
+            "bypassed_by": [
+              "magic_weapons",
+              "silver_weapons"
+            ]
+          },
+          {
+            "id": "feat-voyage-infernal",
+            "name": "Voyage infernal",
+            "unlocks_at_level": 14,
+            "recharge": "long_rest",
+            "uses": 1,
+            "flavor": {
+              "summary": "En touchant une créature avec une attaque, vous la transportez vers les Plans Inférieurs jusqu'à la fin de votre prochain tour (espace libre le plus proche au retour). Si non-fiélon : 10d10 dégâts psychiques. Une fois par repos long.",
+              "lore_note": null
+            },
+            "trigger": "hit_with_attack",
+            "damage": {
+              "dice": "10d10",
+              "type": "psychic",
+              "condition": "target_not_fiend"
+            },
+            "duration": "until_end_of_casters_next_turn"
+          }
+        ]
+      },
+      {
+        "id": "subcls-seigneur-sauvage",
+        "name": "Le seigneur sauvage",
+        "flavor": {
+          "summary": "Un pacte avec une entité sauvage et impétueuse liée aux forces élémentaires (élémentaire puissant, astre, volcan, tarasque, seigneur lycanthrope). Connexion forcée par des moyens détournés.",
+          "lore_note": "Sa violence dort peut-être, mais elle se déchaînera inexorablement un jour."
+        },
+        "expanded_spell_lists": {
+          "seigneur_sauvage": {
+            "1": [
+              "spl-couleurs-dansantes",
+              "spl-vague-de-tonnerre"
+            ],
+            "2": [
+              "spl-bourrasque",
+              "spl-flou"
+            ],
+            "3": [
+              "spl-clignotement",
+              "spl-mur-de-vent"
+            ],
+            "4": [
+              "spl-invocation-d-elementaires-mineurs",
+              "spl-liberte-de-mouvement"
+            ],
+            "5": [
+              "spl-double-illusoire",
+              "spl-invocation-d-elementaire"
+            ]
+          }
+        },
+        "features": [
+          {
+            "id": "feat-la-bete-interieure",
+            "name": "La Bête intérieure",
+            "unlocks_at_level": 1,
+            "recharge": "short_rest",
+            "uses": 1,
+            "flavor": {
+              "summary": "Action : vague de bestialité centrée sur un point visible à 9 m max (rayon 3 m). JS de Sagesse (DD = sort). Échec : lâche ce qu'il tient et consacre sa prochaine action à attaquer à mains nues (ou armes naturelles) la créature la plus proche. Une fois par repos court ou long.",
+              "lore_note": null
+            },
+            "action_type": "action",
+            "saving_throw": {
+              "ability": "wis",
+              "dc_formula": "spell_save_dc"
+            },
+            "area": {
+              "type": "sphere",
+              "radius_m": 3,
+              "origin": "chosen_point",
+              "max_range_m": 9
+            }
+          },
+          {
+            "id": "feat-trebuchement",
+            "name": "Trébuchement",
+            "unlocks_at_level": 6,
+            "recharge": "short_rest",
+            "uses": 1,
+            "flavor": {
+              "summary": "Réaction : quand un adversaire visible vous touche avec une attaque, forcez-le à relancer cette attaque avec un désavantage. Seul le second résultat compte. Une fois par repos court ou long.",
+              "lore_note": null
+            },
+            "action_type": "reaction",
+            "trigger": "hit_by_visible_enemy_attack",
+            "advantages": [
+              {
+                "type": "attack_roll",
+                "target": "attacker",
+                "is_disadvantage": true,
+                "condition": "forcé à relancer par réaction du sorcier"
+              }
+            ]
+          },
+          {
+            "id": "feat-metamorphose-sauvage",
+            "name": "Métamorphose sauvage",
+            "unlocks_at_level": 10,
+            "recharge": "short_rest",
+            "uses": 1,
+            "flavor": {
+              "summary": "Action bonus : transformation en humanoïde bestial (1 minute). Bénéfices : immunité aux dégâts contondants/perforants/tranchants non magiques (sauf argent), Force = Charisme si supérieur, attaques à mains nues magiques (1d8 + Force, tranchant/perforant), 2 attaques à mains nues par action Attaquer, +2 CA, +3 m VD, PV temporaires = bonus de maîtrise. Nouveaux sorts impossibles sous cette forme (sorts en concentration déjà actifs maintenus).",
+              "lore_note": null
+            },
+            "action_type": "bonus_action",
+            "duration_minutes": 1,
+            "immunities_while_active": [
+              "bludgeoning_nonmagical",
+              "piercing_nonmagical",
+              "slashing_nonmagical"
+            ],
+            "immunity_bypass": [
+              "silver_weapons"
+            ],
+            "bonuses_while_active": {
+              "str_equals_cha_if_greater": true,
+              "unarmed_damage_die": "1d8",
+              "unarmed_damage_types": [
+                "slashing",
+                "piercing"
+              ],
+              "unarmed_is_magical": true,
+              "unarmed_attacks_per_attack_action": 2,
+              "ac_bonus": 2,
+              "speed_bonus_m": 3,
+              "temp_hp_formula": "prof_bonus"
+            },
+            "restrictions_while_active": [
+              "no_new_spellcasting"
+            ]
+          },
+          {
+            "id": "feat-vent-de-magie",
+            "name": "Vent de magie",
+            "unlocks_at_level": 14,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Réaction : quand vous êtes la seule cible d'un sort, lancez 1d20. 1–10 : le sort agit normalement. 11–16 : sort annulé + simulacre de vie au même niveau sur vous. 17–20 : inversion totale (vous devenez le lanceur, l'ancien lanceur devient la cible).",
+              "lore_note": null
+            },
+            "action_type": "reaction",
+            "trigger": "sole_target_of_a_spell",
+            "random_table": [
+              {
+                "range": [
+                  1,
+                  10
+                ],
+                "effect_key": "spell_resolves_normally"
+              },
+              {
+                "range": [
+                  11,
+                  16
+                ],
+                "effect_key": "spell_cancelled_simulacre_de_vie_on_self"
+              },
+              {
+                "range": [
+                  17,
+                  20
+                ],
+                "effect_key": "spell_reversed_roles_swapped"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "name": "Suzerain"
+  },
+  "subclass_label": "Suzerain",
+  "subclass_level_unlocked": 1
+}

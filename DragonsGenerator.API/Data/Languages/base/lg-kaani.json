@@ -1,0 +1,22 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-kaani",
+  "name": "Kaani",
+  "category": "base",
+  "typical_speakers": [
+    "Orcs",
+    "Sujets de l'ancien empire Kaan"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-santak",
+      "label": "Santak",
+      "type": "cuneiforme"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [
+    "Partout où l'empire Kaan a régné"
+  ],
+  "description": "Langue partout où l'empire Kaan a régné. Les orcs parlent kaani. Elle s'écrit en cunéiforme santak."
+}

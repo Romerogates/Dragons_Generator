@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-domaine-enchante",
+  "name": "Domaine enchanté",
+  "level": 9,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 24,
+    "unit": "heure"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "speciale",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(une pincée de terre d'une contrée lointaine"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-magicien",
+    "cls-pretre"
+  ],
+  "description": "J Vous créez autour de vous un domaine infusé de magie, confiné dans un espace d'un rayon maximal de 1,5 km. La forme de l'ensemble n'est pas forcément régulière, car la magie s'associe aux limites géographiques telles que les rivières, murs, haies, falaises ou toute autre délimitation. Un domaine enchanté possède des caractéristiques communes et d'autres spécifiques, détaillées plus loin. Lancer ce sort au même endroit à chaque date anniversaire pendant 10 ans le rend permanent.",
+  "modular_options": []
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-faconnage-de-la-pierre",
+  "name": "Façonnage de la pierre",
+  "level": 4,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(argile meuble"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-magicien",
+    "cls-pretre"
+  ],
+  "description": "Vous touchez un objet de pierre de taille M ou inférieure ou une section de pierre ne dépassant pas 1,50 m de côté, puis le façonnez pour lui donner la forme voulue. Par exemple, vous pourriez façonner un rocher en arme, idole ou coffre, ou ouvrir un petit passage dans un mur, pourvu que ce dernier ne fasse pas plus de 1,50 m d'épaisseur. Vous pouvez également façonner une porte en pierre de sorte à la désolidariser de son support, ou à l'inverse façonner son chambranle pour la sceller. L'objet que vous créez peut avoir jusqu'à deux gonds et un loquet, mais l'ensemble reste nécessairement grossier. ## Le temps de façonner l'argile Si votre meneur utilise cette option, vous devez consacrer 10 minutes à façonner l'argile pour lui donner la forme visée, en réussissant un test de Dextérité (outils de potier) DD 13.",
+  "modular_options": []
+}

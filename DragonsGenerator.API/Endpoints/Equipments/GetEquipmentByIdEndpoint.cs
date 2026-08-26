@@ -1,4 +1,7 @@
-﻿
+﻿using DragonsGenerator.API.Common;
+using DragonsGenerator.API.Models;
+using FastEndpoints;
+
 namespace DragonsGenerator.API.Endpoints.Equipments;
 
 public class GetEquipmentByIdRequest
@@ -8,6 +11,10 @@ public class GetEquipmentByIdRequest
 
 public class GetEquipmentByIdEndpoint : Endpoint<GetEquipmentByIdRequest, Equipment>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetEquipmentByIdEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/equipments/{id}");
@@ -16,10 +23,7 @@ public class GetEquipmentByIdEndpoint : Endpoint<GetEquipmentByIdRequest, Equipm
 
     public override async Task HandleAsync(GetEquipmentByIdRequest req, CancellationToken ct)
     {
-        var equipments = await JsonDataLoader.LoadAsync<List<Equipment>>("equipments.json", ct);
-
-        var equipment = equipments?.FirstOrDefault(e =>
-            string.Equals(e.Id, req.Id, StringComparison.OrdinalIgnoreCase));
+        var equipment = await _repo.GetEquipmentByIdAsync(req.Id, ct);
 
         if (equipment is null)
         {

@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-protection-contre-l-energie",
+  "name": "Protection contre l'énergie",
+  "level": 3,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-pretre",
+    "cls-rodeur"
+  ],
+  "description": "P P our toute la durée du sort, la créature consentante que vous touchez bénéficie d'une résistance à un type de dégâts de votre choix : acide, feu, foudre, froid ou tonnerre. ② À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplace ment au-dessus du 3e.",
+  "modular_options": []
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-orientation",
+  "name": "Orientation",
+  "level": 6,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "jour"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(un jeu d'objets divinatoires - osselets"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-pretre"
+  ],
+  "description": "Ce sort vous permet de trouver le chemin le plus court et direct pour vous rendre en un lieu donné que vous connaissez et situé sur le même plan d'existence que vous. Si vous nommez une destination située sur un autre plan d'existence, qui se déplace (comme une forteresse mobile) ou qui n'est pas spécifique (comme « l'antre d'un dragon vert »), le sort échoue. Pour toute la durée du sort, vous connaissez la distance qui vous sépare de votre destination et sa direction aussi longtemps que vous êtes sur le même plan d'existence. Tant que vous vous y rendez, chaque fois que vous devez choisir un itinéraire en chemin, vous déterminez automatiquement le plus court et direct (mais pas forcément le plus sûr). Si vous utilisez la règle optionnelle du rituel de divination, le sort orientation peut être lancé comme un rituel. Si votre meneur utilise cette option, le sort orientation fait appel à un esprit qui connaît la destination que vous recherchez, mais dont le caractère est plus ou moins bienveillant, et les connaissances possiblement caduques. L'esprit peut être l'âme d'un mort ou un esprit animal associé à Eana. Tant que dure le sort, le lanceur du sort voit le guide invisible comme une silhouette fantomatique aux contours irisés et entend ses instructions par télépathie - mais doit y répondre à voix haute. Le guide invisible reste normalement à moins de 3 m du lanceur de sorts, mais peut, à sa demande, partir en éclaireur dans un rayon de 50 m, par exemple pour trouver un passage plus praticable. La table ci-après donne des exemples d'esprit. Votre meneur peut en tirer un au sort, ou en créer un adapté à sa campagne. 1d6 Nature de l'esprit L'esprit connaît la destination telle qu'elle était il y a 1d10 × 100 ans. Il vous guide sur les routes d'alors, qui peuvent être devenues inutilisables, infranchissables, ou tout simplement ne plus exister, comme dans le cas d'un pont effondré au-dessus d'un abîme. L'esprit est ailé ou particulièrement agile : il propose un chemin adapté à ses capacités, mais pas forcément à celles du lanceur de sorts. L'esprit est constamment porté à aller en ligne droite vers l'objectif, ce qui ne rend pas les choses faciles dès que le relief est accidenté ou présente des obstacles. Il fait mine de s'avancer pour être suivi et doit régulièrement revenir en arrière, agacé par ces mortels soumis à des contraintes matérielles. L'esprit est téméraire. S'il en a la possibilité, il guidera toujours les aventuriers vers les situations les plus hautes en couleur, qui pourront présenter de réels dangers. L'esprit est prudent et emprunte les chemins les plus sûrs. Il réduit significativement les chances de faire une rencontre dangereuse ou de tomber dans une zone à risque (sables mouvants, zone d'avalanche, etc.), mais le trajet est lent. L'esprit était autrefois guide, patrouilleur ou voleur, et connaît des raccourcis et des passages secrets qui permettent de gagner du temps.",
+  "modular_options": []
+}

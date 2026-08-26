@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "don-expeditif",
+  "name": "Expéditif",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [],
+  "description": "VD +3 m. Boire une fiole ne coûte aucune action. Les armes à rechargement n'ont plus cette contrainte pour vous. Se relever depuis terre ne coûte que 1,5 m de déplacement.",
+  "benefits": [
+    {
+      "type": "speed_bonus",
+      "value_m": 3
+    },
+    {
+      "type": "free_action",
+      "activity": "boire une fiole"
+    },
+    {
+      "type": "ignore_property",
+      "property": "rechargement"
+    },
+    {
+      "type": "reduced_cost",
+      "activity": "se relever",
+      "cost_m": 1.5
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "mobilité",
+    "vitesse",
+    "combat"
+  ]
+}

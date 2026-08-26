@@ -1,0 +1,60 @@
+{
+  "schema_version": "2.0",
+  "id": "civ-torea",
+  "name": "Torea",
+  "randomization": {
+    "dice": "d100",
+    "min": 99,
+    "max": 100
+  },
+  "demographics": {
+    "primary_species": [
+      {
+        "id": "sp-humain",
+        "label": "Humains"
+      }
+    ],
+    "secondary_species": [],
+    "is_cosmopolitan": false,
+    "cosmopolitan_zones": [
+      "principaux comptoirs"
+    ],
+    "social_roles": [
+      {
+        "id": "role-marchand",
+        "label": "Marchands d'autres peuples (comptoirs)"
+      }
+    ],
+    "peoples_note": "Humains essentiellement. Marchands d'autres peuples dans les comptoirs. Merriens sous les flots."
+  },
+  "official_languages": [
+    {
+      "id": "lg-aupuniwi",
+      "label": "Aupuniwi"
+    }
+  ],
+  "multilingual": false,
+  "writing_systems": [
+    {
+      "id": "wr-tumiit",
+      "label": "Tumiit",
+      "type": "syllabaire"
+    }
+  ],
+  "is_oral_only": false,
+  "description": "Torea est une contrée paradisiaque : voir ses atolls de sable blanc et ses barrières de corail laisse une marque indélébile dans l'esprit du voyageur. Son nom est aussi celui d'un oiseau sacré multicolore, typique de cette région du monde. À la surface des eaux et des terres vivent les navigateurs, marchands et cultivateurs humains, répartis en une multitude de communautés, tribus et civilisations. Sous les flots évoluent les merriens, peuple mystérieux, capable de respirer sous l'eau et de nager avec aisance grâce à une queue de poisson. Ils édifient des cités fastueuses de corail et de perles. Ces contrées paradisiaques sont pourtant menacées de multiples périls et derrière ces apparences idylliques se cachent des menaces mortelles. Depuis les profondeurs abyssales viennent les ravageurs du Chancre menés par la Reine Noyée. Les exécrables merrows, pour leur part, mettent tout en œuvre pour accomplir le cauchemar du prince démon Ouxounouël. Des pirates et marchands d'esclaves des Îles Barbaresques viennent prélever leur part de richesses et de vies, tarissant parfois des communautés entières. Désespérés, certains habitants de ces contrées se réfugient dans des cultes monstrueux qui les rapprochent d'êtres abjects et leur permettent de se défendre en usant de sombres pouvoirs.",
+  "geography_tags": [
+    "atolls",
+    "barrieres-de-corail",
+    "ocean",
+    "cites-de-corail"
+  ],
+  "threat_ids": [
+    "threat-chancre",
+    "threat-reine-noyee",
+    "threat-merrows",
+    "threat-ouxounouel",
+    "threat-pirates-barbaresques",
+    "threat-cultes-monstrueux"
+  ]
+}

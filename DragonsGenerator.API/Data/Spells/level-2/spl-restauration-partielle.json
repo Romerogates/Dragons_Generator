@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-restauration-partielle",
+  "name": "Restauration partielle",
+  "level": 2,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-paladin",
+    "cls-pretre",
+    "cls-rodeur"
+  ],
+  "modular_options": []
+}

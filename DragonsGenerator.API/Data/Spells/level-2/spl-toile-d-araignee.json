@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-toile-d-araignee",
+  "name": "Toile d'araignée",
+  "level": 2,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un bout de toile d'araignée"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Vous invoquez une masse épaisse de fils gluants en un point de votre choix à portée. Les toiles remplissent un cube de 6 m d'arête depuis ce point pour toute la durée du sort. Elles constituent un terrain difficile et voilent légèrement la zone. Si les toiles ne sont pas ancrées en deux points solides (comme des murs ou des arbres) ou disposées en travers du sol, d'un mur ou d'un plafond, elles s'effondrent et le sort prend fin au début de votre tour de jeu suivant. Les toiles invoquées sur une surface plane ont une épaisseur de 1,50 m. Toute créature qui commence son tour de jeu dans les toiles ou y entre à son tour de jeu doit effectuer un JS Dextérité. En cas d'échec, la créature est entravée aussi longtemps qu'elle reste dans les toiles ou jusqu'à ce qu'elle se libère. Une créature entravée par les toiles peut effectuer un test de Force assorti de votre DD de sauvegarde des sorts, au prix d'une action. En cas de réussite, elle n'est plus entravée. Les toiles sont inflammables. Tout cube de 1,50 m d'arête exposé aux flammes brûle en 1 round, en infligeant 2d4 dégâts de feu aux créatures qui y commencent leur tour de jeu.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, chaque niveau d'emplacement au-dessus du 2e augmente la durée de 1 heure et l'arête du cube de 3 m (si vous le souhaitez).",
+  "modular_options": []
+}

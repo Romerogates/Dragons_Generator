@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-amelioration-de-caracteristique",
+  "name": "Amélioration de caractéristique",
+  "level": 2,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "de la fourrure ou une plume d'un animal"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-pretre"
+  ],
+  "description": "Vous touchez une créature et lui conférez une amélioration magique. Choisissez un des effets suivants ; la cible en bénéficie jusqu'à la fin du sort. Endurance de l'ours. La cible bénéficie d'un avantage aux tests de Constitution. Elle gagne aussi 2d6 points de vie temporaires, qui sont perdus quand le sort prend fin. Force de taureau. La cible bénéficie d'un avantage aux tests de Force et sa charge maximale est doublée. Grâce féline. La cible bénéficie d'un avantage aux tests de Dextérité. En outre, elle ne subit pas de dégâts quand elle tombe d'une hauteur de 6 m ou moins si elle n'est pas neutralisée. Splendeur de l'aigle. La cible bénéficie d'un avantage aux tests de Charisme. Ruse de renard. La cible bénéficie d'un avantage aux tests d'Intelligence. Sagesse du hibou. La cible bénéficie d'un avantage aux tests de Sagesse.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

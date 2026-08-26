@@ -1,0 +1,18 @@
+{
+  "schema_version": "2.0",
+  "id": "hdc-vertige",
+  "name": "Vertige",
+  "source": "livre_de_base",
+  "description": "Votre vue se trouble et votre équilibre devient précaire près du vide. Chaque fois que vous vous trouvez à 3 m ou moins d'une dénivellation abrupte d'au moins 3 m, vous devez réussir un jet de sauvegarde de Sagesse DD 11 ou être entravé pendant 1 round.",
+  "mechanics": {
+    "trigger": "À 3 m ou moins d'une dénivellation d'au moins 3 m",
+    "saving_throw": {
+      "ability": "WIS",
+      "dc": 11
+    },
+    "on_fail": {
+      "condition": "entravé",
+      "duration": "1 round"
+    }
+  }
+}

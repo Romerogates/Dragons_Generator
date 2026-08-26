@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-lothrien",
+  "name": "Lothrien",
+  "category": "base",
+  "typical_speakers": [
+    "Habitants de la Lothrienne"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-cyfand",
+      "label": "Cyfand",
+      "type": "alphabet"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [
+    "Lothrienne (continent du Cyfandir)"
+  ],
+  "description": "Langue de la Lothrienne, sur le continent du Cyfandir. Elle s'écrit avec l'alphabet cyfand."
+}

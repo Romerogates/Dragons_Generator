@@ -1,0 +1,1458 @@
+{
+  "id": "cls-ensorceleur",
+  "schema_version": "3.0",
+  "name": "Ensorceleur",
+  "flavor": {
+    "summary": "Arcaniste inné dont la magie sourd du sang ou d'un éveil mystique, l'ensorceleur plie la magie brute à sa volonté au péril de se laisser consumer par elle.",
+    "lore_note": "Sur Eana, l'Éveil à la magie est requis pour jouer cette classe. À valider avec le meneur de jeu à la création du personnage."
+  },
+  "hit_die": "1d6",
+  "hp_at_level_1": 6,
+  "hp_per_level_average": 4,
+  "primary_abilities": [
+    "cha"
+  ],
+  "saving_throw_proficiencies": [
+    "con",
+    "cha"
+  ],
+  "armor_proficiencies": [],
+  "weapon_proficiencies": [
+    "wp-arbalete-legere",
+    "wp-baton-de-combat",
+    "wp-dague",
+    "wp-flechette",
+    "wp-fronde"
+  ],
+  "tool_proficiencies": [],
+  "choice_pools": [
+    {
+      "id": "choice-skills-cls-ensorceleur",
+      "name": "Compétences de classe",
+      "type": "skill_proficiency",
+      "allow_choice": true,
+      "quantity": 2,
+      "pool": [
+        "skill-arcanes",
+        "skill-intimidation",
+        "skill-intuition",
+        "skill-persuasion",
+        "skill-survie",
+        "skill-tromperie"
+      ]
+    }
+  ],
+  "spellcasting": {
+    "type": "known",
+    "ability": "cha",
+    "spell_list_class": "cls-ensorceleur",
+    "is_ritual_caster": false,
+    "starts_at_level": 1,
+    "focus_options": [
+      "tl-sacoche-a-composantes",
+      "tl-focaliseur-arcanique"
+    ],
+    "allows_swap_on_levelup": true,
+    "uses_arcane_points": true,
+    "spell_dc_formula": "8 + proficiency_bonus + cha_mod",
+    "spell_attack_formula": "proficiency_bonus + cha_mod"
+  },
+  "starting_equipment": {
+    "fixed": [
+      {
+        "id": "wp-dague",
+        "qty": 2
+      }
+    ],
+    "choice_pools": [
+      {
+        "id": "choice-equip-slot1-cls",
+        "name": "Arme à distance ou arme courante au choix",
+        "type": "equipment",
+        "allow_choice": true,
+        "quantity": 1,
+        "options": [
+          {
+            "option_id": "A",
+            "items": [
+              {
+                "id": "wp-arbalete-legere",
+                "qty": 1
+              },
+              {
+                "id": "gr-carreau",
+                "qty": 20
+              }
+            ]
+          },
+          {
+            "option_id": "B",
+            "items": [
+              {
+                "id": "category-arme-courante",
+                "qty": 1,
+                "player_choice": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "choice-equip-slot2-cls",
+        "name": "Focaliseur arcanique ou sacoche à composantes",
+        "type": "equipment",
+        "allow_choice": true,
+        "quantity": 1,
+        "options": [
+          {
+            "option_id": "A",
+            "items": [
+              {
+                "id": "tl-sacoche-a-composantes",
+                "qty": 1
+              }
+            ]
+          },
+          {
+            "option_id": "B",
+            "items": [
+              {
+                "id": "tl-focaliseur-arcanique",
+                "qty": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "choice-equip-slot3-cls",
+        "name": "Sac d'équipement",
+        "type": "equipment",
+        "allow_choice": true,
+        "quantity": 1,
+        "options": [
+          {
+            "option_id": "A",
+            "items": [
+              {
+                "id": "gr-sac-dexplorateur",
+                "qty": 1
+              }
+            ]
+          },
+          {
+            "option_id": "B",
+            "items": [
+              {
+                "id": "gr-sac-daventurier",
+                "qty": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "progression": [
+    {
+      "level": 1,
+      "features": [
+        "feat-sorts-ensorceleur",
+        "feat-atavisme"
+      ],
+      "resources": {
+        "cantrips_known": 4,
+        "spells_known": 2,
+        "arcane_points": 0,
+        "spell_slots": {
+          "1": 2
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-cantrips-ensorceleur-1",
+          "type": "spell_known",
+          "quantity": 4,
+          "allow_replacement": false,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level": 0
+          }
+        },
+        {
+          "id": "choice-spells-ensorceleur-1",
+          "type": "spell_known",
+          "quantity": 2,
+          "allow_replacement": false,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 1
+          }
+        },
+        {
+          "id": "choice-subclass-atavisme",
+          "type": "subclass",
+          "quantity": 1,
+          "pool": [
+            "subcls-lignee-draconique",
+            "subcls-magie-psychique"
+          ]
+        }
+      ],
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 2,
+      "features": [
+        "feat-reserve-arcanique",
+        "feat-magie-modulable"
+      ],
+      "resources": {
+        "cantrips_known": 4,
+        "spells_known": 3,
+        "arcane_points": 2,
+        "spell_slots": {
+          "1": 3
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-spells-ensorceleur-2",
+          "type": "spell_known",
+          "quantity": 1,
+          "allow_replacement": true,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 1
+          }
+        }
+      ],
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 3,
+      "features": [
+        "feat-metamagie"
+      ],
+      "resources": {
+        "cantrips_known": 4,
+        "spells_known": 4,
+        "arcane_points": 3,
+        "spell_slots": {
+          "1": 4,
+          "2": 2
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-spells-ensorceleur-3",
+          "type": "spell_known",
+          "quantity": 1,
+          "allow_replacement": true,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 2
+          }
+        },
+        {
+          "id": "choice-metamagie-ensorceleur-3",
+          "type": "metamagic",
+          "quantity": 2,
+          "cumulative_total": 2,
+          "pool": [
+            "meta-sort-accelere",
+            "meta-sort-allonge",
+            "meta-sort-discret",
+            "meta-sort-etendu",
+            "meta-sort-intensifie",
+            "meta-sort-jumeau",
+            "meta-sort-prevenant",
+            "meta-sort-renforce"
+          ]
+        }
+      ],
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 4,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "cantrips_known": 5,
+        "spells_known": 5,
+        "arcane_points": 4,
+        "spell_slots": {
+          "1": 4,
+          "2": 3
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-cantrips-ensorceleur-4",
+          "type": "spell_known",
+          "quantity": 1,
+          "allow_replacement": false,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level": 0
+          }
+        },
+        {
+          "id": "choice-spells-ensorceleur-4",
+          "type": "spell_known",
+          "quantity": 1,
+          "allow_replacement": true,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 2
+          }
+        }
+      ],
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 5,
+      "features": [],
+      "resources": {
+        "cantrips_known": 5,
+        "spells_known": 6,
+        "arcane_points": 5,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 2
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-spells-ensorceleur-5",
+          "type": "spell_known",
+          "quantity": 1,
+          "allow_replacement": true,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 3
+          }
+        }
+      ],
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 6,
+      "features": [
+        "feat-aptitude-atavisme-6"
+      ],
+      "resources": {
+        "cantrips_known": 5,
+        "spells_known": 7,
+        "arcane_points": 6,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-spells-ensorceleur-6",
+          "type": "spell_known",
+          "quantity": 1,
+          "allow_replacement": true,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 3
+          }
+        }
+      ],
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 7,
+      "features": [],
+      "resources": {
+        "cantrips_known": 5,
+        "spells_known": 8,
+        "arcane_points": 7,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 1
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-spells-ensorceleur-7",
+          "type": "spell_known",
+          "quantity": 1,
+          "allow_replacement": true,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 4
+          }
+        }
+      ],
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 8,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "cantrips_known": 5,
+        "spells_known": 9,
+        "arcane_points": 8,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 2
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-spells-ensorceleur-8",
+          "type": "spell_known",
+          "quantity": 1,
+          "allow_replacement": true,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 4
+          }
+        }
+      ],
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 9,
+      "features": [],
+      "resources": {
+        "cantrips_known": 5,
+        "spells_known": 10,
+        "arcane_points": 9,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 1
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-spells-ensorceleur-9",
+          "type": "spell_known",
+          "quantity": 1,
+          "allow_replacement": true,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 5
+          }
+        }
+      ],
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 10,
+      "features": [
+        "feat-metamagie"
+      ],
+      "resources": {
+        "cantrips_known": 6,
+        "spells_known": 11,
+        "arcane_points": 10,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-cantrips-ensorceleur-10",
+          "type": "spell_known",
+          "quantity": 1,
+          "allow_replacement": false,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level": 0
+          }
+        },
+        {
+          "id": "choice-spells-ensorceleur-10",
+          "type": "spell_known",
+          "quantity": 1,
+          "allow_replacement": true,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 5
+          }
+        },
+        {
+          "id": "choice-metamagie-ensorceleur-10",
+          "type": "metamagic",
+          "quantity": 1,
+          "cumulative_total": 3,
+          "pool": [
+            "meta-sort-accelere",
+            "meta-sort-allonge",
+            "meta-sort-discret",
+            "meta-sort-etendu",
+            "meta-sort-intensifie",
+            "meta-sort-jumeau",
+            "meta-sort-prevenant",
+            "meta-sort-renforce"
+          ]
+        }
+      ],
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 11,
+      "features": [],
+      "resources": {
+        "cantrips_known": 6,
+        "spells_known": 12,
+        "arcane_points": 11,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2,
+          "6": 1
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-spells-ensorceleur-11",
+          "type": "spell_known",
+          "quantity": 1,
+          "allow_replacement": true,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 6
+          }
+        }
+      ],
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 12,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "cantrips_known": 6,
+        "spells_known": 12,
+        "arcane_points": 12,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2,
+          "6": 1
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-spells-ensorceleur-12",
+          "type": "spell_known",
+          "quantity": 0,
+          "allow_replacement": true,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 6
+          }
+        }
+      ],
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 13,
+      "features": [],
+      "resources": {
+        "cantrips_known": 6,
+        "spells_known": 13,
+        "arcane_points": 13,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2,
+          "6": 1,
+          "7": 1
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-spells-ensorceleur-13",
+          "type": "spell_known",
+          "quantity": 1,
+          "allow_replacement": true,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 7
+          }
+        }
+      ],
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 14,
+      "features": [
+        "feat-aptitude-atavisme-14"
+      ],
+      "resources": {
+        "cantrips_known": 6,
+        "spells_known": 13,
+        "arcane_points": 14,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2,
+          "6": 1,
+          "7": 1
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-spells-ensorceleur-14",
+          "type": "spell_known",
+          "quantity": 0,
+          "allow_replacement": true,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 7
+          }
+        }
+      ],
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 15,
+      "features": [],
+      "resources": {
+        "cantrips_known": 6,
+        "spells_known": 14,
+        "arcane_points": 15,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2,
+          "6": 1,
+          "7": 1,
+          "8": 1
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-spells-ensorceleur-15",
+          "type": "spell_known",
+          "quantity": 1,
+          "allow_replacement": true,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 8
+          }
+        }
+      ],
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 16,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "cantrips_known": 6,
+        "spells_known": 14,
+        "arcane_points": 16,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2,
+          "6": 1,
+          "7": 1,
+          "8": 1
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-spells-ensorceleur-16",
+          "type": "spell_known",
+          "quantity": 0,
+          "allow_replacement": true,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 8
+          }
+        }
+      ],
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 17,
+      "features": [
+        "feat-metamagie"
+      ],
+      "resources": {
+        "cantrips_known": 6,
+        "spells_known": 15,
+        "arcane_points": 17,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-spells-ensorceleur-17",
+          "type": "spell_known",
+          "quantity": 1,
+          "allow_replacement": true,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 9
+          }
+        },
+        {
+          "id": "choice-metamagie-ensorceleur-17",
+          "type": "metamagic",
+          "quantity": 1,
+          "cumulative_total": 4,
+          "pool": [
+            "meta-sort-accelere",
+            "meta-sort-allonge",
+            "meta-sort-discret",
+            "meta-sort-etendu",
+            "meta-sort-intensifie",
+            "meta-sort-jumeau",
+            "meta-sort-prevenant",
+            "meta-sort-renforce"
+          ]
+        }
+      ],
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 18,
+      "features": [
+        "feat-aptitude-atavisme-18"
+      ],
+      "resources": {
+        "cantrips_known": 6,
+        "spells_known": 15,
+        "arcane_points": 18,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 3,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-spells-ensorceleur-18",
+          "type": "spell_known",
+          "quantity": 0,
+          "allow_replacement": true,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 9
+          }
+        }
+      ],
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 19,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "cantrips_known": 6,
+        "spells_known": 15,
+        "arcane_points": 19,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 3,
+          "6": 2,
+          "7": 1,
+          "8": 1,
+          "9": 1
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-spells-ensorceleur-19",
+          "type": "spell_known",
+          "quantity": 0,
+          "allow_replacement": true,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 9
+          }
+        }
+      ],
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 20,
+      "features": [
+        "feat-restauration-ensorcelee"
+      ],
+      "resources": {
+        "cantrips_known": 6,
+        "spells_known": 15,
+        "arcane_points": 20,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 3,
+          "6": 2,
+          "7": 2,
+          "8": 1,
+          "9": 1
+        }
+      },
+      "choice_pools_active": [
+        {
+          "id": "choice-spells-ensorceleur-20",
+          "type": "spell_known",
+          "quantity": 0,
+          "allow_replacement": true,
+          "pool_filter": {
+            "class": "cls-ensorceleur",
+            "spell_level_min": 1,
+            "spell_level_max": 9
+          }
+        }
+      ],
+      "proficiency_bonus": 6
+    }
+  ],
+  "features_details": [
+    {
+      "id": "feat-sorts-ensorceleur",
+      "name": "Sorts",
+      "unlocks_at_level": 1,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Un événement passé a légué une marque arcanique indélébile. La magie sourd de cette réserve intérieure.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "spellcasting_ability": "cha",
+        "spell_dc_formula": "8 + proficiency_bonus + cha_mod",
+        "spell_attack_formula": "proficiency_bonus + cha_mod",
+        "allows_swap_on_levelup": true,
+        "swap_note": "À chaque niveau, un sort connu peut être remplacé par un autre sort de la liste ensorceleur de niveau disponible."
+      }
+    },
+    {
+      "id": "feat-atavisme",
+      "name": "Atavisme",
+      "unlocks_at_level": 1,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Source des pouvoirs magiques innés. Octroie des aptitudes de sous-classe aux niveaux 1, 6, 14 et 18.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "subclass_trigger": true,
+        "subclass_feature_levels": [
+          1,
+          6,
+          14,
+          18
+        ]
+      }
+    },
+    {
+      "id": "feat-reserve-arcanique",
+      "name": "Réserve arcanique",
+      "unlocks_at_level": 2,
+      "recharge": "long_rest",
+      "flavor": {
+        "summary": "Source intarissable de magie brute se manifestant par des points arcaniques.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "resource_key": "arcane_points",
+        "max_formula": "class_level",
+        "range": {
+          "min": 2,
+          "max": 20
+        },
+        "recovery": "long_rest"
+      }
+    },
+    {
+      "id": "feat-magie-modulable",
+      "name": "Magie modulable",
+      "unlocks_at_level": 2,
+      "recharge": "at_will",
+      "flavor": {
+        "summary": "Conversion bidirectionnelle entre points arcaniques et emplacements de sort.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "action_cost": "bonus_action",
+        "slot_creation": {
+          "costs": {
+            "1": 2,
+            "2": 3,
+            "3": 5,
+            "4": 6,
+            "5": 7
+          },
+          "max_slot_level": 5,
+          "created_slot_expires": "long_rest"
+        },
+        "slot_to_points": {
+          "rate": "slot_level_equals_points_gained"
+        }
+      }
+    },
+    {
+      "id": "feat-metamagie",
+      "name": "Métamagie",
+      "unlocks_at_level": 3,
+      "recharge": "at_will",
+      "flavor": {
+        "summary": "Faculté d'altérer les sorts via des options coûtant des points arcaniques.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "options_known_by_level": {
+          "3": 2,
+          "10": 3,
+          "17": 4
+        },
+        "max_options_per_cast": 1,
+        "stackable_exception": "meta-sort-renforce",
+        "metamagic_options": [
+          {
+            "id": "meta-sort-accelere",
+            "name": "Sort accéléré",
+            "cost_arcane_points": 2,
+            "condition": "sort à temps d'incantation 1 action",
+            "effect": "Le sort est lancé en action bonus à la place."
+          },
+          {
+            "id": "meta-sort-allonge",
+            "name": "Sort allongé",
+            "cost_arcane_points": 1,
+            "condition": "sort à portée ≥ 1,50 m ou de contact",
+            "effect": "Double la portée. Une portée de contact passe à 9 m."
+          },
+          {
+            "id": "meta-sort-discret",
+            "name": "Sort discret",
+            "cost_arcane_points": 1,
+            "condition": null,
+            "effect": "Supprime les composantes verbales ET gestuelles du sort."
+          },
+          {
+            "id": "meta-sort-etendu",
+            "name": "Sort étendu",
+            "cost_arcane_points": 1,
+            "condition": "sort de durée ≥ 1 minute",
+            "effect": "Double la durée du sort (maximum 24 heures)."
+          },
+          {
+            "id": "meta-sort-intensifie",
+            "name": "Sort intensifié",
+            "cost_arcane_points": 3,
+            "condition": "sort imposant un jet de sauvegarde",
+            "effect": "Une cible désignée subit le désavantage à son premier JS contre le sort."
+          },
+          {
+            "id": "meta-sort-jumeau",
+            "name": "Sort jumeau",
+            "cost_arcane_points": "spell_level",
+            "cost_min": 1,
+            "condition": "sort ciblant une seule créature, portée non-personnelle, ne pouvant pas cibler plusieurs créatures au niveau lancé",
+            "effect": "Cible une seconde créature à portée avec le même sort."
+          },
+          {
+            "id": "meta-sort-prevenant",
+            "name": "Sort prévenant",
+            "cost_arcane_points": 1,
+            "condition": "sort imposant un JS à d'autres créatures",
+            "effect": "Jusqu'à [cha_mod] créatures désignées réussissent automatiquement leur JS contre le sort."
+          },
+          {
+            "id": "meta-sort-renforce",
+            "name": "Sort renforcé",
+            "cost_arcane_points": 1,
+            "condition": null,
+            "effect": "Rejoue jusqu'à [cha_mod] dés de dégâts du sort. Chaque dé relancé remplace son résultat.",
+            "stackable": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "feat-augmentation-de-caracteristique",
+      "name": "Augmentation de caractéristique",
+      "unlocks_at_level": 4,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Augmentation de caractéristique à plusieurs reprises au fil des niveaux.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "recurrence_levels": [
+          4,
+          8,
+          12,
+          16,
+          19
+        ],
+        "options": [
+          {
+            "type": "single_stat_boost",
+            "amount": 2
+          },
+          {
+            "type": "dual_stat_boost",
+            "amount": 1
+          }
+        ],
+        "max_stat_value": 20
+      }
+    },
+    {
+      "id": "feat-restauration-ensorcelee",
+      "name": "Restauration ensorcelée",
+      "unlocks_at_level": 20,
+      "recharge": "short_rest",
+      "flavor": {
+        "summary": "Récupère 4 points arcaniques à chaque repos court.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "trigger": "short_rest",
+        "resource_restored": "arcane_points",
+        "amount_restored": 4
+      }
+    },
+    {
+      "id": "feat-aptitude-atavisme-6",
+      "name": "Aptitude d'Atavisme (niveau 6)",
+      "unlocks_at_level": 6,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Aptitude conférée par l'Atavisme choisi au niveau 6.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_feature_delegate",
+        "delegate_to_subclass": true,
+        "at_level": 6
+      }
+    },
+    {
+      "id": "feat-aptitude-atavisme-14",
+      "name": "Aptitude d'Atavisme (niveau 14)",
+      "unlocks_at_level": 14,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Aptitude conférée par l'Atavisme choisi au niveau 14.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_feature_delegate",
+        "delegate_to_subclass": true,
+        "at_level": 14
+      }
+    },
+    {
+      "id": "feat-aptitude-atavisme-18",
+      "name": "Aptitude d'Atavisme (niveau 18)",
+      "unlocks_at_level": 18,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Aptitude conférée par l'Atavisme choisi au niveau 18.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_feature_delegate",
+        "delegate_to_subclass": true,
+        "at_level": 18
+      }
+    }
+  ],
+  "subclasses": {
+    "name": "Atavisme",
+    "level_unlocked": 1,
+    "subclass_feature_levels": [
+      1,
+      6,
+      14,
+      18
+    ],
+    "options": [
+      {
+        "id": "subcls-lignee-draconique",
+        "name": "Lignée draconique",
+        "parent_class": "cls-ensorceleur",
+        "subclass_type": "atavisme",
+        "flavor": {
+          "summary": "Votre magie innée provient de l'influence draconique mêlée à votre sang ou celui de vos ancêtres.",
+          "lore_note": "Sur Eana, un ensorceleur de lignée draconique peut impressionner les kobolds et attirer l'attention des noblesses drakéides."
+        },
+        "choice_pools": [
+          {
+            "id": "choice-ancetre-draconique",
+            "name": "Ancêtre draconique",
+            "type": "dragon_ancestry",
+            "allow_choice": true,
+            "quantity": 1,
+            "pool": [
+              {
+                "id": "dragon-airain",
+                "damage_type": "feu"
+              },
+              {
+                "id": "dragon-argent",
+                "damage_type": "froid"
+              },
+              {
+                "id": "dragon-blanc",
+                "damage_type": "froid"
+              },
+              {
+                "id": "dragon-bleu",
+                "damage_type": "foudre"
+              },
+              {
+                "id": "dragon-bronze",
+                "damage_type": "foudre"
+              },
+              {
+                "id": "dragon-cuivre",
+                "damage_type": "acide"
+              },
+              {
+                "id": "dragon-noir",
+                "damage_type": "acide"
+              },
+              {
+                "id": "dragon-or",
+                "damage_type": "feu"
+              },
+              {
+                "id": "dragon-rouge",
+                "damage_type": "feu"
+              },
+              {
+                "id": "dragon-vert",
+                "damage_type": "poison"
+              }
+            ]
+          }
+        ],
+        "features_details": [
+          {
+            "id": "feat-ancetre-draconique",
+            "name": "Ancêtre draconique",
+            "unlocks_at_level": 1,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Choisissez un type de dragon comme ancêtre. Vous parlez, lisez et écrivez le draconique.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "grants_language": "lang-draconique",
+              "advantages": [
+                {
+                  "type": "proficiency_bonus_doubled",
+                  "target": "cha_check",
+                  "condition": "interaction avec un dragon"
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-resistance-draconique",
+            "name": "Résistance draconique",
+            "unlocks_at_level": 1,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Écailles draconiques latentes : bonus de PV permanents et CA naturelle sans armure.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "hp_bonus_formula": "class_level",
+              "hp_bonus_note": "+1 PV max au niveau 1 puis +1 PV max à chaque niveau d'ensorceleur suivant",
+              "ac_unarmored": {
+                "condition": "no_armor",
+                "base": 13,
+                "modifier": "dex_mod"
+              }
+            }
+          },
+          {
+            "id": "feat-affinite-elementaire",
+            "name": "Affinité élémentaire",
+            "unlocks_at_level": 6,
+            "recharge": "at_will",
+            "flavor": {
+              "summary": "Bonus de dégâts sur les sorts du type de l'ancêtre draconique et résistance optionnelle.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "damage_bonus": {
+                "condition": "sort infligeant le damage_type de l'ancêtre choisi",
+                "bonus": "cha_mod",
+                "target": "un jet de dégâts du sort"
+              },
+              "optional_resistance": {
+                "cost_arcane_points": 1,
+                "resistance_type": "damage_type_from_ancestry",
+                "duration_hours": 1
+              }
+            }
+          },
+          {
+            "id": "feat-ailes-draconiques",
+            "name": "Ailes draconiques",
+            "unlocks_at_level": 14,
+            "recharge": "at_will",
+            "flavor": {
+              "summary": "Développez des ailes offrant un vol. Apparition et dissipation via action bonus.",
+              "lore_note": "Incompatible avec une armure non conçue pour les ailes. Des vêtements inadaptés risquent d'être déchirés."
+            },
+            "mechanics": {
+              "action_cost": "bonus_action",
+              "fly_speed_formula": "current_walk_speed",
+              "condition": "no_armor_unless_designed_for_wings"
+            }
+          },
+          {
+            "id": "feat-presence-draconique",
+            "name": "Présence draconique",
+            "unlocks_at_level": 18,
+            "recharge": "long_rest",
+            "flavor": {
+              "summary": "Aura de majesté ou de terreur sur 18 m, charmant ou effrayant les ennemis à chaque début de tour.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_cost": "action",
+              "cost_arcane_points": 5,
+              "aura_radius_meters": 18,
+              "duration": "concentration",
+              "duration_max_minutes": 1,
+              "aura_options": [
+                {
+                  "choice": "majeste",
+                  "condition_applied": "charme"
+                },
+                {
+                  "choice": "terreur",
+                  "condition_applied": "effrayé"
+                }
+              ],
+              "saving_throw": {
+                "ability": "wis",
+                "trigger": "hostile_creature_starts_turn_in_aura",
+                "on_fail": "condition_applied",
+                "on_success": "immune_for_24_hours"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "subcls-magie-psychique",
+        "name": "Magie psychique",
+        "parent_class": "cls-ensorceleur",
+        "subclass_type": "atavisme",
+        "flavor": {
+          "summary": "Par la seule force de l'esprit, vous manipulez la toile de magie profane sans composantes.",
+          "lore_note": "Des érudits ont noté des similitudes avec les pouvoirs d'aberrations telles que les aboleths, suggérant une origine liée à la proximité de vestiges de l'Inframonde."
+        },
+        "choice_pools": [],
+        "features_details": [
+          {
+            "id": "feat-vicissitudes-psychiques",
+            "name": "Vicissitudes psychiques",
+            "unlocks_at_level": 1,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Chaque utilisation de magie peut déclencher un trouble ou un privilège psychique aléatoire sur décision du MJ.",
+              "lore_note": "Les effets de folie (passagère, durable ou permanente) et les 20 privilèges psychiques sont détaillés dans Grimoire."
+            },
+            "mechanics": {
+              "trigger": "on_any_spell_cast_or_arcane_point_use",
+              "mj_discretion": true,
+              "roll": "1d20",
+              "on_result_1": {
+                "effect": "trouble_psychologique",
+                "roll_subtype": "1d20",
+                "categories": [
+                  "folie_passagere",
+                  "folie_durable",
+                  "folie_permanente"
+                ],
+                "player_keeps": "lowest_duration_of_two_rolled"
+              },
+              "on_result_20": {
+                "effect": "privilege_psychique",
+                "possible_count": 20
+              }
+            }
+          },
+          {
+            "id": "feat-memoire-ancestrale",
+            "name": "Mémoire ancestrale",
+            "unlocks_at_level": 1,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Maîtrise et double bonus de maîtrise pour les compétences Arcanes et Histoire.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "grants_proficiency": [
+                "skill-arcanes",
+                "skill-histoire"
+              ],
+              "advantages": [
+                {
+                  "type": "proficiency_bonus_doubled",
+                  "target": "skill_check",
+                  "skills": [
+                    "skill-arcanes",
+                    "skill-histoire"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-focaliseur-mental",
+            "name": "Focaliseur mental",
+            "unlocks_at_level": 1,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Votre cerveau est votre focaliseur arcanique. Aucune composante gestuelle, verbale ni matérielle sans coût nécessaire.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "removes_components": [
+                "verbal",
+                "somatic",
+                "material_no_cost"
+              ]
+            }
+          },
+          {
+            "id": "feat-force-de-lesprit",
+            "name": "Force de l'esprit",
+            "unlocks_at_level": 6,
+            "recharge": "at_will",
+            "flavor": {
+              "summary": "Altère le métabolisme en réaction pour substituer un JS de Charisme à tout autre JS pendant 1 minute.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_cost": "reaction",
+              "trigger": "before_any_saving_throw",
+              "cost_arcane_points": 2,
+              "effect": "Substitue un jet de sauvegarde de Charisme à n'importe quel autre jet de sauvegarde.",
+              "duration": "1_minute"
+            }
+          },
+          {
+            "id": "feat-bond-mental",
+            "name": "Bond mental",
+            "unlocks_at_level": 14,
+            "recharge": "at_will",
+            "flavor": {
+              "summary": "Téléportation de 9 m en réaction avant application de dégâts ou d'un état préjudiciable.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_cost": "reaction",
+              "trigger": "before_damage_or_condition_applied",
+              "cost_arcane_points": 2,
+              "teleport_distance_meters": 9,
+              "avoidance_condition": "nouvelle_position_hors_portee_annule_effets"
+            }
+          },
+          {
+            "id": "feat-detection-des-consciences",
+            "name": "Détection des consciences",
+            "unlocks_at_level": 18,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Détection permanente et passive de toute créature dotée d'Intelligence ≥ 3 dans un rayon de 36 m.",
+              "lore_note": "Les obstacles physiques sont sans effet. Seul un esprit impénétrable bloque la détection."
+            },
+            "mechanics": {
+              "effect_type": "passive_sense",
+              "radius_meters": 36,
+              "target_condition": {
+                "stat": "int",
+                "min_value": 3
+              },
+              "blocked_by": "esprit_impenetrable"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

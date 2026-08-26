@@ -1,0 +1,39 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-communication-avec-les-plantes",
+  "name": "Communication avec les plantes",
+  "level": 3,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": {
+      "shape": "rayon",
+      "radius_m": 9
+    }
+  },
+  "duration": {
+    "type": "normal",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-rodeur"
+  ],
+  "description": "Vous offrez un semblant de conscience et des capacités de mobilité limitées aux végétaux situés dans un rayon de 9 m de vous, ce qui leur donne le pouvoir de communiquer avec vous et de suivre vos ordres les plus simples. Vous pouvez leur poser des questions au sujet d'événements qui se sont déroulés dans la zone au cours de la journée écoulée pour collecter des informations sur les créatures qui y sont passées, le temps qu'il y a fait et autres détails. Vous pouvez aussi transformer un terrain rendu difficile par la présence de végétaux (comme des fourrés ou des broussailles) en terrain ordinaire pour toute la durée du sort. À l'inverse, vous pouvez transformer un terrain ordinaire occupé par des plantes en terrain difficile qui persiste pour toute la durée du sort (par exemple, les lianes et branches gênent vos poursuivants). À la discrétion du meneur, la flore pourra vous rendre d'autres services. Ce sort ne permet pas aux végétaux de se déraciner et de se déplacer, mais ils peuvent agiter leurs branches, vrilles et tiges. Si une créature de type plante se trouve dans la zone, vous pouvez communiquer avec elle comme si vous parliez la même langue, mais rien ne vous permet de l'influencer. Ce sort peut obliger des végétaux créés par le sort enchevêtrement à libérer une créature entravée.",
+  "modular_options": []
+}

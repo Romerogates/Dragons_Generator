@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-sac-de-bateleur",
+  "name": "Sac de bateleur",
+  "category": "gear",
+  "subcategory": "container",
+  "cost": {
+    "value": 40,
+    "unit": "po"
+  },
+  "weight_kg": 13.5,
+  "description": "Un sac à dos, un sac de couchage, 2 costumes de scène, 5 bougies, 5 jours de rations, une outre, un nécessaire de déguisement."
+}

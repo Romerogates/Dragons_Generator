@@ -4,7 +4,12 @@
   <article class="class">
     <header class="class__header">
       <a routerLink="/classes/summary" class="class__back">← Retour aux classes</a>
-      <h1>{{ c.name }}</h1>
+      <div class="flex items-center gap-3 mb-2">
+        <span class="text-4xl leading-none">
+          <iconify-icon [icon]="iconFor(c.id)" width="1em" height="1em"></iconify-icon>
+        </span>
+        <h1>{{ c.name }}</h1>
+      </div>
       <p class="class__meta">
         Dé de vie <strong>d{{ c.data.hit_die }}</strong> · Caractéristiques principales
         <strong>{{ c.data.primary_abilities.join(', ') }}</strong>
@@ -14,15 +19,15 @@
     <section class="class__section">
       <h2>Maîtrises</h2>
       <ul>
-        <li><strong>Armures :</strong> {{ c.data.proficiencies.armor.join(', ') || '—' }}</li>
-        <li><strong>Armes :</strong> {{ c.data.proficiencies.weapons.join(', ') }}</li>
+        <li><strong>Armures :</strong> {{ c.data.proficiencies.armor | gameIdLabels : ', ' : '—' }}</li>
+        <li><strong>Armes :</strong> {{ c.data.proficiencies.weapons | gameIdLabels }}</li>
         <li>
           <strong>Jets de sauvegarde :</strong> {{ c.data.proficiencies.saving_throws.join(', ') }}
         </li>
         <li>
           <strong>Compétences :</strong>
           {{ c.data.proficiencies.skills.count }} au choix parmi
-          {{ c.data.proficiencies.skills.options.join(', ') }}
+          {{ c.data.proficiencies.skills.options | gameIdLabels }}
         </li>
       </ul>
     </section>
@@ -53,7 +58,7 @@
             @if (slot.fixed) {
               <ul>
                 @for (item of slot.fixed; track item.id) {
-                  <li>{{ item.qty }}× {{ item.id }}</li>
+                  <li>{{ item | gameItemLabel }}</li>
                 }
               </ul>
             }
@@ -62,7 +67,7 @@
                 @for (alt of slot.alternatives; track $index) {
                   <li>
                     @for (item of alt; track item.id) {
-                      <span>{{ item.qty }}× {{ item.id }}</span>
+                      <span>{{ item | gameItemLabel }}</span>
                     }
                   </li>
                 }

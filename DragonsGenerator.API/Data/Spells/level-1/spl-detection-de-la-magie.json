@@ -1,0 +1,41 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-detection-de-la-magie",
+  "name": "Détection de la magie",
+  "level": 1,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": true,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-paladin",
+    "cls-pretre",
+    "cls-rodeur",
+    "cls-sorcier"
+  ],
+  "description": "Pour toute la durée du sort, vous décelez la présence de magie dans un rayon de 9 m de vous. Si vous détectez de la magie de la sorte, vous pouvez, au prix d'une action, percevoir une légère aura autour de tout objet ou créature visibles et porteurs de magie dans la zone (vous en découvrez l'école de magie, le cas échéant). Le sort est capable de pénétrer la plupart des obstacles, mais 90 cm de bois ou de terre, 30 cm de pierre, 2,5 cm de la plupart des métaux ou une mince feuille de plomb le bloquent. Ce sort ne peut percer une frontière éthérée (cf. chapitre Géomagie).",
+  "modular_options": []
+}

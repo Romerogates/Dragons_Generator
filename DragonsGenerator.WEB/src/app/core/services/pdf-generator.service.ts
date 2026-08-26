@@ -1,6 +1,7 @@
 // features/character-sheet/services/pdf-generator.service.ts
 import { Injectable } from '@angular/core';
-import { jsPDF } from 'jspdf';
+import type { jsPDF } from 'jspdf';
+import { labelForGameId } from '@core/utils/game-id-labels';
 import {
   Character,
   Attack,
@@ -40,6 +41,9 @@ const GRIMOIRE_IMAGES: Record<SpellcastingKind, string> = {
   fighter_eldritch_knight: '/images/sheets/grimoires/grimoire-guerrier-rodeur-paladin.jpg',
 };
 
+/** Page de continuation — sorts qui ne tiennent pas sur le grimoire principal. */
+const GRIMOIRE_SUPP_IMAGE = '/images/sheets/grimoires/grimoire-supp.jpg';
+
 // ---------------------------------------------------------------------------
 // Coordonnées BASE (côté gauche) — partagées par tous les casters standards
 // ⚠️ ESTIMATIONS — à calibrer avec le PDF réel
@@ -68,6 +72,38 @@ interface GrimoireBaseCoords {
   colPage: number;
 }
 
+/**
+ * Coordonnées page supplémentaire (image native 1241×1754 → espace 595×842).
+ * 25 lignes, 6 médaillons « Niveau » à gauche.
+ */
+/**
+ * Coordonnées page supplémentaire (image native 1241×1754 → espace 595×842).
+ * 6 médaillons ouroboros × ~5 lignes.
+ */
+const SUPP_COORDS = {
+  /** Centre X des médaillons ouroboros (niveau). */
+  levelX: 46,
+  /** Centres Y des 6 médaillons (alignés sur la 1re ligne de chaque bande). */
+  levelYs: [172, 284, 396, 508, 620, 732],
+  /** Lignes par bande de niveau. */
+  rowsPerBand: 5,
+  preparedX: 76,
+  nameX: 101,
+  effectX: 288,
+  effectEndX: 537,
+  /** Baseline texte de la 1re ligne imprimée. */
+  tableStartY: 168,
+  rowH: 22.5,
+  maxRows: 30,
+};
+
+/** Médaillons « Niveau » du tableau de sorts (grimoires classes standards). */
+const SPELL_TABLE_LEVEL = {
+  levelX: 42,
+  levelYs: [500, 613, 724],
+  rowsPerBand: 5,
+};
+
 const BASE_COORDS: GrimoireBaseCoords = {
   nameX: 130,
   nameY: 160,
@@ -93,9 +129,10 @@ const BASE_COORDS: GrimoireBaseCoords = {
     { y: 384, maxCircles: 1 }, // 8e
     { y: 406, maxCircles: 1 }, // 9e
   ],
-  spellTableStartY: 491,
-  spellTableRowH: 45,
-  spellTableMaxRows: 15,
+  /** 1re ligne du tableau (juste au-dessus du lignage ~492). */
+  spellTableStartY: 490,
+  spellTableRowH: 22.5,
+  spellTableMaxRows: 12,
   colPrepared: 82,
   colName: 95,
   colEffect: 276,
@@ -125,14 +162,16 @@ const PANEL_WIZARD = {
 };
 
 // Prêtre : "Magie Divine" → Divinité–Domaine, Focaliseur arcanique, Conduits divins
+// Lignes mesurées sur grimoire-pretre.jpg (espace 595×842)
 const PANEL_CLERIC = {
-  line1X: 450, // Divinité — Domaine (valeur)
-  line1Y: 250,
-  line2X: 450, // Focaliseur arcanique (valeur)
-  line2Y: 305,
-  channelsStartY: 370, // Conduits divins : première ligne
+  line1X: 448, // Divinité — Domaine (valeur sur la ligne sous le label)
+  line1Y: 258,
+  line2X: 448, // Focaliseur arcanique
+  line2Y: 285,
+  channelsStartY: 365,
   channelsSpacing: 22,
-  channelsX: 450,
+  channelsX: 448,
+  valueFontSize: 10,
 };
 
 // Druide : "Magie druidique" → Cercle, Focaliseur, cases à cocher, notes
@@ -311,6 +350,8 @@ export class PdfGeneratorService {
   // =========================================================================
 
   private async buildPdf(character: Character): Promise<jsPDF> {
+    // Lazy-load jspdf (+ deps) only when exporting — keeps wizard/navigation snappy
+    const { jsPDF } = await import('jspdf');
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const images = await this.loadBackgroundImages();
 
@@ -340,6 +381,18 @@ export class PdfGeneratorService {
       pdf.addPage();
       pdf.addImage(grimoireImg, 'JPEG', 0, 0, 210, 297);
       this.drawGrimoire(pdf, character);
+
+      // Pages supplémentaires si trop de sorts (ou table absente sur GRP)
+      const overflow = this.getGrimoireOverflowSpells(character);
+      if (overflow.length > 0) {
+        const suppImg = await this.loadImage(GRIMOIRE_SUPP_IMAGE);
+        const pages = this.chunkSpellsForSuppPages(overflow);
+        for (const pageSpells of pages) {
+          pdf.addPage();
+          pdf.addImage(suppImg, 'JPEG', 0, 0, 210, 297);
+          this.drawGrimoireSupp(pdf, pageSpells);
+        }
+      }
     }
 
     return pdf;
@@ -460,79 +513,10 @@ export class PdfGeneratorService {
 
   /**
    * Nettoie un ID technique pour affichage lisible.
-   * "lg-commun" → "Commun"
-   * "wp-arbalete-de-poing" → "Arbalète de poing"
-   * "ar-armure-matelassee" → "Armure matelassée"
-   * "category-simple-weapons" → "Armes courantes"
+   * Délègue au dictionnaire central (game-id-labels).
    */
   private prettify(id: string): string {
-    const LABELS: Record<string, string> = {
-      // Catégories
-      'category-simple-weapons': 'Armes courantes',
-      'category-simple-melee-weapons': 'Armes courantes CàC',
-      'category-simple-ranged-weapons': 'Armes courantes à distance',
-      'category-martial-weapons': 'Armes de guerre',
-      'category-martial-melee-weapons': 'Armes de guerre CàC',
-      'category-martial-ranged-weapons': 'Armes de guerre à distance',
-      'category-light-armor': 'Armures légères',
-      'category-medium-armor': 'Armures intermédiaires',
-      'category-heavy-armor': 'Armures lourdes',
-      'category-shield': 'Boucliers',
-      'category-all-armor': 'Toutes armures',
-      'category-tools': 'Outils',
-      // Outils & instruments
-      'tl-necessaire-dalchimiste': "Nécessaire. d'alchimiste",
-      'tl-necessaire-de-brasseur': 'Nécessaire de brasseur',
-      'tl-necessaire-de-calligraphe': 'Nécessaire de calligraphe',
-      'tl-necessaire-de-calligraphie': 'Nécessaire de calligraphie',
-      'tl-necessaire-de-cartographe': 'Nécessaire de cartographe',
-      'tl-necessaire-de-deguisement': 'Nécessaire de déguisement',
-      'tl-necessaire-de-faussaire': 'Nécessaire de faussaire',
-      'tl-necessaire-dempoisonneur': "Nécessaire d'empoisonneur",
-      'tl-necessaire-de-peintre': 'Nécessaire de peintre',
-      'tl-necessaire-dherboristerie': "Nécessaire d'herboristerie",
-      'tl-outils-de-bijoutier': 'Outils de bijoutier',
-      'tl-outils-de-cordonnier': 'Outils de cordonnier',
-      'tl-outils-de-forgeron': 'Outils de forgeron',
-      'tl-outils-de-la-ferme': 'Outils de la ferme',
-      'tl-outils-de-macon': 'Outils de maçon',
-      'tl-outils-de-menuisier': 'Outils de menuisier',
-      'tl-outils-de-potier': 'Outils de potier',
-      'tl-outils-de-retameur': 'Outils de rétameur',
-      'tl-outils-de-sculpteur-sur-bois': 'Outils de sculpteur',
-      'tl-outils-de-tanneur': 'Outils de tanneur',
-      'tl-outils-de-tisserand': 'Outils de tisserand',
-      'tl-outils-de-verrier': 'Outils de verrier',
-      'tl-outils-de-voleur': 'Outils de voleur',
-      'tl-ustensiles-de-cuisinier': 'Ustensiles de cuisinier',
-      'tl-instruments-de-navigation': 'Instr. de navigation',
-      'tl-bombarde': 'Bombarde',
-      'tl-cor': 'Cor',
-      'tl-cornemuse': 'Cornemuse',
-      'tl-dulcimer': 'Dulcimer',
-      'tl-flute': 'Flûte',
-      'tl-flute-de-pan': 'Flûte de Pan',
-      'tl-luth': 'Luth',
-      'tl-lyre': 'Lyre',
-      'tl-tambour': 'Tambour',
-      'tl-viole': 'Viole',
-      'tl-des': 'Dés',
-      'tl-echecs': 'Échecs',
-      'tl-go': 'Go',
-      'tl-jeu-de-cartes': 'Jeu de cartes',
-      'tl-osselets': 'Osselets',
-      // Véhicules
-      'tl-vehicules-terrestres': 'Véhicules terrestres',
-      'tl-vehicules-maritimes': 'Véhicules maritimes',
-    };
-
-    if (LABELS[id]) return LABELS[id];
-
-    // Fallback générique
-    return id
-      .replace(/^(lg|wp|ar|gr|tl|it|mnt|vhc)-/, '')
-      .replace(/-/g, ' ')
-      .replace(/\b\w/g, (c) => c.toUpperCase());
+    return labelForGameId(id);
   }
 
   // =========================================================================
@@ -547,8 +531,13 @@ export class PdfGeneratorService {
     const speciesLabel = c.species.subspeciesLabel
       ? `${c.species.label} (${c.species.subspeciesLabel})`
       : c.species.label;
-    const classLabel =
-      c.totalLevel > 1 ? `${c.classes[0].classLabel} ${c.totalLevel}` : c.classes[0].classLabel;
+    const classLabel = (() => {
+      const cls = c.classes[0];
+      const base = cls.subclassLabel
+        ? `${cls.classLabel} (${cls.subclassLabel})`
+        : cls.classLabel;
+      return c.totalLevel > 1 ? `${base} ${c.totalLevel}` : base;
+    })();
 
     pdf.setFontSize(15);
     this.text(pdf, c.name, 140, 43);
@@ -612,42 +601,46 @@ export class PdfGeneratorService {
       });
     };
 
-    this.drawProfCircle(pdf, isSkillProf('Athlétisme'), 36, 255);
-    this.drawEmptyCircle(pdf, 23, 255);
-    this.drawProfCircle(pdf, isSkillProf('Acrobaties'), 36, 323);
-    this.drawEmptyCircle(pdf, 23, 323);
-    this.drawProfCircle(pdf, isSkillProf('Escamotage'), 36, 338);
-    this.drawEmptyCircle(pdf, 23, 338);
-    this.drawProfCircle(pdf, isSkillProf('Discrétion'), 36, 355);
-    this.drawEmptyCircle(pdf, 23, 355);
-    this.drawProfCircle(pdf, isSkillProf('Arcanes'), 36, 472);
-    this.drawEmptyCircle(pdf, 23, 472);
-    this.drawProfCircle(pdf, isSkillProf('Histoire'), 36, 487);
-    this.drawEmptyCircle(pdf, 23, 487);
-    this.drawProfCircle(pdf, isSkillProf('Investigation'), 36, 503);
-    this.drawEmptyCircle(pdf, 23, 503);
-    this.drawProfCircle(pdf, isSkillProf('Nature'), 36, 519);
-    this.drawEmptyCircle(pdf, 23, 519);
-    this.drawProfCircle(pdf, isSkillProf('Religion'), 36, 535);
-    this.drawEmptyCircle(pdf, 23, 535);
-    this.drawProfCircle(pdf, isSkillProf('Dressage'), 36, 596);
-    this.drawEmptyCircle(pdf, 23, 596);
-    this.drawProfCircle(pdf, isSkillProf('Intuition'), 36, 612);
-    this.drawEmptyCircle(pdf, 23, 612);
-    this.drawProfCircle(pdf, isSkillProf('Médecine'), 36, 628);
-    this.drawEmptyCircle(pdf, 23, 628);
-    this.drawProfCircle(pdf, isSkillProf('Perception'), 36, 644);
-    this.drawEmptyCircle(pdf, 23, 644);
-    this.drawProfCircle(pdf, isSkillProf('Survie'), 36, 660);
-    this.drawEmptyCircle(pdf, 23, 660);
-    this.drawProfCircle(pdf, isSkillProf('Intimidation'), 36, 731);
-    this.drawEmptyCircle(pdf, 23, 731);
-    this.drawProfCircle(pdf, isSkillProf('Persuasion'), 36, 747);
-    this.drawEmptyCircle(pdf, 23, 747);
-    this.drawProfCircle(pdf, isSkillProf('Représentation'), 36, 763);
-    this.drawEmptyCircle(pdf, 23, 763);
-    this.drawProfCircle(pdf, isSkillProf('Tromperie'), 36, 779);
-    this.drawEmptyCircle(pdf, 23, 779);
+    const isSkillExpertise = (skill: string) => {
+      const list = c.proficiencies.expertiseSkills ?? [];
+      const normalized = skill
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+      return list.some((s) => {
+        if (s === skill) return true;
+        const sNorm = s
+          .replace(/^skill-/, '')
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '');
+        return sNorm === normalized;
+      });
+    };
+
+    const skillRow = (name: string, y: number) => {
+      this.drawProfCircle(pdf, isSkillProf(name), 36, y);
+      this.drawProfCircle(pdf, isSkillExpertise(name), 23, y);
+    };
+
+    skillRow('Athlétisme', 255);
+    skillRow('Acrobaties', 323);
+    skillRow('Escamotage', 338);
+    skillRow('Discrétion', 355);
+    skillRow('Arcanes', 472);
+    skillRow('Histoire', 487);
+    skillRow('Investigation', 503);
+    skillRow('Nature', 519);
+    skillRow('Religion', 535);
+    skillRow('Dressage', 596);
+    skillRow('Intuition', 612);
+    skillRow('Médecine', 628);
+    skillRow('Perception', 644);
+    skillRow('Survie', 660);
+    skillRow('Intimidation', 731);
+    skillRow('Persuasion', 747);
+    skillRow('Représentation', 763);
+    skillRow('Tromperie', 779);
 
     pdf.setFontSize(12);
     this.text(pdf, String(c.movement.walk), 238, 360);
@@ -871,8 +864,12 @@ export class PdfGeneratorService {
     features.slice(0, maxLines).forEach((feat, i) => {
       const y = startY + i * lineH;
 
-      // Nom de l'aptitude
+      // Nom de l'aptitude (+ portée d'aura si présente dans la desc)
       let label = feat.name;
+      const auraMatch = String(feat.desc ?? '').match(/Portée d'aura\s*:\s*([\d.,]+)\s*m/i);
+      if (auraMatch) {
+        label += ` (${auraMatch[1]} m)`;
+      }
 
       // Si uses avec max connu > 0, ajouter le compteur textuel
       if (feat.uses && feat.uses.max > 0 && feat.uses.max <= 20) {
@@ -1079,18 +1076,110 @@ export class PdfGeneratorService {
   // GRIMOIRE — Table des sorts
   // =========================================================================
 
-  private drawSpellTable(pdf: jsPDF, c: Character): void {
-    if (!c.knownSpells || c.knownSpells.length === 0) return;
-    const B = BASE_COORDS;
-
-    const effectWidthMm = pxToMmX(B.colPage - B.colEffect - 15);
-
-    const sorted = [...c.knownSpells].sort(
+  private sortedKnownSpells(c: Character): SpellInstance[] {
+    if (!c.knownSpells?.length) return [];
+    return [...c.knownSpells].sort(
       (a, b) => a.level - b.level || a.name.localeCompare(b.name),
     );
+  }
 
-    sorted.slice(0, B.spellTableMaxRows).forEach((spell, i) => {
-      const y = B.spellTableStartY + i * B.spellTableRowH;
+  /**
+   * Sorts qui ne tiennent pas sur le grimoire principal.
+   * GRP n'a pas de table → tous les sorts partent en page(s) supp.
+   * Les sorts à effet 2 lignes consomment 2 lignages imprimés.
+   */
+  private getGrimoireOverflowSpells(c: Character): SpellInstance[] {
+    if (!c.spellcasting) return [];
+    const sorted = this.sortedKnownSpells(c);
+    if (!sorted.length) return [];
+
+    const kind = c.spellcasting.kind;
+    const isGrp =
+      kind === 'ranger' || kind === 'paladin' || kind === 'fighter_eldritch_knight';
+    if (isGrp) return sorted;
+
+    return this.layoutSpellsOnMainTable(sorted).overflow;
+  }
+
+  /**
+   * Place les sorts sur les lignages du tableau principal.
+   * Un sort tient sur 1 ligne, ou 2 si l'effet wrap (2e ligne alignée sur le lignage suivant).
+   */
+  private layoutSpellsOnMainTable(sorted: SpellInstance[]): {
+    entries: { spell: SpellInstance; row: number; effectLines: string[] }[];
+    overflow: SpellInstance[];
+  } {
+    const B = BASE_COORDS;
+    const effectWidthMm = pxToMmX(B.colPage - B.colEffect - 8);
+    // jsPDF n'est pas dispo ici → estimation largeur caractères (~2.1 mm à 7pt)
+    const approxCharW = 1.85;
+    const maxChars = Math.max(20, Math.floor(effectWidthMm / approxCharW));
+
+    const entries: { spell: SpellInstance; row: number; effectLines: string[] }[] = [];
+    const overflow: SpellInstance[] = [];
+    let row = 0;
+
+    for (const spell of sorted) {
+      const effectLines = this.wrapEffectPreview(spell.effectSummary ?? '', maxChars, 2);
+      const rowsNeeded = Math.max(1, effectLines.length);
+      if (row + rowsNeeded > B.spellTableMaxRows) {
+        overflow.push(spell);
+        // Tous les suivants débordent aussi (ordre conservé)
+        const idx = sorted.indexOf(spell);
+        overflow.push(...sorted.slice(idx + 1));
+        break;
+      }
+      entries.push({ spell, row, effectLines });
+      row += rowsNeeded;
+    }
+
+    return { entries, overflow };
+  }
+
+  /** Découpe un effet en 1–2 lignes (approx. largeur colonne), sans jsPDF. */
+  private wrapEffectPreview(text: string, maxChars: number, maxLines: number): string[] {
+    if (!text) return [''];
+    if (text.length <= maxChars) return [text];
+    const lines: string[] = [];
+    let rest = text;
+    while (rest.length > 0 && lines.length < maxLines) {
+      if (rest.length <= maxChars) {
+        lines.push(rest);
+        break;
+      }
+      let breakAt = rest.lastIndexOf(' ', maxChars);
+      if (breakAt < maxChars * 0.4) breakAt = maxChars;
+      lines.push(rest.slice(0, breakAt).trimEnd());
+      rest = rest.slice(breakAt).trimStart();
+    }
+    if (lines.length === maxLines && rest.length > 0) {
+      const last = lines[maxLines - 1];
+      lines[maxLines - 1] =
+        last.length > 3 ? last.slice(0, Math.max(0, last.length - 1)) + '…' : last + '…';
+    }
+    return lines.length ? lines : [''];
+  }
+
+  private drawSpellTable(pdf: jsPDF, c: Character): void {
+    const B = BASE_COORDS;
+    const sorted = this.sortedKnownSpells(c);
+    if (!sorted.length) return;
+
+    const effectWidthMm = pxToMmX(B.colPage - B.colEffect - 8);
+    const lineHMm = pxToMmY(B.spellTableRowH);
+    const { entries } = this.layoutSpellsOnMainTable(sorted);
+
+    // Niveaux dans les médaillons ouroboros (1re ligne de chaque bande)
+    this.drawSpellLevelMedallions(
+      pdf,
+      entries.map((e) => ({ row: e.row, level: e.spell.level })),
+      SPELL_TABLE_LEVEL.levelX,
+      SPELL_TABLE_LEVEL.levelYs,
+      SPELL_TABLE_LEVEL.rowsPerBand,
+    );
+
+    for (const { spell, row, effectLines } of entries) {
+      const y = B.spellTableStartY + row * B.spellTableRowH;
 
       if (spell.alwaysPrepared || spell.prepared) {
         this.drawFilledCircle(pdf, B.colPrepared, y - 2, 1.8);
@@ -1099,21 +1188,165 @@ export class PdfGeneratorService {
       pdf.setFontSize(10);
       this.text(pdf, spell.name, B.colName, y);
 
+      // Effet : chaque ligne sur un lignage imprimé (même X → alignement colonne Effet)
+      pdf.setFontSize(7);
+      let linesToDraw = effectLines;
       if (spell.effectSummary) {
-        pdf.setFontSize(7);
-        const lines = pdf.splitTextToSize(spell.effectSummary, effectWidthMm);
-        const lineH = 8;
-        const effectX = pxToMmX(B.colEffect);
-        const effectY = pxToMmY(y) - 1;
-        lines.slice(0, 2).forEach((line: string, li: number) => {
-          pdf.text(line, effectX, effectY + li * lineH + 1);
-        });
+        const precise = (pdf.splitTextToSize(spell.effectSummary, effectWidthMm) as string[]).slice(
+          0,
+          Math.max(1, effectLines.length),
+        );
+        if (precise.length) linesToDraw = precise;
       }
+      const effectX = pxToMmX(B.colEffect);
+      const baseY = pxToMmY(y);
+      linesToDraw.forEach((line: string, li: number) => {
+        if (line) pdf.text(line, effectX, baseY + li * lineHMm);
+      });
 
       if (spell.pageRef) {
         pdf.setFontSize(7);
         this.text(pdf, spell.pageRef, B.colPage, y);
       }
+    }
+  }
+
+  /**
+   * Écrit le niveau (M / 1–9) centré dans chaque médaillon ouroboros utilisé.
+   */
+  private drawSpellLevelMedallions(
+    pdf: jsPDF,
+    rowLevels: { row: number; level: number }[],
+    levelX: number,
+    levelYs: number[],
+    rowsPerBand: number,
+  ): void {
+    if (!rowLevels.length || !levelYs.length) return;
+
+    const bandLevel = new Map<number, number>();
+    for (const { row, level } of rowLevels) {
+      const band = Math.floor(row / rowsPerBand);
+      if (band >= levelYs.length) continue;
+      if (!bandLevel.has(band)) bandLevel.set(band, level);
+    }
+
+    pdf.setFontSize(12);
+    pdf.setTextColor('#2c1810');
+    for (const [band, level] of bandLevel) {
+      const label = level === 0 ? 'M' : String(level);
+      const y = levelYs[band];
+      // Baseline légèrement sous le centre pour centrage optique dans le rond
+      pdf.text(label, pxToMmX(levelX), pxToMmY(y + 4), { align: 'center' });
+    }
+  }
+
+  private drawSpellTableRow(
+    pdf: jsPDF,
+    spell: SpellInstance,
+    y: number,
+    cols: {
+      preparedX: number;
+      nameX: number;
+      effectX: number;
+      pageX?: number;
+      effectWidthMm: number;
+      nameSize: number;
+      effectSize: number;
+      effectMaxLines: number;
+      /** Hauteur d'une ligne d'effet en mm (doit matcher le lignage imprimé). */
+      effectLineHMm?: number;
+    },
+  ): void {
+    if (spell.alwaysPrepared || spell.prepared) {
+      this.drawFilledCircle(pdf, cols.preparedX, y - 2, 1.8);
+    }
+
+    pdf.setFontSize(cols.nameSize);
+    this.text(pdf, spell.name, cols.nameX, y);
+
+    if (spell.effectSummary) {
+      pdf.setFontSize(cols.effectSize);
+      const lines = pdf.splitTextToSize(spell.effectSummary, cols.effectWidthMm);
+      const lineHMm = cols.effectLineHMm ?? pxToMmY(BASE_COORDS.spellTableRowH);
+      const effectX = pxToMmX(cols.effectX);
+      const effectY = pxToMmY(y);
+      lines.slice(0, cols.effectMaxLines).forEach((line: string, li: number) => {
+        pdf.text(line, effectX, effectY + li * lineHMm);
+      });
+    }
+
+    if (cols.pageX != null && spell.pageRef) {
+      pdf.setFontSize(7);
+      this.text(pdf, spell.pageRef, cols.pageX, y);
+    }
+  }
+
+  /**
+   * Remplit une page grimoire-supp.jpg : médaillons de niveau + lignes Nom / Effet.
+   */
+  private chunkSpellsForSuppPages(spells: SpellInstance[]): SpellInstance[][] {
+    const S = SUPP_COORDS;
+    const pages: SpellInstance[][] = [];
+    let i = 0;
+
+    while (i < spells.length) {
+      const page: SpellInstance[] = [];
+      let bands = 0;
+      let rowsInBand = 0;
+      let lastLevel: number | null = null;
+
+      while (i < spells.length && page.length < S.maxRows) {
+        const spell = spells[i];
+        const levelChanged = lastLevel === null || spell.level !== lastLevel;
+        if (levelChanged || rowsInBand >= S.rowsPerBand) {
+          if (bands >= S.levelYs.length) break;
+          bands++;
+          rowsInBand = 0;
+          lastLevel = spell.level;
+        }
+        page.push(spell);
+        rowsInBand++;
+        i++;
+      }
+
+      if (!page.length) break;
+      pages.push(page);
+    }
+
+    return pages;
+  }
+
+  /**
+   * Remplit une page grimoire-supp.jpg : médaillons de niveau + lignes Nom / Effet.
+   */
+  private drawGrimoireSupp(pdf: jsPDF, spells: SpellInstance[]): void {
+    if (!spells.length) return;
+    const dark = '#2c1810';
+    pdf.setTextColor(dark);
+    const S = SUPP_COORDS;
+    const effectWidthMm = pxToMmX(S.effectEndX - S.effectX - 8);
+
+    // Niveaux : une entrée par bande (1re ligne de la bande)
+    this.drawSpellLevelMedallions(
+      pdf,
+      spells.slice(0, S.maxRows).map((spell, i) => ({ row: i, level: spell.level })),
+      S.levelX,
+      S.levelYs,
+      S.rowsPerBand,
+    );
+
+    spells.slice(0, S.maxRows).forEach((spell, i) => {
+      const y = S.tableStartY + i * S.rowH;
+      this.drawSpellTableRow(pdf, spell, y, {
+        preparedX: S.preparedX,
+        nameX: S.nameX,
+        effectX: S.effectX,
+        effectWidthMm,
+        nameSize: 9,
+        effectSize: 6.5,
+        effectMaxLines: 1,
+        effectLineHMm: pxToMmY(S.rowH),
+      });
     });
   }
 
@@ -1174,6 +1407,21 @@ export class PdfGeneratorService {
     if (sc.focus) {
       this.text(pdf, sc.focus, P.line2X, P.line2Y);
     }
+
+    pdf.setFontSize(7);
+    let y = P.line2Y + 28;
+    if (sc.spellMastery?.length) {
+      for (const m of sc.spellMastery) {
+        this.text(pdf, `Maîtrise ${m.spellLevel} : ${m.spellName}`, P.line1X, y);
+        y += 12;
+      }
+    }
+    if (sc.signatureSpells?.length) {
+      for (const s of sc.signatureSpells) {
+        this.text(pdf, `Attitré : ${s.spellName}`, P.line1X, y);
+        y += 12;
+      }
+    }
   }
 
   // --- PRÊTRE ---
@@ -1182,19 +1430,17 @@ export class PdfGeneratorService {
     sc: Extract<CharacterSpellcasting, { kind: 'cleric' }>,
   ): void {
     const P = PANEL_CLERIC;
-    pdf.setFontSize(15);
+    pdf.setFontSize(P.valueFontSize);
 
-    // Divinité — Domaine
-    if (sc.deity && sc.domain) {
-      this.text(pdf, `${sc.deity} — ${sc.domain}`, P.line1X, P.line1Y);
-    } else {
-      if (sc.deity) this.text(pdf, sc.deity, P.line1X, P.line1Y);
-      if (sc.domain) this.text(pdf, sc.domain, P.line1X, P.line1Y);
+    // Divinité — Domaine (sur la ligne sous le label, pas sur le titre)
+    const deityDomain = [sc.deity, sc.domain].filter(Boolean).join(' — ');
+    if (deityDomain) {
+      this.textWrapped(pdf, deityDomain, P.line1X, P.line1Y, pxToMmX(140), 3.5, 1);
     }
 
     // Focaliseur arcanique
     if (sc.focus) {
-      this.text(pdf, sc.focus, P.line2X, P.line2Y);
+      this.textWrapped(pdf, sc.focus, P.line2X, P.line2Y, pxToMmX(140), 3.5, 1);
     }
 
     // Conduits divins
@@ -1278,9 +1524,23 @@ export class PdfGeneratorService {
     if (sc.eldritchInvocations.length > 0) {
       pdf.setFontSize(8);
       sc.eldritchInvocations.forEach((inv: string, i: number) => {
-        if (i < 6) {
+        if (i < 8) {
           this.text(pdf, inv, P.invocationsX, P.invocationsStartY + i * P.invocationsSpacing);
         }
+      });
+    }
+
+    // Arcanes (haut niveau)
+    if (sc.mysticArcanum?.length) {
+      pdf.setFontSize(7);
+      const baseY = P.invocationsStartY + Math.min(sc.eldritchInvocations.length, 8) * P.invocationsSpacing + 8;
+      sc.mysticArcanum.forEach((a, i) => {
+        this.text(
+          pdf,
+          `Arcane ${a.spellLevel} : ${a.spellName}`,
+          P.invocationsX,
+          baseY + i * 14,
+        );
       });
     }
   }

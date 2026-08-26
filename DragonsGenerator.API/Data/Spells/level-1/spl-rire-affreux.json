@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-rire-affreux",
+  "name": "Rire affreux",
+  "level": 1,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "de minuscules tartelettes et une plume que vous agitez"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien"
+  ],
+  "description": "Une créature de votre choix que vous voyez à portée trouve tout extrêmement drôle et se retrouve en proie au fou rire si ce sort l'affecte. La cible doit réussir un JS Sagesse sous peine de se retrouver à terre, d'être neutralisée et incapable de se relever pour toute la durée du sort. Une créature dotée d'une valeur d'Intelligence de 4 ou moins n'est pas affectée. À la fin de chacun de ses tours de jeu, et chaque fois qu'elle subit des dégâts, la cible a droit à un nouveau JS Sagesse. Elle bénéficie d'un avantage au jet de sauvegarde s'il découle de dégâts. En cas de réussite, le sort prend fin. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 1er. Les créatures doivent se situer dans un rayon de 9 m les unes des autres quand vous les ciblez.",
+  "modular_options": []
+}

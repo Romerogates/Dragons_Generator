@@ -1,0 +1,18 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-masse-darmes",
+  "name": "Masse d'armes",
+  "category": "weapon",
+  "subcategory": "simple_melee",
+  "cost": {
+    "value": 5,
+    "unit": "po"
+  },
+  "weight_kg": 2,
+  "damage_dice": "1d6",
+  "damage_type": "contondant",
+  "properties": [],
+  "throw_range": null,
+  "ammo_range": null,
+  "description": null
+}

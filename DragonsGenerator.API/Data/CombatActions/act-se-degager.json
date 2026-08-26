@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "act-se-degager",
+  "name": "Se dégager",
+  "action_cost": "action",
+  "category": "standard",
+  "description": "Votre déplacement ne provoque pas d'attaque d'opportunité jusqu'à la fin du tour de jeu.",
+  "mechanics": {
+    "duration": "Jusqu'à la fin du tour de jeu",
+    "effect": "Aucune attaque d'opportunité provoquée par le déplacement"
+  },
+  "source": "livre_de_base"
+}

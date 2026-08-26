@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-nain",
+  "name": "Nain",
+  "category": "base",
+  "typical_speakers": [
+    "Nains du Cyfandir"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-runique",
+      "label": "Runique",
+      "type": "alphabet"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [
+    "Communautés naines (pour beaucoup sur le Cyfandir)"
+  ],
+  "description": "Langue des communautés naines, pour beaucoup situées sur le Cyfandir. Elle s'écrit avec l'alphabet runique."
+}

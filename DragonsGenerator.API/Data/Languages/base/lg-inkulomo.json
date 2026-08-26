@@ -1,0 +1,32 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-inkulomo",
+  "name": "Inkulomo",
+  "category": "base",
+  "typical_speakers": [
+    "Peuples Bandiko-Mibu",
+    "Halfelins pieds-sûrs"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-tumiit",
+      "label": "Tumiit",
+      "type": "syllabaire"
+    },
+    {
+      "id": "wr-cyfand",
+      "label": "Cyfand",
+      "type": "alphabet"
+    },
+    {
+      "id": "wr-abjad-kalam",
+      "label": "Abjad kalam",
+      "type": "alphabet"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [
+    "Continents et îles de la culture Bandiko-Mibu"
+  ],
+  "description": "Langue des continents et îles de la culture Bandiko-Mibu, ainsi que des halfelins pieds-sûrs. Culture principalement orale ; les systèmes d'écriture tumiit, cyfand et l'abjad kalam sont ponctuellement utilisés."
+}

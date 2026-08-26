@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-regression-sauvage",
+  "name": "Régression sauvage",
+  "level": 3,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une feuille végétale"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide"
+  ],
+  "description": "Vous invoquez les forces de la nature, qui reprennent leurs droits sur la matière organique et minérale. Chaque créature prise dans la zone d'effet doit réussir un JS Charisme sous peine de voir son équipement et sa personne se transformer comme si elle avait été abandonnée des mois durant dans la nature. En cas d'échec, l'équipement non magique de la créature subit les modifications suivantes : Toutes les armes en bois, pierre ou métal (en dehors du mithral, de l'acier nain ou elfique et de l'adamantium) rouillent, s'émoussent, se recouvrent de mousse et de bourgeons, etc. En conséquence, tout jet de dégâts infligé à l'aide d'une telle arme subit un malus de −2. Les armes à projectiles (comme les arcs, arbalètes et frondes) sont inutilisables. Si la créature porte une armure qui n'est ni en mithral, ni en acier nain ou elfique, ni en adamantium, elle subit un malus de −2 à la CA. La physiologie superficielle et les autres possessions de la créature sont affectées : sa pilosité croît sensiblement, tandis que ses vêtements deviennent usés et sales. Ses ongles grandissent, entraînant un désavantage à tous les tests de caractéristiques impliquant de la minutie jusqu'à ce qu'ils soient coupés. Chaque pièce d'équipement altérée peut être remise en état au prix d'un test d'Intelligence (outil approprié) assorti de votre DD de sauvegarde des sorts. L'opération demande 1 heure.",
+  "higher_levels": "Quand vous lancez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, le malus à la CA augmente de 1 par niveau d'emplacement au-dessus du 3e. Avec un emplacement du 5e niveau ou supérieur, les jets d'attaque effectués avec une arme affectée subissent un désavantage.",
+  "modular_options": []
+}

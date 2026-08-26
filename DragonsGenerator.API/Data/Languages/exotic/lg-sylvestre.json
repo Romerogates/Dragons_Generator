@@ -1,0 +1,19 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-sylvestre",
+  "name": "Sylvestre",
+  "category": "exotique",
+  "typical_speakers": [
+    "Fées"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-mandala",
+      "label": "Mandala",
+      "type": "mandala"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [],
+  "description": "Langue sifflée évoquant les chants d'oiseaux et le murmure du vent dans les arbres. Partage un vocabulaire et une grammaire proches de l'elfique (l'origine féerique des elfes explique cette parenté). Certains locuteurs s'expriment dans des tons très aigus, voire dans des infrasons inaudibles pour les humanoïdes. Système d'écriture : mandala."
+}

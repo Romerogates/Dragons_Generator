@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-symbole",
+  "name": "Symbole",
+  "level": 7,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "permanent",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(du mercure"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien",
+    "cls-pretre"
+  ],
+  "description": "D Du moment de l'incantation, vous inscrivez un glyphe délétère sur une surface (comme une section de sol, de table ou de mur) ou dans un objet qui peut être refermé (comme un livre, un parchemin ou un coffre) pour l'y dissimuler. Si vous optez pour une surface, le glyphe peut couvrir une zone de 3 m de diamètre maximum. Si vous optez pour un objet, celui-ci doit rester en place. Si l'objet s'éloigne de plus de 3 m de l'endroit où vous avez lancé le sort, le glyphe est brisé et le sort prend fin sans être déclenché. Le glyphe est presque invisible et il faut réussir un test d'Intelligence (Investigation) assorti de votre DD de sauvegarde des sorts pour le détecter. Vous fixez les conditions de déclenchement du glyphe au moment de l'incantation. Pour les inscriptions sur une surface, le déclenchement le plus courant consiste à se tenir sur le glyphe ou à le toucher, à retirer un objet qui le recouvre, à s'en approcher à une certaine distance, ou encore à manipuler l'objet sur lequel il a été écrit. Pour les inscriptions dans un objet, le déclenchement le plus courant consiste à ouvrir cet objet, à s'en approcher à une certaine distance, à le voir ou le lire. Vous pouvez affiner les conditions de déclenchement pour que le sort s'active en certaines circonstances seulement, en fonction de paramètres physiques précis (taille ou poids, par exemple) ou selon un type de créature (par exemple, les guenaudes ou les métamorphes). Vous pouvez aussi fixer des conditions qui éviteront à certaines créatures d'activer le glyphe, à l'aide d'un mot de passe, par exemple. Au moment de l'écriture du glyphe, choisissez un des effets suivants. Une fois déclenché, le glyphe se met à luire et emplit une sphère de 18 m de rayon d'une lumière faible pendant 10 minutes, après quoi le sort prend fin. Toute créature prise dans la sphère au moment où le glyphe s'active est ciblée par l'effet, tout comme une créature qui entre dans la sphère pour la première fois d'un tour de jeu ou y termine son tour de jeu. Diagramme de glyphe Mort. Chaque cible doit effectuer un JS Constitution et subit 10d10 dégâts nécrotiques en cas d'échec, la moitié en cas de réussite. Discorde. Chaque cible doit effectuer un JS Constitution. En cas d'échec, elle se chamaille avec d'autres créatures pendant 1 minute. Pendant tout ce temps, elle est incapable de communiquer de manière cohérente et subit un désavantage aux jets d'attaque et aux tests de caractéristique. Terreur. Chaque cible doit effectuer un JS Sagesse. En cas d'échec, elle est effrayée pendant 1 minute. Aussi longtemps qu'elle est effrayée, elle lâche tout ce qu'elle tient et doit s'éloigner d'au moins 9 m du glyphe à chacun de ses tours de jeu, si possible. Désespoir. Chaque cible doit effectuer un JS Charisme. En cas d'échec, elle est submergée par le désespoir pendant 1 minute. Pendant tout ce temps, elle ne peut pas attaquer ni cibler une créature au moyen de capacités, sorts et autres effets magiques délétères. Aliénation mentale. Chaque cible doit effectuer un JS Intelligence. En cas d'échec, elle devient folle pendant 1 minute. Une telle créature ne peut pas entreprendre d'actions, ne comprend pas ce que disent les autres créatures, ne sait plus lire et baragouine un véritable charabia. Le meneur contrôle ses déplacements, qui sont imprévisibles. Douleur. Chaque cible doit effectuer un JS Constitution. En cas d'échec, elle est neutralisée par une douleur insoutenable pendant 1 minute. Sommeil. Chaque cible doit effectuer un JS Sagesse. En cas d'échec, elle se retrouve inconsciente pendant 10 minutes. Une créature se réveille si elle subit des dégâts ou si quelqu'un la secoue ou la gifle au prix d'une action. O Étourdissement. Chaque cible doit effectuer un JS Sagesse. En cas d'échec, elle est étourdie pendant 1 minute. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 8e niveau ou supérieur, vous pouvez ajouter un effet par niveau d'emplacement au-dessus du 7e. Decorative border with fish",
+  "modular_options": []
+}

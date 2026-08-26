@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-mur-de-force",
+  "name": "Mur de force",
+  "level": 5,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une pincée de poudre d'une pierre précieuse transparente"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien"
+  ],
+  "description": "Un mur de force invisible est généré en un point que vous choisissez à portée. Il apparaît orienté comme vous l'entendez : horizontalement, verticalement ou selon l'angle de votre choix. Il peut flotter librement ou reposer sur une surface solide. Vous pouvez lui donner la forme d'un dôme hémisphérique ou d'une sphère ayant un rayon de 3 m maximum, ou d'une surface plane constituée de dix sections de 3 m de côté, chacune devant être adjacente à une autre. Quelle que soit sa forme, il ne mesure que 6 mm d'épaisseur et persiste pour toute la durée du sort. S'il traverse l'espace d'une créature au moment où il apparaît, celle-ci est repoussée d'un côté ou de l'autre (à votre convenance). Rien ne peut franchir ce mur physiquement. Il est immunisé contre tous les dégâts et ne peut pas être dissipé par dissipation de la magie. Toutefois, le sort désintégration le détruit instantanément. Il est aussi présent dans le Plan Éthéré, si bien que les créatures éthérées ne peuvent pas le traverser. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, le rayon maximum (ou la taille maximum des sections) augmente de 1,50 m par niveau d'emplacement au-dessus du 5e.",
+  "modular_options": []
+}

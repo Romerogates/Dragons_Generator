@@ -1,5 +1,5 @@
 <div
-  class="relative w-full flex flex-col justify-start items-center animate-fade-in pb-8 select-none min-h-[75vh] overflow-hidden"
+  class="relative w-full flex-1 flex flex-col justify-center items-center pb-6 sm:pb-8 select-none min-h-0 overflow-x-hidden"
 >
   @if (loading()) {
     <div
@@ -20,76 +20,70 @@
   }
 
   @if (!loading() && !error()) {
-    @if (currentPhase() !== 'species') {
-      <div class="absolute top-2 left-4 md:left-8 z-50">
-        <button
-          class="text-sm font-semibold text-slate-400 hover:text-amber-400 transition-colors flex items-center gap-2 px-3 py-2 md:px-4 bg-[#1b2028] rounded-lg border border-slate-700 hover:border-amber-500/50 shadow-lg animate-fade-in"
-          (click)="clearSelection()"
-        >
-          <span class="sm:hidden">← Retour</span>
-          <span class="hidden sm:inline">← Revenir au choix des peuples</span>
-        </button>
-      </div>
-    }
-
     <div class="text-center w-full px-4 mt-2 flex-none z-10">
       <div
         class="transition-opacity duration-300 w-full max-w-4xl mx-auto"
         [ngClass]="transitioning() ? 'opacity-0' : 'opacity-100'"
       >
         <h2
-          class="text-4xl font-extrabold text-amber-500 mb-2 drop-shadow-md tracking-wide font-serif truncate"
+          class="text-2xl sm:text-4xl font-extrabold text-amber-500 mb-2 drop-shadow-md tracking-wide font-serif"
         >
           {{ phaseTitle() }}
         </h2>
-        <p class="text-slate-400 text-sm max-w-xl mx-auto italic truncate">
+        <p class="text-slate-400 text-xs sm:text-sm max-w-xl mx-auto italic px-1">
           {{ phaseSubtitle() }}
+          @if (choiceProgressLabel()) {
+            <span class="not-italic text-amber-400/90 font-bold ml-2">{{ choiceProgressLabel() }}</span>
+          }
         </p>
       </div>
     </div>
 
     <div class="relative w-full max-w-7xl flex-1 flex items-center justify-center">
       <button
+        type="button"
         (click)="prevCard()"
-        class="absolute left-2 md:left-4 z-40 p-3 md:p-4 rounded-full bg-[#171b22]/90 border border-slate-700 text-amber-500 hover:border-amber-500 hover:scale-110 transition-all duration-200 shadow-2xl"
+        class="absolute left-1 sm:left-2 md:left-4 z-40 p-3 md:p-4 rounded-full bg-[#171b22]/95 border border-slate-700 text-amber-500 hover:border-amber-500 active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-150 shadow-2xl"
+        aria-label="Carte précédente"
       >
-        <span class="text-2xl md:text-3xl">◀</span>
+        <span class="text-xl sm:text-2xl md:text-3xl">◀</span>
       </button>
 
-      <div class="w-full overflow-hidden px-10 py-10">
+      <div class="w-full overflow-hidden px-10 sm:px-14 py-4 sm:py-8">
         <div
-          class="flex transition-transform duration-300 ease-out gap-8 items-center"
+          class="flex transition-transform duration-200 ease-out gap-8 items-stretch"
           [style.transform]="
-            'translateX(calc(50% - 128px - (' + currentIndex() + ' * (256px + 32px))))'
+            'translateX(calc(50% - ' +
+            cardWidthPx / 2 +
+            'px - (' +
+            currentIndex() +
+            ' * ' +
+            cardStridePx +
+            'px)))'
           "
         >
           @for (card of currentCards(); track card.id; let i = $index) {
             <div
-              class="relative w-64 h-[380px] cursor-pointer group transition-all duration-300 shrink-0"
+              class="relative w-72 sm:w-80 h-[min(440px,62dvh)] sm:h-[440px] cursor-pointer group transition-[transform,opacity,filter] duration-200 shrink-0"
               [style.left]="getWrapOffset(i)"
               [ngClass]="{
-                'scale-110 z-30 opacity-100 drop-shadow-[0_0_40px_rgba(245,158,11,0.3)]':
-                  i === normalizedIndex(),
-                'scale-90 z-10 opacity-30 blur-[2px] grayscale-[0.3]': i !== normalizedIndex(),
+                'scale-[1.04] z-30 opacity-100': i === normalizedIndex(),
+                'scale-90 z-10 opacity-40 sm:opacity-35 grayscale-[0.25] pointer-events-none sm:pointer-events-auto':
+                  i !== normalizedIndex(),
               }"
               style="perspective: 1000px"
               (contextmenu)="onRightClick($event, card.id)"
               (click)="pickCard(card.id)"
             >
               <div
-                class="absolute -inset-4 bg-amber-500/30 rounded-2xl blur-3xl transition-opacity duration-300 pointer-events-none"
-                [ngClass]="i === normalizedIndex() ? 'opacity-100 animate-pulse' : 'opacity-0'"
-              ></div>
-
-              <div
-                class="relative w-full h-full transition-transform duration-300 ease-out rounded-xl"
+                class="relative w-full h-full transition-transform duration-200 ease-out rounded-xl"
                 style="transform-style: preserve-3d"
                 [style.transform]="
                   flippedCards().has(card.id) ? 'rotateY(180deg)' : 'rotateY(0deg)'
                 "
               >
                 <div
-                  class="absolute inset-0 flex p-1.5 rounded-xl transition-all duration-300 bg-[#171b22]"
+                  class="absolute inset-0 flex p-1.5 rounded-xl transition-[colors,transform,opacity,box-shadow] duration-200 bg-[#171b22]"
                   [ngClass]="
                     i === normalizedIndex()
                       ? 'border-2 border-amber-500 shadow-[inset_0_0_20px_rgba(245,158,11,0.15)]'
@@ -125,10 +119,22 @@
                       </div>
                     }
 
-                    <div
-                      class="mt-auto text-[9px] text-slate-500 text-center uppercase tracking-[0.2em] font-bold animate-pulse"
-                    >
-                      Clic droit : Grimoire
+                    <div class="mt-auto flex flex-col items-center gap-2">
+                      @if (i === normalizedIndex()) {
+                        <button
+                          type="button"
+                          class="text-[10px] text-amber-400/90 uppercase tracking-[0.15em] font-bold px-3 py-1.5 rounded-full border border-amber-800/50 bg-amber-950/30"
+                          (click)="onRightClick($event, card.id)"
+                        >
+                          {{ flippedCards().has(card.id) ? 'Retourner' : 'Voir le grimoire' }}
+                        </button>
+                      } @else {
+                        <div
+                          class="text-[9px] text-slate-500 text-center uppercase tracking-[0.2em] font-bold hidden sm:block"
+                        >
+                          Clic droit : Grimoire
+                        </div>
+                      }
                     </div>
                   </div>
                 </div>
@@ -159,14 +165,16 @@
                     }
 
                     <div class="overflow-y-auto pr-2 flex-grow custom-scrollbar">
-                      <p class="text-[11px] text-slate-300 leading-relaxed text-justify italic">
+                      <p
+                        class="text-[11px] text-slate-300 leading-relaxed text-justify whitespace-pre-line"
+                      >
                         {{ card.desc }}
                       </p>
                     </div>
 
                     <div class="mt-4 flex justify-center">
                       <span
-                        class="bg-amber-500 text-slate-950 px-4 py-2 rounded text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-transform"
+                        class="bg-amber-500 text-slate-950 px-4 py-2 rounded text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-[0.99] transition-transform"
                       >
                         Forger ce destin
                       </span>
@@ -180,20 +188,37 @@
       </div>
 
       <button
+        type="button"
         (click)="nextCard()"
-        class="absolute right-2 md:right-4 z-40 p-3 md:p-4 rounded-full bg-[#171b22]/90 border border-slate-700 text-amber-500 hover:border-amber-500 hover:scale-110 transition-all duration-200 shadow-2xl"
+        class="absolute right-1 sm:right-2 md:right-4 z-40 p-3 md:p-4 rounded-full bg-[#171b22]/95 border border-slate-700 text-amber-500 hover:border-amber-500 active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-150 shadow-2xl"
+        aria-label="Carte suivante"
       >
-        <span class="text-2xl md:text-3xl">▶</span>
+        <span class="text-xl sm:text-2xl md:text-3xl">▶</span>
       </button>
     </div>
 
-    @if (isConfirmed()) {
-      <div
-        class="flex-none mt-2 px-6 py-2.5 bg-emerald-950/30 text-emerald-400 border border-emerald-800/50 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-3 shadow-[0_0_15px_rgba(16,185,129,0.1)]"
-      >
-        <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
-        Peuple Actuel : {{ selectedSpecies()?.name }}
-      </div>
-    }
+    <nav class="wizard-step-nav">
+      @if (currentPhase() !== 'species') {
+        <button type="button" class="wizard-nav-secondary" (click)="clearSelection()">
+          ← Revenir au choix des peuples
+        </button>
+      } @else if (canContinue()) {
+        <button type="button" class="wizard-nav-secondary" (click)="clearSelection()">
+          ← Changer de peuple
+        </button>
+      }
+
+      @if (canContinue()) {
+        @if (isConfirmed()) {
+          <span class="wizard-nav-status">
+            <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+            {{ selectedSpecies()?.name }}
+          </span>
+        }
+        <button type="button" class="wizard-nav-primary" (click)="continueToNextStep()">
+          Continuer →
+        </button>
+      }
+    </nav>
   }
 </div>

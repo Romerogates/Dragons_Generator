@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "hdc-desequilibre",
+  "name": "Déséquilibré",
+  "source": "livre_de_base",
+  "description": "Vous avez été traumatisé par un vécu insurmontable. Vous subissez un désavantage aux jets de sauvegarde contre la folie et souffrez d'une folie permanente (à définir avec le meneur). Les autres aventuriers ne savent pas forcément que vous avez ce travers.",
+  "mechanics": {
+    "disadvantage_on": [
+      "jets de sauvegarde contre la folie"
+    ],
+    "permanent_condition": "folie_permanente",
+    "note": "Folie permanente à définir avec le meneur (cf. Grimoire)"
+  }
+}

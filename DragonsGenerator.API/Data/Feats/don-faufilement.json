@@ -1,0 +1,41 @@
+{
+  "schema_version": "2.0",
+  "id": "don-faufilement",
+  "name": "Faufilement",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [],
+  "description": "Résistance aux dégâts des attaques d'opportunité que vous provoquez. Avantage pour s'extraire d'une lutte/étreinte. Aucun malus en terrain difficile lors de Foncer. Pas d'inconvénients dans les espaces réduits. Traverser l'espace d'un allié ne coûte aucun déplacement. Test opposé d'Acrobaties pour traverser l'espace d'un ennemi (taille supérieure normalement bloquante).",
+  "benefits": [
+    {
+      "type": "damage_resistance",
+      "condition": "attaques d'opportunité"
+    },
+    {
+      "type": "advantage_on_check",
+      "activities": [
+        "s'extraire d'une lutte"
+      ]
+    },
+    {
+      "type": "ignore_difficult_terrain",
+      "condition": "action Foncer"
+    },
+    {
+      "type": "ignore_squeeze_penalties"
+    },
+    {
+      "type": "free_movement_through_allies"
+    },
+    {
+      "type": "squeeze_through_enemy",
+      "check": "Acrobaties (opposé)"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "mobilité",
+    "esquive",
+    "acrobaties"
+  ]
+}

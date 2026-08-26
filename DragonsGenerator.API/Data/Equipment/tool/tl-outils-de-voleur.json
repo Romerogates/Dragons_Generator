@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "tl-outils-de-voleur",
+  "name": "Outils de voleur",
+  "category": "tool",
+  "subcategory": "thieves_tools",
+  "cost": {
+    "value": 25,
+    "unit": "po"
+  },
+  "weight_kg": 0.5,
+  "description": "Sert à désamorcer des pièges ou crocheter des serrures. Rare et illégal."
+}

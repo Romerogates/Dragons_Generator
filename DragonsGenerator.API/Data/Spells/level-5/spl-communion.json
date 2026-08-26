@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-communion",
+  "name": "Communion",
+  "level": 5,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "de l'encens et une fiole d'eau bénite ou maudite"
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "Vous contactez votre dieu ou l'un de ses agents et lui posez jusqu'à trois questions auxquelles il est possible de répondre par oui ou par non. Vous devez poser vos questions avant la fin du sort. Vous recevez une réponse juste par question. Les êtres divins ne sont pas toujours omniscients, il est donc possible qu'il vous soit répondu « incertain » dans le cas de questions dépassant les connaissances de la créature contactée. Dans l'hypothèse où une réponse en un mot pourrait être trompeuse ou contraire aux intérêts de la divinité, le meneur pourra répondre au moyen d'une courte phrase. Si vous lancez plusieurs fois le sort avant d'avoir terminé un repos long, il y a 25 % de chance cumulatifs pour chaque incantation au-delà de la première de n'obtenir aucune réponse. Le meneur effectue ce jet en secret.",
+  "modular_options": []
+}

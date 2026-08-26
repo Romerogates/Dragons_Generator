@@ -1,0 +1,65 @@
+{
+  "schema_version": "2.0",
+  "id": "civ-cite-franche",
+  "name": "Cité Franche",
+  "randomization": {
+    "dice": "d100",
+    "min": 23,
+    "max": 43
+  },
+  "demographics": {
+    "primary_species": [
+      {
+        "id": "sp-humain",
+        "label": "Humains"
+      },
+      {
+        "id": "sp-nain-batisseur",
+        "label": "Nains bâtisseurs"
+      },
+      {
+        "id": "sp-halfelin-pied-leger",
+        "label": "Halfelins pieds-légers"
+      },
+      {
+        "id": "sp-gnome-des-roches",
+        "label": "Gnomes des roches"
+      }
+    ],
+    "secondary_species": [
+      {
+        "id": "sp-tous",
+        "label": "Tous les peuples"
+      }
+    ],
+    "is_cosmopolitan": true,
+    "cosmopolitan_zones": [
+      "ville entière"
+    ],
+    "social_roles": [],
+    "peoples_note": "Tous les peuples. Majorité d'Humains, Nains bâtisseurs, Halfelins pieds-légers et Gnomes des roches."
+  },
+  "official_languages": [
+    {
+      "id": "lg-cyfand",
+      "label": "Cyfand"
+    }
+  ],
+  "multilingual": true,
+  "writing_systems": [
+    {
+      "id": "wr-cyfand",
+      "label": "Cyfand",
+      "type": "alphabet"
+    }
+  ],
+  "is_oral_only": false,
+  "description": "La Cité Franche est probablement la plus grande ville d'Eana. Port situé à l'embouchure du fleuve Dispende, elle est ouverte sur les mers de l'ouest, du sud et de l'est. Cette puissance marchande majeure a su établir des comptoirs et des alliances dans la plupart des pays et a imposé ses normes (monnaie, alphabet…). La ville elle-même, dirigée par un conseil de citoyens, est partagée en quartiers souvent fortement marqués par une communauté (elfes d'Ellerìna, halfelins de la Myetée…). Riche, contrastée, inégalitaire, bruyante, épicée, déconcertante, violente et multiculturelle : la Cité Franche est le point de départ par défaut de vos aventures.",
+  "geography_tags": [
+    "metropole",
+    "port",
+    "embouchure-dispende",
+    "quartiers-communautaires"
+  ],
+  "threat_ids": []
+}

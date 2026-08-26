@@ -1,0 +1,578 @@
+{
+  "schema_version": "2.0",
+  "description": "Index des dons (Dragons — jeu de rôle). Un don s'obtient à la place d'une Augmentation de caractéristique (niveaux 4, 8, 12, 16, 19 selon la classe) ou comme contrepartie de deux handicaps.",
+  "language": "fr",
+  "stats": {
+    "total": 43,
+    "magic": 8,
+    "combat": 21,
+    "survival": 9,
+    "exploration": 5,
+    "requires_magic": 7,
+    "repeatable": 3
+  },
+  "acquisition": {
+    "note": "Remplace l'Augmentation de caractéristique (règle optionnelle) ou contrepartie de 2 handicaps.",
+    "levels": "Dépend de la classe (généralement niveaux 4, 8, 12, 16, 19)",
+    "rule": "Un même don ne peut être choisi qu'une seule fois, sauf indication contraire."
+  },
+  "feats": [
+    {
+      "id": "don-abjurateur",
+      "name": "Abjurateur",
+      "requires_magic": true,
+      "repeatable": false,
+      "tags": [
+        "magie",
+        "abjuration",
+        "défense"
+      ],
+      "file": "Feats/don-abjurateur.json",
+      "category": "magic"
+    },
+    {
+      "id": "don-ambidextre",
+      "name": "Ambidextre",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "combat",
+        "deux-armes",
+        "dextérité"
+      ],
+      "file": "Feats/don-ambidextre.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-archiviste",
+      "name": "Archiviste",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "connaissance",
+        "intelligence",
+        "compétences"
+      ],
+      "file": "Feats/don-archiviste.json",
+      "category": "exploration"
+    },
+    {
+      "id": "don-brise-lame",
+      "name": "Brise-lame",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "combat",
+        "corps-à-corps",
+        "désarmement"
+      ],
+      "file": "Feats/don-brise-lame.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-catalyseur-magique",
+      "name": "Catalyseur magique",
+      "requires_magic": true,
+      "repeatable": false,
+      "tags": [
+        "magie",
+        "résilience",
+        "emplacements"
+      ],
+      "file": "Feats/don-catalyseur-magique.json",
+      "category": "magic"
+    },
+    {
+      "id": "don-collectionneur-de-magie",
+      "name": "Collectionneur de magie",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "objets-magiques",
+        "affinité"
+      ],
+      "file": "Feats/don-collectionneur-de-magie.json",
+      "category": "magic"
+    },
+    {
+      "id": "don-combat-tropical",
+      "name": "Combat tropical",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "défense",
+        "armure",
+        "constitution"
+      ],
+      "file": "Feats/don-combat-tropical.json",
+      "category": "survival"
+    },
+    {
+      "id": "don-compagnon-animal",
+      "name": "Compagnon animal",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "animal",
+        "compagnon",
+        "nature"
+      ],
+      "file": "Feats/don-compagnon-animal.json",
+      "category": "survival"
+    },
+    {
+      "id": "don-contre-feu",
+      "name": "Contre-feu",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "réaction",
+        "mobilité",
+        "combat"
+      ],
+      "file": "Feats/don-contre-feu.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-devin",
+      "name": "Devin",
+      "requires_magic": true,
+      "repeatable": false,
+      "tags": [
+        "magie",
+        "divination"
+      ],
+      "file": "Feats/don-devin.json",
+      "category": "magic"
+    },
+    {
+      "id": "don-doigts-de-fee",
+      "name": "Doigts de fée",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "dextérité",
+        "escamotage",
+        "subtilité"
+      ],
+      "file": "Feats/don-doigts-de-fee.json",
+      "category": "survival"
+    },
+    {
+      "id": "don-enchainement",
+      "name": "Enchaînement",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "combat",
+        "attaques",
+        "corps-à-corps"
+      ],
+      "file": "Feats/don-enchainement.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-expeditif",
+      "name": "Expéditif",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "mobilité",
+        "vitesse",
+        "combat"
+      ],
+      "file": "Feats/don-expeditif.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-faufilement",
+      "name": "Faufilement",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "mobilité",
+        "esquive",
+        "acrobaties"
+      ],
+      "file": "Feats/don-faufilement.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-gladiateur",
+      "name": "Gladiateur",
+      "requires_magic": false,
+      "repeatable": true,
+      "tags": [
+        "défense",
+        "résistance",
+        "constitution"
+      ],
+      "file": "Feats/don-gladiateur.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-harponneur",
+      "name": "Harponneur",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "armes-de-lancer",
+        "lutte",
+        "combat-à-distance"
+      ],
+      "file": "Feats/don-harponneur.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-herboriste",
+      "name": "Herboriste",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "artisanat",
+        "plantes",
+        "soins"
+      ],
+      "file": "Feats/don-herboriste.json",
+      "category": "survival"
+    },
+    {
+      "id": "don-heroique",
+      "name": "Héroïque",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "polyvalent",
+        "ressource",
+        "héroïsme"
+      ],
+      "file": "Feats/don-heroique.json",
+      "category": "exploration"
+    },
+    {
+      "id": "don-impavide",
+      "name": "Impavide",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "mental",
+        "résistance",
+        "corruption"
+      ],
+      "file": "Feats/don-impavide.json",
+      "category": "survival"
+    },
+    {
+      "id": "don-insensibilite-elementaire",
+      "name": "Insensibilité élémentaire",
+      "requires_magic": false,
+      "repeatable": true,
+      "tags": [
+        "défense",
+        "résistance",
+        "élémentaire"
+      ],
+      "file": "Feats/don-insensibilite-elementaire.json",
+      "category": "survival"
+    },
+    {
+      "id": "don-lanceur-de-couteaux",
+      "name": "Lanceur de couteaux",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "armes-de-lancer",
+        "dextérité",
+        "combat-à-distance"
+      ],
+      "file": "Feats/don-lanceur-de-couteaux.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-magie-perseverante",
+      "name": "Magie persévérante",
+      "requires_magic": true,
+      "repeatable": false,
+      "tags": [
+        "magie",
+        "sorts-mineurs",
+        "ténacité"
+      ],
+      "file": "Feats/don-magie-perseverante.json",
+      "category": "magic"
+    },
+    {
+      "id": "don-maitre-des-poisons",
+      "name": "Maître des poisons",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "poison",
+        "artisanat",
+        "dextérité"
+      ],
+      "file": "Feats/don-maitre-des-poisons.json",
+      "category": "survival"
+    },
+    {
+      "id": "don-mental-dacier",
+      "name": "Mental d'acier",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "mental",
+        "défense",
+        "sagesse"
+      ],
+      "file": "Feats/don-mental-dacier.json",
+      "category": "survival"
+    },
+    {
+      "id": "don-necromant",
+      "name": "Nécromant",
+      "requires_magic": true,
+      "repeatable": false,
+      "tags": [
+        "magie",
+        "nécromancie",
+        "mort"
+      ],
+      "file": "Feats/don-necromant.json",
+      "category": "magic"
+    },
+    {
+      "id": "don-panache-martial",
+      "name": "Panache martial",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "combat",
+        "conditions",
+        "corps-à-corps"
+      ],
+      "file": "Feats/don-panache-martial.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-parangon",
+      "name": "Parangon",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "leadership",
+        "aura",
+        "inspiration"
+      ],
+      "file": "Feats/don-parangon.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-pavois",
+      "name": "Pavois",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "bouclier",
+        "défense",
+        "réaction"
+      ],
+      "file": "Feats/don-pavois.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-pilier-de-taverne",
+      "name": "Pilier de taverne",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "social",
+        "perception",
+        "taverne"
+      ],
+      "file": "Feats/don-pilier-de-taverne.json",
+      "category": "exploration"
+    },
+    {
+      "id": "don-poigne-dogre",
+      "name": "Poigne d'ogre",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "force",
+        "corps-à-corps",
+        "lutte"
+      ],
+      "file": "Feats/don-poigne-dogre.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-regain",
+      "name": "Regain",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "survie",
+        "défense",
+        "endurance"
+      ],
+      "file": "Feats/don-regain.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-reminiscence-magique",
+      "name": "Réminiscence magique",
+      "requires_magic": true,
+      "repeatable": false,
+      "tags": [
+        "magie",
+        "préparation",
+        "urgence"
+      ],
+      "file": "Feats/don-reminiscence-magique.json",
+      "category": "magic"
+    },
+    {
+      "id": "don-science-du-desequilibre",
+      "name": "Science du déséquilibre",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "lutte",
+        "dextérité",
+        "corps-à-corps"
+      ],
+      "file": "Feats/don-science-du-desequilibre.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-secours",
+      "name": "Secours",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "soins",
+        "soutien",
+        "médecine"
+      ],
+      "file": "Feats/don-secours.json",
+      "category": "exploration"
+    },
+    {
+      "id": "don-sens-du-critique",
+      "name": "Sens du critique",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "combat",
+        "coups-critiques",
+        "offensif"
+      ],
+      "file": "Feats/don-sens-du-critique.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-succes-mitige",
+      "name": "Succès mitigé",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "combat",
+        "désavantage",
+        "risque"
+      ],
+      "file": "Feats/don-succes-mitige.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-talent",
+      "name": "Talent",
+      "requires_magic": false,
+      "repeatable": true,
+      "tags": [
+        "polyvalent",
+        "maîtrise",
+        "progression"
+      ],
+      "file": "Feats/don-talent.json",
+      "category": "exploration"
+    },
+    {
+      "id": "don-temeraire",
+      "name": "Téméraire",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "courage",
+        "corps-à-corps",
+        "réaction"
+      ],
+      "file": "Feats/don-temeraire.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-tenaille",
+      "name": "Tenaille",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "tactique",
+        "équipe",
+        "corps-à-corps"
+      ],
+      "file": "Feats/don-tenaille.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-tireur-de-precision",
+      "name": "Tireur de précision",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "armes-à-distance",
+        "précision",
+        "tir"
+      ],
+      "file": "Feats/don-tireur-de-precision.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-transmutateur",
+      "name": "Transmutateur",
+      "requires_magic": true,
+      "repeatable": false,
+      "tags": [
+        "magie",
+        "transmutation",
+        "défense"
+      ],
+      "file": "Feats/don-transmutateur.json",
+      "category": "magic"
+    },
+    {
+      "id": "don-vif-comme-leclair",
+      "name": "Vif comme l'éclair",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "initiative",
+        "réaction",
+        "dextérité"
+      ],
+      "file": "Feats/don-vif-comme-leclair.json",
+      "category": "combat"
+    },
+    {
+      "id": "don-vigoureux",
+      "name": "Vigoureux",
+      "requires_magic": false,
+      "repeatable": false,
+      "tags": [
+        "constitution",
+        "endurance",
+        "survie"
+      ],
+      "file": "Feats/don-vigoureux.json",
+      "category": "survival"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-mur-de-pierre",
+  "name": "Mur de pierre",
+  "level": 5,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un petit morceau de granit"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Icon, logo, and photograph of a rock Photograph of a rock Un mur de pierre non magique apparaît en un point que vous choisissez à portée. Il présente une épaisseur de 15 cm et il est constitué de dix sections de 3 m de côté, chacune devant être adjacente à une autre. Autre possibilité, vous pouvez créer des sections de 3 m par 6 m qui ne font alors que 7,5 cm d'épaisseur. S'il traverse l'espace d'une créature au moment où il apparaît, celle-ci est poussée d'un côté ou de l'autre (à votre convenance). Si la créature est cernée de toutes parts (ou coincée entre le mur et une autre surface solide), elle peut effectuer un JS Dextérité. En cas de réussite, elle peut jouer sa réaction pour se déplacer jusqu'à sa VD de sorte à ne plus être enfermée. Le mur prend la forme de votre choix, mais il ne peut pas occuper le même espace qu'une créature ou un objet. Il n'est pas nécessairement vertical et ne repose pas forcément sur des fondations solides. Par contre, il doit fusionner avec une masse de roche existante, qui le soutient alors. Vous pouvez donc employer ce sort pour enjamber un gouffre ou créer une rampe. Si vous créez ainsi une travée de plus de 6 m de longueur, vous devez réduire de moitié la taille de chaque section, afin de produire des étais. Il vous est possible de procéder à des modifications grossières pour que le mur constitue un rempart, des créneaux et autres détails de fortification. Ce mur est un objet en pierre qui peut être endommagé et brisé. Chaque panneau présente une CA 15 et 30 points de vie par tranche de 2,5 cm d'épaisseur. Une section qui tombe à 0 point de vie est détruite et peut provoquer l'effondrement des sections adjacentes, à la discrétion du meneur. Si vous maintenez votre concentration sur ce sort pour toute sa durée, le mur devient permanent et ne peut pas être dissipé. Dans le cas contraire, il disparaît quand le sort prend fin. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, la taille des sections augmente de 1,50 m de côté par niveau d'emplacement au-dessus du 5e.",
+  "modular_options": []
+}

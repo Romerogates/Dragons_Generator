@@ -22,6 +22,9 @@ import {
   PersonalityTableWithAlignment,
 } from '@core/models/Backgrounds/background';
 import { Currency, EquipmentSlot, EquipmentInstance } from '@core/models/Character/character';
+import { normalizeBackgrounds } from '@core/utils/background-data.adapter';
+import { normalizeSkillId } from '@core/utils/skill.utils';
+import { labelForGameId } from '@core/utils/game-id-labels';
 
 // ─── Types locaux ────────────────────────────────────────────────────────────
 
@@ -176,10 +179,9 @@ export class BackgroundStep implements OnInit {
   ngOnInit(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Chargement des historiques
     this.dataService.getBackgrounds().subscribe({
       next: (bgs) => {
-        this.backgrounds.set(bgs);
+        this.backgrounds.set(normalizeBackgrounds(bgs));
         this.loading.set(false);
 
         const existing = this.c().backgroundId;
@@ -187,7 +189,6 @@ export class BackgroundStep implements OnInit {
           this.selectedBgId.set(existing);
           this.phase.set('configure');
 
-          // Recharger les données custom si existantes
           if (this.c().backgroundPreset === false) {
             this.customPrivilegeName.set(this.c().privilegeName || '');
             this.customPrivilegeDesc.set(this.c().privilegeDesc || '');
@@ -299,7 +300,15 @@ export class BackgroundStep implements OnInit {
       customData: undefined,
     }));
 
-    const choiceSlots: EquipmentSlot[] = [];
+    const choiceSlots: EquipmentSlot[] = (data.equipment?.choose ?? []).map(
+      (choice: any, i: number) => ({
+        slot: 100 + i,
+        description: choice.name ?? "Choix d'équipement",
+        alternatives: (choice.pool ?? []).map((item: any) => [
+          { id: item.id, qty: item.qty ?? 1 },
+        ]),
+      }),
+    );
 
     const goldAmount = isCustom ? this.customGold() : (data.equipment?.currency?.or ?? 0);
     const bgCurrency: Currency = { cuivre: 0, argent: 0, or: goldAmount, platine: 0 };
@@ -312,11 +321,13 @@ export class BackgroundStep implements OnInit {
     const bonds = isCustom ? this.customBond() || undefined : (this.rolledBond() ?? undefined);
     const flaws = isCustom ? this.customFlaw() || undefined : (this.rolledFlaw() ?? undefined);
 
+    const fixedSkills = (data.proficiencies?.skills?.fixed ?? []).map(normalizeSkillId);
+
     const selection: BackgroundSelection = {
       backgroundId: bg.id,
       backgroundName: bgName,
       backgroundPreset: data.preset,
-      skills: [],
+      skills: fixedSkills,
       tools: [],
       proficiencies: data.proficiencies,
       languages: [],
@@ -349,65 +360,13 @@ export class BackgroundStep implements OnInit {
   // ── Helpers ──
 
   prettifySkill(id: string): string {
-    const MAP: Record<string, string> = {
-      'skill-acrobaties': 'Acrobaties',
-      'skill-athletisme': 'Athlétisme',
-      'skill-arcanes': 'Arcanes',
-      'skill-discretion': 'Discrétion',
-      'skill-dressage': 'Dressage',
-      'skill-escamotage': 'Escamotage',
-      'skill-histoire': 'Histoire',
-      'skill-intimidation': 'Intimidation',
-      'skill-intuition': 'Intuition',
-      'skill-investigation': 'Investigation',
-      'skill-medecine': 'Médecine',
-      'skill-nature': 'Nature',
-      'skill-perception': 'Perception',
-      'skill-persuasion': 'Persuasion',
-      'skill-religion': 'Religion',
-      'skill-representation': 'Représentation',
-      'skill-survie': 'Survie',
-      'skill-tromperie': 'Tromperie',
-    };
-    return (
-      MAP[id] ??
-      id
-        .replace(/^skill-/, '')
-        .replace(/-/g, ' ')
-        .replace(/\b\w/g, (c) => c.toUpperCase())
-    );
+    return labelForGameId(id);
   }
 
   prettifyTool(ref: BackgroundToolRef): string {
-    if (ref.any) {
-      const labels: Record<string, string> = {
-        instrument: 'Instrument de musique (au choix)',
-        gameSet: 'Matériel de jeu (au choix)',
-        tool: "Outil d'artisan (au choix)",
-        vehicle: 'Véhicule (au choix)',
-      };
-      return labels[ref.type] ?? ref.type;
-    }
-    if (ref.id) {
-      const MAP: Record<string, string> = {
-        'tl-necessaire-de-calligraphie': 'Nécessaire de calligraphie',
-        'tl-necessaire-de-cartographe': 'Nécessaire de cartographe',
-        'tl-necessaire-dherboristerie': "Nécessaire d'herboristerie",
-        'tl-necessaire-dalchimiste': "Nécessaire d'alchimiste",
-        'tl-necessaire-de-deguisement': 'Nécessaire de déguisement',
-        'tl-necessaire-de-faussaire': 'Nécessaire de faussaire',
-        'tl-outils-de-voleur': 'Outils de voleur',
-        'tl-vehicules-terrestres': 'Véhicules terrestres',
-      };
-      return (
-        MAP[ref.id] ??
-        ref.id
-          .replace(/^tl-/, '')
-          .replace(/-/g, ' ')
-          .replace(/\b\w/g, (c) => c.toUpperCase())
-      );
-    }
-    return ref.type;
+    if (ref.any) return labelForGameId(ref.type);
+    if (ref.id) return labelForGameId(ref.id);
+    return labelForGameId(ref.type);
   }
 
   toolRefKey(ref: BackgroundToolRef): string {

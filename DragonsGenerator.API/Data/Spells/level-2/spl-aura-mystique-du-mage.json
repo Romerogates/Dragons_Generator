@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-aura-mystique-du-mage",
+  "name": "Aura mystique du mage",
+  "level": 2,
+  "school": "illusion",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 24,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un petit carré de soie"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien"
+  ],
+  "description": "Vous placez une illusion sur une créature ou un objet que vous touchez, de sorte que les sorts de divination révèlent des informations erronées à son sujet. La cible peut être une créature consentante ou un objet non porté ni transporté par une autre créature. Au moment de l'incantation, choisissez un ou deux des effets suivants, qui persistent pour toute la durée du sort. Si vous lancez ce sort sur un même objet ou créature chaque jour pendant 30 jours, en l'investissant du même effet à chaque fois, l'illusion persiste jusqu'à ce qu'elle soit dissipée. Fausse aura. La cible n'est plus perçue de la même façon par les sorts et effets magiques qui détectent les auras magiques (comme détection de la magie). Ainsi, vous pouvez faire croire qu'un objet non magique est magique, et vice versa, ou carrément modifier son aura magique afin qu'il semble appartenir à une école de magie de votre choix. Quand vous utilisez cet effet sur un objet, vous pouvez rendre la fausse magie ostensible pour toute créature qui le manipule. Masque. La cible n'est plus perçue de la même façon par les sorts et effets magiques qui détectent les types de créatures (comme la Perception divine du paladin ou le déclenchement du sort symbole). Choisissez un type de créature. Les autres sorts et effets magiques prennent la cible pour une créature de ce type ou de cet alignement. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, la cible peut être non-consentante. Elle peut toutefois résister au sort avec un JS Intelligence. Avec un emplacement de sort du 4e niveau ou supérieur, le sort a une portée de 9 m.",
+  "modular_options": []
+}

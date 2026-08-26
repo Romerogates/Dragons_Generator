@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-image-miroir",
+  "name": "Image miroir",
+  "level": 2,
+  "school": "illusion",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Vous faites apparaître trois doubles illusoires de vous-même dans votre espace. Tant que le sort persiste, ces doubles se déplacent avec vous et reproduisent vos actions, changeant sans cesse de position, si bien qu'il est impossible de vous distinguer de vos images, que vous pouvez révoquer au prix d'une action. Chaque fois qu'une créature vous cible avec une attaque pendant la durée du sort, lancez un d20 pour déterminer si elle vise un de vos doubles. Si vous en avez trois, vous devez obtenir un 6 ou plus pour que la cible de l'attaque soit un double. Si vous en avez deux, vous devez obtenir un 8 ou plus. Si vous en avez un, vous devez obtenir un 11 ou plus. La CA d'un double est égale à 10 + votre modificateur de Dextérité. Si une attaque touche une image, celle-ci est détruite. Un double ne peut être détruit que par une attaque qui le touche. Il ignore les autres dégâts et effets. Le sort prend fin quand les trois images sont détruites. Une créature n'est pas affectée par ce sort si elle ne voit pas, s'appuie sur des sens autres que la vue (comme la vision aveugle) ou si elle est en mesure de percer les illusions, avec la vision lucide notamment.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, la CA des doubles augmente de 1 par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

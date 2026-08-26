@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-image-accomplie",
+  "name": "Image accomplie",
+  "level": 3,
+  "school": "illusion",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un peu de laine brute"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Vous créez l'image d'un objet, d'une créature ou de quelque autre phénomène visible pas plus grand qu'un cube de 6 m d'arête. Elle apparaît en un point que vous voyez à portée et persiste pour toute la durée du sort. Elle semble parfaitement réelle, avec sons, odeurs et température correspondant à la chose en question. Vous ne pouvez pas créer une chaleur ou un froid suffisants pour causer des dégâts, un son assez fort pour infliger des dégâts de tonnerre ou assourdir une créature, ou une odeur susceptible de rendre malade. Tant que vous êtes à portée de l'illusion, vous pouvez déplacer l'image vers un autre point situé à portée au prix d'une action. Quand l'image se déplace, vous pouvez modifier son apparence pour que ses mouvements semblent naturels. Par exemple, si vous créez l'image d'une créature et la déplacez, vous pouvez la modifier pour qu'elle ait l'air de marcher. De même, vous pouvez lui faire produire différents sons à différents moments, et même la faire discuter. En cas d'interaction physique, l'illusion est dévoilée, tout simplement parce que les corps la traversent. Une créature qui examine l'image au prix d'une action comprendra qu'il s'agit d'une illusion en réussissant un test d'Intelligence (Investigation) assorti de votre DD de sauvegarde des sorts. Si une créature perce l'illusion, elle voit au travers et perçoit ses autres propriétés sensorielles, quoique très amoindries.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, le sort persiste jusqu'à ce qu'il soit dissipé sans que vous ayez besoin de vous concentrer.",
+  "modular_options": []
+}

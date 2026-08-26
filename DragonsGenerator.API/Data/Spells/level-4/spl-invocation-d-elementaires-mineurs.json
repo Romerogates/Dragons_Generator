@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-invocation-d-elementaires-mineurs",
+  "name": "Invocation d'élémentaires mineurs",
+  "level": 4,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 27,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-magicien"
+  ],
+  "description": "V Vous invoquez des élémentaires qui apparaissent dans des espaces inoccupés que vous voyez à portée. Choisissez une des options suivantes pour déterminer les élémentaires invoqués : Un élémentaire d'un facteur de puissance de 2 ou moins Deux élémentaires d'un facteur de puissance de 1 ou moins Quatre élémentaires d'un facteur de puissance de ½ ou moins Huit élémentaires d'un facteur de puissance de ¼ ou moins Un élémentaire invoqué par ce sort disparaît quand il tombe à 0 point de vie ou quand le sort prend fin. Les créatures invoquées sont amicales envers vous et vos compagnons. Déterminez l'initiative pour les créatures invoquées, qui forment un groupe avec ses propres tours de jeu. Elles obéissent aux ordres verbaux que vous leur donnez (sans que cela ne vous coûte d'action). Si vous ne leur en donnez pas, elles n'entreprennent pas d'actions, mais se défendent contre les créatures hostiles.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant certains emplacements de sort de niveau supérieur, choisissez une des options ci-dessus, et le nombre de créatures qui apparaissent augmente : le double avec un emplacement du 6e ou 7e niveau, et le triple avec un emplacement du 8e ou 9e niveau.",
+  "modular_options": []
+}

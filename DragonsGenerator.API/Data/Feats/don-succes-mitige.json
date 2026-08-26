@@ -1,0 +1,22 @@
+{
+  "schema_version": "2.0",
+  "id": "don-succes-mitige",
+  "name": "Succès mitigé",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [],
+  "description": "Quand vous ratez une attaque avec désavantage mais que le dé le plus élevé aurait touché : vous pouvez réussir l'attaque en acceptant un désagrément (1d10) : 1 mêmes dégâts, 2 AO de tous les ennemis proches, 3 niveau de fatigue, 4 lâcher arme, 5 à terre, 6 entravé 1 rnd, 7 neutralisé 1 rnd, 8 perte concentration, 9 vous hurlez, 10 aucun désagrément.",
+  "benefits": [
+    {
+      "type": "trade_miss_for_hit",
+      "condition": "désavantage + plus haut dé aurait touché",
+      "cost": "désagrément 1d10"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "combat",
+    "désavantage",
+    "risque"
+  ]
+}

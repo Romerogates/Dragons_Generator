@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-sac-de-religieux",
+  "name": "Sac de religieux",
+  "category": "gear",
+  "subcategory": "container",
+  "cost": {
+    "value": 22,
+    "unit": "po"
+  },
+  "weight_kg": 10,
+  "description": "Un sac à dos, une couverture, 10 bougies, un nécessaire à feu, une sébile, 2 morceaux d'encens, un encensoir, une tenue liturgique, 2 jours de rations et une outre."
+}

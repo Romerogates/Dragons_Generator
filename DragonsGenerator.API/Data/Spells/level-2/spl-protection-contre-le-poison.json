@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-protection-contre-le-poison",
+  "name": "Protection contre le poison",
+  "level": 2,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-paladin",
+    "cls-pretre",
+    "cls-rodeur"
+  ],
+  "description": "Vous touchez une créature. Si elle est empoisonnée, vous neutralisez le poison. Si plusieurs poisons l'affectent, vous en neutralisez un que vous savez présent, ou un au hasard. Pour toute la durée du sort, la cible bénéficie d'un avantage aux jets de sauvegarde contre l'état préjudiciable empoisonné et d'une résistance aux dégâts de poison.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

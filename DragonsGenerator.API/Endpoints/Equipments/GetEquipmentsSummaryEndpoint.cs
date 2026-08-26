@@ -1,18 +1,14 @@
-﻿
+﻿using DragonsGenerator.API.Common;
+using FastEndpoints;
 
 namespace DragonsGenerator.API.Endpoints.Equipments;
 
-public record EquipmentSummary(
-    string Id,
-    string Name,
-    string Type,
-    string? Subtype,
-    Cost Cost,
-    double? WKg
-);
-
-public class GetEquipmentsSummaryEndpoint : EndpointWithoutRequest<List<EquipmentSummary>>
+public class GetEquipmentsSummaryEndpoint : EndpointWithoutRequest<List<EquipmentSummaryDto>>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetEquipmentsSummaryEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/equipments/summary");
@@ -21,19 +17,7 @@ public class GetEquipmentsSummaryEndpoint : EndpointWithoutRequest<List<Equipmen
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var equipments = await JsonDataLoader.LoadAsync<List<Equipment>>("equipments.json", ct);
-
-        var summaries = equipments?
-            .Select(e => new EquipmentSummary(
-                Id: e.Id,
-                Name: e.Name,
-                Type: e.Type,
-                Subtype: e.Subtype,
-                Cost: e.Cost,
-                WKg: e.WKg
-            ))
-            .ToList() ?? [];
-
+        var summaries = await _repo.GetEquipmentsSummaryAsync(ct);
         await Send.OkAsync(summaries, ct);
     }
 }

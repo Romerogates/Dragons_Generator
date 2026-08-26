@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-marche-sur-l-onde",
+  "name": "Marche sur l'onde",
+  "level": 3,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un morceau de liège"
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-pretre",
+    "cls-rodeur"
+  ],
+  "description": "Ce sort permet de marcher sur n'importe quel liquide ou fluide - eau, acide, boue, neige, sables mouvants ou lave - avec autant de facilité que sur la terre ferme (si les bénéficiaires marchent sur de la lave, ils s'exposent tout de même aux dégâts entraînés par la chaleur). Jusqu'à dix créatures consentantes que vous voyez à portée gagnent cette faculté pour toute la durée du sort. Si vous ciblez une créature immergée, le sort la ramène à la surface au rythme de 18 m par round.",
+  "modular_options": []
+}

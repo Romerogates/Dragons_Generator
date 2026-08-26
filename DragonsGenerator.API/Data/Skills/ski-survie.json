@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "ski-survie",
+  "name": "Survie",
+  "ability": "SAG",
+  "description": "Le meneur peut vous demander un test de Sagesse (Survie) pour remonter une piste, traquer du gibier, guider votre groupe à travers un désert de glace, reconnaître les signes de la présence d'un ours-hibou dans les parages, prévoir le temps qu'il fera ou éviter sables mouvants et autres dangers naturels. La Survie vous permet en outre d'effectuer des travaux de bricolage, de petites réparations ou de fabriquer des abris et outils rudimentaires.",
+  "examples": [
+    "Remonter une piste ou traquer du gibier.",
+    "Guider un groupe à travers un environnement hostile.",
+    "Reconnaître les signes de présence d'une créature ou fabriquer un abri rudimentaire."
+  ],
+  "passive_check": false,
+  "source": "livre_de_base"
+}

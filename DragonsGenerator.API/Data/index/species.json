@@ -1,0 +1,234 @@
+{
+  "schema_version": "2.0",
+  "description": "Index des espèces jouables. Chaque entrée référence le fichier JSON de détail dans Species/.",
+  "source_book": "Dragons - Livre de base: Aventuriers",
+  "language": "fr",
+  "species": [
+    {
+      "id": "sp-drakeide",
+      "name": "Drakéides",
+      "name_alt": [],
+      "file": "Species/sp-drakeide.json",
+      "schema_version": "2.0",
+      "playable": true,
+      "requires_subspecies": false,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "26-29"
+      },
+      "size": "M",
+      "darkvision_m": 0,
+      "ability_score_increase": {
+        "str": 2,
+        "cha": 1
+      },
+      "traits_count": 4,
+      "sub_traits_count": 0,
+      "subspecies_count": 0,
+      "subspecies_ids": []
+    },
+    {
+      "id": "sp-elfe",
+      "name": "Elfes",
+      "name_alt": [],
+      "file": "Species/sp-elfe.json",
+      "schema_version": "2.0",
+      "playable": true,
+      "requires_subspecies": true,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "33-38"
+      },
+      "size": "M",
+      "darkvision_m": 18,
+      "ability_score_increase": {
+        "dex": 2
+      },
+      "traits_count": 4,
+      "sub_traits_count": 3,
+      "subspecies_count": 3,
+      "subspecies_ids": [
+        "sp-elfe-elenion",
+        "sp-elfe-aldaron",
+        "sp-elfe-drow"
+      ]
+    },
+    {
+      "id": "sp-gnome",
+      "name": "Gnomes",
+      "name_alt": [],
+      "file": "Species/sp-gnome.json",
+      "schema_version": "2.0",
+      "playable": true,
+      "requires_subspecies": true,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "39-41"
+      },
+      "size": "P",
+      "darkvision_m": 18,
+      "ability_score_increase": {
+        "int": 2
+      },
+      "traits_count": 2,
+      "sub_traits_count": 2,
+      "subspecies_count": 2,
+      "subspecies_ids": [
+        "sp-gnome-roches",
+        "sp-gnome-svirfnebelin"
+      ]
+    },
+    {
+      "id": "sp-halfelin",
+      "name": "Halfelins",
+      "name_alt": [],
+      "file": "Species/sp-halfelin.json",
+      "schema_version": "2.0",
+      "playable": true,
+      "requires_subspecies": true,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "42-45"
+      },
+      "size": "P",
+      "darkvision_m": 0,
+      "ability_score_increase": {
+        "dex": 2
+      },
+      "traits_count": 3,
+      "sub_traits_count": 3,
+      "subspecies_count": 2,
+      "subspecies_ids": [
+        "sp-halfelin-pied-leger",
+        "sp-halfelin-pied-sur"
+      ]
+    },
+    {
+      "id": "sp-humain",
+      "name": "Humains",
+      "name_alt": [],
+      "file": "Species/sp-humain.json",
+      "schema_version": "2.0",
+      "playable": true,
+      "requires_subspecies": false,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "45-48"
+      },
+      "size": "M",
+      "darkvision_m": 0,
+      "ability_score_increase": {
+        "str": 1,
+        "dex": 1,
+        "con": 1,
+        "int": 1,
+        "wis": 1,
+        "cha": 1
+      },
+      "traits_count": 1,
+      "sub_traits_count": 0,
+      "subspecies_count": 0,
+      "subspecies_ids": []
+    },
+    {
+      "id": "sp-melesse",
+      "name": "Melessës",
+      "name_alt": [
+        "Demi-elfes"
+      ],
+      "file": "Species/sp-melesse.json",
+      "schema_version": "2.0",
+      "playable": true,
+      "requires_subspecies": false,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "49-51"
+      },
+      "size": "M",
+      "darkvision_m": 18,
+      "ability_score_increase": {
+        "cha": 2
+      },
+      "traits_count": 3,
+      "sub_traits_count": 0,
+      "subspecies_count": 0,
+      "subspecies_ids": []
+    },
+    {
+      "id": "sp-merosis",
+      "name": "Merosis",
+      "name_alt": [
+        "Demi-orcs"
+      ],
+      "file": "Species/sp-merosis.json",
+      "schema_version": "2.0",
+      "playable": true,
+      "requires_subspecies": false,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "51-54"
+      },
+      "size": "M",
+      "darkvision_m": 18,
+      "ability_score_increase": {
+        "str": 2,
+        "con": 1
+      },
+      "traits_count": 4,
+      "sub_traits_count": 0,
+      "subspecies_count": 0,
+      "subspecies_ids": []
+    },
+    {
+      "id": "sp-nain",
+      "name": "Nains",
+      "name_alt": [
+        "Dvaergen"
+      ],
+      "file": "Species/sp-nain.json",
+      "schema_version": "2.0",
+      "playable": true,
+      "requires_subspecies": true,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "29-33"
+      },
+      "size": "M",
+      "darkvision_m": 18,
+      "ability_score_increase": {
+        "con": 2
+      },
+      "traits_count": 4,
+      "sub_traits_count": 4,
+      "subspecies_count": 3,
+      "subspecies_ids": [
+        "sp-nain-gardien",
+        "sp-nain-batisseur",
+        "sp-nain-duergar"
+      ]
+    },
+    {
+      "id": "sp-tieffelin",
+      "name": "Tieffelins",
+      "name_alt": [],
+      "file": "Species/sp-tieffelin.json",
+      "schema_version": "2.0",
+      "playable": true,
+      "requires_subspecies": false,
+      "source": {
+        "book": "Dragons - Livre de base: Aventuriers",
+        "pages": "54-57"
+      },
+      "size": "M",
+      "darkvision_m": 18,
+      "ability_score_increase": {
+        "int": 1,
+        "cha": 2
+      },
+      "traits_count": 3,
+      "sub_traits_count": 0,
+      "subspecies_count": 0,
+      "subspecies_ids": []
+    }
+  ]
+}

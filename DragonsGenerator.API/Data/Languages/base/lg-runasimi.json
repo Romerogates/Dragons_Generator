@@ -1,0 +1,17 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-runasimi",
+  "name": "Runasimi",
+  "category": "base",
+  "typical_speakers": [
+    "Tribus de l'Acoatl",
+    "Saurians de la forêt émeraude"
+  ],
+  "writing_systems": [],
+  "is_oral_only": true,
+  "regions": [
+    "Acoatl",
+    "forêt émeraude"
+  ],
+  "description": "Langue de l'Acoatl, la forêt émeraude. Déclinée en de nombreux dialectes parlés par les tribus forestières et les saurians. Culture entièrement orale, sans système d'écriture."
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-cri-de-bataille",
+  "name": "Cri de bataille",
+  "level": 0,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-pretre",
+    "cls-sorcier"
+  ],
+  "description": "ous poussez un hurlement audible jusqu'à 90 m, que vous pouvez rendre intelligible. Chaque créature prise dans un cône de 3 m doit effectuer un JS Constitution. En cas d'échec, elle subit 1d6 dégâts de tonnerre et se retrouve assourdie jusqu'au début de votre tour de jeu suivant. ## Provenance de l'eau Le sort agrège l'eau aisément accessible dans un rayon de 10 km. Elle est puisée dans l'environnement : rosée, humidité atmosphérique, cours d'eau, mer, etc. Elle a la même pureté insipide que de l'eau de pluie. Le fonctionnement de ce sort le rend sujet à certains inconvénients et aléas : Dans un désert aride, l'eau, même dans un rayon étendu, est rare. Or, le sort ne vous permet pas de vraiment fabriquer de l'eau, seulement de la porter jusqu'à vous. En d'autres termes, vous pourriez fort bien n'obtenir que quelques litres. La magie puise sans discernement dans ce qu'elle trouve, et peut donc avoir pour effet de dérober l'eau des réserves d'individus situés dans le rayon d'action du sort. Quand l'eau est au contraire détruite, elle est simplement vaporisée dans l'air ambiant. Les dégâts de ce sort augmentent de 1d6 quand vous atteignez le niveau 5 (2d6), le niveau 11 (3d6) et le niveau 17 (4d6).",
+  "modular_options": []
+}

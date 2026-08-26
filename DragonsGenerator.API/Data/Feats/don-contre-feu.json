@@ -1,0 +1,22 @@
+{
+  "schema_version": "2.0",
+  "id": "don-contre-feu",
+  "name": "Contre-feu",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [],
+  "description": "Quand une créature que vous voyez dans un rayon de 9 m tombe à 0 PV ou subit un coup critique, vous pouvez jouer votre réaction pour vous déplacer jusqu'à votre VD et effectuer une des actions suivantes : Assister, Esquiver, Fouiller, Se cacher ou Utiliser un objet.",
+  "benefits": [
+    {
+      "type": "reaction",
+      "trigger": "créature à 0 PV ou coup critique (9 m)",
+      "effect": "déplacement + action (Assister/Esquiver/Fouiller/Se cacher/Utiliser objet)"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "réaction",
+    "mobilité",
+    "combat"
+  ]
+}

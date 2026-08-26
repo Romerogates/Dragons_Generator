@@ -1,0 +1,27 @@
+{
+  "schema_version": "2.0",
+  "id": "don-tenaille",
+  "name": "Tenaille",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [],
+  "description": "Quand vous effectuez une attaque de corps à corps contre une créature et qu'un allié non neutralisé est à 1,5 m d'elle : vous pouvez dépenser une action bonus pour bénéficier d'un avantage au jet d'attaque. Si touché : dégâts +bonus_maitrise.",
+  "benefits": [
+    {
+      "type": "flanking_advantage",
+      "condition": "allié non neutralisé à 1,5 m de la cible",
+      "action": "bonus"
+    },
+    {
+      "type": "damage_bonus",
+      "formula": "bonus_maitrise",
+      "condition": "sur touche avec Tenaille"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "tactique",
+    "équipe",
+    "corps-à-corps"
+  ]
+}

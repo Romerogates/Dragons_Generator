@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-mot-de-pouvoir-etourdissant",
+  "name": "Mot de pouvoir étourdissant",
+  "level": 8,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Vous prononcez un mot de pouvoir capable de submerger l'esprit d'une créature que vous voyez à portée, qui est alors ébahie. Si la cible a un nombre de points de vie égal ou inférieur à 150, elle est étourdie. Dans le cas contraire, le sort n'a aucun effet. La cible étourdie effectue un JS Constitution à la fin de chacun de ses tours de jeu. En cas de réussite, cet état préjudiciable prend fin. Vous murmurez un mot de pouvoir capable de tuer instantanément une créature que vous voyez à portée. Si la créature choisie a un nombre de points de vie égal ou inférieur à 100, elle meurt. Dans le cas contraire, le sort n'a aucun effet.",
+  "modular_options": []
+}

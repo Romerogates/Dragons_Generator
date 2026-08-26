@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-sac-dexplorateur",
+  "name": "Sac d'explorateur",
+  "category": "gear",
+  "subcategory": "container",
+  "cost": {
+    "value": 12,
+    "unit": "po"
+  },
+  "weight_kg": 23.5,
+  "description": "Un sac à dos, un pied-de-biche, un marteau, 10 pitons, 10 torches, un nécessaire à feu, 10 jours de rations et une outre. Une corde en chanvre de 15 m est attachée au flanc du sac."
+}

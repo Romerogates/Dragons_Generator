@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-bille-acide",
+  "name": "Bille acide",
+  "level": 1,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 27,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Bille acide icon Vous fixez du regard une cible à portée en tendant un doigt vers elle, et une bille jaunâtre jaillit dans sa direction. Effectuez un jet d'attaque de sort à distance contre elle. En cas de réussite, elle subit 2d8 dégâts d'acide et doit réussir un JS Constitution sous peine de se retrouver aveuglée jusqu'à la fin de son tour de jeu suivant. Blessure icon",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, les dégâts augmentent de 1d8 par niveau d'emplacement au-dessus du 1ᵉʳ.",
+  "modular_options": []
+}

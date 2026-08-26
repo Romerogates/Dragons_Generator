@@ -1,0 +1,24 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-hachette",
+  "name": "Hachette",
+  "category": "weapon",
+  "subcategory": "simple_melee",
+  "cost": {
+    "value": 5,
+    "unit": "po"
+  },
+  "weight_kg": 1,
+  "damage_dice": "1d6",
+  "damage_type": "tranchant",
+  "properties": [
+    "prop-lancer-6-18",
+    "prop-legere"
+  ],
+  "throw_range": {
+    "normal": 6,
+    "long": 18
+  },
+  "ammo_range": null,
+  "description": null
+}

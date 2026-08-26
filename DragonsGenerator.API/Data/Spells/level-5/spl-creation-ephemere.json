@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-creation-ephemere",
+  "name": "Création éphémère",
+  "level": 5,
+  "school": "illusion",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "speciale",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un minuscule morceau de la matière de l'objet que vous souhaitez créer"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Vous tirez des volutes de matière d'ombre du Plan Éthéré pour créer un objet inerte de matière végétale à portée : tissus, corde, bois, etc. Vous pouvez aussi utiliser ce sort pour créer des objets minéraux comme la pierre, le cristal ou le métal. L'objet créé doit se limiter à un cube de 1,50 m d'arête, et doit être d'une forme et d'un matériau que vous avez déjà vus. La durée dépend du matériau de l'objet. S'il est composé de plusieurs matériaux, reportez-vous à la durée la plus courte. Matière végétale Pierre ou cristal Métaux précieux Pierres précieuses Adamantium ou mithral Si l'on tente d'utiliser un matériau créé grâce à cette illusion comme composante matérielle d'un autre sort, celui-ci échoue.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, l'arête du cube augmente de 1,50 m par niveau de sort au-dessus du 5e.",
+  "modular_options": []
+}

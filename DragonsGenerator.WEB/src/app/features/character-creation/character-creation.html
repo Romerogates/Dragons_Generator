@@ -3,7 +3,7 @@
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in p-4"
   >
     <div
-      class="bg-[#1b2028] border border-slate-700 rounded-2xl shadow-2xl max-w-md w-full p-8 flex flex-col items-center gap-6"
+      class="bg-[#1b2028] border border-slate-700 rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 flex flex-col items-center gap-6"
     >
       <div
         class="w-14 h-14 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-3xl"
@@ -26,13 +26,13 @@
 
       <div class="flex flex-col sm:flex-row gap-3 w-full">
         <button
-          class="flex-1 px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest bg-amber-500 text-slate-900 hover:bg-amber-400 hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(245,158,11,0.2)] flex justify-center items-center gap-2"
+          class="flex-1 px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest bg-amber-500 text-slate-900 hover:bg-amber-400 hover:scale-[1.02] active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-200 shadow-sm flex justify-center items-center gap-2"
           (click)="resumeDraft()"
         >
           <span class="text-sm leading-none pt-0.5">▶</span> Reprendre
         </button>
         <button
-          class="flex-1 px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 hover:text-white hover:border-slate-500 transition-all flex justify-center items-center gap-2"
+          class="flex-1 px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 hover:text-white hover:border-slate-500 transition-[colors,transform,opacity,box-shadow] duration-200 flex justify-center items-center gap-2"
           (click)="startFresh()"
         >
           <span class="text-lg"><iconify-icon icon="fluent-emoji:sparkles"></iconify-icon></span>
@@ -43,8 +43,73 @@
   </div>
 }
 
-<div class="max-w-5xl mx-auto px-4 min-h-[calc(100vh-64px)] flex flex-col justify-center">
-  <div class="w-full animate-fade-in">
+<div
+  class="w-full mx-auto px-2 sm:px-4 lg:px-6 pb-6 pt-2 min-h-[calc(100dvh-4rem)] lg:min-h-[calc(100vh-4rem)] flex flex-col max-w-[90rem]"
+>
+  <!-- Compact progress -->
+  <div
+    class="sticky top-0 z-30 -mx-2 sm:mx-0 mb-3 px-2 sm:px-0 py-2 bg-[#171b22]/90 backdrop-blur-md border-b border-slate-800/80"
+  >
+    <div class="flex items-center justify-between gap-3 mb-2">
+      <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+        Étape {{ builder.currentStep() }} / {{ builder.totalSteps() }}
+      </p>
+      <div class="flex items-center gap-3 min-w-0 justify-end">
+        <label
+          class="flex items-center gap-2 shrink-0 text-[10px] font-black uppercase tracking-widest text-slate-400"
+          [attr.title]="
+            builder.isLevelLocked()
+              ? 'Niveau verrouillé — revenez à l’étape Classe pour le modifier'
+              : 'Niveau du personnage (1–20)'
+          "
+        >
+          Niveau
+          @if (builder.isLevelLocked()) {
+            <span
+              class="w-11 shrink-0 bg-[#12151a] border border-slate-800 rounded-lg px-1 py-1 text-slate-500 text-xs font-bold text-center tabular-nums cursor-not-allowed"
+              >{{ builder.targetLevel() }}</span
+            >
+          } @else {
+            <select
+              class="w-11 shrink-0 bg-[#171b22] border border-slate-700 rounded-lg px-1 py-1 text-amber-400 text-xs font-bold text-center tabular-nums appearance-none focus:outline-none focus:border-amber-500/50 cursor-pointer"
+              [value]="builder.targetLevel()"
+              (change)="onLevelChange($event)"
+            >
+              @for (lvl of levels; track lvl) {
+                <option [value]="lvl">{{ lvl }}</option>
+              }
+            </select>
+          }
+        </label>
+        <span
+          class="hidden sm:inline-block w-[7.5rem] shrink-0 text-right text-[10px] font-mono text-slate-500 tabular-nums"
+        >
+          BM +{{ builder.proficiencyBonus() }}
+          · PV {{ builder.hitPointsMax() }}
+        </span>
+        <p class="text-[11px] font-serif text-amber-500/90 truncate min-w-0 text-right">
+          {{ builder.steps()[builder.currentStep() - 1]?.title }}
+        </p>
+      </div>
+    </div>
+    <div class="flex gap-1 overflow-x-auto pb-0.5 custom-scrollbar">
+      @for (step of builder.steps(); track step.number) {
+        <div
+          class="h-1.5 flex-1 min-w-[1.25rem] rounded-full transition-colors"
+          [class]="
+            step.number < builder.currentStep()
+              ? 'bg-amber-600'
+              : step.number === builder.currentStep()
+                ? 'bg-amber-400'
+                : 'bg-slate-700'
+          "
+          [attr.title]="step.title"
+        ></div>
+      }
+    </div>
+  </div>
+
+  <div class="w-full flex-1 flex flex-col min-h-0">
     @switch (builder.currentStep()) {
       @case (1) {
         <app-species-step />

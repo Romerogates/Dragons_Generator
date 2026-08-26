@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "id": "div-flore",
+  "name": "Flore",
+  "tonality": "harmonique",
+  "domains": [
+    "dom-partage",
+    "dom-vie"
+  ],
+  "other_names": [
+    "Coirë",
+    "Lif-edlish",
+    "Belle"
+  ],
+  "description": "Flore est la déesse enfant du printemps et de l'éclosion de la vie. Elle apporte la joie, l'amour et la chance, elle console des épreuves et redonne espoir. On la prie pour protéger l'innocence et trouver le bonheur. Malgré son aspect fragile, Flore est une divinité qui soutient le courage et dont on dit parfois qu'elle serait capable de se battre bien après que les forteresses de Forgeron se seront effondrées. À l'image de la vie, elle sait éclore et prospérer dans les pires conditions, se découvrant des trésors d'ingéniosité pour s'adapter et évoluer.",
+  "worshippers_note": "Ceux qui cherchent joie, amour, espoir et protection de l'innocence. Dans le panthéon de l'Étoile, vénérée sous le nom d'Aster, sous l'aspect d'une enfant ou jeune fille.",
+  "grants_powers_to": [
+    "pretre"
+  ],
+  "source": "livre_de_base"
+}

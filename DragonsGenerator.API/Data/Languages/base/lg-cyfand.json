@@ -1,0 +1,24 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-cyfand",
+  "name": "Cyfand",
+  "category": "base",
+  "typical_speakers": [
+    "Habitants de la Cité Franche",
+    "Halfelins pieds-légers"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-cyfand",
+      "label": "Cyfand",
+      "type": "alphabet"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [
+    "Cité Franche",
+    "communautés halfelines pieds-légers",
+    "surface des Drakenbergen"
+  ],
+  "description": "Langue de la Cité Franche, des halfelins pieds-légers et des communautés de la surface dans les Drakenbergen. Elle possède son propre alphabet, utilisé par de nombreuses autres langues."
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-tremblement-de-terre",
+  "name": "Tremblement de terre",
+  "level": 8,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 150,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(une pincée de terre"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-pretre"
+  ],
+  "description": "Vous produisez une secousse sismique dont l'origine est un point du sol que vous voyez à portée. Tant que le sort persiste, l'endroit est secoué d'un violent tremblement de terre dans un cercle d'un rayon de 30 m centré sur ce point. Le phénomène affecte les structures et créatures en contact avec le sol dans cette zone. Le sol de la zone devient un terrain difficile. Toute créature au sol qui se concentre doit effectuer un JS Constitution. En cas d'échec, sa concentration est interrompue. Au moment de l'incantation, et à la fin de chacun de vos tours de jeu tant que vous maintenez la concentration, toute créature en contact avec le sol dans la zone doit effectuer un JS Dextérité. En cas d'échec, elle se retrouve à terre. Ce sort peut avoir d'autres effets en fonction du terrain de la zone, à la discrétion du meneur.",
+  "modular_options": []
+}

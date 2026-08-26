@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-lanterne-sourde",
+  "name": "Lanterne sourde",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 10,
+    "unit": "po"
+  },
+  "weight_kg": 1,
+  "description": "Émet un cône de lumière vive de 18 m et de lumière faible sur 18 m de plus pendant 6 heures."
+}

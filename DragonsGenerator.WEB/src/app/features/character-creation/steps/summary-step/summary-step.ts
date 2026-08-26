@@ -13,6 +13,8 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { CharacterBuilderService } from '@core/services/character-builder.service';
 import { PdfGeneratorService } from '@core/services/pdf-generator.service';
+import { CharacterCloudService } from '@core/services/character-cloud.service';
+import { AuthService } from '@core/services/auth.service';
 import {
   ABILITY_KEY_TO_LABEL,
   ABILITY_KEYS,
@@ -32,6 +34,8 @@ export class SummaryStep implements OnInit, OnDestroy {
   private router = inject(Router);
   private pdfService = inject(PdfGeneratorService);
   private sanitizer = inject(DomSanitizer);
+  private cloud = inject(CharacterCloudService);
+  private auth = inject(AuthService);
 
   readonly abilityKeys = ABILITY_KEYS;
   readonly abilityLabels = ABILITY_KEY_TO_LABEL;
@@ -102,8 +106,38 @@ export class SummaryStep implements OnInit, OnDestroy {
     }
 
     localStorage.setItem('dragons-characters', JSON.stringify(saved));
+    localStorage.setItem('dragons-current-character', JSON.stringify(character));
+
+    // Sync cloud si connecté
+    if (this.auth.isLoggedIn()) {
+      this.cloud.save(character as any).subscribe({
+        next: (serverId) => {
+          if (serverId && serverId !== character.id) {
+            const updated = { ...character, id: serverId };
+            const list = this.getSavedCharacters().map((c: any) =>
+              c.id === character.id ? updated : c,
+            );
+            // si pas trouvé, remplace le dernier
+            if (!list.some((c: any) => c.id === serverId)) {
+              const i = list.findIndex((c: any) => c.id === character.id);
+              if (i >= 0) list[i] = updated;
+            }
+            localStorage.setItem('dragons-characters', JSON.stringify(list));
+            localStorage.setItem('dragons-current-character', JSON.stringify(updated));
+          }
+          this.builder.reset();
+          this.router.navigate(['/character-sheet']);
+        },
+        error: () => {
+          this.builder.reset();
+          this.router.navigate(['/character-sheet']);
+        },
+      });
+      return;
+    }
+
     this.builder.reset();
-    this.router.navigate(['/characters']);
+    this.router.navigate(['/character-sheet']);
   }
 
   async downloadPdf(): Promise<void> {

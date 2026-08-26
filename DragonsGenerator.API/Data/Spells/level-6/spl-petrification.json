@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-petrification",
+  "name": "Pétrification",
+  "level": 6,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(un peu de chaux"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Vous tentez de transformer en pierre une créature que vous voyez à portée. Si la créature est faite de chair, elle doit effectuer un JS Constitution. En cas d'échec, elle commence à durcir et se retrouve entravée. En cas de réussite, elle n'est pas affectée. Une créature entravée par ce sort doit effectuer un autre JS Constitution à la fin de chacun de ses tours de jeu. Le sort prend fin si elle cumule trois réussites. Mais si elle cumule trois échecs, elle est pétrifiée pour toute la durée du sort. Les réussites et échecs ne doivent pas nécessairement être consécutifs. Notez-les jusqu'à ce que la cible en obtienne trois d'un type ou d'un autre. Si la créature pétrifiée est brisée, elle souffre de mutilations similaires lorsqu'elle retrouve son état normal. Si vous maintenez votre concentration sur ce sort jusqu'au terme de la durée maximale, la créature est pétrifiée jusqu'à ce qu'elle soit délivrée de l'effet.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 8e niveau ou supérieur, vous pouvez cibler deux créatures.",
+  "modular_options": []
+}

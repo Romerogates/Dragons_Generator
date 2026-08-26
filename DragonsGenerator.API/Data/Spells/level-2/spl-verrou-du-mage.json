@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-verrou-du-mage",
+  "name": "Verrou du mage",
+  "level": 2,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "permanent",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(de la poudre d'or pour une valeur d'au moins 25 po"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien"
+  ],
+  "description": "Logo, icon, and stamp D ous touchez un passage ou un meuble fermés comme une porte, une fenêtre, une grille ou un coffre. La cible est alors verrouillée pour toute la durée du sort. Vous et les créatures que vous avez désignées au moment de l'incantation pouvez l'ouvrir tout à fait normalement. Vous pouvez également fixer un mot de passe qui, prononcé dans un rayon de 1,50 m de la cible, réprime ce sort pendant 1 minute. Autrement, il est impossible de l'ouvrir, à moins de la briser, ou de dissiper ou de réprimer le sort. À ce sujet, le sort déblocage jeté sur la cible réprime le verrou du mage pendant 10 minutes. Tant qu'elle est affectée par ce sort, la cible est particulièrement difficile à briser ou à forcer. Le DD pour la briser ou crocheter sa serrure augmente de 10, et elle acquiert la résistance aux dégâts contondants, perforants et tranchants.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, l'augmentation de DD décrite ci-dessus s'accroît de 5 points supplémentaires, et vous ajoutez une résistance à un type de dégâts au choix par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

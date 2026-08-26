@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-cone-de-froid",
+  "name": "Cône de froid",
+  "level": 5,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un petit cône de cristal ou de verre"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Une bourrasque d'air glacé jaillit de vos mains. Chaque créature prise dans un cône de 18 m doit effectuer un JS Constitution et subit 8d8 dégâts de froid en cas d'échec, la moitié en cas de réussite. Une créature tuée par ce sort est transformée en statue de glace jusqu'à ce qu'elle dégèle.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, les dégâts augmentent de 1d8 par niveau d'emplacement au-dessus du 5e.",
+  "modular_options": []
+}

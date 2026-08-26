@@ -1,0 +1,26 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-arbalete-lourde",
+  "name": "Arbalète lourde",
+  "category": "weapon",
+  "subcategory": "martial_ranged",
+  "cost": {
+    "value": 50,
+    "unit": "po"
+  },
+  "weight_kg": 9,
+  "damage_dice": "1d10",
+  "damage_type": "perforant",
+  "properties": [
+    "prop-deux-mains",
+    "prop-lourde",
+    "prop-projectiles-30-120",
+    "prop-rechargement"
+  ],
+  "throw_range": null,
+  "ammo_range": {
+    "normal": 30,
+    "long": 120
+  },
+  "description": null
+}

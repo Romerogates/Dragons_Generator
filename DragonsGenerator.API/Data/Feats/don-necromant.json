@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "don-necromant",
+  "name": "Nécromant",
+  "requires_magic": true,
+  "category": "magic",
+  "prerequisites": [
+    {
+      "type": "spellcasting",
+      "description": "Capacité de lancer au moins un sort"
+    }
+  ],
+  "ability_score_increase": {
+    "ability": "spellcasting",
+    "value": 1,
+    "max": 20
+  },
+  "description": "+1 caractéristique magique (max 20). Opportunisme funèbre : quand une créature de taille P+ (non mort-vivant, non artificielle) tombe à 0 PV dans un rayon de 9 m, vous pouvez jouer votre réaction pour lancer un sort mineur ou récupérer des PV = 3 × bonus de maîtrise.",
+  "benefits": [
+    {
+      "type": "ability_score_increase",
+      "ability": "spellcasting",
+      "value": 1
+    },
+    {
+      "type": "reaction",
+      "trigger": "créature (P+, vivante) à 0 PV (9 m)",
+      "effect": "sort mineur OU récupérer 3 × bonus_maitrise PV"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "magie",
+    "nécromancie",
+    "mort"
+  ]
+}

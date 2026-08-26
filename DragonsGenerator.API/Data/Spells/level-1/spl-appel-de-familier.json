@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-appel-de-familier",
+  "name": "Appel de familier",
+  "level": 1,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "heure"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 3,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(10 po de charbon"
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien"
+  ],
+  "description": "niranoms sieggo )2rg sdiiT ArNd Vous attirez à votre service un familier, un esprit qui prend une forme animale de votre choix : araignée, belette, chat, chauve-souris, corbeau, crabe, faucon, grenouille (cra-paud), hibou, hippocampe, lézard, pieuvre, poisson (piranha), rat ou serpent venimeux. Le familier apparaît dans un espace inoccupé situé à portée et a le profil de la forme choisie, mais son type bête est remplacé par céleste, fée ou fiélon (à votre convenance). Votre familier agit indépendamment de vous, mais obéit toujours à vos ordres. Au combat, il détermine sa propre initiative et agit à son tour de jeu. Il ne peut pas attaquer, mais peut entreprendre d'autres actions tout à fait normalement. Quand le familier tombe à 0 point de vie, il disparaît sans laisser de traces, mais réapparaît si vous relancez ce sort. Tant que votre familier se situe dans un rayon de 30 m de vous, vous pouvez communiquer avec lui par télépathie. En outre, au prix d'une action, vous pouvez voir par ses yeux et entendre ce qu'il entend jusqu'au début de votre tour de jeu suivant, ce qui vous permet de profiter de ses sens spéciaux, le cas échéant. Pendant ce temps, vous êtes sourd et aveugle en ce qui concerne vos propres sens. Au prix d'une action, vous pouvez temporairement révoquer votre familier, qui disparaît dans une poche dimensionnelle en attendant que vous le convoquiez à nouveau. Vous pouvez aussi le révoquer à tout jamais. Lorsqu'il est temporairement révoqué, vous pouvez le faire réapparaître dans n'importe quel espace inoccupé situé dans un rayon de 9 m de vous au prix d'une action. ## Des familiers plus puissants S'il veut donner plus de latitude à ses joueurs et leur donner accès à des animaux potentiellement plus dangereux, votre meneur peut autoriser d'autres espèces animales de taille TP. Par ailleurs, en vertu de cette règle optionnelle, le familier bénéficie d'une augmentation de l'Intelligence de +4 et d'une vision dans le noir sur 9 m. Vous ne pouvez avoir qu'un seul familier à la fois. Si vous relancez ce sort alors que vous en avez déjà un, il adopte simplement une nouvelle forme, que vous choisissez dans la liste ci-dessus. Votre familier se transforme alors en la créature choisie. Enfin, quand vous lancez un sort ayant une portée de contact, votre familier peut le délivrer comme s'il l'avait lancé. Pour cela, il doit se situer dans un rayon de 30 m de vous et jouer sa réaction au moment de l'incantation. Si le sort s'accompagne d'un jet d'attaque, utilisez votre modificateur au jet d'attaque.",
+  "modular_options": []
+}

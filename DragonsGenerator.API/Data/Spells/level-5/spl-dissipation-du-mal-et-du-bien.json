@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-dissipation-du-mal-et-du-bien",
+  "name": "Dissipation du Mal et du Bien",
+  "level": 5,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "de l'eau bénite ou de la poudre de fer et d'argent"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": true,
+  "classes": [
+    "cls-paladin",
+    "cls-pretre"
+  ],
+  "description": "Une énergie scintillante épouse votre silhouette et vous protège des élémentaires, des fées, des morts-vivants, des ravageurs du Chancre et des créatures non originaires du Plan Matériel. Pour toute la durée du sort, les célestes, élémentaires, fées, fiélons, morts-vivants et ravageurs du Chancre subissent un désavantage aux jets d'attaque contre vous. Vous pouvez mettre fin au sort prématurément en utilisant une des fonctions spéciales qui suivent. Briser un enchantement. Au prix d'une action, vous touchez une créature à portée d'allonge qui est charmée, effrayée ou possédée par un céleste, un élémentaire, une fée, un fiélon, un mort-vivant ou un ravageur du Chancre. La cible touchée n'est plus charmée, effrayée ou possédée par la créature en question. Renvoi. Au prix d'une action, effectuez une attaque de sort au corps à corps contre un céleste, un élémentaire, une fée, un fiélon un mort-vivant ou un ravageur du Chancre à portée d'allonge. En cas de réussite, vous tentez de chasser la créature vers son plan d'origine. Elle doit réussir un JS Charisme sous peine d'être renvoyée sur son plan d'origine - si elle n'y est pas déjà. S'ils ne sont pas sur leur plan d'origine, les morts-vivants sont chassés vers le Plan Éthéré et les fées vers leur royaume féerique d'origine. Les ravageurs sur Eana subissent l'état effrayé pendant 1 minute. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, la durée augmente de 1 minute par niveau d'emplacement au-dessus du 5e.",
+  "modular_options": []
+}

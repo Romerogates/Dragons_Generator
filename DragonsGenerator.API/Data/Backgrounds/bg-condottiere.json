@@ -1,0 +1,196 @@
+{
+  "schema_version": "2.0",
+  "id": "bg-condottiere",
+  "name": "Condottiere",
+  "source": {
+    "book": "Dragons - Livre de base: Aventuriers",
+    "pages": "91-92"
+  },
+  "flavor": {
+    "summary": "Vous n'êtes pas du genre discret. Vous affichez cette lueur dans le regard et ce sourire en coin qui informent chacun qu'il vaut mieux ne pas vous chercher de noises. Vous savez vous battre et vos prouesses animent les discussions des auberges locales."
+  },
+  "proficiencies": {
+    "skills": {
+      "fixed": [],
+      "choose": {
+        "count": 2,
+        "options": [
+          "skill-acrobaties",
+          "skill-athletisme",
+          "skill-intimidation"
+        ]
+      }
+    },
+    "tools": {
+      "fixed": [
+        {
+          "type": "tool_category",
+          "id": "tl-materiel-de-jeu",
+          "name": "Matériel de jeu (1 type au choix)",
+          "category": "jeu"
+        },
+        {
+          "type": "vehicle",
+          "id": "tl-vehicules-terrestres",
+          "name": "Véhicules terrestres"
+        }
+      ],
+      "choose": null
+    },
+    "languages": {
+      "fixed": [],
+      "choose_count": 0
+    }
+  },
+  "equipment": {
+    "fixed": [
+      {
+        "id": "gr-vetements-de-voyage",
+        "name": "Vêtements de voyage",
+        "qty": 1,
+        "location": "equipped"
+      },
+      {
+        "id": "gr-vetement-voyant",
+        "name": "Vêtement ou ustensile voyant et singulier",
+        "qty": 1,
+        "location": "equipped"
+      }
+    ],
+    "choose": [],
+    "currency": {
+      "or": 15
+    }
+  },
+  "privilege": {
+    "id": "priv-autorite-naturelle",
+    "name": "Autorité naturelle",
+    "desc": "Votre assurance est telle que les gens vous craignent ou vous respectent facilement, notamment dans les lieux où l'aplomb physique est un atout. On vous laisse généralement en paix et les gens sont plutôt bienveillants à votre égard."
+  },
+  "personality_tables": {
+    "traits": {
+      "die": "1d8",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Mon humour fait souvent grincer des dents."
+        },
+        {
+          "roll": 2,
+          "text": "Rien ne m’exaspère plus que ceux qui abusent d’une position de force."
+        },
+        {
+          "roll": 3,
+          "text": "Une bonne bagarre permet souvent d’évacuer les tensions malsaines."
+        },
+        {
+          "roll": 4,
+          "text": "Je jauge systématiquement les personnes dont je fais la connaissance ; si le destin me demande de les tuer, je préfère savoir pourquoi."
+        },
+        {
+          "roll": 5,
+          "text": "Cela me vaut quelques mésaventures, mais je ne suis pas du genre à tenir ma langue."
+        },
+        {
+          "roll": 6,
+          "text": "Ceux qui me taxent de sauvagerie n’ont rien saisi de l’art qui accompagne chacune de mes démonstrations de force."
+        },
+        {
+          "roll": 7,
+          "text": "Le calme que j’affiche n’est qu’une façade ; ma vigilance reste intacte."
+        },
+        {
+          "roll": 8,
+          "text": "Il n’est pas question de laisser quiconque dicter mes actes, surtout pas quelqu’un d’inapte au combat."
+        }
+      ]
+    },
+    "ideals": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Protection. La force, oui, mais au service des faibles. (bon)"
+        },
+        {
+          "roll": 2,
+          "text": "Ordre. La violence, oui, mais bien organisée. (loyal)"
+        },
+        {
+          "roll": 3,
+          "text": "Terreur. Impressionner les faibles pour mieux les dominer. (mauvais)"
+        },
+        {
+          "roll": 4,
+          "text": "Libération. Montrer au peuple que les puissants et leurs traditions tyranniques ne sont pas inexpugnables. (chaotique)"
+        },
+        {
+          "roll": 5,
+          "text": "Panache. Rien n’est plus triste que la médiocrité. Tout est question de style. (tout alignement)"
+        },
+        {
+          "roll": 6,
+          "text": "Honneur. Celui qui ne défend rien, qui n’a pas de convictions, a perdu le combat avant de l’avoir entamé. (tout alignement)"
+        }
+      ]
+    },
+    "bonds": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Maintenant que j’ai commencé à sauver la veuve et l’orphelin, je passerais pour le pire des traîtres si je venais à faillir à ma réputation."
+        },
+        {
+          "roll": 2,
+          "text": "Plutôt souffrir mille morts que déshonorer mes ancêtres."
+        },
+        {
+          "roll": 3,
+          "text": "Aujourd’hui, je combats pour une cause ou, du moins, pour quelque chose. Avant, j’étais simplement violent."
+        },
+        {
+          "roll": 4,
+          "text": "Je ne suis pas encore prêt pour affronter le misérable qui a détruit ce qui m’était cher, mais ma lame s’aiguise chaque jour un peu plus."
+        },
+        {
+          "roll": 5,
+          "text": "C’est pour oublier que je ferraille sans relâche, mais certains souvenirs ne s’effacent pas."
+        },
+        {
+          "roll": 6,
+          "text": "L’or accumulé au fil des campagnes et des aventures me permettra un jour de réaliser mon rêve."
+        }
+      ]
+    },
+    "flaws": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Mieux vaut ne pas me regarder de travers quand j’ai une chope dans le nez."
+        },
+        {
+          "roll": 2,
+          "text": "Je suis un cœur d’artichaut, et certaines personnes en profitent."
+        },
+        {
+          "roll": 3,
+          "text": "Je passe pour intrépide, mais c’est parce que les gens n’ont pas été témoins de ce combat qui m’a vu fuir devant un adversaire comme j’espère ne plus jamais en croiser."
+        },
+        {
+          "roll": 4,
+          "text": "Tout va bien tant que je regorge de vitalité, mais je suis peu de chose quand la santé flanche."
+        },
+        {
+          "roll": 5,
+          "text": "Une bataille ancienne revient me hanter chaque nuit."
+        },
+        {
+          "roll": 6,
+          "text": "Je sais que mon goût des sensations fortes peut exposer des innocents, mais je ne me raisonne pas toujours."
+        }
+      ]
+    }
+  }
+}

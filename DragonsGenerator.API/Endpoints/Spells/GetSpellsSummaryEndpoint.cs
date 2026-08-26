@@ -1,19 +1,14 @@
-﻿
+﻿using DragonsGenerator.API.Common;
+using FastEndpoints;
 
 namespace DragonsGenerator.API.Endpoints.Spells;
 
-public record SpellSummary(
-    string Id,
-    string Name,
-    int Level,
-    string School,
-    bool IsRitual,
-    bool IsConcentration,
-    bool IsCorrupted
-);
-
-public class GetSpellsSummaryEndpoint : EndpointWithoutRequest<List<SpellSummary>>
+public class GetSpellsSummaryEndpoint : EndpointWithoutRequest<List<SpellSummaryDto>>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetSpellsSummaryEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/spells/summary");
@@ -22,20 +17,7 @@ public class GetSpellsSummaryEndpoint : EndpointWithoutRequest<List<SpellSummary
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var spells = await JsonDataLoader.LoadAsync<List<Spell>>("spells.json", ct);
-
-        var summaries = spells?
-            .Select(s => new SpellSummary(
-                Id: s.Id,
-                Name: s.Name,
-                Level: s.Level,
-                School: s.School,
-                IsRitual: s.IsRitual,
-                IsConcentration: s.IsConcentration,
-                IsCorrupted: s.IsCorrupted
-            ))
-            .ToList() ?? [];
-
+        var summaries = await _repo.GetSpellsSummaryAsync(ct);
         await Send.OkAsync(summaries, ct);
     }
 }

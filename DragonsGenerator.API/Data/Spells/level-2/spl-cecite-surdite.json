@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-cecite-surdite",
+  "name": "Cécité/surdité",
+  "level": 2,
+  "school": "necromancie",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-pretre"
+  ],
+  "description": "D Vous pouvez aveugler ou assourdir un adversaire. Choisissez une créature que vous voyez à portée, qui doit effectuer un JS Constitution. En cas d'échec, elle est assourdie ou aveuglée (à votre convenance). À la fin de chacun de ses tours de jeu, la cible peut effectuer un JS Constitution. En cas de réussite, le sort prend fin.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "id": "div-tempete",
+  "name": "Tempête",
+  "tonality": "entropique",
+  "domains": [
+    "dom-force",
+    "dom-voyage"
+  ],
+  "other_names": [
+    "Tamerakh",
+    "Le Destructeur",
+    "Le Libérateur"
+  ],
+  "description": "Le fier Tamerakh fut un chef de guerre, conquérant violent avant d'accéder au rang de divinité et de devenir Tempête. Pour lui, le mot « impossible » n'avait pas de sens : les limites étaient faites pour être dépassées. Excessif, d'une audace folle, mais doté d'une intelligence acérée lui permettant de saisir les occasions qui se présentaient, Tamerakh entreprit de s'affranchir de l'ultime frontière : la mort. Il n'était pas question pour lui de devenir une momie ou un vampire, non, sa voie était l'éternité du divin. Il triompha du destin et devint un dieu. Mieux, il libéra sa mère Xonim de la mort et la divinisa. Tamerakh est vénéré par les rebelles, par tous ceux qui veulent lutter contre un ordre. Il est le dieu des bouleversements, celui qui donne leur chance à ceux qui ont la témérité de sortir des sentiers battus pour se tailler un destin à leur mesure. L'instabilité qu'encourage Tamerakh est souvent très mal vue par les autorités qui voient dans ses sectes de dangereux éléments séditieux.",
+  "worshippers_note": "Rebelles, opprimés et audacieux cherchant à renverser l'ordre établi. Tantôt vénéré comme libérateur, tantôt comme destructeur. Dans le culte de l'Étoile, considéré comme esprit maléfique Varanid, destructeur associé à un ange déchu.",
+  "grants_powers_to": [
+    "pretre"
+  ],
+  "source": "livre_de_base"
+}

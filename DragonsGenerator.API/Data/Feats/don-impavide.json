@@ -1,0 +1,26 @@
+{
+  "schema_version": "2.0",
+  "id": "don-impavide",
+  "name": "Impavide",
+  "requires_magic": false,
+  "category": "survival",
+  "prerequisites": [],
+  "description": "Avantage aux jets de sauvegarde contre les effets entraînant l'état effrayé ou charmé, et contre les formes de folie ou de corruption.",
+  "benefits": [
+    {
+      "type": "advantage_on_save",
+      "against": [
+        "état effrayé",
+        "état charmé",
+        "folie",
+        "corruption"
+      ]
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "mental",
+    "résistance",
+    "corruption"
+  ]
+}

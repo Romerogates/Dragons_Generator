@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "id": "div-forgeron",
+  "name": "Forgeron",
+  "tonality": "harmonique",
+  "domains": [
+    "dom-force",
+    "dom-partage"
+  ],
+  "other_names": [
+    "Verndari",
+    "l'Ordonnateur ou le Juge",
+    "le Guerrier"
+  ],
+  "description": "Forgeron est une divinité associée au feu et à l'ordre. Il est celui qui tranche les différends et qui apporte la lumière du soleil, protégeant les peuples de la sauvagerie. Forgeron est le dieu favori des nains et de tous ceux qui endossent un rôle de défenseur de la société. Quoiqu'adoré par des individus d'alignements bons, Forgeron a également un aspect rigide et parfois implacable qui peut se traduire par des cultes honorant ses aspects inquiétants ou tyranniques.",
+  "worshippers_note": "Nains, artisans, défenseurs de la société et gardiens de l'ordre. Selon les régions, honoré comme dieu artisan, dieu solaire ou tyran inflexible. Dans le panthéon de l'Étoile, vénéré sous le nom d'Ulgurd, sous l'aspect d'un homme d'âge mûr.",
+  "grants_powers_to": [
+    "pretre"
+  ],
+  "source": "livre_de_base"
+}

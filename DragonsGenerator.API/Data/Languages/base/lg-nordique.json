@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-nordique",
+  "name": "Nordique",
+  "category": "base",
+  "typical_speakers": [
+    "Habitants du Septentrion"
+  ],
+  "writing_systems": [],
+  "is_oral_only": true,
+  "regions": [
+    "Septentrion (continent du Cyfandir)"
+  ],
+  "description": "Langue du Septentrion, sur le continent du Cyfandir. Le nordique est exclusivement oral ; aucune tradition écrite établie."
+}

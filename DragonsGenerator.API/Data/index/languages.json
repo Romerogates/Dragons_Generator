@@ -1,0 +1,193 @@
+{
+  "schema_version": "2.0",
+  "description": "Index des langues du monde d'Eana (Dragons — jeu de rôle). Une entrée par langue avec référence vers le fichier détaillé.",
+  "language": "fr",
+  "stats": {
+    "total": 30,
+    "base": 18,
+    "exotique": 10,
+    "secret": 2
+  },
+  "languages": [
+    {
+      "id": "lg-arolave",
+      "name": "Arolave",
+      "category": "base",
+      "file": "Languages/base/lg-arolave.json"
+    },
+    {
+      "id": "lg-aupuniwi",
+      "name": "Aupuniwi",
+      "category": "base",
+      "file": "Languages/base/lg-aupuniwi.json"
+    },
+    {
+      "id": "lg-baashan",
+      "name": "Baashan",
+      "category": "base",
+      "file": "Languages/base/lg-baashan.json"
+    },
+    {
+      "id": "lg-cyfand",
+      "name": "Cyfand",
+      "category": "base",
+      "file": "Languages/base/lg-cyfand.json"
+    },
+    {
+      "id": "lg-commun",
+      "name": "Commun",
+      "category": "base",
+      "file": "Languages/base/lg-commun.json"
+    },
+    {
+      "id": "lg-cyrillan",
+      "name": "Cyrillan",
+      "category": "base",
+      "file": "Languages/base/lg-cyrillan.json"
+    },
+    {
+      "id": "lg-elfique",
+      "name": "Elfique",
+      "category": "base",
+      "file": "Languages/base/lg-elfique.json"
+    },
+    {
+      "id": "lg-gnome",
+      "name": "Gnome",
+      "category": "base",
+      "file": "Languages/base/lg-gnome.json"
+    },
+    {
+      "id": "lg-gobelin",
+      "name": "Gobelin",
+      "category": "base",
+      "file": "Languages/base/lg-gobelin.json"
+    },
+    {
+      "id": "lg-inkulomo",
+      "name": "Inkulomo",
+      "category": "base",
+      "file": "Languages/base/lg-inkulomo.json"
+    },
+    {
+      "id": "lg-kaani",
+      "name": "Kaani",
+      "category": "base",
+      "file": "Languages/base/lg-kaani.json"
+    },
+    {
+      "id": "lg-kalam",
+      "name": "Kalam",
+      "category": "base",
+      "file": "Languages/base/lg-kalam.json"
+    },
+    {
+      "id": "lg-karphud",
+      "name": "Karphûd",
+      "category": "base",
+      "file": "Languages/base/lg-karphud.json"
+    },
+    {
+      "id": "lg-lothrien",
+      "name": "Lothrien",
+      "category": "base",
+      "file": "Languages/base/lg-lothrien.json"
+    },
+    {
+      "id": "lg-nain",
+      "name": "Nain",
+      "category": "base",
+      "file": "Languages/base/lg-nain.json"
+    },
+    {
+      "id": "lg-nordique",
+      "name": "Nordique",
+      "category": "base",
+      "file": "Languages/base/lg-nordique.json"
+    },
+    {
+      "id": "lg-runasimi",
+      "name": "Runasimi",
+      "category": "base",
+      "file": "Languages/base/lg-runasimi.json"
+    },
+    {
+      "id": "lg-shi-huang",
+      "name": "Shi-huang",
+      "category": "base",
+      "file": "Languages/base/lg-shi-huang.json"
+    },
+    {
+      "id": "lg-demoniaque",
+      "name": "Démoniaque",
+      "category": "exotique",
+      "file": "Languages/exotic/lg-demoniaque.json"
+    },
+    {
+      "id": "lg-celeste",
+      "name": "Céleste",
+      "category": "exotique",
+      "file": "Languages/exotic/lg-celeste.json"
+    },
+    {
+      "id": "lg-commun-des-profondeurs",
+      "name": "Commun des profondeurs",
+      "category": "exotique",
+      "file": "Languages/exotic/lg-commun-des-profondeurs.json"
+    },
+    {
+      "id": "lg-draconique",
+      "name": "Draconique",
+      "category": "exotique",
+      "file": "Languages/exotic/lg-draconique.json"
+    },
+    {
+      "id": "lg-diabolique",
+      "name": "Diabolique",
+      "category": "exotique",
+      "file": "Languages/exotic/lg-diabolique.json"
+    },
+    {
+      "id": "lg-originel",
+      "name": "Originel",
+      "category": "exotique",
+      "file": "Languages/exotic/lg-originel.json"
+    },
+    {
+      "id": "lg-profond",
+      "name": "Profond",
+      "category": "exotique",
+      "file": "Languages/exotic/lg-profond.json"
+    },
+    {
+      "id": "lg-sylvestre",
+      "name": "Sylvestre",
+      "category": "exotique",
+      "file": "Languages/exotic/lg-sylvestre.json"
+    },
+    {
+      "id": "lg-tumiit",
+      "name": "Tumiit",
+      "category": "exotique",
+      "file": "Languages/exotic/lg-tumiit.json"
+    },
+    {
+      "id": "lg-viatique",
+      "name": "Viatique",
+      "category": "exotique",
+      "file": "Languages/exotic/lg-viatique.json"
+    },
+    {
+      "id": "lg-argot-des-voleurs",
+      "name": "Argot des voleurs",
+      "category": "secret",
+      "file": "Languages/secret/lg-argot-des-voleurs.json"
+    },
+    {
+      "id": "lg-langage-des-druides",
+      "name": "Langue des druides",
+      "category": "secret",
+      "file": "Languages/secret/lg-langage-des-druides.json"
+    }
+  ]
+}

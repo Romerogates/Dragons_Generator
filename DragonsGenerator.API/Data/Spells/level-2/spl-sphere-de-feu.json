@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-sphere-de-feu",
+  "name": "Sphère de feu",
+  "level": 2,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(un peu de suif"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-magicien"
+  ],
+  "description": "Une sphère de feu de 1,50 m de diamètre apparaît dans un espace inoccupé de votre choix à portée et persiste pour toute la durée du sort. Toute créature qui termine son tour de jeu dans un rayon de 1,50 m de la sphère doit effectuer un JS Dextérité et subit 2d6 dégâts de feu en cas d'échec, la moitié en cas de réussite. Au prix d'une action bonus, vous pouvez déplacer la sphère jusqu'à 9 m. Si elle percute une créature, cette dernière doit effectuer le jet de sauvegarde contre les dégâts, et la sphère s'arrête pour ce tour. La sphère peut franchir des obstacles hauts de 1,50 m et des fosses larges de 3 m. Elle embrase les objets inflammables qui ne sont ni portés ni transportés. En outre, elle produit une lumière vive dans un rayon de 6 m et une lumière faible sur 6 m de plus.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, les dégâts augmentent de 1d6 par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

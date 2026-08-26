@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-guerison-de-groupe",
+  "name": "Guérison de groupe",
+  "level": 9,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "Vous produisez une déferlante d'énergie vulnéraire qui balaye les créatures blessées qui vous entourent. Vous rendez jusqu'à 700 points de vie, répartis comme vous l'entendez entre des créatures que vous voyez à portée. Ce sort met aussi fin à la cécité, la surdité et aux maladies qui affectent les cibles. Ce sort n'a aucun effet sur les créatures artificielles et les morts-vivants.",
+  "modular_options": []
+}

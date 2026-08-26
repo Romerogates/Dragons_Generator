@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-nuage-incendiaire",
+  "name": "Nuage incendiaire",
+  "level": 8,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 45,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "n nuage de fumée tourbillonnante rempli de charbons ardents apparaît sous la forme d'une sphère de 6 m de rayon centrée sur un point situé à portée. Ce nuage contourne les coins et sa zone est grandement voilée. Il persiste pour toute la durée du sort ou jusqu'à ce qu'un vent modéré ou supérieur (au moins 15 km/h) le disperse. Quand le nuage apparaît, chaque créature qui y est prise doit effectuer un JS Dextérité et subit 10d8 dégâts de feu en cas d'échec, la moitié en cas de réussite. Une créature doit aussi effectuer ce jet de sauvegarde quand elle entre dans la zone pour la première fois d'un tour de jeu ou y termine son tour de jeu. Au début de chacun de vos tours de jeu, le nuage s'éloigne de vous de 3 m dans une direction de votre choix.",
+  "modular_options": []
+}

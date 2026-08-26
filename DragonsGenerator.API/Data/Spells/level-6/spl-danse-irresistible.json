@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-danse-irresistible",
+  "name": "Danse irrésistible",
+  "level": 6,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien"
+  ],
+  "description": "Choisissez une créature que vous voyez à portée. La cible entame une danse cocasse, tape des pieds et enchaîne les cabrioles pour toute la durée du sort. Les créatures qui ne peuvent être charmées sont immunisées contre ce sort. La cible doit utiliser tout son déplacement pour danser sans quitter son espace et subit un désavantage aux JS Dextérité et aux jets d'attaque. Tant que la cible est affectée par cet enchantement, les autres créatures bénéficient contre elle d'un avantage aux jets d'attaque. Au prix d'une action, la cible peut effectuer un JS Sagesse pour se ressaisir. En cas de réussite, le sort prend fin. Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 6e.",
+  "modular_options": []
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-emprisonnement",
+  "name": "Emprisonnement",
+  "level": 9,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "permanent",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(un dessin sur vélin ou une statuette sculptée à l'image de la cible"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Vous créez une entrave magique qui retient une créature que vous voyez à portée. La cible doit réussir un JS Sagesse sous peine d'être emprisonnée par le sort. En cas de réussite, elle est immunisée contre ce sort si vous le lancez de nouveau. Une créature affectée par ce sort n'a pas besoin de respirer, manger ou boire, et ne vieillit pas. Les sorts de divination ne permettent pas de la localiser ou de la percevoir. Au moment de l'incantation, choisissez une des formes d'emprisonnement suivantes : Enchaînement. De lourdes chaînes fermement ancrées dans le sol clouent la cible sur place. La cible est entravée tant que le sort persiste, et ne peut pas se déplacer ou être déplacée de quelque manière que ce soit. La composante spéciale de cette version du sort est une chaînette en métal précieux. Ensevelissement. La cible est ensevelie sous terre dans une sphère de force magique tout juste assez grande pour l'abriter. Rien ne peut traverser cette sphère, aucune créature ne peut user de téléportation ou de déplacement planaire pour y entrer ou en sortir. La composante spéciale de cette version du sort est un petit orbe de mithral. Miniaturisation. La cible rapetisse jusqu'à mesurer 2,5 cm et se retrouve enfermée dans une pierre précieuse ou quelque objet similaire. La lumière traverse la pierre précieuse tout à fait normalement (ce qui permet à la cible de voir à l'extérieur, et aux autres créatures de voir à l'intérieur), mais rien d'autre ne peut passer au travers, téléportation et déplacements planaires y compris. La pierre ne saurait être brisée ou taillée tant que le sort persiste. La composante spéciale de cette version du sort est une grosse pierre précieuse transparente, comme un corindon, un diamant ou un rubis. Prison close. Le sort transporte la cible vers un minuscule demi-plan protégé contre la téléportation et les déplacements planaires. Il peut s'agir d'un labyrinthe, d'une cage, d'une tour ou de toute autre structure ou zone confinée de votre choix. La composante spéciale de cette version du sort est une représentation miniature en jade de la prison. Sommeil. La cible s'endort et ne peut pas être réveillée. La composante spéciale de cette version du sort est un bouquet d'herbes soporifiques rares. Mettre fin au sort. Au moment de l'incantation, quelle que soit la version choisie, vous pouvez préciser une condition qui provoquera la fin du sort et libérera la cible. Elle peut être aussi précise ou compliquée que vous le souhaitez, mais le meneur doit l'estimer raisonnable pour qu'elle ait une chance d'être remplie. La condition peut être basée sur le nom de la créature, son identité ou son dieu, mais surtout fondée sur des actions ou qualités observables et non intangibles, comme le niveau, la classe ou les points de vie. Le sort dissipation de la magie peut mettre fin au sort, à condition d'être jeté au 9e niveau et de viser la prison ou sa composante spéciale. Une composante spéciale ne permet de créer qu'une seule prison à la fois. Si vous lancez de nouveau le sort en employant la même, la cible de la première incantation est immédiatement libérée.",
+  "modular_options": []
+}

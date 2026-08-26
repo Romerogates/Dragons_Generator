@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "ski-arcanes",
+  "name": "Arcanes",
+  "ability": "INT",
+  "description": "Vos tests d'Intelligence (Arcanes) mesurent votre capacité à vous souvenir de connaissances liées à des sorts, des objets magiques, des symboles ésotériques, des traditions de magie ou les plans d'existence et leurs habitants. Sans une connaissance des Arcanes, il sera difficile de comprendre le contenu d'ouvrages ésotériques, lesquels sont souvent riches de doubles sens métaphoriques.",
+  "examples": [
+    "Identifier un sort ou un objet magique.",
+    "Comprendre des symboles ésotériques ou des traditions de magie.",
+    "Se rappeler des informations sur les plans d'existence et leurs habitants."
+  ],
+  "passive_check": false,
+  "source": "livre_de_base"
+}

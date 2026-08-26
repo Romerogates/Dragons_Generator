@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-passe-muraille",
+  "name": "Passe-muraille",
+  "level": 5,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une pincée de plâtre"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien"
+  ],
+  "description": "Logo icon stamp Un passage apparaît à un point de votre choix que vous voyez à portée sur une surface de bois, de plâtre ou de pierre (comme un mur, un plafond ou une porte) et persiste pour toute la durée du sort. Vous choisissez les dimensions de l'ouverture : jusqu'à 1,50 m de large, 2,40 m de haut et 6 m de profondeur. Le passage ne crée pas d'instabilité dans la structure qui l'entoure. Quand l'ouverture disparaît, les créatures et objets restés dans le passage créé par le sort sont expulsés en toute sécurité vers l'espace inoccupé le plus proche de la surface sur laquelle vous avez jeté le sort.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, chaque niveau d'emplacement au-dessus du 5e vous permet d'augmenter la taille du passage de 1,50 m de largeur, 2,40 m de hauteur ou 6 m de profondeur.",
+  "modular_options": []
+}

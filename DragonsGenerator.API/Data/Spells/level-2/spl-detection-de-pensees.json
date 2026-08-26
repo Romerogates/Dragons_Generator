@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-detection-de-pensees",
+  "name": "Détection de pensées",
+  "level": 2,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une pièce de cuivre"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Pour toute la durée du sort, vous pouvez lire les pensées de certaines créatures. Au moment de l'incantation, et au prix d'une action à chacun de vos tours de jeu tant que le sort persiste, vous pouvez vous concentrer sur une créature que vous voyez dans un rayon de 9 m de vous. Si la créature choisie a une Intelligence de 3 ou moins, ou encore si elle ne parle aucune langue, elle n'est pas affectée. Les frontières éthérées et l'Interdit de Mort (cf. chapitre Géomagie) peuvent mettre le sort en échec. Vous découvrez d'abord les pensées superficielles de la créature, ce qui l'anime le plus à ce moment précis. Au prix d'une action, vous pouvez passer à une autre créature, ou tenter de sonder davantage la même cible. Dans le deuxième cas, la cible doit effectuer un JS Sagesse. En cas d'échec, vous saisissez son mode de réflexion (si elle en a un), son état émotionnel et tout ce qui occupe ses pensées (ce qui l'inquiète, ce qu'elle aime ou déteste). En cas de réussite, le sort prend fin. Quoi qu'il en soit, quand vous ne vous contentez pas des pensées superficielles, la cible sait que vous sondez son esprit, et à moins que vous ne vous tourniez vers les pensées d'une autre créature, elle peut, au prix d'une action à son tour de jeu, effectuer un test d'Intelligence opposé au vôtre. Si elle l'emporte, le sort prend fin. Les questions posées à une créature influent directement sur ses pensées. Ce sort se révèle donc très efficace dans le cadre d'un interrogatoire. Vous pouvez aussi utiliser cette divination pour déceler la présence de créatures pensantes que vous ne voyez pas. Au moment de l'incantation, ou au prix d'une action tant que le sort persiste, vous pouvez chercher des pensées dans un rayon de 9 m de vous. Le sort est capable de pénétrer la plupart des obstacles, mais 60 cm de pierre, 5 cm de métal ou une mince feuille de plomb le bloquent. Vous ne pouvez pas détecter les créatures dont l'Intelligence est inférieure à 4 ou incapables de parler la moindre langue. Une fois la présence d'une créature décelée de la sorte, vous pouvez lire ses pensées tant que le sort persiste comme détaillé ci-dessus, même si vous ne la voyez pas, sous réserve qu'elle se situe à portée.",
+  "modular_options": []
+}

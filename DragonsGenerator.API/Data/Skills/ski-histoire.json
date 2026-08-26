@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "ski-histoire",
+  "name": "Histoire",
+  "ability": "INT",
+  "description": "La connaissance de l'histoire s'étend à des disciplines proches : littérature, diplomatique, politique, géographie, géopolitique, économie et droit. Vos tests d'Intelligence (Histoire) évaluent votre capacité à vous remémorer les événements historiques, les personnes illustres, les royaumes disparus, les conflits d'antan et les guerres récentes, ainsi que les civilisations oubliées de la plupart des gens ; à connaître et comprendre les règles d'un système juridique, ainsi que ses failles ; à avoir connaissance des rapports de force entre maisons nobles, guildes, églises…",
+  "examples": [
+    "Se remémorer des événements historiques ou des personnages illustres.",
+    "Connaître et comprendre les règles d'un système juridique et ses failles.",
+    "Avoir connaissance des rapports de force entre maisons nobles, guildes ou églises."
+  ],
+  "passive_check": false,
+  "source": "livre_de_base"
+}

@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-oeil-du-mage",
+  "name": "Œil du mage",
+  "level": 4,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un œil ou un dessin représentant un œil"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien"
+  ],
+  "description": "Vous faites apparaître à portée un œil magique invisible qui plane dans les airs pour toute la durée du sort. Vous recevez mentalement toutes les informations que reçoit l'œil, qui non seulement jouit d'une vision normale et d'une vision dans le noir sur 9 m, mais peut en plus regarder dans toutes les directions. Au prix d'une action, vous pouvez déplacer cet œil jusqu'à 9 m dans n'importe quelle direction. Il n'y a pas de limite à la distance qui peut vous séparer de l'œil, mais il ne peut pas pénétrer dans un autre plan d'existence. Un obstacle physique l'empêche de passer, mais il peut se glisser dans un trou d'un diamètre minimum de 2,5 cm. Les frontières éthérées et l'Interdit de Mort mettent ce sort en échec. Si vous utilisez la règle optionnelle du rituel de divination, le sort œil du mage peut être lancé comme un rituel.",
+  "modular_options": []
+}

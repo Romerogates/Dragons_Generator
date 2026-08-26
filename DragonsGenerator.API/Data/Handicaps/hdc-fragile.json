@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "hdc-fragile",
+  "name": "Fragile",
+  "source": "livre_de_base",
+  "description": "Votre santé est délicate. Vous subissez un désavantage aux jets de sauvegarde de Constitution contre la maladie, le poison et pour résister à la fatigue.",
+  "mechanics": {
+    "disadvantage_on": [
+      "jets de sauvegarde de Constitution contre la maladie",
+      "jets de sauvegarde de Constitution contre le poison",
+      "jets de sauvegarde pour résister à la fatigue"
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-flamme-eternelle",
+  "name": "Flamme éternelle",
+  "level": 2,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "permanent",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(de la poussière de rubis d'une valeur minimale de 50 po"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien",
+    "cls-pretre"
+  ],
+  "description": "Spell icon for 2nd level evocation Une flamme apparaît brusquement sur un objet que vous touchez. Elle produit autant de lumière qu'une torche. Si elle ressemble à une flamme normale, elle ne dégage pas de chaleur et ne consomme pas d'oxygène. Une flamme éternelle peut être couverte ou cachée, mais pas étouffée ni éteinte. Eternal flame illustration",
+  "modular_options": []
+}

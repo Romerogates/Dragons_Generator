@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-creation-ou-destruction-d-eau",
+  "name": "Création ou destruction d'eau",
+  "level": 1,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(une goutte d'eau si vous créez de l'eau"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-pretre"
+  ],
+  "description": "ous créez ou détruisez de l'eau. Création d'eau. Vous créez jusqu'à 40 litres d'eau potable à portée, dans un récipient ouvert. Ou alors, elle tombe sous la forme d'une averse dans un cube de 9 m d'arête à portée et éteint les flammes exposées dans la zone. Destruction d'eau. Vous détruisez jusqu'à 40 litres d'eau potable dans un récipient ouvert à portée. Ou alors, vous détruisez un cube de 9 m d'arête de brouillard à portée.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, vous créez ou détruisez 40 litres d'eau supplémentaires (ou bien l'arête du cube augmente de 1,50 m) par niveau d'emplacement au-dessus du 1ᵉʳ.",
+  "modular_options": []
+}

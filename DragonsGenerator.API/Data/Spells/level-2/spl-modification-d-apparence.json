@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-modification-d-apparence",
+  "name": "Modification d'apparence",
+  "level": 2,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Vous adoptez une nouvelle forme. Au moment de l'incantation, choisissez une des options ci-dessous. Tant que le sort persiste, vous pouvez mettre fin à une option au prix d'une action pour bénéficier des avantages d'une autre. ### Adaptation aquatique Vous vous adaptez à un environnement aquatique, en vous dotant de branchies et de membranes de peau entre les doigts. Vous pouvez respirer sous l'eau et gagnez une VD à la nage égale à votre VD au sol. ### Changement d'apparence Vous modifiez votre apparence en choisissant notamment votre taille, votre poids, les traits de votre visage, le son de votre voix, la longueur de vos cheveux, la couleur de votre peau et autres signes particuliers. Vous pouvez vous faire passer pour un membre d'une autre espèce, mais vos caractéristiques restent les mêmes. En revanche, vous ne pouvez pas prendre l'apparence d'une créature d'une autre catégorie de taille, et votre forme générale ne change pas. Par exemple, si vous êtes un bipède, vous ne pouvez pas prendre l'apparence d'un quadrupède. À tout moment, tant que le sort persiste, vous pouvez modifier à nouveau votre apparence au prix d'une action. ### Armes naturelles Vous vous dotez de griffes, de crocs, de piquants, de cornes ou de quelque autre arme naturelle de votre choix. Vos attaques à mains nues infligent 1d6 dégâts contondants, perforants ou tranchants, selon l'arme naturelle que vous avez choisie, et vous disposez de la maîtrise de ces attaques à mains nues. Enfin, l'arme naturelle est magique et vous bénéficiez d'un bonus de +1 aux jets d'attaque et de dégâts lorsque vous vous en servez.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, la durée augmente de 1 heure par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "2.0",
+  "id": "ar-harnois",
+  "name": "Harnois",
+  "category": "armor",
+  "subcategory": "heavy",
+  "cost": {
+    "value": 1500,
+    "unit": "po"
+  },
+  "weight_kg": 32.5,
+  "ac_base": 18,
+  "dex_modifier": {
+    "type": "none"
+  },
+  "max_dex_bonus": null,
+  "str_required": 15,
+  "stealth_disadvantage": true,
+  "description": "Assemblage de plaques de métal façonnées sur mesure. Comprend gantelets, heaume et tunique rembourrée. Désavantage aux tests de Force (Athlétisme) pour nager et de Dextérité (Acrobaties)."
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-bouclier-de-la-foi",
+  "name": "Bouclier de la foi",
+  "level": 1,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action_bonus"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un petit parchemin sur lequel a été rédigé un bout de texte sacré"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-paladin",
+    "cls-pretre"
+  ],
+  "description": "n champ scintillant apparaît autour d'une créature de votre choix, ce qui lui confère un bonus de +2 à la CA pour toute la durée du sort.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 1ᵉʳ.",
+  "modular_options": []
+}

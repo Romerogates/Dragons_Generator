@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-deblocage",
+  "name": "Déblocage",
+  "level": 2,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Déblocage ©7 Choisissez un objet que vous voyez à portée. Il peut s'agir d'une porte, d'une boîte, d'un coffre, de menottes, d'un cadenas ou de tout autre objet disposant d'un mécanisme ordinaire ou magique barrant l'accès. Une cible fermée par une serrure ordinaire, coincée ou barrée est déverrouillée, décoincée ou débloquée. Si l'objet est muni de plusieurs serrures, une seule d'entre elles est déverrouillée. Si vous choisissez une cible fermée par le sort verrou du mage, celui-ci est réprimé pendant 10 minutes, durant lesquelles la cible peut être ouverte et fermée normalement. Au moment de l'incantation, l'objet ciblé produit un bruit audible jusqu'à 90 m. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, vous pouvez réduire la portée du bruit de 30 m par niveau d'emplacement au-dessus du 2e, pour finir par retirer tout son au 5e niveau.",
+  "modular_options": []
+}

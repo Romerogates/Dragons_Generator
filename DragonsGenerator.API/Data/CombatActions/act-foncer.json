@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "act-foncer",
+  "name": "Foncer",
+  "action_cost": "action",
+  "category": "standard",
+  "description": "Bénéficier d'un quota de déplacement supplémentaire pour le tour en cours. L'augmentation est égale à votre vitesse de déplacement, après application des modificateurs.",
+  "mechanics": {
+    "extra_movement": "Égal à la VD (après modificateurs)",
+    "example": "VD 9 m → déplacement total possible 18 m ce tour",
+    "note": "Toute diminution ou augmentation de la VD affecte ce quota de façon équivalente"
+  },
+  "source": "livre_de_base"
+}

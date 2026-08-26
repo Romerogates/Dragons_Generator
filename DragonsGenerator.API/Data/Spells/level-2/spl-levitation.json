@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-levitation",
+  "name": "Lévitation",
+  "level": 2,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une petite boucle en cuir ou un bout de fil d'or tordu à l'image d'une coupe pour vue d'une longue anse"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Une créature ou un objet de votre choix que vous voyez à portée s'élève verticalement jusqu'à 6 m et reste en suspension dans les airs pendant toute la durée du sort. La cible ne doit pas peser plus de 250 kg. Une créature non consentante qui réussit un JS Constitution n'est pas affectée. La cible ne peut se déplacer qu'en s'aidant des objets fixés ou d'une surface située à portée (comme un mur ou un plafond), comme si elle escaladait. Vous pouvez changer la hauteur de la cible de 6 m, dans un sens ou dans l'autre, à votre tour de jeu. Si vous êtes la cible, vous pouvez vous déplacer vers le haut ou le bas dans le cadre de votre déplacement. Dans le cas contraire, vous devez consacrer votre action pour déplacer la cible, qui doit rester à portée du sort. Quand le sort prend fin, la cible redescend doucement au sol si elle était encore en l'air.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, vous pouvez affecter une cible supplémentaire par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

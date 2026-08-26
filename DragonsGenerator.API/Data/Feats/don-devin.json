@@ -1,0 +1,42 @@
+{
+  "schema_version": "2.0",
+  "id": "don-devin",
+  "name": "Devin",
+  "requires_magic": true,
+  "category": "magic",
+  "prerequisites": [
+    {
+      "type": "spellcasting",
+      "description": "Capacité de lancer au moins un sort"
+    }
+  ],
+  "ability_score_increase": {
+    "ability": "spellcasting",
+    "value": 1,
+    "max": 20
+  },
+  "description": "+1 caractéristique magique (max 20). DD des divinations +2. Pressentiment : au début de votre tour, lancez 1d20 ; le résultat remplace le premier jet de d20 requis avant votre prochain tour. Utilisation : 1/repos court ou long.",
+  "benefits": [
+    {
+      "type": "ability_score_increase",
+      "ability": "spellcasting",
+      "value": 1
+    },
+    {
+      "type": "spell_save_dc_bonus",
+      "school": "divination",
+      "value": 2
+    },
+    {
+      "type": "prescience",
+      "uses": 1,
+      "recharge": "repos_court",
+      "note": "Prérouler 1d20 au début de son tour, remplace le premier jet requis"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "magie",
+    "divination"
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-graisse",
+  "name": "Graisse",
+  "level": 1,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un peu de couenne de porc ou une noix de beurre"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien"
+  ],
+  "description": "Le sol se recouvre de graisse sur une zone carrée de 3 m de côté centrée sur un point situé à portée et devient un terrain difficile pour toute la durée du sort. Au moment où la graisse apparaît, chaque créature qui se tient dans la zone doit réussir un JS Dextérité sous peine de se retrouver à terre. Une créature qui entre dans la zone ou y termine son tour de jeu doit elle aussi réussir un JS Dextérité sous peine de se retrouver à terre.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, la zone touchée augmente de 1,50 m de côté (si vous le souhaitez) par niveau d'emplacement au-dessus du 1er.",
+  "modular_options": []
+}

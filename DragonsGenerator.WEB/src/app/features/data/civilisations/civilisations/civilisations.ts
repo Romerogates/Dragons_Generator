@@ -10,18 +10,20 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DataService } from '@core/services/data.service';
 import { Civilisation } from '@core/models/Civilisations/civilisations';
+import { EANA_MAP_ASPECT, getEanaMapCoordinates } from '@core/utils/eana-map';
 
 @Component({
   selector: 'app-civilisations',
   standalone: true,
-  imports: [CommonModule, RouterLink], // Ne pas oublier RouterLink et CommonModule (pour ngClass/ngStyle)
+  imports: [CommonModule, RouterLink],
   templateUrl: './civilisations.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class Civilisations implements OnInit {
   private civilisationService = inject(DataService);
 
+  readonly mapAspect = EANA_MAP_ASPECT;
   civilisations = signal<Civilisation[]>([]);
   isLoading = signal<boolean>(true);
   error = signal<string | null>(null);
@@ -71,26 +73,6 @@ export class Civilisations implements OnInit {
 
   /** Retourne les coordonnées X et Y (en %) pour placer l'icône sur la carte */
   getMapCoordinates(id: string): { x: number; y: number } {
-    const coords: Record<string, { x: number; y: number }> = {
-      'civ-cyrillane': { x: 60, y: 45 },
-      'civ-cite-franche': { x: 45, y: 45 },
-      'civ-lothrienne': { x: 50, y: 15 },
-      'civ-drakenbergen': { x: 55, y: 25 },
-      'civ-arolavie': { x: 65, y: 15 },
-      'civ-septentrion': { x: 55, y: 3 },
-      'civ-kaan': { x: 77, y: 38 },
-      'civ-shi-huang': { x: 92, y: 88 },
-      'civ-mibu': { x: 55, y: 72 },
-      'civ-royaumes-des-sables': { x: 54, y: 60 },
-      'civ-ajagar': { x: 78, y: 65 },
-      'civ-acoatl': { x: 15, y: 73 },
-      'civ-iles-barbaresques': { x: 28, y: 56 },
-      'civ-ellerina': { x: 16, y: 22 },
-      'civ-torea': { x: 20, y: 95 },
-      'civ-rachamangekr': { x: 65, y: 90 },
-      'civ-iles-eoliennes': { x: 22, y: 40 },
-      'civ-inframonde': { x: 25, y: 10 },
-    };
-    return coords[id] || { x: 50, y: 50 };
+    return getEanaMapCoordinates(id);
   }
 }

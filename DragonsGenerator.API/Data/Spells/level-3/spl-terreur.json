@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-terreur",
+  "name": "Terreur",
+  "level": 3,
+  "school": "illusion",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "la tête desséchée d'un animal de taille P ou TP"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Vous projetez une image fantasmagorique des pires peurs d'une créature. Chaque créature prise dans un cône de 9 m doit réussir un JS Sagesse sous peine de lâcher ce qu'elle tient et de se retrouver effrayée pour toute la durée du sort. Une cible effrayée par ce sort doit entreprendre l'action Foncer et s'éloigner de vous en empruntant le chemin le plus court et sûr, à moins qu'elle n'ait nulle part où aller. Si elle termine son tour de jeu dans un lieu où elle ne vous a pas dans sa ligne de mire, elle peut effectuer un JS Sagesse. En cas de réussite, le sort prend fin pour cette créature. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, chaque niveau d'emplacement au-dessus du 3e augmente la taille du cône de 3 m (si vous le souhaitez) et la durée du sort de 1 minute. En utilisant cette règle optionnelle, les conséquences de la terreur peuvent être plus graves et durables. Si la cible tire un 1 sur le d20 de son JS Sagesse, elle subit une folie temporaire (cf. chapitre Folies). Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, vous infligez à la place une folie durable ; quand vous jetez ce sort en utilisant un emplacement de sort du 9e niveau, la folie infligée dans ces conditions est permanente.",
+  "modular_options": []
+}

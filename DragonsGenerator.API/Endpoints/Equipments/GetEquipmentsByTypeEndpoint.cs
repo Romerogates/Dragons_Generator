@@ -11,6 +11,10 @@ public class GetEquipmentsByTypeRequest
 
 public class GetEquipmentsByTypeEndpoint : Endpoint<GetEquipmentsByTypeRequest, List<Equipment>>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetEquipmentsByTypeEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/equipments/type/{type}");
@@ -19,12 +23,10 @@ public class GetEquipmentsByTypeEndpoint : Endpoint<GetEquipmentsByTypeRequest, 
 
     public override async Task HandleAsync(GetEquipmentsByTypeRequest req, CancellationToken ct)
     {
-        var equipments = await JsonDataLoader.LoadAsync<List<Equipment>>("equipments.json", ct);
-
-        var filtered = equipments?
+        var equipments = await _repo.GetEquipmentsAsync(ct);
+        var filtered = equipments
             .Where(e => string.Equals(e.Type, req.Type, StringComparison.OrdinalIgnoreCase))
-            .ToList() ?? [];
-
+            .ToList();
         await Send.OkAsync(filtered, ct);
     }
 }

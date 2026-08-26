@@ -6,6 +6,10 @@ namespace DragonsGenerator.API.Endpoints.Equipments;
 
 public class GetEquipmentSubtypesEndpoint : EndpointWithoutRequest<Dictionary<string, List<string>>>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetEquipmentSubtypesEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/equipments/subtypes");
@@ -14,9 +18,8 @@ public class GetEquipmentSubtypesEndpoint : EndpointWithoutRequest<Dictionary<st
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var equipments = await JsonDataLoader.LoadAsync<List<Equipment>>("equipments.json", ct);
-
-        var grouped = equipments?
+        var equipments = await _repo.GetEquipmentsAsync(ct);
+        var grouped = equipments
             .Where(e => e.Subtype is not null)
             .GroupBy(e => e.Type)
             .ToDictionary(
@@ -24,9 +27,7 @@ public class GetEquipmentSubtypesEndpoint : EndpointWithoutRequest<Dictionary<st
                 g => g.Select(e => e.Subtype!)
                       .Distinct()
                       .OrderBy(s => s)
-                      .ToList()
-            ) ?? [];
-
+                      .ToList());
         await Send.OkAsync(grouped, ct);
     }
 }

@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-image-programmee",
+  "name": "Image programmée",
+  "level": 6,
+  "school": "illusion",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "permanent",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un peu de laine et de poudre de jade d'une valeur minimale de 25 po"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien"
+  ],
+  "description": "Vous créez à portée l'illusion d'un objet, d'une créature ou de quelque autre phénomène visible, activée quand une condition précise est remplie (avant cela, l'illusion n'est pas perceptible). Sa taille ne doit pas dépasser celle d'un cube de 9 m d'arête. Vous décidez au moment de l'incantation comment l'illusion va se comporter et les sons qu'elle va produire. Cette représentation programmée peut durer jusqu'à 5 minutes. Quand la condition spécifiée est remplie, l'illusion apparaît et se conduit conformément à vos instructions. Après quoi elle disparaît et reste en sommeil pendant 10 minutes. Ensuite, elle peut être réactivée. La condition de déclenchement est aussi vague ou précise que vous le souhaitez, mais doit s'appuyer sur des paramètres visuels ou auditifs survenant dans un rayon de 9 m de la zone. Par exemple, vous pourriez créer une illusion de vous-même apparaissant et adressant une mise en garde à tous ceux qui tentent d'ouvrir une porte piégée, ou décider de la déclencher seulement quand une créature dit une phrase ou un mot précis. En cas d'interaction physique, l'illusion est dévoilée, tout simplement parce que les corps la traversent. Une créature qui examine l'image au prix d'une action comprendra qu'il s'agit d'une illusion en réussissant un test d'Intelligence (Investigation) assorti de votre DD de sauvegarde des sorts. Si une créature perce l'illusion, elle voit au travers et les sons qu'elle produit lui paraissent creux.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau, la représentation programmée de l'illusion peut durer jusqu'à 15 minutes ; avec un emplacement de sort du 8e niveau, elle peut durer 1 heure ; avec un emplacement du 9e niveau, elle peut durer 12 heures.",
+  "modular_options": []
+}

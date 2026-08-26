@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "act-inciter",
+  "name": "Inciter",
+  "action_cost": "action",
+  "category": "standard",
+  "description": "Tenter par quelques paroles choisies d'influencer une ou plusieurs créatures dans un rayon de 9 m, capables de vous entendre et de vous comprendre. L'incitation doit paraître raisonnable dans le contexte.",
+  "mechanics": {
+    "range_m": 9,
+    "targets": "Créatures capables de vous entendre et comprendre",
+    "save": {
+      "ability": "Sagesse",
+      "dc_formula": "8 + modificateur de Charisme + bonus de maîtrise (si maîtrise de la compétence associée)",
+      "skills": [
+        "Intimidation",
+        "Persuasion",
+        "Tromperie"
+      ]
+    },
+    "save_advantage_if": [
+      "immunisée contre l'état charmé",
+      "plusieurs cibles désignées",
+      "très peu de chances d'influencer (fanatisme, envoûtement, etc.)"
+    ],
+    "save_disadvantage_if": "Circonstances favorables à l'incitation (ex. chef vient de mourir)",
+    "on_fail": {
+      "effect": "Désavantage aux jets associés à une action contraire à l'incitation",
+      "duration": "Jusqu'au début du tour de jeu suivant",
+      "critical_fail": "Si échec d'au moins 5 points : impossible d'entreprendre une action contraire jusqu'au début du tour suivant"
+    },
+    "on_success": "Immunisée contre vos tentatives d'incitation pendant 10 minutes"
+  },
+  "source": "livre_de_base"
+}

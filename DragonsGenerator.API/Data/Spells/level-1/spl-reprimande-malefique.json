@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-reprimande-malefique",
+  "name": "Réprimande maléfique",
+  "level": 1,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "reaction"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-sorcier"
+  ],
+  "description": "Vous pointez du doigt la créature qui vous a blessé, qui est momentanément entourée de flammes maléfiques. La créature doit effectuer un JS Dextérité et subit 2d10 dégâts de feu en cas d'échec, la moitié en cas de réussite.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, les dégâts augmentent de 1d10 par niveau d'emplacement au-dessus du 1ᵉʳ.",
+  "modular_options": []
+}

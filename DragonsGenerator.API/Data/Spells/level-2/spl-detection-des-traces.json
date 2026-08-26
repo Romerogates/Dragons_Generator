@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-detection-des-traces",
+  "name": "Détection des traces",
+  "level": 2,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-rodeur"
+  ],
+  "description": "Pour toute la durée du sort, vous décelez si des créatures de taille TP ou plus sont passées dans un rayon de 9 m de vous au cours de la dernière semaine. Au prix d'une action, vous pouvez vous focaliser sur une trace en particulier pour connaître l'espèce (la sous-espèce, le cas échéant) et la taille de la créature correspondante, ainsi que la direction prise, l'allure (marche traînante ou course, par exemple) et la date du passage. Le sort passage sans trace est inefficace contre détection des traces. Le sort antidétection et toute magie qui protège contre la divination n'efface pas la trace, mais elle la floute, de sorte qu'il vous est impossible d'obtenir des informations dessus, même en l'inspectant au prix d'une action (voir ci-dessus). Si la zone inspectée a vu passer plus de 20 créatures de taille TP ou plus au cours de la dernière semaine (à l'appréciation du meneur), votre détection est saturée d'informations et vous ne pouvez pas obtenir de détails supplémentaires. Cependant, au moment de lancer le sort, vous pouvez restreindre votre recherche en précisant une taille (très petite (TP), petite (P), moyenne (M), grande (G), très grande (TG) ou colossale (C)) et/ou un type de créature (aberration, bête, céleste, créature artificielle, dragon, élémentaire, fée, fiélon, géant, humanoïde, monstruosité, mort-vivant, plante, ravageur ou vase). Le sort est capable de pénétrer la plupart des obstacles, mais 90 cm de bois ou de terre, 30 cm de pierre, 2,5 cm de la plupart des métaux ou une mince feuille de plomb le bloquent. ### Rituel de détection des traces Si vous utilisez la règle optionnelle du rituel de divination, le sort détection des traces peut être lancé comme un rituel.",
+  "modular_options": []
+}

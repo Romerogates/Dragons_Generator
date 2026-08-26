@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-agrandissement-rapetissement",
+  "name": "Agrandissement/rapetissement",
+  "level": 2,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 8,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une minuscule bande de tissu blanc"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Agrandissement/rapetissement Une créature ou un objet que vous voyez à portée grandit ou rapetisse pour toute la durée du sort. Choisissez une créature ou un objet ni porté ni transporté. Si la cible n'est pas consentante, elle a droit à un JS Constitution. Si elle le réussit, le sort n'a aucun effet. Si la cible est une créature, tout ce qu'elle porte et transporte change aussi de taille. Tout objet lâché par la créature affectée retrouve aussitôt sa taille normale. Agrandissement. La taille de la cible est doublée, et son poids multiplié par huit. Sa taille augmente d'une catégorie - de M à G, par exemple. Si l'espace dans lequel elle se tient l'empêche de doubler sa taille, la cible grandit autant que possible. Tant que le sort persiste, elle bénéficie aussi d'un avantage aux tests de Force et JS Force. Ses armes grandissent elles aussi, de sorte à s'adapter à sa nouvelle taille, et infligent 1d4 dégâts supplémentaires. Rapetissement. La taille de la cible est diminuée de moitié, et son poids divisé par huit. Sa taille chute d'une catégorie - de M à P, par exemple. Tant que le sort persiste, elle subit aussi un désavantage aux tests de Force et JS Force. Ses armes rapetissent elles aussi, de sorte à s'adapter à sa nouvelle taille, et infligent 1d4 dégâts de moins (jusqu'à un minimum de 1 dégât). Dotre sort galvanise vos alliés en leur conférant une robustesse et une détermination accrues. Choisissez jusqu'à trois créatures situées à portée. Leurs points de vie maximums et leurs points de vie actuels augmentent de 5 pour toute la durée du sort.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, les cibles gagnent 5 points de vie supplémentaires par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "it-carquois-20-fleches",
+  "name": "Carquois (20 flèches)",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 1,
+    "unit": "po"
+  },
+  "weight_kg": 1,
+  "description": "Carquois contenant 20 flèches."
+}

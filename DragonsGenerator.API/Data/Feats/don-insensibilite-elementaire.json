@@ -1,0 +1,57 @@
+{
+  "schema_version": "2.0",
+  "id": "don-insensibilite-elementaire",
+  "name": "Insensibilité élémentaire",
+  "requires_magic": false,
+  "category": "survival",
+  "prerequisites": [
+    {
+      "type": "ability_score_or",
+      "options": [
+        {
+          "type": "ability_score",
+          "ability": "CON",
+          "min": 13,
+          "description": "13 ou plus en Constitution"
+        },
+        {
+          "type": "ability_score",
+          "ability": "CHA",
+          "min": 13,
+          "description": "13 ou plus en Charisme"
+        }
+      ],
+      "description": "13 ou plus en Constitution ou Charisme"
+    }
+  ],
+  "ability_score_increase": {
+    "ability": "CON_or_CHA",
+    "value": 1,
+    "max": 20
+  },
+  "description": "Prérequis : CON ou CHA 13+. +1 Constitution ou Charisme (max 20). Résistance à un type de dégâts élémentaires au choix : acide, feu, foudre, froid ou tonnerre. Peut être choisi plusieurs fois pour un type différent.",
+  "benefits": [
+    {
+      "type": "ability_score_increase",
+      "ability": "CON ou CHA",
+      "value": 1
+    },
+    {
+      "type": "damage_resistance",
+      "choose_from": [
+        "acide",
+        "feu",
+        "foudre",
+        "froid",
+        "tonnerre"
+      ],
+      "note": "Un type par prise"
+    }
+  ],
+  "repeatable": true,
+  "tags": [
+    "défense",
+    "résistance",
+    "élémentaire"
+  ]
+}

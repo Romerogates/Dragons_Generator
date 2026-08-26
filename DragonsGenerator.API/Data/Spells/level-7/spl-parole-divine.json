@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-parole-divine",
+  "name": "Parole divine",
+  "level": 7,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action_bonus"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "Vous prononcez une parole divine investie du pouvoir qui a façonné le monde à l'aube de la création. Choisissez des créatures que vous voyez à portée, autant que vous le souhaitez. Chaque créature qui vous entend doit effectuer un JS Charisme. En cas d'échec, la cible subit un effet qui dépend de ses points de vie actuels : points de vie ou moins : assourdie pendant 1 minute. points de vie ou moins : assourdie et aveuglée pendant 10 minutes. points de vie ou moins : assourdie, aveuglée et étourdie pendant 1 heure. points de vie ou moins : mort instantanée. Quels que soient ses points de vie actuels, un céleste, un élémentaire, une fée ou un fiélon qui rate son jet de sauvegarde est banni vers son plan d'origine (s'il n'y est pas déjà) et ne peut pas revenir sur le plan sur lequel vous vous situez avant 24 heures, sauf s'il bénéficie d'un souhait.",
+  "modular_options": []
+}

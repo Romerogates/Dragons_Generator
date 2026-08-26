@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-terrain-hallucinatoire",
+  "name": "Terrain hallucinatoire",
+  "level": 4,
+  "school": "illusion",
+  "casting_time": {
+    "value": 10,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 90,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 24,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(un caillou"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Vous modifiez un cube de 45 m d'arête de terrain naturel situé à portée, qui prend un nouvel aspect, tant au niveau de son apparence que des sons et odeurs qu'il produit. Ainsi, un champ ou une route pourra ressembler à un marais, une colline, une crevasse ou quelque autre terrain difficile ou infranchissable. Une mare pourra ressembler à une prairie verdoyante ; un précipice, à une pente douce ; un ravin rocailleux, à une belle route large. En revanche, les bâtiments, équipements et créatures situés dans la zone ne changent pas d'apparence. Les caractéristiques tactiles du terrain restent inchangées, si bien que les créatures qui entrent dans la zone ont toutes les chances de vite découvrir la supercherie. Si la différence n'est pas évidente au toucher, une créature qui examine attentivement l'illusion peut tenter un test d'Intelligence (Investigation) assorti de votre DD de sauvegarde des sorts pour ne pas y croire. Une créature qui voit l'illusion pour ce qu'elle est la perçoit comme une image floue superposée à la zone. et pressentir la supercherie Le terrain hallucinatoire fait effet sur toute personne qui le voit, même de très loin : vision d'une colline dans une vallée, d'une oasis au milieu du désert, d'une île dans l'océan, d'un dangereux maelstrom à contourner, etc. Observer la zone de l'illusion avec attention donne la possibilité de la percer. La créature doit cependant avoir une raison de soupçonner la supercherie, par exemple si elle sait que la zone est normalement boisée, qu'il devrait y avoir une rivière, que sa carte ne correspond pas avec ce qu'elle voit, etc. Un test d'Intelligence (Investigation) contre votre DD de sauvegarde des sorts permet d'être averti de l'usage de magie. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, chaque niveau d'emplacement au-dessus du 4e augmente la portée de 30 m, l'arête du cube de 15 m (si vous le souhaitez) et la durée du sort de 12 heures.",
+  "modular_options": []
+}

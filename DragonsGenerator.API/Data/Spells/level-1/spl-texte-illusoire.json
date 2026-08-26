@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-texte-illusoire",
+  "name": "Texte illusoire",
+  "level": 1,
+  "school": "illusion",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 10,
+    "unit": "jour"
+  },
+  "components": {
+    "v": false,
+    "s": true,
+    "m": "(des encres de calligraphie d'une valeur minimale de 10 po"
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Vous rédigez un court texte sur un parchemin, un bout de papier ou quelque autre support convenant à l'écriture, puis l'investissez d'une puissante illusion qui persiste pour toute la durée du sort. Pour vous et toute créature que vous avez désignée au moment de l'incantation, le texte semble normal, écrit de votre main, et transmet le sens souhaité lors de sa rédaction. Mais pour le reste du monde, il paraît avoir été écrit dans une langue inconnue ou magique parfaitement incompréhensible. Autre possibilité : vous pouvez travestir le message, faire croire que son auteur est tout autre ou qu'il est écrit dans une langue différente (qu'il vous faut alors connaître). Si le sort est dissipé, l'illusion et le texte original s'évanouissent. Une créature douée de vision lucide peut lire le message caché. Lorsqu'une créature autre que les destinataires d'un texte illusoire lit ce dernier, elle peut effectuer un test de Sagesse (Intuition) assorti de votre DD de sauvegarde des sorts. Une réussite ne permet pas de lire le message caché, mais la créature a la sensation dérangeante que quelque chose lui échappe. Après cette prise de conscience, un test d'Intelligence (Arcanes) DD 15 permet de savoir avec certitude que la magie est à l'œuvre.",
+  "modular_options": []
+}

@@ -1,0 +1,92 @@
+{
+  "schema_version": "2.0",
+  "description": "Index des huit divinités principales d'Eana (Dragons — jeu de rôle). Les forces harmoniques (Monde, Façonneur, Forgeron, Flore) œuvrent pour la lumière, la cohésion et la prolifération de la vie ; les forces entropiques (Mort, Givreuse, Nuit, Tempête) tendent vers les ténèbres, la dissociation et l'extinction.",
+  "language": "fr",
+  "stats": {
+    "total": 8,
+    "harmonique": 4,
+    "entropique": 4
+  },
+  "notes": {
+    "pantheon_etoile": "Le culte polythéiste de l'Étoile, répandu dans le Cyfandir et religion officielle en Lothrienne, célèbre cinq divinités : Flore (Aster), Façonneur (Gùnd), Forgeron (Ulgurd), Givreuse (Haldrìn) et Mort (le Masque). Nuit (Niflhel) et Tempête (Varanid) ne sont pas reconnus comme dieux mais comme esprits maléfiques associés à des anges déchus. Le culte d'Eana (Monde) est toléré mais considéré comme antique et païen. Des hérétiques vénèrent l'étoile à sept branches et ajoutent Niflhel et Varanid au panthéon."
+  },
+  "deities": [
+    {
+      "id": "div-faconneur",
+      "name": "Façonneur",
+      "tonality": "harmonique",
+      "domains": [
+        "dom-etrange",
+        "dom-voyage"
+      ],
+      "file": "Deities/div-faconneur.json"
+    },
+    {
+      "id": "div-flore",
+      "name": "Flore",
+      "tonality": "harmonique",
+      "domains": [
+        "dom-partage",
+        "dom-vie"
+      ],
+      "file": "Deities/div-flore.json"
+    },
+    {
+      "id": "div-forgeron",
+      "name": "Forgeron",
+      "tonality": "harmonique",
+      "domains": [
+        "dom-force",
+        "dom-partage"
+      ],
+      "file": "Deities/div-forgeron.json"
+    },
+    {
+      "id": "div-givreuse",
+      "name": "Givreuse",
+      "tonality": "entropique",
+      "domains": [
+        "dom-temps",
+        "dom-vie"
+      ],
+      "file": "Deities/div-givreuse.json"
+    },
+    {
+      "id": "div-monde",
+      "name": "Monde",
+      "tonality": "harmonique",
+      "domains": [],
+      "file": "Deities/div-monde.json"
+    },
+    {
+      "id": "div-mort",
+      "name": "Mort",
+      "tonality": "entropique",
+      "domains": [
+        "dom-indicible",
+        "dom-temps"
+      ],
+      "file": "Deities/div-mort.json"
+    },
+    {
+      "id": "div-nuit",
+      "name": "Nuit",
+      "tonality": "entropique",
+      "domains": [
+        "dom-etrange",
+        "dom-indicible"
+      ],
+      "file": "Deities/div-nuit.json"
+    },
+    {
+      "id": "div-tempete",
+      "name": "Tempête",
+      "tonality": "entropique",
+      "domains": [
+        "dom-force",
+        "dom-voyage"
+      ],
+      "file": "Deities/div-tempete.json"
+    }
+  ]
+}

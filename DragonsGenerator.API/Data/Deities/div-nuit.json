@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "id": "div-nuit",
+  "name": "Nuit",
+  "tonality": "entropique",
+  "domains": [
+    "dom-etrange",
+    "dom-indicible"
+  ],
+  "other_names": [
+    "Xonim",
+    "la Magicienne",
+    "la Vigilante"
+  ],
+  "description": "De son vivant, Xonim fut la mère du conquérant Tamerakh, une magicienne et une femme politique avisée. Elle accéda à la divinité grâce à son fils qui vint la libérer du monde des morts. Dorénavant, elle est la déesse de la magie, de l'obscurité, des intrigues, de la beauté et de la richesse. Elle est connue pour son ambivalence et pour sa sympathie à l'égard des tieffelins qu'elle protège, peu importe leurs actes. Politicienne avisée, elle a rendu son clergé indispensable en lui permettant de fabriquer les célèbres liens de Xonim, des chaînes qui privent les lanceurs de sorts entravés de tout pouvoir. Les prêtres de Xonim, craints et enviés, deviennent souvent conseillers – d'une guilde, d'une faction ou d'un roi. Leur dogme les incite à défendre du mieux qu'ils peuvent les intérêts du camp qu'ils choisissent, même s'ils doivent s'opposer pour cela à d'autres prêtres de même obédience. À eux de démontrer leurs mérites et leur intelligence dans cette compétition qui se joue durant toute leur vie.",
+  "worshippers_note": "Conseillers de guildes, factions ou rois ; protecteurs des tieffelins. Tantôt vénérée comme protectrice des cités, tantôt comme corruption. Dans le culte de l'Étoile, considérée comme esprit maléfique Niflhel, corrupteur associé à un ange déchu.",
+  "grants_powers_to": [
+    "pretre"
+  ],
+  "source": "livre_de_base"
+}

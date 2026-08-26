@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "tl-necessaire-de-cartographe",
+  "name": "Nécessaire de cartographe",
+  "category": "tool",
+  "subcategory": "artisan_tool",
+  "cost": {
+    "value": 15,
+    "unit": "po"
+  },
+  "weight_kg": 3,
+  "description": "Outils d'artisan associé aux architectes et dessinateurs."
+}

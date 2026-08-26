@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-possession",
+  "name": "Possession",
+  "level": 6,
+  "school": "necromancie",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "permanent",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(une pierre précieuse"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Votre corps tombe dans un état catatonique, tandis que votre âme se réfugie dans le contenant utilisé en guise de composante matérielle. Tant qu'elle s'y trouve, vous êtes conscient de votre environnement comme si vous étiez dans l'espace du contenant. Vous ne pouvez pas vous déplacer ou jouer de réaction. La seule action que vous pouvez entreprendre consiste à projeter votre âme jusqu'à 30 m du contenant, soit pour regagner votre corps - ce qui met fin au sort - soit pour tenter de posséder le corps d'un humanoïde. Vous pouvez tenter de posséder tout humanoïde que vous voyez dans un rayon de 30 m de vous (les créatures protégées par les sorts protection contre le Mal et le Bien ou cercle magique ne peuvent pas être possédées). La cible doit effectuer un JS Charisme. En cas d'échec, votre âme se glisse dans son corps, tandis que la sienne est piégée dans le contenant. En cas de réussite, la cible résiste à votre tentative de possession, et vous ne pouvez pas retenter de la posséder pendant 24 heures. Vous contrôlez le corps de la créature possédée. Votre profil est remplacé par le sien, mais vous conservez votre alignement, ainsi que vos valeurs d'Intelligence, Sagesse et Charisme. Vous conservez également le bénéfice de vos aptitudes de classe. Si la cible a des niveaux de classe, vous ne pouvez utiliser aucune de ses aptitudes de classe. De son côté, l'âme de la créature possédée utilise ses propres sens depuis le contenant, mais elle ne peut pas se déplacer ni entreprendre d'action. Lorsque vous possédez un corps, vous pouvez, au prix d'une action, regagner le contenant s'il se situe dans un rayon de 30 m de vous, et ainsi renvoyer l'âme de la créature dans son corps. Si le corps de l'hôte meurt alors que vous le possédez, la créature meurt elle aussi, et vous devez effectuer un JS Charisme contre votre propre DD de sauvegarde des sorts. En cas de réussite, vous regagnez le contenant s'il se situe dans un rayon de 30 m de vous. En cas d'échec, vous mourez vous aussi. Si le contenant est détruit ou que le sort prend fin, votre âme regagne aussitôt votre corps. Si votre corps se situe à plus de 30 m de vous, ou s'il est mort au moment où vous tentez de le regagner, vous mourez. Si l'âme d'une autre créature est dans le contenant au moment où il est détruit, elle regagne son corps si ce dernier est encore vivant et situé dans un rayon de 30 m. Autrement, cette créature meurt. Quand le sort prend fin, le contenant est détruit.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau ou supérieur, toutes les portées du sort augmentent de 30 m par niveau d'emplacement au-dessus du 6e.",
+  "modular_options": []
+}

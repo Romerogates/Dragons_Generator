@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-resurrection-supreme",
+  "name": "Résurrection suprême",
+  "level": 9,
+  "school": "necromancie",
+  "casting_time": {
+    "value": 1,
+    "unit": "heure"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(de l'eau bénite et des diamants d'une valeur minimale de 25 000 po"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-pretre"
+  ],
+  "description": "Logo, icon, photograph Icon Icon Vous touchez une créature morte, ni de vieillesse ni depuis plus de deux cents ans. Si son âme est libre et consentante, la créature est ressuscitée avec tous ses points de vie. Ce sort referme les blessures mortelles, neutralise les poisons, soigne les maladies et lève les malédictions qui affectaient la cible au moment de sa mort. Il remplace également les organes et membres endommagés ou manquants. Si la créature était un mort-vivant, elle est ressuscitée comme créature vivante sous la forme qu'elle avait de son vivant. Enfin, la créature est débarrassée de tous ses niveaux de fatigue. Le sort peut même générer un nouveau corps s'il ne reste rien de l'original, auquel cas vous devez prononcer le nom de la créature, qui apparaît alors dans un espace inoccupé de votre choix dans un rayon de 3 m de vous.",
+  "modular_options": []
+}

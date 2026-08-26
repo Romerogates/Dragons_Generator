@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-cercle-de-teleportation",
+  "name": "Cercle de téléportation",
+  "level": 5,
+  "school": "invocation",
+  "casting_time": {
+    "value": 20,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 3,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "round"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": "(craies et encres rares mêlées de poudre de pierres précieuses d'une valeur minimale de 50 po"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "d'invocation Icône de sort d'invocation d'invocation Au moment de l'incantation, vous tracez au sol un cercle de sceaux de 3 m de diamètre qui vous relie à un cercle de téléportation de votre choix dont vous connaissez la séquence de sceaux et situé sur le même plan d'existence que vous. Un portail scintillant apparaît au sein du cercle que vous avez tracé et reste ouvert jusqu'à la fin de votre tour de jeu suivant. Toute créature qui le franchit apparaît aussitôt dans un rayon de 1,50 m du cercle de destination ou dans l'espace inoccupé le plus proche si cet espace est occupé. De nombreux temples, guildes et autres lieux de premier plan cachent en leur sein des cercles de téléportation permanents. Chacun s'accompagne d'une séquence de sceaux unique, une suite de runes magiques tracées selon un modèle bien précis. Lorsque vous gagnez la faculté de lancer ce sort pour la première fois, vous apprenez les séquences de sceaux de deux endroits du Plan Matériel, déterminés par le meneur. Vous pourrez en découvrir d'autres lors de vos aventures. Vous pouvez apprendre une séquence de sceaux en l'examinant pendant 10 minutes. Vous pouvez créer un cercle de téléportation permanent en jetant ce sort au même endroit quotidiennement pendant un an. Rien ne vous oblige à emprunter le cercle pour vous téléporter lorsque vous jetez le sort de cette façon.",
+  "modular_options": []
+}

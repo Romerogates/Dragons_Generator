@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "tl-tambour",
+  "name": "Tambour",
+  "category": "tool",
+  "subcategory": "instrument",
+  "cost": {
+    "value": 6,
+    "unit": "po"
+  },
+  "weight_kg": 1.5,
+  "description": "Instrument de musique."
+}

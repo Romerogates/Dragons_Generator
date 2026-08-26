@@ -1,0 +1,25 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-kalam",
+  "name": "Kalam",
+  "category": "base",
+  "typical_speakers": [
+    "Habitants des Royaumes des Sables",
+    "Barbaresques",
+    "Habitants de Ghardat"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-abjad-kalam",
+      "label": "Abjad kalam",
+      "type": "alphabet"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [
+    "Royaumes des Sables",
+    "Îles Barbaresques",
+    "Ghardat"
+  ],
+  "description": "Langue principale des Royaumes des Sables, des barbaresques et de Ghardat. Les tribus isolées parlent des dialectes locaux parfois difficiles à comprendre. Elle s'écrit de droite à gauche en abjad kalam."
+}

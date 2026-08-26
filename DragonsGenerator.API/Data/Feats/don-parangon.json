@@ -1,0 +1,33 @@
+{
+  "schema_version": "2.0",
+  "id": "don-parangon",
+  "name": "Parangon",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [],
+  "ability_score_increase": {
+    "ability": "any",
+    "value": 1,
+    "max": 20
+  },
+  "description": "+1 dans une caractéristique au choix (max 20). Quand vous réussissez un coup critique ou réduisez une créature à 0 PV, tous les alliés qui vous voient dans un rayon de 9 m reçoivent immédiatement bonus_maitrise + mod. Charisme PV temporaires (min 1).",
+  "benefits": [
+    {
+      "type": "ability_score_increase",
+      "ability": "any",
+      "value": 1
+    },
+    {
+      "type": "aura_temp_hp",
+      "trigger": "coup critique ou réduire créature à 0 PV",
+      "formula": "bonus_maitrise + CHA",
+      "range_m": 9
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "leadership",
+    "aura",
+    "inspiration"
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "schema_version": "2.0",
+  "id": "civ-iles-barbaresques",
+  "name": "Barbaresques (Îles)",
+  "randomization": {
+    "dice": "d100",
+    "min": 13,
+    "max": 22
+  },
+  "demographics": {
+    "primary_species": [
+      {
+        "id": "sp-tous",
+        "label": "Tous les peuples"
+      }
+    ],
+    "secondary_species": [],
+    "is_cosmopolitan": true,
+    "cosmopolitan_zones": [
+      "archipel entier"
+    ],
+    "social_roles": [
+      {
+        "id": "role-immigre",
+        "label": "Population composée d'immigrés de tous horizons"
+      }
+    ],
+    "peoples_note": "Tous les peuples. Population composée d'immigrés de tous les horizons."
+  },
+  "official_languages": [
+    {
+      "id": "lg-kalam",
+      "label": "Kalam"
+    }
+  ],
+  "multilingual": true,
+  "writing_systems": [
+    {
+      "id": "wr-abjad-kalam",
+      "label": "Abjad kalam",
+      "type": "abjad"
+    }
+  ],
+  "is_oral_only": false,
+  "description": "Pirates ! Corsaires ! Flibustiers ! De l'extérieur, les Îles Barbaresques semblent n'être peuplées que de ces marginaux et de leurs (trop nombreux) complices. En réalité, les premiers seigneurs pirates sont progressivement devenus des chefs de ports et de cités, fondant pour ainsi dire des cités-États, dont une partie importante de l'économie est prédatrice. La vente du sucre et du cacao de leurs îles leur suffit rarement, et ils gagnent bien plus — et plus vite — par d'autres moyens : piraterie, commerce d'esclaves, mercenariat. Les actuels habitants des Îles Barbaresques connaissent très mal — quand ils n'ignorent pas purement et simplement — le passé de leurs terres. Ne faudrait-il pas s'inquiéter des rites étranges accomplis par certains à la tombée de la nuit ?",
+  "geography_tags": [
+    "archipel",
+    "ports",
+    "cites-etats"
+  ],
+  "threat_ids": [
+    "threat-piraterie",
+    "threat-commerce-esclaves",
+    "threat-rites-etranges"
+  ]
+}

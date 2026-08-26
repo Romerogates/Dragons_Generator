@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-gobelin",
+  "name": "Gobelin",
+  "category": "base",
+  "typical_speakers": [
+    "Gobelins",
+    "Gobelours",
+    "Hobgobelins"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-santak",
+      "label": "Santak",
+      "type": "cuneiforme"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [],
+  "description": "Langue des gobelins, gobelours et hobgobelins. Les hobgobelins sont les seuls à disposer d'une tradition écrite (cunéiforme santak), souvenir de l'âge d'or de la Horde. Les tribus gobelinoïdes ont souvent des dialectes distincts mais restent mutuellement intelligibles."
+}

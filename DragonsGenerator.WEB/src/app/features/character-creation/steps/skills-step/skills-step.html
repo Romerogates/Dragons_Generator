@@ -1,16 +1,6 @@
 <div
   class="relative w-full flex flex-col items-center animate-fade-in pb-8 select-none min-h-[65vh] justify-center"
 >
-  <div class="absolute top-2 left-0 z-50">
-    <button
-      class="text-sm font-semibold text-slate-400 hover:text-amber-400 transition-colors flex items-center gap-2 px-3 py-2 md:px-4 bg-[#1b2028] rounded-lg border border-slate-700 hover:border-amber-500/50 shadow-lg animate-fade-in"
-      (click)="prevStep()"
-    >
-      <span class="sm:hidden">← Retour</span>
-      <span class="hidden sm:inline">← Étape précédente</span>
-    </button>
-  </div>
-
   <div class="text-center mb-8 w-full px-4 mt-2">
     <h2
       class="text-3xl font-extrabold text-amber-500 mb-1 drop-shadow-md tracking-wide font-serif flex justify-center items-center gap-3"
@@ -45,7 +35,7 @@
       <div class="flex flex-wrap gap-3">
         @for (skill of classSkillOptions(); track skill.id) {
           <button
-            class="px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition-all duration-200 flex items-center gap-2"
+            class="px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition-[colors,transform,opacity,box-shadow] duration-150 flex items-center gap-2"
             [ngClass]="
               selectedClassSkills().includes(skill.id)
                 ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
@@ -85,52 +75,90 @@
         >
           <iconify-icon icon="fluent-emoji:scroll"></iconify-icon> Compétences d'Historique
         </h4>
-        <span
-          class="text-[10px] font-black uppercase tracking-widest transition-colors duration-300"
-          [ngClass]="bgSkillsRemaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
-        >
-          {{ selectedBgSkills().length }} / {{ bgSkillChooseCount() }}
-        </span>
+        @if (bgSkillChooseCount() > 0) {
+          <span
+            class="text-[10px] font-black uppercase tracking-widest transition-colors duration-300"
+            [ngClass]="bgSkillsRemaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
+          >
+            {{ bgChosenCount() }} / {{ bgSkillChooseCount() }}
+          </span>
+        }
       </div>
       <p class="text-xs text-slate-500 mb-5">
-        Choisissez {{ bgSkillChooseCount() }} compétence(s) issues de votre passé.
+        @if (bgFixedSkills().length > 0 && bgSkillChooseCount() === 0) {
+          Compétences automatiquement accordées par votre historique (non modifiables).
+        } @else if (bgFixedSkills().length > 0) {
+          {{ bgFixedSkills().length }} compétence(s) fixe(s) + {{ bgSkillChooseCount() }} au choix.
+        } @else {
+          Choisissez {{ bgSkillChooseCount() }} compétence(s) issues de votre passé.
+        }
       </p>
 
       @if (!isCustomBg()) {
-        <div class="flex flex-wrap gap-3">
-          @for (skill of bgSkillOptions(); track skill.id) {
-            <button
-              class="px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition-all duration-200 flex items-center gap-2"
-              [ngClass]="
-                selectedBgSkills().includes(skill.id)
-                  ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
-                  : selectedClassSkills().includes(skill.id)
-                    ? 'bg-emerald-950/30 border-emerald-800/50 text-emerald-400/50 cursor-not-allowed'
-                    : bgSkillsRemaining() === 0
-                      ? 'bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed opacity-40'
-                      : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
-              "
-              [disabled]="
-                (!selectedBgSkills().includes(skill.id) && bgSkillsRemaining() === 0) ||
-                selectedClassSkills().includes(skill.id)
-              "
-              (click)="toggleBgSkill(skill.id)"
+        @if (bgFixedSkills().length > 0) {
+          <div class="mb-5">
+            <p
+              class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-2 flex items-center gap-1.5"
             >
-              <iconify-icon [icon]="skill.icon"></iconify-icon>
-              {{ skill.label }}
-              <span
-                class="text-[10px] ml-1 px-1.5 rounded transition-colors"
+              Accordées par l'historique
+            </p>
+            <div class="flex flex-wrap gap-2">
+              @for (id of bgFixedSkills(); track id) {
+                <span
+                  class="px-3 py-2 rounded-xl border border-slate-600/80 bg-slate-900/70 text-slate-300 text-sm font-bold flex items-center gap-2 cursor-default"
+                  title="Compétence d'historique — non modifiable"
+                >
+                  <span class="text-[10px] text-slate-500">🔒</span>
+                  {{ prettifySkill(id) }}
+                  <span
+                    class="text-[9px] uppercase tracking-widest text-slate-500 border border-slate-700 rounded px-1.5 py-0.5"
+                    >Historique</span
+                  >
+                  <span class="text-[10px] ml-0.5 px-1.5 rounded bg-slate-800 text-slate-400">
+                    {{ getModifierForSkill(id) }}
+                  </span>
+                </span>
+              }
+            </div>
+          </div>
+        }
+
+        @if (bgSkillChooseCount() > 0) {
+          <div class="flex flex-wrap gap-3">
+            @for (skill of bgSkillOptions(); track skill.id) {
+              <button
+                class="px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition-[colors,transform,opacity,box-shadow] duration-150 flex items-center gap-2"
                 [ngClass]="
                   selectedBgSkills().includes(skill.id)
-                    ? 'bg-emerald-600 text-emerald-950'
-                    : 'bg-slate-800 text-slate-400'
+                    ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-[1.02]'
+                    : selectedClassSkills().includes(skill.id)
+                      ? 'bg-emerald-950/30 border-emerald-800/50 text-emerald-400/50 cursor-not-allowed'
+                      : bgSkillsRemaining() === 0
+                        ? 'bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed opacity-40'
+                        : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
                 "
+                [disabled]="
+                  (!selectedBgSkills().includes(skill.id) && bgSkillsRemaining() === 0) ||
+                  selectedClassSkills().includes(skill.id)
+                "
+                (click)="toggleBgSkill(skill.id)"
               >
-                {{ getModifierForSkill(skill.id) }}
-              </span>
-            </button>
-          }
-        </div>
+                <iconify-icon [icon]="skill.icon"></iconify-icon>
+                {{ skill.label }}
+                <span
+                  class="text-[10px] ml-1 px-1.5 rounded transition-colors"
+                  [ngClass]="
+                    selectedBgSkills().includes(skill.id)
+                      ? 'bg-emerald-600 text-emerald-950'
+                      : 'bg-slate-800 text-slate-400'
+                  "
+                >
+                  {{ getModifierForSkill(skill.id) }}
+                </span>
+              </button>
+            }
+          </div>
+        }
       } @else {
         @if (selectedBgSkills().length > 0) {
           <div class="flex flex-wrap gap-2 mb-4">
@@ -154,7 +182,7 @@
             <select
               [ngModel]="customSkillInput()"
               (ngModelChange)="customSkillInput.set($event)"
-              class="flex-1 bg-[#171b22] border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-all appearance-none cursor-pointer"
+              class="flex-1 bg-[#171b22] border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 appearance-none cursor-pointer"
             >
               <option value="" disabled selected>Sélectionnez une compétence...</option>
               @for (skill of bgSkillOptions(); track skill.id) {
@@ -170,7 +198,7 @@
               }
             </select>
             <button
-              class="px-5 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-500 text-xs font-black uppercase tracking-widest hover:bg-amber-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-5 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-500 text-xs font-black uppercase tracking-widest hover:bg-amber-500/20 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               [disabled]="!customSkillInput()"
               (click)="addCustomBgSkill()"
             >
@@ -235,7 +263,7 @@
               <div class="flex flex-wrap gap-2">
                 @for (tool of group.items; track tool.id) {
                   <button
-                    class="px-3 py-2 rounded-xl border-2 text-xs font-bold transition-all duration-200"
+                    class="px-3 py-2 rounded-xl border-2 text-xs font-bold transition-[colors,transform,opacity,box-shadow] duration-150"
                     [ngClass]="
                       isToolSelected(tool.id)
                         ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
@@ -255,7 +283,8 @@
         } @else {
           @for (group of bgToolChoiceGroups(); track group.groupIndex) {
             <p class="text-xs text-slate-500 mb-4 mt-3">
-              Choisissez {{ group.chooseCount }} maîtrise{{ group.chooseCount > 1 ? 's' : '' }}.
+              Choisissez {{ group.chooseCount }} maîtrise{{ group.chooseCount > 1 ? 's' : '' }}
+              — puis l'outil précis dans la liste.
               @if (group.note) {
                 <span class="italic text-slate-600 ml-1">{{ group.note }}</span>
               }
@@ -263,45 +292,210 @@
             <div class="flex flex-wrap gap-3 mb-4">
               @for (opt of group.options; track opt.key) {
                 <button
-                  class="px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition-all duration-200"
+                  class="px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition-[colors,transform,opacity,box-shadow] duration-150"
                   [ngClass]="
                     opt.selected
                       ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
-                      : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+                      : expandedBgToolCategory() === opt.category
+                        ? 'bg-amber-500/20 border-amber-500 text-amber-400'
+                        : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
                   "
-                  (click)="toggleBgTool(opt.key, group)"
+                  (click)="onBgToolOptionClick(opt, group)"
                 >
                   {{ opt.label }}
+                  @if (opt.selected && opt.category) {
+                    <span class="block text-[9px] font-black uppercase tracking-widest opacity-80 mt-0.5">
+                      {{ getSelectedConcreteToolLabel(opt.category, opt.label) }}
+                    </span>
+                  }
                 </button>
               }
             </div>
+
+            @if (expandedBgToolCategory(); as cat) {
+              <div
+                class="mb-6 p-4 rounded-xl border border-amber-800/40 bg-amber-950/20"
+              >
+                <p
+                  class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-3"
+                >
+                  Choisissez l'outil précis
+                </p>
+                <div class="flex flex-wrap gap-2">
+                  @for (tool of toolsForExpandedCategory(); track tool.id) {
+                    <button
+                      class="px-3 py-2 rounded-xl border-2 text-xs font-bold transition-[colors,transform,opacity,box-shadow] duration-150 bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer"
+                      (click)="pickConcreteBgTool(tool.id, cat, group)"
+                    >
+                      {{ tool.name }}
+                    </button>
+                  }
+                </div>
+              </div>
+            }
           }
         }
       </div>
     }
 
-    <div class="mt-4 flex flex-col items-center gap-4 w-full">
-      @if (isSelectionComplete()) {
-        <div
-          class="px-6 py-2.5 bg-emerald-950/30 text-emerald-400 border border-emerald-800/50 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-3 shadow-[0_0_15px_rgba(16,185,129,0.1)]"
-        >
-          <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
-          Savoirs et maîtrises définis
+    @if (speciesBonusSkillCount() > 0) {
+      <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+        <div class="flex justify-between items-center mb-2">
+          <h4
+            class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
+          >
+            <iconify-icon icon="fluent-emoji:sparkles"></iconify-icon> Compétences d'espèce
+            (Polyvalence)
+          </h4>
+          <span
+            class="text-[10px] font-black uppercase tracking-widest"
+            [ngClass]="speciesSkillsRemaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
+          >
+            {{ selectedSpeciesSkills().length }} / {{ speciesBonusSkillCount() }}
+          </span>
         </div>
-      }
+        <p class="text-xs text-slate-500 mb-5">
+          Votre héritage vous offre {{ speciesBonusSkillCount() }} compétence(s) supplémentaire(s)
+          au choix.
+        </p>
+        <div class="flex flex-wrap gap-2">
+          @for (skill of speciesSkillOptions(); track skill.id) {
+            <button
+              class="px-3 py-2 rounded-xl border-2 text-xs font-bold transition-[colors,transform,opacity,box-shadow] duration-150"
+              [ngClass]="
+                selectedSpeciesSkills().includes(skill.id)
+                  ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
+                  : isSkillSelected(skill.id)
+                    ? 'bg-slate-900 border-slate-800 text-slate-600 opacity-40 cursor-not-allowed'
+                    : speciesSkillsRemaining() === 0
+                      ? 'bg-slate-900 border-slate-800 text-slate-600 opacity-40 cursor-not-allowed'
+                      : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+              "
+              [disabled]="
+                (!selectedSpeciesSkills().includes(skill.id) &&
+                  (isSkillSelected(skill.id) || speciesSkillsRemaining() === 0))
+              "
+              (click)="toggleSpeciesSkill(skill.id)"
+            >
+              {{ skill.label }}
+            </button>
+          }
+        </div>
+      </div>
+    }
 
+    @if (speciesBonusToolCount() > 0) {
+      <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+        <div class="flex justify-between items-center mb-2">
+          <h4
+            class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
+          >
+            <iconify-icon icon="fluent-emoji:hammer-and-wrench"></iconify-icon> Outil d'espèce
+            (Polyvalence)
+          </h4>
+          <span
+            class="text-[10px] font-black uppercase tracking-widest"
+            [ngClass]="speciesToolsRemaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
+          >
+            {{ selectedSpeciesTools().length }} / {{ speciesBonusToolCount() }}
+          </span>
+        </div>
+        <p class="text-xs text-slate-500 mb-5">
+          Choisissez {{ speciesBonusToolCount() }} maîtrise(s) d'outil liée(s) à votre peuple.
+        </p>
+        @for (group of toolGroups(); track group.label) {
+          <div class="mb-5">
+            <div class="flex items-center gap-2 mb-3">
+              <iconify-icon [icon]="group.icon" class="text-lg"></iconify-icon>
+              <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                {{ group.label }}
+              </span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              @for (tool of group.items; track tool.id) {
+                <button
+                  class="px-3 py-2 rounded-xl border-2 text-xs font-bold transition-[colors,transform,opacity,box-shadow] duration-150"
+                  [ngClass]="
+                    selectedSpeciesTools().includes(tool.id)
+                      ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
+                      : speciesToolsRemaining() === 0
+                        ? 'bg-slate-900 border-slate-800 text-slate-600 opacity-40 cursor-not-allowed'
+                        : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+                  "
+                  [disabled]="
+                    speciesToolsRemaining() === 0 && !selectedSpeciesTools().includes(tool.id)
+                  "
+                  (click)="toggleSpeciesTool(tool.id)"
+                >
+                  {{ tool.name }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    @if (expertiseNeeded() > 0) {
+      <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-violet-900/50 shadow-xl">
+        <div class="flex justify-between items-center mb-2">
+          <h4
+            class="text-[10px] font-black uppercase tracking-widest text-violet-400 flex items-center gap-2"
+          >
+            <iconify-icon icon="fluent-emoji:sparkles"></iconify-icon> Expertise
+          </h4>
+          <span
+            class="text-[10px] font-black uppercase tracking-widest"
+            [ngClass]="expertiseRemaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
+          >
+            {{ selectedExpertise().length }} / {{ expertiseNeeded() }}
+          </span>
+        </div>
+        <p class="text-xs text-slate-500 mb-5">
+          Doublez votre bonus de maîtrise sur {{ expertiseNeeded() }} compétence(s) déjà maîtrisées.
+        </p>
+        <div class="flex flex-wrap gap-3">
+          @for (skill of expertiseCandidates(); track skill.id) {
+            <button
+              type="button"
+              class="px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition-colors flex items-center gap-2"
+              [ngClass]="
+                isExpertiseSelected(skill.id)
+                  ? 'border-violet-400 bg-violet-950/50 text-violet-200'
+                  : 'border-slate-700 bg-[#171b22] text-slate-300 hover:border-violet-500/50'
+              "
+              (click)="toggleExpertise(skill.id)"
+            >
+              {{ skill.label }}
+            </button>
+          }
+        </div>
+        @if (expertiseCandidates().length === 0) {
+          <p class="text-xs text-amber-500/80">
+            Sélectionnez d’abord vos compétences de classe / historique.
+          </p>
+        }
+      </div>
+    }
+
+    <nav class="wizard-step-nav">
+      <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
+        ← Étape précédente
+      </button>
+      @if (isSelectionComplete()) {
+        <span class="wizard-nav-status">
+          <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+          Savoirs définis
+        </span>
+      }
       <button
-        class="px-14 py-4 rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-lg"
-        [ngClass]="
-          isSelectionComplete()
-            ? 'bg-amber-500 text-slate-950 hover:bg-amber-400 hover:scale-105 shadow-[0_0_25px_rgba(245,158,11,0.3)]'
-            : 'bg-slate-800 text-slate-500 opacity-50 cursor-not-allowed'
-        "
+        type="button"
+        class="wizard-nav-primary"
         [disabled]="!isSelectionComplete()"
         (click)="confirmSelection()"
       >
         Forger les maîtrises
       </button>
-    </div>
+    </nav>
   </div>
 </div>

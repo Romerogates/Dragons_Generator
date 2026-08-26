@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-menottes",
+  "name": "Menottes",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 2,
+    "unit": "po"
+  },
+  "weight_kg": 3,
+  "description": "Pour créatures de taille P ou M. Test de Dextérité DD 20 pour s'extraire ou Force DD 20 pour briser. 15 points de vie."
+}

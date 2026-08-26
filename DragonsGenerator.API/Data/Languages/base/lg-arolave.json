@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-arolave",
+  "name": "Arolave",
+  "category": "base",
+  "typical_speakers": [
+    "Humains d'Arolavie"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-cyfand",
+      "label": "Cyfand",
+      "type": "alphabet"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [
+    "Arolavie (continent du Cyfandir)"
+  ],
+  "description": "Langue principale de l'Arolavie, située au nord-est du Cyfandir. L'arolave s'écrit à l'aide de l'alphabet cyfand."
+}

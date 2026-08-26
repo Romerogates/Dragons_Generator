@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-protecteur-de-la-foi",
+  "name": "Protecteur de la foi",
+  "level": 4,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 8,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "Un gardien spectral de taille G apparaît et plane pour toute la durée du sort dans un espace inoccupé de votre choix que vous voyez à portée. Le gardien occupe cet espace et est totalement flou, à l'exception d'une épée et d'un bouclier scintillants, ce dernier marqué du symbole de votre divinité. Toute créature qui vous est hostile et se déplace vers un espace situé dans un rayon de 3 m du gardien pour la première fois d'un tour de jeu doit effectuer un JS Dextérité et subit 20 dégâts radiants en cas d'échec, la moitié en cas de réussite. Le gardien disparaît quand il a infligé un total de 60 dégâts.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, le total de dégâts qu'inflige le gardien avant de disparaître augmente de 20 par niveau d'emplacement au-dessus du 4e.",
+  "modular_options": []
+}

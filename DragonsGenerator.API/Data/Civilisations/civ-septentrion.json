@@ -1,0 +1,53 @@
+{
+  "schema_version": "2.0",
+  "id": "civ-septentrion",
+  "name": "Septentrion",
+  "randomization": {
+    "dice": "d100",
+    "min": 96,
+    "max": 97
+  },
+  "demographics": {
+    "primary_species": [
+      {
+        "id": "sp-humain",
+        "label": "Humains"
+      }
+    ],
+    "secondary_species": [
+      {
+        "id": "sp-aldaron",
+        "label": "Aldarons (quelques-uns)"
+      }
+    ],
+    "is_cosmopolitan": false,
+    "cosmopolitan_zones": [],
+    "social_roles": [],
+    "peoples_note": "Humains en grande majorité. Quelques Aldarons."
+  },
+  "official_languages": [
+    {
+      "id": "lg-nordique",
+      "label": "Nordique"
+    }
+  ],
+  "multilingual": false,
+  "writing_systems": [],
+  "is_oral_only": true,
+  "description": "Une vie rude et libre, ainsi pourrait-on résumer l'existence dans le Septentrion, vaste territoire peu peuplé tout au nord du Cyfandir et du Kaan. Entre la toundra, la taïga, les montagnes, les vallées abritées et les marais, on découvre une grande diversité de paysages, de flore et de faune, mais aussi de mœurs. Certaines tribus vivent selon les préceptes sages de leurs druides, d'autres mènent une existence brutale, allant souvent prendre par la force ce qui leur manque. Vivre dans le Septentrion, c'est d'abord apprendre à résister à un environnement parmi les plus dangereux d'Eana. Il faut aussi savoir défendre sa vie contre les autres tribus, les fauves, les remorhazs, les géants des glaces, les dragons blancs… Par prudence, on évite généralement de s'approcher des ruines boréales, de peur de libérer sur le monde de nouveaux périls.",
+  "geography_tags": [
+    "toundra",
+    "taiga",
+    "montagnes",
+    "marais",
+    "vallees"
+  ],
+  "threat_ids": [
+    "threat-tribus-brutales",
+    "threat-fauves",
+    "threat-remorhaz",
+    "threat-geant-des-glaces",
+    "threat-dragon-blanc",
+    "threat-ruines-boreales"
+  ]
+}

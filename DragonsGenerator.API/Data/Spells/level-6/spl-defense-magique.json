@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-defense-magique",
+  "name": "Défense magique",
+  "level": 6,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 10,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 24,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(de l'encens qui brûle"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien"
+  ],
+  "description": "D Vous créez un sceau couvrant un maximum de 225 m² au sol (une zone de 15 m de côté, cent carrés de 1,50 m de côté ou vingt-cinq carrés de 3 m de côté). La zone protégée peut faire jusqu'à 6 m de haut et avoir la forme de votre choix. Vous pouvez protéger plusieurs étages d'une place forte en y répartissant la zone tant que vous pouvez fouler chaque zone contiguë au moment de l'incantation. Au moment de l'incantation, vous pouvez nommer des individus qui ne seront pas affectés par tout ou partie des effets choisis. Vous pouvez également préciser un mot de passe qui, lorsqu'il est prononcé à haute voix, immunise celui qui le prononce contre ces effets. Défense magique génère les effets suivants dans la zone protégée. ### Couloirs Les couloirs protégés sont remplis de brouillard, ce qui les rend grandement voilés. En outre, chaque fois qu'une créature autre que vous parvient à une intersection ou un embranchement, il y a 50 % de chances pour qu'elle soit convaincue d'aller dans la direction opposée à celle qu'elle prend en réalité. Toutes les portes de la zone protégée sont magiquement verrouillées, comme sous l'effet du sort verrou du mage. En outre, vous pouvez couvrir jusqu'à dix portes avec une illusion (équivalent à la fonction d'objet illusoire du sort illusion mineure) qui leur donne l'apparence d'un pan de mur. ### Escaliers Des toiles d'araignée envahissent les escaliers de la zone protégée de haut en bas, comme sous l'effet du sort toile d'araignée. Elles se reconstituent en 10 minutes si elles sont brûlées ou déchirées tant que persiste défense magique. ### Autre effet magique Vous pouvez choisir un des effets magiques suivants et le placer dans la zone protégée de la place forte. Lumières dansantes dans quatre couloirs. Vous pouvez élaborer un programme simple que les lumières répètent tant que persiste défense magique. Bouche magique dans deux endroits. Nuage nauséabond dans deux endroits. Les vapeurs apparaissent là où vous le souhaitez et reviennent en 10 minutes si le vent les disperse tant que persiste défense magique. Une bourrasque permanente dans un couloir ou une salle. Suggestion dans un endroit. Choisissez une zone de 1,50 m de côté maximum. Toute créature qui y entre ou la traverse entend mentalement la suggestion. La zone protégée dégage une aura magique. Une dissipation de la magie jetée sur un effet spécifique élimine ce dernier en cas de réussite. Vous pouvez créer une structure protégée et gardée à jamais en y jetant ce sort tous les jours pendant un an. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau ou supérieur, la durée augmente de 24 heures par niveau d'emplacement au-dessus du 6e.",
+  "modular_options": []
+}

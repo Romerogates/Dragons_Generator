@@ -1,0 +1,87 @@
+{
+  "schema_version": "2.0",
+  "id": "civ-kaan",
+  "name": "Kaan",
+  "randomization": {
+    "dice": "d100",
+    "min": 73,
+    "max": 76
+  },
+  "demographics": {
+    "primary_species": [
+      {
+        "id": "sp-humain",
+        "label": "Humains"
+      },
+      {
+        "id": "sp-merosi",
+        "label": "Merosis"
+      },
+      {
+        "id": "sp-orc",
+        "label": "Orcs"
+      },
+      {
+        "id": "sp-gobelin",
+        "label": "Gobelins"
+      },
+      {
+        "id": "sp-gobelours",
+        "label": "Gobelours"
+      },
+      {
+        "id": "sp-hobgobelin",
+        "label": "Hobgobelins"
+      },
+      {
+        "id": "sp-kobold",
+        "label": "Kobolds"
+      },
+      {
+        "id": "sp-ulkani",
+        "label": "Ulkani"
+      }
+    ],
+    "secondary_species": [
+      {
+        "id": "sp-tous",
+        "label": "Autres peuples (cités côtières)"
+      }
+    ],
+    "is_cosmopolitan": false,
+    "cosmopolitan_zones": [
+      "cités côtières"
+    ],
+    "social_roles": [],
+    "peoples_note": "Humains, Merosis, Orcs, Gobelins, Gobelours, Hobgobelins, Kobolds, Ulkani. Les autres peuples surtout dans les cités côtières."
+  },
+  "official_languages": [
+    {
+      "id": "lg-kaani",
+      "label": "Kaani"
+    },
+    {
+      "id": "lg-gobelin",
+      "label": "Gobelin"
+    }
+  ],
+  "multilingual": true,
+  "writing_systems": [
+    {
+      "id": "wr-santak",
+      "label": "Santak",
+      "type": "cuneiforme"
+    }
+  ],
+  "is_oral_only": false,
+  "description": "Le cœur de l'empire kaani est composé d'une immense steppe où vivent des clans d'éleveurs et de guerriers. Il arrive qu'un chef se distingue et commence à rassembler une Horde composée d'humains, de merosis, d'orcs, d'hobgobelins, de gobelins, de géants des collines et de bien d'autres… avant de partir à la conquête du monde. Le premier et plus célèbre chef de Horde fut le terrible Tamerakh. On dit qu'il sacrifia sa capitale tout entière pour devenir un dieu. La gloire des Kaanis varie au gré des siècles. Aujourd'hui la capitale se trouve dans une ville côtière et la dynastie régnante prépare certainement ses prochaines guerres glorieuses.",
+  "geography_tags": [
+    "steppe",
+    "ville-cotiere"
+  ],
+  "threat_ids": [
+    "threat-tamerakh",
+    "threat-horde",
+    "threat-dynastie-conquerante"
+  ]
+}

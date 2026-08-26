@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-mise-a-mal",
+  "name": "Mise à mal",
+  "level": 6,
+  "school": "necromancie",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "Vous inoculez une grave maladie à une créature que vous voyez à portée. La cible doit effectuer un JS Constitution et subit 14d6 dégâts nécrotiques en cas d'échec, la moitié en cas de réussite. Les dégâts ne peuvent pas faire tomber la cible à moins de 1 point de vie. Si la cible rate son jet de sauvegarde, ses points de vie maximums sont réduits du montant des dégâts nécrotiques subis pendant 1 heure. Tout effet éliminant les maladies permet à la créature de recouvrer ses points de vie maximums avant la fin de cette heure.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau ou supérieur, les dégâts augmentent de 2d6 par niveau d'emplacement au-dessus du 6e.",
+  "modular_options": []
+}

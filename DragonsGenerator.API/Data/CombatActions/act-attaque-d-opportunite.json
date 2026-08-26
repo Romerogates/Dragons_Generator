@@ -1,0 +1,20 @@
+{
+  "schema_version": "2.0",
+  "id": "act-attaque-d-opportunite",
+  "name": "Attaque d'opportunité",
+  "action_cost": "reaction",
+  "category": "reaction",
+  "description": "Attaque de corps à corps déclenchée lorsqu'une créature que vous voyez sort de la portée de votre allonge en se déplaçant.",
+  "mechanics": {
+    "trigger": "Créature visible quitte votre allonge par un déplacement volontaire",
+    "cost": "réaction",
+    "attack": "Une attaque de corps à corps",
+    "timing": "Juste avant que la créature quitte l'allonge",
+    "not_provoked_by": [
+      "Action Se dégager",
+      "Téléportation",
+      "Déplacement forcé sans utiliser déplacement, action ou réaction (explosion, gravité, etc.)"
+    ]
+  },
+  "source": "livre_de_base"
+}

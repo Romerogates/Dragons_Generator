@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "tl-instruments-de-navigation",
+  "name": "Instruments de navigation",
+  "category": "tool",
+  "subcategory": "navigation",
+  "cost": {
+    "value": 25,
+    "unit": "po"
+  },
+  "weight_kg": 1,
+  "description": "Sert à la navigation maritime. Permet d'établir une route, lire des cartes et éviter de se perdre en mer."
+}

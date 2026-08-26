@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-reparation",
+  "name": "Réparation",
+  "level": 0,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-pretre"
+  ],
+  "description": "C e sort répare une fêlure ou une déchirure de l'objet touché, comme un maillon brisé, les deux moitiés d'une clef, une cape déchirée, ou une outre percée. Tant que la fêlure ou la déchirure ne dépasse pas 30 cm de long ni de profondeur, vous la réparez et il n'en reste aucune trace. Ce sort permet aussi de réparer un objet magique ou une créature artificielle, mais pas de restaurer sa magie. Pour être de qualité, la réparation doit être effectuée avec l'ensemble des composantes de l'objet ciblé : éclats d'une fiole brisée, fils d'un tissu déchiré, mailles d'une armure, etc. S'il en manque ne serait-ce qu'un fragment, la réparation pourra se faire, mais sera visible et plus ou moins fragile. Le meneur détermine alors dans quelles circonstances l'objet pourra de nouveau se briser. De plus, il n'est pas possible de lancer réparation deux fois sur le même objet ou la même portion d'objet. Par exemple, il est possible de réparer deux roues différentes d'un chariot, mais pas deux fois la même. Si vous utilisez cette option, à partir du niveau 5, vous pouvez également lancer une autre variante de réparation. Dans cette variante, le sort a une portée de 1,5 m et un temps d'incantation de 1 action. Il permet de rétablir l'état d'un objet tel qu'il était au round précédent, pourvu que toutes ses composantes soient dans la zone d'effet du sort. Tout ce qui est avalé, incorporé, fusionné, qui a servi à infliger des dégâts, ou est tenu dans les mains est exclu du champ de ce sort. Il sera par exemple possible de faire revenir un verre brisé sur la table avec le liquide qu'il contenait, mais pas de remplir à nouveau un verre dont le contenu vient d'être bu. Au niveau 11, la portée passe à 3 m, et vous pouvez restau rer un objet affecté au cours des deux précédents rounds. Au niveau 17, lancer le sort restaure tous les objets dans le rayon d'action.",
+  "modular_options": []
+}

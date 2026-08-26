@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-arme-irreductible",
+  "name": "Arme irréductible",
+  "level": 1,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action_bonus"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-paladin",
+    "cls-rodeur"
+  ],
+  "description": "L'arme que vous tenez devient soudain bien plus performante. Jusqu'à la fin du sort, chaque fois que vous jetez les dégâts d'une attaque réussie avec cette arme et que vous obtenez un résultat inférieur à la moyenne, on considère que vous avez en fait obtenu un résultat moyen, selon le tableau suivant : Dé et résultat initial Résultat retenu",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, tant que le sort persiste, la résistance contre les dégâts contondants, perforants ou tranchants ne s'applique pas contre votre arme.",
+  "modular_options": []
+}

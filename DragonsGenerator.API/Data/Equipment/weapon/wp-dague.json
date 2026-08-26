@@ -1,0 +1,25 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-dague",
+  "name": "Dague",
+  "category": "weapon",
+  "subcategory": "simple_melee",
+  "cost": {
+    "value": 2,
+    "unit": "po"
+  },
+  "weight_kg": 0.5,
+  "damage_dice": "1d4",
+  "damage_type": "perforant",
+  "properties": [
+    "prop-finesse",
+    "prop-lancer-6-18",
+    "prop-legere"
+  ],
+  "throw_range": {
+    "normal": 6,
+    "long": 18
+  },
+  "ammo_range": null,
+  "description": null
+}

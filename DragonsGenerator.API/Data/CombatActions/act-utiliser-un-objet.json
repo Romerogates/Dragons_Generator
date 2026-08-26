@@ -1,0 +1,16 @@
+{
+  "schema_version": "2.0",
+  "id": "act-utiliser-un-objet",
+  "name": "Utiliser un objet",
+  "action_cost": "action",
+  "category": "standard",
+  "description": "Interagir avec un objet qui demande de consacrer votre action, ou interagir avec plus d'un objet à votre tour de jeu.",
+  "mechanics": {
+    "use_cases": [
+      "Objet exigeant une action dédiée",
+      "Interaction avec plusieurs objets au même tour"
+    ],
+    "note": "Dégainer une arme dans le cadre d'une attaque ne nécessite pas cette action"
+  },
+  "source": "livre_de_base"
+}

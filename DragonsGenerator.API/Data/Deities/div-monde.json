@@ -1,0 +1,19 @@
+{
+  "schema_version": "2.0",
+  "id": "div-monde",
+  "name": "Monde",
+  "tonality": "harmonique",
+  "domains": [],
+  "other_names": [
+    "Eana",
+    "Cerf Stellaire",
+    "Grand arbre"
+  ],
+  "description": "Monde serait la première divinité, celle qui donna naissance précisément au monde qui porte son nom, Eana. Monde est honoré par les populations vivant en étroite relation avec la nature, en particulier les sociétés de chasseurs, cueilleurs, petits cultivateurs ou pêcheurs. Personne n'a jamais entendu parler pourtant de vœux ou prières exaucées par Eana. Cette divinité supérieure ne confère de pouvoirs qu'aux druides et aux rôdeurs. Du point de vue des druides, Eana incarne l'équilibre nécessaire à l'existence même de toutes les formes de vie. Son énergie essentielle ne se trouve pas dans le Plan Astral mais, selon la mythologie druidique, dans le cœur d'Eana.",
+  "worshippers_note": "Populations en étroite relation avec la nature : chasseurs, cueilleurs, petits cultivateurs, pêcheurs. Dans le culte de l'Étoile, le culte d'Eana est toléré mais considéré comme une religion antique et païenne.",
+  "grants_powers_to": [
+    "druide",
+    "rodeur"
+  ],
+  "source": "livre_de_base"
+}

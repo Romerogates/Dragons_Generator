@@ -1,0 +1,30 @@
+{
+  "schema_version": "2.0",
+  "id": "act-lutte",
+  "name": "Lutte",
+  "action_cost": "action",
+  "category": "special_attack",
+  "description": "Attaque de corps à corps spéciale visant à empoigner ou saisir une créature. Remplace une attaque de l'action Attaquer.",
+  "mechanics": {
+    "replaces": "Une attaque de l'action Attaquer",
+    "target_restrictions": {
+      "max_size_difference": 2,
+      "range": "Allonge (portée de corps à corps)"
+    },
+    "requirement": "Au moins une main libre",
+    "contest": {
+      "attacker": "Force (Athlétisme)",
+      "defender": "Force (Athlétisme) ou Dextérité (Acrobaties) — au choix de la cible"
+    },
+    "on_success": "État agrippé",
+    "escape": {
+      "cost": "action",
+      "contest": "Force (Athlétisme) ou Dextérité (Acrobaties) opposé à votre Force (Athlétisme)"
+    },
+    "move_grappled": {
+      "speed": "VD réduite de moitié",
+      "exception": "Cible au moins 2 crans de taille inférieure"
+    }
+  },
+  "source": "livre_de_base"
+}

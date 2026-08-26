@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "don-combat-tropical",
+  "name": "Combat tropical",
+  "requires_magic": false,
+  "category": "survival",
+  "prerequisites": [],
+  "ability_score_increase": {
+    "ability": "CON",
+    "value": 1,
+    "max": 20
+  },
+  "description": "+1 Constitution (max 20) + maîtrise des boucliers. Défense sans armure : tant que vous ne portez aucune armure, CA = 10 + mod. Dextérité + mod. Constitution (le bouclier n'annule pas ce bénéfice).",
+  "benefits": [
+    {
+      "type": "ability_score_increase",
+      "ability": "CON",
+      "value": 1
+    },
+    {
+      "type": "proficiency",
+      "proficiency_type": "armor",
+      "value": "bouclier"
+    },
+    {
+      "type": "unarmored_defense",
+      "formula": "10 + DEX + CON"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "défense",
+    "armure",
+    "constitution"
+  ]
+}

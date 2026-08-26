@@ -1,0 +1,1145 @@
+{
+  "id": "cls-moine",
+  "schema_version": "3.0",
+  "name": "Moine",
+  "flavor": {
+    "summary": "Maître des arts martiaux qui canalise l'énergie vitale du ki pour transcender les limites physiques et dépasser les contraintes de la chair.",
+    "lore_note": "L'entraînement d'un moine est physique et philosophique, passant par le jeûne, la méditation et une pratique intensive des arts martiaux. Le ki — force vitale liant le monde matériel au monde immatériel — est la source de tous leurs prodiges."
+  },
+  "hit_die": "1d8",
+  "hp_at_level_1": 8,
+  "hp_per_level_average": 5,
+  "primary_abilities": [
+    "dex",
+    "wis"
+  ],
+  "saving_throw_proficiencies": [
+    "str",
+    "dex"
+  ],
+  "armor_proficiencies": [],
+  "weapon_proficiencies": [
+    "wp-cat-simple",
+    "wp-epee-courte",
+    "wp-cimeterre",
+    "wp-ceste"
+  ],
+  "tool_proficiencies": [],
+  "choice_pools": [
+    {
+      "id": "choice-skills-cls-moine",
+      "name": "Compétences de classe",
+      "type": "skill_proficiency",
+      "allow_choice": true,
+      "quantity": 2,
+      "pool": [
+        "skill-acrobaties",
+        "skill-athletisme",
+        "skill-discretion",
+        "skill-histoire",
+        "skill-intuition",
+        "skill-religion"
+      ]
+    },
+    {
+      "id": "choice-tool-cls-moine",
+      "name": "Maîtrise d'outil",
+      "type": "tool_proficiency",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        "tl-cat-outils-artisan",
+        "tl-cat-instrument-musique",
+        "tl-outils-de-la-ferme"
+      ],
+      "note": "Certains monastères enseignent des outils spécialisés (empoisonneur, calligraphie). Remplacement autorisé par le meneur."
+    },
+    {
+      "id": "choice-equip-weapon-cls-moine",
+      "name": "Arme de départ",
+      "type": "equipment",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        "wp-epee-courte",
+        "wp-cimeterre",
+        "gr-paire-de-cestes",
+        "wp-cat-simple-cac-au-choix"
+      ]
+    },
+    {
+      "id": "choice-equip-pack-cls-moine",
+      "name": "Sac de départ",
+      "type": "equipment",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        "gr-sac-explorateur",
+        "gr-sac-aventurier"
+      ]
+    }
+  ],
+  "spellcasting": null,
+  "starting_equipment": {
+    "fixed": [
+      {
+        "item_id": "gr-flechette",
+        "quantity": 10
+      }
+    ],
+    "choice_pools": []
+  },
+  "progression": [
+    {
+      "level": 1,
+      "features": [
+        "feat-defense-sans-armure-moine",
+        "feat-arts-martiaux"
+      ],
+      "resources": {
+        "ki_points": 0,
+        "unarmored_movement_bonus_m": 0,
+        "martial_arts_die": "1d4"
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 2,
+      "features": [
+        "feat-ki",
+        "feat-deplacement-sans-armure"
+      ],
+      "resources": {
+        "ki_points": 2,
+        "unarmored_movement_bonus_m": 3,
+        "martial_arts_die": "1d4"
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 3,
+      "features": [
+        "feat-tradition-monastique",
+        "feat-parade-de-projectiles"
+      ],
+      "subclass_features_unlocked": true,
+      "resources": {
+        "ki_points": 3,
+        "unarmored_movement_bonus_m": 3,
+        "martial_arts_die": "1d4"
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 4,
+      "features": [
+        "feat-augmentation-de-caracteristique",
+        "feat-chute-ralentie"
+      ],
+      "resources": {
+        "ki_points": 4,
+        "unarmored_movement_bonus_m": 3,
+        "martial_arts_die": "1d4"
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 5,
+      "features": [
+        "feat-attaque-supplementaire",
+        "feat-coup-etourdissant"
+      ],
+      "feature_upgrades": [
+        "feat-arts-martiaux"
+      ],
+      "resources": {
+        "ki_points": 5,
+        "unarmored_movement_bonus_m": 3,
+        "martial_arts_die": "1d6"
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 6,
+      "features": [
+        "feat-attaques-ki",
+        "feat-aptitude-tradition-moine-6"
+      ],
+      "feature_upgrades": [
+        "feat-deplacement-sans-armure"
+      ],
+      "subclass_features_unlocked": true,
+      "resources": {
+        "ki_points": 6,
+        "unarmored_movement_bonus_m": 4.5,
+        "martial_arts_die": "1d6"
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 7,
+      "features": [
+        "feat-esquive-totale",
+        "feat-serenite"
+      ],
+      "resources": {
+        "ki_points": 7,
+        "unarmored_movement_bonus_m": 4.5,
+        "martial_arts_die": "1d6"
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 8,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "ki_points": 8,
+        "unarmored_movement_bonus_m": 4.5,
+        "martial_arts_die": "1d6"
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 9,
+      "features": [
+        "feat-amelioration-deplacement-sans-armure"
+      ],
+      "feature_upgrades": [
+        "feat-deplacement-sans-armure"
+      ],
+      "resources": {
+        "ki_points": 9,
+        "unarmored_movement_bonus_m": 4.5,
+        "martial_arts_die": "1d6"
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 10,
+      "features": [
+        "feat-purete-physique"
+      ],
+      "feature_upgrades": [
+        "feat-deplacement-sans-armure"
+      ],
+      "resources": {
+        "ki_points": 10,
+        "unarmored_movement_bonus_m": 6,
+        "martial_arts_die": "1d6"
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 11,
+      "features": [
+        "feat-aptitude-tradition-moine-11"
+      ],
+      "feature_upgrades": [
+        "feat-arts-martiaux"
+      ],
+      "subclass_features_unlocked": true,
+      "resources": {
+        "ki_points": 11,
+        "unarmored_movement_bonus_m": 6,
+        "martial_arts_die": "1d8"
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 12,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "ki_points": 12,
+        "unarmored_movement_bonus_m": 6,
+        "martial_arts_die": "1d8"
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 13,
+      "features": [
+        "feat-langue-du-soleil-et-de-la-lune"
+      ],
+      "resources": {
+        "ki_points": 13,
+        "unarmored_movement_bonus_m": 6,
+        "martial_arts_die": "1d8"
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 14,
+      "features": [
+        "feat-ame-de-diamant"
+      ],
+      "feature_upgrades": [
+        "feat-deplacement-sans-armure"
+      ],
+      "resources": {
+        "ki_points": 14,
+        "unarmored_movement_bonus_m": 7.5,
+        "martial_arts_die": "1d8"
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 15,
+      "features": [
+        "feat-corps-intemporel-moine"
+      ],
+      "resources": {
+        "ki_points": 15,
+        "unarmored_movement_bonus_m": 7.5,
+        "martial_arts_die": "1d8"
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 16,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "ki_points": 16,
+        "unarmored_movement_bonus_m": 7.5,
+        "martial_arts_die": "1d8"
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 17,
+      "features": [
+        "feat-aptitude-tradition-moine-17"
+      ],
+      "feature_upgrades": [
+        "feat-arts-martiaux"
+      ],
+      "subclass_features_unlocked": true,
+      "resources": {
+        "ki_points": 17,
+        "unarmored_movement_bonus_m": 7.5,
+        "martial_arts_die": "1d10"
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 18,
+      "features": [
+        "feat-desertion-de-l-ame"
+      ],
+      "feature_upgrades": [
+        "feat-deplacement-sans-armure"
+      ],
+      "resources": {
+        "ki_points": 18,
+        "unarmored_movement_bonus_m": 9,
+        "martial_arts_die": "1d10"
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 19,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "ki_points": 19,
+        "unarmored_movement_bonus_m": 9,
+        "martial_arts_die": "1d10"
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 20,
+      "features": [
+        "feat-perfection-de-l-etre"
+      ],
+      "resources": {
+        "ki_points": 20,
+        "unarmored_movement_bonus_m": 9,
+        "martial_arts_die": "1d10"
+      },
+      "proficiency_bonus": 6
+    }
+  ],
+  "features_details": [
+    {
+      "id": "feat-defense-sans-armure-moine",
+      "name": "Défense sans armure",
+      "unlocks_at_level": 1,
+      "recharge": "passive",
+      "action_type": null,
+      "ki_cost": 0,
+      "flavor": {
+        "summary": "La maîtrise du ki remplace le port d'armure : la plénitude intérieure devient bouclier.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "ca_formula": "10 + dex_mod + wis_mod",
+        "condition": "no_armor_no_shield"
+      }
+    },
+    {
+      "id": "feat-arts-martiaux",
+      "name": "Arts martiaux",
+      "unlocks_at_level": 1,
+      "recharge": "passive",
+      "action_type": null,
+      "ki_cost": 0,
+      "flavor": {
+        "summary": "Maîtrise des techniques de combat à mains nues et avec les armes de moine.",
+        "lore_note": "Les armes de moine incluent les épées courtes et toute arme courante de corps à corps sans propriété 'deux mains' ou 'lourde'."
+      },
+      "mechanics": {
+        "conditions_required": [
+          "no_armor_no_shield",
+          "unarmed_or_monk_weapon_only"
+        ],
+        "allow_dex_for_attack_and_damage": true,
+        "unarmed_damage_die_key": "martial_arts_die",
+        "unarmed_damage_die_source": "progression.resources.martial_arts_die",
+        "damage_die_scaling_levels": {
+          "1": "1d4",
+          "5": "1d6",
+          "11": "1d8",
+          "17": "1d10"
+        },
+        "bonus_unarmed_on_attack_action": {
+          "cost": "bonus_action",
+          "trigger": "after_attack_action_with_monk_weapon_or_unarmed"
+        }
+      }
+    },
+    {
+      "id": "feat-ki",
+      "name": "Ki",
+      "unlocks_at_level": 2,
+      "recharge": "short_rest",
+      "action_type": null,
+      "ki_cost": 0,
+      "flavor": {
+        "summary": "Réserve de points ki pour alimenter les pouvoirs martiaux mystiques du moine.",
+        "lore_note": "La récupération requiert au minimum 30 minutes de méditation lors du repos."
+      },
+      "mechanics": {
+        "points_formula": "class_level",
+        "save_dc_formula": "8 + prof_bonus + wis_mod",
+        "initial_ki_powers": [
+          "feat-ki-deluge-de-coups",
+          "feat-ki-patience-defensive",
+          "feat-ki-porte-par-le-vent"
+        ]
+      }
+    },
+    {
+      "id": "feat-ki-deluge-de-coups",
+      "name": "Déluge de coups",
+      "unlocks_at_level": 2,
+      "recharge": "at_will",
+      "action_type": "bonus_action",
+      "ki_cost": 1,
+      "flavor": {
+        "summary": "Déchaîne deux attaques à mains nues supplémentaires en action bonus après l'action Attaquer.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "trigger": "after_attack_action",
+        "effect": "2_unarmed_strikes",
+        "attack_count": 2
+      }
+    },
+    {
+      "id": "feat-ki-patience-defensive",
+      "name": "Patience défensive",
+      "unlocks_at_level": 2,
+      "recharge": "at_will",
+      "action_type": "bonus_action",
+      "ki_cost": 1,
+      "flavor": {
+        "summary": "Entreprend l'action Esquiver en action bonus.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "effect": "action_dodge_as_bonus_action"
+      }
+    },
+    {
+      "id": "feat-ki-porte-par-le-vent",
+      "name": "Porté par le vent",
+      "unlocks_at_level": 2,
+      "recharge": "at_will",
+      "action_type": "bonus_action",
+      "ki_cost": 1,
+      "flavor": {
+        "summary": "Entreprend Se dégager ou Foncer en action bonus, et double la distance des sauts jusqu'à la fin du tour.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "effect_options": [
+          "action_disengage_as_bonus_action",
+          "action_dash_as_bonus_action"
+        ],
+        "jump_distance_multiplier": 2,
+        "jump_bonus_duration": "end_of_current_turn"
+      }
+    },
+    {
+      "id": "feat-deplacement-sans-armure",
+      "name": "Déplacement sans armure",
+      "unlocks_at_level": 2,
+      "recharge": "passive",
+      "action_type": null,
+      "ki_cost": 0,
+      "flavor": {
+        "summary": "La maîtrise du ki accélère le moine, lui permettant d'aller toujours plus vite sans armure.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "condition": "no_armor_no_shield",
+        "speed_bonus_key": "unarmored_movement_bonus_m",
+        "speed_bonus_source": "progression.resources.unarmored_movement_bonus_m",
+        "speed_bonus_by_level": {
+          "2": 3,
+          "6": 4.5,
+          "10": 6,
+          "14": 7.5,
+          "18": 9
+        },
+        "upgrade_at_level_9": {
+          "description": "Déplacement sur surfaces verticales et liquides sans tomber ni sombrer durant le tour.",
+          "allows_vertical_surface_movement": true,
+          "allows_liquid_surface_movement": true
+        }
+      }
+    },
+    {
+      "id": "feat-tradition-monastique",
+      "name": "Tradition monastique",
+      "unlocks_at_level": 3,
+      "recharge": "passive",
+      "action_type": null,
+      "ki_cost": 0,
+      "flavor": {
+        "summary": "Engagement dans l'une des grandes voies monastiques qui façonnera le style de combat du moine.",
+        "lore_note": "Les traditions ne divergent que lorsque les disciples se perfectionnent ; les bases restent communes à tous."
+      },
+      "mechanics": {
+        "type": "subclass_unlock",
+        "subclass_feature_levels": [
+          3,
+          6,
+          11,
+          17
+        ]
+      }
+    },
+    {
+      "id": "feat-parade-de-projectiles",
+      "name": "Parade de projectiles",
+      "unlocks_at_level": 3,
+      "recharge": "at_will",
+      "action_type": "reaction",
+      "ki_cost": 0,
+      "flavor": {
+        "summary": "Détourne, voire saisit en plein vol les projectiles qui vous touchent.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "trigger": "hit_by_ranged_weapon_attack",
+        "damage_reduction_formula": "1d10 + dex_mod + class_level",
+        "catch_condition": {
+          "require_damage_reduced_to_0": true,
+          "require_free_hand": true,
+          "require_projectile_size_catchable": true
+        },
+        "counterattack_option": {
+          "ki_cost": 1,
+          "action_type": "same_reaction",
+          "attack_type": "ranged",
+          "range_normal_m": 6,
+          "range_extended_m": 18,
+          "treated_as_monk_weapon": true,
+          "proficiency_bonus_applies": true,
+          "ignores_weapon_proficiency_requirement": true
+        }
+      }
+    },
+    {
+      "id": "feat-augmentation-de-caracteristique",
+      "name": "Augmentation de caractéristique",
+      "unlocks_at_level": 4,
+      "recharge": "passive",
+      "action_type": null,
+      "ki_cost": 0,
+      "flavor": {
+        "summary": "Progression des caractéristiques aux niveaux 4, 8, 12, 16 et 19.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "available_at_levels": [
+          4,
+          8,
+          12,
+          16,
+          19
+        ],
+        "options": [
+          {
+            "type": "single_stat_increase",
+            "bonus": 2
+          },
+          {
+            "type": "two_stat_increase",
+            "bonus_each": 1
+          }
+        ],
+        "max_stat_value": 20
+      }
+    },
+    {
+      "id": "feat-chute-ralentie",
+      "name": "Chute ralentie",
+      "unlocks_at_level": 4,
+      "recharge": "at_will",
+      "action_type": "reaction",
+      "ki_cost": 0,
+      "flavor": {
+        "summary": "Réduit les dégâts de chute en contrôlant sa descente via le ki.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "trigger": "take_falling_damage",
+        "damage_reduction_formula": "5 * class_level"
+      }
+    },
+    {
+      "id": "feat-attaque-supplementaire",
+      "name": "Attaque supplémentaire",
+      "unlocks_at_level": 5,
+      "recharge": "passive",
+      "action_type": null,
+      "ki_cost": 0,
+      "flavor": {
+        "summary": "La maîtrise martiale permet deux frappes lors de l'action Attaquer.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "attacks_per_action": 2
+      }
+    },
+    {
+      "id": "feat-coup-etourdissant",
+      "name": "Coup étourdissant",
+      "unlocks_at_level": 5,
+      "recharge": "at_will",
+      "action_type": null,
+      "ki_cost": 1,
+      "flavor": {
+        "summary": "Perturbation des flux de ki adverses pour étourdir la cible après une frappe en mêlée.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "trigger": "hit_melee_weapon_attack_or_unarmed",
+        "saving_throw": {
+          "type": "saving_throw",
+          "target": "con",
+          "dc_formula": "ki_save_dc",
+          "condition": "on_failure"
+        },
+        "advantages": [
+          {
+            "type": "saving_throw",
+            "target": "con",
+            "condition": "contre le coup étourdissant"
+          }
+        ],
+        "on_failure_effect": "stunned",
+        "stun_duration": "until_end_of_your_next_turn"
+      }
+    },
+    {
+      "id": "feat-attaques-ki",
+      "name": "Attaques ki",
+      "unlocks_at_level": 6,
+      "recharge": "passive",
+      "action_type": null,
+      "ki_cost": 0,
+      "flavor": {
+        "summary": "Le ki imprègne les frappes à mains nues de propriétés magiques.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "unarmed_strikes_count_as_magical": true,
+        "bypasses": [
+          "resistance_nonmagical",
+          "immunity_nonmagical"
+        ]
+      }
+    },
+    {
+      "id": "feat-esquive-totale",
+      "name": "Esquive totale",
+      "unlocks_at_level": 7,
+      "recharge": "passive",
+      "action_type": null,
+      "ki_cost": 0,
+      "flavor": {
+        "summary": "Réflexes surnaturels permettant d'éviter totalement les effets de zone nécessitant un JS de Dextérité.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "trigger": "dex_saving_throw_for_half_damage",
+        "on_success": "no_damage",
+        "on_failure": "half_damage"
+      }
+    },
+    {
+      "id": "feat-serenite",
+      "name": "Sérénité",
+      "unlocks_at_level": 7,
+      "recharge": "at_will",
+      "action_type": "action",
+      "ki_cost": 0,
+      "flavor": {
+        "summary": "La clarté mentale du moine brise les effets de charme ou de peur.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "effect": "end_one_charmed_or_frightened_condition",
+        "target": "self"
+      }
+    },
+    {
+      "id": "feat-purete-physique",
+      "name": "Pureté physique",
+      "unlocks_at_level": 10,
+      "recharge": "passive",
+      "action_type": null,
+      "ki_cost": 0,
+      "flavor": {
+        "summary": "Le ki purifié du moine l'immunise contre les maladies et les poisons.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "immunities": [
+          "disease",
+          "poison"
+        ]
+      }
+    },
+    {
+      "id": "feat-langue-du-soleil-et-de-la-lune",
+      "name": "Langue du soleil et de la lune",
+      "unlocks_at_level": 13,
+      "recharge": "passive",
+      "action_type": null,
+      "ki_cost": 0,
+      "flavor": {
+        "summary": "Le ki effleure l'esprit d'autrui : compréhension universelle et expression universelle.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "understand_all_spoken_languages": true,
+        "all_language_speakers_understand_you": true
+      }
+    },
+    {
+      "id": "feat-ame-de-diamant",
+      "name": "Âme de diamant",
+      "unlocks_at_level": 14,
+      "recharge": "passive",
+      "action_type": null,
+      "ki_cost": 0,
+      "flavor": {
+        "summary": "La maîtrise absolue du ki confère la maîtrise de tous les jets de sauvegarde.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "all_saving_throw_proficiency": true,
+        "reroll_on_failed_save": {
+          "ki_cost": 1,
+          "must_keep_second_result": true
+        }
+      }
+    },
+    {
+      "id": "feat-corps-intemporel-moine",
+      "name": "Corps intemporel",
+      "unlocks_at_level": 15,
+      "recharge": "passive",
+      "action_type": null,
+      "ki_cost": 0,
+      "flavor": {
+        "summary": "Le moine transcende l'usure du temps et les besoins corporels fondamentaux.",
+        "lore_note": "Le moine reste mortel et peut mourir de vieillesse naturelle, mais échappe au vieillissement magique."
+      },
+      "mechanics": {
+        "immunity_to_magical_aging": true,
+        "no_need_for_food": true,
+        "no_need_for_water": true
+      }
+    },
+    {
+      "id": "feat-desertion-de-l-ame",
+      "name": "Désertion de l'âme",
+      "unlocks_at_level": 18,
+      "recharge": "at_will",
+      "action_type": "action",
+      "ki_cost": 4,
+      "flavor": {
+        "summary": "Le moine peut se rendre invisible et résistant, voire projeter son âme hors de son corps.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "options": [
+          {
+            "ki_cost": 4,
+            "effects": [
+              "invisible",
+              "resistance_all_damage_except_force"
+            ],
+            "duration_rounds": 10
+          },
+          {
+            "ki_cost": 8,
+            "effect": "cast_projection_astrale",
+            "no_material_components": true,
+            "restriction": "cannot_bring_other_creatures"
+          }
+        ]
+      }
+    },
+    {
+      "id": "feat-perfection-de-l-etre",
+      "name": "Perfection de l'être",
+      "unlocks_at_level": 20,
+      "recharge": "passive",
+      "action_type": null,
+      "ki_cost": 0,
+      "flavor": {
+        "summary": "Au moment critique, la maîtrise absolue restaure instantanément la réserve de ki.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "trigger": "roll_initiative_with_0_ki_points",
+        "effect": "gain_ki_points",
+        "amount": 4
+      }
+    },
+    {
+      "id": "feat-aptitude-tradition-moine-6",
+      "name": "Aptitude de Tradition (niveau 6)",
+      "unlocks_at_level": 6,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Aptitude conférée par la Tradition monastique choisie au niveau 6.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_feature_delegate",
+        "delegate_to_subclass": true,
+        "at_level": 6
+      }
+    },
+    {
+      "id": "feat-amelioration-deplacement-sans-armure",
+      "name": "Amélioration de Déplacement sans armure",
+      "unlocks_at_level": 9,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Au niveau 9, le moine peut utiliser son ki pour courir le long des murs verticaux ou sur l'eau sans tomber à la fin de son tour.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "feature_upgrade",
+        "upgrades_feature": "feat-deplacement-sans-armure",
+        "key": "special_movement",
+        "options": [
+          "wall_run",
+          "water_surface"
+        ]
+      }
+    },
+    {
+      "id": "feat-aptitude-tradition-moine-11",
+      "name": "Aptitude de Tradition (niveau 11)",
+      "unlocks_at_level": 11,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Aptitude conférée par la Tradition monastique choisie au niveau 11.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_feature_delegate",
+        "delegate_to_subclass": true,
+        "at_level": 11
+      }
+    },
+    {
+      "id": "feat-aptitude-tradition-moine-17",
+      "name": "Aptitude de Tradition (niveau 17)",
+      "unlocks_at_level": 17,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Aptitude conférée par la Tradition monastique choisie au niveau 17.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_feature_delegate",
+        "delegate_to_subclass": true,
+        "at_level": 17
+      }
+    }
+  ],
+  "subclasses": {
+    "name": "Tradition monastique",
+    "choice_id": "choice-tradition-cls-moine",
+    "level_unlocked": 3,
+    "feature_levels": [
+      3,
+      6,
+      11,
+      17
+    ],
+    "options": [
+      {
+        "id": "subcls-voie-de-la-paume",
+        "name": "Voie de la paume",
+        "flavor": {
+          "summary": "Maîtres des arts martiaux toutes techniques confondues, capables de bousculer et renverser leurs ennemis par la manipulation du ki.",
+          "lore_note": null
+        },
+        "feature_ids_by_level": {
+          "3": "feat-technique-de-la-paume",
+          "6": "feat-plenitude-physique",
+          "11": "feat-ataraxie",
+          "17": "feat-paume-vibratoire"
+        },
+        "features": [
+          {
+            "id": "feat-technique-de-la-paume",
+            "name": "Technique de la paume",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_type": null,
+            "ki_cost": 0,
+            "flavor": {
+              "summary": "Manipulation du ki ennemi lors du Déluge de coups pour bousculer, renverser ou interrompre.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "hit_with_flurry_of_blows_attack",
+              "apply_one_effect_per_hit": true,
+              "effects": [
+                {
+                  "id": "effect-bascule",
+                  "name": "Bascule",
+                  "saving_throw": {
+                    "type": "saving_throw",
+                    "target": "dex",
+                    "dc_formula": "ki_save_dc",
+                    "condition": "contre la Bascule"
+                  },
+                  "on_failure": "prone"
+                },
+                {
+                  "id": "effect-bourrade",
+                  "name": "Bourrade",
+                  "saving_throw": {
+                    "type": "saving_throw",
+                    "target": "str",
+                    "dc_formula": "ki_save_dc",
+                    "condition": "contre la Bourrade"
+                  },
+                  "on_failure": "pushed",
+                  "push_distance_m": 4.5
+                },
+                {
+                  "id": "effect-interruption",
+                  "name": "Interruption",
+                  "on_hit": "no_reaction",
+                  "duration": "until_end_of_your_next_turn"
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-plenitude-physique",
+            "name": "Plénitude physique",
+            "unlocks_at_level": 6,
+            "recharge": "long_rest",
+            "action_type": "action",
+            "ki_cost": 0,
+            "uses": 1,
+            "flavor": {
+              "summary": "Le moine canalise son ki pour se soigner en profondeur.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "effect": "heal_self",
+              "heal_formula": "3 * class_level"
+            }
+          },
+          {
+            "id": "feat-ataraxie",
+            "name": "Ataraxie",
+            "unlocks_at_level": 11,
+            "recharge": "long_rest",
+            "action_type": null,
+            "ki_cost": 0,
+            "uses": 1,
+            "flavor": {
+              "summary": "Une méditation profonde enveloppe le moine d'une aura de paix protectrice entre deux repos.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "after_long_rest",
+              "effect": "sanctuary_aura_active",
+              "duration": "until_next_long_rest",
+              "save_dc_formula": "8 + wis_mod + prof_bonus",
+              "effect_can_end_early": true
+            }
+          },
+          {
+            "id": "feat-paume-vibratoire",
+            "name": "Paume vibratoire",
+            "unlocks_at_level": 17,
+            "recharge": "at_will",
+            "action_type": null,
+            "ki_cost": 3,
+            "flavor": {
+              "summary": "Vibrations mortelles inoculées à distance, pouvant tuer ou infliger des dégâts nécrotiques massifs.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "hit_with_unarmed_strike",
+              "max_simultaneous_targets": 1,
+              "duration_days_formula": "class_level",
+              "activation": {
+                "action_type": "action",
+                "condition": "same_plane_of_existence",
+                "saving_throw": {
+                  "type": "saving_throw",
+                  "target": "con",
+                  "dc_formula": "ki_save_dc",
+                  "condition": "contre la Paume vibratoire"
+                },
+                "on_failure": "drop_to_0_hp",
+                "on_success": "10d10_necrotic_damage"
+              },
+              "can_dismiss_harmlessly": true
+            }
+          }
+        ]
+      },
+      {
+        "id": "subcls-voie-du-supplice",
+        "name": "Voie du supplice",
+        "flavor": {
+          "summary": "Maîtres qui embrassent la douleur comme ressource : chaque blessure reçue alimente le ki et décuple la puissance martiale.",
+          "lore_note": "La douleur est vue non comme une faiblesse mais comme une composante inépuisable du ki, à maîtriser plutôt qu'à fuir."
+        },
+        "feature_ids_by_level": {
+          "3": "feat-gratitude",
+          "6": "feat-sublimation",
+          "11": "feat-abnegation",
+          "17": "feat-la-derniere-danse"
+        },
+        "features": [
+          {
+            "id": "feat-gratitude",
+            "name": "Gratitude",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_type": "reaction",
+            "ki_cost": 0,
+            "flavor": {
+              "summary": "Le moine 'remercie' son attaquant d'une contre-frappe immédiate.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "take_damage_from_attack",
+              "damage_threshold_formula": "class_level",
+              "trigger_source_at_level_3": "weapon_attack_only",
+              "trigger_source_at_level_6": "weapon_attack_or_spell_damage",
+              "damage_type_match_at_level_6": true,
+              "effect": "melee_attack_against_target_in_range",
+              "upgrade_at_level_11": {
+                "free_movement": true,
+                "free_movement_distance": "speed",
+                "when": "before_or_after_attack"
+              }
+            }
+          },
+          {
+            "id": "feat-sublimation",
+            "name": "Sublimation",
+            "unlocks_at_level": 6,
+            "recharge": "passive",
+            "action_type": null,
+            "ki_cost": 0,
+            "flavor": {
+              "summary": "Toute douleur est aussitôt convertie en énergie ki brute.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "take_damage_excluding_temp_hp",
+              "conversion_rate": "floor(damage_taken / 10)",
+              "minimum_damage_for_gain": 10,
+              "ki_gained_per_10_damage": 1,
+              "no_action_required": true
+            }
+          },
+          {
+            "id": "feat-abnegation",
+            "name": "Abnégation",
+            "unlocks_at_level": 11,
+            "recharge": "passive",
+            "action_type": null,
+            "ki_cost": 0,
+            "flavor": {
+              "summary": "Le moine à demi terrassé devient son adversaire le plus dangereux.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "condition": "current_hp_lte_half_max_hp",
+              "advantages": [
+                {
+                  "type": "attack_roll",
+                  "scope": "all_weapon_attacks_and_unarmed_strikes",
+                  "condition": "quand les PV sont à la moitié ou moins"
+                }
+              ],
+              "saving_throw_bonus": 2
+            }
+          },
+          {
+            "id": "feat-la-derniere-danse",
+            "name": "La dernière danse",
+            "unlocks_at_level": 17,
+            "recharge": "at_will",
+            "action_type": null,
+            "ki_cost": 3,
+            "flavor": {
+              "summary": "Sur le seuil de la mort, une explosion de ki transforme chaque frappe en coup critique garanti.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "damage_would_reduce_to_0_hp_without_instant_kill",
+              "survive_with_hp": 1,
+              "bonus_effect": {
+                "type": "guaranteed_critical_hit",
+                "scope": "all_weapon_attacks_and_unarmed_strikes",
+                "duration": "until_end_of_your_next_turn"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

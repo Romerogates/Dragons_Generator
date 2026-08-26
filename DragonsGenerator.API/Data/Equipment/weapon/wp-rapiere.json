@@ -1,0 +1,20 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-rapiere",
+  "name": "Rapière",
+  "category": "weapon",
+  "subcategory": "martial_melee",
+  "cost": {
+    "value": 25,
+    "unit": "po"
+  },
+  "weight_kg": 1,
+  "damage_dice": "1d8",
+  "damage_type": "perforant",
+  "properties": [
+    "prop-finesse"
+  ],
+  "throw_range": null,
+  "ammo_range": null,
+  "description": null
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-brume-mortelle",
+  "name": "Brume mortelle",
+  "level": 5,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Vous créez une sphère de brume jaune-vert empoisonnée de 6 m de rayon centrée sur un point que vous choisissez à portée. Cette brume contourne les coins. Elle persiste pour toute la durée du sort, ou jusqu'à ce qu'un vent fort la disperse, mettant ainsi fin au sort. Sa zone est grandement voilée. Quand une créature entre dans la zone du sort pour la première fois d'un tour de jeu ou y commence son tour de jeu, elle doit effectuer un JS Constitution et subit 5d8 dégâts de poison en cas d'échec, la moitié en cas de réussite. Les créatures sont affectées même si elles retiennent leur souffle ou ne respirent pas. La brume s'éloigne de 3 m de vous au début de chacun de vos tours de jeu en épousant le relief. Les vapeurs étant plus lourdes que l'air, elles restent au niveau du sol et se glissent même dans les fissures.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, les dégâts augmentent de 1d8 par niveau d'emplacement au-dessus du 5e.",
+  "modular_options": []
+}

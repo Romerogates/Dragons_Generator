@@ -1,0 +1,27 @@
+{
+  "schema_version": "2.0",
+  "id": "don-regain",
+  "name": "Regain",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [],
+  "description": "Quand vos PV actuels < ½ PV max et que vous effectuez l'action Esquiver : vous pouvez dépenser un ou plusieurs dés de vie immédiatement + avantage à tous vos jets de sauvegarde (jusqu'à votre prochain tour) + dégâts reçus réduits de moitié (jusqu'à votre prochain tour) + vous pouvez effectuer gratuitement l'action Chercher.",
+  "benefits": [
+    {
+      "type": "triggered_action",
+      "trigger": "Esquiver quand PV < ½ max",
+      "effects": [
+        "dépenser dés de vie",
+        "avantage à tous JS (1 tour)",
+        "dégâts ×0.5 (1 tour)",
+        "action Chercher gratuite"
+      ]
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "survie",
+    "défense",
+    "endurance"
+  ]
+}

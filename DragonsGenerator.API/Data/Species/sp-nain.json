@@ -1,0 +1,255 @@
+{
+  "schema_version": "2.0",
+  "id": "sp-nain",
+  "name": "Nains",
+  "name_alt": [
+    "Dvaergen"
+  ],
+  "playable": true,
+  "requires_subspecies": true,
+  "source": {
+    "book": "Dragons - Livre de base: Aventuriers",
+    "pages": "29-33"
+  },
+  "flavor": {
+    "summary": "Les nains sont les derniers remparts contre les ravageurs du Chancre. Trapus, endurants et d'un caractère bien trempé, ils sont durs à la peine et ne se laissent pas facilement impressionner.",
+    "culture": "Les nains bâtisseurs se sont répandus bien au-delà du Dvaergejord. Artisans de renom, ils se regroupent en guildes, confréries et corporations. Certains ont abandonné le travail manuel au profit du commerce ou d'activités bancaires.",
+    "lore_notes": [
+      "Les jeunes artisans s'engagent souvent pour plusieurs années d'aventures au cours desquelles ils forgent leur réputation et se créent une clientèle.",
+      "Le vocable 'dvaerg' (pluriel : dvaergen) désigne le nain en langue naine. Les non-nains peinent à le prononcer et disent accidentellement des insultes, d'où la préférence pour 'nain' dans les échanges.",
+      "Les duergars, cousins maléfiques des nains, se seraient volontairement tournés vers le Mal et sont incapables de quitter l'Inframonde. Ils ne font pas partie des peuples piliers."
+    ]
+  },
+  "base_stats": {
+    "ability_score_increase": {
+      "con": 2
+    },
+    "speed": {
+      "base_m": 7.5,
+      "not_reduced_by_heavy_armor": true
+    },
+    "size": "M",
+    "darkvision_m": 18,
+    "age": {
+      "maturity_years": 50,
+      "lifespan_years": 350,
+      "flavor": "Considérés comme jeunes jusqu'à la cinquantaine. Longévité moyenne de 350 ans."
+    },
+    "alignment": {
+      "tendency": "Loyal Bon",
+      "flavor": "La plupart des nains sont loyaux, convaincus des vertus d'une société bien structurée. Leur sens de l'équité est très poussé."
+    }
+  },
+  "traits": [
+    {
+      "id": "trait-vision-noir-nain",
+      "name": "Vision dans le noir",
+      "flavor": {
+        "desc": "Habitué à vivre sous terre, vous êtes doté d'une vision supérieure dans les ténèbres et la pénombre. Dans un rayon de 18 m, vous voyez en lumière faible comme en lumière vive, et dans l'obscurité comme en lumière faible (nuances de gris)."
+      },
+      "mechanics": {
+        "type": "darkvision",
+        "range_m": 18
+      }
+    },
+    {
+      "id": "trait-resistance-naine",
+      "name": "Résistance naine",
+      "flavor": {
+        "desc": "Vous bénéficiez d'un avantage aux jets de sauvegarde contre le poison et d'une résistance aux dégâts de poison."
+      },
+      "mechanics": {
+        "type": "compound",
+        "advantages": [
+          {
+            "type": "saving_throw",
+            "target": "con",
+            "condition": "contre le poison"
+          }
+        ],
+        "resistances": [
+          "damage-poison"
+        ]
+      }
+    },
+    {
+      "id": "trait-formation-martiale-naine",
+      "name": "Formation martiale naine",
+      "flavor": {
+        "desc": "Vous bénéficiez de la maîtrise de la hachette, de la hache d'armes, du marteau léger et du marteau de guerre."
+      },
+      "mechanics": {
+        "type": "weapon_proficiency",
+        "grants": [
+          "hachette",
+          "hache-darmes",
+          "marteau-leger",
+          "marteau-de-guerre"
+        ]
+      }
+    },
+    {
+      "id": "trait-sens-pierre",
+      "name": "Sens de la pierre",
+      "flavor": {
+        "desc": "Chaque fois que vous effectuez un test d'Intelligence (Histoire) lié aux origines d'un travail de maçonnerie, on considère que vous êtes doté de la maîtrise de la compétence Histoire en appliquant même le double de votre bonus de maîtrise."
+      },
+      "mechanics": {
+        "type": "context_expertise",
+        "skill": "skill-histoire",
+        "context_trigger": "travaux_de_maconnerie",
+        "effect": "double_proficiency_bonus"
+      }
+    }
+  ],
+  "creation_choices": [
+    {
+      "id": "choice-maitrise-outils-nain",
+      "name": "Maîtrise d'outils artisan",
+      "flavor": {
+        "desc": "Vous bénéficiez de la maîtrise d'un type d'outils d'artisan de votre choix parmi les suivants."
+      },
+      "type": "tool_proficiency",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        "tl-necessaire-de-brasseur",
+        "tl-outils-de-forgeron",
+        "tl-outils-de-macon"
+      ]
+    },
+    {
+      "id": "choice-langue-regionale-nain",
+      "name": "Langue de résidence",
+      "flavor": {
+        "desc": "Si vous vivez à la surface, vous connaissez le commun ; si vous vivez dans l'Inframonde, le commun des profondeurs."
+      },
+      "type": "language",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        "lg-commun",
+        "lg-commun-des-profondeurs"
+      ]
+    }
+  ],
+  "languages": {
+    "fixed": [
+      "lg-nain"
+    ],
+    "choices": [
+      {
+        "id": "choice-langue-regionale-nain",
+        "allow_choice": true,
+        "quantity": 1,
+        "pool": [
+          "lg-commun",
+          "lg-commun-des-profondeurs"
+        ]
+      }
+    ]
+  },
+  "subspecies": [
+    {
+      "id": "sp-nain-gardien",
+      "name": "Nains gardiens",
+      "playable": true,
+      "flavor": {
+        "desc": "Les nains gardiens sont les premiers exposés aux dangers de l'Inframonde. Leur teint est clair, parfois pâle, leur regard brille du feu ardent de leur détermination. Leur chevelure et leur barbe sont souvent épaisses, aux teintes évoquant les minéraux : cuivre, bronze, obsidienne."
+      },
+      "ability_score_increase": {
+        "wis": 1
+      },
+      "traits": [
+        {
+          "id": "trait-gardien",
+          "name": "Gardien",
+          "flavor": {
+            "desc": "Vous acquérez la maîtrise des boucliers."
+          },
+          "mechanics": {
+            "type": "armor_proficiency",
+            "grants": [
+              "ar-bouclier"
+            ]
+          }
+        },
+        {
+          "id": "trait-resistance-corruption",
+          "name": "Résistance à la corruption",
+          "flavor": {
+            "desc": "Vous bénéficiez d'un avantage aux jets de sauvegarde visant à résister à la folie et aux sorts corrompus. Tous les sorts utilisés par une créature liée au Chancre sont considérés comme corrompus."
+          },
+          "mechanics": {
+            "type": "compound",
+            "advantages": [
+              {
+                "type": "saving_throw",
+                "target": "any",
+                "condition": "contre la folie"
+              },
+              {
+                "type": "saving_throw",
+                "target": "any",
+                "condition": "contre les sorts corrompus (Chancre)"
+              }
+            ]
+          }
+        }
+      ],
+      "creation_choices": []
+    },
+    {
+      "id": "sp-nain-batisseur",
+      "name": "Nains bâtisseurs",
+      "playable": true,
+      "flavor": {
+        "desc": "Les nains bâtisseurs sont dotés d'une grande intelligence mise au service de l'artisanat et d'une résistance remarquable. Leur teint est plus accentué (rosé, doré ou mat), leur chevelure et barbe plus raides."
+      },
+      "ability_score_increase": {
+        "int": 1
+      },
+      "traits": [
+        {
+          "id": "trait-maitre-artisan",
+          "name": "Maître artisan",
+          "flavor": {
+            "desc": "Vous bénéficiez d'un avantage aux tests de caractéristique associés à un type d'outils parmi ceux dont vous avez la maîtrise (un outil choisi au moment de prendre ce trait)."
+          },
+          "mechanics": {
+            "type": "tool_advantage",
+            "condition": "tests_avec_outil_maitrise_choisi",
+            "selection": "one_proficient_tool"
+          }
+        },
+        {
+          "id": "trait-robustesse-naine",
+          "name": "Robustesse naine",
+          "flavor": {
+            "desc": "Vos points de vie maximums augmentent de 1 à la création, puis de 1 supplémentaire à chaque niveau acquis."
+          },
+          "mechanics": {
+            "type": "hp_per_level_bonus",
+            "value": 1,
+            "unlocks_at_level": 1,
+            "applies_every_level": true
+          }
+        }
+      ],
+      "creation_choices": []
+    },
+    {
+      "id": "sp-nain-duergar",
+      "name": "Duergars",
+      "playable": false,
+      "playable_notes": "Les duergars sont apparus après la guerre de l'Aube et ne font pas partie des peuples piliers. Il peut exister des aventuriers duergars sur Eana, mais ils font face à une grande hostilité à la surface.",
+      "flavor": {
+        "desc": "Les duergars sont les cousins maléfiques des nains. Leur peau est souvent grise, parfois noire. Ils se seraient volontairement tournés vers le Mal pour en tirer des capacités surnaturelles, au prix d'une dépendance aux ténèbres les rendant incapables de quitter l'Inframonde."
+      },
+      "ability_score_increase": {},
+      "traits": [],
+      "creation_choices": []
+    }
+  ],
+  "optional_rules": []
+}

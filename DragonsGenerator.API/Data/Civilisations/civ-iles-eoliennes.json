@@ -1,0 +1,56 @@
+{
+  "schema_version": "2.0",
+  "id": "civ-iles-eoliennes",
+  "name": "Éoliennes (Îles)",
+  "randomization": {
+    "dice": "d100",
+    "min": 66,
+    "max": 71
+  },
+  "demographics": {
+    "primary_species": [
+      {
+        "id": "sp-gnome-des-roches",
+        "label": "Gnomes des roches"
+      },
+      {
+        "id": "sp-humain",
+        "label": "Humains"
+      }
+    ],
+    "secondary_species": [
+      {
+        "id": "sp-tous",
+        "label": "Autres peuples (individus installés par curiosité ou par goût)"
+      }
+    ],
+    "is_cosmopolitan": false,
+    "cosmopolitan_zones": [],
+    "social_roles": [],
+    "peoples_note": "Gnomes des roches, Humains. Les autres peuples peuvent s'y établir."
+  },
+  "official_languages": [
+    {
+      "id": "lg-gnome",
+      "label": "Gnome"
+    }
+  ],
+  "multilingual": false,
+  "writing_systems": [
+    {
+      "id": "wr-cyfand",
+      "label": "Cyfand",
+      "type": "alphabet"
+    }
+  ],
+  "is_oral_only": false,
+  "description": "Fabuleuses îles volantes, les Éoliennes forment un monde de merveilles où l'on voyage en néfélytre. Selon l'altitude, les vents, les nuages et les aménagements, les îlots peuvent prendre des aspects très divers. On peut y passer des années en ne croisant jamais personne, se croire seul au monde. D'autres, bien conscients de l'extérieur, explorent cette région mystérieuse et luttent contre des pirates des airs — à moins qu'il ne s'agisse de découvrir l'entrée vers le Plan Astral ?",
+  "geography_tags": [
+    "iles-volantes",
+    "nefelytre",
+    "plan-astral"
+  ],
+  "threat_ids": [
+    "threat-pirates-des-airs"
+  ]
+}

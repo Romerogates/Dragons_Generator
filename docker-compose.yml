@@ -1,17 +1,23 @@
 services:
-  # --- BACKEND ---
   dragons-api:
     container_name: dragons-api
     build:
       context: ./DragonsGenerator.API
       dockerfile: Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_HTTP_PORTS=8080
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__Default: "Data Source=/app/data/dragons.db"
+      # SMTP : définir via .env (Smtp__Host, Smtp__Port, Smtp__UserName, Smtp__Password, …)
+      App__PublicWebUrl: https://dragons-generator.top
+    volumes:
+      - dragons-api-data:/app/data
+    env_file:
+      - path: .env
+        required: false
     networks:
       - dragons-network
 
-  # --- FRONTEND ---
   dragons-web:
     container_name: dragons-web
     build:
@@ -19,14 +25,16 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
-      - "443:443" # NOUVEAU : On ouvre la porte pour le HTTPS
+      - "443:443"
     volumes:
-      # NOUVEAU : On donne à Nginx l'accès (en lecture seule 'ro') à tes nouveaux certificats
       - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - dragons-api
     networks:
       - dragons-network
+
+volumes:
+  dragons-api-data:
 
 networks:
   dragons-network:

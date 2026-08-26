@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-arme-magique",
+  "name": "Arme magique",
+  "level": 2,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action_bonus"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien",
+    "cls-paladin"
+  ],
+  "description": "Vous touchez une arme non magique. Tant que le sort persiste, cette arme devient une arme magique avec un bonus de +1 aux jets d'attaque et aux jets de dégâts. ### Meilleure arme magique Si vous utilisez cette variante, lorsque vous utilisez un emplacement de sort du 5e niveau ou supérieur, il n'est plus nécessaire de vous concentrer sur ce sort.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e ou 5e niveau, le bonus passe à +2. Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, le bonus passe à +3.",
+  "modular_options": []
+}

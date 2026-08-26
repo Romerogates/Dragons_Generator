@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-billes-1000",
+  "name": "Billes (sac de 1000)",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 7,
+    "unit": "po"
+  },
+  "weight_kg": 7,
+  "description": "Action pour répandre sur une zone carrée de 3 m de côté. JS Dextérité DD 10 ou chute à terre, sauf si déplacement à moitié de VD."
+}

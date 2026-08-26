@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-regeneration",
+  "name": "Régénération",
+  "level": 7,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un moulin à prières et de l'eau bénite"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-pretre"
+  ],
+  "description": "Vous touchez une créature pour stimuler ses facultés de guérison naturelles. La cible récupère 4d8 + 15 points de vie. Pour toute la durée du sort, elle récupère aussi 1 point de vie au début de chacun de ses tours de jeu (soit 10 points de vie par minute). Les membres sectionnés ou arrachés (doigts, jambes, queue, etc.) repoussent en 2 minutes. Si un membre tranché est apposé sur la plaie, il se ressoude instantanément.",
+  "modular_options": []
+}

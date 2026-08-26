@@ -1,0 +1,22 @@
+{
+  "schema_version": "2.0",
+  "id": "don-enchainement",
+  "name": "Enchaînement",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [],
+  "description": "Quand vous faites tomber une créature à 0 PV avec une attaque d'arme de corps à corps, vous obtenez une attaque supplémentaire pour ce tour. Maximum d'attaques supplémentaires par tour = votre bonus de maîtrise.",
+  "benefits": [
+    {
+      "type": "bonus_attack",
+      "trigger": "réduire créature à 0 PV (corps à corps)",
+      "max_per_turn": "bonus_maitrise"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "combat",
+    "attaques",
+    "corps-à-corps"
+  ]
+}

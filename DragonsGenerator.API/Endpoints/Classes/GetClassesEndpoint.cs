@@ -6,6 +6,10 @@ namespace DragonsGenerator.API.Endpoints.Classes;
 
 public class GetClassesEndpoint : EndpointWithoutRequest<List<CharacterClass>>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetClassesEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/classes");
@@ -14,7 +18,7 @@ public class GetClassesEndpoint : EndpointWithoutRequest<List<CharacterClass>>
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var classes = await JsonDataLoader.LoadAsync<List<CharacterClass>>("classes.json", ct);
-        await Send.OkAsync(classes ?? [], ct);
+        var classes = await _repo.GetClassesAsync(ct);
+        await Send.OkAsync(classes, ct);
     }
 }

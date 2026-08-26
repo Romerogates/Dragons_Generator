@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-aversion-attirance",
+  "name": "Aversion/attirance",
+  "level": 8,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-magicien"
+  ],
+  "description": "Ce sort attire ou repousse les créatures de votre choix. Vous choisissez une cible située à portée, qu'il s'agisse d'un objet ou d'une créature de taille TG ou inférieure, ou d'une zone pas plus grande qu'un cube de 60 m d'arête. Ensuite, nommez une espèce de créatures intelligentes, comme les dragons rouges, les gobelins ou les vampires. Vous conférez à la cible une aura qui attire ou, au contraire, repousse, les créatures citées pour toute la durée du sort. Choisissez une aura d'aversion ou d'attirance. Aversion. Les créatures de l'espèce choisie ont une envie irrépressible de quitter la zone et de s'éloigner de la cible. Quand une telle créature voit la cible ou s'en approche dans un rayon de 18 m, elle doit réussir un JS Sagesse sous peine d'être effrayée et de le rester tant qu'elle voit la cible ou se situe dans un rayon de 18 m. Tant qu'elle est effrayée par la cible, la créature doit utiliser son déplacement pour se diriger au plus court vers l'endroit sûr où elle ne verra plus la cible. Si elle se retrouve à plus de 18 m de la cible et qu'elle ne la voit plus, la créature n'est plus effrayée, mais elle le redevient si elle revoit la cible ou s'en approche dans un rayon de 18 m. Attirance. Les créatures de l'espèce choisie ont une envie irrépressible de s'approcher de la cible quand elles la voient ou se situent dans un rayon de 18 m d'elle. Quand une telle créature voit la cible ou s'en approche dans un rayon de 18 m, elle doit réussir un JS Sagesse sous peine d'utiliser son déplacement à chacun de ses tours de jeu pour entrer dans la zone ou approcher à portée de la cible. Une fois cela fait, elle peut s'en éloigner si elle le souhaite. Si la cible blesse ou fait du mal à une créature affectée, cette dernière peut effectuer un JS Sagesse pour mettre fin à l'effet, comme détaillé ci-dessous. Mettre fin à l'effet. Si une créature affectée termine son tour de jeu à plus de 18 m de la cible ou ne la voit plus, elle effectue un JS Sagesse. En cas de réussite, elle n'est plus affectée par le sort et comprend que le sentiment d'aversion ou d'attirance était de nature magique. Par ailleurs, une créature affectée par le sort a droit à un autre JS Sagesse toutes les 24 heures tant que le sort persiste. Une créature qui réussit son jet de sauvegarde est immunisée contre cet effet pendant 1 minute, après quoi elle peut être affectée à nouveau. Tant que le sort persiste, vous pouvez remplacer par un 15 les résultats obtenus sur le dé de vos tests de Charisme. En outre, quoi que vous disiez, toute magie censée révéler si vous dites la vérité indique qu'on peut vous croire sur parole.",
+  "modular_options": []
+}

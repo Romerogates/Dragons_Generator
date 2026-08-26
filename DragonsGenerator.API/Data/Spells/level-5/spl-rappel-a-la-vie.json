@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-rappel-a-la-vie",
+  "name": "Rappel à la vie",
+  "level": 5,
+  "school": "necromancie",
+  "casting_time": {
+    "value": 1,
+    "unit": "heure"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(un diamant d'une valeur minimale de 500 po"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-paladin",
+    "cls-pretre"
+  ],
+  "description": "D Vous rendez la vie à une créature morte que vous touchez, pourvu que sa mort ne remonte pas à plus de 10 jours. Si l'âme de la créature est consentante et libre de rejoindre son corps, elle est ressuscitée avec 1 point de vie. Ce sort neutralise aussi les poisons et soigne les maladies non magiques qui affectaient la cible au moment de sa mort. En revanche, il ne peut rien contre les malédictions, maladies magiques et autres effets similaires. S'ils ne sont pas éliminés avant l'incantation du sort, ils reprennent effet dès que la créature est ressuscitée. Ce sort ne permet pas de rappeler un mort-vivant à la vie. Le sort referme les blessures mortelles, mais ne fait pas repousser les parties du corps. S'il lui manque des organes vitaux, comme son cœur ou sa tête, le sort échoue automatiquement. Si la cible avait 6 niveaux de fatigue ou plus, elle revient à la vie avec 5 niveaux de fatigue. La résurrection est éprouvante. La cible subit un malus de −4 aux jets d'attaque, jets de sauvegarde et tests de caractéristique. Chaque fois que la cible termine un repos long, le malus est réduit de 1 jusqu'à ce qu'il disparaisse complètement. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, la mort peut remonter à 5 jours supplémentaires par niveau d'emplacement au-dessus du 5e.",
+  "modular_options": []
+}

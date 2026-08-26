@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-sanctification",
+  "name": "Sanctification",
+  "level": 5,
+  "school": "evocation",
+  "casting_time": {
+    "value": 24,
+    "unit": "heure"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "permanent",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(des herbes"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": true,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "Vous touchez un point et imprégnez la zone qui l'entoure de puissance sacrée (ou impie). La zone a un rayon de 18 m maximum, et le sort échoue s'il chevauche une zone déjà affectée par le sort sanctification. La zone affectée est sujette aux effets suivants. Tout d'abord, les célestes, élémentaires, fées, fiélons, morts-vivants et ravageurs du Chancre ne peuvent ni entrer dans la zone ni charmer, effrayer ou posséder les créatures qui s'y trouvent. Toute créature charmée, effrayée ou possédée par une telle créature ne l'est plus dès qu'elle entre dans la zone. Vous pouvez exclure de l'effet un ou plusieurs des types de créatures mentionnés plus haut. Ensuite, vous pouvez associer un effet supplémentaire à la zone. Choisissez-le dans la liste qui suit, ou optez pour un effet qui vous est proposé par le meneur. Certains de ces effets s'appliquent aux créatures situées dans la zone. À vous de préciser si l'effet s'applique à toutes les créatures, aux créatures obéissant à un dieu ou un chef spécifique, ou à des créatures d'un genre précis, comme les orcs ou les trolls. Quand une créature pouvant être affectée entre dans la zone du sort pour la première fois de son tour de jeu ou y commence son tour de jeu, elle peut effectuer un JS Charisme. En cas de réussite, elle n'est pas sujette à l'effet supplémentaire jusqu'à ce qu'elle quitte la zone. Antidétection. Tout ce qui se trouve dans la zone ne peut pas être ciblé par une magie de divination ou détecté par des capteurs de scrutation magique. Courage. Les créatures affectées ne peuvent pas être effrayées tant qu'elles se situent dans la zone. Floraison. La nature à l'intérieur de la zone pousse avec vigueur en permanence, comme si c'était toujours le début de l'été. Dans ce qui ressemble à un jardin merveilleux, les végétaux créent des abris de branchages. Guérison. Les créatures affectées bénéficient d'un avantage aux JS Constitution visant à résister aux poisons, aux maladies ou à guérir de leurs blessures. Par ailleurs, toute créature qui y effectue un repos long élimine 2 niveaux de fatigue au lieu d'un seul. Interférence extradimensionnelle. Les créatures affectées ne peuvent pas se déplacer ou voyager en utilisant la téléportation ou des moyens extradimensionnels ou interplanaires. Lumière du jour. Une lumière vive baigne la zone. L'obscurité magique créée par des sorts d'un niveau inférieur à l'emplacement que vous avez utilisé pour jeter ce sort ne peut pas venir à bout de la lumière. Langues. Les créatures affectées peuvent communiquer avec toute autre créature située dans la zone, même si elles ne parlent pas la même langue. Obscurité. La zone est plongée dans l'obscurité. Les lumières normales, ainsi que les lumières magiques créées par des sorts d'un niveau inférieur à l'emplacement que vous avez utilisé pour jeter ce sort, ne peuvent pas éclairer la zone. Protection contre l'énergie. Les créatures affectées situées dans la zone ont une résistance à un type de dégâts de votre choix, à l'exception de contondant, perforant et tranchant. Repos éternel. Les cadavres enterrés dans la zone ne peuvent pas être transformés en morts-vivants. Silence. Aucun son ne peut sortir de la zone ou y pénétrer. Terreur. Les créatures affectées sont effrayées tant qu'elles se situent dans la zone. Vulnérabilité à l'énergie. Les créatures affectées situées dans la zone ont une vulnérabilité à un type de dégâts de votre choix, à l'exception de contondant, perforant et tranchant.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, chaque niveau d'emplacement au-dessus du 5e vous permet d'augmenter le rayon d'action de 18 m ou d'ajouter un effet supplémentaire à la zone.",
+  "modular_options": []
+}

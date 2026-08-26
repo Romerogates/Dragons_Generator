@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-fracassement",
+  "name": "Fracassement",
+  "level": 2,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un éclat de mica"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Un son aigu particulièrement intense retentit depuis un point de votre choix à portée. Toute créature prise dans une sphère de 3 m de rayon centrée sur ce point doit effectuer un JS Constitution et subit 3d8 dégâts de tonnerre en cas d'échec, la moitié en cas de réussite. Une créature faite de matière inerte, comme la pierre, le cristal ou le métal subit un désavantage à ce jet de sauvegarde. Un objet non magique qui n'est ni porté ni transporté subit aussi les dégâts s'il est pris dans la zone du sort. La cible doit effectuer un JS Constitution et subit 8d8 dégâts nécrotiques en cas d'échec, la moitié en cas de réussite. Ce sort n'a aucun effet sur les morts-vivants et les créatures artificielles. Si vous ciblez une créature végétale ou une plante magique, elle subit un désavantage au jet de sauvegarde, et le sort lui inflige les dégâts maximums. Si vous ciblez une plante non magique qui n'est pas une créature, comme un arbre ou un arbuste, celle-ci n'a droit à aucun jet de sauvegarde ; elle flétrit et meurt. subissent un désavantage aux jets d'attaque contre vous. Toutefois, un attaquant est immunisé contre cet effet s'il est dépourvu de vision (s'il dispose de la vision aveugle, par exemple) ou s'il perce les illusions (avec vision lucide, par exemple). À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, la durée augmente de 1 minute par niveau d'emplacement au-dessus du 2e.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, les dégâts augmentent de 1d8 par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

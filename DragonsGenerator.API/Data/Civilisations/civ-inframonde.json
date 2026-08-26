@@ -1,0 +1,83 @@
+{
+  "schema_version": "2.0",
+  "id": "civ-inframonde",
+  "name": "Inframonde",
+  "randomization": {
+    "dice": "d100",
+    "min": 72,
+    "max": 72
+  },
+  "demographics": {
+    "primary_species": [
+      {
+        "id": "sp-nain-gardien",
+        "label": "Nains gardiens"
+      },
+      {
+        "id": "sp-nain-batisseur",
+        "label": "Nains bâtisseurs"
+      },
+      {
+        "id": "sp-drow",
+        "label": "Drows"
+      },
+      {
+        "id": "sp-duergar",
+        "label": "Duergars"
+      },
+      {
+        "id": "sp-svirfnebelin",
+        "label": "Svirfnebelins"
+      },
+      {
+        "id": "sp-torve",
+        "label": "Torves"
+      },
+      {
+        "id": "sp-sidhe",
+        "label": "Sidhes"
+      }
+    ],
+    "secondary_species": [],
+    "is_cosmopolitan": true,
+    "cosmopolitan_zones": [],
+    "social_roles": [
+      {
+        "id": "role-esclave",
+        "label": "Autres peuples réduits en esclavage"
+      }
+    ],
+    "peoples_note": "Nains gardiens, Nains bâtisseurs, Drows, Duergars, Svirfnebelins, Torves, Sidhes. Les autres peuples n'y vivent que réduits en esclavage."
+  },
+  "official_languages": [
+    {
+      "id": "lg-commun-des-profondeurs",
+      "label": "Commun des profondeurs"
+    }
+  ],
+  "multilingual": true,
+  "writing_systems": [
+    {
+      "id": "wr-elfique",
+      "label": "Elfique (adapté)",
+      "type": "alphabet"
+    }
+  ],
+  "is_oral_only": false,
+  "description": "L'Inframonde est largement méconnu, même de ceux qui sont habitués à y évoluer. Immédiatement près de la surface se trouvent les mines, les forteresses, les prisons et certains temples. Plus profond, on découvre les cités drows, duergares et svirfnebelines, cherchant tous à survivre et se répandre dans un environnement très dangereux. Ils n'hésitent souvent pas à faire appel à des puissances infernales ou à des divinités inquiétantes pour l'emporter. Dans les abîmes les plus insondables se trouvent les nids chancreux les plus anciens et les plus puissants, une menace pour tout Eana.",
+  "geography_tags": [
+    "profondeurs-abyssales",
+    "mines",
+    "forteresses",
+    "prisons",
+    "temples",
+    "cites-souterraines"
+  ],
+  "threat_ids": [
+    "threat-chancre",
+    "threat-drow",
+    "threat-duergar",
+    "threat-puissances-infernales",
+    "threat-divinites-inquietantes"
+  ]
+}

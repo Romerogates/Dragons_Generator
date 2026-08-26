@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-saut",
+  "name": "Saut",
+  "level": 1,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une patte arrière de sauterelle"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-rodeur"
+  ],
+  "description": "Vous touchez une créature. La distance de saut de la cible est triplée tant que le sort persiste. Modificateur au JS Rapportée (vous avez entendu parler de la cible) Connaissance Personnelle (vous l'avez déjà rencontrée) Connaissance Intime (vous la connaissez très bien) Lien Esquisse ou portrait Lien Bien matériel ou vêtement Lien Partie du corps (mèche de cheveux, rognure d'ongle, etc.) Au lieu de cibler une créature, vous pouvez choisir un lieu que vous avez déjà vu. Dans ce cas, le capteur apparaît dans ce lieu et ne se déplace pas.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, la durée augmente de 10 minutes par niveau d'emplacement au-dessus du 5e.",
+  "modular_options": []
+}

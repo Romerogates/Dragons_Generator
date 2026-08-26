@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-mur-de-feu",
+  "name": "Mur de feu",
+  "level": 4,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un petit morceau de phosphore"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Vous créez un mur de feu qui apparaît sur une surface solide située à portée. Ses dimensions sont les suivantes : jusqu'à 18 m de long, 6 m de haut et 30 cm d'épaisseur. Autre possibilité, vous pouvez lui donner la forme d'un anneau aux dimensions suivantes : jusqu'à 6 m de diamètre, 6 m de haut et 30 cm d'épaisseur. Le mur est opaque et persiste pour toute la durée du sort. Au moment où le mur apparaît, toute créature prise dans sa zone doit effectuer un JS Dextérité et subit 5d8 dégâts de feu en cas d'échec, la moitié en cas de réussite. Un côté du mur (choisi par vos soins au moment de l'incantation) inflige 5d8 dégâts de feu à toute créature qui termine son tour de jeu à 3 m ou moins de ce côté du mur. Une créature subit les mêmes dégâts quand elle traverse le mur pour la première fois d'un tour de jeu ou y termine son tour de jeu. L'autre côté du mur, en revanche, n'inflige pas de dégâts.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, les dégâts augmentent de 1d8 par niveau d'emplacement au-dessus du 4e.",
+  "modular_options": []
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-cercle-magique",
+  "name": "Cercle magique",
+  "level": 3,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 3,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(de l'eau bénite ou de la poudre de fer et d'argent d'une valeur minimale de 100 po"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien",
+    "cls-paladin",
+    "cls-pretre",
+    "cls-sorcier"
+  ],
+  "description": "Logo de cercle magique d'abjuration Vous créez un cylindre d'énergie magique de 6 m de haut et de 3 m de rayon centré sur un point au sol que vous voyez à portée. Des runes luisantes apparaissent là où le cylindre chevauche le sol ou quelque autre surface. Choisissez un ou plusieurs des types de créatures suivants : célestes, élémentaires, fées, fiélons, morts-vivants ou ravageurs du Chancre. Ce cercle affecte les créatures du type choisi comme suit : Elles ne peuvent pas entrer dans le cylindre de leur plein gré sans recourir à la magie. Si elles tentent d'user de téléportation ou de déplacement planaire pour ce faire, elles doivent d'abord réussir un JS Charisme. Elles subissent un désavantage aux jets d'attaque contre les créatures prises dans le cylindre. Elles ne peuvent ni charmer, ni effrayer, ni posséder de cible prise dans le cylindre. Au moment de l'incantation, vous pouvez choisir d'inverser l'effet, pour empêcher une créature d'un type donné de quitter le cylindre et ainsi protéger les cibles qui n'y sont pas prises.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, la durée augmente de 1 heure par niveau d'emplacement au-dessus du 3e.",
+  "modular_options": []
+}

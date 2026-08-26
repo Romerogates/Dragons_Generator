@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "it-carreaux",
+  "name": "Carreaux (20)",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 1,
+    "unit": "po"
+  },
+  "weight_kg": 0.75,
+  "description": "Lot de 20 carreaux d'arbalète."
+}

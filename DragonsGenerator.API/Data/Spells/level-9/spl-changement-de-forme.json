@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-changement-de-forme",
+  "name": "Changement de forme",
+  "level": 9,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(un diadème de jade d'une valeur minimale de 1 500 po"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-magicien"
+  ],
+  "description": "Vous prenez la forme d'une autre créature pour toute la durée du sort, pourvu que son facteur de puissance ne soit pas supérieur au vôtre, qu'il ne s'agisse pas d'une créature artificielle ou d'un mort-vivant, et que vous en ayez déjà vu un représentant. Vous vous transformez en un spécimen moyen de cette créature, sans niveaux de classe ni le trait Sorts. Votre profil est remplacé par celui de la créature choisie, mais vous conservez néanmoins votre alignement ainsi que vos valeurs d'Intelligence, de Sagesse et de Charisme. Vous gardez aussi vos maîtrises de compétence et de jet de sauvegarde, et gagnez celles de la créature. Si la créature a la même maîtrise que vous et que le bonus indiqué dans son profil est supérieur au vôtre, remplacez le vôtre par le sien. En revanche, vous ne pouvez pas utiliser les actions légendaires et actions d'antre de la nouvelle forme. Vous avez les points de vie et dés de vie de la nouvelle forme, mais retrouvez les points de vie que vous aviez avant votre transformation lorsque vous recouvrez votre forme normale. Dans le cas où vous tombez à 0 point de vie, les dégâts en excès sont reportés sur votre forme normale. Tant que ces dégâts ne font pas eux aussi tomber les points de vie de votre forme normale à 0, vous restez conscient. Vous gardez le bénéfice de vos aptitudes de classe, d'espèce et autres sources, et pouvez les utiliser, pourvu que votre nouvelle forme soit capable physiquement de le faire. Vous ne pouvez pas utiliser vos sens spéciaux (par exemple, la vision dans le noir), à moins que votre nouvelle forme la possède aussi. Vous ne pouvez parler que si la créature le peut normalement. Au moment de la transformation, vous décidez si votre équipement tombe au sol, s'il fusionne avec votre nouvelle forme ou si vous continuez à le porter dans ces conditions. L'équipement porté fonctionne normalement, si ce n'est que le meneur peut statuer que certains éléments ne peuvent être raisonnablement transportés par la créature, en fonction de la taille et de la morphologie de celle-ci. La taille et la forme de votre matériel ne changent pas pour se conformer aux spécificités de la créature. Tout élément inadapté au port par votre nouvelle forme doit tomber par terre ou fusionner avec votre nouvelle forme. L'équipement qui fusionne est inutilisable en l'état. Tant que persiste le sort, vous pouvez adopter une nouvelle forme au prix d'une action en respectant les restrictions et règles de la forme d'origine, à une exception : si votre nouvelle forme a plus de points de vie que votre forme actuelle, vos points de vie ne changent pas.",
+  "modular_options": []
+}

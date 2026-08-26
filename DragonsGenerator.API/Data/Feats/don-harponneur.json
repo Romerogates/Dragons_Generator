@@ -1,0 +1,30 @@
+{
+  "schema_version": "2.0",
+  "id": "don-harponneur",
+  "name": "Harponneur",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [],
+  "description": "Avec une arme (lancer, sans finesse) : appliquer le bonus de DEX aux dégâts en plus de la Force ; récupérer l'arme en action bonus. Si dégâts perforants : harponnez la cible (taille à ±1 cran) avec un test de Force opposé — si succès, cible agrippée. Tant que harponnée : vous pouvez infliger automatiquement les dégâts de l'arme (action) ou tirer la cible vers vous (moitié VD).",
+  "benefits": [
+    {
+      "type": "ranged_throw_dex_damage",
+      "condition": "arme lancer sans finesse"
+    },
+    {
+      "type": "bonus_action_retrieve",
+      "condition": "arme de lancer"
+    },
+    {
+      "type": "harpoon_grapple",
+      "condition": "dégâts perforants, taille similaire",
+      "check": "Force opposé"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "armes-de-lancer",
+    "lutte",
+    "combat-à-distance"
+  ]
+}

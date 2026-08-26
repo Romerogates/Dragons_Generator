@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-contagion",
+  "name": "Contagion",
+  "level": 5,
+  "school": "necromancie",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 7,
+    "unit": "jour"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-pretre",
+    "cls-sorcier"
+  ],
+  "description": "J Votre simple contact inocule des maladies. Effectuez une attaque de sort au corps à corps contre une créature située à portée d'allonge. En cas de réussite, la cible est empoisonnée. À la fin de chacun de ses tours de jeu, la cible empoisonnée doit effectuer un JS Constitution. Si elle en réussit trois, elle n'est plus empoisonnée et le sort prend fin. Si elle en échoue trois, elle n'est plus empoisonnée, mais vous choisissez l'une des maladies ci-dessous, dont la cible subit les effets pour la durée du sort. Comme ce sort inocule une maladie naturelle, les effets éliminant les maladies ou, au contraire, les renforçant sont applicables. Voici quelques maladies envisageables. Vous pouvez aussi, au gré du meneur, vous référer à Aventuriers pour infliger une autre maladie présente sur Eana. Croupissure. La cible est victime d'une violente migraine et ses yeux deviennent blanc laiteux. Elle subit un désavantage aux tests de Sagesse et aux JS Sagesse, et elle est aveuglée. Fièvre des marais. La cible souffre d'une fièvre violente. Elle subit un désavantage aux tests de Force, aux JS Force et aux jets d'attaque basés sur la Force. R Putrescente. La cible est frappée de putréfaction. Elle subit un désavantage aux tests de Charisme et une vulnérabilité à tous les dégâts. Bouille-crâne. La cible est fiévreuse. Elle subit un désavantage aux tests d'Intelligence et aux JS Intelligence, et se comporte comme si elle était sous l'effet du sort confusion durant les combats. Tremblotante. La cible est prise de tremblements. Elle subit un désavantage aux tests de Dextérité, aux JS Dextérité et aux jets d'attaque basés sur la Dextérité. ® Mort vaseuse. La cible est victime de saignements incontrôlables. Elle subit un désavantage aux tests de Constitution et aux JS Constitution. En outre, chaque fois qu'elle subit des dégâts, elle est étourdie jusqu'à la fin de son tour de jeu suivant. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, la durée augmente de sept jours par niveau d'emplacement au-dessus du 5e.",
+  "modular_options": []
+}

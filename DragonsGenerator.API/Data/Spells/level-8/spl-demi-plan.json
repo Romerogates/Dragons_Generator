@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-demi-plan",
+  "name": "Demi-plan",
+  "level": 8,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": false,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Demi-plan 0 Jous créez une porte floue sur une surface plane et solide que vous voyez à portée. Cette porte est assez grande pour laisser passer librement des créatures de taille M et s'ouvre sur un demi-plan qui ressemble à une pièce de bois ou de pierre, vide et cubique de 9 m d'arête. Quand le sort prend fin, la porte disparaît des deux côtés et tout objet ou créature situé dans le demi-plan y reste pris au piège. Chaque fois que vous lancez ce sort, vous pouvez créer un nouveau demi-plan ou décider que la porte trouble s'ouvrira sur un demi-plan créé précédemment. Enfin, si vous connaissez la nature et le contenu d'un demi-plan créé par ce sort, mais par une autre créature, vous pouvez faire en sorte que la porte s'ouvre précisément sur cet endroit.",
+  "modular_options": []
+}

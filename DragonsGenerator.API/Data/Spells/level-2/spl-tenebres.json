@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-tenebres",
+  "name": "Ténèbres",
+  "level": 2,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": "un bout de charbon"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "D es ténèbres magiques se propagent depuis un point que vous choisissez à portée et remplissent une sphère de 4,50 m de rayon pour toute la durée du sort. Ces ténèbres contournent les coins. Une créature douée de vision dans le noir ne voit rien dans cette obscurité, et les lumières non magiques y restent sans effet. Si le point que vous choisissez est sur un objet que vous tenez ou qui n'est ni porté ni transporté, l'obscurité s'en dégage et se déplace avec lui. Si la source de l'obscurité est recouverte par un objet opaque, comme un bol ou un casque, les effets des ténèbres sont bloqués. Si une partie de la zone de ce sort chevauche une zone de lumière créée par un sort du 2e niveau ou inférieur, ce dernier est dissipé.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, chaque niveau d'emplacement au-dessus du 2e augmente le rayon de la sphère de ténèbres de 1,50 m (si vous le souhaitez) et la durée de 10 minutes.",
+  "modular_options": []
+}

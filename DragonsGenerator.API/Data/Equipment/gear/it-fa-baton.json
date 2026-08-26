@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "it-fa-baton",
+  "name": "Bâton (focaliseur)",
+  "category": "gear",
+  "subcategory": "arcane_focus",
+  "cost": {
+    "value": 5,
+    "unit": "po"
+  },
+  "weight_kg": 2,
+  "description": "Focaliseur arcanique. Peut remplacer les composantes matérielles d'un sort."
+}

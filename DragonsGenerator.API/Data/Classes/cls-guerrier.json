@@ -1,0 +1,1600 @@
+{
+  "id": "cls-guerrier",
+  "schema_version": "3.0",
+  "name": "Guerrier",
+  "flavor": {
+    "summary": "Maître des armes et de l'art du combat, le guerrier surpasse ses adversaires par l'expérience, l'habileté et une condition physique hors du commun. Soldat aguerri ou champion autodidacte, il incarne le summum de la puissance martiale.",
+    "lore_note": "Sur Eana, certains guerriers développent une communion mystique avec leurs armes (les yataganS), tandis que d'autres portent l'efficacité physique à un niveau presque surnaturel par un entraînement implacable."
+  },
+  "hit_die": "1d10",
+  "hp_at_level_1": 10,
+  "hp_per_level_average": 6,
+  "primary_abilities": [
+    "str",
+    "dex"
+  ],
+  "saving_throw_proficiencies": [
+    "str",
+    "con"
+  ],
+  "armor_proficiencies": [
+    "ar-light",
+    "ar-medium",
+    "ar-heavy",
+    "ar-shield"
+  ],
+  "weapon_proficiencies": [
+    "wp-cat-simple",
+    "wp-cat-martial"
+  ],
+  "tool_proficiencies": [],
+  "choice_pools": [
+    {
+      "id": "choice-skills-cls-guerrier",
+      "name": "Compétences de classe",
+      "type": "skill_proficiency",
+      "allow_choice": true,
+      "quantity": 2,
+      "pool": [
+        "skill-acrobaties",
+        "skill-athletisme",
+        "skill-dressage",
+        "skill-histoire",
+        "skill-intimidation",
+        "skill-intuition",
+        "skill-perception",
+        "skill-survie"
+      ]
+    },
+    {
+      "id": "choice-style-combat-cls-guerrier",
+      "name": "Style de combat",
+      "type": "feature_option",
+      "allow_choice": true,
+      "quantity": 1,
+      "note": "Si une seconde sélection est octroyée (Champion niv.10), une option différente de la première doit être choisie.",
+      "pool": [
+        "feat-style-archerie",
+        "feat-style-armes-deux-mains",
+        "feat-style-combat-deux-armes",
+        "feat-style-defense",
+        "feat-style-duel",
+        "feat-style-protection"
+      ]
+    }
+  ],
+  "spellcasting": null,
+  "starting_equipment": {
+    "fixed": [],
+    "choice_pools": [
+      {
+        "id": "choice-equip-slot1-cls",
+        "name": "Armure de départ",
+        "type": "equipment",
+        "allow_choice": true,
+        "quantity": 1,
+        "options": [
+          {
+            "option_id": "A",
+            "items": [
+              {
+                "id": "ar-cotte-de-mailles",
+                "qty": 1
+              }
+            ]
+          },
+          {
+            "option_id": "B",
+            "items": [
+              {
+                "id": "ar-armure-de-cuir",
+                "qty": 1
+              },
+              {
+                "id": "wp-arc-long",
+                "qty": 1
+              },
+              {
+                "id": "it-fleches",
+                "qty": 20
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "choice-equip-slot2-cls",
+        "name": "Armement martial principal",
+        "type": "equipment",
+        "allow_choice": true,
+        "quantity": 1,
+        "options": [
+          {
+            "option_id": "A",
+            "items": [
+              {
+                "id": "wp-cat-martial",
+                "qty": 1
+              },
+              {
+                "id": "ar-bouclier",
+                "qty": 1
+              }
+            ]
+          },
+          {
+            "option_id": "B",
+            "items": [
+              {
+                "id": "wp-cat-martial",
+                "qty": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "choice-equip-slot3-cls",
+        "name": "Armement secondaire",
+        "type": "equipment",
+        "allow_choice": true,
+        "quantity": 1,
+        "options": [
+          {
+            "option_id": "A",
+            "items": [
+              {
+                "id": "wp-arbalete-legere",
+                "qty": 1
+              },
+              {
+                "id": "it-carreaux",
+                "qty": 20
+              }
+            ]
+          },
+          {
+            "option_id": "B",
+            "items": [
+              {
+                "id": "wp-hachette",
+                "qty": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "choice-equip-slot4-cls",
+        "name": "Sac d'équipement",
+        "type": "equipment",
+        "allow_choice": true,
+        "quantity": 1,
+        "options": [
+          {
+            "option_id": "A",
+            "items": [
+              {
+                "id": "gr-sac-dexplorateur",
+                "qty": 1
+              }
+            ]
+          },
+          {
+            "option_id": "B",
+            "items": [
+              {
+                "id": "gr-sac-daventurier",
+                "qty": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "progression": [
+    {
+      "level": 1,
+      "features": [
+        "feat-style-de-combat-guerrier",
+        "feat-second-souffle"
+      ],
+      "resources": {},
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 2,
+      "features": [
+        "feat-fougue"
+      ],
+      "resources": {
+        "fougue_count": 1
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 3,
+      "features": [
+        "feat-archetype-martial"
+      ],
+      "resources": {
+        "fougue_count": 1
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 4,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "fougue_count": 1
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 5,
+      "features": [
+        "feat-attaque-supplementaire-guerrier"
+      ],
+      "resources": {
+        "fougue_count": 1,
+        "extra_attacks": 1
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 6,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "fougue_count": 1,
+        "extra_attacks": 1
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 7,
+      "features": [
+        "feat-aptitude-darchetype-guerrier"
+      ],
+      "resources": {
+        "fougue_count": 1,
+        "extra_attacks": 1
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 8,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "fougue_count": 1,
+        "extra_attacks": 1
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 9,
+      "features": [
+        "feat-inflexible-guerrier"
+      ],
+      "resources": {
+        "fougue_count": 1,
+        "extra_attacks": 1,
+        "inflexible_count": 1
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 10,
+      "features": [
+        "feat-aptitude-darchetype-guerrier"
+      ],
+      "resources": {
+        "fougue_count": 1,
+        "extra_attacks": 1,
+        "inflexible_count": 1
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 11,
+      "features": [
+        "feat-attaque-supplementaire-guerrier"
+      ],
+      "resources": {
+        "fougue_count": 1,
+        "extra_attacks": 2,
+        "inflexible_count": 1
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 12,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "fougue_count": 1,
+        "extra_attacks": 2,
+        "inflexible_count": 1
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 13,
+      "features": [
+        "feat-inflexible-guerrier"
+      ],
+      "resources": {
+        "fougue_count": 1,
+        "extra_attacks": 2,
+        "inflexible_count": 2
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 14,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "fougue_count": 1,
+        "extra_attacks": 2,
+        "inflexible_count": 2
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 15,
+      "features": [
+        "feat-aptitude-darchetype-guerrier"
+      ],
+      "resources": {
+        "fougue_count": 1,
+        "extra_attacks": 2,
+        "inflexible_count": 2
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 16,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "fougue_count": 1,
+        "extra_attacks": 2,
+        "inflexible_count": 2
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 17,
+      "features": [
+        "feat-fougue",
+        "feat-inflexible-guerrier"
+      ],
+      "resources": {
+        "fougue_count": 2,
+        "fougue_max_per_turn": 1,
+        "extra_attacks": 2,
+        "inflexible_count": 3
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 18,
+      "features": [
+        "feat-aptitude-darchetype-guerrier"
+      ],
+      "resources": {
+        "fougue_count": 2,
+        "fougue_max_per_turn": 1,
+        "extra_attacks": 2,
+        "inflexible_count": 3
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 19,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "fougue_count": 2,
+        "fougue_max_per_turn": 1,
+        "extra_attacks": 2,
+        "inflexible_count": 3
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 20,
+      "features": [
+        "feat-attaque-supplementaire-guerrier"
+      ],
+      "resources": {
+        "fougue_count": 2,
+        "fougue_max_per_turn": 1,
+        "extra_attacks": 3,
+        "inflexible_count": 3
+      },
+      "proficiency_bonus": 6
+    }
+  ],
+  "features_details": [
+    {
+      "id": "feat-style-de-combat-guerrier",
+      "name": "Style de combat",
+      "unlocks_at_level": 1,
+      "recharge": "passive",
+      "resolves_to_choice_pool": "choice-style-combat-cls-guerrier",
+      "flavor": {
+        "summary": "Spécialisation dans l'un des 6 styles de combat disponibles. Toute nouvelle sélection doit être une option différente.",
+        "lore_note": null
+      }
+    },
+    {
+      "id": "feat-style-archerie",
+      "name": "Style de combat : Archerie",
+      "unlocks_at_level": 1,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "+2 aux jets d'attaque effectués avec des armes à distance.",
+        "lore_note": null
+      },
+      "modifiers": [
+        {
+          "type": "attack_roll_bonus",
+          "value": 2,
+          "condition": "ranged_attack"
+        }
+      ]
+    },
+    {
+      "id": "feat-style-armes-deux-mains",
+      "name": "Style de combat : Armes à deux mains",
+      "unlocks_at_level": 1,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Lors d'une attaque avec une arme à propriété deux mains ou polyvalente, relance les dés de dégâts tombant sur 1 ou 2. Conserve le nouveau résultat même si 1 ou 2 à nouveau.",
+        "lore_note": null
+      }
+    },
+    {
+      "id": "feat-style-combat-deux-armes",
+      "name": "Style de combat : Combat à deux armes",
+      "unlocks_at_level": 1,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Lors du combat à deux armes, ajoute le modificateur de caractéristique aux dégâts de la seconde attaque.",
+        "lore_note": null
+      }
+    },
+    {
+      "id": "feat-style-defense",
+      "name": "Style de combat : Défense",
+      "unlocks_at_level": 1,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "+1 à la Classe d'Armure tant que vous portez une armure.",
+        "lore_note": null
+      },
+      "modifiers": [
+        {
+          "type": "ac_bonus",
+          "value": 1,
+          "condition": "wearing_armor"
+        }
+      ]
+    },
+    {
+      "id": "feat-style-duel",
+      "name": "Style de combat : Duel",
+      "unlocks_at_level": 1,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "+2 aux jets de dégâts quand vous tenez une seule arme de corps à corps à une main et ne maniez pas d'autre arme.",
+        "lore_note": null
+      },
+      "modifiers": [
+        {
+          "type": "damage_bonus",
+          "value": 2,
+          "condition": "single_one_handed_melee_no_other_weapon"
+        }
+      ]
+    },
+    {
+      "id": "feat-style-protection",
+      "name": "Style de combat : Protection",
+      "unlocks_at_level": 1,
+      "recharge": "at_will",
+      "action_cost": "reaction",
+      "flavor": {
+        "summary": "Réaction : impose un désavantage à l'attaque d'une créature visible ciblant un allié dans 1,5 m. Requiert de porter un bouclier.",
+        "lore_note": null
+      }
+    },
+    {
+      "id": "feat-second-souffle",
+      "name": "Second souffle",
+      "unlocks_at_level": 1,
+      "recharge": "short_rest",
+      "action_cost": "bonus_action",
+      "uses": {
+        "base": 1
+      },
+      "flavor": {
+        "summary": "Récupère 1d10 + niveau de guerrier points de vie au prix d'une action bonus.",
+        "lore_note": "Réserve d'endurance puisée dans les ressources martiales forgées par l'entraînement intensif."
+      },
+      "effect": {
+        "heal_formula": "1d10 + class_level"
+      }
+    },
+    {
+      "id": "feat-fougue",
+      "name": "Fougue",
+      "unlocks_at_level": 2,
+      "recharge": "short_rest",
+      "action_cost": "none",
+      "uses": {
+        "base": 1,
+        "upgrades": [
+          {
+            "at_level": 17,
+            "value": 2,
+            "constraint": "fougue_max_per_turn:1"
+          }
+        ]
+      },
+      "flavor": {
+        "summary": "Effectue une action supplémentaire à votre tour (en plus de l'action normale et d'une éventuelle action bonus). 1/repos courts ou long. À partir du niv.17, 2/repos mais max 1 par tour.",
+        "lore_note": null
+      }
+    },
+    {
+      "id": "feat-archetype-martial",
+      "name": "Archétype martial",
+      "unlocks_at_level": 3,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Choisissez un idéal martial (Champion, Élu arcanique ou Ruffian). L'archétype choisi octroie des aptitudes aux niveaux 3, 7, 10, 15 et 18.",
+        "lore_note": null
+      }
+    },
+    {
+      "id": "feat-augmentation-de-caracteristique",
+      "name": "Augmentation de caractéristique",
+      "unlocks_at_level": 4,
+      "recharge": "passive",
+      "repeats_at_levels": [
+        4,
+        6,
+        8,
+        12,
+        14,
+        16,
+        19
+      ],
+      "flavor": {
+        "summary": "+2 à une caractéristique ou +1 à deux caractéristiques différentes. Valeur maximale par cette aptitude : 20.",
+        "lore_note": null
+      }
+    },
+    {
+      "id": "feat-attaque-supplementaire-guerrier",
+      "name": "Attaque supplémentaire",
+      "unlocks_at_level": 5,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Nombre d'attaques lors de l'action Attaquer : 2 au niv.5, 3 au niv.11, 4 au niv.20.",
+        "lore_note": null
+      },
+      "scaling": [
+        {
+          "at_level": 5,
+          "resource_key": "extra_attacks",
+          "value": 1,
+          "total_attacks": 2
+        },
+        {
+          "at_level": 11,
+          "resource_key": "extra_attacks",
+          "value": 2,
+          "total_attacks": 3
+        },
+        {
+          "at_level": 20,
+          "resource_key": "extra_attacks",
+          "value": 3,
+          "total_attacks": 4
+        }
+      ]
+    },
+    {
+      "id": "feat-aptitude-darchetype-guerrier",
+      "name": "Aptitude d'archétype",
+      "unlocks_at_level": 7,
+      "recharge": "passive",
+      "repeats_at_levels": [
+        7,
+        10,
+        15,
+        18
+      ],
+      "flavor": {
+        "summary": "Aptitude supplémentaire conférée par l'archétype martial choisi au niveau 3. Voir la section de l'archétype pour le détail.",
+        "lore_note": null
+      }
+    },
+    {
+      "id": "feat-inflexible-guerrier",
+      "name": "Inflexible",
+      "unlocks_at_level": 9,
+      "recharge": "long_rest",
+      "uses": {
+        "base": 1,
+        "upgrades": [
+          {
+            "at_level": 13,
+            "value": 2
+          },
+          {
+            "at_level": 17,
+            "value": 3
+          }
+        ]
+      },
+      "flavor": {
+        "summary": "Relancez un jet de sauvegarde raté et conservez le nouveau résultat. 1/repos long au niv.9, 2 au niv.13, 3 au niv.17.",
+        "lore_note": null
+      }
+    }
+  ],
+  "subclasses": {
+    "name": "Archétype martial",
+    "unlocked_at_level": 3,
+    "feature_levels": [
+      3,
+      7,
+      10,
+      15,
+      18
+    ],
+    "options": [
+      {
+        "id": "subcls-champion",
+        "name": "Champion",
+        "flavor": {
+          "summary": "Force brute et technique irréprochable au service de coups dévastateurs. L'archétype physique pur : entraînement rigoureux, coups critiques élargis et endurance surhumaine.",
+          "lore_note": null
+        },
+        "choice_pools": [],
+        "progression": [
+          {
+            "level": 3,
+            "features": [
+              "feat-critique-ameliore"
+            ]
+          },
+          {
+            "level": 7,
+            "features": [
+              "feat-athlete-accompli"
+            ]
+          },
+          {
+            "level": 10,
+            "features": [
+              "feat-style-de-combat-supplementaire"
+            ]
+          },
+          {
+            "level": 15,
+            "features": [
+              "feat-critique-superieur"
+            ]
+          },
+          {
+            "level": 18,
+            "features": [
+              "feat-survivant"
+            ]
+          }
+        ],
+        "features_details": [
+          {
+            "id": "feat-critique-ameliore",
+            "name": "Critique amélioré",
+            "unlocks_at_level": 3,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Coup critique sur 19–20 au jet d'attaque avec une arme (au lieu de 20 uniquement).",
+              "lore_note": null
+            },
+            "modifiers": [
+              {
+                "type": "critical_range_threshold",
+                "value": 19,
+                "condition": "weapon_attack"
+              }
+            ]
+          },
+          {
+            "id": "feat-athlete-accompli",
+            "name": "Athlète accompli",
+            "unlocks_at_level": 7,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Ajoute la moitié du bonus de maîtrise (arrondi au supérieur) à tout test de For/Dex/Con sans maîtrise existante. Saut en longueur avec élan : +30 cm × mod. Force (min 0 cm).",
+              "lore_note": null
+            },
+            "modifiers": [
+              {
+                "type": "half_proficiency_bonus_to_checks",
+                "attributes": [
+                  "str",
+                  "dex",
+                  "con"
+                ],
+                "condition": "no_existing_proficiency",
+                "round": "up"
+              }
+            ]
+          },
+          {
+            "id": "feat-style-de-combat-supplementaire",
+            "name": "Style de combat supplémentaire",
+            "unlocks_at_level": 10,
+            "recharge": "passive",
+            "resolves_to_choice_pool": "choice-style-combat-cls-guerrier",
+            "flavor": {
+              "summary": "Choisissez une deuxième option de Style de combat parmi celles non encore sélectionnées.",
+              "lore_note": null
+            }
+          },
+          {
+            "id": "feat-critique-superieur",
+            "name": "Critique supérieur",
+            "unlocks_at_level": 15,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Coup critique sur 18–19–20 au jet d'attaque. Remplace et améliore Critique amélioré.",
+              "lore_note": null
+            },
+            "modifiers": [
+              {
+                "type": "critical_range_threshold",
+                "value": 18,
+                "condition": "weapon_attack"
+              }
+            ]
+          },
+          {
+            "id": "feat-survivant",
+            "name": "Survivant",
+            "unlocks_at_level": 18,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Au début de chaque tour, si vous êtes en dessous de la moitié de vos PV max et avez plus de 0 PV, récupérez 5 + mod. Constitution PV.",
+              "lore_note": null
+            },
+            "effect": {
+              "heal_formula": "5 + con_mod",
+              "trigger": "start_of_turn",
+              "condition": "hp_above_zero_and_below_half_max"
+            }
+          }
+        ]
+      },
+      {
+        "id": "subcls-elu-arcanique",
+        "name": "Élu arcanique",
+        "flavor": {
+          "summary": "Combattant dont l'arme se charge d'énergies occultes pour devenir une extension magique de son porteur. Aussi appelé Yatagan. Requiert l'Éveil.",
+          "lore_note": "Si l'élu arcanique meurt définitivement, son esprit fusionne avec l'arme sœur qui devient un objet intelligent autonome. Ce phénomène expliquerait l'origine de toutes les armes intelligentes d'Eana."
+        },
+        "prerequisites": [
+          "eveil"
+        ],
+        "choice_pools": [],
+        "progression": [
+          {
+            "level": 3,
+            "features": [
+              "feat-arme-soeur"
+            ]
+          },
+          {
+            "level": 7,
+            "features": [
+              "feat-egide-arcanique"
+            ]
+          },
+          {
+            "level": 10,
+            "features": [
+              "feat-invocation-darme-soeur"
+            ]
+          },
+          {
+            "level": 15,
+            "features": [
+              "feat-renforcement-arcanique"
+            ]
+          },
+          {
+            "level": 18,
+            "features": [
+              "feat-resistance-legendaire-guerrier"
+            ]
+          }
+        ],
+        "features_details": [
+          {
+            "id": "feat-arme-soeur",
+            "name": "Arme sœur",
+            "unlocks_at_level": 3,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "L'une de vos armes devient un objet magique intelligent lié à vous à vie. Bonus d'attaque/dégâts : +1 (→+2 niv.10, →+3 niv.18). Contient un sort mineur de magicien (1 lancer/repos court ou long). Points à répartir sur Int/Sag/Cha : 3 au niv.3, +2 aux niv.7/10/15, +1 au niv.18. Renaissance arcanique en cas de perte.",
+              "lore_note": null
+            },
+            "spellcasting_ability_choice": [
+              "int",
+              "cha"
+            ],
+            "scaling": [
+              {
+                "at_level": 3,
+                "weapon_bonus": 1,
+                "spell_slots_in_weapon": {
+                  "cantrip": 1
+                },
+                "stat_points_new": 3
+              },
+              {
+                "at_level": 7,
+                "weapon_bonus": 1,
+                "spell_slots_in_weapon": {
+                  "level_1": 1
+                },
+                "stat_points_new": 2
+              },
+              {
+                "at_level": 10,
+                "weapon_bonus": 2,
+                "spell_slots_in_weapon": {
+                  "level_2": 1
+                },
+                "stat_points_new": 2
+              },
+              {
+                "at_level": 15,
+                "weapon_bonus": 2,
+                "spell_slots_in_weapon": {
+                  "level_3": 1
+                },
+                "stat_points_new": 2
+              },
+              {
+                "at_level": 18,
+                "weapon_bonus": 3,
+                "spell_slots_in_weapon": {
+                  "level_4": 1
+                },
+                "stat_points_new": 1
+              }
+            ],
+            "special_rules": [
+              "Les sorts de l'arme sont déterminés aléatoirement après un repos long.",
+              "Renaissance arcanique : si l'arme est perdue/volée/brisée, vous la récupérez intacte après un repos long.",
+              "Il est impossible de vous désarmer de votre arme sœur."
+            ]
+          },
+          {
+            "id": "feat-egide-arcanique",
+            "name": "Égide arcanique",
+            "unlocks_at_level": 7,
+            "recharge": "long_rest",
+            "action_cost": "reaction",
+            "uses": {
+              "base": 1
+            },
+            "flavor": {
+              "summary": "Réaction lors d'une attaque ou d'un JS Dex reçu : le bonus de l'arme sœur s'applique à votre CA et à vos JS Dextérité pendant 1 minute. Durant cette durée, toute attaque CàC ratée contre vous inflige à l'assaillant des dégâts de force = double du bonus de l'arme.",
+              "lore_note": null
+            },
+            "trigger": "incoming_attack_or_dex_saving_throw",
+            "duration_turns": null,
+            "duration_text": "1_minute"
+          },
+          {
+            "id": "feat-invocation-darme-soeur",
+            "name": "Invocation d'arme sœur",
+            "unlocks_at_level": 10,
+            "recharge": "at_will",
+            "action_cost": "bonus_action",
+            "flavor": {
+              "summary": "Fait matérialiser instantanément l'arme sœur dans votre main quelle que soit la distance ou son porteur actuel. Risque 20% d'échec si elle est sur un autre plan (repos long requis pour récupération par renaissance arcanique en cas d'échec).",
+              "lore_note": null
+            }
+          },
+          {
+            "id": "feat-renforcement-arcanique",
+            "name": "Renforcement arcanique",
+            "unlocks_at_level": 15,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Tant que vous tenez votre arme sœur, vous bénéficiez d'un avantage à tous les jets de sauvegarde contre les sorts et effets magiques.",
+              "lore_note": null
+            },
+            "advantages": [
+              {
+                "type": "saving_throw",
+                "target": "all",
+                "condition": "vs_spells_and_magical_effects",
+                "requirement": "holding_sister_weapon"
+              }
+            ]
+          },
+          {
+            "id": "feat-resistance-legendaire-guerrier",
+            "name": "Résistance légendaire",
+            "unlocks_at_level": 18,
+            "recharge": "long_rest",
+            "uses": {
+              "base": 3
+            },
+            "flavor": {
+              "summary": "Lorsque vous ratez un jet de sauvegarde, vous pouvez décider de le réussir tout de même. 3 utilisations par repos long.",
+              "lore_note": null
+            }
+          }
+        ]
+      },
+      {
+        "id": "subcls-ruffian",
+        "name": "Ruffian",
+        "flavor": {
+          "summary": "Guerrier des bas-fonds maîtrisant l'intimidation viscérale et l'exploitation méthodique des faiblesses adverses via des coups bas sales et efficaces.",
+          "lore_note": "Les noms des coups bas ne sont pas à prendre au pied de la lettre : on peut parfaitement saisir un dragon 'par la tignasse'."
+        },
+        "choice_pools": [
+          {
+            "id": "choice-coups-bas-lvl3-subcls-ruffian",
+            "name": "Coups bas — sélection initiale (niv.3)",
+            "type": "feature_option",
+            "allow_choice": true,
+            "quantity": 3,
+            "pool": [
+              "feat-ruffian-coup-de-pression",
+              "feat-ruffian-dans-les-chassses",
+              "feat-ruffian-par-la-tignasse",
+              "feat-ruffian-lentrecuisse",
+              "feat-ruffian-couteau-dans-la-plaie",
+              "feat-ruffian-la-mandale",
+              "feat-ruffian-le-pain",
+              "feat-ruffian-la-bequille",
+              "feat-ruffian-la-clef",
+              "feat-ruffian-cloue-sur-place",
+              "feat-ruffian-le-taquet",
+              "feat-ruffian-le-becot",
+              "feat-ruffian-la-guepe",
+              "feat-ruffian-coup-de-latte",
+              "feat-ruffian-la-balayette",
+              "feat-ruffian-coup-du-lapin"
+            ]
+          },
+          {
+            "id": "choice-coups-bas-lvl7-subcls-ruffian",
+            "name": "Coups bas supplémentaires (niv.7)",
+            "type": "feature_option",
+            "allow_choice": true,
+            "quantity": 2,
+            "exclude_already_chosen": true,
+            "pool": [
+              "feat-ruffian-coup-de-pression",
+              "feat-ruffian-dans-les-chassses",
+              "feat-ruffian-par-la-tignasse",
+              "feat-ruffian-lentrecuisse",
+              "feat-ruffian-couteau-dans-la-plaie",
+              "feat-ruffian-la-mandale",
+              "feat-ruffian-le-pain",
+              "feat-ruffian-la-bequille",
+              "feat-ruffian-la-clef",
+              "feat-ruffian-cloue-sur-place",
+              "feat-ruffian-le-taquet",
+              "feat-ruffian-le-becot",
+              "feat-ruffian-la-guepe",
+              "feat-ruffian-coup-de-latte",
+              "feat-ruffian-la-balayette",
+              "feat-ruffian-coup-du-lapin"
+            ]
+          },
+          {
+            "id": "choice-coups-bas-lvl10-subcls-ruffian",
+            "name": "Coups bas supplémentaires (niv.10)",
+            "type": "feature_option",
+            "allow_choice": true,
+            "quantity": 2,
+            "exclude_already_chosen": true,
+            "pool": [
+              "feat-ruffian-coup-de-pression",
+              "feat-ruffian-dans-les-chassses",
+              "feat-ruffian-par-la-tignasse",
+              "feat-ruffian-lentrecuisse",
+              "feat-ruffian-couteau-dans-la-plaie",
+              "feat-ruffian-la-mandale",
+              "feat-ruffian-le-pain",
+              "feat-ruffian-la-bequille",
+              "feat-ruffian-la-clef",
+              "feat-ruffian-cloue-sur-place",
+              "feat-ruffian-le-taquet",
+              "feat-ruffian-le-becot",
+              "feat-ruffian-la-guepe",
+              "feat-ruffian-coup-de-latte",
+              "feat-ruffian-la-balayette",
+              "feat-ruffian-coup-du-lapin"
+            ]
+          },
+          {
+            "id": "choice-coups-bas-lvl15-subcls-ruffian",
+            "name": "Coups bas supplémentaires (niv.15)",
+            "type": "feature_option",
+            "allow_choice": true,
+            "quantity": 2,
+            "exclude_already_chosen": true,
+            "pool": [
+              "feat-ruffian-coup-de-pression",
+              "feat-ruffian-dans-les-chassses",
+              "feat-ruffian-par-la-tignasse",
+              "feat-ruffian-lentrecuisse",
+              "feat-ruffian-couteau-dans-la-plaie",
+              "feat-ruffian-la-mandale",
+              "feat-ruffian-le-pain",
+              "feat-ruffian-la-bequille",
+              "feat-ruffian-la-clef",
+              "feat-ruffian-cloue-sur-place",
+              "feat-ruffian-le-taquet",
+              "feat-ruffian-le-becot",
+              "feat-ruffian-la-guepe",
+              "feat-ruffian-coup-de-latte",
+              "feat-ruffian-la-balayette",
+              "feat-ruffian-coup-du-lapin"
+            ]
+          }
+        ],
+        "progression": [
+          {
+            "level": 3,
+            "features": [
+              "feat-oeil-torve",
+              "feat-menace-destabilisante",
+              "feat-coups-bas"
+            ],
+            "resources": {
+              "coups_bas_known": 3,
+              "coups_bas_damage_die": "1d6",
+              "menace_targets": 1
+            }
+          },
+          {
+            "level": 7,
+            "features": [
+              "feat-opportuniste-aguerri",
+              "feat-coups-bas"
+            ],
+            "resources": {
+              "coups_bas_known": 5,
+              "coups_bas_damage_die": "1d8",
+              "menace_targets": 1
+            }
+          },
+          {
+            "level": 10,
+            "features": [
+              "feat-science-du-coup-bas",
+              "feat-coups-bas"
+            ],
+            "resources": {
+              "coups_bas_known": 7,
+              "coups_bas_damage_die": "1d10",
+              "menace_targets": 1
+            }
+          },
+          {
+            "level": 15,
+            "features": [
+              "feat-menace-destabilisante-superieure",
+              "feat-coups-bas"
+            ],
+            "resources": {
+              "coups_bas_known": 9,
+              "coups_bas_damage_die": "2d6",
+              "menace_targets": 2
+            }
+          },
+          {
+            "level": 18,
+            "features": [
+              "feat-menace-souveraine"
+            ],
+            "resources": {
+              "coups_bas_known": 9,
+              "coups_bas_damage_die": "2d8",
+              "menace_targets": -1
+            }
+          }
+        ],
+        "features_details": [
+          {
+            "id": "feat-oeil-torve",
+            "name": "Œil torve",
+            "unlocks_at_level": 3,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Octroie la maîtrise de la compétence Intimidation. Si déjà maîtrisée, le bonus de maîtrise est doublé pour tout test associé.",
+              "lore_note": null
+            },
+            "grants_proficiency": "skill-intimidation",
+            "double_prof_if_already_proficient": true
+          },
+          {
+            "id": "feat-menace-destabilisante",
+            "name": "Menace déstabilisante",
+            "unlocks_at_level": 3,
+            "recharge": "short_rest",
+            "action_cost": "bonus_action",
+            "uses": {
+              "formula": "cha_mod_min_1"
+            },
+            "flavor": {
+              "summary": "Désigne un adversaire dans 6 m (1 cible niv.3–14, 2 cibles niv.15–17, toutes cibles dans 6 m niv.18+). JS Sagesse contre votre test de Charisme (Intimidation) : raté = effrayé jusqu'à la fin de son prochain tour.",
+              "lore_note": null
+            },
+            "save": {
+              "ability": "wis",
+              "vs": "cha_intimidation_check"
+            },
+            "on_fail": {
+              "condition": "frightened",
+              "duration": "until_end_of_targets_next_turn"
+            }
+          },
+          {
+            "id": "feat-coups-bas",
+            "name": "Coups bas",
+            "unlocks_at_level": 3,
+            "recharge": "passive",
+            "resolves_to_choice_pools": [
+              "choice-coups-bas-lvl3-subcls-ruffian",
+              "choice-coups-bas-lvl7-subcls-ruffian",
+              "choice-coups-bas-lvl10-subcls-ruffian",
+              "choice-coups-bas-lvl15-subcls-ruffian"
+            ],
+            "flavor": {
+              "summary": "Techniques sales exploitant l'état de l'adversaire. 3 choix sur 16 au niv.3, +2 aux niv.7/10/15 (max 9 connus). Portée : 1,5 m. DD = 8 + bonus maîtrise + mod. Cha. Dégâts sur échec au JS.",
+              "lore_note": null
+            },
+            "save_dc_formula": "8 + prof_bonus + cha_mod",
+            "damage_scaling": [
+              {
+                "from_level": 3,
+                "damage_die": "1d6"
+              },
+              {
+                "from_level": 7,
+                "damage_die": "1d8"
+              },
+              {
+                "from_level": 10,
+                "damage_die": "1d10"
+              },
+              {
+                "from_level": 15,
+                "damage_die": "2d6"
+              },
+              {
+                "from_level": 18,
+                "damage_die": "2d8"
+              }
+            ],
+            "special_rules": [
+              "Si l'effet impose un état préjudiciable, la cible réitère le JS à la fin de chacun de ses tours jusqu'à réussite.",
+              "Les coups bas nécessitant une réaction sont précisés dans leur description."
+            ]
+          },
+          {
+            "id": "feat-ruffian-coup-de-pression",
+            "name": "Coup bas : Le coup de pression",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_cost": "none",
+            "flavor": {
+              "summary": "Lors de l'action Attaquer contre un adversaire subissant un désavantage à ses attaques contre vous : JS Sagesse ou effrayé.",
+              "lore_note": null
+            },
+            "trigger": "attack_action_vs_target_with_attack_disadvantage_vs_you",
+            "save": {
+              "ability": "wis"
+            },
+            "on_fail": {
+              "condition": "frightened"
+            }
+          },
+          {
+            "id": "feat-ruffian-dans-les-chassses",
+            "name": "Coup bas : Dans les châsses",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_cost": "none",
+            "flavor": {
+              "summary": "Lors de l'action Attaquer contre un adversaire agrippé : JS Constitution ou aveuglé.",
+              "lore_note": null
+            },
+            "trigger": "attack_action_vs_grappled_target",
+            "save": {
+              "ability": "con"
+            },
+            "on_fail": {
+              "condition": "blinded"
+            }
+          },
+          {
+            "id": "feat-ruffian-par-la-tignasse",
+            "name": "Coup bas : Par la tignasse",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_cost": "none",
+            "flavor": {
+              "summary": "Lors de l'action Attaquer contre un adversaire neutralisé : JS Force ou la prochaine attaque CàC réussie contre lui avant la fin de votre prochain tour est un coup critique automatique.",
+              "lore_note": null
+            },
+            "trigger": "attack_action_vs_incapacitated_target",
+            "save": {
+              "ability": "str"
+            },
+            "on_fail": {
+              "effect": "next_melee_hit_is_critical_auto",
+              "duration": "until_end_of_your_next_turn"
+            }
+          },
+          {
+            "id": "feat-ruffian-lentrecuisse",
+            "name": "Coup bas : L'entrecuisse",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_cost": "none",
+            "flavor": {
+              "summary": "Lors de l'action Attaquer contre un adversaire à terre : JS Constitution ou neutralisé.",
+              "lore_note": null
+            },
+            "trigger": "attack_action_vs_prone_target",
+            "save": {
+              "ability": "con"
+            },
+            "on_fail": {
+              "condition": "incapacitated"
+            }
+          },
+          {
+            "id": "feat-ruffian-couteau-dans-la-plaie",
+            "name": "Coup bas : Le couteau dans la plaie",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_cost": "reaction",
+            "flavor": {
+              "summary": "Réaction : quand un adversaire subit les dégâts d'une attaque d'arme d'un allié (pas vous), il effectue un JS Sagesse ou devient nauséeux (équivalent : empoisonné).",
+              "lore_note": null
+            },
+            "trigger": "ally_deals_weapon_damage_to_enemy",
+            "save": {
+              "ability": "wis"
+            },
+            "on_fail": {
+              "condition": "poisoned"
+            }
+          },
+          {
+            "id": "feat-ruffian-la-mandale",
+            "name": "Coup bas : La mandale",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_cost": "reaction",
+            "flavor": {
+              "summary": "Réaction : quand un adversaire vous rate avec une attaque CàC, il effectue un JS Charisme ou subit un désavantage à son prochain jet d'attaque avant la fin de son prochain tour.",
+              "lore_note": null
+            },
+            "trigger": "enemy_misses_you_with_melee_attack",
+            "save": {
+              "ability": "cha"
+            },
+            "on_fail": {
+              "condition": "disadvantage_on_next_attack",
+              "duration": "until_end_of_targets_next_turn"
+            }
+          },
+          {
+            "id": "feat-ruffian-le-pain",
+            "name": "Coup bas : Le pain",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_cost": "none",
+            "flavor": {
+              "summary": "Lors de l'action Attaquer contre un adversaire neutralisé : JS Constitution ou étourdi.",
+              "lore_note": null
+            },
+            "trigger": "attack_action_vs_incapacitated_target",
+            "save": {
+              "ability": "con"
+            },
+            "on_fail": {
+              "condition": "stunned"
+            }
+          },
+          {
+            "id": "feat-ruffian-la-bequille",
+            "name": "Coup bas : La béquille",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_cost": "reaction",
+            "flavor": {
+              "summary": "Réaction : quand un adversaire se déplace, il effectue un JS Dextérité ou sa VD est réduite de moitié et vous avez l'avantage aux jets d'attaque le ciblant jusqu'à la fin de votre prochain tour.",
+              "lore_note": null
+            },
+            "trigger": "enemy_moves",
+            "save": {
+              "ability": "dex"
+            },
+            "on_fail": [
+              {
+                "effect": "speed_halved"
+              },
+              {
+                "effect": "grant_advantage_to_attacker",
+                "on": "attacks_vs_target",
+                "duration": "until_end_of_your_next_turn"
+              }
+            ]
+          },
+          {
+            "id": "feat-ruffian-la-clef",
+            "name": "Coup bas : La clef",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_cost": "none",
+            "flavor": {
+              "summary": "Après une attaque CàC réussie : la cible effectue un JS Force ou Dextérité (à sa convenance) ou se retrouve agrippée. Elle peut se libérer selon la règle normale (pas de nouveau JS à chaque tour).",
+              "lore_note": null
+            },
+            "trigger": "successful_melee_attack",
+            "save": {
+              "ability": [
+                "str",
+                "dex"
+              ],
+              "target_chooses": true
+            },
+            "on_fail": {
+              "condition": "grappled",
+              "escape_rule": "standard_grapple_escape"
+            }
+          },
+          {
+            "id": "feat-ruffian-cloue-sur-place",
+            "name": "Coup bas : Cloué sur place",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_cost": "reaction",
+            "flavor": {
+              "summary": "Réaction lors d'une attaque d'opportunité : la cible effectue un JS Dextérité ou sa VD est réduite à 0 jusqu'au début de son prochain tour.",
+              "lore_note": null
+            },
+            "trigger": "opportunity_attack",
+            "save": {
+              "ability": "dex"
+            },
+            "on_fail": {
+              "effect": "speed_zero",
+              "duration": "until_start_of_targets_next_turn"
+            }
+          },
+          {
+            "id": "feat-ruffian-le-taquet",
+            "name": "Coup bas : Le taquet",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_cost": "reaction",
+            "flavor": {
+              "summary": "Réaction : quand un adversaire lance un sort, il effectue un JS Charisme ou devient muet (ne peut pas utiliser de composantes verbales).",
+              "lore_note": null
+            },
+            "trigger": "enemy_casts_spell",
+            "save": {
+              "ability": "cha"
+            },
+            "on_fail": {
+              "condition": "silenced"
+            }
+          },
+          {
+            "id": "feat-ruffian-le-becot",
+            "name": "Coup bas : Le bécot",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_cost": "none",
+            "flavor": {
+              "summary": "Lors de l'action Attaquer contre un adversaire charmé : JS Intelligence ou il reste charmé par son charmeur malgré les dégâts qu'il subit de votre part.",
+              "lore_note": null
+            },
+            "trigger": "attack_action_vs_charmed_target",
+            "save": {
+              "ability": "int"
+            },
+            "on_fail": {
+              "effect": "charm_not_broken_by_damage"
+            }
+          },
+          {
+            "id": "feat-ruffian-la-guepe",
+            "name": "Coup bas : La guêpe",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_cost": "none",
+            "flavor": {
+              "summary": "Après une attaque réussie contre un lanceur de sorts en concentration : il subit un désavantage au jet de sauvegarde de Constitution pour maintenir la concentration.",
+              "lore_note": null
+            },
+            "trigger": "successful_attack_vs_concentrating_spellcaster",
+            "effect": {
+              "disadvantages": [
+                {
+                  "type": "saving_throw",
+                  "target": "con",
+                  "condition": "concentration_check"
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-ruffian-coup-de-latte",
+            "name": "Coup bas : Le coup de latte",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_cost": "reaction",
+            "flavor": {
+              "summary": "Réaction : quand un adversaire subit des dégâts de sort, il effectue un JS Sagesse ou est renversé (à terre).",
+              "lore_note": null
+            },
+            "trigger": "enemy_takes_spell_damage",
+            "save": {
+              "ability": "wis"
+            },
+            "on_fail": {
+              "condition": "prone"
+            }
+          },
+          {
+            "id": "feat-ruffian-la-balayette",
+            "name": "Coup bas : La balayette",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_cost": "none",
+            "flavor": {
+              "summary": "Sur un coup critique de votre part : la cible effectue un JS Dextérité ou tombe à terre.",
+              "lore_note": null
+            },
+            "trigger": "you_score_critical_hit",
+            "save": {
+              "ability": "dex"
+            },
+            "on_fail": {
+              "condition": "prone"
+            }
+          },
+          {
+            "id": "feat-ruffian-coup-du-lapin",
+            "name": "Coup bas : Le coup du lapin",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_cost": "none",
+            "flavor": {
+              "summary": "Lors de l'action Attaquer contre un adversaire étourdi : il effectue un JS (caractéristique au choix de l'attaquant) ou est paralysé.",
+              "lore_note": null
+            },
+            "trigger": "attack_action_vs_stunned_target",
+            "save": {
+              "ability": "attacker_chooses"
+            },
+            "on_fail": {
+              "condition": "paralyzed"
+            }
+          },
+          {
+            "id": "feat-opportuniste-aguerri",
+            "name": "Opportuniste aguerri",
+            "unlocks_at_level": 7,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Avantage à tous les jets d'attaque lors d'une attaque d'opportunité.",
+              "lore_note": null
+            },
+            "advantages": [
+              {
+                "type": "attack_roll",
+                "condition": "opportunity_attack"
+              }
+            ]
+          },
+          {
+            "id": "feat-science-du-coup-bas",
+            "name": "Science du coup bas",
+            "unlocks_at_level": 10,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Quand un adversaire dans 3 m déclenche un coup bas vous demandant une réaction, déplacez-vous gratuitement de 1,5 m pour vous positionner à 1,5 m maximum de lui avant d'asséner le coup.",
+              "lore_note": null
+            }
+          },
+          {
+            "id": "feat-menace-destabilisante-superieure",
+            "name": "Menace déstabilisante supérieure",
+            "unlocks_at_level": 15,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "La Menace déstabilisante peut désormais cibler simultanément deux adversaires dans un rayon de 6 m.",
+              "lore_note": null
+            },
+            "modifiers": [
+              {
+                "type": "resource_upgrade",
+                "resource_key": "menace_targets",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "id": "feat-menace-souveraine",
+            "name": "Menace souveraine",
+            "unlocks_at_level": 18,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "La Menace déstabilisante cible tous les adversaires dans 6 m. Déplacement gratuit de la moitié de votre VD avant un coup bas (réaction) si le déplacement permet de se positionner à 1,5 m de la cible.",
+              "lore_note": null
+            },
+            "modifiers": [
+              {
+                "type": "resource_upgrade",
+                "resource_key": "menace_targets",
+                "value": -1,
+                "note": "-1 = illimité (tous dans la zone)"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "level_unlocked": 3,
+    "subclass_feature_levels": [
+      3,
+      7,
+      10,
+      15,
+      18
+    ]
+  },
+  "source_page": 146,
+  "optional_rule": {
+    "id": "rule-sous-le-soleil-ardent",
+    "name": "Sous le soleil ardent",
+    "description": "Dans les contrées chaudes, le guerrier renonce aux maîtrises des armures lourdes et intermédiaires et obtient à la place l'aptitude Défense sans armure : CA = 10 + mod. Dex + mod. Con (bouclier autorisé)."
+  }
+}

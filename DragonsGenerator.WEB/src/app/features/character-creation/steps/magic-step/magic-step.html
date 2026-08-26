@@ -100,7 +100,7 @@
             "
           >
             @if (cantripsRemaining() === 0) {
-              <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
+              <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
               Maîtrise Complète ({{ selectedCantrips().size }} / {{ q.cantrips }})
             } @else {
               <span class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
@@ -112,7 +112,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
           @for (spell of availableCantrips(); track spell.id) {
             <div
-              class="relative w-full group transition-all duration-300"
+              class="relative w-full group transition-[colors,transform,opacity,box-shadow] duration-200"
               [ngClass]="{
                 'opacity-40 grayscale pointer-events-none':
                   !canSelectCantrip(spell.id) && !isCantripSelected(spell.id),
@@ -120,12 +120,7 @@
               (click)="canSelectCantrip(spell.id) ? toggleCantrip(spell.id) : null"
             >
               <div
-                class="absolute -inset-2 rounded-2xl blur-xl transition-opacity duration-300 pointer-events-none"
-                [ngClass]="getGlowClasses(spell.school, isCantripSelected(spell.id))"
-              ></div>
-
-              <div
-                class="relative flex flex-col h-full p-1.5 rounded-xl bg-[#171b22] transition-all duration-300 cursor-pointer"
+                class="relative flex flex-col h-full p-1.5 rounded-xl bg-[#171b22] transition-[colors,transform,opacity,box-shadow] duration-200 cursor-pointer"
                 [ngClass]="getCardClasses(spell.school, isCantripSelected(spell.id))"
               >
                 <div
@@ -149,7 +144,7 @@
                       </span>
                     </div>
                     <button
-                      class="w-6 h-6 rounded bg-[#171b22] border border-slate-700 flex items-center justify-center text-[10px] text-slate-400 hover:text-amber-400 hover:border-amber-500/50 transition-all shadow-inner shrink-0"
+                      class="w-6 h-6 rounded bg-[#171b22] border border-slate-700 flex items-center justify-center text-[10px] text-slate-400 hover:text-amber-400 hover:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 shadow-inner shrink-0"
                       (click)="toggleExpand(spell.id); $event.stopPropagation()"
                     >
                       {{ isExpanded(spell.id) ? '▲' : '▼' }}
@@ -223,6 +218,155 @@
         </div>
       </div>
 
+      @if (q.hasFullListAccess && spellsToChoose() > 0) {
+        <div
+          class="mb-8 flex flex-col items-center gap-3 bg-[#171b22] px-6 py-5 rounded-xl border border-slate-800 shadow-lg text-center max-w-xl"
+        >
+          <span class="text-3xl opacity-80 drop-shadow-md"
+            ><iconify-icon icon="fluent-emoji:folded-hands"></iconify-icon
+          ></span>
+          <p class="text-xs text-slate-300 italic leading-relaxed font-serif">
+            Vous connaissez toute la liste de sorts de votre classe. Préparez
+            {{ spellsToChoose() }} sort(s) préparés pour aujourd'hui
+            (formule : modificateur de {{ spellcastingAbility() }} + niveau).
+          </p>
+          @if (domainSpells().length > 0) {
+            <p class="text-[10px] uppercase tracking-widest text-amber-500/80 font-black">
+              Les sorts de domaine sont toujours préparés en plus.
+            </p>
+          }
+        </div>
+      } @else if (q.isPrepared && spellsToChoose() === 0) {
+        <div
+          class="mb-12 flex flex-col items-center gap-3 bg-[#171b22] px-6 py-5 rounded-xl border border-slate-800 shadow-lg text-center max-w-xl"
+        >
+          <span class="text-3xl opacity-80 drop-shadow-md"
+            ><iconify-icon icon="fluent-emoji:folded-hands"></iconify-icon
+          ></span>
+          <p class="text-xs text-slate-300 italic leading-relaxed font-serif">
+            "Votre foi ou votre lien avec la nature vous octroie la connaissance absolue."
+          </p>
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-black mt-2">
+            Vous avez accès à toute la liste de sorts de votre classe. Vous préparerez ceux de votre
+            choix après un repos long.
+          </p>
+        </div>
+      }
+
+      @if (arcanumSpellLevels().length > 0) {
+        <div class="w-full mb-12">
+          <div class="flex items-center gap-6 mb-6 w-full">
+            <div
+              class="h-px flex-grow bg-gradient-to-r from-transparent via-violet-800 to-violet-800"
+            ></div>
+            <h3
+              class="text-lg font-bold text-violet-300 font-serif tracking-widest text-center uppercase drop-shadow-md"
+            >
+              Arcanes du Suzerain
+            </h3>
+            <div
+              class="h-px flex-grow bg-gradient-to-l from-transparent via-violet-800 to-violet-800"
+            ></div>
+          </div>
+          <p class="text-center text-[11px] text-slate-400 mb-6 max-w-xl mx-auto italic">
+            Un sort de haut niveau par palier, lançable 1 fois par repos long sans emplacement de
+            pacte.
+          </p>
+          <div class="flex justify-center mb-6">
+            <div
+              class="px-6 py-2.5 rounded-full border text-[10px] font-black uppercase tracking-widest flex items-center gap-3"
+              [ngClass]="
+                arcanumComplete()
+                  ? 'bg-emerald-950/30 text-emerald-400 border-emerald-800/50'
+                  : 'bg-[#1b2028] text-violet-300 border-violet-900/50'
+              "
+            >
+              @if (arcanumComplete()) {
+                <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                Arcanes choisies ({{ arcanumSpellLevels().length }})
+              } @else {
+                <span class="w-2 h-2 bg-violet-400 rounded-full animate-pulse"></span>
+                Choisissez un sort pour chaque Arcane
+              }
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-4 max-w-3xl mx-auto w-full">
+            @for (lvl of arcanumSpellLevels(); track lvl) {
+              <div class="bg-[#171b22] border border-violet-900/40 rounded-xl overflow-hidden">
+                <button
+                  type="button"
+                  class="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-violet-950/20 transition-colors"
+                  (click)="toggleArcanumPanel(lvl)"
+                >
+                  <div>
+                    <div class="text-xs font-black uppercase tracking-widest text-violet-300">
+                      Arcane · niveau {{ lvl }}
+                    </div>
+                    <div class="text-sm text-slate-200 mt-0.5">
+                      @if (arcanumPickName(lvl); as name) {
+                        <span class="text-amber-400 font-bold">{{ name }}</span>
+                      } @else {
+                        <span class="text-slate-500 italic">Aucun sort choisi</span>
+                      }
+                    </div>
+                  </div>
+                  <span class="text-violet-400 text-lg">{{
+                    expandedArcanumLevel() === lvl ? '▴' : '▾'
+                  }}</span>
+                </button>
+                @if (expandedArcanumLevel() === lvl) {
+                  <div
+                    class="border-t border-violet-900/30 p-3 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-72 overflow-y-auto"
+                  >
+                    @for (spell of spellsForArcanum(lvl); track spell.id) {
+                      <button
+                        type="button"
+                        class="text-left px-3 py-2 rounded-lg border text-xs transition-colors"
+                        [class.border-violet-400]="arcanumPicks()[lvl] === spell.id"
+                        [class.bg-violet-950]="arcanumPicks()[lvl] === spell.id"
+                        [class.border-slate-700]="arcanumPicks()[lvl] !== spell.id"
+                        (click)="pickArcanum(lvl, spell.id)"
+                      >
+                        <div class="font-bold text-amber-400">{{ spell.name }}</div>
+                        <div class="text-[10px] text-slate-400 line-clamp-2 mt-0.5">
+                          {{ spell.school }} · {{ spell.description }}
+                        </div>
+                      </button>
+                    } @empty {
+                      <p class="text-xs text-slate-500 col-span-2 px-2 py-4 text-center">
+                        Aucun sort de niveau {{ lvl }} pour le sorcier dans le catalogue.
+                      </p>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (domainSpells().length > 0) {
+        <div class="w-full mb-10">
+          <div class="flex items-center gap-6 mb-4 w-full">
+            <div class="h-px flex-1 bg-gradient-to-r from-transparent to-slate-700"></div>
+            <h3 class="text-sm font-black uppercase tracking-widest text-amber-500 whitespace-nowrap">
+              {{ bonusSpellsTitle() }}
+            </h3>
+            <div class="h-px flex-1 bg-gradient-to-l from-transparent to-slate-700"></div>
+          </div>
+          <div class="flex flex-wrap gap-2 justify-center">
+            @for (spell of domainSpells(); track spell.id) {
+              <span
+                class="px-3 py-1.5 rounded-full text-xs font-bold border border-amber-800/50 bg-amber-950/30 text-amber-300"
+              >
+                {{ spell.name }}
+              </span>
+            }
+          </div>
+        </div>
+      }
+
       @if (spellsToChoose() > 0) {
         <div id="section-level-1" class="w-full mb-12">
           <div class="flex items-center gap-6 mb-6 w-full">
@@ -232,7 +376,11 @@
             <h3
               class="text-lg font-bold text-slate-200 font-serif tracking-widest text-center uppercase drop-shadow-md"
             >
-              Sorts de Niveau 1
+              {{
+                q.hasFullListAccess
+                  ? 'Sorts préparés — Niveaux 1 à ' + maxSpellLevel()
+                  : 'Sorts de niveaux 1 à ' + maxSpellLevel()
+              }}
             </h3>
             <div
               class="h-px flex-grow bg-gradient-to-l from-transparent via-slate-700 to-slate-700"
@@ -249,11 +397,12 @@
               "
             >
               @if (spellsRemaining() === 0) {
-                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
+                <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
                 Sélection Complète ({{ selectedSpells().size }} / {{ spellsToChoose() }})
               } @else {
                 <span class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
-                Encore {{ spellsRemaining() }} sort(s) à retenir
+                Encore {{ spellsRemaining() }} sort(s)
+                {{ q.hasFullListAccess ? 'à préparer' : 'à retenir' }}
               }
             </div>
           </div>
@@ -261,7 +410,7 @@
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             @for (spell of availableLevel1(); track spell.id) {
               <div
-                class="relative w-full group transition-all duration-300"
+                class="relative w-full group transition-[colors,transform,opacity,box-shadow] duration-200"
                 [ngClass]="{
                   'opacity-40 grayscale pointer-events-none':
                     !canSelectSpell(spell.id) && !isSpellSelected(spell.id),
@@ -269,12 +418,7 @@
                 (click)="canSelectSpell(spell.id) ? toggleSpell(spell.id) : null"
               >
                 <div
-                  class="absolute -inset-2 rounded-2xl blur-xl transition-opacity duration-300 pointer-events-none"
-                  [ngClass]="getGlowClasses(spell.school, isSpellSelected(spell.id))"
-                ></div>
-
-                <div
-                  class="relative flex flex-col h-full p-1.5 rounded-xl bg-[#171b22] transition-all duration-300 cursor-pointer"
+                  class="relative flex flex-col h-full p-1.5 rounded-xl bg-[#171b22] transition-[colors,transform,opacity,box-shadow] duration-200 cursor-pointer"
                   [ngClass]="getCardClasses(spell.school, isSpellSelected(spell.id))"
                 >
                   <div
@@ -298,7 +442,7 @@
                         </span>
                       </div>
                       <button
-                        class="w-6 h-6 rounded bg-[#171b22] border border-slate-700 flex items-center justify-center text-[10px] text-slate-400 hover:text-amber-400 hover:border-amber-500/50 transition-all shadow-inner shrink-0"
+                        class="w-6 h-6 rounded bg-[#171b22] border border-slate-700 flex items-center justify-center text-[10px] text-slate-400 hover:text-amber-400 hover:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 shadow-inner shrink-0"
                         (click)="toggleExpand(spell.id); $event.stopPropagation()"
                       >
                         {{ isExpanded(spell.id) ? '▲' : '▼' }}
@@ -306,6 +450,11 @@
                     </div>
 
                     <div class="flex flex-wrap gap-2 mt-2">
+                      <span
+                        class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest shadow-inner border bg-slate-800/80 text-slate-300 border-slate-600/50"
+                      >
+                        Niv. {{ spell.level }}
+                      </span>
                       <span
                         class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest shadow-inner border"
                         [ngClass]="getBadgeClasses(spell.school)"
@@ -379,59 +528,150 @@
         </div>
       }
 
-      @if (q.isPrepared && spellsToChoose() === 0) {
-        <div
-          class="mb-12 flex flex-col items-center gap-3 bg-[#171b22] px-6 py-5 rounded-xl border border-slate-800 shadow-lg text-center max-w-xl"
-        >
-          <span class="text-3xl opacity-80 drop-shadow-md"
-            ><iconify-icon icon="fluent-emoji:folded-hands"></iconify-icon
-          ></span>
-          <p class="text-xs text-slate-300 italic leading-relaxed font-serif">
-            "Votre foi ou votre lien avec la nature vous octroie la connaissance absolue."
+      @if (needsSpellMastery() || needsSignatureSpells()) {
+        <div class="w-full mb-12">
+          <div class="flex items-center gap-6 mb-6 w-full">
+            <div
+              class="h-px flex-grow bg-gradient-to-r from-transparent via-sky-800 to-sky-800"
+            ></div>
+            <h3
+              class="text-lg font-bold text-sky-300 font-serif tracking-widest text-center uppercase drop-shadow-md"
+            >
+              Maîtrise & Sorts attitrés
+            </h3>
+            <div
+              class="h-px flex-grow bg-gradient-to-l from-transparent via-sky-800 to-sky-800"
+            ></div>
+          </div>
+          <p class="text-center text-[11px] text-slate-400 mb-6 max-w-xl mx-auto italic">
+            Choisissez parmi les sorts déjà dans votre grimoire. Maîtrise = à volonté · Attitrés =
+            toujours préparés (1× / repos long).
           </p>
-          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-black mt-2">
-            Vous avez accès à toute la liste de sorts de votre classe. Vous préparerez ceux de votre
-            choix après un repos long.
-          </p>
+
+          @if (needsSpellMastery()) {
+            <div class="max-w-3xl mx-auto w-full mb-8 flex flex-col gap-4">
+              @for (lvl of [1, 2]; track lvl) {
+                <div class="bg-[#171b22] border border-sky-900/40 rounded-xl p-4">
+                  <div class="text-xs font-black uppercase tracking-widest text-sky-300 mb-2">
+                    Maîtrise · sort de niveau {{ lvl }}
+                    @if (masteryPickName(lvl); as n) {
+                      <span class="text-amber-400 normal-case tracking-normal"> — {{ n }}</span>
+                    }
+                  </div>
+                  @if (preparedSpellsOfLevel(lvl).length === 0) {
+                    <p class="text-[11px] text-amber-500/80">
+                      Ajoutez d’abord un sort de niveau {{ lvl }} dans votre grimoire ci-dessus.
+                    </p>
+                  } @else {
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      @for (spell of preparedSpellsOfLevel(lvl); track spell.id) {
+                        <button
+                          type="button"
+                          class="text-left px-3 py-2 rounded-lg border text-xs"
+                          [class.border-sky-400]="masteryPicks()[lvl] === spell.id"
+                          [class.bg-sky-950]="masteryPicks()[lvl] === spell.id"
+                          [class.border-slate-700]="masteryPicks()[lvl] !== spell.id"
+                          (click)="pickMastery($any(lvl), spell.id)"
+                        >
+                          <div class="font-bold text-amber-400">{{ spell.name }}</div>
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          @if (needsSignatureSpells()) {
+            <div class="max-w-3xl mx-auto w-full bg-[#171b22] border border-sky-900/40 rounded-xl p-4">
+              <div class="text-xs font-black uppercase tracking-widest text-sky-300 mb-1">
+                Sorts attitrés · 2 sorts de niveau 3
+              </div>
+              <p class="text-[10px] text-slate-500 mb-3">
+                {{ signatureIds().length }} / 2 sélectionné(s)
+              </p>
+              @if (preparedSpellsOfLevel(3).length === 0) {
+                <p class="text-[11px] text-amber-500/80">
+                  Ajoutez d’abord des sorts de niveau 3 dans votre grimoire.
+                </p>
+              } @else {
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  @for (spell of preparedSpellsOfLevel(3); track spell.id) {
+                    <button
+                      type="button"
+                      class="text-left px-3 py-2 rounded-lg border text-xs"
+                      [class.border-sky-400]="isSignatureSelected(spell.id)"
+                      [class.bg-sky-950]="isSignatureSelected(spell.id)"
+                      [class.border-slate-700]="!isSignatureSelected(spell.id)"
+                      (click)="toggleSignature(spell.id)"
+                    >
+                      <div class="font-bold text-amber-400">{{ spell.name }}</div>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          }
         </div>
       }
 
-      <div class="mt-4 flex flex-col items-center gap-4 animate-[fadeIn_0.5s_ease] w-full">
-        @if (!isConfirmed()) {
-          <button
-            id="btn-confirm-magic"
-            class="px-14 py-4 rounded-xl text-sm font-black uppercase tracking-widest shadow-[0_0_25px_rgba(192,38,211,0.3)] transition-all"
-            [ngClass]="
-              selectionComplete()
-                ? 'bg-fuchsia-600 text-white hover:bg-fuchsia-500 hover:scale-105 active:scale-95'
-                : 'bg-slate-800 text-slate-500 opacity-50 cursor-not-allowed'
-            "
-            [disabled]="!selectionComplete()"
-            (click)="confirm()"
-          >
-            Sceller le Grimoire
-          </button>
-        } @else {
-          <div
-            class="px-6 py-2.5 bg-emerald-950/30 text-emerald-400 border border-emerald-800/50 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-3 shadow-[0_0_15px_rgba(16,185,129,0.1)] mb-2"
-          >
-            <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
-            Sorts mémorisés
+      @if (isCleric()) {
+        <div class="w-full mb-10">
+          <div class="flex items-center gap-6 mb-6 w-full">
+            <div class="h-px flex-1 bg-gradient-to-r from-transparent to-slate-700"></div>
+            <h3 class="text-sm font-black uppercase tracking-widest text-amber-500 whitespace-nowrap">
+              Divinité vénérée
+            </h3>
+            <div class="h-px flex-1 bg-gradient-to-l from-transparent to-slate-700"></div>
           </div>
-          <button
-            class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-500 transition-colors bg-[#1b2028] px-5 py-2 rounded-full border border-slate-700"
-            (click)="clearSelection()"
-          >
-            Déchirer les pages (Modifier)
-          </button>
-        }
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            @for (deity of availableDeities(); track deity.id) {
+              <button
+                type="button"
+                class="p-4 rounded-xl border text-left transition-[colors,transform,opacity,box-shadow] duration-200"
+                [ngClass]="
+                  selectedDeityId() === deity.id
+                    ? 'border-amber-500 bg-amber-950/30 shadow-sm'
+                    : 'border-slate-800 bg-[#171b22] hover:border-slate-600'
+                "
+                (click)="selectDeity(deity.id)"
+              >
+                <div class="font-serif text-amber-400 text-sm mb-1">{{ deity.name }}</div>
+                <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                  {{ deity.tonality ?? '—' }}
+                </div>
+              </button>
+            }
+          </div>
+        </div>
+      }
 
-        <button
-          class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-400 transition-colors bg-[#1b2028] px-6 py-2 rounded-full border border-slate-700 mt-2"
-          (click)="prevStep()"
-        >
-          ← Étape précédente
-        </button>
+            <div class="mt-4 flex flex-col items-center gap-4 animate-[fadeIn_0.5s_ease] w-full">
+        <nav class="wizard-step-nav">
+          <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
+            ← Étape précédente
+          </button>
+          @if (!isConfirmed()) {
+            <button
+              id="btn-confirm-magic"
+              type="button"
+              class="wizard-nav-primary"
+              [disabled]="!selectionComplete()"
+              (click)="confirm()"
+            >
+              Sceller le Grimoire
+            </button>
+          } @else {
+            <span class="wizard-nav-status">
+              <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+              Sorts mémorisés
+            </span>
+            <button type="button" class="wizard-nav-secondary" (click)="clearSelection()">
+              Modifier les sorts
+            </button>
+          }
+        </nav>
       </div>
     </div>
   }

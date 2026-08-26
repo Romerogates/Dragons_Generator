@@ -1,0 +1,207 @@
+{
+  "schema_version": "2.0",
+  "id": "sp-halfelin",
+  "name": "Halfelins",
+  "name_alt": [],
+  "playable": true,
+  "requires_subspecies": true,
+  "source": {
+    "book": "Dragons - Livre de base: Aventuriers",
+    "pages": "42-45"
+  },
+  "flavor": {
+    "summary": "Les halfelins ont l'air de petits humains, à l'exception de leurs pieds légèrement velus. Vifs et agiles, ils savent se faire discrets et passent souvent inaperçus là où d'autres ne le pourraient pas.",
+    "culture": "Les halfelins vivent presque toujours en marge des royaumes humains et ont développé une culture propre, dont leurs célèbres demeures semi-enterrées au toit herbeux. Ils se distinguent par leur talent pour l'agriculture.",
+    "lore_notes": [
+      "Les pieds-légers sont de discrets médiateurs, ayant notamment obtenu la Myetée comme récompense de leur rôle tampon entre humains et elfes.",
+      "Les pieds-sûrs sont des nomades des forêts tropicales et équatoriales, reconnus pour toujours payer leurs dettes — en vengeance ou en gratitude.",
+      "Il n'y a pas vraiment de langue halfeline, tout au plus des expressions et un accent : un dialecte de la langue dominante locale."
+    ]
+  },
+  "base_stats": {
+    "ability_score_increase": {
+      "dex": 2
+    },
+    "speed": {
+      "base_m": 7.5,
+      "not_reduced_by_heavy_armor": false
+    },
+    "size": "P",
+    "darkvision_m": 0,
+    "age": {
+      "maturity_years": 20,
+      "lifespan_years": 150,
+      "flavor": "Adultes vers vingt ans, ils vivent généralement un bon siècle et demi."
+    },
+    "alignment": {
+      "tendency": "Loyal",
+      "flavor": "Majoritairement loyaux par attachement aux traditions et à leur communauté."
+    }
+  },
+  "traits": [
+    {
+      "id": "trait-chanceux",
+      "name": "Chanceux",
+      "flavor": {
+        "desc": "Lorsque vous obtenez un 1 sur le d20 d'un jet d'attaque, d'un test de caractéristique ou d'un jet de sauvegarde, vous pouvez relancer le dé. C'est alors le résultat du second jet qui compte."
+      },
+      "mechanics": {
+        "type": "lucky_reroll",
+        "trigger_dice_result": 1,
+        "applies_to": [
+          "jet_attaque",
+          "test_caracteristique",
+          "jet_sauvegarde"
+        ],
+        "reroll_count": 1,
+        "use_second_result": true
+      }
+    },
+    {
+      "id": "trait-vaillant",
+      "name": "Vaillant",
+      "flavor": {
+        "desc": "Vous bénéficiez d'un avantage aux jets de sauvegarde contre l'état préjudiciable effrayé."
+      },
+      "mechanics": {
+        "type": "compound",
+        "advantages": [
+          {
+            "type": "saving_throw",
+            "target": "any",
+            "condition": "contre l'état condition-effraye"
+          }
+        ]
+      }
+    },
+    {
+      "id": "trait-agilite-halfeline",
+      "name": "Agilité halfeline",
+      "flavor": {
+        "desc": "Vous pouvez vous déplacer dans tout espace occupé par une créature dont la catégorie de taille est au moins d'un cran supérieure à la vôtre."
+      },
+      "mechanics": {
+        "type": "movement_special",
+        "movement_through_larger_creatures": true,
+        "min_size_category_difference": 1
+      }
+    }
+  ],
+  "creation_choices": [
+    {
+      "id": "choice-langue-supp-halfelin",
+      "name": "Langue supplémentaire",
+      "flavor": {
+        "desc": "Vous parlez, lisez et écrivez le commun et une autre langue au choix."
+      },
+      "type": "language",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        "any"
+      ]
+    }
+  ],
+  "languages": {
+    "fixed": [
+      "lg-commun"
+    ],
+    "choices": [
+      {
+        "id": "choice-langue-supp-halfelin",
+        "allow_choice": true,
+        "quantity": 1,
+        "pool": [
+          "any"
+        ]
+      }
+    ]
+  },
+  "subspecies": [
+    {
+      "id": "sp-halfelin-pied-leger",
+      "name": "Pieds-légers",
+      "playable": true,
+      "flavor": {
+        "desc": "Les pieds-légers sont de discrets héros, capables d'éviter bien des problèmes d'un sourire chaleureux ou en se faisant oublier. Souvent roublards ou bardes."
+      },
+      "ability_score_increase": {
+        "cha": 1
+      },
+      "traits": [
+        {
+          "id": "trait-discretion-naturelle",
+          "name": "Discrétion naturelle",
+          "flavor": {
+            "desc": "Il vous suffit d'être derrière une créature dont la catégorie de taille est au moins d'un cran supérieure à la vôtre pour pouvoir tenter de vous cacher."
+          },
+          "mechanics": {
+            "type": "hide_behind_larger",
+            "min_size_category_difference": 1
+          }
+        }
+      ],
+      "creation_choices": [
+        {
+          "id": "choice-outil-pied-leger",
+          "name": "Richesse de la terre",
+          "flavor": {
+            "desc": "Vous gagnez la maîtrise d'un outil lié à l'art de vivre au choix parmi les suivants."
+          },
+          "type": "tool_proficiency",
+          "allow_choice": true,
+          "quantity": 1,
+          "pool": [
+            "tl-outils-de-la-ferme",
+            "tl-necessaire-de-brasseur",
+            "tl-ustensiles-de-cuisinier"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sp-halfelin-pied-sur",
+      "name": "Pieds-sûrs",
+      "playable": true,
+      "flavor": {
+        "desc": "Au teint hâlé sombre, aux cheveux bouclés à frisés, les pieds-sûrs sont les habitants nomades des forêts tropicales et équatoriales. Ils construisent des nids ou des cabanes sphériques et voyagent sur les rivières à bord de pirogues. Souvent rôdeurs ou barbares, parfois druides."
+      },
+      "ability_score_increase": {
+        "con": 1
+      },
+      "traits": [
+        {
+          "id": "trait-harmonie-sauvage",
+          "name": "Harmonie sauvage",
+          "flavor": {
+            "desc": "Vous recevez la maîtrise de la compétence Survie."
+          },
+          "mechanics": {
+            "type": "skill_proficiency",
+            "grants": [
+              "skill-survie"
+            ]
+          }
+        },
+        {
+          "id": "trait-guerre-tribale",
+          "name": "Guerre tribale",
+          "flavor": {
+            "desc": "Vous bénéficiez de la maîtrise de l'arc court, du filet, de la lance et de la sarbacane."
+          },
+          "mechanics": {
+            "type": "weapon_proficiency",
+            "grants": [
+              "arc-court",
+              "filet",
+              "lance",
+              "sarbacane"
+            ]
+          }
+        }
+      ],
+      "creation_choices": []
+    }
+  ],
+  "optional_rules": []
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-karphud",
+  "name": "Karphûd",
+  "category": "base",
+  "typical_speakers": [
+    "Drakéides du Rachamangekr"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-elfique-adapte",
+      "label": "Elfique (adapté)",
+      "type": "alphabet"
+    },
+    {
+      "id": "wr-draconique",
+      "label": "Draconique",
+      "type": "ideogramme-syllabaire"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [
+    "Rachamangekr (royaumes draconiques)"
+  ],
+  "description": "Langue du Rachamangekr, dans les royaumes draconiques. Elle utilise un alphabet elfique adapté ainsi que le draconique."
+}

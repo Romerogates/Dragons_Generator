@@ -1,0 +1,33 @@
+{
+  "schema_version": "2.0",
+  "id": "don-mental-dacier",
+  "name": "Mental d'acier",
+  "requires_magic": false,
+  "category": "survival",
+  "prerequisites": [],
+  "ability_score_increase": {
+    "ability": "WIS",
+    "value": 1,
+    "max": 20
+  },
+  "description": "+1 Sagesse (max 20). Chaque fois que vous obtenez un 1 sur un jet d'attaque ou de sauvegarde, ou qu'un adversaire réussit un coup critique contre vous, vous recevez immédiatement un nombre de PV temporaires égal à votre niveau (uniquement en situation de stress).",
+  "benefits": [
+    {
+      "type": "ability_score_increase",
+      "ability": "WIS",
+      "value": 1
+    },
+    {
+      "type": "temp_hp",
+      "trigger": "résultat brut 1 ou subir coup critique",
+      "formula": "niveau_personnage",
+      "condition": "en danger"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "mental",
+    "défense",
+    "sagesse"
+  ]
+}

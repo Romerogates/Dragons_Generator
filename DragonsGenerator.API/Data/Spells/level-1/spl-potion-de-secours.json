@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-potion-de-secours",
+  "name": "Potion de secours",
+  "level": 1,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "de l'eau et une goutte de miel"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien",
+    "cls-pretre"
+  ],
+  "description": "Tout en lançant le sort, vous tenez un récipient que vous remplissez d'eau avant d'y verser une goutte de miel. Au terme de votre incantation, ce liquide acquiert les mêmes propriétés qu'une potion magique que vous portez. L'emplacement de sort utilisé détermine la puissance de la potion que vous pouvez copier. Vous ne pouvez dupliquer qu'une potion créée par des moyens physiques : processus alchimique, fermentation, décoction, etc. Il n'est pas possible de dupliquer une potion de secours. Vous trouverez en annexe une présentation des potions alchimiques les plus répandues. Au terme de la durée du sort, si la potion de secours n'a pas été bue ou utilisée, elle s'évapore. Rareté de la potion Emplacement de sort requis Romero (Order #44468918) Vous touchez une créature consentante et lui conférez une sorte de sixième sens. Pour toute la durée du sort, la cible ne peut pas être surprise et bénéficie d'un avantage aux jets d'attaque, tests de caractéristique et jets de sauvegarde. En outre, les autres créatures subissent un désavantage aux jets d'attaque contre la cible pendant toute la durée du sort. Ce sort prend fin immédiatement si vous le relancez avant son terme.",
+  "modular_options": []
+}

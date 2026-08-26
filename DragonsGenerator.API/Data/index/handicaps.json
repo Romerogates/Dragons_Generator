@@ -1,0 +1,72 @@
+{
+  "schema_version": "2.0",
+  "description": "Index des handicaps optionnels (règle de création de personnage, Dragons — jeu de rôle). Un handicap offre une compensation (+1 carac., 2 maîtrises ou, si deux handicaps, un don).",
+  "language": "fr",
+  "stats": {
+    "total": 10,
+    "livre_de_base": 7,
+    "optional": 3
+  },
+  "handicaps": [
+    {
+      "id": "hdc-boiteux",
+      "name": "Boiteux",
+      "source": "livre_de_base",
+      "file": "Handicaps/hdc-boiteux.json"
+    },
+    {
+      "id": "hdc-borgne",
+      "name": "Borgne",
+      "source": "livre_de_base",
+      "file": "Handicaps/hdc-borgne.json"
+    },
+    {
+      "id": "hdc-corrompu",
+      "name": "Corrompu",
+      "source": "module:noirceur",
+      "file": "Handicaps/hdc-corrompu.json"
+    },
+    {
+      "id": "hdc-desequilibre",
+      "name": "Déséquilibré",
+      "source": "livre_de_base",
+      "file": "Handicaps/hdc-desequilibre.json"
+    },
+    {
+      "id": "hdc-essence-vulnerable",
+      "name": "Essence vulnérable",
+      "source": "module:noirceur",
+      "file": "Handicaps/hdc-essence-vulnerable.json"
+    },
+    {
+      "id": "hdc-fragile",
+      "name": "Fragile",
+      "source": "livre_de_base",
+      "file": "Handicaps/hdc-fragile.json"
+    },
+    {
+      "id": "hdc-influencable",
+      "name": "Influençable",
+      "source": "livre_de_base",
+      "file": "Handicaps/hdc-influencable.json"
+    },
+    {
+      "id": "hdc-integrite-derisoire",
+      "name": "Intégrité dérisoire",
+      "source": "module:noirceur",
+      "file": "Handicaps/hdc-integrite-derisoire.json"
+    },
+    {
+      "id": "hdc-vertige",
+      "name": "Vertige",
+      "source": "livre_de_base",
+      "file": "Handicaps/hdc-vertige.json"
+    },
+    {
+      "id": "hdc-vulnerable",
+      "name": "Vulnérable",
+      "source": "livre_de_base",
+      "file": "Handicaps/hdc-vulnerable.json"
+    }
+  ]
+}

@@ -1,18 +1,14 @@
-﻿
+﻿using DragonsGenerator.API.Common;
+using FastEndpoints;
 
 namespace DragonsGenerator.API.Endpoints.Civilisations;
 
-public record CivilisationSummary(
-    string Id,
-    string Name,
-    int DiceMin,
-    int DiceMax,
-    bool IsCosmopolitan,
-    List<string> PrimarySpecies
-);
-
-public class GetCivilisationsSummaryEndpoint : EndpointWithoutRequest<List<CivilisationSummary>>
+public class GetCivilisationsSummaryEndpoint : EndpointWithoutRequest<List<CivilisationSummaryDto>>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetCivilisationsSummaryEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/civilisations/summary");
@@ -21,19 +17,7 @@ public class GetCivilisationsSummaryEndpoint : EndpointWithoutRequest<List<Civil
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var civilisations = await JsonDataLoader.LoadAsync<List<Civilisation>>("civilisations.json", ct);
-
-        var summaries = civilisations?
-            .Select(c => new CivilisationSummary(
-                Id: c.Id,
-                Name: c.Name,
-                DiceMin: c.Randomization.DiceMin,
-                DiceMax: c.Randomization.DiceMax,
-                IsCosmopolitan: c.Demographics.IsCosmopolitan,
-                PrimarySpecies: c.Demographics.PrimarySpecies.Select(s => s.Label).ToList()
-            ))
-            .ToList() ?? [];
-
+        var summaries = await _repo.GetCivilisationsSummaryAsync(ct);
         await Send.OkAsync(summaries, ct);
     }
 }

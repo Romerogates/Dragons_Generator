@@ -1,0 +1,264 @@
+{
+  "schema_version": "2.0",
+  "id": "sp-drakeide",
+  "name": "Drakéides",
+  "name_alt": [],
+  "playable": true,
+  "requires_subspecies": false,
+  "source": {
+    "book": "Dragons - Livre de base: Aventuriers",
+    "pages": "26-29"
+  },
+  "flavor": {
+    "summary": "Couverts d'écailles évoquant leur affiliation à l'une des dix espèces de véritables dragons, les drakéides sont des êtres à la fois puissants et charismatiques. Naissant dans des œufs au terme d'une année de maturation, ils bénéficient d'un développement rapide dans leur jeune âge.",
+    "culture": "Deux types de sociétés coexistent : des gardiens reclus de savoirs antiques vivant dans des lieux isolés, et des aristocrates fiers de leurs origines formant encore la noblesse de nombreux territoires insulaires tropicaux. Ces royaumes draconiques, riches mais en déclin, sont menacés par la jungle.",
+    "origins": "Les mythes drakéides décrivent leur espèce comme créée par les dragons pour protéger des sites sacrés. Contrairement aux demi-dragons, ils pondent des œufs sans difficulté mais vivent généralement moins longtemps, succombant souvent avant 80 ans.",
+    "lore_notes": [
+      "Les seuls drakéides connus évoluent dans les régions chaudes d'Eana. Aucune lignée blanche ou argentée n'est aujourd'hui connue, anomalie due à la chute de la civilisation boréale.",
+      "Les drakéides ressentent une affinité forte envers les dragons de leur teinte d'écaille, ce qui peut leur conférer un avantage aux tests de Charisme lors d'interactions avec ces créatures."
+    ]
+  },
+  "base_stats": {
+    "ability_score_increase": {
+      "str": 2,
+      "cha": 1
+    },
+    "speed": {
+      "base_m": 9,
+      "not_reduced_by_heavy_armor": false
+    },
+    "size": "M",
+    "darkvision_m": 0,
+    "age": {
+      "maturity_years": 15,
+      "lifespan_years": 80,
+      "flavor": "Développement fulgurant : adultes à quinze ans, longévité moyenne de 80 ans."
+    },
+    "alignment": {
+      "tendency": "Loyal",
+      "flavor": "Les drakéides sont généralement d'alignement loyal."
+    }
+  },
+  "traits": [
+    {
+      "id": "trait-ascendance-draconique",
+      "name": "Ascendance draconique",
+      "flavor": {
+        "desc": "Vous êtes lié à une lignée draconique qui détermine le type de votre souffle et votre résistance aux dégâts."
+      },
+      "mechanics": {
+        "type": "lineage_selection",
+        "resolved_by_choice": "choice-lignee-draconique"
+      }
+    },
+    {
+      "id": "trait-souvenir-anciens",
+      "name": "Souvenir des Anciens",
+      "flavor": {
+        "desc": "Vous avez intuitivement la maîtrise des artefacts des Anciens, tels les ateaks des Voyageurs ; votre sang de dragon suffit souvent pour les activer. De nombreux temples et sanctuaires anciens ont associé l'essence de dragon à des mécanismes particuliers : les drakéides peuvent tenter de les utiliser par un test de Charisme (Artefacts des Anciens)."
+      },
+      "mechanics": {
+        "type": "context_check",
+        "skill": "skill-artefacts-des-anciens",
+        "ability": "cha",
+        "trigger": "utiliser_artefacts_anciens_ou_mecanismes_de_temples",
+        "note": "Maîtrise intuitive liée au sang draconique."
+      }
+    },
+    {
+      "id": "trait-souffle-draconique",
+      "name": "Souffle draconique",
+      "flavor": {
+        "desc": "Vous pouvez utiliser votre action pour exhaler une énergie destructrice. La forme et le type de dégâts sont déterminés par votre ascendance draconique. Les créatures dans la zone doivent réussir un jet de sauvegarde ou subir les dégâts (la moitié sur réussite)."
+      },
+      "mechanics": {
+        "type": "breath_weapon",
+        "action_type": "action",
+        "recharge": "short_or_long_rest",
+        "save": {
+          "dc_formula": "8 + bonus_maitrise + modificateur_con",
+          "ability_from_lineage": true
+        },
+        "area_from_lineage": true,
+        "damage_type_from_lineage": true,
+        "damage_progression": [
+          {
+            "unlocks_at_level": 1,
+            "dice": {
+              "quantity": 2,
+              "faces": 6,
+              "modifier": 0
+            }
+          },
+          {
+            "unlocks_at_level": 6,
+            "dice": {
+              "quantity": 3,
+              "faces": 6,
+              "modifier": 0
+            }
+          },
+          {
+            "unlocks_at_level": 11,
+            "dice": {
+              "quantity": 4,
+              "faces": 6,
+              "modifier": 0
+            }
+          },
+          {
+            "unlocks_at_level": 16,
+            "dice": {
+              "quantity": 5,
+              "faces": 6,
+              "modifier": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "trait-resistance-ancestrale",
+      "name": "Résistance des ancêtres",
+      "flavor": {
+        "desc": "Vous bénéficiez d'une résistance aux dégâts associés à votre ascendance draconique."
+      },
+      "mechanics": {
+        "type": "damage_resistance",
+        "resistances": [
+          "damage-from-lineage"
+        ],
+        "source_key": "dragon_lineage"
+      }
+    }
+  ],
+  "creation_choices": [
+    {
+      "id": "choice-lignee-draconique",
+      "name": "Ascendance draconique",
+      "flavor": {
+        "desc": "Choisissez votre lignée parmi les espèces de dragons. Ce choix détermine le type de dégâts de votre souffle, la forme de la zone, le type du jet de sauvegarde et votre résistance aux dégâts."
+      },
+      "type": "dragon_lineage",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        {
+          "id": "drag-argent",
+          "name": "Argent",
+          "damage_type": "damage-froid",
+          "breath_area": {
+            "shape": "cone",
+            "length_m": 4.5
+          },
+          "save_ability": "con"
+        },
+        {
+          "id": "drag-airain",
+          "name": "Airain",
+          "damage_type": "damage-feu",
+          "breath_area": {
+            "shape": "ligne",
+            "length_m": 9,
+            "width_m": 1.5
+          },
+          "save_ability": "dex"
+        },
+        {
+          "id": "drag-blanc",
+          "name": "Blanc",
+          "damage_type": "damage-froid",
+          "breath_area": {
+            "shape": "cone",
+            "length_m": 4.5
+          },
+          "save_ability": "con",
+          "lore_note": "Lignée aujourd'hui disparue ou inconnue sur Eana."
+        },
+        {
+          "id": "drag-bleu",
+          "name": "Bleu",
+          "damage_type": "damage-foudre",
+          "breath_area": {
+            "shape": "ligne",
+            "length_m": 9,
+            "width_m": 1.5
+          },
+          "save_ability": "dex"
+        },
+        {
+          "id": "drag-bronze",
+          "name": "Bronze",
+          "damage_type": "damage-foudre",
+          "breath_area": {
+            "shape": "ligne",
+            "length_m": 9,
+            "width_m": 1.5
+          },
+          "save_ability": "dex"
+        },
+        {
+          "id": "drag-cuivre",
+          "name": "Cuivre",
+          "damage_type": "damage-acide",
+          "breath_area": {
+            "shape": "ligne",
+            "length_m": 9,
+            "width_m": 1.5
+          },
+          "save_ability": "dex"
+        },
+        {
+          "id": "drag-noir",
+          "name": "Noir",
+          "damage_type": "damage-acide",
+          "breath_area": {
+            "shape": "ligne",
+            "length_m": 9,
+            "width_m": 1.5
+          },
+          "save_ability": "dex"
+        },
+        {
+          "id": "drag-or",
+          "name": "Or",
+          "damage_type": "damage-feu",
+          "breath_area": {
+            "shape": "cone",
+            "length_m": 4.5
+          },
+          "save_ability": "dex"
+        },
+        {
+          "id": "drag-rouge",
+          "name": "Rouge",
+          "damage_type": "damage-feu",
+          "breath_area": {
+            "shape": "cone",
+            "length_m": 4.5
+          },
+          "save_ability": "dex"
+        },
+        {
+          "id": "drag-vert",
+          "name": "Vert",
+          "damage_type": "damage-poison",
+          "breath_area": {
+            "shape": "cone",
+            "length_m": 4.5
+          },
+          "save_ability": "con"
+        }
+      ]
+    }
+  ],
+  "languages": {
+    "fixed": [
+      "lg-commun",
+      "lg-draconique"
+    ],
+    "choices": []
+  },
+  "subspecies": [],
+  "optional_rules": []
+}

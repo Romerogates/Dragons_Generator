@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "id": "div-mort",
+  "name": "Mort",
+  "tonality": "entropique",
+  "domains": [
+    "dom-indicible",
+    "dom-temps"
+  ],
+  "other_names": [
+    "Masque",
+    "Abysses",
+    "Lame"
+  ],
+  "description": "Mystérieuse, souvent incompréhensible, Mort est la divinité incarnant la fin, l'éternité, l'impermanence, le silence, l'oubli et le secret. On doit à son clergé des sceaux et objets magiques qui protègent de toute tentative de pénétrer l'esprit ou d'imposer à un individu de dire la vérité. De nombreux adeptes de Mort luttent contre les morts-vivants et tout ce qui nuit au cycle naturel. Ils sont souvent impliqués aussi dans l'étude de mystères. D'autres branches du culte de Mort exaltent le morbide et les notions de décrépitudes liées à cette entité. Des cultes plus inquiétants voient dans la mort la transcendance ultime et œuvrent dans l'ombre pour la promouvoir en attisant les guerres, les épidémies et les catastrophes de tout genre.",
+  "worshippers_note": "Clergé combattant les morts-vivants, étudiant les mystères, ou exaltant le morbide selon les branches du culte. Dans le panthéon de l'Étoile, vénérée sous la forme d'un masque séraphique nommée simplement « le Masque ».",
+  "grants_powers_to": [
+    "pretre"
+  ],
+  "source": "livre_de_base"
+}

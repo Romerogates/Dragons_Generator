@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "tl-outils-de-potier",
+  "name": "Outils de potier",
+  "category": "tool",
+  "subcategory": "artisan_tool",
+  "cost": {
+    "value": 10,
+    "unit": "po"
+  },
+  "weight_kg": 1.5,
+  "description": "Outils d'artisan associé à la céramique et l'émail."
+}

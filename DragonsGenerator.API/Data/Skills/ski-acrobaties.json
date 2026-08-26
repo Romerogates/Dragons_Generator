@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "ski-acrobaties",
+  "name": "Acrobaties",
+  "ability": "DEX",
+  "description": "Les tests de Dextérité (Acrobaties) interviennent lorsque vous tenterez de garder l'équilibre dans certaines situations délicates : courir sur une surface gelée, s'avancer sur une corde tendue ou éviter la chute sur le pont d'un navire vigoureusement ballotté par les flots. Le meneur peut également vous demander un test de Dextérité (Acrobaties) lorsque vous cherchez à exécuter une cascade, notamment un périlleux plongeon acrobatique, une roulade, un saut ou autre culbute.",
+  "examples": [
+    "Garder l'équilibre sur une surface gelée ou une corde tendue.",
+    "Éviter la chute sur le pont d'un navire ballotté par les flots.",
+    "Exécuter une cascade acrobatique : plongeon, roulade ou culbute."
+  ],
+  "passive_check": false,
+  "source": "livre_de_base"
+}

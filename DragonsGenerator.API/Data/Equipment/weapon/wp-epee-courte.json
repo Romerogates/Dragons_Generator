@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-epee-courte",
+  "name": "Épée courte",
+  "category": "weapon",
+  "subcategory": "martial_melee",
+  "cost": {
+    "value": 10,
+    "unit": "po"
+  },
+  "weight_kg": 1,
+  "damage_dice": "1d6",
+  "damage_type": "perforant",
+  "properties": [
+    "prop-finesse",
+    "prop-legere"
+  ],
+  "throw_range": null,
+  "ammo_range": null,
+  "description": null
+}

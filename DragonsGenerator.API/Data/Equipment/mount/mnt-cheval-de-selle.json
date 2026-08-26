@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "id": "mnt-cheval-de-selle",
+  "name": "Cheval de selle",
+  "category": "mount",
+  "subcategory": "animal",
+  "cost": {
+    "value": 75,
+    "unit": "po"
+  },
+  "weight_kg": null,
+  "speed": "18 m",
+  "capacity_kg": 240,
+  "description": "Vitesse de déplacement : 18 m. Charge maximale : 240 kg."
+}

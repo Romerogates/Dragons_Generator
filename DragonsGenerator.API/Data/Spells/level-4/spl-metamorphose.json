@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-metamorphose",
+  "name": "Métamorphose",
+  "level": 4,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un cocon de chenille"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Ce sort transforme une créature que vous voyez à portée. La créature doit avoir au moins 1 point de vie. Une créature non consentante doit réussir un JS Sagesse pour échapper à l'effet. Le sort n'a aucun effet sur les métamorphes et les créatures à 0 point de vie. La transformation persiste pour toute la durée du sort, ou jusqu'à ce que la cible tombe à 0 point de vie ou meure. La nouvelle forme peut être n'importe quelle bête d'un facteur de puissance inférieur ou égal à celui de la cible (ou à son niveau si elle n'a pas de FP). Le profil de la cible, y compris ses valeurs de caractéristique mentales, est remplacé par celui de la bête choisie. En revanche, elle conserve son alignement et sa personnalité. La cible a les points de vie de sa nouvelle forme, mais elle retrouve les points de vie qu'elle avait avant sa transformation lorsqu'elle recouvre sa forme normale. Dans le cas où elle tombe à 0 point de vie, les dégâts en excès sont reportés sur sa forme normale. Tant que ces dégâts ne font pas eux aussi tomber les points de vie de la forme normale à 0, la créature reste consciente. La créature est limitée dans ses actions par la nature de sa nouvelle forme, et elle ne peut ni parler, ni lancer de sorts, ni entreprendre d'action nécessitant des mains ou le don de parole. L'équipement de la cible se transforme lui aussi en fusionnant avec elle, mais elle ne peut pas l'activer, s'en servir ou en profiter d'une quelconque manière. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, la durée augmente de 1 heure par niveau d'emplacement au-dessus du 4e.",
+  "modular_options": []
+}

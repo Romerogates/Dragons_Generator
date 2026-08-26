@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-mur-d-epines",
+  "name": "Mur d'épines",
+  "level": 6,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une poignée d'épines"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide"
+  ],
+  "description": "Vous créez un mur de broussailles enchevêtrées et hérissées d'épines. Il apparaît sur une surface solide située à portée et persiste pour toute la durée du sort. Ses dimensions sont les suivantes : jusqu'à 18 m de long, 3 m de haut et 1,50 m d'épaisseur. Autre possibilité, vous pouvez lui donner la forme d'un cercle aux dimensions suivantes : 6 m de diamètre, et jusqu'à 6 m de haut et 1,50 m d'épaisseur. Le mur bloque la ligne de mire. Au moment où le mur apparaît, toute créature prise dans sa zone doit effectuer un JS Dextérité et subit 7d8 dégâts perforants en cas d'échec, la moitié en cas de réussite. Il est possible de le traverser, mais l'opération est longue et pour le moins douloureuse. Une créature qui se déplace dans la zone doit, en termes de quota de déplacement, dépenser le quadruple de toute distance parcourue. En outre, une créature qui y pénètre pour la première fois d'un tour de jeu ou y termine son tour de jeu doit effectuer un JS Dextérité et subit 7d8 dégâts tranchants en cas d'échec, la moitié en cas de réussite.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau ou supérieur, les deux types de dégâts augmentent de 1d8 par niveau d'emplacement au-dessus du 6e.",
+  "modular_options": []
+}

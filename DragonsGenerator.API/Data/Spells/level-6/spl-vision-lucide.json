@@ -1,0 +1,39 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-vision-lucide",
+  "name": "Vision lucide",
+  "level": 6,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un onguent pour les yeux d'une valeur de 25 po que le sort détruit"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-pretre",
+    "cls-sorcier"
+  ],
+  "description": "Ce sort confère à la créature consentante que vous touchez la faculté de voir les choses telles qu'elles sont. Pour toute la durée du sort, la cible dispose de la vision lucide, remarque les passages secrets dissimulés par la magie et voit dans le Plan Éthéré, le tout sur 36 m.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 6e.",
+  "modular_options": []
+}

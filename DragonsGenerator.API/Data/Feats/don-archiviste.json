@@ -1,0 +1,48 @@
+{
+  "schema_version": "2.0",
+  "id": "don-archiviste",
+  "name": "Archiviste",
+  "requires_magic": false,
+  "category": "exploration",
+  "prerequisites": [],
+  "ability_score_increase": {
+    "ability": "INT",
+    "value": 1,
+    "max": 20
+  },
+  "description": "+1 Intelligence (max 20). Avec 1 minute de consultation de notes : avantage aux tests d'Intelligence (Arcanes, Histoire, Religion, Nature). Dans le cadre d'un repos court pour une telle compétence : vous pouvez considérer avoir obtenu 15 sur le dé (une fois par question).",
+  "benefits": [
+    {
+      "type": "ability_score_increase",
+      "ability": "INT",
+      "value": 1
+    },
+    {
+      "type": "advantage_on_check",
+      "skills": [
+        "Arcanes",
+        "Histoire",
+        "Religion",
+        "Nature"
+      ],
+      "condition": "1 min. de consultation de notes"
+    },
+    {
+      "type": "min_roll",
+      "value": 15,
+      "skills": [
+        "Arcanes",
+        "Histoire",
+        "Religion",
+        "Nature"
+      ],
+      "condition": "repos court"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "connaissance",
+    "intelligence",
+    "compétences"
+  ]
+}

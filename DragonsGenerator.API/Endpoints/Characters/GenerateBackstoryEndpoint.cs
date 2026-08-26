@@ -6,7 +6,7 @@ namespace Dragons.Api.Endpoints.Characters;
 public record GenerateBackstoryRequest
 {
     public required string Name { get; init; }
-    public required string Sex { get; init; }   // <-- AJOUTÉ ("M", "F", "X")
+    public required string Sex { get; init; }
 
     public required string SpeciesName { get; init; }
     public string? SubspeciesName { get; init; }
@@ -16,20 +16,25 @@ public record GenerateBackstoryRequest
     public string? Bonds { get; init; }
     public string? Flaws { get; init; }
     public string? Alignment { get; init; }
-    public string? Background { get; init; }  // <-- AJOUTÉ
+    public string? Background { get; init; }
 }
 
-public record GenerateBackstoryResponse(string Story); // <-- Changé
+public record GenerateBackstoryResponse(string Story);
 
 public class GenerateBackstoryEndpoint : Endpoint<GenerateBackstoryRequest, GenerateBackstoryResponse>
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _config;
+    private readonly ILogger<GenerateBackstoryEndpoint> _logger;
 
-    public GenerateBackstoryEndpoint(IHttpClientFactory httpClientFactory, IConfiguration config)
+    public GenerateBackstoryEndpoint(
+        IHttpClientFactory httpClientFactory,
+        IConfiguration config,
+        ILogger<GenerateBackstoryEndpoint> logger)
     {
         _httpClientFactory = httpClientFactory;
         _config = config;
+        _logger = logger;
     }
 
     public override void Configure()
@@ -41,6 +46,13 @@ public class GenerateBackstoryEndpoint : Endpoint<GenerateBackstoryRequest, Gene
     public override async Task HandleAsync(GenerateBackstoryRequest req, CancellationToken ct)
     {
         var apiKey = _config["Groq:ApiKey"];
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            AddError("Clé API Groq manquante. Configurez Groq:ApiKey (appsettings) ou la variable d'environnement Groq__ApiKey.");
+            await Send.ErrorsAsync(StatusCodes.Status503ServiceUnavailable, ct);
+            return;
+        }
+
         var client = _httpClientFactory.CreateClient();
         var sexLabel = req.Sex switch
         {
@@ -70,7 +82,7 @@ public class GenerateBackstoryEndpoint : Endpoint<GenerateBackstoryRequest, Gene
 
         var groqRequest = new
         {
-            model = "llama-3.1-8b-instant",
+            model = "groq/compound",
             messages = new object[]
             {
                 new { role = "system", content = "Tu es un maître du jeu expert en jeux de rôle fantasy francophones." },
@@ -84,16 +96,54 @@ public class GenerateBackstoryEndpoint : Endpoint<GenerateBackstoryRequest, Gene
         httpRequest.Headers.Add("Authorization", $"Bearer {apiKey}");
         httpRequest.Content = JsonContent.Create(groqRequest);
 
-        var response = await client.SendAsync(httpRequest, ct);
-        response.EnsureSuccessStatusCode();
+        HttpResponseMessage response;
+        try
+        {
+            response = await client.SendAsync(httpRequest, ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Échec d'appel à l'API Groq");
+            AddError("Impossible de joindre le service de génération IA.");
+            await Send.ErrorsAsync(StatusCodes.Status502BadGateway, ct);
+            return;
+        }
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync(ct);
+            _logger.LogWarning("Groq a répondu {Status}: {Body}", (int)response.StatusCode, body);
+
+            var message = (int)response.StatusCode switch
+            {
+                401 or 403 => "Clé API Groq invalide ou expirée. Vérifiez Groq:ApiKey.",
+                429 => "Quota Groq dépassé. Réessayez dans quelques instants.",
+                _ => "Le service de génération IA a renvoyé une erreur."
+            };
+
+            AddError(message);
+            await Send.ErrorsAsync(StatusCodes.Status502BadGateway, ct);
+            return;
+        }
 
         var result = await response.Content.ReadFromJsonAsync<GroqResponse>(ct);
-        var story = result?.Choices?.FirstOrDefault()?.Message?.Content ?? "Erreur de génération."; // <-- Renommé
+        var groqMessage = result?.Choices?.FirstOrDefault()?.Message;
+        var story = groqMessage?.Content?.Trim();
+        // Certains modèles (gpt-oss) mettent le texte dans "reasoning" et laissent content vide
+        if (string.IsNullOrWhiteSpace(story))
+            story = groqMessage?.Reasoning?.Trim();
 
-        await Send.OkAsync(new GenerateBackstoryResponse(story), ct); // <-- Corrigé (pas de point)
+        if (string.IsNullOrWhiteSpace(story))
+        {
+            AddError("La génération IA n'a renvoyé aucun texte.");
+            await Send.ErrorsAsync(StatusCodes.Status502BadGateway, ct);
+            return;
+        }
+
+        await Send.OkAsync(new GenerateBackstoryResponse(story), ct);
     }
 
     private record GroqResponse(List<GroqChoice>? Choices);
     private record GroqChoice(GroqMessage? Message);
-    private record GroqMessage(string? Content);
+    private record GroqMessage(string? Content, string? Reasoning);
 }

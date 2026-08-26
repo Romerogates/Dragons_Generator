@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "guid": null,
+  "id": "spl-aide",
+  "name": "Aide",
+  "level": 2,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": false,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-paladin",
+    "cls-pretre"
+  ],
+  "description": "",
+  "higher_levels": null,
+  "modular_options": []
+}

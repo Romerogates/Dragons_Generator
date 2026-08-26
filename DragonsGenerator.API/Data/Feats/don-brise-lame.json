@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "don-brise-lame",
+  "name": "Brise-lame",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [],
+  "description": "Choisissez une catégorie : armes tranchantes ou contondantes. +1 aux jets d'attaque au corps à corps avec ces armes. Si avantage et plus faible dé touche : vous pouvez désarmer la cible (arme à 1,5 m). Sur coup critique : une arme non magique de la cible se brise.",
+  "benefits": [
+    {
+      "type": "attack_bonus",
+      "value": 1,
+      "condition": "corps à corps, catégorie choisie"
+    },
+    {
+      "type": "disarm",
+      "condition": "avantage + plus faible dé touche"
+    },
+    {
+      "type": "break_weapon",
+      "condition": "coup critique, arme non magique"
+    }
+  ],
+  "choice": {
+    "choose": 1,
+    "from": [
+      "tranchantes",
+      "contondantes"
+    ]
+  },
+  "repeatable": false,
+  "tags": [
+    "combat",
+    "corps-à-corps",
+    "désarmement"
+  ]
+}

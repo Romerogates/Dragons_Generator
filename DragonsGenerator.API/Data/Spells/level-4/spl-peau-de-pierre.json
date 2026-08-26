@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-peau-de-pierre",
+  "name": "Peau de pierre",
+  "level": 4,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(de la poudre de diamant d'une valeur minimale de 100 po"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-rodeur"
+  ],
+  "description": "Logo icon stamp La chair d'une créature consentante que vous touchez devient aussi robuste que la pierre. Tant que le sort persiste, la cible bénéficie d'une résistance aux dégâts contondants, perforants et tranchants non magiques.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, la durée augmente de 1 heure par niveau d'emplacement au-dessus du 4e.",
+  "modular_options": []
+}

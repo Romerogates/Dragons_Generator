@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "don-magie-perseverante",
+  "name": "Magie persévérante",
+  "requires_magic": true,
+  "category": "magic",
+  "prerequisites": [
+    {
+      "type": "spellcasting",
+      "description": "Capacité de lancer au moins un sort"
+    }
+  ],
+  "ability_score_increase": {
+    "ability": "spellcasting",
+    "value": 1,
+    "max": 20
+  },
+  "description": "+1 caractéristique magique (max 20). Quand vous lancez un sort de niveau 1+ et que toutes les cibles en évitent la totalité des effets, vous pouvez aussitôt lancer un sort mineur que vous connaissez.",
+  "benefits": [
+    {
+      "type": "ability_score_increase",
+      "ability": "spellcasting",
+      "value": 1
+    },
+    {
+      "type": "free_cantrip",
+      "trigger": "toutes cibles évitent entièrement le sort (1er niv+)"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "magie",
+    "sorts-mineurs",
+    "ténacité"
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-manoir-somptueux",
+  "name": "Manoir somptueux",
+  "level": 7,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 90,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 24,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(un portail miniature sculpté en ivoire"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien"
+  ],
+  "description": "Vous invoquez une habitation extradimensionnelle qui apparaît à portée et persiste pendant toute la durée du sort. À vous de choisir où se situe son entrée, large de 1,50 m et haute de 3 m, qui scintille légèrement. Vous et toute créature que vous avez désignée au moment de l'incantation pouvez entrer dans le manoir extradimensionnel lorsque le portail est ouvert. Vous pouvez l'ouvrir et le fermer tant que vous vous situez dans un rayon de 9 m de lui. Lorsqu'il est fermé, le portail est invisible. De l'autre côté figure une somptueuse entrée desservant de nombreuses chambres. L'air y est propre et il y fait bon. Vous pouvez tracer le plan qui vous convient, mais l'endroit ne peut dépasser un volume de cinquante cubes de 3 m d'arête chacun. L'endroit est meublé et décoré selon vos goûts. Il contient assez de nourriture pour servir un banquet de neuf plats à un maximum de cent personnes. Un personnel de cent serviteurs translucides est à la disposition des convives. Vous choisissez leur apparence et la nature de leur tenue. Ils obéissent à tous vos ordres, peuvent effectuer les mêmes tâches qu'un serviteur humain, mais sont incapables d'attaquer ou d'entreprendre des actions qui nuiraient directement à une autre créature. Ils peuvent aller chercher des affaires, nettoyer, plier des vêtements, allumer un feu, servir à manger ou du vin, etc. Ils peuvent se rendre n'importe où dans le manoir, mais pas le quitter. Les meubles et autres objets créés par ce sort se dissipent en fumée s'ils quittent les lieux. Quand le sort prend fin, les créatures encore présentes dans l'espace extradimensionnel sont expulsées vers les espaces inoccupés les plus proches de l'entrée. Si vous utilisez les options présentées ici, le sort manoir somptueux dissimulera des secrets qui ne sont pas forcément à porter au crédit de son utilisateur. Si les serviteurs invisibles sont des âmes errantes, le sort est corrompu. ## La localisation de l'espace extradimensionnel L'espace que vous créez est édifié dans le Plan Éthéré et peut donc être vu par les êtres qui s'y trouvent. Les murs de votre manoir ont les caractéristiques suivantes : CA = votre DD de sauvegarde des sorts Pv = (niveau de l'emplacement du sort) × 5 ## Provenance de la nourriture La magie seule ne peut créer de la nourriture, seulement l'apporter. En pratique, manoir somptueux a pour effet de dérober dans un rayon de 100 km sur Eana des mets aux goûts du lanceur de sorts. Les habitants de la région seront rarement satisfaits de voir leur repas leur échapper. S'il n'y a rien à manger, ou juste des brouets infâmes, le banquet ne présentera que des assiettes vides ou des plats peu ragoûtants. ## La nature des serviteurs Une partie de la psyché Les serviteurs invisibles sont une matérialisation de votre psyché. L'effort mental continu requis pour maintenir leur existence se traduit par un désavantage à tous vos tests d'Intelligence, de Sagesse et de Charisme pour la durée du sort. En contrepartie, les serviteurs invisibles disposent des mêmes maîtrises que vous. Ils sont considérés comme ayant un bonus de maîtrise de +2 et un score de 10 dans toute caractéristique autre que la Force et la Dextérité. Si vous maîtrisez la compétence Dressage, les serviteurs invisibles sont capables de prodiguer des soins aux chevaux ; si vous maîtrisez les outils de la ferme, ils peuvent jardiner, etc. Chaque serviteur invisible est l'âme d'un mortel récemment décédé et errant dans le Plan Éthéré. Manoir somptueux est alors automatiquement considéré comme corrompu, le sort capturant temporairement l'âme du malheureux pour le transformer en esclave. Même si le défunt est une âme désincarnée, il demeure un être sensible et souffre de l'asservissement. Le serviteur invisible peut utiliser les maîtrises qu'il possédait de son vivant (à la discrétion du meneur).",
+  "modular_options": []
+}

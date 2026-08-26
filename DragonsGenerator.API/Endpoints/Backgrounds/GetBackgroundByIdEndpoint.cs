@@ -11,6 +11,10 @@ public class GetBackgroundByIdRequest
 
 public class GetBackgroundByIdEndpoint : Endpoint<GetBackgroundByIdRequest, Background>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetBackgroundByIdEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/backgrounds/{id}");
@@ -19,10 +23,7 @@ public class GetBackgroundByIdEndpoint : Endpoint<GetBackgroundByIdRequest, Back
 
     public override async Task HandleAsync(GetBackgroundByIdRequest req, CancellationToken ct)
     {
-        var backgrounds = await JsonDataLoader.LoadAsync<List<Background>>("backgrounds.json", ct);
-
-        var background = backgrounds?.FirstOrDefault(b =>
-            string.Equals(b.Id, req.Id, StringComparison.OrdinalIgnoreCase));
+        var background = await _repo.GetBackgroundByIdAsync(req.Id, ct);
 
         if (background is null)
         {

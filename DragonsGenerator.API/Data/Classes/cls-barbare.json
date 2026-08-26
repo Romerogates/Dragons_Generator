@@ -1,0 +1,977 @@
+{
+  "id": "cls-barbare",
+  "schema_version": "3.0",
+  "name": "Barbare",
+  "flavor": {
+    "summary": "Guerrier primitif animé par une rage intérieure dévastatrice, capable d'absorber et d'infliger des dommages considérables en entrant dans une transe de combat.",
+    "lore_note": "Pour un barbare, la civilisation est le repaire du faible et la loi une mauvaise excuse pour ne pas se salir les mains. Il ne reconnaît d'autorité que celle de la force, et de loyauté que celle qu'il voue à son clan."
+  },
+  "hit_die": "1d12",
+  "hp_at_level_1": 12,
+  "hp_per_level_average": 7,
+  "primary_abilities": [
+    "str",
+    "con"
+  ],
+  "saving_throw_proficiencies": [
+    "str",
+    "con"
+  ],
+  "armor_proficiencies": [
+    "ar-light",
+    "ar-medium",
+    "ar-shield"
+  ],
+  "weapon_proficiencies": [
+    "wp-simple",
+    "wp-martial"
+  ],
+  "tool_proficiencies": [],
+  "choice_pools": [
+    {
+      "id": "choice-skills-cls-barbare",
+      "name": "Compétences de classe",
+      "type": "skill_proficiency",
+      "allow_choice": true,
+      "quantity": 2,
+      "pool": [
+        "skill-athletisme",
+        "skill-dressage",
+        "skill-intimidation",
+        "skill-nature",
+        "skill-perception",
+        "skill-survie"
+      ]
+    }
+  ],
+  "spellcasting": null,
+  "starting_equipment": {
+    "fixed": [
+      {
+        "id": "gr-sac-aventurier",
+        "qty": 1
+      }
+    ],
+    "choice_pools": [
+      {
+        "id": "choice-equip-primary-cls-barbare",
+        "name": "Arme principale",
+        "type": "equipment",
+        "allow_choice": true,
+        "quantity": 1,
+        "options": [
+          {
+            "option_id": "A",
+            "items": [
+              "wp-grande-hache"
+            ]
+          },
+          {
+            "option_id": "B",
+            "items": [
+              "wp-arme-de-guerre-cac"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "choice-equip-secondary-cls-barbare",
+        "name": "Arme secondaire",
+        "type": "equipment",
+        "allow_choice": true,
+        "quantity": 1,
+        "options": [
+          {
+            "option_id": "A",
+            "items": [
+              "wp-hachette",
+              "wp-hachette"
+            ]
+          },
+          {
+            "option_id": "B",
+            "items": [
+              "wp-arme-courante"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "choice-equip-ranged-cls-barbare",
+        "name": "Arme de jet ou à distance",
+        "type": "equipment",
+        "allow_choice": true,
+        "quantity": 1,
+        "options": [
+          {
+            "option_id": "A",
+            "items": [
+              "wp-javeline",
+              "wp-javeline",
+              "wp-javeline",
+              "wp-javeline"
+            ]
+          },
+          {
+            "option_id": "B",
+            "items": [
+              "wp-sarbacane",
+              "gr-flechettes-x10"
+            ]
+          },
+          {
+            "option_id": "C",
+            "items": [
+              "wp-arc-court",
+              "gr-carquois-fleches-x20"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "progression": [
+    {
+      "level": 1,
+      "proficiency_bonus": 2,
+      "features": [
+        "feat-rage",
+        "feat-defense-sans-armure"
+      ],
+      "resources": {
+        "rage_count": 2,
+        "rage_damage_bonus": 2,
+        "brutalite_critique_extra_dice": 0
+      }
+    },
+    {
+      "level": 2,
+      "proficiency_bonus": 2,
+      "features": [
+        "feat-attaque-debridee",
+        "feat-sens-du-danger"
+      ],
+      "resources": {
+        "rage_count": 2,
+        "rage_damage_bonus": 2,
+        "brutalite_critique_extra_dice": 0
+      }
+    },
+    {
+      "level": 3,
+      "proficiency_bonus": 2,
+      "features": [
+        "feat-voie-primale"
+      ],
+      "resources": {
+        "rage_count": 3,
+        "rage_damage_bonus": 2,
+        "brutalite_critique_extra_dice": 0
+      }
+    },
+    {
+      "level": 4,
+      "proficiency_bonus": 2,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "rage_count": 3,
+        "rage_damage_bonus": 2,
+        "brutalite_critique_extra_dice": 0
+      }
+    },
+    {
+      "level": 5,
+      "proficiency_bonus": 3,
+      "features": [
+        "feat-attaque-supplementaire",
+        "feat-deplacement-accelere"
+      ],
+      "resources": {
+        "rage_count": 3,
+        "rage_damage_bonus": 2,
+        "brutalite_critique_extra_dice": 0
+      }
+    },
+    {
+      "level": 6,
+      "proficiency_bonus": 3,
+      "features": [
+        "feat-aptitude-de-voie-6"
+      ],
+      "resources": {
+        "rage_count": 4,
+        "rage_damage_bonus": 2,
+        "brutalite_critique_extra_dice": 0
+      }
+    },
+    {
+      "level": 7,
+      "proficiency_bonus": 3,
+      "features": [
+        "feat-instinct-fauve"
+      ],
+      "resources": {
+        "rage_count": 4,
+        "rage_damage_bonus": 2,
+        "brutalite_critique_extra_dice": 0
+      }
+    },
+    {
+      "level": 8,
+      "proficiency_bonus": 3,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "rage_count": 4,
+        "rage_damage_bonus": 2,
+        "brutalite_critique_extra_dice": 0
+      }
+    },
+    {
+      "level": 9,
+      "proficiency_bonus": 4,
+      "features": [
+        "feat-brutalite-critique"
+      ],
+      "resources": {
+        "rage_count": 4,
+        "rage_damage_bonus": 3,
+        "brutalite_critique_extra_dice": 1
+      }
+    },
+    {
+      "level": 10,
+      "proficiency_bonus": 4,
+      "features": [
+        "feat-aptitude-de-voie-10"
+      ],
+      "resources": {
+        "rage_count": 4,
+        "rage_damage_bonus": 3,
+        "brutalite_critique_extra_dice": 1
+      }
+    },
+    {
+      "level": 11,
+      "proficiency_bonus": 4,
+      "features": [
+        "feat-rage-acharnee"
+      ],
+      "resources": {
+        "rage_count": 4,
+        "rage_damage_bonus": 3,
+        "brutalite_critique_extra_dice": 1
+      }
+    },
+    {
+      "level": 12,
+      "proficiency_bonus": 4,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "rage_count": 5,
+        "rage_damage_bonus": 3,
+        "brutalite_critique_extra_dice": 1
+      }
+    },
+    {
+      "level": 13,
+      "proficiency_bonus": 5,
+      "features": [
+        "feat-brutalite-critique"
+      ],
+      "resources": {
+        "rage_count": 5,
+        "rage_damage_bonus": 3,
+        "brutalite_critique_extra_dice": 2
+      }
+    },
+    {
+      "level": 14,
+      "proficiency_bonus": 5,
+      "features": [
+        "feat-aptitude-de-voie-14"
+      ],
+      "resources": {
+        "rage_count": 5,
+        "rage_damage_bonus": 3,
+        "brutalite_critique_extra_dice": 2
+      }
+    },
+    {
+      "level": 15,
+      "proficiency_bonus": 5,
+      "features": [
+        "feat-rage-persistante"
+      ],
+      "resources": {
+        "rage_count": 5,
+        "rage_damage_bonus": 3,
+        "brutalite_critique_extra_dice": 2
+      }
+    },
+    {
+      "level": 16,
+      "proficiency_bonus": 5,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "rage_count": 5,
+        "rage_damage_bonus": 4,
+        "brutalite_critique_extra_dice": 2
+      }
+    },
+    {
+      "level": 17,
+      "proficiency_bonus": 6,
+      "features": [
+        "feat-brutalite-critique"
+      ],
+      "resources": {
+        "rage_count": 6,
+        "rage_damage_bonus": 4,
+        "brutalite_critique_extra_dice": 3
+      }
+    },
+    {
+      "level": 18,
+      "proficiency_bonus": 6,
+      "features": [
+        "feat-puissance-implacable"
+      ],
+      "resources": {
+        "rage_count": 6,
+        "rage_damage_bonus": 4,
+        "brutalite_critique_extra_dice": 3
+      }
+    },
+    {
+      "level": 19,
+      "proficiency_bonus": 6,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "rage_count": 6,
+        "rage_damage_bonus": 4,
+        "brutalite_critique_extra_dice": 3
+      }
+    },
+    {
+      "level": 20,
+      "proficiency_bonus": 6,
+      "features": [
+        "feat-champion-primal"
+      ],
+      "resources": {
+        "rage_count": null,
+        "rage_damage_bonus": 4,
+        "brutalite_critique_extra_dice": 3
+      }
+    }
+  ],
+  "features_details": [
+    {
+      "id": "feat-rage",
+      "name": "Rage",
+      "unlocks_at_level": 1,
+      "recharge": "long_rest",
+      "action_type": "bonus_action",
+      "flavor": {
+        "summary": "Transe de combat octroyant avantages offensifs (Force), bonus aux dégâts et résistances physiques. Incompatible avec l'incantation et la concentration.",
+        "lore_note": "Le feu intérieur du barbare lui permet d'entrer dans une transe de bataille, encaissant des blessures qui feraient s'évanouir n'importe qui d'autre."
+      },
+      "mechanics": {
+        "duration_minutes": 1,
+        "activation_condition": "no_heavy_armor",
+        "termination_conditions": [
+          "unconscious",
+          "end_of_turn_no_hostile_attack_and_no_damage_taken",
+          "voluntary_bonus_action"
+        ],
+        "advantages": [
+          {
+            "type": "ability_check",
+            "target": "str"
+          },
+          {
+            "type": "saving_throw",
+            "target": "str"
+          }
+        ],
+        "damage_bonus": {
+          "source_column": "rage_damage_bonus",
+          "condition": "melee_weapon_attack_using_str"
+        },
+        "resistances": [
+          "bludgeoning",
+          "piercing",
+          "slashing"
+        ],
+        "restrictions": [
+          "cannot_cast_spells",
+          "cannot_maintain_concentration"
+        ]
+      },
+      "uses": {
+        "source_column": "rage_count",
+        "null_means_unlimited": true
+      }
+    },
+    {
+      "id": "feat-defense-sans-armure",
+      "name": "Défense sans armure",
+      "unlocks_at_level": 1,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Sans armure équipée, la CA vaut 10 + modificateur de Dextérité + modificateur de Constitution. Un bouclier reste utilisable.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "condition": "no_armor_equipped",
+        "ac_formula": "10 + dex_mod + con_mod",
+        "shield_compatible": true
+      }
+    },
+    {
+      "id": "feat-attaque-debridee",
+      "name": "Attaque débridée",
+      "unlocks_at_level": 2,
+      "recharge": "at_will",
+      "action_type": "free_on_first_attack_of_turn",
+      "flavor": {
+        "summary": "Avantage à tous les jets d'attaque d'arme CaC (Force) ce tour. En contrepartie, les attaquants ont l'avantage contre vous jusqu'à votre prochain tour.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "advantages": [
+          {
+            "type": "attack_roll",
+            "target": "melee_weapon_str",
+            "scope": "all_attacks_this_turn"
+          }
+        ],
+        "grants_advantage_to_attackers": {
+          "scope": "all_attacks_against_self",
+          "duration": "until_start_of_next_turn"
+        }
+      }
+    },
+    {
+      "id": "feat-sens-du-danger",
+      "name": "Sens du danger",
+      "unlocks_at_level": 2,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Avantage aux jets de sauvegarde de Dextérité contre les effets visibles (pièges, sorts). Inopérant si aveuglé, assourdi ou neutralisé.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "advantages": [
+          {
+            "type": "saving_throw",
+            "target": "dex",
+            "condition": "against_visible_effects_traps_spells"
+          }
+        ],
+        "nullified_by_conditions": [
+          "blinded",
+          "deafened",
+          "incapacitated"
+        ]
+      }
+    },
+    {
+      "id": "feat-voie-primale",
+      "name": "Voie primale",
+      "unlocks_at_level": 3,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Sélection de la sous-classe. Octroie des aptitudes de voie aux niveaux 3, 6, 10 et 14.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_selection",
+        "subclass_pool_ref": "cls-barbare.subclasses",
+        "grants_features_at_levels": [
+          3,
+          6,
+          10,
+          14
+        ]
+      }
+    },
+    {
+      "id": "feat-augmentation-de-caracteristique",
+      "name": "Augmentation de caractéristique",
+      "unlocks_at_level": 4,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "+2 à une caractéristique ou +1 à deux caractéristiques différentes. Plafond de 20. Répété aux niveaux 8, 12, 16 et 19.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "applies_at_levels": [
+          4,
+          8,
+          12,
+          16,
+          19
+        ],
+        "options": [
+          {
+            "type": "single_stat_increase",
+            "value": 2
+          },
+          {
+            "type": "two_stats_increase",
+            "value": 1
+          }
+        ],
+        "stat_cap": 20
+      }
+    },
+    {
+      "id": "feat-attaque-supplementaire",
+      "name": "Attaque supplémentaire",
+      "unlocks_at_level": 5,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Lors de l'action Attaquer, effectue deux attaques au lieu d'une.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "attacks_per_action": 2
+      }
+    },
+    {
+      "id": "feat-deplacement-accelere",
+      "name": "Déplacement accéléré",
+      "unlocks_at_level": 5,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "+3 m à la vitesse de déplacement tant qu'aucune armure lourde n'est portée.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "speed_bonus_meters": 3,
+        "condition": "no_heavy_armor_equipped"
+      }
+    },
+    {
+      "id": "feat-aptitude-de-voie-6",
+      "name": "Aptitude de voie (niveau 6)",
+      "unlocks_at_level": 6,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Aptitude octroyée par la sous-classe choisie au niveau 6. Résolution dynamique via l'ID de sous-classe active.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_feature_delegate",
+        "delegate_to_subclass": true,
+        "at_level": 6
+      }
+    },
+    {
+      "id": "feat-instinct-fauve",
+      "name": "Instinct fauve",
+      "unlocks_at_level": 7,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Avantage aux jets d'initiative. Si surpris et non neutralisé, peut agir normalement à condition d'entrer en rage avant toute autre action.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "advantages": [
+          {
+            "type": "initiative_roll"
+          }
+        ],
+        "surprised_override": {
+          "condition": "not_incapacitated",
+          "requirement": "must_enter_rage_first"
+        }
+      }
+    },
+    {
+      "id": "feat-aptitude-de-voie-10",
+      "name": "Aptitude de voie (niveau 10)",
+      "unlocks_at_level": 10,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Aptitude octroyée par la sous-classe choisie au niveau 10. Résolution dynamique via l'ID de sous-classe active.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_feature_delegate",
+        "delegate_to_subclass": true,
+        "at_level": 10
+      }
+    },
+    {
+      "id": "feat-brutalite-critique",
+      "name": "Brutalité critique",
+      "unlocks_at_level": 9,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Lors d'un coup critique en CaC, lance des dés d'arme supplémentaires pour les dégâts bonus. Nombre de dés dicté par la colonne 'brutalite_critique_extra_dice' de la progression.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "trigger": "critical_hit_melee_attack",
+        "extra_weapon_dice_source_column": "brutalite_critique_extra_dice",
+        "scaling": [
+          {
+            "level": 9,
+            "extra_dice": 1
+          },
+          {
+            "level": 13,
+            "extra_dice": 2
+          },
+          {
+            "level": 17,
+            "extra_dice": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "feat-rage-acharnee",
+      "name": "Rage acharnée",
+      "unlocks_at_level": 11,
+      "recharge": "short_rest",
+      "flavor": {
+        "summary": "En rage, tomber à 0 PV sans mort instantanée permet un JS Constitution DD 10 pour rester à 1 PV. DD +5 à chaque réutilisation, remis à 10 après tout repos.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "trigger": "drop_to_0hp_while_raging_not_killed_outright",
+        "saving_throw": {
+          "ability": "con",
+          "base_dc": 10,
+          "dc_increment_per_use": 5,
+          "dc_resets_on": [
+            "short_rest",
+            "long_rest"
+          ]
+        },
+        "on_success": "set_hp_to_1"
+      }
+    },
+    {
+      "id": "feat-aptitude-de-voie-14",
+      "name": "Aptitude de voie (niveau 14)",
+      "unlocks_at_level": 14,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Aptitude octroyée par la sous-classe choisie au niveau 14. Résolution dynamique via l'ID de sous-classe active.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_feature_delegate",
+        "delegate_to_subclass": true,
+        "at_level": 14
+      }
+    },
+    {
+      "id": "feat-rage-persistante",
+      "name": "Rage persistante",
+      "unlocks_at_level": 15,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "La rage ne se termine plus automatiquement à la fin d'un tour sans action hostile. Seuls l'inconscience ou une interruption volontaire y mettent fin.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "feature_override",
+        "overrides_feature": "feat-rage",
+        "overrides_key": "termination_conditions",
+        "new_termination_conditions": [
+          "unconscious",
+          "voluntary_bonus_action"
+        ]
+      }
+    },
+    {
+      "id": "feat-puissance-implacable",
+      "name": "Puissance implacable",
+      "unlocks_at_level": 18,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Lors de tout test de Force, si le résultat total du dé est inférieur à la valeur brute de Force, cette valeur brute se substitue au résultat.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "trigger": "str_ability_check",
+        "rule": "if_roll_total_less_than_str_score_substitute_str_score"
+      }
+    },
+    {
+      "id": "feat-champion-primal",
+      "name": "Champion primal",
+      "unlocks_at_level": 20,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Force et Constitution augmentent de 4. Leurs plafonds respectifs passent à 24.",
+        "lore_note": "Au niveau 20, le barbare incarne toute la puissance de la nature sauvage."
+      },
+      "mechanics": {
+        "stat_increases": [
+          {
+            "stat": "str",
+            "value": 4
+          },
+          {
+            "stat": "con",
+            "value": 4
+          }
+        ],
+        "new_stat_maximums": [
+          {
+            "stat": "str",
+            "max": 24
+          },
+          {
+            "stat": "con",
+            "max": 24
+          }
+        ]
+      }
+    }
+  ],
+  "subclasses": {
+    "name": "Voie primale",
+    "level_unlocked": 3,
+    "choice_pool_id": "choice-subclass-cls-barbare",
+    "subclass_feature_levels": [
+      3,
+      6,
+      10,
+      14
+    ],
+    "options": [
+      {
+        "id": "subcls-berserker",
+        "name": "Voie du berserker",
+        "flavor": {
+          "summary": "Violence déchaînée et frénésie sanglante. Attaque en action bonus chaque tour de rage au prix d'un niveau de fatigue post-rage.",
+          "lore_note": "Le terme berserker proviendrait d'un mot nordique désignant l'ours. Les berserkers sont présents dans de nombreuses civilisations d'Eana : cavalerie kaani, élite pied-sûr halfeline, opprimés révoltés."
+        },
+        "features_details": [
+          {
+            "id": "feat-frenesie",
+            "name": "Frénésie",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_type": "bonus_action",
+            "flavor": {
+              "summary": "Durant la rage (à partir du tour suivant l'entrée), une attaque d'arme CaC en action bonus par tour. À la fin de la rage : +1 niveau de fatigue.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "during_rage_each_turn_after_entry_turn",
+              "bonus_attack": {
+                "type": "melee_weapon",
+                "action_cost": "bonus_action"
+              },
+              "cost_on_rage_end": {
+                "type": "exhaustion_gain",
+                "levels": 1
+              }
+            }
+          },
+          {
+            "id": "feat-rage-aveugle",
+            "name": "Rage aveugle",
+            "unlocks_at_level": 6,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Immunité aux états charmé et effrayé pendant la rage. Si déjà présents à l'entrée en rage, ces états sont suspendus jusqu'à la fin de la rage.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "condition": "while_raging",
+              "immunities_to_conditions": [
+                "charmed",
+                "frightened"
+              ],
+              "suspends_preexisting_conditions": [
+                "charmed",
+                "frightened"
+              ]
+            }
+          },
+          {
+            "id": "feat-presence-intimidante",
+            "name": "Présence intimidante",
+            "unlocks_at_level": 10,
+            "recharge": "at_will",
+            "action_type": "action",
+            "flavor": {
+              "summary": "Action : impose l'état effrayé (JS Sagesse) à une créature à 9 m ou moins. Renouvelable par une action chaque tour. Annulé si la cible est à plus de 18 m ou hors de vue. Immunité 24 h en cas de réussite.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "range_meters": 9,
+              "saving_throw": {
+                "ability": "wis",
+                "dc_formula": "8 + proficiency_bonus + cha_mod"
+              },
+              "on_fail": {
+                "condition": "frightened",
+                "duration": "until_end_of_next_turn",
+                "renewable_each_turn": true,
+                "action_cost_to_renew": "action"
+              },
+              "ends_if": [
+                "target_beyond_18m",
+                "target_cannot_see_attacker"
+              ],
+              "on_success": {
+                "immune_from_this_feature_hours": 24
+              }
+            }
+          },
+          {
+            "id": "feat-represailles",
+            "name": "Représailles",
+            "unlocks_at_level": 14,
+            "recharge": "at_will",
+            "action_type": "reaction",
+            "flavor": {
+              "summary": "Réaction : immédiatement après avoir subi des dégâts d'une créature à 1,50 m ou moins, effectue une attaque d'arme CaC contre elle.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "take_damage_from_creature_within_1_5m",
+              "counter_attack": {
+                "type": "melee_weapon",
+                "action_cost": "reaction"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "subcls-tueur-de-mages",
+        "name": "Voie du tueur de mages",
+        "flavor": {
+          "summary": "Spécialistes de la neutralisation des lanceurs de sorts. Résistance magique en rage, annulation d'états préjudiciables, détection de la magie et suppression des pouvoirs arcaniques.",
+          "lore_note": "Chez certaines tribus superstitieuses, la magie est une aberration de la nature. Ces barbares furent les meneurs des révoltes contre les tyrans-sorciers de l'ère des Rois destinés."
+        },
+        "features_details": [
+          {
+            "id": "feat-rage-anti-magique",
+            "name": "Rage anti-magique",
+            "unlocks_at_level": 3,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "En rage, choix optionnel : remplacer la résistance physique (cont./perf./tranch.) par une résistance aux dégâts magiques. De plus, frapper un concentrateur pour 11+ dégâts impose un DD de JS Constitution égal aux dégâts totaux infligés.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "condition": "while_raging_optional_activation",
+              "optional_resistance_swap": {
+                "remove_resistances": [
+                  "bludgeoning",
+                  "piercing",
+                  "slashing"
+                ],
+                "add_resistances": [
+                  "magical_damage"
+                ]
+              },
+              "concentration_disruption_override": {
+                "trigger": "deal_11_or_more_damage_to_concentrating_target",
+                "dc_formula": "damage_dealt",
+                "replaces_default": "half_damage_dc"
+              }
+            }
+          },
+          {
+            "id": "feat-ame-indomptable",
+            "name": "Âme indomptable",
+            "unlocks_at_level": 6,
+            "recharge": "at_will",
+            "action_type": "reaction",
+            "flavor": {
+              "summary": "En rage, réaction pour annuler immédiatement tous les états préjudiciables imposés par un sort. Une seule utilisation par rage.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "condition": "while_raging",
+              "trigger": "spell_imposes_one_or_more_conditions",
+              "effect": "negate_all_spell_imposed_conditions",
+              "action_cost": "reaction",
+              "uses": {
+                "max": 1,
+                "per": "rage_instance"
+              }
+            }
+          },
+          {
+            "id": "feat-detection-de-la-magie-tdm",
+            "name": "Détection de la magie",
+            "unlocks_at_level": 10,
+            "recharge": "long_rest",
+            "action_type": "10_minutes",
+            "flavor": {
+              "summary": "Étude d'une sphère de 9 m : détecte toute magie utilisée dans les 24 dernières heures. Succès à un test de Sagesse (Perception ou Intuition) DD 20 révèle la nature générale de l'effet le plus puissant.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "cast_time_minutes": 10,
+              "area": {
+                "type": "sphere",
+                "radius_meters": 9
+              },
+              "detects": "magic_used_within_last_24h",
+              "optional_detail_check": {
+                "skill_options": [
+                  "wis_perception",
+                  "wis_intuition"
+                ],
+                "dc": 20,
+                "on_success": "learn_general_nature_of_most_powerful_effect_no_name_no_school"
+              },
+              "uses": {
+                "formula": "proficiency_bonus",
+                "recharge": "long_rest"
+              }
+            }
+          },
+          {
+            "id": "feat-frappe-desincantatoire",
+            "name": "Frappe désincantatoire",
+            "unlocks_at_level": 14,
+            "recharge": "short_rest",
+            "action_type": "free_on_successful_hit",
+            "flavor": {
+              "summary": "En rage, une attaque CaC réussie contre une créature éveillée l'empêche de lancer des sorts ou d'utiliser des pouvoirs magiques jusqu'au début du prochain tour. Si la cible n'a aucun pouvoir magique, l'utilisation est quand même consommée.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "successful_melee_hit_while_raging_vs_awakened_target",
+              "effect": {
+                "condition": "suppress_all_magic_casting_and_powers",
+                "duration": "until_start_of_attacker_next_turn"
+              },
+              "wasted_use_if_no_magic": true,
+              "uses": {
+                "formula": "proficiency_bonus",
+                "recharge": "short_rest"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

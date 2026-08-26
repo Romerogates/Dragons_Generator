@@ -1,0 +1,33 @@
+{
+  "schema_version": "2.0",
+  "id": "don-panache-martial",
+  "name": "Panache martial",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [],
+  "description": "Quand vous bénéficiez d'un avantage et que le plus faible dé aurait suffi à toucher, ou sur coup critique : effets supplémentaires selon le type de dégâts. Contondants : cible repoussée de 3 m ou à terre. Perforants : cible entravée jusqu'à votre prochain tour. Tranchants : cible neutralisée jusqu'à votre prochain tour.",
+  "benefits": [
+    {
+      "type": "on_hit_bonus",
+      "condition": "avantage (plus faible dé touche) ou coup critique",
+      "effects_by_damage": {
+        "contondant": [
+          "repousser 3 m",
+          "à terre"
+        ],
+        "perforant": [
+          "entravé (1 tour)"
+        ],
+        "tranchant": [
+          "neutralisé (1 tour)"
+        ]
+      }
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "combat",
+    "conditions",
+    "corps-à-corps"
+  ]
+}

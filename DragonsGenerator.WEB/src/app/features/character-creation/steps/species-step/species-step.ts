@@ -6,9 +6,8 @@ import {
   inject,
   signal,
   computed,
-  effect,
   ChangeDetectionStrategy,
-  CUSTOM_ELEMENTS_SCHEMA, // <-- Ajout de l'import
+  CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import type { LanguageSummary } from '@core/models/Languages/language-summary';
@@ -21,8 +20,8 @@ import {
 } from '@core/services/character-builder.service';
 import type { Species, Subspecies, Trait, CreationChoice } from '@core/models/Species/species';
 import type { FeatureInstance, Size } from '@core/models/Character/character';
-import { apiAsiToPartialScores, mergePartialScores } from '@core/utils/ability-mapping';
-import { ABILITY_KEY_TO_LABEL, type AbilityScores } from '@core/models/Character/character';
+import { apiAsiToPartialScores, mergePartialScores, apiCodeToAbilityKey } from '@core/utils/ability-mapping';
+import { ABILITY_KEY_TO_LABEL, ABILITY_IMPACT_DESC, type AbilityScores } from '@core/models/Character/character';
 
 interface CardOption {
   id: string;
@@ -53,11 +52,19 @@ interface ChoiceOptionView {
   imports: [CommonModule],
   templateUrl: './species-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  host: {
+    class: 'flex flex-1 flex-col min-h-0 w-full',
+  },
 })
 export class SpeciesStep implements OnInit {
   private dataService = inject(DataService);
   readonly builder = inject(CharacterBuilderService);
+
+  /** Carousel card width + gap (keep in sync with species-step.html). */
+  readonly cardWidthPx = 320;
+  readonly cardGapPx = 32;
+  readonly cardStridePx = 352; // 320 + 32
 
   readonly allSpecies = signal<Species[]>([]);
   readonly loading = signal(true);
@@ -79,7 +86,8 @@ export class SpeciesStep implements OnInit {
 
   readonly flippedCards = signal<Set<string>>(new Set());
   readonly transitioning = signal(false);
-  private restoringState = true;
+  /** Figé la phase pendant l'auto-avance (évite le flash retour aux peuples). */
+  private readonly holdPhase = signal<Phase | null>(null);
 
   readonly selectedSpecies = computed<Species | null>(() => {
     const id = this.selectedSpeciesId();
@@ -108,22 +116,37 @@ export class SpeciesStep implements OnInit {
   });
 
   readonly actionableChoices = computed<CreationChoice[]>(() => {
-    return this.allCreationChoices().filter((c) => c.type === 'single_select');
+    return this.allCreationChoices().filter((c) => this.isCardSelectableChoice(c));
   });
 
   readonly nextUnresolvedChoice = computed<CreationChoice | null>(() => {
     const answers = this.choiceAnswers();
     for (const choice of this.actionableChoices()) {
       const answer = answers.get(choice.id);
-      if (!answer || answer.length < (choice.choiceCount ?? 1)) return choice;
+      const need = choice.choiceCount ?? 1;
+      if (!answer || answer.length < need) return choice;
     }
     return null;
   });
 
+  /** Progression du choix multi (ex. 1/2 caractéristiques). */
+  readonly choiceProgressLabel = computed<string>(() => {
+    const choice = this.nextUnresolvedChoice();
+    if (!choice) return '';
+    const need = choice.choiceCount ?? 1;
+    if (need <= 1) return '';
+    const have = this.choiceAnswers().get(choice.id)?.length ?? 0;
+    return `${have} / ${need}`;
+  });
+
   readonly currentPhase = computed<Phase>(() => {
+    const held = this.holdPhase();
+    if (held) return held;
+
     if (!this.selectedSpeciesId()) return 'species';
     if (this.requiresSubspecies() && !this.selectedSubspeciesId()) return 'subspecies';
     if (this.nextUnresolvedChoice()) return 'choice';
+    // Selection finished — stay on species overview so Continuer / Changer work.
     return 'species';
   });
 
@@ -134,7 +157,11 @@ export class SpeciesStep implements OnInit {
       case 'subspecies':
         return `Choisissez votre lignée`;
       case 'choice':
-        return this.nextUnresolvedChoice()?.name ?? 'Faites votre choix';
+        return (
+          this.nextUnresolvedChoice()?.name ??
+          this.lastActionableChoice()?.name ??
+          'Faites votre choix'
+        );
     }
   });
 
@@ -145,7 +172,9 @@ export class SpeciesStep implements OnInit {
       case 'subspecies':
         return `${this.selectedSpecies()?.name} — sous-espèce`;
       case 'choice':
-        return this.nextUnresolvedChoice()?.desc ?? '';
+        return (
+          this.nextUnresolvedChoice()?.desc ?? this.lastActionableChoice()?.desc ?? ''
+        );
     }
   });
 
@@ -182,7 +211,7 @@ export class SpeciesStep implements OnInit {
           id: s.id,
           title: s.name,
           subtitle: s.nameAlt.length > 0 ? s.nameAlt.join(', ') : undefined,
-          desc: s.flavor.summary,
+          desc: this.buildSpeciesCardDesc(s),
           stats: this.getCardSummary(s),
           badge: s.baseStats.size,
           icon: this.getIconForSpecies(s.id),
@@ -199,17 +228,23 @@ export class SpeciesStep implements OnInit {
           badge: '—',
         }));
       case 'choice': {
-        const choice = this.nextUnresolvedChoice();
+        // Pendant holdPhase / sélection complète : garder la dernière carte visible
+        const choice =
+          this.nextUnresolvedChoice() ??
+          this.lastActionableChoice();
         if (!choice) return [];
+        const picked = new Set(this.choiceAnswers().get(choice.id) ?? []);
         return this.getChoiceOptions(choice).map((opt) => ({
           id: opt.id,
           title: opt.name,
-          desc: opt.desc ?? '',
-          stats: opt.damageType
-            ? `${opt.damageType}${opt.areaShape ? ` · ${opt.areaShape} ${opt.areaLengthM}m` : ''}`
-            : opt.note,
-          icon: 'fluent-emoji:sparkles', // Modification Iconify
-          badge: '—',
+          desc: opt.desc ?? choice.desc ?? '',
+          stats: picked.has(opt.id)
+            ? '✓ Sélectionné'
+            : opt.damageType
+              ? `${opt.damageType}${opt.areaShape ? ` · ${opt.areaShape} ${opt.areaLengthM}m` : ''}`
+              : opt.note,
+          icon: this.iconForChoiceOption(choice, opt.id),
+          badge: picked.has(opt.id) ? 'OK' : '—',
         }));
       }
     }
@@ -221,8 +256,26 @@ export class SpeciesStep implements OnInit {
     if (!species) return {};
     const baseAsi = apiAsiToPartialScores(species.baseStats.abilityScoreIncrease);
     const subAsi = sub ? apiAsiToPartialScores(sub.abilityScoreIncrease) : {};
-    return mergePartialScores(baseAsi, subAsi);
+    const choiceAsi = this.asiFromChoiceAnswers();
+    return mergePartialScores(baseAsi, subAsi, choiceAsi);
   });
+
+  /** Bonus issus des choix ability_score_increase (ex. Melesse +1/+1). */
+  private asiFromChoiceAnswers(): Partial<AbilityScores> {
+    const answers = this.choiceAnswers();
+    const result: Partial<AbilityScores> = {};
+    for (const choice of this.allCreationChoices()) {
+      if (choice.type !== 'ability_score_increase') continue;
+      const picks = answers.get(choice.id) ?? [];
+      const value = choice.valuePerChoice ?? 1;
+      for (const code of picks) {
+        const key = apiCodeToAbilityKey(code);
+        if (!key) continue;
+        result[key] = (result[key] ?? 0) + value;
+      }
+    }
+    return result;
+  }
 
   readonly combinedTraits = computed<Trait[]>(() => {
     const species = this.selectedSpecies();
@@ -275,27 +328,43 @@ export class SpeciesStep implements OnInit {
 
   readonly resistances = computed<string[]>(() => {
     const res: string[] = [];
+    const answers = this.choiceAnswers();
+    const lineageId =
+      answers.get('choice-lignee-draconique')?.[0] ??
+      answers.get('choice-heritage-draconique')?.[0];
+
     for (const trait of this.combinedTraits()) {
-      const mech = trait.mechanics as any;
+      const mech = trait.mechanics as Record<string, unknown> | undefined;
       if (!mech) continue;
-      if (mech.damage_resistance) {
-        if (Array.isArray(mech.damage_resistance)) res.push(...mech.damage_resistance);
-      }
-      if (mech.type === 'damage_resistance' && mech.damage_type_from === 'heritage_draconique') {
-        const answers = this.choiceAnswers();
-        const heritageAnswer = answers.get('choice-heritage-draconique');
-        if (heritageAnswer?.[0]) {
-          const species = this.selectedSpecies();
-          const heritageChoice = species?.creationChoices.find(
-            (c) => c.id === 'choice-heritage-draconique',
-          );
-          if (heritageChoice && Array.isArray(heritageChoice.options)) {
-            const selectedOption = heritageChoice.options.find(
-              (o: any) => o.id === heritageAnswer[0],
-            );
-            if (selectedOption?.damage_type) res.push(selectedOption.damage_type);
+
+      if (mech['damage_resistance']) {
+        const dr = mech['damage_resistance'];
+        if (Array.isArray(dr)) {
+          for (const item of dr) {
+            if (item === 'damage-from-lineage' || item === 'damage_from_lineage') {
+              const dmg = this.resolveLineageDamageType(lineageId);
+              if (dmg) res.push(dmg);
+            } else if (typeof item === 'string') {
+              res.push(item);
+            }
           }
         }
+      }
+
+      if (Array.isArray(mech['resistances'])) {
+        for (const item of mech['resistances'] as unknown[]) {
+          if (item === 'damage-from-lineage' || item === 'damage_from_lineage') {
+            const dmg = this.resolveLineageDamageType(lineageId);
+            if (dmg) res.push(dmg);
+          } else if (typeof item === 'string') {
+            res.push(item);
+          }
+        }
+      }
+
+      if (mech['type'] === 'damage_resistance' && mech['damage_type_from'] === 'heritage_draconique') {
+        const dmg = this.resolveLineageDamageType(lineageId);
+        if (dmg) res.push(dmg);
       }
     }
     return [...new Set(res)];
@@ -318,16 +387,10 @@ export class SpeciesStep implements OnInit {
     return builderSpeciesId === this.selectedSpeciesId() && builderSpeciesId !== null;
   });
 
-  constructor() {
-    effect(() => {
-      const complete = this.selectionComplete();
-      const confirmed = this.isConfirmed();
-      if (complete && !confirmed && !this.restoringState) {
-        this.confirmSelection();
-        this.builder.nextStep();
-      }
-    });
-  }
+  /** Finished local picks and ready to leave the step (or already saved). */
+  readonly canContinue = computed(
+    () => this.selectionComplete() && this.selectedSpeciesId() !== null,
+  );
 
   ngOnInit(): void {
     this.loading.set(true);
@@ -339,11 +402,11 @@ export class SpeciesStep implements OnInit {
       next: ({ species, languages }) => {
         this.allSpecies.set(species);
 
-        // Map id → name pour résoudre les IDs de langues du JSON espèces
         const map = new Map<string, string>();
         languages.forEach((l) => map.set(l.id, l.name));
         this.languageIdToName.set(map);
 
+        this.restoreFromBuilder();
         this.loading.set(false);
       },
       error: () => {
@@ -351,16 +414,25 @@ export class SpeciesStep implements OnInit {
         this.loading.set(false);
       },
     });
+  }
 
-    // Restauration de l'état si on revient sur cette étape
+  private restoreFromBuilder(): void {
     const current = this.builder.creation();
-    if (current.speciesId) {
-      this.selectedSpeciesId.set(current.speciesId);
-      if (current.subspeciesId) this.selectedSubspeciesId.set(current.subspeciesId);
+    if (!current.speciesId) return;
+
+    this.selectedSpeciesId.set(current.speciesId);
+    if (current.subspeciesId) this.selectedSubspeciesId.set(current.subspeciesId);
+
+    const saved = current.speciesChoiceAnswers ?? {};
+    const map = new Map<string, string[]>();
+    for (const [k, v] of Object.entries(saved)) {
+      if (Array.isArray(v) && v.length > 0) map.set(k, v);
     }
-    setTimeout(() => {
-      this.restoringState = false;
-    }, 500);
+    this.choiceAnswers.set(map);
+
+    // Center carousel on the saved species when overview is shown
+    const idx = this.allSpecies().findIndex((s) => s.id === current.speciesId);
+    if (idx >= 0) this.currentIndex.set(idx);
   }
 
   // --- MÉTHODES CARROUSEL (Boucle infinie) ---
@@ -407,7 +479,6 @@ export class SpeciesStep implements OnInit {
     const total = this.currentCards().length;
     const targetIndex = this.currentCards().findIndex((c) => c.id === cardId);
 
-    // On calcule la distance la plus courte pour tourner le carrousel
     if (targetIndex !== this.normalizedIndex()) {
       let diff = targetIndex - this.normalizedIndex();
       if (diff > total / 2) diff -= total;
@@ -416,16 +487,18 @@ export class SpeciesStep implements OnInit {
       return;
     }
 
+    // Center card then (re)select — always re-run subspecies / lineage picks.
+    const phaseBefore = this.currentPhase();
+
     this.transitioning.set(true);
     setTimeout(() => {
-      switch (this.currentPhase()) {
+      switch (phaseBefore) {
         case 'species':
-          if (this.selectedSpeciesId() !== cardId) {
-            this.selectedSubspeciesId.set(null);
-            this.choiceAnswers.set(new Map());
-            this.builder.clearSpecies();
-            this.flippedCards.set(new Set());
-          }
+          // Re-picking the same species must also reset lineage / choices.
+          this.selectedSubspeciesId.set(null);
+          this.choiceAnswers.set(new Map());
+          this.builder.clearSpecies();
+          this.flippedCards.set(new Set());
           this.selectedSpeciesId.set(cardId);
           break;
         case 'subspecies':
@@ -447,22 +520,50 @@ export class SpeciesStep implements OnInit {
         case 'choice': {
           const choice = this.nextUnresolvedChoice();
           if (choice) {
+            const need = choice.choiceCount ?? 1;
             this.choiceAnswers.update((map) => {
               const newMap = new Map(map);
-              newMap.set(choice.id, [cardId]);
+              const prev = [...(newMap.get(choice.id) ?? [])];
+              const idx = prev.indexOf(cardId);
+              if (idx >= 0) {
+                // Toggle off
+                prev.splice(idx, 1);
+              } else if (need <= 1) {
+                newMap.set(choice.id, [cardId]);
+                return newMap;
+              } else if (prev.length < need) {
+                prev.push(cardId);
+              } else {
+                // Remplace le plus ancien si plein
+                prev.shift();
+                prev.push(cardId);
+              }
+              newMap.set(choice.id, prev);
               return newMap;
             });
           }
           break;
         }
       }
+
+      this.flippedCards.set(new Set());
       this.transitioning.set(false);
-    }, 250);
+
+      if (this.selectionComplete()) {
+        // Figé la phase actuelle avant confirm → évite le rollback visuel vers les peuples
+        this.holdPhase.set(phaseBefore);
+        this.confirmSelection();
+        setTimeout(() => this.builder.nextStep(), 120);
+      } else if (phaseBefore !== this.currentPhase()) {
+        this.currentIndex.set(0);
+      }
+    }, 200);
   }
 
   clearSelection(): void {
     this.transitioning.set(true);
     setTimeout(() => {
+      this.holdPhase.set(null);
       this.selectedSpeciesId.set(null);
       this.selectedSubspeciesId.set(null);
       this.choiceAnswers.set(new Map());
@@ -471,6 +572,13 @@ export class SpeciesStep implements OnInit {
       this.currentIndex.set(0);
       this.transitioning.set(false);
     }, 200);
+  }
+
+  continueToNextStep(): void {
+    if (!this.selectionComplete()) return;
+    this.holdPhase.set(this.currentPhase());
+    this.confirmSelection();
+    this.builder.nextStep();
   }
 
   confirmSelection(): void {
@@ -486,9 +594,23 @@ export class SpeciesStep implements OnInit {
       sourceDetail: sub && sub.traits.some((st) => st.id === t.id) ? sub.name : species.name,
       mechanics: t.mechanics,
     }));
+
     const bonusLangCount = this.allCreationChoices()
-      .filter((c) => c.type === 'language_select')
+      .filter((c) => this.isOpenLanguageChoice(c))
       .reduce((sum, c) => sum + (c.choiceCount ?? 1), 0);
+
+    const bonusSkillCount = this.allCreationChoices()
+      .filter((c) => this.isDeferredSkillChoice(c))
+      .reduce((sum, c) => sum + (c.choiceCount ?? 1), 0);
+
+    const bonusToolCount = this.allCreationChoices()
+      .filter((c) => this.isDeferredToolChoice(c))
+      .reduce((sum, c) => sum + (c.choiceCount ?? 1), 0);
+
+    const choiceAnswers: Record<string, string[]> = {};
+    for (const [k, v] of this.choiceAnswers()) {
+      choiceAnswers[k] = v;
+    }
 
     const selection: SpeciesSelection = {
       speciesId: species.id,
@@ -501,9 +623,12 @@ export class SpeciesStep implements OnInit {
       size: (species.baseStats.size ?? 'M') as Size,
       languages: this.combinedFixedLanguages(),
       bonusLanguageCount: bonusLangCount,
+      bonusSkillCount,
+      bonusToolCount,
       resistances: this.resistances(),
       hasDarkvision: (species.baseStats.darkvisionM ?? 0) > 0,
       darkvisionRadius: species.baseStats.darkvisionM ?? 0,
+      choiceAnswers,
     };
 
     this.builder.setSpecies(selection);
@@ -535,26 +660,169 @@ export class SpeciesStep implements OnInit {
 
   getChoiceOptions(choice: CreationChoice): ChoiceOptionView[] {
     const result: ChoiceOptionView[] = [];
-    if (Array.isArray(choice.options)) {
-      for (const raw of choice.options) {
-        const opt = raw as Record<string, unknown>;
+    const rawOptions = this.rawChoiceOptions(choice);
+    const perPick =
+      choice.type === 'ability_score_increase' ? `+${choice.valuePerChoice ?? 1}` : undefined;
+
+    for (const raw of rawOptions) {
+      if (typeof raw === 'string') {
+        if (raw === 'any') continue;
+        const abilityKey = apiCodeToAbilityKey(raw);
+        const impact = abilityKey ? ABILITY_IMPACT_DESC[abilityKey] : undefined;
+        const bump = perPick
+          ? `Augmente de ${perPick.replace('+', '')}.`
+          : undefined;
         result.push({
-          id: opt['id'] as string,
-          name: opt['name'] as string,
-          desc: (opt['desc'] as string) ?? undefined,
-          note: (opt['note'] as string) ?? undefined,
-          damageType: (opt['damage_type'] as string) ?? undefined,
-          areaShape: (opt['area'] as Record<string, unknown>)?.['shape'] as string | undefined,
-          areaLengthM: (opt['area'] as Record<string, unknown>)?.['length_m'] as number | undefined,
-          group: undefined,
+          id: raw,
+          name: this.prettyOptionId(raw),
+          desc: [bump, impact].filter(Boolean).join('\n\n') || undefined,
+          note: perPick,
         });
+        continue;
       }
+
+      const opt = raw as Record<string, unknown>;
+      const area =
+        (opt['breath_area'] as Record<string, unknown> | undefined) ??
+        (opt['area'] as Record<string, unknown> | undefined);
+
+      result.push({
+        id: opt['id'] as string,
+        name: (opt['name'] as string) ?? this.prettyOptionId(String(opt['id'] ?? '')),
+        desc: (opt['desc'] as string) ?? (opt['lore_note'] as string) ?? undefined,
+        note: (opt['note'] as string) ?? perPick,
+        damageType: (opt['damage_type'] as string) ?? undefined,
+        areaShape: area?.['shape'] as string | undefined,
+        areaLengthM: area?.['length_m'] as number | undefined,
+        group: undefined,
+      });
     }
-    return result;
+    return result.filter((o) => !!o.id);
   }
 
   hasSubspeciesAsi(sub: Subspecies): boolean {
     return !!sub.abilityScoreIncrease && Object.keys(sub.abilityScoreIncrease).length > 0;
+  }
+
+  /** Card-pickable creation choices (not free-form "any language/skill"). */
+  private isCardSelectableChoice(choice: CreationChoice): boolean {
+    if (this.isOpenLanguageChoice(choice)) return false;
+    if (this.isDeferredSkillChoice(choice)) return false;
+    if (this.isDeferredToolChoice(choice)) return false;
+    const opts = this.rawChoiceOptions(choice);
+    if (opts.length === 0) return false;
+    // Pool "any" seul → rien à afficher en cartes
+    if (opts.every((o) => o === 'any')) return false;
+    return true;
+  }
+
+  /** Dernier choix carte (pour garder l'UI pendant holdPhase). */
+  private lastActionableChoice(): CreationChoice | null {
+    const all = this.actionableChoices();
+    return all.length > 0 ? all[all.length - 1]! : null;
+  }
+
+  /** Language picks deferred to the languages step (pool includes "any"). */
+  private isOpenLanguageChoice(choice: CreationChoice): boolean {
+    if (choice.type !== 'language' && choice.type !== 'language_select') return false;
+    const opts = this.rawChoiceOptions(choice);
+    return opts.length === 0 || opts.some((o) => o === 'any');
+  }
+
+  /** Compétences « any » (Polyvalence Melesse) → étape Savoirs. */
+  private isDeferredSkillChoice(choice: CreationChoice): boolean {
+    if (choice.type !== 'skill_proficiency' && choice.type !== 'skill') return false;
+    const opts = this.rawChoiceOptions(choice);
+    return opts.length === 0 || opts.some((o) => o === 'any');
+  }
+
+  /** Outils Polyvalence → étape Savoirs (catalogue concret). */
+  private isDeferredToolChoice(choice: CreationChoice): boolean {
+    return choice.type === 'tool_proficiency' || choice.type === 'tool';
+  }
+
+  private rawChoiceOptions(choice: CreationChoice): unknown[] {
+    const opts = choice.options as unknown;
+    if (Array.isArray(opts)) return opts;
+    // JsonElement parfois sérialisé en objet { valueKind, ... } — rare
+    return [];
+  }
+
+  private prettyOptionId(id: string): string {
+    const ability = apiCodeToAbilityKey(id);
+    if (ability) return ABILITY_KEY_TO_LABEL[ability];
+    return id
+      .replace(/^(tl|lg|drag|gen)-/, '')
+      .replace(/-/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
+  private iconForChoiceOption(choice: CreationChoice, optId: string): string {
+    if (choice.type === 'ability_score_increase') {
+      const icons: Record<string, string> = {
+        str: 'fluent-emoji:flexed-biceps',
+        dex: 'fluent-emoji:person-running',
+        con: 'fluent-emoji:anatomical-heart',
+        int: 'fluent-emoji:brain',
+        wis: 'fluent-emoji:owl',
+        cha: 'fluent-emoji:sparkles',
+      };
+      return icons[optId] ?? 'fluent-emoji:glowing-star';
+    }
+    return 'fluent-emoji:sparkles';
+  }
+
+  /** Texte verso de la carte espèce : résumé + traits / choix différés. */
+  private buildSpeciesCardDesc(species: Species): string {
+    const parts: string[] = [species.flavor.summary];
+    if (species.traits.length) {
+      parts.push(
+        '\n\nTraits : ' +
+          species.traits
+            .map((t) => `${t.name} — ${t.desc}`)
+            .join('\n\n'),
+      );
+    }
+    const deferred = species.creationChoices.filter(
+      (c) =>
+        this.isDeferredSkillChoice(c) ||
+        this.isDeferredToolChoice(c) ||
+        this.isOpenLanguageChoice(c),
+    );
+    if (deferred.length) {
+      parts.push(
+        '\n\nÀ choisir plus loin : ' +
+          deferred.map((c) => `${c.name} (${c.choiceCount ?? 1})`).join(', ') +
+          '.',
+      );
+    }
+    const asiChoices = species.creationChoices.filter((c) => c.type === 'ability_score_increase');
+    if (asiChoices.length) {
+      parts.push(
+        '\n\n' +
+          asiChoices
+            .map((c) => `${c.name} : ${c.desc}`)
+            .join('\n'),
+      );
+    }
+    return parts.join('');
+  }
+
+  private resolveLineageDamageType(lineageOptionId: string | undefined): string | null {
+    if (!lineageOptionId) return null;
+    const species = this.selectedSpecies();
+    const choice = species?.creationChoices.find(
+      (c) => c.id === 'choice-lignee-draconique' || c.id === 'choice-heritage-draconique',
+    );
+    if (!choice) return null;
+    for (const raw of this.rawChoiceOptions(choice)) {
+      if (typeof raw !== 'object' || !raw) continue;
+      const opt = raw as Record<string, unknown>;
+      if (opt['id'] === lineageOptionId && typeof opt['damage_type'] === 'string') {
+        return opt['damage_type'];
+      }
+    }
+    return null;
   }
 
   // --- Fonction pour décaler visuellement les cartes à l'infini ---
@@ -562,9 +830,7 @@ export class SpeciesStep implements OnInit {
     const total = this.currentCards().length;
     if (total === 0) return '0px';
 
-    // On calcule combien de fois la carte doit "faire le tour"
     const wraps = Math.floor((this.currentIndex() - index + total / 2) / total);
-    // 256px (largeur carte w-64) + 32px (gap-8) = 288px
-    return `${wraps * total * 288}px`;
+    return `${wraps * total * this.cardStridePx}px`;
   }
 }

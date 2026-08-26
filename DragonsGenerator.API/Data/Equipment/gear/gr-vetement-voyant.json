@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-vetement-voyant",
+  "name": "Vêtement ou ustensile voyant et singulier",
+  "category": "gear",
+  "subcategory": "clothing",
+  "cost": {
+    "value": 2,
+    "unit": "po"
+  },
+  "weight_kg": 1,
+  "description": "Accessoire vestimentaire ostentatoire servant à affirmer sa prestance (cicatrice exhibée, cape colorée, bijou clinquant, etc.)."
+}

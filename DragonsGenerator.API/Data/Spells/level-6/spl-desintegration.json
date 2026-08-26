@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-desintegration",
+  "name": "Désintégration",
+  "level": 6,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une pierre d'aimant et une pincée de poussière"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Un mince rayon vert part de votre doigt tendu en direction d'une cible que vous voyez à portée. La cible peut être une créature, un objet ou une création de force magique, comme un mur de force. Une créature ciblée par ce sort doit effectuer un JS Dextérité. En cas d'échec, la cible subit 10d6 + 40 dégâts de force. Si ces dégâts la font tomber à 0 point de vie, elle est désintégrée. Une créature désintégrée disparaît avec tout ce qu'elle porte et transporte (à l'exception des objets magiques) en laissant derrière elle un tas de fine poussière grise. Elle ne peut être ramenée à la vie que par les sorts résurrection suprême ou souhait. Ce sort désintègre automatiquement un objet non magique ou une création de force magique de taille G ou inférieure. Si la cible est un objet ou une création de force de taille TG ou supérieure, le sort en désintègre un cube de 3 m d'arête. Ce sort ne fonctionne pas sur les objets magiques.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau ou supérieur, les dégâts augmentent de 3d6 par niveau d'emplacement au-dessus du 6e.",
+  "modular_options": []
+}

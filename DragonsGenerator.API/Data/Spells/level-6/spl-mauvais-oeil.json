@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-mauvais-oeil",
+  "name": "Mauvais œil",
+  "level": 6,
+  "school": "necromancie",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Logo et icônes Icône Vos yeux sont aussi noirs que l'encre et investis d'une puissance redoutable tant que le sort persiste. Une créature de votre choix que vous voyez dans un rayon de 18 m de vous doit effectuer un JS Sagesse. En cas d'échec, elle est affectée par un des effets suivants de votre choix jusqu'à la fin du sort. Sommeil. La cible est inconsciente. Elle se réveille si elle subit des dégâts ou si une autre créature la secoue au prix d'une action. Panique. La cible est effrayée par vous. À chacun de ses tours de jeu, elle doit entreprendre l'action Foncer et s'éloigner de vous en empruntant le chemin le plus court et sûr, à moins qu'elle n'ait nulle part où aller. Si elle se déplace jusqu'à un endroit situé à au moins 18 m de vous d'où elle ne peut plus vous voir, l'effet prend fin. Malade. La cible subit un désavantage aux jets d'attaque et tests de caractéristique. À la fin de chacun de ses tours de jeu, elle a droit à un nouveau JS Sagesse. En cas de réussite, l'effet prend fin. Tant que le sort persiste, vous pouvez, au prix d'une action à chacun de vos tours de jeu, cibler une autre créature, sous réserve qu'elle n'ait pas déjà réussi de jet de sauvegarde contre ce mauvais œil.",
+  "modular_options": []
+}

@@ -1,0 +1,33 @@
+{
+  "schema_version": "2.0",
+  "id": "don-tireur-de-precision",
+  "name": "Tireur de précision",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [],
+  "description": "Avec l'action Attaquer (arme à distance) et sans déplacement ce tour : vous pouvez dépenser une action bonus pour viser (+ 2 dégâts si touche + coup critique sur 19–20) ou ignorer les bonus de CA d'un abri partiel/supérieur.",
+  "benefits": [
+    {
+      "type": "ignore_cover_bonus_ca",
+      "covers": [
+        "partiel",
+        "supérieur"
+      ]
+    },
+    {
+      "type": "aim_action",
+      "cost": "action bonus",
+      "condition": "sans déplacement + action Attaquer",
+      "effects": [
+        "+2 dégâts",
+        "CC sur 19-20"
+      ]
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "armes-à-distance",
+    "précision",
+    "tir"
+  ]
+}

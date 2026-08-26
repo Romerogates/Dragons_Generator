@@ -1,0 +1,22 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-demoniaque",
+  "name": "Démoniaque",
+  "category": "exotique",
+  "typical_speakers": [
+    "Démons"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-abjad-kalam-enrichi",
+      "label": "Abjad kalam enrichi d'idéogrammes et d'accents spécifiques",
+      "type": "alphabet-ideogramme"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [
+    "Mélancolia",
+    "lieux maudits"
+  ],
+  "description": "Langue mélodique aux résonances multiples, semblable à des chants polyphoniques et diphoniques. Parlée par les démons. Quiconque s'exprime en démoniaque semble parler avec des voix vibrantes, s'attardant longuement sur certaines syllabes."
+}

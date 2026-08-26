@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-double-illusoire",
+  "name": "Double illusoire",
+  "level": 5,
+  "school": "illusion",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": false,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien"
+  ],
+  "description": "Vous devenez invisible en même temps qu'apparaît votre double illusoire là où vous vous tenez. Le double persiste pour toute la durée du sort, mais l'invisibilité prend fin si vous attaquez ou jetez un sort. Au prix d'une action, vous pouvez déplacer le double jusqu'à deux fois votre VD et le faire bouger, parler et se comporter comme vous l'entendez. Vous voyez par ses yeux et entendez par ses oreilles comme si vous vous trouviez à sa place. À chacun de vos tours de jeu, au prix d'une action bonus, vous pouvez passer de ses sens aux vôtres, et vice versa. Full page image Quand vous utilisez ses sens, vous êtes considéré comme aveuglé et assourdi au regard de votre propre environnement.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, la durée augmente de 1 heure par niveau d'emplacement au-dessus du 5e.",
+  "modular_options": []
+}

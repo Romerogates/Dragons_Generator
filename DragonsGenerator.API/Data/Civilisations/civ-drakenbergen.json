@@ -1,0 +1,94 @@
+{
+  "schema_version": "2.0",
+  "id": "civ-drakenbergen",
+  "name": "Drakenbergen",
+  "randomization": {
+    "dice": "d100",
+    "min": 54,
+    "max": 62
+  },
+  "demographics": {
+    "primary_species": [
+      {
+        "id": "sp-humain",
+        "label": "Humains (surface)"
+      },
+      {
+        "id": "sp-nain-batisseur",
+        "label": "Nains bâtisseurs (surface)"
+      },
+      {
+        "id": "sp-gnome-des-roches",
+        "label": "Gnomes des roches (surface)"
+      },
+      {
+        "id": "sp-halfelin-pied-leger",
+        "label": "Halfelins pieds-légers (surface)"
+      },
+      {
+        "id": "sp-nain-gardien",
+        "label": "Nains gardiens (mines)"
+      }
+    ],
+    "secondary_species": [
+      {
+        "id": "sp-tous",
+        "label": "Gens de toutes espèces (routes marchandes)"
+      }
+    ],
+    "is_cosmopolitan": true,
+    "cosmopolitan_zones": [
+      "routes marchandes"
+    ],
+    "social_roles": [],
+    "peoples_note": "En surface : Humains, Nains bâtisseurs, Gnomes des roches, Halfelins. En profondeur : Drows, Duergars, Svirfnebelins, Torves, Kobolds."
+  },
+  "official_languages": [
+    {
+      "id": "lg-nain",
+      "label": "Nain"
+    },
+    {
+      "id": "lg-cyfand",
+      "label": "Cyfand"
+    },
+    {
+      "id": "lg-commun-des-profondeurs",
+      "label": "Commun des profondeurs"
+    }
+  ],
+  "multilingual": true,
+  "writing_systems": [
+    {
+      "id": "wr-runique",
+      "label": "Runique",
+      "type": "runique"
+    },
+    {
+      "id": "wr-cyfand",
+      "label": "Cyfand",
+      "type": "alphabet"
+    }
+  ],
+  "is_oral_only": false,
+  "description": "Les monts draconiques, ou Drakenbergen, sont un vaste massif montagneux partagé en d'innombrables communautés et fort d'une riche histoire qui se lit dans les ruines majestueuses. On y trouve aussi bien de minuscules royaumes féodaux, que des communautés audacieuses, établis dans des vallées sauvages. Le seul véritable point commun est la présence des nains qui ont bâti dans le sous-sol des mines, des villes et des forteresses depuis des milliers d'années. Responsables de la tenue des routes et sécurisant les voies marchandes, ils permettent à la vie de se maintenir malgré les dangers et à la civilisation de la Cité Franche de pénétrer dans des régions reculées. Malgré tous leurs efforts, le Chancre s'insinue régulièrement jusqu'à la surface pour ravager et préparer ses conquêtes. Cette abomination n'est pas la seule menace : les raids des drows et des marchands d'esclaves duergars sont tout autant redoutés. À la surface, des communautés kobolds, gobelines et gobelours éparpillées vivotent de rapines tandis que de grands prédateurs aériens — hippogriffes, griffons, jeunes dragons… — sont à l'affût de proies savoureuses.",
+  "geography_tags": [
+    "massif-montagneux",
+    "mines",
+    "villes-souterraines",
+    "forteresses",
+    "vallees-sauvages",
+    "ruines"
+  ],
+  "threat_ids": [
+    "threat-chancre",
+    "threat-drow",
+    "threat-duergar",
+    "threat-kobold",
+    "threat-gobelin",
+    "threat-gobelours",
+    "threat-hippogriffe",
+    "threat-griffon",
+    "threat-dragon"
+  ]
+}

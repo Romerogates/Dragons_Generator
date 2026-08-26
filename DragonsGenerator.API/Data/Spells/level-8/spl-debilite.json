@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-debilite",
+  "name": "Débilité",
+  "level": 8,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 45,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(une poignée de sphères en argile"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "ous vous attaquez à l'esprit d'une créature que vous voyez à portée, en tentant d'anéantir son intelligence et de briser sa personnalité. La cible subit 4d6 dégâts psychiques et doit effectuer un JS Intelligence. En cas d'échec, ses valeurs d'Intelligence et de Charisme tombent à 1. La créature ne peut plus lancer de sorts ni activer d'objets magiques, elle ne comprend plus aucune langue ou se révèle incapable de communiquer de manière intelligible. Elle reconnaît néanmoins ses amis, peut les suivre et même les protéger. Tous les 30 jours, elle peut réitérer son jet de sauvegarde contre ce sort. En cas de réussite, le sort prend fin. Guérison, restauration suprême ou souhait peuvent aussi mettre un terme au sort.",
+  "modular_options": []
+}

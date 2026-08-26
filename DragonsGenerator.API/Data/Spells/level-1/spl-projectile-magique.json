@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-projectile-magique",
+  "name": "Projectile magique",
+  "level": 1,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "speciale",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "ous créez trois fléchettes luisantes de force magique. Chacune touche une créature de votre choix que vous voyez à",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, il crée une fléchette de plus par niveau d'emplacement au-dessus du 1ᵉʳ.",
+  "modular_options": []
+}

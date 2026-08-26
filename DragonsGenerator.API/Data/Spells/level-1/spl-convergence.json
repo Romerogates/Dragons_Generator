@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-convergence",
+  "name": "Convergence",
+  "level": 1,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": true,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-paladin",
+    "cls-pretre"
+  ],
+  "description": "Vous vous concentrez et savez aussitôt dans quelle direction se trouve une créature susceptible de vous aider. Tant que le sort persiste, une balise mentale vous indique dans quelle direction se trouve la créature la plus proche géographiquement qui remplit les conditions suivantes : Sa valeur d'Intelligence est égale ou supérieure à 6. Elle se trouve dans un rayon de 5 km de vous. Elle possède des intérêts concordants avec les vôtres, des idéaux communs, une attirance envers vous, une bienveillance à l'égard de ce que vous représentez ou toute autre raison de vous apprécier. Le sort ne charme pas la créature : il vous guide vers quelqu'un qui aura envie de vous aider. Vous ne connaissez pas cette créature ou ignorez sa présence. Si un vieil ami se trouve dans la même ville que vous sans que vous le sachiez, le sort pourrait ainsi vous guider vers lui. Le sort ne vous donne que la direction vers la créature, sans vous donner la moindre indication sur la distance qui vous sépare d'elle, son identité ou les raisons de votre concorde. Si, pour une raison ou une autre, une nouvelle créature remplissant les conditions détaillées ci-dessus se trouve plus près de vous avant la fin du sort, l'effet vous guide aussitôt vers elle. Dès que vous vous retrouvez dans un rayon de 3 m d'une créature remplissant les conditions, le sort prend fin.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, chaque niveau d'emplacement au-dessus du 1er augmente la durée de la concentration de 1 heure et le rayon d'action de 5 km.",
+  "modular_options": []
+}

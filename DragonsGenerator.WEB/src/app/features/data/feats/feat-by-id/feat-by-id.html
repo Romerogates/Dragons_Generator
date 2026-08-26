@@ -1,0 +1,51 @@
+<div class="w-full min-h-screen bg-[#171b22] text-slate-300 animate-fade-in pb-20">
+  <div class="max-w-4xl mx-auto px-4 pt-10">
+    <a routerLink="/feats" class="text-xs font-black uppercase tracking-widest text-slate-500 hover:text-amber-500 mb-8 inline-block">
+      ← Retour aux dons
+    </a>
+
+    @if (feat() === undefined) {
+      <p class="text-center py-32 text-slate-500 animate-pulse">Chargement...</p>
+    } @else if (notFound()) {
+      <div class="text-center py-32">
+        <h2 class="text-2xl font-bold text-red-500 font-serif">Don introuvable</h2>
+      </div>
+    } @else if (error(); as errorMsg) {
+      <p class="text-red-400 text-center">{{ errorMsg }}</p>
+    } @else if (feat(); as f) {
+      <header class="text-center mb-10">
+        <span class="text-5xl mb-4 block"><iconify-icon icon="fluent-emoji:trophy"></iconify-icon></span>
+        <h1 class="text-4xl font-extrabold text-amber-400 font-serif mb-4">{{ f.name }}</h1>
+        <div class="flex flex-wrap justify-center gap-2">
+          @if (f.category) {
+            <span class="bg-[#1b2028] px-4 py-1 rounded-full text-xs font-black uppercase border border-slate-700">{{ categoryLabel(f.category) }}</span>
+          }
+          @if (f.requiresMagic) {
+            <span class="bg-fuchsia-950/40 text-fuchsia-400 border border-fuchsia-900/50 px-3 py-1 rounded text-[10px] font-black uppercase">Requiert la magie</span>
+          }
+          @if (f.repeatable) {
+            <span class="bg-sky-950/40 text-sky-400 border border-sky-900/50 px-3 py-1 rounded text-[10px] font-black uppercase">Répétable</span>
+          }
+        </div>
+      </header>
+
+      @if (f.description) {
+        <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 mb-8">
+          <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">Effet</h2>
+          <p class="text-sm text-slate-300 leading-relaxed">{{ f.description }}</p>
+        </section>
+      }
+
+      @if (f.tags.length > 0) {
+        <section class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800">
+          <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-3">Tags</h2>
+          <div class="flex flex-wrap gap-2">
+            @for (tag of f.tags; track tag) {
+              <span class="bg-slate-900 text-slate-400 px-3 py-1 rounded-lg text-xs">{{ tag }}</span>
+            }
+          </div>
+        </section>
+      }
+    }
+  </div>
+</div>

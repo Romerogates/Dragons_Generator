@@ -1,0 +1,205 @@
+{
+  "schema_version": "2.0",
+  "id": "bg-survivant",
+  "name": "Survivant",
+  "source": {
+    "book": "Dragons - Livre de base: Aventuriers",
+    "pages": "102-103"
+  },
+  "flavor": {
+    "summary": "Aussi loin que remonte votre mémoire, vous avez toujours été cerné par le sang et la mort. Les conflits ont emporté nombre de vos proches et vous ont dépouillé plus d'une fois, mais ils vous ont finalement épargné."
+  },
+  "proficiencies": {
+    "skills": {
+      "fixed": [],
+      "choose": {
+        "count": 2,
+        "options": [
+          "skill-athletisme",
+          "skill-intuition",
+          "skill-investigation",
+          "skill-perception",
+          "skill-survie"
+        ]
+      }
+    },
+    "tools": {
+      "fixed": [],
+      "choose": {
+        "count": 1,
+        "options": [
+          {
+            "type": "tool_category",
+            "category": "artisan",
+            "name": "Outils d'artisan (1 type au choix)"
+          },
+          {
+            "type": "tool_category",
+            "category": "vehicule",
+            "name": "Véhicules (1 type au choix)"
+          },
+          {
+            "type": "tool",
+            "id": "tl-necessaire-dherboristerie",
+            "name": "Nécessaire d'herboristerie"
+          }
+        ]
+      }
+    },
+    "languages": {
+      "fixed": [],
+      "choose_count": 1
+    }
+  },
+  "equipment": {
+    "fixed": [
+      {
+        "id": "gr-vetements-ordinaires",
+        "name": "Vêtements ordinaires",
+        "qty": 1,
+        "location": "equipped"
+      },
+      {
+        "id": "gr-souvenir",
+        "name": "Souvenir de votre communauté d'origine",
+        "qty": 1,
+        "location": "backpack"
+      }
+    ],
+    "choose": [],
+    "currency": {
+      "or": 5
+    }
+  },
+  "privilege": {
+    "id": "priv-entre-les-gouttes",
+    "name": "Entre les gouttes",
+    "desc": "Votre expérience des guerres et des calamités vous a appris à déceler les signes précurseurs d'un danger mortel et à vous mettre à l'abri. En région de combats ou menacée par des catastrophes, vous savez trouver les itinéraires les moins exposés et les refuges les plus sûrs."
+  },
+  "personality_tables": {
+    "traits": {
+      "die": "1d8",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Je ne verse jamais dans l'optimisme. C'est même plutôt le contraire."
+        },
+        {
+          "roll": 2,
+          "text": "Ma meilleure arme contre l'horreur ? Le sens de la dérision."
+        },
+        {
+          "roll": 3,
+          "text": "Je m'efforce de désamorcer les conflits inutiles, bien conscient que la plupart le sont."
+        },
+        {
+          "roll": 4,
+          "text": "Je suis très tactile ; j'étreins, je tape affectueusement dans le dos, je frotte les têtes, pour réconforter les autres... ou pour me rassurer."
+        },
+        {
+          "roll": 5,
+          "text": "Je suis d'une hygiène irréprochable, excessive diraient certains."
+        },
+        {
+          "roll": 6,
+          "text": "Je suis plutôt timide, mais quand les gens parlent à tort et à travers de ce que je ne connais que trop bien, il m'arrive de sortir de mes gonds."
+        },
+        {
+          "roll": 7,
+          "text": "Sans cesse sur le qui-vive, je ne me détends qu'exceptionnellement."
+        },
+        {
+          "roll": 8,
+          "text": "Je m'isole fréquemment, car je me sens encore plus seul en société."
+        }
+      ]
+    },
+    "ideals": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Fatalisme. Tout ce que j'ai subi, je l'ai surmonté tant que bien que mal. C'est un miracle, mais il y a sûrement un sens à tout cela. (tout alignement)"
+        },
+        {
+          "roll": 2,
+          "text": "Partage. La vie m'a appris bien des choses, notamment qu'on ne survit pas sans l'aide des autres. (bon)"
+        },
+        {
+          "roll": 3,
+          "text": "Épuration. La vie m'a appris bien des choses, notamment que seuls les plus forts méritent de survivre. (mauvais)"
+        },
+        {
+          "roll": 4,
+          "text": "Affranchissement. On combat au nom du seigneur, du pays, de la foi ou des idéaux, mais on meurt surtout pour les caprices de quelques égoïstes. (chaotique)"
+        },
+        {
+          "roll": 5,
+          "text": "Anticipation. La guerre est inévitable, tôt ou tard elle frappe. Seuls ceux qui se tiennent prêts peuvent espérer être épargnés. (loyal)"
+        },
+        {
+          "roll": 6,
+          "text": "Désengagement. Je n'ai compris qu'une chose : plus une cause fait intervenir d'hommes, plus elle dépasse leur entendement. Peut-être se valent-elles toutes, finalement. (neutre)"
+        }
+      ]
+    },
+    "bonds": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "La foi m'a permis de surmonter les épreuves ; je suis désormais son serviteur."
+        },
+        {
+          "roll": 2,
+          "text": "J'ai fui ma patrie frappée par les calamités, mais j'y retournerai un jour."
+        },
+        {
+          "roll": 3,
+          "text": "Je connais l'identité des bourreaux de mes proches et ils recevront chacun ma visite."
+        },
+        {
+          "roll": 4,
+          "text": "J'ai perdu la trace de la personne qui m'a sauvé la vie, mais je suis convaincu qu'elle est toujours parmi nous."
+        },
+        {
+          "roll": 5,
+          "text": "Une créature monstrueuse m'a jadis sauvé et j'ai compris que tout ce qui est or ne brille pas. Depuis ce jour, j'évite de brimer hâtivement ce qui a vilaine allure."
+        },
+        {
+          "roll": 6,
+          "text": "Sans influence, les choses ne changeront jamais. Je ne serai pas un pion toute ma vie."
+        }
+      ]
+    },
+    "flaws": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "J'ai souvent l'impression d'être un fantôme parmi les vivants."
+        },
+        {
+          "roll": 2,
+          "text": "Il y a longtemps que je ne m'attache plus à personne, car tous ceux que j'aime meurent dans l'horreur."
+        },
+        {
+          "roll": 3,
+          "text": "Il m'arrive dans certaines circonstances de sombrer dans ce que je hais le plus : la violence aveugle."
+        },
+        {
+          "roll": 4,
+          "text": "Je hais les dieux pour avoir emporté tous mes proches, crime qui serait moins ignoble s'ils ne m'avaient pas épargné."
+        },
+        {
+          "roll": 5,
+          "text": "J'éprouve souvent de la pitié pour mes adversaires et il m'est arrivé de le regretter."
+        },
+        {
+          "roll": 6,
+          "text": "J'ai tellement surmonté d'épreuves que je me sens parfois immortel."
+        }
+      ]
+    }
+  }
+}

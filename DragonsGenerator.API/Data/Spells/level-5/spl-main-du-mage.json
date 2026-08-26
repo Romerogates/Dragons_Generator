@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-main-du-mage",
+  "name": "Main du mage",
+  "level": 5,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un gant en peau de serpent"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien"
+  ],
+  "description": "Icon, logo, and photograph Icon and photograph Icon Jous faites apparaître une main de taille G constituée d'une force translucide et scintillante dans un espace inoccupé que vous voyez à portée. Elle persiste pour toute la durée du sort et se déplace selon vos ordres en reproduisant les gestes de votre propre main. Cette main est un objet pourvu d'une CA 20 et de points de vie égaux à vos points de vie maximums. Si elle tombe à 0 point de vie, le sort prend fin. Elle a une Force de 26 (+8) et une Dextérité de 10 (+0). Par ailleurs, elle ne remplit pas son espace. Au moment de l'incantation, puis au prix d'une action bonus lors de vos tours de jeu suivants, vous pouvez déplacer la main jusqu'à 18 m puis utiliser un des effets suivants : Poing serré. La main frappe une créature ou un objet se situant dans un rayon de 1,50 m d'elle. Effectuez une attaque de sort au corps à corps en utilisant votre profil. En cas de réussite, la cible subit 4d8 dégâts de force. Main impérieuse. La main tente de pousser une créature située dans un rayon de 1,50 m d'elle dans la direction de votre choix. Effectuez un test avec la Force de la main opposé à un test de Force (Athlétisme) de la cible. Si cette dernière est de taille M ou inférieure, vous bénéficiez d'un avantage au test. En cas de réussite, la main pousse la cible jusqu'à 1,50 m + votre modificateur de caractéristique magique × 1,50 m. Enfin, la main se déplace avec la cible de manière à rester dans un rayon de 1,50 m de celle-ci. Main broyeuse. La main tente d'agripper une créature de taille TG ou inférieure située dans un rayon de 1,50 m d'elle. Utilisez sa valeur de Force pour résoudre la lutte. Si la cible est de taille M ou inférieure, vous bénéficiez d'un avantage au test. Tant que la main agrippe la cible, vous pouvez utiliser une action bonus pour qu'elle la broie. Dans ce cas, la cible subit 2d6 + votre modificateur de caractéristique magique dégâts contondants. Main interposée. La main s'interpose entre vous et une créature de votre choix jusqu'à ce que vous lui donniez un nouvel ordre. Elle se déplace de manière à rester entre vous et la cible, et vous confère un abri partiel face à cette cible, qui ne peut pas traverser l'espace de la main si sa valeur de Force est inférieure ou égale à celle de la main. Si sa valeur de Force est supérieure à celle de la main, la cible peut se déplacer vers vous en traversant son espace, qui constitue néanmoins un terrain difficile pour ce qui la concerne.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, les dégâts du poing serré et la main broyeuse augmentent respectivement de 2d8 et de 2d6 par niveau d'emplacement au-dessus du 5e.",
+  "modular_options": []
+}

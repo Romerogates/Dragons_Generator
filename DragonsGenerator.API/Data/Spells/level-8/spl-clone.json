@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-clone",
+  "name": "Clone",
+  "level": 8,
+  "school": "necromancie",
+  "casting_time": {
+    "value": 1,
+    "unit": "heure"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(un diamant d'une valeur minimale de 1 000 po et au moins 15 cm³ de chair de la créature devant être clonée"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien"
+  ],
+  "description": "Logo, icon, and photograph Icon, logo, and photograph Icon, logo, and photograph Ce sort produit un double inerte d'une créature vivante pour la préserver de la mort. Ce clone se forme dans un réceptacle scellé et atteint sa taille normale en 120 jours, mais il est possible de cloner une version plus jeune de la même créature. Il reste inerte et ne dépérit pas tant que son réceptacle est intact. Si la créature d'origine meurt et que le clone est arrivé à maturation, son âme est transférée dans ce clone, pourvu qu'elle soit libre et accepte de revenir. Sur le plan physique, le clone est identique à l'original, dont il a aussi la personnalité, les souvenirs et le profil, mais pas l'équipement. S'ils existent encore, les restes physiques de la créature d'origine sont inertes et ne peuvent pas être rappelés à la vie, tout simplement parce que l'âme de la créature est ailleurs.",
+  "modular_options": []
+}

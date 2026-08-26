@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-domination-de-personne",
+  "name": "Domination de personne",
+  "level": 5,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Vous tentez d'envoûter un humanoïde que vous voyez à portée. Celui-ci doit réussir un JS Sagesse sous peine d'être charmé par vos soins pour toute la durée du sort. Si vous ou des créatures qui vous sont amicales le combattez, il bénéficie d'un avantage au jet de sauvegarde. Aussi longtemps que la cible est charmée, vous disposez avec elle d'un lien télépathique si vous vous trouvez sur le même plan d'existence. Tant que vous êtes conscient, vous pouvez utiliser ce lien télépathique pour lui donner des ordres (aucune action nécessaire) auxquels elle obéit de son mieux. Les ordres doivent être simples, comme « Attaque cette créature », « Va là-bas » ou « Va chercher ». Si la cible parvient à exécuter son ordre et que vous ne lui en donnez pas de nouveau, elle se défend et se protège du mieux qu'elle le peut. Au prix d'une action, vous pouvez prendre le contrôle total de la cible. Jusqu'à la fin de votre tour de jeu suivant, la créature n'entreprend que les actions que vous choisissez et ne fait rien que vous ne lui autorisiez. Pendant tout ce temps, vous pouvez lui faire jouer des réactions, mais vous devez pour cela utiliser vos propres réactions. Chaque fois que la cible subit des dégâts, elle effectue un nouveau JS Sagesse contre le sort. En cas de réussite, le sort prend fin.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau, la durée est : concentration, jusqu'à 10 minutes. Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau, la durée est : concentration, jusqu'à 1 heure. Quand vous jetez ce sort en utilisant un emplacement de sort du 8e niveau ou supérieur, la durée est : concentration, jusqu'à 8 heures.",
+  "modular_options": []
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-communication-a-distance",
+  "name": "Communication à distance",
+  "level": 3,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "illimitee",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "round"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un petit bout de fil de cuivre fin"
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien",
+    "cls-pretre"
+  ],
+  "description": "Vous envoyez un court message, ne dépassant pas vingt-cinq mots, à une créature qui vous est connue. La cible entend le message dans sa tête, vous identifie si elle vous connaît, et peut répondre immédiatement de la même manière. Le sort permet à une cible ayant une valeur d'Intelligence d'au moins 1 de comprendre le sens de votre message. Vous pouvez envoyer le message à n'importe quelle distance et sur n'importe quel plan, mais si la cible se situe sur un autre plan que vous, il y a un risque de 20 % que le message n'arrive pas. ## La puissance de la haine Si vous contactez une cible qui vous est hostile (qu'elle éprouve pour vous une haine durable ou simplement une colère temporaire), cette énergie mentale négative vous inflige un choc psychique. Vous devez réussir un JS Sagesse contre un DD égal à 8 + bonus de maîtrise de la cible + son modificateur de Charisme. En cas d'échec, vous subissez 3d8 dégâts psychiques.",
+  "modular_options": []
+}

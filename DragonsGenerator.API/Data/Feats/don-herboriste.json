@@ -1,0 +1,41 @@
+{
+  "schema_version": "2.0",
+  "id": "don-herboriste",
+  "name": "Herboriste",
+  "requires_magic": false,
+  "category": "survival",
+  "prerequisites": [],
+  "description": "Avantage aux tests associés au nécessaire d'herboristerie (et maîtrise si absent) et pour trouver/cueillir plantes médicinales/magiques. Permet de préparer des décoctions (équivalent de potions) à partir de plantes fraîches (< 8 h) via des tests de Survie/Nature et de nécessaire d'herboristerie.",
+  "benefits": [
+    {
+      "type": "advantage_on_tool",
+      "tool": "herboristerie"
+    },
+    {
+      "type": "proficiency",
+      "proficiency_type": "tool",
+      "value": "nécessaire d'herboristerie",
+      "note": "Si absent"
+    },
+    {
+      "type": "craft_decoction",
+      "potions": [
+        "escalade",
+        "invisibilité",
+        "croissance",
+        "guérison",
+        "guérison améliorée",
+        "guérison supérieure",
+        "lecture de l'esprit",
+        "résistance",
+        "respiration aquatique"
+      ]
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "artisanat",
+    "plantes",
+    "soins"
+  ]
+}

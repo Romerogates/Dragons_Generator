@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-fleche-assassine",
+  "name": "Flèche assassine",
+  "level": 2,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action_bonus"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": false,
+    "s": true,
+    "m": "le projectile utilisé"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-rodeur"
+  ],
+  "description": "Lors de l'incantation, vous désignez d'un geste un adversaire que vous voyez. Toute munition ou arme possédant la propriété lancer peut être enchantée. Si le projectile enchanté touche la cible désignée d'ici la fin du sort, cette dernière subit 4d10 dégâts supplémentaires du type de l'arme utilisée. Le projectile est considéré comme magique pour ce qui est de passer outre une résistance ou une immunité contre les armes non magiques. S'il touche une autre cible, les dégâts normaux s'appliquent. Chaque fois que vous attaquez la cible désignée avec le projectile et que vous la ratez, il revient aussitôt dans votre main, prêt à servir pour une future attaque. Une fois que le projectile a infligé des dégâts à la cible désignée, qu'une autre créature s'en sert ou que 1 minute s'est écoulée, il perd sa magie.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, les dégâts augmentent de 1d10 par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

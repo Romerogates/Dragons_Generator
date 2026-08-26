@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "tl-necessaire-de-faussaire",
+  "name": "Nécessaire de faussaire",
+  "category": "tool",
+  "subcategory": "special_kit",
+  "cost": {
+    "value": 15,
+    "unit": "po"
+  },
+  "weight_kg": 2.5,
+  "description": "Instruments pour la contrefaçon de documents. Illégal."
+}

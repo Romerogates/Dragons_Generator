@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-poche-de-chair",
+  "name": "Poche de chair",
+  "level": 1,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "permanent",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": false,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-sorcier"
+  ],
+  "description": "Vous altérez votre chair de manière permanente pour pouvoir y stocker des objets. Pour qu'un objet puisse y être rangé, il faut qu'aucune de ses dimensions ne dépasse 90 cm si vous êtes de taille M (60 cm si vous êtes de taille P, 1,80 m si vous êtes de taille G, puis le double par catégorie de taille supplémentaire). Tous les objets ainsi portés s'ajoutent normalement à votre poids transporté, mais en dehors de cela, ils ne gênent aucunement vos mouvements. Tous les objets ainsi contenus en vous échappent à un examen extérieur et même à une fouille au corps. À votre tour de jeu, vous pouvez ranger un objet dans votre poche de chair au prix d'une action, tandis qu'en sortir un est considéré comme une interaction avec un objet (cf. Aventuriers, chapitre Combat, Le déroulement d'un combat, Le tour de jeu : Autres activités possibles à votre tour de jeu). ## Extirper les objets Si votre meneur utilise cette option, la poche de chair se révèle dangereuse lorsque ses effets sont brutalement interrompus. Si votre poche de chair est dissipée alors qu'elle contient des objets, lancez un d20. Sur un résultat de 9 à 20, les objets en vous sont expulsés sans dommages ; de 1 à 8, ils restent dans votre corps, suscitant une gêne et une douleur plus ou moins intenses selon le type d'objets. Pour chaque objet dont une dimension est supérieure ou égale à la moitié de la taille autorisée (45 cm pour une créature de taille M), vous subissez 1d4 dégâts nécrotiques par minute tant que l'objet n'a pas été extrait. Ceci peut être accompli à l'aide d'un test de Sagesse (Médecine) DD 20. En cas de marge d'échec de 5 ou plus, vous subissez 3d6 dégâts tranchants.",
+  "modular_options": []
+}

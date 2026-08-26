@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-porteur-sain",
+  "name": "Porteur sain",
+  "level": 4,
+  "school": "necromancie",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "speciale",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un échantillon contagieux que le sort détruit et un sablier"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-sorcier"
+  ],
+  "description": "Vous touchez une cible et lui inoculez une maladie. L'échantillon utilisé comme composante matérielle détermine la nature du mal que vous placez en elle. Si la cible n'est pas consentante, elle doit réussir un JS Constitution pour contrer l'effet du sort. Dans le cas contraire, elle devient le véhicule de votre magie et est votre « porteur sain ». Incubation. Initialement, le porteur sain transporte le mal en lui sans en exprimer aucun symptôme. La durée de cette phase est définie par l'écoulement du sablier utilisé comme composante de sort (de 1h à 24h). Le sablier peut être confié au porteur sain de sorte à ce qu'il connaisse le temps restant. À l'issue de cette période, le porteur sain est soit libéré de la menace, soit en exprime tous les symptômes. Transmission du mal. Au cours de la première phase du sort, le porteur sain peut transmettre le mal à un maximum de quatre créatures. Toute personne dont la peau entre en contact avec la sienne doit réussir un JS Constitution sous peine d'être contaminée. Si le porteur initial parvient à contaminer quatre personnes, il se libère lui-même de la menace. À l'exception du porteur sain, une créature contaminée ne peut ni transmettre le mal, ni s'en débarrasser avant la fin du sort (voir point suivant). Déclenchement des symptômes. Une fois la première phase du sort terminée, le porteur sain (sauf s'il s'est libéré du mal) et toutes les créatures contaminées subissent de plein fouet les effets de la maladie. Les effets correspondent à ceux qui interviennent à la fin de la période d'incubation - laquelle est donc singulièrement raccourcie - après quoi la maladie suit son cours normal. que le nombre de créatures que doit contaminer chaque porteur sain pour se débarrasser du mal, augmente de deux par niveau d'emplacement au-dessus du 4e. De plus, quand vous jetez ce sort en utilisant un emplacement de sort du 8e niveau ou supérieur, toute créature contaminée devient également un porteur sain jusqu'à la fin du sort. ## Porteur sain de poison Si vous utilisez cette option, le sort porteur sain peut s'appliquer à des poisons. Le sort est ainsi modifié : Une ou plusieurs doses de poison se substituent à l'échantillon contagieux, pour un maximum de 4 doses (+2 par niveau d'emplacement de sort au-dessus du 4e). Le nombre maximum de cibles contaminées est limité par le nombre de doses inoculées au porteur sain. Seule une dose peut être transmise par créature. Par exemple, avoir consommé deux doses de poison permet d'empoisonner deux créatures. Une fois que toutes les doses ont été transmises, le porteur sain est débarrassé du poison. Les créatures à qui la substance est transmise peuvent la transmettre tant que le sablier n'est pas vidé. Contrairement au cas d'une maladie, la dose de poison est alors transférée et la créature transmetteuse ne le porte plus. Il n'est pas possible de retransmettre un poison à une créature l'ayant précédemment porté dans le cadre de ce sort. Une créature ne peut effectuer un JS Constitution pour éviter de recevoir un poison. Le (ou les) dernier porteur de la substance en subit les effets quand le sablier est vide.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, le nombre de porteurs sains, de même",
+  "modular_options": []
+}

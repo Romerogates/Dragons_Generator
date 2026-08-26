@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-bouclier-de-feu",
+  "name": "Bouclier de feu",
+  "level": 4,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un peu de phosphore ou une luciole"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien"
+  ],
+  "description": "J otre corps se couvre de flammèches pour toute la durée du sort, produisant une lumière vive dans un rayon de 3 m et une lumière faible sur 3 m de plus. Vous pouvez révoquer le sort prématurément au prix d'une action. Les flammes vous confèrent un bouclier chaud ou froid, au choix. Le bouclier chaud vous offre une résistance aux dégâts de froid, tandis que le bouclier froid vous offre une résistance aux dégâts de feu. En outre, quand une créature située dans un rayon de 1,50 m de vous vous touche avec une attaque de corps à corps, les flammes sont attisées. L'attaquant subit 2d8 dégâts de feu ou de froid selon le bouclier choisi.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e ou 7e niveau, les dégâts sont de 3d8 ; avec un emplacement du 8e ou 9e niveau, ils sont de 4d8 et vous ne bénéficiez plus d'une résistance mais d'une immunité au type de dégâts choisi.",
+  "modular_options": []
+}

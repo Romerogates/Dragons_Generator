@@ -1,0 +1,210 @@
+{
+  "schema_version": "2.0",
+  "id": "bg-bohemien",
+  "name": "Bohémien",
+  "source": {
+    "book": "Dragons - Livre de base: Aventuriers",
+    "pages": "90-91"
+  },
+  "flavor": {
+    "summary": "Toujours sur la route, d'une ville à l'autre, de fête en festival. Votre communauté est ambulante, nomade, rassemblée autour de roulottes bariolées et de spectacles entêtants. Vous ne concevez pas la vie sans art, sans divertissement."
+  },
+  "proficiencies": {
+    "skills": {
+      "fixed": [],
+      "choose": {
+        "count": 2,
+        "options": [
+          "skill-dressage",
+          "skill-escamotage",
+          "skill-representation",
+          "skill-survie"
+        ]
+      }
+    },
+    "tools": {
+      "fixed": [],
+      "choose": {
+        "count": 1,
+        "options": [
+          {
+            "type": "tool_category",
+            "category": "artisan",
+            "name": "Outils d'artisan (1 type au choix)"
+          },
+          {
+            "type": "tool_category",
+            "category": "instrument",
+            "name": "Instrument de musique (1 au choix)"
+          },
+          {
+            "type": "tool_category",
+            "category": "jeu",
+            "name": "Matériel de jeu (1 type au choix)"
+          }
+        ]
+      }
+    },
+    "languages": {
+      "fixed": [],
+      "choose_count": 1
+    }
+  },
+  "equipment": {
+    "fixed": [
+      {
+        "id": "gr-costume-de-scene",
+        "name": "Costume de scène",
+        "qty": 1,
+        "location": "equipped"
+      },
+      {
+        "id": "gr-vetements-de-voyage",
+        "name": "Vêtements de voyage",
+        "qty": 1,
+        "location": "backpack"
+      },
+      {
+        "id": "gr-sauf-conduit",
+        "name": "Sauf-conduit pour se produire devant un seigneur",
+        "qty": 1,
+        "location": "backpack"
+      }
+    ],
+    "choose": [],
+    "currency": {
+      "or": 5
+    }
+  },
+  "privilege": {
+    "id": "priv-famille-chaque-ville",
+    "name": "Une famille dans chaque ville",
+    "desc": "Quelle que soit la communauté dans laquelle vous vous rendez, vous pouvez compter sur la présence locale de votre ethnie. Vous trouverez toujours du soutien, notamment de personnes débrouillardes et généreuses, capables de vous aider à sortir d'un mauvais pas."
+  },
+  "personality_tables": {
+    "traits": {
+      "die": "1d8",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Je m'efforce de donner une bonne image de moi quand j'arrive quelque part."
+        },
+        {
+          "roll": 2,
+          "text": "Mes journées font alterner périodes d'activité intense et d'oisiveté."
+        },
+        {
+          "roll": 3,
+          "text": "Je passe rarement plus de quelques minutes sans chanter, conter, danser ou jouer."
+        },
+        {
+          "roll": 4,
+          "text": "L'entraide rythme spontanément mes journées, du matin avec mes compagnons."
+        },
+        {
+          "roll": 5,
+          "text": "Je sympathise facilement avec les gens, sans forcément que cela m'engage."
+        },
+        {
+          "roll": 6,
+          "text": "Tout espace public est pour moi prétexte à entrer en scène et faire valoir mes talents."
+        },
+        {
+          "roll": 7,
+          "text": "Je suis toujours partant, quelle que soit l'entreprise, au mépris du danger."
+        },
+        {
+          "roll": 8,
+          "text": "Ce n'est pas trahir la vérité que de l'embellir et de la rendre plus vivante."
+        }
+      ]
+    },
+    "ideals": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Les miens sont éparpillés par monts et par vaux, mais notre loyauté mutuelle est plus forte que tout."
+        },
+        {
+          "roll": 2,
+          "text": "Je suis la fierté de mon clan, qui compte sur moi pour le faire briller et faire tomber les préjugés qui l'entourent."
+        },
+        {
+          "roll": 3,
+          "text": "L'être que j'aime m'a fait promettre une chose qui va à l'encontre de mes convictions."
+        },
+        {
+          "roll": 4,
+          "text": "Ils se multiplient, ceux qui veulent m'attraper, et il y aura bien un jour où ils seront en mesure d'y arriver."
+        },
+        {
+          "roll": 5,
+          "text": "Si je suis encore en liberté, c'est parce que je rends de menus services à des gens d'autorité."
+        },
+        {
+          "roll": 6,
+          "text": "Un membre de ma famille a trahi le clan. J'ai pour mission de le retrouver et de... rétablir la situation."
+        }
+      ]
+    },
+    "bonds": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Fête. La vie est faite pour se régaler de tous les plaisirs qu'elle peut nous offrir. (chaotique)"
+        },
+        {
+          "roll": 2,
+          "text": "Débrouillardise. Négocier, louvoyer, accommoder : tout cela est de bonne guerre. (chaotique)"
+        },
+        {
+          "roll": 3,
+          "text": "Curiosité. Si je voyage tant, c'est avant tout pour assouvir ma soif de connaissance. (tout alignement)"
+        },
+        {
+          "roll": 4,
+          "text": "Baume au cœur. La vie est dure pour tous et je consacre la mienne à rendre celle des autres plus douce. (bon)"
+        },
+        {
+          "roll": 5,
+          "text": "Immoralité. La masse se soumet aux conventions et laisse les dégoudis comme moi profiter de la situation ; tant pis pour les faibles. (mauvais)"
+        },
+        {
+          "roll": 6,
+          "text": "Détachement. Je marche sans cesse pour ne pas souffrir de l'attachement, aux lieux, aux règles, aux gens, au passé. (neutre)"
+        }
+      ]
+    },
+    "flaws": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Même si je donne le change, je respecte difficilement l'opinion de ceux qui ne partagent ni mes racines ni ma route."
+        },
+        {
+          "roll": 2,
+          "text": "J'aime prendre des risques ; plus encore, j'aime en faire prendre aux autres."
+        },
+        {
+          "roll": 3,
+          "text": "Je persiste à prendre des engagements, alors que je devrais savoir que je ne les tiens jamais."
+        },
+        {
+          "roll": 4,
+          "text": "Je suis prêt à tout pour ne pas perdre la face."
+        },
+        {
+          "roll": 5,
+          "text": "On me dit soupe au lait et susceptible, ce qui a tendance à m'agacer passablement."
+        },
+        {
+          "roll": 6,
+          "text": "J'ai toujours du mal à croire qu'on puisse vouloir m'aider sans arrière-pensée."
+        }
+      ]
+    }
+  }
+}

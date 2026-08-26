@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-repli-expeditif",
+  "name": "Repli expéditif",
+  "level": 1,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action_bonus"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Ce sort vous permet de vous déplacer à une vitesse incroyable. Au moment de l'incantation, puis au prix d'une action bonus à chacun de vos tours de jeu tant que le sort persiste, vous pouvez entreprendre l'action Foncer.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, votre VD augmente de 1,50 m par niveau d'emplacement au-dessus du 1ᵉʳ.",
+  "modular_options": []
+}

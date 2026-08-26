@@ -1,0 +1,32 @@
+{
+  "schema_version": "2.0",
+  "id": "don-vif-comme-leclair",
+  "name": "Vif comme l'éclair",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [],
+  "description": "+5 aux jets d'initiative. Vous pouvez jouer deux réactions entre vos tours (effets différents, une seule AO/round, une seule Esquive instinctive/round). Quand vous ratez un JS de Dextérité : vous pouvez jouer votre réaction pour retenter (le second résultat s'applique).",
+  "benefits": [
+    {
+      "type": "initiative_bonus",
+      "value": 5
+    },
+    {
+      "type": "extra_reaction",
+      "max": 2,
+      "restriction": "effets différents"
+    },
+    {
+      "type": "reroll_save",
+      "ability": "DEX",
+      "condition": "raté un JS de Dextérité",
+      "action": "réaction"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "initiative",
+    "réaction",
+    "dextérité"
+  ]
+}

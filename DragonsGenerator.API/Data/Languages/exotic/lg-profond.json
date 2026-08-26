@@ -1,0 +1,20 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-profond",
+  "name": "Profond",
+  "category": "exotique",
+  "typical_speakers": [
+    "Aboleths",
+    "Manteleurres"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-traces",
+      "label": "Traces",
+      "type": "traces"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [],
+  "description": "Langue inquiétante aux sonorités de langues à clic, avec des accentuations déconcertantes passant presque pour du bruit. Des vibrations, craquements et tremblements difficiles à reproduire pour les cordes vocales humanoïdes. Parlée par les aboleths et les manteleurres. Système d'écriture : traces."
+}

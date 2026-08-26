@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-clairvoyance",
+  "name": "Clairvoyance",
+  "level": 3,
+  "school": "divination",
+  "casting_time": {
+    "value": 10,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 1500,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(un focaliseur d'une valeur minimale de 100 po"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-pretre"
+  ],
+  "description": "Logo, icon, and stamp Icon Vous créez un capteur invisible à portée dans un endroit qui vous est familier (vous devez vous y être déjà rendu ou l'avoir déjà vu), ou un lieu évident dans le cas contraire (derrière une porte, au coin d'un couloir ou dans un bosquet). Même si vous connaissez les lieux, le capteur ne peut être créé dans une zone frappée d'un Interdit de Mort ou située au-delà de frontières éthérées. Le capteur reste en place pour toute la durée du sort. Il ne peut pas être attaqué et n'interagit en aucune manière. Au moment de l'incantation, choisissez la vue ou l'ouïe. Vous pouvez utiliser le sens choisi via le capteur comme si vous étiez dans son espace. Au prix d'une action, vous pouvez passer de la vue à l'ouïe, et vice versa. Une créature qui distingue le capteur (par l'intermédiaire de détection de l'invisibilité ou de vision lucide) perçoit un orbe lumineux et intangible de la taille de votre poing. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, la durée augmente de 10 minutes par niveau d'emplacement au-dessus du 3e.",
+  "modular_options": []
+}

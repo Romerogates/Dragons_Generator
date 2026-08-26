@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-deguisement",
+  "name": "Déguisement",
+  "level": 1,
+  "school": "illusion",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Déguisement D Jous modifiez votre apparence - ce qui inclut vos vêtements, votre armure, vos armes et l'ensemble des biens que vous transportez - jusqu'à la fin du sort ou jusqu'à ce que vous le révoquiez au prix d'une action. Vous pouvez paraître 30 cm plus grand ou plus petit, mince, obèse ou entre les deux. Votre type morphologique ne peut cependant pas changer : vous devez donc adopter une forme ayant le même assortiment de membres. Pour le reste, l'illusion ne dépend que de vous. Les changements apportés par ce sort ne résisteront pas à une inspection physique. Par exemple, si vous l'utilisez pour ajouter un couvre-chef à votre tenue, les objets passent au travers et quiconque le touche ne sentira rien, sinon votre crâne et vos cheveux. Et si vous l'utilisez pour paraître plus mince, celui qui tend la main vers vous vous touchera avant de s'y attendre. Pour comprendre que vous êtes déguisé, une créature peut, au prix d'une action, vous examiner et doit réussir un test d'Intelligence (Investigation) assorti de votre DD de sauvegarde des sorts.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, la durée augmente de 1 heure par niveau d'emplacement au-dessus du 1er.",
+  "modular_options": []
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-contact-glacial",
+  "name": "Contact glacial",
+  "level": 0,
+  "school": "necromancie",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "round"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "D Dous créez une main squelettique fantomatique dans l'espace d'une créature située à portée. Effectuez une attaque de sort à distance contre la créature pour la frapper d'un frisson sépulcral. En cas de réussite, elle subit 1d8 dégâts nécrotiques et ne peut pas regagner de points de vie jusqu'au début de votre tour de jeu suivant. Pendant ce temps, la main reste cramponnée à la cible. Si la cible que vous touchez est un mort-vivant, elle subit en plus un désavantage aux jets d'attaque contre vous jusqu'à la fin de votre tour de jeu suivant. Les dégâts de ce sort augmentent de 1d8 quand vous atteignez le niveau 5 (2d8), le niveau 11 (3d8) et le niveau 17 (4d8). (Order #44468918) Anthony Martin Romero",
+  "modular_options": []
+}

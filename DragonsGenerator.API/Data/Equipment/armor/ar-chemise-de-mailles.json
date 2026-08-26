@@ -1,0 +1,20 @@
+{
+  "schema_version": "2.0",
+  "id": "ar-chemise-de-mailles",
+  "name": "Chemise de mailles",
+  "category": "armor",
+  "subcategory": "medium",
+  "cost": {
+    "value": 50,
+    "unit": "po"
+  },
+  "weight_kg": 10,
+  "ac_base": 13,
+  "dex_modifier": {
+    "type": "max2"
+  },
+  "max_dex_bonus": null,
+  "str_required": null,
+  "stealth_disadvantage": false,
+  "description": "Anneaux métalliques entrelacés portés entre deux couches de vêtement."
+}

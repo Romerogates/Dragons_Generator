@@ -1,0 +1,22 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-pique",
+  "name": "Pique",
+  "category": "weapon",
+  "subcategory": "martial_melee",
+  "cost": {
+    "value": 5,
+    "unit": "po"
+  },
+  "weight_kg": 9,
+  "damage_dice": "1d10",
+  "damage_type": "perforant",
+  "properties": [
+    "prop-allonge",
+    "prop-deux-mains",
+    "prop-lourde"
+  ],
+  "throw_range": null,
+  "ammo_range": null,
+  "description": null
+}

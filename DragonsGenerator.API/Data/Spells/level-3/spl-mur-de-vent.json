@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-mur-de-vent",
+  "name": "Mur de vent",
+  "level": 3,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un minuscule éventail et une plume d'oiseau exotique"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-rodeur"
+  ],
+  "description": "Logo and icon Un vent fort s'élève du sol depuis un point que vous choisissez à portée. Le mur peut faire jusqu'à 15 m de long, 4,50 m de haut et 30 cm d'épaisseur. Vous pouvez lui donner la forme de votre choix, mais il suit un chemin continu en contact avec le sol et persiste pour toute la durée du sort. Au moment où le mur apparaît, toute créature prise dans sa zone doit effectuer un JS Force et subit 3d8 dégâts contondants en cas d'échec, la moitié en cas de réussite. Le vent fort chasse brouillard, fumée et autres gaz. Les créatures et objets volants de taille P ou inférieure sont incapables de le traverser. Les matériaux légers et non fixés pris dans le mur s'envolent. Quant aux flèches, carreaux et autres projectiles ordinaires tirés ou lancés sur des cibles situées derrière le mur, ils sont déviés et ratent automatiquement. Toutefois, les rochers jetés par des géants et autres projectiles d'engins de siège ne sont pas affectés. Enfin, les créatures en état gazeux sont incapables de le franchir. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, les dégâts augmentent de 2d8 par niveau d'emplacement au-dessus du 3e.",
+  "modular_options": []
+}

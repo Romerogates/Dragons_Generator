@@ -1,0 +1,65 @@
+{
+  "schema_version": "2.0",
+  "id": "don-heroique",
+  "name": "Héroïque",
+  "requires_magic": false,
+  "category": "exploration",
+  "prerequisites": [],
+  "description": "Vous disposez de 3 points d'héroïsme (récupérés à chaque repos long). Dépensez-les pour : remplacer un jet de d20 par 12 (1 pt) ou 15 (2 pts), voire après lancer (1 pt supp.). 2 pts : transformer une réussite en coup critique. 1 pt : désavantage aux attaques contre vous (1 rnd), relancer une attaque ennemie, doubler VD (1 rnd), maîtrise temporaire d'une compétence/outil (1 rnd ou 1 min). 2 pts : dépenser un dé de vie ou éliminer un niveau de fatigue.",
+  "benefits": [
+    {
+      "type": "resource",
+      "name": "points_heroisme",
+      "max": 3,
+      "recharge": "repos_long"
+    },
+    {
+      "type": "auto_roll",
+      "d20_result": 12,
+      "cost": 1
+    },
+    {
+      "type": "auto_roll",
+      "d20_result": 15,
+      "cost": 2
+    },
+    {
+      "type": "critical_hit",
+      "cost": 2
+    },
+    {
+      "type": "temp_disadvantage_on_attacks",
+      "duration": "1 rnd",
+      "cost": 1
+    },
+    {
+      "type": "reroll_enemy_attack",
+      "cost": 1
+    },
+    {
+      "type": "double_speed",
+      "duration": "1 rnd",
+      "cost": 1
+    },
+    {
+      "type": "temp_proficiency",
+      "duration": "1 rnd / 1 min",
+      "cost": "1 / 2"
+    },
+    {
+      "type": "spend_hit_die",
+      "cost": 1
+    },
+    {
+      "type": "remove_exhaustion",
+      "levels": 1,
+      "cost": 2
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "polyvalent",
+    "ressource",
+    "héroïsme"
+  ]
+}

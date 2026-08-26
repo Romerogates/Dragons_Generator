@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "ski-tromperie",
+  "name": "Tromperie",
+  "ability": "CHA",
+  "description": "Vos tests de Charisme (Tromperie) permettent de savoir si vous parvenez à cacher la vérité, que ce soit par vos paroles ou vos actes. La compétence englobe diverses approches, de la simple ambiguïté dans vos interactions avec autrui aux mensonges les plus éhontés. Les situations classiques ne manquent pas : vous tentez d'abuser un garde, d'escroquer un marchand, de bluffer aux jeux d'argent, de vous faire passer pour quelqu'un d'autre, de dissiper les doutes d'une personne par des promesses fallacieuses ou de donner le change quand vous mentez impudemment.",
+  "examples": [
+    "Abuser un garde ou escroquer un marchand.",
+    "Bluffer aux jeux d'argent ou se faire passer pour quelqu'un d'autre.",
+    "Dissiper les doutes par des promesses fallacieuses."
+  ],
+  "passive_check": false,
+  "source": "livre_de_base"
+}

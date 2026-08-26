@@ -1,0 +1,65 @@
+{
+  "schema_version": "2.0",
+  "id": "civ-arolavie",
+  "name": "Arolavie",
+  "randomization": {
+    "dice": "d100",
+    "min": 8,
+    "max": 12
+  },
+  "demographics": {
+    "primary_species": [
+      {
+        "id": "sp-humain",
+        "label": "Humains"
+      },
+      {
+        "id": "sp-nain-gardien",
+        "label": "Nains gardiens"
+      },
+      {
+        "id": "sp-aldaron",
+        "label": "Aldarons (forêts)"
+      }
+    ],
+    "secondary_species": [
+      {
+        "id": "sp-tous",
+        "label": "Autres peuples (rares, via routes marchandes)"
+      }
+    ],
+    "is_cosmopolitan": false,
+    "cosmopolitan_zones": [],
+    "social_roles": [],
+    "peoples_note": "Humains, Nains gardiens, Aldarons (dans les forêts). Les autres peuples peuvent arriver par les routes marchandes."
+  },
+  "official_languages": [
+    {
+      "id": "lg-arolave",
+      "label": "Arolave"
+    }
+  ],
+  "multilingual": false,
+  "writing_systems": [
+    {
+      "id": "wr-cyfand",
+      "label": "Cyfand",
+      "type": "alphabet"
+    }
+  ],
+  "is_oral_only": false,
+  "description": "Située au nord-est du Cyfandir, l'Arolavie aux vastes forêts demeure mystérieuse à bien des égards. En grande partie sauvage, elle est bordée par des forêts sacrées ou taboues, sur sa frontière nord. Les farouches fées n'écoutent que les druides qui connaissent les secrets de l'antique pacte qui les lie. Le royaume est dirigé par une dynastie de reines, les karalievae. Ces femmes redoutables défendent leurs terres contre les attaques éclair de Lothrienne ou du Septentrion, les incursions du Chancre jaillissant des Drakenbergen et les assauts des pirates de la mer Usvalia. Elles ne manquent pas non plus de surveiller les ombres qui s'agitent autour des colonies des rivages du fleuve Golostarogo ou dans les bas-fonds de la grouillante cité de Moromiek, reprise de haute lutte à l'ennemi. Pour tout cela, elles savent pouvoir s'appuyer sur la garde lunaire, une légion composée de volontaires qui s'engagent en formulant un vœu que l'Arolavie exaucera au terme de leur service — plus ou moins long ou dangereux en fonction de la nature du vœu.",
+  "geography_tags": [
+    "vastes-forets",
+    "forets-sacrees",
+    "frontiere-nord",
+    "fleuve-golostarogo",
+    "moromiek"
+  ],
+  "threat_ids": [
+    "threat-lothrienne",
+    "threat-septentrion",
+    "threat-chancre",
+    "threat-pirates-usvalia"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-ordonnancement",
+  "name": "Ordonnancement",
+  "level": 5,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien"
+  ],
+  "description": "Vous influencez le destin et l'ordonnez de manière à favoriser votre camp et contrarier l'ennemi. Tant que le sort persiste, quand une créature que vous voyez dans un rayon de 9 m de vous s'apprête à effectuer un jet d'attaque, un jet de sauvegarde ou un test de caractéristique, vous pouvez jouer votre réaction pour prononcer une annonce. Une créature non consentante peut effectuer un JS Charisme pour se soustraire aux effets du sort. Choisissez une annonce parmi les suivantes : Gloire. La créature ciblée obtient un résultat de 20 sur le dé (ce qui entraîne un coup critique dans le cas d'un jet d'attaque). Vous ne pouvez utiliser cette annonce que 1 fois. Hourra. La créature ciblée obtient un résultat de 15 sur le dé. Vous ne pouvez utiliser cette annonce que 3 fois. Hélas. La créature ciblée obtient un résultat de 5 sur le dé. Vous ne pouvez utiliser cette annonce que 3 fois. Dans tous les cas, la cible d'une annonce ne lance pas le dé ; elle est simplement soumise à l'annonce.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, chaque niveau d'emplacement au-dessus du 5e augmente le rayon d'action de 9 m et votre quota de Hourras et de Hélas de 1.",
+  "modular_options": []
+}

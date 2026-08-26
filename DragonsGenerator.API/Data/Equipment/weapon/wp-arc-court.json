@@ -1,0 +1,24 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-arc-court",
+  "name": "Arc court",
+  "category": "weapon",
+  "subcategory": "simple_ranged",
+  "cost": {
+    "value": 25,
+    "unit": "po"
+  },
+  "weight_kg": 1.5,
+  "damage_dice": "1d6",
+  "damage_type": "perforant",
+  "properties": [
+    "prop-deux-mains",
+    "prop-projectiles-24-96"
+  ],
+  "throw_range": null,
+  "ammo_range": {
+    "normal": 24,
+    "long": 96
+  },
+  "description": null
+}

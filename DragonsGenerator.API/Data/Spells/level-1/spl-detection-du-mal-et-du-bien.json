@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-detection-du-mal-et-du-bien",
+  "name": "Détection du Mal et du Bien",
+  "level": 1,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": true,
+  "classes": [
+    "cls-paladin",
+    "cls-pretre"
+  ],
+  "description": "Pour toute la durée du sort, si une aberration, un céleste, un élémentaire, une fée, un fiélon, un mort-vivant ou un ravageur du Chancre se trouve dans un rayon de 9 m de vous, vous en décelez la présence et la position. Vous savez également si un endroit ou un objet situé dans un rayon de 9 m de vous a été magiquement consacré ou profané. Le sort est capable de pénétrer la plupart des obstacles, mais 90 cm de bois ou de terre, 30 cm de pierre, 2,5 cm de la plupart des métaux ou une mince feuille de plomb le bloquent. Ce sort ne peut percer à travers une frontière éthérée (cf. chapitre Géomagie). À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, son rayon d'action augmente de 9 m par niveau d'emplacement au-dessus du 1er.",
+  "modular_options": []
+}

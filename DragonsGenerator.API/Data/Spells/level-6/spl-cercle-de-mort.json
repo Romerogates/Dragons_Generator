@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-cercle-de-mort",
+  "name": "Cercle de mort",
+  "level": 6,
+  "school": "necromancie",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 45,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une perle noire réduite en poudre d'une valeur minimale de 500 po"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Une sphère sombre produit une onde d'énergie négative de 18 m de rayon depuis un point situé à portée. Chaque créature prise dans cette zone doit effectuer un JS Constitution et subit 8d6 dégâts nécrotiques en cas d'échec, la moitié en cas de réussite.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau ou supérieur, les dégâts augmentent de 2d6 par niveau d'emplacement au-dessus du 6e.",
+  "modular_options": []
+}

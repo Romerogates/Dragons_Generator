@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-grande-hache",
+  "name": "Grande hache",
+  "category": "weapon",
+  "subcategory": "martial_melee",
+  "cost": {
+    "value": 30,
+    "unit": "po"
+  },
+  "weight_kg": 3.5,
+  "damage_dice": "1d12",
+  "damage_type": "tranchant",
+  "properties": [
+    "prop-deux-mains",
+    "prop-lourde"
+  ],
+  "throw_range": null,
+  "ammo_range": null,
+  "description": null
+}

@@ -1,0 +1,24 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-marteau-leger",
+  "name": "Marteau léger",
+  "category": "weapon",
+  "subcategory": "simple_melee",
+  "cost": {
+    "value": 2,
+    "unit": "po"
+  },
+  "weight_kg": 1,
+  "damage_dice": "1d4",
+  "damage_type": "contondant",
+  "properties": [
+    "prop-lancer-6-18",
+    "prop-legere"
+  ],
+  "throw_range": {
+    "normal": 6,
+    "long": 18
+  },
+  "ammo_range": null,
+  "description": null
+}

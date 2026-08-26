@@ -1,0 +1,39 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-quete",
+  "name": "Quête",
+  "level": 5,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 30,
+    "unit": "jour"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-magicien",
+    "cls-paladin",
+    "cls-pretre"
+  ],
+  "description": "Vous placez une injonction magique sur une créature que vous voyez à portée. Vous l'obligez à entreprendre une mission ou, à l'inverse, à s'en détourner. Si la créature est en mesure de vous comprendre, elle doit réussir un JS Sagesse sous peine d'être charmée par vos soins pour toute la durée du sort. Tant qu'elle est charmée de la sorte, elle subit 5d10 dégâts psychiques chaque fois qu'elle va directement à l'encontre de vos instructions, mais une fois par jour seulement. Une créature qui ne vous comprend pas n'est pas affectée par ce sort. Vous pouvez donner n'importe quel ordre, pour peu que cela n'entraîne pas la mort assurée de la cible. Si vous lui donnez un ordre suicidaire, le sort prend fin. Vous pouvez mettre fin à ce sort prématurément au prix d'une action. Il est alors révoqué. Les sorts délivrance des malédictions, restauration suprême et souhait y mettent également fin. ## Une coercition impitoyable Si votre meneur utilise cette option, le sort de quête inflige 5d10 dégâts psychiques à la créature chaque fois qu'elle va directement à l'encontre des instructions du lanceur de sorts, à raison d'une fois par heure et non une fois par jour seulement.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 7e ou du 8e niveau, la durée est de 1 an. Quand vous jetez ce sort en utilisant un emplacement de sort du 9e niveau, le sort persiste jusqu'à ce qu'un des sorts mentionnés ci-dessus y mette fin.",
+  "modular_options": []
+}

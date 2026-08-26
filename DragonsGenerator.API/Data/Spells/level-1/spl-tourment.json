@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-tourment",
+  "name": "Tourment",
+  "level": 1,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action_bonus"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 27,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une mue de serpent"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-sorcier"
+  ],
+  "description": "Vous désignez comme cible de ce maléfice une créature que vous voyez à portée. Vous lui infligez 1d6 dégâts psychiques supplémentaires chaque fois que vous la touchez avec une attaque. Si elle tombe à 0 point de vie avant la fin du sort, vous pouvez tourmenter une autre créature à l'un de vos tours de jeu suivants au prix d'une action bonus.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou du 4e niveau, la cible est neutralisée jusqu'au début de son tour suivant lorsque vous la touchez avec une attaque. Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, la cible est en outre aveuglée jusqu'au début de son tour suivant lorsque vous la touchez avec une attaque.",
+  "modular_options": []
+}

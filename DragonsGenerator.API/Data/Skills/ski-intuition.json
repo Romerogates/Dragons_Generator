@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "ski-intuition",
+  "name": "Intuition",
+  "ability": "SAG",
+  "description": "Vos tests de Sagesse (Intuition) évaluent votre capacité notamment à deviner les intentions d'une créature, lorsque vous soupçonnez un mensonge ou cherchez à anticiper ce qu'elle s'apprête à faire. Tout cela passe par l'observation de son langage corporel, des inflexions de son discours et d'éventuels tics.",
+  "examples": [
+    "Deviner les intentions d'une créature.",
+    "Détecter un mensonge ou anticiper une action imminente.",
+    "Lire le langage corporel, les inflexions du discours et les tics."
+  ],
+  "passive_check": false,
+  "source": "livre_de_base"
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "2.0",
+  "id": "act-attaquer",
+  "name": "Attaquer",
+  "action_cost": "action",
+  "category": "standard",
+  "description": "L'action la plus courante au combat : asséner un coup d'épée, décoche une flèche ou tenter de placer une attaque. Permet d'effectuer une attaque corps à corps ou à distance.",
+  "mechanics": {
+    "attack_types": [
+      "corps_à_corps",
+      "distance"
+    ],
+    "special_attacks": [
+      "act-lutte",
+      "act-bousculer"
+    ],
+    "note": "Certaines aptitudes (ex. Attaque supplémentaire) permettent plusieurs attaques dans le cadre de cette action"
+  },
+  "source": "livre_de_base"
+}

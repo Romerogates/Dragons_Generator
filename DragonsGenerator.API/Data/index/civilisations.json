@@ -1,0 +1,118 @@
+{
+  "schema_version": "2.0",
+  "description": "Index des civilisations d'Eana (Dragons — jeu de rôle). Tirage d'origine sur 1d100.",
+  "language": "fr",
+  "stats": {
+    "total": 18
+  },
+  "civilisations": [
+    {
+      "id": "civ-acoatl",
+      "name": "Acoatl",
+      "file": "Civilisations/civ-acoatl.json",
+      "dice_range": "1-2"
+    },
+    {
+      "id": "civ-ajagar",
+      "name": "Ajagar",
+      "file": "Civilisations/civ-ajagar.json",
+      "dice_range": "3-7"
+    },
+    {
+      "id": "civ-arolavie",
+      "name": "Arolavie",
+      "file": "Civilisations/civ-arolavie.json",
+      "dice_range": "8-12"
+    },
+    {
+      "id": "civ-iles-barbaresques",
+      "name": "Barbaresques (Îles)",
+      "file": "Civilisations/civ-iles-barbaresques.json",
+      "dice_range": "13-22"
+    },
+    {
+      "id": "civ-cite-franche",
+      "name": "Cité Franche",
+      "file": "Civilisations/civ-cite-franche.json",
+      "dice_range": "23-43"
+    },
+    {
+      "id": "civ-cyrillane",
+      "name": "Cyrillane",
+      "file": "Civilisations/civ-cyrillane.json",
+      "dice_range": "44-53"
+    },
+    {
+      "id": "civ-drakenbergen",
+      "name": "Drakenbergen",
+      "file": "Civilisations/civ-drakenbergen.json",
+      "dice_range": "54-62"
+    },
+    {
+      "id": "civ-ellerina",
+      "name": "Ellerìna",
+      "file": "Civilisations/civ-ellerina.json",
+      "dice_range": "63-65"
+    },
+    {
+      "id": "civ-iles-eoliennes",
+      "name": "Éoliennes (Îles)",
+      "file": "Civilisations/civ-iles-eoliennes.json",
+      "dice_range": "66-71"
+    },
+    {
+      "id": "civ-inframonde",
+      "name": "Inframonde",
+      "file": "Civilisations/civ-inframonde.json",
+      "dice_range": "72-72"
+    },
+    {
+      "id": "civ-kaan",
+      "name": "Kaan",
+      "file": "Civilisations/civ-kaan.json",
+      "dice_range": "73-76"
+    },
+    {
+      "id": "civ-lothrienne",
+      "name": "Lothrienne",
+      "file": "Civilisations/civ-lothrienne.json",
+      "dice_range": "77-82"
+    },
+    {
+      "id": "civ-mibu",
+      "name": "Mibu",
+      "file": "Civilisations/civ-mibu.json",
+      "dice_range": "83-88"
+    },
+    {
+      "id": "civ-rachamangekr",
+      "name": "Rachamangekr",
+      "file": "Civilisations/civ-rachamangekr.json",
+      "dice_range": "89-89"
+    },
+    {
+      "id": "civ-royaumes-des-sables",
+      "name": "Royaumes des Sables",
+      "file": "Civilisations/civ-royaumes-des-sables.json",
+      "dice_range": "90-95"
+    },
+    {
+      "id": "civ-septentrion",
+      "name": "Septentrion",
+      "file": "Civilisations/civ-septentrion.json",
+      "dice_range": "96-97"
+    },
+    {
+      "id": "civ-shi-huang",
+      "name": "Shi-huang",
+      "file": "Civilisations/civ-shi-huang.json",
+      "dice_range": "98-98"
+    },
+    {
+      "id": "civ-torea",
+      "name": "Torea",
+      "file": "Civilisations/civ-torea.json",
+      "dice_range": "99-100"
+    }
+  ]
+}

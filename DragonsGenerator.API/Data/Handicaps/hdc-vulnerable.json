@@ -1,0 +1,17 @@
+{
+  "schema_version": "2.0",
+  "id": "hdc-vulnerable",
+  "name": "Vulnérable",
+  "source": "livre_de_base",
+  "description": "Vous souffrez d'une vulnérabilité à un type de dégâts au choix parmi : acide, feu, foudre, froid, poison ou tonnerre.",
+  "mechanics": {
+    "vulnerability_choice": [
+      "acide",
+      "feu",
+      "foudre",
+      "froid",
+      "poison",
+      "tonnerre"
+    ]
+  }
+}

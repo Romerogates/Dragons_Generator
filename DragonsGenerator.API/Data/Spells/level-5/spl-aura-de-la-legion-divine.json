@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-aura-de-la-legion-divine",
+  "name": "Aura de la légion divine",
+  "level": 5,
+  "school": "illusion",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": {
+      "shape": "rayon",
+      "radius_m": 9
+    }
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-paladin"
+  ],
+  "description": "Une énergie éblouissante émane de vous dans un rayon de 9 m, donnant à vos alliés un aspect glorieux et redoutable. L'aura se déplace avec vous tant que le sort persiste, et vous en restez le centre. Toute créature qui ne vous est pas hostile comprise dans l'aura (y compris vous) paraît bien plus puis sante. Chaque fois qu'une telle créature réussit une attaque d'arme à son tour de jeu, la créature touchée doit réussir un JS Charisme sous peine d'être effrayée par l'attaquant jusqu'au début du tour de jeu suivant de l'attaquant. Si le jet de sauvegarde est raté avec une marge de 5 ou plus, à son tour de jeu suivant, la créature effrayée ne peut utiliser son action que pour Foncer afin de s'éloigner le plus possible de la source de sa peur.",
+  "modular_options": []
+}

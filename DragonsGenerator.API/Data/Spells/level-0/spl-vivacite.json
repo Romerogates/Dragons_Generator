@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-vivacite",
+  "name": "Vivacité",
+  "level": 0,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action_bonus"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": false,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-sorcier"
+  ],
+  "description": "Vous touchez une créature. Sa vitesse augmente de 1,5 m pour la durée de ce sort ou jusqu'à ce que vous le lanciez de nouveau. Lorsque vous atteignez le niveau 5, le bénéficiaire de ce sort n'a pas besoin de prendre d'élan pour effectuer un saut avec élan. À partir du niveau 11, la distance parcourue par le bénéficiaire lors d'un saut en longueur augmente de 60 cm, et de 30 cm lors d'un saut en hauteur. À partir du niveau 17, ces distances sont respectivement augmentées de 1,20 m et 60 cm au total.",
+  "modular_options": []
+}

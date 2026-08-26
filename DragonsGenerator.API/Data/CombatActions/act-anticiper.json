@@ -1,0 +1,22 @@
+{
+  "schema_version": "2.0",
+  "id": "act-anticiper",
+  "name": "Anticiper",
+  "action_cost": "reaction",
+  "category": "standard",
+  "description": "Miser sur votre réaction pour agir de manière favorable avant le début de votre tour de jeu suivant. Vous désignez les circonstances qui déclenchent votre réaction et indiquez quelle action y répondra, ou choisissez de vous déplacer jusqu'à votre VD en réponse au déclencheur. Vous ne pouvez jouer qu'une seule réaction par round.",
+  "mechanics": {
+    "trigger": "Définir les conditions de déclenchement avant le début du tour suivant",
+    "response": [
+      "action_désignée",
+      "déplacement_jusqu_à_VD"
+    ],
+    "limit": "1 réaction par round",
+    "spell_rules": {
+      "casting_time": "1 action",
+      "concentration": true,
+      "note": "Seuls les sorts à 1 action peuvent être anticipés ; la concentration doit être maintenue jusqu'au déclencheur"
+    }
+  },
+  "source": "livre_de_base"
+}

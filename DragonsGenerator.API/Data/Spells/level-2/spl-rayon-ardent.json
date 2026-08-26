@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-rayon-ardent",
+  "name": "Rayon ardent",
+  "level": 2,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Rayon ardent icon Vous créez trois rayons de feu que vous lancez sur des cibles situées à portée. Vous pouvez les répartir comme bon vous semble, contre une seule cible ou plusieurs. Effectuez une attaque de sort à distance pour chaque rayon. En cas de réussite, la cible subit 2d6 dégâts de feu.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, vous créez un rayon supplémentaire par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

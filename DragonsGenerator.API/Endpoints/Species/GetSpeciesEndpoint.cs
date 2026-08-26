@@ -6,6 +6,10 @@ namespace DragonsGenerator.API.Endpoints.Species;
 
 public class GetSpeciesEndpoint : EndpointWithoutRequest<List<Models.Species>>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetSpeciesEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/species");
@@ -14,7 +18,7 @@ public class GetSpeciesEndpoint : EndpointWithoutRequest<List<Models.Species>>
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var data = await JsonDataLoader.LoadAsync<SpeciesData>("species.json", ct);
-        await Send.OkAsync(data?.Species ?? [], ct);
+        var species = await _repo.GetSpeciesAsync(ct);
+        await Send.OkAsync(species, ct);
     }
 }

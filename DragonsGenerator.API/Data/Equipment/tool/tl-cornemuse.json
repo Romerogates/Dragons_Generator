@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "tl-cornemuse",
+  "name": "Cornemuse",
+  "category": "tool",
+  "subcategory": "instrument",
+  "cost": {
+    "value": 30,
+    "unit": "po"
+  },
+  "weight_kg": 3,
+  "description": "Instrument de musique."
+}

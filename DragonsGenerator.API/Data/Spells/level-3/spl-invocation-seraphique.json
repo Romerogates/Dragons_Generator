@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-invocation-seraphique",
+  "name": "Invocation séraphique",
+  "level": 3,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "round"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "Chaque élu d'une divinité (autrement dit, tout personnage possédant des niveaux de prêtre) est lié à un ange qualifié de séraphin, dont la puissance croît avec celle de son protégé. Quand vous invoquez votre séraphin, vous disparaissez dans le Plan Astral dont vous ne percevez confusément que la lumière. Le séraphin apparaît à votre place dans toute sa splendeur. Vous récupérez pour votre part 1d8 pv. Si une autre créature tient ou porte l'objet, briser le saphir ne vous permet pas de le récupérer, mais vous découvrez qui le détient et où se situe approximativement la créature à ce moment-là. Si la créature détenant l'objet est à l'intérieur d'une zone protégée contre les sorts de divination, par exemple par l'intermédiaire d'un Interdit de Mort, vous en êtes conscient lorsque vous manipulez le saphir lié. Briser le saphir permet alors seulement d'obtenir de maigres indices quant à la localisation de la créature, comme un bref aperçu du lieu ou une idée de sa direction approximative. Le sort dissipation de la magie ou un effet analogue appliqué avec succès sur le saphir met fin au sort. Le séraphin peut immédiatement agir. Vous décidez de ses actions. Le séraphin disparaît dès la fin du sort ou s'il tombe à 0 pv et vous réapparaissez dans l'espace qu'il occupait.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, la durée augmente de 1 round par niveau d'emplacement au-dessus du 3e. Chaque round passé dans le Plan Astral vous fait récupérer 1d8 pv.",
+  "modular_options": []
+}

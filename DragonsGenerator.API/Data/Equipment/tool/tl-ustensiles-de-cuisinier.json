@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "tl-ustensiles-de-cuisinier",
+  "name": "Ustensiles de cuisinier",
+  "category": "tool",
+  "subcategory": "artisan_tool",
+  "cost": {
+    "value": 1,
+    "unit": "po"
+  },
+  "weight_kg": 4,
+  "description": "Outils d'artisan associé aux pâtissiers, rôtisseurs, sauciers, boulangers, etc."
+}

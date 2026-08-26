@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "id": "vhc-galere",
+  "name": "Galère",
+  "category": "vehicle",
+  "subcategory": "water",
+  "cost": {
+    "value": 30000,
+    "unit": "po"
+  },
+  "weight_kg": null,
+  "speed": "6 km/h",
+  "capacity_kg": null,
+  "description": "Vitesse de déplacement : 6 km/h."
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "tl-outils-de-menuisier",
+  "name": "Outils de menuisier",
+  "category": "tool",
+  "subcategory": "artisan_tool",
+  "cost": {
+    "value": 8,
+    "unit": "po"
+  },
+  "weight_kg": 3,
+  "description": "Outils d'artisan associé aux charpentiers et au travail du bois."
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-amulette",
+  "name": "Amulette",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": null,
+    "unit": "po",
+    "note": "Objet trouvé ou hérité, prix variable"
+  },
+  "weight_kg": 0.5,
+  "description": "Symbole sacré orné du symbole d'une divinité. Utilisable comme focaliseur magique par un prêtre ou un paladin."
+}

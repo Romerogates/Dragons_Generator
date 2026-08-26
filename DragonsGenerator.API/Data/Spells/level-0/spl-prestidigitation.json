@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-prestidigitation",
+  "name": "Prestidigitation",
+  "level": 0,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "speciale",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Ce sort est un tour de magie mineure utilisé à des fins d'entraînement. Vous produisez l'un des effets magiques suivants à portée : Vous créez un effet sensoriel inoffensif instantané, comme une pluie d'étincelles, un souffle de vent, de légères notes de musique ou une odeur inhabituelle. Vous allumez ou mouchez instantanément une chandelle, une torche ou un petit feu de camp. Vous nettoyez ou souillez instantanément un objet pas plus grand qu'un cube de 30 cm d'arête. Vous refroidissez, réchauffez ou parfumez un cube de 30 cm d'arête de matériau non vivant pendant 1 heure. Vous faites apparaître une couleur, une petite marque ou un symbole sur un objet ou une surface pendant 1 heure. Vous créez une babiole non magique ou une image illusoire capable de tenir dans votre main et qui persiste jusqu'à la fin de votre tour de jeu suivant. Si vous lancez ce sort plusieurs fois, vous pouvez activer jusqu'à trois effets non instantanés en même temps, et pouvez révoquer chacun d'eux au prix d'une action. La puissance de ce sort augmente quand vous atteignez les niveaux 5, 11 et 17, comme le montre le tableau suivant : Volume maximal du cube",
+  "modular_options": []
+}

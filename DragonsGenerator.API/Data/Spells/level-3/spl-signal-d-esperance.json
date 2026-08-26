@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-signal-d-esperance",
+  "name": "Signal d'espérance",
+  "level": 3,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "C e sort confère espoir et vitalité. Choisissez autant de créatures situées à portée que vous le souhaitez. Pour toute la durée du sort, chaque cible bénéficie d'un avantage aux JS Sagesse et JS contre la mort, et récupère le maximum de points de vie possible quand elle est soignée. Tout test de Sagesse (Médecine) et de nécessaire d'herboristerie sur les cibles se fait avec l'avantage. ② À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, chaque niveau d'emplacement au-dessus du 3e augmente la portée de 3 m et la durée de 5 rounds.",
+  "modular_options": []
+}

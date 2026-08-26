@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-feu-gregeois",
+  "name": "Feu grégeois (flasque)",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 50,
+    "unit": "po"
+  },
+  "weight_kg": 0.5,
+  "description": "S'embrase au contact de l'air. Attaque à distance (6 m), inflige 1d4 dégâts de feu au début de chaque tour de la cible. DD 10 DEX pour éteindre."
+}

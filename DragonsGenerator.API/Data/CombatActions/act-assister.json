@@ -1,0 +1,24 @@
+{
+  "schema_version": "2.0",
+  "id": "act-assister",
+  "name": "Assister",
+  "action_cost": "action",
+  "category": "standard",
+  "description": "Aider une autre créature dans l'accomplissement d'une tâche, ou gêner un adversaire pour faciliter l'attaque d'un allié.",
+  "mechanics": {
+    "options": [
+      {
+        "type": "aide_tâche",
+        "effect": "La créature aidée bénéficie d'un avantage à son prochain test de caractéristique associé à la tâche",
+        "duration": "Avant le début de votre tour de jeu suivant"
+      },
+      {
+        "type": "aide_attaque",
+        "range_m": 1.5,
+        "effect": "Si l'allié attaque la cible avant votre tour suivant, son premier jet d'attaque bénéficie d'un avantage",
+        "note": "Feintes et diversions pour gêner l'adversaire"
+      }
+    ]
+  },
+  "source": "livre_de_base"
+}

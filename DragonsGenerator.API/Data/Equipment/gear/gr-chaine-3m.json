@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-chaine-3m",
+  "name": "Chaîne (3 m)",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 5,
+    "unit": "po"
+  },
+  "weight_kg": 5,
+  "description": "10 points de vie. Peut être brisée avec un test de Force DD 20."
+}

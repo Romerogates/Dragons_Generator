@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-nuee-de-meteores",
+  "name": "Nuée de météores",
+  "level": 9,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 1500,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Des orbes de feu incandescents s'abattent du ciel en quatre points différents que vous voyez à portée. Toute créature prise dans une sphère de 12 m de rayon centrée sur chaque point que vous avez défini doit effectuer un JS Dextérité et subit 20d6 dégâts de feu et 20d6 dégâts contondants en cas d'échec, la moitié en cas de réussite. Chaque sphère contourne les coins. Une créature prise dans les zones de plusieurs sphères n'est toutefois affectée que par une seule d'entre elles. Le sort endommage les objets situés dans la zone et embrase les objets inflammables qui ne sont ni portés ni transportés. Carte géographique",
+  "modular_options": []
+}

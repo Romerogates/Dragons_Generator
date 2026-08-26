@@ -1,4 +1,7 @@
-﻿
+﻿using DragonsGenerator.API.Common;
+using DragonsGenerator.API.Models;
+using FastEndpoints;
+
 namespace DragonsGenerator.API.Endpoints.Civilisations;
 
 public class GetCivilisationByIdRequest
@@ -8,6 +11,10 @@ public class GetCivilisationByIdRequest
 
 public class GetCivilisationByIdEndpoint : Endpoint<GetCivilisationByIdRequest, Civilisation>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetCivilisationByIdEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/civilisations/{id}");
@@ -16,10 +23,7 @@ public class GetCivilisationByIdEndpoint : Endpoint<GetCivilisationByIdRequest, 
 
     public override async Task HandleAsync(GetCivilisationByIdRequest req, CancellationToken ct)
     {
-        var civilisations = await JsonDataLoader.LoadAsync<List<Civilisation>>("civilisations.json", ct);
-
-        var civilisation = civilisations?.FirstOrDefault(c =>
-            string.Equals(c.Id, req.Id, StringComparison.OrdinalIgnoreCase));
+        var civilisation = await _repo.GetCivilisationByIdAsync(req.Id, ct);
 
         if (civilisation is null)
         {

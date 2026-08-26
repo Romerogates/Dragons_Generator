@@ -1,0 +1,97 @@
+{
+  "schema_version": "2.0",
+  "id": "sp-humain",
+  "name": "Humains",
+  "name_alt": [],
+  "playable": true,
+  "requires_subspecies": false,
+  "source": {
+    "book": "Dragons - Livre de base: Aventuriers",
+    "pages": "45-48"
+  },
+  "flavor": {
+    "summary": "Les humains sont les plus grands voyageurs et explorateurs d'Eana. Ils s'adaptent à tous types de milieux : déserts de sable ou de glace, forêts tempérées ou équatoriales, rivages océaniques ou marais.",
+    "culture": "À l'aise en mer, dans les villes et dans les campagnes, les humains sont irrésistiblement attirés par les défis. Souvent partagés entre un désir de grandeur et une aspiration aux plaisirs simples, ils s'attachent à de grands idéaux.",
+    "lore_notes": [
+      "Décrire une tâche comme impossible motivera un humain à trouver un moyen de franchir cette limite. L'aventurier humain exprime la quintessence du goût du risque.",
+      "Les humains sont l'espèce la plus répandue mais peuvent être minoritaires, voire absents, dans certains territoires."
+    ]
+  },
+  "base_stats": {
+    "ability_score_increase": {
+      "str": 1,
+      "dex": 1,
+      "con": 1,
+      "int": 1,
+      "wis": 1,
+      "cha": 1
+    },
+    "speed": {
+      "base_m": 9,
+      "not_reduced_by_heavy_armor": false
+    },
+    "size": "M",
+    "darkvision_m": 0,
+    "age": {
+      "maturity_years": 18,
+      "lifespan_years": 100,
+      "flavor": "Adultes vers dix-huit ans, ils vivent généralement moins d'un siècle."
+    },
+    "alignment": {
+      "tendency": "Neutre",
+      "flavor": "Aucun alignement ne se détache chez les humains, capables du meilleur comme du pire."
+    }
+  },
+  "traits": [
+    {
+      "id": "trait-adaptabilite",
+      "name": "Adaptabilité",
+      "flavor": {
+        "desc": "Lorsque vous consacrez du temps à un apprentissage (langue ou outil), vous êtes capable de l'acquérir plus rapidement. Sitôt la moitié du temps requise accomplie, vous effectuez un test d'Intelligence DD 15 par mois. Si vous le réussissez, vous parvenez à acquérir la maîtrise plus tôt que prévu. La dépense financière reste inchangée."
+      },
+      "mechanics": {
+        "type": "faster_training",
+        "trigger": "halfway_through_training_time",
+        "check": {
+          "ability": "int",
+          "dc": 15,
+          "frequency": "monthly"
+        },
+        "effect": "proficiency_acquired_early",
+        "cost_unchanged": true
+      }
+    }
+  ],
+  "creation_choices": [
+    {
+      "id": "choice-langues-supp-humain",
+      "name": "Langues supplémentaires",
+      "flavor": {
+        "desc": "Vous parlez, lisez et écrivez le commun et deux langues supplémentaires de votre choix."
+      },
+      "type": "language",
+      "allow_choice": true,
+      "quantity": 2,
+      "pool": [
+        "any"
+      ]
+    }
+  ],
+  "languages": {
+    "fixed": [
+      "lg-commun"
+    ],
+    "choices": [
+      {
+        "id": "choice-langues-supp-humain",
+        "allow_choice": true,
+        "quantity": 2,
+        "pool": [
+          "any"
+        ]
+      }
+    ]
+  },
+  "subspecies": [],
+  "optional_rules": []
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-identification",
+  "name": "Identification",
+  "level": 1,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une perle d'une valeur minimale de 100 po et une plume de hibou"
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien"
+  ],
+  "description": "Vous choisissez un objet que vous devez toucher tout au long de l'incantation. S'il s'agit d'un objet magique ou investi de magie, vous en découvrez les propriétés et le fonctionnement, mais savez également si son utilisation requiert une affinité et le nombre de charges restant, le cas échéant. Vous apprenez également s'il est affecté par un sort, que vous identifiez alors. Si l'objet a été créé par un sort, vous en découvrez le nom. Si vous touchez une créature tout au long de l'incantation, vous découvrez l'ensemble des sorts qui l'affectent, le cas échéant.",
+  "modular_options": []
+}

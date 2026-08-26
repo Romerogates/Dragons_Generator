@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-insecte-geant",
+  "name": "Insecte géant",
+  "level": 4,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide"
+  ],
+  "description": "Vous transformez jusqu'à dix mille-pattes, trois araignées, cinq guêpes ou un scorpion situés à portée. Chacun adopte la version géante de sa forme naturelle pour toute la durée du sort. Ainsi, un mille-pattes devient un mille-pattes géant, une araignée géante devient une araignée géante, etc. Chaque créature obéit à vos ordres verbaux et agit à votre tour de jeu à chaque round de combat. Le meneur dispose du profil de ces créatures et résout leurs actions et déplacements. Chaque créature conserve sa taille géante pour toute la durée du sort, jusqu'à ce qu'elle tombe à 0 point de vie, ou jusqu'à ce que vous révoquiez l'effet la concernant au prix d'une action. Le meneur peut vous autoriser à choisir d'autres types de cibles similaires. Par exemple, une abeille géante aura probablement le même profil qu'une guêpe géante. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, la durée augmente de 10 minutes par niveau d'emplacement au-dessus du 4e.",
+  "modular_options": []
+}

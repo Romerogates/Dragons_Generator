@@ -1,0 +1,142 @@
+{
+  "schema_version": "1.0",
+  "description": "Index des classes. Chaque entree reference le fichier JSON de detail dans Classes/.",
+  "classes": [
+    {
+      "id": "cls-barbare",
+      "name": "Barbare",
+      "hit_die": "1d12",
+      "primary_abilities": [
+        "str",
+        "con"
+      ],
+      "spellcasting_ability": null,
+      "file": "Classes/cls-barbare.json"
+    },
+    {
+      "id": "cls-barde",
+      "name": "Barde",
+      "hit_die": "1d8",
+      "primary_abilities": [
+        "cha"
+      ],
+      "spellcasting_ability": "cha",
+      "file": "Classes/cls-barde.json"
+    },
+    {
+      "id": "cls-druide",
+      "name": "Druide",
+      "hit_die": "1d8",
+      "primary_abilities": [
+        "wis"
+      ],
+      "spellcasting_ability": "wis",
+      "file": "Classes/cls-druide.json"
+    },
+    {
+      "id": "cls-ensorceleur",
+      "name": "Ensorceleur",
+      "hit_die": "1d6",
+      "primary_abilities": [
+        "cha"
+      ],
+      "spellcasting_ability": "cha",
+      "file": "Classes/cls-ensorceleur.json"
+    },
+    {
+      "id": "cls-guerrier",
+      "name": "Guerrier",
+      "hit_die": "1d10",
+      "primary_abilities": [
+        "str",
+        "dex"
+      ],
+      "spellcasting_ability": null,
+      "file": "Classes/cls-guerrier.json"
+    },
+    {
+      "id": "cls-lettre",
+      "name": "Lettré",
+      "hit_die": "1d8",
+      "primary_abilities": [
+        "int",
+        "wis"
+      ],
+      "spellcasting_ability": null,
+      "file": "Classes/cls-lettre.json"
+    },
+    {
+      "id": "cls-magicien",
+      "name": "Magicien",
+      "hit_die": "1d6",
+      "primary_abilities": [
+        "int"
+      ],
+      "spellcasting_ability": "int",
+      "file": "Classes/cls-magicien.json"
+    },
+    {
+      "id": "cls-moine",
+      "name": "Moine",
+      "hit_die": "1d8",
+      "primary_abilities": [
+        "dex",
+        "wis"
+      ],
+      "spellcasting_ability": null,
+      "file": "Classes/cls-moine.json"
+    },
+    {
+      "id": "cls-paladin",
+      "name": "Paladin",
+      "hit_die": "1d10",
+      "primary_abilities": [
+        "str",
+        "cha"
+      ],
+      "spellcasting_ability": "cha",
+      "file": "Classes/cls-paladin.json"
+    },
+    {
+      "id": "cls-pretre",
+      "name": "Prêtre",
+      "hit_die": "1d8",
+      "primary_abilities": [
+        "wis"
+      ],
+      "spellcasting_ability": "wis",
+      "file": "Classes/cls-pretre.json"
+    },
+    {
+      "id": "cls-rodeur",
+      "name": "Rôdeur",
+      "hit_die": "1d10",
+      "primary_abilities": [
+        "dex",
+        "wis"
+      ],
+      "spellcasting_ability": "wis",
+      "file": "Classes/cls-rodeur.json"
+    },
+    {
+      "id": "cls-roublard",
+      "name": "Roublard",
+      "hit_die": "1d8",
+      "primary_abilities": [
+        "dex"
+      ],
+      "spellcasting_ability": null,
+      "file": "Classes/cls-roublard.json"
+    },
+    {
+      "id": "cls-sorcier",
+      "name": "Sorcier",
+      "hit_die": "1d8",
+      "primary_abilities": [
+        "cha"
+      ],
+      "spellcasting_ability": "cha",
+      "file": "Classes/cls-sorcier.json"
+    }
+  ]
+}

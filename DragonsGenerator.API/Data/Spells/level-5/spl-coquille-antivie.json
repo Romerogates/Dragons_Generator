@@ -1,0 +1,39 @@
+﻿{
+    "schema_version":  "2.0",
+    "id":  "spl-coquille-antivie",
+    "name":  "Coquille antivie",
+    "level":  5,
+    "school":  "abjuration",
+    "casting_time":  {
+                         "value":  1,
+                         "unit":  "action"
+                     },
+    "range":  {
+                  "type":  "personnelle",
+                  "distance_m":  null,
+                  "area":  {
+                               "shape":  "rayon",
+                               "radius_m":  3
+                           }
+              },
+    "duration":  {
+                     "type":  "concentration",
+                     "value":  1,
+                     "unit":  "heure"
+                 },
+    "components":  {
+                       "v":  true,
+                       "s":  true,
+                       "m":  null
+                   },
+    "is_ritual":  false,
+    "is_concentration":  true,
+    "is_corrupted":  false,
+    "classes":  [
+                    "cls-druide"
+                ],
+    "description":  "N champ scintillant de 3 m de rayon apparaît autour de vous. Il se déplace avec vous, reste centré sur vous, et les créatures qui ne sont ni des morts-vivants ni des créatures artificielles ne sauraient le pénétrer. Ce champ persiste pour toute la durée du sort. Il empêche toute créature concernée de passer ou de le traverser. Une telle créature peut lancer des sorts ou effectuer des attaques avec des armes à distance ou à allonge au travers du champ. Si vous vous déplacez de sorte qu\u0027une créature concernée par le sort est obligée de le traverser, le sort prend fin. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, le rayon augmente, si vous le souhaitez, de 3 m par niveau d\u0027emplacement au-dessus du 5e.",
+    "modular_options":  [
+
+                        ]
+}

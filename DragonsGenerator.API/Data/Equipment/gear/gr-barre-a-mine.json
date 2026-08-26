@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-barre-a-mine",
+  "name": "Barre à mine",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 2,
+    "unit": "po"
+  },
+  "weight_kg": 5,
+  "description": "Mesure au moins 1 m et sert à creuser des trous dans des roches dures ou à déchausser des pierres."
+}

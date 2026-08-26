@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-empire-vegetal",
+  "name": "Empire végétal",
+  "level": 3,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action_bonus"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": false,
+    "s": true,
+    "m": "(une graine ou un noyau"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-rodeur"
+  ],
+  "description": "Une zone de végétation luxuriante se développe dans un rayon de 18 m autour du point que vous désignez. Jusqu'à la fin du sort, la zone est considérée comme un terrain difficile pour les créatures qui vous sont hostiles, et toute créature hostile qui y pénètre pour la première fois de son tour ou y commence son tour de jeu doit réussir un JS Force sous peine d'être entravée jusqu'au début de son tour de jeu suivant. La végétation ne gêne en rien les mouvements de vos alliés et facilite même les vôtres. Vous pouvez entreprendre l'action Foncer au prix d'une action bonus si le déplacement correspondant débute dans la zone, et tous vos tests de caractéristique associés à la Force ou à la Dextérité y bénéficient d'un avantage.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, vous pouvez désigner une créature qui bénéficie des mêmes avantages que vous par niveau d'emplacement au-dessus du 3e.",
+  "modular_options": []
+}

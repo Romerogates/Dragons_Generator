@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-epee-a-deux-mains",
+  "name": "Épée à deux mains",
+  "category": "weapon",
+  "subcategory": "martial_melee",
+  "cost": {
+    "value": 50,
+    "unit": "po"
+  },
+  "weight_kg": 3,
+  "damage_dice": "2d6",
+  "damage_type": "tranchant",
+  "properties": [
+    "prop-deux-mains",
+    "prop-lourde"
+  ],
+  "throw_range": null,
+  "ammo_range": null,
+  "description": null
+}

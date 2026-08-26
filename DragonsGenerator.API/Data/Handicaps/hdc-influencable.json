@@ -1,0 +1,17 @@
+{
+  "schema_version": "2.0",
+  "id": "hdc-influencable",
+  "name": "Influençable",
+  "source": "livre_de_base",
+  "description": "Vous êtes très perméable à l'avis d'autrui. Vos interlocuteurs bénéficient d'un avantage aux tests de Charisme (Tromperie) qui vous sont opposés. Vous subissez également un désavantage aux jets de sauvegarde contre les sorts d'enchantement et les aptitudes entraînant l'état charmé ou effrayé.",
+  "mechanics": {
+    "opponents_advantage_on": [
+      "Charisme (Tromperie)"
+    ],
+    "disadvantage_on": [
+      "jets de sauvegarde contre les sorts de l'école d'enchantement",
+      "jets de sauvegarde contre les aptitudes entraînant l'état charmé",
+      "jets de sauvegarde contre les aptitudes entraînant l'état effrayé"
+    ]
+  }
+}

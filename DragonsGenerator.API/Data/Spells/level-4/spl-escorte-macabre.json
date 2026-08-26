@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-escorte-macabre",
+  "name": "Escorte macabre",
+  "level": 4,
+  "school": "necromancie",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "speciale",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une poignée de cendre d'os d'humanoïde"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien",
+    "cls-pretre"
+  ],
+  "description": "Vous êtes enveloppé d'une aura funeste tandis que vos pas soulèvent une très fine poussière noire. Tous les humanoïdes de taille M ou P que vous réduisez à 0 point de vie avant la fin du sort se relèvent au début de votre tour de jeu suivant sous la forme de zombies (le meneur dispose de leur profil, décrit dans ). Les zombies n'obéissent qu'à vous et uniquement aux ordres suivants, que vous pouvez prononcer au prix d'une action bonus. En dehors de l'ordre « Attaquez », les zombies restent passifs face aux autres créatures, n'attaquant qu'en réponse à une agression : Allez là. Cet ordre permet à l'escorte funèbre d'avancer jusqu'à un objectif visible très facile à identifier, par exemple le sommet d'une colline ou une place de village. Attaquez. Les morts-vivants attaquent la créature la plus proche, à l'exception du lanceur du sort et des créatures qui portent son sang. Sont donc épargnés les membres de sa famille liés par le sang (enfants, parents, fratrie, petits-enfants et grands-parents uniquement), ainsi que les créatures qui ont son sang sur elles (éclaboussure ou don délibéré pour les protéger). Avancez. Les créatures se déplacent au mieux de leurs capacités pour suivre le lanceur du sort. Halte. Les zombies s'arrêtent. Ils ripostent face à une agression, mais n'entreprennent aucun déplacement. Passez par là. Cet ordre permet d'organiser des manœuvres en indiquant à une partie de l'escorte de passer par un chemin, tandis que les autres avancent avec le lanceur du sort. Un encerclement est également possible grâce à cet ordre. Saccagez. L'escorte détruit tout élément inanimé à sa portée, sans toucher aux créatures. Sont ciblés en priorité les objets, puis la végétation. Vous ne pouvez pas contrôler plus de zombies par l'intermédiaire de ce sort que votre modificateur de caractéristique magique × 2 ; si vous réduisez une créature à 0 point de vie alors que vous avez déjà atteint cette limite, le zombie relevé remplace automatiquement celui qui a le moins de points de vie, lequel n'est plus alors qu'un simple cadavre. De même, quand le sort cesse de faire effet, les morts-vivants deviennent des corps inertes. Emplacementde sort Taille limitede l'escorte Particularités supplémentaires (se cumulent) Modificateur de caractéristique magique × 3 Tous les zombies bénéficient d'une résistance aux dégâts contondants, perforants et tranchants d'armes non magiques, et ont le maximum possible de points de vie pour leur profil (33 pv). Modificateur de caractéristique magique × 4 Tous les zombies sont dotés d'une Intelligence de 6, leur permettant de comprendre des instructions plus complexes. Cependant, ils ne peuvent toujours pas distinguer les créatures les unes des autres, hormis par la présence de votre sang. Modificateur de caractéristique magique × 5 Modificateur de caractéristique magique × 10 Les victimes de vos zombies se relèvent pour faire partie de votre escorte macabre, sans outrepasser la taille limite. Aucun maximum Dans un rayon de 250 m autour de vous, les créatures tuées par les porteurs de votre sang se relèvent pour faire partie de l'escorte macabre.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, la puissance du sort augmente selon la table suivante. Les zombies en grands nombres peuvent se voir appliquer l'archétype masse décrit dans :",
+  "modular_options": []
+}

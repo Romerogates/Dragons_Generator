@@ -1,0 +1,16 @@
+{
+  "schema_version": "2.0",
+  "id": "act-chercher",
+  "name": "Chercher",
+  "action_cost": "action",
+  "category": "standard",
+  "description": "Consacrer toute votre attention à une recherche donnée. Le meneur décide selon la nature de la recherche s'il vous soumet à un test de Sagesse (Perception) ou d'Intelligence (Investigation).",
+  "mechanics": {
+    "tests": [
+      "Sagesse (Perception)",
+      "Intelligence (Investigation)"
+    ],
+    "dm_decides": true
+  },
+  "source": "livre_de_base"
+}

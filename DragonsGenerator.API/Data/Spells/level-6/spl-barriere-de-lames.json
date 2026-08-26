@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-barriere-de-lames",
+  "name": "Barrière de lames",
+  "level": 6,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 27,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "Logo and icon Vous créez un mur vertical de lames de rasoir tourbillonnantes composé d'énergie magique, qui apparaît à portée et persiste pour toute la durée du sort. Vous pouvez créer un mur droit aux dimensions maximales suivantes : 30 m de long, 6 m de haut et 1,50 m de large ; ou un mur circulaire aux dimensions maximales suivantes : 18 m de diamètre, 6 m de haut et 1,50 m de large. Il confère un abri supérieur aux créatures qui se tiennent derrière, et son espace constitue un terrain difficile. Quand une créature entre dans la zone de la barrière pour la première fois d'un tour de jeu ou y commence son tour de jeu, elle doit effectuer un JS Dextérité et subit 6d10 dégâts tranchants en cas d'échec, la moitié en cas de réussite.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau ou supérieur, les dégâts augmentent de 1d10 par niveau d'emplacement au-dessus du 6e.",
+  "modular_options": []
+}

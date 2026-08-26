@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "ski-intimidation",
+  "name": "Intimidation",
+  "ability": "CHA",
+  "description": "Lorsque vous tentez d'influencer quelqu'un par le biais de menaces manifestes, d'une hostilité palpable ou de violences physiques, le meneur peut vous demander d'effectuer un test de Charisme (Intimidation). C'est le cas lorsque vous essayez d'extorquer des informations à un prisonnier ou de dissuader des voyous des rues de vous chercher des noises. L'intimidation peut être subtile, glaçante, tout en sous-entendus.",
+  "examples": [
+    "Extorquer des informations à un prisonnier par la menace.",
+    "Dissuader des voyous de vous chercher des noises.",
+    "Influencer quelqu'un par une hostilité subtile et glaçante."
+  ],
+  "passive_check": false,
+  "source": "livre_de_base"
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-attirail-de-peche",
+  "name": "Attirail de pêche",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 1,
+    "unit": "po"
+  },
+  "weight_kg": 2,
+  "description": "Comprend une canne à pêche, une ligne en fil de soie, des bouchons en liège, des hameçons en acier, des plombs, des leurres et un filet à mailles serrées. Pour fabriquer une nasse, prévoit une journée de travail et un test de Sagesse (Survie) DD 15."
+}

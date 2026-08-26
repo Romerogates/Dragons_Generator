@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-boule-de-feu",
+  "name": "Boule de feu",
+  "level": 3,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 45,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une minuscule boule de guano de chauve-souris et de soufre"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Une traînée vive jaillit de votre doigt tendu et file jusqu'à un point à portée avant d'exploser dans un grondement sourd. Chaque créature prise dans une sphère de 6 m de rayon centrée sur ce point doit effectuer un JS Dextérité et subit 8d6 dégâts de feu en cas d'échec, la moitié en cas de réussite. Les flammes contournent les coins et embrasent tous les objets inflammables de la zone qui ne sont ni portés ni transportés.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, les dégâts augmentent de 1d6 par niveau d'emplacement au-dessus du 3e.",
+  "modular_options": []
+}

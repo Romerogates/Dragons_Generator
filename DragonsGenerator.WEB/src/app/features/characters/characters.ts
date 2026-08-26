@@ -11,6 +11,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { PdfGeneratorService } from '@core/services/pdf-generator.service';
+import { CharacterCloudService } from '@core/services/character-cloud.service';
+import { AuthService } from '@core/services/auth.service';
 import type { Character } from '../../core/models/Character/character';
 
 @Component({
@@ -19,42 +21,49 @@ import type { Character } from '../../core/models/Character/character';
   imports: [CommonModule, RouterLink],
   templateUrl: './characters.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class Characters implements OnInit {
   private pdfService = inject(PdfGeneratorService);
   private router = inject(Router);
+  private cloud = inject(CharacterCloudService);
+  private auth = inject(AuthService);
 
-  // Utilisation des signaux pour une interface réactive
   readonly characters = signal<any[]>([]);
   readonly characterToDelete = signal<any | null>(null);
 
   ngOnInit(): void {
-    this.loadCharacters();
+    if (this.auth.isLoggedIn()) {
+      this.cloud.syncFromCloud().subscribe({
+        next: (list) => this.applyList(list as any[]),
+        error: () => this.loadCharacters(),
+      });
+    } else {
+      this.loadCharacters();
+    }
+  }
+
+  private applyList(parsed: any[]): void {
+    const safeCharacters = (parsed ?? []).map((c: any, index: number) => {
+      if (!c.id) {
+        c.id = crypto.randomUUID ? crypto.randomUUID() : `legacy-${index}-${Date.now()}`;
+      }
+      return c;
+    });
+    safeCharacters.sort((a: any, b: any) => {
+      const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+      const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+      return dateB - dateA;
+    });
+    this.characters.set(safeCharacters);
+    localStorage.setItem('dragons-characters', JSON.stringify(safeCharacters));
   }
 
   private loadCharacters(): void {
     try {
       const saved = localStorage.getItem('dragons-characters');
       if (saved) {
-        const parsed = JSON.parse(saved);
-
-        // CORRECTION DU TIMEOUT : On s'assure que chaque personnage a un ID unique
-        const safeCharacters = parsed.map((c: any, index: number) => {
-          if (!c.id) {
-            c.id = crypto.randomUUID ? crypto.randomUUID() : `legacy-${index}-${Date.now()}`;
-          }
-          return c;
-        });
-
-        // Tri du plus récent au plus ancien
-        safeCharacters.sort((a: any, b: any) => {
-          const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
-          const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
-          return dateB - dateA;
-        });
-
-        this.characters.set(safeCharacters);
+        this.applyList(JSON.parse(saved));
       }
     } catch (error) {
       console.error('Erreur lors du chargement des personnages:', error);
@@ -79,11 +88,19 @@ export class Characters implements OnInit {
   }
 
   getCharClass(c: any): string {
-    // Nouveau format (ClassRef[])
-    if (Array.isArray(c?.classes) && c.classes.length > 0)
-      return c.classes[0].classLabel || 'Classe inconnue';
-    // Ancien format (legacy)
+    if (Array.isArray(c?.classes) && c.classes.length > 0) {
+      const cls = c.classes[0];
+      if (cls.subclassLabel) return `${cls.classLabel} — ${cls.subclassLabel}`;
+      return cls.classLabel || 'Classe inconnue';
+    }
     return c?.className || c?.class || 'Classe inconnue';
+  }
+
+  getCharSubclass(c: any): string {
+    if (Array.isArray(c?.classes) && c.classes.length > 0) {
+      return c.classes[0].subclassLabel || '';
+    }
+    return '';
   }
 
   getCharHp(c: any): number {
@@ -162,8 +179,11 @@ export class Characters implements OnInit {
       updatedAt: new Date().toISOString(),
     };
 
-    this.characters.update((chars) => [duplicate, ...chars]);
+        this.characters.update((chars) => [duplicate, ...chars]);
     localStorage.setItem('dragons-characters', JSON.stringify(this.characters()));
+    if (this.auth.isLoggedIn()) {
+      this.cloud.save(duplicate).subscribe({ error: () => {} });
+    }
   }
 
   downloadPdf(character: any, event: Event): void {
@@ -188,5 +208,9 @@ export class Characters implements OnInit {
     this.characters.update((chars) => chars.filter((c) => c.id !== toDelete.id));
     localStorage.setItem('dragons-characters', JSON.stringify(this.characters()));
     this.characterToDelete.set(null);
+
+    if (this.auth.isLoggedIn() && toDelete.id) {
+      this.cloud.delete(toDelete.id).subscribe({ error: () => {} });
+    }
   }
 }

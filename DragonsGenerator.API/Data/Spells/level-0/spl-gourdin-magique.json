@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-gourdin-magique",
+  "name": "Gourdin magique",
+  "level": 0,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action_bonus"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un gourdin ou bâton de combat"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide"
+  ],
+  "description": "Gourdin magique Le gourdin ou bâton que vous tenez est investi du pouvoir de la nature. Pour toute la durée du sort, vous pouvez utiliser votre caractéristique magique au lieu de votre Force pour les jets d'attaque et de dégâts des attaques de corps à corps utilisant cette arme, et le dé de dégâts de l'arme devient un d8. En outre, elle devient magique si elle ne l'est pas déjà. Le sort prend fin si vous le relancez ou si vous lâchez l'arme.",
+  "modular_options": []
+}

@@ -1,16 +1,14 @@
 ﻿using DragonsGenerator.API.Common;
-using DragonsGenerator.API.Models;
 using FastEndpoints;
 
 namespace DragonsGenerator.API.Endpoints.Species;
 
-public record SpeciesCodesResponse(
-    Dictionary<string, string> SizeCodes,
-    Dictionary<string, string> AbilityCodes
-);
-
-public class GetSpeciesCodesEndpoint : EndpointWithoutRequest<SpeciesCodesResponse>
+public class GetSpeciesCodesEndpoint : EndpointWithoutRequest<SpeciesCodesDto>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetSpeciesCodesEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/species/codes");
@@ -19,14 +17,7 @@ public class GetSpeciesCodesEndpoint : EndpointWithoutRequest<SpeciesCodesRespon
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var data = await JsonDataLoader.LoadAsync<SpeciesData>("species.json", ct);
-
-        if (data is null)
-        {
-            await Send.NotFoundAsync(ct);
-            return;
-        }
-
-        await Send.OkAsync(new SpeciesCodesResponse(data.SizeCodes, data.AbilityCodes), ct);
+        var codes = await _repo.GetSpeciesCodesAsync(ct);
+        await Send.OkAsync(codes, ct);
     }
 }

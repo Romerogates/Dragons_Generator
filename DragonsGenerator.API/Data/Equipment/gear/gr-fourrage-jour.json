@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-fourrage-jour",
+  "name": "Fourrage (par jour)",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 5,
+    "unit": "pc"
+  },
+  "weight_kg": 5,
+  "description": "Nourriture journalière pour une monture."
+}

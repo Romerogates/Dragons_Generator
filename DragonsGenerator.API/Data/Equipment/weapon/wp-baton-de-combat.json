@@ -1,0 +1,20 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-baton-de-combat",
+  "name": "Bâton de combat",
+  "category": "weapon",
+  "subcategory": "simple_melee",
+  "cost": {
+    "value": 2,
+    "unit": "pa"
+  },
+  "weight_kg": 2,
+  "damage_dice": "1d6",
+  "damage_type": "contondant",
+  "properties": [
+    "prop-polyvalente-1d8"
+  ],
+  "throw_range": null,
+  "ammo_range": null,
+  "description": "Cette arme peut aussi bien s'utiliser à une main qu'à deux mains. Le dé entre parenthèses indique les dégâts à deux mains."
+}

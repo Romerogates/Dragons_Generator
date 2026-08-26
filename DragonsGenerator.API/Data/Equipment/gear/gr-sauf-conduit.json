@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-sauf-conduit",
+  "name": "Sauf-conduit",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": null,
+    "unit": "po",
+    "note": "Document officiel, non vendu"
+  },
+  "weight_kg": null,
+  "description": "Document officiel autorisant le porteur à se déplacer ou à exercer une activité dans un territoire donné."
+}

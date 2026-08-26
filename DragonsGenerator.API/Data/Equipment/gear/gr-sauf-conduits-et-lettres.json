@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-sauf-conduits-et-lettres",
+  "name": "Divers sauf-conduits et lettres de recommandation",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": null,
+    "unit": "po",
+    "note": "Document officiel, non vendu"
+  },
+  "weight_kg": null,
+  "description": "Ensemble de documents officiels et de lettres de recommandation témoignant de votre rang et de votre réseau."
+}

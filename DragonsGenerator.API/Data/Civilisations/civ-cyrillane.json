@@ -1,0 +1,66 @@
+{
+  "schema_version": "2.0",
+  "id": "civ-cyrillane",
+  "name": "Cyrillane",
+  "randomization": {
+    "dice": "d100",
+    "min": 44,
+    "max": 53
+  },
+  "demographics": {
+    "primary_species": [
+      {
+        "id": "sp-humain",
+        "label": "Humains"
+      },
+      {
+        "id": "sp-nain-batisseur",
+        "label": "Nains bâtisseurs"
+      },
+      {
+        "id": "sp-gnome-des-roches",
+        "label": "Gnomes des roches"
+      }
+    ],
+    "secondary_species": [
+      {
+        "id": "sp-tous",
+        "label": "Tous les autres peuples (grandes villes)"
+      }
+    ],
+    "is_cosmopolitan": true,
+    "cosmopolitan_zones": [
+      "grandes villes"
+    ],
+    "social_roles": [],
+    "peoples_note": "Principalement Humains, Nains bâtisseurs et Gnomes des roches. Tous les peuples représentés dans les grandes villes."
+  },
+  "official_languages": [
+    {
+      "id": "lg-cyrillan",
+      "label": "Cyrillan"
+    }
+  ],
+  "multilingual": false,
+  "writing_systems": [
+    {
+      "id": "wr-cyfand",
+      "label": "Cyfand",
+      "type": "alphabet"
+    }
+  ],
+  "is_oral_only": false,
+  "description": "Jusqu'à récemment, l'empire cyrillan était le principal rival de la Cité Franche. Dirigé depuis des siècles par une dynastie brillante, mais miné par de graves inégalités et une corruption endémique, il s'est effondré comme un château de cartes. Aujourd'hui, le pays est déchiré entre les nombreuses factions qui se disputent sa dépouille : sectes autoproclamées libératrices et adeptes de Tamerakh le destructeur, généraux loyalistes, chefs de guerre opportunistes associés de très près aux guildes de voleurs, dragons noirs… Dans l'ombre, un être maléfique et calculateur attend son heure : la liche Mégare de Cyrillane, ancienne princesse contrainte à la clandestinité suite à ses crimes innommables.",
+  "geography_tags": [
+    "empire-dechu",
+    "grandes-villes"
+  ],
+  "threat_ids": [
+    "threat-tamerakh",
+    "threat-generaux-loyalistes",
+    "threat-chefs-de-guerre",
+    "threat-guildes-de-voleurs",
+    "threat-dragons-noirs",
+    "threat-liche-megare"
+  ]
+}

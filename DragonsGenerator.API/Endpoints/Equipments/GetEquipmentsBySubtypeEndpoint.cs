@@ -11,6 +11,10 @@ public class GetEquipmentsBySubtypeRequest
 
 public class GetEquipmentsBySubtypeEndpoint : Endpoint<GetEquipmentsBySubtypeRequest, List<Equipment>>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetEquipmentsBySubtypeEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/equipments/subtype/{subtype}");
@@ -19,12 +23,10 @@ public class GetEquipmentsBySubtypeEndpoint : Endpoint<GetEquipmentsBySubtypeReq
 
     public override async Task HandleAsync(GetEquipmentsBySubtypeRequest req, CancellationToken ct)
     {
-        var equipments = await JsonDataLoader.LoadAsync<List<Equipment>>("equipments.json", ct);
-
-        var filtered = equipments?
+        var equipments = await _repo.GetEquipmentsAsync(ct);
+        var filtered = equipments
             .Where(e => string.Equals(e.Subtype, req.Subtype, StringComparison.OrdinalIgnoreCase))
-            .ToList() ?? [];
-
+            .ToList();
         await Send.OkAsync(filtered, ct);
     }
 }

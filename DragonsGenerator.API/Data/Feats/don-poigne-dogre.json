@@ -1,0 +1,49 @@
+{
+  "schema_version": "2.0",
+  "id": "don-poigne-dogre",
+  "name": "Poigne d'ogre",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [
+    {
+      "type": "ability_score",
+      "ability": "STR",
+      "min": 15,
+      "description": "15 ou plus en Force"
+    },
+    {
+      "type": "size",
+      "min": "M",
+      "description": "Taille M ou supérieure"
+    }
+  ],
+  "description": "Prérequis : FOR 15+, taille M+. Avantage aux tests de Force pour lutte ou bousculade. Toutes les armes non lourdes sont considérées légères. Manier à une main les armes \"deux mains\" (−1 aux dégâts). Bonus aux dégâts = ½ mod. Force (arrondi inf.) quand tenu à deux mains (arme deux mains ou polyvalente).",
+  "benefits": [
+    {
+      "type": "advantage_on_check",
+      "activities": [
+        "lutte",
+        "bousculade"
+      ]
+    },
+    {
+      "type": "treat_weapons_as_light",
+      "except": "lourdes"
+    },
+    {
+      "type": "one_hand_two_handed",
+      "damage_penalty": -1
+    },
+    {
+      "type": "damage_bonus",
+      "formula": "floor(STR / 2)",
+      "condition": "tenu à deux mains"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "force",
+    "corps-à-corps",
+    "lutte"
+  ]
+}

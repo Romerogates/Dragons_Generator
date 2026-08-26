@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-augure",
+  "name": "Augure",
+  "level": 2,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(baguettes"
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "Photograph, icon, and other Icon, logo, and stamp En lançant des baguettes serties de gemmes ou des osselets de dragon, en étalant des cartes enluminées ou en usant de quelque autre colifichet divinatoire, vous recevez un présage de la part d'une entité surnaturelle qui vous révèle si l'ensemble des actions que vous comptez entreprendre dans les 30 prochaines minutes seront positives ou non. Le meneur choisit parmi les présages possibles suivants : Fortune, pour des résultats bénéfiques. Misère, pour des résultats défavorables. Fortune et misère, pour des résultats à la fois bénéfiques et défavorables. Icon, engineering drawing, and logo Rien, pour des résultats qui ne sont ni bénéfiques ni défavorables. Le sort ne tient pas compte des circonstances éventuelles qui pourraient modifier l'issue de l'augure, comme l'incantation d'autres sorts, la venue d'un nouveau compagnon ou le départ d'un allié. Si vous lancez plusieurs fois le sort avant d'avoir terminé un repos long, il y a 25 % de chance cumulatifs pour chaque incantation au-delà de la première d'obtenir un résultat aléatoire. Le meneur effectue bien évidemment ce jet en secret.",
+  "modular_options": []
+}

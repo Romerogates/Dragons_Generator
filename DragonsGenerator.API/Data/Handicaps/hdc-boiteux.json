@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "hdc-boiteux",
+  "name": "Boiteux",
+  "source": "livre_de_base",
+  "description": "Votre Vitesse de déplacement est réduite de 3 m. Vous subissez un désavantage aux tests visant à escalader, ainsi qu'aux tests visant à résister à la fatigue des marches forcées.",
+  "mechanics": {
+    "speed_reduction_m": 3,
+    "disadvantage_on": [
+      "escalader",
+      "résister à la fatigue des marches forcées"
+    ]
+  }
+}

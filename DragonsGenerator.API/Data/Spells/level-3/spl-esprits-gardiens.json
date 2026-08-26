@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "guid": null,
+  "id": "spl-esprits-gardiens",
+  "name": "Esprits gardiens",
+  "level": 3,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": false,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "",
+  "higher_levels": null,
+  "modular_options": []
+}

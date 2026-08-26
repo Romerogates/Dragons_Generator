@@ -1,0 +1,39 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-eclair",
+  "name": "Éclair",
+  "level": 3,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": {
+      "shape": "ligne",
+      "length_m": 30
+    }
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(un peu de fourrure et une baguette d'ambre"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Vous jetez un éclair prenant la forme d'une ligne de 30 m de long et de 1,50 m de large dans la direction de votre choix. Toute créature prise dans la ligne doit effectuer un JS Dextérité et subit 8d6 dégâts de foudre en cas d'échec, la moitié en cas de réussite. La foudre embrase les objets inflammables de la zone qui ne sont ni portés ni transportés.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, les dégâts augmentent de 1d6 par niveau d'emplacement au-dessus du 3e.",
+  "modular_options": []
+}

@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-allie-d-outreplan",
+  "name": "Allié d'outreplan",
+  "level": 6,
+  "school": "invocation",
+  "casting_time": {
+    "value": 10,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "Vous suppliez une entité d'outreplan de vous venir en aide. Celle-ci doit vous être connue, qu'il s'agisse d'un dieu, d'un prince démon ou de quelque autre être de magnitude cosmique. L'entité en question charge un céleste, un élémentaire ou un fiélon de vous porter secours, et la créature apparaît dans un espace inoccupé situé à portée. Si vous connaissez le nom d'une créature précise, il vous suffit de le prononcer au moment de l'incantation pour l'appeler, mais rien ne garantit que ce soit elle qui vienne (la décision appartient au meneur). Lorsque la créature apparaît, rien ne l'oblige à adopter une conduite précise. Vous pouvez lui demander de vous rendre service en échange de quelque chose. La tâche demandée peut aller du simple (« fais-nous traverser le gouffre », ou « aide-nous à livrer bataille ») au complexe (« espionne nos ennemis », ou « protège-nous durant notre exploration du complexe souterrain »). Vous devez être en mesure de communiquer avec la créature pour négocier ses services. Le paiement peut être de toutes sortes. Un céleste pourra demander qu'une coquette somme ou des objets magiques soient donnés à un temple allié, tandis qu'un fiélon exigera plus volontiers un sacrifice ou un trésor. Certaines créatures vous demanderont peut-être d'entreprendre une quête pour leur compte. Voici la règle de base : une tâche mesurée en minutes sera rémunérée 100 po de la minute. Une tâche mesurée en heures sera rémunérée 1 000 po de l'heure. Une tâche mesurée en jours sera rémunérée 10 000 po de la journée et ne pourra excéder 10 jours. Le meneur peut modifier ces sommes en fonction des circonstances au cours desquelles vous jetez le sort. Si la tâche cadre avec la philosophie de la créature, le paiement demandé pourra être réduit de moitié, voire annulé. Si la tâche est sans danger, la contribution sera là aussi réduite de moitié. À l'inverse, si la mission est particulièrement dangereuse, le règlement sera plus élevé. Les créatures acceptent rarement les missions qui leur paraissent suicidaires. Une fois la tâche accomplie ou la durée convenue échue, la créature regagne son plan d'origine après vous avoir fait son rapport, sous réserve que cela soit pertinent et possible. Si vous ne parvenez pas à vous entendre sur un règlement, la créature regagne aussitôt son plan d'origine. Une créature recrutée compte comme un membre de votre groupe et reçoit une part complète de points d'expérience.",
+  "modular_options": []
+}

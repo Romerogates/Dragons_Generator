@@ -1,0 +1,27 @@
+{
+  "schema_version": "2.0",
+  "id": "don-sens-du-critique",
+  "name": "Sens du critique",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [],
+  "description": "Sur coup critique : lancez un dé de moins que prévu et ajoutez le maximum du dé omis. De plus, lancez 1d20 pour un effet supplémentaire éventuel (6 : attaque réaction alliés, 7 : cible étourdie 1 rnd, 8 : aveuglée 1 rnd, 9 : à terre, 10 : effrayée 1 min, 11 : alliés cible effrayés 1 rnd, 12 : paralysée 1 rnd, 13 : VD doublée 1 rnd, 14 : dégâts doublés, 15 : entravée 1 rnd, 16 : inconsciente 1 rnd, 17 : neutralisée 1 rnd, 18 : avantage 1 rnd, 19 : 10 PV temporaires, 20 : effets d'un repos court).",
+  "benefits": [
+    {
+      "type": "critical_hit_modifier",
+      "effect": "un dé de moins + max du dé omis"
+    },
+    {
+      "type": "critical_hit_table",
+      "die": "d20",
+      "range": "6-20",
+      "note": "Effets supplémentaires sur 6–20"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "combat",
+    "coups-critiques",
+    "offensif"
+  ]
+}

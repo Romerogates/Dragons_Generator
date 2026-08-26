@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-mors-et-bride",
+  "name": "Mors et bride",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 2,
+    "unit": "po"
+  },
+  "weight_kg": 0.5,
+  "description": "Harnachement de tête pour diriger une monture."
+}

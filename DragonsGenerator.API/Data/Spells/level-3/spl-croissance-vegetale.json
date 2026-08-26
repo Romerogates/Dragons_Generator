@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-croissance-vegetale",
+  "name": "Croissance végétale",
+  "level": 3,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 45,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-rodeur"
+  ],
+  "description": "Ce sort confère un regain de vitalité à la flore d'une zone spécifique. Il existe deux versions de ce sort, la première instantanée et l'autre à long terme. Si vous lancez ce sort au prix d'une action, choisissez un point à portée. Toutes les plantes normales situées dans un rayon de 30 m centré sur ce point poussent à outrance. Une créature qui se déplace dans la zone doit, en termes de quota de déplacement, dépenser le quadruple de toute distance parcourue. Vous pouvez choisir de ne pas affecter une ou plusieurs zones (de quelque taille que ce soit) de la zone du sort. Si vous jetez ce sort en 8 heures, vous fertilisez le sol. Toutes les plantes situées dans un rayon de 750 m centré sur un point à portée sont fertilisées pendant 1 an. Leur productivité est doublée au moment de la récolte. Decorative letter D with floral elements",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, le rayon d'action augmente de 9 m (pour la version instantanée) ou 100 m (pour la version lancée en 8 heures) par niveau d'emplacement au-dessus du 3e. Par ailleurs, quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, dans le cas de la version lancée en 8 heures, la nature dans le rayon d'effet se régénère et peut être purgée de hantises ou de malédictions.",
+  "modular_options": []
+}

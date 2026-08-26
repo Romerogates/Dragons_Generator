@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-vetements-ordinaires",
+  "name": "Vêtements ordinaires",
+  "category": "gear",
+  "subcategory": "clothing",
+  "cost": {
+    "value": 5,
+    "unit": "pa"
+  },
+  "weight_kg": 1.5,
+  "description": "Tenue simple et fonctionnelle du quotidien."
+}

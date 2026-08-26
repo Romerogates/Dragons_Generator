@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-mur-de-glace",
+  "name": "Mur de glace",
+  "level": 6,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un petit morceau de quartz"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien"
+  ],
+  "description": "Vous créez un mur de glace sur une surface solide à portée. Vous pouvez lui donner la forme d'un dôme hémisphérique ou d'une sphère ayant un rayon de 3 m maximum, ou d'une surface plane constituée de dix sections de 3 m de côté, chacune devant être adjacente à une autre. Quelle que soit sa forme, il mesure 30 cm d'épaisseur et persiste pour toute la durée du sort. S'il traverse l'espace d'une créature au moment où il apparaît, celle-ci est repoussée d'un côté ou de l'autre. Elle doit effectuer un JS Dextérité et subit 10d6 dégât de froid en cas d'échec, la moitié en cas de réussite. Ce mur est un objet qui peut être endommagé et brisé. Il présente une CA 12, 30 points de vie par section de 3 m et une vulnérabilité aux dégâts de feu. Une section de 3 m qui tombe à 0 point de vie est détruite et laisse un rideau de froid dans l'espace qu'occupait le mur. Une créature qui traverse ce rideau pour la première fois d'un tour de jeu doit effectuer un JS Constitution et subit 5d6 dégâts de froid en cas d'échec, la moitié en cas de réussite.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau ou supérieur, les dégâts que le mur inflige quand il apparaît et ceux du rideau augmentent respectivement de 2d6 et de 1d6 par niveau d'emplacement au-dessus du 6e.",
+  "modular_options": []
+}

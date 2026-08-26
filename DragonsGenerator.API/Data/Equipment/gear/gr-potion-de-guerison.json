@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-potion-de-guerison",
+  "name": "Potion de guérison",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 50,
+    "unit": "po"
+  },
+  "weight_kg": 0.25,
+  "description": "Liquide rouge magique. Récupère 2d4+2 points de vie. Boire ou administrer demande une action."
+}

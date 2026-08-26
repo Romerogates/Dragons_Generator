@@ -9,11 +9,19 @@ import {
 import { CommonModule, KeyValuePipe } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DataService } from '@core/services/data.service';
+import { normalizeCharacterClasses } from '@core/utils/class-data.adapter';
+import { getClassIcon } from '@core/utils/class-icons';
+import {
+  GameIdLabelPipe,
+  GameIdLabelsPipe,
+  GameItemLabelPipe,
+} from '@shared/pipes/game-id-label.pipe';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-character-classes',
   standalone: true,
-  imports: [CommonModule, KeyValuePipe],
+  imports: [CommonModule, KeyValuePipe, GameIdLabelPipe, GameIdLabelsPipe, GameItemLabelPipe],
   templateUrl: './character-classes.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
@@ -21,9 +29,10 @@ import { DataService } from '@core/services/data.service';
 export class CharacterClasses {
   private readonly dataService = inject(DataService);
 
-  protected readonly classes = toSignal(this.dataService.getClasses(), {
-    initialValue: [],
-  });
+  protected readonly classes = toSignal(
+    this.dataService.getClasses().pipe(map((list) => normalizeCharacterClasses(list))),
+    { initialValue: [] },
+  );
 
   protected readonly search = signal('');
 
@@ -33,6 +42,10 @@ export class CharacterClasses {
     if (!term) return list;
     return list.filter((c) => c.name.toLowerCase().includes(term));
   });
+
+  protected iconFor(classId: string): string {
+    return getClassIcon(classId);
+  }
 
   protected onSearch(value: string): void {
     this.search.set(value);

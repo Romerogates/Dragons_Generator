@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-aupuniwi",
+  "name": "Aupuniwi",
+  "category": "base",
+  "typical_speakers": [
+    "Habitants de la Torea"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-tumiit",
+      "label": "Tumiit",
+      "type": "syllabaire"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [
+    "Torea (vaste archipel tropical)"
+  ],
+  "description": "Langue de la Torea, vaste archipel tropical. L'aupuniwi est avant tout une culture orale ; le syllabaire tumiit est parfois utilisé à l'écrit."
+}

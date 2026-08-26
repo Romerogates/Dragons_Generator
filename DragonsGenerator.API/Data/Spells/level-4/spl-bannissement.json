@@ -1,0 +1,39 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-bannissement",
+  "name": "Bannissement",
+  "level": 4,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un objet répugnant pour la cible"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-paladin",
+    "cls-pretre",
+    "cls-sorcier"
+  ],
+  "description": "Vous tentez d'envoyer une créature que vous voyez à portée vers un autre plan d'existence. La cible doit réussir un JS Charisme sous peine d'être bannie. Si la cible est originaire du plan d'existence dans lequel vous vous trouvez, vous la bannissez vers un demi-plan inoffensif où elle est neutralisée. Elle y reste tant que le sort persiste, après quoi elle réapparaît dans l'espace qu'elle occupait ou dans l'espace inoccupé le plus proche si celui-ci est maintenant occupé. Si la cible est originaire d'un autre plan d'existence que celui dans lequel vous vous trouvez, elle est bannie en produisant un léger bruit sec et renvoyée sur son plan d'origine. Si le sort prend fin avant que 1 minute ne se soit écoulée, une telle cible réapparaît dans l'espace qu'elle occupait ou dans l'espace inoccupé le plus proche si celui-ci est maintenant occupé. Autrement, elle ne revient pas.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 4e.",
+  "modular_options": []
+}

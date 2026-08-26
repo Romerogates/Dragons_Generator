@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "ski-medecine",
+  "name": "Médecine",
+  "ability": "SAG",
+  "description": "Par un test de Sagesse (Médecine), vous pouvez tenter de stabiliser l'état d'un compagnon mourant, de diagnostiquer une maladie, soigner des blessures.",
+  "examples": [
+    "Stabiliser l'état d'un compagnon mourant.",
+    "Diagnostiquer une maladie.",
+    "Soigner des blessures."
+  ],
+  "passive_check": false,
+  "source": "livre_de_base"
+}

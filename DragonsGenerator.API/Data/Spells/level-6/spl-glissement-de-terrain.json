@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-glissement-de-terrain",
+  "name": "Glissement de terrain",
+  "level": 6,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 2,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(une lame en fer et un sachet contenant un mélange d'argile"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Choisissez une zone de terrain située à portée ne dépassant pas 12 m de côté. Vous pouvez remodeler la terre, le sable et l'argile de la zone comme vous l'entendez pour toute la durée du sort. Vous pouvez élever ou abaisser le niveau de la zone, créer ou combler un fossé, ériger ou raser un mur, ou former un pilier. L'étendue de ces changements ne peut pas dépasser la moitié de la longueur de la zone. Par exemple, si vous affectez un carré de 12 m de côté, vous pouvez créer un pilier de 6 m de haut, élever ou abaisser le niveau de la zone de 6 m, creuser une fosse de 6 m, etc. L'application de ces changements demande 10 minutes. Toutes les 10 minutes passées à vous concentrer sur le sort, vous pouvez affecter une nouvelle zone de terrain. Étant donné que la transformation se déroule lentement, les créatures situées dans la zone ne sont normalement pas prises au piège ni blessées par le glissement de terrain. Ce sort ne permet pas de manipuler la roche ni les constructions en pierre, qui bougent néanmoins pour s'accommoder au nouveau relief. Si vos manipulations rendent le terrain instable, en revanche, une structure peut parfaitement s'effondrer. De même, ce sort n'affecte pas directement la flore, mais le glissement de terrain peut très bien emporter des plantes.",
+  "modular_options": []
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "sv-repas-modeste",
+  "name": "Repas (par jour) - Modeste",
+  "category": "service",
+  "subcategory": null,
+  "cost": {
+    "value": 3,
+    "unit": "pa"
+  },
+  "weight_kg": null,
+  "description": "Coût de nourriture journalier pour un train de vie modeste à la Cité Franche."
+}

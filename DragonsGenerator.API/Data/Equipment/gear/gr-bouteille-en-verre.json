@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-bouteille-en-verre",
+  "name": "Bouteille en verre",
+  "category": "gear",
+  "subcategory": "container",
+  "cost": {
+    "value": 2,
+    "unit": "po"
+  },
+  "weight_kg": 1,
+  "description": "Capacité : 75 cl."
+}

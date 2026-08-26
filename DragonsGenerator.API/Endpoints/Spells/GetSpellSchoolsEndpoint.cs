@@ -6,6 +6,10 @@ namespace DragonsGenerator.API.Endpoints.Spells;
 
 public class GetSpellSchoolsEndpoint : EndpointWithoutRequest<List<string>>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetSpellSchoolsEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/spells/schools");
@@ -14,14 +18,12 @@ public class GetSpellSchoolsEndpoint : EndpointWithoutRequest<List<string>>
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var spells = await JsonDataLoader.LoadAsync<List<Spell>>("spells.json", ct);
-
-        var schools = spells?
+        var spells = await _repo.GetSpellsAsync(ct);
+        var schools = spells
             .Select(s => s.School)
             .Distinct()
             .OrderBy(s => s)
-            .ToList() ?? [];
-
+            .ToList();
         await Send.OkAsync(schools, ct);
     }
 }

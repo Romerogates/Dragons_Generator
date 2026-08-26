@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-rations-2j",
+  "name": "Rations (2 journées)",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 5,
+    "unit": "pa"
+  },
+  "weight_kg": 1,
+  "description": "Nourriture déshydratée pour les longs voyages (viande séchée, fruits secs, biscuits, noix)."
+}

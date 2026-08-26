@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-chausse-trappes-20",
+  "name": "Chausse-trappes (20)",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 1,
+    "unit": "po"
+  },
+  "weight_kg": 1,
+  "description": "Action pour couvrir une zone de 1,50 m de côté. JS Dextérité DD 15 ou 1 dégât perforant et réduction de VD de 3 m."
+}

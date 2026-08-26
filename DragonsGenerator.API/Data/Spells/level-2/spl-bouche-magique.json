@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-bouche-magique",
+  "name": "Bouche magique",
+  "level": 2,
+  "school": "illusion",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "permanent",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(un petit rayon de miel et de la poussière de jade d'une valeur minimale de 10 po"
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien"
+  ],
+  "description": "Bouche magique icon Bouche magique icon Vous implantez un message au sein d'un objet situé à portée, message qui sera prononcé au moment où la condition de déclenchement sera remplie. Choisissez un objet que vous voyez et qui n'est ni porté ni transporté par une autre créature. Puis prononcez le message, qui ne doit pas dépasser vingt-cinq mots, même s'il peut être délivré sur 10 minutes. Enfin, fixez les circonstances qui déclencheront la transmission de votre message. Quand les conditions sont réunies, une bouche magique apparaît sur l'objet et récite le message, avec votre voix et aussi fort que vous l'avez-vous-même prononcé. Si l'objet choisi présente une bouche ou ce qui y ressemble (comme la bouche d'une statue), c'est là que la bouche magique apparaît, de sorte que les mots sembleront en sortir. Au moment de l'incantation, vous pouvez faire en sorte que le sort prenne fin une fois le message délivré, mais il peut aussi rester en place et répéter son message chaque fois que les conditions sont réunies. Les conditions de déclenchement sont aussi vagues ou précises que vous le souhaitez, mais doivent s'appuyer sur des paramètres visuels ou auditifs survenant dans un rayon de 9 m de l'objet. Par exemple, vous pourriez demander à la bouche de parler quand une créature s'approche dans un rayon de 9 m, ou lorsqu'une cloche en argent retentit dans un rayon de 9 m.",
+  "modular_options": []
+}

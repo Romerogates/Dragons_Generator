@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-serviteur-invisible",
+  "name": "Serviteur invisible",
+  "level": 1,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un bout de ficelle et un peu de bois"
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Ce sort crée une force invisible, inintelligente et informe qui accomplit les tâches simples que vous lui confiez tant que le sort persiste. Le serviteur naît par terre, dans un espace inoccupé situé à portée. Il présente une CA 10, 1 point de vie, une Force de 2 (charge maximale de 15 kg), une Dextérité de 6, et ne peut pas attaquer. S'il tombe à 0 point de vie, le sort prend fin. Une fois à chacun de vos tours de jeu, vous pouvez lui ordonner de se déplacer jusqu'à 4,50 m et d'interagir avec un objet au prix d'une action. Le serviteur peut s'acquitter des mêmes tâches qu'un domestique humain non qualifié. Il peut aller chercher quelque chose, nettoyer ou plier des vêtements, allumer un feu, servir à manger ou du vin, etc. Après avoir reçu ses ordres, le serviteur y obéit au mieux de ses capacités. Une fois vos instructions menées à bien, il en attend de nouvelles. Si vous lui ordonnez d'effectuer une tâche qui l'éloignerait de plus de 18 m de vous, le sort prend fin. ## L'origine des serviteurs invisibles Selon la tonalité que vous souhaitez donner à votre campagne, serviteur invisible sera un sort neutre ou corrompu en fonction de son origine. Les différentes formes peuvent même être toutes deux accessibles, le lanceur du sort choisissant quelle variante employer au moment de l'incantation. Si le serviteur invisible est issu de votre psyché, le sort est d'harmonique neutre ; en revanche, si c'est une âme errante, le sort est corrompu. ## Une partie de la psyché Le serviteur invisible est une matérialisation de votre psyché. L'effort mental continu requis pour maintenir son existence se traduit par un désavantage à tous vos tests d'Intelligence, de Sagesse et de Charisme pour la durée du sort. En contrepartie, le serviteur invisible dispose des mêmes maîtrises que vous. Il est considéré comme ayant un bonus de maîtrise de +2 et un score de 10 dans la caractéristique associée. Si vous maîtrisez la compétence Dressage, le serviteur invisible est capable de prodiguer des soins aux chevaux ; si vous maîtrisez les outils de la ferme, il peut jardiner, etc. ## Une âme errante Si votre meneur utilise cette option, le serviteur invisible est par défaut l'âme d'un mortel récemment décédé et errant dans le Plan Éthéré. Serviteur invisible est alors automatiquement considéré comme corrompu, le sort capturant temporairement l'âme du malheureux pour le transformer en esclave. Le serviteur invisible peut utiliser les maîtrises qu'il possédait de son vivant, à la discrétion du meneur. Même si le défunt est une âme désincarnée, il demeure un être sensible et souffre de l'asservissement.",
+  "modular_options": []
+}

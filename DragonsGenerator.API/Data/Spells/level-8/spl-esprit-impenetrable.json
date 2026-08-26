@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-esprit-impenetrable",
+  "name": "Esprit impénétrable",
+  "level": 8,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un peu de gaze et une volute de fumée"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien"
+  ],
+  "description": "Logo icon stamp Tant que le sort persiste, une créature consentante que vous touchez est immunisée contre les dégâts psychiques, ainsi que contre tout effet détectant ses émotions ou lisant ses pensées, les sorts de divination et l'état préjudiciable charmé. Cette abjuration se joue même du sort souhait et des sorts et effets de puissance équivalente utilisés pour affecter l'esprit de la cible ou recueillir des informations la concernant. ## Esprits gardiens Vous appelez des esprits protecteurs qui volettent à une distance de 4,50 m de vous pour toute la durée du sort. Si vous êtes bon ou neutre, les formes spectrales ont une apparence angélique ou féerique (à votre convenance). Si vous êtes mauvais, ils évoquent des fiélons. Au moment de l'incantation, vous pouvez désigner autant de créatures que vous voyez que vous le souhaitez et qui ne seront pas affectées. La VD d'une créature affectée est réduite de moitié dans la zone, et quand elle y entre pour la première fois d'un tour de jeu ou y commence son tour de jeu, elle doit effectuer un JS Sagesse et subit 3d8 dégâts radiants (si vous êtes bon ou neutre) ou 3d8 dégâts nécrotiques (si vous êtes mauvais) en cas d'échec, la moitié en cas de réussite. ## État gazeux Vous transformez une créature consentante que vous touchez - ainsi que tout ce qu'elle porte et transporte - en nuage de brume pour toute la durée du sort. Le sort prend fin si la créature tombe à 0 point de vie. Une créature intangible n'est pas affectée. Sous cette forme, la créature a une vitesse de déplacement en vol de 3 m (il s'agit de son seul mode de déplacement). La cible peut entrer dans l'espace d'une autre créature et l'occuper. Elle bénéficie d'une résistance aux dégâts non magiques et d'un avantage aux jets de sauvegarde de Force, de Dextérité et de Constitution. Elle peut se glisser dans un petit trou, une porte entrebâillée ou une simple fissure. En revanche, les liquides constituent des surfaces solides en ce qui la concerne. La cible ne peut pas chuter et reste comme suspendue dans les airs quand elle est étourdie ou neutralisée. Sous forme de brume, la cible ne peut ni parler ni manipuler d'objets. Les objets qu'elle transportait ou tenait ne peuvent pas être lâchés ou utilisés, il est tout bonnement impossible d'interagir avec eux. Enfin, la cible ne peut ni attaquer ni lancer de sorts.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 3e.",
+  "modular_options": []
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-clignotement",
+  "name": "Clignotement",
+  "level": 3,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "and photograph Lancez un d20 à la fin de chacun de vos tours de jeu pour toute la durée du sort. Sur un résultat de 11+, vous vous évanouissez de votre plan d'existence et apparaissez dans le Plan Éthéré (mais le sort échoue et l'incantation est perdue si vous vous y trouvez déjà). Au début de votre tour de jeu suivant - et quand le sort prend fin si vous êtes encore dans le Plan Éthéré -, vous regagnez un espace inoccupé de votre choix que vous voyez dans un rayon de 3 m de l'espace dont vous avez disparu. Si aucun espace inoccupé n'est disponible à portée, vous réapparaissez dans l'espace inoccupé le plus proche (déterminé aléatoirement si plusieurs sont à même distance). Vous pouvez révoquer ce sort au prix d'une action. Lorsque vous êtes sur le Plan Éthéré, vous entendez et voyez ce qui se passe sur le plan d'où vous êtes venu, qui est projeté en nuances de gris. Votre champ de vision s'y limite cependant à un rayon de 18 m. Vous pouvez juste affecter les créatures situées sur le Plan Éthéré, et vice versa. Les créatures qui ne s'y trouvent pas ne vous perçoivent pas et ne peuvent pas interagir avec vous, à moins qu'elles en aient les moyens spécifiques. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, le résultat nécessaire pour disparaître dans le Plan Éthéré est réduit de 1 par niveau d'emplacement au-dessus du 3e. Il passe ainsi à 10+ au 4e niveau, puis 9+ au 5e niveau et ainsi de suite.",
+  "modular_options": []
+}

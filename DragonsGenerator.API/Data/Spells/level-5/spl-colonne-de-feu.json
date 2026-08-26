@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-colonne-de-feu",
+  "name": "Colonne de feu",
+  "level": 5,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une pincée de soufre"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "Une colonne de flammes divines tombe du ciel dans un lieu de votre choix. Chaque créature prise dans un cylindre de 3 m de rayon et de 12 m de haut centré sur un point situé à portée doit effectuer un JS Dextérité, et subit 4d6 dégâts de feu et 4d6 dégâts radiants en cas d'échec, la moitié en cas de réussite.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, les dégâts de feu ou les dégâts radiants (à votre convenance) augmentent de 1d6 par niveau d'emplacement au-dessus du 5e.",
+  "modular_options": []
+}

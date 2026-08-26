@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "don-secours",
+  "name": "Secours",
+  "requires_magic": false,
+  "category": "exploration",
+  "prerequisites": [],
+  "description": "Si vous prodiguez des soins à un allié à votre tour : pas d'attaque d'opportunité sur vos déplacements + PV temporaires = bonus_maitrise (1 fois/tour). Quand un allié subit un coup critique ou tombe à 0 PV : vous pouvez jouer votre réaction pour vous déplacer jusqu'à votre VD vers cet allié (sans attaque d'opportunité). Stabiliser une créature coûte une action bonus (au lieu d'action).",
+  "benefits": [
+    {
+      "type": "no_opportunity_attack",
+      "condition": "tour où vous soignez un allié"
+    },
+    {
+      "type": "temp_hp_self",
+      "formula": "bonus_maitrise",
+      "trigger": "soigner un allié (1/tour)"
+    },
+    {
+      "type": "reaction_movement",
+      "trigger": "allié à 0 PV ou coup critique",
+      "effect": "VD vers allié (sans AO)"
+    },
+    {
+      "type": "stabilize_as_bonus_action"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "soins",
+    "soutien",
+    "médecine"
+  ]
+}

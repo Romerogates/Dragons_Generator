@@ -1,0 +1,20 @@
+{
+  "schema_version": "2.0",
+  "id": "ar-armure-de-plaques",
+  "name": "Armure de plaques",
+  "category": "armor",
+  "subcategory": "medium",
+  "cost": {
+    "value": 750,
+    "unit": "po"
+  },
+  "weight_kg": 20,
+  "ac_base": 15,
+  "dex_modifier": {
+    "type": "max2"
+  },
+  "max_dex_bonus": null,
+  "str_required": 12,
+  "stealth_disadvantage": true,
+  "description": "Série de plaques ajustées couvrant l'essentiel du corps, avec de simples jambières. Désavantage aux tests de Force (Athlétisme) pour nager et de Dextérité (Acrobaties)."
+}

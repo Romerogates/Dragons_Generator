@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-controle-du-climat",
+  "name": "Contrôle du climat",
+  "level": 8,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 10,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 8,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "de l'encens brûlant et un peu de terre et de bois mélangés dans de l'eau"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-magicien",
+    "cls-pretre"
+  ],
+  "description": "Vous prenez le contrôle du climat dans un rayon de 7,5 km pour toute la durée du sort. Vous devez être dehors pour jeter ce sort. Si vous vous déplacez vers un lieu où vous ne distinguez pas clairement le ciel, le sort prend fin prématurément. Au moment de l'incantation, vous modifiez les conditions climatiques, déterminées par le meneur en fonction du temps et de la saison. Vous pouvez modifier les précipitations, la température et le vent, mais le nouveau temps met 1d4 × 10 minutes à s'installer. Ensuite, rien ne vous empêche de les modifier à nouveau. Le temps revient progressivement à la normale quand le sort prend fin. Quand vous modifiez les conditions météorologiques, commencez par trouver le temps qu'il fait sur les tables suivantes, et changez-les d'un cran, dans un sens ou dans l'autre. Quand vous modifiez le vent, vous pouvez aussi changer la direction dans laquelle il souffle. ## Précipitations Nuages épars Couvert ou brouillard Pluie, grêle ou neige Pluie torrentielle, orage de grêle ou blizzard ## Température Chaleur accablante Froid arctique Vent modéré",
+  "modular_options": []
+}

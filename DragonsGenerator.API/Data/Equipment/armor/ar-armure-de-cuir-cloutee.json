@@ -1,0 +1,20 @@
+{
+  "schema_version": "2.0",
+  "id": "ar-armure-de-cuir-cloutee",
+  "name": "Armure de cuir cloutée",
+  "category": "armor",
+  "subcategory": "light",
+  "cost": {
+    "value": 45,
+    "unit": "po"
+  },
+  "weight_kg": 6.5,
+  "ac_base": 12,
+  "dex_modifier": {
+    "type": "full"
+  },
+  "max_dex_bonus": null,
+  "str_required": null,
+  "stealth_disadvantage": false,
+  "description": "Cuir épais mais souple renforcé de rivets ou clous."
+}

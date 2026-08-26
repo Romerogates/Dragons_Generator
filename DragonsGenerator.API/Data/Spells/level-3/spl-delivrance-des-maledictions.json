@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-delivrance-des-maledictions",
+  "name": "Délivrance des malédictions",
+  "level": 3,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien",
+    "cls-paladin",
+    "cls-pretre",
+    "cls-sorcier"
+  ],
+  "description": "Vous touchez une créature ou un objet, et toutes les malédictions qui l'affectent sont levées. Si la cible est un objet magique maudit, la malédiction n'est pas supprimée, mais le sort brise l'affinité de son propriétaire avec l'objet, si bien qu'il peut le retirer ou s'en débarrasser. ## La puissance de la magie noire Pour lever une malédiction ou suspendre temporairement l'effet d'un objet maudit, il faut utiliser un emplacement de sort d'un niveau au moins égal à celui utilisé pour générer la malédiction. Dans le cas d'un objet maudit, le tableau ci-après indique la concordance entre la rareté de l'objet et le niveau de sort associé : Rareté de l'objet Niveau de sort ## Les multiples formes des demi-plans Les demi-plans sont des espaces intermédiaires dont la nature intéresse les invocateurs au plus haut point. Certains demi-plans sont très grands, assez pour y habiter durablement. La création de tels lieux nécessite des préparatifs importants, impliquant souvent des mois de travail arcanique. Au gré de leurs voyages, les aventuriers pourront ainsi découvrir des demi-plans aux caractéristiques étranges, façonnés par des magiciens reclus, des incantateurs imaginatifs, des héros soucieux d'emprisonner des créatures abominables, etc.",
+  "modular_options": []
+}

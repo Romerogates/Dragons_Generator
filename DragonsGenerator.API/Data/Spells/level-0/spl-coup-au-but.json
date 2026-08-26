@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-coup-au-but",
+  "name": "Coup au but",
+  "level": 0,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "round"
+  },
+  "components": {
+    "v": false,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Ce sort vous permet d'anticiper les difficultés d'une action que vous vous apprêtez à accomplir. Choisissez un effet parmi les suivants : ### Avantage à l'attaque Vous tendez le doigt vers une cible située à portée pour mieux saisir l'étendue de ses défenses, ne serait-ce que brièvement. Lors de votre tour de jeu suivant, vous bénéficiez d'un avantage à votre premier jet d'attaque contre la cible, pourvu que le sort n'ait pas déjà pris fin.",
+  "modular_options": []
+}

@@ -1,18 +1,14 @@
-﻿
+﻿using DragonsGenerator.API.Common;
+using FastEndpoints;
 
 namespace DragonsGenerator.API.Endpoints.Species;
 
-public record SpeciesSummary(
-    string Id,
-    string Name,
-    string Size,
-    double SpeedM,
-    double DarkvisionM,
-    int PlayableSubspeciesCount
-);
-
-public class GetSpeciesSummaryEndpoint : EndpointWithoutRequest<List<SpeciesSummary>>
+public class GetSpeciesSummaryEndpoint : EndpointWithoutRequest<List<SpeciesSummaryDto>>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetSpeciesSummaryEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/species/summary");
@@ -21,19 +17,7 @@ public class GetSpeciesSummaryEndpoint : EndpointWithoutRequest<List<SpeciesSumm
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var data = await JsonDataLoader.LoadAsync<SpeciesData>("species.json", ct);
-
-        var summaries = data?.Species
-            .Select(s => new SpeciesSummary(
-                Id: s.Id,
-                Name: s.Name,
-                Size: s.BaseStats.Size,
-                SpeedM: s.BaseStats.SpeedM,
-                DarkvisionM: s.BaseStats.DarkvisionM,
-                PlayableSubspeciesCount: s.Subspecies.Count(sub => sub.Playable)
-            ))
-            .ToList() ?? [];
-
+        var summaries = await _repo.GetSpeciesSummaryAsync(ct);
         await Send.OkAsync(summaries, ct);
     }
 }

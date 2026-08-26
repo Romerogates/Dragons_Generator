@@ -1,0 +1,22 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-tumiit",
+  "name": "Tumiit",
+  "category": "exotique",
+  "typical_speakers": [
+    "Géants des tempêtes",
+    "Habitants des ruines boréales"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-tumiit",
+      "label": "Tumiit",
+      "type": "syllabaire"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [
+    "Ruines boréales"
+  ],
+  "description": "Langue des ruines boréales et des géants des tempêtes. Elle possède son propre syllabaire (tumiit), également adopté par certaines cultures tropicales comme l'aupuniwi."
+}

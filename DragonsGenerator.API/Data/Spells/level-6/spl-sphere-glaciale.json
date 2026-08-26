@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-sphere-glaciale",
+  "name": "Sphère glaciale",
+  "level": 6,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 90,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une petite sphère en cristal"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien"
+  ],
+  "description": "ArR de me i gy can shad dyryhdyk Laeim Came py po hy dye h e a m gn h ho Ahtdy w odnto to io phiunke supole metn gr i phie po matn Un globe d'énergie glaciale jaillit de vos doigts en direction d'un point de votre choix situé à portée, où il explose en une sphère de 18 m de rayon. Toute créature prise dans la zone doit effectuer un JS Constitution et subit 10d6 dégâts de froid en cas d'échec, la moitié en cas de réussite. Si le globe frappe une étendue d'eau ou un liquide principalement composé d'eau (ce qui n'inclut pas les créatures liées à l'élément Eau), il gèle le liquide en question sur une épaisseur de 15 cm dans une zone de 9 m de côté. Cette glace persiste pendant 1 minute. Les créatures qui nageaient à la surface du liquide gelé sont prises au piège dans la glace. Une créature piégée de la sorte peut, au prix d'une action, effectuer un test de Force assorti de votre DD de sauvegarde des sorts pour se libérer. Si vous le préférez, vous pouvez retenir le globe au terme de l'incantation. Dans ce cas, c'est une sphère de la taille d'une bille de fronde et froide au toucher qui apparaît dans votre main. À tout moment, vous - ou la créature à laquelle vous confiez la bille - pouvez la jeter (jusqu'à 12 m) ou la lancer à l'aide d'une fronde (portée normale de l'arme). Elle se brise à l'impact et produit l'effet détaillé ci-dessus. Enfin, vous pouvez poser le globe sans le briser. S'il n'a pas été brisé entre temps, il explose au bout de 1 minute.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau ou supérieur, les dégâts augmentent de 1d6 par niveau d'emplacement au-dessus du 6e.",
+  "modular_options": []
+}

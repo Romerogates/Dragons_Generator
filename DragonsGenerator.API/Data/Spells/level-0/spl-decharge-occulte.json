@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-decharge-occulte",
+  "name": "Décharge occulte",
+  "level": 0,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-sorcier"
+  ],
+  "description": "Un rayon d'énergie crépitante file vers une créature située à portée. Effectuez une attaque de sort à distance contre la cible. En cas de réussite, elle subit 1d10 dégâts de force. Le nombre de rayons créés par le sort augmente lorsque vous atteignez certains niveaux : deux au niveau 5, trois au niveau 11, et quatre au niveau 17. Les rayons peuvent viser différentes cibles. Effectuez un jet d'attaque distinct pour chacun d'entre eux.",
+  "modular_options": []
+}

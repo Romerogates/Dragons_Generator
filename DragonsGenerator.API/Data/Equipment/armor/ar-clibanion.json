@@ -1,0 +1,20 @@
+{
+  "schema_version": "2.0",
+  "id": "ar-clibanion",
+  "name": "Clibanion",
+  "category": "armor",
+  "subcategory": "heavy",
+  "cost": {
+    "value": 200,
+    "unit": "po"
+  },
+  "weight_kg": 30,
+  "ac_base": 17,
+  "dex_modifier": {
+    "type": "none"
+  },
+  "max_dex_bonus": null,
+  "str_required": 15,
+  "stealth_disadvantage": true,
+  "description": "Bandes de métal verticales rivetées sur une tunique de cuir, avec articulations en cotte de mailles. Désavantage aux tests de Force (Athlétisme) pour nager et de Dextérité (Acrobaties)."
+}

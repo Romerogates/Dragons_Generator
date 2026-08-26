@@ -1,0 +1,221 @@
+{
+  "schema_version": "2.0",
+  "id": "sp-gnome",
+  "name": "Gnomes",
+  "name_alt": [],
+  "playable": true,
+  "requires_subspecies": true,
+  "source": {
+    "book": "Dragons - Livre de base: Aventuriers",
+    "pages": "39-41"
+  },
+  "flavor": {
+    "summary": "Petits, inventifs et curieux, les gnomes sont connus pour leur intelligence vive, leur imagination débordante et leur goût pour la mécanique, la magie et les innovations en tout genre.",
+    "culture": "Les gnomes s'organisent en corporations et cherchent à conquérir de nouveaux marchés avec leurs automates, mécanismes ingénieux, potions cosmétiques et luminaires élégants. Les gnomes du haut de leurs îles volantes sont des marchands téméraires peu regardants sur leur clientèle.",
+    "lore_notes": [
+      "Les gnomes furent des artificiers cruciaux durant la guerre de l'Aube, posant des explosifs dans les galeries souterraines pour écraser les troupes du Chancre. Beaucoup ne revinrent jamais ; certains se transformèrent en svirfnebelins.",
+      "La bonhomie des gnomes ne doit pas faire négliger le danger de leurs inventions : elles n'explosent pas toujours par accident et les fumées dégagées peuvent être mortelles."
+    ]
+  },
+  "base_stats": {
+    "ability_score_increase": {
+      "int": 2
+    },
+    "speed": {
+      "base_m": 7.5,
+      "not_reduced_by_heavy_armor": false
+    },
+    "size": "P",
+    "darkvision_m": 18,
+    "age": {
+      "maturity_years": 40,
+      "lifespan_years": 350,
+      "lifespan_max_years": 500,
+      "flavor": "Développement humain, mais âge adulte vers la quarantaine. Espérance de vie de 350 à 500 ans."
+    },
+    "alignment": {
+      "tendency": "Bon",
+      "flavor": "Souvent bons. Les gnomes Loyaux sont érudits ou inventeurs ; les Chaotiques sont ménestrels, filous ou joailliers novateurs."
+    }
+  },
+  "traits": [
+    {
+      "id": "trait-vision-noir-gnome",
+      "name": "Vision dans le noir",
+      "flavor": {
+        "desc": "Né de la terre, vous êtes doté d'une vision supérieure dans les ténèbres et la pénombre. Dans un rayon de 18 m, vous voyez en lumière faible comme en lumière vive, et dans l'obscurité comme en lumière faible (nuances de gris)."
+      },
+      "mechanics": {
+        "type": "darkvision",
+        "range_m": 18
+      }
+    },
+    {
+      "id": "trait-ruse-gnome",
+      "name": "Ruse gnome",
+      "flavor": {
+        "desc": "Vous bénéficiez d'un avantage à tous les jets de sauvegarde d'Intelligence, de Sagesse et de Charisme contre la magie."
+      },
+      "mechanics": {
+        "type": "compound",
+        "advantages": [
+          {
+            "type": "saving_throw",
+            "target": "int",
+            "condition": "contre la magie"
+          },
+          {
+            "type": "saving_throw",
+            "target": "wis",
+            "condition": "contre la magie"
+          },
+          {
+            "type": "saving_throw",
+            "target": "cha",
+            "condition": "contre la magie"
+          }
+        ]
+      }
+    }
+  ],
+  "creation_choices": [
+    {
+      "id": "choice-langue-regionale-gnome",
+      "name": "Langue de résidence",
+      "flavor": {
+        "desc": "Les gnomes de la surface parlent le commun ; ceux de l'Inframonde pratiquent le commun des profondeurs."
+      },
+      "type": "language",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        "lg-commun",
+        "lg-commun-des-profondeurs"
+      ]
+    }
+  ],
+  "languages": {
+    "fixed": [
+      "lg-gnome"
+    ],
+    "choices": [
+      {
+        "id": "choice-langue-regionale-gnome",
+        "allow_choice": true,
+        "quantity": 1,
+        "pool": [
+          "lg-commun",
+          "lg-commun-des-profondeurs"
+        ]
+      }
+    ]
+  },
+  "subspecies": [
+    {
+      "id": "sp-gnome-roches",
+      "name": "Gnomes des roches",
+      "playable": true,
+      "flavor": {
+        "desc": "Inventifs et adroits, les gnomes des roches ont une allure parfois qualifiée de 'mignonne'. Teint clair, yeux dans les nuances de bleu, gris, mauve ou teintes irisées, chevelures allant de l'argenté au blond pâle."
+      },
+      "ability_score_increase": {
+        "dex": 1
+      },
+      "traits": [
+        {
+          "id": "trait-artificier",
+          "name": "Artificier",
+          "flavor": {
+            "desc": "Chaque fois que vous effectuez un test d'Intelligence (Histoire) lié aux objets magiques, aux ustensiles alchimiques ou aux appareils technologiques, on considère que vous êtes doté de la maîtrise de la compétence Histoire en appliquant le double de votre bonus de maîtrise."
+          },
+          "mechanics": {
+            "type": "context_expertise",
+            "skill": "skill-histoire",
+            "context_trigger": "objets_magiques_alchimie_technologie",
+            "effect": "double_proficiency_bonus"
+          }
+        },
+        {
+          "id": "trait-bricoleur",
+          "name": "Bricoleur",
+          "flavor": {
+            "desc": "Vous bénéficiez de la maîtrise des outils de rétameur. En vous servant de cet équipement, vous pouvez fabriquer un objet mécanique de taille TP (CA 5, 1 pv) au prix d'une heure de travail et de 10 po de matériaux. L'objet cesse de fonctionner au bout de 24 heures (sauf réparation de 1 heure) ou quand vous le démontez (action libre ; vous récupérez les matériaux). Vous ne pouvez disposer simultanément de plus de dispositifs opérationnels que votre modificateur d'Intelligence."
+          },
+          "mechanics": {
+            "type": "crafting_ability",
+            "tool_proficiency_granted": "tl-outils-de-retameur",
+            "crafted_object": {
+              "size": "TP",
+              "ac": 5,
+              "hp": 1,
+              "craft_time_hours": 1,
+              "craft_cost_gp": 10,
+              "duration_hours": 24,
+              "repair_time_hours": 1,
+              "max_simultaneous": "modificateur_int",
+              "options": [
+                {
+                  "id": "bricoleur-jouet-mecanique",
+                  "name": "Jouet mécanique",
+                  "desc": "Animal, monstre ou personnage mécanique se déplaçant de 1,50 m à chaque tour dans une direction aléatoire et produisant des sons évocateurs de la créature représentée."
+                },
+                {
+                  "id": "bricoleur-amorceur",
+                  "name": "Amorceur",
+                  "desc": "Produit une petite flamme permettant d'allumer une bougie, une torche ou un feu de camp. Utilisation au prix d'une action."
+                },
+                {
+                  "id": "bricoleur-boite-a-musique",
+                  "name": "Boîte à musique",
+                  "desc": "Produit une mélodie fixe à volume mesuré jusqu'à la fin du morceau ou jusqu'à ce qu'on la ferme."
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "creation_choices": [
+        {
+          "id": "choice-pilote-gnome-roches",
+          "name": "Pilote",
+          "flavor": {
+            "desc": "Vous gagnez une maîtrise d'outil au choix parmi les véhicules terrestres, maritimes ou aériens."
+          },
+          "type": "tool_proficiency",
+          "allow_choice": true,
+          "quantity": 1,
+          "pool": [
+            {
+              "id": "tl-vehicules-terrestres",
+              "name": "Véhicules terrestres",
+              "category": "vehicule"
+            },
+            {
+              "id": "tl-vehicules-maritimes",
+              "name": "Véhicules maritimes",
+              "category": "vehicule"
+            },
+            {
+              "id": "tl-vehicules-aeriens",
+              "name": "Véhicules aériens",
+              "category": "vehicule"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sp-gnome-svirfnebelin",
+      "name": "Svirfnebelins",
+      "playable": false,
+      "playable_notes": "Les svirfnebelins sont apparus après la guerre de l'Aube et ne font pas partie des peuples piliers. Il peut exister des aventuriers svirfnebelins sur Eana.",
+      "flavor": {
+        "desc": "Cousins de l'Inframonde des gnomes des roches. Teint oscillant entre le gris et le bleu nuit, voire le noir ; cheveux gris ou blancs. Contrairement aux drows et duergars, ils n'ont pas de penchant pour le Mal."
+      },
+      "ability_score_increase": {},
+      "traits": [],
+      "creation_choices": []
+    }
+  ],
+  "optional_rules": []
+}

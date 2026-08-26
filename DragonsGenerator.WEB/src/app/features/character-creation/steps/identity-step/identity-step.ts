@@ -87,7 +87,7 @@ export class IdentityStep implements OnInit {
     this.dataService
       .generateBackstory({
         name: char.name,
-        sex: char.sex, // <-- AJOUTÉ
+        sex: char.sex || 'X',
         speciesName: char.speciesName,
         subspeciesName: char.subspeciesName,
         civilizationName: char.civilizationName ?? 'Inconnue',
@@ -105,7 +105,18 @@ export class IdentityStep implements OnInit {
         },
         error: (err) => {
           console.error('Erreur IA:', err);
-          this.generationError.set("L'inspiration cosmique est momentanément indisponible.");
+          const e = err?.error;
+          const apiMsg =
+            e?.errors?.generalErrors?.[0] ||
+            e?.errors?.[0]?.reason ||
+            e?.errors?.[0]?.message ||
+            e?.message ||
+            null;
+          this.generationError.set(
+            apiMsg && apiMsg !== 'One or more errors occurred!'
+              ? apiMsg
+              : "L'inspiration cosmique est momentanément indisponible. Vérifiez la clé Groq côté API.",
+          );
           this.isGenerating.set(false);
         },
       });

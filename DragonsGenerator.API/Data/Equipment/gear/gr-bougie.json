@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-bougie",
+  "name": "Bougie",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 5,
+    "unit": "pc"
+  },
+  "weight_kg": null,
+  "description": "Émet une lumière vive dans un rayon de 1,50 m et une lumière faible sur 1,50 m de plus pendant 1 heure."
+}

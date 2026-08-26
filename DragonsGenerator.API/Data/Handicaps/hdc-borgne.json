@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "hdc-borgne",
+  "name": "Borgne",
+  "source": "livre_de_base",
+  "description": "Vous avez perdu l'un de vos yeux dans des circonstances dramatiques. Vous subissez un désavantage à tout test de caractéristique dépendant essentiellement de la vue.",
+  "mechanics": {
+    "disadvantage_on": [
+      "Perception (vue)",
+      "Survie (pistage visuel)",
+      "Investigation (observation)"
+    ]
+  }
+}

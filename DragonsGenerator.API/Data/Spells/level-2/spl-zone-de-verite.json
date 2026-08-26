@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-zone-de-verite",
+  "name": "Zone de vérité",
+  "level": 2,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-paladin",
+    "cls-pretre"
+  ],
+  "description": "Vous créez une zone magique qui protège de la duplicité. Cette zone prend la forme d'une sphère de 4,50 m de rayon centrée sur un point de votre choix à portée. Tant que le sort persiste, toute créature qui entre dans la zone pour la première fois d'un tour de jeu ou y commence son tour de jeu doit effectuer un JS Charisme. En cas d'échec, elle ne peut mentir intentionnellement dans la sphère. Vous savez pour chaque créature si elle réussit ou rate son jet de sauvegarde. Une créature affectée est consciente du sort et peut donc se soustraire aux questions auxquelles elle répondrait par des mensonges. Il lui suffit pour cela de rester suffisamment évasive tout en disant la vérité. ## La différence entre conviction et vérité La limite entre vérité et mensonge est parfois floue. En l'occurrence, la « vérité » de ce sort se rapporte à ce que la cible pense être vrai, pas à ce qui l'est objectivement. Il fonctionnera lorsqu'un locuteur tentera de dissimuler ce qu'il tient comme la vérité, mais rien ne garantit que celle-ci corresponde à la réalité des faits. Cela signifie que même s'il fonctionne, ce sort pourra induire son lanceur en erreur d'une des façons suivantes : Fourvoiement. À force de s'enfoncer dans ses propres mensonges, un individu pourra finir par y croire réellement. De la sorte, il pensera dire la vérité à son propre insu. Faux souvenirs. L'esprit n'aime pas l'ambiguïté, de sorte qu'en cas d'incertitude, il comble ou reconstitue des détails, parfois jusqu'à créer de faux souvenirs. Une personne participant à une fête où un crime a eu lieu pourra croire avoir vu l'assassin fuir dans la panique, simplement par surinterprétation de vacillements d'ombres. Il peut ainsi arriver que l'usage du sort zone de vérité aboutisse à des témoignages différents sur des mêmes faits, chaque témoin ayant créé sa vérité. Manipulation. Des techniques de manipulation plus ou moins complexes et longues permettent d'implanter un souvenir dans l'esprit d'une personne. Il n'est nullement nécessaire de faire appel à la magie : seule la connaissance de l'esprit et de ses faiblesses suffit. L'artifice consiste alors à insérer un souvenir dans une zone de flou de la mémoire. Il ne faut pas beaucoup de temps pour convaincre une personne influençable d'un détail crédible (présence d'un objet, couleur d'un drapeau, ouverture d'une fenêtre, etc.). En disposant d'assez de temps et d'une bonne méthode, il est même possible de convaincre quelqu'un qu'il a commis un délit plusieurs années auparavant. Une fois convaincue, la victime de telles manipulations croit sincèrement ce qu'elle dit.",
+  "modular_options": []
+}

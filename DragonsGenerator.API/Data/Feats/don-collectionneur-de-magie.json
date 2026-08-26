@@ -1,0 +1,23 @@
+{
+  "schema_version": "2.0",
+  "id": "don-collectionneur-de-magie",
+  "name": "Collectionneur de magie",
+  "requires_magic": false,
+  "category": "magic",
+  "prerequisites": [],
+  "description": "Vous pouvez entretenir une affinité avec jusqu'à 5 objets magiques (au lieu de 3). Vous ne tenez pas compte des restrictions de classe, de race ou de niveau pour l'utilisation des objets magiques.",
+  "benefits": [
+    {
+      "type": "magic_item_attunement",
+      "max": 5
+    },
+    {
+      "type": "ignore_magic_item_restrictions"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "objets-magiques",
+    "affinité"
+  ]
+}

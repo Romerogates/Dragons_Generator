@@ -1,0 +1,2213 @@
+{
+  "id": "cls-pretre",
+  "schema_version": "3.0",
+  "name": "Prêtre",
+  "flavor": {
+    "summary": "Intermédiaire entre les mortels et le divin, le prêtre puise sa magie dans la foi et la dévotion envers sa divinité pour soigner, protéger et combattre au nom de son dieu.",
+    "lore_note": "Sur Eana, les prêtres sont des personnalités souvent influentes : conseillers des puissants, chefs spirituels ou gardiens de secrets ancestraux. Chaque divinité donne accès à deux domaines spécifiques."
+  },
+  "hit_die": "1d8",
+  "hp_at_level_1": 8,
+  "hp_per_level_average": 5,
+  "primary_abilities": [
+    "wis"
+  ],
+  "saving_throw_proficiencies": [
+    "wis",
+    "cha"
+  ],
+  "armor_proficiencies": [
+    "ar-light",
+    "ar-medium",
+    "ar-shield"
+  ],
+  "weapon_proficiencies": [
+    "category-simple-weapons"
+  ],
+  "tool_proficiencies": [],
+  "choice_pools": [
+    {
+      "id": "choice-skills-cls-pretre",
+      "name": "Compétences de classe",
+      "type": "skill_proficiency",
+      "allow_choice": true,
+      "quantity": 2,
+      "pool": [
+        "skill-histoire",
+        "skill-intuition",
+        "skill-medecine",
+        "skill-persuasion",
+        "skill-religion"
+      ]
+    },
+    {
+      "id": "choice-language-cls-pretre",
+      "name": "Langue exotique",
+      "type": "language_proficiency",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        "category-exotic-languages"
+      ]
+    }
+  ],
+  "spellcasting": {
+    "ability": "wis",
+    "spell_list_class": "cls-pretre",
+    "is_ritual_caster": true,
+    "focuser": "category-holy-symbol",
+    "starts_at_level": 1,
+    "prepared_formula": "wis_mod + class_level",
+    "domain_spells_always_prepared": true,
+    "type": "prepared",
+    "spell_dc_formula": "8 + proficiency_bonus + wis_mod",
+    "spell_attack_formula": "proficiency_bonus + wis_mod"
+  },
+  "starting_equipment": {
+    "fixed": [
+      {
+        "id": "it-ss-amulette",
+        "qty": 1
+      }
+    ],
+    "choice_pools": [
+      {
+        "id": "choice-equip-arme-cls-pretre",
+        "name": "Arme principale",
+        "type": "equipment",
+        "allow_choice": true,
+        "quantity": 1,
+        "options": [
+          {
+            "option_id": "A",
+            "items": [{ "id": "wp-masse-darmes", "qty": 1 }]
+          },
+          {
+            "option_id": "B",
+            "items": [{ "id": "wp-marteau-de-guerre", "qty": 1 }]
+          }
+        ]
+      },
+      {
+        "id": "choice-equip-armure-cls-pretre",
+        "name": "Armure",
+        "type": "equipment",
+        "allow_choice": true,
+        "quantity": 1,
+        "options": [
+          {
+            "option_id": "A",
+            "items": [{ "id": "ar-armure-decailles", "qty": 1 }]
+          },
+          {
+            "option_id": "B",
+            "items": [{ "id": "ar-armure-de-cuir", "qty": 1 }]
+          },
+          {
+            "option_id": "C",
+            "items": [{ "id": "ar-cotte-de-mailles", "qty": 1 }]
+          }
+        ]
+      },
+      {
+        "id": "choice-equip-secondaire-cls-pretre",
+        "name": "Arme secondaire",
+        "type": "equipment",
+        "allow_choice": true,
+        "quantity": 1,
+        "options": [
+          {
+            "option_id": "A",
+            "items": [
+              { "id": "wp-arbalete-legere", "qty": 1 },
+              { "id": "it-carreaux", "qty": 1 }
+            ]
+          },
+          {
+            "option_id": "B",
+            "items": [{ "id": "wp-cat-simple", "qty": 1 }]
+          }
+        ]
+      },
+      {
+        "id": "choice-equip-sac-cls-pretre",
+        "name": "Sac d'équipement",
+        "type": "equipment",
+        "allow_choice": true,
+        "quantity": 1,
+        "options": [
+          {
+            "option_id": "A",
+            "items": [{ "id": "gr-sac-de-religieux", "qty": 1 }]
+          },
+          {
+            "option_id": "B",
+            "items": [{ "id": "gr-sac-dexplorateur", "qty": 1 }]
+          }
+        ]
+      }
+    ]
+  },
+  "progression": [
+    {
+      "level": 1,
+      "subclass_choice": true,
+      "subclass_feature_grant": true,
+      "features": [
+        "feat-incantation-pretre",
+        "feat-domaine-divin"
+      ],
+      "resources": {
+        "cantrips_known": 3,
+        "conduit_divin_uses": 0,
+        "spell_slots": {
+          "1": 2
+        }
+      },
+      "spell_choices": [
+        {
+          "id": "choice-cantrips-pretre-niv1",
+          "type": "cantrip",
+          "count": 3,
+          "label": "Choisissez 3 sorts mineurs de prêtre",
+          "filter": {
+            "spell_level": 0,
+            "class": "cls-pretre"
+          }
+        }
+      ],
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 2,
+      "subclass_feature_grant": true,
+      "features": [
+        "feat-conduit-divin",
+        "feat-conduit-divin-renvoi-morts-vivants",
+        "feat-aptitude-domaine-2"
+      ],
+      "resources": {
+        "cantrips_known": 3,
+        "conduit_divin_uses": 1,
+        "spell_slots": {
+          "1": 3
+        }
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 3,
+      "features": [],
+      "resources": {
+        "cantrips_known": 3,
+        "conduit_divin_uses": 1,
+        "spell_slots": {
+          "1": 4,
+          "2": 2
+        }
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 4,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "cantrips_known": 4,
+        "conduit_divin_uses": 1,
+        "spell_slots": {
+          "1": 4,
+          "2": 3
+        }
+      },
+      "spell_choices": [
+        {
+          "id": "choice-cantrips-pretre-niv4",
+          "type": "cantrip",
+          "count": 1,
+          "label": "Choisissez 1 sort mineur de prêtre supplémentaire",
+          "filter": {
+            "spell_level": 0,
+            "class": "cls-pretre"
+          }
+        }
+      ],
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 5,
+      "features": [
+        "feat-destruction-morts-vivants"
+      ],
+      "resources": {
+        "cantrips_known": 4,
+        "conduit_divin_uses": 1,
+        "destruction_mv_fp_threshold": 0.5,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 2
+        }
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 6,
+      "subclass_feature_grant": true,
+      "features": [
+        "feat-conduit-divin-2repos",
+        "feat-aptitude-domaine-6"
+      ],
+      "feature_upgrades": [
+        "feat-conduit-divin"
+      ],
+      "resources": {
+        "cantrips_known": 4,
+        "conduit_divin_uses": 2,
+        "destruction_mv_fp_threshold": 0.5,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3
+        }
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 7,
+      "features": [],
+      "resources": {
+        "cantrips_known": 4,
+        "conduit_divin_uses": 2,
+        "destruction_mv_fp_threshold": 0.5,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 1
+        }
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 8,
+      "subclass_feature_grant": true,
+      "features": [
+        "feat-augmentation-de-caracteristique",
+        "feat-destruction-mv-fp1",
+        "feat-aptitude-domaine-8"
+      ],
+      "feature_upgrades": [
+        "feat-destruction-morts-vivants"
+      ],
+      "resources": {
+        "cantrips_known": 4,
+        "conduit_divin_uses": 2,
+        "destruction_mv_fp_threshold": 1,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 2
+        }
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 9,
+      "features": [],
+      "resources": {
+        "cantrips_known": 4,
+        "conduit_divin_uses": 2,
+        "destruction_mv_fp_threshold": 1,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 1
+        }
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 10,
+      "features": [
+        "feat-intervention-divine"
+      ],
+      "resources": {
+        "cantrips_known": 5,
+        "conduit_divin_uses": 2,
+        "destruction_mv_fp_threshold": 1,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2
+        }
+      },
+      "spell_choices": [
+        {
+          "id": "choice-cantrips-pretre-niv10",
+          "type": "cantrip",
+          "count": 1,
+          "label": "Choisissez 1 sort mineur de prêtre supplémentaire",
+          "filter": {
+            "spell_level": 0,
+            "class": "cls-pretre"
+          }
+        }
+      ],
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 11,
+      "features": [
+        "feat-destruction-mv-fp2"
+      ],
+      "feature_upgrades": [
+        "feat-destruction-morts-vivants"
+      ],
+      "resources": {
+        "cantrips_known": 5,
+        "conduit_divin_uses": 2,
+        "destruction_mv_fp_threshold": 2,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2,
+          "6": 1
+        }
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 12,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "cantrips_known": 5,
+        "conduit_divin_uses": 2,
+        "destruction_mv_fp_threshold": 2,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2,
+          "6": 1
+        }
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 13,
+      "features": [],
+      "resources": {
+        "cantrips_known": 5,
+        "conduit_divin_uses": 2,
+        "destruction_mv_fp_threshold": 2,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2,
+          "6": 1,
+          "7": 1
+        }
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 14,
+      "features": [
+        "feat-destruction-mv-fp3"
+      ],
+      "feature_upgrades": [
+        "feat-destruction-morts-vivants"
+      ],
+      "resources": {
+        "cantrips_known": 5,
+        "conduit_divin_uses": 2,
+        "destruction_mv_fp_threshold": 3,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2,
+          "6": 1,
+          "7": 1
+        }
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 15,
+      "features": [],
+      "resources": {
+        "cantrips_known": 5,
+        "conduit_divin_uses": 2,
+        "destruction_mv_fp_threshold": 3,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2,
+          "6": 1,
+          "7": 1,
+          "8": 1
+        }
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 16,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "cantrips_known": 5,
+        "conduit_divin_uses": 2,
+        "destruction_mv_fp_threshold": 3,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2,
+          "6": 1,
+          "7": 1,
+          "8": 1
+        }
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 17,
+      "subclass_feature_grant": true,
+      "features": [
+        "feat-destruction-mv-fp4",
+        "feat-aptitude-domaine-17"
+      ],
+      "feature_upgrades": [
+        "feat-destruction-morts-vivants"
+      ],
+      "resources": {
+        "cantrips_known": 5,
+        "conduit_divin_uses": 2,
+        "destruction_mv_fp_threshold": 4,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 2,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1
+        }
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 18,
+      "features": [
+        "feat-conduit-divin-3repos"
+      ],
+      "feature_upgrades": [
+        "feat-conduit-divin"
+      ],
+      "resources": {
+        "cantrips_known": 5,
+        "conduit_divin_uses": 3,
+        "destruction_mv_fp_threshold": 4,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 3,
+          "6": 1,
+          "7": 1,
+          "8": 1,
+          "9": 1
+        }
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 19,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "cantrips_known": 5,
+        "conduit_divin_uses": 3,
+        "destruction_mv_fp_threshold": 4,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 3,
+          "6": 2,
+          "7": 1,
+          "8": 1,
+          "9": 1
+        }
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 20,
+      "features": [
+        "feat-amelioration-intervention-divine"
+      ],
+      "feature_upgrades": [
+        "feat-intervention-divine"
+      ],
+      "resources": {
+        "cantrips_known": 5,
+        "conduit_divin_uses": 3,
+        "destruction_mv_fp_threshold": 4,
+        "spell_slots": {
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 3,
+          "5": 3,
+          "6": 2,
+          "7": 2,
+          "8": 1,
+          "9": 1
+        }
+      },
+      "proficiency_bonus": 6
+    }
+  ],
+  "features_details": [
+    {
+      "id": "feat-incantation-pretre",
+      "name": "Sorts",
+      "unlocks_at_level": 1,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Intermédiaire de votre divinité, vous lancez des sorts de prêtre préparés chaque jour après un repos long, selon une formule basée sur votre Sagesse.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "spellcasting_ability": "wis",
+        "prepared_formula": "wis_mod + class_level",
+        "save_dc_formula": "8 + prof_bonus + wis_mod",
+        "attack_bonus_formula": "prof_bonus + wis_mod",
+        "ritual_casting": true,
+        "focuser": "category-holy-symbol",
+        "preparation_change": "after_long_rest",
+        "preparation_time_per_level": "1_minute"
+      }
+    },
+    {
+      "id": "feat-domaine-divin",
+      "name": "Domaine divin",
+      "unlocks_at_level": 1,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Choisissez un domaine parmi : Étrange, Force, Indicible, Partage, Temps, Vie ou Voyage. Ce choix octroie des sorts de domaine toujours préparés et des aptitudes aux niveaux 1, 2, 6, 8 et 17.",
+        "lore_note": "Chaque divinité d'Eana est associée à deux domaines. Exemples : Mort → Indicible/Temps, Forgeron → Force/Partage, Givreuse → Temps/Vie."
+      },
+      "mechanics": {
+        "subclass_key": "subclasses",
+        "subclass_feature_levels": [
+          1,
+          2,
+          6,
+          8,
+          17
+        ],
+        "domain_spells_always_prepared": true
+      }
+    },
+    {
+      "id": "feat-conduit-divin",
+      "name": "Conduit divin",
+      "unlocks_at_level": 2,
+      "recharge": "short_rest",
+      "flavor": {
+        "summary": "Vous canalisez l'énergie divine pour produire des effets magiques. Vous disposez de Renvoi des morts-vivants plus un ou plusieurs effets propres à votre domaine.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "uses_key": "conduit_divin_uses",
+        "upgrades": [
+          {
+            "at_level": 2,
+            "uses": 1
+          },
+          {
+            "at_level": 6,
+            "uses": 2
+          },
+          {
+            "at_level": 18,
+            "uses": 3
+          }
+        ],
+        "save_dc_formula": "spell_save_dc",
+        "base_effects": [
+          "feat-conduit-divin-renvoi-morts-vivants"
+        ],
+        "domain_effects": "see_subclass"
+      }
+    },
+    {
+      "id": "feat-conduit-divin-renvoi-morts-vivants",
+      "name": "Conduit divin : Renvoi des morts-vivants",
+      "unlocks_at_level": 2,
+      "recharge": "short_rest",
+      "flavor": {
+        "summary": "Vous brandissez votre symbole sacré et récitez une prière de condamnation : chaque mort-vivant dans un rayon de 9m doit réussir un JS Sagesse ou être renvoyé pendant 1 minute.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "action_type": "action",
+        "area": {
+          "type": "sphere",
+          "radius_m": 9
+        },
+        "target": "undead",
+        "saving_throw": {
+          "ability": "wis",
+          "dc_formula": "spell_save_dc"
+        },
+        "on_failure": {
+          "condition": "renvoyé",
+          "duration": "1_minute_or_until_takes_damage",
+          "movement": "flee_max_distance_from_caster",
+          "no_reactions": true,
+          "allowed_actions": [
+            "dash",
+            "escape_restraint"
+          ],
+          "fallback_action": "dodge"
+        }
+      }
+    },
+    {
+      "id": "feat-augmentation-de-caracteristique",
+      "name": "Augmentation de caractéristique",
+      "unlocks_at_level": 4,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Augmentez une valeur de caractéristique de 2, ou deux valeurs de 1 chacune. Maximum 20.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "recurrence_levels": [
+          4,
+          8,
+          12,
+          16,
+          19
+        ],
+        "options": [
+          {
+            "type": "single_stat_increase",
+            "value": 2
+          },
+          {
+            "type": "dual_stat_increase",
+            "value": 1
+          }
+        ],
+        "max_stat_value": 20
+      }
+    },
+    {
+      "id": "feat-destruction-morts-vivants",
+      "name": "Destruction des morts-vivants",
+      "unlocks_at_level": 5,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Les morts-vivants qui ratent le jet contre Renvoi des morts-vivants sont détruits si leur FP est inférieur ou égal au seuil du niveau actuel.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "trigger": "undead_fails_turn_undead_save",
+        "fp_threshold_by_level": {
+          "5": 0.5,
+          "8": 1,
+          "11": 2,
+          "14": 3,
+          "17": 4
+        }
+      }
+    },
+    {
+      "id": "feat-intervention-divine",
+      "name": "Intervention divine",
+      "unlocks_at_level": 10,
+      "recharge": "long_rest",
+      "flavor": {
+        "summary": "Implorer la divinité coûte votre action. Lancez 1d100 : si le résultat ≤ votre niveau de prêtre, la divinité intervient (effets décidés par le meneur). En cas de réussite, inutilisable 7 jours. Au niveau 20, l'intervention est automatique.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "action_type": "action",
+        "uses": 1,
+        "roll": "1d100",
+        "success_condition": "roll_lte_class_level",
+        "on_success_cooldown_days": 7,
+        "on_failure_recovery": "long_rest",
+        "upgrades": [
+          {
+            "at_level": 20,
+            "automatic_success": true,
+            "no_roll_required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "feat-aptitude-domaine-2",
+      "name": "Aptitude de Domaine (niveau 2)",
+      "unlocks_at_level": 2,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Aptitude conférée par le Domaine divin choisi au niveau 2.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_feature_delegate",
+        "delegate_to_subclass": true,
+        "at_level": 2
+      }
+    },
+    {
+      "id": "feat-conduit-divin-2repos",
+      "name": "Conduit divin (2/repos)",
+      "unlocks_at_level": 6,
+      "recharge": "short_or_long_rest",
+      "flavor": {
+        "summary": "Le prêtre peut désormais utiliser le Conduit divin deux fois par repos court ou long.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "feature_upgrade",
+        "upgrades_feature": "feat-conduit-divin",
+        "key": "uses_per_rest",
+        "new_value": 2
+      }
+    },
+    {
+      "id": "feat-aptitude-domaine-6",
+      "name": "Aptitude de Domaine (niveau 6)",
+      "unlocks_at_level": 6,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Aptitude conférée par le Domaine divin choisi au niveau 6.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_feature_delegate",
+        "delegate_to_subclass": true,
+        "at_level": 6
+      }
+    },
+    {
+      "id": "feat-destruction-mv-fp1",
+      "name": "Destruction des morts-vivants (FP 1)",
+      "unlocks_at_level": 8,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Le seuil de Facteur de Puissance pour la destruction automatique des morts-vivants passe à FP 1 ou inférieur.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "feature_upgrade",
+        "upgrades_feature": "feat-destruction-morts-vivants",
+        "key": "max_cr_destroyed",
+        "new_value": 1,
+        "scaling": [
+          {
+            "level": 5,
+            "max_cr": 0.5,
+            "label": "FP ½"
+          },
+          {
+            "level": 8,
+            "max_cr": 1,
+            "label": "FP 1"
+          },
+          {
+            "level": 11,
+            "max_cr": 2,
+            "label": "FP 2"
+          },
+          {
+            "level": 14,
+            "max_cr": 3,
+            "label": "FP 3"
+          },
+          {
+            "level": 17,
+            "max_cr": 4,
+            "label": "FP 4"
+          }
+        ]
+      }
+    },
+    {
+      "id": "feat-aptitude-domaine-8",
+      "name": "Aptitude de Domaine (niveau 8)",
+      "unlocks_at_level": 8,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Aptitude conférée par le Domaine divin choisi au niveau 8.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_feature_delegate",
+        "delegate_to_subclass": true,
+        "at_level": 8
+      }
+    },
+    {
+      "id": "feat-destruction-mv-fp2",
+      "name": "Destruction des morts-vivants (FP 2)",
+      "unlocks_at_level": 11,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Le seuil de Facteur de Puissance pour la destruction automatique des morts-vivants passe à FP 2 ou inférieur.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "feature_upgrade",
+        "upgrades_feature": "feat-destruction-morts-vivants",
+        "key": "max_cr_destroyed",
+        "new_value": 2
+      }
+    },
+    {
+      "id": "feat-destruction-mv-fp3",
+      "name": "Destruction des morts-vivants (FP 3)",
+      "unlocks_at_level": 14,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Le seuil de Facteur de Puissance pour la destruction automatique des morts-vivants passe à FP 3 ou inférieur.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "feature_upgrade",
+        "upgrades_feature": "feat-destruction-morts-vivants",
+        "key": "max_cr_destroyed",
+        "new_value": 3
+      }
+    },
+    {
+      "id": "feat-destruction-mv-fp4",
+      "name": "Destruction des morts-vivants (FP 4)",
+      "unlocks_at_level": 17,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Le seuil de Facteur de Puissance pour la destruction automatique des morts-vivants passe à FP 4 ou inférieur.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "feature_upgrade",
+        "upgrades_feature": "feat-destruction-morts-vivants",
+        "key": "max_cr_destroyed",
+        "new_value": 4
+      }
+    },
+    {
+      "id": "feat-aptitude-domaine-17",
+      "name": "Aptitude de Domaine (niveau 17)",
+      "unlocks_at_level": 17,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Aptitude conférée par le Domaine divin choisi au niveau 17.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "subclass_feature_delegate",
+        "delegate_to_subclass": true,
+        "at_level": 17
+      }
+    },
+    {
+      "id": "feat-conduit-divin-3repos",
+      "name": "Conduit divin (3/repos)",
+      "unlocks_at_level": 18,
+      "recharge": "short_or_long_rest",
+      "flavor": {
+        "summary": "Le prêtre peut désormais utiliser le Conduit divin trois fois par repos court ou long.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "feature_upgrade",
+        "upgrades_feature": "feat-conduit-divin",
+        "key": "uses_per_rest",
+        "new_value": 3
+      }
+    },
+    {
+      "id": "feat-amelioration-intervention-divine",
+      "name": "Amélioration d'Intervention divine",
+      "unlocks_at_level": 20,
+      "recharge": "long_rest",
+      "flavor": {
+        "summary": "L'intervention divine est garantie au niveau 20 — aucun jet nécessaire, elle réussit automatiquement.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "type": "feature_upgrade",
+        "upgrades_feature": "feat-intervention-divine",
+        "key": "auto_success",
+        "new_value": true,
+        "overrides": "requires_roll"
+      }
+    }
+  ],
+  "subclasses": {
+    "name": "Domaine divin",
+    "level_unlocked": 1,
+    "feature_grant_levels": [
+      1,
+      2,
+      6,
+      8,
+      17
+    ],
+    "options": [
+      {
+        "id": "subcls-domaine-de-letrange",
+        "name": "Étrange",
+        "flavor": {
+          "summary": "Ce domaine incarne l'entropie, la dissymétrie et le hasard. Ses prêtres maîtrisent l'art de déstabiliser l'ennemi, de renverser la tendance et d'inspirer la terreur.",
+          "lore_note": "Associé aux divinités : Façonneur, Nuit."
+        },
+        "bonus_proficiencies": {
+          "armor": [
+            "category-heavy-armor"
+          ],
+          "skills": [
+            "skill-intimidation",
+            "skill-tromperie"
+          ]
+        },
+        "bonus_spells_granted": [
+          {
+            "level_unlocked": 1,
+            "always_prepared": true,
+            "spells": [
+              "spl-blessure",
+              "spl-simulacre-de-vie"
+            ]
+          },
+          {
+            "level_unlocked": 3,
+            "always_prepared": true,
+            "spells": [
+              "spl-cecite-surdite",
+              "spl-rayon-affaiblissant"
+            ]
+          },
+          {
+            "level_unlocked": 5,
+            "always_prepared": true,
+            "spells": [
+              "spl-baiser-du-vampire",
+              "spl-malediction"
+            ]
+          },
+          {
+            "level_unlocked": 7,
+            "always_prepared": true,
+            "spells": [
+              "spl-confusion",
+              "spl-fletrissement"
+            ]
+          },
+          {
+            "level_unlocked": 9,
+            "always_prepared": true,
+            "spells": [
+              "spl-contagion",
+              "spl-domination-de-personne"
+            ]
+          }
+        ],
+        "features": [
+          {
+            "id": "feat-aura-lunatique",
+            "name": "Aura lunatique",
+            "unlocks_at_level": 1,
+            "recharge": "long_rest",
+            "flavor": {
+              "summary": "À la fin d'un repos long, lancez 1d6 pour déterminer votre aura du jour (1-2 : intimidante, 3-4 : réflexe, 5-6 : belliqueuse). Utilisable wis_mod fois.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "daily_roll": "1d6",
+              "uses_formula": "wis_mod",
+              "aura_table": {
+                "1-2": {
+                  "type": "intimidante",
+                  "trigger": "opponent_attacks_you",
+                  "action_type": "reaction",
+                  "effect": "attacker_disadvantage_on_attack_roll"
+                },
+                "3-4": {
+                  "type": "reflexe",
+                  "trigger": "combat_starts_not_surprised",
+                  "effect": "allies_within_6m_advantage_on_attacks_first_round_vs_unacted_enemies"
+                },
+                "5-6": {
+                  "type": "belliqueuse",
+                  "trigger": "make_weapon_or_spell_attack",
+                  "action_type": "bonus_action",
+                  "effect": "self_advantage_on_attack_roll"
+                }
+              }
+            }
+          },
+          {
+            "id": "feat-conduit-divin-trompe-la-mort",
+            "name": "Conduit divin : Trompe la mort",
+            "unlocks_at_level": 2,
+            "recharge": "short_rest",
+            "flavor": {
+              "summary": "Réaction : quand un allié visible tombe à 0 PV, il bascule brièvement dans l'Éthéré et ne subit aucun dégât ni effet. Chaque utilisation inflige un niveau de fatigue.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_type": "reaction",
+              "trigger": "visible_ally_drops_to_0_hp",
+              "effect": "target_avoids_all_damage_and_effects_of_trigger",
+              "cost_on_use": "one_exhaustion_level"
+            }
+          },
+          {
+            "id": "feat-conduit-divin-cruelle-misericorde",
+            "name": "Conduit divin : Cruelle miséricorde",
+            "unlocks_at_level": 6,
+            "recharge": "short_rest",
+            "flavor": {
+              "summary": "Réaction : quand vous faites tomber une créature à 0 PV, épargnez-la et dominez-la pendant wis_mod rounds (tant qu'elle vous voit). Elle est hostile à l'issue.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_type": "reaction",
+              "trigger": "self_reduces_creature_to_0_hp",
+              "effect": "target_spared_and_dominated",
+              "duration_formula": "wis_mod_rounds",
+              "duration_condition": "while_target_sees_caster",
+              "after_effect": "target_becomes_hostile"
+            }
+          },
+          {
+            "id": "feat-frappe-alienante",
+            "name": "Frappe aliénante",
+            "unlocks_at_level": 8,
+            "recharge": "at_will",
+            "flavor": {
+              "summary": "Après une attaque d'arme réussie, dépensez une action bonus : la cible effectue un JS Sagesse ou est désorientée jusqu'à la fin de son tour suivant. Au niveau 14 : reste désorientée jusqu'à réussir le JS (réitéré chaque fin de tour, immunité 24h).",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_type": "bonus_action",
+              "trigger": "successful_weapon_attack_this_turn",
+              "saving_throw": {
+                "ability": "wis",
+                "dc_formula": "spell_save_dc"
+              },
+              "on_failure": "disoriented_until_end_of_next_turn",
+              "upgrades": [
+                {
+                  "at_level": 14,
+                  "on_failure": "disoriented_until_successful_save",
+                  "save_retry": "end_of_each_of_targets_turns",
+                  "immunity_on_save_hours": 24
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-presence-terrifiante",
+            "name": "Présence terrifiante",
+            "unlocks_at_level": 17,
+            "recharge": "long_rest",
+            "flavor": {
+              "summary": "Action : aura de terreur 18m pendant 1 minute (concentration). Chaque ennemi commençant son tour dans l'aura doit réussir un JS Sagesse ou être effrayé. Immunité 24h après réussite.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_type": "action",
+              "uses_formula": "wis_mod",
+              "area": {
+                "type": "sphere",
+                "radius_m": 18
+              },
+              "duration_minutes": 1,
+              "concentration": true,
+              "trigger": "hostile_starts_turn_in_aura",
+              "saving_throw": {
+                "ability": "wis",
+                "dc_formula": "spell_save_dc"
+              },
+              "on_failure": "frightened_for_duration",
+              "immunity_on_save_hours": 24
+            }
+          }
+        ]
+      },
+      {
+        "id": "subcls-domaine-de-la-force",
+        "name": "Force",
+        "flavor": {
+          "summary": "Ce domaine recoupe la puissance physique, la gravité et la force mentale. Ses prêtres sont des guerriers divins capables d'exploits physiques surhumains.",
+          "lore_note": "Associé aux divinités : Forgeron, Tempête."
+        },
+        "bonus_proficiencies": {
+          "weapons": [
+            "category-martial-weapons"
+          ],
+          "skills": [
+            "skill-acrobaties",
+            "skill-athletisme"
+          ]
+        },
+        "bonus_spells_granted": [
+          {
+            "level_unlocked": 1,
+            "always_prepared": true,
+            "spells": [
+              "spl-repli-expeditif",
+              "spl-saut"
+            ]
+          },
+          {
+            "level_unlocked": 3,
+            "always_prepared": true,
+            "spells": [
+              "spl-amelioration-de-caracteristique",
+              "spl-peau-decorce"
+            ]
+          },
+          {
+            "level_unlocked": 5,
+            "always_prepared": true,
+            "spells": [
+              "spl-protection-contre-lenergie",
+              "spl-rapidite"
+            ]
+          },
+          {
+            "level_unlocked": 7,
+            "always_prepared": true,
+            "spells": [
+              "spl-liberte-de-mouvement",
+              "spl-peau-de-pierre"
+            ]
+          },
+          {
+            "level_unlocked": 9,
+            "always_prepared": true,
+            "spells": [
+              "spl-immobilisation-de-monstre",
+              "spl-restauration-supreme"
+            ]
+          }
+        ],
+        "features": [
+          {
+            "id": "feat-prouesse-physique",
+            "name": "Prouesse physique",
+            "unlocks_at_level": 1,
+            "recharge": "long_rest",
+            "flavor": {
+              "summary": "Action bonus : doublez votre VD jusqu'à votre prochain tour, OU gagnez +10 aux tests de Force (Athlétisme) et Dextérité (Acrobaties) jusqu'à votre prochain tour.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_type": "bonus_action",
+              "uses_formula": "wis_mod",
+              "options": [
+                {
+                  "type": "speed_multiplier",
+                  "multiplier": 2,
+                  "duration": "until_start_of_next_turn"
+                },
+                {
+                  "type": "skill_bonus",
+                  "skills": [
+                    "skill-athletisme",
+                    "skill-acrobaties"
+                  ],
+                  "bonus": 10,
+                  "duration": "until_start_of_next_turn"
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-conduit-divin-fort-comme-un-taureau",
+            "name": "Conduit divin : Fort comme un taureau",
+            "unlocks_at_level": 2,
+            "recharge": "short_rest",
+            "flavor": {
+              "summary": "Réaction après une attaque de corps à corps réussie : infligez des dégâts de force supplémentaires = 2×bonus de maîtrise, puis tentez gratuitement une bousculade avec avantage.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_type": "reaction",
+              "trigger": "successful_melee_weapon_attack",
+              "extra_damage": {
+                "formula": "2 * prof_bonus",
+                "type": "force"
+              },
+              "bonus_action_free": {
+                "type": "shove",
+                "roll": "str_athletics",
+                "advantages": [
+                  {
+                    "type": "skill_check",
+                    "target": "self",
+                    "skill": "skill-athletisme"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "feat-conduit-divin-rafale-divine",
+            "name": "Conduit divin : Rafale divine",
+            "unlocks_at_level": 6,
+            "recharge": "short_rest",
+            "flavor": {
+              "summary": "À votre tour, action : effectuez wis_mod attaques de corps à corps (minimum 1). Ce tour, vos déplacements ne provoquent pas d'attaques d'opportunité.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_type": "action",
+              "attack_count_formula": "max(wis_mod, 1)",
+              "attack_type": "melee_weapon",
+              "no_opportunity_attacks_this_turn": true
+            }
+          },
+          {
+            "id": "feat-impact-divin-force",
+            "name": "Impact divin (Force)",
+            "unlocks_at_level": 8,
+            "recharge": "at_will",
+            "flavor": {
+              "summary": "Une fois par tour, quand vous touchez avec une arme : 1d8 dégâts de force supplémentaires (2d8 au niveau 14).",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "successful_weapon_attack",
+              "frequency": "once_per_turn",
+              "extra_damage": {
+                "base": "1d8",
+                "type": "force"
+              },
+              "upgrades": [
+                {
+                  "at_level": 14,
+                  "extra_damage": {
+                    "base": "2d8",
+                    "type": "force"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-resonance-de-lairain",
+            "name": "Résonance de l'airain",
+            "unlocks_at_level": 17,
+            "recharge": "long_rest",
+            "flavor": {
+              "summary": "Action bonus : +5 CA pendant wis_mod rounds (minimum 1). Durant cet effet, tout attaquant de CaC vous touchant doit réussir un JS Constitution ou être étourdi jusqu'au début de son prochain tour.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_type": "bonus_action",
+              "uses": 1,
+              "ac_bonus": 5,
+              "duration_formula": "max(wis_mod, 1)_rounds",
+              "aura_effect": {
+                "trigger": "melee_attacker_hits_self",
+                "saving_throw": {
+                  "ability": "con",
+                  "dc_formula": "spell_save_dc"
+                },
+                "on_failure": "stunned_until_start_of_attacker_next_turn"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "subcls-domaine-de-lindicible",
+        "name": "Indicible",
+        "flavor": {
+          "summary": "Ce domaine est celui des tabous, de la mort et des secrets insoutenables. Ses prêtres ont apprivoisé l'angoisse existentielle pour la distiller contre leurs ennemis.",
+          "lore_note": "Associé aux divinités : Mort, Nuit."
+        },
+        "bonus_proficiencies": {
+          "skills": [
+            "skill-arcanes",
+            "skill-tromperie"
+          ]
+        },
+        "bonus_spells_granted": [
+          {
+            "level_unlocked": 1,
+            "always_prepared": true,
+            "spells": [
+              "spl-deguisement",
+              "spl-imprecation"
+            ]
+          },
+          {
+            "level_unlocked": 3,
+            "always_prepared": true,
+            "spells": [
+              "spl-invisibilite",
+              "spl-silence"
+            ]
+          },
+          {
+            "level_unlocked": 5,
+            "always_prepared": true,
+            "spells": [
+              "spl-antidetection",
+              "spl-communication-avec-les-morts"
+            ]
+          },
+          {
+            "level_unlocked": 7,
+            "always_prepared": true,
+            "spells": [
+              "spl-divination",
+              "spl-protection-contre-la-mort"
+            ]
+          },
+          {
+            "level_unlocked": 9,
+            "always_prepared": true,
+            "spells": [
+              "spl-faux-semblant",
+              "spl-quete"
+            ]
+          }
+        ],
+        "features": [
+          {
+            "id": "feat-gardien-du-secret",
+            "name": "Gardien du secret",
+            "unlocks_at_level": 1,
+            "recharge": "at_will",
+            "flavor": {
+              "summary": "Vous lancez vos sorts sans composantes verbales. Action bonus : envoyez un message silencieux à une créature visible à 18m (compréhensible uniquement par lecture labiale).",
+              "lore_note": null
+            },
+            "mechanics": {
+              "passive_effect": "remove_verbal_spell_components",
+              "bonus_action_effect": {
+                "action_type": "bonus_action",
+                "range_m": 18,
+                "condition": "target_visible",
+                "silent_message": true,
+                "perception_method": "lip_reading_only"
+              }
+            }
+          },
+          {
+            "id": "feat-conduit-divin-silence-sacre",
+            "name": "Conduit divin : Silence sacré",
+            "unlocks_at_level": 2,
+            "recharge": "short_rest",
+            "flavor": {
+              "summary": "Réaction : quand une créature à 36m s'apprête à parler ou lancer un sort, JS Sagesse ou les mots sont bloqués et le sort perdu. Un deuxième échec → tait le sujet jusqu'au repos long.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_type": "reaction",
+              "range_m": 36,
+              "trigger": "creature_about_to_speak_or_cast",
+              "saving_throw": {
+                "ability": "wis",
+                "dc_formula": "spell_save_dc",
+                "retry": "end_of_each_of_targets_turns"
+              },
+              "on_first_failure": "words_blocked_and_spell_lost",
+              "on_second_failure": "silenced_on_subject_until_long_rest"
+            }
+          },
+          {
+            "id": "feat-conduit-divin-offrande-funeste",
+            "name": "Conduit divin : Offrande funeste",
+            "unlocks_at_level": 6,
+            "recharge": "short_rest",
+            "flavor": {
+              "summary": "Action : attaque de sort au corps à corps → 2d10 dégâts nécrotiques ou radiants (au choix). En cas de réussite, une deuxième créature à 27m subit le double des dégâts (JS Constitution ou Sagesse pour demi).",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_type": "action",
+              "attack_type": "melee_spell_attack",
+              "primary_damage": {
+                "dice": "2d10",
+                "type_choice": [
+                  "necrotic",
+                  "radiant"
+                ]
+              },
+              "chain_effect": {
+                "second_target_range_m": 27,
+                "condition": "primary_attack_hit",
+                "damage_multiplier": 2,
+                "saving_throw": {
+                  "ability_choice": [
+                    "con",
+                    "wis"
+                  ],
+                  "dc_formula": "spell_save_dc"
+                },
+                "on_save": "half_damage"
+              }
+            }
+          },
+          {
+            "id": "feat-frappe-divine-indicible",
+            "name": "Frappe divine (Indicible)",
+            "unlocks_at_level": 8,
+            "recharge": "at_will",
+            "flavor": {
+              "summary": "Une fois par tour, quand vous touchez avec une arme : 1d8 dégâts nécrotiques supplémentaires (2d8 au niveau 14).",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "successful_weapon_attack",
+              "frequency": "once_per_turn",
+              "extra_damage": {
+                "base": "1d8",
+                "type": "necrotic"
+              },
+              "upgrades": [
+                {
+                  "at_level": 14,
+                  "extra_damage": {
+                    "base": "2d8",
+                    "type": "necrotic"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-verite-ultime",
+            "name": "Vérité ultime",
+            "unlocks_at_level": 17,
+            "recharge": "at_will",
+            "flavor": {
+              "summary": "Toute créature qui tente de vous attaquer doit d'abord réussir un JS Sagesse. En cas d'échec, elle perd son attaque et est frappée de folie jusqu'à la fin de son tour.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "hostile_creature_attempts_to_attack_self",
+              "saving_throw": {
+                "ability": "wis",
+                "dc_formula": "spell_save_dc"
+              },
+              "on_failure": [
+                "attack_action_lost",
+                "incapacitated_until_end_of_their_turn"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "subcls-domaine-du-partage",
+        "name": "Partage",
+        "flavor": {
+          "summary": "Ce domaine représente l'échange, le sacrifice de soi, la communion et la symbiose. Ses prêtres sont médiateurs, pédagogues et défenseurs des déshérités.",
+          "lore_note": "Associé aux divinités : Forgeron, Flore."
+        },
+        "bonus_proficiencies": {
+          "skills": [
+            "skill-persuasion"
+          ],
+          "expertise": [
+            "skill-persuasion"
+          ]
+        },
+        "bonus_spells_granted": [
+          {
+            "level_unlocked": 1,
+            "always_prepared": true,
+            "spells": [
+              "spl-charme-personne",
+              "spl-mot-de-guerison"
+            ]
+          },
+          {
+            "level_unlocked": 3,
+            "always_prepared": true,
+            "spells": [
+              "spl-amelioration-de-caracteristique",
+              "spl-augure"
+            ]
+          },
+          {
+            "level_unlocked": 5,
+            "always_prepared": true,
+            "spells": [
+              "spl-delivrance-des-maledictions",
+              "spl-don-des-langues"
+            ]
+          },
+          {
+            "level_unlocked": 7,
+            "always_prepared": true,
+            "spells": [
+              "spl-divination",
+              "spl-protecteur-de-la-foi"
+            ]
+          },
+          {
+            "level_unlocked": 9,
+            "always_prepared": true,
+            "spells": [
+              "spl-mythes-et-legendes",
+              "spl-sanctification"
+            ]
+          }
+        ],
+        "features": [
+          {
+            "id": "feat-polyglotte",
+            "name": "Polyglotte",
+            "unlocks_at_level": 1,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Vous parlez, lisez et écrivez trois langues supplémentaires, dont une exotique obligatoire.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "bonus_languages": 3,
+              "required_exotic_count": 1
+            }
+          },
+          {
+            "id": "feat-conduit-divin-grace-divine",
+            "name": "Conduit divin : Grâce divine",
+            "unlocks_at_level": 2,
+            "recharge": "short_rest",
+            "flavor": {
+              "summary": "Action : obtenez la maîtrise temporaire d'une compétence, d'un outil, d'une arme ou d'une armure au choix pendant 10 minutes.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_type": "action",
+              "duration_minutes": 10,
+              "grants_temporary_proficiency_type_choice": [
+                "skill",
+                "tool",
+                "weapon",
+                "armor"
+              ]
+            }
+          },
+          {
+            "id": "feat-conduit-divin-miracle",
+            "name": "Conduit divin : Miracle",
+            "unlocks_at_level": 6,
+            "recharge": "short_rest",
+            "flavor": {
+              "summary": "Action : dépensez un emplacement de sort pour lancer n'importe quel sort non préparé de niveau équivalent (toute liste de classe), à condition que son temps d'incantation soit 1 action ou 1 action bonus. Composantes matérielles à coût requises.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_type": "action",
+              "spell_slot_cost": "equals_target_spell_level",
+              "source": "any_class_spell_list",
+              "max_casting_time_allowed": "1_bonus_action",
+              "material_components_with_cost": "required"
+            }
+          },
+          {
+            "id": "feat-apaisement",
+            "name": "Apaisement",
+            "unlocks_at_level": 8,
+            "recharge": "at_will",
+            "flavor": {
+              "summary": "Pour désamorcer un conflit ou entamer un dialogue en situation houleuse, vous avez avantage à Charisme (Persuasion/Tromperie). Vos interlocuteurs ont désavantage à Sagesse (Intuition) et Charisme (Intimidation).",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "social_deescalation_or_dialogue_in_conflict",
+              "advantages": [
+                {
+                  "type": "skill_check",
+                  "target": "self",
+                  "skill": "skill-persuasion"
+                },
+                {
+                  "type": "skill_check",
+                  "target": "self",
+                  "skill": "skill-tromperie"
+                }
+              ],
+              "disadvantages": [
+                {
+                  "type": "skill_check",
+                  "target": "opponents",
+                  "skill": "skill-intuition"
+                },
+                {
+                  "type": "skill_check",
+                  "target": "opponents",
+                  "skill": "skill-intimidation"
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-harmonie-de-la-communaute",
+            "name": "Harmonie de la communauté",
+            "unlocks_at_level": 17,
+            "recharge": "at_will",
+            "flavor": {
+              "summary": "Tant qu'un allié se trouve dans un rayon de 9m de vous, vous bénéficiez tous deux de l'avantage à tous les jets de sauvegarde.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "aura_radius_m": 9,
+              "advantages": [
+                {
+                  "type": "saving_throw",
+                  "target": "self_and_each_ally_in_aura",
+                  "condition": "all_saving_throws"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "subcls-domaine-du-temps",
+        "name": "Temps",
+        "flavor": {
+          "summary": "Ces prêtres ont appris à amadouer le flux temporel, à entrevoir l'histoire et la vérité, et à altérer imperceptiblement leur environnement pour surprendre l'adversité.",
+          "lore_note": "Associé aux divinités : Mort, Givreuse."
+        },
+        "bonus_proficiencies": {
+          "skills": [
+            "skill-arcanes",
+            "skill-histoire"
+          ]
+        },
+        "bonus_spells_granted": [
+          {
+            "level_unlocked": 1,
+            "always_prepared": true,
+            "spells": [
+              "spl-repli-expeditif",
+              "spl-sanctuaire"
+            ]
+          },
+          {
+            "level_unlocked": 3,
+            "always_prepared": true,
+            "spells": [
+              "spl-immobilisation-de-personne",
+              "spl-marche-de-brume"
+            ]
+          },
+          {
+            "level_unlocked": 5,
+            "always_prepared": true,
+            "spells": [
+              "spl-lenteur",
+              "spl-rapidite"
+            ]
+          },
+          {
+            "level_unlocked": 7,
+            "always_prepared": true,
+            "spells": [
+              "spl-liberte-de-mouvement",
+              "spl-porte-dimensionnelle"
+            ]
+          },
+          {
+            "level_unlocked": 9,
+            "always_prepared": true,
+            "spells": [
+              "spl-immobilisation-de-monstre",
+              "spl-mythes-et-legendes"
+            ]
+          }
+        ],
+        "features": [
+          {
+            "id": "feat-ascendant-temporel",
+            "name": "Ascendant temporel",
+            "unlocks_at_level": 1,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Votre perception du temps vous donne un avantage permanent à tous vos jets d'initiative.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "advantages": [
+                {
+                  "type": "initiative",
+                  "target": "self",
+                  "condition": "permanent"
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-conduit-divin-instant-decisif",
+            "name": "Conduit divin : Instant décisif",
+            "unlocks_at_level": 2,
+            "recharge": "short_rest",
+            "flavor": {
+              "summary": "Action bonus durant le premier round si aucune créature n'a encore agi : augmentez de +10 l'initiative de wis_mod créatures consentantes que vous choisissez.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_type": "bonus_action",
+              "trigger": "first_round_before_any_creature_has_acted",
+              "target_count_formula": "wis_mod",
+              "target_type": "willing_creatures",
+              "effect": "initiative_bonus",
+              "bonus_value": 10
+            }
+          },
+          {
+            "id": "feat-conduit-divin-soubresaut-du-pendule",
+            "name": "Conduit divin : Soubresaut du pendule",
+            "unlocks_at_level": 6,
+            "recharge": "short_rest",
+            "flavor": {
+              "summary": "Réaction quand vous ou un allié êtes touchés par une attaque de CaC : l'attaquant rejoue son jet avec désavantage. Si réussite malgré tout → relance les dégâts. Si échec → JS Sagesse ou effrayé jusqu'à fin de son tour suivant.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_type": "reaction",
+              "trigger": "self_or_ally_hit_by_melee_attack",
+              "can_wait_for_damage_roll": true,
+              "attacker_rerolls_attack": "with_disadvantage",
+              "on_second_hit": "attacker_rerolls_damage",
+              "on_second_miss": {
+                "saving_throw": {
+                  "ability": "wis",
+                  "dc_formula": "spell_save_dc"
+                },
+                "on_failure": "frightened_until_end_of_attacker_next_turn"
+              }
+            }
+          },
+          {
+            "id": "feat-suspension-divine",
+            "name": "Suspension divine",
+            "unlocks_at_level": 8,
+            "recharge": "at_will",
+            "flavor": {
+              "summary": "Une fois par tour, quand vous touchez avec une arme : 1d8 dégâts psychiques supplémentaires (2d8 au niveau 14).",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "successful_weapon_attack",
+              "frequency": "once_per_turn",
+              "extra_damage": {
+                "base": "1d8",
+                "type": "psychic"
+              },
+              "upgrades": [
+                {
+                  "at_level": 14,
+                  "extra_damage": {
+                    "base": "2d8",
+                    "type": "psychic"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-gardien-du-sablier",
+            "name": "Gardien du sablier",
+            "unlocks_at_level": 17,
+            "recharge": "long_rest",
+            "flavor": {
+              "summary": "Action bonus : aura asynchrone 9m jusqu'au début de votre prochain tour. Vous et vos alliés dans l'aura bénéficient des effets de Rapidité (l'action bonus peut lancer un sort d'1 action). Aucune torpeur consécutive.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_type": "bonus_action",
+              "uses_formula": "wis_mod",
+              "area": {
+                "type": "sphere",
+                "radius_m": 9
+              },
+              "duration": "until_start_of_casters_next_turn",
+              "effect": "haste_equivalent_for_allies",
+              "haste_overrides": {
+                "bonus_action_allows_casting_1_action_spell": true,
+                "no_lethargy_after": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "subcls-domaine-de-la-vie",
+        "name": "Vie",
+        "flavor": {
+          "summary": "Ce domaine a trait aux énergies positives et à la vitalité. Ses prêtres soignent les blessés, assistent les nécessiteux et repoussent les forces de la mort.",
+          "lore_note": "Associé aux divinités : Flore, Givreuse."
+        },
+        "bonus_proficiencies": {
+          "armor": [
+            "category-heavy-armor"
+          ]
+        },
+        "bonus_spells_granted": [
+          {
+            "level_unlocked": 1,
+            "always_prepared": true,
+            "spells": [
+              "spl-benediction",
+              "spl-soins"
+            ]
+          },
+          {
+            "level_unlocked": 3,
+            "always_prepared": true,
+            "spells": [
+              "spl-arme-spirituelle",
+              "spl-restauration-mineure"
+            ]
+          },
+          {
+            "level_unlocked": 5,
+            "always_prepared": true,
+            "spells": [
+              "spl-retour-a-la-vie",
+              "spl-signal-desperance"
+            ]
+          },
+          {
+            "level_unlocked": 7,
+            "always_prepared": true,
+            "spells": [
+              "spl-protecteur-de-la-foi",
+              "spl-protection-contre-la-mort"
+            ]
+          },
+          {
+            "level_unlocked": 9,
+            "always_prepared": true,
+            "spells": [
+              "spl-rappel-a-la-vie",
+              "spl-soins-de-groupe"
+            ]
+          }
+        ],
+        "features": [
+          {
+            "id": "feat-disciple-de-la-vie",
+            "name": "Disciple de la vie",
+            "unlocks_at_level": 1,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Vos sorts de guérison de niveau 1 ou supérieur restituent 2 + le niveau du sort PV supplémentaires à la cible.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "cast_healing_spell_level_1_or_higher",
+              "bonus_hp_formula": "2 + spell_level"
+            }
+          },
+          {
+            "id": "feat-conduit-divin-survivance",
+            "name": "Conduit divin : Survivance",
+            "unlocks_at_level": 2,
+            "recharge": "short_rest",
+            "flavor": {
+              "summary": "Action : redistribuez un total de PV = 5 × votre niveau de prêtre entre autant de créatures que souhaité dans un rayon de 9m. Chaque cible est plafonnée à 50% de ses PV max. Morts-vivants et créatures artificielles exclues.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_type": "action",
+              "total_hp_formula": "5 * class_level",
+              "area": {
+                "type": "sphere",
+                "radius_m": 9
+              },
+              "cap_per_target": "half_max_hp",
+              "excluded_targets": [
+                "undead",
+                "construct"
+              ]
+            }
+          },
+          {
+            "id": "feat-guerisseur-saint",
+            "name": "Guérisseur saint",
+            "unlocks_at_level": 6,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Quand vous lancez un sort de soin de niveau 1 ou supérieur sur une créature autre que vous-même, vous récupérez 2 + niveau du sort PV.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "cast_healing_spell_level_1_or_higher_on_other_creature",
+              "self_heal_formula": "2 + spell_level"
+            }
+          },
+          {
+            "id": "feat-impact-divin-vie",
+            "name": "Impact divin (Vie)",
+            "unlocks_at_level": 8,
+            "recharge": "at_will",
+            "flavor": {
+              "summary": "Une fois par tour, quand vous touchez avec une arme : 1d8 dégâts radiants supplémentaires (2d8 au niveau 14).",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "successful_weapon_attack",
+              "frequency": "once_per_turn",
+              "extra_damage": {
+                "base": "1d8",
+                "type": "radiant"
+              },
+              "upgrades": [
+                {
+                  "at_level": 14,
+                  "extra_damage": {
+                    "base": "2d8",
+                    "type": "radiant"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-guerison-souveraine",
+            "name": "Guérison souveraine",
+            "unlocks_at_level": 17,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Quand vous lancez un sort de soin impliquant des dés, vous obtenez automatiquement le maximum sur chaque dé (ex : 2d6 = 12).",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "cast_healing_spell_with_dice",
+              "effect": "maximize_all_healing_dice"
+            }
+          }
+        ]
+      },
+      {
+        "id": "subcls-domaine-du-voyage",
+        "name": "Voyage",
+        "flavor": {
+          "summary": "Ce domaine représente le mouvement, l'espace et les puissances dynamiques. Ses prêtres sont de grands voyageurs, maîtres des espaces, toujours prêts à s'aventurer dans l'inconnu.",
+          "lore_note": "Associé aux divinités : Façonneur, Tempête."
+        },
+        "bonus_proficiencies": {
+          "skills": [
+            "skill-arcanes",
+            "skill-nature"
+          ]
+        },
+        "bonus_spells_granted": [
+          {
+            "level_unlocked": 1,
+            "always_prepared": true,
+            "spells": [
+              "spl-disque-flottant",
+              "spl-grand-pas"
+            ]
+          },
+          {
+            "level_unlocked": 3,
+            "always_prepared": true,
+            "spells": [
+              "spl-messager-animal",
+              "spl-passage-sans-trace"
+            ]
+          },
+          {
+            "level_unlocked": 5,
+            "always_prepared": true,
+            "spells": [
+              "spl-marche-sur-londe",
+              "spl-vol"
+            ]
+          },
+          {
+            "level_unlocked": 7,
+            "always_prepared": true,
+            "spells": [
+              "spl-bannissement",
+              "spl-invocation-delementaires-mineurs"
+            ]
+          },
+          {
+            "level_unlocked": 9,
+            "always_prepared": true,
+            "spells": [
+              "spl-telekinesie",
+              "spl-voyage-par-les-arbres"
+            ]
+          }
+        ],
+        "features": [
+          {
+            "id": "feat-guide-voyage",
+            "name": "Guide",
+            "unlocks_at_level": 1,
+            "recharge": "passive",
+            "flavor": {
+              "summary": "Votre VD augmente de 3m. En marche forcée, vous et jusqu'à 6 compagnons ne faites les JS Constitution contre la fatigue qu'à partir de la 11e heure, et bénéficiez d'un avantage à ces jets.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "speed_bonus_m": 3,
+              "forced_march": {
+                "max_affected_companions": 6,
+                "con_save_fatigue_threshold_hours": 11,
+                "advantages": [
+                  {
+                    "type": "saving_throw",
+                    "target": "self_and_companions",
+                    "condition": "con_save_vs_forced_march_fatigue"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "feat-conduit-divin-percee-fulgurante",
+            "name": "Conduit divin : Percée fulgurante",
+            "unlocks_at_level": 2,
+            "recharge": "short_rest",
+            "flavor": {
+              "summary": "Action bonus : dans un rayon de 9m, toutes les créatures alliées voient leur VD doublée jusqu'au début de votre prochain tour. Elles peuvent Se dégager gratuitement (vous) ou en action bonus (les autres).",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_type": "bonus_action",
+              "area": {
+                "type": "sphere",
+                "radius_m": 9
+              },
+              "target": "allied_creatures_including_self",
+              "effects": [
+                {
+                  "type": "speed_multiplier",
+                  "multiplier": 2,
+                  "duration": "until_start_of_casters_next_turn"
+                },
+                {
+                  "type": "disengage",
+                  "cost_for_self": "free",
+                  "cost_for_allies": "bonus_action",
+                  "duration": "until_start_of_casters_next_turn"
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-conduit-divin-contact-a-distance",
+            "name": "Conduit divin : Contact à distance",
+            "unlocks_at_level": 6,
+            "recharge": "short_rest",
+            "flavor": {
+              "summary": "Quand vous lancez un sort de portée « contact », vous pouvez étendre sa portée à une cible visible à 30m.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "cast_touch_range_spell",
+              "extended_range_m": 30,
+              "condition": "target_visible"
+            }
+          },
+          {
+            "id": "feat-impact-divin-voyage",
+            "name": "Impact divin (Voyage)",
+            "unlocks_at_level": 8,
+            "recharge": "at_will",
+            "flavor": {
+              "summary": "Une fois par tour, quand vous touchez avec une arme : 1d8 dégâts supplémentaires de feu, foudre ou froid (au choix). 2d8 au niveau 14.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "trigger": "successful_weapon_attack",
+              "frequency": "once_per_turn",
+              "extra_damage": {
+                "base": "1d8",
+                "type_choice": [
+                  "fire",
+                  "lightning",
+                  "cold"
+                ]
+              },
+              "upgrades": [
+                {
+                  "at_level": 14,
+                  "extra_damage": {
+                    "base": "2d8",
+                    "type_choice": [
+                      "fire",
+                      "lightning",
+                      "cold"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-regroupement",
+            "name": "Regroupement",
+            "unlocks_at_level": 17,
+            "recharge": "long_rest",
+            "flavor": {
+              "summary": "Action bonus : téléportez instantanément jusqu'à wis_mod créatures consentantes situées à 120m vers un espace inoccupé à 1,5m de vous (possible en plusieurs fois).",
+              "lore_note": null
+            },
+            "mechanics": {
+              "action_type": "bonus_action",
+              "uses_formula": "wis_mod",
+              "range_m": 120,
+              "target_count_formula": "wis_mod",
+              "target_type": "willing_creatures",
+              "destination": "unoccupied_space_within_1_5m_of_self",
+              "can_split_across_multiple_uses": true
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-decharge-mentale",
+  "name": "Décharge mentale",
+  "level": 5,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": false,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-sorcier"
+  ],
+  "description": "D Vous produisez une vague d'énergie psychique. Chaque créature prise dans un cône de 9 m doit effectuer un JS Intelligence. En cas d'échec, elle subit 4d8 dégâts psychiques et se retrouve étourdie pendant 1 minute. En cas de réussite, les dégâts sont réduits de moitié et elle n'est pas étourdie. Une cible étourdie par ce sort effectue un JS Intelligence à la fin de chacun de ses tours de jeu, cet état préjudiciable prenant fin en cas de réussite. ## Le son d'un déblocage Selon votre style de jeu, vous pouvez opter pour des approches différentes concernant le bruit du déblocage. ### Réverbération Réverbération Le sort produit un bruit fort et bref qui résonne contre les murs. Il porte à 90 m en terrain dégagé, mais en intérieur, par le jeu des échos et des répercussions, cela peut aller jusqu'à 200 m. Simplement en prêtant attention à leur environnement, les aventuriers sauront aisément s'ils sont dans un milieu où le son se répand facilement. ### Carillon magique Carillon magique Le son qui se propage depuis le verrou et dans un rayon de 90 m est une note de carillon magique, pure et claire. Elle est immédiatement audible et traçable par toutes les créatures à portée. Elle ne cause aucun inconfort ou assourdissement.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, les dégâts augmentent de 1d8 par niveau d'emplacement au-dessus du 5e.",
+  "modular_options": []
+}

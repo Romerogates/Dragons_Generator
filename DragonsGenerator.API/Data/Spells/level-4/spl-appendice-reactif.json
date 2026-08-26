@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-appendice-reactif",
+  "name": "Appendice réactif",
+  "level": 4,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": false,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Un appendice tentaculaire de 1,50 m apparaît dans votre dos, contrôlable aussi aisément que s'il s'agissait de l'un de vos membres. Quand il n'agit pas, il ondule doucement derrière vous, offrant un spectacle dérangeant aux observateurs. Jusqu'à la fin du sort et tant que vous n'êtes pas neutralisé, vous bénéficiez des effets suivants : Préhension. Tant que votre appendice est libre, il peut s'agripper à toute surface par l'intermédiaire de ventouses. Pour tout test d'Athlétisme effectué avec un appendice, utilisez votre caractéristique magique au lieu de la caractéristique normalement utilisée. En outre, vous acquérez une vitesse d'escalade égale à votre VD. Actions supplémentaires. À votre tour de jeu, si l'appendice est libre, il vous permet d'entreprendre l'une des actions suivantes au prix d'une action bonus : Assister, Attaquer (y compris pour engager une lutte ou bousculer une créature) ou Parer (voir ci-après). Une fois par round, il vous permet également d'effectuer une attaque d'opportunité sans jouer votre réaction. Attaquer. Lorsque vous entreprenez l'action Attaquer avec votre appendice, votre caractéristique magique s'applique à la résolution des jets d'attaque et de dégâts. Il en va de même dans le cas d'une lutte ou d'une bousculade. Vous ne pouvez utiliser votre appendice pour manier une arme et attaquer avec. Si vous infligez des dégâts avec l'appendice, ils sont contondants et s'élèvent à 1d4 + votre modificateur de caractéristique magique. L'appendice possède une allonge de 1,50 m et est considéré comme une arme magique. Parer. Jusqu'au début de votre tour de jeu suivant, tous les jets d'attaque au corps à corps contre vous subissent un désavantage lorsque l'attaquant vous est visible. ## Les appendices du psychurge Les ensorceleurs psychurges ont accès à une variante non corrompue de ce sort. Les appendices qui apparaissent sont alors constitués d'énergie psychique brute ; ils sont une extension de l'esprit du psychurge, sa matérialisation. Les appendices d'un psychurge sont le reflet de son âme (alignement, corruption, etc.) : quand son esprit est pur et serein, des appendices multiples peuvent prendre l'aspect d'ailes luminescentes ou d'une roue de paon. Toutefois, les psychurges sont les lanceurs de sorts les plus exposés à la folie, et par là, à la corruption. Ainsi, il est rare qu'ils parviennent longtemps à arborer des appendices psychiques dépourvus de toute souillure. Ceux qui y parviennent ont lutté avec succès contre la déchéance qui les menace.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, vous créez un appendice de plus par niveau d'emplacement au-dessus du 4e. L'ensemble des actions de vos appendices constitue alors une unique action bonus.",
+  "modular_options": []
+}

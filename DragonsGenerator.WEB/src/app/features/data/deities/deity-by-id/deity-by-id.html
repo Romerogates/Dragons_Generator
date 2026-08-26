@@ -1,0 +1,65 @@
+<div class="w-full min-h-screen bg-[#171b22] text-slate-300 animate-fade-in pb-20">
+  <div class="max-w-4xl mx-auto px-4 pt-10">
+    <a routerLink="/deities" class="text-xs font-black uppercase tracking-widest text-slate-500 hover:text-violet-400 mb-8 inline-block">
+      ← Retour au panthéon
+    </a>
+
+    @if (deity() === undefined) {
+      <p class="text-center py-32 text-slate-500 animate-pulse">Chargement...</p>
+    } @else if (notFound()) {
+      <div class="text-center py-32">
+        <h2 class="text-2xl font-bold text-red-500 font-serif">Divinité introuvable</h2>
+      </div>
+    } @else if (error(); as errorMsg) {
+      <p class="text-red-400 text-center">{{ errorMsg }}</p>
+    } @else if (deity(); as d) {
+      <header class="text-center mb-10">
+        <span class="text-5xl mb-4 block"><iconify-icon icon="fluent-emoji:star"></iconify-icon></span>
+        <h1 class="text-4xl font-extrabold text-violet-300 font-serif mb-2">{{ d.name }}</h1>
+        @if (d.otherNames.length > 0) {
+          <p class="text-sm text-slate-500 italic mb-4">{{ d.otherNames.join(' · ') }}</p>
+        }
+        <span class="bg-[#1b2028] px-4 py-1.5 rounded-full text-xs font-black uppercase border border-slate-700">
+          {{ tonalityLabel(d.tonality) }}
+        </span>
+      </header>
+
+      @if (d.description) {
+        <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 mb-8">
+          <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">Légende</h2>
+          <p class="text-sm text-slate-300 leading-relaxed">{{ d.description }}</p>
+        </section>
+      }
+
+      @if (d.worshippersNote) {
+        <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 mb-8">
+          <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">Adorateurs</h2>
+          <p class="text-sm text-slate-400 italic leading-relaxed">{{ d.worshippersNote }}</p>
+        </section>
+      }
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        @if (d.domains.length > 0) {
+          <section class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800">
+            <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-3">Domaines</h2>
+            <div class="flex flex-wrap gap-2">
+              @for (dom of d.domains; track dom) {
+                <span class="bg-violet-950/30 text-violet-300 px-3 py-1 rounded-lg text-xs">{{ dom }}</span>
+              }
+            </div>
+          </section>
+        }
+        @if (d.grantsPowersTo.length > 0) {
+          <section class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800">
+            <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-3">Accorde des pouvoirs à</h2>
+            <div class="flex flex-wrap gap-2">
+              @for (g of d.grantsPowersTo; track g) {
+                <span class="bg-slate-900 text-slate-400 px-3 py-1 rounded-lg text-xs">{{ g }}</span>
+              }
+            </div>
+          </section>
+        }
+      </div>
+    }
+  </div>
+</div>

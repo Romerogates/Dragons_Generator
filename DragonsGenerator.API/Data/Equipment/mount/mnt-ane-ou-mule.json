@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "id": "mnt-ane-ou-mule",
+  "name": "Âne ou mule",
+  "category": "mount",
+  "subcategory": "animal",
+  "cost": {
+    "value": 8,
+    "unit": "po"
+  },
+  "weight_kg": null,
+  "speed": "12 m",
+  "capacity_kg": 210,
+  "description": "Vitesse de déplacement : 12 m. Charge maximale : 210 kg."
+}

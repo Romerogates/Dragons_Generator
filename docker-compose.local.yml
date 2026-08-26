@@ -1,0 +1,70 @@
+# Stack locale de test — ports alternatifs
+# Frontend : http://localhost:8081
+# API      : http://localhost:8080  (Swagger : /swagger)
+# MailHog  : http://localhost:8025  (boîte mail de test)
+#
+# Admin par défaut : admin@dragons.local / AdminDragons!2026
+
+services:
+  mailhog:
+    container_name: dragons-mailhog-local
+    image: mailhog/mailhog:v1.0.1
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - dragons-network
+
+  dragons-api:
+    container_name: dragons-api-local
+    build:
+      context: ./DragonsGenerator.API
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__Default: "Data Source=/app/data/dragons.db"
+      # SMTP : valeurs par défaut MailHog ; surchargées par .env si présent
+      Smtp__Host: ${Smtp__Host:-mailhog}
+      Smtp__Port: ${Smtp__Port:-1025}
+      Smtp__UseSsl: ${Smtp__UseSsl:-false}
+      Smtp__UserName: ${Smtp__UserName:-}
+      Smtp__Password: ${Smtp__Password:-}
+      Smtp__FromEmail: ${Smtp__FromEmail:-noreply@dragons-generator.local}
+      Smtp__FromName: ${Smtp__FromName:-Dragons Generator}
+      App__PublicWebUrl: ${App__PublicWebUrl:-http://localhost:8081}
+      Jwt__Key: DragonsGenerator_Dev_Jwt_Key_ChangeInProd_32+
+      Admin__Email: ${Admin__Email:-admin@dragons.local}
+      Admin__Password: ${Admin__Password:-AdminDragons!2026}
+    volumes:
+      - dragons-api-data:/app/data
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      - mailhog
+    networks:
+      - dragons-network
+
+  dragons-web:
+    container_name: dragons-web-local
+    build:
+      context: ./DragonsGenerator.WEB
+      dockerfile: Dockerfile
+      args:
+        NGINX_CONF: nginx.local.conf
+    ports:
+      - "8081:80"
+    depends_on:
+      - dragons-api
+    networks:
+      - dragons-network
+
+volumes:
+  dragons-api-data:
+
+networks:
+  dragons-network:
+    driver: bridge

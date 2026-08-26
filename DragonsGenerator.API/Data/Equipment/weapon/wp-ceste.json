@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-ceste",
+  "name": "Ceste",
+  "category": "weapon",
+  "subcategory": "martial_melee",
+  "cost": {
+    "value": 5,
+    "unit": "po"
+  },
+  "weight_kg": 0.5,
+  "damage_dice": "1d6",
+  "damage_type": "contondant",
+  "properties": [
+    "prop-legere",
+    "prop-speciale"
+  ],
+  "throw_range": null,
+  "ammo_range": null,
+  "description": "Le ceste est un gantelet de cuir renforcé de métal porté à la main. Légère. Spéciale : le ceste ne peut pas être désarmé."
+}

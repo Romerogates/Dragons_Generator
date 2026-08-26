@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-armure-de-mage",
+  "name": "Armure de mage",
+  "level": 1,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 8,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un morceau de cuir tanné"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Vous touchez une créature consentante qui ne porte pas d'armure, et un champ de force magique l'entoure tant que le sort persiste. La CA de base de la cible passe à 13 + son modificateur de Dextérité. Le sort prend fin si la cible enfile une armure ou que vous révoquez ce sort au prix d'une action.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, la CA de base de la cible passe à 14 + son modificateur de Dextérité ; avec un emplacement du 5e niveau ou supérieur, la CA de base de la cible passe à 15 + son modificateur de Dextérité ; avec un emplacement du 7e niveau ou supérieur, elle gagne en outre une résistance aux dégâts contondants, perforants et tranchants.",
+  "modular_options": []
+}

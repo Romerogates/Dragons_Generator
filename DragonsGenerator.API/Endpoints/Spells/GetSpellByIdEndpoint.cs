@@ -1,4 +1,6 @@
-﻿
+﻿using DragonsGenerator.API.Common;
+using DragonsGenerator.API.Models;
+using FastEndpoints;
 
 namespace DragonsGenerator.API.Endpoints.Spells;
 
@@ -9,6 +11,10 @@ public class GetSpellByIdRequest
 
 public class GetSpellByIdEndpoint : Endpoint<GetSpellByIdRequest, Spell>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetSpellByIdEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/spells/{id}");
@@ -17,10 +23,7 @@ public class GetSpellByIdEndpoint : Endpoint<GetSpellByIdRequest, Spell>
 
     public override async Task HandleAsync(GetSpellByIdRequest req, CancellationToken ct)
     {
-        var spells = await JsonDataLoader.LoadAsync<List<Spell>>("spells.json", ct);
-
-        var spell = spells?.FirstOrDefault(s =>
-            string.Equals(s.Id, req.Id, StringComparison.OrdinalIgnoreCase));
+        var spell = await _repo.GetSpellByIdAsync(req.Id, ct);
 
         if (spell is null)
         {

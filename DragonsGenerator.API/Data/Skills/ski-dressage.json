@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "ski-dressage",
+  "name": "Dressage",
+  "ability": "SAG",
+  "description": "Lorsqu'il s'agit de déterminer si vous pouvez apaiser un animal domestique, rasséréner une monture ou reconnaître l'humeur d'une bête, le meneur peut demander un test de Sagesse (Dressage). Vous pouvez également recourir à un tel test pour diriger votre monture dans le cadre d'une manœuvre délicate, ou bien encore si vous élevez ou dressez un animal.",
+  "examples": [
+    "Apaiser un animal domestique ou rasséréner une monture.",
+    "Reconnaître l'humeur d'une bête.",
+    "Diriger une monture dans le cadre d'une manœuvre délicate."
+  ],
+  "passive_check": false,
+  "source": "livre_de_base"
+}

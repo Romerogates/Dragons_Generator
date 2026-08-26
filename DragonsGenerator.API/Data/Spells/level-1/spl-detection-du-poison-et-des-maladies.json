@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-detection-du-poison-et-des-maladies",
+  "name": "Détection du poison et des maladies",
+  "level": 1,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une feuille d'if"
+  },
+  "is_ritual": true,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-paladin",
+    "cls-pretre",
+    "cls-rodeur"
+  ],
+  "description": "Pour toute la durée du sort, vous décelez la présence et la position de poisons, créatures venimeuses et maladies dans un rayon de 9 m de vous. Vous identifiez aussi le type de poison, de créature venimeuse ou de maladie dans chaque cas. Le sort est capable de pénétrer la plupart des obstacles, mais 90 cm de bois ou de terre, 30 cm de pierre, 2,5 cm de la plupart des métaux ou une mince feuille de plomb le bloquent. Ce sort ne peut percer à travers une fron éthérée (cf. chapitre Géomagie). Identifier le mal Si votre meneur utilise cette option, vous devez effectuer un test d'In telligence (Médecine) par poison ou maladie présent dans le rayon d'action afin de l'identifier. Il en va de même pour les créatures veni meuses, avec un test d'Intelligence (Nature). Par défaut, le DD est de 15, mais il peut être plus bas pour un spé cimen bien connu, ou au contraire plus élevé si la menace est rare. En cas d'échec, vous savez seulement si la créature ou l'objet est empoison né, venimeux ou contagieux.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, son rayon d'action augmente de 9 m par niveau d'emplacement au-dessus du 1ᵉʳ.",
+  "modular_options": []
+}

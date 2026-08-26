@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "ski-escamotage",
+  "name": "Escamotage",
+  "ability": "DEX",
+  "description": "Chaque fois que vous tentez un tour de passe-passe tel qu'introduire subrepticement un objet dans les effets d'une autre personne ou dissimuler quelque chose sur vous-même, vous effectuez un test de Dextérité (Escamotage). Le meneur peut également vous demander un tel test si vous tentez de délester quelqu'un de sa bourse ou de lui faire discrètement les poches.",
+  "examples": [
+    "Introduire subrepticement un objet dans les effets d'une autre personne.",
+    "Dissimuler quelque chose sur soi-même.",
+    "Délester quelqu'un de sa bourse ou lui faire discrètement les poches."
+  ],
+  "passive_check": false,
+  "source": "livre_de_base"
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-invocation-d-animaux",
+  "name": "Invocation d'animaux",
+  "level": 3,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-rodeur"
+  ],
+  "description": "Vous invoquez des esprits féeriques qui prennent la forme de bêtes et apparaissent dans des espaces inoccupés que vous voyez à portée. Choisissez une des options suivantes pour déterminer les bêtes invoquées : Une bête d'un facteur de puissance de 2 ou moins. Deux bêtes d'un facteur de puissance de 1 ou moins. Quatre bêtes d'un facteur de puissance de ½ ou moins. Huit bêtes d'un facteur de puissance de ¼ ou moins. Chaque bête est aussi considérée comme une fée et disparaît quand elle tombe à 0 point de vie ou quand le sort prend fin. Les créatures invoquées sont amicales envers vous et vos compagnons. Déterminez l'initiative pour les créatures invoquées, qui forment un groupe avec ses propres tours de jeu. Elles obéissent aux ordres verbaux que vous leur donnez (sans que cela ne vous coûte d'action). Si vous ne leur en donnez pas, elles n'entreprennent pas d'actions, mais se défendent contre les créatures hostiles.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant certains emplacements de sort de niveau supérieur, choisissez une des options ci-dessus et le nombre de créatures qui apparaissent augmente : le double avec un emplacement du 5e ou 6e niveau, le triple avec un emplacement du 7e ou 8e niveau, et le quadruple avec un emplacement du 9e niveau.",
+  "modular_options": []
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "id": "vhc-barge",
+  "name": "Barge",
+  "category": "vehicle",
+  "subcategory": "water",
+  "cost": {
+    "value": 3000,
+    "unit": "po"
+  },
+  "weight_kg": null,
+  "speed": "1.5 km/h",
+  "capacity_kg": null,
+  "description": "Vitesse : 1,5 km/h."
+}

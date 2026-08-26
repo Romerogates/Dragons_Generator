@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-amitie-avec-les-animaux",
+  "name": "Amitié avec les animaux",
+  "level": 1,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 24,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un peu de nourriture"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-rodeur"
+  ],
+  "description": "Ce sort vous permet de convaincre un animal que vous ne lui voulez aucun mal. Choisissez une bête que vous voyez située à portée, qui elle-même doit pouvoir vous voir et vous entendre. Si son Intelligence est de 4 ou plus, le sort échoue. Autrement, elle doit réussir un JS Sagesse sous peine d'être charmée par vous pour toute la durée du sort. Si vous ou un de vos compagnons faites du mal à la cible, le sort prend fin.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, vous pouvez affecter une bête supplémentaire par niveau d'emplacement au-dessus du 1er.",
+  "modular_options": []
+}

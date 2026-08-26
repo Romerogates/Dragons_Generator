@@ -1,0 +1,25 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-arc-long",
+  "name": "Arc long",
+  "category": "weapon",
+  "subcategory": "martial_ranged",
+  "cost": {
+    "value": 50,
+    "unit": "po"
+  },
+  "weight_kg": 1,
+  "damage_dice": "1d8",
+  "damage_type": "perforant",
+  "properties": [
+    "prop-deux-mains",
+    "prop-lourde",
+    "prop-projectiles-45-180"
+  ],
+  "throw_range": null,
+  "ammo_range": {
+    "normal": 45,
+    "long": 180
+  },
+  "description": null
+}

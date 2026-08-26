@@ -1,0 +1,119 @@
+{
+  "schema_version": "2.0",
+  "description": "Index des actions de combat (Dragons — jeu de rôle, livre de base).",
+  "language": "fr",
+  "stats": {
+    "total": 15,
+    "standard": 11,
+    "special_attack": 2,
+    "reaction": 1,
+    "bonus": 1
+  },
+  "actions": [
+    {
+      "id": "act-anticiper",
+      "name": "Anticiper",
+      "action_cost": "reaction",
+      "category": "standard",
+      "file": "CombatActions/act-anticiper.json"
+    },
+    {
+      "id": "act-assister",
+      "name": "Assister",
+      "action_cost": "action",
+      "category": "standard",
+      "file": "CombatActions/act-assister.json"
+    },
+    {
+      "id": "act-attaquer",
+      "name": "Attaquer",
+      "action_cost": "action",
+      "category": "standard",
+      "file": "CombatActions/act-attaquer.json"
+    },
+    {
+      "id": "act-chercher",
+      "name": "Chercher",
+      "action_cost": "action",
+      "category": "standard",
+      "file": "CombatActions/act-chercher.json"
+    },
+    {
+      "id": "act-esquiver",
+      "name": "Esquiver",
+      "action_cost": "action",
+      "category": "standard",
+      "file": "CombatActions/act-esquiver.json"
+    },
+    {
+      "id": "act-inciter",
+      "name": "Inciter",
+      "action_cost": "action",
+      "category": "standard",
+      "file": "CombatActions/act-inciter.json"
+    },
+    {
+      "id": "act-foncer",
+      "name": "Foncer",
+      "action_cost": "action",
+      "category": "standard",
+      "file": "CombatActions/act-foncer.json"
+    },
+    {
+      "id": "act-lancer-un-sort",
+      "name": "Lancer un sort",
+      "action_cost": "action",
+      "category": "standard",
+      "file": "CombatActions/act-lancer-un-sort.json"
+    },
+    {
+      "id": "act-se-cacher",
+      "name": "Se cacher",
+      "action_cost": "action",
+      "category": "standard",
+      "file": "CombatActions/act-se-cacher.json"
+    },
+    {
+      "id": "act-se-degager",
+      "name": "Se dégager",
+      "action_cost": "action",
+      "category": "standard",
+      "file": "CombatActions/act-se-degager.json"
+    },
+    {
+      "id": "act-utiliser-un-objet",
+      "name": "Utiliser un objet",
+      "action_cost": "action",
+      "category": "standard",
+      "file": "CombatActions/act-utiliser-un-objet.json"
+    },
+    {
+      "id": "act-lutte",
+      "name": "Lutte",
+      "action_cost": "action",
+      "category": "special_attack",
+      "file": "CombatActions/act-lutte.json"
+    },
+    {
+      "id": "act-bousculer",
+      "name": "Bousculer une créature",
+      "action_cost": "action",
+      "category": "special_attack",
+      "file": "CombatActions/act-bousculer.json"
+    },
+    {
+      "id": "act-attaque-d-opportunite",
+      "name": "Attaque d'opportunité",
+      "action_cost": "reaction",
+      "category": "reaction",
+      "file": "CombatActions/act-attaque-d-opportunite.json"
+    },
+    {
+      "id": "act-combat-a-deux-armes",
+      "name": "Combat à deux armes",
+      "action_cost": "bonus_action",
+      "category": "bonus",
+      "file": "CombatActions/act-combat-a-deux-armes.json"
+    }
+  ]
+}

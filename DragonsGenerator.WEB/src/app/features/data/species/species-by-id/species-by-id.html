@@ -16,7 +16,7 @@
       </div>
     } @else if (error()) {
       <div class="flex flex-col items-center justify-center py-32 text-center">
-        <span class="text-7xl mb-6 drop-shadow-[0_0_20px_rgba(220,38,38,0.4)] animate-pulse"
+        <span class="text-7xl mb-6 drop-shadow-md animate-pulse"
           ><iconify-icon icon="fluent-emoji:skull-and-crossbones"></iconify-icon
         ></span>
         <h2
@@ -27,7 +27,7 @@
         <p class="text-lg text-slate-400 italic max-w-md leading-relaxed mb-8">{{ error() }}</p>
         <a
           routerLink="/species"
-          class="px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all border border-slate-700 shadow-lg hover:-translate-y-1"
+          class="px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest bg-slate-800 text-slate-300 hover:bg-slate-700 transition-[colors,transform,opacity,box-shadow] duration-200 border border-slate-700 shadow-lg hover:-translate-y-1"
           >Fuir cette zone</a
         >
       </div>

@@ -1,0 +1,24 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-sarbacane",
+  "name": "Sarbacane",
+  "category": "weapon",
+  "subcategory": "martial_ranged",
+  "cost": {
+    "value": 10,
+    "unit": "po"
+  },
+  "weight_kg": 0.5,
+  "damage_dice": "1",
+  "damage_type": "perforant",
+  "properties": [
+    "prop-projectiles-7-50-30",
+    "prop-rechargement"
+  ],
+  "throw_range": null,
+  "ammo_range": {
+    "normal": 7,
+    "long": 30
+  },
+  "description": null
+}

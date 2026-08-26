@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-hurlement",
+  "name": "Hurlement",
+  "level": 2,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un peu de poudre noire"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "ous écartez les bras en poussant un cri tonitruant. Effectuez une attaque de sort au corps à corps contre chaque créature de votre choix à portée de votre allonge. Une attaque qui touche inflige 3d8 dégâts de tonnerre à la cible. Chaque créature que vous avez ciblée - même si vous ne l'avez pas touchée - doit également réussir un JS Constitution sous peine de se retrouver assourdie et neutralisée jusqu'au début de votre tour de jeu suivant.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, les dégâts augmentent de 1d8 par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

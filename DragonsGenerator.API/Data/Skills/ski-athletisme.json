@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "ski-athletisme",
+  "name": "Athlétisme",
+  "ability": "FOR",
+  "description": "Les tests de Force (Athlétisme) couvrent une grande palette de situations, notamment lorsque vous aurez à escalader, à sauter ou à nager.",
+  "examples": [
+    "Gravir une paroi escarpée ou glissante, rester agrippé à une corniche tandis qu'une créature tente de vous faire lâcher prise.",
+    "Couvrir une distance appréciable d'un bond.",
+    "Nager face à des courants violents ou une mer démontée, ou résister à une créature qui tente de vous maintenir sous la surface."
+  ],
+  "passive_check": false,
+  "source": "livre_de_base"
+}

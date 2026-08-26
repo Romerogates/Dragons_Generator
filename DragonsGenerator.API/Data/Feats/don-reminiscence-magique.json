@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "don-reminiscence-magique",
+  "name": "Réminiscence magique",
+  "requires_magic": true,
+  "category": "magic",
+  "prerequisites": [
+    {
+      "type": "spell_preparation",
+      "description": "Capacité de préparer au moins un sort"
+    }
+  ],
+  "ability_score_increase": {
+    "ability": "spellcasting",
+    "value": 1,
+    "max": 20
+  },
+  "description": "+1 caractéristique magique (max 20). À tout moment, vous pouvez ajouter un sort de votre liste à vos sorts préparés (sans action requise). Ce sort est disponible jusqu'au repos long. Chaque utilisation impose un niveau de fatigue.",
+  "benefits": [
+    {
+      "type": "ability_score_increase",
+      "ability": "spellcasting",
+      "value": 1
+    },
+    {
+      "type": "emergency_prepare_spell",
+      "cost": "1 niveau de fatigue par utilisation"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "magie",
+    "préparation",
+    "urgence"
+  ]
+}

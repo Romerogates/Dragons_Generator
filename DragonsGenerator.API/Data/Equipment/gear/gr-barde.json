@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-barde",
+  "name": "Barde",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": null,
+    "unit": "po",
+    "note": "Prix variable selon le type de barde"
+  },
+  "weight_kg": null,
+  "description": "Armure destinée à protéger une monture. Tous les types d'armures sont disponibles. Prix : quadruple de l'armure humanoïde équivalente. Poids : double de l'armure humanoïde équivalente."
+}

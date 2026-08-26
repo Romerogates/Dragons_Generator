@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-communion-avec-la-nature",
+  "name": "Communion avec la nature",
+  "level": 5,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-rodeur"
+  ],
+  "description": "Vous ne faites brièvement plus qu'un avec la nature et obtenez des renseignements sur les alentours. En extérieur, le sort vous renseigne sur une zone de 4,5 km de rayon autour de vous. Dans un réseau de cavernes ou quelque autre environnement souterrain, ce rayon se limite à 90 m. Le sort ne fonctionne pas là où la nature a été remplacée par des constructions, comme dans les donjons et les villes. Vous recevez instantanément des informations sur un maximum de trois faits de votre choix parmi les sujets suivants, en rapport avec la zone concernée : relief et étendues d'eau ; flore, faune, population ou minéraux dominants ; célestes, fées, fiélons, élémentaires, morts-vivants ou ravageurs du Chancre puissants ; influence d'autres plans d'existence ; manifestation d'un aspect magique, tel que la présence d'une géomagie particulière ou des effets magiques provenant du repaire d'une créature légendaire ; constructions. Vous pouvez ainsi déterminer la position de puissants morts-vivants dans la zone, d'importantes sources d'eau potable, ou de villes proches. La puissance de la colère La puissance de la colère Si vous irritez votre dieu ou son représentant, cette énergie mentale négative vous inflige un choc psychique. Vous devez réussir un JS Sagesse contre un DD de 15. En cas d'échec, vous subissez 5d8 dégâts psychiques.",
+  "modular_options": []
+}

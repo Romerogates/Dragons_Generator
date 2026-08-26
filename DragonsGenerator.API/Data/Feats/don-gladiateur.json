@@ -1,0 +1,43 @@
+{
+  "schema_version": "2.0",
+  "id": "don-gladiateur",
+  "name": "Gladiateur",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [
+    {
+      "type": "ability_score",
+      "ability": "CON",
+      "min": 13,
+      "description": "13 ou plus en Constitution"
+    }
+  ],
+  "ability_score_increase": {
+    "ability": "CON",
+    "value": 1,
+    "max": 20
+  },
+  "description": "Prérequis : CON 13+. +1 Constitution (max 20). Résistance à un type de dégâts au choix parmi : contondants, tranchants ou perforants. Peut être choisi plusieurs fois pour un type différent.",
+  "benefits": [
+    {
+      "type": "ability_score_increase",
+      "ability": "CON",
+      "value": 1
+    },
+    {
+      "type": "damage_resistance",
+      "choose_from": [
+        "contondants",
+        "tranchants",
+        "perforants"
+      ],
+      "note": "Un type par prise"
+    }
+  ],
+  "repeatable": true,
+  "tags": [
+    "défense",
+    "résistance",
+    "constitution"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "id": "mnt-cheval-de-trait",
+  "name": "Cheval de trait",
+  "category": "mount",
+  "subcategory": "animal",
+  "cost": {
+    "value": 50,
+    "unit": "po"
+  },
+  "weight_kg": null,
+  "speed": "12 m",
+  "capacity_kg": 270,
+  "description": "Vitesse de déplacement : 12 m. Charge maximale : 270 kg."
+}

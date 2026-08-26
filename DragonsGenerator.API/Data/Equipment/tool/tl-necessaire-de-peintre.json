@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "tl-necessaire-de-peintre",
+  "name": "Nécessaire de peintre",
+  "category": "tool",
+  "subcategory": "artisan_tool",
+  "cost": {
+    "value": 10,
+    "unit": "po"
+  },
+  "weight_kg": 2.5,
+  "description": "Outils d'artisan associé aux dessinateurs."
+}

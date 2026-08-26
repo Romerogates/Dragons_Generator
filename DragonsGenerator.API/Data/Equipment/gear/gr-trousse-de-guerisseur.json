@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-trousse-de-guerisseur",
+  "name": "Trousse de guérisseur",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 5,
+    "unit": "po"
+  },
+  "weight_kg": 1.5,
+  "description": "10 utilisations. Permet de stabiliser une créature à 0 pv sans test de Sagesse (Médecine)."
+}

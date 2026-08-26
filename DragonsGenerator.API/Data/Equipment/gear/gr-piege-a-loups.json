@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-piege-a-loups",
+  "name": "Piège à loups",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 5,
+    "unit": "po"
+  },
+  "weight_kg": 12.5,
+  "description": "JS Dextérité DD 13 ou 1d4 dégâts perforants et immobilisation. Libération possible par test Force DD 13. Chaque échec inflige 1 dégât perforant."
+}

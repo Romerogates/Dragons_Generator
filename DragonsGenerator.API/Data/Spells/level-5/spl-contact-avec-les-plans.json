@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-contact-avec-les-plans",
+  "name": "Contact avec les plans",
+  "level": 5,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "D Dous contactez mentalement un demi-dieu, l'esprit d'un sage d'antan ou quelque autre entité mystérieuse d'un autre plan. Le contact avec cette intelligence extraplanaire peut être éprouvant ou vous faire perdre la raison. Au moment de l'incantation, effectuez un JS Intelligence DD 15. En cas d'échec, vous subissez 6d6 dégâts psychiques et subissez une folie durable jusqu'à ce que vous ayez terminé un repos long. Tant que vous êtes dans cet état, vous ne pouvez pas entreprendre d'actions, ne comprenez pas ce que disent les autres créatures, ne pouvez pas lire et ne vous exprimez que dans un véritable charabia. Le sort restauration suprême met fin à l'effet s'il est lancé sur vous. En cas de réussite, vous pouvez poser jusqu'à cinq questions à l'entité, mais vous devez le faire avant que le sort prenne fin. Le meneur répond à chaque question par un mot, comme « oui », « non », « peut-être », « jamais », « aucun rapport » ou « incertain » (si l'entité ne connaît pas la réponse à la question). Dans le cas où une réponse en un mot pourrait être trompeuse, le meneur pourra répondre au moyen d'une courte phrase. Persuader l'entité ## Persuader l'entité Si votre meneur utilise cette option, la réussite du sort permet uniquement d'établir un contact en attirant l'attention de l'entité. Celle-ci connaît votre nom et sait où vous vous trouvez. Vous avez 1 minute pour la convaincre de vous répondre. Des entités avec lesquelles vous avez un ennemi commun accepteront souvent de vous aider sans contrepartie. Si vous obtenez le consentement de l'entité, vous avez le droit de poser vos cinq questions, auxquelles elle est obligée de répondre. Si vous tentez de contacter une cible qui vous est hostile (qu'elle éprouve pour vous une haine durable ou simplement une colère temporaire), cette énergie mentale négative vous inflige un choc psychique. Vous devez réussir un JS Sagesse DD 15. En cas d'échec, vous subissez 5d8 dégâts psychiques. De plus, irriter votre interlocuteur peut vous attirer son courroux et vous exposer à des représailles.",
+  "modular_options": []
+}

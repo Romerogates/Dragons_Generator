@@ -1,0 +1,63 @@
+{
+  "schema_version": "2.0",
+  "id": "civ-ellerina",
+  "name": "Ellerìna",
+  "randomization": {
+    "dice": "d100",
+    "min": 63,
+    "max": 65
+  },
+  "demographics": {
+    "primary_species": [
+      {
+        "id": "sp-elenion",
+        "label": "Elenions"
+      }
+    ],
+    "secondary_species": [
+      {
+        "id": "sp-demi-elfe",
+        "label": "Demi-elfes (résidents minoritaires)"
+      },
+      {
+        "id": "sp-aldaron",
+        "label": "Aldarons (résidents minoritaires)"
+      },
+      {
+        "id": "sp-tous",
+        "label": "Autres peuples (cantonnés à Varnaïrello, commerce/études)"
+      }
+    ],
+    "is_cosmopolitan": false,
+    "cosmopolitan_zones": [
+      "Varnaïrello (uniquement commerce et études)"
+    ],
+    "social_roles": [],
+    "peoples_note": "Elenions (grande majorité). Demi-elfes et Aldarons en minorité permanente. Les étrangers sont limités à la cité de Varnaïrello."
+  },
+  "official_languages": [
+    {
+      "id": "lg-elfique",
+      "label": "Elfique"
+    }
+  ],
+  "multilingual": false,
+  "writing_systems": [
+    {
+      "id": "wr-elfique",
+      "label": "Elfique",
+      "type": "alphabet"
+    }
+  ],
+  "is_oral_only": false,
+  "description": "Les elenions ne partagent volontiers leurs terres qu'avec ceux de leur sang. Leur royaume est immense et totalement méconnu de l'extérieur. Les étrangers savent seulement que s'y trouvent d'abondantes richesses et de grandes sources de magie. On prétend aussi que la terre des géants des tempêtes se trouverait de l'autre côté de la vaste île des elfes et que là-bas, tout serait proportionnel à ces êtres : les bois, les forteresses, le bétail… D'Ellerìna, on ne connaît généralement que la capitale Varnaïrello, blanche cité, image de la perfection en toute chose. Les secrets des elfes sont bien gardés, car une si vive lumière ne va pas sans zones d'ombre.",
+  "geography_tags": [
+    "ile",
+    "varnairello",
+    "sources-de-magie"
+  ],
+  "threat_ids": [
+    "threat-geants-des-tempetes",
+    "threat-secrets-elfiques"
+  ]
+}

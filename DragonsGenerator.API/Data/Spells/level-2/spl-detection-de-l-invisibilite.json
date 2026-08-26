@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-detection-de-l-invisibilite",
+  "name": "Détection de l'invisibilité",
+  "level": 2,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une pincée de talc et un peu de poudre d'argent"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Pour toute la durée du sort, vous voyez les objets et créatures invisibles, ainsi que dans le Plan Éthéré. Les créatures et objets éthérés vous apparaissent fantomatiques et translucides. Ce sort ne peut percer à travers une frontière éthérée (cf. chapitre Géomagie).",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, la durée augmente de 1 heure par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-portail",
+  "name": "Portail",
+  "level": 9,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un diamant d'une valeur minimale de 5 000 po"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-pretre"
+  ],
+  "description": "Portail icons Vous invoquez un portail reliant un espace inoccupé que vous voyez à portée à un lieu précis situé dans le Plan Éthéré, dans le Plan Astral, dans la Fournaise, sur Mélancolia, sur Gémonies, sur la Lune Éternité, dans une contrée enchantée. Ce portail prend la forme d'une ouverture circulaire d'un diamètre de 1,50 à 6 m, à votre convenance. Vous pouvez l'orienter dans n'importe quelle direction et il persiste pendant toute la durée du sort. Le portail a deux faces sur chacun des plans sur lesquels il apparaît : l'une servant de point de départ et l'autre d'arrivée. On ne peut l'emprunter qu'en passant par le point de départ. Tout ce qui passe est instantanément déplacé vers l'autre plan, pour apparaître dans l'espace inoccupé le plus proche du portail. Les dieux et autres suzerains planaires peuvent empêcher les portails créés par ce sort de s'ouvrir en leur présence ou sur leur domaine. Au moment de l'incantation, vous pouvez prononcer le nom d'une créature précise (un pseudonyme, titre ou surnom ne convient pas). Si cette créature est sur un autre plan, le portail s'ouvre tout près d'elle et l'attire jusqu'à l'espace inoccupé le plus proche de votre côté du portail. Vous n'avez aucun pouvoir sur elle, et elle est libre d'agir comme l'entend le meneur. Elle peut donc s'en aller, vous attaquer, vous aider, etc.",
+  "modular_options": []
+}

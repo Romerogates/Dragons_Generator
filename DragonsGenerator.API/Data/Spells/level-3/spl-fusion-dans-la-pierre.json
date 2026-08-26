@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-fusion-dans-la-pierre",
+  "name": "Fusion dans la pierre",
+  "level": 3,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 8,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-pretre"
+  ],
+  "description": "V ous entrez dans un objet ou une surface de pierre assez important pour abriter votre corps, et fusionnez en compagnie de l'équipement que vous transportez avec la roche pour toute la durée du sort. Vous entrez dans la pierre au prix de votre déplacement en un point que vous pouvez toucher. Vous ne laissez der rière vous aucune trace détectable par des moyens non magiques. Tant que vous ne faites qu'un avec la roche, vous ne voyez pas ce qui se passe à l'extérieur, et tous les tests de Sagesse (Perception) que vous effectuez pour entendre des sons au-dehors subissent un désavantage. Vous restez conscient du temps qui passe et pouvez lancer des sorts sur votre personne. Vous pouvez quitter la roche, là où vous y êtes entré, au prix de votre déplacement, ce qui met fin au sort. En dehors de cela, tout déplacement est impossible. Les dégâts physiques mineurs infligés à la roche ne vous affectent pas, mais sa destruction partielle ou un chan gement de forme tel que vous n'y rentreriez plus vous en expulse en vous infligeant 6d6 dégâts contondants. La destruction complète de la pierre (ou sa transformation en un autre matériau) vous expulse en vous infligeant 50 dégâts contondants. En cas d'expulsion, vous vous retrouvez à terre dans l'espace inoccupé le plus proche de l'endroit par lequel vous êtes entré.",
+  "modular_options": []
+}

@@ -1,0 +1,33 @@
+{
+  "schema_version": "2.0",
+  "id": "don-lanceur-de-couteaux",
+  "name": "Lanceur de couteaux",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [],
+  "description": "Avec armes finesse + lancer. Une attaque supplémentaire en action bonus (si arme disponible). Les abris partiels et supérieurs n'imposent aucun malus. Pas de désavantage si une créature hostile est à 1,5 m.",
+  "benefits": [
+    {
+      "type": "bonus_attack",
+      "condition": "arme finesse + lancer",
+      "action": "bonus"
+    },
+    {
+      "type": "ignore_cover_penalty",
+      "covers": [
+        "partiel",
+        "supérieur"
+      ]
+    },
+    {
+      "type": "no_close_range_disadvantage",
+      "range_m": 1.5
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "armes-de-lancer",
+    "dextérité",
+    "combat-à-distance"
+  ]
+}

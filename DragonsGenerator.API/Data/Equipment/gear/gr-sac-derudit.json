@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-sac-derudit",
+  "name": "Sac d'érudit",
+  "category": "gear",
+  "subcategory": "container",
+  "cost": {
+    "value": 40,
+    "unit": "po"
+  },
+  "weight_kg": 3,
+  "description": "Un sac à dos, un livre savant, une bouteille d'encre, une plume d'écriture, dix feuilles de parchemin, un petit sac de sable, un petit couteau."
+}

@@ -31,6 +31,11 @@ coverage/
 .env
 .env.local
 
+# Local junk / previews
+_pdf_preview/
+*.zip
+deploy_keys/
+
 # Yarn / NPM logs
 yarn-debug.log*
 yarn-error.log*

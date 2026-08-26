@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-priere-de-guerison",
+  "name": "Prière de guérison",
+  "level": 2,
+  "school": "evocation",
+  "casting_time": {
+    "value": 10,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "Jusqu'à six créatures de votre choix que vous voyez à portée récupèrent un nombre de points de vie égal à 2d8 + votre modificateur de caractéristique magique. Ce sort n'a aucun effet sur les morts-vivants et les créatures artificielles.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, les soins augmentent de 1d8 par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

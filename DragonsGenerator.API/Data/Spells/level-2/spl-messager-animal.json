@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-messager-animal",
+  "name": "Messager animal",
+  "level": 2,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 24,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un peu de nourriture"
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-rodeur"
+  ],
+  "description": "Grâce à ce sort, vous vous servez d'un animal pour transmettre un message. Choisissez une bête de taille TP - comme un écureuil, un geai bleu ou une chauve-souris - que vous voyez et située à portée. Puis vous lui précisez un lieu, dans lequel vous vous êtes déjà rendu, et la description générale du destinataire, comme « une personne vêtue de l'uniforme du guet » ou « un nain aux cheveux roux portant un chapeau pointu. » Le message ne doit pas compter plus de vingt-cinq mots. La bête ciblée prend la direction du lieu qui lui a été indiqué pour toute la durée du sort, en parcourant 75 km environ en 24 heures pour un messager volant, la moitié de cette distance pour les autres animaux. À son arrivée, la bête transmet votre message à la créature que vous lui avez décrite, en reproduisant jusqu'au son de votre voix. Le messager ne s'adresse qu'à une créature dont la description correspond à celle que vous lui avez donnée. S'il n'atteint pas sa destination avant la fin du sort, le message est perdu et la bête fait demi-tour pour regagner l'endroit où vous avez jeté ce sort.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, la durée augmente de 48 heures par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

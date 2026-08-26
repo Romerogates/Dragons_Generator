@@ -1,0 +1,39 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-localisation-de-creature",
+  "name": "Localisation de créature",
+  "level": 4,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un peu de fourrure de limier"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-druide",
+    "cls-magicien",
+    "cls-paladin",
+    "cls-pretre",
+    "cls-rodeur"
+  ],
+  "description": "D Décrivez ou nommez une créature qui vous est familière. Vous découvrez la direction dans laquelle se trouve la cible, tant qu'elle se situe dans un rayon de 300 m de vous. Si elle se déplace, vous savez dans quelle direction elle progresse. Ce sort permet de localiser une créature précise que vous connaissez ou une créature d'un genre spécifique (comme un humain ou une licorne), sous réserve que vous ayez déjà vu ce type de créature de près (dans un rayon de 9 m) au moins une fois. Si la créature décrite ou nommée a adopté une forme différente (sous l'effet du sort métamorphose par exemple), cette divination ne permet pas de la localiser. En outre, ce sort ne permet pas de localiser une créature si un cours d'eau d'au moins 3 m de large coupe le chemin direct qui vous sépare d'elle. Les frontières éthérées et l'Interdit de Mort mettent ce sort en échec.",
+  "modular_options": []
+}

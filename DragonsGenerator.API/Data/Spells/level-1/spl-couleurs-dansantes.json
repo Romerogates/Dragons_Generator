@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-couleurs-dansantes",
+  "name": "Couleurs dansantes",
+  "level": 1,
+  "school": "illusion",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "round"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(une pincée de poudre ou de sable rouge"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Une nuée éblouissante de couleurs vives jaillit de votre main. Lancez 6d10, le résultat obtenu étant le nombre de points de vie de créatures que le sort peut affecter. Les créatures prises dans un cône de 4,50 m dont vous êtes l'origine sont affectées dans l'ordre croissant de leurs points de vie actuels (sans prendre en compte les créatures inconscientes et celles qui ne peuvent pas voir). En commençant par celle qui a le moins de points de vie, chaque créature affectée par ce sort est aveuglée jusqu'à la fin de votre tour de jeu suivant. Soustrayez les points de vie de chaque cible du total de points de vie restants avant de passer à la créature suivante dans l'ordre croissant des points de vie. Pour qu'une créature puisse être affectée, il est nécessaire que ses points de vie soient inférieurs ou égaux au total restant.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, lancez 2d10 supplémentaires par niveau d'emplacement au-dessus du 1er.",
+  "modular_options": []
+}

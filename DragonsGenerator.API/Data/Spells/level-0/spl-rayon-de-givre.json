@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-rayon-de-givre",
+  "name": "Rayon de givre",
+  "level": 0,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Rayon de givre icon Un rayon glacé d'énergie bleutée file vers une créature située à portée. Effectuez une attaque de sort à distance contre la cible. En cas de réussite, elle subit 1d8 dégâts de froid et sa VD est réduite de 3 m jusqu'au début de votre tour de jeu suivant. Les dégâts de ce sort augmentent de 1d8 quand vous atteignez le niveau 5 (2d8), le niveau 11 (3d8) et le niveau 17 (4d8).",
+  "modular_options": []
+}

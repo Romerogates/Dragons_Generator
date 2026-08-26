@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "id": "div-givreuse",
+  "name": "Givreuse",
+  "tonality": "entropique",
+  "domains": [
+    "dom-temps",
+    "dom-vie"
+  ],
+  "other_names": [
+    "La Vieille",
+    "Nolwë",
+    "La Morsure"
+  ],
+  "description": "Givreuse est une déesse de l'hiver, de la pureté, du temps, de l'humilité, de la modération, de la patience et de la détermination. Elle guide les populations au travers des épreuves, faisant montre de sagesse et d'une grande liberté d'esprit. Là où Flore voit la vie comme un tout, Givreuse accepte la mort de ceux qui ont renoncé à se battre ou qui ont fait leur temps. Les prêtres vénérant cette divinité valorisent souvent la tempérance et se regroupent parfois en communauté vivant dans l'ascèse. Dans les régions polaires, les prêtres de Givreuse guident leur tribu, enseignant le cycle des saisons et la survie. Quand les temps sont particulièrement difficiles, il arrive à certains de tenter, en désespoir de cause, d'obtenir la clémence de la déesse par des rituels et des sacrifices.",
+  "worshippers_note": "Prêtres ascétiques valorisant la tempérance ; guides des tribus polaires. Dans le panthéon de l'Étoile, vénérée sous le nom de Haldrìn, sous l'aspect d'une femme âgée.",
+  "grants_powers_to": [
+    "pretre"
+  ],
+  "source": "livre_de_base"
+}

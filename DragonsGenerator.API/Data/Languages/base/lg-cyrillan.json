@@ -1,0 +1,23 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-cyrillan",
+  "name": "Cyrillan",
+  "category": "base",
+  "typical_speakers": [
+    "Cyrillans",
+    "Marchands de l'empire déchu"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-cyfand",
+      "label": "Cyfand",
+      "type": "alphabet"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [
+    "Cyrillane",
+    "comptoirs de l'empire déchu"
+  ],
+  "description": "Langue de la Cyrillane et de ses anciens comptoirs impériaux. Elle s'écrit avec l'alphabet cyfand."
+}

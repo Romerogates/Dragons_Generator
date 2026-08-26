@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "tl-jeu-de-cartes",
+  "name": "Jeu de cartes",
+  "category": "tool",
+  "subcategory": "gaming_set",
+  "cost": {
+    "value": 5,
+    "unit": "pa"
+  },
+  "weight_kg": null,
+  "description": "Matériel de jeu."
+}

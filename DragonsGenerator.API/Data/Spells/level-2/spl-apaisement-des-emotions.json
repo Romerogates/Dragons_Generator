@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-apaisement-des-emotions",
+  "name": "Apaisement des émotions",
+  "level": 2,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 10,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-pretre"
+  ],
+  "description": "V ous tentez de réprimer les émotions fortes d'un groupe de gens. Chaque humanoïde situé dans une sphère de 6 m de rayon centrée sur un point que vous choisissez à portée doit effectuer un JS Charisme. Chacun peut décider de le rater s'il le souhaite. En cas d'échec, choisissez un des deux effets suivants : Vous pouvez réprimer tout effet infligeant à une cible l'état préjudiciable charmé ou effrayé. Quand ce sort prend fin, tout effet réprimé reprend, sous réserve que sa durée n'ait pas expiré entre-temps. Au lieu de cela, vous pouvez rendre une cible indifférente envers des créatures de votre choix si elle leur est hostile. Cette indifférence prend fin si la cible est attaquée ou blessée par un sort, ou voit un de ses amis se faire blesser. Quand le sort prend fin, la créature redevient hostile, à moins que le meneur n'en décide autrement. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, le rayon de la sphère augmente de 3 m par niveau d'emplacement au-dessus du 2e. Logo Paix et amour Si votre meneur utilise cette option, en cas de marge d'échec de 5 ou plus au JS, les individus ciblés par le deuxième effet du sort se sentent d'humeur sereine, voire joyeuse. Leur comportement dépend alors de leur personnalité, et leur état d'esprit pourra influencer leur prise de décision vers le pacifisme et la conciliation. ## Appel de destrier Appel de destrier icon Vous convoquez un esprit qui prend la forme d'un destrier particulièrement intelligent, puissant et fidèle, et créez un lien durable avec lui. Le destrier apparaît dans un espace inoccupé situé à portée et prend la forme de votre choix : un destrier, un poney, un chameau, un élan ou un molosse (votre meneur peut autoriser d'autres types de monture). Il a le profil de la forme choisie, mais son type habituel est remplacé par céleste, fée ou fiélon (à votre convenance). En outre, si votre destrier a une Intelligence inférieure ou égale à 5, elle passe à 6, et il acquiert la faculté de comprendre une langue de votre choix que vous parlez. Votre destrier vous sert de monture, y compris au combat, et vous partagez avec lui un lien instinctif qui vous permet de combattre comme si vous ne faisiez qu'un. Tant que vous montez votre destrier, tout sort que vous lancez et qui ne cible que vous peut aussi le cibler. Quand le destrier tombe à 0 point de vie, il disparaît sans laisser de traces. Vous pouvez aussi le révoquer à tout moment au prix d'une action, il disparaît alors. Dans tous les cas, en relançant ce sort, vous invoquez le même destrier, avec ses points de vie maximums. Tant que votre destrier se situe dans un rayon de 1,5 km de vous, vous pouvez communiquer avec lui par télépathie, et vice versa. Vous ne pouvez avoir qu'un seul destrier lié par ce sort ou par appel de destrier volant à la fois. Au prix d'une action, vous pouvez le libérer de son lien à tout moment, auquel cas il disparaît. Lieu d'apparition icon ### Lieu d'apparition du destrier Si votre meneur utilise cette option, ce sort acquiert la composante rituel. En contrepartie, vous devez vous trouver en un lieu lié à l'entité qui animera votre monture. Céleste : un lieu sacré, un lieu baigné par la lumière du soleil. Fée : un lieu sauvage proche d'un royaume féerique. Fiélon : un lieu où un crime fut commis, un lieu maudit, un lieu inquiétant plongé dans les ténèbres. ## Appel de destrier volant Appel de destrier volant icon Vous convoquez un esprit qui prend la forme d'un destrier volant particulièrement intelligent, puissant et fidèle, et créez un lien durable avec lui. Le destrier apparaît dans un espace inoccupé situé à portée et prend la forme de votre choix : un griffon, un pégase ou un ange déchu. Il a le profil de la forme choisie, à ces différences près dans le cas d'un griffon : son type habituel est remplacé par fée, sa valeur d'Intelligence passe à 6 et il acquiert la faculté de comprendre une langue de votre choix que vous parlez. Votre destrier vous sert de monture, y compris au combat, et vous partagez avec lui un lien instinctif qui vous permet de combattre comme si vous ne faisiez qu'un. Tant que vous montez votre destrier, tout sort que vous lancez et qui ne cible que vous peut aussi le cibler. Quand le destrier tombe à 0 point de vie, il disparaît sans laisser de traces. Vous pouvez aussi le révoquer à tout moment au prix d'une action, il disparaît alors. Dans tous les cas, en relançant ce sort, vous invoquez le même destrier, avec ses points de vie maximums. Tant que votre destrier se situe dans un rayon de 1,5 km de vous, vous pouvez communiquer avec lui par télépathie, et vice versa. Vous ne pouvez avoir qu'un seul destrier lié par ce sort ou par appel de destrier à la fois. Au prix d'une action, vous pouvez le libérer de son lien à tout moment, auquel cas il disparaît. Appel de destrier volant icons",
+  "modular_options": []
+}

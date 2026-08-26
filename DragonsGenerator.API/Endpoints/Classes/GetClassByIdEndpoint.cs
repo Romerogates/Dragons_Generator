@@ -1,5 +1,9 @@
 ﻿
 
+using DragonsGenerator.API.Common;
+using DragonsGenerator.API.Models;
+using FastEndpoints;
+
 namespace DragonsGenerator.API.Endpoints.Classes;
 
 public class GetClassByIdRequest
@@ -9,6 +13,10 @@ public class GetClassByIdRequest
 
 public class GetClassByIdEndpoint : Endpoint<GetClassByIdRequest, CharacterClass>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetClassByIdEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/classes/{id}");
@@ -17,10 +25,7 @@ public class GetClassByIdEndpoint : Endpoint<GetClassByIdRequest, CharacterClass
 
     public override async Task HandleAsync(GetClassByIdRequest req, CancellationToken ct)
     {
-        var classes = await JsonDataLoader.LoadAsync<List<CharacterClass>>("classes.json", ct);
-
-        var characterClass = classes?.FirstOrDefault(c =>
-            string.Equals(c.Id, req.Id, StringComparison.OrdinalIgnoreCase));
+        var characterClass = await _repo.GetClassByIdAsync(req.Id, ct);
 
         if (characterClass is null)
         {

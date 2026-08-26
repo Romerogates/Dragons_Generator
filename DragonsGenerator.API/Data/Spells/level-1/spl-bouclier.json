@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-bouclier",
+  "name": "Bouclier",
+  "level": 1,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "reaction"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "round"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Une barrière invisible de force magique vous protège. Jusqu'au début de votre tour de jeu suivant, vous bénéficiez d'un bonus de +5 à la CA, y compris contre l'attaque déclenchante, et le sort projectile magique ne vous inflige pas de dégâts.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e ou 4e niveau, vous bénéficiez d'un bonus de +6 à la CA ; +7 pour un emplacement du 5e ou 6e niveau ; +8 pour un emplacement du 7e ou 8e niveau ; +9 pour un emplacement du 9e niveau. À partir d'un emplacement de sort du 3e niveau, vous bénéficiez d'une résistance aux dégâts de force. À partir du 7e niveau, bouclier vous confère également une immunité aux dégâts de force.",
+  "modular_options": []
+}

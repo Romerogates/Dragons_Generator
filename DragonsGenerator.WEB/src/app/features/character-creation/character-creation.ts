@@ -53,6 +53,9 @@ export class CharacterCreation implements OnInit {
   /** Affiche l'overlay de choix brouillon. */
   readonly showDraftPrompt = signal(false);
 
+  /** Niveaux sélectionnables dans le bandeau. */
+  readonly levels = Array.from({ length: 20 }, (_, i) => i + 1);
+
   ngOnInit(): void {
     // 1. Mode édition depuis /characters → priorité absolue
     const hasEditData = !!localStorage.getItem('dragons-edit-character');
@@ -76,6 +79,12 @@ export class CharacterCreation implements OnInit {
     this.builder.reset();
   }
 
+  onLevelChange(event: Event): void {
+    if (this.builder.isLevelLocked()) return;
+    const value = Number((event.target as HTMLSelectElement).value);
+    this.builder.setTargetLevel(value);
+  }
+
   onReset(): void {
     if (confirm('Êtes-vous sûr de vouloir recommencer ? Toutes les données seront perdues.')) {
       this.builder.reset();
@@ -83,6 +92,8 @@ export class CharacterCreation implements OnInit {
   }
 
   finishCreation(): void {
+    const character = this.builder.build();
+    localStorage.setItem('dragons-current-character', JSON.stringify(character));
     this.router.navigate(['/character-sheet']);
   }
 }

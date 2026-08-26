@@ -1,0 +1,58 @@
+<div class="min-h-[70vh] flex items-center justify-center px-4 py-10">
+  <div class="w-full max-w-md bg-[#1b2028] border border-slate-800 rounded-2xl p-8 shadow-xl">
+    <h1 class="font-serif text-2xl font-bold text-amber-500 mb-1 text-center">Créer un compte</h1>
+    <p class="text-xs text-slate-400 text-center mb-6 italic">
+      Un email de confirmation sera envoyé.
+    </p>
+
+    @if (success()) {
+      <p class="text-sm text-emerald-400 text-center mb-4">
+        Compte créé. Ouvrez le lien reçu par email pour activer votre compte, puis connectez-vous.
+      </p>
+      <a routerLink="/login" class="wizard-nav-primary w-full text-center block">Aller à la connexion</a>
+    } @else {
+      <form class="flex flex-col gap-4" (ngSubmit)="submit()">
+        <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+          Pseudo (optionnel)
+          <input
+            type="text"
+            [(ngModel)]="displayName"
+            name="displayName"
+            class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 outline-none"
+          />
+        </label>
+        <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+          Email
+          <input
+            type="email"
+            required
+            [(ngModel)]="email"
+            name="email"
+            class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 outline-none"
+          />
+        </label>
+        <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+          Mot de passe (8+ caractères)
+          <input
+            type="password"
+            required
+            minlength="8"
+            [(ngModel)]="password"
+            name="password"
+            class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 outline-none"
+          />
+        </label>
+        @if (error()) {
+          <p class="text-sm text-red-400">{{ error() }}</p>
+        }
+        <button type="submit" class="wizard-nav-primary w-full" [disabled]="loading()">
+          {{ loading() ? 'Création…' : "S'inscrire" }}
+        </button>
+      </form>
+      <p class="mt-4 text-center text-xs text-slate-400">
+        Déjà un compte ?
+        <a routerLink="/login" class="text-amber-500 hover:underline">Connexion</a>
+      </p>
+    }
+  </div>
+</div>

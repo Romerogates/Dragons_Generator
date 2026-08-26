@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-epee-du-mage",
+  "name": "Épée du mage",
+  "level": 7,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une minuscule épée en platine munie d'une poignée et d'un pommeau en cuivre et en zinc d'une valeur de 250 po"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien"
+  ],
+  "description": "Jous faites apparaître à portée une épée de force qui plane dans les airs pour toute la durée du sort. Quand l'épée se manifeste, effectuez une attaque de sort de corps à corps contre une cible de votre choix située dans un rayon de 1,50 m de l'arme. En cas de réussite, la cible subit 3d10 dégâts de force. Tant que le sort persiste, vous pouvez, au prix d'une action bonus à votre tour de jeu, déplacer l'épée jusqu'à 6 m vers un espace que vous voyez et réitérer cette attaque contre la même cible ou une autre.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 8e niveau ou supérieur, les dégâts infligés par l'arme augmentent de 1d10 par niveau d'emplacement au-dessus du 7e.",
+  "modular_options": []
+}

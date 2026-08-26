@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-antidetection",
+  "name": "Antidétection",
+  "level": 3,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 8,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(une pincée de poudre de diamant d'une valeur de 25 po"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien",
+    "cls-rodeur"
+  ],
+  "description": "P our toute la durée du sort, vous protégez une cible que vous touchez contre la magie de divination. La cible peut être une créature consentante, un lieu ou un objet ne dépassant pas 3 m d'arête. Elle ne peut pas être ciblée par une magie de divination ou détectée par des capteurs de scrutation magique. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, il est possible de cibler une créature, un lieu ou un objet faisant 3 m d'arête supplémentaires par niveau d'emplacement au-dessus du 3e.",
+  "modular_options": []
+}

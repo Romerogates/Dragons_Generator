@@ -1,0 +1,125 @@
+{
+  "schema_version": "2.0",
+  "description": "Index des compétences (Dragons — jeu de rôle). Les 18 compétences du livre de base, chacune associée à une caractéristique (FOR, DEX, INT, SAG, CHA). Aucune compétence n'est liée à la Constitution.",
+  "language": "fr",
+  "stats": {
+    "total": 18,
+    "by_ability": {
+      "FOR": 1,
+      "DEX": 3,
+      "INT": 5,
+      "SAG": 5,
+      "CHA": 4
+    }
+  },
+  "entries": [
+    {
+      "id": "ski-athletisme",
+      "name": "Athlétisme",
+      "ability": "FOR",
+      "file": "Skills/ski-athletisme.json"
+    },
+    {
+      "id": "ski-acrobaties",
+      "name": "Acrobaties",
+      "ability": "DEX",
+      "file": "Skills/ski-acrobaties.json"
+    },
+    {
+      "id": "ski-discretion",
+      "name": "Discrétion",
+      "ability": "DEX",
+      "file": "Skills/ski-discretion.json"
+    },
+    {
+      "id": "ski-escamotage",
+      "name": "Escamotage",
+      "ability": "DEX",
+      "file": "Skills/ski-escamotage.json"
+    },
+    {
+      "id": "ski-arcanes",
+      "name": "Arcanes",
+      "ability": "INT",
+      "file": "Skills/ski-arcanes.json"
+    },
+    {
+      "id": "ski-histoire",
+      "name": "Histoire",
+      "ability": "INT",
+      "file": "Skills/ski-histoire.json"
+    },
+    {
+      "id": "ski-investigation",
+      "name": "Investigation",
+      "ability": "INT",
+      "file": "Skills/ski-investigation.json"
+    },
+    {
+      "id": "ski-nature",
+      "name": "Nature",
+      "ability": "INT",
+      "file": "Skills/ski-nature.json"
+    },
+    {
+      "id": "ski-religion",
+      "name": "Religion",
+      "ability": "INT",
+      "file": "Skills/ski-religion.json"
+    },
+    {
+      "id": "ski-dressage",
+      "name": "Dressage",
+      "ability": "SAG",
+      "file": "Skills/ski-dressage.json"
+    },
+    {
+      "id": "ski-intuition",
+      "name": "Intuition",
+      "ability": "SAG",
+      "file": "Skills/ski-intuition.json"
+    },
+    {
+      "id": "ski-medecine",
+      "name": "Médecine",
+      "ability": "SAG",
+      "file": "Skills/ski-medecine.json"
+    },
+    {
+      "id": "ski-perception",
+      "name": "Perception",
+      "ability": "SAG",
+      "file": "Skills/ski-perception.json"
+    },
+    {
+      "id": "ski-survie",
+      "name": "Survie",
+      "ability": "SAG",
+      "file": "Skills/ski-survie.json"
+    },
+    {
+      "id": "ski-intimidation",
+      "name": "Intimidation",
+      "ability": "CHA",
+      "file": "Skills/ski-intimidation.json"
+    },
+    {
+      "id": "ski-persuasion",
+      "name": "Persuasion",
+      "ability": "CHA",
+      "file": "Skills/ski-persuasion.json"
+    },
+    {
+      "id": "ski-representation",
+      "name": "Représentation",
+      "ability": "CHA",
+      "file": "Skills/ski-representation.json"
+    },
+    {
+      "id": "ski-tromperie",
+      "name": "Tromperie",
+      "ability": "CHA",
+      "file": "Skills/ski-tromperie.json"
+    }
+  ]
+}

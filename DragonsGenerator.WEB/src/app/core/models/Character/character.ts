@@ -43,6 +43,15 @@ export interface AbilityScores {
   charisme: number;
 }
 
+/** Un palier ASI (ou don à la place). */
+export interface AsiChoiceSlot {
+  level: number;
+  mode: 'plus2' | 'plus1plus1' | 'feat';
+  primary?: AbilityKey | null;
+  secondary?: AbilityKey | null;
+  featId?: string | null;
+}
+
 export const ABILITY_KEYS: readonly AbilityKey[] = [
   'force',
   'dexterite',
@@ -68,6 +77,22 @@ export const ABILITY_LABEL_TO_KEY: Record<Ability, AbilityKey> = {
   Intelligence: 'intelligence',
   Sagesse: 'sagesse',
   Charisme: 'charisme',
+};
+
+/** Impact en jeu de chaque caractéristique (verso des cartes ASI, etc.). */
+export const ABILITY_IMPACT_DESC: Record<AbilityKey, string> = {
+  force:
+    'Puissance physique et athlétisme. Influe sur les attaques au corps à corps, les dégâts des armes de Force, la capacité de charge, ainsi que les jets d’Athlétisme (grimper, sauter, lutter).',
+  dexterite:
+    'Agilité, réflexes et précision. Influe sur l’initiative, la CA (sans armure lourde), les attaques à distance et fines, ainsi que Acrobaties, Discrétion et Tour de passe-passe.',
+  constitution:
+    'Endurance et vitalité. Détermine vos points de vie (à chaque niveau), la résistance à la fatigue, et les jets de sauvegarde liés à la santé (poison, maladie, concentration).',
+  intelligence:
+    'Mémoire, analyse et savoir. Sert aux sorts des magiciens, aux jets d’Arcane, Histoire, Investigation, Nature et Religion, et à la résolution de problèmes intellectuels.',
+  sagesse:
+    'Perception et intuition. Sert aux sorts de prêtres et druides, aux jets de Perception, Insight (intuition), Médecine, Survie et Dressage, et à repérer les dangers.',
+  charisme:
+    'Présence et force de personnalité. Sert aux sorts de barde, sorcier et ensorceleur, ainsi qu’à Persuasion, Tromperie, Intimidation et Représentation.',
 };
 
 // =============================================================================
@@ -383,6 +408,10 @@ interface CharacterSpellcastingBase {
 export interface WizardSpellcasting extends CharacterSpellcastingBase {
   kind: 'wizard';
   arcaneTradition: string;
+  /** Maîtrise des sorts (L17) : 1 sort niv.1 + 1 sort niv.2 à volonté. */
+  spellMastery: { spellLevel: number; spellId: string; spellName: string }[];
+  /** Sorts attitrés (L19) : 2 sorts niv.3 toujours préparés, 1× / repos long chacun. */
+  signatureSpells: { spellId: string; spellName: string }[];
 }
 
 // ENSORCELEUR - Grimoire de l'Ensorceleur
@@ -398,7 +427,9 @@ export interface WarlockSpellcasting extends CharacterSpellcastingBase {
   kind: 'warlock';
   patron: string; // Suzerain
   pact: string;
-  eldritchInvocations: string[]; // Manifestations occultes
+  eldritchInvocations: string[]; // Manifestations occultes (noms affichés)
+  /** Arcanes : un sort de haut niveau par palier (1× / repos long). */
+  mysticArcanum: { spellLevel: number; spellId: string; spellName: string }[];
 }
 
 // PRÊTRE - Grimoire du Prêtre
@@ -570,6 +601,8 @@ export interface Character {
   // === Incantation ===
   spellcasting: CharacterSpellcasting | null;
   knownSpells: SpellInstance[];
+  /** Ressources de progression (points d'astuce, rage, ki, points arcaniques…). */
+  classResources?: Record<string, number>;
 
   // === Page 1 - divers ===
   ammunition: Ammunition[];
@@ -597,6 +630,12 @@ export interface CharacterCreation {
   speciesResistances: string[];
   hasDarkvision: boolean;
   darkvisionRadius: number;
+  /** Answers to species creation choices (e.g. dragon lineage). */
+  speciesChoiceAnswers: Record<string, string[]>;
+  /** Compétences bonus d'espèce à choisir (Polyvalence, etc.). */
+  speciesBonusSkillCount: number;
+  /** Outils bonus d'espèce à choisir. */
+  speciesBonusToolCount: number;
 
   // Étape 2 - Civilisation
   civilizationId: string | null;
@@ -620,11 +659,17 @@ export interface CharacterCreation {
   handicapCompensationType: string | null;
 
   // Étape 4 - Classe (anciennement 3)
+  /** Niveau cible du personnage (1–20). Défaut : 1. */
+  targetLevel: number;
   classId: string | null;
   className: string | null;
   subclassId: string | null;
   subclassName: string | null;
   hitDie: number;
+  /** PV max au niveau 1 (sans CON), depuis la classe. */
+  hpAtLevel1: number;
+  /** PV moyens par niveau après le 1 (sans CON). */
+  hpPerLevelAverage: number;
   hasSpellcasting: boolean;
   spellcastingKind: SpellcastingKind | null;
   spellcastingAbility: Ability | null;
@@ -636,6 +681,32 @@ export interface CharacterCreation {
   skillChooseCount: number;
   classFeatures: FeatureInstance[];
   startingEquipmentSlots: EquipmentSlot[];
+  /** Ressources de progression au niveau cible (ki, rage, déplacement sans armure…). */
+  classProgressionResources: Record<string, number | string | null>;
+  /** Réponses aux choix de progression (ennemi, terrain, métamagie, invocations…). */
+  classChoiceAnswers: Record<string, string[]>;
+  /** Bonus ASI (niv. 4+) appliqués après le point-buy — somme de tous les slots. */
+  asiBonuses: Partial<AbilityScores>;
+  /** Don choisi à la place d'un ASI (compat : premier don). */
+  selectedFeatId: string | null;
+  /** Tous les dons choisis à la place d'ASI (multi-slots niv. 6–20). */
+  selectedFeatIds: string[];
+  /** Détail des choix ASI (un par palier). */
+  asiChoices: AsiChoiceSlot[];
+  /** Compétences en expertise (roublard, barde, lettré…). */
+  expertiseSkills: string[];
+  /** Options de métamagie choisies. */
+  metamagicOptions: string[];
+  /** Manifestations occultes (sorcier). */
+  eldritchInvocations: string[];
+  /** Faveur du pacte (sorcier). */
+  pactBoon: string | null;
+  /** Arcanes sorcier : clé = niveau de sort (6–9), valeur = id du sort. */
+  mysticArcanumPicks: Record<string, string>;
+  /** Magicien L17 : clé = niveau de sort (1|2), valeur = id. */
+  spellMasteryPicks: Record<string, string>;
+  /** Magicien L19 : deux sorts de niveau 3. */
+  signatureSpellIds: string[];
 
   // Étape 5 - Caractéristiques (anciennement 4)
   baseAbilities: AbilityScores;

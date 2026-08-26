@@ -1,0 +1,32 @@
+{
+  "schema_version": "2.0",
+  "id": "don-temeraire",
+  "name": "Téméraire",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [],
+  "description": "Quand vous ratez un JS contre l'état effrayé : vous pouvez jouer votre réaction pour retenter. Bonus aux jets d'attaque et de dégâts en corps à corps contre des créatures plus grandes que vous (+1 par cran de taille d'écart). Quand vous subissez un coup critique : vous pouvez jouer votre réaction pour effectuer une attaque de corps à corps.",
+  "benefits": [
+    {
+      "type": "reroll_save",
+      "condition": "raté JS contre état effrayé",
+      "action": "réaction"
+    },
+    {
+      "type": "attack_damage_bonus",
+      "condition": "cible de taille supérieure",
+      "formula": "+1 par cran de taille"
+    },
+    {
+      "type": "reaction_attack",
+      "trigger": "subir coup critique",
+      "type_": "corps à corps"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "courage",
+    "corps-à-corps",
+    "réaction"
+  ]
+}

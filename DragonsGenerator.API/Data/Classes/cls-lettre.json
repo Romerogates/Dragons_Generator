@@ -1,0 +1,1342 @@
+{
+  "id": "cls-lettre",
+  "schema_version": "3.0",
+  "name": "Lettré",
+  "flavor": {
+    "summary": "Aventurier polyvalent s'appuyant sur son intellect supérieur, ses connaissances théoriques et sa grande adaptabilité pour réaliser des prouesses dans toutes sortes de circonstances.",
+    "lore_note": "Chercheurs, alchimistes, occultistes, dracologues : les lettrés couvrent une gamme extraordinairement large de disciplines. Puits de science capables de véritables éclairs de génie, indispensables à tout groupe d'aventuriers."
+  },
+  "hit_die": "1d8",
+  "hp_at_level_1": 8,
+  "hp_per_level_average": 5,
+  "primary_abilities": [
+    "int",
+    "wis"
+  ],
+  "saving_throw_proficiencies": [
+    "int",
+    "wis"
+  ],
+  "armor_proficiencies": [
+    "ar-light"
+  ],
+  "weapon_proficiencies": [
+    "wp-dague",
+    "wp-baton-de-combat"
+  ],
+  "tool_proficiencies": [],
+  "choice_pools": [
+    {
+      "id": "choice-weapons-cls-lettre",
+      "name": "Armes supplémentaires maîtrisées",
+      "type": "weapon_proficiency",
+      "allow_choice": true,
+      "quantity": 2,
+      "pool": [
+        "wp-any"
+      ],
+      "constraint_max_price_po": 25,
+      "unlocked_at_level": 1
+    },
+    {
+      "id": "choice-tools-cls-lettre",
+      "name": "Maîtrises d'outils",
+      "type": "tool_proficiency",
+      "allow_choice": true,
+      "quantity": 3,
+      "pool": [
+        "tl-any"
+      ],
+      "unlocked_at_level": 1
+    },
+    {
+      "id": "choice-languages-cls-lettre",
+      "name": "Langues supplémentaires",
+      "type": "language_proficiency",
+      "allow_choice": true,
+      "quantity": 3,
+      "pool": [
+        "lang-any"
+      ],
+      "unlocked_at_level": 1
+    },
+    {
+      "id": "choice-skills-cls-lettre",
+      "name": "Compétences de classe",
+      "type": "skill_proficiency",
+      "allow_choice": true,
+      "quantity": 3,
+      "pool": [
+        "skill-any"
+      ],
+      "unlocked_at_level": 1
+    },
+    {
+      "id": "choice-astuces-initial-cls-lettre",
+      "name": "Astuces initiales (Empressement fixe + 2 au choix)",
+      "type": "feature_selection",
+      "allow_choice": true,
+      "quantity": 2,
+      "fixed_features": [
+        "feat-astuce-empressement"
+      ],
+      "pool": [
+        "feat-astuce-abstraction",
+        "feat-astuce-audace",
+        "feat-astuce-brio",
+        "feat-astuce-diversion",
+        "feat-astuce-effervescence",
+        "feat-astuce-expedient",
+        "feat-astuce-fulgurance",
+        "feat-astuce-inapercu",
+        "feat-astuce-ingeniosite",
+        "feat-astuce-jaugeage",
+        "feat-astuce-repit",
+        "feat-astuce-tac-au-tac"
+      ],
+      "unlocked_at_level": 1
+    },
+    {
+      "id": "choice-astuce-gain-cls-lettre",
+      "name": "Nouvelle astuce",
+      "type": "feature_selection",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        "feat-astuce-abstraction",
+        "feat-astuce-audace",
+        "feat-astuce-brio",
+        "feat-astuce-diversion",
+        "feat-astuce-effervescence",
+        "feat-astuce-expedient",
+        "feat-astuce-fulgurance",
+        "feat-astuce-inapercu",
+        "feat-astuce-ingeniosite",
+        "feat-astuce-jaugeage",
+        "feat-astuce-repit",
+        "feat-astuce-tac-au-tac"
+      ],
+      "unlocked_at_levels": [
+        5,
+        9,
+        11,
+        15,
+        18
+      ]
+    },
+    {
+      "id": "choice-conquete-niv3-cls-lettre",
+      "name": "Effet de Conquête méthodique (niv. 3)",
+      "type": "feature_selection",
+      "allow_choice": true,
+      "quantity": 1,
+      "replaceable": true,
+      "pool": [
+        "feat-conquete-methodique-alerte",
+        "feat-conquete-methodique-langue-universelle",
+        "feat-conquete-methodique-perception-magie"
+      ],
+      "unlocked_at_level": 3
+    },
+    {
+      "id": "choice-conquete-niv9-cls-lettre",
+      "name": "Effet de Conquête méthodique (niv. 9)",
+      "type": "feature_selection",
+      "allow_choice": true,
+      "quantity": 1,
+      "replaceable": true,
+      "pool": [
+        "feat-conquete-methodique-presence-residuelle",
+        "feat-conquete-methodique-refuge",
+        "feat-conquete-methodique-sous-cape"
+      ],
+      "unlocked_at_level": 9
+    },
+    {
+      "id": "choice-conquete-niv13-cls-lettre",
+      "name": "Effet de Conquête méthodique (niv. 13)",
+      "type": "feature_selection",
+      "allow_choice": true,
+      "quantity": 1,
+      "replaceable": true,
+      "pool": [
+        "feat-conquete-methodique-havre",
+        "feat-conquete-methodique-interdit",
+        "feat-conquete-methodique-telepathie"
+      ],
+      "unlocked_at_level": 13
+    },
+    {
+      "id": "choice-specialiste-cls-lettre",
+      "name": "Spécialité (expertise)",
+      "type": "expertise",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        "skill-any",
+        "tl-any"
+      ],
+      "unlocked_at_level": 3
+    },
+    {
+      "id": "choice-marotte-cls-lettre",
+      "name": "Marotte",
+      "type": "subclass",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        "subcls-alchimie",
+        "subcls-exploration-de-lame"
+      ],
+      "unlocked_at_level": 3,
+      "note": "Faculté d'adaptation (règle optionnelle) : archétypes compatibles d'autres classes (élu arcanique, ruffian, chasseur, explorateur de l'Inframonde, espion) acceptés sous conditions."
+    }
+  ],
+  "spellcasting": null,
+  "starting_equipment": {
+    "fixed": [
+      {
+        "id": "ar-armure-de-cuir",
+        "qty": 1
+      }
+    ],
+    "choice_pools": [
+      {
+        "id": "choice-equip-slot2-cls",
+        "name": "Équipement (slot 2)",
+        "type": "equipment",
+        "allow_choice": true,
+        "quantity": 1,
+        "options": [
+          {
+            "option_id": "A",
+            "items": [
+              {
+                "id": "tl-mastered-choice",
+                "qty": 1
+              }
+            ]
+          },
+          {
+            "option_id": "B",
+            "items": [
+              {
+                "id": "wp-mastered-choice",
+                "qty": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "choice-equip-slot3-cls",
+        "name": "Équipement (slot 3)",
+        "type": "equipment",
+        "allow_choice": true,
+        "quantity": 1,
+        "options": [
+          {
+            "option_id": "A",
+            "items": [
+              {
+                "id": "gr-sac-derudit",
+                "qty": 1
+              }
+            ]
+          },
+          {
+            "option_id": "B",
+            "items": [
+              {
+                "id": "gr-sac-daventurier",
+                "qty": 1
+              }
+            ]
+          },
+          {
+            "option_id": "C",
+            "items": [
+              {
+                "id": "gr-sac-de-diplomate",
+                "qty": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "progression": [
+    {
+      "level": 1,
+      "features": [
+        "feat-besace-a-astuces",
+        "feat-astuces"
+      ],
+      "resources": {
+        "points_astuce": 4,
+        "astuces_known": 3,
+        "bidouilles_per_rest": 0,
+        "conquete_methodique_effects": 0
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 2,
+      "features": [
+        "feat-don"
+      ],
+      "resources": {
+        "points_astuce": 5,
+        "astuces_known": 3,
+        "bidouilles_per_rest": 0,
+        "conquete_methodique_effects": 0
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 3,
+      "features": [
+        "feat-marotte",
+        "feat-conquete-methodique",
+        "feat-specialiste"
+      ],
+      "resources": {
+        "points_astuce": 5,
+        "astuces_known": 3,
+        "bidouilles_per_rest": 0,
+        "conquete_methodique_effects": 1
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 4,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "points_astuce": 6,
+        "astuces_known": 3,
+        "bidouilles_per_rest": 0,
+        "conquete_methodique_effects": 1
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 5,
+      "features": [
+        "feat-gain-astuce"
+      ],
+      "resources": {
+        "points_astuce": 7,
+        "astuces_known": 4,
+        "bidouilles_per_rest": 0,
+        "conquete_methodique_effects": 1
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 6,
+      "features": [
+        "feat-aptitude-de-marotte",
+        "feat-don"
+      ],
+      "resources": {
+        "points_astuce": 8,
+        "astuces_known": 4,
+        "bidouilles_per_rest": 0,
+        "conquete_methodique_effects": 1
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 7,
+      "features": [
+        "feat-bidouille"
+      ],
+      "resources": {
+        "points_astuce": 8,
+        "astuces_known": 4,
+        "bidouilles_per_rest": 1,
+        "conquete_methodique_effects": 1
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 8,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "points_astuce": 9,
+        "astuces_known": 4,
+        "bidouilles_per_rest": 1,
+        "conquete_methodique_effects": 1
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 9,
+      "features": [
+        "feat-gain-astuce",
+        "feat-conquete-methodique"
+      ],
+      "resources": {
+        "points_astuce": 10,
+        "astuces_known": 5,
+        "bidouilles_per_rest": 1,
+        "conquete_methodique_effects": 2
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 10,
+      "features": [
+        "feat-aptitude-de-marotte",
+        "feat-don"
+      ],
+      "resources": {
+        "points_astuce": 11,
+        "astuces_known": 5,
+        "bidouilles_per_rest": 1,
+        "conquete_methodique_effects": 2
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 11,
+      "features": [
+        "feat-gain-astuce"
+      ],
+      "resources": {
+        "points_astuce": 12,
+        "astuces_known": 6,
+        "bidouilles_per_rest": 1,
+        "conquete_methodique_effects": 2
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 12,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "points_astuce": 13,
+        "astuces_known": 6,
+        "bidouilles_per_rest": 1,
+        "conquete_methodique_effects": 2
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 13,
+      "features": [
+        "feat-conquete-methodique"
+      ],
+      "resources": {
+        "points_astuce": 14,
+        "astuces_known": 6,
+        "bidouilles_per_rest": 1,
+        "conquete_methodique_effects": 3
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 14,
+      "features": [
+        "feat-don"
+      ],
+      "resources": {
+        "points_astuce": 14,
+        "astuces_known": 6,
+        "bidouilles_per_rest": 2,
+        "conquete_methodique_effects": 3
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 15,
+      "features": [
+        "feat-gain-astuce"
+      ],
+      "resources": {
+        "points_astuce": 15,
+        "astuces_known": 7,
+        "bidouilles_per_rest": 2,
+        "conquete_methodique_effects": 3
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 16,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "points_astuce": 16,
+        "astuces_known": 7,
+        "bidouilles_per_rest": 2,
+        "conquete_methodique_effects": 3
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 17,
+      "features": [
+        "feat-aptitude-de-marotte"
+      ],
+      "resources": {
+        "points_astuce": 17,
+        "astuces_known": 7,
+        "bidouilles_per_rest": 2,
+        "conquete_methodique_effects": 3
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 18,
+      "features": [
+        "feat-gain-astuce",
+        "feat-don"
+      ],
+      "resources": {
+        "points_astuce": 18,
+        "astuces_known": 8,
+        "bidouilles_per_rest": 2,
+        "conquete_methodique_effects": 3
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 19,
+      "features": [
+        "feat-augmentation-de-caracteristique"
+      ],
+      "resources": {
+        "points_astuce": 19,
+        "astuces_known": 8,
+        "bidouilles_per_rest": 2,
+        "conquete_methodique_effects": 3
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 20,
+      "features": [
+        "feat-besace-dabondance"
+      ],
+      "resources": {
+        "points_astuce": 20,
+        "astuces_known": 8,
+        "bidouilles_per_rest": 3,
+        "conquete_methodique_effects": 3
+      },
+      "proficiency_bonus": 6
+    }
+  ],
+  "features_details": [
+    {
+      "id": "feat-besace-a-astuces",
+      "name": "Besace à astuces",
+      "unlocks_at_level": 1,
+      "recharge": "short_rest",
+      "resource_key": "points_astuce",
+      "save_dc": {
+        "formula": "8 + prof_bonus + int_mod",
+        "label": "DD de sauvegarde des Astuces"
+      },
+      "flavor": {
+        "summary": "Vous puisez dans votre intellect supérieur pour réaliser des prouesses étonnantes via des points d'astuce.",
+        "lore_note": null
+      },
+      "description": "Vous disposez d'un nombre de points d'astuce défini par la table de progression (colonne Points d'astuce). Vous ne pouvez jamais en avoir plus que ce qu'affiche la table à votre niveau. Vous récupérez tous les points dépensés après un repos court ou long. Ces points alimentent les aptitudes de la catégorie Astuces ainsi que certaines aptitudes de marotte."
+    },
+    {
+      "id": "feat-astuces",
+      "name": "Astuces",
+      "unlocks_at_level": 1,
+      "recharge": "at_will",
+      "choice_pool_ref": "choice-astuces-initial-cls-lettre",
+      "gain_pool_ref": "choice-astuce-gain-cls-lettre",
+      "flavor": {
+        "summary": "Répertoire de techniques brillantes activées en dépensant des points d'astuce.",
+        "lore_note": null
+      },
+      "description": "Empressement et 2 astuces au choix sont octroyés au niveau 1. Une nouvelle astuce est sélectionnée aux niveaux 5, 9, 11, 15 et 18. La marotte choisie peut conférer des astuces supplémentaires."
+    },
+    {
+      "id": "feat-astuce-empressement",
+      "name": "Empressement",
+      "unlocks_at_level": 1,
+      "recharge": "at_will",
+      "cost": {
+        "resource": "points_astuce",
+        "amount_min": 1,
+        "amount_max": 2
+      },
+      "action": "bonus_action",
+      "flavor": {
+        "summary": "Se rendre utile en plein combat sans perdre une seconde.",
+        "lore_note": null
+      },
+      "description": "Dépensez 1 PA : effectuez l'action Assister, Foncer ou Chercher comme action bonus. Pour l'action Assister ciblant une attaque sur une créature, dépensez 1 PA supplémentaire pour étendre la portée à 9 m (au lieu de 1,50 m)."
+    },
+    {
+      "id": "feat-astuce-abstraction",
+      "name": "Abstraction",
+      "unlocks_at_level": 1,
+      "recharge": "at_will",
+      "cost_sag_cha": {
+        "resource": "points_astuce",
+        "amount": 1
+      },
+      "cost_for_dex_con": {
+        "resource": "points_astuce",
+        "amount": 3
+      },
+      "flavor": {
+        "summary": "Votre réactivité mentale vous permet de substituer votre Intelligence aux jets de sauvegarde.",
+        "lore_note": null
+      },
+      "description": "Lors d'un jet de sauvegarde autre qu'Intelligence, dépensez 1 PA (Sagesse ou Charisme) ou 3 PA (Force, Dextérité ou Constitution) pour substituer votre modificateur d'Intelligence au modificateur prévu."
+    },
+    {
+      "id": "feat-astuce-audace",
+      "name": "Audace",
+      "unlocks_at_level": 1,
+      "recharge": "at_will",
+      "cost": {
+        "resource": "points_astuce",
+        "amount": 1
+      },
+      "trigger": "reaction",
+      "flavor": {
+        "summary": "Il en faut beaucoup pour impressionner un esprit aussi brillant que le vôtre.",
+        "lore_note": null
+      },
+      "description": "Lorsque vous ratez un jet de sauvegarde qui vous impose l'état effrayé ou charmé, jouez votre réaction et dépensez 1 PA pour vous débarrasser immédiatement de l'état."
+    },
+    {
+      "id": "feat-astuce-brio",
+      "name": "Brio",
+      "unlocks_at_level": 1,
+      "recharge": "at_will",
+      "cost": {
+        "resource": "points_astuce",
+        "amount": 2
+      },
+      "flavor": {
+        "summary": "Vous êtes si brillant que vous paraissez parfois plus expert que vous ne l'êtes vraiment.",
+        "lore_note": null
+      },
+      "description": "Avant d'effectuer une attaque, un jet de sauvegarde ou un test de caractéristique, dépensez 2 PA pour appliquer votre bonus de maîtrise au jet. Si votre bonus de maîtrise s'appliquait déjà, il est doublé pour ce jet."
+    },
+    {
+      "id": "feat-astuce-diversion",
+      "name": "Diversion",
+      "unlocks_at_level": 1,
+      "recharge": "at_will",
+      "cost": {
+        "resource": "points_astuce",
+        "amount_min": 1,
+        "amount_max": 3
+      },
+      "trigger": "reaction",
+      "flavor": {
+        "summary": "Vous détournez l'attention de l'ennemi pour gêner ses manœuvres.",
+        "lore_note": null
+      },
+      "description": "Réaction lorsqu'une créature visible (portée 18 m) effectue une attaque, un test ou un jet de dégâts : dépensez 1 à 3 PA, lancez le même nombre de d4 et soustrayez la somme au résultat. Applicable après le jet du dé mais avant l'annonce du résultat. N'affecte pas une créature qui ne vous voit et ne vous entend pas."
+    },
+    {
+      "id": "feat-astuce-effervescence",
+      "name": "Effervescence",
+      "unlocks_at_level": 1,
+      "recharge": "at_will",
+      "cost": {
+        "resource": "points_astuce",
+        "amount": 2
+      },
+      "limit": "once_per_turn",
+      "flavor": {
+        "summary": "Dans l'adversité, vous savez vous transcender.",
+        "lore_note": null
+      },
+      "description": "À votre tour, dépensez 2 PA pour effectuer une action supplémentaire (en plus de votre action normale et d'une éventuelle action bonus). Utilisable une seule fois par tour."
+    },
+    {
+      "id": "feat-astuce-expedient",
+      "name": "Expédient",
+      "unlocks_at_level": 1,
+      "recharge": "at_will",
+      "cost": {
+        "resource": "points_astuce",
+        "amount": 5
+      },
+      "trigger": "reaction",
+      "flavor": {
+        "summary": "Vous savez esquiver efficacement les effets dévastateurs.",
+        "lore_note": null
+      },
+      "description": "Lorsqu'une attaque ou un effet doit vous infliger des dégâts ou un état préjudiciable, réaction + 5 PA : déplacez-vous gratuitement de votre VD sans provoquer d'attaque d'opportunité. Si votre nouvelle position vous met à l'abri, vous ne subissez ni les dégâts ni l'état."
+    },
+    {
+      "id": "feat-astuce-fulgurance",
+      "name": "Fulgurance",
+      "unlocks_at_level": 1,
+      "recharge": "at_will",
+      "cost": {
+        "resource": "points_astuce",
+        "amount_min": 1,
+        "amount_max": 3
+      },
+      "flavor": {
+        "summary": "Des traits de génie vous permettent de vous surpasser dans la difficulté.",
+        "lore_note": null
+      },
+      "description": "Lors d'une attaque, d'un jet de sauvegarde ou d'un test de caractéristique, dépensez 1 à 3 PA : lancez le même nombre de d4 et ajoutez la somme au jet. Peut être décidé après le lancer du d20, tant que le meneur n'a pas annoncé la réussite ou l'échec."
+    },
+    {
+      "id": "feat-astuce-inapercu",
+      "name": "Inaperçu",
+      "unlocks_at_level": 1,
+      "recharge": "at_will",
+      "cost": {
+        "resource": "points_astuce",
+        "amount": 1
+      },
+      "trigger": "reaction",
+      "flavor": {
+        "summary": "Vous savez vous faire oublier quand les choses se gâtent.",
+        "lore_note": null
+      },
+      "description": "Lorsqu'une créature vous cible avec une attaque ou un sort délétère, réaction + 1 PA : la forcez à changer de cible ou perdre l'attaque/sort. N'annule pas les effets de zone (ex : boule de feu)."
+    },
+    {
+      "id": "feat-astuce-ingeniosite",
+      "name": "Ingéniosité",
+      "unlocks_at_level": 1,
+      "recharge": "at_will",
+      "cost_sag_cha": {
+        "resource": "points_astuce",
+        "amount": 1
+      },
+      "cost_for_dex_con": {
+        "resource": "points_astuce",
+        "amount": 3
+      },
+      "flavor": {
+        "summary": "Votre vivacité intellectuelle vous permet de surmonter vos lacunes sur les tests de caractéristique.",
+        "lore_note": null
+      },
+      "description": "Lors d'un test de caractéristique autre qu'Intelligence, dépensez 1 PA (Sagesse ou Charisme) ou 3 PA (Force, Dextérité ou Constitution) pour substituer votre modificateur d'Intelligence au modificateur prévu."
+    },
+    {
+      "id": "feat-astuce-jaugeage",
+      "name": "Jaugeage",
+      "unlocks_at_level": 1,
+      "recharge": "at_will",
+      "cost": {
+        "resource": "points_astuce",
+        "amount": 1
+      },
+      "action": "action",
+      "duration_minutes": 10,
+      "limit": "one_target_at_a_time",
+      "flavor": {
+        "summary": "Vous évaluez l'adversité pour mieux vous en préserver.",
+        "lore_note": null
+      },
+      "description": "Action + 1 PA : désignez une cible visible (portée 18 m). Pendant 10 minutes : bonus +2 aux jets d'attaque contre elle, aux jets de sauvegarde contre ses aptitudes et sorts, et aux tests de caractéristique la concernant directement (interactions sociales, Perception si elle se dissimule, etc.). Activer sur une nouvelle cible annule le bénéfice sur la précédente."
+    },
+    {
+      "id": "feat-astuce-repit",
+      "name": "Répit",
+      "unlocks_at_level": 1,
+      "recharge": "at_will",
+      "cost": {
+        "resource": "points_astuce",
+        "amount_min": 1,
+        "amount_max": "unlimited"
+      },
+      "action": "bonus_action",
+      "temp_hp_formula": "PA_depenses * prof_bonus",
+      "flavor": {
+        "summary": "Votre force mentale vous permet de mieux supporter les coups.",
+        "lore_note": null
+      },
+      "description": "Action bonus : dépensez autant de PA que souhaité. Gagnez un nombre de PV temporaires égal aux PA dépensés multipliés par votre bonus de maîtrise."
+    },
+    {
+      "id": "feat-astuce-tac-au-tac",
+      "name": "Tac au tac",
+      "unlocks_at_level": 1,
+      "recharge": "at_will",
+      "cost": {
+        "resource": "points_astuce",
+        "amount": 1
+      },
+      "trigger": "reaction",
+      "bonus_formula": "int_mod",
+      "flavor": {
+        "summary": "Vous anticipez les dangers et aidez vos alliés à mieux y faire face.",
+        "lore_note": null
+      },
+      "description": "Lorsqu'une créature visible (portée 18 m) attaque ou lance un sort, réaction + 1 PA : transmettez un conseil à une autre créature visible (portée 18 m, doit vous voir). Elle bénéficie d'un bonus égal à votre modificateur d'Intelligence à sa CA ou au jet de sauvegarde contre l'attaque ou le sort visé."
+    },
+    {
+      "id": "feat-don",
+      "name": "Don",
+      "unlocks_at_level": 2,
+      "recharge": "passive",
+      "trigger_levels": [
+        2,
+        6,
+        10,
+        14,
+        18
+      ],
+      "flavor": {
+        "summary": "Accès à un don supplémentaire issu du chapitre Options d'évolution.",
+        "lore_note": null
+      },
+      "description": "Aux niveaux 2, 6, 10, 14 et 18, sélectionnez un don dans le chapitre Options d'évolution. Soumis aux prérequis et règles de cumul habituelles."
+    },
+    {
+      "id": "feat-marotte",
+      "name": "Marotte",
+      "unlocks_at_level": 3,
+      "recharge": "passive",
+      "choice_pool_ref": "choice-marotte-cls-lettre",
+      "flavor": {
+        "summary": "Un domaine d'expression privilégié de votre intellect : alchimie ou exploration de l'âme.",
+        "lore_note": "Faculté d'adaptation (règle optionnelle) : le lettré peut choisir un archétype compatible d'une autre classe. Les aptitudes s'acquièrent aux niveaux 3, 6, 10 et 17 au lieu des niveaux d'origine. Une seule aptitude par niveau de marotte, sauf au niveau 17 (deux possibles)."
+      },
+      "description": "Choisissez une marotte au niveau 3. Ce choix octroie des aptitudes aux niveaux 3, 6, 10 et 17 (via feat-aptitude-de-marotte)."
+    },
+    {
+      "id": "feat-conquete-methodique",
+      "name": "Conquête méthodique",
+      "unlocks_at_level": 3,
+      "recharge": "long_rest",
+      "upgrades_at_levels": [
+        9,
+        13
+      ],
+      "zone_radius_meters": 9,
+      "material_cost_po": {
+        "level_3_effect": 20,
+        "level_9_effect": 50,
+        "level_13_effect": 100
+      },
+      "choice_pool_refs": [
+        "choice-conquete-niv3-cls-lettre",
+        "choice-conquete-niv9-cls-lettre",
+        "choice-conquete-niv13-cls-lettre"
+      ],
+      "flavor": {
+        "summary": "En étudiant un lieu pendant au moins une heure, vous en faites une zone conquise où vous déployez des effets tactiques non-magiques avancés.",
+        "lore_note": "Ces effets ne sont pas magiques. Ils reflètent un sens pratique avancé et une connaissance des rouages de l'esprit, du corps et de la nature."
+      },
+      "description": "Passez au moins 1 heure à étudier un lieu pour le circonscrire comme zone conquise (rayon 9 m). Vous restez en phase avec la zone jusqu'à la fin de votre prochain repos long. Apprenez 1 effet au niv. 3, 1 au niv. 9, 1 au niv. 13 (voir pools associés). Un effet peut être remplacé par un autre du même niveau lors d'un gain. L'ajout a posteriori d'un effet prend 10 minutes. Chaque effet requiert des matériaux coûteux spécifiques. Une zone n'est pas limitée en nombre d'effets actifs. Les effets prennent fin dès que vous n'êtes plus en phase."
+    },
+    {
+      "id": "feat-conquete-methodique-alerte",
+      "name": "Alerte (Conquête méthodique)",
+      "unlocks_at_level": 3,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Alarme déclenchée par les intrus entrant dans la zone conquise.",
+        "lore_note": null
+      },
+      "description": "Une alarme (mentale ou sonore, choisie à l'application) vous prévient dès qu'une créature de taille TP ou supérieure entre dans la zone conquise."
+    },
+    {
+      "id": "feat-conquete-methodique-langue-universelle",
+      "name": "Langue universelle (Conquête méthodique)",
+      "unlocks_at_level": 3,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Communication universelle dans la zone conquise, y compris avec les bêtes.",
+        "lore_note": null
+      },
+      "description": "Tant que l'effet est actif, vous comprenez toute langue orale dans la zone et pouvez vous faire comprendre. Vous comprenez également les bêtes et pouvez communiquer verbalement avec elles (connaissances limitées par leur intelligence, elles peuvent indiquer présences et événements récents)."
+    },
+    {
+      "id": "feat-conquete-methodique-perception-magie",
+      "name": "Perception de la magie (Conquête méthodique)",
+      "unlocks_at_level": 3,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Détection et identification de la magie dans la zone conquise.",
+        "lore_note": null
+      },
+      "description": "Détectez la présence de magie dans la zone. Action : localisez précisément objets et créatures porteurs de magie visibles. Contact 1 minute sur une créature : découvrez tous les sorts actifs. Étude 1 minute d'un objet magique : propriétés, fonctionnement, affinité requise, charges restantes, sort actif et nom du sort d'origine."
+    },
+    {
+      "id": "feat-conquete-methodique-presence-residuelle",
+      "name": "Présence résiduelle (Conquête méthodique)",
+      "unlocks_at_level": 9,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Détection de passages d'espèces récents dans la zone conquise.",
+        "lore_note": null
+      },
+      "description": "Étudiez la zone conquise 10 minutes en vous concentrant sur une espèce/sous-espèce. Apprenez si une créature de ce type l'a traversée dans la semaine écoulée, si elle s'y trouve encore et, le cas échéant, depuis combien de jours elle est partie. L'effet prend fin une fois les informations révélées."
+    },
+    {
+      "id": "feat-conquete-methodique-refuge",
+      "name": "Refuge (Conquête méthodique)",
+      "unlocks_at_level": 9,
+      "recharge": "passive",
+      "save": {
+        "type": "saving_throw",
+        "ability": "wis",
+        "dd_formula": "8 + int_mod + prof_bonus",
+        "on_fail": "La créature renonce et doit terminer un repos long avant de retenter"
+      },
+      "flavor": {
+        "summary": "Zone d'abri dissimulée et confortable, hermétique aux intrus.",
+        "lore_note": null
+      },
+      "description": "La zone conquise abrite ses occupants dans une atmosphère agréable et sèche quelle que soit la météo. Les créatures et objets présents lors de l'application peuvent la traverser librement. Les autres créatures n'en distinguent pas le contenu. Pour pénétrer malgré tout dans la zone, une créature doit réussir un jet de sauvegarde de Sagesse (DD = 8 + mod Int + bonus maîtrise). En cas d'échec, elle renonce jusqu'à son prochain repos long."
+    },
+    {
+      "id": "feat-conquete-methodique-sous-cape",
+      "name": "Sous cape (Conquête méthodique)",
+      "unlocks_at_level": 9,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Zone de silence total ou de discrétion renforcée, au choix.",
+        "lore_note": null
+      },
+      "description": "Au moment de la mise en phase, choisissez l'une des deux versions. (A) Silence : aucun son produit dans la zone ni traversant ses limites ; immunité dégâts tonnerre pour tout ce qui est entièrement dans la zone ; tout occupant est assourdi ; sorts verbaux impossibles. (B) Furtivité : vous et jusqu'à 9 créatures désignées bénéficiez d'un avantage aux tests Discrétion, Perception et Intuition dans la zone ; les autres créatures subissent un désavantage sur ces mêmes tests contre les bénéficiaires ; sorts verbaux exempts de composante verbale pour les bénéficiaires."
+    },
+    {
+      "id": "feat-conquete-methodique-havre",
+      "name": "Havre (Conquête méthodique)",
+      "unlocks_at_level": 13,
+      "recharge": "passive",
+      "flavor": {
+        "summary": "Zone de récupération optimale pour vos alliés.",
+        "lore_note": null
+      },
+      "description": "Les alliés utilisant des dés de vie lors d'un repos court dans la zone obtiennent le résultat maximum possible sur chaque dé. De plus, chaque allié peut soigner 1 niveau de fatigue une fois par jour (lors d'un repos court ou long) dans la zone."
+    },
+    {
+      "id": "feat-conquete-methodique-interdit",
+      "name": "Interdit (Conquête méthodique)",
+      "unlocks_at_level": 13,
+      "recharge": "passive",
+      "damage": {
+        "dice": "5d10",
+        "type": "psychic",
+        "trigger": "entry_by_banned_type"
+      },
+      "flavor": {
+        "summary": "Zone bloquant les voyages magiques et pénalisant les types de créatures indésirables.",
+        "lore_note": null
+      },
+      "description": "La téléportation et les portails sont impossibles à l'intérieur de la zone. Désignez un ou plusieurs types de créatures (morts-vivants, fées, fiélons, célestes, élémentaires, etc.) : tout individu de ces types entrant dans la zone subit 5d10 dégâts psychiques."
+    },
+    {
+      "id": "feat-conquete-methodique-telepathie",
+      "name": "Télépathie (Conquête méthodique)",
+      "unlocks_at_level": 13,
+      "recharge": "passive",
+      "max_participants": 8,
+      "flavor": {
+        "summary": "Lien télépathique entre les occupants désignés de la zone conquise.",
+        "lore_note": null
+      },
+      "description": "Crée un lien télépathique permanent entre un maximum de 8 créatures choisies dans la zone conquise, leur permettant de communiquer mentalement."
+    },
+    {
+      "id": "feat-specialiste",
+      "name": "Spécialiste",
+      "unlocks_at_level": 3,
+      "recharge": "at_will",
+      "choice_pool_ref": "choice-specialiste-cls-lettre",
+      "expertise_type": "proficiency_double",
+      "cost_advantage": {
+        "resource": "points_astuce",
+        "amount": 2
+      },
+      "flavor": {
+        "summary": "Maîtrise étendue dans un domaine de prédilection reflétant votre sujet de recherche.",
+        "lore_note": "Spécialités possibles — Arcanes : draconique, magiologie, occultisme, folklore, bestiaire. Histoire : archéologie, droit, littérature, politique. Nature : astronomie, botanique, géologie, météorologie."
+      },
+      "description": "Choisissez une compétence de connaissance ou une maîtrise d'outil. Votre bonus de maîtrise est doublé pour tout test associé (expertise). De plus, dépensez 2 PA pour bénéficier d'un avantage à tout test associé à ce choix."
+    },
+    {
+      "id": "feat-augmentation-de-caracteristique",
+      "name": "Augmentation de caractéristique",
+      "unlocks_at_level": 4,
+      "recharge": "passive",
+      "trigger_levels": [
+        4,
+        8,
+        12,
+        16,
+        19
+      ],
+      "flavor": {
+        "summary": null,
+        "lore_note": null
+      },
+      "description": "Augmentez de 2 une valeur de caractéristique au choix, ou augmentez de 1 deux valeurs de caractéristique au choix. Maximum 20 par cette aptitude."
+    },
+    {
+      "id": "feat-gain-astuce",
+      "name": "Nouvelle astuce",
+      "unlocks_at_level": 5,
+      "recharge": "passive",
+      "trigger_levels": [
+        5,
+        9,
+        11,
+        15,
+        18
+      ],
+      "choice_pool_ref": "choice-astuce-gain-cls-lettre",
+      "flavor": {
+        "summary": "Sélection d'une nouvelle astuce parmi la liste disponible.",
+        "lore_note": null
+      },
+      "description": "Sélectionnez une nouvelle astuce parmi le pool de choix associé (choice-astuce-gain-cls-lettre)."
+    },
+    {
+      "id": "feat-aptitude-de-marotte",
+      "name": "Aptitude de marotte",
+      "unlocks_at_level": 6,
+      "recharge": "passive",
+      "trigger_levels": [
+        6,
+        10,
+        17
+      ],
+      "flavor": {
+        "summary": "Gain de l'aptitude de niveau correspondant de la marotte choisie.",
+        "lore_note": null
+      },
+      "description": "Le moteur applique l'aptitude de la sous-classe choisie (marotte) correspondant au niveau courant."
+    },
+    {
+      "id": "feat-bidouille",
+      "name": "Bidouille",
+      "unlocks_at_level": 7,
+      "recharge": "short_rest",
+      "resource_key": "bidouilles_per_rest",
+      "duration_minutes": 1,
+      "duration_max_hours": 24,
+      "flavor": {
+        "summary": "Confection de petits objets périssables augmentant les capacités d'un utilisateur.",
+        "lore_note": null
+      },
+      "description": "Lors d'un repos court ou long, confectionnez un nombre d'objets périssables égal à bidouilles_per_rest (1 au niv. 7, 2 au niv. 14, 3 au niv. 20). Au moment de la confection, choisissez l'un des effets : (A) Compétence ou outil lié à une caractéristique physique — avantage aux jets associés pendant 1 minute d'activation. (B) Arme précise — bonus +2 aux jets d'attaque et de dégâts pendant 1 minute. (C) Armure précise — bonus +2 à la CA et annulation du désavantage aux tests de Discrétion pendant 1 minute. L'objet est détruit après 1 minute de fonctionnement ou 24 heures sans utilisation."
+    },
+    {
+      "id": "feat-besace-dabondance",
+      "name": "Besace d'abondance",
+      "unlocks_at_level": 20,
+      "recharge": "passive",
+      "trigger": "initiative_roll_at_0_pa",
+      "flavor": {
+        "summary": "Un dernier éclat d'intellect au moment le plus critique.",
+        "lore_note": null
+      },
+      "description": "Lorsque vous lancez le dé d'initiative alors qu'il ne vous reste plus aucun point d'astuce, vous en regagnez immédiatement 4."
+    }
+  ],
+  "subclasses": {
+    "name": "Marotte",
+    "choice_pool_ref": "choice-marotte-cls-lettre",
+    "level_unlocked": 3,
+    "aptitude_levels": [
+      3,
+      6,
+      10,
+      17
+    ],
+    "options": [
+      {
+        "id": "subcls-alchimie",
+        "name": "Alchimie",
+        "flavor": {
+          "summary": "Maîtrise des substances, baumes et réactions chimiques pour produire des effets stupéfiants indépendants de la magie.",
+          "lore_note": "Classique chez les étudiants en arcanes, les ingénieurs gnomes et les médecins. Souvent présent dans les palais des souverains et en soutien des armées."
+        },
+        "features": [
+          {
+            "id": "feat-sacoche-alchimique",
+            "name": "Sacoche alchimique",
+            "unlocks_at_level": 3,
+            "recharge": "passive",
+            "grants_proficiency": "tl-necessaire-alchimiste",
+            "flavor": {
+              "summary": "Ingrédients de base de l'art alchimique, condition sine qua non de la marotte.",
+              "lore_note": null
+            },
+            "description": "Acquisition d'une sacoche d'ingrédients alchimiques de base (ne permet pas de lancer des sorts). Si perdue, toutes les autres aptitudes de la marotte Alchimie sont inaccessibles. Maîtrise du nécessaire d'alchimiste accordée (si déjà possédée, bonus de maîtrise doublé pour tout test associé)."
+          },
+          {
+            "id": "feat-guerisseur-alchimique",
+            "name": "Guérisseur",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "cost": {
+              "resource": "points_astuce",
+              "amount_min": 1,
+              "amount_max": "unlimited"
+            },
+            "action": "action",
+            "heal_formula": "1d6_per_PA + int_mod",
+            "heal_formula_bidouille_upgrade": "1d10_per_PA + int_mod",
+            "flavor": {
+              "summary": "Soins par baumes alchimiques de votre cru.",
+              "lore_note": null
+            },
+            "description": "Action : touchez une créature et dépensez autant de PA que souhaité. Elle récupère (1d6 × PA dépensés) + modificateur d'Intelligence PV. À partir du niv. 7 (Bidouille) : confectionnez un baume spécial lors d'un repos pour substituer 1d10 par PA aux 1d6."
+          },
+          {
+            "id": "feat-artificier",
+            "name": "Artificier",
+            "unlocks_at_level": 6,
+            "recharge": "at_will",
+            "cost": {
+              "resource": "points_astuce",
+              "amount_min": 1,
+              "amount_max": "unlimited"
+            },
+            "action": "action",
+            "attack_ability": "int",
+            "flavor": {
+              "summary": "Improvisation d'effets pyrotechniques dévastateurs à partir de la sacoche alchimique.",
+              "lore_note": null
+            },
+            "description": "Action : choisissez l'une des deux versions. (A) Feu — attaque à distance (portée 6 m, mod Int) ; en cas de réussite, la cible subit au début de chacun de ses tours (1d4 × PA dépensés) + mod Int dégâts de feu ; une action et un test de Dextérité DD 10 permettent d'éteindre les flammes. (B) Acide — répandez ou lancez une mixture à 1,50 m ou 6 m, attaque à distance (mod Int) ; en cas de réussite, (2d6 × PA dépensés) + mod Int dégâts d'acide. Bidouille (niv. 7+) : version améliorée avec résultat maximum garanti sur chaque dé + type de dégâts au choix (acide, feu, foudre, froid, tonnerre)."
+          },
+          {
+            "id": "feat-stupefacteur",
+            "name": "Stupéfacteur",
+            "unlocks_at_level": 10,
+            "recharge": "at_will",
+            "cost": {
+              "resource": "points_astuce",
+              "amount_min": 1,
+              "amount_max": 3
+            },
+            "action": "action",
+            "duration_minutes": 1,
+            "save_end": {
+              "type": "saving_throw",
+              "ability": "con",
+              "dd_formula": "10 + PA_depenses",
+              "on_fail": "1 niveau de fatigue ou folie passagère aléatoire"
+            },
+            "flavor": {
+              "summary": "Préparations boostant les capacités physiques ou mentales avec risque de rechute.",
+              "lore_note": "Dans certaines régions, vous serez considéré comme un marchand de drogues."
+            },
+            "description": "Action : appliquez un effet (durée 1 min) sur une créature consentante. Avec 1 PA : réprimer charmé/effrayé ; avantage tests/JS Force + résistance dégâts contondants/perforants/tranchants + +2 dégâts Corps-à-Corps (Force) ; PV temporaires = 3 × mod Int ; résistance à un type de dégâts choisi. Avec 3 PA : réprimer empoisonné/étourdi/paralysé/pétrifié ; immunité à un type de dégâts choisi. Après 1 minute, la créature effectue un JS Constitution (DD = 10 + PA dépensés) : en cas d'échec, 1 niveau de fatigue ou folie passagère aléatoire. Bidouille : durée 1 heure, sans jet de sauvegarde."
+          },
+          {
+            "id": "feat-mithridatisme",
+            "name": "Mithridatisme",
+            "unlocks_at_level": 17,
+            "recharge": "at_will",
+            "cost_reaction_optional": {
+              "resource": "points_astuce",
+              "amount": 5
+            },
+            "trigger": "reaction",
+            "temp_hp_max": 15,
+            "flavor": {
+              "summary": "Immunité totale aux poisons et maladies par exposition prolongée.",
+              "lore_note": null
+            },
+            "description": "Vous êtes immunisé contre les poisons et les maladies. Lorsqu'un poison doit vous infliger une perte de PV sur un jet de sauvegarde raté, réaction + 5 PA : gagnez autant de PV temporaires que la perte normalement infligée (maximum 15)."
+          },
+          {
+            "id": "feat-pierre-philosophale",
+            "name": "Pierre philosophale",
+            "unlocks_at_level": 17,
+            "recharge": "passive",
+            "crafting": {
+              "time_days": 7,
+              "requires": "laboratoire alchimique",
+              "alternative_dc": 25,
+              "tool": "tl-necessaire-alchimiste"
+            },
+            "uses_guérison_per_long_rest": 2,
+            "flavor": {
+              "summary": "L'aboutissement ultime de la maîtrise alchimique.",
+              "lore_note": "Surnaturelle mais non magique. Utilisable uniquement par son créateur."
+            },
+            "description": "Fabriquez la pierre philosophale (1 semaine en laboratoire ou test DD 25 du nécessaire d'alchimiste). Réservée à vous. Effets : (Transmutation) altérez 250 kg de métal en un autre métal pendant jusqu'à 1 min d'usage actif ou 24 h ; (Guérison) appliquez restauration suprême, retour à la vie ou soins de groupe 2 fois par repos long (mod Int = caractéristique magique, niveau minimum du sort) ; (Stabilisation) toucher une créature à 0 PV la stabilise automatiquement ; (Jouvence) blocage du vieillissement magique et surnaturel + jet annuel 1d20 : sur 1 vieillissez de 2 ans, sur 2-9 de 1 an, sur 10-19 aucun changement, sur 20 rajeunissez d'1 an."
+          }
+        ]
+      },
+      {
+        "id": "subcls-exploration-de-lame",
+        "name": "Exploration de l'âme",
+        "flavor": {
+          "summary": "Clairvoyance presque surnaturelle pour scruter les cœurs et esprits d'autrui, sans recourir à la magie.",
+          "lore_note": "Professions associées : conseiller politique, enquêteur, conciliateur, agitateur, avocat. Certains s'en servent pour manipuler, d'autres pour traquer les malfaisants se cachant derrière une façade immaculée."
+        },
+        "features": [
+          {
+            "id": "feat-aisance-sociale",
+            "name": "Aisance sociale",
+            "unlocks_at_level": 3,
+            "recharge": "passive",
+            "grants_proficiency": "skill-intuition",
+            "choice_pool": {
+              "id": "choice-aisance-sociale-subcls-lettre",
+              "name": "Compétences sociales supplémentaires",
+              "type": "skill_proficiency",
+              "allow_choice": true,
+              "quantity": 2,
+              "pool": [
+                "skill-intimidation",
+                "skill-investigation",
+                "skill-persuasion",
+                "skill-tromperie"
+              ]
+            },
+            "flavor": {
+              "summary": "Expertise sociale étendue dès le choix de la marotte.",
+              "lore_note": null
+            },
+            "description": "Maîtrise de la compétence Intuition accordée + 2 compétences au choix parmi : Intimidation, Investigation, Persuasion, Tromperie. Pour chaque compétence octroyée déjà maîtrisée, le bonus de maîtrise est doublé pour tous les tests associés."
+          },
+          {
+            "id": "feat-incitation",
+            "name": "Incitation",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "cost_optional": {
+              "resource": "points_astuce",
+              "amount": 1,
+              "for": "bonus_action"
+            },
+            "flavor": {
+              "summary": "Talent exceptionnel pour galvaniser autrui au bon moment.",
+              "lore_note": null
+            },
+            "description": "Accès à l'action Inciter même si le meneur ne l'accorde pas aux autres personnages. Dépensez 1 PA pour effectuer l'action Inciter comme action bonus."
+          },
+          {
+            "id": "feat-intuition-lettre",
+            "name": "Intuition",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "cost": {
+              "resource": "points_astuce",
+              "amount": 3
+            },
+            "trigger": "reaction",
+            "flavor": {
+              "summary": "Anticipation des mouvements et actions d'autrui pour protéger ou alerter.",
+              "lore_note": null
+            },
+            "description": "Lorsqu'une créature visible (portée 18 m) se déplace ou effectue une action, réaction + 3 PA : choisissez l'une des deux options. (Déplacement) Déplacez-vous de votre VD ou effectuez une action non offensive — si la créature vous ciblait et ne peut plus le faire, elle perd l'attaque/sort. (Alerte) Jusqu'à la fin du tour, toutes les créatures qui vous entendent et vous comprennent bénéficient d'un avantage aux jets de sauvegarde, et la créature déclenchante subit un désavantage à ses jets d'attaque contre elles."
+          },
+          {
+            "id": "feat-trouble-sort",
+            "name": "Trouble-sort",
+            "unlocks_at_level": 6,
+            "recharge": "at_will",
+            "cost": {
+              "resource": "points_astuce",
+              "amount_min": 1,
+              "amount_max": "unlimited"
+            },
+            "trigger": "reaction",
+            "check": {
+              "ability": "int",
+              "dd_formula": "10 + spell_level"
+            },
+            "flavor": {
+              "summary": "Talent pour perturber les lanceurs de sorts adverses.",
+              "lore_note": null
+            },
+            "description": "Lorsqu'une créature visible (portée 18 m) lance un sort, réaction + 1 PA minimum : effectuez un test d'Intelligence (DD = 10 + niveau du sort). Réussite : le sort échoue et n'a aucun effet. Chaque PA supplémentaire au-delà du premier permet d'ajouter une fois votre bonus de maîtrise au test."
+          },
+          {
+            "id": "feat-detachement",
+            "name": "Détachement",
+            "unlocks_at_level": 10,
+            "recharge": "passive",
+            "advantages": [
+              {
+                "type": "saving_throw",
+                "condition": "résister à la folie"
+              },
+              {
+                "type": "saving_throw",
+                "condition": "sorts de l'école Enchantement"
+              },
+              {
+                "type": "saving_throw",
+                "condition": "corruption"
+              },
+              {
+                "type": "saving_throw",
+                "condition": "état charmé ou effrayé"
+              }
+            ],
+            "flavor": {
+              "summary": "Endurci contre l'aliénation mentale par l'étude de nombreux esprits dérangés.",
+              "lore_note": null
+            },
+            "description": "Avantage aux jets de sauvegarde pour résister à la folie. Lors d'une détermination aléatoire de folie vous affectant, lancez les dés 2 fois et choisissez. Avantage aux jets de sauvegarde contre tous les sorts de l'école d'Enchantement, contre la corruption, et contre toute aptitude imposant l'état charmé ou effrayé."
+          },
+          {
+            "id": "feat-influence",
+            "name": "Influence",
+            "unlocks_at_level": 10,
+            "recharge": "at_will",
+            "cost": {
+              "resource": "points_astuce",
+              "amount_min": 1,
+              "amount_max": 10
+            },
+            "action": "action",
+            "target_requirement": "int_min_4",
+            "save": {
+              "type": "saving_throw",
+              "ability": "wis",
+              "dd_formula": "8 + prof_bonus + int_mod",
+              "hostile_target": "advantage_on_save",
+              "broken_by_damage": true
+            },
+            "flavor": {
+              "summary": "Autorité et charme hors du commun conférés par la maîtrise de l'hypnose.",
+              "lore_note": null
+            },
+            "description": "Action : adressez-vous à une créature (Intelligence ≥ 4) qui vous entend. Effets selon les PA dépensés — (1 PA) communication universelle pendant 1 minute ; (3 PA) charme : JS Sagesse ou charmée 1 heure ; (5 PA) ordre court : JS Sagesse ou suit l'instruction jusqu'à accomplissement ou 8 heures ; (10 PA) mission longue : JS Sagesse ou œuvre à la mission jusqu'à accomplissement ou 30 jours. Créature hostile → avantage au jet. Dégâts infligés à la créature → effets annulés. Immunité au charmé → avantage au JS."
+          },
+          {
+            "id": "feat-cure",
+            "name": "Cure",
+            "unlocks_at_level": 17,
+            "recharge": "at_will",
+            "cost": {
+              "resource": "points_astuce",
+              "amount_min": 1,
+              "amount_max": 10
+            },
+            "duration_minutes": 30,
+            "flavor": {
+              "summary": "Guérison des troubles mentaux par connaissance approfondie de la psyché.",
+              "lore_note": null
+            },
+            "description": "Passez 30 minutes avec une créature et dépensez des PA pour l'un des effets suivants — (1 PA) réprimer 1 point de Corruption (permanent ou non) pendant 24 h ; (3 PA) réprimer une folie pendant 24 h ; (5 PA) supprimer l'état effrayé ou charmé ; (5 PA) supprimer une folie passagère ; (10 PA) supprimer une folie durable ; (10 PA) tentative de lever une malédiction mentale (test Intelligence DD 20) ; (10 PA) supprimer 1 point de Corruption temporaire (la cible subit 1 niveau de fatigue par point ainsi purifié)."
+          }
+        ]
+      }
+    ]
+  }
+}

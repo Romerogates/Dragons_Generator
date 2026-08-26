@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-abri-du-chasseur",
+  "name": "Abri du chasseur",
+  "level": 1,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "speciale",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": false,
+    "s": true,
+    "m": "(spécial"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-rodeur"
+  ],
+  "description": "D'un geste, vous modifiez la nature alentour pour y générer un refuge. Votre abri est un terrier d'environ 9 m², avec une hauteur sous plafond de 2 m au plus haut. Il est accessible via une porte de 1,50 m de haut et 1,50 m de large. Elle apparaît dans le sol, un tronc d'arbre, une paroi rocheuse, etc. et demeure ouverte jusqu'à ce que vous y entriez ou la fermiez. Depuis l'extérieur, vous seul êtes capable d'ouvrir la porte. Il est toutefois possible de la défoncer. La porte possède une CA équivalente à votre DD de sauvegarde des sorts et un nombre de pv équivalent à dix fois le niveau d'emplacement de sort utilisé. Le sort ne peut être employé que dans un environnement naturel, entendu comme une étendue carrée d'au moins 50 m de côté qui n'a pas été cultivée depuis au moins un an. La terre sauvage constitue la composante matérielle du sort. Par ailleurs, vous ne pouvez avoir qu'un seul abri du chasseur actif au même moment. Si vous lancez un nouvel abri du chasseur, le précédent disparaît et tout ce qu'il contenait se retrouve à l'extérieur. L'intérieur de l'abri évoque l'environnement où il se situe : des murs de sable dans le désert, des racines dans la forêt, des parois évoquant la substance d'œufs de crapaud sous l'eau d'un marais, etc. ## L'avant-poste des fées Si vous lancez ce sort avec un emplacement de sort de 4e niveau ou supérieur, votre abri est un espace extradimensionnel de la même nature que les contrées enchantées. Si vous êtes allié avec des fées ou des djinns d'un royaume proche, votre abri comporte une issue menant à l'entrée de leur domaine. La distance en kilomètres qui sépare votre abri du royaume en question ne peut excéder le niveau de l'emplacement du sort. Les fées ou djinns du royaume peuvent librement emprunter l'issue et rejoindre votre abri. En revanche, vous ne pouvez pénétrer en leur domaine qu'avec leur accord. Par ailleurs, les circonstances suivantes s'appliquent à l'intérieur de l'abri du chasseur : S'il y a de l'eau à proximité, votre abri en est pourvu. L'eau est pure. Une lumière faible éclaire l'intérieur de l'abri depuis les parois. Emplacementde sort Espacedisponible(taille maximale) Permanent,jusqu'à dissipation",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort de niveau supérieur, la durée et la taille de l'abri s'accroissent :",
+  "modular_options": []
+}

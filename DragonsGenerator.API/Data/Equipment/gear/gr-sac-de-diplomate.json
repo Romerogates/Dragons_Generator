@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-sac-de-diplomate",
+  "name": "Sac de diplomate",
+  "category": "gear",
+  "subcategory": "container",
+  "cost": {
+    "value": 39,
+    "unit": "po"
+  },
+  "weight_kg": 18,
+  "description": "Un coffre, 2 étuis à parchemins, une tenue raffinée, une bouteille d'encre, une plume d'écriture, une lampe, 2 flasques d'huile, 5 feuilles de papier, un flacon de parfum, de la cire à cacheter, un savon."
+}

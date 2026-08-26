@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-porte-dimensionnelle",
+  "name": "Porte dimensionnelle",
+  "level": 4,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 150,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Porte dimensionnelle icons Vous vous téléportez vers un lieu situé à portée et arrivez précisément à l'endroit désiré. Il peut s'agir d'un endroit que vous voyez, ou dont vous estimez la distance et la direction, comme « 60 m plus bas » ou « 90 m plus haut, direction nord-ouest selon un angle de 45° ». Vous pouvez emporter des objets tant que leur poids total ne dépasse pas ce que vous êtes capable de porter. Vous pouvez aussi emmener une créature de votre catégorie de taille ou inférieure qui porte un équipement ne dépassant pas sa charge maximale. La créature en question doit être consentante et se situer dans un rayon de 1,50 m de vous au moment de l'incantation. Si vous êtes censé arriver à un endroit déjà occupé par un objet ou une créature, vous et toute créature voyageant avec vous subissez 4d6 dégâts de force, et la téléportation échoue.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, vous pouvez emmener une créature supplémentaire par niveau d'emplacement au-dessus du 4e.",
+  "modular_options": []
+}

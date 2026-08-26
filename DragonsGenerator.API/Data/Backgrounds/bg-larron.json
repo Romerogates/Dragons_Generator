@@ -1,0 +1,205 @@
+{
+  "schema_version": "2.0",
+  "id": "bg-larron",
+  "name": "Larron",
+  "source": {
+    "book": "Dragons - Livre de base: Aventuriers",
+    "pages": "97-98"
+  },
+  "flavor": {
+    "summary": "Vous frayez avec des gens peu recommandables depuis un certain bout de temps.",
+    "adventure_hook": "Qu'est-ce qui vous distingue des criminels ordinaires et vous a mené sur la voie de l'aventure ?"
+  },
+  "proficiencies": {
+    "skills": {
+      "fixed": [],
+      "choose": {
+        "count": 2,
+        "options": [
+          "skill-discretion",
+          "skill-escamotage",
+          "skill-investigation",
+          "skill-tromperie"
+        ]
+      }
+    },
+    "tools": {
+      "fixed": [],
+      "choose": {
+        "count": 1,
+        "options": [
+          {
+            "type": "tool",
+            "id": "tl-outils-de-voleur",
+            "name": "Outils de voleur"
+          },
+          {
+            "type": "tool",
+            "id": "tl-necessaire-de-deguisement",
+            "name": "Nécessaire de déguisement"
+          },
+          {
+            "type": "tool",
+            "id": "tl-necessaire-de-faussaire",
+            "name": "Nécessaire de faussaire"
+          }
+        ]
+      }
+    },
+    "languages": {
+      "fixed": [],
+      "choose_count": 0
+    }
+  },
+  "equipment": {
+    "fixed": [
+      {
+        "id": "gr-vetements-ordinaires",
+        "name": "Vêtements ordinaires",
+        "qty": 1,
+        "location": "equipped"
+      },
+      {
+        "id": "gr-faux-papiers",
+        "name": "Faux papiers divers",
+        "qty": 1,
+        "location": "backpack"
+      }
+    ],
+    "choose": [],
+    "currency": {
+      "or": 15
+    }
+  },
+  "privilege": {
+    "id": "priv-connaissance-du-milieu",
+    "name": "Connaissance du milieu",
+    "desc": "Vous savez renifler l'odeur de la corruption. La plupart des communautés abritent leur lot de criminels et de représentants véreux de l'autorité. Vous ne pouvez pas automatiquement définir si un individu donné a trempé dans ce genre d'affaires, mais vous pouvez rapidement trouver des personnes corrompues avec lesquelles entamer des négociations ou des conversations orientées."
+  },
+  "personality_tables": {
+    "traits": {
+      "die": "1d8",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "J'aime instaurer un certain malaise quand je rencontre quelqu'un, lui faire sentir que je représente une menace."
+        },
+        {
+          "roll": 2,
+          "text": "J'ai besoin de sonder les gens, de percer à jour leurs intentions par quelques remarques et questions bien choisies."
+        },
+        {
+          "roll": 3,
+          "text": "Je suis très soupe au lait, en plus d'être rancunier."
+        },
+        {
+          "roll": 4,
+          "text": "Les gens bien m'ennuient, j'aime la compagnie des canailles."
+        },
+        {
+          "roll": 5,
+          "text": "Breloques, étoffes chatoyantes, démarche chaloupée ; j'affiche mon opulence, que mes poches soient pleines ou vides."
+        },
+        {
+          "roll": 6,
+          "text": "Ils sont rares ceux qui savent qui je suis vraiment : il faut toujours que je joue un rôle."
+        },
+        {
+          "roll": 7,
+          "text": "J'aime le risque et, jusqu'ici, c'est réciproque."
+        },
+        {
+          "roll": 8,
+          "text": "Ton narquois, sourcil haussé : j'ai toujours l'air de me moquer, même quand ce n'est pas méchant."
+        }
+      ]
+    },
+    "ideals": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Liberté. Les règles sont faites pour être transgressées."
+        },
+        {
+          "roll": 2,
+          "text": "Charité. Il faut bien redistribuer les richesses d'une manière ou d'une autre."
+        },
+        {
+          "roll": 3,
+          "text": "Pouvoir. Tous les moyens sont bons pour accumuler fortune et influence."
+        },
+        {
+          "roll": 4,
+          "text": "Structure. La hiérarchie et l'honneur assurent la prospérité du monde clandestin."
+        },
+        {
+          "roll": 5,
+          "text": "Chienlit. Le chaos est mon allié et nul ne mérite le droit d'imposer son ordre."
+        },
+        {
+          "roll": 6,
+          "text": "Rédemption. J'espère un jour pouvoir me racheter."
+        }
+      ]
+    },
+    "bonds": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "J'essaie de rembourser une dette ancienne envers un bienfaiteur généreux."
+        },
+        {
+          "roll": 2,
+          "text": "Mes gains mal acquis sont destinés à aider ma famille."
+        },
+        {
+          "roll": 3,
+          "text": "Quelque chose de précieux m'a été volé et je compte bien le récupérer."
+        },
+        {
+          "roll": 4,
+          "text": "Je ne reculerai devant rien pour devenir le roi de la pègre."
+        },
+        {
+          "roll": 5,
+          "text": "Je ferai payer ceux qui m'ont trahi."
+        },
+        {
+          "roll": 6,
+          "text": "J'ai rejoint la pègre pour protéger quelqu'un qui m'est cher."
+        }
+      ]
+    },
+    "flaws": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Quand je m'ennuie, je cherche à faire dégénérer la situation."
+        },
+        {
+          "roll": 2,
+          "text": "Si je ne mens pas effrontément au moins une fois par jour, je dors mal."
+        },
+        {
+          "roll": 3,
+          "text": "Je ne pense pas toujours à la sécurité des autres."
+        },
+        {
+          "roll": 4,
+          "text": "J'ai une fâcheuse tendance à tomber amoureux de représentants de l'autorité officielle."
+        },
+        {
+          "roll": 5,
+          "text": "Je résiste mal à l'appel de l'ivresse quand je m'attarde dans une taverne ou à une fête."
+        },
+        {
+          "roll": 6,
+          "text": "Une voyante m'a dit que tous mes vœux seraient exaucés quand j'aurais tué un certain nombre d'innocents ; il m'arrive de la croire."
+        }
+      ]
+    }
+  }
+}

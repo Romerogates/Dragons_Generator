@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-faux-papiers",
+  "name": "Faux papiers divers",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": null,
+    "unit": "po",
+    "note": "Illégal, prix variable"
+  },
+  "weight_kg": null,
+  "description": "Ensemble de documents contrefaits : lettres de change, sauf-conduits périmés, permis bidons. Illégal."
+}

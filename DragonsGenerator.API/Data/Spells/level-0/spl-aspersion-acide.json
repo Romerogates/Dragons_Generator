@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-aspersion-acide",
+  "name": "Aspersion acide",
+  "level": 0,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Vous lancez une bulle d'acide. Choisissez une créature située à portée que vous pouvez voir, ou deux créatures situées à portée que vous pouvez voir, et dans un rayon de 1,50 m l'une de l'autre. Chaque cible doit réussir un JS Dextérité sous peine de subir 1d6 dégâts d'acide. Les dégâts de ce sort augmentent de 1d6 quand vous atteignez le niveau 5 (2d6), le niveau 11 (3d6) et le niveau 17 (4d6).",
+  "modular_options": []
+}

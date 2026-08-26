@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-controle-de-l-eau",
+  "name": "Contrôle de l'eau",
+  "level": 4,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 90,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une goutte d'eau et une pincée de poussière"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-magicien",
+    "cls-pretre"
+  ],
+  "description": "Tant que le sort persiste, vous contrôlez une étendue d'eau bien déterminée dans une zone que vous choisissez et qui prend la forme d'un cube de 30 m d'arête maximum. Vous pouvez choisir n'importe lequel des effets suivants au moment de l'incantation. Au prix d'une action à votre tour de jeu, vous pouvez réitérer le même effet ou en choisir un autre. Le niveau de l'eau stagnante monte d'une hauteur pouvant atteindre 6 m. Si la zone inclut un rivage, la crue envahit la terre ferme. Si vous choisissez une zone d'une vaste étendue d'eau, vous créez une vague de 6 m qui balaye la zone avant de retomber brutalement. Les véhicules de taille TG ou inférieure situés sur le chemin de la déferlante sont emportés et ont 25 % de chance de chavirer. Le niveau de l'eau reste élevé jusqu'à ce que le sort prenne fin ou que vous optiez pour un autre effet. Si cet effet produit une vague, celle-ci se répète au début de votre tour de jeu suivant tant que l'effet de crue persiste. ## Écarter les eaux Les eaux situées dans la zone s'écartent et forment un fossé dont la largeur est égale à la zone du sort. Le fossé reste en place jusqu'à ce que le sort prenne fin ou que vous optiez pour un autre effet. L'eau remplit ensuite lentement le fossé lors du round suivant jusqu'à ce qu'elle retrouve son niveau normal. ## Canaliser le courant L'eau vive située dans la zone coule dans la direction de votre choix, même si elle doit passer par-dessus des obstacles, des murs ou prendre des directions improbables. L'eau située dans la zone se déplace conformément à vos souhaits, mais dès qu'elle sort de la zone du sort, elle reprend son cours normal en fonction du relief. L'eau continue de couler dans la direction choisie jusqu'à ce que le sort prenne fin ou que vous optiez pour un autre effet. ## Tourbillon Cet effet nécessite une étendue d'eau d'au moins 15 m de côté et de 7,50 m de profondeur. Un tourbillon se forme au centre de la zone : un vortex de 1,50 m de large à sa base, de 7,50 m de haut, et pouvant atteindre 15 m de large à son sommet. Les créatures et objets situés dans l'eau et dans un rayon de 7,50 m du vortex sont attirés de 3 m vers lui. Une créature peut s'éloigner du vortex en réussissant un test de Force (Athlétisme) assorti de votre DD de sauvegarde des sorts. Quand une créature entre dans le vortex pour la première fois d'un tour de jeu ou y commence son tour de jeu, elle doit effectuer un JS Force. En cas d'échec, elle subit 2d8 dégâts contondants et est prise dans le vortex tant que le sort persiste. En cas de réussite, les dégâts sont réduits de moitié et elle n'est pas prise dans le vortex. Une créature prise dans le vortex peut, au prix de son action, s'en éloigner comme détaillé ci-dessus, mais elle subit un désavantage au test de Force (Athlétisme) requis. La première fois qu'un objet entre dans le vortex à chaque tour de jeu, il subit 2d8 dégâts contondants. Ces dégâts surviennent à chaque round passé dans le vortex.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, la portée augmente de 15 m et la durée de 10 minutes par niveau d'emplacement au-dessus du 4e.",
+  "modular_options": []
+}

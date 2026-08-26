@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-commun",
+  "name": "Commun",
+  "category": "base",
+  "typical_speakers": [
+    "Tous les personnages joueurs (langue véhiculaire)"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-cyfand",
+      "label": "Cyfand",
+      "type": "alphabet"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [
+    "Majorité des civilisations de surface"
+  ],
+  "description": "Le terme « commun » désigne la langue dominante dans la région où les aventuriers débutent. C'est le meneur qui la définit. Tous les personnages d'un groupe parlent cette langue, quelle qu'elle soit."
+}

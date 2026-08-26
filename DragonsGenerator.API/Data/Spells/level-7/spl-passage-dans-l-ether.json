@@ -1,0 +1,39 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-passage-dans-l-ether",
+  "name": "Passage dans l'éther",
+  "level": 7,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 8,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-pretre",
+    "cls-sorcier"
+  ],
+  "description": "Vous vous aventurez dans les régions frontalières du Plan Éthéré, où celui-ci chevauche le plan sur lequel vous vous trouvez. Vous restez sur les Rives Éthérées pour toute la durée du sort ou jusqu'à ce que vous le réprimiez au prix d'une action. Pendant tout ce temps, vous pouvez vous déplacer dans la direction de votre choix. Si vous vous déplacez vers le haut ou le bas, toute distance parcourue vous coûte le double de la normale en termes de déplacement. Vous voyez et entendez ce qui se passe sur le plan d'où vous venez, mais tout y paraît gris, et votre champ de vision se limite à 18 m. Dans le Plan Éthéré, vous ne pouvez affecter que les créatures situées sur ce plan, et vice versa. Les créatures qui ne se situent pas sur le Plan Éthéré ne vous perçoivent pas et ne peuvent pas interagir avec vous, à moins qu'une capacité spéciale ou magique ne le leur permette. Vous n'êtes pas concerné par les objets et effets qui ne sont pas sur le Plan Éthéré, ce qui vous permet de traverser les objets que vous percevez malgré tout sur le plan d'où vous venez. Quand le sort prend fin, vous regagnez immédiatement le plan d'où vous veniez, à l'endroit que vous occupez actuellement. Si vous occupez le même endroit qu'un objet ou une créature à ce moment-là, vous êtes aussitôt chassé vers l'espace inoccupé le plus proche que vous pouvez occuper et subissez 10 dégâts de force par tranche de 1,50 m parcourue. Ce sort n'a aucun effet si vous le lancez dans le Plan Éthéré ou dans un plan qui ne lui est pas attenant, comme les Plans Extérieurs.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 8e niveau ou supérieur, vous pouvez cibler jusqu'à trois créatures consentantes (vous y compris) par niveau d'emplacement au-dessus du 7e. Les créatures doivent se situer dans un rayon de 3 m de vous au moment de l'incantation.",
+  "modular_options": []
+}

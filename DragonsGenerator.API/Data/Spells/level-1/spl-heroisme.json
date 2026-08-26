@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-heroisme",
+  "name": "Héroïsme",
+  "level": 1,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-paladin"
+  ],
+  "description": "Une créature consentante que vous touchez est galvanisée. Tant que le sort persiste, elle est immunisée contre l'état préjudiciable effrayé et gagne un nombre de points de vie temporaires égal à votre modificateur de caractéristique magique au début de chacun de ses tours de jeu. Quand le sort prend fin, la cible perd les points de vie temporaires restants que le sort lui a octroyés.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 1ᵉʳ.",
+  "modular_options": []
+}

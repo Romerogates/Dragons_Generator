@@ -1,0 +1,24 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-filet",
+  "name": "Filet",
+  "category": "weapon",
+  "subcategory": "martial_ranged",
+  "cost": {
+    "value": 1,
+    "unit": "po"
+  },
+  "weight_kg": 1.5,
+  "damage_dice": null,
+  "damage_type": null,
+  "properties": [
+    "prop-lancer-1-50-4-50",
+    "prop-speciale"
+  ],
+  "throw_range": {
+    "normal": 1,
+    "long": 4
+  },
+  "ammo_range": null,
+  "description": "Portée lancer : 1,50/4,50 m. Une créature de taille G ou inférieure touchée par un filet est Entravée jusqu'à ce qu'elle s'en libère. Le filet n'a aucun effet sur les créatures sans forme matérielle ni sur celles de taille TG+. Une créature peut dépenser une action pour réussir un JS Force DD 10 et se libérer ou libérer une autre créature à portée d'allonge. Infliger 5 dégâts tranchants au filet (CA 10) libère également la créature sans la blesser et détruit le filet."
+}

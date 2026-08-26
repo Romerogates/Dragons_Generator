@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "act-se-cacher",
+  "name": "Se cacher",
+  "action_cost": "action",
+  "category": "standard",
+  "description": "Effectuer un test de Dextérité (Discrétion) pour tenter de vous cacher. En cas de réussite, vous bénéficiez des atouts détaillés à la section Assaillants et cibles non visibles.",
+  "mechanics": {
+    "test": "Dextérité (Discrétion)",
+    "on_success": "État caché — avantage aux attaques contre créatures qui ne vous voient pas ; attaquer révèle votre position"
+  },
+  "source": "livre_de_base"
+}

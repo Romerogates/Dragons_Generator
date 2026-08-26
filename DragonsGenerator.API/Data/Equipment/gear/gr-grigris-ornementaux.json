@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-grigris-ornementaux",
+  "name": "Divers grigris ornementaux",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": null,
+    "unit": "po",
+    "note": "Artisanat, prix variable"
+  },
+  "weight_kg": 0.5,
+  "description": "Petits objets rituels, amulettes, plumes, ossements ou pierres portés comme ornements ésotériques."
+}

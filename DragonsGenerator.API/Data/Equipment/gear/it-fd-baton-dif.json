@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "it-fd-baton-dif",
+  "name": "Bâton d'if (focaliseur druidique)",
+  "category": "gear",
+  "subcategory": "druidic_focus",
+  "cost": {
+    "value": 5,
+    "unit": "po"
+  },
+  "weight_kg": 2,
+  "description": "Focaliseur druidique. Peut remplacer les composantes matérielles d'un sort de druide."
+}

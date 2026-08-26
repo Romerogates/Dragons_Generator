@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-disque-flottant",
+  "name": "Disque flottant",
+  "level": 1,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une goutte de mercure"
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien"
+  ],
+  "description": "Ce sort crée un plan de force horizontal et circulaire de 90 cm de diamètre et de 2,5 cm d'épaisseur, qui flotte à 90 cm au-dessus du sol dans un espace inoccupé de votre choix que vous voyez à portée. Le disque reste pour toute la durée du sort et peut supporter jusqu'à 250 kg. Si cette valeur est dépassée, le sort prend fin et tout ce qui était posé sur le disque tombe par terre. Le disque est immobile tant que vous vous situez dans un rayon de 6 m de lui. Mais si vous vous en éloignez davantage, il vous suit de manière à rester dans un rayon de 6 m de vous. Il peut se déplacer en terrain accidenté, descendre ou monter des escaliers et autres pentes, mais ne peut pas franchir une dénivelée abrupte de 3 m ou plus. Par exemple, il ne peut pas franchir une fosse de 3 m de profondeur, ni même la quitter s'il a été créé au fond. Le sort prend fin si vous vous éloignez de plus de 30 m du disque (si un obstacle l'empêche de vous suivre, par exemple).",
+  "modular_options": []
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-materiel-descalade",
+  "name": "Matériel d'escalade",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 25,
+    "unit": "po"
+  },
+  "weight_kg": 6,
+  "description": "Comprend pitons, crampons, gants et harnais. Permet de s'assurer pour ne pas tomber de plus de 7,50 m sous le point d'ancrage."
+}

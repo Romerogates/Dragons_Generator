@@ -6,6 +6,10 @@ namespace DragonsGenerator.API.Endpoints.WritingSystems;
 
 public class GetWritingSystemTypesEndpoint : EndpointWithoutRequest<List<string>>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetWritingSystemTypesEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/writing-systems/types");
@@ -14,14 +18,12 @@ public class GetWritingSystemTypesEndpoint : EndpointWithoutRequest<List<string>
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var writingSystems = await JsonDataLoader.LoadAsync<List<WritingSystem>>("writingSystems.json", ct);
-
-        var types = writingSystems?
+        var writingSystems = await _repo.GetWritingSystemsAsync(ct);
+        var types = writingSystems
             .Select(w => w.Type)
             .Distinct()
             .OrderBy(t => t)
-            .ToList() ?? [];
-
+            .ToList();
         await Send.OkAsync(types, ct);
     }
 }

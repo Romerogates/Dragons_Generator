@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-projection-d-image",
+  "name": "Projection d'image",
+  "level": 7,
+  "school": "illusion",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 750000,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "jour"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(une petite réplique de vous-même"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien"
+  ],
+  "description": "Vous créez un double illusoire de vous-même qui persiste pour toute la durée du sort. Ce double peut apparaître dans tout endroit situé à portée que vous avez déjà vu, quels que soient les obstacles qui vous en séparent. L'illusion vous ressemble (apparence, voix), mais est intangible. Si elle subit des dégâts, elle disparaît et le sort prend fin. Au prix d'une action, vous pouvez déplacer cette illusion jusqu'à deux fois votre VD et la faire bouger, parler et se comporter comme vous l'entendez. Elle vous imite à la perfection. Vous voyez par ses yeux et entendez par ses oreilles comme si vous vous trouviez à sa place. À chacun de vos tours de jeu, au prix d'une action bonus, vous pouvez passer de ses sens aux vôtres, et vice versa. Tant que vous utilisez ses sens, vous êtes considéré comme aveuglé et assourdi au regard de votre propre environnement. En cas d'interaction physique, l'illusion est dévoilée, tout simplement parce que les corps la traversent. Une créature qui examine l'image au prix d'une action comprendra qu'il s'agit d'une illusion en réussissant un test d'Intelligence (Investigation) assorti de votre DD de sauvegarde des sorts. Si une créature perce l'illusion, elle voit au travers et les sons qu'elle produit lui paraissent creux.",
+  "modular_options": []
+}

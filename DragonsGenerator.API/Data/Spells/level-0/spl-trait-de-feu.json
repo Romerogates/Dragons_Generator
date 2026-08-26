@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-trait-de-feu",
+  "name": "Trait de feu",
+  "level": 0,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Vous projetez une flam mèche sur une créature ou un objet situé à portée. Effectuez une attaque de sort à distance contre la cible. En cas de réussite, elle subit 1d10 dégâts de feu. Tout objet inflammable touché par ce sort s'embrase s'il n'est ni porté ni transporté. Les dégâts de ce sort augmentent de 1d10 quand vous atteignez le niveau 5 (2d10), le niveau 11 (3d10) et le niveau 17 (4d10).",
+  "modular_options": []
+}

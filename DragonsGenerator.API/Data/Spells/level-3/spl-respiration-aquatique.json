@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-respiration-aquatique",
+  "name": "Respiration aquatique",
+  "level": 3,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 24,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un petit roseau ou un brin de paille"
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-rodeur"
+  ],
+  "description": "Cette transmutation offre à un maximum de dix créatures consentantes que vous voyez à portée la faculté de respirer sous l'eau jusqu'à la fin du sort. Les créatures affectées conservent leur mode de respiration habituel.",
+  "modular_options": []
+}

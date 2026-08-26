@@ -1,0 +1,217 @@
+{
+  "schema_version": "2.0",
+  "id": "bg-acolyte",
+  "name": "Acolyte",
+  "source": {
+    "book": "Dragons - Livre de base: Aventuriers",
+    "pages": "87-88"
+  },
+  "flavor": {
+    "summary": "Vous avez passé votre vie à servir dans un temple dédié à un dieu ou un panthéon. Intermédiaire entre le royaume du sacré et le monde des mortels, vous participez aux rites et offrandes censés mener les fidèles en présence du divin.",
+    "adventure_hook": "Qu'est-ce qui vous a poussé à quitter le service du temple pour la vie d'aventurier ?"
+  },
+  "proficiencies": {
+    "skills": {
+      "fixed": [
+        "skill-intuition",
+        "skill-religion"
+      ],
+      "choose": null
+    },
+    "tools": {
+      "fixed": [],
+      "choose": null
+    },
+    "languages": {
+      "fixed": [],
+      "choose_count": 2
+    }
+  },
+  "equipment": {
+    "fixed": [
+      {
+        "id": "it-ss-amulette",
+        "name": "Symbole sacré (amulette)",
+        "qty": 1,
+        "location": "equipped"
+      },
+      {
+        "id": "gr-batons-encens",
+        "name": "Bâtons d'encens",
+        "qty": 5,
+        "location": "backpack"
+      },
+      {
+        "id": "gr-vetements-liturgiques",
+        "name": "Vêtements liturgiques",
+        "qty": 1,
+        "location": "equipped"
+      },
+      {
+        "id": "gr-vetements-ordinaires",
+        "name": "Vêtements ordinaires",
+        "qty": 1,
+        "location": "backpack"
+      }
+    ],
+    "choose": [
+      {
+        "id": "choice-acolyte-prieres",
+        "name": "Livre de prières ou moulin à prières",
+        "type": "item",
+        "quantity": 1,
+        "pool": [
+          {
+            "id": "gr-livre-de-prieres",
+            "name": "Livre de prières",
+            "qty": 1
+          },
+          {
+            "id": "gr-moulin-a-prieres",
+            "name": "Moulin à prières",
+            "qty": 1
+          }
+        ]
+      }
+    ],
+    "currency": {
+      "or": 15
+    }
+  },
+  "privilege": {
+    "id": "priv-hospitalite-des-fideles",
+    "name": "Hospitalité des fidèles",
+    "desc": "En tant qu'acolyte, vous bénéficiez du respect de ceux qui partagent votre foi. Vous et vos compagnons pouvez espérer recevoir soins et assistance gratuits dans un temple, un sanctuaire ou toute autre implantation de votre religion, à condition que vous puissiez les pourvoir. Le soutien de vos coreligionnaires vous est acquis pour vous assurer un train de vie modeste."
+  },
+  "personality_tables": {
+    "traits": {
+      "die": "1d8",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "J'idolâtre un héros de ma foi et ne cesse de me référer à ses actes et à son exemple."
+        },
+        {
+          "roll": 2,
+          "text": "Je sais trouver un terrain d'entente entre les pires ennemis et faire naître de l'empathie entre eux."
+        },
+        {
+          "roll": 3,
+          "text": "Le moindre événement est pour moi signe d'un dessein supérieur."
+        },
+        {
+          "roll": 4,
+          "text": "Rien ne saurait ébranler mon optimisme."
+        },
+        {
+          "roll": 5,
+          "text": "Dès que je le peux, je cite les textes sacrés (ou les déforme)."
+        },
+        {
+          "roll": 6,
+          "text": "Je suis tolérant (ou intolérant) envers les autres croyances et respecte (ou condamne) le culte des autres dieux."
+        },
+        {
+          "roll": 7,
+          "text": "J'ai connu les charmes de la bonne chère et de la haute société dans le temple de ma communauté."
+        },
+        {
+          "roll": 8,
+          "text": "J'ai passé tellement de temps au temple que j'ai peu d'expérience des rapports avec le monde extérieur."
+        }
+      ]
+    },
+    "ideals": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Tradition. Il faut préserver et perpétuer les rites et les sacrifices ancestraux."
+        },
+        {
+          "roll": 2,
+          "text": "Charité. J'essaie toujours d'aider ceux qui sont dans le besoin, quoi qu'il m'en coûte."
+        },
+        {
+          "roll": 3,
+          "text": "Changement. Nous devons contribuer aux transformations que les dieux apportent constamment au monde."
+        },
+        {
+          "roll": 4,
+          "text": "Pouvoir. J'espère gravir les échelons de la hiérarchie de mon temple."
+        },
+        {
+          "roll": 5,
+          "text": "Foi. J'ai confiance en mon dieu. Il guide mes pas et tout ira bien tant que je serai fidèle."
+        },
+        {
+          "roll": 6,
+          "text": "Aspiration. Je cherche à me montrer digne de la bienveillance de mon dieu par mes actes."
+        }
+      ]
+    },
+    "bonds": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Je suis prêt à tout pour récupérer une relique ancienne de ma foi, perdue depuis longtemps."
+        },
+        {
+          "roll": 2,
+          "text": "Un jour, je me vengerai de la hiérarchie corrompue du temple qui m'a qualifié d'hérétique."
+        },
+        {
+          "roll": 3,
+          "text": "Je dois ma vie au prêtre qui m'a recueilli quand mes parents sont morts."
+        },
+        {
+          "roll": 4,
+          "text": "Tout ce que je fais, je le fais pour le petit peuple."
+        },
+        {
+          "roll": 5,
+          "text": "Je ferai tout pour protéger le temple dans lequel j'ai servi."
+        },
+        {
+          "roll": 6,
+          "text": "Je cherche à préserver un texte sacré que mes ennemis considèrent comme hérétique et veulent détruire."
+        }
+      ]
+    },
+    "flaws": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Je juge les autres sévèrement. Et moi encore plus sévèrement."
+        },
+        {
+          "roll": 2,
+          "text": "J'accorde trop de confiance à ceux qui exercent un pouvoir au sein de la hiérarchie de mon temple."
+        },
+        {
+          "roll": 3,
+          "text": "Ma piété me pousse parfois à accorder une confiance aveugle à ceux qui professent la même foi que moi."
+        },
+        {
+          "roll": 4,
+          "text": "Je suis inflexible dans ma pensée."
+        },
+        {
+          "roll": 5,
+          "text": "Je suis méfiant envers les étrangers et je m'attends au pire de leur part."
+        },
+        {
+          "roll": 6,
+          "text": "Une fois que j'ai fixé un objectif, je deviens obsédé par celui-ci au détriment de tout le reste."
+        }
+      ]
+    }
+  },
+  "handicaps_compatible": [
+    "hdc-corrompu",
+    "hdc-essence-vulnerable",
+    "hdc-vulnerable"
+  ]
+}

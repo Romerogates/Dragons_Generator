@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-arme-elementaire",
+  "name": "Arme élémentaire",
+  "level": 1,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action_bonus"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-paladin"
+  ],
+  "description": "Dotre arme de corps à corps s'anime de puissance élémentaire. Chaque fois que vous touchez une cible avec cette arme avant la fin du sort, vous lui infligez des dégâts supplémentaires égaux à votre modificateur de caractéristique magique. Le type de ces dégâts est à choisir parmi la liste suivante au moment du lance ment du sort : acide, feu, foudre, froid, radiant, tonnerre.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, les dégâts supplémentaires sont égaux au double de votre modificateur de caractéristique magique.",
+  "modular_options": []
+}

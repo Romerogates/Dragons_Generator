@@ -11,6 +11,10 @@ public class GetWritingSystemsByTypeRequest
 
 public class GetWritingSystemsByTypeEndpoint : Endpoint<GetWritingSystemsByTypeRequest, List<WritingSystem>>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetWritingSystemsByTypeEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/writing-systems/type/{type}");
@@ -19,12 +23,10 @@ public class GetWritingSystemsByTypeEndpoint : Endpoint<GetWritingSystemsByTypeR
 
     public override async Task HandleAsync(GetWritingSystemsByTypeRequest req, CancellationToken ct)
     {
-        var writingSystems = await JsonDataLoader.LoadAsync<List<WritingSystem>>("writingSystems.json", ct);
-
-        var filtered = writingSystems?
+        var writingSystems = await _repo.GetWritingSystemsAsync(ct);
+        var filtered = writingSystems
             .Where(w => string.Equals(w.Type, req.Type, StringComparison.OrdinalIgnoreCase))
-            .ToList() ?? [];
-
+            .ToList();
         await Send.OkAsync(filtered, ct);
     }
 }

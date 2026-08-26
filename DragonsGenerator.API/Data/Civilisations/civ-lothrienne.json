@@ -1,0 +1,65 @@
+{
+  "schema_version": "2.0",
+  "id": "civ-lothrienne",
+  "name": "Lothrienne",
+  "randomization": {
+    "dice": "d100",
+    "min": 77,
+    "max": 82
+  },
+  "demographics": {
+    "primary_species": [
+      {
+        "id": "sp-humain",
+        "label": "Humains"
+      },
+      {
+        "id": "sp-nain-batisseur",
+        "label": "Nains bâtisseurs"
+      }
+    ],
+    "secondary_species": [
+      {
+        "id": "sp-aldaron",
+        "label": "Aldarons (quelques-uns)"
+      },
+      {
+        "id": "sp-sidhe",
+        "label": "Sidhes (quelques-uns)"
+      }
+    ],
+    "is_cosmopolitan": false,
+    "cosmopolitan_zones": [],
+    "social_roles": [],
+    "peoples_note": "Humains et Nains bâtisseurs (essentiel). Quelques Aldarons et Sidhes. Les autres peuples sont rares et souvent étrangers."
+  },
+  "official_languages": [
+    {
+      "id": "lg-lothrien",
+      "label": "Lothrien"
+    }
+  ],
+  "multilingual": false,
+  "writing_systems": [
+    {
+      "id": "wr-cyfand",
+      "label": "Cyfand",
+      "type": "alphabet"
+    }
+  ],
+  "is_oral_only": false,
+  "description": "Coincée entre les Drakenbergen et le Septentrion, la Lothrienne est un royaume féodal rude, dans lequel chaque seigneur lutte âprement pour la survie de son domaine. La magie de cette contrée est très faible en dehors des royaumes féeriques dirigés par un roi fée irascible connu pour prendre souvent la forme d'un ours lorsqu'il se rend parmi les hommes. Les menaces sont essentiellement humaines : pirates remontant le fleuve, ambitions des maisons nobles, communautés obscurantistes craignant la magie et les druides, pillards barbares… Le surnaturel s'immisce insidieusement avec la propagation de la desvérie, maladie du sommeil et des rêves, annonciatrice de plus grands maux.",
+  "geography_tags": [
+    "royaume-feodal",
+    "royaumes-feeriques",
+    "fleuve"
+  ],
+  "threat_ids": [
+    "threat-roi-fee",
+    "threat-pirates-fluviaux",
+    "threat-maisons-nobles",
+    "threat-communautes-obscurantistes",
+    "threat-pillards-barbares",
+    "threat-desverie"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "id": "div-faconneur",
+  "name": "Façonneur",
+  "tonality": "harmonique",
+  "domains": [
+    "dom-etrange",
+    "dom-voyage"
+  ],
+  "other_names": [
+    "le Fou",
+    "le Potier",
+    "le Père de la multitude"
+  ],
+  "description": "Façonneur est le créateur par excellence, celui qui surprend, étonne, prend au dépourvu et émerveille, parfois horrifie. Il est en quête d'idées, d'inspiration et valorise à hauteur égale la beauté parfaite et la monstruosité difforme. Des mythes font de lui le responsable de l'étonnante diversité des espèces, expérimentant les formes, les couleurs, les idées… C'est la raison pour laquelle certains prêtres de Façonneur encouragent l'expérience individuelle et l'aventure. D'autres soutiennent les inventeurs, ceux qui cherchent des solutions novatrices aux problèmes ou se confrontent volontiers à la difficulté. Une autre facette du Façonneur peut donner lieu à des cultes vénérant la monstruosité.",
+  "worshippers_note": "Inventeurs, aventuriers, expérimentateurs et ceux qui valorisent la nouveauté. Dans le panthéon de l'Étoile, vénéré sous le nom de Gùnd, sous l'aspect d'un enfant ou adolescent.",
+  "grants_powers_to": [
+    "pretre"
+  ],
+  "source": "livre_de_base"
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-necessaire-a-feu",
+  "name": "Nécessaire à feu",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 5,
+    "unit": "pa"
+  },
+  "weight_kg": 0.5,
+  "description": "Silex, pierre à briquet et amorce. Allumer une torche ou combustible prend 1 action, un feu de camp 1 minute."
+}

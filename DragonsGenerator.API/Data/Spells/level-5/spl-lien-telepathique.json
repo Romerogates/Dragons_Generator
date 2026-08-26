@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-lien-telepathique",
+  "name": "Lien télépathique",
+  "level": 5,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "des morceaux de coquille d'œufs de deux espèces de créatures différentes"
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien"
+  ],
+  "description": "Logo de sort D ous nouez un lien télépathique entre un maximum de huit créatures consentantes de votre choix situées à portée pour toute la durée du sort. Les créatures ayant une valeur d'Intelligence de 2 ou moins ne sont pas affectées par ce sort. Tant que le sort persiste, les cibles peuvent communiquer par télépathie, qu'elles parlent ou non une même langue et quelle que soit la distance les séparant. Le lien est néanmoins réprimé entre les individus se situant sur différents plans d'existence.",
+  "modular_options": []
+}

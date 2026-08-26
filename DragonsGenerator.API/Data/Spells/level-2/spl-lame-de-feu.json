@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-lame-de-feu",
+  "name": "Lame de feu",
+  "level": 2,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action_bonus"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une feuille de sumac"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide"
+  ],
+  "description": "Une lame embrasée apparaît dans votre main libre et persiste pour toute la durée du sort. Sa taille et sa forme se rapprochent de celles d'un cime terre. Si vous la lâchez, elle disparaît, mais vous pouvez l'évoquer à nouveau au prix d'une action bonus. Vous pouvez effectuer une attaque de sort au corps à corps avec cette arme au prix d'une action. En cas de réussite, la cible subit 3d6 dégâts de feu. La lame enflammée produit une lumière vive dans un rayon de 3 m et une lumière faible sur 3 m de plus.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, les dégâts augmentent de 1d6 par tranche de deux niveaux d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

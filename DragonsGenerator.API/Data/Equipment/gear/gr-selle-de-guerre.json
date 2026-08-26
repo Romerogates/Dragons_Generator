@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-selle-de-guerre",
+  "name": "Selle de guerre",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 20,
+    "unit": "po"
+  },
+  "weight_kg": 15,
+  "description": "Soutient le cavalier. Confère un avantage aux tests pour éviter de tomber de selle."
+}

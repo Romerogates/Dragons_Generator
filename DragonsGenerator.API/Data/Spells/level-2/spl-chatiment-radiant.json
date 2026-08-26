@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-chatiment-radiant",
+  "name": "Châtiment radiant",
+  "level": 2,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action_bonus"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-paladin"
+  ],
+  "description": "Votre arme scintille d'une brillance astrale la première fois que vous touchez une créature avec une attaque d'arme avant que le sort prenne fin. Cette attaque inflige 2d6 dégâts radiants supplémentaires à la cible, qui redevient visible si elle était invisible. En outre, la cible émet une lumière faible sur un rayon de 1,50 m et ne peut pas devenir invisible tant que le sort persiste.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, les dégâts supplémentaires augmentent de 1d6 par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

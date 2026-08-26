@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-cage-de-force",
+  "name": "Cage de force",
+  "level": 7,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 30,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "poudre de rubis d'une valeur de 1 500 po"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Une prison de force magique invisible et immobile en forme de cube apparaît autour d'une zone que vous choisissez à portée. Il peut s'agir d'une cage ou d'une cellule, à votre convenance. Une cage présente une arête de 6 m maximum et est constituée de barreaux de 1,25 cm de diamètre espacés de 1,25 cm. Une cellule présente une arête de 3 m maximum et constitue un obstacle solide qui empêche toute matière de la traverser. De même, les sorts ne peuvent pas la traverser, dans un sens ou dans l'autre. Au moment de l'incantation, toute créature située intégralement dans la zone d'effet est prise au piège. Celles qui ne s'y situent que partiellement, ou qui sont trop grandes pour y prendre place, sont repoussées du centre de la zone jusqu'à ce qu'elles en soient entièrement sorties. Une créature située dans la cage ne peut pas la quitter par des moyens non magiques. Si elle tente de recourir à la téléportation ou à une forme de déplacement planaire pour s'en échapper, elle doit d'abord effectuer un JS Charisme. En cas de réussite, elle peut utiliser cette magie pour s'en aller. En cas d'échec, elle ne parvient pas à s'évader et le sort (ou effet) est gâché. La cage existe aussi dans le Plan Éthéré, empêchant du même coup les déplacements éthérés. Dissipation de la magie ne peut pas dissiper ce sort. À plus hauts niveaux. Quand vous jetez ce sort en utilisant un emplacement de sort du 8e niveau, la durée du sort passe à 8 heures ; au 9e niveau, elle est de 24 heures.",
+  "modular_options": []
+}

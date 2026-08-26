@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-vetements-de-voyage",
+  "name": "Vêtements de voyage",
+  "category": "gear",
+  "subcategory": "clothing",
+  "cost": {
+    "value": 2,
+    "unit": "po"
+  },
+  "weight_kg": 2,
+  "description": "Vêtements résistants et pratiques adaptés aux longs déplacements."
+}

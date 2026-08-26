@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-illusion-mineure",
+  "name": "Illusion mineure",
+  "level": 0,
+  "school": "illusion",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": false,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Vous créez un son ou l'image d'un objet à portée qui persiste pour toute la durée du sort. Vous ne pouvez manifester que des sons et images que vous avez déjà entendus ou vus. L'illusion prend fin si vous la révoquez au prix d'une action ou relancez ce sort. Si vous créez un bruit, son volume peut varier du simple murmure au hurlement. Il peut s'agir de votre voix, de celle de quelqu'un d'autre, d'un rugissement de lion, d'un roulement de tambour ou de quelque autre son de votre choix. Il se prolonge en conservant son intensité pendant toute la durée du sort, mais vous pouvez aussi produire des sons distincts qui se font entendre à différents moments. Si vous créez l'image d'un objet immobile - comme une chaise, des traces de pas boueuses, ou un coffret - celui-ci doit tenir dans un cube de 1,50 m d'arête. L'image ne produit ni son, ni lumière, ni odeur, ni autre effet sensoriel. En cas d'interaction physique, l'illusion est dévoilée, tout simplement parce que les corps la traversent. Une créature qui examine le son ou l'image au prix d'une action comprendra qu'il s'agit d'une illusion en réussissant un test d'Intelligence (Investigation) assorti de votre DD de sauvegarde des sorts. Si une créature perce l'illusion, elle la perçoit floutée. Quand vous atteignez le niveau 5, la portée de ce sort passe à 18 m ; à partir du niveau 11, vous pouvez produire simultanément deux illusions ; à partir du niveau 17, vous pouvez en produire trois.",
+  "modular_options": []
+}

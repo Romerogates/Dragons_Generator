@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-eau-benite",
+  "name": "Eau bénite (flasque)",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 25,
+    "unit": "po"
+  },
+  "weight_kg": 0.5,
+  "description": "Action pour répandre (1,50 m) ou lancer (6 m). Attaque à distance contre une créature (arme improvisée). Les fiélons et morts-vivants subissent 2d6 dégâts radiants."
+}

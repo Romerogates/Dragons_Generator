@@ -1,0 +1,28 @@
+{
+  "schema_version": "2.0",
+  "id": "don-pavois",
+  "name": "Pavois",
+  "requires_magic": false,
+  "category": "combat",
+  "prerequisites": [],
+  "description": "Nécessite un bouclier. Si vous ne vous déplacez pas à votre tour : abri partiel jusqu'à votre prochain tour (annulé si neutralisé). Quand un ennemi vous rate au corps à corps : vous pouvez jouer votre réaction pour lui infliger automatiquement bonus_maitrise dégâts contondants.",
+  "benefits": [
+    {
+      "type": "cover",
+      "cover": "partiel",
+      "condition": "sans déplacement à son tour, bouclier équipé"
+    },
+    {
+      "type": "reaction_damage",
+      "trigger": "ennemi rate une attaque de corps à corps",
+      "damage": "bonus_maitrise (contondant)",
+      "action": "réaction"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "bouclier",
+    "défense",
+    "réaction"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "act-lancer-un-sort",
+  "name": "Lancer un sort",
+  "action_cost": "action",
+  "category": "standard",
+  "description": "Incantation d'un sort au combat. Chaque sort indique son temps d'incantation ; la plupart des sorts se lancent au prix d'une action.",
+  "mechanics": {
+    "casting_time": "Variable selon le sort (souvent 1 action)",
+    "note": "Les lanceurs de sorts consacrent souvent leur action de combat à l'incantation"
+  },
+  "source": "livre_de_base"
+}

@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-magie-derobee",
+  "name": "Magie dérobée",
+  "level": 2,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un carré de tissu sombre"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Logo icon Icon logo Désignez une créature que vous voyez à portée et choisissez un sort qu'elle a lancé, lequel doit être d'une durée supérieure à 1 round. La créature doit réussir un JS de sa caractéristique magique, sur lequel elle bénéficie d'un avantage si le niveau de son sort est supérieur au niveau de l'emplacement utilisé pour le vôtre. Si elle rate son jet de sauvegarde, le sort reste actif, mais vous en prenez le contrôle et êtes désormais considéré comme son lanceur. Les paramètres du sort restent les mêmes (cible, durée, etc.), mais c'est désormais votre modificateur de caractéristique magique et votre bonus de maîtrise qui sont pris en compte. Si le transfert implique des conditions qui empêchent le bon fonctionnement du sort (parce que vous êtes trop loin de la cible, par exemple), le sort prend fin.",
+  "modular_options": []
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "tl-cor",
+  "name": "Cor",
+  "category": "tool",
+  "subcategory": "instrument",
+  "cost": {
+    "value": 3,
+    "unit": "po"
+  },
+  "weight_kg": 1,
+  "description": "Instrument de musique."
+}

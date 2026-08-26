@@ -1,0 +1,24 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-commun-des-profondeurs",
+  "name": "Commun des profondeurs",
+  "category": "exotique",
+  "typical_speakers": [
+    "Négociants de l'Inframonde",
+    "Drows",
+    "Duergars",
+    "Svirfnebelins"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-elfique-modifie",
+      "label": "Elfique (accents adaptés et ajouts de lettres)",
+      "type": "alphabet"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [
+    "Inframonde"
+  ],
+  "description": "Langue hybride née de l'elfique, du nain et du profond, parlée par les négociants de l'Inframonde. Son oral est plus complexe que son écrit : rythme enlevé, abréviations, intonations subtiles et langage non verbal importants. Drows, duergars et svirfnebelins n'ont pas exactement les mêmes conventions gestuelles."
+}

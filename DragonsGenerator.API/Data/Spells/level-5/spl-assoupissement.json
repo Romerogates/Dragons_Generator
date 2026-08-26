@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-assoupissement",
+  "name": "Assoupissement",
+  "level": 5,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-magicien",
+    "cls-pretre",
+    "cls-sorcier"
+  ],
+  "description": "Vous créez une barrière empêchant une créature de manipuler les flux magiques. Choisissez une créature que vous voyez à portée. Elle doit réussir un JS Charisme sous peine de subir les effets suivants tant que le sort persiste : La créature est prise de vertiges (équivalent de l'état empoisonné). À la fin de chacun de ses tours de jeu, elle peut réitérer le JS Charisme. En cas de réussite, elle surmonte le malaise. Cet effet s'applique même si la créature n'est dotée d'aucun pouvoir magique. La créature perd le bénéfice de tous ses sorts, sorts innés, pouvoirs spécifiquement magiques (cf. Créatures) et aptitudes liées à l'Éveil (cf. Aventuriers). Icon, engineering drawing, and logo Si la cible maintenait sa concentration sur un sort ou un effet, celle-ci est rompue. Elle perd également le contrôle de tout sort ou effet magique produit par elle.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, vous pouvez affecter une cible supplémentaire par niveau d'emplacement au-dessus du 5e.",
+  "modular_options": []
+}

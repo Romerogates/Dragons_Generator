@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "it-fa-baguette",
+  "name": "Baguette (focaliseur)",
+  "category": "gear",
+  "subcategory": "arcane_focus",
+  "cost": {
+    "value": 10,
+    "unit": "po"
+  },
+  "weight_kg": 0.5,
+  "description": "Focaliseur arcanique. Peut remplacer les composantes matérielles d'un sort."
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "ski-discretion",
+  "name": "Discrétion",
+  "ability": "DEX",
+  "description": "Effectuez un test de Dextérité (Discrétion) lorsque vous tentez de vous soustraire aux sens de vos ennemis, de vous faufiler sans éveiller l'attention de la garde, de vous esquiver ou de vous approcher dans le dos de quelqu'un sans qu'il vous voie ni ne vous entende.",
+  "examples": [
+    "Se faufiler sans éveiller l'attention de la garde.",
+    "S'approcher dans le dos de quelqu'un sans être vu ni entendu.",
+    "Se cacher et rester dissimulé face à une créature qui cherche activement des signes de votre présence."
+  ],
+  "passive_check": false,
+  "source": "livre_de_base"
+}

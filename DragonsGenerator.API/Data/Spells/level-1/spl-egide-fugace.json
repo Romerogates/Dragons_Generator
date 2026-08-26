@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-egide-fugace",
+  "name": "Égide fugace",
+  "level": 1,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "reaction"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": false,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-paladin",
+    "cls-pretre"
+  ],
+  "description": "Vous pouvez dresser une protection momentanée face à un sort imminent. Au moment de jouer votre réaction, préalablement au lancement d'égide fugace, vous identifiez les caractéristiques suivantes du sort : S'il est de 3e niveau ou inférieur ; S'il entraîne un jet de sauvegarde ou un jet d'attaque de sort dès son lancement ; Si l'incantation ne dure pas plus de 1 action. Si toutes ces conditions ne sont pas réunies, vous pouvez renoncer à lancer égide fugace. Votre réaction reste dépensée, mais vous gardez l'emplacement de sort correspondant. Si toutes les conditions sont réunies, vous et jusqu'à trois créatures que vous voyez dans un rayon de 18 m bénéficiez d'un avantage aux jets de sauvegarde contre le sort déclencheur, tandis que les jets d'attaque de ce même sort subissent un désavantage contre les bénéficiaires. Cet effet prend fin dès la résolution des effets initiaux du sort déclencheur.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e ou 4e niveau, égide fugace peut s'appliquer contre des sorts du 5e niveau ou inférieur ; avec un emplacement du 5e ou 6e niveau, égide fugace s'applique contre des sorts du 7e niveau ou inférieur ; avec un emplacement du 7e niveau ou supérieur, égide fugace s'applique contre les sorts de tout niveau.",
+  "modular_options": []
+}

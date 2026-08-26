@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-sommeil",
+  "name": "Sommeil",
+  "level": 1,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 27,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(une pincée de sable fin"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Ce sort plonge des créatures dans un sommeil magique. Lancez 5d8 ; le total représente le nombre de points de vie de créatures que le sort peut affecter. Les créatures situées dans un rayon de 6 m d'un point que vous avez choisi à portée sont affectées dans l'ordre croissant de leurs points de vie (sans tenir compte de celles qui sont inconscientes). En commençant par la créature qui a le moins de points de vie actuellement, chaque créature affectée par ce sort se retrouve inconsciente tant que persiste le sort, jusqu'à ce qu'elle subisse des dégâts ou que quelqu'un la secoue ou la gifle au prix d'une action. Soustrayez du total les points de vie de chaque créature affectée avant de passer à la suivante. Pour qu'une créature soit affectée, il faut que ses points de vie actuels soient inférieurs ou égaux au total restant. Les morts-vivants et les créatures immunisées contre l'état préjudiciable charmé ne sont pas affectés par ce sort.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, lancez 2d8 supplémentaires par niveau d'emplacement au-dessus du 1ᵉʳ.",
+  "modular_options": []
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "it-carquois-20-carreaux",
+  "name": "Étui à carreaux (20 carreaux)",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 1,
+    "unit": "po"
+  },
+  "weight_kg": 0.75,
+  "description": "Étui contenant 20 carreaux d'arbalète."
+}

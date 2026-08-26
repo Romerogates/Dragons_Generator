@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "guid": null,
+  "id": "spl-interdiction",
+  "name": "Interdiction",
+  "level": 6,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": false,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": true,
+  "is_concentration": false,
+  "is_corrupted": true,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "",
+  "higher_levels": null,
+  "modular_options": []
+}

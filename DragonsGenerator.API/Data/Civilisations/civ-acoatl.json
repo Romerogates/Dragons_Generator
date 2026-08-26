@@ -1,0 +1,63 @@
+{
+  "schema_version": "2.0",
+  "id": "civ-acoatl",
+  "name": "Acoatl",
+  "randomization": {
+    "dice": "d100",
+    "min": 1,
+    "max": 2
+  },
+  "demographics": {
+    "primary_species": [
+      {
+        "id": "sp-humain",
+        "label": "Humains"
+      },
+      {
+        "id": "sp-aldaron",
+        "label": "Aldarons"
+      },
+      {
+        "id": "sp-halfelin-pied-sur",
+        "label": "Halfelins pieds-sûrs"
+      }
+    ],
+    "secondary_species": [],
+    "is_cosmopolitan": false,
+    "cosmopolitan_zones": [
+      "comptoirs côtiers"
+    ],
+    "social_roles": [
+      {
+        "id": "role-marchand",
+        "label": "Marchands (comptoirs)"
+      },
+      {
+        "id": "role-mercenaire",
+        "label": "Mercenaires (comptoirs)"
+      }
+    ],
+    "peoples_note": "Humains, Aldarons, Halfelins pieds-sûrs. Dans les comptoirs côtiers : marchands et mercenaires de toutes origines."
+  },
+  "official_languages": [
+    {
+      "id": "lg-runasimi",
+      "label": "Runasimi"
+    }
+  ],
+  "multilingual": false,
+  "writing_systems": [],
+  "is_oral_only": true,
+  "description": "Acoatl est une contrée encore très largement inconnue et inexplorée — qu'y a-t-il d'ailleurs derrière les montagnes volcaniques, loin, à l'ouest ? — à laquelle on accède via des comptoirs établis sur des rivages insalubres, infestés de moustiques et de caïmans. Les étrangers viennent ici en quête d'aventures ; ils rêvent de l'or et de la magie des ruines des cités dans les hauteurs. Dans l'immense plaine de la forêt émeraude, les habitants des tribus locales sont prudents : ils connaissent les légendes sur les cruels tyrans qui gouvernaient autrefois, luttaient et s'entredéchiraient, rêvant de pouvoir absolu et d'immortalité. Mais ce n'est pas tout, car on raconte que les cénotes renferment les portes vers d'autres mondes… Le nom de cette contrée signifie « dragon » dans la langue des tribus pieds-sûrs locales : les pionniers racontent que ces créatures sont particulièrement nombreuses dans cette région.",
+  "geography_tags": [
+    "montagnes-volcaniques",
+    "comptoirs",
+    "rivages-insalubres",
+    "foret-emeraude",
+    "cenotes"
+  ],
+  "threat_ids": [
+    "threat-tyrans-cruels",
+    "threat-dragons"
+  ]
+}

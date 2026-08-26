@@ -1,0 +1,49 @@
+{
+  "schema_version": "2.0",
+  "id": "don-pilier-de-taverne",
+  "name": "Pilier de taverne",
+  "requires_magic": false,
+  "category": "exploration",
+  "prerequisites": [],
+  "description": "Quand empoisonné : pas de désavantage aux jets d'attaque + avantage contre l'état effrayé. Avantage aux tests de jeux d'argent. La brume et le brouillard vous affectent moins (zone légèrement voilée = normal ; grandement = légèrement). Vision dans le noir sur 9 m (ou +9 m si déjà présente). Avantage aux tests de Perception opposés à Discrétion ou Escamotage.",
+  "benefits": [
+    {
+      "type": "condition_immunity_partial",
+      "condition": "empoisonné",
+      "effect": "no attack disadvantage"
+    },
+    {
+      "type": "advantage_on_save",
+      "against": [
+        "état effrayé"
+      ],
+      "condition": "quand empoisonné"
+    },
+    {
+      "type": "advantage_on_check",
+      "activities": [
+        "jeux d'argent"
+      ]
+    },
+    {
+      "type": "reduced_obscurement"
+    },
+    {
+      "type": "darkvision",
+      "range_m": 9
+    },
+    {
+      "type": "advantage_on_check",
+      "skills": [
+        "Perception"
+      ],
+      "condition": "opposé à Discrétion/Escamotage"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "social",
+    "perception",
+    "taverne"
+  ]
+}

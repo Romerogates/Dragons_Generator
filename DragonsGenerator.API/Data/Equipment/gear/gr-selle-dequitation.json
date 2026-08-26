@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-selle-dequitation",
+  "name": "Selle d'équitation",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 10,
+    "unit": "po"
+  },
+  "weight_kg": 12.5,
+  "description": "Selle standard pour monter à cheval."
+}

@@ -11,6 +11,10 @@ public class GetWritingSystemByIdRequest
 
 public class GetWritingSystemByIdEndpoint : Endpoint<GetWritingSystemByIdRequest, WritingSystem>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetWritingSystemByIdEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/writing-systems/{id}");
@@ -19,10 +23,7 @@ public class GetWritingSystemByIdEndpoint : Endpoint<GetWritingSystemByIdRequest
 
     public override async Task HandleAsync(GetWritingSystemByIdRequest req, CancellationToken ct)
     {
-        var writingSystems = await JsonDataLoader.LoadAsync<List<WritingSystem>>("writingSystems.json", ct);
-
-        var writingSystem = writingSystems?.FirstOrDefault(w =>
-            string.Equals(w.Id, req.Id, StringComparison.OrdinalIgnoreCase));
+        var writingSystem = await _repo.GetWritingSystemByIdAsync(req.Id, ct);
 
         if (writingSystem is null)
         {

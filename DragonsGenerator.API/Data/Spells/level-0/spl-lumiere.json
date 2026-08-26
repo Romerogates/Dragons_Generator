@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-lumiere",
+  "name": "Lumière",
+  "level": 0,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-pretre"
+  ],
+  "description": "Vous touchez un objet dont aucune dimension ne peut dépasser 3 m. Tant que le sort persiste, cet objet dégage une lumière vive dans un rayon de 6 m, et une lumière faible sur 6 m de plus. Cette lumière est de la couleur de votre choix. Pour la bloquer, il suffit de recouvrir l'objet d'un écran opaque. Le sort prend fin si vous le relancez ou si vous le révoquez au prix d'une action. Si vous ciblez un objet tenu ou porté par une créature hostile, cette dernière doit réussir un JS Dextérité pour éviter le sort. Lorsque vous atteignez les niveaux 5, 11 et 17, vous pouvez créer respectivement 1, 2, et 3 lumières supplémentaires. À ces mêmes niveaux, le rayon d'éclairage passe respectivement à 9 m, 12 m et 15 m. Au niveau 11, vous pouvez, à l'aide d'une action bonus, faire varier le rayon d'action de la lumière de 0 m à son maximum. Au niveau 17, au lancement de lumière, vous pouvez désigner jusqu'à six créatures qui, outre les créatures douées de vision lucide, seront les seules à percevoir la lumière.",
+  "modular_options": []
+}

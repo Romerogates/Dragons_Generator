@@ -1,0 +1,19 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-celeste",
+  "name": "Céleste",
+  "category": "exotique",
+  "typical_speakers": [
+    "Célestes"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-celeste",
+      "label": "Céleste",
+      "type": "hieroglyphe"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [],
+  "description": "Le céleste se désigne lui-même comme mdw-ntr (les paroles du dieu). Ses sonorités rondes, douces et séduisantes exigent une maîtrise certaine pour être prononcées correctement. Parlée par les célestes. Système d'écriture : hiéroglyphes célestes."
+}

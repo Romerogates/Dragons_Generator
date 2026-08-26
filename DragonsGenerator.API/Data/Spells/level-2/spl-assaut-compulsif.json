@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-assaut-compulsif",
+  "name": "Assaut compulsif",
+  "level": 2,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une feuille d'ortie"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien",
+    "cls-pretre",
+    "cls-sorcier"
+  ],
+  "description": "Vous désignez une créature, laquelle doit immédiatement utiliser sa réaction pour effectuer une attaque à l'aide de l'arme qu'elle tient contre une créature de votre choix. Si elle n'en a pas la possibilité (soit parce qu'elle devrait se déplacer pour atteindre la créature ciblée, soit parce qu'un effet quelconque l'en empêche), ce sort est sans effet. Si la créature désignée n'est pas consentante, elle peut effectuer un JS Sagesse pour se soustraire à l'effet du sort. Le consentement de la cible distingue la version corrompue de celle non-corrompue de ce sort.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 2e. Les créatures doivent se situer dans un rayon de 9 m les unes des autres quand vous les ciblez.",
+  "modular_options": []
+}

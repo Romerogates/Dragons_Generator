@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-souvenir",
+  "name": "Souvenir personnel",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": null,
+    "unit": "po",
+    "note": "Objet personnel, prix variable"
+  },
+  "weight_kg": 0.25,
+  "description": "Objet cher à vos yeux, en lien avec votre passé (souvenir de chasse, relique familiale, trophée, etc.)."
+}

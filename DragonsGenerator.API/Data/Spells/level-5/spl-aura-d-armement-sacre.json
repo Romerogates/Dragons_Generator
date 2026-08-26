@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-aura-d-armement-sacre",
+  "name": "Aura d'armement sacré",
+  "level": 5,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": {
+      "shape": "rayon",
+      "radius_m": 9
+    }
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-paladin"
+  ],
+  "description": "Une énergie enchantée émane de vous dans un rayon de 9 m. L'aura se déplace avec vous tant que le sort persiste, et vous en restez le centre. Toute créature qui ne vous est pas hostile comprise dans l'aura (y compris vous) bénéficie d'un enchantement temporaire sacré qui s'applique à un équipement non magique au choix du bénéficiaire : armure, bouclier, arme ou projectile. L'objet est désormais magique jusqu'à la fin du sort et offre un bonus de +2 à la CA (dans le cas d'une armure ou d'un bouclier) ou de +2 aux jets d'attaque et de dégâts (dans le cas d'une arme ou d'un projectile).",
+  "modular_options": []
+}

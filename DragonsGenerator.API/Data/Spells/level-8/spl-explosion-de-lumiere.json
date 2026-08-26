@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-explosion-de-lumiere",
+  "name": "Explosion de lumière",
+  "level": 8,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 45,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une flamme et un bout de pierre de soleil"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Une explosion de lumière solaire aveuglante se produit dans un rayon de 18 m centré sur un point que vous choisissez à portée. Toute créature prise dans la zone doit effectuer un JS Constitution. En cas d'échec, elle subit 12d6 dégâts radiants et se retrouve aveuglée pendant 1 minute. En cas de réussite, les dégâts sont réduits de moitié et la cible n'est pas aveuglée. Les morts-vivants et les vases subissent un désavantage au jet de sauvegarde. Une créature aveuglée par ce sort effectue un nouveau JS Constitution à la fin de chacun de ses tours de jeu. En cas de réussite, elle n'est plus aveuglée. Cette évocation dissipe toute obscurité créée par un sort dans sa zone. Photograph of a sun stone Martin Romero",
+  "modular_options": []
+}

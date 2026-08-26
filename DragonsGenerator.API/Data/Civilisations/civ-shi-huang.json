@@ -1,0 +1,57 @@
+{
+  "schema_version": "2.0",
+  "id": "civ-shi-huang",
+  "name": "Shi-huang",
+  "randomization": {
+    "dice": "d100",
+    "min": 98,
+    "max": 98
+  },
+  "demographics": {
+    "primary_species": [
+      {
+        "id": "sp-humain",
+        "label": "Humains"
+      }
+    ],
+    "secondary_species": [
+      {
+        "id": "sp-tous",
+        "label": "Autres peuples (dans les cités)"
+      }
+    ],
+    "is_cosmopolitan": true,
+    "cosmopolitan_zones": [
+      "cités"
+    ],
+    "social_roles": [],
+    "peoples_note": "Humains principalement. Les autres peuples rencontrés dans les cités. Les Drakéides ont fui après la révolution."
+  },
+  "official_languages": [
+    {
+      "id": "lg-shi-huang",
+      "label": "Shi-huang"
+    }
+  ],
+  "multilingual": false,
+  "writing_systems": [
+    {
+      "id": "wr-draconique",
+      "label": "Draconique (syllabaire)",
+      "type": "ideogramme-syllabaire"
+    }
+  ],
+  "is_oral_only": false,
+  "description": "Riche culture millénaire, Shi-huang fut dirigée par des géants puis par des drakéides. Ces dynasties s'effondrèrent et laissèrent la place à des royaumes humains raffinés. C'est dans cette culture qu'apparurent les premiers moines-guerriers théorisant l'usage du ki. Les habitants du Shi-huang doivent se montrer vigilants. Outre les luttes entre les royaumes, leurs frontières montagneuses sont peuplées de monstres. Si pour l'instant, le sceau qui ferme l'Inframonde profond les protège du Chancre, le Plan Éthéré en revanche est étonnamment proche et permet aux fantômes de prospérer.",
+  "geography_tags": [
+    "royaumes-humains",
+    "frontieres-montagneuses"
+  ],
+  "threat_ids": [
+    "threat-luttes-inter-royaumes",
+    "threat-monstres-montagneux",
+    "threat-chancre",
+    "threat-fantomes",
+    "threat-plan-ethere"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "id": "mnt-molosse",
+  "name": "Molosse",
+  "category": "mount",
+  "subcategory": "animal",
+  "cost": {
+    "value": 25,
+    "unit": "po"
+  },
+  "weight_kg": null,
+  "speed": "12 m",
+  "capacity_kg": 97.5,
+  "description": "Vitesse de déplacement : 12 m. Charge maximale : 97,5 kg."
+}

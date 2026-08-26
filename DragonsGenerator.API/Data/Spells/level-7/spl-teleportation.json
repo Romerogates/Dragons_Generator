@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-teleportation",
+  "name": "Téléportation",
+  "level": 7,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 3,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": "un cristal d'alecrithe ou une gemme de dracopale d'une valeur d'au moins 1 000 po"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Ce sort vous transporte instantanément, ainsi qu'un maximum de huit créatures consentantes de votre choix que vous voyez à portée, vers une destination à votre convenance. Autre possibilité, vous pouvez emmener avec vous un objet que vous voyez à portée. Dans ce cas, l'objet doit pouvoir entrer dans un cube de 3 m d'arête, et ne doit pas être porté ni transporté par une créature non consentante. La destination que vous choisissez doit vous être connue et se situer sur la même planète (par exemple Eana), le même astre (par exemple la lune Éternité) ou sur le même plan d'existence (par exemple le Plan Astral) que vous. Votre degré de familiarité avec cette destination détermine si vous y arrivez ou non. Pour cela, le meneur lance un d100 et se reporte à la table suivante. Degré de familiarité Zone similaire Cercle permanent Objet associé Très familier Vu plusieurs fois Vu une fois Destination erronée Voici quelques détails et règles optionnelles relatifs aux différents facteurs du tableau ci-dessus. ### Degré de familiarité Le degré de familiarité avec un lieu détermine les risques d'un voyage par téléportation. Cercle permanent : un cercle de téléportation permanent dont vous connaissez la séquence de sceaux. Objet associé : vous détenez un objet récupéré sur le lieu de destination dans les six derniers mois, comme un livre de la bibliothèque d'un magicien, un drap d'un appartement royal ou un morceau de marbre du tombeau secret d'une liche. Très familier : lieu dans lequel vous vous êtes très souvent rendu (au moins une centaine de fois), que vous avez minutieusement examiné ou que vous voyez au moment de l'incantation. Vu plusieurs fois : lieu où vous avez eu l'occasion de vous rendre à plusieurs reprises (au moins une dizaine de fois), mais que vous ne connaissez pas très bien. Vu une fois : un endroit que vous n'avez vu qu'une seule fois, éventuellement au moyen d'un sort comme scrutation. Décrit : un endroit dont on vous a donné l'emplacement et la description, ou que vous avez trouvé sur un plan. Destination erronée : le lieu n'existe pas ; peut-être avez-vous tenté de scruter le sanctuaire d'un ennemi dissimulé par une illusion, à moins que vous ayez cherché à vous téléporter dans un lieu familier qui n'existe plus. ### Issue du voyage Les voyages par téléportation subissent des influences magiques, notamment celle de la lune Éternité qui peut être à l'origine de surprises et de révélations. ### Incident Les voies de la magie sont parfois imprévisibles. Chacune des créatures téléportées (ou l'objet ciblé) subit 3d10 dégâts de force, puis le meneur effectue un nouveau jet sur la table pour voir où vous finissez (si les incidents s'enchaînent, vous subissez les dégâts à chaque fois). Si vous subissez consécutivement deux incidents au cours d'une tentative de téléportation, vous êtes transporté dans un autre plan. Si vous avez voyagé à l'aide d'une alecrithe, vous vous perdez dans le Plan Éthéré ; s'il s'agissait d'une dracopale, vous vous retrouvez dans le Plan Astral. Si vous aviez emporté avec vous d'autres créatures ou un objet, le meneur lance 1d100 pour chaque passager. Plus les résultats sont proches, plus les créatures ou l'objet le sont, et inversement. Une différence de plus de 30 (par exemple en tirant 01 pour un passager et 36 pour l'autre) représente une distance hors de portée de vue, tandis qu'une différence supérieure à 70 signifie que les créatures sont hors de portée de voix, même en criant de toutes leurs forces. Pour les 1d6 jours à venir, il vous est impossible de vous téléporter ou de vous orienter magiquement. Il vous faudra trouver vos repères, survivre et regagner le Plan Matériel par vos propres moyens. ### Zone similaire Vous et vos passagers apparaissez dans un lieu différent, mais semblable d'un point de vue visuel ou thématique. Si vous cherchiez à gagner votre laboratoire, vous pourriez vous retrouver dans celui d'un autre magicien, ou encore dans l'échoppe d'un alchimiste possédant nombre d'outils et d'accessoires semblables aux vôtres. En règle générale, vous apparaissez dans la zone similaire le plus proche, mais le sort n'ayant aucune limite de portée, vous pouvez potentiellement vous matérialiser n'importe où sur le même plan.",
+  "modular_options": []
+}

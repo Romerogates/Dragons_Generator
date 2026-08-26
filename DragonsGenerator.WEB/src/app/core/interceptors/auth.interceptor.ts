@@ -1,0 +1,13 @@
+import { HttpInterceptorFn } from '@angular/common/http';
+
+const TOKEN_KEY = 'dragons_auth_token';
+
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (!token) return next(req);
+  return next(
+    req.clone({
+      setHeaders: { Authorization: `Bearer ${token}` },
+    }),
+  );
+};

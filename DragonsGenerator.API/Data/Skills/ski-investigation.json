@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "ski-investigation",
+  "name": "Investigation",
+  "ability": "INT",
+  "description": "Lorsque vous cherchez des indices pour en tirer des déductions, vous effectuez un test d'Intelligence (Investigation). Cette compétence vous permet également de repérer des anomalies ou de relier des bribes d'informations entre elles pour obtenir un tableau d'ensemble. Vous pouvez ainsi déduire l'emplacement d'un objet caché, déterminer l'arme selon l'aspect de la plaie, ou déceler dans un tunnel les parties qui menacent d'en provoquer l'affaissement. Éplucher de vieux parchemins en quête d'une bribe de savoir caché peut également donner lieu à un test d'Intelligence (Investigation).",
+  "examples": [
+    "Déduire l'emplacement d'un objet caché à partir d'indices.",
+    "Déterminer l'arme utilisée selon l'aspect d'une plaie.",
+    "Repérer dans un tunnel les parties menaçant de provoquer un affaissement."
+  ],
+  "passive_check": false,
+  "source": "livre_de_base"
+}

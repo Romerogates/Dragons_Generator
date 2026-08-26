@@ -1,0 +1,203 @@
+{
+  "schema_version": "2.0",
+  "id": "bg-explorateur",
+  "name": "Explorateur des terres sauvages",
+  "source": {
+    "book": "Dragons - Livre de base: Aventuriers",
+    "pages": "95-96"
+  },
+  "flavor": {
+    "summary": "Vous ne comptez plus les lieues parcourues, les forêts traversées et les montagnes gravies, mais gardez un souvenir vivace de chaque terre foulée. L'horizon a su chaque jour vous offrir un visage nouveau."
+  },
+  "proficiencies": {
+    "skills": {
+      "fixed": [],
+      "choose": {
+        "count": 2,
+        "options": [
+          "skill-athletisme",
+          "skill-dressage",
+          "skill-nature",
+          "skill-survie"
+        ]
+      }
+    },
+    "tools": {
+      "fixed": [
+        {
+          "type": "vehicle",
+          "id": "tl-vehicules-terrestres",
+          "name": "tl-vehicules-terrestres"
+        }
+      ],
+      "choose": null
+    },
+    "languages": {
+      "fixed": [],
+      "choose_count": 1
+    }
+  },
+  "equipment": {
+    "fixed": [
+      {
+        "id": "wp-baton-de-combat",
+        "name": "Bâton",
+        "qty": 1,
+        "location": "equipped"
+      },
+      {
+        "id": "gr-piege-a-loups",
+        "name": "Piège à loups",
+        "qty": 1,
+        "location": "backpack"
+      },
+      {
+        "id": "gr-souvenir",
+        "name": "Objet cher à vos yeux (souvenir de chasse)",
+        "qty": 1,
+        "location": "backpack"
+      },
+      {
+        "id": "gr-vetements-de-voyage",
+        "name": "Vêtements de voyage",
+        "qty": 1,
+        "location": "equipped"
+      }
+    ],
+    "choose": [],
+    "currency": {
+      "or": 5
+    }
+  },
+  "privilege": {
+    "id": "priv-belle-etoile",
+    "name": "À la belle étoile",
+    "desc": "La nécessité et l'expérience vous ont appris à vivre sans toit. Vous savez vous mettre à l'abri des pires intempéries, identifier les meilleurs sites naturels pour reposer vos jambes fourbues et trouver de quoi vous sustenter vous et quatre compagnons quand vous évoluez en milieu naturel."
+  },
+  "personality_tables": {
+    "traits": {
+      "die": "1d8",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Je prends spontanément la tête quand il faut se rendre d'un endroit à un autre."
+        },
+        {
+          "roll": 2,
+          "text": "Il est pour moi contre nature de reprendre un chemin que j'ai déjà foulé."
+        },
+        {
+          "roll": 3,
+          "text": "Les gens qui font des manières me font rire et je leur ris d'ailleurs au nez."
+        },
+        {
+          "roll": 4,
+          "text": "J'adore les défis physiques, même quand je ne pars pas gagnant."
+        },
+        {
+          "roll": 5,
+          "text": "J'ai toujours l'impression que mes compagnons de route ne pourraient rien faire sans mon assistance de tous les instants."
+        },
+        {
+          "roll": 6,
+          "text": "Je m'exprime plus par gestes et par bruits que par la parole."
+        },
+        {
+          "roll": 7,
+          "text": "Je déteste l'eau chaude, les lits, les chaises et les bancs, et ce que les citadins appellent des parfums."
+        },
+        {
+          "roll": 8,
+          "text": "Je suis un farceur incurable."
+        }
+      ]
+    },
+    "ideals": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Équilibre. Éviter que les peuples, dans leurs luttes et leurs ambitions, ne ravagent la terre qui les porte et les nourrit. (neutre)"
+        },
+        {
+          "roll": 2,
+          "text": "Retour aux sources. Plus j'y pense, plus les bienfaits de la civilisation me semblent maigres ; les préjudices m'apparaissent en revanche colossaux. (neutre)"
+        },
+        {
+          "roll": 3,
+          "text": "Véhémence. Se laisser aller à ses pulsions les plus brutales sans craindre l'autorité. (mauvais)"
+        },
+        {
+          "roll": 4,
+          "text": "Solidarité. Découvrir de nouveaux horizons pour accueillir ceux qui en ont besoin et leur faire comprendre que leur condition n'est pas une fatalité. (bon)"
+        },
+        {
+          "roll": 5,
+          "text": "Renouveau. Il faut régulièrement bouleverser les choses pour leur redonner vigueur. (chaotique)"
+        },
+        {
+          "roll": 6,
+          "text": "Autosuffisance. Ne pas dépendre de l'aide des autres, qu'elle soit sincère ou intéressée. (tout alignement)"
+        }
+      ]
+    },
+    "bonds": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Mon village compte sur moi pour le sauver du malheur qui l'a frappé."
+        },
+        {
+          "roll": 2,
+          "text": "Des bonnes âmes m'ont plus d'une fois sorti d'un mauvais pas et je compte perpétuer cette générosité."
+        },
+        {
+          "roll": 3,
+          "text": "Je m'ennuie dès que je reste plus de quelques jours au même endroit."
+        },
+        {
+          "roll": 4,
+          "text": "Je suis animé par l'espoir de trouver un jour la terre de mes rêves."
+        },
+        {
+          "roll": 5,
+          "text": "Je suis issu d'une famille respectée de la société et je me garde de lui faire du tort par mes actions."
+        },
+        {
+          "roll": 6,
+          "text": "La foi guide mes pas."
+        }
+      ]
+    },
+    "flaws": {
+      "die": "1d6",
+      "entries": [
+        {
+          "roll": 1,
+          "text": "Je crois facilement aux superstitions les plus farfelues."
+        },
+        {
+          "roll": 2,
+          "text": "Je cache une phobie qui s'accorde mal avec mon caractère."
+        },
+        {
+          "roll": 3,
+          "text": "Quand les choses ne tournent pas comme je le souhaite, je suis souvent violent, surtout si je ne suis pas dans mon élément."
+        },
+        {
+          "roll": 4,
+          "text": "J'aime exagérer mon côté homme ou femme de la nature, quitte à feindre des aptitudes que je n'ai pas."
+        },
+        {
+          "roll": 5,
+          "text": "Je supporte très mal les gens qui persistent à parler fort hors des villes."
+        },
+        {
+          "roll": 6,
+          "text": "Je ne vaux pas tripette si je dois veiller au-delà d'une certaine heure."
+        }
+      ]
+    }
+  }
+}

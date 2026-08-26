@@ -2,42 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
-  /* Pour Firefox */
-  scrollbar-width: none;
-  /* Pour Internet Explorer et Edge (anciennes versions) */
-  -ms-overflow-style: none;
+@layer base {
+  /* Cheaper paints: avoid animating layout properties site-wide when user prefers less motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
-/* Pour Chrome, Safari et les navigateurs basés sur WebKit (Edge récent, Opera) */
-html::-webkit-scrollbar,
-body::-webkit-scrollbar {
-  display: none;
-}
-body {
-  background-color: #020617;
-  color: #e2e8f0;
-}
+@layer components {
+  /* Wizard creation — common bottom-centered nav */
+  .wizard-step-nav {
+    @apply mt-auto shrink-0 w-full flex flex-wrap justify-center items-center gap-2.5 sm:gap-3 pt-4 pb-2 px-2;
+  }
 
-/* --- Style de la barre de défilement façon RPG --- */
-.custom-scrollbar {
-  scrollbar-width: thin; /* Pour Firefox */
-  scrollbar-color: rgba(217, 119, 6, 0.5) transparent; /* amber-600 avec transparence */
-}
+  .wizard-nav-secondary {
+    @apply text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-400 transition-colors bg-[#1b2028] px-5 sm:px-6 py-2.5 rounded-full border border-slate-700 shadow-lg;
+  }
 
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px; /* Très fin pour ne pas gêner la lecture */
-}
+  .wizard-nav-primary {
+    @apply px-7 sm:px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-amber-500 text-slate-900 hover:bg-amber-400 shadow-sm transition-[colors,transform,opacity,box-shadow] duration-200 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-amber-500;
+  }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
+  .wizard-nav-status {
+    @apply px-5 py-2 bg-emerald-950/30 text-emerald-400 border border-emerald-800/50 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2;
+  }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(217, 119, 6, 0.5); /* amber-600 */
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(245, 158, 11, 0.8); /* amber-500 au survol */
+  /* Skip offscreen paint work for dense card grids */
+  .perf-card {
+    content-visibility: auto;
+    contain-intrinsic-size: 220px;
+  }
 }

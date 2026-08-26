@@ -1,0 +1,1078 @@
+{
+  "id": "cls-roublard",
+  "schema_version": "3.0",
+  "name": "Roublard",
+  "flavor": {
+    "summary": "",
+    "lore_note": null
+  },
+  "hit_die": "1d8",
+  "hp_at_level_1": 8,
+  "hp_per_level_average": 5,
+  "primary_abilities": [
+    "dex"
+  ],
+  "saving_throw_proficiencies": [
+    "dex",
+    "int"
+  ],
+  "armor_proficiencies": [
+    "ar-light"
+  ],
+  "weapon_proficiencies": [
+    "wp-category-simple",
+    "wp-arbalete-de-poing",
+    "wp-epee-courte",
+    "wp-epee-longue",
+    "wp-rapiere"
+  ],
+  "tool_proficiencies": [
+    "tl-outils-de-voleur"
+  ],
+  "choice_pools": [
+    {
+      "id": "choice-skills-cls-roublard",
+      "name": "Compétences de classe",
+      "type": "skill_proficiency",
+      "allow_choice": true,
+      "quantity": 4,
+      "pool": [
+        "skill-acrobaties",
+        "skill-athletisme",
+        "skill-discretion",
+        "skill-escamotage",
+        "skill-intimidation",
+        "skill-intuition",
+        "skill-investigation",
+        "skill-perception",
+        "skill-persuasion",
+        "skill-representation",
+        "skill-tromperie"
+      ]
+    },
+    {
+      "id": "choice-expertise-1-cls-roublard",
+      "name": "Expertise — sélection initiale (niveau 1)",
+      "type": "expertise_proficiency",
+      "allow_choice": true,
+      "quantity": 2,
+      "unlock_level": 1,
+      "constraint": "must_already_be_proficient",
+      "pool": [
+        "skill-acrobaties",
+        "skill-athletisme",
+        "skill-discretion",
+        "skill-escamotage",
+        "skill-intimidation",
+        "skill-intuition",
+        "skill-investigation",
+        "skill-perception",
+        "skill-persuasion",
+        "skill-representation",
+        "skill-tromperie",
+        "tl-outils-de-voleur"
+      ]
+    },
+    {
+      "id": "choice-expertise-2-cls-roublard",
+      "name": "Expertise — sélection secondaire (niveau 6)",
+      "type": "expertise_proficiency",
+      "allow_choice": true,
+      "quantity": 2,
+      "unlock_level": 6,
+      "constraint": "must_already_be_proficient",
+      "pool": [
+        "skill-acrobaties",
+        "skill-athletisme",
+        "skill-discretion",
+        "skill-escamotage",
+        "skill-intimidation",
+        "skill-intuition",
+        "skill-investigation",
+        "skill-perception",
+        "skill-persuasion",
+        "skill-representation",
+        "skill-tromperie",
+        "tl-outils-de-voleur"
+      ]
+    },
+    {
+      "id": "choice-equipment-1-cls-roublard",
+      "name": "Arme principale",
+      "type": "equipment",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        {
+          "option_id": "opt-a",
+          "items": [
+            {
+              "id": "wp-rapiere",
+              "qty": 1
+            }
+          ]
+        },
+        {
+          "option_id": "opt-b",
+          "items": [
+            {
+              "id": "wp-epee-courte",
+              "qty": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "choice-equipment-2-cls-roublard",
+      "name": "Arme secondaire ou à distance",
+      "type": "equipment",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        {
+          "option_id": "opt-a",
+          "items": [
+            {
+              "id": "wp-arc-court",
+              "qty": 1
+            },
+            {
+              "id": "it-carquois-20-fleches",
+              "qty": 1
+            }
+          ]
+        },
+        {
+          "option_id": "opt-b",
+          "items": [
+            {
+              "id": "wp-epee-courte",
+              "qty": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "choice-equipment-3-cls-roublard",
+      "name": "Sac d'équipement",
+      "type": "equipment",
+      "allow_choice": true,
+      "quantity": 1,
+      "pool": [
+        {
+          "option_id": "opt-a",
+          "items": [
+            {
+              "id": "gr-sac-de-cambrioleur",
+              "qty": 1
+            }
+          ]
+        },
+        {
+          "option_id": "opt-b",
+          "items": [
+            {
+              "id": "gr-sac-dexplorateur",
+              "qty": 1
+            }
+          ]
+        },
+        {
+          "option_id": "opt-c",
+          "items": [
+            {
+              "id": "gr-sac-daventurier",
+              "qty": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "spellcasting": null,
+  "starting_equipment": {
+    "fixed": [],
+    "choice_pools": []
+  },
+  "progression": [
+    {
+      "level": 1,
+      "features": [
+        "feat-expertise-cls-roublard",
+        "feat-attaque-sournoise-cls-roublard",
+        "feat-argot-des-voleurs-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "1d6"
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 2,
+      "features": [
+        "feat-roublardise-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "1d6"
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 3,
+      "features": [
+        "feat-choix-archetype-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "2d6"
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 4,
+      "features": [
+        "feat-asi-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "2d6"
+      },
+      "proficiency_bonus": 2
+    },
+    {
+      "level": 5,
+      "features": [
+        "feat-esquive-instinctive-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "3d6"
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 6,
+      "features": [
+        "feat-expertise-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "3d6"
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 7,
+      "features": [
+        "feat-esquive-totale-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "4d6"
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 8,
+      "features": [
+        "feat-asi-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "4d6"
+      },
+      "proficiency_bonus": 3
+    },
+    {
+      "level": 9,
+      "features": [
+        "feat-aptitude-archetype-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "5d6"
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 10,
+      "features": [
+        "feat-asi-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "5d6"
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 11,
+      "features": [
+        "feat-savoir-faire-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "6d6"
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 12,
+      "features": [
+        "feat-asi-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "6d6"
+      },
+      "proficiency_bonus": 4
+    },
+    {
+      "level": 13,
+      "features": [
+        "feat-aptitude-archetype-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "7d6"
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 14,
+      "features": [
+        "feat-perception-aveugle-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "7d6"
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 15,
+      "features": [
+        "feat-esprit-fuyant-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "8d6"
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 16,
+      "features": [
+        "feat-asi-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "8d6"
+      },
+      "proficiency_bonus": 5
+    },
+    {
+      "level": 17,
+      "features": [
+        "feat-aptitude-archetype-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "9d6"
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 18,
+      "features": [
+        "feat-insaisissable-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "9d6"
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 19,
+      "features": [
+        "feat-asi-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "10d6"
+      },
+      "proficiency_bonus": 6
+    },
+    {
+      "level": 20,
+      "features": [
+        "feat-verni-cls-roublard"
+      ],
+      "resources": {
+        "sneak_attack_dice": "10d6"
+      },
+      "proficiency_bonus": 6
+    }
+  ],
+  "features_details": [
+    {
+      "id": "feat-expertise-cls-roublard",
+      "name": "Expertise",
+      "unlocks_at_level": 1,
+      "recharge": "passive",
+      "action_type": null,
+      "flavor": {
+        "summary": "Double le bonus de maîtrise pour deux maîtrises choisies au niveau 1, puis deux autres au niveau 6.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Choisissez deux maîtrises de compétence, ou une compétence et la maîtrise des outils de voleur. Le bonus de maîtrise est doublé pour tout test associé. Au niveau 6, sélectionnez deux maîtrises supplémentaires.",
+        "effect": "double_proficiency_bonus",
+        "triggers": [
+          {
+            "level": 1,
+            "choice_pool_ref": "choice-expertise-1-cls-roublard"
+          },
+          {
+            "level": 6,
+            "choice_pool_ref": "choice-expertise-2-cls-roublard"
+          }
+        ]
+      }
+    },
+    {
+      "id": "feat-attaque-sournoise-cls-roublard",
+      "name": "Attaque sournoise",
+      "unlocks_at_level": 1,
+      "recharge": "at_will",
+      "action_type": "part_of_attack",
+      "uses_per_turn": 1,
+      "flavor": {
+        "summary": "Frappe précise exploitant la moindre inattention adverse pour infliger des dégâts supplémentaires.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Une fois par tour, inflige des dégâts supplémentaires (resources.sneak_attack_dice) à une créature touchée avec une arme à distance ou à finesse, si vous avez un avantage au jet d'attaque. L'avantage n'est pas requis si un allié non neutralisé est à ≤ 1,50 m de la cible et que vous n'avez pas de désavantage.",
+        "weapon_restriction": [
+          "ranged",
+          "finesse"
+        ],
+        "scaling_resource_key": "sneak_attack_dice",
+        "alternate_condition": {
+          "ally_adjacent_to_target_range_m": 1.5,
+          "condition": "no_disadvantage_on_attack"
+        }
+      }
+    },
+    {
+      "id": "feat-argot-des-voleurs-cls-roublard",
+      "name": "Argot des voleurs",
+      "unlocks_at_level": 1,
+      "recharge": "passive",
+      "action_type": null,
+      "flavor": {
+        "summary": "Langage secret permettant de glisser des messages codés dans des conversations ordinaires.",
+        "lore_note": "Présenté dans le chapitre Langues. Note : intitulé 'Argot du milieu' dans la table de progression ; 'Argot des voleurs' dans la description canonique — l'ID normalise sur la désignation descriptive."
+      },
+      "mechanics": {
+        "description": "Maîtrise de l'argot des voleurs, langue secrète pour communiquer des messages dissimulés (temps ×4). Connaissance de signes secrets indiquant dangers, richesses, guildes et refuges.",
+        "grants_language": "lang-argot-des-voleurs"
+      }
+    },
+    {
+      "id": "feat-roublardise-cls-roublard",
+      "name": "Roublardise",
+      "unlocks_at_level": 2,
+      "recharge": "at_will",
+      "action_type": "bonus_action",
+      "flavor": {
+        "summary": "Vivacité d'esprit et de corps permettant d'agir plus vite en combat.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "À chaque tour en combat, vous disposez d'une action bonus permettant uniquement d'entreprendre Foncer, Se cacher ou Se dégager.",
+        "allowed_bonus_actions": [
+          "foncer",
+          "se-cacher",
+          "se-degager"
+        ]
+      }
+    },
+    {
+      "id": "feat-choix-archetype-cls-roublard",
+      "name": "Archétype roublard",
+      "unlocks_at_level": 3,
+      "recharge": "passive",
+      "action_type": null,
+      "flavor": {
+        "summary": "Choix d'un archétype définissant la tendance forte du roublard parmi Voleur, Espion et Sicaire.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Au niveau 3, choisissez un archétype. Des aptitudes d'archétype sont octroyées aux niveaux 3, 9, 13 et 17.",
+        "subclass_feature_levels": [
+          3,
+          9,
+          13,
+          17
+        ]
+      }
+    },
+    {
+      "id": "feat-asi-cls-roublard",
+      "name": "Augmentation de caractéristique",
+      "unlocks_at_level": 4,
+      "recharge": "passive",
+      "action_type": null,
+      "flavor": {
+        "summary": "Développement ponctuel d'une ou deux caractéristiques.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Augmentez une valeur de caractéristique de 2, ou deux valeurs de 1 chacune. Maximum 20.",
+        "applies_at_levels": [
+          4,
+          8,
+          10,
+          12,
+          16,
+          19
+        ]
+      }
+    },
+    {
+      "id": "feat-esquive-instinctive-cls-roublard",
+      "name": "Esquive instinctive",
+      "unlocks_at_level": 5,
+      "recharge": "at_will",
+      "action_type": "reaction",
+      "flavor": {
+        "summary": "Réflexes permettant de réduire de moitié les dégâts d'une attaque vue venir.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Lorsqu'un assaillant que vous voyez vous touche avec une attaque, utilisez votre réaction pour réduire de moitié les dégâts subis.",
+        "trigger": "visible_attacker_hits",
+        "effect": "halve_damage"
+      }
+    },
+    {
+      "id": "feat-esquive-totale-cls-roublard",
+      "name": "Esquive totale",
+      "unlocks_at_level": 7,
+      "recharge": "at_will",
+      "action_type": null,
+      "flavor": {
+        "summary": "Agilité permettant d'éviter totalement les effets de zone sur jet de sauvegarde de Dextérité réussi.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Lorsque vous êtes soumis à un effet exigeant un jet de sauvegarde de DEX pour réduire les dégâts de moitié : succès = 0 dégât ; échec = moitié des dégâts.",
+        "saving_throw_upgrade": {
+          "type": "dex",
+          "on_success": "no_damage",
+          "on_failure": "half_damage"
+        }
+      }
+    },
+    {
+      "id": "feat-aptitude-archetype-cls-roublard",
+      "name": "Aptitude d'archétype",
+      "unlocks_at_level": 9,
+      "recharge": "passive",
+      "action_type": null,
+      "flavor": {
+        "summary": "Aptitude octroyée par la sous-classe active aux niveaux 9, 13 et 17.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Se référer aux features_details de la sous-classe sélectionnée au niveau 3.",
+        "applies_at_levels": [
+          9,
+          13,
+          17
+        ],
+        "delegates_to_subclass": true
+      }
+    },
+    {
+      "id": "feat-savoir-faire-cls-roublard",
+      "name": "Savoir-faire",
+      "unlocks_at_level": 11,
+      "recharge": "at_will",
+      "action_type": null,
+      "flavor": {
+        "summary": "Excellence frôlant la perfection dans les compétences maîtrisées.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Pour tout test de caractéristique dans lequel le bonus de maîtrise est ajouté, tout résultat de d20 ≤ 9 est traité comme un 10.",
+        "minimum_d20_value": 10,
+        "condition": "proficient_check_only"
+      }
+    },
+    {
+      "id": "feat-perception-aveugle-cls-roublard",
+      "name": "Perception aveugle",
+      "unlocks_at_level": 14,
+      "recharge": "passive",
+      "action_type": null,
+      "flavor": {
+        "summary": "Sens aiguisés permettant de localiser toute créature cachée ou invisible dans un rayon de 3 m.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Tant que vous n'êtes pas sourd, vous connaissez la position de toute créature cachée ou invisible dans un rayon de 3 m.",
+        "sense_type": "blindsight",
+        "range_m": 3,
+        "condition": "not_deafened"
+      }
+    },
+    {
+      "id": "feat-esprit-fuyant-cls-roublard",
+      "name": "Esprit fuyant",
+      "unlocks_at_level": 15,
+      "recharge": "passive",
+      "action_type": null,
+      "flavor": {
+        "summary": "Force mentale considérable conférant la maîtrise des jets de sauvegarde de Sagesse.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Vous obtenez la maîtrise des jets de sauvegarde de Sagesse.",
+        "grants_saving_throw_proficiency": "wis"
+      }
+    },
+    {
+      "id": "feat-insaisissable-cls-roublard",
+      "name": "Insaisissable",
+      "unlocks_at_level": 18,
+      "recharge": "passive",
+      "action_type": null,
+      "flavor": {
+        "summary": "Furtivité absolue : aucun jet d'attaque ne peut bénéficier d'un avantage contre vous.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Tant que vous n'êtes pas neutralisé, aucun jet d'attaque ne peut bénéficier d'un avantage contre vous.",
+        "condition": "not_incapacitated",
+        "effect": "suppress_advantage_against_self"
+      }
+    },
+    {
+      "id": "feat-verni-cls-roublard",
+      "name": "Verni",
+      "unlocks_at_level": 20,
+      "recharge": "short_rest",
+      "uses": 1,
+      "action_type": null,
+      "flavor": {
+        "summary": "Capacité à se dépasser au moment critique, transformant un échec en réussite.",
+        "lore_note": null
+      },
+      "mechanics": {
+        "description": "Lorsque votre attaque rate, transformez cet échec en réussite. Ou, lors d'un test de caractéristique raté, le moteur traite le d20 comme ayant donné 20. Une utilisation par repos court ou long.",
+        "triggers": [
+          {
+            "event": "attack_miss",
+            "effect": "convert_to_hit"
+          },
+          {
+            "event": "ability_check_fail",
+            "effect": "treat_d20_as_20"
+          }
+        ]
+      }
+    }
+  ],
+  "subclasses": {
+    "name": "Archétype roublard",
+    "level_unlocked": 3,
+    "feature_levels": [
+      3,
+      9,
+      13,
+      17
+    ],
+    "options": [
+      {
+        "id": "subcls-voleur-roublard",
+        "name": "Voleur",
+        "flavor": {
+          "summary": "Art du vol porté à l'excellence : cambriolage, exploration de ruines, chasse au trésor et activation d'objets magiques interdits.",
+          "lore_note": null
+        },
+        "features": [
+          {
+            "id": "feat-vite-fait-bien-fait-subcls-voleur",
+            "name": "Vite fait bien fait",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_type": "bonus_action",
+            "flavor": {
+              "summary": "Utilise l'action bonus de Roublardise pour des actions de vol, de crochetage ou d'utilisation d'objet.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Au prix de l'action bonus octroyée par Roublardise : test de DEX (Escamotage), désarmage de piège, crochetage de serrure avec outils de voleur, ou action Utiliser un objet.",
+              "requires": "feat-roublardise-cls-roublard",
+              "allowed_actions": [
+                "skill_check_escamotage",
+                "desarmer_piege",
+                "crocheter_serrure",
+                "utiliser_objet"
+              ]
+            }
+          },
+          {
+            "id": "feat-monte-en-lair-subcls-voleur",
+            "name": "Monte-en-l'air",
+            "unlocks_at_level": 3,
+            "recharge": "passive",
+            "action_type": null,
+            "flavor": {
+              "summary": "Capacités d'escalade et de saut supérieures à la normale.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Escalader ne coûte aucun déplacement supplémentaire. Distance de saut avec élan augmentée de 0,30 m × modificateur de DEX.",
+              "climb_cost": "normal_movement_only",
+              "jump_bonus_formula": "dex_mod * 0.30"
+            }
+          },
+          {
+            "id": "feat-sournoiserie-subcls-voleur",
+            "name": "Sournoiserie",
+            "unlocks_at_level": 9,
+            "recharge": "at_will",
+            "action_type": null,
+            "flavor": {
+              "summary": "Discrétion parfaite lorsque le déplacement est limité à la moitié de la vitesse.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Avantage aux tests de DEX (Discrétion) si vous ne vous déplacez pas de plus de la moitié de votre vitesse de déplacement ce tour.",
+              "advantages": [
+                {
+                  "type": "skill_check",
+                  "target": "skill-discretion",
+                  "condition": "move_distance_le_half_speed"
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-utilisation-objets-magiques-subcls-voleur",
+            "name": "Utilisation d'objets magiques",
+            "unlocks_at_level": 13,
+            "recharge": "passive",
+            "action_type": null,
+            "flavor": {
+              "summary": "Expérience des rouages magiques permettant d'activer n'importe quel objet, quelles que soient ses restrictions.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Vous ignorez toutes les restrictions de classe, de race ou de niveau pour l'utilisation des objets magiques.",
+              "effect": "ignore_magic_item_restrictions"
+            }
+          },
+          {
+            "id": "feat-expeditif-subcls-voleur",
+            "name": "Expéditif",
+            "unlocks_at_level": 17,
+            "recharge": "at_will",
+            "action_type": null,
+            "flavor": {
+              "summary": "Maîtrise de l'embuscade conférant deux tours de jeu lors du premier round de combat.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Au premier round de chaque combat, agissez à votre rang d'initiative normal et une seconde fois à votre rang d'initiative − 10. Inutilisable si surpris.",
+              "extra_turns_in_round": 1,
+              "second_turn_initiative_offset": -10,
+              "condition": "not_surprised"
+            }
+          }
+        ]
+      },
+      {
+        "id": "subcls-espion-roublard",
+        "name": "Espion",
+        "flavor": {
+          "summary": "Maître de l'observation, de l'imitation et de la manipulation de l'information au profit de factions ou de causes personnelles.",
+          "lore_note": null
+        },
+        "features": [
+          {
+            "id": "feat-intrigant-subcls-espion",
+            "name": "Intrigant",
+            "unlocks_at_level": 3,
+            "recharge": "passive",
+            "action_type": null,
+            "flavor": {
+              "summary": "Maîtrise des subterfuges, lecture sur les lèvres et aisance dans l'imposteur.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Maîtrise octroyée : nécessaire de déguisement, nécessaire de faussaire, un matériel de jeu au choix. Langue supplémentaire au niveau 3, une seconde au niveau 9. Lecture sur les lèvres à ≤ 18 m : test SAG (Perception) DD 10 ou opposé à DEX (Discrétion) de la cible. Avantage aux tests d'imposteur.",
+              "grants_tool_proficiencies": [
+                "tl-necessaire-de-deguisement",
+                "tl-necessaire-de-faussaire"
+              ],
+              "grants_tool_proficiency_choice": {
+                "type": "tool_proficiency",
+                "pool": [
+                  "tl-category-materiel-de-jeu"
+                ],
+                "quantity": 1
+              },
+              "language_bonus": [
+                {
+                  "at_level": 3,
+                  "quantity": 1,
+                  "choice_pool_ref": "choice-language-intrigant-espion-3"
+                },
+                {
+                  "at_level": 9,
+                  "quantity": 1,
+                  "choice_pool_ref": "choice-language-intrigant-espion-9"
+                }
+              ],
+              "special_abilities": [
+                "lip_reading_18m"
+              ],
+              "advantages": [
+                {
+                  "type": "skill_check",
+                  "target": "impersonation_checks",
+                  "condition": "always"
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-observateur-subcls-espion",
+            "name": "Observateur",
+            "unlocks_at_level": 3,
+            "recharge": "at_will",
+            "action_type": "bonus_action",
+            "flavor": {
+              "summary": "Étude minutieuse d'un adversaire pour déceler ses failles et permettre l'attaque sournoise sans condition.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Au prix de l'action bonus de Roublardise : action Chercher, ou étude d'un adversaire visible. Étude : test INT (Investigation) DD = 10 + mod. CHA cible + bonus maîtrise si cible maîtrise Tromperie (désavantage si cible non-humanoïde/non-géant). Succès : cible 'guettée' jusqu'au début de votre prochain tour → attaque sournoise applicable sans avantage ni allié adjacent.",
+              "requires": "feat-roublardise-cls-roublard",
+              "study_check": {
+                "skill": "skill-investigation",
+                "ability": "int",
+                "dc_formula": "10 + target_cha_mod + target_deception_mastery_bonus",
+                "disadvantage_condition": "target_not_humanoid_or_giant"
+              },
+              "on_success_applies_tag": "watched",
+              "watched_tag_effect": "sneak_attack_without_advantage_or_flanking"
+            }
+          },
+          {
+            "id": "feat-rapporteur-subcls-espion",
+            "name": "Rapporteur",
+            "unlocks_at_level": 9,
+            "recharge": "at_will",
+            "action_type": null,
+            "flavor": {
+              "summary": "Partage de failles exposées avec les alliés pour leur conférer un avantage aux jets d'attaque.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Lors de l'application de dégâts d'attaque sournoise, sacrifiez N dés pour accorder à N alliés visibles (qui vous voient) un avantage aux jets d'attaque contre la cible jusqu'au début de votre prochain tour.",
+              "cost": {
+                "type": "sneak_attack_dice_sacrifice",
+                "quantity": "variable_n"
+              },
+              "benefit": {
+                "type": "advantage_on_attack",
+                "target": "same_enemy",
+                "beneficiaries": "n_visible_allies",
+                "duration": "until_start_of_your_next_turn"
+              }
+            }
+          },
+          {
+            "id": "feat-causeur-subcls-espion",
+            "name": "Causeur",
+            "unlocks_at_level": 13,
+            "recharge": "long_rest",
+            "uses": 1,
+            "action_type": "bonus_action",
+            "flavor": {
+              "summary": "Art de la ventriloquie et manipulation psychologique non magique équivalent au sort Bagou.",
+              "lore_note": "Explicitement non magique. En combat, les ennemis attribuent vos paroles à un autre. Jet SAG (Intuition) opposé à CHA (Tromperie) accordé par le MJ."
+            },
+            "mechanics": {
+              "description": "Bénéficiez des effets du sort Bagou (non magique) — une fois par repos long. En combat avec ≥ 2 ennemis, au prix de votre Roublardise, parlez sans être identifié. Un ennemi à ≤ 9 m parlant votre langue semble être le locuteur pour ses alliés (jet SAG Intuition opposé à CHA Tromperie possible).",
+              "spell_effect_mirror": "spl-bagou",
+              "is_magical": false,
+              "ventriloquism": {
+                "in_combat": true,
+                "minimum_enemies": 2,
+                "max_range_m": 9,
+                "requires_shared_language": true,
+                "contested_check": {
+                  "attacker": {
+                    "skill": "skill-tromperie",
+                    "ability": "cha"
+                  },
+                  "defender": {
+                    "skill": "skill-intuition",
+                    "ability": "wis"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": "feat-revelateur-subcls-espion",
+            "name": "Révélateur",
+            "unlocks_at_level": 17,
+            "recharge": "at_will",
+            "action_type": "reaction",
+            "flavor": {
+              "summary": "Transmet par signaux la précision meurtrière du roublard à un allié attaquant une cible guettée.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Lorsqu'un allié visible (qui vous voit) attaque une créature portant le tag 'guettée' (feat-observateur-subcls-espion) et que l'attaque réussit, utilisez votre réaction : l'allié peut ajouter la moitié de vos dés d'attaque sournoise en dégâts.",
+              "requires_tag_on_target": "watched",
+              "trigger": "ally_hits_watched_target",
+              "shared_sneak_attack_fraction": 0.5
+            }
+          }
+        ]
+      },
+      {
+        "id": "subcls-sicaire-roublard",
+        "name": "Sicaire",
+        "flavor": {
+          "summary": "Chasseur implacable qui ne lâche jamais sa proie désignée, transformant la traque en art mortel.",
+          "lore_note": null
+        },
+        "features": [
+          {
+            "id": "feat-contrat-subcls-sicaire",
+            "name": "Contrat",
+            "unlocks_at_level": 3,
+            "recharge": "long_rest",
+            "uses": 1,
+            "action_type": null,
+            "flavor": {
+              "summary": "Conditionnement mental focalisant toutes les capacités du sicaire contre une cible désignée.",
+              "lore_note": "Basé sur la conviction subjective du sicaire : les effets s'appliquent même si la cible est innocente, tant que le sicaire la croit coupable. Un transfert de Contrat est possible à la lumière de nouvelles informations."
+            },
+            "mechanics": {
+              "description": "Désignez une créature comme Contrat (requiert une info comportementale + une info biographique). Après repos long, effets : avantage sur tous tests de traque du Contrat, avantage aux jets de sauvegarde contre ses pouvoirs/sorts, toute attaque sournoise réussie contre le Contrat = coup critique. Un seul Contrat actif. Au niveau 13, un repos court suffit pour valider un nouveau Contrat.",
+              "activation": "after_long_rest",
+              "max_active_contracts": 1,
+              "advantages": [
+                {
+                  "type": "skill_check",
+                  "target": "contract_tracking",
+                  "condition": "gm_approval"
+                },
+                {
+                  "type": "saving_throw",
+                  "target": "all",
+                  "condition": "vs_contract_spells_or_powers"
+                }
+              ],
+              "special_effects": [
+                "sneak_attack_on_contract_is_critical"
+              ],
+              "recharge_upgrade": {
+                "at_level": 13,
+                "new_activation": "after_short_or_long_rest"
+              }
+            }
+          },
+          {
+            "id": "feat-fulgurance-sournoise-subcls-sicaire",
+            "name": "Fulgurance sournoise",
+            "unlocks_at_level": 3,
+            "recharge": "short_rest",
+            "uses": 1,
+            "action_type": null,
+            "flavor": {
+              "summary": "Frappe d'une puissance fulgurante ajoutant des dégâts supplémentaires à l'attaque sournoise.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Lorsque vous infligez des dégâts d'attaque sournoise, ajoutez des dégâts bonus (voir bonus_damage_by_level). Utilisable une fois par repos court ou long.",
+              "trigger": "on_sneak_attack_damage",
+              "bonus_damage_by_level": [
+                {
+                  "min_level": 3,
+                  "dice": "1d6"
+                },
+                {
+                  "min_level": 9,
+                  "dice": "2d6"
+                },
+                {
+                  "min_level": 13,
+                  "dice": "3d6"
+                }
+              ]
+            }
+          },
+          {
+            "id": "feat-a-la-ronde-subcls-sicaire",
+            "name": "À la ronde",
+            "unlocks_at_level": 9,
+            "recharge": "short_rest",
+            "uses": 1,
+            "action_type": "full_round_action",
+            "flavor": {
+              "summary": "Sens aiguisé permettant de détecter la présence du Contrat dans un rayon de 90 m, au prix d'un étourdissement.",
+              "lore_note": "Seul le sort Esprit impénétrable ou un effet équivalent peut bloquer cette aptitude."
+            },
+            "mechanics": {
+              "description": "Concentration de 1 round (état : neutralisé). Si le Contrat se trouve à ≤ 90 m : connaissance de sa présence (sans position ni état précis), puis étourdissement 1 round. Bloqué par esprit impénétrable.",
+              "cost_state_during": "incapacitated",
+              "detection_range_m": 90,
+              "on_contract_detected": "stunned_1_round",
+              "blocked_by_spell": "spl-esprit-impenetrable"
+            }
+          },
+          {
+            "id": "feat-moment-crucial-subcls-sicaire",
+            "name": "Moment crucial",
+            "unlocks_at_level": 13,
+            "recharge": "long_rest",
+            "uses": 1,
+            "action_type": "reaction",
+            "flavor": {
+              "summary": "Dépassement de soi au moment critique pour réussir automatiquement un test de Force ou Dextérité.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Réaction : réussissez automatiquement un test de Force ou Dextérité (sauf si le résultat était impossible même avec un 20 sur le dé).",
+              "allowed_ability_checks": [
+                "str",
+                "dex"
+              ],
+              "effect": "auto_success",
+              "exception": "impossible_result_even_on_20"
+            }
+          },
+          {
+            "id": "feat-attaque-dissuasive-subcls-sicaire",
+            "name": "Attaque dissuasive",
+            "unlocks_at_level": 17,
+            "recharge": "at_will",
+            "action_type": null,
+            "flavor": {
+              "summary": "Regard menaçant paralysant un ennemi proche après avoir frappé le Contrat.",
+              "lore_note": null
+            },
+            "mechanics": {
+              "description": "Après chaque attaque sournoise réussie contre le Contrat, désignez une créature visible dans un rayon de 18 m qui vous voit. Elle effectue un jet de sauvegarde de CHA (DD = 8 + bonus maîtrise + mod. CHA). Échec : neutralisée jusqu'au début de votre prochain tour.",
+              "trigger": "sneak_attack_hits_contract",
+              "target_range_m": 18,
+              "target_must_see_you": true,
+              "saving_throw": {
+                "ability": "cha",
+                "dc_formula": "8 + prof_bonus + cha_mod"
+              },
+              "on_failure": "incapacitated_until_start_of_your_next_turn"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "schema_version": "2.0",
+  "id": "civ-mibu",
+  "name": "Mibu",
+  "randomization": {
+    "dice": "d100",
+    "min": 83,
+    "max": 88
+  },
+  "demographics": {
+    "primary_species": [
+      {
+        "id": "sp-humain",
+        "label": "Humains"
+      }
+    ],
+    "secondary_species": [],
+    "is_cosmopolitan": false,
+    "cosmopolitan_zones": [
+      "principaux comptoirs"
+    ],
+    "social_roles": [
+      {
+        "id": "role-marchand",
+        "label": "Marchands d'autres peuples (comptoirs)"
+      }
+    ],
+    "peoples_note": "Humains essentiellement. Marchands d'autres peuples dans les comptoirs principaux."
+  },
+  "official_languages": [
+    {
+      "id": "lg-inkulomo",
+      "label": "Inkulomo"
+    }
+  ],
+  "multilingual": false,
+  "writing_systems": [
+    {
+      "id": "wr-tumiit",
+      "label": "Tumiit",
+      "type": "syllabaire"
+    },
+    {
+      "id": "wr-cyfand",
+      "label": "Cyfand",
+      "type": "alphabet"
+    },
+    {
+      "id": "wr-abjad-kalam",
+      "label": "Abjad kalam",
+      "type": "abjad"
+    }
+  ],
+  "is_oral_only": false,
+  "description": "Bandiko-Mibu, la « terre de Mibu », est un continent tropical où alternent des savanes, des forêts équatoriales impénétrables, des cours d'eau indomptables et des canyons à couper le souffle. Ces terres sont partagées entre de grands royaumes d'une richesse folle, et d'innombrables chefferies et tribus. Sur les côtes, les cités marchandes importent quantité d'esclaves, transportés par les pirates barbaresques pour venir servir dans les mines d'or et de diamant ou dans les carrières. Parmi les puissants souverains qui les exploitent, on compte des reines immortelles et des tueurs de géants. Ces êtres sont d'ailleurs omniprésents dans les mythes et auraient gouverné toutes ces terres autrefois, depuis les sommets des tepuys.",
+  "geography_tags": [
+    "continent-tropical",
+    "savanes",
+    "forets-equatoriales",
+    "cours-d-eau",
+    "canyons",
+    "tepuys"
+  ],
+  "threat_ids": [
+    "threat-pirates-barbaresques",
+    "threat-esclavage",
+    "threat-reines-immortelles",
+    "threat-tueurs-de-geants"
+  ]
+}

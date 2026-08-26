@@ -41,14 +41,9 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 w-full max-w-4xl">
           @for (lang of currentLanguages(); track lang.name) {
-            <div class="relative w-full group transition-all duration-300">
+            <div class="relative w-full group transition-[colors,transform,opacity,box-shadow] duration-200">
               <div
-                class="absolute -inset-2 bg-emerald-500/10 rounded-2xl blur-xl transition-opacity duration-300 pointer-events-none"
-                [ngClass]="lang.isLocked ? 'opacity-100' : 'opacity-50'"
-              ></div>
-
-              <div
-                class="relative flex flex-col h-full p-1.5 rounded-xl bg-[#171b22] border border-emerald-500/40 shadow-lg"
+                class="relative flex flex-col h-full p-1.5 rounded-xl bg-[#171b22] border border-emerald-500/40 shadow-md"
               >
                 <div
                   class="w-full h-full border border-slate-700/30 rounded-lg flex flex-col p-4 bg-[#1b2028]"
@@ -147,7 +142,7 @@
               "
             >
               @if (remainingPicks() === 0) {
-                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span> Sélection
+                <span class="w-2 h-2 bg-emerald-500 rounded-full"></span> Sélection
                 Complète ({{ bonusCount() }} / {{ bonusCount() }})
               } @else {
                 <span class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span> Encore
@@ -160,7 +155,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full max-w-5xl">
               @for (lang of availableBaseLanguages(); track lang.id) {
                 <button
-                  class="w-full px-4 py-3 rounded-xl border text-left flex flex-col gap-1 transition-all group/btn bg-[#171b22] border-slate-800 hover:border-amber-500/50 hover:bg-[#1b2028] shadow-md"
+                  class="w-full px-4 py-3 rounded-xl border text-left flex flex-col gap-1 transition-[colors,transform,opacity,box-shadow] duration-200 group/btn bg-[#171b22] border-slate-800 hover:border-amber-500/50 hover:bg-[#1b2028] shadow-md"
                   (click)="addLanguage(lang.name)"
                 >
                   <div class="flex justify-between items-center w-full">
@@ -182,25 +177,19 @@
       }
 
       <div class="mt-12 flex flex-col items-center gap-4 animate-[fadeIn_0.5s_ease] w-full">
-        <button
-          class="px-14 py-4 rounded-xl text-sm font-black uppercase tracking-widest transition-all"
-          [ngClass]="
-            remainingPicks() === 0
-              ? 'bg-emerald-500 text-slate-950 hover:bg-emerald-400 hover:scale-105 active:scale-95 shadow-[0_0_25px_rgba(16,185,129,0.3)]'
-              : 'bg-slate-800 text-slate-500 opacity-50 cursor-not-allowed'
-          "
-          [disabled]="remainingPicks() > 0"
-          (click)="confirm()"
-        >
-          Inscrire ces langues au registre
-        </button>
-
-        <button
-          class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-400 transition-colors bg-[#1b2028] px-6 py-2 rounded-full border border-slate-700 mt-2"
-          (click)="prevStep()"
-        >
-          ← Revenir en arrière
-        </button>
+        <nav class="wizard-step-nav">
+          <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
+            ← Étape précédente
+          </button>
+          <button
+            type="button"
+            class="wizard-nav-primary"
+            [disabled]="remainingPicks() > 0"
+            (click)="confirm()"
+          >
+            Inscrire ces langues au registre
+          </button>
+        </nav>
       </div>
     </div>
   }

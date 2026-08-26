@@ -1,0 +1,57 @@
+<div class="w-full min-h-screen bg-[#171b22] text-slate-300 animate-fade-in pb-20">
+  <div class="max-w-4xl mx-auto px-4 pt-10">
+    <a
+      routerLink="/skills"
+      class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-sky-500 mb-8"
+    >
+      ← Retour aux compétences
+    </a>
+
+    @if (skill() === undefined) {
+      <p class="text-center py-32 text-slate-500 animate-pulse">Chargement...</p>
+    } @else if (notFound()) {
+      <div class="text-center py-32">
+        <h2 class="text-2xl font-bold text-red-500 font-serif mb-4">Compétence introuvable</h2>
+        <a routerLink="/skills" class="text-sky-500 text-sm uppercase tracking-widest">Retour</a>
+      </div>
+    } @else if (error(); as errorMsg) {
+      <p class="text-red-400 text-center">{{ errorMsg }}</p>
+    } @else if (skill(); as s) {
+      <header class="text-center mb-10">
+        <span class="text-5xl mb-4 block"
+          ><iconify-icon [icon]="skillIcon(s.id)"></iconify-icon
+        ></span>
+        <h1 class="text-4xl font-extrabold text-sky-400 font-serif mb-4">{{ s.name }}</h1>
+        <span
+          class="bg-[#1b2028] text-slate-300 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider border border-slate-700"
+        >
+          {{ abilityLabel(s.ability) }}
+        </span>
+        @if (s.passiveCheck) {
+          <span
+            class="ml-2 bg-emerald-950/40 text-emerald-400 border border-emerald-900/50 px-3 py-1 rounded text-[10px] font-black uppercase"
+            >Test passif</span
+          >
+        }
+      </header>
+
+      <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 mb-8">
+        <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">Description</h2>
+        <p class="text-sm text-slate-300 leading-relaxed">{{ s.description }}</p>
+      </section>
+
+      @if (s.examples.length > 0) {
+        <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800">
+          <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">Exemples</h2>
+          <ul class="space-y-3">
+            @for (ex of s.examples; track ex) {
+              <li class="text-sm text-slate-400 italic leading-relaxed flex gap-2">
+                <span class="text-sky-500">•</span>{{ ex }}
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    }
+  </div>
+</div>

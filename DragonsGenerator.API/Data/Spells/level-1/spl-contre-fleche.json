@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-contre-fleche",
+  "name": "Contre-flèche",
+  "level": 1,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action_bonus"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "speciale",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": false,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-rodeur"
+  ],
+  "description": "Jusqu'à la fin du sort, lorsque vous voyez une créature effectuer une attaque d'arme à distance dans un rayon de 18 m de vous, vous pouvez jouer votre réaction pour intercepter le tir à l'aide d'un projectile prêt à tirer (flèche, bille de fronde ou carreau chargé). Dans ce cas, effectuez une attaque de sort à distance. Si le résultat du jet d'attaque est supérieur ou égal à celui de l'attaque qui a déclenché le sort, les deux objets entrent en collision. Votre projectile est détruit et celui de l'adversaire aussi s'il s'agissait d'une munition. Si l'adversaire avait lancé une arme, celle-ci chute en un point de votre choix entre l'attaquant et sa cible. Vous pouvez jouer votre réaction après le jet d'attaque de la créature, à condition de ne pas attendre sciemment que le meneur en annonce la réussite ou l'échec. Niveau d'emplacement de sort Bonus à votre jet d'attaque contre le projectile Vous pouvez contrer tout projectile dont la cible se situe dans un rayon de 18 m de vous, peu importe la distance qui vous sépare du tireur. Vous pouvez réagir même à un tir que vous ne pouvez pas voir (dans l'obscurité ou dans votre dos, par exemple). Vous pouvez contrer un sort nécessitant une attaque de sort à distance. En cas de réussite, l'impact entre votre projectile et celui que vous contrez peut, si vous le souhaitez, provoquer un effet supplémentaire parmi les suivants :[dot] une vive lumière, éclairant la zone sur un rayon de 18 m autour du point d'impact jusqu'à la fin de votre tour de jeu suivant.[dot] une détonation dont le son est audible dans un rayon de 90 m.[dot] votre projectile file vers le tireur. Vous pouvez immédiatement effectuer une attaque d'arme à distance avec le projectile concerné, laquelle est soumise à la portée de votre arme.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, votre sort s'améliore selon les modalités précisées dans le tableau ci-après :",
+  "modular_options": []
+}

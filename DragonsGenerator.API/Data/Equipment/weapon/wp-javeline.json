@@ -1,0 +1,23 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-javeline",
+  "name": "Javeline",
+  "category": "weapon",
+  "subcategory": "simple_melee",
+  "cost": {
+    "value": 5,
+    "unit": "pa"
+  },
+  "weight_kg": 1,
+  "damage_dice": "1d6",
+  "damage_type": "perforant",
+  "properties": [
+    "prop-lancer-9-36"
+  ],
+  "throw_range": {
+    "normal": 9,
+    "long": 36
+  },
+  "ammo_range": null,
+  "description": null
+}

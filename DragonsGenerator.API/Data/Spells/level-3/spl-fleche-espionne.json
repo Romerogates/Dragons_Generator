@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-fleche-espionne",
+  "name": "Flèche espionne",
+  "level": 3,
+  "school": "divination",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": false,
+    "s": true,
+    "m": "un projectile d'arme à distance"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-rodeur"
+  ],
+  "description": "Vous chargez de magie divinatoire un projectile prêt à tirer. Toute munition ou arme possédant la propriété lancer peut être enchantée. Tant que le sort persiste, vous pouvez diriger le projectile à votre guise avec une maniabilité totale et percevez par son biais, tout en conservant le bénéfice de vos propres sens. La vue est le seul sens dont vous pouvez disposer par le biais du projectile, et il bénéficie de la vision dans le noir sur 36 m. Vous pouvez effectuer des tests de Sagesse (Perception) et d'Intelligence (Investigation) par son intermédiaire s'ils sont basés sur la vue, mais ces tests subissent un désavantage. Le projectile vole à une vitesse maximale de 36 m par round. Il peut se glisser dans tout interstice adapté à ses dimensions. S'il s'éloigne de plus de 1,5 km de vous, le sort prend fin. Le projectile est détruit quand le sort prend fin. Les mouvements de la flèche espionne peuvent éveiller l'attention. Une créature à proximité du projectile peut réaliser un test de Sagesse (Perception) opposé à votre DD de sauvegarde des sorts pour remarquer sa présence. Tant que le sort persiste, vous pouvez à tout moment vous servir du projectile pour attaquer une cible située dans un rayon de 18 m de la flèche espionne à l'aide d'une action. Effectuez une attaque de sort à distance contre la cible. En cas de réussite, la cible subit 3d8 dégâts du type du projectile. Ces dégâts sont considérés comme magiques pour ce qui est de passer outre une résistance ou une immunité contre les armes non magiques. Que l'attaque touche ou non, le sort prend fin.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, les dégâts augmentent de 1d8 et le projectile est doté d'une ouïe équivalente à la vôtre ainsi que de la vision aveugle sur 36 m ; avec un emplacement du 5e niveau ou supérieur, les dégâts augmentent encore de 1d8 et le projectile est invisible.",
+  "modular_options": []
+}

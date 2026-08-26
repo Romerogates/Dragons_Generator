@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "don-abjurateur",
+  "name": "Abjurateur",
+  "requires_magic": true,
+  "category": "magic",
+  "prerequisites": [
+    {
+      "type": "spellcasting",
+      "description": "Capacité de lancer au moins un sort"
+    }
+  ],
+  "ability_score_increase": {
+    "ability": "spellcasting",
+    "value": 1,
+    "max": 20
+  },
+  "description": "Votre maîtrise de la magie de protection vous confère les bénéfices suivants : +1 dans votre caractéristique magique (max 20) ; chaque fois que vous lancez une abjuration du 1er niveau ou supérieur, vous recevez autant de points de vie temporaires que le double du niveau de l'emplacement utilisé.",
+  "benefits": [
+    {
+      "type": "ability_score_increase",
+      "ability": "spellcasting",
+      "value": 1
+    },
+    {
+      "type": "temp_hp_on_abjuration",
+      "formula": "2 × niveau_emplacement"
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "magie",
+    "abjuration",
+    "défense"
+  ]
+}

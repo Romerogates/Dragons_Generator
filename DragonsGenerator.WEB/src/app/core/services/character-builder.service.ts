@@ -1,4 +1,13 @@
-import { Injectable, signal, computed, effect } from '@angular/core';
+import {
+  resolveFeatureUses,
+  extractScalarResources,
+  type FeatureUsesInput,
+} from '../utils/feature-uses.util';
+import { invocationLabel, pactBoonLabel } from '../data/warlock-invocations.data';
+import { metamagicLabel } from '../data/metamagic-labels.data';
+import { annotateAuraDesc } from '../utils/aura-range.util';
+import { Injectable, signal, computed, effect, inject } from '@angular/core';
+import { DataService } from './data.service';
 import {
   Character,
   CharacterCreation,
@@ -7,6 +16,7 @@ import {
   Ability,
   AbilityKey,
   AbilityScores,
+  AsiChoiceSlot,
   Size,
   Attack,
   FeatureInstance,
@@ -38,9 +48,15 @@ export interface SpeciesSelection {
   size: Size;
   languages: string[];
   bonusLanguageCount: number;
+  /** Compétences d'espèce à choisir à l'étape Savoirs (ex. Polyvalence). */
+  bonusSkillCount: number;
+  /** Outils d'espèce à choisir à l'étape Savoirs. */
+  bonusToolCount: number;
   resistances: string[];
   hasDarkvision: boolean;
   darkvisionRadius: number;
+  /** Creation-choice answers (lineage, tools, etc.) for restore when revisiting the step. */
+  choiceAnswers: Record<string, string[]>;
 }
 
 export interface CivilizationSelection {
@@ -81,6 +97,8 @@ export interface ClassSelection {
   subclassId?: string;
   subclassName?: string;
   hitDie: number;
+  hpAtLevel1?: number;
+  hpPerLevelAverage?: number;
   hasSpellcasting: boolean;
   spellcastingKind: SpellcastingKind | null;
   spellcastingAbility: Ability | null;
@@ -92,6 +110,7 @@ export interface ClassSelection {
   skillChooseCount: number;
   classFeatures: FeatureInstance[];
   startingEquipmentSlots: EquipmentSlot[];
+  classProgressionResources?: Record<string, number | string | null>;
 }
 
 export interface IdentitySelection {
@@ -127,6 +146,9 @@ const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   speciesResistances: [],
   hasDarkvision: false,
   darkvisionRadius: 0,
+  speciesChoiceAnswers: {},
+  speciesBonusSkillCount: 0,
+  speciesBonusToolCount: 0,
 
   civilizationId: null,
   civilizationName: null,
@@ -150,11 +172,14 @@ const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   selectedHandicaps: [],
   handicapCompensationType: null,
 
+  targetLevel: 1,
   classId: null,
   className: null,
   subclassId: null,
   subclassName: null,
   hitDie: 0,
+  hpAtLevel1: 0,
+  hpPerLevelAverage: 0,
   hasSpellcasting: false,
   spellcastingKind: null,
   spellcastingAbility: null,
@@ -166,6 +191,19 @@ const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   skillChooseCount: 0,
   classFeatures: [],
   startingEquipmentSlots: [],
+  classProgressionResources: {},
+  classChoiceAnswers: {},
+  asiBonuses: {},
+  selectedFeatId: null,
+  selectedFeatIds: [],
+  asiChoices: [],
+  expertiseSkills: [],
+  metamagicOptions: [],
+  eldritchInvocations: [],
+  pactBoon: null,
+  mysticArcanumPicks: {},
+  spellMasteryPicks: {},
+  signatureSpellIds: [],
 
   baseAbilities: {
     force: DEFAULT_ABILITY_SCORE,
@@ -201,7 +239,13 @@ const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   spellcastingDetails: {},
 };
 
-const STORAGE_KEY = 'dragon_character_builder_v4';
+const STORAGE_KEY = 'dragon_character_builder_v6';
+
+/** Bonus de maîtrise D&D/Dragons : +2 aux niv. 1–4, +3 aux 5–8, etc. */
+export function proficiencyBonusForLevel(level: number): number {
+  const lvl = Math.min(20, Math.max(1, Math.floor(level) || 1));
+  return Math.floor((lvl - 1) / 4) + 2;
+}
 
 interface StoredState {
   character: CharacterCreation;
@@ -214,8 +258,15 @@ interface EditingRef {
   createdAt: string;
 }
 
+function isConcreteStyleRef(id: string): boolean {
+  if (!id) return false;
+  if (id.includes('style-de-combat')) return false;
+  return id.startsWith('style-') || id.startsWith('feat-style-');
+}
+
 @Injectable({ providedIn: 'root' })
 export class CharacterBuilderService {
+  private readonly dataService = inject(DataService);
   readonly creation = signal<ExtendedCharacterCreation>(structuredClone(INITIAL_CREATION_STATE));
   readonly currentStep = signal<number>(1);
   private readonly editingRef = signal<EditingRef | null>(null);
@@ -259,17 +310,33 @@ export class CharacterBuilderService {
   readonly totalSteps = computed(() => this.steps().length);
   readonly summaryStep = computed(() => this.totalSteps());
 
+  /** Étape « Classe » (fixe dans le wizard). */
+  readonly classStepNumber = 4;
+
+  /**
+   * Niveau verrouillé une fois l'étape Classe dépassée :
+   * ASI, expertise, sorts, ressources dépendent du niveau déjà choisi.
+   * Revenir à Classe (≤ 4) le déverrouille.
+   */
+  readonly isLevelLocked = computed(() => this.currentStep() > this.classStepNumber);
+
   readonly finalAbilities = computed<AbilityScores>(() => {
     const c = this.creation();
     const base = c.baseAbilities;
     const bonuses = c.racialBonuses;
+    const asi = c.asiBonuses ?? {};
+    const clamp = (n: number) => Math.min(20, n);
     return {
-      force: base.force + (bonuses.force ?? 0),
-      dexterite: base.dexterite + (bonuses.dexterite ?? 0),
-      constitution: base.constitution + (bonuses.constitution ?? 0),
-      intelligence: base.intelligence + (bonuses.intelligence ?? 0),
-      sagesse: base.sagesse + (bonuses.sagesse ?? 0),
-      charisme: base.charisme + (bonuses.charisme ?? 0),
+      force: clamp(base.force + (bonuses.force ?? 0) + (asi.force ?? 0)),
+      dexterite: clamp(base.dexterite + (bonuses.dexterite ?? 0) + (asi.dexterite ?? 0)),
+      constitution: clamp(
+        base.constitution + (bonuses.constitution ?? 0) + (asi.constitution ?? 0),
+      ),
+      intelligence: clamp(
+        base.intelligence + (bonuses.intelligence ?? 0) + (asi.intelligence ?? 0),
+      ),
+      sagesse: clamp(base.sagesse + (bonuses.sagesse ?? 0) + (asi.sagesse ?? 0)),
+      charisme: clamp(base.charisme + (bonuses.charisme ?? 0) + (asi.charisme ?? 0)),
     };
   });
 
@@ -286,15 +353,41 @@ export class CharacterBuilderService {
   });
 
   readonly hitPointsMax = computed<number>(() => {
-    return this.creation().hitDie + this.abilityModifiers().constitution;
+    const c = this.creation();
+    const level = Math.min(20, Math.max(1, c.targetLevel || 1));
+    const con = this.abilityModifiers().constitution;
+    const hp1 = c.hpAtLevel1 > 0 ? c.hpAtLevel1 : c.hitDie || 8;
+    const hpAvg =
+      c.hpPerLevelAverage > 0 ? c.hpPerLevelAverage : Math.floor((c.hitDie || 8) / 2) + 1;
+    let hp = hp1 + con + (level - 1) * (hpAvg + con);
+    // Lignée draconique : +1 PV max par niveau d'ensorceleur
+    const hasDraconic =
+      c.subclassId === 'subcls-lignee-draconique' ||
+      (c.classFeatures ?? []).some((f) => f.refId === 'feat-resistance-draconique');
+    if (hasDraconic && c.classId === 'cls-ensorceleur') {
+      hp += level;
+    }
+    return hp;
   });
+
+  readonly proficiencyBonus = computed<number>(() =>
+    proficiencyBonusForLevel(this.creation().targetLevel || 1),
+  );
+
+  readonly targetLevel = computed(() => Math.min(20, Math.max(1, this.creation().targetLevel || 1)));
 
   readonly woundThreshold = computed<number>(() => {
     return Math.ceil(this.hitPointsMax() / 2);
   });
 
   readonly baseArmorClass = computed<number>(() => {
-    return 10 + this.abilityModifiers().dexterite;
+    const c = this.creation();
+    const allEquipment = [...c.selectedEquipment, ...(c.backgroundEquipment ?? [])];
+    return this.computeArmorClass(allEquipment, this.abilityModifiers(), {
+      classId: c.classId,
+      subclassId: c.subclassId,
+      classFeatures: c.classFeatures,
+    });
   });
 
   readonly initiative = computed<number>(() => {
@@ -381,6 +474,9 @@ export class CharacterBuilderService {
         speciesResistances: selection.resistances,
         hasDarkvision: selection.hasDarkvision,
         darkvisionRadius: selection.darkvisionRadius,
+        speciesChoiceAnswers: selection.choiceAnswers,
+        speciesBonusSkillCount: selection.bonusSkillCount,
+        speciesBonusToolCount: selection.bonusToolCount,
         bonusLanguageCount: newBonusTotal,
         languages: [
           ...new Set([
@@ -415,6 +511,9 @@ export class CharacterBuilderService {
         speciesResistances: [],
         hasDarkvision: false,
         darkvisionRadius: 0,
+        speciesChoiceAnswers: {},
+        speciesBonusSkillCount: 0,
+        speciesBonusToolCount: 0,
         bonusLanguageCount: (c.bonusLanguageCount || 0) - prevSpBonus,
         languages: [
           ...new Set([
@@ -475,7 +574,13 @@ export class CharacterBuilderService {
         backgroundName: selection.backgroundName,
         backgroundPreset: selection.backgroundPreset,
         backgroundProficiencies: selection.proficiencies ?? null,
-        backgroundSkills: [],
+        backgroundSkills: (selection.skills ?? []).map((s) =>
+          s.startsWith('skill-') || s.startsWith('ski-')
+            ? s.startsWith('ski-')
+              ? `skill-${s.slice(4)}`
+              : s
+            : s,
+        ),
         backgroundTools: [],
         toolEquipmentSlots: [],
         backgroundLanguages: [],
@@ -547,7 +652,128 @@ export class CharacterBuilderService {
     });
   }
 
-  setClass(selection: ClassSelection): void {
+  setTargetLevel(level: number): void {
+    if (this.isLevelLocked()) return;
+    const targetLevel = Math.min(20, Math.max(1, Math.floor(Number(level)) || 1));
+    this.creation.update((c) => ({
+      ...c,
+      targetLevel,
+      classFeatures: (c.classFeatures ?? []).filter((f) => (f.level ?? 1) <= targetLevel),
+    }));
+    this.refreshClassFeaturesForLevel(targetLevel);
+  }
+
+  /**
+   * Recharge les aptitudes de classe/sous-classe pour le niveau cible
+   * (utile quand on change le niveau hors de l'étape Classe).
+   */
+  private refreshClassFeaturesForLevel(targetLevel: number): void {
+    const c = this.creation();
+    if (!c.classId) return;
+
+    this.dataService.getClassById(c.classId).subscribe({
+      next: (cls) => {
+        const features: FeatureInstance[] = [];
+        const progression = (cls.data?.progression ?? []) as {
+          level: number;
+          features?: string[];
+          resources?: Record<string, unknown>;
+        }[];
+        const details = (cls.data?.features_details ?? []) as (FeatureUsesInput & {
+          id: string;
+          name: string;
+          desc: string;
+          level?: number;
+        })[];
+        const profBonus = proficiencyBonusForLevel(targetLevel);
+
+        for (const prog of progression) {
+          if (prog.level < 1 || prog.level > targetLevel) continue;
+          for (const id of prog.features ?? []) {
+            const feat = details.find((f) => f.id === id);
+            if (!feat || features.some((f) => f.refId === feat.id)) continue;
+            features.push({
+              refId: feat.id,
+              name: feat.name,
+              desc: annotateAuraDesc(feat as any, targetLevel),
+              source: 'class',
+              sourceDetail: `${cls.name} ${prog.level}`,
+              level: prog.level,
+              uses: resolveFeatureUses(feat, cls, targetLevel, profBonus),
+            });
+          }
+        }
+
+        const subId = c.subclassId;
+        const options = (cls.data as any)?.subclasses?.options ?? [];
+        const sub = subId ? options.find((o: any) => o.id === subId) : null;
+        if (sub?.features) {
+          for (const feat of sub.features as (FeatureUsesInput & {
+            id: string;
+            name: string;
+            desc: string;
+            level: number;
+          })[]) {
+            if ((feat.level ?? 1) > targetLevel) continue;
+            if (features.some((f) => f.refId === feat.id)) continue;
+            features.push({
+              refId: feat.id,
+              name: feat.name,
+              desc: annotateAuraDesc(feat as any, targetLevel),
+              source: 'subclass',
+              sourceDetail: `${sub.name} ${feat.level}`,
+              level: feat.level,
+              uses: resolveFeatureUses(feat, cls, targetLevel, profBonus),
+            });
+          }
+        }
+
+        // Conserve les styles de combat déjà présents (ids style-* ou feat-style-*)
+        const combatStyles = (c.classFeatures ?? []).filter((f) =>
+          isConcreteStyleRef(f.refId ?? ''),
+        );
+
+        // Paladin / Rôdeur : débloque l'incantation à partir du niv. 2
+        let hasSpellcasting = c.hasSpellcasting;
+        let spellcastingKind = c.spellcastingKind;
+        let spellcastingAbility = c.spellcastingAbility;
+        if (c.classId === 'cls-paladin' && targetLevel >= 2) {
+          hasSpellcasting = true;
+          spellcastingKind = 'paladin';
+          spellcastingAbility = 'Charisme';
+        } else if (c.classId === 'cls-rodeur' && targetLevel >= 2) {
+          hasSpellcasting = true;
+          spellcastingKind = 'ranger';
+          spellcastingAbility = 'Sagesse';
+        } else if (
+          (c.classId === 'cls-paladin' || c.classId === 'cls-rodeur') &&
+          targetLevel < 2
+        ) {
+          hasSpellcasting = false;
+          spellcastingKind = null;
+          spellcastingAbility = null;
+        }
+
+        const progAtLevel = progression.find((p) => p.level === targetLevel);
+        const classProgressionResources = extractScalarResources(progAtLevel?.resources);
+
+        this.creation.update((cur) => ({
+          ...cur,
+          classFeatures: [...features, ...combatStyles],
+          classProgressionResources,
+          hasSpellcasting,
+          spellcastingKind,
+          spellcastingAbility,
+        }));
+      },
+      error: () => {
+        /* silencieux : le filtre local suffit en fallback */
+      },
+    });
+  }
+
+  setClass(selection: ClassSelection, opts?: { preserveProgress?: boolean }): void {
+    const preserve = opts?.preserveProgress === true;
     this.creation.update((c) => ({
       ...c,
       classId: selection.classId,
@@ -555,6 +781,14 @@ export class CharacterBuilderService {
       subclassId: selection.subclassId ?? null,
       subclassName: selection.subclassName ?? null,
       hitDie: selection.hitDie,
+      hpAtLevel1:
+        selection.hpAtLevel1 && selection.hpAtLevel1 > 0
+          ? selection.hpAtLevel1
+          : selection.hitDie,
+      hpPerLevelAverage:
+        selection.hpPerLevelAverage && selection.hpPerLevelAverage > 0
+          ? selection.hpPerLevelAverage
+          : Math.floor(selection.hitDie / 2) + 1,
       hasSpellcasting: selection.hasSpellcasting,
       spellcastingKind: selection.spellcastingKind,
       spellcastingAbility: selection.spellcastingAbility,
@@ -566,9 +800,107 @@ export class CharacterBuilderService {
       skillChooseCount: selection.skillChooseCount,
       classFeatures: selection.classFeatures,
       startingEquipmentSlots: selection.startingEquipmentSlots,
-      selectedSkills: [],
-      selectedEquipment: [],
-      spellcastingDetails: {},
+      classProgressionResources: selection.classProgressionResources ?? {},
+      classChoiceAnswers: preserve ? c.classChoiceAnswers : {},
+      asiBonuses: preserve ? c.asiBonuses : {},
+      selectedFeatId: preserve ? c.selectedFeatId : null,
+      selectedFeatIds: preserve ? c.selectedFeatIds : [],
+      asiChoices: preserve ? c.asiChoices : [],
+      expertiseSkills: preserve ? c.expertiseSkills : [],
+      metamagicOptions: preserve ? c.metamagicOptions : [],
+      eldritchInvocations: preserve ? c.eldritchInvocations : [],
+      pactBoon: preserve ? c.pactBoon : null,
+      mysticArcanumPicks: preserve ? c.mysticArcanumPicks : {},
+      spellMasteryPicks: preserve ? c.spellMasteryPicks : {},
+      signatureSpellIds: preserve ? c.signatureSpellIds : [],
+      selectedSkills: preserve ? c.selectedSkills : [],
+      selectedEquipment: preserve ? c.selectedEquipment : [],
+      spellcastingDetails: preserve ? c.spellcastingDetails : {},
+    }));
+  }
+
+  setClassProgressionChoices(payload: {
+    classChoiceAnswers: Record<string, string[]>;
+    metamagicOptions?: string[];
+    eldritchInvocations?: string[];
+    pactBoon?: string | null;
+    extraFeatures?: FeatureInstance[];
+  }): void {
+    this.creation.update((c) => {
+      const extras = payload.extraFeatures ?? [];
+      const stripPrefixes = [
+        'invoc-',
+        'meta-',
+        'pact-boon-',
+        'ennemi-',
+        'terrain-',
+        'dragon-',
+        'feat-astuce-',
+        'feat-conquete-',
+      ];
+      const withoutOld = (c.classFeatures ?? []).filter((f) => {
+        const id = f.refId ?? '';
+        if (extras.some((e) => e.refId === id)) return false;
+        return !stripPrefixes.some((p) => id.startsWith(p));
+      });
+      return {
+        ...c,
+        classChoiceAnswers: payload.classChoiceAnswers,
+        metamagicOptions: payload.metamagicOptions ?? c.metamagicOptions ?? [],
+        eldritchInvocations: payload.eldritchInvocations ?? c.eldritchInvocations ?? [],
+        pactBoon: payload.pactBoon !== undefined ? payload.pactBoon : c.pactBoon,
+        classFeatures: [...withoutOld, ...extras],
+      };
+    });
+  }
+
+  setAsiChoice(bonuses: Partial<AbilityScores>, featId: string | null = null): void {
+    this.creation.update((c) => ({
+      ...c,
+      asiBonuses: bonuses,
+      selectedFeatId: featId,
+      selectedFeatIds: featId ? [featId] : [],
+      asiChoices: [],
+    }));
+  }
+
+  /** Applique N slots ASI (niveaux 4–20) : somme des bonus + liste des dons. */
+  setAsiChoices(slots: AsiChoiceSlot[]): void {
+    const bonuses: Partial<AbilityScores> = {};
+    const featIds: string[] = [];
+    for (const slot of slots) {
+      if (slot.mode === 'feat' && slot.featId) {
+        featIds.push(slot.featId);
+        continue;
+      }
+      if (slot.mode === 'plus2' && slot.primary) {
+        bonuses[slot.primary] = (bonuses[slot.primary] ?? 0) + 2;
+      } else if (slot.mode === 'plus1plus1' && slot.primary && slot.secondary) {
+        bonuses[slot.primary] = (bonuses[slot.primary] ?? 0) + 1;
+        bonuses[slot.secondary] = (bonuses[slot.secondary] ?? 0) + 1;
+      }
+    }
+    // Cap soft à 20 côté affichage final (apply dans finalAbilities si besoin)
+    this.creation.update((c) => ({
+      ...c,
+      asiChoices: slots.map((s) => ({ ...s })),
+      asiBonuses: bonuses,
+      selectedFeatIds: featIds,
+      selectedFeatId: featIds[0] ?? null,
+    }));
+  }
+
+  setMysticArcanumPicks(picks: Record<string, string>): void {
+    this.creation.update((c) => ({
+      ...c,
+      mysticArcanumPicks: { ...picks },
+    }));
+  }
+
+  setExpertiseSkills(skills: string[]): void {
+    this.creation.update((c) => ({
+      ...c,
+      expertiseSkills: [...skills],
     }));
   }
 
@@ -580,6 +912,8 @@ export class CharacterBuilderService {
       subclassId: null,
       subclassName: null,
       hitDie: 0,
+      hpAtLevel1: 0,
+      hpPerLevelAverage: 0,
       hasSpellcasting: false,
       spellcastingKind: null,
       spellcastingAbility: null,
@@ -591,6 +925,19 @@ export class CharacterBuilderService {
       skillChooseCount: 0,
       classFeatures: [],
       startingEquipmentSlots: [],
+      classProgressionResources: {},
+      classChoiceAnswers: {},
+      asiBonuses: {},
+      selectedFeatId: null,
+      selectedFeatIds: [],
+      asiChoices: [],
+      expertiseSkills: [],
+      metamagicOptions: [],
+      eldritchInvocations: [],
+      pactBoon: null,
+      mysticArcanumPicks: {},
+      spellMasteryPicks: {},
+      signatureSpellIds: [],
       selectedSkills: [],
       selectedEquipment: [],
       spellcastingDetails: {},
@@ -773,6 +1120,9 @@ export class CharacterBuilderService {
       speciesResistances: savedCharacter.defense.resistances,
       hasDarkvision: savedCharacter.senses.hasDarkvision,
       darkvisionRadius: savedCharacter.senses.darkvisionRadius,
+      speciesChoiceAnswers: {},
+      speciesBonusSkillCount: 0,
+      speciesBonusToolCount: 0,
 
       civilizationId: savedCharacter.civilization.id,
       civilizationName: savedCharacter.civilization.label,
@@ -800,7 +1150,13 @@ export class CharacterBuilderService {
       className: savedCharacter.classes[0]?.classLabel ?? null,
       subclassId: savedCharacter.classes[0]?.subclassId ?? null,
       subclassName: savedCharacter.classes[0]?.subclassLabel ?? null,
+      targetLevel: savedCharacter.totalLevel || savedCharacter.classes[0]?.level || 1,
       hitDie: savedCharacter.classes[0]?.hitDie ?? 0,
+      hpAtLevel1: savedCharacter.classes[0]?.hitDie ?? 0,
+      hpPerLevelAverage:
+        savedCharacter.classes[0]?.hitDie
+          ? Math.floor(savedCharacter.classes[0].hitDie / 2) + 1
+          : 0,
       hasSpellcasting: savedCharacter.spellcasting !== null,
       spellcastingKind: savedCharacter.spellcasting?.kind ?? null,
       spellcastingAbility: savedCharacter.spellcasting?.ability ?? null,
@@ -814,6 +1170,47 @@ export class CharacterBuilderService {
         (f) => f.source === 'class' || f.source === 'subclass',
       ),
       startingEquipmentSlots: [],
+      classProgressionResources: {},
+      classChoiceAnswers: {},
+      asiBonuses: {},
+      selectedFeatId: null,
+      selectedFeatIds: [],
+      asiChoices: [],
+      expertiseSkills: savedCharacter.proficiencies.expertiseSkills ?? [],
+      metamagicOptions:
+        savedCharacter.spellcasting?.kind === 'sorcerer'
+          ? (savedCharacter.spellcasting.metamagic ?? [])
+          : [],
+      eldritchInvocations:
+        savedCharacter.spellcasting?.kind === 'warlock'
+          ? (savedCharacter.spellcasting.eldritchInvocations ?? [])
+          : [],
+      pactBoon:
+        savedCharacter.spellcasting?.kind === 'warlock'
+          ? (savedCharacter.spellcasting.pact || null)
+          : null,
+      mysticArcanumPicks:
+        savedCharacter.spellcasting?.kind === 'warlock'
+          ? Object.fromEntries(
+              (savedCharacter.spellcasting.mysticArcanum ?? []).map((a) => [
+                String(a.spellLevel),
+                a.spellId,
+              ]),
+            )
+          : {},
+      spellMasteryPicks:
+        savedCharacter.spellcasting?.kind === 'wizard'
+          ? Object.fromEntries(
+              (savedCharacter.spellcasting.spellMastery ?? []).map((a) => [
+                String(a.spellLevel),
+                a.spellId,
+              ]),
+            )
+          : {},
+      signatureSpellIds:
+        savedCharacter.spellcasting?.kind === 'wizard'
+          ? (savedCharacter.spellcasting.signatureSpells ?? []).map((s) => s.spellId)
+          : [],
 
       baseAbilities: savedCharacter.abilities,
       pointsRemaining: 0,
@@ -892,11 +1289,44 @@ export class CharacterBuilderService {
 
     const spellcasting = this.buildSpellcasting(c, modifiers);
     const features: FeatureInstance[] = [...c.speciesTraits, ...c.classFeatures];
-    const attacks = this.buildAttacks(c.selectedEquipment, modifiers);
+    const featIds =
+      c.selectedFeatIds?.length > 0
+        ? c.selectedFeatIds
+        : c.selectedFeatId
+          ? [c.selectedFeatId]
+          : [];
+    for (const featId of featIds) {
+      features.push({
+        refId: featId,
+        name: featId.replace(/^don-/, '').replace(/-/g, ' '),
+        desc: 'Don choisi à la place d’une augmentation de caractéristique.',
+        source: 'feat',
+        sourceDetail: 'ASI',
+        level: 4,
+      });
+    }
+    const allEquipmentForAttacks = [
+      ...c.selectedEquipment,
+      ...((c as any).backgroundEquipment ?? []),
+    ];
+    const attacks = this.buildAttacks(allEquipmentForAttacks, modifiers, this.buildKnownSpells(c), {
+      spellAbility: c.spellcastingAbility,
+      classId: c.classId,
+      classFeatures: c.classFeatures,
+      resources: c.classProgressionResources ?? {},
+    });
 
     const allEquipment = [...c.selectedEquipment, ...c.backgroundEquipment];
     const totalWeight = allEquipment.reduce((sum, item) => sum + (item.wKg ?? 0) * item.qty, 0);
     const maxCarry = abilities.force * 7.5;
+
+    const armorClass = this.computeArmorClass(allEquipment, modifiers, {
+      classId: c.classId,
+      subclassId: c.subclassId,
+      classFeatures: c.classFeatures,
+    });
+
+    const walkSpeed = this.computeWalkSpeed(c, allEquipment);
 
     const mergedCurrency: Currency = {
       cuivre: c.currency.cuivre + c.backgroundCurrency.cuivre,
@@ -934,29 +1364,29 @@ export class CharacterBuilderService {
           classId: c.classId!,
           classLabel: c.className!,
           ...(c.subclassId ? { subclassId: c.subclassId, subclassLabel: c.subclassName! } : {}),
-          level: 1,
+          level: this.targetLevel(),
           hitDie: c.hitDie,
         },
       ],
-      totalLevel: 1,
+      totalLevel: this.targetLevel(),
       experience: 0,
 
       abilities,
       abilityModifiers: modifiers,
-      proficiencyBonus: 2,
+      proficiencyBonus: this.proficiencyBonus(),
 
       vitality: {
         hitPointsMax: hpMax,
         hitPointsCurrent: hpMax,
         hitPointsTemporary: 0,
         woundThreshold: Math.ceil(hpMax / 2),
-        hitDice: [{ dieType: c.hitDie, total: 1, used: 0 }],
+        hitDice: [{ dieType: c.hitDie, total: this.targetLevel(), used: 0 }],
         fatigue: 0,
         deathSaves: { successes: 0, failures: 0 },
         inspiration: false,
       },
       defense: {
-        armorClass: this.computeArmorClass(allEquipment, modifiers),
+        armorClass,
         armorType: this.findEquippedArmorName(allEquipment),
         hasShield: allEquipment.some(
           (e) => e.equipped && e.name.toLowerCase().includes('bouclier'),
@@ -971,9 +1401,9 @@ export class CharacterBuilderService {
       attacks,
 
       movement: {
-        walk: c.speciesSpeed,
-        climb: Math.floor(c.speciesSpeed / 2),
-        swim: Math.floor(c.speciesSpeed / 2),
+        walk: walkSpeed,
+        climb: Math.floor(walkSpeed / 2),
+        swim: Math.floor(walkSpeed / 2),
         jumpHeight: 3 + modifiers.force,
         jumpLength: 3 + modifiers.force,
       },
@@ -989,7 +1419,7 @@ export class CharacterBuilderService {
         tools: allTools,
         savingThrows: c.savingThrows,
         skills: [...new Set([...c.selectedSkills, ...c.backgroundSkills])],
-        expertiseSkills: [],
+        expertiseSkills: c.expertiseSkills ?? [],
         languages: c.languages,
         writingSystems: c.civilizationWritingSystems,
       },
@@ -1012,6 +1442,11 @@ export class CharacterBuilderService {
 
       spellcasting,
       knownSpells: this.buildKnownSpells(c),
+      classResources: Object.fromEntries(
+        Object.entries(c.classProgressionResources ?? {})
+          .filter(([, v]) => typeof v === 'number' && Number.isFinite(v))
+          .map(([k, v]) => [k, Number(v)]),
+      ),
       ammunition: [],
       notes: '',
 
@@ -1045,70 +1480,133 @@ export class CharacterBuilderService {
       | { cantrips?: unknown[]; spells?: unknown[] }
       | undefined;
     const cantripCount = Array.isArray(details?.cantrips) ? details.cantrips.length : 0;
-    const LEVEL1_SLOTS: Record<string, { level: number; max: number }[]> = {
-      bard: [{ level: 1, max: 2 }],
-      wizard: [{ level: 1, max: 2 }],
-      sorcerer: [{ level: 1, max: 2 }],
-      cleric: [{ level: 1, max: 2 }],
-      druid: [{ level: 1, max: 2 }],
-      warlock: [{ level: 1, max: 1 }],
-      ranger: [{ level: 1, max: 0 }],
-      paladin: [{ level: 1, max: 0 }],
-      fighter_eldritch_knight: [{ level: 1, max: 0 }],
-    };
     const focus = this.detectFocus(c);
-    const slots = (LEVEL1_SLOTS[c.spellcastingKind] ?? [{ level: 1, max: 2 }]).map((s) => ({
-      ...s,
-      used: 0,
-    }));
+    const level = Math.min(20, Math.max(1, c.targetLevel || 1));
+    const prof = proficiencyBonusForLevel(level);
+    const slots = this.spellSlotsForLevel(c.spellcastingKind, level).map((s) => ({ ...s, used: 0 }));
     const base = {
       ability: c.spellcastingAbility,
-      spellSaveDC: 8 + 2 + spellMod,
-      spellAttackBonus: 2 + spellMod,
+      spellSaveDC: 8 + prof + spellMod,
+      spellAttackBonus: prof + spellMod,
       focus,
       spellSlots: slots,
       cantrips: { max: cantripCount, used: 0 },
     };
     switch (c.spellcastingKind) {
-      case 'wizard':
+      case 'wizard': {
+        const masteryDetail = ((details as any)?.spellMastery ?? []) as {
+          spellLevel: number;
+          spellId: string;
+          spellName: string;
+        }[];
+        const sigDetail = ((details as any)?.signatureSpells ?? []) as {
+          spellId: string;
+          spellName: string;
+        }[];
+        const masteryFromCreation = Object.entries(c.spellMasteryPicks ?? {}).map(
+          ([lvl, spellId]) => {
+            const spellLevel = Number(lvl);
+            const hit = masteryDetail.find((d) => d.spellLevel === spellLevel);
+            return {
+              spellLevel,
+              spellId,
+              spellName: hit?.spellName ?? spellId,
+            };
+          },
+        );
+        const signatureFromCreation = (c.signatureSpellIds ?? []).map((spellId) => {
+          const hit = sigDetail.find((d) => d.spellId === spellId);
+          return { spellId, spellName: hit?.spellName ?? spellId };
+        });
         return {
           ...base,
           kind: 'wizard',
-          arcaneTradition: (details as any)?.arcaneTradition ?? '',
+          arcaneTradition: (details as any)?.arcaneTradition ?? c.subclassName ?? '',
+          spellMastery: masteryDetail.length ? masteryDetail : masteryFromCreation,
+          signatureSpells: sigDetail.length ? sigDetail : signatureFromCreation,
         };
+      }
       case 'sorcerer':
         return {
           ...base,
           kind: 'sorcerer',
-          atavism: (details as any)?.atavism ?? '',
-          sorceryPoints: { max: 0, current: 0 },
-          metamagic: [],
+          atavism: (details as any)?.atavism ?? c.subclassName ?? '',
+          sorceryPoints: {
+            max: Number(c.classProgressionResources?.['arcane_points'] ?? 0) || 0,
+            current: Number(c.classProgressionResources?.['arcane_points'] ?? 0) || 0,
+          },
+          metamagic: (c.metamagicOptions ?? []).map(metamagicLabel),
         };
-      case 'warlock':
+      case 'warlock': {
+        const arcanumPicks = c.mysticArcanumPicks ?? {};
+        const detailArcanum = ((details as any)?.mysticArcanum ?? []) as {
+          spellLevel: number;
+          spellId: string;
+          spellName: string;
+        }[];
+        const mysticArcanum = Object.entries(arcanumPicks)
+          .map(([lvl, spellId]) => {
+            const spellLevel = Number(lvl);
+            const hit = detailArcanum.find(
+              (d) => d.spellLevel === spellLevel || d.spellId === spellId,
+            );
+            return {
+              spellLevel,
+              spellId,
+              spellName: hit?.spellName ?? spellId,
+            };
+          })
+          .filter((a) => a.spellLevel >= 6 && !!a.spellId)
+          .sort((a, b) => a.spellLevel - b.spellLevel);
         return {
           ...base,
           kind: 'warlock',
-          patron: (details as any)?.patron ?? '',
-          pact: '',
-          eldritchInvocations: [],
+          patron: (details as any)?.patron ?? c.subclassName ?? '',
+          pact: pactBoonLabel(c.pactBoon),
+          eldritchInvocations: (c.eldritchInvocations ?? []).map(invocationLabel),
+          mysticArcanum,
         };
-      case 'cleric':
+      }
+      case 'cleric': {
+        const channelUses =
+          Number(c.classProgressionResources?.['conduit_divin_uses'] ?? 0) || 1;
+        const channels = (c.classFeatures ?? [])
+          .filter((f) => {
+            const id = f.refId ?? '';
+            return (
+              id.startsWith('feat-conduit-divin-') &&
+              !id.endsWith('-2repos') &&
+              !id.endsWith('-3repos')
+            );
+          })
+          .map((f) => ({
+            id: f.refId ?? '',
+            name: f.name,
+            desc: f.desc ?? '',
+            uses: { max: channelUses, current: channelUses },
+          }));
         return {
           ...base,
           kind: 'cleric',
           deity: (details as any)?.deity ?? '',
-          domain: (details as any)?.domain ?? '',
-          divineChannels: [],
+          domain: (details as any)?.domain ?? c.subclassName ?? '',
+          divineChannels: channels,
         };
-      case 'druid':
+      }
+      case 'druid': {
+        const hasTrance = (c.classFeatures ?? []).some(
+          (f) => f.refId === 'feat-transe-mystique',
+        );
+        const circleFromDetails = ((details as any)?.circleSpells ?? []) as string[];
         return {
           ...base,
           kind: 'druid',
-          druidCircle: '',
-          circleSpells: [],
-          mysticTranceAvailable: false,
+          druidCircle: (details as any)?.druidCircle ?? c.subclassName ?? '',
+          circleSpells: circleFromDetails,
+          mysticTranceAvailable: hasTrance,
           mysticTranceUsed: false,
         };
+      }
       case 'bard':
         return { ...base, kind: 'bard', bardicCollege: c.subclassName ?? '' };
       case 'ranger':
@@ -1117,8 +1615,18 @@ export class CharacterBuilderService {
           kind: 'ranger',
           knownSpellsCount: Array.isArray(details?.spells) ? details.spells.length : 0,
         };
-      case 'paladin':
-        return { ...base, kind: 'paladin', oath: c.subclassName ?? '', oathSpells: [] };
+      case 'paladin': {
+        const oathFromDetails = ((details as any)?.oathSpells ?? []) as {
+          characterLevel: number;
+          spells: string[];
+        }[];
+        return {
+          ...base,
+          kind: 'paladin',
+          oath: c.subclassName ?? '',
+          oathSpells: oathFromDetails,
+        };
+      }
       case 'fighter_eldritch_knight':
         return {
           ...base,
@@ -1132,6 +1640,115 @@ export class CharacterBuilderService {
       default:
         return null;
     }
+  }
+
+  /**
+   * Emplacements de sorts selon le type d'incantateur et le niveau.
+   * Tables SRD-like (full / half / warlock) — suffisant tant que la classe
+   * n'expose pas encore sa progression complète côté builder.
+   */
+  private spellSlotsForLevel(
+    kind: SpellcastingKind | null,
+    level: number,
+  ): { level: number; max: number }[] {
+    if (!kind) return [];
+    const lvl = Math.min(20, Math.max(1, level));
+
+    const FULL: Record<number, number[]> = {
+      1: [2],
+      2: [3],
+      3: [4, 2],
+      4: [4, 3],
+      5: [4, 3, 2],
+      6: [4, 3, 3],
+      7: [4, 3, 3, 1],
+      8: [4, 3, 3, 2],
+      9: [4, 3, 3, 3, 1],
+      10: [4, 3, 3, 3, 2],
+      11: [4, 3, 3, 3, 2, 1],
+      12: [4, 3, 3, 3, 2, 1],
+      13: [4, 3, 3, 3, 2, 1, 1],
+      14: [4, 3, 3, 3, 2, 1, 1],
+      15: [4, 3, 3, 3, 2, 1, 1, 1],
+      16: [4, 3, 3, 3, 2, 1, 1, 1],
+      17: [4, 3, 3, 3, 2, 1, 1, 1, 1],
+      18: [4, 3, 3, 3, 3, 1, 1, 1, 1],
+      19: [4, 3, 3, 3, 3, 2, 1, 1, 1],
+      20: [4, 3, 3, 3, 3, 2, 2, 1, 1],
+    };
+    const HALF: Record<number, number[]> = {
+      1: [],
+      2: [2],
+      3: [3],
+      4: [3],
+      5: [4, 2],
+      6: [4, 2],
+      7: [4, 3],
+      8: [4, 3],
+      9: [4, 3, 2],
+      10: [4, 3, 2],
+      11: [4, 3, 3],
+      12: [4, 3, 3],
+      13: [4, 3, 3, 1],
+      14: [4, 3, 3, 1],
+      15: [4, 3, 3, 2],
+      16: [4, 3, 3, 2],
+      17: [4, 3, 3, 3, 1],
+      18: [4, 3, 3, 3, 1],
+      19: [4, 3, 3, 3, 2],
+      20: [4, 3, 3, 3, 2],
+    };
+    // Pact magic : (slotLevel, count) approx
+    const WARLOCK: Record<number, { slotLevel: number; count: number }> = {
+      1: { slotLevel: 1, count: 1 },
+      2: { slotLevel: 1, count: 2 },
+      3: { slotLevel: 2, count: 2 },
+      4: { slotLevel: 2, count: 2 },
+      5: { slotLevel: 3, count: 2 },
+      6: { slotLevel: 3, count: 2 },
+      7: { slotLevel: 4, count: 2 },
+      8: { slotLevel: 4, count: 2 },
+      9: { slotLevel: 5, count: 2 },
+      10: { slotLevel: 5, count: 2 },
+      11: { slotLevel: 5, count: 3 },
+      12: { slotLevel: 5, count: 3 },
+      13: { slotLevel: 5, count: 3 },
+      14: { slotLevel: 5, count: 3 },
+      15: { slotLevel: 5, count: 3 },
+      16: { slotLevel: 5, count: 3 },
+      17: { slotLevel: 5, count: 4 },
+      18: { slotLevel: 5, count: 4 },
+      19: { slotLevel: 5, count: 4 },
+      20: { slotLevel: 5, count: 4 },
+    };
+
+    const fullKinds: SpellcastingKind[] = [
+      'wizard',
+      'sorcerer',
+      'bard',
+      'cleric',
+      'druid',
+    ];
+    const halfKinds: SpellcastingKind[] = [
+      'paladin',
+      'ranger',
+      'fighter_eldritch_knight',
+    ];
+
+    if (kind === 'warlock') {
+      const w = WARLOCK[lvl] ?? WARLOCK[1];
+      return [{ level: w.slotLevel, max: w.count }];
+    }
+
+    const table = fullKinds.includes(kind)
+      ? FULL
+      : halfKinds.includes(kind)
+        ? HALF
+        : FULL;
+    const counts = table[lvl] ?? [];
+    return counts
+      .map((max, i) => ({ level: i + 1, max }))
+      .filter((s) => s.max > 0);
   }
 
   private detectFocus(c: CharacterCreation): string | null {
@@ -1182,6 +1799,7 @@ export class CharacterBuilderService {
             name: string;
             level: number;
             prepared: boolean;
+            alwaysPrepared?: boolean;
             effectSummary?: string;
           }[];
         }
@@ -1203,34 +1821,68 @@ export class CharacterBuilderService {
           refId: s.refId,
           name: s.name,
           level: s.level,
-          prepared: true,
+          prepared: s.prepared ?? true,
+          alwaysPrepared: s.alwaysPrepared,
           effectSummary: s.effectSummary,
         });
     return result;
   }
 
-  private buildAttacks(equipment: EquipmentInstance[], modifiers: AbilityScores): Attack[] {
-    const profBonus = 2;
-    return equipment
-      .filter((eq) => (eq.customData as { isWeapon?: boolean })?.isWeapon === true)
+  private buildAttacks(
+    equipment: EquipmentInstance[],
+    modifiers: AbilityScores,
+    knownSpells: SpellInstance[] = [],
+    ctx: {
+      spellAbility?: Ability | null;
+      classId?: string | null;
+      classFeatures?: FeatureInstance[];
+      resources?: Record<string, number | string | null>;
+    } = {},
+  ): Attack[] {
+    const profBonus = this.proficiencyBonus();
+    const spellAbility = ctx.spellAbility ?? null;
+    const isMonk = ctx.classId === 'cls-moine';
+    const martialArtsDie =
+      typeof ctx.resources?.['martial_arts_die'] === 'string'
+        ? String(ctx.resources['martial_arts_die'])
+        : isMonk
+          ? '1d4'
+          : null;
+    const unarmored = this.isUnarmoredForMonk(equipment);
+    const canUseMartialArts = isMonk && unarmored && !!martialArtsDie;
+    const extraAttacks = Math.max(0, Number(ctx.resources?.['extra_attacks'] ?? 0) || 0);
+
+    const weaponAttacks = equipment
+      .filter(
+        (eq) =>
+          (eq.customData as { isWeapon?: boolean })?.isWeapon === true ||
+          (eq.refId ?? '').startsWith('wp-'),
+      )
       .map((eq) => {
-        const wd = eq.customData as {
-          damage: string;
-          damageType: string;
-          properties: string[];
-          subtype: string | null;
+        const wd = (eq.customData ?? {}) as {
+          damage?: string;
+          damageType?: string;
+          properties?: string[];
+          subtype?: string | null;
         };
-        const props = wd.properties.map((p) => p.toLowerCase());
+        const props = (wd.properties ?? []).map((p) => p.toLowerCase());
         const isRanged = props.some((p) => p.includes('projectile') || p.includes('lancer'));
         const isFinesse = props.some((p) => p.includes('finesse'));
+        const monkWeapon = canUseMartialArts && this.isMonkWeapon(eq, props, wd.subtype);
         let abilityMod = isRanged
           ? modifiers.dexterite
-          : isFinesse
+          : isFinesse || monkWeapon
             ? Math.max(modifiers.force, modifiers.dexterite)
             : modifiers.force;
         const attackBonus = abilityMod + profBonus;
         const dmgMod = abilityMod >= 0 ? `+${abilityMod}` : `${abilityMod}`;
-        const rangeProp = wd.properties.find(
+        let damageDie = wd.damage ?? '?';
+        if (monkWeapon && martialArtsDie && damageDie !== '?') {
+          damageDie = this.pickHigherDie(damageDie, martialArtsDie);
+        } else if (monkWeapon && martialArtsDie) {
+          damageDie = martialArtsDie;
+        }
+        const rangeProp = (wd.properties ?? []).find(
           (p) => p.toLowerCase().includes('projectile') || p.toLowerCase().includes('lancer'),
         );
         return {
@@ -1238,20 +1890,241 @@ export class CharacterBuilderService {
           source: 'weapon' as const,
           refId: eq.refId,
           attackBonus,
-          damage: `${wd.damage}${dmgMod}`,
-          damageType: wd.damageType,
+          damage: `${damageDie}${damageDie !== '?' ? dmgMod : ''}`,
+          damageType: wd.damageType ?? (monkWeapon ? 'contondant' : ''),
           range: isRanged ? (rangeProp ?? 'Distance') : 'Corps à corps',
-          properties: wd.properties,
+          properties: [
+            ...(wd.properties ?? []),
+            ...(extraAttacks > 0 && !isRanged
+              ? [`Attaques ×${1 + extraAttacks}`]
+              : extraAttacks > 0
+                ? [`Attaques ×${1 + extraAttacks}`]
+                : []),
+          ],
         };
       });
+
+    // Arts martiaux : attaque à mains nues
+    if (canUseMartialArts && martialArtsDie) {
+      const abilityMod = Math.max(modifiers.force, modifiers.dexterite);
+      const dmgMod = abilityMod >= 0 ? `+${abilityMod}` : `${abilityMod}`;
+      weaponAttacks.unshift({
+        name: 'Mains nues',
+        source: 'weapon' as const,
+        refId: 'atk-unarmed-monk',
+        attackBonus: abilityMod + profBonus,
+        damage: `${martialArtsDie}${dmgMod}`,
+        damageType: 'contondant',
+        range: 'Corps à corps',
+        properties: [
+          'Arts martiaux',
+          ...(extraAttacks > 0 ? [`Attaques ×${1 + extraAttacks}`] : []),
+        ],
+      });
+    }
+
+    // Cantrips / sorts d'attaque (ex. Flamme sacrée) si pas assez d'armes
+    const spellAttacks: Attack[] = [];
+    if (weaponAttacks.length < 5 && knownSpells.length > 0) {
+      const spellMod = spellAbility
+        ? modifiers[ABILITY_LABEL_TO_KEY[spellAbility]] ?? 0
+        : modifiers.sagesse;
+      const attackBonus = spellMod + profBonus;
+      for (const sp of knownSpells) {
+        if (spellAttacks.length + weaponAttacks.length >= 5) break;
+        if (sp.level > 0) continue; // cantrips prioritaires pour la section attaques
+        const summary = (sp.effectSummary ?? '').toLowerCase();
+        const name = sp.name.toLowerCase();
+        const looksOffensive =
+          /dégât|degat|attaque|rayon|flamme|bolt|projectile|blessure|missile/.test(
+            summary + ' ' + name,
+          );
+        if (!looksOffensive) continue;
+        spellAttacks.push({
+          name: sp.name,
+          source: 'spell',
+          refId: sp.refId,
+          attackBonus,
+          damage: 'sort',
+          damageType: '',
+          range: 'Sort',
+          properties: [],
+        });
+      }
+    }
+
+    return [...weaponAttacks, ...spellAttacks];
   }
 
-  private computeArmorClass(equipment: EquipmentInstance[], modifiers: AbilityScores): number {
-    return 10 + modifiers.dexterite;
+  /** Vitesse de marche : espèce + bonus moine sans armure (mètres). */
+  private computeWalkSpeed(
+    c: CharacterCreation,
+    equipment: EquipmentInstance[],
+  ): number {
+    let walk = c.speciesSpeed || 9;
+    const isMonk =
+      c.classId === 'cls-moine' ||
+      (c.classFeatures ?? []).some(
+        (f) =>
+          f.refId === 'feat-deplacement-sans-armure' ||
+          f.refId === 'feat-mouvement-sans-armure',
+      );
+    if (isMonk && this.isUnarmoredForMonk(equipment)) {
+      const bonus = Number(c.classProgressionResources?.['unarmored_movement_bonus_m'] ?? 0);
+      if (!Number.isNaN(bonus) && bonus > 0) walk += bonus;
+    }
+    return walk;
+  }
+
+  private isUnarmoredForMonk(equipment: EquipmentInstance[]): boolean {
+    const armor = equipment.find(
+      (e) =>
+        e.equipped &&
+        (e.customData as { isArmor?: boolean; isShield?: boolean })?.isArmor &&
+        !(e.customData as { isShield?: boolean })?.isShield,
+    );
+    const shield = equipment.find(
+      (e) => e.equipped && (e.customData as { isShield?: boolean })?.isShield,
+    );
+    return !armor && !shield;
+  }
+
+  private isMonkWeapon(
+    eq: EquipmentInstance,
+    props: string[],
+    subtype: string | null | undefined,
+  ): boolean {
+    const id = eq.refId ?? '';
+    if (id === 'wp-epee-courte' || id === 'wp-cimeterre') return true;
+    const sub = (subtype ?? '').toUpperCase();
+    const isSimpleMelee =
+      sub === 'SIMPLE_MELEE' ||
+      sub.includes('SIMPLE_MELEE') ||
+      (sub.includes('SIMPLE') && sub.includes('MELEE'));
+    if (!isSimpleMelee) return false;
+    const heavyOrTwoHanded = props.some(
+      (p) =>
+        p.includes('lourde') ||
+        p.includes('heavy') ||
+        p.includes('deux mains') ||
+        p.includes('two-handed') ||
+        p.includes('deux_mains'),
+    );
+    return !heavyOrTwoHanded;
+  }
+
+  /** Choisit le dé de dégâts le plus avantageux (ex. 1d6 > 1d4). */
+  private pickHigherDie(a: string, b: string): string {
+    const avg = (die: string): number => {
+      const m = die.match(/(\d*)d(\d+)/i);
+      if (!m) return 0;
+      const n = parseInt(m[1] || '1', 10);
+      const sides = parseInt(m[2], 10);
+      return n * ((sides + 1) / 2);
+    };
+    return avg(a) >= avg(b) ? a : b;
+  }
+
+  /**
+   * CA : armure équipée (avec plafond Dex) ou défense sans armure de classe,
+   * + bouclier si autorisé, + style Défense (+1 avec armure).
+   */
+  private computeArmorClass(
+    equipment: EquipmentInstance[],
+    modifiers: AbilityScores,
+    ctx?: {
+      classId?: string | null;
+      subclassId?: string | null;
+      classFeatures?: FeatureInstance[];
+    },
+  ): number {
+    const armor = equipment.find(
+      (e) =>
+        e.equipped &&
+        (e.customData as { isArmor?: boolean; isShield?: boolean })?.isArmor &&
+        !(e.customData as { isShield?: boolean })?.isShield,
+    );
+    const shield = equipment.find(
+      (e) => e.equipped && (e.customData as { isShield?: boolean })?.isShield,
+    );
+
+    const classId = ctx?.classId ?? null;
+    const subclassId = ctx?.subclassId ?? null;
+    const features = ctx?.classFeatures ?? [];
+    const featureIds = new Set(features.map((f) => f.refId));
+
+    const hasBarbarianUD =
+      classId === 'cls-barbare' || featureIds.has('feat-defense-sans-armure');
+    const hasMonkUD =
+      classId === 'cls-moine' || featureIds.has('feat-defense-sans-armure-moine');
+    const hasDraconicResilience =
+      subclassId === 'subcls-lignee-draconique' ||
+      featureIds.has('feat-resistance-draconique');
+    const hasDefenseStyle = features.some(
+      (f) =>
+        f.refId === 'style-defense' ||
+        f.refId === 'feat-style-defense' ||
+        f.refId === 'style-defense-rodeur' ||
+        /^style-defense/i.test(f.refId ?? '') ||
+        /Style\s*:\s*Défense/i.test(f.name ?? ''),
+    );
+
+    let ac: number;
+
+    if (armor) {
+      const data = armor.customData as {
+        ac?: number;
+        dexModifier?: { type?: string; max?: number } | string;
+        maxDexBonus?: number | null;
+      };
+      const base = data.ac ?? 10;
+      let dexBonus = modifiers.dexterite;
+      const dexMod = data.dexModifier;
+      const dexType = typeof dexMod === 'string' ? dexMod : dexMod?.type;
+
+      if (dexType === 'none') {
+        dexBonus = 0;
+      } else if (dexType === 'max' || data.maxDexBonus != null) {
+        const cap =
+          data.maxDexBonus ??
+          (typeof dexMod === 'object' ? dexMod?.max : undefined) ??
+          2;
+        dexBonus = Math.min(dexBonus, cap);
+      }
+      ac = base + dexBonus;
+
+      if (hasDefenseStyle) ac += 1;
+    } else {
+      // Défense sans armure / résilience
+      if (hasBarbarianUD) {
+        ac = 10 + modifiers.dexterite + modifiers.constitution;
+      } else if (hasMonkUD && !shield) {
+        // Moine : pas d'armure ni de bouclier
+        ac = 10 + modifiers.dexterite + modifiers.sagesse;
+      } else if (hasDraconicResilience) {
+        ac = 13 + modifiers.dexterite;
+      } else {
+        ac = 10 + modifiers.dexterite;
+      }
+    }
+
+    // Bouclier : OK pour barbare / draconique / armure ; interdit pour la DSA moine
+    if (shield) {
+      const monkBlocksShield = hasMonkUD && !armor;
+      if (!monkBlocksShield) {
+        const shieldAc = (shield.customData as { ac?: number })?.ac ?? 2;
+        ac += shieldAc;
+      }
+    }
+
+    return ac;
   }
 
   private findEquippedArmorName(equipment: EquipmentInstance[]): string {
-    return equipment.find((e) => e.equipped && e.location === 'equipped')?.name ?? 'Aucune';
+    return (
+      equipment.find((e) => e.equipped && (e.customData as { isArmor?: boolean })?.isArmor)?.name ??
+      'Aucune'
+    );
   }
 
   getModifier(score: number): number {
@@ -1272,10 +2145,35 @@ export class CharacterBuilderService {
 
   private loadFromStorage(): void {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      const stored =
+        localStorage.getItem(STORAGE_KEY) ??
+        localStorage.getItem('dragon_character_builder_v5') ??
+        localStorage.getItem('dragon_character_builder_v4');
       if (!stored) return;
       const parsed: StoredState = JSON.parse(stored);
-      if (parsed.character) this.creation.set(parsed.character as any);
+      if (parsed.character) {
+        const c = parsed.character as ExtendedCharacterCreation;
+        this.creation.set({
+          ...structuredClone(INITIAL_CREATION_STATE),
+          ...c,
+          targetLevel: Math.min(20, Math.max(1, c.targetLevel || 1)),
+          hpAtLevel1: c.hpAtLevel1 ?? 0,
+          hpPerLevelAverage: c.hpPerLevelAverage ?? 0,
+          classProgressionResources: c.classProgressionResources ?? {},
+          classChoiceAnswers: c.classChoiceAnswers ?? {},
+          asiBonuses: c.asiBonuses ?? {},
+          selectedFeatId: c.selectedFeatId ?? null,
+          selectedFeatIds: c.selectedFeatIds ?? (c.selectedFeatId ? [c.selectedFeatId] : []),
+          asiChoices: c.asiChoices ?? [],
+          expertiseSkills: c.expertiseSkills ?? [],
+          metamagicOptions: c.metamagicOptions ?? [],
+          eldritchInvocations: c.eldritchInvocations ?? [],
+          pactBoon: c.pactBoon ?? null,
+          mysticArcanumPicks: c.mysticArcanumPicks ?? {},
+          spellMasteryPicks: c.spellMasteryPicks ?? {},
+          signatureSpellIds: c.signatureSpellIds ?? [],
+        });
+      }
       if (parsed.step) this.currentStep.set(parsed.step);
       if (parsed.editing) this.editingRef.set(parsed.editing);
     } catch (e) {

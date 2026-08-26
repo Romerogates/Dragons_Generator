@@ -36,7 +36,7 @@
             [ngModel]="c().name"
             (ngModelChange)="updateIdentity('name', $event)"
             placeholder="Ex: Valerius l'Audacieux"
-            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-all"
+            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200"
           />
         </div>
         <div class="space-y-2">
@@ -46,7 +46,7 @@
           <select
             [ngModel]="c().sex"
             (ngModelChange)="updateIdentity('sex', $event)"
-            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-all cursor-pointer appearance-none"
+            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 cursor-pointer appearance-none"
           >
             <option value="X">Indéfini</option>
             <option value="M">Masculin</option>
@@ -61,7 +61,7 @@
           <select
             [ngModel]="c().alignment"
             (ngModelChange)="updateIdentity('alignment', $event)"
-            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-all cursor-pointer appearance-none"
+            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 cursor-pointer appearance-none"
           >
             <option value="" disabled selected>Choisir un alignement...</option>
             @for (align of alignments; track align) {
@@ -85,7 +85,7 @@
           (ngModelChange)="updateIdentity('description', $event)"
           rows="3"
           placeholder="Décrivez l'apparence de votre personnage (taille, yeux, signes distinctifs...)"
-          class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-4 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-all resize-none custom-scrollbar leading-relaxed"
+          class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-4 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 resize-none custom-scrollbar leading-relaxed"
         ></textarea>
       </div>
     </div>
@@ -106,7 +106,7 @@
             [ngModel]="c().traits"
             (ngModelChange)="updateIdentity('traits', $event)"
             rows="3"
-            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-all resize-none text-xs leading-relaxed"
+            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 resize-none text-xs leading-relaxed"
           ></textarea>
         </div>
 
@@ -118,7 +118,7 @@
             [ngModel]="c().ideal"
             (ngModelChange)="updateIdentity('ideal', $event)"
             rows="3"
-            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-all resize-none text-xs leading-relaxed"
+            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 resize-none text-xs leading-relaxed"
           ></textarea>
         </div>
 
@@ -130,7 +130,7 @@
             [ngModel]="c().bonds"
             (ngModelChange)="updateIdentity('bonds', $event)"
             rows="3"
-            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-all resize-none text-xs leading-relaxed"
+            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 resize-none text-xs leading-relaxed"
           ></textarea>
         </div>
 
@@ -142,7 +142,7 @@
             [ngModel]="c().flaws"
             (ngModelChange)="updateIdentity('flaws', $event)"
             rows="3"
-            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-all resize-none text-xs leading-relaxed"
+            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 resize-none text-xs leading-relaxed"
           ></textarea>
         </div>
       </div>
@@ -157,7 +157,7 @@
         </h4>
 
         <button
-          class="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-500 text-[10px] font-black uppercase tracking-widest hover:bg-amber-500/20 transition-all disabled:opacity-50"
+          class="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-500 text-[10px] font-black uppercase tracking-widest hover:bg-amber-500/20 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-50"
           (click)="generateStory()"
           [disabled]="isGenerating() || !c().name.trim()"
         >
@@ -187,7 +187,7 @@
             (ngModelChange)="updateIdentity('story', $event)"
             rows="8"
             placeholder="L'histoire de votre personnage... Laissez l'IA vous inspirer ou écrivez votre propre légende."
-            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-4 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-all resize-none custom-scrollbar leading-relaxed"
+            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-4 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 resize-none custom-scrollbar leading-relaxed"
           ></textarea>
         </div>
       </div>
@@ -205,25 +205,19 @@
         </div>
       }
 
-      <button
-        class="px-14 py-4 rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-lg"
-        [ngClass]="
-          c().name.trim()
-            ? 'bg-amber-500 text-slate-950 hover:bg-amber-400 hover:scale-105 shadow-[0_0_25px_rgba(245,158,11,0.3)]'
-            : 'bg-slate-800 text-slate-500 opacity-50 cursor-not-allowed'
-        "
-        [disabled]="!c().name.trim()"
-        (click)="confirm()"
-      >
-        Finaliser l'identité
-      </button>
-
-      <button
-        class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-400 transition-colors bg-[#1b2028] px-6 py-2 rounded-full border border-slate-700 mt-2"
-        (click)="prevStep()"
-      >
-        ← Étape précédente
-      </button>
+      <nav class="wizard-step-nav">
+        <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
+          ← Étape précédente
+        </button>
+        <button
+          type="button"
+          class="wizard-nav-primary"
+          [disabled]="!c().name.trim()"
+          (click)="confirm()"
+        >
+          Finaliser l'identité
+        </button>
+      </nav>
     </div>
   </div>
 </div>

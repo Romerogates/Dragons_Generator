@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-suggestion-de-groupe",
+  "name": "Suggestion de groupe",
+  "level": 6,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 24,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": "(une langue de serpent"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Suggestion de groupe icons Vous suggérez une ligne de conduite (limitée à une phrase ou deux) et influencez magiquement jusqu'à douze créatures de votre choix que vous voyez à portée et qui peuvent vous entendre et vous comprendre. Les créatures qui ne peuvent être charmées sont immunisées contre cet effet. La suggestion doit être formulée de sorte que cette ligne de conduite paraisse raisonnable. Demander à une créature de se poignarder, de se jeter sur une lance, de s'immoler par le feu ou de se mettre indubitablement en danger annule automatiquement l'effet de l'enchantement. Il en va de même si la suggestion s'oppose résolument aux valeurs morales d'une cible ou à ses intérêts. Chaque cible doit effectuer un JS Sagesse. En cas d'échec, elle adopte la ligne de conduite que vous lui avez précisée du mieux possible. Cette ligne de conduite peut valoir pour toute la durée du sort. Si l'activité suggérée peut être résolue en un temps plus court, le sort prend fin au moment où le sujet a fait ce qui lui a été demandé. Vous pouvez aussi spécifier des conditions qui provoqueront une réaction spéciale tant que le sort persiste. Par exemple, vous pouvez suggérer à un groupe de soldats de donner leur bourse au premier mendiant dont ils croisent le chemin. Si la condition n'est pas remplie avant la fin du sort, l'action n'est pas réalisée. Si vous ou un de vos compagnons blessez une cible de ce sort, l'effet prend fin la concernant.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau, la durée est de 10 jours. Quand vous jetez ce sort en utilisant un emplacement de sort du 8e niveau, la durée est de 30 jours. Quand vous jetez ce sort en utilisant un emplacement de sort du 9e niveau, la durée est de 1 an et 1 jour.",
+  "modular_options": []
+}

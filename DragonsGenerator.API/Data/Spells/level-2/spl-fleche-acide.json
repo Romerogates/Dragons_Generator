@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-fleche-acide",
+  "name": "Flèche acide",
+  "level": 2,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 27,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "de la poudre de feuille de rhubarbe et un estomac de vipère"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien"
+  ],
+  "description": "Photographie Une flèche verte et chatoyante file droit vers une cible située à portée avant d'éclater et de l'arroser d'acide. Effectuez une attaque de sort à distance. En cas de réussite, la cible subit immédiatement 4d4 dégâts d'acide, puis 2d4 dégâts d'acide à la fin de son tour de jeu suivant. En cas d'échec, la flèche l'asperge d'acide en ne lui infligeant que la moitié des dégâts initiaux et aucun dégât à la fin de son tour de jeu suivant.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, les dégâts - initiaux et ultérieurs - augmentent de 1d4 par niveau d'emplacement au-dessus du 2e.",
+  "modular_options": []
+}

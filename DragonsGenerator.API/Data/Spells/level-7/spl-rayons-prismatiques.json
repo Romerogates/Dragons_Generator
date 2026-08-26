@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-rayons-prismatiques",
+  "name": "Rayons prismatiques",
+  "level": 7,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "G uit rayons de lumière multicolores jaillissent de votre main. Chaque rayon a une couleur et un pouvoir différents. Toute créature prise dans un cône de 18 m doit effectuer un JS Dextérité. Pour chaque cible, lancez 1d8 pour déterminer la couleur du rayon qui l'affecte. 1. Rouge. La cible subit 10d6 dégâts de feu en cas d'échec, la moitié en cas de réussite. 2. Orange. La cible subit 10d6 dégâts d'acide en cas d'échec, la moitié en cas de réussite. 3. Jaune. La cible subit 10d6 dégâts de foudre en cas d'échec, la moitié en cas de réussite. 4. Vert. La cible subit 10d6 dégâts de poison en cas d'échec, la moitié en cas de réussite. 5. Bleu. La cible subit 10d6 dégâts de froid en cas d'échec, la moitié en cas de réussite. 6. Indigo. En cas d'échec, la cible est entravée. Ensuite, elle doit effectuer un JS Constitution à la fin de chacun de ses tours de jeu. Si elle en réussit trois, le sort prend fin. Si elle en rate trois, elle est à jamais pétrifiée. Les réussites et échecs ne doivent pas nécessairement être consécutifs. Notez-les jusqu'à ce que la cible en obtienne trois d'un type ou d'un autre. 7. Violet. En cas d'échec, la cible est aveuglée. Ensuite, elle doit effectuer un JS Sagesse au début de votre tour de jeu suivant. En cas de réussite, la cécité prend fin. En cas d'échec, la créature est transportée vers un autre plan d'existence au choix du meneur et n'est plus aveuglée. En règle générale, une créature est bannie vers son plan d'origine si elle ne s'y trouve pas déjà, vers le Plan Astral ou Éthéré dans le cas contraire. 8. Spécial. La cible est frappée par deux rayons. Relancez le dé deux fois, en relançant tout 8.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 8e niveau, les dégâts des rayons rouge, orange, jaune, vert et bleu augmentent de 2d6. En plus de ces dégâts accrus, quand vous jetez ce sort en utilisant un emplacement de sort du 9e niveau, la cible est frappée par deux rayons (trois si vous obtenez un 8 au d8).",
+  "modular_options": []
+}

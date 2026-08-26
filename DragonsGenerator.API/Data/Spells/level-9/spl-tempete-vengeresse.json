@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-tempete-vengeresse",
+  "name": "Tempête vengeresse",
+  "level": 9,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "vue",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide"
+  ],
+  "description": "N nuage noir se forme, centré sur un point que vous voyez, et grossit jusqu'à atteindre un rayon de 108 m. La zone est la proie d'éclairs, de coups de tonnerre et de vents mugissants. Toute créature située sous ce nuage (directement à la verticale et à moins de 1 500 m) au moment où il apparaît doit réussir un JS Constitution sous peine de subir 2d6 dégâts de tonnerre et d'être assourdie pendant 5 minutes. À chaque round où vous maintenez votre concentration sur ce sort, la tempête a des effets différents à votre tour de jeu. Round 2. Une pluie acide s'abat du nuage. Les créatures et objets qui se trouvent en dessous subissent 1d6 dégâts d'acide. Round 3. Six éclairs s'abattent sur six créatures ou objets de votre choix situés sous le nuage. Une cible donnée ne peut être frappée que par un seul éclair. Chacune doit effectuer un JS Dextérité et subit 10d6 dégâts de foudre en cas d'échec, la moitié en cas de réussite. Round 4. Une pluie de grêlons s'abat du nuage. Toute créature qui se trouve en dessous subit 2d6 dégâts contondants. Rounds 5-10. Une pluie glaciale accompagnée de bourrasques s'abat du nuage. La zone devient un terrain difficile et est grandement voilée. Toute créature qui s'y trouve subit 1d6 dégâts de froid. Les attaques d'arme à distance sont impossibles dans la zone. Le vent et la pluie gênent sérieusement la concentration des sorts. Enfin, les bourrasques de vent fort (30 à 75 km/h) dispersent brouillard, brumes et autres phénomènes similaires dans la zone, qu'ils soient de nature magique ou non.",
+  "modular_options": []
+}

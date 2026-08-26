@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-image-silencieuse",
+  "name": "Image silencieuse",
+  "level": 1,
+  "school": "illusion",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un peu de laine brute"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Vous créez l'image d'un objet, d'une créature ou de quelque autre phénomène visible pas plus grand qu'un cube de 4,50 m d'arête. Elle apparaît en un lieu situé à portée et persiste pour toute la durée du sort. L'image est purement visuelle, elle ne s'accompagne d'aucun son, odeur ou autre effet sensoriel. Au prix d'une action, vous pouvez déplacer l'image vers un endroit situé à portée. Quand elle se déplace, vous pouvez modifier son apparence pour que ses mouvements semblent naturels. Par exemple, si vous créez l'image d'une créature et la déplacez, vous pouvez la modifier pour qu'elle ait l'air de marcher. En cas d'interaction physique, l'illusion est dévoilée, tout simplement parce que les corps la traversent. Une créature qui examine l'image au prix d'une action comprendra qu'il s'agit d'une illusion en réussissant un test d'Intelligence (Investigation) assorti de votre DD de sauvegarde des sorts. Si une créature perce l'illusion, elle voit au travers.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, la durée augmente de 10 minutes par niveau d'emplacement au-dessus du 1er.",
+  "modular_options": []
+}

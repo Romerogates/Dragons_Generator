@@ -1,0 +1,39 @@
+{
+  "schema_version": "2.0",
+  "id": "don-doigts-de-fee",
+  "name": "Doigts de fée",
+  "requires_magic": false,
+  "category": "survival",
+  "prerequisites": [],
+  "ability_score_increase": {
+    "ability": "DEX",
+    "value": 1,
+    "max": 20
+  },
+  "description": "+1 Dextérité (max 20). +2 aux tests de Dextérité (Escamotage, crocheter une serrure, pièges, ligoter, et autres tâches manuelles non martiales).",
+  "benefits": [
+    {
+      "type": "ability_score_increase",
+      "ability": "DEX",
+      "value": 1
+    },
+    {
+      "type": "check_bonus",
+      "value": 2,
+      "skills": [
+        "Escamotage"
+      ],
+      "activities": [
+        "crocheter serrure",
+        "pièges",
+        "ligoter"
+      ]
+    }
+  ],
+  "repeatable": false,
+  "tags": [
+    "dextérité",
+    "escamotage",
+    "subtilité"
+  ]
+}

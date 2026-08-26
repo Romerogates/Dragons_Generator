@@ -10,4 +10,6 @@ RUN dotnet publish "DragonsGenerator.API.csproj" -c Release -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
+EXPOSE 8080
+ENV ASPNETCORE_HTTP_PORTS=8080
 ENTRYPOINT ["dotnet", "DragonsGenerator.API.dll"]

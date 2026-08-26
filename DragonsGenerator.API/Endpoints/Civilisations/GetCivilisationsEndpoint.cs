@@ -1,8 +1,15 @@
-﻿
+﻿using DragonsGenerator.API.Common;
+using DragonsGenerator.API.Models;
+using FastEndpoints;
+
 namespace DragonsGenerator.API.Endpoints.Civilisations;
 
 public class GetCivilisationsEndpoint : EndpointWithoutRequest<List<Civilisation>>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetCivilisationsEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/civilisations");
@@ -11,7 +18,7 @@ public class GetCivilisationsEndpoint : EndpointWithoutRequest<List<Civilisation
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var civilisations = await JsonDataLoader.LoadAsync<List<Civilisation>>("civilisations.json", ct);
-        await Send.OkAsync(civilisations ?? [], ct);
+        var civilisations = await _repo.GetCivilisationsAsync(ct);
+        await Send.OkAsync(civilisations, ct);
     }
 }

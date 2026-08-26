@@ -58,16 +58,16 @@
         @for (school of schools(); track school) {
           <a
             [routerLink]="['/spells/school', school]"
-            class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl group hover:border-fuchsia-500/50 hover:bg-[#1f242e] transition-all duration-300 hover:-translate-y-2 flex flex-col items-center text-center relative overflow-hidden"
+            class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl group hover:border-fuchsia-500/50 hover:bg-[#1f242e] transition-[colors,transform,opacity,box-shadow] duration-200 hover:-translate-y-2 flex flex-col items-center text-center relative overflow-hidden"
           >
             <div
-              class="absolute -top-4 -right-4 text-7xl opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-500"
+              class="absolute -top-4 -right-4 text-7xl opacity-5 pointer-events-none group-hover:scale-[1.01] transition-transform duration-500"
             >
               <iconify-icon [icon]="getSchoolIcon(school)"></iconify-icon>
             </div>
 
             <span
-              class="text-5xl mb-4 drop-shadow-[0_0_15px_rgba(217,70,239,0.2)] group-hover:scale-110 transition-transform origin-bottom relative z-10"
+              class="text-5xl mb-4 drop-shadow-sm group-hover:scale-[1.01] transition-transform origin-bottom relative z-10"
             >
               <iconify-icon [icon]="getSchoolIcon(school)"></iconify-icon>
             </span>

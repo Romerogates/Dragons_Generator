@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-songe",
+  "name": "Songe",
+  "level": 5,
+  "school": "illusion",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "speciale",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 8,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(une poignée de sable"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-magicien",
+    "cls-sorcier"
+  ],
+  "description": "Ce sort façonne les rêves d'une créature. Choisissez une créature que vous connaissez, qui devient la cible du sort. La cible doit se situer sur le même plan d'existence que vous. Les créatures qui ne dorment pas, comme les elfes, ne peuvent pas être contactées par ce sort. Vous - ou une créature consentante que vous touchez - entrez dans un état de transe et devenez le messager. Tant qu'il est en transe, le messager est conscient de son environnement, mais ne peut pas entreprendre d'actions ou se déplacer. Si la cible est endormie, le messager apparaît dans ses rêves et peut converser avec elle dans son sommeil pour toute la durée du sort. Le messager peut aussi façonner l'environnement du rêve, créer des paysages, objets et autres images. Il peut quitter la transe à tout moment, et ainsi mettre fin prématurément au sort. À son réveil, la cible se souvient parfaitement du rêve. Si elle est réveillée au moment de l'incantation, le messager le sait et peut mettre fin à la transe (et au sort) ou attendre qu'elle se rendorme, moment auquel il pourra lui apparaître en rêve.",
+  "modular_options": []
+}

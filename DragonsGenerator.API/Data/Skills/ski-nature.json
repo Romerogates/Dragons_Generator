@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "id": "ski-nature",
+  "name": "Nature",
+  "ability": "INT",
+  "description": "Vos tests d'Intelligence (Nature) éprouvent votre capacité à rassembler vos connaissances en matière d'environnement, de reliefs, de faune, de flore, de climat et de cycles naturels. La compétence Nature se distingue de la Survie par son aspect plus scientifique. Elle correspond en fait aux sciences naturelles et peut être utilisée pour ce qui a trait à l'astronomie (s'orienter avec les étoiles, prédire une éclipse…), géologie (évaluer le risque qu'un volcan entre en éruption…), météorologie (prévoir le temps qu'il fera demain, repérer les indices signalant l'approche d'une tempête…).",
+  "examples": [
+    "S'orienter avec les étoiles ou prédire une éclipse.",
+    "Évaluer le risque qu'un volcan entre en éruption.",
+    "Prévoir le temps qu'il fera ou repérer les indices d'approche d'une tempête."
+  ],
+  "passive_check": false,
+  "source": "livre_de_base"
+}

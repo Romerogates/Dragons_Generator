@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-sarcasmes-venimeux",
+  "name": "Sarcasmes venimeux",
+  "level": 0,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 18,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-ensorceleur"
+  ],
+  "description": "Vous crachez un flot d'insultes mêlé de subtils enchantements à l'adresse d'une créature que vous voyez à portée. Si la cible vous entend (il n'est pas nécessaire qu'elle vous comprenne), elle doit réussir un JS Sagesse sous peine de subir 1d4 dégâts psychiques et un désavantage au prochain jet d'attaque qu'elle effectuera avant la fin de son tour de jeu suivant. Les dégâts de ce sort augmentent de 1d4 quand vous atteignez le niveau 5 (2d4), le niveau 11 (3d4) et le niveau 17 (4d4).",
+  "modular_options": []
+}

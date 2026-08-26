@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "id": "wp-lance-darcon",
+  "name": "Lance d'arçon",
+  "category": "weapon",
+  "subcategory": "martial_melee",
+  "cost": {
+    "value": 10,
+    "unit": "po"
+  },
+  "weight_kg": 3,
+  "damage_dice": "1d12",
+  "damage_type": "perforant",
+  "properties": [
+    "prop-allonge",
+    "prop-speciale"
+  ],
+  "throw_range": null,
+  "ammo_range": null,
+  "description": "Désavantage contre cible à 1,50 m. Se manie à deux mains sauf si le porteur est sur une monture."
+}

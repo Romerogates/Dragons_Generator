@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-resurrection",
+  "name": "Résurrection",
+  "level": 7,
+  "school": "necromancie",
+  "casting_time": {
+    "value": 1,
+    "unit": "heure"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(un diamant d'une valeur minimale de 1 000 po"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-barde",
+    "cls-pretre"
+  ],
+  "description": "Logo, icon, stamp Icon Icon Vous rendez la vie à une créature morte que vous touchez, pourvu qu'elle ne soit morte ni de vieillesse ni depuis plus de cent ans. Si l'âme de la créature est libre et consentante, elle est ressuscitée avec tous ses points de vie. Ce sort neutralise aussi les poisons et soigne les maladies non magiques qui affectaient la cible au moment de sa mort. En revanche, il ne peut rien contre les malédictions, maladies magiques et autres effets similaires. S'ils ne sont pas éliminés avant l'incantation du sort, ils reprennent effet dès que la créature est ressuscitée. Ce sort ne permet pas de ressusciter un mort-vivant. Ce sort referme les blessures mortelles et fait repousser les parties de corps manquantes. Si la cible avait 6 niveaux de fatigue ou plus, elle revient à la vie avec 5 niveaux de fatigue. La résurrection est éprouvante. La cible subit un malus de −4 aux jets d'attaque, jets de sauvegarde et tests de caractéristique. Chaque fois que la cible termine un repos long, le malus est réduit de 1 jusqu'à ce qu'il disparaisse complètement. Lancer ce sort sur une créature qui est morte depuis plus d'un an est exténuant : vous ne pouvez plus lancer de sorts et subissez un désavantage aux jets d'attaque, tests de caractéristique et jets de sauvegarde jusqu'à ce que vous ayez terminé un repos long.",
+  "modular_options": []
+}

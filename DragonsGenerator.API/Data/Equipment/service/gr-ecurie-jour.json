@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-ecurie-jour",
+  "name": "Écurie (par jour)",
+  "category": "service",
+  "subcategory": null,
+  "cost": {
+    "value": 5,
+    "unit": "pa"
+  },
+  "weight_kg": null,
+  "description": "Prix journalier pour l'hébergement d'une monture à l'écurie."
+}

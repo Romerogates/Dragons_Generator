@@ -1,4 +1,7 @@
-﻿
+﻿using DragonsGenerator.API.Common;
+using DragonsGenerator.API.Models;
+using FastEndpoints;
+
 namespace DragonsGenerator.API.Endpoints.Spells;
 
 public class GetSpellsByLevelRequest
@@ -8,6 +11,10 @@ public class GetSpellsByLevelRequest
 
 public class GetSpellsByLevelEndpoint : Endpoint<GetSpellsByLevelRequest, List<Spell>>
 {
+    private readonly GameDataRepository _repo;
+
+    public GetSpellsByLevelEndpoint(GameDataRepository repo) => _repo = repo;
+
     public override void Configure()
     {
         Get("/spells/level/{level}");
@@ -16,12 +23,8 @@ public class GetSpellsByLevelEndpoint : Endpoint<GetSpellsByLevelRequest, List<S
 
     public override async Task HandleAsync(GetSpellsByLevelRequest req, CancellationToken ct)
     {
-        var spells = await JsonDataLoader.LoadAsync<List<Spell>>("spells.json", ct);
-
-        var filtered = spells?
-            .Where(s => s.Level == req.Level)
-            .ToList() ?? [];
-
+        var spells = await _repo.GetSpellsAsync(ct);
+        var filtered = spells.Where(s => s.Level == req.Level).ToList();
         await Send.OkAsync(filtered, ct);
     }
 }

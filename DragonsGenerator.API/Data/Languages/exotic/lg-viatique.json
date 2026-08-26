@@ -1,0 +1,19 @@
+{
+  "schema_version": "2.0",
+  "id": "lg-viatique",
+  "name": "Viatique",
+  "category": "exotique",
+  "typical_speakers": [
+    "Les Voyageurs (disparus)"
+  ],
+  "writing_systems": [
+    {
+      "id": "wr-hieroglyphes-celestes-draconiques",
+      "label": "Hiéroglyphes célestes et draconiques",
+      "type": "hieroglyphe"
+    }
+  ],
+  "is_oral_only": false,
+  "regions": [],
+  "description": "Langue ancienne des Voyageurs, désormais disparue : plus personne ne la parle nativement. Elle s'écrit en hiéroglyphes empruntés au céleste et au draconique. Les érudits qui la maîtrisent peuvent lire certains artefacts et textes d'un âge révolu."
+}

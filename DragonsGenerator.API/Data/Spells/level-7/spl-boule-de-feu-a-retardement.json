@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-boule-de-feu-a-retardement",
+  "name": "Boule de feu à retardement",
+  "level": 7,
+  "school": "evocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 45,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une minuscule boule de fiente de chauve-souris et de soufre"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "N rai jaune jaillit de votre doigt tendu et forme une bille luisante au point choisi à portée pour toute la durée du sort. Quand le sort prend fin, que votre concentration ait été interrompue ou que vous ayez décidé d'y mettre un terme, la bille produit une explosion enflammée qui contourne les coins. Chaque créature prise dans une sphère de 6 m de rayon centrée sur ce point doit effectuer un JS Dextérité et subit des dégâts de feu égaux aux dégâts accumulés en cas d'échec, la moitié en cas de réussite. Les dégâts de base du sort s'élèvent à 12d6, auxquels il faut ajouter 1d6 à la fin de chacun de vos tours, jusqu'à ce que la bille explose. Si une créature touche la bille avant que le sort n'ait pris fin, elle doit réussir un JS Dextérité. En cas d'échec, le sort prend aussitôt fin et la bille explose. En cas de réussite la créature peut lancer la bille jusqu'à 12 m. Si elle frappe une créature ou un objet, le sort prend fin et elle explose. Le feu endommage les objets situés dans la zone et embrase les objets inflammables qui ne sont ni portés ni transportés.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 8e niveau ou supérieur, les dégâts de base augmentent de 1d6 par niveau de sort au-dessus du 7e.",
+  "modular_options": []
+}

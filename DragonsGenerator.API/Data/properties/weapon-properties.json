@@ -1,0 +1,114 @@
+{
+  "schema_version": "2.0",
+  "description": "Définition de toutes les propriétés d'armes référencées dans les fichiers d'armes.",
+  "properties": [
+    {
+      "id": "prop-allonge",
+      "name": "Allonge",
+      "description": "Cette arme ajoute 1,50 m à votre allonge lorsque vous vous en servez pour porter une attaque, y compris une attaque d'opportunité."
+    },
+    {
+      "id": "prop-deux-mains",
+      "name": "Deux mains",
+      "description": "Cette arme se manie à deux mains pour effectuer une attaque."
+    },
+    {
+      "id": "prop-finesse",
+      "name": "Finesse",
+      "description": "Vous choisissez entre votre modificateur de Force et celui de Dextérité pour les jets d'attaque et de dégâts (le même modificateur pour les deux)."
+    },
+    {
+      "id": "prop-fragile",
+      "name": "Fragile",
+      "description": "L'arme peut se briser lors d'une attaque (résultat de 1 sur le d20 ou sur le dé de dégâts). Un test d'Intelligence (nécessaire de forgeron) DD 13 permet de détecter la fragilité."
+    },
+    {
+      "id": "prop-lancer-6-18",
+      "name": "Lancer (6/18 m)",
+      "description": "Vous pouvez lancer cette arme pour effectuer une attaque à distance. Portée normale : 6 m. Portée étendue : 18 m.",
+      "range_normal_m": 6,
+      "range_long_m": 18
+    },
+    {
+      "id": "prop-lancer-9-36",
+      "name": "Lancer (9/36 m)",
+      "description": "Vous pouvez lancer cette arme pour effectuer une attaque à distance. Portée normale : 9 m. Portée étendue : 36 m.",
+      "range_normal_m": 9,
+      "range_long_m": 36
+    },
+    {
+      "id": "prop-lancer-1-50-4-50",
+      "name": "Lancer (1,50/4,50 m)",
+      "description": "Vous pouvez lancer cette arme pour effectuer une attaque à distance. Portée normale : 1,50 m. Portée étendue : 4,50 m.",
+      "range_normal_m": 1.5,
+      "range_long_m": 4.5
+    },
+    {
+      "id": "prop-legere",
+      "name": "Légère",
+      "description": "Cette arme est petite et facile à tenir en main, idéale pour le combat à deux armes."
+    },
+    {
+      "id": "prop-lourde",
+      "name": "Lourde",
+      "description": "Les créatures de taille P subissent un désavantage aux jets d'attaque avec cette arme."
+    },
+    {
+      "id": "prop-polyvalente-1d8",
+      "name": "Polyvalente (1d8)",
+      "description": "Cette arme peut s'utiliser à une main (dégâts normaux) ou à deux mains (1d8 dégâts).",
+      "two_handed_dice": "1d8"
+    },
+    {
+      "id": "prop-polyvalente-1d10",
+      "name": "Polyvalente (1d10)",
+      "description": "Cette arme peut s'utiliser à une main (dégâts normaux) ou à deux mains (1d10 dégâts).",
+      "two_handed_dice": "1d10"
+    },
+    {
+      "id": "prop-projectiles-9-36",
+      "name": "Projectiles (9/36 m)",
+      "description": "Arme à projectiles. Portée normale : 9 m. Portée étendue : 36 m. Nécessite des projectiles adaptés.",
+      "range_normal_m": 9,
+      "range_long_m": 36
+    },
+    {
+      "id": "prop-projectiles-24-96",
+      "name": "Projectiles (24/96 m)",
+      "description": "Arme à projectiles. Portée normale : 24 m. Portée étendue : 96 m.",
+      "range_normal_m": 24,
+      "range_long_m": 96
+    },
+    {
+      "id": "prop-projectiles-30-120",
+      "name": "Projectiles (30/120 m)",
+      "description": "Arme à projectiles. Portée normale : 30 m. Portée étendue : 120 m.",
+      "range_normal_m": 30,
+      "range_long_m": 120
+    },
+    {
+      "id": "prop-projectiles-45-180",
+      "name": "Projectiles (45/180 m)",
+      "description": "Arme à projectiles. Portée normale : 45 m. Portée étendue : 180 m.",
+      "range_normal_m": 45,
+      "range_long_m": 180
+    },
+    {
+      "id": "prop-projectiles-7-50-30",
+      "name": "Projectiles (7,50/30 m)",
+      "description": "Arme à projectiles. Portée normale : 7,50 m. Portée étendue : 30 m.",
+      "range_normal_m": 7.5,
+      "range_long_m": 30
+    },
+    {
+      "id": "prop-rechargement",
+      "name": "Rechargement",
+      "description": "Le rechargement prend du temps : vous ne pouvez tirer qu'un seul projectile par action, action bonus ou réaction, quel que soit le nombre d'attaques."
+    },
+    {
+      "id": "prop-speciale",
+      "name": "Spéciale",
+      "description": "Cette arme a des règles spéciales détaillées dans sa description."
+    }
+  ]
+}

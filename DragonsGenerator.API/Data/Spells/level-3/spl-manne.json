@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-manne",
+  "name": "Manne",
+  "level": 3,
+  "school": "invocation",
+  "casting_time": {
+    "value": 10,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-paladin",
+    "cls-pretre"
+  ],
+  "description": "Vous créez 22,5 kg de nourriture et 120 litres d'eau sur le sol ou dans des récipients situés à portée, de quoi sustenter jusqu'à quinze humanoïdes ou cinq montures pendant 24 heures. La nourriture est insipide, mais nourrissante, et se gâte si elle n'est pas consommée sous 24 heures. L'eau est potable et ne croupit pas. ## Provenance de la nourriture Le sort agrège et modifie des substances organiques élémentaires et aisément accessibles dans un rayon de 10 km : miettes, déchets alimentaires, poussière, fragments d'insectes morts, épluchures, etc. La nourriture prend la forme de galettes sèches et friables, dans des tons gris-brun ternes. L'eau est également puisée dans l'environnement : rosée, humidité atmosphérique, cours d'eau, mer, etc. Elle a la même pureté insipide que de l'eau distillée. Mélanger l'eau et les galettes permet d'obtenir une bouillie sans grande saveur. Le fonctionnement de ce sort le rend sujet à certains inconvénients et aléas : Dans un désert aride, l'eau, même dans un rayon étendu, est rare. Or, manne ne vous permet pas de fabriquer de l'eau, seulement de la porter jusqu'à vous. En d'autres termes, vous pourriez fort bien n'obtenir que quelques litres. La magie puise sans discernement dans ce qu'elle trouve, et peut donc avoir pour effet de dérober l'eau des réserves d'individus situés dans le rayon d'action du sort. Vitamines et minéraux manquent fréquemment dans la nourriture créée. Il y a donc un risque de carence si ce régime est utilisé trop durablement. À partir d'une semaine passée à vous nourrir exclusivement à l'aide de manne, votre peau devient malsaine, votre teint cireux, vos cheveux cassants, etc. et vous souffrez d'un désavantage aux JS contre la maladie et la fatigue. Les animaux renâclent généralement à se nourrir du produit d'une manne.",
+  "modular_options": []
+}

@@ -1,0 +1,34 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-flammes",
+  "name": "Flammes",
+  "level": 0,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide"
+  ],
+  "description": "Une flamme vacillante apparaît dans votre main. Elle y reste pour toute la durée du sort sans vous blesser ni endommager votre équipement. Elle produit une lumière vive dans un rayon de 3 m et une lumière faible sur 3 m de plus. Le sort prend fin si vous le révoquez au prix d'une action ou si vous le relancez. Vous pouvez aussi attaquer avec la flamme, mais cela met fin au sort. Au moment de l'incantation, ou au prix d'une action lors d'un tour de jeu ultérieur, vous pouvez la jeter sur une créature située dans un rayon de 9 m de vous. Effectuez une attaque de sort à distance. En cas de réussite, la cible subit 1d8 dégâts de feu. Les dégâts de ce sort augmentent de 1d8 quand vous atteignez le niveau 5 (2d8), le niveau 11 (3d8) et le niveau 17 (4d8).",
+  "modular_options": []
+}

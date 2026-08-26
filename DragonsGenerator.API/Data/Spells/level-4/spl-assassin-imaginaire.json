@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-assassin-imaginaire",
+  "name": "Assassin imaginaire",
+  "level": 4,
+  "school": "illusion",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-magicien"
+  ],
+  "description": "Vous vous inspirez des cauchemars d'une créature que vous voyez à portée et créez une manifestation illusoire de ses pires terreurs, qu'elle est seule à voir. La cible doit effectuer un JS Sagesse. En cas d'échec, elle est effrayée pour toute la durée du sort. À la fin de chacun de ses tours de jeu, tant que le sort persiste, la cible doit réussir un JS Sagesse sous peine de subir 4d10 dégâts psychiques. En cas de réussite, le sort prend fin.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, les dégâts augmentent de 1d10 par niveau d'emplacement au-dessus du 4e.",
+  "modular_options": []
+}

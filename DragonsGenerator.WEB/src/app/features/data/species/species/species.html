@@ -37,10 +37,10 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
         @for (sp of species(); track sp.id) {
           <article
-            class="bg-[#1b2028] rounded-2xl border border-slate-800 shadow-xl group hover:border-amber-500/50 transition-all duration-300 hover:-translate-y-1 flex flex-col overflow-hidden relative"
+            class="bg-[#1b2028] rounded-2xl border border-slate-800 shadow-xl group hover:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 hover:-translate-y-1 flex flex-col overflow-hidden relative"
           >
             <div
-              class="absolute -top-6 -right-6 text-8xl opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-500"
+              class="absolute -top-6 -right-6 text-8xl opacity-5 pointer-events-none group-hover:scale-[1.01] transition-transform duration-500"
             >
               <iconify-icon icon="fluent-emoji:dna"></iconify-icon>
             </div>
@@ -150,7 +150,7 @@
                 </p>
                 <a
                   [routerLink]="['/species', sp.id]"
-                  class="text-xs font-black uppercase tracking-widest text-amber-500 hover:text-amber-400 group-hover:translate-x-1 transition-all flex items-center gap-1"
+                  class="text-xs font-black uppercase tracking-widest text-amber-500 hover:text-amber-400 group-hover:translate-x-1 transition-[colors,transform,opacity,box-shadow] duration-200 flex items-center gap-1"
                 >
                   Explorer <span class="text-lg leading-none">→</span>
                 </a>

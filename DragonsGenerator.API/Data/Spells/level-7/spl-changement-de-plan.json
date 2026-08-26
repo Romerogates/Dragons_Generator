@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-changement-de-plan",
+  "name": "Changement de plan",
+  "level": 7,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(la clef du plan de destination"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien",
+    "cls-pretre",
+    "cls-sorcier"
+  ],
+  "description": "Lettre ornée D Vous et jusqu'à huit créatures consentantes qui vous tenez en cercle par la main êtes transportés vers une destination parmi : le Plan Éthéré, le Plan Astral, la Fournaise, Mélancolia, Gémonies, la Lune Éternité, une contrée enchantée. Vous pouvez désigner la cible en termes généraux, comme par exemple « le seuil du domaine du prince démon Liridem l'amer », auquel cas vous apparaissez aussi près qu'il est possible, à la discrétion du meneur. Les puissants munissent fréquemment leurs domaines de protections magiques, empêchant autrui de les scruter par divination tout autant que s'y téléporter directement, hors cercle de téléportation solidement protégé. Il ne sera alors possible d'accéder qu'aux frontières extérieures du domaine vers lequel vous vous dirigez. Par ailleurs, si vous connaissez la séquence de sceaux d'un cercle de téléportation situé sur un autre plan d'existence, ce sort peut vous y conduire. Si le cercle de téléportation est trop petit pour accueillir toutes les créatures que vous transportez, elles apparaissent dans les espaces inoccupés les plus proches du cercle. Vous pouvez également utiliser ce sort pour bannir une créature non consentante vers un autre plan. Choisissez une créature située à portée d'allonge et effectuez une attaque de sort au corps à corps contre elle. Si l'attaque touche, la créature doit effectuer un JS Charisme. En cas d'échec, elle est transportée vers un lieu aléatoire sur le plan d'existence que vous avez spécifié. Une créature ainsi transportée doit trouver elle-même le moyen de regagner votre plan d'existence actuel.",
+  "modular_options": []
+}

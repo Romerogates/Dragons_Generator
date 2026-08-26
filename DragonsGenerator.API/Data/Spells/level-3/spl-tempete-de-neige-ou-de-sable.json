@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-tempete-de-neige-ou-de-sable",
+  "name": "Tempête de neige ou de sable",
+  "level": 3,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 45,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "(une pincée de poussière et quelques gouttes d'eau"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-ensorceleur",
+    "cls-magicien"
+  ],
+  "description": "Au moment de lancer le sort, le choix de la composante matérielle permet de déclencher une tempête de neige, une pluie de mousson ou une tempête de sable. L'aspect du sort diffère, mais ses effets sont semblables. Tant que le sort persiste, une averse de neige fondue - ou un tourbillon de sable ou une trombe d'eau - s'abat dans un cylindre de 6 m de haut et de 12 m de rayon centré sur un point que vous choisissez à portée. La zone est grandement voilée et les flammes exposées y sont éteintes. Le sol de la zone se couvre d'une couche de glace - ou d'un sable mouvant dans le cas d'une tempête de sable, ou d'un bourbier marécageux dans le cas d'une pluie de mousson - ce qui en fait un terrain difficile. Quand une créature entre dans la zone du sort pour la première fois d'un tour de jeu ou y commence son tour de jeu, elle doit effectuer un JS Dextérité. En cas d'échec, elle se retrouve à terre. Une créature qui commence son tour de jeu dans la zone du sort et se concentre sur un sort doit réussir un JS Constitution assorti de votre DD de sauvegarde des sorts sous peine de perdre sa concentration. ## Les tempêtes selon les latitudes Les lanceurs de sorts des régions tropicales, qui n'ont jamais vu de neige de leur vie, seraient bien en peine de concevoir un sort qui fait appel à cette condition météorologique. Il en va de même chez les habitants des royaumes des Sables où, de surcroît, l'eau manque. Si votre meneur utilise cette règle optionnelle, un lanceur de sorts ne peut générer qu'une tempête cohérente avec l'environnement : Sec : tempête de sable (composante M : poignée de sable ou de poussière). Froid et humide : tempête de neige (composante M : une pincée de poussière et quelques gouttes d'eau). Chaud et humide : pluie de mousson (composante M : poignée de boue ou d'argile détrempée). Dans tous les cas, les effets sont les mêmes : le terrain devient difficile avec des risques de chute, la visibilité est mauvaise et les flammes sont éteintes. ## Aveuglé par la tempête Pluie battante, neige fondue et sable cinglant ont en commun de pouvoir aveugler quelques instants. Si votre meneur utilise cette option, quand une créature entre dans la zone du sort pour la première fois d'un tour de jeu ou y commence son tour de jeu, elle doit effectuer un JS Constitution en plus du JS Dextérité. En cas d'échec, elle est aveuglée jusqu'au début de son tour suivant. ## Terrain dévasté Une fois que le sort s'achève, l'environnement peut avoir subi des dégâts : plantes mortes d'un coup de gel, ensablement, inondation… Le lanceur de sorts n'a aucun contrôle sur les conséquences, plus ou moins problématiques selon les lieux, de sa magie. Par ailleurs, de telles traces constitueront une marque évidente de son passage.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, chaque niveau d'emplacement au-dessus du 3e augmente la durée de 1 minute, la hauteur de la zone d'effet de 1,50 m et son rayon de 3 m.",
+  "modular_options": []
+}

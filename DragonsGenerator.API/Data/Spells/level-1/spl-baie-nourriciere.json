@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-baie-nourriciere",
+  "name": "Baie nourricière",
+  "level": 1,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "un brin d'une plante produisant des baies"
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-rodeur"
+  ],
+  "description": "Jusqu'à dix baies imprégnées de magie apparaissent sur le brin de plante que vous tenez dans votre main. Une créature peut en manger une au prix d'une action, ce qui lui permet de récupérer 1 point de vie et la nourrit pour une journée. La baie ne désaltère cependant pas suffisamment pour remplacer la nécessité de boire. Les baies qui ne sont pas consommées dans les 24 heures suivant l'incantation perdent leurs propriétés. Romero (Order #44468918)",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, vous créez cinq baies de plus par niveau d'emplacement au-dessus du 1ᵉʳ.",
+  "modular_options": []
+}

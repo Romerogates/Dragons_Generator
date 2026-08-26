@@ -1,0 +1,38 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-aura-de-confiance",
+  "name": "Aura de confiance",
+  "level": 3,
+  "school": "abjuration",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "personnelle",
+    "distance_m": null,
+    "area": {
+      "shape": "rayon",
+      "radius_m": 9
+    }
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": false,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-paladin"
+  ],
+  "description": "Une énergie de détermination émane de vous dans un rayon de 9 m. L'aura se déplace avec vous tant que le sort persiste, et vous en restez le centre. Toute créature qui ne vous est pas hostile comprise dans l'aura (y compris vous) est immunisée contre les états préjudiciables charmé et effrayé, et gagne un nombre de points de vie temporaires égal à votre modificateur de caractéristique magique au début de chacun de ses tours de jeu. De plus, chaque fois qu'elle tente un test de caractéristique et obtient un résultat inférieur à 10 sur le dé, elle peut décider qu'elle a en réalité obtenu 10.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, la valeur minimale des tests de caractéristique augmente de 1 par niveau d'emplacement au-dessus du 3e.",
+  "modular_options": []
+}
