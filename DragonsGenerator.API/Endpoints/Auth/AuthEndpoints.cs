@@ -375,11 +375,12 @@ public class ResetPasswordEndpoint(AppDbContext db) : Endpoint<ResetPasswordRequ
             return;
         }
 
-        var user = await db.Users.FirstOrDefaultAsync(
-            u => u.PasswordResetToken == req.Token && u.PasswordResetExpires > DateTimeOffset.UtcNow,
-            ct
-        );
-        if (user is null)
+        var token = (req.Token ?? "").Trim();
+        if (token.Contains(' '))
+            token = token.Replace(' ', '+');
+
+        var user = await db.Users.FirstOrDefaultAsync(u => u.PasswordResetToken == token, ct);
+        if (user is null || user.PasswordResetExpires is null || user.PasswordResetExpires <= DateTimeOffset.UtcNow)
         {
             AddError("Lien invalide ou expiré.");
             await Send.ErrorsAsync(cancellation: ct);
