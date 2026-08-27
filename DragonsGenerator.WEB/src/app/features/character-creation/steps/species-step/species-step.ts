@@ -5,6 +5,7 @@ import {
   OnInit,
   afterNextRender,
   inject,
+  Injector,
   signal,
   computed,
   viewChild,
@@ -19,6 +20,7 @@ import { DataService } from '@core/services/data.service';
 import {
   CharacterBuilderService,
   SpeciesSelection,
+  RacialSpellGrant,
 } from '@core/services/character-builder.service';
 import type { Species, Subspecies, Trait, CreationChoice } from '@core/models/Species/species';
 import type { FeatureInstance, Size } from '@core/models/Character/character';
@@ -61,6 +63,7 @@ interface ChoiceOptionView {
 })
 export class SpeciesStep implements OnInit {
   private dataService = inject(DataService);
+  private readonly injector = inject(Injector);
   readonly builder = inject(CharacterBuilderService);
 
   private readonly carouselViewport = viewChild<ElementRef<HTMLElement>>('carouselViewport');
@@ -77,10 +80,6 @@ export class SpeciesStep implements OnInit {
 
   // --- CARROUSEL ---
   readonly currentIndex = signal(0);
-
-  constructor() {
-    afterNextRender(() => this.scrollToIndex(this.currentIndex(), 'instant'));
-  }
 
   readonly normalizedIndex = computed(() => {
     const total = this.currentCards().length;
@@ -412,7 +411,7 @@ export class SpeciesStep implements OnInit {
 
         this.restoreFromBuilder();
         this.loading.set(false);
-        queueMicrotask(() => this.scrollToIndex(this.currentIndex(), 'instant'));
+        this.scheduleCarouselRestore();
       },
       error: () => {
         this.error.set('Impossible de charger les données.');
@@ -431,12 +430,51 @@ export class SpeciesStep implements OnInit {
     const saved = current.speciesChoiceAnswers ?? {};
     const map = new Map<string, string[]>();
     for (const [k, v] of Object.entries(saved)) {
-      if (Array.isArray(v) && v.length > 0) map.set(k, v);
+      if (!Array.isArray(v) || v.length === 0) continue;
+      const choice = this.findCreationChoice(k);
+      if (choice && this.isDeferredSpellChoice(choice)) continue;
+      map.set(k, v);
     }
     this.choiceAnswers.set(map);
+  }
 
-    const idx = this.allSpecies().findIndex((s) => s.id === current.speciesId);
+  /** Repositionne le carrousel sur l'élément déjà sélectionné (retour arrière). */
+  private scheduleCarouselRestore(): void {
+    this.syncCarouselIndexFromSelection();
+    afterNextRender(
+      () => this.scrollToIndex(this.normalizedIndex(), 'instant'),
+      { injector: this.injector },
+    );
+  }
+
+  private syncCarouselIndexFromSelection(): void {
+    const cards = this.currentCards();
+    if (!cards.length) return;
+    const targetId = this.resolveCarouselTargetId();
+    if (!targetId) return;
+    const idx = cards.findIndex((c) => c.id === targetId);
     if (idx >= 0) this.currentIndex.set(idx);
+  }
+
+  private resolveCarouselTargetId(): string | null {
+    switch (this.currentPhase()) {
+      case 'species':
+        return this.selectedSpeciesId();
+      case 'subspecies':
+        return this.selectedSubspeciesId() ?? this.selectedSpeciesId();
+      case 'choice': {
+        const choice = this.nextUnresolvedChoice() ?? this.lastActionableChoice();
+        if (!choice) return null;
+        const picks = this.choiceAnswers().get(choice.id);
+        return picks?.[picks.length - 1] ?? null;
+      }
+      default:
+        return this.selectedSpeciesId();
+    }
+  }
+
+  private findCreationChoice(id: string): CreationChoice | undefined {
+    return this.allCreationChoices().find((c) => c.id === id);
   }
 
   // --- MÉTHODES CARROUSEL (scroll-snap centré) ---
@@ -673,6 +711,7 @@ export class SpeciesStep implements OnInit {
       hasDarkvision: (species.baseStats.darkvisionM ?? 0) > 0,
       darkvisionRadius: species.baseStats.darkvisionM ?? 0,
       choiceAnswers,
+      racialSpellGrants: this.extractRacialSpellGrants(),
     };
 
     this.builder.setSpecies(selection);
@@ -753,11 +792,30 @@ export class SpeciesStep implements OnInit {
     if (this.isOpenLanguageChoice(choice)) return false;
     if (this.isDeferredSkillChoice(choice)) return false;
     if (this.isDeferredToolChoice(choice)) return false;
+    if (this.isDeferredSpellChoice(choice)) return false;
     const opts = this.rawChoiceOptions(choice);
     if (opts.length === 0) return false;
     // Pool "any" seul → rien à afficher en cartes
     if (opts.every((o) => o === 'any')) return false;
     return true;
+  }
+
+  /** Sorts raciaux (ex. sort mineur de magicien) → étape Magie. */
+  private isDeferredSpellChoice(choice: CreationChoice): boolean {
+    return choice.type === 'spell' || choice.type === 'cantrip';
+  }
+
+  private extractRacialSpellGrants(): RacialSpellGrant[] {
+    return this.allCreationChoices()
+      .filter((c) => this.isDeferredSpellChoice(c))
+      .map((c) => ({
+        choiceId: c.id,
+        label: c.name,
+        desc: c.desc,
+        pool: this.rawChoiceOptions(c).filter((o): o is string => typeof o === 'string'),
+        spellLevel: c.spellLevel ?? 0,
+        spellcastingAbility: c.spellcastingAbility ?? 'int',
+      }));
   }
 
   /** Dernier choix carte (pour garder l'UI pendant holdPhase). */
@@ -831,7 +889,8 @@ export class SpeciesStep implements OnInit {
       (c) =>
         this.isDeferredSkillChoice(c) ||
         this.isDeferredToolChoice(c) ||
-        this.isOpenLanguageChoice(c),
+        this.isOpenLanguageChoice(c) ||
+        this.isDeferredSpellChoice(c),
     );
     if (deferred.length) {
       parts.push(

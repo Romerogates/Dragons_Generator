@@ -182,6 +182,8 @@ export class MagicStep implements OnInit {
 
   readonly selectedCantrips = signal<Set<string>>(new Set());
   readonly selectedSpells = signal<Set<string>>(new Set());
+  /** Sorts raciaux (espèce) : choiceId → spellId */
+  readonly racialCantripPicks = signal<Record<string, string>>({});
   /** Arcanes sorcier : niveau de sort → id sort */
   readonly arcanumPicks = signal<Record<number, string>>({});
   readonly expandedArcanumLevel = signal<number | null>(null);
@@ -212,6 +214,17 @@ export class MagicStep implements OnInit {
 
   readonly spellcastingKind = computed<SpellcastingKind | null>(
     () => this.builder.creation().spellcastingKind,
+  );
+
+  readonly racialSpellGrants = computed(() => this.builder.creation().racialSpellGrants ?? []);
+
+  readonly hasClassSpellcasting = computed(() => this.builder.creation().hasSpellcasting);
+
+  readonly racialSpellsComplete = computed(() =>
+    this.racialSpellGrants().every((g) => {
+      const pick = this.racialCantripPicks()[g.choiceId];
+      return !!pick && pick !== 'any_wizard_cantrip';
+    }),
   );
 
   readonly isCleric = computed(() => this.spellcastingKind() === 'cleric');
@@ -398,6 +411,43 @@ export class MagicStep implements OnInit {
   /** Cantrips disponibles (level 0) pour la classe. */
   readonly availableCantrips = computed(() => this.spellsForClass(0));
 
+  /** Sorts mineurs de magicien pour les octrois raciaux (ex. Elfe). */
+  availableRacialCantrips(grant: { pool: string[]; spellLevel?: number }): Spell[] {
+    const level = grant.spellLevel ?? 0;
+    const pool = grant.pool ?? [];
+    return this.allSpells()
+      .filter((s) => s.level === level)
+      .filter((s) => {
+        if (pool.includes('any_wizard_cantrip')) {
+          return s.classes?.includes('cls-magicien') ?? false;
+        }
+        return pool.includes(s.id);
+      })
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  pickRacialCantrip(choiceId: string, spellId: string): void {
+    this.racialCantripPicks.update((m) => {
+      const next = { ...m };
+      if (next[choiceId] === spellId) delete next[choiceId];
+      else next[choiceId] = spellId;
+      return next;
+    });
+  }
+
+  isRacialCantripSelected(choiceId: string, spellId: string): boolean {
+    return this.racialCantripPicks()[choiceId] === spellId;
+  }
+
+  racialAbilityLabel(code: string): string {
+    const map: Record<string, string> = {
+      int: 'Intelligence',
+      wis: 'Sagesse',
+      cha: 'Charisme',
+    };
+    return map[code.toLowerCase()] ?? code;
+  }
+
   /** Niveaux de sorts préparables / connus (1 → max). */
   readonly spellLevels = computed(() => {
     const max = this.maxSpellLevel();
@@ -455,6 +505,8 @@ export class MagicStep implements OnInit {
   });
 
   readonly selectionComplete = computed(() => {
+    if (!this.racialSpellsComplete()) return false;
+    if (!this.hasClassSpellcasting()) return true;
     const spellsOk =
       this.cantripsRemaining() === 0 &&
       (this.spellsToChoose() === 0 || this.spellsRemaining() === 0);
@@ -702,16 +754,34 @@ export class MagicStep implements OnInit {
   confirm(): void {
     const allMap = new Map(this.allSpells().map((s) => [s.id, s]));
 
-    const cantripInstances = [...this.selectedCantrips()].map((id) => {
-      const raw = allMap.get(id);
-      return {
-        refId: id,
-        name: raw?.name ?? id,
-        level: 0,
-        prepared: true,
-        effectSummary: this.extractEffect(raw),
-      };
-    });
+    const racialCantripInstances = this.racialSpellGrants()
+      .map((grant) => {
+        const id = this.racialCantripPicks()[grant.choiceId];
+        if (!id) return null;
+        const raw = allMap.get(id);
+        return {
+          refId: id,
+          name: raw?.name ?? id,
+          level: 0,
+          prepared: true,
+          effectSummary: `${grant.label} · ${this.extractEffect(raw)}`,
+        };
+      })
+      .filter((x): x is NonNullable<typeof x> => !!x);
+
+    const cantripInstances = [
+      ...racialCantripInstances,
+      ...[...this.selectedCantrips()].map((id) => {
+        const raw = allMap.get(id);
+        return {
+          refId: id,
+          name: raw?.name ?? id,
+          level: 0,
+          prepared: true,
+          effectSummary: this.extractEffect(raw),
+        };
+      }),
+    ];
 
     const chosenSpellIds = [...this.selectedSpells()];
     const domainIds = this.domainSpellIds().filter((id) => !chosenSpellIds.includes(id));
@@ -818,13 +888,21 @@ export class MagicStep implements OnInit {
     const masteryRecord: Record<string, string> = {};
     for (const m of spellMastery) masteryRecord[String(m.spellLevel)] = m.spellId;
 
-    this.builder.creation.update((c) => ({
-      ...c,
-      spellcastingDetails: details,
-      mysticArcanumPicks: arcanumRecord,
-      spellMasteryPicks: masteryRecord,
-      signatureSpellIds: signatureSpells.map((s) => s.spellId),
-    }));
+    this.builder.creation.update((c) => {
+      const speciesAnswers = { ...(c.speciesChoiceAnswers ?? {}) };
+      for (const grant of this.racialSpellGrants()) {
+        const pick = this.racialCantripPicks()[grant.choiceId];
+        if (pick) speciesAnswers[grant.choiceId] = [pick];
+      }
+      return {
+        ...c,
+        speciesChoiceAnswers: speciesAnswers,
+        spellcastingDetails: details,
+        mysticArcanumPicks: arcanumRecord,
+        spellMasteryPicks: masteryRecord,
+        signatureSpellIds: signatureSpells.map((s) => s.spellId),
+      };
+    });
     this.builder.nextStep();
   }
 
@@ -953,6 +1031,15 @@ export class MagicStep implements OnInit {
   }
 
   private restoreFromBuilder(): void {
+    const racial: Record<string, string> = {};
+    const answers = this.builder.creation().speciesChoiceAnswers ?? {};
+    for (const grant of this.racialSpellGrants()) {
+      const pick = answers[grant.choiceId]?.[0];
+      if (pick && pick !== 'any_wizard_cantrip') racial[grant.choiceId] = pick;
+    }
+    if (Object.keys(racial).length) this.racialCantripPicks.set(racial);
+    const racialIds = new Set(Object.values(racial));
+
     const details = this.builder.creation().spellcastingDetails as any;
     const arcanumIds = new Set(
       ((details?.mysticArcanum ?? []) as { spellId: string }[])
@@ -960,7 +1047,13 @@ export class MagicStep implements OnInit {
         .filter(Boolean),
     );
     if (details?.cantrips) {
-      this.selectedCantrips.set(new Set(details.cantrips.map((c: any) => c.refId)));
+      this.selectedCantrips.set(
+        new Set(
+          details.cantrips
+            .map((c: any) => c.refId)
+            .filter((id: string) => !racialIds.has(id)),
+        ),
+      );
     }
     if (details?.spells) {
       this.selectedSpells.set(

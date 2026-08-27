@@ -29,8 +29,84 @@
     </div>
   }
 
-  @if (!loading() && !error() && quota(); as q) {
+  @if (!loading() && !error()) {
     <div class="w-full max-w-5xl px-4 flex flex-col items-center pb-8">
+      @if (racialSpellGrants().length) {
+        @for (grant of racialSpellGrants(); track grant.choiceId) {
+          <div class="w-full mb-12">
+            <div class="flex items-center gap-6 mb-6 w-full">
+              <div
+                class="h-px flex-grow bg-gradient-to-r from-transparent via-slate-700 to-slate-700"
+              ></div>
+              <h3
+                class="text-lg font-bold text-slate-200 font-serif tracking-widest text-center uppercase drop-shadow-md"
+              >
+                {{ grant.label }}
+              </h3>
+              <div
+                class="h-px flex-grow bg-gradient-to-l from-transparent via-slate-700 to-slate-700"
+              ></div>
+            </div>
+            @if (grant.desc) {
+              <p class="text-slate-400 text-xs italic text-center mb-4 max-w-2xl mx-auto">
+                {{ grant.desc }}
+                · Caractéristique d'incantation : {{ racialAbilityLabel(grant.spellcastingAbility) }}
+              </p>
+            }
+            <div class="flex justify-center w-full mb-6">
+              <div
+                class="px-6 py-2.5 rounded-full border text-[10px] font-black uppercase tracking-widest flex items-center gap-3 shadow-lg transition-colors"
+                [ngClass]="
+                  racialCantripPicks()[grant.choiceId]
+                    ? 'bg-emerald-950/30 text-emerald-400 border-emerald-800/50'
+                    : 'bg-[#1b2028] text-amber-500 border-amber-900/50'
+                "
+              >
+                @if (racialCantripPicks()[grant.choiceId]) {
+                  <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                  Sort choisi
+                } @else {
+                  <span class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
+                  Choisissez 1 sort mineur
+                }
+              </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 magic-spell-grid">
+              @for (spell of availableRacialCantrips(grant); track spell.id) {
+                <div
+                  class="relative w-full group transition-[colors,transform,opacity,box-shadow] duration-200 cursor-pointer"
+                  (click)="pickRacialCantrip(grant.choiceId, spell.id)"
+                >
+                  <div
+                    class="relative flex flex-col h-full p-1.5 rounded-xl bg-[#171b22] transition-[colors,transform,opacity,box-shadow] duration-200"
+                    [ngClass]="getCardClasses(spell.school, isRacialCantripSelected(grant.choiceId, spell.id))"
+                  >
+                    <div
+                      class="w-full h-full border border-slate-700/30 rounded-lg flex flex-col p-4 bg-[#1b2028]"
+                    >
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="w-5 h-5 rounded border flex items-center justify-center shrink-0 transition-colors shadow-inner"
+                          [ngClass]="getCheckboxClasses(spell.school, isRacialCantripSelected(grant.choiceId, spell.id))"
+                        >
+                          @if (isRacialCantripSelected(grant.choiceId, spell.id)) {
+                            <span class="text-[12px] leading-none">✓</span>
+                          }
+                        </div>
+                        <span class="text-sm font-bold font-serif tracking-wide text-slate-200">{{
+                          spell.name
+                        }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+
+      @if (hasClassSpellcasting() && quota(); as q) {
       <div
         class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-[#1b2028] p-4 sm:p-6 rounded-2xl border border-slate-800 shadow-xl mb-12 w-full"
       >
@@ -109,7 +185,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 magic-spell-grid">
           @for (spell of availableCantrips(); track spell.id) {
             <div
               class="relative w-full group transition-[colors,transform,opacity,box-shadow] duration-200"
@@ -333,7 +409,7 @@
                 </button>
                 @if (expandedArcanumLevel() === lvl) {
                   <div
-                    class="border-t border-violet-900/30 p-3 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-72 overflow-y-auto"
+                    class="border-t border-violet-900/30 p-3 grid grid-cols-1 lg:grid-cols-2 gap-2 max-h-72 overflow-y-auto magic-spell-grid"
                   >
                     @for (spell of spellsForArcanum(lvl); track spell.id) {
                       <button
@@ -425,7 +501,7 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 magic-spell-grid">
             @for (spell of availableLevel1(); track spell.id) {
               <div
                 class="relative w-full group transition-[colors,transform,opacity,box-shadow] duration-200"
@@ -601,7 +677,7 @@
                       Ajoutez d’abord un sort de niveau {{ lvl }} dans votre grimoire ci-dessus.
                     </p>
                   } @else {
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 magic-spell-grid">
                       @for (spell of preparedSpellsOfLevel(lvl); track spell.id) {
                         <button
                           type="button"
@@ -638,7 +714,7 @@
                   Ajoutez d’abord des sorts de niveau 3 dans votre grimoire.
                 </p>
               } @else {
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 magic-spell-grid">
                   @for (spell of preparedSpellsOfLevel(3); track spell.id) {
                     <button
                       type="button"
@@ -692,8 +768,9 @@
           </div>
         </div>
       }
+      }
 
-            <div class="mt-4 flex flex-col items-center gap-4 animate-[fadeIn_0.5s_ease] w-full">
+      <div class="mt-4 flex flex-col items-center gap-4 animate-[fadeIn_0.5s_ease] w-full">
         <nav class="wizard-step-nav">
           <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
             ← Étape précédente

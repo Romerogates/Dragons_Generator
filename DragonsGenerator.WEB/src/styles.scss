@@ -62,6 +62,29 @@
     }
   }
 
+  /* Mobile / tablette — sorts du wizard : 1 colonne stable, cartes plus grandes */
+  @media (max-width: 1023px) {
+    .magic-spell-grid {
+      grid-template-columns: 1fr !important;
+      gap: 0.875rem;
+    }
+
+    .magic-spell-grid > * {
+      min-width: 0;
+    }
+  }
+
+  /* Mobile / tablette — carte d'Eana */
+  @media (max-width: 1023px) {
+    .eana-map-viewport {
+      touch-action: none;
+    }
+
+    .eana-map-viewport .eana-map-image {
+      object-fit: contain;
+    }
+  }
+
   /* Skip offscreen paint work for dense card grids */
   .perf-card {
     content-visibility: auto;

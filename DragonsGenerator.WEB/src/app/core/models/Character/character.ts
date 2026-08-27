@@ -636,6 +636,15 @@ export interface CharacterCreation {
   speciesBonusSkillCount: number;
   /** Outils bonus d'espèce à choisir. */
   speciesBonusToolCount: number;
+  /** Sorts raciaux à choisir à l'étape Magie (ex. sort mineur de magicien). */
+  racialSpellGrants: {
+    choiceId: string;
+    label: string;
+    desc: string;
+    pool: string[];
+    spellLevel: number;
+    spellcastingAbility: string;
+  }[];
 
   // Étape 2 - Civilisation
   civilizationId: string | null;

@@ -3,10 +3,14 @@
 import {
   Component,
   OnInit,
+  afterNextRender,
   inject,
+  Injector,
   signal,
   computed,
   effect,
+  viewChild,
+  ElementRef,
   ChangeDetectionStrategy,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
@@ -265,7 +269,12 @@ const SPELLCASTING_FROM_LEVEL: Record<string, number> = {
 })
 export class ClassStep implements OnInit {
   private dataService = inject(DataService);
+  private readonly injector = inject(Injector);
   readonly builder = inject(CharacterBuilderService);
+
+  private readonly carouselViewport = viewChild<ElementRef<HTMLElement>>('carouselViewport');
+  private scrollRaf = 0;
+  private suppressScrollSync = false;
 
   readonly cardWidthPx = 320;
   readonly cardGapPx = 32;
@@ -600,6 +609,9 @@ export class ClassStep implements OnInit {
 
   ngOnInit(): void {
     this.loadClasses();
+  }
+
+  private restoreFromBuilder(): void {
     const current = this.builder.creation();
     if (current.classId) {
       this.selectedClassId.set(current.classId);
@@ -611,9 +623,127 @@ export class ClassStep implements OnInit {
         this.selectedCombatStyleIds.set(styleFeats.map((f) => f.refId!).filter(Boolean));
       }
     }
+
+    const answers = current.classChoiceAnswers ?? {};
+    const progMap = new Map<string, string[]>();
+    for (const [k, v] of Object.entries(answers)) {
+      if (Array.isArray(v) && v.length > 0) progMap.set(k, v);
+    }
+    if (progMap.size) this.progChoiceAnswers.set(progMap);
+
+    this.syncCarouselIndexFromSelection();
+  }
+
+  private syncCarouselIndexFromSelection(): void {
+    const cards = this.currentCards();
+    if (!cards.length) return;
+    const targetId = this.resolveCarouselTargetId();
+    if (!targetId) return;
+    const idx = cards.findIndex((c) => c.id === targetId);
+    if (idx >= 0) this.currentIndex.set(idx);
+  }
+
+  private resolveCarouselTargetId(): string | null {
+    switch (this.currentPhase()) {
+      case 'class':
+        return this.selectedClassId();
+      case 'subclass':
+        return this.selectedSubclassId() ?? this.selectedClassId();
+      case 'combat_style': {
+        const styles = this.selectedCombatStyleIds();
+        return styles[styles.length - 1] ?? null;
+      }
+      case 'sub_choice': {
+        const choice =
+          this.nextUnresolvedSubChoice() ??
+          this.activeSubChoices()[this.activeSubChoices().length - 1];
+        if (!choice) return null;
+        const picks = this.subChoiceAnswers().get(choice.id);
+        return picks?.[picks.length - 1] ?? null;
+      }
+      case 'prog_choice': {
+        const choice =
+          this.nextUnresolvedProgChoice() ??
+          this.activeProgChoices()[this.activeProgChoices().length - 1];
+        if (!choice) return null;
+        const picks = this.progChoiceAnswers().get(choice.id);
+        return picks?.[picks.length - 1] ?? null;
+      }
+      default:
+        return this.selectedClassId();
+    }
   }
 
   // === CARROUSEL LOGIC ===
+  private useScrollCarousel(): boolean {
+    return typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches;
+  }
+
+  onCarouselScroll(): void {
+    if (this.suppressScrollSync) return;
+    cancelAnimationFrame(this.scrollRaf);
+    this.scrollRaf = requestAnimationFrame(() => this.syncIndexFromScroll());
+  }
+
+  private syncIndexFromScroll(): void {
+    const viewport = this.carouselViewport()?.nativeElement;
+    if (!viewport) return;
+
+    const viewportCenter =
+      viewport.getBoundingClientRect().left + viewport.clientWidth / 2;
+    let best = 0;
+    let bestDist = Number.POSITIVE_INFINITY;
+
+    viewport.querySelectorAll<HTMLElement>('[data-carousel-index]').forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      const mid = rect.left + rect.width / 2;
+      const dist = Math.abs(mid - viewportCenter);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = Number(el.dataset['carouselIndex'] ?? 0);
+      }
+    });
+
+    if (best !== this.currentIndex()) {
+      this.currentIndex.set(best);
+    }
+  }
+
+  private scrollToIndex(index: number, behavior: ScrollBehavior = 'smooth'): void {
+    const total = this.currentCards().length;
+    if (total <= 0) return;
+    const safe = ((index % total) + total) % total;
+    this.currentIndex.set(safe);
+
+    const viewport = this.carouselViewport()?.nativeElement;
+    const card = viewport?.querySelector<HTMLElement>(`[data-carousel-index="${safe}"]`);
+    if (!viewport || !card) return;
+
+    const viewportRect = viewport.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    const delta =
+      cardRect.left + cardRect.width / 2 - (viewportRect.left + viewport.clientWidth / 2);
+
+    this.suppressScrollSync = true;
+    viewport.scrollBy({ left: delta, behavior });
+    window.setTimeout(
+      () => {
+        this.suppressScrollSync = false;
+        this.syncIndexFromScroll();
+      },
+      behavior === 'smooth' ? 320 : 40,
+    );
+  }
+
+  private scheduleCarouselRestore(): void {
+    if (!this.useScrollCarousel()) return;
+    this.syncCarouselIndexFromSelection();
+    afterNextRender(
+      () => this.scrollToIndex(this.normalizedIndex(), 'instant'),
+      { injector: this.injector },
+    );
+  }
+
   getWrapOffset(index: number): string {
     const total = this.currentCards().length;
     if (total === 0) return '0px';
@@ -628,15 +758,23 @@ export class ClassStep implements OnInit {
   }
 
   nextCard(): void {
-    if (this.currentCards().length > 0) {
-      this.currentIndex.update((i) => i + 1);
+    const total = this.currentCards().length;
+    if (!total) return;
+    if (this.useScrollCarousel()) {
+      this.scrollToIndex((this.normalizedIndex() + 1) % total);
+      return;
     }
+    this.currentIndex.update((i) => i + 1);
   }
 
   prevCard(): void {
-    if (this.currentCards().length > 0) {
-      this.currentIndex.update((i) => i - 1);
+    const total = this.currentCards().length;
+    if (!total) return;
+    if (this.useScrollCarousel()) {
+      this.scrollToIndex((this.normalizedIndex() - 1 + total) % total);
+      return;
     }
+    this.currentIndex.update((i) => i - 1);
   }
 
   onRightClick(event: Event, cardId: string): void {
@@ -655,11 +793,15 @@ export class ClassStep implements OnInit {
 
     // Si on a cliqué sur une carte sur le côté, on la centre d'abord
     if (index !== this.normalizedIndex()) {
-      let diff = index - this.normalizedIndex();
-      const total = this.currentCards().length;
-      if (diff > total / 2) diff -= total;
-      if (diff < -total / 2) diff += total;
-      this.currentIndex.update((i) => i + diff);
+      if (this.useScrollCarousel()) {
+        this.scrollToIndex(index);
+      } else {
+        let diff = index - this.normalizedIndex();
+        const total = this.currentCards().length;
+        if (diff > total / 2) diff -= total;
+        if (diff < -total / 2) diff += total;
+        this.currentIndex.update((i) => i + diff);
+      }
       return;
     }
 
@@ -1007,6 +1149,8 @@ export class ClassStep implements OnInit {
     this.dataService.getClasses().subscribe({
       next: (classes) => {
         this.allClasses.set(normalizeCharacterClasses(classes));
+        this.restoreFromBuilder();
+        this.scheduleCarouselRestore();
         this.loading.set(false);
       },
       error: () => {

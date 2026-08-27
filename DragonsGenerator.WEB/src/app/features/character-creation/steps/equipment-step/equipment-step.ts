@@ -14,6 +14,8 @@ import {
   CATEGORY_FILTERS,
   normalizeEquipments,
   resolveEquipmentRefId,
+  isMasteredProficiencyChoice,
+  masteredProficiencyChoiceLabel,
 } from '@core/utils/equipment.utils';
 import {
   equipmentDescription,
@@ -252,6 +254,8 @@ export class EquipmentStep implements OnInit {
   getIconForItem(item: ResolvedItem): string {
     if (item.isCategory) {
       const id = item.ref.id;
+      if (id === 'wp-mastered-choice') return 'fluent-emoji:crossed-swords';
+      if (id === 'tl-mastered-choice') return 'fluent-emoji:hammer-and-wrench';
       if (id.includes('weapon')) return 'fluent-emoji:crossed-swords';
       if (id.includes('focus') || id.includes('holy-symbol')) return 'fluent-emoji:sparkles';
       if (id.includes('instrument')) return 'fluent-emoji:violin';
@@ -282,6 +286,26 @@ export class EquipmentStep implements OnInit {
 
   private resolve(ref: ItemRef, map: Map<string, EquipmentRaw>): ResolvedItem {
     const resolvedId = resolveEquipmentRefId(ref.id);
+
+    if (isMasteredProficiencyChoice(resolvedId)) {
+      const isWeapon = resolvedId === 'wp-mastered-choice';
+      const c = this.builder.creation();
+      const profIds = isWeapon
+        ? c.weaponProficiencies
+        : [...new Set([...c.toolProficiencies, ...(c.backgroundTools ?? [])])];
+      const items = profIds
+        .map((id) => map.get(resolveEquipmentRefId(id)))
+        .filter((e): e is EquipmentRaw => !!e);
+
+      return {
+        ref: { ...ref, id: resolvedId },
+        isCategory: true,
+        equipment: null,
+        categoryLabel: masteredProficiencyChoiceLabel(resolvedId),
+        categoryItems: items.sort((a, b) => a.name.localeCompare(b.name)),
+      };
+    }
+
     const filter = CATEGORY_FILTERS[resolvedId];
     if (filter) {
       const items = filter.ids

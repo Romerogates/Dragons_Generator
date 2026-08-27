@@ -31,10 +31,14 @@ public sealed class GroqChatClient
         if (string.IsNullOrWhiteSpace(apiKey))
             return (false, null, "Clé API Groq manquante. Configurez Groq:ApiKey (appsettings) ou la variable d'environnement Groq__ApiKey.");
 
-        var client = _httpClientFactory.CreateClient();
+        var model = _config["Groq:Model"];
+        if (string.IsNullOrWhiteSpace(model))
+            model = "llama-3.3-70b-versatile";
+
+        var client = _httpClientFactory.CreateClient("Groq");
         var groqRequest = new
         {
-            model = "groq/compound",
+            model,
             messages = new object[]
             {
                 new { role = "system", content = systemPrompt },

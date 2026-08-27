@@ -126,6 +126,12 @@ export class CivilizationStep implements OnInit, OnDestroy {
     () => `translate(${this.panX()}px, ${this.panY()}px) scale(${this.scale()})`,
   );
 
+  /** Seuil d'affichage des noms sur la carte (plus bas sur mobile). */
+  pinLabelMinScale(): number {
+    if (typeof window === 'undefined') return 1.35;
+    return window.matchMedia('(max-width: 1023px)').matches ? 1 : 1.35;
+  }
+
   readonly pinCounterScale = computed(() => 1 / this.scale());
 
   readonly canZoomOut = computed(() => this.scale() > MIN_SCALE + 0.01);
@@ -295,6 +301,7 @@ export class CivilizationStep implements OnInit, OnDestroy {
       };
       this.isPanning.set(true);
     } else if (this.pointers.size === 2) {
+      this.isPanning.set(false);
       this.panOrigin = null;
       const pts = [...this.pointers.values()];
       const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
@@ -316,6 +323,7 @@ export class CivilizationStep implements OnInit, OnDestroy {
     this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
 
     if (this.pointers.size === 2 && this.pinchOrigin) {
+      this.isPanning.set(false);
       const pts = [...this.pointers.values()];
       const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
       const midX = (pts[0].x + pts[1].x) / 2;
@@ -399,6 +407,13 @@ export class CivilizationStep implements OnInit, OnDestroy {
     if (resetScale) this.scale.set(1);
     const ok = this.refitMap(true);
     if (!ok) this.retryFit(resetScale);
+    else if (typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches) {
+      // Mobile : second passage après layout flex pour garantir le zoom 1:1 utilisable au pinch.
+      requestAnimationFrame(() => {
+        this.scale.set(1);
+        this.refitMap(true);
+      });
+    }
   }
 
   private retryFit(resetScale: boolean): void {

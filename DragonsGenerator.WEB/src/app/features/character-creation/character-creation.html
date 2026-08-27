@@ -136,14 +136,14 @@
         <app-languages-step />
       }
       @case (9) {
-        @if (builder.creation().hasSpellcasting) {
+        @if (builder.needsMagicStep()) {
           <app-magic-step />
         } @else {
           <app-identity-step />
         }
       }
       @case (10) {
-        @if (builder.creation().hasSpellcasting) {
+        @if (builder.needsMagicStep()) {
           <app-identity-step />
         } @else {
           <app-summary-step />

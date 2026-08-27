@@ -42,7 +42,7 @@
         <!-- Map viewport: full map visible (contain) on PC + phone -->
         <div
           #mapViewport
-          class="relative w-full flex-1 min-h-[48dvh] sm:min-h-[480px] lg:min-h-[560px] max-h-[62dvh] lg:max-h-[min(70vh,720px)] bg-[#171b22] border-2 border-slate-700 rounded-xl shadow-2xl overflow-hidden touch-none cursor-grab"
+          class="eana-map-viewport relative w-full flex-1 min-h-[52dvh] sm:min-h-[480px] lg:min-h-[560px] max-h-[58dvh] lg:max-h-[min(70vh,720px)] bg-[#171b22] border-2 border-slate-700 rounded-xl shadow-2xl overflow-hidden touch-none cursor-grab"
           [class.cursor-grabbing]="isPanning()"
           (wheel)="onWheel($event)"
           (pointerdown)="onPointerDown($event)"
@@ -60,7 +60,7 @@
             <img
               src="Carte.jpg"
               alt="Carte d'Eana"
-              class="absolute inset-0 w-full h-full object-fill opacity-85 pointer-events-none select-none"
+              class="eana-map-image absolute inset-0 w-full h-full object-fill lg:object-fill max-lg:object-contain opacity-85 pointer-events-none select-none"
               draggable="false"
             />
 
@@ -83,9 +83,9 @@
                   <iconify-icon [icon]="getIconForCiv(civ.id)"></iconify-icon>
                 </button>
                 <span
-                  class="absolute left-1/2 -translate-x-1/2 top-full mt-1 whitespace-nowrap px-2 py-0.5 rounded bg-[#020617]/90 border border-amber-700/40 text-[10px] font-bold uppercase tracking-wider text-amber-400 pointer-events-none shadow-lg"
-                  [class.hidden]="scale() < 1.35"
-                  [class.lg:block]="true"
+                  class="absolute left-1/2 -translate-x-1/2 top-full mt-1 whitespace-nowrap px-2 py-0.5 rounded bg-[#020617]/90 border border-amber-700/40 text-[10px] font-bold uppercase tracking-wider text-amber-400 pointer-events-none shadow-lg max-lg:block"
+                  [class.hidden]="scale() < pinLabelMinScale()"
+                  [class.lg:block]="scale() >= 1.35"
                 >
                   {{ civ.name }}
                 </span>

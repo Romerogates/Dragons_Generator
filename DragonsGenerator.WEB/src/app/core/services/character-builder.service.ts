@@ -37,6 +37,16 @@ import {
   formatModifier,
 } from '../models/Character/character';
 
+/** Sort racial à choisir à l'étape Magie (ex. sort mineur de magicien pour l'Elfe). */
+export interface RacialSpellGrant {
+  choiceId: string;
+  label: string;
+  desc: string;
+  pool: string[];
+  spellLevel: number;
+  spellcastingAbility: string;
+}
+
 export interface SpeciesSelection {
   speciesId: string;
   speciesName: string;
@@ -57,6 +67,8 @@ export interface SpeciesSelection {
   darkvisionRadius: number;
   /** Creation-choice answers (lineage, tools, etc.) for restore when revisiting the step. */
   choiceAnswers: Record<string, string[]>;
+  /** Sorts raciaux différés à l'étape Magie. */
+  racialSpellGrants: RacialSpellGrant[];
 }
 
 export interface CivilizationSelection {
@@ -149,6 +161,7 @@ const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   speciesChoiceAnswers: {},
   speciesBonusSkillCount: 0,
   speciesBonusToolCount: 0,
+  racialSpellGrants: [],
 
   civilizationId: null,
   civilizationName: null,
@@ -295,7 +308,7 @@ export class CharacterBuilderService {
       { number: 8, title: 'Langues', icon: '🗣️' },
     ];
 
-    if (this.creation().hasSpellcasting) {
+    if (this.needsMagicStep()) {
       base.push({ number: 9, title: 'Magie', icon: '✨' });
       base.push({ number: 10, title: 'Identité', icon: '📜' });
       base.push({ number: 11, title: 'Récapitulatif', icon: '✅' });
@@ -306,6 +319,12 @@ export class CharacterBuilderService {
 
     return base;
   });
+
+  /** Étape Magie si la classe incante ou si l'espèce accorde un sort racial. */
+  readonly needsMagicStep = computed(
+    () =>
+      this.creation().hasSpellcasting || (this.creation().racialSpellGrants?.length ?? 0) > 0,
+  );
 
   readonly totalSteps = computed(() => this.steps().length);
   readonly summaryStep = computed(() => this.totalSteps());
@@ -420,6 +439,17 @@ export class CharacterBuilderService {
     return parts.length > 0 ? parts.join(' · ') : 'Brouillon en cours';
   });
 
+  /** Tous les sorts raciaux requis ont été choisis (étape Magie). */
+  private racialSpellsComplete(c: CharacterCreation): boolean {
+    const grants = c.racialSpellGrants ?? [];
+    if (!grants.length) return true;
+    const answers = c.speciesChoiceAnswers ?? {};
+    return grants.every((g) => {
+      const pick = answers[g.choiceId]?.[0];
+      return !!pick && pick !== 'any_wizard_cantrip';
+    });
+  }
+
   isStepValid(step: number): boolean {
     const c = this.creation();
 
@@ -441,10 +471,18 @@ export class CharacterBuilderService {
       case 8:
         return c.languages.length > 0;
       case 9:
-        if (c.hasSpellcasting) return true;
+        if (this.needsMagicStep()) {
+          if (!this.racialSpellsComplete(c)) return false;
+          if (c.hasSpellcasting) {
+            const details = c.spellcastingDetails as Record<string, unknown> | undefined;
+            return !!details && Object.keys(details).length > 0;
+          }
+          const details = c.spellcastingDetails as { cantrips?: unknown[] } | undefined;
+          return !!(details?.cantrips?.length);
+        }
         return c.name.trim().length > 0;
       case 10:
-        if (c.hasSpellcasting) return c.name.trim().length > 0;
+        if (this.needsMagicStep()) return c.name.trim().length > 0;
         return true;
       case 11:
         return true;
@@ -477,6 +515,7 @@ export class CharacterBuilderService {
         speciesChoiceAnswers: selection.choiceAnswers,
         speciesBonusSkillCount: selection.bonusSkillCount,
         speciesBonusToolCount: selection.bonusToolCount,
+        racialSpellGrants: selection.racialSpellGrants,
         bonusLanguageCount: newBonusTotal,
         languages: [
           ...new Set([
@@ -514,6 +553,7 @@ export class CharacterBuilderService {
         speciesChoiceAnswers: {},
         speciesBonusSkillCount: 0,
         speciesBonusToolCount: 0,
+        racialSpellGrants: [],
         bonusLanguageCount: (c.bonusLanguageCount || 0) - prevSpBonus,
         languages: [
           ...new Set([
@@ -1123,6 +1163,7 @@ export class CharacterBuilderService {
       speciesChoiceAnswers: {},
       speciesBonusSkillCount: 0,
       speciesBonusToolCount: 0,
+      racialSpellGrants: [],
 
       civilizationId: savedCharacter.civilization.id,
       civilizationName: savedCharacter.civilization.label,

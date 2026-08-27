@@ -20,6 +20,8 @@ export const EQUIPMENT_CATEGORY_ALIASES: Record<string, string> = {
   'tl-focaliseur-arcanique': 'category-arcane-focus',
   'tl-symbole-sacre': 'category-holy-symbol',
   'tl-focaliseur-personnel': 'category-arcane-focus',
+  'tl-mastered-choice': 'tl-mastered-choice',
+  'wp-mastered-choice': 'wp-mastered-choice',
 };
 
 /** Alias d'IDs concrets (typos / variantes dans les JSON classes). */
@@ -108,7 +110,25 @@ export function resolveEquipmentRefId(id: string): string {
 
 export function isEquipmentCategoryId(id: string): boolean {
   const resolved = resolveEquipmentRefId(id);
-  return resolved in CATEGORY_FILTERS || resolved.startsWith('category-');
+  return (
+    resolved in CATEGORY_FILTERS ||
+    resolved.startsWith('category-') ||
+    resolved === 'tl-mastered-choice' ||
+    resolved === 'wp-mastered-choice'
+  );
+}
+
+/** Choix d'équipement Lettré : une arme ou un outil déjà maîtrisé. */
+export function isMasteredProficiencyChoice(id: string): boolean {
+  const resolved = resolveEquipmentRefId(id);
+  return resolved === 'tl-mastered-choice' || resolved === 'wp-mastered-choice';
+}
+
+export function masteredProficiencyChoiceLabel(id: string): string {
+  const resolved = resolveEquipmentRefId(id);
+  if (resolved === 'wp-mastered-choice') return 'Arme maîtrisée (au choix)';
+  if (resolved === 'tl-mastered-choice') return 'Outil maîtrisé (au choix)';
+  return 'Choix';
 }
 
 /** Normalise une ref d'item (string | {id,qty}) vers {id, qty}. */

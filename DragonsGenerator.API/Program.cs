@@ -59,7 +59,10 @@ builder.Services.AddAuthorization();
 builder.Services.AddSingleton<IndexedDataStore>();
 builder.Services.AddSingleton<GameDataRepository>();
 builder.Services.AddSingleton<GroqChatClient>();
-builder.Services.AddHttpClient();
+builder.Services.AddHttpClient("Groq", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(120);
+});
 
 builder.Services
     .AddFastEndpoints()
