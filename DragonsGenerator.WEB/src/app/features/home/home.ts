@@ -55,6 +55,12 @@ export class Home implements OnInit {
         "Accédez instantanément aux détails des sorts, de l'équipement et des langues d'Eana.",
       icon: 'fluent-emoji:books',
     },
+    {
+      title: 'Forge de Scénarios',
+      description:
+        'Composez une aventure à partir du bestiaire : nommez vos créatures, générez l\'intrigue et imprimez le pack MJ.',
+      icon: 'fluent-emoji:scroll',
+    },
   ];
 
   /** Codex tiles — keep count divisible by 3 for a balanced grid. */
@@ -68,6 +74,7 @@ export class Home implements OnInit {
       hover: 'amber',
     },
     { label: 'Sorts', path: '/spells', icon: 'fluent-emoji:magic-wand', hover: 'amber' },
+    { label: 'Bestiaire', path: '/creatures', icon: 'fluent-emoji:dragon', hover: 'rose' },
     { label: 'Équipements', path: '/equipments', icon: 'fluent-emoji:shield', hover: 'amber' },
     { label: 'Compétences', path: '/skills', icon: 'fluent-emoji:bookmark-tabs', hover: 'sky' },
     { label: 'Dons', path: '/feats', icon: 'fluent-emoji:trophy', hover: 'amber' },

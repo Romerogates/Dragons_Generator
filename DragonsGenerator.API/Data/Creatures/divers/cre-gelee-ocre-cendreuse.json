@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-gelee-ocre-cendreuse",
+  "name": "Gelée ocre cendreuse",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Vase de taille G, non aligné",
+  "armor_class": 12,
+  "armor_note": "armure naturelle",
+  "hit_points": "68 (8d10 + 24)",
+  "wound_threshold": null,
+  "speed": "3 m, escalade 3 m",
+  "abilities": {
+    "str": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 8,
+      "modifier": "-1"
+    },
+    "cha": {
+      "score": 1,
+      "modifier": "-5"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +1, Survie +1",
+  "senses": "vision aveugle 18 m (aucune vision au-delà de ce rayon), Perception passive 11",
+  "languages": "—",
+  "challenge_rating": "3",
+  "xp": 700,
+  "traits": [
+    {
+      "name": "Amorphe",
+      "description": "La gelée peut traverser des espaces très étroits (jusqu'à 2,5 cm de large) sans avoir besoin de se faufiler (cf. **Aventuriers**, chapitre **Combat**)."
+    },
+    {
+      "name": "Pattes d'araignée",
+      "description": "La gelée ocre peut parcourir les parois les plus difficiles à escalader, y compris les plafonds, sans devoir effectuer de test de caractéristique."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Pseudopode",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 10 (2d6 + 3) dégâts contondants plus 3 (1d6) dégâts d'acide."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "S"
+}

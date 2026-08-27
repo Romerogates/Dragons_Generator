@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-dragon-de-cuivre-venerable",
+  "name": "Dragon de cuivre vénérable",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Dragon de taille Gig, chaotique bon",
+  "armor_class": 21,
+  "armor_note": "armure naturelle",
+  "hit_points": "350 (20d20 + 140)",
+  "wound_threshold": 88,
+  "speed": "12 m, escalade 12 m, vol 24 m",
+  "abilities": {
+    "str": {
+      "score": 27,
+      "modifier": "+8"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 25,
+      "modifier": "+7"
+    },
+    "int": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "wis": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "cha": {
+      "score": 19,
+      "modifier": "+4"
+    }
+  },
+  "saving_throws": "Dex +8, Con +14, Sag +10, Cha +11",
+  "skills": "Discrétion +8, Escamotage +8, Perception +17, Persuasion +11, Représentation +11, Tromperie +11",
+  "senses": "vision aveugle 18 m, vision dans le noir 36 m, Perception passive 27",
+  "languages": "commun, draconique",
+  "challenge_rating": "21",
+  "xp": 33000,
+  "traits": [],
+  "actions": [],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Dragon de taille Gig, chaotique bon"
+}

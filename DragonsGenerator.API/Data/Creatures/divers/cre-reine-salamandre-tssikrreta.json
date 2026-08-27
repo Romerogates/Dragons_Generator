@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-reine-salamandre-tssikrreta",
+  "name": "Reine salamandre Tssikrreta",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Élémentaire (feu) de taille G, neutre",
+  "armor_class": 15,
+  "armor_note": "armure naturelle + bouclier",
+  "hit_points": "119 (14d10 + 42)",
+  "wound_threshold": 30,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "wis": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "cha": {
+      "score": 17,
+      "modifier": "+3"
+    }
+  },
+  "saving_throws": "Con +8, Sag +9, Cha +8",
+  "skills": "Arcanes +7, Persuasion +8, Religion +7",
+  "senses": "vision dans le noir 18 m, Perception passive 14",
+  "languages": "céleste, diabolique, originel, sylvestre",
+  "challenge_rating": "16",
+  "xp": 15000,
+  "traits": [],
+  "actions": [],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Élémentaire (feu) de taille G, neutre"
+}

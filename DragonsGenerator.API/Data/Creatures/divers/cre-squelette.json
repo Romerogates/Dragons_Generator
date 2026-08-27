@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-squelette",
+  "name": "Squelette",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Mort-vivant de taille M, loyal mauvais",
+  "armor_class": 13,
+  "armor_note": "lambeaux d'armure",
+  "hit_points": "13 (2d8 + 4)",
+  "wound_threshold": null,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "wis": {
+      "score": 8,
+      "modifier": "-1"
+    },
+    "cha": {
+      "score": 5,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 9",
+  "languages": "comprend toutes les langues pratiquées de son vivant mais ne peut pas parler",
+  "challenge_rating": "1/4",
+  "xp": 50,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Épée courte",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 5 (1d6 + 2) dégâts perforants."
+    },
+    {
+      "name": "Arc court",
+      "description": "Attaque d'arme à distance : +4 pour toucher, portée 24/96 m, une cible. Réussite : 5 (1d6 + 2) dégâts perforants.\n171"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Pour créer de nouveaux squelettes, adaptés aux besoins d’une campagne, il suffit de prendre comme base une créature dotée d’un squelette, qu’il s’agisse d’une **aberration**, d’une **bête**, d’un **humanoïde**, d’une **monstruosité** ou d’un **géant**, voire d’un **dragon**. Adaptez ensuite le profil comme suit :"
+}

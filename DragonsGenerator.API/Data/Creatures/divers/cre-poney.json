@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-poney",
+  "name": "Poney",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille M, non aligné",
+  "armor_class": 10,
+  "armor_note": null,
+  "hit_points": "11 (2d8 + 2)",
+  "wound_threshold": 5,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "Perception passive 10",
+  "languages": "—",
+  "challenge_rating": "1/8",
+  "xp": 25,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Sabots",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (2d4 + 2) dégâts contondants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

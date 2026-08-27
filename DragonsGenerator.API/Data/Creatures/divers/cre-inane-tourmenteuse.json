@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-inane-tourmenteuse",
+  "name": "Inane tourmenteuse",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Créature artificielle de taille variable, non aligné",
+  "armor_class": 17,
+  "armor_note": "armure naturelle",
+  "hit_points": "68 (8d8 + 32)",
+  "wound_threshold": 17,
+  "speed": "15 m",
+  "abilities": {
+    "str": {
+      "score": 1,
+      "modifier": "-5"
+    },
+    "dex": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "con": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "int": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "wis": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "cha": {
+      "score": 19,
+      "modifier": "+4"
+    }
+  },
+  "saving_throws": "Con +7",
+  "skills": "Acrobaties +8, Discrétion +8, Tromperie +7",
+  "senses": "vision lucide 18 m, Perception passive 13",
+  "languages": "les mêmes que son modèle, télépathie 36 m",
+  "challenge_rating": "8",
+  "xp": 3900,
+  "traits": [
+    {
+      "name": "Cauchemar incarné",
+      "description": "L'apparence de l'inane est le reflet des tourments intérieurs de la créature qui a suscité son apparition. Elle prend typiquement l'aspect de la créature en question, mais cela peut varier selon la psyché de la créature : être aimé perdu, phobie, némésis, etc. Peu importe son apparence, l'inane garde son profil, exception faite de sa taille, qui est celle de la créature."
+    },
+    {
+      "name": "Irréel",
+      "description": "L'inane ignore les terrains difficiles."
+    },
+    {
+      "name": "Résistance illusoire",
+      "description": "Chaque fois que l'inane échoue à un jet d'attaque contre la créature qui a suscité son apparition ou que celle-ci réussit un jet de sauvegarde contre un sort de l'inane, l'inane perd l'une de ses résistances aux dégâts, à tirer sur le tableau **Sensibilités de l'inane**. Si l'inane a déjà perdu sa résistance aux dégâts, le meneur relance le d20."
+    },
+    {
+      "name": "Tourment apaisé",
+      "description": "Lorsque l'inane est vaincue, la créature qui a suscité son apparition perd la folie à l'origine de l'existence de l'inane."
+    },
+    {
+      "name": "Sorts innés",
+      "description": "La caractéristique magique de l'inane est le Charisme (DD de sauvegarde des sorts : 15). L'inane peut lancer les sorts suivants sans composantes matérielles comme un lanceur de sorts de niveau 11 :\nÀ volonté : illusion mineure, image silencieuse, sarcasmes venimeux\n3/jour chacun : ajustement fatidique, assassin imaginaire, assaut compulsif, image accomplie, image miroir, marche de brume, terreur\n1/jour chacun : contresort, dissipation de la magie, faux-semblant, terrain hallucinatoire"
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "L'inane lance un sort et effectue une attaque de Désespoir glacé."
+    },
+    {
+      "name": "Désespoir glacé",
+      "description": "Attaque de sort au corps à corps : +8 pour toucher, allonge 1,50 m, une créature. Réussite : 4 (1d8) dégâts de froid et 9 (2d8) dégâts psychiques. La cible doit en outre réussir un JS Sagesse DD 15 sous peine d'être **engourdie** pendant 1 minute. Une créature **engourdie** par l'inane peut réitérer le jet de sauvegarde à la fin de chacun de ses tours de jeu et met un terme à l'effet sur elle-même en cas de réussite."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

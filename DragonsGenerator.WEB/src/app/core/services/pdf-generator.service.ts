@@ -533,10 +533,9 @@ export class PdfGeneratorService {
       : c.species.label;
     const classLabel = (() => {
       const cls = c.classes[0];
-      const base = cls.subclassLabel
+      return cls.subclassLabel
         ? `${cls.classLabel} (${cls.subclassLabel})`
         : cls.classLabel;
-      return c.totalLevel > 1 ? `${base} ${c.totalLevel}` : base;
     })();
 
     pdf.setFontSize(15);
@@ -544,7 +543,9 @@ export class PdfGeneratorService {
     this.text(pdf, speciesLabel, 140, 66);
     this.text(pdf, c.civilization.label, 140, 90);
     this.text(pdf, classLabel, 400, 43);
-    this.text(pdf, String(c.experience), 400, 90);
+    // Emplacement « Niveau » sur la fiche (pas les XP — un perso niv. 1 a 0 XP).
+    const pdfLevel = Math.max(1, c.totalLevel || c.classes[0]?.level || 1);
+    this.text(pdf, String(pdfLevel), 400, 90);
 
     this.text(pdf, String(c.vitality.hitPointsCurrent), 230, 123);
     this.text(pdf, String(c.vitality.hitPointsTemporary), 250, 171);

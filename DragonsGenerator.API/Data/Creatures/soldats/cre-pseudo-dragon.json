@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-pseudo-dragon",
+  "name": "Pseudo-dragon",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Dragon de taille TP, neutre bon",
+  "armor_class": 13,
+  "armor_note": "armure naturelle",
+  "hit_points": "7 (2d4 + 2)",
+  "wound_threshold": 5,
+  "speed": "4,50 m, vol 18 m",
+  "abilities": {
+    "str": {
+      "score": 8,
+      "modifier": "-1"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +4, Perception +3",
+  "senses": "aiguisés. Le pseudo-dragon bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir la vue, l'ouïe ou l'odorat.",
+  "languages": "comprend le commun et le draconique mais ne peut pas parler",
+  "challenge_rating": "1/4",
+  "xp": 50,
+  "traits": [
+    {
+      "name": "Résistance à la magie",
+      "description": "Le pseudo-dragon bénéficie d'un avantage aux jets de sauvegarde contre les sorts et autres effets magiques."
+    },
+    {
+      "name": "Sens aiguisés",
+      "description": "Le pseudo-dragon bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir la vue, l'ouïe ou l'odorat."
+    },
+    {
+      "name": "Télépathie limitée",
+      "description": "Le pseudo-dragon peut transmettre magiquement des idées, des émotions et des images simples à n'importe quelle créature située dans un rayon de 30 m et capable de comprendre une langue."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d4 + 2) dégâts perforants."
+    },
+    {
+      "name": "Dard",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une créature. Réussite : 4 (1d4 + 2) dégâts perforants, et la cible doit réussir un JS Constitution DD 11 sous peine d'être **empoisonnée** pendant 1 heure. Si le jet de sauvegarde est raté de 5 ou plus, la cible tombe **inconsciente** et le reste jusqu'à ce que le poison disparaisse. Elle se réveille si elle subit des dégâts ou si une autre créature consacre une action à la réveiller en la secouant énergiquement."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Certains pseudo-dragons s’attachent à des individus qu’ils jugent particulièrement bienveillants et héroïques, se faisant un plaisir de participer à leurs aventures et de contribuer à leurs exploits. Il s’agit là d’une décision d’importance qui crée un lien protecteur entre le pseudo-dragon et son compagnon (les pseudo-dragons sont doués d’une certaine fierté et répugnent à la notion de « maître »). Tant que ces derniers restent dans un rayon de 9 m l’un de l’autre, ils bénéficient tous deux d’un bonus d’appoint de +2 aux jets de sauvegarde d’Intelligence, de Sagesse et de Charisme contre la magie. On retrouve des pseudo-dragons un peu partout sur Eana mais leur profusion dans la Cité Franche reste un mystère. Cela vaut même à la Cité Franche d’être nommée Xiaolong Zhi Cheng dans le Shi-huang, ce qui signifie littéralement « la cité des petits dragons »."
+}

@@ -1,0 +1,88 @@
+<div class="w-full min-h-screen bg-[#171b22] text-slate-300 pb-20 animate-fade-in">
+  <section class="border-b border-slate-800 pt-16 pb-12 px-4 text-center">
+    <h1 class="text-4xl font-extrabold text-violet-400 font-serif uppercase mb-4">Amis</h1>
+    <p class="text-sm text-slate-400 italic max-w-xl mx-auto">Trouvez des joueurs, acceptez des demandes et rejoignez des campagnes.</p>
+  </section>
+
+  <section class="max-w-2xl mx-auto px-4 py-10 space-y-10">
+    @if (!isLoggedIn()) {
+      <p class="text-center text-slate-400 py-12">Connectez-vous pour gérer vos amis.</p>
+      <div class="text-center"><a routerLink="/login" class="px-6 py-3 bg-violet-600 text-white rounded-xl text-xs font-black uppercase">Se connecter</a></div>
+    } @else {
+      @if (message(); as msg) {
+        <div class="p-3 rounded-xl text-sm text-center bg-violet-950/30 border border-violet-800/40 text-violet-300">{{ msg }}</div>
+      }
+
+      <div>
+        <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Rechercher un joueur</h2>
+        <div class="flex gap-2">
+          <input
+            type="search"
+            placeholder="Nom ou email..."
+            class="flex-1 bg-[#1b2028] border border-slate-700 rounded-xl py-3 px-4 text-sm"
+            [value]="searchQuery()"
+            (input)="searchQuery.set($any($event.target).value)"
+            (keyup.enter)="search()"
+          />
+          <button type="button" class="px-4 py-3 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white" (click)="search()">Chercher</button>
+        </div>
+        <div class="mt-3 space-y-2">
+          @for (u of searchResults(); track u.id) {
+            <div class="flex items-center justify-between bg-[#1b2028] border border-slate-800 rounded-xl p-3">
+              <div>
+                <p class="font-serif text-slate-200">{{ u.displayName }}</p>
+                <p class="text-xs text-slate-500">{{ u.email }}</p>
+              </div>
+              <button type="button" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase border border-violet-800/40 text-violet-300" (click)="sendRequest(u.id)">Ajouter</button>
+            </div>
+          }
+        </div>
+      </div>
+
+      @if (requests().length) {
+        <div>
+          <h2 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-3">Demandes reçues</h2>
+          @for (r of requests(); track r.id) {
+            <div class="flex items-center justify-between bg-[#1b2028] border border-slate-800 rounded-xl p-3 mb-2">
+              <span class="font-serif">{{ r.displayName }}</span>
+              <div class="flex gap-2">
+                <button type="button" class="px-3 py-1 text-[10px] font-black uppercase text-emerald-400" (click)="accept(r.id)">Accepter</button>
+                <button type="button" class="px-3 py-1 text-[10px] font-black uppercase text-slate-500" (click)="decline(r.id)">Refuser</button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      @if (campaignInvites().length) {
+        <div>
+          <h2 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-3">Invitations campagne</h2>
+          @for (inv of campaignInvites(); track inv.id) {
+            <div class="bg-amber-950/20 border border-amber-900/40 rounded-xl p-3 mb-2 flex justify-between items-center gap-3">
+              <div>
+                <p class="font-serif">{{ inv.campaignTitle }}</p>
+                <p class="text-xs text-slate-500">par {{ inv.invitedByName }}</p>
+              </div>
+              <div class="flex gap-2">
+                <button type="button" class="px-3 py-1 text-[10px] font-black uppercase text-emerald-400" (click)="acceptCampaign(inv.id)">Rejoindre</button>
+                <button type="button" class="px-3 py-1 text-[10px] font-black uppercase text-slate-500" (click)="declineCampaign(inv.id)">Refuser</button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <div>
+        <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Mes amis ({{ friendsList().length }})</h2>
+        @for (f of friendsList(); track f.id) {
+          <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-3 mb-2">
+            <p class="font-serif text-slate-200">{{ f.displayName }}</p>
+            <p class="text-xs text-slate-500">{{ f.email }}</p>
+          </div>
+        } @empty {
+          <p class="text-sm text-slate-500 italic">Aucun ami pour l'instant.</p>
+        }
+      </div>
+    }
+  </section>
+</div>

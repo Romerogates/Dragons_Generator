@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-mephite-orageux",
+  "name": "Méphite orageux",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Élémentaire (air) de taille P, neutre mauvais",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "17 (5d6)",
+  "wound_threshold": 5,
+  "speed": "9 m, vol 12 m",
+  "abilities": {
+    "str": {
+      "score": 5,
+      "modifier": "-3"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +4, Perception +2",
+  "senses": "vision dans le noir 18 m, Perception passive 12",
+  "languages": "originel",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [
+    {
+      "name": "Explosion posthume",
+      "description": "Quand le méphite meurt, il disparaît dans une explosion fulgurante. Chaque créature située dans un rayon de 1,50 m doit réussir un JS Constitution DD 10 sous peine d'être **assourdie** pendant 1 minute. En cas de marge d'échec de 5 ou plus, la créature est également **étourdie** pour la même durée. Une créature **assourdie** (et éventuellement **étourdie**) peut réitérer le jet de sauvegarde à la fin de chacun de ses tours de jeu et met un terme aux effets sur elle-même en cas de réussite."
+    },
+    {
+      "name": "Sorts innés (1/jour)",
+      "description": "Le méphite peut lancer vague de tonnerre sans composantes matérielles. Sa caractéristique magique est le Charisme."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une créature. Réussite : 4 (1d4 + 2) dégâts tranchants plus 2 (1d4) dégâts de foudre."
+    },
+    {
+      "name": "Souffle tonnant (recharge 6)",
+      "description": "Le méphite crache un cône orageux de 4,50 m. Chaque créature prise dans cette zone d'effet doit réussir un JS Dextérité DD 10 sous peine d'être **assourdie** pendant 1 minute. En cas de marge d'échec de 5 ou plus, la créature est également **étourdie** pour la même durée. Une créature **assourdie** (et éventuellement **étourdie**) peut réitérer le jet de sauvegarde à la fin de chacun de ses tours de jeu et met un terme aux effets sur elle-même en cas de réussite."
+    },
+    {
+      "name": "305",
+      "description": ""
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

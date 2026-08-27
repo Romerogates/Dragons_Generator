@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-garde",
+  "name": "Garde",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 16,
+  "armor_note": "chemise de mailles, bouclier",
+  "hit_points": "11 (2d8 + 2)",
+  "wound_threshold": 5,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +2",
+  "senses": "Perception passive 12",
+  "languages": "une au choix (généralement le commun)",
+  "challenge_rating": "1/8",
+  "xp": 25,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Lance",
+      "description": "Attaque d'arme de corps à corps ou à distance : +3 pour toucher, allonge 1,50 m ou portée 6/18 m, une cible. Réussite : 4 (1d6 + 1) dégâts perforants, ou 5 (1d8 + 1) dégâts perforants si utilisée à deux mains dans le cadre d'une attaque de corps à corps."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "L’équipement des gardes dépend de leur employeur et du contexte global d’insécurité. Si l’environnement est paisible, par exemple, ils porteront plutôt une armure légère et une épée courte, afin de moins se fatiguer au terme de longues journées de travail. Un état ou un seigneur puissant pourra également sélectionner et déployer ses gardes en fonction d’aptitudes particulières, comme par exemple des maîtres-chiens, des troupes de choc lourdement équipées ou une police montée."
+}

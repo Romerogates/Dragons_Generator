@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-le-destrier-des-marchevents",
+  "name": "Le destrier des marchevents",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille G, non aligné",
+  "armor_class": 15,
+  "armor_note": null,
+  "hit_points": "85 (10d10 + 30)",
+  "wound_threshold": 22,
+  "speed": "21 m, escalade 12 m",
+  "abilities": {
+    "str": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 21,
+      "modifier": "+5"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Acrobaties + 7, Athlétisme +6, Perception +3",
+  "senses": "Perception passive 13",
+  "languages": "—",
+  "challenge_rating": "4",
+  "xp": 1100,
+  "traits": [
+    {
+      "name": "Charge",
+      "description": "<u>Si le harro se déplace d'au moins 6 m en ligne droite</u> <u>vers sa cible et qu'il la touche</u> avec une attaque de cornes au même tour de jeu, la cible subit 9 (2d8) dégâts contondants supplémentaires. Si la cible est une créature, elle doit réussir un JS Force DD 14 sous peine de se retrouver **à terre**."
+    },
+    {
+      "name": "Grimpeur exceptionnel",
+      "description": "Le harro peut parcourir les parois les plus difficiles à escalader sans devoir effectuer de test de caractéristique. Seule une surface lisse ou des circonstances exceptionnellement mauvaises le mettront en défaut."
+    },
+    {
+      "name": "Leste",
+      "description": "Le harro bénéficie d'un avantage aux JS Force et Dextérité contre les effets qui menacent de le jeter **à terre**."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le harro effectue deux attaques : une de cornes et une de sabots."
+    },
+    {
+      "name": "Cornes",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 13 (2d8 + 4) dégâts contondants."
+    },
+    {
+      "name": "Sabots",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 9 (2d4 + 4) dégâts contondants.\n112"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Malgré son régime herbivore et sa célérité, c’est un animal farouche et susceptible qui n’hésite pas à se défendre s’il se sent menacé, chargeant et piétinant sans peur. Les harros mâles sont particulièrement agressifs pendant la saison des amours, et peuvent s’en prendre à quiconque fait mine de se dresser sur leur passage. Seuls les plus redoutables prédateurs animaux et chasseurs humanoïdes se mesurent à lui. Porter des habits ou des objets en peau ou en corne de harro est une marque de grand prestige… ou, pour certains, un sacrilège."
+}

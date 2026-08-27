@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-guerrier-tribal",
+  "name": "Guerrier tribal",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 12,
+  "armor_note": "armure de peau",
+  "hit_points": "11 (2d8 + 2)",
+  "wound_threshold": 5,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "Perception passive 10",
+  "languages": "une au choix",
+  "challenge_rating": "1/8",
+  "xp": 25,
+  "traits": [
+    {
+      "name": "Tactique de meute",
+      "description": "Le guerrier tribal bénéficie d'un avantage aux jets d'attaque contre les créatures situées à 1,50 m ou moins d'un de ses alliés qui n'est pas neutralisé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Lance",
+      "description": "Attaque d'arme de corps à corps ou à distance +3 pour toucher, allonge 1,50 m ou portée 6/18 m, une cible. Réussite : 4 (1d6 + 1) dégâts perforants, ou 5 (1d8 + 1) dégâts perforants si utilisée à deux mains dans le cadre d'une attaque de corps à corps.\nIrgituu est une vieille guerrière du Septentrion. Elle est de très loin la doyenne de son clan, mais malgré son âge, elle s'obstine à participer à toutes les tâches, y compris les plus dangereuses. Elle refuse d'être à l'arrière. De quoi devrait-elle avoir peur ? Elle est arrivée à un moment de sa vie où la mort est déjà proche, alors à quoi bon se mettre à l'abri et se cacher derrière les plus jeunes qui ont encore de belles années devant eux ? Irgituu n'a peur de rien. Elle est bien moins forte qu'avant, mais elle reste tenace, chaleureuse et courageuse. Armée de sa lance, elle continuera d'aider sa communauté et de tout partager avec les siens.\n235\nBerserker\nLe berserker décrit tout combattant capable d'entrer dans un état second au moment de se battre. Certains y parviennent en consommant des drogues, ou bien au terme de rituels accomplis avant une bataille. Dans certaines tribus, les berserkers forment une élite guerrière recevant un enseignement mystique et martial spécifique dans un sanctuaire à l'écart du village, réservé aux cultes qu'ils rendent à des esprits fauves terrifiants. En tant que guerriers d'exception, les berserkers bénéficient souvent d'un équipement de qualité supérieure."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "le Dressage, la Survie et l’arc court. Beaucoup apprennent aussi le maniement de l’arc à double courbure. La lance est l’arme la plus commune dans les troupes claniques du Septentrion, souvent utilisée de pair avec un bouclier. L’usage des épées courtes est assez courant également. Avant de partir à la guerre, les combattants se couvrent de peintures de guerre et de protections offertes par les druides."
+}

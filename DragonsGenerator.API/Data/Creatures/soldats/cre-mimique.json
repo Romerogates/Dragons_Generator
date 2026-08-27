@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-mimique",
+  "name": "Mimique",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Monstruosité de taille M (métamorphe), neutre",
+  "armor_class": 12,
+  "armor_note": "armure naturelle",
+  "hit_points": "58 (9d8 + 18)",
+  "wound_threshold": 15,
+  "speed": "4,50 m",
+  "abilities": {
+    "str": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 5,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 8,
+      "modifier": "-1"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +5",
+  "senses": "vision dans le noir 18 m, Perception passive 11",
+  "languages": "—",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [
+    {
+      "name": "Métamorphe",
+      "description": "La mimique peut utiliser son action pour se métamorphoser en objet ou pour reprendre son aspect amorphe d'origine. Son profil est le même sous chaque forme. L'équipement qu'elle porte ou transporte n'est pas transformé. Enfin, elle retrouve sa véritable forme si elle meurt."
+    },
+    {
+      "name": "Adhésif (sous forme d'objet uniquement)",
+      "description": "La mimique adhère à tout ce qui la touche. Toute créature de taille TG ou inférieure qui adhère à la mimique est également **agrippée** par elle (DD 13 pour s'extraire). Les tests de caractéristique effectués pour s'extraire de cette lutte subissent un désavantage."
+    },
+    {
+      "name": "Apparence trompeuse (sous forme d'objet unique-ment)",
+      "description": "Tant que la mimique ne bouge pas, elle est indiscernable d'un objet ordinaire."
+    },
+    {
+      "name": "Saisie",
+      "description": "La mimique bénéficie d'un avantage aux jets d'attaques contre toute créature qu'elle a agrippée."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Pseudopode",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (1d8 + 3) dégâts contondants. Si la mimique est sous forme d'objet, la cible est soumise aux effets de son trait Adhésif."
+    },
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (1d8 + 3) dégâts perforants plus 4 (1d8) dégâts d'acide."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les mimiques n’ont pas besoin de se nourrir, s’attaquant aux intrus uniquement par instinct de prédation. Elles ont cependant une appétence pour la magie, dévorant volontiers les lanceurs de sorts et objets magiques que leur maître les laisse consommer. Quand elles accumulent une quantité suffisante d’énergie magique, elles sont capables de se reproduire par mitose."
+}

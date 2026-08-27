@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-grand-gregaire",
+  "name": "Grand grégaire",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille G, non aligné",
+  "armor_class": 14,
+  "armor_note": "armure naturelle",
+  "hit_points": "22 (3d10 + 6)",
+  "wound_threshold": 6,
+  "speed": "15 m",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Athlétisme + 5, Perception +4",
+  "senses": "Perception passive 14",
+  "languages": "—",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [
+    {
+      "name": "Charge",
+      "description": "Si le grand grégaire se déplace d'au <u>moins 6 m en ligne droite vers sa cible et</u> qu'il la touche avec une attaque de coup de boutoir au même tour de jeu, la cible subit 7 (2d6) dégâts supplémentaires. Si la cible est une créature, elle doit réussir un JS Force DD 13 sous peine de se retrouver **à terre**."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Coup de boutoir",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 6 (1d6 + 3) dégâts contondants."
+    },
+    {
+      "name": "Sabots",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une créature à terre. Réussite : 8 (2d4 + 3) dégâts contondants.\n280"
+    },
+    {
+      "name": "Cerf",
+      "description": ""
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Logo de tête de dragon"
+}

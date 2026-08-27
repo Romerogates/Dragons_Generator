@@ -22,6 +22,7 @@ public sealed class GameDataRepository
     private const string CivilisationsIndex = "index/civilisations.json";
     private const string EquipmentsIndex = "index/equipments.json";
     private const string SpellsIndex = "index/spells.json";
+    private const string CreaturesIndex = "index/creatures.json";
     private const string LanguagesIndex = "index/languages.json";
     private const string HandicapsIndex = "index/handicaps.json";
     private const string SkillsIndex = "index/skills.json";
@@ -260,6 +261,54 @@ public sealed class GameDataRepository
     }
 
     // =========================================================================
+    // CRÉATURES
+    // =========================================================================
+
+    public async Task<List<Creature>> GetCreaturesAsync(CancellationToken ct = default)
+    {
+        var details = await _store.LoadAllDetailsFromIndexAsync(CreaturesIndex, "creatures", ct);
+        return details.Select(DataMappers.ToCreature).ToList();
+    }
+
+    public async Task<Creature?> GetCreatureByIdAsync(string id, CancellationToken ct = default)
+    {
+        var detail = await _store.LoadDetailByIdFromIndexAsync(CreaturesIndex, "creatures", id, ct);
+        return detail is null ? null : DataMappers.ToCreature(detail.Value);
+    }
+
+    public async Task<List<CreatureSummaryDto>> GetCreaturesSummaryAsync(CancellationToken ct = default)
+    {
+        var entries = await _store.GetIndexEntriesAsync(CreaturesIndex, "creatures", ct);
+        return entries.Select(e => new CreatureSummaryDto(
+            Id: GetEntryString(e, "id"),
+            Name: GetEntryString(e, "name"),
+            Category: GetEntryString(e, "category"),
+            Part: e.TryGetProperty("part", out var p) ? p.GetString() : null,
+            Section: e.TryGetProperty("section", out var s) ? s.GetString() : null,
+            ChallengeRating: GetEntryString(e, "challenge_rating"),
+            Xp: e.TryGetProperty("xp", out var xp) ? xp.GetInt32() : 0,
+            ArmorClass: e.TryGetProperty("armor_class", out var ac) ? ac.GetInt32() : 0
+        )).ToList();
+    }
+
+    public async Task<List<string>> GetCreatureCategoriesAsync(CancellationToken ct = default)
+    {
+        var index = await _store.LoadFileAsync(CreaturesIndex, ct);
+        if (!index.TryGetProperty("stats", out var stats) ||
+            !stats.TryGetProperty("by_category", out var byCategory) ||
+            byCategory.ValueKind != JsonValueKind.Object)
+        {
+            var creatures = await GetCreaturesAsync(ct);
+            return creatures.Select(c => c.Category).Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(c => c).ToList();
+        }
+
+        return byCategory.EnumerateObject()
+            .Select(p => p.Name)
+            .OrderBy(c => c, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
+    // =========================================================================
     // LANGUES
     // =========================================================================
 
@@ -441,4 +490,13 @@ public record BackgroundSummaryDto(string Id, string Name, bool Preset, string S
 public record CivilisationSummaryDto(string Id, string Name, int DiceMin, int DiceMax, bool IsCosmopolitan, List<string> PrimarySpecies);
 public record EquipmentSummaryDto(string Id, string Name, string Type, string? Subtype, Cost Cost, double? WKg);
 public record SpellSummaryDto(string Id, string Name, int Level, string School, bool IsRitual, bool IsConcentration, bool IsCorrupted);
+public record CreatureSummaryDto(
+    string Id,
+    string Name,
+    string Category,
+    string? Part,
+    string? Section,
+    string ChallengeRating,
+    int Xp,
+    int ArmorClass);
 public record LanguageSummaryDto(string Id, string Name, string Category, bool IsOralOnly, int WritingSystemsCount);

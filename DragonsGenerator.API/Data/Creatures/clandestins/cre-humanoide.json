@@ -1,0 +1,98 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-humanoide",
+  "name": "humanoïde",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Ravageur ayant l’aspect d’un humanoïde (humain) de taille M, chaotique mauvais",
+  "armor_class": 20,
+  "armor_note": "armure de cuir clouté +2, armure naturelle chancreuse",
+  "hit_points": "225 (18d12 + 108)",
+  "wound_threshold": 57,
+  "speed": "9 m, escalade 9 m",
+  "abilities": {
+    "str": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "wis": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 19,
+      "modifier": "+4"
+    }
+  },
+  "saving_throws": "Dex +8, Con +7, Sag +7, Cha +9",
+  "skills": "Acrobaties +8, Discrétion +13, Intimidation +9, Intuition +7, Perception +12, Persuasion +9, Survie +7, Tromperie +9",
+  "senses": "Perception passive 22",
+  "languages": "cyfand, draconique, phantasme",
+  "challenge_rating": "16",
+  "xp": 15000,
+  "traits": [
+    {
+      "name": "Attaque sournoise.",
+      "description": "Une fois par tour de jeu, Mille visages inflige 14 (4d6) dégâts supplémentaires quand il touche une cible avec une attaque d’arme s’il a bénéficié d’un avantage au jet d’attaque ou si la cible est située à 1,50 m ou moins d’un de ses alliés non neutralisés. L’aptitude ne s’applique pas si Mille visages a subi un désavantage au jet d’attaque."
+    },
+    {
+      "name": "Change-forme.",
+      "description": "Au prix d’une action, Mille visages retrouve sa forme draconique, ou prend la forme d’un humanoïde ou d’une bête de son choix."
+    },
+    {
+      "name": "Jumeau maléfique.",
+      "description": "Tant que Hrysanthëis vit, si Mille visages meurt, il réapparaît à minuit à un endroit où Hrysanthëis a précédemment perdu du sang."
+    },
+    {
+      "name": "Pattes d’araignée.",
+      "description": "Mille visages peut parcourir les parois les plus difficiles à escalader, y compris les plafonds, sans devoir effectuer de test de caractéristique."
+    },
+    {
+      "name": "Résistance légendaire (3/jour).",
+      "description": "Si Mille visages rate un jet de sauvegarde, il peut décider de le réussir tout de même."
+    },
+    {
+      "name": "Saut étendu.",
+      "description": "Mille visages peut sauter avec élan jusqu’à 8,40 m en longueur et 3 m de hauteur."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples.",
+      "description": "Mille visages effectue deux attaques d’épée courte."
+    },
+    {
+      "name": "Épée courte +1 vicieuse.",
+      "description": "Attaque d’arme de corps à corps : +9 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (1d6 + 4) dégâts perforants, et la cible doit effectuer un JS Constitution DD 15. Elle subit 24 (7d6) dégâts de poison en cas de sauvegarde ratée, et la moitié en cas de réussite. Sur un 20 naturel au jet d’attaque, le coup critique inflige également 7 dégâts perforants supplémentaires."
+    },
+    {
+      "name": "Arbalète légère.",
+      "description": "Attaque d’arme à distance : +8 pour toucher, portée 24/96 m, une cible. Réussite : 7 (1d8 + 3) dégâts perforants, et la cible doit effectuer un JS Constitution DD 15. Elle subit 24 (7d6) dégâts de poison en cas de sauvegarde ratée, et la moitié en cas de réussite."
+    }
+  ],
+  "reactions": [
+    {
+      "name": "Adaptation instantanée (×3 par repos court ou long).",
+      "description": "Quand Mille visage est ciblé par une attaque d’arme ou de sort, il peut utiliser sa réaction pour renforcer son exosquelette chancreux sur la partie de son corps visée. Il bénéficie d’un bonus de +5 à la CA contre cette attaque."
+    },
+    {
+      "name": "Bond évasif.",
+      "description": "Quand Mille visages est ciblé par un effet de zone, il peut jouer sa réaction pour effectuer un saut sans élan, en hauteur ou en longueur. Si son bond la resitue hors de la zone de l’effet, il n’est pas affecté. Le trajet de son saut doit être dégagé, c’est-à-dire dépourvu de créatures ou d’obstacles. Son déplacement suscite les attaques d’opportunité des créatures à portée."
+    }
+  ],
+  "legendary_actions": [],
+  "description": ""
+}

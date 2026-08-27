@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-chef-de-bande",
+  "name": "Chef de bande",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement autre que loyal au choix",
+  "armor_class": 15,
+  "armor_note": "armure de cuir cloutée",
+  "hit_points": "65 (10d8 + 20)",
+  "wound_threshold": 17,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 14,
+      "modifier": "+2"
+    }
+  },
+  "saving_throws": "For +4, Dex +5, Sag +2",
+  "skills": "Athlétisme +4, Discrétion +5, Perception +2, Tromperie +4",
+  "senses": "Perception passive 12",
+  "languages": "argot des voleurs et deux au choix",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le chef de bande effectue trois attaques de corps à corps : deux de cimeterre et une de dague. Ou alors, il effectue deux attaques à distance avec ses dagues."
+    },
+    {
+      "name": "Cimeterre",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 6 (1d6 + 3) dégâts tranchants."
+    },
+    {
+      "name": "Dague",
+      "description": "Attaque d'arme de corps à corps ou à distance : +5 pour toucher, allonge 1,50 m ou portée 6/18 m, une cible. Réussite : 5 (1d4 + 3) dégâts perforants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Le chef de bande a des compétences dépendant de sa spécialité dans le domaine criminel. Par exemple, s’il est pirate, il maîtrisera à la fois les Véhicules maritimes et les Instruments de navigation, ce qui le distinguera de ses subordonnés."
+}

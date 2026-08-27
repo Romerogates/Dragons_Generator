@@ -10,6 +10,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
+import { resolveApiAssetUrl } from '@core/utils/api-url.util';
+import { downloadTicketCharacterJson } from '@core/utils/support-download.util';
 
 interface AdminUser {
   id: string;
@@ -31,6 +33,8 @@ interface AdminTicket {
   userEmail?: string;
   attachmentOriginalName?: string;
   attachmentUrl?: string;
+  characterId?: string;
+  characterName?: string;
   createdAt: string;
   adminNotes?: string;
 }
@@ -48,6 +52,7 @@ export class AdminPage implements OnInit {
   private readonly api = environment.apiUrl;
 
   readonly tab = signal<'users' | 'tickets'>('users');
+  readonly assetUrl = resolveApiAssetUrl;
   readonly users = signal<AdminUser[]>([]);
   readonly tickets = signal<AdminTicket[]>([]);
   readonly message = signal<string | null>(null);
@@ -126,5 +131,12 @@ export class AdminPage implements OnInit {
     this.http.patch(`${this.api}/admin/support/tickets/${id}`, { status }).subscribe({
       next: () => this.loadTickets(),
     });
+  }
+
+  downloadCharacterJson(ticket: AdminTicket): void {
+    if (!ticket.characterId) return;
+    downloadTicketCharacterJson(this.http, ticket.id, ticket.characterName ?? 'personnage', () =>
+      this.error.set('Impossible de télécharger le JSON du personnage.'),
+    );
   }
 }

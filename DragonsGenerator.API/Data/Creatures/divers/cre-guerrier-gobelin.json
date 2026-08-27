@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-guerrier-gobelin",
+  "name": "Guerrier gobelin",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (gobelinoïde) de taille P, chaotique (tout alignement)",
+  "armor_class": 15,
+  "armor_note": "armure de cuir, bouclier",
+  "hit_points": "7 (2d6)",
+  "wound_threshold": 4,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": "Dex +5",
+  "skills": "Discrétion +7, Dressage +5",
+  "senses": "vision dans le noir 18 m, Perception passive 11",
+  "languages": "commun, gobelin",
+  "challenge_rating": "1/4",
+  "xp": 50,
+  "traits": [],
+  "actions": [],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Humanoïde (gobelinoïde) de taille P, chaotique (tout alignement)"
+}

@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-guerrier-orc",
+  "name": "Guerrier orc",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (orc) de taille M, chaotique (tout alignement)",
+  "armor_class": 13,
+  "armor_note": "armure de peau",
+  "hit_points": "15 (2d8 + 6)",
+  "wound_threshold": 7,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 10",
+  "languages": "commun, kaani",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [
+    {
+      "name": "Vélocité",
+      "description": "Au prix d'une action bonus, l'orc peut se déplacer jusqu'à sa VD vers une créature qu'il voit."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Sabre long",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 9 (1d12 + 3) dégâts perforants ou tranchants."
+    },
+    {
+      "name": "Arc composite",
+      "description": "Attaque d'arme à distance : +3 pour toucher, portée 48/150 m, une cible. Réussite : 7 (1d8 + 3) dégâts perforants.\nLogo cavalier orc"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Tous les enfants orcs, qu’ils naissent dans le Grand Kaan ou ailleurs sur Eana, apprennent les rudiments du combat et sont bercés d’épopées pleines de merveilles. Respectés dans le Grand Kaan, les descendants orcs de la Horde qui vivent dans d’autres régions, au Cyfandir en particulier, sont la cible de préjugés et de racisme. Leur réputation de courage les précède, et elle inquiète souvent les adversaires avant même qu’ils n’aient à dégainer leurs armes. Malheureusement, ils sont fréquemment considérés, en conséquence, comme des monstres brutaux, cruels et arriérés. La discrimination qui les touche les cantonne le plus souvent à la marginalité. Beaucoup d’entre eux deviennent mercenaires, gardes du corps ou brigands. Dans le Cyfandir, la Cité Franche représente pour les orcs une source d’espoir, car la diversité de la ville pourrait leur donner, plus qu’ailleurs sur ce continent, une chance de mener une vie normale."
+}

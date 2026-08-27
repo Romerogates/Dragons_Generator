@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-smilodon",
+  "name": "Smilodon",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille G, non aligné",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "52 (7d10 + 14)",
+  "wound_threshold": 13,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +6, Perception +3",
+  "senses": "Perception passive 13",
+  "languages": "—",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [
+    {
+      "name": "Flair",
+      "description": "Le smilodon bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'odorat."
+    },
+    {
+      "name": "Bond offensif",
+      "description": "<u>Si le smilodon se déplace d'au moins 6 m en ligne droite vers une créature et qu'il la touche</u> avec une attaque de griffes au même tour de jeu, la cible doit réussir un JS Force DD 14 sous peine de se retrouver **à terre**. Si la créature est à terre, le smilodon peut aussitôt effectuer une attaque de morsure contre elle au prix d'une action bonus."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 10 (1d12 + 4) dégâts perforants."
+    },
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 11 (2d6 + 4) dégâts tranchants."
+    },
+    {
+      "name": "372",
+      "description": ""
+    },
+    {
+      "name": "Annexe",
+      "description": ""
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Également appelé tigre à dents de sabre du fait de ses canines exceptionnellement longues, comparables à deux poignards, le smilodon était l’un des emblèmes majeurs de la civilisation boréale. Ce félin puissant du Grand Nord n’est pas taillé pour courser des bêtes petites et agiles, il dépend donc de grandes proies. Il chasse les chevaux, les rhinocéros laineux, les rennes et les mammouths, animaux qu’il est parfois capable de tuer net grâce à ses crocs massifs. Les barbares du Septentrion aiment à imiter la démarche et les attitudes de ce fauve."
+}

@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-ankheg-cendreuse-d-elite",
+  "name": "Ankheg cendreuse d’élite",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille G, non aligné",
+  "armor_class": 19,
+  "armor_note": "armure naturelle",
+  "hit_points": "104 (11d10 + 44)",
+  "wound_threshold": 26,
+  "speed": "12 m, fouissage 3 m",
+  "abilities": {
+    "str": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "dex": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "int": {
+      "score": 8,
+      "modifier": "-1"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 8,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": "Con +7, Sag +4",
+  "skills": "Discrétion +3, Perception +4, Nature +2, Survie +4",
+  "senses": "vision dans le noir 18 m, perception des vibrations 18 m, Perception passive 13",
+  "languages": "phéromones et langage corporel, sylvestre",
+  "challenge_rating": "7",
+  "xp": 2900,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "L'ankheg cendreuse d'élite effectue deux attaques de morsure."
+    },
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +8 pour toucher, allonge 1,50 m, une cible. Réussite : 12 (2d6 + 5) dégâts tranchants plus 4 (1d8) dégâts d'acide. Si la cible est une créature de taille G ou inférieure, elle est **agrippée** (DD 16 pour s'extraire). Tant que la lutte persiste, l'ankheg ne peut mordre que la créature agrippée et bénéficie d'un avantage aux jets d'attaque correspondants."
+    },
+    {
+      "name": "Jet d'acide (recharge 5-6)",
+      "description": "L'ankheg crache une ligne d'acide de 12 m de long et de 1,50 m de large, à condition qu'elle ne soit pas en train d'agripper une créature. Chaque créature prise dans la ligne doit effectuer un JS Dextérité DD 16 et subit 21 (6d6) dégâts d'acide en cas d'échec, la moitié en cas de réussite.\nBeaucoup plus rares que les simples soldates ankhegs, les ankhegs d'élite sont des combattantes redoutables, à même de défendre la colonie contre les plus grandes menaces. Leur intelligence supérieure les rend plus adaptables à des situations inédites. Malheureusement, donner naissance à ces créatures demande beaucoup d'énergie à une regikheg, au point que son espérance de vie se réduit légèrement à chaque fois qu'elle conçoit l'une de ces prodigieuses gardiennes. Les druides rapportent des légendes dans lesquelles ces créatures accomplirent des exploits pour protéger Eana, parfois même en quittant leur colonie pour accompagner des Élus d'Éternité dans des aventures épiques.\nAprès avoir creusé secrètement des tunnels, les ankhegs se tiennent à l'affût sous terre et jaillissent en nombre, de manière parfaitement coordonnée, pour surprendre leurs proies ou leurs ennemis. Cette tactique redoutable est rendue possible grâce à leur communication par phéromones et cliquetis.\nExtrait de Rencontres et découvertes, par Tarella, géographe et cartographe"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "C"
+}

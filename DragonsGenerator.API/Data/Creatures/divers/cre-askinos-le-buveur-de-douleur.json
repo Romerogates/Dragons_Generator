@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-askinos-le-buveur-de-douleur",
+  "name": "Askinos le buveur de douleur",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Fiélon (hospodar diabolique) de taille TG, loyal mauvais",
+  "armor_class": 20,
+  "armor_note": "armure naturelle",
+  "hit_points": "375 (30d12 + 180)",
+  "wound_threshold": 94,
+  "speed": "15 m, escalade 12 m",
+  "abilities": {
+    "str": {
+      "score": 25,
+      "modifier": "+7"
+    },
+    "dex": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "con": {
+      "score": 23,
+      "modifier": "+6"
+    },
+    "int": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "wis": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "cha": {
+      "score": 24,
+      "modifier": "+7"
+    }
+  },
+  "saving_throws": "Dex +12, Con +14, Sag +13, Cha +15",
+  "skills": "Acrobaties +12, Intimidation +15, Intuition +13, Perception +13, Religion +13, Survie +13, Tromperie +15",
+  "senses": "vision lucide 36 m, Perception passive 23",
+  "languages": "céleste, diabolique, télépathie 36 m",
+  "challenge_rating": "25",
+  "xp": 75000,
+  "traits": [
+    {
+      "name": "Armes magiques",
+      "description": "Les attaques d'arme d'Askinos sont magiques."
+    },
+    {
+      "name": "Capture d'âme",
+      "description": "Si les trois attaques de pattes d'Askinos touchent une même cible au cours de son tour, Askinos peut tenter d'arracher l'âme de sa proie pour l'emprisonner dans sa cage thoracique. La cible doit réussir un JS Charisme DD 23 sous peine d'être **inconsciente**. Le corps tombe inerte tandis que l'âme est incorporée en Askinos. L'âme emprisonnée est désormais partiellement intégrée à l'esprit d'Askinos. Dans cet état, elle peut, en considérant Askinos comme la source de ses actions : communiquer par télépathie sur 18 m ; utiliser les actions Assister et Inciter ; pénétrer dans les profondeurs de l'esprit d'Askinos pour y chercher des informations (cf. encadré **Explorer l'esprit d'Askinos**). Askinos peut expulser volontairement une âme capturée avec l'action légendaire Libérer une âme capturée. Sitôt libérée, la créature retrouve son corps et l'état inconscient cesse. Askinos peut emprisonner plusieurs âmes."
+    },
+    {
+      "name": "Vif",
+      "description": "Askinos peut jouer deux réactions par round."
+    },
+    {
+      "name": "Sorts innés",
+      "description": "La caractéristique magique d'Askinos est le Charisme (DD de sauvegarde des sorts : 23, +15 aux jets d'attaque de sorts). Askinos peut lancer les sorts suivants au niveau 17 sans composantes matérielles :\nÀ volonté : manipulation à distance, rayon de givre, vivacité\n3/jour chacun : dissipation de la magie, mur de glace, sphère glaciale\n1/jour chacun : dédale, ennemi subconscient"
+    },
+    {
+      "name": "Résistance à la magie",
+      "description": "Askinos bénéficie d'un avantage aux jets de sauvegarde contre les sorts et autres effets magiques."
+    },
+    {
+      "name": "Résistance légendaire (3/jour)",
+      "description": "Si Askinos rate un jet de sauvegarde, il peut décider de le réussir tout de même."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Askinos effectue trois attaques de pattes."
+    },
+    {
+      "name": "Appel de kûshu (recharge 6)",
+      "description": "Askinos fait appel à un **diable gelé**, lequel apparaît dans un rayon de 9 m et obéit à ses ordres."
+    },
+    {
+      "name": "Pattes",
+      "description": "Attaque d'arme de corps à corps : +15 pour toucher, allonge 3 m, une cible. Réussite : 14 (2d6 + 7) dégâts tranchants plus 11 (2d10) dégâts de froid."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Askinos le buveur de douleur"
+}

@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-creature-inconnue",
+  "name": "Créature inconnue",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement autre que bon au choix",
+  "armor_class": 16,
+  "armor_note": "armure de cuir cloutée",
+  "hit_points": "135 (18d8 + 54)",
+  "wound_threshold": 34,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "dex": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "con": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "wis": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 12,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": "Dex +8, Con +7, Int +6",
+  "skills": "Acrobaties +8, Athlétisme +5, Discrétion +12, Investigation +6, Perception +10, Tromperie +5",
+  "senses": "Perception passive 20",
+  "languages": "argot des voleurs et trois au choix",
+  "challenge_rating": "11",
+  "xp": 7200,
+  "traits": [
+    {
+      "name": "Assassinat",
+      "description": "À son premier tour de jeu, l’assassin bénéficie d’un avantage aux jets d’attaque contre toute créature qui n’a pas encore joué un tour. Toute attaque réussie par l’assassin contre une cible surprise est considérée comme un coup critique."
+    },
+    {
+      "name": "Attaque sournoise",
+      "description": "Une fois par tour de jeu, l’assassin inflige 21 (6d6) dégâts supplémentaires quand il touche une cible avec une attaque d’arme s’il a bénéficié d’un avantage au jet d’attaque ou si la cible est située à 1,50 m ou moins d’un de ses alliés non neutralisés. L’aptitude ne s’applique pas si l’assassin a subi un désavantage au jet d’attaque."
+    },
+    {
+      "name": "Esquive totale",
+      "description": "Lorsqu’il est soumis à un effet qui lui donne droit à un jet de sauvegarde de Dextérité pour réduire les dégâts de moitié, l’assassin ne subit en fait aucun dégât en cas de réussite et seulement la moitié en cas d’échec."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "L’assassin effectue deux attaques d’épée courte."
+    },
+    {
+      "name": "Épée courte",
+      "description": "Attaque d’arme de corps à corps : +8 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (1d6 + 4) dégâts perforants, et la cible doit effectuer un JS Constitution DD 17. Elle subit 31 (9d6) dégâts de poison en cas de sauvegarde ratée, et la moitié en cas de réussite."
+    },
+    {
+      "name": "Arbalète légère",
+      "description": "Attaque d’arme à distance : +8 pour toucher, portée 24/96 m, une cible. Réussite : 8 (1d8 + 4) dégâts perforants, et la cible doit effectuer un JS Constitution DD 17. Elle subit 31 (9d6) dégâts de poison en cas de sauvegarde ratée, et la moitié en cas de réussite."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using DragonsGenerator.API.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace DragonsGenerator.API.Services;
@@ -65,4 +66,49 @@ public static class AuthHelpers
     }
 
     public static bool IsAdmin(ClaimsPrincipal user) => user.IsInRole(AppRoles.Admin);
+
+    public static bool TryNormalizeDisplayName(string? raw, out string normalized, out string? error)
+    {
+        normalized = (raw ?? "").Trim();
+        if (normalized.Length < 2)
+        {
+            error = "Pseudo obligatoire (2–64 caractères).";
+            return false;
+        }
+        if (normalized.Length > 64)
+        {
+            error = "Pseudo trop long (64 caractères max).";
+            return false;
+        }
+        error = null;
+        return true;
+    }
+
+    public static Task<bool> IsDisplayNameTakenAsync(
+        AppDbContext db,
+        string displayName,
+        Guid? excludeUserId,
+        CancellationToken ct
+    )
+    {
+        var lower = displayName.ToLowerInvariant();
+        return db.Users.AnyAsync(
+            u => u.DisplayName.ToLower() == lower && (!excludeUserId.HasValue || u.Id != excludeUserId.Value),
+            ct
+        );
+    }
+
+    public static string ResolveWebUrl(string? requestWebUrl, string configuredUrl)
+    {
+        if (
+            !string.IsNullOrWhiteSpace(requestWebUrl)
+            && Uri.TryCreate(requestWebUrl, UriKind.Absolute, out var uri)
+            && uri.Scheme is "http" or "https"
+        )
+        {
+            return requestWebUrl.TrimEnd('/');
+        }
+
+        return configuredUrl.TrimEnd('/');
+    }
 }

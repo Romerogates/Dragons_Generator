@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-salamandre",
+  "name": "Salamandre",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Élémentaire (feu) de taille G, neutre ou neutre mauvais",
+  "armor_class": 15,
+  "armor_note": "armure naturelle",
+  "hit_points": "90 (12d10 + 24)",
+  "wound_threshold": 23,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 12,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 10",
+  "languages": "originel",
+  "challenge_rating": "5",
+  "xp": 1800,
+  "traits": [
+    {
+      "name": "Armes brûlantes",
+      "description": "Quand la salamandre touche avec une arme de corps à corps en métal, elle inflige 3 (1d6) dégâts de feu supplémentaires (inclus dans l'attaque)."
+    },
+    {
+      "name": "Corps brûlant",
+      "description": "Une créature qui entre en contact avec la salamandre ou qui la touche avec une attaque de corps à corps alors qu'elle se situe dans un rayon de 1,50 m du monstre subit 7 (2d6) dégâts de feu."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "La salamandre effectue deux attaques : une de lance et une de queue."
+    },
+    {
+      "name": "Lance",
+      "description": "Attaque d'arme de corps à corps ou à distance : +7 pour toucher, allonge 1,50 m ou portée 6 m/18 m, une cible. Réussite : 11 (2d6 + 4) dégâts perforants, ou 13 (2d8 + 4) dégâts perforants si utilisée à deux mains dans le cadre d'une attaque de corps à corps, plus 3 (1d6) dégâts de feu."
+    },
+    {
+      "name": "Queue",
+      "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 3 m, une cible. Réussite : 11 (2d6 + 4) dégâts contondants plus 7 (2d6) dégâts de feu, et la cible est **agrippée** (DD 15 pour s'extraire). Tant que la lutte persiste, la cible est **entravée** et la salamandre peut la toucher automatiquement avec sa queue, mais le monstre ne peut plus effectuer d'attaques de queue contre d'autres cibles.\nG"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

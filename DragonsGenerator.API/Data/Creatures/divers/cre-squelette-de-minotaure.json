@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-squelette-de-minotaure",
+  "name": "Squelette de minotaure",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Mort-vivant de taille G, loyal mauvais",
+  "armor_class": 12,
+  "armor_note": "armure naturelle",
+  "hit_points": "67 (9d10 + 18)",
+  "wound_threshold": null,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "wis": {
+      "score": 8,
+      "modifier": "-1"
+    },
+    "cha": {
+      "score": 5,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 9",
+  "languages": "comprend toutes les langues pratiquées de son vivant mais ne peut pas parler",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [
+    {
+      "name": "Charge",
+      "description": "<u>Si le squelette se déplace d'au moins 3 m en</u> <u>ligne droite vers sa cible et qu'il la touche</u> avec une attaque d'embrochage au même tour de jeu, la cible subit 9 (2d8) dégâts perforants supplémentaires. Si la cible est une créature, elle doit réussir un JS Force DD 14 sous peine d'être repoussée de 3 m et de se retrouver **à terre**."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Grande hache",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 17 (2d12 + 4) dégâts tranchants."
+    },
+    {
+      "name": "Embrochage",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 13 (2d8 + 4) dégâts perforants.\nSquelette de minotaure\n173"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

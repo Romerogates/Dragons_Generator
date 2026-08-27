@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-expert",
+  "name": "Expert",
+  "category": "habitants",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Habitants",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "9 (2d8)",
+  "wound_threshold": 4,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "wis": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 14,
+      "modifier": "+2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "trois au choix à +6, hormis Acrobaties, Athlétisme, Discrétion, Escamotage et Perception",
+  "senses": "Perception passive 12",
+  "languages": "trois au choix",
+  "challenge_rating": "1/8",
+  "xp": 25,
+  "traits": [
+    {
+      "name": "Talentueux",
+      "description": "L'expert a l'avantage aux tests de caractéristiques relatifs à son métier."
+    },
+    {
+      "name": "Méticuleux",
+      "description": "Lorsqu'un expert a la possibilité de consacrer un repos court à un jet dans une compétence ou des outils qu'il maîtrise, il peut renoncer à lancer le dé et considérer qu'il a obtenu un résultat de 15 sur le dé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Dague",
+      "description": "Attaque d'arme de corps à corps ou à distance : +4 pour toucher, allonge 1,50 m ou portée 6/18 m, une créature. Réussite : 4 (1d4+2) dégâts perforants.\n21\nAristocrate"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "L’expert est une personne qui a développé un talent particulier dans un domaine spécifique. Il se distingue par sa quête d’excellence et jouit aisément d’une certaine réputation. Des gens le sollicitent de loin pour obtenir ses conseils ou commander ses œuvres. Il est tantôt maître artisan, tantôt érudit. Très souvent, il a un statut de bourgeois et les droits afférents, et fait partie d’une guilde ou d’un réseau analogue. Dans certaines sociétés, les experts sont aussi respectés que les **aristocrates**. Obtenir une place d’apprenti auprès d’un expert réputé est un grand honneur, et cette expérience forge généralement un lien qui dure toute la vie, voire s’étend sur plusieurs générations."
+}

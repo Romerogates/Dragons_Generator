@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-renne",
+  "name": "Renne",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille G, non aligné",
+  "armor_class": 11,
+  "armor_note": "armure naturelle",
+  "hit_points": "17 (2d10 + 6)",
+  "wound_threshold": 7,
+  "speed": "15 m",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 6,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +2",
+  "senses": "Perception passive 12",
+  "languages": "—",
+  "challenge_rating": "1/4",
+  "xp": 50,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Ruade",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 6 (1d6 + 3) dégâts contondants.\nWorg"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Ces troupeaux constituent une des plus grandes richesses des habitants dans ces régions où le sous-sol est gelé en permanence. Ces animaux servent dans des attelages de traîneaux, de montures, et dans de nombreuses préparations culinaires (viandes séchées) et confections artisanales (vêtements en peau de renne). Pour les habitants du Septentrion, le renne a une importance mythologique aussi grande que le cheval sous d’autres latitudes. Dans les légendes locales, il tire des traîneaux de fées ou leur sert de monture."
+}

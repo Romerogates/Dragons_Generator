@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-mule",
+  "name": "Mule",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille M, non aligné",
+  "armor_class": 10,
+  "armor_note": null,
+  "hit_points": "11 (2d8 + 2)",
+  "wound_threshold": 5,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 5,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "Perception passive 10",
+  "languages": "—",
+  "challenge_rating": "1/8",
+  "xp": 25,
+  "traits": [
+    {
+      "name": "Bête de somme",
+      "description": "La mule est considérée comme une créature de taille G pour ce qui est de déterminer sa charge maximale."
+    },
+    {
+      "name": "Leste",
+      "description": "La mule bénéficie d'un avantage aux JS Force et Dextérité contre les effets qui menacent de la jeter à terre."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Sabots",
+      "description": "Attaque d'arme de corps à corps : +2 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d4 + 2) dégâts contondants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

@@ -15,6 +15,12 @@ import {
   normalizeEquipments,
   resolveEquipmentRefId,
 } from '@core/utils/equipment.utils';
+import {
+  equipmentDescription,
+  equipmentSummaryText,
+  type EquipmentDisplayLike,
+} from '@core/utils/equipment-display.util';
+import { registerGameLabels } from '@core/utils/game-id-labels';
 import type { EquipmentInstance } from '../../../../core/models/Character/character';
 
 export interface EquipmentRaw {
@@ -142,7 +148,9 @@ export class EquipmentStep implements OnInit {
   ngOnInit(): void {
     this.dataService.getEquipments().subscribe({
       next: (items) => {
-        this.catalog.set(normalizeEquipments(items) as unknown as EquipmentRaw[]);
+        const normalized = normalizeEquipments(items) as unknown as EquipmentRaw[];
+        this.catalog.set(normalized);
+        registerGameLabels(normalized.map((e) => [e.id, e.name]));
         this.loading.set(false);
       },
       error: () => {
@@ -260,8 +268,16 @@ export class EquipmentStep implements OnInit {
     return item.isCategory ? (item.categoryLabel ?? 'Choix') : (item.equipment?.name ?? 'Objet');
   }
 
+  equipmentSummary(eq: EquipmentRaw): string {
+    return equipmentSummaryText(eq as EquipmentDisplayLike);
+  }
+
+  equipmentDesc(eq: EquipmentRaw): string | null {
+    return equipmentDescription(eq as EquipmentDisplayLike);
+  }
+
   eqDetail(eq: EquipmentRaw): string {
-    return eq.wKg ? `${eq.wKg} kg` : '';
+    return equipmentSummaryText(eq as EquipmentDisplayLike);
   }
 
   private resolve(ref: ItemRef, map: Map<string, EquipmentRaw>): ResolvedItem {

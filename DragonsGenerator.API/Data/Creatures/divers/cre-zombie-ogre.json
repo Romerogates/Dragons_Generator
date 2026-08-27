@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-zombie-ogre",
+  "name": "Zombie ogre",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Mort-vivant de taille G, neutre mauvais",
+  "armor_class": 8,
+  "armor_note": null,
+  "hit_points": "76 (8d10 + 32)",
+  "wound_threshold": null,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "con": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "int": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "cha": {
+      "score": 5,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": "Sag +0",
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 8",
+  "languages": "comprend le commun et le géant mais ne peut pas parler",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [
+    {
+      "name": "Vigueur cadavérique",
+      "description": "Si des dégâts font tomber le zombie ogre à 0 pv, il doit effectuer un JS Constitution dont le DD est égal à 5 + les dégâts subis, à moins qu'il ne s'agisse de dégâts radiants ou d'un coup critique. En cas de réussite, il tombe à 1 pv au lieu de 0."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morgenstern",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 13 (2d8 + 4) dégâts contondants.\nZombie harro logo"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

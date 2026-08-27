@@ -12,6 +12,7 @@ public static class DbSeeder
         using var scope = sp.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         await db.Database.EnsureCreatedAsync();
+        await DbSchemaUpgrader.EnsureCampaignAndSocialTablesAsync(db);
 
         var adminOpt = scope.ServiceProvider.GetRequiredService<IOptions<AdminSeedOptions>>().Value;
         var email = (adminOpt.Email ?? "").Trim().ToLowerInvariant();

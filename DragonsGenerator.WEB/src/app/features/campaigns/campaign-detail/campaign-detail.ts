@@ -1,0 +1,391 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+  CUSTOM_ELEMENTS_SCHEMA,
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { CampaignCloudService } from '@core/services/campaign-cloud.service';
+import { FriendsService } from '@core/services/friends.service';
+import { CharacterCloudService } from '@core/services/character-cloud.service';
+import { AuthService } from '@core/services/auth.service';
+import { DataService } from '@core/services/data.service';
+import { forkJoin, catchError, map, of, Observable } from 'rxjs';
+import { CampaignPdfService, CreaturePrintEntry } from '@core/services/campaign-pdf.service';
+import { Character } from '@core/models/Character/character';
+import {
+  CampaignData,
+  CampaignMember,
+  CREATURE_ROLE_LABELS,
+  createEncounterFromCreatures,
+  encounterPendingXp,
+  encounterTotalXp,
+  EncounterGroup,
+  FriendUser,
+  type CampaignDetail as CampaignDetailModel,
+} from '@core/models/Campaign/campaign';
+import { ADVENTURE_TONE_LABELS } from '@core/models/Story/story';
+import { formatChallengeRating, getCreatureCategoryLabel } from '@core/utils/creature-display.util';
+
+type Tab = 'overview' | 'creatures' | 'encounters' | 'players';
+
+@Component({
+  selector: 'app-campaign-detail',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink],
+  templateUrl: './campaign-detail.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
+export class CampaignDetailPage implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private campaigns = inject(CampaignCloudService);
+  private friends = inject(FriendsService);
+  private characters = inject(CharacterCloudService);
+  private auth = inject(AuthService);
+  private data = inject(DataService);
+  private pdf = inject(CampaignPdfService);
+
+  readonly loading = signal(true);
+  readonly saving = signal(false);
+  readonly error = signal<string | null>(null);
+  readonly tab = signal<Tab>('overview');
+  readonly campaign = signal<CampaignDetailModel | null>(null);
+  readonly printing = signal(false);
+  readonly friendsList = signal<FriendUser[]>([]);
+  readonly myCharacters = signal<{ id: string; name: string }[]>([]);
+  readonly creatureXpMap = signal<Record<string, number>>({});
+
+  readonly isLoggedIn = this.auth.isLoggedIn;
+
+  readonly players = computed(() =>
+    (this.campaign()?.members ?? []).filter((m) => m.role === 'player'),
+  );
+
+  readonly totalXpAwarded = computed(() =>
+    (this.campaign()?.members ?? [])
+      .filter((m) => m.role === 'player')
+      .reduce((s, m) => s + m.xpEarnedInCampaign, 0),
+  );
+
+  protected roleLabels = CREATURE_ROLE_LABELS;
+  protected toneLabels = ADVENTURE_TONE_LABELS;
+  protected formatCr = formatChallengeRating;
+  protected categoryLabel = getCreatureCategoryLabel;
+  protected encounterTotalXp = encounterTotalXp;
+  protected encounterPendingXp = encounterPendingXp;
+
+  ngOnInit(): void {
+    if (!this.auth.isLoggedIn()) {
+      this.loading.set(false);
+      return;
+    }
+
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) {
+      this.router.navigate(['/campaigns']);
+      return;
+    }
+
+    this.data.getCreaturesSummary().pipe(catchError(() => of([]))).subscribe((list) => {
+      const map: Record<string, number> = {};
+      for (const c of list) map[c.id] = c.xp;
+      this.creatureXpMap.set(map);
+    });
+
+    this.reload(id);
+    this.friends.listFriends().subscribe((f) => this.friendsList.set(f));
+    this.characters.list().subscribe((chars) =>
+      this.myCharacters.set(chars.map((c) => ({ id: c.id, name: c.name }))),
+    );
+  }
+
+  reload(id?: string): void {
+    const campaignId = id ?? this.campaign()?.id;
+    if (!campaignId) return;
+    this.loading.set(true);
+    this.campaigns.get(campaignId).subscribe({
+      next: (c) => {
+        this.campaign.set(c);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.error.set('Campagne introuvable.');
+        this.loading.set(false);
+      },
+    });
+  }
+
+  setTab(t: Tab): void {
+    this.tab.set(t);
+  }
+
+  saveData(patch: Partial<CampaignData>): void {
+    const c = this.campaign();
+    if (!c) return;
+    const data = { ...c.data, ...patch };
+    this.persist(c.title, data);
+  }
+
+  saveTitle(title: string): void {
+    const c = this.campaign();
+    if (!c) return;
+    this.persist(title, c.data);
+  }
+
+  private persist(title: string, data: CampaignData): void {
+    const c = this.campaign();
+    if (!c) return;
+    this.saving.set(true);
+    this.campaigns.update(c.id, title, data).subscribe({
+      next: () => {
+        this.campaign.update((prev) => (prev ? { ...prev, title, data } : prev));
+        this.saving.set(false);
+      },
+      error: () => {
+        this.error.set('Échec de la sauvegarde.');
+        this.saving.set(false);
+      },
+    });
+  }
+
+  generateEncountersFromStory(): void {
+    const c = this.campaign();
+    if (!c || c.data.creatures.length === 0) return;
+    const xpMap = this.creatureXpMap();
+    const antagonists = c.data.creatures.filter((x) => x.role === 'antagonist');
+    const others = c.data.creatures.filter((x) => x.role !== 'antagonist');
+    const groups: EncounterGroup[] = [];
+    if (antagonists.length) {
+      groups.push(createEncounterFromCreatures('Confrontation principale', antagonists, xpMap));
+    }
+    if (others.length) {
+      groups.push(createEncounterFromCreatures('Rencontres secondaires', others, xpMap));
+    }
+    this.saveData({ encounters: [...c.data.encounters, ...groups] });
+  }
+
+  markDefeated(encounterId: string, creatureIndex: number): void {
+    const c = this.campaign();
+    if (!c || !c.isOwner) return;
+    const encounters = c.data.encounters.map((enc) => {
+      if (enc.id !== encounterId) return enc;
+      const creatures = enc.creatures.map((cr, i) => {
+        if (i !== creatureIndex || cr.defeated >= cr.quantity) return cr;
+        return { ...cr, defeated: cr.defeated + 1 };
+      });
+      return { ...enc, creatures };
+    });
+    this.saveData({ encounters });
+  }
+
+  distributeEncounterXp(encounter: EncounterGroup): void {
+    const c = this.campaign();
+    if (!c || !c.isOwner || encounter.xpAwarded) return;
+    const xpGained = encounterTotalXp(encounter);
+    if (xpGained <= 0) return;
+
+    const approved = this.players().filter((p) => p.proposalStatus === 'approved');
+    if (approved.length === 0) {
+      this.error.set('Aucun joueur avec un personnage approuvé.');
+      return;
+    }
+
+    const share = Math.floor(xpGained / approved.length);
+    if (share <= 0) return;
+
+    let completed = 0;
+    for (const player of approved) {
+      this.campaigns.awardXp(c.id, player.id, share).subscribe({
+        next: () => {
+          completed++;
+          if (completed === approved.length) {
+            const encounters = c.data.encounters.map((e) =>
+              e.id === encounter.id ? { ...e, xpAwarded: true } : e,
+            );
+            this.saveData({ encounters });
+            this.reload();
+          }
+        },
+      });
+    }
+  }
+
+  inviteFriend(userId: string): void {
+    const c = this.campaign();
+    if (!c) return;
+    this.campaigns.invitePlayer(c.id, userId).subscribe({
+      next: () => this.error.set(null),
+      error: (err) => {
+        const msg = err?.error?.errors?.[0]?.reason ?? 'Invitation impossible.';
+        this.error.set(msg);
+      },
+    });
+  }
+
+  proposeCharacter(characterId: string): void {
+    const c = this.campaign();
+    if (!c) return;
+    this.campaigns.proposeCharacter(c.id, characterId).subscribe({
+      next: () => this.reload(),
+      error: () => this.error.set('Impossible de proposer ce personnage.'),
+    });
+  }
+
+  approveMember(member: CampaignMember): void {
+    const c = this.campaign();
+    if (!c) return;
+    this.campaigns.approveProposal(c.id, member.id).subscribe(() => this.reload());
+  }
+
+  rejectMember(member: CampaignMember): void {
+    const c = this.campaign();
+    if (!c) return;
+    this.campaigns.rejectProposal(c.id, member.id).subscribe(() => this.reload());
+  }
+
+  isMyPlayerMember(): CampaignMember | undefined {
+    const userId = this.auth.user()?.id;
+    if (!userId) return undefined;
+    return this.players().find((p) => p.userId === userId);
+  }
+
+  printBestiary(): void {
+    this.runPrint(async (entries) => {
+      const c = this.campaign()!;
+      await this.pdf.downloadCreaturesCompilation(entries, c.title);
+    });
+  }
+
+  printPackMj(): void {
+    this.runPrint(async (entries) => {
+      const c = this.campaign()!;
+      const summaries = await this.loadPlayerSummaries();
+      await this.pdf.downloadCampaignPack(c.title, c.data, entries, summaries);
+    });
+  }
+
+  printPlayerSummariesPdf(): void {
+    void this.runPrintPlayerSummariesOnly();
+  }
+
+  printAllPlayerSheets(): void {
+    void this.runPrintPlayerFullSheets();
+  }
+
+  private runPrint(action: (entries: CreaturePrintEntry[]) => Promise<void>): void {
+    const c = this.campaign();
+    if (!c?.data.creatures.length) {
+      this.error.set('Aucune créature à imprimer.');
+      return;
+    }
+    this.printing.set(true);
+    this.error.set(null);
+    this.loadCreatureEntries(c.data).subscribe({
+      next: (entries) => {
+        action(entries)
+          .catch(() => this.error.set('Échec de la génération PDF.'))
+          .finally(() => this.printing.set(false));
+      },
+      error: () => {
+        this.error.set('Impossible de charger les fiches créatures.');
+        this.printing.set(false);
+      },
+    });
+  }
+
+  private loadCreatureEntries(data: CampaignData): Observable<CreaturePrintEntry[]> {
+    const selections = data.creatures;
+    if (!selections.length) return of([]);
+    return forkJoin(
+      selections.map((s) =>
+        this.data.getCreatureById(s.creatureId).pipe(
+          catchError(() => of(null)),
+          map(
+            (creature): CreaturePrintEntry | null =>
+              creature
+                ? {
+                    creature,
+                    customName: s.customName,
+                    role: s.role,
+                    backstory: s.backstory,
+                  }
+                : null,
+          ),
+        ),
+      ),
+    ).pipe(map((list) => list.filter((x): x is CreaturePrintEntry => x !== null)));
+  }
+
+  private async loadPlayerSummaries() {
+    const approved = this.players().filter(
+      (p) => p.proposalStatus === 'approved' && p.approvedCharacterId,
+    );
+    const summaries = await Promise.all(
+      approved.map(
+        (p) =>
+          new Promise<ReturnType<CampaignPdfService['buildPlayerGmSummary']> | null>((resolve) => {
+            this.characters.get(p.approvedCharacterId!).subscribe({
+              next: (res) => resolve(this.pdf.buildPlayerGmSummary(res.data as Character)),
+              error: () => resolve(null),
+            });
+          }),
+      ),
+    );
+    return summaries.filter((s): s is NonNullable<typeof s> => s !== null);
+  }
+
+  private async runPrintPlayerSummariesOnly(): Promise<void> {
+    this.printing.set(true);
+    try {
+      const summaries = await this.loadPlayerSummaries();
+      if (!summaries.length) {
+        this.error.set('Aucun joueur avec personnage approuvé.');
+        return;
+      }
+      await this.pdf.downloadPlayerSummaries(this.campaign()?.title ?? 'Campagne', summaries);
+    } catch {
+      this.error.set('Échec de la génération PDF.');
+    } finally {
+      this.printing.set(false);
+    }
+  }
+
+  private async runPrintPlayerFullSheets(): Promise<void> {
+    const approved = this.players().filter(
+      (p) => p.proposalStatus === 'approved' && p.approvedCharacterId,
+    );
+    if (!approved.length) {
+      this.error.set('Aucun joueur avec personnage approuvé.');
+      return;
+    }
+    this.printing.set(true);
+    try {
+      for (const p of approved) {
+        await new Promise<void>((resolve, reject) => {
+          this.characters.get(p.approvedCharacterId!).subscribe({
+            next: async (res) => {
+              try {
+                await this.pdf.downloadPlayerFullSheet(res.data as Character);
+                resolve();
+              } catch {
+                reject();
+              }
+            },
+            error: () => reject(),
+          });
+        });
+      }
+    } catch {
+      this.error.set('Échec lors de la génération des fiches joueurs.');
+    } finally {
+      this.printing.set(false);
+    }
+  }
+}

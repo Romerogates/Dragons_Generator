@@ -1,0 +1,40 @@
+<div class="w-full min-h-screen bg-[#171b22] text-slate-300 animate-fade-in select-none pb-20">
+  <div class="max-w-5xl mx-auto px-4 pt-10">
+    <a
+      routerLink="/creatures"
+      class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-red-500 transition-colors mb-8 group"
+    >
+      <span class="group-hover:-translate-x-1 transition-transform">←</span> Retour au Bestiaire
+    </a>
+
+    <header class="text-center mb-12">
+      <span class="text-5xl mb-4 block"><iconify-icon icon="fluent-emoji:card-index-dividers"></iconify-icon></span>
+      <h1 class="text-4xl md:text-5xl font-extrabold text-red-400 font-serif tracking-wide mb-4">
+        Catégories
+      </h1>
+      <p class="text-slate-400 italic max-w-lg mx-auto">
+        Parcourez les créatures par thématique : croyants, soldats, faune urbaine, etc.
+      </p>
+    </header>
+
+    @if (categories() === null) {
+      <div class="text-center py-20 text-red-400 animate-pulse">Chargement...</div>
+    } @else if (error(); as errorMsg) {
+      <div class="p-4 bg-red-950/50 border border-red-900 rounded-xl text-center">{{ errorMsg }}</div>
+    } @else {
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        @for (category of categories(); track category) {
+          <a
+            [routerLink]="['/creatures/category', category]"
+            class="group bg-[#1b2028] border border-slate-800 rounded-2xl p-6 hover:border-red-500/50 hover:-translate-y-1 transition-[colors,transform,opacity,box-shadow] duration-200 text-center"
+          >
+            <span class="text-4xl mb-3 block"><iconify-icon [icon]="getCategoryIcon(category)"></iconify-icon></span>
+            <h2 class="text-lg font-bold text-slate-100 group-hover:text-red-400 transition-colors font-serif uppercase tracking-wide">
+              {{ categoryLabel(category) }}
+            </h2>
+          </a>
+        }
+      </div>
+    }
+  </div>
+</div>

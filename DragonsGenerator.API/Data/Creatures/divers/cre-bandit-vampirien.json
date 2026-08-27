@@ -1,0 +1,93 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-bandit-vampirien",
+  "name": "Bandit vampirien",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Mort-vivant de taille M, neutre mauvais",
+  "armor_class": 16,
+  "armor_note": "armure d'écailles",
+  "hit_points": "30 (4d8 + 12)",
+  "wound_threshold": null,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +5, Intimidation +2",
+  "senses": "vision dans le noir 18 m, Perception passive 10",
+  "languages": "une au choix (généralement le commun)",
+  "challenge_rating": "1",
+  "xp": 200,
+  "traits": [
+    {
+      "name": "Faiblesses des vampires",
+      "description": "Le vampirien est affecté des handicaps suivants :"
+    },
+    {
+      "name": "Blessé par l'eau vive",
+      "description": "Le vampirien subit 20 dégâts d'acide s'il termine son tour de jeu dans l'eau vive."
+    },
+    {
+      "name": "Hypersensibilité au soleil",
+      "description": "Le vampirien subit 20 dégâts radiants lorsqu'il commence son tour de jeu au soleil. Tant qu'il y reste exposé, il subit un désavantage aux jets d'attaque et aux tests de caractéristique."
+    },
+    {
+      "name": "Interdiction d'entrer",
+      "description": "Le vampirien ne peut pénétrer dans une résidence sans y avoir été invité par l'un de ses occupants."
+    },
+    {
+      "name": "Pieu dans le cœur",
+      "description": "Si une arme perforante en bois lui est plantée dans le cœur alors qu'il est neutralisé dans son lieu de repos, le vampirien est **paralysé** jusqu'à ce qu'elle soit retirée."
+    },
+    {
+      "name": "Pattes d'araignée",
+      "description": "Le vampirien peut parcourir les parois les plus difficiles à escalader, y compris les plafonds, sans devoir effectuer de test de caractéristique."
+    },
+    {
+      "name": "Régénération",
+      "description": "Le vampirien récupère 10 pv au début de son tour de jeu s'il lui reste au moins 1 pv et qu'il n'est exposé ni à la lumière du soleil ni à l'eau vive. S'il subit des dégâts radiants ou infligés par de l'eau bénite, ce trait ne fonctionne pas au début de son tour de jeu suivant."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une créature. Réussite : 8 (2d4 + 3) dégâts tranchants. Au lieu d'infliger des dégâts, le bandit vampirien peut **agripper** sa cible (DD 13 pour s'extraire)."
+    },
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une créature consentante, agrippée par le vampirien, neutralisée ou entravée. Réussite : 5 (1d6 + 3) dégâts perforants plus 7 (2d6) dégâts nécrotiques. Les pv maximums de la cible sont réduits d'un montant égal aux dégâts nécrotiques subis, et le vampirien récupère autant de pv. La réduction persiste jusqu'à ce que la cible termine un repos long. La cible meurt si cet effet réduit ses pv maximums à 0."
+    },
+    {
+      "name": "Arbalète légère",
+      "description": "Attaque d'arme à distance : +5 pour toucher, portée 24/96 m, une cible. Réussite : 7 (1d8 + 3) dégâts perforants.\nLes hors-la-loi qui ne manqueront à personne représentent des séides pratiques pour un vampire, particulièrement si ce dernier doit rester discret. De tels vampiriens ne sont d'ailleurs souvent que trop heureux de leur nouvelle puissance, et ne manquent aucune occasion de tyranniser ou tourmenter les mortels.\n183"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Mathilde la lothrienne Evguenia l’arolave Niobé la cyrillane"
+}

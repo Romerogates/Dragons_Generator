@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-suirel-ou-nuee-de-suiris",
+  "name": "Süirel, ou nuée de süiris",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Nuée de taille M de bêtes de taille TP, non aligné",
+  "armor_class": 13,
+  "armor_note": null,
+  "hit_points": "18 (4d8)",
+  "wound_threshold": null,
+  "speed": "3 m, vol 15 m",
+  "abilities": {
+    "str": {
+      "score": 9,
+      "modifier": "-1"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 2,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 4,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "Perception passive 10",
+  "languages": "—",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [
+    {
+      "name": "Nuée",
+      "description": "La nuée peut occuper l'espace d'une autre créature et réciproquement. La nuée peut se déplacer dans tout passage suffisant pour laisser passer un insecte de taille TP. La nuée ne peut pas récupérer de pv ni gagner de pv temporaires."
+    },
+    {
+      "name": "Bonds de sauterelle",
+      "description": "La nuée à terre saute sans élan jusqu'à 10 fois sa hauteur à la verticale et à l'horizontale, soit 150 cm."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsures",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 0 m, une créature occupant l'espace de la nuée. Réussite : 10 (4d4) dégâts perforants ou 5 (2d4) dégâts perforants si les pv actuels de la nuée sont inférieurs ou égaux à la moitié de son maximum. Par ailleurs, la cible doit réussir un JS Constitution DD 10 sous peine d'être contaminée par la noirçure (cf. **Aventuriers**, chapitre **Santé, Maladies : Noirçure**)."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Certains lanceurs de sorts prennent ces sauterelles particulières comme familier. Ce choix est souvent vu comme une sorte de provocation ou une manière d’afficher une forme de noirceur raffinée et dédaigneuse. S’il est difficile de faire face aux nuées, lorsque les süiris sont isolées, elles peuvent être récoltées. Une fois grillées ou frites, elles constituent un mets nourrissant et apprécié. Süirel icon"
+}

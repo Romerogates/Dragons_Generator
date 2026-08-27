@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-espion",
+  "name": "Espion",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "27 (6d8)",
+  "wound_threshold": 7,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 16,
+      "modifier": "+3"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +4, Escamotage +4, Intuition +4, Investigation +5, Perception +6, Persuasion +5, Tromperie +5",
+  "senses": "Perception passive 16",
+  "languages": "trois au choix",
+  "challenge_rating": "1",
+  "xp": 200,
+  "traits": [
+    {
+      "name": "Attaque sournoise",
+      "description": "Une fois par tour de jeu, l'espion inflige 7 (2d6) dégâts supplémentaires quand il touche une cible avec une attaque d'arme s'il a bénéficié d'un avantage au jet d'attaque ou si la cible est située à 1,50 m ou moins d'un de ses alliés non neutralisés. L'aptitude ne s'applique pas si l'espion a subi un désavantage au jet d'attaque."
+    },
+    {
+      "name": "Roublardise",
+      "description": "À chacun de ses tours de jeu, l'espion peut entreprendre l'action **Foncer**, **Se cacher** ou **Se dégager** au prix d'une action bonus."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "L'espion effectue deux attaques de corps à corps."
+    },
+    {
+      "name": "Épée courte",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 5 (1d6 + 2) dégâts perforants."
+    },
+    {
+      "name": "Arbalète de poing",
+      "description": "Attaque d'arme à distance : +4 pour toucher, portée 9/36 m, une cible. Réussite : 5 (1d6 + 2) dégâts perforants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Dans le cadre de sa mission, l’espion dispose toujours d’une couverture : une histoire sur laquelle il peut s’appuyer de manière crédible pour justifier ses allées et venues. Il maîtrise souvent des outils d’artisan ou cultive des compétences artistiques qui lui permettront de s’introduire dans l’intimité d’une maisonnée ou d’un clan. Diplomates et marchands comptent également de nombreux espions occasionnels ou professionnels parmi leurs rangs. Un agent recruté et devenu progressivement espion maîtrisera les compétences et outils associés à son métier d’origine."
+}

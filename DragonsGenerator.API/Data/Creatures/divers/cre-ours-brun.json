@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-ours-brun",
+  "name": "Ours brun",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille G, non aligné",
+  "armor_class": 12,
+  "armor_note": "armure naturelle",
+  "hit_points": "34 (4d10 + 12)",
+  "wound_threshold": 9,
+  "speed": "12 m, escalade 9 m",
+  "abilities": {
+    "str": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 5,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 8,
+      "modifier": "-1"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Athlétisme +6, Perception +3",
+  "senses": "Perception passive 13",
+  "languages": "—",
+  "challenge_rating": "1",
+  "xp": 200,
+  "traits": [
+    {
+      "name": "Flair",
+      "description": "L'ours brun bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'odorat."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "L'ours effectue deux attaques : une de morsure et une de griffes."
+    },
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 8 (1d8 + 4) dégâts perforants."
+    },
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 11 (2d6 + 4) dégâts tranchants.\nOurs"
+    },
+    {
+      "name": "117",
+      "description": ""
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

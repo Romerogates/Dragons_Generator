@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-poney-2",
+  "name": "Poney",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "",
+  "armor_class": 10,
+  "armor_note": null,
+  "hit_points": "19 (3d10 + 3)",
+  "wound_threshold": 5,
+  "speed": "\\",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "\\*\\* Perception passive 10                                                                                                     |         |         |        |         |        |",
+  "languages": "\\*\\* —                                                                                                                      |         |         |        |         |        |",
+  "challenge_rating": "1/8",
+  "xp": 25,
+  "traits": [
+    {
+      "name": "Bête de somme",
+      "description": "** La mule est considérée comme une créature de taille G pour ce qui est de déterminer sa charge maximale."
+    },
+    {
+      "name": "Leste",
+      "description": "** La mule bénéficie d’un avantage aux JS Force et Dextérité contre les effets qui menacent de la jeter à terre."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Sabots",
+      "description": "** Attaque d’arme de corps à corps : +2 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d4 + 2) dégâts contondants.\n\n<page_number>244</page_number>\n\nIllustration of a horse\n\n### Cheval de trait\n\nBête de taille G, non aligné"
+    },
+    {
+      "name": "Classe d’armure",
+      "description": "10"
+    },
+    {
+      "name": "Points de vie",
+      "description": "19 (3d10 + 3) | **Seuil de blessure** 5"
+    },
+    {
+      "name": "Vitesse de déplacement",
+      "description": "12 m\n\n| FOR     | DEX     | CON     | INT    | SAG     | CHA    |\n| ------- | ------- | ------- | ------ | ------- | ------ |\n| 18 (+4) | 10 (+0) | 12 (+1) | 4 (−3) | 11 (+0) | 7 (−2) |\n\n| • \\*\\*Sens\\*\\* Perception passive 10                                                                                                     |         |         |        |         |        |\n| ---------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------- | ------ | ------- | ------ |\n|                                                                                                                                          |         |         |        |         |        |\n| • \\*\\*Langues\\*\\* —                                                                                                                      |         |         |        |         |        |\n|                                                                                                                                          |         |         |        |         |        |\n| • \\*\\*Facteur de puissance\\*\\* 1/4 (50 PX)                                                                                               |         |         |        |         |        |\n|                                                                                                                                          |         |         |        |         |        |\n| ### \\*\\*Actions\\*\\*                                                                                                                      |         |         |        |         |        |\n|                                                                                                                                          |         |         |        |         |        |\n| \\*\\*Sabots.\\*\\* Attaque d’arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 9 (2d4 + 4) dégâts contondants. |         |         |        |         |        |"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

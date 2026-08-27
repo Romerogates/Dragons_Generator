@@ -15,5 +15,5 @@ COPY ${NGINX_CONF} /etc/nginx/conf.d/default.conf
 # Copie des fichiers compilés Angular avec le bon chemin
 COPY --from=build /app/dist/DragonsGenerator.WEB/browser /usr/share/nginx/html
 
-EXPOSE 80
+EXPOSE 80 443
 CMD ["nginx", "-g", "daemon off;"]

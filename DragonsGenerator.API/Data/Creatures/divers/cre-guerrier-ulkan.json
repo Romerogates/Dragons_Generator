@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-guerrier-ulkan",
+  "name": "Guerrier ulkan",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde de taille G (ulkan), loyal (tout alignement)",
+  "armor_class": 15,
+  "armor_note": "armure de peau, bouclier",
+  "hit_points": "17 (2d10 + 6)",
+  "wound_threshold": 5,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 8,
+      "modifier": "-1"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "Perception passive 11",
+  "languages": "commun, kaani",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Hachette",
+      "description": "Attaque au corps à corps ou à distance avec une arme : +5 au toucher, allonge 1,50 m ou portée 6/18 m, une cible. Réussite : 10 (2d6 + 3) dégâts tranchants.\nLes guerriers ulkani savent employer leur taille et leur force à bon escient, frappant bien et fort. Face à des créatures qu'ils estiment peu dangereuses, ils se contentent de repousser leurs adversaires dans l'espoir qu'ils auront retenu la leçon.\nSage ulkan"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Guerrier ulkan"
+}

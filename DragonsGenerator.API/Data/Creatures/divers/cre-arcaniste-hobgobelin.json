@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-arcaniste-hobgobelin",
+  "name": "Arcaniste hobgobelin",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (gobelinoïde) de taille M, loyal (tout alignement)",
+  "armor_class": 16,
+  "armor_note": "chemise de mailles + bouclier",
+  "hit_points": "44 (8d8 + 8)",
+  "wound_threshold": 11,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 13,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": "Int +5, Sag +2, Cha +3",
+  "skills": "Arcanes +5, Religion +5, Intimidation +3",
+  "senses": "vision dans le noir 18 m, Perception passive 10",
+  "languages": "commun, diabolique, gobelin",
+  "challenge_rating": "3",
+  "xp": 700,
+  "traits": [
+    {
+      "name": "Puissance écrasante (recharge 4-6)",
+      "description": "Lorsque l'arcaniste hobgobelin cible une ou plusieurs créatures avec un sort entraînant un jet de sauvegarde, il peut désigner l'une de ces cibles, laquelle effectue le jet de sauvegarde avec un désavantage.\nSorts mineurs (à volonté) : aspersion acide, cri de bataille, jet empoisonné, rayon de givre\n1ᵉʳ niveau (4 emplacements) : bille acide, bouclier, rire affreux\n2ᵉ niveau (3 emplacements) : fracassement, image miroir, toile d'araignée\n3ᵉ niveau (2 emplacements) : boule de feu, contresort"
+    },
+    {
+      "name": "Puissance écrasante (recharge 4-6)",
+      "description": "Lorsque l'arcaniste hobgobelin cible une ou plusieurs créatures avec un sort entraînant un jet de sauvegarde, il peut désigner l'une de ces cibles, laquelle effectue le jet de sauvegarde avec un désavantage.\nSorts mineurs (à volonté) : aspersion acide, cri de bataille, jet empoisonné, rayon de givre\n1ᵉʳ niveau (4 emplacements) : bille acide, bouclier, rire affreux\n2ᵉ niveau (3 emplacements) : fracassement, image miroir, toile d'araignée\n3ᵉ niveau (2 emplacements) : boule de feu, contresort"
+    }
+  ],
+  "actions": [
+    {
+      "name": "Sabre médian",
+      "description": "Attaque d'arme de corps à corps : +2 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d8) dégâts perforants ou tranchants."
+    },
+    {
+      "name": "Arc composite",
+      "description": "Attaque d'arme à distance : +3 pour toucher, portée 48/150 m, une cible. Réussite : 5 (1d8 + 1) dégâts perforants.\nFormés avec une discipline de fer dans une école mêlant l'enseignement des arcanes et du combat, les arcanistes hobgobelins sont sur le champ de bataille le présage de véritables désolations. Ils neutralisent, perturbent et déciment leurs ennemis, permettant aux guerriers de tailler en pièces des adversaires affaiblis.\n218"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Méthodiques et organisés, les soldats hobgobelins sont bien plus redoutables en groupe qu’individuellement. Un peloton hobgobelin est un mur mouvant hérissé de lames qui découpe froidement tout sur son passage et ne se résigne à un repli que face à la certitude d’une défaite écrasante."
+}

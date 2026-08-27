@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-sanglier-2",
+  "name": "Sanglier",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "",
+  "armor_class": 18,
+  "armor_note": "armure naturelle",
+  "hit_points": "125 (10d12 + 60)",
+  "wound_threshold": 32,
+  "speed": "\\",
+  "abilities": {
+    "str": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 21,
+      "modifier": "+5"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": "Con +9, Sag +6",
+  "skills": "Athlétisme +5, Perception +3",
+  "senses": "Perception passive 13",
+  "languages": "—",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [
+    {
+      "name": "Charge",
+      "description": "** Si le sanglier géant se déplace d’au moins 6 m en ligne droite <u>vers sa cible et qu’il la touche</u> avec une attaque de défenses au même tour de jeu, la cible subit 9 (2d8) dégâts tranchants supplémentaires. Si la cible est une créature de taille G ou inférieure, elle doit réussir un JS Force DD 13 sous peine de se retrouver **à terre**."
+    },
+    {
+      "name": "Acharnement (recharge après un repos court ou long)",
+      "description": "** Si le sanglier subit 10 dégâts ou moins et que ces dommages sont censés le faire tomber à 0 pv, il se retrouve en fait à 1 pv."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Défenses",
+      "description": "** Attaque d’arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 10 (2d6 + 3) dégâts tranchants.\n\nSanglier illustration\n\n<page_number>120</page_number>\nMartin Romero (Order #44468918)\n\n# Schatz\n\nProtecteur de l’Inframonde proche des Drakenbergen, le **schatz** est une légende vivante. Gigantesque serpent à la peau semblable à de la pierre, aux yeux brillants comme des joyaux et aux crocs résistants et perçants comme du marbre, son affiliation aux forces élémentaires de la terre est évidente. Il se nourrit d’ailleurs de roches qu’il engloutit avant de les broyer dans son puissant estomac, passant régulièrement plusieurs mois dans une somnolence digestive paisible. Du fait de ce régime, les entrailles du **schatz** regorgent de pierres précieuses qu’il ne digère pas et qui tapissent\n\nles parois de son organisme. Qui parviendrait à venir à bout d’un tel monstre deviendrait richissime, mais s’attirerait une animosité considérable, car il est dit que cette créature est bénie par Forgeron, voire qu’il l’aurait créée. La tuer serait donc s’attirer l’ire de la divinité et de ses croyants. Dans les Drakenbergen, Shaaris dite Écaille de lune est la plus ancienne des **schatz** et est considérée comme une fille du dieu Verndari le Défenseur.\n\nUne autre théorie expliquant son apparition en fait un être originaire du même monde que la **cocatrice** ou le **basilic**, prenant pour preuve son venin pétrifiant. Quelle que soit la vérité, les **schatz** eux-mêmes refusent de se prononcer sur la question.\n\n## Le protecteur de la surface\n\nEntité sage à la patience hiératique, le **schatz** prodigue parfois conseils, oracles ou instructions aux peuples piliers. Il arrive même qu’il fasse appel à des aventuriers pour régler un problème ou accomplir une tâche dont il n’est pas en mesure de s’acquitter lui-même. À cet effet, il les récompense de connaissances centenaires, ou de joyaux tirés de ses entrailles.\n\nSelon les légendes, les **schatz** furent désignés pour protéger la surface des horreurs de l’Inframonde,\n\nraison pour laquelle ils habitent les montagnes d’Eana, qui regorgent d’issues vers la surface. On a de nombreuses fois vu un **schatz** se mesurer à des ravageurs, particulièrement lors de la guerre de l’Aube. En revanche, ils ne semblent jamais s’opposer au passage des drows. Interrogé à ce sujet, un **schatz** a répondu : « Comme elle est la vôtre, cette terre fut la leur. Elle le reste. »\n\n> … alors le serpent se dressa haut, semblant se hisser jusqu’au soleil lui-même, et s’exprima en ces termes :\n>\n> « Dvaergen, vous porterez le nom de gardiens, car c’est là désormais votre responsabilité et votre nature. Vous habiterez sous la surface d’Eana et la sauvegarderez des séides du Chancre. Jurez maintenant de respecter ce devoir par la terre et la pierre, et la faveur de Verndari sera avec vous. »\n>\n> Ainsi jurèrent-ils. Et ainsi en fut-il depuis.\n>\n> Extrait du Credo de Forgeron, traduit du nain\n\n121\n\nJeune schatz\n\n### Jeune schatz\n\nÉlémentaire (terre) de taille TG, neutre"
+    },
+    {
+      "name": "Classe d’armure",
+      "description": "18 (armure naturelle)"
+    },
+    {
+      "name": "Points de vie",
+      "description": "125 (10d12 + 60) | **Seuil de blessure** 32"
+    },
+    {
+      "name": "Vitesse de déplacement",
+      "description": "15 m, fouissage 12 m\n\n| \\*\\*FOR\\*\\* | \\*\\*DEX\\*\\* | \\*\\*CON\\*\\* | \\*\\*INT\\*\\* | \\*\\*SAG\\*\\* | \\*\\*CHA\\*\\* |\n| ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |\n| 21 (+5)     | 10 (+0)     | 22 (+6)     | 15 (+2)     | 16 (+3)     | 13 (+1)     |"
+    },
+    {
+      "name": "Jets de sauvegarde",
+      "description": "Con +9, Sag +6"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

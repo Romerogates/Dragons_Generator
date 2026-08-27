@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-cavalier-gobelin",
+  "name": "Cavalier gobelin",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (gobelinoïde) de taille P, chaotique (tout alignement)",
+  "armor_class": 15,
+  "armor_note": "armure de cuir clouté",
+  "hit_points": "60 (11d6 + 22)",
+  "wound_threshold": 15,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 12,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": "Dex +5",
+  "skills": "Discrétion +7, Dressage +5",
+  "senses": "vision dans le noir 18 m, Perception passive 11",
+  "languages": "commun, gobelin",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [
+    {
+      "name": "Fuite agile",
+      "description": "À chacun de ses tours de jeu et au prix d'une action bonus, le gobelin peut entreprendre l'action **Se dégager** ou l'action **Se cacher**."
+    },
+    {
+      "name": "Manœuvre cavalière",
+      "description": "Lorsque le cavalier gobelin est monté, sa monture possède également le trait **Fuite agile**."
+    },
+    {
+      "name": "Supériorité montée",
+      "description": "Tant qu'il est monté, le cavalier gobelin a l'avantage aux attaques de corps à corps contre les créatures dont la taille n'est pas supérieure à celle de sa monture."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le cavalier gobelin effectue deux attaques de **Sabre court**."
+    },
+    {
+      "name": "Sabre court",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 6 (1d6 + 3) dégâts perforants ou tranchants."
+    },
+    {
+      "name": "Arc court",
+      "description": "Attaque d'arme à distance : +5 pour toucher, portée 24/96 m, une cible. Réussite : 6 (1d6 + 3) dégâts perforants.\n215"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Cavalier gobelin"
+}

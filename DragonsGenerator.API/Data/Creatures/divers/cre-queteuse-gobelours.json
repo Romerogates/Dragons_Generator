@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-queteuse-gobelours",
+  "name": "Quêteuse gobelours",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (gobelinoïde) de taille M, neutre (tout alignement)",
+  "armor_class": 14,
+  "armor_note": "chemise de mailles",
+  "hit_points": "18 (4d8)",
+  "wound_threshold": 5,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 15,
+      "modifier": "+2"
+    }
+  },
+  "saving_throws": "Sag +4",
+  "skills": "Discrétion +3, Intuition +6, Perception +4, Intimidation +6, Persuasion +4, Tromperie +6",
+  "senses": "vision dans le noir 18 m, Perception passive 14",
+  "languages": "commun, gobelin, kaani et une autre langue au choix",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [],
+  "actions": [],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

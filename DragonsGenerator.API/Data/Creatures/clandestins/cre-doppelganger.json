@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-doppelganger",
+  "name": "Doppelgänger",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Humanoïde (métamorphe) de taille M, neutre mauvais",
+  "armor_class": 14,
+  "armor_note": null,
+  "hit_points": "52 (8d8 + 16)",
+  "wound_threshold": 13,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 14,
+      "modifier": "+2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +6, Intuition +3, Tromperie +6",
+  "senses": "vision dans le noir 18 m, Perception passive 11",
+  "languages": "commun",
+  "challenge_rating": "3",
+  "xp": 700,
+  "traits": [
+    {
+      "name": "Attaque surprise",
+      "description": "Si le doppelgänger surprend une créature et la touche avec une attaque au cours du premier round de combat, cette attaque inflige 10 (3d6) dégâts supplémentaires à la cible."
+    },
+    {
+      "name": "Déséquilibré",
+      "description": "Le doppelgänger souffre d'un désavantage aux JS contre les assauts du Cauchemar ainsi que contre les aptitudes et sorts engendrant la folie. Par ailleurs, les folies temporaires et durables durent deux fois plus longtemps."
+    },
+    {
+      "name": "Embusqué",
+      "description": "Le doppelgänger bénéficie d'un avantage aux jets d'attaque contre toute créature qu'il a surprise."
+    },
+    {
+      "name": "Métamorphe",
+      "description": "Le doppelgänger peut utiliser son action pour se métamorphoser en un humanoïde de taille P ou M qu'il a déjà vu, ou pour recouvrer sa véritable forme. Son profil est le même sous chaque forme, exception faite de sa catégorie de taille. L'équipement qu'il porte ou transporte n'est pas transformé. Enfin, il retrouve sa véritable forme s'il meurt."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le doppelgänger effectue deux attaques de corps à corps."
+    },
+    {
+      "name": "Coup",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (1d6 + 4) dégâts contondants."
+    },
+    {
+      "name": "Lecture des pensées",
+      "description": "Le doppelgänger lit magiquement les pensées superficielles d'une créature située dans un rayon de 18 m de lui. L'effet peut pénétrer les obstacles, mais 90 cm de bois ou de terre, 60 cm de pierre, 5 cm de métal ou une mince feuille de plomb le bloquent. Tant que la cible est à portée, le doppelgänger peut continuer de lire ses pensées aussi longtemps que sa concentration n'est pas interrompue (comme s'il se concentrait sur un sort). Lorsqu'il sonde ainsi l'esprit d'une cible, le doppelgänger bénéficie d'un avantage aux tests de Sagesse (Intuition) et de Charisme (Tromperie, Intimidation et Persuasion) contre la cible."
+    },
+    {
+      "name": "65",
+      "description": ""
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Le doppelgänger est un **humanoïde** qui a attiré l’attention de Xonim pour une raison ou une autre, et a reçu une sombre bénédiction de la dame de la nuit."
+}

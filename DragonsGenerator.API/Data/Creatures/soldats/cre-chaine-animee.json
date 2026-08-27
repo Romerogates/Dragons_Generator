@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-chaine-animee",
+  "name": "Chaîne animée",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Créature artificielle de taille M, non aligné",
+  "armor_class": 18,
+  "armor_note": "armure naturelle",
+  "hit_points": "13 (3d8)",
+  "wound_threshold": null,
+  "speed": "0 m, 12 m (vol stationnaire)",
+  "abilities": {
+    "str": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "cha": {
+      "score": 1,
+      "modifier": "-5"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision aveugle 18 m (aucune vision au-delà de ce rayon), Perception passive 6",
+  "languages": "—",
+  "challenge_rating": "1/8",
+  "xp": 25,
+  "traits": [
+    {
+      "name": "Apparence trompeuse",
+      "description": "Tant que la chaîne se tient immobile, elle est indiscernable d'une chaîne normale."
+    },
+    {
+      "name": "Attache",
+      "description": "Une extrémité de la chaîne est attachée à une surface dont elle ne peut être séparée sans tomber à 0 pv. La chaîne peut seulement se déplacer sur l'étendue de sa longueur. Une chaîne animée a typiquement une longueur de 12 m.\n48\nLes objets animés sont très appréciés comme moyen de défendre un lieu. Des instructions simples leur sont données pour savoir qui attaquer et qui laisser passer. Étant doués uniquement d'une intelligence rudimentaire, ils ne peuvent pas exécuter d'ordres complexes ou prendre d'initiatives, et se contentent donc généralement d'attaquer aveuglément toute cible hostile. Une fois un intrus identifié, sauf intervention du maître de l'objet animé ou autre interruption programmée (comme un mot de commande) le combat est à mort. En raison de sa taille, son histoire, et la présence importante d'arcanistes, la Cité Franche est devenu un lieu important de manufacture de tels objets animés. Pour le meilleur, et pour le pire..."
+    }
+  ],
+  "actions": [],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Cous les objets animés sont à l’origine des pièces d’artisanat dans lesquelles une puissance magique a été insufflée. Pour fonctionner, ils doivent être situés dans une zone de magie neutre ou haute, sans quoi ils perdent progressivement leur mobilité."
+}

@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-belette-2",
+  "name": "Belette",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "",
+  "armor_class": 13,
+  "armor_note": null,
+  "hit_points": "9 (2d8)",
+  "wound_threshold": 4,
+  "speed": "\\",
+  "abilities": {
+    "str": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +5, Perception +3",
+  "senses": "vision dans le noir 9 m, Perception passive 11",
+  "languages": "—",
+  "challenge_rating": "0",
+  "xp": 10,
+  "traits": [
+    {
+      "name": "Flair",
+      "description": "** Le blaireau bénéficie d’un avantage aux tests de Sagesse (Perception) qui font intervenir l’odorat."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "** Attaque d’arme de corps à corps : +2 pour toucher, allonge 1,50 m, une cible. Réussite : 2 (1d4) dégâts perforants.\n\n<page_number>115</page_number>\nAnthony Martin Romero (Order #44468918)\n\n### Belette géante\n\nBête de taille M, non aligné"
+    },
+    {
+      "name": "Classe d’armure",
+      "description": "13"
+    },
+    {
+      "name": "Points de vie",
+      "description": "9 (2d8) | **Seuil de blessure** 4"
+    },
+    {
+      "name": "Vitesse de déplacement",
+      "description": "12 m\n\n| \\*\\*FOR\\*\\* | \\*\\*DEX\\*\\* | \\*\\*CON\\*\\* | \\*\\*INT\\*\\* | \\*\\*SAG\\*\\* | \\*\\*CHA\\*\\* |\n| ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |\n| 11 (+0)     | 16 (+3)     | 10 (+0)     | 4 (−3)      | 12 (+1)     | 6 (−2)      |"
+    },
+    {
+      "name": "Compétences",
+      "description": "Discrétion +5, Perception +3"
+    },
+    {
+      "name": "Sens",
+      "description": "vision dans le noir 18 m, Perception passive 13"
+    },
+    {
+      "name": "Langues",
+      "description": "—"
+    },
+    {
+      "name": "Facteur de puissance",
+      "description": "1/8 (25 PX)"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-minotaure",
+  "name": "Minotaure",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Monstruosité de taille G, chaotique mauvais",
+  "armor_class": 14,
+  "armor_note": "armure naturelle",
+  "hit_points": "76 (9d10 + 27)",
+  "wound_threshold": 19,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "wis": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "cha": {
+      "score": 9,
+      "modifier": "-1"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +7",
+  "senses": "vision dans le noir 18 m, Perception passive 17",
+  "languages": "commun",
+  "challenge_rating": "3",
+  "xp": 700,
+  "traits": [
+    {
+      "name": "Charge",
+      "description": "<u>Si le minotaure se déplace d'au moins 3 m en ligne</u> <u>droite vers sa cible et qu'il la touche</u> avec une attaque d'embrochage au même tour de jeu, la cible subit 9 (2d8) dégâts perforants supplémentaires. Si la cible est une créature, elle doit réussir un JS Force DD 14 sous peine d'être repoussée de 3 m et de se retrouver **à terre**."
+    },
+    {
+      "name": "Mémoire des labyrinthes",
+      "description": "Le minotaure se rappelle parfaitement tout chemin qu'il a emprunté."
+    },
+    {
+      "name": "Intrépide",
+      "description": "Au début de son tour, le minotaure peut obtenir l'avantage à tous les jets d'attaque d'arme de corps à corps qu'il effectue durant le tour, mais tous les jets d'attaque qui le prennent pour cible bénéficient également d'un avantage jusqu'au début de son tour de jeu suivant."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Grande hache",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 17 (2d12 + 4) dégâts tranchants."
+    },
+    {
+      "name": "Embrochage",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 13 (2d8 + 4) dégâts perforants.\nMinotaure\n309"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "TLTSLLTTPE"
+}

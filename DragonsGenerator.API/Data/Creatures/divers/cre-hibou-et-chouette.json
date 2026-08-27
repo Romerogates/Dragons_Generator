@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-hibou-et-chouette",
+  "name": "Hibou et chouette",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille TP, non aligné",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "2 (1d4)",
+  "wound_threshold": null,
+  "speed": "1,50 m, vol 18 m",
+  "abilities": {
+    "str": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +4, Perception +3",
+  "senses": "vision dans le noir 36 m, Perception passive 13",
+  "languages": "—",
+  "challenge_rating": "0",
+  "xp": 10,
+  "traits": [
+    {
+      "name": "Fluidité aérienne",
+      "description": "Le hibou ne provoque pas d'attaque d'opportunité lorsqu'il quitte l'allonge d'un ennemi en volant."
+    },
+    {
+      "name": "Ouïe fine et vision perçante",
+      "description": "Le hibou bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'ouïe ou la vue."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Serres",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 1 dégât tranchant."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les rapaces de la famille des strigidés sont perçus comme des gardiens sacrés et des messagers d’Eana. Beaucoup de contes et légendes en font des guides pour les voyageurs égarés, les enfants ou les personnes qui cherchent leur voie dans la vie."
+}

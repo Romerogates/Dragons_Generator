@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-dragonnet-de-cuivre",
+  "name": "Dragonnet de cuivre",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Dragon de taille M, chaotique bon",
+  "armor_class": 16,
+  "armor_note": "armure naturelle",
+  "hit_points": "22 (4d8 + 4)",
+  "wound_threshold": 6,
+  "speed": "9 m, escalade 9 m, vol 18 m",
+  "abilities": {
+    "str": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 13,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": "Dex +3, Con +3, Sag +2, Cha +3",
+  "skills": "Discrétion +3, Perception +4, Représentation +3",
+  "senses": "vision aveugle 3 m, vision dans le noir 18 m, Perception passive 14",
+  "languages": "draconique",
+  "challenge_rating": "1",
+  "xp": 200,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (1d10 + 2) dégâts perforants."
+    },
+    {
+      "name": "Souffle (recharge 5-6)",
+      "description": "Le dragon utilise l'un des deux souffles suivants :"
+    },
+    {
+      "name": "Souffle corrosif",
+      "description": "Le dragon crache une ligne d'acide de 6 m de long et de 1,50 m de large. Chaque créature prise dans cette ligne doit effectuer un JS Dextérité DD 11 et subit 18 (4d8) dégâts d'acide en cas d'échec, la moitié en cas de réussite."
+    },
+    {
+      "name": "Souffle invalidant",
+      "description": "Le dragon crache un cône de gaz invalidant de 4,50 m. Chaque créature prise dans cette zone d'effet doit réussir un JS Constitution DD 11 sous peine de ne plus pouvoir jouer de réactions, de voir sa VD réduite de moitié et d'être limitée à une attaque à ses tours de jeu. En cas de sauvegarde ratée, elle ne peut en outre entreprendre à son tour de jeu qu'une action ou une action bonus, mais pas les deux. Ces effets persistent pendant 1 minute. Une créature peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet sur elle-même en cas de réussite.\n259"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Si quelques dragonnets de cuivre sont confiés à des nourrices de toutes espèces – incluant des fées et des aventuriers –, la plupart passent leur temps dans le repaire de leur parent éducateur, lequel n’est généralement pas un modèle très strict. Il encourage les jeux et peut aménager une partie de son domaine en une sorte de cour de récréation pour dragonnets farceurs. La tutelle d’un dragon de cuivre est d’un laxisme étonnant pour un dragon, même en comparaison de l’éducation permissive d’un dragon chromatique. Le géniteur se soucie plus de voir son enfant s’amuser que de lui inculquer des principes ou de lui apprendre des choses sur le monde. Une fois livrés à eux-mêmes, bien des jeunes dragons ne doivent leur survie qu’à leurs aptitudes et leur vivacité d’esprit naturelles."
+}

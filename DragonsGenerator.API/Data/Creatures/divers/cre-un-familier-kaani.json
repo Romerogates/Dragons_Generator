@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-un-familier-kaani",
+  "name": "Un familier kaani",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille TP, non aligné",
+  "armor_class": 10,
+  "armor_note": null,
+  "hit_points": "2 (1d4)",
+  "wound_threshold": null,
+  "speed": "6 m",
+  "abilities": {
+    "str": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 5,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +2",
+  "senses": "Perception passive 12",
+  "languages": "—",
+  "challenge_rating": "0",
+  "xp": 10,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +2 pour toucher, allonge 1,50 m, une cible. Réussite : 1 dégât perforant.\nRocrisse"
+    },
+    {
+      "name": "Rocrisse",
+      "description": "Cette sorte de crabe insectoïde fouisseur est étonnamment fidèle, et les tons iridescents de sa carapace chitineuse le rendent fort apprécié des esthètes. Particularités : CA 12 (armure naturelle) ; perception des vibrations 9 m ; fouissage 1,50 m.\n267\n267\nGorgone taurine icon\nD e loin, ce prédateur typique des steppes kaani évoque une statue de taureau, mais sitôt qu'il sent une présence, il se met à bouger et attaque à vue. Bien que les régions désolées et arides lui offrent moins de ressources alimentaires, la gorgone préfère éviter les zones humides et la pluie, qui lui sont désagréables. Elle pétrifie ses proies et broie la pierre en poussière dont elle tire une substance nutritive.\nLes pouvoirs de pétrification de la gorgone la rapprochent du basilic, de la cocatrice et de la méduse, trois créatures supposément amenées sur Eana depuis un monde étrange où il est commun que la chair devienne minérale et inversement. La gorgone laisse cependant les érudits perplexes, car sa silhouette évoque le taureau et il est difficile d'imaginer qu'il apparaisse spontanément dans deux mondes des créatures aussi semblables. La force et l'agressivité de la gorgone rendent difficile son étude, réduisant les savants aux spéculations. Est-elle le résultat d'une expérience magique visant à transformer un taureau en mêlant son essence à celle d'une créature planaire ? Si oui, quelle est cette dernière ? S'agit-il d'une entité distincte, mais aujourd'hui inconnue ? Ou serait-ce une forme de parasite transformant son hôte ?"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Un familier kaani"
+}

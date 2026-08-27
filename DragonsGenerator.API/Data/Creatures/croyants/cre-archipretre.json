@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-archipretre",
+  "name": "Archiprêtre",
+  "category": "croyants",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": null,
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 17,
+  "armor_note": "armure de plaques, bouclier",
+  "hit_points": "117 (18d8 + 36)",
+  "wound_threshold": 30,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "wis": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "cha": {
+      "score": 17,
+      "modifier": "+3"
+    }
+  },
+  "saving_throws": "Sag +9, Cha +7",
+  "skills": "Persuasion +7, Religion +10",
+  "senses": "Perception passive 15",
+  "languages": "quatre au choix",
+  "challenge_rating": "12",
+  "xp": 8400,
+  "traits": [
+    {
+      "name": "Harmonie divine (recharge après un repos long)",
+      "description": "Lorsque l'archiprêtre lance un sort, il peut choisir que celui-ci ne requière pas de concentration. **Sorts.** L'archiprêtre est un lanceur de sorts de niveau 18. Sa caractéristique magique est la Sagesse (DD de sauvegarde des sorts : 17, +9 pour toucher avec ses attaques de sort). L'archiprêtre a préparé les sorts de prêtre suivants :\nSorts mineurs (à volonté) : assistance divine, flamme sacrée, lumière, résistance, thaumaturgie\n1ᵉʳ niveau (4 emplacements) : ajustement fatidique, bénédiction, éclair traçant, égide fugace, injonction, mot de guérison\n2ᵉ niveau (3 emplacements) : apaisement des émotions, arme spirituelle, immobilisation de personne, silence\n3ᵉ niveau (3 emplacements) : dissipation de la magie, esprits gardiens, invocation séraphique\n4ᵉ niveau (3 emplacements) : bannissement, protecteur de la foi, liberté de mouvement\n5ᵉ niveau (3 emplacements) : colonne de feu, ordonnancement, soins de groupe\n6ᵉ niveau (1 emplacement) : mot de rappel\n7ᵉ niveau (1 emplacement) : tempête de feu\n8ᵉ niveau (1 emplacement) : aura sacrée\n9ᵉ niveau (1 emplacement) : guérison de groupe"
+    }
+  ],
+  "actions": [
+    {
+      "name": "Masse d'armes",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 3 (1d6) dégâts contondants.\nD R\nAyant grandi comme garçon réduit en esclavage, Asayanga est désormais la grande prêtresse de la Dame de la Nuit. Elle se présente tantôt sous une apparence féminine sophistiquée, tantôt comme un simple voyageur originaire de Mibu. Bien que très discrète, la mystérieuse Asayanga est redoutable et l'on dit que ses paroles sont inspirées directement par la déesse.\nLa population d'une ville ou d'un village est essentiellement composée de **roturiers** encadrés par des **aristocrates**. La sécurité est assurée par des combattants de métier, principalement des **gardes** et des **vétérans** dirigés par des **chevaliers** (cf. chapitre **Soldats**), tandis que l'adversité prendra la forme de **bandits** ou de **brutes** menés par un **chef de bande** (cf. chapitre **Dans les ombres : Clandestins**)."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "sur ce que le culte de Forgeron doit être. Et pourtant, ils représenteront chacun une facette de leur divinité tutélaire. De par leur rang et leurs attributions, les archiprêtres sont avant tout des gestionnaires, des administrateurs et des politiciens plutôt que des hommes de terrain. Ils s’impliquent rarement dans des conflits, réservant leurs interventions pour des démonstrations mémorables ou pour des cas de force majeure. Dans ces situations, ils montrent la pleine mesure de leur puissance, qui n’a rien à envier à des héros légendaires. L’importance de la Cité Franche est telle qu’elle attire les hauts prêtres de bien des Églises, qu’il s’agisse pour eux de faire rayonner leur foi depuis les temples de la ville ou bien de résoudre en personne un problème diplomatique à l’occasion d’un voyage."
+}

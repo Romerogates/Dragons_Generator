@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-arslanikh-le-lion-du-kaan",
+  "name": "Arslanikh, le lion du Kaan",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille G, non aligné",
+  "armor_class": 15,
+  "armor_note": "armure naturelle",
+  "hit_points": "76 (9d10 + 27)",
+  "wound_threshold": 19,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 5,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 9,
+      "modifier": "-1"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Athlétisme + 8, Discrétion +5, Perception +4",
+  "senses": "Perception passive 14",
+  "languages": "—",
+  "challenge_rating": "5",
+  "xp": 1800,
+  "traits": [
+    {
+      "name": "Bond avec élan",
+      "description": "S'il bénéficie d'une course d'élan de 3 m, l'arslanikh peut sauter en longueur jusqu'à 9 m."
+    },
+    {
+      "name": "Bond offensif",
+      "description": "<u>Si l'arslanikh se déplace d'au moins 6 m en ligne</u> <u>droite vers une créature de taille M ou inférieure et qu'il la</u> <u>touche</u> avec une attaque de griffes au même tour de jeu, la cible doit réussir un JS Force DD 16 sous peine de se retrouver **à terre** et **agrippée** (DD 16 pour s'extraire). Si la créature est à terre, l'arslanikh peut aussitôt effectuer une attaque de morsure contre elle au prix d'une action bonus. Tant que la lutte persiste, l'arslanikh ne peut pas effectuer d'attaque de morsure sur une autre cible."
+    },
+    {
+      "name": "Flair",
+      "description": "L'arslanikh bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'odorat."
+    },
+    {
+      "name": "Tactique de meute",
+      "description": "L'arslanikh bénéficie d'un avantage aux jets d'attaque contre les créatures situées à 1,50 m ou moins d'un de ses alliés qui n'est pas neutralisé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "L'arslanikh effectue deux attaques de griffes. <u>Si l'arslanikh agrippe une cible **à terre**,</u> il peut en outre lui infliger une attaque de morsure au prix d'une action bonus."
+    },
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +8 pour toucher, allonge 1,50 m, une cible. *Réussite* : 14 (2d8 + 5) dégâts perforants."
+    },
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +8 pour toucher, allonge 1,50 m, une cible. *Réussite* : 12 (2d6 + 5) dégâts tranchants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Icone de tête de lion"
+}

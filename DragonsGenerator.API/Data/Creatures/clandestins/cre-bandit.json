@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-bandit",
+  "name": "Bandit",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement autre que loyal",
+  "armor_class": 12,
+  "armor_note": "armure de cuir",
+  "hit_points": "11 (2d8 + 2)",
+  "wound_threshold": 5,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +3, Intimidation +2",
+  "senses": "Perception passive 10",
+  "languages": "une au choix (généralement le commun)",
+  "challenge_rating": "1/8",
+  "xp": 25,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Cimeterre",
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d6 + 1) dégâts tranchants."
+    },
+    {
+      "name": "Arbalète légère",
+      "description": "Attaque d'arme à distance : +3 pour toucher, portée 24/92 m, une cible. Réussite : 5 (1d8 + 1) dégâts perforants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Piegrièche est un melessë doté de traits si fins qu'on lui imaginerait volontiers une ascendance princière. Malheureusement pour lui, si c’est le cas de son paternel elfique, sa mère humaine, en revanche, se contentait de vendre ses charmes dans le port de la Cité Franche. Sitôt qu’il fût en âge de rapporter de l’argent au foyer, il mit tout en œuvre pour protéger ses cadets et leur assurer une meilleure vie. Pour lui, il est trop tard – en tous cas c’est ce qu’il pense. Il abuse de la bouteille, il se laisse porter par ses coups de cœur et vagues à l’âme, et plus que tout, il a un penchant pour les ennuis. C’est plus fort que lui, ils l’attirent. À chaque fois qu’il sort d’une galère, il se dit que la prochaine fois, il s’y prendra autrement, et finalement, ça recommence. C’est d’autant plus embêtant que la situation entre les guildes de voleurs se tend de plus en plus…"
+}

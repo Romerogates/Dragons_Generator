@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-reprouve",
+  "name": "Réprouvé",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Mort-vivant de taille M, neutre mauvais",
+  "armor_class": 14,
+  "armor_note": "armure de cuir cloutée",
+  "hit_points": "45 (6d8 + 18)",
+  "wound_threshold": null,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 15,
+      "modifier": "+2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +4, Perception +3",
+  "senses": "ibilité à la lumière du jour. Quand le réprouvé est exposé à la lumière du jour, il subit un désavantage aux jets d'attaque ainsi qu'aux tests de Sagesse (Perception) basés sur la vue.",
+  "languages": "celles pratiquées de son vivant",
+  "challenge_rating": "3",
+  "xp": 700,
+  "traits": [
+    {
+      "name": "Sensibilité à la lumière du jour",
+      "description": "Quand le réprouvé est exposé à la lumière du jour, il subit un désavantage aux jets d'attaque ainsi qu'aux tests de Sagesse (Perception) basés sur la vue."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le réprouvé effectue deux attaques d'épée longue ou deux attaques d'arc long. Il peut utiliser absorption de vie à la place d'une attaque d'épée longue."
+    },
+    {
+      "name": "Absorption de vie",
+      "description": "Attaque de sort au corps à corps : +4 pour toucher, allonge 1,50 m, une créature. Réussite : 5 (1d6+2) dégâts nécrotiques. La cible doit réussir un JS Constitution DD 13 sous peine de voir ses pv maximums réduits d'un montant égal aux dégâts subis. Cette réduction persiste jusqu'à ce qu'elle termine un repos long. La cible meurt si cet effet réduit ses pv maximums à 0.\nUn humanoïde tué par cette attaque se relève 24 heures plus tard en tant que **zombie** sous le contrôle du réprouvé, à moins qu'il ait été ramené à la vie ou que son cadavre ait été détruit. Le réprouvé ne peut avoir plus de douze zombies sous son contrôle à la fois."
+    },
+    {
+      "name": "Épée longue",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 6 (1d8 + 2) dégâts tranchants, ou 7 (1d10 + 2) dégâts tranchants si utilisée à deux mains."
+    },
+    {
+      "name": "Arc long",
+      "description": "Attaque d'arme à distance : +4 pour toucher, portée 45/180 m, une cible. Réussite : 6 (1d8 + 2) dégâts perforants.\n168"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Une fois sa propre quête accomplie (à supposer que celle-ci ait eu un sens et une fin), le réprouvé peut décider de se mettre au service de puissances maléfiques, se refaisant en quelque sorte une « vie » de mercenaire. Gleannceò est peut-être le seul endroit où une telle créature peut trouver une place dans la société. Le réprouvé devient garde, soldat, escorte, etc. Mais désormais, l’odeur de la mort l’accompagne, et sa seule vue sème la terreur parmi ses ennemis."
+}

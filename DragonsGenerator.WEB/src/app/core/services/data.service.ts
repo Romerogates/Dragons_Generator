@@ -21,6 +21,12 @@ import { EquipmentSummary } from '@core/models/Equipments/equipment-summary';
 import { Spell } from '@core/models/Spells/spell';
 import { SpellSummary } from '@core/models/Spells/spell-summary';
 import { GenerateBackstoryRequest, GenerateBackstoryResponse } from '../models/Character/backstory';
+import {
+  GenerateAdventureRequest,
+  GenerateAdventureResponse,
+  GenerateCreatureStoryRequest,
+  GenerateCreatureStoryResponse,
+} from '../models/Story/story';
 import { Background } from '../models/Backgrounds/background';
 import { BackgroundSummary } from '../models/Backgrounds/background-summary';
 import { Handicap } from '../models/Handicaps/handicap';
@@ -31,6 +37,8 @@ import { Skill, SkillSummary } from '../models/Skills/skill';
 import { Feat, FeatSummary } from '../models/Feats/feat';
 import { Deity, DeitySummary } from '../models/Deities/deity';
 import { CombatAction, CombatActionSummary } from '../models/CombatActions/combat-action';
+import { Creature } from '../models/Creatures/creature';
+import { CreatureSummary } from '../models/Creatures/creature-summary';
 
 @Injectable({
   providedIn: 'root',
@@ -185,6 +193,34 @@ export class DataService {
   }
 
   // =========================================================================
+  // CRÉATURES
+  // =========================================================================
+
+  getCreatures(): Observable<Creature[]> {
+    return this.cached('creatures', () => this.http.get<Creature[]>(`${this.apiUrl}/creatures`));
+  }
+
+  getCreaturesSummary(): Observable<CreatureSummary[]> {
+    return this.cached('creatures-summary', () =>
+      this.http.get<CreatureSummary[]>(`${this.apiUrl}/creatures/summary`),
+    );
+  }
+
+  getCreatureCategories(): Observable<string[]> {
+    return this.cached('creature-categories', () =>
+      this.http.get<string[]>(`${this.apiUrl}/creatures/categories`),
+    );
+  }
+
+  getCreatureById(id: string): Observable<Creature> {
+    return this.http.get<Creature>(`${this.apiUrl}/creatures/${id}`);
+  }
+
+  getCreaturesByCategory(category: string): Observable<Creature[]> {
+    return this.http.get<Creature[]>(`${this.apiUrl}/creatures/category/${category}`);
+  }
+
+  // =========================================================================
   // BACKGROUNDS
   // =========================================================================
 
@@ -256,6 +292,16 @@ export class DataService {
 
   generateBackstory(request: GenerateBackstoryRequest): Observable<GenerateBackstoryResponse> {
     return this.http.post<GenerateBackstoryResponse>(`${this.apiUrl}/generate-backstory`, request);
+  }
+
+  generateCreatureStory(
+    request: GenerateCreatureStoryRequest,
+  ): Observable<GenerateCreatureStoryResponse> {
+    return this.http.post<GenerateCreatureStoryResponse>(`${this.apiUrl}/generate-creature-story`, request);
+  }
+
+  generateAdventure(request: GenerateAdventureRequest): Observable<GenerateAdventureResponse> {
+    return this.http.post<GenerateAdventureResponse>(`${this.apiUrl}/generate-adventure`, request);
   }
 
   // =========================================================================

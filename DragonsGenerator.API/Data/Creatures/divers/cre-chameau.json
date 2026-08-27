@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-chameau",
+  "name": "Chameau",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille G, non aligné",
+  "armor_class": 11,
+  "armor_note": null,
+  "hit_points": "19 (3d10 + 3)",
+  "wound_threshold": 5,
+  "speed": "24 m",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 8,
+      "modifier": "-1"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 5,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "Perception passive 10",
+  "languages": "—",
+  "challenge_rating": "1/8",
+  "xp": 25,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 2 (1d4) dégâts contondants."
+    },
+    {
+      "name": "243",
+      "description": ""
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Doté de deux bosses permettant de stocker des graisses pour la mauvaise saison et d’une bonne endurance au manque d’eau, le chameau est la meilleure monture pour les expéditions dans les régions les plus arides du Kaan, tel le désert de sel de Tuzdisöl. Ses qualités ne s’arrêtent pas là : son lait est très apprécié des habitants du pays, et il a une laine beige ou brune très chaude presque impossible à teindre. Grâce à elle, on tisse et tricote couvertures, bonnets, gants et chausses qui permettent de supporter des températures polaires au cœur de l’hiver."
+}

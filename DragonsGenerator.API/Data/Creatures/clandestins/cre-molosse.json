@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-molosse",
+  "name": "Molosse",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Bête de taille M, non aligné",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "5 (1d8 + 1)",
+  "wound_threshold": null,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +3",
+  "senses": "Perception passive 13",
+  "languages": "—",
+  "challenge_rating": "1/8",
+  "xp": 25,
+  "traits": [
+    {
+      "name": "Ouïe fine et flair",
+      "description": "Le molosse bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'ouïe ou l'odorat."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d6 + 1) dégâts perforants. Si la cible est une créature de taille M ou inférieure, elle doit réussir un JS Force DD 11 sous peine d'être jetée **à terre**.\nLes molosses sont des chiens impressionnants, que les humanoïdes recherchent pour leur loyauté et leurs sens aiguisés. On peut les dresser comme chiens de garde, de chasse ou de guerre. Les halfelins et autres humanoïdes de taille P peuvent même s'en servir de montures.\nMolosse féroce\nMolosse féroce"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Il existe des chiens sang-arcanes de toutes tailles et toutes formes."
+}

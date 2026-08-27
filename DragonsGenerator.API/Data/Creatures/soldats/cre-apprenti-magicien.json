@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-apprenti-magicien",
+  "name": "Apprenti magicien",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 11,
+  "armor_note": null,
+  "hit_points": "18 (4d8)",
+  "wound_threshold": 5,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 9,
+      "modifier": "-1"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 11,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": "Cha +4",
+  "skills": "Tromperie +4",
+  "senses": "Perception passive 11",
+  "languages": "trois au choix",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Dague",
+      "description": "Attaque d'arme de corps à corps ou à distance : +3 pour toucher, allonge 1,50 m ou portée 6/18 m, une cible. Réussite : 3 (1d4 + 2) dégâts perforants.\nVariante **Variante : Apprenti ensorceleur**\nLe profil ci-dessus peut également s'appliquer à un ensorceleur inexpérimenté, avec les changements suivants :\n• **Modification de caractéristique.** L'Intelligence passe à 11 (+0). Le Charisme passe à 15 (+2).\n• **Jets de sauvegarde** Cha +4\n• **Compétences** Tromperie +4"
+    },
+    {
+      "name": "Réserve arcanique",
+      "description": "(recharge après un repos long). Au prix d'une action bonus, l'apprenti ensorceleur peut récupérer un emplacement de sort de 1ᵉʳ niveau.\n• **Sorts mineurs** (à volonté) : illusion mineure, trait de feu, vivacité\n• • **1ᵉʳ niveau** (3 emplacements) : bouclier, charme-personne, mains brûlantes"
+    },
+    {
+      "name": "Réserve arcanique",
+      "description": "(recharge après un repos long). Au prix d'une action bonus, l'apprenti ensorceleur peut récupérer un emplacement de sort de 1ᵉʳ niveau.\n• **Sorts mineurs** (à volonté) : illusion mineure, trait de feu, vivacité\n• • **1ᵉʳ niveau** (3 emplacements) : bouclier, charme-personne, mains brûlantes"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

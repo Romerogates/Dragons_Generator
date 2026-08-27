@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-brute-gobelourse",
+  "name": "Brute gobelourse",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (gobelinoïde) de taille M, neutre (tout alignement)",
+  "armor_class": 16,
+  "armor_note": "armure de peau, bouclier",
+  "hit_points": "27 (5d8 + 5)",
+  "wound_threshold": 7,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Athlétisme +4, Discrétion +6, Survie +2",
+  "senses": "vision dans le noir 18 m, Perception passive 10",
+  "languages": "commun, gobelin",
+  "challenge_rating": "1",
+  "xp": 200,
+  "traits": [],
+  "actions": [],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "La quêteuse se distingue avant tout par sa grande astuce et ses aptitudes sociales expertes qui font d’elle une survivante. Si elle n’est pas pour autant sans défense, en cas d’hostilités, son premier réflexe sera de se soustraire à la mêlée, laissant le combat aux brutes dont toute quêteuse est immanquablement flanquée. Elle ne prendra les devants que s’il lui semble que son engagement serait déterminant."
+}

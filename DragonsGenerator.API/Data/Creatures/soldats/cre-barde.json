@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-barde",
+  "name": "Barde",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 14,
+  "armor_note": "chemise de mailles",
+  "hit_points": "36 (8d8)",
+  "wound_threshold": 9,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 16,
+      "modifier": "+3"
+    }
+  },
+  "saving_throws": "Cha +5",
+  "skills": "Intuition +3, Persuasion +7, Représentation +5, Tromperie +7",
+  "senses": "Perception passive 11",
+  "languages": "quatre au choix",
+  "challenge_rating": "4",
+  "xp": 1100,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Rapière",
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 1,50 m. Réussite : 5 (1d8 + 1) dégâts perforants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Barde"
+}

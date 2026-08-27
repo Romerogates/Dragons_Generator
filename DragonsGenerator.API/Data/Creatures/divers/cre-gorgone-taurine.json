@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-gorgone-taurine",
+  "name": "Gorgone taurine",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Monstruosité de taille G, non aligné",
+  "armor_class": 19,
+  "armor_note": "armure naturelle",
+  "hit_points": "114 (12d10 + 48)",
+  "wound_threshold": 29,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "dex": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "int": {
+      "score": 5,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +4",
+  "senses": "vision dans le noir 18 m, Perception passive 14",
+  "languages": "—",
+  "challenge_rating": "5",
+  "xp": 1800,
+  "traits": [
+    {
+      "name": "Charge écrasante",
+      "description": "Si la gorgone se déplace d'au moins 6 m en ligne droite vers une créature et qu'elle la touche avec une attaque d'embrochage au même tour de jeu, la cible doit réussir un JS Force DD 16 sous peine de se retrouver **à terre**. Si la cible se retrouve **à terre**, la gorgone peut aussitôt lui porter une attaque de sabots au prix d'une action bonus."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Embrochage",
+      "description": "Attaque d'arme de corps à corps : +8 pour toucher, allonge 1,50 m, une cible. Réussite : 18 (2d12 + 5) dégâts perforants."
+    },
+    {
+      "name": "Sabots",
+      "description": "Attaque d'arme de corps à corps : +8 pour toucher, allonge 1,50 m, une cible. Réussite : 16 (2d10 + 5) dégâts contondants."
+    },
+    {
+      "name": "Souffle pétrifiant (recharge 5-6)",
+      "description": "La gorgone souffle un cône de gaz pétrifiant de 9 m. Chaque créature prise dans la zone d'effet doit effectuer un JS Constitution DD 13. En cas d'échec, la cible commence à se pétrifier et se retrouve **entravée**. Ainsi affectée,\nelle doit réitérer le jet de sauvegarde à la fin de son tour de jeu suivant. En cas de réussite, l'effet prend fin. En cas d'échec, la créature est **pétrifiée** jusqu'à être libérée par le sort restauration suprême ou autre effet magique similaire.\nicon Si vous souhaitez rendre cette créature plus redoutable, vous pouvez utiliser l'option ci-dessous. Dans ce cas, son FP passera de 5 à 6."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les pouvoirs de pétrification de la gorgone la rapprochent du basilic, de la cocatrice et de la méduse, trois créatures supposément amenées sur Eana depuis un monde étrange où il est commun que la chair devienne minérale et inversement. La gorgone laisse cependant les érudits perplexes, car sa silhouette évoque le taureau et il est difficile d’imaginer qu’il apparaisse spontanément dans deux mondes des créatures aussi semblables. La force et l’agressivité de la gorgone rendent difficile son étude, réduisant les savants aux spéculations. Est-elle le résultat d’une expérience magique visant à transformer un taureau en mêlant son essence à celle d’une créature planaire ? Si oui, quelle est cette dernière ? S’agit-il d’une entité distincte, mais aujourd’hui inconnue ? Ou serait-ce une forme de parasite transformant son hôte ?"
+}

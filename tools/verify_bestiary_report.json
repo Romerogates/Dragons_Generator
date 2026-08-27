@@ -1,0 +1,767 @@
+{
+  "json_total": 211,
+  "pdf_ca_count": 219,
+  "found_in_pdf": 209,
+  "missing_in_pdf": [
+    "cre-mille-visages-sous-sa-forme-draconique (Mille visages sous sa forme draconique)",
+    "cre-colonie-kheg (Colonie kheg)"
+  ],
+  "issues": [
+    {
+      "creature_id": "cre-bandit",
+      "name": "Bandit",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-corbeaux-nuee",
+      "name": "Corbeaux - Nuée",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-ez-galwyn",
+      "name": "Ez’Galwyn",
+      "field": "actions",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-ez-galwyn",
+      "name": "Ez’Galwyn",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-rat",
+      "name": "Rat",
+      "field": "hit_points",
+      "expected": "1 (1d4 - 1)",
+      "actual": "4 (1d8)"
+    },
+    {
+      "creature_id": "cre-rat",
+      "name": "Rat",
+      "field": "abilities.str.score",
+      "expected": "2",
+      "actual": "10"
+    },
+    {
+      "creature_id": "cre-rat",
+      "name": "Rat",
+      "field": "abilities.str.modifier",
+      "expected": "-4",
+      "actual": "+0"
+    },
+    {
+      "creature_id": "cre-rat",
+      "name": "Rat",
+      "field": "abilities.dex.score",
+      "expected": "11",
+      "actual": "10"
+    },
+    {
+      "creature_id": "cre-rat",
+      "name": "Rat",
+      "field": "abilities.con.score",
+      "expected": "9",
+      "actual": "10"
+    },
+    {
+      "creature_id": "cre-rat",
+      "name": "Rat",
+      "field": "abilities.con.modifier",
+      "expected": "-1",
+      "actual": "+0"
+    },
+    {
+      "creature_id": "cre-rat",
+      "name": "Rat",
+      "field": "abilities.int.score",
+      "expected": "2",
+      "actual": "10"
+    },
+    {
+      "creature_id": "cre-rat",
+      "name": "Rat",
+      "field": "abilities.int.modifier",
+      "expected": "-4",
+      "actual": "+0"
+    },
+    {
+      "creature_id": "cre-rat",
+      "name": "Rat",
+      "field": "abilities.cha.score",
+      "expected": "4",
+      "actual": "10"
+    },
+    {
+      "creature_id": "cre-rat",
+      "name": "Rat",
+      "field": "abilities.cha.modifier",
+      "expected": "-3",
+      "actual": "+0"
+    },
+    {
+      "creature_id": "cre-rat-geant",
+      "name": "Rat géant",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-acolyte",
+      "name": "Acolyte",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-ecclesiastique",
+      "name": "Ecclésiastique",
+      "field": "actions",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-fanatique",
+      "name": "Fanatique",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-garde-sacre",
+      "name": "Garde sacré",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-araignees-nuee",
+      "name": "Araignées - Nuée",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-araignees-nuee",
+      "name": "Araignées - Nuée",
+      "field": "actions",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-archidruide",
+      "name": "Archidruide",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-archidruide",
+      "name": "Archidruide",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-belette-geante",
+      "name": "Belette géante",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-berserker-sacre",
+      "name": "Berserker sacré",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-berserker-sacre",
+      "name": "Berserker sacré",
+      "field": "actions",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-blaireau",
+      "name": "Blaireau",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-brute-gobelourse",
+      "name": "Brute gobelourse",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-brute-gobelourse",
+      "name": "Brute gobelourse",
+      "field": "actions",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-chameau",
+      "name": "Chameau",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-cheval-de-selle",
+      "name": "Cheval de selle",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-cheval-de-selle",
+      "name": "Cheval de selle",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-cheval-de-trait",
+      "name": "Cheval de trait",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-cheval-de-trait",
+      "name": "Cheval de trait",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-destrier",
+      "name": "Destrier",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-dragonnet-blanc",
+      "name": "Dragonnet blanc",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-druide",
+      "name": "Druide",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-guerrier-geant-du-givre",
+      "name": "Guerrier géant du givre",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-guerrier-ulkan",
+      "name": "Guerrier ulkan",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-geant-du-givre-sorcier-de-gegaor",
+      "name": "Géant du givre sorcier de Gegaôr",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-hibou-geant",
+      "name": "Hibou géant",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-inane-tourmenteuse",
+      "name": "Inane tourmenteuse",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-lycose-geante",
+      "name": "Lycose géante",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-lycose-geante",
+      "name": "Lycose géante",
+      "field": "actions",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-lycose-geante",
+      "name": "Lycose géante",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-mule",
+      "name": "Mule",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-mephite-orageux",
+      "name": "Méphite orageux",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-ours-brun",
+      "name": "Ours brun",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-poney",
+      "name": "Poney",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-poney",
+      "name": "Poney",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-queteuse-gobelours",
+      "name": "Quêteuse gobelours",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-queteuse-gobelours",
+      "name": "Quêteuse gobelours",
+      "field": "actions",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-queteuse-gobelours",
+      "name": "Quêteuse gobelours",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-renne",
+      "name": "Renne",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-sage-ulkan",
+      "name": "Sage ulkan",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-salamandre",
+      "name": "Salamandre",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-soldat-hobgobelin",
+      "name": "Soldat hobgobelin",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-squelette",
+      "name": "Squelette",
+      "field": "abilities.str.score",
+      "expected": "10",
+      "actual": "15"
+    },
+    {
+      "creature_id": "cre-squelette",
+      "name": "Squelette",
+      "field": "abilities.str.modifier",
+      "expected": "+0",
+      "actual": "+2"
+    },
+    {
+      "creature_id": "cre-squelette",
+      "name": "Squelette",
+      "field": "abilities.dex.score",
+      "expected": "14",
+      "actual": "10"
+    },
+    {
+      "creature_id": "cre-squelette",
+      "name": "Squelette",
+      "field": "abilities.dex.modifier",
+      "expected": "+2",
+      "actual": "+0"
+    },
+    {
+      "creature_id": "cre-squelette",
+      "name": "Squelette",
+      "field": "abilities.con.score",
+      "expected": "15",
+      "actual": "14"
+    },
+    {
+      "creature_id": "cre-squelette",
+      "name": "Squelette",
+      "field": "abilities.int.score",
+      "expected": "6",
+      "actual": "15"
+    },
+    {
+      "creature_id": "cre-squelette",
+      "name": "Squelette",
+      "field": "abilities.int.modifier",
+      "expected": "-2",
+      "actual": "+2"
+    },
+    {
+      "creature_id": "cre-squelette",
+      "name": "Squelette",
+      "field": "abilities.wis.score",
+      "expected": "8",
+      "actual": "6"
+    },
+    {
+      "creature_id": "cre-squelette",
+      "name": "Squelette",
+      "field": "abilities.wis.modifier",
+      "expected": "-1",
+      "actual": "-2"
+    },
+    {
+      "creature_id": "cre-squelette",
+      "name": "Squelette",
+      "field": "abilities.cha.score",
+      "expected": "5",
+      "actual": "8"
+    },
+    {
+      "creature_id": "cre-squelette",
+      "name": "Squelette",
+      "field": "abilities.cha.modifier",
+      "expected": "-3",
+      "actual": "-1"
+    },
+    {
+      "creature_id": "cre-squelette",
+      "name": "Squelette",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-squelette-de-destrier",
+      "name": "Squelette de destrier",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-squelette-de-destrier",
+      "name": "Squelette de destrier",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-squelette-de-minotaure",
+      "name": "Squelette de minotaure",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-sunsutaa",
+      "name": "Sünsutaa",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-sunsutaaikh",
+      "name": "Sünsutaaikh",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-un-familier-kaani",
+      "name": "Un familier kaani",
+      "field": "abilities.str.score",
+      "expected": "4",
+      "actual": "16"
+    },
+    {
+      "creature_id": "cre-un-familier-kaani",
+      "name": "Un familier kaani",
+      "field": "abilities.str.modifier",
+      "expected": "-3",
+      "actual": "+3"
+    },
+    {
+      "creature_id": "cre-un-familier-kaani",
+      "name": "Un familier kaani",
+      "field": "abilities.dex.score",
+      "expected": "10",
+      "actual": "12"
+    },
+    {
+      "creature_id": "cre-un-familier-kaani",
+      "name": "Un familier kaani",
+      "field": "abilities.dex.modifier",
+      "expected": "+0",
+      "actual": "+1"
+    },
+    {
+      "creature_id": "cre-un-familier-kaani",
+      "name": "Un familier kaani",
+      "field": "abilities.con.score",
+      "expected": "10",
+      "actual": "4"
+    },
+    {
+      "creature_id": "cre-un-familier-kaani",
+      "name": "Un familier kaani",
+      "field": "abilities.con.modifier",
+      "expected": "+0",
+      "actual": "-3"
+    },
+    {
+      "creature_id": "cre-un-familier-kaani",
+      "name": "Un familier kaani",
+      "field": "abilities.int.score",
+      "expected": "5",
+      "actual": "10"
+    },
+    {
+      "creature_id": "cre-un-familier-kaani",
+      "name": "Un familier kaani",
+      "field": "abilities.int.modifier",
+      "expected": "-3",
+      "actual": "+0"
+    },
+    {
+      "creature_id": "cre-un-familier-kaani",
+      "name": "Un familier kaani",
+      "field": "abilities.cha.score",
+      "expected": "10",
+      "actual": "5"
+    },
+    {
+      "creature_id": "cre-un-familier-kaani",
+      "name": "Un familier kaani",
+      "field": "abilities.cha.modifier",
+      "expected": "+0",
+      "actual": "-3"
+    },
+    {
+      "creature_id": "cre-zombie-ogre",
+      "name": "Zombie ogre",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-ame-en-peine",
+      "name": "Âme-en-peine",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-ame-en-peine",
+      "name": "Âme-en-peine",
+      "field": "actions",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-roturier",
+      "name": "Roturier",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-apprenti-magicien",
+      "name": "Apprenti magicien",
+      "field": "abilities.str.score",
+      "expected": "9",
+      "actual": "11"
+    },
+    {
+      "creature_id": "cre-apprenti-magicien",
+      "name": "Apprenti magicien",
+      "field": "abilities.str.modifier",
+      "expected": "-1",
+      "actual": "+0"
+    },
+    {
+      "creature_id": "cre-apprenti-magicien",
+      "name": "Apprenti magicien",
+      "field": "abilities.dex.score",
+      "expected": "12",
+      "actual": "15"
+    },
+    {
+      "creature_id": "cre-apprenti-magicien",
+      "name": "Apprenti magicien",
+      "field": "abilities.dex.modifier",
+      "expected": "+1",
+      "actual": "+2"
+    },
+    {
+      "creature_id": "cre-apprenti-magicien",
+      "name": "Apprenti magicien",
+      "field": "abilities.con.score",
+      "expected": "11",
+      "actual": "9"
+    },
+    {
+      "creature_id": "cre-apprenti-magicien",
+      "name": "Apprenti magicien",
+      "field": "abilities.con.modifier",
+      "expected": "+0",
+      "actual": "-1"
+    },
+    {
+      "creature_id": "cre-apprenti-magicien",
+      "name": "Apprenti magicien",
+      "field": "abilities.int.score",
+      "expected": "15",
+      "actual": "12"
+    },
+    {
+      "creature_id": "cre-apprenti-magicien",
+      "name": "Apprenti magicien",
+      "field": "abilities.int.modifier",
+      "expected": "+2",
+      "actual": "+1"
+    },
+    {
+      "creature_id": "cre-apprenti-magicien",
+      "name": "Apprenti magicien",
+      "field": "abilities.wis.score",
+      "expected": "12",
+      "actual": "11"
+    },
+    {
+      "creature_id": "cre-apprenti-magicien",
+      "name": "Apprenti magicien",
+      "field": "abilities.wis.modifier",
+      "expected": "+1",
+      "actual": "+0"
+    },
+    {
+      "creature_id": "cre-apprenti-magicien",
+      "name": "Apprenti magicien",
+      "field": "abilities.cha.score",
+      "expected": "11",
+      "actual": "15"
+    },
+    {
+      "creature_id": "cre-apprenti-magicien",
+      "name": "Apprenti magicien",
+      "field": "abilities.cha.modifier",
+      "expected": "+0",
+      "actual": "+2"
+    },
+    {
+      "creature_id": "cre-apprenti-magicien",
+      "name": "Apprenti magicien",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-apprenti-magicien",
+      "name": "Apprenti magicien",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-barde",
+      "name": "Barde",
+      "field": "traits",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-champion",
+      "name": "Champion",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-chaine-animee",
+      "name": "Chaîne animée",
+      "field": "actions",
+      "expected": "missing",
+      "actual": "present in PDF"
+    },
+    {
+      "creature_id": "cre-chevalier",
+      "name": "Chevalier",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-mage",
+      "name": "Mage",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    },
+    {
+      "creature_id": "cre-epee-volante",
+      "name": "Épée volante",
+      "field": "description",
+      "expected": "empty",
+      "actual": "should have flavor text"
+    }
+  ]
+}

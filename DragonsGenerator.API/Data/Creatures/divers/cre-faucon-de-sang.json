@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-faucon-de-sang",
+  "name": "Faucon de sang",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille P, non aligné",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "7 (2d6)",
+  "wound_threshold": 4,
+  "speed": "3 m, vol 18 m",
+  "abilities": {
+    "str": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 6,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +4",
+  "senses": "Perception passive 14",
+  "languages": "—",
+  "challenge_rating": "1/8",
+  "xp": 25,
+  "traits": [
+    {
+      "name": "Vue perçante",
+      "description": "Le faucon de sang bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir la vue."
+    },
+    {
+      "name": "Tactique de meute",
+      "description": "Le faucon de sang bénéficie d'un avantage aux jets d'attaque contre les créatures situées à 1,50 m ou moins d'un de ses alliés qui n'est pas neutralisé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Bec",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d4 + 2) dégâts perforants.\nLe faucon de sang tire son nom de ses plumes cramoisies et de son tempérament très agressif. Ces volatiles attaquent en nombre lors d'attaques coordonnées.\nDes dresseurs sont capables d'élever des faucons de sang pour servir de guetteurs ou d'éclaireurs. Ils apprennent à signaler la présence de fugitifs poursuivis, tout en restant eux-mêmes à une altitude suffisante pour ne pas être abattus par le premier archer venu."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "CYETYNTATOY"
+}

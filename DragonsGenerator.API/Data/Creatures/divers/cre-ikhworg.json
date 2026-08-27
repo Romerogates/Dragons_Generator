@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-ikhworg",
+  "name": "Ikhworg",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille G, neutre",
+  "armor_class": 15,
+  "armor_note": "armure naturelle",
+  "hit_points": "102 (12d10 + 36)",
+  "wound_threshold": 26,
+  "speed": "18 m",
+  "abilities": {
+    "str": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "dex": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 9,
+      "modifier": "-1"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 16,
+      "modifier": "+3"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Acrobaties +7, Athlétisme +8, Intimidation +6, Perception +7",
+  "senses": "vision dans le noir 18 m, Perception passive 17",
+  "languages": "—",
+  "challenge_rating": "5",
+  "xp": 1800,
+  "traits": [
+    {
+      "name": "Ouïe fine et flair",
+      "description": "L'ikhworg bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'ouïe ou l'odorat."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +8 pour toucher, allonge 1,50 m, une cible. Réussite : 22 (5d6 + 5) dégâts perforants + 9 (2d8) dégâts de foudre. Si la cible est une créature, elle doit réussir un JS Force DD 16 sous peine de se retrouver **à terre**."
+    },
+    {
+      "name": "Hurlement (recharge 5-6)",
+      "description": "L'ikhworg pousse un cri assourdissant grondant comme le tonnerre, aux effets équivalents à un sort de hurlement DD 14 lancé avec un emplacement de sort de 4ᵉ niveau.\nRapides comme la foudre, féroces comme la tempête, dangereux comme un ouragan, les ikhworgs, ou worgs suprêmes, sont des spécimens extraordinaires reconnus comme des émissaires divins de Tamerakh. Il est dit que seuls les véritables héros du Destructeur sont dignes d'être réincarnés sous une telle forme. Plus massifs et élancés que leurs semblables ordinaires, leur pelage est d'un gris de ciel d'orage aux reflets violacés, et ils sont entourés d'une senteur lourde d'ozone. Les worgs leur obéissent sans conteste, et on dit qu'un ikhworg n'accepte comme cavaliers que les plus grands champions de la Horde. En voir un est perçu comme un présage extrêmement éloquent de la part de Tamerakh… en bien ou en mal."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Ikhworg"
+}

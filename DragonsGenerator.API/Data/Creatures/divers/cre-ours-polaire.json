@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-ours-polaire",
+  "name": "Ours polaire",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille G, non aligné",
+  "armor_class": 14,
+  "armor_note": "armure naturelle",
+  "hit_points": "42 (5d10 + 15)",
+  "wound_threshold": 11,
+  "speed": "12 m, nage 9 m",
+  "abilities": {
+    "str": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 5,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 8,
+      "modifier": "-1"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +3",
+  "senses": "Perception passive 13",
+  "languages": "—",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [
+    {
+      "name": "Flair",
+      "description": "L'ours polaire bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'odorat."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "L'ours polaire effectue deux attaques : une de morsure et une de griffes."
+    },
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 1,50 m, une cible. Réussite : 9 (1d8 + 5) dégâts perforants."
+    },
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 1,50 m, une cible. Réussite : 12 (2d6 + 5) dégâts tranchants.\n365\nRemorhaz icon"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les **géants du givre** apprécient énormément les ours polaires qu’ils chérissent et prennent parfois comme compagnons animaux."
+}

@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-logo-paladin",
+  "name": "Logo Paladin",
+  "category": "croyants",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": null,
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 20,
+  "armor_note": "harnois, bouclier",
+  "hit_points": "112 (15d8 + 45)",
+  "wound_threshold": 23,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 17,
+      "modifier": "+3"
+    }
+  },
+  "saving_throws": "Sag +4, Cha +6",
+  "skills": "Intimidation +6, Persuasion +6, Religion +3",
+  "senses": "Perception passive 11",
+  "languages": "deux au choix",
+  "challenge_rating": "8",
+  "xp": 3900,
+  "traits": [],
+  "actions": [],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Synthia naquit dans les royaumes des Sables d’un père elfe parti découvrir le monde. Paladine honorant Façonneur, elle défend la liberté et l’ouverture d’esprit, s’engageant à aider ceux qui touchent son cœur. Elle a pris fait et cause pour les réfugiés de Cyrillane, et cherche désormais à inciter la Cité Franche à intervenir pour contribuer à mettre fin à la guerre civile."
+}

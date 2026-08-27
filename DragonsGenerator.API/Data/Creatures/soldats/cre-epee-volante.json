@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-epee-volante",
+  "name": "Épée volante",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Créature artificielle de taille P, non aligné",
+  "armor_class": 17,
+  "armor_note": "armure naturelle",
+  "hit_points": "17 (5d6)",
+  "wound_threshold": null,
+  "speed": "0 m, vol 15 m (stationnaire)",
+  "abilities": {
+    "str": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 1,
+      "modifier": "-5"
+    },
+    "wis": {
+      "score": 5,
+      "modifier": "-3"
+    },
+    "cha": {
+      "score": 1,
+      "modifier": "-5"
+    }
+  },
+  "saving_throws": "Dex +4",
+  "skills": null,
+  "senses": "vision aveugle 18 m (aucune vision au-delà de ce rayon), Perception passive 7",
+  "languages": "—",
+  "challenge_rating": "1/4",
+  "xp": 50,
+  "traits": [
+    {
+      "name": "Apparence trompeuse",
+      "description": "Tant que l'épée se tient immobile, elle est indiscernable d'une épée normale."
+    },
+    {
+      "name": "Sensibilité antimagique",
+      "description": "L'épée est **neutralisée** lorsqu'elle se trouve dans la zone d'un champ d'antimagie. Si elle est ciblée par dissipation de la magie, elle doit réussir un JS Constitution contre le DD de sauvegarde des sorts du lanceur sous peine d'être **inconsciente** pendant 1 minute."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Épée longue",
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 1,50 m, une cible. Réussite : 5 (1d8 + 1) dégâts tranchants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-chauve-souris",
+  "name": "Chauve-souris",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille TP, non aligné",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "1 (1d4 - 1)",
+  "wound_threshold": null,
+  "speed": "1,50 m, vol 9 m",
+  "abilities": {
+    "str": {
+      "score": 2,
+      "modifier": "-4"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 8,
+      "modifier": "-1"
+    },
+    "int": {
+      "score": 2,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 4,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision aveugle 18 m, Perception passive 11",
+  "languages": "—",
+  "challenge_rating": "0",
+  "xp": 10,
+  "traits": [
+    {
+      "name": "Écholocalisation",
+      "description": "La chauve-souris ne peut pas utiliser sa vision aveugle quand elle est assourdie"
+    },
+    {
+      "name": "Ouïe fine",
+      "description": "La chauve-souris bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'ouïe."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +0 pour toucher, allonge 1,50 m, une créature. Réussite : 1 dégât perforant.\n\\<page\\_footer>\\<page\\_number>150\\</page\\_number>\\</page\\_footer>"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "es chauves-souris utilisent des anfractuosités comme abris. en dépit de leur sinistre représentation dans l’imagerie populaire, elles sont pour l’essentiel insectivores ou frugivores, seule une petite minorité se nourrissant de sang. En temps normal, elles ne représentent pas un danger pour les aventuriers, tout au plus une nuisance qui peut être limitée grâce à la prudence d’un guide avisé. Certains lanceurs de sorts adoptent d’ailleurs un familier prenant la forme de cet animal."
+}

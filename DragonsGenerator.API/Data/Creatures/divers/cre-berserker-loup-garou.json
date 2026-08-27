@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-berserker-loup-garou",
+  "name": "Berserker loup-garou",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (espèce au choix) de taille M, chaotique mauvais",
+  "armor_class": 13,
+  "armor_note": "armure de peau",
+  "hit_points": "76 (9d8 + 36)",
+  "wound_threshold": 19,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "int": {
+      "score": 9,
+      "modifier": "-1"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 9,
+      "modifier": "-1"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 10",
+  "languages": "une au choix",
+  "challenge_rating": "4",
+  "xp": 1100,
+  "traits": [
+    {
+      "name": "Intrépide",
+      "description": "Au début de son tour de jeu, le berserker loup-garou peut recevoir un avantage à tous ses jets d'attaque d'arme de corps à corps du tour, mais tous les jets d'attaque le ciblant bénéficient en retour d'un avantage jusqu'au début de son tour de jeu suivant."
+    },
+    {
+      "name": "Instinct fauve",
+      "description": "Le berserker loup-garou a l'avantage aux jets d'initiative."
+    },
+    {
+      "name": "Ouïe fine et flair",
+      "description": "Le berserker loup-garou bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'ouïe et l'odorat."
+    },
+    {
+      "name": "Régénération",
+      "description": "Le berserker loup-garou récupère 5 pv au début de son tour de jeu s'il lui reste au moins 1 pv. S'il subit des dégâts infligés par une arme en argent, ce trait ne fonctionne pas au début de son tour de jeu suivant."
+    },
+    {
+      "name": "Métamorphe",
+      "description": "Le berserker loup-garou peut utiliser son action pour se métamorphoser en hybride de loup humanoïde ou en loup, ou pour recouvrer sa véritable forme qui est humanoïde. Son profil est le même sous chaque forme, exception faite de la CA. L'équipement qu'il porte ou transporte n'est pas transformé. Enfin, il retrouve sa véritable forme s'il tombe à 0 pv."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples (forme hybride uniquement)",
+      "description": "Le berserker loup-garou effectue deux attaques : une de morsure, et une de griffes ou de grande hache."
+    },
+    {
+      "name": "Morsure (forme hybride uniquement)",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 8 (1d8 + 4) dégâts perforants. Si la cible est humanoïde, elle doit réussir un JS Constitution ou Charisme (au choix) DD 14 sous peine de contracter la malédiction de la lycanthropie du loup-garou."
+    },
+    {
+      "name": "Griffes (forme hybride uniquement)",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 9 (2d4 + 4) dégâts tranchants."
+    },
+    {
+      "name": "Grande hache",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 10 (1d12 + 4) dégâts tranchants.\n359"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Berserker loup-garou"
+}

@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-bantu-le-calice-de-douleur",
+  "name": "Bantu, le calice de douleur",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Fiélon (diable) de taille G, loyal mauvais",
+  "armor_class": 20,
+  "armor_note": null,
+  "hit_points": "228 (28d10 + 74)",
+  "wound_threshold": 57,
+  "speed": "15 m, escalade 12 m",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 30,
+      "modifier": "+10"
+    },
+    "con": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "wis": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "cha": {
+      "score": 24,
+      "modifier": "+7"
+    }
+  },
+  "saving_throws": "For +9, Dex +16, Con +9, Sag +11",
+  "skills": "Arcanes +10, Athlétisme +9, Discrétion +16, Médecine +11, Religion +10, Représentation +13",
+  "senses": "vision aveugle 18 m, vision dans le noir 36 m, Perception passive 15",
+  "languages": "céleste, diabolique, télépathie 36 m",
+  "challenge_rating": "17",
+  "xp": 18000,
+  "traits": [
+    {
+      "name": "Armes magiques",
+      "description": "Les attaques d'arme du calice de douleur sont magiques."
+    },
+    {
+      "name": "Change-forme",
+      "description": "Au prix d'une action, le calice de douleur se métamorphose magiquement en humanoïde ou bête d'un facteur de puissance inférieur ou égal au sien, ou recouvre sa véritable forme. Il la retrouve aussi s'il est tué. L'équipement qu'il porte ou transporte est absorbé ou porté lui aussi par la nouvelle forme (à sa convenance).\nSous sa nouvelle forme, le calice de douleur conserve son alignement, ses pv, ses dés de vie, sa faculté de parole, ses maîtrises, ses valeurs d'Intelligence, de Sagesse et de Charisme, ainsi que sa capacité à utiliser cette aptitude, son Chant envoûtant et sa capacité à Émollier. En dehors de ces éléments, ses caractéristiques et capacités sont remplacées par celles de sa nouvelle forme, à l'exception des aptitudes de classe et des actions légendaires dont celle-ci pourrait disposer."
+    },
+    {
+      "name": "Résistance à la magie",
+      "description": "Le calice de douleur bénéficie d'un avantage aux jets de sauvegarde contre les sorts et autres effets magiques."
+    },
+    {
+      "name": "Sorts innés",
+      "description": "La caractéristique magique du calice de douleur est le Charisme (DD de sauvegarde des sorts : 21). Le calice de douleur peut lancer les sorts suivants sans composantes matérielles :\nÀ volonté : apaisement des émotions, détection des pensées\n3/jour chacun : cône de froid, contresort, dissipation de la magie, don des langues, flou, mur de glace, repli expéditif, tempête de neige\n1/jour chacun : changement de plan, coquille antivie, débilité, localisation de créature, mot de pouvoir étourdissant"
+    },
+    {
+      "name": "Vision diabolique",
+      "description": "L'obscurité magique ne gêne en rien la vision dans le noir du calice de douleur."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le calice de douleur effectue deux attaques de pattes."
+    },
+    {
+      "name": "Pattes",
+      "description": "Attaque d'arme de corps à corps : +16 pour toucher, allonge 3 m, une cible. Réussite : 19 (2d8 + 10) dégâts tranchants plus 11 (2d10) dégâts de froid. Si la cible est une créature de taille G ou inférieure et que le calice de douleur n'a pas déjà agrippé deux créatures, elle est **agrippée** (DD 17 pour s'extraire). Tant que la lutte persiste, la cible est **entravée** et subit un désavantage pour résister au Chant envoûtant du calice de douleur."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Extrait du traité De l’ascension tragique des fiélons, par Chlodovique de Rusli"
+}

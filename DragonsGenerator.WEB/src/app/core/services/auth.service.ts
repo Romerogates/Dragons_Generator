@@ -34,8 +34,38 @@ export class AuthService {
   readonly isLoggedIn = computed(() => !!this.tokenSignal() && !!this.userSignal());
   readonly isAdmin = computed(() => this.userSignal()?.role === 'Admin');
 
-  register(email: string, password: string, displayName?: string): Observable<unknown> {
-    return this.http.post(`${this.api}/auth/register`, { email, password, displayName });
+  register(email: string, password: string, displayName: string): Observable<unknown> {
+    const webUrl = typeof window !== 'undefined' ? window.location.origin : undefined;
+    return this.http.post(`${this.api}/auth/register`, {
+      email,
+      password,
+      displayName: displayName.trim(),
+      webUrl,
+    });
+  }
+
+  resendConfirmation(email: string): Observable<{ message?: string; confirmLink?: string }> {
+    const webUrl = typeof window !== 'undefined' ? window.location.origin : undefined;
+    return this.http.post<{ message?: string; confirmLink?: string }>(
+      `${this.api}/auth/resend-confirmation`,
+      { email, webUrl },
+    );
+  }
+
+  updateProfile(displayName: string): Observable<AuthUser> {
+    return this.http.patch<AuthUser>(`${this.api}/auth/me`, { displayName }).pipe(
+      tap((u) => {
+        this.userSignal.set(u);
+        localStorage.setItem(USER_KEY, JSON.stringify(u));
+      }),
+    );
+  }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.api}/auth/change-password`, {
+      currentPassword,
+      newPassword,
+    });
   }
 
   login(email: string, password: string): Observable<AuthResponse> {
@@ -49,7 +79,8 @@ export class AuthService {
   }
 
   forgotPassword(email: string): Observable<unknown> {
-    return this.http.post(`${this.api}/auth/forgot-password`, { email });
+    const webUrl = typeof window !== 'undefined' ? window.location.origin : undefined;
+    return this.http.post(`${this.api}/auth/forgot-password`, { email, webUrl });
   }
 
   resetPassword(token: string, newPassword: string): Observable<unknown> {

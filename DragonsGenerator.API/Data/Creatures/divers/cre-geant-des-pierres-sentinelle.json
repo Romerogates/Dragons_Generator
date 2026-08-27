@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-geant-des-pierres-sentinelle",
+  "name": "Géant des pierres sentinelle",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Géant de taille TG, neutre",
+  "armor_class": 17,
+  "armor_note": "armure naturelle",
+  "hit_points": "126 (11d12 + 55)",
+  "wound_threshold": 32,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 23,
+      "modifier": "+6"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 9,
+      "modifier": "-1"
+    }
+  },
+  "saving_throws": "Dex +5, Con +8, Sag +4",
+  "skills": "Athlétisme +12, Perception +4",
+  "senses": "vision dans le noir 18 m, Perception passive 14",
+  "languages": "commun des profondeurs, tumiit",
+  "challenge_rating": "7",
+  "xp": 2900,
+  "traits": [
+    {
+      "name": "Camouflage rocheux",
+      "description": "Le géant bénéficie d'un avantage aux tests de Dextérité (Discrétion) visant à se cacher dans un environnement rocailleux."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le géant effectue deux attaques de massue. **Massue.** Attaque d'arme de corps à corps : +9 pour toucher, allonge 4,50 m, une cible. Réussite : 19 (3d8 + 6) dégâts contondants."
+    },
+    {
+      "name": "Rocher",
+      "description": "Attaque d'arme à distance : +9 pour toucher, portée 18/72 m, une cible. Réussite : 28 (4d10 + 6) dégâts contondants. Si la cible est une créature, elle doit réussir un JS Force DD 17 sous peine de se retrouver **à terre**."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "En raison de l’affinité de ces géants avec la pierre, les druides sont relativement courants parmi eux. Ce sont des gardiens contemplatifs qui se mêlent peu du monde extérieur et évitent généralement tout contact avec les autres peuples, mais qui protègent farouchement le lieu dont ils sont responsables. Au combat, ils savent mêler leur grande force à leurs pouvoirs magiques pour écraser et chasser promptement leurs ennemis."
+}

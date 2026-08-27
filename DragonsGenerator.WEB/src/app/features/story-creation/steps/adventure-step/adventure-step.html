@@ -1,0 +1,113 @@
+<div class="flex flex-col gap-6 animate-fade-in pb-8">
+  <header class="text-center px-4">
+    <h2 class="text-2xl md:text-3xl font-bold text-violet-400 font-serif mb-2">Composer l'aventure</h2>
+    <p class="text-sm text-slate-400 italic max-w-xl mx-auto">
+      Définissez le cadre de votre histoire, puis laissez l'IA tisser une aventure jouable autour de vos créatures.
+    </p>
+  </header>
+
+  <div class="px-4 max-w-3xl mx-auto w-full space-y-5">
+    <div>
+      <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Titre de l'aventure *</label>
+      <input
+        type="text"
+        placeholder="Ex: Les Ombres de la Cité Franche"
+        [ngModel]="builder.title()"
+        (ngModelChange)="builder.title.set($event)"
+        class="w-full bg-[#1b2028] border border-slate-700 rounded-xl py-3 px-4 text-lg font-serif text-violet-300 focus:outline-none focus:border-violet-500/50"
+      />
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Niveau des héros</label>
+        <select
+          class="w-full bg-[#1b2028] border border-slate-700 rounded-xl py-3 px-4 text-sm text-slate-300 focus:outline-none focus:border-violet-500/50"
+          [ngModel]="builder.partyLevel()"
+          (ngModelChange)="builder.partyLevel.set(+$event)"
+        >
+          @for (lvl of levels; track lvl) {
+            <option [value]="lvl">Niveau {{ lvl }}</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Ton narratif</label>
+        <select
+          class="w-full bg-[#1b2028] border border-slate-700 rounded-xl py-3 px-4 text-sm text-slate-300 focus:outline-none focus:border-violet-500/50"
+          [ngModel]="builder.tone()"
+          (ngModelChange)="builder.tone.set($event)"
+        >
+          @for (tone of tones; track tone[0]) {
+            <option [value]="tone[0]">{{ tone[1] }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Lieu / ambiance</label>
+      <input
+        type="text"
+        placeholder="Ex: Les bas-fonds de la Cité Franche, nuit d'orage..."
+        [ngModel]="builder.setting()"
+        (ngModelChange)="builder.setting.set($event)"
+        class="w-full bg-[#1b2028] border border-slate-700 rounded-xl py-3 px-4 text-sm text-slate-200 focus:outline-none focus:border-violet-500/50"
+      />
+    </div>
+
+    <!-- Résumé des personnages -->
+    <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-4">
+      <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Personnages de l'histoire</p>
+      <div class="flex flex-wrap gap-2">
+        @for (c of builder.creatures(); track c.creatureId) {
+          <span class="px-3 py-1 bg-violet-950/30 border border-violet-800/40 rounded-lg text-xs text-violet-300">
+            {{ c.customName }}
+          </span>
+        }
+      </div>
+    </div>
+
+    @if (generationError(); as err) {
+      <div class="p-3 bg-red-950/40 border border-red-900/50 rounded-xl text-sm text-red-300">{{ err }}</div>
+    }
+
+    <button
+      type="button"
+      class="w-full py-4 rounded-xl text-xs font-black uppercase tracking-widest bg-violet-600 text-white hover:bg-violet-500 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 shadow-lg"
+      [disabled]="isGenerating()"
+      (click)="generateAdventure()"
+    >
+      @if (isGenerating()) {
+        <span class="animate-pulse">⏳</span> Tissage de l'aventure...
+      } @else {
+        <iconify-icon icon="fluent-emoji:scroll"></iconify-icon>
+        {{ builder.adventure() ? 'Régénérer l\'aventure' : 'Générer l\'aventure (IA)' }}
+      }
+    </button>
+
+    @if (builder.adventure()) {
+      <div>
+        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Aventure générée</label>
+        <textarea
+          rows="16"
+          [ngModel]="builder.adventure()"
+          (ngModelChange)="builder.setAdventure($event)"
+          class="w-full bg-[#171b22] border border-slate-700 rounded-xl py-4 px-4 text-sm text-slate-300 leading-relaxed focus:outline-none focus:border-violet-500/50 resize-y font-serif"
+        ></textarea>
+      </div>
+    }
+  </div>
+
+  <div class="wizard-step-nav px-4 max-w-3xl mx-auto w-full">
+    <button type="button" class="wizard-nav-secondary" (click)="prevStep()">← Personnages</button>
+    <button
+      type="button"
+      class="wizard-nav-primary"
+      [disabled]="!builder.isStepValid(3)"
+      (click)="confirm()"
+    >
+      Récapitulatif →
+    </button>
+  </div>
+</div>

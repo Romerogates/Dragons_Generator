@@ -1,0 +1,140 @@
+<div class="w-full min-h-screen bg-[#171b22] text-slate-300 animate-fade-in select-none pb-20">
+  <div class="max-w-5xl mx-auto px-4 pt-10">
+    <a
+      routerLink="/creatures"
+      class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-red-500 transition-colors mb-8 group"
+    >
+      <span class="group-hover:-translate-x-1 transition-transform">←</span> Retour au Bestiaire
+    </a>
+
+    @if (creature() === undefined) {
+      <div class="flex flex-col items-center justify-center py-32 animate-pulse text-red-500">
+        <span class="text-6xl mb-6"><iconify-icon icon="fluent-emoji:dragon"></iconify-icon></span>
+        <p class="text-lg font-serif tracking-widest uppercase text-slate-400">Consultation de la fiche...</p>
+      </div>
+    } @else if (notFound()) {
+      <div class="flex flex-col items-center justify-center py-32 text-center">
+        <span class="text-7xl mb-6"><iconify-icon icon="fluent-emoji:ghost"></iconify-icon></span>
+        <h2 class="text-3xl font-bold text-red-500 font-serif uppercase mb-4">Créature introuvable</h2>
+        <a routerLink="/creatures" class="px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest bg-slate-800 border border-slate-700">Retour</a>
+      </div>
+    } @else if (error(); as errorMsg) {
+      <div class="p-4 bg-red-950/50 border border-red-900 rounded-xl text-center">{{ errorMsg }}</div>
+    } @else if (creature(); as c) {
+      <header class="text-center mb-12">
+        <span class="text-5xl mb-4 block"><iconify-icon icon="fluent-emoji:dragon"></iconify-icon></span>
+        <h1 class="text-4xl md:text-6xl font-extrabold text-red-400 font-serif tracking-wide mb-4">{{ c.name }}</h1>
+        <p class="text-sm italic text-slate-400 max-w-2xl mx-auto mb-6">{{ c.type }}</p>
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <a
+            [routerLink]="['/creatures/category', c.category]"
+            class="bg-[#1b2028] text-slate-300 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider border border-slate-700 hover:border-red-500 hover:text-red-400 transition-colors"
+          >
+            {{ categoryLabel(c.category) }}
+          </a>
+          <span class="bg-red-950/40 text-red-300 border border-red-900/50 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider">
+            {{ formatCr(c.challengeRating) }} · {{ c.xp }} PX
+          </span>
+        </div>
+      </header>
+
+      @if (c.description) {
+        <section class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800 shadow-xl mb-8">
+          <p class="text-slate-300 leading-relaxed italic font-serif">{{ c.description }}</p>
+        </section>
+      }
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="col-span-1 flex flex-col gap-6">
+          <section class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800 shadow-xl">
+            <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-5">
+              Statistiques
+            </h2>
+            <dl class="space-y-4 text-sm">
+              <div><dt class="text-red-500 font-bold uppercase text-[10px] tracking-widest">Classe d'armure</dt><dd>{{ c.armorClass }}@if (c.armorNote) { ({{ c.armorNote }}) }</dd></div>
+              <div><dt class="text-red-500 font-bold uppercase text-[10px] tracking-widest">Points de vie</dt><dd>{{ c.hitPoints }}@if (c.woundThreshold !== null) { · SB {{ c.woundThreshold }} }</dd></div>
+              <div><dt class="text-red-500 font-bold uppercase text-[10px] tracking-widest">Vitesse</dt><dd>{{ c.speed }}</dd></div>
+              @if (c.savingThrows) { <div><dt class="text-red-500 font-bold uppercase text-[10px] tracking-widest">JS</dt><dd>{{ c.savingThrows }}</dd></div> }
+              @if (c.skills) { <div><dt class="text-red-500 font-bold uppercase text-[10px] tracking-widest">Compétences</dt><dd>{{ c.skills }}</dd></div> }
+              @if (c.senses) { <div><dt class="text-red-500 font-bold uppercase text-[10px] tracking-widest">Sens</dt><dd>{{ c.senses }}</dd></div> }
+              @if (c.languages) { <div><dt class="text-red-500 font-bold uppercase text-[10px] tracking-widest">Langues</dt><dd>{{ c.languages }}</dd></div> }
+            </dl>
+          </section>
+
+          <section class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800 shadow-xl">
+            <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-5">
+              Caractéristiques
+            </h2>
+            <div class="grid grid-cols-3 gap-3">
+              @for (key of abilityKeys(c); track key) {
+                <div class="text-center bg-[#171b22] rounded-xl p-3 border border-slate-800">
+                  <div class="text-[10px] font-black text-red-500 uppercase">{{ abilityLabels[key] }}</div>
+                  <div class="text-lg font-bold text-slate-100">{{ c.abilities[key].score }}</div>
+                  <div class="text-xs text-slate-500">{{ c.abilities[key].modifier }}</div>
+                </div>
+              }
+            </div>
+          </section>
+        </div>
+
+        <div class="col-span-1 lg:col-span-2 flex flex-col gap-6">
+          @if (c.traits.length) {
+            <section class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800 shadow-xl">
+              <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-5">Traits</h2>
+              <div class="space-y-4">
+                @for (trait of c.traits; track trait.name) {
+                  <div>
+                    <h3 class="font-bold text-red-300 mb-1">{{ trait.name }}</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">{{ trait.description }}</p>
+                  </div>
+                }
+              </div>
+            </section>
+          }
+
+          @if (c.actions.length) {
+            <section class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800 shadow-xl">
+              <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-5">Actions</h2>
+              <div class="space-y-4">
+                @for (action of c.actions; track action.name) {
+                  <div>
+                    <h3 class="font-bold text-orange-300 mb-1">{{ action.name }}</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">{{ action.description }}</p>
+                  </div>
+                }
+              </div>
+            </section>
+          }
+
+          @if (c.reactions.length) {
+            <section class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800 shadow-xl">
+              <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-5">Réactions</h2>
+              <div class="space-y-4">
+                @for (reaction of c.reactions; track reaction.name) {
+                  <div>
+                    <h3 class="font-bold text-amber-300 mb-1">{{ reaction.name }}</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">{{ reaction.description }}</p>
+                  </div>
+                }
+              </div>
+            </section>
+          }
+
+          @if (c.legendaryActions.length) {
+            <section class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800 shadow-xl">
+              <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-5">Actions légendaires</h2>
+              <div class="space-y-4">
+                @for (action of c.legendaryActions; track action.name) {
+                  <div>
+                    <h3 class="font-bold text-yellow-300 mb-1">{{ action.name }}</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">{{ action.description }}</p>
+                  </div>
+                }
+              </div>
+            </section>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

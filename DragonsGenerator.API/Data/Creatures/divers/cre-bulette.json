@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-bulette",
+  "name": "Bulette",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille G, non aligné",
+  "armor_class": 17,
+  "armor_note": "armure naturelle",
+  "hit_points": "94 (9d10 + 45)",
+  "wound_threshold": 24,
+  "speed": "12 m, fouissage 9 m",
+  "abilities": {
+    "str": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 21,
+      "modifier": "+5"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 5,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +6",
+  "senses": "vision dans le noir 18 m, perception des vibrations 18 m, Perception passive 16",
+  "languages": "—",
+  "challenge_rating": "5",
+  "xp": 1800,
+  "traits": [
+    {
+      "name": "Bondissement",
+      "description": "La bulette peut effectuer des sauts en longueur jusqu'à 9 m et des sauts en hauteur jusqu'à 4,50 m, avec ou sans élan."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 1,50 m, une cible. Réussite : 30 (4d12 + 4) dégâts perforants."
+    },
+    {
+      "name": "Bond meurtrier",
+      "description": "<u>Si la bulette saute d'au moins 4,50 m dans le cadre de son déplacement,</u> elle peut utiliser cette action pour atterrir sur ses pattes dans un espace contenant une ou plusieurs autres créatures. Chacune de ces créatures doit réussir un JS Force ou Dextérité (au choix de la cible) DD 16 sous peine de se retrouver **à terre** et de subir 14 (3d6 + 4) dégâts contondants plus 14 (3d6 + 4) dégâts tranchants. En cas de"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Contrairement à d’autres prédateurs des steppes et à l’instar de sa cousine lointaine la taupe, la bulette ne sait pas stocker la nourriture sous forme de tissu graisseux. Elle doit donc manger très régulièrement sous peine de succomber brutalement d’inanition. Pour éviter ce sort tragique, elle entretient un garde-manger souterrain – constitué de charognes et de proies trop gravement blessées pour s’échapper – et est constamment en chasse."
+}

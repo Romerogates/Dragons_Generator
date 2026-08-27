@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-jeune-dragon-blanc",
+  "name": "Jeune dragon blanc",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Dragon de taille G, chaotique mauvais",
+  "armor_class": 17,
+  "armor_note": "armure naturelle",
+  "hit_points": "133 (14d10 + 56)",
+  "wound_threshold": 34,
+  "speed": "12 m, fouissage 6 m, vol 24 m, nage 12 m",
+  "abilities": {
+    "str": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "int": {
+      "score": 9,
+      "modifier": "-1"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 12,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": "Dex +3, Con +7, Sag +3, Cha +4",
+  "skills": "Athlétisme + 7, Discrétion +3, Perception +6",
+  "senses": "vision aveugle 9 m, vision dans le noir 36 m, Perception passive 16",
+  "languages": "commun, draconique",
+  "challenge_rating": "6",
+  "xp": 2300,
+  "traits": [
+    {
+      "name": "Marche de glace",
+      "description": "Le dragon peut fouler et escalader les surfaces glacées sans devoir effectuer de test de caractéristique. En outre, un terrain difficile composé de glace ou de neige ne lui coûte pas de déplacement supplémentaire."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le dragon effectue trois attaques : une de morsure et deux de coup de griffe."
+    },
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 3 m, une cible. Réussite : 15 (2d10 + 4) dégâts perforants plus 4 (1d8) dégâts de froid."
+    },
+    {
+      "name": "Coup de griffe",
+      "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 1,50 m, une cible. Réussite : 11 (2d6 + 4) dégâts tranchants."
+    },
+    {
+      "name": "Souffle glacé (recharge 5–6)",
+      "description": "Le dragon crache un cône de froid de 9 m. Chaque créature prise dans cette zone d'effet doit effectuer un JS Constitution DD15 et subit 45 (10d8) dégâts de froid en cas d'échec, la moitié en cas de réussite."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les dragons blancs juvéniles se comportent volontiers en prédateurs arrogants. Sûrs – parfois trop – de leur puissance, ils prennent des risques et attaquent des voyageurs ou des villageois. Irascibles mais curieux et ambitieux, ils acceptent parfois de s’associer avec des brigands ou des sorciers. Il arrive aussi qu’ils gardent prisonniers des humanoïdes capables de parler le draconique, pour se distraire ou pour s’instruire. C’est au cours de ces expériences qu’ils apprennent souvent une langue commune. De tels partenariats durent toutefois rarement, les dragons blancs étant d’une nature impatiente, de sorte que les associés risquent de finir dévorés."
+}

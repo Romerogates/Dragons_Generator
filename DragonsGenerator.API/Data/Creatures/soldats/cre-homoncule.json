@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-homoncule",
+  "name": "Homoncule",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Créature artificielle de taille TP, neutre",
+  "armor_class": 13,
+  "armor_note": "armure naturelle",
+  "hit_points": "5 (2d4)",
+  "wound_threshold": 4,
+  "speed": "6 m, vol 12 m",
+  "abilities": {
+    "str": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 10",
+  "languages": "comprend les langues de son créateur, mais ne peut pas parler",
+  "challenge_rating": "0",
+  "xp": 10,
+  "traits": [
+    {
+      "name": "Lien télépathique",
+      "description": "Tant que l'homoncule se trouve sur le même plan d'existence que son maître, l'homoncule peut lui transmettre magiquement ce qu'il perçoit et ils peuvent communiquer télépathiquement."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une créature. Réussite : 1 dégât perforant, et la cible doit réussir un JS Constitution DD 10 sous peine d'être **empoisonnée** pendant 1 minute. Si la sauvegarde est ratée de 5 ou plus, la cible est **empoisonnée** pendant 5 (1d10) minutes et reste **inconsciente** tant qu'elle est intoxiquée de la sorte."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Une créature engloutie peut tenter de s’échapper en effectuant un test de Force DD 12 au prix d’une action. En cas de réussite, elle parvient à s’extraire et se retrouve dans un espace de son choix, dans un rayon de 1,50 m du monstre."
+}

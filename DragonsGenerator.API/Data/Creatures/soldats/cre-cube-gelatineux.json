@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-cube-gelatineux",
+  "name": "Cube gélatineux",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Vase de taille G, non aligné",
+  "armor_class": 6,
+  "armor_note": null,
+  "hit_points": "84 (8d10 + 40)",
+  "wound_threshold": null,
+  "speed": "4,50 m",
+  "abilities": {
+    "str": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "con": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "int": {
+      "score": 1,
+      "modifier": "-5"
+    },
+    "wis": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "cha": {
+      "score": 1,
+      "modifier": "-5"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision aveugle 18 m (aucune vision au-delà de ce rayon), Perception passive 8",
+  "languages": "—",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [
+    {
+      "name": "Cube de vase",
+      "description": "Le cube occupe la totalité de son espace. Les autres créatures peuvent y entrer, mais sont alors sujettes à l'Engloutissement du cube et subissent un désavantage au jet de sauvegarde correspondant.\nLes créatures situées à l'intérieur du cube sont visibles mais bénéficient d'un abri total.\nUne créature située dans un rayon de 1,50 m du cube peut entreprendre une action pour en retirer une créature ou un objet. Pour ce faire, elle doit réussir un test de Force DD 12, et subit 10 (3d6) dégâts d'acide.\nLe cube ne peut contenir qu'une créature de taille G ou jusqu'à quatre créatures de taille M ou inférieure."
+    },
+    {
+      "name": "Transparent",
+      "description": "Même lorsqu'aucun obstacle ne cache le cube, il faut réussir un test de Sagesse (Perception) DD 15 pour le détecter s'il n'a ni bougé ni attaqué. Toute créature qui tente d'entrer dans l'espace qu'occupe le cube sans avoir conscience de sa présence est surprise par le monstre."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Pseudopode",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une créature. Réussite : 10 (3d6) dégâts d'acide."
+    },
+    {
+      "name": "Engloutissement",
+      "description": "Le cube se déplace jusqu'à sa VD. Ce faisant, il peut entrer dans des espaces occupés par des créatures de taille G ou inférieure, qui doivent alors effectuer un JS Dextérité DD 12. En cas de réussite, la créature en question peut choisir d'être poussée de 1,50 m en arrière ou sur le côté du cube. Une créature qui ne choisit pas d'être poussée subit les conséquences d'un jet de sauvegarde raté.\nEn cas de sauvegarde ratée, le cube pénètre dans l'espace de la créature, qui subit 10 (3d6) dégâts d'acide et se retrouve engloutie. Elle ne peut pas respirer, est **entravée** et subit 21 (6d6) dégâts d'acide au début de chacun des tours de jeu du cube. Quand ce dernier se déplace, la créature engloutie se déplace avec lui.\nUne créature engloutie peut tenter de s'échapper en effectuant un test de Force DD 12 au prix d'une action. En cas de réussite, elle parvient à s'extraire et se retrouve dans un espace de son choix, dans un rayon de 1,50 m du monstre.\n40"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les cubes gélatineux figurent en bonne place dans les légendes urbaines de la Cité Franche. On raconte qu’ils auraient été créés accidentellement dans les laboratoires de l’Académie, ou peut-être dans le quartier des Cristaux. Jetés ensuite dans les égouts, ils prospèreraient dans les sous-sols et seraient même utilisés intentionnellement pour défendre l’accès à certains lieux. La Steinbank en ferait même un usage très important pour protéger ses sous-sols. Aucune de ces rumeurs n’a jamais reçu la moindre confirmation officielle."
+}

@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-aigle-geant",
+  "name": "Aigle géant",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille G, neutre",
+  "armor_class": 13,
+  "armor_note": null,
+  "hit_points": "26 (4d10 + 4)",
+  "wound_threshold": 7,
+  "speed": "3 m, vol 24 m",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 8,
+      "modifier": "-1"
+    },
+    "wis": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +4",
+  "senses": "Perception passive 14",
+  "languages": "aigle géant, sylvestre",
+  "challenge_rating": "1",
+  "xp": 200,
+  "traits": [
+    {
+      "name": "Vue perçante",
+      "description": "L'aigle géant bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir la vue."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "L'aigle géant effectue deux attaques : une de bec et une de serres."
+    },
+    {
+      "name": "Bec",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 6 (1d6 + 3) dégâts perforants."
+    },
+    {
+      "name": "Serres",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 10 (2d6 + 3) dégâts tranchants.\nFiers prédateurs des hautes montagnes, les aigles géants prospèrent dans les Drakenbergen, où ils sont souvent pris comme emblème par les peuples des environs. Tout comme il existe plusieurs espèces d'aigle – aux couleurs et aux techniques de chasse variées –, les aigles géants arborent des plumages différents : noir profond, bistre, gris perle, etc. Ils ne sont pas aussi proches des fées que les hiboux géants, mais ont néanmoins des affinités avec elles, et sont enclins à se porter à leur aide ou à accomplir des services pour elles.\n119\nSanglier illustration"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "POVOAYAAYAYOYTVOY"
+}

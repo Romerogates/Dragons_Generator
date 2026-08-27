@@ -128,23 +128,47 @@
                         }
                       </span>
                     </div>
+                    @if (!item.isCategory && item.equipment) {
+                      <span class="text-[10px] text-amber-500/80 text-center leading-snug px-2">
+                        {{ eqDetail(item.equipment) }}
+                      </span>
+                    }
 
                     @if (item.isCategory) {
                       <div
-                        class="mt-1 grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-h-52 overflow-y-auto pr-1"
+                        class="mt-1 grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-h-80 overflow-y-auto pr-1"
                       >
                         @for (eq of item.categoryItems; track eq.id) {
                           <button
-                            class="w-full px-2.5 py-2 rounded-lg border text-[10px] font-bold transition-[colors,transform,opacity,box-shadow] duration-200 text-left leading-tight break-words flex items-center"
+                            class="w-full px-2.5 py-2.5 rounded-lg border text-left transition-[colors,transform,opacity,box-shadow] duration-200 flex flex-col gap-1"
                             [ngClass]="
                               categoryChoices().get(slot.slotNumber + '-fixed-' + itemIdx) === eq.id
                                 ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md'
                                 : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:bg-slate-800 hover:text-amber-400'
                             "
                             (click)="selectFromFixedCategory(slot.slotNumber, itemIdx, eq.id)"
-                            [title]="eq.name"
                           >
-                            {{ eq.name }}
+                            <span class="text-[11px] font-bold leading-tight">{{ eq.name }}</span>
+                            @if (equipmentSummary(eq); as summary) {
+                              <span
+                                class="text-[9px] leading-snug"
+                                [class.text-slate-600]="
+                                  categoryChoices().get(slot.slotNumber + '-fixed-' + itemIdx) ===
+                                  eq.id
+                                "
+                                [class.text-slate-400]="
+                                  categoryChoices().get(slot.slotNumber + '-fixed-' + itemIdx) !==
+                                  eq.id
+                                "
+                                >{{ summary }}</span
+                              >
+                            }
+                            @if (equipmentDesc(eq); as desc) {
+                              <span
+                                class="text-[9px] italic line-clamp-2 leading-snug opacity-80"
+                                >{{ desc }}</span
+                              >
+                            }
                           </button>
                         }
                       </div>
@@ -199,9 +223,14 @@
                               </span>
                             }
                             @if (!item.isCategory && item.equipment) {
-                              <span class="text-[10px] text-amber-500/70 mt-0.5 italic">
+                              <span class="text-[10px] text-amber-500/80 mt-0.5 leading-snug">
                                 {{ eqDetail(item.equipment) }}
                               </span>
+                              @if (equipmentDesc(item.equipment); as desc) {
+                                <span class="text-[9px] text-slate-500 italic line-clamp-2 mt-0.5">
+                                  {{ desc }}
+                                </span>
+                              }
                             }
                           </div>
                         </div>
@@ -211,12 +240,12 @@
                           selectedAlternatives().get(slot.slotNumber) === alt.index
                         ) {
                           <div
-                            class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1"
+                            class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-1"
                             (click)="$event.stopPropagation()"
                           >
                             @for (eq of item.categoryItems; track eq.id) {
                               <button
-                                class="w-full h-full px-2.5 py-2 rounded-lg border text-[10px] font-bold transition-[colors,transform,opacity,box-shadow] duration-200 text-left leading-tight break-words disabled:opacity-30 disabled:cursor-not-allowed flex items-center"
+                                class="w-full px-2.5 py-2.5 rounded-lg border text-left transition-[colors,transform,opacity,box-shadow] duration-200 flex flex-col gap-1 disabled:opacity-30 disabled:cursor-not-allowed"
                                 [ngClass]="
                                   categoryChoices().get(
                                     slot.slotNumber + '-' + alt.index + '-' + itemIdx
@@ -230,9 +259,32 @@
                                 (click)="
                                   $event.stopPropagation(); selectFromCategory(itemIdx, eq.id)
                                 "
-                                [title]="eq.name"
                               >
-                                {{ eq.name }}
+                                <span class="text-[11px] font-bold leading-tight">{{
+                                  eq.name
+                                }}</span>
+                                @if (equipmentSummary(eq); as summary) {
+                                  <span
+                                    class="text-[9px] leading-snug"
+                                    [class.text-slate-600]="
+                                      categoryChoices().get(
+                                        slot.slotNumber + '-' + alt.index + '-' + itemIdx
+                                      ) === eq.id
+                                    "
+                                    [class.text-slate-400]="
+                                      categoryChoices().get(
+                                        slot.slotNumber + '-' + alt.index + '-' + itemIdx
+                                      ) !== eq.id
+                                    "
+                                    >{{ summary }}</span
+                                  >
+                                }
+                                @if (equipmentDesc(eq); as desc) {
+                                  <span
+                                    class="text-[9px] italic line-clamp-2 leading-snug opacity-80"
+                                    >{{ desc }}</span
+                                  >
+                                }
                               </button>
                             }
                           </div>

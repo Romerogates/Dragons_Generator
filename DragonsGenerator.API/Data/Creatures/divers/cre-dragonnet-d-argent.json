@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-dragonnet-d-argent",
+  "name": "Dragonnet d’argent",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Dragon de taille M, neutre bon",
+  "armor_class": 17,
+  "armor_note": "armure naturelle",
+  "hit_points": "45 (6d8 + 18)",
+  "wound_threshold": 12,
+  "speed": "9 m, vol 18 m",
+  "abilities": {
+    "str": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 15,
+      "modifier": "+2"
+    }
+  },
+  "saving_throws": "Dex +2, Con +5, Sag +2, Cha +4",
+  "skills": "Discrétion +2, Perception +4",
+  "senses": "vision aveugle 3 m, vision dans le noir 18 m, Perception passive 14",
+  "languages": "draconique",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 9 (1d10 + 4) dégâts perforants."
+    },
+    {
+      "name": "Souffle (recharge 5-6)",
+      "description": "Le dragon utilise l'un des deux souffles suivants :"
+    },
+    {
+      "name": "Souffle glacé",
+      "description": "Le dragon crache un cône de froid de 4,50 m. Chaque créature prise dans cette zone d'effet doit effectuer un JS Constitution DD 13 et subit 18 (4d8) dégâts de froid en cas d'échec, la moitié en cas de réussite."
+    },
+    {
+      "name": "Souffle paralysant",
+      "description": "Le dragon crache un cône de gaz paralysant de 4,50 m. Chaque créature prise dans cette zone d'effet doit réussir un JS Constitution DD 13 sous peine d'être **paralysée** pendant 1 minute. Une créature peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet sur elle-même en cas de réussite.\n102"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les nids des dragons d’argent sont parmi les mieux cachés. Leurs parents ont tant appris à intriguer et à se méfier qu’ils prennent pour berceau des repaires soigneusement dissimulés et habilement protégés. De la sorte, des chasseurs de trésors prennent parfois un tel repaire pour un coffre-fort, et sont fort déçus de n’y trouver que la prunelle des yeux d’un dragon d’argent. Lorsque les parents des petits sont trop pris par les affaires des mortels, les dragonnets sont confiés au quotidien à des personnes de confiance, lesquelles ont pour charge de les protéger au péril de leur vie."
+}

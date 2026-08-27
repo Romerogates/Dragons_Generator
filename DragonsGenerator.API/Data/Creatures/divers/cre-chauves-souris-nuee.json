@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-chauves-souris-nuee",
+  "name": "Chauves-souris - Nuée",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Nuée de taille M de bêtes de taille TP, non aligné",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "22 (5d8)",
+  "wound_threshold": null,
+  "speed": "0 m, vol 9 m",
+  "abilities": {
+    "str": {
+      "score": 5,
+      "modifier": "-3"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 2,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 4,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision aveugle 18 m, Perception passive 11",
+  "languages": "—",
+  "challenge_rating": "1/4",
+  "xp": 50,
+  "traits": [
+    {
+      "name": "Écholocalisation",
+      "description": "La nuée ne peut pas utiliser sa vision aveugle quand elle est assourdie."
+    },
+    {
+      "name": "Ouïe fine",
+      "description": "La nuée bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'ouïe."
+    },
+    {
+      "name": "Nuée",
+      "description": "La nuée peut occuper l'espace d'une autre créature et réciproquement. La nuée peut se déplacer dans tout passage suffisant pour laisser passer une chauve-souris de taille TP. La nuée ne peut pas récupérer de pv ni gagner de pv temporaires."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsures",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 0 m, une créature occupant l'espace de la nuée. Réussite : 5 (2d4) dégâts perforants ou 2 (1d4) dégâts perforants si les pv actuels de la nuée sont inférieurs ou égaux à la moitié de son maximum.\nLes nuées de chauves-souris peuvent attaquer un groupe d'explorateurs qui dérange une nichée, mais une telle hostilité est brève. Qu'un escadron entier de chauve-souris soit agressif est un signe certain d'une influence surnaturelle."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "\\<page\\_footer>\\<page\\_number>150\\</page\\_number>\\</page\\_footer>"
+}

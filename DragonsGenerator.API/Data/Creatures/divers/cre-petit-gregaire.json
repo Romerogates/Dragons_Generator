@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-petit-gregaire",
+  "name": "Petit grégaire",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille M, non aligné",
+  "armor_class": 13,
+  "armor_note": null,
+  "hit_points": "4 (1d8)",
+  "wound_threshold": null,
+  "speed": "15 m",
+  "abilities": {
+    "str": {
+      "score": 8,
+      "modifier": "-1"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": "Dextérité +5",
+  "skills": "Discrétion +7, Perception +4",
+  "senses": "Perception passive 14",
+  "languages": "—",
+  "challenge_rating": "0",
+  "xp": 10,
+  "traits": [
+    {
+      "name": "Fuite agile",
+      "description": "À chacun de ses tours de jeu et au prix d'une action bonus, le petit grégaire peut entreprendre l'action **Se dégager**, l'action **Esquiver** ou l'action **Se cacher**."
+    },
+    {
+      "name": "Ouïe fine et flair",
+      "description": "Le petit grégaire bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'ouïe ou l'odorat."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +1 pour toucher, allonge 1,50 m, une cible. Réussite : 1 (1d4-1) dégâts perforants.\nDaim"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les bêtes grégaires de petite taille ne doivent leur survie qu’à leur vivacité. Elles se cachent et disparaissent à la moindre menace. Au quotidien, elles se dissimulent dans les hautes herbes qui les dépassent et dans les fourrés. Les daims et les chevreuils font partie des petits grégaires."
+}

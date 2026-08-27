@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-vampire",
+  "name": "Vampire",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Mort-vivant (métamorphe) de taille M, loyal mauvais",
+  "armor_class": 16,
+  "armor_note": "armure naturelle",
+  "hit_points": "144 (17d8 + 68)",
+  "wound_threshold": null,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "con": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "int": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "wis": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 18,
+      "modifier": "+4"
+    }
+  },
+  "saving_throws": "Dex +9, Sag +7, Cha +9",
+  "skills": "Discrétion +9, Intimidation +9, Intuition +7, Perception +7, Tromperie +9",
+  "senses": "vision dans le noir 36 m, Perception passive 17",
+  "languages": "celles pratiquées de son vivant",
+  "challenge_rating": "13",
+  "xp": 10000,
+  "traits": [
+    {
+      "name": "Brume d'évasion (3/jour)",
+      "description": "Quand il tombe à 0 pv hors de son lieu de repos, le vampire se transforme en nuage de brume (cf. trait **Métamorphe**) au lieu de tomber inconscient, à condition qu'il ne soit pas exposé à la lumière du soleil ni à l'eau vive. S'il ne peut pas se transformer, il est détruit.\nS'il est réduit à 0 pv sous forme de brume, il ne peut pas recouvrer sa forme de vampire et doit rejoindre son lieu de repos dans les 2 heures sous peine d'être détruit. Une fois dans son lieu de repos, il reprend sa forme de vampire. Il est alors **paralysé** jusqu'à ce qu'il récupère au moins 1 pv. Après avoir passé 1 heure dans son lieu de repos, il regagne 1 pv."
+    },
+    {
+      "name": "Faiblesses des vampires",
+      "description": "Le vampire est affecté des handicaps suivants :"
+    },
+    {
+      "name": "Blessé par l'eau vive",
+      "description": "Le vampire subit 20 dégâts d'acide s'il termine son tour de jeu dans l'eau vive."
+    },
+    {
+      "name": "Hypersensibilité au soleil",
+      "description": "Le vampire subit 20 dégâts radiants lorsqu'il commence son tour de jeu au soleil. Tant qu'il y reste exposé, il subit un désavantage aux jets d'attaque et aux tests de caractéristique."
+    },
+    {
+      "name": "Interdiction d'entrer",
+      "description": "Le vampire ne peut pénétrer dans une résidence sans y avoir été invité par l'un de ses occupants."
+    },
+    {
+      "name": "Pieu dans le cœur",
+      "description": "Si une arme perforante en bois lui est plantée dans le cœur alors qu'il est neutralisé dans son lieu de repos, le vampire est **paralysé** jusqu'à ce qu'elle soit retirée."
+    },
+    {
+      "name": "Métamorphe",
+      "description": "Quand il n'est pas exposé au soleil ou à de l'eau vive, le vampire peut, au prix d'une action, se métamorphoser en chauve-souris de taille TP (VD 1,50 m ; vol 9 m) ou en un nuage de brume de taille M (vol 6 m), ou recouvrer sa véritable forme.\nSous forme de chauve-souris, il ne peut pas parler. Son profil est le même, exception faite de la taille et des VD indiquées. Ce qu'il porte directement sur lui se transforme avec lui, mais pas ce qu'il transporte. Enfin, il retrouve sa véritable forme s'il meurt.\nSous forme de brume, le vampire ne peut ni effectuer d'action, ni parler, ni manipuler d'objets. Il n'a aucun poids, peut rester en vol stationnaire, et peut pénétrer dans l'espace d'une créature hostile et s'y arrêter. En outre, il peut traverser n'importe quel espace où de l'air pourrait s'infiltrer, mais ne peut se déplacer dans l'eau. Il bénéficie d'un avantage aux jets de sauvegarde de Force, de Dextérité et de Constitution, et est immunisé contre tous les dégâts non magiques, exceptés ceux que lui inflige la lumière du jour."
+    },
+    {
+      "name": "Pattes d'araignée",
+      "description": "Le vampire peut parcourir les parois les plus difficiles à escalader, y compris les plafonds, sans devoir effectuer de test de caractéristique."
+    },
+    {
+      "name": "Régénération",
+      "description": "Le vampire récupère 20 pv au début de son tour de jeu s'il lui reste au moins 1 pv et qu'il n'est exposé ni à la lumière du soleil ni à l'eau vive. S'il subit des dégâts radiants ou infligés par de l'eau bénite, ce trait ne fonctionne pas au début de son tour de jeu suivant."
+    },
+    {
+      "name": "Résistance légendaire (3/jour)",
+      "description": "Si le vampire rate un jet de sauvegarde, il peut décider de le réussir tout de même."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples (forme de vampire uniquement)",
+      "description": "Le vampire effectue deux attaques, dont une seule peut être une morsure."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Un vampire peut avoir l’opportunité de traverser le Labyrinthe, que ce soit par le biais d’un sort de souhait ou en se rendant directement sur Éternité. Ensuite, il devra parvenir à la Forge du Destin par ses propres moyens."
+}

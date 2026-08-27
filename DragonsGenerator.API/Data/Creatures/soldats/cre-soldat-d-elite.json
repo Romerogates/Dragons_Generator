@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-soldat-d-elite",
+  "name": "Soldat d’élite",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 18,
+  "armor_note": "cotte de mailles, bouclier",
+  "hit_points": "136 (16d8 + 64)",
+  "wound_threshold": 34,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "int": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 13,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Athlétisme +7, Perception +4",
+  "senses": "Perception passive 14",
+  "languages": "deux au choix (généralement le commun)",
+  "challenge_rating": "7",
+  "xp": 2900,
+  "traits": [
+    {
+      "name": "Indéfectible",
+      "description": "Le soldat d'élite bénéficie d'un avantage aux jets de sauvegarde contre les états préjudiciables charmé et effrayé."
+    },
+    {
+      "name": "Tactique défensive",
+      "description": "Tant que le soldat d'élite est situé à 1,50 m ou moins d'un allié qui n'est pas neutralisé, il bénéficie d'un bonus de +1 à la CA."
+    },
+    {
+      "name": "Tactique de meute",
+      "description": "Le soldat d'élite bénéficie d'un avantage aux jets d'attaque contre les créatures situées à 1,50 m ou moins d'un de ses alliés qui n'est pas neutralisé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le soldat d'élite effectue trois attaques de corps à corps ou deux attaques à distance."
+    },
+    {
+      "name": "Épée longue",
+      "description": "Attaque d'arme de corps à corps ou à distance : +7 pour toucher, allonge 1,50 m. Réussite : 8 (1d8 + 4) dégâts tranchants, ou 9 (1d10 + 4) dégâts tranchants si utilisée à deux mains."
+    },
+    {
+      "name": "Dague",
+      "description": "Attaque d'arme de corps à corps ou à distance : +7 pour toucher, allonge 1,50 m ou portée 6/18 m, une créature. Réussite : 6 (1d4 + 4) dégâts perforants."
+    },
+    {
+      "name": "Arc long",
+      "description": "Attaque d'arme à distance : +4 pour toucher, portée 45/180 m, une cible. Réussite : 5 (1d8 + 1) dégâts perforants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Si les soldats d’élite sont redoutables à eux seuls, c’est en groupe qu’ils donnent la pleine mesure de leurs capacités, sachant se soutenir les uns les autres tout en écrasant leurs ennemis par des manœuvres groupées. Massés bouclier contre bouclier, ils présentent alors un mur inébranlable que même de terribles monstres auront du mal à briser. Qui veut pouvoir l’emporter contre eux devra trouver le moyen de soit briser leur unité en les séparant, soit retourner leurs tactiques de groupe contre eux, grâce à des attaques de zone par exemple."
+}

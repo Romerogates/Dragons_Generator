@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-champion",
+  "name": "Champion",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 20,
+  "armor_note": "harnois et bouclier",
+  "hit_points": "225 (30d8 + 90)",
+  "wound_threshold": 57,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 15,
+      "modifier": "+2"
+    }
+  },
+  "saving_throws": "For +9, Con +7",
+  "skills": "Athlétisme +9, Dressage +5, Intimidation +6, Intuition +5, Perception +5",
+  "senses": "Perception passive 15",
+  "languages": "deux au choix (généralement le commun)",
+  "challenge_rating": "12",
+  "xp": 8400,
+  "traits": [
+    {
+      "name": "Critique dévastateur",
+      "description": "Les attaques d'arme du champion infligent un critique sur un résultat de 18, 19 ou 20 au d20 du jet d'attaque. En cas de coup critique, l'armure de son adversaire, sous réserve qu'elle ne soit pas magique, subit un malus de -1 à la CA et est désormais **fragile** (cf. **Aventuriers**, chapitre **Équipement, Armurerie : Armes et armures abîmées**). Par ailleurs, la cible doit réussir un JS Constitution DD 17 sous peine d'être **étourdie** jusqu'à la fin de son tour de jeu suivant."
+    },
+    {
+      "name": "Duelliste",
+      "description": "Lorsque le champion tient une arme de corps à corps d'une seule main et ne manie pas d'autre arme, les jets de dégâts infligés avec cette arme reçoivent un bonus de +2 (pris en compte dans les attaques ci-après)."
+    },
+    {
+      "name": "Survivant",
+      "description": "Au début de chacun de ses tours de jeu, si les pv du champion sont réduits à moins de la moitié de leur maximum mais supérieurs à 0, le champion récupère 8 pv."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le champion effectue trois attaques d'arme."
+    },
+    {
+      "name": "Arc long",
+      "description": "Attaque d'arme à distance : +6 pour toucher, portée 45/180 m, une cible. Réussite : 6 (1d8 + 2) dégâts perforants."
+    },
+    {
+      "name": "Épée longue",
+      "description": "Attaque d'arme de corps à corps : +9 pour toucher, allonge 1,50 m, une cible. Réussite : 11 (1d8 + 7) dégâts tranchants, ou 10 (1d10 + 5) dégâts tranchants si utilisée à deux mains."
+    },
+    {
+      "name": "Javeline",
+      "description": "Attaque d'arme de corps à corps ou à distance : +9 pour toucher, allonge 1,50 m ou portée 9/36 m, une cible. Réussite : 10 (1d6 + 7) dégâts perforants."
+    },
+    {
+      "name": "Cri de bataille (recharge 5-6)",
+      "description": "Le champion émet un cri de guerre terrifiant. Toute créature hostile située dans un rayon de 9 m doit réussir un JS Sagesse DD 14 sous peine de subir l'état **effrayé** durant 1 minute. En cas d'échec de 5 ou plus, la créature est en outre **paralysée** pendant la même durée. La cible peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet en cas de réussite."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-dragon-d-agate-venerable",
+  "name": "Dragon d’agate vénérable",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Dragon de taille Gig, chaotique neutre",
+  "armor_class": 22,
+  "armor_note": "armure naturelle",
+  "hit_points": "444 (24d20 + 192)",
+  "wound_threshold": 111,
+  "speed": "12 m, vol 24 m",
+  "abilities": {
+    "str": {
+      "score": 29,
+      "modifier": "+9"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 27,
+      "modifier": "+8"
+    },
+    "int": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "wis": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "cha": {
+      "score": 21,
+      "modifier": "+5"
+    }
+  },
+  "saving_throws": "Dex +7, Con +15, Sag +10, Cha +12",
+  "skills": "Discrétion +7, Nature +12, Perception +17, Survie +10, Tromperie + 12",
+  "senses": "vision aveugle 18 m, vision dans le noir 36 m, Perception passive 27",
+  "languages": "commun, draconique",
+  "challenge_rating": "22",
+  "xp": 41000,
+  "traits": [
+    {
+      "name": "Change-forme",
+      "description": "Au prix d'une action le dragon se métamorphose magiquement en humanoïde ou bête d'un facteur de puissance inférieur ou égal au sien, ou recouvre sa véritable forme. Il la retrouve aussi s'il est tué. L'équipement qu'il porte ou transporte est absorbé ou porté lui aussi par la nouvelle forme (à sa convenance). Sous sa nouvelle forme, le dragon conserve son alignement, ses pv, ses dés de vie, sa faculté de parole, ses maîtrises, sa **Résistance légendaire (3/jour)**, ses actions de repaire, ses valeurs d'Intelligence, de Sagesse et de Charisme, ainsi que sa capacité à utiliser cette aptitude. En dehors de ces éléments, ses caractéristiques et capacités sont remplacées par celles de sa nouvelle forme, à l'exception des aptitudes de classe et des actions légendaires dont celle-ci pourrait disposer."
+    },
+    {
+      "name": "Résistance légendaire (3/jour)",
+      "description": "Si le dragon rate un jet de sauvegarde, il peut décider de le réussir tout de même."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le dragon peut utiliser **Présence terrifiante**. Il effectue ensuite trois attaques : une de morsure et deux de coup de griffe."
+    },
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +16 pour toucher, allonge 4,50 m, une cible. Réussite : 20 (2d10 + 9) dégâts perforants."
+    },
+    {
+      "name": "Coup de griffe",
+      "description": "Attaque d'arme de corps à corps : +16 pour toucher, allonge 3 m, une cible. Réussite : 16 (2d6 + 9) dégâts tranchants."
+    },
+    {
+      "name": "Queue",
+      "description": "Attaque d'arme de corps à corps : +16 pour toucher, allonge 6 m, une cible. Réussite : 18 (2d8 + 9) dégâts contondants."
+    },
+    {
+      "name": "Présence terrifiante",
+      "description": "Chaque créature située dans un rayon de 36 m du dragon, choisie par ce dernier et consciente de sa présence, doit réussir un JS Sagesse DD 20 sous peine d'être **effrayée** pendant 1 minute. Une créature peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet sur elle-même en cas de réussite. Toute créature qui réussit le jet de sauvegarde ou pour qui l'effet prend fin est immunisée contre la **Présence terrifiante** du dragon pour les 24 prochaines heures."
+    },
+    {
+      "name": "Souffle (recharge 5-6)",
+      "description": "Le dragon utilise l'un des deux souffles suivants :"
+    },
+    {
+      "name": "Souffle psychique",
+      "description": "Le dragon crache une projection d'énergie psychique de 36 m de long et de 3 m de large. Chaque créature prise dans cette ligne doit effectuer un JS Intelligence DD 23 et subit 71 (13d10) dégâts psychiques en cas d'échec, la moitié en cas de réussite."
+    },
+    {
+      "name": "Souffle étourdissant",
+      "description": "Le dragon crache un cône d'énergie étourdissante de 18 m. Chaque créature prise dans cette zone d'effet doit réussir un JS Intelligence DD 23 sous peine d'être **étourdie** durant 1 minute. Une cible peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet en cas de réussite."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [
+    {
+      "name": "Attaque de queue",
+      "description": "Le dragon effectue une attaque de queue."
+    },
+    {
+      "name": "Détection",
+      "description": "Le dragon effectue un test de Sagesse (Perception)."
+    },
+    {
+      "name": "Attaque d'ailes (coûte 2 actions)",
+      "description": "Le dragon bat furieusement des ailes. Chaque créature située dans un rayon de 4,50 m du dragon doit réussir un JS Dextérité DD 24 sous peine de subir 16 (2d6 + 9) dégâts contondants et de se retrouver **à terre**. Le dragon peut ensuite voler jusqu'à la moitié de sa VD en vol.\n70"
+    }
+  ],
+  "description": "Aucun dragon d’agate vénérable n’est semblable à un autre. L’un pourra être un ermite satisfait de sa solitude, l’autre un sage soucieux de dispenser ses connaissances et son expérience, et l’autre enfin un farceur invétéré incapable de refréner l’étendue de ses plaisanteries. Il n’est d’ailleurs pas impossible que son attitude change d’un siècle sur l’autre."
+}

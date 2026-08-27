@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-azer",
+  "name": "Azer",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Élémentaire (feu) de taille M, loyal neutre",
+  "armor_class": 17,
+  "armor_note": "armure naturelle, bouclier",
+  "hit_points": "39 (6d8 + 12)",
+  "wound_threshold": 10,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": "Con +4",
+  "skills": null,
+  "senses": "Perception passive 11",
+  "languages": "céleste, originel",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [
+    {
+      "name": "Armes brûlantes",
+      "description": "Quand l'azer touche avec une arme de corps à corps en métal, il inflige 3 (1d6) dégâts de feu supplémentaires (inclus dans l'attaque)."
+    },
+    {
+      "name": "Corps brûlant",
+      "description": "Une créature qui entre en contact avec l'azer ou qui le touche avec une attaque de corps à corps alors qu'elle se situe dans un rayon de 1,50 m de lui subit 5 (1d10) dégâts de feu."
+    },
+    {
+      "name": "Illumination",
+      "description": "L'azer émet une lumière vive dans un rayon de 3 m et une lumière faible sur 3 m de plus."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Marteau de guerre",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (1d8 + 3) dégâts contondants, ou 8 (1d10 + 3) dégâts contondants si utilisé à deux mains dans le cadre d'une attaque de corps à corps, plus 3 (1d6) dégâts de feu.\nL'essentiel des azers sont chargés de tâches courantes qui ne requièrent pas d'aptitudes ou de puissance supérieure : assistance, manutention, surveillance, excavation, etc. Même ces azers sont des êtres robustes et hardis, rompus au combat."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "L’archétype d’**azer** vise à vous permettre de concevoir au gré des besoins de votre campagne un membre de ce peuple adapté à une profession ou une vocation particulière. Le profil de base d’**azer** ci-dessous vaut pour un représentant moyen de ce peuple, sans talents particuliers, mais grâce à cet archétype, vous pouvez concevoir un éclaireur **azer**, un acolyte **azer**, un champion **azer**, etc. Prenez un **profil de PNJ humanoïde** adapté à vos besoins et appliquez les modifications suivantes :"
+}

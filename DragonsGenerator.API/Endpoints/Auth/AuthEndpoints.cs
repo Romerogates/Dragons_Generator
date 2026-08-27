@@ -7,17 +7,81 @@ using Microsoft.Extensions.Options;
 
 namespace DragonsGenerator.API.Endpoints.Auth;
 
-public record RegisterRequest(string Email, string Password, string? DisplayName);
+public record RegisterRequest(string Email, string Password, string? DisplayName, string? WebUrl);
 public record LoginRequest(string Email, string Password);
-public record ForgotPasswordRequest(string Email);
+public record ForgotPasswordRequest(string Email, string? WebUrl);
+public record ResendConfirmationRequest(string Email, string? WebUrl);
 public record ResetPasswordRequest(string Token, string NewPassword);
+public record UpdateProfileRequest(string DisplayName);
+public record ChangePasswordRequest(string CurrentPassword, string NewPassword);
 public record AuthResponse(string Token, UserDto User);
 public record UserDto(Guid Id, string Email, string DisplayName, string Role, bool EmailConfirmed);
+
+internal static class AuthEmailHelper
+{
+    internal static async Task<(bool Sent, string Link)> SendConfirmationAsync(
+        AppUser user,
+        string? webUrl,
+        AppUrlOptions appUrl,
+        IEmailSender email,
+        ILogger logger,
+        CancellationToken ct
+    )
+    {
+        user.EmailConfirmToken = AuthHelpers.NewToken();
+        var webBase = AuthHelpers.ResolveWebUrl(webUrl, appUrl.PublicWebUrl);
+        var link = $"{webBase}/confirm-email?token={Uri.EscapeDataString(user.EmailConfirmToken)}";
+        try
+        {
+            await email.SendAsync(
+                user.Email,
+                "Confirmez votre compte — Dragons Generator",
+                $"""
+                <h2>Bonjour {user.DisplayName} !</h2>
+                <p>Confirmez votre adresse email pour activer votre compte :</p>
+                <p><a href="{link}">Confirmer mon compte</a></p>
+                <p>Ou copiez ce lien :<br/><code>{link}</code></p>
+                """,
+                ct
+            );
+            return (true, link);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Email de confirmation non envoyé à {Email}", user.Email);
+            return (false, link);
+        }
+    }
+
+    internal static Dictionary<string, object?> BuildConfirmationResponse(
+        AppUser user,
+        bool emailSent,
+        string link,
+        string message,
+        IHostEnvironment env,
+        bool resent = false
+    )
+    {
+        var response = new Dictionary<string, object?>
+        {
+            ["message"] = message,
+            ["email"] = user.Email,
+            ["emailSent"] = emailSent,
+            ["resent"] = resent,
+        };
+        if (env.IsDevelopment() || !emailSent)
+        {
+            response["confirmLink"] = link;
+        }
+        return response;
+    }
+}
 
 public class RegisterEndpoint(
     AppDbContext db,
     IEmailSender email,
     IOptions<AppUrlOptions> appUrl,
+    IHostEnvironment env,
     ILogger<RegisterEndpoint> logger
 ) : Endpoint<RegisterRequest, object>
 {
@@ -42,54 +106,116 @@ public class RegisterEndpoint(
             await Send.ErrorsAsync(cancellation: ct);
             return;
         }
-        if (await db.Users.AnyAsync(u => u.Email == emailAddr, ct))
+        if (!AuthHelpers.TryNormalizeDisplayName(req.DisplayName, out var displayName, out var nameError))
         {
-            AddError("Un compte existe déjà avec cet email.");
+            AddError(nameError!);
             await Send.ErrorsAsync(cancellation: ct);
             return;
         }
 
-        var token = AuthHelpers.NewToken();
+        var existing = await db.Users.FirstOrDefaultAsync(u => u.Email == emailAddr, ct);
+        if (existing is not null)
+        {
+            if (existing.EmailConfirmed)
+            {
+                AddError("Un compte existe déjà. Connectez-vous ou utilisez « Mot de passe oublié ».");
+                await Send.ErrorsAsync(cancellation: ct);
+                return;
+            }
+
+            if (!AuthHelpers.VerifyPassword(req.Password, existing.PasswordHash))
+            {
+                AddError(
+                    "Un compte non confirmé existe déjà avec cet email. Mot de passe incorrect — ou renvoyez la confirmation."
+                );
+                await Send.ErrorsAsync(cancellation: ct);
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(req.DisplayName))
+            {
+                if (!AuthHelpers.TryNormalizeDisplayName(req.DisplayName, out var newName, out var renameError))
+                {
+                    AddError(renameError!);
+                    await Send.ErrorsAsync(cancellation: ct);
+                    return;
+                }
+                if (
+                    !string.Equals(existing.DisplayName, newName, StringComparison.OrdinalIgnoreCase)
+                    && await AuthHelpers.IsDisplayNameTakenAsync(db, newName, existing.Id, ct)
+                )
+                {
+                    AddError("Ce pseudo est déjà pris.");
+                    await Send.ErrorsAsync(cancellation: ct);
+                    return;
+                }
+                existing.DisplayName = newName;
+            }
+
+            var (emailSent, link) = await AuthEmailHelper.SendConfirmationAsync(
+                existing,
+                req.WebUrl,
+                appUrl.Value,
+                email,
+                logger,
+                ct
+            );
+            await db.SaveChangesAsync(ct);
+
+            await Send.OkAsync(
+                AuthEmailHelper.BuildConfirmationResponse(
+                    existing,
+                    emailSent,
+                    link,
+                    emailSent
+                        ? "Compte déjà créé. Un nouveau lien de confirmation a été envoyé."
+                        : "Compte déjà créé. Utilisez le lien ci-dessous pour confirmer.",
+                    env,
+                    resent: true
+                ),
+                ct
+            );
+            return;
+        }
+
+        if (await AuthHelpers.IsDisplayNameTakenAsync(db, displayName, null, ct))
+        {
+            AddError("Ce pseudo est déjà pris.");
+            await Send.ErrorsAsync(cancellation: ct);
+            return;
+        }
+
         var user = new AppUser
         {
             Email = emailAddr,
-            DisplayName = string.IsNullOrWhiteSpace(req.DisplayName)
-                ? emailAddr.Split('@')[0]
-                : req.DisplayName.Trim(),
+            DisplayName = displayName,
             PasswordHash = AuthHelpers.HashPassword(req.Password),
             Role = AppRoles.User,
             EmailConfirmed = false,
-            EmailConfirmToken = token,
         };
         db.Users.Add(user);
         await db.SaveChangesAsync(ct);
 
-        var link = $"{appUrl.Value.PublicWebUrl.TrimEnd('/')}/confirm-email?token={Uri.EscapeDataString(token)}";
-        try
-        {
-            await email.SendAsync(
-                user.Email,
-                "Confirmez votre compte — Dragons Generator",
-                $"""
-                <h2>Bienvenue {user.DisplayName} !</h2>
-                <p>Confirmez votre adresse email pour activer votre compte :</p>
-                <p><a href="{link}">Confirmer mon compte</a></p>
-                <p>Ou copiez ce lien :<br/><code>{link}</code></p>
-                """,
-                ct
-            );
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Email de confirmation non envoyé");
-        }
+        var (sent, confirmLink) = await AuthEmailHelper.SendConfirmationAsync(
+            user,
+            req.WebUrl,
+            appUrl.Value,
+            email,
+            logger,
+            ct
+        );
+        await db.SaveChangesAsync(ct);
 
         await Send.OkAsync(
-            new
-            {
-                message = "Compte créé. Vérifiez votre boîte mail pour confirmer l'adresse.",
-                email = user.Email,
-            },
+            AuthEmailHelper.BuildConfirmationResponse(
+                user,
+                sent,
+                confirmLink,
+                sent
+                    ? "Compte créé. Vérifiez votre boîte mail pour confirmer l'adresse."
+                    : "Compte créé, mais l'email n'a pas pu être envoyé. Utilisez le lien ci-dessous.",
+                env
+            ),
             ct
         );
     }
@@ -147,7 +273,7 @@ public class LoginEndpoint(AppDbContext db, IOptions<JwtOptions> jwt) : Endpoint
         }
         if (!user.EmailConfirmed)
         {
-            AddError("Confirmez d'abord votre email (lien reçu à l'inscription).");
+            AddError("email_not_confirmed");
             await Send.ErrorsAsync(StatusCodes.Status403Forbidden, ct);
             return;
         }
@@ -170,6 +296,7 @@ public class ForgotPasswordEndpoint(
     AppDbContext db,
     IEmailSender email,
     IOptions<AppUrlOptions> appUrl,
+    IHostEnvironment env,
     ILogger<ForgotPasswordEndpoint> logger
 ) : Endpoint<ForgotPasswordRequest>
 {
@@ -182,7 +309,10 @@ public class ForgotPasswordEndpoint(
     public override async Task HandleAsync(ForgotPasswordRequest req, CancellationToken ct)
     {
         // Réponse uniforme pour ne pas révéler si l'email existe
-        var ok = new { message = "Si un compte existe, un email de réinitialisation a été envoyé." };
+        var ok = new Dictionary<string, object?>
+        {
+            ["message"] = "Si un compte existe, un email de réinitialisation a été envoyé.",
+        };
         var emailAddr = (req.Email ?? "").Trim().ToLowerInvariant();
         var user = await db.Users.FirstOrDefaultAsync(u => u.Email == emailAddr, ct);
         if (user is null)
@@ -195,8 +325,10 @@ public class ForgotPasswordEndpoint(
         user.PasswordResetExpires = DateTimeOffset.UtcNow.AddHours(2);
         await db.SaveChangesAsync(ct);
 
+        var webBase = AuthHelpers.ResolveWebUrl(req.WebUrl, appUrl.Value.PublicWebUrl);
         var link =
-            $"{appUrl.Value.PublicWebUrl.TrimEnd('/')}/reset-password?token={Uri.EscapeDataString(user.PasswordResetToken)}";
+            $"{webBase}/reset-password?token={Uri.EscapeDataString(user.PasswordResetToken)}";
+        var emailSent = false;
         try
         {
             await email.SendAsync(
@@ -206,13 +338,20 @@ public class ForgotPasswordEndpoint(
                 <h2>Réinitialisation</h2>
                 <p>Cliquez pour choisir un nouveau mot de passe (valable 2 h) :</p>
                 <p><a href="{link}">Réinitialiser mon mot de passe</a></p>
+                <p>Ou copiez ce lien :<br/><code>{link}</code></p>
                 """,
                 ct
             );
+            emailSent = true;
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Email reset non envoyé");
+        }
+
+        if (env.IsDevelopment() || !emailSent)
+        {
+            ok["resetLink"] = link;
         }
 
         await Send.OkAsync(ok, ct);
@@ -281,5 +420,155 @@ public class MeEndpoint(AppDbContext db) : EndpointWithoutRequest<UserDto>
             new UserDto(user.Id, user.Email, user.DisplayName, user.Role, user.EmailConfirmed),
             ct
         );
+    }
+}
+
+public class ResendConfirmationEndpoint(
+    AppDbContext db,
+    IEmailSender email,
+    IOptions<AppUrlOptions> appUrl,
+    IHostEnvironment env,
+    ILogger<ResendConfirmationEndpoint> logger
+) : Endpoint<ResendConfirmationRequest, object>
+{
+    public override void Configure()
+    {
+        Post("/auth/resend-confirmation");
+        AllowAnonymous();
+    }
+
+    public override async Task HandleAsync(ResendConfirmationRequest req, CancellationToken ct)
+    {
+        var emailAddr = (req.Email ?? "").Trim().ToLowerInvariant();
+        var generic = new Dictionary<string, object?>
+        {
+            ["message"] = "Si un compte non confirmé existe, un email a été renvoyé.",
+        };
+
+        if (string.IsNullOrWhiteSpace(emailAddr) || !emailAddr.Contains('@'))
+        {
+            await Send.OkAsync(generic, ct);
+            return;
+        }
+
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Email == emailAddr, ct);
+        if (user is null || user.EmailConfirmed)
+        {
+            await Send.OkAsync(generic, ct);
+            return;
+        }
+
+        var (sent, link) = await AuthEmailHelper.SendConfirmationAsync(
+            user,
+            req.WebUrl,
+            appUrl.Value,
+            email,
+            logger,
+            ct
+        );
+        await db.SaveChangesAsync(ct);
+
+        var response = AuthEmailHelper.BuildConfirmationResponse(
+            user,
+            sent,
+            link,
+            sent ? "Un nouveau lien de confirmation a été envoyé." : "Utilisez le lien ci-dessous.",
+            env,
+            resent: true
+        );
+        await Send.OkAsync(response, ct);
+    }
+}
+
+public class UpdateProfileEndpoint(AppDbContext db) : Endpoint<UpdateProfileRequest, UserDto>
+{
+    public override void Configure()
+    {
+        Patch("/auth/me");
+    }
+
+    public override async Task HandleAsync(UpdateProfileRequest req, CancellationToken ct)
+    {
+        var id = AuthHelpers.GetUserId(User);
+        if (id is null)
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        var name = (req.DisplayName ?? "").Trim();
+        if (!AuthHelpers.TryNormalizeDisplayName(name, out var normalized, out var nameError))
+        {
+            AddError(nameError!);
+            await Send.ErrorsAsync(cancellation: ct);
+            return;
+        }
+
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Id == id, ct);
+        if (user is null)
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        if (
+            !string.Equals(user.DisplayName, normalized, StringComparison.OrdinalIgnoreCase)
+            && await AuthHelpers.IsDisplayNameTakenAsync(db, normalized, user.Id, ct)
+        )
+        {
+            AddError("Ce pseudo est déjà pris.");
+            await Send.ErrorsAsync(cancellation: ct);
+            return;
+        }
+
+        user.DisplayName = normalized;
+        await db.SaveChangesAsync(ct);
+        await Send.OkAsync(
+            new UserDto(user.Id, user.Email, user.DisplayName, user.Role, user.EmailConfirmed),
+            ct
+        );
+    }
+}
+
+public class ChangePasswordEndpoint(AppDbContext db) : Endpoint<ChangePasswordRequest>
+{
+    public override void Configure()
+    {
+        Post("/auth/change-password");
+    }
+
+    public override async Task HandleAsync(ChangePasswordRequest req, CancellationToken ct)
+    {
+        var id = AuthHelpers.GetUserId(User);
+        if (id is null)
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(req.NewPassword) || req.NewPassword.Length < 8)
+        {
+            AddError("Nouveau mot de passe : 8 caractères minimum.");
+            await Send.ErrorsAsync(cancellation: ct);
+            return;
+        }
+
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Id == id, ct);
+        if (user is null)
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        if (!AuthHelpers.VerifyPassword(req.CurrentPassword ?? "", user.PasswordHash))
+        {
+            AddError("Mot de passe actuel incorrect.");
+            await Send.ErrorsAsync(StatusCodes.Status401Unauthorized, ct);
+            return;
+        }
+
+        user.PasswordHash = AuthHelpers.HashPassword(req.NewPassword);
+        await db.SaveChangesAsync(ct);
+        await Send.OkAsync(new { message = "Mot de passe mis à jour." }, ct);
     }
 }

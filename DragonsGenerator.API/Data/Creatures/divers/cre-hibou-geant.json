@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-hibou-geant",
+  "name": "Hibou géant",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille G, neutre",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "19 (3d10 + 3)",
+  "wound_threshold": 5,
+  "speed": "1,50 m, vol 18 m",
+  "abilities": {
+    "str": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +4, Perception +5",
+  "senses": "vision dans le noir 36 m, Perception passive 15",
+  "languages": "sylvestre",
+  "challenge_rating": "1/4",
+  "xp": 50,
+  "traits": [
+    {
+      "name": "Fluidité aérienne",
+      "description": "Le hibou géant ne provoque pas d'attaque d'opportunité lorsqu'il quitte l'allonge d'un ennemi en volant."
+    },
+    {
+      "name": "Ouïe fine et vision perçante",
+      "description": "Le hibou géant bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'ouïe ou la vue."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Serres",
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 1,50 m, une cible. Réussite : 8 (2d6 + 1) dégâts tranchants.\nAvec leur envergure, les hiboux géants s'installent dans les arbres les plus massifs et anciens. Ils profitent de leur agilité pour se faufiler entre les troncs d'arbres et dans les prés où ils fondent sur leurs proies. Ce sont de redoutables prédateurs. Ils se lient souvent avec des fées et autres créatures sylvestres, pour devenir les gardiens de leurs royaumes forestiers."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

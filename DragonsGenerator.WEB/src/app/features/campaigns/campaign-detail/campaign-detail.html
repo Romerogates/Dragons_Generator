@@ -1,0 +1,282 @@
+<div class="w-full min-h-screen bg-[#171b22] text-slate-300 pb-20 animate-fade-in">
+  @if (!isLoggedIn()) {
+    <div class="max-w-lg mx-auto px-4 py-24 text-center">
+      <p class="text-slate-400 mb-6 font-serif italic">Connectez-vous pour accéder à vos campagnes.</p>
+      <a routerLink="/login" class="px-6 py-3 bg-violet-600 text-white rounded-xl text-xs font-black uppercase tracking-widest">Se connecter</a>
+    </div>
+  } @else if (loading()) {
+    <p class="text-center py-24 text-violet-400 animate-pulse">Chargement de la campagne...</p>
+  } @else if (error(); as err) {
+    <div class="max-w-lg mx-auto px-4 py-24 text-center">
+      <p class="text-red-400 mb-4">{{ err }}</p>
+      <a routerLink="/campaigns" class="text-violet-400 text-sm">← Retour aux campagnes</a>
+    </div>
+  } @else if (campaign(); as c) {
+    <header class="border-b border-slate-800 px-4 py-8">
+      <div class="max-w-5xl mx-auto">
+        <a routerLink="/campaigns" class="text-xs font-black uppercase tracking-widest text-slate-500 hover:text-violet-400 mb-4 inline-block">← Campagnes</a>
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 class="text-3xl md:text-4xl font-bold text-violet-400 font-serif">{{ c.title }}</h1>
+            <p class="text-sm text-slate-500 mt-2">
+              Niv. {{ c.data.partyLevel }} · {{ toneLabels[c.data.tone] }}
+              @if (c.data.setting) { · {{ c.data.setting }} }
+              · {{ c.isOwner ? 'MJ' : 'Joueur' }}
+            </p>
+          </div>
+          @if (saving()) {
+            <span class="text-[10px] font-black uppercase tracking-widest text-violet-500 animate-pulse">Sauvegarde...</span>
+          }
+        </div>
+
+        <nav class="flex flex-wrap gap-2 mt-6">
+          @for (t of [
+            { id: 'overview', label: 'Résumé' },
+            { id: 'creatures', label: 'Personnages & créatures' },
+            { id: 'encounters', label: 'Rencontres & XP' },
+            { id: 'players', label: 'Joueurs' }
+          ]; track t.id) {
+            <button
+              type="button"
+              class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors"
+              [class]="tab() === t.id ? 'border-violet-500 text-violet-300 bg-violet-950/30' : 'border-slate-700 text-slate-500'"
+              (click)="setTab($any(t.id))"
+            >
+              {{ t.label }}
+            </button>
+          }
+        </nav>
+      </div>
+    </header>
+
+    <div class="max-w-5xl mx-auto px-4 py-8">
+      @switch (tab()) {
+        @case ('overview') {
+          <section class="space-y-6">
+            <!-- Tableau de bord MJ -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
+                <p class="text-2xl font-bold text-violet-400">{{ c.data.creatures.length }}</p>
+                <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Créatures</p>
+              </div>
+              <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
+                <p class="text-2xl font-bold text-violet-400">{{ c.data.encounters.length }}</p>
+                <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Rencontres</p>
+              </div>
+              <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
+                <p class="text-2xl font-bold text-violet-400">{{ players().length }}</p>
+                <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Joueurs</p>
+              </div>
+              <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
+                <p class="text-2xl font-bold text-emerald-400">{{ totalXpAwarded() }}</p>
+                <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">XP distribuée</p>
+              </div>
+            </div>
+
+            @if (c.isOwner) {
+              <div class="bg-violet-950/20 border border-violet-800/40 rounded-2xl p-5">
+                <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-4">
+                  <iconify-icon icon="fluent-emoji:printer"></iconify-icon> Imprimer (fond parchemin)
+                </h2>
+                <div class="flex flex-wrap gap-2">
+                  <button type="button" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white disabled:opacity-50" [disabled]="printing()" (click)="printPackMj()">
+                    Pack MJ complet
+                  </button>
+                  <button type="button" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-violet-800/50 text-violet-300 disabled:opacity-50" [disabled]="printing()" (click)="printBestiary()">
+                    Bestiaire (stats)
+                  </button>
+                  <button type="button" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-violet-800/50 text-violet-300 disabled:opacity-50" [disabled]="printing()" (click)="printPlayerSummariesPdf()">
+                    Synthèse joueurs (MJ)
+                  </button>
+                  <button type="button" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-violet-800/50 text-violet-300 disabled:opacity-50" [disabled]="printing()" (click)="printAllPlayerSheets()">
+                    Fiches joueurs complètes
+                  </button>
+                </div>
+                @if (printing()) {
+                  <p class="text-xs text-violet-400/80 mt-3 animate-pulse">Génération PDF...</p>
+                }
+              </div>
+            }
+
+            @if (c.isOwner) {
+              <input
+                type="text"
+                class="w-full bg-[#1b2028] border border-slate-700 rounded-xl py-3 px-4 text-lg font-serif text-violet-300"
+                [ngModel]="c.title"
+                (ngModelChange)="saveTitle($event)"
+              />
+            }
+            <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
+              <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Synopsis</h2>
+              <div class="text-sm leading-relaxed whitespace-pre-wrap font-serif text-slate-300">{{ c.data.adventure || '—' }}</div>
+            </div>
+            <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
+              <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Notes du MJ</h2>
+              <textarea
+                rows="4"
+                class="w-full bg-[#171b22] border border-slate-700 rounded-xl p-3 text-sm text-slate-300"
+                [readonly]="!c.isOwner"
+                [ngModel]="c.data.notes"
+                (ngModelChange)="saveData({ notes: $event })"
+                placeholder="Notes privées..."
+              ></textarea>
+            </div>
+            <p class="text-xs text-slate-500">XP total distribué aux joueurs : <strong class="text-violet-400">{{ totalXpAwarded() }}</strong></p>
+          </section>
+        }
+
+        @case ('creatures') {
+          <section class="space-y-4">
+            @for (cr of c.data.creatures; track cr.creatureId) {
+              <article class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
+                <div class="flex items-baseline gap-2 mb-1">
+                  <h3 class="font-bold text-slate-100 font-serif">{{ cr.customName }}</h3>
+                  <span class="text-[10px] uppercase text-slate-500">{{ roleLabels[cr.role] }}</span>
+                  <span class="text-[10px] text-red-400/80">{{ formatCr(cr.challengeRating) }}</span>
+                </div>
+                <p class="text-[10px] text-slate-600 mb-2">{{ cr.creatureName }} · {{ categoryLabel(cr.category) }}</p>
+                @if (cr.backstory) {
+                  <p class="text-sm text-slate-400 italic">{{ cr.backstory }}</p>
+                }
+              </article>
+            } @empty {
+              <p class="text-slate-500 italic text-center py-12">Aucune créature dans cette campagne.</p>
+            }
+          </section>
+        }
+
+        @case ('encounters') {
+          <section class="space-y-6">
+            @if (c.isOwner && c.data.creatures.length && !c.data.encounters.length) {
+              <button
+                type="button"
+                class="w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest bg-violet-950/30 border border-violet-800/50 text-violet-300"
+                (click)="generateEncountersFromStory()"
+              >
+                Générer des groupes de rencontre depuis les créatures
+              </button>
+            }
+
+            @for (enc of c.data.encounters; track enc.id) {
+              <article class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="font-bold text-violet-300 font-serif">{{ enc.name }}</h3>
+                  <div class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                    XP vaincus : {{ encounterTotalXp(enc) }}
+                    @if (enc.xpAwarded) {
+                      <span class="text-emerald-400 ml-2">✓ Distribué</span>
+                    }
+                  </div>
+                </div>
+                <div class="space-y-3">
+                  @for (cr of enc.creatures; track $index) {
+                    <div class="flex flex-wrap items-center justify-between gap-3 py-2 border-b border-slate-800/60 last:border-0">
+                      <div>
+                        <span class="font-serif text-slate-200">{{ cr.customName || cr.creatureName }}</span>
+                        <span class="text-[10px] text-slate-500 ml-2">×{{ cr.quantity }} · {{ cr.xp }} XP/u</span>
+                      </div>
+                      <div class="flex items-center gap-3">
+                        <span class="text-xs text-slate-400">{{ cr.defeated }}/{{ cr.quantity }} vaincus</span>
+                        @if (c.isOwner && cr.defeated < cr.quantity) {
+                          <button
+                            type="button"
+                            class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-red-950/30 border border-red-900/40 text-red-300"
+                            (click)="markDefeated(enc.id, $index)"
+                          >
+                            +1 kill
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+                @if (c.isOwner && encounterTotalXp(enc) > 0 && !enc.xpAwarded) {
+                  <button
+                    type="button"
+                    class="mt-4 w-full py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-950/30 border border-emerald-800/40 text-emerald-300"
+                    (click)="distributeEncounterXp(enc)"
+                  >
+                    Distribuer {{ encounterTotalXp(enc) }} XP aux joueurs
+                  </button>
+                }
+              </article>
+            } @empty {
+              <p class="text-slate-500 italic text-center py-12">Aucune rencontre. Générez-en depuis les créatures de l'histoire.</p>
+            }
+          </section>
+        }
+
+        @case ('players') {
+          <section class="space-y-6">
+            @if (c.isOwner) {
+              <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
+                <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Inviter un ami</h3>
+                <div class="flex flex-wrap gap-2">
+                  @for (f of friendsList(); track f.id) {
+                    <button
+                      type="button"
+                      class="px-3 py-2 rounded-xl text-xs border border-slate-700 text-slate-300 hover:border-violet-500/50"
+                      (click)="inviteFriend(f.id)"
+                    >
+                      {{ f.displayName }}
+                    </button>
+                  } @empty {
+                    <p class="text-sm text-slate-500 italic">Ajoutez des amis depuis la page <a routerLink="/friends" class="text-violet-400">Amis</a>.</p>
+                  }
+                </div>
+              </div>
+
+              @for (m of players(); track m.id) {
+                <article class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
+                  <div class="flex justify-between items-start gap-3">
+                    <div>
+                      <h3 class="font-bold text-slate-100">{{ m.displayName }}</h3>
+                      <p class="text-[10px] text-emerald-400/80 uppercase tracking-widest mt-1">{{ m.xpEarnedInCampaign }} XP en campagne</p>
+                      @if (m.approvedCharacterName) {
+                        <p class="text-sm text-violet-300 mt-2">{{ m.approvedCharacterName }} (niv. {{ m.approvedCharacterLevel ?? '?' }})</p>
+                      }
+                      @if (m.proposalStatus === 'pending') {
+                        <p class="text-sm text-amber-400 mt-2">Propose : {{ m.proposedCharacterName }} (niv. {{ m.proposedCharacterLevel ?? '?' }})</p>
+                        <div class="flex gap-2 mt-3">
+                          <button type="button" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-emerald-950/30 text-emerald-300 border border-emerald-800/40" (click)="approveMember(m)">Accepter</button>
+                          <button type="button" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40" (click)="rejectMember(m)">Refuser</button>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </article>
+              }
+            } @else {
+              @if (isMyPlayerMember(); as me) {
+                <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
+                  <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Mon personnage</h3>
+                  @if (me.approvedCharacterName) {
+                    <p class="text-violet-300 font-serif">{{ me.approvedCharacterName }} — approuvé · {{ me.xpEarnedInCampaign }} XP</p>
+                  } @else if (me.proposalStatus === 'pending') {
+                    <p class="text-amber-400 text-sm">En attente d'approbation : {{ me.proposedCharacterName }}</p>
+                  } @else if (me.proposalStatus === 'rejected') {
+                    <p class="text-red-400 text-sm mb-3">Proposition refusée. Choisissez un autre personnage :</p>
+                    <div class="flex flex-wrap gap-2">
+                      @for (ch of myCharacters(); track ch.id) {
+                        <button type="button" class="px-3 py-2 rounded-xl text-xs border border-slate-700 hover:border-violet-500/50" (click)="proposeCharacter(ch.id)">{{ ch.name }}</button>
+                      }
+                    </div>
+                  } @else {
+                    <p class="text-sm text-slate-400 mb-3">Proposez un de vos personnages au MJ :</p>
+                    <div class="flex flex-wrap gap-2">
+                      @for (ch of myCharacters(); track ch.id) {
+                        <button type="button" class="px-3 py-2 rounded-xl text-xs border border-slate-700 hover:border-violet-500/50" (click)="proposeCharacter(ch.id)">{{ ch.name }}</button>
+                      } @empty {
+                        <a routerLink="/create" class="text-violet-400 text-sm">Créer un personnage →</a>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            }
+          </section>
+        }
+      }
+    </div>
+  }
+</div>

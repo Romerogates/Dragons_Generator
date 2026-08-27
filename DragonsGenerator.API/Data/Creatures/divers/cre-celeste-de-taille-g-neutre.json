@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-celeste-de-taille-g-neutre",
+  "name": "Céleste de taille G, neutre",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "",
+  "armor_class": 15,
+  "armor_note": "armure naturelle",
+  "hit_points": "105 (10d10 + 50)",
+  "wound_threshold": 27,
+  "speed": "15 m",
+  "abilities": {
+    "str": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 21,
+      "modifier": "+5"
+    },
+    "int": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 16,
+      "modifier": "+3"
+    }
+  },
+  "saving_throws": "For +7, Sag +5",
+  "skills": "Athlétisme +7, Discrétion +4, Perception +5, Survie +8",
+  "senses": "vision lucide 18 m, Perception passive 15",
+  "languages": "comprend le céleste, mais ne parle pas",
+  "challenge_rating": "8",
+  "xp": 3900,
+  "traits": [
+    {
+      "name": "Vue perçante et flair",
+      "description": "Le vina bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir la vue ou l'odorat. **Sorts innés.** La caractéristique magique du vina est le Charisme (DD de sauvegarde des sorts : 14). Le vina peut lancer les sorts suivants sans composantes matérielles :\n3/jour chacun : marque du chasseur, nappe de brouillard, voyage par les arbres\n1/jour chacun : assassin imaginaire, localisation de créature, passage dans l'éther"
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le vina effectue deux attaques de coup de boutoir."
+    },
+    {
+      "name": "Coup de boutoir",
+      "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 3 m, une cible. Réussite : 13 (2d8 + 4) dégâts contondants plus 5 (1d10) dégâts psychiques."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Vina"
+}

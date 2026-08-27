@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-druide",
+  "name": "Druide",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 11,
+  "armor_note": "16 avec peau d'écorce",
+  "hit_points": "27 (5d8 + 5)",
+  "wound_threshold": 7,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 11,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Médecine +4, Nature +3, Perception +4",
+  "senses": "Perception passive 14",
+  "languages": "druidique et deux autres au choix",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Bâton",
+      "description": "Attaque d'arme de corps à corps : +2 pour toucher (+4 pour toucher avec gourdin magique), allonge 1,50 m, une cible. Réussite : 3 (1d6) dégâts contondants, 4 (1d8) dégâts contondants si utilisé à deux mains, ou 6 (1d8 + 2) dégâts contondants avec gourdin magique."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Parmi les descendants de la Horde habitant loin de leurs terres ancestrales, les druides et chamanes sont souvent les garants de la tradition, aptes à transmettre la culture du Kaan et ses valeurs."
+}

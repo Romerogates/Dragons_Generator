@@ -1,0 +1,101 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-tarasque",
+  "name": "Tarasque",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Monstruosité (titan) de taille Gig, non aligné",
+  "armor_class": 25,
+  "armor_note": "armure naturelle",
+  "hit_points": "676 (33d20 + 330)",
+  "wound_threshold": 169,
+  "speed": "18 m, nage 18 m",
+  "abilities": {
+    "str": {
+      "score": 30,
+      "modifier": "+10"
+    },
+    "dex": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 30,
+      "modifier": "+10"
+    },
+    "int": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 11,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": "Int +5, Sag +9, Cha +9",
+  "skills": null,
+  "senses": "vision aveugle 36 m, Perception passive 10",
+  "languages": "—",
+  "challenge_rating": "30",
+  "xp": 155000,
+  "traits": [
+    {
+      "name": "Amphibie",
+      "description": "La tarasque est capable de respirer aussi bien sous l'eau qu'à l'air libre."
+    },
+    {
+      "name": "Carapace réflectrice",
+      "description": "Chaque fois que la tarasque est la cible du sort projectile magique, d'un sort en ligne ou d'un sort nécessitant un jet d'attaque à distance, lancez un d6. Sur un résultat de 1 ou 5, la tarasque n'est pas affectée. Sur un 6, elle n'est pas affectée et l'effet est renvoyé au lanceur de sorts comme s'il provenait de la tarasque et que ce dernier en était la cible."
+    },
+    {
+      "name": "Monstre de siège",
+      "description": "Les dégâts qu'inflige la tarasque aux objets et aux structures sont doublés."
+    },
+    {
+      "name": "Résistance à la magie",
+      "description": "La tarasque bénéficie d'un avantage aux jets de sauvegarde contre les sorts et autres effets magiques."
+    },
+    {
+      "name": "Résistance légendaire (3/jour)",
+      "description": "Si la tarasque rate un jet de sauvegarde, elle peut décider de le réussir tout de même."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "La tarasque peut utiliser sa Présence terrifiante. Elle effectue ensuite cinq attaques : une de morsure, deux de coup de griffe, une de cornes et une de queue. Elle peut utiliser Engloutissement à la place de sa morsure."
+    },
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +19 pour toucher, allonge 3 m, une cible. Réussite : 36 (4d12 + 10) dégâts perforants. Si la cible est une créature, elle est **agrippée** (DD 20 pour s'extraire). Tant que la lutte persiste, la cible est **entravée**, et la tarasque ne peut pas mordre d'autre cible."
+    },
+    {
+      "name": "Coup de griffe",
+      "description": "Attaque d'arme de corps à corps : +19 pour toucher, allonge 4,50 m, une cible. Réussite : 28 (4d8 + 10) dégâts tranchants."
+    },
+    {
+      "name": "Cornes",
+      "description": "Attaque d'arme de corps à corps : +19 pour toucher, allonge 3 m, une cible. Réussite : 32 (4d10 + 10) dégâts perforants."
+    },
+    {
+      "name": "Queue",
+      "description": "Attaque d'arme de corps à corps : +19 pour toucher, allonge 6 m, une cible. Réussite : 24 (4d6 + 10) dégâts contondants. Si la cible est une créature, elle doit réussir un JS Force DD 20 sous peine de se retrouver **à terre**."
+    },
+    {
+      "name": "Présence terrifiante",
+      "description": "Chaque créature située dans un rayon de 36 m de la tarasque, choisie par cette dernière et consciente de sa présence, doit réussir un JS Sagesse DD 17 sous peine d'être **effrayée** pendant 1 minute. Une créature peut réitérer le jet de sauvegarde à la fin de chacun de ses tours de jeu, avec un désavantage si la tarasque lui est toujours visible, et met un terme à l'effet sur elle-même en cas de réussite. Toute créature qui se sauvegarde ou pour qui l'effet prend fin est immunisée contre la Présence terrifiante de la tarasque pour les 24 prochaines heures."
+    },
+    {
+      "name": "Engloutissement",
+      "description": "La tarasque effectue une attaque de morsure contre une cible de taille G ou inférieure qu'elle est en train d'agripper. Si l'attaque touche, la cible est engloutie et la lutte prend fin. Une cible engloutie est **aveuglée** et **entravée**. Elle bénéficie d'un abri total contre les attaques et effets émanant de l'extérieur de la tarasque, et subit 56 (16d6) dégâts d'acide au début de chaque tour de jeu de la tarasque.\nSi la tarasque subit au moins 60 dégâts en un tour de jeu de la part d'une créature engloutie, elle doit réussir un JS Constitution DD 20 à la fin de ce tour de jeu sous peine de recracher toutes les créatures englouties, qui se retrouvent **à terre** dans espace situé dans un rayon de 3 m du monstre. Si la tarasque meurt, les créatures englouties ne sont plus entravées par le monstre et peuvent s'extraire du cadavre au prix de 9 m de leur déplacement. Elles se retrouvent alors **à terre**."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les visions de la sainte ulkane étaient terribles. Elle évoquait les cités abattues et brisées. Elle disait que l’horreur véritable de l’anéantissement était au cœur de la nature de cette créature gigantesque. Elle était née de fragments de la puissance des Voyageurs, dérobée par les Géants, redécouverts après leur Chute. À quoi songent-ils, ceux qui la cherchent ? Croient-ils pouvoir maîtriser les fauves des maîtres d’antan ?"
+}

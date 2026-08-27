@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-lezard-geant-cendreux",
+  "name": "Lézard géant cendreux",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille G, non aligné",
+  "armor_class": 14,
+  "armor_note": "armure naturelle",
+  "hit_points": "37 (5d10 + 10)",
+  "wound_threshold": 10,
+  "speed": "12 m, escalade 12 m",
+  "abilities": {
+    "str": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 5,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 6,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +2, Survie +2",
+  "senses": "vision dans le noir 18 m, perception des vibrations 18 m, Perception passive 12",
+  "languages": "aucune, mais dressé peut comprendre des mots en nain ou en commun",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (1d8 + 3) dégâts perforants.\n135"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Icon"
+}

@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-logo-haut-chamane",
+  "name": "Logo Haut chamane",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 16,
+  "armor_note": "bouclier et armure de peau",
+  "hit_points": "99 (18d8+18)",
+  "wound_threshold": 25,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "cha": {
+      "score": 12,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": "Int +4, Sag +7",
+  "skills": "Intuition +7, Médecine +7, Nature +4",
+  "senses": "Perception passive 14",
+  "languages": "commun, druidique, sylvestre, originel",
+  "challenge_rating": "8",
+  "xp": 3900,
+  "traits": [],
+  "actions": [],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Itelgini est un puissant ulkan qui a été formé dès l’enfance à écouter les esprits. Que l’on ait la forme d’un humanoïde, d’une bête, d’une plante, d’une source ou d’un rocher, la nature véritable de l’être est toujours celle d’un fragment d’Eana. Sa foi est profonde, mais il a déjà vu à l’œuvre les vilenies des sunsutaas. Il connait la corruption des puissants des rivages de la mer de Nulim. Il a vu les drogues détournées de leur usage traditionnel, ne servant plus à ouvrir l’esprit à l’immensité, mais à le fermer dans un cocon toxique. La détermination d’Itelgini est sans faille. Il prend son temps pour prendre des décisions, mais une fois qu’elles sont prises, il ne renonce jamais, peu importe les épreuves et les remises en question."
+}

@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-berserker",
+  "name": "Berserker",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (espèce au choix) de taille M, alignement chaotique au choix",
+  "armor_class": 13,
+  "armor_note": "armure de peau",
+  "hit_points": "67 (9d8 + 27)",
+  "wound_threshold": 17,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 9,
+      "modifier": "-1"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "Perception passive 10",
+  "languages": "une au choix",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [
+    {
+      "name": "Instinct fauve",
+      "description": "Le berserker a l'avantage aux jets d'initiative."
+    },
+    {
+      "name": "Intrépide",
+      "description": "Au début de son tour de jeu, le berserker peut recevoir un avantage à tous ses jets d'attaque d'arme de corps à corps du tour, mais tous les jets d'attaque le ciblant bénéficient en retour d'un avantage jusqu'au début de son tour de jeu suivant."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Grande hache",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 9 (1d12 + 3) dégâts tranchants.\nBaatir de pirate\nBaatir est un vétéran gobelin couturé de cicatrices. Jeune il a été tour à tour pirate, mercenaire, marchand, voleur, pilleur et héros. Il en a acquis un dédain pour la civilisation et les gras notables qui se cachent derrière de maigres gardes censés se sacrifier pour eux. La colère contre l'injustice du monde n'a jamais quitté Baatir. Aujourd'hui, sa rage se dirige contre Shüd'delkii et Kartaçöl, fédérant d'autres gobelins. Lui-même a un tempérament dur et peu conciliant, de sorte qu'en dépit de proximités évidentes de vues, il n'a pu s'associer aux résistants d'Ozodlik. Ces groupes se croisent sur certains coups de force, ils se connaissent, ils se respectent, parfois s'entraident, souvent se compliquent mutuellement la vie."
+    },
+    {
+      "name": "236",
+      "description": ""
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Le berserker décrit tout combattant capable d’entrer dans un état second au moment de se battre. Certains y parviennent en consommant des drogues, ou bien au terme de rituels accomplis avant une bataille. Dans certaines tribus, les berserkers forment une élite guerrière recevant un enseignement mystique et martial spécifique dans un sanctuaire à l’écart du village, réservé aux cultes qu’ils rendent à des esprits fauves terrifiants. En tant que guerriers d’exception, les berserkers bénéficient souvent d’un équipement de qualité supérieure."
+}

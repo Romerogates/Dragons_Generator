@@ -1,6 +1,7 @@
 services:
   dragons-api:
     container_name: dragons-api
+    restart: unless-stopped
     build:
       context: ./DragonsGenerator.API
       dockerfile: Dockerfile
@@ -20,6 +21,7 @@ services:
 
   dragons-web:
     container_name: dragons-web
+    restart: unless-stopped
     build:
       context: ./DragonsGenerator.WEB
       dockerfile: Dockerfile

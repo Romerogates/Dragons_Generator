@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-araignee",
+  "name": "Araignée",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille TP, non aligné",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "1 (1d4 - 1)",
+  "wound_threshold": null,
+  "speed": "6 m, escalade 6 m",
+  "abilities": {
+    "str": {
+      "score": 2,
+      "modifier": "-4"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 8,
+      "modifier": "-1"
+    },
+    "int": {
+      "score": 1,
+      "modifier": "-5"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 2,
+      "modifier": "-4"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +4",
+  "senses": "perception des vibrations 1,50 m, Perception passive 10",
+  "languages": "—",
+  "challenge_rating": "0",
+  "xp": 10,
+  "traits": [
+    {
+      "name": "Pattes d'araignée",
+      "description": "L'araignée peut parcourir les parois les plus difficiles à escalader, y compris les plafonds, sans devoir effectuer de test de caractéristique."
+    },
+    {
+      "name": "Perception des toiles",
+      "description": "Tant qu'elle est en contact avec une toile, l'araignée connaît la position exacte de toutes les créatures qui touchent cette même toile."
+    },
+    {
+      "name": "Arpenteur de toiles",
+      "description": "L'araignée n'est pas soumise aux contraintes de déplacement imposées par les toiles."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une créature. Réussite : 1 dégât perforant, et la cible doit réussir un JS Constitution DD 9 sous peine de subir 2 (1d4) dégâts de poison.\n146"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Dépourvues de tympans et dotées d’une vue assez mauvaise (d’où leur immunité aux états assourdi et aveuglé), elles se guident surtout grâce aux vibrations, par l’intermédiaire de leurs toiles. Ces prédatrices sont connues pour être des solitaires chassant essentiellement à l’affût, c’est-à-dire qu’elles attendent qu’une proie soit prise au piège de leur toile pour l’assaillir. Elles la mordent pour la paralyser, puis l’enveloppent de soie pour la dévorer ultérieurement. Cette tactique, pour commune qu’elle soit, n’est pas universelle. En voici quelques variantes :"
+}

@@ -1,0 +1,99 @@
+<div class="max-w-lg mx-auto px-4 py-10">
+  <div class="flex items-center gap-3 mb-8">
+    <span class="text-2xl"><iconify-icon icon="mdi:cog-outline"></iconify-icon></span>
+    <h1 class="font-serif text-2xl font-bold text-amber-500">Paramètres du compte</h1>
+  </div>
+
+  <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6 mb-6">
+    <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Profil</h2>
+    <p class="text-xs text-slate-400 mb-4">{{ user()?.email }}</p>
+    <form class="flex flex-col gap-4" (ngSubmit)="saveProfile()">
+      <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+        Pseudo
+        <input
+          type="text"
+          required
+          minlength="2"
+          maxlength="64"
+          [(ngModel)]="displayName"
+          name="displayName"
+          placeholder="Nom affiché (unique)"
+          class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 outline-none"
+        />
+      </label>
+      @if (profileError()) {
+        <p class="text-sm text-red-400">{{ profileError() }}</p>
+      }
+      @if (profileMsg()) {
+        <p class="text-sm text-emerald-400">{{ profileMsg() }}</p>
+      }
+      <button type="submit" class="wizard-nav-primary w-full" [disabled]="profileLoading()">
+        {{ profileLoading() ? 'Enregistrement…' : 'Enregistrer le pseudo' }}
+      </button>
+    </form>
+  </section>
+
+  <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6 mb-6">
+    <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">
+      Mot de passe
+    </h2>
+    <form class="flex flex-col gap-4" (ngSubmit)="savePassword()">
+      <app-password-field
+        label="Mot de passe actuel"
+        name="currentPassword"
+        [required]="true"
+        [(value)]="currentPassword"
+      />
+      <app-password-field
+        label="Nouveau mot de passe"
+        name="newPassword"
+        [required]="true"
+        [minlength]="8"
+        [(value)]="newPassword"
+      />
+      <app-password-field
+        label="Confirmer le nouveau mot de passe"
+        name="confirmPassword"
+        [required]="true"
+        [minlength]="8"
+        [(value)]="confirmPassword"
+      />
+      @if (passwordError()) {
+        <p class="text-sm text-red-400">{{ passwordError() }}</p>
+      }
+      @if (passwordMsg()) {
+        <p class="text-sm text-emerald-400">{{ passwordMsg() }}</p>
+      }
+      <button type="submit" class="wizard-nav-primary w-full" [disabled]="passwordLoading()">
+        {{ passwordLoading() ? 'Mise à jour…' : 'Changer le mot de passe' }}
+      </button>
+    </form>
+  </section>
+
+  @if (user() && !user()!.emailConfirmed) {
+    <section class="bg-amber-950/20 border border-amber-800/40 rounded-2xl p-6">
+      <h2 class="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-2">
+        Email non confirmé
+      </h2>
+      <p class="text-xs text-slate-400 mb-4">
+        Ton compte n'est pas encore activé. Renvoie le lien de confirmation.
+      </p>
+      <button
+        type="button"
+        class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-amber-950/40 border border-amber-700/50 text-amber-300 disabled:opacity-50"
+        [disabled]="confirmLoading()"
+        (click)="resendConfirmation()"
+      >
+        {{ confirmLoading() ? 'Envoi…' : 'Renvoyer la confirmation' }}
+      </button>
+      @if (confirmMsg()) {
+        <p class="text-sm text-emerald-400 mt-3">{{ confirmMsg() }}</p>
+      }
+      @if (confirmLink()) {
+        <a [href]="confirmLink()!" class="block text-xs text-amber-300 break-all mt-2 hover:underline">{{
+          confirmLink()
+        }}</a>
+      }
+    </section>
+  }
+</div>

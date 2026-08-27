@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-lezard-cendreux",
+  "name": "Lézard cendreux",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille TP, non aligné",
+  "armor_class": 15,
+  "armor_note": "armure naturelle",
+  "hit_points": "10 (3d4+3)",
+  "wound_threshold": 5,
+  "speed": "6 m, escalade 6 m",
+  "abilities": {
+    "str": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 6,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +2, Survie +2",
+  "senses": "vision dans le noir 9 m, perception des vibrations 18 m, Perception passive 12",
+  "languages": "—",
+  "challenge_rating": "1/8",
+  "xp": 25,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d6) dégâts perforants.\nIcon"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Icon"
+}

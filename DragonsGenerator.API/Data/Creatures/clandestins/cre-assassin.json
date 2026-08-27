@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-assassin",
+  "name": "Assassin",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement autre que bon au choix",
+  "armor_class": 15,
+  "armor_note": "armure de cuir cloutée",
+  "hit_points": "78 (12d8 + 24)",
+  "wound_threshold": 20,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": "Dex +6, Int +4",
+  "skills": "Acrobaties +6, Discrétion +9, Perception +4, Tromperie +3",
+  "senses": "Perception passive 14",
+  "languages": "argot des voleurs et deux au choix",
+  "challenge_rating": "8",
+  "xp": 3900,
+  "traits": [
+    {
+      "name": "Assassinat",
+      "description": "À son premier tour de jeu, l'assassin bénéficie d'un avantage aux jets d'attaque contre toute créature qui n'a pas encore joué un tour. Toute attaque réussie par l'assassin contre une cible surprise est considérée comme un coup critique."
+    },
+    {
+      "name": "Attaque sournoise",
+      "description": "Une fois par tour de jeu, l'assassin inflige 14 (4d6) dégâts supplémentaires quand il touche une cible avec une attaque d'arme s'il a bénéficié d'un avantage au jet d'attaque ou si la cible est située à 1,50 m ou moins d'un de ses alliés non neutralisés. L'aptitude ne s'applique pas si l'assassin a subi un désavantage au jet d'attaque."
+    },
+    {
+      "name": "Esquive totale",
+      "description": "Lorsqu'il est soumis à un effet qui lui donne droit à un jet de sauvegarde de Dextérité pour réduire les dégâts de moitié, l'assassin ne subit en fait aucun dégât en cas de réussite et seulement la moitié en cas d'échec."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "L'assassin effectue deux attaques d'épée courte."
+    },
+    {
+      "name": "Épée courte",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 6 (1d6 + 3) dégâts perforants, et la cible doit effectuer un JS Constitution DD 15. Elle subit 24 (7d6) dégâts de poison en cas de sauvegarde ratée, et la moitié en cas de réussite."
+    },
+    {
+      "name": "Arbalète légère",
+      "description": "Attaque d'arme à distance : +6 pour toucher, portée 24/96 m, une cible. Réussite : 7 (1d8 + 3) dégâts perforants, et la cible doit effectuer un JS Constitution DD 15. Elle subit 24 (7d6) dégâts de poison en cas de sauvegarde ratée, et la moitié en cas de réussite.\nrésistance extraordinaire de la part de la cible ou un empressement de la part du client pousseront l'assassin à faire le travail de ses propres mains, de préférence quand elle est affaiblie (ivre, désarmée, endormie, etc.). En cas de problème, une prompte retraite dans les ombres permet de fomenter une nouvelle ~~attaque plus efficace. La patience et la persévérance sont les~~ alliées de l'assassin.\nL'assassin peut disposer de compétences supplémentaires selon qu'il est, par exemple, membre d'une secte ou agent d'un royaume. Dans tous les cas, parvenir à un tel niveau d'excellence implique des années de pratique et de nombreux succès. Un tel tueur fait partie de l'élite des combattants, et si le meneur le souhaite, un équipement de meilleure qualité (comme une rapière, une arbalète lourde, un bouclier, une cuirasse ou même un objet magique) pourrait le rendre plus dangereux encore."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Le profil de l’assassin s’applique à tout expert dans l’usage de techniques lui permettant d’éliminer un adversaire en quelques instants. Une telle activité est extrêmement risquée : à la moindre erreur, l’assassin risque d’être tué, ou pire, capturé. Certains travaillent pour cela en équipe, bénéficiant du soutien ou des diversions de complices en cas de besoin ; d’autres ont placé leur destinée entre les mains d’un démon ou d’un diable pour les aider dans leur sinistre besogne. Roublard autodidacte ou élève d’un tueur, un assassin, même très expérimenté, privilégiera la simplicité dans la mesure du possible, mettant à profit ce qu’il sait des habitudes de la victime. Les méthodes pour se débarrasser de sa cible sont diverses, variant en subtilité et en ampleur : empoisonner son repas, saboter son embarcation en zone dangereuse, faire s’écrouler une statue sur lui, enfermer le malheureux dans un bâtiment et y mettre le feu, etc. Seuls une"
+}

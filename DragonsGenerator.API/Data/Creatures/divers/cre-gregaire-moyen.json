@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-gregaire-moyen",
+  "name": "Grégaire moyen",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille M, non aligné",
+  "armor_class": 13,
+  "armor_note": null,
+  "hit_points": "11 (2d8+2)",
+  "wound_threshold": 5,
+  "speed": "18 m",
+  "abilities": {
+    "str": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": "Dextérité +5",
+  "skills": "Discrétion +5, Perception +4",
+  "senses": "Perception passive 14",
+  "languages": "—",
+  "challenge_rating": "1/8",
+  "xp": 25,
+  "traits": [
+    {
+      "name": "Fuite agile",
+      "description": "À chacun de ses tours de jeu et au prix d'une action bonus, le moyen grégaire peut entreprendre l'action **Se dégager,** l'action **Esquiver** ou l'action **Foncer.**"
+    },
+    {
+      "name": "Ouïe fine et flair",
+      "description": "Le grégaire moyen bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'ouïe ou l'odorat."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Coup de boutoir",
+      "description": "Attaque d'arme de corps à corps : +2 pour toucher, allonge 1,50 m, une cible. Réussite : 3 (1d6) dégâts contondants."
+    },
+    {
+      "name": "278",
+      "description": ""
+    },
+    {
+      "name": "Saïga",
+      "description": ""
+    },
+    {
+      "name": "Hippotrague puce",
+      "description": ""
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Sceau de grégaire"
+}

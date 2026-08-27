@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-ankheg-cendreuse",
+  "name": "Ankheg cendreuse",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille G, non aligné",
+  "armor_class": 16,
+  "armor_note": "armure naturelle",
+  "hit_points": "60 (8d10 + 16)",
+  "wound_threshold": 15,
+  "speed": "9 m, fouissage 3 m",
+  "abilities": {
+    "str": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 6,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +3, Survie +3",
+  "senses": "vision dans le noir 18 m, perception des vibrations 18 m, Perception passive 13",
+  "languages": "phéromones et langage corporel",
+  "challenge_rating": "3",
+  "xp": 700,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 11 (2d6 + 4) dégâts tranchants plus 3 (1d6) dégâts d'acide. Si la cible est une créature de taille G ou inférieure, elle est **agrippée** (DD 14 pour s'extraire).\nTant que la lutte persiste, l'ankheg ne peut mordre que la créature agrippée et bénéficie d'un avantage aux jets d'attaque correspondants."
+    },
+    {
+      "name": "Jet d'acide (recharge 6)",
+      "description": "L'ankheg crache une ligne d'acide de 9 m de long et de 1,50 m de large, à condition qu'elle ne soit pas en train d'agripper une créature. Chaque créature prise dans la ligne doit effectuer un JS Dextérité DD 14 et subit 10 (3d6) dégâts d'acide en cas d'échec, la moitié en cas de réussite.\nLes ankhegs cendreuses sont les soldates et les chasseresses de la colonie. Elles sont chargées de la sécurité dans les tunnels ainsi que de l'approvisionnement en viande. De leur point de vue, bêtes, monstruosités et humanoïdes sont similaires. Si elles peuvent parfois chercher seules des proies, la véritable menace réside dans les assauts groupés, où elles attaquent à deux ou trois une cible de taille moyenne pour la neutraliser rapidement."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Ankheg cendreuse"
+}

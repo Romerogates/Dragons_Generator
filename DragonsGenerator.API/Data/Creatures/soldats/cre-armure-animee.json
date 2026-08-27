@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-armure-animee",
+  "name": "Armure animée",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Créature artificielle de taille M, non aligné",
+  "armor_class": 18,
+  "armor_note": "armure naturelle",
+  "hit_points": "33 (6d8 + 6)",
+  "wound_threshold": null,
+  "speed": "7,50 m",
+  "abilities": {
+    "str": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 1,
+      "modifier": "-5"
+    },
+    "wis": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "cha": {
+      "score": 1,
+      "modifier": "-5"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision aveugle 18 m (aucune vision au-delà de ce rayon), Perception passive 6",
+  "languages": "—",
+  "challenge_rating": "1",
+  "xp": 200,
+  "traits": [
+    {
+      "name": "Apparence trompeuse",
+      "description": "Tant que l'armure se tient immobile, elle est indiscernable d'une armure normale."
+    },
+    {
+      "name": "Sensibilité antimagique",
+      "description": "L'armure est **neutralisée** lorsqu'elle se trouve dans la zone d'un champ d'antimagie. Si elle est ciblée par dissipation de la magie, elle doit réussir un JS Constitution contre le DD de sauvegarde des sorts du lanceur sous peine d'être **inconsciente** pendant 1 minute."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "L'armure effectue deux attaques de coup."
+    },
+    {
+      "name": "Coup",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 5 (1d6 + 2) dégâts contondants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Ornant majestueusement les couloirs des châteaux, les armures animées, parfois accompagnées d’**armes animées**, attendent l’apparition d’une menace ou d’une anomalie pour agir conformément aux ordres d’élimination des intrus."
+}

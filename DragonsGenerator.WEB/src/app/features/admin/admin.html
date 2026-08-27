@@ -117,11 +117,24 @@
             <span class="text-[10px] text-slate-500">{{ t.userEmail }}</span>
           </div>
           <p class="text-xs text-slate-400 mt-2 whitespace-pre-wrap">{{ t.message }}</p>
+          @if (t.characterName) {
+            <p class="text-xs text-violet-300 mt-2">
+              Personnage : {{ t.characterName }}
+              <button
+                type="button"
+                class="ml-2 text-sky-400 hover:underline"
+                (click)="downloadCharacterJson(t)"
+              >
+                Télécharger JSON
+              </button>
+            </p>
+          }
           @if (t.attachmentUrl) {
             <a
               class="text-xs text-sky-400 hover:underline mt-2 inline-block"
-              [href]="t.attachmentUrl || '#'"
+              [href]="assetUrl(t.attachmentUrl)"
               target="_blank"
+              rel="noopener"
               >{{ t.attachmentOriginalName || 'Pièce jointe' }}</a
             >
           }

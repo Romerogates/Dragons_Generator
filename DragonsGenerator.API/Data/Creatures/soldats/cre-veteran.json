@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-veteran",
+  "name": "Vétéran",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 17,
+  "armor_note": "clibanion",
+  "hit_points": "58 (9d8 + 18)",
+  "wound_threshold": 15,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Athlétisme +5, Intimidation +2, Perception +3",
+  "senses": "Perception passive 13",
+  "languages": "trois au choix (dont généralement le commun)",
+  "challenge_rating": "3",
+  "xp": 700,
+  "traits": [
+    {
+      "name": "Vaillant",
+      "description": "Le vétéran bénéficie d'un avantage aux jets de sauvegarde contre l'état préjudiciable effrayé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le vétéran effectue deux attaques d'épée longue. S'il a dégainé une épée courte, il peut également porter une attaque avec cette arme."
+    },
+    {
+      "name": "Épée longue",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (1d8 + 3) dégâts tranchants, ou 8 (1d10 + 3) dégâts tranchants si utilisée à deux mains."
+    },
+    {
+      "name": "Épée courte",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 6 (1d6 + 3) dégâts perforants."
+    },
+    {
+      "name": "Arbalète lourde",
+      "description": "Attaque d'arme à distance : +3 pour toucher, portée 30/120 m, une cible. Réussite : 6 (1d10 + 1) dégâts perforants.\nHonoria est une des plus vieilles gardes de la vigence. Elle est en charge de la porte seconde qui mène du quartier d'Artifique à la terrasse du Palais. Elle a vu tellement de choses au cours de ses années de service qu'elle est un peu désabusée, et a développé une certaine réserve à l'égard des gens de pouvoir. Elle ne se laisse pas manipuler facilement, ni par les politiciens ni par le baratin des aventuriers. Courageuse, elle sait aussi quand appeler des renforts pour gérer un problème."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Le vétéran a pu apprendre au fil des années de nombreux métiers, que ce soit pour réparer son équipement lors de longues campagnes militaires ou bien parce que la vie au camp nécessitait un cuisinier. Ces savoir-faire hétéroclites prennent la forme de maîtrises d’outils parfois inattendues."
+}

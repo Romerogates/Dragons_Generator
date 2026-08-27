@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-gladiateur",
+  "name": "Gladiateur",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 16,
+  "armor_note": "armure de cuir cloutée, bouclier",
+  "hit_points": "112 (15d8 + 45)",
+  "wound_threshold": 28,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 15,
+      "modifier": "+2"
+    }
+  },
+  "saving_throws": "For +7, Dex +5, Con +6",
+  "skills": "Athlétisme +10, Intimidation +5",
+  "senses": "Perception passive 11",
+  "languages": "une au choix (généralement le commun)",
+  "challenge_rating": "5",
+  "xp": 1800,
+  "traits": [
+    {
+      "name": "Vaillant",
+      "description": "Le gladiateur bénéficie d'un avantage aux jets de sauvegarde contre l'état préjudiciable effrayé."
+    },
+    {
+      "name": "Brutal",
+      "description": "Quand le gladiateur touche sa cible avec une arme de corps à corps, il inflige un dé supplémentaire de dégâts (pris en compte dans l'attaque ci-après)."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le gladiateur effectue trois attaques de corps à corps ou deux attaques à distance."
+    },
+    {
+      "name": "Lance",
+      "description": "Attaque d'arme de corps à corps ou à distance : +7 pour toucher, allonge 1,50 m ou portée 6/18 m, une cible. Réussite : 11 (2d6 + 4) dégâts perforants, ou 13 (2d8 + 4) dégâts perforants si utilisée à deux mains dans le cadre d'une attaque de corps à corps."
+    },
+    {
+      "name": "Coup de bouclier",
+      "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 1,50 m, une créature. Réussite : 9 (2d4 + 4) dégâts contondants. Si la cible est une créature de taille M ou inférieure, elle doit réussir un JS Force DD 15 sous peine de se retrouver **à terre**."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Il est rare de voir des aldarons hors de leurs forêts. Ustaolë est l’une d’entre eux et pourtant, elle a rejoint la ville et vit de combats spectaculaires qui se tiennent pour le plaisir du public. Quand on voit cette elfe encore jeune, le mélange de calme, de ténèbres et d’orgueil interpelle. Qu’est-il arrivé pour qu’elle quitte sa communauté de la Taurëlma et se produise ici ? Il a fallu sans doute qu’elle déçoive et soit déçue. Les poètes lui prêtent volontiers une histoire d’amour tragique la contraignant à quitter ses bois et chercher à survivre. Ustaolë se contente de boire et ne leur répond pas."
+}

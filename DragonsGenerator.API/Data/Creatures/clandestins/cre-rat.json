@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-rat",
+  "name": "Rat",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Bête de taille TP, non aligné",
+  "armor_class": 10,
+  "armor_note": null,
+  "hit_points": "1 (1d4 - 1)",
+  "wound_threshold": null,
+  "speed": "6 m",
+  "abilities": {
+    "str": {
+      "score": 2,
+      "modifier": "-4"
+    },
+    "dex": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 9,
+      "modifier": "-1"
+    },
+    "int": {
+      "score": 2,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 4,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 9 m, Perception passive 10",
+  "languages": "—",
+  "challenge_rating": "0",
+  "xp": 10,
+  "traits": [
+    {
+      "name": "Flair",
+      "description": "Le rat bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'odorat."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +0 pour toucher, allonge 1,50 m, une cible. Réussite : 1 dégât perforant."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les rats sont des rongeurs extrêmement adaptables, qui vivent à proximité des communautés humanoïdes, attirés par les sources de nourriture, en particulier dans les greniers et les dépotoirs. Les puces de certaines sous-espèces de rat peuvent véhiculer des maladies aussi graves que la peste (cf. **Aventuriers**, chapitre **Santé : Maladies**). On raconte que le nombre de rats qui vivent dans les profondeurs de la Cité Franche serait largement supérieur à celui de tous les habitants humanoïdes de la surface."
+}

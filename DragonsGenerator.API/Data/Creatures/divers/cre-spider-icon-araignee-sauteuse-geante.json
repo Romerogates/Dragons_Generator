@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-spider-icon-araignee-sauteuse-geante",
+  "name": "Spider icon Araignée sauteuse géante",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille M, non aligné",
+  "armor_class": 14,
+  "armor_note": "armure naturelle",
+  "hit_points": "16 (3d8 + 3)",
+  "wound_threshold": 5,
+  "speed": "12 m, escalade 9 m",
+  "abilities": {
+    "str": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 4,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +7, Perception +5",
+  "senses": "perception des vibrations 6 m, vision dans le noir 18 m, Perception passive 15",
+  "languages": "—",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [
+    {
+      "name": "Pattes d'araignée",
+      "description": "L'araignée peut parcourir les parois les plus difficiles à escalader, y compris les plafonds, sans devoir effectuer de test de caractéristique."
+    },
+    {
+      "name": "Bondissement",
+      "description": "L'araignée sauteuse géante peut effectuer des sauts en longueur jusqu'à 12 m et des sauts en hauteur jusqu'à 6 m, que ce soit avec ou sans élan."
+    },
+    {
+      "name": "Bond offensif",
+      "description": "<u>Si l'araignée sauteuse géante se déplace d'au moins 6 m en ligne droite vers une créature et qu'elle la touche</u> avec une attaque de morsure au même tour de jeu, la cible doit réussir un JS Force DD 12 sous peine d'être agrippée (DD 12 pour s'extraire). Si la créature est agrippée, l'araignée sauteuse géante peut aussitôt effectuer une attaque de morsure contre elle au prix d'une action bonus."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une créature. Réussite : 5 (1d6 + 2) dégâts perforants, et la cible doit effectuer un JS Constitution DD 11. Elle subit 7 (2d6) dégâts de poison en cas de sauvegarde ratée et la moitié en cas de réussite. Si ces dégâts de poison font tomber la cible à 0 pv, celle-ci est en état stable mais se retrouve empoisonnée pendant 1 heure, même si elle récupère des pv. Elle reste également paralysée tant qu'elle est intoxiquée par ce venin.\n---"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

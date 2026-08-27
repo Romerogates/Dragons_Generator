@@ -34,9 +34,59 @@
     @apply px-5 py-2 bg-emerald-950/30 text-emerald-400 border border-emerald-800/50 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2;
   }
 
+  /* Species / class wizard carousel — centered snap, no page sideways shift */
+  .species-carousel {
+    @apply flex items-stretch gap-5 sm:gap-8 overflow-x-auto overflow-y-hidden scroll-smooth;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    /* Centre la 1re / dernière carte : demi-viewport − demi-carte */
+    padding-inline: max(0.75rem, calc(50% - clamp(7.5rem, 36vw, 10rem)));
+  }
+
+  .species-carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .species-carousel-card {
+    @apply shrink-0 snap-center;
+    width: clamp(15rem, 72vw, 20rem);
+    height: min(26.25rem, 58dvh);
+  }
+
+  @media (min-width: 640px) {
+    .species-carousel-card {
+      height: 27.5rem;
+    }
+  }
+
   /* Skip offscreen paint work for dense card grids */
   .perf-card {
     content-visibility: auto;
     contain-intrinsic-size: 220px;
+  }
+
+  /* Scrollable zones — scrollbar masquée sur PC, scroll conservé */
+  .custom-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Barre de scroll principale masquée sur PC (souris / trackpad) */
+@media (pointer: fine) {
+  html {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  html::-webkit-scrollbar {
+    display: none;
   }
 }

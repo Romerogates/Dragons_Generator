@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-ez-galwyn",
+  "name": "Ez’Galwyn",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Humanoïde (drow) de taille M, alignement loyal mauvais",
+  "armor_class": 17,
+  "armor_note": "cuirasse +1",
+  "hit_points": "100",
+  "wound_threshold": 25,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 9,
+      "modifier": "-1"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 18,
+      "modifier": "+4"
+    }
+  },
+  "saving_throws": "For + 7, Con + 5",
+  "skills": "Athlétisme + 7, Discrétion + 5, Intimidation + 10, Perception + 3, Tromperie +7",
+  "senses": "ibilité à la lumière du jour. Quand Dharka est exposée à la lumière du jour, elle subit un désavantage aux jets d'attaque ainsi qu'aux tests de Sagesse (Perception) basés sur la vue.",
+  "languages": "commun des profondeurs, elfique (classique et dialecte drow), et une langue de la surface",
+  "challenge_rating": "5",
+  "xp": 1800,
+  "traits": [
+    {
+      "name": "Élusif",
+      "description": "Au prix d'une action bonus, Dharka peut entreprendre l'action **Foncer**, **Se cacher** ou **Se dégager**."
+    },
+    {
+      "name": "Héritage féerique",
+      "description": "Dharka bénéficie d'un avantage aux jets de sauvegarde contre l'état préjudiciable charmé, et aucune magie ne peut l'endormir."
+    },
+    {
+      "name": "Sensibilité à la lumière du jour",
+      "description": "Quand Dharka est exposée à la lumière du jour, elle subit un désavantage aux jets d'attaque ainsi qu'aux tests de Sagesse (Perception) basés sur la vue."
+    },
+    {
+      "name": "Sorts innés",
+      "description": "La caractéristique magique de Dharka est le Charisme (DD de sauvegarde des sorts : 15). Dharka peut lancer les sorts suivants sans composantes matérielles :\nÀ volonté : lumières dansantes\n1/jour chacun : lueurs féeriques, ténèbres"
+    }
+  ],
+  "actions": [],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

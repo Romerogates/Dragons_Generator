@@ -31,10 +31,18 @@ coverage/
 .env
 .env.local
 
+# SQLite runtime (prod : volume Docker)
+*.db
+*.db-shm
+*.db-wal
+
 # Local junk / previews
 _pdf_preview/
 *.zip
 deploy_keys/
+tools/__pycache__/
+tools/.bestiary_pdf_text.txt
+source/*.pdf
 
 # Yarn / NPM logs
 yarn-debug.log*

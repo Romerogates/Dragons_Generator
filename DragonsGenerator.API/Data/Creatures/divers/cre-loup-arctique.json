@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-loup-arctique",
+  "name": "Loup arctique",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Élémentaire (froid) de taille G, chaotique (au choix)",
+  "armor_class": 13,
+  "armor_note": "armure naturelle",
+  "hit_points": "75 (10d10 + 20)",
+  "wound_threshold": 19,
+  "speed": "15 m",
+  "abilities": {
+    "str": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 7,
+      "modifier": "-2"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +3, Perception +5",
+  "senses": "Perception passive 15",
+  "languages": "—",
+  "challenge_rating": "3",
+  "xp": 700,
+  "traits": [
+    {
+      "name": "Ouïe fine et flair",
+      "description": "Le loup arctique bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'ouïe ou l'odorat."
+    },
+    {
+      "name": "Tactique de meute",
+      "description": "Le loup arctique bénéficie d'un avantage aux jets d'attaque contre les créatures situées à 1,50 m ou moins d'un de ses alliés qui n'est pas neutralisé."
+    },
+    {
+      "name": "Camouflage hivernal",
+      "description": "Le loup arctique bénéficie d'un avantage aux tests de Dextérité (Discrétion) effectués en terrain neigeux."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 11 (2d6 + 4) dégâts perforants. Si la cible est une créature, elle doit réussir un JS Force DD 14 sous peine de se retrouver **à terre**."
+    },
+    {
+      "name": "Souffle de givre (recharge 5–6)",
+      "description": "Le loup exhale une rafale de vent glacial qui prend la forme d'un cône de 4,50 m. Toute créature prise dans la zone doit effectuer un JS Dextérité DD 12. Elle subit 18 (4d8) dégâts de froid en cas de sauvegarde ratée et la moitié en cas de réussite."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "icon"
+}

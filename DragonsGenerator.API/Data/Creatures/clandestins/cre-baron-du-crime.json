@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-baron-du-crime",
+  "name": "Baron du crime",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 16,
+  "armor_note": "cuirasse",
+  "hit_points": "75 (10d8 + 30)",
+  "wound_threshold": 19,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "wis": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "cha": {
+      "score": 18,
+      "modifier": "+4"
+    }
+  },
+  "saving_throws": "Con +5, Int +6, Cha +7",
+  "skills": "Discrétion +5, Escamotage +5, Intimidation +10, Intuition +9, Investigation +6, Perception +9, Persuasion +7, Tromperie +10",
+  "senses": "Perception passive 19",
+  "languages": "argot des voleurs et quatre au choix",
+  "challenge_rating": "5",
+  "xp": 1800,
+  "traits": [
+    {
+      "name": "Attaque sournoise",
+      "description": "Une fois par tour de jeu, le baron du crime inflige 10 (3d6) dégâts supplémentaires quand il touche une cible avec une attaque d'arme s'il a bénéficié d'un avantage au jet d'attaque ou si la cible est située à 1,50 m ou moins d'un de ses alliés non neutralisés. L'aptitude ne s'applique pas si le baron du crime a subi un désavantage au jet d'attaque."
+    },
+    {
+      "name": "Roublardise",
+      "description": "À chacun de ses tours de jeu, le baron du crime peut entreprendre l'action **Foncer**, **Se cacher** ou **Se dégager** au prix d'une action bonus."
+    },
+    {
+      "name": "Sens du danger",
+      "description": "Lorsqu'il s'agit de déterminer son initiative, le baron du crime peut utiliser son modificateur aux tests de Sagesse (Intuition) plutôt que son modificateur de Dextérité."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le baron du crime effectue deux attaques de corps à corps."
+    },
+    {
+      "name": "Rapière",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 6 (1d8 + 2) dégâts perforants, et la cible doit effectuer un JS Constitution DD 14. Elle subit 14 (4d6) dégâts de poison en cas de sauvegarde ratée, et la moitié en cas de réussite."
+    },
+    {
+      "name": "Arbalète de poing",
+      "description": "Attaque d'arme à distance : +5 pour toucher, portée 9/36 m, une cible. Réussite : 5 (1d6 + 2) dégâts perforants, et la cible doit effectuer un JS Constitution DD 14. Elle subit 14 (4d6) dégâts de poison en cas de sauvegarde ratée, et la moitié en cas de réussite."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Un baron du crime a plusieurs **chefs de bande** à ses ordres, et s’entoure de **bandits** et de **brutes** aptes à se charger de ses basses besognes. Les plus puissants barons du crime ont un voire plusieurs **assassins** à leur service, pour les cas les plus délicats ou pour leur servir de garde du corps."
+}

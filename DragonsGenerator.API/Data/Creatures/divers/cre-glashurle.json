@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-glashurle",
+  "name": "Glashurle",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Mort-vivant de taille M, chaotique mauvais",
+  "armor_class": 14,
+  "armor_note": null,
+  "hit_points": "90 (20d8)",
+  "wound_threshold": null,
+  "speed": "0 m, vol 12 m (stationnaire)",
+  "abilities": {
+    "str": {
+      "score": 1,
+      "modifier": "-5"
+    },
+    "dex": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "wis": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 18,
+      "modifier": "+4"
+    }
+  },
+  "saving_throws": "Int +6, Sag +6, Cha +8",
+  "skills": "Intuition +6, Religion +6",
+  "senses": "ibilité à la lumière du soleil. Quand le glashurle est exposé à la lumière du soleil, il subit un désavantage aux jets d'attaque ainsi qu'aux tests de Sagesse (Perception) basés sur la vue.",
+  "languages": "céleste, langues parlées de son vivant",
+  "challenge_rating": "9",
+  "xp": 5000,
+  "traits": [
+    {
+      "name": "Damnation à la banquise",
+      "description": "Une créature humanoïde tuée par le glashurle devient un glaçanglot 1d4 heures plus tard et ne peut être ramenée à la vie sans l'accord de Givreuse ou d'un céleste à son service."
+    },
+    {
+      "name": "Déplacement intangible",
+      "description": "Le glashurle est capable de se déplacer au travers d'autres créatures ou d'objets comme s'il s'agissait de terrain difficile. Il subit 5 (1d10) dégâts de force s'il termine son tour de jeu à l'intérieur d'un objet."
+    },
+    {
+      "name": "Flou",
+      "description": "La silhouette du glashurle est floue, comme instable et vacillante. Tout jet d'attaque contre le glashurle se fait avec un désavantage. Les créatures dépourvues de vision (dotées de vision aveugle par exemple) ou bénéficiant des effets de vision lucide ne sont pas affectées."
+    },
+    {
+      "name": "Sensibilité à la lumière du soleil",
+      "description": "Quand le glashurle est exposé à la lumière du soleil, il subit un désavantage aux jets d'attaque ainsi qu'aux tests de Sagesse (Perception) basés sur la vue."
+    },
+    {
+      "name": "Sorts innés",
+      "description": "La caractéristique magique du glashurle est le Charisme (DD de sauvegarde des sorts : 16). Le glashurle peut lancer les sorts suivants sans composantes matérielles :\n1/jour chacun : confusion, terreur"
+    }
+  ],
+  "actions": [
+    {
+      "name": "Désespoir glacé",
+      "description": "Attaque d'arme au corps à corps : +8 pour toucher, allonge 1,50 m, une créature. Réussite : 27 (6d8) dégâts de froid et 13 (3d8) dégâts psychiques. La cible doit en outre réussir un JS Sagesse DD 16 sous peine d'être **paralysée** pendant 1 minute. Une créature paralysée peut réitérer le jet de sauvegarde à la fin de chacun de ses tours de jeu et met un terme à l'effet sur elle-même en cas de réussite."
+    },
+    {
+      "name": "Appel de glaçanglot (recharge 6)",
+      "description": "Le glashurle fait appel à un **glaçanglot** qui apparaît dans un rayon de 9 m et obéit à ses ordres."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Le glashurle est un puissant glas des limbes chargé de guider les glaçanglots. Il est l’un d’eux et souffre de la même damnation à la banquise, mais il jouit d’une puissance supérieure et d’une identité plus marquée. Certains conservent ou développent une personnalité et peuvent être ouverts au dialogue. Cette personnalité se reflète dans leur forme et dans leurs traits, plus dessinés et humanoïdes que les vagues formes des glaçanglots."
+}

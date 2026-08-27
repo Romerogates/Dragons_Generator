@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-jeune-schatz",
+  "name": "Jeune schatz",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Élémentaire (terre) de taille TG, neutre",
+  "armor_class": 18,
+  "armor_note": "armure naturelle",
+  "hit_points": "125 (10d12 + 60)",
+  "wound_threshold": 32,
+  "speed": "15 m, fouissage 12 m",
+  "abilities": {
+    "str": {
+      "score": 21,
+      "modifier": "+5"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 22,
+      "modifier": "+6"
+    },
+    "int": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "wis": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "cha": {
+      "score": 13,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": "Con +9, Sag +6",
+  "skills": "Histoire +5, Nature +5, Perception +6, Religion +5",
+  "senses": "vision aveugle 12 m, vision dans le noir 24 m, Perception passive 16",
+  "languages": "originel",
+  "challenge_rating": "7",
+  "xp": 2900,
+  "traits": [
+    {
+      "name": "Fouisseur",
+      "description": "Le jeune schatz peut se déplacer au travers de la roche solide à la moitié de sa vitesse de fouissage et laisse un tunnel de 1,50 m de diamètre derrière lui."
+    },
+    {
+      "name": "Sens de la pierre",
+      "description": "Le jeune schatz a une connaissance intuitive de toute chose au contact de la pierre dans un rayon de 90 m. Il en connaît le type et l'emplacement, mais pas l'identité ou l'apparence précise."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le jeune schatz effectue deux attaques : une de morsure et une de queue."
+    },
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +8 pour toucher, allonge 3 m, une créature. Réussite : 15 (3d6 + 5) dégâts perforants, et la cible doit effectuer un JS Constitution DD 17 contre la **pétrification** magique. En cas d'échec, la créature commence à se **pétrifier** et est **entravée**. Elle doit réitérer le jet de sauvegarde à la fin de son tour de jeu suivant. En cas d'échec, la créature est **pétrifiée** jusqu'à être libérée par le sort restauration suprême ou autre effet magique similaire."
+    },
+    {
+      "name": "Queue",
+      "description": "Attaque d'arme de corps à corps : +8 pour toucher, allonge 4,50 m, une cible. Réussite : 14 (2d8 + 5) dégâts contondants. Si la cible est une créature, elle doit réussir un JS Force DD 16 sous peine d'être repoussée jusqu'à 3 m et de se retrouver **à terre**.\nMalgré leur nature élémentaire, les schatz ne naissent pas entièrement formés. Ils prennent existence au sein des entrailles d'Eana, et connaissent ensuite une croissance lente qui se mesure en décennies. Cependant, même un jeune schatz reste une créature massive et redoutable. Comparés à leurs aînés, ils maîtrisent moins leurs pouvoirs, ne parlent pas de langue humanoïde et sont moins au fait des coutumes civilisées, ce qui les rend plus sauvages et imprévisibles. Ils sont plus curieux et moins sédentaires, et leurs vagabondages peuvent les confronter à des problèmes. Bien des schatz immatures ont connu une fin prématurée, que ce soit en s'attaquant à des ravageurs plus forts qu'eux, en étant pris pour de simples monstruosités et abattus, ou encore en étant traqués par des chasseurs de trésors avides.\nSchatz"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Jeune schatz"
+}

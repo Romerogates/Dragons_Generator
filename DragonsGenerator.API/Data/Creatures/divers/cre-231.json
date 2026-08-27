@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-231",
+  "name": "231",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 16,
+  "armor_note": "bouclier et armure de peau",
+  "hit_points": "99 (18d8+18)",
+  "wound_threshold": 25,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "cha": {
+      "score": 12,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": "Int +4, Sag +7",
+  "skills": "Intuition +7, Médecine +7, Nature +4",
+  "senses": "Perception passive 14",
+  "languages": "commun, druidique, sylvestre, originel",
+  "challenge_rating": "8",
+  "xp": 3900,
+  "traits": [
+    {
+      "name": "Esprit solide",
+      "description": "Le haut chamane bénéficie d’un avantage aux jets de sauvegarde visant à résister à la folie, aux états charmé et effrayé, et à tout effet menaçant de dominer ou posséder son esprit, ou d’y semer le trouble (comme le sort confusion)."
+    },
+    {
+      "name": "Change-forme",
+      "description": "Au prix d’une action, le haut chamane se métamorphose magiquement en son animal totem (une bête de FP 3 ou inférieur), ou recouvre sa véritable forme. Il la retrouve aussi s’il tombe à 0 pv. L’équipement qu’il porte ou transporte est absorbé ou porté lui aussi par la nouvelle forme (à sa convenance). Sous sa nouvelle forme, le haut chamane conserve son alignement, ses pv, ses dés de vie, sa faculté de parole, ses maîtrises, ses valeurs d’Intelligence, de Sagesse et de Charisme, ainsi que sa capacité à utiliser cette aptitude. En dehors de ces éléments, ses caractéristiques et capacités sont remplacées par celles de sa nouvelle forme."
+    },
+    {
+      "name": "Change-forme",
+      "description": "Au prix d’une action, le haut chamane se métamorphose magiquement en son animal totem (une bête de FP 3 ou inférieur), ou recouvre sa véritable forme. Il la retrouve aussi s’il tombe à 0 pv. L’équipement qu’il porte ou transporte est absorbé ou porté lui aussi par la nouvelle forme (à sa convenance). Sous sa nouvelle forme, le haut chamane conserve son alignement, ses pv, ses dés de vie, sa faculté de parole, ses maîtrises, ses valeurs d’Intelligence, de Sagesse et de Charisme, ainsi que sa capacité à utiliser cette aptitude. En dehors de ces éléments, ses caractéristiques et capacités sont remplacées par celles de sa nouvelle forme."
+    },
+    {
+      "name": "Sorts mineurs",
+      "description": "(à volonté) : art druidique, assistance divine, flammes, gourdin magique"
+    },
+    {
+      "name": "1ᵉʳ niveau",
+      "description": "(4 emplacements) : enchevêtrement, soins, vague de tonnerre"
+    },
+    {
+      "name": "2ᵉ niveau",
+      "description": "(3 emplacements) : bourrasque, restauration partielle, sphère de feu"
+    },
+    {
+      "name": "3ᵉ niveau",
+      "description": "(3 emplacements) : dissipation de la magie, protection contre l’énergie, régression sauvage"
+    },
+    {
+      "name": "4ᵉ niveau",
+      "description": "(3 emplacements) : invocation de fées mineures, métamorphose, peau de pierre"
+    },
+    {
+      "name": "5ᵉ niveau",
+      "description": "(2 emplacements) : restauration suprême, voyage par les arbres"
+    },
+    {
+      "name": "6ᵉ niveau",
+      "description": "(1 emplacement) : rayon de soleil"
+    }
+  ],
+  "actions": [
+    {
+      "name": "Bâton",
+      "description": "Attaque d’arme de corps à corps : +3 pour toucher (+7 pour toucher avec gourdin magique), allonge 1,50 m, une cible. Réussite : 3 (1d6) dégâts contondants, 4 (1d8) dégâts contondants si utilisé à deux mains, ou 8 (1d8 + 4) dégâts contondants avec gourdin magique.\n232"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

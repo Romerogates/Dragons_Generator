@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-vautour",
+  "name": "Vautour",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille M, non aligné",
+  "armor_class": 11,
+  "armor_note": null,
+  "hit_points": "6 (1d8 + 2)",
+  "wound_threshold": null,
+  "speed": "3 m, vol 15 m",
+  "abilities": {
+    "str": {
+      "score": 7,
+      "modifier": "-2"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 5,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 6,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +3",
+  "senses": "Perception passive 13",
+  "languages": "—",
+  "challenge_rating": "0",
+  "xp": 10,
+  "traits": [
+    {
+      "name": "Vue perçante et flair",
+      "description": "Le vautour bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir la vue ou l'odorat."
+    },
+    {
+      "name": "Tactique de meute",
+      "description": "Le vautour bénéficie d'un avantage aux jets d'attaque contre les créatures situées à 1,50 m ou moins d'un de ses alliés qui n'est pas neutralisé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Bec",
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 1,50 m, une cible. Réussite : 3 (1d4 + 1) dégâts perforants.\nCYETYNTATOY"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Vautour"
+}

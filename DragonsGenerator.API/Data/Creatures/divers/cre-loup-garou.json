@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-loup-garou",
+  "name": "Loup-garou",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (humain, métamorphe) de taille M, chaotique mauvais",
+  "armor_class": 10,
+  "armor_note": null,
+  "hit_points": "58 (9d8 + 18)",
+  "wound_threshold": 15,
+  "speed": "9 m (12 m sous forme animale)",
+  "abilities": {
+    "str": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +2, Perception +4",
+  "senses": "vision dans le noir 18 m, Perception passive 14",
+  "languages": "commun (ne peut pas parler sous forme de loup)",
+  "challenge_rating": "3",
+  "xp": 700,
+  "traits": [
+    {
+      "name": "Métamorphe",
+      "description": "Le loup-garou peut utiliser son action pour se métamorphoser en hybride de loup humanoïde ou en loup, ou pour recouvrer sa véritable forme, qui est humanoïde. Son profil est le même sous chaque forme, exception faite de la CA. L'équipement qu'il porte ou transporte n'est pas transformé. Enfin, il retrouve sa véritable forme s'il tombe à 0 pv."
+    },
+    {
+      "name": "Ouïe fine et flair",
+      "description": "Le loup-garou bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'ouïe et l'odorat."
+    },
+    {
+      "name": "Régénération",
+      "description": "Le loup-garou récupère 5 pv au début de son tour de jeu s'il lui reste au moins 1 pv. S'il subit des dégâts infligés par une arme en argent, ce trait ne fonctionne pas au début de son tour de jeu suivant."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples (forme hybride uniquement)",
+      "description": "Le loup-garou effectue deux attaques : une de morsure, et une de griffes ou de lance."
+    },
+    {
+      "name": "Morsure (forme de loup ou hybride uniquement)",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 6 (1d8 + 2) dégâts perforants. Si la cible est humanoïde, elle doit réussir un JS Constitution (ou Charisme, au choix) DD 12 sous peine de contracter la malédiction de la lycanthropie du loup-garou."
+    },
+    {
+      "name": "Griffes (forme hybride uniquement)",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une créature. Réussite : 7 (2d4 + 2) dégâts tranchants."
+    },
+    {
+      "name": "Lance (forme humanoïde ou hybride uniquement)",
+      "description": "Attaque d'arme de corps à corps ou à distance : +4 pour toucher, allonge 1,50 m ou portée 6/18 m, une créature. Réussite : 5 (1d6 + 2) dégâts perforants, ou 6 (1d8 + 2) dégâts perforants si utilisée à deux mains dans le cadre d'une attaque de corps à corps.\nBerserker loup-garou"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Un **humanoïde** peut devenir un loup-garou. On applique les modifications suivantes au profil :"
+}

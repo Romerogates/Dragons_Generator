@@ -103,7 +103,24 @@ public class AdminUpdateUserEndpoint(AppDbContext db) : Endpoint<AdminUpdateUser
             user.Email = email;
         }
         if (req.DisplayName is not null)
-            user.DisplayName = req.DisplayName.Trim();
+        {
+            if (!AuthHelpers.TryNormalizeDisplayName(req.DisplayName, out var adminName, out var adminNameError))
+            {
+                AddError(adminNameError!);
+                await Send.ErrorsAsync(cancellation: ct);
+                return;
+            }
+            if (
+                !string.Equals(user.DisplayName, adminName, StringComparison.OrdinalIgnoreCase)
+                && await AuthHelpers.IsDisplayNameTakenAsync(db, adminName, user.Id, ct)
+            )
+            {
+                AddError("Ce pseudo est déjà pris.");
+                await Send.ErrorsAsync(cancellation: ct);
+                return;
+            }
+            user.DisplayName = adminName;
+        }
         if (!string.IsNullOrWhiteSpace(req.Role) &&
             (req.Role == AppRoles.Admin || req.Role == AppRoles.User))
             user.Role = req.Role;

@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-adorateur",
+  "name": "Adorateur",
+  "category": "croyants",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": null,
+  "type": "Humanoïde (espèce au choix) de taille M, alignement autre que bon au choix",
+  "armor_class": 12,
+  "armor_note": "armure de cuir",
+  "hit_points": "9 (2d8)",
+  "wound_threshold": 4,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 12,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Religion +2, Tromperie +3",
+  "senses": "Perception passive 10",
+  "languages": "deux au choix (généralement le commun et une langue reflétant son affiliation religieuse)",
+  "challenge_rating": "1/8",
+  "xp": 25,
+  "traits": [
+    {
+      "name": "Sombre ferveur",
+      "description": "L'adorateur bénéficie d'un avantage aux jets de sauvegarde contre les états préjudiciables charmé et effrayé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Cimeterre",
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 1,50 m, une créature. Réussite : 4 (1d6 + 1) dégâts tranchants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Le profil de l’adorateur se prête à tout individu fanatisé agissant pour la plus grande gloire d’un suzerain maléfique, prince démon ou hospodar. Il joue parfois les espions infiltrés dans un clergé. Certains sont d’ailleurs d’anciens **acolytes** voués aux forces du Mal après avoir perdu la foi, suivant par exemple le motif littéraire du moine perverti. Toutefois, ce profil de PNJ peut aussi se rencontrer dans des religions établies, représentant alors la frange intégriste du culte. Manquant d’envergure, l’adorateur sera typiquement le serviteur zélé d’un **fanatique** qui lui montre la voie à suivre."
+}

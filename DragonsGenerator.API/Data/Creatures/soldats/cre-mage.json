@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-mage",
+  "name": "Mage",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 12,
+  "armor_note": "15 avec armure de mage",
+  "hit_points": "40 (9d8)",
+  "wound_threshold": 10,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 9,
+      "modifier": "-1"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 11,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": "Int +6, Sag +4",
+  "skills": "Arcanes +6, Histoire +6",
+  "senses": "Perception passive 11",
+  "languages": "quatre au choix",
+  "challenge_rating": "6",
+  "xp": 2300,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Dague",
+      "description": "Attaque d'arme de corps à corps ou à distance : +5 pour toucher, allonge 1,50 m ou portée 6/18 m, une cible. Réussite : 4 (1d4 + 2) dégâts perforants.\nDésiré Saphirin est la preuve vivante que l'Éveil n'implique pas la confiance en soi. Cet homme est timide, excessivement modeste, respectueux et suit scrupuleusement les règles de politesse. En dépit de son talent pour la magie, c'est un aventurier de bureau, qui a passé plus de temps à rêver d'horizons lointains qu'à explorer des contrées exotiques. Comme il n'ose jamais s'imposer, ses projets traînent dans les tiroirs de l'Académie et leur financement tarde. Son épouse l'exhorte à s'affirmer, en vain. Peut-être un jour, sur un malentendu ou des suites d'un accident, se retrouvera-t-il embarqué – littéralement – à l'autre bout du monde pour une expédition désirée autant que crainte ?"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

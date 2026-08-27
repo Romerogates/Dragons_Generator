@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-belette",
+  "name": "Belette",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille TP, non aligné",
+  "armor_class": 13,
+  "armor_note": null,
+  "hit_points": "1 (1d4 - 1)",
+  "wound_threshold": null,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 8,
+      "modifier": "-1"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 3,
+      "modifier": "-4"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +5, Perception +3",
+  "senses": "Perception passive 13",
+  "languages": "—",
+  "challenge_rating": "0",
+  "xp": 10,
+  "traits": [
+    {
+      "name": "Ouïe fine et flair",
+      "description": "La belette bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'ouïe ou l'odorat."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 1 dégât perforant."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les caractéristiques de rongeurs végétariens de taille TP et P peuvent être dérivées de celles des mustélidés. Les caractéristiques d’une marmotte, par exemple, ne seront guère différentes de celles d’un blaireau."
+}

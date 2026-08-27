@@ -182,33 +182,49 @@
                     }
                   </div>
 
+                  <div
+                    class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[10px] text-slate-400 font-medium tracking-wide"
+                  >
+                    <span title="Temps d'incantation" class="flex items-center gap-1">
+                      <iconify-icon icon="fluent-emoji:hourglass-done"></iconify-icon>
+                      {{ castTimeLabel(spell) }}
+                    </span>
+                    <span title="Portée" class="flex items-center gap-1">
+                      <iconify-icon icon="fluent-emoji:straight-ruler"></iconify-icon>
+                      {{ rangeLabel(spell) }}
+                    </span>
+                    <span title="Composantes" class="flex items-center gap-1">
+                      <iconify-icon icon="fluent-emoji:test-tube"></iconify-icon>
+                      {{ componentsLabel(spell, isExpanded(spell.id)) }}
+                    </span>
+                    <span title="Durée" class="flex items-center gap-1">
+                      <iconify-icon icon="fluent-emoji:stopwatch"></iconify-icon>
+                      {{ durationLabel(spell) }}
+                    </span>
+                  </div>
+
+                  <p
+                    class="mt-2 text-[11px] text-slate-300 leading-relaxed text-justify"
+                    [class.line-clamp-4]="!isExpanded(spell.id)"
+                  >
+                    {{ spell.description }}
+                  </p>
+
                   @if (isExpanded(spell.id)) {
                     <div
-                      class="mt-4 pt-3 border-t border-slate-800/80 flex flex-col gap-3 animate-[fadeIn_0.2s_ease]"
+                      class="mt-3 pt-3 border-t border-slate-800/80 flex flex-col gap-2 animate-[fadeIn_0.2s_ease]"
                     >
-                      <div
-                        class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] text-slate-400 font-medium tracking-wide"
-                      >
-                        <span title="Temps d'incantation" class="flex items-center gap-1"
-                          ><iconify-icon icon="fluent-emoji:hourglass-done"></iconify-icon>
-                          {{ castTimeLabel(spell) }}</span
-                        >
-                        <span title="Portée" class="flex items-center gap-1"
-                          ><iconify-icon icon="fluent-emoji:straight-ruler"></iconify-icon>
-                          {{ rangeLabel(spell) }}</span
-                        >
-                        <span title="Composantes" class="flex items-center gap-1"
-                          ><iconify-icon icon="fluent-emoji:test-tube"></iconify-icon>
-                          {{ componentsLabel(spell) }}</span
-                        >
-                        <span title="Durée" class="flex items-center gap-1"
-                          ><iconify-icon icon="fluent-emoji:stopwatch"></iconify-icon>
-                          {{ durationLabel(spell) }}</span
-                        >
-                      </div>
-                      <p class="text-[11px] text-slate-300 leading-relaxed text-justify mt-1">
-                        {{ spell.description }}
-                      </p>
+                      @if (spell.modularOptions?.length) {
+                        @for (opt of spell.modularOptions; track opt.name) {
+                          <div class="bg-slate-900/50 p-2 rounded border border-slate-800">
+                            <span
+                              class="text-[9px] font-black text-fuchsia-400 uppercase tracking-widest block mb-1"
+                              >{{ opt.name }}</span
+                            >
+                            <p class="text-[10px] text-slate-400 leading-relaxed">{{ opt.description }}</p>
+                          </div>
+                        }
+                      }
                     </div>
                   }
                 </div>
@@ -322,16 +338,17 @@
                     @for (spell of spellsForArcanum(lvl); track spell.id) {
                       <button
                         type="button"
-                        class="text-left px-3 py-2 rounded-lg border text-xs transition-colors"
+                        class="text-left px-3 py-2.5 rounded-lg border text-xs transition-colors"
                         [class.border-violet-400]="arcanumPicks()[lvl] === spell.id"
                         [class.bg-violet-950]="arcanumPicks()[lvl] === spell.id"
                         [class.border-slate-700]="arcanumPicks()[lvl] !== spell.id"
                         (click)="pickArcanum(lvl, spell.id)"
                       >
                         <div class="font-bold text-amber-400">{{ spell.name }}</div>
-                        <div class="text-[10px] text-slate-400 line-clamp-2 mt-0.5">
-                          {{ spell.school }} · {{ spell.description }}
-                        </div>
+                        <div class="text-[10px] text-slate-400 mt-1">{{ statsLine(spell) }}</div>
+                        <p class="text-[10px] text-slate-500 line-clamp-2 mt-1 leading-relaxed">
+                          {{ spell.description }}
+                        </p>
                       </button>
                     } @empty {
                       <p class="text-xs text-slate-500 col-span-2 px-2 py-4 text-center">
@@ -359,6 +376,7 @@
             @for (spell of domainSpells(); track spell.id) {
               <span
                 class="px-3 py-1.5 rounded-full text-xs font-bold border border-amber-800/50 bg-amber-950/30 text-amber-300"
+                [title]="statsLine(spell)"
               >
                 {{ spell.name }}
               </span>
@@ -482,41 +500,61 @@
                       }
                     </div>
 
+                    <div
+                      class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[10px] text-slate-400 font-medium tracking-wide"
+                    >
+                      <span title="Temps d'incantation" class="flex items-center gap-1">
+                        <iconify-icon icon="fluent-emoji:hourglass-done"></iconify-icon>
+                        {{ castTimeLabel(spell) }}
+                      </span>
+                      <span title="Portée" class="flex items-center gap-1">
+                        <iconify-icon icon="fluent-emoji:straight-ruler"></iconify-icon>
+                        {{ rangeLabel(spell) }}
+                      </span>
+                      <span title="Composantes" class="flex items-center gap-1">
+                        <iconify-icon icon="fluent-emoji:test-tube"></iconify-icon>
+                        {{ componentsLabel(spell, isExpanded(spell.id)) }}
+                      </span>
+                      <span title="Durée" class="flex items-center gap-1">
+                        <iconify-icon icon="fluent-emoji:stopwatch"></iconify-icon>
+                        {{ durationLabel(spell) }}
+                      </span>
+                    </div>
+
+                    <p
+                      class="mt-2 text-[11px] text-slate-300 leading-relaxed text-justify"
+                      [class.line-clamp-4]="!isExpanded(spell.id)"
+                    >
+                      {{ spell.description }}
+                    </p>
+
                     @if (isExpanded(spell.id)) {
                       <div
-                        class="mt-4 pt-3 border-t border-slate-800/80 flex flex-col gap-3 animate-[fadeIn_0.2s_ease]"
+                        class="mt-3 pt-3 border-t border-slate-800/80 flex flex-col gap-2 animate-[fadeIn_0.2s_ease]"
                       >
-                        <div
-                          class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] text-slate-400 font-medium tracking-wide"
-                        >
-                          <span title="Temps d'incantation" class="flex items-center gap-1"
-                            ><iconify-icon icon="fluent-emoji:hourglass-done"></iconify-icon>
-                            {{ castTimeLabel(spell) }}</span
-                          >
-                          <span title="Portée" class="flex items-center gap-1"
-                            ><iconify-icon icon="fluent-emoji:straight-ruler"></iconify-icon>
-                            {{ rangeLabel(spell) }}</span
-                          >
-                          <span title="Composantes" class="flex items-center gap-1"
-                            ><iconify-icon icon="fluent-emoji:test-tube"></iconify-icon>
-                            {{ componentsLabel(spell) }}</span
-                          >
-                          <span title="Durée" class="flex items-center gap-1"
-                            ><iconify-icon icon="fluent-emoji:stopwatch"></iconify-icon>
-                            {{ durationLabel(spell) }}</span
-                          >
-                        </div>
-                        <p class="text-[11px] text-slate-300 leading-relaxed text-justify mt-1">
-                          {{ spell.description }}
-                        </p>
                         @if (spell.higherLevels) {
                           <div class="bg-slate-900/50 p-2 rounded border border-slate-800">
                             <span
                               class="text-[9px] font-black text-amber-500 uppercase tracking-widest block mb-1"
                               >À plus haut niveau</span
                             >
-                            <p class="text-[11px] text-slate-400">{{ spell.higherLevels }}</p>
+                            <p class="text-[11px] text-slate-400 leading-relaxed">
+                              {{ spell.higherLevels }}
+                            </p>
                           </div>
+                        }
+                        @if (spell.modularOptions?.length) {
+                          @for (opt of spell.modularOptions; track opt.name) {
+                            <div class="bg-slate-900/50 p-2 rounded border border-slate-800">
+                              <span
+                                class="text-[9px] font-black text-fuchsia-400 uppercase tracking-widest block mb-1"
+                                >{{ opt.name }}</span
+                              >
+                              <p class="text-[10px] text-slate-400 leading-relaxed">
+                                {{ opt.description }}
+                              </p>
+                            </div>
+                          }
                         }
                       </div>
                     }
@@ -567,13 +605,17 @@
                       @for (spell of preparedSpellsOfLevel(lvl); track spell.id) {
                         <button
                           type="button"
-                          class="text-left px-3 py-2 rounded-lg border text-xs"
+                          class="text-left px-3 py-2.5 rounded-lg border text-xs"
                           [class.border-sky-400]="masteryPicks()[lvl] === spell.id"
                           [class.bg-sky-950]="masteryPicks()[lvl] === spell.id"
                           [class.border-slate-700]="masteryPicks()[lvl] !== spell.id"
                           (click)="pickMastery($any(lvl), spell.id)"
                         >
                           <div class="font-bold text-amber-400">{{ spell.name }}</div>
+                          <div class="text-[10px] text-slate-400 mt-1">{{ statsLine(spell) }}</div>
+                          <p class="text-[10px] text-slate-500 line-clamp-2 mt-1 leading-relaxed">
+                            {{ spell.description }}
+                          </p>
                         </button>
                       }
                     </div>
@@ -600,13 +642,17 @@
                   @for (spell of preparedSpellsOfLevel(3); track spell.id) {
                     <button
                       type="button"
-                      class="text-left px-3 py-2 rounded-lg border text-xs"
+                      class="text-left px-3 py-2.5 rounded-lg border text-xs"
                       [class.border-sky-400]="isSignatureSelected(spell.id)"
                       [class.bg-sky-950]="isSignatureSelected(spell.id)"
                       [class.border-slate-700]="!isSignatureSelected(spell.id)"
                       (click)="toggleSignature(spell.id)"
                     >
                       <div class="font-bold text-amber-400">{{ spell.name }}</div>
+                      <div class="text-[10px] text-slate-400 mt-1">{{ statsLine(spell) }}</div>
+                      <p class="text-[10px] text-slate-500 line-clamp-2 mt-1 leading-relaxed">
+                        {{ spell.description }}
+                      </p>
                     </button>
                   }
                 </div>

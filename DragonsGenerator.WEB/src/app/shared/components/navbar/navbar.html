@@ -34,6 +34,33 @@
             Forger
           </a>
 
+          <a
+            routerLink="/story/create"
+            routerLinkActive="text-violet-400"
+            class="h-10 flex items-center px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-violet-400 hover:bg-slate-800/60 transition-colors"
+            (click)="closeMenus()"
+          >
+            Scénario
+          </a>
+
+          <a
+            routerLink="/campaigns"
+            routerLinkActive="text-violet-400"
+            class="h-10 flex items-center px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-violet-400 hover:bg-slate-800/60 transition-colors"
+            (click)="closeMenus()"
+          >
+            Campagnes
+          </a>
+
+          <a
+            routerLink="/friends"
+            routerLinkActive="text-violet-400"
+            class="h-10 flex items-center px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-violet-400 hover:bg-slate-800/60 transition-colors"
+            (click)="closeMenus()"
+          >
+            Amis
+          </a>
+
           <div class="relative" data-codex-menu>
             <button
               type="button"
@@ -108,6 +135,18 @@
           }
         </a>
 
+        @if (auth.isLoggedIn()) {
+          <a
+            routerLink="/settings"
+            routerLinkActive="text-amber-400 border-amber-700/50"
+            class="hidden sm:flex items-center justify-center w-10 h-10 rounded-xl border border-slate-700 text-slate-400 hover:text-amber-400 hover:border-amber-700/50 transition-colors"
+            title="Paramètres"
+            (click)="closeMenus()"
+          >
+            <iconify-icon icon="mdi:cog-outline" class="text-lg"></iconify-icon>
+          </a>
+        }
+
         <div class="relative hidden sm:block" data-account-menu>
           <button
             type="button"
@@ -122,6 +161,12 @@
               class="absolute right-0 mt-2 w-48 rounded-xl border border-slate-700 bg-[#171b22] shadow-xl py-2 z-50"
             >
               @if (auth.isLoggedIn()) {
+                <a
+                  routerLink="/settings"
+                  class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
+                  (click)="closeMenus()"
+                  >Paramètres</a
+                >
                 <a
                   routerLink="/support"
                   class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
@@ -208,6 +253,14 @@
         </a>
 
         @if (auth.isLoggedIn()) {
+          <a
+            routerLink="/settings"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+            (click)="closeMenus()"
+          >
+            <span class="text-xl"><iconify-icon icon="mdi:cog-outline"></iconify-icon></span>
+            <span class="text-sm font-bold tracking-wide">Paramètres</span>
+          </a>
           <a
             routerLink="/support"
             class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"

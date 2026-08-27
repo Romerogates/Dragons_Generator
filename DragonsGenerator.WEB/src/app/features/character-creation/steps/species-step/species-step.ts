@@ -3,7 +3,6 @@
 import {
   Component,
   OnInit,
-  OnDestroy,
   afterNextRender,
   inject,
   signal,
@@ -14,7 +13,6 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { forkJoin } from 'rxjs';
-import type { LanguageSummary } from '@core/models/Languages/language-summary';
 
 import { CommonModule } from '@angular/common';
 import { DataService } from '@core/services/data.service';
@@ -61,28 +59,13 @@ interface ChoiceOptionView {
     class: 'flex flex-1 flex-col min-h-0 w-full',
   },
 })
-export class SpeciesStep implements OnInit, OnDestroy {
+export class SpeciesStep implements OnInit {
   private dataService = inject(DataService);
   readonly builder = inject(CharacterBuilderService);
 
   private readonly carouselViewport = viewChild<ElementRef<HTMLElement>>('carouselViewport');
-  private resizeObserver: ResizeObserver | null = null;
-
-  /** Largeur carte + gap — mesurés / adaptés au viewport (mobile). */
-  readonly cardGapPx = 32;
-  readonly cardWidthPx = signal(288);
-  readonly viewportWidthPx = signal(360);
-  readonly cardStridePx = computed(() => this.cardWidthPx() + this.cardGapPx);
-
-  /**
-   * Décalage du track pour centrer la carte active dans le viewport visible.
-   * (Ne pas utiliser translateX(%) : le % se base sur la largeur du track, pas de l’écran.)
-   */
-  readonly trackOffsetPx = computed(() => {
-    const vw = this.viewportWidthPx();
-    const cw = this.cardWidthPx();
-    return vw / 2 - cw / 2 - this.currentIndex() * this.cardStridePx();
-  });
+  private scrollRaf = 0;
+  private suppressScrollSync = false;
 
   readonly allSpecies = signal<Species[]>([]);
   readonly loading = signal(true);
@@ -92,17 +75,16 @@ export class SpeciesStep implements OnInit, OnDestroy {
   readonly choiceAnswers = signal<Map<string, string[]>>(new Map());
   readonly languageIdToName = signal<Map<string, string>>(new Map());
 
-  // --- CARROUSEL & 3D ---
+  // --- CARROUSEL ---
   readonly currentIndex = signal(0);
 
   constructor() {
-    afterNextRender(() => this.bindCarouselMetrics());
+    afterNextRender(() => this.scrollToIndex(this.currentIndex(), 'instant'));
   }
 
   readonly normalizedIndex = computed(() => {
     const total = this.currentCards().length;
     if (total === 0) return 0;
-    // Permet d'avoir toujours un index entre 0 et total - 1, même si currentIndex est négatif
     return ((this.currentIndex() % total) + total) % total;
   });
 
@@ -430,39 +412,13 @@ export class SpeciesStep implements OnInit, OnDestroy {
 
         this.restoreFromBuilder();
         this.loading.set(false);
-        // Viewport peut apparaître après le chargement
-        queueMicrotask(() => this.bindCarouselMetrics());
+        queueMicrotask(() => this.scrollToIndex(this.currentIndex(), 'instant'));
       },
       error: () => {
         this.error.set('Impossible de charger les données.');
         this.loading.set(false);
       },
     });
-  }
-
-  ngOnDestroy(): void {
-    this.resizeObserver?.disconnect();
-    this.resizeObserver = null;
-  }
-
-  private bindCarouselMetrics(): void {
-    const el = this.carouselViewport()?.nativeElement;
-    if (!el) return;
-
-    this.resizeObserver?.disconnect();
-    this.measureCarousel(el);
-    this.resizeObserver = new ResizeObserver(() => this.measureCarousel(el));
-    this.resizeObserver.observe(el);
-  }
-
-  private measureCarousel(el: HTMLElement): void {
-    const vw = el.clientWidth;
-    if (vw <= 0) return;
-    this.viewportWidthPx.set(vw);
-    // Marge pour les flèches ; carte max 20rem desktop / ~18rem mobile
-    const maxCard = vw >= 640 ? 320 : 288;
-    const fitted = Math.min(maxCard, Math.max(240, vw - 88));
-    this.cardWidthPx.set(Math.round(fitted));
   }
 
   private restoreFromBuilder(): void {
@@ -479,40 +435,83 @@ export class SpeciesStep implements OnInit, OnDestroy {
     }
     this.choiceAnswers.set(map);
 
-    // Center carousel on the saved species when overview is shown
     const idx = this.allSpecies().findIndex((s) => s.id === current.speciesId);
     if (idx >= 0) this.currentIndex.set(idx);
   }
 
-  // --- MÉTHODES CARROUSEL (Boucle infinie) ---
+  // --- MÉTHODES CARROUSEL (scroll-snap centré) ---
   nextCard(): void {
-    if (this.currentCards().length > 0) {
-      this.currentIndex.update((i) => i + 1);
-    }
+    const total = this.currentCards().length;
+    if (!total) return;
+    this.scrollToIndex((this.normalizedIndex() + 1) % total);
   }
 
   prevCard(): void {
-    if (this.currentCards().length > 0) {
-      this.currentIndex.update((i) => i - 1);
+    const total = this.currentCards().length;
+    if (!total) return;
+    this.scrollToIndex((this.normalizedIndex() - 1 + total) % total);
+  }
+
+  onCarouselScroll(): void {
+    if (this.suppressScrollSync) return;
+    cancelAnimationFrame(this.scrollRaf);
+    this.scrollRaf = requestAnimationFrame(() => this.syncIndexFromScroll());
+  }
+
+  private syncIndexFromScroll(): void {
+    const viewport = this.carouselViewport()?.nativeElement;
+    if (!viewport) return;
+
+    const viewportCenter =
+      viewport.getBoundingClientRect().left + viewport.clientWidth / 2;
+    let best = 0;
+    let bestDist = Number.POSITIVE_INFINITY;
+
+    viewport.querySelectorAll<HTMLElement>('[data-carousel-index]').forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      const mid = rect.left + rect.width / 2;
+      const dist = Math.abs(mid - viewportCenter);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = Number(el.dataset['carouselIndex'] ?? 0);
+      }
+    });
+
+    if (best !== this.currentIndex()) {
+      this.currentIndex.set(best);
     }
   }
 
-  private loadSpecies(): void {
-    this.loading.set(true);
-    this.dataService.getSpecies().subscribe({
-      next: (species) => {
-        this.allSpecies.set(species);
-        this.loading.set(false);
+  private scrollToIndex(index: number, behavior: ScrollBehavior = 'smooth'): void {
+    const total = this.currentCards().length;
+    if (total <= 0) return;
+    const safe = ((index % total) + total) % total;
+    this.currentIndex.set(safe);
+
+    const viewport = this.carouselViewport()?.nativeElement;
+    const card = viewport?.querySelector<HTMLElement>(`[data-carousel-index="${safe}"]`);
+    if (!viewport || !card) return;
+
+    // scrollLeft only — avoid scrollIntoView (it can shift the whole page)
+    const viewportRect = viewport.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    const delta =
+      cardRect.left + cardRect.width / 2 - (viewportRect.left + viewport.clientWidth / 2);
+
+    this.suppressScrollSync = true;
+    viewport.scrollBy({ left: delta, behavior });
+    window.setTimeout(
+      () => {
+        this.suppressScrollSync = false;
+        this.syncIndexFromScroll();
       },
-      error: () => {
-        this.error.set('Impossible de charger les espèces.');
-        this.loading.set(false);
-      },
-    });
+      behavior === 'smooth' ? 320 : 40,
+    );
   }
 
   onRightClick(event: Event, cardId: string): void {
     event.preventDefault();
+    event.stopPropagation();
     this.flippedCards.update((set) => {
       const newSet = new Set(set);
       if (newSet.has(cardId)) {
@@ -525,14 +524,11 @@ export class SpeciesStep implements OnInit, OnDestroy {
   }
 
   pickCard(cardId: string): void {
-    const total = this.currentCards().length;
     const targetIndex = this.currentCards().findIndex((c) => c.id === cardId);
+    if (targetIndex < 0) return;
 
     if (targetIndex !== this.normalizedIndex()) {
-      let diff = targetIndex - this.normalizedIndex();
-      if (diff > total / 2) diff -= total;
-      if (diff < -total / 2) diff += total;
-      this.currentIndex.update((i) => i + diff);
+      this.scrollToIndex(targetIndex);
       return;
     }
 
@@ -575,7 +571,6 @@ export class SpeciesStep implements OnInit, OnDestroy {
               const prev = [...(newMap.get(choice.id) ?? [])];
               const idx = prev.indexOf(cardId);
               if (idx >= 0) {
-                // Toggle off
                 prev.splice(idx, 1);
               } else if (need <= 1) {
                 newMap.set(choice.id, [cardId]);
@@ -583,7 +578,6 @@ export class SpeciesStep implements OnInit, OnDestroy {
               } else if (prev.length < need) {
                 prev.push(cardId);
               } else {
-                // Remplace le plus ancien si plein
                 prev.shift();
                 prev.push(cardId);
               }
@@ -599,12 +593,12 @@ export class SpeciesStep implements OnInit, OnDestroy {
       this.transitioning.set(false);
 
       if (this.selectionComplete()) {
-        // Figé la phase actuelle avant confirm → évite le rollback visuel vers les peuples
         this.holdPhase.set(phaseBefore);
         this.confirmSelection();
         setTimeout(() => this.builder.nextStep(), 120);
       } else if (phaseBefore !== this.currentPhase()) {
         this.currentIndex.set(0);
+        queueMicrotask(() => this.scrollToIndex(0, 'instant'));
       }
     }, 200);
   }
@@ -620,6 +614,7 @@ export class SpeciesStep implements OnInit, OnDestroy {
       this.flippedCards.set(new Set());
       this.currentIndex.set(0);
       this.transitioning.set(false);
+      queueMicrotask(() => this.scrollToIndex(0, 'instant'));
     }, 200);
   }
 
@@ -872,14 +867,5 @@ export class SpeciesStep implements OnInit, OnDestroy {
       }
     }
     return null;
-  }
-
-  // --- Fonction pour décaler visuellement les cartes à l'infini ---
-  getWrapOffset(index: number): string {
-    const total = this.currentCards().length;
-    if (total === 0) return '0px';
-
-    const wraps = Math.floor((this.currentIndex() - index + total / 2) / total);
-    return `${wraps * total * this.cardStridePx()}px`;
   }
 }

@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-gregaire-massif",
+  "name": "Grégaire massif",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille TG, non aligné",
+  "armor_class": 13,
+  "armor_note": "armure naturelle",
+  "hit_points": "126 (11d12 + 55)",
+  "wound_threshold": 32,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 24,
+      "modifier": "+7"
+    },
+    "dex": {
+      "score": 9,
+      "modifier": "-1"
+    },
+    "con": {
+      "score": 21,
+      "modifier": "+5"
+    },
+    "int": {
+      "score": 7,
+      "modifier": "-2"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 8,
+      "modifier": "-1"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Athlétisme + 10, Perception +4",
+  "senses": "Perception passive 14",
+  "languages": "—",
+  "challenge_rating": "6",
+  "xp": 2300,
+  "traits": [
+    {
+      "name": "Charge écrasante",
+      "description": "<u>Si le grégaire massif se déplace d'au moins</u> <u>6 m en ligne droite vers une créature et qu'il la touche</u> avec une attaque de défenses au même tour de jeu, la cible doit réussir un JS Force DD 18 sous peine de se retrouver **à terre**. Si la cible est **à terre**, le grégaire massif peut aussitôt lui porter une attaque de piétinement au prix d'une action bonus."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Coup de boutoir",
+      "description": "Attaque d'arme de corps à corps : +10 pour toucher, allonge 3 m, une cible. Réussite : 25 (4d8 + 7) dégâts contondants ou perforants (selon la morphologie)."
+    },
+    {
+      "name": "Piétinement",
+      "description": "Attaque d'arme de corps à corps : +10 pour toucher, allonge 1,50 m, une créature à terre. Réussite : 29 (4d10 + 7) dégâts contondants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les grégaires massifs désignent les individus les plus puissants et exceptionnels des espèces du Kaan, tels de grands mâles bisons latifrons. Les mammouths et les individus remarquablement aguerris de la faune du Septentrion – à l’instar d’un rhinocéros laineux vétéran de nombreux combats – peuvent aussi être décrits avec ce profil."
+}

@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-liche",
+  "name": "Liche",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Mort-vivant de taille M, alignement mauvais au choix",
+  "armor_class": 17,
+  "armor_note": "armure naturelle",
+  "hit_points": "135 (18d8 + 54)",
+  "wound_threshold": null,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "wis": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 16,
+      "modifier": "+3"
+    }
+  },
+  "saving_throws": "Con +10, Int +12, Sag +9",
+  "skills": "Arcanes +19, Histoire +12, Intuition +9, Perception +9",
+  "senses": "vision lucide 36 m, Perception passive 19",
+  "languages": "commun et jusqu'à cinq autres langues",
+  "challenge_rating": "21",
+  "xp": 33000,
+  "traits": [
+    {
+      "name": "Reconstitution",
+      "description": "Si elle dispose d'un phylactère, une liche détruite recouvre un nouveau corps qui apparaît à 1,50 m de l'objet au bout de 1d10 jours. Elle récupère tous ses pv et reprend ses activités."
+    },
+    {
+      "name": "Résistance au renvoi des morts-vivants",
+      "description": "La liche bénéficie d'un avantage aux jets de sauvegarde contre tout effet qui renvoie les morts-vivants."
+    },
+    {
+      "name": "Résistance légendaire (3/jour)",
+      "description": "Si la liche rate un jet de sauvegarde, elle peut décider de le réussir tout de même."
+    },
+    {
+      "name": "Résistance légendaire (3/jour)",
+      "description": "Si la liche rate un jet de sauvegarde, elle peut décider de le réussir tout de même."
+    },
+    {
+      "name": "Sorts mineurs",
+      "description": "(à volonté) : manipulation à distance, prestidigitation, rayon de givre\n1ᵉʳ niveau (4 emplacements) : bouclier, détection de la magie, projectile magique, vague de tonnerre\n2ᵉ niveau (3 emplacements) : détection de pensées, flèche acide, image miroir, invisibilité\n3ᵉ niveau (3 emplacements) : animation des morts, boule de feu, contresort, dissipation de la magie\n4ᵉ niveau (3 emplacements) : flétrissement, porte dimensionnelle"
+    }
+  ],
+  "actions": [
+    {
+      "name": "Contact paralysant",
+      "description": "Attaque de sort au corps à corps : + 12 pour toucher, allonge 1,50 m, une créature. Réussite : 10 (3d6) dégâts de froid. La cible doit réussir un JS Constitution DD 18 sous peine d'être **paralysée** pendant 1 minute. Elle peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet sur elle-même en cas de réussite."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Un phylactère est un récipient capable de recevoir l’âme d’une liche. Cet objet est toujours soigneusement dissimulé en un lieu où la créature trouvera les ressources nécessaires à un nouveau départ si cela s’avérait nécessaire."
+}

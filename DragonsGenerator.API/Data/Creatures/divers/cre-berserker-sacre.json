@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-berserker-sacre",
+  "name": "Berserker sacré",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (espèce au choix) de taille M, alignement chaotique au choix",
+  "armor_class": 16,
+  "armor_note": "armure naturelle",
+  "hit_points": "187 (22d8 + 88)",
+  "wound_threshold": 47,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "int": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 13,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": "For +8, Con +8",
+  "skills": "Athlétisme +12, Intimidation +9, Perception +5",
+  "senses": "Perception passive 15",
+  "languages": "deux au choix (incluant généralement le commun)",
+  "challenge_rating": "10",
+  "xp": 5900,
+  "traits": [],
+  "actions": [],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Légendes du Septentrion, les berserkers sacrés comptent parmi les combattants les plus irréductibles des peuples de ces rudes territoires. À eux seuls, ils sont capables de terrasser l’un des terribles **géants du givre**, et nombre d’entre ces puissants guerriers vouent leur existence à affronter des ennemis toujours plus dangereux jusqu’à périr glorieusement au combat. D’aucuns tirent leur force d’une vie de combat, d’autres sont les Élus de Tempête, et d’autres enfin se vouent à des puissances plus obscures comme le vil prince démon Gegaôr. Certains sont des personnalités influentes, dont l’autorité s’étend à des régions entières, mais d’autres se tiennent à l’écart de leurs semblables, leur tempérament violent et incontrôlable les rendant inaptes à la vie en société. Ceux-là sont considérés par les locaux avec une adoration mêlée de crainte."
+}

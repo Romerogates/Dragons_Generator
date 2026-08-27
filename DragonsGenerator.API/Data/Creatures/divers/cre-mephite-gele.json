@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-mephite-gele",
+  "name": "Méphite gelé",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Élémentaire (froid) de taille P, neutre mauvais",
+  "armor_class": 11,
+  "armor_note": null,
+  "hit_points": "21 (6d6)",
+  "wound_threshold": 6,
+  "speed": "9 m, vol 9 m",
+  "abilities": {
+    "str": {
+      "score": 7,
+      "modifier": "-2"
+    },
+    "dex": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 9,
+      "modifier": "-1"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 12,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +3, Perception +2",
+  "senses": "vision dans le noir 18 m, Perception passive 12",
+  "languages": "originel",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [
+    {
+      "name": "Apparence trompeuse",
+      "description": "Tant que le méphite se tient immobile, il est indiscernable d'un bloc de glace ordinaire."
+    },
+    {
+      "name": "Explosion posthume",
+      "description": "Quand le méphite meurt, il disparaît dans une explosion de fragments de glace. Chaque créature située dans un rayon de 1,50 m doit effectuer un JS Dextérité DD 10 et subit 4 (1d8) dégâts tranchants en cas d'échec, la moitié en cas de réussite."
+    },
+    {
+      "name": "Sorts innés (1/jour)",
+      "description": "Le méphite gelé peut lancer le sort nappe de brouillard sans composantes matérielles. Sa caractéristique magique est le Charisme."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 1,50 m, une créature. Réussite : 3 (1d4 + 1) dégâts tranchants plus 2 (1d4) dégâts de froid."
+    },
+    {
+      "name": "Souffle glacé (recharge 6)",
+      "description": "Le méphite crache un cône d'air froid de 4,50 m. Chaque créature prise dans cette zone d'effet doit réussir un JS Dextérité DD 10 et subit 5 (2d4) dégâts de froid en cas d'échec, la moitié en cas de réussite."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Composé d’air froid et d’eau, le méphite gelé jaillit du blizzard et semble prendre plaisir à égarer les voyageurs, faire craquer la glace sous leur pas, les tourmentant jusqu’à ce qu’ils succombent d’hypothermie."
+}

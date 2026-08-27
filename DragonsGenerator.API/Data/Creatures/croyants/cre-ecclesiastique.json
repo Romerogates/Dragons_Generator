@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-ecclesiastique",
+  "name": "Ecclésiastique",
+  "category": "croyants",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": null,
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 13,
+  "armor_note": "chemise de mailles",
+  "hit_points": "27 (5d8 + 5)",
+  "wound_threshold": 7,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "cha": {
+      "score": 14,
+      "modifier": "+2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Médecine +7, Persuasion +4, Religion +5",
+  "senses": "Perception passive 13",
+  "languages": "trois au choix",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [
+    {
+      "name": "Éminence divine",
+      "description": "Au prix d'une action bonus, l'ecclésiastique peut dépenser un emplacement de sort pour que ses attaques de corps à corps infligent magiquement 10 (3d6) dégâts radiants supplémentaires aux cibles qu'elles touchent. Cet effet persiste jusqu'à la fin du tour de jeu. Si l'ecclésiastique dépense pour ce faire un emplacement de 2ᵉ niveau ou supérieur, les dégâts supplémentaires augmentent de 1d6 par niveau au-delà du premier.\nIcône de haut forgeur"
+    }
+  ],
+  "actions": [],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "La qualité de l’équipement de l’ecclésiastique dépend de son rang dans la hiérarchie, de la richesse de son Église et de la mission qu’il a reçue. En période de guerre sainte, par exemple, il pourra être armé pour lutter contre le Chancre, tandis qu’en temps de paix, les moyens à sa disposition seront consacrés au développement de son culte plutôt qu’à du matériel militaire."
+}

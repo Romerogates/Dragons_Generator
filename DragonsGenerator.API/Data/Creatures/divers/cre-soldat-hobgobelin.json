@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-soldat-hobgobelin",
+  "name": "Soldat hobgobelin",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (gobelinoïde) de taille M, loyal (tout alignement)",
+  "armor_class": 18,
+  "armor_note": "cotte de mailles, bouclier",
+  "hit_points": "11 (2d8 + 2)",
+  "wound_threshold": 5,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 10",
+  "languages": "commun, gobelin",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [
+    {
+      "name": "Avantage martial",
+      "description": "Une fois par tour de jeu, le hobgobelin peut infliger 7 (2d6) dégâts supplémentaires à une créature qu'il touche avec une attaque d'arme, à condition que celle-ci se trouve dans un rayon de 1,50 m d'un allié non neutralisé du hobgobelin."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Sabre médian",
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 1,50 m, une cible. Réussite : 5 (1d8 + 1) dégâts perforants ou tranchants."
+    },
+    {
+      "name": "Arc composite",
+      "description": "Attaque d'arme à distance : +3 pour toucher, portée 48/150 m, une cible. Réussite : 5 (1d8 + 1) dégâts perforants.\nMéthodiques et organisés, les soldats hobgobelins sont bien plus redoutables en groupe qu'individuellement. Un peloton hobgobelin est un mur mouvant hérissé de lames qui découpe froidement tout sur son passage et ne se résigne à un repli que face à la certitude d'une défaite écrasante."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

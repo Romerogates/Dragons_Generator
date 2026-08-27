@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-loup-sanguinaire",
+  "name": "Loup sanguinaire",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille G, non aligné",
+  "armor_class": 14,
+  "armor_note": "armure naturelle",
+  "hit_points": "37 (5d10 + 10)",
+  "wound_threshold": 10,
+  "speed": "15 m",
+  "abilities": {
+    "str": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +4, Perception +3",
+  "senses": "Perception passive 13",
+  "languages": "—",
+  "challenge_rating": "1",
+  "xp": 200,
+  "traits": [
+    {
+      "name": "Ouïe fine et flair",
+      "description": "Le loup sanguinaire bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'ouïe ou l'odorat."
+    },
+    {
+      "name": "Tactique de meute",
+      "description": "Le loup sanguinaire bénéficie d'un avantage aux jets d'attaque contre les créatures situées à 1,50 m ou moins d'un de ses alliés qui n'est pas neutralisé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 10 (2d6 + 3) dégâts perforants. Si la cible est une créature, elle doit réussir un JS Force DD 13 sous peine de se retrouver **à terre**."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Ils sont considérés comme de proches parents des humanoïdes et présents dans de nombreuses légendes. Tandis que l’ars lanikh a été adopté par les puissants des cités d’argile comme symbole de leur autorité, les loups en revanche demeurent étroitement associés à l’idée de liberté. Les orcs et les gobelins sont toujours très fiers quand ils parviennent à établir une relation de confiance avec des loups sanguinaires : une telle complicité témoigne d’une grande connaissance de la nature et de la reconnaissance par la nature elle-même de leur dignité."
+}

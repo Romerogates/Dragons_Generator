@@ -29,6 +29,19 @@
       ></textarea>
     </label>
     <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+      Personnage concerné (optionnel)
+      <select
+        [(ngModel)]="characterId"
+        name="characterId"
+        class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-amber-500"
+      >
+        <option value="">— Aucun / pas encore sauvegardé —</option>
+        @for (c of myCharacters(); track c.id) {
+          <option [value]="c.id">{{ c.name }}</option>
+        }
+      </select>
+    </label>
+    <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
       Fichier (PDF de fiche recommandé)
       <input
         type="file"
@@ -59,10 +72,23 @@
           <span class="text-[10px] uppercase tracking-wider text-slate-500">{{ t.status }}</span>
         </div>
         <p class="text-xs text-slate-400 whitespace-pre-wrap">{{ t.message }}</p>
+        @if (t.characterName) {
+          <p class="text-xs text-violet-300 mt-2">
+            <iconify-icon icon="fluent-emoji:bust-in-silhouette"></iconify-icon>
+            Personnage : {{ t.characterName }}
+            <button
+              type="button"
+              class="ml-2 text-sky-400 hover:underline"
+              (click)="downloadCharacterJson(t)"
+            >
+              Télécharger JSON
+            </button>
+          </p>
+        }
         @if (t.attachmentOriginalName) {
           <a
             class="text-xs text-sky-400 hover:underline mt-2 inline-block"
-            [href]="t.attachmentUrl || '#'"
+            [href]="assetUrl(t.attachmentUrl)"
             target="_blank"
             rel="noopener"
           >

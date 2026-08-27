@@ -1,0 +1,109 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-mille-visages-sous-sa-forme-draconique",
+  "name": "Mille visages sous sa forme draconique",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Ravageur ayant l'aspect d'un dragon adulte de taille TG, chaotique mauvais",
+  "armor_class": 22,
+  "armor_note": "armure naturelle chancreuse",
+  "hit_points": "225 (18d12 + 108)",
+  "wound_threshold": 57,
+  "speed": "12 m, escalade 12 m, vol 24 m",
+  "abilities": {
+    "str": {
+      "score": 25,
+      "modifier": "+7"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 23,
+      "modifier": "+6"
+    },
+    "int": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "wis": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 19,
+      "modifier": "+4"
+    }
+  },
+  "saving_throws": "Dex +5, Con +11, Sag +7, Cha +9",
+  "skills": "Acrobaties +5, Discrétion +10, Intimidation +9, Intuition +7, Perception +12, Persuasion +9, Survie +7, Tromperie +9",
+  "senses": "vision aveugle 18 m, vision dans le noir 36 m, Perception passive 22",
+  "languages": "cyfand, draconique, phantasme",
+  "challenge_rating": "16",
+  "xp": 15000,
+  "traits": [
+    {
+      "name": "Attaque sournoise",
+      "description": "Une fois par tour de jeu, Mille visages inflige 14 (4d6) dégâts supplémentaires quand il touche une cible avec une attaque d'arme s'il a bénéficié d'un avantage au jet d'attaque ou si la cible est située à 1,50 m ou moins d'un de ses alliés non neutralisés. L'aptitude ne s'applique pas si Mille visages a subi un désavantage au jet d'attaque."
+    },
+    {
+      "name": "Change-forme",
+      "description": "Au prix d'une action, Mille visages se métamorphose magiquement en humanoïde ou bête d'un facteur de puissance inférieur ou égal au sien, ou recouvre sa véritable forme (à sa convenance). Il retrouve aussi s'il est tué. L'équipement qu'il porte ou transporte est absorbé ou porté lui aussi par la nouvelle forme (à sa convenance). Sous sa nouvelle forme, Mille visages conserve son alignement, ses pv, ses dés de vie, sa faculté de parole, ses maîtrises, sa Résistance légendaire, ses valeurs d'Intelligence, de Sagesse et de Charisme, ainsi que sa capacité à utiliser cette aptitude. En dehors de ces éléments, ses caractéristiques et capacités sont remplacées par celles de sa nouvelle forme, à l'exception des aptitudes de classe et des actions légendaires dont celle-ci pourrait disposer."
+    },
+    {
+      "name": "Jumeau maléfique",
+      "description": "Tant que Hrysanthéis vit, si Mille visages meurt, il réapparaît à minuit à un endroit où Hrysanthéis a précédemment perdu du sang."
+    },
+    {
+      "name": "Pattes d'araignée",
+      "description": "Mille visages peut parcourir les parois les plus difficiles à escalader, y compris les plafonds, sans devoir effectuer de test de caractéristique."
+    },
+    {
+      "name": "Résistance légendaire (3/jour)",
+      "description": "Si Mille visages rate un jet de sauvegarde, il peut décider de le réussir tout de même."
+    },
+    {
+      "name": "Saut étendu",
+      "description": "Mille visages peut sauter avec élan jusqu'à 15 m en longueur et 6 m de hauteur."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Mille visages peut utiliser Présence terrifiante. Il effectue ensuite trois attaques : une de morsure et deux de coup de griffe."
+    },
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +12 pour toucher, allonge 3 m, une cible. Réussite : 18 (2d10 + 7) dégâts perforants."
+    },
+    {
+      "name": "Coup de griffe",
+      "description": "Attaque d'arme de corps à corps : +12 pour toucher, allonge 1,50 m, une cible. Réussite : 14 (2d6 + 7) dégâts tranchants."
+    },
+    {
+      "name": "Queue",
+      "description": "Attaque d'arme de corps à corps : +12 pour toucher, allonge 4,50 m, une cible. Réussite : 16 (2d8 + 7) dégâts contondants."
+    },
+    {
+      "name": "Présence terrifiante",
+      "description": "Chaque créature située dans un rayon de 36 m de Mille visages, choisie par ce dernier et consciente de sa présence, doit réussir un JS Sagesse DD 17 sous peine d'être **effrayée** pendant 1 minute. Une créature peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet sur elle-même en cas de réussite. Toute créature qui réussit le jet de sauvegarde ou pour qui l'effet prend fin est immunisée contre la Présence terrifiante de Mille visages pour les 24 prochaines heures."
+    },
+    {
+      "name": "Souffle (recharge 5-6)",
+      "description": "Mille visages utilise l'un des deux souffles suivants :"
+    },
+    {
+      "name": "Souffle psychique",
+      "description": "Mille visages crache une projection d'énergie psychique de 27 m de long et de 1,50 m de large. Chaque créature prise dans cette ligne doit effectuer un JS Intelligence DD 19 et subit 55 (10d10) dégâts psychiques en cas d'échec, la moitié en cas de réussite."
+    },
+    {
+      "name": "Souffle étourdissant",
+      "description": "Mille visages crache un cône d'énergie étourdissante de 18 m. Chaque créature prise dans cette zone d'effet doit réussir un JS Intelligence DD 19 sous peine d'être **étourdie** durant 1 minute. Une cible peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet en cas de réussite."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "bcou"
+}

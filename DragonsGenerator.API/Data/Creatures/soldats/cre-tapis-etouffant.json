@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-tapis-etouffant",
+  "name": "Tapis étouffant",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Créature artificielle de taille G, non aligné",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "33 (6d10)",
+  "wound_threshold": null,
+  "speed": "3 m",
+  "abilities": {
+    "str": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 1,
+      "modifier": "-5"
+    },
+    "wis": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "cha": {
+      "score": 1,
+      "modifier": "-5"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision aveugle 18 m (aucune vision au-delà de ce rayon), Perception passive 6",
+  "languages": "—",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [
+    {
+      "name": "Apparence trompeuse",
+      "description": "Tant que le tapis se tient immobile, il est indiscernable d'un tapis normal."
+    },
+    {
+      "name": "Sensibilité antimagique",
+      "description": "Le tapis est **neutralisé** lorsqu'il se trouve dans la zone d'un champ d'antimagie. S'il est ciblé par dissipation de la magie, il doit réussir un JS Constitution contre le DD de sauvegarde des sorts du lanceur sous peine d'être **inconscient** pendant 1 minute."
+    },
+    {
+      "name": "Transfert de dégâts",
+      "description": "Lorsqu'il lutte avec une créature, le tapis ne subit que la moitié des dégâts qui lui sont infligés, et la créature agrippée subit l'autre moitié."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Étouffement",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une créature de taille M ou inférieure. Réussite : la créature est **agrippée** (DD 13 pour s'extraire). Tant que la lutte persiste, la cible est **entravée**, **aveuglée** et **asphyxiée**, et le tapis ne peut pas étouffer une autre cible. En outre, au début de chacun de ses tours de jeu, la cible subit 10 (2d6 + 3) dégâts contondants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Plus imprévisible qu’une **arme animée** ou une **armure animée** qui ont tendance à éveiller la méfiance des intrus, le tapis étouffant est capable de venir sans peine à bout des malfrats de bas étage. Du fait de ses capacités restrictives, certains propriétaires lui donnent pour instruction d’uniquement capturer les intrus plutôt que de les tuer."
+}

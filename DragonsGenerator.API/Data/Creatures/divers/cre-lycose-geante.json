@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-lycose-geante",
+  "name": "Lycose géante",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille M, non aligné",
+  "armor_class": 13,
+  "armor_note": null,
+  "hit_points": "11 (2d8 + 2)",
+  "wound_threshold": 5,
+  "speed": "12 m, escalade 12 m",
+  "abilities": {
+    "str": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 4,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +7, Perception +3",
+  "senses": "perception des vibrations 9 m, Perception passive 13",
+  "languages": "—",
+  "challenge_rating": "1/4",
+  "xp": 50,
+  "traits": [],
+  "actions": [],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

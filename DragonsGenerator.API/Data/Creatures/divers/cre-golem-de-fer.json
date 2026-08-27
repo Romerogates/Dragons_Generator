@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-golem-de-fer",
+  "name": "Golem de fer",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Créature artificielle de taille G, non aligné",
+  "armor_class": 20,
+  "armor_note": "armure naturelle",
+  "hit_points": "210 (20d10 + 100)",
+  "wound_threshold": null,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 24,
+      "modifier": "+7"
+    },
+    "dex": {
+      "score": 9,
+      "modifier": "-1"
+    },
+    "con": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "int": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 1,
+      "modifier": "-5"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 36 m, Perception passive 10",
+  "languages": "comprend les langues de son créateur mais ne peut pas parler",
+  "challenge_rating": "16",
+  "xp": 15000,
+  "traits": [
+    {
+      "name": "Absorption de feu",
+      "description": "Chaque fois que le golem reçoit des dégâts de feu, il ne subit aucun dommage et récupère en fait un nombre de pv égal aux dégâts de feu correspondants."
+    },
+    {
+      "name": "Armes magiques",
+      "description": "Les attaques d'arme du golem sont magiques. **Forme inaltérable.** Le golem est immunisé contre tous les sorts ou effets susceptibles de transformer son corps."
+    },
+    {
+      "name": "Résistance à la magie",
+      "description": "Le golem bénéficie d'un avantage aux jets de sauvegarde contre les sorts et autres effets magiques."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le golem effectue deux attaques de corps à corps."
+    },
+    {
+      "name": "Coup",
+      "description": "Attaque d'arme de corps à corps : +13 pour toucher, allonge 1,50 m, une cible. Réussite : 20 (3d8 + 7) dégâts contondants."
+    },
+    {
+      "name": "Épée",
+      "description": "Attaque d'arme de corps à corps : +13 pour toucher, allonge 3 m, une cible. Réussite : 23 (3d10 + 7) dégâts tranchants."
+    },
+    {
+      "name": "Souffle toxique (recharge 6)",
+      "description": "Le golem crache un cône de gaz toxique de 4,50 m. Chaque créature prise dans cette zone d'effet doit effectuer un JS Constitution DD 19 et subit 45 (10d8) dégâts de poison en cas d'échec, la moitié en cas de réussite.\nicon\nSi vous souhaitez rendre cette créature plus redoutable, vous pouvez utiliser l'option ci-dessous. Dans ce cas, son FP passera de 16 à 17. Notez que ce changement de FP fait passer son bonus de maîtrise de +5 à +6."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Machine à tuer la plus perfectionnée qui existe dans le monde, le golem de fer est une arme valant à elle seule une compagnie de soldats. Il ne s’agit pas d’un gardien, mais bien d’un instrument de conquête militaire, nourrissant les rêves de gloire des généraux et des arcanistes à leur service. Combien de princes ont pensé bâtir un empire en s’appuyant sur l’art de leur ministre mage, payant grassement ses recherches, avant d’être tués par l’outil créé par leur conseiller avide de porter lui-même la couronne ? Dans de nombreux royaumes, la construction et même les recherches sur de telles machines à tuer sont proscrites, voire passibles d’exécution."
+}

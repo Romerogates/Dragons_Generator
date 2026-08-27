@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-cavalier-orc",
+  "name": "Cavalier orc",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (orc) de taille M, chaotique (tout alignement)",
+  "armor_class": 15,
+  "armor_note": "armure de cuir clouté",
+  "hit_points": "75 (10d8 + 30)",
+  "wound_threshold": 19,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 11,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": "Dex +5, Con +5",
+  "skills": "Dressage +6, Perception +4, Survie +4",
+  "senses": "vision dans le noir 18 m, Perception passive 14",
+  "languages": "commun, kaani",
+  "challenge_rating": "4",
+  "xp": 1100,
+  "traits": [
+    {
+      "name": "Vélocité",
+      "description": "Au prix d'une action bonus, le cavalier orc peut se déplacer jusqu'à sa VD vers une créature qu'il voit."
+    },
+    {
+      "name": "Manœuvre cavalière",
+      "description": "Lorsque le cavalier orc est monté, sa monture possède également le trait Vélocité."
+    },
+    {
+      "name": "Supériorité montée",
+      "description": "Tant qu'il est monté, le cavalier orc a l'avantage aux attaques de corps à corps contre les créatures dont la taille n'est pas supérieure à celle de sa monture."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le cavalier orc effectue trois attaques de guisarme ou deux attaques d'arc composite."
+    },
+    {
+      "name": "Guisarme",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 3 m, une cible. Réussite : 9 (1d10 + 4) dégâts tranchants."
+    },
+    {
+      "name": "Arc composite",
+      "description": "Attaque d'arme à distance : +5 pour toucher, portée 48/150 m, une cible. Réussite : 8 (1d8 + 4) dégâts perforants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Logo cavalier orc"
+}

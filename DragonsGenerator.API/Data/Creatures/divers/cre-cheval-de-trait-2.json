@@ -1,0 +1,109 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-cheval-de-trait-2",
+  "name": "Cheval de trait",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "",
+  "armor_class": 14,
+  "armor_note": "armure naturelle",
+  "hit_points": "42 (5d12 + 10)",
+  "wound_threshold": 11,
+  "speed": "\\",
+  "abilities": {
+    "str": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "cha": {
+      "score": 16,
+      "modifier": "+3"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +4",
+  "senses": "Perception passive 14",
+  "languages": "sylvestre",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [
+    {
+      "name": "Charge écrasante",
+      "description": "** Si le destrier se déplace d’au moins 6 m en ligne droite vers une créature et qu’il la touche avec une attaque de sabots au même tour de jeu, la cible doit réussir un JS Force DD 14 sous peine de se retrouver **à terre**. Si elle est **à terre**, le destrier peut aussitôt lui porter une attaque de sabots au prix d’une action bonus."
+    },
+    {
+      "name": "Vaillant",
+      "description": "** Le destrier bénéficie d’un avantage aux jets de sauve garde contre l’état préjudiciable effrayé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Sabots",
+      "description": "** Attaque d’arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 11 (2d6 + 4) dégâts contondants.\n\n245\n\nIllustration d'un élan géant\n\n# Élan géant\n\nDans le Septentrion, deux montures se distinguent, le **renne** et l’élan géant. Ce dernier est doté d’un grand prestige. Les druides, après une retraite spirituelle dans les forêts primaires, sont heureux de revenir dans leurs communautés sur un tel animal. Une délégation de druides peut également se présenter à des autorités à la Boréïa ou au Kartaçöl en montant ces bêtes. Leur taille et leur majesté font toujours effet et assurent l’attention de l’auditoire.\n\n### Élan géant\n\nBête de taille TG, non aligné"
+    },
+    {
+      "name": "Classe d’armure",
+      "description": "14 (armure naturelle)"
+    },
+    {
+      "name": "Points de vie",
+      "description": "42 (5d12 + 10) | **Seuil de blessure** 11"
+    },
+    {
+      "name": "Vitesse de déplacement",
+      "description": "18 m\n\n| \\*\\*FOR\\*\\* | \\*\\*DEX\\*\\* | \\*\\*CON\\*\\* | \\*\\*INT\\*\\* | \\*\\*SAG\\*\\* | \\*\\*CHA\\*\\* |\n| ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |\n| 19 (+4)     | 16 (+3)     | 14 (+2)     | 7 (−2)      | 14 (+2)     | 10 (+0)     |"
+    },
+    {
+      "name": "Compétences",
+      "description": "Perception +4"
+    },
+    {
+      "name": "Sens",
+      "description": "Perception passive 14"
+    },
+    {
+      "name": "Langues",
+      "description": "sylvestre"
+    },
+    {
+      "name": "Facteur de puissance",
+      "description": "2 (450 PX)\n\n### Traits"
+    },
+    {
+      "name": "Charge",
+      "description": "** <u>Si l’élan géant se déplace d’au moins 6 m en ligne droite vers sa cible et qu’il la touche</u> avec une attaque de coup de boutoir au même tour de jeu, la cible subit 7 (2d6) dégâts supplémentaires. Si la cible est une créature, elle doit réussir un JS Force DD 14 sous peine de se retrouver **à terre**.\n\n### Actions"
+    },
+    {
+      "name": "Coup de boutoir",
+      "description": "** Attaque d’arme de corps à corps : +6 pour toucher, allonge 3 m, une cible. Réussite : 11 (2d6 + 4) dégâts contondants."
+    },
+    {
+      "name": "Sabots",
+      "description": "** Attaque d’arme de corps à corps : +6 pour toucher, allonge 1,50 m, une créature **à terre**. Réussite : 22 (4d8 + 4) dégâts contondants.\n\n<page_number>246</page_number>\n\nUn corps de lion, une tête et des ailes d’aigle : le griffon est l’un des nombreux hybrides qui parcourent Eana. Ce prédateur affectionne particulièrement les montagnes du Kaan. Les griffons étaient grandement honorés dans les cités d’argile, avant la conquête de Tamerakh et les grands changements dans l’ordre religieux qui ont suivi. Aujourd’hui, les principaux cavaliers de griffons sont les orcs de l’extrême est du continent, les tribus perdues des monts Iruuls.\n\n### Griffon\n\nBête de taille G, non aligné"
+    },
+    {
+      "name": "Classe d’armure",
+      "description": "12"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

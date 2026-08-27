@@ -1,0 +1,109 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-ours-noir-2",
+  "name": "Ours noir",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "",
+  "armor_class": 13,
+  "armor_note": null,
+  "hit_points": "2 (1d4)",
+  "wound_threshold": null,
+  "speed": "\\",
+  "abilities": {
+    "str": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +4",
+  "senses": "Perception passive 14",
+  "languages": "—",
+  "challenge_rating": "1",
+  "xp": 200,
+  "traits": [
+    {
+      "name": "Flair",
+      "description": "** L’ours brun bénéficie d’un avantage aux tests de Sagesse (Perception) qui font intervenir l’odorat."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "** L’ours effectue deux attaques : une de morsure et une de griffes."
+    },
+    {
+      "name": "Morsure",
+      "description": "** Attaque d’arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 8 (1d8 + 4) dégâts perforants."
+    },
+    {
+      "name": "Griffes",
+      "description": "** Attaque d’arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 11 (2d6 + 4) dégâts tranchants.\n\nOurs"
+    },
+    {
+      "name": "*117**\n\n# Rapaces\n\nL\n\nLa famille des rapaces rassemble des prédateurs et charogn",
+      "description": "*117**\n\n# Rapaces\n\nL\n\nLa famille des rapaces rassemble des prédateurs et charognards ailés, taillés pour de longues heures de vol plané à chercher leur pitance, et dotés d’assez de puissance pour abattre leur proie en vol, la capturer sur terre, ou même l’arracher de sous la surface de l’eau. Certaines espèces ont été apprivoisées et peuvent être utilisées pour la chasse, ou pour des tâches aussi complexes que guetter des intrus ou signaler la présence de fugitifs. Les rapaces les plus communément utilisés pour cette tâche sont les faucons de sang, dont les techniques de dressage sont originaires des Drakenbergen.\n\nFaucon\n\nFaucon\n\n## Faucon\n\nBête de taille TP, non aligné"
+    },
+    {
+      "name": "Classe d’armure",
+      "description": "13"
+    },
+    {
+      "name": "Points de vie** 2 (1d4) | **Seuil de blessure** N",
+      "description": "A."
+    },
+    {
+      "name": "Vitesse de déplacement",
+      "description": "3 m, vol 18 m\n\n| \\*\\*FOR\\*\\* | \\*\\*DEX\\*\\* | \\*\\*CON\\*\\* | \\*\\*INT\\*\\* | \\*\\*SAG\\*\\* | \\*\\*CHA\\*\\* |\n| ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |\n| 5 (−3)      | 16 (+3)     | 10 (+0)     | 4 (−3)      | 14 (+2)     | 6 (−2)      |\n\n\n'''"
+    },
+    {
+      "name": "Compétences",
+      "description": "Perception +4"
+    },
+    {
+      "name": "Sens",
+      "description": "Perception passive 14"
+    },
+    {
+      "name": "Langues",
+      "description": "—"
+    },
+    {
+      "name": "Facteur de puissance",
+      "description": "0 (10 PX)\n\n### Traits"
+    },
+    {
+      "name": "Vue perçante",
+      "description": "** Le faucon bénéficie d’un avantage aux tests de Sagesse (Perception) qui font intervenir la vue.\n\n### Actions"
+    },
+    {
+      "name": "Serres",
+      "description": "** Attaque d’arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 1 dégât tranchant.\n\nAigle"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

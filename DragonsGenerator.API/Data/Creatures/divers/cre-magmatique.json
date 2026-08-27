@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-magmatique",
+  "name": "Magmatique",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Élémentaire (feu) de taille P, chaotique neutre",
+  "armor_class": 14,
+  "armor_note": "armure naturelle",
+  "hit_points": "9 (2d6 + 2)",
+  "wound_threshold": 5,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 7,
+      "modifier": "-2"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 8,
+      "modifier": "-1"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 10",
+  "languages": "originel",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [
+    {
+      "name": "Explosion posthume",
+      "description": "Quand le magmatique meurt, il se consume dans une explosion de feu et de magma. Chaque créature située dans un rayon de 3 m doit effectuer un JS Dextérité DD 11 et subit 7 (2d6) dégâts de feu en cas d'échec, la moitié en cas de réussite. Les objets inflammables présents dans la zone et qui ne sont ni portés ni transportés prennent feu."
+    },
+    {
+      "name": "Illumination ignée",
+      "description": "Au prix d'une action bonus, le magmatique peut s'enflammer ou s'éteindre. Lorsqu'il est en feu, il projette une lumière vive dans un rayon de 3 m et une lumière faible sur 3 m de plus."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Contact",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (2d6) dégâts de feu. Si la cible est une créature ou un objet inflammable, elle prend feu. Jusqu'à ce qu'une créature consacre une action à éteindre les flammes, la cible subit 3 (1d6) dégâts de feu à la fin de chacun de ses tours de jeu."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Dans la région d’Askamor, une tradition druidique décrit les magmatiques comme des âmes d’enfants qui erraient dans le Plan Éthéré et ont pu s’en échapper pour se réchauffer dans le foyer du volcan. Son magma est semblable à l’énergie primordiale qui est à l’origine de toute vie, et à laquelle revient ce qui existe une fois qu’il s’est libéré de la forme éphémère de son existence. Dans cette conception, les âmes des morts deviennent des élémentaires ou des fées pendant un temps qui leur permet d’oublier leur vie passée et de se préparer à retourner dans le cycle des renaissances. Suivant ce mythe, des parents endeuillés des Drakenbergen se rendent parfois en pèlerinage à Askamor, non pas pour quérir la bénédiction de Forgeron-Verndari, mais pour retrouver une dernière fois leur enfant parmi les facétieux magmatiques qui courent dans la région."
+}

@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-cocatrice",
+  "name": "Cocatrice",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Monstruosité de taille P, non aligné",
+  "armor_class": 11,
+  "armor_note": null,
+  "hit_points": "27 (6d6 + 6)",
+  "wound_threshold": 7,
+  "speed": "6 m, vol 12 m",
+  "abilities": {
+    "str": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 2,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 5,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 11",
+  "languages": "—",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 1,50 m, une créature. Réussite : 3 (1d4 + 1) dégâts perforants, et la cible doit effectuer un JS Constitution DD 11 contre la pétrification magique. En cas d'échec, la créature commence à se pétrifier et est **entravée**. Elle doit réitérer le jet de sauvegarde à la fin de son tour de jeu suivant. En cas de réussite, l'effet prend fin. En cas d'échec, la créature est **pétrifiée** pendant 24 heures."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "De nombreuses ballades de bardes se plaisent à décrire des aventuriers imprudents qui sous-estiment ce petit monstre extrêmement susceptible et finissent honteusement statufiés ou mis en déroute. Malgré ces avertissements comiques, la cocatrice est recherchée pour le jeu du « Tire-queue ». Il s’agit pour des adolescents et jeunes adultes de prouver leur bravoure en arrachant une de ses plumettes sans être becqueté. Chaque année, des alchimistes sont consultés en urgence par des familles éplorées en quête d’un remède, et malgré cela, la vogue de ce jeu dangereux ne cesse de s’étendre."
+}

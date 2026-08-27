@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-delsednae",
+  "name": "Delsednae",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Céleste de taille M, neutre (tout alignement)",
+  "armor_class": 16,
+  "armor_note": "armure naturelle, bouclier",
+  "hit_points": "97 (13d8 + 39)",
+  "wound_threshold": 25,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "cha": {
+      "score": 15,
+      "modifier": "+2"
+    }
+  },
+  "saving_throws": "Con+6, Sag +6",
+  "skills": "Athlétisme +6, Perception +6, Survie +6",
+  "senses": "vision dans le noir 18 m, Perception passive 16",
+  "languages": "céleste, diabolique, nordique, originel, sylvestre, tumiit",
+  "challenge_rating": "6",
+  "xp": 2300,
+  "traits": [],
+  "actions": [],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les delsednaï sont parfois déchirés entre leur devoir divin et leur affect mortel tenace. Pour les mortels, les règles de Givreuse, si nécessaires soient-elles, sont parfois difficiles à comprendre et donc à accepter. Certains peuples du Septentrion, poussés par l’avidité, la désillusion ou le désespoir, en viennent à les enfreindre, et il revient alors au delsednae d’appliquer la loi divine. Mais comment lever la main sur ceux qui étaient ses semblables il n’y a pas si longtemps ? Des delsednaï se retrouvent ainsi à atermoyer, plaider, parlementer dans l’espoir de trouver une solution non-violente à ce dilemme. Le pire survient lorsque le problème s’éternise et qu’un talsednae finit par s’en mêler. Ces célestes supérieurs sont moins portés à la pédagogie ou à la demi-mesure, car ils ne peuvent passer autant de temps dans le Plan Matériel que les delsednaï ; il leur faut aller au plus court pour résoudre un problème."
+}

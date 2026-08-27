@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-kushu-le-diable-gele",
+  "name": "Kûshu, le diable gelé",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Fiélon (diable) de taille G, loyal mauvais",
+  "armor_class": 18,
+  "armor_note": "armure naturelle",
+  "hit_points": "180 (19d10 + 76)",
+  "wound_threshold": 45,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 21,
+      "modifier": "+5"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "int": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "wis": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 18,
+      "modifier": "+4"
+    }
+  },
+  "saving_throws": "Dex +7, Con +9, Sag +7, Cha +9",
+  "skills": null,
+  "senses": "vision aveugle 18 m, vision dans le noir 36 m, Perception passive 12",
+  "languages": "diabolique, télépathie 36 m",
+  "challenge_rating": "14",
+  "xp": 11500,
+  "traits": [
+    {
+      "name": "Résistance à la magie",
+      "description": "Le diable gelé bénéficie d'un avantage aux jets de sauvegarde contre les sorts et autres effets magiques."
+    },
+    {
+      "name": "Vision diabolique",
+      "description": "L'obscurité magique ne gêne en rien la vision dans le noir du diable gelé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le diable gelé effectue trois attaques : une de morsure, une de griffes et une de queue."
+    },
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +10 pour toucher, allonge 1,50 m, une cible. Réussite : 12 (2d6 + 5) dégâts perforants plus 10 (3d6) dégâts de froid."
+    },
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +10 pour toucher, allonge 1,50 m, une cible. Réussite : 10 (2d4 + 5) dégâts tranchants plus 10 (3d6) dégâts de froid."
+    },
+    {
+      "name": "Queue",
+      "description": "Attaque d'arme de corps à corps : +10 pour toucher, allonge 3 m, une cible. Réussite : 12 (2d6 + 5) dégâts contondants plus 10 (3d6) dégâts de froid."
+    },
+    {
+      "name": "Mur de glace (recharge 6)",
+      "description": "Le diable gelé forme magiquement un mur de glace opaque sur une surface solide qu'il voit dans un rayon de 18 m de lui. Ce mur d'une épaisseur de 30 cm s'étend au maximum sur 9 m de long et 3 m de haut, ou prend la forme d'un dôme hémisphérique pouvant aller jusqu'à 6 m de diamètre.\nQuand le mur apparaît, chaque créature située dans l'espace correspondant en est repoussée par le chemin le plus court. La créature choisit de quel côté du mur elle se retrouve, sauf si elle est neutralisée. Elle effectue ensuite un JS Dextérité DD 17 et subit 35 (10d6) dégâts de froid en cas d'échec, la moitié en cas de réussite.\nLe mur persiste pendant 1 minute ou jusqu'à ce que le diable gelé soit neutralisé ou meure. Il peut être endommagé et battu en brèche ; chaque section de 3 m présente les propriétés suivantes : CA 5, 30 pv, vulnérabilité aux dégâts de feu, et immunité contre les dégâts d'acide, de froid, nécrotiques, de poison et psychiques.\nSi une section est détruite, elle laisse dans l'espace qu'elle occupait une sorte de rideau d'air froid. Une fois par tour de jeu, quand une créature termine un déplacement qui l'a vu traverser un tel rideau, de son plein gré ou non, elle doit effectuer un JS Constitution DD 17 et subit 17 (5d6) dégâts de froid en cas d'échec, la moitié en cas de réussite. Le rideau d'air glacé se dissipe quand le reste du mur s'évanouit.\n352\n353"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Aux abords du pôle nord, dans une zone dangereuse en raison du froid gémonien qui y règne et de la présence de sentinelles de Givreuse qui en interdisent l’accès, se trouve un portail qui conduit directement aux Gémonies. Ce monde de glace, maléfique et dément, est un véritable enfer dans lequel sont emprisonnées des créatures qui déplurent à des prêtres de Givreuse ou constituèrent un danger aux yeux de la déesse ou de ses célestes serviteurs. Les terrifiants kûshus rôdent parfois non loin du portail. Durant leur temps libre, si l’occasion se présente, ils chassent des humanoïdes ou des géants pour nourrir leur maître terrifiant, **Askinos**. Du fait de l’accord entre l’hospodar et Givreuse, il arrive aussi que des diables gelés soient envoyés en mission au service du culte ou qu’ils gardent le cœur de ses sanctuaires."
+}

@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-chevre",
+  "name": "Chèvre",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille M, non aligné",
+  "armor_class": 10,
+  "armor_note": null,
+  "hit_points": "4 (1d8)",
+  "wound_threshold": null,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 5,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "Perception passive 10",
+  "languages": "—",
+  "challenge_rating": "0",
+  "xp": 10,
+  "traits": [
+    {
+      "name": "Charge",
+      "description": "<u>Si la chèvre se déplace d'au moins 6 m en ligne droite vers sa cible et qu'elle la touche</u> avec une attaque de coup de boutoir au même tour de jeu, la cible subit 2 (1d4) dégâts contondants supplémentaires. Si la cible est une créature, elle doit réussir un JS Force DD 10 sous peine de se retrouver **à terre**."
+    },
+    {
+      "name": "Leste",
+      "description": "La chèvre bénéficie d'un avantage aux JS Force et Dextérité contre les effets qui menacent de la jeter **à terre**."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Coup de boutoir",
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 1,50 m, une cible. Réussite : 3 (1d4 + 1) dégâts contondants.\n234"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "La richesse dans les tribus se mesure souvent en têtes de bétail, qu’il s’agisse de moutons ou de chèvres. Ces animaux sont encore très proches de leurs cousins sauvages. Ils fournissent la laine et le lait qui permettent aux nombreux éleveurs de la steppe de subsister dans les étendues herbeuses."
+}

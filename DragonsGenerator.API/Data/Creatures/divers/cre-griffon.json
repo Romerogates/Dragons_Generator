@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-griffon",
+  "name": "Griffon",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille G, non aligné",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "59 (7d10 + 21)",
+  "wound_threshold": 15,
+  "speed": "9 m, vol 24 m",
+  "abilities": {
+    "str": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 8,
+      "modifier": "-1"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +5",
+  "senses": "vision dans le noir 18 m, Perception passive 15",
+  "languages": "—",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [
+    {
+      "name": "Vue perçante",
+      "description": "Le griffon bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir la vue."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le griffon effectue deux attaques : une de bec et une de griffes."
+    },
+    {
+      "name": "Bec",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 8 (1d8 + 4) dégâts perforants."
+    },
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 11 (2d6 + 4) dégâts tranchants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Un corps de lion, une tête et des ailes d’aigle : le griffon est l’un des nombreux hybrides qui parcourent Eana. Ce prédateur affectionne particulièrement les montagnes du Kaan. Les griffons étaient grandement honorés dans les cités d’argile, avant la conquête de Tamerakh et les grands changements dans l’ordre religieux qui ont suivi. Aujourd’hui, les principaux cavaliers de griffons sont les orcs de l’extrême est du continent, les tribus perdues des monts Iruuls."
+}

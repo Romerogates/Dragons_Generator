@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-araignee-geante",
+  "name": "Araignée géante",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille G, non aligné",
+  "armor_class": 14,
+  "armor_note": "armure naturelle",
+  "hit_points": "26 (4d10 + 4)",
+  "wound_threshold": 7,
+  "speed": "9 m, escalade 9 m",
+  "abilities": {
+    "str": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 2,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 4,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +7",
+  "senses": "perception des vibrations 15 m, Perception passive 10",
+  "languages": "—",
+  "challenge_rating": "1",
+  "xp": 200,
+  "traits": [
+    {
+      "name": "Pattes d'araignée",
+      "description": "L'araignée peut parcourir les parois les plus difficiles à escalader, y compris les plafonds, sans devoir effectuer de test de caractéristique."
+    },
+    {
+      "name": "Perception des toiles",
+      "description": "Tant qu'elle est en contact avec une toile, l'araignée connaît la position exacte de toutes les créatures qui touchent cette même toile."
+    },
+    {
+      "name": "Arpenteur de toiles",
+      "description": "L'araignée n'est pas soumise aux contraintes de déplacement imposées par les toiles."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une créature. Réussite : 7 (1d8 + 3) dégâts perforants, et la cible doit effectuer un JS Constitution DD 11. Elle subit 9 (2d8) dégâts de poison en cas de sauvegarde ratée et la moitié en cas de réussite. Si ces dégâts de poison font tomber la cible à 0 pv, celle-ci est en état stable mais se retrouve empoisonnée pendant 1 heure, même si elle récupère des pv. Elle reste également paralysée tant qu'elle est intoxiquée par ce venin."
+    },
+    {
+      "name": "Toile (recharge 5–6)",
+      "description": "Attaque d'arme à distance : +5 pour toucher, portée 9/18 m, une créature. Réussite : la cible est entravée par la toile. Au prix d'une action, elle peut tenter un test de Force DD 12 pour faire céder la toile. Il est également possible d'attaquer directement la toile (CA 10 ; pv 5 ; vulnérabilité aux dégâts de feu ; immunité aux dégâts contondants, psychiques et de poison).\nGiant spider illustration"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "---"
+}

@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-aigle",
+  "name": "Aigle",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille P, non aligné",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "4 (1d6 + 1)",
+  "wound_threshold": null,
+  "speed": "3 m, vol 18 m",
+  "abilities": {
+    "str": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 5,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +4",
+  "senses": "Perception passive 14",
+  "languages": "—",
+  "challenge_rating": "0",
+  "xp": 10,
+  "traits": [
+    {
+      "name": "Vue perçante",
+      "description": "L'aigle bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir la vue."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Serres",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d4 + 2) dégâts tranchants.\nPOVOAYAAYAYOYTVOY"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Le faucon de sang tire son nom de ses plumes cramoisies et de son tempérament très agressif. Ces volatiles attaquent en nombre lors d’attaques coordonnées. Des dresseurs sont capables d’élever des faucons de sang pour servir de guetteurs ou d’éclaireurs. Ils apprennent à signaler la présence de fugitifs poursuivis, tout en restant eux-mêmes à une altitude suffisante pour ne pas être abattus par le premier archer venu."
+}

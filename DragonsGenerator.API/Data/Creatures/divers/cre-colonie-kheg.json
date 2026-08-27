@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-colonie-kheg",
+  "name": "Colonie kheg",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille P, non aligné",
+  "armor_class": 14,
+  "armor_note": "armure naturelle",
+  "hit_points": "28 (8d6)",
+  "wound_threshold": 7,
+  "speed": "6 m, fouissage 3 m",
+  "abilities": {
+    "str": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 6,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +2, Survie +2",
+  "senses": "vision dans le noir 18 m, perception des vibrations 18 m, Perception passive 12",
+  "languages": "phéromones et langage corporel",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d4+2) dégâts tranchants plus 2 (1d4) dégâts d'acide. Si la cible est une créature de taille P ou inférieure, elle est **agrippée** (DD 12 pour s'extraire). Tant que la lutte persiste, la khegon ne peut mordre que la créature agrippée et bénéficie d'un avantage aux jets d'attaque correspondants."
+    },
+    {
+      "name": "Jet d'acide (recharge 6)",
+      "description": "La khegon crache une ligne d'acide de 6 m de long et de 1,50 m de large, à condition qu'elle ne soit pas en train d'agripper une créature. Chaque créature prise dans la ligne doit effectuer un JS Dextérité DD 10 et subit 7 (2d6) dégâts d'acide en cas d'échec, la moitié en cas de réussite."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Un « vétéran » azer n’est pas tant expérimenté que conçu avec soin, doté d’une enveloppe corporelle et d’une âme ardente particulièrement fortes, en faisant un individu qui sort du lot, capables de mener de dangereuses opérations militaires, que ce soit en solitaire ou en tant que membre d’une escouade."
+}

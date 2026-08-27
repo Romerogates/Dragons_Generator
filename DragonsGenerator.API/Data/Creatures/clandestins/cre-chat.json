@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-chat",
+  "name": "Chat",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Bête de taille TP, non aligné",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "2 (1d4)",
+  "wound_threshold": null,
+  "speed": "12 m, escalade 9 m",
+  "abilities": {
+    "str": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +4, Perception +3",
+  "senses": "Perception passive 13",
+  "languages": "—",
+  "challenge_rating": "0",
+  "xp": 10,
+  "traits": [
+    {
+      "name": "Flair",
+      "description": "Le chat bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'odorat."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +0 pour toucher, allonge 1,50 m, une cible. Réussite : 1 dégât tranchant."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les chats sont appréciés pour leur capacité à exterminer les **rats** et souris avec enthousiasme. Beaucoup d’habitants les nourrissent, et il n’est pas rare de trouver des places de villes et de villages remplies de ces félins. La nuit, sur les toits, les guerres de territoire sont impitoyables, et peuvent empêcher les locaux de dormir."
+}

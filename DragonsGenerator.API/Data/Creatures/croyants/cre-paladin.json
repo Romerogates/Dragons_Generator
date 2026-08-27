@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-paladin",
+  "name": "Paladin",
+  "category": "croyants",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": null,
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 20,
+  "armor_note": "harnois, bouclier",
+  "hit_points": "112 (15d8 + 45)",
+  "wound_threshold": 23,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 17,
+      "modifier": "+3"
+    }
+  },
+  "saving_throws": "Sag +4, Cha +6",
+  "skills": "Intimidation +6, Persuasion +6, Religion +3",
+  "senses": "Perception passive 11",
+  "languages": "deux au choix",
+  "challenge_rating": "8",
+  "xp": 3900,
+  "traits": [
+    {
+      "name": "Aura de protection",
+      "description": "Chaque fois que le paladin ou une créature amicale située dans un rayon de 3 m de lui doit effectuer un jet de sauvegarde, la créature en question bénéficie d'un bonus égal à son modificateur de Charisme (+3). Le paladin doit être conscient pour conférer ce bonus."
+    },
+    {
+      "name": "Châtiment divin",
+      "description": "Lorsque le paladin touche une créature avec une attaque d'arme de corps à corps, il peut dépenser un emplacement de sort pour lui infliger des dégâts radiants, en plus des dégâts de l'arme. Ces dégâts supplémentaires s'élèvent à 2d8 pour un emplacement de sort du 1ᵉʳ niveau, auxquels s'ajoute 1d8 par niveau supplémentaire de l'emplacement. Les dégâts augmentent encore de 1d8 si la cible est un mort-vivant, un ravageur ou un fiélon.\n1ᵉʳ niveau (4 emplacements) : détection du Mal et du Bien, égide fugace, faveur divine, protection contre le Mal et le Bien\n2ᵉ niveau (3 emplacements) : arme vengeresse, restauration partielle\n3ᵉ niveau (2 emplacements) : aura de confiance, dissipation de la magie"
+    },
+    {
+      "name": "Châtiment divin",
+      "description": "Lorsque le paladin touche une créature avec une attaque d'arme de corps à corps, il peut dépenser un emplacement de sort pour lui infliger des dégâts radiants, en plus des dégâts de l'arme. Ces dégâts supplémentaires s'élèvent à 2d8 pour un emplacement de sort du 1ᵉʳ niveau, auxquels s'ajoute 1d8 par niveau supplémentaire de l'emplacement. Les dégâts augmentent encore de 1d8 si la cible est un mort-vivant, un ravageur ou un fiélon.\n1ᵉʳ niveau (4 emplacements) : détection du Mal et du Bien, égide fugace, faveur divine, protection contre le Mal et le Bien\n2ᵉ niveau (3 emplacements) : arme vengeresse, restauration partielle\n3ᵉ niveau (2 emplacements) : aura de confiance, dissipation de la magie"
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le paladin effectue deux attaques de corps à corps."
+    },
+    {
+      "name": "Épée longue",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (1d8+3) dégâts tranchants + 4 (1d8) dégâts radiants.\n17"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Le profil de fanatique s’applique à un individu passionné, dogmatique et rigide. Ses certitudes sont inébranlables et il a dédié sa vie à l’accomplissement d’une œuvre. Celle-ci peut être à la seule gloire de son seigneur (dieu ou fiélon), ou inclure aussi des ambitions personnelles, dont certains aspects pourraient être en conflit avec les grands principes qu’il affiche devant ses adorateurs. Il peut diriger un groupuscule religieux intolérant, estimant que son dieu n’est pas honoré comme il le mérite, et prendre en conséquence les mesures qui s’imposent : éliminer les mécréants, terroriser les croyants insuffisamment zélés, etc. Un fanatique adepte des fiélons cherchera pour sa part à démontrer la faiblesse des dieux et leur indifférence aux souffrances des mortels, arguant que les dons des seigneurs maléfiques envers leurs fidèles sont bien plus concrets qu’une promesse de félicité dans l’au-delà. L’équipement d’un fanatique dépend du succès de son groupuscule et de l’emprise qu’il a sur ses fidèles. Si ceux-ci sont prodigues, il pourrait facilement disposer d’équipement de qualité et de mercenaires. Par ailleurs, si le meneur souhaite refléter la nature de son affiliation, un fanatique voué à un seigneur fiélon pourra disposer de sorts choisis dans la liste du sorcier plutôt que du prêtre (cf. **Variante : Fanatique sorcier**)."
+}

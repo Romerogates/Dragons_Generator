@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-sanglier-geant",
+  "name": "Sanglier géant",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille G, non aligné",
+  "armor_class": 15,
+  "armor_note": "armure naturelle",
+  "hit_points": "42 (5d10 + 15)",
+  "wound_threshold": 11,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Athlétisme +5, Perception +3",
+  "senses": "Perception passive 13",
+  "languages": "—",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [
+    {
+      "name": "Charge",
+      "description": "Si le sanglier géant se déplace d'au moins 6 m en ligne droite <u>vers sa cible et qu'il la touche</u> avec une attaque de défenses au même tour de jeu, la cible subit 9 (2d8) dégâts tranchants supplémentaires. Si la cible est une créature de taille G ou inférieure, elle doit réussir un JS Force DD 13 sous peine de se retrouver **à terre**."
+    },
+    {
+      "name": "Acharnement (recharge après un repos court ou long)",
+      "description": "Si le sanglier subit 10 dégâts ou moins et que ces dommages sont censés le faire tomber à 0 pv, il se retrouve en fait à 1 pv."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Défenses",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 10 (2d6 + 3) dégâts tranchants.\nSanglier illustration"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les cochons d’élevage ont des caractéristiques proches, mais sont généralement privés des traits charge et acharnement."
+}

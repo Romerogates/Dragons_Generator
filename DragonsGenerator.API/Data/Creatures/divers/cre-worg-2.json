@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-worg-2",
+  "name": "Worg",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "",
+  "armor_class": 15,
+  "armor_note": "armure naturelle",
+  "hit_points": "",
+  "wound_threshold": null,
+  "speed": "\\",
+  "abilities": {},
+  "saving_throws": null,
+  "skills": "Acrobaties +7, Athlétisme +8, Intimidation +6, Perception +7",
+  "senses": "vision dans le noir 18 m, Perception passive 17",
+  "languages": "—",
+  "challenge_rating": "5",
+  "xp": 1800,
+  "traits": [
+    {
+      "name": "Ouïe fine et flair",
+      "description": "** L’ikhworg bénéficie d’un avantage aux tests de Sagesse (Perception) qui font intervenir l’ouïe ou l’odorat."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "** Attaque d’arme de corps à corps : +8 pour toucher, allonge 1,50 m, une cible. Réussite : 22 (5d6 + 5) dégâts perforants + 9 (2d8) dégâts de foudre. Si la cible est une créature, elle doit réussir un JS Force DD 16 sous peine de se retrouver **à terre**."
+    },
+    {
+      "name": "Hurlement (recharge 5-6)",
+      "description": "** L’ikhworg pousse un cri assourdissant grondant comme le tonnerre, aux effets équivalents à un sort de hurlement DD 14 lancé avec un emplacement de sort de 4ᵉ niveau.\n\nRapides comme la foudre, féroces comme la tempête, dangereux comme un ouragan, les ikhworgs, ou worgs suprêmes, sont des spécimens extraordinaires reconnus comme des émissaires divins de Tamerakh. Il est dit que seuls les véritables héros du Destructeur sont dignes d’être réincarnés sous une telle forme. Plus massifs et élancés que leurs semblables ordinaires, leur pelage est d’un gris de ciel d’orage aux reflets violacés, et ils sont entourés d’une senteur lourde d’ozone. Les worgs leur obéissent sans conteste, et on dit qu’un ikhworg n’accepte comme cavaliers que les plus grands champions de la Horde. En voir un est perçu comme un présage extrêmement éloquent de la part de Tamerakh… en bien ou en mal.\n\nAnthony Martin Romero (Order #44468918)\n\n# Steppes et forêts de pins\n\nSi les steppes du Kaan fascinent et paraissent infinies, elles sont aussi entre coupées de bois dans les vallées abritées, près de cours d’eau éphémères ou réguliers. La région de Manbalarer, terre des sources, comprend de nombreuses forêts. Pour un voyageur de la Cité Franche, découvrir le Kaan revient à plonger dans un monde naturel nouveau, dont les aspects familiers sont constamment en contraste avec des étrangetés inconnues d’une beauté déconcertante. Lister des espèces endémiques du Kaan serait long et sans doute vain, tant il en existe, de toutes tailles, dans tous les milieux.\n\n## Panorama\n\nLa nature est au cœur de la vie des habitants du Kaan. Pour les nomades, les saisons sont marquées par les temps forts que sont le départ ou le retour des oiseaux migrateurs, telles les vaillantes oies bernaches, les élégantes grues cendrées ou les outardes des déserts à l’étonnante parade nuptiale. Ces bêtes occupent une place importante dans les mythes et les contes, elles sont considérées à la fois comme un don d’Eana – en tant que proies abondantes pendant leurs migrations – et comme des messagères de l’équilibre du monde.\n\n## Sous le couvert des arbres\n\nLes conifères endémiques sont les plus abondants, comprenant de nombreuses variétés de pins, de cyprès et d’araucarias et d’autres encore, à toutes les latitudes et les altitudes du continent. Des pins à écorce blanche à la silhouette tourmentée dominent des collines semi-désertiques. De maigres mais sculpturaux petits dacrydes queues de chat poussent même les pieds dans l’eau, leurs branches fines et claires formant un entrelacs tandis que leurs touffes d’épines composent d’épais nuages verts. On dit d’ailleurs qu’ils veillent sur des passages vers le monde des esprits lacustres. Les forêts sont marquées par la présence de feuillus qui arborent dès le début de l’automne des couleurs chatoyantes, dans les tons dorés et rouges, tels les chênes rouges, les bouleaux, les frênes blancs, les trembles ou les érables.\n\nLes fougères, basses ou arbustives, prospèrent dans les sous-bois humides. D’après les druides, ces plantes sont particulièrement précieuses, car elles remontent à l’ère des Géants. Leurs racines et leurs cendres entrent dans la composition de remèdes et potions.\n\n## La mégafaune du Kaan\n\nCertaines bêtes atteignent de grandes tailles au Kaan : la faune des steppes et forêts de pins n’est pas en reste. Les voyageurs ne manquent pas d’être stupéfaits par leur confrontation avec les variantes locales des créatures qu’ils connaissent. Le terme de mégafaune désigne des environnements où toute la faune paraît disproportionnée par rapport à ce qui est la norme pour un habitant de la Cité Franche. Les bêtes ont évolué dans un contexte\n\nqui a permis le développement de formes massives et plus puissantes qu’ailleurs. En contrepartie, elles ont habituellement un taux de natalité faible et une longévité accrue. On trouve ces créatures essentiellement dans les prairies, peu importe la latitude. Les prédateurs de ces régions sont à la mesure de leurs proies. C’est ainsi le cas des lions et des loups sanguinaires ou des castors géants, mais il en existe bien d’autres, notamment de grands ours, des cousins massifs de lynx, ou de formidables tatous.\n\n## Immenses troupeaux\n\nOutre les créatures de grande taille, la steppe est l’habitat d’espèces formant des troupeaux de plusieurs milliers d’individus. Ces bêtes s’adaptent également aux forêts peu denses, de sorte qu’on les retrouve du nord au sud du Kaan avec des sous-espèces locales adaptées à des terrains particuliers.\n\n## Colonies migratrices\n\nLe spectacle des immensités naturelles varie grandement selon les saisons. Les espèces d’oiseaux migrateurs changent radicalement l’aspect d’une région. Des milliers d’espèces comprenant pour certaines des millions d’individus migrent chaque année au printemps et à l’automne, formant de véritables nuages vivants. Les nuées se posent sur les lacs, les estuaires et dans les zones humides pour reprendre des forces dans un brouhaha de caquètements et piaillements digne d’une foule un jour de fête. Les colonies d’oiseaux nichant dans les falaises ou des rivages abrités ont des aspects de campements immenses agités en tous sens.\n\n<page_number>252</page_number>\n\n# Arslanikh\n\nCes grands prédateurs félins, aussi nommés lions du Kaan ou lions sanguinaires, chassent les troupeaux dans la toundra ou la steppe. Les mâles et les femelles ne se distinguent pas au premier regard, car contrairement à leurs cousins les lions de Mibu, ils n’ont pas de crinière. Il en existe plusieurs sous-espèces adaptées à différents climats du Kaan, depuis le Grand Nord jusqu’aux tropiques. L’arslanikh est un prédateur respecté, et certaines tribus le prennent volontiers comme totem, admirant sa puissance autant que son aptitude à travailler en équipe.\n\nAu-delà des chasseurs traditionnels, le fauve a également beaucoup marqué la culture des cités d’argile, apparaissant dans de nombreux mythes. La beauté de l’animal et sa noblesse sont communément admirées, et il est fréquemment représenté dans les arts. Pour les puissants, notables et souverains, avoir des arslanikhs dans son palais est un signe de prestige. Dompter les fauves est en effet considéré comme le signe d’une haute dignité. Afin de faciliter l’établissement d’un lien fort avec la bête, certains parents de riches familles vont jusqu’à offrir un tout jeune arslanikh à leur enfant. Charge aux dresseurs professionnels d’éviter les accidents au palais !\n\nIcone de tête de lion\n\n### Arslanikh, le lion du Kaan\n\nBête de taille G, non aligné"
+    },
+    {
+      "name": "Classe d’armure",
+      "description": "15 (armure naturelle)"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

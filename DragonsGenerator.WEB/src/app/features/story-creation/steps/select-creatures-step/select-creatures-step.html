@@ -1,0 +1,439 @@
+<div class="flex flex-col gap-6 animate-fade-in pb-8">
+
+  <header class="text-center px-4">
+
+    <h2 class="text-2xl md:text-3xl font-bold text-violet-400 font-serif mb-2">Choisir les créatures</h2>
+
+    <p class="text-sm text-slate-400 italic max-w-xl mx-auto">
+
+      Laissez le bestiaire proposer des créatures adaptées à votre niveau, ou sélectionnez-les vous-même.
+
+    </p>
+
+  </header>
+
+
+
+  <!-- Mode toggle -->
+
+  <div class="flex justify-center gap-3 px-4">
+
+    <button
+
+      type="button"
+
+      class="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors"
+
+      [class]="
+
+        builder.selectionMode() === 'auto'
+
+          ? 'bg-violet-950/40 border-violet-500 text-violet-300'
+
+          : 'bg-[#1b2028] border-slate-700 text-slate-500 hover:border-slate-600'
+
+      "
+
+      (click)="setMode('auto')"
+
+    >
+
+      <iconify-icon icon="fluent-emoji:dice"></iconify-icon> Sélection auto
+
+    </button>
+
+    <button
+
+      type="button"
+
+      class="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors"
+
+      [class]="
+
+        builder.selectionMode() === 'manual'
+
+          ? 'bg-violet-950/40 border-violet-500 text-violet-300'
+
+          : 'bg-[#1b2028] border-slate-700 text-slate-500 hover:border-slate-600'
+
+      "
+
+      (click)="setMode('manual')"
+
+    >
+
+      <iconify-icon icon="fluent-emoji:pointing-up"></iconify-icon> Choisir moi-même
+
+    </button>
+
+  </div>
+
+
+
+  @if (builder.selectionMode() === 'auto') {
+
+    <div class="px-4 max-w-2xl mx-auto w-full space-y-6">
+
+      <div>
+
+        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3 text-center">
+
+          Niveau des héros
+
+        </label>
+
+        <div class="grid grid-cols-3 sm:grid-cols-3 gap-2">
+
+          @for (range of levelRanges; track range.id) {
+
+            <button
+
+              type="button"
+
+              class="px-3 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors text-center"
+
+              [class]="
+
+                builder.levelRangeId() === range.id
+
+                  ? 'bg-violet-950/40 border-violet-500 text-violet-300'
+
+                  : 'bg-[#1b2028] border-slate-700 text-slate-400 hover:border-slate-600'
+
+              "
+
+              (click)="builder.levelRangeId.set(range.id)"
+
+            >
+
+              {{ range.label }}
+
+            </button>
+
+          }
+
+        </div>
+
+      </div>
+
+
+
+      <div>
+
+        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3 text-center">
+
+          Nombre de personnages
+
+        </label>
+
+        <div class="flex justify-center gap-2">
+
+          @for (n of autoCounts; track n) {
+
+            <button
+
+              type="button"
+
+              class="w-12 h-12 rounded-xl text-sm font-black border transition-colors"
+
+              [class]="
+
+                builder.autoCreatureCount() === n
+
+                  ? 'bg-violet-950/40 border-violet-500 text-violet-300'
+
+                  : 'bg-[#1b2028] border-slate-700 text-slate-400 hover:border-slate-600'
+
+              "
+
+              (click)="builder.autoCreatureCount.set(n)"
+
+            >
+
+              {{ n }}
+
+            </button>
+
+          }
+
+        </div>
+
+      </div>
+
+
+
+      @if (selectedLevelRange(); as range) {
+
+        <p class="text-center text-xs text-slate-500 italic">
+
+          Créatures adaptées aux aventures {{ range.label.toLowerCase() }}
+
+          (FP {{ range.fpMin }}–{{ range.bossFpMax }})
+
+        </p>
+
+      }
+
+
+
+      @if (autoPickError(); as err) {
+
+        <div class="p-3 bg-red-950/40 border border-red-900/50 rounded-xl text-sm text-red-300 text-center">{{ err }}</div>
+
+      }
+
+
+
+      @if (creatures() !== null) {
+
+        <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
+
+          <div class="flex items-center justify-between mb-4">
+
+            <p class="text-[10px] font-black uppercase tracking-widest text-violet-500">Aperçu (aléatoire)</p>
+
+            <button
+
+              type="button"
+
+              class="text-[10px] font-black uppercase tracking-widest text-violet-400 hover:text-violet-300 flex items-center gap-1"
+
+              (click)="rerollAuto()"
+
+            >
+
+              <iconify-icon icon="fluent-emoji:dice"></iconify-icon> Relancer
+
+            </button>
+
+          </div>
+
+          <div class="space-y-2">
+
+            @for (c of autoPreview(); track c.creatureId) {
+
+              <div class="flex items-center justify-between gap-3 py-2 border-b border-slate-800/80 last:border-0">
+
+                <span class="font-serif text-slate-200">{{ c.creatureName }}</span>
+
+                <div class="flex gap-2 text-[9px] font-black uppercase tracking-wider shrink-0">
+
+                  <span class="text-violet-400">{{ formatCr(c.challengeRating) }}</span>
+
+                  <span class="text-slate-500">{{ categoryLabel(c.category) }}</span>
+
+                </div>
+
+              </div>
+
+            } @empty {
+
+              <p class="text-sm text-slate-500 italic text-center py-4">
+
+                Aucune créature disponible pour cette tranche. Essayez une autre plage.
+
+              </p>
+
+            }
+
+          </div>
+
+        </div>
+
+      }
+
+    </div>
+
+  } @else {
+
+    <p class="text-[10px] font-black uppercase tracking-widest text-violet-500/80 text-center">
+
+      {{ selectedCount() }} / 20 sélectionnée(s)
+
+    </p>
+
+
+
+    <div class="px-4 max-w-4xl mx-auto w-full space-y-4">
+
+      <input
+
+        type="search"
+
+        placeholder="Rechercher..."
+
+        [value]="search()"
+
+        (input)="search.set($any($event.target).value)"
+
+        class="w-full bg-[#1b2028] border-2 border-slate-700 rounded-full py-3 px-5 text-sm text-slate-200 focus:outline-none focus:border-violet-500/70"
+
+      />
+
+
+
+      <div class="flex flex-wrap gap-2">
+
+        <button
+
+          type="button"
+
+          class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border"
+
+          [class]="categoryFilter() === null ? 'border-violet-500 text-violet-400 bg-violet-950/30' : 'border-slate-700 text-slate-500'"
+
+          (click)="categoryFilter.set(null)"
+
+        >
+
+          Toutes
+
+        </button>
+
+        @for (cat of categories(); track cat) {
+
+          <button
+
+            type="button"
+
+            class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border"
+
+            [class]="categoryFilter() === cat ? 'border-violet-500 text-violet-400 bg-violet-950/30' : 'border-slate-700 text-slate-500'"
+
+            (click)="categoryFilter.set(cat)"
+
+          >
+
+            {{ categoryLabel(cat) }}
+
+          </button>
+
+        }
+
+      </div>
+
+
+
+      <div class="flex flex-wrap gap-2">
+
+        @for (tier of crTiers; track tier) {
+
+          <button
+
+            type="button"
+
+            class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border"
+
+            [class]="crTierFilter() === tier ? 'border-orange-500 text-orange-400 bg-orange-950/30' : 'border-slate-700 text-slate-500'"
+
+            (click)="crTierFilter.set(crTierFilter() === tier ? null : tier)"
+
+          >
+
+            {{ crTierLabels[tier] }}
+
+          </button>
+
+        }
+
+      </div>
+
+    </div>
+
+
+
+    @if (creatures() === null) {
+
+      <p class="text-center text-violet-400 animate-pulse py-12">Chargement du bestiaire...</p>
+
+    } @else {
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 px-4 max-w-5xl mx-auto w-full">
+
+        @for (creature of filteredCreatures(); track creature.id) {
+
+          <button
+
+            type="button"
+
+            class="text-left p-4 rounded-2xl border transition-all duration-200"
+
+            [class]="
+
+              isSelected(creature.id)
+
+                ? 'bg-violet-950/30 border-violet-500 ring-1 ring-violet-500/30'
+
+                : 'bg-[#1b2028] border-slate-800 hover:border-violet-500/40'
+
+            "
+
+            (click)="toggle(creature)"
+
+          >
+
+            <div class="flex items-start justify-between gap-2 mb-2">
+
+              <span class="font-bold text-slate-100 font-serif">{{ creature.name }}</span>
+
+              <span class="text-lg shrink-0">
+
+                @if (isSelected(creature.id)) {
+
+                  <iconify-icon icon="fluent-emoji:check-mark-button"></iconify-icon>
+
+                } @else {
+
+                  <iconify-icon [icon]="categoryIcon(creature.category)"></iconify-icon>
+
+                }
+
+              </span>
+
+            </div>
+
+            <div class="flex flex-wrap gap-1.5 text-[9px] font-black uppercase tracking-wider">
+
+              <span class="bg-violet-950/40 text-violet-300 px-2 py-0.5 rounded">{{ formatCr(creature.challengeRating) }}</span>
+
+              <span class="bg-slate-900 text-slate-500 px-2 py-0.5 rounded">{{ categoryLabel(creature.category) }}</span>
+
+            </div>
+
+          </button>
+
+        }
+
+      </div>
+
+    }
+
+  }
+
+
+
+  <div class="wizard-step-nav px-4 max-w-3xl mx-auto w-full">
+
+    <div></div>
+
+    <button
+
+      type="button"
+
+      class="wizard-nav-primary"
+
+      [disabled]="!builder.isStepValid(1) || (builder.selectionMode() === 'auto' && autoPreview().length === 0)"
+
+      (click)="confirm()"
+
+    >
+
+      Personnaliser →
+
+    </button>
+
+  </div>
+
+</div>
+
+

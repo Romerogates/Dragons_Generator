@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-hibou-et-chouette-2",
+  "name": "Hibou et chouette",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "",
+  "armor_class": 11,
+  "armor_note": "16 avec peau d’écorce",
+  "hit_points": "27 (5d8 + 5)",
+  "wound_threshold": 7,
+  "speed": "\\",
+  "abilities": {
+    "str": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Médecine +4, Nature +3, Perception +4",
+  "senses": "Perception passive 14",
+  "languages": "druidique et deux autres au choix",
+  "challenge_rating": "1/4",
+  "xp": 50,
+  "traits": [],
+  "actions": [],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

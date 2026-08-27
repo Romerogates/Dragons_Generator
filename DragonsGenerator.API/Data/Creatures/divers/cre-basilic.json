@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-basilic",
+  "name": "Basilic",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Monstruosité de taille M, non aligné",
+  "armor_class": 15,
+  "armor_note": "armure naturelle",
+  "hit_points": "52 (8d8 + 16)",
+  "wound_threshold": 13,
+  "speed": "6 m",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 8,
+      "modifier": "-1"
+    },
+    "con": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 9,
+      "modifier": "-1"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 10",
+  "languages": "—",
+  "challenge_rating": "3",
+  "xp": 700,
+  "traits": [
+    {
+      "name": "Regard pétrifiant",
+      "description": "Si une créature commence son tour de jeu dans un rayon de 9 m du basilic et que tous deux se voient, le monstre peut obliger la cible à effectuer un JS Constitution DD 12 s'il n'est pas neutralisé. En cas d'échec, la créature commence magiquement à se pétrifier et est **entravée**. Ainsi affectée, elle doit réitérer le jet de sauvegarde à la fin de son tour de jeu suivant. En cas de réussite, l'effet prend fin. En cas d'échec, la créature est **pétrifiée** jusqu'à être libérée par le sort *restauration suprême* ou autre effet magique similaire.\nUne créature qui n'est pas surprise peut se détourner pour éviter le jet de sauvegarde au début de son tour de jeu. Dans ce cas, elle ne voit pas le basilic jusqu'au début de son tour de jeu suivant, où elle peut à nouveau se détourner. Si elle le regarde entre-temps, elle doit aussitôt effectuer le jet de sauvegarde.\nSi le basilic voit son reflet dans un rayon de 9 m par lumière vive, il y voit un rival et se prend pour cible avec son regard."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 10 (2d6 + 3) dégâts perforants plus 7 (2d6) dégâts de poison."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "D’un naturel presque débonnaire – pour un monstre soucieux de son estomac – le basilic peut être élevé en captivité et dressé. C’est une pratique assez répandue dans les cités d’argile. Les dresseurs utilisent des amulettes d’argile humide pour se protéger du risque de pétrification."
+}

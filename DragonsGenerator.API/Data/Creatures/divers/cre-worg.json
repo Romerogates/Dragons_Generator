@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-worg",
+  "name": "Worg",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille G, neutre",
+  "armor_class": 13,
+  "armor_note": "armure naturelle",
+  "hit_points": "26 (4d10 + 4)",
+  "wound_threshold": 7,
+  "speed": "15 m",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 7,
+      "modifier": "-2"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 8,
+      "modifier": "-1"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +4",
+  "senses": "vision dans le noir 18 m, Perception passive 14",
+  "languages": "—",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [
+    {
+      "name": "Ouïe fine et flair",
+      "description": "Le worg bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'ouïe ou l'odorat."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 10 (2d6 + 3) dégâts perforants. Si la cible est une créature, elle doit réussir un JS Force DD 13 sous peine de se retrouver **à terre**.\nIkhworg"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les worgs sont des fauves anormalement intelligents, ce qui suscite une vive curiosité à leur égard : d’où viennent-ils ? D’où tiennent-ils leur intelligence exceptionnelle ? Pourquoi sont-ils décrits comme malveillants ? Une légende fait d’eux une création du dieu Tamerakh le Destructeur. Les worgs seraient animés par les âmes de bienheureux passant l’éternité dans le domaine du dieu, et revenant momentanément dans le monde mortel pour goûter à la bataille et au sang. Pour cette raison, ces chiens de guerre sont particulièrement respectés par les adeptes de Tempête. Certains racontent même que le dieu transmettrait des signes par l’intermédiaire de worgs se comportant étrangement, comme en transe."
+}

@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-archimage",
+  "name": "Archimage",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 12,
+  "armor_note": "15 avec armure de mage",
+  "hit_points": "99 (18d8 + 18)",
+  "wound_threshold": 25,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "wis": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 16,
+      "modifier": "+3"
+    }
+  },
+  "saving_throws": "Int +9, Sag +6",
+  "skills": "Arcanes +13, Histoire +13",
+  "senses": "Perception passive 12",
+  "languages": "six au choix",
+  "challenge_rating": "12",
+  "xp": 8400,
+  "traits": [
+    {
+      "name": "Résistance à la magie",
+      "description": "L'archimage bénéficie d'un avantage aux jets de sauvegarde contre les sorts et autres effets magiques.\nSorts mineurs (à volonté) : poigne foudroyante, lumière, manipulation à distance, prestidigitation, trait de feu\n1<sup>er</sup> niveau (4 emplacements) : armure de mage*, détection de la magie, identification, projectile magique\n2<sup>e</sup> niveau (3 emplacements) : détection de pensées, image miroir, marche de brume\n3<sup>e</sup> niveau (3 emplacements) : contresort, éclair, vol\n4<sup>e</sup> niveau (3 emplacements) : bannissement, bouclier de feu, peau de pierre*\n5<sup>e</sup> niveau (3 emplacements) : cône de froid, mur de force, scrutation\n6<sup>e</sup> niveau (1 emplacement) : globe d'invulnérabilité\n7<sup>e</sup> niveau (1 emplacement) : téléportation\n8<sup>e</sup> niveau (1 emplacement) : esprit impénétrable*\n9<sup>e</sup> niveau (1 emplacement) : arrêt du temps\nL'archimage lance ces sorts sur sa propre personne avant le combat."
+    },
+    {
+      "name": "Résistance à la magie",
+      "description": "L'archimage bénéficie d'un avantage aux jets de sauvegarde contre les sorts et autres effets magiques.\nSorts mineurs (à volonté) : poigne foudroyante, lumière, manipulation à distance, prestidigitation, trait de feu\n1<sup>er</sup> niveau (4 emplacements) : armure de mage*, détection de la magie, identification, projectile magique\n2<sup>e</sup> niveau (3 emplacements) : détection de pensées, image miroir, marche de brume\n3<sup>e</sup> niveau (3 emplacements) : contresort, éclair, vol\n4<sup>e</sup> niveau (3 emplacements) : bannissement, bouclier de feu, peau de pierre*\n5<sup>e</sup> niveau (3 emplacements) : cône de froid, mur de force, scrutation\n6<sup>e</sup> niveau (1 emplacement) : globe d'invulnérabilité\n7<sup>e</sup> niveau (1 emplacement) : téléportation\n8<sup>e</sup> niveau (1 emplacement) : esprit impénétrable*\n9<sup>e</sup> niveau (1 emplacement) : arrêt du temps\nL'archimage lance ces sorts sur sa propre personne avant le combat."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Dague",
+      "description": "Attaque d'arme de corps à corps ou à distance : +6 pour toucher, allonge 1,50 m ou portée 9/18 m, une cible. Réussite : 4 (1d4 + 2) dégâts perforants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Âgée de plus de quatre siècles, l’elenionne Melda de Sornorë est une grand-tante de la princesse Miriniël, fondatrice de l’internat de Latacoa en Ellerìna. En cet établissement unique, la magie est enseignée dès l’enfance aussi bien aux elfes qu’aux membres d’autres peuples. Pendant longtemps, l’archimage Melda fut réservée à propos des projets de sa lointaine nièce, mais elle finit par être convaincue et accepta de se rendre au Cyfandir pour soutenir le développement de l’école en cherchant des apprentis prometteurs de toutes origines. Disposant d’appartements au palais de l’Étoile, parmi la communauté elenionne, Melda de Sornorë est souvent en voyage incognito dans les campagnes avoisinantes. Elle s’intéresse pour le moment à la Myetée et à Issure, pour des raisons différentes. La récente guerre de la Taurëlma la peine beaucoup, d’autant plus que les aldarons paraissent profondément hostiles à tous les non-elfes par principe. Ce mépris est précisément l’un des aspects que l’expérience de l’internat de Latacoa cherche à corriger. Serait-il possible d’établir des relations plus paisibles dans ces contrées troublées ?"
+}

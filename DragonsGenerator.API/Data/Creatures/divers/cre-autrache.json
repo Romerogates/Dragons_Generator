@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-autrache",
+  "name": "Autrache",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "- **Bête de taille G**, non aligné",
+  "armor_class": 11,
+  "armor_note": null,
+  "hit_points": "19 (3d10 + 3)",
+  "wound_threshold": 5,
+  "speed": "24 m",
+  "abilities": {
+    "str": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "cha": {
+      "score": 11,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "Perception passive 11",
+  "languages": "—",
+  "challenge_rating": "1/4",
+  "xp": 50,
+  "traits": [
+    {
+      "name": "Charge",
+      "description": "** Si le capricorne se déplace d’au moins 6 m en ligne droite vers sa cible et qu’il la touche avec une attaque de coup de boutoir au même tour de jeu, la cible subit 5 (2d4) dégâts contondants supplémentaires. Si la cible est une créature, elle doit réussir un JS Force DD 13 sous peine de se retrouver **à terre**."
+    },
+    {
+      "name": "Leste",
+      "description": "** Le capricorne bénéficie d’un avantage aux JS Force et Dextérité contre les effets qui menacent de le jeter **à terre**."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Coup de boutoir",
+      "description": "** Attaque d’arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 8 (2d4 + 3) dégâts contondants.\n\n<page_number>242</page_number>\nAnthony Martin Romero (Order #44468918)\n\nIllustration d'un chameau\n\nDoté de deux bosses permettant de stocker des graisses pour la mauvaise saison et d’une bonne endurance au manque d’eau, le chameau est la meilleure monture pour les expéditions dans les régions les plus arides du Kaan, tel le désert de sel de Tuzdisöl. Ses qualités ne s’arrêtent pas là : son lait est très apprécié des habitants du pays, et il a une laine beige ou brune très chaude presque impossible à teindre. Grâce à elle, on tisse et tricote couvertures, bonnets, gants et chausses qui permettent de supporter des températures polaires au cœur de l’hiver.\n\n### Chameau\n\nBête de taille G, non aligné"
+    },
+    {
+      "name": "Classe d’armure",
+      "description": "11"
+    },
+    {
+      "name": "Points de vie",
+      "description": "19 (3d10 + 3) | **Seuil de blessure** 5"
+    },
+    {
+      "name": "Vitesse de déplacement",
+      "description": "24 m\n\n| \\*\\*FOR\\*\\* | \\*\\*DEX\\*\\* | \\*\\*CON\\*\\* | \\*\\*INT\\*\\* | \\*\\*SAG\\*\\* | \\*\\*CHA\\*\\* |\n| ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |\n| 16 (+3)     | 8 (−1)      | 14 (+2)     | 4 (−3)      | 10 (+0)     | 5 (−3)      |"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "- **Bête de taille G**, non aligné"
+}

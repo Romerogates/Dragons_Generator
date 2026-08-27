@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-brute",
+  "name": "Brute",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement autre que bon au choix",
+  "armor_class": 11,
+  "armor_note": "armure de cuir",
+  "hit_points": "32 (5d8 + 10)",
+  "wound_threshold": 8,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 11,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +2, Intimidation +2",
+  "senses": "Perception passive 10",
+  "languages": "une au choix (généralement le commun)",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [
+    {
+      "name": "Tactique de meute",
+      "description": "La brute bénéficie d'un avantage aux jets d'attaque contre les créatures situées à 1,50 m ou moins d'un de ses alliés qui n'est pas neutralisé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "La brute effectue deux attaques de corps à corps."
+    },
+    {
+      "name": "Masse d'armes",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une créature. Réussite : 5 (1d6 + 2) dégâts contondants."
+    },
+    {
+      "name": "Arbalète lourde",
+      "description": "Attaque d'arme à distance : +2 pour toucher, portée 30/120 m, une cible. Réussite : 5 (1d10) dégâts perforants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Mirella Forte-Tête travaille sur les docks du quartier du Vieux port. Le jour, elle charge et décharge ; la nuit, elle traîne dans les tripots aux mains de la Tridentine, la plus vieille guilde de voleurs de la Cité Franche. Issue d’une famille pauvre et mère d’un enfant en bas âge dont elle confie la garde à son compagnon Delfin, honnête boulanger, elle se laisse porter au jour le jour par les opportunités et les rencontres. Son goût pour la vie nocturne agitée et ses amitiés douteuses l’entraînent depuis toujours dans des histoires louches. Il s’agit tantôt de donner un coup de main pour débarquer des marchandises illégales, tantôt pour expliquer la vie à un escroc qui ne paye pas sa dîme à la Tridentine."
+}

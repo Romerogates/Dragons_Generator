@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-golem-de-chair",
+  "name": "Golem de chair",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Créature artificielle de taille M, neutre",
+  "armor_class": 9,
+  "armor_note": null,
+  "hit_points": "93 (11d8 + 44)",
+  "wound_threshold": null,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 9,
+      "modifier": "-1"
+    },
+    "con": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "int": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 5,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 10",
+  "languages": "comprend les langues de son créateur mais ne peut pas parler",
+  "challenge_rating": "5",
+  "xp": 1800,
+  "traits": [
+    {
+      "name": "Absorption de la foudre",
+      "description": "Chaque fois que le golem reçoit des dégâts de foudre, il ne subit aucun dommage et récupère en fait un nombre de pv égal aux dégâts de foudre correspondants."
+    },
+    {
+      "name": "Armes magiques",
+      "description": "Les attaques d'arme du golem sont magiques."
+    },
+    {
+      "name": "Aversion pour le feu",
+      "description": "Si le golem reçoit des dégâts de feu, il subit un désavantage aux jets d'attaque et aux tests de caractéristique jusqu'à la fin de son tour de jeu suivant."
+    },
+    {
+      "name": "Forme inaltérable",
+      "description": "Le golem est immunisé contre tous les sorts ou effets susceptibles de transformer son corps."
+    },
+    {
+      "name": "Rage aveugle",
+      "description": "Quand le golem commence son tour de jeu alors qu'il ne lui reste que 40 pv ou moins, lancez un d6. Sur un 6, le golem entre dans une rage aveugle. À chacun de ses tours de jeu, s'il est en rage, le golem attaque la créature visible la plus proche. Si aucune créature n'est assez proche pour qu'il puisse lui porter une attaque après un déplacement éventuel, le golem s'en prend à un objet, de préférence plus petit que lui. Une fois que le golem est entré en rage aveugle, il le reste jusqu'à ce qu'il soit détruit ou qu'il ait récupéré tous ses pv.\nLe créateur du golem peut tenter de l'apaiser en lui parlant avec autorité. Il faut pour cela qu'il se trouve dans un rayon de 18 m du golem (qui doit être en mesure de l'entendre) et qu'il effectue un test de Charisme (Persuasion) DD 15. En cas de réussite, la rage aveugle prend fin. Si le golem subit alors des dégâts alors qu'il ne lui reste pas plus de 40 pv, il redevient susceptible d'entrer en rage aveugle selon la règle ci-dessus."
+    },
+    {
+      "name": "Résistance à la magie",
+      "description": "Le golem bénéficie d'un avantage aux jets de sauvegarde contre les sorts et autres effets magiques."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le golem effectue deux attaques de coup."
+    },
+    {
+      "name": "Coup",
+      "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 1,50 m, une cible. Réussite : 13 (2d8 + 4) dégâts contondants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Kentigern et ses agents de la dorchadas sont très préoccupés par ces questionnements, et prêtent donc à ces recherches un intérêt consommé. Tout érudit nécromancien est sûr d’être le bienvenu dans le val de Gleannceò s’il met ses spécimens au service de la conquête du seigneur vampire."
+}

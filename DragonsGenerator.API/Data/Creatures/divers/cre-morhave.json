@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-morhave",
+  "name": "Morhâve",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Mort-vivant de taille M, neutre mauvais",
+  "armor_class": 10,
+  "armor_note": null,
+  "hit_points": "27 (6d8)",
+  "wound_threshold": null,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 9,
+      "modifier": "-1"
+    },
+    "cha": {
+      "score": 8,
+      "modifier": "-1"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 9",
+  "languages": "—",
+  "challenge_rating": "0",
+  "xp": 0,
+  "traits": [
+    {
+      "name": "Sensibilité extrême au soleil",
+      "description": "Le morhâve subit 20 dégâts radiants lorsqu'il commence son tour de jeu au soleil. Tant qu'il y reste exposé, il subit un désavantage aux jets d'attaque et aux tests de caractéristique."
+    },
+    {
+      "name": "Vigueur cadavérique",
+      "description": "Si des dégâts font tomber le morhâve à 0 pv, il doit effectuer un JS Constitution dont le DD est égal à 5 + les dégâts subis, à moins qu'il ne s'agisse de dégâts radiants ou d'un coup critique. En cas de réussite, il tombe à 1 pv au lieu de 0."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une créature. Réussite : 4 (1d4 + 2) dégâts perforants et le morhâve récupère une quantité de pv égale aux dégâts infligés."
+    },
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (2d4 + 2) dégâts tranchants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Ces êtres ne peuvent en effet subsister – si l’on peut dire – qu’à la condition de se nourrir. Leur malédiction est de ne pouvoir le faire que par leur morsure. En d’autres termes, il leur est impossible de se sustenter en dévorant un cadavre : seul un être vivant peut apaiser leur faim. En l’absence de repas, un morhâve perd 1pv chaque jour. Leur apparence reflète cet état : ils deviennent de plus en plus blafards et maigres à mesure qu’ils perdent inéluctablement l’énergie qui les anime."
+}

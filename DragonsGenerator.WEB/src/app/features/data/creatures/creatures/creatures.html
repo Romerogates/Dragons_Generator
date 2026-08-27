@@ -1,0 +1,385 @@
+<div
+
+  class="w-full flex flex-col animate-fade-in select-none bg-[#171b22] text-slate-300 min-h-screen pb-20"
+
+>
+
+  <section
+
+    class="relative w-full flex flex-col items-center justify-center overflow-hidden border-b border-slate-800 pt-16 pb-12 md:pt-24 md:pb-16"
+
+  >
+
+    <div class="absolute inset-0 z-0 bg-[#0a0d13] opacity-90"
+
+      style="background-image: radial-gradient(circle at 50% 50%, rgba(239, 68, 68, 0.08) 2px, transparent 2px); background-size: 40px 40px;"></div>
+
+    <div class="absolute inset-0 z-0 bg-gradient-to-b from-transparent via-[#171b22]/80 to-[#171b22]"></div>
+
+
+
+    <div class="relative z-10 flex flex-col items-center text-center px-4 w-full max-w-4xl">
+
+      <div class="flex items-center gap-6 mb-8 w-full">
+
+        <div class="h-px flex-grow bg-gradient-to-r from-transparent to-slate-700"></div>
+
+        <h1 class="text-4xl md:text-6xl font-extrabold text-slate-100 font-serif tracking-widest uppercase drop-shadow-2xl text-center">
+
+          Le
+
+          <span class="text-red-500 bg-clip-text text-transparent bg-gradient-to-r from-red-400 to-orange-500">Bestiaire</span>
+
+        </h1>
+
+        <div class="h-px flex-grow bg-gradient-to-l from-transparent to-slate-700"></div>
+
+      </div>
+
+
+
+      <p class="text-sm md:text-base text-slate-400 italic mb-8 max-w-xl leading-relaxed font-serif">
+
+        Profils de créatures, PNJ et adversaires prêts à l'emploi pour vos aventures sur Eana.
+
+      </p>
+
+
+
+      <div class="flex flex-wrap justify-center gap-4 mb-8">
+
+        <a
+
+          routerLink="/creatures/categories"
+
+          class="px-5 py-2.5 bg-[#1b2028] border border-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-300 hover:bg-[#1f242e] hover:border-red-500 hover:text-red-400 transition-[colors,transform,opacity,box-shadow] duration-200 shadow-lg flex items-center gap-2"
+
+        >
+
+          <span><iconify-icon icon="fluent-emoji:card-index-dividers"></iconify-icon></span>
+
+          Par catégorie
+
+        </a>
+
+        <a
+
+          routerLink="/story/create"
+
+          class="px-5 py-2.5 bg-red-950/30 border border-red-800/50 rounded-xl text-[10px] font-black uppercase tracking-widest text-red-300 hover:bg-red-950/50 hover:border-red-500 hover:text-red-200 transition-[colors,transform,opacity,box-shadow] duration-200 shadow-lg flex items-center gap-2"
+
+        >
+
+          <span><iconify-icon icon="fluent-emoji:scroll"></iconify-icon></span>
+
+          Nouveau scénario
+
+        </a>
+
+      </div>
+
+
+
+      <div class="relative w-full max-w-lg group">
+
+        <div class="absolute inset-0 bg-red-500/20 blur-[30px] rounded-full group-focus-within:bg-red-500/30 transition-colors duration-700"></div>
+
+        <div class="relative flex items-center">
+
+          <span class="absolute left-6 text-slate-500 text-lg group-focus-within:text-red-400 transition-colors">
+
+            <iconify-icon icon="fluent-emoji:magnifying-glass-tilted-right"></iconify-icon>
+
+          </span>
+
+          <input
+
+            type="search"
+
+            placeholder="Rechercher une créature (ex: Garde, Dragon)..."
+
+            [value]="search()"
+
+            (input)="onSearch($any($event.target).value)"
+
+            class="w-full bg-[#1b2028]/80 backdrop-blur-md border-2 border-slate-700 rounded-full py-4 pl-14 pr-6 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-red-500/70 focus:ring-1 focus:ring-red-500/50 shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-[colors,transform,opacity,box-shadow] duration-200"
+
+          />
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <section class="max-w-6xl mx-auto px-4 py-10 w-full">
+
+    @if (creatures() === null) {
+
+      <div class="flex flex-col items-center justify-center py-24 text-red-400 animate-pulse">
+
+        <span class="text-5xl mb-4"><iconify-icon icon="fluent-emoji:dragon"></iconify-icon></span>
+
+        <p class="font-serif uppercase tracking-widest text-sm">Consultation du bestiaire...</p>
+
+      </div>
+
+    } @else if (error(); as errorMsg) {
+
+      <div class="p-4 bg-red-950/50 border border-red-900 rounded-xl text-center">{{ errorMsg }}</div>
+
+    } @else {
+
+      <!-- Filtres catégorie -->
+
+      <div class="flex flex-wrap gap-2 mb-4">
+
+        <button
+
+          type="button"
+
+          class="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors"
+
+          [class]="
+
+            categoryFilter() === null
+
+              ? 'bg-red-950/40 border-red-500 text-red-400'
+
+              : 'bg-[#1b2028] border-slate-700 text-slate-400 hover:border-slate-600'
+
+          "
+
+          (click)="setCategoryFilter(null)"
+
+        >
+
+          Toutes
+
+        </button>
+
+        @for (cat of categories(); track cat) {
+
+          <button
+
+            type="button"
+
+            class="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors"
+
+            [class]="
+
+              categoryFilter() === cat
+
+                ? 'bg-red-950/40 border-red-500 text-red-400'
+
+                : 'bg-[#1b2028] border-slate-700 text-slate-400 hover:border-slate-600'
+
+            "
+
+            (click)="setCategoryFilter(cat)"
+
+          >
+
+            {{ categoryLabel(cat) }}
+
+          </button>
+
+        }
+
+      </div>
+
+
+
+      <!-- Filtres FP + tri -->
+
+      <div class="flex flex-wrap items-center gap-3 mb-6">
+
+        <div class="flex flex-wrap gap-2">
+
+          @for (tier of crTiers; track tier) {
+
+            <button
+
+              type="button"
+
+              class="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors"
+
+              [class]="
+
+                crTierFilter() === tier
+
+                  ? 'bg-orange-950/40 border-orange-500 text-orange-400'
+
+                  : 'bg-[#1b2028] border-slate-700 text-slate-400 hover:border-slate-600'
+
+              "
+
+              (click)="setCrTierFilter(crTierFilter() === tier ? null : tier)"
+
+            >
+
+              {{ crTierLabels[tier] }}
+
+            </button>
+
+          }
+
+        </div>
+
+
+
+        <select
+
+          class="ml-auto bg-[#1b2028] border border-slate-700 rounded-xl px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400 focus:outline-none focus:border-red-500/50"
+
+          [value]="sortKey()"
+
+          (change)="sortKey.set($any($event.target).value)"
+
+        >
+
+          <option value="name">Nom A→Z</option>
+
+          <option value="cr-asc">FP croissant</option>
+
+          <option value="cr-desc">FP décroissant</option>
+
+          <option value="xp-desc">XP décroissant</option>
+
+        </select>
+
+
+
+        @if (hasActiveFilters()) {
+
+          <button
+
+            type="button"
+
+            class="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-red-400 transition-colors"
+
+            (click)="clearFilters()"
+
+          >
+
+            Réinitialiser
+
+          </button>
+
+        }
+
+      </div>
+
+
+
+      <p class="text-xs uppercase tracking-widest text-slate-500 mb-6 font-black">
+
+        {{ filteredCreatures().length }} créature(s)
+
+        @if (creatures()?.length !== filteredCreatures().length) {
+
+          <span class="text-slate-600"> sur {{ creatures()?.length }}</span>
+
+        }
+
+      </p>
+
+
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+        @for (creature of filteredCreatures(); track creature.id) {
+
+          <a
+
+            [routerLink]="['/creatures', creature.id]"
+
+            class="group bg-[#1b2028] border border-slate-800 rounded-2xl p-5 hover:border-red-500/50 hover:-translate-y-1 transition-[colors,transform,opacity,box-shadow] duration-200 shadow-lg"
+
+          >
+
+            <div class="flex items-start justify-between gap-3 mb-3">
+
+              <h2 class="text-lg font-bold text-slate-100 group-hover:text-red-400 transition-colors font-serif">
+
+                {{ creature.name }}
+
+              </h2>
+
+              <span class="text-xl shrink-0"><iconify-icon [icon]="categoryIcon(creature.category)"></iconify-icon></span>
+
+            </div>
+
+            <div class="flex flex-wrap gap-2 text-[10px] font-black uppercase tracking-wider">
+
+              <span class="bg-red-950/40 text-red-300 border border-red-900/50 px-2 py-1 rounded">
+
+                {{ formatCr(creature.challengeRating) }}
+
+              </span>
+
+              <span class="bg-slate-900 text-slate-400 border border-slate-700 px-2 py-1 rounded">
+
+                CA {{ creature.armorClass }}
+
+              </span>
+
+              @if (creature.xp > 0) {
+
+                <span class="bg-slate-900 text-slate-500 border border-slate-700 px-2 py-1 rounded">
+
+                  {{ creature.xp }} XP
+
+                </span>
+
+              }
+
+              <span class="bg-slate-900 text-slate-400 border border-slate-700 px-2 py-1 rounded">
+
+                {{ categoryLabel(creature.category) }}
+
+              </span>
+
+            </div>
+
+          </a>
+
+        } @empty {
+
+          <div class="col-span-full flex flex-col items-center justify-center py-20 text-center">
+
+            <span class="text-5xl mb-4 opacity-50"><iconify-icon icon="fluent-emoji:ghost"></iconify-icon></span>
+
+            <p class="text-slate-400 font-serif italic mb-4">Aucune créature ne correspond à vos filtres.</p>
+
+            <button
+
+              type="button"
+
+              class="px-5 py-2 bg-red-950/30 border border-red-800/50 rounded-xl text-[10px] font-black uppercase tracking-widest text-red-400 hover:bg-red-950/50 transition-colors"
+
+              (click)="clearFilters()"
+
+            >
+
+              Effacer les filtres
+
+            </button>
+
+          </div>
+
+        }
+
+      </div>
+
+    }
+
+  </section>
+
+</div>
+
+

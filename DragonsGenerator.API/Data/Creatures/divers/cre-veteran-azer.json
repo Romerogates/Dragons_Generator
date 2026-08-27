@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-veteran-azer",
+  "name": "Vétéran azer",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Élémentaire (feu) de taille M, loyal neutre",
+  "armor_class": 17,
+  "armor_note": "clibanion",
+  "hit_points": "84 (13d8 + 26)",
+  "wound_threshold": 21,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 12,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Athlétisme +6, Intimidation +3, Perception +4",
+  "senses": "Perception passive 14",
+  "languages": "céleste, originel et deux langues au choix",
+  "challenge_rating": "5",
+  "xp": 1800,
+  "traits": [
+    {
+      "name": "Armes brûlantes",
+      "description": "Quand l'azer touche avec une arme de corps à corps en métal, il inflige 3 (1d6) dégâts de feu supplémentaires (inclus dans l'attaque)."
+    },
+    {
+      "name": "Corps brûlant",
+      "description": "Une créature qui entre en contact avec l'azer ou qui le touche avec une attaque de corps à corps alors qu'elle se situe dans un rayon de 1,50 m de lui subit 5 (1d10) dégâts de feu."
+    },
+    {
+      "name": "Illumination",
+      "description": "L'azer émet une lumière vive dans un rayon de 3 m et une lumière faible sur 3 m de plus."
+    },
+    {
+      "name": "Vaillant",
+      "description": "Le vétéran bénéficie d'un avantage aux jets de sauve garde contre l'état préjudiciable effrayé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le vétéran effectue deux attaques d'épée longue. S'il a dégainé une épée courte, il peut également porter une attaque avec cette arme."
+    },
+    {
+      "name": "Épée longue",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (1d8 + 3) dégâts tranchants, ou (1d10 + 3) dégâts tranchants si utilisée à deux mains, plus 3 (1d6) dégâts de feu."
+    },
+    {
+      "name": "Épée courte",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 6 (1d6 + 3) dégâts perforants, plus 3 (1d6) dégâts de feu."
+    },
+    {
+      "name": "Arbalète lourde",
+      "description": "Attaque d'arme à distance : +4 pour toucher, portée 30/120 m, une cible. Réussite : 6 (1d10 + 1) dégâts perforants.\nUn « vétéran » azer n'est pas tant expérimenté que conçu avec soin, doté d'une enveloppe corporelle et d'une âme ardente particulièrement fortes, en faisant un individu qui sort du lot, capables de mener de dangereuses opérations militaires, que ce soit en solitaire ou en tant que membre d'une escouade."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "L’essentiel des azers sont chargés de tâches courantes qui ne requièrent pas d’aptitudes ou de puissance supérieure : assistance, manutention, surveillance, excavation, etc. Même ces azers sont des êtres robustes et hardis, rompus au combat."
+}

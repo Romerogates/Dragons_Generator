@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-salamandre-ensorceleuse",
+  "name": "Salamandre ensorceleuse",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Élémentaire (feu) de taille G, neutre ou neutre mauvais",
+  "armor_class": 15,
+  "armor_note": "armure naturelle",
+  "hit_points": "97 (15d10 + 15)",
+  "wound_threshold": 25,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 19,
+      "modifier": "+4"
+    }
+  },
+  "saving_throws": "Con +5, Cha +8",
+  "skills": "Arcanes +4, Tromperie +8",
+  "senses": "vision dans le noir 18 m, Perception passive 11",
+  "languages": "originel et trois autres au choix",
+  "challenge_rating": "9",
+  "xp": 5000,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Dague",
+      "description": "Attaque d'arme de corps à corps ou à distance : +6 pour toucher, allonge 1,50 m ou portée 6/18 m, une cible. Réussite : 7 (2d4 + 2) dégâts perforants plus 3 (1d6) dégâts de feu."
+    },
+    {
+      "name": "Queue",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 3 m, une cible. Réussite : 8 (2d6 + 1) dégâts contondants plus 7 (2d6) dégâts de feu, et la cible est **agrippée** (DD 12 pour s'extraire). Tant que la lutte persiste, la cible est **entravée** et la salamandre peut la toucher automatiquement avec sa queue, mais le monstre ne peut plus effectuer d'attaques de queue contre d'autres cibles."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "G"
+}

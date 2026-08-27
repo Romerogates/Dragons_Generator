@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-arpenteur-sauvage",
+  "name": "Arpenteur sauvage",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 15,
+  "armor_note": "armure de cuir cloutée",
+  "hit_points": "127 (17d8 + 51)",
+  "wound_threshold": 32,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": "For +6, Dex +6, Con +6",
+  "skills": "Athlétisme +6, Discrétion +6, Intimidation +3, Nature +4, Perception +9, Survie +9",
+  "senses": "Perception passive 19",
+  "languages": "deux au choix",
+  "challenge_rating": "6",
+  "xp": 2300,
+  "traits": [
+    {
+      "name": "Instinct fauve",
+      "description": "L'arpenteur sauvage a l'avantage aux jets d'initiative."
+    },
+    {
+      "name": "Attaque précise",
+      "description": "Quand l'arpenteur sauvage touche sa cible avec une arme, il inflige un dé supplémentaire de dégâts (pris en compte dans les attaques ci-après)."
+    },
+    {
+      "name": "Harcèlement",
+      "description": "Lorsque l'arpenteur sauvage attaque une cible qu'il a déjà attaquée depuis le début de son tour, il bénéficie de l'avantage à son jet d'attaque."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "L'arpenteur sauvage effectue trois attaques."
+    },
+    {
+      "name": "Lance",
+      "description": "Attaque d'arme de corps à corps ou à distance : +6 pour toucher, allonge 1,50 m ou portée 6/18 m, une cible. Réussite : 10 (2d6 + 3) dégâts perforants, ou 12 (2d8 + 3) dégâts perforants si utilisée à deux mains dans le cadre d'une attaque de corps à corps."
+    },
+    {
+      "name": "Arc long",
+      "description": "Attaque d'arme à distance : +6 pour toucher, portée 45/180 m, une cible. Réussite : 12 (2d8 + 3) dégâts perforants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "L’arpenteur sauvage est une sommité des peuples habitant les régions où la nature règne en maître. Pleinement en phase avec son environnement, il sait évoluer en milieu naturel avec l’aisance d’un prédateur accompli. Apte aux combats, à la traque, aux longs voyages, il peut prendre si nécessaire des jours pour attendre le moment propice et frapper sa cible. Il peut être le champion de son village, voire en être le chef. Il vend parfois ses services qui se monnayent à prix d’or, œuvrant en tant que guide, éclaireur, explorateur, messager, exterminateur ou même assassin. Ce profil peut aussi s’appliquer à un soldat vétéran en territoire hostile, ou encore à un aventurier rôdeur."
+}

@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-destrier",
+  "name": "Destrier",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille G, non aligné",
+  "armor_class": 11,
+  "armor_note": null,
+  "hit_points": "19 (3d10 + 3)",
+  "wound_threshold": 5,
+  "speed": "18 m",
+  "abilities": {
+    "str": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Athlétisme +6",
+  "senses": "Perception passive 11",
+  "languages": "—",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [
+    {
+      "name": "Charge écrasante",
+      "description": "Si le destrier se déplace d'au moins 6 m en ligne droite vers une créature et qu'il la touche avec une attaque de sabots au même tour de jeu, la cible doit réussir un JS Force DD 14 sous peine de se retrouver **à terre**. Si elle est **à terre**, le destrier peut aussitôt lui porter une attaque de sabots au prix d'une action bonus."
+    },
+    {
+      "name": "Vaillant",
+      "description": "Le destrier bénéficie d'un avantage aux jets de sauve garde contre l'état préjudiciable effrayé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Sabots",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 11 (2d6 + 4) dégâts contondants.\n245"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

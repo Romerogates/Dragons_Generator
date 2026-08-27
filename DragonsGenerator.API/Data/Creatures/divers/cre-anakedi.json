@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-anakedi",
+  "name": "Anakedi",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Fée de taille TP, alignement au choix",
+  "armor_class": 17,
+  "armor_note": "armure naturelle",
+  "hit_points": "36 (8d4 + 16)",
+  "wound_threshold": 9,
+  "speed": "12 m, escalade 12 m",
+  "abilities": {
+    "str": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "dex": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "con": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 14,
+      "modifier": "+2"
+    }
+  },
+  "saving_throws": "Dex +7, Cha +4",
+  "skills": "Acrobaties +9, Arcanes +4, Discrétion +9, Intuition +3, Perception +5, Tromperie +6",
+  "senses": "vision dans le noir 18m, Perception passive 15",
+  "languages": "anakedi, kaani, sylvestre (mais se contente le plus souvent de miauler)",
+  "challenge_rating": "3",
+  "xp": 700,
+  "traits": [
+    {
+      "name": "Bondissement",
+      "description": "L'anakedi peut effectuer des sauts en longueur jusqu'à 6 m et des sauts en hauteur jusqu'à 3 m, que ce soit avec ou sans élan."
+    },
+    {
+      "name": "Flair",
+      "description": "L'anakedi bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'odorat."
+    },
+    {
+      "name": "Fuite agile",
+      "description": "À chacun de ses tours de jeu et au prix d'une action bonus, l'anakedi peut entreprendre l'action **Se dégager**, **Esquiver** ou **Se cacher**."
+    },
+    {
+      "name": "Neuf vies",
+      "description": "L'anakedi dispose de neuf vies. Ce quota est réduit de 1 à chaque fois qu'il tombe à 0 pv. S'il dispose encore d'une vie au moins, l'anakedi reprend conscience après 1 heure comme s'il avait bénéficié du sort résurrection. Ce trait n'opère pas si le corps de l'anakedi est entièrement détruit."
+    },
+    {
+      "name": "Sorts innés",
+      "description": "La caractéristique magique de l'anakedi est le Charisme (DD de sauvegarde des sorts : 12). L'anakedi peut lancer les sorts suivants sans composantes matérielles :\nÀ volonté : alarme, antidétection, passage sans trace\n3/jour chacun : bouclier, charme-personne, restauration partielle, sanctuaire, verrou du mage\n1/jour chacun : délivrance des malédictions, dissipation de la magie, glyphe de garde, liberté de mouvement, sanctuaire secret"
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "L'anakedi effectue deux attaques de griffes."
+    },
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (1d4 + 5) dégâts tranchants.\n287"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Le matou Aile-de-poulet s’est imposé à la tête du groupe marginal Balikölüm à force de combats, mais son autorité pourrait être à tout moment remise en question par d’autres anakedis. Il est tigré, le museau couturé de cicatrices. Ce n’est pas le genre à prévenir : quand quelque chose lui déplaît, c’est directement coup de griffes ou morsure. Il ne respecte que les cyniques qui manient le sens de l’humour ou les solitaires qui ne demandent rien à personne."
+}

@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-araignees-nuee",
+  "name": "Araignées - Nuée",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Nuée de taille M de bêtes de taille TP, non aligné",
+  "armor_class": 12,
+  "armor_note": "armure naturelle",
+  "hit_points": "22 (5d8)",
+  "wound_threshold": null,
+  "speed": "6 m, escalade 6 m",
+  "abilities": {
+    "str": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "dex": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 1,
+      "modifier": "-5"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 2,
+      "modifier": "-4"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "perception des vibrations 3 m, Perception passive 10",
+  "languages": "—",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [],
+  "actions": [],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Giant spider in a cave"
+}

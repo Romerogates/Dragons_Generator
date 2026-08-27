@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-chef-d-escouade-kobold",
+  "name": "Chef d’escouade kobold",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (kobold) de taille P, neutre (tout alignement)",
+  "armor_class": 13,
+  "armor_note": "armure de cuir",
+  "hit_points": "17 (5d6)",
+  "wound_threshold": 5,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 13,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +4, Perception +4, Survie +2",
+  "senses": "vision dans le noir 18 m, Perception passive 14",
+  "languages": "commun, draconique",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [
+    {
+      "name": "Tactique de meute",
+      "description": "Le kobold bénéficie d'un avantage aux jets d'attaque contre les créatures situées à 1,50 m ou moins d'un de ses alliés qui n'est pas neutralisé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Commandement (recharge après un repos court ou long)",
+      "description": "Pendant 1 minute, le chef d'escouade peut prononcer une instruction spéciale ou une mise en garde lorsqu'un kobold non hostile qu'il voit dans un rayon de 9 m effectue un jet d'attaque ou de sauvegarde. Le kobold peut alors ajouter un d4 au résultat de son jet, à condition de pouvoir entendre et comprendre le chef d'escouade. Un même kobold ne peut bénéficier de plus d'un dé de commandement à la fois. Les effets prennent fin si le chef d'escouade se retrouve neutralisé."
+    },
+    {
+      "name": "Ordres",
+      "description": "Le chef d'escouade désigne jusqu'à deux autres kobolds dans un rayon de 18 m qu'il peut voir et qui peuvent l'entendre, lesquels peuvent réaliser une attaque."
+    },
+    {
+      "name": "Dague",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d4 + 2) dégâts perforants."
+    },
+    {
+      "name": "Fronde",
+      "description": "Attaque d'arme à distance : +4 pour toucher, portée 9/36 m, une cible. Réussite : 4 (1d4 + 2) dégâts contondants.\nLe chef d'escouade kobold est l'équivalent d'un civil sergent dans une milice. Son expérience du combat est limitée, tout comme son équipement, mais il a acquis la maîtrise de quelques aptitudes tactiques qui lui permettent de galvaniser ses troupes. Certains le font de manière particulièrement excentrique aux yeux des habitants de la Cité Franche qui n'entendent que peu de choses à l'art de la guerre dans le Kaan."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Le troupier kobold est l’équivalent d’un civil entraîné dans une milice. Il a appris le maniement d’armes courantes et surtout, de redoutables tactiques de combat en groupe. Sa principale faiblesse réside dans son manque de protection."
+}

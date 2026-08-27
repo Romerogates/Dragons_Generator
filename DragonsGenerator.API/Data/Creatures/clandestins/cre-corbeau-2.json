@@ -1,0 +1,105 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-corbeau-2",
+  "name": "Corbeau",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "",
+  "armor_class": 10,
+  "armor_note": null,
+  "hit_points": "1 (1d4 − 1)",
+  "wound_threshold": null,
+  "speed": "\\",
+  "abilities": {
+    "str": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 11,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +5",
+  "senses": "vision dans le noir 9 m, Perception passive 10",
+  "languages": "—",
+  "challenge_rating": "1/4",
+  "xp": 50,
+  "traits": [
+    {
+      "name": "Nuée",
+      "description": "** La nuée peut occuper l’espace d’une autre créature et réciproquement. La nuée peut se déplacer dans tout passage suffisant pour laisser passer un corbeau de taille TP. La nuée ne peut pas récupérer de pv ni gagner de pv temporaires."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Becs",
+      "description": "** Attaque d’arme de corps à corps : +4 pour toucher, allonge 1,50 m, une créature occupant l’espace de la nuée. Réussite : 7 (2d6) dégâts perforants ou 3 (1d6) dégâts perforants si les pv actuels de la nuée sont inférieurs ou égaux à la moitié de son maximum.\n\nIllustration de corbeaux\n\n<page_number>95</page_number>\n\n# Rat\n\nLes rats sont des rongeurs extrêmement adaptables, qui vivent à proximité des communautés humanoïdes, attirés par les sources de nourriture, en particulier dans les greniers et les dépotoirs. Les puces de certaines sous-espèces de rat peuvent véhiculer des maladies aussi graves que la peste (cf. **Aventuriers**, chapitre **Santé : Maladies**). On raconte que le nombre de rats qui vivent dans les profondeurs de la Cité Franche serait largement supérieur à celui de tous les habitants humanoïdes de la surface.\n\n### Rat\n\nBête de taille TP, non aligné"
+    },
+    {
+      "name": "Classe d’armure",
+      "description": "10"
+    },
+    {
+      "name": "Points de vie** 1 (1d4 − 1) | **Seuil de blessure** N",
+      "description": "A."
+    },
+    {
+      "name": "Vitesse de déplacement",
+      "description": "6 m\n\n| \\*\\*FOR\\*\\* | \\*\\*DEX\\*\\* | \\*\\*CON\\*\\* | \\*\\*INT\\*\\* | \\*\\*SAG\\*\\* | \\*\\*CHA\\*\\* |\n| ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |\n| 2 (−4)      | 11 (+0)     | 9 (−1)      | 2 (−4)      | 10 (+0)     | 4 (−3)      |\n\n\n'''"
+    },
+    {
+      "name": "Sens",
+      "description": "vision dans le noir 9 m, Perception passive 10"
+    },
+    {
+      "name": "Langues",
+      "description": "—"
+    },
+    {
+      "name": "Facteur de puissance",
+      "description": "0 (10 PX)\n\n### Traits"
+    },
+    {
+      "name": "Flair",
+      "description": "** Le rat bénéficie d’un avantage aux tests de Sagesse (Perception) qui font intervenir l’odorat.\n\n### Actions"
+    },
+    {
+      "name": "Morsure",
+      "description": "** Attaque d’arme de corps à corps : +0 pour toucher, allonge 1,50 m, une cible. Réussite : 1 dégât perforant.\n\n<page_number>96</page_number>\n\n# Rat géant\n\nBête de taille P, non aligné"
+    },
+    {
+      "name": "Classe d’armure",
+      "description": "12"
+    },
+    {
+      "name": "Points de vie",
+      "description": "7 (2d6) | **Seuil de blessure** 4"
+    },
+    {
+      "name": "Vitesse de déplacement",
+      "description": "9 m\n\n| FOR    | DEX     | CON     | INT    | SAG     | CHA    |\n| ------ | ------- | ------- | ------ | ------- | ------ |\n| 7 (−2) | 15 (+2) | 11 (+0) | 2 (−4) | 10 (+0) | 4 (−3) |"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-molosse-feroce",
+  "name": "Molosse féroce",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Bête de taille M, non aligné",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "19 (3d8 + 6)",
+  "wound_threshold": 6,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Athlétisme +4, Perception +3",
+  "senses": "Perception passive 13",
+  "languages": "—",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [
+    {
+      "name": "Ouïe fine et flair",
+      "description": "Le molosse bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'ouïe ou l'odorat. **Tactique de meute.** Le molosse bénéficie d'un avantage aux jets d'attaque contre les créatures situées à 1,50 m ou moins d'un de ses alliés qui n'est pas neutralisé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 5 (1d6 + 2) dégâts perforants. Si la cible est une créature de taille M ou inférieure, elle doit réussir un JS Force DD 12 sous peine d'être jetée **à terre** et **agrippée** (DD 12 pour se libérer). Tant que molosse féroce maintient une créature **agrippée**, il ne peut plus attaquer une autre cible.\nLes molosses féroces sont des bêtes sélectionnées et entraînées pour la guerre ou pour servir de gardes. En sus de leurs aptitudes, ils sont parfois pourvus de protections analogues à une armure.\n93"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les molosses sont des chiens impressionnants, que les humanoïdes recherchent pour leur loyauté et leurs sens aiguisés. On peut les dresser comme chiens de garde, de chasse ou de guerre. Les halfelins et autres humanoïdes de taille P peuvent même s’en servir de montures. Molosse féroce Molosse féroce"
+}

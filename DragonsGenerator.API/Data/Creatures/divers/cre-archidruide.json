@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-archidruide",
+  "name": "Archidruide",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 16,
+  "armor_note": "armure de peau + bouclier",
+  "hit_points": "110 (17d8 + 18)",
+  "wound_threshold": 28,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "wis": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "cha": {
+      "score": 15,
+      "modifier": "+2"
+    }
+  },
+  "saving_throws": "Int +7, Sag +9",
+  "skills": "Histoire +7, Nature +11, Religion +7",
+  "senses": "Perception passive 15",
+  "languages": "druidique et cinq au choix",
+  "challenge_rating": "12",
+  "xp": 8400,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Protecteurs de la nature (1/jour)",
+      "description": "L'archidruide appelle magiquement 1d6 bêtes de FP 2, 2d6 bêtes de FP 1 ou 4d6 bêtes de FP 1/2. Les créatures arrivent au bout de 1d4 rounds, se comportent comme les alliés de l'archidruide et obéissent à ses ordres. Elles restent 1 heure, sauf si l'archidruide les congédie au prix d'une action bonus."
+    },
+    {
+      "name": "Bâton",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher (+9 pour toucher avec gourdin magique), allonge 1,50 m, une cible. Réussite : 3 (1d6) dégâts contondants, 4 (1d8) dégâts contondants si utilisé à deux mains, ou 9 (1d8 + 5) dégâts contondants avec gourdin magique.\nAyuu est une gobelourse sans âge apparent et druidesse\nAyuu est une gobelourse sans âge apparent et druidesse très expérimentée. Elle veille depuis si longtemps sur la forêt primaire d'Ündsenoin que beaucoup de druides locaux n'ont connu que son enseignement. Elle est une protectrice de la nature, proche des bêtes qu'elle invoque avec une facilité déconcertante, comme si elle ne faisait qu'un avec son environnement. Sa très haute maîtrise de la méditation druidique lui assure un grand respect de ses pairs, qui reconnaissent par ailleurs sa vertu et sa moralité sans tache. Elle défend cependant avec constance une société traditionnelle idéalisée. Ayant longtemps eu raison, elle ne peut envisager qu'elle puisse à présent se tromper, alors même que le monde change et qu'elle a cessé de chercher à le comprendre. Aujourd'hui, l'empire de Kartaçöl menace de ronger la forêt primaire d'Ündsenoin, mais Ayuu n'est pas préparée à manœuvrer face aux intrigues, aux manipulations et aux coups de force.\nLes archidruides se distinguent par une harmonie exceptionnelle avec Eana, que bien peu ont su atteindre dans l'histoire du monde. Il est dit qu'ils seraient les seuls capables d'entendre la voix de Monde, voire qu'ils seraient devenus une extension de sa conscience. Ils sont révérés comme des sages aux connaissances incomparables et au jugement incroyablement pénétrant, et même ceux qui ne se revendiquent pas de leurs enseignements leur prêtent une oreille attentive. En règle générale, ils ne se mêlent guère de politique ou même de religion, menant une vie recluse, dans un sanctuaire d'Eana qu'ils protègent, ou en tant que sommité d'un cercle druidique où ils forment et soutiennent les initiés. Fervents protecteurs, ce n'est que lorsque l'intégrité d'Eana est menacée qu'ils se lancent au combat, déchaînant alors les forces de la nature avec une intensité cataclysmique.\n233"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

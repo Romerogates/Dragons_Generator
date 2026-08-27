@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-ours-noir",
+  "name": "Ours noir",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille M, non aligné",
+  "armor_class": 12,
+  "armor_note": "armure naturelle",
+  "hit_points": "19 (3d8 + 6)",
+  "wound_threshold": 6,
+  "speed": "12 m, escalade 9 m",
+  "abilities": {
+    "str": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 5,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 8,
+      "modifier": "-1"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +3",
+  "senses": "Perception passive 13",
+  "languages": "—",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [
+    {
+      "name": "Flair",
+      "description": "L'ours noir bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'odorat."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "L'ours noir effectue deux attaques : une de morsure et une de griffes."
+    },
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 5 (1d6 + 2) dégâts perforants."
+    },
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (2d4 + 2) dégâts tranchants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Dans les temps anciens, durant l’Ère du Renouveau, les cavernes dans lesquelles les ours des Drakenbergen hibernaient étaient l’objet de cultes. L’animal, qui paraissait mort en hiver et s’animait au printemps, était l’image du retour de la vie. Pour cette raison, il est aussi considéré comme sacré par les adeptes de Flore."
+}

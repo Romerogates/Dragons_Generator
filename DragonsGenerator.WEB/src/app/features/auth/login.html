@@ -21,26 +21,31 @@
             class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 outline-none"
           />
         </label>
-        <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-          Mot de passe
-          <input
-            type="password"
-            required
-            [(ngModel)]="password"
-            name="password"
-            class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 outline-none"
-          />
-        </label>
+        <app-password-field label="Mot de passe" name="password" [required]="true" [(value)]="password" />
 
         @if (error()) {
           <p class="text-sm text-red-400">{{ error() }}</p>
         }
+        @if (unconfirmed()) {
+          <button
+            type="button"
+            class="text-xs text-amber-400 hover:underline text-left"
+            [disabled]="resendLoading()"
+            (click)="resendConfirmation()"
+          >
+            {{ resendLoading() ? 'Envoi…' : 'Renvoyer le lien de confirmation' }}
+          </button>
+          @if (resendMsg()) {
+            <p class="text-xs text-emerald-400">{{ resendMsg() }}</p>
+          }
+          @if (confirmLink()) {
+            <a [href]="confirmLink()!" class="text-xs text-amber-300 break-all hover:underline">{{
+              confirmLink()
+            }}</a>
+          }
+        }
 
-        <button
-          type="submit"
-          class="wizard-nav-primary w-full"
-          [disabled]="loading()"
-        >
+        <button type="submit" class="wizard-nav-primary w-full" [disabled]="loading()">
           {{ loading() ? 'Connexion…' : 'Se connecter' }}
         </button>
       </form>
@@ -60,9 +65,19 @@
       </div>
     } @else {
       @if (forgotSent()) {
-        <p class="text-sm text-emerald-400 text-center">
+        <p class="text-sm text-emerald-400 text-center mb-4">
           Si un compte existe, un email de réinitialisation a été envoyé.
         </p>
+        @if (resetLink()) {
+          <div class="mb-4 p-3 rounded-lg bg-amber-950/30 border border-amber-800/50">
+            <p class="text-[10px] uppercase tracking-widest text-amber-400 font-bold mb-2">
+              Lien de réinitialisation
+            </p>
+            <a [href]="resetLink()!" class="text-xs text-amber-300 break-all hover:underline">{{
+              resetLink()
+            }}</a>
+          </div>
+        }
       } @else {
         <form class="flex flex-col gap-4" (ngSubmit)="submitForgot()">
           <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
@@ -86,7 +101,7 @@
       <button
         type="button"
         class="mt-4 w-full text-xs text-slate-400 hover:text-amber-400"
-        (click)="mode.set('login'); forgotSent.set(false)"
+        (click)="mode.set('login'); forgotSent.set(false); resetLink.set(null)"
       >
         ← Retour connexion
       </button>

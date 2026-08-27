@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-creature-inconnue-2",
+  "name": "Créature inconnue",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "",
+  "armor_class": 14,
+  "armor_note": "armure naturelle",
+  "hit_points": "19 (3d8 + 6)",
+  "wound_threshold": 6,
+  "speed": "\\",
+  "abilities": {
+    "str": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "wis": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "cha": {
+      "score": 13,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": null,
+  "skills": "\\*\\* Perception +4                                                                                                     |             |             |             |             |             |",
+  "senses": "\\*\\* Perception passive 14                                                                                                    |             |             |             |             |             |",
+  "languages": "\\*\\* aigle géant, sylvestre                                                                                                |             |             |             |             |             |",
+  "challenge_rating": "0",
+  "xp": 0,
+  "traits": [
+    {
+      "name": "Vue perçante",
+      "description": "** L’aigle géant bénéficie d’un avantage aux tests de Sagesse (Perception) qui font intervenir la vue."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "** L’aigle géant effectue deux attaques : une de bec et une de serres."
+    },
+    {
+      "name": "Bec",
+      "description": "** Attaque d’arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 6 (1d6 + 3) dégâts perforants."
+    },
+    {
+      "name": "Serres",
+      "description": "** Attaque d’arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 10 (2d6 + 3) dégâts tranchants.\n\nFiers prédateurs des hautes montagnes, les aigles géants prospèrent dans les Drakenbergen, où ils sont souvent pris comme emblème par les peuples des environs. Tout comme il existe plusieurs espèces d’aigle – aux couleurs et aux techniques de chasse variées –, les aigles géants arborent des plumages différents : noir profond, bistre, gris perle, etc. Ils ne sont pas aussi proches des fées que les hiboux géants, mais ont néanmoins des affinités avec elles, et sont enclins à se porter à leur aide ou à accomplir des services pour elles.\n\n119\n\nSanglier illustration\n\n# Sanglier\n\nLes sangliers, réputés pour leur fureur, sont fréquemment associés à Tamerakh, représentant sa fierté farouche. En réaction, les adeptes de Forgeron, qui se sentent à l’opposé du culte du tempétueux conquérant, déprécient ces bêtes. Chasser le sanglier dans les Drakenbergen a valeur de destruction du chaos qui menace la civilisation.\n\n### Sanglier\n\nBête de taille M, non aligné"
+    },
+    {
+      "name": "Classe d’armure",
+      "description": "14 (armure naturelle)"
+    },
+    {
+      "name": "Points de vie",
+      "description": "19 (3d8 + 6) | **Seuil de blessure** 6"
+    },
+    {
+      "name": "Vitesse de déplacement",
+      "description": "12 m\n\n| \\*\\*FOR\\*\\* | \\*\\*DEX\\*\\* | \\*\\*CON\\*\\* | \\*\\*INT\\*\\* | \\*\\*SAG\\*\\* | \\*\\*CHA\\*\\* |\n| ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |\n| 13 (+1)     | 11 (+0)     | 15 (+2)     | 5 (−3)      | 10 (+0)     | 7 (−2)      |"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

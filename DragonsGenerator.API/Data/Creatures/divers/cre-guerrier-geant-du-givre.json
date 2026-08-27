@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-guerrier-geant-du-givre",
+  "name": "Guerrier géant du givre",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Géant de taille TG, chaotique mauvais",
+  "armor_class": 15,
+  "armor_note": "cotte de maille grossière",
+  "hit_points": "138 (12d12 + 60)",
+  "wound_threshold": 35,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 23,
+      "modifier": "+6"
+    },
+    "dex": {
+      "score": 9,
+      "modifier": "-1"
+    },
+    "con": {
+      "score": 21,
+      "modifier": "+5"
+    },
+    "int": {
+      "score": 9,
+      "modifier": "-1"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 12,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": "Con +8, Sag +3, Cha +4",
+  "skills": "Athlétisme +9, Dressage +3, Perception +3, Survie +3",
+  "senses": "Perception passive 13",
+  "languages": "tumiit",
+  "challenge_rating": "8",
+  "xp": 3900,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le géant effectue deux attaques de grande hache."
+    },
+    {
+      "name": "Grande hache",
+      "description": "Attaque d'arme de corps à corps : +9 pour toucher, allonge 3 m, une cible. Réussite : 25 (3d12 + 6) dégâts tranchants."
+    },
+    {
+      "name": "Rocher",
+      "description": "Attaque d'arme à distance : +9 pour toucher, portée 18/72 m, une cible. Réussite : 28 (4d10 + 6) dégâts contondants.\n347"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

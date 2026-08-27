@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-corbeaux-nuee",
+  "name": "Corbeaux - Nuée",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Nuée de taille M de bêtes de taille TP, non aligné",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "24 (7d8 - 7)",
+  "wound_threshold": null,
+  "speed": "3 m, vol 15 m",
+  "abilities": {
+    "str": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 8,
+      "modifier": "-1"
+    },
+    "int": {
+      "score": 5,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +5",
+  "senses": "Perception passive 15",
+  "languages": "—",
+  "challenge_rating": "1/4",
+  "xp": 50,
+  "traits": [
+    {
+      "name": "Nuée",
+      "description": "La nuée peut occuper l'espace d'une autre créature et réciproquement. La nuée peut se déplacer dans tout passage suffisant pour laisser passer un corbeau de taille TP. La nuée ne peut pas récupérer de pv ni gagner de pv temporaires."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Becs",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une créature occupant l'espace de la nuée. Réussite : 7 (2d6) dégâts perforants ou 3 (1d6) dégâts perforants si les pv actuels de la nuée sont inférieurs ou égaux à la moitié de son maximum."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

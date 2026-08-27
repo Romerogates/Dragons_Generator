@@ -1,0 +1,93 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-sui-adacayi-kartacol",
+  "name": "Süi Adaçayi Kartaçöl",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (humain) de taille M, loyal mauvais, neutre ou bon, au gré du meneur",
+  "armor_class": 25,
+  "armor_note": "Écrin de l'Immortel, Représaille",
+  "hit_points": "285 (30d8 + 150)",
+  "wound_threshold": 72,
+  "speed": "9 m, vol 18 m",
+  "abilities": {
+    "str": {
+      "score": 25,
+      "modifier": "+7"
+    },
+    "dex": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "con": {
+      "score": 22,
+      "modifier": "+6"
+    },
+    "int": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "wis": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "cha": {
+      "score": 22,
+      "modifier": "+6"
+    }
+  },
+  "saving_throws": "For +14, Dex +12, Con +13, Sag +11, Cha +13",
+  "skills": "Acrobaties +12, Athlétisme +14, Histoire +11, Intimidation +20, Intuition +18, Perception +11, Persuasion +13",
+  "senses": "Perception passive 21",
+  "languages": "anakedi, baashan, elfique, gobelin, kaani, kalam, kartace",
+  "challenge_rating": "24",
+  "xp": 62000,
+  "traits": [
+    {
+      "name": "Ailes de la victoire",
+      "description": "Süi Adaçayi bénéficie des effets du sort liberté de mouvement (cf. le profil de l'objet magique ci-après)."
+    },
+    {
+      "name": "Brutal",
+      "description": "Quand Süi Adaçayi touche sa cible avec une arme de corps à corps, il inflige un dé supplémentaire de dégâts (pris en compte dans les attaques ci-après)."
+    },
+    {
+      "name": "Cœur de l'Immortel",
+      "description": "Süi Adaçayi bénéficie des effets du cœur de l'Immortel. Les bénéfices conférés par cet artefact sont indiqués par un *, mais ils sont modulables (cf. le profil de l'artefact ci-après)."
+    },
+    {
+      "name": "Critique dévastateur",
+      "description": "Les attaques d'arme de Süi Adaçayi infligent un critique sur un résultat de 18, 19 ou 20 au d20 du jet d'attaque. En cas de coup critique, l'armure de son adversaire, sous réserve qu'elle ne soit pas magique, subit un malus de -1 à la CA et est désormais fragile. Par ailleurs, la cible doit réussir un JS Constitution DD 18 sous peine d'être **étourdie** jusqu'à la fin de son tour de jeu suivant."
+    },
+    {
+      "name": "Écrin de l'Immortel",
+      "description": "Lorsque Süi Adaçayi reçoit un coup critique, celui-ci est résolu comme un coup normal (cf. le profil de l'objet magique ci-après)."
+    },
+    {
+      "name": "Fougue (recharge 5-6)",
+      "description": "À son tour de jeu, Süi Adaçayi peut effectuer une action supplémentaire, en plus de son action normale et d'une éventuelle action bonus."
+    },
+    {
+      "name": "Résistance à la magie",
+      "description": "Süi Adaçayi bénéficie d'un avantage aux jets de sauvegarde contre les sorts et autres effets magiques."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Süi Adaçayi effectue quatre attaques à l'aide de Conquête ou trois attaques à distance."
+    },
+    {
+      "name": "Conquête",
+      "description": "Attaque d'arme de corps à corps : +16 pour toucher, allonge 1,50 m, une cible. Réussite : 16 (2d8 + 7) dégâts tranchants plus 3 (1d6) dégâts psychiques et la cible subit un malus d'appoint cumulatif de -1 à tous ses jets jusqu'à la fin de son tour de jeu suivant."
+    },
+    {
+      "name": "Arc composite +2",
+      "description": "Attaque d'arme à distance : +14 pour toucher, portée 48/150 m, une cible. Réussite : 11 (1d8 + 7) dégâts perforants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "soutient. Au combat, sa stratégie et simple : foncer sur l’ennemi le plus dangereux et focaliser toute sa puissance sur lui, se fiant à sa légendaire invincibilité pour tenir le temps d’éliminer ses adversaires un par un. Cette tactique en apparence rudimentaire ne lui a jusqu’ici jamais fait défaut."
+}

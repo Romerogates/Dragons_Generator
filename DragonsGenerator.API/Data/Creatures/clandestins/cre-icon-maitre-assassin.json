@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-icon-maitre-assassin",
+  "name": "Icon Maître assassin",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement autre que bon au choix",
+  "armor_class": 16,
+  "armor_note": "armure de cuir cloutée",
+  "hit_points": "135 (18d8 + 54)",
+  "wound_threshold": 34,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "dex": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "con": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "wis": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 12,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": "Dex +8, Con +7, Int +6",
+  "skills": "Acrobaties +8, Athlétisme +5, Discrétion +12, Investigation +6, Perception +10, Tromperie +5",
+  "senses": "Perception passive 20",
+  "languages": "argot des voleurs et trois au choix",
+  "challenge_rating": "11",
+  "xp": 7200,
+  "traits": [],
+  "actions": [],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "meilleure arme d’un tueur expert est la préparation. Tout maître assassin aura soin de se renseigner sur sa cible et de s’équiper en conséquence, renonçant par exemple au poison si celle-ci y est immunisée. Son influence et ses moyens lui permettent généralement de se fournir en outils, même magiques."
+}

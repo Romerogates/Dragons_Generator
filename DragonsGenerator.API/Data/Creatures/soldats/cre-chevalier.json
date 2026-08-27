@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-chevalier",
+  "name": "Chevalier",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 18,
+  "armor_note": "harnois",
+  "hit_points": "52 (8d8 + 16)",
+  "wound_threshold": 13,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 15,
+      "modifier": "+2"
+    }
+  },
+  "saving_throws": "Con +4, Sag +2",
+  "skills": "Dressage +2, Intimidation +4",
+  "senses": "Perception passive 10",
+  "languages": "une au choix (généralement le commun)",
+  "challenge_rating": "3",
+  "xp": 700,
+  "traits": [
+    {
+      "name": "Vaillant",
+      "description": "Le chevalier bénéficie d'un avantage aux jets de sauvegarde contre l'état préjudiciable effrayé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le chevalier effectue deux attaques de corps à corps."
+    },
+    {
+      "name": "Épée à deux mains",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 10 (2d6 + 3) dégâts tranchants."
+    },
+    {
+      "name": "Arbalète lourde",
+      "description": "Attaque d'arme à distance : +2 pour toucher, portée 30/120 m, une cible. Réussite : 5 (1d10) dégâts perforants."
+    },
+    {
+      "name": "Commandement (recharge après un repos court ou long)",
+      "description": "Pendant une minute, le chevalier peut prononcer une instruction spéciale ou une mise en garde lorsqu'une créature non hostile qu'il voit dans un rayon de 9 m effectue un jet d'attaque ou de sauvegarde. La créature peut alors ajouter un d4 au résultat de son jet, à condition de pouvoir entendre et comprendre le chevalier. Une même créature ne peut bénéficier de plus d'un dé de commandement à la fois. Les effets prennent fin si le chevalier se retrouve neutralisé."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

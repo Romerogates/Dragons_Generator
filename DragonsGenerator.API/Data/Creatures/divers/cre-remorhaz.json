@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-remorhaz",
+  "name": "Remorhaz",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Monstruosité de taille TG, non aligné",
+  "armor_class": 17,
+  "armor_note": "armure naturelle",
+  "hit_points": "195 (17d12 + 85)",
+  "wound_threshold": 49,
+  "speed": "9 m, fouissage 6 m",
+  "abilities": {
+    "str": {
+      "score": 24,
+      "modifier": "+7"
+    },
+    "dex": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 21,
+      "modifier": "+5"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 5,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, perception des vibrations 18 m, Perception passive 10",
+  "languages": "—",
+  "challenge_rating": "11",
+  "xp": 7200,
+  "traits": [
+    {
+      "name": "Corps brûlant",
+      "description": "Une créature qui entre en contact avec le remorhaz ou qui le touche avec une attaque de corps à corps alors qu'elle se situe dans un rayon de 1,50 m de lui subit 10 (3d6) dégâts de feu. Les créatures artificielles et les morts-vivants sont immunisés à cet effet."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +11 pour toucher, allonge 3 m, une cible. Réussite : 40 (6d10 + 7) dégâts perforants plus 10 (3d6) dégâts de feu. Si la cible est une créature, elle est **agrippée** (DD 17 pour s'extraire). Tant que la lutte persiste, la cible est **entravée** et le remorhaz ne peut pas en mordre d'autre."
+    },
+    {
+      "name": "Engloutissement",
+      "description": "Le remorhaz effectue une attaque de morsure contre une cible de taille M ou inférieure qu'il est en train d'agripper. Si l'attaque touche, la cible subit les dégâts de morsure, est engloutie, et la lutte prend fin. Une cible engloutie est **aveuglée** et **entravée**, elle bénéficie d'un abri total contre les attaques et effets émanant de l'extérieur du remorhaz, et subit 21 (6d6) dégâts d'acide au début de chaque tour de jeu du monstre.\nSi le remorhaz subit au moins 30 dégâts en un tour de jeu de la part de la créature engloutie, il doit réussir un JS Constitution DD 15 à la fin de ce tour de jeu sous peine de recracher toutes les créatures englouties, qui se retrouvent **à terre** dans espace situé dans un rayon de 3 m du monstre. Si le remorhaz meurt, la créature engloutie n'est plus **entravée** par le monstre et peut s'extraire du cadavre au prix de 4,50 m de son déplacement. Elle se retrouve alors **à terre**.\nIcon\nSi vous souhaitez rendre cette créature plus redoutable, vous pouvez utiliser l'option ci-dessous. Dans ce cas, son FP passera de 11 à 12."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Un remorhaz capturé jeune peut être dressé et devenir le redoutable gardien des domaines des géants du givre. De par leur capacité à faire usage du feu sans le propager aux matières inertes, ils sont aussi très appréciés des géants du feu. Comme ces créatures se trouvent dans les territoires des géants du givre, leurs ennemis jurés, parvenir à obtenir un remorhaz de compagnie est un immense prestige pour un géant du feu."
+}

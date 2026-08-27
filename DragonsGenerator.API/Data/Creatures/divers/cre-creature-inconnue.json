@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-creature-inconnue",
+  "name": "Créature inconnue",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "",
+  "armor_class": 14,
+  "armor_note": "armure naturelle",
+  "hit_points": "19 (3d8 + 6)",
+  "wound_threshold": 6,
+  "speed": "\\",
+  "abilities": {},
+  "saving_throws": null,
+  "skills": "\\*\\* Perception +4                                                                                                     |             |             |             |             |             |",
+  "senses": "\\*\\* Perception passive 14                                                                                                    |             |             |             |             |             |",
+  "languages": "\\*\\* aigle géant, sylvestre                                                                                                |             |             |             |             |             |",
+  "challenge_rating": "0",
+  "xp": 0,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Classe d’armure",
+      "description": "14 (armure naturelle)"
+    },
+    {
+      "name": "Points de vie",
+      "description": "19 (3d8 + 6) | **Seuil de blessure** 6"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

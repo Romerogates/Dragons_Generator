@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-assangui",
+  "name": "Assangui",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Monstruosité de taille M, chaotique mauvais",
+  "armor_class": 16,
+  "armor_note": "armure naturelle",
+  "hit_points": "112 (15d8 + 45)",
+  "wound_threshold": 28,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 7,
+      "modifier": "-2"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": "Con +6, Cha +1",
+  "skills": "Athlétisme +7, Discrétion +9, Perception +4",
+  "senses": "vision dans le noir 18 m, Perception passive 14",
+  "languages": "commun",
+  "challenge_rating": "6",
+  "xp": 2300,
+  "traits": [
+    {
+      "name": "Attaque surprise",
+      "description": "Si l'assangui surprend une créature et la touche avec une attaque au cours du premier round de combat, cette attaque inflige 14 (4d6) dégâts supplémentaires à la cible."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "L'assangui effectue deux attaques de griffes. Si l'assangui en a la possibilité, il effectue également une attaque de morsure."
+    },
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 1,50 m, une créature. Réussite : 13 (2d8 + 4) dégâts tranchants, et la cible est **agrippée** (DD 15 pour s'extraire)."
+    },
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 1,50 m, une créature agrippée par l'assangui, neutralisée ou entravée. Réussite : 11 (2d6 + 4) dégâts perforants, et l'assan gui se fixe à la cible. Tant qu'il reste fixé, au lieu d'effectuer une attaque de morsure, l'assangui peut faire perdre à la cible 18 (4d6 + 4) pv au début de chacun des tours de jeu du monstre en raison de l'hémorragie."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les assanguis, pour leur part, ne semblent avoir aucune propension à la rédemption, n’ayant jamais fait montre que d’une cruauté écœurante. Pour cette raison, ces assertions ne sont très souvent considérées comme rien d’autre que des contes à raconter au coin du feu."
+}

@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-acolyte",
+  "name": "Acolyte",
+  "category": "croyants",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": null,
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 10,
+  "armor_note": null,
+  "hit_points": "9 (2d8)",
+  "wound_threshold": 4,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 11,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Médecine +4, Religion +2",
+  "senses": "Perception passive 12",
+  "languages": "une au choix (généralement le commun)",
+  "challenge_rating": "1/4",
+  "xp": 50,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Gourdin",
+      "description": "Attaque d'arme de corps à corps : +2 pour toucher, allonge 1,50 m, une cible. Réussite : 2 (1d4) dégâts contondants.\n13"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Le profil d’acolyte vaut pour tout membre subalterne d’un clergé établi. La plupart officient dans les hospices et assistent leurs supérieurs lors des rituels. Les fonctions sociales des acolytes peuvent les pousser à développer les compétences Intuition et Persuasion, en particulier dans le cas de ceux officiant comme prédicateurs, missionnaires et prêcheurs."
+}

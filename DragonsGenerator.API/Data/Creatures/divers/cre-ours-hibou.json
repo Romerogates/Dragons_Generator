@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-ours-hibou",
+  "name": "Ours-hibou",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Monstruosité de taille G, non aligné",
+  "armor_class": 13,
+  "armor_note": "armure naturelle",
+  "hit_points": "59 (7d10 + 21)",
+  "wound_threshold": 15,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +3",
+  "senses": "vision dans le noir 18 m, Perception passive 13",
+  "languages": "—",
+  "challenge_rating": "3",
+  "xp": 700,
+  "traits": [
+    {
+      "name": "Vue perçante et flair",
+      "description": "L'ours-hibou bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir la vue ou l'odorat."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "L'ours-hibou effectue deux attaques : une de bec et une de griffes."
+    },
+    {
+      "name": "Bec",
+      "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 1,50 m, une créature. Réussite : 10 (1d10 + 5) dégâts perforants."
+    },
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 1,50 m, une cible. Réussite : 14 (2d8 + 5) dégâts tranchants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les ours-hiboux se comportent comme des prédateurs féroces, mais des dresseurs de Gleannceò ont commencé à en apprivoiser. Les monstres demeurent difficilement contrôlables, mais l’atout qu’ils représenteraient comme force de frappe dans une armée justifie les efforts pour les dompter."
+}

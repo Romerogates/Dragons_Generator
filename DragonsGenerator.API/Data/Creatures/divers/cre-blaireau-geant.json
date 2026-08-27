@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-blaireau-geant",
+  "name": "Blaireau géant",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille M, non aligné",
+  "armor_class": 10,
+  "armor_note": null,
+  "hit_points": "13 (2d8 + 4)",
+  "wound_threshold": 6,
+  "speed": "9 m, fouissage 3 m",
+  "abilities": {
+    "str": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 5,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 9 m, Perception passive 11",
+  "languages": "—",
+  "challenge_rating": "1/4",
+  "xp": 50,
+  "traits": [
+    {
+      "name": "Flair",
+      "description": "Le blaireau géant bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'odorat."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le blaireau géant effectue deux attaques : une de morsure et une de griffes."
+    },
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d6 + 1) dégâts perforants."
+    },
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 1,50 m, une cible. Réussite : 6 (2d4 + 1) dégâts tranchants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "10 (+0) 4 (−3) 12 (+1) 6 (−2)"
+}

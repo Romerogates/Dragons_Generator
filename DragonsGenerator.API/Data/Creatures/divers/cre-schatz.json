@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-schatz",
+  "name": "Schatz",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Élémentaire (terre) de taille Gig, loyal neutre",
+  "armor_class": 20,
+  "armor_note": "armure naturelle",
+  "hit_points": "277 (15d20 + 120)",
+  "wound_threshold": 70,
+  "speed": "15 m, fouissage 12 m",
+  "abilities": {
+    "str": {
+      "score": 25,
+      "modifier": "+7"
+    },
+    "dex": {
+      "score": 8,
+      "modifier": "-1"
+    },
+    "con": {
+      "score": 26,
+      "modifier": "+8"
+    },
+    "int": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "wis": {
+      "score": 21,
+      "modifier": "+5"
+    },
+    "cha": {
+      "score": 17,
+      "modifier": "+3"
+    }
+  },
+  "saving_throws": "Con +13, Sag +10, Cha +8",
+  "skills": "Histoire +13, Nature +8, Perception +10, Religion +8",
+  "senses": "vision aveugle 18 m, vision dans le noir 36 m, Perception passive 20",
+  "languages": "commun, originel",
+  "challenge_rating": "16",
+  "xp": 15000,
+  "traits": [
+    {
+      "name": "Fouisseur",
+      "description": "Le schatz peut se déplacer au travers de la roche solide à la moitié de sa vitesse de fouissage et laisse un tunnel de 3 m de diamètre derrière lui."
+    },
+    {
+      "name": "Sens de la pierre",
+      "description": "Le schatz a une connaissance intuitive de toute chose au contact de la pierre dans un rayon de 150 m. Il en connaît le type et l'emplacement, mais pas l'identité ou l'apparence précise."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le schatz effectue trois attaques : une de constriction, une de morsure et une de queue."
+    },
+    {
+      "name": "Constriction",
+      "description": "Attaque d'arme de corps à corps : +12 pour toucher, allonge 1,50 m, une créature. Réussite : 23 (3d10 + 7) dégâts contondants, et la cible est **agrippée** (DD 20 pour s'extraire). Tant que la lutte persiste, la créature est **entravée**, et le schatz ne peut pas effectuer d'attaque de constriction sur une autre cible."
+    },
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +12 pour toucher, allonge 3 m, une créature. Réussite : 20 (3d8 + 7) dégâts perforants, et la cible doit effectuer un JS Constitution DD 21 contre la **pétrification** magique. En cas d'échec, la créature commence à se **pétrifier** et est **entravée**. Elle doit réitérer le jet de sauvegarde à la fin de son tour de jeu suivant. En cas d'échec, la créature est **pétrifiée** jusqu'à être libérée par le sort restauration suprême ou autre effet magique similaire, ou par la volonté du schatz."
+    },
+    {
+      "name": "Queue",
+      "description": "Attaque d'arme de corps à corps : +12 pour toucher, allonge 4,50 m, une cible. Réussite : 18 (2d10 + 7) dégâts contondants. Si la cible est une créature, elle doit réussir un JS Force DD 20 sous peine d'être repoussée jusqu'à 3 m et de se retrouver **à terre**."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Schatz"
+}

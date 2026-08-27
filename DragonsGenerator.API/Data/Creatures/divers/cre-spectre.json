@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-spectre",
+  "name": "Spectre",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Mort-vivant de taille M, chaotique mauvais",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "22 (5d8)",
+  "wound_threshold": null,
+  "speed": "0 m, vol 15 m (stationnaire)",
+  "abilities": {
+    "str": {
+      "score": 1,
+      "modifier": "-5"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 11,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "ibilité à la lumière du soleil. Quand le spectre est exposé à la lumière du soleil, il subit un désavantage aux jets d'attaque ainsi qu'aux tests de Sagesse (Perception) basés sur la vue.",
+  "languages": "comprend toutes les langues qu'il pratiquait de son vivant mais ne peut pas parler",
+  "challenge_rating": "1",
+  "xp": 200,
+  "traits": [
+    {
+      "name": "Déplacement intangible",
+      "description": "Le spectre est capable de se déplacer au travers d'autres créatures ou d'objets comme s'il s'agissait de terrain difficile. Il subit 5 (1d10) dégâts de force s'il termine son tour de jeu à l'intérieur d'un objet."
+    },
+    {
+      "name": "Sensibilité à la lumière du soleil",
+      "description": "Quand le spectre est exposé à la lumière du soleil, il subit un désavantage aux jets d'attaque ainsi qu'aux tests de Sagesse (Perception) basés sur la vue."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Absorption de vie",
+      "description": "Attaque de sort au corps à corps : +4 pour toucher, allonge 1,50 m, une créature. Réussite : 10 (3d6) dégâts nécrotiques. La cible doit réussir un JS Constitution DD 10 sous peine de voir ses pv maximums réduits d'un montant égal aux dégâts subis. Cette réduction persiste jusqu'à ce que la victime termine un repos long. La cible meurt si cet effet réduit ses pv maximums à 0.\n310\nIcône de dragon\nIcône de baguette"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les âmes-en-peine et les spectres sont un fléau du Plan Éthéré. En voyant les âmes des morts, ils se rappellent le mal dément qui les anime. Ils cherchent à transformer les défunts en monstres semblables à eux."
+}

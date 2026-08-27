@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-dragon-blanc-adulte",
+  "name": "Dragon blanc adulte",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Dragon de taille TG, chaotique mauvais",
+  "armor_class": 18,
+  "armor_note": "armure naturelle",
+  "hit_points": "200 (16d12 + 96)",
+  "wound_threshold": 50,
+  "speed": "12 m, fouissage 9 m, vol 24 m, nage 12 m",
+  "abilities": {
+    "str": {
+      "score": 22,
+      "modifier": "+6"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 22,
+      "modifier": "+6"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 12,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": "Dex +5, Con +11, Sag +6, Cha +6",
+  "skills": "Athlétisme +11, Discrétion +5, Perception +11",
+  "senses": "vision aveugle 18 m, vision dans le noir 36 m, Perception passive 21",
+  "languages": "commun, draconique",
+  "challenge_rating": "13",
+  "xp": 10000,
+  "traits": [
+    {
+      "name": "Marche de glace",
+      "description": "Le dragon peut fouler et escalader les surfaces glacées sans devoir effectuer de test de caractéristique. En outre, un terrain difficile composé de glace ou de neige ne lui coûte pas de déplacement supplémentaire."
+    },
+    {
+      "name": "Résistance légendaire (3/jour)",
+      "description": "Si le dragon rate un jet de sauvegarde, il peut décider de le réussir tout de même."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le dragon peut utiliser sa Présence terrifiante. Il effectue ensuite trois attaques : une avec sa morsure et deux de coup de griffe."
+    },
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +11 pour toucher, allonge 3 m, une cible. Réussite : 17 (2d10 + 6) dégâts perforants plus 4 (1d8) dégâts de froid."
+    },
+    {
+      "name": "Coup de griffe",
+      "description": "Attaque d'arme de corps à corps : +11 pour toucher, allonge 1,50 m, une cible. Réussite : 13 (2d6 + 6) dégâts tranchants."
+    },
+    {
+      "name": "Queue",
+      "description": "Attaque d'arme de corps à corps : +11 pour toucher, allonge 4,50 m, une cible. Réussite : 15 (2d8 + 6) dégâts contondants."
+    },
+    {
+      "name": "Présence terrifiante",
+      "description": "Chaque créature située dans un rayon de 36 m du dragon, choisie par ce dernier et consciente de sa présence, doit réussir un JS Sagesse DD 14 sous peine d'être **effrayée** pendant 1 minute. Une créature peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet sur elle-même en cas de réussite. Toute créature qui réussit le jet de sauvegarde ou pour qui l'effet prend fin est immunisée contre la Présence terrifiante du dragon pour les 24 prochaines heures."
+    },
+    {
+      "name": "Souffle glacé (recharge 5–6)",
+      "description": "Le dragon crache un cône de froid de 18 m. Chaque créature prise dans cette zone d'effet doit effectuer un JS Constitution DD 19 et subit 54 (12d8) dégâts de froid en cas d'échec, la moitié en cas de réussite."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Après l’apprentissage et les expériences de la jeunesse, la personnalité du dragon blanc s’affirme. Beaucoup demeurent toutefois des prédateurs brutaux. Les ressources alimentaires limitées peuvent d’ailleurs les pousser à s’entretuer, voire à chasser les plus jeunes membres de leur espèce pour les dévorer. À la suite de rencontres fortuites, certains dragons blancs décident de devenir les seigneurs de communautés isolées. Quelques-uns s’impliquent dans des luttes d’influence ou des plans majeurs. D’autres deviennent les terrifiantes montures de héros assez rusés ou charismatiques pour apaiser ou dominer les humeurs d’un dragon blanc adulte. Similairement, longuement asservis et dressés depuis le plus jeune âge, quelques-uns se contentent du rôle de machine de guerre de géants du givre."
+}

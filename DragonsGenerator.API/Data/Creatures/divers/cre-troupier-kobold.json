@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-troupier-kobold",
+  "name": "Troupier kobold",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Humanoïde (kobold) de taille P, neutre (tout alignement)",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "7 (2d6)",
+  "wound_threshold": 4,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +4, Survie +2",
+  "senses": "vision dans le noir 18 m, Perception passive 10",
+  "languages": "commun, draconique",
+  "challenge_rating": "1/8",
+  "xp": 25,
+  "traits": [
+    {
+      "name": "Tactique de meute",
+      "description": "Le kobold bénéficie d'un avantage aux jets d'attaque contre les créatures situées à 1,50 m ou moins d'un de ses alliés qui n'est pas neutralisé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Dague",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d4 + 2) dégâts perforants."
+    },
+    {
+      "name": "Fronde",
+      "description": "Attaque d'arme à distance : +4 pour toucher, portée 9/36 m, une cible. Réussite : 4 (1d4 + 2) dégâts contondants.\nLe troupier kobold est l'équivalent d'un civil entraîné dans une milice. Il a appris le maniement d'armes courantes et surtout, de redoutables tactiques de combat en groupe. Sa principale faiblesse réside dans son manque de protection."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Autrefois, les kobolds étaient utilisés dans la Horde comme éclaireurs, mais plus d’un chef de guerre n’a pas hésité à les sacrifier en première ligne. Les descendants de ces bataillons massacrés en gardent une rancœur tenace et n’hésiteront pas à s’allier avec toute espèce qui les traite avec respect."
+}

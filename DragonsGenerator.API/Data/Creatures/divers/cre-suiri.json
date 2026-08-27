@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-suiri",
+  "name": "Süiri",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille TP, non aligné",
+  "armor_class": 13,
+  "armor_note": null,
+  "hit_points": "2 (1d4)",
+  "wound_threshold": null,
+  "speed": "3 m, vol 15 m",
+  "abilities": {
+    "str": {
+      "score": 1,
+      "modifier": "-5"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 2,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 4,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "Perception passive 10",
+  "languages": "—",
+  "challenge_rating": "0",
+  "xp": 10,
+  "traits": [
+    {
+      "name": "Bonds de sauterelle",
+      "description": "La süiri saute sans élan jusqu'à 10 fois sa hauteur à la verticale et à l'horizontale, soit 150 cm."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Mandibules",
+      "description": "Attaque d'arme de corps à corps : +2 pour toucher, allonge 1,50 m, une créature. Réussite : 1 dégât perforant et la cible doit réussir un JS Constitution DD 5 sous peine d'être contaminée par la noirçure (cf. **Aventuriers**, chapitre **Santé, Maladies : Noirçure**).\nCertains lanceurs de sorts prennent ces sauterelles particulières comme familier. Ce choix est souvent vu comme une sorte de provocation ou une manière d'afficher une forme de noirceur raffinée et dédaigneuse. S'il est difficile de faire face aux nuées, lorsque les süiris sont isolées, elles peuvent être récoltées. Une fois grillées ou frites, elles constituent un mets nourrissant et apprécié.\nSüirel icon"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Süiri icon"
+}

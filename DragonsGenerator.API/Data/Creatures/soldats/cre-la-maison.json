@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-la-maison",
+  "name": "La Maison",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Fée (urbaine) de taille Gig, tout alignement neutre",
+  "armor_class": 20,
+  "armor_note": "armure naturelle",
+  "hit_points": "247 (15d20 + 90)",
+  "wound_threshold": null,
+  "speed": "0 m",
+  "abilities": {
+    "str": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "dex": {
+      "score": 1,
+      "modifier": "-5"
+    },
+    "con": {
+      "score": 23,
+      "modifier": "+6"
+    },
+    "int": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "wis": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "cha": {
+      "score": 24,
+      "modifier": "+7"
+    }
+  },
+  "saving_throws": "Intelligence +9, Sagesse +8, Charisme +12",
+  "skills": "Intuition +12, Perception +12",
+  "senses": "vision lucide (à l'intérieur), Perception passive 22",
+  "languages": ", Silence.",
+  "challenge_rating": "15",
+  "xp": 13000,
+  "traits": [
+    {
+      "name": "Âme incarnée",
+      "description": "L'âme de La Maison prend corps en son sein. Sa forme varie pour chaque Maison : cristal, cœur palpitant, araignée à 60 pattes, etc. La sortir de La Maison entraîne sa mort. Si La Maison est détruite, tant que l'Âme incarnée existe, La Maison réapparaîtra une année après une destruction."
+    },
+    {
+      "name": "Avatar",
+      "description": "La Maison peut s'incarner dans un objet qui devient alors un **objet animé** (voir le sort animation d'objets). La Maison ne conserve alors que son Intelligence, sa Sagesse et son Charisme, ainsi que son aptitude à lancer des sorts. Si l'objet animé est détruit, l'esprit de La Maison revient au foyer."
+    },
+    {
+      "name": "Foyer enchanté",
+      "description": "La Maison et ses habitants bénéficient des effets suivants du sort sanctification : Antidétection, Courage, Guérison, Langues, Silence."
+    },
+    {
+      "name": "Maison fermée",
+      "description": "La Maison se ferme en l'absence d'occupants. Toute ouverture est alors sous l'effet d'un verrou de mage."
+    },
+    {
+      "name": "Sorts innés",
+      "description": "La caractéristique magique de La Maison est le Charisme (DD de sauvegarde des sorts : 20). La Maison peut lancer les sorts suivants sans composantes :\nÀ volonté : bouche magique, création ou destruction d'eau, invisibilité, flamme éternelle, lumière, nappe de brouillard, protection d'autrui, réparation, sanctuaire, serviteur invisible, sommeil, stabilisation, télékinésie, verrou de mage\n3/jour chacun : apaisement des émotions, création éphémère, dissipation de la magie, festin des héros, flou, lueurs hypnotiques, restauration partielle, silence, suggestion*\n1/jour chacun : animation d'objets, appel de familier, aversion/attirance*, chien de garde, coffre secret, contrôle de l'eau, délivrance des malédictions, ordonnancement, mirage, mot de pouvoir étourdissant, porte dimensionnelle, quête, rappel à la vie, restauration suprême, suggestion de groupe*\n1/mois chacun : don de conscience, téléportation (uniquement à destination d'un espace inoccupé où se trouve au préalable un objet provenant de l'intérieur de La Maison)\n(*) Seuls ces sorts peuvent affecter une cible extérieure à La Maison."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "La Maison effectue six attaques de poltergeist."
+    },
+    {
+      "name": "Poltergeist",
+      "description": "Attaque de sort au corps à corps : +10 pour toucher, allonge 0 m, une cible. Réussite : 12 (2d6 + 5) dégâts psychiques.\n44"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Logo La Maison"
+}

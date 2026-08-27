@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-sunsutaajijig",
+  "name": "Sünsutaajijig",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Mort-vivant (incorporel) de taille P, neutre mauvais",
+  "armor_class": 14,
+  "armor_note": null,
+  "hit_points": "78 (12d6 + 36)",
+  "wound_threshold": null,
+  "speed": "0 m, vol 18 m (stationnaire)",
+  "abilities": {
+    "str": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "dex": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "wis": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "cha": {
+      "score": 20,
+      "modifier": "+5"
+    }
+  },
+  "saving_throws": "Int +6, Cha +8",
+  "skills": "Arcanes +6, Tromperie +8",
+  "senses": "vision dans le noir 36 m, Perception passive 13",
+  "languages": "celles pratiquées de son vivant",
+  "challenge_rating": "7",
+  "xp": 2900,
+  "traits": [
+    {
+      "name": "Déplacement intangible",
+      "description": "Le sünsutaa est capable de se déplacer au travers d'autres créatures ou d'objets comme s'il s'agissait de terrain difficile. Il subit 5 (1d10) dégâts de force s'il termine son tour de jeu à l'intérieur d'un objet."
+    },
+    {
+      "name": "Flou",
+      "description": "La silhouette du sünsutaa est floue, instable et vacillante. Tout jet d'attaque contre le sünsataa se fait avec un désavantage. Les créatures dépourvues de vision (dotées de vision aveugle par exemple) ou bénéficiant des effets de vision lucide ne sont pas affectées."
+    },
+    {
+      "name": "Noire magie du parasite",
+      "description": "Le sünsutaa peut utiliser ses sorts innés quand il possède une créature."
+    },
+    {
+      "name": "Sorts innés",
+      "description": "La caractéristique magique du sünsutaa est le Charisme (DD de sauvegarde des sorts : 16, +8 aux jets d'attaque de sorts). Le sünsutaa peut lancer les sorts suivants sans composantes matérielles :\nÀ volonté : cri de bataille, décharge occulte, illusion mineure, message\n3/jour chacun : repli expéditif, réprimande maléfique\n1/jour chacun : marche de brume, tourment"
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le sünsutaa effectue deux attaques de griffe de fumée."
+    },
+    {
+      "name": "Griffe de fumée",
+      "description": "Attaque de sort au corps à corps : +7 pour toucher, allonge 1,50 m, une créature. Réussite : 19 (3d10 + 4) dégâts nécrotiques."
+    },
+    {
+      "name": "Possession (recharge 4-6)",
+      "description": "Une bête ou un humanoïde de taille M ou inférieur, visible du sünsutaa et qui se trouve dans un rayon de 9 m de celui-ci doit réussir un JS Charisme DD 16 sous peine d'être **possédé** par lui (cf. **Annexe : États préjudiciables**)."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Plus un sünsutaa est ancien, plus sa forme grandit. Les sünsutaas les plus jeunes (quelques années), nommés sünsutaajijig, font à peine un mètre, mais sont déjà des menaces insidieuses qui peuvent mettre en péril une ville ou un petit territoire. Au bout de quelques décennies, le sünsutaa arrive « à maturité » et ses pouvoirs autant que son ampleur s’accroissent, pouvant désormais donner du fil à retordre à une région entière. Passé le siècle, le sünsutaaikh est une calamité morte-vivante qui peut à elle seule terrasser de grands héros mortels et gangrener un royaume entier par son influence. Car plutôt que par sa puissance brute, c’est par sa patience malveillante que le sünsutaa se démarque. Que plusieurs sünsutaas s’unissent, et c’est toute une contrée qui peut être mise en péril."
+}

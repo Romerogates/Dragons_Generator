@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-druide-geant-des-pierres",
+  "name": "Druide géant des pierres",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Géant de taille TG, neutre",
+  "armor_class": 15,
+  "armor_note": null,
+  "hit_points": "115 (11d12 + 44)",
+  "wound_threshold": 29,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "int": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "cha": {
+      "score": 11,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Nature +4, Perception +6, Religion +4",
+  "senses": "Perception passive 16",
+  "languages": "commun des profondeurs, druidique, tumiit",
+  "challenge_rating": "5",
+  "xp": 1800,
+  "traits": [
+    {
+      "name": "Camouflage rocheux",
+      "description": "Le géant bénéficie d'un avantage aux tests de Dextérité (Discrétion) visant à se cacher dans un environnement rocailleux."
+    },
+    {
+      "name": "Camouflage rocheux",
+      "description": "Le géant bénéficie d'un avantage aux tests de Dextérité (Discrétion) visant à se cacher dans un environnement rocailleux."
+    },
+    {
+      "name": "Sorts mineurs",
+      "description": "(à volonté) : art druidique, assistance divine, flammes."
+    },
+    {
+      "name": "1ᵉʳ niveau",
+      "description": "(4 emplacements) : détection de la magie, enchevêtrement, soins, vague de tonnerre."
+    },
+    {
+      "name": "2ᵉ niveau",
+      "description": "(3 emplacements) : passage sans trace, sphère de feu."
+    },
+    {
+      "name": "3ᵉ niveau",
+      "description": "(2 emplacements) : fusion dans la pierre, régression sauvage."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Bâton",
+      "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 4,50 m, une cible. Réussite : 14 (3d6 + 4) dégâts contondants, 17 (3d8 + 4) dégâts contondants si utilisé à deux mains."
+    },
+    {
+      "name": "Rocher",
+      "description": "Attaque d'arme à distance : +7 pour toucher, portée 18/72 m, une cible. Réussite : 15 (2d10 + 4) dégâts contondants. Si la cible est une créature, elle doit réussir un JS Force DD 15 sous peine de se retrouver **à terre**."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "8 FP. Le FP de la créature augmente de 3."
+}

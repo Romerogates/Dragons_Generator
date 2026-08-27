@@ -1,0 +1,93 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-chevalier-vampirien",
+  "name": "Chevalier vampirien",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Mort-vivant de taille M, loyal mauvais",
+  "armor_class": 18,
+  "armor_note": "harnois",
+  "hit_points": "75 (10d8 + 30)",
+  "wound_threshold": null,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 15,
+      "modifier": "+2"
+    }
+  },
+  "saving_throws": "Con +6, Sag +3",
+  "skills": "Dressage +3, Intimidation +5",
+  "senses": "vision dans le noir 18 m, Perception passive 10",
+  "languages": "une au choix (généralement le commun)",
+  "challenge_rating": "6",
+  "xp": 2300,
+  "traits": [
+    {
+      "name": "Faiblesses des vampires",
+      "description": "Le vampirien est affecté des handicaps suivants :\nBlessé par l'eau vive. Le vampirien subit 20 dégâts d'acide s'il termine son tour de jeu dans l'eau vive.\nHypersensibilité au soleil. Le vampirien subit 20 dégâts radiants lorsqu'il commence son tour de jeu au soleil. Tant qu'il y reste exposé, il subit un désavantage aux jets d'attaque et aux tests de caractéristique.\nInterdiction d'entrer. Le vampirien ne peut pénétrer dans une résidence sans y avoir été invité par l'un de ses occupants.\nPieu dans le cœur. Si une arme perforante en bois lui est plantée dans le cœur alors qu'il est neutralisé dans son lieu de repos, le vampirien est **paralysé** jusqu'à ce qu'elle soit retirée."
+    },
+    {
+      "name": "Pattes d'araignée",
+      "description": "Le vampirien peut parcourir les parois les plus difficiles à escalader, y compris les plafonds, sans devoir effectuer de test de caractéristique."
+    },
+    {
+      "name": "Régénération",
+      "description": "Le vampirien récupère 10 pv au début de son tour de jeu s'il lui reste au moins 1 pv et qu'il n'est exposé ni à la lumière du soleil ni à l'eau vive. S'il subit des dégâts radiants ou infligés par de l'eau bénite, ce trait ne fonctionne pas au début de son tour de jeu suivant."
+    },
+    {
+      "name": "Vaillant",
+      "description": "Le chevalier bénéficie d'un avantage aux jets de sauvegarde contre l'état préjudiciable effrayé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le vampirien effectue deux attaques, dont une seule peut être une morsure."
+    },
+    {
+      "name": "Épée à deux mains",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 10 (2d6 + 3) dégâts tranchants."
+    },
+    {
+      "name": "Arbalète lourde",
+      "description": "Attaque d'arme à distance : +6 pour toucher, portée 30/120 m, une cible. Réussite : 8 (1d10 + 3) dégâts perforants."
+    },
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une créature. Réussite : 8 (2d4 + 3) dégâts tranchants. Au lieu d'infliger des dégâts, le vampirien peut **agripper** sa cible (DD 14 pour s'extraire)."
+    },
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une créature consentante, agrippée par le vampirien, neutralisée ou entravée. Réussite : 6 (1d6 + 3) dégâts perforants plus 7 (2d6) dégâts nécrotiques. Les pv maximums de la cible sont réduits d'un montant égal aux dégâts nécrotiques subis, et le vampirien récupère autant de pv. La réduction persiste jusqu'à ce que la cible termine un repos long. La cible meurt si cet effet réduit ses pv maximums à 0."
+    },
+    {
+      "name": "Commandement (recharge après un repos court ou long)",
+      "description": "Pendant une minute, le vampirien peut prononcer une instruction spéciale ou une mise en garde lorsqu'une créature non hostile qu'il voit dans un rayon de 9 m effectue un jet d'attaque ou de sauvegarde. La créature peut alors ajouter un d4 au résultat de son jet, à condition de pouvoir entendre et comprendre le vampirien. Une même créature ne peut bénéficier de plus d'un dé de commandement à la fois. Les effets prennent fin si le vampirien se retrouve neutralisé."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les hors-la-loi qui ne manqueront à personne représentent des séides pratiques pour un vampire, particulièrement si ce dernier doit rester discret. De tels vampiriens ne sont d’ailleurs souvent que trop heureux de leur nouvelle puissance, et ne manquent aucune occasion de tyranniser ou tourmenter les mortels."
+}

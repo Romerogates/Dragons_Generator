@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-elan-geant",
+  "name": "Élan géant",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Bête de taille TG, non aligné",
+  "armor_class": 14,
+  "armor_note": "armure naturelle",
+  "hit_points": "42 (5d12 + 10)",
+  "wound_threshold": 11,
+  "speed": "18 m",
+  "abilities": {
+    "str": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 7,
+      "modifier": "-2"
+    },
+    "wis": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +4",
+  "senses": "Perception passive 14",
+  "languages": "sylvestre",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [
+    {
+      "name": "Charge",
+      "description": "<u>Si l'élan géant se déplace d'au moins 6 m en ligne droite vers sa cible et qu'il la touche</u> avec une attaque de coup de boutoir au même tour de jeu, la cible subit 7 (2d6) dégâts supplémentaires. Si la cible est une créature, elle doit réussir un JS Force DD 14 sous peine de se retrouver **à terre**."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Coup de boutoir",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 3 m, une cible. Réussite : 11 (2d6 + 4) dégâts contondants."
+    },
+    {
+      "name": "Sabots",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une créature **à terre**. Réussite : 22 (4d8 + 4) dégâts contondants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Dans le Septentrion, deux montures se distinguent, le **renne** et l’élan géant. Ce dernier est doté d’un grand prestige. Les druides, après une retraite spirituelle dans les forêts primaires, sont heureux de revenir dans leurs communautés sur un tel animal. Une délégation de druides peut également se présenter à des autorités à la Boréïa ou au Kartaçöl en montant ces bêtes. Leur taille et leur majesté font toujours effet et assurent l’attention de l’auditoire."
+}

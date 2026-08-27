@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-pomoshch",
+  "name": "Pomoshch",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Céleste de taille TP, neutre bon",
+  "armor_class": 14,
+  "armor_note": null,
+  "hit_points": "10 (4d4)",
+  "wound_threshold": 4,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "dex": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 12,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +6, Intuition +4, Perception +4, Survie +6",
+  "senses": "vision dans le noir 18 m, Perception passive 14",
+  "languages": "comprend le céleste, mais ne parle pas",
+  "challenge_rating": "1/8",
+  "xp": 25,
+  "traits": [
+    {
+      "name": "Camouflage hivernal",
+      "description": "Le pomoshch bénéficie d'un avantage aux tests de Dextérité (Discrétion) effectués en terrain neigeux."
+    },
+    {
+      "name": "Ouïe perçante et flair",
+      "description": "Le pomoshch bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'ouïe ou l'odorat."
+    },
+    {
+      "name": "Sorts innés",
+      "description": "La caractéristique magique du pomoshch est la Sagesse (DD de sauvegarde des sorts : 12). Le pomoshch peut lancer les sorts suivants sans compo santes matérielles :\n3/jour chacun : voyage par les arbres\n1/jour chacun : convergence, orientation, passage dans l'éther"
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,5 m, une cible. Réussite : 2 (1d4) dégâts perforants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Rien n’emplit davantage d’espoir le voyageur égaré que la vision d’un pomoshch. Ce céleste bienveillant a en tout point l’aspect d’un petit animal (souvent un renard, mais parfois un chien, un chat, une belette, un blaireau, ou d’autres formes encore), si ce n’est sa fourrure d’un blanc immaculé et ses yeux d’un bleu turquoise. Son nom signifie « sauveur », et il apparaît aux personnes perdues pour leur montrer le chemin vers leur destination ou vers un abri sûr. Volontiers joueur avec les individus qu’il guide, il se laisse facilement approcher, mais s’en va aussitôt sa mission accomplie. On dit aussi que des pomoshch apparaissent parfois à des Élus du destin pour leur montrer la voie vers une tâche à accomplir."
+}

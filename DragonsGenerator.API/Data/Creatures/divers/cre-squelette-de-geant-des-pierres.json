@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-squelette-de-geant-des-pierres",
+  "name": "Squelette de géant des pierres",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Mort-vivant de taille TG, loyal mauvais",
+  "armor_class": 15,
+  "armor_note": "armure naturelle",
+  "hit_points": "93 (11d12 + 22)",
+  "wound_threshold": null,
+  "speed": "12 m",
+  "abilities": {
+    "str": {
+      "score": 23,
+      "modifier": "+6"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "wis": {
+      "score": 8,
+      "modifier": "-1"
+    },
+    "cha": {
+      "score": 5,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": "Dex +5, Con +5, Sag +2",
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 9",
+  "languages": "comprend le tumiit, mais ne parle pas",
+  "challenge_rating": "5",
+  "xp": 1800,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le squelette géant effectue deux attaques de massue."
+    },
+    {
+      "name": "Massue",
+      "description": "Attaque d'arme de corps à corps : +9 pour toucher, allonge 4,50 m, une cible. Réussite : 19 (3d8 + 6) dégâts contondants."
+    },
+    {
+      "name": "Rocher",
+      "description": "Attaque d'arme à distance : +9 pour toucher, portée 18/72 m, une cible. Réussite : 28 (4d10 + 6) dégâts contondants. Si la cible est une créature, elle doit réussir un JS Force DD 17 sous peine de se retrouver **à terre**."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Squelette de minotaure"
+}

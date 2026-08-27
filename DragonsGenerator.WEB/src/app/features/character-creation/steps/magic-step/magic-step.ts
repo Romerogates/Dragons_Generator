@@ -18,6 +18,14 @@ import type { Spell } from '@core/models/Spells/spell';
 import type { Deity } from '@core/models/Deities/deity';
 import type { SpellcastingKind, AbilityKey } from '@core/models/Character/character';
 import { warlockArcanumSpellLevels } from '@core/utils/progression-choices.util';
+import {
+  spellCastTimeLabel,
+  spellComponentsLabel,
+  spellDurationLabel,
+  spellRangeLabel,
+  spellSchoolLabel,
+  spellStatsLine,
+} from '@core/utils/spell-display.util';
 
 // ============================================================================
 // TYPES
@@ -132,18 +140,6 @@ const SPELL_QUOTAS_FALLBACK: Record<string, SpellQuota> = {
     hasFullListAccess: false,
     modeLabel: 'Sorts connus (niv. 2+)',
   },
-};
-
-const SCHOOL_LABELS: Record<string, string> = {
-  abjuration: 'Abjuration',
-  conjuration: 'Conjuration',
-  invocation: 'Invocation',
-  divination: 'Divination',
-  enchantement: 'Enchantement',
-  evocation: 'Évocation',
-  illusion: 'Illusion',
-  necromancie: 'Nécromancie',
-  transmutation: 'Transmutation',
 };
 
 /** subcls-domaine-de-la-vie → dom-vie */
@@ -915,56 +911,27 @@ export class MagicStep implements OnInit {
   // === Display helpers ===
 
   schoolLabel(school: string): string {
-    return SCHOOL_LABELS[school] ?? school;
+    return spellSchoolLabel(school);
   }
 
   castTimeLabel(s: Spell): string {
-    if (!s.castingTime.amount && !s.castingTime.unit) return '—';
-    return `${s.castingTime.amount ?? ''} ${s.castingTime.unit ?? ''}`.trim();
+    return spellCastTimeLabel(s);
   }
 
   rangeLabel(s: Spell): string {
-    const amount = s.range.amount != null ? String(s.range.amount) : '';
-    const unit = (s.range.unit ?? '').toLowerCase();
-    if (!amount && !unit) return 'Personnel';
-    if (amount === 'personnelle' || amount === 'personnel' || unit === 'personnelle') {
-      return 'Personnel';
-    }
-    if (amount === 'contact' || unit === 'contact') return 'Contact';
-    if (unit === 'm' || unit === 'mètre' || unit === 'metres') {
-      return `${amount} m`;
-    }
-    return `${amount}${s.range.unit ? ' ' + s.range.unit : ''}`.trim() || '—';
+    return spellRangeLabel(s);
   }
 
-  componentsLabel(s: Spell): string {
-    const parts: string[] = [];
-    if (s.components.v) parts.push('V');
-    if (s.components.s) parts.push('S');
-    if (s.components.m) parts.push('M');
-    return parts.join(', ') || '—';
+  componentsLabel(s: Spell, detailed = false): string {
+    return spellComponentsLabel(s, detailed);
   }
 
   durationLabel(s: Spell): string {
-    const amount = s.duration.amount != null ? String(s.duration.amount) : '';
-    const unit = (s.duration.unit ?? '').toLowerCase();
-    if (!amount && !unit) return 'Instantané';
-    if (
-      amount === 'instantanee' ||
-      amount === 'instantané' ||
-      amount === 'instantanée' ||
-      unit === 'instantane' ||
-      unit === 'instantanée'
-    ) {
-      return 'Instantané';
-    }
-    if (
-      amount.includes('dissipation') ||
-      unit.includes('dissipation')
-    ) {
-      return "Jusqu'à dissipation";
-    }
-    return `${amount}${s.duration.unit ? ' ' + s.duration.unit : ''}`.trim() || '—';
+    return spellDurationLabel(s);
+  }
+
+  statsLine(s: Spell): string {
+    return spellStatsLine(s);
   }
 
   fmtBonus(n: number): string {

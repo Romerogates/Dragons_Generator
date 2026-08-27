@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-goule",
+  "name": "Goule",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Humanoïde ou mort-vivant de taille M, chaotique mauvais",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "22 (5d8)",
+  "wound_threshold": null,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 7,
+      "modifier": "-2"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 6,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 10",
+  "languages": "commun",
+  "challenge_rating": "1",
+  "xp": 200,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +2 pour toucher, allonge 1,50 m, une créature. Réussite : 9 (2d6 + 2) dégâts perforants."
+    },
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (2d4 + 2) dégâts tranchants. Si la cible n'est pas un mort-vivant, elle doit réussir un JS Constitution DD 10 sous peine de se retrouver **paralysée** pendant 1 minute. La cible peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet en cas de réussite.\nIcône de chaîne"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les goules sont des monstres – vivants ou morts-vivants – constamment maigres et affamés. Elles sont l’image vivante la folie à laquelle la faim peut conduire. En l’absence de **blêmes** pour les diriger, elles mènent une existence fruste faite de prédation et de dissimulation. Même si elles ne craignent pas le soleil comme les **vampires** ou les **morhâves**, elles évitent la pleine lumière autant que possible."
+}

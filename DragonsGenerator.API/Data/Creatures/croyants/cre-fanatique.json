@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-fanatique",
+  "name": "Fanatique",
+  "category": "croyants",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": null,
+  "type": "Humanoïde (espèce au choix) de taille M, alignement autre que bon au choix",
+  "armor_class": 13,
+  "armor_note": "armure de cuir",
+  "hit_points": "33 (6d8 + 6)",
+  "wound_threshold": 9,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 14,
+      "modifier": "+2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Persuasion +4, Religion +2, Tromperie +4",
+  "senses": "Perception passive 11",
+  "languages": "deux au choix (généralement le commun)",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [
+    {
+      "name": "Sombre ferveur",
+      "description": "Le fanatique bénéficie d'un avantage aux jets de sauvegarde contre les états préjudiciables charmé et effrayé.\nSorts mineurs (à volonté) : flamme sacrée, lumière, thaumaturgie\n1<sup>er</sup> niveau (4 emplacements) : *blessure*, *bouclier de la foi*, *injonction*\n2<sup>e</sup> niveau (3 emplacements) : *arme spirituelle*, *immobilisation de personne*"
+    },
+    {
+      "name": "Sombre ferveur",
+      "description": "Le fanatique bénéficie d'un avantage aux jets de sauvegarde contre les états préjudiciables charmé et effrayé.\nSorts mineurs (à volonté) : flamme sacrée, lumière, thaumaturgie\n1<sup>er</sup> niveau (4 emplacements) : *blessure*, *bouclier de la foi*, *injonction*\n2<sup>e</sup> niveau (3 emplacements) : *arme spirituelle*, *immobilisation de personne*"
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le fanatique effectue deux attaques de corps à corps."
+    },
+    {
+      "name": "Dague",
+      "description": "Attaque d'arme de corps à corps ou à distance : +4 pour toucher, allonge 1,50 m ou portée 6/18 m, une créature. Réussite : 4 (1d4 + 2) dégâts perforants.\nIcon"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

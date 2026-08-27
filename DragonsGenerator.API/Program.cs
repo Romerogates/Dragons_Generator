@@ -58,6 +58,7 @@ builder.Services.AddAuthorization();
 // --- Game data ---
 builder.Services.AddSingleton<IndexedDataStore>();
 builder.Services.AddSingleton<GameDataRepository>();
+builder.Services.AddSingleton<GroqChatClient>();
 builder.Services.AddHttpClient();
 
 builder.Services

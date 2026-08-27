@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-talsednae",
+  "name": "Talsednae",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Céleste de taille M, loyal neutre",
+  "armor_class": 20,
+  "armor_note": "armure naturelle, bouclier",
+  "hit_points": "178 (21d8 + 84)",
+  "wound_threshold": 45,
+  "speed": "9 m, vol 27 m",
+  "abilities": {
+    "str": {
+      "score": 21,
+      "modifier": "+5"
+    },
+    "dex": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "con": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "int": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "wis": {
+      "score": 22,
+      "modifier": "+6"
+    },
+    "cha": {
+      "score": 18,
+      "modifier": "+4"
+    }
+  },
+  "saving_throws": "Con+9, Sag +11, Cha +9",
+  "skills": "Athlétisme +10, Intimidation +9, Nature +8, Perception +11, Religion +8, Survie +11",
+  "senses": "vision lucide 36 m, Perception passive 21",
+  "languages": "céleste, diabolique, nordique, originel, sylvestre, tumiit, télépathie 36 m",
+  "challenge_rating": "15",
+  "xp": 13000,
+  "traits": [
+    {
+      "name": "Armes angéliques",
+      "description": "Les attaques d'arme du sednae sont magiques. Lorsque le sednae touche avec une arme, celle-ci inflige 4d8 dégâts radiants supplémentaires (pris en compte dans les attaques ci-après)."
+    },
+    {
+      "name": "Sorts innés",
+      "description": "La caractéristique magique du sednae est la Sagesse (DD de sauvegarde des sorts : 19). Le sednae peut lancer les sorts suivants sans composantes matérielles :\nÀ volonté : assistance divine, résistance\n3/jour chacun : bouclier de la foi, châtiment radiant, faveur divine, mot de guérison de groupe, tempête de grêle\n1/jour chacun : changement de plan (doit se faire lors d'une aurore boréale), guérison, rappel à la vie, restauration suprême, sphère glaciale"
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le sednae effectue deux attaques de lance et une **Étreinte de Givreuse**."
+    },
+    {
+      "name": "Lance",
+      "description": "Attaque d'arme de corps à corps ou à distance : +10 pour toucher, allonge 1,50 m ou portée 6/18 m, une cible. Réussite : 8 (1d6 + 5) dégâts perforants, ou 9 (1d8 + 5) dégâts perforants si utilisée à deux mains dans le cadre d'une attaque de corps à corps plus 18 (4d8) dégâts radiants."
+    },
+    {
+      "name": "Étreinte de Givreuse",
+      "description": "Une créature dans un rayon de 18 m du sednae doit effectuer un JS Constitution DD 19 ou subir 27 (6d8) dégâts de froid ou radiants (au choix du sednae), la moitié en cas de réussite. Si la cible a subi des dégâts de froid et échoué au JS Constitution, elle est **engourdie** pendant 1 minute. Une créature **engourdie** par le sednae peut réitérer le jet de sauvegarde à la fin de chacun de ses tours de jeu et met un terme à l'effet sur elle-même en cas de réussite."
+    },
+    {
+      "name": "Arc long",
+      "description": "Attaque d'arme à distance : +9 pour toucher, portée 45/180 m, une cible. Réussite : 8 (1d8 + 4) dégâts perforants plus 18 (4d8) dégâts radiants."
+    },
+    {
+      "name": "371",
+      "description": "Smilodon"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Le pacte qui lie Givreuse à Askinos dure depuis des millénaires, mais demeure fragile. Chacun des contractants guette les failles et l’occasion d’abattre l’autre. Les talsednaï en savent long sur ce jeu trouble et sont vigilants. Ils pressentent que le moment de la rupture approche. La crise sera terrible et se soldera par la victoire de la déesse ou de l’hospodar diabolique. Cependant, même en admettant le succès des plans de la Vieille de l’Hiver, il faudra encore bien des efforts pour vaincre les autres hospodars, et le terrible archidiable qui attend son heure dans sa prison…"
+}

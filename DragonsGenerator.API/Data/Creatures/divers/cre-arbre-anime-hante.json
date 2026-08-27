@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-arbre-anime-hante",
+  "name": "Arbre animé hanté",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Plante morte-vivante de taille TG, neutre mauvais",
+  "armor_class": 13,
+  "armor_note": "armure naturelle",
+  "hit_points": "115 (11d12 + 44)",
+  "wound_threshold": null,
+  "speed": "6 m",
+  "abilities": {
+    "str": {
+      "score": 23,
+      "modifier": "+6"
+    },
+    "dex": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "con": {
+      "score": 19,
+      "modifier": "+4"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": null,
+  "languages": "—",
+  "challenge_rating": "4",
+  "xp": 1100,
+  "traits": [
+    {
+      "name": "Apparence trompeuse",
+      "description": "Tant que l'arbre animé hanté se tient immobile, il est indiscernable d'un arbre mort normal."
+    },
+    {
+      "name": "Deux morts",
+      "description": "Si l'arbre animé hanté est tué et que son corps n'est pas détruit, il se relève dans les 24 heures, récupérant tous ses pv. Il perd également son type d'origine, ne gardant plus que celui de mort-vivant, et perd le trait Deux morts."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Coup",
+      "description": "Attaque d'arme de corps à corps : +8 pour toucher, allonge 3 m, une cible. Réussite : 16 (3d6 + 6) dégâts contondants et 3 (1d6) dégâts nécrotiques et l'arbre animé hanté récupère un nombre de pv équivalents aux dégâts nécrotiques infligés.\nLogo\n165"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Icon"
+}

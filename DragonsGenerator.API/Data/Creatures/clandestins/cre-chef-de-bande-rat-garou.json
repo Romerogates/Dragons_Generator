@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-chef-de-bande-rat-garou",
+  "name": "Chef de bande rat-garou",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Humanoïde (espèce au choix, métamorphe) de taille M, loyal mauvais",
+  "armor_class": 15,
+  "armor_note": "armure de cuir cloutée",
+  "hit_points": "65 (10d8 + 20)",
+  "wound_threshold": 17,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 14,
+      "modifier": "+2"
+    }
+  },
+  "saving_throws": "For +4, Dex +5, Sag +2",
+  "skills": "Athlétisme +4, Discrétion +5, Perception +2, Tromperie +4",
+  "senses": "vision dans le noir 18 m, Perception passive 12",
+  "languages": "deux au choix (ne peut pas parler sous forme de rat géant)",
+  "challenge_rating": "3",
+  "xp": 700,
+  "traits": [
+    {
+      "name": "Faveur de Gegaôr",
+      "description": "Le rat-garou est immunisé aux maladies non magiques."
+    },
+    {
+      "name": "Flair",
+      "description": "Le rat-garou bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'odorat."
+    },
+    {
+      "name": "Métamorphe",
+      "description": "Le rat-garou peut utiliser son action pour se métamorphoser en **hybride de rat humanoïde** ou en **rat géant de Gegaôr**, ou pour recouvrer sa véritable forme, qui est humanoïde. Son profil ne change pas sous sa forme hybride. Sous sa forme de rat géant, le rat-garou conserve son alignement, ses pv, ses dés de vie, ses maîtrises, ses valeurs d'Intelligence, de Sagesse et de Charisme, ainsi que sa capacité à utiliser cette aptitude. En dehors de ces éléments, ses caractéristiques et capacités sont remplacées par celles de sa nouvelle forme. L'équipement qu'il porte ou transporte n'est pas transformé. Enfin, il retrouve sa véritable forme s'il tombe à 0 pv."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le chef de bande effectue trois attaques de corps à corps : deux de cimeterre et une de dague. Sous sa forme hybride, il peut remplacer ces attaques par des attaques de morsure ou de griffes. Ou alors, il effectue deux attaques à distance avec ses dagues."
+    },
+    {
+      "name": "Cimeterre",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 6 (1d6 + 3) dégâts tranchants."
+    },
+    {
+      "name": "Dague",
+      "description": "Attaque d'arme de corps à corps ou à distance : +5 pour toucher, allonge 1,50 m ou portée 6/18 m, une cible. Réussite : 5 (1d4 + 3) dégâts perforants."
+    },
+    {
+      "name": "Morsure (forme hybride uniquement)",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 5 (1d4 + 3) dégâts perforants. Si la cible est humanoïde, elle doit réussir un JS Constitution ou Charisme (au choix) DD 12 sous peine de contracter la rage du rat-garou."
+    },
+    {
+      "name": "Griffes (forme hybride uniquement)",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 10 (2d6 + 3) dégâts tranchants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "On applique les modifications suivantes :"
+}

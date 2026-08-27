@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-corbeau",
+  "name": "Corbeau",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Bête de taille TP, non aligné",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "1 (1d4 - 1)",
+  "wound_threshold": null,
+  "speed": "3 m, vol 15 m",
+  "abilities": {
+    "str": {
+      "score": 2,
+      "modifier": "-4"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 8,
+      "modifier": "-1"
+    },
+    "int": {
+      "score": 5,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +3",
+  "senses": "Perception passive 13",
+  "languages": "—",
+  "challenge_rating": "0",
+  "xp": 10,
+  "traits": [
+    {
+      "name": "Imitation des sons",
+      "description": "Le corbeau peut reproduire des sons simples qu'il a entendus, comme un chuchotement, les pleurs d'un nourrisson ou de petits couinements d'animal. Toute créature qui entend les bruits peut comprendre qu'ils sont imités en réussissant un test de Sagesse (Intuition) DD 10."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Bec",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 1 dégât perforant."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Ces oiseaux sont réputés pour leur intelligence, et notamment pour leur capacité à comprendre des mécanismes et à employer la ruse. Arcanistes et prêtres de Mort les apprécient pour leur allure distinguée et l’image élégamment macabre qui leur est associée, et s’en font volontiers des animaux de compagnie. Ces oiseaux n’attaquent généralement des humanoïdes que sous l’effet d’un conditionnement ou d’une influence surnaturelle. Ils sont très courants dans le cimetière de la plaine et aux alentours de la Vieille nécropole."
+}

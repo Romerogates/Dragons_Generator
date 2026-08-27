@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-zombie",
+  "name": "Zombie",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Mort-vivant de taille M, neutre mauvais",
+  "armor_class": 8,
+  "armor_note": null,
+  "hit_points": "22 (3d8 + 9)",
+  "wound_threshold": null,
+  "speed": "6 m",
+  "abilities": {
+    "str": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "dex": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "cha": {
+      "score": 5,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": "Sag +0",
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 8",
+  "languages": "comprend celles pratiquées de son vivant mais ne peut pas parler",
+  "challenge_rating": "1/4",
+  "xp": 50,
+  "traits": [
+    {
+      "name": "Vigueur cadavérique",
+      "description": "Si des dégâts font tomber le zombie à 0 pv, il doit effectuer un JS Constitution dont le DD est égal à 5 + les dégâts subis, à moins qu'il ne s'agisse de dégâts radiants ou d'un coup critique. En cas de réussite, il tombe à 1 pv au lieu de 0."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Coup",
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d6 + 1) dégâts contondants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Si **bêtes** et **géants** peuvent devenir des zombies, les plus fréquents sont de type **humanoïde**. Appliquez les modifications suivantes au profil de base de la créature :"
+}

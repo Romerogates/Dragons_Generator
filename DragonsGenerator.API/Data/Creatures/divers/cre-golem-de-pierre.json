@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-golem-de-pierre",
+  "name": "Golem de pierre",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Créature artificielle de taille G, non aligné",
+  "armor_class": 17,
+  "armor_note": "armure naturelle",
+  "hit_points": "178 (17d10 + 85)",
+  "wound_threshold": null,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 22,
+      "modifier": "+6"
+    },
+    "dex": {
+      "score": 9,
+      "modifier": "-1"
+    },
+    "con": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "int": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 1,
+      "modifier": "-5"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 36 m, Perception passive 10",
+  "languages": "comprend les langues de son créateur mais ne peut pas parler",
+  "challenge_rating": "10",
+  "xp": 5900,
+  "traits": [
+    {
+      "name": "Armes magiques",
+      "description": "Les attaques d'arme du golem sont magiques."
+    },
+    {
+      "name": "Forme inaltérable",
+      "description": "Le golem est immunisé contre tous les sorts ou effets susceptibles de transformer son corps."
+    },
+    {
+      "name": "Résistance à la magie",
+      "description": "Le golem bénéficie d'un avantage aux jets de sauvegarde contre les sorts et autres effets magiques."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le golem effectue deux attaques de coup."
+    },
+    {
+      "name": "Coup",
+      "description": "Attaque d'arme de corps à corps : +10 pour toucher, allonge 1,50 m, une cible. Réussite : 19 (3d8 + 6) dégâts contondants."
+    },
+    {
+      "name": "Lenteur (recharge 5–6)",
+      "description": "Le golem vise une ou plusieurs créatures qui lui sont visibles dans un rayon de 3 m. Chaque cible doit réussir un JS Sagesse DD 17 contre cet effet magique sous peine de ne plus pouvoir jouer de réactions, de voir sa VD réduite de moitié et d'être limitée à une attaque à ses tours de jeu. En cas de sauvegarde ratée, elle ne peut en outre entreprendre à son tour de jeu qu'une action ou une action bonus, mais pas les deux. Ces effets persistent pendant 1 minute. Une créature peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet sur elle-même en cas de réussite."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "La connaissance des prières peut être conditionnée par un test d’Intelligence (Religion) d’un DD fonction de la rareté du culte. Par exemple, des cantiques de Forgeron seraient associés à un DD de 10, tandis que des psaumes en l’honneur d’une déité disparue atteindraient un DD de 25. Réciter les prières prend une action, et en cas de succès, le golem n’est plus hostile pendant un round. Tant que l’individu récite correctement, le golem cesse toute hostilité (mais reprendra aussitôt en cas d’agression). Si les psaumes sont chantés sans erreur pendant 5 rounds consécutifs, le golem cesse toute hostilité envers le récitateur et son entourage jusqu’à la prochaine aube."
+}

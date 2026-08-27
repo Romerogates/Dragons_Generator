@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-dragonnet-d-agate",
+  "name": "Dragonnet d’agate",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Dragon de taille M, chaotique neutre",
+  "armor_class": 17,
+  "armor_note": "armure naturelle",
+  "hit_points": "32 (5d8 + 10)",
+  "wound_threshold": 8,
+  "speed": "9 m, vol 18 m",
+  "abilities": {
+    "str": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 15,
+      "modifier": "+2"
+    }
+  },
+  "saving_throws": "Dex +2, Con +4, Sag +2, Cha +4",
+  "skills": "Discrétion +2, Perception +4",
+  "senses": "vision aveugle 3 m, vision dans le noir 18 m, Perception passive 14",
+  "languages": "draconique",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 8 (1d10 + 3) dégâts perforants."
+    },
+    {
+      "name": "Souffle (recharge 5-6)",
+      "description": "Le dragon utilise l'un des deux souffles suivants :"
+    },
+    {
+      "name": "Souffle psychique",
+      "description": "Le dragon crache une projection d'énergie psychique de 9 m de long et de 1,50 m de large. Chaque créature prise dans cette ligne doit effectuer un JS Intelligence DD 12 et subit 16 (3d10) dégâts psychiques en cas d'échec, la moitié en cas de réussite."
+    },
+    {
+      "name": "Souffle étourdissant",
+      "description": "Le dragon crache un cône d'énergie étourdissante de 9 m. Chaque créature prise dans cette zone d'effet doit réussir un JS Intelligence DD 12 sous peine d'être **étourdie** durant 1 minute. Une cible peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet en cas de réussite."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Comme les dragonnets ne savent pas encore se métamorphoser, les nids d’agate sont particulièrement protégés et dissimulés. Il n’y a pas d’environnement type, l’essentiel pour les parents étant de passer inaperçu. Les petits apprennent autant de choses que possible tout en restant dissimulés afin d’être prêts à affronter le monde le moment venu. La soif de connaissances et de vagabondage des petits peut donner bien des difficultés au parent, qui doit faire montre d’une attention constante, sous peine de voir sa précieuse progéniture partir en vadrouille."
+}

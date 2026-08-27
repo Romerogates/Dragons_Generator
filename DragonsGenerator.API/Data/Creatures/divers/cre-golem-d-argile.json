@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-golem-d-argile",
+  "name": "Golem d’argile",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Créature artificielle de taille G, non aligné",
+  "armor_class": 14,
+  "armor_note": "armure naturelle",
+  "hit_points": "133 (14d10 + 56)",
+  "wound_threshold": null,
+  "speed": "6 m",
+  "abilities": {
+    "str": {
+      "score": 20,
+      "modifier": "+5"
+    },
+    "dex": {
+      "score": 9,
+      "modifier": "-1"
+    },
+    "con": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "int": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 8,
+      "modifier": "-1"
+    },
+    "cha": {
+      "score": 1,
+      "modifier": "-5"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 9",
+  "languages": "comprend les langues de son créateur mais ne peut pas parler",
+  "challenge_rating": "9",
+  "xp": 5000,
+  "traits": [
+    {
+      "name": "Absorption d'acide",
+      "description": "Chaque fois que le golem reçoit des dégâts d'acide, il ne subit aucun dommage et récupère en fait un nombre de pv égal aux dégâts d'acide correspondants."
+    },
+    {
+      "name": "Armes magiques",
+      "description": "Les attaques d'arme du golem sont magiques. **Forme inaltérable.** Le golem est immunisé contre tous les sorts et effets susceptibles de transformer son corps."
+    },
+    {
+      "name": "Rage aveugle",
+      "description": "Quand le golem commence son tour de jeu alors qu'il ne lui reste que 60 pv ou moins, lancez un d6. Sur un 6, le golem entre dans une rage aveugle. À chacun de ses tours de\njeu, s'il est en rage, le golem attaque la créature visible la plus proche. Si aucune créature n'est assez proche pour qu'il puisse lui porter une attaque après un déplacement éventuel, le golem s'en prend à un objet, de préférence plus petit que lui. Une fois que le golem est entré en rage aveugle, il le reste jusqu'à ce qu'il soit détruit ou qu'il ait récupéré tous ses pv."
+    },
+    {
+      "name": "Résistance à la magie",
+      "description": "Le golem bénéficie d'un avantage aux jets de sauvegarde contre les sorts et autres effets magiques."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le golem effectue deux attaques de coup."
+    },
+    {
+      "name": "Coup",
+      "description": "Attaque d'arme de corps à corps : +8 pour toucher, allonge 1,50 m, une cible. Réussite : 16 (2d10 + 5) dégâts contondants. Si la cible est une créature, elle doit réussir un JS Constitution DD 15 sous peine de devoir réduire ses pv maximums des dégâts reçus. La cible meurt si cette attaque réduit ses pv maximums à 0. Cette réduction persiste jusqu'à ce qu'elle soit annulée par le sort restauration suprême ou autre effet magique similaire."
+    },
+    {
+      "name": "Hâte (recharge 5-6)",
+      "description": "Jusqu'à la fin de son tour de jeu suivant, le golem bénéficie d'un bonus magique de +2 à la CA, d'un avantage aux jets de sauvegarde de Dextérité et peut effectuer son attaque de coup au prix d'une action bonus.\n293"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les golems d’argile paraissent être des brutes pataudes. Hélas, ils se révèlent capables de brusques accélérations qui prennent leurs adversaires par surprise."
+}

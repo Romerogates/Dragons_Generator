@@ -26,6 +26,11 @@ export const routes: Routes = [
       import('./features/auth/reset-password').then((m) => m.ResetPasswordPage),
   },
   {
+    path: 'settings',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/settings/settings').then((m) => m.SettingsPage),
+  },
+  {
     path: 'support',
     canActivate: [authGuard],
     loadComponent: () => import('./features/support/support').then((m) => m.SupportPage),
@@ -62,6 +67,39 @@ export const routes: Routes = [
   {
     path: 'spells',
     loadChildren: () => import('@features/data/spells/spells.routes').then((m) => m.SPELLS_ROUTES),
+  },
+  {
+    path: 'creatures',
+    loadChildren: () =>
+      import('@features/data/creatures/creatures.routes').then((m) => m.CREATURES_ROUTES),
+  },
+  {
+    path: 'scenario/create',
+    redirectTo: 'story/create',
+    pathMatch: 'full',
+  },
+  {
+    path: 'story/create',
+    loadComponent: () =>
+      import('@features/story-creation/story-creation').then((m) => m.StoryCreation),
+  },
+  {
+    path: 'campaigns',
+    loadComponent: () => import('@features/campaigns/campaigns').then((m) => m.Campaigns),
+  },
+  {
+    path: 'campaigns/:id',
+    loadComponent: () =>
+      import('@features/campaigns/campaign-detail/campaign-detail').then((m) => m.CampaignDetailPage),
+  },
+  {
+    path: 'friends',
+    loadComponent: () => import('@features/friends/friends').then((m) => m.FriendsPage),
+  },
+  {
+    path: 'stories',
+    redirectTo: 'campaigns',
+    pathMatch: 'full',
   },
   {
     path: 'skills',

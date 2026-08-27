@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-dragonnet-blanc",
+  "name": "Dragonnet blanc",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Dragon de taille M, chaotique mauvais",
+  "armor_class": 16,
+  "armor_note": "armure naturelle",
+  "hit_points": "32 (5d8 + 10)",
+  "wound_threshold": 8,
+  "speed": "9 m, fouissage 4,50 m, vol 18 m, nage 9 m",
+  "abilities": {
+    "str": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 8,
+      "modifier": "-1"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 11,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": "Dex +2, Con +4, Sag +2, Cha +2",
+  "skills": "Discrétion +2, Perception +4",
+  "senses": "vision aveugle 3 m, vision dans le noir 18 m, Perception passive 14",
+  "languages": "draconique",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (1d10 + 2) dégâts perforants plus 2 (1d4) dégâts de froid."
+    },
+    {
+      "name": "Souffle glacé (recharge 5–6)",
+      "description": "Le dragon crache un cône de grêle de 4,50 m. Chaque créature prise dans cette zone d'effet doit effectuer un JS Constitution DD 12 et subit 22 (5d8) dégâts de froid en cas d'échec, la moitié en cas de réussite."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Sitôt sortis de l’œuf, les dragonnets blancs doivent très vite apprendre à se débrouiller. Leur mère leur laisse généralement quelques proies gelées pour leur premier repas mais sans plus. Lors des périodes de pénurie, il n’y a pas assez de nourriture pour tous les petits, de sorte que les derniers à sortir de la coquille risquent de mourir de faim. Il arrive aussi que les premiers-nés, et donc les mieux nourris, attaquent leurs cadets, gagnant ainsi facilement un autre repas. Se nourrir est essentiel car la croissance est conditionnée par la quantité de nourriture absorbée. Plus un dragonnet se gave, plus vite il deviendra un jeune dragon."
+}

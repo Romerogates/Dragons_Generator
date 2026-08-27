@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-regikheg-cendreuse",
+  "name": "Regikheg cendreuse",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "",
+  "armor_class": 16,
+  "armor_note": "armure naturelle",
+  "hit_points": "126 (12d12 + 48)",
+  "wound_threshold": 32,
+  "speed": "6 m, fouissage 3 m",
+  "abilities": {
+    "str": {
+      "score": 21,
+      "modifier": "+5"
+    },
+    "dex": {
+      "score": 9,
+      "modifier": "-1"
+    },
+    "con": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 8,
+      "modifier": "-1"
+    }
+  },
+  "saving_throws": "Con +7, Int +3, Sag +5",
+  "skills": "Dressage +8, Intuition +8, Perception +8, Survie +8",
+  "senses": "vision dans le noir 18 m, perception des vibrations 36 m, Perception passive 18",
+  "languages": "phéromones et langage corporel, sylvestre",
+  "challenge_rating": "7",
+  "xp": 2900,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Coup de mandibule",
+      "description": "Attaque d'arme de corps à corps : +8 pour toucher, allonge 3 m, une cible. Réussite : 19 (4d6 + 5) dégâts tranchants plus 6 (1d12) dégâts d'acide. Par ailleurs, la cible doit réussir un JS Force DD 16 sous peine d'être éloignée de 6 m de la regikheg et de se retrouver **à terre**."
+    },
+    {
+      "name": "Écrasement",
+      "description": "La regikheg bascule sur un côté, dans un espace situé à 1,50 m d'elle. Toutes les créatures de taille G ou inférieure situées dans cet espace doivent réussir un JS Dextérité DD 16 sous peine d'être écrasées sous la regikheg. Une créature écrasée subit 45 (10d8) dégâts contondants et est **agrippée** par la regikheg (DD 16 pour s'extraire). Tant qu'elle est **agrippée**, la créature est également **entravée**. Lorsque la regikheg effectue un nouvel écrasement elle relâche du même coup les créatures précédemment prises sous elle."
+    },
+    {
+      "name": "Jet d'acide (recharge 4–6)",
+      "description": "La regikheg crache une ligne d'acide de 18 m de long et de 3 m de large. Chaque créature prise dans la ligne doit effectuer un JS Dextérité DD 16 et subit 20 (4d10) dégâts d'acide en cas d'échec, la moitié en cas de réussite."
+    },
+    {
+      "name": "Ponte (recharge 5–6)",
+      "description": "La regikheg pond une **khegon** **cendreuse**.\nLa regikheg (prononcer ré-gui-kaigue) est la mère de la colonie, entourée de khegons et d'ankhegs dévouées qui font de sa protection leur priorité absolue. Particulièrement massive, elle est incapable de quitter la salle souterraine dans laquelle elle se trouve. Son aspect monstrueux ne doit pas faire négliger son intelligence et sa sagesse. Elle a notamment connaissance de la malfaisance du Chancre, dont l'action corruptrice a déjà détruit horriblement bien des nids, voire rendu folles des regikhegs, ou encore transformé des ankhegs en ravageurs.\n132"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Extrait de Rencontres et découvertes, par Tarella, géographe et cartographe"
+}

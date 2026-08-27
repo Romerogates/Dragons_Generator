@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-zombie-harro",
+  "name": "Zombie harro",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Mort-vivant de taille G, neutre mauvais",
+  "armor_class": 8,
+  "armor_note": null,
+  "hit_points": "104 (11d10 + 44)",
+  "wound_threshold": null,
+  "speed": "18 m",
+  "abilities": {
+    "str": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "dex": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "con": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "int": {
+      "score": 3,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "cha": {
+      "score": 5,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": "Sag +0",
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 8",
+  "languages": "—",
+  "challenge_rating": "4",
+  "xp": 1100,
+  "traits": [
+    {
+      "name": "Charge",
+      "description": "Si le zombie harro se déplace d'au moins 6 m en ligne droite vers sa cible et qu'il la touche avec une attaque de cornes au même tour de jeu, la cible subit 9 (2d8) dégâts contondants supplémentaires. Si la cible est une créature, elle doit réussir un JS Force DD 14 sous peine de se retrouver **à terre**."
+    },
+    {
+      "name": "Leste",
+      "description": "Le zombie harro bénéficie d'un avantage aux JS Force et Dextérité contre les effets qui menacent de le jeter **à terre**."
+    },
+    {
+      "name": "Vigueur cadavérique",
+      "description": "Si des dégâts font tomber le zombie harro à 0 pv, il doit effectuer un JS Constitution dont le DD est égal à 5 + les dégâts subis, à moins qu'il ne s'agisse de dégâts radiants ou d'un coup critique. En cas de réussite, il tombe à 1 pv au lieu de 0."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Le zombie harro effectue deux attaques : une de cornes et une de sabots."
+    },
+    {
+      "name": "Cornes",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 13 (2d8 + 4) dégâts contondants."
+    },
+    {
+      "name": "Sabots",
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 9 (2d4 + 4) dégâts contondants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Zombie harro logo"
+}

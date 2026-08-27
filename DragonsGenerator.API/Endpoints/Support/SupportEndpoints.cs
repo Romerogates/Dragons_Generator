@@ -12,6 +12,8 @@ public record TicketDto(
     string Status,
     string? AttachmentOriginalName,
     string? AttachmentUrl,
+    Guid? CharacterId,
+    string? CharacterName,
     DateTimeOffset CreatedAt,
     string? UserEmail,
     string? AdminNotes
@@ -74,6 +76,23 @@ public class CreateTicketEndpoint(AppDbContext db, ILogger<CreateTicketEndpoint>
             logger.LogInformation("Ticket attachment saved {File}", stored);
         }
 
+        Guid? characterId = null;
+        string? characterName = null;
+        var characterRaw = form["characterId"].ToString().Trim();
+        if (!string.IsNullOrWhiteSpace(characterRaw) && Guid.TryParse(characterRaw, out var parsedCharId))
+        {
+            var character = await db.Characters.AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Id == parsedCharId && c.UserId == userId.Value, ct);
+            if (character is null)
+            {
+                AddError("Personnage invalide.");
+                await Send.ErrorsAsync(cancellation: ct);
+                return;
+            }
+            characterId = character.Id;
+            characterName = character.Name;
+        }
+
         var ticket = new SupportTicket
         {
             UserId = userId.Value,
@@ -81,6 +100,8 @@ public class CreateTicketEndpoint(AppDbContext db, ILogger<CreateTicketEndpoint>
             Message = message,
             AttachmentStoredName = stored,
             AttachmentOriginalName = original,
+            CharacterId = characterId,
+            CharacterName = characterName,
         };
         db.SupportTickets.Add(ticket);
         await db.SaveChangesAsync(ct);
@@ -96,6 +117,8 @@ public class CreateTicketEndpoint(AppDbContext db, ILogger<CreateTicketEndpoint>
             t.Status,
             t.AttachmentOriginalName,
             t.AttachmentStoredName is null ? null : $"/uploads/tickets/{t.AttachmentStoredName}",
+            t.CharacterId,
+            t.CharacterName,
             t.CreatedAt,
             email,
             t.AdminNotes
@@ -182,5 +205,60 @@ public class AdminUpdateTicketEndpoint(AppDbContext db) : Endpoint<UpdateTicketR
             ticket.AdminNotes = req.AdminNotes;
         await db.SaveChangesAsync(ct);
         await Send.OkAsync(CreateTicketEndpoint.ToDto(ticket, ticket.User.Email), ct);
+    }
+}
+
+public class DownloadTicketCharacterJsonEndpoint(AppDbContext db) : EndpointWithoutRequest
+{
+    public override void Configure() => Get("/support/tickets/{id}/character-json");
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var userId = AuthHelpers.GetUserId(User);
+        if (userId is null)
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        var id = Route<Guid>("id");
+        var ticket = await db.SupportTickets.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id, ct);
+        if (ticket is null || ticket.CharacterId is null)
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        var isAdmin = AuthHelpers.IsAdmin(User);
+        if (ticket.UserId != userId && !isAdmin)
+        {
+            await Send.ForbiddenAsync(ct);
+            return;
+        }
+
+        var character = await db.Characters.AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == ticket.CharacterId && c.UserId == ticket.UserId, ct);
+        if (character is null)
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        var json = string.IsNullOrWhiteSpace(character.JsonData) ? "{}" : character.JsonData;
+        var fileName = SanitizeFileName(character.Name) + ".json";
+        var bytes = System.Text.Encoding.UTF8.GetBytes(json);
+
+        HttpContext.Response.ContentType = "application/json; charset=utf-8";
+        HttpContext.Response.Headers.ContentDisposition = $"attachment; filename=\"{fileName}\"";
+        await HttpContext.Response.Body.WriteAsync(bytes, ct);
+    }
+
+    private static string SanitizeFileName(string name)
+    {
+        var cleaned = string.Join(
+            "_",
+            (name ?? "personnage").Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries)
+        ).Trim();
+        return string.IsNullOrWhiteSpace(cleaned) ? "personnage" : cleaned;
     }
 }

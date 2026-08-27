@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-gadai-le-chacripaon",
+  "name": "Gadaí, le chacripaon",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Fée de taille TP, chaotique neutre",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "5 (2d4)",
+  "wound_threshold": 4,
+  "speed": "12 m, vol 12 m",
+  "abilities": {
+    "str": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 17,
+      "modifier": "+3"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Acrobaties +4, Escamotage +6, Perception +2, Tromperie +5",
+  "senses": "vision dans le noir 18 m, Perception passive 12",
+  "languages": "sylvestre",
+  "challenge_rating": "1/8",
+  "xp": 25,
+  "traits": [
+    {
+      "name": "Sorts innés",
+      "description": "La caractéristique magique du gadaí est le Charisme (DD de sauvegarde des sorts : 13). Le gadaí peut lancer les sorts suivants sans composantes matérielles :\nÀ volonté : *manipulation à distance*, *prestidigitation*\n3/jour chacun : *invisibilité*, *marche de brume*\n1/jour chacun : *couleurs dansantes*"
+    }
+  ],
+  "actions": [
+    {
+      "name": "Serres",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 3 dégâts perforants.\n111"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les plumes d’un gadaí sont d’une rare beauté, et les grands de ce monde se les arrachent. Une seule grande et belle plume peut valoir jusqu’à 200 po ! Or, à la mort d’un gadaí, ses plumes deviennent grises, ternes et friables. Seules celles données volontairement conservent leur merveilleux éclat. Convaincre la fée de se départir d’une de ses plumes requerra des trésors de diplomatie, de négociation et de patience, ainsi que l’un ou l’autre service ardu. Être fournisseur de plumes de gadaí n’est pas une carrière de tout repos !"
+}

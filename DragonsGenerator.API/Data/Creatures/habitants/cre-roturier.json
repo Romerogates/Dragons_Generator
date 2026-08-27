@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-roturier",
+  "name": "Roturier",
+  "category": "habitants",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Habitants",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 10,
+  "armor_note": null,
+  "hit_points": "4 (1d8)",
+  "wound_threshold": null,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 10,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "Perception passive 10",
+  "languages": "une au choix (généralement le commun)",
+  "challenge_rating": "0",
+  "xp": 10,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Gourdin",
+      "description": "Attaque d'arme de corps à corps : +2 pour toucher, allonge 1,50 m, une cible. Réussite : 2 (1d4) dégâts contondants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Le profil de roturier s’applique à l’ensemble des gens du peuple. Ils seront selon les cas paysans, ouvriers, esclaves, serviteurs, jeunes gens, pèlerins, marchands, artisans, etc. Si le meneur souhaite créer un artisan compétent, il peut donner à ce PNJ de meilleures caractéristiques selon son métier (comme une Intelligence élevée pour un herboristerie ou une forte Constitution pour un forgeron), et la maîtrise des outils associés, voire l’expertise."
+}

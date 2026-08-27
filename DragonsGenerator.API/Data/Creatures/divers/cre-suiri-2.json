@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-suiri-2",
+  "name": "Süiri",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "",
+  "armor_class": 25,
+  "armor_note": "armure naturelle",
+  "hit_points": "676 (33d20 + 330)",
+  "wound_threshold": 169,
+  "speed": "\\",
+  "abilities": {},
+  "saving_throws": null,
+  "skills": null,
+  "senses": "Perception passive 10",
+  "languages": "—",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [
+    {
+      "name": "Nuée",
+      "description": "** La nuée peut occuper l’espace d’une autre créature et réciproquement. La nuée peut se déplacer dans tout passage suffisant pour laisser passer un insecte de taille TP. La nuée ne peut pas récupérer de pv ni gagner de pv temporaires."
+    },
+    {
+      "name": "Bonds de sauterelle",
+      "description": "** La nuée à terre saute sans élan jusqu’à 10 fois sa hauteur à la verticale et à l’horizontale, soit 150 cm."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsures",
+      "description": "** Attaque d’arme de corps à corps : +5 pour toucher, allonge 0 m, une créature occupant l’espace de la nuée. Réussite : 10 (4d4) dégâts perforants ou 5 (2d4) dégâts perforants si les pv actuels de la nuée sont inférieurs ou égaux à la moitié de son maximum. Par ailleurs, la cible doit réussir un JS Constitution DD 10 sous peine d’être contaminée par la noirçure (cf. **Aventuriers**, chapitre **Santé, Maladies : Noirçure**).\n\nMartin Romero (Order #44468918)\n\n# Tarasque\n\nGigantesque créature, incarnation de la puissance absolue, la tarasque est une légende dont la réputation va bien au-delà du Kaan. Les légendes et théories à son sujet abondent. On dit qu’elle sommeille durant des années dans un antre dont nul ne connaît l’emplacement, s’éveillant pour dévaster des régions entières, invulnérable aux feux des incendies qu’elle déclenche et à toute arme non magique. Toute population prise pour cible en est réduite à fuir pour espérer échapper au cataclysme vivant.\n\nBeaucoup de gens s’interrogent sur les origines et la réalité de cette créature épique. La découverte de la vérité à son sujet ne manquera pas de motiver des aventures périlleuses ! Vous trouverez ci-après des exemples d’hypothèses, mais d’autres encore sont envisageables.\n\nIllustration de la Tarasque\n\n<page_number>272</page_number>\n\n### Un vœu manqué\n\nLa nature exceptionnelle et unique de la **tarasque** a conduit à l’élaboration d’une théorie quant à son apparition. Elle serait le résultat d’un vœu imprudent formulé au cœur de la Forge du Destin. Un héros du Kaan des temps anciens aurait demandé à acquérir une puissance quasi-divine tout en restant présent en personne sur Eana. Peut-être exigea-t-il de devenir semblable à un puissant dragon que tous craindraient ? Si cette explication était vraie, alors le seul moyen de la vaincre définitivement serait de se rendre dans la Forge du Destin pour annuler ce vœu fatidique à l’aide d’un autre vœu… Mais gare à sa formulation, car par la faute d’une rectification malavisée, l’humanité pourrait bien se retrouver tourmentée par deux créatures légendaires détruisant tout dans le sillage de leur lutte éternelle, uniquement ponctuée de périodes de sommeil ! Il se pourrait aussi que celui qui formule le vœu parvienne à obtenir la destruction de la **tarasque**, tout en étant condamné à lui succéder, devenant ce dont il avait voulu libérer Eana !\n\n### Hors du monde\n\nUne autre hypothèse fait de la **tarasque** une entité venant d’un autre monde, laquelle aurait jailli d’un portail à sa mesure, dans les profondeurs des océans. La **tarasque** serait alors simplement perdue sur Eana en tant que seul spécimen de son espèce. Si tel était le cas, il serait souhaitable qu’elle le demeure… Il devrait être possible de la vaincre par un combat tactique astucieux ou en la renvoyant vers sa contrée originelle, avant de détruire son portail d’arrivée. Les tenants de cette théorie pensent que le portail pourrait voir arriver d’autres spécimens. Il n’a jamais été localisé, et cet état de fait reste l’argument le plus souvent utilisé pour rejeter cette théorie.\n\n### L’arme du lac Khorikhuntakh\n\nLes habitants de la région du lac Khorikhuntakh ont une légende expliquant le nom du lieu (un terme évoquant une prison par le sommeil) par la présence de la **tarasque** dans ses profondeurs. La **tarasque** serait une arme conçue par les Géants. Elle aurait dû permettre à ses créateurs de vaincre leurs rivaux de toujours, les Voyageurs, mais la destruction du monde et des Voyageurs mit un terme à cette course à la puissance.\n\nPar la suite la **tarasque** aurait été libérée accidentellement, par des personnes qui auraient découvert le fonctionnement de sites secrets souterrains à proximité du lac. Aux yeux du néophyte, la ruine ressemblerait à un temple conçu pour des géants, alors qu’il s’agirait en fait d’un centre militaire.\n\nAujourd’hui, cette légende intéresse particulièrement les dirigeants de Kartaçöl en quête de moyens d’accroître leur puissance et de mener leurs conquêtes efficacement. Ces gens sont conscients du danger, tout comme ils savent que leurs adversaires feront tout pour les empêcher de réussir. Des guerres d’assassins visant à prendre le contrôle de ce site perdu pourraient bien précéder des conflits de grande ampleur et peut-être déterminer le sort du monde !\n\n### Icon Icon **Hurleur viatique**\n\nObjet merveilleux, artefact (affinité requise)\n\nLe hurleur viatique est une sorte de gorget de facture simple, fait d’un métal doré inconnu, orné d’écritures en viatique inscrites avec une finesse microscopique. La localisation de cet artefact permettant de contrôler la légendaire **tarasque** est inconnue, et fait l’objet d’avides recherches. À volonté, le porteur peut s’exprimer d’une voix jusqu’à dix fois plus puissante. Si la **tarasque** l’entend, elle exécutera les ordres du porteur tant que celui-ci conserve une affinité avec le hurleur viatique. Elle agira au mieux de ses capacités, bien qu’avec une réticence manifeste. Si la **tarasque** reçoit un ordre manifestement suicidaire ou contraire à sa nature guerrière, elle se rebellera. Dans ce cas, le porteur du hurleur viatique peut tenter de rasseoir son autorité sur la **tarasque** au moyen d’un jet de Charisme DD 20. Une fois cet effet utilisé, il ne peut pas l’être de nouveau avant la prochaine aube."
+    },
+    {
+      "name": "Détruire le hurleur",
+      "description": "** Ironiquement, seule la **tarasque** peut détruire le hurleur viatique, ce à quoi elle parviendra sans peine.\n\n273\n\nLes visions de la sainte ulkane étaient terribles. Elle évoquait les cités abattues et brisées. Elle disait que l’horreur véritable de l’anéantissement était au cœur de la nature de cette créature gigantesque. Elle était née de fragments de la puissance des Voyageurs, dérobée par les Géants, redécouverts après leur Chute. À quoi songent-ils, ceux qui la cherchent ? Croient-ils pouvoir maîtriser les fauves des maîtres d’antan ?\n\n# Tarasque\n\nMonstruosité (titan) de taille Gig, non aligné"
+    },
+    {
+      "name": "Classe d’armure",
+      "description": "25 (armure naturelle)"
+    },
+    {
+      "name": "Points de vie",
+      "description": "676 (33d20 + 330) | **Seuil de blessure** 169"
+    },
+    {
+      "name": "Vitesse de déplacement",
+      "description": "18 m, nage 18 m"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-gargouille",
+  "name": "Gargouille",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Élémentaire (terre) de taille M, loyal mauvais",
+  "armor_class": 15,
+  "armor_note": "armure naturelle",
+  "hit_points": "52 (7d8 + 21)",
+  "wound_threshold": null,
+  "speed": "9 m, escalade 9 m, vol 18 m",
+  "abilities": {
+    "str": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 6,
+      "modifier": "-2"
+    },
+    "wis": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 7,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 10",
+  "languages": "originel",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [
+    {
+      "name": "Apparence trompeuse",
+      "description": "Tant que la gargouille se tient immobile, elle est indiscernable d'une statue ordinaire."
+    },
+    {
+      "name": "Pattes d'araignée",
+      "description": "La gargouille peut parcourir les parois les plus difficiles à escalader, y compris les plafonds, sans devoir effectuer de test de caractéristique."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "La gargouille effectue deux attaques : une de morsure et une de griffes."
+    },
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 5 (1d6 + 2) dégâts perforants."
+    },
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 5 (1d6 + 2) dégâts tranchants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Les gargouilles restent loyalement attachées à un lieu, qu’elles défendent jusqu’à leur mort si nécessaire. Il semble donc que les bâtisseurs détiennent le moyen d’affecter durablement ces dangereux élémentaires à la protection d’un site. Ils sont aussi capables de les contrôler jusqu’à un certain point, puisque les gargouilles n’attaquent jamais le maître des lieux, ni les artisans chargés de l’entretien. Quiconque pourrait percer ce secret à jour trouverait là le moyen de tromper leur vigilance, et ainsi de circuler sans danger. Cet artifice est certainement spécifique à chaque lieu, nécessitant des recherches de la part des explorateurs souhaitant éviter l’affrontement… Et une telle entreprise est encore compliquée par le zèle employé par la guilde des bâtisseurs pour protéger ses secrets."
+}

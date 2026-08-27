@@ -44,6 +44,7 @@ export class Navbar implements OnInit, OnDestroy {
     { label: 'Civilisations', path: '/civilisations', icon: 'fluent-emoji:classical-building' },
     { label: 'Équipements', path: '/equipments', icon: 'fluent-emoji:shield' },
     { label: 'Sortilèges', path: '/spells', icon: 'fluent-emoji:sparkles' },
+    { label: 'Bestiaire', path: '/creatures', icon: 'fluent-emoji:dragon' },
     { label: 'Compétences', path: '/skills', icon: 'fluent-emoji:bookmark-tabs' },
     { label: 'Dons', path: '/feats', icon: 'fluent-emoji:trophy' },
     { label: 'Actions de combat', path: '/combat-actions', icon: 'fluent-emoji:collision' },

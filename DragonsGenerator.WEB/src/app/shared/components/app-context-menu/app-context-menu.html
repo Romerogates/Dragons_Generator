@@ -1,0 +1,131 @@
+@if (open()) {
+  <div
+    class="fixed inset-0 z-[200]"
+    (click)="close()"
+    (contextmenu)="onBackdropContextMenu($event)"
+  ></div>
+
+  <div
+    class="fixed z-[201] min-w-[15rem] max-w-[18rem] rounded-2xl border border-amber-900/40 bg-[#171b22]/98 backdrop-blur-md shadow-[0_20px_60px_rgba(0,0,0,0.65)] py-2"
+    [style.left.px]="position().x"
+    [style.top.px]="position().y"
+    role="menu"
+    (click)="$event.stopPropagation()"
+  >
+    <p
+      class="px-4 pt-1 pb-2 text-[9px] font-black uppercase tracking-[0.28em] text-amber-600/80 border-b border-slate-800/80 mb-1"
+    >
+      Grimoire
+    </p>
+
+    @for (item of primaryLinks; track item.path) {
+      <a
+        [routerLink]="item.path"
+        class="flex items-center gap-3 px-4 py-2 text-sm text-slate-300 hover:bg-amber-950/30 hover:text-amber-300 transition-colors"
+        role="menuitem"
+        (click)="close()"
+      >
+        <span class="text-base w-6 text-center shrink-0">
+          <iconify-icon [icon]="item.icon"></iconify-icon>
+        </span>
+        <span class="font-medium tracking-wide">{{ item.label }}</span>
+      </a>
+    }
+
+    <div class="my-1.5 mx-3 border-t border-slate-800/80"></div>
+
+    <p class="px-4 py-1 text-[9px] font-black uppercase tracking-[0.28em] text-slate-500">
+      Codex
+    </p>
+
+    <div class="max-h-44 overflow-y-auto custom-scrollbar">
+      @for (item of codexLinks; track item.path) {
+        <a
+          [routerLink]="item.path"
+          class="flex items-center gap-3 px-4 py-1.5 text-xs text-slate-400 hover:bg-slate-800/70 hover:text-amber-300 transition-colors"
+          role="menuitem"
+          (click)="close()"
+        >
+          <span class="text-sm w-6 text-center shrink-0">
+            <iconify-icon [icon]="item.icon"></iconify-icon>
+          </span>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </div>
+
+    <div class="my-1.5 mx-3 border-t border-slate-800/80"></div>
+
+    @if (auth.isLoggedIn()) {
+      <a
+        routerLink="/settings"
+        class="flex items-center gap-3 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/70 hover:text-amber-300 transition-colors"
+        role="menuitem"
+        (click)="close()"
+      >
+        <span class="text-base w-6 text-center shrink-0">
+          <iconify-icon icon="mdi:cog-outline"></iconify-icon>
+        </span>
+        <span>Paramètres</span>
+      </a>
+      <a
+        routerLink="/support"
+        class="flex items-center gap-3 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/70 hover:text-amber-300 transition-colors"
+        role="menuitem"
+        (click)="close()"
+      >
+        <span class="text-base w-6 text-center shrink-0">
+          <iconify-icon icon="fluent-emoji:envelope"></iconify-icon>
+        </span>
+        <span>Support</span>
+      </a>
+      @if (auth.isAdmin()) {
+        <a
+          routerLink="/admin"
+          class="flex items-center gap-3 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/70 hover:text-amber-300 transition-colors"
+          role="menuitem"
+          (click)="close()"
+        >
+          <span class="text-base w-6 text-center shrink-0">
+            <iconify-icon icon="fluent-emoji:shield"></iconify-icon>
+          </span>
+          <span>Administration</span>
+        </a>
+      }
+      <button
+        type="button"
+        class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:bg-slate-800/70 transition-colors text-left"
+        role="menuitem"
+        (click)="logout()"
+      >
+        <span class="text-base w-6 text-center shrink-0">
+          <iconify-icon icon="mdi:logout"></iconify-icon>
+        </span>
+        <span>Déconnexion</span>
+      </button>
+    } @else {
+      <a
+        routerLink="/login"
+        class="flex items-center gap-3 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/70 hover:text-amber-300 transition-colors"
+        role="menuitem"
+        (click)="close()"
+      >
+        <span class="text-base w-6 text-center shrink-0">
+          <iconify-icon icon="mdi:login"></iconify-icon>
+        </span>
+        <span>Connexion</span>
+      </a>
+      <a
+        routerLink="/register"
+        class="flex items-center gap-3 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800/70 hover:text-amber-300 transition-colors"
+        role="menuitem"
+        (click)="close()"
+      >
+        <span class="text-base w-6 text-center shrink-0">
+          <iconify-icon icon="mdi:account-plus-outline"></iconify-icon>
+        </span>
+        <span>Créer un compte</span>
+      </a>
+    }
+  </div>
+}

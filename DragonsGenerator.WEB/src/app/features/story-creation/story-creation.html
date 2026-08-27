@@ -1,0 +1,70 @@
+@if (showDraftPrompt()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in p-4">
+    <div class="bg-[#1b2028] border border-slate-700 rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 flex flex-col items-center gap-6">
+      <div class="w-14 h-14 rounded-full bg-violet-500/10 border border-violet-500/30 flex items-center justify-center text-3xl">
+        <iconify-icon icon="fluent-emoji:scroll"></iconify-icon>
+      </div>
+      <div class="text-center">
+        <h2 class="text-xl font-bold text-violet-400 font-serif mb-2">Brouillon retrouvé</h2>
+        <p class="text-slate-400 text-sm">Une aventure est en cours :</p>
+        <p class="text-slate-200 font-serif text-base mt-2 bg-[#171b22] px-4 py-2 rounded-lg border border-slate-700/50">
+          {{ builder.draftSummary() }}
+        </p>
+        <p class="text-slate-500 text-xs mt-2 italic">
+          Étape {{ builder.currentStep() }} / {{ builder.totalSteps }}
+        </p>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-3 w-full">
+        <button
+          class="flex-1 px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest bg-violet-600 text-white hover:bg-violet-500 transition-colors"
+          (click)="resumeDraft()"
+        >
+          Reprendre
+        </button>
+        <button
+          class="flex-1 px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition-colors"
+          (click)="startFresh()"
+        >
+          Recommencer
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<div class="w-full mx-auto px-2 sm:px-4 lg:px-6 pb-6 pt-2 min-h-[calc(100dvh-4rem)] flex flex-col max-w-[90rem] overflow-x-clip">
+  <div class="sticky top-0 z-30 -mx-2 sm:mx-0 mb-3 px-2 sm:px-0 py-2 bg-[#171b22]/90 backdrop-blur-md border-b border-slate-800/80">
+    <div class="flex items-center justify-between gap-3 mb-2">
+      <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+        Étape {{ builder.currentStep() }} / {{ builder.totalSteps }}
+      </p>
+      <p class="text-[11px] font-serif text-violet-400/90 truncate min-w-0 text-right">
+        {{ builder.steps()[builder.currentStep() - 1]?.title }}
+      </p>
+    </div>
+    <div class="flex gap-1 overflow-x-auto pb-0.5">
+      @for (step of builder.steps(); track step.number) {
+        <div
+          class="h-1.5 flex-1 min-w-[1.25rem] rounded-full transition-colors"
+          [class]="
+            step.number < builder.currentStep()
+              ? 'bg-violet-600'
+              : step.number === builder.currentStep()
+                ? 'bg-violet-400'
+                : 'bg-slate-700'
+          "
+          [attr.title]="step.title"
+        ></div>
+      }
+    </div>
+  </div>
+
+  <div class="w-full flex-1 flex flex-col min-h-0">
+    @switch (builder.currentStep()) {
+      @case (1) { <app-select-creatures-step /> }
+      @case (2) { <app-customize-creatures-step /> }
+      @case (3) { <app-adventure-step /> }
+      @case (4) { <app-story-summary-step /> }
+    }
+  </div>
+</div>

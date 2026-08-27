@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-aristocrate",
+  "name": "Aristocrate",
+  "category": "habitants",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Habitants",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 15,
+  "armor_note": "cuirasse",
+  "hit_points": "9 (2d8)",
+  "wound_threshold": 4,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 16,
+      "modifier": "+3"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Intuition +4, Histoire +3, Persuasion +5, Tromperie +5",
+  "senses": "Perception passive 12",
+  "languages": "trois au choix",
+  "challenge_rating": "1/8",
+  "xp": 25,
+  "traits": [],
+  "actions": [
+    {
+      "name": "Rapière",
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 1,50 m, une cible. Réussite : 5 (1d8 + 1) dégâts perforants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Grâce à la fortune de leur famille, les aristocrates disposent d’un équipement de bonne qualité, adapté aux problèmes qu’ils s’attendent à rencontrer. La nature précise dudit équipement dépend de leur civilisation, le profil ci-après valant pour un aristocrate de la Cité Franche."
+}

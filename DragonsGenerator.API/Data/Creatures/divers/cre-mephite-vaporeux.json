@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-mephite-vaporeux",
+  "name": "Méphite vaporeux",
+  "category": "divers",
+  "part": "Troisième partie Rencontres dans le Grand Kaan",
+  "section": null,
+  "type": "Élémentaire (feu) de taille P, neutre mauvais",
+  "armor_class": 10,
+  "armor_note": null,
+  "hit_points": "21 (6d6)",
+  "wound_threshold": 6,
+  "speed": "9 m, vol 9 m",
+  "abilities": {
+    "str": {
+      "score": 5,
+      "modifier": "-3"
+    },
+    "dex": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 12,
+      "modifier": "+1"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 10",
+  "languages": "originel",
+  "challenge_rating": "1/4",
+  "xp": 50,
+  "traits": [
+    {
+      "name": "Explosion posthume",
+      "description": "Quand le méphite meurt, il disparaît dans un nuage de vapeur. Chaque créature située dans un rayon de 1,50 m doit effectuer un JS Dextérité DD 10 et subit 4 (1d8) dégâts de feu en cas d'échec."
+    },
+    {
+      "name": "Sorts innés (1/jour)",
+      "description": "Le méphite vaporeux peut lancer le sort flou sans composantes matérielles. Sa caractéristique magique est le Charisme."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +2 pour toucher, allonge 1,50 m, une créature. Réussite : 2 (1d4) dégâts tranchants plus 2 (1d4) dégâts de feu."
+    },
+    {
+      "name": "Souffle de vapeur (recharge 6)",
+      "description": "Le méphite crache un cône de vapeur brûlante de 4,50 m. Chaque créature prise dans cette zone d'effet doit effectuer un JS Dextérité DD 10 et subit 4 (1d8) dégâts de feu en cas d'échec, la moitié en cas de réussite.\nMéphite vaporeux\nDansant volontiers autour des bouillonnants geysers, le méphite vaporeux peut également naître dans une cuisine où la marmite a été abandonnée sans surveillance, ou dans les ateliers de gnomes cherchant à faire fonctionner des machineries ingénieuses, ou encore dans les laboratoires d'alchimistes maladroits."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Si le **méphite** tombe à 0 point de vie, il explose en particules élémentaires. Vous ne pouvez avoir plus de serviteurs **méphites** que votre bonus de maîtrise. Si vous relancez ce sort alors que vous avez déjà atteint ce quota, le **méphite** le plus ancien explose."
+}

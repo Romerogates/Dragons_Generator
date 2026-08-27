@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-fantome",
+  "name": "Fantôme",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Mort-vivant de taille M, alignement au choix",
+  "armor_class": 11,
+  "armor_note": null,
+  "hit_points": "45 (10d8)",
+  "wound_threshold": null,
+  "speed": "0 m, vol 12 m (stationnaire)",
+  "abilities": {
+    "str": {
+      "score": 7,
+      "modifier": "-2"
+    },
+    "dex": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 17,
+      "modifier": "+3"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 11",
+  "languages": "toutes celles pratiquées de son vivant",
+  "challenge_rating": "4",
+  "xp": 1100,
+  "traits": [
+    {
+      "name": "Vision éthérée",
+      "description": "Le fantôme peut voir à 18 m dans le Plan Éthéré quand il se trouve sur le Plan Matériel et inversement."
+    },
+    {
+      "name": "Déplacement intangible",
+      "description": "Le fantôme est capable de se déplacer au travers d'autres créatures ou d'objets comme s'il s'agissait de terrain difficile. Il subit 5 (1d10) dégâts de force s'il termine son tour de jeu à l'intérieur d'un objet."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Contact flétrissant",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 17 (4d6 + 3) dégâts nécrotiques."
+    },
+    {
+      "name": "Passage dans l'éther",
+      "description": "Le fantôme passe du Plan Matériel au Plan Éthéré, ou inversement. Il reste visible depuis le Plan Matériel quand il se trouve sur la frontière entre les plans, mais il ne peut affecter ce qui se trouve sur un autre plan que lui, et réciproquement."
+    },
+    {
+      "name": "Visage horrifique",
+      "description": "Chaque créature non morte-vivante située dans un rayon de 18 m du fantôme doit si elle voit ce dernier réussir un JS Sagesse DD 13 sous peine d'être **effrayée** pendant 1 minute. Si le jet est raté d'au moins 5, la cible vieillit de 1d4 × 10 ans. Une cible **effrayée** peut réitérer le JS à la fin de chacun de ses tours de jeu et n'est plus **effrayée** en cas de réussite. Toute créature qui se sauvegarde ou pour qui l'effet prend fin est immunisée contre le visage horrifique de ce fantôme pour les 24 prochaines heures. Le vieillissement peut quant à lui être annulé par le sort restauration suprême, à condition qu'il soit lancé sur la victime dans les 24 heures."
+    },
+    {
+      "name": "Possession (recharge 6)",
+      "description": "Un humanoïde visible du fantôme et qui se trouve dans un rayon de 1,50 m de celui-ci doit réussir un JS Charisme DD 13 sous peine d'être **possédé** par lui. Le fantôme disparaît, la cible est **neutralisée** et perd le contrôle de son propre corps qui revient désormais au fantôme. La victime reste toutefois consciente de son environnement. Le fantôme ne peut être ciblé par une attaque, un sort ou tout autre effet, à l'exception de ceux qui renvoient les morts-vivants. Il conserve son alignement, ses valeurs d'Intelligence, de Sagesse et de Charisme, ainsi que son immunité contre les états charmé et effrayé. Pour le reste, il utilise les caractéristiques de la cible **possédée**, sans bénéficier toutefois de ses connaissances, aptitudes de classe ou maîtrises.\nLa possession perdure jusqu'à ce que le corps tombe à 0 pv, que le fantôme y mette fin au prix d'une action bonus, ou qu'il soit expulsé du corps par le sort dissipation du Mal et du Bien ou un effet similaire. Quand la possession prend fin, le fantôme réapparaît dans un espace inoccupé, dans un rayon de 1,50 m du corps. Une cible qui se sauvegarde ou pour qui l'effet prend fin est immunisée contre la possession de ce fantôme pour les 24 prochaines heures."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Extrait de Rencontres et découvertes, par Tarella, géographe et cartographe"
+}

@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-eclaireur",
+  "name": "Éclaireur",
+  "category": "soldats",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Soldats",
+  "type": "Humanoïde (espèce au choix) de taille M, alignement au choix",
+  "armor_class": 13,
+  "armor_note": "armure de cuir",
+  "hit_points": "16 (3d8 + 3)",
+  "wound_threshold": 5,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "int": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 11,
+      "modifier": "+0"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +6, Dressage +5, Nature +4, Perception +5, Survie +5",
+  "senses": "Perception passive 15",
+  "languages": "trois au choix",
+  "challenge_rating": "1/2",
+  "xp": 100,
+  "traits": [
+    {
+      "name": "Ouïe fine et vision perçante",
+      "description": "L'éclaireur bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'ouïe ou la vue."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "L'éclaireur effectue deux attaques de corps à corps ou deux attaques à distance."
+    },
+    {
+      "name": "Épée courte",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 5 (1d6 + 2) dégâts perforants."
+    },
+    {
+      "name": "Arc long",
+      "description": "Attaque d'arme à distance : +4 pour toucher, portée 45/180 m, une cible. Réussite : 6 (1d8 + 2) dégâts perforants."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Le profil de l’éclaireur s’applique à tout connaisseur des terres sauvages ayant l’habitude de travailler avec des armées régulières ou d’autres employeurs issus de sociétés structurées. Un éclaireur expérimenté ou soigneusement formé peut même jouer un rôle d’émissaire. Habitué à devoir négocier avec des fées, des tribus aldarons, des gobelinoïdes ou des barbares, il connaît alors leurs langues peu communes et dispose de compétences sociales, notamment Intuition et Persuasion."
+}

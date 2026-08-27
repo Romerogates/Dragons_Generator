@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-bleme",
+  "name": "Blême",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Mort-vivant de taille M, chaotique mauvais",
+  "armor_class": 13,
+  "armor_note": null,
+  "hit_points": "36 (8d8)",
+  "wound_threshold": null,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "dex": {
+      "score": 17,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 8,
+      "modifier": "-1"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 10",
+  "languages": "commun",
+  "challenge_rating": "2",
+  "xp": 450,
+  "traits": [
+    {
+      "name": "Puanteur",
+      "description": "Toute créature qui commence son tour de jeu dans un rayon de 1,50 m du blême doit réussir un JS Constitution DD 10 sous peine d'être **empoisonnée** jusqu'au début de son tour de jeu suivant. En cas de réussite, la créature est immunisée contre la Puanteur du blême pendant 24 heures."
+    },
+    {
+      "name": "Résistance au renvoi",
+      "description": "Le blême, ainsi que toute **goule** dans un rayon de 9 m de lui, bénéficient d'un avantage aux JS contre les effets qui renvoient les morts-vivants."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 1,50 m, une créature. Réussite : 12 (2d8 + 3) dégâts perforants."
+    },
+    {
+      "name": "Griffes",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 10 (2d6 + 3) dégâts tranchants. Si la cible n'est pas un mort-vivant, elle doit réussir un JS Constitution DD 10 sous peine de se retrouver **paralysée** pendant 1 minute. La cible peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet en cas de réussite.\n163"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Bien que les goules paraissent habituellement stupides et frustes, le contact avec des créatures intelligentes leur permet d’entretenir leurs propres capacités de raisonnement, voire de les développer. C’est le cas de celles qui se sont mises au service de Kentigern. Il a su, dans une certaine mesure, discipliner ces prédateurs nocturnes pour en faire des agents perturbateurs de zones qu’il ambitionne, à terme, de contrôler."
+}

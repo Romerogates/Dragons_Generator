@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-152",
+  "name": "**152**",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille TG, non aligné",
+  "armor_class": 15,
+  "armor_note": "armure naturelle",
+  "hit_points": "68 (8d12 + 16)",
+  "wound_threshold": 17,
+  "speed": "18 m",
+  "abilities": {
+    "str": {
+      "score": 21,
+      "modifier": "+5"
+    },
+    "dex": {
+      "score": 18,
+      "modifier": "+4"
+    },
+    "con": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "int": {
+      "score": 5,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 8,
+      "modifier": "-1"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +3",
+  "senses": "Perception passive 13",
+  "languages": "sylvestre",
+  "challenge_rating": "3",
+  "xp": 700,
+  "traits": [
+    {
+      "name": "Acharnement (recharge après un repos court ou long)",
+      "description": "Si l'élan géant subit des dégâts inférieurs ou égaux à 17 et que ces dommages sont censés la faire tomber à 0 pv, il se retrouve en fait à 1 pv."
+    },
+    {
+      "name": "Charge",
+      "description": "<u>Si l'élan géant se déplace d'au moins 6 m en</u> ligne droite vers sa cible et qu'il la touche avec une attaque de coup de boutoir au même tour de jeu, la cible subit 7 (2d6) dégâts supplémentaires. Si la cible est une créature, elle doit réussir un JS Force DD 15 sous peine de se retrouver **à terre**."
+    },
+    {
+      "name": "Implacable",
+      "description": "L'élan géant bénéficie d'un avantage aux jets de sauvegarde contre les états préjudiciables charmé et effrayé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Coup de boutoir",
+      "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 3 m, une cible. Réussite : 12 (2d6 + 5) dégâts contondants."
+    },
+    {
+      "name": "Sabots",
+      "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 1,50 m, une créature **à terre**. Réussite : 23 (4d8 + 5) dégâts contondants."
+    },
+    {
+      "name": "153",
+      "description": ""
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

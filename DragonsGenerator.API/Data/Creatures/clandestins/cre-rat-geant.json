@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-rat-geant",
+  "name": "Rat géant",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Bête de taille P, non aligné",
+  "armor_class": 12,
+  "armor_note": null,
+  "hit_points": "7 (2d6)",
+  "wound_threshold": 4,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 7,
+      "modifier": "-2"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 2,
+      "modifier": "-4"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 4,
+      "modifier": "-3"
+    }
+  },
+  "saving_throws": null,
+  "skills": null,
+  "senses": "vision dans le noir 18 m, Perception passive 10",
+  "languages": "—",
+  "challenge_rating": "1/8",
+  "xp": 25,
+  "traits": [
+    {
+      "name": "Flair",
+      "description": "Le rat géant bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir l'odorat."
+    },
+    {
+      "name": "Tactique de meute",
+      "description": "Le rat géant bénéficie d'un avantage aux jets d'attaque contre les créatures situées à 1,50 m ou moins d'un de ses alliés qui n'est pas neutralisé."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d4 + 2) dégâts perforants.\nLes rats géants sont connus pour être plus agressifs que les rats ordinaires, avec des comportements de prédation coordonnés qui peuvent les conduire à chasser des humanoïdes blessés ou fragiles. Ceux porteurs de maladies se signalent par une témérité particulièrement marquée."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": ""
+}

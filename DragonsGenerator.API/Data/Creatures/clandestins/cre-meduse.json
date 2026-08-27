@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-meduse",
+  "name": "Méduse",
+  "category": "clandestins",
+  "part": "Première partie Rencontres dans la Cité Franche",
+  "section": "Clandestins",
+  "type": "Humanoïde (maudit) de taille M, alignement autre que bon au choix",
+  "armor_class": 15,
+  "armor_note": "armure naturelle",
+  "hit_points": "127 (17d8 + 51)",
+  "wound_threshold": 32,
+  "speed": "9 m",
+  "abilities": {
+    "str": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "dex": {
+      "score": 15,
+      "modifier": "+2"
+    },
+    "con": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "int": {
+      "score": 12,
+      "modifier": "+1"
+    },
+    "wis": {
+      "score": 13,
+      "modifier": "+1"
+    },
+    "cha": {
+      "score": 15,
+      "modifier": "+2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Discrétion +5, Intuition +4, Perception +4, Tromperie +5",
+  "senses": "vision dans le noir 18 m, Perception passive 14",
+  "languages": "commun",
+  "challenge_rating": "6",
+  "xp": 2300,
+  "traits": [
+    {
+      "name": "Regard pétrifiant",
+      "description": "Si une créature commence son tour de jeu dans un rayon de 9 m de la méduse et que tous deux se voient, le monstre peut obliger la cible à effectuer un JS Constitution DD 14 s'il n'est pas neutralisé. En cas d'échec de 5 ou plus, la créature est aussitôt **pétrifiée**. En cas d'échec, elle commence à se transformer en pierre et se retrouve **entravée**. Ainsi affectée, elle doit réitérer le jet de sauvegarde à la fin de son tour de jeu suivant. En cas de réussite, l'effet prend fin. En cas d'échec, la créature est **pétrifiée** jusqu'à être libérée par le sort restauration suprême ou autre effet magique similaire.\nUne créature qui n'est pas surprise peut se détourner pour éviter le jet de sauvegarde au début de son tour de jeu. Dans ce cas, elle ne voit pas la méduse jusqu'au début de son tour de jeu suivant, où elle peut à nouveau se détourner. Si elle la regarde entre-temps, elle doit aussitôt effectuer le jet de sauvegarde.\nSi la méduse voit son reflet sur une surface polie dans un rayon de 9 m par lumière vive, elle est affectée par son propre regard en raison de la malédiction qui la frappe."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "La méduse effectue trois attaques de corps à corps (une de cheveux ophidiens et deux d'épée courte) ou deux attaques à distance avec son arc long."
+    },
+    {
+      "name": "Cheveux ophidiens",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une créature. Réussite : 4 (1d4 + 2) dégâts perforants plus 14 (4d6) dégâts de poison."
+    },
+    {
+      "name": "Épée courte",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 5 (1d6 + 2) dégâts perforants."
+    },
+    {
+      "name": "Arc long",
+      "description": "Attaque d'arme à distance : +5 pour toucher, portée 45/180 m, une cible. Réussite : 6 (1d8 + 2) dégâts perforants plus 7 (2d6) dégâts de poison."
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "La transformation en méduse est progressive : démangeaisons affreuses, cloques dans le cuir chevelu grouillant de vipères en devenir, perte de cheveux, céphalées en regardant son reflet, etc. En à peine quelques semaines, la victime est complètement transfigurée, devenue une créature monstrueuse et quasi-méconnaissable. Si la nouvelle méduse est généralement incapable de poursuivre sa vie telle qu’elle la menait auparavant, ses passions ne se sont pas éteintes avec sa transformation. Elle cherche donc, même de manière détournée, à assouvir ses ambitions passées."
+}

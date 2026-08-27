@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "id": "cre-faucon",
+  "name": "Faucon",
+  "category": "divers",
+  "part": "Deuxième partie",
+  "section": null,
+  "type": "Bête de taille TP, non aligné",
+  "armor_class": 13,
+  "armor_note": null,
+  "hit_points": "2 (1d4)",
+  "wound_threshold": null,
+  "speed": "3 m, vol 18 m",
+  "abilities": {
+    "str": {
+      "score": 5,
+      "modifier": "-3"
+    },
+    "dex": {
+      "score": 16,
+      "modifier": "+3"
+    },
+    "con": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "cha": {
+      "score": 6,
+      "modifier": "-2"
+    }
+  },
+  "saving_throws": null,
+  "skills": "Perception +4",
+  "senses": "Perception passive 14",
+  "languages": "—",
+  "challenge_rating": "0",
+  "xp": 10,
+  "traits": [
+    {
+      "name": "Vue perçante",
+      "description": "Le faucon bénéficie d'un avantage aux tests de Sagesse (Perception) qui font intervenir la vue."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Serres",
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 1 dégât tranchant.\nAigle\nVautour\nVautour"
+    }
+  ],
+  "reactions": [],
+  "legendary_actions": [],
+  "description": "Faucon"
+}
