@@ -26,6 +26,8 @@ public class AdminSeedOptions
 {
     public string Email { get; set; } = "admin@dragons.local";
     public string Password { get; set; } = "AdminDragons!2026";
+    /// <summary>Si true au démarrage : met à jour le mot de passe du compte admin (Admin__Email) uniquement.</summary>
+    public bool ResetPassword { get; set; }
 }
 
 public static class AuthHelpers

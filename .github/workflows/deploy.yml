@@ -26,5 +26,25 @@ jobs:
             cd ~/Dragons_Generator
             git fetch origin main
             git reset --hard origin/main
+
+            # Réinitialisation mot de passe admin (une seule fois — autres comptes / persos intacts)
+            MARKER="$HOME/Dragons_Generator/.admin-password-reset-v1"
+            ENV_FILE="$HOME/Dragons_Generator/.env"
+            touch "$ENV_FILE"
+            if [ ! -f "$MARKER" ]; then
+              grep -q '^Admin__Email=' "$ENV_FILE" || echo 'Admin__Email=admin@dragons.local' >> "$ENV_FILE"
+              grep -q '^Admin__Password=' "$ENV_FILE" || echo 'Admin__Password=AdminDragons!2026' >> "$ENV_FILE"
+              sed -i '/^Admin__ResetPassword=/d' "$ENV_FILE"
+              echo 'Admin__ResetPassword=true' >> "$ENV_FILE"
+            fi
+
             docker compose -f docker-compose.prod.yml up --build -d
+
+            if [ ! -f "$MARKER" ]; then
+              sleep 8
+              sed -i '/^Admin__ResetPassword=/d' "$ENV_FILE"
+              docker compose -f docker-compose.prod.yml up -d dragons-api
+              touch "$MARKER"
+            fi
+
             docker compose -f docker-compose.prod.yml ps

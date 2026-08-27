@@ -39,6 +39,12 @@ public static class DbSeeder
             existing.EmailConfirmed = true;
             await db.SaveChangesAsync();
         }
+        else if (adminOpt.ResetPassword && !string.IsNullOrWhiteSpace(adminOpt.Password))
+        {
+            existing.PasswordHash = AuthHelpers.HashPassword(adminOpt.Password);
+            existing.EmailConfirmed = true;
+            await db.SaveChangesAsync();
+        }
 
         var uploads = Path.Combine(AppContext.BaseDirectory, "data", "uploads", "tickets");
         Directory.CreateDirectory(uploads);
