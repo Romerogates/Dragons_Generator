@@ -28,7 +28,7 @@ jobs:
             git reset --hard origin/main
 
             # Réinitialisation mot de passe admin (une seule fois — autres comptes / persos intacts)
-            MARKER="$HOME/Dragons_Generator/.admin-password-reset-v1"
+            MARKER="$HOME/Dragons_Generator/.admin-password-reset-v2"
             ENV_FILE="$HOME/Dragons_Generator/.env"
             touch "$ENV_FILE"
             if [ ! -f "$MARKER" ]; then
@@ -45,6 +45,8 @@ jobs:
               sed -i '/^Admin__ResetPassword=/d' "$ENV_FILE"
               docker compose -f docker-compose.prod.yml up -d dragons-api
               touch "$MARKER"
+              echo "--- Comptes admin en base ---"
+              docker logs dragons-api 2>&1 | grep -E "admin réinitialisé|Compte admin créé" | tail -5 || true
             fi
 
             docker compose -f docker-compose.prod.yml ps
