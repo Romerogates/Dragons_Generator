@@ -237,14 +237,18 @@ public class ListCampaignInvitesEndpoint(AppDbContext db) : EndpointWithoutReque
             return;
         }
 
-        var invites = await db.CampaignInvites.AsNoTracking()
-            .Where(i => i.InvitedUserId == userId && i.Status == CampaignInviteStatuses.Pending)
-            .Include(i => i.Campaign)
-            .Join(db.Users, i => i.InvitedByUserId, u => u.Id, (i, u) => new { i, u })
-            .OrderByDescending(x => x.i.CreatedAt)
-            .Select(x => new CampaignInviteDto(
-                x.i.Id, x.i.CampaignId, x.i.Campaign.Title, x.u.DisplayName, x.i.CreatedAt))
-            .ToListAsync(ct);
+        var rows = await (
+            from i in db.CampaignInvites.AsNoTracking()
+            join c in db.Campaigns.AsNoTracking() on i.CampaignId equals c.Id
+            join u in db.Users.AsNoTracking() on i.InvitedByUserId equals u.Id
+            where i.InvitedUserId == userId && i.Status == CampaignInviteStatuses.Pending
+            select new { i.Id, i.CampaignId, CampaignTitle = c.Title, InvitedByName = u.DisplayName, i.CreatedAt }
+        ).ToListAsync(ct);
+
+        var invites = rows
+            .OrderByDescending(x => x.CreatedAt)
+            .Select(x => new CampaignInviteDto(x.Id, x.CampaignId, x.CampaignTitle, x.InvitedByName, x.CreatedAt))
+            .ToList();
 
         await Send.OkAsync(invites, ct);
     }

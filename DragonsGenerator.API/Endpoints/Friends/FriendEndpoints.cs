@@ -93,11 +93,10 @@ public class ListFriendRequestsEndpoint(AppDbContext db) : EndpointWithoutReques
         var incoming = await db.Friendships.AsNoTracking()
             .Where(f => f.AddresseeId == userId && f.Status == FriendStatuses.Pending)
             .Include(f => f.Requester)
-            .OrderByDescending(f => f.CreatedAt)
             .Select(f => new FriendRequestDto(f.Id, f.RequesterId, f.Requester.DisplayName, f.Requester.Email, f.CreatedAt))
             .ToListAsync(ct);
 
-        await Send.OkAsync(incoming, ct);
+        await Send.OkAsync(incoming.OrderByDescending(f => f.CreatedAt).ToList(), ct);
     }
 }
 
