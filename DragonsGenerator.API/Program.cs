@@ -105,9 +105,9 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.UseCors("AllowAngular");
-app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 app.UseFastEndpoints(c =>
 {
     c.Errors.UseProblemDetails();

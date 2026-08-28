@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '@core/services/data.service';
 import { AiRateLimitDialogService } from '@core/services/ai-rate-limit-dialog.service';
+import { isAiRateLimitHttpError } from '@core/utils/ai-rate-limit.util';
 import { StoryBuilderService } from '@core/services/story-builder.service';
 import { ADVENTURE_TONE_LABELS, AdventureTone } from '@core/models/Story/story';
 
@@ -66,9 +67,11 @@ export class AdventureStep implements OnInit {
           this.isGenerating.set(false);
         },
         error: (err) => {
-          if (!this.aiRateLimit.handleHttpError(err)) {
-            this.generationError.set(this.extractError(err));
+          if (isAiRateLimitHttpError(err)) {
+            this.isGenerating.set(false);
+            return;
           }
+          this.generationError.set(this.extractError(err));
           this.isGenerating.set(false);
         },
       });
@@ -97,7 +100,6 @@ export class AdventureStep implements OnInit {
     if (apiMsg && apiMsg !== 'One or more errors occurred!') return apiMsg;
     if (http.status === 502)
       return 'Le service de génération IA est indisponible. Vérifiez la clé Groq ou réessayez dans quelques instants.';
-    if (http.status === 429) return 'Limite atteinte — voir le message à l\'écran.';
     return "L'inspiration cosmique est momentanément indisponible.";
   }
 }

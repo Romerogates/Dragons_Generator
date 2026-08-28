@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Threading.RateLimiting;
+using DragonsGenerator.API.Persistence;
 
 namespace DragonsGenerator.API.Services;
 
@@ -81,6 +82,12 @@ public static class RateLimitPolicies
                 AiGeneration,
                 context =>
                 {
+                    if (context.User?.Identity?.IsAuthenticated == true
+                        && context.User.IsInRole(AppRoles.Admin))
+                    {
+                        return RateLimitPartition.GetNoLimiter($"{AiGeneration}-admin");
+                    }
+
                     var userId = context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
                     var key = !string.IsNullOrEmpty(userId)
                         ? $"user:{userId}"

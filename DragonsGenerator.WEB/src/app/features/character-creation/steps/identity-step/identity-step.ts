@@ -18,6 +18,7 @@ import {
 import { ALIGNMENTS } from '@core/models/Character/character';
 import { DataService } from '@core/services/data.service';
 import { AiRateLimitDialogService } from '@core/services/ai-rate-limit-dialog.service';
+import { isAiRateLimitHttpError } from '@core/utils/ai-rate-limit.util';
 
 @Component({
   selector: 'app-identity-step',
@@ -107,8 +108,7 @@ export class IdentityStep implements OnInit {
           this.isGenerating.set(false);
         },
         error: (err) => {
-          console.error('Erreur IA:', err);
-          if (this.aiRateLimit.handleHttpError(err)) {
+          if (isAiRateLimitHttpError(err)) {
             this.isGenerating.set(false);
             return;
           }

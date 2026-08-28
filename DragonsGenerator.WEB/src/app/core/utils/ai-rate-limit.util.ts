@@ -8,6 +8,16 @@ export interface AiRateLimitInfo {
 
 const STORAGE_KEY = 'dragons-ai-rate-limit-until';
 
+const AI_GENERATION_PATH = /\/generate-(creature-story|adventure|backstory)(?:\?|$)/i;
+
+export function isAiGenerationRequest(url: string): boolean {
+  return AI_GENERATION_PATH.test(url);
+}
+
+export function isAiRateLimitHttpError(err: unknown): boolean {
+  return err instanceof HttpErrorResponse && err.status === 429 && isAiGenerationRequest(err.url ?? '');
+}
+
 export function parseAiRateLimitError(err: unknown): AiRateLimitInfo | null {
   if (!(err instanceof HttpErrorResponse) || err.status !== 429) return null;
 
