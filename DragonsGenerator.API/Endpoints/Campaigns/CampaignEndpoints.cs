@@ -793,3 +793,70 @@ public class ClaimCampaignPregenEndpoint(AppDbContext db) : EndpointWithoutReque
         await Send.OkAsync(new CharacterSummaryDto(copy.Id, copy.Name, copy.UpdatedAt), ct);
     }
 }
+
+public class GetCampaignPregenCharacterEndpoint(AppDbContext db) : EndpointWithoutRequest<CharacterDto>
+{
+    public override void Configure() => Get("/me/campaigns/{id}/pregens/{pregenId}/character");
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var userId = AuthHelpers.GetUserId(User);
+        if (userId is null)
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        var campaignId = Route<Guid>("id");
+        var pregenId = Route<Guid>("pregenId");
+        var (campaign, membership, isOwner) = await CampaignAccess.LoadAsync(db, campaignId, userId.Value, ct);
+        if (campaign is null || !CampaignAccess.CanView(isOwner, membership))
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        var data = CampaignPregenHelpers.ParseDataObject(campaign.JsonData);
+        var pregen = CampaignPregenHelpers.FindPregen(data, pregenId);
+        if (pregen is null)
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        if (!isOwner)
+        {
+            if (pregen["assignedUserId"]?.GetValue<string>() != userId.Value.ToString())
+            {
+                AddError("Ce personnage ne vous est pas assigné.");
+                await Send.ErrorsAsync(StatusCodes.Status403Forbidden, ct);
+                return;
+            }
+
+            if (pregen["status"]?.GetValue<string>() != "assigned")
+            {
+                AddError("Ce personnage n'est plus disponible en prévisualisation.");
+                await Send.ErrorsAsync(StatusCodes.Status409Conflict, ct);
+                return;
+            }
+        }
+
+        if (!Guid.TryParse(pregen["characterId"]?.GetValue<string>(), out var sourceCharacterId))
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        var source = await db.Characters.AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == sourceCharacterId && c.UserId == campaign.OwnerUserId, ct);
+        if (source is null)
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        var displayName = pregen["characterName"]?.GetValue<string>()?.Trim() ?? source.Name;
+        using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(source.JsonData) ? "{}" : source.JsonData);
+        await Send.OkAsync(new CharacterDto(source.Id, displayName, doc.RootElement.Clone(), source.UpdatedAt), ct);
+    }
+}

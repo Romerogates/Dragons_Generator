@@ -17,7 +17,7 @@ import { FriendsService } from '@core/services/friends.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
 import { AuthService } from '@core/services/auth.service';
 import { DataService } from '@core/services/data.service';
-import { forkJoin, catchError, map, of, Observable } from 'rxjs';
+import { forkJoin, catchError, map, of, Observable, throwError } from 'rxjs';
 import { CampaignPdfService, CreaturePrintEntry } from '@core/services/campaign-pdf.service';
 import { Character } from '@core/models/Character/character';
 import {
@@ -455,9 +455,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (this.pregenPdfLoadingId()) return;
     this.pregenPdfLoadingId.set(pregen.id);
     this.error.set(null);
-    this.characters.get(pregen.characterId).subscribe({
-      next: (res) => {
-        void this.pdf.downloadPlayerFullSheet(res.data as Character).finally(() => {
+    this.loadPregenCharacter(pregen).subscribe({
+      next: (character) => {
+        void this.pdf.downloadPlayerFullSheet(character).finally(() => {
           this.pregenPdfLoadingId.set(null);
         });
       },
@@ -471,9 +471,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   viewPregenCharacter(pregen: CampaignPregen): void {
     this.pregenPdfLoadingId.set(pregen.id);
     this.error.set(null);
-    this.characters.get(pregen.characterId).subscribe({
-      next: (res) => {
-        localStorage.setItem('dragons-current-character', JSON.stringify(res.data));
+    this.loadPregenCharacter(pregen).subscribe({
+      next: (character) => {
+        localStorage.setItem('dragons-current-character', JSON.stringify(character));
         this.pregenPdfLoadingId.set(null);
         this.router.navigate(['/character-sheet']);
       },
@@ -482,6 +482,23 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         this.error.set('Impossible d\'ouvrir la fiche.');
       },
     });
+  }
+
+  private loadPregenCharacter(pregen: CampaignPregen): Observable<Character> {
+    const c = this.campaign();
+    if (!c) return throwError(() => new Error('Campagne introuvable'));
+
+    const mapResponse = (res: { data: unknown; name?: string }) => {
+      const character = { ...(res.data as object) } as Character;
+      if (res.name) character.name = res.name;
+      return character;
+    };
+
+    if (c.isOwner) {
+      return this.characters.get(pregen.characterId).pipe(map((res) => mapResponse(res)));
+    }
+
+    return this.campaigns.getPregenCharacter(c.id, pregen.id).pipe(map((res) => mapResponse(res)));
   }
 
   myAssignedPregens(): CampaignPregen[] {

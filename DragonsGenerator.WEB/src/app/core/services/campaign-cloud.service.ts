@@ -112,6 +112,15 @@ export class CampaignCloudService {
     );
   }
 
+  getPregenCharacter(
+    campaignId: string,
+    pregenId: string,
+  ): Observable<{ id: string; name: string; data: unknown }> {
+    return this.http.get<{ id: string; name: string; data: unknown }>(
+      `${this.api}/me/campaigns/${campaignId}/pregens/${pregenId}/character`,
+    );
+  }
+
   private normalizeData(raw: Partial<CampaignData> | null | undefined): CampaignData {
     const base = emptyCampaignData();
     if (!raw) return base;

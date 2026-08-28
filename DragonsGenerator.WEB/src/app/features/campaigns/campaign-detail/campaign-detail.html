@@ -225,13 +225,33 @@
                         <p class="text-xs text-slate-400 mt-1 italic">« {{ p.publicHook }} »</p>
                       }
                     </div>
-                    <button
-                      type="button"
-                      class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white"
-                      (click)="claimPregen(p.id)"
-                    >
-                      Prendre ce personnage — jouable tout de suite
-                    </button>
+                    <div class="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        class="px-3 py-2 rounded-xl text-[10px] font-black uppercase border border-emerald-800/50 text-emerald-300 hover:border-emerald-500/50 disabled:opacity-50"
+                        [disabled]="pregenPdfLoadingId() === p.id"
+                        (click)="printPregenFullSheet(p)"
+                      >
+                        @if (pregenPdfLoadingId() === p.id) { PDF… }
+                        @else { PDF fiche complète }
+                      </button>
+                      <button
+                        type="button"
+                        class="px-3 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-300 hover:border-emerald-500/50 disabled:opacity-50"
+                        [disabled]="pregenPdfLoadingId() === p.id"
+                        (click)="viewPregenCharacter(p)"
+                      >
+                        Voir la fiche
+                      </button>
+                      <button
+                        type="button"
+                        class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white disabled:opacity-50"
+                        [disabled]="pregenPdfLoadingId() === p.id"
+                        (click)="claimPregen(p.id)"
+                      >
+                        Prendre ce personnage
+                      </button>
+                    </div>
                   </div>
                 }
               </div>
