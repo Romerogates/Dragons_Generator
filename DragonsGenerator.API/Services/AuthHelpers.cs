@@ -30,6 +30,20 @@ public class AdminSeedOptions
     public bool ResetPassword { get; set; }
 }
 
+/// <summary>Comptes de test créés automatiquement en Development (stack Docker locale).</summary>
+public class DevSeedOptions
+{
+    public bool Enabled { get; set; }
+    public List<DevSeedUser> Users { get; set; } = [];
+}
+
+public class DevSeedUser
+{
+    public string Email { get; set; } = "";
+    public string Password { get; set; } = "";
+    public string? DisplayName { get; set; }
+}
+
 public static class AuthHelpers
 {
     public static string HashPassword(string password) => BCrypt.Net.BCrypt.HashPassword(password);

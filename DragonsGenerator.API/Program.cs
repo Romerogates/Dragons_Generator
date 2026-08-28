@@ -16,6 +16,7 @@ builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp")
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 builder.Services.Configure<AppUrlOptions>(builder.Configuration.GetSection("App"));
 builder.Services.Configure<AdminSeedOptions>(builder.Configuration.GetSection("Admin"));
+builder.Services.Configure<DevSeedOptions>(builder.Configuration.GetSection("DevSeed"));
 
 var jwtOpt = builder.Configuration.GetSection("Jwt").Get<JwtOptions>() ?? new JwtOptions();
 var smtpHost = builder.Configuration["Smtp:Host"] ?? "log";

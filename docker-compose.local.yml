@@ -38,6 +38,14 @@ services:
       Jwt__Key: DragonsGenerator_Dev_Jwt_Key_ChangeInProd_32+
       Admin__Email: admin@dragons.local
       Admin__Password: AdminDragons!2026
+      # Comptes de test auto-créés (Development uniquement, email confirmé)
+      DevSeed__Enabled: "true"
+      DevSeed__Users__0__Email: anthony.martinr@hotmail.be
+      DevSeed__Users__0__Password: Ma3ds3ds
+      DevSeed__Users__0__DisplayName: Anthony
+      DevSeed__Users__1__Email: test@dragons.local
+      DevSeed__Users__1__Password: TestDragons!2026
+      DevSeed__Users__1__DisplayName: TestHero
     volumes:
       - dragons-api-data:/app/data
     env_file:
