@@ -333,7 +333,6 @@ public class ForgotPasswordEndpoint(
         var webBase = AuthHelpers.ResolveWebUrl(req.WebUrl, appUrl.Value.PublicWebUrl);
         var link =
             $"{webBase}/reset-password?token={Uri.EscapeDataString(user.PasswordResetToken)}";
-        var emailSent = false;
         try
         {
             await email.SendAsync(
@@ -347,7 +346,6 @@ public class ForgotPasswordEndpoint(
                 """,
                 ct
             );
-            emailSent = true;
         }
         catch (Exception ex)
         {
