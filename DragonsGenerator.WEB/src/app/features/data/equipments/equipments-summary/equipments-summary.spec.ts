@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { zonelessTestProviders } from '@testing/zoneless-test-providers';
 
 import { EquipmentsSummary } from './equipments-summary';
 
@@ -8,9 +9,9 @@ describe('EquipmentsSummary', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EquipmentsSummary]
-    })
-    .compileComponents();
+      imports: [EquipmentsSummary],
+      providers: zonelessTestProviders,
+    }).compileComponents();
 
     fixture = TestBed.createComponent(EquipmentsSummary);
     component = fixture.componentInstance;

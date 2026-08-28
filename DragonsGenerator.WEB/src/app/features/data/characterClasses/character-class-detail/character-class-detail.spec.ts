@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { zonelessTestProviders } from '@testing/zoneless-test-providers';
 
 import { CharacterClassDetail } from './character-class-detail';
 
@@ -8,12 +10,13 @@ describe('CharacterClassDetail', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CharacterClassDetail]
-    })
-    .compileComponents();
+      imports: [CharacterClassDetail],
+      providers: [...zonelessTestProviders, provideRouter([])],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(CharacterClassDetail);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('id', 'cls-barde');
     fixture.detectChanges();
   });
 

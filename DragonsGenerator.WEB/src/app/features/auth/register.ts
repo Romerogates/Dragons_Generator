@@ -38,6 +38,7 @@ export class RegisterPage implements OnInit {
   readonly resendLoading = signal(false);
   readonly loading = signal(false);
   readonly saveIntent = signal(false);
+  readonly localDev = signal(false);
 
   loginQueryParams: Record<string, string> = {};
 
@@ -50,6 +51,10 @@ export class RegisterPage implements OnInit {
       returnUrl,
       ...(intent ? { intent } : {}),
     };
+    if (typeof window !== 'undefined') {
+      const host = window.location.hostname;
+      this.localDev.set(host === 'localhost' || host === '127.0.0.1');
+    }
   }
 
   submit(): void {

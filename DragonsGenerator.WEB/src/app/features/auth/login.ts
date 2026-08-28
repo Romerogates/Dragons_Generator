@@ -39,6 +39,7 @@ export class LoginPage implements OnInit {
   readonly confirmLink = signal<string | null>(null);
   readonly mode = signal<'login' | 'forgot'>('login');
   readonly saveIntent = signal(false);
+  readonly localDev = signal(false);
 
   private returnUrl = '/characters';
 
@@ -46,6 +47,10 @@ export class LoginPage implements OnInit {
     const q = this.route.snapshot.queryParamMap;
     this.returnUrl = q.get('returnUrl') || '/characters';
     this.saveIntent.set(q.get('intent') === 'save' || this.pendingSave.hasPending());
+    if (typeof window !== 'undefined') {
+      const host = window.location.hostname;
+      this.localDev.set(host === 'localhost' || host === '127.0.0.1');
+    }
   }
 
   submitLogin(): void {

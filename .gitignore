@@ -26,6 +26,7 @@ bazel-out/
 
 # Test coverage
 coverage/
+TestResults/
 
 # Environment files (Security)
 .env

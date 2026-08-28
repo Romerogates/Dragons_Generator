@@ -8,7 +8,8 @@
       "@shared/*": ["./src/app/shared/*"],
       "@features/*": ["./src/app/features/*"],
       "@env/*": ["./src/environments/*"],
-      "@models/*":["./src/app/core/models/*"]
+      "@models/*":["./src/app/core/models/*"],
+      "@testing/*": ["./src/testing/*"]
     },
 
     /* --- Règles de rigueur (Strict Mode) --- */

@@ -1,0 +1,15 @@
+# Run API unit + integration tests inside SDK container (no local .NET SDK required).
+# Usage: docker compose -f docker-compose.test.yml run --rm api-tests
+
+services:
+  api-tests:
+    image: mcr.microsoft.com/dotnet/sdk:9.0
+    working_dir: /src
+    volumes:
+      - .:/src
+    command: >
+      dotnet test DragonsGenerator.API.Tests/DragonsGenerator.API.Tests.csproj
+      -c Release
+      --collect:"XPlat Code Coverage"
+      --results-directory /src/TestResults
+      --logger "trx;LogFileName=api-tests.trx"

@@ -9,6 +9,19 @@
       }
     </p>
 
+    @if (localDev()) {
+      <p class="text-[10px] text-sky-400/90 text-center mb-4 -mt-2">
+        Mode local : emails de test dans
+        <a
+          href="http://localhost:8025"
+          target="_blank"
+          rel="noopener"
+          class="underline hover:text-sky-300"
+          >MailHog (8025)</a
+        >.
+      </p>
+    }
+
     @if (success()) {
       <p class="text-sm text-emerald-400 text-center mb-4">
         {{ successMessage() || 'Compte créé.' }} Ouvre le lien pour activer ton compte, puis

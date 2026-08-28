@@ -88,6 +88,33 @@
           "options": {
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
+            "codeCoverage": true,
+            "karmaConfig": "karma.conf.js",
+            "browsers": ["ChromeHeadless"],
+            "reporters": ["progress", "coverage"],
+            "codeCoverageExclude": [
+              "src/**/*.spec.ts",
+              "src/main.ts",
+              "src/app/features/**",
+              "src/app/core/models/**",
+              "src/app/core/services/**",
+              "src/app/core/data/**",
+              "src/app/core/interceptors/**",
+              "src/app/core/routing/**",
+              "src/app/app.ts",
+              "src/app/app.config.ts",
+              "src/app/app.routes.ts",
+              "src/app/shared/**",
+              "src/testing/**",
+              "src/app/core/utils/progression-choices.util.ts",
+              "src/app/core/utils/class-resource-labels.ts",
+              "src/app/core/utils/class-data.adapter.ts",
+              "src/app/core/utils/background-data.adapter.ts",
+              "src/app/core/utils/creature-display.util.ts",
+              "src/app/core/utils/spell-display.util.ts",
+              "src/app/core/utils/story-creature-picker.util.ts",
+              "src/app/core/utils/support-download.util.ts"
+            ],
             "assets": [
               {
                 "glob": "**/*",

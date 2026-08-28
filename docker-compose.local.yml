@@ -26,18 +26,18 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: "8080"
       ConnectionStrings__Default: "Data Source=/app/data/dragons.db"
-      # SMTP : valeurs par défaut MailHog ; surchargées par .env si présent
-      Smtp__Host: ${Smtp__Host:-mailhog}
-      Smtp__Port: ${Smtp__Port:-1025}
-      Smtp__UseSsl: ${Smtp__UseSsl:-false}
-      Smtp__UserName: ${Smtp__UserName:-}
-      Smtp__Password: ${Smtp__Password:-}
-      Smtp__FromEmail: ${Smtp__FromEmail:-noreply@dragons-generator.local}
-      Smtp__FromName: ${Smtp__FromName:-Dragons Generator}
-      App__PublicWebUrl: ${App__PublicWebUrl:-http://localhost:8081}
+      # SMTP local : MailHog forcé (ne pas hériter du .env prod OVH)
+      Smtp__Host: mailhog
+      Smtp__Port: "1025"
+      Smtp__UseSsl: "false"
+      Smtp__UserName: ""
+      Smtp__Password: ""
+      Smtp__FromEmail: noreply@dragons-generator.local
+      Smtp__FromName: Dragons Generator
+      App__PublicWebUrl: http://localhost:8081
       Jwt__Key: DragonsGenerator_Dev_Jwt_Key_ChangeInProd_32+
-      Admin__Email: ${Admin__Email:-admin@dragons.local}
-      Admin__Password: ${Admin__Password:-AdminDragons!2026}
+      Admin__Email: admin@dragons.local
+      Admin__Password: AdminDragons!2026
     volumes:
       - dragons-api-data:/app/data
     env_file:

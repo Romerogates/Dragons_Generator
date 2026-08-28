@@ -226,7 +226,11 @@ public sealed class GameDataRepository
                 Type: GetEntryString(e, "category"),
                 Subtype: e.TryGetProperty("subcategory", out var sub) ? sub.GetString() : null,
                 Cost: cost,
-                WKg: e.TryGetProperty("weight_kg", out var w) && w.TryGetDouble(out var wd) ? wd : null);
+                WKg: e.TryGetProperty("weight_kg", out var w)
+                    && w.ValueKind == System.Text.Json.JsonValueKind.Number
+                    && w.TryGetDouble(out var wd)
+                    ? wd
+                    : null);
         }).ToList();
     }
 

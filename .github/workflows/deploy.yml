@@ -10,7 +10,43 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore API solution
+        run: dotnet restore DragonsGenerator.API.sln
+
+      - name: API tests
+        run: >
+          dotnet test DragonsGenerator.API.Tests/DragonsGenerator.API.Tests.csproj
+          -c Release --no-restore
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: DragonsGenerator.WEB/package-lock.json
+
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Angular tests
+        working-directory: DragonsGenerator.WEB
+        run: |
+          npm ci
+          npm test
+
   deploy:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Deploy over SSH
