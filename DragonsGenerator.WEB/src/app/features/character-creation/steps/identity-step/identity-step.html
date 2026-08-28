@@ -33,6 +33,7 @@
           >
           <input
             type="text"
+            data-testid="wizard-identity-name"
             [ngModel]="c().name"
             (ngModelChange)="updateIdentity('name', $event)"
             placeholder="Ex: Valerius l'Audacieux"

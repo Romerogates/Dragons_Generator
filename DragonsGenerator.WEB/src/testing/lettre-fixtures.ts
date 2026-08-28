@@ -24,6 +24,7 @@ export function createLettreClass(): CharacterClass {
           type: 'weapon_proficiency',
           quantity: 2,
           pool: ['wp-any'],
+          constraint_max_price_po: 25,
           unlocked_at_level: 1,
         },
         {

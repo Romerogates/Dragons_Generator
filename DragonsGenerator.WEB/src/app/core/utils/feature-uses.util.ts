@@ -78,6 +78,18 @@ export function extractScalarResources(
   return out;
 }
 
+/** Emplacements de sorts depuis `resources.spell_slots` (progression classe). */
+export function extractSpellSlotsFromResources(
+  resources: Record<string, unknown> | undefined,
+): { level: number; max: number }[] {
+  const raw = resources?.['spell_slots'];
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return [];
+  return Object.entries(raw as Record<string, unknown>)
+    .map(([lvl, max]) => ({ level: parseInt(lvl, 10), max: Number(max) }))
+    .filter((s) => !Number.isNaN(s.level) && s.level >= 1 && s.max > 0)
+    .sort((a, b) => a.level - b.level);
+}
+
 /**
  * Convertit uses / mechanics JSON en FeatureInstance.uses.
  * @param proficiencyBonus bonus de maîtrise (si formula = proficiency_bonus)

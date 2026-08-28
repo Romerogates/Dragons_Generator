@@ -182,11 +182,33 @@ export function extractProgressionChoices(
   // --- Root choice_pools ---
   for (const pool of cls.data.choice_pools ?? []) {
     if (!poolActiveAtLevel(pool, effective)) continue;
-    if (ROOT_SKIP_TYPES.has(String(pool.type ?? ''))) continue;
-    if (isFightingStylePool(pool)) continue;
 
     const type = String(pool.type ?? 'option');
     const qty = poolQuantityAtLevel(pool, effective);
+
+    if (type === 'weapon_proficiency' || type === 'tool_proficiency') {
+      push({
+        id: pool.id,
+        type,
+        label:
+          pool.name ??
+          (type === 'weapon_proficiency' ? 'Armes maîtrisées' : "Maîtrises d'outils"),
+        count: qty,
+        options: [],
+        deferred: true,
+        meta: {
+          poolIds: pool.pool ?? pool.options ?? [],
+          maxPricePo:
+            typeof pool.constraint_max_price_po === 'number'
+              ? pool.constraint_max_price_po
+              : undefined,
+        },
+      });
+      continue;
+    }
+
+    if (isFightingStylePool(pool)) continue;
+    if (ROOT_SKIP_TYPES.has(type)) continue;
 
     if (type === 'expertise' || type === 'expertise_proficiency') {
       push({
@@ -375,6 +397,40 @@ export function extractExpertiseChoices(
   return extractProgressionChoices(cls, level, maxLevel).filter(
     (c) => c.deferred && (c.type === 'expertise' || c.type === 'expertise_proficiency'),
   );
+}
+
+export function extractWeaponProficiencyChoices(
+  cls: any,
+  level: number,
+  maxLevel = PROGRESSION_MAX_LEVEL,
+): ProgressionChoiceDef[] {
+  return extractProgressionChoices(cls, level, maxLevel).filter(
+    (c) => c.deferred && c.type === 'weapon_proficiency',
+  );
+}
+
+export function extractToolProficiencyChoices(
+  cls: any,
+  level: number,
+  maxLevel = PROGRESSION_MAX_LEVEL,
+): ProgressionChoiceDef[] {
+  return extractProgressionChoices(cls, level, maxLevel).filter(
+    (c) => c.deferred && c.type === 'tool_proficiency',
+  );
+}
+
+/** Langues supplémentaires de classe (ex. Lettré ×3) → étape Langues. */
+export function classBonusLanguageCount(cls: any, level: number, maxLevel = PROGRESSION_MAX_LEVEL): number {
+  if (!cls?.data?.choice_pools) return 0;
+  const effective = Math.min(Math.max(1, level), maxLevel);
+  let total = 0;
+  for (const pool of cls.data.choice_pools) {
+    const type = String(pool.type ?? '');
+    if (type !== 'language_proficiency' && type !== 'language') continue;
+    if (!poolActiveAtLevel(pool, effective)) continue;
+    total += poolQuantityAtLevel(pool, effective);
+  }
+  return total;
 }
 
 export function classNeedsAsi(

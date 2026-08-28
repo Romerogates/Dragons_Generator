@@ -436,6 +436,86 @@
       </div>
     }
 
+    @if (classWeaponsNeeded() > 0) {
+      <div
+        class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl"
+        data-testid="wizard-class-weapons"
+      >
+        <div class="flex justify-between items-center mb-2">
+          <h4
+            class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
+          >
+            <iconify-icon icon="fluent-emoji:crossed-swords"></iconify-icon>
+            {{ classWeaponChoices()[0]?.label ?? 'Armes maîtrisées' }}
+          </h4>
+          <span
+            class="text-[10px] font-black uppercase tracking-widest"
+            [ngClass]="classWeaponsRemaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
+          >
+            {{ classWeaponsPicked() }} / {{ classWeaponsNeeded() }}
+          </span>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          @for (weapon of classWeaponOptions(); track weapon.id) {
+            <button
+              class="px-3 py-2 rounded-xl border-2 text-xs font-bold transition-[colors,transform,opacity,box-shadow] duration-150"
+              [ngClass]="
+                isClassWeaponSelected(weapon.id)
+                  ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
+                  : classWeaponsRemaining() === 0
+                    ? 'bg-slate-900 border-slate-800 text-slate-600 opacity-40 cursor-not-allowed'
+                    : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+              "
+              [disabled]="classWeaponsRemaining() === 0 && !isClassWeaponSelected(weapon.id)"
+              (click)="toggleClassWeapon(weapon.id)"
+            >
+              {{ weapon.name }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    @if (classToolsNeeded() > 0) {
+      <div
+        class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl"
+        data-testid="wizard-class-tools"
+      >
+        <div class="flex justify-between items-center mb-2">
+          <h4
+            class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
+          >
+            <iconify-icon icon="fluent-emoji:hammer-and-wrench"></iconify-icon>
+            {{ classToolChoices()[0]?.label ?? "Maîtrises d'outils" }}
+          </h4>
+          <span
+            class="text-[10px] font-black uppercase tracking-widest"
+            [ngClass]="classToolsRemaining() === 0 ? 'text-emerald-400' : 'text-slate-500'"
+          >
+            {{ classToolsPicked() }} / {{ classToolsNeeded() }}
+          </span>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          @for (tool of toolCatalog(); track tool.id) {
+            <button
+              class="px-3 py-2 rounded-xl border-2 text-xs font-bold transition-[colors,transform,opacity,box-shadow] duration-150"
+              [ngClass]="
+                isClassToolSelected(tool.id)
+                  ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
+                  : classToolsRemaining() === 0
+                    ? 'bg-slate-900 border-slate-800 text-slate-600 opacity-40 cursor-not-allowed'
+                    : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+              "
+              [disabled]="classToolsRemaining() === 0 && !isClassToolSelected(tool.id)"
+              (click)="toggleClassTool(tool.id)"
+            >
+              {{ tool.name }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
     @if (expertiseNeeded() > 0) {
       <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-violet-900/50 shadow-xl">
         <div class="flex justify-between items-center mb-2">

@@ -694,6 +694,10 @@ export interface CharacterCreation {
   classProgressionResources: Record<string, number | string | null>;
   /** Réponses aux choix de progression (ennemi, terrain, métamagie, invocations…). */
   classChoiceAnswers: Record<string, string[]>;
+  /** Langues supplémentaires de classe (ex. Lettré ×3). */
+  classBonusLanguageCount: number;
+  /** Emplacements de sorts issus de la progression JSON. */
+  classSpellSlots: { level: number; max: number }[];
   /** Bonus ASI (niv. 4+) appliqués après le point-buy — somme de tous les slots. */
   asiBonuses: Partial<AbilityScores>;
   /** Don choisi à la place d'un ASI (compat : premier don). */

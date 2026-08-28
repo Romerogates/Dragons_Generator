@@ -40,6 +40,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         @for (bg of backgrounds(); track bg.id) {
           <button
+            [attr.data-testid]="'wizard-bg-' + bg.id"
             class="perf-card group relative flex flex-col p-6 rounded-2xl border-2 transition-[colors,transform,opacity,box-shadow] duration-200 bg-[#171b22] text-left cursor-pointer hover:border-amber-500/50 hover:bg-[#1b2028] hover:scale-[1.02]"
             [ngClass]="{
               'border-emerald-500 bg-emerald-950/20 shadow-md':

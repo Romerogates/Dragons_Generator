@@ -76,6 +76,7 @@
               >
                 <button
                   type="button"
+                  [attr.data-testid]="'wizard-civ-' + civ.id"
                   class="relative w-11 h-11 sm:w-10 sm:h-10 flex items-center justify-center bg-[#1b2028]/95 border-2 border-amber-500/80 rounded-full text-lg shadow-sm active:scale-[1.02] hover:scale-[1.01] hover:border-amber-400 transition-transform"
                   (click)="selectCiv(civ.id, $event)"
                   [attr.aria-label]="civ.name"

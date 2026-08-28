@@ -61,6 +61,7 @@
         @for (card of currentCards(); track card.id; let i = $index) {
           <div
             class="species-carousel-card relative cursor-pointer group transition-[transform,opacity,filter] duration-200"
+            [attr.data-card-id]="card.id"
             [attr.data-carousel-index]="i"
             [ngClass]="{
               'z-30 opacity-100 scale-100': i === currentIndex(),

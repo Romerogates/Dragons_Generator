@@ -22,7 +22,7 @@ import {
   type SkillInfo,
 } from '@core/utils/skill.utils';
 import { labelForGameId } from '@core/utils/game-id-labels';
-import { extractExpertiseChoices } from '@core/utils/progression-choices.util';
+import { extractExpertiseChoices, extractWeaponProficiencyChoices, extractToolProficiencyChoices } from '@core/utils/progression-choices.util';
 
 export type { SkillInfo };
 
@@ -43,6 +43,7 @@ export class SkillsStep implements OnInit {
   readonly toolCatalog = signal<
     { id: string; name: string; type: string; subtype: string | null }[]
   >([]);
+  readonly weaponCatalog = signal<{ id: string; name: string; costPo: number }[]>([]);
 
   // === ÉTATS LOCAUX ===
   readonly selectedClassSkills = signal<string[]>([]);
@@ -56,6 +57,9 @@ export class SkillsStep implements OnInit {
   readonly expandedBgToolCategory = signal<string | null>(null);
   /** Compétences choisies pour l'expertise (roublard / barde / lettré). */
   readonly selectedExpertise = signal<string[]>([]);
+  /** Armes/outils de classe différés (ex. Lettré). */
+  readonly classWeaponAnswers = signal<Map<string, string[]>>(new Map());
+  readonly classToolAnswers = signal<Map<string, string[]>>(new Map());
   readonly classJson = signal<any>(null);
 
   // Pour les historiques personnalisés
@@ -67,6 +71,15 @@ export class SkillsStep implements OnInit {
     this.selectedBgSkills.set([...c.backgroundSkills]);
     this.selectedBgTools.set([...c.backgroundTools]);
     this.selectedExpertise.set([...(c.expertiseSkills ?? [])]);
+    const weaponMap = new Map<string, string[]>();
+    const toolMap = new Map<string, string[]>();
+    for (const [k, v] of Object.entries(c.classChoiceAnswers ?? {})) {
+      if (!Array.isArray(v) || !v.length) continue;
+      if (k.includes('weapons') || k.includes('weapon')) weaponMap.set(k, v);
+      else if (k.includes('tools') || k.includes('tool')) toolMap.set(k, v);
+    }
+    this.classWeaponAnswers.set(weaponMap);
+    this.classToolAnswers.set(toolMap);
     this.selectedSpeciesSkills.set([]);
     this.selectedSpeciesTools.set([]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -94,6 +107,15 @@ export class SkillsStep implements OnInit {
               name: e.name,
               type: String(e.type ?? '').toUpperCase(),
               subtype: e.subtype ? String(e.subtype).toLowerCase() : null,
+            })),
+        );
+        this.weaponCatalog.set(
+          items
+            .filter((e) => String(e.type ?? '').toUpperCase() === 'WEAPON')
+            .map((e) => ({
+              id: e.id,
+              name: e.name,
+              costPo: Number(e.cost?.v ?? e.cost ?? 0) || 0,
             })),
         );
       },
@@ -560,6 +582,102 @@ export class SkillsStep implements OnInit {
     Math.max(0, this.expertiseNeeded() - this.selectedExpertise().length),
   );
 
+  readonly classWeaponChoices = computed(() => {
+    const cls = this.classJson();
+    if (!cls) return [];
+    return extractWeaponProficiencyChoices(cls, this.builder.targetLevel());
+  });
+
+  readonly classToolChoices = computed(() => {
+    const cls = this.classJson();
+    if (!cls) return [];
+    return extractToolProficiencyChoices(cls, this.builder.targetLevel());
+  });
+
+  readonly classWeaponsNeeded = computed(() =>
+    this.classWeaponChoices().reduce((sum, c) => sum + (c.count || 0), 0),
+  );
+
+  readonly classToolsNeeded = computed(() =>
+    this.classToolChoices().reduce((sum, c) => sum + (c.count || 0), 0),
+  );
+
+  readonly classWeaponsPicked = computed(() =>
+    [...this.classWeaponAnswers().values()].reduce((sum, ids) => sum + ids.length, 0),
+  );
+
+  readonly classToolsPicked = computed(() =>
+    [...this.classToolAnswers().values()].reduce((sum, ids) => sum + ids.length, 0),
+  );
+
+  readonly classWeaponsRemaining = computed(() =>
+    Math.max(0, this.classWeaponsNeeded() - this.classWeaponsPicked()),
+  );
+
+  readonly classToolsRemaining = computed(() =>
+    Math.max(0, this.classToolsNeeded() - this.classToolsPicked()),
+  );
+
+  readonly classWeaponOptions = computed(() => {
+    const maxPrice = this.classWeaponChoices()[0]?.meta?.['maxPricePo'] as number | undefined;
+    const base = new Set(this.builder.creation().weaponProficiencies ?? []);
+    return this.weaponCatalog()
+      .filter((w) => {
+        if (base.has(w.id)) return false;
+        if (maxPrice != null && w.costPo > maxPrice) return false;
+        return true;
+      })
+      .sort((a, b) => a.name.localeCompare(b.name));
+  });
+
+  isClassWeaponSelected(weaponId: string): boolean {
+    for (const ids of this.classWeaponAnswers().values()) {
+      if (ids.includes(weaponId)) return true;
+    }
+    return false;
+  }
+
+  isClassToolSelected(toolId: string): boolean {
+    for (const ids of this.classToolAnswers().values()) {
+      if (ids.includes(toolId)) return true;
+    }
+    return false;
+  }
+
+  toggleClassWeapon(weaponId: string): void {
+    const choice = this.classWeaponChoices()[0];
+    if (!choice) return;
+    this.classWeaponAnswers.update((map) => {
+      const next = new Map(map);
+      const prev = [...(next.get(choice.id) ?? [])];
+      const idx = prev.indexOf(weaponId);
+      if (idx >= 0) {
+        prev.splice(idx, 1);
+      } else if (prev.length < choice.count) {
+        prev.push(weaponId);
+      }
+      next.set(choice.id, prev);
+      return next;
+    });
+  }
+
+  toggleClassTool(toolId: string): void {
+    const choice = this.classToolChoices()[0];
+    if (!choice) return;
+    this.classToolAnswers.update((map) => {
+      const next = new Map(map);
+      const prev = [...(next.get(choice.id) ?? [])];
+      const idx = prev.indexOf(toolId);
+      if (idx >= 0) {
+        prev.splice(idx, 1);
+      } else if (prev.length < choice.count) {
+        prev.push(toolId);
+      }
+      next.set(choice.id, prev);
+      return next;
+    });
+  }
+
   toggleExpertise(skillId: string): void {
     const id = normalizeSkillId(skillId);
     const current = this.selectedExpertise().map(normalizeSkillId);
@@ -576,6 +694,8 @@ export class SkillsStep implements OnInit {
     if (this.speciesSkillsRemaining() > 0) return false;
     if (this.speciesToolsRemaining() > 0) return false;
     if (this.expertiseRemaining() > 0) return false;
+    if (this.classWeaponsRemaining() > 0) return false;
+    if (this.classToolsRemaining() > 0) return false;
 
     if (this.isCustomBg()) {
       if (this.customBgToolsRemaining() > 0) return false;
@@ -715,6 +835,15 @@ export class SkillsStep implements OnInit {
       bgSlots,
     );
     this.builder.setExpertiseSkills(this.selectedExpertise());
+
+    const extraWeapons = [...this.classWeaponAnswers().values()].flat();
+    const extraTools = [...this.classToolAnswers().values()].flat();
+    const profAnswers: Record<string, string[]> = {};
+    for (const [k, v] of this.classWeaponAnswers()) profAnswers[k] = v;
+    for (const [k, v] of this.classToolAnswers()) profAnswers[k] = v;
+    if (extraWeapons.length || extraTools.length || Object.keys(profAnswers).length) {
+      this.builder.mergeClassProficiencies(extraWeapons, extraTools, profAnswers);
+    }
 
     this.builder.nextStep();
   }

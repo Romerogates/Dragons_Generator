@@ -32,6 +32,7 @@
           <span class="text-sm leading-none pt-0.5">▶</span> Reprendre
         </button>
         <button
+          data-testid="wizard-draft-restart"
           class="flex-1 px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 hover:text-white hover:border-slate-500 transition-[colors,transform,opacity,box-shadow] duration-200 flex justify-center items-center gap-2"
           (click)="startFresh()"
         >
@@ -71,6 +72,7 @@
             >
           } @else {
             <select
+              data-testid="wizard-level-select"
               class="w-11 shrink-0 bg-[#171b22] border border-slate-700 rounded-lg px-1 py-1 text-amber-400 text-xs font-bold text-center tabular-nums appearance-none focus:outline-none focus:border-amber-500/50 cursor-pointer"
               [value]="builder.targetLevel()"
               (change)="onLevelChange($event)"

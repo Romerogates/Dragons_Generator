@@ -123,6 +123,10 @@ export interface ClassSelection {
   classFeatures: FeatureInstance[];
   startingEquipmentSlots: EquipmentSlot[];
   classProgressionResources?: Record<string, number | string | null>;
+  /** Langues bonus de classe (ex. Lettré) — fusionnées dans bonusLanguageCount. */
+  classBonusLanguageCount?: number;
+  /** Emplacements de sorts au niveau cible (JSON progression). */
+  classSpellSlots?: { level: number; max: number }[];
 }
 
 export interface IdentitySelection {
@@ -205,6 +209,8 @@ const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   classFeatures: [],
   startingEquipmentSlots: [],
   classProgressionResources: {},
+  classBonusLanguageCount: 0,
+  classSpellSlots: [],
   classChoiceAnswers: {},
   asiBonuses: {},
   selectedFeatId: null,
@@ -814,7 +820,10 @@ export class CharacterBuilderService {
 
   setClass(selection: ClassSelection, opts?: { preserveProgress?: boolean }): void {
     const preserve = opts?.preserveProgress === true;
-    this.creation.update((c) => ({
+    this.creation.update((c) => {
+      const prevClassLang = c.classBonusLanguageCount ?? 0;
+      const newClassLang = selection.classBonusLanguageCount ?? 0;
+      return {
       ...c,
       classId: selection.classId,
       className: selection.className,
@@ -841,6 +850,9 @@ export class CharacterBuilderService {
       classFeatures: selection.classFeatures,
       startingEquipmentSlots: selection.startingEquipmentSlots,
       classProgressionResources: selection.classProgressionResources ?? {},
+      classBonusLanguageCount: newClassLang,
+      classSpellSlots: selection.classSpellSlots ?? [],
+      bonusLanguageCount: (c.bonusLanguageCount || 0) - prevClassLang + newClassLang,
       classChoiceAnswers: preserve ? c.classChoiceAnswers : {},
       asiBonuses: preserve ? c.asiBonuses : {},
       selectedFeatId: preserve ? c.selectedFeatId : null,
@@ -856,6 +868,21 @@ export class CharacterBuilderService {
       selectedSkills: preserve ? c.selectedSkills : [],
       selectedEquipment: preserve ? c.selectedEquipment : [],
       spellcastingDetails: preserve ? c.spellcastingDetails : {},
+    };
+    });
+  }
+
+  /** Fusionne les maîtrises d'armes/outils choisies à l'étape Savoirs. */
+  mergeClassProficiencies(
+    extraWeapons: string[],
+    extraTools: string[],
+    choiceAnswers: Record<string, string[]>,
+  ): void {
+    this.creation.update((c) => ({
+      ...c,
+      weaponProficiencies: [...new Set([...(c.weaponProficiencies ?? []), ...extraWeapons])],
+      toolProficiencies: [...new Set([...(c.toolProficiencies ?? []), ...extraTools])],
+      classChoiceAnswers: { ...c.classChoiceAnswers, ...choiceAnswers },
     }));
   }
 
@@ -966,6 +993,9 @@ export class CharacterBuilderService {
       classFeatures: [],
       startingEquipmentSlots: [],
       classProgressionResources: {},
+      classBonusLanguageCount: 0,
+      classSpellSlots: [],
+      bonusLanguageCount: (c.bonusLanguageCount || 0) - (c.classBonusLanguageCount || 0),
       classChoiceAnswers: {},
       asiBonuses: {},
       selectedFeatId: null,
@@ -1212,6 +1242,8 @@ export class CharacterBuilderService {
       ),
       startingEquipmentSlots: [],
       classProgressionResources: {},
+      classBonusLanguageCount: 0,
+      classSpellSlots: [],
       classChoiceAnswers: {},
       asiBonuses: {},
       selectedFeatId: null,
@@ -1524,7 +1556,10 @@ export class CharacterBuilderService {
     const focus = this.detectFocus(c);
     const level = Math.min(20, Math.max(1, c.targetLevel || 1));
     const prof = proficiencyBonusForLevel(level);
-    const slots = this.spellSlotsForLevel(c.spellcastingKind, level).map((s) => ({ ...s, used: 0 }));
+    const slots = this.spellSlotsForLevel(c.spellcastingKind, level, c.classSpellSlots).map((s) => ({
+      ...s,
+      used: 0,
+    }));
     const base = {
       ability: c.spellcastingAbility,
       spellSaveDC: 8 + prof + spellMod,
@@ -1691,8 +1726,10 @@ export class CharacterBuilderService {
   private spellSlotsForLevel(
     kind: SpellcastingKind | null,
     level: number,
+    jsonSlots?: { level: number; max: number }[],
   ): { level: number; max: number }[] {
     if (!kind) return [];
+    if (jsonSlots?.length) return jsonSlots.map((s) => ({ ...s }));
     const lvl = Math.min(20, Math.max(1, level));
 
     const FULL: Record<number, number[]> = {

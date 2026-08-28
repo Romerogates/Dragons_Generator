@@ -28,10 +28,12 @@ import { metamagicLabel } from '@core/data/metamagic-labels.data';
 import {
   resolveFeatureUses,
   extractScalarResources,
+  extractSpellSlotsFromResources,
 } from '@core/utils/feature-uses.util';
 import { annotateAuraDesc } from '@core/utils/aura-range.util';
 import {
   extractProgressionChoices,
+  classBonusLanguageCount,
   type ProgressionChoiceDef,
 } from '@core/utils/progression-choices.util';
 import type {
@@ -1043,6 +1045,8 @@ export class ClassStep implements OnInit {
 
       const progAtLevel = progression.find((p) => p.level === targetLevel);
       const classProgressionResources = extractScalarResources(progAtLevel?.resources);
+      const classSpellSlots = extractSpellSlotsFromResources(progAtLevel?.resources);
+      const langBonus = classBonusLanguageCount(cls, targetLevel);
 
       const data = cls.data as Record<string, unknown>;
       const selection: ClassSelection = {
@@ -1069,6 +1073,8 @@ export class ClassStep implements OnInit {
         classFeatures: features,
         startingEquipmentSlots: cls.data.starting_equipment ?? [],
         classProgressionResources,
+        classBonusLanguageCount: langBonus,
+        classSpellSlots,
       };
 
       this.builder.setClass(selection, { preserveProgress: !!this.builder.creation().classId });

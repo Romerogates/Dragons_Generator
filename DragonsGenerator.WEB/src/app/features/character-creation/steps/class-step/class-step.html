@@ -52,6 +52,7 @@
         @for (card of currentCards(); track card.id; let i = $index) {
           <div
             class="species-carousel-card relative cursor-pointer group transition-[transform,opacity,filter] duration-200"
+            [attr.data-card-id]="card.id"
             [attr.data-carousel-index]="i"
             [ngClass]="{
               'z-30 opacity-100 scale-100': i === currentIndex(),
@@ -105,6 +106,7 @@
           @for (card of currentCards(); track card.id; let i = $index) {
             <div
               class="relative w-72 sm:w-80 h-[min(440px,62dvh)] sm:h-[440px] cursor-pointer group transition-[transform,opacity,filter] duration-200 shrink-0"
+              [attr.data-card-id]="card.id"
               [style.left]="getWrapOffset(i)"
               [ngClass]="{
                 'scale-[1.04] z-30 opacity-100': i === normalizedIndex(),

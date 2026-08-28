@@ -45,8 +45,51 @@ jobs:
           npm ci
           npm test
 
-  deploy:
+  e2e:
     needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: DragonsGenerator.WEB/package-lock.json
+
+      - name: Start local stack
+        run: |
+          docker compose -f docker-compose.local.yml up -d --build
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:8081/ >/dev/null \
+              && curl -sf http://localhost:8081/api/species/summary >/dev/null; then
+              echo "Stack ready after ${i} attempt(s)"
+              exit 0
+            fi
+            echo "Waiting for stack… ($i/60)"
+            sleep 5
+          done
+          echo "Stack failed to become ready"
+          docker compose -f docker-compose.local.yml logs
+          exit 1
+
+      - name: Playwright E2E (Lettré L1)
+        working-directory: DragonsGenerator.WEB
+        env:
+          E2E_BASE_URL: http://localhost:8081
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npm run e2e
+
+      - name: Stop local stack
+        if: always()
+        run: docker compose -f docker-compose.local.yml down -v
+
+  deploy:
+    needs: [test, e2e]
     runs-on: ubuntu-latest
     steps:
       - name: Deploy over SSH
