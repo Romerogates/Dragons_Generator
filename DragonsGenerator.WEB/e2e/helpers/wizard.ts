@@ -1,6 +1,5 @@
 import { expect, type Page } from '@playwright/test';
 
-const CAROUSEL_DELAY_MS = 250;
 const isCi = !!process.env['CI'];
 
 /** Titres affichés sur les cartes (fallback si data-card-id absent). */
@@ -44,55 +43,51 @@ async function isCarouselCardCentered(page: Page, cardId: string): Promise<boole
 }
 
 export type PickCarouselOptions = {
-  /** 2 = centrer puis sélectionner (espèce). 1 = sélection directe (classe, astuces…). */
+  /** @deprecated Ignoré — un seul clic suffit une fois la carte centrée. */
   clickCount?: 1 | 2;
 };
 
-/** Clic(s) carrousel — centrer si besoin puis sélectionner. */
+/**
+ * Sélectionne une carte carrousel.
+ * L'app centre d'abord (flèches ou clic sur carte latérale), puis un clic sur la carte centrée valide.
+ */
 export async function pickCarouselCard(
   page: Page,
   cardId: string,
-  options: PickCarouselOptions = {},
+  _options: PickCarouselOptions = {},
 ): Promise<void> {
-  const clickCount = options.clickCount ?? 2;
-  const carouselDelay = isCi ? 400 : CAROUSEL_DELAY_MS;
   const clickTimeout = isCi ? 15_000 : 5_000;
-  const settleDelay = isCi ? 350 : 150;
+  const settleDelay = isCi ? 400 : 200;
+  const scrollDelay = isCi ? 500 : 350;
   const nextBtn = page.getByRole('button', { name: 'Carte suivante' }).filter({ visible: true }).first();
 
   for (let attempt = 0; attempt < 50; attempt++) {
-    const card = visibleCarouselCard(page, cardId);
-    if ((await card.count()) === 0) {
-      if (await nextBtn.isVisible().catch(() => false)) {
-        await nextBtn.click();
-        await page.waitForTimeout(settleDelay);
-        continue;
-      }
+    if ((await visibleCarouselCard(page, cardId).count()) > 0 && (await isCarouselCardCentered(page, cardId))) {
       break;
     }
 
-    if (!(await isCarouselCardCentered(page, cardId))) {
-      if (await nextBtn.isVisible().catch(() => false)) {
-        await nextBtn.click();
-        await page.waitForTimeout(settleDelay);
-        continue;
-      }
+    if (await nextBtn.isVisible().catch(() => false)) {
+      await nextBtn.click();
+      await page.waitForTimeout(settleDelay);
+      continue;
     }
 
-    await page.waitForTimeout(settleDelay);
-
-    for (let c = 0; c < clickCount; c++) {
-      const freshCard = visibleCarouselCard(page, cardId);
-      await freshCard.waitFor({ state: 'visible', timeout: clickTimeout });
-      await freshCard.click({ timeout: clickTimeout });
-      if (c < clickCount - 1) {
-        await page.waitForTimeout(carouselDelay);
-      }
+    const sideCard = visibleCarouselCard(page, cardId);
+    if ((await sideCard.count()) > 0) {
+      await sideCard.click({ timeout: clickTimeout });
+      await page.waitForTimeout(scrollDelay);
+      continue;
     }
-    return;
+
+    break;
   }
 
-  throw new Error(`Carte carrousel introuvable : ${cardId}`);
+  if (!(await isCarouselCardCentered(page, cardId))) {
+    throw new Error(`Carte carrousel introuvable ou non centrée : ${cardId}`);
+  }
+
+  const centered = visibleCarouselCard(page, cardId);
+  await centered.click({ timeout: clickTimeout });
 }
 
 export async function incrementAbility(page: Page, label: string, times: number): Promise<void> {
