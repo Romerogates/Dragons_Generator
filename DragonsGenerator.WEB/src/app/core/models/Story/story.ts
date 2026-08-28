@@ -2,6 +2,10 @@ export type CreatureRole = 'antagonist' | 'ally' | 'neutral' | 'wildcard';
 
 export type AdventureTone = 'classic' | 'dark' | 'heroic' | 'humorous' | 'mysterious';
 
+export type StoryRegionChoice =
+  | { kind: 'unknown' }
+  | { kind: 'civilization'; id: string; name: string };
+
 export interface StoryCreatureSelection {
   creatureId: string;
   creatureName: string;
@@ -10,18 +14,6 @@ export interface StoryCreatureSelection {
   customName: string;
   role: CreatureRole;
   backstory: string;
-}
-
-export interface RpgStory {
-  id: string;
-  title: string;
-  setting: string;
-  partyLevel: number;
-  tone: AdventureTone;
-  creatures: StoryCreatureSelection[];
-  adventure: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface GenerateCreatureStoryRequest {

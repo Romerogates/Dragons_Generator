@@ -27,6 +27,8 @@ export const EANA_MAP_COORDS: Record<string, { x: number; y: number }> = {
   'civ-shi-huang': { x: 93.1, y: 80.8 },
 };
 
+export const UNKNOWN_REGION_LABEL = 'Région inconnue';
+
 export function getEanaMapCoordinates(id: string): { x: number; y: number } {
   return EANA_MAP_COORDS[id] ?? { x: 50, y: 50 };
 }

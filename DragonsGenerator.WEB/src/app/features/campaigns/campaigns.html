@@ -31,6 +31,12 @@
     }
   </header>
 
+  @if (actionError(); as err) {
+    <div class="mb-6 p-3 bg-red-950/40 border border-red-900/50 rounded-xl text-sm text-red-300 max-w-3xl mx-auto">
+      {{ err }}
+    </div>
+  }
+
   @if (!isLoggedIn()) {
     <div
       class="flex flex-col items-center justify-center flex-grow bg-[#1b2028] border border-dashed border-slate-700 rounded-3xl p-12 text-center shadow-inner"
@@ -154,7 +160,11 @@
                 {{ c.title }}
               </h2>
               <p class="text-xs font-black uppercase tracking-widest text-slate-500 mb-6 truncate">
-                {{ c.playerCount }} joueur{{ c.playerCount > 1 ? 's' : '' }} · Campagne cloud
+                @if (c.regionName) {
+                  {{ c.regionName }} ·
+                }
+                {{ c.playerCount }} joueur{{ c.playerCount > 1 ? 's' : '' }} ·
+                {{ c.role === 'dm' ? 'MJ' : 'Joueur' }}
               </p>
 
               <div class="flex gap-4 mt-auto">
@@ -162,16 +172,14 @@
                   class="flex flex-col items-center bg-[#171b22] border border-slate-700/50 rounded-xl p-3 flex-1 shadow-inner"
                 >
                   <span class="text-[9px] font-black uppercase tracking-widest text-violet-500/80 mb-1"
-                    >Rôle</span
+                    >Région</span
                   >
                   <div class="flex items-center gap-1.5">
                     <span class="text-sm"
-                      ><iconify-icon
-                        [icon]="c.role === 'dm' ? 'fluent-emoji:crown' : 'fluent-emoji:bust-in-silhouette'"
-                      ></iconify-icon
+                      ><iconify-icon icon="fluent-emoji:world-map"></iconify-icon
                     ></span>
-                    <span class="text-sm font-serif text-violet-300">{{
-                      c.role === 'dm' ? 'Maître du jeu' : 'Joueur'
+                    <span class="text-sm font-serif text-violet-300 truncate max-w-[7rem]">{{
+                      c.regionName || '—'
                     }}</span>
                   </div>
                 </div>
@@ -199,16 +207,34 @@
               </span>
               <div class="flex gap-2">
                 <button
-                  class="w-8 h-8 rounded-lg bg-[#1b2028] border border-slate-700 flex items-center justify-center text-xs text-slate-400 hover:text-violet-400 hover:border-violet-500/50 transition-[colors,transform,opacity,box-shadow] duration-200"
+                  class="w-8 h-8 rounded-lg bg-[#1b2028] border border-slate-700 flex items-center justify-center text-xs text-slate-400 hover:text-violet-400 hover:border-violet-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-40"
                   title="Ouvrir"
+                  [disabled]="isCardBusy(c)"
                   (click)="open(c); $event.stopPropagation()"
                 >
                   <iconify-icon icon="fluent-emoji:open-book"></iconify-icon>
                 </button>
                 @if (c.role === 'dm') {
                   <button
-                    class="w-8 h-8 rounded-lg bg-red-950/30 border border-red-900/50 flex items-center justify-center text-xs text-red-500 hover:bg-red-900/50 hover:text-red-400 transition-[colors,transform,opacity,box-shadow] duration-200"
+                    class="w-8 h-8 rounded-lg bg-[#1b2028] border border-slate-700 flex items-center justify-center text-xs text-slate-400 hover:text-amber-400 hover:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-40"
+                    title="PDF Bestiaire"
+                    [disabled]="isCardBusy(c)"
+                    (click)="downloadBestiary(c, $event)"
+                  >
+                    <iconify-icon icon="fluent-emoji:page-facing-up"></iconify-icon>
+                  </button>
+                  <button
+                    class="w-8 h-8 rounded-lg bg-[#1b2028] border border-slate-700 flex items-center justify-center text-xs text-slate-400 hover:text-emerald-400 hover:border-emerald-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-40"
+                    title="Dupliquer"
+                    [disabled]="isCardBusy(c)"
+                    (click)="duplicateCampaign(c, $event)"
+                  >
+                    <iconify-icon icon="fluent-emoji:clipboard"></iconify-icon>
+                  </button>
+                  <button
+                    class="w-8 h-8 rounded-lg bg-red-950/30 border border-red-900/50 flex items-center justify-center text-xs text-red-500 hover:bg-red-900/50 hover:text-red-400 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-40"
                     title="Supprimer"
+                    [disabled]="isCardBusy(c)"
                     (click)="confirmDelete(c); $event.stopPropagation()"
                   >
                     <iconify-icon icon="fluent-emoji:wastebasket"></iconify-icon>
@@ -258,19 +284,24 @@
           />
         </label>
 
+        @if (deleteError(); as err) {
+          <p class="text-sm text-red-400 mb-4 w-full">{{ err }}</p>
+        }
+
         <div class="flex gap-4 w-full">
           <button
             class="flex-1 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-[#171b22] text-slate-300 border border-slate-700 hover:bg-slate-800 transition-[colors,transform,opacity,box-shadow] duration-200"
+            [disabled]="deleting()"
             (click)="cancelDelete()"
           >
             Annuler
           </button>
           <button
             class="flex-1 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-red-600 text-white shadow-sm hover:bg-red-500 active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-            [disabled]="!canConfirmDelete()"
+            [disabled]="!canConfirmDelete() || deleting()"
             (click)="deleteCampaign()"
           >
-            Supprimer
+            @if (deleting()) { Suppression... } @else { Supprimer }
           </button>
         </div>
       </div>

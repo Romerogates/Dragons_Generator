@@ -98,6 +98,8 @@ export class CampaignCloudService {
     if (!raw) return base;
     return {
       setting: raw.setting ?? base.setting,
+      regionId: raw.regionId ?? base.regionId,
+      regionName: raw.regionName ?? base.regionName,
       partyLevel: raw.partyLevel ?? base.partyLevel,
       tone: raw.tone ?? base.tone,
       adventure: raw.adventure ?? base.adventure,

@@ -2,20 +2,21 @@ import { Injectable, computed, effect, signal } from '@angular/core';
 import {
   AdventureTone,
   CreatureRole,
-  RpgStory,
   StoryCreatureSelection,
+  StoryRegionChoice,
 } from '../models/Story/story';
+import { CampaignData, CampaignDetail, EncounterGroup, emptyCampaignData } from '../models/Campaign/campaign';
 import { CreatureSummary } from '../models/Creatures/creature-summary';
 import {
   getLevelRangePreset,
   partyLevelFromRange,
   pickCreaturesForLevelRange,
 } from '../utils/story-creature-picker.util';
+import { campaignRegionFields, campaignRegionFromData } from '../utils/story-location.util';
 
 export type CreatureSelectionMode = 'manual' | 'auto';
 
 const STORAGE_KEY = 'dragon_story_builder_v1';
-const SAVED_STORIES_KEY = 'dragons-stories';
 
 export interface StoryStep {
   number: number;
@@ -29,6 +30,7 @@ export class StoryBuilderService {
 
   readonly title = signal('');
   readonly setting = signal('');
+  readonly region = signal<StoryRegionChoice | null>(null);
   readonly partyLevel = signal(3);
   readonly tone = signal<AdventureTone>('classic');
   readonly creatures = signal<StoryCreatureSelection[]>([]);
@@ -36,6 +38,13 @@ export class StoryBuilderService {
   readonly selectionMode = signal<CreatureSelectionMode>('auto');
   readonly levelRangeId = signal('3-4');
   readonly autoCreatureCount = signal(4);
+
+  /** When set, the wizard updates this cloud campaign instead of creating a new one. */
+  readonly editingCampaignId = signal<string | null>(null);
+  readonly preservedEncounters = signal<EncounterGroup[]>([]);
+  readonly preservedNotes = signal('');
+
+  readonly isEditingCampaign = computed(() => this.editingCampaignId() !== null);
 
   readonly steps = computed<StoryStep[]>(() => [
     { number: 1, title: 'Créatures' },
@@ -73,7 +82,11 @@ export class StoryBuilderService {
       case 2:
         return this.creatures().every((c) => c.customName.trim().length >= 2);
       case 3:
-        return this.title().trim().length >= 3 && !!this.adventure().trim();
+        return (
+          this.title().trim().length >= 3 &&
+          !!this.adventure().trim() &&
+          this.region() !== null
+        );
       case 4:
         return true;
       default:
@@ -156,10 +169,45 @@ export class StoryBuilderService {
     this.adventure.set(text);
   }
 
+  setRegion(region: StoryRegionChoice): void {
+    this.region.set(region);
+  }
+
+  loadCampaignIntoBuilder(campaign: CampaignDetail): void {
+    this.editingCampaignId.set(campaign.id);
+    this.preservedEncounters.set(structuredClone(campaign.data.encounters ?? []));
+    this.preservedNotes.set(campaign.data.notes ?? '');
+    this.title.set(campaign.title);
+    this.setting.set(campaign.data.setting ?? '');
+    this.region.set(campaignRegionFromData(campaign.data.regionId, campaign.data.regionName));
+    this.partyLevel.set(campaign.data.partyLevel);
+    this.tone.set(campaign.data.tone);
+    this.creatures.set(structuredClone(campaign.data.creatures ?? []));
+    this.adventure.set(campaign.data.adventure ?? '');
+    this.selectionMode.set('manual');
+    this.currentStep.set(1);
+  }
+
+  buildCampaignData(): CampaignData {
+    const regionFields = campaignRegionFields(this.region());
+    return {
+      ...emptyCampaignData(this.partyLevel()),
+      setting: this.setting().trim(),
+      ...regionFields,
+      partyLevel: this.partyLevel(),
+      tone: this.tone(),
+      adventure: this.adventure().trim(),
+      creatures: this.creatures(),
+      encounters: structuredClone(this.preservedEncounters()),
+      notes: this.preservedNotes(),
+    };
+  }
+
   reset(): void {
     this.currentStep.set(1);
     this.title.set('');
     this.setting.set('');
+    this.region.set(null);
     this.partyLevel.set(3);
     this.tone.set('classic');
     this.creatures.set([]);
@@ -167,52 +215,10 @@ export class StoryBuilderService {
     this.selectionMode.set('auto');
     this.levelRangeId.set('3-4');
     this.autoCreatureCount.set(4);
+    this.editingCampaignId.set(null);
+    this.preservedEncounters.set([]);
+    this.preservedNotes.set('');
     localStorage.removeItem(STORAGE_KEY);
-  }
-
-  saveToLibrary(): RpgStory {
-    const now = new Date().toISOString();
-    const story: RpgStory = {
-      id: crypto.randomUUID?.() ?? `story-${Date.now()}`,
-      title: this.title().trim() || 'Aventure sans titre',
-      setting: this.setting().trim(),
-      partyLevel: this.partyLevel(),
-      tone: this.tone(),
-      creatures: this.creatures(),
-      adventure: this.adventure(),
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    const saved = this.loadSavedStories();
-    saved.unshift(story);
-    localStorage.setItem(SAVED_STORIES_KEY, JSON.stringify(saved));
-    return story;
-  }
-
-  loadSavedStories(): RpgStory[] {
-    try {
-      const raw = localStorage.getItem(SAVED_STORIES_KEY);
-      return raw ? (JSON.parse(raw) as RpgStory[]) : [];
-    } catch {
-      return [];
-    }
-  }
-
-  deleteSavedStory(id: string): void {
-    const saved = this.loadSavedStories().filter((s) => s.id !== id);
-    localStorage.setItem(SAVED_STORIES_KEY, JSON.stringify(saved));
-  }
-
-  loadStoryIntoBuilder(story: RpgStory): void {
-    this.title.set(story.title);
-    this.setting.set(story.setting);
-    this.partyLevel.set(story.partyLevel);
-    this.tone.set(story.tone);
-    this.creatures.set(story.creatures);
-    this.adventure.set(story.adventure);
-    this.selectionMode.set('manual');
-    this.currentStep.set(4);
   }
 
   private saveDraft(): void {
@@ -220,6 +226,7 @@ export class StoryBuilderService {
       currentStep: this.currentStep(),
       title: this.title(),
       setting: this.setting(),
+      region: this.region(),
       partyLevel: this.partyLevel(),
       tone: this.tone(),
       creatures: this.creatures(),
@@ -227,6 +234,9 @@ export class StoryBuilderService {
       selectionMode: this.selectionMode(),
       levelRangeId: this.levelRangeId(),
       autoCreatureCount: this.autoCreatureCount(),
+      editingCampaignId: this.editingCampaignId(),
+      preservedEncounters: this.preservedEncounters(),
+      preservedNotes: this.preservedNotes(),
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
   }
@@ -239,6 +249,7 @@ export class StoryBuilderService {
       if (draft.currentStep) this.currentStep.set(draft.currentStep);
       if (draft.title) this.title.set(draft.title);
       if (draft.setting) this.setting.set(draft.setting);
+      if (draft.region) this.region.set(draft.region);
       if (draft.partyLevel) this.partyLevel.set(draft.partyLevel);
       if (draft.tone) this.tone.set(draft.tone);
       if (Array.isArray(draft.creatures)) this.creatures.set(draft.creatures);
@@ -246,6 +257,13 @@ export class StoryBuilderService {
       if (draft.selectionMode) this.selectionMode.set(draft.selectionMode);
       if (draft.levelRangeId) this.levelRangeId.set(draft.levelRangeId);
       if (draft.autoCreatureCount) this.autoCreatureCount.set(draft.autoCreatureCount);
+      if (draft.editingCampaignId) this.editingCampaignId.set(draft.editingCampaignId);
+      if (Array.isArray(draft.preservedEncounters)) {
+        this.preservedEncounters.set(draft.preservedEncounters);
+      }
+      if (typeof draft.preservedNotes === 'string') {
+        this.preservedNotes.set(draft.preservedNotes);
+      }
     } catch {
       /* ignore corrupt draft */
     }

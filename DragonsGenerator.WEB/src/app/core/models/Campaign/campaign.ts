@@ -25,6 +25,8 @@ export interface EncounterGroup {
 
 export interface CampaignData {
   setting: string;
+  regionId: string | null;
+  regionName: string;
   partyLevel: number;
   tone: AdventureTone;
   adventure: string;
@@ -54,6 +56,7 @@ export interface CampaignSummary {
   role: 'dm' | 'player';
   updatedAt: string;
   playerCount: number;
+  regionName?: string | null;
 }
 
 export interface CampaignDetail {
@@ -89,6 +92,8 @@ export interface CampaignInvite {
 export function emptyCampaignData(partyLevel = 3): CampaignData {
   return {
     setting: '',
+    regionId: null,
+    regionName: '',
     partyLevel,
     tone: 'classic',
     adventure: '',

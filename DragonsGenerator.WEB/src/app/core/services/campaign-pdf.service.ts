@@ -298,7 +298,11 @@ export class CampaignPdfService {
     pdf.text(subtitle ?? 'Pack Maître du Jeu — Dragons', PAGE_W / 2, 95, { align: 'center' });
     if (data) {
       pdf.setFontSize(10);
-      const info = [`Niveau des héros : ${data.partyLevel}`, data.setting?.trim()].filter(Boolean);
+      const info = [
+        `Niveau des héros : ${data.partyLevel}`,
+        data.regionName?.trim(),
+        data.setting?.trim(),
+      ].filter(Boolean);
       let y = 110;
       for (const line of info) {
         pdf.text(line!, PAGE_W / 2, y, { align: 'center' });

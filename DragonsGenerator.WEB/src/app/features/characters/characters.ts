@@ -34,6 +34,8 @@ export class Characters implements OnInit {
   readonly characters = signal<any[]>([]);
   readonly characterToDelete = signal<any | null>(null);
   readonly deleteConfirmName = signal('');
+  readonly deleteError = signal<string | null>(null);
+  readonly deleting = signal(false);
   readonly isLoggedIn = this.auth.isLoggedIn;
   readonly loading = signal(true);
 
@@ -216,11 +218,13 @@ export class Characters implements OnInit {
   confirmDelete(character: any, event: Event): void {
     event.stopPropagation();
     this.deleteConfirmName.set('');
+    this.deleteError.set(null);
     this.characterToDelete.set(character);
   }
 
   cancelDelete(): void {
     this.deleteConfirmName.set('');
+    this.deleteError.set(null);
     this.characterToDelete.set(null);
   }
 
@@ -232,15 +236,32 @@ export class Characters implements OnInit {
 
   deleteCharacter(): void {
     const toDelete = this.characterToDelete();
-    if (!toDelete || !this.canConfirmDelete()) return;
+    if (!toDelete || !this.canConfirmDelete() || this.deleting()) return;
 
-    this.characters.update((chars) => chars.filter((c) => c.id !== toDelete.id));
-    localStorage.setItem('dragons-characters', JSON.stringify(this.characters()));
-    this.deleteConfirmName.set('');
-    this.characterToDelete.set(null);
+    const removeLocal = (): void => {
+      this.characters.update((chars) => chars.filter((c) => c.id !== toDelete.id));
+      localStorage.setItem('dragons-characters', JSON.stringify(this.characters()));
+      this.deleteConfirmName.set('');
+      this.deleteError.set(null);
+      this.characterToDelete.set(null);
+    };
 
     if (this.auth.isLoggedIn() && toDelete.id) {
-      this.cloud.delete(toDelete.id).subscribe({ error: () => {} });
+      this.deleting.set(true);
+      this.deleteError.set(null);
+      this.cloud.delete(toDelete.id).subscribe({
+        next: () => {
+          removeLocal();
+          this.deleting.set(false);
+        },
+        error: () => {
+          this.deleteError.set('Échec de la suppression cloud. Réessayez dans un instant.');
+          this.deleting.set(false);
+        },
+      });
+      return;
     }
+
+    removeLocal();
   }
 }

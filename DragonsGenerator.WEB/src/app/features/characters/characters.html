@@ -227,19 +227,24 @@
           />
         </label>
 
+        @if (deleteError(); as err) {
+          <p class="text-sm text-red-400 mb-4 w-full">{{ err }}</p>
+        }
+
         <div class="flex gap-4 w-full">
           <button
             class="flex-1 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-[#171b22] text-slate-300 border border-slate-700 hover:bg-slate-800 transition-[colors,transform,opacity,box-shadow] duration-200"
+            [disabled]="deleting()"
             (click)="cancelDelete()"
           >
             Annuler
           </button>
           <button
             class="flex-1 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-red-600 text-white shadow-sm hover:bg-red-500 active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-            [disabled]="!canConfirmDelete()"
+            [disabled]="!canConfirmDelete() || deleting()"
             (click)="deleteCharacter()"
           >
-            Détruire
+            @if (deleting()) { Suppression... } @else { Détruire }
           </button>
         </div>
       </div>

@@ -283,6 +283,28 @@
           }
         </a>
 
+        <a
+          routerLink="/story/create"
+          routerLinkActive="bg-violet-950/30 text-violet-400 border-violet-900/40"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+          (click)="closeMenus()"
+        >
+          <span class="text-xl"><iconify-icon icon="fluent-emoji:scroll"></iconify-icon></span>
+          <span class="text-sm font-bold tracking-wide">Nouveau scénario</span>
+        </a>
+
+        @if (auth.isLoggedIn()) {
+          <a
+            routerLink="/friends"
+            routerLinkActive="bg-violet-950/30 text-violet-400 border-violet-900/40"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+            (click)="closeMenus()"
+          >
+            <span class="text-xl"><iconify-icon icon="fluent-emoji:handshake"></iconify-icon></span>
+            <span class="text-sm font-bold tracking-wide">Amis</span>
+          </a>
+        }
+
         @if (auth.isLoggedIn()) {
           <a
             routerLink="/settings"

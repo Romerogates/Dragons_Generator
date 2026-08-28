@@ -16,8 +16,10 @@ import {
   ADVENTURE_TONE_LABELS,
   CREATURE_ROLE_LABELS,
   CreatureRole,
+  StoryCreatureSelection,
 } from '@core/models/Story/story';
 import { formatChallengeRating } from '@core/utils/creature-display.util';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-customize-creatures-step',
@@ -113,20 +115,56 @@ export class CustomizeCreaturesStep implements OnInit {
       })
       .subscribe({
         next: (res) => {
+          const generated = new Set(res.backstories.map((item) => item.creatureId));
           for (const item of res.backstories) {
             this.builder.updateCreature(item.creatureId, { backstory: item.backstory });
           }
-          this.generatingId.set(null);
+          const missing = pending.filter((c) => !generated.has(c.creatureId));
+          if (missing.length) {
+            void this.generateBackstoriesSequentially(missing);
+          } else {
+            this.generatingId.set(null);
+          }
         },
         error: (err) => {
           if (isAiRateLimitHttpError(err)) {
             this.generatingId.set(null);
             return;
           }
-          this.generationError.set(this.extractError(err));
-          this.generatingId.set(null);
+          void this.generateBackstoriesSequentially(pending);
         },
       });
+  }
+
+  private async generateBackstoriesSequentially(pending: StoryCreatureSelection[]): Promise<void> {
+    this.generatingId.set('batch');
+    this.generationError.set(null);
+    let failed = 0;
+
+    for (const creature of pending) {
+      try {
+        const res = await firstValueFrom(
+          this.dataService.generateCreatureStory({
+            creatureId: creature.creatureId,
+            customName: creature.customName.trim(),
+            role: creature.role,
+            setting: this.builder.setting().trim() || null,
+          }),
+        );
+        this.builder.updateCreature(creature.creatureId, { backstory: res.backstory });
+      } catch {
+        failed++;
+      }
+    }
+
+    this.generatingId.set(null);
+    if (failed > 0) {
+      this.generationError.set(
+        failed === pending.length
+          ? "L'inspiration cosmique est momentanément indisponible."
+          : `${failed} créature(s) n'ont pas pu être générées. Réessayez individuellement.`,
+      );
+    }
   }
 
   prevStep(): void {

@@ -6,7 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DragonsGenerator.API.Endpoints.Campaigns;
 
-public record CampaignSummaryDto(Guid Id, string Title, string Role, DateTimeOffset UpdatedAt, int PlayerCount);
+public record CampaignSummaryDto(
+    Guid Id,
+    string Title,
+    string Role,
+    DateTimeOffset UpdatedAt,
+    int PlayerCount,
+    string? RegionName);
 public record CampaignMemberDto(
     Guid Id,
     Guid UserId,
@@ -33,6 +39,25 @@ public record CampaignInviteDto(Guid Id, Guid CampaignId, string CampaignTitle, 
 public record SendCampaignInviteBody(Guid UserId);
 public record ProposeCharacterBody(Guid CharacterId);
 public record AwardXpBody(Guid MemberId, int Xp);
+
+static file class CampaignJsonHelpers
+{
+    public static string? RegionNameFromJson(string json)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(json) ? "{}" : json);
+            if (doc.RootElement.TryGetProperty("regionName", out var rn))
+            {
+                var name = rn.GetString();
+                return string.IsNullOrWhiteSpace(name) ? null : name;
+            }
+        }
+        catch { /* ignore malformed JSON */ }
+
+        return null;
+    }
+}
 
 static file class CampaignAccess
 {
@@ -69,23 +94,49 @@ public class ListMyCampaignsEndpoint(AppDbContext db) : EndpointWithoutRequest<L
             return;
         }
 
-        var owned = await db.Campaigns.AsNoTracking()
+        var ownedRows = await db.Campaigns.AsNoTracking()
             .Where(c => c.OwnerUserId == userId)
-            .Select(c => new CampaignSummaryDto(
-                c.Id, c.Title, CampaignMemberRoles.Dm, c.UpdatedAt,
-                c.Members.Count(m => m.Role == CampaignMemberRoles.Player)))
+            .Select(c => new
+            {
+                c.Id,
+                c.Title,
+                c.UpdatedAt,
+                c.JsonData,
+                PlayerCount = c.Members.Count(m => m.Role == CampaignMemberRoles.Player),
+            })
             .ToListAsync(ct);
 
-        var joined = await db.CampaignMembers.AsNoTracking()
+        var owned = ownedRows
+            .Select(c => new CampaignSummaryDto(
+                c.Id,
+                c.Title,
+                CampaignMemberRoles.Dm,
+                c.UpdatedAt,
+                c.PlayerCount,
+                CampaignJsonHelpers.RegionNameFromJson(c.JsonData)))
+            .ToList();
+
+        var joinedRows = await db.CampaignMembers.AsNoTracking()
             .Where(m => m.UserId == userId && m.Role == CampaignMemberRoles.Player)
-            .Include(m => m.Campaign).ThenInclude(c => c.Members)
-            .Select(m => new CampaignSummaryDto(
+            .Select(m => new
+            {
                 m.CampaignId,
                 m.Campaign.Title,
-                CampaignMemberRoles.Player,
                 m.Campaign.UpdatedAt,
-                m.Campaign.Members.Count(x => x.Role == CampaignMemberRoles.Player)))
+                m.Campaign.JsonData,
+                PlayerCount = m.Campaign.Members.Count(x => x.Role == CampaignMemberRoles.Player),
+            })
             .ToListAsync(ct);
+
+        var joined = joinedRows
+            .Select(m => new CampaignSummaryDto(
+                m.CampaignId,
+                m.Title,
+                CampaignMemberRoles.Player,
+                m.UpdatedAt,
+                m.PlayerCount,
+                CampaignJsonHelpers.RegionNameFromJson(m.JsonData)))
+            .ToList();
 
         var all = owned.Concat(joined).OrderByDescending(c => c.UpdatedAt).ToList();
         await Send.OkAsync(all, ct);
@@ -160,7 +211,13 @@ public class CreateCampaignEndpoint(AppDbContext db) : Endpoint<UpsertCampaignRe
         await db.SaveChangesAsync(ct);
 
         HttpContext.Response.StatusCode = StatusCodes.Status201Created;
-        await Send.OkAsync(new CampaignSummaryDto(campaign.Id, campaign.Title, CampaignMemberRoles.Dm, campaign.UpdatedAt, 0), ct);
+        await Send.OkAsync(new CampaignSummaryDto(
+            campaign.Id,
+            campaign.Title,
+            CampaignMemberRoles.Dm,
+            campaign.UpdatedAt,
+            0,
+            CampaignJsonHelpers.RegionNameFromJson(json)), ct);
     }
 }
 
@@ -193,7 +250,13 @@ public class UpdateCampaignEndpoint(AppDbContext db) : Endpoint<UpsertCampaignRe
         await db.SaveChangesAsync(ct);
 
         var playerCount = campaign.Members.Count(m => m.Role == CampaignMemberRoles.Player);
-        await Send.OkAsync(new CampaignSummaryDto(campaign.Id, campaign.Title, CampaignMemberRoles.Dm, campaign.UpdatedAt, playerCount), ct);
+        await Send.OkAsync(new CampaignSummaryDto(
+            campaign.Id,
+            campaign.Title,
+            CampaignMemberRoles.Dm,
+            campaign.UpdatedAt,
+            playerCount,
+            CampaignJsonHelpers.RegionNameFromJson(campaign.JsonData)), ct);
     }
 }
 

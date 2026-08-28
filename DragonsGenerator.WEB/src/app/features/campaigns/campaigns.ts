@@ -11,7 +11,10 @@ import { Router, RouterLink } from '@angular/router';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { FriendsService } from '@core/services/friends.service';
 import { AuthService } from '@core/services/auth.service';
-import { CampaignInvite, CampaignSummary } from '@core/models/Campaign/campaign';
+import { DataService } from '@core/services/data.service';
+import { CampaignPdfService, CreaturePrintEntry } from '@core/services/campaign-pdf.service';
+import { CampaignData, CampaignInvite, CampaignSummary } from '@core/models/Campaign/campaign';
+import { forkJoin, catchError, map, of, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-campaigns',
@@ -26,12 +29,18 @@ export class Campaigns implements OnInit {
   private friends = inject(FriendsService);
   private auth = inject(AuthService);
   private router = inject(Router);
+  private data = inject(DataService);
+  private pdf = inject(CampaignPdfService);
 
   readonly list = signal<CampaignSummary[]>([]);
   readonly invites = signal<CampaignInvite[]>([]);
   readonly loading = signal(true);
   readonly toDelete = signal<CampaignSummary | null>(null);
   readonly deleteConfirmName = signal('');
+  readonly deleteError = signal<string | null>(null);
+  readonly deleting = signal(false);
+  readonly actionError = signal<string | null>(null);
+  readonly cardActionId = signal<string | null>(null);
   readonly isLoggedIn = this.auth.isLoggedIn;
 
   ngOnInit(): void {
@@ -45,12 +54,16 @@ export class Campaigns implements OnInit {
 
   reload(): void {
     this.loading.set(true);
+    this.actionError.set(null);
     this.campaigns.list().subscribe({
       next: (items) => {
         this.list.set(items);
         this.loading.set(false);
       },
-      error: () => this.loading.set(false),
+      error: () => {
+        this.actionError.set('Impossible de charger vos campagnes.');
+        this.loading.set(false);
+      },
     });
   }
 
@@ -73,11 +86,13 @@ export class Campaigns implements OnInit {
 
   confirmDelete(c: CampaignSummary): void {
     this.deleteConfirmName.set('');
+    this.deleteError.set(null);
     this.toDelete.set(c);
   }
 
   cancelDelete(): void {
     this.deleteConfirmName.set('');
+    this.deleteError.set(null);
     this.toDelete.set(null);
   }
 
@@ -89,12 +104,90 @@ export class Campaigns implements OnInit {
 
   deleteCampaign(): void {
     const c = this.toDelete();
-    if (!c || !this.canConfirmDelete()) return;
-    this.campaigns.delete(c.id).subscribe(() => {
-      this.deleteConfirmName.set('');
-      this.toDelete.set(null);
-      this.reload();
+    if (!c || !this.canConfirmDelete() || this.deleting()) return;
+    this.deleting.set(true);
+    this.deleteError.set(null);
+    this.campaigns.delete(c.id).subscribe({
+      next: () => {
+        this.deleteConfirmName.set('');
+        this.deleteError.set(null);
+        this.toDelete.set(null);
+        this.deleting.set(false);
+        this.reload();
+      },
+      error: () => {
+        this.deleteError.set('Échec de la suppression cloud. Réessayez dans un instant.');
+        this.deleting.set(false);
+      },
     });
+  }
+
+  duplicateCampaign(c: CampaignSummary, event: Event): void {
+    event.stopPropagation();
+    if (c.role !== 'dm') return;
+    this.cardActionId.set(c.id);
+    this.actionError.set(null);
+    this.campaigns.get(c.id).subscribe({
+      next: (detail) => {
+        const data: CampaignData = {
+          ...detail.data,
+          encounters: [],
+        };
+        this.campaigns.create(`${detail.title} (copie)`, data).subscribe({
+          next: () => {
+            this.cardActionId.set(null);
+            this.reload();
+          },
+          error: () => {
+            this.actionError.set('Impossible de dupliquer la campagne.');
+            this.cardActionId.set(null);
+          },
+        });
+      },
+      error: () => {
+        this.actionError.set('Campagne introuvable.');
+        this.cardActionId.set(null);
+      },
+    });
+  }
+
+  downloadBestiary(c: CampaignSummary, event: Event): void {
+    event.stopPropagation();
+    if (c.role !== 'dm') return;
+    this.cardActionId.set(c.id);
+    this.actionError.set(null);
+    this.campaigns.get(c.id).subscribe({
+      next: (detail) => {
+        if (!detail.data.creatures.length) {
+          this.actionError.set('Cette campagne ne contient aucune créature.');
+          this.cardActionId.set(null);
+          return;
+        }
+        this.loadCreatureEntries(detail.data).subscribe({
+          next: async (entries) => {
+            try {
+              await this.pdf.downloadCreaturesCompilation(entries, detail.title);
+            } catch {
+              this.actionError.set('Échec de la génération du PDF bestiaire.');
+            } finally {
+              this.cardActionId.set(null);
+            }
+          },
+          error: () => {
+            this.actionError.set('Impossible de charger les fiches créatures.');
+            this.cardActionId.set(null);
+          },
+        });
+      },
+      error: () => {
+        this.actionError.set('Campagne introuvable.');
+        this.cardActionId.set(null);
+      },
+    });
+  }
+
+  isCardBusy(c: CampaignSummary): boolean {
+    return this.cardActionId() === c.id;
   }
 
   formatDate(dateString: string): string {
@@ -106,5 +199,28 @@ export class Campaigns implements OnInit {
       month: 'short',
       year: 'numeric',
     }).format(date);
+  }
+
+  private loadCreatureEntries(data: CampaignData): Observable<CreaturePrintEntry[]> {
+    const selections = data.creatures;
+    if (!selections.length) return of([]);
+    return forkJoin(
+      selections.map((s) =>
+        this.data.getCreatureById(s.creatureId).pipe(
+          catchError(() => of(null)),
+          map(
+            (creature): CreaturePrintEntry | null =>
+              creature
+                ? {
+                    creature,
+                    customName: s.customName,
+                    role: s.role,
+                    backstory: s.backstory,
+                  }
+                : null,
+          ),
+        ),
+      ),
+    ).pipe(map((list) => list.filter((x): x is CreaturePrintEntry => x !== null)));
   }
 }

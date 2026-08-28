@@ -12,12 +12,14 @@ import { DataService } from '@core/services/data.service';
 import { AiRateLimitDialogService } from '@core/services/ai-rate-limit-dialog.service';
 import { isAiRateLimitHttpError } from '@core/utils/ai-rate-limit.util';
 import { StoryBuilderService } from '@core/services/story-builder.service';
-import { ADVENTURE_TONE_LABELS, AdventureTone } from '@core/models/Story/story';
+import { ADVENTURE_TONE_LABELS, AdventureTone, StoryRegionChoice } from '@core/models/Story/story';
+import { EanaMapPicker } from '@shared/components/eana-map-picker/eana-map-picker';
+import { storyLocationContext } from '@core/utils/story-location.util';
 
 @Component({
   selector: 'app-adventure-step',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, EanaMapPicker],
   templateUrl: './adventure-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -42,6 +44,10 @@ export class AdventureStep implements OnInit {
       this.generationError.set("Donnez un titre à l'aventure.");
       return;
     }
+    if (!this.builder.region()) {
+      this.generationError.set('Choisissez une région sur la carte ou « Région inconnue ».');
+      return;
+    }
     if (this.aiRateLimit.showIfBlocked()) return;
 
     this.isGenerating.set(true);
@@ -50,7 +56,7 @@ export class AdventureStep implements OnInit {
     this.dataService
       .generateAdventure({
         title: this.builder.title().trim(),
-        setting: this.builder.setting().trim() || null,
+        setting: storyLocationContext(this.builder.region(), this.builder.setting()),
         partyLevel: this.builder.partyLevel(),
         tone: this.builder.tone(),
         creatures: this.builder.creatures().map((c) => ({
@@ -83,6 +89,11 @@ export class AdventureStep implements OnInit {
 
   confirm(): void {
     this.builder.nextStep();
+  }
+
+  onRegionChange(region: StoryRegionChoice): void {
+    this.builder.setRegion(region);
+    this.generationError.set(null);
   }
 
   private extractError(err: unknown): string {

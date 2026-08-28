@@ -32,6 +32,9 @@ export class StoryCreation implements OnInit {
   readonly showDraftPrompt = signal(false);
 
   ngOnInit(): void {
+    if (this.builder.isEditingCampaign()) {
+      return;
+    }
     if (this.builder.hasPendingDraft() && this.builder.currentStep() > 1) {
       this.showDraftPrompt.set(true);
     }

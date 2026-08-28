@@ -45,11 +45,18 @@
       </div>
     </div>
 
+    <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-4">
+      <app-eana-map-picker
+        [selectedRegion]="builder.region()"
+        (regionChange)="onRegionChange($event)"
+      />
+    </div>
+
     <div>
-      <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Lieu / ambiance</label>
+      <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Ambiance / lieu précis (optionnel)</label>
       <input
         type="text"
-        placeholder="Ex: Les bas-fonds de la Cité Franche, nuit d'orage..."
+        placeholder="Ex: Les bas-fonds, nuit d'orage, taverne du Vieux Pont..."
         [ngModel]="builder.setting()"
         (ngModelChange)="builder.setting.set($event)"
         class="w-full bg-[#1b2028] border border-slate-700 rounded-xl py-3 px-4 text-sm text-slate-200 focus:outline-none focus:border-violet-500/50"

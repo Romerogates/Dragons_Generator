@@ -3,12 +3,14 @@ import {
   Component,
   computed,
   inject,
+  OnDestroy,
   OnInit,
   signal,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { FriendsService } from '@core/services/friends.service';
@@ -31,6 +33,7 @@ import {
 } from '@core/models/Campaign/campaign';
 import { ADVENTURE_TONE_LABELS } from '@core/models/Story/story';
 import { formatChallengeRating, getCreatureCategoryLabel } from '@core/utils/creature-display.util';
+import { StoryBuilderService } from '@core/services/story-builder.service';
 
 type Tab = 'overview' | 'creatures' | 'encounters' | 'players';
 
@@ -42,7 +45,7 @@ type Tab = 'overview' | 'creatures' | 'encounters' | 'players';
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class CampaignDetailPage implements OnInit {
+export class CampaignDetailPage implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private campaigns = inject(CampaignCloudService);
@@ -51,6 +54,8 @@ export class CampaignDetailPage implements OnInit {
   private auth = inject(AuthService);
   private data = inject(DataService);
   private pdf = inject(CampaignPdfService);
+  private sanitizer = inject(DomSanitizer);
+  private storyBuilder = inject(StoryBuilderService);
 
   readonly loading = signal(true);
   readonly saving = signal(false);
@@ -61,6 +66,10 @@ export class CampaignDetailPage implements OnInit {
   readonly friendsList = signal<FriendUser[]>([]);
   readonly myCharacters = signal<{ id: string; name: string }[]>([]);
   readonly creatureXpMap = signal<Record<string, number>>({});
+  readonly isLoadingPreview = signal(false);
+  readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
+  private rawBlobUrl: string | null = null;
+  private previewCampaignId: string | null = null;
 
   readonly isLoggedIn = this.auth.isLoggedIn;
 
@@ -106,6 +115,10 @@ export class CampaignDetailPage implements OnInit {
     );
   }
 
+  ngOnDestroy(): void {
+    this.revokePreviewUrl();
+  }
+
   reload(id?: string): void {
     const campaignId = id ?? this.campaign()?.id;
     if (!campaignId) return;
@@ -124,6 +137,56 @@ export class CampaignDetailPage implements OnInit {
 
   setTab(t: Tab): void {
     this.tab.set(t);
+    if (t === 'creatures') {
+      this.loadBestiaryPreview();
+    }
+  }
+
+  openBestiaryFullscreen(): void {
+    if (this.rawBlobUrl) window.open(this.rawBlobUrl, '_blank');
+  }
+
+  private revokePreviewUrl(): void {
+    if (this.rawBlobUrl) {
+      URL.revokeObjectURL(this.rawBlobUrl);
+      this.rawBlobUrl = null;
+    }
+    this.pdfPreviewUrl.set(null);
+    this.previewCampaignId = null;
+  }
+
+  private loadBestiaryPreview(): void {
+    const c = this.campaign();
+    if (!c?.data.creatures.length) {
+      this.revokePreviewUrl();
+      return;
+    }
+    if (this.previewCampaignId === c.id && this.pdfPreviewUrl()) return;
+
+    this.isLoadingPreview.set(true);
+    this.loadCreatureEntries(c.data).subscribe({
+      next: async (entries) => {
+        try {
+          if (!entries.length) {
+            this.revokePreviewUrl();
+            return;
+          }
+          this.revokePreviewUrl();
+          const url = await this.pdf.generateCreaturesPdfBlob(entries, c.title);
+          this.rawBlobUrl = url;
+          this.previewCampaignId = c.id;
+          this.pdfPreviewUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+        } catch {
+          this.revokePreviewUrl();
+        } finally {
+          this.isLoadingPreview.set(false);
+        }
+      },
+      error: () => {
+        this.revokePreviewUrl();
+        this.isLoadingPreview.set(false);
+      },
+    });
   }
 
   saveData(patch: Partial<CampaignData>): void {
@@ -254,6 +317,13 @@ export class CampaignDetailPage implements OnInit {
     const userId = this.auth.user()?.id;
     if (!userId) return undefined;
     return this.players().find((p) => p.userId === userId);
+  }
+
+  editScenario(): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    this.storyBuilder.loadCampaignIntoBuilder(c);
+    this.router.navigate(['/story/create']);
   }
 
   printBestiary(): void {

@@ -111,7 +111,7 @@ public class CharacterCampaignIntegrationTests
             new
             {
                 title = "Campagne test Lettré",
-                data = JsonDocument.Parse("""{"notes":"Arc Ajagar"}""").RootElement,
+                data = JsonDocument.Parse("""{"notes":"Arc Ajagar","regionName":"Cité Franche"}""").RootElement,
             }
         );
         var createBody = await create.Content.ReadAsStringAsync();
@@ -121,9 +121,12 @@ public class CharacterCampaignIntegrationTests
         var id = created.GetProperty("id").GetGuid();
         Assert.Equal("Campagne test Lettré", created.GetProperty("title").GetString());
         Assert.Equal("dm", created.GetProperty("role").GetString());
+        Assert.Equal("Cité Franche", created.GetProperty("regionName").GetString());
 
         var list = await _client.GetFromJsonAsync<JsonElement[]>("/me/campaigns");
         Assert.Contains(list!, c => c.GetProperty("id").GetGuid() == id);
+        var listed = list!.First(c => c.GetProperty("id").GetGuid() == id);
+        Assert.Equal("Cité Franche", listed.GetProperty("regionName").GetString());
 
         var detail = await _client.GetFromJsonAsync<JsonElement>($"/me/campaigns/{id}");
         Assert.True(detail.GetProperty("isOwner").GetBoolean());

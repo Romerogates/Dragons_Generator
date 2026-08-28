@@ -15,12 +15,15 @@ import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { CampaignPdfService, CreaturePrintEntry } from '@core/services/campaign-pdf.service';
 import { DataService } from '@core/services/data.service';
 import { AuthService } from '@core/services/auth.service';
-import { emptyCampaignData } from '@core/models/Campaign/campaign';
 import { forkJoin, catchError, map, of, Observable } from 'rxjs';
 import {
   ADVENTURE_TONE_LABELS,
   CREATURE_ROLE_LABELS,
 } from '@core/models/Story/story';
+import {
+  storyLocationContext,
+  storyRegionLabel,
+} from '@core/utils/story-location.util';
 
 @Component({
   selector: 'app-story-summary-step',
@@ -104,19 +107,16 @@ export class StorySummaryStep implements OnInit, OnDestroy {
     }
 
     const b = this.builder;
-    const data = {
-      ...emptyCampaignData(b.partyLevel()),
-      setting: b.setting().trim(),
-      partyLevel: b.partyLevel(),
-      tone: b.tone(),
-      adventure: b.adventure().trim(),
-      creatures: b.creatures(),
-      encounters: [],
-      notes: '',
-    };
+    const data = b.buildCampaignData();
+    const title = b.title().trim() || 'Nouvelle campagne';
+    const editId = b.editingCampaignId();
 
     this.saving.set(true);
-    this.campaigns.create(b.title().trim() || 'Nouvelle campagne', data).subscribe({
+    const save$ = editId
+      ? this.campaigns.update(editId, title, data)
+      : this.campaigns.create(title, data);
+
+    save$.subscribe({
       next: (summary) => {
         this.saved.set(true);
         this.savedCampaignId.set(summary.id);
@@ -124,7 +124,9 @@ export class StorySummaryStep implements OnInit, OnDestroy {
         this.builder.reset();
       },
       error: () => {
-        this.saveError.set('Échec de la sauvegarde cloud.');
+        this.saveError.set(
+          editId ? 'Échec de la mise à jour cloud.' : 'Échec de la sauvegarde cloud.',
+        );
         this.saving.set(false);
       },
     });
@@ -185,16 +187,7 @@ export class StorySummaryStep implements OnInit, OnDestroy {
       next: async (entries) => {
         try {
           const b = this.builder;
-          const data = {
-            ...emptyCampaignData(b.partyLevel()),
-            setting: b.setting().trim(),
-            partyLevel: b.partyLevel(),
-            tone: b.tone(),
-            adventure: b.adventure().trim(),
-            creatures: b.creatures(),
-            encounters: [],
-            notes: '',
-          };
+          const data = b.buildCampaignData();
           await this.pdf.downloadCampaignPack(
             b.title().trim() || 'Scénario',
             data,
@@ -233,6 +226,8 @@ export class StorySummaryStep implements OnInit, OnDestroy {
 
   protected toneLabels = ADVENTURE_TONE_LABELS;
   protected roleLabels = CREATURE_ROLE_LABELS;
+  protected regionLabel = storyRegionLabel;
+  protected locationContext = storyLocationContext;
 
   private buildExportText(): string {
     const b = this.builder;
@@ -241,7 +236,8 @@ export class StorySummaryStep implements OnInit, OnDestroy {
       '',
       `**Niveau des héros:** ${b.partyLevel()}`,
       `**Ton:** ${ADVENTURE_TONE_LABELS[b.tone()]}`,
-      b.setting().trim() ? `**Lieu:** ${b.setting().trim()}` : '',
+      storyRegionLabel(b.region()) ? `**Région:** ${storyRegionLabel(b.region())}` : '',
+      b.setting().trim() ? `**Ambiance:** ${b.setting().trim()}` : '',
       '',
       '## Personnages',
       '',
