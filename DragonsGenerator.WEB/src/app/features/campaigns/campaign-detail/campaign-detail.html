@@ -241,7 +241,9 @@
               <div class="bg-violet-950/20 border border-violet-800/40 rounded-2xl p-5">
                 <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-3">Pool MJ</h3>
                 <p class="text-xs text-slate-400 mb-4">
-                  Génère un héros original niveau 1 (espèce, classe, équipement, sorts). Le joueur clique « Prendre ce personnage » et peut jouer tout de suite dans Mes héros.
+                  Génère un héros original niveau 1 (espèce, classe, équipement, sorts). Chaque pré-tiré apparaît ci-dessous et aussi dans
+                  <a routerLink="/characters" class="text-violet-400 hover:underline">Mes héros</a>
+                  (nom « … (pré-tiré) »). Boutons Voir la fiche et PDF fiche complète : armes, compétences et stats.
                 </p>
                 <div class="flex flex-wrap gap-2 mb-4">
                   <button
@@ -283,7 +285,24 @@
                       </p>
                     </div>
                     <div class="flex flex-wrap gap-2">
-                      <button type="button" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400" (click)="printPregenHandout(p)">PDF</button>
+                      <button
+                        type="button"
+                        class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-violet-800/50 text-violet-300 hover:border-violet-500/50 disabled:opacity-50"
+                        [disabled]="pregenPdfLoadingId() === p.id"
+                        (click)="viewPregenCharacter(p)"
+                      >
+                        Voir la fiche
+                      </button>
+                      <button
+                        type="button"
+                        class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-emerald-800/50 text-emerald-300 hover:border-emerald-500/50 disabled:opacity-50"
+                        [disabled]="pregenPdfLoadingId() === p.id"
+                        (click)="printPregenFullSheet(p)"
+                      >
+                        @if (pregenPdfLoadingId() === p.id) { PDF… }
+                        @else { PDF fiche complète }
+                      </button>
+                      <button type="button" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400" (click)="printPregenHandout(p)">PDF accroche</button>
                       <button type="button" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-red-900/40 text-red-400" (click)="removePregen(p.id)">Supprimer</button>
                     </div>
                   </div>

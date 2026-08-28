@@ -74,6 +74,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly dmCharacters = signal<{ id: string; name: string }[]>([]);
   readonly importingPregen = signal(false);
   readonly generatingAutoPregen = signal(false);
+  readonly pregenPdfLoadingId = signal<string | null>(null);
 
   readonly creatureXpMap = signal<Record<string, number>>({});
   readonly isLoadingPreview = signal(false);
@@ -448,6 +449,39 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (!c) return;
     const meta = [pregen.speciesLabel, pregen.classLabel].filter(Boolean).join(' · ');
     void this.pdf.downloadPregenHandout(c.title, pregen.characterName, pregen.publicHook, meta);
+  }
+
+  printPregenFullSheet(pregen: CampaignPregen): void {
+    if (this.pregenPdfLoadingId()) return;
+    this.pregenPdfLoadingId.set(pregen.id);
+    this.error.set(null);
+    this.characters.get(pregen.characterId).subscribe({
+      next: (res) => {
+        void this.pdf.downloadPlayerFullSheet(res.data as Character).finally(() => {
+          this.pregenPdfLoadingId.set(null);
+        });
+      },
+      error: () => {
+        this.pregenPdfLoadingId.set(null);
+        this.error.set('Impossible de générer la fiche PDF.');
+      },
+    });
+  }
+
+  viewPregenCharacter(pregen: CampaignPregen): void {
+    this.pregenPdfLoadingId.set(pregen.id);
+    this.error.set(null);
+    this.characters.get(pregen.characterId).subscribe({
+      next: (res) => {
+        localStorage.setItem('dragons-current-character', JSON.stringify(res.data));
+        this.pregenPdfLoadingId.set(null);
+        this.router.navigate(['/character-sheet']);
+      },
+      error: () => {
+        this.pregenPdfLoadingId.set(null);
+        this.error.set('Impossible d\'ouvrir la fiche.');
+      },
+    });
   }
 
   myAssignedPregens(): CampaignPregen[] {
