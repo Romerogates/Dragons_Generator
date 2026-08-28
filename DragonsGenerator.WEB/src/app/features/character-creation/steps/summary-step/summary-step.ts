@@ -23,6 +23,10 @@ import {
   type AbilityKey,
   type Character,
 } from '../../../../core/models/Character/character';
+import {
+  formatCharacterExportErrors,
+  validateCharacterExport,
+} from '@core/utils/character-export-validation.util';
 
 @Component({
   selector: 'app-summary-step',
@@ -96,12 +100,18 @@ export class SummaryStep implements OnInit, OnDestroy {
   /** Sauvegarde cloud obligatoire (compte requis). */
   saveCharacter(): void {
     this.saveError.set(null);
+    const character = this.character();
+    const validation = validateCharacterExport(character);
+    if (!validation.valid) {
+      this.saveError.set(formatCharacterExportErrors(validation.errors));
+      return;
+    }
     if (!this.auth.isLoggedIn()) {
-      this.pendingSave.stash(this.character());
+      this.pendingSave.stash(character);
       this.showAuthGate.set(true);
       return;
     }
-    this.persistToCloud(this.character());
+    this.persistToCloud(character);
   }
 
   closeAuthGate(): void {

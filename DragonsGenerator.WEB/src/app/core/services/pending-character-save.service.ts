@@ -1,5 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, of, map, catchError } from 'rxjs';
+import type { Character } from '@core/models/Character/character';
+import {
+  validateCharacterExport,
+} from '@core/utils/character-export-validation.util';
 import { CharacterCloudService } from './character-cloud.service';
 import { AuthService } from './auth.service';
 
@@ -44,7 +48,12 @@ export class PendingCharacterSaveService {
     const pending = this.peek();
     if (!pending || typeof pending !== 'object') return of(null);
 
-    const character = pending as { id?: string; name?: string; [k: string]: unknown };
+    const character = pending as Character;
+    const validation = validateCharacterExport(character);
+    if (!validation.valid) {
+      return of(null);
+    }
+
     return this.cloud.save(character).pipe(
       map((serverId) => {
         const updated = {
