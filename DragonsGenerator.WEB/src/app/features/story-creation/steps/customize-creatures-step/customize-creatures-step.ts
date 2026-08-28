@@ -123,11 +123,19 @@ export class CustomizeCreaturesStep implements OnInit {
   protected formatCr = formatChallengeRating;
 
   private extractError(err: unknown): string {
-    const e = (err as { error?: Record<string, unknown> })?.error;
+    const http = err as {
+      status?: number;
+      error?: Record<string, unknown> | string;
+    };
+    if (typeof http.error === 'string' && http.error.trim()) return http.error.trim();
+    const e = typeof http.error === 'object' ? http.error : undefined;
     const general = (e?.['errors'] as { generalErrors?: string[] })?.generalErrors?.[0];
-    const apiMsg = general || (e?.['message'] as string) || null;
-    return apiMsg && apiMsg !== 'One or more errors occurred!'
-      ? apiMsg
-      : "L'inspiration cosmique est momentanément indisponible.";
+    const detail = e?.['detail'] as string | undefined;
+    const apiMsg = general || detail || (e?.['message'] as string) || null;
+    if (apiMsg && apiMsg !== 'One or more errors occurred!') return apiMsg;
+    if (http.status === 502)
+      return 'Le service de génération IA est indisponible. Vérifiez la clé Groq ou réessayez dans quelques instants.';
+    if (http.status === 429) return 'Trop de requêtes — réessayez dans quelques instants.';
+    return "L'inspiration cosmique est momentanément indisponible.";
   }
 }

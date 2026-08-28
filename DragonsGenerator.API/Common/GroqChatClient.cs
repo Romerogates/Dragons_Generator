@@ -33,7 +33,7 @@ public sealed class GroqChatClient
 
         var model = _config["Groq:Model"];
         if (string.IsNullOrWhiteSpace(model))
-            model = "llama-3.3-70b-versatile";
+            model = "openai/gpt-oss-120b";
 
         var client = _httpClientFactory.CreateClient("Groq");
         var groqRequest = new
@@ -71,6 +71,7 @@ public sealed class GroqChatClient
             var message = (int)response.StatusCode switch
             {
                 401 or 403 => "Clé API Groq invalide ou expirée. Vérifiez Groq:ApiKey.",
+                404 => "Modèle Groq indisponible. Configurez Groq:Model (ex. openai/gpt-oss-120b).",
                 429 => "Quota Groq dépassé. Réessayez dans quelques instants.",
                 _ => "Le service de génération IA a renvoyé une erreur."
             };
