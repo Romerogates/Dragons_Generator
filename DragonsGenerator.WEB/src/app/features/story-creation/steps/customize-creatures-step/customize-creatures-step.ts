@@ -94,38 +94,39 @@ export class CustomizeCreaturesStep implements OnInit {
     if (pending.length === 0) return;
     if (this.aiRateLimit.showIfBlocked()) return;
 
-    const delayBetweenMs = 1800;
-    let index = 0;
-    const runNext = (): void => {
-      if (index >= pending.length) {
-        this.generatingId.set(null);
-        return;
-      }
-      const creature = pending[index++];
-      this.generatingId.set(creature.creatureId);
-      this.dataService
-        .generateCreatureStory({
-          creatureId: creature.creatureId,
-          customName: creature.customName.trim(),
-          role: creature.role,
-          setting: this.builder.setting().trim() || null,
-        })
-        .subscribe({
-          next: (res) => {
-            this.builder.updateCreature(creature.creatureId, { backstory: res.backstory });
-            setTimeout(() => runNext(), delayBetweenMs);
-          },
-          error: (err) => {
-            if (isAiRateLimitHttpError(err)) {
-              this.generatingId.set(null);
-              return;
-            }
-            this.generationError.set(this.extractError(err));
+    this.generationError.set(null);
+    this.generatingId.set('batch');
+
+    if (pending.length === 1) {
+      this.generateBackstory(pending[0].creatureId);
+      return;
+    }
+
+    this.dataService
+      .generateCreatureStoriesBatch({
+        setting: this.builder.setting().trim() || null,
+        creatures: pending.map((c) => ({
+          creatureId: c.creatureId,
+          customName: c.customName.trim(),
+          role: c.role,
+        })),
+      })
+      .subscribe({
+        next: (res) => {
+          for (const item of res.backstories) {
+            this.builder.updateCreature(item.creatureId, { backstory: item.backstory });
+          }
+          this.generatingId.set(null);
+        },
+        error: (err) => {
+          if (isAiRateLimitHttpError(err)) {
             this.generatingId.set(null);
-          },
-        });
-    };
-    runNext();
+            return;
+          }
+          this.generationError.set(this.extractError(err));
+          this.generatingId.set(null);
+        },
+      });
   }
 
   prevStep(): void {

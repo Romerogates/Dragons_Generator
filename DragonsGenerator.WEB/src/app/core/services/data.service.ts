@@ -26,6 +26,8 @@ import {
   GenerateAdventureResponse,
   GenerateCreatureStoryRequest,
   GenerateCreatureStoryResponse,
+  GenerateCreatureStoriesBatchRequest,
+  GenerateCreatureStoriesBatchResponse,
 } from '../models/Story/story';
 import { Background } from '../models/Backgrounds/background';
 import { BackgroundSummary } from '../models/Backgrounds/background-summary';
@@ -298,6 +300,15 @@ export class DataService {
     request: GenerateCreatureStoryRequest,
   ): Observable<GenerateCreatureStoryResponse> {
     return this.http.post<GenerateCreatureStoryResponse>(`${this.apiUrl}/generate-creature-story`, request);
+  }
+
+  generateCreatureStoriesBatch(
+    request: GenerateCreatureStoriesBatchRequest,
+  ): Observable<GenerateCreatureStoriesBatchResponse> {
+    return this.http.post<GenerateCreatureStoriesBatchResponse>(
+      `${this.apiUrl}/generate-creature-stories-batch`,
+      request,
+    );
   }
 
   generateAdventure(request: GenerateAdventureRequest): Observable<GenerateAdventureResponse> {

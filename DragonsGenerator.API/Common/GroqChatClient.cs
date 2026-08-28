@@ -3,7 +3,13 @@ using System.Text.RegularExpressions;
 
 namespace DragonsGenerator.API.Common;
 
-public sealed record GroqChatResult(bool Ok, string? Text, string? Error, bool RateLimited = false, bool Retryable = false);
+public sealed record GroqChatResult(
+    bool Ok,
+    string? Text,
+    string? Error,
+    bool RateLimited = false,
+    bool Retryable = false,
+    int? RetryAfterMs = null);
 
 public sealed class GroqChatClient
 {
@@ -14,15 +20,18 @@ public sealed class GroqChatClient
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _config;
     private readonly ILogger<GroqChatClient> _logger;
+    private readonly GroqRequestCoordinator _coordinator;
 
     public GroqChatClient(
         IHttpClientFactory httpClientFactory,
         IConfiguration config,
-        ILogger<GroqChatClient> logger)
+        ILogger<GroqChatClient> logger,
+        GroqRequestCoordinator coordinator)
     {
         _httpClientFactory = httpClientFactory;
         _config = config;
         _logger = logger;
+        _coordinator = coordinator;
     }
 
     public string? GetApiKey() => _config["Groq:ApiKey"];
@@ -33,11 +42,12 @@ public sealed class GroqChatClient
         int maxTokens,
         CancellationToken ct)
     {
-        const int maxAttempts = 6;
+        const int maxAttempts = 8;
         GroqChatResult? last = null;
 
         for (var attempt = 1; attempt <= maxAttempts; attempt++)
         {
+            await _coordinator.WaitTurnAsync(ct);
             last = await SendChatOnceAsync(userPrompt, systemPrompt, maxTokens, ct);
             if (last.Ok)
                 return last;
@@ -45,13 +55,14 @@ public sealed class GroqChatClient
             if (!last.Retryable || attempt >= maxAttempts)
                 return last;
 
-            var delayMs = 400 * (1 << (attempt - 1));
+            var delayMs = last.RetryAfterMs ?? Math.Min(30_000, 800 * (1 << (attempt - 1)));
+            delayMs = Math.Max(delayMs, 2600);
             _logger.LogInformation(
                 "Groq temporairement indisponible (tentative {Attempt}/{Max}), nouvel essai dans {DelayMs} ms",
                 attempt,
                 maxAttempts,
                 delayMs);
-            await Task.Delay(delayMs, ct);
+            await _coordinator.DelayForRetryAsync(delayMs, ct);
         }
 
         return last ?? new GroqChatResult(false, null, "La génération IA a échoué.", false);
@@ -110,6 +121,7 @@ public sealed class GroqChatClient
             var status = (int)response.StatusCode;
             var rateLimited = status == 429;
             var retryable = rateLimited || status is 502 or 503;
+            var retryAfterMs = ParseRetryAfterMs(response);
             var message = status switch
             {
                 401 or 403 => "Clé API Groq invalide ou expirée. Vérifiez Groq:ApiKey.",
@@ -118,7 +130,7 @@ public sealed class GroqChatClient
                 _ => "Le service de génération IA a renvoyé une erreur."
             };
 
-            return new GroqChatResult(false, null, message, rateLimited, retryable);
+            return new GroqChatResult(false, null, message, rateLimited, retryable, retryAfterMs);
         }
 
         var result = await response.Content.ReadFromJsonAsync<GroqResponse>(ct);
@@ -129,6 +141,18 @@ public sealed class GroqChatClient
             return new GroqChatResult(false, null, "La génération IA n'a renvoyé aucun texte en français.");
 
         return new GroqChatResult(true, text, null);
+    }
+
+    private static int? ParseRetryAfterMs(HttpResponseMessage response)
+    {
+        if (!response.Headers.TryGetValues("Retry-After", out var values))
+            return null;
+        var raw = values.FirstOrDefault();
+        if (string.IsNullOrWhiteSpace(raw))
+            return null;
+        if (int.TryParse(raw, out var seconds) && seconds > 0)
+            return seconds * 1000;
+        return null;
     }
 
     internal static string? SanitizeModelOutput(string? text)
@@ -155,6 +179,12 @@ public sealed class GroqChatClient
         }
 
         text = text.Trim().Trim('"');
+        if (text.StartsWith("```", StringComparison.Ordinal))
+        {
+            text = Regex.Replace(text, @"^```(?:json)?\s*", string.Empty, RegexOptions.IgnoreCase);
+            text = Regex.Replace(text, @"\s*```$", string.Empty);
+        }
+
         return string.IsNullOrWhiteSpace(text) ? null : text;
     }
 

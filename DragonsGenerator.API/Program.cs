@@ -61,6 +61,7 @@ builder.Services.AddDragonsRateLimiting(builder.Configuration, builder.Environme
 // --- Game data ---
 builder.Services.AddSingleton<IndexedDataStore>();
 builder.Services.AddSingleton<GameDataRepository>();
+builder.Services.AddSingleton<GroqRequestCoordinator>();
 builder.Services.AddSingleton<GroqChatClient>();
 builder.Services.AddHttpClient("Groq", client =>
 {

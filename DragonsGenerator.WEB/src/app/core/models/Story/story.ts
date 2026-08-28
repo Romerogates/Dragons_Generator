@@ -35,6 +35,19 @@ export interface GenerateCreatureStoryResponse {
   backstory: string;
 }
 
+export interface GenerateCreatureStoriesBatchRequest {
+  creatures: {
+    creatureId: string;
+    customName: string;
+    role?: CreatureRole | null;
+  }[];
+  setting?: string | null;
+}
+
+export interface GenerateCreatureStoriesBatchResponse {
+  backstories: { creatureId: string; backstory: string }[];
+}
+
 export interface GenerateAdventureRequest {
   title: string;
   setting?: string | null;
