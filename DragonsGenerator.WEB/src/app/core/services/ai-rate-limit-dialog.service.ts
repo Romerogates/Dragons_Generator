@@ -39,6 +39,11 @@ export class AiRateLimitDialogService implements OnDestroy {
 
   /** Affiche le dialogue si une limite persistée est encore active. */
   showIfBlocked(): boolean {
+    if (this.auth.isAdmin()) {
+      clearPersistedAiRateLimit();
+      this.close();
+      return false;
+    }
     const until = readPersistedAiRateLimitUntil();
     if (!until) return false;
     this.openFromUntil(until, !this.auth.isLoggedIn());
@@ -47,6 +52,10 @@ export class AiRateLimitDialogService implements OnDestroy {
 
   /** Retourne true si l'erreur HTTP a été traitée comme limite IA. */
   handleHttpError(err: unknown): boolean {
+    if (this.auth.isAdmin()) {
+      clearPersistedAiRateLimit();
+      return false;
+    }
     const info = parseAiRateLimitError(err);
     if (!info) return false;
     this.open(info);

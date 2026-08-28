@@ -33,7 +33,7 @@ public sealed class GroqChatClient
         int maxTokens,
         CancellationToken ct)
     {
-        const int maxAttempts = 4;
+        const int maxAttempts = 6;
         GroqChatResult? last = null;
 
         for (var attempt = 1; attempt <= maxAttempts; attempt++)

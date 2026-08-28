@@ -94,7 +94,7 @@ export class CustomizeCreaturesStep implements OnInit {
     if (pending.length === 0) return;
     if (this.aiRateLimit.showIfBlocked()) return;
 
-    const delayBetweenMs = 900;
+    const delayBetweenMs = 1800;
     let index = 0;
     const runNext = (): void => {
       if (index >= pending.length) {

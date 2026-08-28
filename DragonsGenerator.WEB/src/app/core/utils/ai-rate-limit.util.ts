@@ -15,14 +15,18 @@ export function isAiGenerationRequest(url: string): boolean {
 }
 
 export function isAiRateLimitHttpError(err: unknown): boolean {
-  return err instanceof HttpErrorResponse && err.status === 429 && isAiGenerationRequest(err.url ?? '');
+  return parseAiRateLimitError(err) !== null;
 }
 
 export function parseAiRateLimitError(err: unknown): AiRateLimitInfo | null {
   if (!(err instanceof HttpErrorResponse) || err.status !== 429) return null;
+  if (!isAiGenerationRequest(err.url ?? '')) return null;
 
   const body =
     err.error && typeof err.error === 'object' ? (err.error as Record<string, unknown>) : null;
+
+  // Uniquement la limite applicative — pas les erreurs Groq (502) ni autres 429.
+  if (body?.['code'] !== 'ai_rate_limit') return null;
 
   let retryAfterSeconds = 3600;
   const retryHeader = err.headers.get('Retry-After');
