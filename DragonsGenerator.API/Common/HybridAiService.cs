@@ -7,8 +7,8 @@ public sealed class HybridAiService
 {
     private readonly OpenAiChatClient? _local;
     private readonly OpenAiChatClient _remote;
+    private readonly IConfiguration _config;
     private readonly ILogger<HybridAiService> _logger;
-    private readonly bool _localEnabled;
 
     public HybridAiService(
         IHttpClientFactory httpClientFactory,
@@ -16,8 +16,8 @@ public sealed class HybridAiService
         ILoggerFactory loggerFactory,
         GroqRequestCoordinator coordinator)
     {
+        _config = config;
         _logger = loggerFactory.CreateLogger<HybridAiService>();
-        _localEnabled = config.GetValue("LocalLlm:Enabled", false);
 
         _remote = new OpenAiChatClient(
             httpClientFactory,
@@ -27,7 +27,7 @@ public sealed class HybridAiService
             "Groq",
             coordinator);
 
-        if (_localEnabled)
+        if (config.GetValue("LocalLlm:Enabled", false))
         {
             _local = new OpenAiChatClient(
                 httpClientFactory,
@@ -60,16 +60,22 @@ public sealed class HybridAiService
         return await _remote.SendChatAsync(userPrompt, systemPrompt, maxTokens, ct);
     }
 
-    /// <summary>Aventure structurée — Groq d'abord, Ollama local en secours.</summary>
+    /// <summary>Aventure structurée — qwen/Groq d'abord, Ollama local en secours.</summary>
     public async Task<GroqChatResult> SendAdventureGenerationAsync(
         string userPrompt,
         string systemPrompt,
         int maxTokens,
         CancellationToken ct)
     {
-        var remote = await _remote.SendChatAsync(userPrompt, systemPrompt, maxTokens, ct);
+        var remote = await _remote.SendChatAsync(
+            userPrompt,
+            systemPrompt,
+            maxTokens,
+            ct,
+            GetAdventureModelChain());
+
         if (remote.Ok)
-            return remote;
+            return FinalizeAdventure(remote);
 
         if (_local is null)
             return remote;
@@ -80,9 +86,37 @@ public sealed class HybridAiService
         if (local.Ok)
         {
             _logger.LogInformation("Aventure servie par Ollama local (secours)");
-            return local;
+            return FinalizeAdventure(local);
         }
 
         return remote;
+    }
+
+    private IReadOnlyList<string> GetAdventureModelChain()
+    {
+        var primary = _config["Groq:AdventureModel"];
+        if (string.IsNullOrWhiteSpace(primary))
+            primary = _config["Groq:FallbackModel"] ?? "qwen/qwen3.6-27b";
+
+        var fallback = _config["Groq:Model"] ?? "groq/compound";
+        if (string.Equals(primary, fallback, StringComparison.Ordinal))
+            return [primary];
+
+        return [primary, fallback];
+    }
+
+    private GroqChatResult FinalizeAdventure(GroqChatResult result)
+    {
+        var cleaned = AdventureOutputCleaner.Clean(result.Text);
+        if (!string.IsNullOrWhiteSpace(cleaned))
+            return result with { Text = cleaned };
+
+        _logger.LogWarning("Aventure brute non exploitable après nettoyage ({Length} car.)", result.Text?.Length ?? 0);
+        return result with
+        {
+            Ok = false,
+            Error = "La génération IA n'a renvoyé aucun texte en français.",
+            Retryable = true,
+        };
     }
 }

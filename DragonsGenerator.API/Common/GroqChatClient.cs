@@ -30,6 +30,9 @@ public static class GroqChatClient
         if (string.IsNullOrWhiteSpace(text))
             text = ExtractStructuredAdventure(original);
 
+        if (string.IsNullOrWhiteSpace(text))
+            return null;
+
         if (Regex.IsMatch(text, @"^\s*We need to\b", RegexOptions.IgnoreCase))
         {
             var quoted = Regex.Matches(text, "\"([^\"]{40,})\"")

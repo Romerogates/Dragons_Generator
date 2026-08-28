@@ -82,34 +82,32 @@ public class GenerateAdventureEndpoint : Endpoint<GenerateAdventureRequest, Gene
         };
 
         var prompt = $"""
-            Tu es un maître du jeu expert en jeux de rôle fantasy francophones, spécialisé dans l'univers d'Eana (Dragons).
-            Rédige une AVENTURE JDR complète et jouable, structurée et immersive.
-            Longueur: 400 à 600 mots.
+            Rédige une AVENTURE JDR complète en français (400 à 600 mots) pour l'univers fantasy Eana (Dragons).
+            Commence directement par **Accroche** — suivi du texte. Ne répète pas les consignes. Pas d'anglais. Pas de plan, pas de comptage de mots.
 
-            Structure obligatoire (avec titres en gras markdown):
-            **Accroche** — présentation du conflit
-            **Contexte** — où et quand, ambiance
-            **Personnages clés** — rappel bref de chaque créature nommée et son rôle
-            **Acte 1** — découverte / enquête
-            **Acte 2** — complications et confrontations
-            **Acte 3** — climax et résolution possible
-            **Pistes pour le MJ** — 2-3 idées de rebondissements
+            Titres obligatoires (markdown gras), chacun suivi d'un paragraphe narratif :
+            **Accroche**
+            **Contexte**
+            **Personnages clés**
+            **Acte 1**
+            **Acte 2**
+            **Acte 3**
+            **Pistes pour le MJ**
 
-            L'aventure doit intégrer logiquement TOUTES les créatures listées avec leurs noms personnalisés et leurs vies.
-            Réponds uniquement avec l'aventure, sans commentaire introductif.
+            Intègre TOUTES les créatures avec leurs noms et leurs vies.
 
-            TITRE DE L'AVENTURE: {req.Title}
-            {(req.Setting != null ? $"LIEU / CONTEXTE: {req.Setting}" : "")}
-            {(req.PartyLevel != null ? $"NIVEAU DES HÉROS: {req.PartyLevel}" : "")}
+            TITRE: {req.Title}
+            {(req.Setting != null ? $"LIEU: {req.Setting}" : "")}
+            {(req.PartyLevel != null ? $"NIVEAU HÉROS: {req.PartyLevel}" : "")}
             TON: {toneLabel}
 
-            CRÉATURES DE L'HISTOIRE:
+            CRÉATURES:
             {string.Join('\n', creatureBlocks)}
             """;
 
         var result = await _ai.SendAdventureGenerationAsync(
             prompt,
-            "Tu es un maître du jeu expert en jeux de rôle fantasy francophones.",
+            "Tu es un maître du jeu expert en jeux de rôle fantasy francophones. Tu livres uniquement l'aventure finale en français, prête à lire aux joueurs.",
             2500,
             ct);
 
