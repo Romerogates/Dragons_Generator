@@ -75,19 +75,19 @@ public class GenerateCreatureStoryEndpoint : Endpoint<GenerateCreatureStoryReque
             {(actionsSummary.Length > 0 ? $"- Capacités marquantes: {actionsSummary}" : "")}
             """;
 
-        var (ok, text, error) = await _groq.SendChatAsync(
+        var result = await _groq.SendChatAsync(
             prompt,
             "Tu es un maître du jeu expert en jeux de rôle fantasy francophones.",
             500,
             ct);
 
-        if (!ok)
+        if (!result.Ok)
         {
-            AddError(error!);
-            await Send.ErrorsAsync(StatusCodes.Status502BadGateway, ct);
+            AddError(result.Error!);
+            await Send.ErrorsAsync(AiEndpointResponses.StatusCodeFor(result), ct);
             return;
         }
 
-        await Send.OkAsync(new GenerateCreatureStoryResponse(text!), ct);
+        await Send.OkAsync(new GenerateCreatureStoryResponse(result.Text!), ct);
     }
 }

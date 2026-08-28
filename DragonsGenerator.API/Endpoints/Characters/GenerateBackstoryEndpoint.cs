@@ -63,19 +63,19 @@ public class GenerateBackstoryEndpoint : Endpoint<GenerateBackstoryRequest, Gene
             {(req.Flaws != null ? $"- Défauts: {req.Flaws}" : "")}
             """;
 
-        var (ok, text, error) = await _groq.SendChatAsync(
+        var result = await _groq.SendChatAsync(
             prompt,
             "Tu es un maître du jeu expert en jeux de rôle fantasy francophones, spécialisé dans l'univers d'Eana (Dragons).",
             400,
             ct);
 
-        if (!ok)
+        if (!result.Ok)
         {
-            AddError(error!);
-            await Send.ErrorsAsync(StatusCodes.Status502BadGateway, ct);
+            AddError(result.Error!);
+            await Send.ErrorsAsync(AiEndpointResponses.StatusCodeFor(result), ct);
             return;
         }
 
-        await Send.OkAsync(new GenerateBackstoryResponse(text!), ct);
+        await Send.OkAsync(new GenerateBackstoryResponse(result.Text!), ct);
     }
 }

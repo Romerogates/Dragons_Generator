@@ -102,19 +102,19 @@ public class GenerateAdventureEndpoint : Endpoint<GenerateAdventureRequest, Gene
             {string.Join('\n', creatureBlocks)}
             """;
 
-        var (ok, text, error) = await _groq.SendChatAsync(
+        var result = await _groq.SendChatAsync(
             prompt,
             "Tu es un maître du jeu expert en jeux de rôle fantasy francophones.",
             1200,
             ct);
 
-        if (!ok)
+        if (!result.Ok)
         {
-            AddError(error!);
-            await Send.ErrorsAsync(StatusCodes.Status502BadGateway, ct);
+            AddError(result.Error!);
+            await Send.ErrorsAsync(AiEndpointResponses.StatusCodeFor(result), ct);
             return;
         }
 
-        await Send.OkAsync(new GenerateAdventureResponse(text!), ct);
+        await Send.OkAsync(new GenerateAdventureResponse(result.Text!), ct);
     }
 }

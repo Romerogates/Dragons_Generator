@@ -85,10 +85,13 @@ export class CustomizeCreaturesStep implements OnInit {
   }
 
   generateAllBackstories(): void {
-    const pending = this.builder.creatures().filter((c) => !c.backstory.trim());
+    const pending = this.builder
+      .creatures()
+      .filter((c) => !c.backstory.trim() && c.customName.trim());
     if (pending.length === 0) return;
     if (this.aiRateLimit.showIfBlocked()) return;
 
+    const delayBetweenMs = 900;
     let index = 0;
     const runNext = (): void => {
       if (index >= pending.length) {
@@ -107,7 +110,7 @@ export class CustomizeCreaturesStep implements OnInit {
         .subscribe({
           next: (res) => {
             this.builder.updateCreature(creature.creatureId, { backstory: res.backstory });
-            runNext();
+            setTimeout(() => runNext(), delayBetweenMs);
           },
           error: (err) => {
             if (!this.aiRateLimit.handleHttpError(err)) {

@@ -1,8 +1,9 @@
 using System.Net.Http.Json;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace DragonsGenerator.API.Common;
+
+public sealed record GroqChatResult(bool Ok, string? Text, string? Error, bool RateLimited = false, bool Retryable = false);
 
 public sealed class GroqChatClient
 {
@@ -26,7 +27,37 @@ public sealed class GroqChatClient
 
     public string? GetApiKey() => _config["Groq:ApiKey"];
 
-    public async Task<(bool Ok, string? Text, string? Error)> SendChatAsync(
+    public async Task<GroqChatResult> SendChatAsync(
+        string userPrompt,
+        string systemPrompt,
+        int maxTokens,
+        CancellationToken ct)
+    {
+        const int maxAttempts = 4;
+        GroqChatResult? last = null;
+
+        for (var attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            last = await SendChatOnceAsync(userPrompt, systemPrompt, maxTokens, ct);
+            if (last.Ok)
+                return last;
+
+            if (!last.Retryable || attempt >= maxAttempts)
+                return last;
+
+            var delayMs = 400 * (1 << (attempt - 1));
+            _logger.LogInformation(
+                "Groq temporairement indisponible (tentative {Attempt}/{Max}), nouvel essai dans {DelayMs} ms",
+                attempt,
+                maxAttempts,
+                delayMs);
+            await Task.Delay(delayMs, ct);
+        }
+
+        return last ?? new GroqChatResult(false, null, "La génération IA a échoué.", false);
+    }
+
+    private async Task<GroqChatResult> SendChatOnceAsync(
         string userPrompt,
         string systemPrompt,
         int maxTokens,
@@ -34,7 +65,10 @@ public sealed class GroqChatClient
     {
         var apiKey = GetApiKey();
         if (string.IsNullOrWhiteSpace(apiKey))
-            return (false, null, "Clé API Groq manquante. Configurez Groq:ApiKey (appsettings) ou la variable d'environnement Groq__ApiKey.");
+            return new GroqChatResult(
+                false,
+                null,
+                "Clé API Groq manquante. Configurez Groq:ApiKey (appsettings) ou la variable d'environnement Groq__ApiKey.");
 
         var model = _config["Groq:Model"];
         if (string.IsNullOrWhiteSpace(model))
@@ -65,7 +99,7 @@ public sealed class GroqChatClient
         catch (Exception ex)
         {
             _logger.LogError(ex, "Échec d'appel à l'API Groq");
-            return (false, null, "Impossible de joindre le service de génération IA.");
+            return new GroqChatResult(false, null, "Impossible de joindre le service de génération IA.");
         }
 
         if (!response.IsSuccessStatusCode)
@@ -73,7 +107,10 @@ public sealed class GroqChatClient
             var body = await response.Content.ReadAsStringAsync(ct);
             _logger.LogWarning("Groq a répondu {Status}: {Body}", (int)response.StatusCode, body);
 
-            var message = (int)response.StatusCode switch
+            var status = (int)response.StatusCode;
+            var rateLimited = status == 429;
+            var retryable = rateLimited || status is 502 or 503;
+            var message = status switch
             {
                 401 or 403 => "Clé API Groq invalide ou expirée. Vérifiez Groq:ApiKey.",
                 404 => "Modèle Groq indisponible. Configurez Groq:Model (ex. groq/compound).",
@@ -81,7 +118,7 @@ public sealed class GroqChatClient
                 _ => "Le service de génération IA a renvoyé une erreur."
             };
 
-            return (false, null, message);
+            return new GroqChatResult(false, null, message, rateLimited, retryable);
         }
 
         var result = await response.Content.ReadFromJsonAsync<GroqResponse>(ct);
@@ -89,9 +126,9 @@ public sealed class GroqChatClient
         var text = SanitizeModelOutput(groqMessage?.Content?.Trim());
 
         if (string.IsNullOrWhiteSpace(text))
-            return (false, null, "La génération IA n'a renvoyé aucun texte en français.");
+            return new GroqChatResult(false, null, "La génération IA n'a renvoyé aucun texte en français.");
 
-        return (true, text, null);
+        return new GroqChatResult(true, text, null);
     }
 
     internal static string? SanitizeModelOutput(string? text)
@@ -99,7 +136,6 @@ public sealed class GroqChatClient
         if (string.IsNullOrWhiteSpace(text))
             return null;
 
-        // Certains modèles renvoient des blocs de réflexion dans content
         if (text.Contains("<think>", StringComparison.OrdinalIgnoreCase))
         {
             var afterThinking = Regex.Replace(
@@ -109,7 +145,6 @@ public sealed class GroqChatClient
             text = afterThinking.Trim();
         }
 
-        // Meta anglais type "We need to produce..." suivi d'un paragraphe français entre guillemets
         if (Regex.IsMatch(text, @"^\s*We need to\b", RegexOptions.IgnoreCase))
         {
             var quoted = Regex.Matches(text, "\"([^\"]{40,})\"")

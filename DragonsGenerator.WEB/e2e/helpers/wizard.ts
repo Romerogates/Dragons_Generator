@@ -1,6 +1,7 @@
 import { expect, type Page } from '@playwright/test';
 
 const CAROUSEL_DELAY_MS = 250;
+const isCi = !!process.env['CI'];
 
 /** Titres affichés sur les cartes (fallback si data-card-id absent). */
 const CARD_TITLES: Record<string, string | RegExp> = {
@@ -54,6 +55,9 @@ export async function pickCarouselCard(
   options: PickCarouselOptions = {},
 ): Promise<void> {
   const clickCount = options.clickCount ?? 2;
+  const carouselDelay = isCi ? 400 : CAROUSEL_DELAY_MS;
+  const clickTimeout = isCi ? 15_000 : 5_000;
+  const settleDelay = isCi ? 350 : 150;
   const nextBtn = page.getByRole('button', { name: 'Carte suivante' }).filter({ visible: true }).first();
 
   for (let attempt = 0; attempt < 50; attempt++) {
@@ -61,7 +65,7 @@ export async function pickCarouselCard(
     if ((await card.count()) === 0) {
       if (await nextBtn.isVisible().catch(() => false)) {
         await nextBtn.click();
-        await page.waitForTimeout(150);
+        await page.waitForTimeout(settleDelay);
         continue;
       }
       break;
@@ -70,14 +74,20 @@ export async function pickCarouselCard(
     if (!(await isCarouselCardCentered(page, cardId))) {
       if (await nextBtn.isVisible().catch(() => false)) {
         await nextBtn.click();
-        await page.waitForTimeout(150);
+        await page.waitForTimeout(settleDelay);
         continue;
       }
     }
 
+    await page.waitForTimeout(settleDelay);
+
     for (let c = 0; c < clickCount; c++) {
-      await card.click({ timeout: 5_000 });
-      await page.waitForTimeout(CAROUSEL_DELAY_MS);
+      const freshCard = visibleCarouselCard(page, cardId);
+      await freshCard.waitFor({ state: 'visible', timeout: clickTimeout });
+      await freshCard.click({ timeout: clickTimeout });
+      if (c < clickCount - 1) {
+        await page.waitForTimeout(carouselDelay);
+      }
     }
     return;
   }
