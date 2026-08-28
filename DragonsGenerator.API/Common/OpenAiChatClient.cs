@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace DragonsGenerator.API.Common;
@@ -189,12 +190,34 @@ public sealed class OpenAiChatClient
 
         var result = await response.Content.ReadFromJsonAsync<GroqResponse>(ct);
         var groqMessage = result?.Choices?.FirstOrDefault()?.Message;
-        var text = GroqChatClient.SanitizeModelOutput(groqMessage?.Content?.Trim());
+        var text = ExtractMessageText(groqMessage);
 
         if (string.IsNullOrWhiteSpace(text))
-            return new GroqChatResult(false, null, "La génération IA n'a renvoyé aucun texte en français.");
+        {
+            _logger.LogWarning(
+                "{Section}/{Model}: réponse vide (content et reasoning absents après nettoyage)",
+                _configSection,
+                model);
+            return new GroqChatResult(
+                false,
+                null,
+                "La génération IA n'a renvoyé aucun texte en français.",
+                Retryable: true);
+        }
 
         return new GroqChatResult(true, text, null);
+    }
+
+    private static string? ExtractMessageText(GroqMessage? message)
+    {
+        if (message is null)
+            return null;
+
+        var text = GroqChatClient.SanitizeModelOutput(message.Content?.Trim());
+        if (!string.IsNullOrWhiteSpace(text))
+            return text;
+
+        return GroqChatClient.SanitizeModelOutput(message.Reasoning?.Trim());
     }
 
     private static int? ParseRetryAfterMs(HttpResponseMessage response)
@@ -211,5 +234,7 @@ public sealed class OpenAiChatClient
 
     private sealed record GroqResponse(List<GroqChoice>? Choices);
     private sealed record GroqChoice(GroqMessage? Message);
-    private sealed record GroqMessage(string? Content);
+    private sealed record GroqMessage(
+        [property: JsonPropertyName("content")] string? Content,
+        [property: JsonPropertyName("reasoning")] string? Reasoning);
 }

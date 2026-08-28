@@ -60,11 +60,29 @@ public sealed class HybridAiService
         return await _remote.SendChatAsync(userPrompt, systemPrompt, maxTokens, ct);
     }
 
-    /// <summary>Aventure structurée longue — Groq uniquement.</summary>
-    public Task<GroqChatResult> SendAdventureGenerationAsync(
+    /// <summary>Aventure structurée — Groq d'abord, Ollama local en secours.</summary>
+    public async Task<GroqChatResult> SendAdventureGenerationAsync(
         string userPrompt,
         string systemPrompt,
         int maxTokens,
-        CancellationToken ct) =>
-        _remote.SendChatAsync(userPrompt, systemPrompt, maxTokens, ct);
+        CancellationToken ct)
+    {
+        var remote = await _remote.SendChatAsync(userPrompt, systemPrompt, maxTokens, ct);
+        if (remote.Ok)
+            return remote;
+
+        if (_local is null)
+            return remote;
+
+        _logger.LogWarning("Groq aventure indisponible ({Error}) — bascule Ollama local", remote.Error);
+        var localMaxTokens = Math.Max(maxTokens, 3500);
+        var local = await _local.SendChatAsync(userPrompt, systemPrompt, localMaxTokens, ct);
+        if (local.Ok)
+        {
+            _logger.LogInformation("Aventure servie par Ollama local (secours)");
+            return local;
+        }
+
+        return remote;
+    }
 }

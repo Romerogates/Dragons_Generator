@@ -17,14 +17,18 @@ public static class GroqChatClient
         if (string.IsNullOrWhiteSpace(text))
             return null;
 
+        var original = text;
+
         if (text.Contains("<think>", StringComparison.OrdinalIgnoreCase))
         {
-            var afterThinking = Regex.Replace(
+            text = Regex.Replace(
                 text,
                 @"(?is)<think>.*?(?:</think>|$)",
-                string.Empty);
-            text = afterThinking.Trim();
+                string.Empty).Trim();
         }
+
+        if (string.IsNullOrWhiteSpace(text))
+            text = ExtractStructuredAdventure(original);
 
         if (Regex.IsMatch(text, @"^\s*We need to\b", RegexOptions.IgnoreCase))
         {
@@ -43,5 +47,16 @@ public static class GroqChatClient
         }
 
         return string.IsNullOrWhiteSpace(text) ? null : text;
+    }
+
+    /// <summary>groq/compound place parfois l'aventure uniquement dans le bloc thinking.</summary>
+    private static string? ExtractStructuredAdventure(string text)
+    {
+        var match = Regex.Match(text, @"(?is)(\*\*Accroche\*\*[\s\S]+)", RegexOptions.None);
+        if (match.Success)
+            return match.Groups[1].Value.Trim();
+
+        match = Regex.Match(text, @"(?is)((?:\*\*[^*]+\*\*\s*[—\-–][\s\S]+))", RegexOptions.None);
+        return match.Success ? match.Groups[1].Value.Trim() : null;
     }
 }
