@@ -4,7 +4,8 @@ using System.Text.Json;
 
 namespace DragonsGenerator.API.Tests;
 
-public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
+[Collection("ApiIntegration")]
+public class ApiIntegrationTests
 {
     private readonly HttpClient _client;
 
