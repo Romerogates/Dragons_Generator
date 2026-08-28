@@ -98,7 +98,8 @@ public class GenerateCreatureStoriesBatchEndpoint
             );
         }
 
-        var prompt = $"""
+        var prompt =
+            $"""
             Tu es un maître du jeu expert en jeux de rôle fantasy francophones (univers Eana / Dragons).
             Pour CHAQUE créature listée, rédige sa vie et son histoire personnelle (max 100 mots, un paragraphe dense, en français).
             {(setting != null ? $"Contexte de l'aventure: {setting}" : "")}
@@ -107,8 +108,8 @@ public class GenerateCreatureStoriesBatchEndpoint
             {string.Join('\n', blocks)}
 
             Réponds UNIQUEMENT avec un JSON valide (tableau), sans markdown ni commentaire:
-            [{{"creatureId":"id","backstory":"texte en français"}}]
-            """;
+            """
+            + "[{\"creatureId\":\"id\",\"backstory\":\"texte en français\"}]";
 
         var maxTokens = Math.Min(4096, 220 * chunk.Length + 200);
         var result = await _groq.SendChatAsync(
