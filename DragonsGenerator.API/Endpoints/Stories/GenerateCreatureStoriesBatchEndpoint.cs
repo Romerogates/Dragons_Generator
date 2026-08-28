@@ -31,12 +31,12 @@ public class GenerateCreatureStoriesBatchEndpoint
     private const int ChunkSize = 5;
 
     private readonly GameDataRepository _repo;
-    private readonly GroqChatClient _groq;
+    private readonly HybridAiService _ai;
 
-    public GenerateCreatureStoriesBatchEndpoint(GameDataRepository repo, GroqChatClient groq)
+    public GenerateCreatureStoriesBatchEndpoint(GameDataRepository repo, HybridAiService ai)
     {
         _repo = repo;
-        _groq = groq;
+        _ai = ai;
     }
 
     public override void Configure()
@@ -112,7 +112,7 @@ public class GenerateCreatureStoriesBatchEndpoint
             + "[{\"creatureId\":\"id\",\"backstory\":\"texte en français\"}]";
 
         var maxTokens = Math.Min(4096, 220 * chunk.Length + 200);
-        var result = await _groq.SendChatAsync(
+        var result = await _ai.SendShortGenerationAsync(
             prompt,
             "Tu es un maître du jeu expert en jeux de rôle fantasy francophones.",
             maxTokens,

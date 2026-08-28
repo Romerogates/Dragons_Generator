@@ -27,9 +27,9 @@ public record GenerateAdventureResponse(string Adventure);
 
 public class GenerateAdventureEndpoint : Endpoint<GenerateAdventureRequest, GenerateAdventureResponse>
 {
-    private readonly GroqChatClient _groq;
+    private readonly HybridAiService _ai;
 
-    public GenerateAdventureEndpoint(GroqChatClient groq) => _groq = groq;
+    public GenerateAdventureEndpoint(HybridAiService ai) => _ai = ai;
 
     public override void Configure()
     {
@@ -63,7 +63,12 @@ public class GenerateAdventureEndpoint : Endpoint<GenerateAdventureRequest, Gene
                 $"- {c.CustomName} (bestiaire: {c.CreatureName}, rôle: {RoleLabel(c.Role)})"
             };
             if (!string.IsNullOrWhiteSpace(c.Backstory))
-                lines.Add($"  Vie: {c.Backstory}");
+            {
+                var life = c.Backstory.Trim();
+                if (life.Length > 400)
+                    life = life[..397] + "...";
+                lines.Add($"  Vie: {life}");
+            }
             return string.Join('\n', lines);
         });
 
@@ -102,10 +107,10 @@ public class GenerateAdventureEndpoint : Endpoint<GenerateAdventureRequest, Gene
             {string.Join('\n', creatureBlocks)}
             """;
 
-        var result = await _groq.SendChatAsync(
+        var result = await _ai.SendAdventureGenerationAsync(
             prompt,
             "Tu es un maître du jeu expert en jeux de rôle fantasy francophones.",
-            1200,
+            2500,
             ct);
 
         if (!result.Ok)

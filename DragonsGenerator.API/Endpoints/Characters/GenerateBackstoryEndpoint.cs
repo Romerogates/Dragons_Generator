@@ -25,9 +25,9 @@ public record GenerateBackstoryResponse(string Story);
 
 public class GenerateBackstoryEndpoint : Endpoint<GenerateBackstoryRequest, GenerateBackstoryResponse>
 {
-    private readonly GroqChatClient _groq;
+    private readonly HybridAiService _ai;
 
-    public GenerateBackstoryEndpoint(GroqChatClient groq) => _groq = groq;
+    public GenerateBackstoryEndpoint(HybridAiService ai) => _ai = ai;
 
     public override void Configure()
     {
@@ -63,7 +63,7 @@ public class GenerateBackstoryEndpoint : Endpoint<GenerateBackstoryRequest, Gene
             {(req.Flaws != null ? $"- Défauts: {req.Flaws}" : "")}
             """;
 
-        var result = await _groq.SendChatAsync(
+        var result = await _ai.SendShortGenerationAsync(
             prompt,
             "Tu es un maître du jeu expert en jeux de rôle fantasy francophones, spécialisé dans l'univers d'Eana (Dragons).",
             400,

@@ -15,6 +15,20 @@ services:
     networks:
       - dragons-network
 
+  ollama:
+    container_name: dragons-ollama-local
+    image: ollama/ollama:latest
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - dragons-network
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
   dragons-api:
     container_name: dragons-api-local
     build:
@@ -36,6 +50,9 @@ services:
       Smtp__FromName: Dragons Generator
       App__PublicWebUrl: http://localhost:8081
       Groq__Model: groq/compound
+      LocalLlm__Enabled: "true"
+      LocalLlm__BaseUrl: http://ollama:11434/v1
+      LocalLlm__Model: qwen2.5:3b
       RateLimit__Enabled: "false"
       Jwt__Key: DragonsGenerator_Dev_Jwt_Key_ChangeInProd_32+
       Admin__Email: admin@dragons.local
@@ -54,7 +71,10 @@ services:
       - path: .env
         required: false
     depends_on:
-      - mailhog
+      mailhog:
+        condition: service_started
+      ollama:
+        condition: service_healthy
     networks:
       - dragons-network
 
@@ -74,6 +94,7 @@ services:
 
 volumes:
   dragons-api-data:
+  ollama-data:
 
 networks:
   dragons-network:

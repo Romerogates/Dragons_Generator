@@ -49,7 +49,7 @@
     "is_ritual_caster": false,
     "starts_at_level": 1,
     "focus_options": [
-      "tl-sacoche-a-composantes",
+      "it-sacoche-a-composantes",
       "tl-focaliseur-arcanique"
     ],
     "allows_swap_on_levelup": true,
@@ -80,7 +80,7 @@
                 "qty": 1
               },
               {
-                "id": "gr-carreau",
+                "id": "it-carreaux",
                 "qty": 20
               }
             ]
@@ -108,7 +108,7 @@
             "option_id": "A",
             "items": [
               {
-                "id": "tl-sacoche-a-composantes",
+                "id": "it-sacoche-a-composantes",
                 "qty": 1
               }
             ]

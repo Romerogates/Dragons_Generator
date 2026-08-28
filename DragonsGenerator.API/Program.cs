@@ -62,10 +62,14 @@ builder.Services.AddDragonsRateLimiting(builder.Configuration, builder.Environme
 builder.Services.AddSingleton<IndexedDataStore>();
 builder.Services.AddSingleton<GameDataRepository>();
 builder.Services.AddSingleton<GroqRequestCoordinator>();
-builder.Services.AddSingleton<GroqChatClient>();
+builder.Services.AddSingleton<HybridAiService>();
 builder.Services.AddHttpClient("Groq", client =>
 {
     client.Timeout = TimeSpan.FromSeconds(120);
+});
+builder.Services.AddHttpClient("LocalLlm", client =>
+{
+    client.Timeout = TimeSpan.FromMinutes(5);
 });
 
 builder.Services

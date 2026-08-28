@@ -19,12 +19,12 @@ public record GenerateCreatureStoryResponse(string Backstory);
 public class GenerateCreatureStoryEndpoint : Endpoint<GenerateCreatureStoryRequest, GenerateCreatureStoryResponse>
 {
     private readonly GameDataRepository _repo;
-    private readonly GroqChatClient _groq;
+    private readonly HybridAiService _ai;
 
-    public GenerateCreatureStoryEndpoint(GameDataRepository repo, GroqChatClient groq)
+    public GenerateCreatureStoryEndpoint(GameDataRepository repo, HybridAiService ai)
     {
         _repo = repo;
-        _groq = groq;
+        _ai = ai;
     }
 
     public override void Configure()
@@ -75,7 +75,7 @@ public class GenerateCreatureStoryEndpoint : Endpoint<GenerateCreatureStoryReque
             {(actionsSummary.Length > 0 ? $"- Capacités marquantes: {actionsSummary}" : "")}
             """;
 
-        var result = await _groq.SendChatAsync(
+        var result = await _ai.SendShortGenerationAsync(
             prompt,
             "Tu es un maître du jeu expert en jeux de rôle fantasy francophones.",
             500,
