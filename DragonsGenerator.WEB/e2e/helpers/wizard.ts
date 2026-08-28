@@ -2,6 +2,14 @@ import { expect, type Page } from '@playwright/test';
 
 const CAROUSEL_DELAY_MS = 250;
 
+/** Titres affichés sur les cartes (fallback si data-card-id absent). */
+const CARD_TITLES: Record<string, string | RegExp> = {
+  'sp-humain': 'Humains',
+  'cls-lettre': 'Lettré',
+  'feat-astuce-audace': 'Audace',
+  'feat-astuce-brio': 'Brio',
+};
+
 /** Vide le brouillon local et ouvre /create avec une session propre. */
 export async function startFreshWizard(page: Page): Promise<void> {
   await page.goto('/create');
@@ -14,14 +22,24 @@ export async function startFreshWizard(page: Page): Promise<void> {
 }
 
 function visibleCarouselCard(page: Page, cardId: string) {
-  // Ignore le carrousel mobile (lg:hidden) dupliqué en viewport desktop.
-  return page.locator(`[data-card-id="${cardId}"]`).filter({ visible: true }).first();
+  const byId = page.locator(`[data-card-id="${cardId}"]`).filter({ visible: true });
+  const title = CARD_TITLES[cardId];
+  if (!title) return byId.first();
+  const byTitle = page
+    .getByRole('heading', { name: title, level: 3 })
+    .locator('xpath=ancestor::*[contains(@class,"cursor-pointer")][1]')
+    .filter({ visible: true });
+  return byId.or(byTitle).first();
 }
 
 async function isCarouselCardCentered(page: Page, cardId: string): Promise<boolean> {
   const card = visibleCarouselCard(page, cardId);
   if ((await card.count()) === 0) return false;
-  return card.evaluate((el) => getComputedStyle(el).pointerEvents !== 'none');
+  return card.evaluate((el) => {
+    const style = getComputedStyle(el);
+    if (style.pointerEvents === 'none') return false;
+    return parseFloat(style.opacity) > 0.9;
+  });
 }
 
 export type PickCarouselOptions = {
