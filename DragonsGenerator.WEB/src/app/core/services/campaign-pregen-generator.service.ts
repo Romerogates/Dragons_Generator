@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { DataService } from './data.service';
 import { CharacterCloudService } from './character-cloud.service';
+import { CharacterAutoGeneratorService } from './character-auto-generator.service';
 import type { CampaignDetail } from '@core/models/Campaign/campaign';
 import type { Character } from '@core/models/Character/character';
 import { pickRandom } from '@core/utils/pregen-random.util';
@@ -19,6 +20,12 @@ export interface GeneratedPregenCharacter {
 export class CampaignPregenGeneratorService {
   private readonly data = inject(DataService);
   private readonly characters = inject(CharacterCloudService);
+  private readonly autoGenerator = inject(CharacterAutoGeneratorService);
+
+  /** Génère un héros original niveau 1 — fiche complète, jouable après claim. */
+  generateOriginalPlayable(campaign: CampaignDetail, withAiStory = true): Promise<GeneratedPregenCharacter> {
+    return this.autoGenerator.generateOriginalPlayable(campaign, withAiStory);
+  }
 
   /** Duplique un héros MJ complet — fiche jouable immédiatement après claim. */
   async generatePlayableDuplicate(

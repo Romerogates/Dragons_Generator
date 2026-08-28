@@ -75,7 +75,6 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly importingPregen = signal(false);
   readonly generatingAutoPregen = signal(false);
 
-  readonly canGeneratePlayablePregen = computed(() => this.dmCharacters().length > 0);
   readonly creatureXpMap = signal<Record<string, number>>({});
   readonly isLoadingPreview = signal(false);
   readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
@@ -352,17 +351,10 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const c = this.campaign();
     if (!c?.isOwner || this.generatingAutoPregen()) return;
 
-    const pool = this.dmCharacters().map((ch) => ch.id);
-    const sourceId = this.pregenGenerator.pickRandomCharacterId(pool);
-    if (!sourceId) {
-      this.error.set('Créez d\'abord au moins un héros complet dans /create.');
-      return;
-    }
-
     this.generatingAutoPregen.set(true);
     this.error.set(null);
     try {
-      const generated = await this.pregenGenerator.generatePlayableDuplicate(c, sourceId, true);
+      const generated = await this.pregenGenerator.generateOriginalPlayable(c, true);
       const entry = createCampaignPregenEntry(
         generated.characterId,
         generated.characterName,
@@ -376,7 +368,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         pregenCharacters: [...(c.data.pregenCharacters ?? []), entry],
       });
     } catch {
-      this.error.set('Génération impossible. Vérifiez qu\'au moins un héros est sauvegardé dans le cloud.');
+      this.error.set('Génération impossible. Réessayez dans quelques instants.');
     } finally {
       this.generatingAutoPregen.set(false);
     }
