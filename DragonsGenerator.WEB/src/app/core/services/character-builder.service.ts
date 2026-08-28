@@ -275,6 +275,7 @@ interface StoredState {
 interface EditingRef {
   id: string;
   createdAt: string;
+  cloudSynced?: boolean;
 }
 
 function isConcreteStyleRef(id: string): boolean {
@@ -1172,6 +1173,7 @@ export class CharacterBuilderService {
     this.editingRef.set({
       id: savedCharacter.id,
       createdAt: savedCharacter.createdAt,
+      cloudSynced: savedCharacter.cloudSynced === true,
     });
 
     const species = savedCharacter.species;
@@ -1412,6 +1414,7 @@ export class CharacterBuilderService {
 
     return {
       id: this.editingRef()?.id ?? crypto.randomUUID(),
+      cloudSynced: this.editingRef()?.cloudSynced ?? false,
       createdAt: this.editingRef()?.createdAt ?? now,
       updatedAt: now,
       schemaVersion: CURRENT_SCHEMA_VERSION,

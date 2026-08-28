@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of, switchMap, tap, catchError, map } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, of, switchMap, tap, catchError, map, throwError } from 'rxjs';
 import { environment } from '@env/environment';
 import type { Character } from '@core/models/Character/character';
 import { AuthService } from './auth.service';
@@ -10,6 +10,13 @@ export interface CloudCharacterSummary {
   name: string;
   updatedAt: string;
 }
+
+export interface SaveCharacterOptions {
+  /** Force la mise à jour PUT (perso déjà connu côté serveur). */
+  updateExisting?: boolean;
+}
+
+const GUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 @Injectable({ providedIn: 'root' })
 export class CharacterCloudService {
@@ -29,35 +36,31 @@ export class CharacterCloudService {
   }
 
   /** Crée ou met à jour un perso cloud ; retourne l'id serveur. */
-  save(character: Character): Observable<string> {
+  save(character: Character, options?: SaveCharacterOptions): Observable<string> {
     if (!this.auth.isLoggedIn()) return of(character.id ?? '');
 
     const body = { name: character.name ?? 'Sans nom', data: character };
-    const existingId = typeof character.id === 'string' && character.id.length > 20
-      ? character.id
-      : null;
+    const shouldUpdate =
+      options?.updateExisting === true ||
+      (character.cloudSynced === true &&
+        typeof character.id === 'string' &&
+        GUID_RE.test(character.id));
 
-    if (existingId && !existingId.includes('-') === false && existingId.length === 36) {
-      // GUID serveur
-    }
-
-    // Si l'id ressemble à un GUID → update, sinon create
-    const looksGuid =
-      typeof character.id === 'string' &&
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(character.id);
-
-    if (looksGuid) {
+    if (shouldUpdate && character.id) {
       return this.http
         .put<{ id: string }>(`${this.api}/me/characters/${character.id}`, body)
         .pipe(
-          map((r) => r.id),
-          catchError(() =>
-            this.http.post<{ id: string }>(`${this.api}/me/characters`, body).pipe(map((r) => r.id)),
-          ),
+          map((r) => r.id ?? character.id),
+          catchError((err: unknown) => {
+            if (err instanceof HttpErrorResponse && err.status === 404) {
+              return this.createCharacter(body);
+            }
+            return throwError(() => err);
+          }),
         );
     }
 
-    return this.http.post<{ id: string }>(`${this.api}/me/characters`, body).pipe(map((r) => r.id));
+    return this.createCharacter(body);
   }
 
   delete(id: string): Observable<void> {
@@ -79,7 +82,12 @@ export class CharacterCloudService {
               switchMap((arr) =>
                 req.pipe(
                   map((full) => {
-                    const data = { ...(full.data as object), id: full.id, name: full.name };
+                    const data = {
+                      ...(full.data as object),
+                      id: full.id,
+                      name: full.name,
+                      cloudSynced: true,
+                    };
                     return [...arr, data];
                   }),
                   catchError(() => of(arr)),
@@ -94,6 +102,10 @@ export class CharacterCloudService {
       }),
       catchError(() => of(this.readLocal())),
     );
+  }
+
+  private createCharacter(body: { name: string; data: Character }): Observable<string> {
+    return this.http.post<{ id: string }>(`${this.api}/me/characters`, body).pipe(map((r) => r.id));
   }
 
   private readLocal(): unknown[] {

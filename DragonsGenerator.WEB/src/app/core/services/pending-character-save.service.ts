@@ -59,6 +59,7 @@ export class PendingCharacterSaveService {
         const updated = {
           ...character,
           id: serverId || character.id,
+          cloudSynced: true,
         };
         this.upsertLocal(updated);
         localStorage.setItem('dragons-current-character', JSON.stringify(updated));

@@ -553,6 +553,8 @@ export interface Personality {
 export interface Character {
   // === Méta ===
   id: string;
+  /** true si le personnage est enregistré sur le serveur (id cloud valide). */
+  cloudSynced?: boolean;
   createdAt: string; // ISO 8601
   updatedAt: string;
   schemaVersion: number;
