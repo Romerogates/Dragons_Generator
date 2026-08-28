@@ -48,10 +48,10 @@ test.describe('Lettré L1 wizard', () => {
 
     // 4 — Classe : Lettré + 2 astuces
     await expect(page.getByText('La Vocation')).toBeVisible({ timeout: 20_000 });
-    await pickCarouselCard(page, 'cls-lettre');
+    await pickCarouselCard(page, 'cls-lettre', { clickCount: 1 });
     await expect(page.getByText(/Astuces initiales/i)).toBeVisible({ timeout: 15_000 });
-    await pickCarouselCard(page, 'feat-astuce-audace');
-    await pickCarouselCard(page, 'feat-astuce-brio');
+    await pickCarouselCard(page, 'feat-astuce-audace', { clickCount: 1 });
+    await pickCarouselCard(page, 'feat-astuce-brio', { clickCount: 1 });
 
     // 5 — Caractéristiques (15 pts : Int 15, Dex 14, Con 13)
     await expectStepHeading(page, /Essence & Attributs/i);

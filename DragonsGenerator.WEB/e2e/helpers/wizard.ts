@@ -24,8 +24,18 @@ async function isCarouselCardCentered(page: Page, cardId: string): Promise<boole
   return card.evaluate((el) => getComputedStyle(el).pointerEvents !== 'none');
 }
 
-/** Double-clic carrousel (centrer puis sélectionner). */
-export async function pickCarouselCard(page: Page, cardId: string): Promise<void> {
+export type PickCarouselOptions = {
+  /** 2 = centrer puis sélectionner (espèce). 1 = sélection directe (classe, astuces…). */
+  clickCount?: 1 | 2;
+};
+
+/** Clic(s) carrousel — centrer si besoin puis sélectionner. */
+export async function pickCarouselCard(
+  page: Page,
+  cardId: string,
+  options: PickCarouselOptions = {},
+): Promise<void> {
+  const clickCount = options.clickCount ?? 2;
   const nextBtn = page.getByRole('button', { name: 'Carte suivante' }).filter({ visible: true }).first();
 
   for (let attempt = 0; attempt < 50; attempt++) {
@@ -47,10 +57,10 @@ export async function pickCarouselCard(page: Page, cardId: string): Promise<void
       }
     }
 
-    await card.click();
-    await page.waitForTimeout(CAROUSEL_DELAY_MS);
-    await card.click();
-    await page.waitForTimeout(CAROUSEL_DELAY_MS);
+    for (let c = 0; c < clickCount; c++) {
+      await card.click({ timeout: 5_000 });
+      await page.waitForTimeout(CAROUSEL_DELAY_MS);
+    }
     return;
   }
 
