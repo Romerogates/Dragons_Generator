@@ -22,7 +22,7 @@ public static class AdventureOutputCleaner
         RegexOptions.Compiled);
 
     private static readonly Regex SectionHeader = new(
-        @"(?im)^[\*_\s]*(?:\*\*(?<title>Accroche|Contexte|Personnages clés|Acte 1|Acte 2|Acte 3|Pistes pour le MJ)\*\*|\*(?<title>Accroche|Contexte|Personnages clés|Acte 1|Acte 2|Acte 3|Pistes pour le MJ)\*:)\s*[—\-–:]?\s*(?<body>.*)$",
+        @"(?im)^[\*_\s]*(?:\*\*(?<titleBold>Accroche|Contexte|Personnages clés|Acte 1|Acte 2|Acte 3|Pistes pour le MJ)\*\*|\*(?<titleItalic>Accroche|Contexte|Personnages clés|Acte 1|Acte 2|Acte 3|Pistes pour le MJ)\*:)\s*[—\-–:]?\s*(?<body>.*)$",
         RegexOptions.Compiled);
 
     public static string? Clean(string? raw)
@@ -121,7 +121,10 @@ public static class AdventureOutputCleaner
 
         for (var i = 0; i < matches.Count; i++)
         {
-            var title = matches[i].Groups["title"].Value.Trim();
+            var title = matches[i].Groups["titleBold"].Success
+                ? matches[i].Groups["titleBold"].Value
+                : matches[i].Groups["titleItalic"].Value;
+            title = title.Trim();
             var inlineBody = matches[i].Groups["body"].Value.Trim();
             string body;
             if (i + 1 < matches.Count)

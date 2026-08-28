@@ -127,6 +127,7 @@ public sealed class HybridAiService
 
         return new[] { primary, secondary, tertiary }
             .Where(m => !string.IsNullOrWhiteSpace(m))
+            .Select(m => m!)
             .Distinct(StringComparer.Ordinal)
             .ToList();
     }
