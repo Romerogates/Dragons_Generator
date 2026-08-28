@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-moulin-a-prieres",
+  "name": "Moulin à prières",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 1,
+    "unit": "po"
+  },
+  "weight_kg": 0.25,
+  "description": "Cylindre gravé de prières et de mantras sacrés, tourné pour accompagner la dévotion et la méditation."
+}
