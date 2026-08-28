@@ -65,7 +65,9 @@ public static class RateLimitPolicies
                     var key = !string.IsNullOrEmpty(userId)
                         ? $"user:{userId}"
                         : $"ip:{context.Connection.RemoteIpAddress?.ToString() ?? "unknown"}";
-                    var permitLimit = !string.IsNullOrEmpty(userId) ? 30 : 5;
+                    var permitLimit = !string.IsNullOrEmpty(userId)
+                        ? configuration.GetValue("RateLimit:AiGenerationAuthenticatedPerHour", 60)
+                        : configuration.GetValue("RateLimit:AiGenerationAnonymousPerHour", 30);
 
                     return RateLimitPartition.GetFixedWindowLimiter(
                         key,
