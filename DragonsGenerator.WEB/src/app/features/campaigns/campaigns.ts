@@ -97,11 +97,14 @@ export class Campaigns implements OnInit {
     });
   }
 
-  formatDate(iso: string): string {
-    try {
-      return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-    } catch {
-      return iso;
-    }
+  formatDate(dateString: string): string {
+    if (!dateString) return 'Récemment';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Récemment';
+    return new Intl.DateTimeFormat('fr-FR', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }).format(date);
   }
 }

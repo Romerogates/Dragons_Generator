@@ -44,15 +44,6 @@
           </a>
 
           <a
-            routerLink="/campaigns"
-            routerLinkActive="text-violet-400"
-            class="h-10 flex items-center px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-violet-400 hover:bg-slate-800/60 transition-colors"
-            (click)="closeMenus()"
-          >
-            Campagnes
-          </a>
-
-          <a
             routerLink="/friends"
             routerLinkActive="text-violet-400"
             class="h-10 flex items-center px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-violet-400 hover:bg-slate-800/60 transition-colors"
@@ -118,22 +109,43 @@
           Forger
         </a>
 
-        <a
-          routerLink="/characters"
-          class="flex items-center gap-2 bg-[#171b22] border border-slate-700 hover:border-emerald-500/50 px-3 sm:px-4 py-2 rounded-full shadow-inner group transition-[colors,transform,opacity,box-shadow] duration-200"
-          (click)="closeMenus()"
-        >
-          <span
-            class="text-[10px] font-black uppercase tracking-widest text-slate-300 group-hover:text-emerald-400"
-            >Héros</span
+        <div class="flex items-center gap-2">
+          <a
+            routerLink="/characters"
+            routerLinkActive="border-emerald-500/50"
+            class="flex items-center gap-2 bg-[#171b22] border border-slate-700 hover:border-emerald-500/50 px-3 sm:px-4 py-2 rounded-full shadow-inner group transition-[colors,transform,opacity,box-shadow] duration-200"
+            (click)="closeMenus()"
           >
-          @if (savedCount() > 0) {
             <span
-              class="bg-emerald-950 text-emerald-400 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full border border-emerald-900"
-              >{{ savedCount() }}</span
+              class="text-[10px] font-black uppercase tracking-widest text-slate-300 group-hover:text-emerald-400"
+              >Héros</span
             >
-          }
-        </a>
+            @if (savedCount() > 0) {
+              <span
+                class="bg-emerald-950 text-emerald-400 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full border border-emerald-900"
+                >{{ savedCount() }}</span
+              >
+            }
+          </a>
+
+          <a
+            routerLink="/campaigns"
+            routerLinkActive="border-violet-500/50"
+            class="flex items-center gap-2 bg-[#171b22] border border-slate-700 hover:border-violet-500/50 px-3 sm:px-4 py-2 rounded-full shadow-inner group transition-[colors,transform,opacity,box-shadow] duration-200"
+            (click)="closeMenus()"
+          >
+            <span
+              class="text-[10px] font-black uppercase tracking-widest text-slate-300 group-hover:text-violet-400"
+              >Campagnes</span
+            >
+            @if (campaignCount() > 0) {
+              <span
+                class="bg-violet-950 text-violet-400 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full border border-violet-900"
+                >{{ campaignCount() }}</span
+              >
+            }
+          </a>
+        </div>
 
         @if (auth.isLoggedIn()) {
           <a
@@ -245,11 +257,30 @@
 
         <a
           routerLink="/characters"
-          class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+          class="flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
           (click)="closeMenus()"
         >
-          <span class="text-xl"><iconify-icon icon="fluent-emoji:busts-in-silhouette"></iconify-icon></span>
-          <span class="text-sm font-bold tracking-wide">Mes héros</span>
+          <span class="flex items-center gap-3">
+            <span class="text-xl"><iconify-icon icon="fluent-emoji:busts-in-silhouette"></iconify-icon></span>
+            <span class="text-sm font-bold tracking-wide">Mes héros</span>
+          </span>
+          @if (savedCount() > 0) {
+            <span class="bg-emerald-950 text-emerald-400 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full border border-emerald-900">{{ savedCount() }}</span>
+          }
+        </a>
+
+        <a
+          routerLink="/campaigns"
+          class="flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+          (click)="closeMenus()"
+        >
+          <span class="flex items-center gap-3">
+            <span class="text-xl"><iconify-icon icon="fluent-emoji:world-map"></iconify-icon></span>
+            <span class="text-sm font-bold tracking-wide">Mes campagnes</span>
+          </span>
+          @if (campaignCount() > 0) {
+            <span class="bg-violet-950 text-violet-400 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full border border-violet-900">{{ campaignCount() }}</span>
+          }
         </a>
 
         @if (auth.isLoggedIn()) {
