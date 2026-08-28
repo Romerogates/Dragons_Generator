@@ -25,14 +25,15 @@ import { FormsModule } from '@angular/forms';
           [required]="required"
           [minlength]="minlength ?? null"
           [name]="name"
+          [autocomplete]="autocomplete"
           [placeholder]="placeholder"
           [ngModel]="value"
           (ngModelChange)="valueChange.emit($event)"
-          class="w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 pr-10 text-sm text-slate-100 focus:border-amber-500 outline-none"
+          class="w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 pr-12 text-sm text-slate-100 focus:border-amber-500 outline-none"
         />
         <button
           type="button"
-          class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-500 hover:text-amber-400 transition-colors"
+          class="absolute right-1 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-500 hover:text-amber-400 transition-colors"
           [attr.aria-label]="visible() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
           (click)="visible.set(!visible())"
         >
@@ -46,6 +47,7 @@ export class PasswordFieldComponent {
   @Input({ required: true }) label = 'Mot de passe';
   @Input() value = '';
   @Input() name = 'password';
+  @Input() autocomplete = 'current-password';
   @Input() placeholder = '';
   @Input() required = false;
   @Input() minlength?: number;

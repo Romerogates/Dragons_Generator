@@ -1,5 +1,5 @@
-<div class="min-h-[70vh] flex items-center justify-center px-4 py-10">
-  <div class="w-full max-w-md bg-[#1b2028] border border-slate-800 rounded-2xl p-8 shadow-xl">
+<div class="min-h-[70vh] flex items-center justify-center px-4 py-8 sm:py-10">
+  <div class="w-full max-w-md bg-[#1b2028] border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl">
     <h1 class="font-serif text-2xl font-bold text-amber-500 mb-1 text-center">Connexion</h1>
     <p class="text-xs text-slate-400 text-center mb-6 italic">
       @if (saveIntent()) {
@@ -13,7 +13,7 @@
       <p class="text-[10px] text-sky-400/90 text-center mb-4 -mt-2">
         Mode local : emails de test dans
         <a
-          href="http://localhost:8025"
+          [href]="mailhogUrl()"
           target="_blank"
           rel="noopener"
           class="underline hover:text-sky-300"
@@ -29,12 +29,20 @@
           <input
             type="email"
             required
+            autocomplete="email"
+            inputmode="email"
             [(ngModel)]="email"
             name="email"
             class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 outline-none"
           />
         </label>
-        <app-password-field label="Mot de passe" name="password" [required]="true" [(value)]="password" />
+        <app-password-field
+          label="Mot de passe"
+          name="password"
+          autocomplete="current-password"
+          [required]="true"
+          [(value)]="password"
+        />
 
         @if (error()) {
           <p class="text-sm text-red-400">{{ error() }}</p>
@@ -52,9 +60,14 @@
             <p class="text-xs text-emerald-400">{{ resendMsg() }}</p>
           }
           @if (confirmLink()) {
-            <a [href]="confirmLink()!" class="text-xs text-amber-300 break-all hover:underline">{{
-              confirmLink()
-            }}</a>
+            <div class="p-3 rounded-lg bg-amber-950/30 border border-amber-800/50 space-y-2">
+              <a
+                [href]="confirmLink()!"
+                class="wizard-nav-primary w-full text-center block text-xs"
+                >Ouvrir le lien de confirmation</a
+              >
+              <p class="text-[10px] text-slate-500 break-all">{{ confirmLink() }}</p>
+            </div>
           }
         }
 

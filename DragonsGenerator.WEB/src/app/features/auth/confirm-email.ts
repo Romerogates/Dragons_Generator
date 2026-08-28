@@ -16,8 +16,8 @@ import { PendingCharacterSaveService } from '@core/services/pending-character-sa
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <div class="min-h-[60vh] flex items-center justify-center px-4">
-      <div class="max-w-md w-full bg-[#1b2028] border border-slate-800 rounded-2xl p-8 text-center">
+    <div class="min-h-[60vh] flex items-center justify-center px-4 py-8">
+      <div class="max-w-md w-full bg-[#1b2028] border border-slate-800 rounded-2xl p-6 sm:p-8 text-center">
         <h1 class="font-serif text-2xl text-amber-500 mb-4">Confirmation email</h1>
         @if (loading()) {
           <p class="text-slate-400 text-sm">Vérification…</p>
@@ -36,9 +36,14 @@ import { PendingCharacterSaveService } from '@core/services/pending-character-sa
           >
         } @else {
           <p class="text-red-400 text-sm mb-4">{{ message() }}</p>
-          <a routerLink="/register" class="text-amber-500 text-xs hover:underline"
-            >Réessayer l'inscription</a
-          >
+          <div class="flex flex-col gap-2">
+            <a routerLink="/register" class="wizard-nav-primary inline-block text-xs"
+              >Réessayer l'inscription</a
+            >
+            <a routerLink="/login" [queryParams]="loginQueryParams" class="text-amber-500 text-xs hover:underline"
+              >Se connecter</a
+            >
+          </div>
         }
       </div>
     </div>

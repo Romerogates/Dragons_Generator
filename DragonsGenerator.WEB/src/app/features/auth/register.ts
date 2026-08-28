@@ -12,6 +12,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { PendingCharacterSaveService } from '@core/services/pending-character-save.service';
 import { PasswordFieldComponent } from '@shared/components/password-field/password-field';
+import { isLocalDevHost, mailhogWebUrl } from '@core/utils/local-dev.util';
 
 @Component({
   selector: 'app-register',
@@ -39,6 +40,7 @@ export class RegisterPage implements OnInit {
   readonly loading = signal(false);
   readonly saveIntent = signal(false);
   readonly localDev = signal(false);
+  readonly mailhogUrl = signal('http://localhost:8025');
 
   loginQueryParams: Record<string, string> = {};
 
@@ -53,7 +55,8 @@ export class RegisterPage implements OnInit {
     };
     if (typeof window !== 'undefined') {
       const host = window.location.hostname;
-      this.localDev.set(host === 'localhost' || host === '127.0.0.1');
+      this.localDev.set(isLocalDevHost(host));
+      this.mailhogUrl.set(mailhogWebUrl(host));
     }
   }
 
@@ -86,7 +89,7 @@ export class RegisterPage implements OnInit {
           this.loading.set(false);
           if (err.status === 0) {
             this.error.set(
-              'Impossible de joindre le serveur. Vérifiez le Wi‑Fi et que l\'API tourne sur le PC.',
+              'Impossible de joindre le serveur. Vérifiez votre connexion réseau.',
             );
             return;
           }

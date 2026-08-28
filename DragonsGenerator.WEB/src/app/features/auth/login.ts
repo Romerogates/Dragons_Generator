@@ -12,6 +12,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { PendingCharacterSaveService } from '@core/services/pending-character-save.service';
 import { PasswordFieldComponent } from '@shared/components/password-field/password-field';
+import { isLocalDevHost, mailhogWebUrl } from '@core/utils/local-dev.util';
 
 @Component({
   selector: 'app-login',
@@ -40,6 +41,7 @@ export class LoginPage implements OnInit {
   readonly mode = signal<'login' | 'forgot'>('login');
   readonly saveIntent = signal(false);
   readonly localDev = signal(false);
+  readonly mailhogUrl = signal('http://localhost:8025');
 
   private returnUrl = '/characters';
 
@@ -49,7 +51,8 @@ export class LoginPage implements OnInit {
     this.saveIntent.set(q.get('intent') === 'save' || this.pendingSave.hasPending());
     if (typeof window !== 'undefined') {
       const host = window.location.hostname;
-      this.localDev.set(host === 'localhost' || host === '127.0.0.1');
+      this.localDev.set(isLocalDevHost(host));
+      this.mailhogUrl.set(mailhogWebUrl(host));
     }
   }
 
