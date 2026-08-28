@@ -30,6 +30,7 @@ services:
       RateLimit__Enabled: "true"
       ConnectionStrings__Default: "Data Source=/app/data/dragons.db"
       App__PublicWebUrl: https://dragons-generator.top
+      Groq__AdventureModel: qwen/qwen3.6-27b
       LocalLlm__Enabled: "true"
       LocalLlm__BaseUrl: http://ollama:11434/v1
       LocalLlm__Model: qwen2.5:3b

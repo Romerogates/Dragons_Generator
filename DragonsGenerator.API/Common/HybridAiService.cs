@@ -60,61 +60,88 @@ public sealed class HybridAiService
         return await _remote.SendChatAsync(userPrompt, systemPrompt, maxTokens, ct);
     }
 
-    /// <summary>Aventure structurée — qwen/Groq d'abord, Ollama local en secours.</summary>
+    /// <summary>Aventure structurée — essaie chaque modèle Groq puis Ollama local.</summary>
     public async Task<GroqChatResult> SendAdventureGenerationAsync(
         string userPrompt,
         string systemPrompt,
         int maxTokens,
         CancellationToken ct)
     {
-        var remote = await _remote.SendChatAsync(
-            userPrompt,
-            systemPrompt,
-            maxTokens,
-            ct,
-            GetAdventureModelChain());
-
-        if (remote.Ok)
-            return FinalizeAdventure(remote);
-
-        if (_local is null)
-            return remote;
-
-        _logger.LogWarning("Groq aventure indisponible ({Error}) — bascule Ollama local", remote.Error);
-        var localMaxTokens = Math.Max(maxTokens, 3500);
-        var local = await _local.SendChatAsync(userPrompt, systemPrompt, localMaxTokens, ct);
-        if (local.Ok)
+        GroqChatResult? last = null;
+        foreach (var model in GetAdventureModelChain())
         {
-            _logger.LogInformation("Aventure servie par Ollama local (secours)");
-            return FinalizeAdventure(local);
+            var attempt = await _remote.SendChatAsync(
+                userPrompt,
+                systemPrompt,
+                maxTokens,
+                ct,
+                [model]);
+
+            last = attempt;
+            if (!attempt.Ok)
+                continue;
+
+            var finalized = FinalizeAdventure(attempt);
+            if (finalized.Ok)
+            {
+                _logger.LogInformation("Aventure Groq servie par {Model}", model);
+                return finalized;
+            }
+
+            _logger.LogWarning("Réponse aventure rejetée après nettoyage ({Model})", model);
         }
 
-        return remote;
+        if (_local is not null)
+        {
+            _logger.LogWarning("Groq aventure insatisfaisante — bascule Ollama local");
+            var localMaxTokens = Math.Max(maxTokens, 3500);
+            var local = await _local.SendChatAsync(userPrompt, systemPrompt, localMaxTokens, ct);
+            if (local.Ok)
+            {
+                var finalized = FinalizeAdventure(local);
+                if (finalized.Ok)
+                {
+                    _logger.LogInformation("Aventure servie par Ollama local (secours)");
+                    return finalized;
+                }
+
+                last = finalized;
+            }
+            else
+            {
+                last = local;
+            }
+        }
+
+        return last ?? new GroqChatResult(false, null, "La génération IA a échoué.", false);
     }
 
     private IReadOnlyList<string> GetAdventureModelChain()
     {
         var primary = _config["Groq:AdventureModel"];
         if (string.IsNullOrWhiteSpace(primary))
-            primary = _config["Groq:FallbackModel"] ?? "qwen/qwen3.6-27b";
+            primary = "qwen/qwen3.6-27b";
 
-        var fallback = _config["Groq:Model"] ?? "groq/compound";
-        if (string.Equals(primary, fallback, StringComparison.Ordinal))
-            return [primary];
+        var secondary = _config["Groq:FallbackModel"];
+        var tertiary = _config["Groq:Model"] ?? "groq/compound";
 
-        return [primary, fallback];
+        return new[] { primary, secondary, tertiary }
+            .Where(m => !string.IsNullOrWhiteSpace(m))
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
     }
 
     private GroqChatResult FinalizeAdventure(GroqChatResult result)
     {
         var cleaned = AdventureOutputCleaner.Clean(result.Text);
-        if (!string.IsNullOrWhiteSpace(cleaned))
-            return result with { Text = cleaned };
+        if (AdventureOutputCleaner.LooksProfessional(cleaned))
+            return result with { Text = cleaned! };
 
         _logger.LogWarning("Aventure brute non exploitable après nettoyage ({Length} car.)", result.Text?.Length ?? 0);
         return result with
         {
             Ok = false,
+            Text = null,
             Error = "La génération IA n'a renvoyé aucun texte en français.",
             Retryable = true,
         };

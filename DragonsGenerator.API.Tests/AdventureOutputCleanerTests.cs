@@ -43,4 +43,11 @@ public class AdventureOutputCleanerTests
         Assert.Contains("La Cité Franche tremble", cleaned);
         Assert.Contains("**Pistes pour le MJ**", cleaned);
     }
+
+    [Fact]
+    public void LooksProfessional_rejects_english_meta()
+    {
+        const string bad = "**Accroche** — , **Contexte**\nWord Count Check: 523 words";
+        Assert.False(AdventureOutputCleaner.LooksProfessional(bad));
+    }
 }

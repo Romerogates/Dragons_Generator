@@ -32,6 +32,7 @@ public static class AdventureOutputCleaner
 
         var text = GroqChatClient.SanitizeModelOutput(raw) ?? raw.Trim();
         text = EnglishPlanningCutoff.Split(text)[0].Trim();
+        text = StripEnglishLines(text);
         text = StripBulletOutline(text);
 
         var sections = ParseSections(text);
@@ -47,6 +48,52 @@ public static class AdventureOutputCleaner
             return Clean(fallback.Groups[1].Value);
 
         return IsSubstantiveBody(text) ? text.Trim() : null;
+    }
+
+    private static string StripEnglishLines(string text)
+    {
+        var kept = new List<string>();
+        foreach (var line in text.Split('\n'))
+        {
+            if (IsEnglishMetaLine(line))
+                continue;
+            kept.Add(line);
+        }
+
+        return string.Join('\n', kept);
+    }
+
+    private static bool IsEnglishMetaLine(string line)
+    {
+        var trimmed = line.Trim();
+        if (trimmed.Length == 0)
+            return false;
+
+        var lower = trimmed.ToLowerInvariant();
+        if (Regex.IsMatch(lower, @"\b(word count|let's count|deconstruct|integration:|language:|adventure details:|creatures to include|note on ""vie""|must follow|need to assign|need to invent|i need to|i'll need to|perfect\.|total:)\b"))
+            return true;
+
+        if (Regex.IsMatch(trimmed, @"\[[^\]]*(?:Need to|e\.g\.|HP|assign)[^\]]*\]", RegexOptions.IgnoreCase))
+            return true;
+
+        // Ligne quasi entièrement anglaise (> 6 mots anglais courants)
+        var englishHits = Regex.Matches(lower, @"\b(the|and|with|must|should|party|level|context|creatures|include|assign|plausible|standard|fantasy|prompt)\b").Count;
+        return englishHits >= 4;
+    }
+
+    public static bool LooksProfessional(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return false;
+
+        var lower = text.ToLowerInvariant();
+        if (Regex.IsMatch(lower, @"\b(word count|deconstruct|integration:|creatures to include|need to assign)\b"))
+            return false;
+
+        if (!text.Contains("**Accroche**", StringComparison.Ordinal))
+            return false;
+
+        return Regex.IsMatch(text, @"\*\*Accroche\*\*\s*[—\-–]\s*[A-ZÀ-Ü«""][^*\n]{30,}");
     }
 
     private static string StripBulletOutline(string text)

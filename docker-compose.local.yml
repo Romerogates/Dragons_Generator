@@ -50,6 +50,7 @@ services:
       Smtp__FromName: Dragons Generator
       App__PublicWebUrl: http://localhost:8081
       Groq__Model: groq/compound
+      Groq__AdventureModel: qwen/qwen3.6-27b
       LocalLlm__Enabled: "true"
       LocalLlm__BaseUrl: http://ollama:11434/v1
       LocalLlm__Model: qwen2.5:3b
