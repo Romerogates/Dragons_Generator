@@ -18,7 +18,7 @@ public static class AdventureOutputCleaner
     ];
 
     private static readonly Regex EnglishPlanningCutoff = new(
-        @"(?is)(?:\d+\.\s*\*\*Word Count|\*\*Word Count Check|\bLet's count\b|\bTotal:\s*~?\d|\bI'll adjust slightly\b|\bDeconstruct Constraints\b|\bMental Refinement\b|\bUnderstand the Task\b|\*\*Integration:\*\*|\*\*Language:\*\*|\*\*Adventure Details:\*\*)",
+        @"(?is)(?:\n\s*\d+\.\s*\*\*Word Count|\*\*Word Count Check|\bLet's count\b|\bTotal:\s*~?\d|\bI'll adjust slightly\b|\bDeconstruct Constraints\b|\bMental Refinement\b|\bUnderstand the Task\b|\*\*Integration:\*\*|\*\*Language:\*\*|\*\*Adventure Details:\*\*)",
         RegexOptions.Compiled);
 
     private static readonly Regex SectionHeader = new(
