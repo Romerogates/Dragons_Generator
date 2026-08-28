@@ -771,6 +771,18 @@
       "file": "Equipment/gear/gr-livre-de-prieres.json"
     },
     {
+      "id": "gr-moulin-a-prieres",
+      "name": "Moulin à prières",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 0.25,
+      "file": "Equipment/gear/gr-moulin-a-prieres.json"
+    },
+    {
       "id": "gr-materiel-descalade",
       "name": "Matériel d'escalade",
       "category": "gear",

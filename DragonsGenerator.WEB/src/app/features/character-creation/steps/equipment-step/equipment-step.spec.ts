@@ -41,6 +41,8 @@ const MOCK_CATALOG: Equipment[] = [
   mockEquipment('tl-necessaire-dherboristerie', "Nécessaire d'herboristerie", 'tool', 'artisan_tools'),
   mockEquipment('gr-sac-derudit', "Sac d'érudit", 'gear', null),
   mockEquipment('gr-sac-daventurier', "Sac d'aventurier", 'gear', null),
+  mockEquipment('gr-livre-de-prieres', 'Livre de prières', 'gear', null),
+  mockEquipment('gr-moulin-a-prieres', 'Moulin à prières', 'gear', null),
 ];
 
 const LETTRE_SLOTS = [
@@ -261,6 +263,30 @@ describe('EquipmentStep', () => {
     component.selectFromFixedCategory(1, 0, 'wp-dague');
     expect(component.pickedCategory().get('1-fixed-0')).toBe('wp-dague');
     expect(component.selectionComplete()).toBeTrue();
+  });
+
+  it('resolves acolyte background prayer item alternatives by catalog name', () => {
+    creationSignal.set(
+      lettreCreation({
+        startingEquipmentSlots: [],
+        backgroundEquipmentSlots: [
+          {
+            slot: 100,
+            description: 'Livre de prières ou moulin à prières',
+            alternatives: [
+              [{ id: 'gr-livre-de-prieres', qty: 1 }],
+              [{ id: 'gr-moulin-a-prieres', qty: 1 }],
+            ],
+          },
+        ],
+      }),
+    );
+    fixture.detectChanges();
+
+    const slot = component.resolvedSlots()[0];
+    expect(slot.alternatives[0].items[0].equipment?.name).toBe('Livre de prières');
+    expect(slot.alternatives[1].items[0].equipment?.name).toBe('Moulin à prières');
+    expect(component.itemName(slot.alternatives[1].items[0])).toBe('Moulin à prières');
   });
 
   it('shows load error when catalog request fails', async () => {
