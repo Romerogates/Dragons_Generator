@@ -2,12 +2,14 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
+  OnDestroy,
   OnInit,
   signal,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { StoryBuilderService } from '@core/services/story-builder.service';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { CampaignPdfService, CreaturePrintEntry } from '@core/services/campaign-pdf.service';
@@ -28,13 +30,14 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class StorySummaryStep implements OnInit {
+export class StorySummaryStep implements OnInit, OnDestroy {
   readonly builder = inject(StoryBuilderService);
   private router = inject(Router);
   private campaigns = inject(CampaignCloudService);
   private pdf = inject(CampaignPdfService);
   private data = inject(DataService);
   private auth = inject(AuthService);
+  private sanitizer = inject(DomSanitizer);
 
   readonly saved = signal(false);
   readonly saving = signal(false);
@@ -43,8 +46,53 @@ export class StorySummaryStep implements OnInit {
   readonly copyFeedback = signal(false);
   readonly savedCampaignId = signal<string | null>(null);
 
+  readonly isLoadingPreview = signal(false);
+  readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
+  private rawBlobUrl: string | null = null;
+
   ngOnInit(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (this.builder.creatures().length) {
+      this.loadBestiaryPreview();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.revokePreviewUrl();
+  }
+
+  private revokePreviewUrl(): void {
+    if (this.rawBlobUrl) {
+      URL.revokeObjectURL(this.rawBlobUrl);
+      this.rawBlobUrl = null;
+    }
+  }
+
+  private loadBestiaryPreview(): void {
+    this.isLoadingPreview.set(true);
+    this.loadEntries().subscribe({
+      next: async (entries) => {
+        try {
+          if (!entries.length) return;
+          this.revokePreviewUrl();
+          const url = await this.pdf.generateCreaturesPdfBlob(
+            entries,
+            this.builder.title().trim() || 'Scénario',
+          );
+          this.rawBlobUrl = url;
+          this.pdfPreviewUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+        } catch (err) {
+          console.error('Erreur génération aperçu bestiaire :', err);
+        } finally {
+          this.isLoadingPreview.set(false);
+        }
+      },
+      error: () => this.isLoadingPreview.set(false),
+    });
+  }
+
+  openFullscreen(): void {
+    if (this.rawBlobUrl) window.open(this.rawBlobUrl, '_blank');
   }
 
   saveStory(): void {

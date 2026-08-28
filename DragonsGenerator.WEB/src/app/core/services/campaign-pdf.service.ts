@@ -48,6 +48,16 @@ export class CampaignPdfService {
     pdf.save(this.safeName(`${title}-bestiaire.pdf`));
   }
 
+  /** Génère le PDF bestiaire et retourne une blob URL pour l'aperçu in-page. */
+  async generateCreaturesPdfBlob(
+    entries: CreaturePrintEntry[],
+    title: string,
+  ): Promise<string> {
+    const pdf = await this.buildCreaturesPdf(entries, title);
+    const blob = pdf.output('blob');
+    return URL.createObjectURL(blob);
+  }
+
   async downloadCampaignPack(
     title: string,
     data: CampaignData,

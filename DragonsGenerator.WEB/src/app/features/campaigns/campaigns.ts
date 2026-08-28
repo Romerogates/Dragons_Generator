@@ -31,6 +31,7 @@ export class Campaigns implements OnInit {
   readonly invites = signal<CampaignInvite[]>([]);
   readonly loading = signal(true);
   readonly toDelete = signal<CampaignSummary | null>(null);
+  readonly deleteConfirmName = signal('');
   readonly isLoggedIn = this.auth.isLoggedIn;
 
   ngOnInit(): void {
@@ -71,13 +72,26 @@ export class Campaigns implements OnInit {
   }
 
   confirmDelete(c: CampaignSummary): void {
+    this.deleteConfirmName.set('');
     this.toDelete.set(c);
+  }
+
+  cancelDelete(): void {
+    this.deleteConfirmName.set('');
+    this.toDelete.set(null);
+  }
+
+  canConfirmDelete(): boolean {
+    const c = this.toDelete();
+    if (!c) return false;
+    return this.deleteConfirmName().trim() === c.title.trim();
   }
 
   deleteCampaign(): void {
     const c = this.toDelete();
-    if (!c) return;
+    if (!c || !this.canConfirmDelete()) return;
     this.campaigns.delete(c.id).subscribe(() => {
+      this.deleteConfirmName.set('');
       this.toDelete.set(null);
       this.reload();
     });

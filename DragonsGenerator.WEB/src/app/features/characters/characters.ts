@@ -33,6 +33,7 @@ export class Characters implements OnInit {
 
   readonly characters = signal<any[]>([]);
   readonly characterToDelete = signal<any | null>(null);
+  readonly deleteConfirmName = signal('');
   readonly isLoggedIn = this.auth.isLoggedIn;
   readonly loading = signal(true);
 
@@ -214,19 +215,28 @@ export class Characters implements OnInit {
 
   confirmDelete(character: any, event: Event): void {
     event.stopPropagation();
+    this.deleteConfirmName.set('');
     this.characterToDelete.set(character);
   }
 
   cancelDelete(): void {
+    this.deleteConfirmName.set('');
     this.characterToDelete.set(null);
+  }
+
+  canConfirmDelete(): boolean {
+    const toDelete = this.characterToDelete();
+    if (!toDelete) return false;
+    return this.deleteConfirmName().trim() === this.getCharName(toDelete);
   }
 
   deleteCharacter(): void {
     const toDelete = this.characterToDelete();
-    if (!toDelete) return;
+    if (!toDelete || !this.canConfirmDelete()) return;
 
     this.characters.update((chars) => chars.filter((c) => c.id !== toDelete.id));
     localStorage.setItem('dragons-characters', JSON.stringify(this.characters()));
+    this.deleteConfirmName.set('');
     this.characterToDelete.set(null);
 
     if (this.auth.isLoggedIn() && toDelete.id) {

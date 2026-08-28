@@ -35,6 +35,53 @@
       <div class="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap font-serif">{{ builder.adventure() }}</div>
     </section>
 
+    <!-- Aperçu PDF bestiaire -->
+    @if (builder.creatures().length) {
+      <section class="flex flex-col gap-3">
+        <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500 text-center">
+          Aperçu du bestiaire
+        </h3>
+        <div
+          class="relative w-full bg-[#0f1117] border border-slate-800 rounded-2xl overflow-hidden shadow-2xl"
+          style="aspect-ratio: 210 / 297; max-height: 70vh"
+        >
+          @if (isLoadingPreview()) {
+            <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[#0f1117]">
+              <div
+                class="w-10 h-10 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin"
+              ></div>
+              <p class="text-slate-500 text-xs font-bold uppercase tracking-widest animate-pulse">
+                Gravure du bestiaire...
+              </p>
+            </div>
+          }
+
+          @if (!isLoadingPreview() && pdfPreviewUrl()) {
+            <iframe
+              [src]="pdfPreviewUrl()"
+              class="w-full h-full border-0"
+              title="Aperçu du bestiaire"
+            ></iframe>
+          }
+
+          @if (!isLoadingPreview() && !pdfPreviewUrl()) {
+            <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0f1117]">
+              <span class="text-3xl">⚠️</span>
+              <p class="text-slate-400 text-xs text-center max-w-xs">
+                L'aperçu n'a pas pu être généré. Vous pouvez quand même télécharger le PDF.
+              </p>
+            </div>
+          }
+        </div>
+
+        @if (!isLoadingPreview() && pdfPreviewUrl()) {
+          <p class="text-center text-[10px] text-slate-600 italic">
+            Utilisez la molette ou les flèches du viewer pour naviguer entre les pages
+          </p>
+        }
+      </section>
+    }
+
     <!-- Actions -->
     @if (saveError(); as err) {
       <div class="p-3 bg-red-950/40 border border-red-900/50 rounded-xl text-sm text-red-300">{{ err }}</div>
@@ -44,11 +91,20 @@
       <button
         type="button"
         class="flex-1 min-w-[140px] py-3 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-950/30 border border-amber-800/50 text-amber-300 hover:border-amber-500/50 disabled:opacity-50"
-        [disabled]="printing() || !builder.creatures().length"
+        [disabled]="printing() || isLoadingPreview() || !builder.creatures().length"
         (click)="printBestiary()"
       >
-        PDF Bestiaire
+        Télécharger PDF Bestiaire
       </button>
+      @if (pdfPreviewUrl()) {
+        <button
+          type="button"
+          class="flex-1 min-w-[140px] py-3 rounded-xl text-[10px] font-black uppercase tracking-widest bg-[#1b2028] border border-slate-700 text-slate-300 hover:border-amber-500/50 transition-colors"
+          (click)="openFullscreen()"
+        >
+          Ouvrir en plein écran
+        </button>
+      }
       <button
         type="button"
         class="flex-1 min-w-[140px] py-3 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-950/30 border border-amber-800/50 text-amber-300 hover:border-amber-500/50 disabled:opacity-50"
