@@ -1,4 +1,23 @@
 services:
+  ollama:
+    container_name: dragons-ollama
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - dragons-network
+    deploy:
+      resources:
+        limits:
+          memory: 3500M
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
   dragons-api:
     container_name: dragons-api
     restart: unless-stopped
@@ -11,11 +30,17 @@ services:
       RateLimit__Enabled: "true"
       ConnectionStrings__Default: "Data Source=/app/data/dragons.db"
       App__PublicWebUrl: https://dragons-generator.top
+      LocalLlm__Enabled: "true"
+      LocalLlm__BaseUrl: http://ollama:11434/v1
+      LocalLlm__Model: qwen2.5:3b
     volumes:
       - dragons-api-data:/app/data
     env_file:
       - path: .env
         required: false
+    depends_on:
+      ollama:
+        condition: service_healthy
     networks:
       - dragons-network
 
@@ -37,6 +62,7 @@ services:
 
 volumes:
   dragons-api-data:
+  ollama-data:
 
 networks:
   dragons-network:

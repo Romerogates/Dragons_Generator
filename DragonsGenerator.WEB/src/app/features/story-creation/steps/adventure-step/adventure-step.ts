@@ -98,8 +98,8 @@ export class AdventureStep implements OnInit {
     const detail = e?.['detail'] as string | undefined;
     const apiMsg = general || detail || title || (e?.['message'] as string) || null;
     if (apiMsg && apiMsg !== 'One or more errors occurred!') return apiMsg;
-    if (http.status === 502)
-      return 'Le service de génération IA est indisponible. Vérifiez la clé Groq ou réessayez dans quelques instants.';
+    if (http.status === 502 || http.status === 503 || http.status === 504)
+      return 'Le service de génération IA est temporairement indisponible (quota ou surcharge Groq). Attendez une minute et réessayez.';
     return "L'inspiration cosmique est momentanément indisponible.";
   }
 }

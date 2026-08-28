@@ -61,7 +61,10 @@ jobs:
 
       - name: Start local stack
         run: |
-          docker compose -f docker-compose.local.yml up -d --build
+          docker compose -f docker-compose.local.yml up -d --build mailhog ollama
+          chmod +x scripts/ensure-ollama-model.sh
+          ./scripts/ensure-ollama-model.sh docker-compose.local.yml
+          docker compose -f docker-compose.local.yml up -d --build dragons-api dragons-web
           for i in $(seq 1 60); do
             if curl -sf http://localhost:8081/ >/dev/null \
               && curl -sf http://localhost:8081/api/species/summary >/dev/null; then
@@ -117,6 +120,9 @@ jobs:
               echo 'Admin__ResetPassword=true' >> "$ENV_FILE"
             fi
 
+            docker compose -f docker-compose.prod.yml up --build -d ollama
+            chmod +x scripts/ensure-ollama-model.sh
+            ./scripts/ensure-ollama-model.sh docker-compose.prod.yml
             docker compose -f docker-compose.prod.yml up --build -d
 
             if [ ! -f "$MARKER" ]; then

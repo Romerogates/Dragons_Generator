@@ -31,6 +31,9 @@ export const EQUIPMENT_ID_ALIASES: Record<string, string> = {
   'gr-sac-explorateur': 'gr-sac-dexplorateur',
   'gr-sac-erudit': 'gr-sac-derudit',
   'gr-carreaux-x20': 'it-carreaux',
+  'gr-carreau': 'it-carreaux',
+  'tl-sacoche-a-composantes': 'it-sacoche-a-composantes',
+  'tl-sacoche-composantes': 'it-sacoche-a-composantes',
   'tl-necessaire-d-herboristerie': 'tl-necessaire-dherboristerie',
   'tl-necessaire-d-alchimiste': 'tl-necessaire-dalchimiste',
 };

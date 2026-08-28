@@ -43,6 +43,12 @@ const MOCK_CATALOG: Equipment[] = [
   mockEquipment('gr-sac-daventurier', "Sac d'aventurier", 'gear', null),
   mockEquipment('gr-livre-de-prieres', 'Livre de prières', 'gear', null),
   mockEquipment('gr-moulin-a-prieres', 'Moulin à prières', 'gear', null),
+  mockEquipment('it-carreaux', 'Carreaux (20)', 'gear', null),
+  mockEquipment('it-sacoche-a-composantes', 'Sacoche à composantes', 'gear', null),
+  mockEquipment('wp-arbalete-legere', 'Arbalète légère', 'weapon', 'simple_ranged', {
+    damage_dice: '1d8',
+    damage_type: 'perforant',
+  }),
 ];
 
 const LETTRE_SLOTS = [
@@ -287,6 +293,44 @@ describe('EquipmentStep', () => {
     expect(slot.alternatives[0].items[0].equipment?.name).toBe('Livre de prières');
     expect(slot.alternatives[1].items[0].equipment?.name).toBe('Moulin à prières');
     expect(component.itemName(slot.alternatives[1].items[0])).toBe('Moulin à prières');
+  });
+
+  it('resolves ensorceleur starting equipment refs by catalog name', () => {
+    creationSignal.set(
+      lettreCreation({
+        className: 'Ensorceleur',
+        startingEquipmentSlots: [
+          {
+            slot: 2,
+            description: 'Arme à distance ou arme courante au choix',
+            alternatives: [
+              [
+                { id: 'wp-arbalete-legere', qty: 1 },
+                { id: 'gr-carreau', qty: 20 },
+              ],
+              [{ id: 'category-arme-courante', qty: 1 }],
+            ],
+          },
+          {
+            slot: 3,
+            description: 'Focaliseur arcanique ou sacoche à composantes',
+            alternatives: [
+              [{ id: 'tl-sacoche-a-composantes', qty: 1 }],
+              [{ id: 'tl-focaliseur-arcanique', qty: 1 }],
+            ],
+          },
+        ],
+      }),
+    );
+    fixture.detectChanges();
+
+    const weaponSlot = component.resolvedSlots()[0];
+    expect(component.itemName(weaponSlot.alternatives[0].items[0])).toBe('Arbalète légère');
+    expect(component.itemName(weaponSlot.alternatives[0].items[1])).toBe('Carreaux (20)');
+
+    const focusSlot = component.resolvedSlots()[1];
+    expect(component.itemName(focusSlot.alternatives[0].items[0])).toBe('Sacoche à composantes');
+    expect(component.itemName(focusSlot.alternatives[1].items[0])).toBe('Focaliseur arcanique');
   });
 
   it('shows load error when catalog request fails', async () => {

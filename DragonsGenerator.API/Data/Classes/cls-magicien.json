@@ -78,7 +78,7 @@
     "attack_bonus_formula": "prof_bonus + int_mod",
     "focus_options": [
       "tl-focaliseur-arcanique",
-      "tl-sacoche-a-composantes"
+      "it-sacoche-a-composantes"
     ],
     "grimoire": {
       "initial_spells": 6,
@@ -137,7 +137,7 @@
             "option_id": "A",
             "items": [
               {
-                "id": "tl-sacoche-a-composantes",
+                "id": "it-sacoche-a-composantes",
                 "qty": 1
               }
             ]
