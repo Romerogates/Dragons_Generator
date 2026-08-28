@@ -31,11 +31,15 @@ public static class AdventureOutputCleaner
             return null;
 
         var text = GroqChatClient.SanitizeModelOutput(raw) ?? raw.Trim();
-        text = EnglishPlanningCutoff.Split(text)[0].Trim();
         text = StripEnglishLines(text);
         text = StripBulletOutline(text);
 
         var sections = ParseSections(text);
+        if (sections.Count >= 3)
+            return FormatSections(sections);
+
+        text = EnglishPlanningCutoff.Split(text)[0].Trim();
+        sections = ParseSections(text);
         if (sections.Count >= 3)
             return FormatSections(sections);
 
