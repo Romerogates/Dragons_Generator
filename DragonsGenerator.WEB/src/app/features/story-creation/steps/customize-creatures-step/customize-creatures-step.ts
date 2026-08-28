@@ -9,6 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '@core/services/data.service';
+import { AiRateLimitDialogService } from '@core/services/ai-rate-limit-dialog.service';
 import { StoryBuilderService } from '@core/services/story-builder.service';
 import {
   ADVENTURE_TONE_LABELS,
@@ -27,7 +28,8 @@ import { formatChallengeRating } from '@core/utils/creature-display.util';
 })
 export class CustomizeCreaturesStep implements OnInit {
   readonly builder = inject(StoryBuilderService);
-  private dataService = inject(DataService);
+  private readonly dataService = inject(DataService);
+  private readonly aiRateLimit = inject(AiRateLimitDialogService);
 
   readonly generatingId = signal<string | null>(null);
   readonly generationError = signal<string | null>(null);
@@ -56,6 +58,7 @@ export class CustomizeCreaturesStep implements OnInit {
       this.generationError.set('Donnez un nom à la créature avant de générer sa vie.');
       return;
     }
+    if (this.aiRateLimit.showIfBlocked()) return;
 
     this.generatingId.set(creatureId);
     this.generationError.set(null);
@@ -73,7 +76,9 @@ export class CustomizeCreaturesStep implements OnInit {
           this.generatingId.set(null);
         },
         error: (err) => {
-          this.generationError.set(this.extractError(err));
+          if (!this.aiRateLimit.handleHttpError(err)) {
+            this.generationError.set(this.extractError(err));
+          }
           this.generatingId.set(null);
         },
       });
@@ -82,6 +87,7 @@ export class CustomizeCreaturesStep implements OnInit {
   generateAllBackstories(): void {
     const pending = this.builder.creatures().filter((c) => !c.backstory.trim());
     if (pending.length === 0) return;
+    if (this.aiRateLimit.showIfBlocked()) return;
 
     let index = 0;
     const runNext = (): void => {
@@ -104,7 +110,9 @@ export class CustomizeCreaturesStep implements OnInit {
             runNext();
           },
           error: (err) => {
-            this.generationError.set(this.extractError(err));
+            if (!this.aiRateLimit.handleHttpError(err)) {
+              this.generationError.set(this.extractError(err));
+            }
             this.generatingId.set(null);
           },
         });
@@ -135,7 +143,7 @@ export class CustomizeCreaturesStep implements OnInit {
     if (apiMsg && apiMsg !== 'One or more errors occurred!') return apiMsg;
     if (http.status === 502)
       return 'Le service de génération IA est indisponible. Vérifiez la clé Groq ou réessayez dans quelques instants.';
-    if (http.status === 429) return 'Trop de requêtes — réessayez dans quelques instants.';
+    if (http.status === 429) return 'Limite atteinte — voir le message à l\'écran.';
     return "L'inspiration cosmique est momentanément indisponible.";
   }
 }

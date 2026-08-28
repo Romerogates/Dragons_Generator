@@ -30,13 +30,33 @@ public static class RateLimitPolicies
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             options.OnRejected = async (context, token) =>
             {
+                var retryAfterSeconds = 60;
                 if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
                 {
-                    context.HttpContext.Response.Headers.RetryAfter =
-                        ((int)Math.Ceiling(retryAfter.TotalSeconds)).ToString();
+                    retryAfterSeconds = Math.Max(1, (int)Math.Ceiling(retryAfter.TotalSeconds));
+                    context.HttpContext.Response.Headers.RetryAfter = retryAfterSeconds.ToString();
                 }
 
                 context.HttpContext.Response.ContentType = "application/json";
+                var path = context.HttpContext.Request.Path.Value ?? string.Empty;
+                var isAiGeneration = path.Contains("generate-", StringComparison.OrdinalIgnoreCase);
+                var isAuthenticated = context.HttpContext.User?.Identity?.IsAuthenticated == true;
+
+                if (isAiGeneration)
+                {
+                    await context.HttpContext.Response.WriteAsJsonAsync(
+                        new
+                        {
+                            message = "Limite de génération IA atteinte pour le moment.",
+                            code = "ai_rate_limit",
+                            retryAfterSeconds,
+                            suggestLogin = !isAuthenticated,
+                        },
+                        token
+                    );
+                    return;
+                }
+
                 await context.HttpContext.Response.WriteAsJsonAsync(
                     new { message = "Trop de requêtes. Réessayez dans quelques instants." },
                     token

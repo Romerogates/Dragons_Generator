@@ -1,0 +1,93 @@
+@if (dialog.visible()) {
+  <div
+    class="fixed inset-0 z-[120] flex items-end sm:items-center justify-center p-4 sm:p-6 pointer-events-none"
+    role="presentation"
+  >
+    <button
+      type="button"
+      class="absolute inset-0 bg-black/45 backdrop-blur-[2px] pointer-events-auto animate-fade-in"
+      aria-label="Fermer"
+      (click)="close()"
+    ></button>
+
+    <div
+      class="relative w-full max-w-md pointer-events-auto animate-fade-in"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ai-rate-limit-title"
+    >
+      <div
+        class="overflow-hidden rounded-2xl border border-amber-500/25 bg-[#1b2028]/95 shadow-2xl shadow-black/40 backdrop-blur-md"
+      >
+        <div
+          class="h-1 w-full bg-gradient-to-r from-transparent via-amber-500/70 to-transparent"
+        ></div>
+
+        <div class="px-6 pt-6 pb-5 flex flex-col gap-5">
+          <div class="flex items-start gap-4">
+            <div
+              class="shrink-0 w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-2xl"
+            >
+              <iconify-icon icon="fluent-emoji:hourglass-not-done"></iconify-icon>
+            </div>
+            <div class="min-w-0 pt-0.5">
+              <h2
+                id="ai-rate-limit-title"
+                class="text-lg font-bold text-amber-400 font-serif tracking-wide"
+              >
+                Inspiration en repos
+              </h2>
+              <p class="text-sm text-slate-400 mt-1 leading-relaxed">
+                {{ dialog.message() }}
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="rounded-xl border border-slate-700/80 bg-[#171b22]/80 px-5 py-4 text-center"
+          >
+            <p
+              class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-500 mb-2"
+            >
+              Prochaine génération dans
+            </p>
+            <p
+              class="text-3xl sm:text-4xl font-black tabular-nums tracking-wide text-amber-300 font-serif"
+            >
+              {{ dialog.remainingLabel() }}
+            </p>
+          </div>
+
+          @if (dialog.suggestLogin()) {
+            <div
+              class="rounded-xl border border-violet-500/20 bg-violet-950/20 px-4 py-3.5 flex flex-col sm:flex-row sm:items-center gap-3"
+            >
+              <div class="flex-1 text-xs text-slate-300 leading-relaxed">
+                <span class="text-violet-300 font-bold">Connectez-vous</span> pour passer à
+                <span class="text-white font-bold">60</span> générations / heure
+                <span class="text-slate-500">(30 sans compte)</span>.
+              </div>
+              <button
+                type="button"
+                class="shrink-0 px-4 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest bg-violet-600 text-white hover:bg-violet-500 transition-colors"
+                (click)="login()"
+              >
+                Se connecter
+              </button>
+            </div>
+          }
+
+          <div class="flex justify-end gap-2 pt-1">
+            <button
+              type="button"
+              class="px-5 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-200 transition-colors"
+              (click)="close()"
+            >
+              Compris
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

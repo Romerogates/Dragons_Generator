@@ -17,6 +17,7 @@ import {
 } from '@core/services/character-builder.service';
 import { ALIGNMENTS } from '@core/models/Character/character';
 import { DataService } from '@core/services/data.service';
+import { AiRateLimitDialogService } from '@core/services/ai-rate-limit-dialog.service';
 
 @Component({
   selector: 'app-identity-step',
@@ -29,6 +30,7 @@ import { DataService } from '@core/services/data.service';
 export class IdentityStep implements OnInit {
   readonly builder = inject(CharacterBuilderService);
   readonly dataService = inject(DataService);
+  private readonly aiRateLimit = inject(AiRateLimitDialogService);
   readonly alignments = ALIGNMENTS;
 
   /** État de la génération IA */
@@ -80,6 +82,7 @@ export class IdentityStep implements OnInit {
       this.generationError.set("L'espèce et la classe sont nécessaires.");
       return;
     }
+    if (this.aiRateLimit.showIfBlocked()) return;
 
     this.isGenerating.set(true);
     this.generationError.set(null);
@@ -105,13 +108,15 @@ export class IdentityStep implements OnInit {
         },
         error: (err) => {
           console.error('Erreur IA:', err);
-          const e = err?.error;
+          if (this.aiRateLimit.handleHttpError(err)) {
+            this.isGenerating.set(false);
+            return;
+          }
+          const e = (err as { error?: Record<string, unknown>; status?: number })?.error;
           const apiMsg =
-            e?.errors?.generalErrors?.[0] ||
-            e?.errors?.[0]?.reason ||
-            e?.errors?.[0]?.message ||
-            e?.message ||
-            (err.status === 429 ? 'Trop de générations IA pour le moment. Réessayez plus tard.' : null) ||
+            (e?.['errors'] as { generalErrors?: string[] })?.generalErrors?.[0] ||
+            (e?.['errors'] as { reason?: string }[])?.[0]?.reason ||
+            (e?.['message'] as string) ||
             null;
           this.generationError.set(
             apiMsg && apiMsg !== 'One or more errors occurred!'
