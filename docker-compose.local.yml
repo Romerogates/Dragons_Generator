@@ -35,6 +35,8 @@ services:
       Smtp__FromEmail: noreply@dragons-generator.local
       Smtp__FromName: Dragons Generator
       App__PublicWebUrl: http://localhost:8081
+      Groq__Model: groq/compound
+      RateLimit__Enabled: "false"
       Jwt__Key: DragonsGenerator_Dev_Jwt_Key_ChangeInProd_32+
       Admin__Email: admin@dragons.local
       Admin__Password: AdminDragons!2026

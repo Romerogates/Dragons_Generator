@@ -26,6 +26,7 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
                     ["Admin:Password"] = "AdminDragons!2026",
                     ["Admin:ResetPassword"] = "false",
                     ["App:PublicWebUrl"] = "http://localhost:8081",
+                    ["RateLimit:Enabled"] = "false",
                 }
             );
         });
