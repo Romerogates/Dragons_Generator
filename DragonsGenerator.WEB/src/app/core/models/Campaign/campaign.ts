@@ -23,6 +23,23 @@ export interface EncounterGroup {
   xpAwarded?: boolean;
 }
 
+export type CampaignPregenStatus = 'draft' | 'ready' | 'assigned' | 'claimed';
+
+export interface CampaignPregen {
+  id: string;
+  characterId: string;
+  characterName: string;
+  speciesLabel?: string;
+  classLabel?: string;
+  label?: string;
+  publicHook: string;
+  dmBackstory: string;
+  dmSecrets: string;
+  assignedUserId?: string | null;
+  assignedDisplayName?: string | null;
+  status: CampaignPregenStatus;
+}
+
 export interface CampaignData {
   setting: string;
   regionId: string | null;
@@ -33,6 +50,7 @@ export interface CampaignData {
   creatures: StoryCreatureSelection[];
   encounters: EncounterGroup[];
   notes: string;
+  pregenCharacters: CampaignPregen[];
 }
 
 export interface CampaignMember {
@@ -100,6 +118,7 @@ export function emptyCampaignData(partyLevel = 3): CampaignData {
     creatures: [],
     encounters: [],
     notes: '',
+    pregenCharacters: [],
   };
 }
 
@@ -133,6 +152,32 @@ export function encounterPendingXp(encounter: EncounterGroup): number {
     0,
   );
 }
+
+export function createCampaignPregenEntry(
+  characterId: string,
+  characterName: string,
+  speciesLabel: string,
+  classLabel: string,
+): CampaignPregen {
+  return {
+    id: crypto.randomUUID?.() ?? `pregen-${Date.now()}`,
+    characterId,
+    characterName,
+    speciesLabel,
+    classLabel,
+    publicHook: '',
+    dmBackstory: '',
+    dmSecrets: '',
+    status: 'draft',
+  };
+}
+
+export const PREGEN_STATUS_LABELS: Record<CampaignPregenStatus, string> = {
+  draft: 'Brouillon',
+  ready: 'Prêt',
+  assigned: 'Assigné',
+  claimed: 'Revendiqué',
+};
 
 export type { CreatureRole };
 export { CREATURE_ROLE_LABELS };

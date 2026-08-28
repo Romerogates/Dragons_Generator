@@ -5,7 +5,13 @@ import {
   StoryCreatureSelection,
   StoryRegionChoice,
 } from '../models/Story/story';
-import { CampaignData, CampaignDetail, EncounterGroup, emptyCampaignData } from '../models/Campaign/campaign';
+import {
+  CampaignData,
+  CampaignDetail,
+  CampaignPregen,
+  EncounterGroup,
+  emptyCampaignData,
+} from '../models/Campaign/campaign';
 import { CreatureSummary } from '../models/Creatures/creature-summary';
 import {
   getLevelRangePreset,
@@ -15,6 +21,7 @@ import {
 import { campaignRegionFields, campaignRegionFromData } from '../utils/story-location.util';
 
 export type CreatureSelectionMode = 'manual' | 'auto';
+export type CampaignEditScope = 'full' | 'creatures-only';
 
 const STORAGE_KEY = 'dragon_story_builder_v1';
 
@@ -26,7 +33,6 @@ export interface StoryStep {
 @Injectable({ providedIn: 'root' })
 export class StoryBuilderService {
   readonly currentStep = signal(1);
-  readonly totalSteps = 4;
 
   readonly title = signal('');
   readonly setting = signal('');
@@ -41,21 +47,39 @@ export class StoryBuilderService {
 
   /** When set, the wizard updates this cloud campaign instead of creating a new one. */
   readonly editingCampaignId = signal<string | null>(null);
+  readonly editScope = signal<CampaignEditScope | null>(null);
+  readonly baselineCreatureIds = signal<Set<string>>(new Set());
   readonly preservedEncounters = signal<EncounterGroup[]>([]);
   readonly preservedNotes = signal('');
+  readonly preservedPregens = signal<CampaignPregen[]>([]);
 
   readonly isEditingCampaign = computed(() => this.editingCampaignId() !== null);
+  readonly isCreaturesOnlyEdit = computed(() => this.editScope() === 'creatures-only');
 
-  readonly steps = computed<StoryStep[]>(() => [
-    { number: 1, title: 'Créatures' },
-    { number: 2, title: 'Personnages' },
-    { number: 3, title: 'Aventure' },
-    { number: 4, title: 'Récapitulatif' },
-  ]);
+  readonly steps = computed<StoryStep[]>(() => {
+    if (this.editScope() === 'creatures-only') {
+      return [
+        { number: 1, title: 'Créatures' },
+        { number: 2, title: 'Personnages' },
+        { number: 3, title: 'Récapitulatif' },
+      ];
+    }
+    return [
+      { number: 1, title: 'Créatures' },
+      { number: 2, title: 'Personnages' },
+      { number: 3, title: 'Aventure' },
+      { number: 4, title: 'Récapitulatif' },
+    ];
+  });
+
+  readonly totalSteps = computed(() => this.steps().length);
 
   readonly draftSummary = computed(() => {
     const count = this.creatures().length;
     const t = this.title().trim();
+    if (this.isCreaturesOnlyEdit()) {
+      return t ? `${t} — ajout de créatures` : 'Ajout de créatures';
+    }
     if (t) return t;
     if (count > 0) return `${count} créature(s) sélectionnée(s)`;
     return 'Nouveau scénario';
@@ -72,7 +96,15 @@ export class StoryBuilderService {
     return this.creatures().length > 0 || !!this.title().trim() || !!this.adventure().trim();
   }
 
+  isBaselineCreature(creatureId: string): boolean {
+    return this.baselineCreatureIds().has(creatureId);
+  }
+
   isStepValid(step: number): boolean {
+    if (this.editScope() === 'creatures-only' && step === 3) {
+      return true;
+    }
+
     switch (step) {
       case 1:
         if (this.selectionMode() === 'manual') {
@@ -95,21 +127,36 @@ export class StoryBuilderService {
   }
 
   nextStep(): void {
-    if (this.currentStep() < this.totalSteps && this.isStepValid(this.currentStep())) {
+    const step = this.currentStep();
+    if (!this.isStepValid(step)) return;
+
+    if (this.editScope() === 'creatures-only' && step === 2) {
+      this.currentStep.set(3);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (step < this.totalSteps()) {
       this.currentStep.update((s) => s + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
   previousStep(): void {
-    if (this.currentStep() > 1) {
+    const step = this.currentStep();
+    if (this.editScope() === 'creatures-only' && step === 3) {
+      this.currentStep.set(2);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    if (step > 1) {
       this.currentStep.update((s) => s - 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
   goToStep(step: number): void {
-    if (step >= 1 && step <= this.totalSteps) {
+    if (step >= 1 && step <= this.totalSteps()) {
       this.currentStep.set(step);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -117,7 +164,7 @@ export class StoryBuilderService {
 
   setSelectionMode(mode: CreatureSelectionMode): void {
     this.selectionMode.set(mode);
-    if (mode === 'auto') {
+    if (mode === 'auto' && !this.isEditingCampaign()) {
       this.creatures.set([]);
     }
   }
@@ -129,9 +176,30 @@ export class StoryBuilderService {
     const picked = pickCreaturesForLevelRange(allCreatures, preset, this.autoCreatureCount());
     if (picked.length === 0) return false;
 
-    this.creatures.set(picked);
+    if (this.isEditingCampaign()) {
+      this.mergeCreatures(picked);
+    } else {
+      this.creatures.set(picked);
+    }
     this.partyLevel.set(partyLevelFromRange(preset));
     return true;
+  }
+
+  mergeCreatures(incoming: StoryCreatureSelection[]): void {
+    this.creatures.update((list) => {
+      const merged = [...list];
+      for (const entry of incoming) {
+        if (merged.some((c) => c.creatureId === entry.creatureId)) continue;
+        if (merged.length >= 20) break;
+        merged.push({
+          ...entry,
+          customName: entry.customName?.trim() || entry.creatureName,
+          role: entry.role ?? ('neutral' as CreatureRole),
+          backstory: entry.backstory ?? '',
+        });
+      }
+      return merged;
+    });
   }
 
   toggleCreature(entry: Omit<StoryCreatureSelection, 'customName' | 'role' | 'backstory'>): void {
@@ -173,10 +241,16 @@ export class StoryBuilderService {
     this.region.set(region);
   }
 
-  loadCampaignIntoBuilder(campaign: CampaignDetail): void {
+  loadCampaignIntoBuilder(
+    campaign: CampaignDetail,
+    scope: CampaignEditScope = 'full',
+  ): void {
     this.editingCampaignId.set(campaign.id);
+    this.editScope.set(scope);
+    this.baselineCreatureIds.set(new Set((campaign.data.creatures ?? []).map((c) => c.creatureId)));
     this.preservedEncounters.set(structuredClone(campaign.data.encounters ?? []));
     this.preservedNotes.set(campaign.data.notes ?? '');
+    this.preservedPregens.set(structuredClone(campaign.data.pregenCharacters ?? []));
     this.title.set(campaign.title);
     this.setting.set(campaign.data.setting ?? '');
     this.region.set(campaignRegionFromData(campaign.data.regionId, campaign.data.regionName));
@@ -200,6 +274,7 @@ export class StoryBuilderService {
       creatures: this.creatures(),
       encounters: structuredClone(this.preservedEncounters()),
       notes: this.preservedNotes(),
+      pregenCharacters: structuredClone(this.preservedPregens()),
     };
   }
 
@@ -216,8 +291,11 @@ export class StoryBuilderService {
     this.levelRangeId.set('3-4');
     this.autoCreatureCount.set(4);
     this.editingCampaignId.set(null);
+    this.editScope.set(null);
+    this.baselineCreatureIds.set(new Set());
     this.preservedEncounters.set([]);
     this.preservedNotes.set('');
+    this.preservedPregens.set([]);
     localStorage.removeItem(STORAGE_KEY);
   }
 
@@ -235,8 +313,11 @@ export class StoryBuilderService {
       levelRangeId: this.levelRangeId(),
       autoCreatureCount: this.autoCreatureCount(),
       editingCampaignId: this.editingCampaignId(),
+      editScope: this.editScope(),
+      baselineCreatureIds: [...this.baselineCreatureIds()],
       preservedEncounters: this.preservedEncounters(),
       preservedNotes: this.preservedNotes(),
+      preservedPregens: this.preservedPregens(),
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
   }
@@ -258,11 +339,18 @@ export class StoryBuilderService {
       if (draft.levelRangeId) this.levelRangeId.set(draft.levelRangeId);
       if (draft.autoCreatureCount) this.autoCreatureCount.set(draft.autoCreatureCount);
       if (draft.editingCampaignId) this.editingCampaignId.set(draft.editingCampaignId);
+      if (draft.editScope) this.editScope.set(draft.editScope);
+      if (Array.isArray(draft.baselineCreatureIds)) {
+        this.baselineCreatureIds.set(new Set(draft.baselineCreatureIds));
+      }
       if (Array.isArray(draft.preservedEncounters)) {
         this.preservedEncounters.set(draft.preservedEncounters);
       }
       if (typeof draft.preservedNotes === 'string') {
         this.preservedNotes.set(draft.preservedNotes);
+      }
+      if (Array.isArray(draft.preservedPregens)) {
+        this.preservedPregens.set(draft.preservedPregens);
       }
     } catch {
       /* ignore corrupt draft */

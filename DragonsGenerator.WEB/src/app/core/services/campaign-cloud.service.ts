@@ -93,6 +93,25 @@ export class CampaignCloudService {
     );
   }
 
+  assignPregen(
+    campaignId: string,
+    pregenId: string,
+    userId: string,
+    displayName: string,
+  ): Observable<void> {
+    return this.http.post<void>(`${this.api}/me/campaigns/${campaignId}/pregens/${pregenId}/assign`, {
+      userId,
+      displayName,
+    });
+  }
+
+  claimPregen(campaignId: string, pregenId: string): Observable<{ characterId: string }> {
+    return this.http.post<{ characterId: string }>(
+      `${this.api}/me/campaigns/${campaignId}/pregens/${pregenId}/claim`,
+      {},
+    );
+  }
+
   private normalizeData(raw: Partial<CampaignData> | null | undefined): CampaignData {
     const base = emptyCampaignData();
     if (!raw) return base;
@@ -106,6 +125,7 @@ export class CampaignCloudService {
       creatures: Array.isArray(raw.creatures) ? raw.creatures : [],
       encounters: Array.isArray(raw.encounters) ? raw.encounters : [],
       notes: raw.notes ?? base.notes,
+      pregenCharacters: Array.isArray(raw.pregenCharacters) ? raw.pregenCharacters : [],
     };
   }
 }

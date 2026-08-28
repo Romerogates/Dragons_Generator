@@ -130,6 +130,7 @@
           @if (builder.isEditingCampaign()) { ✓ Campagne mise à jour }
           @else { ✓ Campagne créée }
         }
+        @else if (builder.isCreaturesOnlyEdit()) { Mettre à jour les créatures }
         @else if (builder.isEditingCampaign()) { Mettre à jour la campagne }
         @else { Sauvegarder la campagne }
       </button>
@@ -150,13 +151,15 @@
     </div>
 
     <div class="flex flex-wrap gap-3 pt-2">
-      <button
-        type="button"
-        class="py-2 px-4 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-violet-400 transition-colors"
-        (click)="builder.goToStep(3)"
-      >
-        ← Modifier l'aventure
-      </button>
+      @if (!builder.isCreaturesOnlyEdit()) {
+        <button
+          type="button"
+          class="py-2 px-4 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-violet-400 transition-colors"
+          (click)="builder.goToStep(3)"
+        >
+          ← Modifier l'aventure
+        </button>
+      }
       <button
         type="button"
         class="py-2 px-4 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-violet-400 transition-colors"

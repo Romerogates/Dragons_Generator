@@ -12,7 +12,13 @@
 
   </header>
 
-
+  @if (builder.isEditingCampaign()) {
+    <div class="mx-4 max-w-2xl w-full self-center px-4 py-3 rounded-xl bg-emerald-950/20 border border-emerald-800/40 text-center">
+      <p class="text-xs text-emerald-300/90 font-serif">
+        Les créatures déjà configurées sont conservées. Ajoutez-en de nouvelles sans tout réinitialiser.
+      </p>
+    </div>
+  }
 
   <!-- Mode toggle -->
 

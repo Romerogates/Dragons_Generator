@@ -23,7 +23,10 @@ import { Character } from '@core/models/Character/character';
 import {
   CampaignData,
   CampaignMember,
+  CampaignPregen,
   CREATURE_ROLE_LABELS,
+  PREGEN_STATUS_LABELS,
+  createCampaignPregenEntry,
   createEncounterFromCreatures,
   encounterPendingXp,
   encounterTotalXp,
@@ -34,8 +37,9 @@ import {
 import { ADVENTURE_TONE_LABELS } from '@core/models/Story/story';
 import { formatChallengeRating, getCreatureCategoryLabel } from '@core/utils/creature-display.util';
 import { StoryBuilderService } from '@core/services/story-builder.service';
+import { firstValueFrom } from 'rxjs';
 
-type Tab = 'overview' | 'creatures' | 'encounters' | 'players';
+type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens';
 
 @Component({
   selector: 'app-campaign-detail',
@@ -65,6 +69,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly printing = signal(false);
   readonly friendsList = signal<FriendUser[]>([]);
   readonly myCharacters = signal<{ id: string; name: string }[]>([]);
+  readonly dmCharacters = signal<{ id: string; name: string }[]>([]);
+  readonly importingPregen = signal(false);
   readonly creatureXpMap = signal<Record<string, number>>({});
   readonly isLoadingPreview = signal(false);
   readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
@@ -85,6 +91,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
   protected roleLabels = CREATURE_ROLE_LABELS;
   protected toneLabels = ADVENTURE_TONE_LABELS;
+  protected pregenStatusLabels = PREGEN_STATUS_LABELS;
   protected formatCr = formatChallengeRating;
   protected categoryLabel = getCreatureCategoryLabel;
   protected encounterTotalXp = encounterTotalXp;
@@ -110,9 +117,12 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
     this.reload(id);
     this.friends.listFriends().subscribe((f) => this.friendsList.set(f));
-    this.characters.list().subscribe((chars) =>
-      this.myCharacters.set(chars.map((c) => ({ id: c.id, name: c.name }))),
-    );
+    this.characters.list().subscribe((chars) => {
+      this.myCharacters.set(chars.map((c) => ({ id: c.id, name: c.name })));
+      if (this.campaign()?.isOwner) {
+        this.dmCharacters.set(chars.map((c) => ({ id: c.id, name: c.name })));
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -172,7 +182,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
             return;
           }
           this.revokePreviewUrl();
-          const url = await this.pdf.generateCreaturesPdfBlob(entries, c.title);
+          const url = await this.pdf.generateCreaturesPdfBlob(entries, c.title, c.data);
           this.rawBlobUrl = url;
           this.previewCampaignId = c.id;
           this.pdfPreviewUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
@@ -322,14 +332,106 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   editScenario(): void {
     const c = this.campaign();
     if (!c?.isOwner) return;
-    this.storyBuilder.loadCampaignIntoBuilder(c);
+    this.storyBuilder.loadCampaignIntoBuilder(c, 'full');
     this.router.navigate(['/story/create']);
+  }
+
+  addCreaturesOnly(): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    this.storyBuilder.loadCampaignIntoBuilder(c, 'creatures-only');
+    this.router.navigate(['/story/create']);
+  }
+
+  async importPregenFromCharacter(characterId: string): Promise<void> {
+    const c = this.campaign();
+    if (!c?.isOwner || this.importingPregen()) return;
+    this.importingPregen.set(true);
+    this.error.set(null);
+    try {
+      const res = await firstValueFrom(this.characters.get(characterId));
+      const source = structuredClone(res.data as Character);
+      const copy = structuredClone(source) as Character;
+      copy.id = '';
+      copy.cloudSynced = false;
+      copy.name = `${source.name || 'Héros'} (pré-tiré)`;
+      const newId = await firstValueFrom(this.characters.save(copy));
+      const species = source.species.subspeciesLabel
+        ? `${source.species.label} (${source.species.subspeciesLabel})`
+        : source.species.label;
+      const classLabel = source.classes.map((cl) => cl.classLabel).join(' / ') || '—';
+      const entry = createCampaignPregenEntry(newId, copy.name ?? 'Sans nom', species, classLabel);
+      this.saveData({
+        pregenCharacters: [...(c.data.pregenCharacters ?? []), entry],
+      });
+    } catch {
+      this.error.set('Impossible d\'importer ce personnage.');
+    } finally {
+      this.importingPregen.set(false);
+    }
+  }
+
+  updatePregen(pregenId: string, patch: Partial<CampaignPregen>): void {
+    const c = this.campaign();
+    if (!c) return;
+    const pregens = (c.data.pregenCharacters ?? []).map((p) =>
+      p.id === pregenId ? { ...p, ...patch } : p,
+    );
+    this.saveData({ pregenCharacters: pregens });
+  }
+
+  markPregenReady(pregenId: string): void {
+    this.updatePregen(pregenId, { status: 'ready' });
+  }
+
+  removePregen(pregenId: string): void {
+    const c = this.campaign();
+    if (!c) return;
+    this.saveData({
+      pregenCharacters: (c.data.pregenCharacters ?? []).filter((p) => p.id !== pregenId),
+    });
+  }
+
+  assignPregen(pregen: CampaignPregen, member: CampaignMember): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    this.campaigns.assignPregen(c.id, pregen.id, member.userId, member.displayName).subscribe({
+      next: () => this.reload(),
+      error: () => this.error.set('Assignation impossible.'),
+    });
+  }
+
+  claimPregen(pregenId: string): void {
+    const c = this.campaign();
+    if (!c) return;
+    this.campaigns.claimPregen(c.id, pregenId).subscribe({
+      next: () => {
+        this.error.set(null);
+        this.reload();
+      },
+      error: () => this.error.set('Impossible de revendiquer ce personnage.'),
+    });
+  }
+
+  printPregenHandout(pregen: CampaignPregen): void {
+    const c = this.campaign();
+    if (!c) return;
+    const meta = [pregen.speciesLabel, pregen.classLabel].filter(Boolean).join(' · ');
+    void this.pdf.downloadPregenHandout(c.title, pregen.characterName, pregen.publicHook, meta);
+  }
+
+  myAssignedPregens(): CampaignPregen[] {
+    const userId = this.auth.user()?.id;
+    if (!userId) return [];
+    return (this.campaign()?.data.pregenCharacters ?? []).filter(
+      (p) => p.assignedUserId === userId && p.status === 'assigned',
+    );
   }
 
   printBestiary(): void {
     this.runPrint(async (entries) => {
       const c = this.campaign()!;
-      await this.pdf.downloadCreaturesCompilation(entries, c.title);
+      await this.pdf.downloadCreaturesCompilation(entries, c.title, c.data);
     });
   }
 

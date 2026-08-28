@@ -122,6 +122,9 @@ export class StorySummaryStep implements OnInit, OnDestroy {
         this.savedCampaignId.set(summary.id);
         this.saving.set(false);
         this.builder.reset();
+        if (editId) {
+          this.router.navigate(['/campaigns', summary.id]);
+        }
       },
       error: () => {
         this.saveError.set(

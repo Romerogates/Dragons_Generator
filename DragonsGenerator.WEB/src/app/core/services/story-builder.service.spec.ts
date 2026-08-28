@@ -34,6 +34,7 @@ describe('StoryBuilderService', () => {
       ],
       encounters: [{ id: 'enc-1', name: 'Combat', creatures: [] }],
       notes: 'Note MJ',
+      pregenCharacters: [],
     },
   };
 
@@ -68,6 +69,27 @@ describe('StoryBuilderService', () => {
 
     expect(service.region()?.kind).toBe('unknown');
     expect(service.buildCampaignData().regionName).toBe(UNKNOWN_REGION_LABEL);
+  });
+
+  it('merges creatures when editing without replacing existing ones', () => {
+    service.loadCampaignIntoBuilder(sampleCampaign, 'creatures-only');
+    service.mergeCreatures([
+      {
+        creatureId: 'cre-new',
+        creatureName: 'Orc',
+        category: 'humanoid',
+        challengeRating: '1/2',
+        customName: 'Brute',
+        role: 'antagonist',
+        backstory: '',
+      },
+    ]);
+
+    const ids = service.creatures().map((c) => c.creatureId);
+    expect(ids).toContain('cre-gob');
+    expect(ids).toContain('cre-new');
+    expect(service.isBaselineCreature('cre-gob')).toBe(true);
+    expect(service.isBaselineCreature('cre-new')).toBe(false);
   });
 
   it('clears edit mode on reset', () => {

@@ -132,7 +132,17 @@ export class SelectCreaturesStep implements OnInit {
         );
         return;
       }
-      this.builder.creatures.set(preview.map((c) => ({ ...c, backstory: '' })));
+      const enriched = preview.map((c) => ({
+        ...c,
+        customName: c.customName?.trim() || c.creatureName,
+        role: c.role ?? ('neutral' as const),
+        backstory: c.backstory ?? '',
+      }));
+      if (this.builder.isEditingCampaign()) {
+        this.builder.mergeCreatures(enriched);
+      } else {
+        this.builder.creatures.set(enriched);
+      }
       const preset = getLevelRangePreset(this.builder.levelRangeId());
       if (preset) {
         this.builder.partyLevel.set(partyLevelFromRange(preset));

@@ -3,9 +3,10 @@ import type { jsPDF } from 'jspdf';
 import { Creature } from '@core/models/Creatures/creature';
 import { Character, Attack } from '@core/models/Character/character';
 import { CampaignData, EncounterGroup } from '@core/models/Campaign/campaign';
-import { CREATURE_ROLE_LABELS } from '@core/models/Story/story';
+import { CREATURE_ROLE_LABELS, ADVENTURE_TONE_LABELS, AdventureTone } from '@core/models/Story/story';
 import { formatChallengeRating, ABILITY_LABELS } from '@core/utils/creature-display.util';
 import { encounterTotalXp } from '@core/models/Campaign/campaign';
+import { getEanaMapCoordinates } from '@core/utils/eana-map';
 import { PdfGeneratorService } from './pdf-generator.service';
 
 const PARCHMENT = '/images/dragons_background.jpg';
@@ -13,6 +14,16 @@ const MARGIN = 14;
 const PAGE_W = 210;
 const PAGE_H = 297;
 const CONTENT_W = PAGE_W - MARGIN * 2;
+
+type CoverKind = 'pack-mj' | 'bestiary' | 'pregen-hero';
+
+interface CoverOptions {
+  kind?: CoverKind;
+  subtitle?: string;
+  creatureCount?: number;
+  pregenHook?: string;
+  pregenMeta?: string;
+}
 
 export interface CreaturePrintEntry {
   creature: Creature;
@@ -43,8 +54,9 @@ export class CampaignPdfService {
   async downloadCreaturesCompilation(
     entries: CreaturePrintEntry[],
     title: string,
+    data?: CampaignData | null,
   ): Promise<void> {
-    const pdf = await this.buildCreaturesPdf(entries, title);
+    const pdf = await this.buildCreaturesPdf(entries, title, data);
     pdf.save(this.safeName(`${title}-bestiaire.pdf`));
   }
 
@@ -52,8 +64,9 @@ export class CampaignPdfService {
   async generateCreaturesPdfBlob(
     entries: CreaturePrintEntry[],
     title: string,
+    data?: CampaignData | null,
   ): Promise<string> {
-    const pdf = await this.buildCreaturesPdf(entries, title);
+    const pdf = await this.buildCreaturesPdf(entries, title, data);
     const blob = pdf.output('blob');
     return URL.createObjectURL(blob);
   }
@@ -68,7 +81,7 @@ export class CampaignPdfService {
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const bg = await this.loadImage(PARCHMENT);
 
-    this.drawCoverPage(pdf, bg, title, data);
+    this.drawCoverPage(pdf, bg, title, data, { kind: 'pack-mj' });
     this.drawSynopsisPage(pdf, bg, data);
 
     if (creatureEntries.length) {
@@ -94,13 +107,44 @@ export class CampaignPdfService {
     const { jsPDF } = await import('jspdf');
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const bg = await this.loadImage(PARCHMENT);
-    this.drawCoverPage(pdf, bg, title, null, 'Synthèse des héros — MJ');
+    this.drawCoverPage(pdf, bg, title, null, { kind: 'pack-mj', subtitle: 'Synthèse des héros — MJ' });
     this.drawPlayerSummariesSection(pdf, bg, summaries);
     pdf.save(this.safeName(`${title}-joueurs-mj.pdf`));
   }
 
   async downloadPlayerFullSheet(character: Character): Promise<void> {
     await this.characterPdf.generatePdf(character);
+  }
+
+  async downloadPregenHandout(
+    campaignTitle: string,
+    characterName: string,
+    publicHook: string,
+    meta: string,
+  ): Promise<void> {
+    const { jsPDF } = await import('jspdf');
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const bg = await this.loadImage(PARCHMENT);
+    this.drawCoverPage(pdf, bg, characterName, null, {
+      kind: 'pregen-hero',
+      subtitle: `Personnage pré-tiré — ${campaignTitle}`,
+      pregenHook: publicHook,
+      pregenMeta: meta,
+    });
+    if (publicHook.trim()) {
+      pdf.addPage();
+      pdf.addImage(bg, 'JPEG', 0, 0, PAGE_W, PAGE_H);
+      let y = MARGIN + 4;
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(14);
+      pdf.setTextColor(70, 35, 10);
+      pdf.text('Accroche', MARGIN, y);
+      y += 8;
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10);
+      this.writeParagraph(pdf, bg, publicHook, y, 10, false);
+    }
+    pdf.save(this.safeName(`${characterName}-pre-tire.pdf`));
   }
 
   buildPlayerGmSummary(character: Character): PlayerGmSummary {
@@ -125,17 +169,27 @@ export class CampaignPdfService {
     };
   }
 
-  private async buildCreaturesPdf(entries: CreaturePrintEntry[], docTitle: string): Promise<jsPDF> {
+  private async buildCreaturesPdf(
+    entries: CreaturePrintEntry[],
+    docTitle: string,
+    data?: CampaignData | null,
+  ): Promise<jsPDF> {
     const { jsPDF } = await import('jspdf');
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const bg = await this.loadImage(PARCHMENT);
 
+    this.drawCoverPage(pdf, bg, docTitle, data ?? null, {
+      kind: 'bestiary',
+      creatureCount: entries.length,
+    });
+
+    pdf.addPage();
     pdf.addImage(bg, 'JPEG', 0, 0, PAGE_W, PAGE_H);
     let y = MARGIN + 4;
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(16);
     pdf.setTextColor(60, 40, 20);
-    pdf.text(docTitle, MARGIN, y);
+    pdf.text('Fiches créatures', MARGIN, y);
     y += 12;
 
     for (const entry of entries) {
@@ -286,29 +340,131 @@ export class CampaignPdfService {
     bg: string,
     title: string,
     data: CampaignData | null,
-    subtitle?: string,
+    options: CoverOptions = {},
   ): void {
+    const kind = options.kind ?? 'pack-mj';
     pdf.addImage(bg, 'JPEG', 0, 0, PAGE_W, PAGE_H);
+    this.drawDecorativeBorder(pdf);
+
     pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(22);
+    pdf.setFontSize(11);
+    pdf.setTextColor(90, 45, 15);
+    pdf.text('DRAGONS', PAGE_W / 2, 28, { align: 'center' });
+
+    pdf.setFontSize(kind === 'pregen-hero' ? 24 : 22);
     pdf.setTextColor(70, 35, 10);
-    pdf.text(title, PAGE_W / 2, 80, { align: 'center' });
-    pdf.setFontSize(12);
+    const titleY = kind === 'pregen-hero' ? 78 : 72;
+    pdf.text(title, PAGE_W / 2, titleY, { align: 'center', maxWidth: CONTENT_W });
+
     pdf.setFont('helvetica', 'normal');
-    pdf.text(subtitle ?? 'Pack Maître du Jeu — Dragons', PAGE_W / 2, 95, { align: 'center' });
-    if (data) {
+    pdf.setFontSize(11);
+    pdf.setTextColor(80, 50, 25);
+
+    const defaultSubtitle =
+      kind === 'bestiary'
+        ? 'Bestiaire de campagne'
+        : kind === 'pregen-hero'
+          ? options.subtitle ?? 'Personnage pré-tiré'
+          : 'Pack Maître du Jeu';
+    pdf.text(options.subtitle ?? defaultSubtitle, PAGE_W / 2, titleY + 14, { align: 'center' });
+
+    let y = titleY + 28;
+
+    if (kind === 'bestiary') {
+      pdf.setFontSize(10);
+      pdf.text(`${options.creatureCount ?? 0} créature(s) répertoriée(s)`, PAGE_W / 2, y, {
+        align: 'center',
+      });
+      y += 8;
+      if (data?.regionName?.trim()) {
+        pdf.text(data.regionName.trim(), PAGE_W / 2, y, { align: 'center' });
+        y += 6;
+      }
+    } else if (kind === 'pregen-hero') {
+      if (options.pregenMeta?.trim()) {
+        pdf.setFontSize(10);
+        pdf.text(options.pregenMeta.trim(), PAGE_W / 2, y, { align: 'center' });
+        y += 10;
+      }
+      if (options.pregenHook?.trim()) {
+        pdf.setFont('helvetica', 'italic');
+        pdf.setFontSize(10);
+        const hookLines = pdf.splitTextToSize(`« ${options.pregenHook.trim()} »`, CONTENT_W - 20);
+        for (const line of hookLines) {
+          pdf.text(line, PAGE_W / 2, y, { align: 'center' });
+          y += 5;
+        }
+        pdf.setFont('helvetica', 'normal');
+      }
+    } else if (data) {
+      if (data.tone) {
+        pdf.setFontSize(9);
+        pdf.text(this.toneLabel(data.tone), PAGE_W / 2, y, { align: 'center' });
+        y += 7;
+      }
       pdf.setFontSize(10);
       const info = [
         `Niveau des héros : ${data.partyLevel}`,
         data.regionName?.trim(),
         data.setting?.trim(),
       ].filter(Boolean);
-      let y = 110;
       for (const line of info) {
         pdf.text(line!, PAGE_W / 2, y, { align: 'center' });
         y += 6;
       }
+      if (data.regionId) {
+        this.drawRegionPin(pdf, data.regionId, 105, y + 8);
+        y += 18;
+      }
     }
+
+    pdf.setFontSize(8);
+    pdf.setTextColor(100, 70, 40);
+    const footer =
+      kind === 'pack-mj'
+        ? 'Document MJ — ne pas distribuer aux joueurs'
+        : kind === 'pregen-hero'
+          ? 'Distribuable aux joueurs — sans secrets MJ'
+          : 'Bestiaire — usage table';
+    pdf.text(footer, PAGE_W / 2, PAGE_H - 16, { align: 'center' });
+    pdf.text(
+      new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }),
+      PAGE_W / 2,
+      PAGE_H - 10,
+      { align: 'center' },
+    );
+  }
+
+  private drawDecorativeBorder(pdf: jsPDF): void {
+    pdf.setDrawColor(100, 50, 20);
+    pdf.setLineWidth(0.7);
+    pdf.rect(10, 10, PAGE_W - 20, PAGE_H - 20);
+    pdf.setLineWidth(0.25);
+    pdf.rect(13, 13, PAGE_W - 26, PAGE_H - 26);
+  }
+
+  private drawRegionPin(pdf: jsPDF, regionId: string, centerX: number, centerY: number): void {
+    const coords = getEanaMapCoordinates(regionId);
+    const mapW = 36;
+    const mapH = mapW / (1500 / 1061);
+    const mapX = centerX - mapW / 2;
+    const mapY = centerY - mapH / 2;
+
+    pdf.setFillColor(210, 195, 165);
+    pdf.setDrawColor(90, 45, 15);
+    pdf.setLineWidth(0.3);
+    pdf.roundedRect(mapX, mapY, mapW, mapH, 2, 2, 'FD');
+
+    const pinX = mapX + (coords.x / 100) * mapW;
+    const pinY = mapY + (coords.y / 100) * mapH;
+    pdf.setFillColor(139, 92, 246);
+    pdf.circle(pinX, pinY, 1.2, 'F');
+    pdf.setDrawColor(70, 35, 10);
+    pdf.circle(pinX, pinY, 1.2, 'S');
+  }
+
+  private toneLabel(tone: AdventureTone): string {
+    return ADVENTURE_TONE_LABELS[tone] ?? tone;
   }
 
   private drawSynopsisPage(pdf: jsPDF, bg: string, data: CampaignData): void {
