@@ -56,6 +56,8 @@ builder.Services
     });
 builder.Services.AddAuthorization();
 
+builder.Services.AddDragonsRateLimiting(builder.Configuration, builder.Environment);
+
 // --- Game data ---
 builder.Services.AddSingleton<IndexedDataStore>();
 builder.Services.AddSingleton<GameDataRepository>();
@@ -103,6 +105,7 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.UseCors("AllowAngular");
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseFastEndpoints(c =>

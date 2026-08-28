@@ -2,6 +2,7 @@ using System.Security.Claims;
 using DragonsGenerator.API.Persistence;
 using DragonsGenerator.API.Services;
 using FastEndpoints;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -69,7 +70,7 @@ internal static class AuthEmailHelper
             ["emailSent"] = emailSent,
             ["resent"] = resent,
         };
-        if (env.IsDevelopment() || !emailSent)
+        if (env.IsDevelopment())
         {
             response["confirmLink"] = link;
         }
@@ -89,6 +90,7 @@ public class RegisterEndpoint(
     {
         Post("/auth/register");
         AllowAnonymous();
+        Options(b => b.RequireRateLimiting(RateLimitPolicies.Auth));
     }
 
     public override async Task HandleAsync(RegisterRequest req, CancellationToken ct)
@@ -227,6 +229,7 @@ public class ConfirmEmailEndpoint(AppDbContext db) : EndpointWithoutRequest
     {
         Get("/auth/confirm-email");
         AllowAnonymous();
+        Options(b => b.RequireRateLimiting(RateLimitPolicies.Auth));
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -259,6 +262,7 @@ public class LoginEndpoint(AppDbContext db, IOptions<JwtOptions> jwt) : Endpoint
     {
         Post("/auth/login");
         AllowAnonymous();
+        Options(b => b.RequireRateLimiting(RateLimitPolicies.Auth));
     }
 
     public override async Task HandleAsync(LoginRequest req, CancellationToken ct)
@@ -304,6 +308,7 @@ public class ForgotPasswordEndpoint(
     {
         Post("/auth/forgot-password");
         AllowAnonymous();
+        Options(b => b.RequireRateLimiting(RateLimitPolicies.Auth));
     }
 
     public override async Task HandleAsync(ForgotPasswordRequest req, CancellationToken ct)
@@ -349,7 +354,7 @@ public class ForgotPasswordEndpoint(
             logger.LogError(ex, "Email reset non envoyé");
         }
 
-        if (env.IsDevelopment() || !emailSent)
+        if (env.IsDevelopment())
         {
             ok["resetLink"] = link;
         }
@@ -364,6 +369,7 @@ public class ResetPasswordEndpoint(AppDbContext db) : Endpoint<ResetPasswordRequ
     {
         Post("/auth/reset-password");
         AllowAnonymous();
+        Options(b => b.RequireRateLimiting(RateLimitPolicies.Auth));
     }
 
     public override async Task HandleAsync(ResetPasswordRequest req, CancellationToken ct)
@@ -436,6 +442,7 @@ public class ResendConfirmationEndpoint(
     {
         Post("/auth/resend-confirmation");
         AllowAnonymous();
+        Options(b => b.RequireRateLimiting(RateLimitPolicies.Auth));
     }
 
     public override async Task HandleAsync(ResendConfirmationRequest req, CancellationToken ct)

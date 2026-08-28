@@ -1,5 +1,7 @@
 ﻿using System.Net.Http.Json;
+using DragonsGenerator.API.Services;
 using FastEndpoints;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Dragons.Api.Endpoints.Characters;
 
@@ -41,6 +43,7 @@ public class GenerateBackstoryEndpoint : Endpoint<GenerateBackstoryRequest, Gene
     {
         Post("/generate-backstory");
         AllowAnonymous();
+        Options(b => b.RequireRateLimiting(RateLimitPolicies.AiGeneration));
     }
 
     public override async Task HandleAsync(GenerateBackstoryRequest req, CancellationToken ct)

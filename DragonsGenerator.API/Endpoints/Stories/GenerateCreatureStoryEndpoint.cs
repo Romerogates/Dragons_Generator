@@ -1,6 +1,8 @@
 using DragonsGenerator.API.Common;
 using DragonsGenerator.API.Models;
+using DragonsGenerator.API.Services;
 using FastEndpoints;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Dragons.Api.Endpoints.Stories;
 
@@ -29,6 +31,7 @@ public class GenerateCreatureStoryEndpoint : Endpoint<GenerateCreatureStoryReque
     {
         Post("/generate-creature-story");
         AllowAnonymous();
+        Options(b => b.RequireRateLimiting(RateLimitPolicies.AiGeneration));
     }
 
     public override async Task HandleAsync(GenerateCreatureStoryRequest req, CancellationToken ct)

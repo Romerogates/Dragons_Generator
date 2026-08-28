@@ -69,14 +69,12 @@ export interface CampaignDetail {
 export interface FriendUser {
   id: string;
   displayName: string;
-  email: string;
 }
 
 export interface FriendRequest {
   id: string;
   userId: string;
   displayName: string;
-  email: string;
   createdAt: string;
 }
 

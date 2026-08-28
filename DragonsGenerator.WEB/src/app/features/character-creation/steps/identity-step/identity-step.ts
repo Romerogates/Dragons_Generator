@@ -111,6 +111,7 @@ export class IdentityStep implements OnInit {
             e?.errors?.[0]?.reason ||
             e?.errors?.[0]?.message ||
             e?.message ||
+            (err.status === 429 ? 'Trop de générations IA pour le moment. Réessayez plus tard.' : null) ||
             null;
           this.generationError.set(
             apiMsg && apiMsg !== 'One or more errors occurred!'

@@ -22,6 +22,19 @@ public class FriendSupportIntegrationTests
     }
 
     [Fact]
+    public async Task Friends_search_returns_display_name_only()
+    {
+        var (_, token, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "search");
+
+        using var req = ApiTestAuth.Authed(HttpMethod.Get, "/users/search?q=Hero", token);
+        var response = await _client.SendAsync(req);
+        response.EnsureSuccessStatusCode();
+        var body = await response.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("@dragons.local", body);
+        Assert.Contains("displayName", body, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public async Task Friends_search_returns_empty_for_short_query()
     {
         var token = await ApiTestAuth.LoginAdminAsync(_client);
