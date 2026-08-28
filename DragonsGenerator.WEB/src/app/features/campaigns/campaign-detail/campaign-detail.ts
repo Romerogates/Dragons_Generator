@@ -37,6 +37,7 @@ import {
 import { ADVENTURE_TONE_LABELS } from '@core/models/Story/story';
 import { formatChallengeRating, getCreatureCategoryLabel } from '@core/utils/creature-display.util';
 import { StoryBuilderService } from '@core/services/story-builder.service';
+import { CampaignPregenGeneratorService } from '@core/services/campaign-pregen-generator.service';
 import { firstValueFrom } from 'rxjs';
 
 type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens';
@@ -60,6 +61,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   private pdf = inject(CampaignPdfService);
   private sanitizer = inject(DomSanitizer);
   private storyBuilder = inject(StoryBuilderService);
+  private pregenGenerator = inject(CampaignPregenGeneratorService);
 
   readonly loading = signal(true);
   readonly saving = signal(false);
@@ -71,6 +73,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly myCharacters = signal<{ id: string; name: string }[]>([]);
   readonly dmCharacters = signal<{ id: string; name: string }[]>([]);
   readonly importingPregen = signal(false);
+  readonly generatingAutoPregen = signal(false);
+
+  readonly canGeneratePlayablePregen = computed(() => this.dmCharacters().length > 0);
   readonly creatureXpMap = signal<Record<string, number>>({});
   readonly isLoadingPreview = signal(false);
   readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
@@ -343,24 +348,56 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.router.navigate(['/story/create']);
   }
 
+  async generateAutoPregen(): Promise<void> {
+    const c = this.campaign();
+    if (!c?.isOwner || this.generatingAutoPregen()) return;
+
+    const pool = this.dmCharacters().map((ch) => ch.id);
+    const sourceId = this.pregenGenerator.pickRandomCharacterId(pool);
+    if (!sourceId) {
+      this.error.set('Créez d\'abord au moins un héros complet dans /create.');
+      return;
+    }
+
+    this.generatingAutoPregen.set(true);
+    this.error.set(null);
+    try {
+      const generated = await this.pregenGenerator.generatePlayableDuplicate(c, sourceId, true);
+      const entry = createCampaignPregenEntry(
+        generated.characterId,
+        generated.characterName,
+        generated.speciesLabel,
+        generated.classLabel,
+      );
+      entry.publicHook = generated.publicHook;
+      entry.dmBackstory = generated.dmBackstory;
+      entry.status = 'ready';
+      this.saveData({
+        pregenCharacters: [...(c.data.pregenCharacters ?? []), entry],
+      });
+    } catch {
+      this.error.set('Génération impossible. Vérifiez qu\'au moins un héros est sauvegardé dans le cloud.');
+    } finally {
+      this.generatingAutoPregen.set(false);
+    }
+  }
+
   async importPregenFromCharacter(characterId: string): Promise<void> {
     const c = this.campaign();
     if (!c?.isOwner || this.importingPregen()) return;
     this.importingPregen.set(true);
     this.error.set(null);
     try {
-      const res = await firstValueFrom(this.characters.get(characterId));
-      const source = structuredClone(res.data as Character);
-      const copy = structuredClone(source) as Character;
-      copy.id = '';
-      copy.cloudSynced = false;
-      copy.name = `${source.name || 'Héros'} (pré-tiré)`;
-      const newId = await firstValueFrom(this.characters.save(copy));
-      const species = source.species.subspeciesLabel
-        ? `${source.species.label} (${source.species.subspeciesLabel})`
-        : source.species.label;
-      const classLabel = source.classes.map((cl) => cl.classLabel).join(' / ') || '—';
-      const entry = createCampaignPregenEntry(newId, copy.name ?? 'Sans nom', species, classLabel);
+      const generated = await this.pregenGenerator.generatePlayableDuplicate(c, characterId, false);
+      const entry = createCampaignPregenEntry(
+        generated.characterId,
+        generated.characterName,
+        generated.speciesLabel,
+        generated.classLabel,
+      );
+      entry.publicHook = generated.publicHook;
+      entry.dmBackstory = generated.dmBackstory;
+      entry.status = 'ready';
       this.saveData({
         pregenCharacters: [...(c.data.pregenCharacters ?? []), entry],
       });
@@ -408,6 +445,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       next: () => {
         this.error.set(null);
         this.reload();
+        this.router.navigate(['/characters']);
       },
       error: () => this.error.set('Impossible de revendiquer ce personnage.'),
     });
