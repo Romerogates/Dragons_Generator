@@ -13,25 +13,47 @@ export async function startFreshWizard(page: Page): Promise<void> {
   }
 }
 
+function visibleCarouselCard(page: Page, cardId: string) {
+  // Ignore le carrousel mobile (lg:hidden) dupliqué en viewport desktop.
+  return page.locator(`[data-card-id="${cardId}"]`).filter({ visible: true }).first();
+}
+
+async function isCarouselCardCentered(page: Page, cardId: string): Promise<boolean> {
+  const card = visibleCarouselCard(page, cardId);
+  if ((await card.count()) === 0) return false;
+  return card.evaluate((el) => getComputedStyle(el).pointerEvents !== 'none');
+}
+
 /** Double-clic carrousel (centrer puis sélectionner). */
 export async function pickCarouselCard(page: Page, cardId: string): Promise<void> {
-  for (let attempt = 0; attempt < 40; attempt++) {
-    const card = page.locator(`[data-card-id="${cardId}"]`).first();
-    if ((await card.count()) > 0 && (await card.isVisible())) {
-      await card.click();
-      await page.waitForTimeout(CAROUSEL_DELAY_MS);
-      await card.click();
-      await page.waitForTimeout(CAROUSEL_DELAY_MS);
-      return;
-    }
-    const next = page.getByRole('button', { name: 'Carte suivante' });
-    if (await next.isVisible().catch(() => false)) {
-      await next.click();
-      await page.waitForTimeout(150);
-    } else {
+  const nextBtn = page.getByRole('button', { name: 'Carte suivante' }).filter({ visible: true }).first();
+
+  for (let attempt = 0; attempt < 50; attempt++) {
+    const card = visibleCarouselCard(page, cardId);
+    if ((await card.count()) === 0) {
+      if (await nextBtn.isVisible().catch(() => false)) {
+        await nextBtn.click();
+        await page.waitForTimeout(150);
+        continue;
+      }
       break;
     }
+
+    if (!(await isCarouselCardCentered(page, cardId))) {
+      if (await nextBtn.isVisible().catch(() => false)) {
+        await nextBtn.click();
+        await page.waitForTimeout(150);
+        continue;
+      }
+    }
+
+    await card.click();
+    await page.waitForTimeout(CAROUSEL_DELAY_MS);
+    await card.click();
+    await page.waitForTimeout(CAROUSEL_DELAY_MS);
+    return;
   }
+
   throw new Error(`Carte carrousel introuvable : ${cardId}`);
 }
 
