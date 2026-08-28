@@ -62,59 +62,54 @@ test.describe('Lettré L1 wizard', () => {
 
     // 6 — Savoirs & Maîtrises
     await expectStepHeading(page, /Savoirs & Maîtrises/i);
-    const bgSkills = page.locator('div').filter({ hasText: '1 compétence(s) fixe(s) + 1 au choix' });
+    const bgSkills = page
+      .locator('div.rounded-2xl')
+      .filter({ hasText: '1 compétence(s) fixe(s) + 1 au choix' });
     await bgSkills.getByRole('button', { name: /^Arcanes\b/ }).click();
     const classSkills = page
-      .locator('div')
+      .locator('div.rounded-2xl')
       .filter({ hasText: 'Choisissez 3 compétence(s) liées à votre vocation' });
     await classSkills.getByRole('button', { name: /^Investigation\b/ }).click();
     await classSkills.getByRole('button', { name: /^Perception\b/ }).click();
     await classSkills.getByRole('button', { name: /^Persuasion\b/ }).click();
-    // 2 armes de classe (≤ 25 po)
-    const weaponsSection = page
-      .locator('div')
-      .filter({ has: page.getByText('Armes supplémentaires maîtrisées') })
-      .last();
+    const weaponsSection = page.getByTestId('wizard-class-weapons');
     await weaponsSection.getByRole('button', { name: 'Épée courte', exact: true }).click();
     await weaponsSection.getByRole('button', { name: 'Arbalète légère', exact: true }).click();
-    // 3 outils de classe
-    const toolsSection = page
-      .locator('div')
-      .filter({ has: page.getByText("Maîtrises d'outils") })
-      .last();
+    const toolsSection = page.getByTestId('wizard-class-tools');
     await toolsSection.getByRole('button', { name: 'Lyre', exact: true }).click();
     await toolsSection.getByRole('button', { name: 'Dés', exact: true }).click();
     await toolsSection.getByRole('button', { name: 'Échecs', exact: true }).click();
     await page.getByRole('button', { name: 'Forger les maîtrises' }).click();
 
     // 7 — Équipement
-    await expect(page.getByText('Équipement automatique reçu')).toBeVisible({ timeout: 20_000 });
+    await expectStepHeading(page, /Arsenal de Départ/i);
     await page.getByRole('button', { name: 'Choix suivant' }).click();
-    // Slot 2 : arme maîtrisée
-    await page.locator('div.cursor-pointer').filter({ hasText: /Arme.*maîtrisée/i }).first().click();
-    await page.getByRole('button', { name: 'Épée courte' }).click();
-    await page.getByRole('button', { name: 'Choix suivant' }).click();
-    // Slot 3 : sac
-    await page.locator('div.cursor-pointer').filter({ hasText: /Sac d'érudit/i }).first().click();
-    await page.getByRole('button', { name: "Forger l'équipement" }).click();
+    await page.locator('.perf-card').filter({ hasText: /Arme.*maîtrisée/i }).click();
+    await page.getByRole('button', { name: /^Épée courte\b/ }).click();
+    await page.locator('.perf-card').filter({ hasText: /Sac d'érudit/i }).click();
+    await page.getByTestId('wizard-equipment-confirm').click();
 
     // 8 — Langues (6 bonus : Humain×2 + Érudit×1 + Lettré×3)
     await expectStepHeading(page, /Langues & Dialectes/i);
     const confirmLang = page.getByRole('button', { name: 'Inscrire ces langues au registre' });
-    for (let guard = 0; guard < 12 && (await confirmLang.isDisabled()); guard++) {
-      await page.locator('.grid.grid-cols-1.sm\\:grid-cols-2 button').first().click();
+    const bonusLanguages = ['Arolave', 'Aupuniwi', 'Cyfand', 'Cyrillan', 'Elfique', 'Gnome'];
+    for (const lang of bonusLanguages) {
+      if (!(await confirmLang.isDisabled())) break;
+      await page.getByRole('button', { name: new RegExp(`^${lang}\\b`) }).click();
     }
     await expect(confirmLang).toBeEnabled({ timeout: 10_000 });
-    await page.getByRole('button', { name: 'Inscrire ces langues au registre' }).click();
+    await confirmLang.click();
 
     // 9 — Identité
     await expectStepHeading(page, /Identité & Personnalité/i);
     await page.getByPlaceholder('Ex: Valerius').fill('Valerius le Lettré');
     await page.getByRole('button', { name: "Finaliser l'identité" }).click();
 
-    // 10 — Récapitulatif
+    // 10 — Récapitulatif (contenu dans l'aperçu PDF iframe)
     await expectStepHeading(page, /Le Destin Scellé/i);
     await expect(page.getByRole('button', { name: 'Sauvegarder le héros' })).toBeVisible();
-    await expect(page.getByText(/Lettré|Humains|Ajagar|Érudit/i).first()).toBeVisible();
+    await expect(page.locator('iframe[title="Aperçu de la fiche de personnage"]')).toBeVisible({
+      timeout: 30_000,
+    });
   });
 });
