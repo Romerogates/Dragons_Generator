@@ -136,7 +136,7 @@ export class SummaryStep implements OnInit, OnDestroy {
 
   private persistToCloud(character: Character): void {
     this.saving.set(true);
-    this.cloud.save(character as any).subscribe({
+    this.cloud.save(character as Character).subscribe({
       next: (serverId) => {
         const updated = {
           ...character,

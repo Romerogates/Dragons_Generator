@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, switchMap, tap, catchError, map } from 'rxjs';
 import { environment } from '@env/environment';
+import type { Character } from '@core/models/Character/character';
 import { AuthService } from './auth.service';
 
 export interface CloudCharacterSummary {
@@ -28,7 +29,7 @@ export class CharacterCloudService {
   }
 
   /** Crée ou met à jour un perso cloud ; retourne l'id serveur. */
-  save(character: { id?: string; name?: string; [k: string]: unknown }): Observable<string> {
+  save(character: Character): Observable<string> {
     if (!this.auth.isLoggedIn()) return of(character.id ?? '');
 
     const body = { name: character.name ?? 'Sans nom', data: character };
