@@ -214,7 +214,7 @@ public static class DbMigrationRunner
         await TryAddColumnAsync(db, "FriendMessages", "AttachmentPayload", "TEXT NULL", ct);
     }
 
-    private static async TryAddColumnAsync(
+    private static async Task TryAddColumnAsync(
         AppDbContext db,
         string table,
         string column,
