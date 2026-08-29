@@ -48,9 +48,12 @@ public static class CampaignActivityService
         var rows = await db.CampaignActivities
             .AsNoTracking()
             .Where(a => a.CampaignId == campaignId)
-            .OrderByDescending(a => a.CreatedAt)
-            .Take(limit)
             .ToListAsync(ct);
+
+        rows = rows
+            .OrderByDescending(r => r.CreatedAt)
+            .Take(limit)
+            .ToList();
 
         if (rows.Count == 0)
             return [];
