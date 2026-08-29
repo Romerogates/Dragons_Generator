@@ -1,6 +1,7 @@
 using System.Text.Json;
 using DragonsGenerator.API.Persistence;
 using Lib.Net.Http.WebPush;
+using Lib.Net.Http.WebPush.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -13,6 +14,7 @@ public class PushNotificationService(
     ILogger<PushNotificationService> logger)
 {
     private readonly VapidOptions _vapid = vapidOpt.Value;
+    private readonly PushServiceClient _client = new();
 
     public bool IsConfigured =>
         !string.IsNullOrWhiteSpace(_vapid.PublicKey) && !string.IsNullOrWhiteSpace(_vapid.PrivateKey);
@@ -34,15 +36,21 @@ public class PushNotificationService(
         if (subs.Count == 0) return;
 
         var payload = JsonSerializer.Serialize(new { title, body, url });
-        var client = new WebPushClient();
-        var vapid = new VapidDetails(_vapid.Subject, _vapid.PublicKey, _vapid.PrivateKey);
+        var auth = new VapidAuthentication(_vapid.PublicKey, _vapid.PrivateKey)
+        {
+            Subject = _vapid.Subject,
+        };
 
         foreach (var sub in subs)
         {
             try
             {
                 var pushSub = new PushSubscription(sub.Endpoint, sub.P256dh, sub.Auth);
-                await client.SendNotificationAsync(pushSub, payload, vapid, ct);
+                await _client.RequestPushMessageDeliveryAsync(
+                    pushSub,
+                    new PushMessage(payload),
+                    auth,
+                    cancellationToken: ct);
             }
             catch (Exception ex)
             {
