@@ -68,8 +68,10 @@ public class HomeAndCampaignFeatureTests
         Guid friendRequestId;
         using (var pendingFriend = ApiTestAuth.Authed(HttpMethod.Get, "/me/friends/requests", playerToken))
         {
-            var p = await pendingFriend.Content.ReadFromJsonAsync<JsonElement>();
-            friendRequestId = p[0].GetProperty("id").GetGuid();
+            var pending = await _client.SendAsync(pendingFriend);
+            pending.EnsureSuccessStatusCode();
+            var p = await pending.Content.ReadFromJsonAsync<JsonElement>();
+            friendRequestId = p![0].GetProperty("id").GetGuid();
         }
 
         using (var acceptFriend = ApiTestAuth.Authed(HttpMethod.Post, $"/me/friends/requests/{friendRequestId}/accept", playerToken))
@@ -143,8 +145,10 @@ public class HomeAndCampaignFeatureTests
         Guid reqId;
         using (var pending = ApiTestAuth.Authed(HttpMethod.Get, "/me/friends/requests", playerToken))
         {
-            var p = await pending.Content.ReadFromJsonAsync<JsonElement>();
-            reqId = p[0].GetProperty("id").GetGuid();
+            var res = await _client.SendAsync(pending);
+            res.EnsureSuccessStatusCode();
+            var p = await res.Content.ReadFromJsonAsync<JsonElement>();
+            reqId = p![0].GetProperty("id").GetGuid();
         }
 
         using (var acceptFriend = ApiTestAuth.Authed(HttpMethod.Post, $"/me/friends/requests/{reqId}/accept", playerToken))
