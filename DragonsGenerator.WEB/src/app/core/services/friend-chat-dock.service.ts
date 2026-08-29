@@ -12,7 +12,7 @@ export interface ChatConversation {
   unreadCount: number;
 }
 
-type ChatHistoryState = { dgFriendChat: 'list' | 'thread'; friendId?: string };
+type ChatHistoryState = { dgFriendChat: true };
 
 @Injectable({ providedIn: 'root' })
 export class FriendChatDockService {
@@ -64,15 +64,20 @@ export class FriendChatDockService {
 
   private summaryPollTimer: ReturnType<typeof setInterval> | null = null;
   private initialized = false;
-  private historyDepth = 0;
+  /** Une seule entrée history tant que le chat est ouvert (évite de quitter la PWA). */
+  private historyArmed = false;
   private ignorePopState = false;
-  private readonly onPopState = (): void => this.handlePopState();
+  private readonly onPopState = (event: PopStateEvent): void => {
+    if (this.ignorePopState || !this.isOpen()) return;
+    event.stopImmediatePropagation();
+    this.handleMobileBack();
+  };
 
   init(): void {
     if (this.initialized) return;
     this.initialized = true;
     if (typeof window !== 'undefined') {
-      window.addEventListener('popstate', this.onPopState);
+      window.addEventListener('popstate', this.onPopState, true);
     }
     this.refreshList();
     this.summaryPollTimer = setInterval(() => {
@@ -82,7 +87,7 @@ export class FriendChatDockService {
 
   destroy(): void {
     if (typeof window !== 'undefined') {
-      window.removeEventListener('popstate', this.onPopState);
+      window.removeEventListener('popstate', this.onPopState, true);
     }
     if (this.summaryPollTimer) {
       clearInterval(this.summaryPollTimer);
@@ -100,41 +105,31 @@ export class FriendChatDockService {
     if (!this.auth.isLoggedIn()) return;
     this.isOpen.set(true);
     this.view.set('list');
-    this.pushHistory({ dgFriendChat: 'list' });
+    this.armHistory();
     this.setBodyScrollLocked(true);
     this.refreshList();
   }
 
   close(): void {
     if (!this.isOpen()) return;
-    const steps = this.historyDepth;
     this.applyClose();
-    if (steps > 0) {
-      this.ignorePopState = true;
-      history.go(-steps);
-      this.historyDepth = 0;
-      this.ignorePopState = false;
-    }
+    this.disarmHistory();
   }
 
   openThread(friendUserId: string, displayName: string): void {
     if (!this.auth.isLoggedIn()) return;
-    const wasOpen = this.isOpen();
     this.activeFriendId.set(friendUserId);
     this.activeFriendName.set(displayName);
     this.view.set('thread');
     this.isOpen.set(true);
-    if (!wasOpen) {
-      this.pushHistory({ dgFriendChat: 'list' });
-    }
-    this.pushHistory({ dgFriendChat: 'thread', friendId: friendUserId });
+    this.armHistory();
     this.setBodyScrollLocked(true);
     this.refreshList();
   }
 
   backToList(): void {
     if (this.view() !== 'thread') return;
-    history.back();
+    this.applyBackToList();
   }
 
   refreshList(): void {
@@ -158,19 +153,15 @@ export class FriendChatDockService {
     this.chat.listSummaries().subscribe((s) => this.summaries.set(s));
   }
 
-  private handlePopState(): void {
-    if (this.ignorePopState) return;
-
+  /** Bouton retour système / geste : conversation → liste → fermer, sans quitter l'app. */
+  private handleMobileBack(): void {
     if (this.view() === 'thread') {
       this.applyBackToList();
-      this.historyDepth = Math.max(0, this.historyDepth - 1);
+      this.rearmHistory();
       return;
     }
-
-    if (this.isOpen()) {
-      this.applyClose();
-      this.historyDepth = 0;
-    }
+    this.applyClose();
+    this.historyArmed = false;
   }
 
   private applyBackToList(): void {
@@ -189,10 +180,32 @@ export class FriendChatDockService {
     this.setBodyScrollLocked(false);
   }
 
-  private pushHistory(state: ChatHistoryState): void {
+  private armHistory(): void {
+    if (this.historyArmed || typeof history === 'undefined') return;
+    history.pushState({ dgFriendChat: true } satisfies ChatHistoryState, '', this.currentHref());
+    this.historyArmed = true;
+  }
+
+  /** Après un retour depuis une conversation, remet une entrée pour ne pas quitter la PWA. */
+  private rearmHistory(): void {
     if (typeof history === 'undefined') return;
-    history.pushState(state, '');
-    this.historyDepth++;
+    this.ignorePopState = true;
+    history.pushState({ dgFriendChat: true } satisfies ChatHistoryState, '', this.currentHref());
+    this.historyArmed = true;
+    this.ignorePopState = false;
+  }
+
+  private disarmHistory(): void {
+    if (!this.historyArmed || typeof history === 'undefined') return;
+    this.ignorePopState = true;
+    history.back();
+    this.historyArmed = false;
+    this.ignorePopState = false;
+  }
+
+  private currentHref(): string {
+    if (typeof window === 'undefined') return '/';
+    return `${window.location.pathname}${window.location.search}${window.location.hash}`;
   }
 
   private setBodyScrollLocked(lock: boolean): void {
