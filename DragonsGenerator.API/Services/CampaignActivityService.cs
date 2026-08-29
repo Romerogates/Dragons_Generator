@@ -45,19 +45,29 @@ public static class CampaignActivityService
         CancellationToken ct)
     {
         limit = Math.Clamp(limit, 1, 100);
-        return await (
-            from a in db.CampaignActivities.AsNoTracking()
-            join u in db.Users.AsNoTracking() on a.ActorUserId equals u.Id
-            where a.CampaignId == campaignId
-            orderby a.CreatedAt descending
-            select new CampaignActivityDto(
-                a.Id,
-                a.ActorUserId,
-                u.DisplayName,
-                a.Kind,
-                a.PayloadJson,
-                a.CreatedAt)
-        ).Take(limit).ToListAsync(ct);
+        var rows = await db.CampaignActivities
+            .AsNoTracking()
+            .Where(a => a.CampaignId == campaignId)
+            .OrderByDescending(a => a.CreatedAt)
+            .Take(limit)
+            .ToListAsync(ct);
+
+        if (rows.Count == 0)
+            return [];
+
+        var actorIds = rows.Select(r => r.ActorUserId).Distinct().ToList();
+        var actors = await db.Users
+            .AsNoTracking()
+            .Where(u => actorIds.Contains(u.Id))
+            .ToDictionaryAsync(u => u.Id, u => u.DisplayName, ct);
+
+        return rows.Select(r => new CampaignActivityDto(
+            r.Id,
+            r.ActorUserId,
+            actors.GetValueOrDefault(r.ActorUserId, ""),
+            r.Kind,
+            r.PayloadJson,
+            r.CreatedAt)).ToList();
     }
 }
 

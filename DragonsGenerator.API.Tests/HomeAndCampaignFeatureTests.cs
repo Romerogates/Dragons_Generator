@@ -165,8 +165,10 @@ public class HomeAndCampaignFeatureTests
         using (var actReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}/activity", ownerToken))
         {
             var act = await _client.SendAsync(actReq);
-            act.EnsureSuccessStatusCode();
             var raw = await act.Content.ReadAsStringAsync();
+            Assert.True(
+                act.IsSuccessStatusCode,
+                $"Activity GET failed: {(int)act.StatusCode} {raw}");
             Assert.Contains("invite_sent", raw);
         }
     }
