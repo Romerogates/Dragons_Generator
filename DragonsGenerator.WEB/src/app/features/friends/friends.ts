@@ -28,6 +28,7 @@ export class FriendsPage implements OnInit {
   readonly searchResults = signal<FriendUser[]>([]);
   readonly friendsList = signal<FriendUser[]>([]);
   readonly requests = signal<FriendRequest[]>([]);
+  readonly sentRequests = signal<FriendRequest[]>([]);
   readonly campaignInvites = signal<CampaignInvite[]>([]);
   readonly message = signal<string | null>(null);
   readonly isLoggedIn = this.auth.isLoggedIn;
@@ -40,6 +41,7 @@ export class FriendsPage implements OnInit {
   reload(): void {
     this.friends.listFriends().subscribe((f) => this.friendsList.set(f));
     this.friends.listIncomingRequests().subscribe((r) => this.requests.set(r));
+    this.friends.listSentRequests().subscribe((r) => this.sentRequests.set(r));
     this.friends.listCampaignInvites().subscribe((i) => this.campaignInvites.set(i));
   }
 
@@ -55,7 +57,10 @@ export class FriendsPage implements OnInit {
   sendRequest(userId: string): void {
     this.message.set(null);
     this.friends.sendRequest(userId).subscribe({
-      next: () => this.message.set('Demande envoyée !'),
+      next: () => {
+        this.message.set('Demande envoyée !');
+        this.reload();
+      },
       error: (err) => this.message.set(err?.error?.errors?.[0]?.reason ?? 'Échec de la demande.'),
     });
   }
@@ -66,6 +71,16 @@ export class FriendsPage implements OnInit {
 
   decline(id: string): void {
     this.friends.declineRequest(id).subscribe(() => this.reload());
+  }
+
+  cancelSent(id: string): void {
+    this.friends.cancelRequest(id).subscribe({
+      next: () => {
+        this.message.set('Demande annulée.');
+        this.reload();
+      },
+      error: () => this.message.set('Impossible d\'annuler cette demande.'),
+    });
   }
 
   acceptCampaign(id: string): void {

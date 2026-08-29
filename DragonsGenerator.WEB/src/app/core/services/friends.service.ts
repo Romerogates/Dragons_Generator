@@ -26,6 +26,15 @@ export class FriendsService {
     return this.http.get<FriendRequest[]>(`${this.api}/me/friends/requests`);
   }
 
+  listSentRequests(): Observable<FriendRequest[]> {
+    if (!this.auth.isLoggedIn()) return of([]);
+    return this.http.get<FriendRequest[]>(`${this.api}/me/friends/requests/sent`);
+  }
+
+  cancelRequest(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.api}/me/friends/requests/${id}`);
+  }
+
   sendRequest(userId: string): Observable<void> {
     return this.http.post<void>(`${this.api}/me/friends/request`, { userId });
   }

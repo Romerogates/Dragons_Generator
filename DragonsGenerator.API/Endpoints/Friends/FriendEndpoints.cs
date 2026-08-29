@@ -100,6 +100,57 @@ public class ListFriendRequestsEndpoint(AppDbContext db) : EndpointWithoutReques
     }
 }
 
+public class ListSentFriendRequestsEndpoint(AppDbContext db) : EndpointWithoutRequest<List<FriendRequestDto>>
+{
+    public override void Configure() => Get("/me/friends/requests/sent");
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var userId = AuthHelpers.GetUserId(User);
+        if (userId is null)
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        var outgoing = await db.Friendships.AsNoTracking()
+            .Where(f => f.RequesterId == userId && f.Status == FriendStatuses.Pending)
+            .Include(f => f.Addressee)
+            .Select(f => new FriendRequestDto(f.Id, f.AddresseeId, f.Addressee.DisplayName, f.CreatedAt))
+            .ToListAsync(ct);
+
+        await Send.OkAsync(outgoing.OrderByDescending(f => f.CreatedAt).ToList(), ct);
+    }
+}
+
+public class CancelFriendRequestEndpoint(AppDbContext db) : EndpointWithoutRequest
+{
+    public override void Configure() => Delete("/me/friends/requests/{id}");
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var userId = AuthHelpers.GetUserId(User);
+        if (userId is null)
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        var id = Route<Guid>("id");
+        var friendship = await db.Friendships.FirstOrDefaultAsync(
+            f => f.Id == id && f.RequesterId == userId && f.Status == FriendStatuses.Pending, ct);
+        if (friendship is null)
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        db.Friendships.Remove(friendship);
+        await db.SaveChangesAsync(ct);
+        await Send.NoContentAsync(ct);
+    }
+}
+
 public class SendFriendRequestEndpoint(AppDbContext db) : Endpoint<SendFriendRequestBody>
 {
     public override void Configure() => Post("/me/friends/request");

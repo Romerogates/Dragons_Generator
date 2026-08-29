@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+  html,
+  body {
+    overflow-x: clip;
+    max-width: 100%;
+  }
+
   /* Cheaper paints: avoid animating layout properties site-wide when user prefers less motion */
   @media (prefers-reduced-motion: reduce) {
     *,
