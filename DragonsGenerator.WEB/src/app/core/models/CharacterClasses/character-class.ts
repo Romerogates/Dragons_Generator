@@ -74,6 +74,7 @@ export interface CharacterClassData {
   features_details?: FeatureDetail[];
   subclasses?: Subclass[];
   spellcasting?: Spellcasting;
+  flavor?: { summary?: string; lore_note?: string; loreNote?: string };
   // Spécifiques (moine, sorcier…)
   ki_powers?: FeatureDetail[];
   pact_boons?: FeatureDetail[];

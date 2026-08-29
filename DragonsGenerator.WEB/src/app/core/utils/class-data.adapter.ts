@@ -201,10 +201,12 @@ export function normalizeCharacterClass(cls: CharacterClass): CharacterClass {
   const d = cls.data as Record<string, unknown>;
 
   if (d['proficiencies'] && Array.isArray(d['starting_equipment'])) {
+    const flavor = normalizeClassFlavor(d['flavor']);
     return {
       ...cls,
       data: {
         ...d,
+        ...(flavor ? { flavor } : {}),
         hit_die: parseHitDie(d['hit_die']),
         primary_abilities: mapSavingThrows(
           (d['primary_abilities'] as string[]) ?? [],
@@ -222,11 +224,13 @@ export function normalizeCharacterClass(cls: CharacterClass): CharacterClass {
     id === 'any' || id === 'any-skills' || id === 'skill-any' ? 'any' : normalizeSkillId(id),
   );
   const skillCount = skillPool?.quantity ?? fallback?.count ?? 0;
+  const flavor = normalizeClassFlavor(d['flavor']);
 
   return {
     ...cls,
     data: {
       ...d,
+      ...(flavor ? { flavor } : {}),
       hit_die: parseHitDie(d['hit_die']),
       primary_abilities: mapSavingThrows(
         (d['primary_abilities'] as string[]) ?? [],
@@ -248,6 +252,23 @@ export function normalizeCharacterClass(cls: CharacterClass): CharacterClass {
         choicePools,
       ) as CharacterClass['data']['starting_equipment'],
     } as CharacterClass['data'],
+  };
+}
+
+function normalizeClassFlavor(
+  raw: unknown,
+): { summary?: string; lore_note?: string } | undefined {
+  if (!raw || typeof raw !== 'object') return undefined;
+  const f = raw as Record<string, unknown>;
+  const summary = typeof f['summary'] === 'string' ? f['summary'].trim() : '';
+  const lore =
+    (typeof f['lore_note'] === 'string' && f['lore_note']) ||
+    (typeof f['loreNote'] === 'string' && f['loreNote']) ||
+    '';
+  if (!summary && !lore) return undefined;
+  return {
+    ...(summary ? { summary } : {}),
+    ...(lore ? { lore_note: String(lore).trim() } : {}),
   };
 }
 

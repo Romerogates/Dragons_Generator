@@ -6,6 +6,7 @@ import { CharacterAutoGeneratorService } from './character-auto-generator.servic
 import type { CampaignDetail } from '@core/models/Campaign/campaign';
 import type { Character } from '@core/models/Character/character';
 import { pickRandom } from '@core/utils/pregen-random.util';
+import { buildPregenPhysicalDescription } from '@core/utils/pregen-narrative.util';
 
 export interface GeneratedPregenCharacter {
   characterId: string;
@@ -76,6 +77,22 @@ export class CampaignPregenGeneratorService {
         }
       }
     }
+
+    if (!dmBackstory) {
+      dmBackstory = `${copy.name} est un héros prêt pour ${campaign.data.regionName || "l'aventure"}.`;
+      publicHook = dmBackstory;
+    }
+
+    copy.id = newId;
+    copy.cloudSynced = true;
+    copy.personality = {
+      ...copy.personality,
+      story: dmBackstory,
+      description:
+        copy.personality?.description?.trim() ||
+        buildPregenPhysicalDescription(copy, speciesLabel, classLabel),
+    };
+    await firstValueFrom(this.characters.save(copy, { updateExisting: true }));
 
     return {
       characterId: newId,

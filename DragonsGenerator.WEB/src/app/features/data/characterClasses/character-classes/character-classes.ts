@@ -7,22 +7,19 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DataService } from '@core/services/data.service';
 import { normalizeCharacterClasses } from '@core/utils/class-data.adapter';
 import { getClassIcon } from '@core/utils/class-icons';
-import { formatClassResources, resolveFeatureNames } from '@core/utils/catalog-display.util';
-import {
-  GameIdLabelPipe,
-  GameIdLabelsPipe,
-  GameItemLabelPipe,
-} from '@shared/pipes/game-id-label.pipe';
+import { GameIdLabelsPipe } from '@shared/pipes/game-id-label.pipe';
+import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
 import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-character-classes',
   standalone: true,
-  imports: [CommonModule, GameIdLabelPipe, GameIdLabelsPipe, GameItemLabelPipe],
+  imports: [CommonModule, RouterLink, GameIdLabelsPipe],
   templateUrl: './character-classes.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -41,7 +38,11 @@ export class CharacterClasses {
     const term = this.search().trim().toLowerCase();
     const list = this.classes();
     if (!term) return list;
-    return list.filter((c) => c.name.toLowerCase().includes(term));
+    return list.filter(
+      (c) =>
+        c.name.toLowerCase().includes(term) ||
+        this.classSummary(c).toLowerCase().includes(term),
+    );
   });
 
   protected iconFor(classId: string): string {
@@ -52,57 +53,12 @@ export class CharacterClasses {
     this.search.set(value);
   }
 
-  protected resourceLines(resources: Record<string, unknown> | null | undefined) {
-    return formatClassResources(resources);
-  }
-
-  protected featureNames(
-    featureIds: string[] | null | undefined,
-    details: { id?: string; name?: string }[] | null | undefined,
-  ): string {
-    return resolveFeatureNames(featureIds, details);
-  }
-
-  /**
-   * Navigation rapide entre les classes
-   */
-  protected scrollTo(direction: 'up' | 'down'): void {
-    // On récupère toutes les balises "article" qui ont la classe "class-card"
-    const cards = Array.from(document.querySelectorAll('.class-card')) as HTMLElement[];
-    if (!cards.length) return;
-
-    let currentIndex = 0;
-    const offset = 100; // Marge de confort en haut de l'écran
-
-    // On cherche quelle carte est actuellement à l'écran
-    for (let i = 0; i < cards.length; i++) {
-      const rect = cards[i].getBoundingClientRect();
-
-      // Si le haut de la carte est en dessous de notre ligne de vue,
-      // c'est qu'on est en train de lire la carte précédente (i - 1)
-      if (rect.top > offset) {
-        currentIndex = i === 0 ? 0 : i - 1;
-        // Exception: si on est très proche du haut de cette carte, on la considère comme active
-        if (rect.top < offset + 150) {
-          currentIndex = i;
-        }
-        break;
-      }
-      // Fallback si on a tout scrollé : on est sur la dernière carte
-      currentIndex = i;
-    }
-
-    // On détermine la cible
-    let targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
-
-    // On bloque aux limites du tableau
-    if (targetIndex < 0) targetIndex = 0;
-    if (targetIndex >= cards.length) targetIndex = cards.length - 1;
-
-    // Défilement en douceur vers la cible (avec une petite marge de 30px au-dessus)
-    const targetCard = cards[targetIndex];
-    const targetPosition = targetCard.getBoundingClientRect().top + window.scrollY - 30;
-
-    window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+  protected classSummary(cls: CharacterClass): string {
+    const flavor = cls.data.flavor;
+    const summary = flavor?.summary?.trim();
+    if (summary) return summary;
+    const first = cls.data.features_details?.[0]?.desc?.trim();
+    if (first) return first.slice(0, 180) + (first.length > 180 ? '…' : '');
+    return `Voie du ${cls.name} — dé de vie d${cls.data.hit_die}.`;
   }
 }

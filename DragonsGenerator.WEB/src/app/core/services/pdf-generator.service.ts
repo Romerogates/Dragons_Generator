@@ -189,16 +189,16 @@ const PANEL_DRUID = {
   notesSpacing: 22,
 };
 
-// Sorcier : "Sorcellerie" → Suzerain, Pacte, Focaliseur, Manifestations occultes
+// Sorcier : "Sorcellerie" → Suzerain, Pacte, Focaliseur (serrés sur le parchemin), puis Manifestations
 const PANEL_WARLOCK = {
-  line1X: 450, // Suzerain (valeur)
+  line1X: 448, // Suzerain (valeur)
   line1Y: 248,
-  line2X: 450, // Pacte (valeur)
-  line2Y: 295,
-  line3X: 450, // Focaliseur arcanique (valeur)
-  line3Y: 345,
-  invocationsX: 450, // Manifestations occultes (titre)
-  invocationsStartY: 400,
+  line2X: 448, // Pacte (valeur)
+  line2Y: 272,
+  line3X: 448, // Focaliseur arcanique (valeur) — trop bas (345) écrivait sur Manifestations
+  line3Y: 296,
+  invocationsX: 448,
+  invocationsStartY: 378,
   invocationsSpacing: 18,
 };
 

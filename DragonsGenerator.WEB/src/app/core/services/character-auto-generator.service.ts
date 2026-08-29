@@ -37,6 +37,7 @@ import { pickRandom, randomHeroName } from '@core/utils/pregen-random.util';
 import { validateCharacterExport } from '@core/utils/character-export-validation.util';
 import { normalizeSkillId, type SkillInfo } from '@core/utils/skill.utils';
 import type { GeneratedPregenCharacter } from './campaign-pregen-generator.service';
+import { buildPregenPhysicalDescription } from '@core/utils/pregen-narrative.util';
 
 interface GameCatalogs {
   species: Species[];
@@ -112,6 +113,22 @@ export class CharacterAutoGeneratorService {
             }
           }
         }
+
+        if (!dmBackstory) {
+          dmBackstory = `${copy.name} est un héros prêt pour ${campaign.data.regionName || "l'aventure"}.`;
+          publicHook = dmBackstory;
+        }
+
+        copy.id = newId;
+        copy.cloudSynced = true;
+        copy.personality = {
+          ...copy.personality,
+          story: dmBackstory,
+          description:
+            copy.personality?.description?.trim() ||
+            buildPregenPhysicalDescription(copy, speciesLabel, classLabel),
+        };
+        await firstValueFrom(this.characters.save(copy, { updateExisting: true }));
 
         return {
           characterId: newId,

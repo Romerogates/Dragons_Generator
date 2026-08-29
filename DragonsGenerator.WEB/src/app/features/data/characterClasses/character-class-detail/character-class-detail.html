@@ -19,10 +19,15 @@
           <iconify-icon [icon]="iconFor(c.id)" width="1em" height="1em"></iconify-icon>
         </span>
         <h1
-          class="text-4xl md:text-6xl font-extrabold text-amber-500 font-serif tracking-wide mb-6 drop-shadow-lg"
+          class="text-4xl md:text-6xl font-extrabold text-amber-500 font-serif tracking-wide mb-4 drop-shadow-lg"
         >
           {{ c.name }}
         </h1>
+        @if (c.data.flavor?.summary) {
+          <p class="text-sm md:text-base text-slate-400 italic max-w-2xl mx-auto mb-6 leading-relaxed">
+            {{ c.data.flavor?.summary }}
+          </p>
+        }
         <div class="flex flex-wrap justify-center gap-3">
           <div
             class="bg-rose-950/30 border border-rose-900/50 px-4 py-2 rounded-xl flex items-center gap-3"
