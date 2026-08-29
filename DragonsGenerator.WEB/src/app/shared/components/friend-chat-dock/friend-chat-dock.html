@@ -1,0 +1,222 @@
+@if (isLoggedIn()) {
+  <div class="friend-chat-dock pointer-events-none fixed inset-0 z-[70]">
+    @if (dock.isOpen()) {
+      <div
+        class="pointer-events-auto fixed inset-0 bg-black/40 lg:bg-transparent lg:pointer-events-none"
+        (click)="close()"
+        aria-hidden="true"
+      ></div>
+    }
+
+    <div
+      class="pointer-events-none fixed bottom-0 right-0 left-0 lg:left-auto lg:bottom-4 lg:right-4 flex flex-col items-end gap-3 p-3 lg:p-0"
+    >
+      @if (dock.isOpen()) {
+        <div
+          class="friend-chat-panel pointer-events-auto flex flex-col w-full lg:w-[360px] h-[min(100dvh,100%)] max-h-[100dvh] lg:h-[min(520px,calc(100dvh-5rem))] lg:max-h-[520px] bg-[#1b2028] border border-slate-700/80 lg:rounded-2xl shadow-[0_12px_48px_rgba(0,0,0,0.55)] overflow-hidden animate-dock-in lg:rounded-2xl rounded-t-2xl"
+          (click)="$event.stopPropagation()"
+        >
+          @if (dock.view() === 'list') {
+            <header class="shrink-0 flex items-center justify-between gap-2 px-4 py-3 border-b border-slate-800 bg-[#171b22]">
+              <button
+                type="button"
+                class="lg:hidden w-9 h-9 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-800"
+                aria-label="Fermer"
+                (click)="close()"
+              >
+                <iconify-icon icon="mdi:close" class="text-xl"></iconify-icon>
+              </button>
+              <h2 class="flex-1 text-center lg:text-left text-sm font-black uppercase tracking-widest text-slate-100">
+                Messages
+              </h2>
+              <button
+                type="button"
+                class="w-9 h-9 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-800 hover:text-violet-300"
+                aria-label="Réduire"
+                (click)="close()"
+              >
+                <iconify-icon icon="mdi:chevron-down" class="text-xl"></iconify-icon>
+              </button>
+            </header>
+
+            <div class="shrink-0 px-3 py-2 border-b border-slate-800/80">
+              <div class="relative">
+                <iconify-icon
+                  icon="mdi:magnify"
+                  class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-lg pointer-events-none"
+                ></iconify-icon>
+                <input
+                  type="search"
+                  placeholder="Rechercher un ami"
+                  class="w-full rounded-full bg-[#252b36] border border-slate-700/60 py-2.5 pl-10 pr-4 text-sm text-slate-200 placeholder:text-slate-500 outline-none focus:border-violet-600/60"
+                  [value]="dock.searchQuery()"
+                  (input)="dock.searchQuery.set($any($event.target).value)"
+                />
+              </div>
+            </div>
+
+            <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+              @if (dock.loadingList()) {
+                <div class="flex justify-center py-12">
+                  <div
+                    class="w-8 h-8 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin"
+                  ></div>
+                </div>
+              } @else if (dock.filteredConversations().length === 0) {
+                <div class="px-6 py-12 text-center">
+                  <p class="text-sm text-slate-400">
+                    @if (dock.searchQuery().trim()) {
+                      Aucun ami trouvé.
+                    } @else {
+                      Ajoutez des amis pour démarrer une conversation.
+                    }
+                  </p>
+                </div>
+              } @else {
+                @for (c of dock.filteredConversations(); track trackConversation($index, c)) {
+                  <button
+                    type="button"
+                    class="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-800/50 transition-colors text-left border-b border-slate-800/40 last:border-0"
+                    (click)="openConversation(c)"
+                  >
+                    <span
+                      class="shrink-0 w-11 h-11 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-700 flex items-center justify-center text-sm font-black text-white shadow-inner"
+                      >{{ initial(c.friendDisplayName) }}</span
+                    >
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-baseline justify-between gap-2">
+                        <p class="text-sm font-semibold text-slate-100 truncate">{{ c.friendDisplayName }}</p>
+                        @if (c.lastMessageAt) {
+                          <span class="text-[10px] text-slate-500 shrink-0">{{
+                            formatTime(c.lastMessageAt)
+                          }}</span>
+                        }
+                      </div>
+                      <p class="text-xs text-slate-400 truncate mt-0.5">{{ c.lastMessagePreview }}</p>
+                    </div>
+                    @if (c.unreadCount > 0) {
+                      <span
+                        class="shrink-0 min-w-[1.25rem] h-5 px-1.5 flex items-center justify-center rounded-full bg-violet-500 text-[10px] font-black text-white"
+                        >{{ c.unreadCount > 9 ? '9+' : c.unreadCount }}</span
+                      >
+                    }
+                  </button>
+                }
+              }
+            </div>
+          } @else {
+            <header class="shrink-0 flex items-center gap-2 px-3 py-3 border-b border-slate-800 bg-[#171b22]">
+              <button
+                type="button"
+                class="w-9 h-9 flex items-center justify-center rounded-full text-slate-300 hover:bg-slate-800"
+                aria-label="Retour"
+                (click)="backToList()"
+              >
+                <iconify-icon icon="mdi:arrow-left" class="text-xl"></iconify-icon>
+              </button>
+              <div class="flex items-center gap-2 min-w-0 flex-1">
+                <span
+                  class="shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-700 flex items-center justify-center text-xs font-black text-white"
+                  >{{ initial(dock.activeFriendName()) }}</span
+                >
+                <p class="text-sm font-semibold text-slate-100 truncate">{{ dock.activeFriendName() }}</p>
+              </div>
+              <button
+                type="button"
+                class="w-9 h-9 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-800"
+                aria-label="Réduire"
+                (click)="close()"
+              >
+                <iconify-icon icon="mdi:chevron-down" class="text-xl"></iconify-icon>
+              </button>
+            </header>
+
+            @if (threadLoading()) {
+              <div class="flex-1 flex items-center justify-center min-h-0">
+                <div
+                  class="w-8 h-8 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin"
+                ></div>
+              </div>
+            } @else {
+              <div class="flex flex-col flex-1 min-h-0">
+                @if (threadError(); as err) {
+                  <p class="text-center text-red-400 text-xs py-3 px-4 shrink-0">{{ err }}</p>
+                }
+
+                <div
+                  #threadScroll
+                  class="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 py-3 space-y-2 bg-[#141820]/50"
+                >
+                  @for (msg of messages(); track trackMessage($index, msg)) {
+                    <div class="flex" [class.justify-end]="msg.isMine">
+                      <div
+                        class="max-w-[82%] rounded-2xl px-3 py-2 text-[13px] leading-snug"
+                        [class]="
+                          msg.isMine
+                            ? 'bg-violet-600 text-white rounded-br-sm'
+                            : 'bg-[#252b36] text-slate-100 rounded-bl-sm'
+                        "
+                      >
+                        <p class="whitespace-pre-wrap break-words">{{ msg.body }}</p>
+                        <p
+                          class="text-[9px] mt-1 opacity-70"
+                          [class.text-right]="msg.isMine"
+                        >
+                          {{ msg.createdAt | date: 'shortTime' }}
+                        </p>
+                      </div>
+                    </div>
+                  } @empty {
+                    <p class="text-center text-slate-500 text-xs italic py-8">Envoyez le premier message</p>
+                  }
+                </div>
+
+                <form
+                  class="shrink-0 flex items-end gap-2 px-3 py-3 border-t border-slate-800 bg-[#171b22]"
+                  (ngSubmit)="send()"
+                >
+                  <textarea
+                    rows="1"
+                    maxlength="2000"
+                    placeholder="Message…"
+                    class="flex-1 min-w-0 max-h-24 rounded-3xl bg-[#252b36] border border-slate-700/60 px-4 py-2.5 text-sm resize-none outline-none focus:border-violet-600/60"
+                    [value]="draft()"
+                    (input)="draft.set($any($event.target).value)"
+                    (keydown)="onKeydown($event)"
+                  ></textarea>
+                  <button
+                    type="submit"
+                    class="shrink-0 w-10 h-10 rounded-full bg-violet-600 text-white flex items-center justify-center disabled:opacity-40 hover:bg-violet-500 transition-colors"
+                    [disabled]="sending() || !draft().trim()"
+                    aria-label="Envoyer"
+                  >
+                    @if (sending()) {
+                      <span class="text-xs">…</span>
+                    } @else {
+                      <iconify-icon icon="mdi:send" class="text-lg"></iconify-icon>
+                    }
+                  </button>
+                </form>
+              </div>
+            }
+          }
+        </div>
+      } @else {
+        <button
+          type="button"
+          class="friend-chat-fab pointer-events-auto relative w-14 h-14 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white shadow-[0_8px_28px_rgba(124,58,237,0.45)] flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+          aria-label="Messages"
+          (click)="toggle()"
+        >
+          <iconify-icon icon="mdi:message-text" class="text-2xl"></iconify-icon>
+          @if (dock.totalUnread() > 0) {
+            <span
+              class="absolute -top-0.5 -right-0.5 min-w-[1.25rem] h-5 px-1 flex items-center justify-center rounded-full bg-red-500 text-[10px] font-black text-white ring-2 ring-[#171b22]"
+              >{{ dock.totalUnread() > 9 ? '9+' : dock.totalUnread() }}</span
+            >
+          }
+        </button>
+      }
+    </div>
+  </div>
+}

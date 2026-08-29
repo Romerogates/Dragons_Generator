@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FriendsService } from '@core/services/friends.service';
 import { FriendChatService, FriendChatSummary } from '@core/services/friend-chat.service';
+import { FriendChatDockService } from '@core/services/friend-chat-dock.service';
 import { NotificationService } from '@core/services/notification.service';
 import { AuthService } from '@core/services/auth.service';
 import { CampaignInvite, FriendRequest, FriendUser } from '@core/models/Campaign/campaign';
@@ -28,6 +29,7 @@ type SearchStatus = 'none' | 'friend' | 'pending_sent' | 'pending_received';
 export class FriendsPage implements OnInit {
   private friends = inject(FriendsService);
   private chat = inject(FriendChatService);
+  private dock = inject(FriendChatDockService);
   private auth = inject(AuthService);
   private notifications = inject(NotificationService);
 
@@ -146,5 +148,9 @@ export class FriendsPage implements OnInit {
 
   unreadCount(friendId: string): number {
     return this.unreadByFriendId().get(friendId) ?? 0;
+  }
+
+  openChat(friend: FriendUser): void {
+    this.dock.openThread(friend.id, friend.displayName);
   }
 }

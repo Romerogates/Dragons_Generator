@@ -55,10 +55,11 @@
               }
             </div>
             <div class="flex flex-wrap gap-2 shrink-0 w-full sm:w-auto">
-              <a
-                [routerLink]="['/friends/chat', f.id]"
+              <button
+                type="button"
                 class="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-[10px] font-black uppercase bg-violet-600 text-white hover:bg-violet-500 transition-colors"
-                >Chatter</a
+                (click)="openChat(f)"
+                >Chatter</button
               >
               <button
                 type="button"
@@ -94,10 +95,11 @@
               @switch (searchStatus(u.id)) {
                 @case ('friend') {
                   <div class="flex flex-wrap gap-2 shrink-0 w-full sm:w-auto">
-                    <a
-                      [routerLink]="['/friends/chat', u.id]"
+                    <button
+                      type="button"
                       class="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-violet-600 text-white"
-                      >Chatter</a
+                      (click)="openChat(u)"
+                      >Chatter</button
                     >
                     <button
                       type="button"

@@ -8,11 +8,12 @@ import { GameLabelCatalogService } from '@core/services/game-label-catalog.servi
 import { AuthService } from '@core/services/auth.service';
 import { OfflineSyncService } from '@core/services/offline-sync.service';
 import { NotificationService } from '@core/services/notification.service';
+import { FriendChatDockComponent } from './shared/components/friend-chat-dock/friend-chat-dock';
 import { clearPersistedAiRateLimit } from '@core/utils/ai-rate-limit.util';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Navbar, SiteFooterComponent, AppContextMenu, AiRateLimitDialogComponent],
+  imports: [RouterOutlet, Navbar, SiteFooterComponent, AppContextMenu, AiRateLimitDialogComponent, FriendChatDockComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
