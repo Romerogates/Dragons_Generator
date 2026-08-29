@@ -1,23 +1,17 @@
+import { classResourceLabel } from './class-resource-labels';
+
 /** Libellés lisibles pour le catalogue (classes, équipements, dons…). */
 
-const CLASS_RESOURCE_LABELS: Record<string, string> = {
+const EXTRA_RESOURCE_LABELS: Record<string, string> = {
   fougue_count: 'Fougue',
   extra_attacks: 'Attaques supplémentaires',
-  ki_points: 'Points de ki',
-  rages: 'Rages',
   spell_slots: 'Emplacements de sorts',
   cantrips: 'Tours de magie',
   known_spells: 'Sorts connus',
   prepared_spells: 'Sorts préparés',
-  sorcery_points: 'Points de sorcellerie',
   invocations: 'Invocations',
   expertise_dice: 'Dés d’expertise',
-  superiority_dice: 'Dés de superiorité',
   superiority_die: 'Dé de superiorité',
-  channel_divinity: 'Canalisation divine',
-  wild_shape: 'Forme sauvage',
-  bardic_inspiration: 'Inspiration bardique',
-  lay_on_hands: 'Imposition des mains',
   sneak_attack: 'Attaque sournoise',
   martial_arts: 'Arts martiaux',
   unarmored_movement: 'Mouvement sans armure',
@@ -40,9 +34,9 @@ const FEAT_BENEFIT_TYPE_LABELS: Record<string, string> = {
   other: 'Effet',
 };
 
-export function classResourceLabel(key: string): string {
-  if (CLASS_RESOURCE_LABELS[key]) return CLASS_RESOURCE_LABELS[key];
-  return humanizeKey(key);
+export function catalogClassResourceLabel(key: string): string {
+  if (EXTRA_RESOURCE_LABELS[key]) return EXTRA_RESOURCE_LABELS[key];
+  return classResourceLabel(key);
 }
 
 export function featBenefitTypeLabel(type: string): string {
@@ -63,7 +57,7 @@ export function formatClassResources(
   return Object.entries(resources)
     .filter(([, v]) => v !== null && v !== undefined && v !== '')
     .map(([key, value]) => ({
-      label: classResourceLabel(key),
+      label: catalogClassResourceLabel(key),
       value: formatSimpleValue(value),
     }));
 }

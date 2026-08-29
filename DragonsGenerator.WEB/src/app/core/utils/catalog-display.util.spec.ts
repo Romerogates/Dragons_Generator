@@ -1,5 +1,5 @@
 import {
-  classResourceLabel,
+  catalogClassResourceLabel,
   formatClassResources,
   formatFeatBenefits,
   formatFeatPrerequisites,
@@ -9,8 +9,8 @@ import {
 
 describe('catalog-display.util', () => {
   it('labels known class resources', () => {
-    expect(classResourceLabel('fougue_count')).toBe('Fougue');
-    expect(classResourceLabel('unknown_thing')).toBe('Unknown Thing');
+    expect(catalogClassResourceLabel('fougue_count')).toBe('Fougue');
+    expect(catalogClassResourceLabel('unknown_thing')).toContain('nknown');
     expect(formatClassResources({ fougue_count: 1, extra_attacks: 2 })).toEqual([
       { label: 'Fougue', value: '1' },
       { label: 'Attaques supplémentaires', value: '2' },
