@@ -1,6 +1,9 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { forkJoin, map, Observable, of, catchError } from 'rxjs';
-import { DataService } from './data.service';
+import { environment } from '@env/environment';
+import { normalizeCharacterClasses } from '@core/utils/class-data.adapter';
+import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
 
 const STORAGE_KEY = 'dragons-offline-codex-v1';
 const META_KEY = 'dragons-offline-codex-meta';
@@ -12,7 +15,8 @@ export interface OfflineCodexMeta {
 
 @Injectable({ providedIn: 'root' })
 export class OfflineCodexService {
-  private readonly data = inject(DataService);
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = environment.apiUrl;
 
   readonly downloading = signal(false);
   readonly downloadError = signal<string | null>(null);
@@ -53,38 +57,40 @@ export class OfflineCodexService {
     this.downloading.set(true);
     this.downloadError.set(null);
 
+    const get = <T>(path: string) => this.http.get<T>(`${this.apiUrl}${path}`);
+
     const jobs = {
-      species: this.data.getSpecies(),
-      'species-summary': this.data.getSpeciesSummary(),
-      'species-codes': this.data.getSpeciesCodes(),
-      classes: this.data.getClasses(),
-      'classes-summary': this.data.getClassesSummary(),
-      civilisations: this.data.getCivilisations(),
-      'civilisations-summary': this.data.getCivilisationsSummary(),
-      equipments: this.data.getEquipments(),
-      'equipments-summary': this.data.getEquipmentsSummary(),
-      'equipment-types': this.data.getEquipmentTypes(),
-      spells: this.data.getSpells(),
-      'spells-summary': this.data.getSpellsSummary(),
-      'spell-schools': this.data.getSpellSchools(),
-      creatures: this.data.getCreatures(),
-      'creatures-summary': this.data.getCreaturesSummary(),
-      'creature-categories': this.data.getCreatureCategories(),
-      backgrounds: this.data.getBackgrounds(),
-      'backgrounds-summary': this.data.getBackgroundsSummary(),
-      handicaps: this.data.getHandicaps(),
-      'handicap-rules': this.data.getHandicapRules(),
-      languages: this.data.getLanguages(),
-      'languages-summary': this.data.getLanguagesSummary(),
-      'language-categories': this.data.getLanguageCategories(),
-      skills: this.data.getSkills(),
-      'skills-summary': this.data.getSkillsSummary(),
-      feats: this.data.getFeats(),
-      'feats-summary': this.data.getFeatsSummary(),
-      deities: this.data.getDeities(),
-      'deities-summary': this.data.getDeitiesSummary(),
-      'combat-actions': this.data.getCombatActions(),
-      'combat-actions-summary': this.data.getCombatActionsSummary(),
+      species: get('/species'),
+      'species-summary': get('/species/summary'),
+      'species-codes': get('/species/codes'),
+      classes: get<CharacterClass[]>('/classes').pipe(map((list) => normalizeCharacterClasses(list))),
+      'classes-summary': get('/classes/summary'),
+      civilisations: get('/civilisations'),
+      'civilisations-summary': get('/civilisations/summary'),
+      equipments: get('/equipments'),
+      'equipments-summary': get('/equipments/summary'),
+      'equipment-types': get('/equipments/types'),
+      spells: get('/spells'),
+      'spells-summary': get('/spells/summary'),
+      'spell-schools': get('/spells/schools'),
+      creatures: get('/creatures'),
+      'creatures-summary': get('/creatures/summary'),
+      'creature-categories': get('/creatures/categories'),
+      backgrounds: get('/backgrounds'),
+      'backgrounds-summary': get('/backgrounds/summary'),
+      handicaps: get('/handicaps'),
+      'handicap-rules': get('/handicaps/rules'),
+      languages: get('/languages'),
+      'languages-summary': get('/languages/summary'),
+      'language-categories': get('/languages/categories'),
+      skills: get('/skills'),
+      'skills-summary': get('/skills/summary'),
+      feats: get('/feats'),
+      'feats-summary': get('/feats/summary'),
+      deities: get('/deities'),
+      'deities-summary': get('/deities/summary'),
+      'combat-actions': get('/combat-actions'),
+      'combat-actions-summary': get('/combat-actions/summary'),
     };
 
     return forkJoin(jobs).pipe(
