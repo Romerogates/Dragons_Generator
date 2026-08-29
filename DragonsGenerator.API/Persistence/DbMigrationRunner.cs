@@ -221,11 +221,18 @@ public static class DbMigrationRunner
         string definition,
         CancellationToken ct)
     {
+        // DDL identifiers cannot be parameterized. Values come only from our migration
+        // call sites (never user input); validate so EF1002 is a false positive here.
+        if (!IsSafeSqlIdentifier(table) || !IsSafeSqlIdentifier(column) || !IsSafeSqlTypeDefinition(definition))
+            throw new InvalidOperationException($"Refusing unsafe migration DDL: {table}.{column} {definition}");
+
         try
         {
+#pragma warning disable EF1002 // Identifiers validated above; not user-controlled
             await db.Database.ExecuteSqlRawAsync(
                 $"""ALTER TABLE "{table}" ADD COLUMN "{column}" {definition};""",
                 ct);
+#pragma warning restore EF1002
         }
         catch (Exception ex)
         {
@@ -239,4 +246,12 @@ public static class DbMigrationRunner
             throw;
         }
     }
+
+    private static bool IsSafeSqlIdentifier(string value) =>
+        value.Length is > 0 and <= 64
+        && value.All(c => char.IsAsciiLetterOrDigit(c) || c == '_');
+
+    private static bool IsSafeSqlTypeDefinition(string definition) =>
+        definition is "TEXT NULL"
+            or "TEXT NOT NULL DEFAULT 'violet'";
 }
