@@ -48,11 +48,21 @@
         <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Mes amis ({{ friendsList().length }})</h2>
         @for (f of friendsList(); track f.id) {
           <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-3 mb-2 flex flex-wrap items-center justify-between gap-3">
-            <div class="min-w-0 flex items-center gap-2">
-              <p class="font-serif text-slate-200 truncate">{{ f.displayName }}</p>
+            <div class="min-w-0 flex items-center gap-3">
+              <app-profile-avatar
+                [displayName]="f.displayName"
+                [avatarEmoji]="f.avatarEmoji"
+                [accentColor]="f.accentColor"
+                size="sm"
+              />
+              <div class="min-w-0 flex items-center gap-2">
+                <p class="font-serif text-slate-200 truncate">
+                  <a [routerLink]="['/profile', f.id]" class="hover:text-violet-300">{{ f.displayName }}</a>
+                </p>
               @if (unreadCount(f.id) > 0) {
                 <span class="min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950">{{ unreadCount(f.id) }}</span>
               }
+              </div>
             </div>
             <div class="flex flex-wrap gap-2 shrink-0 w-full sm:w-auto">
               <button
@@ -91,7 +101,15 @@
         <div class="mt-3 space-y-2">
           @for (u of searchResults(); track u.id) {
             <div class="flex flex-wrap items-center justify-between gap-2 bg-[#1b2028] border border-slate-800 rounded-xl p-3">
-              <p class="font-serif text-slate-200 min-w-0 truncate">{{ u.displayName }}</p>
+              <div class="min-w-0 flex items-center gap-3">
+                <app-profile-avatar
+                  [displayName]="u.displayName"
+                  [avatarEmoji]="u.avatarEmoji"
+                  [accentColor]="u.accentColor"
+                  size="sm"
+                />
+                <p class="font-serif text-slate-200 min-w-0 truncate">{{ u.displayName }}</p>
+              </div>
               @switch (searchStatus(u.id)) {
                 @case ('friend') {
                   <div class="flex flex-wrap gap-2 shrink-0 w-full sm:w-auto">
@@ -130,9 +148,17 @@
           <h2 class="text-[10px] font-black uppercase tracking-widest text-sky-500 mb-3">Demandes envoyées</h2>
           @for (r of sentRequests(); track r.id) {
             <div class="flex flex-wrap items-center justify-between gap-2 bg-[#1b2028] border border-sky-900/30 rounded-xl p-3 mb-2">
-              <div class="min-w-0">
-                <span class="font-serif text-slate-200 block truncate">{{ r.displayName }}</span>
-                <span class="text-[10px] text-slate-500 uppercase tracking-widest">En attente</span>
+              <div class="min-w-0 flex items-center gap-3">
+                <app-profile-avatar
+                  [displayName]="r.displayName"
+                  [avatarEmoji]="r.avatarEmoji"
+                  [accentColor]="r.accentColor"
+                  size="sm"
+                />
+                <div class="min-w-0">
+                  <span class="font-serif text-slate-200 block truncate">{{ r.displayName }}</span>
+                  <span class="text-[10px] text-slate-500 uppercase tracking-widest">En attente</span>
+                </div>
               </div>
               <button type="button" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase text-red-400 border border-red-900/30 shrink-0" (click)="cancelSent(r.id)">Annuler</button>
             </div>
@@ -145,7 +171,15 @@
           <h2 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-3">Demandes reçues</h2>
           @for (r of requests(); track r.id) {
             <div class="flex flex-wrap items-center justify-between gap-2 bg-[#1b2028] border border-slate-800 rounded-xl p-3 mb-2">
-              <span class="font-serif min-w-0 truncate">{{ r.displayName }}</span>
+              <div class="min-w-0 flex items-center gap-3">
+                <app-profile-avatar
+                  [displayName]="r.displayName"
+                  [avatarEmoji]="r.avatarEmoji"
+                  [accentColor]="r.accentColor"
+                  size="sm"
+                />
+                <span class="font-serif min-w-0 truncate">{{ r.displayName }}</span>
+              </div>
               <div class="flex flex-wrap gap-2 shrink-0">
                 <button type="button" class="px-3 py-1 text-[10px] font-black uppercase text-emerald-400" (click)="accept(r.id)">Accepter</button>
                 <button type="button" class="px-3 py-1 text-[10px] font-black uppercase text-slate-500" (click)="decline(r.id)">Refuser</button>

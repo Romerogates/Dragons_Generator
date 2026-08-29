@@ -16,12 +16,14 @@ import { AuthService } from '@core/services/auth.service';
 import { FriendChatDockService } from '@core/services/friend-chat-dock.service';
 import { FriendChatService, FriendMessage } from '@core/services/friend-chat.service';
 import { NotificationService } from '@core/services/notification.service';
+import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
+import { accentMessageClass, accentGradient } from '@core/utils/profile.util';
 import type { ChatConversation } from '@core/services/friend-chat-dock.service';
 
 @Component({
   selector: 'app-friend-chat-dock',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ProfileAvatarComponent],
   templateUrl: './friend-chat-dock.html',
   styleUrl: './friend-chat-dock.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -78,7 +80,12 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
   }
 
   openConversation(c: ChatConversation): void {
-    this.dock.openThread(c.friendUserId, c.friendDisplayName);
+    this.dock.openThread(
+      c.friendUserId,
+      c.friendDisplayName,
+      c.friendAvatarEmoji,
+      c.friendAccentColor,
+    );
   }
 
   backToList(): void {
@@ -128,6 +135,14 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
   initial(name: string): string {
     const t = name.trim();
     return t ? t[0]!.toUpperCase() : '?';
+  }
+
+  myMessageClass(): string {
+    return accentMessageClass(this.auth.user()?.accentColor);
+  }
+
+  fabGradient(): string {
+    return `bg-gradient-to-br ${accentGradient(this.auth.user()?.accentColor)}`;
   }
 
   formatTime(iso: string | null): string {

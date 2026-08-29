@@ -14,6 +14,12 @@ import { OfflineSyncService } from '@core/services/offline-sync.service';
 import { ConnectivityService } from '@core/services/connectivity.service';
 import { PasswordFieldComponent } from '@shared/components/password-field/password-field';
 import { RouterLink } from '@angular/router';
+import {
+  PROFILE_ACCENTS,
+  PROFILE_AVATAR_OPTIONS,
+  accentGradient,
+  profileInitial,
+} from '@core/utils/profile.util';
 
 @Component({
   selector: 'app-settings',
@@ -30,6 +36,12 @@ export class SettingsPage implements OnInit {
   private readonly connectivity = inject(ConnectivityService);
 
   displayName = '';
+  bio = '';
+  avatarEmoji: string | null = null;
+  accentColor = 'violet';
+
+  readonly avatarOptions = PROFILE_AVATAR_OPTIONS;
+  readonly accentOptions = PROFILE_ACCENTS;
   currentPassword = '';
   newPassword = '';
   confirmPassword = '';
@@ -68,9 +80,29 @@ export class SettingsPage implements OnInit {
   readonly user = this.auth.user;
 
   ngOnInit(): void {
-    this.displayName = this.auth.user()?.displayName ?? '';
+    const u = this.auth.user();
+    this.displayName = u?.displayName ?? '';
+    this.bio = u?.bio ?? '';
+    this.avatarEmoji = u?.avatarEmoji ?? null;
+    this.accentColor = u?.accentColor ?? 'violet';
     this.refreshCodexMeta();
     this.offlineSync.refreshPendingCount();
+  }
+
+  previewGradient(): string {
+    return accentGradient(this.accentColor);
+  }
+
+  previewInitial(): string {
+    return profileInitial(this.displayName);
+  }
+
+  selectAvatar(icon: string | null): void {
+    this.avatarEmoji = this.avatarEmoji === icon ? null : icon;
+  }
+
+  selectAccent(id: string): void {
+    this.accentColor = id;
   }
 
   downloadCodex(): void {
@@ -155,10 +187,17 @@ export class SettingsPage implements OnInit {
       return;
     }
     this.profileLoading.set(true);
-    this.auth.updateProfile(name).subscribe({
+    this.auth
+      .updateProfile({
+        displayName: name,
+        bio: this.bio.trim() || null,
+        avatarEmoji: this.avatarEmoji,
+        accentColor: this.accentColor,
+      })
+      .subscribe({
       next: () => {
         this.profileLoading.set(false);
-        this.profileMsg.set('Pseudo mis à jour.');
+        this.profileMsg.set('Profil mis à jour.');
       },
       error: (err) => {
         this.profileLoading.set(false);

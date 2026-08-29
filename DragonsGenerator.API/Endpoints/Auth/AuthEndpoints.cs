@@ -19,10 +19,9 @@ public record LoginRequest(string Email, string Password);
 public record ForgotPasswordRequest(string Email, string? WebUrl);
 public record ResendConfirmationRequest(string Email, string? WebUrl);
 public record ResetPasswordRequest(string Token, string NewPassword);
-public record UpdateProfileRequest(string DisplayName);
+public record UpdateProfileRequest(string DisplayName, string? Bio, string? AvatarEmoji, string? AccentColor);
 public record ChangePasswordRequest(string CurrentPassword, string NewPassword);
 public record AuthResponse(string Token, UserDto User);
-public record UserDto(Guid Id, string Email, string DisplayName, string Role, bool EmailConfirmed);
 
 internal static class AuthEmailHelper
 {
@@ -207,6 +206,7 @@ public class RegisterEndpoint(
         {
             Email = emailAddr,
             DisplayName = displayName,
+            AccentColor = "violet",
             PasswordHash = AuthHelpers.HashPassword(req.Password),
             Role = AppRoles.User,
             EmailConfirmed = false,
@@ -307,7 +307,7 @@ public class LoginEndpoint(AppDbContext db, IOptions<JwtOptions> jwt) : Endpoint
         await Send.OkAsync(
             new AuthResponse(
                 token,
-                new UserDto(user.Id, user.Email, user.DisplayName, user.Role, user.EmailConfirmed)
+                UserProfileHelper.ToUserDto(user)
             ),
             ct
         );
@@ -444,7 +444,7 @@ public class MeEndpoint(AppDbContext db) : EndpointWithoutRequest<UserDto>
             return;
         }
         await Send.OkAsync(
-            new UserDto(user.Id, user.Email, user.DisplayName, user.Role, user.EmailConfirmed),
+            UserProfileHelper.ToUserDto(user),
             ct
         );
     }
@@ -551,11 +551,27 @@ public class UpdateProfileEndpoint(AppDbContext db) : Endpoint<UpdateProfileRequ
         }
 
         user.DisplayName = normalized;
+
+        if (!UserProfileHelper.TryNormalizeBio(req.Bio, out var bio, out var bioError))
+        {
+            AddError(bioError!);
+            await Send.ErrorsAsync(cancellation: ct);
+            return;
+        }
+
+        if (!UserProfileHelper.TryNormalizeAvatarEmoji(req.AvatarEmoji, out var avatar, out var avatarError))
+        {
+            AddError(avatarError!);
+            await Send.ErrorsAsync(cancellation: ct);
+            return;
+        }
+
+        user.Bio = bio;
+        user.AvatarEmoji = avatar;
+        user.AccentColor = UserProfileHelper.NormalizeAccentColor(req.AccentColor);
+
         await db.SaveChangesAsync(ct);
-        await Send.OkAsync(
-            new UserDto(user.Id, user.Email, user.DisplayName, user.Role, user.EmailConfirmed),
-            ct
-        );
+        await Send.OkAsync(UserProfileHelper.ToUserDto(user), ct);
     }
 }
 

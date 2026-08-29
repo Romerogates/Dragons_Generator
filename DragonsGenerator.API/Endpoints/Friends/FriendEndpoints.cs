@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DragonsGenerator.API.Endpoints.Friends;
 
-public record UserSearchResultDto(Guid Id, string DisplayName);
-public record FriendUserDto(Guid Id, string DisplayName);
-public record FriendRequestDto(Guid Id, Guid UserId, string DisplayName, DateTimeOffset CreatedAt);
+public record UserSearchResultDto(Guid Id, string DisplayName, string? AvatarEmoji, string AccentColor);
+public record FriendUserDto(Guid Id, string DisplayName, string? AvatarEmoji, string AccentColor);
+public record FriendRequestDto(Guid Id, Guid UserId, string DisplayName, string? AvatarEmoji, string AccentColor, DateTimeOffset CreatedAt);
 public record SendFriendRequestBody(Guid UserId);
 
 public class SearchUsersEndpoint(AppDbContext db) : EndpointWithoutRequest<List<UserSearchResultDto>>
@@ -40,7 +40,7 @@ public class SearchUsersEndpoint(AppDbContext db) : EndpointWithoutRequest<List<
                 u.DisplayName.ToLower().Contains(qLower))
             .OrderBy(u => u.DisplayName)
             .Take(20)
-            .Select(u => new UserSearchResultDto(u.Id, u.DisplayName))
+            .Select(u => new UserSearchResultDto(u.Id, u.DisplayName, u.AvatarEmoji, u.AccentColor))
             .ToListAsync(ct);
 
         await Send.OkAsync(results, ct);
@@ -70,7 +70,7 @@ public class ListFriendsEndpoint(AppDbContext db) : EndpointWithoutRequest<List<
         var friends = friendships.Select(f =>
         {
             var friend = f.RequesterId == userId ? f.Addressee : f.Requester;
-            return new FriendUserDto(friend.Id, friend.DisplayName);
+            return new FriendUserDto(friend.Id, friend.DisplayName, friend.AvatarEmoji, friend.AccentColor);
         }).OrderBy(f => f.DisplayName).ToList();
 
         await Send.OkAsync(friends, ct);
@@ -93,7 +93,7 @@ public class ListFriendRequestsEndpoint(AppDbContext db) : EndpointWithoutReques
         var incoming = await db.Friendships.AsNoTracking()
             .Where(f => f.AddresseeId == userId && f.Status == FriendStatuses.Pending)
             .Include(f => f.Requester)
-            .Select(f => new FriendRequestDto(f.Id, f.RequesterId, f.Requester.DisplayName, f.CreatedAt))
+            .Select(f => new FriendRequestDto(f.Id, f.RequesterId, f.Requester.DisplayName, f.Requester.AvatarEmoji, f.Requester.AccentColor, f.CreatedAt))
             .ToListAsync(ct);
 
         await Send.OkAsync(incoming.OrderByDescending(f => f.CreatedAt).ToList(), ct);
@@ -116,7 +116,7 @@ public class ListSentFriendRequestsEndpoint(AppDbContext db) : EndpointWithoutRe
         var outgoing = await db.Friendships.AsNoTracking()
             .Where(f => f.RequesterId == userId && f.Status == FriendStatuses.Pending)
             .Include(f => f.Addressee)
-            .Select(f => new FriendRequestDto(f.Id, f.AddresseeId, f.Addressee.DisplayName, f.CreatedAt))
+            .Select(f => new FriendRequestDto(f.Id, f.AddresseeId, f.Addressee.DisplayName, f.Addressee.AvatarEmoji, f.Addressee.AccentColor, f.CreatedAt))
             .ToListAsync(ct);
 
         await Send.OkAsync(outgoing.OrderByDescending(f => f.CreatedAt).ToList(), ct);

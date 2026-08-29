@@ -22,6 +22,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.Email).HasMaxLength(256);
             e.Property(x => x.Role).HasMaxLength(32);
             e.Property(x => x.DisplayName).HasMaxLength(128);
+            e.Property(x => x.Bio).HasMaxLength(280);
+            e.Property(x => x.AvatarEmoji).HasMaxLength(64);
+            e.Property(x => x.AccentColor).HasMaxLength(16);
         });
 
         modelBuilder.Entity<CharacterRecord>(e =>

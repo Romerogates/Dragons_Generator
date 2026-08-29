@@ -79,10 +79,12 @@
                     class="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-800/50 transition-colors text-left border-b border-slate-800/40 last:border-0"
                     (click)="openConversation(c)"
                   >
-                    <span
-                      class="shrink-0 w-11 h-11 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-700 flex items-center justify-center text-sm font-black text-white shadow-inner"
-                      >{{ initial(c.friendDisplayName) }}</span
-                    >
+                    <app-profile-avatar
+                      [displayName]="c.friendDisplayName"
+                      [avatarEmoji]="c.friendAvatarEmoji"
+                      [accentColor]="c.friendAccentColor"
+                      size="md"
+                    />
                     <div class="min-w-0 flex-1">
                       <div class="flex items-baseline justify-between gap-2">
                         <p class="text-sm font-semibold text-slate-100 truncate">{{ c.friendDisplayName }}</p>
@@ -115,10 +117,12 @@
                 <iconify-icon icon="mdi:arrow-left" class="text-xl"></iconify-icon>
               </button>
               <div class="flex items-center gap-2 min-w-0 flex-1">
-                <span
-                  class="shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-700 flex items-center justify-center text-xs font-black text-white"
-                  >{{ initial(dock.activeFriendName()) }}</span
-                >
+                <app-profile-avatar
+                  [displayName]="dock.activeFriendName()"
+                  [avatarEmoji]="dock.activeFriendAvatar()"
+                  [accentColor]="dock.activeFriendAccent()"
+                  size="sm"
+                />
                 <p class="text-sm font-semibold text-slate-100 truncate">{{ dock.activeFriendName() }}</p>
               </div>
               <button
@@ -153,7 +157,7 @@
                         class="max-w-[82%] rounded-2xl px-3 py-2 text-[13px] leading-snug"
                         [class]="
                           msg.isMine
-                            ? 'bg-violet-600 text-white rounded-br-sm'
+                            ? myMessageClass() + ' text-white rounded-br-sm'
                             : 'bg-[#252b36] text-slate-100 rounded-bl-sm'
                         "
                       >
@@ -186,7 +190,8 @@
                   ></textarea>
                   <button
                     type="submit"
-                    class="shrink-0 w-10 h-10 rounded-full bg-violet-600 text-white flex items-center justify-center disabled:opacity-40 hover:bg-violet-500 transition-colors"
+                    class="shrink-0 w-10 h-10 rounded-full text-white flex items-center justify-center disabled:opacity-40 hover:opacity-90 transition-opacity"
+                    [ngClass]="myMessageClass()"
                     [disabled]="sending() || !draft().trim()"
                     aria-label="Envoyer"
                   >
@@ -204,7 +209,8 @@
       } @else {
         <button
           type="button"
-          class="friend-chat-fab pointer-events-auto relative w-14 h-14 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white shadow-[0_8px_28px_rgba(124,58,237,0.45)] flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+          class="friend-chat-fab pointer-events-auto relative w-14 h-14 rounded-full text-white shadow-[0_8px_28px_rgba(124,58,237,0.45)] flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+          [ngClass]="fabGradient()"
           aria-label="Messages"
           (click)="toggle()"
         >

@@ -15,13 +15,14 @@ import { FriendChatDockService } from '@core/services/friend-chat-dock.service';
 import { NotificationService } from '@core/services/notification.service';
 import { AuthService } from '@core/services/auth.service';
 import { CampaignInvite, FriendRequest, FriendUser } from '@core/models/Campaign/campaign';
+import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
 
 type SearchStatus = 'none' | 'friend' | 'pending_sent' | 'pending_received';
 
 @Component({
   selector: 'app-friends',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ProfileAvatarComponent],
   templateUrl: './friends.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -151,6 +152,6 @@ export class FriendsPage implements OnInit {
   }
 
   openChat(friend: FriendUser): void {
-    this.dock.openThread(friend.id, friend.displayName);
+    this.dock.openThread(friend.id, friend.displayName, friend.avatarEmoji, friend.accentColor);
   }
 }

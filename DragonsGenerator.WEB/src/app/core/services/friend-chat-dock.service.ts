@@ -7,6 +7,8 @@ import { FriendUser } from '@core/models/Campaign/campaign';
 export interface ChatConversation {
   friendUserId: string;
   friendDisplayName: string;
+  friendAvatarEmoji?: string | null;
+  friendAccentColor?: string | null;
   lastMessagePreview: string;
   lastMessageAt: string | null;
   unreadCount: number;
@@ -24,6 +26,8 @@ export class FriendChatDockService {
   readonly view = signal<'list' | 'thread'>('list');
   readonly activeFriendId = signal<string | null>(null);
   readonly activeFriendName = signal('');
+  readonly activeFriendAvatar = signal<string | null>(null);
+  readonly activeFriendAccent = signal<string | null>(null);
   readonly summaries = signal<FriendChatSummary[]>([]);
   readonly friendsList = signal<FriendUser[]>([]);
   readonly searchQuery = signal('');
@@ -41,6 +45,8 @@ export class FriendChatDockService {
         return {
           friendUserId: f.id,
           friendDisplayName: f.displayName,
+          friendAvatarEmoji: f.avatarEmoji,
+          friendAccentColor: f.accentColor,
           lastMessagePreview: s?.lastMessagePreview?.trim() || 'Dites bonjour',
           lastMessageAt: s?.lastMessageAt ?? null,
           unreadCount: s?.unreadCount ?? 0,
@@ -116,10 +122,17 @@ export class FriendChatDockService {
     this.disarmHistory();
   }
 
-  openThread(friendUserId: string, displayName: string): void {
+  openThread(
+    friendUserId: string,
+    displayName: string,
+    avatarEmoji?: string | null,
+    accentColor?: string | null,
+  ): void {
     if (!this.auth.isLoggedIn()) return;
     this.activeFriendId.set(friendUserId);
     this.activeFriendName.set(displayName);
+    this.activeFriendAvatar.set(avatarEmoji ?? null);
+    this.activeFriendAccent.set(accentColor ?? null);
     this.view.set('thread');
     this.isOpen.set(true);
     this.armHistory();
@@ -168,6 +181,8 @@ export class FriendChatDockService {
     this.view.set('list');
     this.activeFriendId.set(null);
     this.activeFriendName.set('');
+    this.activeFriendAvatar.set(null);
+    this.activeFriendAccent.set(null);
     this.refreshSummaries();
   }
 
@@ -176,6 +191,8 @@ export class FriendChatDockService {
     this.view.set('list');
     this.activeFriendId.set(null);
     this.activeFriendName.set('');
+    this.activeFriendAvatar.set(null);
+    this.activeFriendAccent.set(null);
     this.searchQuery.set('');
     this.setBodyScrollLocked(false);
   }

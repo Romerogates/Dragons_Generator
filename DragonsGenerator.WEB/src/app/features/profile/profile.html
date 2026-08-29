@@ -1,0 +1,72 @@
+<div class="w-full min-h-screen bg-[#171b22] text-slate-300 pb-20 animate-fade-in">
+  <section class="border-b border-slate-800 pt-16 pb-10 px-4">
+    <div class="max-w-lg mx-auto">
+      @if (loading()) {
+        <div class="flex justify-center py-16">
+          <div
+            class="w-10 h-10 border-4 border-violet-500/30 border-t-violet-500 rounded-full animate-spin"
+          ></div>
+        </div>
+      } @else if (error(); as err) {
+        <p class="text-center text-slate-400 py-12">{{ err }}</p>
+        <div class="text-center">
+          <a routerLink="/login" [queryParams]="{ returnUrl: '/profile' }" class="text-amber-400 text-sm"
+            >Se connecter</a
+          >
+        </div>
+      } @else if (profile(); as p) {
+        <div class="flex flex-col items-center text-center">
+          <div
+            class="w-24 h-24 rounded-full bg-gradient-to-br flex items-center justify-center text-3xl font-black text-white shadow-lg mb-4 ring-4 ring-[#171b22]"
+            [class]="avatarGradient(p)"
+          >
+            @if (p.avatarEmoji) {
+              <iconify-icon [icon]="p.avatarEmoji" class="text-4xl"></iconify-icon>
+            } @else {
+              {{ initial(p) }}
+            }
+          </div>
+          <h1 class="font-serif text-2xl font-bold text-slate-100">{{ p.displayName }}</h1>
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 mt-2">
+            Aventurier depuis {{ p.memberSince | date: 'longDate' }}
+          </p>
+          @if (p.isFriend && !p.isSelf) {
+            <span class="mt-2 text-[10px] font-black uppercase tracking-widest text-emerald-400">Ami</span>
+          }
+        </div>
+
+        <div class="mt-8 bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
+          <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Bio</h2>
+          @if (p.bio) {
+            <p class="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">{{ p.bio }}</p>
+          } @else {
+            <p class="text-sm text-slate-500 italic">Ce joueur n'a pas encore rédigé de bio.</p>
+          }
+        </div>
+
+        <div class="mt-4 flex flex-wrap gap-3 justify-center">
+          @if (p.isSelf) {
+            <a
+              routerLink="/settings"
+              class="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase bg-amber-600 text-white"
+              >Personnaliser</a
+            >
+          } @else if (p.isFriend) {
+            <button
+              type="button"
+              class="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white"
+              (click)="openChat(p)"
+            >
+              Envoyer un message
+            </button>
+          }
+          <a
+            routerLink="/friends"
+            class="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-400"
+            >Retour aux amis</a
+          >
+        </div>
+      }
+    </div>
+  </section>
+</div>

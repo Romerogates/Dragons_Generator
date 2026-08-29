@@ -68,6 +68,9 @@ public static class DbSchemaUpgrader
         await TryAddColumnAsync(db, "SupportTickets", "CharacterId", "TEXT NULL", ct);
         await TryAddColumnAsync(db, "SupportTickets", "CharacterName", "TEXT NULL", ct);
         await TryAddColumnAsync(db, "Users", "AcceptedTermsAt", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "Users", "Bio", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "Users", "AvatarEmoji", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "Users", "AccentColor", "TEXT NULL", ct);
         await EnsureFriendChatTablesAsync(db, ct);
     }
 

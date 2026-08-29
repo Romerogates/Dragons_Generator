@@ -20,6 +20,7 @@ import { NotificationService } from '@core/services/notification.service';
 import { DataService } from '@core/services/data.service';
 import { forkJoin, catchError, map, of, Observable, throwError } from 'rxjs';
 import { CampaignPdfService, CreaturePrintEntry } from '@core/services/campaign-pdf.service';
+import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
 import { Character } from '@core/models/Character/character';
 import {
   CampaignData,
@@ -46,7 +47,7 @@ type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens';
 @Component({
   selector: 'app-campaign-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, ProfileAvatarComponent],
   templateUrl: './campaign-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

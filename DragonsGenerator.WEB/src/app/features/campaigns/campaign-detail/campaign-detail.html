@@ -464,9 +464,15 @@
                   @for (f of friendsList(); track f.id) {
                     <button
                       type="button"
-                      class="px-3 py-2 rounded-xl text-xs border border-slate-700 text-slate-300 hover:border-violet-500/50"
+                      class="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs border border-slate-700 text-slate-300 hover:border-violet-500/50"
                       (click)="inviteFriend(f.id)"
                     >
+                      <app-profile-avatar
+                        [displayName]="f.displayName"
+                        [avatarEmoji]="f.avatarEmoji"
+                        [accentColor]="f.accentColor"
+                        size="xs"
+                      />
                       {{ f.displayName }}
                     </button>
                   } @empty {

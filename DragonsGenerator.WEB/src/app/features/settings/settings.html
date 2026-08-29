@@ -5,8 +5,28 @@
   </div>
 
   <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6 mb-6">
-    <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Profil</h2>
+    <div class="flex items-center justify-between gap-3 mb-4">
+      <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500">Profil public</h2>
+      <a routerLink="/profile" class="text-[10px] font-black uppercase text-violet-400 hover:text-violet-300"
+        >Voir le profil →</a
+      >
+    </div>
     <p class="text-xs text-slate-400 mb-4">{{ user()?.email }}</p>
+
+    <div class="flex items-center gap-4 mb-6">
+      <div
+        class="w-16 h-16 rounded-full bg-gradient-to-br flex items-center justify-center text-xl font-black text-white shrink-0"
+        [class]="previewGradient()"
+      >
+        @if (avatarEmoji) {
+          <iconify-icon [icon]="avatarEmoji" class="text-2xl"></iconify-icon>
+        } @else {
+          {{ previewInitial() }}
+        }
+      </div>
+      <p class="text-xs text-slate-500">Aperçu de votre avatar sur le profil et chez vos amis.</p>
+    </div>
+
     <form class="flex flex-col gap-4" (ngSubmit)="saveProfile()">
       <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
         Pseudo
@@ -21,6 +41,61 @@
           class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 outline-none"
         />
       </label>
+
+      <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+        Bio
+        <textarea
+          rows="3"
+          maxlength="280"
+          [(ngModel)]="bio"
+          name="bio"
+          placeholder="Quelques mots sur votre style de jeu, vos campagnes…"
+          class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 outline-none resize-none"
+        ></textarea>
+        <span class="text-[10px] text-slate-600">{{ bio.length }}/280</span>
+      </label>
+
+      <div>
+        <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-2">Avatar</p>
+        <div class="flex flex-wrap gap-2">
+          @for (opt of avatarOptions; track opt.id) {
+            <button
+              type="button"
+              class="w-11 h-11 rounded-xl border flex items-center justify-center text-xl transition-colors"
+              [class]="
+                avatarEmoji === opt.icon
+                  ? 'border-amber-500 bg-amber-950/30'
+                  : 'border-slate-700 bg-[#171b22] hover:border-slate-500'
+              "
+              [attr.aria-label]="opt.label"
+              (click)="selectAvatar(opt.icon)"
+            >
+              <iconify-icon [icon]="opt.icon"></iconify-icon>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div>
+        <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-2">Couleur d'accent</p>
+        <div class="flex flex-wrap gap-2">
+          @for (accent of accentOptions; track accent.id) {
+            <button
+              type="button"
+              class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border transition-colors"
+              [class]="
+                accentColor === accent.id
+                  ? 'border-amber-500 text-amber-300 bg-amber-950/20'
+                  : 'border-slate-700 text-slate-400 hover:border-slate-500'
+              "
+              (click)="selectAccent(accent.id)"
+            >
+              {{ accent.label }}
+            </button>
+          }
+        </div>
+      </div>
+
       @if (profileError()) {
         <p class="text-sm text-red-400">{{ profileError() }}</p>
       }
@@ -28,7 +103,7 @@
         <p class="text-sm text-emerald-400">{{ profileMsg() }}</p>
       }
       <button type="submit" class="wizard-nav-primary w-full" [disabled]="profileLoading()">
-        {{ profileLoading() ? 'Enregistrement…' : 'Enregistrer le pseudo' }}
+        {{ profileLoading() ? 'Enregistrement…' : 'Enregistrer le profil' }}
       </button>
     </form>
   </section>

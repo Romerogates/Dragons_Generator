@@ -12,6 +12,9 @@ public class AppUser
     public required string Email { get; set; }
     public required string PasswordHash { get; set; }
     public string DisplayName { get; set; } = "";
+    public string? Bio { get; set; }
+    public string? AvatarEmoji { get; set; }
+    public string AccentColor { get; set; } = "violet";
     public string Role { get; set; } = AppRoles.User;
     public bool EmailConfirmed { get; set; }
     public string? EmailConfirmToken { get; set; }

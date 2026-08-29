@@ -180,10 +180,20 @@
         <div class="relative hidden sm:block" data-account-menu>
           <button
             type="button"
-            class="h-10 flex items-center gap-1.5 px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-amber-400 hover:bg-slate-800/60 transition-colors"
+            class="h-10 flex items-center gap-2 px-2 sm:px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-amber-400 hover:bg-slate-800/60 transition-colors"
             (click)="toggleAccount($event)"
           >
-            <span class="max-w-[8rem] truncate">{{ auth.isLoggedIn() ? (auth.user()?.displayName || 'Compte') : 'Compte' }}</span>
+            @if (auth.isLoggedIn() && auth.user(); as u) {
+              <app-profile-avatar
+                [displayName]="u.displayName"
+                [avatarEmoji]="u.avatarEmoji"
+                [accentColor]="u.accentColor"
+                size="xs"
+              />
+              <span class="max-w-[8rem] truncate hidden min-[480px]:inline">{{ u.displayName }}</span>
+            } @else {
+              <span>Compte</span>
+            }
             <span class="text-[9px]">▾</span>
           </button>
           @if (accountOpen()) {
@@ -191,15 +201,31 @@
               class="absolute right-0 mt-2 w-56 rounded-xl border border-slate-700 bg-[#171b22] shadow-xl py-2 z-50"
             >
               @if (auth.isLoggedIn()) {
-                <div class="px-4 py-2 border-b border-slate-800 mb-1">
-                  <p class="text-xs font-bold text-slate-200 truncate">{{ auth.user()?.displayName }}</p>
-                  <p class="text-[10px] text-slate-500 truncate">{{ auth.user()?.email }}</p>
+                <div class="px-4 py-3 border-b border-slate-800 mb-1 flex items-center gap-3">
+                  @if (auth.user(); as u) {
+                    <app-profile-avatar
+                      [displayName]="u.displayName"
+                      [avatarEmoji]="u.avatarEmoji"
+                      [accentColor]="u.accentColor"
+                      size="sm"
+                    />
+                    <div class="min-w-0">
+                      <p class="text-xs font-bold text-slate-200 truncate">{{ u.displayName }}</p>
+                      <p class="text-[10px] text-slate-500 truncate">{{ u.email }}</p>
+                    </div>
+                  }
                 </div>
                 <a
                   routerLink="/notifications"
                   class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
                   (click)="closeMenus()"
                   >Notifications</a
+                >
+                <a
+                  routerLink="/profile"
+                  class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-violet-400"
+                  (click)="closeMenus()"
+                  >Mon profil</a
                 >
                 <a
                   routerLink="/settings"
@@ -335,6 +361,14 @@
                 >{{ formatBadgeCount(notificationCount()) }}</span
               >
             }
+          </a>
+          <a
+            routerLink="/profile"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+            (click)="closeMenus()"
+          >
+            <span class="text-xl"><iconify-icon noobserver icon="fluent-emoji:bust-in-silhouette"></iconify-icon></span>
+            <span class="text-sm font-bold tracking-wide">Mon profil</span>
           </a>
           <a
             routerLink="/friends"

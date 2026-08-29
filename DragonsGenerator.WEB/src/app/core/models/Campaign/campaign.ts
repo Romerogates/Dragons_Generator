@@ -94,12 +94,16 @@ export interface CampaignDetail {
 export interface FriendUser {
   id: string;
   displayName: string;
+  avatarEmoji?: string | null;
+  accentColor?: string;
 }
 
 export interface FriendRequest {
   id: string;
   userId: string;
   displayName: string;
+  avatarEmoji?: string | null;
+  accentColor?: string;
   createdAt: string;
 }
 

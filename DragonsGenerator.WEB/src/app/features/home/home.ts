@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
+import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
 
 interface StatItem {
   value: string;
@@ -25,7 +26,7 @@ interface FeatureItem {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ProfileAvatarComponent],
   templateUrl: './home.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -35,7 +36,7 @@ export class Home implements OnInit {
   private readonly cloud = inject(CharacterCloudService);
 
   readonly isLoggedIn = this.auth.isLoggedIn;
-  readonly displayName = signal('');
+  readonly user = this.auth.user;
   readonly savedCharactersCount = signal(0);
 
   readonly stats: StatItem[] = [
@@ -73,7 +74,7 @@ export class Home implements OnInit {
     {
       title: 'Amis & Messages',
       description:
-        'Ajoutez des joueurs, discutez en direct et coordonnez vos parties depuis le chat intégré.',
+        'Profil personnalisable, liste d\'amis et chat intégré pour organiser vos parties.',
       icon: 'fluent-emoji:speech-balloon',
     },
     {
@@ -138,7 +139,6 @@ export class Home implements OnInit {
 
   private refreshHeroStats(): void {
     if (this.auth.isLoggedIn()) {
-      this.displayName.set(this.auth.user()?.displayName ?? '');
       this.cloud.list().subscribe({
         next: (list) => this.savedCharactersCount.set(list.length),
         error: () => this.savedCharactersCount.set(0),
@@ -146,7 +146,6 @@ export class Home implements OnInit {
       return;
     }
 
-    this.displayName.set('');
     const raw = localStorage.getItem('dragons-characters');
     if (!raw) {
       this.savedCharactersCount.set(0);

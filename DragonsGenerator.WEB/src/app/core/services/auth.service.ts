@@ -12,6 +12,17 @@ export interface AuthUser {
   displayName: string;
   role: string;
   emailConfirmed: boolean;
+  bio?: string | null;
+  avatarEmoji?: string | null;
+  accentColor?: string;
+  memberSince?: string;
+}
+
+export interface UpdateProfilePayload {
+  displayName: string;
+  bio?: string | null;
+  avatarEmoji?: string | null;
+  accentColor?: string;
 }
 
 interface AuthResponse {
@@ -55,8 +66,8 @@ export class AuthService {
     );
   }
 
-  updateProfile(displayName: string): Observable<AuthUser> {
-    return this.http.patch<AuthUser>(`${this.api}/auth/me`, { displayName }).pipe(
+  updateProfile(payload: UpdateProfilePayload): Observable<AuthUser> {
+    return this.http.patch<AuthUser>(`${this.api}/auth/me`, payload).pipe(
       tap((u) => {
         this.userSignal.set(u);
         localStorage.setItem(USER_KEY, JSON.stringify(u));
