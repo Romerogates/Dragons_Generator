@@ -56,6 +56,6 @@ describe('catalog-display.util', () => {
   });
 
   it('humanizes keys', () => {
-    expect(humanizeKey('spell_slots')).toBe('Spell Slots');
+    expect(humanizeKey('spell_slots')).toBe('Spell slots');
   });
 });
