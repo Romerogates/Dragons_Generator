@@ -47,7 +47,7 @@ export class RegisterPage implements OnInit {
 
   ngOnInit(): void {
     const q = this.route.snapshot.queryParamMap;
-    const returnUrl = q.get('returnUrl') || '/characters';
+    const returnUrl = q.get('returnUrl') || '/';
     const intent = q.get('intent') || (this.pendingSave.hasPending() ? 'save' : '');
     this.saveIntent.set(intent === 'save');
     this.loginQueryParams = {

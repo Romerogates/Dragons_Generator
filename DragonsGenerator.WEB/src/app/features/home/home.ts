@@ -1,6 +1,15 @@
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '@core/services/auth.service';
+import { CharacterCloudService } from '@core/services/character-cloud.service';
 
 interface StatItem {
   value: string;
@@ -18,10 +27,16 @@ interface FeatureItem {
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './home.html',
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class Home implements OnInit {
-  savedCharactersCount = 0;
+  private readonly auth = inject(AuthService);
+  private readonly cloud = inject(CharacterCloudService);
+
+  readonly isLoggedIn = this.auth.isLoggedIn;
+  readonly displayName = signal('');
+  readonly savedCharactersCount = signal(0);
 
   readonly stats: StatItem[] = [
     { value: '9', label: 'Peuples' },
@@ -34,36 +49,41 @@ export class Home implements OnInit {
     {
       title: 'Création Guidée',
       description:
-        "Un assistant immersif pour forger votre héros, du choix de l'espèce jusqu'à l'équipement final.",
+        "Un assistant pas à pas pour forger votre héros, de l'espèce à l'équipement final.",
       icon: 'fluent-emoji:man-mage',
     },
     {
       title: 'Fiches de Héros',
       description:
-        'Générez et visualisez vos fiches de personnages avec toutes leurs aptitudes et sorts.',
+        'Consultez vos personnages, exportez en PDF et retrouvez toutes leurs aptitudes et sorts.',
       icon: 'fluent-emoji:scroll',
     },
     {
-      title: 'Sauvegarde Magique',
+      title: 'Sauvegarde Cloud',
       description:
-        'Vos héros sont stockés en sécurité dans votre grimoire local. Ne perdez jamais un destin.',
-      icon: 'fluent-emoji:floppy-disk',
+        'Connecté ? Vos héros et scénarios sont synchronisés sur votre compte, accessibles partout.',
+      icon: 'fluent-emoji:cloud-with-lightning',
+    },
+    {
+      title: 'Campagnes & Scénarios',
+      description:
+        'Créez des aventures, invitez des joueurs et gérez vos campagnes en ligne.',
+      icon: 'fluent-emoji:world-map',
+    },
+    {
+      title: 'Amis & Messages',
+      description:
+        'Ajoutez des joueurs, discutez en direct et coordonnez vos parties depuis le chat intégré.',
+      icon: 'fluent-emoji:speech-balloon',
     },
     {
       title: 'Grimoire de Règles',
       description:
-        "Accédez instantanément aux détails des sorts, de l'équipement et des langues d'Eana.",
+        "Codex complet : espèces, sorts, équipement, bestiaire et règles d'Eana à portée de main.",
       icon: 'fluent-emoji:books',
-    },
-    {
-      title: 'Forge de Scénarios',
-      description:
-        'Composez une aventure à partir du bestiaire : nommez vos créatures, générez l\'intrigue et imprimez le pack MJ.',
-      icon: 'fluent-emoji:scroll',
     },
   ];
 
-  /** Codex tiles — keep count divisible by 3 for a balanced grid. */
   readonly grimoireLinks: { label: string; path: string; icon: string; hover: string }[] = [
     { label: 'Espèces', path: '/species', icon: 'fluent-emoji:dna', hover: 'amber' },
     { label: 'Classes', path: '/classes', icon: 'fluent-emoji:crossed-swords', hover: 'amber' },
@@ -81,6 +101,10 @@ export class Home implements OnInit {
     { label: 'Combat', path: '/combat-actions', icon: 'fluent-emoji:collision', hover: 'rose' },
     { label: 'Divinités', path: '/deities', icon: 'fluent-emoji:glowing-star', hover: 'violet' },
   ];
+
+  ngOnInit(): void {
+    this.refreshHeroStats();
+  }
 
   hoverBorder(kind: string): string {
     switch (kind) {
@@ -108,27 +132,31 @@ export class Home implements OnInit {
     }
   }
 
-  ngOnInit(): void {
-    this.checkSavedCharacters();
-  }
-
-  private checkSavedCharacters(): void {
-    const raw = localStorage.getItem('dragons-characters');
-    if (raw) {
-      try {
-        const chars = JSON.parse(raw);
-        this.savedCharactersCount = Array.isArray(chars) ? chars.length : 0;
-      } catch {
-        this.savedCharactersCount = 0;
-      }
-    }
-  }
-
-  // NOUVELLE MÉTHODE : Fait défiler la page jusqu'à la section des statistiques
   scrollToStats(): void {
-    const element = document.getElementById('stats-section');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('stats-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  private refreshHeroStats(): void {
+    if (this.auth.isLoggedIn()) {
+      this.displayName.set(this.auth.user()?.displayName ?? '');
+      this.cloud.list().subscribe({
+        next: (list) => this.savedCharactersCount.set(list.length),
+        error: () => this.savedCharactersCount.set(0),
+      });
+      return;
+    }
+
+    this.displayName.set('');
+    const raw = localStorage.getItem('dragons-characters');
+    if (!raw) {
+      this.savedCharactersCount.set(0);
+      return;
+    }
+    try {
+      const chars = JSON.parse(raw);
+      this.savedCharactersCount.set(Array.isArray(chars) ? chars.length : 0);
+    } catch {
+      this.savedCharactersCount.set(0);
     }
   }
 }

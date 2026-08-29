@@ -60,7 +60,7 @@ export class ConfirmEmailPage implements OnInit {
   readonly ok = signal(false);
   readonly message = signal('');
   readonly hasPendingSave = signal(false);
-  loginQueryParams: Record<string, string> = { returnUrl: '/characters' };
+  loginQueryParams: Record<string, string> = { returnUrl: '/' };
 
   ngOnInit(): void {
     if (this.pendingSave.hasPending()) {

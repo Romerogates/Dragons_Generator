@@ -5,7 +5,7 @@
       @if (saveIntent()) {
         Connecte-toi pour enregistrer ton héros dans ton compte.
       } @else {
-        Accédez à vos héros et au support.
+        Accédez à votre table de jeu Dragons.
       }
     </p>
 
@@ -83,7 +83,7 @@
         <a
           routerLink="/register"
           [queryParams]="
-            saveIntent() ? { returnUrl: '/characters', intent: 'save' } : { returnUrl: '/characters' }
+            saveIntent() ? { returnUrl: '/characters', intent: 'save' } : { returnUrl: '/' }
           "
           class="hover:text-amber-400"
           >Créer un compte</a

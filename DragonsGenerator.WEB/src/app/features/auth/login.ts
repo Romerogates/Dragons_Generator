@@ -43,11 +43,11 @@ export class LoginPage implements OnInit {
   readonly localDev = signal(false);
   readonly mailhogUrl = signal('http://localhost:8025');
 
-  private returnUrl = '/characters';
+  private returnUrl = '/';
 
   ngOnInit(): void {
     const q = this.route.snapshot.queryParamMap;
-    this.returnUrl = q.get('returnUrl') || '/characters';
+    this.returnUrl = q.get('returnUrl') || '/';
     this.saveIntent.set(q.get('intent') === 'save' || this.pendingSave.hasPending());
     if (typeof window !== 'undefined') {
       const host = window.location.hostname;

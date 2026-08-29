@@ -31,11 +31,16 @@
         Dragons <span class="text-amber-500">Generator</span>
       </h1>
       <p class="text-lg md:text-xl text-slate-400 italic mb-10 max-w-2xl leading-relaxed">
-        Créez et gérez vos personnages pour le jeu de rôle Dragons.<br />
-        L'aventure commence ici !
+        @if (isLoggedIn()) {
+          Bon retour, <span class="text-amber-400/90 not-italic font-semibold">{{ displayName() }}</span> — votre
+          table de jeu Dragons vous attend.
+        } @else {
+          Créez et gérez vos personnages pour le jeu de rôle Dragons.<br />
+          L'aventure commence ici !
+        }
       </p>
 
-      <div class="flex flex-col sm:flex-row gap-5">
+      <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center max-w-3xl">
         <a
           routerLink="/create"
           class="px-10 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-amber-500 text-slate-950 shadow-md hover:bg-amber-400 hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
@@ -47,13 +52,35 @@
           class="px-10 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-[#1b2028] text-slate-300 border border-slate-700 hover:border-emerald-500/50 hover:text-emerald-400 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
         >
           <span><iconify-icon icon="fluent-emoji:scroll"></iconify-icon></span> Mes Héros
-          @if (savedCharactersCount > 0) {
+          @if (savedCharactersCount() > 0) {
             <span
               class="bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-900 text-[10px]"
-              >{{ savedCharactersCount }}</span
+              >{{ savedCharactersCount() }}</span
             >
           }
         </a>
+        <a
+          routerLink="/campaigns"
+          class="px-8 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-sky-950/30 text-sky-300 border border-sky-800/50 hover:border-sky-500/50 hover:text-sky-200 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
+        >
+          <span><iconify-icon icon="fluent-emoji:world-map"></iconify-icon></span> Campagnes
+        </a>
+        @if (isLoggedIn()) {
+          <a
+            routerLink="/friends"
+            class="px-8 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-violet-950/30 text-violet-300 border border-violet-800/50 hover:border-violet-500/50 hover:text-violet-200 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
+          >
+            <span><iconify-icon icon="fluent-emoji:handshake"></iconify-icon></span> Amis
+          </a>
+        } @else {
+          <a
+            routerLink="/login"
+            [queryParams]="{ returnUrl: '/' }"
+            class="px-8 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-violet-950/30 text-violet-300 border border-violet-800/50 hover:border-violet-500/50 hover:text-violet-200 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
+          >
+            <span><iconify-icon icon="fluent-emoji:locked"></iconify-icon></span> Se connecter
+          </a>
+        }
         <a
           routerLink="/story/create"
           class="px-10 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-violet-950/30 text-violet-300 border border-violet-800/50 hover:border-violet-500/50 hover:text-violet-200 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
@@ -98,7 +125,7 @@
       <div class="h-px flex-grow bg-gradient-to-l from-transparent to-slate-700"></div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
       @for (feature of features; track feature.title) {
         <div
           class="perf-card bg-[#1b2028] p-8 rounded-2xl border border-slate-800 shadow-xl group hover:border-amber-500/50 transition-transform transition-colors duration-200 hover:-translate-y-1"
@@ -151,13 +178,21 @@
     <h2 class="text-3xl font-extrabold text-slate-100 font-serif tracking-wide mb-4">
       Prêt à commencer l'aventure ?
     </h2>
-    <p class="text-slate-400 italic mb-8">Votre destin n'attend plus que quelques jets de dés.</p>
-    <a
-      routerLink="/create"
-      class="inline-block px-12 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-emerald-600 text-white shadow-md hover:bg-emerald-500 hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200"
-    >
-      Lancer la création
-    </a>
+    <p class="text-slate-400 italic mb-8">Forgez un héros, lancez une campagne ou retrouvez vos amis.</p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a
+        routerLink="/create"
+        class="inline-block px-10 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-emerald-600 text-white shadow-md hover:bg-emerald-500 hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200"
+      >
+        Forger un héros
+      </a>
+      <a
+        routerLink="/campaigns"
+        class="inline-block px-10 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-[#1b2028] text-sky-300 border border-sky-800/50 hover:border-sky-500/50 shadow-md hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200"
+      >
+        Mes campagnes
+      </a>
+    </div>
   </section>
 
   <footer class="w-full py-8 text-center border-t border-slate-800 bg-[#1b2028]">
