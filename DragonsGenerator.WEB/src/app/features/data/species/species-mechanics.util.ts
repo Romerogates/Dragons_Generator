@@ -287,7 +287,7 @@ function parseOptionObject(opt: Record<string, unknown>, choiceType?: string): M
   if (opt['grants_language'] ?? opt['grantsLanguage']) {
     rows.push(row('Langue accordée', refLabel(String(opt['grants_language'] ?? opt['grantsLanguage']))));
   }
-  if (opt['category']) rows.push(row('Catégorie', humanizeText(String(opt['category'])));
+  if (opt['category']) rows.push(row('Catégorie', humanizeText(String(opt['category']))));
 
   return {
     title: String(opt['name'] ?? prettyOptionId(String(opt['id'] ?? ''), choiceType)),
