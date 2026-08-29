@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   signal,
   OnInit,
@@ -10,6 +11,15 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DataService } from '@core/services/data.service';
 import { Equipment } from '@core/models/Equipments/equipment';
+import {
+  equipmentSubtypeLabel,
+  equipmentTypeLabel,
+  type EquipmentDisplayLike,
+} from '@core/utils/equipment-display.util';
+import {
+  equipmentDetailCards,
+  equipmentDetailDescription,
+} from '@core/utils/equipment-detail-cards.util';
 
 @Component({
   selector: 'app-equipment-detail',
@@ -17,15 +27,27 @@ import { Equipment } from '@core/models/Equipments/equipment';
   imports: [CommonModule, RouterLink],
   templateUrl: './equipment-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class EquipmentDetail implements OnInit {
   private dataService = inject(DataService);
   private route = inject(ActivatedRoute);
 
   equipment = signal<Equipment | null>(null);
-  loading = signal<boolean>(true);
+  loading = signal(true);
   error = signal<string | null>(null);
+
+  readonly cards = computed(() => {
+    const eq = this.equipment();
+    if (!eq) return [];
+    return equipmentDetailCards(this.asDisplay(eq));
+  });
+
+  readonly description = computed(() => {
+    const eq = this.equipment();
+    if (!eq) return null;
+    return equipmentDetailDescription(this.asDisplay(eq));
+  });
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -47,77 +69,21 @@ export class EquipmentDetail implements OnInit {
     });
   }
 
-  // Helper pour itérer sur les clés de data (en excluant la description qui a un affichage spécifique)
-  dataEntries(data: unknown): { key: string; value: unknown }[] {
-    if (!data || typeof data !== 'object') return [];
-    return Object.entries(data as Record<string, unknown>)
-      .filter(([key]) => key !== 'desc') // On filtre la description
-      .map(([key, value]) => ({
-        key: this.translateKey(key), // On traduit la clé pour l'affichage
-        value,
-      }));
-  }
-
-  formatValue(value: unknown, key?: string): string | boolean {
-    if (value === null || value === undefined) return '—';
-    if (typeof value === 'boolean') return value ? 'Oui' : 'Non';
-    if (Array.isArray(value)) return value.join(', ');
-    return String(value);
-  }
-
-  /**
-   * Traduit les types anglais en français pour l'affichage
-   */
   translateType(type: string): string {
-    const map: Record<string, string> = {
-      WEAPON: 'Arme',
-      ARMOR: 'Armure',
-      MOUNT: 'Monture',
-      VEHICLE: 'Véhicule',
-      TOOL: 'Outil',
-      GEAR: 'Équipement',
-      SERVICE: 'Service',
-    };
-    return map[type] || type;
+    return equipmentTypeLabel(type);
   }
 
-  /**
-   * Traduit les sous-types anglais en français pour l'affichage
-   */
   translateSubtype(subtype: string | null): string {
-    if (!subtype) return '—';
-    const map: Record<string, string> = {
-      SIMPLE_MELEE: 'Courante (Mêlée)',
-      SIMPLE_RANGED: 'Courante (Distance)',
-      MARTIAL_MELEE: 'Guerre (Mêlée)',
-      MARTIAL_RANGED: 'Guerre (Distance)',
-      LIGHT: 'Légère',
-      MEDIUM: 'Intermédiaire',
-      HEAVY: 'Lourde',
-      SHIELD: 'Bouclier',
-      ANIMAL: 'Animal',
-      LAND: 'Terrestre',
-      WATER: 'Maritime',
-      AIR: 'Aérien',
-      CONTAINER: 'Contenant',
-    };
-    return map[subtype] || subtype;
+    return equipmentSubtypeLabel(subtype) || '—';
   }
 
-  /**
-   * Traduit les clés techniques du JSON en termes lisibles par les joueurs
-   */
-  private translateKey(key: string): string {
-    const dict: Record<string, string> = {
-      ac: "Classe d'Armure (CA)",
-      str_req: 'Force requise',
-      stealth_dis: 'Désavantage Discrétion',
-      dmg_d: 'Dégâts',
-      dmg_t: 'Type de dégâts',
-      props: 'Propriétés',
-      speed: 'Vitesse de déplacement',
-      cap_kg: 'Capacité de charge (kg)',
+  private asDisplay(eq: Equipment): EquipmentDisplayLike {
+    return {
+      type: eq.type,
+      subtype: eq.subtype,
+      cost: eq.cost,
+      wKg: eq.wKg,
+      data: (eq.data ?? {}) as Record<string, unknown>,
     };
-    return dict[key] || key;
   }
 }

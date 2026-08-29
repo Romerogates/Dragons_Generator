@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   signal,
   CUSTOM_ELEMENTS_SCHEMA,
@@ -9,6 +10,10 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of, switchMap } from 'rxjs';
 import { DataService } from '@core/services/data.service';
+import {
+  formatFeatBenefits,
+  formatFeatPrerequisites,
+} from '@core/utils/catalog-display.util';
 
 const CATEGORY_LABELS: Record<string, string> = {
   survival: 'Survie',
@@ -49,6 +54,18 @@ export class FeatById {
     ),
     { initialValue: undefined },
   );
+
+  protected readonly benefits = computed(() => {
+    const f = this.feat();
+    if (!f || !f.data) return [];
+    return formatFeatBenefits(f.data);
+  });
+
+  protected readonly prerequisites = computed(() => {
+    const f = this.feat();
+    if (!f || !f.data) return [];
+    return formatFeatPrerequisites(f.data);
+  });
 
   categoryLabel(cat: string | null | undefined): string {
     if (!cat) return '—';

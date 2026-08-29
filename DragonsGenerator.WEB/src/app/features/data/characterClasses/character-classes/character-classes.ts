@@ -6,11 +6,12 @@ import {
   signal,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
-import { CommonModule, KeyValuePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DataService } from '@core/services/data.service';
 import { normalizeCharacterClasses } from '@core/utils/class-data.adapter';
 import { getClassIcon } from '@core/utils/class-icons';
+import { formatClassResources, resolveFeatureNames } from '@core/utils/catalog-display.util';
 import {
   GameIdLabelPipe,
   GameIdLabelsPipe,
@@ -21,10 +22,10 @@ import { map } from 'rxjs/operators';
 @Component({
   selector: 'app-character-classes',
   standalone: true,
-  imports: [CommonModule, KeyValuePipe, GameIdLabelPipe, GameIdLabelsPipe, GameItemLabelPipe],
+  imports: [CommonModule, GameIdLabelPipe, GameIdLabelsPipe, GameItemLabelPipe],
   templateUrl: './character-classes.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class CharacterClasses {
   private readonly dataService = inject(DataService);
@@ -49,6 +50,17 @@ export class CharacterClasses {
 
   protected onSearch(value: string): void {
     this.search.set(value);
+  }
+
+  protected resourceLines(resources: Record<string, unknown> | null | undefined) {
+    return formatClassResources(resources);
+  }
+
+  protected featureNames(
+    featureIds: string[] | null | undefined,
+    details: { id?: string; name?: string }[] | null | undefined,
+  ): string {
+    return resolveFeatureNames(featureIds, details);
   }
 
   /**

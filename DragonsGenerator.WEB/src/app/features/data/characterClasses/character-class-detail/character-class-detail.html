@@ -1,192 +1,352 @@
 @let c = cls();
 
-@if (c) {
-  <article class="class">
-    <header class="class__header">
-      <a routerLink="/classes/summary" class="class__back">← Retour aux classes</a>
-      <div class="flex items-center gap-3 mb-2">
-        <span class="text-4xl leading-none">
+<div class="w-full min-h-screen bg-[#171b22] text-slate-300 animate-fade-in select-none pb-20">
+  <div class="max-w-5xl mx-auto px-4 pt-10">
+    <a
+      routerLink="/classes"
+      class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-amber-500 transition-colors mb-8 group"
+    >
+      <span class="group-hover:-translate-x-1 transition-transform">←</span> Retour aux classes
+    </a>
+
+    @if (!c) {
+      <p class="text-center py-32 text-slate-500 animate-pulse font-serif tracking-widest uppercase">
+        Consultation des archives...
+      </p>
+    } @else {
+      <header class="text-center mb-12">
+        <span class="text-5xl mb-4 block drop-shadow-md">
           <iconify-icon [icon]="iconFor(c.id)" width="1em" height="1em"></iconify-icon>
         </span>
-        <h1>{{ c.name }}</h1>
-      </div>
-      <p class="class__meta">
-        Dé de vie <strong>d{{ c.data.hit_die }}</strong> · Caractéristiques principales
-        <strong>{{ c.data.primary_abilities.join(', ') }}</strong>
-      </p>
-    </header>
+        <h1
+          class="text-4xl md:text-6xl font-extrabold text-amber-500 font-serif tracking-wide mb-6 drop-shadow-lg"
+        >
+          {{ c.name }}
+        </h1>
+        <div class="flex flex-wrap justify-center gap-3">
+          <div
+            class="bg-rose-950/30 border border-rose-900/50 px-4 py-2 rounded-xl flex items-center gap-3"
+          >
+            <span class="text-xl"><iconify-icon icon="fluent-emoji:game-die"></iconify-icon></span>
+            <div class="text-left">
+              <span class="block text-[9px] text-rose-500/80 font-black uppercase tracking-widest"
+                >Dé de vie</span
+              >
+              <span class="text-rose-400 font-bold">d{{ c.data.hit_die }}</span>
+            </div>
+          </div>
+          <div
+            class="bg-emerald-950/30 border border-emerald-900/50 px-4 py-2 rounded-xl flex items-center gap-3"
+          >
+            <span class="text-xl"><iconify-icon icon="fluent-emoji:sparkles"></iconify-icon></span>
+            <div class="text-left">
+              <span
+                class="block text-[9px] text-emerald-500/80 font-black uppercase tracking-widest"
+                >Caractéristiques clés</span
+              >
+              <span class="text-emerald-400 font-bold text-sm uppercase tracking-wider">{{
+                c.data.primary_abilities.join(', ')
+              }}</span>
+            </div>
+          </div>
+        </div>
+      </header>
 
-    <section class="class__section">
-      <h2>Maîtrises</h2>
-      <ul>
-        <li><strong>Armures :</strong> {{ c.data.proficiencies.armor | gameIdLabels : ', ' : '—' }}</li>
-        <li><strong>Armes :</strong> {{ c.data.proficiencies.weapons | gameIdLabels }}</li>
-        <li>
-          <strong>Jets de sauvegarde :</strong> {{ c.data.proficiencies.saving_throws.join(', ') }}
-        </li>
-        <li>
-          <strong>Compétences :</strong>
-          {{ c.data.proficiencies.skills.count }} au choix parmi
-          {{ c.data.proficiencies.skills.options | gameIdLabels }}
-        </li>
-      </ul>
-    </section>
-
-    @if (c.data.spellcasting; as sc) {
-      <section class="class__section">
-        <h2>Incantation</h2>
-        <p>
-          Caractéristique : <strong>{{ sc.ability }}</strong>
-        </p>
-        @if (sc.focus) {
-          <p>Focaliseur : {{ sc.focus }}</p>
-        }
-        @if (sc.ritual) {
-          <p>Rituels autorisés</p>
-        }
+      <section
+        class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl mb-8 group hover:border-amber-500/30 transition-colors"
+      >
+        <h2
+          class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-2"
+        >
+          <span class="text-amber-500"><iconify-icon icon="fluent-emoji:shield"></iconify-icon></span>
+          Maîtrises
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-4">
+            <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">Armures</p>
+            <p class="text-sm text-slate-300">
+              {{ c.data.proficiencies.armor | gameIdLabels : ', ' : 'Aucune' }}
+            </p>
+          </div>
+          <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-4">
+            <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">Armes</p>
+            <p class="text-sm text-slate-300">
+              {{ c.data.proficiencies.weapons | gameIdLabels : ', ' : 'Aucune' }}
+            </p>
+          </div>
+          <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-4">
+            <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">
+              Jets de sauvegarde
+            </p>
+            <p class="text-sm text-amber-400/90 font-bold uppercase tracking-wider">
+              {{ c.data.proficiencies.saving_throws.join(', ') }}
+            </p>
+          </div>
+          <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-4">
+            <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">
+              Compétences ({{ c.data.proficiencies.skills.count }} au choix)
+            </p>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              {{ c.data.proficiencies.skills.options | gameIdLabels }}
+            </p>
+          </div>
+        </div>
       </section>
-    }
 
-    <section class="class__section">
-      <h2>Équipement de départ</h2>
-      <ol class="equipment">
-        @for (slot of c.data.starting_equipment; track slot.slot) {
-          <li>
-            @if (slot.description) {
-              <p>{{ slot.description }}</p>
+      @if (c.data.spellcasting; as sc) {
+        <section
+          class="bg-fuchsia-950/20 border border-fuchsia-900/30 rounded-3xl p-8 mb-8 relative overflow-hidden"
+        >
+          <h2
+            class="text-xl font-bold text-fuchsia-400 font-serif tracking-widest uppercase mb-4"
+          >
+            Incantation
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <p class="text-[10px] text-fuchsia-500/70 font-black uppercase tracking-widest mb-1">
+                Caractéristique
+              </p>
+              <p class="text-sm text-fuchsia-300 uppercase tracking-wider font-bold">{{ sc.ability }}</p>
+            </div>
+            @if (sc.focus) {
+              <div>
+                <p class="text-[10px] text-fuchsia-500/70 font-black uppercase tracking-widest mb-1">
+                  Focaliseur
+                </p>
+                <p class="text-sm text-fuchsia-300">{{ sc.focus }}</p>
+              </div>
             }
-            @if (slot.fixed) {
-              <ul>
-                @for (item of slot.fixed; track item.id) {
-                  <li>{{ item | gameItemLabel }}</li>
-                }
-              </ul>
+            @if (sc.ritual) {
+              <div>
+                <p class="text-[10px] text-fuchsia-500/70 font-black uppercase tracking-widest mb-1">
+                  Rituels
+                </p>
+                <p class="text-sm text-fuchsia-300">Autorisés</p>
+              </div>
             }
-            @if (slot.alternatives) {
-              <ul class="alternatives">
-                @for (alt of slot.alternatives; track $index) {
-                  <li>
-                    @for (item of alt; track item.id) {
-                      <span>{{ item | gameItemLabel }}</span>
-                    }
-                  </li>
-                }
-              </ul>
-            }
-          </li>
-        }
-      </ol>
-    </section>
+          </div>
+        </section>
+      }
 
-    <section class="class__section">
-      <h2>Progression</h2>
-      <table class="progression">
-        <thead>
-          <tr>
-            <th>Niv.</th>
-            <th>Bonus</th>
-            <th>Aptitudes</th>
-            <th>Ressources</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (lvl of c.data.progression; track lvl.level) {
-            <tr>
-              <td>{{ lvl.level }}</td>
-              <td>+{{ lvl.prof_bonus }}</td>
-              <td>
-                @if (lvl.features.length) {
-                  {{ lvl.features.join(', ') }}
-                } @else {
-                  —
-                }
-              </td>
-              <td>
-                @if (lvl.resources) {
-                  @for (entry of lvl.resources | keyvalue; track entry.key) {
-                    <div>{{ entry.key }} : {{ entry.value }}</div>
+      <section
+        class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl mb-8 group hover:border-sky-500/30 transition-colors"
+      >
+        <h2
+          class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-2"
+        >
+          <span class="text-sky-500"><iconify-icon icon="fluent-emoji:backpack"></iconify-icon></span>
+          Équipement de départ
+        </h2>
+        <ol class="space-y-4 list-decimal list-inside">
+          @for (slot of c.data.starting_equipment; track slot.slot) {
+            <li class="bg-[#171b22] border border-slate-700/40 rounded-xl p-4 text-sm">
+              @if (slot.description) {
+                <p class="text-slate-300 mb-2">{{ slot.description }}</p>
+              }
+              @if (slot.fixed) {
+                <ul class="mt-2 space-y-1 text-slate-400">
+                  @for (item of slot.fixed; track item.id) {
+                    <li>• {{ item | gameItemLabel }}</li>
                   }
-                } @else {
-                  —
-                }
-              </td>
-            </tr>
+                </ul>
+              }
+              @if (slot.alternatives) {
+                <div class="mt-2 space-y-2">
+                  <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                    Alternatives
+                  </p>
+                  @for (alt of slot.alternatives; track $index) {
+                    <p class="text-slate-400">
+                      @for (item of alt; track item.id; let last = $last) {
+                        <span>{{ item | gameItemLabel }}</span>@if (!last) {
+                          <span class="text-slate-600"> · </span>
+                        }
+                      }
+                    </p>
+                  }
+                </div>
+              }
+            </li>
           }
-        </tbody>
-      </table>
-    </section>
-
-    @if (c.data.features_details?.length) {
-      <section class="class__section">
-        <h2>Aptitudes détaillées</h2>
-        @for (feat of c.data.features_details; track feat.id) {
-          <details>
-            <summary>{{ feat.name }}</summary>
-            <p>{{ feat.desc }}</p>
-          </details>
-        }
+        </ol>
       </section>
-    }
 
-    @if (c.data.subclasses?.length) {
-      <section class="class__section">
-        <h2>Sous-classes</h2>
-        @for (sub of c.data.subclasses; track sub.id) {
-          <details>
-            <summary>{{ sub.name }}</summary>
-            @if (sub.desc) {
-              <p>{{ sub.desc }}</p>
+      <section
+        class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl mb-8 group hover:border-amber-500/30 transition-colors"
+      >
+        <h2
+          class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6 flex items-center gap-2"
+        >
+          <span class="text-amber-500"
+            ><iconify-icon icon="fluent-emoji:chart-increasing"></iconify-icon
+          ></span>
+          Progression
+        </h2>
+        <div class="overflow-x-auto rounded-xl border border-slate-700 bg-[#171b22]">
+          <table class="w-full text-left text-sm text-slate-400 whitespace-nowrap">
+            <thead
+              class="bg-[#1b2028] text-[10px] font-black uppercase tracking-widest text-amber-500 border-b-2 border-slate-700"
+            >
+              <tr>
+                <th class="px-4 py-3">Niv.</th>
+                <th class="px-4 py-3">Bonus</th>
+                <th class="px-4 py-3 w-full">Aptitudes</th>
+                <th class="px-4 py-3">Ressources</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/50">
+              @for (lvl of c.data.progression; track lvl.level) {
+                <tr class="hover:bg-[#1b2028] transition-colors">
+                  <td class="px-4 py-3 font-bold text-slate-200">{{ lvl.level }}</td>
+                  <td class="px-4 py-3 text-emerald-400 font-bold">+{{ lvl.prof_bonus }}</td>
+                  <td class="px-4 py-3 text-slate-300 whitespace-normal min-w-[160px]">
+                    @if (lvl.features.length) {
+                      {{ featureNames(lvl.features, c.data.features_details) }}
+                    } @else {
+                      <span class="opacity-30">—</span>
+                    }
+                  </td>
+                  <td class="px-4 py-3">
+                    @if (resourceLines(lvl.resources); as rows) {
+                      @if (rows.length) {
+                        <div class="flex flex-col gap-1">
+                          @for (r of rows; track r.label) {
+                            <span
+                              class="text-xs bg-slate-800/50 px-2 py-1 rounded text-slate-300 border border-slate-700/50"
+                            >
+                              <strong class="text-amber-500/80 mr-1">{{ r.label }} :</strong>
+                              {{ r.value }}
+                            </span>
+                          }
+                        </div>
+                      } @else {
+                        <span class="opacity-30">—</span>
+                      }
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      @if (c.data.features_details?.length) {
+        <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl mb-8">
+          <h2
+            class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6"
+          >
+            Aptitudes détaillées
+          </h2>
+          <div class="space-y-3">
+            @for (feat of c.data.features_details; track feat.id) {
+              <details
+                class="group/details bg-[#171b22] border border-slate-700/50 rounded-xl overflow-hidden"
+              >
+                <summary
+                  class="cursor-pointer p-4 text-sm font-bold text-amber-500 hover:bg-[#1b2028] list-none flex items-center gap-3"
+                >
+                  <span class="group-open/details:rotate-90 transition-transform text-xs text-slate-500"
+                    >▶</span
+                  >
+                  {{ feat.name }}
+                </summary>
+                <p class="px-4 pb-4 text-sm text-slate-400 leading-relaxed">{{ feat.desc }}</p>
+              </details>
             }
-            @if (sub.features?.length) {
-              <ul>
-                @for (f of sub.features; track f.id) {
-                  <li>
-                    <strong>{{ f.name }}</strong> — {{ f.desc }}
-                  </li>
-                }
-              </ul>
+          </div>
+        </section>
+      }
+
+      @if (c.data.subclasses?.length) {
+        <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl mb-8">
+          <h2
+            class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6"
+          >
+            Sous-classes
+          </h2>
+          <div class="space-y-3">
+            @for (sub of c.data.subclasses; track sub.id) {
+              <details
+                class="group/details bg-[#171b22] border border-indigo-900/40 rounded-xl overflow-hidden"
+              >
+                <summary
+                  class="cursor-pointer p-4 text-sm font-bold text-indigo-400 hover:bg-[#1b2028] list-none flex items-center gap-3"
+                >
+                  <span class="group-open/details:rotate-90 transition-transform text-xs text-slate-500"
+                    >▶</span
+                  >
+                  {{ sub.name }}
+                </summary>
+                <div class="px-4 pb-4 space-y-3">
+                  @if (sub.desc) {
+                    <p class="text-sm text-slate-400 leading-relaxed">{{ sub.desc }}</p>
+                  }
+                  @if (sub.features?.length) {
+                    <ul class="space-y-2">
+                      @for (f of sub.features; track f.id) {
+                        <li class="text-sm text-slate-300">
+                          <strong class="text-indigo-300">{{ f.name }}.</strong>
+                          <span class="text-slate-400"> {{ f.desc }}</span>
+                        </li>
+                      }
+                    </ul>
+                  }
+                </div>
+              </details>
             }
-          </details>
-        }
-      </section>
-    }
+          </div>
+        </section>
+      }
 
-    @if (c.data.ki_powers?.length) {
-      <section class="class__section">
-        <h2>Dons du Ki</h2>
-        @for (k of c.data.ki_powers; track k.id) {
-          <details>
-            <summary>{{ k.name }}</summary>
-            <p>{{ k.desc }}</p>
-          </details>
-        }
-      </section>
-    }
+      @if (c.data.ki_powers?.length) {
+        <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl mb-8">
+          <h2 class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase mb-4">
+            Dons du Ki
+          </h2>
+          <div class="space-y-3">
+            @for (k of c.data.ki_powers; track k.id) {
+              <article class="bg-[#171b22] border border-slate-700/40 rounded-xl p-4">
+                <h3 class="text-sm font-bold text-amber-400 mb-1">{{ k.name }}</h3>
+                <p class="text-sm text-slate-400">{{ k.desc }}</p>
+              </article>
+            }
+          </div>
+        </section>
+      }
 
-    @if (c.data.pact_boons?.length) {
-      <section class="class__section">
-        <h2>Faveurs de pacte</h2>
-        @for (p of c.data.pact_boons; track p.id) {
-          <details>
-            <summary>{{ p.name }}</summary>
-            <p>{{ p.desc }}</p>
-          </details>
-        }
-      </section>
-    }
+      @if (c.data.pact_boons?.length) {
+        <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl mb-8">
+          <h2 class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase mb-4">
+            Faveurs de pacte
+          </h2>
+          <div class="space-y-3">
+            @for (p of c.data.pact_boons; track p.id) {
+              <article class="bg-[#171b22] border border-slate-700/40 rounded-xl p-4">
+                <h3 class="text-sm font-bold text-fuchsia-400 mb-1">{{ p.name }}</h3>
+                <p class="text-sm text-slate-400">{{ p.desc }}</p>
+              </article>
+            }
+          </div>
+        </section>
+      }
 
-    @if (c.data.invocations?.length) {
-      <section class="class__section">
-        <h2>Invocations occultes</h2>
-        @for (inv of c.data.invocations; track inv.id) {
-          <details>
-            <summary>{{ inv.name }}</summary>
-            <p>{{ inv.desc }}</p>
-          </details>
-        }
-      </section>
+      @if (c.data.invocations?.length) {
+        <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl mb-8">
+          <h2 class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase mb-4">
+            Invocations occultes
+          </h2>
+          <div class="space-y-3">
+            @for (inv of c.data.invocations; track inv.id) {
+              <article class="bg-[#171b22] border border-slate-700/40 rounded-xl p-4">
+                <h3 class="text-sm font-bold text-violet-400 mb-1">{{ inv.name }}</h3>
+                <p class="text-sm text-slate-400">{{ inv.desc }}</p>
+              </article>
+            }
+          </div>
+        </section>
+      }
     }
-  </article>
-} @else {
-  <p>Chargement…</p>
-}
+  </div>
+</div>

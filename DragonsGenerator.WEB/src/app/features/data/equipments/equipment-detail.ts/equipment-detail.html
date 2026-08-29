@@ -7,7 +7,7 @@
       <span class="group-hover:-translate-x-1 transition-transform">←</span> Retour à l'Arsenal
     </a>
 
-    @if (loading()) {
+    10|    @if (loading()) {
       <div class="flex flex-col items-center justify-center py-32 animate-pulse text-amber-500">
         <span class="text-6xl mb-6"
           ><iconify-icon icon="fluent-emoji:magnifying-glass-tilted-right"></iconify-icon
@@ -17,7 +17,7 @@
         </p>
       </div>
     } @else if (error()) {
-      <div class="flex flex-col items-center justify-center py-32 text-center">
+    20|      <div class="flex flex-col items-center justify-center py-32 text-center">
         <span class="text-7xl mb-6 drop-shadow-md animate-pulse"
           ><iconify-icon icon="fluent-emoji:fire"></iconify-icon
         ></span>
@@ -27,7 +27,7 @@
         <p class="text-lg text-slate-400 italic max-w-md leading-relaxed mb-8">{{ error() }}</p>
         <a
           routerLink="/equipments"
-          class="px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest bg-slate-800 text-slate-300 hover:bg-slate-700 transition-[colors,transform,opacity,box-shadow] duration-200 border border-slate-700 shadow-lg hover:-translate-y-1"
+    30|          class="px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest bg-slate-800 text-slate-300 hover:bg-slate-700 transition-[colors,transform,opacity,box-shadow] duration-200 border border-slate-700 shadow-lg hover:-translate-y-1"
           >Retourner au marché</a
         >
       </div>
@@ -37,7 +37,7 @@
           class="text-5xl md:text-6xl font-extrabold text-amber-500 font-serif tracking-wide mb-4 drop-shadow-lg"
         >
           {{ eq.name }}
-        </h1>
+    40|        </h1>
         <div class="flex flex-wrap items-center justify-center gap-3">
           <a
             [routerLink]="['/equipments/type', eq.type.toLowerCase()]"
@@ -46,45 +46,27 @@
           >
             {{ translateType(eq.type) }}
           </a>
-
           <span class="text-slate-500 text-xs font-bold italic">
             {{ translateSubtype(eq.subtype) }}
-          </span>
+    50|          </span>
         </div>
       </header>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div class="col-span-1 flex flex-col gap-8">
           <section
-            class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800 shadow-xl group hover:border-amber-500/30 transition-colors relative overflow-hidden"
+            class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800 shadow-xl group hover:border-amber-500/30 transition-colors"
           >
-            <div
-              class="absolute -top-4 -right-4 text-6xl opacity-5 pointer-events-none group-hover:scale-[1.01] transition-transform"
-            >
-              <iconify-icon icon="fluent-emoji:label"></iconify-icon>
-            </div>
-
             <h2
-              class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-4"
+    60|              class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-4"
             >
               Identification
             </h2>
 
             <dl class="space-y-4">
               <div>
-                <dt class="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-1">
-                  Identifiant d'archive
-                </dt>
-                <dd
-                  class="text-xs text-slate-400 font-mono bg-[#171b22] px-2 py-1 rounded border border-slate-700/50 break-all"
-                >
-                  {{ eq.id }}
-                </dd>
-              </div>
-
-              <div>
                 <dt class="text-[10px] uppercase tracking-widest text-amber-600/80 font-bold mb-1">
-                  Valeur Marchande
+                  Valeur marchande
                 </dt>
                 <dd class="text-lg font-medium text-amber-500">
                   @if (eq.cost.v !== null) {
@@ -96,10 +78,8 @@
               </div>
 
               <div>
-                <dt
-                  class="text-[10px] uppercase tracking-widest text-emerald-600/80 font-bold mb-1"
-                >
-                  Encombrement (Poids)
+                <dt class="text-[10px] uppercase tracking-widest text-emerald-600/80 font-bold mb-1">
+                  Encombrement
                 </dt>
                 <dd class="text-base font-medium text-emerald-400">
                   @if (eq.wKg !== null) {
@@ -114,71 +94,65 @@
         </div>
 
         <div class="col-span-1 md:col-span-2 flex flex-col gap-8">
-          @if (eq.data) {
-            @if ($any(eq.data).desc) {
-              <section
-                class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl relative group hover:border-slate-500/30 transition-colors"
+          @if (description(); as desc) {
+            <section
+              class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl relative group hover:border-slate-500/30 transition-colors"
+            >
+              <h2
+                class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-4"
               >
-                <div class="absolute top-0 right-0 p-6 text-6xl opacity-5 pointer-events-none">
-                  <iconify-icon icon="fluent-emoji:scroll"></iconify-icon>
-                </div>
-                <h2
-                  class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-4"
-                >
-                  Description
-                </h2>
-                <p class="text-sm md:text-base text-slate-300 leading-relaxed italic">
-                  "{{ $any(eq.data).desc }}"
-                </p>
-              </section>
-            }
+                Description
+              </h2>
+              <p class="text-sm md:text-base text-slate-300 leading-relaxed italic">"{{ desc }}"</p>
+            </section>
+          }
 
-            @if (dataEntries(eq.data).length > 0) {
-              <section
-                class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl group hover:border-emerald-500/30 transition-colors"
+          @if (cards().length > 0) {
+            <section
+              class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl group hover:border-emerald-500/30 transition-colors"
+            >
+              <h2
+                class="text-sm font-black text-emerald-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-6 flex items-center gap-2"
               >
-                <h2
-                  class="text-sm font-black text-emerald-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-6 flex items-center gap-2"
-                >
-                  <span class="text-lg"
-                    ><iconify-icon icon="fluent-emoji:gear"></iconify-icon
-                  ></span>
-                  Caractéristiques Techniques
-                </h2>
+                <span class="text-lg"><iconify-icon icon="fluent-emoji:gear"></iconify-icon></span>
+                Caractéristiques
+              </h2>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  @for (entry of dataEntries(eq.data); track entry.key) {
-                    <div
-                      class="bg-[#171b22] border border-slate-700/50 rounded-xl p-4 flex flex-col"
-                    >
-                      <dt
-                        class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-2"
-                      >
-                        {{ entry.key }}
-                      </dt>
-                      <dd class="text-sm text-slate-200 font-medium">
-                        @if (formatValue(entry.value) === 'Oui') {
-                          <span
-                            class="bg-red-950/40 text-red-400 border border-red-900/50 px-2 py-1 rounded text-[10px] uppercase font-bold tracking-wider"
-                          >
-                            Applicable
-                          </span>
-                        } @else if (formatValue(entry.value) === 'Non') {
-                          <span
-                            class="bg-emerald-950/40 text-emerald-400 border border-emerald-900/50 px-2 py-1 rounded text-[10px] uppercase font-bold tracking-wider"
-                          >
-                            Non applicable
-                          </span>
-                        } @else {
-                          {{ formatValue(entry.value) }}
-                        }
-                      </dd>
-                    </div>
-                  }
-                </div>
-              </section>
-            }
-          } @else {
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                @for (card of cards(); track card.label + card.value) {
+                  <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-4 flex flex-col">
+                    <dt class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-2">
+                      {{ card.label }}
+                    </dt>
+                    <dd class="text-sm text-slate-200 font-medium">
+                      @if (card.kind === 'yes') {
+                        <span
+                          class="bg-red-950/40 text-red-400 border border-red-900/50 px-2 py-1 rounded text-[10px] uppercase font-bold tracking-wider"
+                          >Oui</span
+                        >
+                      } @else if (card.kind === 'no') {
+                        <span
+                          class="bg-emerald-950/40 text-emerald-400 border border-emerald-900/50 px-2 py-1 rounded text-[10px] uppercase font-bold tracking-wider"
+                          >Non</span
+                        >
+                      } @else if (card.kind === 'chips' && card.chips?.length) {
+                        <div class="flex flex-wrap gap-1.5">
+                          @for (chip of card.chips; track chip) {
+                            <span
+                              class="bg-slate-900 text-slate-300 border border-slate-700 px-2 py-1 rounded-lg text-[10px]"
+                              >{{ chip }}</span
+                            >
+                          }
+                        </div>
+                      } @else {
+                        {{ card.value }}
+                      }
+                    </dd>
+                  </div>
+                }
+              </div>
+            </section>
+          } @else if (!description()) {
             <div
               class="flex items-center justify-center h-full bg-[#1b2028]/50 border border-slate-800 border-dashed rounded-3xl p-8"
             >

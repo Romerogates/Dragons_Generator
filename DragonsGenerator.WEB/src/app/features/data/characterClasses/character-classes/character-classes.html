@@ -282,25 +282,27 @@
                         <td class="px-6 py-3 text-emerald-400 font-bold">+{{ lvl.prof_bonus }}</td>
                         <td class="px-6 py-3 text-slate-300 whitespace-normal min-w-[200px]">
                           @if (lvl.features.length) {
-                            {{ lvl.features.join(', ') }}
+                            {{ featureNames(lvl.features, cls.data.features_details) }}
                           } @else {
                             <span class="opacity-30">—</span>
                           }
                         </td>
                         <td class="px-6 py-3">
-                          @if (lvl.resources) {
-                            <div class="flex flex-col gap-1">
-                              @for (entry of lvl.resources | keyvalue; track entry.key) {
-                                <span
-                                  class="text-xs bg-slate-800/50 px-2 py-1 rounded text-slate-300 border border-slate-700/50"
-                                >
-                                  <strong class="text-amber-500/80 mr-1">{{ entry.key }}:</strong>
-                                  {{ entry.value }}
-                                </span>
-                              }
-                            </div>
-                          } @else {
-                            <span class="opacity-30">—</span>
+                          @if (resourceLines(lvl.resources); as rows) {
+                            @if (rows.length) {
+                              <div class="flex flex-col gap-1">
+                                @for (r of rows; track r.label) {
+                                  <span
+                                    class="text-xs bg-slate-800/50 px-2 py-1 rounded text-slate-300 border border-slate-700/50"
+                                  >
+                                    <strong class="text-amber-500/80 mr-1">{{ r.label }} :</strong>
+                                    {{ r.value }}
+                                  </span>
+                                }
+                              </div>
+                            } @else {
+                              <span class="opacity-30">—</span>
+                            }
                           }
                         </td>
                       </tr>
