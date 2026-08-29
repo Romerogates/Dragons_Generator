@@ -45,6 +45,36 @@
       }
 
       <div>
+        <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Mes amis ({{ friendsList().length }})</h2>
+        @for (f of friendsList(); track f.id) {
+          <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-3 mb-2 flex flex-wrap items-center justify-between gap-3">
+            <div class="min-w-0 flex items-center gap-2">
+              <p class="font-serif text-slate-200 truncate">{{ f.displayName }}</p>
+              @if (unreadCount(f.id) > 0) {
+                <span class="min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950">{{ unreadCount(f.id) }}</span>
+              }
+            </div>
+            <div class="flex flex-wrap gap-2 shrink-0 w-full sm:w-auto">
+              <a
+                [routerLink]="['/friends/chat', f.id]"
+                class="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-[10px] font-black uppercase bg-violet-600 text-white hover:bg-violet-500 transition-colors"
+                >Chatter</a
+              >
+              <button
+                type="button"
+                class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-[10px] font-black uppercase text-red-300 border border-red-800/50 hover:bg-red-950/30 transition-colors"
+                (click)="confirmRemove(f)"
+              >
+                Retirer
+              </button>
+            </div>
+          </div>
+        } @empty {
+          <p class="text-sm text-slate-500 italic">Aucun ami pour l'instant — cherchez un joueur ci-dessous.</p>
+        }
+      </div>
+
+      <div>
         <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Rechercher un joueur</h2>
         <div class="flex flex-col sm:flex-row gap-2">
           <input
@@ -63,7 +93,20 @@
               <p class="font-serif text-slate-200 min-w-0 truncate">{{ u.displayName }}</p>
               @switch (searchStatus(u.id)) {
                 @case ('friend') {
-                  <span class="text-[10px] uppercase text-emerald-400 font-bold">Déjà ami</span>
+                  <div class="flex flex-wrap gap-2 shrink-0 w-full sm:w-auto">
+                    <a
+                      [routerLink]="['/friends/chat', u.id]"
+                      class="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-violet-600 text-white"
+                      >Chatter</a
+                    >
+                    <button
+                      type="button"
+                      class="flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-[10px] font-black uppercase text-red-300 border border-red-800/50"
+                      (click)="confirmRemove(u)"
+                    >
+                      Retirer
+                    </button>
+                  </div>
                 }
                 @case ('pending_sent') {
                   <span class="text-[10px] uppercase text-sky-400 font-bold">Demande envoyée</span>
@@ -127,36 +170,6 @@
           }
         </div>
       }
-
-      <div>
-        <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Mes amis ({{ friendsList().length }})</h2>
-        @for (f of friendsList(); track f.id) {
-          <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-3 mb-2 flex flex-wrap items-center justify-between gap-2">
-            <div class="min-w-0 flex items-center gap-2">
-              <p class="font-serif text-slate-200 truncate">{{ f.displayName }}</p>
-              @if (unreadCount(f.id) > 0) {
-                <span class="min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950">{{ unreadCount(f.id) }}</span>
-              }
-            </div>
-            <div class="flex flex-wrap gap-2 shrink-0">
-              <a
-                [routerLink]="['/friends/chat', f.id]"
-                class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-violet-900/50 border border-violet-800/50 text-violet-300"
-                >Message</a
-              >
-              <button
-                type="button"
-                class="px-3 py-1 rounded-lg text-[10px] font-black uppercase text-red-400/90 border border-red-900/30"
-                (click)="confirmRemove(f)"
-              >
-                Retirer
-              </button>
-            </div>
-          </div>
-        } @empty {
-          <p class="text-sm text-slate-500 italic">Aucun ami pour l'instant.</p>
-        }
-      </div>
     }
   </section>
 </div>
