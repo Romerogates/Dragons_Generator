@@ -45,7 +45,15 @@ public class PushNotificationService(
         {
             try
             {
-                var pushSub = new Lib.Net.Http.WebPush.PushSubscription(sub.Endpoint, sub.P256dh, sub.Auth);
+                var pushSub = new Lib.Net.Http.WebPush.PushSubscription
+                {
+                    Endpoint = sub.Endpoint,
+                    Keys = new Dictionary<string, string>
+                    {
+                        ["p256dh"] = sub.P256dh,
+                        ["auth"] = sub.Auth,
+                    },
+                };
                 await _client.RequestPushMessageDeliveryAsync(
                     pushSub,
                     new PushMessage(payload),
