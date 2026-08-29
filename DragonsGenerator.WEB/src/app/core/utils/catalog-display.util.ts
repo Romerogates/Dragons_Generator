@@ -1,24 +1,6 @@
-import { classResourceLabel } from './class-resource-labels';
+import { classResourceLabel, isHiddenClassResourceKey } from './class-resource-labels';
 
 /** Libellés lisibles pour le catalogue (classes, équipements, dons…). */
-
-const EXTRA_RESOURCE_LABELS: Record<string, string> = {
-  fougue_count: 'Fougue',
-  extra_attacks: 'Attaques supplémentaires',
-  spell_slots: 'Emplacements de sorts',
-  cantrips: 'Tours de magie',
-  known_spells: 'Sorts connus',
-  prepared_spells: 'Sorts préparés',
-  invocations: 'Invocations',
-  expertise_dice: 'Dés d’expertise',
-  superiority_die: 'Dé de superiorité',
-  sneak_attack: 'Attaque sournoise',
-  martial_arts: 'Arts martiaux',
-  unarmored_movement: 'Mouvement sans armure',
-  pact_magic: 'Magie de pacte',
-  arcane_recovery: 'Récupération arcanique',
-  hit_dice: 'Dés de vie',
-};
 
 const FEAT_BENEFIT_TYPE_LABELS: Record<string, string> = {
   speed_bonus: 'Bonus de vitesse',
@@ -35,7 +17,6 @@ const FEAT_BENEFIT_TYPE_LABELS: Record<string, string> = {
 };
 
 export function catalogClassResourceLabel(key: string): string {
-  if (EXTRA_RESOURCE_LABELS[key]) return EXTRA_RESOURCE_LABELS[key];
   return classResourceLabel(key);
 }
 
@@ -47,7 +28,7 @@ export function humanizeKey(key: string): string {
   return key
     .replace(/_/g, ' ')
     .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+    .replace(/^\w/, (c) => c.toUpperCase());
 }
 
 export function formatClassResources(
@@ -55,11 +36,21 @@ export function formatClassResources(
 ): { label: string; value: string }[] {
   if (!resources) return [];
   return Object.entries(resources)
-    .filter(([, v]) => v !== null && v !== undefined && v !== '')
+    .filter(([key, v]) => !isHiddenClassResourceKey(key) && v !== null && v !== undefined && v !== '')
     .map(([key, value]) => ({
       label: catalogClassResourceLabel(key),
-      value: formatSimpleValue(value),
+      value: formatResourceValue(key, value),
     }));
+}
+
+function formatResourceValue(key: string, value: unknown): string {
+  if (key === 'spell_slots' && value && typeof value === 'object' && !Array.isArray(value)) {
+    return Object.entries(value as Record<string, unknown>)
+      .filter(([, v]) => v !== null && v !== undefined)
+      .map(([lvl, count]) => `niv. ${lvl} ×${count}`)
+      .join(' · ');
+  }
+  return formatSimpleValue(value);
 }
 
 export function formatFeatBenefits(data: Record<string, unknown> | null | undefined): {
@@ -117,7 +108,7 @@ export function formatSimpleValue(value: unknown): string {
   if (Array.isArray(value)) return value.map((v) => formatSimpleValue(v)).join(', ');
   try {
     return Object.entries(value as Record<string, unknown>)
-      .map(([k, v]) => `${humanizeKey(k)}: ${formatSimpleValue(v)}`)
+      .map(([k, v]) => `${catalogClassResourceLabel(k)} : ${formatSimpleValue(v)}`)
       .join(' · ');
   } catch {
     return String(value);

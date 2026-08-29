@@ -140,6 +140,11 @@ export const routes: Routes = [
     loadChildren: () => import('@features/data/feats/feats.routes').then((m) => m.FEATS_ROUTES),
   },
   {
+    path: 'backgrounds',
+    loadChildren: () =>
+      import('@features/data/backgrounds/backgrounds.routes').then((m) => m.BACKGROUNDS_ROUTES),
+  },
+  {
     path: 'combat-actions',
     loadChildren: () =>
       import('@features/data/combat-actions/combat-actions.routes').then(

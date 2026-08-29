@@ -54,6 +54,7 @@ export class Navbar implements OnInit, OnDestroy {
     { label: 'Bestiaire', path: '/creatures', icon: 'fluent-emoji:dragon' },
     { label: 'Compétences', path: '/skills', icon: 'fluent-emoji:bookmark-tabs' },
     { label: 'Dons', path: '/feats', icon: 'fluent-emoji:trophy' },
+    { label: 'Historiques', path: '/backgrounds', icon: 'fluent-emoji:scroll' },
     { label: 'Actions de combat', path: '/combat-actions', icon: 'fluent-emoji:collision' },
     { label: 'Divinités', path: '/deities', icon: 'fluent-emoji:glowing-star' },
   ];

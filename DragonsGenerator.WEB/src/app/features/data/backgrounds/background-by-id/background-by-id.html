@@ -1,0 +1,180 @@
+<div class="w-full min-h-screen bg-[#171b22] text-slate-300 animate-fade-in pb-20">
+  <div class="max-w-4xl mx-auto px-4 pt-10">
+    <a
+      routerLink="/backgrounds"
+      class="text-xs font-black uppercase tracking-widest text-slate-500 hover:text-teal-400 mb-8 inline-block"
+    >
+      ← Retour aux historiques
+    </a>
+
+    @if (background() === undefined) {
+      <p class="text-center py-32 text-slate-500 animate-pulse">Chargement...</p>
+    } @else if (notFound()) {
+      <div class="text-center py-32">
+        <h2 class="text-2xl font-bold text-red-500 font-serif">Historique introuvable</h2>
+      </div>
+    } @else if (error(); as errorMsg) {
+      <p class="text-red-400 text-center">{{ errorMsg }}</p>
+    } @else if (background(); as bg) {
+      <header class="text-center mb-10">
+        <span class="text-5xl mb-4 block"
+          ><iconify-icon icon="fluent-emoji:scroll"></iconify-icon
+        ></span>
+        <h1 class="text-4xl font-extrabold text-teal-300 font-serif mb-3">{{ bg.name }}</h1>
+        @if (bg.data.source?.book) {
+          <p class="text-xs text-slate-500 uppercase tracking-widest">
+            {{ bg.data.source.book }}
+            @if (bg.data.source.pages) {
+              · p. {{ bg.data.source.pages }}
+            }
+          </p>
+        }
+      </header>
+
+      @if (bg.data.flavor.summary) {
+        <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 mb-6">
+          <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">
+            Résumé
+          </h2>
+          <p class="text-sm text-slate-300 leading-relaxed font-serif">{{ bg.data.flavor.summary }}</p>
+          @if (bg.data.flavor.adventureHook) {
+            <p class="text-sm text-teal-300/90 italic mt-4 leading-relaxed">
+              {{ bg.data.flavor.adventureHook }}
+            </p>
+          }
+        </section>
+      }
+
+      @if (bg.data.privilege.name || bg.data.privilege.desc) {
+        <section class="bg-[#1b2028] p-8 rounded-3xl border border-teal-900/30 mb-6">
+          <h2 class="text-sm font-black text-teal-500 uppercase tracking-widest mb-3">
+            Privilège
+          </h2>
+          @if (bg.data.privilege.name) {
+            <h3 class="text-lg font-serif text-teal-200 mb-2">{{ bg.data.privilege.name }}</h3>
+          }
+          @if (bg.data.privilege.desc) {
+            <p class="text-sm text-slate-300 leading-relaxed">{{ bg.data.privilege.desc }}</p>
+          }
+        </section>
+      }
+
+      <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 mb-6">
+        <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">
+          Maîtrises
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
+              Compétences
+            </p>
+            @if (skillLabels().length) {
+              <p class="text-sm text-slate-300">{{ skillLabels() | gameIdLabels }}</p>
+            } @else if (bg.data.proficiencies.skills.chooseCount) {
+              <p class="text-sm text-slate-400">
+                {{ bg.data.proficiencies.skills.chooseCount }} au choix
+              </p>
+            } @else {
+              <p class="text-sm text-slate-500">—</p>
+            }
+          </div>
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
+              Langues
+            </p>
+            <p class="text-sm text-slate-300">
+              @if (bg.data.proficiencies.languages.choiceCount) {
+                {{ bg.data.proficiencies.languages.choiceCount }} langue(s) au choix
+              } @else {
+                —
+              }
+            </p>
+          </div>
+          <div class="sm:col-span-2">
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
+              Outils
+            </p>
+            @if (bg.data.proficiencies.tools.fixed.length) {
+              <ul class="space-y-1">
+                @for (t of bg.data.proficiencies.tools.fixed; track $index) {
+                  <li class="text-sm text-slate-300">
+                    @if (t.id && !t.any) {
+                      {{ t.id | gameIdLabel }}
+                    } @else {
+                      {{ toolLabel(t) }}
+                    }
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="text-sm text-slate-500">—</p>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 mb-6">
+        <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">
+          Équipement
+        </h2>
+        @if (bg.data.equipment.fixed.length) {
+          <ul class="space-y-2 mb-4">
+            @for (item of bg.data.equipment.fixed; track item.id + item.qty) {
+              <li class="text-sm text-slate-300 flex gap-2">
+                <span class="text-teal-500/70 shrink-0">•</span>
+                <span>
+                  {{ item.name || (item.id | gameIdLabel) }}
+                  @if (item.qty > 1) {
+                    <span class="text-slate-500"> ×{{ item.qty }}</span>
+                  }
+                </span>
+              </li>
+            }
+          </ul>
+        }
+        @if (bg.data.equipment.currency?.or) {
+          <p class="text-sm text-amber-300/90">
+            {{ bg.data.equipment.currency.or }} po
+          </p>
+        }
+        @if (!bg.data.equipment.fixed.length && !bg.data.equipment.currency?.or) {
+          <p class="text-sm text-slate-500 italic">Équipement libre ou personnalisé.</p>
+        }
+      </section>
+
+      @if (bg.data.personalityTables; as tables) {
+        <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800">
+          <h2 class="text-sm font-black text-slate-500 uppercase tracking-widest mb-6">
+            Personnalité
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            @for (
+              block of [
+                { title: 'Traits', table: tables.traits },
+                { title: 'Idéaux', table: tables.ideals },
+                { title: 'Liens', table: tables.bonds },
+                { title: 'Défauts', table: tables.flaws },
+              ];
+              track block.title
+            ) {
+              <div>
+                <h3 class="text-xs font-black uppercase tracking-widest text-teal-500/80 mb-2">
+                  {{ block.title }}
+                  <span class="text-slate-600 font-normal"> ({{ block.table.die }})</span>
+                </h3>
+                <ul class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                  @for (entry of block.table.entries; track entry.roll) {
+                    <li class="text-xs text-slate-400 leading-snug">
+                      <span class="text-slate-500 tabular-nums">{{ entry.roll }}.</span>
+                      {{ entry.text }}
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+          </div>
+        </section>
+      }
+    }
+  </div>
+</div>

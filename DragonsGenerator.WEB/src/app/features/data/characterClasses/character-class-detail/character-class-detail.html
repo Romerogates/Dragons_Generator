@@ -114,7 +114,7 @@
                 <p class="text-[10px] text-fuchsia-500/70 font-black uppercase tracking-widest mb-1">
                   Focaliseur
                 </p>
-                <p class="text-sm text-fuchsia-300">{{ sc.focus }}</p>
+                <p class="text-sm text-fuchsia-300">{{ sc.focus | gameIdLabel }}</p>
               </div>
             }
             @if (sc.ritual) {
@@ -210,13 +210,13 @@
                   <td class="px-4 py-3">
                     @if (resourceLines(lvl.resources); as rows) {
                       @if (rows.length) {
-                        <div class="flex flex-col gap-1">
+                        <div class="flex flex-wrap gap-1.5">
                           @for (r of rows; track r.label) {
                             <span
-                              class="text-xs bg-slate-800/50 px-2 py-1 rounded text-slate-300 border border-slate-700/50"
+                              class="inline-flex items-baseline gap-1.5 rounded-lg border border-amber-900/30 bg-amber-950/20 px-2.5 py-1 text-[11px] text-slate-300"
                             >
-                              <strong class="text-amber-500/80 mr-1">{{ r.label }} :</strong>
-                              {{ r.value }}
+                              <span class="font-semibold text-amber-400/90">{{ r.label }}</span>
+                              <span class="text-slate-200 tabular-nums">{{ r.value }}</span>
                             </span>
                           }
                         </div>

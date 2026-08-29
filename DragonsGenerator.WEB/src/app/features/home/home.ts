@@ -103,6 +103,7 @@ export class Home implements OnInit {
     { label: 'Équipements', path: '/equipments', icon: 'fluent-emoji:shield', hover: 'amber' },
     { label: 'Compétences', path: '/skills', icon: 'fluent-emoji:bookmark-tabs', hover: 'sky' },
     { label: 'Dons', path: '/feats', icon: 'fluent-emoji:trophy', hover: 'amber' },
+    { label: 'Historiques', path: '/backgrounds', icon: 'fluent-emoji:scroll', hover: 'teal' },
     { label: 'Combat', path: '/combat-actions', icon: 'fluent-emoji:collision', hover: 'rose' },
     { label: 'Divinités', path: '/deities', icon: 'fluent-emoji:glowing-star', hover: 'violet' },
   ];
@@ -148,6 +149,8 @@ export class Home implements OnInit {
         return 'hover:border-rose-500/50';
       case 'violet':
         return 'hover:border-violet-500/50';
+      case 'teal':
+        return 'hover:border-teal-500/50';
       default:
         return 'hover:border-amber-500/50';
     }
@@ -161,6 +164,8 @@ export class Home implements OnInit {
         return 'group-hover:text-rose-400';
       case 'violet':
         return 'group-hover:text-violet-400';
+      case 'teal':
+        return 'group-hover:text-teal-400';
       default:
         return 'group-hover:text-amber-500';
     }

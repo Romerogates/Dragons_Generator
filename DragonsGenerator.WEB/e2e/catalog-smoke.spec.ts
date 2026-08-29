@@ -16,11 +16,20 @@ test.describe('Catalogues (smoke)', () => {
     await expect(page.getByPlaceholder(/Rechercher une classe/i)).toBeVisible();
   });
 
-  test('spells grimoire loads', async ({ page }) => {
-    await page.goto('/spells');
-    await expect(page.getByRole('heading', { name: /Grimoire/i })).toBeVisible({
+  test('backgrounds list loads', async ({ page }) => {
+    await page.goto('/backgrounds');
+    await expect(page.getByRole('heading', { name: /Historiques/i })).toBeVisible({
       timeout: 45_000,
     });
-    await expect(page.getByRole('link', { name: /Écoles de Magie/i })).toBeVisible();
+    await expect(page.locator('a[href^="/backgrounds/"]').first()).toBeVisible({
+      timeout: 30_000,
+    });
+  });
+
+  test('combat actions list loads', async ({ page }) => {
+    await page.goto('/combat-actions');
+    await expect(page.getByRole('heading', { name: /Actions de combat/i })).toBeVisible({
+      timeout: 45_000,
+    });
   });
 });

@@ -1390,7 +1390,7 @@ export class PdfGeneratorService {
       this.text(pdf, sc.bardicCollege, P.line1X, P.line1Y);
     }
     if (sc.focus) {
-      this.text(pdf, sc.focus, P.line2X, P.line2Y);
+      this.text(pdf, labelForGameId(sc.focus), P.line2X, P.line2Y);
     }
   }
 
@@ -1406,7 +1406,7 @@ export class PdfGeneratorService {
       this.text(pdf, sc.arcaneTradition, P.line1X, P.line1Y);
     }
     if (sc.focus) {
-      this.text(pdf, sc.focus, P.line2X, P.line2Y);
+      this.text(pdf, labelForGameId(sc.focus), P.line2X, P.line2Y);
     }
 
     pdf.setFontSize(7);
@@ -1441,7 +1441,7 @@ export class PdfGeneratorService {
 
     // Focaliseur arcanique
     if (sc.focus) {
-      this.textWrapped(pdf, sc.focus, P.line2X, P.line2Y, pxToMmX(140), 3.5, 1);
+      this.textWrapped(pdf, labelForGameId(sc.focus), P.line2X, P.line2Y, pxToMmX(140), 3.5, 1);
     }
 
     // Conduits divins
@@ -1476,7 +1476,7 @@ export class PdfGeneratorService {
 
     // Focaliseur arcanique
     if (sc.focus) {
-      this.text(pdf, sc.focus, P.line2X, P.line2Y);
+      this.text(pdf, labelForGameId(sc.focus), P.line2X, P.line2Y);
     }
 
     // Cases à cocher
@@ -1518,7 +1518,7 @@ export class PdfGeneratorService {
 
     // Focaliseur arcanique
     if (sc.focus) {
-      this.text(pdf, sc.focus, P.line3X, P.line3Y);
+      this.text(pdf, labelForGameId(sc.focus), P.line3X, P.line3Y);
     }
 
     // Manifestations occultes (invocations)
@@ -1561,7 +1561,7 @@ export class PdfGeneratorService {
 
     // Focaliseur arcanique
     if (sc.focus) {
-      this.text(pdf, sc.focus, P.line2X, P.line2Y);
+      this.text(pdf, labelForGameId(sc.focus), P.line2X, P.line2Y);
     }
 
     // Points arcaniques
@@ -1612,7 +1612,7 @@ export class PdfGeneratorService {
         pdf.setFontSize(14);
         this.text(pdf, String(sc.knownSpellsCount), G.rodeurSortsConnusX, G.rodeurSortsConnusY);
         pdf.setFontSize(10);
-        if (sc.focus) this.text(pdf, sc.focus, G.rodeurFocaliseurX, G.rodeurFocaliseurY);
+        if (sc.focus) this.text(pdf, labelForGameId(sc.focus), G.rodeurFocaliseurX, G.rodeurFocaliseurY);
         break;
       }
       case 'paladin': {

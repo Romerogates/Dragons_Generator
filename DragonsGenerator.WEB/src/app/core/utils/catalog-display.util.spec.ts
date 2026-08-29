@@ -17,6 +17,10 @@ describe('catalog-display.util', () => {
     ]);
     expect(formatClassResources(null)).toEqual([]);
     expect(formatClassResources({ empty: '' })).toEqual([]);
+    expect(formatClassResources({ spell_slots: { '1': 2, '2': 3 } })).toEqual([
+      { label: 'Emplacements de sorts', value: 'niv. 1 ×2 · niv. 2 ×3' },
+    ]);
+    expect(catalogClassResourceLabel('bardic_inspiration_die')).toBe('Dé d’inspiration');
   });
 
   it('formats feat benefits and prerequisites', () => {

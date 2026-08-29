@@ -13,6 +13,7 @@ import { normalizeCharacterClass } from '@core/utils/class-data.adapter';
 import { getClassIcon } from '@core/utils/class-icons';
 import { formatClassResources, resolveFeatureNames } from '@core/utils/catalog-display.util';
 import {
+  GameIdLabelPipe,
   GameIdLabelsPipe,
   GameItemLabelPipe,
 } from '@shared/pipes/game-id-label.pipe';
@@ -20,7 +21,7 @@ import {
 @Component({
   selector: 'app-character-class-detail',
   standalone: true,
-  imports: [RouterLink, GameIdLabelsPipe, GameItemLabelPipe],
+  imports: [RouterLink, GameIdLabelPipe, GameIdLabelsPipe, GameItemLabelPipe],
   templateUrl: './character-class-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
