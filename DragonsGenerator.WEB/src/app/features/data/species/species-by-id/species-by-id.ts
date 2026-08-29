@@ -10,11 +10,12 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DataService } from '@core/services/data.service';
 import { Species } from '@core/models/Species/species';
+import { SpeciesMechanicsPanel } from '../species-mechanics-panel/species-mechanics-panel';
 
 @Component({
   selector: 'app-species-by-id',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, SpeciesMechanicsPanel],
   templateUrl: './species-by-id.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
@@ -60,15 +61,5 @@ export class SpeciesById implements OnInit {
     const entries = Object.entries(asi);
     if (entries.length === 0) return '—';
     return entries.map(([key, value]) => `${key.toUpperCase()} +${value}`).join(', ');
-  }
-
-  /** Sérialisation lisible des objets `mechanics` et `options` (forme variable). */
-  formatMechanics(value: unknown): string {
-    if (value === null || value === undefined) return '';
-    try {
-      return JSON.stringify(value, null, 2);
-    } catch {
-      return String(value);
-    }
   }
 }

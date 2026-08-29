@@ -136,6 +136,9 @@ jobs:
               exit 1
             fi
 
+            chmod +x scripts/ensure-vapid-keys.sh
+            ./scripts/ensure-vapid-keys.sh "$ENV_FILE"
+
             docker compose -f docker-compose.prod.yml up --build -d ollama || echo "WARN: Ollama container failed to start"
             chmod +x scripts/ensure-ollama-model.sh
             if ./scripts/ensure-ollama-model.sh docker-compose.prod.yml; then

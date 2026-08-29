@@ -1,6 +1,6 @@
 <div class="w-full flex flex-col animate-fade-in select-none">
   <section
-    class="relative w-full h-[85vh] flex flex-col items-center justify-center overflow-hidden border-b border-slate-800"
+    class="relative w-full min-h-[85vh] flex flex-col items-center border-b border-slate-800"
   >
     <div
       class="absolute inset-0 z-0 bg-[#111] opacity-80"
@@ -17,7 +17,7 @@
       class="absolute inset-0 z-0 bg-gradient-to-b from-transparent via-[#171b22]/80 to-[#171b22]"
     ></div>
 
-    <div class="relative z-10 flex flex-col items-center text-center px-4 max-w-4xl">
+    <div class="relative z-10 flex flex-1 flex-col items-center justify-center text-center px-4 max-w-4xl py-10 sm:py-12">
       <img
         src="dragon_512x512.png"
         alt="Logo Dragons"
@@ -110,7 +110,7 @@
 
     <button
       (click)="scrollToStats()"
-      class="absolute bottom-8 flex flex-col items-center gap-2 opacity-50 hover:opacity-100 cursor-pointer text-amber-500 transition-opacity duration-200 focus:outline-none"
+      class="relative z-10 pb-8 sm:pb-10 flex flex-col items-center gap-2 opacity-50 hover:opacity-100 cursor-pointer text-amber-500 transition-opacity duration-200 focus:outline-none shrink-0"
     >
       <span class="text-[9px] font-black uppercase tracking-widest">Découvrir</span>
       <span class="text-xl">↓</span>
