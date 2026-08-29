@@ -26,6 +26,9 @@ public static class CampaignJsonHelpers
         var node = JsonNode.Parse(data.GetRawText()) as JsonObject ?? new JsonObject();
         node["adventure"] = "";
         node["notes"] = "";
+        // PNJ / créatures / rencontres : secrets du MJ à découvrir en jeu
+        node["creatures"] = new JsonArray();
+        node["encounters"] = new JsonArray();
 
         if (node["pregenCharacters"] is JsonArray pregens)
         {
@@ -34,6 +37,15 @@ public static class CampaignJsonHelpers
                 if (item is not JsonObject pregen) continue;
                 pregen["dmBackstory"] = "";
                 pregen["dmSecrets"] = "";
+            }
+        }
+
+        if (node["sessions"] is JsonArray sessions)
+        {
+            foreach (var item in sessions)
+            {
+                if (item is not JsonObject session) continue;
+                session["notes"] = "";
             }
         }
 
@@ -51,7 +63,7 @@ public static class CampaignJsonHelpers
 
         foreach (var prop in update.ToList())
         {
-            if (prop.Key is "adventure" or "notes") continue;
+            if (prop.Key is "adventure" or "notes" or "creatures" or "encounters") continue;
             existing[prop.Key] = prop.Value?.DeepClone();
         }
 

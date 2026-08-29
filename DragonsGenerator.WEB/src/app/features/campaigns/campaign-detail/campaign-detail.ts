@@ -104,6 +104,24 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       .reduce((s, m) => s + m.xpEarnedInCampaign, 0),
   );
 
+  /** Onglets visibles : créatures / rencontres réservés au MJ. */
+  readonly visibleTabs = computed(() => {
+    const owner = this.campaign()?.isOwner === true;
+    const tabs: { id: Tab; label: string }[] = [
+      { id: 'overview', label: 'Résumé' },
+      { id: 'activity', label: 'Activité' },
+    ];
+    if (owner) {
+      tabs.push({ id: 'creatures', label: 'Personnages & créatures' });
+    }
+    tabs.push({ id: 'pregens', label: 'Héros pré-tirés' });
+    if (owner) {
+      tabs.push({ id: 'encounters', label: 'Rencontres & XP' });
+    }
+    tabs.push({ id: 'players', label: 'Joueurs' });
+    return tabs;
+  });
+
   protected roleLabels = CREATURE_ROLE_LABELS;
   protected toneLabels = ADVENTURE_TONE_LABELS;
   protected pregenStatusLabels = PREGEN_STATUS_LABELS;
@@ -154,6 +172,10 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         this.campaign.set(c);
         this.loading.set(false);
         this.notifications.refresh();
+        const t = this.tab();
+        if (!c.isOwner && (t === 'creatures' || t === 'encounters')) {
+          this.tab.set('overview');
+        }
       },
       error: () => {
         this.error.set('Campagne introuvable.');
@@ -163,6 +185,10 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   setTab(t: Tab): void {
+    if (!this.campaign()?.isOwner && (t === 'creatures' || t === 'encounters')) {
+      this.tab.set('overview');
+      return;
+    }
     this.tab.set(t);
     if (t === 'creatures') {
       this.loadBestiaryPreview();
@@ -400,7 +426,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
   private loadBestiaryPreview(): void {
     const c = this.campaign();
-    if (!c?.data.creatures.length) {
+    if (!c?.isOwner || !c.data.creatures.length) {
       this.revokePreviewUrl();
       return;
     }

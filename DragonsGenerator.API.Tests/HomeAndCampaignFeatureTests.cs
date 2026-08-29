@@ -27,7 +27,7 @@ public class HomeAndCampaignFeatureTests
     }
 
     [Fact]
-    public async Task Player_campaign_view_hides_synopsis()
+    public async Task Player_campaign_view_hides_synopsis_and_story_cast()
     {
         var (_, ownerToken, ownerId) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "campowner");
         var (_, playerToken, playerId) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "campplayer");
@@ -46,8 +46,28 @@ public class HomeAndCampaignFeatureTests
                     partyLevel = 3,
                     tone = "classic",
                     adventure = "SECRET SYNOPSIS MJ ONLY",
-                    creatures = Array.Empty<object>(),
-                    encounters = Array.Empty<object>(),
+                    creatures = new object[]
+                    {
+                        new
+                        {
+                            creatureId = "secret-npc-1",
+                            customName = "Seigneur Ombre SECRET",
+                            role = "antagonist",
+                            category = "npc",
+                            challenge = "5",
+                            backstory = "BACKSTORY PNJ SECRET",
+                        },
+                    },
+                    encounters = new object[]
+                    {
+                        new
+                        {
+                            id = "enc-1",
+                            name = "Embuscade SECRET",
+                            creatures = Array.Empty<object>(),
+                            xpAwarded = false,
+                        },
+                    },
                     notes = "Notes MJ secrètes",
                     pregenCharacters = Array.Empty<object>(),
                     sessions = Array.Empty<object>(),
@@ -106,6 +126,12 @@ public class HomeAndCampaignFeatureTests
             var raw = await get.Content.ReadAsStringAsync();
             Assert.DoesNotContain("SECRET SYNOPSIS MJ ONLY", raw);
             Assert.DoesNotContain("Notes MJ secrètes", raw);
+            Assert.DoesNotContain("Seigneur Ombre SECRET", raw);
+            Assert.DoesNotContain("BACKSTORY PNJ SECRET", raw);
+            Assert.DoesNotContain("Embuscade SECRET", raw);
+            var json = JsonDocument.Parse(raw).RootElement;
+            Assert.Empty(json.GetProperty("data").GetProperty("creatures").EnumerateArray());
+            Assert.Empty(json.GetProperty("data").GetProperty("encounters").EnumerateArray());
         }
 
         using (var getOwnerReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}", ownerToken))
@@ -114,6 +140,8 @@ public class HomeAndCampaignFeatureTests
             get.EnsureSuccessStatusCode();
             var raw = await get.Content.ReadAsStringAsync();
             Assert.Contains("SECRET SYNOPSIS MJ ONLY", raw);
+            Assert.Contains("Seigneur Ombre SECRET", raw);
+            Assert.Contains("Embuscade SECRET", raw);
         }
     }
 

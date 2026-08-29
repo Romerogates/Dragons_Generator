@@ -31,14 +31,7 @@
         </div>
 
         <nav class="flex flex-wrap gap-2 mt-6">
-          @for (t of [
-            { id: 'overview', label: 'Résumé' },
-            { id: 'activity', label: 'Activité' },
-            { id: 'creatures', label: 'Personnages & créatures' },
-            { id: 'pregens', label: 'Héros pré-tirés' },
-            { id: 'encounters', label: 'Rencontres & XP' },
-            { id: 'players', label: 'Joueurs' }
-          ]; track t.id) {
+          @for (t of visibleTabs(); track t.id) {
             <button
               type="button"
               class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors"
@@ -56,24 +49,28 @@
       @switch (tab()) {
         @case ('overview') {
           <section class="space-y-6">
-            <!-- Tableau de bord MJ -->
+            <!-- Tableau de bord (créatures / rencontres / XP = MJ seulement) -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
-                <p class="text-2xl font-bold text-violet-400">{{ c.data.creatures.length }}</p>
-                <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Créatures</p>
-              </div>
-              <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
-                <p class="text-2xl font-bold text-violet-400">{{ c.data.encounters.length }}</p>
-                <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Rencontres</p>
-              </div>
+              @if (c.isOwner) {
+                <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
+                  <p class="text-2xl font-bold text-violet-400">{{ c.data.creatures.length }}</p>
+                  <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Créatures</p>
+                </div>
+                <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
+                  <p class="text-2xl font-bold text-violet-400">{{ c.data.encounters.length }}</p>
+                  <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Rencontres</p>
+                </div>
+              }
               <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
                 <p class="text-2xl font-bold text-violet-400">{{ players().length }}</p>
                 <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Joueurs</p>
               </div>
-              <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
-                <p class="text-2xl font-bold text-emerald-400">{{ totalXpAwarded() }}</p>
-                <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">XP distribuée</p>
-              </div>
+              @if (c.isOwner) {
+                <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
+                  <p class="text-2xl font-bold text-emerald-400">{{ totalXpAwarded() }}</p>
+                  <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">XP distribuée</p>
+                </div>
+              }
             </div>
 
             @if (c.isOwner) {
@@ -339,6 +336,7 @@
         }
 
         @case ('creatures') {
+          @if (c.isOwner) {
           <section class="space-y-6">
             @if (c.data.creatures.length) {
               <div class="flex flex-col gap-3">
@@ -394,6 +392,7 @@
               <p class="text-slate-500 italic text-center py-12">Aucune créature dans cette campagne.</p>
             }
           </section>
+          }
         }
 
         @case ('pregens') {
@@ -579,6 +578,7 @@
         }
 
         @case ('encounters') {
+          @if (c.isOwner) {
           <section class="space-y-6">
             @if (c.isOwner && c.data.creatures.length && !c.data.encounters.length) {
               <button
@@ -637,6 +637,7 @@
               <p class="text-slate-500 italic text-center py-12">Aucune rencontre. Générez-en depuis les créatures de l'histoire.</p>
             }
           </section>
+          }
         }
 
         @case ('players') {
