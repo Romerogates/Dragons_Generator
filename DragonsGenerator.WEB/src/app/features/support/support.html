@@ -86,14 +86,13 @@
           </p>
         }
         @if (t.attachmentOriginalName) {
-          <a
+          <button
+            type="button"
             class="text-xs text-sky-400 hover:underline mt-2 inline-block"
-            [href]="assetUrl(t.attachmentUrl)"
-            target="_blank"
-            rel="noopener"
+            (click)="openAttachment(t)"
           >
             Pièce jointe : {{ t.attachmentOriginalName }}
-          </a>
+          </button>
         }
       </div>
     } @empty {

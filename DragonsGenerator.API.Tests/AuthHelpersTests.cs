@@ -117,14 +117,28 @@ public class AuthHelpersTests
     }
 
     [Fact]
-    public void ResolveWebUrl_prefers_valid_absolute_request_url()
+    public void ResolveWebUrl_ignores_client_url_when_not_allowed()
+    {
+        var configured = "https://dragons-generator.top";
+        Assert.Equal(
+            configured,
+            AuthHelpers.ResolveWebUrl("https://evil.example/", configured, allowRequestWebUrl: false)
+        );
+        Assert.Equal(configured, AuthHelpers.ResolveWebUrl("not-a-url", configured));
+        Assert.Equal(configured, AuthHelpers.ResolveWebUrl(null, configured));
+    }
+
+    [Fact]
+    public void ResolveWebUrl_prefers_valid_absolute_request_url_in_development()
     {
         var configured = "https://dragons-generator.top";
         Assert.Equal(
             "http://localhost:8081",
-            AuthHelpers.ResolveWebUrl("http://localhost:8081/", configured)
+            AuthHelpers.ResolveWebUrl("http://localhost:8081/", configured, allowRequestWebUrl: true)
         );
-        Assert.Equal(configured, AuthHelpers.ResolveWebUrl("not-a-url", configured));
-        Assert.Equal(configured, AuthHelpers.ResolveWebUrl(null, configured));
+        Assert.Equal(
+            configured,
+            AuthHelpers.ResolveWebUrl("not-a-url", configured, allowRequestWebUrl: true)
+        );
     }
 }

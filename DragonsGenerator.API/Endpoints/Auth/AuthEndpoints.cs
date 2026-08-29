@@ -26,11 +26,12 @@ internal static class AuthEmailHelper
         AppUrlOptions appUrl,
         IEmailSender email,
         ILogger logger,
+        bool allowRequestWebUrl,
         CancellationToken ct
     )
     {
         user.EmailConfirmToken = AuthHelpers.NewToken();
-        var webBase = AuthHelpers.ResolveWebUrl(webUrl, appUrl.PublicWebUrl);
+        var webBase = AuthHelpers.ResolveWebUrl(webUrl, appUrl.PublicWebUrl, allowRequestWebUrl);
         var link = $"{webBase}/confirm-email?token={Uri.EscapeDataString(user.EmailConfirmToken)}";
         try
         {
@@ -160,6 +161,7 @@ public class RegisterEndpoint(
                 appUrl.Value,
                 email,
                 logger,
+                env.IsDevelopment(),
                 ct
             );
             await db.SaveChangesAsync(ct);
@@ -204,6 +206,7 @@ public class RegisterEndpoint(
             appUrl.Value,
             email,
             logger,
+            env.IsDevelopment(),
             ct
         );
         await db.SaveChangesAsync(ct);
@@ -330,7 +333,11 @@ public class ForgotPasswordEndpoint(
         user.PasswordResetExpires = DateTimeOffset.UtcNow.AddHours(2);
         await db.SaveChangesAsync(ct);
 
-        var webBase = AuthHelpers.ResolveWebUrl(req.WebUrl, appUrl.Value.PublicWebUrl);
+        var webBase = AuthHelpers.ResolveWebUrl(
+            req.WebUrl,
+            appUrl.Value.PublicWebUrl,
+            env.IsDevelopment()
+        );
         var link =
             $"{webBase}/reset-password?token={Uri.EscapeDataString(user.PasswordResetToken)}";
         try
@@ -470,6 +477,7 @@ public class ResendConfirmationEndpoint(
             appUrl.Value,
             email,
             logger,
+            env.IsDevelopment(),
             ct
         );
         await db.SaveChangesAsync(ct);

@@ -116,13 +116,78 @@ public class CreateTicketEndpoint(AppDbContext db, ILogger<CreateTicketEndpoint>
             t.Message,
             t.Status,
             t.AttachmentOriginalName,
-            t.AttachmentStoredName is null ? null : $"/uploads/tickets/{t.AttachmentStoredName}",
+            t.AttachmentStoredName is null ? null : $"/support/tickets/{t.Id}/attachment",
             t.CharacterId,
             t.CharacterName,
             t.CreatedAt,
             email,
             t.AdminNotes
         );
+}
+
+public class DownloadTicketAttachmentEndpoint(AppDbContext db) : EndpointWithoutRequest
+{
+    public override void Configure() => Get("/support/tickets/{id}/attachment");
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var userId = AuthHelpers.GetUserId(User);
+        if (userId is null)
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        var id = Route<Guid>("id");
+        var ticket = await db.SupportTickets.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id, ct);
+        if (ticket is null || string.IsNullOrWhiteSpace(ticket.AttachmentStoredName))
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        var isAdmin = AuthHelpers.IsAdmin(User);
+        if (ticket.UserId != userId && !isAdmin)
+        {
+            await Send.ForbiddenAsync(ct);
+            return;
+        }
+
+        var dir = Path.Combine(AppContext.BaseDirectory, "data", "uploads", "tickets");
+        var stored = Path.GetFileName(ticket.AttachmentStoredName);
+        var path = Path.Combine(dir, stored);
+        if (!File.Exists(path))
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        var ext = Path.GetExtension(stored).ToLowerInvariant();
+        var downloadName = SanitizeFileName(ticket.AttachmentOriginalName ?? stored);
+        HttpContext.Response.ContentType = ContentTypeForExtension(ext);
+        HttpContext.Response.Headers.ContentDisposition = $"inline; filename=\"{downloadName}\"";
+        await using var fs = File.OpenRead(path);
+        await fs.CopyToAsync(HttpContext.Response.Body, ct);
+    }
+
+    private static string ContentTypeForExtension(string ext) =>
+        ext switch
+        {
+            ".pdf" => "application/pdf",
+            ".png" => "image/png",
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".webp" => "image/webp",
+            _ => "application/octet-stream",
+        };
+
+    private static string SanitizeFileName(string name)
+    {
+        var cleaned = string.Join(
+            "_",
+            name.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries)
+        ).Trim();
+        return string.IsNullOrWhiteSpace(cleaned) ? "piece-jointe" : cleaned;
+    }
 }
 
 public class ListMyTicketsEndpoint(AppDbContext db) : EndpointWithoutRequest<List<TicketDto>>

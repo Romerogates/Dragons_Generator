@@ -1,4 +1,4 @@
-# Local stack (mirrors prod routes: /api, /uploads, SPA)
+# Local stack (mirrors prod routes: /api, SPA)
 # Requires Docker Desktop running.
 # Frontend http://localhost:8081  |  API http://localhost:8080/swagger
 

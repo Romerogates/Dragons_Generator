@@ -172,4 +172,66 @@ public class FriendSupportIntegrationTests
         };
         Assert.Equal(HttpStatusCode.BadRequest, (await _client.SendAsync(createReq)).StatusCode);
     }
+
+    [Fact]
+    public async Task Support_attachment_requires_auth_and_owner_or_admin()
+    {
+        var (_, ownerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "attachowner");
+        var (_, otherToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "attachother");
+        var adminToken = await ApiTestAuth.LoginAdminAsync(_client);
+
+        var pngBytes = Convert.FromBase64String(
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+        );
+
+        using var createReq = ApiTestAuth.Authed(HttpMethod.Post, "/support/tickets", ownerToken);
+        createReq.Content = new MultipartFormDataContent
+        {
+            { new StringContent("Bug visuel"), "subject" },
+            { new StringContent("Capture d'écran jointe."), "message" },
+            { new ByteArrayContent(pngBytes), "file", "capture.png" },
+        };
+        var created = await _client.SendAsync(createReq);
+        created.EnsureSuccessStatusCode();
+        var ticket = await created.Content.ReadFromJsonAsync<JsonElement>();
+        var ticketId = ticket.GetProperty("id").GetGuid();
+        Assert.Contains(
+            $"/support/tickets/{ticketId}/attachment",
+            ticket.GetProperty("attachmentUrl").GetString(),
+            StringComparison.Ordinal
+        );
+
+        Assert.Equal(
+            HttpStatusCode.Unauthorized,
+            (await _client.GetAsync($"/support/tickets/{ticketId}/attachment")).StatusCode
+        );
+        Assert.Equal(
+            HttpStatusCode.NotFound,
+            (await _client.GetAsync("/uploads/tickets/capture.png")).StatusCode
+        );
+
+        using var otherReq = ApiTestAuth.Authed(
+            HttpMethod.Get,
+            $"/support/tickets/{ticketId}/attachment",
+            otherToken
+        );
+        Assert.Equal(HttpStatusCode.Forbidden, (await _client.SendAsync(otherReq)).StatusCode);
+
+        using var ownerReq = ApiTestAuth.Authed(
+            HttpMethod.Get,
+            $"/support/tickets/{ticketId}/attachment",
+            ownerToken
+        );
+        var ownerResponse = await _client.SendAsync(ownerReq);
+        ownerResponse.EnsureSuccessStatusCode();
+        Assert.Equal("image/png", ownerResponse.Content.Headers.ContentType?.MediaType);
+
+        using var adminReq = ApiTestAuth.Authed(
+            HttpMethod.Get,
+            $"/support/tickets/{ticketId}/attachment",
+            adminToken
+        );
+        var adminResponse = await _client.SendAsync(adminReq);
+        adminResponse.EnsureSuccessStatusCode();
+    }
 }

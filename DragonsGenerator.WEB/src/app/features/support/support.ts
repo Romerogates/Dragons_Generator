@@ -11,8 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { CharacterCloudService, CloudCharacterSummary } from '@core/services/character-cloud.service';
-import { resolveApiAssetUrl } from '@core/utils/api-url.util';
-import { downloadTicketCharacterJson } from '@core/utils/support-download.util';
+import { downloadTicketCharacterJson, openTicketAttachment } from '@core/utils/support-download.util';
 
 interface Ticket {
   id: string;
@@ -49,8 +48,6 @@ export class SupportPage implements OnInit {
   readonly error = signal<string | null>(null);
   readonly success = signal<string | null>(null);
   readonly loading = signal(false);
-
-  readonly assetUrl = resolveApiAssetUrl;
 
   ngOnInit(): void {
     this.characters.list().subscribe((list) => this.myCharacters.set(list));
@@ -100,6 +97,13 @@ export class SupportPage implements OnInit {
     if (!ticket.characterId) return;
     downloadTicketCharacterJson(this.http, ticket.id, ticket.characterName ?? 'personnage', () =>
       this.error.set('Impossible de télécharger le JSON du personnage.'),
+    );
+  }
+
+  openAttachment(ticket: Ticket): void {
+    if (!ticket.attachmentOriginalName) return;
+    openTicketAttachment(this.http, ticket.id, () =>
+      this.error.set('Impossible d\'ouvrir la pièce jointe.'),
     );
   }
 }

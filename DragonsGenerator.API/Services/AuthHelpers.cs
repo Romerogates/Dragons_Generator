@@ -10,7 +10,7 @@ namespace DragonsGenerator.API.Services;
 
 public class JwtOptions
 {
-    public string Key { get; set; } = "CHANGE_ME_DRAGONS_JWT_SECRET_KEY_32CHARS_MIN";
+    public string Key { get; set; } = "";
     public string Issuer { get; set; } = "DragonsGenerator";
     public string Audience { get; set; } = "DragonsGeneratorWeb";
     public int ExpireHours { get; set; } = 72;
@@ -24,8 +24,8 @@ public class AppUrlOptions
 
 public class AdminSeedOptions
 {
-    public string Email { get; set; } = "admin@dragons.local";
-    public string Password { get; set; } = "AdminDragons!2026";
+    public string Email { get; set; } = "";
+    public string Password { get; set; } = "";
     /// <summary>Si true au démarrage : met à jour le mot de passe du compte admin (Admin__Email) uniquement.</summary>
     public bool ResetPassword { get; set; }
 }
@@ -114,10 +114,19 @@ public static class AuthHelpers
         );
     }
 
-    public static string ResolveWebUrl(string? requestWebUrl, string configuredUrl)
+  /// <param name="allowRequestWebUrl">
+  /// En production, toujours false : ignore le webUrl client (anti-phishing / account takeover).
+  /// En développement, true permet ng serve sur un autre port que PublicWebUrl.
+  /// </param>
+    public static string ResolveWebUrl(
+        string? requestWebUrl,
+        string configuredUrl,
+        bool allowRequestWebUrl = false
+    )
     {
         if (
-            !string.IsNullOrWhiteSpace(requestWebUrl)
+            allowRequestWebUrl
+            && !string.IsNullOrWhiteSpace(requestWebUrl)
             && Uri.TryCreate(requestWebUrl, UriKind.Absolute, out var uri)
             && uri.Scheme is "http" or "https"
         )

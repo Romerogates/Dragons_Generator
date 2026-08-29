@@ -7,9 +7,10 @@ using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
+
+ProductionConfigGuard.EnsureValid(builder.Configuration, builder.Environment);
 
 // --- Options ---
 builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
@@ -101,13 +102,6 @@ builder.WebHost.ConfigureKestrel(o =>
 var app = builder.Build();
 
 await DbSeeder.SeedAsync(app.Services);
-
-var uploadsRoot = Path.Combine(AppContext.BaseDirectory, "data", "uploads");
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(uploadsRoot),
-    RequestPath = "/uploads",
-});
 
 app.UseCors("AllowAngular");
 app.UseAuthentication();

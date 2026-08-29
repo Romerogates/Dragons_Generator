@@ -10,8 +10,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
-import { resolveApiAssetUrl } from '@core/utils/api-url.util';
-import { downloadTicketCharacterJson } from '@core/utils/support-download.util';
+import { downloadTicketCharacterJson, openTicketAttachment } from '@core/utils/support-download.util';
 
 interface AdminUser {
   id: string;
@@ -52,7 +51,6 @@ export class AdminPage implements OnInit {
   private readonly api = environment.apiUrl;
 
   readonly tab = signal<'users' | 'tickets'>('users');
-  readonly assetUrl = resolveApiAssetUrl;
   readonly users = signal<AdminUser[]>([]);
   readonly tickets = signal<AdminTicket[]>([]);
   readonly message = signal<string | null>(null);
@@ -137,6 +135,13 @@ export class AdminPage implements OnInit {
     if (!ticket.characterId) return;
     downloadTicketCharacterJson(this.http, ticket.id, ticket.characterName ?? 'personnage', () =>
       this.error.set('Impossible de télécharger le JSON du personnage.'),
+    );
+  }
+
+  openAttachment(ticket: AdminTicket): void {
+    if (!ticket.attachmentUrl) return;
+    openTicketAttachment(this.http, ticket.id, () =>
+      this.error.set('Impossible d\'ouvrir la pièce jointe.'),
     );
   }
 }

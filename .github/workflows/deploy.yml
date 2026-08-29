@@ -109,29 +109,38 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
-            # Réinitialisation mot de passe admin (une seule fois — autres comptes / persos intacts)
-            MARKER="$HOME/Dragons_Generator/.admin-password-reset-v2"
             ENV_FILE="$HOME/Dragons_Generator/.env"
             touch "$ENV_FILE"
-            if [ ! -f "$MARKER" ]; then
-              grep -q '^Admin__Email=' "$ENV_FILE" || echo 'Admin__Email=admin@dragons.local' >> "$ENV_FILE"
-              grep -q '^Admin__Password=' "$ENV_FILE" || echo 'Admin__Password=AdminDragons!2026' >> "$ENV_FILE"
-              sed -i '/^Admin__ResetPassword=/d' "$ENV_FILE"
-              echo 'Admin__ResetPassword=true' >> "$ENV_FILE"
+
+            missing=0
+            for key in Jwt__Key Admin__Email Admin__Password; do
+              if ! grep -qE "^${key}=.+$" "$ENV_FILE"; then
+                echo "ERROR: ${key} must be set in ${ENV_FILE}"
+                missing=1
+              fi
+            done
+            jwt_key=$(grep -E '^Jwt__Key=' "$ENV_FILE" | head -1 | cut -d= -f2- || true)
+            if [ -z "$jwt_key" ] || [ "${#jwt_key}" -lt 32 ]; then
+              echo "ERROR: Jwt__Key must be at least 32 characters"
+              missing=1
+            fi
+            case "$jwt_key" in
+              CHANGE_ME*|DragonsGenerator_Dev_Jwt_Key_ChangeInProd_32+)
+                echo "ERROR: Jwt__Key must be a unique production secret"
+                missing=1
+                ;;
+            esac
+            if grep -qE '^Admin__Password=(AdminDragons!2026|ChangeMeStrong!)$' "$ENV_FILE"; then
+              echo "ERROR: Admin__Password must not be a default/example password"
+              missing=1
+            fi
+            if [ "$missing" -ne 0 ]; then
+              exit 1
             fi
 
             docker compose -f docker-compose.prod.yml up --build -d ollama
             chmod +x scripts/ensure-ollama-model.sh
             ./scripts/ensure-ollama-model.sh docker-compose.prod.yml
             docker compose -f docker-compose.prod.yml up --build -d
-
-            if [ ! -f "$MARKER" ]; then
-              sleep 8
-              sed -i '/^Admin__ResetPassword=/d' "$ENV_FILE"
-              docker compose -f docker-compose.prod.yml up -d dragons-api
-              touch "$MARKER"
-              echo "--- Comptes admin en base ---"
-              docker logs dragons-api 2>&1 | grep -E "admin réinitialisé|Compte admin créé" | tail -5 || true
-            fi
 
             docker compose -f docker-compose.prod.yml ps

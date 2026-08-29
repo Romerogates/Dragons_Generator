@@ -5,11 +5,8 @@ describe('api-url.util', () => {
     expect(resolveApiAssetUrl('https://cdn.example.com/a.png')).toBe('https://cdn.example.com/a.png');
   });
 
-  it('keeps uploads on same origin', () => {
-    expect(resolveApiAssetUrl('/uploads/tickets/x.pdf')).toBe('/uploads/tickets/x.pdf');
-  });
-
   it('prefixes API paths with environment base', () => {
+    expect(resolveApiAssetUrl('/support/tickets/x/attachment')).toMatch(/\/support\/tickets\/x\/attachment$/);
     expect(resolveApiAssetUrl('/species')).toMatch(/\/species$/);
     expect(resolveApiAssetUrl('classes')).toMatch(/\/classes$/);
   });

@@ -130,13 +130,13 @@
             </p>
           }
           @if (t.attachmentUrl) {
-            <a
+            <button
+              type="button"
               class="text-xs text-sky-400 hover:underline mt-2 inline-block"
-              [href]="assetUrl(t.attachmentUrl)"
-              target="_blank"
-              rel="noopener"
-              >{{ t.attachmentOriginalName || 'Pièce jointe' }}</a
+              (click)="openAttachment(t)"
             >
+              {{ t.attachmentOriginalName || 'Pièce jointe' }}
+            </button>
           }
           <div class="flex gap-2 mt-3">
             <button type="button" class="text-[10px] uppercase border border-slate-600 px-2 py-1 rounded" (click)="setTicketStatus(t.id, 'open')">Open</button>
