@@ -214,7 +214,7 @@ public static class DbMigrationRunner
         await TryAddColumnAsync(db, "FriendMessages", "AttachmentPayload", "TEXT NULL", ct);
     }
 
-    private static async Task TryAddColumnAsync(
+    private static async TryAddColumnAsync(
         AppDbContext db,
         string table,
         string column,
@@ -227,9 +227,16 @@ public static class DbMigrationRunner
                 $"""ALTER TABLE "{table}" ADD COLUMN "{column}" {definition};""",
                 ct);
         }
-        catch
+        catch (Exception ex)
         {
-            // Colonne déjà présente
+            var msg = $"{ex.Message} {ex.InnerException?.Message}";
+            if (msg.Contains("duplicate column", StringComparison.OrdinalIgnoreCase)
+                || msg.Contains("already exists", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            throw;
         }
     }
 }

@@ -5,6 +5,7 @@ import { Observable, tap, catchError, of, map } from 'rxjs';
 import { clearPersistedAiRateLimit } from '@core/utils/ai-rate-limit.util';
 import { clearLocalAppData } from '@core/utils/clear-local-app-data.util';
 import { environment } from '@env/environment';
+import { OfflineProfileService } from './offline-profile.service';
 
 export interface AuthUser {
   id: string;
@@ -37,6 +38,7 @@ const USER_KEY = 'dragons_auth_user';
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
+  private readonly offlineProfile = inject(OfflineProfileService);
   private readonly api = environment.apiUrl;
 
   private readonly userSignal = signal<AuthUser | null>(this.readUser());
@@ -71,8 +73,35 @@ export class AuthService {
       tap((u) => {
         this.userSignal.set(u);
         localStorage.setItem(USER_KEY, JSON.stringify(u));
+        this.writeThroughPublicProfileCache(u);
       }),
     );
+  }
+
+  /** Garde le cache profil public aligné après édition Settings. */
+  private writeThroughPublicProfileCache(u: AuthUser): void {
+    type CachedProfile = {
+      id: string;
+      displayName: string;
+      bio: string | null;
+      avatarEmoji: string | null;
+      accentColor: string;
+      memberSince: string;
+      isSelf: boolean;
+      isFriend: boolean;
+    };
+    const cached = this.offlineProfile.readProfile<CachedProfile>(u.id);
+    const next: CachedProfile = {
+      id: u.id,
+      displayName: u.displayName,
+      bio: u.bio ?? null,
+      avatarEmoji: u.avatarEmoji ?? null,
+      accentColor: u.accentColor ?? cached?.accentColor ?? 'violet',
+      memberSince: u.memberSince ?? cached?.memberSince ?? new Date().toISOString(),
+      isSelf: true,
+      isFriend: cached?.isFriend ?? false,
+    };
+    this.offlineProfile.writeProfile(u.id, next);
   }
 
   changePassword(currentPassword: string, newPassword: string): Observable<{ message: string }> {
