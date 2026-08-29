@@ -170,64 +170,128 @@
               </div>
 
               @if (c.isOwner) {
-                @for (session of c.data.sessions ?? []; track session.id) {
-                  <article class="rounded-xl border border-slate-700/60 p-4 space-y-3">
-                    <div class="flex flex-wrap gap-2 items-center">
-                      <input
-                        type="text"
-                        class="flex-1 min-w-[10rem] bg-[#171b22] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200"
-                        [ngModel]="session.title"
-                        (ngModelChange)="updateSession(session.id, { title: $event })"
-                      />
-                      <select
-                        class="bg-[#171b22] border border-slate-700 rounded-lg px-2 py-2 text-[10px] font-black uppercase text-slate-400"
-                        [ngModel]="session.status"
-                        (ngModelChange)="updateSession(session.id, { status: $event })"
-                      >
-                        <option value="planned">Planifiée</option>
-                        <option value="played">Jouée</option>
-                        <option value="cancelled">Annulée</option>
-                      </select>
-                      <button
-                        type="button"
-                        class="px-2 py-1 rounded-lg text-[10px] font-black uppercase text-red-400 border border-red-900/40"
-                        (click)="removeSession(session.id)"
-                      >
-                        Supprimer
-                      </button>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      <input
-                        type="datetime-local"
-                        class="bg-[#171b22] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300"
-                        [ngModel]="sessionInputValue(session.scheduledAt)"
-                        (ngModelChange)="onSessionDateChange(session.id, $event)"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Lieu"
-                        class="bg-[#171b22] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300"
-                        [ngModel]="session.location ?? ''"
-                        (ngModelChange)="updateSession(session.id, { location: $event || undefined })"
-                      />
-                    </div>
-                    <textarea
-                      rows="2"
-                      placeholder="Notes de session (MJ)"
-                      class="w-full bg-[#171b22] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-400"
-                      [ngModel]="session.notes ?? ''"
-                      (ngModelChange)="updateSession(session.id, { notes: $event || undefined })"
-                    ></textarea>
+                @for (session of sortedSessions(); track session.id) {
+                  <article class="rounded-xl border border-slate-700/60 overflow-hidden">
+                    @if (editingSessionId() === session.id) {
+                      <div class="p-4 space-y-3 bg-[#171b22]/60">
+                        <div class="flex flex-wrap gap-2 items-center justify-between">
+                          <p class="text-[10px] font-black uppercase tracking-widest text-amber-500">Modifier la session</p>
+                          <button
+                            type="button"
+                            class="px-2 py-1 rounded-lg text-[10px] font-black uppercase text-slate-400 border border-slate-700"
+                            (click)="stopEditSession()"
+                          >
+                            Terminé
+                          </button>
+                        </div>
+                        <label class="block">
+                          <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Titre</span>
+                          <input
+                            type="text"
+                            class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200"
+                            [ngModel]="session.title"
+                            (ngModelChange)="updateSession(session.id, { title: $event })"
+                          />
+                        </label>
+                        <div class="flex flex-wrap gap-2 items-end">
+                          <label class="flex-1 min-w-[8rem]">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Statut</span>
+                            <select
+                              class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-2 py-2 text-[10px] font-black uppercase text-slate-400"
+                              [ngModel]="session.status"
+                              (ngModelChange)="updateSession(session.id, { status: $event }, { immediate: true })"
+                            >
+                              <option value="planned">Planifiée</option>
+                              <option value="played">Jouée</option>
+                              <option value="cancelled">Annulée</option>
+                            </select>
+                          </label>
+                          <button
+                            type="button"
+                            class="px-2 py-2 rounded-lg text-[10px] font-black uppercase text-red-400 border border-red-900/40"
+                            (click)="removeSession(session.id)"
+                          >
+                            Supprimer
+                          </button>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <label>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Date & heure</span>
+                            <input
+                              type="datetime-local"
+                              class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300"
+                              [ngModel]="sessionInputValue(session.scheduledAt)"
+                              (ngModelChange)="onSessionDateChange(session.id, $event)"
+                            />
+                          </label>
+                          <label>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Lieu</span>
+                            <input
+                              type="text"
+                              placeholder="En ligne, salle…"
+                              class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300"
+                              [ngModel]="session.location ?? ''"
+                              (ngModelChange)="updateSession(session.id, { location: $event || undefined })"
+                            />
+                          </label>
+                        </div>
+                        <label class="block">
+                          <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Notes MJ</span>
+                          <textarea
+                            rows="2"
+                            placeholder="Préparation, objectifs…"
+                            class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-400"
+                            [ngModel]="session.notes ?? ''"
+                            (ngModelChange)="updateSession(session.id, { notes: $event || undefined })"
+                          ></textarea>
+                        </label>
+                      </div>
+                    } @else {
+                      <div class="px-4 py-3 flex flex-wrap items-start justify-between gap-3">
+                        <div class="min-w-0">
+                          <div class="flex flex-wrap items-center gap-2 mb-1">
+                            <h3 class="font-serif text-amber-200 text-lg truncate">{{ session.title }}</h3>
+                            <span
+                              class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border"
+                              [class]="sessionStatusChipClass(session.status)"
+                            >
+                              {{ sessionStatusLabel(session.status) }}
+                            </span>
+                          </div>
+                          <p class="text-sm text-slate-400">
+                            {{ formatSessionDate(session.scheduledAt) }}
+                            @if (session.location) {
+                              <span class="text-slate-500"> · {{ session.location }}</span>
+                            }
+                          </p>
+                          @if (session.notes) {
+                            <p class="text-xs text-slate-500 mt-2 line-clamp-2">{{ session.notes }}</p>
+                          }
+                        </div>
+                        <button
+                          type="button"
+                          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:border-amber-500/50 hover:text-amber-300"
+                          (click)="startEditSession(session.id)"
+                        >
+                          Modifier
+                        </button>
+                      </div>
+                    }
                   </article>
                 } @empty {
                   <p class="text-sm text-slate-500 italic">Aucune session planifiée.</p>
                 }
               } @else {
                 @for (session of upcomingSessions(); track session.id) {
-                  <div class="rounded-xl border border-slate-700/60 px-4 py-3">
-                    <p class="font-serif text-amber-200">{{ session.title }}</p>
-                    <p class="text-xs text-slate-500 mt-1">
-                      {{ session.scheduledAt | date: 'full' }}
+                  <div class="rounded-xl border border-amber-900/30 bg-amber-950/10 px-4 py-3">
+                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                      <p class="font-serif text-amber-200 text-lg">{{ session.title }}</p>
+                      <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border border-amber-800/50 text-amber-300 bg-amber-950/30">
+                        {{ sessionStatusLabel(session.status) }}
+                      </span>
+                    </div>
+                    <p class="text-sm text-slate-400">
+                      {{ formatSessionDate(session.scheduledAt) }}
                       @if (session.location) { · {{ session.location }} }
                     </p>
                   </div>
@@ -242,19 +306,30 @@
         }
 
         @case ('activity') {
-          <section class="space-y-4">
+          <section class="relative space-y-0 pl-2">
             @if (activityLoading()) {
               <p class="text-center text-violet-400 animate-pulse py-8">Chargement de l'activité…</p>
             } @else if (activity().length) {
+              <div class="absolute left-[1.15rem] top-2 bottom-2 w-px bg-slate-800" aria-hidden="true"></div>
               @for (item of activity(); track item.id) {
-                <article class="bg-[#1b2028] border border-slate-800 rounded-xl px-4 py-3 flex flex-wrap justify-between gap-2">
-                  <div>
-                    <p class="text-sm text-slate-200">
-                      <span class="text-violet-400 font-semibold">{{ item.actorDisplayName }}</span>
-                      · {{ activityLabel(item.kind) }}
-                    </p>
+                <article class="relative flex gap-4 py-3 pl-1">
+                  <div class="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1b2028] border border-slate-700 text-base">
+                    <iconify-icon [icon]="activityIcon(item.kind)"></iconify-icon>
                   </div>
-                  <time class="text-[10px] text-slate-500">{{ item.createdAt | date: 'short' }}</time>
+                  <div class="flex-1 min-w-0 bg-[#1b2028] border border-slate-800 rounded-xl px-4 py-3">
+                    <div class="flex flex-wrap items-baseline justify-between gap-2">
+                      <p class="text-sm text-slate-200">
+                        <span class="text-violet-400 font-semibold">{{ item.actorDisplayName }}</span>
+                        · {{ activityLabel(item.kind) }}
+                      </p>
+                      <time class="text-[10px] text-slate-500 shrink-0" [attr.title]="item.createdAt | date: 'medium'">
+                        {{ relativeActivityTime(item.createdAt) }}
+                      </time>
+                    </div>
+                    @if (activityDetail(item); as detail) {
+                      <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">{{ detail }}</p>
+                    }
+                  </div>
                 </article>
               }
             } @else {

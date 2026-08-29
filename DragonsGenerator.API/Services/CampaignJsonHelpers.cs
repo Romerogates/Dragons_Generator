@@ -90,19 +90,105 @@ public static class CampaignJsonHelpers
         }
     }
 
-    public static bool HasSessionChanges(string oldJson, string newJson)
+    public static bool HasSessionChanges(string oldJson, string newJson) =>
+        AnalyzeSessionChanges(oldJson, newJson).Changed;
+
+    /// <summary>
+    /// Compare les tableaux sessions et résume le changement pour activité + push.
+    /// </summary>
+    public static SessionChangeInfo AnalyzeSessionChanges(string oldJson, string newJson)
     {
         try
         {
             using var oldDoc = JsonDocument.Parse(string.IsNullOrWhiteSpace(oldJson) ? "{}" : oldJson);
             using var newDoc = JsonDocument.Parse(string.IsNullOrWhiteSpace(newJson) ? "{}" : newJson);
-            var oldSessions = oldDoc.RootElement.TryGetProperty("sessions", out var os) ? os.GetRawText() : "[]";
-            var newSessions = newDoc.RootElement.TryGetProperty("sessions", out var ns) ? ns.GetRawText() : "[]";
-            return oldSessions != newSessions;
+            var oldSessions = ReadSessions(oldDoc.RootElement);
+            var newSessions = ReadSessions(newDoc.RootElement);
+
+            if (SessionsEqual(oldSessions, newSessions))
+                return SessionChangeInfo.None;
+
+            var isNew = newSessions.Count > oldSessions.Count;
+            var focus = FindFocusSession(oldSessions, newSessions);
+            var title = focus?.Title ?? "Session";
+            var message = isNew
+                ? $"Session planifiée : {title}"
+                : $"Session mise à jour : {title}";
+
+            return new SessionChangeInfo(
+                Changed: true,
+                IsNewSession: isNew,
+                Title: title,
+                ScheduledAt: focus?.ScheduledAt,
+                Location: focus?.Location,
+                Message: message);
         }
         catch
         {
-            return false;
+            return SessionChangeInfo.None;
         }
     }
+
+    private static List<SessionSnapshot> ReadSessions(JsonElement root)
+    {
+        if (!root.TryGetProperty("sessions", out var arr) || arr.ValueKind != JsonValueKind.Array)
+            return [];
+
+        var list = new List<SessionSnapshot>();
+        foreach (var item in arr.EnumerateArray())
+        {
+            list.Add(new SessionSnapshot(
+                Id: item.TryGetProperty("id", out var id) ? id.GetString() ?? "" : "",
+                Title: item.TryGetProperty("title", out var t) ? t.GetString() ?? "Session" : "Session",
+                ScheduledAt: item.TryGetProperty("scheduledAt", out var s) ? s.GetString() : null,
+                Location: item.TryGetProperty("location", out var loc) ? loc.GetString() : null,
+                Status: item.TryGetProperty("status", out var st) ? st.GetString() : null,
+                Notes: item.TryGetProperty("notes", out var n) ? n.GetString() : null,
+                Raw: item.GetRawText()));
+        }
+        return list;
+    }
+
+    private static bool SessionsEqual(List<SessionSnapshot> a, List<SessionSnapshot> b)
+    {
+        if (a.Count != b.Count) return false;
+        for (var i = 0; i < a.Count; i++)
+        {
+            if (a[i].Raw != b[i].Raw) return false;
+        }
+        return true;
+    }
+
+    private static SessionSnapshot? FindFocusSession(List<SessionSnapshot> oldSessions, List<SessionSnapshot> newSessions)
+    {
+        var oldById = oldSessions.Where(s => !string.IsNullOrEmpty(s.Id)).ToDictionary(s => s.Id);
+        foreach (var s in newSessions)
+        {
+            if (string.IsNullOrEmpty(s.Id) || !oldById.TryGetValue(s.Id, out var prev))
+                return s;
+            if (prev.Raw != s.Raw)
+                return s;
+        }
+        return newSessions.LastOrDefault() ?? oldSessions.LastOrDefault();
+    }
+
+    private sealed record SessionSnapshot(
+        string Id,
+        string Title,
+        string? ScheduledAt,
+        string? Location,
+        string? Status,
+        string? Notes,
+        string Raw);
+}
+
+public sealed record SessionChangeInfo(
+    bool Changed,
+    bool IsNewSession,
+    string? Title,
+    string? ScheduledAt,
+    string? Location,
+    string Message)
+{
+    public static SessionChangeInfo None { get; } = new(false, false, null, null, null, "");
 }

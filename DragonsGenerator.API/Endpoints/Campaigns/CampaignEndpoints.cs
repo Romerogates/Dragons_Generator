@@ -183,7 +183,7 @@ public class CreateCampaignEndpoint(AppDbContext db) : Endpoint<UpsertCampaignRe
     }
 }
 
-public class UpdateCampaignEndpoint(AppDbContext db) : Endpoint<UpsertCampaignRequest, CampaignSummaryDto>
+public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService push) : Endpoint<UpsertCampaignRequest, CampaignSummaryDto>
 {
     public override void Configure() => Put("/me/campaigns/{id}");
 
@@ -204,22 +204,52 @@ public class UpdateCampaignEndpoint(AppDbContext db) : Endpoint<UpsertCampaignRe
             return;
         }
 
+        SessionChangeInfo? sessionChange = null;
         if (!string.IsNullOrWhiteSpace(req.Title))
             campaign.Title = req.Title.Trim();
         if (req.Data.ValueKind != JsonValueKind.Undefined)
         {
             var merged = CampaignJsonHelpers.StripDmOnlyFieldsFromUpdate(req.Data, campaign.JsonData, isOwner);
             var newJson = merged.GetRawText();
-            if (isOwner && CampaignJsonHelpers.HasSessionChanges(campaign.JsonData, newJson))
+            if (isOwner)
             {
-                await CampaignActivityService.LogAsync(
-                    db, campaign.Id, userId.Value, CampaignActivityKinds.SessionUpdated,
-                    new { message = "Session planifiée ou modifiée" }, ct);
+                var change = CampaignJsonHelpers.AnalyzeSessionChanges(campaign.JsonData, newJson);
+                if (change.Changed)
+                {
+                    sessionChange = change;
+                    var kind = change.IsNewSession
+                        ? CampaignActivityKinds.SessionScheduled
+                        : CampaignActivityKinds.SessionUpdated;
+                    await CampaignActivityService.LogAsync(
+                        db, campaign.Id, userId.Value, kind,
+                        new
+                        {
+                            message = change.Message,
+                            title = change.Title,
+                            scheduledAt = change.ScheduledAt,
+                            location = change.Location,
+                        }, ct);
+                }
             }
             campaign.JsonData = newJson;
         }
         campaign.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
+
+        if (sessionChange is not null)
+        {
+            var url = $"/campaigns/{campaign.Id}";
+            var pushTitle = sessionChange.IsNewSession ? "Session planifiée" : "Session mise à jour";
+            var playerIds = campaign.Members
+                .Where(m => m.Role == CampaignMemberRoles.Player)
+                .Select(m => m.UserId)
+                .Distinct()
+                .ToList();
+            foreach (var playerId in playerIds)
+            {
+                await push.NotifyUserAsync(playerId, pushTitle, sessionChange.Message, url, ct);
+            }
+        }
 
         var playerCount = campaign.Members.Count(m => m.Role == CampaignMemberRoles.Player);
         await Send.OkAsync(new CampaignSummaryDto(

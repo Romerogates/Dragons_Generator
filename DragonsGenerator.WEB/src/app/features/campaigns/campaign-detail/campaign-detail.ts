@@ -82,12 +82,15 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly pregenPdfLoadingId = signal<string | null>(null);
   readonly activity = signal<CampaignActivityItem[]>([]);
   readonly activityLoading = signal(false);
+  /** Session en mode édition (MJ) — sinon carte lecture. */
+  readonly editingSessionId = signal<string | null>(null);
 
   readonly creatureXpMap = signal<Record<string, number>>({});
   readonly isLoadingPreview = signal(false);
   readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
   private rawBlobUrl: string | null = null;
   private previewCampaignId: string | null = null;
+  private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly isLoggedIn = this.auth.isLoggedIn;
 
@@ -138,6 +141,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.flushSessionSave();
     this.revokePreviewUrl();
   }
 
@@ -197,33 +201,137 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       session_updated: 'Session modifiée',
       pregen_assigned: 'Pré-tiré assigné',
     };
-    return labels[kind] ?? kind;
+    return labels[kind] ?? kind.replace(/_/g, ' ');
+  }
+
+  activityIcon(kind: string): string {
+    const icons: Record<string, string> = {
+      invite_sent: 'fluent-emoji:envelope',
+      invite_accepted: 'fluent-emoji:handshake',
+      member_joined: 'fluent-emoji:waving-hand',
+      character_proposed: 'fluent-emoji:scroll',
+      character_approved: 'fluent-emoji:check-mark-button',
+      character_rejected: 'fluent-emoji:cross-mark',
+      xp_awarded: 'fluent-emoji:sparkles',
+      session_scheduled: 'fluent-emoji:calendar',
+      session_updated: 'fluent-emoji:spiral-calendar',
+      pregen_assigned: 'fluent-emoji:bust-in-silhouette',
+    };
+    return icons[kind] ?? 'fluent-emoji:memo';
+  }
+
+  activityDetail(item: CampaignActivityItem): string | null {
+    try {
+      const raw = item.payloadJson ? JSON.parse(item.payloadJson) : null;
+      if (!raw || typeof raw !== 'object') return null;
+      const p = raw as Record<string, unknown>;
+      if (typeof p['message'] === 'string' && p['message'].trim()) return p['message'].trim();
+      if (typeof p['title'] === 'string' && p['title'].trim()) {
+        const loc = typeof p['location'] === 'string' && p['location'] ? ` · ${p['location']}` : '';
+        return `${p['title']}${loc}`;
+      }
+      if (typeof p['campaignTitle'] === 'string') return String(p['campaignTitle']);
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  relativeActivityTime(iso: string): string {
+    const t = new Date(iso).getTime();
+    if (Number.isNaN(t)) return '';
+    const diffSec = Math.round((Date.now() - t) / 1000);
+    if (diffSec < 60) return 'à l’instant';
+    if (diffSec < 3600) return `il y a ${Math.floor(diffSec / 60)} min`;
+    if (diffSec < 86400) return `il y a ${Math.floor(diffSec / 3600)} h`;
+    if (diffSec < 86400 * 7) return `il y a ${Math.floor(diffSec / 86400)} j`;
+    return new Date(iso).toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  formatSessionDate(iso: string): string {
+    return new Date(iso).toLocaleString('fr-FR', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
 
   addSession(): void {
     const c = this.campaign();
     if (!c?.isOwner) return;
+    this.flushSessionSave();
     const session: CampaignSession = {
       id: crypto.randomUUID?.() ?? `session-${Date.now()}`,
       title: 'Nouvelle session',
       scheduledAt: new Date(Date.now() + 7 * 86400000).toISOString(),
       status: 'planned',
     };
+    this.editingSessionId.set(session.id);
     this.saveData({ sessions: [...(c.data.sessions ?? []), session] });
   }
 
-  updateSession(sessionId: string, patch: Partial<CampaignSession>): void {
+  startEditSession(sessionId: string): void {
+    this.flushSessionSave();
+    this.editingSessionId.set(sessionId);
+  }
+
+  stopEditSession(): void {
+    this.flushSessionSave();
+    this.editingSessionId.set(null);
+  }
+
+  /** Mise à jour locale immédiate + sauvegarde (debounce pour texte). */
+  updateSession(sessionId: string, patch: Partial<CampaignSession>, options?: { immediate?: boolean }): void {
     const c = this.campaign();
     if (!c?.isOwner) return;
     const sessions = (c.data.sessions ?? []).map((s) =>
       s.id === sessionId ? { ...s, ...patch } : s,
     );
-    this.saveData({ sessions });
+    this.campaign.update((prev) =>
+      prev ? { ...prev, data: { ...prev.data, sessions } } : prev,
+    );
+
+    const immediate = options?.immediate === true;
+    if (immediate) {
+      if (this.sessionSaveTimer) {
+        clearTimeout(this.sessionSaveTimer);
+        this.sessionSaveTimer = null;
+      }
+      this.saveData({ sessions });
+      return;
+    }
+
+    if (this.sessionSaveTimer) clearTimeout(this.sessionSaveTimer);
+    this.sessionSaveTimer = setTimeout(() => {
+      this.sessionSaveTimer = null;
+      const latest = this.campaign();
+      if (!latest) return;
+      this.saveData({ sessions: latest.data.sessions ?? [] });
+    }, 700);
+  }
+
+  private flushSessionSave(): void {
+    if (!this.sessionSaveTimer) return;
+    clearTimeout(this.sessionSaveTimer);
+    this.sessionSaveTimer = null;
+    const latest = this.campaign();
+    if (!latest?.isOwner) return;
+    this.saveData({ sessions: latest.data.sessions ?? [] });
   }
 
   removeSession(sessionId: string): void {
     const c = this.campaign();
     if (!c?.isOwner) return;
+    if (!confirm('Supprimer cette session ?')) return;
+    this.flushSessionSave();
+    if (this.editingSessionId() === sessionId) this.editingSessionId.set(null);
     this.saveData({
       sessions: (c.data.sessions ?? []).filter((s) => s.id !== sessionId),
     });
@@ -238,6 +346,17 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     return labels[status];
   }
 
+  sessionStatusChipClass(status: CampaignSessionStatus): string {
+    switch (status) {
+      case 'played':
+        return 'border-emerald-800/50 text-emerald-300 bg-emerald-950/30';
+      case 'cancelled':
+        return 'border-red-900/40 text-red-300 bg-red-950/20';
+      default:
+        return 'border-amber-800/50 text-amber-300 bg-amber-950/30';
+    }
+  }
+
   sessionInputValue(iso: string): string {
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return '';
@@ -249,7 +368,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (!value) return;
     const parsed = new Date(value);
     if (Number.isNaN(parsed.getTime())) return;
-    this.updateSession(sessionId, { scheduledAt: parsed.toISOString() });
+    this.updateSession(sessionId, { scheduledAt: parsed.toISOString() }, { immediate: true });
   }
 
   upcomingSessions(): CampaignSession[] {
@@ -257,6 +376,13 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     return [...sessions]
       .filter((s) => s.status === 'planned')
       .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime());
+  }
+
+  sortedSessions(): CampaignSession[] {
+    const sessions = this.campaign()?.data.sessions ?? [];
+    return [...sessions].sort(
+      (a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime(),
+    );
   }
 
   openBestiaryFullscreen(): void {
@@ -327,6 +453,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       next: () => {
         this.campaign.update((prev) => (prev ? { ...prev, title, data } : prev));
         this.saving.set(false);
+        if (this.tab() === 'activity') this.loadActivity();
       },
       error: () => {
         this.error.set('Échec de la sauvegarde.');
@@ -401,7 +528,10 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const c = this.campaign();
     if (!c) return;
     this.campaigns.invitePlayer(c.id, userId).subscribe({
-      next: () => this.error.set(null),
+      next: () => {
+        this.error.set(null);
+        if (this.tab() === 'activity') this.loadActivity();
+      },
       error: (err) => {
         const msg = err?.error?.errors?.[0]?.reason ?? 'Invitation impossible.';
         this.error.set(msg);
