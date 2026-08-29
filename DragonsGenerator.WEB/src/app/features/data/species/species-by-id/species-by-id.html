@@ -159,7 +159,10 @@
             <dt class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">
               Taille
             </dt>
-            <dd class="text-sm text-slate-200 font-medium">{{ sp.baseStats.size }}</dd>
+            <dd class="text-sm text-slate-200 font-medium">
+              {{ sizeLabel(sp.baseStats.size) }}
+              <span class="text-[10px] text-slate-500 font-normal">({{ sp.baseStats.size }})</span>
+            </dd>
           </div>
 
           <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-4">
@@ -198,23 +201,53 @@
             </dd>
           </div>
 
-          <div class="col-span-2 bg-[#171b22] border border-slate-700/50 rounded-xl p-4">
-            <dt class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-2">
-              Mensurations
-            </dt>
-            <dd class="text-xs text-slate-400 leading-relaxed">
-              <span class="text-slate-300 flex items-center gap-1"
-                ><iconify-icon icon="fluent-emoji:straight-ruler"></iconify-icon>
-                <strong>{{ sp.baseStats.height.rangeM || 'Variable' }}</strong></span
-              >
-              : {{ sp.baseStats.height.desc }}<br />
-              <span class="text-slate-300 mt-1 inline-flex items-center gap-1"
-                ><iconify-icon icon="fluent-emoji:balance-scale"></iconify-icon>
-                <strong>{{ sp.baseStats.weight.rangeKg || 'Variable' }}</strong></span
-              >
-              : {{ sp.baseStats.weight.desc }}
-            </dd>
-          </div>
+          @if (hasMeasurements(sp)) {
+            <div
+              class="col-span-2 bg-[#171b22] border border-slate-700/50 rounded-xl p-4"
+            >
+              <dt class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-3">
+                Mensurations
+              </dt>
+              <dd class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-400 leading-relaxed">
+                @if (sp.baseStats.height.desc || sp.baseStats.height.rangeM) {
+                  <div class="flex gap-3">
+                    <span class="text-lg shrink-0 mt-0.5"
+                      ><iconify-icon icon="fluent-emoji:straight-ruler"></iconify-icon
+                    ></span>
+                    <div>
+                      <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">
+                        Taille
+                      </p>
+                      @if (sp.baseStats.height.rangeM) {
+                        <p class="text-sm text-slate-200 font-medium">{{ sp.baseStats.height.rangeM }}</p>
+                      }
+                      @if (sp.baseStats.height.desc) {
+                        <p class="mt-1">{{ sp.baseStats.height.desc }}</p>
+                      }
+                    </div>
+                  </div>
+                }
+                @if (sp.baseStats.weight.desc || sp.baseStats.weight.rangeKg) {
+                  <div class="flex gap-3">
+                    <span class="text-lg shrink-0 mt-0.5"
+                      ><iconify-icon icon="fluent-emoji:balance-scale"></iconify-icon
+                    ></span>
+                    <div>
+                      <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">
+                        Poids
+                      </p>
+                      @if (sp.baseStats.weight.rangeKg) {
+                        <p class="text-sm text-slate-200 font-medium">{{ sp.baseStats.weight.rangeKg }} kg</p>
+                      }
+                      @if (sp.baseStats.weight.desc) {
+                        <p class="mt-1">{{ sp.baseStats.weight.desc }}</p>
+                      }
+                    </div>
+                  </div>
+                }
+              </dd>
+            </div>
+          }
 
           <div class="col-span-2 bg-[#171b22] border border-slate-700/50 rounded-xl p-4">
             <dt class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-2">

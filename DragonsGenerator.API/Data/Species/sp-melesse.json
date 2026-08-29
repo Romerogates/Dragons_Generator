@@ -29,6 +29,10 @@
     },
     "size": "M",
     "darkvision_m": 18,
+    "height": {
+      "range_m": "1,50 - 1,80",
+      "desc": "Entre le gabarit humain et elfique."
+    },
     "age": {
       "maturity_years": 20,
       "lifespan_years": 180,

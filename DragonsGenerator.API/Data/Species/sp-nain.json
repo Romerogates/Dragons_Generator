@@ -30,6 +30,14 @@
     },
     "size": "M",
     "darkvision_m": 18,
+    "height": {
+      "range_m": "1,20 - 1,50",
+      "desc": "Trapus et solidement bâtis, plus petits que la moyenne humaine."
+    },
+    "weight": {
+      "range_kg": "~70",
+      "desc": "Corpulence dense, adaptée à la vie en montagne."
+    },
     "age": {
       "maturity_years": 50,
       "lifespan_years": 350,

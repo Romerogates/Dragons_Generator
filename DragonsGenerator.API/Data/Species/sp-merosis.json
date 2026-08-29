@@ -31,6 +31,10 @@
     },
     "size": "M",
     "darkvision_m": 18,
+    "height": {
+      "range_m": "1,50 - 1,80",
+      "desc": "Carrure puissante, héritage roc et humain."
+    },
     "age": {
       "maturity_years": 14,
       "lifespan_years": 70,

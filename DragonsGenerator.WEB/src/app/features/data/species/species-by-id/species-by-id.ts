@@ -62,4 +62,23 @@ export class SpeciesById implements OnInit {
     if (entries.length === 0) return '—';
     return entries.map(([key, value]) => `${key.toUpperCase()} +${value}`).join(', ');
   }
+
+  hasMeasurements(sp: Species): boolean {
+    const h = sp.baseStats.height;
+    const w = sp.baseStats.weight;
+    return this.hasStatBlock(h?.desc, h?.rangeM) || this.hasStatBlock(w?.desc, w?.rangeKg);
+  }
+
+  sizeLabel(code: string): string {
+    const labels: Record<string, string> = {
+      P: 'Petite',
+      M: 'Moyenne',
+      G: 'Grande',
+    };
+    return labels[code] ?? code;
+  }
+
+  private hasStatBlock(desc?: string, range?: string): boolean {
+    return !!(desc?.trim() || range?.trim());
+  }
 }

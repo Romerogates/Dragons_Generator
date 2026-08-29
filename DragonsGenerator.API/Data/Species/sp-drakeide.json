@@ -29,6 +29,14 @@
     },
     "size": "M",
     "darkvision_m": 0,
+    "height": {
+      "range_m": "> 1,80",
+      "desc": "Imposants et massifs, les drakéides dépassent la taille humaine moyenne."
+    },
+    "weight": {
+      "range_kg": "~110",
+      "desc": "Corpulence robuste, héritage de leur ascendance draconique."
+    },
     "age": {
       "maturity_years": 15,
       "lifespan_years": 80,

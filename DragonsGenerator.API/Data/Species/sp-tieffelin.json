@@ -29,6 +29,10 @@
     },
     "size": "M",
     "darkvision_m": 18,
+    "height": {
+      "range_m": "1,50 - 1,80",
+      "desc": "Silhouette humanoïde, parfois marquée par des cornes ou une queue."
+    },
     "age": {
       "maturity_years": 18,
       "lifespan_years": 100,

@@ -28,6 +28,14 @@
     },
     "size": "P",
     "darkvision_m": 0,
+    "height": {
+      "range_m": "0,90 - 1,20",
+      "desc": "De petite taille, ressemblant à de petits humains."
+    },
+    "weight": {
+      "range_kg": "~20",
+      "desc": "Corpulence légère et agile."
+    },
     "age": {
       "maturity_years": 20,
       "lifespan_years": 150,

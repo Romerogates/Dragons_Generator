@@ -32,6 +32,10 @@
     },
     "size": "M",
     "darkvision_m": 0,
+    "height": {
+      "range_m": "1,50 - 1,80",
+      "desc": "Silhouette variée, comparable aux humains."
+    },
     "age": {
       "maturity_years": 18,
       "lifespan_years": 100,

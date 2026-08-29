@@ -28,6 +28,10 @@
     },
     "size": "M",
     "darkvision_m": 18,
+    "height": {
+      "range_m": "1,50 - 1,80",
+      "desc": "Silhouette élancée et gracieuse, aux traits fins."
+    },
     "age": {
       "maturity_years": 16,
       "adulthood_cultural_years": 100,

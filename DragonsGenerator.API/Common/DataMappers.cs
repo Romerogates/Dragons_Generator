@@ -327,10 +327,8 @@ public static class DataMappers
             SpeedM: speedM,
             Size: GetStringOrNull(baseStatsEl, "size") ?? "M",
             DarkvisionM: baseStatsEl.TryGetProperty("darkvision_m", out var dv) ? dv.GetDouble() : 0,
-            Height: new Height(
-                GetStringOrNull(baseStatsEl, "height") ?? GetStringOrNull(baseStatsEl, "height_desc") ?? ""),
-            Weight: new Weight(
-                GetStringOrNull(baseStatsEl, "weight") ?? GetStringOrNull(baseStatsEl, "weight_desc") ?? ""),
+            Height: MapHeight(baseStatsEl),
+            Weight: MapWeight(baseStatsEl),
             Age: new Age(
                 MaturityYears: ageEl.TryGetProperty("maturity_years", out var my) ? my.GetInt32() : 0,
                 LifespanYears: ageEl.TryGetProperty("lifespan_years", out var ly) ? ly.GetInt32() : 0,
@@ -568,6 +566,36 @@ public static class DataMappers
 
         var json = JsonSerializer.Serialize(dict, Options);
         return JsonSerializer.Deserialize<JsonElement>(json, Options);
+    }
+
+    private static Height MapHeight(JsonElement baseStatsEl)
+    {
+        if (baseStatsEl.TryGetProperty("height", out var h) && h.ValueKind == JsonValueKind.Object)
+        {
+            return new Height(
+                GetStringOrNull(h, "desc") ?? GetStringOrNull(h, "flavor") ?? "",
+                GetStringOrNull(h, "range_m") ?? GetStringOrNull(h, "rangeM"));
+        }
+
+        if (baseStatsEl.TryGetProperty("height", out var hs) && hs.ValueKind == JsonValueKind.String)
+            return new Height(hs.GetString() ?? "", null);
+
+        return new Height(GetStringOrNull(baseStatsEl, "height_desc") ?? "", null);
+    }
+
+    private static Weight MapWeight(JsonElement baseStatsEl)
+    {
+        if (baseStatsEl.TryGetProperty("weight", out var w) && w.ValueKind == JsonValueKind.Object)
+        {
+            return new Weight(
+                GetStringOrNull(w, "desc") ?? GetStringOrNull(w, "flavor") ?? "",
+                GetStringOrNull(w, "range_kg") ?? GetStringOrNull(w, "rangeKg"));
+        }
+
+        if (baseStatsEl.TryGetProperty("weight", out var ws) && ws.ValueKind == JsonValueKind.String)
+            return new Weight(ws.GetString() ?? "", null);
+
+        return new Weight(GetStringOrNull(baseStatsEl, "weight_desc") ?? "", null);
     }
 
     private static string GetString(JsonElement el, string prop) =>
