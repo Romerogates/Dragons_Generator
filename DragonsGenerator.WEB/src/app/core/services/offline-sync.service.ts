@@ -1,12 +1,12 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
-import { Observable, of, forkJoin, switchMap, map, catchError, tap } from 'rxjs';
+import { Observable, of, switchMap, map, catchError, tap } from 'rxjs';
 import type { Character } from '@core/models/Character/character';
 import { CampaignData, CampaignSummary } from '@core/models/Campaign/campaign';
 import { AuthService } from './auth.service';
 import { ConnectivityService } from './connectivity.service';
 import { CharacterCloudService } from './character-cloud.service';
 import { CampaignCloudService } from './campaign-cloud.service';
+import { formatOfflineSyncError } from '@core/utils/offline-sync-error.util';
 
 const QUEUE_KEY = 'dragons-offline-sync-queue';
 const LOCAL_CAMPAIGNS_KEY = 'dragons-campaigns-local';
@@ -186,7 +186,6 @@ export class OfflineSyncService {
       switchMap(() => this.flushSequential(queue, index + 1)),
       catchError((err: unknown) => {
         this.lastSyncError.set(this.formatSyncError(item, err));
-        // Ne jamais supprimer silencieusement : conserver l'élément en échec et la suite de la file.
         return of(queue.slice(index));
       }),
     );
@@ -243,43 +242,16 @@ export class OfflineSyncService {
   }
 
   private formatSyncError(item: SyncQueueItem, err: unknown): string {
-    const label = this.itemLabel(item);
-    if (err instanceof HttpErrorResponse) {
-      if (err.status === 0) {
-        return `${label} : serveur inaccessible. Nouvel essai automatique au retour du réseau.`;
-      }
-      if (err.status === 401 || err.status === 403) {
-        return `${label} : session expirée ou droits insuffisants. Reconnectez-vous puis relancez la sync.`;
-      }
-      const reason = this.extractHttpError(err);
-      if (reason) {
-        return `${label} : ${reason} (élément conservé en file d'attente).`;
-      }
-      return `${label} : erreur ${err.status} (élément conservé en file d'attente).`;
+    if (item.type === 'character-save') {
+      return formatOfflineSyncError(
+        { type: 'character-save', name: item.character.name },
+        err,
+      );
     }
-    return `${label} : échec de synchronisation (élément conservé en file d'attente).`;
-  }
-
-  private itemLabel(item: SyncQueueItem): string {
-    switch (item.type) {
-      case 'character-save':
-        return `Personnage « ${item.character.name?.trim() || 'sans nom'} »`;
-      case 'campaign-create':
-        return `Campagne « ${item.title} » (création)`;
-      case 'campaign-update':
-        return `Campagne « ${item.title} » (mise à jour)`;
+    if (item.type === 'campaign-create') {
+      return formatOfflineSyncError({ type: 'campaign-create', title: item.title }, err);
     }
-  }
-
-  private extractHttpError(err: HttpErrorResponse): string | null {
-    const body = err.error as
-      | { errors?: { reason?: string }[] | Record<string, string[]>; message?: string }
-      | undefined;
-    if (Array.isArray(body?.errors) && body.errors[0]?.reason) {
-      return body.errors[0].reason;
-    }
-    if (body?.message) return body.message;
-    return null;
+    return formatOfflineSyncError({ type: 'campaign-update', title: item.title }, err);
   }
 
   private pushQueue(item: SyncQueueItem): void {
