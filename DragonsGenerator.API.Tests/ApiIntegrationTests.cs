@@ -17,6 +17,7 @@ public class ApiIntegrationTests
   [Theory]
   [InlineData("/species")]
   [InlineData("/species/summary")]
+  [InlineData("/health")]
   [InlineData("/classes")]
   [InlineData("/classes/summary")]
   [InlineData("/skills")]

@@ -75,7 +75,7 @@ services:
       mailhog:
         condition: service_started
       ollama:
-        condition: service_healthy
+        condition: service_started
     networks:
       - dragons-network
 
