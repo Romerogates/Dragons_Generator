@@ -5,8 +5,8 @@ export type NotificationType =
   | 'proposal_rejected';
 
 export interface NotificationItem {
-  id: string;
-  type: NotificationType;
+  key: string;
+  kind: NotificationType;
   title: string;
   message: string;
   actionPath: string;

@@ -6,8 +6,8 @@ using Microsoft.EntityFrameworkCore;
 namespace DragonsGenerator.API.Endpoints.Notifications;
 
 public record NotificationItemDto(
-    string Id,
-    string Type,
+    string Key,
+    string Kind,
     string Title,
     string Message,
     string ActionPath,
@@ -21,7 +21,7 @@ public record NotificationsSummaryDto(
     List<NotificationItemDto> Notifications
 );
 
-public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest<NotificationsSummaryDto>
+public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
 {
     public override void Configure() => Get("/me/notifications");
 
@@ -139,7 +139,7 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
 
         items = items.OrderByDescending(i => i.CreatedAt).ToList();
 
-        var friendsCount = items.Count(i => i.Type == "friend_request");
+        var friendsCount = items.Count(i => i.Kind == "friend_request");
         var campaignsCount = items.Count - friendsCount;
 
         await Send.OkAsync(

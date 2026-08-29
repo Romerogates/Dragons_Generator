@@ -31,8 +31,8 @@ export class NotificationsPage implements OnInit {
     this.notifications.refresh();
   }
 
-  iconFor(type: NotificationType): string {
-    switch (type) {
+  iconFor(kind: NotificationType): string {
+    switch (kind) {
       case 'friend_request':
         return 'fluent-emoji:handshake';
       case 'campaign_invite':
@@ -45,6 +45,6 @@ export class NotificationsPage implements OnInit {
   }
 
   trackItem(_index: number, item: NotificationItem): string {
-    return item.id;
+    return item.key;
   }
 }

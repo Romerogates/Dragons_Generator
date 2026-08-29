@@ -19,7 +19,8 @@ public class NotificationsIntegrationTests
 
         using var req = ApiTestAuth.Authed(HttpMethod.Get, "/me/notifications", token);
         var res = await _client.SendAsync(req);
-        res.EnsureSuccessStatusCode();
+        var raw = await res.Content.ReadAsStringAsync();
+        Assert.True(res.IsSuccessStatusCode, raw);
 
         var body = await res.Content.ReadFromJsonAsync<NotificationsSummaryResponse>();
         Assert.NotNull(body);
@@ -42,13 +43,14 @@ public class NotificationsIntegrationTests
 
         using var notifReq = ApiTestAuth.Authed(HttpMethod.Get, "/me/notifications", tokenB);
         var notif = await _client.SendAsync(notifReq);
-        notif.EnsureSuccessStatusCode();
+        var raw = await notif.Content.ReadAsStringAsync();
+        Assert.True(notif.IsSuccessStatusCode, raw);
 
         var body = await notif.Content.ReadFromJsonAsync<NotificationsSummaryResponse>();
         Assert.NotNull(body);
         Assert.Equal(1, body!.FriendsActionCount);
         Assert.Equal(1, body.TotalCount);
-        Assert.Contains(body.Notifications, i => i.Type == "friend_request");
+        Assert.Contains(body.Notifications, i => i.Kind == "friend_request");
     }
 }
 
@@ -62,5 +64,5 @@ internal sealed class NotificationsSummaryResponse
 
 internal sealed class NotificationItemResponse
 {
-    public string Type { get; set; } = "";
+    public string Kind { get; set; } = "";
 }
