@@ -70,8 +70,18 @@ public static class DbSchemaUpgrader
         await TryAddColumnAsync(db, "Users", "AcceptedTermsAt", "TEXT NULL", ct);
         await TryAddColumnAsync(db, "Users", "Bio", "TEXT NULL", ct);
         await TryAddColumnAsync(db, "Users", "AvatarEmoji", "TEXT NULL", ct);
-        await TryAddColumnAsync(db, "Users", "AccentColor", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "Users", "AccentColor", "TEXT NOT NULL DEFAULT 'violet'", ct);
+        await BackfillUserProfileDefaultsAsync(db, ct);
         await EnsureFriendChatTablesAsync(db, ct);
+    }
+
+    private static async Task BackfillUserProfileDefaultsAsync(AppDbContext db, CancellationToken ct)
+    {
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            UPDATE "Users" SET "AccentColor" = 'violet' WHERE "AccentColor" IS NULL OR "AccentColor" = '';
+            """,
+            ct);
     }
 
     private static async Task EnsureFriendChatTablesAsync(AppDbContext db, CancellationToken ct)
