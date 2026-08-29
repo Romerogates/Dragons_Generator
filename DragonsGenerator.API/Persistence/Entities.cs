@@ -19,6 +19,7 @@ public class AppUser
     public DateTimeOffset? PasswordResetExpires { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset? LastLoginAt { get; set; }
+    public DateTimeOffset? AcceptedTermsAt { get; set; }
 
     public List<CharacterRecord> Characters { get; set; } = [];
     public List<SupportTicket> SupportTickets { get; set; } = [];

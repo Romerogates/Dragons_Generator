@@ -26,6 +26,14 @@ export const routes: Routes = [
       import('./features/auth/reset-password').then((m) => m.ResetPasswordPage),
   },
   {
+    path: 'legal/privacy',
+    loadComponent: () => import('./features/legal/privacy/privacy').then((m) => m.PrivacyPage),
+  },
+  {
+    path: 'legal/terms',
+    loadComponent: () => import('./features/legal/terms/terms').then((m) => m.TermsPage),
+  },
+  {
     path: 'settings',
     canActivate: [authGuard],
     loadComponent: () => import('./features/settings/settings').then((m) => m.SettingsPage),

@@ -13,11 +13,12 @@ import { OfflineCodexService } from '@core/services/offline-codex.service';
 import { OfflineSyncService } from '@core/services/offline-sync.service';
 import { ConnectivityService } from '@core/services/connectivity.service';
 import { PasswordFieldComponent } from '@shared/components/password-field/password-field';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, PasswordFieldComponent],
+  imports: [CommonModule, FormsModule, PasswordFieldComponent, RouterLink],
   templateUrl: './settings.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -54,6 +55,16 @@ export class SettingsPage implements OnInit {
   readonly syncMessage = this.offlineSync.lastSyncMessage;
   readonly syncError = this.offlineSync.lastSyncError;
 
+  readonly exportLoading = signal(false);
+  readonly exportMsg = signal<string | null>(null);
+  readonly exportError = signal<string | null>(null);
+
+  deletePassword = '';
+  readonly deleteConfirmEmail = signal('');
+  readonly deleteLoading = signal(false);
+  readonly deleteError = signal<string | null>(null);
+  readonly showDeleteForm = signal(false);
+
   readonly user = this.auth.user;
 
   ngOnInit(): void {
@@ -70,6 +81,59 @@ export class SettingsPage implements OnInit {
 
   syncNow(): void {
     this.offlineSync.flushIfPossible();
+  }
+
+  exportData(): void {
+    this.exportMsg.set(null);
+    this.exportError.set(null);
+    this.exportLoading.set(true);
+    this.auth.exportMyData().subscribe({
+      next: (blob) => {
+        this.exportLoading.set(false);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `dragons-generator-export-${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        this.exportMsg.set('Export téléchargé.');
+      },
+      error: (err) => {
+        this.exportLoading.set(false);
+        this.exportError.set(this.extractError(err) || 'Échec de l’export.');
+      },
+    });
+  }
+
+  toggleDeleteForm(): void {
+    this.showDeleteForm.update((v) => !v);
+    this.deletePassword = '';
+    this.deleteConfirmEmail.set('');
+    this.deleteError.set(null);
+  }
+
+  canConfirmDelete(): boolean {
+    const email = this.user()?.email ?? '';
+    return (
+      this.deletePassword.length >= 8 &&
+      this.deleteConfirmEmail().trim().toLowerCase() === email.toLowerCase()
+    );
+  }
+
+  deleteAccount(): void {
+    if (!this.canConfirmDelete() || this.deleteLoading()) return;
+    this.deleteError.set(null);
+    this.deleteLoading.set(true);
+    this.auth.deleteAccount(this.deletePassword).subscribe({
+      next: () => {
+        this.deleteLoading.set(false);
+        this.auth.logoutAndClearLocalData();
+      },
+      error: (err) => {
+        this.deleteLoading.set(false);
+        this.deleteError.set(this.extractError(err) || 'Impossible de supprimer le compte.');
+      },
+    });
   }
 
   clearCodexDownload(): void {

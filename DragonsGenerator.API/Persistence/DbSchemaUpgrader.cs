@@ -67,6 +67,7 @@ public static class DbSchemaUpgrader
 
         await TryAddColumnAsync(db, "SupportTickets", "CharacterId", "TEXT NULL", ct);
         await TryAddColumnAsync(db, "SupportTickets", "CharacterName", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "Users", "AcceptedTermsAt", "TEXT NULL", ct);
     }
 
     private static async Task TryAddColumnAsync(

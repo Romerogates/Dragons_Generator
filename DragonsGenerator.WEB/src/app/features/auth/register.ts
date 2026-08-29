@@ -31,6 +31,7 @@ export class RegisterPage implements OnInit {
   password = '';
   passwordConfirm = '';
   displayName = '';
+  acceptedTerms = false;
   readonly error = signal<string | null>(null);
   readonly success = signal(false);
   readonly confirmLink = signal<string | null>(null);
@@ -72,9 +73,13 @@ export class RegisterPage implements OnInit {
       this.error.set('Le pseudo est obligatoire (2 caractères minimum).');
       return;
     }
+    if (!this.acceptedTerms) {
+      this.error.set('Vous devez accepter les conditions et la politique de confidentialité.');
+      return;
+    }
     this.loading.set(true);
     this.auth
-      .register(this.email.trim(), this.password, pseudo)
+      .register(this.email.trim(), this.password, pseudo, this.acceptedTerms)
       .subscribe({
         next: (res: unknown) => {
           this.loading.set(false);

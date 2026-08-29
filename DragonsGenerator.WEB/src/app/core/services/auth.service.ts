@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap, catchError, of, map } from 'rxjs';
 import { clearPersistedAiRateLimit } from '@core/utils/ai-rate-limit.util';
+import { clearLocalAppData } from '@core/utils/clear-local-app-data.util';
 import { environment } from '@env/environment';
 
 export interface AuthUser {
@@ -35,13 +36,14 @@ export class AuthService {
   readonly isLoggedIn = computed(() => !!this.tokenSignal() && !!this.userSignal());
   readonly isAdmin = computed(() => this.userSignal()?.role === 'Admin');
 
-  register(email: string, password: string, displayName: string): Observable<unknown> {
+  register(email: string, password: string, displayName: string, acceptTerms: boolean): Observable<unknown> {
     const webUrl = typeof window !== 'undefined' ? window.location.origin : undefined;
     return this.http.post(`${this.api}/auth/register`, {
       email,
       password,
       displayName: displayName.trim(),
       webUrl,
+      acceptTerms,
     });
   }
 
@@ -66,6 +68,16 @@ export class AuthService {
     return this.http.post<{ message: string }>(`${this.api}/auth/change-password`, {
       currentPassword,
       newPassword,
+    });
+  }
+
+  exportMyData(): Observable<Blob> {
+    return this.http.get(`${this.api}/me/export`, { responseType: 'blob' });
+  }
+
+  deleteAccount(currentPassword: string): Observable<void> {
+    return this.http.request<void>('DELETE', `${this.api}/auth/me`, {
+      body: { currentPassword },
     });
   }
 
@@ -108,6 +120,12 @@ export class AuthService {
     this.tokenSignal.set(null);
     this.userSignal.set(null);
     if (navigate) void this.router.navigateByUrl('/login');
+  }
+
+  /** Déconnexion + effacement complet des données locales après suppression de compte. */
+  logoutAndClearLocalData(): void {
+    clearLocalAppData();
+    this.logout(true);
   }
 
   private persist(token: string, user: AuthUser): void {

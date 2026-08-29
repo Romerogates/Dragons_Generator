@@ -33,7 +33,7 @@ internal static class ApiTestAuth
 
         var register = await client.PostAsJsonAsync(
             "/auth/register",
-            new { email, password, displayName }
+            new { email, password, displayName, acceptTerms = true }
         );
         var registerBody = await register.Content.ReadAsStringAsync();
         Assert.True(

@@ -8,7 +8,13 @@ using Microsoft.Extensions.Options;
 
 namespace DragonsGenerator.API.Endpoints.Auth;
 
-public record RegisterRequest(string Email, string Password, string? DisplayName, string? WebUrl);
+public record RegisterRequest(
+    string Email,
+    string Password,
+    string? DisplayName,
+    string? WebUrl,
+    bool AcceptTerms = false
+);
 public record LoginRequest(string Email, string Password);
 public record ForgotPasswordRequest(string Email, string? WebUrl);
 public record ResendConfirmationRequest(string Email, string? WebUrl);
@@ -115,6 +121,12 @@ public class RegisterEndpoint(
             await Send.ErrorsAsync(cancellation: ct);
             return;
         }
+        if (!req.AcceptTerms)
+        {
+            AddError("Vous devez accepter les conditions d'utilisation et la politique de confidentialité.");
+            await Send.ErrorsAsync(cancellation: ct);
+            return;
+        }
 
         var existing = await db.Users.FirstOrDefaultAsync(u => u.Email == emailAddr, ct);
         if (existing is not null)
@@ -154,6 +166,8 @@ public class RegisterEndpoint(
                 }
                 existing.DisplayName = newName;
             }
+
+            existing.AcceptedTermsAt = DateTimeOffset.UtcNow;
 
             var (emailSent, link) = await AuthEmailHelper.SendConfirmationAsync(
                 existing,
@@ -196,6 +210,7 @@ public class RegisterEndpoint(
             PasswordHash = AuthHelpers.HashPassword(req.Password),
             Role = AppRoles.User,
             EmailConfirmed = false,
+            AcceptedTermsAt = DateTimeOffset.UtcNow,
         };
         db.Users.Add(user);
         await db.SaveChangesAsync(ct);

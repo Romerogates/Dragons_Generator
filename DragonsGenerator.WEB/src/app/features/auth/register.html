@@ -93,6 +93,25 @@
         @if (error()) {
           <p class="text-sm text-red-400">{{ error() }}</p>
         }
+        <label class="flex items-start gap-2 text-xs text-slate-400 cursor-pointer">
+          <input
+            type="checkbox"
+            required
+            [(ngModel)]="acceptedTerms"
+            name="acceptedTerms"
+            class="mt-0.5 rounded border-slate-600 bg-[#171b22] text-amber-500 focus:ring-amber-500"
+          />
+          <span>
+            J’accepte les
+            <a routerLink="/legal/terms" target="_blank" class="text-amber-400 hover:underline"
+              >conditions d’utilisation</a
+            >
+            et la
+            <a routerLink="/legal/privacy" target="_blank" class="text-amber-400 hover:underline"
+              >politique de confidentialité</a
+            >.
+          </span>
+        </label>
         @if (showResend()) {
           <button
             type="button"

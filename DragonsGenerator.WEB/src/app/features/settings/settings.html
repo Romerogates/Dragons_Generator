@@ -131,6 +131,92 @@
     }
   </section>
 
+  <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6 mb-6">
+    <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
+      Données personnelles (RGPD)
+    </h2>
+    <p class="text-xs text-slate-400 mb-4">
+      Consulte la
+      <a routerLink="/legal/privacy" class="text-amber-400 hover:underline">politique de confidentialité</a>
+      et les
+      <a routerLink="/legal/terms" class="text-amber-400 hover:underline">conditions d’utilisation</a>.
+      Tu peux exporter ou supprimer les données stockées sur le serveur.
+    </p>
+
+    <button
+      type="button"
+      class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-sky-900/40 border border-sky-700/50 text-sky-300 disabled:opacity-50 mb-3"
+      [disabled]="exportLoading() || !isOnline()"
+      (click)="exportData()"
+    >
+      {{ exportLoading() ? 'Export…' : 'Exporter mes données (JSON)' }}
+    </button>
+    @if (exportError()) {
+      <p class="text-sm text-red-400 mb-2">{{ exportError() }}</p>
+    }
+    @if (exportMsg()) {
+      <p class="text-sm text-emerald-400 mb-2">{{ exportMsg() }}</p>
+    }
+
+    <div class="mt-4 pt-4 border-t border-slate-800">
+      <h3 class="text-[10px] font-black uppercase tracking-widest text-red-400/90 mb-2">Zone de danger</h3>
+      <p class="text-xs text-slate-400 mb-3">
+        La suppression efface définitivement ton compte, tes personnages, campagnes hébergées et tickets
+        support. Les campagnes dont tu es propriétaire seront supprimées pour tous les membres.
+      </p>
+      @if (!showDeleteForm()) {
+        <button
+          type="button"
+          class="px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-red-900/60 text-red-400 hover:bg-red-950/30"
+          (click)="toggleDeleteForm()"
+        >
+          Supprimer mon compte
+        </button>
+      } @else {
+        <div class="flex flex-col gap-3">
+          <app-password-field
+            label="Mot de passe actuel"
+            name="deletePassword"
+            [required]="true"
+            [(value)]="deletePassword"
+          />
+          <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+            Confirmer en tapant ton email
+            <input
+              type="email"
+              [value]="deleteConfirmEmail()"
+              (input)="deleteConfirmEmail.set($any($event.target).value)"
+              name="deleteConfirmEmail"
+              [placeholder]="user()?.email ?? ''"
+              class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-red-500 outline-none"
+            />
+          </label>
+          @if (deleteError()) {
+            <p class="text-sm text-red-400">{{ deleteError() }}</p>
+          }
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-red-900/50 border border-red-800 text-red-300 disabled:opacity-50"
+              [disabled]="!canConfirmDelete() || deleteLoading()"
+              (click)="deleteAccount()"
+            >
+              {{ deleteLoading() ? 'Suppression…' : 'Confirmer la suppression' }}
+            </button>
+            <button
+              type="button"
+              class="px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-400"
+              [disabled]="deleteLoading()"
+              (click)="toggleDeleteForm()"
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
   @if (user() && !user()!.emailConfirmed) {
     <section class="bg-amber-950/20 border border-amber-800/40 rounded-2xl p-6">
       <h2 class="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-2">

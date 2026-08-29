@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { Navbar } from './shared/components/navbar/navbar';
 import { AppContextMenu } from './shared/components/app-context-menu/app-context-menu';
 import { AiRateLimitDialogComponent } from './shared/components/ai-rate-limit-dialog/ai-rate-limit-dialog';
+import { SiteFooterComponent } from './shared/components/site-footer/site-footer';
 import { GameLabelCatalogService } from '@core/services/game-label-catalog.service';
 import { AuthService } from '@core/services/auth.service';
 import { OfflineSyncService } from '@core/services/offline-sync.service';
@@ -10,7 +11,7 @@ import { clearPersistedAiRateLimit } from '@core/utils/ai-rate-limit.util';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Navbar, AppContextMenu, AiRateLimitDialogComponent],
+  imports: [RouterOutlet, Navbar, SiteFooterComponent, AppContextMenu, AiRateLimitDialogComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

@@ -50,7 +50,7 @@ public class ApiIntegrationTests
         var password = "TestPass123!";
         var register = await _client.PostAsJsonAsync(
             "/auth/register",
-            new { email, password, displayName = $"Hero{suffix}" }
+            new { email, password, displayName = $"Hero{suffix}", acceptTerms = true }
         );
         var registerBody = await register.Content.ReadAsStringAsync();
         Assert.True(
