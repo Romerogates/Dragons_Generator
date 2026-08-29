@@ -147,6 +147,32 @@
 
   <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6 mb-6">
     <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
+      Application (PWA)
+    </h2>
+    <p class="text-xs text-slate-400 mb-4">
+      Installez Dragons Generator sur l’écran d’accueil pour un accès rapide et les notifications.
+    </p>
+    @if (isPwaStandalone()) {
+      <p class="text-sm text-emerald-400">Application déjà installée.</p>
+    } @else if (canInstallPwa()) {
+      <button
+        type="button"
+        class="wizard-nav-primary"
+        [disabled]="installBusy()"
+        (click)="installPwa()"
+      >
+        {{ installBusy() ? 'Installation…' : 'Installer l’app' }}
+      </button>
+    } @else {
+      <p class="text-sm text-slate-500">
+        Sur mobile : menu du navigateur → « Ajouter à l’écran d’accueil ». Sur desktop Chrome : icône
+        d’installation dans la barre d’adresse.
+      </p>
+    }
+  </section>
+
+  <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6 mb-6">
+    <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
       Notifications push
     </h2>
     <p class="text-xs text-slate-400 mb-4">

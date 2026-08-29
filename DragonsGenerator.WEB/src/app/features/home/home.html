@@ -1,6 +1,6 @@
 <div class="w-full flex flex-col animate-fade-in select-none">
   <section
-    class="relative w-full min-h-[85vh] flex flex-col items-center border-b border-slate-800"
+    class="relative w-full min-h-[85dvh] flex flex-col items-center border-b border-slate-800"
   >
     <div
       class="absolute inset-0 z-0 bg-[#111] opacity-80"
@@ -26,13 +26,13 @@
         class="h-24 w-24 object-contain mb-6 drop-shadow-md animate-[fadeInDown_0.35s_ease-out]"
       />
       <h1
-        class="text-5xl md:text-7xl font-extrabold text-slate-100 font-serif tracking-wide mb-6 drop-shadow-lg"
+        class="text-4xl sm:text-5xl md:text-7xl font-extrabold text-slate-100 font-serif tracking-wide mb-4 sm:mb-6 drop-shadow-lg"
       >
         Dragons <span class="text-amber-500">Generator</span>
       </h1>
-      <p class="text-lg md:text-xl text-slate-400 italic mb-10 max-w-2xl leading-relaxed">
+      <p class="text-base sm:text-lg md:text-xl text-slate-400 italic mb-6 sm:mb-10 max-w-2xl leading-relaxed">
         @if (isLoggedIn() && user(); as u) {
-          <span class="flex flex-col items-center gap-4 not-italic">
+          <span class="flex flex-col items-center gap-3 sm:gap-4 not-italic">
             <a routerLink="/profile" class="hover:scale-105 transition-transform" title="Mon profil">
               <app-profile-avatar
                 [displayName]="u.displayName"
@@ -52,16 +52,16 @@
         }
       </p>
 
-      <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center max-w-3xl">
+      <div class="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center max-w-3xl">
         <a
           routerLink="/create"
-          class="px-10 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-amber-500 text-slate-950 shadow-md hover:bg-amber-400 hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
+          class="px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-amber-500 text-slate-950 shadow-md hover:bg-amber-400 hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
         >
           <span><iconify-icon icon="fluent-emoji:sparkles"></iconify-icon></span> Forger une Légende
         </a>
         <a
           routerLink="/characters"
-          class="px-10 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-[#1b2028] text-slate-300 border border-slate-700 hover:border-emerald-500/50 hover:text-emerald-400 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
+          class="px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-[#1b2028] text-slate-300 border border-slate-700 hover:border-emerald-500/50 hover:text-emerald-400 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
         >
           <span><iconify-icon icon="fluent-emoji:scroll"></iconify-icon></span> Mes Héros
           @if (savedCharactersCount() > 0) {
@@ -73,39 +73,39 @@
         </a>
         <a
           routerLink="/campaigns"
-          class="px-8 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-sky-950/30 text-sky-300 border border-sky-800/50 hover:border-sky-500/50 hover:text-sky-200 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
+          class="px-8 py-3.5 sm:py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-sky-950/30 text-sky-300 border border-sky-800/50 hover:border-sky-500/50 hover:text-sky-200 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
         >
           <span><iconify-icon icon="fluent-emoji:world-map"></iconify-icon></span> Campagnes
         </a>
-        @if (isLoggedIn()) {
-          <a
-            routerLink="/profile"
-            class="px-8 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-violet-950/30 text-violet-300 border border-violet-800/50 hover:border-violet-500/50 hover:text-violet-200 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
-          >
-            <span><iconify-icon icon="fluent-emoji:bust-in-silhouette"></iconify-icon></span> Mon profil
-          </a>
-          <a
-            routerLink="/friends"
-            class="px-8 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-violet-950/30 text-violet-300 border border-violet-800/50 hover:border-violet-500/50 hover:text-violet-200 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
-          >
-            <span><iconify-icon icon="fluent-emoji:handshake"></iconify-icon></span> Amis
-          </a>
-        } @else {
+        @if (!isLoggedIn()) {
           <a
             routerLink="/login"
             [queryParams]="{ returnUrl: '/' }"
-            class="px-8 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-violet-950/30 text-violet-300 border border-violet-800/50 hover:border-violet-500/50 hover:text-violet-200 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
+            class="px-8 py-3.5 sm:py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-violet-950/30 text-violet-300 border border-violet-800/50 hover:border-violet-500/50 hover:text-violet-200 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
           >
             <span><iconify-icon icon="fluent-emoji:locked"></iconify-icon></span> Se connecter
           </a>
         }
-        <a
-          routerLink="/story/create"
-          class="px-10 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-violet-950/30 text-violet-300 border border-violet-800/50 hover:border-violet-500/50 hover:text-violet-200 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
-        >
-          <span><iconify-icon icon="fluent-emoji:scroll"></iconify-icon></span> Nouveau Scénario
-        </a>
       </div>
+
+      @if (isLoggedIn()) {
+        <div class="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-slate-500">
+          <a routerLink="/story/create" class="hover:text-violet-300 transition-colors">Nouveau scénario</a>
+          <span aria-hidden="true">·</span>
+          <a routerLink="/friends" class="hover:text-violet-300 transition-colors">Amis</a>
+          <span aria-hidden="true">·</span>
+          <a routerLink="/profile" class="hover:text-violet-300 transition-colors">Profil</a>
+        </div>
+      } @else {
+        <div class="mt-4">
+          <a
+            routerLink="/story/create"
+            class="text-xs text-slate-500 hover:text-violet-300 transition-colors"
+          >
+            Ou créer un scénario →
+          </a>
+        </div>
+      }
     </div>
 
     <button
@@ -248,7 +248,7 @@
       </h2>
 
       <div
-        class="grid grid-cols-3 sm:grid-cols-3 gap-3 sm:gap-4 w-full max-w-xl sm:max-w-2xl"
+        class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 w-full max-w-xl sm:max-w-2xl"
       >
         @for (link of grimoireLinks; track link.path) {
           <a
@@ -260,7 +260,7 @@
               <iconify-icon [icon]="link.icon" width="1em" height="1em"></iconify-icon>
             </span>
             <span
-              class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400 text-center px-1"
+              class="text-[10px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400 text-center px-1"
               [ngClass]="hoverText(link.hover)"
             >
               {{ link.label }}
@@ -291,17 +291,4 @@
       </a>
     </div>
   </section>
-
-  <footer class="w-full py-8 text-center border-t border-slate-800 bg-[#1b2028]">
-    <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">
-      Dragons Companion — Fan-made pour le JDR
-      <a
-        href="https://www.dragons-rpg.com/fr"
-        target="_blank"
-        class="text-amber-500 hover:underline"
-        >Dragons</a
-      >
-    </p>
-    <p class="text-[9px] text-slate-600 mt-2 uppercase tracking-widest">Non affilié à Agate RPG</p>
-  </footer>
 </div>

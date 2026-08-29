@@ -13,6 +13,7 @@ import { OfflineCodexService } from '@core/services/offline-codex.service';
 import { OfflineSyncService } from '@core/services/offline-sync.service';
 import { ConnectivityService } from '@core/services/connectivity.service';
 import { PushNotificationService } from '@core/services/push-notification.service';
+import { PwaLifecycleService } from '@core/services/pwa-lifecycle.service';
 import { PasswordFieldComponent } from '@shared/components/password-field/password-field';
 import { RouterLink } from '@angular/router';
 import {
@@ -36,6 +37,7 @@ export class SettingsPage implements OnInit {
   private readonly offlineSync = inject(OfflineSyncService);
   private readonly connectivity = inject(ConnectivityService);
   private readonly push = inject(PushNotificationService);
+  private readonly pwa = inject(PwaLifecycleService);
 
   displayName = '';
   bio = '';
@@ -83,6 +85,9 @@ export class SettingsPage implements OnInit {
   readonly pushEnabled = signal(false);
   readonly pushBusy = this.push.busy;
   readonly pushError = this.push.lastError;
+  readonly canInstallPwa = this.pwa.canInstall;
+  readonly isPwaStandalone = this.pwa.isStandalone;
+  readonly installBusy = signal(false);
 
   readonly user = this.auth.user;
 
@@ -93,9 +98,18 @@ export class SettingsPage implements OnInit {
     this.avatarEmoji = u?.avatarEmoji ?? null;
     this.accentColor = u?.accentColor ?? 'violet';
     this.pushEnabled.set(this.push.isPreferredEnabled());
-    this.pushSupported.set(typeof window !== 'undefined' && 'serviceWorker' in navigator);
     this.refreshCodexMeta();
     this.offlineSync.refreshPendingCount();
+  }
+
+  async installPwa(): Promise<void> {
+    if (this.installBusy()) return;
+    this.installBusy.set(true);
+    try {
+      await this.pwa.promptInstall();
+    } finally {
+      this.installBusy.set(false);
+    }
   }
 
   async togglePushNotifications(event: Event): Promise<void> {

@@ -9,6 +9,8 @@ import { AuthService } from '@core/services/auth.service';
 import { OfflineSyncService } from '@core/services/offline-sync.service';
 import { NotificationService } from '@core/services/notification.service';
 import { PushNotificationService } from '@core/services/push-notification.service';
+import { ConnectivityService } from '@core/services/connectivity.service';
+import { PwaLifecycleService } from '@core/services/pwa-lifecycle.service';
 import { FriendChatDockComponent } from './shared/components/friend-chat-dock/friend-chat-dock';
 import { clearPersistedAiRateLimit } from '@core/utils/ai-rate-limit.util';
 
@@ -24,16 +26,31 @@ export class App implements OnInit {
   private readonly offlineSync = inject(OfflineSyncService);
   private readonly notifications = inject(NotificationService);
   private readonly push = inject(PushNotificationService);
+  private readonly connectivity = inject(ConnectivityService);
+  private readonly pwa = inject(PwaLifecycleService);
   protected readonly title = signal('DragonsGenerator.WEB');
+
+  readonly isOnline = this.connectivity.isOnline;
+  readonly pendingSyncCount = this.offlineSync.pendingCount;
+  readonly updateReady = this.pwa.updateReady;
 
   ngOnInit(): void {
     this.gameLabels.warmUp();
     this.auth.initSessionSync();
     this.offlineSync.init();
     this.notifications.init();
+    this.pwa.init();
     if (this.auth.isLoggedIn()) {
       this.push.initAfterLogin();
     }
     if (this.auth.isAdmin()) clearPersistedAiRateLimit();
+  }
+
+  applyUpdate(): void {
+    this.pwa.applyUpdate();
+  }
+
+  dismissUpdate(): void {
+    this.pwa.dismissUpdate();
   }
 }
