@@ -52,6 +52,7 @@ export class SettingsPage implements OnInit {
   readonly pendingSyncCount = this.offlineSync.pendingCount;
   readonly isOnline = this.connectivity.isOnline;
   readonly syncMessage = this.offlineSync.lastSyncMessage;
+  readonly syncError = this.offlineSync.lastSyncError;
 
   readonly user = this.auth.user;
 

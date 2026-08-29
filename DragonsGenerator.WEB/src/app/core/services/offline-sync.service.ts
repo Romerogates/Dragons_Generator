@@ -52,6 +52,7 @@ export class OfflineSyncService {
   readonly flushing = signal(false);
   readonly pendingCount = signal(0);
   readonly lastSyncMessage = signal<string | null>(null);
+  readonly lastSyncError = signal<string | null>(null);
 
   init(): void {
     this.refreshPendingCount();
@@ -152,6 +153,7 @@ export class OfflineSyncService {
     if (!queue.length) return;
 
     this.flushing.set(true);
+    this.lastSyncError.set(null);
     this.flushSequential(queue, 0).subscribe({
       next: (remaining) => {
         this.writeQueue(remaining);
@@ -159,11 +161,16 @@ export class OfflineSyncService {
         this.flushing.set(false);
         if (remaining.length === 0) {
           this.lastSyncMessage.set('Synchronisation terminée.');
+        } else if (!this.lastSyncError()) {
+          this.lastSyncMessage.set(
+            `${remaining.length} élément(s) restent en attente (réseau ou serveur).`,
+          );
         }
       },
       error: () => {
         this.flushing.set(false);
         this.refreshPendingCount();
+        this.lastSyncError.set('Synchronisation interrompue. Réessayez depuis les paramètres.');
       },
     });
   }
@@ -178,10 +185,9 @@ export class OfflineSyncService {
     return this.processItem(item).pipe(
       switchMap(() => this.flushSequential(queue, index + 1)),
       catchError((err: unknown) => {
-        if (this.isRetryable(err)) {
-          return of(queue.slice(index));
-        }
-        return this.flushSequential(queue, index + 1);
+        this.lastSyncError.set(this.formatSyncError(item, err));
+        // Ne jamais supprimer silencieusement : conserver l'élément en échec et la suite de la file.
+        return of(queue.slice(index));
       }),
     );
   }
@@ -236,11 +242,44 @@ export class OfflineSyncService {
     );
   }
 
-  private isRetryable(err: unknown): boolean {
+  private formatSyncError(item: SyncQueueItem, err: unknown): string {
+    const label = this.itemLabel(item);
     if (err instanceof HttpErrorResponse) {
-      return err.status === 0 || err.status >= 500;
+      if (err.status === 0) {
+        return `${label} : serveur inaccessible. Nouvel essai automatique au retour du réseau.`;
+      }
+      if (err.status === 401 || err.status === 403) {
+        return `${label} : session expirée ou droits insuffisants. Reconnectez-vous puis relancez la sync.`;
+      }
+      const reason = this.extractHttpError(err);
+      if (reason) {
+        return `${label} : ${reason} (élément conservé en file d'attente).`;
+      }
+      return `${label} : erreur ${err.status} (élément conservé en file d'attente).`;
     }
-    return true;
+    return `${label} : échec de synchronisation (élément conservé en file d'attente).`;
+  }
+
+  private itemLabel(item: SyncQueueItem): string {
+    switch (item.type) {
+      case 'character-save':
+        return `Personnage « ${item.character.name?.trim() || 'sans nom'} »`;
+      case 'campaign-create':
+        return `Campagne « ${item.title} » (création)`;
+      case 'campaign-update':
+        return `Campagne « ${item.title} » (mise à jour)`;
+    }
+  }
+
+  private extractHttpError(err: HttpErrorResponse): string | null {
+    const body = err.error as
+      | { errors?: { reason?: string }[] | Record<string, string[]>; message?: string }
+      | undefined;
+    if (Array.isArray(body?.errors) && body.errors[0]?.reason) {
+      return body.errors[0].reason;
+    }
+    if (body?.message) return body.message;
+    return null;
   }
 
   private pushQueue(item: SyncQueueItem): void {

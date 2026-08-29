@@ -123,6 +123,9 @@
         Synchroniser maintenant
       </button>
     }
+    @if (syncError()) {
+      <p class="text-sm text-amber-400 mt-3">{{ syncError() }}</p>
+    }
     @if (syncMessage()) {
       <p class="text-sm text-emerald-400 mt-3">{{ syncMessage() }}</p>
     }
