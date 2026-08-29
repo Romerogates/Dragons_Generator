@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
-import { CampaignCloudService } from '@core/services/campaign-cloud.service';
+import { NotificationService } from '@core/services/notification.service';
 
 export interface NavLink {
   label: string;
@@ -30,20 +30,19 @@ export interface NavLink {
 })
 export class Navbar implements OnInit, OnDestroy {
   readonly auth = inject(AuthService);
-  private readonly campaigns = inject(CampaignCloudService);
-  private readonly savedCountSignal = signal(0);
-  private readonly campaignCountSignal = signal(0);
+  private readonly notifications = inject(NotificationService);
   private routerSub?: Subscription;
 
   readonly mobileOpen = signal(false);
   readonly codexOpen = signal(false);
   readonly accountOpen = signal(false);
 
+  readonly friendsActionCount = this.notifications.friendsActionCount;
+  readonly campaignsActionCount = this.notifications.campaignsActionCount;
+  readonly notificationCount = this.notifications.totalCount;
+
   private savedScrollY = 0;
   private bodyScrollLocked = false;
-
-  readonly savedCount = this.savedCountSignal.asReadonly();
-  readonly campaignCount = this.campaignCountSignal.asReadonly();
 
   readonly codexLinks: NavLink[] = [
     { label: 'Espèces', path: '/species', icon: 'fluent-emoji:dna' },
@@ -62,35 +61,19 @@ export class Navbar implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.preloadNavbarIcons();
-    this.refreshCharacterCount();
-    this.refreshCampaignCount();
-    window.addEventListener('storage', this.onStorage);
-    window.addEventListener('focus', this.onFocus);
-
     this.routerSub = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
-      .subscribe(() => {
-        this.closeMenus();
-        this.refreshCharacterCount();
-        this.refreshCampaignCount();
-      });
+      .subscribe(() => this.closeMenus());
   }
 
   ngOnDestroy(): void {
     this.unlockBodyScroll();
-    window.removeEventListener('storage', this.onStorage);
-    window.removeEventListener('focus', this.onFocus);
     this.routerSub?.unsubscribe();
   }
 
-  private readonly onStorage = (): void => {
-    this.refreshCharacterCount();
-    this.refreshCampaignCount();
-  };
-  private readonly onFocus = (): void => {
-    this.refreshCharacterCount();
-    this.refreshCampaignCount();
-  };
+  formatBadgeCount(count: number): string {
+    return count > 9 ? '9+' : String(count);
+  }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
@@ -141,36 +124,11 @@ export class Navbar implements OnInit, OnDestroy {
     return this.codexLinks.some((l) => this.router.url.startsWith(l.path));
   }
 
-  refreshCharacterCount(): void {
-    const raw = localStorage.getItem('dragons-characters');
-    if (!raw) {
-      this.savedCountSignal.set(0);
-      return;
-    }
-    try {
-      const chars = JSON.parse(raw);
-      this.savedCountSignal.set(Array.isArray(chars) ? chars.length : 0);
-    } catch {
-      this.savedCountSignal.set(0);
-    }
-  }
-
-  refreshCampaignCount(): void {
-    if (!this.auth.isLoggedIn()) {
-      this.campaignCountSignal.set(0);
-      return;
-    }
-    this.campaigns.list().subscribe({
-      next: (list) => this.campaignCountSignal.set(list.length),
-      error: () => this.campaignCountSignal.set(0),
-    });
-  }
-
-  /** Preload menu icons so the mobile drawer does not pop them in while scrolling. */
   private preloadNavbarIcons(): void {
     if (typeof customElements === 'undefined') return;
 
     const icons = [
+      'mdi:bell-outline',
       'mdi:cog-outline',
       'fluent-emoji:hammer-and-pick',
       'fluent-emoji:busts-in-silhouette',
@@ -190,7 +148,6 @@ export class Navbar implements OnInit, OnDestroy {
     });
   }
 
-  /** Keep page still while the mobile drawer is open (incl. iOS). */
   private syncBodyScrollLock(): void {
     if (typeof document === 'undefined') return;
 

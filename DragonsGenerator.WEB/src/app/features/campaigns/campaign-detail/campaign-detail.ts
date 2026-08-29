@@ -16,6 +16,7 @@ import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { FriendsService } from '@core/services/friends.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
 import { AuthService } from '@core/services/auth.service';
+import { NotificationService } from '@core/services/notification.service';
 import { DataService } from '@core/services/data.service';
 import { forkJoin, catchError, map, of, Observable, throwError } from 'rxjs';
 import { CampaignPdfService, CreaturePrintEntry } from '@core/services/campaign-pdf.service';
@@ -57,6 +58,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   private friends = inject(FriendsService);
   private characters = inject(CharacterCloudService);
   private auth = inject(AuthService);
+  private notifications = inject(NotificationService);
   private data = inject(DataService);
   private pdf = inject(CampaignPdfService);
   private sanitizer = inject(DomSanitizer);
@@ -142,6 +144,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       next: (c) => {
         this.campaign.set(c);
         this.loading.set(false);
+        this.notifications.refresh();
       },
       error: () => {
         this.error.set('Campagne introuvable.');

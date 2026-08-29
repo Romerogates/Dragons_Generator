@@ -9,6 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FriendsService } from '@core/services/friends.service';
+import { NotificationService } from '@core/services/notification.service';
 import { AuthService } from '@core/services/auth.service';
 import { CampaignInvite, FriendRequest, FriendUser } from '@core/models/Campaign/campaign';
 
@@ -23,6 +24,7 @@ import { CampaignInvite, FriendRequest, FriendUser } from '@core/models/Campaign
 export class FriendsPage implements OnInit {
   private friends = inject(FriendsService);
   private auth = inject(AuthService);
+  private notifications = inject(NotificationService);
 
   readonly searchQuery = signal('');
   readonly searchResults = signal<FriendUser[]>([]);
@@ -43,6 +45,7 @@ export class FriendsPage implements OnInit {
     this.friends.listIncomingRequests().subscribe((r) => this.requests.set(r));
     this.friends.listSentRequests().subscribe((r) => this.sentRequests.set(r));
     this.friends.listCampaignInvites().subscribe((i) => this.campaignInvites.set(i));
+    this.notifications.refresh();
   }
 
   search(): void {

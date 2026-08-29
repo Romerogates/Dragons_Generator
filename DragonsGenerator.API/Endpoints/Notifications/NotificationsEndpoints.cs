@@ -1,0 +1,151 @@
+using DragonsGenerator.API.Persistence;
+using DragonsGenerator.API.Services;
+using FastEndpoints;
+using Microsoft.EntityFrameworkCore;
+
+namespace DragonsGenerator.API.Endpoints.Notifications;
+
+public record NotificationItemDto(
+    string Id,
+    string Type,
+    string Title,
+    string Message,
+    string ActionPath,
+    DateTimeOffset CreatedAt
+);
+
+public record NotificationsSummaryDto(
+    int FriendsActionCount,
+    int CampaignsActionCount,
+    int TotalCount,
+    List<NotificationItemDto> Items
+);
+
+public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest<NotificationsSummaryDto>
+{
+    public override void Configure() => Get("/me/notifications");
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var userId = AuthHelpers.GetUserId(User);
+        if (userId is null)
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        var items = new List<NotificationItemDto>();
+
+        var friendRequests = await db.Friendships.AsNoTracking()
+            .Where(f => f.AddresseeId == userId && f.Status == FriendStatuses.Pending)
+            .Include(f => f.Requester)
+            .OrderByDescending(f => f.CreatedAt)
+            .ToListAsync(ct);
+
+        foreach (var f in friendRequests)
+        {
+            items.Add(
+                new NotificationItemDto(
+                    $"friend-{f.Id}",
+                    "friend_request",
+                    "Demande d'ami",
+                    $"{f.Requester.DisplayName} souhaite vous ajouter.",
+                    "/friends",
+                    f.CreatedAt
+                )
+            );
+        }
+
+        var invites = await (
+            from i in db.CampaignInvites.AsNoTracking()
+            join c in db.Campaigns.AsNoTracking() on i.CampaignId equals c.Id
+            join u in db.Users.AsNoTracking() on i.InvitedByUserId equals u.Id
+            where i.InvitedUserId == userId && i.Status == CampaignInviteStatuses.Pending
+            orderby i.CreatedAt descending
+            select new { i.Id, i.CampaignId, c.Title, u.DisplayName, i.CreatedAt }
+        ).ToListAsync(ct);
+
+        foreach (var inv in invites)
+        {
+            items.Add(
+                new NotificationItemDto(
+                    $"invite-{inv.Id}",
+                    "campaign_invite",
+                    "Invitation campagne",
+                    $"{inv.DisplayName} vous invite à « {inv.Title} ».",
+                    "/campaigns",
+                    inv.CreatedAt
+                )
+            );
+        }
+
+        var managedCampaignIds = await db.Campaigns.AsNoTracking()
+            .Where(c => c.OwnerUserId == userId)
+            .Select(c => c.Id)
+            .ToListAsync(ct);
+        var dmCampaignIds = await db.CampaignMembers.AsNoTracking()
+            .Where(m => m.UserId == userId && m.Role == CampaignMemberRoles.Dm)
+            .Select(m => m.CampaignId)
+            .ToListAsync(ct);
+        var reviewCampaignIds = managedCampaignIds.Union(dmCampaignIds).Distinct().ToHashSet();
+
+        if (reviewCampaignIds.Count > 0)
+        {
+            var pendingProposals = await db.CampaignMembers.AsNoTracking()
+                .Where(m =>
+                    reviewCampaignIds.Contains(m.CampaignId)
+                    && m.UserId != userId
+                    && m.ProposalStatus == CharacterProposalStatuses.Pending
+                )
+                .Include(m => m.User)
+                .Include(m => m.Campaign)
+                .OrderByDescending(m => m.JoinedAt)
+                .ToListAsync(ct);
+
+            foreach (var m in pendingProposals)
+            {
+                var name = m.ProposedCharacterName ?? "un personnage";
+                items.Add(
+                    new NotificationItemDto(
+                        $"proposal-{m.Id}",
+                        "character_proposal",
+                        "Personnage à valider",
+                        $"{m.User.DisplayName} propose {name} dans « {m.Campaign.Title} ».",
+                        $"/campaigns/{m.CampaignId}",
+                        m.JoinedAt
+                    )
+                );
+            }
+        }
+
+        var rejected = await db.CampaignMembers.AsNoTracking()
+            .Where(m => m.UserId == userId && m.ProposalStatus == CharacterProposalStatuses.Rejected)
+            .Include(m => m.Campaign)
+            .OrderByDescending(m => m.JoinedAt)
+            .ToListAsync(ct);
+
+        foreach (var m in rejected)
+        {
+            items.Add(
+                new NotificationItemDto(
+                    $"rejected-{m.Id}",
+                    "proposal_rejected",
+                    "Personnage refusé",
+                    $"Votre proposition dans « {m.Campaign.Title} » a été refusée — proposez-en un autre.",
+                    $"/campaigns/{m.CampaignId}",
+                    m.JoinedAt
+                )
+            );
+        }
+
+        items = items.OrderByDescending(i => i.CreatedAt).ToList();
+
+        var friendsCount = items.Count(i => i.Type == "friend_request");
+        var campaignsCount = items.Count(i => i.Type != "friend_request");
+
+        await Send.OkAsync(
+            new NotificationsSummaryDto(friendsCount, campaignsCount, items.Count, items),
+            ct
+        );
+    }
+}

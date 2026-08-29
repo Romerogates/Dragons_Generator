@@ -12,6 +12,7 @@ import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { OfflineSyncService } from '@core/services/offline-sync.service';
 import { ConnectivityService } from '@core/services/connectivity.service';
 import { FriendsService } from '@core/services/friends.service';
+import { NotificationService } from '@core/services/notification.service';
 import { AuthService } from '@core/services/auth.service';
 import { DataService } from '@core/services/data.service';
 import { CampaignPdfService, CreaturePrintEntry } from '@core/services/campaign-pdf.service';
@@ -29,6 +30,7 @@ import { forkJoin, catchError, map, of, Observable } from 'rxjs';
 export class Campaigns implements OnInit {
   private campaigns = inject(CampaignCloudService);
   private friends = inject(FriendsService);
+  private notifications = inject(NotificationService);
   private auth = inject(AuthService);
   private router = inject(Router);
   private data = inject(DataService);
@@ -74,6 +76,7 @@ export class Campaigns implements OnInit {
       next: (items) => {
         this.list.set(this.offlineSync.mergeCampaignLists(items));
         this.loading.set(false);
+        this.notifications.refresh();
       },
       error: () => {
         this.list.set(this.offlineSync.mergeCampaignLists([]));

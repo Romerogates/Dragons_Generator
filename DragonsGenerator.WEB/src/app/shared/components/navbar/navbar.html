@@ -46,10 +46,16 @@
           <a
             routerLink="/friends"
             routerLinkActive="text-violet-400"
-            class="h-10 flex items-center px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-violet-400 hover:bg-slate-800/60 transition-colors"
+            class="relative h-10 flex items-center px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-violet-400 hover:bg-slate-800/60 transition-colors"
             (click)="closeMenus()"
           >
             Amis
+            @if (auth.isLoggedIn() && friendsActionCount() > 0) {
+              <span
+                class="absolute top-1 right-1 min-w-[1rem] h-4 px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none"
+                >{{ formatBadgeCount(friendsActionCount()) }}</span
+              >
+            }
           </a>
 
           <div class="relative" data-codex-menu>
@@ -120,32 +126,44 @@
               class="text-[10px] font-black uppercase tracking-widest text-slate-300 group-hover:text-emerald-400"
               >Héros</span
             >
-            @if (savedCount() > 0) {
-              <span
-                class="bg-emerald-950 text-emerald-400 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full border border-emerald-900"
-                >{{ savedCount() }}</span
-              >
-            }
           </a>
 
           <a
             routerLink="/campaigns"
             routerLinkActive="border-violet-500/50"
-            class="flex items-center gap-2 bg-[#171b22] border border-slate-700 hover:border-violet-500/50 px-3 sm:px-4 py-2 rounded-full shadow-inner group transition-[colors,transform,opacity,box-shadow] duration-200"
+            class="relative flex items-center gap-2 bg-[#171b22] border border-slate-700 hover:border-violet-500/50 px-3 sm:px-4 py-2 rounded-full shadow-inner group transition-[colors,transform,opacity,box-shadow] duration-200"
             (click)="closeMenus()"
           >
             <span
               class="text-[10px] font-black uppercase tracking-widest text-slate-300 group-hover:text-violet-400"
               >Campagnes</span
             >
-            @if (campaignCount() > 0) {
+            @if (auth.isLoggedIn() && campaignsActionCount() > 0) {
               <span
-                class="bg-violet-950 text-violet-400 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full border border-violet-900"
-                >{{ campaignCount() }}</span
+                class="absolute -top-1.5 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none border-2 border-[#1b2028]"
+                >{{ formatBadgeCount(campaignsActionCount()) }}</span
               >
             }
           </a>
         </div>
+
+        @if (auth.isLoggedIn()) {
+          <a
+            routerLink="/notifications"
+            routerLinkActive="text-amber-400 border-amber-700/50"
+            class="relative hidden sm:flex items-center justify-center w-10 h-10 rounded-xl border border-slate-700 text-slate-400 hover:text-amber-400 hover:border-amber-700/50 transition-colors"
+            title="Notifications"
+            (click)="closeMenus()"
+          >
+            <iconify-icon noobserver icon="mdi:bell-outline" class="text-lg"></iconify-icon>
+            @if (notificationCount() > 0) {
+              <span
+                class="absolute -top-1 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none border-2 border-[#1b2028]"
+                >{{ formatBadgeCount(notificationCount()) }}</span
+              >
+            }
+          </a>
+        }
 
         @if (auth.isLoggedIn()) {
           <a
@@ -173,6 +191,12 @@
               class="absolute right-0 mt-2 w-48 rounded-xl border border-slate-700 bg-[#171b22] shadow-xl py-2 z-50"
             >
               @if (auth.isLoggedIn()) {
+                <a
+                  routerLink="/notifications"
+                  class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
+                  (click)="closeMenus()"
+                  >Notifications</a
+                >
                 <a
                   routerLink="/settings"
                   class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
@@ -257,29 +281,27 @@
 
         <a
           routerLink="/characters"
-          class="flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
           (click)="closeMenus()"
         >
-          <span class="flex items-center gap-3">
-            <span class="text-xl"><iconify-icon noobserver icon="fluent-emoji:busts-in-silhouette"></iconify-icon></span>
-            <span class="text-sm font-bold tracking-wide">Mes héros</span>
-          </span>
-          @if (savedCount() > 0) {
-            <span class="bg-emerald-950 text-emerald-400 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full border border-emerald-900">{{ savedCount() }}</span>
-          }
+          <span class="text-xl"><iconify-icon noobserver icon="fluent-emoji:busts-in-silhouette"></iconify-icon></span>
+          <span class="text-sm font-bold tracking-wide">Mes héros</span>
         </a>
 
         <a
           routerLink="/campaigns"
-          class="flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+          class="relative flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
           (click)="closeMenus()"
         >
           <span class="flex items-center gap-3">
             <span class="text-xl"><iconify-icon noobserver icon="fluent-emoji:world-map"></iconify-icon></span>
             <span class="text-sm font-bold tracking-wide">Mes campagnes</span>
           </span>
-          @if (campaignCount() > 0) {
-            <span class="bg-violet-950 text-violet-400 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full border border-violet-900">{{ campaignCount() }}</span>
+          @if (auth.isLoggedIn() && campaignsActionCount() > 0) {
+            <span
+              class="bg-amber-500 text-slate-950 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full"
+              >{{ formatBadgeCount(campaignsActionCount()) }}</span
+            >
           }
         </a>
 
@@ -295,13 +317,37 @@
 
         @if (auth.isLoggedIn()) {
           <a
-            routerLink="/friends"
-            routerLinkActive="bg-violet-950/30 text-violet-400 border-violet-900/40"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+            routerLink="/notifications"
+            class="relative flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
             (click)="closeMenus()"
           >
-            <span class="text-xl"><iconify-icon noobserver icon="fluent-emoji:handshake"></iconify-icon></span>
-            <span class="text-sm font-bold tracking-wide">Amis</span>
+            <span class="flex items-center gap-3">
+              <span class="text-xl"><iconify-icon noobserver icon="mdi:bell-outline"></iconify-icon></span>
+              <span class="text-sm font-bold tracking-wide">Notifications</span>
+            </span>
+            @if (notificationCount() > 0) {
+              <span
+                class="bg-amber-500 text-slate-950 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full"
+                >{{ formatBadgeCount(notificationCount()) }}</span
+              >
+            }
+          </a>
+          <a
+            routerLink="/friends"
+            routerLinkActive="bg-violet-950/30 text-violet-400 border-violet-900/40"
+            class="relative flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+            (click)="closeMenus()"
+          >
+            <span class="flex items-center gap-3">
+              <span class="text-xl"><iconify-icon noobserver icon="fluent-emoji:handshake"></iconify-icon></span>
+              <span class="text-sm font-bold tracking-wide">Amis</span>
+            </span>
+            @if (friendsActionCount() > 0) {
+              <span
+                class="bg-amber-500 text-slate-950 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full"
+                >{{ formatBadgeCount(friendsActionCount()) }}</span
+              >
+            }
           </a>
         }
 
