@@ -65,6 +65,7 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopThreadPoll();
+    this.dock.destroy();
   }
 
   toggle(): void {
@@ -82,7 +83,6 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
 
   backToList(): void {
     this.dock.backToList();
-    this.notifications.refresh();
   }
 
   private startThread(friendId: string): void {

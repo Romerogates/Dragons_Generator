@@ -12,6 +12,8 @@ export interface ChatConversation {
   unreadCount: number;
 }
 
+type ChatHistoryState = { dgFriendChat: 'list' | 'thread'; friendId?: string };
+
 @Injectable({ providedIn: 'root' })
 export class FriendChatDockService {
   private readonly chat = inject(FriendChatService);
@@ -62,14 +64,31 @@ export class FriendChatDockService {
 
   private summaryPollTimer: ReturnType<typeof setInterval> | null = null;
   private initialized = false;
+  private historyDepth = 0;
+  private ignorePopState = false;
+  private readonly onPopState = (): void => this.handlePopState();
 
   init(): void {
     if (this.initialized) return;
     this.initialized = true;
+    if (typeof window !== 'undefined') {
+      window.addEventListener('popstate', this.onPopState);
+    }
     this.refreshList();
     this.summaryPollTimer = setInterval(() => {
       if (this.auth.isLoggedIn()) this.refreshSummaries();
     }, 20_000);
+  }
+
+  destroy(): void {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('popstate', this.onPopState);
+    }
+    if (this.summaryPollTimer) {
+      clearInterval(this.summaryPollTimer);
+      this.summaryPollTimer = null;
+    }
+    this.setBodyScrollLocked(false);
   }
 
   toggle(): void {
@@ -80,31 +99,42 @@ export class FriendChatDockService {
   open(): void {
     if (!this.auth.isLoggedIn()) return;
     this.isOpen.set(true);
+    this.view.set('list');
+    this.pushHistory({ dgFriendChat: 'list' });
+    this.setBodyScrollLocked(true);
     this.refreshList();
   }
 
   close(): void {
-    this.isOpen.set(false);
-    this.view.set('list');
-    this.activeFriendId.set(null);
-    this.activeFriendName.set('');
-    this.searchQuery.set('');
+    if (!this.isOpen()) return;
+    const steps = this.historyDepth;
+    this.applyClose();
+    if (steps > 0) {
+      this.ignorePopState = true;
+      history.go(-steps);
+      this.historyDepth = 0;
+      this.ignorePopState = false;
+    }
   }
 
   openThread(friendUserId: string, displayName: string): void {
     if (!this.auth.isLoggedIn()) return;
+    const wasOpen = this.isOpen();
     this.activeFriendId.set(friendUserId);
     this.activeFriendName.set(displayName);
     this.view.set('thread');
     this.isOpen.set(true);
+    if (!wasOpen) {
+      this.pushHistory({ dgFriendChat: 'list' });
+    }
+    this.pushHistory({ dgFriendChat: 'thread', friendId: friendUserId });
+    this.setBodyScrollLocked(true);
     this.refreshList();
   }
 
   backToList(): void {
-    this.view.set('list');
-    this.activeFriendId.set(null);
-    this.activeFriendName.set('');
-    this.refreshSummaries();
+    if (this.view() !== 'thread') return;
+    history.back();
   }
 
   refreshList(): void {
@@ -126,5 +156,48 @@ export class FriendChatDockService {
       return;
     }
     this.chat.listSummaries().subscribe((s) => this.summaries.set(s));
+  }
+
+  private handlePopState(): void {
+    if (this.ignorePopState) return;
+
+    if (this.view() === 'thread') {
+      this.applyBackToList();
+      this.historyDepth = Math.max(0, this.historyDepth - 1);
+      return;
+    }
+
+    if (this.isOpen()) {
+      this.applyClose();
+      this.historyDepth = 0;
+    }
+  }
+
+  private applyBackToList(): void {
+    this.view.set('list');
+    this.activeFriendId.set(null);
+    this.activeFriendName.set('');
+    this.refreshSummaries();
+  }
+
+  private applyClose(): void {
+    this.isOpen.set(false);
+    this.view.set('list');
+    this.activeFriendId.set(null);
+    this.activeFriendName.set('');
+    this.searchQuery.set('');
+    this.setBodyScrollLocked(false);
+  }
+
+  private pushHistory(state: ChatHistoryState): void {
+    if (typeof history === 'undefined') return;
+    history.pushState(state, '');
+    this.historyDepth++;
+  }
+
+  private setBodyScrollLocked(lock: boolean): void {
+    if (typeof document === 'undefined' || typeof window === 'undefined') return;
+    const mobile = window.matchMedia('(max-width: 1023px)').matches;
+    document.body.style.overflow = lock && mobile ? 'hidden' : '';
   }
 }
