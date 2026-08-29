@@ -1,3 +1,4 @@
+using DragonsGenerator.API.Endpoints.Campaigns;
 using DragonsGenerator.API.Persistence;
 using DragonsGenerator.API.Services;
 using FastEndpoints;
@@ -11,11 +12,13 @@ public record FriendMessageDto(
     string SenderDisplayName,
     Guid RecipientId,
     string Body,
+    string? AttachmentKind,
+    string? AttachmentPayload,
     DateTimeOffset CreatedAt,
     bool IsMine
 );
 
-public record SendFriendMessageBody(string Body);
+public record SendFriendMessageBody(string? Body, string? AttachmentKind, string? AttachmentPayload);
 
 public record FriendChatSummaryDto(
     Guid FriendUserId,
@@ -72,6 +75,8 @@ public class ListFriendMessagesEndpoint(AppDbContext db) : EndpointWithoutReques
                 m.Sender.DisplayName,
                 m.RecipientId,
                 m.Body,
+                m.AttachmentKind,
+                m.AttachmentPayload,
                 m.CreatedAt,
                 m.SenderId == userId
             ))
@@ -81,7 +86,7 @@ public class ListFriendMessagesEndpoint(AppDbContext db) : EndpointWithoutReques
     }
 }
 
-public class SendFriendMessageEndpoint(AppDbContext db) : Endpoint<SendFriendMessageBody, FriendMessageDto>
+public class SendFriendMessageEndpoint(AppDbContext db, PushNotificationService push) : Endpoint<SendFriendMessageBody, FriendMessageDto>
 {
     public override void Configure() => Post("/me/friends/{userId}/messages");
 
@@ -101,8 +106,16 @@ public class SendFriendMessageEndpoint(AppDbContext db) : Endpoint<SendFriendMes
             return;
         }
 
+        if (!FriendChatAttachmentHelper.TryValidate(
+                req.AttachmentKind, req.AttachmentPayload, out var kind, out var payload, out var attachError))
+        {
+            AddError(attachError!);
+            await Send.ErrorsAsync(cancellation: ct);
+            return;
+        }
+
         var body = (req.Body ?? "").Trim();
-        if (body.Length < 1)
+        if (body.Length < 1 && kind is null)
         {
             AddError("Message vide.");
             await Send.ErrorsAsync(cancellation: ct);
@@ -115,15 +128,50 @@ public class SendFriendMessageEndpoint(AppDbContext db) : Endpoint<SendFriendMes
             return;
         }
 
+        if (kind == FriendChatAttachmentHelper.Character && payload is not null)
+        {
+            using var doc = System.Text.Json.JsonDocument.Parse(payload);
+            var charId = Guid.Parse(doc.RootElement.GetProperty("characterId").GetString()!);
+            var owns = await db.Characters.AnyAsync(c => c.Id == charId && c.UserId == userId, ct);
+            if (!owns)
+            {
+                AddError("Fiche personnage inaccessible.");
+                await Send.ErrorsAsync(StatusCodes.Status403Forbidden, ct);
+                return;
+            }
+        }
+
+        if (kind == FriendChatAttachmentHelper.Campaign && payload is not null)
+        {
+            using var doc = System.Text.Json.JsonDocument.Parse(payload);
+            var campId = Guid.Parse(doc.RootElement.GetProperty("campaignId").GetString()!);
+            var (campaign, membership, isOwner) = await CampaignAccess.LoadAsync(db, campId, userId.Value, ct);
+            if (campaign is null || !CampaignAccess.CanView(isOwner, membership))
+            {
+                AddError("Campagne inaccessible.");
+                await Send.ErrorsAsync(StatusCodes.Status403Forbidden, ct);
+                return;
+            }
+        }
+
         var sender = await db.Users.AsNoTracking().FirstAsync(u => u.Id == userId, ct);
         var message = new FriendMessage
         {
             SenderId = userId.Value,
             RecipientId = friendUserId,
             Body = body,
+            AttachmentKind = kind,
+            AttachmentPayload = payload,
         };
         db.FriendMessages.Add(message);
         await db.SaveChangesAsync(ct);
+
+        await push.NotifyUserAsync(
+            friendUserId,
+            sender.DisplayName,
+            FriendChatAttachmentHelper.Preview(body, kind, payload),
+            $"/friends/chat/{userId}",
+            ct);
 
         await Send.OkAsync(
             new FriendMessageDto(
@@ -132,6 +180,8 @@ public class SendFriendMessageEndpoint(AppDbContext db) : Endpoint<SendFriendMes
                 sender.DisplayName,
                 message.RecipientId,
                 message.Body,
+                message.AttachmentKind,
+                message.AttachmentPayload,
                 message.CreatedAt,
                 true
             ),
@@ -233,7 +283,7 @@ public class ListFriendChatSummariesEndpoint(AppDbContext db)
                 new FriendChatSummaryDto(
                     friend.Id,
                     friend.DisplayName,
-                    last is null ? null : TrimPreview(last.Body),
+                    last is null ? null : FriendChatAttachmentHelper.Preview(last.Body, last.AttachmentKind, last.AttachmentPayload),
                     last?.CreatedAt,
                     unread
                 )
@@ -246,12 +296,6 @@ public class ListFriendChatSummariesEndpoint(AppDbContext db)
             .ToList();
 
         await Send.OkAsync(summaries, ct);
-    }
-
-    private static string TrimPreview(string body)
-    {
-        var trimmed = body.Trim();
-        return trimmed.Length <= 80 ? trimmed : trimmed[..77] + "…";
     }
 }
 

@@ -11,6 +11,15 @@ import {
   emptyCampaignData,
 } from '../models/Campaign/campaign';
 
+export interface CampaignActivityItem {
+  id: string;
+  actorUserId: string;
+  actorDisplayName: string;
+  kind: string;
+  payloadJson: string;
+  createdAt: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class CampaignCloudService {
   private readonly http = inject(HttpClient);
@@ -135,6 +144,13 @@ export class CampaignCloudService {
       encounters: Array.isArray(raw.encounters) ? raw.encounters : [],
       notes: raw.notes ?? base.notes,
       pregenCharacters: Array.isArray(raw.pregenCharacters) ? raw.pregenCharacters : [],
+      sessions: Array.isArray(raw.sessions) ? raw.sessions : [],
     };
+  }
+
+  listActivity(campaignId: string, limit = 50): Observable<CampaignActivityItem[]> {
+    return this.http.get<CampaignActivityItem[]>(`${this.api}/me/campaigns/${campaignId}/activity`, {
+      params: { limit: String(limit) },
+    });
   }
 }

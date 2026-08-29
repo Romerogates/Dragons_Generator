@@ -40,6 +40,17 @@ export interface CampaignPregen {
   status: CampaignPregenStatus;
 }
 
+export type CampaignSessionStatus = 'planned' | 'played' | 'cancelled';
+
+export interface CampaignSession {
+  id: string;
+  title: string;
+  scheduledAt: string;
+  location?: string;
+  notes?: string;
+  status: CampaignSessionStatus;
+}
+
 export interface CampaignData {
   setting: string;
   regionId: string | null;
@@ -51,6 +62,7 @@ export interface CampaignData {
   encounters: EncounterGroup[];
   notes: string;
   pregenCharacters: CampaignPregen[];
+  sessions: CampaignSession[];
 }
 
 export interface CampaignMember {
@@ -127,6 +139,7 @@ export function emptyCampaignData(partyLevel = 3): CampaignData {
     encounters: [],
     notes: '',
     pregenCharacters: [],
+    sessions: [],
   };
 }
 

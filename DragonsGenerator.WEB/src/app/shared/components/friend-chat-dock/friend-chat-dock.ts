@@ -12,18 +12,34 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { FriendChatDockService } from '@core/services/friend-chat-dock.service';
-import { FriendChatService, FriendMessage } from '@core/services/friend-chat.service';
+import {
+  FriendChatService,
+  FriendMessage,
+  FriendMessageAttachmentKind,
+} from '@core/services/friend-chat.service';
+import { CharacterCloudService, CloudCharacterSummary } from '@core/services/character-cloud.service';
+import { CampaignCloudService } from '@core/services/campaign-cloud.service';
+import { CampaignSummary } from '@core/models/Campaign/campaign';
 import { NotificationService } from '@core/services/notification.service';
 import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
 import { accentMessageClass, accentGradient } from '@core/utils/profile.util';
 import type { ChatConversation } from '@core/services/friend-chat-dock.service';
 
+interface ParsedAttachment {
+  kind: FriendMessageAttachmentKind;
+  characterId?: string;
+  characterName?: string;
+  campaignId?: string;
+  campaignTitle?: string;
+}
+
 @Component({
   selector: 'app-friend-chat-dock',
   standalone: true,
-  imports: [CommonModule, FormsModule, ProfileAvatarComponent],
+  imports: [CommonModule, FormsModule, RouterLink, ProfileAvatarComponent],
   templateUrl: './friend-chat-dock.html',
   styleUrl: './friend-chat-dock.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -33,6 +49,8 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
   private readonly auth = inject(AuthService);
   readonly dock = inject(FriendChatDockService);
   private readonly chat = inject(FriendChatService);
+  private readonly characters = inject(CharacterCloudService);
+  private readonly campaigns = inject(CampaignCloudService);
   private readonly notifications = inject(NotificationService);
 
   @ViewChild('threadScroll') threadScroll?: ElementRef<HTMLDivElement>;
@@ -43,6 +61,10 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
   readonly threadLoading = signal(false);
   readonly sending = signal(false);
   readonly threadError = signal<string | null>(null);
+  readonly shareMenuOpen = signal(false);
+  readonly shareLoading = signal(false);
+  readonly myCharacters = signal<CloudCharacterSummary[]>([]);
+  readonly myCampaigns = signal<CampaignSummary[]>([]);
 
   private messagePollTimer: ReturnType<typeof setInterval> | null = null;
   private activeThreadId: string | null = null;
@@ -57,6 +79,7 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
         this.messages.set([]);
         this.draft.set('');
         this.threadError.set(null);
+        this.shareMenuOpen.set(false);
       }
     });
   }
@@ -92,6 +115,67 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
     this.dock.backToList();
   }
 
+  toggleShareMenu(): void {
+    const next = !this.shareMenuOpen();
+    this.shareMenuOpen.set(next);
+    if (next) this.loadShareSources();
+  }
+
+  private loadShareSources(): void {
+    this.shareLoading.set(true);
+    this.characters.list().subscribe({
+      next: (list) => {
+        this.myCharacters.set(list);
+        this.campaigns.list().subscribe({
+          next: (camps) => {
+            this.myCampaigns.set(camps);
+            this.shareLoading.set(false);
+          },
+          error: () => this.shareLoading.set(false),
+        });
+      },
+      error: () => this.shareLoading.set(false),
+    });
+  }
+
+  shareCharacter(ch: CloudCharacterSummary): void {
+    this.sendAttachment('character', { characterId: ch.id, characterName: ch.name });
+  }
+
+  shareCampaign(c: CampaignSummary): void {
+    this.sendAttachment('campaign', { campaignId: c.id, campaignTitle: c.title });
+  }
+
+  private sendAttachment(
+    kind: FriendMessageAttachmentKind,
+    payload: Record<string, string>,
+  ): void {
+    const id = this.dock.activeFriendId();
+    if (!id || this.sending()) return;
+    this.sending.set(true);
+    this.threadError.set(null);
+    this.shareMenuOpen.set(false);
+    this.chat
+      .sendMessage(id, {
+        body: '',
+        attachmentKind: kind,
+        attachmentPayload: JSON.stringify(payload),
+      })
+      .subscribe({
+        next: (msg) => {
+          this.messages.update((list) => [...list, msg]);
+          this.sending.set(false);
+          this.scrollThreadToBottom();
+          this.dock.refreshSummaries();
+          this.notifications.refresh();
+        },
+        error: () => {
+          this.threadError.set('Partage impossible.');
+          this.sending.set(false);
+        },
+      });
+  }
+
   private startThread(friendId: string): void {
     if (this.activeThreadId === friendId && this.messagePollTimer) return;
     this.stopThreadPoll();
@@ -109,7 +193,7 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
     if (!id || !text || this.sending()) return;
     this.sending.set(true);
     this.threadError.set(null);
-    this.chat.sendMessage(id, text).subscribe({
+    this.chat.sendMessage(id, { body: text }).subscribe({
       next: (msg) => {
         this.draft.set('');
         this.messages.update((list) => [...list, msg]);
@@ -132,9 +216,27 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
     }
   }
 
-  initial(name: string): string {
-    const t = name.trim();
-    return t ? t[0]!.toUpperCase() : '?';
+  parseAttachment(msg: FriendMessage): ParsedAttachment | null {
+    if (!msg.attachmentKind || !msg.attachmentPayload) return null;
+    const kind = msg.attachmentKind as FriendMessageAttachmentKind;
+    if (kind !== 'character' && kind !== 'campaign') return null;
+    try {
+      const data = JSON.parse(msg.attachmentPayload) as Record<string, string>;
+      if (kind === 'character') {
+        return {
+          kind,
+          characterId: data['characterId'],
+          characterName: data['characterName'],
+        };
+      }
+      return {
+        kind,
+        campaignId: data['campaignId'],
+        campaignTitle: data['campaignTitle'],
+      };
+    } catch {
+      return { kind };
+    }
   }
 
   myMessageClass(): string {

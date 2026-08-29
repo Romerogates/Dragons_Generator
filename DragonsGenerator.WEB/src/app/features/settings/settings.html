@@ -146,6 +146,32 @@
   </section>
 
   <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6 mb-6">
+    <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
+      Notifications push
+    </h2>
+    <p class="text-xs text-slate-400 mb-4">
+      Recevez des alertes pour les messages, invitations et rappels de session (PWA installée, production).
+    </p>
+    @if (!pushSupported()) {
+      <p class="text-sm text-amber-300">Indisponible dans cet environnement (service worker requis).</p>
+    } @else {
+      <label class="flex items-center gap-3 cursor-pointer">
+        <input
+          type="checkbox"
+          class="w-4 h-4 rounded border-slate-600"
+          [checked]="pushEnabled()"
+          [disabled]="pushBusy()"
+          (change)="togglePushNotifications($event)"
+        />
+        <span class="text-sm text-slate-300">Activer les notifications push</span>
+      </label>
+      @if (pushError(); as err) {
+        <p class="text-sm text-red-400 mt-3">{{ err }}</p>
+      }
+    }
+  </section>
+
+  <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6 mb-6">
     <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Mode hors ligne</h2>
     <p class="text-xs text-slate-400 mb-4">
       Télécharge le Codex pour forger un personnage sans connexion. Les campagnes manuelles (sans IA) et les

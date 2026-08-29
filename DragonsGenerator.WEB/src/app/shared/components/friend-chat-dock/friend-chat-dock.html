@@ -154,14 +154,43 @@
                   @for (msg of messages(); track trackMessage($index, msg)) {
                     <div class="flex" [class.justify-end]="msg.isMine">
                       <div
-                        class="max-w-[82%] rounded-2xl px-3 py-2 text-[13px] leading-snug"
+                        class="max-w-[82%] rounded-2xl px-3 py-2 text-[13px] leading-snug space-y-2"
                         [class]="
                           msg.isMine
                             ? myMessageClass() + ' text-white rounded-br-sm'
                             : 'bg-[#252b36] text-slate-100 rounded-bl-sm'
                         "
                       >
-                        <p class="whitespace-pre-wrap break-words">{{ msg.body }}</p>
+                        @if (parseAttachment(msg); as att) {
+                          @if (att.kind === 'character' && att.characterId) {
+                            <a
+                              [routerLink]="['/characters']"
+                              class="block rounded-xl border border-white/10 bg-black/20 px-3 py-2 hover:bg-black/30 transition-colors"
+                            >
+                              <p class="text-[10px] font-black uppercase tracking-widest opacity-80">
+                                Fiche partagée
+                              </p>
+                              <p class="font-serif text-sm mt-0.5">
+                                {{ att.characterName || 'Personnage' }}
+                              </p>
+                            </a>
+                          } @else if (att.kind === 'campaign' && att.campaignId) {
+                            <a
+                              [routerLink]="['/campaigns', att.campaignId]"
+                              class="block rounded-xl border border-white/10 bg-black/20 px-3 py-2 hover:bg-black/30 transition-colors"
+                            >
+                              <p class="text-[10px] font-black uppercase tracking-widest opacity-80">
+                                Campagne partagée
+                              </p>
+                              <p class="font-serif text-sm mt-0.5">
+                                {{ att.campaignTitle || 'Campagne' }}
+                              </p>
+                            </a>
+                          }
+                        }
+                        @if (msg.body) {
+                          <p class="whitespace-pre-wrap break-words">{{ msg.body }}</p>
+                        }
                         <p
                           class="text-[9px] mt-1 opacity-70"
                           [class.text-right]="msg.isMine"
@@ -176,31 +205,83 @@
                 </div>
 
                 <form
-                  class="shrink-0 flex items-end gap-2 px-3 py-3 border-t border-slate-800 bg-[#171b22]"
+                  class="shrink-0 flex flex-col gap-2 px-3 py-3 border-t border-slate-800 bg-[#171b22]"
                   (ngSubmit)="send()"
                 >
-                  <textarea
-                    rows="1"
-                    maxlength="2000"
-                    placeholder="Message…"
-                    class="flex-1 min-w-0 max-h-24 rounded-3xl bg-[#252b36] border border-slate-700/60 px-4 py-2.5 text-sm resize-none outline-none focus:border-violet-600/60"
-                    [value]="draft()"
-                    (input)="draft.set($any($event.target).value)"
-                    (keydown)="onKeydown($event)"
-                  ></textarea>
-                  <button
-                    type="submit"
-                    class="shrink-0 w-10 h-10 rounded-full text-white flex items-center justify-center disabled:opacity-40 hover:opacity-90 transition-opacity"
-                    [ngClass]="myMessageClass()"
-                    [disabled]="sending() || !draft().trim()"
-                    aria-label="Envoyer"
-                  >
-                    @if (sending()) {
-                      <span class="text-xs">…</span>
-                    } @else {
-                      <iconify-icon icon="mdi:send" class="text-lg"></iconify-icon>
-                    }
-                  </button>
+                  @if (shareMenuOpen()) {
+                    <div class="rounded-xl border border-slate-700 bg-[#141820] p-3 max-h-40 overflow-y-auto">
+                      <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
+                        Partager
+                      </p>
+                      @if (shareLoading()) {
+                        <p class="text-xs text-slate-500 italic">Chargement…</p>
+                      } @else {
+                        @if (myCharacters().length) {
+                          <p class="text-[9px] uppercase text-slate-600 mb-1">Personnages</p>
+                          <div class="flex flex-wrap gap-1 mb-2">
+                            @for (ch of myCharacters(); track ch.id) {
+                              <button
+                                type="button"
+                                class="px-2 py-1 rounded-lg text-[10px] border border-slate-700 text-slate-300 hover:border-violet-500/50"
+                                (click)="shareCharacter(ch)"
+                              >
+                                {{ ch.name }}
+                              </button>
+                            }
+                          </div>
+                        }
+                        @if (myCampaigns().length) {
+                          <p class="text-[9px] uppercase text-slate-600 mb-1">Campagnes</p>
+                          <div class="flex flex-wrap gap-1">
+                            @for (c of myCampaigns(); track c.id) {
+                              <button
+                                type="button"
+                                class="px-2 py-1 rounded-lg text-[10px] border border-slate-700 text-slate-300 hover:border-sky-500/50"
+                                (click)="shareCampaign(c)"
+                              >
+                                {{ c.title }}
+                              </button>
+                            }
+                          </div>
+                        }
+                        @if (!myCharacters().length && !myCampaigns().length) {
+                          <p class="text-xs text-slate-500 italic">Aucun élément à partager.</p>
+                        }
+                      }
+                    </div>
+                  }
+                  <div class="flex items-end gap-2">
+                    <button
+                      type="button"
+                      class="shrink-0 w-10 h-10 rounded-full border border-slate-700 text-slate-400 flex items-center justify-center hover:border-violet-500/50 hover:text-violet-300"
+                      aria-label="Partager"
+                      (click)="toggleShareMenu()"
+                    >
+                      <iconify-icon icon="mdi:paperclip" class="text-lg"></iconify-icon>
+                    </button>
+                    <textarea
+                      rows="1"
+                      maxlength="2000"
+                      placeholder="Message…"
+                      class="flex-1 min-w-0 max-h-24 rounded-3xl bg-[#252b36] border border-slate-700/60 px-4 py-2.5 text-sm resize-none outline-none focus:border-violet-600/60"
+                      [value]="draft()"
+                      (input)="draft.set($any($event.target).value)"
+                      (keydown)="onKeydown($event)"
+                    ></textarea>
+                    <button
+                      type="submit"
+                      class="shrink-0 w-10 h-10 rounded-full text-white flex items-center justify-center disabled:opacity-40 hover:opacity-90 transition-opacity"
+                      [ngClass]="myMessageClass()"
+                      [disabled]="sending() || !draft().trim()"
+                      aria-label="Envoyer"
+                    >
+                      @if (sending()) {
+                        <span class="text-xs">…</span>
+                      } @else {
+                        <iconify-icon icon="mdi:send" class="text-lg"></iconify-icon>
+                      }
+                    </button>
+                  </div>
                 </form>
               </div>
             }

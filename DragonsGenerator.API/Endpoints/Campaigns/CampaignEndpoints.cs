@@ -42,47 +42,6 @@ public record SendCampaignInviteBody(Guid UserId);
 public record ProposeCharacterBody(Guid CharacterId);
 public record AwardXpBody(Guid MemberId, int Xp);
 
-static file class CampaignJsonHelpers
-{
-    public static string? RegionNameFromJson(string json)
-    {
-        try
-        {
-            using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(json) ? "{}" : json);
-            if (doc.RootElement.TryGetProperty("regionName", out var rn))
-            {
-                var name = rn.GetString();
-                return string.IsNullOrWhiteSpace(name) ? null : name;
-            }
-        }
-        catch { /* ignore malformed JSON */ }
-
-        return null;
-    }
-}
-
-static file class CampaignAccess
-{
-    public static async Task<(CampaignRecord? Campaign, CampaignMember? Membership, bool IsOwner)> LoadAsync(
-        AppDbContext db, Guid campaignId, Guid userId, CancellationToken ct)
-    {
-        var campaign = await db.Campaigns
-            .Include(c => c.Members).ThenInclude(m => m.User)
-            .FirstOrDefaultAsync(c => c.Id == campaignId, ct);
-        if (campaign is null) return (null, null, false);
-
-        var isOwner = campaign.OwnerUserId == userId;
-        var membership = campaign.Members.FirstOrDefault(m => m.UserId == userId);
-        return (campaign, membership, isOwner);
-    }
-
-    public static bool CanView(bool isOwner, CampaignMember? membership) =>
-        isOwner || membership is not null;
-
-    public static bool CanEdit(bool isOwner, CampaignMember? membership) =>
-        isOwner || membership?.Role == CampaignMemberRoles.Dm;
-}
-
 public class ListMyCampaignsEndpoint(AppDbContext db) : EndpointWithoutRequest<List<CampaignSummaryDto>>
 {
     public override void Configure() => Get("/me/campaigns");
@@ -168,6 +127,7 @@ public class GetMyCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest<Cam
 
         using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(campaign.JsonData) ? "{}" : campaign.JsonData);
         var role = isOwner ? CampaignMemberRoles.Dm : membership!.Role;
+        var data = isOwner ? doc.RootElement.Clone() : CampaignJsonHelpers.FilterForPlayerView(doc.RootElement);
 
         var members = campaign.Members.Select(m => new CampaignMemberDto(
             m.Id, m.UserId, m.User.DisplayName, m.Role, m.ProposalStatus,
@@ -176,7 +136,7 @@ public class GetMyCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest<Cam
             m.XpEarnedInCampaign)).ToList();
 
         await Send.OkAsync(new CampaignDetailDto(
-            campaign.Id, campaign.Title, doc.RootElement.Clone(), role, isOwner, campaign.UpdatedAt, members), ct);
+            campaign.Id, campaign.Title, data, role, isOwner, campaign.UpdatedAt, members), ct);
     }
 }
 
@@ -247,7 +207,17 @@ public class UpdateCampaignEndpoint(AppDbContext db) : Endpoint<UpsertCampaignRe
         if (!string.IsNullOrWhiteSpace(req.Title))
             campaign.Title = req.Title.Trim();
         if (req.Data.ValueKind != JsonValueKind.Undefined)
-            campaign.JsonData = req.Data.GetRawText();
+        {
+            var merged = CampaignJsonHelpers.StripDmOnlyFieldsFromUpdate(req.Data, campaign.JsonData, isOwner);
+            var newJson = merged.GetRawText();
+            if (isOwner && CampaignJsonHelpers.HasSessionChanges(campaign.JsonData, newJson))
+            {
+                await CampaignActivityService.LogAsync(
+                    db, campaign.Id, userId.Value, CampaignActivityKinds.SessionUpdated,
+                    new { message = "Session planifiée ou modifiée" }, ct);
+            }
+            campaign.JsonData = newJson;
+        }
         campaign.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
 
@@ -319,7 +289,7 @@ public class ListCampaignInvitesEndpoint(AppDbContext db) : EndpointWithoutReque
     }
 }
 
-public class SendCampaignInviteEndpoint(AppDbContext db) : Endpoint<SendCampaignInviteBody>
+public class SendCampaignInviteEndpoint(AppDbContext db, PushNotificationService push) : Endpoint<SendCampaignInviteBody>
 {
     public override void Configure() => Post("/me/campaigns/{id}/invites");
 
@@ -376,6 +346,18 @@ public class SendCampaignInviteEndpoint(AppDbContext db) : Endpoint<SendCampaign
             InvitedByUserId = userId.Value,
         });
         await db.SaveChangesAsync(ct);
+
+        var inviter = await db.Users.AsNoTracking().FirstAsync(u => u.Id == userId, ct);
+        await CampaignActivityService.LogAsync(
+            db, campaignId, userId.Value, CampaignActivityKinds.InviteSent,
+            new { userId = req.UserId, campaignTitle = campaign.Title }, ct);
+        await push.NotifyUserAsync(
+            req.UserId,
+            "Invitation campagne",
+            $"{inviter.DisplayName} vous invite à « {campaign.Title} »",
+            "/friends",
+            ct);
+
         await Send.NoContentAsync(ct);
     }
 }
@@ -413,6 +395,12 @@ public class AcceptCampaignInviteEndpoint(AppDbContext db) : EndpointWithoutRequ
         });
         invite.Campaign.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
+
+        var user = await db.Users.AsNoTracking().FirstAsync(u => u.Id == userId, ct);
+        await CampaignActivityService.LogAsync(
+            db, invite.CampaignId, userId.Value, CampaignActivityKinds.InviteAccepted,
+            new { displayName = user.DisplayName, campaignTitle = invite.Campaign.Title }, ct);
+
         await Send.NoContentAsync(ct);
     }
 }

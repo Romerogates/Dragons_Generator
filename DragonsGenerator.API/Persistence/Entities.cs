@@ -34,6 +34,7 @@ public class AppUser
     public List<FriendMessage> FriendMessagesSent { get; set; } = [];
     public List<FriendMessage> FriendMessagesReceived { get; set; } = [];
     public List<FriendChatRead> FriendChatReads { get; set; } = [];
+    public List<PushSubscription> PushSubscriptions { get; set; } = [];
 }
 
 public class CharacterRecord
@@ -90,6 +91,8 @@ public class FriendMessage
     public Guid RecipientId { get; set; }
     public AppUser Recipient { get; set; } = null!;
     public string Body { get; set; } = "";
+    public string? AttachmentKind { get; set; }
+    public string? AttachmentPayload { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }
 
@@ -114,6 +117,7 @@ public class CampaignRecord
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
     public List<CampaignMember> Members { get; set; } = [];
     public List<CampaignInvite> Invites { get; set; } = [];
+    public List<CampaignActivity> Activities { get; set; } = [];
 }
 
 public static class CampaignMemberRoles
@@ -165,5 +169,28 @@ public class CampaignInvite
     public AppUser InvitedUser { get; set; } = null!;
     public Guid InvitedByUserId { get; set; }
     public string Status { get; set; } = CampaignInviteStatuses.Pending;
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+}
+
+public class PushSubscription
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid UserId { get; set; }
+    public AppUser User { get; set; } = null!;
+    public string Endpoint { get; set; } = "";
+    public string P256dh { get; set; } = "";
+    public string Auth { get; set; } = "";
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+}
+
+public class CampaignActivity
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid CampaignId { get; set; }
+    public CampaignRecord Campaign { get; set; } = null!;
+    public Guid ActorUserId { get; set; }
+    public AppUser Actor { get; set; } = null!;
+    public string Kind { get; set; } = "";
+    public string PayloadJson { get; set; } = "{}";
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }

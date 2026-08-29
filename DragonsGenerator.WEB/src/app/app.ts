@@ -8,6 +8,7 @@ import { GameLabelCatalogService } from '@core/services/game-label-catalog.servi
 import { AuthService } from '@core/services/auth.service';
 import { OfflineSyncService } from '@core/services/offline-sync.service';
 import { NotificationService } from '@core/services/notification.service';
+import { PushNotificationService } from '@core/services/push-notification.service';
 import { FriendChatDockComponent } from './shared/components/friend-chat-dock/friend-chat-dock';
 import { clearPersistedAiRateLimit } from '@core/utils/ai-rate-limit.util';
 
@@ -22,6 +23,7 @@ export class App implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly offlineSync = inject(OfflineSyncService);
   private readonly notifications = inject(NotificationService);
+  private readonly push = inject(PushNotificationService);
   protected readonly title = signal('DragonsGenerator.WEB');
 
   ngOnInit(): void {
@@ -29,6 +31,9 @@ export class App implements OnInit {
     this.auth.initSessionSync();
     this.offlineSync.init();
     this.notifications.init();
+    if (this.auth.isLoggedIn()) {
+      this.push.initAfterLogin();
+    }
     if (this.auth.isAdmin()) clearPersistedAiRateLimit();
   }
 }

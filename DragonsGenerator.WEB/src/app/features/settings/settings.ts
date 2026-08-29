@@ -12,6 +12,7 @@ import { AuthService } from '@core/services/auth.service';
 import { OfflineCodexService } from '@core/services/offline-codex.service';
 import { OfflineSyncService } from '@core/services/offline-sync.service';
 import { ConnectivityService } from '@core/services/connectivity.service';
+import { PushNotificationService } from '@core/services/push-notification.service';
 import { PasswordFieldComponent } from '@shared/components/password-field/password-field';
 import { RouterLink } from '@angular/router';
 import {
@@ -34,6 +35,7 @@ export class SettingsPage implements OnInit {
   private readonly offlineCodex = inject(OfflineCodexService);
   private readonly offlineSync = inject(OfflineSyncService);
   private readonly connectivity = inject(ConnectivityService);
+  private readonly push = inject(PushNotificationService);
 
   displayName = '';
   bio = '';
@@ -77,6 +79,11 @@ export class SettingsPage implements OnInit {
   readonly deleteError = signal<string | null>(null);
   readonly showDeleteForm = signal(false);
 
+  readonly pushSupported = this.push.supported;
+  readonly pushEnabled = signal(false);
+  readonly pushBusy = this.push.busy;
+  readonly pushError = this.push.lastError;
+
   readonly user = this.auth.user;
 
   ngOnInit(): void {
@@ -85,8 +92,16 @@ export class SettingsPage implements OnInit {
     this.bio = u?.bio ?? '';
     this.avatarEmoji = u?.avatarEmoji ?? null;
     this.accentColor = u?.accentColor ?? 'violet';
+    this.pushEnabled.set(this.push.isPreferredEnabled());
+    this.pushSupported.set(typeof window !== 'undefined' && 'serviceWorker' in navigator);
     this.refreshCodexMeta();
     this.offlineSync.refreshPendingCount();
+  }
+
+  async togglePushNotifications(event: Event): Promise<void> {
+    const checked = (event.target as HTMLInputElement).checked;
+    const ok = await this.push.setEnabled(checked);
+    this.pushEnabled.set(ok ? checked : !checked);
   }
 
   previewGradient(): string {

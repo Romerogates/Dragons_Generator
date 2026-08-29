@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { PendingCharacterSaveService } from '@core/services/pending-character-save.service';
+import { PushNotificationService } from '@core/services/push-notification.service';
 import { PasswordFieldComponent } from '@shared/components/password-field/password-field';
 import { isLocalDevHost, mailhogWebUrl } from '@core/utils/local-dev.util';
 
@@ -27,6 +28,7 @@ export class LoginPage implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly pendingSave = inject(PendingCharacterSaveService);
+  private readonly push = inject(PushNotificationService);
 
   email = '';
   password = '';
@@ -63,6 +65,7 @@ export class LoginPage implements OnInit {
     this.loading.set(true);
     this.auth.login(this.email.trim(), this.password).subscribe({
       next: () => {
+        this.push.initAfterLogin();
         this.pendingSave.flushIfPossible().subscribe({
           next: (saved) => {
             this.loading.set(false);

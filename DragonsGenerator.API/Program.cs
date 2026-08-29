@@ -32,6 +32,16 @@ builder.Services.PostConfigure<AdminSeedOptions>(opts =>
         opts.Password = "AdminDragons!2026";
 });
 builder.Services.Configure<DevSeedOptions>(builder.Configuration.GetSection("DevSeed"));
+builder.Services.Configure<VapidOptions>(builder.Configuration.GetSection("Vapid"));
+builder.Services.PostConfigure<VapidOptions>(opts =>
+{
+    if (builder.Environment.IsProduction()) return;
+    if (string.IsNullOrWhiteSpace(opts.PublicKey))
+    {
+        opts.PublicKey = "BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrx_kLQDh0k3q8VbwYmkWTKE4rAx8FK_4KFdq2FQ";
+        opts.PrivateKey = "UUxI4O8-FbRqjAplFgKQXg7E7y1PW0zDnB2OQ6k8fY0";
+    }
+});
 
 var smtpHost = builder.Configuration["Smtp:Host"] ?? "log";
 
@@ -80,6 +90,7 @@ builder.Services.AddSingleton<IndexedDataStore>();
 builder.Services.AddSingleton<GameDataRepository>();
 builder.Services.AddSingleton<GroqRequestCoordinator>();
 builder.Services.AddSingleton<HybridAiService>();
+builder.Services.AddScoped<PushNotificationService>();
 builder.Services.AddHttpClient("Groq", client =>
 {
     client.Timeout = TimeSpan.FromSeconds(120);

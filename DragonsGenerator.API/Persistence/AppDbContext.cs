@@ -13,6 +13,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<CampaignInvite> CampaignInvites => Set<CampaignInvite>();
     public DbSet<FriendMessage> FriendMessages => Set<FriendMessage>();
     public DbSet<FriendChatRead> FriendChatReads => Set<FriendChatRead>();
+    public DbSet<PushSubscription> PushSubscriptions => Set<PushSubscription>();
+    public DbSet<CampaignActivity> CampaignActivities => Set<CampaignActivity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -104,6 +106,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<FriendMessage>(e =>
         {
             e.Property(x => x.Body).HasMaxLength(2000);
+            e.Property(x => x.AttachmentKind).HasMaxLength(32);
+            e.Property(x => x.AttachmentPayload).HasMaxLength(2000);
             e.HasIndex(x => new { x.SenderId, x.RecipientId, x.CreatedAt });
             e.HasOne(x => x.Sender)
                 .WithMany(u => u.FriendMessagesSent)
@@ -125,6 +129,32 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasOne(x => x.FriendUser)
                 .WithMany()
                 .HasForeignKey(x => x.FriendUserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<PushSubscription>(e =>
+        {
+            e.HasIndex(x => new { x.UserId, x.Endpoint }).IsUnique();
+            e.Property(x => x.Endpoint).HasMaxLength(2048);
+            e.Property(x => x.P256dh).HasMaxLength(256);
+            e.Property(x => x.Auth).HasMaxLength(128);
+            e.HasOne(x => x.User)
+                .WithMany(u => u.PushSubscriptions)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<CampaignActivity>(e =>
+        {
+            e.HasIndex(x => new { x.CampaignId, x.CreatedAt });
+            e.Property(x => x.Kind).HasMaxLength(64);
+            e.HasOne(x => x.Campaign)
+                .WithMany(c => c.Activities)
+                .HasForeignKey(x => x.CampaignId)
+                .OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(x => x.Actor)
+                .WithMany()
+                .HasForeignKey(x => x.ActorUserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }

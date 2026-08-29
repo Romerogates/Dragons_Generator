@@ -35,6 +35,7 @@ describe('StoryBuilderService', () => {
       encounters: [{ id: 'enc-1', name: 'Combat', creatures: [] }],
       notes: 'Note MJ',
       pregenCharacters: [],
+      sessions: [],
     },
   };
 

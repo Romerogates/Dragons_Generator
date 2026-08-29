@@ -3,11 +3,70 @@ using Microsoft.EntityFrameworkCore;
 namespace DragonsGenerator.API.Persistence;
 
 /// <summary>
-/// EnsureCreated ne met pas à jour une base existante — on crée les nouvelles tables à la main si besoin.
+/// Migrations versionnées — chaque migration s'exécute une seule fois (table __DbMigrations).
 /// </summary>
-public static class DbSchemaUpgrader
+public static class DbMigrationRunner
 {
-    public static async Task EnsureCampaignAndSocialTablesAsync(AppDbContext db, CancellationToken ct = default)
+    public static async Task ApplyAllAsync(AppDbContext db, CancellationToken ct = default)
+    {
+        await EnsureHistoryTableAsync(db, ct);
+        var applied = await GetAppliedIdsAsync(db, ct);
+
+        foreach (var migration in Migrations)
+        {
+            if (applied.Contains(migration.Id)) continue;
+            await migration.Apply(db, ct);
+            await RecordAsync(db, migration.Id, ct);
+        }
+    }
+
+    private static readonly Migration[] Migrations =
+    [
+        new("001_campaign_social_tables", Apply001CampaignSocialTablesAsync),
+        new("002_support_user_columns", Apply002SupportUserColumnsAsync),
+        new("003_profile_columns", Apply003ProfileColumnsAsync),
+        new("004_friend_chat_tables", Apply004FriendChatTablesAsync),
+        new("005_push_subscriptions", Apply005PushSubscriptionsAsync),
+        new("006_campaign_activity", Apply006CampaignActivityAsync),
+        new("007_message_attachments", Apply007MessageAttachmentsAsync),
+    ];
+
+    private sealed record Migration(string Id, Func<AppDbContext, CancellationToken, Task> Apply);
+
+    private static async Task EnsureHistoryTableAsync(AppDbContext db, CancellationToken ct)
+    {
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            CREATE TABLE IF NOT EXISTS "__DbMigrations" (
+                "Id" TEXT NOT NULL CONSTRAINT "PK___DbMigrations" PRIMARY KEY,
+                "AppliedAt" TEXT NOT NULL
+            );
+            """,
+            ct);
+    }
+
+    private static async Task<HashSet<string>> GetAppliedIdsAsync(AppDbContext db, CancellationToken ct)
+    {
+        var list = new HashSet<string>(StringComparer.Ordinal);
+        await using var conn = db.Database.GetDbConnection();
+        await conn.OpenAsync(ct);
+        await using var cmd = conn.CreateCommand();
+        cmd.CommandText = """SELECT "Id" FROM "__DbMigrations";""";
+        await using var reader = await cmd.ExecuteReaderAsync(ct);
+        while (await reader.ReadAsync(ct))
+            list.Add(reader.GetString(0));
+        return list;
+    }
+
+    private static async Task RecordAsync(AppDbContext db, string id, CancellationToken ct)
+    {
+        var appliedAt = DateTimeOffset.UtcNow.ToString("O");
+        await db.Database.ExecuteSqlInterpolatedAsync(
+            $"""INSERT INTO "__DbMigrations" ("Id", "AppliedAt") VALUES ({id}, {appliedAt});""",
+            ct);
+    }
+
+    private static async Task Apply001CampaignSocialTablesAsync(AppDbContext db, CancellationToken ct)
     {
         await db.Database.ExecuteSqlRawAsync(
             """
@@ -64,19 +123,20 @@ public static class DbSchemaUpgrader
             CREATE INDEX IF NOT EXISTS "IX_CampaignInvites_CampaignId_InvitedUserId_Status" ON "CampaignInvites" ("CampaignId", "InvitedUserId", "Status");
             """,
             ct);
+    }
 
+    private static async Task Apply002SupportUserColumnsAsync(AppDbContext db, CancellationToken ct)
+    {
         await TryAddColumnAsync(db, "SupportTickets", "CharacterId", "TEXT NULL", ct);
         await TryAddColumnAsync(db, "SupportTickets", "CharacterName", "TEXT NULL", ct);
         await TryAddColumnAsync(db, "Users", "AcceptedTermsAt", "TEXT NULL", ct);
+    }
+
+    private static async Task Apply003ProfileColumnsAsync(AppDbContext db, CancellationToken ct)
+    {
         await TryAddColumnAsync(db, "Users", "Bio", "TEXT NULL", ct);
         await TryAddColumnAsync(db, "Users", "AvatarEmoji", "TEXT NULL", ct);
         await TryAddColumnAsync(db, "Users", "AccentColor", "TEXT NOT NULL DEFAULT 'violet'", ct);
-        await BackfillUserProfileDefaultsAsync(db, ct);
-        await EnsureFriendChatTablesAsync(db, ct);
-    }
-
-    private static async Task BackfillUserProfileDefaultsAsync(AppDbContext db, CancellationToken ct)
-    {
         await db.Database.ExecuteSqlRawAsync(
             """
             UPDATE "Users" SET "AccentColor" = 'violet' WHERE "AccentColor" IS NULL OR "AccentColor" = '';
@@ -84,7 +144,7 @@ public static class DbSchemaUpgrader
             ct);
     }
 
-    private static async Task EnsureFriendChatTablesAsync(AppDbContext db, CancellationToken ct)
+    private static async Task Apply004FriendChatTablesAsync(AppDbContext db, CancellationToken ct)
     {
         await db.Database.ExecuteSqlRawAsync(
             """
@@ -111,20 +171,61 @@ public static class DbSchemaUpgrader
             ct);
     }
 
+    private static async Task Apply005PushSubscriptionsAsync(AppDbContext db, CancellationToken ct)
+    {
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            CREATE TABLE IF NOT EXISTS "PushSubscriptions" (
+                "Id" TEXT NOT NULL CONSTRAINT "PK_PushSubscriptions" PRIMARY KEY,
+                "UserId" TEXT NOT NULL,
+                "Endpoint" TEXT NOT NULL,
+                "P256dh" TEXT NOT NULL,
+                "Auth" TEXT NOT NULL,
+                "CreatedAt" TEXT NOT NULL,
+                CONSTRAINT "FK_PushSubscriptions_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE
+            );
+            CREATE UNIQUE INDEX IF NOT EXISTS "IX_PushSubscriptions_UserId_Endpoint" ON "PushSubscriptions" ("UserId", "Endpoint");
+            """,
+            ct);
+    }
+
+    private static async Task Apply006CampaignActivityAsync(AppDbContext db, CancellationToken ct)
+    {
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            CREATE TABLE IF NOT EXISTS "CampaignActivities" (
+                "Id" TEXT NOT NULL CONSTRAINT "PK_CampaignActivities" PRIMARY KEY,
+                "CampaignId" TEXT NOT NULL,
+                "ActorUserId" TEXT NOT NULL,
+                "Kind" TEXT NOT NULL,
+                "PayloadJson" TEXT NOT NULL,
+                "CreatedAt" TEXT NOT NULL,
+                CONSTRAINT "FK_CampaignActivities_Campaigns_CampaignId" FOREIGN KEY ("CampaignId") REFERENCES "Campaigns" ("Id") ON DELETE CASCADE,
+                CONSTRAINT "FK_CampaignActivities_Users_ActorUserId" FOREIGN KEY ("ActorUserId") REFERENCES "Users" ("Id") ON DELETE CASCADE
+            );
+            CREATE INDEX IF NOT EXISTS "IX_CampaignActivities_CampaignId_CreatedAt" ON "CampaignActivities" ("CampaignId", "CreatedAt");
+            """,
+            ct);
+    }
+
+    private static async Task Apply007MessageAttachmentsAsync(AppDbContext db, CancellationToken ct)
+    {
+        await TryAddColumnAsync(db, "FriendMessages", "AttachmentKind", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "FriendMessages", "AttachmentPayload", "TEXT NULL", ct);
+    }
+
     private static async Task TryAddColumnAsync(
         AppDbContext db,
         string table,
         string column,
         string definition,
-        CancellationToken ct
-    )
+        CancellationToken ct)
     {
         try
         {
             await db.Database.ExecuteSqlRawAsync(
                 $"""ALTER TABLE "{table}" ADD COLUMN "{column}" {definition};""",
-                ct
-            );
+                ct);
         }
         catch
         {

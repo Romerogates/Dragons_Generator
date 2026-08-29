@@ -16,7 +16,7 @@ public static class DbSeeder
         var env = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
         var logger = scope.ServiceProvider.GetService<ILoggerFactory>()?.CreateLogger("DbSeeder");
         await db.Database.EnsureCreatedAsync();
-        await DbSchemaUpgrader.EnsureCampaignAndSocialTablesAsync(db);
+        await DbMigrationRunner.ApplyAllAsync(db);
 
         var adminOpt = scope.ServiceProvider.GetRequiredService<IOptions<AdminSeedOptions>>().Value;
         var email = (adminOpt.Email ?? "").Trim().ToLowerInvariant();

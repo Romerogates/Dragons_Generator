@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
+import { HomeSummary, HomeSummaryService } from '@core/services/home-summary.service';
 import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
 
 interface StatItem {
@@ -34,10 +35,13 @@ interface FeatureItem {
 export class Home implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly cloud = inject(CharacterCloudService);
+  private readonly homeSummary = inject(HomeSummaryService);
 
   readonly isLoggedIn = this.auth.isLoggedIn;
   readonly user = this.auth.user;
   readonly savedCharactersCount = signal(0);
+  readonly summary = signal<HomeSummary | null>(null);
+  readonly summaryLoading = signal(false);
 
   readonly stats: StatItem[] = [
     { value: '9', label: 'Peuples' },
@@ -105,6 +109,35 @@ export class Home implements OnInit {
 
   ngOnInit(): void {
     this.refreshHeroStats();
+    this.loadSummary();
+  }
+
+  formatSessionDate(iso: string): string {
+    return new Date(iso).toLocaleString('fr-FR', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  private loadSummary(): void {
+    if (!this.auth.isLoggedIn()) {
+      this.summary.set(null);
+      return;
+    }
+    this.summaryLoading.set(true);
+    this.homeSummary.getSummary().subscribe({
+      next: (s) => {
+        this.summary.set(s);
+        if (s) this.savedCharactersCount.set(s.savedCharactersCount);
+        this.summaryLoading.set(false);
+      },
+      error: () => {
+        this.summaryLoading.set(false);
+      },
+    });
   }
 
   hoverBorder(kind: string): string {
@@ -140,7 +173,9 @@ export class Home implements OnInit {
   private refreshHeroStats(): void {
     if (this.auth.isLoggedIn()) {
       this.cloud.list().subscribe({
-        next: (list) => this.savedCharactersCount.set(list.length),
+        next: (list) => {
+          if (!this.summary()) this.savedCharactersCount.set(list.length);
+        },
         error: () => this.savedCharactersCount.set(0),
       });
       return;

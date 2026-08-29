@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { CampaignCloudService } from '@core/services/campaign-cloud.service';
+import { CampaignCloudService, CampaignActivityItem } from '@core/services/campaign-cloud.service';
 import { FriendsService } from '@core/services/friends.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
 import { AuthService } from '@core/services/auth.service';
@@ -26,6 +26,8 @@ import {
   CampaignData,
   CampaignMember,
   CampaignPregen,
+  CampaignSession,
+  CampaignSessionStatus,
   CREATURE_ROLE_LABELS,
   PREGEN_STATUS_LABELS,
   createCampaignPregenEntry,
@@ -42,7 +44,7 @@ import { StoryBuilderService } from '@core/services/story-builder.service';
 import { CampaignPregenGeneratorService } from '@core/services/campaign-pregen-generator.service';
 import { firstValueFrom } from 'rxjs';
 
-type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens';
+type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'activity';
 
 @Component({
   selector: 'app-campaign-detail',
@@ -78,6 +80,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly importingPregen = signal(false);
   readonly generatingAutoPregen = signal(false);
   readonly pregenPdfLoadingId = signal<string | null>(null);
+  readonly activity = signal<CampaignActivityItem[]>([]);
+  readonly activityLoading = signal(false);
 
   readonly creatureXpMap = signal<Record<string, number>>({});
   readonly isLoadingPreview = signal(false);
@@ -159,6 +163,100 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (t === 'creatures') {
       this.loadBestiaryPreview();
     }
+    if (t === 'activity') {
+      this.loadActivity();
+    }
+  }
+
+  loadActivity(): void {
+    const c = this.campaign();
+    if (!c) return;
+    this.activityLoading.set(true);
+    this.campaigns.listActivity(c.id).subscribe({
+      next: (items) => {
+        this.activity.set(items);
+        this.activityLoading.set(false);
+      },
+      error: () => {
+        this.activity.set([]);
+        this.activityLoading.set(false);
+      },
+    });
+  }
+
+  activityLabel(kind: string): string {
+    const labels: Record<string, string> = {
+      invite_sent: 'Invitation envoyée',
+      invite_accepted: 'Invitation acceptée',
+      member_joined: 'Joueur rejoint',
+      character_proposed: 'Personnage proposé',
+      character_approved: 'Personnage approuvé',
+      character_rejected: 'Personnage refusé',
+      xp_awarded: 'XP attribuée',
+      session_scheduled: 'Session planifiée',
+      session_updated: 'Session modifiée',
+      pregen_assigned: 'Pré-tiré assigné',
+    };
+    return labels[kind] ?? kind;
+  }
+
+  addSession(): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    const session: CampaignSession = {
+      id: crypto.randomUUID?.() ?? `session-${Date.now()}`,
+      title: 'Nouvelle session',
+      scheduledAt: new Date(Date.now() + 7 * 86400000).toISOString(),
+      status: 'planned',
+    };
+    this.saveData({ sessions: [...(c.data.sessions ?? []), session] });
+  }
+
+  updateSession(sessionId: string, patch: Partial<CampaignSession>): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    const sessions = (c.data.sessions ?? []).map((s) =>
+      s.id === sessionId ? { ...s, ...patch } : s,
+    );
+    this.saveData({ sessions });
+  }
+
+  removeSession(sessionId: string): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    this.saveData({
+      sessions: (c.data.sessions ?? []).filter((s) => s.id !== sessionId),
+    });
+  }
+
+  sessionStatusLabel(status: CampaignSessionStatus): string {
+    const labels: Record<CampaignSessionStatus, string> = {
+      planned: 'Planifiée',
+      played: 'Jouée',
+      cancelled: 'Annulée',
+    };
+    return labels[status];
+  }
+
+  sessionInputValue(iso: string): string {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '';
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  onSessionDateChange(sessionId: string, value: string): void {
+    if (!value) return;
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return;
+    this.updateSession(sessionId, { scheduledAt: parsed.toISOString() });
+  }
+
+  upcomingSessions(): CampaignSession[] {
+    const sessions = this.campaign()?.data.sessions ?? [];
+    return [...sessions]
+      .filter((s) => s.status === 'planned')
+      .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime());
   }
 
   openBestiaryFullscreen(): void {

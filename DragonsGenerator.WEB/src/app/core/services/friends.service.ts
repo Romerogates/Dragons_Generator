@@ -1,14 +1,16 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
 import { environment } from '@env/environment';
 import { AuthService } from './auth.service';
 import { CampaignInvite, FriendRequest, FriendUser } from '../models/Campaign/campaign';
+import { OfflineProfileService } from './offline-profile.service';
 
 @Injectable({ providedIn: 'root' })
 export class FriendsService {
   private readonly http = inject(HttpClient);
   private readonly auth = inject(AuthService);
+  private readonly offline = inject(OfflineProfileService);
   private readonly api = environment.apiUrl;
 
   searchUsers(q: string): Observable<FriendUser[]> {
@@ -18,7 +20,18 @@ export class FriendsService {
 
   listFriends(): Observable<FriendUser[]> {
     if (!this.auth.isLoggedIn()) return of([]);
-    return this.http.get<FriendUser[]>(`${this.api}/me/friends`);
+
+    const cached = this.offline.readFriends<FriendUser[]>();
+    const network$ = this.http.get<FriendUser[]>(`${this.api}/me/friends`).pipe(
+      tap((friends) => this.offline.writeFriends(friends)),
+    );
+
+    if (cached?.length) {
+      network$.subscribe({ error: () => undefined });
+      return of(cached);
+    }
+
+    return network$;
   }
 
   listIncomingRequests(): Observable<FriendRequest[]> {
