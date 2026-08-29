@@ -89,9 +89,10 @@ builder.Services.AddHttpClient("LocalLlm", client =>
     client.Timeout = TimeSpan.FromMinutes(5);
 });
 
-builder.Services
-    .AddFastEndpoints()
-    .SwaggerDocument(o =>
+var fastEndpoints = builder.Services.AddFastEndpoints();
+if (!builder.Environment.IsProduction())
+{
+    fastEndpoints.SwaggerDocument(o =>
     {
         o.DocumentSettings = s =>
         {
@@ -99,6 +100,7 @@ builder.Services
             s.Version = "v1";
         };
     });
+}
 
 builder.Services.AddCors(options =>
 {
@@ -127,7 +129,8 @@ app.UseFastEndpoints(c =>
 {
     c.Errors.UseProblemDetails();
 });
-app.UseSwaggerGen();
+if (!app.Environment.IsProduction())
+    app.UseSwaggerGen();
 
 app.Run();
 
