@@ -1,6 +1,7 @@
 using DragonsGenerator.API.Persistence;
 using DragonsGenerator.API.Services;
 using FastEndpoints;
+using Microsoft.EntityFrameworkCore;
 
 namespace DragonsGenerator.API.Endpoints.Campaigns;
 
