@@ -37,6 +37,7 @@ export class Characters implements OnInit {
 
   readonly isOnline = this.connectivity.isOnline;
   readonly pendingSyncCount = this.offlineSync.pendingCount;
+  readonly cloudSyncError = this.cloud.lastSyncError;
 
   readonly characters = signal<any[]>([]);
   readonly characterToDelete = signal<any | null>(null);

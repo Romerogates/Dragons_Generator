@@ -1,8 +1,13 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, of, switchMap, tap, catchError, map, throwError } from 'rxjs';
 import { environment } from '@env/environment';
 import type { Character } from '@core/models/Character/character';
+import {
+  formatCharacterCloudListError,
+  formatCharacterCloudLoadError,
+  formatCharacterCloudSyncSummary,
+} from '@core/utils/character-cloud-sync.util';
 import { AuthService } from './auth.service';
 
 export interface CloudCharacterSummary {
@@ -23,6 +28,9 @@ export class CharacterCloudService {
   private readonly http = inject(HttpClient);
   private readonly auth = inject(AuthService);
   private readonly api = environment.apiUrl;
+
+  /** Dernier échec partiel ou total lors d'un syncFromCloud(). */
+  readonly lastSyncError = signal<string | null>(null);
 
   list(): Observable<CloudCharacterSummary[]> {
     if (!this.auth.isLoggedIn()) return of([]);
@@ -72,30 +80,11 @@ export class CharacterCloudService {
     if (!this.auth.isLoggedIn()) {
       return of(this.readLocal());
     }
+    this.lastSyncError.set(null);
     return this.list().pipe(
       switchMap((summaries) => {
         if (!summaries.length) return of([] as unknown[]);
-        const loads = summaries.map((s) => this.get(s.id));
-        return loads.reduce(
-          (acc$, req) =>
-            acc$.pipe(
-              switchMap((arr) =>
-                req.pipe(
-                  map((full) => {
-                    const data = {
-                      ...(full.data as object),
-                      id: full.id,
-                      name: full.name,
-                      cloudSynced: true,
-                    };
-                    return [...arr, data];
-                  }),
-                  catchError(() => of(arr)),
-                ),
-              ),
-            ),
-          of([] as unknown[]),
-        );
+        return this.loadSummariesSequentially(summaries);
       }),
       tap((merged) => {
         const pendingLocal = this.readLocal().filter(
@@ -111,7 +100,45 @@ export class CharacterCloudService {
         const combined = [...(merged as unknown[]), ...extras];
         localStorage.setItem('dragons-characters', JSON.stringify(combined));
       }),
-      catchError(() => of(this.readLocal())),
+      catchError((err) => {
+        this.lastSyncError.set(formatCharacterCloudListError(err));
+        return of(this.readLocal());
+      }),
+    );
+  }
+
+  private loadSummariesSequentially(
+    summaries: CloudCharacterSummary[],
+  ): Observable<unknown[]> {
+    const loadErrors: string[] = [];
+    return summaries.reduce(
+      (acc$, summary) =>
+        acc$.pipe(
+          switchMap((arr) =>
+            this.get(summary.id).pipe(
+              map((full) => {
+                const data = {
+                  ...(full.data as object),
+                  id: full.id,
+                  name: full.name,
+                  cloudSynced: true,
+                };
+                return [...arr, data];
+              }),
+              catchError((err) => {
+                loadErrors.push(formatCharacterCloudLoadError(summary.name, err));
+                return of(arr);
+              }),
+            ),
+          ),
+        ),
+      of([] as unknown[]),
+    ).pipe(
+      tap(() => {
+        if (loadErrors.length > 0) {
+          this.lastSyncError.set(formatCharacterCloudSyncSummary(loadErrors));
+        }
+      }),
     );
   }
 
