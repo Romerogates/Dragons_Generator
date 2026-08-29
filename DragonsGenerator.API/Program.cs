@@ -15,11 +15,24 @@ ProductionConfigGuard.EnsureValid(builder.Configuration, builder.Environment);
 // --- Options ---
 builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
+builder.Services.PostConfigure<JwtOptions>(opts =>
+{
+    if (string.IsNullOrWhiteSpace(opts.Key) && !builder.Environment.IsProduction())
+        opts.Key = "DragonsGenerator_Dev_Jwt_Key_ChangeInProd_32+";
+});
 builder.Services.Configure<AppUrlOptions>(builder.Configuration.GetSection("App"));
 builder.Services.Configure<AdminSeedOptions>(builder.Configuration.GetSection("Admin"));
+builder.Services.PostConfigure<AdminSeedOptions>(opts =>
+{
+    if (builder.Environment.IsProduction())
+        return;
+    if (string.IsNullOrWhiteSpace(opts.Email))
+        opts.Email = "admin@dragons.local";
+    if (string.IsNullOrWhiteSpace(opts.Password))
+        opts.Password = "AdminDragons!2026";
+});
 builder.Services.Configure<DevSeedOptions>(builder.Configuration.GetSection("DevSeed"));
 
-var jwtOpt = builder.Configuration.GetSection("Jwt").Get<JwtOptions>() ?? new JwtOptions();
 var smtpHost = builder.Configuration["Smtp:Host"] ?? "log";
 
 // --- Persistence ---
@@ -41,17 +54,20 @@ else
 // --- Auth JWT ---
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(o =>
+    .AddJwtBearer();
+builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+    .Configure<Microsoft.Extensions.Options.IOptions<JwtOptions>>((o, jwt) =>
     {
+        var opt = jwt.Value;
         o.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtOpt.Issuer,
-            ValidAudience = jwtOpt.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOpt.Key)),
+            ValidIssuer = opt.Issuer,
+            ValidAudience = opt.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(opt.Key)),
             ClockSkew = TimeSpan.FromMinutes(2),
         };
     });
