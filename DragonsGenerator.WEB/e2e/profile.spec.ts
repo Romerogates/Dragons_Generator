@@ -6,6 +6,9 @@ test.describe('Profil utilisateur', () => {
     test.setTimeout(90_000);
 
     await loginViaUi(page, '/settings');
+    await expect(page.getByRole('heading', { name: 'Paramètres du compte' })).toBeVisible({
+      timeout: 30_000,
+    });
 
     const bioText = `Bio E2E ${Date.now()}`;
     await page.getByLabel('Bio').fill(bioText);
