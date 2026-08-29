@@ -39,8 +39,8 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
         var friendRequests = await db.Friendships.AsNoTracking()
             .Where(f => f.AddresseeId == userId && f.Status == FriendStatuses.Pending)
             .Include(f => f.Requester)
-            .OrderByDescending(f => f.CreatedAt)
             .ToListAsync(ct);
+        friendRequests = friendRequests.OrderByDescending(f => f.CreatedAt).ToList();
 
         foreach (var f in friendRequests)
         {
@@ -98,8 +98,8 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
                 )
                 .Include(m => m.User)
                 .Include(m => m.Campaign)
-                .OrderByDescending(m => m.JoinedAt)
                 .ToListAsync(ct);
+            pendingProposals = pendingProposals.OrderByDescending(m => m.JoinedAt).ToList();
 
             foreach (var m in pendingProposals)
             {
@@ -120,8 +120,8 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
         var rejected = await db.CampaignMembers.AsNoTracking()
             .Where(m => m.UserId == userId && m.ProposalStatus == CharacterProposalStatuses.Rejected)
             .Include(m => m.Campaign)
-            .OrderByDescending(m => m.JoinedAt)
             .ToListAsync(ct);
+        rejected = rejected.OrderByDescending(m => m.JoinedAt).ToList();
 
         foreach (var m in rejected)
         {
