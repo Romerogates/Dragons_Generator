@@ -58,6 +58,7 @@ export class Navbar implements OnInit, OnDestroy {
   constructor(private readonly router: Router) {}
 
   ngOnInit(): void {
+    this.preloadNavbarIcons();
     this.refreshCharacterCount();
     this.refreshCampaignCount();
     window.addEventListener('storage', this.onStorage);
@@ -160,6 +161,30 @@ export class Navbar implements OnInit, OnDestroy {
     this.campaigns.list().subscribe({
       next: (list) => this.campaignCountSignal.set(list.length),
       error: () => this.campaignCountSignal.set(0),
+    });
+  }
+
+  /** Preload menu icons so the mobile drawer does not pop them in while scrolling. */
+  private preloadNavbarIcons(): void {
+    if (typeof customElements === 'undefined') return;
+
+    const icons = [
+      'mdi:cog-outline',
+      'fluent-emoji:hammer-and-pick',
+      'fluent-emoji:busts-in-silhouette',
+      'fluent-emoji:world-map',
+      'fluent-emoji:scroll',
+      'fluent-emoji:handshake',
+      'fluent-emoji:envelope',
+      'fluent-emoji:shield',
+      ...this.codexLinks.map((l) => l.icon),
+    ];
+
+    customElements.whenDefined('iconify-icon').then(() => {
+      const IconifyIcon = customElements.get('iconify-icon') as
+        | { loadIcons?: (names: string[]) => void }
+        | undefined;
+      IconifyIcon?.loadIcons?.([...new Set(icons)]);
     });
   }
 }

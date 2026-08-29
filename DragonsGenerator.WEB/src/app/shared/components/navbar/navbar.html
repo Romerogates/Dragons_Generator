@@ -90,7 +90,7 @@
                       (click)="closeMenus()"
                     >
                       <span class="text-lg leading-none w-6 text-center shrink-0"
-                        ><iconify-icon [icon]="link.icon"></iconify-icon
+                        ><iconify-icon noobserver [icon]="link.icon"></iconify-icon
                       ></span>
                       <span class="font-medium tracking-wide">{{ link.label }}</span>
                     </a>
@@ -155,7 +155,7 @@
             title="Paramètres"
             (click)="closeMenus()"
           >
-            <iconify-icon icon="mdi:cog-outline" class="text-lg"></iconify-icon>
+            <iconify-icon noobserver icon="mdi:cog-outline" class="text-lg"></iconify-icon>
           </a>
         }
 
@@ -251,7 +251,7 @@
           class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
           (click)="closeMenus()"
         >
-          <span class="text-xl"><iconify-icon icon="fluent-emoji:hammer-and-pick"></iconify-icon></span>
+          <span class="text-xl"><iconify-icon noobserver icon="fluent-emoji:hammer-and-pick"></iconify-icon></span>
           <span class="text-sm font-bold tracking-wide">Forger un héros</span>
         </a>
 
@@ -261,7 +261,7 @@
           (click)="closeMenus()"
         >
           <span class="flex items-center gap-3">
-            <span class="text-xl"><iconify-icon icon="fluent-emoji:busts-in-silhouette"></iconify-icon></span>
+            <span class="text-xl"><iconify-icon noobserver icon="fluent-emoji:busts-in-silhouette"></iconify-icon></span>
             <span class="text-sm font-bold tracking-wide">Mes héros</span>
           </span>
           @if (savedCount() > 0) {
@@ -275,7 +275,7 @@
           (click)="closeMenus()"
         >
           <span class="flex items-center gap-3">
-            <span class="text-xl"><iconify-icon icon="fluent-emoji:world-map"></iconify-icon></span>
+            <span class="text-xl"><iconify-icon noobserver icon="fluent-emoji:world-map"></iconify-icon></span>
             <span class="text-sm font-bold tracking-wide">Mes campagnes</span>
           </span>
           @if (campaignCount() > 0) {
@@ -289,7 +289,7 @@
           class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
           (click)="closeMenus()"
         >
-          <span class="text-xl"><iconify-icon icon="fluent-emoji:scroll"></iconify-icon></span>
+          <span class="text-xl"><iconify-icon noobserver icon="fluent-emoji:scroll"></iconify-icon></span>
           <span class="text-sm font-bold tracking-wide">Nouveau scénario</span>
         </a>
 
@@ -300,7 +300,7 @@
             class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
             (click)="closeMenus()"
           >
-            <span class="text-xl"><iconify-icon icon="fluent-emoji:handshake"></iconify-icon></span>
+            <span class="text-xl"><iconify-icon noobserver icon="fluent-emoji:handshake"></iconify-icon></span>
             <span class="text-sm font-bold tracking-wide">Amis</span>
           </a>
         }
@@ -311,7 +311,7 @@
             class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
             (click)="closeMenus()"
           >
-            <span class="text-xl"><iconify-icon icon="mdi:cog-outline"></iconify-icon></span>
+            <span class="text-xl"><iconify-icon noobserver icon="mdi:cog-outline"></iconify-icon></span>
             <span class="text-sm font-bold tracking-wide">Paramètres</span>
           </a>
           <a
@@ -319,7 +319,7 @@
             class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
             (click)="closeMenus()"
           >
-            <span class="text-xl"><iconify-icon icon="fluent-emoji:envelope"></iconify-icon></span>
+            <span class="text-xl"><iconify-icon noobserver icon="fluent-emoji:envelope"></iconify-icon></span>
             <span class="text-sm font-bold tracking-wide">Support</span>
           </a>
           @if (auth.isAdmin()) {
@@ -328,7 +328,7 @@
               class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
               (click)="closeMenus()"
             >
-              <span class="text-xl"><iconify-icon icon="fluent-emoji:shield"></iconify-icon></span>
+              <span class="text-xl"><iconify-icon noobserver icon="fluent-emoji:shield"></iconify-icon></span>
               <span class="text-sm font-bold tracking-wide">Admin</span>
             </a>
           }
@@ -370,7 +370,7 @@
             (click)="closeMenus()"
           >
             <span class="text-xl w-7 text-center"
-              ><iconify-icon [icon]="link.icon"></iconify-icon
+              ><iconify-icon noobserver [icon]="link.icon"></iconify-icon
             ></span>
             <span class="text-sm font-medium tracking-wide">{{ link.label }}</span>
           </a>
