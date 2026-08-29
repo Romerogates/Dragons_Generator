@@ -24,7 +24,7 @@ public class NotificationsIntegrationTests
         var body = await res.Content.ReadFromJsonAsync<NotificationsSummaryResponse>();
         Assert.NotNull(body);
         Assert.Equal(0, body!.TotalCount);
-        Assert.Empty(body.Items);
+        Assert.Empty(body.Notifications);
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class NotificationsIntegrationTests
         Assert.NotNull(body);
         Assert.Equal(1, body!.FriendsActionCount);
         Assert.Equal(1, body.TotalCount);
-        Assert.Contains(body.Items, i => i.Type == "friend_request");
+        Assert.Contains(body.Notifications, i => i.Type == "friend_request");
     }
 }
 
@@ -57,7 +57,7 @@ internal sealed class NotificationsSummaryResponse
     public int FriendsActionCount { get; set; }
     public int CampaignsActionCount { get; set; }
     public int TotalCount { get; set; }
-    public List<NotificationItemResponse> Items { get; set; } = [];
+    public List<NotificationItemResponse> Notifications { get; set; } = [];
 }
 
 internal sealed class NotificationItemResponse

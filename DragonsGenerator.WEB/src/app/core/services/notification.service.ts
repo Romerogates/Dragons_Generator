@@ -10,7 +10,7 @@ const EMPTY_SUMMARY: NotificationsSummary = {
   friendsActionCount: 0,
   campaignsActionCount: 0,
   totalCount: 0,
-  items: [],
+  notifications: [],
 };
 
 @Injectable({ providedIn: 'root' })
@@ -27,7 +27,7 @@ export class NotificationService {
   readonly friendsActionCount = computed(() => this.summarySignal()?.friendsActionCount ?? 0);
   readonly campaignsActionCount = computed(() => this.summarySignal()?.campaignsActionCount ?? 0);
   readonly totalCount = computed(() => this.summarySignal()?.totalCount ?? 0);
-  readonly items = computed(() => this.summarySignal()?.items ?? []);
+  readonly items = computed(() => this.summarySignal()?.notifications ?? []);
 
   constructor() {
     effect(() => {

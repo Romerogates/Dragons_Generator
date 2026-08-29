@@ -17,5 +17,5 @@ export interface NotificationsSummary {
   friendsActionCount: number;
   campaignsActionCount: number;
   totalCount: number;
-  items: NotificationItem[];
+  notifications: NotificationItem[];
 }

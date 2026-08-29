@@ -18,7 +18,7 @@ public record NotificationsSummaryDto(
     int FriendsActionCount,
     int CampaignsActionCount,
     int TotalCount,
-    List<NotificationItemDto> Items
+    List<NotificationItemDto> Notifications
 );
 
 public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest<NotificationsSummaryDto>
@@ -56,16 +56,15 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
             );
         }
 
-        var invites = await (
+        var inviteRows = await (
             from i in db.CampaignInvites.AsNoTracking()
             join c in db.Campaigns.AsNoTracking() on i.CampaignId equals c.Id
             join u in db.Users.AsNoTracking() on i.InvitedByUserId equals u.Id
             where i.InvitedUserId == userId && i.Status == CampaignInviteStatuses.Pending
-            orderby i.CreatedAt descending
             select new { i.Id, i.CampaignId, c.Title, u.DisplayName, i.CreatedAt }
         ).ToListAsync(ct);
 
-        foreach (var inv in invites)
+        foreach (var inv in inviteRows.OrderByDescending(x => x.CreatedAt))
         {
             items.Add(
                 new NotificationItemDto(
@@ -79,7 +78,7 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
             );
         }
 
-        var managedCampaignIds = await db.Campaigns.AsNoTracking()
+        var ownedCampaignIds = await db.Campaigns.AsNoTracking()
             .Where(c => c.OwnerUserId == userId)
             .Select(c => c.Id)
             .ToListAsync(ct);
@@ -87,7 +86,7 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
             .Where(m => m.UserId == userId && m.Role == CampaignMemberRoles.Dm)
             .Select(m => m.CampaignId)
             .ToListAsync(ct);
-        var reviewCampaignIds = managedCampaignIds.Union(dmCampaignIds).Distinct().ToHashSet();
+        var reviewCampaignIds = ownedCampaignIds.Concat(dmCampaignIds).Distinct().ToList();
 
         if (reviewCampaignIds.Count > 0)
         {
@@ -141,7 +140,7 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
         items = items.OrderByDescending(i => i.CreatedAt).ToList();
 
         var friendsCount = items.Count(i => i.Type == "friend_request");
-        var campaignsCount = items.Count(i => i.Type != "friend_request");
+        var campaignsCount = items.Count - friendsCount;
 
         await Send.OkAsync(
             new NotificationsSummaryDto(friendsCount, campaignsCount, items.Count, items),
@@ -149,3 +148,4 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
         );
     }
 }
+
