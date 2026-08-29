@@ -39,6 +39,9 @@ export class Navbar implements OnInit, OnDestroy {
   readonly codexOpen = signal(false);
   readonly accountOpen = signal(false);
 
+  private savedScrollY = 0;
+  private bodyScrollLocked = false;
+
   readonly savedCount = this.savedCountSignal.asReadonly();
   readonly campaignCount = this.campaignCountSignal.asReadonly();
 
@@ -67,15 +70,14 @@ export class Navbar implements OnInit, OnDestroy {
     this.routerSub = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe(() => {
-        this.mobileOpen.set(false);
-        this.codexOpen.set(false);
-        this.accountOpen.set(false);
+        this.closeMenus();
         this.refreshCharacterCount();
         this.refreshCampaignCount();
       });
   }
 
   ngOnDestroy(): void {
+    this.unlockBodyScroll();
     window.removeEventListener('storage', this.onStorage);
     window.removeEventListener('focus', this.onFocus);
     this.routerSub?.unsubscribe();
@@ -99,9 +101,7 @@ export class Navbar implements OnInit, OnDestroy {
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
-    this.codexOpen.set(false);
-    this.accountOpen.set(false);
-    this.mobileOpen.set(false);
+    this.closeMenus();
   }
 
   toggleCodex(event: Event): void {
@@ -118,6 +118,7 @@ export class Navbar implements OnInit, OnDestroy {
 
   toggleMobile(): void {
     this.mobileOpen.update((v) => !v);
+    this.syncBodyScrollLock();
     if (!this.mobileOpen()) {
       this.codexOpen.set(false);
       this.accountOpen.set(false);
@@ -128,6 +129,7 @@ export class Navbar implements OnInit, OnDestroy {
     this.mobileOpen.set(false);
     this.codexOpen.set(false);
     this.accountOpen.set(false);
+    this.syncBodyScrollLock();
   }
 
   logout(): void {
@@ -186,5 +188,40 @@ export class Navbar implements OnInit, OnDestroy {
         | undefined;
       IconifyIcon?.loadIcons?.([...new Set(icons)]);
     });
+  }
+
+  /** Keep page still while the mobile drawer is open (incl. iOS). */
+  private syncBodyScrollLock(): void {
+    if (typeof document === 'undefined') return;
+
+    if (this.mobileOpen()) {
+      if (this.bodyScrollLocked) return;
+      this.savedScrollY = window.scrollY;
+      const body = document.body;
+      body.style.position = 'fixed';
+      body.style.top = `-${this.savedScrollY}px`;
+      body.style.left = '0';
+      body.style.right = '0';
+      body.style.width = '100%';
+      body.style.overflow = 'hidden';
+      this.bodyScrollLocked = true;
+      return;
+    }
+
+    this.unlockBodyScroll();
+  }
+
+  private unlockBodyScroll(): void {
+    if (typeof document === 'undefined' || !this.bodyScrollLocked) return;
+
+    const body = document.body;
+    body.style.position = '';
+    body.style.top = '';
+    body.style.left = '';
+    body.style.right = '';
+    body.style.width = '';
+    body.style.overflow = '';
+    window.scrollTo(0, this.savedScrollY);
+    this.bodyScrollLocked = false;
   }
 }

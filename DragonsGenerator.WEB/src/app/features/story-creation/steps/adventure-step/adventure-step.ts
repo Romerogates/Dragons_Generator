@@ -12,6 +12,7 @@ import { DataService } from '@core/services/data.service';
 import { AiRateLimitDialogService } from '@core/services/ai-rate-limit-dialog.service';
 import { isAiRateLimitHttpError } from '@core/utils/ai-rate-limit.util';
 import { StoryBuilderService } from '@core/services/story-builder.service';
+import { ConnectivityService } from '@core/services/connectivity.service';
 import { ADVENTURE_TONE_LABELS, AdventureTone, StoryRegionChoice } from '@core/models/Story/story';
 import { EanaMapPicker } from '@shared/components/eana-map-picker/eana-map-picker';
 import { storyLocationContext } from '@core/utils/story-location.util';
@@ -28,6 +29,9 @@ export class AdventureStep implements OnInit {
   readonly builder = inject(StoryBuilderService);
   private readonly dataService = inject(DataService);
   private readonly aiRateLimit = inject(AiRateLimitDialogService);
+  private readonly connectivity = inject(ConnectivityService);
+
+  readonly isOnline = this.connectivity.isOnline;
 
   readonly isGenerating = signal(false);
   readonly generationError = signal<string | null>(null);
@@ -40,6 +44,10 @@ export class AdventureStep implements OnInit {
   }
 
   generateAdventure(): void {
+    if (!this.connectivity.isOnline()) {
+      this.generationError.set('La génération IA nécessite une connexion. Rédige l\'aventure manuellement ci-dessous.');
+      return;
+    }
     if (!this.builder.title().trim()) {
       this.generationError.set("Donnez un titre à l'aventure.");
       return;

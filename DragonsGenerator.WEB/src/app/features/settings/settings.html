@@ -70,6 +70,64 @@
     </form>
   </section>
 
+  <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6 mb-6">
+    <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Mode hors ligne</h2>
+    <p class="text-xs text-slate-400 mb-4">
+      Télécharge le Codex pour forger un personnage sans connexion. Les campagnes manuelles (sans IA) et les
+      personnages créés hors ligne seront synchronisés automatiquement à la reconnexion.
+    </p>
+
+    @if (codexDownloaded()) {
+      <p class="text-sm text-emerald-400 mb-3">
+        Codex disponible hors ligne
+        @if (codexDownloadedAt(); as at) {
+          <span class="text-slate-500"> · {{ at | date: 'short' }}</span>
+        }
+      </p>
+    } @else {
+      <p class="text-sm text-amber-300 mb-3">Codex non téléchargé — la création de personnage hors ligne sera limitée.</p>
+    }
+
+    @if (codexDownloadError(); as err) {
+      <p class="text-sm text-red-400 mb-3">{{ err }}</p>
+    }
+
+    <div class="flex flex-wrap gap-2 mb-4">
+      <button
+        type="button"
+        class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white disabled:opacity-50"
+        [disabled]="codexDownloading() || !isOnline()"
+        (click)="downloadCodex()"
+      >
+        {{ codexDownloading() ? 'Téléchargement…' : (codexDownloaded() ? 'Mettre à jour le Codex' : 'Télécharger le Codex') }}
+      </button>
+      @if (codexDownloaded()) {
+        <button
+          type="button"
+          class="px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-400"
+          (click)="clearCodexDownload()"
+        >
+          Supprimer le cache
+        </button>
+      }
+    </div>
+
+    @if (pendingSyncCount() > 0) {
+      <p class="text-sm text-sky-300 mb-2">{{ pendingSyncCount() }} élément(s) en attente de synchronisation.</p>
+      <button
+        type="button"
+        class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-sky-900/40 border border-sky-700/50 text-sky-300 disabled:opacity-50"
+        [disabled]="!isOnline()"
+        (click)="syncNow()"
+      >
+        Synchroniser maintenant
+      </button>
+    }
+    @if (syncMessage()) {
+      <p class="text-sm text-emerald-400 mt-3">{{ syncMessage() }}</p>
+    }
+  </section>
+
   @if (user() && !user()!.emailConfirmed) {
     <section class="bg-amber-950/20 border border-amber-800/40 rounded-2xl p-6">
       <h2 class="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-2">

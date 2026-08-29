@@ -15,6 +15,8 @@ import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { CampaignPdfService, CreaturePrintEntry } from '@core/services/campaign-pdf.service';
 import { DataService } from '@core/services/data.service';
 import { AuthService } from '@core/services/auth.service';
+import { ConnectivityService } from '@core/services/connectivity.service';
+import { OfflineSyncService } from '@core/services/offline-sync.service';
 import { forkJoin, catchError, map, of, Observable } from 'rxjs';
 import {
   ADVENTURE_TONE_LABELS,
@@ -41,6 +43,10 @@ export class StorySummaryStep implements OnInit, OnDestroy {
   private data = inject(DataService);
   private auth = inject(AuthService);
   private sanitizer = inject(DomSanitizer);
+  private readonly connectivity = inject(ConnectivityService);
+  private readonly offlineSync = inject(OfflineSyncService);
+
+  readonly isOnline = this.connectivity.isOnline;
 
   readonly saved = signal(false);
   readonly saving = signal(false);
@@ -102,7 +108,7 @@ export class StorySummaryStep implements OnInit, OnDestroy {
     this.saveError.set(null);
 
     if (!this.auth.isLoggedIn()) {
-      this.saveError.set('Connectez-vous pour sauvegarder la campagne dans le cloud.');
+      this.saveError.set('Connectez-vous pour sauvegarder la campagne.');
       return;
     }
 
@@ -110,6 +116,24 @@ export class StorySummaryStep implements OnInit, OnDestroy {
     const data = b.buildCampaignData();
     const title = b.title().trim() || 'Nouvelle campagne';
     const editId = b.editingCampaignId();
+
+    if (!this.connectivity.isOnline()) {
+      if (!b.adventure().trim()) {
+        this.saveError.set('Rédige au moins un résumé d\'aventure (sans IA) avant de sauvegarder hors ligne.');
+        return;
+      }
+      this.saving.set(true);
+      if (editId) {
+        this.offlineSync.queueCampaignUpdate(editId, title, data);
+      } else {
+        const local = this.offlineSync.queueCampaignCreate(title, data);
+        this.savedCampaignId.set(local.serverId ?? local.id);
+      }
+      this.saved.set(true);
+      this.saving.set(false);
+      this.builder.reset();
+      return;
+    }
 
     this.saving.set(true);
     const save$ = editId
@@ -127,10 +151,23 @@ export class StorySummaryStep implements OnInit, OnDestroy {
         }
       },
       error: () => {
-        this.saveError.set(
-          editId ? 'Échec de la mise à jour cloud.' : 'Échec de la sauvegarde cloud.',
-        );
+        if (!b.adventure().trim()) {
+          this.saveError.set('Rédige un résumé d\'aventure avant la sauvegarde locale.');
+          this.saving.set(false);
+          return;
+        }
+        if (editId) {
+          this.offlineSync.queueCampaignUpdate(editId, title, data);
+        } else {
+          const local = this.offlineSync.queueCampaignCreate(title, data);
+          this.savedCampaignId.set(local.serverId ?? local.id);
+        }
+        this.saved.set(true);
         this.saving.set(false);
+        this.saveError.set(
+          'Connexion instable : campagne enregistrée localement. Synchronisation automatique à la reconnexion.',
+        );
+        this.builder.reset();
       },
     });
   }

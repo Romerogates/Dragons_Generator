@@ -9,6 +9,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
+import { OfflineSyncService } from '@core/services/offline-sync.service';
+import { ConnectivityService } from '@core/services/connectivity.service';
 import { FriendsService } from '@core/services/friends.service';
 import { AuthService } from '@core/services/auth.service';
 import { DataService } from '@core/services/data.service';
@@ -31,6 +33,11 @@ export class Campaigns implements OnInit {
   private router = inject(Router);
   private data = inject(DataService);
   private pdf = inject(CampaignPdfService);
+  private readonly offlineSync = inject(OfflineSyncService);
+  private readonly connectivity = inject(ConnectivityService);
+
+  readonly isOnline = this.connectivity.isOnline;
+  readonly pendingSyncCount = this.offlineSync.pendingCount;
 
   readonly list = signal<CampaignSummary[]>([]);
   readonly invites = signal<CampaignInvite[]>([]);
@@ -55,19 +62,34 @@ export class Campaigns implements OnInit {
   reload(): void {
     this.loading.set(true);
     this.actionError.set(null);
+
+    if (!this.connectivity.isOnline()) {
+      this.list.set(this.offlineSync.getLocalCampaignSummaries());
+      this.loading.set(false);
+      return;
+    }
+
+    this.offlineSync.flushIfPossible();
     this.campaigns.list().subscribe({
       next: (items) => {
-        this.list.set(items);
+        this.list.set(this.offlineSync.mergeCampaignLists(items));
         this.loading.set(false);
       },
       error: () => {
-        this.actionError.set('Impossible de charger vos campagnes.');
+        this.list.set(this.offlineSync.mergeCampaignLists([]));
+        this.actionError.set('Impossible de charger vos campagnes. Affichage des brouillons locaux.');
         this.loading.set(false);
       },
     });
   }
 
   open(c: CampaignSummary): void {
+    if (c.pendingSync) {
+      this.actionError.set(
+        'Campagne en attente de synchronisation. Reconnecte-toi pour l\'envoyer au cloud.',
+      );
+      return;
+    }
     this.router.navigate(['/campaigns', c.id]);
   }
 

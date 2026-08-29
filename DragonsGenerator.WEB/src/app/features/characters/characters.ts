@@ -14,6 +14,8 @@ import { PdfGeneratorService } from '@core/services/pdf-generator.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
 import { AuthService } from '@core/services/auth.service';
 import { PendingCharacterSaveService } from '@core/services/pending-character-save.service';
+import { OfflineSyncService } from '@core/services/offline-sync.service';
+import { ConnectivityService } from '@core/services/connectivity.service';
 import type { Character } from '../../core/models/Character/character';
 
 @Component({
@@ -30,6 +32,11 @@ export class Characters implements OnInit {
   private cloud = inject(CharacterCloudService);
   private auth = inject(AuthService);
   private pendingSave = inject(PendingCharacterSaveService);
+  private readonly offlineSync = inject(OfflineSyncService);
+  private readonly connectivity = inject(ConnectivityService);
+
+  readonly isOnline = this.connectivity.isOnline;
+  readonly pendingSyncCount = this.offlineSync.pendingCount;
 
   readonly characters = signal<any[]>([]);
   readonly characterToDelete = signal<any | null>(null);
@@ -47,8 +54,14 @@ export class Characters implements OnInit {
     }
 
     this.pendingSave.flushIfPossible().subscribe({
-      next: () => this.reloadFromCloud(),
-      error: () => this.reloadFromCloud(),
+      next: () => {
+        this.offlineSync.flushIfPossible();
+        this.reloadFromCloud();
+      },
+      error: () => {
+        this.offlineSync.flushIfPossible();
+        this.reloadFromCloud();
+      },
     });
   }
 
@@ -62,6 +75,9 @@ export class Characters implements OnInit {
       error: () => {
         this.loadCharacters();
         this.loading.set(false);
+        if (!this.connectivity.isOnline()) {
+          this.offlineSync.flushIfPossible();
+        }
       },
     });
   }

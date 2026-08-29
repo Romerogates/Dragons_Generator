@@ -1,0 +1,32 @@
+{
+  "name": "Dragons Generator",
+  "short_name": "Dragons",
+  "description": "Forgez vos héros, scénarios et campagnes Dragons.",
+  "lang": "fr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#171b22",
+  "background_color": "#171b22",
+  "icons": [
+    {
+      "src": "dragon_256x256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "dragon_512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "dragon_512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

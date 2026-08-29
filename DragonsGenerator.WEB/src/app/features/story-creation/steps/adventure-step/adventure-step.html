@@ -82,28 +82,31 @@
     <button
       type="button"
       class="w-full py-4 rounded-xl text-xs font-black uppercase tracking-widest bg-violet-600 text-white hover:bg-violet-500 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 shadow-lg"
-      [disabled]="isGenerating()"
+      [disabled]="isGenerating() || !isOnline()"
       (click)="generateAdventure()"
     >
       @if (isGenerating()) {
         <span class="animate-pulse">⏳</span> Tissage de l'aventure...
+      } @else if (!isOnline()) {
+        Génération IA indisponible hors ligne
       } @else {
         <iconify-icon icon="fluent-emoji:scroll"></iconify-icon>
         {{ builder.adventure() ? 'Régénérer l\'aventure' : 'Générer l\'aventure (IA)' }}
       }
     </button>
 
-    @if (builder.adventure()) {
-      <div>
-        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Aventure générée</label>
-        <textarea
-          rows="16"
-          [ngModel]="builder.adventure()"
-          (ngModelChange)="builder.setAdventure($event)"
-          class="w-full bg-[#171b22] border border-slate-700 rounded-xl py-4 px-4 text-sm text-slate-300 leading-relaxed focus:outline-none focus:border-violet-500/50 resize-y font-serif"
-        ></textarea>
-      </div>
-    }
+    <div>
+      <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
+        {{ builder.adventure() ? 'Aventure (modifiable)' : 'Rédiger l\'aventure à la main' }}
+      </label>
+      <textarea
+        rows="16"
+        placeholder="Décrivez votre intrigue, les lieux clés, les rencontres… (obligatoire hors ligne)"
+        [ngModel]="builder.adventure()"
+        (ngModelChange)="builder.setAdventure($event)"
+        class="w-full bg-[#171b22] border border-slate-700 rounded-xl py-4 px-4 text-sm text-slate-300 leading-relaxed focus:outline-none focus:border-violet-500/50 resize-y font-serif"
+      ></textarea>
+    </div>
   </div>
 
   <div class="wizard-step-nav px-4 max-w-3xl mx-auto w-full">

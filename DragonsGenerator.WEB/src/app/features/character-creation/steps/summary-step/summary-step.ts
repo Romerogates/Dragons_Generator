@@ -17,6 +17,9 @@ import { PdfGeneratorService } from '@core/services/pdf-generator.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
 import { AuthService } from '@core/services/auth.service';
 import { PendingCharacterSaveService } from '@core/services/pending-character-save.service';
+import { ConnectivityService } from '@core/services/connectivity.service';
+import { OfflineCodexService } from '@core/services/offline-codex.service';
+import { OfflineSyncService } from '@core/services/offline-sync.service';
 import {
   ABILITY_KEY_TO_LABEL,
   ABILITY_KEYS,
@@ -44,6 +47,12 @@ export class SummaryStep implements OnInit, OnDestroy {
   private cloud = inject(CharacterCloudService);
   private auth = inject(AuthService);
   private pendingSave = inject(PendingCharacterSaveService);
+  private readonly connectivity = inject(ConnectivityService);
+  private readonly offlineCodex = inject(OfflineCodexService);
+  private readonly offlineSync = inject(OfflineSyncService);
+
+  readonly isOnline = this.connectivity.isOnline;
+  readonly codexReady = computed(() => this.offlineCodex.isDownloaded());
 
   readonly abilityKeys = ABILITY_KEYS;
   readonly abilityLabels = ABILITY_KEY_TO_LABEL;
@@ -136,6 +145,22 @@ export class SummaryStep implements OnInit, OnDestroy {
 
   private persistToCloud(character: Character): void {
     this.saving.set(true);
+
+    if (!this.connectivity.isOnline()) {
+      const withId = {
+        ...character,
+        id: character.id ?? crypto.randomUUID(),
+        cloudSynced: false,
+      };
+      this.offlineSync.queueCharacterSave(withId, this.isEditMode());
+      localStorage.setItem('dragons-current-character', JSON.stringify(withId));
+      this.pendingSave.clear();
+      this.saving.set(false);
+      this.builder.reset();
+      void this.router.navigate(['/character-sheet']);
+      return;
+    }
+
     this.cloud.save(character as Character).subscribe({
       next: (serverId) => {
         const updated = {
@@ -151,10 +176,20 @@ export class SummaryStep implements OnInit, OnDestroy {
         void this.router.navigate(['/character-sheet']);
       },
       error: () => {
+        const withId = {
+          ...character,
+          id: character.id ?? crypto.randomUUID(),
+          cloudSynced: false,
+        };
+        this.offlineSync.queueCharacterSave(withId, this.isEditMode());
+        localStorage.setItem('dragons-current-character', JSON.stringify(withId));
+        this.pendingSave.clear();
         this.saving.set(false);
         this.saveError.set(
-          'La sauvegarde cloud a échoué. Vérifie ta connexion ou réessaie dans un instant.',
+          'Hors ligne : personnage enregistré localement. Il sera envoyé au cloud dès que la connexion reviendra.',
         );
+        this.builder.reset();
+        void this.router.navigate(['/characters']);
       },
     });
   }

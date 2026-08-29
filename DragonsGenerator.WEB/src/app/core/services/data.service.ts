@@ -3,8 +3,10 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '@env/environment';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
+import { ConnectivityService } from './connectivity.service';
+import { OfflineCodexService } from './offline-codex.service';
 import { Civilisation } from '@core/models/Civilisations/civilisations';
 import { CivilisationSummary } from '@core/models/Civilisations/civilisation-summary';
 import { CharacterClass } from '@core/models/CharacterClasses/character-class';
@@ -48,6 +50,8 @@ import { CreatureSummary } from '../models/Creatures/creature-summary';
 export class DataService {
   private http = inject(HttpClient);
   private apiUrl = environment.apiUrl;
+  private readonly connectivity = inject(ConnectivityService);
+  private readonly offlineCodex = inject(OfflineCodexService);
 
   // =========================================================================
   // CACHE — un seul appel HTTP par ressource pendant toute la session
@@ -55,11 +59,28 @@ export class DataService {
 
   private cache = new Map<string, Observable<unknown>>();
 
+  private offlineList<T>(key: string): T | null {
+    if (!this.connectivity.isOnline() && this.offlineCodex.isDownloaded()) {
+      return this.offlineCodex.getSnapshot<T>(key);
+    }
+    return null;
+  }
+
+  private offlineById<T extends { id?: string }>(listKey: string, id: string): T | null {
+    if (!this.connectivity.isOnline() && this.offlineCodex.isDownloaded()) {
+      return this.offlineCodex.findById<T>(listKey, id);
+    }
+    return null;
+  }
+
   /**
    * Retourne un Observable caché : le premier subscribe déclenche le HTTP,
    * les suivants reçoivent le résultat en mémoire instantanément.
    */
   private cached<T>(key: string, factory: () => Observable<T>): Observable<T> {
+    const offline = this.offlineList<T>(key);
+    if (offline !== null) return of(offline);
+
     if (!this.cache.has(key)) {
       this.cache.set(key, factory().pipe(shareReplay(1)));
     }
@@ -83,6 +104,8 @@ export class DataService {
   }
 
   getCivilisationById(id: string): Observable<Civilisation> {
+    const offline = this.offlineById<Civilisation>('civilisations', id);
+    if (offline) return of(offline);
     return this.http.get<Civilisation>(`${this.apiUrl}/civilisations/${id}`);
   }
 
@@ -105,6 +128,8 @@ export class DataService {
   }
 
   getClassById(id: string): Observable<CharacterClass> {
+    const offline = this.offlineById<CharacterClass>('classes', id);
+    if (offline) return of(normalizeCharacterClass(offline));
     return this.http
       .get<CharacterClass>(`${this.apiUrl}/classes/${id}`)
       .pipe(map((cls) => normalizeCharacterClass(cls)));
@@ -131,6 +156,8 @@ export class DataService {
   }
 
   getSpeciesById(id: string): Observable<Species> {
+    const offline = this.offlineById<Species>('species', id);
+    if (offline) return of(offline);
     return this.http.get<Species>(`${this.apiUrl}/species/${id}`);
   }
 
@@ -155,10 +182,14 @@ export class DataService {
   }
 
   getEquipmentById(id: string): Observable<Equipment> {
+    const offline = this.offlineById<Equipment>('equipments', id);
+    if (offline) return of(offline);
     return this.http.get<Equipment>(`${this.apiUrl}/equipments/${id}`);
   }
 
   getEquipmentsByType(type: string): Observable<Equipment[]> {
+    const offline = this.offlineList<Equipment[]>('equipments');
+    if (offline) return of(offline.filter((e) => e.type === type));
     return this.http.get<Equipment[]>(`${this.apiUrl}/equipments/type/${type}`);
   }
 
@@ -183,14 +214,20 @@ export class DataService {
   }
 
   getSpellById(id: string): Observable<Spell> {
+    const offline = this.offlineById<Spell>('spells', id);
+    if (offline) return of(offline);
     return this.http.get<Spell>(`${this.apiUrl}/spells/${id}`);
   }
 
   getSpellsByLevel(level: number): Observable<Spell[]> {
+    const offline = this.offlineList<Spell[]>('spells');
+    if (offline) return of(offline.filter((s) => s.level === level));
     return this.http.get<Spell[]>(`${this.apiUrl}/spells/level/${level}`);
   }
 
   getSpellsBySchool(school: string): Observable<Spell[]> {
+    const offline = this.offlineList<Spell[]>('spells');
+    if (offline) return of(offline.filter((s) => s.school === school));
     return this.http.get<Spell[]>(`${this.apiUrl}/spells/school/${school}`);
   }
 
@@ -215,10 +252,14 @@ export class DataService {
   }
 
   getCreatureById(id: string): Observable<Creature> {
+    const offline = this.offlineById<Creature>('creatures', id);
+    if (offline) return of(offline);
     return this.http.get<Creature>(`${this.apiUrl}/creatures/${id}`);
   }
 
   getCreaturesByCategory(category: string): Observable<Creature[]> {
+    const offline = this.offlineList<Creature[]>('creatures');
+    if (offline) return of(offline.filter((c) => c.category === category));
     return this.http.get<Creature[]>(`${this.apiUrl}/creatures/category/${category}`);
   }
 
@@ -239,6 +280,8 @@ export class DataService {
   }
 
   getBackgroundById(id: string): Observable<Background> {
+    const offline = this.offlineById<Background>('backgrounds', id);
+    if (offline) return of(offline);
     return this.http.get<Background>(`${this.apiUrl}/backgrounds/${id}`);
   }
 
@@ -257,6 +300,8 @@ export class DataService {
   }
 
   getHandicapById(id: string): Observable<Handicap> {
+    const offline = this.offlineById<Handicap>('handicaps', id);
+    if (offline) return of(offline);
     return this.http.get<Handicap>(`${this.apiUrl}/handicaps/${id}`);
   }
 
@@ -281,10 +326,14 @@ export class DataService {
   }
 
   getLanguageById(id: string): Observable<Language> {
+    const offline = this.offlineById<Language>('languages', id);
+    if (offline) return of(offline);
     return this.http.get<Language>(`${this.apiUrl}/languages/${id}`);
   }
 
   getLanguagesByCategory(category: string): Observable<Language[]> {
+    const offline = this.offlineList<Language[]>('languages');
+    if (offline) return of(offline.filter((l) => l.category === category));
     return this.http.get<Language[]>(`${this.apiUrl}/languages/category/${category}`);
   }
 
@@ -330,6 +379,8 @@ export class DataService {
   }
 
   getSkillById(id: string): Observable<Skill> {
+    const offline = this.offlineById<Skill>('skills', id);
+    if (offline) return of(offline);
     return this.http.get<Skill>(`${this.apiUrl}/skills/${id}`);
   }
 
@@ -344,6 +395,8 @@ export class DataService {
   }
 
   getFeatById(id: string): Observable<Feat> {
+    const offline = this.offlineById<Feat>('feats', id);
+    if (offline) return of(offline);
     return this.http.get<Feat>(`${this.apiUrl}/feats/${id}`);
   }
 
@@ -358,6 +411,8 @@ export class DataService {
   }
 
   getDeityById(id: string): Observable<Deity> {
+    const offline = this.offlineById<Deity>('deities', id);
+    if (offline) return of(offline);
     return this.http.get<Deity>(`${this.apiUrl}/deities/${id}`);
   }
 
@@ -374,6 +429,8 @@ export class DataService {
   }
 
   getCombatActionById(id: string): Observable<CombatAction> {
+    const offline = this.offlineById<CombatAction>('combat-actions', id);
+    if (offline) return of(offline);
     return this.http.get<CombatAction>(`${this.apiUrl}/combat-actions/${id}`);
   }
 }

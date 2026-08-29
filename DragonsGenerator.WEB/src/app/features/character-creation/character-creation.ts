@@ -9,8 +9,10 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CharacterBuilderService } from '../../core/services/character-builder.service';
+import { ConnectivityService } from '@core/services/connectivity.service';
+import { OfflineCodexService } from '@core/services/offline-codex.service';
 
 // Steps
 import { SpeciesStep } from './steps/species-step/species-step';
@@ -30,6 +32,7 @@ import { BackgroundStep } from './steps/background-step/background-step';
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     SpeciesStep,
     CivilizationStep,
     BackgroundStep,
@@ -49,6 +52,11 @@ import { BackgroundStep } from './steps/background-step/background-step';
 export class CharacterCreation implements OnInit {
   readonly builder = inject(CharacterBuilderService);
   private readonly router = inject(Router);
+  private readonly connectivity = inject(ConnectivityService);
+  private readonly offlineCodex = inject(OfflineCodexService);
+
+  readonly isOnline = this.connectivity.isOnline;
+  readonly codexReady = signal(this.offlineCodex.isDownloaded());
 
   /** Affiche l'overlay de choix brouillon. */
   readonly showDraftPrompt = signal(false);

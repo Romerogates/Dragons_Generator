@@ -1,0 +1,58 @@
+{
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app-shell",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/favicon.ico",
+          "/index.html",
+          "/manifest.webmanifest",
+          "/*.css",
+          "/*.js",
+          "/ngsw-worker.js"
+        ]
+      }
+    },
+    {
+      "name": "static-assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/**",
+          "/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|ico|woff|woff2|ttf|eot)"
+        ]
+      }
+    }
+  ],
+  "dataGroups": [
+    {
+      "name": "codex-api",
+      "urls": [
+        "/api/species/**",
+        "/api/classes/**",
+        "/api/spells/**",
+        "/api/creatures/**",
+        "/api/equipments/**",
+        "/api/skills/**",
+        "/api/feats/**",
+        "/api/civilisations/**",
+        "/api/deities/**",
+        "/api/combat-actions/**",
+        "/api/backgrounds/**",
+        "/api/handicaps/**",
+        "/api/languages/**"
+      ],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 128,
+        "maxAge": "7d",
+        "timeout": "10s"
+      }
+    }
+  ]
+}

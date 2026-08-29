@@ -98,7 +98,18 @@ export class CharacterCloudService {
         );
       }),
       tap((merged) => {
-        localStorage.setItem('dragons-characters', JSON.stringify(merged));
+        const pendingLocal = this.readLocal().filter(
+          (c): c is { id?: string; cloudSynced?: boolean } =>
+            typeof c === 'object' &&
+            c !== null &&
+            (c as { cloudSynced?: boolean }).cloudSynced === false,
+        );
+        const mergedIds = new Set(
+          (merged as { id?: string }[]).map((c) => c.id).filter(Boolean),
+        );
+        const extras = pendingLocal.filter((c) => !mergedIds.has(c.id));
+        const combined = [...(merged as unknown[]), ...extras];
+        localStorage.setItem('dragons-characters', JSON.stringify(combined));
       }),
       catchError(() => of(this.readLocal())),
     );

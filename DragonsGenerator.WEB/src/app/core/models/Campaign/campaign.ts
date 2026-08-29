@@ -75,6 +75,10 @@ export interface CampaignSummary {
   updatedAt: string;
   playerCount: number;
   regionName?: string | null;
+  /** Campagne créée hors ligne, en attente de sync cloud. */
+  pendingSync?: boolean;
+  /** Id local tant que la campagne n'est pas synchronisée. */
+  localId?: string;
 }
 
 export interface CampaignDetail {

@@ -9,6 +9,9 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '@core/services/auth.service';
+import { OfflineCodexService } from '@core/services/offline-codex.service';
+import { OfflineSyncService } from '@core/services/offline-sync.service';
+import { ConnectivityService } from '@core/services/connectivity.service';
 import { PasswordFieldComponent } from '@shared/components/password-field/password-field';
 
 @Component({
@@ -21,6 +24,9 @@ import { PasswordFieldComponent } from '@shared/components/password-field/passwo
 })
 export class SettingsPage implements OnInit {
   private readonly auth = inject(AuthService);
+  private readonly offlineCodex = inject(OfflineCodexService);
+  private readonly offlineSync = inject(OfflineSyncService);
+  private readonly connectivity = inject(ConnectivityService);
 
   displayName = '';
   currentPassword = '';
@@ -39,10 +45,40 @@ export class SettingsPage implements OnInit {
   readonly confirmLink = signal<string | null>(null);
   readonly confirmLoading = signal(false);
 
+  readonly codexDownloaded = signal(false);
+  readonly codexDownloadedAt = signal<string | null>(null);
+  readonly codexDownloading = this.offlineCodex.downloading;
+  readonly codexDownloadError = this.offlineCodex.downloadError;
+  readonly pendingSyncCount = this.offlineSync.pendingCount;
+  readonly isOnline = this.connectivity.isOnline;
+  readonly syncMessage = this.offlineSync.lastSyncMessage;
+
   readonly user = this.auth.user;
 
   ngOnInit(): void {
     this.displayName = this.auth.user()?.displayName ?? '';
+    this.refreshCodexMeta();
+    this.offlineSync.refreshPendingCount();
+  }
+
+  downloadCodex(): void {
+    this.offlineCodex.downloadCodex().subscribe((ok) => {
+      if (ok) this.refreshCodexMeta();
+    });
+  }
+
+  syncNow(): void {
+    this.offlineSync.flushIfPossible();
+  }
+
+  clearCodexDownload(): void {
+    this.offlineCodex.clearDownload();
+    this.refreshCodexMeta();
+  }
+
+  private refreshCodexMeta(): void {
+    this.codexDownloaded.set(this.offlineCodex.isDownloaded());
+    this.codexDownloadedAt.set(this.offlineCodex.meta()?.downloadedAt ?? null);
   }
 
   saveProfile(): void {
