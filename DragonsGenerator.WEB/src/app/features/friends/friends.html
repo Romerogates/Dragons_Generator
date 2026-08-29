@@ -1,16 +1,47 @@
 <div class="w-full min-h-screen bg-[#171b22] text-slate-300 pb-20 animate-fade-in overflow-x-clip">
   <section class="border-b border-slate-800 pt-16 pb-12 px-4 text-center">
     <h1 class="text-3xl sm:text-4xl font-extrabold text-violet-400 font-serif uppercase mb-4">Amis</h1>
-    <p class="text-sm text-slate-400 italic max-w-xl mx-auto">Trouvez des joueurs, acceptez des demandes et rejoignez des campagnes.</p>
+    <p class="text-sm text-slate-400 italic max-w-xl mx-auto">
+      Trouvez des joueurs, discutez et gérez vos campagnes ensemble.
+    </p>
   </section>
 
   <section class="max-w-2xl mx-auto px-4 py-10 space-y-10 min-w-0">
     @if (!isLoggedIn()) {
       <p class="text-center text-slate-400 py-12">Connectez-vous pour gérer vos amis.</p>
-      <div class="text-center"><a routerLink="/login" class="px-6 py-3 bg-violet-600 text-white rounded-xl text-xs font-black uppercase">Se connecter</a></div>
+      <div class="text-center">
+        <a routerLink="/login" [queryParams]="{ returnUrl: '/friends' }" class="px-6 py-3 bg-violet-600 text-white rounded-xl text-xs font-black uppercase">Se connecter</a>
+      </div>
     } @else {
       @if (message(); as msg) {
         <div class="p-3 rounded-xl text-sm text-center bg-violet-950/30 border border-violet-800/40 text-violet-300">{{ msg }}</div>
+      }
+
+      @if (friendToRemove(); as target) {
+        <div class="p-4 rounded-xl border border-red-900/50 bg-red-950/20 space-y-3">
+          <p class="text-sm text-red-200">
+            Retirer <strong>{{ target.displayName }}</strong> de vos amis ? L'historique de chat sera
+            supprimé.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              class="px-4 py-2 rounded-lg text-[10px] font-black uppercase bg-red-900/60 text-red-200 disabled:opacity-50"
+              [disabled]="removing()"
+              (click)="removeFriend()"
+            >
+              {{ removing() ? 'Suppression…' : 'Confirmer' }}
+            </button>
+            <button
+              type="button"
+              class="px-4 py-2 rounded-lg text-[10px] font-black uppercase border border-slate-600 text-slate-400"
+              [disabled]="removing()"
+              (click)="cancelRemove()"
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
       }
 
       <div>
@@ -30,7 +61,20 @@
           @for (u of searchResults(); track u.id) {
             <div class="flex flex-wrap items-center justify-between gap-2 bg-[#1b2028] border border-slate-800 rounded-xl p-3">
               <p class="font-serif text-slate-200 min-w-0 truncate">{{ u.displayName }}</p>
-              <button type="button" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase border border-violet-800/40 text-violet-300 shrink-0" (click)="sendRequest(u.id)">Ajouter</button>
+              @switch (searchStatus(u.id)) {
+                @case ('friend') {
+                  <span class="text-[10px] uppercase text-emerald-400 font-bold">Déjà ami</span>
+                }
+                @case ('pending_sent') {
+                  <span class="text-[10px] uppercase text-sky-400 font-bold">Demande envoyée</span>
+                }
+                @case ('pending_received') {
+                  <span class="text-[10px] uppercase text-amber-400 font-bold">Vous a demandé</span>
+                }
+                @default {
+                  <button type="button" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase border border-violet-800/40 text-violet-300 shrink-0" (click)="sendRequest(u.id)">Ajouter</button>
+                }
+              }
             </div>
           }
         </div>
@@ -87,8 +131,27 @@
       <div>
         <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Mes amis ({{ friendsList().length }})</h2>
         @for (f of friendsList(); track f.id) {
-          <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-3 mb-2">
-            <p class="font-serif text-slate-200 truncate">{{ f.displayName }}</p>
+          <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-3 mb-2 flex flex-wrap items-center justify-between gap-2">
+            <div class="min-w-0 flex items-center gap-2">
+              <p class="font-serif text-slate-200 truncate">{{ f.displayName }}</p>
+              @if (unreadCount(f.id) > 0) {
+                <span class="min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950">{{ unreadCount(f.id) }}</span>
+              }
+            </div>
+            <div class="flex flex-wrap gap-2 shrink-0">
+              <a
+                [routerLink]="['/friends/chat', f.id]"
+                class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-violet-900/50 border border-violet-800/50 text-violet-300"
+                >Message</a
+              >
+              <button
+                type="button"
+                class="px-3 py-1 rounded-lg text-[10px] font-black uppercase text-red-400/90 border border-red-900/30"
+                (click)="confirmRemove(f)"
+              >
+                Retirer
+              </button>
+            </div>
           </div>
         } @empty {
           <p class="text-sm text-slate-500 italic">Aucun ami pour l'instant.</p>

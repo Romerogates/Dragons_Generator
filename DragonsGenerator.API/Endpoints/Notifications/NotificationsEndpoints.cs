@@ -1,3 +1,4 @@
+using DragonsGenerator.API.Endpoints.Friends;
 using DragonsGenerator.API.Persistence;
 using DragonsGenerator.API.Services;
 using FastEndpoints;
@@ -137,9 +138,51 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
             );
         }
 
+        var acceptedFriendships = await db.Friendships.AsNoTracking()
+            .Where(f =>
+                f.Status == FriendStatuses.Accepted
+                && (f.RequesterId == userId || f.AddresseeId == userId)
+            )
+            .Include(f => f.Requester)
+            .Include(f => f.Addressee)
+            .ToListAsync(ct);
+        var readMarkers = await db.FriendChatReads.AsNoTracking()
+            .Where(r => r.UserId == userId)
+            .ToDictionaryAsync(r => r.FriendUserId, r => r.LastReadAt, ct);
+
+        foreach (var f in acceptedFriendships)
+        {
+            var friend = f.RequesterId == userId ? f.Addressee : f.Requester;
+            var lastRead = readMarkers.GetValueOrDefault(friend.Id, DateTimeOffset.MinValue);
+            var unreadMsg = (await FriendAccess
+                    .ConversationQuery(db, userId.Value, friend.Id)
+                    .Include(m => m.Sender)
+                    .ToListAsync(ct))
+                .Where(m => m.RecipientId == userId && m.CreatedAt > lastRead)
+                .OrderByDescending(m => m.CreatedAt)
+                .FirstOrDefault();
+            if (unreadMsg is null)
+                continue;
+
+            var preview = unreadMsg.Body.Trim();
+            if (preview.Length > 60)
+                preview = preview[..57] + "…";
+
+            items.Add(
+                new NotificationItemDto(
+                    $"chat-{friend.Id}-{unreadMsg.Id}",
+                    "friend_message",
+                    "Message d'un ami",
+                    $"{friend.DisplayName} : {preview}",
+                    $"/friends/chat/{friend.Id}",
+                    unreadMsg.CreatedAt
+                )
+            );
+        }
+
         items = items.OrderByDescending(i => i.CreatedAt).ToList();
 
-        var friendsCount = items.Count(i => i.Kind == "friend_request");
+        var friendsCount = items.Count(i => i.Kind is "friend_request" or "friend_message");
         var campaignsCount = items.Count - friendsCount;
 
         await Send.OkAsync(

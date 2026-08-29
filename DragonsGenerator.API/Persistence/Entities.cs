@@ -28,6 +28,9 @@ public class AppUser
     public List<Friendship> FriendshipsRequested { get; set; } = [];
     public List<Friendship> FriendshipsReceived { get; set; } = [];
     public List<CampaignInvite> CampaignInvitesReceived { get; set; } = [];
+    public List<FriendMessage> FriendMessagesSent { get; set; } = [];
+    public List<FriendMessage> FriendMessagesReceived { get; set; } = [];
+    public List<FriendChatRead> FriendChatReads { get; set; } = [];
 }
 
 public class CharacterRecord
@@ -74,6 +77,26 @@ public class Friendship
     public AppUser Addressee { get; set; } = null!;
     public string Status { get; set; } = FriendStatuses.Pending;
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+}
+
+public class FriendMessage
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid SenderId { get; set; }
+    public AppUser Sender { get; set; } = null!;
+    public Guid RecipientId { get; set; }
+    public AppUser Recipient { get; set; } = null!;
+    public string Body { get; set; } = "";
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+}
+
+public class FriendChatRead
+{
+    public Guid UserId { get; set; }
+    public AppUser User { get; set; } = null!;
+    public Guid FriendUserId { get; set; }
+    public AppUser FriendUser { get; set; } = null!;
+    public DateTimeOffset LastReadAt { get; set; } = DateTimeOffset.UtcNow;
 }
 
 public class CampaignRecord

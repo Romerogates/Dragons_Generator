@@ -35,6 +35,8 @@ export class NotificationsPage implements OnInit {
     switch (kind) {
       case 'friend_request':
         return 'fluent-emoji:handshake';
+      case 'friend_message':
+        return 'fluent-emoji:speech-balloon';
       case 'campaign_invite':
         return 'fluent-emoji:world-map';
       case 'character_proposal':

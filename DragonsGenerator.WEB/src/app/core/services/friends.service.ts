@@ -59,4 +59,8 @@ export class FriendsService {
   declineCampaignInvite(id: string): Observable<void> {
     return this.http.post<void>(`${this.api}/me/campaign-invites/${id}/decline`, {});
   }
+
+  removeFriend(userId: string): Observable<void> {
+    return this.http.delete<void>(`${this.api}/me/friends/${userId}`);
+  }
 }

@@ -114,6 +114,24 @@ export class AuthService {
     );
   }
 
+  /** Vérifie le token au démarrage et au retour sur l'app (PWA / onglet). */
+  initSessionSync(): void {
+    if (typeof window === 'undefined') return;
+    if (this.tokenSignal()) {
+      this.refreshMe().subscribe();
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && this.tokenSignal()) {
+        this.refreshMe().subscribe();
+      }
+    });
+    window.addEventListener('focus', () => {
+      if (this.tokenSignal()) {
+        this.refreshMe().subscribe();
+      }
+    });
+  }
+
   logout(navigate = true): void {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);

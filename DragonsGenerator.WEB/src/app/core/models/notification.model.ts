@@ -1,5 +1,6 @@
 export type NotificationType =
   | 'friend_request'
+  | 'friend_message'
   | 'campaign_invite'
   | 'character_proposal'
   | 'proposal_rejected';

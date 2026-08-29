@@ -111,6 +111,12 @@ export const routes: Routes = [
     loadComponent: () => import('@features/friends/friends').then((m) => m.FriendsPage),
   },
   {
+    path: 'friends/chat/:userId',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('@features/friends/friend-chat/friend-chat').then((m) => m.FriendChatPage),
+  },
+  {
     path: 'stories',
     redirectTo: 'campaigns',
     pathMatch: 'full',

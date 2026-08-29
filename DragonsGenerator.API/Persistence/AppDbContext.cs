@@ -11,6 +11,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<CampaignRecord> Campaigns => Set<CampaignRecord>();
     public DbSet<CampaignMember> CampaignMembers => Set<CampaignMember>();
     public DbSet<CampaignInvite> CampaignInvites => Set<CampaignInvite>();
+    public DbSet<FriendMessage> FriendMessages => Set<FriendMessage>();
+    public DbSet<FriendChatRead> FriendChatReads => Set<FriendChatRead>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -93,6 +95,33 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasOne(x => x.InvitedUser)
                 .WithMany(u => u.CampaignInvitesReceived)
                 .HasForeignKey(x => x.InvitedUserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<FriendMessage>(e =>
+        {
+            e.Property(x => x.Body).HasMaxLength(2000);
+            e.HasIndex(x => new { x.SenderId, x.RecipientId, x.CreatedAt });
+            e.HasOne(x => x.Sender)
+                .WithMany(u => u.FriendMessagesSent)
+                .HasForeignKey(x => x.SenderId)
+                .OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(x => x.Recipient)
+                .WithMany(u => u.FriendMessagesReceived)
+                .HasForeignKey(x => x.RecipientId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<FriendChatRead>(e =>
+        {
+            e.HasKey(x => new { x.UserId, x.FriendUserId });
+            e.HasOne(x => x.User)
+                .WithMany(u => u.FriendChatReads)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(x => x.FriendUser)
+                .WithMany()
+                .HasForeignKey(x => x.FriendUserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }

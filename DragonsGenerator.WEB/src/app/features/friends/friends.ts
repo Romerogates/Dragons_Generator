@@ -5,13 +5,17 @@ import {
   OnInit,
   signal,
   CUSTOM_ELEMENTS_SCHEMA,
+  computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FriendsService } from '@core/services/friends.service';
+import { FriendChatService, FriendChatSummary } from '@core/services/friend-chat.service';
 import { NotificationService } from '@core/services/notification.service';
 import { AuthService } from '@core/services/auth.service';
 import { CampaignInvite, FriendRequest, FriendUser } from '@core/models/Campaign/campaign';
+
+type SearchStatus = 'none' | 'friend' | 'pending_sent' | 'pending_received';
 
 @Component({
   selector: 'app-friends',
@@ -23,17 +27,29 @@ import { CampaignInvite, FriendRequest, FriendUser } from '@core/models/Campaign
 })
 export class FriendsPage implements OnInit {
   private friends = inject(FriendsService);
+  private chat = inject(FriendChatService);
   private auth = inject(AuthService);
   private notifications = inject(NotificationService);
 
   readonly searchQuery = signal('');
   readonly searchResults = signal<FriendUser[]>([]);
   readonly friendsList = signal<FriendUser[]>([]);
+  readonly chatSummaries = signal<FriendChatSummary[]>([]);
   readonly requests = signal<FriendRequest[]>([]);
   readonly sentRequests = signal<FriendRequest[]>([]);
   readonly campaignInvites = signal<CampaignInvite[]>([]);
   readonly message = signal<string | null>(null);
+  readonly friendToRemove = signal<FriendUser | null>(null);
+  readonly removing = signal(false);
   readonly isLoggedIn = this.auth.isLoggedIn;
+
+  readonly unreadByFriendId = computed(() => {
+    const map = new Map<string, number>();
+    for (const s of this.chatSummaries()) {
+      map.set(s.friendUserId, s.unreadCount);
+    }
+    return map;
+  });
 
   ngOnInit(): void {
     if (!this.auth.isLoggedIn()) return;
@@ -42,10 +58,18 @@ export class FriendsPage implements OnInit {
 
   reload(): void {
     this.friends.listFriends().subscribe((f) => this.friendsList.set(f));
+    this.chat.listSummaries().subscribe((s) => this.chatSummaries.set(s));
     this.friends.listIncomingRequests().subscribe((r) => this.requests.set(r));
     this.friends.listSentRequests().subscribe((r) => this.sentRequests.set(r));
     this.friends.listCampaignInvites().subscribe((i) => this.campaignInvites.set(i));
     this.notifications.refresh();
+  }
+
+  searchStatus(userId: string): SearchStatus {
+    if (this.friendsList().some((f) => f.id === userId)) return 'friend';
+    if (this.sentRequests().some((r) => r.userId === userId)) return 'pending_sent';
+    if (this.requests().some((r) => r.userId === userId)) return 'pending_received';
+    return 'none';
   }
 
   search(): void {
@@ -92,5 +116,35 @@ export class FriendsPage implements OnInit {
 
   declineCampaign(id: string): void {
     this.friends.declineCampaignInvite(id).subscribe(() => this.reload());
+  }
+
+  confirmRemove(friend: FriendUser): void {
+    this.friendToRemove.set(friend);
+  }
+
+  cancelRemove(): void {
+    this.friendToRemove.set(null);
+  }
+
+  removeFriend(): void {
+    const friend = this.friendToRemove();
+    if (!friend || this.removing()) return;
+    this.removing.set(true);
+    this.friends.removeFriend(friend.id).subscribe({
+      next: () => {
+        this.removing.set(false);
+        this.friendToRemove.set(null);
+        this.message.set(`${friend.displayName} retiré de vos amis.`);
+        this.reload();
+      },
+      error: () => {
+        this.removing.set(false);
+        this.message.set('Impossible de retirer cet ami.');
+      },
+    });
+  }
+
+  unreadCount(friendId: string): number {
+    return this.unreadByFriendId().get(friendId) ?? 0;
   }
 }

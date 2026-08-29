@@ -68,6 +68,34 @@ public static class DbSchemaUpgrader
         await TryAddColumnAsync(db, "SupportTickets", "CharacterId", "TEXT NULL", ct);
         await TryAddColumnAsync(db, "SupportTickets", "CharacterName", "TEXT NULL", ct);
         await TryAddColumnAsync(db, "Users", "AcceptedTermsAt", "TEXT NULL", ct);
+        await EnsureFriendChatTablesAsync(db, ct);
+    }
+
+    private static async Task EnsureFriendChatTablesAsync(AppDbContext db, CancellationToken ct)
+    {
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            CREATE TABLE IF NOT EXISTS "FriendMessages" (
+                "Id" TEXT NOT NULL CONSTRAINT "PK_FriendMessages" PRIMARY KEY,
+                "SenderId" TEXT NOT NULL,
+                "RecipientId" TEXT NOT NULL,
+                "Body" TEXT NOT NULL,
+                "CreatedAt" TEXT NOT NULL,
+                CONSTRAINT "FK_FriendMessages_Users_SenderId" FOREIGN KEY ("SenderId") REFERENCES "Users" ("Id") ON DELETE CASCADE,
+                CONSTRAINT "FK_FriendMessages_Users_RecipientId" FOREIGN KEY ("RecipientId") REFERENCES "Users" ("Id") ON DELETE CASCADE
+            );
+            CREATE INDEX IF NOT EXISTS "IX_FriendMessages_SenderId_RecipientId_CreatedAt" ON "FriendMessages" ("SenderId", "RecipientId", "CreatedAt");
+
+            CREATE TABLE IF NOT EXISTS "FriendChatReads" (
+                "UserId" TEXT NOT NULL,
+                "FriendUserId" TEXT NOT NULL,
+                "LastReadAt" TEXT NOT NULL,
+                CONSTRAINT "PK_FriendChatReads" PRIMARY KEY ("UserId", "FriendUserId"),
+                CONSTRAINT "FK_FriendChatReads_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE,
+                CONSTRAINT "FK_FriendChatReads_Users_FriendUserId" FOREIGN KEY ("FriendUserId") REFERENCES "Users" ("Id") ON DELETE CASCADE
+            );
+            """,
+            ct);
     }
 
     private static async Task TryAddColumnAsync(

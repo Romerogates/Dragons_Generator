@@ -25,6 +25,7 @@ export class App implements OnInit {
 
   ngOnInit(): void {
     this.gameLabels.warmUp();
+    this.auth.initSessionSync();
     this.offlineSync.init();
     this.notifications.init();
     if (this.auth.isAdmin()) clearPersistedAiRateLimit();
