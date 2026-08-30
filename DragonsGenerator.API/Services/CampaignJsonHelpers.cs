@@ -190,12 +190,12 @@ public static class CampaignJsonHelpers
             if (newlyPublished.Count == 0)
                 return HandoutChangeInfo.None;
 
-            var title = newlyPublished[0].Title;
+            var first = newlyPublished[0];
             var message = newlyPublished.Count == 1
-                ? $"Document publié : {title}"
+                ? $"Document publié : {first.Title}"
                 : $"{newlyPublished.Count} documents publiés";
 
-            return new HandoutChangeInfo(true, title, newlyPublished.Count, message);
+            return new HandoutChangeInfo(true, first.Title, first.Id, newlyPublished.Count, message);
         }
         catch
         {
@@ -232,6 +232,176 @@ public static class CampaignJsonHelpers
     }
 
     private sealed record HandoutSnapshot(string Id, string Title, bool Published);
+
+    /// <summary>
+    /// Lit l'état de collecte d'initiative (session active) pour les joueurs.
+    /// </summary>
+    public static InitiativeBoardInfo? TryReadInitiativeBoard(string json)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(json) ? "{}" : json);
+            var root = doc.RootElement;
+            if (!root.TryGetProperty("activeSessionId", out var activeIdEl))
+                return null;
+            var activeSessionId = activeIdEl.GetString();
+            if (string.IsNullOrWhiteSpace(activeSessionId))
+                return null;
+            if (!root.TryGetProperty("sessions", out var sessions) || sessions.ValueKind != JsonValueKind.Array)
+                return null;
+
+            foreach (var session in sessions.EnumerateArray())
+            {
+                var sid = session.TryGetProperty("id", out var idEl) ? idEl.GetString() : null;
+                if (!string.Equals(sid, activeSessionId, StringComparison.Ordinal))
+                    continue;
+                if (!session.TryGetProperty("activeCombat", out var combat) || combat.ValueKind != JsonValueKind.Object)
+                    return null;
+                if (!combat.TryGetProperty("collectingInitiative", out var collecting) || collecting.ValueKind != JsonValueKind.True)
+                    return null;
+
+                var code = combat.TryGetProperty("initiativeCode", out var codeEl) ? codeEl.GetString() ?? "" : "";
+                var label = combat.TryGetProperty("label", out var labelEl) ? labelEl.GetString() : null;
+                var combatants = new List<InitiativeCombatantInfo>();
+                if (combat.TryGetProperty("combatants", out var arr) && arr.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var cb in arr.EnumerateArray())
+                    {
+                        var kind = cb.TryGetProperty("kind", out var k) ? k.GetString() : null;
+                        if (kind is not ("player" or "npc"))
+                            continue;
+                        combatants.Add(new InitiativeCombatantInfo(
+                            Id: cb.TryGetProperty("id", out var cid) ? cid.GetString() ?? "" : "",
+                            Name: cb.TryGetProperty("name", out var n) ? n.GetString() ?? "Sans nom" : "Sans nom",
+                            Kind: kind,
+                            InitiativeBonus: cb.TryGetProperty("initiativeBonus", out var b) && b.TryGetInt32(out var bi) ? bi : 0,
+                            HasRoll: cb.TryGetProperty("initiativeRoll", out var roll) && roll.ValueKind == JsonValueKind.Number,
+                            MemberUserId: cb.TryGetProperty("memberUserId", out var m) ? m.GetString() : null));
+                    }
+                }
+
+                return new InitiativeBoardInfo(true, code, label, combatants);
+            }
+
+            return null;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Applique un jet d'initiative joueur dans le JSON campagne. Retourne le nouveau JSON ou null si échec.
+    /// </summary>
+    public static string? TryApplyInitiativeRoll(
+        string json,
+        string code,
+        string combatantId,
+        int roll,
+        Guid? preferredUserId,
+        out string? error)
+    {
+        error = null;
+        if (roll is < 1 or > 30)
+        {
+            error = "Le jet doit être entre 1 et 30.";
+            return null;
+        }
+
+        try
+        {
+            var node = JsonNode.Parse(string.IsNullOrWhiteSpace(json) ? "{}" : json) as JsonObject ?? new JsonObject();
+            var activeSessionId = node["activeSessionId"]?.GetValue<string>();
+            if (string.IsNullOrWhiteSpace(activeSessionId))
+            {
+                error = "Aucune session de jeu en cours.";
+                return null;
+            }
+
+            if (node["sessions"] is not JsonArray sessions)
+            {
+                error = "Session introuvable.";
+                return null;
+            }
+
+            JsonObject? combat = null;
+            foreach (var item in sessions)
+            {
+                if (item is not JsonObject session) continue;
+                if (session["id"]?.GetValue<string>() != activeSessionId) continue;
+                combat = session["activeCombat"] as JsonObject;
+                break;
+            }
+
+            if (combat is null)
+            {
+                error = "Aucun combat actif.";
+                return null;
+            }
+
+            if (combat["collectingInitiative"]?.GetValue<bool>() != true)
+            {
+                error = "La collecte d'initiative est fermée.";
+                return null;
+            }
+
+            var expectedCode = combat["initiativeCode"]?.GetValue<string>() ?? "";
+            if (!string.Equals(expectedCode, code.Trim(), StringComparison.OrdinalIgnoreCase))
+            {
+                error = "Code invalide.";
+                return null;
+            }
+
+            if (combat["combatants"] is not JsonArray combatants)
+            {
+                error = "Combattant introuvable.";
+                return null;
+            }
+
+            JsonObject? target = null;
+            foreach (var item in combatants)
+            {
+                if (item is not JsonObject cb) continue;
+                if (cb["id"]?.GetValue<string>() != combatantId) continue;
+                var kind = cb["kind"]?.GetValue<string>();
+                if (kind is not ("player" or "npc"))
+                {
+                    error = "Ce combattant n'accepte pas de jet joueur.";
+                    return null;
+                }
+                target = cb;
+                break;
+            }
+
+            if (target is null)
+            {
+                error = "Combattant introuvable.";
+                return null;
+            }
+
+            if (preferredUserId is not null)
+            {
+                var linked = target["memberUserId"]?.GetValue<string>();
+                if (!string.IsNullOrWhiteSpace(linked)
+                    && Guid.TryParse(linked, out var linkedId)
+                    && linkedId != preferredUserId.Value)
+                {
+                    error = "Ce personnage est lié à un autre joueur.";
+                    return null;
+                }
+            }
+
+            target["initiativeRoll"] = roll;
+            target["playerSubmitted"] = true;
+            return node.ToJsonString();
+        }
+        catch
+        {
+            error = "Données de campagne invalides.";
+            return null;
+        }
+    }
 
     /// <summary>
     /// Compare les tableaux sessions et résume le changement pour activité + push.
@@ -336,8 +506,23 @@ public sealed record SessionChangeInfo(
 public sealed record HandoutChangeInfo(
     bool Changed,
     string? Title,
+    string? HandoutId,
     int Count,
     string Message)
 {
-    public static HandoutChangeInfo None { get; } = new(false, null, 0, "");
+    public static HandoutChangeInfo None { get; } = new(false, null, null, 0, "");
 }
+
+public sealed record InitiativeBoardInfo(
+    bool Open,
+    string Code,
+    string? Label,
+    IReadOnlyList<InitiativeCombatantInfo> Combatants);
+
+public sealed record InitiativeCombatantInfo(
+    string Id,
+    string Name,
+    string Kind,
+    int InitiativeBonus,
+    bool HasRoll,
+    string? MemberUserId);

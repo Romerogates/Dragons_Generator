@@ -253,4 +253,226 @@ public class HomeAndCampaignFeatureTests
             Assert.Contains("invite_accepted", raw);
         }
     }
+
+    [Fact]
+    public async Task Player_campaign_view_hides_draft_handouts()
+    {
+        var (_, ownerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "hoowner");
+        var (_, playerToken, playerId) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "hoplayer");
+
+        Guid campaignId;
+        using (var createReq = ApiTestAuth.Authed(HttpMethod.Post, "/me/campaigns", ownerToken))
+        {
+            createReq.Content = JsonContent.Create(new
+            {
+                title = "Handouts Test",
+                data = new
+                {
+                    notes = "",
+                    handouts = new object[]
+                    {
+                        new
+                        {
+                            id = "ho-draft",
+                            title = "Brouillon SECRET",
+                            body = "Ne pas montrer DRAFT_BODY",
+                            kind = "letter",
+                            published = false,
+                            createdAt = DateTimeOffset.UtcNow.ToString("O"),
+                        },
+                        new
+                        {
+                            id = "ho-pub",
+                            title = "Lettre publique",
+                            body = "Contenu visible PUB_BODY",
+                            kind = "letter",
+                            published = true,
+                            publishedAt = DateTimeOffset.UtcNow.ToString("O"),
+                            createdAt = DateTimeOffset.UtcNow.ToString("O"),
+                        },
+                    },
+                    sessions = Array.Empty<object>(),
+                    creatures = Array.Empty<object>(),
+                    encounters = Array.Empty<object>(),
+                    pregenCharacters = Array.Empty<object>(),
+                },
+            });
+            var created = await _client.SendAsync(createReq);
+            created.EnsureSuccessStatusCode();
+            campaignId = (await created.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("id").GetGuid();
+        }
+
+        await InvitePlayerToCampaignAsync(ownerToken, playerToken, playerId, campaignId);
+
+        using (var getReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}", playerToken))
+        {
+            var get = await _client.SendAsync(getReq);
+            get.EnsureSuccessStatusCode();
+            var raw = await get.Content.ReadAsStringAsync();
+            Assert.DoesNotContain("Brouillon SECRET", raw);
+            Assert.DoesNotContain("DRAFT_BODY", raw);
+            Assert.Contains("Lettre publique", raw);
+            Assert.Contains("PUB_BODY", raw);
+        }
+
+        using (var getOwner = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}", ownerToken))
+        {
+            var get = await _client.SendAsync(getOwner);
+            get.EnsureSuccessStatusCode();
+            var raw = await get.Content.ReadAsStringAsync();
+            Assert.Contains("Brouillon SECRET", raw);
+            Assert.Contains("Lettre publique", raw);
+        }
+    }
+
+    [Fact]
+    public async Task Player_can_submit_initiative_with_code()
+    {
+        var (_, ownerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "initowner");
+        var (_, playerToken, playerId) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "initplayer");
+
+        var sessionId = "sess-init-1";
+        var combatantId = "cb-player-1";
+        Guid campaignId;
+        using (var createReq = ApiTestAuth.Authed(HttpMethod.Post, "/me/campaigns", ownerToken))
+        {
+            createReq.Content = JsonContent.Create(new
+            {
+                title = "Init Test",
+                data = new
+                {
+                    activeSessionId = sessionId,
+                    sessions = new object[]
+                    {
+                        new
+                        {
+                            id = sessionId,
+                            title = "Soirée",
+                            scheduledAt = DateTimeOffset.UtcNow.ToString("O"),
+                            status = "planned",
+                            activeCombat = new
+                            {
+                                id = "combat-1",
+                                label = "Embuscade",
+                                round = 1,
+                                turnIndex = 0,
+                                collectingInitiative = true,
+                                initiativeCode = "AB12",
+                                combatants = new object[]
+                                {
+                                    new
+                                    {
+                                        id = combatantId,
+                                        name = "Héros",
+                                        kind = "player",
+                                        initiativeBonus = 2,
+                                        memberUserId = playerId.ToString(),
+                                    },
+                                    new
+                                    {
+                                        id = "cb-gob",
+                                        name = "Gobelin",
+                                        kind = "monster",
+                                        initiativeBonus = 0,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    handouts = Array.Empty<object>(),
+                    creatures = Array.Empty<object>(),
+                    encounters = Array.Empty<object>(),
+                    pregenCharacters = Array.Empty<object>(),
+                },
+            });
+            var created = await _client.SendAsync(createReq);
+            created.EnsureSuccessStatusCode();
+            campaignId = (await created.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("id").GetGuid();
+        }
+
+        await InvitePlayerToCampaignAsync(ownerToken, playerToken, playerId, campaignId);
+
+        using (var boardReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}/initiative", playerToken))
+        {
+            var board = await _client.SendAsync(boardReq);
+            board.EnsureSuccessStatusCode();
+            var json = await board.Content.ReadFromJsonAsync<JsonElement>();
+            Assert.True(json.GetProperty("open").GetBoolean());
+            Assert.Equal("AB12", json.GetProperty("code").GetString());
+            Assert.Equal(1, json.GetProperty("combatants").GetArrayLength());
+            Assert.Equal("Héros", json.GetProperty("combatants")[0].GetProperty("name").GetString());
+        }
+
+        using (var submitReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaigns/{campaignId}/initiative/submit", playerToken))
+        {
+            submitReq.Content = JsonContent.Create(new { code = "AB12", combatantId, roll = 17 });
+            var submit = await _client.SendAsync(submitReq);
+            Assert.Equal(System.Net.HttpStatusCode.NoContent, submit.StatusCode);
+        }
+
+        using (var boardReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}/initiative", playerToken))
+        {
+            var board = await _client.SendAsync(boardReq);
+            board.EnsureSuccessStatusCode();
+            var json = await board.Content.ReadFromJsonAsync<JsonElement>();
+            Assert.True(json.GetProperty("combatants")[0].GetProperty("hasRoll").GetBoolean());
+        }
+
+        using (var ownerGet = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}", ownerToken))
+        {
+            var get = await _client.SendAsync(ownerGet);
+            get.EnsureSuccessStatusCode();
+            var raw = await get.Content.ReadAsStringAsync();
+            Assert.Contains("initiativeRoll", raw);
+            Assert.Contains("17", raw);
+            Assert.Contains("playerSubmitted", raw);
+        }
+    }
+
+    private async Task InvitePlayerToCampaignAsync(
+        string ownerToken,
+        string playerToken,
+        Guid playerId,
+        Guid campaignId)
+    {
+        using (var friendReq = ApiTestAuth.Authed(HttpMethod.Post, "/me/friends/request", ownerToken))
+        {
+            friendReq.Content = JsonContent.Create(new { userId = playerId });
+            (await _client.SendAsync(friendReq)).EnsureSuccessStatusCode();
+        }
+
+        Guid friendRequestId;
+        using (var pendingFriend = ApiTestAuth.Authed(HttpMethod.Get, "/me/friends/requests", playerToken))
+        {
+            var pending = await _client.SendAsync(pendingFriend);
+            pending.EnsureSuccessStatusCode();
+            var p = await pending.Content.ReadFromJsonAsync<JsonElement>();
+            friendRequestId = p![0].GetProperty("id").GetGuid();
+        }
+
+        using (var acceptFriend = ApiTestAuth.Authed(HttpMethod.Post, $"/me/friends/requests/{friendRequestId}/accept", playerToken))
+        {
+            (await _client.SendAsync(acceptFriend)).EnsureSuccessStatusCode();
+        }
+
+        using (var inviteReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaigns/{campaignId}/invites", ownerToken))
+        {
+            inviteReq.Content = JsonContent.Create(new { userId = playerId });
+            (await _client.SendAsync(inviteReq)).EnsureSuccessStatusCode();
+        }
+
+        Guid inviteId;
+        using (var listInv = ApiTestAuth.Authed(HttpMethod.Get, "/me/campaign-invites", playerToken))
+        {
+            var inv = await _client.SendAsync(listInv);
+            inv.EnsureSuccessStatusCode();
+            var arr = await inv.Content.ReadFromJsonAsync<JsonElement>();
+            inviteId = arr[0].GetProperty("id").GetGuid();
+        }
+
+        using (var acceptReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaign-invites/{inviteId}/accept", playerToken))
+        {
+            (await _client.SendAsync(acceptReq)).EnsureSuccessStatusCode();
+        }
+    }
 }

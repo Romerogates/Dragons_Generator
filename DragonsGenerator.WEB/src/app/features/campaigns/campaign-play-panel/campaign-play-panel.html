@@ -60,10 +60,27 @@
           Initiative & ordre de combat
         </h3>
         @if (activeCombat(); as combat) {
-          <div class="flex flex-wrap gap-2">
+          <div class="flex flex-wrap gap-2 items-center">
             <span class="text-xs text-slate-500 self-center">
               Manche {{ combat.round }} · {{ combat.label || 'Combat' }}
             </span>
+            @if (combat.collectingInitiative) {
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-amber-700/50 text-amber-200"
+                (click)="closeInitiativeCollection()"
+              >
+                Fermer collecte
+              </button>
+            } @else {
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-sky-800/50 text-sky-300"
+                (click)="openInitiativeCollection()"
+              >
+                Collecter l’init
+              </button>
+            }
             <button
               type="button"
               class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-400 hover:text-slate-200"
@@ -102,6 +119,33 @@
           </div>
         } @else if (activeCombat()?.combatants?.length) {
           <p class="text-xs text-slate-500 italic px-1">Tous les combattants actifs sont hors combat.</p>
+        }
+
+        @if (activeCombat()?.collectingInitiative) {
+          <div class="bg-sky-950/20 border border-sky-800/40 rounded-xl px-4 py-3 space-y-2">
+            <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">
+              Collecte ouverte · code {{ activeCombat()!.initiativeCode }}
+            </p>
+            <p class="text-xs text-slate-400">
+              Jets joueurs : {{ submittedPlayerCount() }}/{{ playerCombatantCount() }}
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <a
+                [routerLink]="['/campaigns', c.id, 'init']"
+                [queryParams]="{ code: activeCombat()!.initiativeCode }"
+                class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase bg-[#1b2028] border border-sky-700/50 text-sky-300"
+              >
+                Page joueurs
+              </a>
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-400"
+                (click)="copyInitiativeLink()"
+              >
+                Copier le lien
+              </button>
+            </div>
+          </div>
         }
 
         <div class="overflow-x-auto rounded-xl border border-slate-800">
@@ -167,6 +211,9 @@
                   </td>
                   <td class="p-2 text-center font-mono text-amber-300/90">
                     {{ combatantInitiativeTotal(cb) ?? '—' }}
+                    @if (cb.playerSubmitted) {
+                      <span class="block text-[8px] text-sky-400/80 uppercase tracking-wide">joueur</span>
+                    }
                   </td>
                   <td class="p-2">
                     <div class="flex items-center justify-center gap-1">

@@ -34,6 +34,7 @@ import {
   combatantInitiativeTotal,
   createActiveCombat,
   createCombatant,
+  createInitiativeCode,
   currentTurnCombatant,
   duplicateCombatant,
   expandEncounterToCombatants,
@@ -64,6 +65,7 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly importingParty = signal(false);
 
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
+  private initiativePollTimer: ReturnType<typeof setInterval> | null = null;
 
   readonly activeSession = computed(() => {
     const c = this.campaign();
@@ -113,6 +115,7 @@ export class CampaignPlayPanel implements OnDestroy {
 
   ngOnDestroy(): void {
     this.flushSessionSave();
+    this.stopInitiativePoll();
   }
 
   formatSessionDate(iso: string): string {
@@ -185,13 +188,14 @@ export class CampaignPlayPanel implements OnDestroy {
     this.importingParty.set(true);
     const requests = approved.map((p) =>
       this.characters.get(p.approvedCharacterId!).pipe(
-        map((res) => this.combatantFromCharacter(res.data as Character)),
+        map((res) => this.combatantFromCharacter(res.data as Character, p.userId)),
         catchError(() =>
           of(
             createCombatant({
               name: p.approvedCharacterName ?? p.displayName,
               kind: 'player',
               initiativeBonus: 0,
+              memberUserId: p.userId,
             }),
           ),
         ),
@@ -221,6 +225,7 @@ export class CampaignPlayPanel implements OnDestroy {
     if (!combat || !session) return;
     if (!confirm('Terminer le combat en cours ? Un résumé sera ajouté aux notes de session.')) return;
 
+    this.stopInitiativePoll();
     const archive = formatCombatArchiveSummary(combat);
     const playNotes = [session.playNotes?.trim(), archive].filter(Boolean).join('\n\n');
     this.patchSession({ activeCombat: null, playNotes }, { immediate: true });
@@ -346,6 +351,73 @@ export class CampaignPlayPanel implements OnDestroy {
     this.patchCombat({ ...combat, ...patch }, { immediate: true });
   }
 
+  openInitiativeCollection(): void {
+    const combat = this.activeCombat();
+    if (!combat) return;
+    this.patchCombat(
+      {
+        ...combat,
+        collectingInitiative: true,
+        initiativeCode: combat.initiativeCode || createInitiativeCode(),
+      },
+      { immediate: true },
+    );
+    this.startInitiativePoll();
+  }
+
+  closeInitiativeCollection(): void {
+    const combat = this.activeCombat();
+    if (!combat) return;
+    this.stopInitiativePoll();
+    this.patchCombat(
+      { ...combat, collectingInitiative: false },
+      { immediate: true },
+    );
+  }
+
+  private startInitiativePoll(): void {
+    this.stopInitiativePoll();
+    this.initiativePollTimer = setInterval(() => {
+      if (!this.activeCombat()?.collectingInitiative) {
+        this.stopInitiativePoll();
+        return;
+      }
+      this.reload();
+    }, 4000);
+  }
+
+  private stopInitiativePoll(): void {
+    if (!this.initiativePollTimer) return;
+    clearInterval(this.initiativePollTimer);
+    this.initiativePollTimer = null;
+  }
+
+  initiativeShareUrl(): string {
+    const c = this.campaign();
+    const combat = this.activeCombat();
+    if (!combat?.initiativeCode) return '';
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    return `${origin}/campaigns/${c.id}/init?code=${combat.initiativeCode}`;
+  }
+
+  copyInitiativeLink(): void {
+    const url = this.initiativeShareUrl();
+    if (!url || !navigator.clipboard) return;
+    void navigator.clipboard.writeText(url);
+  }
+
+  submittedPlayerCount(): number {
+    const combat = this.activeCombat();
+    if (!combat) return 0;
+    return combat.combatants.filter((c) => c.kind === 'player' && c.playerSubmitted).length;
+  }
+
+  playerCombatantCount(): number {
+    const combat = this.activeCombat();
+    if (!combat) return 0;
+    return combat.combatants.filter((c) => c.kind === 'player').length;
+  }
+
   isCurrentTurn(combatantId: string): boolean {
     return this.currentTurn()?.id === combatantId;
   }
@@ -438,7 +510,7 @@ export class CampaignPlayPanel implements OnDestroy {
     }
   }
 
-  private combatantFromCharacter(character: Character): Combatant {
+  private combatantFromCharacter(character: Character, memberUserId?: string): Combatant {
     const maxHp =
       typeof character.vitality?.hitPointsMax === 'number'
         ? character.vitality.hitPointsMax
@@ -449,6 +521,7 @@ export class CampaignPlayPanel implements OnDestroy {
       initiativeBonus: character.initiative ?? 0,
       maxHp,
       currentHp: maxHp,
+      memberUserId: memberUserId ?? null,
     });
   }
 

@@ -64,6 +64,10 @@ export interface Combatant {
   encounterLink?: CombatantEncounterLink;
   /** Unité hors de combat (sync +1 kill sur la rencontre). */
   defeated?: boolean;
+  /** Joueur lié (collecte d'initiative). */
+  memberUserId?: string | null;
+  /** Jet soumis par le joueur via la collecte. */
+  playerSubmitted?: boolean;
 }
 
 export interface ActiveCombat {
@@ -73,6 +77,10 @@ export interface ActiveCombat {
   round: number;
   turnIndex: number;
   combatants: Combatant[];
+  /** Collecte ouverte : les joueurs peuvent saisir leur jet. */
+  collectingInitiative?: boolean;
+  /** Code court partagé avec les joueurs. */
+  initiativeCode?: string;
 }
 
 export interface CampaignSession {
@@ -168,11 +176,21 @@ export interface CampaignInvite {
   createdAt: string;
 }
 
+export type HandoutKind = 'letter' | 'map' | 'summary' | 'other';
+
+export const HANDOUT_KIND_LABELS: Record<HandoutKind, string> = {
+  letter: 'Letter',
+  map: 'Carte',
+  summary: 'Résumé',
+  other: 'Autre',
+};
+
 /** Document / handout publiable par le MJ (sans spoiler). */
 export interface CampaignHandout {
   id: string;
   title: string;
   body: string;
+  kind: HandoutKind;
   published: boolean;
   publishedAt?: string;
   createdAt: string;
@@ -185,9 +203,15 @@ export function createCampaignHandout(title = 'Nouveau document'): CampaignHando
     id: crypto.randomUUID?.() ?? `ho-${Date.now()}`,
     title,
     body: '',
+    kind: 'other',
     published: false,
     createdAt: now,
   };
+}
+
+export function normalizeHandoutKind(raw: unknown): HandoutKind {
+  if (raw === 'letter' || raw === 'map' || raw === 'summary' || raw === 'other') return raw;
+  return 'other';
 }
 
 export function emptyCampaignData(partyLevel = 3): CampaignData {

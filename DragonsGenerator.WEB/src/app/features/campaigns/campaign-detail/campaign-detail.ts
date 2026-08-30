@@ -27,6 +27,8 @@ import { Character } from '@core/models/Character/character';
 import {
   CampaignData,
   CampaignHandout,
+  HandoutKind,
+  HANDOUT_KIND_LABELS,
   CampaignMember,
   CampaignPregen,
   CampaignSession,
@@ -92,6 +94,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
   /** Handout en mode édition (MJ). */
   readonly editingHandoutId = signal<string | null>(null);
+  readonly previewHandoutId = signal<string | null>(null);
+  readonly focusHandoutId = signal<string | null>(null);
+  readonly handoutKindFilter = signal<HandoutKind | 'all'>('all');
 
   readonly creatureXpMap = signal<Record<string, number>>({});
   readonly isLoadingPreview = signal(false);
@@ -155,16 +160,27 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
   readonly sortedHandouts = computed(() => {
     const list = this.campaign()?.data.handouts ?? [];
-    return [...list].sort((a, b) => {
-      const ta = new Date(a.publishedAt ?? a.createdAt).getTime();
-      const tb = new Date(b.publishedAt ?? b.createdAt).getTime();
-      return tb - ta;
-    });
+    const filter = this.handoutKindFilter();
+    return [...list]
+      .filter((h) => filter === 'all' || h.kind === filter)
+      .sort((a, b) => {
+        const ta = new Date(a.publishedAt ?? a.createdAt).getTime();
+        const tb = new Date(b.publishedAt ?? b.createdAt).getTime();
+        return tb - ta;
+      });
+  });
+
+  readonly previewHandout = computed(() => {
+    const id = this.previewHandoutId();
+    if (!id) return null;
+    return (this.campaign()?.data.handouts ?? []).find((h) => h.id === id) ?? null;
   });
 
   protected roleLabels = CREATURE_ROLE_LABELS;
   protected toneLabels = ADVENTURE_TONE_LABELS;
   protected pregenStatusLabels = PREGEN_STATUS_LABELS;
+  protected handoutKindLabels = HANDOUT_KIND_LABELS;
+  protected handoutKinds: HandoutKind[] = ['letter', 'map', 'summary', 'other'];
   protected formatCr = formatChallengeRating;
   protected categoryLabel = getCreatureCategoryLabel;
   protected encounterTotalXp = encounterTotalXp;
@@ -206,6 +222,13 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         this.dmCharacters.set(chars.map((c) => ({ id: c.id, name: c.name })));
       }
     });
+
+    const tab = this.route.snapshot.queryParamMap.get('tab');
+    const handoutId = this.route.snapshot.queryParamMap.get('handout');
+    if (tab === 'handouts') {
+      this.tab.set('handouts');
+      if (handoutId) this.focusHandoutId.set(handoutId);
+    }
   }
 
   ngOnDestroy(): void {
@@ -330,6 +353,37 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       hour: '2-digit',
       minute: '2-digit',
     });
+  }
+
+  openHandoutFromActivity(item: CampaignActivityItem): void {
+    if (item.kind !== 'handout_published') return;
+    let handoutId: string | null = null;
+    try {
+      const raw = item.payloadJson ? JSON.parse(item.payloadJson) : null;
+      if (raw && typeof raw === 'object' && typeof raw.handoutId === 'string') {
+        handoutId = raw.handoutId;
+      }
+    } catch {
+      /* ignore */
+    }
+    this.focusHandoutId.set(handoutId);
+    this.setTab('handouts');
+  }
+
+  previewHandoutAsPlayer(handoutId: string): void {
+    this.previewHandoutId.set(handoutId);
+  }
+
+  closeHandoutPreview(): void {
+    this.previewHandoutId.set(null);
+  }
+
+  setHandoutKindFilter(kind: HandoutKind | 'all'): void {
+    this.handoutKindFilter.set(kind);
+  }
+
+  isHandoutFocused(handoutId: string): boolean {
+    return this.focusHandoutId() === handoutId;
   }
 
   formatSessionDate(iso: string): string {

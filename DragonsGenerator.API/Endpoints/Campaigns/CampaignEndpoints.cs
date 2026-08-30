@@ -240,7 +240,13 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
                     handoutChange = handout;
                     await CampaignActivityService.LogAsync(
                         db, campaign.Id, userId.Value, CampaignActivityKinds.HandoutPublished,
-                        new { message = handout.Message, title = handout.Title, count = handout.Count }, ct);
+                        new
+                        {
+                            message = handout.Message,
+                            title = handout.Title,
+                            handoutId = handout.HandoutId,
+                            count = handout.Count,
+                        }, ct);
                 }
             }
             campaign.JsonData = newJson;
@@ -265,7 +271,9 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
 
         if (handoutChange is not null)
         {
-            var url = $"/campaigns/{campaign.Id}";
+            var url = string.IsNullOrWhiteSpace(handoutChange.HandoutId)
+                ? $"/campaigns/{campaign.Id}?tab=handouts"
+                : $"/campaigns/{campaign.Id}?tab=handouts&handout={handoutChange.HandoutId}";
             var playerIds = campaign.Members
                 .Where(m => m.Role == CampaignMemberRoles.Player)
                 .Select(m => m.UserId)

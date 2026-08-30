@@ -8,6 +8,15 @@ export function createCombatantId(): string {
   return crypto.randomUUID?.() ?? `cb-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+export function createInitiativeCode(): string {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 4; i++) {
+    code += alphabet[Math.floor(Math.random() * alphabet.length)];
+  }
+  return code;
+}
+
 export function createCombatant(
   partial: Partial<Combatant> & Pick<Combatant, 'name' | 'kind'>,
 ): Combatant {

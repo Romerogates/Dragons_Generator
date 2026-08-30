@@ -9,6 +9,7 @@ import {
   CampaignDetail,
   CampaignSummary,
   emptyCampaignData,
+  normalizeHandoutKind,
 } from '../models/Campaign/campaign';
 
 export interface CampaignActivityItem {
@@ -145,7 +146,12 @@ export class CampaignCloudService {
       notes: raw.notes ?? base.notes,
       pregenCharacters: Array.isArray(raw.pregenCharacters) ? raw.pregenCharacters : [],
       sessions: Array.isArray(raw.sessions) ? raw.sessions : [],
-      handouts: Array.isArray(raw.handouts) ? raw.handouts : [],
+      handouts: Array.isArray(raw.handouts)
+        ? raw.handouts.map((h) => ({
+            ...h,
+            kind: normalizeHandoutKind((h as { kind?: unknown }).kind),
+          }))
+        : [],
       activeSessionId: raw.activeSessionId ?? null,
     };
   }
@@ -155,4 +161,31 @@ export class CampaignCloudService {
       params: { limit: String(limit) },
     });
   }
+
+  getInitiativeBoard(campaignId: string): Observable<InitiativeBoard> {
+    return this.http.get<InitiativeBoard>(`${this.api}/me/campaigns/${campaignId}/initiative`);
+  }
+
+  submitInitiative(
+    campaignId: string,
+    body: { code: string; combatantId: string; roll: number },
+  ): Observable<void> {
+    return this.http.post<void>(`${this.api}/me/campaigns/${campaignId}/initiative/submit`, body);
+  }
+}
+
+export interface InitiativeBoard {
+  open: boolean;
+  code: string | null;
+  label: string | null;
+  combatants: InitiativeBoardCombatant[];
+}
+
+export interface InitiativeBoardCombatant {
+  id: string;
+  name: string;
+  kind: string;
+  initiativeBonus: number;
+  hasRoll: boolean;
+  memberUserId: string | null;
 }
