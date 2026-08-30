@@ -1,6 +1,7 @@
 import {
   ActiveCombat,
   Combatant,
+  CombatHistoryEntry,
   EncounterGroup,
 } from '@core/models/Campaign/campaign';
 
@@ -236,6 +237,17 @@ export function formatCombatArchiveSummary(combat: ActiveCombat): string {
   }
 
   return lines.join('\n');
+}
+
+export function createCombatHistoryEntry(combat: ActiveCombat): CombatHistoryEntry {
+  return {
+    id: combat.id,
+    endedAt: new Date().toISOString(),
+    label: combat.label,
+    encounterId: combat.encounterId,
+    round: combat.round,
+    summary: formatCombatArchiveSummary(combat),
+  };
 }
 
 export const COMBATANT_KIND_LABELS: Record<Combatant['kind'], string> = {

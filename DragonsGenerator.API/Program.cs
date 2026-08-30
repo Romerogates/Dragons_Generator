@@ -91,6 +91,7 @@ builder.Services.AddSingleton<GameDataRepository>();
 builder.Services.AddSingleton<GroqRequestCoordinator>();
 builder.Services.AddSingleton<HybridAiService>();
 builder.Services.AddScoped<PushNotificationService>();
+builder.Services.AddHostedService<SessionReminderWorker>();
 builder.Services.AddHttpClient("Groq", client =>
 {
     client.Timeout = TimeSpan.FromSeconds(120);

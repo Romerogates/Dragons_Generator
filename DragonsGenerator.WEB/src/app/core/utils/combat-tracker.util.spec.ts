@@ -1,5 +1,6 @@
 import {
   createActiveCombat,
+  createCombatHistoryEntry,
   createCombatant,
   combatantInitiativeTotal,
   advanceTurn,
@@ -125,6 +126,16 @@ describe('combat-tracker.util', () => {
     expect(patch.turnOrderIds).toEqual([b.id, a.id, c.id]);
     combat = { ...combat, ...patch };
     expect(sortCombatants(combat.combatants, combat.turnOrderIds).map((x) => x.name)).toEqual(['B', 'A', 'C']);
+  });
+
+  it('createCombatHistoryEntry captures combat snapshot', () => {
+    const a = createCombatant({ name: 'Théo', kind: 'player', initiativeRoll: 18, initiativeBonus: 2 });
+    const combat = createActiveCombat([a], { label: 'Grotte' });
+    const entry = createCombatHistoryEntry(combat);
+    expect(entry.label).toBe('Grotte');
+    expect(entry.round).toBe(1);
+    expect(entry.summary).toContain('Fin combat : Grotte');
+    expect(entry.summary).toContain('Théo');
   });
 
   it('createActiveCombat starts at round 1 turn 0', () => {

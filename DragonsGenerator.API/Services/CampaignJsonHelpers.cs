@@ -61,6 +61,7 @@ public static class CampaignJsonHelpers
                 session["notes"] = "";
                 session["playNotes"] = "";
                 session["activeCombat"] = null;
+                session["combatHistory"] = new JsonArray();
             }
         }
 
@@ -168,6 +169,40 @@ public static class CampaignJsonHelpers
         catch
         {
             return null;
+        }
+    }
+
+    /// <summary>Sessions planifiées futures (rappels push).</summary>
+    public static IReadOnlyList<PlannedSessionInfo> ListUpcomingPlannedSessions(string json, DateTimeOffset now)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(json) ? "{}" : json);
+            if (!doc.RootElement.TryGetProperty("sessions", out var sessions) || sessions.ValueKind != JsonValueKind.Array)
+                return [];
+
+            var list = new List<PlannedSessionInfo>();
+            foreach (var session in sessions.EnumerateArray())
+            {
+                if (!session.TryGetProperty("status", out var st) || st.GetString() != "planned")
+                    continue;
+                if (!session.TryGetProperty("scheduledAt", out var at))
+                    continue;
+                if (!DateTimeOffset.TryParse(at.GetString(), out var when) || when <= now)
+                    continue;
+
+                var id = session.TryGetProperty("id", out var idEl) ? idEl.GetString() ?? "" : "";
+                if (string.IsNullOrEmpty(id)) continue;
+                var title = session.TryGetProperty("title", out var t) ? t.GetString() ?? "Session" : "Session";
+                var location = session.TryGetProperty("location", out var loc) ? loc.GetString() : null;
+                list.Add(new PlannedSessionInfo(id, title, when, location));
+            }
+
+            return list;
+        }
+        catch
+        {
+            return [];
         }
     }
 
@@ -594,3 +629,9 @@ public sealed record InitiativeCombatantInfo(
     int InitiativeBonus,
     bool HasRoll,
     string? MemberUserId);
+
+public sealed record PlannedSessionInfo(
+    string Id,
+    string Title,
+    DateTimeOffset ScheduledAt,
+    string? Location);

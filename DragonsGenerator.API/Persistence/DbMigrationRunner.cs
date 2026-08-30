@@ -29,6 +29,7 @@ public static class DbMigrationRunner
         new("005_push_subscriptions", Apply005PushSubscriptionsAsync),
         new("006_campaign_activity", Apply006CampaignActivityAsync),
         new("007_message_attachments", Apply007MessageAttachmentsAsync),
+        new("008_session_reminder_logs", Apply008SessionReminderLogsAsync),
     ];
 
     private sealed record Migration(string Id, Func<AppDbContext, CancellationToken, Task> Apply);
@@ -212,6 +213,24 @@ public static class DbMigrationRunner
     {
         await TryAddColumnAsync(db, "FriendMessages", "AttachmentKind", "TEXT NULL", ct);
         await TryAddColumnAsync(db, "FriendMessages", "AttachmentPayload", "TEXT NULL", ct);
+    }
+
+    private static async Task Apply008SessionReminderLogsAsync(AppDbContext db, CancellationToken ct)
+    {
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            CREATE TABLE IF NOT EXISTS "SessionReminderLogs" (
+                "Id" TEXT NOT NULL CONSTRAINT "PK_SessionReminderLogs" PRIMARY KEY,
+                "CampaignId" TEXT NOT NULL,
+                "SessionId" TEXT NOT NULL,
+                "UserId" TEXT NOT NULL,
+                "ReminderKind" TEXT NOT NULL,
+                "SentAt" TEXT NOT NULL
+            );
+            CREATE UNIQUE INDEX IF NOT EXISTS "IX_SessionReminderLogs_Dedupe"
+                ON "SessionReminderLogs" ("CampaignId", "SessionId", "UserId", "ReminderKind");
+            """,
+            ct);
     }
 
     private static async Task TryAddColumnAsync(

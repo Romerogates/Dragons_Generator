@@ -1,0 +1,137 @@
+<div class="min-h-screen bg-[#171b22] text-slate-300 pb-16">
+  <div class="max-w-4xl mx-auto px-4 py-10">
+    <header class="mb-10">
+      <a routerLink="/" class="text-xs font-black uppercase tracking-widest text-slate-500 hover:text-amber-400 mb-4 inline-block">← Accueil</a>
+      <h1 class="text-3xl md:text-4xl font-bold text-amber-400 font-serif mb-2">Guide Dragons Generator</h1>
+      <p class="text-slate-400 text-sm max-w-2xl">
+        Tout ce que vous pouvez faire sur le site — création, campagnes, table de jeu, social et codex.
+        Outil fan pour <em>Dragons</em>, non affilié à Agate RPG.
+      </p>
+    </header>
+
+    <nav class="mb-10 p-4 bg-[#1b2028] border border-slate-800 rounded-xl">
+      <p class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-3">Sommaire</p>
+      <ul class="grid sm:grid-cols-2 gap-1 text-sm">
+        <li><a href="#compte" class="text-sky-400 hover:text-sky-300">Compte & connexion</a></li>
+        <li><a href="#personnage" class="text-sky-400 hover:text-sky-300">Création de personnage</a></li>
+        <li><a href="#scenario" class="text-sky-400 hover:text-sky-300">Scénarios & campagnes</a></li>
+        <li><a href="#table" class="text-sky-400 hover:text-sky-300">Table de jeu (MJ)</a></li>
+        <li><a href="#initiative" class="text-sky-400 hover:text-sky-300">Initiative & combat</a></li>
+        <li><a href="#documents" class="text-sky-400 hover:text-sky-300">Documents joueurs</a></li>
+        <li><a href="#social" class="text-sky-400 hover:text-sky-300">Amis, chat & profils</a></li>
+        <li><a href="#notifications" class="text-sky-400 hover:text-sky-300">Notifications & PWA</a></li>
+        <li><a href="#codex" class="text-sky-400 hover:text-sky-300">Codex (règles & données)</a></li>
+        <li><a href="#pdf" class="text-sky-400 hover:text-sky-300">PDF & exports</a></li>
+        <li><a href="#support" class="text-sky-400 hover:text-sky-300">Support & admin</a></li>
+      </ul>
+    </nav>
+
+    <article class="prose prose-invert prose-slate max-w-none prose-headings:font-serif prose-headings:text-amber-500 prose-a:text-amber-400 prose-li:marker:text-slate-500">
+
+      <h2 id="compte">Compte & connexion</h2>
+      <ul>
+        <li><strong>Inscription</strong> — email, pseudo unique, mot de passe 8+ caractères, confirmation par mail.</li>
+        <li><strong>Connexion</strong> — JWT ; vos personnages et campagnes sont synchronisés dans le cloud.</li>
+        <li><strong>Mot de passe oublié</strong> — lien de réinitialisation valide 2 h.</li>
+        <li><strong>Paramètres</strong> (<a routerLink="/settings">/settings</a>) — bio, couleur d’accent, emoji avatar, mot de passe, notifications push.</li>
+        <li><strong>Profil public</strong> (<a routerLink="/profile">/profile</a>) — visible par vos amis.</li>
+        <li>Sans compte : brouillon local des personnages ; à la connexion, le perso en cours peut être sauvegardé.</li>
+      </ul>
+
+      <h2 id="personnage">Création de personnage</h2>
+      <p>Assistant <a routerLink="/create">Forger un héros</a> — 10 ou 11 étapes selon la classe (magie), niveaux <strong>1 à 20</strong>.</p>
+      <ol>
+        <li>Espèce & sous-espèce</li>
+        <li>Civilisation (carte d’Eana)</li>
+        <li>Historique (prédéfini ou custom)</li>
+        <li>Classe, sous-classe, styles, choix de progression (ASI, invocations sorcier…)</li>
+        <li>Caractéristiques (point-buy)</li>
+        <li>Compétences & maîtrises</li>
+        <li>Équipement de départ</li>
+        <li>Langues</li>
+        <li>Magie (lanceurs) — sorts, grimoire, domaines…</li>
+        <li>Identité — nom, alignement, <strong>backstory IA</strong> (Groq)</li>
+        <li>Récap — PDF fiche + grimoire, sauvegarde cloud</li>
+      </ol>
+      <p>Bibliothèque <a routerLink="/characters">/characters</a> : voir, éditer, dupliquer, exporter PDF.</p>
+
+      <h2 id="scenario">Scénarios & campagnes</h2>
+      <h3>Assistant scénario</h3>
+      <p><a routerLink="/story/create">/story/create</a> — 4 étapes : créatures, personnages (IA vie), aventure (IA 400–600 mots), récap PDF bestiaire + export campagne.</p>
+      <h3>Campagnes multijoueur</h3>
+      <p><a routerLink="/campaigns">/campaigns</a> — hub MJ et joueur.</p>
+      <ul>
+        <li><strong>MJ</strong> — synopsis, créatures, rencontres, XP, sessions, héros pré-tirés, invitations amis, approbation des persos joueurs.</li>
+        <li><strong>Joueur</strong> — proposer un personnage, voir documents publiés, activité, sessions à venir (sans spoilers MJ).</li>
+        <li>Onglets MJ : Résumé, Activité, Documents, Créatures, Pré-tirés, Rencontres, Joueurs.</li>
+        <li>Onglets joueur : Résumé, Activité, Documents, Pré-tirés, Joueurs.</li>
+        <li><strong>Fil d’activité</strong> — invitations, XP, documents publiés, collecte d’initiative…</li>
+        <li><strong>Sessions</strong> — planifier date/lieu ; rappels push <em>24 h</em> et <em>1 h</em> avant (si notifications activées).</li>
+      </ul>
+
+      <h2 id="table">Table de jeu (MJ)</h2>
+      <p>Depuis une campagne : <strong>Démarrer la table</strong> ou route plein écran <code>/campaigns/:id/play</code>.</p>
+      <ul>
+        <li>Notes en direct (sauvegarde auto)</li>
+        <li>Rencontres — +1/−1 kills, sync avec le tracker, distribution XP</li>
+        <li>Terminer la session → notes archivées, statut « jouée »</li>
+      </ul>
+
+      <h2 id="initiative">Initiative & combat</h2>
+      <ul>
+        <li><strong>Combat autonome</strong> ou import depuis une rencontre / party approuvée</li>
+        <li>Ordre de tour, PV, conditions, mort (sync kills rencontre)</li>
+        <li><strong>Collecter l’init</strong> — code + lien ; joueurs saisissent leur jet sur <code>/campaigns/:id/init</code></li>
+        <li>Bandeau joueur + push quand la collecte s’ouvre</li>
+        <li>Flèches ↑↓ pour départager les égalités d’initiative</li>
+        <li><strong>Fin combat</strong> — résumé dans les notes + entrée dans l’<strong>historique des combats</strong> (repliable)</li>
+      </ul>
+
+      <h2 id="documents">Documents joueurs (handouts)</h2>
+      <ul>
+        <li>MJ : onglet Documents — créer, types (letter, carte, résumé…), markdown léger (<code>**gras**</code>, <code># titres</code>, listes)</li>
+        <li>Publier → visible joueurs, push, activité cliquable</li>
+        <li>Joueur : aperçu depuis l’activité ou l’onglet Documents</li>
+      </ul>
+
+      <h2 id="social">Amis, chat & profils</h2>
+      <ul>
+        <li><a routerLink="/friends">/friends</a> — recherche, demandes, liste d’amis</li>
+        <li>Chat privé — messages, pièces jointes légères (fiche perso, campagne)</li>
+        <li>Invitations campagne via amis</li>
+        <li>Profils avec bio, avatar emoji, couleur</li>
+      </ul>
+
+      <h2 id="notifications">Notifications & PWA</h2>
+      <ul>
+        <li>Centre <a routerLink="/notifications">/notifications</a> — amis, campagnes, validations</li>
+        <li><strong>Push PWA</strong> — activer dans Paramètres ; sessions, documents, initiative, messages…</li>
+        <li>Installable sur mobile (raccourci écran d’accueil)</li>
+        <li>Mode hors-ligne partiel — cache profils consultés</li>
+      </ul>
+
+      <h2 id="codex">Codex (données de jeu)</h2>
+      <p>Référence lazy-loaded : espèces, classes, civilisations, équipements, sorts, bestiaire, compétences, dons, historiques, actions de combat, divinités — fiches en cartes résumé + détail.</p>
+
+      <h2 id="pdf">PDF & exports</h2>
+      <ul>
+        <li>Fiche personnage + grimoire (fond parchemin calibré)</li>
+        <li>Campagne — bestiaire, pack MJ, fiches joueurs, accroche pré-tirés</li>
+        <li>Scénario — export Markdown, PDF créatures</li>
+      </ul>
+
+      <h2 id="support">Support & admin</h2>
+      <ul>
+        <li><a routerLink="/support">/support</a> — ticket bug/question + pièce jointe (connecté)</li>
+        <li><a routerLink="/legal/privacy">Confidentialité</a> · <a routerLink="/legal/terms">Conditions</a></li>
+        <li>Admin (<code>/admin</code>) — utilisateurs et tickets (rôle admin uniquement)</li>
+      </ul>
+
+      <hr class="border-slate-800" />
+      <p class="text-sm text-slate-500 not-prose">
+        Une fonction manque ou un comportement surprend ?
+        <a routerLink="/support" class="text-amber-400">Ouvrez un ticket support</a>.
+      </p>
+    </article>
+  </div>
+</div>

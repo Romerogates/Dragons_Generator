@@ -35,6 +35,7 @@ import {
   combatantInitiativeTotal,
   createActiveCombat,
   createCombatant,
+  createCombatHistoryEntry,
   createInitiativeCode,
   currentTurnCombatant,
   duplicateCombatant,
@@ -81,6 +82,11 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly combatTurnOrder = computed(() => {
     const combat = this.activeCombat();
     return combat ? sortedTurnOrder(combat) : [];
+  });
+
+  readonly sessionCombatHistory = computed(() => {
+    const session = this.activeSession();
+    return [...(session?.combatHistory ?? [])].reverse();
   });
 
   readonly currentTurn = computed(() => {
@@ -229,8 +235,19 @@ export class CampaignPlayPanel implements OnDestroy {
 
     this.stopInitiativePoll();
     const archive = formatCombatArchiveSummary(combat);
+    const entry = createCombatHistoryEntry(combat);
     const playNotes = [session.playNotes?.trim(), archive].filter(Boolean).join('\n\n');
-    this.patchSession({ activeCombat: null, playNotes }, { immediate: true });
+    const combatHistory = [...(session.combatHistory ?? []), entry];
+    this.patchSession({ activeCombat: null, playNotes, combatHistory }, { immediate: true });
+  }
+
+  formatCombatHistoryDate(iso: string): string {
+    return new Date(iso).toLocaleString('fr-FR', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
 
   duplicateCombatantRow(combatantId: string): void {

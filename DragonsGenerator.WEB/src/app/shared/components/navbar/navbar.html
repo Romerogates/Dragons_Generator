@@ -234,6 +234,12 @@
                   >Paramètres</a
                 >
                 <a
+                  routerLink="/guide"
+                  class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
+                  (click)="closeMenus()"
+                  >Guide</a
+                >
+                <a
                   routerLink="/support"
                   class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
                   (click)="closeMenus()"
@@ -397,6 +403,14 @@
           >
             <span class="text-xl"><iconify-icon noobserver icon="mdi:cog-outline"></iconify-icon></span>
             <span class="text-sm font-bold tracking-wide">Paramètres</span>
+          </a>
+          <a
+            routerLink="/guide"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+            (click)="closeMenus()"
+          >
+            <span class="text-xl"><iconify-icon noobserver icon="fluent-emoji:open-book"></iconify-icon></span>
+            <span class="text-sm font-bold tracking-wide">Guide</span>
           </a>
           <a
             routerLink="/support"

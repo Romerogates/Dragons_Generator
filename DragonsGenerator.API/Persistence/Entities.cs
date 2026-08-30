@@ -183,6 +183,17 @@ public class PushSubscription
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }
 
+public class SessionReminderLog
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid CampaignId { get; set; }
+    public string SessionId { get; set; } = "";
+    public Guid UserId { get; set; }
+    /// <summary>24h ou 1h avant la session.</summary>
+    public string ReminderKind { get; set; } = "";
+    public DateTimeOffset SentAt { get; set; } = DateTimeOffset.UtcNow;
+}
+
 public class CampaignActivity
 {
     public Guid Id { get; set; } = Guid.NewGuid();

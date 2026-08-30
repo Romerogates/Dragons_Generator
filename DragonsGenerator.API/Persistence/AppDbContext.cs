@@ -15,6 +15,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<FriendChatRead> FriendChatReads => Set<FriendChatRead>();
     public DbSet<PushSubscription> PushSubscriptions => Set<PushSubscription>();
     public DbSet<CampaignActivity> CampaignActivities => Set<CampaignActivity>();
+    public DbSet<SessionReminderLog> SessionReminderLogs => Set<SessionReminderLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -156,6 +157,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .WithMany()
                 .HasForeignKey(x => x.ActorUserId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<SessionReminderLog>(e =>
+        {
+            e.HasIndex(x => new { x.CampaignId, x.SessionId, x.UserId, x.ReminderKind }).IsUnique();
+            e.Property(x => x.SessionId).HasMaxLength(128);
+            e.Property(x => x.ReminderKind).HasMaxLength(8);
         });
     }
 }

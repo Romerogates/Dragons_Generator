@@ -374,6 +374,26 @@
       }
     </section>
 
+    @if (sessionCombatHistory().length) {
+      <section class="space-y-3">
+        <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+          Historique des combats
+        </h3>
+        @for (entry of sessionCombatHistory(); track entry.id + entry.endedAt) {
+          <details class="bg-[#1b2028]/80 border border-slate-800 rounded-xl overflow-hidden group">
+            <summary class="cursor-pointer px-4 py-3 flex flex-wrap items-center justify-between gap-2 hover:bg-slate-800/30">
+              <span class="font-serif text-slate-200">
+                {{ entry.label || 'Combat' }}
+                <span class="text-slate-500 text-sm font-sans">· manche {{ entry.round }}</span>
+              </span>
+              <time class="text-[10px] text-slate-500">{{ formatCombatHistoryDate(entry.endedAt) }}</time>
+            </summary>
+            <pre class="px-4 pb-4 text-xs text-slate-400 whitespace-pre-wrap leading-relaxed border-t border-slate-800/80 pt-3">{{ entry.summary }}</pre>
+          </details>
+        }
+      </section>
+    }
+
     @if (c.data.encounters.length) {
       <div class="space-y-4">
         <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-400">Rencontres</h3>

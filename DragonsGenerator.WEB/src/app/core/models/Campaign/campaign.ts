@@ -96,6 +96,17 @@ export interface CampaignSession {
   /** Tracker initiative / ordre de combat en cours (MJ). */
   activeCombat?: ActiveCombat | null;
   status: CampaignSessionStatus;
+  /** Combats terminés durant cette session (MJ). */
+  combatHistory?: CombatHistoryEntry[];
+}
+
+export interface CombatHistoryEntry {
+  id: string;
+  endedAt: string;
+  label?: string;
+  encounterId?: string;
+  round: number;
+  summary: string;
 }
 
 export interface CampaignData {
