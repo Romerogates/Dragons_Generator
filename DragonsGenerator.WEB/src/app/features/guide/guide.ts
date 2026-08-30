@@ -136,7 +136,7 @@ export class GuidePage {
       date: '30 août 2026',
       tag: 'Initiative',
       title: 'Collecte côté joueurs',
-      summary: 'Bandeau + notification quand le MJ ouvre la collecte. Jet saisi sur /campaigns/:id/init.',
+      summary: 'Bandeau + notification quand le MJ ouvre la collecte. Les joueurs saisissent leur jet depuis le lien fourni.',
       icon: 'fluent-emoji:dice',
       border: 'border-sky-500/30',
       tagColor: 'text-sky-400 bg-sky-950/40',

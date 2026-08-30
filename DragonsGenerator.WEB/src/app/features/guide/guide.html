@@ -195,7 +195,7 @@
                 Créer un compte
               </h3>
               <ol class="space-y-3">
-                @for (item of ['Inscription sur /register', 'E-mail + pseudo unique + mot de passe 8+', 'Confirmation par mail (~2 h)', 'Connexion — persos synchronisés']; track item; let i = $index) {
+                @for (item of ['Ouvrir la page Inscription', 'E-mail + pseudo unique + mot de passe 8+', 'Confirmation par mail (~2 h)', 'Connexion — persos synchronisés']; track item; let i = $index) {
                   <li class="flex gap-3 text-sm">
                     <span class="text-sky-500 font-black shrink-0">{{ i + 1 }}.</span>
                     <span class="text-slate-300">{{ item }}</span>
@@ -331,7 +331,7 @@
                 <li class="flex gap-2"><span class="text-violet-500">③</span> Synopsis 400–600 mots (IA)</li>
                 <li class="flex gap-2"><span class="text-violet-500">④</span> PDF + export campagne</li>
               </ul>
-              <a routerLink="/story/create" class="inline-block mt-4 text-xs font-bold uppercase tracking-wider text-violet-400 hover:text-violet-300">/story/create →</a>
+              <a routerLink="/story/create" class="inline-block mt-4 text-xs font-bold uppercase tracking-wider text-violet-400 hover:text-violet-300">Ouvrir l’assistant →</a>
             </div>
             <div class="p-5 rounded-2xl bg-[#1b2028] border border-slate-800">
               <h3 class="text-sm font-bold text-violet-300 mb-4 flex items-center gap-2">
@@ -343,7 +343,7 @@
                 <li class="flex gap-2"><span class="text-emerald-500">✓</span> Retirer un joueur · invitations filtrées</li>
                 <li class="flex gap-2"><span class="text-emerald-500">✓</span> Synthèse MJ & PDF depuis les vraies stats</li>
               </ul>
-              <a routerLink="/campaigns" class="inline-block mt-4 text-xs font-bold uppercase tracking-wider text-violet-400 hover:text-violet-300">/campaigns →</a>
+              <a routerLink="/campaigns" class="inline-block mt-4 text-xs font-bold uppercase tracking-wider text-violet-400 hover:text-violet-300">Voir mes campagnes →</a>
             </div>
           </div>
         </section>
@@ -357,8 +357,7 @@
             <div>
               <h2 class="text-2xl font-bold text-slate-100 font-serif">Table de jeu</h2>
               <p class="text-sm text-slate-500 mt-1">
-                <strong class="text-amber-400/80">Démarrer la table</strong> ou plein écran
-                <code class="text-xs bg-slate-800 px-1.5 py-0.5 rounded">/campaigns/:id/play</code>
+                Bouton <strong class="text-amber-400/80">Démarrer la table</strong> depuis une campagne, ou mode plein écran.
               </p>
             </div>
           </div>
@@ -397,7 +396,7 @@
               <h3 class="text-[10px] font-black uppercase tracking-widest text-sky-400 mb-4">Joueur — collecte</h3>
               <div class="space-y-2 text-sm text-slate-400">
                 <p>① Notification + bandeau campagne</p>
-                <p>② Ouvrir <code class="text-xs bg-slate-800 px-1 rounded">/campaigns/:id/init</code></p>
+                <p>② Ouvrir le lien d’initiative (bandeau ou notification)</p>
                 <p>③ Saisir le jet d20 (+ modificateur auto)</p>
                 <p>④ Le MJ importe dans le tracker</p>
               </div>
@@ -479,7 +478,7 @@
             </div>
             <p class="text-sm text-slate-500">
               Activez dans <a routerLink="/settings" class="text-amber-400 hover:underline">Paramètres</a> → Push PWA.
-              Centre <a routerLink="/notifications" class="text-amber-400 hover:underline">/notifications</a> pour l’historique.
+              Consultez le <a routerLink="/notifications" class="text-amber-400 hover:underline">centre de notifications</a> pour l’historique.
               Installez l’app sur mobile (écran d’accueil).
             </p>
           </div>
