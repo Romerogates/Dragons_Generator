@@ -39,6 +39,11 @@ export function combatantInitiativeTotal(c: Combatant): number | null {
   return c.initiativeRoll + c.initiativeBonus;
 }
 
+export function isCombatantDefeated(c: Combatant): boolean {
+  if (c.defeated) return true;
+  return c.currentHp !== undefined && c.currentHp <= 0;
+}
+
 /** Tri décroissant par total d'initiative ; sans jet en bas. */
 export function sortCombatants(combatants: Combatant[]): Combatant[] {
   return [...combatants].sort((a, b) => {
@@ -52,17 +57,49 @@ export function sortCombatants(combatants: Combatant[]): Combatant[] {
   });
 }
 
-/** Une ligne par unité (Gobelin ×3 → Gobelin 1, 2, 3). */
+/** Une ligne par unité (Gobelin ×3 → Gobelin 1, 2, 3), liée à la rencontre. */
 export function expandEncounterToCombatants(encounter: EncounterGroup): Combatant[] {
   const out: Combatant[] = [];
-  for (const cr of encounter.creatures) {
-    for (let i = 0; i < cr.quantity; i++) {
+  encounter.creatures.forEach((cr, creatureIndex) => {
+    for (let unitIndex = 0; unitIndex < cr.quantity; unitIndex++) {
       const base = cr.customName || cr.creatureName;
-      const name = cr.quantity > 1 ? `${base} ${i + 1}` : base;
-      out.push(createCombatant({ name, kind: 'monster', initiativeBonus: 0 }));
+      const name = cr.quantity > 1 ? `${base} ${unitIndex + 1}` : base;
+      out.push(
+        createCombatant({
+          name,
+          kind: 'monster',
+          initiativeBonus: 0,
+          encounterLink: {
+            encounterId: encounter.id,
+            creatureIndex,
+            unitIndex,
+          },
+          defeated: unitIndex < cr.defeated,
+          currentHp: unitIndex < cr.defeated ? 0 : undefined,
+        }),
+      );
     }
-  }
+  });
   return out;
+}
+
+/** Recalcule defeated par créature depuis les combattants liés. */
+export function syncEncountersFromCombatants(
+  encounters: EncounterGroup[],
+  combatants: Combatant[],
+): EncounterGroup[] {
+  return encounters.map((enc) => ({
+    ...enc,
+    creatures: enc.creatures.map((cr, creatureIndex) => {
+      const defeated = combatants.filter(
+        (c) =>
+          c.encounterLink?.encounterId === enc.id &&
+          c.encounterLink.creatureIndex === creatureIndex &&
+          isCombatantDefeated(c),
+      ).length;
+      return { ...cr, defeated: Math.min(defeated, cr.quantity) };
+    }),
+  }));
 }
 
 export function sortedTurnOrder(combat: ActiveCombat): Combatant[] {

@@ -44,6 +44,13 @@ export type CampaignSessionStatus = 'planned' | 'played' | 'cancelled';
 
 export type CombatantKind = 'player' | 'monster' | 'npc';
 
+export interface CombatantEncounterLink {
+  encounterId: string;
+  creatureIndex: number;
+  /** Index de l'unité dans le groupe (0 … quantity−1). */
+  unitIndex: number;
+}
+
 export interface Combatant {
   id: string;
   name: string;
@@ -53,6 +60,10 @@ export interface Combatant {
   currentHp?: number;
   maxHp?: number;
   conditions?: string[];
+  /** Lien vers une ligne de rencontre (monstres importés). */
+  encounterLink?: CombatantEncounterLink;
+  /** Unité hors de combat (sync +1 kill sur la rencontre). */
+  defeated?: boolean;
 }
 
 export interface ActiveCombat {

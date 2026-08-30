@@ -35,7 +35,9 @@ import {
   createCombatant,
   currentTurnCombatant,
   expandEncounterToCombatants,
+  isCombatantDefeated,
   sortedTurnOrder,
+  syncEncountersFromCombatants,
 } from '@core/utils/combat-tracker.util';
 
 @Component({
@@ -104,6 +106,7 @@ export class CampaignPlayPanel implements OnDestroy {
   protected encounterPendingXp = encounterPendingXp;
   protected combatantInitiativeTotal = combatantInitiativeTotal;
   protected combatantKindLabels = COMBATANT_KIND_LABELS;
+  protected isCombatantDefeated = isCombatantDefeated;
 
   ngOnDestroy(): void {
     this.flushSessionSave();
@@ -253,6 +256,56 @@ export class CampaignPlayPanel implements OnDestroy {
     this.patchCombat({ ...combat, combatants }, options);
   }
 
+  updateCombatantHp(combatantId: string, raw: string | number): void {
+    const combat = this.activeCombat();
+    if (!combat) return;
+    const current = combat.combatants.find((c) => c.id === combatantId);
+    if (!current) return;
+
+    const currentHp = raw === '' || raw === undefined ? undefined : +raw;
+    let defeated = current.defeated ?? false;
+    if (currentHp !== undefined && currentHp <= 0) {
+      defeated = true;
+    } else if (currentHp !== undefined && currentHp > 0) {
+      defeated = false;
+    }
+
+    const combatants = combat.combatants.map((c) => {
+      if (c.id !== combatantId) return c;
+      return {
+        ...c,
+        currentHp,
+        defeated,
+      };
+    });
+
+    this.applyCombatWithEncounterSync({ ...combat, combatants });
+  }
+
+  markCombatantDead(combatantId: string): void {
+    this.setCombatantDefeated(combatantId, true);
+  }
+
+  reviveCombatant(combatantId: string): void {
+    this.setCombatantDefeated(combatantId, false);
+  }
+
+  private setCombatantDefeated(combatantId: string, defeated: boolean): void {
+    const combat = this.activeCombat();
+    if (!combat) return;
+
+    const combatants = combat.combatants.map((c) => {
+      if (c.id !== combatantId) return c;
+      return {
+        ...c,
+        defeated,
+        currentHp: defeated ? 0 : c.maxHp ?? c.currentHp,
+      };
+    });
+
+    this.applyCombatWithEncounterSync({ ...combat, combatants });
+  }
+
   rollInitiativeFor(combatantId: string): void {
     const roll = Math.floor(Math.random() * 20) + 1;
     this.updateCombatant(combatantId, { initiativeRoll: roll }, { immediate: true });
@@ -293,6 +346,21 @@ export class CampaignPlayPanel implements OnDestroy {
   markDefeated(encounterId: string, creatureIndex: number): void {
     const c = this.campaign();
     if (!c.isOwner) return;
+
+    const combat = this.activeCombat();
+    if (combat?.encounterId === encounterId) {
+      const target = combat.combatants.find(
+        (cb) =>
+          cb.encounterLink?.encounterId === encounterId &&
+          cb.encounterLink.creatureIndex === creatureIndex &&
+          !isCombatantDefeated(cb),
+      );
+      if (target) {
+        this.setCombatantDefeated(target.id, true);
+        return;
+      }
+    }
+
     const encounters = c.data.encounters.map((enc) => {
       if (enc.id !== encounterId) return enc;
       const creatures = enc.creatures.map((cr, i) => {
@@ -307,6 +375,22 @@ export class CampaignPlayPanel implements OnDestroy {
   undoDefeated(encounterId: string, creatureIndex: number): void {
     const c = this.campaign();
     if (!c.isOwner) return;
+
+    const combat = this.activeCombat();
+    if (combat?.encounterId === encounterId) {
+      const defeated = combat.combatants.filter(
+        (cb) =>
+          cb.encounterLink?.encounterId === encounterId &&
+          cb.encounterLink.creatureIndex === creatureIndex &&
+          isCombatantDefeated(cb),
+      );
+      const target = defeated[defeated.length - 1];
+      if (target) {
+        this.setCombatantDefeated(target.id, false);
+        return;
+      }
+    }
+
     const encounters = c.data.encounters.map((enc) => {
       if (enc.id !== encounterId) return enc;
       const creatures = enc.creatures.map((cr, i) => {
@@ -372,6 +456,21 @@ export class CampaignPlayPanel implements OnDestroy {
 
   private patchCombat(combat: ActiveCombat, options?: { immediate?: boolean }): void {
     this.patchSession({ activeCombat: combat }, options);
+  }
+
+  /** Sauvegarde combat + sync kills rencontre en une requête. */
+  private applyCombatWithEncounterSync(combat: ActiveCombat): void {
+    const c = this.campaign();
+    const session = this.activeSession();
+    if (!session) return;
+
+    const encounters = syncEncountersFromCombatants(c.data.encounters, combat.combatants);
+    const sessions = (c.data.sessions ?? []).map((s) =>
+      s.id === session.id ? { ...s, activeCombat: combat } : s,
+    );
+    const data = { ...c.data, sessions, encounters };
+    this.patchCampaign(data);
+    this.persist(c.title, data);
   }
 
   private patchSession(
