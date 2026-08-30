@@ -207,6 +207,7 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
         }
 
         SessionChangeInfo? sessionChange = null;
+        HandoutChangeInfo? handoutChange = null;
         if (!string.IsNullOrWhiteSpace(req.Title))
             campaign.Title = req.Title.Trim();
         if (req.Data.ValueKind != JsonValueKind.Undefined)
@@ -232,6 +233,15 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
                             location = change.Location,
                         }, ct);
                 }
+
+                var handout = CampaignJsonHelpers.AnalyzeHandoutChanges(campaign.JsonData, newJson);
+                if (handout.Changed)
+                {
+                    handoutChange = handout;
+                    await CampaignActivityService.LogAsync(
+                        db, campaign.Id, userId.Value, CampaignActivityKinds.HandoutPublished,
+                        new { message = handout.Message, title = handout.Title, count = handout.Count }, ct);
+                }
             }
             campaign.JsonData = newJson;
         }
@@ -250,6 +260,25 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
             foreach (var playerId in playerIds)
             {
                 await push.NotifyUserAsync(playerId, pushTitle, sessionChange.Message, url, ct);
+            }
+        }
+
+        if (handoutChange is not null)
+        {
+            var url = $"/campaigns/{campaign.Id}";
+            var playerIds = campaign.Members
+                .Where(m => m.Role == CampaignMemberRoles.Player)
+                .Select(m => m.UserId)
+                .Distinct()
+                .ToList();
+            foreach (var playerId in playerIds)
+            {
+                await push.NotifyUserAsync(
+                    playerId,
+                    "Nouveau document",
+                    handoutChange.Message,
+                    url,
+                    ct);
             }
         }
 

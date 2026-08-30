@@ -16,6 +16,7 @@ public static class CampaignActivityKinds
     public const string SessionScheduled = "session_scheduled";
     public const string SessionUpdated = "session_updated";
     public const string PregenAssigned = "pregen_assigned";
+    public const string HandoutPublished = "handout_published";
 }
 
 public static class CampaignActivityService

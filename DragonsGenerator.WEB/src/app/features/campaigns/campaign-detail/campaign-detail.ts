@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   inject,
+  Injector,
   OnDestroy,
   OnInit,
   signal,
@@ -19,11 +20,13 @@ import { AuthService } from '@core/services/auth.service';
 import { NotificationService } from '@core/services/notification.service';
 import { DataService } from '@core/services/data.service';
 import { forkJoin, catchError, map, of, Observable, throwError } from 'rxjs';
-import { CampaignPdfService, CreaturePrintEntry } from '@core/services/campaign-pdf.service';
+import { getCampaignPdfService } from '@core/services/campaign-pdf.loader';
+import type { CreaturePrintEntry, PlayerGmSummary } from '@core/services/campaign-pdf.types';
 import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
 import { Character } from '@core/models/Character/character';
 import {
   CampaignData,
+  CampaignHandout,
   CampaignMember,
   CampaignPregen,
   CampaignSession,
@@ -31,6 +34,7 @@ import {
   CREATURE_ROLE_LABELS,
   PREGEN_STATUS_LABELS,
   createCampaignPregenEntry,
+  createCampaignHandout,
   createEncounterFromCreatures,
   encounterPendingXp,
   encounterTotalXp,
@@ -45,7 +49,7 @@ import { CampaignPregenGeneratorService } from '@core/services/campaign-pregen-g
 import { CampaignPlayPanel } from '../campaign-play-panel/campaign-play-panel';
 import { firstValueFrom } from 'rxjs';
 
-type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'activity';
+type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'activity' | 'handouts';
 
 @Component({
   selector: 'app-campaign-detail',
@@ -64,7 +68,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   private auth = inject(AuthService);
   private notifications = inject(NotificationService);
   private data = inject(DataService);
-  private pdf = inject(CampaignPdfService);
+  private injector = inject(Injector);
   private sanitizer = inject(DomSanitizer);
   private storyBuilder = inject(StoryBuilderService);
   private pregenGenerator = inject(CampaignPregenGeneratorService);
@@ -86,12 +90,16 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   /** Session en mode édition (MJ) — sinon carte lecture. */
   readonly editingSessionId = signal<string | null>(null);
 
+  /** Handout en mode édition (MJ). */
+  readonly editingHandoutId = signal<string | null>(null);
+
   readonly creatureXpMap = signal<Record<string, number>>({});
   readonly isLoadingPreview = signal(false);
   readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
   private rawBlobUrl: string | null = null;
   private previewCampaignId: string | null = null;
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
+  private handoutSaveTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly isLoggedIn = this.auth.isLoggedIn;
 
@@ -128,6 +136,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const tabs: { id: Tab; label: string }[] = [
       { id: 'overview', label: 'Résumé' },
       { id: 'activity', label: 'Activité' },
+      { id: 'handouts', label: 'Documents' },
     ];
     if (owner) {
       tabs.push({ id: 'creatures', label: 'Personnages & créatures' });
@@ -138,6 +147,19 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     }
     tabs.push({ id: 'players', label: 'Joueurs' });
     return tabs;
+  });
+
+  readonly publishedHandoutsCount = computed(
+    () => (this.campaign()?.data.handouts ?? []).filter((h) => h.published).length,
+  );
+
+  readonly sortedHandouts = computed(() => {
+    const list = this.campaign()?.data.handouts ?? [];
+    return [...list].sort((a, b) => {
+      const ta = new Date(a.publishedAt ?? a.createdAt).getTime();
+      const tb = new Date(b.publishedAt ?? b.createdAt).getTime();
+      return tb - ta;
+    });
   });
 
   protected roleLabels = CREATURE_ROLE_LABELS;
@@ -188,6 +210,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.flushSessionSave();
+    this.flushHandoutSave();
     this.revokePreviewUrl();
   }
 
@@ -254,6 +277,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       session_scheduled: 'Session planifiée',
       session_updated: 'Session modifiée',
       pregen_assigned: 'Pré-tiré assigné',
+      handout_published: 'Document publié',
     };
     return labels[kind] ?? kind.replace(/_/g, ' ');
   }
@@ -270,6 +294,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       session_scheduled: 'fluent-emoji:calendar',
       session_updated: 'fluent-emoji:spiral-calendar',
       pregen_assigned: 'fluent-emoji:bust-in-silhouette',
+      handout_published: 'fluent-emoji:scroll',
     };
     return icons[kind] ?? 'fluent-emoji:memo';
   }
@@ -315,6 +340,93 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       hour: '2-digit',
       minute: '2-digit',
     });
+  }
+
+  formatHandoutDate(iso?: string): string {
+    if (!iso) return '';
+    return new Date(iso).toLocaleString('fr-FR', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  addHandout(): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    this.flushHandoutSave();
+    const handout = createCampaignHandout();
+    this.editingHandoutId.set(handout.id);
+    this.saveData({ handouts: [...(c.data.handouts ?? []), handout] });
+  }
+
+  startEditHandout(handoutId: string): void {
+    this.flushHandoutSave();
+    this.editingHandoutId.set(handoutId);
+  }
+
+  stopEditHandout(): void {
+    this.flushHandoutSave();
+    this.editingHandoutId.set(null);
+  }
+
+  updateHandout(
+    handoutId: string,
+    patch: Partial<CampaignHandout>,
+    options?: { immediate?: boolean },
+  ): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    const now = new Date().toISOString();
+    const handouts = (c.data.handouts ?? []).map((h) =>
+      h.id === handoutId ? { ...h, ...patch, updatedAt: now } : h,
+    );
+    this.campaign.update((prev) => (prev ? { ...prev, data: { ...prev.data, handouts } } : prev));
+
+    if (options?.immediate) {
+      if (this.handoutSaveTimer) {
+        clearTimeout(this.handoutSaveTimer);
+        this.handoutSaveTimer = null;
+      }
+      this.saveData({ handouts });
+      return;
+    }
+
+    if (this.handoutSaveTimer) clearTimeout(this.handoutSaveTimer);
+    this.handoutSaveTimer = setTimeout(() => {
+      this.handoutSaveTimer = null;
+      const latest = this.campaign();
+      this.saveData({ handouts: latest?.data.handouts ?? [] });
+    }, 700);
+  }
+
+  toggleHandoutPublished(handoutId: string, published: boolean): void {
+    const patch: Partial<CampaignHandout> = published
+      ? { published: true, publishedAt: new Date().toISOString() }
+      : { published: false };
+    this.updateHandout(handoutId, patch, { immediate: true });
+  }
+
+  deleteHandout(handoutId: string): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    if (!confirm('Supprimer ce document ?')) return;
+    this.flushHandoutSave();
+    if (this.editingHandoutId() === handoutId) this.editingHandoutId.set(null);
+    this.saveData({
+      handouts: (c.data.handouts ?? []).filter((h) => h.id !== handoutId),
+    });
+  }
+
+  private flushHandoutSave(): void {
+    if (!this.handoutSaveTimer) return;
+    clearTimeout(this.handoutSaveTimer);
+    this.handoutSaveTimer = null;
+    const latest = this.campaign();
+    if (!latest?.isOwner) return;
+    this.saveData({ handouts: latest.data.handouts ?? [] });
   }
 
   addSession(): void {
@@ -469,7 +581,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
             return;
           }
           this.revokePreviewUrl();
-          const url = await this.pdf.generateCreaturesPdfBlob(entries, c.title, c.data);
+          const pdf = await getCampaignPdfService(this.injector);
+          const url = await pdf.generateCreaturesPdfBlob(entries, c.title, c.data);
           this.rawBlobUrl = url;
           this.previewCampaignId = c.id;
           this.pdfPreviewUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
@@ -748,7 +861,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const c = this.campaign();
     if (!c) return;
     const meta = [pregen.speciesLabel, pregen.classLabel].filter(Boolean).join(' · ');
-    void this.pdf.downloadPregenHandout(c.title, pregen.characterName, pregen.publicHook, meta);
+    void getCampaignPdfService(this.injector).then((pdf) =>
+      pdf.downloadPregenHandout(c.title, pregen.characterName, pregen.publicHook, meta),
+    );
   }
 
   printPregenFullSheet(pregen: CampaignPregen): void {
@@ -757,9 +872,11 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.error.set(null);
     this.loadPregenCharacter(pregen).subscribe({
       next: (character) => {
-        void this.pdf.downloadPlayerFullSheet(character).finally(() => {
-          this.pregenPdfLoadingId.set(null);
-        });
+        void getCampaignPdfService(this.injector).then((pdf) =>
+          pdf.downloadPlayerFullSheet(character).finally(() => {
+            this.pregenPdfLoadingId.set(null);
+          }),
+        );
       },
       error: () => {
         this.pregenPdfLoadingId.set(null);
@@ -812,7 +929,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   printBestiary(): void {
     this.runPrint(async (entries) => {
       const c = this.campaign()!;
-      await this.pdf.downloadCreaturesCompilation(entries, c.title, c.data);
+      const pdf = await getCampaignPdfService(this.injector);
+      await pdf.downloadCreaturesCompilation(entries, c.title, c.data);
     });
   }
 
@@ -820,7 +938,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.runPrint(async (entries) => {
       const c = this.campaign()!;
       const summaries = await this.loadPlayerSummaries();
-      await this.pdf.downloadCampaignPack(c.title, c.data, entries, summaries);
+      const pdf = await getCampaignPdfService(this.injector);
+      await pdf.downloadCampaignPack(c.title, c.data, entries, summaries);
     });
   }
 
@@ -876,22 +995,23 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     ).pipe(map((list) => list.filter((x): x is CreaturePrintEntry => x !== null)));
   }
 
-  private async loadPlayerSummaries() {
+  private async loadPlayerSummaries(): Promise<PlayerGmSummary[]> {
     const approved = this.players().filter(
       (p) => p.proposalStatus === 'approved' && p.approvedCharacterId,
     );
+    const pdf = await getCampaignPdfService(this.injector);
     const summaries = await Promise.all(
       approved.map(
         (p) =>
-          new Promise<ReturnType<CampaignPdfService['buildPlayerGmSummary']> | null>((resolve) => {
+          new Promise<PlayerGmSummary | null>((resolve) => {
             this.characters.get(p.approvedCharacterId!).subscribe({
-              next: (res) => resolve(this.pdf.buildPlayerGmSummary(res.data as Character)),
+              next: (res) => resolve(pdf.buildPlayerGmSummary(res.data as Character)),
               error: () => resolve(null),
             });
           }),
       ),
     );
-    return summaries.filter((s): s is NonNullable<typeof s> => s !== null);
+    return summaries.filter((s): s is PlayerGmSummary => s !== null);
   }
 
   private async runPrintPlayerSummariesOnly(): Promise<void> {
@@ -902,7 +1022,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         this.error.set('Aucun joueur avec personnage approuvé.');
         return;
       }
-      await this.pdf.downloadPlayerSummaries(this.campaign()?.title ?? 'Campagne', summaries);
+      const pdf = await getCampaignPdfService(this.injector);
+      await pdf.downloadPlayerSummaries(this.campaign()?.title ?? 'Campagne', summaries);
     } catch {
       this.error.set('Échec de la génération PDF.');
     } finally {
@@ -920,12 +1041,13 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     }
     this.printing.set(true);
     try {
+      const pdf = await getCampaignPdfService(this.injector);
       for (const p of approved) {
         await new Promise<void>((resolve, reject) => {
           this.characters.get(p.approvedCharacterId!).subscribe({
             next: async (res) => {
               try {
-                await this.pdf.downloadPlayerFullSheet(res.data as Character);
+                await pdf.downloadPlayerFullSheet(res.data as Character);
                 resolve();
               } catch {
                 reject();

@@ -66,6 +66,19 @@ public static class CampaignJsonHelpers
 
         node["activeSessionId"] = null;
 
+        if (node["handouts"] is JsonArray handouts)
+        {
+            var visibleHandouts = new JsonArray();
+            foreach (var item in handouts)
+            {
+                if (item is not JsonObject handout) continue;
+                if (handout["published"]?.GetValue<bool>() != true) continue;
+                visibleHandouts.Add(handout.DeepClone());
+            }
+
+            node["handouts"] = visibleHandouts;
+        }
+
         using var doc = JsonDocument.Parse(node.ToJsonString());
         return doc.RootElement.Clone();
     }
@@ -119,7 +132,7 @@ public static class CampaignJsonHelpers
 
         foreach (var prop in update.ToList())
         {
-            if (prop.Key is "adventure" or "notes" or "creatures" or "encounters" or "activeSessionId") continue;
+            if (prop.Key is "adventure" or "notes" or "creatures" or "encounters" or "activeSessionId" or "handouts") continue;
             existing[prop.Key] = prop.Value?.DeepClone();
         }
 
@@ -160,6 +173,65 @@ public static class CampaignJsonHelpers
 
     public static bool HasSessionChanges(string oldJson, string newJson) =>
         AnalyzeSessionChanges(oldJson, newJson).Changed;
+
+    public static HandoutChangeInfo AnalyzeHandoutChanges(string oldJson, string newJson)
+    {
+        try
+        {
+            using var oldDoc = JsonDocument.Parse(string.IsNullOrWhiteSpace(oldJson) ? "{}" : oldJson);
+            using var newDoc = JsonDocument.Parse(string.IsNullOrWhiteSpace(newJson) ? "{}" : newJson);
+            var oldPublished = ReadPublishedHandoutIds(oldDoc.RootElement);
+            var newHandouts = ReadHandouts(newDoc.RootElement);
+
+            var newlyPublished = newHandouts
+                .Where(h => h.Published && !oldPublished.Contains(h.Id))
+                .ToList();
+
+            if (newlyPublished.Count == 0)
+                return HandoutChangeInfo.None;
+
+            var title = newlyPublished[0].Title;
+            var message = newlyPublished.Count == 1
+                ? $"Document publié : {title}"
+                : $"{newlyPublished.Count} documents publiés";
+
+            return new HandoutChangeInfo(true, title, newlyPublished.Count, message);
+        }
+        catch
+        {
+            return HandoutChangeInfo.None;
+        }
+    }
+
+    private static HashSet<string> ReadPublishedHandoutIds(JsonElement root)
+    {
+        var set = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var item in ReadHandouts(root))
+        {
+            if (item.Published && !string.IsNullOrEmpty(item.Id))
+                set.Add(item.Id);
+        }
+        return set;
+    }
+
+    private static List<HandoutSnapshot> ReadHandouts(JsonElement root)
+    {
+        if (!root.TryGetProperty("handouts", out var arr) || arr.ValueKind != JsonValueKind.Array)
+            return [];
+
+        var list = new List<HandoutSnapshot>();
+        foreach (var item in arr.EnumerateArray())
+        {
+            var published = item.TryGetProperty("published", out var pub) && pub.ValueKind == JsonValueKind.True;
+            list.Add(new HandoutSnapshot(
+                Id: item.TryGetProperty("id", out var id) ? id.GetString() ?? "" : "",
+                Title: item.TryGetProperty("title", out var t) ? t.GetString() ?? "Document" : "Document",
+                Published: published));
+        }
+        return list;
+    }
+
+    private sealed record HandoutSnapshot(string Id, string Title, bool Published);
 
     /// <summary>
     /// Compare les tableaux sessions et résume le changement pour activité + push.
@@ -259,4 +331,13 @@ public sealed record SessionChangeInfo(
     string Message)
 {
     public static SessionChangeInfo None { get; } = new(false, false, null, null, null, "");
+}
+
+public sealed record HandoutChangeInfo(
+    bool Changed,
+    string? Title,
+    int Count,
+    string Message)
+{
+    public static HandoutChangeInfo None { get; } = new(false, null, 0, "");
 }

@@ -100,6 +100,8 @@ export interface CampaignData {
   notes: string;
   pregenCharacters: CampaignPregen[];
   sessions: CampaignSession[];
+  /** Documents distribuables aux joueurs (MJ publie, joueurs voient published uniquement). */
+  handouts: CampaignHandout[];
   /** Session en cours côté table de jeu MJ. */
   activeSessionId?: string | null;
 }
@@ -166,6 +168,28 @@ export interface CampaignInvite {
   createdAt: string;
 }
 
+/** Document / handout publiable par le MJ (sans spoiler). */
+export interface CampaignHandout {
+  id: string;
+  title: string;
+  body: string;
+  published: boolean;
+  publishedAt?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export function createCampaignHandout(title = 'Nouveau document'): CampaignHandout {
+  const now = new Date().toISOString();
+  return {
+    id: crypto.randomUUID?.() ?? `ho-${Date.now()}`,
+    title,
+    body: '',
+    published: false,
+    createdAt: now,
+  };
+}
+
 export function emptyCampaignData(partyLevel = 3): CampaignData {
   return {
     setting: '',
@@ -179,6 +203,7 @@ export function emptyCampaignData(partyLevel = 3): CampaignData {
     notes: '',
     pregenCharacters: [],
     sessions: [],
+    handouts: [],
     activeSessionId: null,
   };
 }

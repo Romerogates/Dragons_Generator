@@ -100,6 +100,8 @@
               </button>
             </div>
           </div>
+        } @else if (activeCombat()?.combatants?.length) {
+          <p class="text-xs text-slate-500 italic px-1">Tous les combattants actifs sont hors combat.</p>
         }
 
         <div class="overflow-x-auto rounded-xl border border-slate-800">
@@ -217,6 +219,14 @@
                           </button>
                           <button
                             type="button"
+                            title="Dupliquer (sans lien rencontre)"
+                            class="px-1.5 py-1 rounded text-[8px] font-black uppercase border border-slate-600 text-slate-400"
+                            (click)="duplicateCombatantRow(cb.id)"
+                          >
+                            +
+                          </button>
+                          <button
+                            type="button"
                             title="Jet d20 aléatoire"
                             class="px-1.5 py-1 rounded text-[8px] font-black uppercase border border-violet-800/50 text-violet-300"
                             (click)="rollInitiativeFor(cb.id)"
@@ -264,7 +274,7 @@
           </button>
         </div>
         <p class="text-[10px] text-slate-500 italic">
-          Saisissez les jets annoncés à la table. Sans joueurs connectés, ajoutez les PJ à la main ou via « + Combattant ».
+          Saisissez les jets annoncés à la table. Les morts sont ignorés au changement de tour.
         </p>
       } @else {
         <div class="bg-[#1b2028]/80 border border-dashed border-amber-800/40 rounded-xl p-4 space-y-3">

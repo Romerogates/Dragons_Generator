@@ -36,6 +36,8 @@ describe('StoryBuilderService', () => {
       notes: 'Note MJ',
       pregenCharacters: [],
       sessions: [],
+      handouts: [],
+      activeSessionId: null,
     },
   };
 

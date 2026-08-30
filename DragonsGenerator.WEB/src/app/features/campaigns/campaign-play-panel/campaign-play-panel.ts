@@ -30,11 +30,14 @@ import {
 } from '@core/models/Campaign/campaign';
 import {
   COMBATANT_KIND_LABELS,
+  advanceTurn,
   combatantInitiativeTotal,
   createActiveCombat,
   createCombatant,
   currentTurnCombatant,
+  duplicateCombatant,
   expandEncounterToCombatants,
+  formatCombatArchiveSummary,
   isCombatantDefeated,
   sortedTurnOrder,
   syncEncountersFromCombatants,
@@ -213,8 +216,26 @@ export class CampaignPlayPanel implements OnDestroy {
   }
 
   endCombat(): void {
-    if (!confirm('Terminer le combat en cours ?')) return;
-    this.patchSession({ activeCombat: null }, { immediate: true });
+    const combat = this.activeCombat();
+    const session = this.activeSession();
+    if (!combat || !session) return;
+    if (!confirm('Terminer le combat en cours ? Un résumé sera ajouté aux notes de session.')) return;
+
+    const archive = formatCombatArchiveSummary(combat);
+    const playNotes = [session.playNotes?.trim(), archive].filter(Boolean).join('\n\n');
+    this.patchSession({ activeCombat: null, playNotes }, { immediate: true });
+  }
+
+  duplicateCombatantRow(combatantId: string): void {
+    const combat = this.activeCombat();
+    if (!combat) return;
+    const source = combat.combatants.find((c) => c.id === combatantId);
+    if (!source) return;
+    const copy = duplicateCombatant(source);
+    this.patchCombat({
+      ...combat,
+      combatants: [...combat.combatants, copy],
+    }, { immediate: true });
   }
 
   addCombatant(): void {
@@ -314,29 +335,15 @@ export class CampaignPlayPanel implements OnDestroy {
   nextTurn(): void {
     const combat = this.activeCombat();
     if (!combat) return;
-    const order = sortedTurnOrder(combat);
-    if (!order.length) return;
-    let turnIndex = combat.turnIndex + 1;
-    let round = combat.round;
-    if (turnIndex >= order.length) {
-      turnIndex = 0;
-      round += 1;
-    }
-    this.patchCombat({ ...combat, turnIndex, round }, { immediate: true });
+    const patch = advanceTurn(combat, 1);
+    this.patchCombat({ ...combat, ...patch }, { immediate: true });
   }
 
   prevTurn(): void {
     const combat = this.activeCombat();
     if (!combat) return;
-    const order = sortedTurnOrder(combat);
-    if (!order.length) return;
-    let turnIndex = combat.turnIndex - 1;
-    let round = combat.round;
-    if (turnIndex < 0) {
-      turnIndex = order.length - 1;
-      round = Math.max(1, round - 1);
-    }
-    this.patchCombat({ ...combat, turnIndex, round }, { immediate: true });
+    const patch = advanceTurn(combat, -1);
+    this.patchCombat({ ...combat, ...patch }, { immediate: true });
   }
 
   isCurrentTurn(combatantId: string): boolean {

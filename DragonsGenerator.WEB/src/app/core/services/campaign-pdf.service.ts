@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, Injector } from '@angular/core';
 import type { jsPDF } from 'jspdf';
 import { Creature } from '@core/models/Creatures/creature';
 import { Character, Attack } from '@core/models/Character/character';
@@ -7,7 +7,9 @@ import { CREATURE_ROLE_LABELS, ADVENTURE_TONE_LABELS, AdventureTone } from '@cor
 import { formatChallengeRating, ABILITY_LABELS } from '@core/utils/creature-display.util';
 import { encounterTotalXp } from '@core/models/Campaign/campaign';
 import { getEanaMapCoordinates } from '@core/utils/eana-map';
-import { PdfGeneratorService } from './pdf-generator.service';
+import type { CreaturePrintEntry, PlayerGmSummary } from './campaign-pdf.types';
+
+export type { CreaturePrintEntry, PlayerGmSummary } from './campaign-pdf.types';
 
 const PARCHMENT = '/images/dragons_background.jpg';
 const MARGIN = 14;
@@ -25,26 +27,9 @@ interface CoverOptions {
   pregenMeta?: string;
 }
 
-export interface CreaturePrintEntry {
-  creature: Creature;
-  customName?: string;
-  role?: string;
-  backstory?: string;
-}
-
-export interface PlayerGmSummary {
-  name: string;
-  species: string;
-  className: string;
-  armorClass: number | string;
-  hitPoints: number | string;
-  initiative: number | string;
-  attacks: string;
-}
-
 @Injectable({ providedIn: 'root' })
 export class CampaignPdfService {
-  private readonly characterPdf = inject(PdfGeneratorService);
+  private readonly injector = inject(Injector);
 
   async downloadCreatureSheet(entry: CreaturePrintEntry): Promise<void> {
     const pdf = await this.buildCreaturesPdf([entry], entry.customName || entry.creature.name);
@@ -113,7 +98,8 @@ export class CampaignPdfService {
   }
 
   async downloadPlayerFullSheet(character: Character): Promise<void> {
-    await this.characterPdf.generatePdf(character);
+    const mod = await import('./pdf-generator.service');
+    await this.injector.get(mod.PdfGeneratorService).generatePdf(character);
   }
 
   async downloadPregenHandout(

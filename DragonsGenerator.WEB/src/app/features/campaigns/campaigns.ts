@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  OnInit,
-  signal,
-  CUSTOM_ELEMENTS_SCHEMA,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Injector, inject, OnInit, signal, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
@@ -15,7 +8,8 @@ import { FriendsService } from '@core/services/friends.service';
 import { NotificationService } from '@core/services/notification.service';
 import { AuthService } from '@core/services/auth.service';
 import { DataService } from '@core/services/data.service';
-import { CampaignPdfService, CreaturePrintEntry } from '@core/services/campaign-pdf.service';
+import { getCampaignPdfService } from '@core/services/campaign-pdf.loader';
+import type { CreaturePrintEntry } from '@core/services/campaign-pdf.types';
 import { CampaignData, CampaignInvite, CampaignSummary } from '@core/models/Campaign/campaign';
 import { forkJoin, catchError, map, of, Observable } from 'rxjs';
 
@@ -34,7 +28,7 @@ export class Campaigns implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
   private data = inject(DataService);
-  private pdf = inject(CampaignPdfService);
+  private injector = inject(Injector);
   private readonly offlineSync = inject(OfflineSyncService);
   private readonly connectivity = inject(ConnectivityService);
 
@@ -191,7 +185,8 @@ export class Campaigns implements OnInit {
         this.loadCreatureEntries(detail.data).subscribe({
           next: async (entries) => {
             try {
-              await this.pdf.downloadCreaturesCompilation(entries, detail.title);
+              const pdf = await getCampaignPdfService(this.injector);
+              await pdf.downloadCreaturesCompilation(entries, detail.title);
             } catch {
               this.actionError.set('Échec de la génération du PDF bestiaire.');
             } finally {

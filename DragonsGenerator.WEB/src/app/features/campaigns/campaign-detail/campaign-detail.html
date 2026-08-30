@@ -313,6 +313,19 @@
               }
             </div>
 
+            @if (!c.isOwner && publishedHandoutsCount() > 0) {
+              <button
+                type="button"
+                class="w-full text-left bg-sky-950/20 border border-sky-800/40 rounded-xl px-4 py-3 hover:border-sky-600/50 transition-colors"
+                (click)="setTab('handouts')"
+              >
+                <p class="text-[10px] font-black uppercase tracking-widest text-sky-400 mb-1">Documents MJ</p>
+                <p class="text-sm text-slate-300">
+                  {{ publishedHandoutsCount() }} document{{ publishedHandoutsCount() > 1 ? 's' : '' }} disponible{{ publishedHandoutsCount() > 1 ? 's' : '' }}
+                </p>
+              </button>
+            }
+
             <p class="text-xs text-slate-500">XP total distribué aux joueurs : <strong class="text-violet-400">{{ totalXpAwarded() }}</strong></p>
           </section>
         }
@@ -346,6 +359,127 @@
               }
             } @else {
               <p class="text-slate-500 italic text-center py-12">Aucune activité enregistrée.</p>
+            }
+          </section>
+        }
+
+        @case ('handouts') {
+          <section class="space-y-5">
+            @if (c.isOwner) {
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <p class="text-sm text-slate-400">
+                  Rédigez des documents sans spoiler et publiez-les aux joueurs.
+                </p>
+                <button
+                  type="button"
+                  class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-sky-900/40 border border-sky-700/50 text-sky-200 hover:bg-sky-900/60"
+                  (click)="addHandout()"
+                >
+                  + Document
+                </button>
+              </div>
+            }
+
+            @for (handout of sortedHandouts(); track handout.id) {
+              <article
+                class="bg-[#1b2028] border rounded-2xl p-5"
+                [class.border-sky-800/40]="handout.published"
+                [class.border-slate-800]="!handout.published"
+              >
+                @if (c.isOwner && editingHandoutId() === handout.id) {
+                  <div class="space-y-3">
+                    <input
+                      type="text"
+                      class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-3 py-2 text-slate-200 font-serif"
+                      placeholder="Titre"
+                      [ngModel]="handout.title"
+                      (ngModelChange)="updateHandout(handout.id, { title: $event })"
+                    />
+                    <textarea
+                      rows="8"
+                      class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-300"
+                      placeholder="Contenu visible par les joueurs (letter, résumé de scène, carte en texte…)"
+                      [ngModel]="handout.body"
+                      (ngModelChange)="updateHandout(handout.id, { body: $event })"
+                    ></textarea>
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                      <label class="flex items-center gap-2 text-xs text-slate-400 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          class="rounded border-slate-600"
+                          [ngModel]="handout.published"
+                          (ngModelChange)="toggleHandoutPublished(handout.id, $event)"
+                        />
+                        Publié aux joueurs
+                      </label>
+                      <div class="flex gap-2">
+                        <button
+                          type="button"
+                          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400"
+                          (click)="stopEditHandout()"
+                        >
+                          Fermer
+                        </button>
+                        <button
+                          type="button"
+                          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-red-900/40 text-red-400"
+                          (click)="deleteHandout(handout.id)"
+                        >
+                          Supprimer
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                } @else if (c.isOwner) {
+                  <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div class="min-w-0 flex-1">
+                      <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <h3 class="font-serif text-lg text-slate-100">{{ handout.title || 'Sans titre' }}</h3>
+                        @if (handout.published) {
+                          <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border border-sky-800/50 text-sky-300 bg-sky-950/30">
+                            Publié
+                          </span>
+                        } @else {
+                          <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border border-slate-700 text-slate-500">
+                            Brouillon
+                          </span>
+                        }
+                      </div>
+                      @if (handout.body) {
+                        <p class="text-sm text-slate-400 whitespace-pre-wrap line-clamp-4">{{ handout.body }}</p>
+                      } @else {
+                        <p class="text-sm text-slate-600 italic">Contenu vide</p>
+                      }
+                      @if (handout.publishedAt) {
+                        <p class="text-[10px] text-slate-600 mt-2">Publié le {{ formatHandoutDate(handout.publishedAt) }}</p>
+                      }
+                    </div>
+                    <button
+                      type="button"
+                      class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:border-sky-500/50 hover:text-sky-300"
+                      (click)="startEditHandout(handout.id)"
+                    >
+                      Modifier
+                    </button>
+                  </div>
+                } @else {
+                  <div>
+                    <h3 class="font-serif text-lg text-sky-200 mb-1">{{ handout.title }}</h3>
+                    @if (handout.publishedAt) {
+                      <p class="text-[10px] text-slate-500 mb-3">{{ formatHandoutDate(handout.publishedAt) }}</p>
+                    }
+                    <div class="text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">{{ handout.body }}</div>
+                  </div>
+                }
+              </article>
+            } @empty {
+              <p class="text-slate-500 italic text-center py-12">
+                @if (c.isOwner) {
+                  Aucun document — créez un handout pour vos joueurs.
+                } @else {
+                  Aucun document publié pour l'instant.
+                }
+              </p>
             }
           </section>
         }

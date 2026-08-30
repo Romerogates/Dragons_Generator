@@ -2,10 +2,14 @@ import {
   createActiveCombat,
   createCombatant,
   combatantInitiativeTotal,
+  advanceTurn,
+  duplicateCombatant,
   expandEncounterToCombatants,
+  formatCombatArchiveSummary,
   isCombatantDefeated,
   sortCombatants,
   syncEncountersFromCombatants,
+  activeTurnOrder,
 } from './combat-tracker.util';
 import type { EncounterGroup } from '@core/models/Campaign/campaign';
 
@@ -64,6 +68,40 @@ describe('combat-tracker.util', () => {
     const synced = syncEncountersFromCombatants([sampleEncounter], rows);
     expect(synced[0].creatures[0].defeated).toBe(2);
     expect(synced[0].creatures[1].defeated).toBe(0);
+  });
+
+  it('activeTurnOrder excludes defeated combatants', () => {
+    const a = createCombatant({ name: 'A', kind: 'player', initiativeRoll: 20, initiativeBonus: 0 });
+    const b = createCombatant({ name: 'B', kind: 'monster', initiativeRoll: 15, initiativeBonus: 0, defeated: true, currentHp: 0 });
+    const combat = createActiveCombat([a, b]);
+    expect(activeTurnOrder(combat).map((c) => c.name)).toEqual(['A']);
+  });
+
+  it('advanceTurn skips defeated and wraps rounds', () => {
+    const a = createCombatant({ name: 'A', kind: 'player', initiativeRoll: 20, initiativeBonus: 0 });
+    const b = createCombatant({ name: 'B', kind: 'player', initiativeRoll: 10, initiativeBonus: 0 });
+    let combat = createActiveCombat([a, b]);
+    expect(advanceTurn(combat, 1)).toEqual({ turnIndex: 1, round: 1 });
+    combat = { ...combat, turnIndex: 1 };
+    expect(advanceTurn(combat, 1)).toEqual({ turnIndex: 0, round: 2 });
+  });
+
+  it('duplicateCombatant increments numbered names', () => {
+    const src = createCombatant({ name: 'Gobelin 2', kind: 'monster', initiativeBonus: 1, maxHp: 7 });
+    const copy = duplicateCombatant(src);
+    expect(copy.name).toBe('Gobelin 3');
+    expect(copy.encounterLink).toBeUndefined();
+    expect(copy.initiativeBonus).toBe(1);
+  });
+
+  it('formatCombatArchiveSummary lists combatants', () => {
+    const a = createCombatant({ name: 'Théo', kind: 'player', currentHp: 12, maxHp: 20 });
+    const b = createCombatant({ name: 'Gobelin', kind: 'monster', defeated: true, currentHp: 0 });
+    const combat = createActiveCombat([a, b], { label: 'Grotte' });
+    const text = formatCombatArchiveSummary(combat);
+    expect(text).toContain('Fin combat : Grotte');
+    expect(text).toContain('Théo : vivant (12/20 PV)');
+    expect(text).toContain('Gobelin : mort');
   });
 
   it('sortCombatants orders by total initiative descending', () => {
