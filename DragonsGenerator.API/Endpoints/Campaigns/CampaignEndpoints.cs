@@ -208,6 +208,7 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
 
         SessionChangeInfo? sessionChange = null;
         HandoutChangeInfo? handoutChange = null;
+        InitiativeCollectionChangeInfo? initiativeChange = null;
         if (!string.IsNullOrWhiteSpace(req.Title))
             campaign.Title = req.Title.Trim();
         if (req.Data.ValueKind != JsonValueKind.Undefined)
@@ -248,6 +249,20 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
                             count = handout.Count,
                         }, ct);
                 }
+
+                var initiative = CampaignJsonHelpers.AnalyzeInitiativeCollectionOpened(campaign.JsonData, newJson);
+                if (initiative.Changed)
+                {
+                    initiativeChange = initiative;
+                    await CampaignActivityService.LogAsync(
+                        db, campaign.Id, userId.Value, CampaignActivityKinds.InitiativeCollectionOpened,
+                        new
+                        {
+                            message = initiative.Message,
+                            code = initiative.Code,
+                            label = initiative.Label,
+                        }, ct);
+                }
             }
             campaign.JsonData = newJson;
         }
@@ -285,6 +300,26 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
                     playerId,
                     "Nouveau document",
                     handoutChange.Message,
+                    url,
+                    ct);
+            }
+        }
+
+        if (initiativeChange is not null)
+        {
+            var code = initiativeChange.Code ?? "";
+            var url = $"/campaigns/{campaign.Id}/init?code={Uri.EscapeDataString(code)}";
+            var playerIds = campaign.Members
+                .Where(m => m.Role == CampaignMemberRoles.Player)
+                .Select(m => m.UserId)
+                .Distinct()
+                .ToList();
+            foreach (var playerId in playerIds)
+            {
+                await push.NotifyUserAsync(
+                    playerId,
+                    "Initiative — saisir votre jet",
+                    initiativeChange.Message,
                     url,
                     ct);
             }

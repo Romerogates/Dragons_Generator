@@ -459,12 +459,71 @@ public static class CampaignJsonHelpers
         return list;
     }
 
+    /// <summary>Détecte l'ouverture de la collecte d'initiative (false → true sur la session active).</summary>
+    public static InitiativeCollectionChangeInfo AnalyzeInitiativeCollectionOpened(string oldJson, string newJson)
+    {
+        try
+        {
+            if (ReadActiveCombatInitiativeState(oldJson).Open)
+                return InitiativeCollectionChangeInfo.None;
+
+            var state = ReadActiveCombatInitiativeState(newJson);
+            if (!state.Open || string.IsNullOrWhiteSpace(state.Code))
+                return InitiativeCollectionChangeInfo.None;
+
+            var labelPart = string.IsNullOrWhiteSpace(state.Label) ? "" : $" — {state.Label}";
+            return new InitiativeCollectionChangeInfo(
+                Changed: true,
+                Code: state.Code,
+                Label: state.Label,
+                Message: $"Collecte d'initiative ouverte{labelPart}");
+        }
+        catch
+        {
+            return InitiativeCollectionChangeInfo.None;
+        }
+    }
+
+    private static ActiveCombatInitiativeState ReadActiveCombatInitiativeState(string json)
+    {
+        using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(json) ? "{}" : json);
+        var root = doc.RootElement;
+        if (!root.TryGetProperty("activeSessionId", out var activeIdEl))
+            return new ActiveCombatInitiativeState(false, null, null);
+        var activeSessionId = activeIdEl.GetString();
+        if (string.IsNullOrWhiteSpace(activeSessionId))
+            return new ActiveCombatInitiativeState(false, null, null);
+        if (!root.TryGetProperty("sessions", out var sessions) || sessions.ValueKind != JsonValueKind.Array)
+            return new ActiveCombatInitiativeState(false, null, null);
+
+        foreach (var session in sessions.EnumerateArray())
+        {
+            var sid = session.TryGetProperty("id", out var idEl) ? idEl.GetString() : null;
+            if (!string.Equals(sid, activeSessionId, StringComparison.Ordinal))
+                continue;
+            if (!session.TryGetProperty("activeCombat", out var combat) || combat.ValueKind != JsonValueKind.Object)
+                return new ActiveCombatInitiativeState(false, null, null);
+            if (!combat.TryGetProperty("collectingInitiative", out var collecting) || collecting.ValueKind != JsonValueKind.True)
+                return new ActiveCombatInitiativeState(false, null, null);
+            var code = combat.TryGetProperty("initiativeCode", out var codeEl) ? codeEl.GetString() : null;
+            var label = combat.TryGetProperty("label", out var labelEl) ? labelEl.GetString() : null;
+            return new ActiveCombatInitiativeState(true, code, label);
+        }
+
+        return new ActiveCombatInitiativeState(false, null, null);
+    }
+
+    private sealed record ActiveCombatInitiativeState(bool Open, string? Code, string? Label);
+
+    private static string SessionSchedulingKey(SessionSnapshot s) =>
+        $"{s.Id}|{s.Title}|{s.ScheduledAt}|{s.Location}|{s.Status}|{s.Notes}";
+
     private static bool SessionsEqual(List<SessionSnapshot> a, List<SessionSnapshot> b)
     {
         if (a.Count != b.Count) return false;
         for (var i = 0; i < a.Count; i++)
         {
-            if (a[i].Raw != b[i].Raw) return false;
+            if (SessionSchedulingKey(a[i]) != SessionSchedulingKey(b[i])) return false;
         }
         return true;
     }
@@ -476,7 +535,7 @@ public static class CampaignJsonHelpers
         {
             if (string.IsNullOrEmpty(s.Id) || !oldById.TryGetValue(s.Id, out var prev))
                 return s;
-            if (prev.Raw != s.Raw)
+            if (SessionSchedulingKey(prev) != SessionSchedulingKey(s))
                 return s;
         }
         return newSessions.LastOrDefault() ?? oldSessions.LastOrDefault();
@@ -511,6 +570,15 @@ public sealed record HandoutChangeInfo(
     string Message)
 {
     public static HandoutChangeInfo None { get; } = new(false, null, null, 0, "");
+}
+
+public sealed record InitiativeCollectionChangeInfo(
+    bool Changed,
+    string? Code,
+    string? Label,
+    string Message)
+{
+    public static InitiativeCollectionChangeInfo None { get; } = new(false, null, null, "");
 }
 
 public sealed record InitiativeBoardInfo(

@@ -326,6 +326,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       session_updated: 'Session modifiée',
       pregen_assigned: 'Pré-tiré assigné',
       handout_published: 'Document publié',
+      initiative_collection_opened: 'Collecte d\'initiative',
     };
     return labels[kind] ?? kind.replace(/_/g, ' ');
   }
@@ -343,6 +344,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       session_updated: 'fluent-emoji:spiral-calendar',
       pregen_assigned: 'fluent-emoji:bust-in-silhouette',
       handout_published: 'fluent-emoji:scroll',
+      initiative_collection_opened: 'fluent-emoji:dart',
     };
     return icons[kind] ?? 'fluent-emoji:memo';
   }
