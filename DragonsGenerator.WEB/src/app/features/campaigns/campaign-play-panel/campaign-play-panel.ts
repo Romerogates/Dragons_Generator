@@ -31,6 +31,7 @@ import {
 import {
   COMBATANT_KIND_LABELS,
   advanceTurn,
+  canReorderCombatantInTurnOrder,
   combatantInitiativeTotal,
   createActiveCombat,
   createCombatant,
@@ -40,6 +41,7 @@ import {
   expandEncounterToCombatants,
   formatCombatArchiveSummary,
   isCombatantDefeated,
+  reorderCombatantInTurnOrder,
   sortedTurnOrder,
   syncEncountersFromCombatants,
 } from '@core/utils/combat-tracker.util';
@@ -420,6 +422,20 @@ export class CampaignPlayPanel implements OnDestroy {
 
   isCurrentTurn(combatantId: string): boolean {
     return this.currentTurn()?.id === combatantId;
+  }
+
+  canMoveCombatantTurn(combatantId: string, direction: -1 | 1): boolean {
+    const combat = this.activeCombat();
+    if (!combat) return false;
+    return canReorderCombatantInTurnOrder(combat, combatantId, direction);
+  }
+
+  moveCombatantTurn(combatantId: string, direction: -1 | 1): void {
+    const combat = this.activeCombat();
+    if (!combat) return;
+    const patch = reorderCombatantInTurnOrder(combat, combatantId, direction);
+    if (!patch.turnOrderIds) return;
+    this.patchCombat({ ...combat, ...patch }, { immediate: true });
   }
 
   markDefeated(encounterId: string, creatureIndex: number): void {

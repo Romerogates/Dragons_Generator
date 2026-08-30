@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { CampaignCloudService, CampaignActivityItem } from '@core/services/campaign-cloud.service';
+import { CampaignCloudService, CampaignActivityItem, InitiativeBoard } from '@core/services/campaign-cloud.service';
 import { FriendsService } from '@core/services/friends.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
 import { AuthService } from '@core/services/auth.service';
@@ -49,6 +49,7 @@ import { formatChallengeRating, getCreatureCategoryLabel } from '@core/utils/cre
 import { StoryBuilderService } from '@core/services/story-builder.service';
 import { CampaignPregenGeneratorService } from '@core/services/campaign-pregen-generator.service';
 import { CampaignPlayPanel } from '../campaign-play-panel/campaign-play-panel';
+import { LightMarkdownPipe } from '@shared/pipes/light-markdown.pipe';
 import { firstValueFrom } from 'rxjs';
 
 type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'activity' | 'handouts';
@@ -56,7 +57,7 @@ type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'ac
 @Component({
   selector: 'app-campaign-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ProfileAvatarComponent, CampaignPlayPanel],
+  imports: [CommonModule, FormsModule, RouterLink, ProfileAvatarComponent, CampaignPlayPanel, LightMarkdownPipe],
   templateUrl: './campaign-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -97,6 +98,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly previewHandoutId = signal<string | null>(null);
   readonly focusHandoutId = signal<string | null>(null);
   readonly handoutKindFilter = signal<HandoutKind | 'all'>('all');
+  readonly initiativeBoard = signal<InitiativeBoard | null>(null);
+
+  private initiativePollTimer: ReturnType<typeof setInterval> | null = null;
 
   readonly creatureXpMap = signal<Record<string, number>>({});
   readonly isLoadingPreview = signal(false);
@@ -157,6 +161,20 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly publishedHandoutsCount = computed(
     () => (this.campaign()?.data.handouts ?? []).filter((h) => h.published).length,
   );
+
+  readonly showInitiativeBanner = computed(() => {
+    const board = this.initiativeBoard();
+    if (!board?.open || !board.code) return false;
+    const userId = this.auth.user()?.id;
+    const list = board.combatants;
+    if (!list.length) return false;
+    if (!userId) return list.some((c) => !c.hasRoll);
+    const linked = list.filter((c) => c.memberUserId === userId);
+    const targets = linked.length ? linked : list;
+    return targets.some((c) => !c.hasRoll);
+  });
+
+  readonly initiativeBannerCode = computed(() => this.initiativeBoard()?.code ?? null);
 
   readonly sortedHandouts = computed(() => {
     const list = this.campaign()?.data.handouts ?? [];
@@ -234,6 +252,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.flushSessionSave();
     this.flushHandoutSave();
+    this.stopInitiativeBannerPoll();
     this.revokePreviewUrl();
   }
 
@@ -249,6 +268,12 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         const t = this.tab();
         if (!c.isOwner && (t === 'creatures' || t === 'encounters')) {
           this.tab.set('overview');
+        }
+        if (!c.isOwner) {
+          this.startInitiativeBannerPoll(c.id);
+        } else {
+          this.stopInitiativeBannerPoll();
+          this.initiativeBoard.set(null);
         }
       },
       error: () => {
@@ -368,6 +393,29 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     }
     this.focusHandoutId.set(handoutId);
     this.setTab('handouts');
+    const c = this.campaign();
+    if (handoutId && c && !c.isOwner) {
+      const published = (c.data.handouts ?? []).some((h) => h.id === handoutId && h.published);
+      if (published) this.previewHandoutAsPlayer(handoutId);
+    }
+  }
+
+  private startInitiativeBannerPoll(campaignId: string): void {
+    this.stopInitiativeBannerPoll();
+    const refresh = () => {
+      this.campaigns.getInitiativeBoard(campaignId).subscribe({
+        next: (board) => this.initiativeBoard.set(board),
+        error: () => this.initiativeBoard.set(null),
+      });
+    };
+    refresh();
+    this.initiativePollTimer = setInterval(refresh, 8000);
+  }
+
+  private stopInitiativeBannerPoll(): void {
+    if (!this.initiativePollTimer) return;
+    clearInterval(this.initiativePollTimer);
+    this.initiativePollTimer = null;
   }
 
   previewHandoutAsPlayer(handoutId: string): void {

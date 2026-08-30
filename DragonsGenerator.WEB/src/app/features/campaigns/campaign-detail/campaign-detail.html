@@ -45,6 +45,24 @@
       </div>
     </header>
 
+    @if (!c.isOwner && showInitiativeBanner()) {
+      <div class="border-b border-amber-900/40 bg-amber-950/25">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+          <p class="text-sm text-amber-100">
+            <span class="font-semibold">Le MJ attend ton initiative.</span>
+            <span class="text-amber-200/80"> Saisis ton jet d20 avant le combat.</span>
+          </p>
+          <a
+            class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-600 text-white hover:bg-amber-500 transition-colors shrink-0"
+            [routerLink]="['/campaigns', c.id, 'init']"
+            [queryParams]="{ code: initiativeBannerCode() }"
+          >
+            Saisir mon jet
+          </a>
+        </div>
+      </div>
+    }
+
     <div class="max-w-5xl mx-auto px-4 py-8">
       @switch (tab()) {
         @case ('overview') {
@@ -448,6 +466,9 @@
                       [ngModel]="handout.body"
                       (ngModelChange)="updateHandout(handout.id, { body: $event })"
                     ></textarea>
+                    <p class="text-[10px] text-slate-500">
+                      Markdown léger : <strong class="text-slate-400">**gras**</strong>, # titres, - listes
+                    </p>
                     <div class="flex flex-wrap items-center justify-between gap-2">
                       <label class="flex items-center gap-2 text-xs text-slate-400 cursor-pointer">
                         <input
@@ -502,7 +523,7 @@
                         }
                       </div>
                       @if (handout.body) {
-                        <p class="text-sm text-slate-400 whitespace-pre-wrap line-clamp-4">{{ handout.body }}</p>
+                        <div class="text-sm text-slate-400 line-clamp-4" [innerHTML]="handout.body | lightMarkdown"></div>
                       } @else {
                         <p class="text-sm text-slate-600 italic">Contenu vide</p>
                       }
@@ -538,7 +559,7 @@
                     @if (handout.publishedAt) {
                       <p class="text-[10px] text-slate-500 mb-3">{{ formatHandoutDate(handout.publishedAt) }}</p>
                     }
-                    <div class="text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">{{ handout.body }}</div>
+                    <div class="text-sm text-slate-300 leading-relaxed" [innerHTML]="handout.body | lightMarkdown"></div>
                   </div>
                 }
               </article>
@@ -569,9 +590,7 @@
                     {{ handoutKindLabels[preview.kind] }}
                   </span>
                 </div>
-                <div class="text-sm text-slate-300 whitespace-pre-wrap leading-relaxed max-h-[50vh] overflow-y-auto">
-                  {{ preview.body || 'Contenu vide' }}
-                </div>
+                <div class="text-sm text-slate-300 leading-relaxed max-h-[50vh] overflow-y-auto" [innerHTML]="preview.body | lightMarkdown"></div>
                 <button
                   type="button"
                   class="w-full py-2 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-300"

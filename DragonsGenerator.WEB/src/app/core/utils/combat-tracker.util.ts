@@ -53,17 +53,64 @@ export function isCombatantDefeated(c: Combatant): boolean {
   return c.currentHp !== undefined && c.currentHp <= 0;
 }
 
-/** Tri décroissant par total d'initiative ; sans jet en bas. */
-export function sortCombatants(combatants: Combatant[]): Combatant[] {
+function turnOrderIndex(id: string, turnOrderIds?: string[]): number {
+  if (!turnOrderIds?.length) return 9999;
+  const idx = turnOrderIds.indexOf(id);
+  return idx < 0 ? 9999 : idx;
+}
+
+/** Tri décroissant par total d'initiative ; sans jet en bas ; égalités via turnOrderIds. */
+export function sortCombatants(combatants: Combatant[], turnOrderIds?: string[]): Combatant[] {
   return [...combatants].sort((a, b) => {
     const ta = combatantInitiativeTotal(a);
     const tb = combatantInitiativeTotal(b);
-    if (ta === null && tb === null) return a.name.localeCompare(b.name, 'fr');
+    if (ta === null && tb === null) {
+      const oa = turnOrderIndex(a.id, turnOrderIds);
+      const ob = turnOrderIndex(b.id, turnOrderIds);
+      if (oa !== ob) return oa - ob;
+      return a.name.localeCompare(b.name, 'fr');
+    }
     if (ta === null) return 1;
     if (tb === null) return -1;
     if (tb !== ta) return tb - ta;
+    const oa = turnOrderIndex(a.id, turnOrderIds);
+    const ob = turnOrderIndex(b.id, turnOrderIds);
+    if (oa !== ob) return oa - ob;
     return a.name.localeCompare(b.name, 'fr');
   });
+}
+
+/** Déplace un combattant dans l'ordre de tour (égalité d'initiative uniquement). */
+export function reorderCombatantInTurnOrder(
+  combat: ActiveCombat,
+  combatantId: string,
+  direction: -1 | 1,
+): Partial<Pick<ActiveCombat, 'turnOrderIds'>> {
+  const order = sortedTurnOrder(combat);
+  const idx = order.findIndex((c) => c.id === combatantId);
+  if (idx < 0) return {};
+
+  const swapIdx = idx + direction;
+  if (swapIdx < 0 || swapIdx >= order.length) return {};
+
+  const a = order[idx];
+  const b = order[swapIdx];
+  const ta = combatantInitiativeTotal(a);
+  const tb = combatantInitiativeTotal(b);
+  if (ta === null || tb === null || ta !== tb) return {};
+
+  const ids = order.map((c) => c.id);
+  ids[idx] = b.id;
+  ids[swapIdx] = a.id;
+  return { turnOrderIds: ids };
+}
+
+export function canReorderCombatantInTurnOrder(
+  combat: ActiveCombat,
+  combatantId: string,
+  direction: -1 | 1,
+): boolean {
+  return reorderCombatantInTurnOrder(combat, combatantId, direction).turnOrderIds !== undefined;
 }
 
 /** Une ligne par unité (Gobelin ×3 → Gobelin 1, 2, 3), liée à la rencontre. */
@@ -112,7 +159,7 @@ export function syncEncountersFromCombatants(
 }
 
 export function sortedTurnOrder(combat: ActiveCombat): Combatant[] {
-  return sortCombatants(combat.combatants);
+  return sortCombatants(combat.combatants, combat.turnOrderIds);
 }
 
 /** Ordre de combat sans les unités mortes (suiv./préc.). */

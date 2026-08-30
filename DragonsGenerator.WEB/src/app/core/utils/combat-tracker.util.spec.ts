@@ -10,6 +10,7 @@ import {
   sortCombatants,
   syncEncountersFromCombatants,
   activeTurnOrder,
+  reorderCombatantInTurnOrder,
 } from './combat-tracker.util';
 import type { EncounterGroup } from '@core/models/Campaign/campaign';
 
@@ -111,6 +112,19 @@ describe('combat-tracker.util', () => {
     const sorted = sortCombatants([a, b, c]);
     expect(sorted.map((x) => x.name)).toEqual(['B', 'A', 'C']);
     expect(combatantInitiativeTotal(a)).toBe(12);
+  });
+
+  it('reorderCombatantInTurnOrder swaps tied initiative totals', () => {
+    const a = createCombatant({ name: 'A', kind: 'player', initiativeRoll: 15, initiativeBonus: 0 });
+    const b = createCombatant({ name: 'B', kind: 'player', initiativeRoll: 15, initiativeBonus: 0 });
+    const c = createCombatant({ name: 'C', kind: 'monster', initiativeRoll: 10, initiativeBonus: 0 });
+    let combat = createActiveCombat([a, b, c]);
+    expect(sortCombatants(combat.combatants).map((x) => x.name)).toEqual(['A', 'B', 'C']);
+
+    const patch = reorderCombatantInTurnOrder(combat, b.id, -1);
+    expect(patch.turnOrderIds).toEqual([b.id, a.id, c.id]);
+    combat = { ...combat, ...patch };
+    expect(sortCombatants(combat.combatants, combat.turnOrderIds).map((x) => x.name)).toEqual(['B', 'A', 'C']);
   });
 
   it('createActiveCombat starts at round 1 turn 0', () => {

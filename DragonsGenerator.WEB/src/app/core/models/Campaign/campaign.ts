@@ -81,6 +81,8 @@ export interface ActiveCombat {
   collectingInitiative?: boolean;
   /** Code court partagé avec les joueurs. */
   initiativeCode?: string;
+  /** Ordre manuel entre combattants à égalité d'initiative (ids). */
+  turnOrderIds?: string[];
 }
 
 export interface CampaignSession {
