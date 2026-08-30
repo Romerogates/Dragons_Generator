@@ -145,6 +145,7 @@ export class CampaignCloudService {
       notes: raw.notes ?? base.notes,
       pregenCharacters: Array.isArray(raw.pregenCharacters) ? raw.pregenCharacters : [],
       sessions: Array.isArray(raw.sessions) ? raw.sessions : [],
+      activeSessionId: raw.activeSessionId ?? null,
     };
   }
 

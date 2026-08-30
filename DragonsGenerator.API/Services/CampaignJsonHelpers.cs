@@ -59,8 +59,11 @@ public static class CampaignJsonHelpers
             {
                 if (item is not JsonObject session) continue;
                 session["notes"] = "";
+                session["playNotes"] = "";
             }
         }
+
+        node["activeSessionId"] = null;
 
         using var doc = JsonDocument.Parse(node.ToJsonString());
         return doc.RootElement.Clone();
@@ -115,7 +118,7 @@ public static class CampaignJsonHelpers
 
         foreach (var prop in update.ToList())
         {
-            if (prop.Key is "adventure" or "notes" or "creatures" or "encounters") continue;
+            if (prop.Key is "adventure" or "notes" or "creatures" or "encounters" or "activeSessionId") continue;
             existing[prop.Key] = prop.Value?.DeepClone();
         }
 

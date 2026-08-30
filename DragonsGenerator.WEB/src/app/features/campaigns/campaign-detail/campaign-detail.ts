@@ -104,6 +104,23 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       .reduce((s, m) => s + m.xpEarnedInCampaign, 0),
   );
 
+  readonly activeSession = computed(() => {
+    const c = this.campaign();
+    const id = c?.data.activeSessionId;
+    if (!c?.isOwner || !id) return null;
+    return (c.data.sessions ?? []).find((s) => s.id === id) ?? null;
+  });
+
+  readonly nextPlannedSession = computed(() => {
+    const now = Date.now();
+    return (this.campaign()?.data.sessions ?? [])
+      .filter((s) => s.status === 'planned')
+      .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())
+      .find((s) => new Date(s.scheduledAt).getTime() >= now)
+      ?? (this.campaign()?.data.sessions ?? []).find((s) => s.status === 'planned')
+      ?? null;
+  });
+
   /** Onglets visibles : créatures / rencontres réservés au MJ. */
   readonly visibleTabs = computed(() => {
     const owner = this.campaign()?.isOwner === true;
@@ -129,6 +146,35 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   protected categoryLabel = getCreatureCategoryLabel;
   protected encounterTotalXp = encounterTotalXp;
   protected encounterPendingXp = encounterPendingXp;
+
+  startPlaySession(sessionId: string): void {
+    if (!this.campaign()?.isOwner) return;
+    this.flushSessionSave();
+    this.saveData({ activeSessionId: sessionId });
+    this.tab.set('overview');
+  }
+
+  endPlaySession(): void {
+    const c = this.campaign();
+    const session = this.activeSession();
+    if (!c?.isOwner || !session) return;
+    if (!confirm('Terminer la session en cours ? Les notes de jeu seront archivées.')) return;
+    this.flushSessionSave();
+    const sessions = (c.data.sessions ?? []).map((s) => {
+      if (s.id !== session.id) return s;
+      const playBlock = s.playNotes?.trim();
+      const mergedNotes = playBlock
+        ? [s.notes?.trim(), playBlock].filter(Boolean).join('\n\n--- Notes de session ---\n\n')
+        : s.notes;
+      return {
+        ...s,
+        status: 'played' as CampaignSessionStatus,
+        notes: mergedNotes || s.notes,
+        playNotes: '',
+      };
+    });
+    this.saveData({ sessions, activeSessionId: null });
+  }
 
   ngOnInit(): void {
     if (!this.auth.isLoggedIn()) {
@@ -512,6 +558,20 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       const creatures = enc.creatures.map((cr, i) => {
         if (i !== creatureIndex || cr.defeated >= cr.quantity) return cr;
         return { ...cr, defeated: cr.defeated + 1 };
+      });
+      return { ...enc, creatures };
+    });
+    this.saveData({ encounters });
+  }
+
+  undoDefeated(encounterId: string, creatureIndex: number): void {
+    const c = this.campaign();
+    if (!c || !c.isOwner) return;
+    const encounters = c.data.encounters.map((enc) => {
+      if (enc.id !== encounterId) return enc;
+      const creatures = enc.creatures.map((cr, i) => {
+        if (i !== creatureIndex || cr.defeated <= 0) return cr;
+        return { ...cr, defeated: cr.defeated - 1 };
       });
       return { ...enc, creatures };
     });

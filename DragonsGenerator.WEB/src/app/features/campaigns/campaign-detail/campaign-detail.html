@@ -73,6 +73,116 @@
               }
             </div>
 
+            @if (c.isOwner && activeSession(); as playSession) {
+              <div class="bg-emerald-950/25 border-2 border-emerald-700/50 rounded-2xl p-5 space-y-5 shadow-lg">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-1">
+                      Table de jeu — session en cours
+                    </p>
+                    <h2 class="text-xl font-serif text-emerald-200">{{ playSession.title }}</h2>
+                    <p class="text-xs text-slate-400 mt-1">{{ formatSessionDate(playSession.scheduledAt) }}</p>
+                  </div>
+                  <button
+                    type="button"
+                    class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-900/40 border border-emerald-700/50 text-emerald-300 hover:bg-emerald-800/50"
+                    (click)="endPlaySession()"
+                  >
+                    Terminer la session
+                  </button>
+                </div>
+
+                <label class="block">
+                  <span class="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-1"
+                    >Notes en direct</span
+                  >
+                  <textarea
+                    rows="4"
+                    placeholder="Scènes, PNJ rencontrés, décisions des joueurs…"
+                    class="w-full bg-[#171b22] border border-emerald-900/40 rounded-xl p-3 text-sm text-slate-300"
+                    [ngModel]="playSession.playNotes ?? ''"
+                    (ngModelChange)="updateSession(playSession.id, { playNotes: $event || undefined })"
+                  ></textarea>
+                </label>
+
+                @if (c.data.encounters.length) {
+                  <div class="space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                      <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-400">
+                        Rencontres
+                      </h3>
+                      <button
+                        type="button"
+                        class="text-[10px] font-black uppercase text-violet-400 hover:text-violet-300"
+                        (click)="setTab('encounters')"
+                      >
+                        Vue complète →
+                      </button>
+                    </div>
+                    @for (enc of c.data.encounters; track enc.id) {
+                      <article class="bg-[#1b2028]/80 border border-slate-800 rounded-xl p-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                          <h4 class="font-serif text-violet-300">{{ enc.name }}</h4>
+                          <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                            {{ encounterTotalXp(enc) }} XP · {{ encounterPendingXp(enc) }} restants
+                          </span>
+                        </div>
+                        @for (cr of enc.creatures; track $index) {
+                          <div class="flex flex-wrap items-center justify-between gap-2 py-2 border-b border-slate-800/50 last:border-0">
+                            <span class="text-sm text-slate-300">{{ cr.customName || cr.creatureName }}</span>
+                            <div class="flex items-center gap-2">
+                              <span class="text-xs text-slate-500">{{ cr.defeated }}/{{ cr.quantity }}</span>
+                              @if (cr.defeated > 0) {
+                                <button
+                                  type="button"
+                                  class="px-2 py-1 rounded text-[9px] font-black uppercase border border-slate-700 text-slate-400"
+                                  (click)="undoDefeated(enc.id, $index)"
+                                >
+                                  −1
+                                </button>
+                              }
+                              @if (cr.defeated < cr.quantity) {
+                                <button
+                                  type="button"
+                                  class="px-2 py-1 rounded text-[9px] font-black uppercase bg-red-950/30 border border-red-900/40 text-red-300"
+                                  (click)="markDefeated(enc.id, $index)"
+                                >
+                                  +1 kill
+                                </button>
+                              }
+                            </div>
+                          </div>
+                        }
+                        @if (encounterTotalXp(enc) > 0 && !enc.xpAwarded) {
+                          <button
+                            type="button"
+                            class="mt-3 w-full py-2 rounded-lg text-[10px] font-black uppercase bg-emerald-950/30 border border-emerald-800/40 text-emerald-300"
+                            (click)="distributeEncounterXp(enc)"
+                          >
+                            Distribuer {{ encounterTotalXp(enc) }} XP
+                          </button>
+                        }
+                      </article>
+                    }
+                  </div>
+                }
+              </div>
+            } @else if (c.isOwner && nextPlannedSession(); as nextSession) {
+              <div class="bg-[#1b2028] border border-dashed border-emerald-800/40 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p class="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-1">Prochaine session</p>
+                  <p class="font-serif text-slate-200">{{ nextSession.title }} · {{ formatSessionDate(nextSession.scheduledAt) }}</p>
+                </div>
+                <button
+                  type="button"
+                  class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
+                  (click)="startPlaySession(nextSession.id)"
+                >
+                  Démarrer la table
+                </button>
+              </div>
+            }
+
             @if (c.isOwner) {
               <div class="bg-violet-950/20 border border-violet-800/40 rounded-2xl p-5">
                 <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-4">
@@ -265,13 +375,24 @@
                             <p class="text-xs text-slate-500 mt-2 line-clamp-2">{{ session.notes }}</p>
                           }
                         </div>
-                        <button
-                          type="button"
-                          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:border-amber-500/50 hover:text-amber-300"
-                          (click)="startEditSession(session.id)"
-                        >
-                          Modifier
-                        </button>
+                        <div class="flex flex-wrap gap-2">
+                          @if (session.status === 'planned' && !activeSession()) {
+                            <button
+                              type="button"
+                              class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-emerald-800/50 text-emerald-300 hover:border-emerald-500/50"
+                              (click)="startPlaySession(session.id)"
+                            >
+                              Démarrer
+                            </button>
+                          }
+                          <button
+                            type="button"
+                            class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:border-amber-500/50 hover:text-amber-300"
+                            (click)="startEditSession(session.id)"
+                          >
+                            Modifier
+                          </button>
+                        </div>
                       </div>
                     }
                   </article>
@@ -477,7 +598,7 @@
                 </div>
               </div>
 
-              @for (p of c.data.pregenCharacters ?? []; track p.id) {
+              @for (p of c.data.pregenCharacters; track p.id) {
                 <article class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5 space-y-4">
                   <div class="flex flex-wrap items-start justify-between gap-3">
                     <div>
@@ -596,6 +717,9 @@
                   <h3 class="font-bold text-violet-300 font-serif">{{ enc.name }}</h3>
                   <div class="text-[10px] font-black uppercase tracking-widest text-slate-500">
                     XP vaincus : {{ encounterTotalXp(enc) }}
+                    @if (encounterPendingXp(enc) > 0) {
+                      <span class="text-amber-400/80 ml-2">{{ encounterPendingXp(enc) }} restants</span>
+                    }
                     @if (enc.xpAwarded) {
                       <span class="text-emerald-400 ml-2">✓ Distribué</span>
                     }
@@ -610,6 +734,15 @@
                       </div>
                       <div class="flex items-center gap-3">
                         <span class="text-xs text-slate-400">{{ cr.defeated }}/{{ cr.quantity }} vaincus</span>
+                        @if (c.isOwner && cr.defeated > 0) {
+                          <button
+                            type="button"
+                            class="px-2 py-1 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400"
+                            (click)="undoDefeated(enc.id, $index)"
+                          >
+                            −1
+                          </button>
+                        }
                         @if (c.isOwner && cr.defeated < cr.quantity) {
                           <button
                             type="button"

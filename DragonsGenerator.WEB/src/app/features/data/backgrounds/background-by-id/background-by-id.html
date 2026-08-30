@@ -21,7 +21,7 @@
           ><iconify-icon icon="fluent-emoji:scroll"></iconify-icon
         ></span>
         <h1 class="text-4xl font-extrabold text-teal-300 font-serif mb-3">{{ bg.name }}</h1>
-        @if (bg.data.source?.book) {
+        @if (bg.data.source.book) {
           <p class="text-xs text-slate-500 uppercase tracking-widest">
             {{ bg.data.source.book }}
             @if (bg.data.source.pages) {
@@ -132,12 +132,12 @@
             }
           </ul>
         }
-        @if (bg.data.equipment.currency?.or) {
+        @if (bg.data.equipment.currency.or) {
           <p class="text-sm text-amber-300/90">
             {{ bg.data.equipment.currency.or }} po
           </p>
         }
-        @if (!bg.data.equipment.fixed.length && !bg.data.equipment.currency?.or) {
+        @if (!bg.data.equipment.fixed.length && !bg.data.equipment.currency.or) {
           <p class="text-sm text-slate-500 italic">Équipement libre ou personnalisé.</p>
         }
       </section>

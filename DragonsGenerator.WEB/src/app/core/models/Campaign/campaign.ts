@@ -48,6 +48,8 @@ export interface CampaignSession {
   scheduledAt: string;
   location?: string;
   notes?: string;
+  /** Notes prises en direct pendant la session (MJ). */
+  playNotes?: string;
   status: CampaignSessionStatus;
 }
 
@@ -63,6 +65,8 @@ export interface CampaignData {
   notes: string;
   pregenCharacters: CampaignPregen[];
   sessions: CampaignSession[];
+  /** Session en cours côté table de jeu MJ. */
+  activeSessionId?: string | null;
 }
 
 export interface CampaignMember {
@@ -140,6 +144,7 @@ export function emptyCampaignData(partyLevel = 3): CampaignData {
     notes: '',
     pregenCharacters: [],
     sessions: [],
+    activeSessionId: null,
   };
 }
 
