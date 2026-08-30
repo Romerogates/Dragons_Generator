@@ -43,6 +43,8 @@ export class NotificationsPage implements OnInit {
         return 'fluent-emoji:bust-in-silhouette';
       case 'proposal_rejected':
         return 'fluent-emoji:warning';
+      case 'proposal_approved':
+        return 'fluent-emoji:check-mark-button';
     }
   }
 

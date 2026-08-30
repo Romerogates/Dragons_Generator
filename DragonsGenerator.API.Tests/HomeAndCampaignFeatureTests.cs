@@ -710,6 +710,134 @@ public class HomeAndCampaignFeatureTests
         }
     }
 
+    [Fact]
+    public async Task Character_propose_approve_reject_logs_activity_and_notifications()
+    {
+        var (_, ownerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "propowner");
+        var (_, playerToken, playerId) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "propplayer");
+
+        Guid campaignId;
+        using (var createReq = ApiTestAuth.Authed(HttpMethod.Post, "/me/campaigns", ownerToken))
+        {
+            createReq.Content = JsonContent.Create(new
+            {
+                title = "Campagne propositions",
+                data = JsonDocument.Parse("{}").RootElement,
+            });
+            var create = await _client.SendAsync(createReq);
+            create.EnsureSuccessStatusCode();
+            var created = await create.Content.ReadFromJsonAsync<JsonElement>();
+            campaignId = created!.GetProperty("id").GetGuid();
+        }
+
+        Guid characterId;
+        using (var charReq = ApiTestAuth.Authed(HttpMethod.Post, "/me/characters", playerToken))
+        {
+            charReq.Content = JsonContent.Create(new
+            {
+                name = "Lyra",
+                data = JsonDocument.Parse("""{"name":"Lyra","totalLevel":2}""").RootElement,
+            });
+            var created = await _client.SendAsync(charReq);
+            created.EnsureSuccessStatusCode();
+            var body = await created.Content.ReadFromJsonAsync<JsonElement>();
+            characterId = body!.GetProperty("id").GetGuid();
+        }
+
+        await InvitePlayerToCampaignAsync(ownerToken, playerToken, playerId, campaignId);
+
+        using (var proposeReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaigns/{campaignId}/propose-character", playerToken))
+        {
+            proposeReq.Content = JsonContent.Create(new { characterId });
+            (await _client.SendAsync(proposeReq)).EnsureSuccessStatusCode();
+        }
+
+        using (var actReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}/activity", ownerToken))
+        {
+            var act = await _client.SendAsync(actReq);
+            act.EnsureSuccessStatusCode();
+            var raw = await act.Content.ReadAsStringAsync();
+            Assert.Contains("character_proposed", raw);
+        }
+
+        using (var ownerNotifReq = ApiTestAuth.Authed(HttpMethod.Get, "/me/notifications", ownerToken))
+        {
+            var notif = await _client.SendAsync(ownerNotifReq);
+            notif.EnsureSuccessStatusCode();
+            var body = await notif.Content.ReadFromJsonAsync<JsonElement>();
+            var kinds = body!.GetProperty("notifications").EnumerateArray()
+                .Select(n => n.GetProperty("kind").GetString())
+                .ToList();
+            Assert.Contains("character_proposal", kinds);
+        }
+
+        Guid memberId;
+        using (var detailReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}", ownerToken))
+        {
+            var detail = await _client.SendAsync(detailReq);
+            detail.EnsureSuccessStatusCode();
+            var body = await detail.Content.ReadFromJsonAsync<JsonElement>();
+            memberId = body!.GetProperty("members").EnumerateArray()
+                .First(m => m.GetProperty("userId").GetGuid() == playerId)
+                .GetProperty("id").GetGuid();
+        }
+
+        using (var rejectReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaigns/{campaignId}/members/{memberId}/reject", ownerToken))
+        {
+            (await _client.SendAsync(rejectReq)).EnsureSuccessStatusCode();
+        }
+
+        using (var actRejectReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}/activity", ownerToken))
+        {
+            var act = await _client.SendAsync(actRejectReq);
+            act.EnsureSuccessStatusCode();
+            var raw = await act.Content.ReadAsStringAsync();
+            Assert.Contains("character_rejected", raw);
+        }
+
+        using (var playerRejectNotif = ApiTestAuth.Authed(HttpMethod.Get, "/me/notifications", playerToken))
+        {
+            var notif = await _client.SendAsync(playerRejectNotif);
+            notif.EnsureSuccessStatusCode();
+            var body = await notif.Content.ReadFromJsonAsync<JsonElement>();
+            var kinds = body!.GetProperty("notifications").EnumerateArray()
+                .Select(n => n.GetProperty("kind").GetString())
+                .ToList();
+            Assert.Contains("proposal_rejected", kinds);
+        }
+
+        using (var proposeAgain = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaigns/{campaignId}/propose-character", playerToken))
+        {
+            proposeAgain.Content = JsonContent.Create(new { characterId });
+            (await _client.SendAsync(proposeAgain)).EnsureSuccessStatusCode();
+        }
+
+        using (var approveReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaigns/{campaignId}/members/{memberId}/approve", ownerToken))
+        {
+            (await _client.SendAsync(approveReq)).EnsureSuccessStatusCode();
+        }
+
+        using (var actApproveReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}/activity", ownerToken))
+        {
+            var act = await _client.SendAsync(actApproveReq);
+            act.EnsureSuccessStatusCode();
+            var raw = await act.Content.ReadAsStringAsync();
+            Assert.Contains("character_approved", raw);
+        }
+
+        using (var playerApproveNotif = ApiTestAuth.Authed(HttpMethod.Get, "/me/notifications", playerToken))
+        {
+            var notif = await _client.SendAsync(playerApproveNotif);
+            notif.EnsureSuccessStatusCode();
+            var body = await notif.Content.ReadFromJsonAsync<JsonElement>();
+            var kinds = body!.GetProperty("notifications").EnumerateArray()
+                .Select(n => n.GetProperty("kind").GetString())
+                .ToList();
+            Assert.Contains("proposal_approved", kinds);
+            Assert.DoesNotContain("proposal_rejected", kinds);
+        }
+    }
+
     private async Task InvitePlayerToCampaignAsync(
         string ownerToken,
         string playerToken,

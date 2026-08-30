@@ -257,9 +257,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
     const tab = this.route.snapshot.queryParamMap.get('tab');
     const handoutId = this.route.snapshot.queryParamMap.get('handout');
-    if (tab === 'handouts') {
-      this.tab.set('handouts');
-      if (handoutId) this.focusHandoutId.set(handoutId);
+    if (tab === 'handouts' || tab === 'players' || tab === 'activity' || tab === 'overview') {
+      this.tab.set(tab);
+      if (tab === 'handouts' && handoutId) this.focusHandoutId.set(handoutId);
     }
   }
 
@@ -371,6 +371,13 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       if (!raw || typeof raw !== 'object') return null;
       const p = raw as Record<string, unknown>;
       if (typeof p['message'] === 'string' && p['message'].trim()) return p['message'].trim();
+      if (typeof p['characterName'] === 'string' && p['characterName'].trim()) {
+        const who =
+          typeof p['displayName'] === 'string' && p['displayName'].trim()
+            ? `${p['displayName']} · `
+            : '';
+        return `${who}${p['characterName']}`;
+      }
       if (typeof p['title'] === 'string' && p['title'].trim()) {
         const loc = typeof p['location'] === 'string' && p['location'] ? ` · ${p['location']}` : '';
         return `${p['title']}${loc}`;
@@ -844,7 +851,11 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const c = this.campaign();
     if (!c) return;
     this.campaigns.proposeCharacter(c.id, characterId).subscribe({
-      next: () => this.reload(),
+      next: () => {
+        this.reload();
+        this.notifications.refresh();
+        if (this.tab() === 'activity') this.loadActivity();
+      },
       error: () => this.error.set('Impossible de proposer ce personnage.'),
     });
   }
@@ -852,13 +863,27 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   approveMember(member: CampaignMember): void {
     const c = this.campaign();
     if (!c) return;
-    this.campaigns.approveProposal(c.id, member.id).subscribe(() => this.reload());
+    this.campaigns.approveProposal(c.id, member.id).subscribe({
+      next: () => {
+        this.reload();
+        this.notifications.refresh();
+        if (this.tab() === 'activity') this.loadActivity();
+      },
+      error: () => this.error.set('Impossible d’approuver ce personnage.'),
+    });
   }
 
   rejectMember(member: CampaignMember): void {
     const c = this.campaign();
     if (!c) return;
-    this.campaigns.rejectProposal(c.id, member.id).subscribe(() => this.reload());
+    this.campaigns.rejectProposal(c.id, member.id).subscribe({
+      next: () => {
+        this.reload();
+        this.notifications.refresh();
+        if (this.tab() === 'activity') this.loadActivity();
+      },
+      error: () => this.error.set('Impossible de refuser ce personnage.'),
+    });
   }
 
   removeMember(member: CampaignMember): void {

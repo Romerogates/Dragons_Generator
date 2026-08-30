@@ -537,7 +537,7 @@ public class DeclineCampaignInviteEndpoint(AppDbContext db) : EndpointWithoutReq
     }
 }
 
-public class ProposeCharacterEndpoint(AppDbContext db) : Endpoint<ProposeCharacterBody>
+public class ProposeCharacterEndpoint(AppDbContext db, PushNotificationService push) : Endpoint<ProposeCharacterBody>
 {
     public override void Configure() => Post("/me/campaigns/{id}/propose-character");
 
@@ -584,11 +584,36 @@ public class ProposeCharacterEndpoint(AppDbContext db) : Endpoint<ProposeCharact
         member.ProposalStatus = CharacterProposalStatuses.Pending;
         member.Campaign.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
+
+        var proposer = await db.Users.AsNoTracking().FirstAsync(u => u.Id == userId, ct);
+        var message = $"{proposer.DisplayName} propose {character.Name} dans « {member.Campaign.Title} »";
+        await CampaignActivityService.LogAsync(
+            db,
+            campaignId,
+            userId.Value,
+            CampaignActivityKinds.CharacterProposed,
+            new
+            {
+                characterId = character.Id,
+                characterName = character.Name,
+                level,
+                displayName = proposer.DisplayName,
+                memberUserId = userId.Value,
+                message,
+            },
+            ct);
+        await push.NotifyUserAsync(
+            member.Campaign.OwnerUserId,
+            "Personnage à valider",
+            message,
+            $"/campaigns/{campaignId}?tab=players",
+            ct);
+
         await Send.NoContentAsync(ct);
     }
 }
 
-public class ApproveCharacterProposalEndpoint(AppDbContext db) : EndpointWithoutRequest
+public class ApproveCharacterProposalEndpoint(AppDbContext db, PushNotificationService push) : EndpointWithoutRequest
 {
     public override void Configure() => Post("/me/campaigns/{id}/members/{memberId}/approve");
 
@@ -619,6 +644,10 @@ public class ApproveCharacterProposalEndpoint(AppDbContext db) : EndpointWithout
             return;
         }
 
+        var characterId = member.ProposedCharacterId;
+        var characterName = member.ProposedCharacterName ?? "votre personnage";
+        var playerUserId = member.UserId;
+
         member.ApprovedCharacterId = member.ProposedCharacterId;
         member.ApprovedCharacterName = member.ProposedCharacterName;
         member.ApprovedCharacterLevel = member.ProposedCharacterLevel;
@@ -628,11 +657,35 @@ public class ApproveCharacterProposalEndpoint(AppDbContext db) : EndpointWithout
         member.ProposedCharacterLevel = null;
         campaign.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
+
+        var player = await db.Users.AsNoTracking().FirstAsync(u => u.Id == playerUserId, ct);
+        var message = $"{characterName} est accepté dans « {campaign.Title} »";
+        await CampaignActivityService.LogAsync(
+            db,
+            campaignId,
+            userId.Value,
+            CampaignActivityKinds.CharacterApproved,
+            new
+            {
+                characterId,
+                characterName,
+                displayName = player.DisplayName,
+                memberUserId = playerUserId,
+                message,
+            },
+            ct);
+        await push.NotifyUserAsync(
+            playerUserId,
+            "Personnage approuvé",
+            message,
+            $"/campaigns/{campaignId}",
+            ct);
+
         await Send.NoContentAsync(ct);
     }
 }
 
-public class RejectCharacterProposalEndpoint(AppDbContext db) : EndpointWithoutRequest
+public class RejectCharacterProposalEndpoint(AppDbContext db, PushNotificationService push) : EndpointWithoutRequest
 {
     public override void Configure() => Post("/me/campaigns/{id}/members/{memberId}/reject");
 
@@ -663,12 +716,40 @@ public class RejectCharacterProposalEndpoint(AppDbContext db) : EndpointWithoutR
             return;
         }
 
+        var characterId = member.ProposedCharacterId;
+        var characterName = member.ProposedCharacterName ?? "votre personnage";
+        var playerUserId = member.UserId;
+
         member.ProposalStatus = CharacterProposalStatuses.Rejected;
         member.ProposedCharacterId = null;
         member.ProposedCharacterName = null;
         member.ProposedCharacterLevel = null;
         campaign.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
+
+        var player = await db.Users.AsNoTracking().FirstAsync(u => u.Id == playerUserId, ct);
+        var message = $"{characterName} a été refusé dans « {campaign.Title} » — proposez-en un autre";
+        await CampaignActivityService.LogAsync(
+            db,
+            campaignId,
+            userId.Value,
+            CampaignActivityKinds.CharacterRejected,
+            new
+            {
+                characterId,
+                characterName,
+                displayName = player.DisplayName,
+                memberUserId = playerUserId,
+                message,
+            },
+            ct);
+        await push.NotifyUserAsync(
+            playerUserId,
+            "Personnage refusé",
+            message,
+            $"/campaigns/{campaignId}?tab=players",
+            ct);
+
         await Send.NoContentAsync(ct);
     }
 }

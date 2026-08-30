@@ -1,3 +1,4 @@
+using System.Text.Json;
 using DragonsGenerator.API.Endpoints.Friends;
 using DragonsGenerator.API.Persistence;
 using DragonsGenerator.API.Services;
@@ -24,6 +25,8 @@ public record NotificationsSummaryDto(
 
 public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
 {
+    private static readonly TimeSpan ApprovedNotificationWindow = TimeSpan.FromDays(14);
+
     public override void Configure() => Get("/me/notifications");
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -100,19 +103,28 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
                 .Include(m => m.User)
                 .Include(m => m.Campaign)
                 .ToListAsync(ct);
-            pendingProposals = pendingProposals.OrderByDescending(m => m.JoinedAt).ToList();
 
-            foreach (var m in pendingProposals)
+            var proposedAtByMember = await LatestActivityTimesAsync(
+                db,
+                reviewCampaignIds,
+                CampaignActivityKinds.CharacterProposed,
+                matchActorUserId: true,
+                memberUserIds: pendingProposals.Select(m => m.UserId).ToList(),
+                ct);
+
+            foreach (var m in pendingProposals.OrderByDescending(m =>
+                         proposedAtByMember.GetValueOrDefault((m.CampaignId, m.UserId), m.JoinedAt)))
             {
                 var name = m.ProposedCharacterName ?? "un personnage";
+                var createdAt = proposedAtByMember.GetValueOrDefault((m.CampaignId, m.UserId), m.JoinedAt);
                 items.Add(
                     new NotificationItemDto(
                         $"proposal-{m.Id}",
                         "character_proposal",
                         "Personnage à valider",
                         $"{m.User.DisplayName} propose {name} dans « {m.Campaign.Title} ».",
-                        $"/campaigns/{m.CampaignId}",
-                        m.JoinedAt
+                        $"/campaigns/{m.CampaignId}?tab=players",
+                        createdAt
                     )
                 );
             }
@@ -122,18 +134,60 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
             .Where(m => m.UserId == userId && m.ProposalStatus == CharacterProposalStatuses.Rejected)
             .Include(m => m.Campaign)
             .ToListAsync(ct);
-        rejected = rejected.OrderByDescending(m => m.JoinedAt).ToList();
 
-        foreach (var m in rejected)
+        var rejectedCampaignIds = rejected.Select(m => m.CampaignId).Distinct().ToList();
+        var rejectedAtByMember = await LatestActivityTimesAsync(
+            db,
+            rejectedCampaignIds,
+            CampaignActivityKinds.CharacterRejected,
+            matchActorUserId: false,
+            memberUserIds: [userId.Value],
+            ct);
+
+        foreach (var m in rejected.OrderByDescending(m =>
+                     rejectedAtByMember.GetValueOrDefault((m.CampaignId, userId.Value), m.JoinedAt)))
         {
+            var createdAt = rejectedAtByMember.GetValueOrDefault((m.CampaignId, userId.Value), m.JoinedAt);
             items.Add(
                 new NotificationItemDto(
                     $"rejected-{m.Id}",
                     "proposal_rejected",
                     "Personnage refusé",
                     $"Votre proposition dans « {m.Campaign.Title} » a été refusée — proposez-en un autre.",
-                    $"/campaigns/{m.CampaignId}",
-                    m.JoinedAt
+                    $"/campaigns/{m.CampaignId}?tab=players",
+                    createdAt
+                )
+            );
+        }
+
+        var approvedSince = DateTimeOffset.UtcNow - ApprovedNotificationWindow;
+        var approvedActs = (await db.CampaignActivities.AsNoTracking()
+                .Where(a => a.Kind == CampaignActivityKinds.CharacterApproved)
+                .ToListAsync(ct))
+            .Where(a => a.CreatedAt >= approvedSince)
+            .OrderByDescending(a => a.CreatedAt)
+            .Take(100)
+            .ToList();
+
+        foreach (var act in approvedActs)
+        {
+            if (!TryGetMemberUserId(act.PayloadJson, out var memberUserId) || memberUserId != userId)
+                continue;
+
+            var characterName = TryGetString(act.PayloadJson, "characterName") ?? "votre personnage";
+            var campaignTitle = await db.Campaigns.AsNoTracking()
+                .Where(c => c.Id == act.CampaignId)
+                .Select(c => c.Title)
+                .FirstOrDefaultAsync(ct) ?? "campagne";
+
+            items.Add(
+                new NotificationItemDto(
+                    $"approved-{act.Id}",
+                    "proposal_approved",
+                    "Personnage approuvé",
+                    $"{characterName} est accepté dans « {campaignTitle} ».",
+                    $"/campaigns/{act.CampaignId}",
+                    act.CreatedAt
                 )
             );
         }
@@ -190,5 +244,77 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
             ct
         );
     }
-}
 
+    private static async Task<Dictionary<(Guid CampaignId, Guid MemberUserId), DateTimeOffset>> LatestActivityTimesAsync(
+        AppDbContext db,
+        List<Guid> campaignIds,
+        string kind,
+        bool matchActorUserId,
+        List<Guid> memberUserIds,
+        CancellationToken ct)
+    {
+        var result = new Dictionary<(Guid, Guid), DateTimeOffset>();
+        if (campaignIds.Count == 0 || memberUserIds.Count == 0)
+            return result;
+
+        var acts = (await db.CampaignActivities.AsNoTracking()
+                .Where(a => campaignIds.Contains(a.CampaignId) && a.Kind == kind)
+                .ToListAsync(ct))
+            .OrderByDescending(a => a.CreatedAt)
+            .Take(200)
+            .ToList();
+
+        var memberSet = memberUserIds.ToHashSet();
+        foreach (var act in acts)
+        {
+            Guid? memberUserId = null;
+            if (matchActorUserId && memberSet.Contains(act.ActorUserId))
+                memberUserId = act.ActorUserId;
+            else if (TryGetMemberUserId(act.PayloadJson, out var fromPayload) && memberSet.Contains(fromPayload))
+                memberUserId = fromPayload;
+
+            if (memberUserId is null)
+                continue;
+
+            var key = (act.CampaignId, memberUserId.Value);
+            if (!result.ContainsKey(key))
+                result[key] = act.CreatedAt;
+        }
+
+        return result;
+    }
+
+    private static bool TryGetMemberUserId(string payloadJson, out Guid memberUserId)
+    {
+        memberUserId = default;
+        try
+        {
+            using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(payloadJson) ? "{}" : payloadJson);
+            if (!doc.RootElement.TryGetProperty("memberUserId", out var prop))
+                return false;
+            if (prop.ValueKind == JsonValueKind.String && Guid.TryParse(prop.GetString(), out memberUserId))
+                return true;
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static string? TryGetString(string payloadJson, string propertyName)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(payloadJson) ? "{}" : payloadJson);
+            if (doc.RootElement.TryGetProperty(propertyName, out var prop) && prop.ValueKind == JsonValueKind.String)
+                return prop.GetString();
+        }
+        catch
+        {
+            /* ignore */
+        }
+
+        return null;
+    }
+}

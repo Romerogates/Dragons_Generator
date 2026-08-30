@@ -3,7 +3,8 @@ export type NotificationType =
   | 'friend_message'
   | 'campaign_invite'
   | 'character_proposal'
-  | 'proposal_rejected';
+  | 'proposal_rejected'
+  | 'proposal_approved';
 
 export interface NotificationItem {
   key: string;

@@ -109,7 +109,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   private readonly prefetched = new Set<string>();
 
   readonly guideUpdatedAt = '30 août 2026';
-  readonly guideVersion = '1.2';
+  readonly guideVersion = '1.3';
 
   readonly audience = signal<GuideAudience>('all');
   readonly activeSection = signal('parcours');
@@ -125,10 +125,14 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   readonly tipOfDay = computed(() => {
     const tips = [
       'Activez les notifications push avant une session pour les rappels 24 h et 1 h.',
+      'Quand un joueur propose un perso, le MJ reçoit une push + une entrée Activité.',
+      'Après Accepter / Refuser, le joueur est notifié (push + centre de notifications).',
       'Le MJ peut ouvrir la fiche proposée avant d’accepter un personnage.',
       'Guerrier · 2 armes : choisissez l’alternative ×2 puis deux armes différentes.',
       'Un message « Export incomplet » signifie qu’il reste un choix d’équipement ou de maîtrise.',
       'Les amis déjà dans la campagne n’apparaissent plus dans Inviter un ami.',
+      'Import party : les PJ déjà dans le combat sont ignorés ; un bandeau signale les fiches incomplètes.',
+      'La table surligne les combattants sans initiative ou sans PV.',
       'Utilisez le bandeau campagne pour saisir votre initiative rapidement.',
       'Publiez un handout : les joueurs le voient dans Activité et Documents.',
       'Terminez le combat pour archiver un résumé dans l’historique MJ.',
@@ -139,21 +143,21 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
 
   readonly allNav: GuideNavItem[] = [
     { id: 'parcours', label: 'Parcours', icon: 'fluent-emoji:compass', accent: 'text-amber-400', audience: 'all' },
-    { id: 'oneshot', label: 'One-shot', icon: 'fluent-emoji:film-frames', accent: 'text-pink-400', audience: 'all', isNew: true },
-    { id: 'actions', label: '30 secondes', icon: 'fluent-emoji:high-voltage', accent: 'text-amber-400', audience: 'all', isNew: true },
+    { id: 'oneshot', label: 'One-shot', icon: 'fluent-emoji:film-frames', accent: 'text-pink-400', audience: 'all' },
+    { id: 'actions', label: '30 secondes', icon: 'fluent-emoji:high-voltage', accent: 'text-amber-400', audience: 'all' },
     { id: 'journal', label: 'Journal', icon: 'fluent-emoji:newspaper', accent: 'text-violet-400', audience: 'all' },
     { id: 'demarrage', label: 'Premiers pas', icon: 'fluent-emoji:rocket', accent: 'text-amber-400', audience: 'all' },
     { id: 'checklists', label: 'Checklists', icon: 'fluent-emoji:check-mark-button', accent: 'text-emerald-400', audience: 'all' },
     { id: 'schemas', label: 'Schémas', icon: 'fluent-emoji:world-map', accent: 'text-sky-400', audience: 'all' },
-    { id: 'captures', label: 'Aperçus UI', icon: 'fluent-emoji:framed-picture', accent: 'text-emerald-400', audience: 'all', isNew: true },
+    { id: 'captures', label: 'Aperçus UI', icon: 'fluent-emoji:framed-picture', accent: 'text-emerald-400', audience: 'all' },
     { id: 'compte', label: 'Compte', icon: 'fluent-emoji:bust-in-silhouette', accent: 'text-sky-400', audience: 'all' },
     { id: 'personnage', label: 'Personnage', icon: 'fluent-emoji:shield', accent: 'text-emerald-400', audience: 'all' },
     { id: 'scenario', label: 'Campagnes', icon: 'fluent-emoji:globe-showing-europe-africa', accent: 'text-violet-400', audience: 'all', isNew: true },
-    { id: 'table', label: 'Table MJ', icon: 'fluent-emoji:performing-arts', accent: 'text-amber-400', audience: 'dm' },
-    { id: 'initiative', label: 'Combat', icon: 'fluent-emoji:crossed-swords', accent: 'text-red-400', audience: 'all', isNew: true },
+    { id: 'table', label: 'Table MJ', icon: 'fluent-emoji:performing-arts', accent: 'text-amber-400', audience: 'dm', isNew: true },
+    { id: 'initiative', label: 'Combat', icon: 'fluent-emoji:crossed-swords', accent: 'text-red-400', audience: 'all' },
     { id: 'documents', label: 'Documents', icon: 'fluent-emoji:scroll', accent: 'text-sky-400', audience: 'all' },
     { id: 'social', label: 'Social', icon: 'fluent-emoji:speech-balloon', accent: 'text-pink-400', audience: 'all' },
-    { id: 'notifications', label: 'Notifications', icon: 'fluent-emoji:bell', accent: 'text-amber-400', audience: 'all' },
+    { id: 'notifications', label: 'Notifications', icon: 'fluent-emoji:bell', accent: 'text-amber-400', audience: 'all', isNew: true },
     { id: 'codex', label: 'Codex', icon: 'fluent-emoji:books', accent: 'text-emerald-400', audience: 'all' },
     { id: 'pdf', label: 'PDF', icon: 'fluent-emoji:printer', accent: 'text-slate-300', audience: 'all' },
     { id: 'faq', label: 'FAQ', icon: 'fluent-emoji:red-question-mark', accent: 'text-amber-400', audience: 'all' },
@@ -210,14 +214,35 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   readonly blogPosts: GuideBlogPost[] = [
     {
       date: '30 août 2026',
+      tag: 'Campagnes',
+      title: 'Boucle proposition → validation',
+      summary:
+        'Proposer, accepter ou refuser : push + activité pour MJ et joueurs. Notif « Personnage approuvé » côté joueur. Liens directs vers l’onglet Joueurs.',
+      icon: 'fluent-emoji:bell',
+      border: 'border-amber-500/30',
+      tagColor: 'text-amber-400 bg-amber-950/40',
+      isNew: true,
+    },
+    {
+      date: '30 août 2026',
+      tag: 'Table MJ',
+      title: 'Table de jeu stabilisée',
+      summary:
+        'Bannière de feedback (import party, sauvegarde, XP, lien init). Cases sans init/PV surlignées. Confirmation avant retrait. Cibles tactiles plus grandes.',
+      icon: 'fluent-emoji:performing-arts',
+      border: 'border-emerald-500/30',
+      tagColor: 'text-emerald-400 bg-emerald-950/40',
+      isNew: true,
+    },
+    {
+      date: '30 août 2026',
       tag: 'Wiki',
       title: 'Guide forgeron v1.2',
       summary:
         'Recherche, parcours one-shot, fiches 30 s, aperçus UI annotés, feedback sections et mémorisation du rôle.',
       icon: 'fluent-emoji:books',
-      border: 'border-amber-500/30',
-      tagColor: 'text-amber-400 bg-amber-950/40',
-      isNew: true,
+      border: 'border-violet-500/30',
+      tagColor: 'text-violet-400 bg-violet-950/40',
     },
     {
       date: '30 août 2026',
@@ -228,7 +253,6 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
       icon: 'fluent-emoji:identification-card',
       border: 'border-violet-500/30',
       tagColor: 'text-violet-400 bg-violet-950/40',
-      isNew: true,
     },
     {
       date: '30 août 2026',
@@ -271,11 +295,12 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   readonly oneshotSteps: GuideOneshotStep[] = [
-    { role: 'Tous', title: 'Comptes prêts', detail: 'MJ et joueurs inscrits, amis entre eux.' },
+    { role: 'Tous', title: 'Comptes prêts', detail: 'MJ et joueurs inscrits, amis entre eux · push activées.' },
     { role: 'MJ', title: 'Créer la campagne', detail: 'Titre, synopsis, niveau conseillé.' },
     { role: 'MJ', title: 'Inviter la table', detail: 'Onglet Joueurs → inviter chaque ami.' },
-    { role: 'Joueur', title: 'Accepter & proposer', detail: 'Invitation → proposer un héros sauvegardé.' },
-    { role: 'MJ', title: 'Valider les fiches', detail: 'Voir la fiche → Accepter (ou Refuser).' },
+    { role: 'Joueur', title: 'Accepter & proposer', detail: 'Invitation → proposer un héros · le MJ est notifié.' },
+    { role: 'MJ', title: 'Valider les fiches', detail: 'Notif / Activité → Voir la fiche → Accepter (ou Refuser).' },
+    { role: 'Joueur', title: 'Confirmation', detail: 'Push « approuvé » ou « refusé » → re-proposer si besoin.' },
     { role: 'MJ', title: 'Préparer & planifier', detail: 'Rencontre + session + push activés.' },
     { role: 'MJ', title: 'Démarrer la table', detail: 'Notes live · import party · combat.' },
     { role: 'Joueur', title: 'Saisir l’initiative', detail: 'Bandeau / notification → jet d20.' },
@@ -292,10 +317,17 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     },
     {
       title: 'Valider un perso',
-      bullets: ['Groupe ou onglet Joueurs', 'Voir la fiche proposée', 'Accepter ou Refuser'],
+      bullets: ['Notif ou Activité', 'Voir la fiche proposée', 'Accepter / Refuser → joueur notifié'],
       audience: 'dm',
       icon: 'fluent-emoji:identification-card',
       sectionId: 'scenario',
+    },
+    {
+      title: 'Importer la party',
+      bullets: ['Table → + Party campagne', 'Lire le bandeau de feedback', 'Compléter init / PV manquants'],
+      audience: 'dm',
+      icon: 'fluent-emoji:busts-in-silhouette',
+      sectionId: 'table',
     },
     {
       title: 'Collecter l’init',
@@ -306,7 +338,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     },
     {
       title: 'Proposer mon héros',
-      bullets: ['Accepter l’invitation', 'Onglet Joueurs → choisir perso', 'Attendre le MJ'],
+      bullets: ['Accepter l’invitation', 'Onglet Joueurs → choisir perso', 'Attendre push MJ'],
       audience: 'player',
       icon: 'fluent-emoji:shield',
       sectionId: 'scenario',
@@ -369,7 +401,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     },
     {
       title: 'Activer les notifications',
-      body: 'Push PWA pour sessions, documents, initiative et messages.',
+      body: 'Push PWA pour sessions, documents, initiative, propositions de perso et messages.',
       link: '/settings',
       linkLabel: 'Paramètres',
     },
@@ -412,15 +444,17 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   readonly campaignPlayerFlow = [
     'Accepter invite',
     'Proposer perso',
+    'Notif MJ → validation',
     'Lire documents',
     'Saisir initiative',
   ];
 
   readonly proposalFlow = [
     { role: 'Joueur', label: 'Propose un perso' },
+    { role: 'Système', label: 'Push + Activité MJ' },
     { role: 'MJ', label: 'Voir la fiche' },
     { role: 'MJ', label: 'Accepter / Refuser' },
-    { role: 'Groupe', label: 'Prêt pour la table' },
+    { role: 'Joueur', label: 'Notifié du résultat' },
   ];
 
   readonly arsenalFlow = [
@@ -431,20 +465,38 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   readonly combatFlow = [
-    { role: 'MJ', label: 'Ouvrir le tracker' },
+    { role: 'MJ', label: 'Import party' },
     { role: 'MJ', label: 'Collecter l’init' },
     { role: 'Joueurs', label: 'Saisir le jet' },
-    { role: 'MJ', label: 'Importer & jouer' },
+    { role: 'MJ', label: 'Compléter PV · jouer' },
+  ];
+
+  readonly notificationEvents = [
+    'Sessions (24 h / 1 h)',
+    'Documents publiés',
+    'Collecte initiative',
+    'Perso proposé (MJ)',
+    'Perso accepté / refusé',
+    'Messages & invites',
+  ];
+
+  readonly tablePlaySteps = [
+    { label: 'Démarrer', detail: 'Session en cours' },
+    { label: 'Notes live', detail: 'Sauvegardées auto' },
+    { label: 'Import party', detail: 'PJ approuvés' },
+    { label: 'Tracker', detail: 'Init · PV · tours' },
+    { label: 'Terminer', detail: 'Historique + notes' },
   ];
 
   readonly dmChecklist: GuideChecklistItem[] = [
     { id: 'dm-1', label: 'Campagne créée avec synopsis' },
     { id: 'dm-2', label: 'Amis invités (déjà dans la liste d’amis)' },
     { id: 'dm-3', label: 'Personnages joueurs validés (fiche consultée)' },
-    { id: 'dm-4', label: 'Rencontres / créatures préparées' },
-    { id: 'dm-5', label: 'Session planifiée (rappels push activés)' },
-    { id: 'dm-6', label: 'Documents / handouts prêts si besoin' },
-    { id: 'dm-7', label: 'Table démarrée le jour J' },
+    { id: 'dm-4', label: 'Notifications push activées (propositions incluses)' },
+    { id: 'dm-5', label: 'Rencontres / créatures préparées' },
+    { id: 'dm-6', label: 'Session planifiée (rappels push activés)' },
+    { id: 'dm-7', label: 'Documents / handouts prêts si besoin' },
+    { id: 'dm-8', label: 'Table démarrée le jour J · party importée' },
   ];
 
   readonly playerChecklist: GuideChecklistItem[] = [
@@ -453,7 +505,8 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     { id: 'pl-3', label: 'Ami avec le MJ + invitation acceptée' },
     { id: 'pl-4', label: 'Personnage proposé à la campagne' },
     { id: 'pl-5', label: 'Notifications push activées' },
-    { id: 'pl-6', label: 'Prêt pour la collecte d’initiative' },
+    { id: 'pl-6', label: 'Personnage accepté (ou re-proposé après refus)' },
+    { id: 'pl-7', label: 'Prêt pour la collecte d’initiative' },
   ];
 
   readonly faqItems: GuideFaqItem[] = [
@@ -472,6 +525,20 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
       audience: 'all',
     },
     {
+      id: 'faq-propos',
+      question: 'J’ai proposé mon perso — le MJ n’est pas prévenu ?',
+      answer:
+        'Le MJ reçoit une notification push « Personnage à valider », une entrée dans le centre de notifications, et une ligne dans l’onglet Activité. Vérifiez que le MJ a activé Push PWA. Vous pouvez aussi lui signaler manuellement ; le bouton reste dans Groupe / Joueurs.',
+      audience: 'all',
+    },
+    {
+      id: 'faq-refuse',
+      question: 'Mon personnage a été refusé — que faire ?',
+      answer:
+        'Vous recevez une push et une notif « Personnage refusé ». Corrigez ou choisissez un autre héros, puis proposez à nouveau depuis l’onglet Joueurs. Le statut redevient « en attente » pour le MJ.',
+      audience: 'player',
+    },
+    {
       id: 'faq-armes',
       question: 'Le Guerrier dit « 2 armes de guerre » mais je n’en choisis qu’une',
       answer:
@@ -483,6 +550,13 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
       question: 'Comment retirer un joueur de la campagne ?',
       answer:
         'MJ : onglet Joueurs (ou bloc Groupe) → Retirer → confirmer. Le joueur quitte la table ; vous pourrez le réinviter plus tard. Les pré-tirés qui lui étaient assignés sont libérés.',
+      audience: 'dm',
+    },
+    {
+      id: 'faq-party',
+      question: 'L’import party ne fait rien / affiche un message d’erreur',
+      answer:
+        'Il faut au moins un personnage approuvé. Si tous les PJ sont déjà dans le combat, un bandeau l’indique. Si des fiches sont incomplètes (PV manquants), le bandeau demande de vérifier init/PV — les cases concernées sont surlignées.',
       audience: 'dm',
     },
     {
@@ -539,8 +613,15 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     },
     {
       term: 'Proposition',
-      definition: 'Un joueur soumet un personnage ; le MJ peut le consulter puis accepter ou refuser.',
+      definition:
+        'Un joueur soumet un personnage ; le MJ est notifié (push + activité), consulte la fiche, puis accepte ou refuse — le joueur est notifié du résultat.',
     },
+    {
+      term: 'Import party',
+      definition:
+        'Sur la table, ajoute les personnages approuvés au tracker. Ignore les doublons et signale les fiches sans PV.',
+    },
+    { term: 'Activité', definition: 'Journal de campagne : invites, propositions, handouts, sessions…' },
     { term: 'Codex', definition: 'Référence de règles du site : espèces, classes, sorts, bestiaire…' },
     { term: 'PWA', definition: 'Application installable + notifications push hors navigateur classique.' },
   ];
@@ -562,11 +643,13 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     { label: 'Documents / handouts', description: 'Publication markdown', sectionId: 'documents', audience: 'all' },
     { label: 'Fiche personnage PDF', description: 'Export & sauvegarde', sectionId: 'pdf', audience: 'all' },
     { label: 'Historique des combats', description: 'Résumé après combat', sectionId: 'initiative', audience: 'dm' },
-    { label: 'Notifications push', description: 'Sessions, init, messages', sectionId: 'notifications', audience: 'all' },
+    { label: 'Import party', description: 'PJ approuvés dans le tracker', sectionId: 'table', audience: 'dm' },
+    { label: 'Notifications push', description: 'Sessions, init, propositions, messages', sectionId: 'notifications', audience: 'all' },
     { label: 'One-shot type', description: 'Scénario de session complète', sectionId: 'oneshot', audience: 'all' },
     { label: 'Pré-tirés', description: 'Héros assignables', sectionId: 'scenario', audience: 'all' },
-    { label: 'Table de jeu', description: 'Session live MJ', sectionId: 'table', audience: 'dm' },
-    { label: 'Validation de personnage', description: 'Voir fiche → accepter', sectionId: 'scenario', audience: 'dm' },
+    { label: 'Proposition de personnage', description: 'Propose → push → valider', sectionId: 'scenario', audience: 'all' },
+    { label: 'Table de jeu', description: 'Session live MJ + feedback', sectionId: 'table', audience: 'dm' },
+    { label: 'Validation de personnage', description: 'Voir fiche → accepter / refuser', sectionId: 'scenario', audience: 'dm' },
   ];
 
   readonly filteredIndex = computed(() => {

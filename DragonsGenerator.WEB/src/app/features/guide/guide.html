@@ -557,12 +557,13 @@
               <div class="p-4 space-y-2 relative min-h-[160px]">
                 <div class="h-3 w-1/3 rounded bg-slate-700"></div>
                 <div class="h-8 rounded-lg bg-amber-950/40 border border-amber-500/30 flex items-center px-2 text-[10px] text-amber-200">Propose : NomDuHéros</div>
+                <div class="h-6 rounded bg-violet-950/40 border border-violet-700/40 text-[9px] text-violet-200 flex items-center px-2">🔔 Push MJ · Activité</div>
                 <div class="flex gap-2 mt-3">
                   <div class="px-2 py-1 rounded bg-violet-600 text-[9px] font-black text-white">Voir fiche</div>
                   <div class="px-2 py-1 rounded bg-emerald-700 text-[9px] font-black text-white">Accepter</div>
                   <div class="px-2 py-1 rounded bg-red-900 text-[9px] font-black text-red-200">Refuser</div>
                 </div>
-                <p class="absolute bottom-3 right-3 text-[9px] text-violet-400 font-bold max-w-[7rem] text-right">① Ouvrir la fiche avant d’accepter</p>
+                <p class="absolute bottom-3 right-3 text-[9px] text-violet-400 font-bold max-w-[8rem] text-right">① Notif → ouvrir la fiche → décider</p>
               </div>
             </div>
             <div class="rounded-2xl border border-emerald-800/40 bg-[#12151a] overflow-hidden">
@@ -747,8 +748,9 @@
               <div class="p-5 rounded-2xl bg-[#1b2028] border border-slate-800">
                 <h3 class="text-sm font-bold text-violet-300 mb-4">Valider un personnage joueur</h3>
                 <ul class="space-y-2 text-sm text-slate-400">
-                  <li class="flex gap-2"><span class="text-emerald-500">✓</span> Bloc Groupe ou onglet Joueurs</li>
+                  <li class="flex gap-2"><span class="text-emerald-500">✓</span> Push + Activité dès qu’un joueur propose</li>
                   <li class="flex gap-2"><span class="text-emerald-500">✓</span> Voir la fiche proposée avant Accepter</li>
+                  <li class="flex gap-2"><span class="text-emerald-500">✓</span> Accepter / Refuser → le joueur est notifié</li>
                   <li class="flex gap-2"><span class="text-emerald-500">✓</span> Retirer un joueur · invitations filtrées</li>
                 </ul>
                 <div class="mt-4 p-3 rounded-lg bg-amber-950/20 border border-amber-500/20">
@@ -757,12 +759,13 @@
                 <a routerLink="/campaigns" class="inline-block mt-4 text-xs font-bold uppercase tracking-wider text-violet-400 hover:text-violet-300">Voir mes campagnes →</a>
               </div>
             }
-            @if (showPlayer() && !showDm()) {
-              <div class="p-5 rounded-2xl bg-[#1b2028] border border-slate-800 lg:col-span-2">
+            @if (showPlayer()) {
+              <div class="p-5 rounded-2xl bg-[#1b2028] border border-slate-800" [class.lg:col-span-2]="!showDm()">
                 <h3 class="text-sm font-bold text-sky-300 mb-3">Côté joueur</h3>
                 <ul class="space-y-2 text-sm text-slate-400">
-                  <li>Acceptez l’invitation · proposez un personnage · lisez Activité & Documents</li>
-                  <li>Les pré-tirés peuvent vous être assignés par le MJ</li>
+                  <li>Acceptez l’invitation · proposez un personnage (le MJ est notifié)</li>
+                  <li>Attendez la push « approuvé » ou « refusé » · re-proposez si besoin</li>
+                  <li>Lisez Activité & Documents · pré-tirés possibles</li>
                 </ul>
                 <a routerLink="/campaigns" class="inline-block mt-4 text-xs font-bold uppercase tracking-wider text-sky-400">Mes campagnes →</a>
               </div>
@@ -773,24 +776,49 @@
         <!-- Table MJ -->
         @if (showDm()) {
           <section id="table" class="scroll-mt-24">
-            <div class="flex items-start gap-4 mb-8">
-              <div class="w-14 h-14 rounded-2xl bg-amber-950/40 border border-amber-800/40 flex items-center justify-center text-3xl shrink-0">
-                <iconify-icon icon="fluent-emoji:performing-arts"></iconify-icon>
+            <div class="flex items-start justify-between gap-4 mb-8">
+              <div class="flex items-start gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-amber-950/40 border border-amber-800/40 flex items-center justify-center text-3xl shrink-0">
+                  <iconify-icon icon="fluent-emoji:performing-arts"></iconify-icon>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <h2 class="text-2xl font-bold text-slate-100 font-serif">Table de jeu</h2>
+                    <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-amber-950/50 text-amber-400 border border-amber-800/40">Nouveau</span>
+                  </div>
+                  <p class="text-sm text-slate-500 mt-1">
+                    Bouton <strong class="text-amber-400/80">Démarrer la table</strong> depuis une campagne, ou mode plein écran.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 class="text-2xl font-bold text-slate-100 font-serif">Table de jeu</h2>
-                <p class="text-sm text-slate-500 mt-1">
-                  Bouton <strong class="text-amber-400/80">Démarrer la table</strong> depuis une campagne, ou mode plein écran.
-                </p>
-              </div>
+              <button type="button" class="text-[10px] font-black uppercase tracking-wider text-slate-500 hover:text-amber-400" (click)="copySectionLink('table')" aria-label="Copier le lien">Lien</button>
             </div>
-            <div class="grid sm:grid-cols-5 gap-2">
-              @for (label of ['Démarrer', 'Notes live', 'Rencontre', 'Tracker XP', 'Terminer']; track label; let i = $index) {
+            <div class="grid sm:grid-cols-5 gap-2 mb-4">
+              @for (step of tablePlaySteps; track step.label; let i = $index) {
                 <div class="text-center p-4 rounded-xl bg-[#1b2028] border border-slate-800">
                   <div class="w-8 h-8 mx-auto mb-2 rounded-full bg-amber-500/20 text-amber-400 text-xs font-black flex items-center justify-center">{{ i + 1 }}</div>
-                  <p class="text-[10px] font-black uppercase tracking-wider text-slate-300">{{ label }}</p>
+                  <p class="text-[10px] font-black uppercase tracking-wider text-slate-300">{{ step.label }}</p>
+                  <p class="text-[9px] text-slate-500 mt-1">{{ step.detail }}</p>
                 </div>
               }
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="p-5 rounded-2xl bg-[#1b2028] border border-amber-800/30">
+                <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-3">Import party</h3>
+                <ul class="space-y-2 text-sm text-slate-400">
+                  <li>+ Party campagne (PJ approuvés uniquement)</li>
+                  <li>Doublons ignorés · bandeau de confirmation</li>
+                  <li>Fiches incomplètes signalées (PV / init)</li>
+                </ul>
+              </div>
+              <div class="p-5 rounded-2xl bg-[#1b2028] border border-emerald-800/30">
+                <h3 class="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-3">Feedback live</h3>
+                <ul class="space-y-2 text-sm text-slate-400">
+                  <li>Bannière pour import, sauvegarde, XP, lien init</li>
+                  <li>Cases sans initiative / PV surlignées</li>
+                  <li>Confirmation avant de retirer un combattant</li>
+                </ul>
+              </div>
             </div>
           </section>
         }
@@ -811,10 +839,10 @@
               <div class="p-5 rounded-2xl bg-[#1b2028] border border-red-900/30">
                 <h3 class="text-[10px] font-black uppercase tracking-widest text-red-400 mb-4">MJ — lancer un combat</h3>
                 <div class="space-y-2 text-sm text-slate-400">
-                  <p>① Ouvrir le tracker (table ou rencontre)</p>
-                  <p>② Ajouter PJ, PNJ, créatures</p>
+                  <p>① Import party ou + Combattant</p>
+                  <p>② Lire le bandeau (doublons / fiches incomplètes)</p>
                   <p>③ Initiative manuelle ou <strong class="text-slate-200">Collecter l’init</strong></p>
-                  <p>④ ↑↓ pour égalités · Fin combat → historique</p>
+                  <p>④ Compléter les PV manquants · ↑↓ égalités · Fin combat</p>
                 </div>
               </div>
             }
@@ -891,22 +919,39 @@
 
         <!-- Notifications -->
         <section id="notifications" class="scroll-mt-24">
-          <div class="flex items-start gap-4 mb-6">
-            <div class="w-14 h-14 rounded-2xl bg-amber-950/40 border border-amber-800/40 flex items-center justify-center text-3xl shrink-0">
-              <iconify-icon icon="fluent-emoji:bell"></iconify-icon>
+          <div class="flex items-start justify-between gap-4 mb-6">
+            <div class="flex items-start gap-4">
+              <div class="w-14 h-14 rounded-2xl bg-amber-950/40 border border-amber-800/40 flex items-center justify-center text-3xl shrink-0">
+                <iconify-icon icon="fluent-emoji:bell"></iconify-icon>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <h2 class="text-2xl font-bold text-slate-100 font-serif">Notifications & PWA</h2>
+                  <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-amber-950/50 text-amber-400 border border-amber-800/40">Nouveau</span>
+                </div>
+                <p class="text-sm text-slate-500">Push + centre de notifications — y compris les propositions de perso.</p>
+              </div>
             </div>
-            <div>
-              <h2 class="text-2xl font-bold text-slate-100 font-serif">Notifications & PWA</h2>
-            </div>
+            <button type="button" class="text-[10px] font-black uppercase tracking-wider text-slate-500 hover:text-amber-400" (click)="copySectionLink('notifications')" aria-label="Copier le lien">Lien</button>
           </div>
           <div class="p-5 rounded-2xl bg-[#1b2028] border border-slate-800">
-            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-              @for (evt of ['Sessions (24 h / 1 h)', 'Documents publiés', 'Collecte initiative', 'Messages & invites']; track evt) {
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-5">
+              @for (evt of notificationEvents; track evt) {
                 <div class="flex items-center gap-2 text-sm text-slate-400">
                   <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
                   {{ evt }}
                 </div>
               }
+            </div>
+            <div class="grid md:grid-cols-2 gap-4 mb-5">
+              <div class="p-3 rounded-xl bg-violet-950/20 border border-violet-800/30">
+                <p class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-1">MJ</p>
+                <p class="text-xs text-slate-400 leading-relaxed">Push « Personnage à valider » → lien vers l’onglet Joueurs. Même événement dans Activité.</p>
+              </div>
+              <div class="p-3 rounded-xl bg-sky-950/20 border border-sky-800/30">
+                <p class="text-[10px] font-black uppercase tracking-widest text-sky-400 mb-1">Joueur</p>
+                <p class="text-xs text-slate-400 leading-relaxed">Push + notif « approuvé » ou « refusé ». En cas de refus, re-proposez depuis Joueurs.</p>
+              </div>
             </div>
             <p class="text-sm text-slate-500">
               Activez dans <a routerLink="/settings" class="text-amber-400 hover:underline">Paramètres</a> → Push PWA.
