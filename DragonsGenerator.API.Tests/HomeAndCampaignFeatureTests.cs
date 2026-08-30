@@ -250,7 +250,7 @@ public class HomeAndCampaignFeatureTests
             var raw = await act.Content.ReadAsStringAsync();
             act.EnsureSuccessStatusCode();
             Assert.DoesNotContain("invite_sent", raw);
-            Assert.DoesNotContain(playerId.ToString(), raw);
+            Assert.Contains("invite_accepted", raw);
         }
     }
 }
