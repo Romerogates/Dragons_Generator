@@ -60,6 +60,7 @@ public static class CampaignJsonHelpers
                 if (item is not JsonObject session) continue;
                 session["notes"] = "";
                 session["playNotes"] = "";
+                session["activeCombat"] = null;
             }
         }
 

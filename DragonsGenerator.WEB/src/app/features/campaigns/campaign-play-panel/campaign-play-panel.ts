@@ -12,16 +12,31 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
+import { CharacterCloudService } from '@core/services/character-cloud.service';
+import type { Character } from '@core/models/Character/character';
 import {
+  ActiveCombat,
   CampaignData,
   CampaignSession,
   CampaignSessionStatus,
+  Combatant,
   encounterPendingXp,
   encounterTotalXp,
   EncounterGroup,
   type CampaignDetail as CampaignDetailModel,
 } from '@core/models/Campaign/campaign';
+import {
+  COMBATANT_KIND_LABELS,
+  combatantInitiativeTotal,
+  createActiveCombat,
+  createCombatant,
+  currentTurnCombatant,
+  expandEncounterToCombatants,
+  sortedTurnOrder,
+} from '@core/utils/combat-tracker.util';
 
 @Component({
   selector: 'app-campaign-play-panel',
@@ -33,6 +48,7 @@ import {
 })
 export class CampaignPlayPanel implements OnDestroy {
   private readonly campaigns = inject(CampaignCloudService);
+  private readonly characters = inject(CharacterCloudService);
   private readonly router = inject(Router);
 
   readonly campaign = input.required<CampaignDetailModel>();
@@ -40,6 +56,7 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly campaignChange = output<CampaignDetailModel>();
 
   readonly saving = signal(false);
+  readonly importingParty = signal(false);
 
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -48,6 +65,18 @@ export class CampaignPlayPanel implements OnDestroy {
     const id = c.data.activeSessionId;
     if (!c.isOwner || !id) return null;
     return (c.data.sessions ?? []).find((s) => s.id === id) ?? null;
+  });
+
+  readonly activeCombat = computed(() => this.activeSession()?.activeCombat ?? null);
+
+  readonly combatTurnOrder = computed(() => {
+    const combat = this.activeCombat();
+    return combat ? sortedTurnOrder(combat) : [];
+  });
+
+  readonly currentTurn = computed(() => {
+    const combat = this.activeCombat();
+    return combat ? currentTurnCombatant(combat) : null;
   });
 
   readonly nextPlannedSession = computed(() => {
@@ -67,8 +96,14 @@ export class CampaignPlayPanel implements OnDestroy {
     this.campaign().members.filter((m) => m.role === 'player'),
   );
 
+  readonly approvedPlayers = computed(() =>
+    this.players().filter((p) => p.proposalStatus === 'approved' && p.approvedCharacterId),
+  );
+
   protected encounterTotalXp = encounterTotalXp;
   protected encounterPendingXp = encounterPendingXp;
+  protected combatantInitiativeTotal = combatantInitiativeTotal;
+  protected combatantKindLabels = COMBATANT_KIND_LABELS;
 
   ngOnDestroy(): void {
     this.flushSessionSave();
@@ -107,6 +142,7 @@ export class CampaignPlayPanel implements OnDestroy {
         status: 'played' as CampaignSessionStatus,
         notes: mergedNotes || s.notes,
         playNotes: '',
+        activeCombat: null,
       };
     });
     this.saveData({ sessions, activeSessionId: null });
@@ -115,29 +151,143 @@ export class CampaignPlayPanel implements OnDestroy {
     }
   }
 
-  updateSession(sessionId: string, patch: Partial<CampaignSession>, options?: { immediate?: boolean }): void {
-    const c = this.campaign();
-    if (!c.isOwner) return;
-    const sessions = (c.data.sessions ?? []).map((s) =>
-      s.id === sessionId ? { ...s, ...patch } : s,
-    );
-    this.patchCampaign({ ...c.data, sessions });
+  startStandaloneCombat(): void {
+    if (!this.confirmReplaceCombat()) return;
+    this.setActiveCombat(createActiveCombat([], { label: 'Combat' }));
+  }
 
-    if (options?.immediate) {
-      if (this.sessionSaveTimer) {
-        clearTimeout(this.sessionSaveTimer);
-        this.sessionSaveTimer = null;
+  startCombatFromEncounter(encounter: EncounterGroup): void {
+    if (!this.confirmReplaceCombat()) return;
+    const combatants = expandEncounterToCombatants(encounter);
+    this.setActiveCombat(
+      createActiveCombat(combatants, { label: encounter.name, encounterId: encounter.id }),
+    );
+  }
+
+  importPartyIntoCombat(): void {
+    const session = this.activeSession();
+    if (!session || this.importingParty()) return;
+
+    const approved = this.approvedPlayers();
+    if (!approved.length) {
+      if (!this.activeCombat()) {
+        this.startStandaloneCombat();
       }
-      this.saveData({ sessions });
       return;
     }
 
-    if (this.sessionSaveTimer) clearTimeout(this.sessionSaveTimer);
-    this.sessionSaveTimer = setTimeout(() => {
-      this.sessionSaveTimer = null;
-      const latest = this.campaign();
-      this.saveData({ sessions: latest.data.sessions ?? [] });
-    }, 700);
+    this.importingParty.set(true);
+    const requests = approved.map((p) =>
+      this.characters.get(p.approvedCharacterId!).pipe(
+        map((res) => this.combatantFromCharacter(res.data as Character)),
+        catchError(() =>
+          of(
+            createCombatant({
+              name: p.approvedCharacterName ?? p.displayName,
+              kind: 'player',
+              initiativeBonus: 0,
+            }),
+          ),
+        ),
+      ),
+    );
+
+    forkJoin(requests).subscribe({
+      next: (partyCombatants) => {
+        this.importingParty.set(false);
+        const existing = this.activeCombat();
+        if (existing) {
+          this.patchCombat({
+            ...existing,
+            combatants: [...existing.combatants, ...partyCombatants],
+          });
+        } else {
+          this.setActiveCombat(createActiveCombat(partyCombatants, { label: 'Party' }));
+        }
+      },
+      error: () => this.importingParty.set(false),
+    });
+  }
+
+  endCombat(): void {
+    if (!confirm('Terminer le combat en cours ?')) return;
+    this.patchSession({ activeCombat: null }, { immediate: true });
+  }
+
+  addCombatant(): void {
+    const combat = this.activeCombat();
+    if (!combat) {
+      this.startStandaloneCombat();
+      return;
+    }
+    this.patchCombat({
+      ...combat,
+      combatants: [
+        ...combat.combatants,
+        createCombatant({ name: '', kind: 'npc', initiativeBonus: 0 }),
+      ],
+    });
+  }
+
+  removeCombatant(combatantId: string): void {
+    const combat = this.activeCombat();
+    if (!combat) return;
+    const combatants = combat.combatants.filter((c) => c.id !== combatantId);
+    const turnIndex = Math.min(combat.turnIndex, Math.max(0, combatants.length - 1));
+    this.patchCombat({ ...combat, combatants, turnIndex }, { immediate: true });
+  }
+
+  updateCombatantConditions(combatantId: string, raw: string): void {
+    const conditions = raw.trim()
+      ? raw.split(',').map((s) => s.trim()).filter(Boolean)
+      : undefined;
+    this.updateCombatant(combatantId, { conditions });
+  }
+
+  updateCombatant(combatantId: string, patch: Partial<Combatant>, options?: { immediate?: boolean }): void {
+    const combat = this.activeCombat();
+    if (!combat) return;
+    const combatants = combat.combatants.map((c) =>
+      c.id === combatantId ? { ...c, ...patch } : c,
+    );
+    this.patchCombat({ ...combat, combatants }, options);
+  }
+
+  rollInitiativeFor(combatantId: string): void {
+    const roll = Math.floor(Math.random() * 20) + 1;
+    this.updateCombatant(combatantId, { initiativeRoll: roll }, { immediate: true });
+  }
+
+  nextTurn(): void {
+    const combat = this.activeCombat();
+    if (!combat) return;
+    const order = sortedTurnOrder(combat);
+    if (!order.length) return;
+    let turnIndex = combat.turnIndex + 1;
+    let round = combat.round;
+    if (turnIndex >= order.length) {
+      turnIndex = 0;
+      round += 1;
+    }
+    this.patchCombat({ ...combat, turnIndex, round }, { immediate: true });
+  }
+
+  prevTurn(): void {
+    const combat = this.activeCombat();
+    if (!combat) return;
+    const order = sortedTurnOrder(combat);
+    if (!order.length) return;
+    let turnIndex = combat.turnIndex - 1;
+    let round = combat.round;
+    if (turnIndex < 0) {
+      turnIndex = order.length - 1;
+      round = Math.max(1, round - 1);
+    }
+    this.patchCombat({ ...combat, turnIndex, round }, { immediate: true });
+  }
+
+  isCurrentTurn(combatantId: string): boolean {
+    return this.currentTurn()?.id === combatantId;
   }
 
   markDefeated(encounterId: string, creatureIndex: number): void {
@@ -195,6 +345,67 @@ export class CampaignPlayPanel implements OnDestroy {
         },
       });
     }
+  }
+
+  private combatantFromCharacter(character: Character): Combatant {
+    const maxHp =
+      typeof character.vitality?.hitPointsMax === 'number'
+        ? character.vitality.hitPointsMax
+        : undefined;
+    return createCombatant({
+      name: character.name || 'Sans nom',
+      kind: 'player',
+      initiativeBonus: character.initiative ?? 0,
+      maxHp,
+      currentHp: maxHp,
+    });
+  }
+
+  private confirmReplaceCombat(): boolean {
+    if (!this.activeCombat()) return true;
+    return confirm('Remplacer le combat en cours ?');
+  }
+
+  private setActiveCombat(combat: ActiveCombat): void {
+    this.patchSession({ activeCombat: combat }, { immediate: true });
+  }
+
+  private patchCombat(combat: ActiveCombat, options?: { immediate?: boolean }): void {
+    this.patchSession({ activeCombat: combat }, options);
+  }
+
+  private patchSession(
+    patch: Partial<CampaignSession>,
+    options?: { immediate?: boolean },
+  ): void {
+    const session = this.activeSession();
+    if (!session) return;
+    this.updateSession(session.id, patch, options);
+  }
+
+  updateSession(sessionId: string, patch: Partial<CampaignSession>, options?: { immediate?: boolean }): void {
+    const c = this.campaign();
+    if (!c.isOwner) return;
+    const sessions = (c.data.sessions ?? []).map((s) =>
+      s.id === sessionId ? { ...s, ...patch } : s,
+    );
+    this.patchCampaign({ ...c.data, sessions });
+
+    if (options?.immediate) {
+      if (this.sessionSaveTimer) {
+        clearTimeout(this.sessionSaveTimer);
+        this.sessionSaveTimer = null;
+      }
+      this.saveData({ sessions });
+      return;
+    }
+
+    if (this.sessionSaveTimer) clearTimeout(this.sessionSaveTimer);
+    this.sessionSaveTimer = setTimeout(() => {
+      this.sessionSaveTimer = null;
+      const latest = this.campaign();
+      this.saveData({ sessions: latest.data.sessions ?? [] });
+    }, 700);
   }
 
   private flushSessionSave(): void {

@@ -42,6 +42,28 @@ export interface CampaignPregen {
 
 export type CampaignSessionStatus = 'planned' | 'played' | 'cancelled';
 
+export type CombatantKind = 'player' | 'monster' | 'npc';
+
+export interface Combatant {
+  id: string;
+  name: string;
+  kind: CombatantKind;
+  initiativeBonus: number;
+  initiativeRoll?: number;
+  currentHp?: number;
+  maxHp?: number;
+  conditions?: string[];
+}
+
+export interface ActiveCombat {
+  id: string;
+  label?: string;
+  encounterId?: string;
+  round: number;
+  turnIndex: number;
+  combatants: Combatant[];
+}
+
 export interface CampaignSession {
   id: string;
   title: string;
@@ -50,6 +72,8 @@ export interface CampaignSession {
   notes?: string;
   /** Notes prises en direct pendant la session (MJ). */
   playNotes?: string;
+  /** Tracker initiative / ordre de combat en cours (MJ). */
+  activeCombat?: ActiveCombat | null;
   status: CampaignSessionStatus;
 }
 
