@@ -7,7 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
 import { HomeSummary, HomeSummaryService } from '@core/services/home-summary.service';
@@ -24,6 +24,9 @@ interface FeatureItem {
   icon: string;
 }
 
+const GUIDE_AUDIENCE_KEY = 'dragons-guide-audience';
+const ONBOARDING_SEEN_KEY = 'dragons-onboarding-role-seen';
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -36,12 +39,14 @@ export class Home implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly cloud = inject(CharacterCloudService);
   private readonly homeSummary = inject(HomeSummaryService);
+  private readonly router = inject(Router);
 
   readonly isLoggedIn = this.auth.isLoggedIn;
   readonly user = this.auth.user;
   readonly savedCharactersCount = signal(0);
   readonly summary = signal<HomeSummary | null>(null);
   readonly summaryLoading = signal(false);
+  readonly showRoleOnboarding = signal(false);
 
   readonly stats: StatItem[] = [
     { value: '9', label: 'Peuples' },
@@ -111,6 +116,30 @@ export class Home implements OnInit {
   ngOnInit(): void {
     this.refreshHeroStats();
     this.loadSummary();
+    this.maybeShowRoleOnboarding();
+  }
+
+  chooseRole(role: 'dm' | 'player'): void {
+    try {
+      localStorage.setItem(GUIDE_AUDIENCE_KEY, role);
+      localStorage.setItem(ONBOARDING_SEEN_KEY, '1');
+    } catch {
+      /* ignore */
+    }
+    this.showRoleOnboarding.set(false);
+    void this.router.navigate(['/guide']);
+  }
+
+  skipRoleOnboarding(): void {
+    try {
+      localStorage.setItem(ONBOARDING_SEEN_KEY, '1');
+      if (!localStorage.getItem(GUIDE_AUDIENCE_KEY)) {
+        localStorage.setItem(GUIDE_AUDIENCE_KEY, 'all');
+      }
+    } catch {
+      /* ignore */
+    }
+    this.showRoleOnboarding.set(false);
   }
 
   formatSessionDate(iso: string): string {
@@ -121,6 +150,23 @@ export class Home implements OnInit {
       hour: '2-digit',
       minute: '2-digit',
     });
+  }
+
+  private maybeShowRoleOnboarding(): void {
+    if (!this.auth.isLoggedIn()) {
+      this.showRoleOnboarding.set(false);
+      return;
+    }
+    try {
+      const seen = localStorage.getItem(ONBOARDING_SEEN_KEY);
+      if (seen) {
+        this.showRoleOnboarding.set(false);
+        return;
+      }
+      this.showRoleOnboarding.set(true);
+    } catch {
+      this.showRoleOnboarding.set(false);
+    }
   }
 
   private loadSummary(): void {

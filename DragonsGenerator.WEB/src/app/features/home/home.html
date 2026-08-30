@@ -1,4 +1,85 @@
 <div class="w-full flex flex-col animate-fade-in select-none">
+  @if (showRoleOnboarding()) {
+    <div
+      class="fixed inset-0 z-[120] flex items-end sm:items-center justify-center p-4 sm:p-6"
+      role="presentation"
+    >
+      <button
+        type="button"
+        class="absolute inset-0 bg-black/50 backdrop-blur-[2px]"
+        aria-label="Passer l’introduction"
+        (click)="skipRoleOnboarding()"
+      ></button>
+      <div
+        class="relative w-full max-w-lg animate-fade-in"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="role-onboarding-title"
+      >
+        <div
+          class="overflow-hidden rounded-2xl border border-amber-500/25 bg-[#1b2028]/95 shadow-2xl shadow-black/40 backdrop-blur-md"
+        >
+          <div class="h-1 w-full bg-gradient-to-r from-transparent via-amber-500/70 to-transparent"></div>
+          <div class="px-6 pt-6 pb-5 flex flex-col gap-5">
+            <div class="flex items-start gap-4">
+              <div
+                class="shrink-0 w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-2xl"
+              >
+                <iconify-icon icon="fluent-emoji:compass"></iconify-icon>
+              </div>
+              <div class="min-w-0 pt-0.5">
+                <h2
+                  id="role-onboarding-title"
+                  class="text-lg font-bold text-amber-400 font-serif tracking-wide"
+                >
+                  Comment jouez-vous ?
+                </h2>
+                <p class="text-sm text-slate-400 mt-1 leading-relaxed">
+                  On ouvre le guide filtré pour votre rôle — vous pourrez changer à tout moment.
+                </p>
+              </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-3">
+              <button
+                type="button"
+                class="text-left p-4 rounded-xl border border-violet-800/50 bg-violet-950/25 hover:border-violet-500/50 hover:bg-violet-950/40 transition-colors"
+                (click)="chooseRole('dm')"
+              >
+                <span class="text-2xl block mb-2"><iconify-icon icon="fluent-emoji:performing-arts"></iconify-icon></span>
+                <span class="block text-sm font-bold text-violet-200">Je suis MJ</span>
+                <span class="block text-xs text-slate-500 mt-1 leading-relaxed"
+                  >Campagnes, table, validation des persos</span
+                >
+              </button>
+              <button
+                type="button"
+                class="text-left p-4 rounded-xl border border-sky-800/50 bg-sky-950/25 hover:border-sky-500/50 hover:bg-sky-950/40 transition-colors"
+                (click)="chooseRole('player')"
+              >
+                <span class="text-2xl block mb-2"><iconify-icon icon="fluent-emoji:shield"></iconify-icon></span>
+                <span class="block text-sm font-bold text-sky-200">Je suis joueur</span>
+                <span class="block text-xs text-slate-500 mt-1 leading-relaxed"
+                  >Forger un héros, rejoindre, initiative</span
+                >
+              </button>
+            </div>
+
+            <div class="flex justify-end">
+              <button
+                type="button"
+                class="px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-300"
+                (click)="skipRoleOnboarding()"
+              >
+                Plus tard
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
   <section
     class="relative w-full min-h-[85dvh] flex flex-col items-center border-b border-slate-800"
   >
@@ -77,6 +158,14 @@
         >
           <span><iconify-icon icon="fluent-emoji:world-map"></iconify-icon></span> Campagnes
         </a>
+        @if (isLoggedIn()) {
+          <a
+            routerLink="/guide"
+            class="px-8 py-3.5 sm:py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-violet-950/30 text-violet-300 border border-violet-800/50 hover:border-violet-500/50 hover:text-violet-200 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
+          >
+            <span><iconify-icon icon="fluent-emoji:books"></iconify-icon></span> Guide
+          </a>
+        }
         @if (!isLoggedIn()) {
           <a
             routerLink="/login"
