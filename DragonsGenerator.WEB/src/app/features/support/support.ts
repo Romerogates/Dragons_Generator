@@ -9,6 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 import { environment } from '@env/environment';
 import { CharacterCloudService, CloudCharacterSummary } from '@core/services/character-cloud.service';
 import { downloadTicketCharacterJson, openTicketAttachment } from '@core/utils/support-download.util';
@@ -36,6 +37,7 @@ interface Ticket {
 export class SupportPage implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly characters = inject(CharacterCloudService);
+  private readonly route = inject(ActivatedRoute);
   private readonly api = environment.apiUrl;
 
   subject = '';
@@ -50,6 +52,12 @@ export class SupportPage implements OnInit {
   readonly loading = signal(false);
 
   ngOnInit(): void {
+    const q = this.route.snapshot.queryParamMap;
+    const subject = q.get('subject')?.trim();
+    const message = q.get('message')?.trim();
+    if (subject) this.subject = subject.slice(0, 200);
+    if (message) this.message = message.slice(0, 4000);
+
     this.characters.list().subscribe((list) => this.myCharacters.set(list));
     this.reload();
   }

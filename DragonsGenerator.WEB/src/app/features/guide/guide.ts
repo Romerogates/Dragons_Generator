@@ -7,11 +7,13 @@ import {
   DestroyRef,
   inject,
   OnDestroy,
+  OnInit,
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { fromEvent } from 'rxjs';
+import { auditTime } from 'rxjs/operators';
 
 export type GuideAudience = 'all' | 'dm' | 'player';
 
@@ -21,6 +23,7 @@ export interface GuideNavItem {
   icon: string;
   accent: string;
   audience: GuideAudience;
+  isNew?: boolean;
 }
 
 export interface GuideBlogPost {
@@ -31,6 +34,7 @@ export interface GuideBlogPost {
   icon: string;
   border: string;
   tagColor: string;
+  isNew?: boolean;
 }
 
 export interface GuideQuickCard {
@@ -39,6 +43,7 @@ export interface GuideQuickCard {
   icon: string;
   link: string;
   accent: string;
+  prefetch?: 'campaigns' | 'create' | 'support' | 'species';
 }
 
 export interface GuideStep {
@@ -73,6 +78,23 @@ export interface GuideIndexItem {
   audience: GuideAudience;
 }
 
+export interface GuideFlashCard {
+  title: string;
+  bullets: string[];
+  audience: GuideAudience;
+  icon: string;
+  sectionId: string;
+}
+
+export interface GuideOneshotStep {
+  title: string;
+  detail: string;
+  role: 'MJ' | 'Joueur' | 'Tous';
+}
+
+const AUDIENCE_KEY = 'dragons-guide-audience';
+const FEEDBACK_KEY = 'dragons-guide-feedback';
+
 @Component({
   selector: 'app-guide',
   standalone: true,
@@ -81,30 +103,54 @@ export interface GuideIndexItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class GuidePage implements AfterViewInit, OnDestroy {
+export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   private readonly destroyRef = inject(DestroyRef);
   private observer: IntersectionObserver | null = null;
+  private readonly prefetched = new Set<string>();
 
   readonly guideUpdatedAt = '30 août 2026';
-  readonly guideVersion = '1.1';
+  readonly guideVersion = '1.2';
 
   readonly audience = signal<GuideAudience>('all');
   readonly activeSection = signal('parcours');
   readonly openFaqId = signal<string | null>(null);
   readonly characterExpanded = signal(false);
   readonly checklistDone = signal<Record<string, boolean>>({});
+  readonly searchQuery = signal('');
+  readonly scrollProgress = signal(0);
+  readonly showBackToTop = signal(false);
+  readonly copyToast = signal<string | null>(null);
+  readonly sectionFeedback = signal<Record<string, 'yes' | 'no'>>({});
+
+  readonly tipOfDay = computed(() => {
+    const tips = [
+      'Activez les notifications push avant une session pour les rappels 24 h et 1 h.',
+      'Le MJ peut ouvrir la fiche proposée avant d’accepter un personnage.',
+      'Guerrier · 2 armes : choisissez l’alternative ×2 puis deux armes différentes.',
+      'Un message « Export incomplet » signifie qu’il reste un choix d’équipement ou de maîtrise.',
+      'Les amis déjà dans la campagne n’apparaissent plus dans Inviter un ami.',
+      'Utilisez le bandeau campagne pour saisir votre initiative rapidement.',
+      'Publiez un handout : les joueurs le voient dans Activité et Documents.',
+      'Terminez le combat pour archiver un résumé dans l’historique MJ.',
+    ];
+    const day = Math.floor(Date.now() / 86_400_000);
+    return tips[day % tips.length];
+  });
 
   readonly allNav: GuideNavItem[] = [
     { id: 'parcours', label: 'Parcours', icon: 'fluent-emoji:compass', accent: 'text-amber-400', audience: 'all' },
+    { id: 'oneshot', label: 'One-shot', icon: 'fluent-emoji:film-frames', accent: 'text-pink-400', audience: 'all', isNew: true },
+    { id: 'actions', label: '30 secondes', icon: 'fluent-emoji:high-voltage', accent: 'text-amber-400', audience: 'all', isNew: true },
     { id: 'journal', label: 'Journal', icon: 'fluent-emoji:newspaper', accent: 'text-violet-400', audience: 'all' },
     { id: 'demarrage', label: 'Premiers pas', icon: 'fluent-emoji:rocket', accent: 'text-amber-400', audience: 'all' },
     { id: 'checklists', label: 'Checklists', icon: 'fluent-emoji:check-mark-button', accent: 'text-emerald-400', audience: 'all' },
     { id: 'schemas', label: 'Schémas', icon: 'fluent-emoji:world-map', accent: 'text-sky-400', audience: 'all' },
+    { id: 'captures', label: 'Aperçus UI', icon: 'fluent-emoji:framed-picture', accent: 'text-emerald-400', audience: 'all', isNew: true },
     { id: 'compte', label: 'Compte', icon: 'fluent-emoji:bust-in-silhouette', accent: 'text-sky-400', audience: 'all' },
     { id: 'personnage', label: 'Personnage', icon: 'fluent-emoji:shield', accent: 'text-emerald-400', audience: 'all' },
-    { id: 'scenario', label: 'Campagnes', icon: 'fluent-emoji:globe-showing-europe-africa', accent: 'text-violet-400', audience: 'all' },
+    { id: 'scenario', label: 'Campagnes', icon: 'fluent-emoji:globe-showing-europe-africa', accent: 'text-violet-400', audience: 'all', isNew: true },
     { id: 'table', label: 'Table MJ', icon: 'fluent-emoji:performing-arts', accent: 'text-amber-400', audience: 'dm' },
-    { id: 'initiative', label: 'Combat', icon: 'fluent-emoji:crossed-swords', accent: 'text-red-400', audience: 'all' },
+    { id: 'initiative', label: 'Combat', icon: 'fluent-emoji:crossed-swords', accent: 'text-red-400', audience: 'all', isNew: true },
     { id: 'documents', label: 'Documents', icon: 'fluent-emoji:scroll', accent: 'text-sky-400', audience: 'all' },
     { id: 'social', label: 'Social', icon: 'fluent-emoji:speech-balloon', accent: 'text-pink-400', audience: 'all' },
     { id: 'notifications', label: 'Notifications', icon: 'fluent-emoji:bell', accent: 'text-amber-400', audience: 'all' },
@@ -118,7 +164,12 @@ export class GuidePage implements AfterViewInit, OnDestroy {
 
   readonly nav = computed(() => {
     const a = this.audience();
-    return this.allNav.filter((item) => this.matchesAudience(item.audience, a));
+    const q = this.searchQuery().trim().toLowerCase();
+    return this.allNav.filter((item) => {
+      if (!this.matchesAudience(item.audience, a)) return false;
+      if (!q) return true;
+      return item.label.toLowerCase().includes(q);
+    });
   });
 
   readonly quickCards: GuideQuickCard[] = [
@@ -128,6 +179,7 @@ export class GuidePage implements AfterViewInit, OnDestroy {
       icon: 'fluent-emoji:sparkles',
       link: '/create',
       accent: 'border-amber-500/40 hover:border-amber-400 bg-amber-950/20',
+      prefetch: 'create',
     },
     {
       title: 'Mes campagnes',
@@ -135,6 +187,7 @@ export class GuidePage implements AfterViewInit, OnDestroy {
       icon: 'fluent-emoji:world-map',
       link: '/campaigns',
       accent: 'border-violet-500/40 hover:border-violet-400 bg-violet-950/20',
+      prefetch: 'campaigns',
     },
     {
       title: 'Codex',
@@ -142,6 +195,7 @@ export class GuidePage implements AfterViewInit, OnDestroy {
       icon: 'fluent-emoji:books',
       link: '/species',
       accent: 'border-emerald-500/40 hover:border-emerald-400 bg-emerald-950/20',
+      prefetch: 'species',
     },
     {
       title: 'Support',
@@ -149,26 +203,39 @@ export class GuidePage implements AfterViewInit, OnDestroy {
       icon: 'fluent-emoji:raising-hands',
       link: '/support',
       accent: 'border-sky-500/40 hover:border-sky-400 bg-sky-950/20',
+      prefetch: 'support',
     },
   ];
 
   readonly blogPosts: GuideBlogPost[] = [
     {
       date: '30 août 2026',
-      tag: 'Campagnes MJ',
-      title: 'Fiches joueurs consultables',
+      tag: 'Wiki',
+      title: 'Guide forgeron v1.2',
       summary:
-        'Voir la fiche proposée ou approuvée avant validation. Synthèse MJ et import combat basés sur les vraies stats.',
+        'Recherche, parcours one-shot, fiches 30 s, aperçus UI annotés, feedback sections et mémorisation du rôle.',
+      icon: 'fluent-emoji:books',
+      border: 'border-amber-500/30',
+      tagColor: 'text-amber-400 bg-amber-950/40',
+      isNew: true,
+    },
+    {
+      date: '30 août 2026',
+      tag: 'Campagnes MJ',
+      title: 'Fiches joueurs + retrait de membres',
+      summary:
+        'Voir la fiche proposée/approuvée. Invitations filtrées. Bouton Retirer. Synthèse MJ et import combat corrigés.',
       icon: 'fluent-emoji:identification-card',
       border: 'border-violet-500/30',
       tagColor: 'text-violet-400 bg-violet-950/40',
+      isNew: true,
     },
     {
       date: '30 août 2026',
       tag: 'Équipement',
       title: 'Double arme de guerre (Guerrier)',
       summary:
-        'Alternative ×2 à l’Arsenal : choisissez deux armes différentes. Compteur 1/2. Export PDF corrigé pour les maîtrises de catégorie.',
+        'Alternative ×2 à l’Arsenal : deux armes différentes. Compteur 1/2. Export PDF OK pour les maîtrises de catégorie.',
       icon: 'fluent-emoji:crossed-swords',
       border: 'border-emerald-500/30',
       tagColor: 'text-emerald-400 bg-emerald-950/40',
@@ -192,7 +259,86 @@ export class GuidePage implements AfterViewInit, OnDestroy {
       border: 'border-sky-500/30',
       tagColor: 'text-sky-400 bg-sky-950/40',
     },
+    {
+      date: '29 août 2026',
+      tag: 'Documents',
+      title: 'Handouts markdown & activité',
+      summary: 'Publication joueurs, aperçu depuis l’activité, markdown léger (gras, titres, listes).',
+      icon: 'fluent-emoji:scroll',
+      border: 'border-sky-500/30',
+      tagColor: 'text-sky-400 bg-sky-950/40',
+    },
   ];
+
+  readonly oneshotSteps: GuideOneshotStep[] = [
+    { role: 'Tous', title: 'Comptes prêts', detail: 'MJ et joueurs inscrits, amis entre eux.' },
+    { role: 'MJ', title: 'Créer la campagne', detail: 'Titre, synopsis, niveau conseillé.' },
+    { role: 'MJ', title: 'Inviter la table', detail: 'Onglet Joueurs → inviter chaque ami.' },
+    { role: 'Joueur', title: 'Accepter & proposer', detail: 'Invitation → proposer un héros sauvegardé.' },
+    { role: 'MJ', title: 'Valider les fiches', detail: 'Voir la fiche → Accepter (ou Refuser).' },
+    { role: 'MJ', title: 'Préparer & planifier', detail: 'Rencontre + session + push activés.' },
+    { role: 'MJ', title: 'Démarrer la table', detail: 'Notes live · import party · combat.' },
+    { role: 'Joueur', title: 'Saisir l’initiative', detail: 'Bandeau / notification → jet d20.' },
+    { role: 'MJ', title: 'Fin de session', detail: 'Terminer combat → historique · Terminer session.' },
+  ];
+
+  readonly flashCards: GuideFlashCard[] = [
+    {
+      title: 'Publier un handout',
+      bullets: ['Documents → Créer', 'Rédiger (markdown léger)', 'Publier → push joueurs'],
+      audience: 'dm',
+      icon: 'fluent-emoji:scroll',
+      sectionId: 'documents',
+    },
+    {
+      title: 'Valider un perso',
+      bullets: ['Groupe ou onglet Joueurs', 'Voir la fiche proposée', 'Accepter ou Refuser'],
+      audience: 'dm',
+      icon: 'fluent-emoji:identification-card',
+      sectionId: 'scenario',
+    },
+    {
+      title: 'Collecter l’init',
+      bullets: ['Tracker → Collecter', 'Joueurs reçoivent bandeau', 'Importer les jets'],
+      audience: 'dm',
+      icon: 'fluent-emoji:dice',
+      sectionId: 'initiative',
+    },
+    {
+      title: 'Proposer mon héros',
+      bullets: ['Accepter l’invitation', 'Onglet Joueurs → choisir perso', 'Attendre le MJ'],
+      audience: 'player',
+      icon: 'fluent-emoji:shield',
+      sectionId: 'scenario',
+    },
+    {
+      title: 'Saisir mon initiative',
+      bullets: ['Attendre la collecte MJ', 'Clic bandeau / notif', 'Envoyer le jet d20'],
+      audience: 'player',
+      icon: 'fluent-emoji:game-die',
+      sectionId: 'initiative',
+    },
+    {
+      title: 'Exporter mon PDF',
+      bullets: ['Finir toutes les étapes', 'Vérifier l’aperçu', 'Sauvegarder puis télécharger'],
+      audience: 'all',
+      icon: 'fluent-emoji:printer',
+      sectionId: 'pdf',
+    },
+  ];
+
+  readonly filteredFlashCards = computed(() => {
+    const a = this.audience();
+    const q = this.searchQuery().trim().toLowerCase();
+    return this.flashCards.filter((c) => {
+      if (!this.matchesAudience(c.audience, a)) return false;
+      if (!q) return true;
+      return (
+        c.title.toLowerCase().includes(q) ||
+        c.bullets.some((b) => b.toLowerCase().includes(q))
+      );
+    });
+  });
 
   readonly startSteps: GuideStep[] = [
     {
@@ -371,7 +517,12 @@ export class GuidePage implements AfterViewInit, OnDestroy {
 
   readonly filteredFaq = computed(() => {
     const a = this.audience();
-    return this.faqItems.filter((f) => this.matchesAudience(f.audience, a));
+    const q = this.searchQuery().trim().toLowerCase();
+    return this.faqItems.filter((f) => {
+      if (!this.matchesAudience(f.audience, a)) return false;
+      if (!q) return true;
+      return f.question.toLowerCase().includes(q) || f.answer.toLowerCase().includes(q);
+    });
   });
 
   readonly glossary: GuideGlossaryItem[] = [
@@ -394,6 +545,14 @@ export class GuidePage implements AfterViewInit, OnDestroy {
     { term: 'PWA', definition: 'Application installable + notifications push hors navigateur classique.' },
   ];
 
+  readonly filteredGlossary = computed(() => {
+    const q = this.searchQuery().trim().toLowerCase();
+    if (!q) return this.glossary;
+    return this.glossary.filter(
+      (g) => g.term.toLowerCase().includes(q) || g.definition.toLowerCase().includes(q),
+    );
+  });
+
   readonly featureIndex: GuideIndexItem[] = [
     { label: 'Amis & chat', description: 'Demandes, messages, invitations', sectionId: 'social', audience: 'all' },
     { label: 'Arsenal de départ', description: 'Équipement et choix d’armes', sectionId: 'personnage', audience: 'all' },
@@ -404,6 +563,7 @@ export class GuidePage implements AfterViewInit, OnDestroy {
     { label: 'Fiche personnage PDF', description: 'Export & sauvegarde', sectionId: 'pdf', audience: 'all' },
     { label: 'Historique des combats', description: 'Résumé après combat', sectionId: 'initiative', audience: 'dm' },
     { label: 'Notifications push', description: 'Sessions, init, messages', sectionId: 'notifications', audience: 'all' },
+    { label: 'One-shot type', description: 'Scénario de session complète', sectionId: 'oneshot', audience: 'all' },
     { label: 'Pré-tirés', description: 'Héros assignables', sectionId: 'scenario', audience: 'all' },
     { label: 'Table de jeu', description: 'Session live MJ', sectionId: 'table', audience: 'dm' },
     { label: 'Validation de personnage', description: 'Voir fiche → accepter', sectionId: 'scenario', audience: 'dm' },
@@ -411,11 +571,41 @@ export class GuidePage implements AfterViewInit, OnDestroy {
 
   readonly filteredIndex = computed(() => {
     const a = this.audience();
-    return this.featureIndex.filter((i) => this.matchesAudience(i.audience, a));
+    const q = this.searchQuery().trim().toLowerCase();
+    return this.featureIndex.filter((i) => {
+      if (!this.matchesAudience(i.audience, a)) return false;
+      if (!q) return true;
+      return i.label.toLowerCase().includes(q) || i.description.toLowerCase().includes(q);
+    });
+  });
+
+  readonly searchHitCount = computed(() => {
+    const q = this.searchQuery().trim();
+    if (!q) return 0;
+    return (
+      this.filteredFaq().length +
+      this.filteredGlossary().length +
+      this.filteredIndex().length +
+      this.filteredFlashCards().length +
+      this.nav().length
+    );
   });
 
   readonly showDm = computed(() => this.audience() !== 'player');
   readonly showPlayer = computed(() => this.audience() !== 'dm');
+
+  ngOnInit(): void {
+    try {
+      const saved = localStorage.getItem(AUDIENCE_KEY) as GuideAudience | null;
+      if (saved === 'all' || saved === 'dm' || saved === 'player') {
+        this.audience.set(saved);
+      }
+      const fb = localStorage.getItem(FEEDBACK_KEY);
+      if (fb) this.sectionFeedback.set(JSON.parse(fb) as Record<string, 'yes' | 'no'>);
+    } catch {
+      /* ignore */
+    }
+  }
 
   ngAfterViewInit(): void {
     this.setupScrollSpy();
@@ -423,8 +613,23 @@ export class GuidePage implements AfterViewInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         const id = location.hash.replace('#', '');
-        if (id) this.activeSection.set(id);
+        if (id) {
+          this.activeSection.set(id);
+          if (id.startsWith('faq-')) this.openFaqId.set(id);
+        }
       });
+
+    fromEvent(window, 'scroll')
+      .pipe(auditTime(40), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.updateScrollChrome());
+
+    this.updateScrollChrome();
+
+    const hash = location.hash.replace('#', '');
+    if (hash.startsWith('faq-')) {
+      this.openFaqId.set(hash);
+      this.activeSection.set('faq');
+    }
   }
 
   ngOnDestroy(): void {
@@ -433,7 +638,20 @@ export class GuidePage implements AfterViewInit, OnDestroy {
 
   setAudience(value: GuideAudience): void {
     this.audience.set(value);
+    try {
+      localStorage.setItem(AUDIENCE_KEY, value);
+    } catch {
+      /* ignore */
+    }
     queueMicrotask(() => this.setupScrollSpy());
+  }
+
+  onSearchInput(ev: Event): void {
+    this.searchQuery.set((ev.target as HTMLInputElement).value);
+  }
+
+  clearSearch(): void {
+    this.searchQuery.set('');
   }
 
   toggleFaq(id: string): void {
@@ -453,6 +671,59 @@ export class GuidePage implements AfterViewInit, OnDestroy {
     return { done, total: items.length };
   }
 
+  async copySectionLink(sectionId: string): Promise<void> {
+    const url = `${location.origin}${location.pathname}#${sectionId}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      this.copyToast.set('Lien copié');
+    } catch {
+      this.copyToast.set('Impossible de copier');
+    }
+    setTimeout(() => this.copyToast.set(null), 1800);
+  }
+
+  setSectionFeedback(sectionId: string, value: 'yes' | 'no'): void {
+    this.sectionFeedback.update((m) => {
+      const next = { ...m, [sectionId]: value };
+      try {
+        localStorage.setItem(FEEDBACK_KEY, JSON.stringify(next));
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  }
+
+  supportQuery(sectionLabel: string): { subject: string; message: string } {
+    return {
+      subject: `Guide — retour sur « ${sectionLabel} »`,
+      message: `La section « ${sectionLabel} » du guide ne m’a pas aidé.\n\nCe qui n’était pas clair :\n`,
+    };
+  }
+
+  scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  prefetch(key?: GuideQuickCard['prefetch']): void {
+    if (!key || this.prefetched.has(key)) return;
+    this.prefetched.add(key);
+    switch (key) {
+      case 'campaigns':
+        void import('../campaigns/campaigns');
+        break;
+      case 'create':
+        void import('../character-creation/character-creation');
+        break;
+      case 'support':
+        void import('../support/support');
+        break;
+      case 'species':
+        void import('@features/data/species/species.routes');
+        break;
+    }
+  }
+
   badgeClass(badge?: GuideStep['badge']): string {
     if (badge === 'MJ') return 'bg-violet-950/50 text-violet-300 border-violet-800/50';
     if (badge === 'Joueur') return 'bg-sky-950/50 text-sky-300 border-sky-800/50';
@@ -464,9 +735,17 @@ export class GuidePage implements AfterViewInit, OnDestroy {
     return item === current;
   }
 
+  private updateScrollChrome(): void {
+    const doc = document.documentElement;
+    const scrollTop = doc.scrollTop || document.body.scrollTop;
+    const height = doc.scrollHeight - doc.clientHeight;
+    this.scrollProgress.set(height > 0 ? Math.min(100, (scrollTop / height) * 100) : 0);
+    this.showBackToTop.set(scrollTop > 480);
+  }
+
   private setupScrollSpy(): void {
     this.observer?.disconnect();
-    const ids = this.nav().map((n) => n.id);
+    const ids = this.allNav.map((n) => n.id);
     const elements = ids
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => !!el);
