@@ -434,6 +434,7 @@ public class HomeAndCampaignFeatureTests
     {
         var (_, ownerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "initpushowner");
         var sessionId = "sess-push-1";
+        var scheduledAt = "2026-09-15T19:00:00.0000000+00:00";
         Guid campaignId;
 
         using (var createReq = ApiTestAuth.Authed(HttpMethod.Post, "/me/campaigns", ownerToken))
@@ -450,7 +451,7 @@ public class HomeAndCampaignFeatureTests
                         {
                             id = sessionId,
                             title = "Soirée",
-                            scheduledAt = DateTimeOffset.UtcNow.ToString("O"),
+                            scheduledAt,
                             status = "planned",
                             playNotes = "notes live",
                             activeCombat = new
@@ -497,7 +498,7 @@ public class HomeAndCampaignFeatureTests
                         {
                             id = sessionId,
                             title = "Soirée",
-                            scheduledAt = DateTimeOffset.UtcNow.ToString("O"),
+                            scheduledAt,
                             status = "planned",
                             playNotes = "notes live",
                             activeCombat = new
@@ -553,7 +554,7 @@ public class HomeAndCampaignFeatureTests
                         {
                             id = sessionId,
                             title = "Soirée",
-                            scheduledAt = DateTimeOffset.UtcNow.ToString("O"),
+                            scheduledAt,
                             status = "planned",
                             playNotes = "notes live modifiées",
                             activeCombat = new
