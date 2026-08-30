@@ -599,6 +599,116 @@ public class HomeAndCampaignFeatureTests
         }
     }
 
+    [Fact]
+    public async Task Dm_can_view_proposed_and_approved_player_character_in_campaign()
+    {
+        var (_, ownerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "sheetowner");
+        var (_, playerToken, playerId) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "sheetplayer");
+
+        Guid campaignId;
+        using (var createReq = ApiTestAuth.Authed(HttpMethod.Post, "/me/campaigns", ownerToken))
+        {
+            createReq.Content = JsonContent.Create(new
+            {
+                title = "Campagne fiches joueurs",
+                data = JsonDocument.Parse("{}").RootElement,
+            });
+            var create = await _client.SendAsync(createReq);
+            create.EnsureSuccessStatusCode();
+            var created = await create.Content.ReadFromJsonAsync<JsonElement>();
+            campaignId = created!.GetProperty("id").GetGuid();
+        }
+
+        Guid characterId;
+        using (var charReq = ApiTestAuth.Authed(HttpMethod.Post, "/me/characters", playerToken))
+        {
+            charReq.Content = JsonContent.Create(new
+            {
+                name = "Eldrin",
+                data = JsonDocument.Parse("""{"name":"Eldrin","totalLevel":3,"classes":[{"classLabel":"Guerrier","level":3}]}""").RootElement,
+            });
+            var created = await _client.SendAsync(charReq);
+            created.EnsureSuccessStatusCode();
+            var body = await created.Content.ReadFromJsonAsync<JsonElement>();
+            characterId = body!.GetProperty("id").GetGuid();
+        }
+
+        await InvitePlayerToCampaignAsync(ownerToken, playerToken, playerId, campaignId);
+
+        using (var proposeReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaigns/{campaignId}/propose-character", playerToken))
+        {
+            proposeReq.Content = JsonContent.Create(new { characterId });
+            (await _client.SendAsync(proposeReq)).EnsureSuccessStatusCode();
+        }
+
+        Guid memberId;
+        using (var detailReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}", ownerToken))
+        {
+            var detail = await _client.SendAsync(detailReq);
+            detail.EnsureSuccessStatusCode();
+            var body = await detail.Content.ReadFromJsonAsync<JsonElement>();
+            memberId = body!.GetProperty("members").EnumerateArray()
+                .First(m => m.GetProperty("userId").GetGuid() == playerId)
+                .GetProperty("id").GetGuid();
+        }
+
+        using (var ownerDirectReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/characters/{characterId}", ownerToken))
+        {
+            var resp = await _client.SendAsync(ownerDirectReq);
+            Assert.Equal(HttpStatusCode.NotFound, resp.StatusCode);
+        }
+
+        using (var proposedReq = ApiTestAuth.Authed(
+            HttpMethod.Get,
+            $"/me/campaigns/{campaignId}/members/{memberId}/character?scope=proposed",
+            ownerToken))
+        {
+            var resp = await _client.SendAsync(proposedReq);
+            resp.EnsureSuccessStatusCode();
+            var sheet = await resp.Content.ReadFromJsonAsync<JsonElement>();
+            Assert.Equal("Eldrin", sheet!.GetProperty("name").GetString());
+        }
+
+        using (var approveReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaigns/{campaignId}/members/{memberId}/approve", ownerToken))
+        {
+            (await _client.SendAsync(approveReq)).EnsureSuccessStatusCode();
+        }
+
+        using (var approvedReq = ApiTestAuth.Authed(
+            HttpMethod.Get,
+            $"/me/campaigns/{campaignId}/members/{memberId}/character?scope=approved",
+            ownerToken))
+        {
+            var resp = await _client.SendAsync(approvedReq);
+            resp.EnsureSuccessStatusCode();
+            var sheet = await resp.Content.ReadFromJsonAsync<JsonElement>();
+            Assert.Equal("Eldrin", sheet!.GetProperty("name").GetString());
+        }
+
+        using (var removeReq = ApiTestAuth.Authed(
+            HttpMethod.Delete,
+            $"/me/campaigns/{campaignId}/members/{memberId}",
+            ownerToken))
+        {
+            (await _client.SendAsync(removeReq)).EnsureSuccessStatusCode();
+        }
+
+        using (var detailAfterReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}", ownerToken))
+        {
+            var detail = await _client.SendAsync(detailAfterReq);
+            detail.EnsureSuccessStatusCode();
+            var body = await detail.Content.ReadFromJsonAsync<JsonElement>();
+            Assert.Empty(body!.GetProperty("members").EnumerateArray().Where(m =>
+                m.GetProperty("userId").GetGuid() == playerId));
+        }
+
+        using (var inviteAgainReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaigns/{campaignId}/invites", ownerToken))
+        {
+            inviteAgainReq.Content = JsonContent.Create(new { userId = playerId });
+            (await _client.SendAsync(inviteAgainReq)).EnsureSuccessStatusCode();
+        }
+    }
+
     private async Task InvitePlayerToCampaignAsync(
         string ownerToken,
         string playerToken,

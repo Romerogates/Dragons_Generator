@@ -95,6 +95,95 @@
               <app-campaign-play-panel [campaign]="c" (campaignChange)="campaign.set($event)" />
             }
 
+            @if (c.isOwner && (approvedPlayersWithCharacter().length || pendingProposals().length)) {
+              <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5 space-y-4">
+                <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-400">
+                  <iconify-icon icon="fluent-emoji:busts-in-silhouette"></iconify-icon> Groupe — personnages joueurs
+                </h2>
+
+                @if (pendingProposals().length) {
+                  <div class="space-y-3">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-amber-500">En attente d'approbation</p>
+                    @for (m of pendingProposals(); track m.id) {
+                      <article class="p-4 rounded-xl border border-amber-900/40 bg-amber-950/20">
+                        <p class="font-bold text-slate-100">{{ m.displayName }}</p>
+                        <p class="text-sm text-amber-300 mt-1">
+                          Propose : {{ m.proposedCharacterName }} (niv. {{ m.proposedCharacterLevel ?? '?' }})
+                        </p>
+                        <div class="flex flex-wrap gap-2 mt-3">
+                          <button
+                            type="button"
+                            class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
+                            [disabled]="isMemberCharacterLoading(m.id, 'proposed')"
+                            (click)="viewMemberCharacter(m, 'proposed')"
+                          >
+                            @if (isMemberCharacterLoading(m.id, 'proposed')) { Chargement… }
+                            @else { Voir la fiche proposée }
+                          </button>
+                          <button
+                            type="button"
+                            class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
+                            [disabled]="isMemberCharacterLoading(m.id, 'proposed')"
+                            (click)="printMemberFullSheet(m, 'proposed')"
+                          >
+                            PDF fiche complète
+                          </button>
+                          <button type="button" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-emerald-950/30 text-emerald-300 border border-emerald-800/40" (click)="approveMember(m)">Accepter</button>
+                          <button type="button" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40" (click)="rejectMember(m)">Refuser</button>
+                          <button type="button" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40" (click)="removeMember(m)">Retirer</button>
+                        </div>
+                      </article>
+                    }
+                  </div>
+                }
+
+                @if (approvedPlayersWithCharacter().length) {
+                  <div class="space-y-3">
+                    @if (pendingProposals().length) {
+                      <p class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Approuvés</p>
+                    }
+                    @for (m of approvedPlayersWithCharacter(); track m.id) {
+                      <article class="p-4 rounded-xl border border-slate-800 bg-[#171b22] flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                          <p class="font-bold text-slate-100">{{ m.displayName }}</p>
+                          <p class="text-sm text-violet-300 mt-1">
+                            {{ m.approvedCharacterName }} (niv. {{ m.approvedCharacterLevel ?? '?' }})
+                          </p>
+                          <p class="text-[10px] text-emerald-400/80 uppercase tracking-widest mt-1">{{ m.xpEarnedInCampaign }} XP</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-violet-950/30 border border-violet-800/50 text-violet-300 disabled:opacity-50"
+                            [disabled]="isMemberCharacterLoading(m.id, 'approved')"
+                            (click)="viewMemberCharacter(m, 'approved')"
+                          >
+                            @if (isMemberCharacterLoading(m.id, 'approved')) { Chargement… }
+                            @else { Voir la fiche }
+                          </button>
+                          <button
+                            type="button"
+                            class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-[#1b2028] border border-violet-800/50 text-violet-300 disabled:opacity-50"
+                            [disabled]="isMemberCharacterLoading(m.id, 'approved')"
+                            (click)="printMemberFullSheet(m, 'approved')"
+                          >
+                            PDF fiche complète
+                          </button>
+                          <button
+                            type="button"
+                            class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 border border-red-900/40 text-red-300"
+                            (click)="removeMember(m)"
+                          >
+                            Retirer
+                          </button>
+                        </div>
+                      </article>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
             @if (c.isOwner) {
               <div class="bg-violet-950/20 border border-violet-800/40 rounded-2xl p-5">
                 <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-4">
@@ -926,7 +1015,7 @@
               <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
                 <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Inviter un ami</h3>
                 <div class="flex flex-wrap gap-2">
-                  @for (f of friendsList(); track f.id) {
+                  @for (f of invitableFriends(); track f.id) {
                     <button
                       type="button"
                       class="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs border border-slate-700 text-slate-300 hover:border-violet-500/50"
@@ -941,7 +1030,7 @@
                       {{ f.displayName }}
                     </button>
                   } @empty {
-                    <p class="text-sm text-slate-500 italic">Ajoutez des amis depuis la page <a routerLink="/friends" class="text-violet-400">Amis</a>.</p>
+                    <p class="text-sm text-slate-500 italic">Tous vos amis sont déjà dans la campagne, ou ajoutez-en depuis <a routerLink="/friends" class="text-violet-400">Amis</a>.</p>
                   }
                 </div>
               </div>
@@ -949,7 +1038,7 @@
               @for (m of players(); track m.id) {
                 <article class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
                   <div class="flex justify-between items-start gap-3">
-                    <div>
+                    <div class="flex-grow">
                       <h3 class="font-bold text-slate-100">{{ m.displayName }}</h3>
                       <p class="text-[10px] text-emerald-400/80 uppercase tracking-widest mt-1">{{ m.xpEarnedInCampaign }} XP en campagne</p>
                       @if (m.approvedCharacterName) {
@@ -957,12 +1046,57 @@
                       }
                       @if (m.proposalStatus === 'pending') {
                         <p class="text-sm text-amber-400 mt-2">Propose : {{ m.proposedCharacterName }} (niv. {{ m.proposedCharacterLevel ?? '?' }})</p>
-                        <div class="flex gap-2 mt-3">
+                        <div class="flex flex-wrap gap-2 mt-3">
+                          <button
+                            type="button"
+                            class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
+                            [disabled]="isMemberCharacterLoading(m.id, 'proposed')"
+                            (click)="viewMemberCharacter(m, 'proposed')"
+                          >
+                            @if (isMemberCharacterLoading(m.id, 'proposed')) { Chargement… }
+                            @else { Voir la fiche proposée }
+                          </button>
+                          <button
+                            type="button"
+                            class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
+                            [disabled]="isMemberCharacterLoading(m.id, 'proposed')"
+                            (click)="printMemberFullSheet(m, 'proposed')"
+                          >
+                            PDF fiche complète
+                          </button>
                           <button type="button" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-emerald-950/30 text-emerald-300 border border-emerald-800/40" (click)="approveMember(m)">Accepter</button>
                           <button type="button" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40" (click)="rejectMember(m)">Refuser</button>
                         </div>
+                      } @else if (m.approvedCharacterName) {
+                        <div class="flex flex-wrap gap-2 mt-3">
+                          <button
+                            type="button"
+                            class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
+                            [disabled]="isMemberCharacterLoading(m.id, 'approved')"
+                            (click)="viewMemberCharacter(m, 'approved')"
+                          >
+                            @if (isMemberCharacterLoading(m.id, 'approved')) { Chargement… }
+                            @else { Voir la fiche }
+                          </button>
+                          <button
+                            type="button"
+                            class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
+                            [disabled]="isMemberCharacterLoading(m.id, 'approved')"
+                            (click)="printMemberFullSheet(m, 'approved')"
+                          >
+                            PDF fiche complète
+                          </button>
+                        </div>
                       }
                     </div>
+                    <button
+                      type="button"
+                      class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase shrink-0 bg-red-950/30 border border-red-900/40 text-red-300 hover:bg-red-950/50"
+                      (click)="removeMember(m)"
+                      title="Retirer de la campagne"
+                    >
+                      Retirer
+                    </button>
                   </div>
                 </article>
               }

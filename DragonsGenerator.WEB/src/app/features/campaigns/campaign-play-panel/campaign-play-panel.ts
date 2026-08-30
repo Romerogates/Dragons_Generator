@@ -15,7 +15,6 @@ import { Router, RouterLink } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
-import { CharacterCloudService } from '@core/services/character-cloud.service';
 import type { Character } from '@core/models/Character/character';
 import {
   ActiveCombat,
@@ -57,7 +56,6 @@ import {
 })
 export class CampaignPlayPanel implements OnDestroy {
   private readonly campaigns = inject(CampaignCloudService);
-  private readonly characters = inject(CharacterCloudService);
   private readonly router = inject(Router);
 
   readonly campaign = input.required<CampaignDetailModel>();
@@ -194,9 +192,13 @@ export class CampaignPlayPanel implements OnDestroy {
     }
 
     this.importingParty.set(true);
+    const campaignId = this.campaign().id;
     const requests = approved.map((p) =>
-      this.characters.get(p.approvedCharacterId!).pipe(
-        map((res) => this.combatantFromCharacter(res.data as Character, p.userId)),
+      this.campaigns.getMemberCharacter(campaignId, p.id, 'approved').pipe(
+        map((res) => {
+          const character = { ...(res.data as object), name: res.name ?? p.approvedCharacterName } as Character;
+          return this.combatantFromCharacter(character, p.userId);
+        }),
         catchError(() =>
           of(
             createCombatant({

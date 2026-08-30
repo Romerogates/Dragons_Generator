@@ -49,6 +49,15 @@ const MOCK_CATALOG: Equipment[] = [
     damage_dice: '1d8',
     damage_type: 'perforant',
   }),
+  mockEquipment('wp-epee-longue', 'Épée longue', 'weapon', 'martial_melee', {
+    damage_dice: '1d8',
+    damage_type: 'tranchant',
+  }),
+  mockEquipment('wp-hache-bataille', 'Hache de bataille', 'weapon', 'martial_melee', {
+    damage_dice: '1d8',
+    damage_type: 'tranchant',
+  }),
+  mockEquipment('ar-bouclier', 'Bouclier', 'armor', 'shield', { ac: 2 }),
 ];
 
 const LETTRE_SLOTS = [
@@ -231,14 +240,15 @@ describe('EquipmentStep', () => {
     expectCatalogLoaded();
     component.activeSlotIndex.set(1);
     component.selectAlternative(1);
-    component.pickedCategory.update((m) => new Map(m).set('2-1-0', 'wp-dague'));
+    component.pickedCategory.update((m) => new Map(m).set('2-1-0', ['wp-dague']));
     fixture.detectChanges();
 
     expect(component.isAlreadyPicked(2, 1, 0, 'wp-dague')).toBeFalse();
     expect(component.isAlreadyPicked(2, 1, 0, 'wp-baton-de-combat')).toBeFalse();
 
-    component.pickedCategory.update((m) => new Map(m).set('3-0-0', 'wp-dague'));
     expect(component.isAlreadyPicked(3, 0, 0, 'wp-dague')).toBeTrue();
+    component.pickedCategory.update((m) => new Map(m).set('3-0-0', ['wp-dague']));
+    expect(component.isAlreadyPicked(3, 0, 0, 'wp-dague')).toBeFalse();
     expect(component.isAlreadyPicked(3, 0, 0, 'wp-baton-de-combat')).toBeFalse();
   });
 
@@ -246,7 +256,7 @@ describe('EquipmentStep', () => {
     expectCatalogLoaded();
     component.activeSlotIndex.set(1);
     component.selectAlternative(1);
-    component.pickedCategory.update((m) => new Map(m).set('2-1-0', 'wp-dague'));
+    component.pickedCategory.update((m) => new Map(m).set('2-1-0', ['wp-dague']));
     component.selectAlternative(0);
     fixture.detectChanges();
 
@@ -267,7 +277,7 @@ describe('EquipmentStep', () => {
     fixture.detectChanges();
 
     component.selectFromFixedCategory(1, 0, 'wp-dague');
-    expect(component.pickedCategory().get('1-fixed-0')).toBe('wp-dague');
+    expect(component.pickedCategory().get('1-fixed-0')).toEqual(['wp-dague']);
     expect(component.selectionComplete()).toBeTrue();
   });
 
@@ -331,6 +341,48 @@ describe('EquipmentStep', () => {
     const focusSlot = component.resolvedSlots()[1];
     expect(component.itemName(focusSlot.alternatives[0].items[0])).toBe('Sacoche à composantes');
     expect(component.itemName(focusSlot.alternatives[1].items[0])).toBe('Focaliseur arcanique');
+  });
+
+  it('allows picking two martial weapons when qty is 2 (Guerrier option B)', () => {
+    creationSignal.set({
+      ...lettreCreation(),
+      className: 'Guerrier',
+      startingEquipmentSlots: [
+        {
+          slot: 2,
+          description: 'Armement martial principal',
+          alternatives: [
+            [
+              { id: 'wp-cat-martial', qty: 1 },
+              { id: 'ar-bouclier', qty: 1 },
+            ],
+            [{ id: 'wp-cat-martial', qty: 2 }],
+          ],
+        },
+      ],
+    });
+    fixture.detectChanges();
+
+    component.activeSlotIndex.set(0);
+    component.selectAlternative(1);
+    fixture.detectChanges();
+    expect(component.selectionComplete()).toBeFalse();
+
+    component.selectFromCategory(0, 'wp-epee-longue');
+    fixture.detectChanges();
+    expect(component.selectionComplete()).toBeFalse();
+    expect(component.getCategoryPicks('2-1-0')).toEqual(['wp-epee-longue']);
+
+    component.selectFromCategory(0, 'wp-hache-bataille');
+    fixture.detectChanges();
+    expect(component.selectionComplete()).toBeTrue();
+
+    component.confirm();
+    const items = setEquipmentSpy.calls.mostRecent().args[0];
+    expect(items.map((i: { refId: string }) => i.refId)).toEqual([
+      'wp-epee-longue',
+      'wp-hache-bataille',
+    ]);
   });
 
   it('shows load error when catalog request fails', async () => {

@@ -9,6 +9,7 @@ public static class CampaignActivityKinds
     public const string InviteSent = "invite_sent";
     public const string InviteAccepted = "invite_accepted";
     public const string MemberJoined = "member_joined";
+    public const string MemberRemoved = "member_removed";
     public const string CharacterProposed = "character_proposed";
     public const string CharacterApproved = "character_approved";
     public const string CharacterRejected = "character_rejected";

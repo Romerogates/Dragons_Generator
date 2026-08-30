@@ -2,18 +2,33 @@ import {
   CURRENT_SCHEMA_VERSION,
   type Character,
 } from '@core/models/Character/character';
-import { isEquipmentCategoryId, isMasteredProficiencyChoice } from './equipment.utils';
+import {
+  CATEGORY_FILTERS,
+  isEquipmentCategoryId,
+  isMasteredProficiencyChoice,
+  resolveEquipmentRefId,
+} from './equipment.utils';
 
 export interface CharacterExportValidation {
   valid: boolean;
   errors: string[];
 }
 
-function isUnresolvedProficiencyId(id: string): boolean {
+function isValidCategoryProficiency(id: string, kind: 'weapon' | 'tool'): boolean {
+  const resolved = resolveEquipmentRefId(id);
+  const filter = CATEGORY_FILTERS[resolved];
+  if (!filter) return false;
+  if (kind === 'weapon') return filter.type === 'WEAPON';
+  return filter.type === 'TOOL' || filter.type === 'GEAR' || filter.type === 'VEHICLE';
+}
+
+function isUnresolvedProficiencyId(id: string, kind: 'weapon' | 'tool'): boolean {
   if (!id || typeof id !== 'string') return true;
   if (isMasteredProficiencyChoice(id)) return true;
   if (id.endsWith('-any') || id === 'any' || id === 'skill-any') return true;
-  if (id.startsWith('category-') || id.startsWith('wp-cat-')) return true;
+  if (isValidCategoryProficiency(id, kind)) return false;
+  const resolved = resolveEquipmentRefId(id);
+  if (resolved.startsWith('category-') || id.startsWith('wp-cat-')) return true;
   return false;
 }
 
@@ -50,14 +65,14 @@ export function validateCharacterExport(character: Character): CharacterExportVa
 
   const weapons = character.proficiencies?.weapons ?? [];
   for (const id of weapons) {
-    if (isUnresolvedProficiencyId(id)) {
+    if (isUnresolvedProficiencyId(id, 'weapon')) {
       errors.push(`Maîtrise d'arme non résolue : ${id}.`);
     }
   }
 
   const tools = character.proficiencies?.tools ?? [];
   for (const id of tools) {
-    if (isUnresolvedProficiencyId(id)) {
+    if (isUnresolvedProficiencyId(id, 'tool')) {
       errors.push(`Maîtrise d'outil non résolue : ${id}.`);
     }
   }

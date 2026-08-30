@@ -88,6 +88,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly importingPregen = signal(false);
   readonly generatingAutoPregen = signal(false);
   readonly pregenPdfLoadingId = signal<string | null>(null);
+  readonly memberCharacterLoadingId = signal<string | null>(null);
   readonly activity = signal<CampaignActivityItem[]>([]);
   readonly activityLoading = signal(false);
   /** Session en mode édition (MJ) — sinon carte lecture. */
@@ -115,6 +116,19 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly players = computed(() =>
     (this.campaign()?.members ?? []).filter((m) => m.role === 'player'),
   );
+
+  readonly approvedPlayersWithCharacter = computed(() =>
+    this.players().filter((p) => p.proposalStatus === 'approved' && p.approvedCharacterId),
+  );
+
+  readonly pendingProposals = computed(() =>
+    this.players().filter((p) => p.proposalStatus === 'pending' && p.proposedCharacterId),
+  );
+
+  readonly invitableFriends = computed(() => {
+    const memberUserIds = new Set(this.players().map((m) => m.userId));
+    return this.friendsList().filter((f) => !memberUserIds.has(f.id));
+  });
 
   readonly totalXpAwarded = computed(() =>
     (this.campaign()?.members ?? [])
@@ -318,6 +332,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       invite_sent: 'Invitation envoyée',
       invite_accepted: 'Invitation acceptée',
       member_joined: 'Joueur rejoint',
+      member_removed: 'Joueur retiré',
       character_proposed: 'Personnage proposé',
       character_approved: 'Personnage approuvé',
       character_rejected: 'Personnage refusé',
@@ -336,6 +351,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       invite_sent: 'fluent-emoji:envelope',
       invite_accepted: 'fluent-emoji:handshake',
       member_joined: 'fluent-emoji:waving-hand',
+      member_removed: 'fluent-emoji:door',
       character_proposed: 'fluent-emoji:scroll',
       character_approved: 'fluent-emoji:check-mark-button',
       character_rejected: 'fluent-emoji:cross-mark',
@@ -845,6 +861,82 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.campaigns.rejectProposal(c.id, member.id).subscribe(() => this.reload());
   }
 
+  removeMember(member: CampaignMember): void {
+    const c = this.campaign();
+    if (!c) return;
+    if (!confirm(`Retirer ${member.displayName} de la campagne ?`)) return;
+    this.campaigns.removeMember(c.id, member.id).subscribe({
+      next: () => {
+        this.error.set(null);
+        this.reload();
+        if (this.tab() === 'activity') this.loadActivity();
+      },
+      error: () => this.error.set('Impossible de retirer ce joueur.'),
+    });
+  }
+
+  memberLoadingKey(memberId: string, scope: 'proposed' | 'approved'): string {
+    return `${memberId}-${scope}`;
+  }
+
+  isMemberCharacterLoading(memberId: string, scope: 'proposed' | 'approved'): boolean {
+    return this.memberCharacterLoadingId() === this.memberLoadingKey(memberId, scope);
+  }
+
+  viewMemberCharacter(member: CampaignMember, scope: 'proposed' | 'approved'): void {
+    const key = this.memberLoadingKey(member.id, scope);
+    if (this.memberCharacterLoadingId() === key) return;
+    this.memberCharacterLoadingId.set(key);
+    this.error.set(null);
+    this.loadMemberCharacter(member, scope).subscribe({
+      next: (character) => {
+        localStorage.setItem('dragons-current-character', JSON.stringify(character));
+        this.memberCharacterLoadingId.set(null);
+        this.router.navigate(['/character-sheet']);
+      },
+      error: () => {
+        this.memberCharacterLoadingId.set(null);
+        this.error.set('Impossible d\'ouvrir la fiche.');
+      },
+    });
+  }
+
+  printMemberFullSheet(member: CampaignMember, scope: 'proposed' | 'approved' = 'approved'): void {
+    const key = this.memberLoadingKey(member.id, scope);
+    if (this.memberCharacterLoadingId() === key) return;
+    this.memberCharacterLoadingId.set(key);
+    this.error.set(null);
+    this.loadMemberCharacter(member, scope).subscribe({
+      next: (character) => {
+        void getCampaignPdfService(this.injector).then((pdf) =>
+          pdf.downloadPlayerFullSheet(character).finally(() => {
+            this.memberCharacterLoadingId.set(null);
+          }),
+        );
+      },
+      error: () => {
+        this.memberCharacterLoadingId.set(null);
+        this.error.set('Impossible de générer la fiche PDF.');
+      },
+    });
+  }
+
+  private loadMemberCharacter(
+    member: CampaignMember,
+    scope: 'proposed' | 'approved',
+  ): Observable<Character> {
+    const c = this.campaign();
+    if (!c) return throwError(() => new Error('Campagne introuvable'));
+
+    return this.campaigns.getMemberCharacter(c.id, member.id, scope).pipe(
+      map((res) => {
+        const character = { ...(res.data as object) } as Character;
+        if (res.name) character.name = res.name;
+        return character;
+      }),
+    );
+  }
+
   isMyPlayerMember(): CampaignMember | undefined {
     const userId = this.auth.user()?.id;
     if (!userId) return undefined;
@@ -1100,15 +1192,15 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   private async loadPlayerSummaries(): Promise<PlayerGmSummary[]> {
-    const approved = this.players().filter(
-      (p) => p.proposalStatus === 'approved' && p.approvedCharacterId,
-    );
+    const c = this.campaign();
+    if (!c) return [];
+    const approved = this.approvedPlayersWithCharacter();
     const pdf = await getCampaignPdfService(this.injector);
     const summaries = await Promise.all(
       approved.map(
         (p) =>
           new Promise<PlayerGmSummary | null>((resolve) => {
-            this.characters.get(p.approvedCharacterId!).subscribe({
+            this.campaigns.getMemberCharacter(c.id, p.id, 'approved').subscribe({
               next: (res) => resolve(pdf.buildPlayerGmSummary(res.data as Character)),
               error: () => resolve(null),
             });
@@ -1136,9 +1228,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   private async runPrintPlayerFullSheets(): Promise<void> {
-    const approved = this.players().filter(
-      (p) => p.proposalStatus === 'approved' && p.approvedCharacterId,
-    );
+    const c = this.campaign();
+    if (!c) return;
+    const approved = this.approvedPlayersWithCharacter();
     if (!approved.length) {
       this.error.set('Aucun joueur avec personnage approuvé.');
       return;
@@ -1148,10 +1240,11 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       const pdf = await getCampaignPdfService(this.injector);
       for (const p of approved) {
         await new Promise<void>((resolve, reject) => {
-          this.characters.get(p.approvedCharacterId!).subscribe({
+          this.campaigns.getMemberCharacter(c.id, p.id, 'approved').subscribe({
             next: async (res) => {
               try {
-                await pdf.downloadPlayerFullSheet(res.data as Character);
+                const character = { ...(res.data as object), name: res.name } as Character;
+                await pdf.downloadPlayerFullSheet(character);
                 resolve();
               } catch {
                 reject();

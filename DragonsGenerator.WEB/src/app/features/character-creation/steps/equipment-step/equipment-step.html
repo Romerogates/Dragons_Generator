@@ -135,17 +135,27 @@
                     }
 
                     @if (item.isCategory) {
+                      @if (item.ref.qty > 1) {
+                        <p class="text-[10px] text-amber-500/80 text-center font-bold uppercase tracking-widest">
+                          {{ getCategoryPicks(categoryKey(slot.slotNumber, -1, itemIdx)).length }} /
+                          {{ item.ref.qty }} choisi(s)
+                        </p>
+                      }
                       <div
                         class="mt-1 grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-h-80 overflow-y-auto pr-1"
                       >
                         @for (eq of item.categoryItems; track eq.id) {
                           <button
-                            class="w-full px-2.5 py-2.5 rounded-lg border text-left transition-[colors,transform,opacity,box-shadow] duration-200 flex flex-col gap-1"
+                            class="w-full px-2.5 py-2.5 rounded-lg border text-left transition-[colors,transform,opacity,box-shadow] duration-200 flex flex-col gap-1 disabled:opacity-30 disabled:cursor-not-allowed"
                             [ngClass]="
-                              categoryChoices().get(slot.slotNumber + '-fixed-' + itemIdx) === eq.id
+                              isCategoryChoiceSelected(
+                                categoryKey(slot.slotNumber, -1, itemIdx),
+                                eq.id
+                              )
                                 ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md'
                                 : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:bg-slate-800 hover:text-amber-400'
                             "
+                            [disabled]="isAlreadyPicked(slot.slotNumber, -1, itemIdx, eq.id)"
                             (click)="selectFromFixedCategory(slot.slotNumber, itemIdx, eq.id)"
                           >
                             <span class="text-[11px] font-bold leading-tight">{{ eq.name }}</span>
@@ -153,12 +163,16 @@
                               <span
                                 class="text-[9px] leading-snug"
                                 [class.text-slate-600]="
-                                  categoryChoices().get(slot.slotNumber + '-fixed-' + itemIdx) ===
-                                  eq.id
+                                  isCategoryChoiceSelected(
+                                    categoryKey(slot.slotNumber, -1, itemIdx),
+                                    eq.id
+                                  )
                                 "
                                 [class.text-slate-400]="
-                                  categoryChoices().get(slot.slotNumber + '-fixed-' + itemIdx) !==
-                                  eq.id
+                                  !isCategoryChoiceSelected(
+                                    categoryKey(slot.slotNumber, -1, itemIdx),
+                                    eq.id
+                                  )
                                 "
                                 >{{ summary }}</span
                               >
@@ -239,6 +253,18 @@
                           item.isCategory &&
                           selectedAlternatives().get(slot.slotNumber) === alt.index
                         ) {
+                          @if (item.ref.qty > 1) {
+                            <p
+                              class="text-[10px] text-amber-500/80 font-bold uppercase tracking-widest"
+                            >
+                              {{
+                                getCategoryPicks(
+                                  categoryKey(slot.slotNumber, alt.index, itemIdx)
+                                ).length
+                              }}
+                              / {{ item.ref.qty }} choisi(s)
+                            </p>
+                          }
                           <div
                             class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-1"
                             (click)="$event.stopPropagation()"
@@ -247,9 +273,10 @@
                               <button
                                 class="w-full px-2.5 py-2.5 rounded-lg border text-left transition-[colors,transform,opacity,box-shadow] duration-200 flex flex-col gap-1 disabled:opacity-30 disabled:cursor-not-allowed"
                                 [ngClass]="
-                                  categoryChoices().get(
-                                    slot.slotNumber + '-' + alt.index + '-' + itemIdx
-                                  ) === eq.id
+                                  isCategoryChoiceSelected(
+                                    categoryKey(slot.slotNumber, alt.index, itemIdx),
+                                    eq.id
+                                  )
                                     ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md'
                                     : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:bg-slate-800 hover:text-amber-400'
                                 "
@@ -267,14 +294,16 @@
                                   <span
                                     class="text-[9px] leading-snug"
                                     [class.text-slate-600]="
-                                      categoryChoices().get(
-                                        slot.slotNumber + '-' + alt.index + '-' + itemIdx
-                                      ) === eq.id
+                                      isCategoryChoiceSelected(
+                                        categoryKey(slot.slotNumber, alt.index, itemIdx),
+                                        eq.id
+                                      )
                                     "
                                     [class.text-slate-400]="
-                                      categoryChoices().get(
-                                        slot.slotNumber + '-' + alt.index + '-' + itemIdx
-                                      ) !== eq.id
+                                      !isCategoryChoiceSelected(
+                                        categoryKey(slot.slotNumber, alt.index, itemIdx),
+                                        eq.id
+                                      )
                                     "
                                     >{{ summary }}</span
                                   >

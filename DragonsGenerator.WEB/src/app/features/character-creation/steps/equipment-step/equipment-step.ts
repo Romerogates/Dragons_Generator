@@ -86,7 +86,7 @@ export class EquipmentStep implements OnInit {
   readonly error = signal<string | null>(null);
 
   readonly pickedAlt = signal<Map<number, number>>(new Map());
-  readonly pickedCategory = signal<Map<string, string>>(new Map());
+  readonly pickedCategory = signal<Map<string, string[]>>(new Map());
   readonly activeSlotIndex = signal(0);
 
   private readonly catalogMap = computed(() => {
@@ -131,8 +131,11 @@ export class EquipmentStep implements OnInit {
     for (const slot of this.resolvedSlots()) {
       // Vérifier les catégories dans les items fixes
       for (let i = 0; i < slot.fixedItems.length; i++) {
-        if (slot.fixedItems[i].isCategory && !cats.has(`${slot.slotNumber}-fixed-${i}`)) {
-          return false;
+        const item = slot.fixedItems[i];
+        if (item.isCategory) {
+          const key = `${slot.slotNumber}-fixed-${i}`;
+          const needed = this.neededCategoryPicks(item);
+          if ((cats.get(key)?.length ?? 0) < needed) return false;
         }
       }
       // Vérifier les alternatives
@@ -141,7 +144,12 @@ export class EquipmentStep implements OnInit {
       if (altIdx === undefined) return false;
       const alt = slot.alternatives[altIdx];
       for (let i = 0; i < alt.items.length; i++) {
-        if (alt.items[i].isCategory && !cats.has(`${slot.slotNumber}-${altIdx}-${i}`)) return false;
+        const item = alt.items[i];
+        if (item.isCategory) {
+          const key = `${slot.slotNumber}-${altIdx}-${i}`;
+          const needed = this.neededCategoryPicks(item);
+          if ((cats.get(key)?.length ?? 0) < needed) return false;
+        }
       }
     }
     return true;
@@ -193,16 +201,55 @@ export class EquipmentStep implements OnInit {
     const altIdx = this.pickedAlt().get(slot.slotNumber);
     if (altIdx === undefined) return;
 
+    const item = slot.alternatives[altIdx].items[itemIdx];
     const key = `${slot.slotNumber}-${altIdx}-${itemIdx}`;
-    this.pickedCategory.update((m) => new Map(m).set(key, eqId));
+    const needed = this.neededCategoryPicks(item);
+    this.toggleCategoryPick(key, eqId, needed);
 
-    setTimeout(() => this.nextSlot(), 300);
+    if (this.getCategoryPicks(key).length >= needed) {
+      setTimeout(() => this.nextSlot(), 300);
+    }
+  }
+
+  getCategoryPicks(key: string): string[] {
+    return this.pickedCategory().get(key) ?? [];
+  }
+
+  categoryKey(slot: number, altIdx: number, itemIdx: number): string {
+    return altIdx === -1 ? `${slot}-fixed-${itemIdx}` : `${slot}-${altIdx}-${itemIdx}`;
+  }
+
+  isCategoryChoiceSelected(key: string, eqId: string): boolean {
+    return this.getCategoryPicks(key).includes(eqId);
+  }
+
+  neededCategoryPicks(item: ResolvedItem): number {
+    return item.isCategory ? Math.max(1, item.ref.qty) : 0;
+  }
+
+  private toggleCategoryPick(key: string, eqId: string, needed: number): void {
+    this.pickedCategory.update((m) => {
+      const next = new Map(m);
+      const current = [...(next.get(key) ?? [])];
+      const idx = current.indexOf(eqId);
+      if (idx >= 0) {
+        current.splice(idx, 1);
+      } else if (current.length < needed) {
+        current.push(eqId);
+      }
+      if (current.length === 0) next.delete(key);
+      else next.set(key, current);
+      return next;
+    });
   }
 
   isAlreadyPicked(slot: number, altIdx: number, itemIdx: number, eqId: string): boolean {
-    const currentKey = `${slot}-${altIdx}-${itemIdx}`;
-    for (const [key, val] of this.pickedCategory().entries()) {
-      if (key !== currentKey && val === eqId) return true;
+    const currentKey = this.categoryKey(slot, altIdx, itemIdx);
+    if (this.getCategoryPicks(currentKey).includes(eqId)) return false;
+
+    for (const [key, picks] of this.pickedCategory().entries()) {
+      if (key === currentKey) continue;
+      if (picks.includes(eqId)) return true;
     }
     return false;
   }
@@ -214,30 +261,32 @@ export class EquipmentStep implements OnInit {
     this.resolvedSlots().forEach((slot) => {
       // Items fixes — résoudre les catégories via pickedCategory
       slot.fixedItems.forEach((item, i) => {
-        const inst = this.toInstance(
-          item,
-          map,
-          this.pickedCategory(),
-          slot.slotNumber,
-          -1, // altIdx = -1 pour les fixes
-          i,
+        result.push(
+          ...this.toInstances(
+            item,
+            map,
+            this.pickedCategory(),
+            slot.slotNumber,
+            -1,
+            i,
+          ),
         );
-        if (inst) result.push(inst);
       });
       // Alternatives
       if (!slot.isFixed) {
         const altIdx = this.pickedAlt().get(slot.slotNumber);
         if (altIdx !== undefined) {
           slot.alternatives[altIdx].items.forEach((item, i) => {
-            const inst = this.toInstance(
-              item,
-              map,
-              this.pickedCategory(),
-              slot.slotNumber,
-              altIdx,
-              i,
+            result.push(
+              ...this.toInstances(
+                item,
+                map,
+                this.pickedCategory(),
+                slot.slotNumber,
+                altIdx,
+                i,
+              ),
             );
-            if (inst) result.push(inst);
           });
         }
       }
@@ -333,21 +382,27 @@ export class EquipmentStep implements OnInit {
     };
   }
 
-  private toInstance(
+  private toInstances(
     item: ResolvedItem,
     map: Map<string, EquipmentRaw>,
-    cats: Map<string, string>,
+    cats: Map<string, string[]>,
     slot: number,
     altIdx: number,
     itemIdx: number,
-  ): EquipmentInstance | null {
-    let eq: EquipmentRaw | undefined;
+  ): EquipmentInstance[] {
     if (item.isCategory) {
       const key = altIdx === -1 ? `${slot}-fixed-${itemIdx}` : `${slot}-${altIdx}-${itemIdx}`;
-      eq = map.get(cats.get(key)!);
-    } else {
-      eq = item.equipment ?? undefined;
+      const picks = cats.get(key) ?? [];
+      return picks
+        .map((pickId) => this.buildInstance(map.get(pickId), 1))
+        .filter((inst): inst is EquipmentInstance => !!inst);
     }
+
+    const inst = this.buildInstance(item.equipment ?? undefined, item.ref.qty);
+    return inst ? [inst] : [];
+  }
+
+  private buildInstance(eq: EquipmentRaw | undefined, qty: number): EquipmentInstance | null {
     if (!eq) return null;
 
     const data = (eq.data ?? {}) as Record<string, any>;
@@ -380,7 +435,7 @@ export class EquipmentStep implements OnInit {
       instanceId: crypto.randomUUID(),
       refId: eq.id,
       name: eq.name,
-      qty: item.ref.qty,
+      qty,
       location: isArmor ? 'equipped' : 'at_hand',
       equipped: isArmor,
       wKg: eq.wKg,
@@ -397,7 +452,12 @@ export class EquipmentStep implements OnInit {
   });
 
   selectFromFixedCategory(slotNumber: number, itemIdx: number, eqId: string): void {
+    const slot = this.resolvedSlots().find((s) => s.slotNumber === slotNumber);
+    const item = slot?.fixedItems[itemIdx];
+    if (!item?.isCategory) return;
+
     const key = `${slotNumber}-fixed-${itemIdx}`;
-    this.pickedCategory.update((m) => new Map(m).set(key, eqId));
+    const needed = this.neededCategoryPicks(item);
+    this.toggleCategoryPick(key, eqId, needed);
   }
 }

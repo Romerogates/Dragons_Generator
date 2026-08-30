@@ -35,6 +35,26 @@ describe('character-export-validation.util', () => {
     expect(result.errors).toEqual([]);
   });
 
+  it('accepts weapon category proficiencies on export', () => {
+    const ok = {
+      schemaVersion: CURRENT_SCHEMA_VERSION,
+      name: 'Guerrier',
+      species: { id: 'spc-humain', label: 'Humain' },
+      classes: [{ classId: 'cls-guerrier', classLabel: 'Guerrier', level: 1, hitDie: 10 }],
+      totalLevel: 1,
+      proficiencies: {
+        weapons: ['wp-cat-simple', 'wp-cat-martial', 'wp-bouclier'],
+        tools: [],
+        armor: [],
+        languages: [],
+      },
+      equipment: [{ refId: 'wp-epee-longue', name: 'Épée longue', qty: 1 }],
+    } as unknown as Character;
+
+    const result = validateCharacterExport(ok);
+    expect(result.valid).toBeTrue();
+  });
+
   it('rejects mastered-choice placeholders in proficiencies and equipment', () => {
     const broken = {
       schemaVersion: CURRENT_SCHEMA_VERSION,

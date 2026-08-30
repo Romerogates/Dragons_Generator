@@ -96,6 +96,10 @@ export class CampaignCloudService {
     );
   }
 
+  removeMember(campaignId: string, memberId: string): Observable<void> {
+    return this.http.delete<void>(`${this.api}/me/campaigns/${campaignId}/members/${memberId}`);
+  }
+
   awardXp(campaignId: string, memberId: string, xp: number): Observable<{ xpEarnedInCampaign: number }> {
     return this.http.post<{ xpEarnedInCampaign: number }>(
       `${this.api}/me/campaigns/${campaignId}/award-xp`,
@@ -128,6 +132,17 @@ export class CampaignCloudService {
   ): Observable<{ id: string; name: string; data: unknown }> {
     return this.http.get<{ id: string; name: string; data: unknown }>(
       `${this.api}/me/campaigns/${campaignId}/pregens/${pregenId}/character`,
+    );
+  }
+
+  getMemberCharacter(
+    campaignId: string,
+    memberId: string,
+    scope: 'proposed' | 'approved' = 'approved',
+  ): Observable<{ id: string; name: string; data: unknown }> {
+    return this.http.get<{ id: string; name: string; data: unknown }>(
+      `${this.api}/me/campaigns/${campaignId}/members/${memberId}/character`,
+      { params: { scope } },
     );
   }
 

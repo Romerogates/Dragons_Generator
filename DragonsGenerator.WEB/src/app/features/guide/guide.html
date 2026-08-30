@@ -4,7 +4,7 @@
       <a routerLink="/" class="text-xs font-black uppercase tracking-widest text-slate-500 hover:text-amber-400 mb-4 inline-block">← Accueil</a>
       <h1 class="text-3xl md:text-4xl font-bold text-amber-400 font-serif mb-2">Guide Dragons Generator</h1>
       <p class="text-slate-400 text-sm max-w-2xl">
-        Tout ce que vous pouvez faire sur le site — création, campagnes, table de jeu, social et codex.
+        Wiki pas-à-pas — création, campagnes, table de jeu, social et codex.
         Outil fan pour <em>Dragons</em>, non affilié à Agate RPG.
       </p>
     </header>
@@ -12,6 +12,8 @@
     <nav class="mb-10 p-4 bg-[#1b2028] border border-slate-800 rounded-xl">
       <p class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-3">Sommaire</p>
       <ul class="grid sm:grid-cols-2 gap-1 text-sm">
+        <li><a href="#journal" class="text-sky-400 hover:text-sky-300">Journal & nouveautés</a></li>
+        <li><a href="#demarrage" class="text-sky-400 hover:text-sky-300">Premiers pas (5 min)</a></li>
         <li><a href="#compte" class="text-sky-400 hover:text-sky-300">Compte & connexion</a></li>
         <li><a href="#personnage" class="text-sky-400 hover:text-sky-300">Création de personnage</a></li>
         <li><a href="#scenario" class="text-sky-400 hover:text-sky-300">Scénarios & campagnes</a></li>
@@ -28,103 +30,226 @@
 
     <article class="prose prose-invert prose-slate max-w-none prose-headings:font-serif prose-headings:text-amber-500 prose-a:text-amber-400 prose-li:marker:text-slate-500">
 
+      <h2 id="journal">Journal & nouveautés</h2>
+      <p class="text-sm text-slate-400 not-prose mb-6">Petites notes de version et astuces — comme un fil d’actualité du site.</p>
+
+      <div class="not-prose space-y-4 mb-10">
+        <article class="p-5 bg-[#1b2028] border border-violet-500/20 rounded-xl">
+          <p class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-1">Août 2026 · Campagnes MJ</p>
+          <h3 class="text-lg font-bold text-slate-100 mb-2">Fiches joueurs dans les campagnes</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Le MJ peut consulter la <strong>fiche complète</strong> d'un joueur approuvé (Résumé ou onglet Joueurs).
+            Lors d'une proposition en attente, boutons <em>Voir la fiche proposée</em> et <em>PDF</em> avant Accepter / Refuser.
+            La synthèse MJ et l'import party en combat utilisent les vraies stats du personnage.
+          </p>
+        </article>
+
+        <article class="p-5 bg-[#1b2028] border border-emerald-500/20 rounded-xl">
+          <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-1">Août 2026 · Équipement & PDF</p>
+          <h3 class="text-lg font-bold text-slate-100 mb-2">Deux armes de guerre pour le Guerrier</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Si vous choisissez l’alternative « 2 armes de guerre » à l’étape Arsenal, cliquez <strong>deux armes différentes</strong> dans la liste.
+            Un compteur <em>1/2 choisi(s)</em> vous guide. L’export PDF accepte désormais les maîtrises de catégorie (armes courantes / de guerre).
+          </p>
+        </article>
+
+        <article class="p-5 bg-[#1b2028] border border-violet-500/20 rounded-xl">
+          <p class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-1">Août 2026 · Campagnes</p>
+          <h3 class="text-lg font-bold text-slate-100 mb-2">Historique des combats & rappels de session</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Le MJ retrouve un résumé repliable de chaque combat terminé. Les sessions planifiées envoient un rappel push
+            <strong>24 h</strong> et <strong>1 h</strong> avant (si les notifications sont activées dans Paramètres).
+          </p>
+        </article>
+
+        <article class="p-5 bg-[#1b2028] border border-sky-500/20 rounded-xl">
+          <p class="text-[10px] font-black uppercase tracking-widest text-sky-400 mb-1">Août 2026 · Initiative</p>
+          <h3 class="text-lg font-bold text-slate-100 mb-2">Collecte d’initiative côté joueurs</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Quand le MJ ouvre la collecte, les joueurs reçoivent une notification et un bandeau sur la campagne.
+            Ils saisissent leur jet sur <code>/campaigns/:id/init</code>. Le MJ peut départager les égalités avec ↑↓.
+          </p>
+        </article>
+      </div>
+
+      <h2 id="demarrage">Premiers pas (5 minutes)</h2>
+      <ol>
+        <li><strong>Créez un compte</strong> — inscription avec confirmation e-mail (<a routerLink="/register">/register</a>).</li>
+        <li><strong>Forgez un héros</strong> — <a routerLink="/create">/create</a>, suivez les étapes jusqu’au récap, téléchargez le PDF.</li>
+        <li><strong>(MJ)</strong> Créez une campagne — <a routerLink="/campaigns">/campaigns</a> → Nouvelle campagne, invitez un ami.</li>
+        <li><strong>(Joueur)</strong> Proposez votre personnage à la campagne et attendez l’approbation du MJ.</li>
+        <li><strong>Activez les notifications</strong> — <a routerLink="/settings">Paramètres</a> → Push PWA, pour ne rien rater en session.</li>
+      </ol>
+
       <h2 id="compte">Compte & connexion</h2>
+      <h3>Créer un compte</h3>
+      <ol>
+        <li>Allez sur <a routerLink="/register">/register</a>.</li>
+        <li>Renseignez e-mail, pseudo unique et mot de passe (8 caractères minimum).</li>
+        <li>Confirmez via le lien reçu par mail (valide ~2 h).</li>
+        <li>Connectez-vous sur <a routerLink="/login">/login</a> — vos personnages sont synchronisés dans le cloud.</li>
+      </ol>
+      <h3>Sans compte</h3>
+      <p>Vous pouvez créer un personnage en brouillon local. À la connexion, le perso en cours peut être sauvegardé automatiquement.</p>
+      <h3>Paramètres utiles</h3>
       <ul>
-        <li><strong>Inscription</strong> — email, pseudo unique, mot de passe 8+ caractères, confirmation par mail.</li>
-        <li><strong>Connexion</strong> — JWT ; vos personnages et campagnes sont synchronisés dans le cloud.</li>
-        <li><strong>Mot de passe oublié</strong> — lien de réinitialisation valide 2 h.</li>
-        <li><strong>Paramètres</strong> (<a routerLink="/settings">/settings</a>) — bio, couleur d’accent, emoji avatar, mot de passe, notifications push.</li>
-        <li><strong>Profil public</strong> (<a routerLink="/profile">/profile</a>) — visible par vos amis.</li>
-        <li>Sans compte : brouillon local des personnages ; à la connexion, le perso en cours peut être sauvegardé.</li>
+        <li><a routerLink="/settings">/settings</a> — bio, couleur d’accent, emoji avatar, mot de passe, notifications push.</li>
+        <li><a routerLink="/profile">/profile</a> — profil public visible par vos amis.</li>
+        <li>Mot de passe oublié — lien de réinitialisation valide 2 h.</li>
       </ul>
 
       <h2 id="personnage">Création de personnage</h2>
       <p>Assistant <a routerLink="/create">Forger un héros</a> — 10 ou 11 étapes selon la classe (magie), niveaux <strong>1 à 20</strong>.</p>
+
+      <h3>Marche à suivre complète</h3>
       <ol>
-        <li>Espèce & sous-espèce</li>
-        <li>Civilisation (carte d’Eana)</li>
-        <li>Historique (prédéfini ou custom)</li>
-        <li>Classe, sous-classe, styles, choix de progression (ASI, invocations sorcier…)</li>
-        <li>Caractéristiques (point-buy)</li>
-        <li>Compétences & maîtrises</li>
-        <li>Équipement de départ</li>
-        <li>Langues</li>
-        <li>Magie (lanceurs) — sorts, grimoire, domaines…</li>
-        <li>Identité — nom, alignement, <strong>backstory IA</strong> (Groq)</li>
-        <li>Récap — PDF fiche + grimoire, sauvegarde cloud</li>
+        <li><strong>Espèce & sous-espèce</strong> — lisez les traits ; certains modifient taille, vitesse ou capacités.</li>
+        <li><strong>Civilisation</strong> — choisissez sur la carte d’Eana (bonus de langues / compétences).</li>
+        <li><strong>Historique</strong> — prédéfini ou custom ; notez les outils et équipement automatiques.</li>
+        <li><strong>Classe</strong> — sous-classe au niveau requis, styles de combat, choix ASI / invocations au fil des niveaux.</li>
+        <li><strong>Caractéristiques</strong> — point-buy ; le total doit être valide avant de continuer.</li>
+        <li><strong>Compétences</strong> — cochez vos maîtrises ; résolvez les choix « au choix » (ex. Lettré : arme ou outil maîtrisé).</li>
+        <li><strong>Équipement de départ</strong> — pour chaque slot, choisissez une alternative puis les objets dans les listes déroulantes.
+          <ul>
+            <li>Catégorie « Arme de guerre » → cliquez une arme concrète dans la grille.</li>
+            <li>Quantité ×2 (Guerrier) → sélectionnez <em>deux armes différentes</em> ; le compteur indique la progression.</li>
+            <li>Points verts en haut = slots complétés.</li>
+          </ul>
+        </li>
+        <li><strong>Langues</strong> — langues connues + choix bonus espèce / civilisation / historique.</li>
+        <li><strong>Magie</strong> (lanceurs) — sorts connus, grimoire, domaines, emplacements.</li>
+        <li><strong>Identité</strong> — nom, alignement, portrait ; backstory IA optionnelle (Groq).</li>
+        <li><strong>Récap</strong> — vérifiez la fiche, <strong>Sauvegarder le héros</strong>, <strong>Télécharger PDF</strong>.</li>
       </ol>
+
+      <div class="not-prose p-4 my-6 bg-amber-950/20 border border-amber-500/30 rounded-xl text-sm text-amber-200/90">
+        <strong>Astuce PDF :</strong> si un message rouge « Export incomplet » apparaît, il reste des choix non faits (arme au choix, placeholder).
+        Revenez à l’étape équipement ou compétences et complétez les sélections avant de sauvegarder.
+      </div>
+
       <p>Bibliothèque <a routerLink="/characters">/characters</a> : voir, éditer, dupliquer, exporter PDF.</p>
 
       <h2 id="scenario">Scénarios & campagnes</h2>
-      <h3>Assistant scénario</h3>
-      <p><a routerLink="/story/create">/story/create</a> — 4 étapes : créatures, personnages (IA vie), aventure (IA 400–600 mots), récap PDF bestiaire + export campagne.</p>
-      <h3>Campagnes multijoueur</h3>
-      <p><a routerLink="/campaigns">/campaigns</a> — hub MJ et joueur.</p>
+      <h3>Assistant scénario (MJ solo)</h3>
+      <ol>
+        <li><a routerLink="/story/create">/story/create</a></li>
+        <li>Étape 1 — sélectionnez les créatures du bestiaire.</li>
+        <li>Étape 2 — générez ou saisissez les PNJ (IA).</li>
+        <li>Étape 3 — synopsis d’aventure (IA, 400–600 mots).</li>
+        <li>Étape 4 — récap : PDF bestiaire + export campagne.</li>
+      </ol>
+
+      <h3>Créer une campagne multijoueur</h3>
+      <ol>
+        <li><a routerLink="/campaigns">/campaigns</a> → <strong>Nouvelle campagne</strong>.</li>
+        <li>Renseignez titre, synopsis, niveau conseillé.</li>
+        <li>Onglet <strong>Joueurs</strong> — invitez des amis (il faut être amis au préalable).</li>
+        <li>Les joueurs proposent un personnage ; vous l’<strong>approuvez</strong> ou refusez après avoir consulté sa fiche complète.</li>
+        <li>Onglet <strong>Rencontres</strong> — préparez vos combats (XP, créatures).</li>
+        <li><strong>Planifiez une session</strong> — date, lieu ; les rappels push partent automatiquement.</li>
+      </ol>
+
+      <h3>Valider un personnage joueur (MJ)</h3>
+      <ol>
+        <li>Onglet <strong>Joueurs</strong> ou bloc <strong>Groupe</strong> sur le Résumé.</li>
+        <li>Quand un joueur propose : cliquez <strong>Voir la fiche proposée</strong> (ou PDF) pour vérifier stats, équipement et sorts.</li>
+        <li><strong>Accepter</strong> ou <strong>Refuser</strong> selon votre décision.</li>
+        <li>Une fois approuvé : <strong>Voir la fiche</strong> reste disponible ; la synthèse MJ et les PDF utilisent ces données.</li>
+      </ol>
+
+      <h3>Côté joueur</h3>
       <ul>
-        <li><strong>MJ</strong> — synopsis, créatures, rencontres, XP, sessions, héros pré-tirés, invitations amis, approbation des persos joueurs.</li>
-        <li><strong>Joueur</strong> — proposer un personnage, voir documents publiés, activité, sessions à venir (sans spoilers MJ).</li>
-        <li>Onglets MJ : Résumé, Activité, Documents, Créatures, Pré-tirés, Rencontres, Joueurs.</li>
-        <li>Onglets joueur : Résumé, Activité, Documents, Pré-tirés, Joueurs.</li>
-        <li><strong>Fil d’activité</strong> — invitations, XP, documents publiés, collecte d’initiative…</li>
-        <li><strong>Sessions</strong> — planifier date/lieu ; rappels push <em>24 h</em> et <em>1 h</em> avant (si notifications activées).</li>
+        <li>Acceptez l’invitation depuis la campagne ou les notifications.</li>
+        <li>Proposez un personnage depuis votre bibliothèque.</li>
+        <li>Consultez l’<strong>Activité</strong> et les <strong>Documents</strong> publiés (sans spoilers MJ).</li>
+        <li>Pré-tirés : le MJ peut vous assigner un personnage prêt à jouer.</li>
       </ul>
 
       <h2 id="table">Table de jeu (MJ)</h2>
       <p>Depuis une campagne : <strong>Démarrer la table</strong> ou route plein écran <code>/campaigns/:id/play</code>.</p>
-      <ul>
-        <li>Notes en direct (sauvegarde auto)</li>
-        <li>Rencontres — +1/−1 kills, sync avec le tracker, distribution XP</li>
-        <li>Terminer la session → notes archivées, statut « jouée »</li>
-      </ul>
+      <h3>Déroulé d’une session</h3>
+      <ol>
+        <li>Cliquez <strong>Démarrer la table</strong> (ou reprenez une session en cours).</li>
+        <li>Prenez des notes en direct — sauvegarde automatique.</li>
+        <li>Lancez une rencontre depuis l’onglet Rencontres ou un combat libre.</li>
+        <li>Gérez les kills (+1/−1) — sync avec le tracker XP.</li>
+        <li><strong>Terminer la session</strong> — notes archivées, statut « jouée », retour au hub campagne.</li>
+      </ol>
 
       <h2 id="initiative">Initiative & combat</h2>
+      <h3>Lancer un combat (MJ)</h3>
+      <ol>
+        <li>Depuis la table de jeu ou une rencontre, ouvrez le tracker de combat.</li>
+        <li>Ajoutez PJ (party approuvée), PNJ et créatures.</li>
+        <li>Saisissez l’initiative ou ouvrez la <strong>collecte</strong>.</li>
+      </ol>
+
+      <h3>Collecte d’initiative (joueurs)</h3>
+      <ol>
+        <li>Le MJ clique <strong>Collecter l’init</strong> — un code et un lien sont générés.</li>
+        <li>Les joueurs reçoivent une notification + bandeau sur la campagne.</li>
+        <li>Chacun ouvre <code>/campaigns/:id/init</code> et saisit son jet d’initiative.</li>
+        <li>Le MJ importe les résultats dans le tracker.</li>
+        <li>Égalités : flèches ↑↓ pour fixer l’ordre entre ex-aequo.</li>
+      </ol>
+
+      <h3>Pendant le combat</h3>
       <ul>
-        <li><strong>Combat autonome</strong> ou import depuis une rencontre / party approuvée</li>
-        <li>Ordre de tour, PV, conditions, mort (sync kills rencontre)</li>
-        <li><strong>Collecter l’init</strong> — code + lien ; joueurs saisissent leur jet sur <code>/campaigns/:id/init</code></li>
-        <li>Bandeau joueur + push quand la collecte s’ouvre</li>
-        <li>Flèches ↑↓ pour départager les égalités d’initiative</li>
-        <li><strong>Fin combat</strong> — résumé dans les notes + entrée dans l’<strong>historique des combats</strong> (repliable)</li>
+        <li>Ordre de tour, PV, conditions, mort (sync kills rencontre).</li>
+        <li><strong>Fin combat</strong> — résumé dans les notes + entrée dans l’<strong>historique des combats</strong> (repliable, MJ uniquement).</li>
       </ul>
 
       <h2 id="documents">Documents joueurs (handouts)</h2>
-      <ul>
-        <li>MJ : onglet Documents — créer, types (letter, carte, résumé…), markdown léger (<code>**gras**</code>, <code># titres</code>, listes)</li>
-        <li>Publier → visible joueurs, push, activité cliquable</li>
-        <li>Joueur : aperçu depuis l’activité ou l’onglet Documents</li>
-      </ul>
+      <h3>Publier un document (MJ)</h3>
+      <ol>
+        <li>Campagne → onglet <strong>Documents</strong> → Créer.</li>
+        <li>Choisissez le type (letter, carte, résumé…).</li>
+        <li>Rédigez en markdown léger : <code>**gras**</code>, <code># titres</code>, listes.</li>
+        <li><strong>Publier</strong> — visible joueurs, push envoyé, entrée dans l’activité.</li>
+      </ol>
+      <h3>Lire un document (joueur)</h3>
+      <p>Cliquez l’entrée dans l’<strong>Activité</strong> ou ouvrez l’onglet <strong>Documents</strong> de la campagne.</p>
 
       <h2 id="social">Amis, chat & profils</h2>
-      <ul>
-        <li><a routerLink="/friends">/friends</a> — recherche, demandes, liste d’amis</li>
-        <li>Chat privé — messages, pièces jointes légères (fiche perso, campagne)</li>
-        <li>Invitations campagne via amis</li>
-        <li>Profils avec bio, avatar emoji, couleur</li>
-      </ul>
+      <ol>
+        <li><a routerLink="/friends">/friends</a> — recherchez un pseudo, envoyez une demande.</li>
+        <li>Une fois amis, chat privé disponible (messages + pièces jointes légères).</li>
+        <li>Invitez des amis directement lors de la création / édition de campagne.</li>
+        <li>Profils publics : bio, avatar emoji, couleur d’accent.</li>
+      </ol>
 
       <h2 id="notifications">Notifications & PWA</h2>
-      <ul>
-        <li>Centre <a routerLink="/notifications">/notifications</a> — amis, campagnes, validations</li>
-        <li><strong>Push PWA</strong> — activer dans Paramètres ; sessions, documents, initiative, messages…</li>
-        <li>Installable sur mobile (raccourci écran d’accueil)</li>
-        <li>Mode hors-ligne partiel — cache profils consultés</li>
-      </ul>
+      <ol>
+        <li>Ouvrez <a routerLink="/settings">Paramètres</a> → section Push PWA → <strong>Activer</strong>.</li>
+        <li>Acceptez la permission du navigateur (Chrome / Edge recommandés).</li>
+        <li>Installez l’app : « Ajouter à l’écran d’accueil » sur mobile.</li>
+        <li>Centre <a routerLink="/notifications">/notifications</a> — historique : amis, campagnes, validations, sessions, initiative.</li>
+      </ol>
+      <p>Événements notifiés : rappels session (24 h / 1 h), document publié, collecte d’initiative, messages, invitations campagne.</p>
 
       <h2 id="codex">Codex (données de jeu)</h2>
-      <p>Référence lazy-loaded : espèces, classes, civilisations, équipements, sorts, bestiaire, compétences, dons, historiques, actions de combat, divinités — fiches en cartes résumé + détail.</p>
+      <p>Référence lazy-loaded : espèces, classes, civilisations, équipements, sorts, bestiaire, compétences, dons, historiques, actions de combat, divinités.</p>
+      <p>Utilisez le codex pendant la création de personnage pour comparer les options avant de valider une étape.</p>
 
       <h2 id="pdf">PDF & exports</h2>
+      <h3>Fiche personnage</h3>
+      <ol>
+        <li>Terminez le wizard jusqu’au récap (étape 10 ou 11).</li>
+        <li>Vérifiez l’aperçu — aucun message d’erreur rouge en bas.</li>
+        <li><strong>Sauvegarder le héros</strong> (cloud) puis <strong>Télécharger PDF</strong>.</li>
+        <li>Grimoire séparé pour les lanceurs de sorts.</li>
+      </ol>
+      <h3>Autres exports</h3>
       <ul>
-        <li>Fiche personnage + grimoire (fond parchemin calibré)</li>
-        <li>Campagne — bestiaire, pack MJ, fiches joueurs, accroche pré-tirés</li>
-        <li>Scénario — export Markdown, PDF créatures</li>
+        <li>Campagne — bestiaire, pack MJ, fiches joueurs, accroche pré-tirés.</li>
+        <li>Scénario — export Markdown, PDF créatures.</li>
       </ul>
 
       <h2 id="support">Support & admin</h2>
       <ul>
-        <li><a routerLink="/support">/support</a> — ticket bug/question + pièce jointe (connecté)</li>
+        <li><a routerLink="/support">/support</a> — ticket bug/question + pièce jointe (connecté).</li>
         <li><a routerLink="/legal/privacy">Confidentialité</a> · <a routerLink="/legal/terms">Conditions</a></li>
-        <li>Admin (<code>/admin</code>) — utilisateurs et tickets (rôle admin uniquement)</li>
+        <li>Admin (<code>/admin</code>) — utilisateurs et tickets (rôle admin uniquement).</li>
       </ul>
 
       <hr class="border-slate-800" />
