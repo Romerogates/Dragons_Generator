@@ -109,4 +109,13 @@ export class CombatActionsList {
     if (!cost) return 'fluent-emoji:crossed-swords';
     return COST_ICONS[cost] ?? 'fluent-emoji:crossed-swords';
   }
+
+  actionSummary(action: CombatAction): string {
+    const desc = action.description?.trim();
+    if (desc) {
+      const short = desc.slice(0, 180);
+      return short + (desc.length > 180 ? '…' : '');
+    }
+    return `${this.costLabel(action.actionCost)} — ${this.categoryLabel(action.category).toLowerCase()}.`;
+  }
 }

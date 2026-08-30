@@ -42,6 +42,7 @@ import { ADVENTURE_TONE_LABELS } from '@core/models/Story/story';
 import { formatChallengeRating, getCreatureCategoryLabel } from '@core/utils/creature-display.util';
 import { StoryBuilderService } from '@core/services/story-builder.service';
 import { CampaignPregenGeneratorService } from '@core/services/campaign-pregen-generator.service';
+import { CampaignPlayPanel } from '../campaign-play-panel/campaign-play-panel';
 import { firstValueFrom } from 'rxjs';
 
 type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'activity';
@@ -49,7 +50,7 @@ type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'ac
 @Component({
   selector: 'app-campaign-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ProfileAvatarComponent],
+  imports: [CommonModule, FormsModule, RouterLink, ProfileAvatarComponent, CampaignPlayPanel],
   templateUrl: './campaign-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -148,32 +149,13 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   protected encounterPendingXp = encounterPendingXp;
 
   startPlaySession(sessionId: string): void {
-    if (!this.campaign()?.isOwner) return;
-    this.flushSessionSave();
-    this.saveData({ activeSessionId: sessionId });
-    this.tab.set('overview');
-  }
-
-  endPlaySession(): void {
     const c = this.campaign();
-    const session = this.activeSession();
-    if (!c?.isOwner || !session) return;
-    if (!confirm('Terminer la session en cours ? Les notes de jeu seront archivées.')) return;
+    if (!c?.isOwner) return;
     this.flushSessionSave();
-    const sessions = (c.data.sessions ?? []).map((s) => {
-      if (s.id !== session.id) return s;
-      const playBlock = s.playNotes?.trim();
-      const mergedNotes = playBlock
-        ? [s.notes?.trim(), playBlock].filter(Boolean).join('\n\n--- Notes de session ---\n\n')
-        : s.notes;
-      return {
-        ...s,
-        status: 'played' as CampaignSessionStatus,
-        notes: mergedNotes || s.notes,
-        playNotes: '',
-      };
-    });
-    this.saveData({ sessions, activeSessionId: null });
+    const data = { ...c.data, activeSessionId: sessionId };
+    this.campaign.update((prev) => (prev ? { ...prev, data } : prev));
+    this.persist(c.title, data);
+    this.router.navigate(['/campaigns', c.id, 'play']);
   }
 
   ngOnInit(): void {

@@ -117,6 +117,12 @@ export const routes: Routes = [
       import('@features/campaigns/campaign-detail/campaign-detail').then((m) => m.CampaignDetailPage),
   },
   {
+    path: 'campaigns/:id/play',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('@features/campaigns/campaign-play/campaign-play').then((m) => m.CampaignPlayPage),
+  },
+  {
     path: 'friends',
     loadComponent: () => import('@features/friends/friends').then((m) => m.FriendsPage),
   },

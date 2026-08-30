@@ -71,4 +71,14 @@ export class DeitiesList {
     if (t === 'entropique') return 'fluent-emoji:new-moon';
     return 'fluent-emoji:star';
   }
+
+  deitySummary(deity: Deity): string {
+    const desc = deity.description?.trim();
+    if (desc) {
+      const short = desc.slice(0, 180);
+      return short + (desc.length > 180 ? '…' : '');
+    }
+    const domains = deity.domains.slice(0, 2).join(', ');
+    return `Divinité ${this.tonalityLabel(deity.tonality).toLowerCase()}${domains ? ` — ${domains}` : ''}.`;
+  }
 }

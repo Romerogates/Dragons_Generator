@@ -1,116 +1,157 @@
-<div
-  class="w-full flex flex-col animate-fade-in select-none bg-[#171b22] text-slate-300 min-h-screen pb-20"
->
-  <section
-    class="relative w-full flex flex-col items-center border-b border-slate-800 pt-16 pb-12 md:pt-24 md:pb-16"
-  >
-    <div class="relative z-10 flex flex-col items-center text-center px-4 w-full max-w-4xl">
-      <h1 class="text-4xl md:text-5xl font-extrabold text-slate-100 font-serif tracking-widest uppercase mb-4">
-        Divinités d'Eana
+<div class="w-full min-h-screen bg-[#171b22] flex flex-col animate-fade-in select-none pb-20">
+  <section class="w-full py-16 px-4 max-w-7xl mx-auto flex flex-col items-center">
+    <div class="flex items-center gap-6 mb-4 w-full max-w-3xl">
+      <div class="h-px flex-grow bg-gradient-to-r from-transparent to-slate-700"></div>
+      <h1
+        class="text-3xl md:text-4xl font-bold text-slate-200 font-serif tracking-widest uppercase drop-shadow-md text-center"
+      >
+        Divinités d'<span class="text-violet-400">Eana</span>
       </h1>
-      <p class="text-sm text-slate-400 italic mb-8 max-w-xl font-serif">
-        Les huit forces divines — harmoniques et entropiques — qui façonnent le panthéon.
-      </p>
+      <div class="h-px flex-grow bg-gradient-to-l from-transparent to-slate-700"></div>
+    </div>
 
-      <div class="flex flex-wrap justify-center gap-2 mb-6">
-        <button
-          type="button"
-          class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border"
-          [class]="
-            tonalityFilter() === null
-              ? 'bg-violet-950/40 border-violet-500 text-violet-300'
-              : 'bg-[#1b2028] border-slate-700 text-slate-400'
-          "
-          (click)="tonalityFilter.set(null)"
-        >
-          Toutes
-        </button>
-        <button
-          type="button"
-          class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border"
-          [class]="
-            tonalityFilter() === 'harmonique'
-              ? 'bg-amber-950/40 border-amber-500 text-amber-400'
-              : 'bg-[#1b2028] border-slate-700 text-slate-400'
-          "
-          (click)="tonalityFilter.set('harmonique')"
-        >
-          Harmoniques
-        </button>
-        <button
-          type="button"
-          class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border"
-          [class]="
-            tonalityFilter() === 'entropique'
-              ? 'bg-slate-800 border-slate-500 text-slate-300'
-              : 'bg-[#1b2028] border-slate-700 text-slate-400'
-          "
-          (click)="tonalityFilter.set('entropique')"
-        >
-          Entropiques
-        </button>
-      </div>
+    <p class="text-slate-400 text-sm md:text-base max-w-xl mx-auto italic text-center mb-8">
+      Les huit forces divines — harmoniques et entropiques — qui façonnent le panthéon.
+    </p>
 
+    <div class="flex flex-wrap justify-center gap-2 mb-6">
+      <button
+        type="button"
+        class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors"
+        [class]="
+          tonalityFilter() === null
+            ? 'bg-violet-950/40 border-violet-500 text-violet-300'
+            : 'bg-[#1b2028] border-slate-700 text-slate-400'
+        "
+        (click)="tonalityFilter.set(null)"
+      >
+        Toutes
+      </button>
+      <button
+        type="button"
+        class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors"
+        [class]="
+          tonalityFilter() === 'harmonique'
+            ? 'bg-amber-950/40 border-amber-500 text-amber-400'
+            : 'bg-[#1b2028] border-slate-700 text-slate-400'
+        "
+        (click)="tonalityFilter.set('harmonique')"
+      >
+        Harmoniques
+      </button>
+      <button
+        type="button"
+        class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors"
+        [class]="
+          tonalityFilter() === 'entropique'
+            ? 'bg-slate-800 border-slate-500 text-slate-300'
+            : 'bg-[#1b2028] border-slate-700 text-slate-400'
+        "
+        (click)="tonalityFilter.set('entropique')"
+      >
+        Entropiques
+      </button>
+    </div>
+
+    <div class="relative w-full max-w-md group mb-10">
       <input
         type="search"
         placeholder="Rechercher une divinité..."
         [value]="search()"
         (input)="onSearch($any($event.target).value)"
-        class="w-full max-w-lg bg-[#1b2028] border-2 border-slate-700 rounded-full py-4 px-6 text-sm text-slate-200"
+        class="w-full bg-[#1b2028] border border-slate-700 rounded-full py-3 px-6 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-violet-500/50"
       />
     </div>
-  </section>
 
-  <section class="w-full px-4 max-w-5xl mx-auto mt-10">
     @if (error(); as errorMsg) {
-      <p class="text-center text-red-400 py-20">{{ errorMsg }}</p>
+      <p class="text-center text-red-400 py-12">{{ errorMsg }}</p>
     } @else if (deities() === null) {
-      <p class="text-center text-slate-500 py-20 animate-pulse">Chargement...</p>
+      <p class="text-center text-slate-500 py-12 animate-pulse">Chargement...</p>
     } @else {
-      <p class="text-violet-400/80 text-[10px] font-black uppercase tracking-widest mb-6">
-        {{ filteredDeities().length }} divinité(s)
-      </p>
+      <div class="w-full mb-6 flex justify-between items-end border-b border-slate-800 pb-2">
+        <p class="text-violet-400/80 text-[10px] font-black uppercase tracking-widest">
+          {{ filteredDeities().length }} divinité(s)
+        </p>
+      </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
         @for (deity of filteredDeities(); track deity.id) {
           <article
-            class="bg-[#1b2028] rounded-2xl border border-slate-800 p-6 hover:border-violet-500/50 transition-[colors,transform,opacity,box-shadow] duration-200"
+            class="bg-[#1b2028] rounded-2xl border border-slate-800 shadow-xl group hover:border-violet-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 hover:-translate-y-1 flex flex-col overflow-hidden relative"
           >
-            <header class="flex items-start gap-4 mb-4">
-              <span class="text-4xl"
-                ><iconify-icon [icon]="tonalityIcon(deity.tonality)"></iconify-icon
-              ></span>
-              <div>
-                <h2 class="text-2xl font-bold text-violet-300 font-serif">
-                  <a [routerLink]="['/deities', deity.id]" class="hover:underline">{{
-                    deity.name
-                  }}</a>
-                </h2>
-                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">{{
-                  tonalityLabel(deity.tonality)
-                }}</span>
-              </div>
-            </header>
-            @if (deity.otherNames.length > 0) {
-              <p class="text-[10px] text-slate-500 mb-3 italic">
-                Aussi : {{ deity.otherNames.join(', ') }}
-              </p>
-            }
-            <p class="text-xs text-slate-400 line-clamp-4 mb-4">{{ deity.description }}</p>
-            @if (deity.domains.length > 0) {
-              <div class="flex flex-wrap gap-1 mb-4">
-                @for (dom of deity.domains; track dom) {
-                  <span class="bg-slate-900 text-slate-500 px-2 py-0.5 rounded text-[9px] uppercase">{{ dom }}</span>
-                }
-              </div>
-            }
-            <a
-              [routerLink]="['/deities', deity.id]"
-              class="block text-center bg-violet-950/20 text-violet-400 border border-violet-900/30 rounded-lg py-2 text-[10px] font-black uppercase tracking-widest"
+            <div
+              class="absolute -top-6 -right-6 text-8xl opacity-5 pointer-events-none group-hover:scale-[1.01] transition-transform duration-500"
             >
-              En savoir plus
-            </a>
+              <iconify-icon [icon]="tonalityIcon(deity.tonality)"></iconify-icon>
+            </div>
+
+            <div class="p-6 md:p-8 flex flex-col flex-grow relative z-10">
+              <header class="mb-4 flex items-start gap-3">
+                <span class="text-3xl drop-shadow-md leading-none shrink-0 pt-1">
+                  <iconify-icon [icon]="tonalityIcon(deity.tonality)" width="1em" height="1em"></iconify-icon>
+                </span>
+                <div class="min-w-0">
+                  <h2 class="text-2xl font-bold text-violet-300 font-serif tracking-wide mb-1">
+                    <a
+                      [routerLink]="['/deities', deity.id]"
+                      class="hover:underline decoration-violet-500/30 underline-offset-4"
+                    >
+                      {{ deity.name }}
+                    </a>
+                  </h2>
+                  <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest">
+                    {{ tonalityLabel(deity.tonality) }}
+                  </p>
+                </div>
+              </header>
+
+              <p class="text-sm text-slate-400 leading-relaxed italic line-clamp-3 mb-6 flex-grow">
+                « {{ deitySummary(deity) }} »
+              </p>
+
+              <div class="grid grid-cols-2 gap-3 mb-6">
+                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
+                  <span class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1"
+                    >Tonalité</span
+                  >
+                  <span class="text-xs text-violet-300 font-medium">{{
+                    tonalityLabel(deity.tonality)
+                  }}</span>
+                </div>
+                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
+                  <span class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1"
+                    >Domaines</span
+                  >
+                  <span class="text-xs text-slate-200 font-medium">{{
+                    deity.domains.length || '—'
+                  }}</span>
+                </div>
+              </div>
+
+              @if (deity.domains.length > 0) {
+                <div class="flex flex-wrap gap-1 mb-4">
+                  @for (dom of deity.domains.slice(0, 3); track dom) {
+                    <span
+                      class="bg-slate-900 text-slate-500 px-2 py-0.5 rounded text-[9px] uppercase"
+                      >{{ dom }}</span
+                    >
+                  }
+                  @if (deity.domains.length > 3) {
+                    <span class="text-[9px] text-slate-600 self-center">+{{ deity.domains.length - 3 }}</span>
+                  }
+                </div>
+              }
+
+              <a
+                [routerLink]="['/deities', deity.id]"
+                class="mt-auto block text-center bg-violet-950/20 text-violet-400 border border-violet-900/30 rounded-lg py-2.5 text-[10px] font-black uppercase tracking-widest hover:border-violet-500/50 transition-colors"
+              >
+                Voir le détail
+              </a>
+            </div>
           </article>
+        } @empty {
+          <p class="col-span-full text-center text-slate-500 italic py-16">Aucune divinité trouvée.</p>
         }
       </div>
     }
