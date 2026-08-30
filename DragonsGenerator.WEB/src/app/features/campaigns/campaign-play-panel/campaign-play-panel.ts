@@ -64,9 +64,11 @@ export class CampaignPlayPanel implements OnDestroy {
 
   readonly saving = signal(false);
   readonly importingParty = signal(false);
+  readonly feedback = signal<{ kind: 'ok' | 'err'; text: string } | null>(null);
 
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
   private initiativePollTimer: ReturnType<typeof setInterval> | null = null;
+  private feedbackTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly activeSession = computed(() => {
     const c = this.campaign();
@@ -113,6 +115,24 @@ export class CampaignPlayPanel implements OnDestroy {
     this.players().filter((p) => p.proposalStatus === 'approved' && p.approvedCharacterId),
   );
 
+  readonly combatMissingInitCount = computed(() => {
+    const combat = this.activeCombat();
+    if (!combat) return 0;
+    return combat.combatants.filter(
+      (c) => !isCombatantDefeated(c) && combatantInitiativeTotal(c) == null,
+    ).length;
+  });
+
+  readonly combatMissingHpCount = computed(() => {
+    const combat = this.activeCombat();
+    if (!combat) return 0;
+    return combat.combatants.filter(
+      (c) =>
+        !isCombatantDefeated(c) &&
+        (c.currentHp === undefined || c.currentHp === null || c.maxHp === undefined || c.maxHp === null),
+    ).length;
+  });
+
   protected encounterTotalXp = encounterTotalXp;
   protected encounterPendingXp = encounterPendingXp;
   protected combatantInitiativeTotal = combatantInitiativeTotal;
@@ -122,6 +142,38 @@ export class CampaignPlayPanel implements OnDestroy {
   ngOnDestroy(): void {
     this.flushSessionSave();
     this.stopInitiativePoll();
+    if (this.feedbackTimer) clearTimeout(this.feedbackTimer);
+  }
+
+  clearFeedback(): void {
+    this.feedback.set(null);
+    if (this.feedbackTimer) {
+      clearTimeout(this.feedbackTimer);
+      this.feedbackTimer = null;
+    }
+  }
+
+  private setFeedback(kind: 'ok' | 'err', text: string, ttlMs = 4500): void {
+    this.feedback.set({ kind, text });
+    if (this.feedbackTimer) clearTimeout(this.feedbackTimer);
+    this.feedbackTimer = setTimeout(() => {
+      this.feedback.set(null);
+      this.feedbackTimer = null;
+    }, ttlMs);
+  }
+
+  combatantNeedsInit(cb: Combatant): boolean {
+    return !isCombatantDefeated(cb) && combatantInitiativeTotal(cb) == null;
+  }
+
+  combatantNeedsHp(cb: Combatant): boolean {
+    return (
+      !isCombatantDefeated(cb) &&
+      (cb.currentHp === undefined ||
+        cb.currentHp === null ||
+        cb.maxHp === undefined ||
+        cb.maxHp === null)
+    );
   }
 
   formatSessionDate(iso: string): string {
@@ -185,37 +237,66 @@ export class CampaignPlayPanel implements OnDestroy {
 
     const approved = this.approvedPlayers();
     if (!approved.length) {
-      if (!this.activeCombat()) {
-        this.startStandaloneCombat();
-      }
+      this.setFeedback(
+        'err',
+        'Aucun personnage joueur approuvé. Ajoutez des combattants manuellement.',
+      );
       return;
     }
 
     this.importingParty.set(true);
+    this.clearFeedback();
     const campaignId = this.campaign().id;
-    const requests = approved.map((p) =>
+    const existing = this.activeCombat();
+    const existingMemberIds = new Set(
+      (existing?.combatants ?? [])
+        .map((c) => c.memberUserId)
+        .filter((id): id is string => !!id),
+    );
+
+    const toImport = approved.filter((p) => !existingMemberIds.has(p.userId));
+    if (!toImport.length) {
+      this.importingParty.set(false);
+      this.setFeedback('ok', 'Tous les PJ approuvés sont déjà dans le combat.');
+      return;
+    }
+
+    type ImportRow = { combatant: Combatant; incomplete: boolean };
+    const requests = toImport.map((p) =>
       this.campaigns.getMemberCharacter(campaignId, p.id, 'approved').pipe(
-        map((res) => {
-          const character = { ...(res.data as object), name: res.name ?? p.approvedCharacterName } as Character;
-          return this.combatantFromCharacter(character, p.userId);
+        map((res): ImportRow => {
+          const character = {
+            ...(res.data as object),
+            name: res.name ?? p.approvedCharacterName,
+          } as Character;
+          const combatant = this.combatantFromCharacter(character, p.userId);
+          const incomplete =
+            combatant.maxHp === undefined ||
+            combatant.maxHp === null ||
+            combatant.currentHp === undefined;
+          return { combatant, incomplete };
         }),
         catchError(() =>
-          of(
-            createCombatant({
+          of({
+            combatant: createCombatant({
               name: p.approvedCharacterName ?? p.displayName,
               kind: 'player',
               initiativeBonus: 0,
               memberUserId: p.userId,
             }),
-          ),
+            incomplete: true,
+          } satisfies ImportRow),
         ),
       ),
     );
 
     forkJoin(requests).subscribe({
-      next: (partyCombatants) => {
+      next: (rows) => {
         this.importingParty.set(false);
-        const existing = this.activeCombat();
+        const partyCombatants = rows.map((r) => r.combatant);
+        const incomplete = rows.filter((r) => r.incomplete).length;
+        const skipped = approved.length - toImport.length;
+
         if (existing) {
           this.patchCombat({
             ...existing,
@@ -224,8 +305,18 @@ export class CampaignPlayPanel implements OnDestroy {
         } else {
           this.setActiveCombat(createActiveCombat(partyCombatants, { label: 'Party' }));
         }
+
+        const parts = [`+${partyCombatants.length} PJ importé(s)`];
+        if (skipped > 0) parts.push(`${skipped} déjà présent(s) ignoré(s)`);
+        if (incomplete > 0) {
+          parts.push(`${incomplete} fiche(s) incomplète(s) — vérifiez PV / init`);
+        }
+        this.setFeedback(incomplete > 0 ? 'err' : 'ok', parts.join(' · '));
       },
-      error: () => this.importingParty.set(false),
+      error: () => {
+        this.importingParty.set(false);
+        this.setFeedback('err', 'Impossible d’importer la party. Réessayez.');
+      },
     });
   }
 
@@ -241,6 +332,7 @@ export class CampaignPlayPanel implements OnDestroy {
     const playNotes = [session.playNotes?.trim(), archive].filter(Boolean).join('\n\n');
     const combatHistory = [...(session.combatHistory ?? []), entry];
     this.patchSession({ activeCombat: null, playNotes, combatHistory }, { immediate: true });
+    this.setFeedback('ok', 'Combat terminé — résumé ajouté aux notes et à l’historique.');
   }
 
   formatCombatHistoryDate(iso: string): string {
@@ -282,6 +374,9 @@ export class CampaignPlayPanel implements OnDestroy {
   removeCombatant(combatantId: string): void {
     const combat = this.activeCombat();
     if (!combat) return;
+    const target = combat.combatants.find((c) => c.id === combatantId);
+    const label = target?.name?.trim() || 'ce combattant';
+    if (!confirm(`Retirer ${label} du combat ?`)) return;
     const combatants = combat.combatants.filter((c) => c.id !== combatantId);
     const turnIndex = Math.min(combat.turnIndex, Math.max(0, combatants.length - 1));
     this.patchCombat({ ...combat, combatants, turnIndex }, { immediate: true });
@@ -423,8 +518,18 @@ export class CampaignPlayPanel implements OnDestroy {
 
   copyInitiativeLink(): void {
     const url = this.initiativeShareUrl();
-    if (!url || !navigator.clipboard) return;
-    void navigator.clipboard.writeText(url);
+    if (!url) {
+      this.setFeedback('err', 'Aucun lien à copier — ouvrez d’abord la collecte.');
+      return;
+    }
+    if (!navigator.clipboard?.writeText) {
+      this.setFeedback('err', 'Presse-papiers indisponible dans ce navigateur.');
+      return;
+    }
+    void navigator.clipboard.writeText(url).then(
+      () => this.setFeedback('ok', 'Lien d’initiative copié.'),
+      () => this.setFeedback('err', 'Impossible de copier le lien.'),
+    );
   }
 
   submittedPlayerCount(): number {
@@ -518,27 +623,60 @@ export class CampaignPlayPanel implements OnDestroy {
 
   distributeEncounterXp(encounter: EncounterGroup): void {
     const c = this.campaign();
-    if (!c.isOwner || encounter.xpAwarded) return;
+    if (!c.isOwner || encounter.xpAwarded) {
+      this.setFeedback('err', 'XP déjà distribuée ou action impossible.');
+      return;
+    }
     const xpGained = encounterTotalXp(encounter);
-    if (xpGained <= 0) return;
+    if (xpGained <= 0) {
+      this.setFeedback('err', 'Aucun XP à distribuer pour cette rencontre.');
+      return;
+    }
 
     const approved = this.players().filter((p) => p.proposalStatus === 'approved');
-    if (approved.length === 0) return;
+    if (approved.length === 0) {
+      this.setFeedback('err', 'Aucun joueur avec personnage approuvé.');
+      return;
+    }
 
     const share = Math.floor(xpGained / approved.length);
-    if (share <= 0) return;
+    if (share <= 0) {
+      this.setFeedback('err', 'Part d’XP trop faible à répartir.');
+      return;
+    }
 
     let completed = 0;
+    let failed = 0;
     for (const player of approved) {
       this.campaigns.awardXp(c.id, player.id, share).subscribe({
         next: () => {
           completed++;
-          if (completed === approved.length) {
-            const encounters = c.data.encounters.map((e) =>
-              e.id === encounter.id ? { ...e, xpAwarded: true } : e,
+          if (completed + failed === approved.length) {
+            if (failed === 0) {
+              const encounters = c.data.encounters.map((e) =>
+                e.id === encounter.id ? { ...e, xpAwarded: true } : e,
+              );
+              this.saveData({ encounters });
+              this.reload();
+              this.setFeedback(
+                'ok',
+                `+${share} XP × ${approved.length} joueur(s) (${xpGained} XP total).`,
+              );
+            } else {
+              this.setFeedback(
+                'err',
+                `XP partiellement envoyée (${completed}/${approved.length}). Réessayez.`,
+              );
+            }
+          }
+        },
+        error: () => {
+          failed++;
+          if (completed + failed === approved.length) {
+            this.setFeedback(
+              'err',
+              `Échec XP (${completed}/${approved.length} OK). Vérifiez la connexion.`,
             );
-            this.saveData({ encounters });
-            this.reload();
           }
         },
       });
@@ -650,7 +788,10 @@ export class CampaignPlayPanel implements OnDestroy {
         this.campaignChange.emit({ ...c, data });
         this.saving.set(false);
       },
-      error: () => this.saving.set(false),
+      error: () => {
+        this.saving.set(false);
+        this.setFeedback('err', 'Sauvegarde échouée — vérifiez la connexion.', 6000);
+      },
     });
   }
 
