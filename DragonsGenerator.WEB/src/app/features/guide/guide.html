@@ -17,15 +17,20 @@
       </a>
       <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
         <div class="max-w-2xl">
-          <p class="text-[10px] font-black uppercase tracking-[0.35em] text-amber-500/80 mb-3">
-            Wiki officiel · Dragons Generator
-          </p>
+          <div class="flex flex-wrap items-center gap-2 mb-3">
+            <p class="text-[10px] font-black uppercase tracking-[0.35em] text-amber-500/80">
+              Wiki · Dragons Generator
+            </p>
+            <span class="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-slate-800 text-slate-500 border border-slate-700">
+              v{{ guideVersion }} · {{ guideUpdatedAt }}
+            </span>
+          </div>
           <h1 class="text-4xl md:text-5xl font-bold text-slate-100 font-serif mb-4 leading-tight">
             Guide du <span class="text-amber-400">forgeron</span>
           </h1>
           <p class="text-slate-400 text-base leading-relaxed">
-            Tout ce qu’il faut pour créer un personnage, animer une campagne ou jouer à la table —
-            structuré par rôle, avec des parcours visuels et des raccourcis directs.
+            Wiki complet : parcours MJ ou joueur, schémas, checklists, FAQ et glossaire —
+            sans jargon technique.
           </p>
           <p class="text-xs text-slate-600 mt-3 italic">
             Outil fan pour <em>Dragons</em> · non affilié à Agate RPG
@@ -44,21 +49,66 @@
           }
         </div>
       </div>
+
+      <!-- Audience switch -->
+      <div class="mt-10 flex flex-col sm:flex-row sm:items-center gap-3">
+        <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 shrink-0">Je suis…</p>
+        <div class="inline-flex p-1 rounded-xl bg-[#1b2028] border border-slate-800 gap-1">
+          <button
+            type="button"
+            class="px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors"
+            [class]="audience() === 'all' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:text-slate-200'"
+            (click)="setAudience('all')"
+          >
+            Tout voir
+          </button>
+          <button
+            type="button"
+            class="px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors"
+            [class]="audience() === 'dm' ? 'bg-violet-600 text-white' : 'text-slate-400 hover:text-slate-200'"
+            (click)="setAudience('dm')"
+          >
+            Maître du jeu
+          </button>
+          <button
+            type="button"
+            class="px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors"
+            [class]="audience() === 'player' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-slate-200'"
+            (click)="setAudience('player')"
+          >
+            Joueur
+          </button>
+        </div>
+        <p class="text-xs text-slate-600">
+          @if (audience() === 'dm') {
+            Sections MJ mises en avant · parcours joueur masqué.
+          } @else if (audience() === 'player') {
+            Sections joueur mises en avant · outils MJ masqués.
+          } @else {
+            Guide complet pour toute la table.
+          }
+        </p>
+      </div>
     </div>
   </header>
 
   <div class="max-w-6xl mx-auto px-4 py-10">
     <div class="lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10 xl:gap-14">
-      <!-- Sidebar -->
+      <!-- Sidebar + scrollspy -->
       <aside class="hidden lg:block">
-        <nav class="sticky top-6 space-y-1">
+        <nav class="sticky top-6 space-y-0.5 max-h-[calc(100vh-3rem)] overflow-y-auto pr-1">
           <p class="text-[10px] font-black uppercase tracking-widest text-slate-600 mb-3 px-3">
             Sommaire
           </p>
-          @for (item of nav; track item.id) {
+          @for (item of nav(); track item.id) {
             <a
               [href]="'#' + item.id"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-slate-100 hover:bg-[#1b2028] border border-transparent hover:border-slate-800 transition-colors"
+              class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm border transition-colors"
+              [class]="
+                activeSection() === item.id
+                  ? 'bg-[#1b2028] border-amber-500/40 text-slate-100'
+                  : 'border-transparent text-slate-400 hover:text-slate-100 hover:bg-[#1b2028] hover:border-slate-800'
+              "
             >
               <span class="text-lg shrink-0 {{ item.accent }}"
                 ><iconify-icon [icon]="item.icon"></iconify-icon
@@ -69,12 +119,16 @@
         </nav>
       </aside>
 
-      <!-- Mobile nav chips -->
       <nav class="lg:hidden flex flex-wrap gap-2 mb-10 pb-6 border-b border-slate-800">
-        @for (item of nav; track item.id) {
+        @for (item of nav(); track item.id) {
           <a
             [href]="'#' + item.id"
-            class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#1b2028] border border-slate-800 text-slate-400 hover:border-amber-500/40 hover:text-amber-400"
+            class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider border transition-colors"
+            [class]="
+              activeSection() === item.id
+                ? 'bg-amber-500/15 border-amber-500/50 text-amber-300'
+                : 'bg-[#1b2028] border-slate-800 text-slate-400'
+            "
           >
             {{ item.label }}
           </a>
@@ -82,38 +136,71 @@
       </nav>
 
       <main class="min-w-0 space-y-20">
+        <!-- Parcours -->
+        <section id="parcours" class="scroll-mt-24">
+          <div class="flex items-start gap-4 mb-8">
+            <div class="w-14 h-14 rounded-2xl bg-amber-950/40 border border-amber-800/40 flex items-center justify-center text-3xl shrink-0">
+              <iconify-icon icon="fluent-emoji:compass"></iconify-icon>
+            </div>
+            <div>
+              <h2 class="text-2xl font-bold text-slate-100 font-serif">Parcours recommandés</h2>
+              <p class="text-sm text-slate-500 mt-1">Choisissez votre rôle ci-dessus pour filtrer le wiki.</p>
+            </div>
+          </div>
+          <div class="grid md:grid-cols-2 gap-4">
+            @if (showDm()) {
+              <div class="p-5 rounded-2xl bg-violet-950/20 border border-violet-800/40">
+                <p class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-3 flex items-center gap-2">
+                  <iconify-icon icon="fluent-emoji:crown"></iconify-icon> Parcours MJ
+                </p>
+                <ol class="space-y-2 text-sm text-slate-400 mb-4">
+                  <li>1. Créer une campagne et inviter des amis</li>
+                  <li>2. Valider les personnages (voir fiche)</li>
+                  <li>3. Préparer rencontres & documents</li>
+                  <li>4. Planifier une session → démarrer la table</li>
+                </ol>
+                <a href="#checklists" class="text-xs font-bold uppercase tracking-wider text-violet-400 hover:text-violet-300">Checklist MJ →</a>
+              </div>
+            }
+            @if (showPlayer()) {
+              <div class="p-5 rounded-2xl bg-sky-950/20 border border-sky-800/40">
+                <p class="text-[10px] font-black uppercase tracking-widest text-sky-400 mb-3 flex items-center gap-2">
+                  <iconify-icon icon="fluent-emoji:game-die"></iconify-icon> Parcours joueur
+                </p>
+                <ol class="space-y-2 text-sm text-slate-400 mb-4">
+                  <li>1. Créer un compte et forger un héros</li>
+                  <li>2. Devenir ami du MJ et accepter l’invitation</li>
+                  <li>3. Proposer le personnage</li>
+                  <li>4. Activer les notifs · rejoindre la collecte d’init</li>
+                </ol>
+                <a href="#checklists" class="text-xs font-bold uppercase tracking-wider text-sky-400 hover:text-sky-300">Checklist joueur →</a>
+              </div>
+            }
+          </div>
+        </section>
+
         <!-- Journal -->
         <section id="journal" class="scroll-mt-24">
           <div class="flex items-start gap-4 mb-8">
-            <div
-              class="w-14 h-14 rounded-2xl bg-violet-950/40 border border-violet-800/40 flex items-center justify-center text-3xl shrink-0"
-            >
+            <div class="w-14 h-14 rounded-2xl bg-violet-950/40 border border-violet-800/40 flex items-center justify-center text-3xl shrink-0">
               <iconify-icon icon="fluent-emoji:newspaper"></iconify-icon>
             </div>
             <div>
               <h2 class="text-2xl font-bold text-slate-100 font-serif">Journal & nouveautés</h2>
-              <p class="text-sm text-slate-500 mt-1">
-                Fil d’actualité du site — mises à jour récentes et astuces.
-              </p>
+              <p class="text-sm text-slate-500 mt-1">Fil d’actualité du site.</p>
             </div>
           </div>
           <div class="grid md:grid-cols-2 gap-4">
             @for (post of blogPosts; track post.title) {
-              <article
-                class="relative p-5 rounded-2xl bg-[#1b2028] border {{ post.border }} hover:border-opacity-60 transition-colors"
-              >
+              <article class="relative p-5 rounded-2xl bg-[#1b2028] border {{ post.border }}">
                 <div class="flex items-center justify-between gap-2 mb-3">
-                  <span
-                    class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border border-transparent {{ post.tagColor }}"
-                  >
+                  <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full {{ post.tagColor }}">
                     {{ post.tag }}
                   </span>
                   <time class="text-[10px] text-slate-600">{{ post.date }}</time>
                 </div>
                 <div class="flex gap-3">
-                  <span class="text-2xl shrink-0 opacity-80"
-                    ><iconify-icon [icon]="post.icon"></iconify-icon
-                  ></span>
+                  <span class="text-2xl shrink-0 opacity-80"><iconify-icon [icon]="post.icon"></iconify-icon></span>
                   <div>
                     <h3 class="font-bold text-slate-100 mb-2 leading-snug">{{ post.title }}</h3>
                     <p class="text-sm text-slate-400 leading-relaxed">{{ post.summary }}</p>
@@ -127,51 +214,162 @@
         <!-- Premiers pas -->
         <section id="demarrage" class="scroll-mt-24">
           <div class="flex items-start gap-4 mb-8">
-            <div
-              class="w-14 h-14 rounded-2xl bg-amber-950/40 border border-amber-800/40 flex items-center justify-center text-3xl shrink-0"
-            >
+            <div class="w-14 h-14 rounded-2xl bg-amber-950/40 border border-amber-800/40 flex items-center justify-center text-3xl shrink-0">
               <iconify-icon icon="fluent-emoji:rocket"></iconify-icon>
             </div>
             <div>
               <h2 class="text-2xl font-bold text-slate-100 font-serif">Premiers pas</h2>
-              <p class="text-sm text-slate-500 mt-1">Cinq étapes · environ 5 minutes pour être opérationnel.</p>
+              <p class="text-sm text-slate-500 mt-1">Environ 5 minutes pour être opérationnel.</p>
             </div>
           </div>
-          <div class="relative">
+          <div class="relative space-y-4">
             <div class="absolute left-[1.15rem] top-4 bottom-4 w-px bg-gradient-to-b from-amber-500/50 via-amber-500/20 to-transparent hidden sm:block"></div>
-            <div class="space-y-4">
-              @for (step of startSteps; track step.title; let i = $index) {
-                <div
-                  class="relative flex gap-4 sm:gap-6 p-4 sm:p-5 rounded-2xl bg-[#1b2028] border border-slate-800 hover:border-amber-500/20 transition-colors"
-                >
-                  <div
-                    class="w-9 h-9 rounded-full bg-amber-500 text-slate-950 font-black text-sm flex items-center justify-center shrink-0 z-10"
-                  >
-                    {{ i + 1 }}
-                  </div>
-                  <div class="flex-grow min-w-0">
-                    <div class="flex flex-wrap items-center gap-2 mb-1">
-                      <h3 class="font-bold text-slate-100">{{ step.title }}</h3>
-                      @if (step.badge) {
-                        <span
-                          class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border {{ badgeClass(step.badge) }}"
-                        >
-                          {{ step.badge }}
-                        </span>
-                      }
-                    </div>
-                    <p class="text-sm text-slate-400 leading-relaxed">{{ step.body }}</p>
-                    @if (step.link) {
-                      <a
-                        [routerLink]="step.link"
-                        class="inline-flex items-center gap-1 mt-3 text-xs font-bold uppercase tracking-wider text-amber-400 hover:text-amber-300"
-                      >
-                        {{ step.linkLabel }} →
-                      </a>
+            @for (step of filteredStartSteps(); track step.title; let i = $index) {
+              <div class="relative flex gap-4 sm:gap-6 p-4 sm:p-5 rounded-2xl bg-[#1b2028] border border-slate-800">
+                <div class="w-9 h-9 rounded-full bg-amber-500 text-slate-950 font-black text-sm flex items-center justify-center shrink-0 z-10">
+                  {{ i + 1 }}
+                </div>
+                <div class="flex-grow min-w-0">
+                  <div class="flex flex-wrap items-center gap-2 mb-1">
+                    <h3 class="font-bold text-slate-100">{{ step.title }}</h3>
+                    @if (step.badge) {
+                      <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border {{ badgeClass(step.badge) }}">
+                        {{ step.badge }}
+                      </span>
                     }
                   </div>
+                  <p class="text-sm text-slate-400 leading-relaxed">{{ step.body }}</p>
+                  @if (step.link) {
+                    <a [routerLink]="step.link" class="inline-flex items-center gap-1 mt-3 text-xs font-bold uppercase tracking-wider text-amber-400 hover:text-amber-300">
+                      {{ step.linkLabel }} →
+                    </a>
+                  }
                 </div>
-              }
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- Checklists -->
+        <section id="checklists" class="scroll-mt-24">
+          <div class="flex items-start gap-4 mb-8">
+            <div class="w-14 h-14 rounded-2xl bg-emerald-950/40 border border-emerald-800/40 flex items-center justify-center text-3xl shrink-0">
+              <iconify-icon icon="fluent-emoji:check-mark-button"></iconify-icon>
+            </div>
+            <div>
+              <h2 class="text-2xl font-bold text-slate-100 font-serif">Checklists</h2>
+              <p class="text-sm text-slate-500 mt-1">Cochez au fur et à mesure (stocké sur cette page seulement).</p>
+            </div>
+          </div>
+          <div class="grid md:grid-cols-2 gap-4">
+            @if (showDm()) {
+              <div class="p-5 rounded-2xl bg-[#1b2028] border border-violet-800/40">
+                @let dmProg = checklistProgress(dmChecklist);
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-400">Avant la session · MJ</h3>
+                  <span class="text-xs text-slate-500">{{ dmProg.done }}/{{ dmProg.total }}</span>
+                </div>
+                <ul class="space-y-2">
+                  @for (item of dmChecklist; track item.id) {
+                    <li>
+                      <button
+                        type="button"
+                        class="w-full flex items-start gap-3 text-left text-sm rounded-lg px-2 py-1.5 hover:bg-slate-800/50 transition-colors"
+                        (click)="toggleChecklist(item.id)"
+                      >
+                        <span
+                          class="mt-0.5 w-5 h-5 rounded border flex items-center justify-center shrink-0 text-[10px] font-black"
+                          [class]="checklistDone()[item.id] ? 'bg-emerald-500 border-emerald-400 text-slate-950' : 'border-slate-600 text-transparent'"
+                        >✓</span>
+                        <span [class]="checklistDone()[item.id] ? 'text-slate-500 line-through' : 'text-slate-300'">{{ item.label }}</span>
+                      </button>
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+            @if (showPlayer()) {
+              <div class="p-5 rounded-2xl bg-[#1b2028] border border-sky-800/40">
+                @let plProg = checklistProgress(playerChecklist);
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-[10px] font-black uppercase tracking-widest text-sky-400">Premier perso · Joueur</h3>
+                  <span class="text-xs text-slate-500">{{ plProg.done }}/{{ plProg.total }}</span>
+                </div>
+                <ul class="space-y-2">
+                  @for (item of playerChecklist; track item.id) {
+                    <li>
+                      <button
+                        type="button"
+                        class="w-full flex items-start gap-3 text-left text-sm rounded-lg px-2 py-1.5 hover:bg-slate-800/50 transition-colors"
+                        (click)="toggleChecklist(item.id)"
+                      >
+                        <span
+                          class="mt-0.5 w-5 h-5 rounded border flex items-center justify-center shrink-0 text-[10px] font-black"
+                          [class]="checklistDone()[item.id] ? 'bg-emerald-500 border-emerald-400 text-slate-950' : 'border-slate-600 text-transparent'"
+                        >✓</span>
+                        <span [class]="checklistDone()[item.id] ? 'text-slate-500 line-through' : 'text-slate-300'">{{ item.label }}</span>
+                      </button>
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- Schémas -->
+        <section id="schemas" class="scroll-mt-24">
+          <div class="flex items-start gap-4 mb-8">
+            <div class="w-14 h-14 rounded-2xl bg-sky-950/40 border border-sky-800/40 flex items-center justify-center text-3xl shrink-0">
+              <iconify-icon icon="fluent-emoji:world-map"></iconify-icon>
+            </div>
+            <div>
+              <h2 class="text-2xl font-bold text-slate-100 font-serif">Schémas des flux critiques</h2>
+              <p class="text-sm text-slate-500 mt-1">Trois parcours en un coup d’œil.</p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div class="p-5 rounded-2xl bg-[#1b2028] border border-slate-800">
+              <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-4">Proposition de personnage</h3>
+              <div class="flex flex-wrap items-center gap-2">
+                @for (node of proposalFlow; track node.label; let last = $last) {
+                  <div class="px-3 py-2 rounded-xl bg-violet-950/30 border border-violet-800/40 text-center min-w-[7rem]">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-violet-500">{{ node.role }}</p>
+                    <p class="text-xs font-bold text-slate-200 mt-0.5">{{ node.label }}</p>
+                  </div>
+                  @if (!last) {
+                    <span class="text-violet-600 font-bold">→</span>
+                  }
+                }
+              </div>
+            </div>
+            <div class="p-5 rounded-2xl bg-[#1b2028] border border-slate-800">
+              <h3 class="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-4">Arsenal · 2 armes de guerre</h3>
+              <div class="flex flex-wrap items-center gap-2">
+                @for (node of arsenalFlow; track node.label; let last = $last) {
+                  <div class="px-3 py-2 rounded-xl bg-emerald-950/30 border border-emerald-800/40 text-center min-w-[7rem]">
+                    <p class="text-xs font-bold text-slate-200">{{ node.label }}</p>
+                    <p class="text-[10px] text-emerald-500/80 mt-0.5">{{ node.detail }}</p>
+                  </div>
+                  @if (!last) {
+                    <span class="text-emerald-700 font-bold">→</span>
+                  }
+                }
+              </div>
+            </div>
+            <div class="p-5 rounded-2xl bg-[#1b2028] border border-slate-800">
+              <h3 class="text-[10px] font-black uppercase tracking-widest text-red-400 mb-4">Collecte d’initiative</h3>
+              <div class="flex flex-wrap items-center gap-2">
+                @for (node of combatFlow; track node.label; let last = $last) {
+                  <div class="px-3 py-2 rounded-xl bg-red-950/20 border border-red-900/40 text-center min-w-[7rem]">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-red-500/80">{{ node.role }}</p>
+                    <p class="text-xs font-bold text-slate-200 mt-0.5">{{ node.label }}</p>
+                  </div>
+                  @if (!last) {
+                    <span class="text-red-800 font-bold">→</span>
+                  }
+                }
+              </div>
             </div>
           </div>
         </section>
@@ -179,9 +377,7 @@
         <!-- Compte -->
         <section id="compte" class="scroll-mt-24">
           <div class="flex items-start gap-4 mb-8">
-            <div
-              class="w-14 h-14 rounded-2xl bg-sky-950/40 border border-sky-800/40 flex items-center justify-center text-3xl shrink-0"
-            >
+            <div class="w-14 h-14 rounded-2xl bg-sky-950/40 border border-sky-800/40 flex items-center justify-center text-3xl shrink-0">
               <iconify-icon icon="fluent-emoji:bust-in-silhouette"></iconify-icon>
             </div>
             <div>
@@ -191,9 +387,7 @@
           </div>
           <div class="grid md:grid-cols-3 gap-4">
             <div class="p-5 rounded-2xl bg-[#1b2028] border border-slate-800 md:col-span-2">
-              <h3 class="text-[10px] font-black uppercase tracking-widest text-sky-400 mb-4">
-                Créer un compte
-              </h3>
+              <h3 class="text-[10px] font-black uppercase tracking-widest text-sky-400 mb-4">Créer un compte</h3>
               <ol class="space-y-3">
                 @for (item of ['Ouvrir la page Inscription', 'E-mail + pseudo unique + mot de passe 8+', 'Confirmation par mail (~2 h)', 'Connexion — persos synchronisés']; track item; let i = $index) {
                   <li class="flex gap-3 text-sm">
@@ -228,9 +422,7 @@
         <!-- Personnage -->
         <section id="personnage" class="scroll-mt-24">
           <div class="flex items-start gap-4 mb-8">
-            <div
-              class="w-14 h-14 rounded-2xl bg-emerald-950/40 border border-emerald-800/40 flex items-center justify-center text-3xl shrink-0"
-            >
+            <div class="w-14 h-14 rounded-2xl bg-emerald-950/40 border border-emerald-800/40 flex items-center justify-center text-3xl shrink-0">
               <iconify-icon icon="fluent-emoji:shield"></iconify-icon>
             </div>
             <div>
@@ -240,49 +432,54 @@
               </p>
             </div>
           </div>
-          <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-3 mb-6">
-            @for (step of characterSteps; track step.title; let i = $index) {
-              <div
-                class="p-4 rounded-xl bg-[#1b2028] border border-slate-800 hover:border-emerald-500/25 transition-colors group"
-              >
-                <div class="flex items-center gap-2 mb-2">
-                  <span
-                    class="w-6 h-6 rounded-md bg-emerald-950/60 border border-emerald-800/40 text-emerald-400 text-[10px] font-black flex items-center justify-center"
-                  >
-                    {{ i + 1 }}
-                  </span>
-                  <h3 class="text-sm font-bold text-slate-100 group-hover:text-emerald-300 transition-colors">
-                    {{ step.title }}
-                  </h3>
+
+          <div class="p-4 mb-4 rounded-xl bg-amber-950/20 border border-amber-500/30">
+            <p class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-1">Erreur fréquente</p>
+            <p class="text-sm text-amber-200/85 leading-relaxed">
+              Message rouge « Export incomplet » = choix non faits. Terminez Compétences et Équipement avant le PDF.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="w-full flex items-center justify-between gap-3 p-4 rounded-xl bg-[#1b2028] border border-slate-800 hover:border-emerald-500/30 transition-colors mb-3"
+            (click)="toggleCharacterExpanded()"
+          >
+            <span class="text-sm font-bold text-slate-200">
+              {{ characterExpanded() ? 'Masquer' : 'Afficher' }} les {{ characterSteps.length }} étapes
+            </span>
+            <span class="text-emerald-400 text-lg leading-none">{{ characterExpanded() ? '−' : '+' }}</span>
+          </button>
+
+          @if (characterExpanded()) {
+            <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-3 mb-6">
+              @for (step of characterSteps; track step.title; let i = $index) {
+                <div class="p-4 rounded-xl bg-[#1b2028] border border-slate-800">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="w-6 h-6 rounded-md bg-emerald-950/60 border border-emerald-800/40 text-emerald-400 text-[10px] font-black flex items-center justify-center">
+                      {{ i + 1 }}
+                    </span>
+                    <h3 class="text-sm font-bold text-slate-100">{{ step.title }}</h3>
+                  </div>
+                  <p class="text-xs text-slate-500 leading-relaxed pl-8">{{ step.body }}</p>
                 </div>
-                <p class="text-xs text-slate-500 leading-relaxed pl-8">{{ step.body }}</p>
-              </div>
-            }
-          </div>
-          <div class="flex flex-col sm:flex-row gap-4">
-            <div class="flex-grow p-4 rounded-xl bg-amber-950/20 border border-amber-500/30">
-              <p class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-2">Astuce PDF</p>
-              <p class="text-sm text-amber-200/85 leading-relaxed">
-                Message rouge « Export incomplet » = choix non faits (arme au choix, placeholder). Revenez à
-                Équipement ou Compétences avant de sauvegarder.
-              </p>
+              }
             </div>
-            <a
-              routerLink="/characters"
-              class="shrink-0 flex items-center justify-center gap-2 px-6 py-4 rounded-xl border border-emerald-800/50 bg-emerald-950/30 text-emerald-300 text-xs font-black uppercase tracking-widest hover:border-emerald-500/50 transition-colors"
-            >
-              <iconify-icon icon="fluent-emoji:scroll"></iconify-icon> Bibliothèque persos
-            </a>
-          </div>
+          }
+
+          <a
+            routerLink="/characters"
+            class="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-emerald-800/50 bg-emerald-950/30 text-emerald-300 text-xs font-black uppercase tracking-widest hover:border-emerald-500/50"
+          >
+            <iconify-icon icon="fluent-emoji:scroll"></iconify-icon> Bibliothèque persos
+          </a>
         </section>
 
         <!-- Campagnes -->
         <section id="scenario" class="scroll-mt-24">
           <div class="flex items-start gap-4 mb-8">
-            <div
-              class="w-14 h-14 rounded-2xl bg-violet-950/40 border border-violet-800/40 flex items-center justify-center text-3xl shrink-0"
-            >
-              <iconify-icon icon="fluent-emoji:world-map"></iconify-icon>
+            <div class="w-14 h-14 rounded-2xl bg-violet-950/40 border border-violet-800/40 flex items-center justify-center text-3xl shrink-0">
+              <iconify-icon icon="fluent-emoji:globe-showing-europe-africa"></iconify-icon>
             </div>
             <div>
               <h2 class="text-2xl font-bold text-slate-100 font-serif">Scénarios & campagnes</h2>
@@ -290,86 +487,93 @@
             </div>
           </div>
 
-          <!-- Parcours visuels MJ / Joueur -->
           <div class="grid md:grid-cols-2 gap-4 mb-8">
-            <div class="p-5 rounded-2xl bg-violet-950/15 border border-violet-800/40">
-              <p class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-4 flex items-center gap-2">
-                <iconify-icon icon="fluent-emoji:crown"></iconify-icon> Parcours MJ
-              </p>
-              <div class="flex flex-wrap items-center gap-1 text-[10px] font-bold uppercase tracking-wider">
-                @for (step of campaignMjFlow; track step; let last = $last) {
-                  <span class="px-2.5 py-1.5 rounded-lg bg-[#1b2028] border border-violet-800/30 text-violet-200">{{ step }}</span>
-                  @if (!last) {
-                    <span class="text-violet-600 px-0.5">→</span>
+            @if (showDm()) {
+              <div class="p-5 rounded-2xl bg-violet-950/15 border border-violet-800/40">
+                <p class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-4">Flux MJ</p>
+                <div class="flex flex-wrap items-center gap-1 text-[10px] font-bold uppercase tracking-wider">
+                  @for (step of campaignMjFlow; track step; let last = $last) {
+                    <span class="px-2.5 py-1.5 rounded-lg bg-[#1b2028] border border-violet-800/30 text-violet-200">{{ step }}</span>
+                    @if (!last) { <span class="text-violet-600 px-0.5">→</span> }
                   }
-                }
+                </div>
               </div>
-            </div>
-            <div class="p-5 rounded-2xl bg-sky-950/15 border border-sky-800/40">
-              <p class="text-[10px] font-black uppercase tracking-widest text-sky-400 mb-4 flex items-center gap-2">
-                <iconify-icon icon="fluent-emoji:game-die"></iconify-icon> Parcours joueur
-              </p>
-              <div class="flex flex-wrap items-center gap-1 text-[10px] font-bold uppercase tracking-wider">
-                @for (step of campaignPlayerFlow; track step; let last = $last) {
-                  <span class="px-2.5 py-1.5 rounded-lg bg-[#1b2028] border border-sky-800/30 text-sky-200">{{ step }}</span>
-                  @if (!last) {
-                    <span class="text-sky-600 px-0.5">→</span>
+            }
+            @if (showPlayer()) {
+              <div class="p-5 rounded-2xl bg-sky-950/15 border border-sky-800/40">
+                <p class="text-[10px] font-black uppercase tracking-widest text-sky-400 mb-4">Flux joueur</p>
+                <div class="flex flex-wrap items-center gap-1 text-[10px] font-bold uppercase tracking-wider">
+                  @for (step of campaignPlayerFlow; track step; let last = $last) {
+                    <span class="px-2.5 py-1.5 rounded-lg bg-[#1b2028] border border-sky-800/30 text-sky-200">{{ step }}</span>
+                    @if (!last) { <span class="text-sky-600 px-0.5">→</span> }
                   }
-                }
+                </div>
               </div>
-            </div>
+            }
           </div>
 
           <div class="grid lg:grid-cols-2 gap-4">
-            <div class="p-5 rounded-2xl bg-[#1b2028] border border-slate-800">
-              <h3 class="text-sm font-bold text-violet-300 mb-4 flex items-center gap-2">
-                <iconify-icon icon="fluent-emoji:scroll"></iconify-icon> Assistant scénario (solo)
-              </h3>
-              <ul class="space-y-2 text-sm text-slate-400">
-                <li class="flex gap-2"><span class="text-violet-500">①</span> Créatures du bestiaire</li>
-                <li class="flex gap-2"><span class="text-violet-500">②</span> PNJ (IA ou manuel)</li>
-                <li class="flex gap-2"><span class="text-violet-500">③</span> Synopsis 400–600 mots (IA)</li>
-                <li class="flex gap-2"><span class="text-violet-500">④</span> PDF + export campagne</li>
-              </ul>
-              <a routerLink="/story/create" class="inline-block mt-4 text-xs font-bold uppercase tracking-wider text-violet-400 hover:text-violet-300">Ouvrir l’assistant →</a>
-            </div>
-            <div class="p-5 rounded-2xl bg-[#1b2028] border border-slate-800">
-              <h3 class="text-sm font-bold text-violet-300 mb-4 flex items-center gap-2">
-                <iconify-icon icon="fluent-emoji:identification-card"></iconify-icon> Valider un personnage joueur
-              </h3>
-              <ul class="space-y-2 text-sm text-slate-400">
-                <li class="flex gap-2"><span class="text-emerald-500">✓</span> Bloc <strong class="text-slate-300">Groupe</strong> (Résumé) ou onglet Joueurs</li>
-                <li class="flex gap-2"><span class="text-emerald-500">✓</span> <strong class="text-slate-300">Voir la fiche proposée</strong> avant Accepter</li>
-                <li class="flex gap-2"><span class="text-emerald-500">✓</span> Retirer un joueur · invitations filtrées</li>
-                <li class="flex gap-2"><span class="text-emerald-500">✓</span> Synthèse MJ & PDF depuis les vraies stats</li>
-              </ul>
-              <a routerLink="/campaigns" class="inline-block mt-4 text-xs font-bold uppercase tracking-wider text-violet-400 hover:text-violet-300">Voir mes campagnes →</a>
-            </div>
-          </div>
-        </section>
-
-        <!-- Table MJ -->
-        <section id="table" class="scroll-mt-24">
-          <div class="flex items-start gap-4 mb-8">
-            <div class="w-14 h-14 rounded-2xl bg-amber-950/40 border border-amber-800/40 flex items-center justify-center text-3xl shrink-0">
-              <iconify-icon icon="fluent-emoji:performing-arts"></iconify-icon>
-            </div>
-            <div>
-              <h2 class="text-2xl font-bold text-slate-100 font-serif">Table de jeu</h2>
-              <p class="text-sm text-slate-500 mt-1">
-                Bouton <strong class="text-amber-400/80">Démarrer la table</strong> depuis une campagne, ou mode plein écran.
-              </p>
-            </div>
-          </div>
-          <div class="grid sm:grid-cols-5 gap-2">
-            @for (label of ['Démarrer', 'Notes live', 'Rencontre', 'Tracker XP', 'Terminer']; track label; let i = $index) {
-              <div class="text-center p-4 rounded-xl bg-[#1b2028] border border-slate-800">
-                <div class="w-8 h-8 mx-auto mb-2 rounded-full bg-amber-500/20 text-amber-400 text-xs font-black flex items-center justify-center">{{ i + 1 }}</div>
-                <p class="text-[10px] font-black uppercase tracking-wider text-slate-300">{{ label }}</p>
+            @if (showDm()) {
+              <div class="p-5 rounded-2xl bg-[#1b2028] border border-slate-800">
+                <h3 class="text-sm font-bold text-violet-300 mb-4">Assistant scénario (solo)</h3>
+                <ul class="space-y-2 text-sm text-slate-400">
+                  <li class="flex gap-2"><span class="text-violet-500">①</span> Créatures du bestiaire</li>
+                  <li class="flex gap-2"><span class="text-violet-500">②</span> PNJ (IA ou manuel)</li>
+                  <li class="flex gap-2"><span class="text-violet-500">③</span> Synopsis 400–600 mots (IA)</li>
+                  <li class="flex gap-2"><span class="text-violet-500">④</span> PDF + export campagne</li>
+                </ul>
+                <a routerLink="/story/create" class="inline-block mt-4 text-xs font-bold uppercase tracking-wider text-violet-400 hover:text-violet-300">Ouvrir l’assistant →</a>
+              </div>
+              <div class="p-5 rounded-2xl bg-[#1b2028] border border-slate-800">
+                <h3 class="text-sm font-bold text-violet-300 mb-4">Valider un personnage joueur</h3>
+                <ul class="space-y-2 text-sm text-slate-400">
+                  <li class="flex gap-2"><span class="text-emerald-500">✓</span> Bloc Groupe ou onglet Joueurs</li>
+                  <li class="flex gap-2"><span class="text-emerald-500">✓</span> Voir la fiche proposée avant Accepter</li>
+                  <li class="flex gap-2"><span class="text-emerald-500">✓</span> Retirer un joueur · invitations filtrées</li>
+                </ul>
+                <div class="mt-4 p-3 rounded-lg bg-amber-950/20 border border-amber-500/20">
+                  <p class="text-xs text-amber-200/80">Astuce : ne validez jamais sans ouvrir la fiche complète.</p>
+                </div>
+                <a routerLink="/campaigns" class="inline-block mt-4 text-xs font-bold uppercase tracking-wider text-violet-400 hover:text-violet-300">Voir mes campagnes →</a>
+              </div>
+            }
+            @if (showPlayer() && !showDm()) {
+              <div class="p-5 rounded-2xl bg-[#1b2028] border border-slate-800 lg:col-span-2">
+                <h3 class="text-sm font-bold text-sky-300 mb-3">Côté joueur</h3>
+                <ul class="space-y-2 text-sm text-slate-400">
+                  <li>Acceptez l’invitation · proposez un personnage · lisez Activité & Documents</li>
+                  <li>Les pré-tirés peuvent vous être assignés par le MJ</li>
+                </ul>
+                <a routerLink="/campaigns" class="inline-block mt-4 text-xs font-bold uppercase tracking-wider text-sky-400">Mes campagnes →</a>
               </div>
             }
           </div>
         </section>
+
+        <!-- Table MJ -->
+        @if (showDm()) {
+          <section id="table" class="scroll-mt-24">
+            <div class="flex items-start gap-4 mb-8">
+              <div class="w-14 h-14 rounded-2xl bg-amber-950/40 border border-amber-800/40 flex items-center justify-center text-3xl shrink-0">
+                <iconify-icon icon="fluent-emoji:performing-arts"></iconify-icon>
+              </div>
+              <div>
+                <h2 class="text-2xl font-bold text-slate-100 font-serif">Table de jeu</h2>
+                <p class="text-sm text-slate-500 mt-1">
+                  Bouton <strong class="text-amber-400/80">Démarrer la table</strong> depuis une campagne, ou mode plein écran.
+                </p>
+              </div>
+            </div>
+            <div class="grid sm:grid-cols-5 gap-2">
+              @for (label of ['Démarrer', 'Notes live', 'Rencontre', 'Tracker XP', 'Terminer']; track label; let i = $index) {
+                <div class="text-center p-4 rounded-xl bg-[#1b2028] border border-slate-800">
+                  <div class="w-8 h-8 mx-auto mb-2 rounded-full bg-amber-500/20 text-amber-400 text-xs font-black flex items-center justify-center">{{ i + 1 }}</div>
+                  <p class="text-[10px] font-black uppercase tracking-wider text-slate-300">{{ label }}</p>
+                </div>
+              }
+            </div>
+          </section>
+        }
 
         <!-- Combat -->
         <section id="initiative" class="scroll-mt-24">
@@ -379,28 +583,32 @@
             </div>
             <div>
               <h2 class="text-2xl font-bold text-slate-100 font-serif">Initiative & combat</h2>
-              <p class="text-sm text-slate-500 mt-1">Tracker intégré · collecte joueurs · historique MJ.</p>
+              <p class="text-sm text-slate-500 mt-1">Tracker · collecte joueurs · historique MJ.</p>
             </div>
           </div>
           <div class="grid md:grid-cols-2 gap-4">
-            <div class="p-5 rounded-2xl bg-[#1b2028] border border-red-900/30">
-              <h3 class="text-[10px] font-black uppercase tracking-widest text-red-400 mb-4">MJ — lancer un combat</h3>
-              <div class="space-y-2 text-sm text-slate-400">
-                <p>① Ouvrir le tracker (table ou rencontre)</p>
-                <p>② Ajouter PJ, PNJ, créatures</p>
-                <p>③ Initiative manuelle ou <strong class="text-slate-200">Collecter l’init</strong></p>
-                <p>④ ↑↓ pour égalités · Fin combat → historique</p>
+            @if (showDm()) {
+              <div class="p-5 rounded-2xl bg-[#1b2028] border border-red-900/30">
+                <h3 class="text-[10px] font-black uppercase tracking-widest text-red-400 mb-4">MJ — lancer un combat</h3>
+                <div class="space-y-2 text-sm text-slate-400">
+                  <p>① Ouvrir le tracker (table ou rencontre)</p>
+                  <p>② Ajouter PJ, PNJ, créatures</p>
+                  <p>③ Initiative manuelle ou <strong class="text-slate-200">Collecter l’init</strong></p>
+                  <p>④ ↑↓ pour égalités · Fin combat → historique</p>
+                </div>
               </div>
-            </div>
-            <div class="p-5 rounded-2xl bg-[#1b2028] border border-sky-900/30">
-              <h3 class="text-[10px] font-black uppercase tracking-widest text-sky-400 mb-4">Joueur — collecte</h3>
-              <div class="space-y-2 text-sm text-slate-400">
-                <p>① Notification + bandeau campagne</p>
-                <p>② Ouvrir le lien d’initiative (bandeau ou notification)</p>
-                <p>③ Saisir le jet d20 (+ modificateur auto)</p>
-                <p>④ Le MJ importe dans le tracker</p>
+            }
+            @if (showPlayer()) {
+              <div class="p-5 rounded-2xl bg-[#1b2028] border border-sky-900/30">
+                <h3 class="text-[10px] font-black uppercase tracking-widest text-sky-400 mb-4">Joueur — collecte</h3>
+                <div class="space-y-2 text-sm text-slate-400">
+                  <p>① Notification + bandeau campagne</p>
+                  <p>② Ouvrir le lien d’initiative</p>
+                  <p>③ Saisir le jet d20</p>
+                  <p>④ Le MJ importe dans le tracker</p>
+                </div>
               </div>
-            </div>
+            }
           </div>
         </section>
 
@@ -416,18 +624,22 @@
             </div>
           </div>
           <div class="grid sm:grid-cols-2 gap-4">
-            <div class="p-5 rounded-2xl bg-violet-950/10 border border-violet-800/30">
-              <span class="text-[9px] font-black uppercase tracking-widest text-violet-400 bg-violet-950/50 px-2 py-0.5 rounded">MJ</span>
-              <p class="text-sm text-slate-400 mt-3 leading-relaxed">
-                Onglet Documents → Créer → type (letter, carte…) → markdown léger → <strong class="text-slate-200">Publier</strong>.
-              </p>
-            </div>
-            <div class="p-5 rounded-2xl bg-sky-950/10 border border-sky-800/30">
-              <span class="text-[9px] font-black uppercase tracking-widest text-sky-400 bg-sky-950/50 px-2 py-0.5 rounded">Joueur</span>
-              <p class="text-sm text-slate-400 mt-3 leading-relaxed">
-                Lire depuis l’<strong class="text-slate-200">Activité</strong> (clic) ou l’onglet Documents — sans spoilers MJ ailleurs.
-              </p>
-            </div>
+            @if (showDm()) {
+              <div class="p-5 rounded-2xl bg-violet-950/10 border border-violet-800/30">
+                <span class="text-[9px] font-black uppercase tracking-widest text-violet-400 bg-violet-950/50 px-2 py-0.5 rounded">MJ</span>
+                <p class="text-sm text-slate-400 mt-3 leading-relaxed">
+                  Onglet Documents → Créer → type → markdown léger → <strong class="text-slate-200">Publier</strong>.
+                </p>
+              </div>
+            }
+            @if (showPlayer()) {
+              <div class="p-5 rounded-2xl bg-sky-950/10 border border-sky-800/30">
+                <span class="text-[9px] font-black uppercase tracking-widest text-sky-400 bg-sky-950/50 px-2 py-0.5 rounded">Joueur</span>
+                <p class="text-sm text-slate-400 mt-3 leading-relaxed">
+                  Lire depuis l’<strong class="text-slate-200">Activité</strong> ou l’onglet Documents.
+                </p>
+              </div>
+            }
           </div>
         </section>
 
@@ -478,7 +690,7 @@
             </div>
             <p class="text-sm text-slate-500">
               Activez dans <a routerLink="/settings" class="text-amber-400 hover:underline">Paramètres</a> → Push PWA.
-              Consultez le <a routerLink="/notifications" class="text-amber-400 hover:underline">centre de notifications</a> pour l’historique.
+              Consultez le <a routerLink="/notifications" class="text-amber-400 hover:underline">centre de notifications</a>.
               Installez l’app sur mobile (écran d’accueil).
             </p>
           </div>
@@ -492,7 +704,7 @@
             </div>
             <div>
               <h2 class="text-2xl font-bold text-slate-100 font-serif">Codex</h2>
-              <p class="text-sm text-slate-500 mt-1">Référence de jeu — consultez pendant la création de perso.</p>
+              <p class="text-sm text-slate-500 mt-1">Référence de jeu — utile pendant la création de perso.</p>
             </div>
           </div>
           <div class="flex flex-wrap gap-2">
@@ -528,14 +740,97 @@
               <h3 class="text-sm font-bold text-slate-200 mb-2">Fiche personnage</h3>
               <p class="text-xs text-slate-500 leading-relaxed">Récap wizard · aperçu sans erreur · sauvegarde + PDF · grimoire séparé.</p>
             </div>
-            <div class="p-5 rounded-2xl bg-[#1b2028] border border-slate-800">
-              <h3 class="text-sm font-bold text-slate-200 mb-2">Campagne MJ</h3>
-              <p class="text-xs text-slate-500 leading-relaxed">Pack complet, bestiaire, synthèse joueurs, fiches complètes.</p>
+            @if (showDm()) {
+              <div class="p-5 rounded-2xl bg-[#1b2028] border border-slate-800">
+                <h3 class="text-sm font-bold text-slate-200 mb-2">Campagne MJ</h3>
+                <p class="text-xs text-slate-500 leading-relaxed">Pack complet, bestiaire, synthèse joueurs, fiches complètes.</p>
+              </div>
+              <div class="p-5 rounded-2xl bg-[#1b2028] border border-slate-800">
+                <h3 class="text-sm font-bold text-slate-200 mb-2">Scénario</h3>
+                <p class="text-xs text-slate-500 leading-relaxed">Markdown + PDF créatures depuis l’assistant scénario.</p>
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq" class="scroll-mt-24">
+          <div class="flex items-start gap-4 mb-8">
+            <div class="w-14 h-14 rounded-2xl bg-amber-950/40 border border-amber-800/40 flex items-center justify-center text-3xl shrink-0">
+              <iconify-icon icon="fluent-emoji:red-question-mark"></iconify-icon>
             </div>
-            <div class="p-5 rounded-2xl bg-[#1b2028] border border-slate-800">
-              <h3 class="text-sm font-bold text-slate-200 mb-2">Scénario</h3>
-              <p class="text-xs text-slate-500 leading-relaxed">Markdown + PDF créatures depuis l’assistant scénario.</p>
+            <div>
+              <h2 class="text-2xl font-bold text-slate-100 font-serif">FAQ</h2>
+              <p class="text-sm text-slate-500 mt-1">Questions fréquentes — filtrées selon votre rôle.</p>
             </div>
+          </div>
+          <div class="space-y-2">
+            @for (item of filteredFaq(); track item.id) {
+              <div class="rounded-xl bg-[#1b2028] border border-slate-800 overflow-hidden">
+                <button
+                  type="button"
+                  class="w-full flex items-center justify-between gap-3 px-4 py-3.5 text-left hover:bg-slate-800/40 transition-colors"
+                  (click)="toggleFaq(item.id)"
+                  [attr.aria-expanded]="openFaqId() === item.id"
+                >
+                  <span class="text-sm font-bold text-slate-100">{{ item.question }}</span>
+                  <span class="text-amber-400 shrink-0 text-lg leading-none">{{ openFaqId() === item.id ? '−' : '+' }}</span>
+                </button>
+                @if (openFaqId() === item.id) {
+                  <div class="px-4 pb-4 text-sm text-slate-400 leading-relaxed border-t border-slate-800/80 pt-3">
+                    {{ item.answer }}
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- Glossaire -->
+        <section id="glossaire" class="scroll-mt-24">
+          <div class="flex items-start gap-4 mb-8">
+            <div class="w-14 h-14 rounded-2xl bg-violet-950/40 border border-violet-800/40 flex items-center justify-center text-3xl shrink-0">
+              <iconify-icon icon="fluent-emoji:label"></iconify-icon>
+            </div>
+            <div>
+              <h2 class="text-2xl font-bold text-slate-100 font-serif">Glossaire</h2>
+              <p class="text-sm text-slate-500 mt-1">Les termes du site en une ligne.</p>
+            </div>
+          </div>
+          <dl class="grid sm:grid-cols-2 gap-3">
+            @for (g of glossary; track g.term) {
+              <div class="p-4 rounded-xl bg-[#1b2028] border border-slate-800">
+                <dt class="text-sm font-bold text-amber-400 mb-1">{{ g.term }}</dt>
+                <dd class="text-xs text-slate-400 leading-relaxed">{{ g.definition }}</dd>
+              </div>
+            }
+          </dl>
+        </section>
+
+        <!-- Index -->
+        <section id="index" class="scroll-mt-24">
+          <div class="flex items-start gap-4 mb-8">
+            <div class="w-14 h-14 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-3xl shrink-0">
+              <iconify-icon icon="fluent-emoji:input-latin-letters"></iconify-icon>
+            </div>
+            <div>
+              <h2 class="text-2xl font-bold text-slate-100 font-serif">Index des fonctionnalités</h2>
+              <p class="text-sm text-slate-500 mt-1">Accès alphabétique · saute à la section concernée.</p>
+            </div>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-2">
+            @for (item of filteredIndex(); track item.label) {
+              <a
+                [href]="'#' + item.sectionId"
+                class="flex items-start justify-between gap-3 p-3 rounded-xl bg-[#1b2028] border border-slate-800 hover:border-amber-500/30 transition-colors"
+              >
+                <div>
+                  <p class="text-sm font-bold text-slate-100">{{ item.label }}</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">{{ item.description }}</p>
+                </div>
+                <span class="text-amber-500 text-xs shrink-0 mt-1">↓</span>
+              </a>
+            }
           </div>
         </section>
 
@@ -552,6 +847,9 @@
               <a routerLink="/legal/privacy" class="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-400">Confidentialité</a>
               <a routerLink="/legal/terms" class="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-400">Conditions</a>
             </div>
+            <p class="text-[10px] text-slate-600 mt-6 uppercase tracking-widest">
+              Guide v{{ guideVersion }} · mis à jour le {{ guideUpdatedAt }}
+            </p>
           </div>
         </section>
       </main>
