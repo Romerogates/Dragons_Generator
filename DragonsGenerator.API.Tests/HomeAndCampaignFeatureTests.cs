@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -698,8 +699,8 @@ public class HomeAndCampaignFeatureTests
             var detail = await _client.SendAsync(detailAfterReq);
             detail.EnsureSuccessStatusCode();
             var body = await detail.Content.ReadFromJsonAsync<JsonElement>();
-            Assert.Empty(body!.GetProperty("members").EnumerateArray().Where(m =>
-                m.GetProperty("userId").GetGuid() == playerId));
+            var members = body!.GetProperty("members").EnumerateArray().ToList();
+            Assert.DoesNotContain(members, m => m.GetProperty("userId").GetGuid() == playerId);
         }
 
         using (var inviteAgainReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaigns/{campaignId}/invites", ownerToken))
