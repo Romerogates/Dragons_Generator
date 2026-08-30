@@ -166,4 +166,19 @@ export class EquipmentsList implements OnInit {
     };
     return map[subtype] || subtype;
   }
+
+  equipmentSummary(eq: Equipment): string {
+    const desc = eq.data?.desc?.trim();
+    if (desc) {
+      const short = desc.slice(0, 180);
+      return short + (desc.length > 180 ? '…' : '');
+    }
+    const subtype = eq.subtype ? this.translateSubtype(eq.subtype) : '';
+    return `${this.translateType(eq.type)}${subtype !== '—' ? ` · ${subtype}` : ''}.`;
+  }
+
+  formatCost(eq: Equipment): string {
+    if (eq.cost.v === null) return '—';
+    return `${eq.cost.v} ${eq.cost.u ?? ''}`.trim();
+  }
 }

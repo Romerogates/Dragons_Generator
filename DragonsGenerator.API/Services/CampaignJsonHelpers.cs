@@ -21,7 +21,7 @@ public static class CampaignJsonHelpers
         return null;
     }
 
-    public static JsonElement FilterForPlayerView(JsonElement data)
+    public static JsonElement FilterForPlayerView(JsonElement data, Guid playerUserId)
     {
         var node = JsonNode.Parse(data.GetRawText()) as JsonObject ?? new JsonObject();
         node["adventure"] = "";
@@ -32,12 +32,25 @@ public static class CampaignJsonHelpers
 
         if (node["pregenCharacters"] is JsonArray pregens)
         {
+            var visiblePregens = new JsonArray();
             foreach (var item in pregens)
             {
                 if (item is not JsonObject pregen) continue;
                 pregen["dmBackstory"] = "";
                 pregen["dmSecrets"] = "";
+
+                var assignedRaw = pregen["assignedUserId"]?.GetValue<string>();
+                if (string.IsNullOrWhiteSpace(assignedRaw)
+                    || !Guid.TryParse(assignedRaw, out var assignedId)
+                    || assignedId != playerUserId)
+                {
+                    continue;
+                }
+
+                visiblePregens.Add(pregen.DeepClone());
             }
+
+            node["pregenCharacters"] = visiblePregens;
         }
 
         if (node["sessions"] is JsonArray sessions)
@@ -51,6 +64,45 @@ public static class CampaignJsonHelpers
 
         using var doc = JsonDocument.Parse(node.ToJsonString());
         return doc.RootElement.Clone();
+    }
+
+    private static readonly HashSet<string> ActivitySpoilerKeys = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "creatureName",
+        "customName",
+        "backstory",
+        "encounterName",
+        "adventure",
+        "notes",
+        "dmBackstory",
+        "dmSecrets",
+        "creatures",
+        "encounters",
+        "userId",
+        "characterName",
+        "publicHook",
+    };
+
+    public static bool IsActivityVisibleToPlayer(string kind) =>
+        kind != CampaignActivityKinds.InviteSent;
+
+    public static string FilterActivityPayloadForPlayer(string kind, string payloadJson)
+    {
+        if (kind == CampaignActivityKinds.InviteSent)
+            return "{}";
+
+        try
+        {
+            var node = JsonNode.Parse(string.IsNullOrWhiteSpace(payloadJson) ? "{}" : payloadJson) as JsonObject
+                ?? new JsonObject();
+            foreach (var key in ActivitySpoilerKeys)
+                node.Remove(key);
+            return node.ToJsonString();
+        }
+        catch
+        {
+            return "{}";
+        }
     }
 
     public static JsonElement StripDmOnlyFieldsFromUpdate(JsonElement incoming, string existingJson, bool isOwner)

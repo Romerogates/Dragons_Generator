@@ -28,6 +28,17 @@ public class ListCampaignActivityEndpoint(AppDbContext db) : EndpointWithoutRequ
 
         var limit = Query<int?>("limit", false) ?? 50;
         var items = await CampaignActivityService.ListForCampaignAsync(db, id, limit, ct);
+        if (!isOwner)
+        {
+            items = items
+                .Where(i => CampaignJsonHelpers.IsActivityVisibleToPlayer(i.Kind))
+                .Select(i => i with
+                {
+                    PayloadJson = CampaignJsonHelpers.FilterActivityPayloadForPlayer(i.Kind, i.PayloadJson),
+                })
+                .ToList();
+        }
+
         await Send.OkAsync(items, ct);
     }
 }

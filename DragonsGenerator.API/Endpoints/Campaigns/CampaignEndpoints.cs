@@ -127,7 +127,9 @@ public class GetMyCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest<Cam
 
         using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(campaign.JsonData) ? "{}" : campaign.JsonData);
         var role = isOwner ? CampaignMemberRoles.Dm : membership!.Role;
-        var data = isOwner ? doc.RootElement.Clone() : CampaignJsonHelpers.FilterForPlayerView(doc.RootElement);
+        var data = isOwner
+            ? doc.RootElement.Clone()
+            : CampaignJsonHelpers.FilterForPlayerView(doc.RootElement, userId.Value);
 
         var members = campaign.Members.Select(m => new CampaignMemberDto(
             m.Id, m.UserId, m.User.DisplayName, m.Role, m.ProposalStatus,

@@ -91,4 +91,13 @@ export class SkillsList {
   skillIcon(skill: Skill): string {
     return this.skillIcons()[normalizeSkillId(skill.id)]?.icon ?? 'fluent-emoji:bookmark-tabs';
   }
+
+  skillSummary(skill: Skill): string {
+    const desc = skill.description?.trim();
+    if (desc) {
+      const short = desc.slice(0, 180);
+      return short + (desc.length > 180 ? '…' : '');
+    }
+    return `Compétence basée sur ${this.abilityLabel(skill.ability).toLowerCase()}.`;
+  }
 }

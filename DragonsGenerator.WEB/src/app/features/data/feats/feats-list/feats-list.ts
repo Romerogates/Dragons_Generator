@@ -94,4 +94,13 @@ export class FeatsList {
         return 'fluent-emoji:trophy';
     }
   }
+
+  featSummary(feat: Feat): string {
+    const desc = feat.description?.trim();
+    if (desc) {
+      const short = desc.slice(0, 180);
+      return short + (desc.length > 180 ? '…' : '');
+    }
+    return `Don ${this.categoryLabel(feat.category).toLowerCase()}${feat.requiresMagic ? ' nécessitant la magie' : ''}.`;
+  }
 }

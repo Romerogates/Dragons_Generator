@@ -52,6 +52,15 @@ export class Spells {
     );
   });
 
+  protected spellSummary(spell: Spell): string {
+    const desc = spell.description?.trim();
+    if (desc) {
+      const short = desc.slice(0, 180);
+      return short + (desc.length > 180 ? '…' : '');
+    }
+    return `${spell.level === 0 ? 'Tour de magie' : 'Sort de niveau ' + spell.level} — ${spell.school}.`;
+  }
+
   onSearch(value: string): void {
     this.search.set(value);
   }

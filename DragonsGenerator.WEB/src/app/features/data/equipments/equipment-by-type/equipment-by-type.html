@@ -84,96 +84,83 @@
         </div>
       }
 
-      <div class="w-full flex justify-between items-end mb-4 px-2">
-        <p
-          class="text-amber-500/80 text-[10px] md:text-xs font-black uppercase tracking-widest bg-[#1b2028] px-4 py-2 rounded-t-xl border-x border-t border-slate-800 shadow-inner"
-        >
-          <span class="text-slate-300">{{ filteredEquipments().length }}</span> résultat(s)
+      <div class="w-full mb-6 flex justify-between items-end border-b border-slate-800 pb-2">
+        <p class="text-amber-500/80 text-[10px] font-black uppercase tracking-widest">
+          {{ filteredEquipments().length }} résultat(s)
         </p>
       </div>
 
-      <div
-        class="w-full overflow-x-auto rounded-b-3xl rounded-tr-3xl border border-slate-700 shadow-[0_20px_50px_rgba(0,0,0,0.5)] bg-[#1b2028] custom-scrollbar"
-      >
-        <table class="w-full text-left text-sm text-slate-300 whitespace-nowrap min-w-[800px]">
-          <thead
-            class="bg-[#11141a]/90 text-[10px] font-black uppercase tracking-widest text-slate-500 border-b-2 border-slate-700"
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+        @for (eq of filteredEquipments(); track eq.id) {
+          <article
+            class="bg-[#1b2028] rounded-2xl border border-slate-800 shadow-xl group hover:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 hover:-translate-y-1 flex flex-col overflow-hidden relative"
           >
-            <tr>
-              <th class="px-6 py-5 rounded-tl-3xl">Nom de l'objet</th>
-              <th class="px-6 py-5">Sous-catégorie</th>
-              <th class="px-6 py-5">Valeur</th>
-              <th class="px-6 py-5">Poids</th>
-              <th class="px-6 py-5 text-right rounded-tr-3xl">Action</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-800/50">
-            @for (eq of filteredEquipments(); track eq.id) {
-              <tr class="hover:bg-[#1f242e]/80 transition-colors group">
-                <td class="px-6 py-4 font-bold text-amber-500 font-serif">
-                  <div class="flex items-center gap-4">
-                    <span
-                      class="text-2xl drop-shadow-sm group-hover:scale-[1.01] transition-transform origin-center cursor-default"
+            <div
+              class="absolute -top-6 -right-6 text-8xl opacity-5 pointer-events-none group-hover:scale-[1.01] transition-transform duration-500"
+            >
+              <iconify-icon [icon]="getTypeIcon(eq)"></iconify-icon>
+            </div>
+
+            <div class="p-6 md:p-8 flex flex-col flex-grow relative z-10">
+              <header class="mb-4 flex items-start gap-3">
+                <span class="text-3xl drop-shadow-md leading-none shrink-0 pt-1">
+                  <iconify-icon [icon]="getTypeIcon(eq)" width="1em" height="1em"></iconify-icon>
+                </span>
+                <div class="min-w-0">
+                  <h2 class="text-2xl font-bold text-amber-500 font-serif tracking-wide mb-1">
+                    <a
+                      [routerLink]="['/equipments', eq.id]"
+                      class="hover:underline decoration-amber-500/30 underline-offset-4"
                     >
-                      <iconify-icon [icon]="getTypeIcon(eq)"></iconify-icon>
-                    </span>
-                    <span class="group-hover:text-amber-400 transition-colors">{{ eq.name }}</span>
-                  </div>
-                </td>
-
-                <td class="px-6 py-4 text-slate-400 italic text-xs">
-                  {{ translateSubtype(eq.subtype) }}
-                </td>
-
-                <td class="px-6 py-4 font-medium">
-                  @if (eq.cost.v !== null) {
-                    <span class="text-amber-400 drop-shadow-sm">{{ eq.cost.v }}</span>
-                    <span class="text-amber-600/80 text-[10px] uppercase font-bold ml-1">{{
-                      eq.cost.u
-                    }}</span>
-                  } @else {
-                    <span class="opacity-40 text-slate-600">—</span>
+                      {{ eq.name }}
+                    </a>
+                  </h2>
+                  @if (eq.subtype) {
+                    <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest">
+                      {{ translateSubtype(eq.subtype) }}
+                    </p>
                   }
-                </td>
+                </div>
+              </header>
 
-                <td class="px-6 py-4 font-medium text-slate-400">
-                  @if (eq.wKg !== null && eq.wKg !== undefined) {
-                    {{ eq.wKg }} <span class="text-[10px] opacity-70">kg</span>
-                  } @else {
-                    <span class="opacity-40 text-slate-600">—</span>
-                  }
-                </td>
+              <p class="text-sm text-slate-400 leading-relaxed italic line-clamp-3 mb-6 flex-grow">
+                « {{ equipmentSummary(eq) }} »
+              </p>
 
-                <td class="px-6 py-4 text-right">
-                  <a
-                    [routerLink]="['/equipments', eq.id]"
-                    class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-emerald-950/30 text-[10px] font-black uppercase tracking-widest text-emerald-500 border border-emerald-900/50 rounded-lg hover:bg-emerald-900/50 hover:text-emerald-400 hover:border-emerald-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 shadow-sm group/btn"
+              <div class="grid grid-cols-2 gap-3 mb-6">
+                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
+                  <span class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1"
+                    >Valeur</span
                   >
-                    Examiner
-                    <span
-                      class="text-sm leading-none group-hover/btn:translate-x-1 transition-transform"
-                      >→</span
-                    >
-                  </a>
-                </td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="5" class="px-6 py-24 text-center relative overflow-hidden">
-                  <span class="text-6xl mb-6 block opacity-30"
-                    ><iconify-icon icon="fluent-emoji:package"></iconify-icon
-                  ></span>
-                  <h3 class="text-slate-300 font-serif text-xl font-bold tracking-wide mb-2">
-                    Rayon vide
-                  </h3>
-                  <p class="text-slate-500 text-sm italic">
-                    Aucun objet n'est disponible pour ce filtre.
-                  </p>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
+                  <span class="text-xs text-amber-400 font-medium">{{ formatCost(eq) }}</span>
+                </div>
+                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
+                  <span class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1"
+                    >Poids</span
+                  >
+                  <span class="text-xs text-slate-200 font-medium">
+                    @if (eq.wKg !== null && eq.wKg !== undefined) {
+                      {{ eq.wKg }} kg
+                    } @else {
+                      —
+                    }
+                  </span>
+                </div>
+              </div>
+
+              <a
+                [routerLink]="['/equipments', eq.id]"
+                class="mt-auto block text-center bg-amber-950/20 text-amber-400 border border-amber-900/30 rounded-lg py-2.5 text-[10px] font-black uppercase tracking-widest hover:border-amber-500/50 transition-colors"
+              >
+                Voir le détail
+              </a>
+            </div>
+          </article>
+        } @empty {
+          <p class="col-span-full text-center text-slate-500 italic py-16">
+            Aucun objet n'est disponible pour ce filtre.
+          </p>
+        }
       </div>
     }
   </section>

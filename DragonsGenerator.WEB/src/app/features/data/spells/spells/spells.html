@@ -183,46 +183,18 @@
                     formatMeta(spell.range)
                   }}</span>
                 </div>
-                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
-                  <span class="text-[8px] text-slate-500 uppercase tracking-widest font-bold mb-0.5"
-                    >Durée</span
-                  >
-                  <span class="text-xs text-slate-300 font-medium">{{
-                    formatMeta(spell.duration)
-                  }}</span>
-                </div>
-                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
-                  <span class="text-[8px] text-slate-500 uppercase tracking-widest font-bold mb-0.5"
-                    >Composantes</span
-                  >
-                  <span class="text-xs text-fuchsia-400 font-bold tracking-widest">{{
-                    formatComponents(spell.components)
-                  }}</span>
-                </div>
               </div>
 
               <p class="text-xs text-slate-400 leading-relaxed italic line-clamp-3 mb-6">
-                {{ spell.description }}
+                « {{ spellSummary(spell) }} »
               </p>
-
-              @if (spell.classes.length > 0) {
-                <div class="border-t border-slate-800 pt-4 mb-4">
-                  <span
-                    class="text-[9px] font-black uppercase tracking-widest text-slate-600 block mb-1"
-                    >Invocateurs</span
-                  >
-                  <p class="text-[10px] text-slate-400 uppercase tracking-wider">
-                    {{ spell.classes.join(' · ') }}
-                  </p>
-                </div>
-              }
 
               <footer class="mt-auto">
                 <a
                   [routerLink]="['/spells', spell.id]"
                   class="w-full block text-center bg-fuchsia-950/20 hover:bg-fuchsia-900/40 text-fuchsia-500 border border-fuchsia-900/30 rounded-lg py-2 text-[10px] font-black uppercase tracking-widest transition-colors"
                 >
-                  Déchiffrer le sort
+                  Voir le détail
                 </a>
               </footer>
             </div>

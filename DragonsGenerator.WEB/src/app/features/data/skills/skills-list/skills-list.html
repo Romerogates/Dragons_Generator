@@ -78,30 +78,53 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @for (skill of filteredSkills(); track skill.id) {
           <article
-            class="bg-[#1b2028] rounded-2xl border border-slate-800 p-6 hover:border-sky-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 group"
+            class="bg-[#1b2028] rounded-2xl border border-slate-800 shadow-xl group hover:border-sky-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 hover:-translate-y-1 flex flex-col overflow-hidden relative"
           >
-            <header class="flex items-start gap-4 mb-4">
-              <span class="text-3xl"
-                ><iconify-icon [icon]="skillIcon(skill)"></iconify-icon
-              ></span>
-              <div>
-                <h2 class="text-xl font-bold text-sky-400 font-serif">
-                  <a [routerLink]="['/skills', skill.id]" class="hover:underline">{{
-                    skill.name
-                  }}</a>
-                </h2>
-                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">{{
-                  abilityLabel(skill.ability)
-                }}</span>
+            <div class="p-6 md:p-8 flex flex-col flex-grow relative z-10">
+              <header class="flex items-start gap-4 mb-4">
+                <span class="text-3xl shrink-0"
+                  ><iconify-icon [icon]="skillIcon(skill)"></iconify-icon
+                ></span>
+                <div>
+                  <h2 class="text-xl font-bold text-sky-400 font-serif">
+                    <a [routerLink]="['/skills', skill.id]" class="hover:underline">{{
+                      skill.name
+                    }}</a>
+                  </h2>
+                  <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">{{
+                    abilityLabel(skill.ability)
+                  }}</span>
+                </div>
+              </header>
+
+              <p class="text-sm text-slate-400 leading-relaxed italic line-clamp-3 mb-6 flex-grow">
+                « {{ skillSummary(skill) }} »
+              </p>
+
+              <div class="grid grid-cols-2 gap-3 mb-6">
+                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
+                  <span class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1"
+                    >Caractéristique</span
+                  >
+                  <span class="text-xs text-sky-300 font-medium">{{ abilityLabel(skill.ability) }}</span>
+                </div>
+                <div class="bg-[#171b22] border border-slate-700/50 rounded-lg p-2 flex flex-col">
+                  <span class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1"
+                    >Passive</span
+                  >
+                  <span class="text-xs text-slate-200 font-medium">{{
+                    skill.passiveCheck ? 'Oui' : 'Non'
+                  }}</span>
+                </div>
               </div>
-            </header>
-            <p class="text-xs text-slate-400 italic line-clamp-3 mb-4">{{ skill.description }}</p>
-            <a
-              [routerLink]="['/skills', skill.id]"
-              class="block text-center bg-sky-950/20 hover:bg-sky-900/40 text-sky-500 border border-sky-900/30 rounded-lg py-2 text-[10px] font-black uppercase tracking-widest"
-            >
-              Voir le détail
-            </a>
+
+              <a
+                [routerLink]="['/skills', skill.id]"
+                class="mt-auto block text-center bg-sky-950/20 hover:bg-sky-900/40 text-sky-500 border border-sky-900/30 rounded-lg py-2 text-[10px] font-black uppercase tracking-widest"
+              >
+                Voir le détail
+              </a>
+            </div>
           </article>
         }
       </div>

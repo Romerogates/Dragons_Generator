@@ -69,7 +69,31 @@ public class HomeAndCampaignFeatureTests
                         },
                     },
                     notes = "Notes MJ secrètes",
-                    pregenCharacters = Array.Empty<object>(),
+                    pregenCharacters = new object[]
+                    {
+                        new
+                        {
+                            id = "pregen-1",
+                            characterId = "char-1",
+                            characterName = "Héros Secret Non Assigné",
+                            publicHook = "HOOK SECRET NON ASSIGNÉ",
+                            dmBackstory = "DM SECRET",
+                            dmSecrets = "SECRETS",
+                            assignedUserId = (string?)null,
+                            status = "ready",
+                        },
+                        new
+                        {
+                            id = "pregen-2",
+                            characterId = "char-2",
+                            characterName = "Mon Héros Assigné",
+                            publicHook = "Hook public assigné",
+                            dmBackstory = "DM SECRET ASSIGNÉ",
+                            dmSecrets = "SECRETS ASSIGNÉS",
+                            assignedUserId = playerId.ToString(),
+                            status = "assigned",
+                        },
+                    },
                     sessions = Array.Empty<object>(),
                 },
             });
@@ -129,9 +153,15 @@ public class HomeAndCampaignFeatureTests
             Assert.DoesNotContain("Seigneur Ombre SECRET", raw);
             Assert.DoesNotContain("BACKSTORY PNJ SECRET", raw);
             Assert.DoesNotContain("Embuscade SECRET", raw);
+            Assert.DoesNotContain("Héros Secret Non Assigné", raw);
+            Assert.DoesNotContain("HOOK SECRET NON ASSIGNÉ", raw);
+            Assert.DoesNotContain("DM SECRET ASSIGNÉ", raw);
+            Assert.Contains("Mon Héros Assigné", raw);
+            Assert.Contains("Hook public assigné", raw);
             var json = JsonDocument.Parse(raw).RootElement;
             Assert.Empty(json.GetProperty("data").GetProperty("creatures").EnumerateArray());
             Assert.Empty(json.GetProperty("data").GetProperty("encounters").EnumerateArray());
+            Assert.Equal(1, json.GetProperty("data").GetProperty("pregenCharacters").GetArrayLength());
         }
 
         using (var getOwnerReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}", ownerToken))
@@ -190,6 +220,20 @@ public class HomeAndCampaignFeatureTests
             (await _client.SendAsync(inviteReq)).EnsureSuccessStatusCode();
         }
 
+        Guid inviteId;
+        using (var listInv = ApiTestAuth.Authed(HttpMethod.Get, "/me/campaign-invites", playerToken))
+        {
+            var inv = await _client.SendAsync(listInv);
+            inv.EnsureSuccessStatusCode();
+            var arr = await inv.Content.ReadFromJsonAsync<JsonElement>();
+            inviteId = arr[0].GetProperty("id").GetGuid();
+        }
+
+        using (var acceptReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaign-invites/{inviteId}/accept", playerToken))
+        {
+            (await _client.SendAsync(acceptReq)).EnsureSuccessStatusCode();
+        }
+
         using (var actReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}/activity", ownerToken))
         {
             var act = await _client.SendAsync(actReq);
@@ -198,6 +242,15 @@ public class HomeAndCampaignFeatureTests
                 act.IsSuccessStatusCode,
                 $"Activity GET failed: {(int)act.StatusCode} {raw}");
             Assert.Contains("invite_sent", raw);
+        }
+
+        using (var actPlayerReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}/activity", playerToken))
+        {
+            var act = await _client.SendAsync(actPlayerReq);
+            var raw = await act.Content.ReadAsStringAsync();
+            act.EnsureSuccessStatusCode();
+            Assert.DoesNotContain("invite_sent", raw);
+            Assert.DoesNotContain(playerId.ToString(), raw);
         }
     }
 }
