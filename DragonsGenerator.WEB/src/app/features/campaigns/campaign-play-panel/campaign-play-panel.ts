@@ -212,10 +212,11 @@ export class CampaignPlayPanel implements OnDestroy {
         activeCombat: null,
       };
     });
-    this.saveData({ sessions, activeSessionId: null });
-    if (this.fullscreen()) {
-      this.router.navigate(['/campaigns', c.id]);
-    }
+    this.saveData({ sessions, activeSessionId: null }, () => {
+      if (this.fullscreen()) {
+        this.router.navigate(['/campaigns', c.id]);
+      }
+    });
   }
 
   startStandaloneCombat(): void {
@@ -774,19 +775,20 @@ export class CampaignPlayPanel implements OnDestroy {
     this.campaignChange.emit({ ...c, data });
   }
 
-  private saveData(patch: Partial<CampaignData>): void {
+  private saveData(patch: Partial<CampaignData>, onSuccess?: () => void): void {
     const c = this.campaign();
     const data = { ...c.data, ...patch };
-    this.persist(c.title, data);
+    this.persist(c.title, data, onSuccess);
   }
 
-  private persist(title: string, data: CampaignData): void {
+  private persist(title: string, data: CampaignData, onSuccess?: () => void): void {
     const c = this.campaign();
     this.saving.set(true);
     this.campaigns.update(c.id, title, data).subscribe({
       next: () => {
         this.campaignChange.emit({ ...c, data });
         this.saving.set(false);
+        onSuccess?.();
       },
       error: () => {
         this.saving.set(false);

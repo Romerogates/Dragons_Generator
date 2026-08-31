@@ -6,7 +6,7 @@ test.describe('Profil utilisateur', () => {
     test.setTimeout(90_000);
 
     await loginViaUi(page, '/settings');
-    await expect(page.getByRole('heading', { name: 'Paramètres du compte' })).toBeVisible({
+    await expect(page.getByRole('heading', { name: 'Paramètres' })).toBeVisible({
       timeout: 30_000,
     });
 

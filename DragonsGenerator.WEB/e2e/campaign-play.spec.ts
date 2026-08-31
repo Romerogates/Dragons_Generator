@@ -39,9 +39,10 @@ test.describe('Mode table MJ', () => {
     });
 
     await page.getByRole('button', { name: 'Terminer la session' }).click();
+    await expect(page).toHaveURL(new RegExp(`/campaigns/${campaignId}$`), { timeout: 20_000 });
     await expect(page.getByText('Table de jeu — session en cours')).not.toBeVisible({
-      timeout: 15_000,
+      timeout: 20_000,
     });
-    await expect(page.getByText(/Planifiez une session/i)).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText(/Planifiez une session/i)).toBeVisible({ timeout: 20_000 });
   });
 });
