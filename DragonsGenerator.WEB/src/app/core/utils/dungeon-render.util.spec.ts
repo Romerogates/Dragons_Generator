@@ -5,6 +5,7 @@ import {
   dungeonMapToPngDataUrl,
   exportDungeonPdf,
   exportDungeonPng,
+  fogRevealSet,
   roomAt,
   roomLabelAt,
   themePalette,
@@ -222,5 +223,27 @@ describe('dungeon-render helpers', () => {
       },
     ];
     await expectAsync(exportDungeonPdf(map, encounters, 'branches.pdf')).toBeResolved();
+  });
+
+  it('fogRevealSet returns null when fog disabled', () => {
+    expect(fogRevealSet(sampleMap())).toBeNull();
+    expect(fogRevealSet(sampleMap({ fogOfWarEnabled: true, revealedRoomIds: ['r1'] }))).toEqual(
+      new Set(['r1']),
+    );
+  });
+
+  it('buildHandoutBody with playerFog hides unrevealed rooms and markers', () => {
+    const map = sampleMap({ fogOfWarEnabled: true, revealedRoomIds: [] });
+    const body = buildHandoutBody(map, [], { playerFog: true });
+    expect(body).not.toContain('**Salle 1**');
+    expect(body).not.toContain('Coffre');
+    expect(body).toMatch(/!\[Crypte test\]\(data:image\/png;base64,/);
+  });
+
+  it('drawDungeonToCanvas applies fog overlay for unrevealed rooms', () => {
+    const map = sampleMap({ fogOfWarEnabled: true, revealedRoomIds: [] });
+    const canvas = document.createElement('canvas');
+    drawDungeonToCanvas(map, canvas, 8, { revealedRoomIds: fogRevealSet(map) });
+    expect(canvas.width).toBe(32);
   });
 });
