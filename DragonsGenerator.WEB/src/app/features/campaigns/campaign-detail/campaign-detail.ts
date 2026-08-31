@@ -49,15 +49,16 @@ import { formatChallengeRating, getCreatureCategoryLabel } from '@core/utils/cre
 import { StoryBuilderService } from '@core/services/story-builder.service';
 import { CampaignPregenGeneratorService } from '@core/services/campaign-pregen-generator.service';
 import { CampaignPlayPanel } from '../campaign-play-panel/campaign-play-panel';
+import { CampaignDungeonMaps } from '../campaign-dungeon-maps/campaign-dungeon-maps';
 import { LightMarkdownPipe } from '@shared/pipes/light-markdown.pipe';
 import { firstValueFrom } from 'rxjs';
 
-type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'activity' | 'handouts';
+type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'activity' | 'handouts' | 'maps';
 
 @Component({
   selector: 'app-campaign-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ProfileAvatarComponent, CampaignPlayPanel, LightMarkdownPipe],
+  imports: [CommonModule, FormsModule, RouterLink, ProfileAvatarComponent, CampaignPlayPanel, CampaignDungeonMaps, LightMarkdownPipe],
   templateUrl: './campaign-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -163,6 +164,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     ];
     if (owner) {
       tabs.push({ id: 'creatures', label: 'Personnages & créatures' });
+      tabs.push({ id: 'maps', label: 'Cartes & donjons' });
     }
     tabs.push({ id: 'pregens', label: 'Héros pré-tirés' });
     if (owner) {
@@ -257,7 +259,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
     const tab = this.route.snapshot.queryParamMap.get('tab');
     const handoutId = this.route.snapshot.queryParamMap.get('handout');
-    if (tab === 'handouts' || tab === 'players' || tab === 'activity' || tab === 'overview') {
+    if (tab === 'handouts' || tab === 'players' || tab === 'activity' || tab === 'overview' || tab === 'maps') {
       this.tab.set(tab);
       if (tab === 'handouts' && handoutId) this.focusHandoutId.set(handoutId);
     }
@@ -298,7 +300,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   setTab(t: Tab): void {
-    if (!this.campaign()?.isOwner && (t === 'creatures' || t === 'encounters')) {
+    if (!this.campaign()?.isOwner && (t === 'creatures' || t === 'encounters' || t === 'maps')) {
       this.tab.set('overview');
       return;
     }
@@ -730,6 +732,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const c = this.campaign();
     if (!c) return;
     const data = { ...c.data, ...patch };
+    this.campaign.update((prev) => (prev ? { ...prev, data } : prev));
     this.persist(c.title, data);
   }
 

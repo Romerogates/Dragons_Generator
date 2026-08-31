@@ -108,8 +108,8 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   private observer: IntersectionObserver | null = null;
   private readonly prefetched = new Set<string>();
 
-  readonly guideUpdatedAt = '30 août 2026';
-  readonly guideVersion = '1.3';
+  readonly guideUpdatedAt = '31 août 2026';
+  readonly guideVersion = '1.4';
 
   readonly audience = signal<GuideAudience>('all');
   readonly activeSection = signal('parcours');
@@ -136,6 +136,9 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
       'Utilisez le bandeau campagne pour saisir votre initiative rapidement.',
       'Publiez un handout : les joueurs le voient dans Activité et Documents.',
       'Terminez le combat pour archiver un résumé dans l’historique MJ.',
+      'Générez un donjon depuis Cartes & donjons — le thème suit souvent la région Eana.',
+      'Handout brouillon : les joueurs ne voient la carte qu’après publication dans Documents.',
+      'Paramètres → onglet Notifications : filtrez amis, campagnes et push par type.',
     ];
     const day = Math.floor(Date.now() / 86_400_000);
     return tips[day % tips.length];
@@ -154,6 +157,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     { id: 'personnage', label: 'Personnage', icon: 'fluent-emoji:shield', accent: 'text-emerald-400', audience: 'all' },
     { id: 'scenario', label: 'Campagnes', icon: 'fluent-emoji:globe-showing-europe-africa', accent: 'text-violet-400', audience: 'all', isNew: true },
     { id: 'table', label: 'Table MJ', icon: 'fluent-emoji:performing-arts', accent: 'text-amber-400', audience: 'dm', isNew: true },
+    { id: 'donjons', label: 'Donjons & cartes', icon: 'fluent-emoji:castle', accent: 'text-violet-400', audience: 'dm', isNew: true },
     { id: 'initiative', label: 'Combat', icon: 'fluent-emoji:crossed-swords', accent: 'text-red-400', audience: 'all' },
     { id: 'documents', label: 'Documents', icon: 'fluent-emoji:scroll', accent: 'text-sky-400', audience: 'all' },
     { id: 'social', label: 'Social', icon: 'fluent-emoji:speech-balloon', accent: 'text-pink-400', audience: 'all' },
@@ -212,6 +216,28 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   readonly blogPosts: GuideBlogPost[] = [
+    {
+      date: '31 août 2026',
+      tag: 'Cartes MJ',
+      title: 'Générateur de donjons v1',
+      summary:
+        'Onglet Cartes & donjons : génération procédurale, édition grille, rencontres par salle, export PNG/PDF/JSON et handout brouillon.',
+      icon: 'fluent-emoji:castle',
+      border: 'border-violet-500/30',
+      tagColor: 'text-violet-400 bg-violet-950/40',
+      isNew: true,
+    },
+    {
+      date: '31 août 2026',
+      tag: 'Compte',
+      title: 'Paramètres, profil & notifications',
+      summary:
+        'Paramètres par onglets, profil avec stats, centre de notifications filtrable et préférences par type (localStorage).',
+      icon: 'fluent-emoji:bust-in-silhouette',
+      border: 'border-sky-500/30',
+      tagColor: 'text-sky-400 bg-sky-950/40',
+      isNew: true,
+    },
     {
       date: '30 août 2026',
       tag: 'Campagnes',
@@ -330,6 +356,13 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
       sectionId: 'table',
     },
     {
+      title: 'Générer un donjon',
+      bullets: ['Campagne → Cartes & donjons', 'Curseurs + thème → Générer', 'Export ou handout brouillon'],
+      audience: 'dm',
+      icon: 'fluent-emoji:castle',
+      sectionId: 'donjons',
+    },
+    {
       title: 'Collecter l’init',
       bullets: ['Tracker → Collecter', 'Joueurs reçoivent bandeau', 'Importer les jets'],
       audience: 'dm',
@@ -438,6 +471,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     'Créer campagne',
     'Inviter amis',
     'Valider persos',
+    'Préparer donjon / docs',
     'Planifier session',
     'Démarrer la table',
   ];
@@ -488,15 +522,73 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     { label: 'Terminer', detail: 'Historique + notes' },
   ];
 
+  readonly dungeonGenSteps: GuideStep[] = [
+    {
+      title: 'Ouvrir l’onglet',
+      body: 'Campagne → Cartes & donjons (MJ uniquement). Plusieurs cartes possibles par campagne.',
+      badge: 'MJ',
+      link: '/campaigns',
+      linkLabel: 'Mes campagnes',
+    },
+    {
+      title: 'Nouveau donjon',
+      body: 'Bouton Nouveau donjon → nom, thème (suggéré depuis la région Eana), curseurs grille / salles / couloirs.',
+      badge: 'MJ',
+    },
+    {
+      title: 'Générer',
+      body: 'Salles + couloirs connectés, portes automatiques, rencontres aléatoires cohérentes avec le thème.',
+      badge: 'MJ',
+    },
+    {
+      title: 'Éditer la grille',
+      body: 'Outils : sol, mur, porte, piège, coffre, escalier. Zoom +/-. Panneau latéral : salles numérotées.',
+      badge: 'MJ',
+    },
+    {
+      title: 'Assigner les rencontres',
+      body: 'Par salle : choisir une rencontre campagne (boss fixe) ou garder le tirage aléatoire · Relancer si besoin.',
+      badge: 'MJ',
+    },
+    {
+      title: 'Exporter & partager',
+      body: 'PNG, PDF (carte + légende), JSON (réouvrir plus tard). Handout brouillon → onglet Documents.',
+      badge: 'MJ',
+    },
+    {
+      title: 'Publier aux joueurs',
+      body: 'Documents → ouvrir le handout carte → Publier. Les joueurs voient la légende ; fog of war = prochaine version.',
+      badge: 'MJ',
+    },
+  ];
+
+  readonly dungeonEditorTools = [
+    { tool: 'Sélection', detail: 'Cliquer une salle ou un marqueur dans le panneau' },
+    { tool: 'Sol / Mur / Porte', detail: 'Peindre la grille case par case' },
+    { tool: 'Piège / Coffre / Escalier', detail: 'Placer un marqueur (re-clic pour retirer)' },
+    { tool: 'Notes de salle', detail: 'Texte libre MJ dans le panneau latéral' },
+  ];
+
+  readonly dungeonThemes = [
+    'Crypte',
+    'Caverne',
+    'Ruines',
+    'Temple',
+    'Égouts',
+    'Forêt souterraine',
+    'Générique',
+  ];
+
   readonly dmChecklist: GuideChecklistItem[] = [
     { id: 'dm-1', label: 'Campagne créée avec synopsis' },
     { id: 'dm-2', label: 'Amis invités (déjà dans la liste d’amis)' },
     { id: 'dm-3', label: 'Personnages joueurs validés (fiche consultée)' },
     { id: 'dm-4', label: 'Notifications push activées (propositions incluses)' },
     { id: 'dm-5', label: 'Rencontres / créatures préparées' },
-    { id: 'dm-6', label: 'Session planifiée (rappels push activés)' },
-    { id: 'dm-7', label: 'Documents / handouts prêts si besoin' },
-    { id: 'dm-8', label: 'Table démarrée le jour J · party importée' },
+    { id: 'dm-6', label: 'Donjon ou carte préparée (Cartes & donjons)' },
+    { id: 'dm-7', label: 'Session planifiée (rappels push activés)' },
+    { id: 'dm-8', label: 'Documents / handouts prêts si besoin' },
+    { id: 'dm-9', label: 'Table démarrée le jour J · party importée' },
   ];
 
   readonly playerChecklist: GuideChecklistItem[] = [
@@ -510,6 +602,20 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   readonly faqItems: GuideFaqItem[] = [
+    {
+      id: 'faq-donjon',
+      question: 'Où générer un donjon pour ma campagne ?',
+      answer:
+        'MJ : ouvrez votre campagne → onglet Cartes & donjons → Nouveau donjon. Ajustez les curseurs (taille grille, nombre de salles, densité des couloirs), choisissez un thème, puis Générer. Éditez, exportez en PNG/PDF ou créez un handout brouillon.',
+      audience: 'dm',
+    },
+    {
+      id: 'faq-handout-carte',
+      question: 'Les joueurs voient-ils la carte tout de suite ?',
+      answer:
+        'Non tant que le handout n’est pas publié. Le bouton Handout brouillon crée un document type « Carte » dans l’onglet Documents, invisible pour les joueurs. Publiez-le quand vous êtes prêt. La révélation progressive (fog of war) arrivera dans une prochaine version.',
+      audience: 'dm',
+    },
     {
       id: 'faq-pdf',
       question: 'Mon PDF affiche « Export incomplet »',
@@ -604,6 +710,11 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     { term: 'Pré-tiré', definition: 'Personnage préparé par le MJ, assignable puis revendiquable par un joueur.' },
     { term: 'Handout', definition: 'Document publié aux joueurs (lettre, carte, résumé…) en markdown léger.' },
     {
+      term: 'Carte & donjon',
+      definition:
+        'Layout procédural MJ (salles, couloirs, marqueurs) sauvegardé dans la campagne. Export PNG/PDF ou handout brouillon.',
+    },
+    {
       term: 'Collecte d’initiative',
       definition: 'Le MJ ouvre une saisie ; chaque joueur envoie son jet avant le combat.',
     },
@@ -639,6 +750,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     { label: 'Arsenal de départ', description: 'Équipement et choix d’armes', sectionId: 'personnage', audience: 'all' },
     { label: 'Bestiaire / créatures', description: 'Préparation MJ et PDF', sectionId: 'scenario', audience: 'dm' },
     { label: 'Campagnes', description: 'Création, joueurs, sessions', sectionId: 'scenario', audience: 'all' },
+    { label: 'Cartes & donjons', description: 'Génération procédurale MJ', sectionId: 'donjons', audience: 'dm' },
     { label: 'Collecte d’initiative', description: 'Jets joueurs synchronisés', sectionId: 'initiative', audience: 'all' },
     { label: 'Documents / handouts', description: 'Publication markdown', sectionId: 'documents', audience: 'all' },
     { label: 'Fiche personnage PDF', description: 'Export & sauvegarde', sectionId: 'pdf', audience: 'all' },
@@ -650,6 +762,8 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     { label: 'Proposition de personnage', description: 'Propose → push → valider', sectionId: 'scenario', audience: 'all' },
     { label: 'Table de jeu', description: 'Session live MJ + feedback', sectionId: 'table', audience: 'dm' },
     { label: 'Validation de personnage', description: 'Voir fiche → accepter / refuser', sectionId: 'scenario', audience: 'dm' },
+    { label: 'Paramètres compte', description: 'Onglets profil, notifs, sécurité, données', sectionId: 'compte', audience: 'all' },
+    { label: 'Centre notifications', description: 'Filtres, masquage, préférences', sectionId: 'notifications', audience: 'all' },
   ];
 
   readonly filteredIndex = computed(() => {

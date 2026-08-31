@@ -80,6 +80,8 @@ public static class CampaignJsonHelpers
             node["handouts"] = visibleHandouts;
         }
 
+        node["dungeonMaps"] = new JsonArray();
+
         using var doc = JsonDocument.Parse(node.ToJsonString());
         return doc.RootElement.Clone();
     }
@@ -133,7 +135,7 @@ public static class CampaignJsonHelpers
 
         foreach (var prop in update.ToList())
         {
-            if (prop.Key is "adventure" or "notes" or "creatures" or "encounters" or "activeSessionId" or "handouts") continue;
+            if (prop.Key is "adventure" or "notes" or "creatures" or "encounters" or "activeSessionId" or "handouts" or "dungeonMaps") continue;
             existing[prop.Key] = prop.Value?.DeepClone();
         }
 

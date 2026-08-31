@@ -1,14 +1,22 @@
 <div class="w-full min-h-screen bg-[#171b22] text-slate-300 pb-20 animate-fade-in overflow-x-clip">
-  <section class="border-b border-slate-800 pt-16 pb-12 px-4 text-center">
-    <h1 class="text-3xl sm:text-4xl font-extrabold text-amber-400 font-serif uppercase mb-4">
+  <section class="border-b border-slate-800 pt-16 pb-10 px-4 text-center">
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-amber-400 font-serif uppercase mb-3">
       Notifications
     </h1>
     <p class="text-sm text-slate-400 italic max-w-xl mx-auto">
-      Demandes d'amis, invitations et actions en attente sur vos campagnes.
+      Actions en attente : amis, campagnes et validations de personnages.
     </p>
+    @if (isLoggedIn()) {
+      <a
+        routerLink="/settings"
+        [queryParams]="{ tab: 'notifications' }"
+        class="inline-block mt-4 text-[10px] font-black uppercase tracking-wider text-slate-500 hover:text-amber-400"
+        >Gérer les préférences →</a
+      >
+    }
   </section>
 
-  <section class="max-w-2xl mx-auto px-4 py-10 min-w-0">
+  <section class="max-w-2xl mx-auto px-4 py-8 min-w-0">
     @if (!isLoggedIn()) {
       <p class="text-center text-slate-400 py-12">Connectez-vous pour voir vos notifications.</p>
       <div class="text-center">
@@ -19,42 +27,107 @@
           >Se connecter</a
         >
       </div>
-    } @else if (totalCount() === 0) {
-      <div
-        class="flex flex-col items-center justify-center bg-[#1b2028] border border-dashed border-slate-700 rounded-3xl p-12 text-center"
-      >
-        <span class="text-5xl mb-4 opacity-80"
-          ><iconify-icon icon="fluent-emoji:bell-with-slash"></iconify-icon
-        ></span>
-        <p class="text-slate-400">Aucune action en attente pour le moment.</p>
-      </div>
     } @else {
-      <div class="space-y-3">
-        @for (item of items(); track trackItem($index, item)) {
-          <a
-            [routerLink]="item.actionPath"
-            class="flex items-start gap-4 bg-[#1b2028] border border-slate-800 hover:border-amber-800/50 rounded-2xl p-4 transition-colors group"
-          >
-            <span class="text-2xl shrink-0 mt-0.5"
-              ><iconify-icon [icon]="iconFor(item.kind)"></iconify-icon
-            ></span>
-            <div class="min-w-0 flex-1">
-              <p
-                class="text-[10px] font-black uppercase tracking-widest text-amber-500/90 mb-1"
-              >
-                {{ item.title }}
-              </p>
-              <p class="text-sm text-slate-200 group-hover:text-amber-100 transition-colors">
-                {{ item.message }}
-              </p>
-              <p class="text-[10px] text-slate-500 mt-2">
-                {{ item.createdAt | date: 'short' }}
-              </p>
-            </div>
-            <span class="text-slate-600 group-hover:text-amber-400 shrink-0 self-center">→</span>
-          </a>
-        }
+      <div class="flex flex-wrap gap-2 mb-6">
+        <button
+          type="button"
+          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border transition-colors"
+          [class]="
+            filter() === 'all'
+              ? 'border-amber-500/50 bg-amber-950/30 text-amber-300'
+              : 'border-slate-800 text-slate-500'
+          "
+          (click)="setFilter('all')"
+        >
+          Tout ({{ friendsCount() + campaignsCount() }})
+        </button>
+        <button
+          type="button"
+          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border transition-colors"
+          [class]="
+            filter() === 'friends'
+              ? 'border-emerald-500/50 bg-emerald-950/30 text-emerald-300'
+              : 'border-slate-800 text-slate-500'
+          "
+          (click)="setFilter('friends')"
+        >
+          Amis ({{ friendsCount() }})
+        </button>
+        <button
+          type="button"
+          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border transition-colors"
+          [class]="
+            filter() === 'campaigns'
+              ? 'border-violet-500/50 bg-violet-950/30 text-violet-300'
+              : 'border-slate-800 text-slate-500'
+          "
+          (click)="setFilter('campaigns')"
+        >
+          Campagnes ({{ campaignsCount() }})
+        </button>
       </div>
+
+      @if (hiddenByPrefsCount() > 0) {
+        <p class="text-xs text-slate-500 mb-4 text-center">
+          {{ hiddenByPrefsCount() }} notification(s) masquée(s) par vos préférences.
+          <a routerLink="/settings" [queryParams]="{ tab: 'notifications' }" class="text-amber-400 hover:underline"
+            >Modifier</a
+          >
+        </p>
+      }
+
+      @if (totalVisible() === 0) {
+        <div
+          class="flex flex-col items-center justify-center bg-[#1b2028] border border-dashed border-slate-700 rounded-3xl p-12 text-center"
+        >
+          <span class="text-5xl mb-4 opacity-80"
+            ><iconify-icon icon="fluent-emoji:bell-with-slash"></iconify-icon
+          ></span>
+          <p class="text-slate-400">Aucune action en attente pour ce filtre.</p>
+          @if (allItems().length > 0) {
+            <button
+              type="button"
+              class="mt-4 text-[10px] font-black uppercase text-slate-500 hover:text-amber-400"
+              (click)="clearDismissed()"
+            >
+              Réafficher les masquées
+            </button>
+          }
+        </div>
+      } @else {
+        <div class="space-y-3">
+          @for (item of visibleItems(); track trackItem($index, item)) {
+            <div
+              class="relative flex items-start gap-4 bg-[#1b2028] border border-slate-800 hover:border-amber-800/50 rounded-2xl p-4 transition-colors group"
+            >
+              <a [routerLink]="item.actionPath" class="flex items-start gap-4 min-w-0 flex-1">
+                <span class="text-2xl shrink-0 mt-0.5"
+                  ><iconify-icon [icon]="iconFor(item.kind)"></iconify-icon
+                ></span>
+                <div class="min-w-0 flex-1">
+                  <p class="text-[10px] font-black uppercase tracking-widest text-amber-500/90 mb-1">
+                    {{ item.title }}
+                  </p>
+                  <p class="text-sm text-slate-200 group-hover:text-amber-100 transition-colors">
+                    {{ item.message }}
+                  </p>
+                  <p class="text-[10px] text-slate-500 mt-2">{{ relativeTime(item.createdAt) }}</p>
+                </div>
+                <span class="text-slate-600 group-hover:text-amber-400 shrink-0 self-center">→</span>
+              </a>
+              <button
+                type="button"
+                title="Masquer"
+                aria-label="Masquer cette notification"
+                class="shrink-0 min-h-9 min-w-9 rounded-lg text-slate-600 hover:text-slate-300 hover:bg-slate-800/50 text-xs"
+                (click)="dismiss(item, $event)"
+              >
+                ✕
+              </button>
+            </div>
+          }
+        </div>
+      }
     }
   </section>
 </div>

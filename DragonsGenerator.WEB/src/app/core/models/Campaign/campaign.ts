@@ -4,6 +4,7 @@ import {
   CreatureRole,
   StoryCreatureSelection,
 } from '../Story/story';
+import type { CampaignDungeonMap } from './dungeon-map';
 
 export interface EncounterCreature {
   creatureId: string;
@@ -125,6 +126,8 @@ export interface CampaignData {
   handouts: CampaignHandout[];
   /** Session en cours côté table de jeu MJ. */
   activeSessionId?: string | null;
+  /** Cartes / donjons générés (MJ uniquement). */
+  dungeonMaps?: CampaignDungeonMap[];
 }
 
 export interface CampaignMember {
@@ -242,6 +245,7 @@ export function emptyCampaignData(partyLevel = 3): CampaignData {
     sessions: [],
     handouts: [],
     activeSessionId: null,
+    dungeonMaps: [],
   };
 }
 

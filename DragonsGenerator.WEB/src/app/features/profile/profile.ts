@@ -11,6 +11,8 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ProfileService, PublicUserProfile } from '@core/services/profile.service';
 import { AuthService } from '@core/services/auth.service';
 import { FriendChatDockService } from '@core/services/friend-chat-dock.service';
+import { HomeSummary, HomeSummaryService } from '@core/services/home-summary.service';
+import { NotificationService } from '@core/services/notification.service';
 import {
   accentGradient,
   profileInitial,
@@ -29,10 +31,15 @@ export class ProfilePage implements OnInit {
   private readonly profiles = inject(ProfileService);
   private readonly auth = inject(AuthService);
   private readonly chatDock = inject(FriendChatDockService);
+  private readonly homeSummary = inject(HomeSummaryService);
+  private readonly notifications = inject(NotificationService);
 
   readonly profile = signal<PublicUserProfile | null>(null);
+  readonly summary = signal<HomeSummary | null>(null);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
+
+  readonly notificationCount = this.notifications.totalCount;
 
   ngOnInit(): void {
     const paramId = this.route.snapshot.paramMap.get('userId');
@@ -46,6 +53,9 @@ export class ProfilePage implements OnInit {
       next: (p) => {
         this.profile.set(p);
         this.loading.set(false);
+        if (p.isSelf) {
+          this.homeSummary.getSummary().subscribe((s) => this.summary.set(s));
+        }
       },
       error: () => {
         this.error.set('Profil introuvable.');
@@ -64,5 +74,15 @@ export class ProfilePage implements OnInit {
 
   openChat(p: PublicUserProfile): void {
     this.chatDock.openThread(p.id, p.displayName, p.avatarEmoji, p.accentColor);
+  }
+
+  formatSessionDate(iso: string): string {
+    return new Date(iso).toLocaleString('fr-FR', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
 }

@@ -1,357 +1,25 @@
-<div class="max-w-lg mx-auto px-4 py-10">
-  <div class="flex items-center gap-3 mb-8">
-    <span class="text-2xl"><iconify-icon icon="mdi:cog-outline"></iconify-icon></span>
-    <h1 class="font-serif text-2xl font-bold text-amber-500">Paramètres du compte</h1>
+<div class="max-w-3xl mx-auto px-4 py-10">
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <div class="flex items-center gap-3">
+      <span class="text-2xl"><iconify-icon icon="mdi:cog-outline"></iconify-icon></span>
+      <div>
+        <h1 class="font-serif text-2xl font-bold text-amber-500">Paramètres</h1>
+        <p class="text-xs text-slate-500 mt-0.5">Compte, notifications, application et données.</p>
+      </div>
+    </div>
+    <a
+      routerLink="/profile"
+      class="text-[10px] font-black uppercase tracking-wider text-violet-400 hover:text-violet-300"
+      >Voir mon profil →</a
+    >
   </div>
 
-  <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6 mb-6">
-    <div class="flex items-center justify-between gap-3 mb-4">
-      <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500">Profil public</h2>
-      <a routerLink="/profile" class="text-[10px] font-black uppercase text-violet-400 hover:text-violet-300"
-        >Voir le profil →</a
-      >
-    </div>
-    <p class="text-xs text-slate-400 mb-4">{{ user()?.email }}</p>
-
-    <div class="flex items-center gap-4 mb-6">
-      <div
-        class="w-16 h-16 rounded-full bg-gradient-to-br flex items-center justify-center text-xl font-black text-white shrink-0"
-        [class]="previewGradient()"
-      >
-        @if (avatarEmoji) {
-          <iconify-icon [icon]="avatarEmoji" class="text-2xl"></iconify-icon>
-        } @else {
-          {{ previewInitial() }}
-        }
-      </div>
-      <p class="text-xs text-slate-500">Aperçu de votre avatar sur le profil et chez vos amis.</p>
-    </div>
-
-    <form class="flex flex-col gap-4" (ngSubmit)="saveProfile()">
-      <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-        Pseudo
-        <input
-          type="text"
-          required
-          minlength="2"
-          maxlength="64"
-          [(ngModel)]="displayName"
-          name="displayName"
-          placeholder="Nom affiché (unique)"
-          class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 outline-none"
-        />
-      </label>
-
-      <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-        Bio
-        <textarea
-          rows="3"
-          maxlength="280"
-          [(ngModel)]="bio"
-          name="bio"
-          placeholder="Quelques mots sur votre style de jeu, vos campagnes…"
-          class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 outline-none resize-none"
-        ></textarea>
-        <span class="text-[10px] text-slate-600">{{ bio.length }}/280</span>
-      </label>
-
-      <div>
-        <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-2">Avatar</p>
-        <div class="flex flex-wrap gap-2">
-          @for (opt of avatarOptions; track opt.id) {
-            <button
-              type="button"
-              class="w-11 h-11 rounded-xl border flex items-center justify-center text-xl transition-colors"
-              [class]="
-                avatarEmoji === opt.icon
-                  ? 'border-amber-500 bg-amber-950/30'
-                  : 'border-slate-700 bg-[#171b22] hover:border-slate-500'
-              "
-              [attr.aria-label]="opt.label"
-              (click)="selectAvatar(opt.icon)"
-            >
-              <iconify-icon [icon]="opt.icon"></iconify-icon>
-            </button>
-          }
-        </div>
-      </div>
-
-      <div>
-        <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-2">Couleur d'accent</p>
-        <div class="flex flex-wrap gap-2">
-          @for (accent of accentOptions; track accent.id) {
-            <button
-              type="button"
-              class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border transition-colors"
-              [class]="
-                accentColor === accent.id
-                  ? 'border-amber-500 text-amber-300 bg-amber-950/20'
-                  : 'border-slate-700 text-slate-400 hover:border-slate-500'
-              "
-              (click)="selectAccent(accent.id)"
-            >
-              {{ accent.label }}
-            </button>
-          }
-        </div>
-      </div>
-
-      @if (profileError()) {
-        <p class="text-sm text-red-400">{{ profileError() }}</p>
-      }
-      @if (profileMsg()) {
-        <p class="text-sm text-emerald-400">{{ profileMsg() }}</p>
-      }
-      <button type="submit" class="wizard-nav-primary w-full" [disabled]="profileLoading()">
-        {{ profileLoading() ? 'Enregistrement…' : 'Enregistrer le profil' }}
-      </button>
-    </form>
-  </section>
-
-  <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6 mb-6">
-    <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">
-      Mot de passe
-    </h2>
-    <form class="flex flex-col gap-4" (ngSubmit)="savePassword()">
-      <app-password-field
-        label="Mot de passe actuel"
-        name="currentPassword"
-        [required]="true"
-        [(value)]="currentPassword"
-      />
-      <app-password-field
-        label="Nouveau mot de passe"
-        name="newPassword"
-        [required]="true"
-        [minlength]="8"
-        [(value)]="newPassword"
-      />
-      <app-password-field
-        label="Confirmer le nouveau mot de passe"
-        name="confirmPassword"
-        [required]="true"
-        [minlength]="8"
-        [(value)]="confirmPassword"
-      />
-      @if (passwordError()) {
-        <p class="text-sm text-red-400">{{ passwordError() }}</p>
-      }
-      @if (passwordMsg()) {
-        <p class="text-sm text-emerald-400">{{ passwordMsg() }}</p>
-      }
-      <button type="submit" class="wizard-nav-primary w-full" [disabled]="passwordLoading()">
-        {{ passwordLoading() ? 'Mise à jour…' : 'Changer le mot de passe' }}
-      </button>
-    </form>
-  </section>
-
-  <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6 mb-6">
-    <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
-      Application (PWA)
-    </h2>
-    <p class="text-xs text-slate-400 mb-4">
-      Installez Dragons Generator sur l’écran d’accueil pour un accès rapide et les notifications.
-    </p>
-    @if (isPwaStandalone()) {
-      <p class="text-sm text-emerald-400">Application déjà installée.</p>
-    } @else if (canInstallPwa()) {
-      <button
-        type="button"
-        class="wizard-nav-primary"
-        [disabled]="installBusy()"
-        (click)="installPwa()"
-      >
-        {{ installBusy() ? 'Installation…' : 'Installer l’app' }}
-      </button>
-    } @else {
-      <p class="text-sm text-slate-500">
-        Sur mobile : menu du navigateur → « Ajouter à l’écran d’accueil ». Sur desktop Chrome : icône
-        d’installation dans la barre d’adresse.
-      </p>
-    }
-  </section>
-
-  <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6 mb-6">
-    <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
-      Notifications push
-    </h2>
-    <p class="text-xs text-slate-400 mb-4">
-      Recevez des alertes pour les messages, invitations, rappels de session (24 h et 1 h avant), documents publiés et collecte d’initiative (PWA installée, production).
-    </p>
-    @if (!pushSupported()) {
-      <p class="text-sm text-amber-300">Indisponible dans cet environnement (service worker requis).</p>
-    } @else {
-      <label class="flex items-center gap-3 cursor-pointer">
-        <input
-          type="checkbox"
-          class="w-4 h-4 rounded border-slate-600"
-          [checked]="pushEnabled()"
-          [disabled]="pushBusy()"
-          (change)="togglePushNotifications($event)"
-        />
-        <span class="text-sm text-slate-300">Activer les notifications push</span>
-      </label>
-      @if (pushError(); as err) {
-        <p class="text-sm text-red-400 mt-3">{{ err }}</p>
-      }
-    }
-  </section>
-
-  <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6 mb-6">
-    <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Mode hors ligne</h2>
-    <p class="text-xs text-slate-400 mb-4">
-      Télécharge le Codex pour forger un personnage sans connexion. Les campagnes manuelles (sans IA) et les
-      personnages créés hors ligne seront synchronisés automatiquement à la reconnexion.
-    </p>
-
-    @if (codexDownloaded()) {
-      <p class="text-sm text-emerald-400 mb-3">
-        Codex disponible hors ligne
-        @if (codexDownloadedAt(); as at) {
-          <span class="text-slate-500"> · {{ at | date: 'short' }}</span>
-        }
-      </p>
-    } @else {
-      <p class="text-sm text-amber-300 mb-3">Codex non téléchargé — la création de personnage hors ligne sera limitée.</p>
-    }
-
-    @if (codexDownloadError(); as err) {
-      <p class="text-sm text-red-400 mb-3">{{ err }}</p>
-    }
-
-    <div class="flex flex-wrap gap-2 mb-4">
-      <button
-        type="button"
-        class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white disabled:opacity-50"
-        [disabled]="codexDownloading() || !isOnline()"
-        (click)="downloadCodex()"
-      >
-        {{ codexDownloading() ? 'Téléchargement…' : (codexDownloaded() ? 'Mettre à jour le Codex' : 'Télécharger le Codex') }}
-      </button>
-      @if (codexDownloaded()) {
-        <button
-          type="button"
-          class="px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-400"
-          (click)="clearCodexDownload()"
-        >
-          Supprimer le cache
-        </button>
-      }
-    </div>
-
-    @if (pendingSyncCount() > 0) {
-      <p class="text-sm text-sky-300 mb-2">{{ pendingSyncCount() }} élément(s) en attente de synchronisation.</p>
-      <button
-        type="button"
-        class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-sky-900/40 border border-sky-700/50 text-sky-300 disabled:opacity-50"
-        [disabled]="!isOnline()"
-        (click)="syncNow()"
-      >
-        Synchroniser maintenant
-      </button>
-    }
-    @if (syncError()) {
-      <p class="text-sm text-amber-400 mt-3">{{ syncError() }}</p>
-    }
-    @if (syncMessage()) {
-      <p class="text-sm text-emerald-400 mt-3">{{ syncMessage() }}</p>
-    }
-  </section>
-
-  <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6 mb-6">
-    <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
-      Données personnelles (RGPD)
-    </h2>
-    <p class="text-xs text-slate-400 mb-4">
-      Consulte la
-      <a routerLink="/legal/privacy" class="text-amber-400 hover:underline">politique de confidentialité</a>
-      et les
-      <a routerLink="/legal/terms" class="text-amber-400 hover:underline">conditions d’utilisation</a>.
-      Tu peux exporter ou supprimer les données stockées sur le serveur.
-    </p>
-
-    <button
-      type="button"
-      class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-sky-900/40 border border-sky-700/50 text-sky-300 disabled:opacity-50 mb-3"
-      [disabled]="exportLoading() || !isOnline()"
-      (click)="exportData()"
-    >
-      {{ exportLoading() ? 'Export…' : 'Exporter mes données (JSON)' }}
-    </button>
-    @if (exportError()) {
-      <p class="text-sm text-red-400 mb-2">{{ exportError() }}</p>
-    }
-    @if (exportMsg()) {
-      <p class="text-sm text-emerald-400 mb-2">{{ exportMsg() }}</p>
-    }
-
-    <div class="mt-4 pt-4 border-t border-slate-800">
-      <h3 class="text-[10px] font-black uppercase tracking-widest text-red-400/90 mb-2">Zone de danger</h3>
-      <p class="text-xs text-slate-400 mb-3">
-        La suppression efface définitivement ton compte, tes personnages, campagnes hébergées et tickets
-        support. Les campagnes dont tu es propriétaire seront supprimées pour tous les membres.
-      </p>
-      @if (!showDeleteForm()) {
-        <button
-          type="button"
-          class="px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-red-900/60 text-red-400 hover:bg-red-950/30"
-          (click)="toggleDeleteForm()"
-        >
-          Supprimer mon compte
-        </button>
-      } @else {
-        <div class="flex flex-col gap-3">
-          <app-password-field
-            label="Mot de passe actuel"
-            name="deletePassword"
-            [required]="true"
-            [(value)]="deletePassword"
-          />
-          <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-            Confirmer en tapant ton email
-            <input
-              type="email"
-              [value]="deleteConfirmEmail()"
-              (input)="deleteConfirmEmail.set($any($event.target).value)"
-              name="deleteConfirmEmail"
-              [placeholder]="user()?.email ?? ''"
-              class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-red-500 outline-none"
-            />
-          </label>
-          @if (deleteError()) {
-            <p class="text-sm text-red-400">{{ deleteError() }}</p>
-          }
-          <div class="flex flex-wrap gap-2">
-            <button
-              type="button"
-              class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-red-900/50 border border-red-800 text-red-300 disabled:opacity-50"
-              [disabled]="!canConfirmDelete() || deleteLoading()"
-              (click)="deleteAccount()"
-            >
-              {{ deleteLoading() ? 'Suppression…' : 'Confirmer la suppression' }}
-            </button>
-            <button
-              type="button"
-              class="px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-400"
-              [disabled]="deleteLoading()"
-              (click)="toggleDeleteForm()"
-            >
-              Annuler
-            </button>
-          </div>
-        </div>
-      }
-    </div>
-  </section>
-
   @if (user() && !user()!.emailConfirmed) {
-    <section class="bg-amber-950/20 border border-amber-800/40 rounded-2xl p-6">
+    <section class="bg-amber-950/20 border border-amber-800/40 rounded-2xl p-4 mb-6">
       <h2 class="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-2">
         Email non confirmé
       </h2>
-      <p class="text-xs text-slate-400 mb-4">
-        Ton compte n'est pas encore activé. Renvoie le lien de confirmation.
-      </p>
+      <p class="text-xs text-slate-400 mb-3">Activez votre compte pour toutes les fonctionnalités.</p>
       <button
         type="button"
         class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-amber-950/40 border border-amber-700/50 text-amber-300 disabled:opacity-50"
@@ -361,13 +29,447 @@
         {{ confirmLoading() ? 'Envoi…' : 'Renvoyer la confirmation' }}
       </button>
       @if (confirmMsg()) {
-        <p class="text-sm text-emerald-400 mt-3">{{ confirmMsg() }}</p>
+        <p class="text-sm text-emerald-400 mt-2">{{ confirmMsg() }}</p>
       }
       @if (confirmLink()) {
         <a [href]="confirmLink()!" class="block text-xs text-amber-300 break-all mt-2 hover:underline">{{
           confirmLink()
         }}</a>
       }
+    </section>
+  }
+
+  <nav class="flex gap-1 overflow-x-auto pb-1 mb-6 scrollbar-thin" aria-label="Sections des paramètres">
+    @for (tab of tabs; track tab.id) {
+      <button
+        type="button"
+        class="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider border transition-colors"
+        [class]="
+          activeTab() === tab.id
+            ? 'border-amber-500/50 bg-amber-950/30 text-amber-300'
+            : 'border-slate-800 bg-[#1b2028] text-slate-500 hover:text-slate-300'
+        "
+        [attr.aria-current]="activeTab() === tab.id ? 'page' : null"
+        (click)="setTab(tab.id)"
+      >
+        <iconify-icon [icon]="tab.icon" class="text-sm"></iconify-icon>
+        {{ tab.label }}
+      </button>
+    }
+  </nav>
+
+  @if (activeTab() === 'account') {
+    <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
+      <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Profil public</h2>
+      <p class="text-xs text-slate-400 mb-4">{{ user()?.email }}</p>
+
+      <div class="flex items-center gap-4 mb-6">
+        <div
+          class="w-16 h-16 rounded-full bg-gradient-to-br flex items-center justify-center text-xl font-black text-white shrink-0"
+          [class]="previewGradient()"
+        >
+          @if (avatarEmoji) {
+            <iconify-icon [icon]="avatarEmoji" class="text-2xl"></iconify-icon>
+          } @else {
+            {{ previewInitial() }}
+          }
+        </div>
+        <p class="text-xs text-slate-500">Visible sur votre profil et chez vos amis.</p>
+      </div>
+
+      <form class="flex flex-col gap-4" (ngSubmit)="saveProfile()">
+        <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+          Pseudo
+          <input
+            type="text"
+            required
+            minlength="2"
+            maxlength="64"
+            [(ngModel)]="displayName"
+            name="displayName"
+            placeholder="Nom affiché (unique)"
+            class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 outline-none"
+          />
+        </label>
+
+        <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+          Bio
+          <textarea
+            rows="3"
+            maxlength="280"
+            [(ngModel)]="bio"
+            name="bio"
+            placeholder="Quelques mots sur votre style de jeu, vos campagnes…"
+            class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 outline-none resize-none"
+          ></textarea>
+          <span class="text-[10px] text-slate-600">{{ bio.length }}/280</span>
+        </label>
+
+        <div>
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-2">Avatar</p>
+          <div class="flex flex-wrap gap-2">
+            @for (opt of avatarOptions; track opt.id) {
+              <button
+                type="button"
+                class="w-11 h-11 rounded-xl border flex items-center justify-center text-xl transition-colors"
+                [class]="
+                  avatarEmoji === opt.icon
+                    ? 'border-amber-500 bg-amber-950/30'
+                    : 'border-slate-700 bg-[#171b22] hover:border-slate-500'
+                "
+                [attr.aria-label]="opt.label"
+                (click)="selectAvatar(opt.icon)"
+              >
+                <iconify-icon [icon]="opt.icon"></iconify-icon>
+              </button>
+            }
+          </div>
+        </div>
+
+        <div>
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-2">Couleur d'accent</p>
+          <div class="flex flex-wrap gap-2">
+            @for (accent of accentOptions; track accent.id) {
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border transition-colors"
+                [class]="
+                  accentColor === accent.id
+                    ? 'border-amber-500 text-amber-300 bg-amber-950/20'
+                    : 'border-slate-700 text-slate-400 hover:border-slate-500'
+                "
+                (click)="selectAccent(accent.id)"
+              >
+                {{ accent.label }}
+              </button>
+            }
+          </div>
+        </div>
+
+        @if (profileError()) {
+          <p class="text-sm text-red-400">{{ profileError() }}</p>
+        }
+        @if (profileMsg()) {
+          <p class="text-sm text-emerald-400">{{ profileMsg() }}</p>
+        }
+        <button type="submit" class="wizard-nav-primary w-full" [disabled]="profileLoading()">
+          {{ profileLoading() ? 'Enregistrement…' : 'Enregistrer le profil' }}
+        </button>
+      </form>
+    </section>
+  }
+
+  @if (activeTab() === 'notifications') {
+    <div class="space-y-4">
+      <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
+        <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
+          Notifications push
+        </h2>
+        <p class="text-xs text-slate-400 mb-4">
+          Alertes navigateur / PWA. Installez l’app pour une meilleure fiabilité.
+        </p>
+        @if (!pushSupported()) {
+          <p class="text-sm text-amber-300">Indisponible ici (service worker requis).</p>
+        } @else {
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              class="w-4 h-4 rounded border-slate-600"
+              [checked]="pushEnabled()"
+              [disabled]="pushBusy()"
+              (change)="togglePushNotifications($event)"
+            />
+            <span class="text-sm text-slate-300">Activer les notifications push</span>
+          </label>
+          @if (pushError(); as err) {
+            <p class="text-sm text-red-400 mt-3">{{ err }}</p>
+          }
+        }
+      </section>
+
+      <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+            Préférences par type
+          </h2>
+          <button
+            type="button"
+            class="text-[10px] font-black uppercase text-slate-500 hover:text-amber-400"
+            (click)="resetNotifPrefs()"
+          >
+            Tout réactiver
+          </button>
+        </div>
+        <p class="text-xs text-slate-400 mb-5">
+          Filtre le centre de notifications. Les rappels session / handouts / initiative s’appliquent aux
+          push quand le serveur les envoie.
+        </p>
+
+        @for (group of ['social', 'campaign', 'push']; track group) {
+          <div class="mb-5 last:mb-0">
+            <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500/80 mb-3">
+              {{ prefGroupLabel($any(group)) }}
+            </h3>
+            <div class="space-y-3">
+              @for (opt of prefOptions; track opt.id) {
+                @if (opt.group === group) {
+                  <label class="flex items-start gap-3 cursor-pointer rounded-xl border border-slate-800/80 px-3 py-2.5 hover:border-slate-700">
+                    <input
+                      type="checkbox"
+                      class="mt-0.5 w-4 h-4 rounded border-slate-600 shrink-0"
+                      [checked]="notifPreferences()[opt.id]"
+                      (change)="setNotifPref(opt.id, $event)"
+                    />
+                    <span class="min-w-0">
+                      <span class="block text-sm text-slate-200">{{ opt.label }}</span>
+                      <span class="block text-[11px] text-slate-500 mt-0.5">{{ opt.hint }}</span>
+                    </span>
+                  </label>
+                }
+              }
+            </div>
+          </div>
+        }
+      </section>
+
+      <p class="text-xs text-slate-500 text-center">
+        <a routerLink="/notifications" class="text-amber-400 hover:underline">Ouvrir le centre de notifications</a>
+      </p>
+    </div>
+  }
+
+  @if (activeTab() === 'app') {
+    <div class="space-y-4">
+      <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
+        <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Application (PWA)</h2>
+        <p class="text-xs text-slate-400 mb-4">
+          Installez Dragons Generator sur l’écran d’accueil pour un accès rapide et les notifications.
+        </p>
+        @if (isPwaStandalone()) {
+          <p class="text-sm text-emerald-400">Application déjà installée.</p>
+        } @else if (canInstallPwa()) {
+          <button
+            type="button"
+            class="wizard-nav-primary"
+            [disabled]="installBusy()"
+            (click)="installPwa()"
+          >
+            {{ installBusy() ? 'Installation…' : 'Installer l’app' }}
+          </button>
+        } @else {
+          <p class="text-sm text-slate-500">
+            Sur mobile : menu du navigateur → « Ajouter à l’écran d’accueil ». Sur desktop Chrome : icône
+            d’installation dans la barre d’adresse.
+          </p>
+        }
+      </section>
+
+      <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
+        <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Mode hors ligne</h2>
+        <p class="text-xs text-slate-400 mb-4">
+          Télécharge le Codex pour forger un personnage sans connexion. Les éléments créés hors ligne seront
+          synchronisés à la reconnexion.
+        </p>
+
+        @if (codexDownloaded()) {
+          <p class="text-sm text-emerald-400 mb-3">
+            Codex disponible hors ligne
+            @if (codexDownloadedAt(); as at) {
+              <span class="text-slate-500"> · {{ at | date: 'short' }}</span>
+            }
+          </p>
+        } @else {
+          <p class="text-sm text-amber-300 mb-3">Codex non téléchargé.</p>
+        }
+
+        @if (codexDownloadError(); as err) {
+          <p class="text-sm text-red-400 mb-3">{{ err }}</p>
+        }
+
+        <div class="flex flex-wrap gap-2 mb-4">
+          <button
+            type="button"
+            class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white disabled:opacity-50"
+            [disabled]="codexDownloading() || !isOnline()"
+            (click)="downloadCodex()"
+          >
+            {{ codexDownloading() ? 'Téléchargement…' : (codexDownloaded() ? 'Mettre à jour le Codex' : 'Télécharger le Codex') }}
+          </button>
+          @if (codexDownloaded()) {
+            <button
+              type="button"
+              class="px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-400"
+              (click)="clearCodexDownload()"
+            >
+              Supprimer le cache
+            </button>
+          }
+        </div>
+
+        @if (pendingSyncCount() > 0) {
+          <p class="text-sm text-sky-300 mb-2">{{ pendingSyncCount() }} élément(s) en attente de synchronisation.</p>
+          <button
+            type="button"
+            class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-sky-900/40 border border-sky-700/50 text-sky-300 disabled:opacity-50"
+            [disabled]="!isOnline()"
+            (click)="syncNow()"
+          >
+            Synchroniser maintenant
+          </button>
+        }
+        @if (syncError()) {
+          <p class="text-sm text-amber-400 mt-3">{{ syncError() }}</p>
+        }
+        @if (syncMessage()) {
+          <p class="text-sm text-emerald-400 mt-3">{{ syncMessage() }}</p>
+        }
+      </section>
+    </div>
+  }
+
+  @if (activeTab() === 'security') {
+    <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
+      <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Mot de passe</h2>
+      <p class="text-xs text-slate-400 mb-4">
+        Modifiez votre mot de passe uniquement si nécessaire — 8 caractères minimum.
+      </p>
+
+      @if (!showPasswordForm()) {
+        <button
+          type="button"
+          class="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-300 hover:border-amber-600/40 hover:text-amber-200"
+          (click)="togglePasswordForm()"
+        >
+          Modifier le mot de passe
+        </button>
+      } @else {
+        <form class="flex flex-col gap-4" (ngSubmit)="savePassword()">
+          <app-password-field
+            label="Mot de passe actuel"
+            name="currentPassword"
+            [required]="true"
+            [(value)]="currentPassword"
+          />
+          <app-password-field
+            label="Nouveau mot de passe"
+            name="newPassword"
+            [required]="true"
+            [minlength]="8"
+            [(value)]="newPassword"
+          />
+          <app-password-field
+            label="Confirmer le nouveau mot de passe"
+            name="confirmPassword"
+            [required]="true"
+            [minlength]="8"
+            [(value)]="confirmPassword"
+          />
+          @if (passwordError()) {
+            <p class="text-sm text-red-400">{{ passwordError() }}</p>
+          }
+          @if (passwordMsg()) {
+            <p class="text-sm text-emerald-400">{{ passwordMsg() }}</p>
+          }
+          <div class="flex flex-wrap gap-2">
+            <button type="submit" class="wizard-nav-primary" [disabled]="passwordLoading()">
+              {{ passwordLoading() ? 'Mise à jour…' : 'Enregistrer' }}
+            </button>
+            <button
+              type="button"
+              class="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-400"
+              (click)="togglePasswordForm()"
+            >
+              Annuler
+            </button>
+          </div>
+        </form>
+      }
+    </section>
+  }
+
+  @if (activeTab() === 'data') {
+    <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
+      <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
+        Données personnelles (RGPD)
+      </h2>
+      <p class="text-xs text-slate-400 mb-4">
+        Consulte la
+        <a routerLink="/legal/privacy" class="text-amber-400 hover:underline">politique de confidentialité</a>
+        et les
+        <a routerLink="/legal/terms" class="text-amber-400 hover:underline">conditions d’utilisation</a>.
+      </p>
+
+      <button
+        type="button"
+        class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-sky-900/40 border border-sky-700/50 text-sky-300 disabled:opacity-50 mb-3"
+        [disabled]="exportLoading() || !isOnline()"
+        (click)="exportData()"
+      >
+        {{ exportLoading() ? 'Export…' : 'Exporter mes données (JSON)' }}
+      </button>
+      @if (exportError()) {
+        <p class="text-sm text-red-400 mb-2">{{ exportError() }}</p>
+      }
+      @if (exportMsg()) {
+        <p class="text-sm text-emerald-400 mb-2">{{ exportMsg() }}</p>
+      }
+
+      <div class="mt-6 pt-6 border-t border-slate-800">
+        <h3 class="text-[10px] font-black uppercase tracking-widest text-red-400/90 mb-2">Zone de danger</h3>
+        <p class="text-xs text-slate-400 mb-3">
+          La suppression efface définitivement votre compte, vos personnages et campagnes hébergées.
+        </p>
+        @if (!showDeleteForm()) {
+          <button
+            type="button"
+            class="px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-red-900/60 text-red-400 hover:bg-red-950/30"
+            (click)="toggleDeleteForm()"
+          >
+            Supprimer mon compte
+          </button>
+        } @else {
+          <div class="flex flex-col gap-3">
+            <app-password-field
+              label="Mot de passe actuel"
+              name="deletePassword"
+              [required]="true"
+              [(value)]="deletePassword"
+            />
+            <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+              Confirmer en tapant ton email
+              <input
+                type="email"
+                [value]="deleteConfirmEmail()"
+                (input)="deleteConfirmEmail.set($any($event.target).value)"
+                name="deleteConfirmEmail"
+                [placeholder]="user()?.email ?? ''"
+                class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-red-500 outline-none"
+              />
+            </label>
+            @if (deleteError()) {
+              <p class="text-sm text-red-400">{{ deleteError() }}</p>
+            }
+            <div class="flex flex-wrap gap-2">
+              <button
+                type="button"
+                class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-red-900/50 border border-red-800 text-red-300 disabled:opacity-50"
+                [disabled]="!canConfirmDelete() || deleteLoading()"
+                (click)="deleteAccount()"
+              >
+                {{ deleteLoading() ? 'Suppression…' : 'Confirmer la suppression' }}
+              </button>
+              <button
+                type="button"
+                class="px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-400"
+                [disabled]="deleteLoading()"
+                (click)="toggleDeleteForm()"
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+        }
+      </div>
     </section>
   }
 </div>

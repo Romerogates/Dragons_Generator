@@ -35,10 +35,55 @@
           }
         </div>
 
+        @if (p.isSelf && summary(); as s) {
+          <div class="mt-8 grid grid-cols-2 gap-3">
+            <div class="rounded-xl bg-[#1b2028] border border-slate-800 p-3 text-center">
+              <p class="text-xl font-black text-emerald-400">{{ s.savedCharactersCount }}</p>
+              <p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mt-1">Héros</p>
+            </div>
+            <div class="rounded-xl bg-[#1b2028] border border-slate-800 p-3 text-center">
+              <p class="text-xl font-black text-sky-400">{{ s.campaignCount }}</p>
+              <p class="text-[9px] font-black uppercase tracking-widest text-slate-500 mt-1">Campagnes</p>
+            </div>
+            @if (s.pendingFriendRequests > 0 || s.pendingCampaignInvites > 0) {
+              <div class="col-span-2 rounded-xl bg-amber-950/20 border border-amber-800/40 p-3 text-center">
+                <p class="text-sm text-amber-200">
+                  @if (s.pendingFriendRequests > 0) {
+                    {{ s.pendingFriendRequests }} demande(s) d’ami
+                  }
+                  @if (s.pendingFriendRequests > 0 && s.pendingCampaignInvites > 0) {
+                    ·
+                  }
+                  @if (s.pendingCampaignInvites > 0) {
+                    {{ s.pendingCampaignInvites }} invitation(s) campagne
+                  }
+                </p>
+                <a routerLink="/notifications" class="text-[10px] font-black uppercase text-amber-400 mt-1 inline-block"
+                  >Voir les notifications →</a
+                >
+              </div>
+            }
+            @if (s.nextSession; as sess) {
+              <div class="col-span-2 rounded-xl bg-violet-950/20 border border-violet-800/40 p-3">
+                <p class="text-[9px] font-black uppercase tracking-widest text-violet-400 mb-1">Prochaine session</p>
+                <p class="text-sm text-slate-200">{{ sess.sessionTitle }} · {{ sess.campaignTitle }}</p>
+                <p class="text-[11px] text-slate-500 mt-1">{{ formatSessionDate(sess.scheduledAt) }}</p>
+              </div>
+            }
+          </div>
+        }
+
         <div class="mt-8 bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
           <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Bio</h2>
           @if (p.bio) {
             <p class="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">{{ p.bio }}</p>
+          } @else if (p.isSelf) {
+            <p class="text-sm text-slate-500 italic mb-3">Ajoutez une bio pour présenter votre style de jeu.</p>
+            <a
+              routerLink="/settings"
+              class="text-[10px] font-black uppercase text-violet-400 hover:text-violet-300"
+              >Modifier dans Paramètres →</a
+            >
           } @else {
             <p class="text-sm text-slate-500 italic">Ce joueur n'a pas encore rédigé de bio.</p>
           }
@@ -50,6 +95,28 @@
               routerLink="/settings"
               class="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase bg-amber-600 text-white"
               >Personnaliser</a
+            >
+            <a
+              routerLink="/notifications"
+              class="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-300 relative"
+            >
+              Notifications
+              @if (notificationCount() > 0) {
+                <span
+                  class="absolute -top-1.5 -right-1.5 min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-amber-500 text-slate-950 text-[9px] font-black flex items-center justify-center"
+                  >{{ notificationCount() }}</span
+                >
+              }
+            </a>
+            <a
+              routerLink="/characters"
+              class="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase border border-emerald-800/50 text-emerald-300"
+              >Mes héros</a
+            >
+            <a
+              routerLink="/campaigns"
+              class="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase border border-sky-800/50 text-sky-300"
+              >Campagnes</a
             >
           } @else if (p.isFriend) {
             <button

@@ -8,20 +8,27 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { OfflineCodexService } from '@core/services/offline-codex.service';
 import { OfflineSyncService } from '@core/services/offline-sync.service';
 import { ConnectivityService } from '@core/services/connectivity.service';
 import { PushNotificationService } from '@core/services/push-notification.service';
+import {
+  NotificationPreferencesService,
+  NOTIFICATION_PREF_OPTIONS,
+  type NotificationPrefOption,
+} from '@core/services/notification-preferences.service';
 import { PwaLifecycleService } from '@core/services/pwa-lifecycle.service';
 import { PasswordFieldComponent } from '@shared/components/password-field/password-field';
-import { RouterLink } from '@angular/router';
 import {
   PROFILE_ACCENTS,
   PROFILE_AVATAR_OPTIONS,
   accentGradient,
   profileInitial,
 } from '@core/utils/profile.util';
+
+type SettingsTab = 'account' | 'notifications' | 'app' | 'security' | 'data';
 
 @Component({
   selector: 'app-settings',
@@ -37,7 +44,12 @@ export class SettingsPage implements OnInit {
   private readonly offlineSync = inject(OfflineSyncService);
   private readonly connectivity = inject(ConnectivityService);
   private readonly push = inject(PushNotificationService);
+  private readonly notifPrefs = inject(NotificationPreferencesService);
   private readonly pwa = inject(PwaLifecycleService);
+  private readonly route = inject(ActivatedRoute);
+
+  readonly activeTab = signal<SettingsTab>('account');
+  readonly showPasswordForm = signal(false);
 
   displayName = '';
   bio = '';
@@ -46,6 +58,9 @@ export class SettingsPage implements OnInit {
 
   readonly avatarOptions = PROFILE_AVATAR_OPTIONS;
   readonly accentOptions = PROFILE_ACCENTS;
+  readonly prefOptions = NOTIFICATION_PREF_OPTIONS;
+  readonly notifPreferences = this.notifPrefs.prefs;
+
   currentPassword = '';
   newPassword = '';
   confirmPassword = '';
@@ -91,6 +106,14 @@ export class SettingsPage implements OnInit {
 
   readonly user = this.auth.user;
 
+  readonly tabs: { id: SettingsTab; label: string; icon: string }[] = [
+    { id: 'account', label: 'Compte', icon: 'fluent-emoji:bust-in-silhouette' },
+    { id: 'notifications', label: 'Notifications', icon: 'fluent-emoji:bell' },
+    { id: 'app', label: 'Application', icon: 'fluent-emoji:mobile-phone' },
+    { id: 'security', label: 'Sécurité', icon: 'fluent-emoji:locked' },
+    { id: 'data', label: 'Données', icon: 'fluent-emoji:floppy-disk' },
+  ];
+
   ngOnInit(): void {
     const u = this.auth.user();
     this.displayName = u?.displayName ?? '';
@@ -100,6 +123,46 @@ export class SettingsPage implements OnInit {
     this.pushEnabled.set(this.push.isPreferredEnabled());
     this.refreshCodexMeta();
     this.offlineSync.refreshPendingCount();
+
+    const tab = this.route.snapshot.queryParamMap.get('tab');
+    if (tab === 'notifications' || tab === 'app' || tab === 'security' || tab === 'data') {
+      this.activeTab.set(tab);
+    }
+  }
+
+  setTab(tab: SettingsTab): void {
+    this.activeTab.set(tab);
+  }
+
+  togglePasswordForm(): void {
+    this.showPasswordForm.update((v) => !v);
+    if (!this.showPasswordForm()) {
+      this.currentPassword = '';
+      this.newPassword = '';
+      this.confirmPassword = '';
+      this.passwordMsg.set(null);
+      this.passwordError.set(null);
+    }
+  }
+
+  prefGroupLabel(group: NotificationPrefOption['group']): string {
+    switch (group) {
+      case 'social':
+        return 'Amis & messages';
+      case 'campaign':
+        return 'Campagnes';
+      case 'push':
+        return 'Push (sessions & table)';
+    }
+  }
+
+  setNotifPref(id: NotificationPrefOption['id'], event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.notifPrefs.setPref(id, checked);
+  }
+
+  resetNotifPrefs(): void {
+    this.notifPrefs.resetPrefs();
   }
 
   async installPwa(): Promise<void> {
@@ -224,15 +287,15 @@ export class SettingsPage implements OnInit {
         accentColor: this.accentColor,
       })
       .subscribe({
-      next: () => {
-        this.profileLoading.set(false);
-        this.profileMsg.set('Profil mis à jour.');
-      },
-      error: (err) => {
-        this.profileLoading.set(false);
-        this.profileError.set(this.extractError(err) || 'Échec de la mise à jour.');
-      },
-    });
+        next: () => {
+          this.profileLoading.set(false);
+          this.profileMsg.set('Profil mis à jour.');
+        },
+        error: (err) => {
+          this.profileLoading.set(false);
+          this.profileError.set(this.extractError(err) || 'Échec de la mise à jour.');
+        },
+      });
   }
 
   savePassword(): void {
@@ -254,6 +317,7 @@ export class SettingsPage implements OnInit {
         this.currentPassword = '';
         this.newPassword = '';
         this.confirmPassword = '';
+        this.showPasswordForm.set(false);
       },
       error: (err) => {
         this.passwordLoading.set(false);
