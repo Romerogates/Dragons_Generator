@@ -82,6 +82,7 @@ Les secrets prod (`Jwt__Key`, `Admin__*`, SMTP…) restent dans `.env` sur le se
 
 - [Fonctionnalités](docs/FONCTIONNALITES.md)
 - Guide intégré : `/guide` dans l’app
+- [Déploiement prod (VPS / Docker / Actions)](docs/DEPLOY-PROD.md)
 - [Restauration / backup](docs/restauration.md)
 - [Email DNS OVH](docs/EMAIL-DNS-OVH.md)
 

@@ -5,7 +5,10 @@ Expéditeur : **dragons@romerogates.be** via `smtp.mail.ovh.net:465`
 
 Sans SPF + DKIM, Gmail / Outlook classent souvent les mails (confirmation, reset MDP, tickets) en spam.
 
-État constaté (août 2026) : MX OVH OK, **pas de SPF TXT**, **pas de DKIM**, **pas de DMARC**.
+État constaté (31 août 2026) :
+- **SPF** : OK (`v=spf1 include:mx.ovh.com …` sur `romerogates.be` — idéalement **un seul** TXT SPF)
+- **DMARC** : OK (`_dmarc.romerogates.be` → `p=none`)
+- **DKIM** : à finaliser côté OVH (activer DKIM + publier les CNAME `ovhselector*._domainkey` — pas encore résolus publiquement)
 
 ---
 
