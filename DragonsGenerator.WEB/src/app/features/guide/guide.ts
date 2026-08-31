@@ -159,6 +159,27 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     this.nav().filter((item) => this.guidePrefs.isSectionUnread(item.id)).length,
   );
 
+  readonly prevChapter = computed(() => {
+    const items = this.nav();
+    const idx = items.findIndex((item) => item.id === this.activeSection());
+    if (idx <= 0) return null;
+    return items[idx - 1];
+  });
+
+  readonly nextChapter = computed(() => {
+    const items = this.nav();
+    const idx = items.findIndex((item) => item.id === this.activeSection());
+    if (idx < 0 || idx >= items.length - 1) return null;
+    return items[idx + 1];
+  });
+
+  readonly chapterPosition = computed(() => {
+    const items = this.nav();
+    const idx = items.findIndex((item) => item.id === this.activeSection());
+    if (idx < 0) return null;
+    return { current: idx + 1, total: items.length };
+  });
+
   readonly filteredFlashCards = computed(() => {
     const a = this.audience();
     const q = this.searchQuery().trim().toLowerCase();

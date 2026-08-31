@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-[#171b22] text-slate-300 pb-20">
+<div class="min-h-screen bg-[#171b22] text-slate-300 pb-28">
   <!-- Reading progress -->
   <div
     class="fixed top-0 left-0 right-0 z-50 h-0.5 bg-transparent pointer-events-none"
@@ -22,12 +22,60 @@
   @if (showBackToTop()) {
     <button
       type="button"
-      class="fixed bottom-6 right-6 z-40 w-11 h-11 rounded-full bg-amber-500 text-slate-950 font-black text-lg shadow-lg hover:bg-amber-400 transition-colors"
+      class="fixed z-40 w-11 h-11 rounded-full bg-amber-500 text-slate-950 font-black text-lg shadow-lg hover:bg-amber-400 transition-colors"
+      [class]="prevChapter() || nextChapter() ? 'bottom-20 right-6' : 'bottom-6 right-6'"
       (click)="scrollToTop()"
       aria-label="Retour en haut de page"
     >
       ↑
     </button>
+  }
+
+  @if (prevChapter() || nextChapter()) {
+    <nav
+      class="fixed bottom-0 inset-x-0 z-40 border-t border-slate-800/80 bg-[#171b22]/95 backdrop-blur-md px-4 py-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))]"
+      aria-label="Chapitre précédent ou suivant"
+    >
+      <div class="max-w-6xl mx-auto flex items-center gap-2">
+        @if (prevChapter(); as prev) {
+          <button
+            type="button"
+            class="flex-1 min-w-0 flex items-center gap-2 px-3 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:border-amber-500/40 hover:text-amber-300 text-left transition-colors"
+            (click)="scrollToSection(prev.id)"
+          >
+            <span class="shrink-0 text-sm" aria-hidden="true">←</span>
+            <span class="min-w-0">
+              <span class="block text-[9px] font-black uppercase tracking-wider text-slate-500">Précédent</span>
+              <span class="block truncate text-xs font-bold">{{ prev.label }}</span>
+            </span>
+          </button>
+        } @else {
+          <div class="flex-1" aria-hidden="true"></div>
+        }
+
+        @if (chapterPosition(); as pos) {
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-600 shrink-0 px-1">
+            {{ pos.current }}/{{ pos.total }}
+          </span>
+        }
+
+        @if (nextChapter(); as next) {
+          <button
+            type="button"
+            class="flex-1 min-w-0 flex items-center justify-end gap-2 px-3 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:border-amber-500/40 hover:text-amber-300 text-right transition-colors"
+            (click)="scrollToSection(next.id)"
+          >
+            <span class="min-w-0">
+              <span class="block text-[9px] font-black uppercase tracking-wider text-slate-500">Suivant</span>
+              <span class="block truncate text-xs font-bold">{{ next.label }}</span>
+            </span>
+            <span class="shrink-0 text-sm" aria-hidden="true">→</span>
+          </button>
+        } @else {
+          <div class="flex-1" aria-hidden="true"></div>
+        }
+      </div>
+    </nav>
   }
 
   <!-- Hero -->
