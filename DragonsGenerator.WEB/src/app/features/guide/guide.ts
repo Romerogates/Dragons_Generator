@@ -16,6 +16,7 @@ import { fromEvent } from 'rxjs';
 import { auditTime } from 'rxjs/operators';
 import {
   GUIDE_ALL_NAV,
+  GUIDE_NAV_GROUPS,
   GUIDE_ARSENAL_FLOW,
   GUIDE_BLOG_POSTS,
   GUIDE_CAMPAIGN_MJ_FLOW,
@@ -56,7 +57,7 @@ export type {
   GuideStep,
 } from './guide.types';
 
-import type { GuideAudience, GuideChecklistItem, GuideQuickCard, GuideStep } from './guide.types';
+import type { GuideAudience, GuideChecklistItem, GuideNavItem, GuideQuickCard, GuideStep } from './guide.types';
 import { GuidePreferencesService } from '@core/services/guide-preferences.service';
 
 const AUDIENCE_KEY = 'dragons-guide-audience';
@@ -91,6 +92,9 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   readonly showBackToTop = signal(false);
   readonly copyToast = signal<string | null>(null);
   readonly sectionFeedback = signal<Record<string, 'yes' | 'no'>>({});
+  readonly collapsedGroups = signal<Record<string, true>>({});
+  readonly sommaireFadeTop = signal(false);
+  readonly sommaireFadeBottom = signal(true);
 
   readonly tipOfDay = computed(() => {
     const day = Math.floor(Date.now() / 86_400_000);
@@ -136,6 +140,24 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
       return item.label.toLowerCase().includes(q);
     });
   });
+
+  readonly navGroups = computed(() => {
+    const items = this.nav();
+    const byId = new Map(items.map((item) => [item.id, item]));
+    return GUIDE_NAV_GROUPS.map((group) => ({
+      ...group,
+      items: group.sectionIds
+        .map((id) => byId.get(id))
+        .filter((item): item is GuideNavItem => !!item),
+      unreadCount: group.sectionIds.filter(
+        (id) => byId.has(id) && this.guidePrefs.isSectionUnread(id),
+      ).length,
+    })).filter((group) => group.items.length > 0);
+  });
+
+  readonly unreadSectionsCount = computed(() =>
+    this.nav().filter((item) => this.guidePrefs.isSectionUnread(item.id)).length,
+  );
 
   readonly filteredFlashCards = computed(() => {
     const a = this.audience();
@@ -224,7 +246,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   markAllNewsRead(): void {
-    this.guidePrefs.markAll(this.blogPosts.map((post) => post.id));
+    this.guidePrefs.markAllNews(this.blogPosts.map((post) => post.id));
   }
 
   readonly readPosts = computed(() => this.guidePrefs.readPosts());
@@ -329,7 +351,42 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
 
   scrollToSection(sectionId: string, event?: Event): void {
     event?.preventDefault();
+    if (!sectionId.startsWith('faq-')) {
+      this.guidePrefs.markSectionRead(sectionId);
+    }
     this.navigateToHash(sectionId, true);
+  }
+
+  jumpToSection(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const id = select.value;
+    if (id) this.scrollToSection(id);
+    select.value = '';
+  }
+
+  isSectionUnread(sectionId: string): boolean {
+    return this.guidePrefs.isSectionUnread(sectionId);
+  }
+
+  toggleNavGroup(groupId: string): void {
+    this.collapsedGroups.update((current) => {
+      const next = { ...current };
+      if (next[groupId]) delete next[groupId];
+      else next[groupId] = true;
+      return next;
+    });
+  }
+
+  isGroupCollapsed(groupId: string): boolean {
+    return !!this.collapsedGroups()[groupId];
+  }
+
+  onSommaireScroll(event: Event): void {
+    const el = event.target as HTMLElement;
+    const atTop = el.scrollTop < 6;
+    const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 6;
+    this.sommaireFadeTop.set(!atTop);
+    this.sommaireFadeBottom.set(!atBottom);
   }
 
   private navigateToHash(sectionId: string, updateHistory: boolean): void {
@@ -346,12 +403,8 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     if (sectionId.startsWith('faq-')) return;
     const item = this.allNav.find((n) => n.id === sectionId);
     if (item?.audience === 'dm' && this.audience() === 'player') {
+      this.guidePrefs.setAudience('all');
       this.audience.set('all');
-      try {
-        localStorage.setItem(AUDIENCE_KEY, 'all');
-      } catch {
-        /* ignore */
-      }
       queueMicrotask(() => this.setupScrollSpy());
     }
   }

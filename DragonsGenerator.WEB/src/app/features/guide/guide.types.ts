@@ -1,5 +1,11 @@
 export type GuideAudience = 'all' | 'dm' | 'player';
 
+export interface GuideNavGroup {
+  id: string;
+  label: string;
+  sectionIds: string[];
+}
+
 export interface GuideNavItem {
   id: string;
   label: string;

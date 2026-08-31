@@ -9,6 +9,9 @@ public sealed class UserPreferences
     [JsonPropertyName("guideReadNewsIds")]
     public List<string> GuideReadNewsIds { get; set; } = [];
 
+    [JsonPropertyName("guideReadSectionIds")]
+    public List<string> GuideReadSectionIds { get; set; } = [];
+
     [JsonPropertyName("guideAudience")]
     public string? GuideAudience { get; set; }
 }
@@ -37,7 +40,7 @@ public static class UserPreferencesHelper
     public static string Serialize(UserPreferences prefs) =>
         JsonSerializer.Serialize(prefs, JsonOptions);
 
-    public static string[] NormalizeReadNewsIds(IEnumerable<string>? raw, out string? error)
+    public static string[] NormalizeGuideIds(IEnumerable<string>? raw, out string? error, int maxCount = 200)
     {
         error = null;
         if (raw is null) return [];
@@ -50,20 +53,26 @@ public static class UserPreferencesHelper
             if (id.Length is 0 or > 64) continue;
             if (!id.All(c => char.IsAsciiLetterOrDigit(c) || c is '-' or '_'))
             {
-                error = "Identifiant de nouveauté invalide.";
+                error = "Identifiant guide invalide.";
                 return [];
             }
 
             if (seen.Add(id)) list.Add(id);
-            if (list.Count > 200)
+            if (list.Count > maxCount)
             {
-                error = "Trop de nouveautés lues enregistrées.";
+                error = "Trop d'entrées guide enregistrées.";
                 return [];
             }
         }
 
         return list.ToArray();
     }
+
+    public static string[] NormalizeReadNewsIds(IEnumerable<string>? raw, out string? error) =>
+        NormalizeGuideIds(raw, out error);
+
+    public static string[] NormalizeReadSectionIds(IEnumerable<string>? raw, out string? error) =>
+        NormalizeGuideIds(raw, out error, maxCount: 100);
 
     public static string? NormalizeGuideAudience(string? raw, out string? error)
     {
@@ -77,16 +86,25 @@ public static class UserPreferencesHelper
         };
     }
 
-    public static void ApplyGuidePreferences(AppUser user, IEnumerable<string> ids, string? audience)
+    public static void ApplyGuidePreferences(
+        AppUser user,
+        IEnumerable<string> newsIds,
+        IEnumerable<string> sectionIds,
+        string? audience
+    )
     {
         var prefs = Parse(user.PreferencesJson);
-        prefs.GuideReadNewsIds = ids.Distinct(StringComparer.Ordinal).ToList();
+        prefs.GuideReadNewsIds = newsIds.Distinct(StringComparer.Ordinal).ToList();
+        prefs.GuideReadSectionIds = sectionIds.Distinct(StringComparer.Ordinal).ToList();
         prefs.GuideAudience = audience;
         user.PreferencesJson = Serialize(prefs);
     }
 
     public static string[] GetReadNewsIds(AppUser user) =>
         Parse(user.PreferencesJson).GuideReadNewsIds.ToArray();
+
+    public static string[] GetReadSectionIds(AppUser user) =>
+        Parse(user.PreferencesJson).GuideReadSectionIds.ToArray();
 
     public static string? GetGuideAudience(AppUser user) =>
         NormalizeGuideAudience(Parse(user.PreferencesJson).GuideAudience, out _);
@@ -97,6 +115,7 @@ public static class UserPreferencesHelper
         return new
         {
             readNewsIds = prefs.GuideReadNewsIds,
+            readSectionIds = prefs.GuideReadSectionIds,
             audience = NormalizeGuideAudience(prefs.GuideAudience, out _),
         };
     }

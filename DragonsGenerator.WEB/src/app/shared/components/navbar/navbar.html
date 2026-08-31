@@ -44,6 +44,21 @@
           </a>
 
           <a
+            routerLink="/guide"
+            routerLinkActive="text-emerald-400"
+            class="relative h-10 flex items-center px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-emerald-400 hover:bg-slate-800/60 transition-colors"
+            (click)="closeMenus()"
+          >
+            Guide
+            @if (guideNewsCount() > 0) {
+              <span
+                class="absolute top-1 right-1 min-w-[1rem] h-4 px-1 flex items-center justify-center rounded-full bg-emerald-500 text-[9px] font-black text-slate-950 leading-none"
+                >{{ formatBadgeCount(guideNewsCount()) }}</span
+              >
+            }
+          </a>
+
+          <a
             routerLink="/friends"
             routerLinkActive="text-violet-400"
             class="relative h-10 flex items-center px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-violet-400 hover:bg-slate-800/60 transition-colors"
@@ -113,6 +128,19 @@
           (click)="closeMenus()"
         >
           Forger
+        </a>
+
+        <a
+          routerLink="/guide"
+          class="hidden sm:inline-flex lg:hidden relative items-center px-3 py-2 rounded-full text-[10px] font-black uppercase tracking-widest text-emerald-400 border border-emerald-900/50 bg-emerald-950/20 hover:border-emerald-500/50 transition-colors"
+          (click)="closeMenus()"
+        >
+          Guide
+          @if (guideNewsCount() > 0) {
+            <span class="ml-1 min-w-[1rem] h-4 px-1 inline-flex items-center justify-center rounded-full bg-emerald-500 text-[9px] font-black text-slate-950">{{
+              formatBadgeCount(guideNewsCount())
+            }}</span>
+          }
         </a>
 
         <div class="hidden lg:flex items-center gap-2">
@@ -234,17 +262,6 @@
                   >Paramètres</a
                 >
                 <a
-                  routerLink="/guide"
-                  class="relative block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
-                  (click)="closeMenus()"
-                  >Guide
-                  @if (guideNewsCount() > 0) {
-                    <span class="ml-1 inline-flex min-w-[1.1rem] h-[1.1rem] items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 px-1">{{
-                      formatBadgeCount(guideNewsCount())
-                    }}</span>
-                  }
-                </a>
-                <a
                   routerLink="/support"
                   class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
                   (click)="closeMenus()"
@@ -356,6 +373,23 @@
           <span class="text-sm font-bold tracking-wide">Nouveau scénario</span>
         </a>
 
+        <a
+          routerLink="/guide"
+          routerLinkActive="bg-emerald-950/30 text-emerald-400 border-emerald-900/40"
+          class="relative flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+          (click)="closeMenus()"
+        >
+          <span class="flex items-center gap-3">
+            <span class="text-xl"><iconify-icon noobserver icon="fluent-emoji:open-book"></iconify-icon></span>
+            <span class="text-sm font-bold tracking-wide">Guide wiki</span>
+          </span>
+          @if (guideNewsCount() > 0) {
+            <span class="bg-emerald-500 text-slate-950 text-[10px] font-black min-w-[1.25rem] text-center px-1.5 py-0.5 rounded-full">{{
+              formatBadgeCount(guideNewsCount())
+            }}</span>
+          }
+        </a>
+
         @if (auth.isLoggedIn()) {
           <a
             routerLink="/notifications"
@@ -408,19 +442,6 @@
           >
             <span class="text-xl"><iconify-icon noobserver icon="mdi:cog-outline"></iconify-icon></span>
             <span class="text-sm font-bold tracking-wide">Paramètres</span>
-          </a>
-          <a
-            routerLink="/guide"
-            class="relative flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
-            (click)="closeMenus()"
-          >
-            <span class="text-xl"><iconify-icon noobserver icon="fluent-emoji:open-book"></iconify-icon></span>
-            <span class="text-sm font-bold tracking-wide">Guide</span>
-            @if (guideNewsCount() > 0) {
-              <span class="ml-auto min-w-[1.25rem] h-5 px-1.5 flex items-center justify-center rounded-full bg-amber-500 text-[10px] font-black text-slate-950">{{
-                formatBadgeCount(guideNewsCount())
-              }}</span>
-            }
           </a>
           <a
             routerLink="/support"

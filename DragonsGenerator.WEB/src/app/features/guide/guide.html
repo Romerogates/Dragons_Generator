@@ -166,49 +166,118 @@
     <div class="lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10 xl:gap-14">
       <!-- Sidebar + scrollspy -->
       <aside class="hidden lg:block">
-        <nav class="guide-sommaire sticky top-6 space-y-0.5 max-h-[calc(100vh-3rem)] overflow-y-auto pr-1">
-          <p class="text-[10px] font-black uppercase tracking-widest text-slate-600 mb-3 px-3">
-            Sommaire
-          </p>
+        <div class="sticky top-6 space-y-3">
+          <label class="sr-only" for="guide-jump">Aller au chapitre</label>
+          <select
+            id="guide-jump"
+            class="w-full bg-[#1b2028] border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 focus:border-amber-500/50 focus:outline-none"
+            (change)="jumpToSection($event)"
+          >
+            <option value="">Aller au chapitre…</option>
+            @for (group of navGroups(); track group.id) {
+              <optgroup [label]="group.label">
+                @for (item of group.items; track item.id) {
+                  <option [value]="item.id">
+                    {{ item.label }}{{ isSectionUnread(item.id) ? ' • new' : '' }}
+                  </option>
+                }
+              </optgroup>
+            }
+          </select>
+
+          <div
+            class="guide-sommaire-wrap"
+            [class.guide-sommaire-wrap--fade-top]="sommaireFadeTop()"
+            [class.guide-sommaire-wrap--fade-bottom]="sommaireFadeBottom()"
+          >
+            <nav
+              class="guide-sommaire space-y-3 max-h-[calc(100vh-8rem)] overflow-y-auto pr-1"
+              (scroll)="onSommaireScroll($event)"
+            >
+              <p class="text-[10px] font-black uppercase tracking-widest text-slate-600 px-3">
+                Sommaire
+                @if (unreadSectionsCount() > 0) {
+                  <span class="text-emerald-400"> · {{ unreadSectionsCount() }} new</span>
+                }
+              </p>
+              @for (group of navGroups(); track group.id) {
+                <div class="rounded-xl border border-slate-800/80 bg-[#1b2028]/40 overflow-hidden">
+                  <button
+                    type="button"
+                    class="w-full flex items-center justify-between gap-2 px-3 py-2 text-left text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-300"
+                    (click)="toggleNavGroup(group.id)"
+                  >
+                    <span>{{ group.label }}</span>
+                    <span class="flex items-center gap-2 shrink-0">
+                      @if (group.unreadCount > 0) {
+                        <span class="text-[9px] text-emerald-400">{{ group.unreadCount }}</span>
+                      }
+                      <span class="text-slate-600">{{ isGroupCollapsed(group.id) ? '▸' : '▾' }}</span>
+                    </span>
+                  </button>
+                  @if (!isGroupCollapsed(group.id)) {
+                    <div class="space-y-0.5 px-1 pb-1">
+                      @for (item of group.items; track item.id) {
+                        <a
+                          [href]="sectionHref(item.id)"
+                          class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm border transition-colors"
+                          [class]="
+                            activeSection() === item.id
+                              ? 'bg-[#171b22] border-amber-500/40 text-slate-100'
+                              : 'border-transparent text-slate-400 hover:text-slate-100 hover:bg-[#171b22] hover:border-slate-800'
+                          "
+                          (click)="scrollToSection(item.id, $event)"
+                        >
+                          <span class="text-base shrink-0 {{ item.accent }}"
+                            ><iconify-icon [icon]="item.icon"></iconify-icon
+                          ></span>
+                          <span class="truncate flex-grow text-xs">{{ item.label }}</span>
+                          @if (isSectionUnread(item.id)) {
+                            <span class="text-[8px] font-black uppercase tracking-wider text-emerald-400 shrink-0">new</span>
+                          }
+                        </a>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </nav>
+          </div>
+        </div>
+      </aside>
+
+      <div class="lg:hidden mb-8 space-y-3 pb-6 border-b border-slate-800">
+        <label class="sr-only" for="guide-jump-mobile">Aller au chapitre</label>
+        <select
+          id="guide-jump-mobile"
+          class="w-full bg-[#1b2028] border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-300"
+          (change)="jumpToSection($event)"
+        >
+          <option value="">Aller au chapitre…</option>
+          @for (item of nav(); track item.id) {
+            <option [value]="item.id">{{ item.label }}</option>
+          }
+        </select>
+        <div class="flex gap-2 overflow-x-auto guide-sommaire pb-1">
           @for (item of nav(); track item.id) {
             <a
               [href]="sectionHref(item.id)"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm border transition-colors"
+              class="shrink-0 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider border transition-colors"
               [class]="
                 activeSection() === item.id
-                  ? 'bg-[#1b2028] border-amber-500/40 text-slate-100'
-                  : 'border-transparent text-slate-400 hover:text-slate-100 hover:bg-[#1b2028] hover:border-slate-800'
+                  ? 'bg-amber-500/15 border-amber-500/50 text-amber-300'
+                  : 'bg-[#1b2028] border-slate-800 text-slate-400'
               "
               (click)="scrollToSection(item.id, $event)"
             >
-              <span class="text-lg shrink-0 {{ item.accent }}"
-                ><iconify-icon [icon]="item.icon"></iconify-icon
-              ></span>
-              <span class="truncate flex-grow">{{ item.label }}</span>
-              @if (item.isNew) {
-                <span class="text-[8px] font-black uppercase tracking-wider text-emerald-400 shrink-0">new</span>
+              {{ item.label }}
+              @if (isSectionUnread(item.id)) {
+                <span class="text-emerald-400"> ·</span>
               }
             </a>
           }
-        </nav>
-      </aside>
-
-      <nav class="lg:hidden flex flex-wrap gap-2 mb-10 pb-6 border-b border-slate-800">
-        @for (item of nav(); track item.id) {
-          <a
-            [href]="sectionHref(item.id)"
-            class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider border transition-colors"
-            [class]="
-              activeSection() === item.id
-                ? 'bg-amber-500/15 border-amber-500/50 text-amber-300'
-                : 'bg-[#1b2028] border-slate-800 text-slate-400'
-            "
-            (click)="scrollToSection(item.id, $event)"
-          >
-            {{ item.label }}
-          </a>
-        }
-      </nav>
+        </div>
+      </div>
 
       <main class="min-w-0 space-y-20">
         <!-- Parcours -->

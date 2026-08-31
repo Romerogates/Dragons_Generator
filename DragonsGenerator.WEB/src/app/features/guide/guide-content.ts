@@ -8,6 +8,7 @@ import type {
   GuideIndexItem,
   GuideLabeledFlowStep,
   GuideNavItem,
+  GuideNavGroup,
   GuideOneshotStep,
   GuideQuickCard,
   GuideRoleFlowStep,
@@ -34,7 +35,30 @@ export const GUIDE_TIPS: string[] = [
 
 export const GUIDE_UPDATED_AT = '31 août 2026';
 
-export const GUIDE_VERSION = '1.4';
+export const GUIDE_VERSION = '1.5';
+
+export const GUIDE_NAV_GROUPS: GuideNavGroup[] = [
+  {
+    id: 'discover',
+    label: 'Découverte',
+    sectionIds: ['parcours', 'oneshot', 'actions', 'journal', 'demarrage'],
+  },
+  {
+    id: 'tools',
+    label: 'Outils',
+    sectionIds: ['checklists', 'schemas', 'captures'],
+  },
+  {
+    id: 'table',
+    label: 'À la table',
+    sectionIds: ['compte', 'personnage', 'scenario', 'table', 'donjons', 'initiative', 'documents'],
+  },
+  {
+    id: 'reference',
+    label: 'Référence',
+    sectionIds: ['social', 'notifications', 'codex', 'pdf', 'faq', 'glossaire', 'index', 'support'],
+  },
+];
 
 export const GUIDE_ALL_NAV: GuideNavItem[] = [
     { id: 'parcours', label: 'Parcours', icon: 'fluent-emoji:compass', accent: 'text-amber-400', audience: 'all' },
@@ -47,13 +71,13 @@ export const GUIDE_ALL_NAV: GuideNavItem[] = [
     { id: 'captures', label: 'Aperçus UI', icon: 'fluent-emoji:framed-picture', accent: 'text-emerald-400', audience: 'all' },
     { id: 'compte', label: 'Compte', icon: 'fluent-emoji:bust-in-silhouette', accent: 'text-sky-400', audience: 'all' },
     { id: 'personnage', label: 'Personnage', icon: 'fluent-emoji:shield', accent: 'text-emerald-400', audience: 'all' },
-    { id: 'scenario', label: 'Campagnes', icon: 'fluent-emoji:globe-showing-europe-africa', accent: 'text-violet-400', audience: 'all', isNew: true },
-    { id: 'table', label: 'Table MJ', icon: 'fluent-emoji:performing-arts', accent: 'text-amber-400', audience: 'dm', isNew: true },
-    { id: 'donjons', label: 'Donjons & cartes', icon: 'fluent-emoji:castle', accent: 'text-violet-400', audience: 'dm', isNew: true },
+    { id: 'scenario', label: 'Campagnes', icon: 'fluent-emoji:globe-showing-europe-africa', accent: 'text-violet-400', audience: 'all' },
+    { id: 'table', label: 'Table MJ', icon: 'fluent-emoji:performing-arts', accent: 'text-amber-400', audience: 'dm' },
+    { id: 'donjons', label: 'Donjons & cartes', icon: 'fluent-emoji:castle', accent: 'text-violet-400', audience: 'dm' },
     { id: 'initiative', label: 'Combat', icon: 'fluent-emoji:crossed-swords', accent: 'text-red-400', audience: 'all' },
     { id: 'documents', label: 'Documents', icon: 'fluent-emoji:scroll', accent: 'text-sky-400', audience: 'all' },
     { id: 'social', label: 'Social', icon: 'fluent-emoji:speech-balloon', accent: 'text-pink-400', audience: 'all' },
-    { id: 'notifications', label: 'Notifications', icon: 'fluent-emoji:bell', accent: 'text-amber-400', audience: 'all', isNew: true },
+    { id: 'notifications', label: 'Notifications', icon: 'fluent-emoji:bell', accent: 'text-amber-400', audience: 'all' },
     { id: 'codex', label: 'Codex', icon: 'fluent-emoji:books', accent: 'text-emerald-400', audience: 'all' },
     { id: 'pdf', label: 'PDF', icon: 'fluent-emoji:printer', accent: 'text-slate-300', audience: 'all' },
     { id: 'faq', label: 'FAQ', icon: 'fluent-emoji:red-question-mark', accent: 'text-amber-400', audience: 'all' },

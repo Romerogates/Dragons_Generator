@@ -55,6 +55,41 @@
     }
   }
 
+  .guide-sommaire-wrap {
+    position: relative;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1.25rem;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    &::before {
+      top: 0;
+      background: linear-gradient(to bottom, rgb(23 27 34), transparent);
+    }
+
+    &::after {
+      bottom: 0;
+      background: linear-gradient(to top, rgb(23 27 34), transparent);
+    }
+
+    &--fade-top::before {
+      opacity: 1;
+    }
+
+    &--fade-bottom::after {
+      opacity: 1;
+    }
+  }
+
   /* Species / class wizard carousel — centered snap, no page sideways shift */
   .species-carousel {
     @apply flex items-stretch gap-5 sm:gap-8 overflow-x-auto overflow-y-hidden scroll-smooth;

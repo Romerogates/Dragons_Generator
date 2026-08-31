@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DragonsGenerator.API.Endpoints.Guide;
 
-public record GuidePreferencesDto(string[] ReadNewsIds, string? Audience);
+public record GuidePreferencesDto(string[] ReadNewsIds, string[] ReadSectionIds, string? Audience);
 
-public record UpdateGuidePreferencesRequest(string[] ReadNewsIds, string? Audience);
+public record UpdateGuidePreferencesRequest(string[] ReadNewsIds, string[] ReadSectionIds, string? Audience);
 
 public class GetGuidePreferencesEndpoint(AppDbContext db) : EndpointWithoutRequest<GuidePreferencesDto>
 {
@@ -32,6 +32,7 @@ public class GetGuidePreferencesEndpoint(AppDbContext db) : EndpointWithoutReque
         await Send.OkAsync(
             new GuidePreferencesDto(
                 UserPreferencesHelper.GetReadNewsIds(user),
+                UserPreferencesHelper.GetReadSectionIds(user),
                 UserPreferencesHelper.GetGuideAudience(user)
             ),
             ct
@@ -53,10 +54,18 @@ public class UpdateGuidePreferencesEndpoint(AppDbContext db)
             return;
         }
 
-        var ids = UserPreferencesHelper.NormalizeReadNewsIds(req.ReadNewsIds, out var idsError);
-        if (idsError is not null)
+        var newsIds = UserPreferencesHelper.NormalizeReadNewsIds(req.ReadNewsIds, out var newsError);
+        if (newsError is not null)
         {
-            AddError(idsError);
+            AddError(newsError);
+            await Send.ErrorsAsync(cancellation: ct);
+            return;
+        }
+
+        var sectionIds = UserPreferencesHelper.NormalizeReadSectionIds(req.ReadSectionIds, out var sectionError);
+        if (sectionError is not null)
+        {
+            AddError(sectionError);
             await Send.ErrorsAsync(cancellation: ct);
             return;
         }
@@ -76,8 +85,8 @@ public class UpdateGuidePreferencesEndpoint(AppDbContext db)
             return;
         }
 
-        UserPreferencesHelper.ApplyGuidePreferences(user, ids, audience);
+        UserPreferencesHelper.ApplyGuidePreferences(user, newsIds, sectionIds, audience);
         await db.SaveChangesAsync(ct);
-        await Send.OkAsync(new GuidePreferencesDto(ids, audience), ct);
+        await Send.OkAsync(new GuidePreferencesDto(newsIds, sectionIds, audience), ct);
     }
 }
