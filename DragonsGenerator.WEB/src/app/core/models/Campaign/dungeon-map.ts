@@ -49,6 +49,9 @@ export interface CampaignDungeonMap {
   rooms: DungeonRoom[];
   markers: DungeonMarker[];
   handoutId?: string | null;
+  /** Révélation progressive des salles pour les joueurs (handout / fog). */
+  fogOfWarEnabled?: boolean;
+  revealedRoomIds?: string[];
   createdAt: string;
   updatedAt: string;
 }

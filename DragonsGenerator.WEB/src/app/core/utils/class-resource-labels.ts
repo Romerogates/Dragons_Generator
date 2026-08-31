@@ -69,11 +69,20 @@ export function isHiddenClassResourceKey(key: string): boolean {
 }
 
 export function visibleClassResources(
-  resources: Record<string, number> | null | undefined,
-): { key: string; label: string; value: number }[] {
+  resources: Record<string, number | string | null> | null | undefined,
+): { key: string; label: string; value: string }[] {
   if (!resources) return [];
   return Object.entries(resources)
-    .filter(([k, v]) => !HIDDEN_KEYS.has(k) && typeof v === 'number' && v > 0)
-    .map(([key, value]) => ({ key, label: classResourceLabel(key), value }))
+    .filter(([k, v]) => {
+      if (HIDDEN_KEYS.has(k)) return false;
+      if (typeof v === 'number') return v > 0;
+      if (typeof v === 'string') return v.trim().length > 0;
+      return false;
+    })
+    .map(([key, value]) => ({
+      key,
+      label: classResourceLabel(key),
+      value: typeof value === 'number' ? String(value) : String(value),
+    }))
     .sort((a, b) => a.label.localeCompare(b.label, 'fr'));
 }

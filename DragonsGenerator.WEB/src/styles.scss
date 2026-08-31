@@ -169,3 +169,15 @@
     display: none;
   }
 }
+
+.safe-area-pb {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+.pinned-handout-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  margin: 0.5rem 0;
+  border: 1px solid rgb(51 65 85 / 0.6);
+}

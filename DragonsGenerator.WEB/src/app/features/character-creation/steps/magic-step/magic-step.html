@@ -9,6 +9,14 @@
       Canalisez les flux arcaniques, divins ou primordiaux. Les mots ont un pouvoir, choisissez les
       vôtres.
     </p>
+    @if (spellMilestones().length) {
+      <p class="text-[10px] text-slate-500 max-w-xl mx-auto mt-2 leading-relaxed">
+        Jalons de progression (niv. 1–{{ builder.targetLevel() }}) :
+        @for (m of spellMilestones(); track m.level + m.label; let last = $last) {
+          <span class="text-slate-400">niv. {{ m.level }} +{{ m.count }} {{ m.label }}</span>@if (!last) { · }
+        }
+      </p>
+    }
   </div>
 
   @if (loading()) {

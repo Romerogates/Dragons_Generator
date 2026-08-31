@@ -17,7 +17,7 @@ import { CharacterBuilderService } from '@core/services/character-builder.servic
 import type { Spell } from '@core/models/Spells/spell';
 import type { Deity } from '@core/models/Deities/deity';
 import type { SpellcastingKind, AbilityKey } from '@core/models/Character/character';
-import { warlockArcanumSpellLevels } from '@core/utils/progression-choices.util';
+import { warlockArcanumSpellLevels, spellProgressionMilestones } from '@core/utils/progression-choices.util';
 import {
   spellCastTimeLabel,
   spellComponentsLabel,
@@ -240,6 +240,12 @@ export class MagicStep implements OnInit {
   readonly arcanumSpellLevels = computed(() => {
     if (!this.isWarlock()) return [] as number[];
     return warlockArcanumSpellLevels(this.builder.targetLevel());
+  });
+
+  readonly spellMilestones = computed(() => {
+    const cls = this.loadedClass();
+    if (!cls) return [];
+    return spellProgressionMilestones(cls, this.builder.targetLevel());
   });
 
   readonly arcanumComplete = computed(() => {

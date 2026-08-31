@@ -166,6 +166,40 @@ export interface DrawDungeonOptions {
   selectedRoomId?: string | null;
   showGrid?: boolean;
   vignette?: boolean;
+  /** Si défini, masque les salles non révélées (fog of war joueur). */
+  revealedRoomIds?: Set<string> | null;
+}
+
+export function fogRevealSet(map: CampaignDungeonMap): Set<string> | null {
+  if (!map.fogOfWarEnabled) return null;
+  return new Set(map.revealedRoomIds ?? []);
+}
+
+function isCellRevealed(
+  map: CampaignDungeonMap,
+  x: number,
+  y: number,
+  revealed: Set<string> | null,
+): boolean {
+  if (!revealed) return true;
+  const roomId = roomAt(map, x, y);
+  if (roomId) return revealed.has(roomId);
+  const kind = tileAt(map, x, y);
+  if (kind === 'wall') return false;
+  const neighbors: [number, number][] = [
+    [0, 1],
+    [0, -1],
+    [1, 0],
+    [-1, 0],
+  ];
+  for (const [dx, dy] of neighbors) {
+    const nx = x + dx;
+    const ny = y + dy;
+    if (nx < 0 || ny < 0 || nx >= map.gridWidth || ny >= map.gridHeight) continue;
+    const nRoom = roomAt(map, nx, ny);
+    if (nRoom && revealed.has(nRoom)) return true;
+  }
+  return false;
 }
 
 export function drawDungeonToCanvas(
@@ -177,6 +211,7 @@ export function drawDungeonToCanvas(
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
   const palette = themePalette(map.theme);
+  const revealed = options?.revealedRoomIds ?? null;
   const w = map.gridWidth * cellSize;
   const h = map.gridHeight * cellSize;
   canvas.width = w;
@@ -244,6 +279,7 @@ export function drawDungeonToCanvas(
       const cx = (room.x + room.width / 2) * cellSize;
       const cy = (room.y + room.height / 2) * cellSize;
       const num = room.label.replace(/\D/g, '') || '?';
+      if (revealed && !revealed.has(room.id)) continue;
       ctx.fillStyle = 'rgba(0,0,0,0.35)';
       ctx.fillText(num, cx + 1, cy + 1);
       ctx.fillStyle =
@@ -253,6 +289,7 @@ export function drawDungeonToCanvas(
   }
 
   for (const marker of map.markers) {
+    if (revealed && !isCellRevealed(map, marker.x, marker.y, revealed)) continue;
     const cx = marker.x * cellSize + cellSize / 2;
     const cy = marker.y * cellSize + cellSize / 2;
     const r = cellSize * 0.38;
@@ -269,6 +306,17 @@ export function drawDungeonToCanvas(
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(MARKER_SYMBOLS[marker.kind], cx, cy + 0.5);
+  }
+
+  if (revealed) {
+    for (let y = 0; y < map.gridHeight; y++) {
+      for (let x = 0; x < map.gridWidth; x++) {
+        if (!isCellRevealed(map, x, y, revealed)) {
+          ctx.fillStyle = '#06080c';
+          ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+        }
+      }
+    }
   }
 
   if (options?.vignette !== false && cellSize >= 6) {
@@ -312,11 +360,23 @@ export function dungeonMapToPngDataUrl(
   return canvas.toDataURL('image/png');
 }
 
+export interface HandoutBuildOptions {
+  /** Applique le fog of war pour la vue joueur (salles révélées uniquement). */
+  playerFog?: boolean;
+}
+
 export function buildHandoutBody(
   map: CampaignDungeonMap,
   encounters: EncounterGroup[],
+  options?: HandoutBuildOptions,
 ): string {
-  const imageUrl = dungeonMapToPngDataUrl(map);
+  const revealed =
+    options?.playerFog && map.fogOfWarEnabled ? fogRevealSet(map) : null;
+  const imageUrl = dungeonMapToPngDataUrl(map, 10, {
+    showRoomNumbers: true,
+    vignette: true,
+    revealedRoomIds: revealed,
+  });
   const lines: string[] = [
     `# ${map.name}`,
     '',
@@ -330,6 +390,7 @@ export function buildHandoutBody(
   ].filter(Boolean);
 
   for (const room of map.rooms) {
+    if (revealed && !revealed.has(room.id)) continue;
     let encounterText = '';
     if (room.encounterId) {
       const enc = encounters.find((e) => e.id === room.encounterId);
@@ -352,6 +413,7 @@ export function buildHandoutBody(
   if (map.markers.length) {
     lines.push('', '## Points d’intérêt', '');
     for (const m of map.markers) {
+      if (revealed && !isCellRevealed(map, m.x, m.y, revealed)) continue;
       const label = m.label || DUNGEON_MARKER_LABELS[m.kind];
       lines.push(`- ${label} (${m.x}, ${m.y})${m.notes ? ` — ${m.notes}` : ''}`);
     }

@@ -478,7 +478,7 @@ export const GUIDE_DUNGEON_GEN_STEPS: GuideStep[] = [
     },
     {
       title: 'Publier aux joueurs',
-      body: 'Documents → ouvrir le handout carte → Publier. Les joueurs voient la carte en image et la légende des salles. Fog of war = prochaine version.',
+      body: 'Documents → ouvrir le handout carte → Publier. Les joueurs voient la carte en image et la légende des salles révélées (fog of war activable dans l’éditeur de donjon).',
       badge: 'MJ',
     },
   ];
@@ -536,7 +536,7 @@ export const GUIDE_FAQ_ITEMS: GuideFaqItem[] = [
       id: 'faq-handout-carte',
       question: 'Les joueurs voient-ils la carte tout de suite ?',
       answer:
-        'Non tant que le handout n’est pas publié. Le bouton Handout brouillon crée un document type « Carte » dans l’onglet Documents, avec l’image PNG de la carte et la légende des salles — invisible pour les joueurs tant qu’il reste en brouillon. Publiez-le quand vous êtes prêt. La révélation progressive (fog of war) arrivera dans une prochaine version.',
+        'Non tant que le handout n’est pas publié. Le bouton Handout brouillon crée un document type « Carte » dans l’onglet Documents, avec l’image PNG de la carte et la légende des salles révélées — invisible pour les joueurs tant qu’il reste en brouillon. Activez le fog of war dans l’éditeur, révélez les salles une par une, puis regénérez le handout avant publication.',
       audience: 'dm',
     },
     {

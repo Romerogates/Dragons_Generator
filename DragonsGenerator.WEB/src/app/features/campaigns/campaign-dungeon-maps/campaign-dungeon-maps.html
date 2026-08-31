@@ -293,6 +293,32 @@
         </div>
 
         <div class="rounded-xl border border-slate-800 bg-[#141820] p-4">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <h4 class="text-[11px] font-bold uppercase tracking-widest text-violet-400/90">Fog of war</h4>
+            <button
+              type="button"
+              class="text-[10px] font-black uppercase px-2 py-1 rounded border transition-colors"
+              [class.border-violet-500]="map.fogOfWarEnabled"
+              [class.text-violet-300]="map.fogOfWarEnabled"
+              [class.border-slate-700]="!map.fogOfWarEnabled"
+              [class.text-slate-500]="!map.fogOfWarEnabled"
+              (click)="toggleFogOfWar()"
+            >
+              {{ map.fogOfWarEnabled ? 'Activé' : 'Off' }}
+            </button>
+          </div>
+          @if (map.fogOfWarEnabled) {
+            <div class="flex flex-wrap gap-2 mb-2">
+              <button type="button" class="text-[9px] font-bold uppercase text-emerald-400" (click)="revealAllRooms()">Tout révéler</button>
+              <button type="button" class="text-[9px] font-bold uppercase text-slate-500" (click)="hideAllRooms()">Tout masquer</button>
+            </div>
+            <p class="text-[10px] text-slate-500 leading-relaxed">
+              Révélez les salles pour les joueurs. Regénérez le handout après chaque révélation.
+            </p>
+          }
+        </div>
+
+        <div class="rounded-xl border border-slate-800 bg-[#141820] p-4">
           <h4 class="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-3">Salles</h4>
           <div class="space-y-2.5">
             @for (room of map.rooms; track room.id) {
@@ -311,6 +337,20 @@
                   (click)="$event.stopPropagation()"
                 />
                 <p class="text-[10px] text-slate-500 mt-1">{{ encounterLabel(room, encounters()) }}</p>
+
+                @if (map.fogOfWarEnabled) {
+                  <button
+                    type="button"
+                    class="text-[9px] font-black uppercase mt-1.5 px-2 py-0.5 rounded border"
+                    [class.border-emerald-600/60]="isRoomRevealed(room.id)"
+                    [class.text-emerald-400]="isRoomRevealed(room.id)"
+                    [class.border-slate-700]="!isRoomRevealed(room.id)"
+                    [class.text-slate-500]="!isRoomRevealed(room.id)"
+                    (click)="toggleRoomReveal(room.id, $event)"
+                  >
+                    {{ isRoomRevealed(room.id) ? 'Révélée aux joueurs' : 'Révéler aux joueurs' }}
+                  </button>
+                }
 
                 <label class="block text-[9px] uppercase text-slate-600 mt-2">Rencontre campagne</label>
                 <select

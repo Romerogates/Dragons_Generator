@@ -90,6 +90,18 @@ export function extractSpellSlotsFromResources(
     .sort((a, b) => a.level - b.level);
 }
 
+/** Emplacements de pacte (sorcier) depuis `pact_slots_count` / `pact_slot_level`. */
+export function extractPactSlotsFromResources(
+  resources: Record<string, unknown> | undefined,
+): { level: number; max: number }[] {
+  const count = Number(resources?.['pact_slots_count']);
+  const slotLevel = Number(resources?.['pact_slot_level']);
+  if (count > 0 && slotLevel > 0) {
+    return [{ level: slotLevel, max: count }];
+  }
+  return [];
+}
+
 /**
  * Convertit uses / mechanics JSON en FeatureInstance.uses.
  * @param proficiencyBonus bonus de maîtrise (si formula = proficiency_bonus)

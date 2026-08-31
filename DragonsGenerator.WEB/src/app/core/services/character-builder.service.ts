@@ -1369,13 +1369,14 @@ export class CharacterBuilderService {
           ? [c.selectedFeatId]
           : [];
     for (const featId of featIds) {
+      const featSlot = c.asiChoices?.find((s) => s.mode === 'feat' && s.featId === featId);
       features.push({
         refId: featId,
         name: featId.replace(/^don-/, '').replace(/-/g, ' '),
         desc: 'Don choisi à la place d’une augmentation de caractéristique.',
         source: 'feat',
         sourceDetail: 'ASI',
-        level: 4,
+        level: featSlot?.level ?? 4,
       });
     }
     const allEquipmentForAttacks = [

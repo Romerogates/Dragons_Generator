@@ -62,9 +62,10 @@ Guide OVH : https://docs.ovhcloud.com/fr/domains/dns-zone-dmarc/
 Après propagation :
 
 ```powershell
-nslookup -type=TXT romerogates.be 8.8.8.8
-nslookup -type=TXT _dmarc.romerogates.be 8.8.8.8
+.\scripts\verify-email-dns.ps1
 ```
+
+Ou manuellement :
 
 Outils en ligne :
 - https://mxtoolbox.com/spf.aspx → `romerogates.be`

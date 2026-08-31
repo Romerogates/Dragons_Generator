@@ -1,9 +1,10 @@
-import { extractSpellSlotsFromResources } from './feature-uses.util';
+import { extractSpellSlotsFromResources, extractPactSlotsFromResources } from './feature-uses.util';
 import {
   classBonusLanguageCount,
   extractWeaponProficiencyChoices,
   extractToolProficiencyChoices,
   countAsiSlots,
+  spellProgressionMilestones,
 } from './progression-choices.util';
 import { normalizeCharacterClass } from './class-data.adapter';
 
@@ -81,5 +82,25 @@ describe('High-level progression (6–20)', () => {
     expect(tools.length).toBe(1);
     expect(tools[0].count).toBe(3);
     expect(classBonusLanguageCount(lettre, 1)).toBe(3);
+  });
+
+  it('extracts warlock pact slots from JSON resources', () => {
+    const slots = extractPactSlotsFromResources({ pact_slots_count: 3, pact_slot_level: 5 });
+    expect(slots).toEqual([{ level: 5, max: 3 }]);
+  });
+
+  it('lists spell progression milestones up to target level', () => {
+    const cls = {
+      data: {
+        progression: [
+          { level: 6, spell_choices: [{ count: 1, label: 'Sort occulte' }] },
+          { level: 11, choice_pools_active: [{ type: 'spell_known', quantity: 1, label: 'Arcane' }] },
+        ],
+      },
+    };
+    expect(spellProgressionMilestones(cls, 10)).toEqual([
+      { level: 6, count: 1, label: 'Sort occulte' },
+    ]);
+    expect(spellProgressionMilestones(cls, 20).length).toBe(2);
   });
 });

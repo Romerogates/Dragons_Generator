@@ -555,6 +555,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const c = this.campaign();
     if (!c?.isOwner) return;
     const next = c.data.pinnedHandoutId === handoutId ? null : handoutId;
+    this.pinnedOverlayDismissed.set(false);
     this.saveData({ pinnedHandoutId: next });
   }
 

@@ -37,6 +37,7 @@ import {
   dungeonMapToPngDataUrl,
   exportDungeonPdf,
   exportDungeonPng,
+  fogRevealSet,
   roomAt,
   themePalette,
 } from '@core/utils/dungeon-render.util';
@@ -171,6 +172,7 @@ export class CampaignDungeonMaps {
         showRoomNumbers: true,
         selectedRoomId: this.selectedRoomId(),
         vignette: true,
+        revealedRoomIds: fogRevealSet(map),
       });
     });
 
@@ -636,7 +638,9 @@ export class CampaignDungeonMaps {
     const map = this.editingMap();
     if (!map) return;
     const c = this.campaign();
-    const body = buildHandoutBody(map, this.encounters());
+    const body = buildHandoutBody(map, this.encounters(), {
+      playerFog: !!map.fogOfWarEnabled,
+    });
     const now = new Date().toISOString();
     let handouts = [...(c.data.handouts ?? [])];
     let handoutId = map.handoutId ?? null;
@@ -682,6 +686,47 @@ export class CampaignDungeonMaps {
       month: 'short',
       year: 'numeric',
     });
+  }
+
+  toggleFogOfWar(): void {
+    const map = this.editingMap();
+    if (!map) return;
+    const enabled = !map.fogOfWarEnabled;
+    this.patchEditingMap({
+      fogOfWarEnabled: enabled,
+      revealedRoomIds: enabled ? (map.revealedRoomIds ?? []) : [],
+    });
+    this.message.set(enabled ? 'Fog of war activé — révélez les salles une par une.' : 'Fog of war désactivé.');
+  }
+
+  isRoomRevealed(roomId: string): boolean {
+    const map = this.editingMap();
+    if (!map?.fogOfWarEnabled) return true;
+    return (map.revealedRoomIds ?? []).includes(roomId);
+  }
+
+  toggleRoomReveal(roomId: string, event?: Event): void {
+    event?.stopPropagation();
+    const map = this.editingMap();
+    if (!map) return;
+    const current = new Set(map.revealedRoomIds ?? []);
+    if (current.has(roomId)) current.delete(roomId);
+    else current.add(roomId);
+    this.patchEditingMap({ revealedRoomIds: [...current] });
+  }
+
+  revealAllRooms(): void {
+    const map = this.editingMap();
+    if (!map) return;
+    this.patchEditingMap({ revealedRoomIds: map.rooms.map((r) => r.id) });
+    this.message.set('Toutes les salles révélées.');
+  }
+
+  hideAllRooms(): void {
+    const map = this.editingMap();
+    if (!map) return;
+    this.patchEditingMap({ revealedRoomIds: [] });
+    this.message.set('Salles masquées — régénérez le handout pour les joueurs.');
   }
 
   onThemeChange(raw: string): void {

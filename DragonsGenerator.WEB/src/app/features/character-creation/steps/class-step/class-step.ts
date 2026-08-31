@@ -29,6 +29,7 @@ import {
   resolveFeatureUses,
   extractScalarResources,
   extractSpellSlotsFromResources,
+  extractPactSlotsFromResources,
 } from '@core/utils/feature-uses.util';
 import { annotateAuraDesc } from '@core/utils/aura-range.util';
 import {
@@ -1045,7 +1046,11 @@ export class ClassStep implements OnInit {
 
       const progAtLevel = progression.find((p) => p.level === targetLevel);
       const classProgressionResources = extractScalarResources(progAtLevel?.resources);
-      const classSpellSlots = extractSpellSlotsFromResources(progAtLevel?.resources);
+      const pactSlots = extractPactSlotsFromResources(progAtLevel?.resources);
+      const classSpellSlots =
+        pactSlots.length > 0
+          ? pactSlots
+          : extractSpellSlotsFromResources(progAtLevel?.resources);
       const langBonus = classBonusLanguageCount(cls, targetLevel);
 
       const data = cls.data as Record<string, unknown>;
