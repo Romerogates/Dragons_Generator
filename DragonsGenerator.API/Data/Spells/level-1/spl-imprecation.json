@@ -1,0 +1,35 @@
+{
+  "schema_version": "2.0",
+  "id": "spl-imprecation",
+  "name": "Imprécation",
+  "level": 1,
+  "school": "enchantement",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": "une goutte de sang"
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-pretre"
+  ],
+  "description": "Jusqu'à trois créatures de votre choix dans un rayon de 9 mètres doivent effectuer un jet de sauvegarde de Charisme. En cas d'échec, chaque fois qu'une cible effectue un jet d'attaque ou de sauvegarde avant la fin du sort, elle doit lancer 1d4 et soustraire le résultat du jet.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 1ᵉʳ.",
+  "modular_options": []
+}

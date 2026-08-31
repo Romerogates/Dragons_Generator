@@ -161,10 +161,10 @@ const PANEL_WIZARD = {
 // Prêtre : "Magie Divine" → Divinité–Domaine, Focaliseur arcanique, Conduits divins
 // Lignes mesurées sur grimoire-pretre.jpg (espace 595×842)
 const PANEL_CLERIC = {
-  line1X: 448, // Divinité — Domaine (valeur sur la ligne sous le label)
-  line1Y: 268,
+  line1X: 448, // Divinité — Domaine (ligne sous le label)
+  line1Y: 255,
   line2X: 448, // Symbole sacré / focaliseur
-  line2Y: 298,
+  line2Y: 282,
   channelsStartY: 365,
   channelsSpacing: 22,
   channelsX: 448,
@@ -1101,40 +1101,78 @@ export class PdfGeneratorService {
 
   /**
    * Place les sorts sur les lignages du tableau principal.
-   * Un sort tient sur 1 ligne, ou 2 si l'effet wrap (2e ligne alignée sur le lignage suivant).
+   * Ligne 1 effet : composants · durée ; ligne 2 : description (colonne Effet alignée).
    */
   private layoutSpellsOnMainTable(sorted: SpellInstance[]): {
-    entries: { spell: SpellInstance; row: number; effectLines: string[] }[];
+    entries: {
+      spell: SpellInstance;
+      row: number;
+      effectHeader: string;
+      effectBody: string;
+      rowsNeeded: number;
+    }[];
     overflow: SpellInstance[];
   } {
     const B = BASE_COORDS;
-    const effectWidthMm = pxToMmX(B.colPage - B.colEffect - 8);
-    // jsPDF n'est pas dispo ici → estimation largeur caractères (~2.1 mm à 7pt)
-    const approxCharW = 1.85;
-    const maxChars = Math.max(20, Math.floor(effectWidthMm / approxCharW));
 
-    const entries: { spell: SpellInstance; row: number; effectLines: string[] }[] = [];
+    const entries: {
+      spell: SpellInstance;
+      row: number;
+      effectHeader: string;
+      effectBody: string;
+      rowsNeeded: number;
+    }[] = [];
     const overflow: SpellInstance[] = [];
     let row = 0;
 
     for (const spell of sorted) {
-      const effectLines = this.wrapEffectPreview(spell.effectSummary ?? '', maxChars, 2);
-      const rowsNeeded = Math.max(1, effectLines.length);
-      if (row + rowsNeeded > B.spellTableMaxRows) {
+      const layout = this.grimoireEffectLayout(spell.effectSummary ?? '');
+      if (row + layout.rowsNeeded > B.spellTableMaxRows) {
         overflow.push(spell);
-        // Tous les suivants débordent aussi (ordre conservé)
         const idx = sorted.indexOf(spell);
         overflow.push(...sorted.slice(idx + 1));
         break;
       }
-      entries.push({ spell, row, effectLines });
-      row += rowsNeeded;
+      entries.push({
+        spell,
+        row,
+        effectHeader: layout.header,
+        effectBody: layout.body,
+        rowsNeeded: layout.rowsNeeded,
+      });
+      row += layout.rowsNeeded;
     }
 
     return { entries, overflow };
   }
 
-  /** Découpe un effet en 1–2 lignes (approx. largeur colonne), sans jsPDF. */
+  /** Sépare composants/durée (ligne 1) et description (ligne 2). */
+  private splitEffectForGrimoire(summary: string): { header: string; body: string } {
+    const parts = summary.split(' | ').map((p) => p.trim()).filter(Boolean);
+    if (parts.length >= 3) {
+      return { header: `${parts[0]} · ${parts[1]}`, body: parts.slice(2).join(' ') };
+    }
+    if (parts.length === 2) {
+      return { header: parts[0], body: parts[1] };
+    }
+    return { header: '', body: summary };
+  }
+
+  private grimoireEffectLayout(summary: string): {
+    header: string;
+    body: string;
+    rowsNeeded: number;
+  } {
+    const { header, body } = this.splitEffectForGrimoire(summary);
+    const bodyTrim = body.trim();
+    if (!bodyTrim || bodyTrim.length <= 48) {
+      const single = [header, bodyTrim].filter(Boolean).join(header && bodyTrim ? ' · ' : '');
+      return { header: single, body: '', rowsNeeded: 1 };
+    }
+    return { header, body: bodyTrim, rowsNeeded: 2 };
+  }
+
+  /** @deprecated Estimation sans jsPDF — conservé pour la page supp si besoin. */
   private wrapEffectPreview(text: string, maxChars: number, maxLines: number): string[] {
     if (!text) return [''];
     if (text.length <= maxChars) return [text];
@@ -1176,7 +1214,7 @@ export class PdfGeneratorService {
       SPELL_TABLE_LEVEL.rowsPerBand,
     );
 
-    for (const { spell, row, effectLines } of entries) {
+    for (const { spell, row, effectHeader, effectBody, rowsNeeded } of entries) {
       const y = B.spellTableStartY + row * B.spellTableRowH;
 
       if (spell.alwaysPrepared || spell.prepared) {
@@ -1186,21 +1224,25 @@ export class PdfGeneratorService {
       pdf.setFontSize(10);
       this.text(pdf, spell.name, B.colName, y);
 
-      // Effet : chaque ligne sur un lignage imprimé (même X → alignement colonne Effet)
       pdf.setFontSize(7);
-      let linesToDraw = effectLines;
-      if (spell.effectSummary) {
-        const precise = (pdf.splitTextToSize(spell.effectSummary, effectWidthMm) as string[]).slice(
-          0,
-          Math.max(1, effectLines.length),
-        );
-        if (precise.length) linesToDraw = precise;
-      }
       const effectX = pxToMmX(B.colEffect);
       const baseY = pxToMmY(y);
-      linesToDraw.forEach((line: string, li: number) => {
-        if (line) pdf.text(line, effectX, baseY + li * lineHMm);
-      });
+
+      if (rowsNeeded === 1) {
+        const single = effectBody
+          ? [effectHeader, effectBody].filter(Boolean).join(' · ')
+          : effectHeader;
+        const lines = pdf.splitTextToSize(single, effectWidthMm) as string[];
+        lines.slice(0, 2).forEach((line, li) => {
+          if (line) pdf.text(line, effectX, baseY + li * lineHMm);
+        });
+      } else {
+        if (effectHeader) pdf.text(effectHeader, effectX, baseY);
+        if (effectBody) {
+          const bodyLines = pdf.splitTextToSize(effectBody, effectWidthMm) as string[];
+          pdf.text(bodyLines[0] ?? '', effectX, baseY + lineHMm);
+        }
+      }
 
       if (spell.pageRef) {
         pdf.setFontSize(7);
@@ -1250,8 +1292,10 @@ export class PdfGeneratorService {
       effectWidthMm: number;
       nameSize: number;
       effectSize: number;
-      effectMaxLines: number;
-      /** Hauteur d'une ligne d'effet en mm (doit matcher le lignage imprimé). */
+      effectHeader?: string;
+      effectBody?: string;
+      effectRowsNeeded?: number;
+      effectMaxLines?: number;
       effectLineHMm?: number;
     },
   ): void {
@@ -1262,14 +1306,36 @@ export class PdfGeneratorService {
     pdf.setFontSize(cols.nameSize);
     this.text(pdf, spell.name, cols.nameX, y);
 
-    if (spell.effectSummary) {
+    const lineHMm = cols.effectLineHMm ?? pxToMmY(BASE_COORDS.spellTableRowH);
+    const effectX = pxToMmX(cols.effectX);
+    const baseY = pxToMmY(y);
+
+    if (cols.effectHeader !== undefined || cols.effectBody !== undefined) {
+      pdf.setFontSize(cols.effectSize);
+      const header = cols.effectHeader ?? '';
+      const body = cols.effectBody ?? '';
+      const rowsNeeded = cols.effectRowsNeeded ?? 1;
+      if (rowsNeeded === 1) {
+        const single = body ? [header, body].filter(Boolean).join(' · ') : header;
+        if (single) {
+          const lines = pdf.splitTextToSize(single, cols.effectWidthMm) as string[];
+          lines.slice(0, 2).forEach((line, li) => {
+            if (line) pdf.text(line, effectX, baseY + li * lineHMm);
+          });
+        }
+      } else {
+        if (header) pdf.text(header, effectX, baseY);
+        if (body) {
+          const bodyLines = pdf.splitTextToSize(body, cols.effectWidthMm) as string[];
+          pdf.text(bodyLines[0] ?? '', effectX, baseY + lineHMm);
+        }
+      }
+    } else if (spell.effectSummary) {
       pdf.setFontSize(cols.effectSize);
       const lines = pdf.splitTextToSize(spell.effectSummary, cols.effectWidthMm);
-      const lineHMm = cols.effectLineHMm ?? pxToMmY(BASE_COORDS.spellTableRowH);
-      const effectX = pxToMmX(cols.effectX);
-      const effectY = pxToMmY(y);
-      lines.slice(0, cols.effectMaxLines).forEach((line: string, li: number) => {
-        pdf.text(line, effectX, effectY + li * lineHMm);
+      const maxLines = cols.effectMaxLines ?? 1;
+      lines.slice(0, maxLines).forEach((line: string, li: number) => {
+        pdf.text(line, effectX, baseY + li * lineHMm);
       });
     }
 
@@ -1335,10 +1401,7 @@ export class PdfGeneratorService {
 
     spells.slice(0, S.maxRows).forEach((spell, i) => {
       const y = S.tableStartY + i * S.rowH;
-      const effectWidthMm = pxToMmX(S.effectEndX - S.effectX - 8);
-      const approxCharW = 1.85;
-      const maxChars = Math.max(20, Math.floor(effectWidthMm / approxCharW));
-      const effectLines = this.wrapEffectPreview(spell.effectSummary ?? '', maxChars, 2);
+      const layout = this.grimoireEffectLayout(spell.effectSummary ?? '');
       this.drawSpellTableRow(pdf, spell, y, {
         preparedX: S.preparedX,
         nameX: S.nameX,
@@ -1346,7 +1409,9 @@ export class PdfGeneratorService {
         effectWidthMm,
         nameSize: 9,
         effectSize: 6.5,
-        effectMaxLines: effectLines.length,
+        effectHeader: layout.header,
+        effectBody: layout.body,
+        effectRowsNeeded: layout.rowsNeeded,
         effectLineHMm: pxToMmY(S.rowH),
       });
     });

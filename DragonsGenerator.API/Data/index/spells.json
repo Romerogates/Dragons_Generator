@@ -1178,6 +1178,22 @@
                        "distance_m":  18
                    },
                    {
+                       "id":  "spl-imprecation",
+                       "name":  "Imprécation",
+                       "level":  1,
+                       "school":  "enchantement",
+                       "file":  "Spells/level-1/spl-imprecation.json",
+                       "is_ritual":  false,
+                       "is_concentration":  true,
+                       "is_corrupted":  false,
+                       "classes":  [
+                                       "cls-pretre"
+                                   ],
+                       "casting_time_unit":  "action",
+                       "range_type":  "normal",
+                       "distance_m":  9
+                   },
+                   {
                        "id":  "spl-injonction",
                        "name":  "Injonction",
                        "level":  1,
