@@ -30,6 +30,7 @@ public static class DbMigrationRunner
         new("006_campaign_activity", Apply006CampaignActivityAsync),
         new("007_message_attachments", Apply007MessageAttachmentsAsync),
         new("008_session_reminder_logs", Apply008SessionReminderLogsAsync),
+        new("009_user_preferences_json", Apply009UserPreferencesJsonAsync),
     ];
 
     private sealed record Migration(string Id, Func<AppDbContext, CancellationToken, Task> Apply);
@@ -229,6 +230,18 @@ public static class DbMigrationRunner
             );
             CREATE UNIQUE INDEX IF NOT EXISTS "IX_SessionReminderLogs_Dedupe"
                 ON "SessionReminderLogs" ("CampaignId", "SessionId", "UserId", "ReminderKind");
+            """,
+            ct);
+    }
+
+    private static async Task Apply009UserPreferencesJsonAsync(AppDbContext db, CancellationToken ct)
+    {
+        await TryAddColumnAsync(db, "Users", "PreferencesJson", "TEXT NULL", ct);
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            UPDATE "Users"
+            SET "PreferencesJson" = '{}'
+            WHERE "PreferencesJson" IS NULL OR TRIM("PreferencesJson") = '';
             """,
             ct);
     }

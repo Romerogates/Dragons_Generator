@@ -23,6 +23,8 @@ public class AppUser
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset? LastLoginAt { get; set; }
     public DateTimeOffset? AcceptedTermsAt { get; set; }
+    /// <summary>JSON préférences UI (guide, etc.).</summary>
+    public string PreferencesJson { get; set; } = "{}";
 
     public List<CharacterRecord> Characters { get; set; } = [];
     public List<SupportTicket> SupportTickets { get; set; } = [];
