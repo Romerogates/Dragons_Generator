@@ -1,7 +1,15 @@
 // features/character-sheet/services/pdf-generator.service.ts
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import type { jsPDF } from 'jspdf';
+import { firstValueFrom } from 'rxjs';
 import { labelForGameId } from '@core/utils/game-id-labels';
+import {
+  buildGrimoireEffectSummary,
+  layoutGrimoireEffect,
+  type GrimoireEffectLayout,
+} from '@core/utils/spell-grimoire-effect.util';
+import { DataService } from '@core/services/data.service';
+import type { Spell } from '@core/models/Spells/spell';
 import {
   Character,
   SpellInstance,
@@ -96,9 +104,11 @@ const SUPP_COORDS = {
 
 /** Médaillons « Niveau » du tableau de sorts (grimoires classes standards). */
 const SPELL_TABLE_LEVEL = {
-  levelX: 42,
-  levelYs: [500, 613, 724],
+  levelX: 43,
+  /** Centres optiques des médaillons ouroboros (1re bande = sorts mineurs). */
+  levelYs: [507, 620, 733],
   rowsPerBand: 5,
+  labelFontSize: 11,
 };
 
 const BASE_COORDS: GrimoireBaseCoords = {
@@ -158,17 +168,17 @@ const PANEL_WIZARD = {
   line2Y: 305,
 };
 
-// Prêtre : "Magie Divine" → Divinité–Domaine, Focaliseur arcanique, Conduits divins
-// Lignes mesurées sur grimoire-pretre.jpg (espace 595×842)
+// Prêtre : "Magie Divine" → Divinité–Domaine, Symbole sacré, Conduits divins
 const PANEL_CLERIC = {
-  line1X: 448, // Divinité — Domaine (ligne sous le label)
-  line1Y: 255,
-  line2X: 448, // Symbole sacré / focaliseur
-  line2Y: 282,
+  line1X: 448, // Divinité — Domaine
+  line1Y: 252,
+  line2X: 448, // Symbole sacré (sous « Focaliseur arcanique »)
+  line2Y: 296,
   channelsStartY: 365,
   channelsSpacing: 22,
   channelsX: 448,
   valueFontSize: 10,
+  focusFontSize: 9,
 };
 
 // Druide : "Magie druidique" → Cercle, Focaliseur, cases à cocher, notes
@@ -323,6 +333,8 @@ const PAGE2 = {
   providedIn: 'root',
 })
 export class PdfGeneratorService {
+  private readonly dataService = inject(DataService);
+
   // =========================================================================
   // API PUBLIQUE
   // =========================================================================
@@ -350,37 +362,38 @@ export class PdfGeneratorService {
     // Lazy-load jspdf (+ deps) only when exporting — keeps wizard/navigation snappy
     const { jsPDF } = await import('jspdf');
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const enriched = await this.enrichCharacterSpells(character);
     const images = await this.loadBackgroundImages();
 
     // === PAGE 1 ===
     pdf.addImage(images[0], 'JPEG', 0, 0, 210, 297);
-    this.drawPage1(pdf, character);
+    this.drawPage1(pdf, enriched);
 
     // === PAGE 2 ===
     pdf.addPage();
     pdf.addImage(images[1], 'JPEG', 0, 0, 210, 297);
-    this.drawPage2(pdf, character);
+    this.drawPage2(pdf, enriched);
 
     // === PAGE 3 ===
     pdf.addPage();
     pdf.addImage(images[2], 'JPEG', 0, 0, 210, 297);
-    this.drawPage3(pdf, character);
+    this.drawPage3(pdf, enriched);
 
     // === PAGE 4 ===
     pdf.addPage();
     pdf.addImage(images[3], 'JPEG', 0, 0, 210, 297);
-    this.drawPage4(pdf, character);
+    this.drawPage4(pdf, enriched);
 
     // === PAGE 5 — Grimoire (optionnel) ===
-    if (character.spellcasting) {
-      const grimoireUrl = GRIMOIRE_IMAGES[character.spellcasting.kind];
+    if (enriched.spellcasting) {
+      const grimoireUrl = GRIMOIRE_IMAGES[enriched.spellcasting.kind];
       const grimoireImg = await this.loadImage(grimoireUrl);
       pdf.addPage();
       pdf.addImage(grimoireImg, 'JPEG', 0, 0, 210, 297);
-      this.drawGrimoire(pdf, character);
+      this.drawGrimoire(pdf, enriched);
 
       // Pages supplémentaires si trop de sorts (ou table absente sur GRP)
-      const overflow = this.getGrimoireOverflowSpells(character);
+      const overflow = this.getGrimoireOverflowSpells(enriched, pdf);
       if (overflow.length > 0) {
         const suppImg = await this.loadImage(GRIMOIRE_SUPP_IMAGE);
         const pages = this.chunkSpellsForSuppPages(overflow);
@@ -1086,7 +1099,7 @@ export class PdfGeneratorService {
    * GRP n'a pas de table → tous les sorts partent en page(s) supp.
    * Les sorts à effet 2 lignes consomment 2 lignages imprimés.
    */
-  private getGrimoireOverflowSpells(c: Character): SpellInstance[] {
+  private getGrimoireOverflowSpells(c: Character, pdf: jsPDF): SpellInstance[] {
     if (!c.spellcasting) return [];
     const sorted = this.sortedKnownSpells(c);
     if (!sorted.length) return [];
@@ -1096,104 +1109,108 @@ export class PdfGeneratorService {
       kind === 'ranger' || kind === 'paladin' || kind === 'fighter_eldritch_knight';
     if (isGrp) return sorted;
 
-    return this.layoutSpellsOnMainTable(sorted).overflow;
+    const B = BASE_COORDS;
+    const effectWidthMm = pxToMmX(B.colPage - B.colEffect - 8);
+    return this.layoutSpellsOnMainTable(pdf, sorted, effectWidthMm).overflow;
+  }
+
+  /**
+   * Complète noms/effets des sorts depuis l'API (personnages créés avant ajout d'un sort, etc.).
+   */
+  private async enrichCharacterSpells(character: Character): Promise<Character> {
+    if (!character.knownSpells?.length) return character;
+
+    let spellById = new Map<string, Spell>();
+    try {
+      const spells = await firstValueFrom(this.dataService.getSpells());
+      spellById = new Map(spells.map((s) => [s.id, s]));
+    } catch {
+      return character;
+    }
+
+    const knownSpells = character.knownSpells.map((inst) => {
+      const raw = spellById.get(inst.refId);
+      const unresolvedName = !inst.name || inst.name === inst.refId || /^spl-/.test(inst.name);
+      const name = unresolvedName && raw ? raw.name : inst.name;
+
+      return {
+        ...inst,
+        name: name || labelForGameId(inst.refId),
+        effectSummary: raw ? buildGrimoireEffectSummary(raw) : (inst.effectSummary ?? ''),
+      };
+    });
+
+    return { ...character, knownSpells };
   }
 
   /**
    * Place les sorts sur les lignages du tableau principal.
-   * Ligne 1 effet : composants · durée ; ligne 2 : description (colonne Effet alignée).
+   * Ligne 1 effet : composants · durée ; lignes suivantes : description (colonne Effet).
    */
-  private layoutSpellsOnMainTable(sorted: SpellInstance[]): {
+  private layoutSpellsOnMainTable(
+    pdf: jsPDF,
+    sorted: SpellInstance[],
+    effectWidthMm: number,
+  ): {
     entries: {
       spell: SpellInstance;
       row: number;
-      effectHeader: string;
-      effectBody: string;
-      rowsNeeded: number;
+      layout: GrimoireEffectLayout;
     }[];
     overflow: SpellInstance[];
   } {
     const B = BASE_COORDS;
+    const split = (text: string, maxWidth: number) =>
+      pdf.splitTextToSize(text, maxWidth) as string[];
 
     const entries: {
       spell: SpellInstance;
       row: number;
-      effectHeader: string;
-      effectBody: string;
-      rowsNeeded: number;
+      layout: GrimoireEffectLayout;
     }[] = [];
     const overflow: SpellInstance[] = [];
     let row = 0;
 
     for (const spell of sorted) {
-      const layout = this.grimoireEffectLayout(spell.effectSummary ?? '');
+      const layout = layoutGrimoireEffect(spell.effectSummary ?? '', split, effectWidthMm);
       if (row + layout.rowsNeeded > B.spellTableMaxRows) {
         overflow.push(spell);
         const idx = sorted.indexOf(spell);
         overflow.push(...sorted.slice(idx + 1));
         break;
       }
-      entries.push({
-        spell,
-        row,
-        effectHeader: layout.header,
-        effectBody: layout.body,
-        rowsNeeded: layout.rowsNeeded,
-      });
+      entries.push({ spell, row, layout });
       row += layout.rowsNeeded;
     }
 
     return { entries, overflow };
   }
 
-  /** Sépare composants/durée (ligne 1) et description (ligne 2). */
-  private splitEffectForGrimoire(summary: string): { header: string; body: string } {
-    const parts = summary.split(' | ').map((p) => p.trim()).filter(Boolean);
-    if (parts.length >= 3) {
-      return { header: `${parts[0]} · ${parts[1]}`, body: parts.slice(2).join(' ') };
-    }
-    if (parts.length === 2) {
-      return { header: parts[0], body: parts[1] };
-    }
-    return { header: '', body: summary };
-  }
+  private drawGrimoireEffectLines(
+    pdf: jsPDF,
+    layout: GrimoireEffectLayout,
+    effectX: number,
+    baseYMm: number,
+    lineHMm: number,
+    fontSize: number,
+  ): void {
+    pdf.setFontSize(fontSize);
+    let lineIndex = 0;
 
-  private grimoireEffectLayout(summary: string): {
-    header: string;
-    body: string;
-    rowsNeeded: number;
-  } {
-    const { header, body } = this.splitEffectForGrimoire(summary);
-    const bodyTrim = body.trim();
-    if (!bodyTrim || bodyTrim.length <= 48) {
-      const single = [header, bodyTrim].filter(Boolean).join(header && bodyTrim ? ' · ' : '');
-      return { header: single, body: '', rowsNeeded: 1 };
-    }
-    return { header, body: bodyTrim, rowsNeeded: 2 };
-  }
-
-  /** @deprecated Estimation sans jsPDF — conservé pour la page supp si besoin. */
-  private wrapEffectPreview(text: string, maxChars: number, maxLines: number): string[] {
-    if (!text) return [''];
-    if (text.length <= maxChars) return [text];
-    const lines: string[] = [];
-    let rest = text;
-    while (rest.length > 0 && lines.length < maxLines) {
-      if (rest.length <= maxChars) {
-        lines.push(rest);
-        break;
+    const writeLines = (lines: string[]) => {
+      for (const line of lines) {
+        if (line) pdf.text(line, effectX, baseYMm + lineIndex * lineHMm);
+        lineIndex++;
       }
-      let breakAt = rest.lastIndexOf(' ', maxChars);
-      if (breakAt < maxChars * 0.4) breakAt = maxChars;
-      lines.push(rest.slice(0, breakAt).trimEnd());
-      rest = rest.slice(breakAt).trimStart();
+    };
+
+    if (layout.bodyLines.length === 0) {
+      writeLines(layout.headerLines);
+      return;
     }
-    if (lines.length === maxLines && rest.length > 0) {
-      const last = lines[maxLines - 1];
-      lines[maxLines - 1] =
-        last.length > 3 ? last.slice(0, Math.max(0, last.length - 1)) + '…' : last + '…';
-    }
-    return lines.length ? lines : [''];
+
+    writeLines(layout.headerLines);
+    writeLines(layout.bodyLines);
   }
 
   private drawSpellTable(pdf: jsPDF, c: Character): void {
@@ -1203,18 +1220,19 @@ export class PdfGeneratorService {
 
     const effectWidthMm = pxToMmX(B.colPage - B.colEffect - 8);
     const lineHMm = pxToMmY(B.spellTableRowH);
-    const { entries } = this.layoutSpellsOnMainTable(sorted);
+    pdf.setFontSize(7);
+    const { entries } = this.layoutSpellsOnMainTable(pdf, sorted, effectWidthMm);
 
-    // Niveaux dans les médaillons ouroboros (1re ligne de chaque bande)
     this.drawSpellLevelMedallions(
       pdf,
       entries.map((e) => ({ row: e.row, level: e.spell.level })),
       SPELL_TABLE_LEVEL.levelX,
       SPELL_TABLE_LEVEL.levelYs,
       SPELL_TABLE_LEVEL.rowsPerBand,
+      SPELL_TABLE_LEVEL.labelFontSize,
     );
 
-    for (const { spell, row, effectHeader, effectBody, rowsNeeded } of entries) {
+    for (const { spell, row, layout } of entries) {
       const y = B.spellTableStartY + row * B.spellTableRowH;
 
       if (spell.alwaysPrepared || spell.prepared) {
@@ -1224,25 +1242,14 @@ export class PdfGeneratorService {
       pdf.setFontSize(10);
       this.text(pdf, spell.name, B.colName, y);
 
-      pdf.setFontSize(7);
-      const effectX = pxToMmX(B.colEffect);
-      const baseY = pxToMmY(y);
-
-      if (rowsNeeded === 1) {
-        const single = effectBody
-          ? [effectHeader, effectBody].filter(Boolean).join(' · ')
-          : effectHeader;
-        const lines = pdf.splitTextToSize(single, effectWidthMm) as string[];
-        lines.slice(0, 2).forEach((line, li) => {
-          if (line) pdf.text(line, effectX, baseY + li * lineHMm);
-        });
-      } else {
-        if (effectHeader) pdf.text(effectHeader, effectX, baseY);
-        if (effectBody) {
-          const bodyLines = pdf.splitTextToSize(effectBody, effectWidthMm) as string[];
-          pdf.text(bodyLines[0] ?? '', effectX, baseY + lineHMm);
-        }
-      }
+      this.drawGrimoireEffectLines(
+        pdf,
+        layout,
+        pxToMmX(B.colEffect),
+        pxToMmY(y),
+        lineHMm,
+        7,
+      );
 
       if (spell.pageRef) {
         pdf.setFontSize(7);
@@ -1260,6 +1267,7 @@ export class PdfGeneratorService {
     levelX: number,
     levelYs: number[],
     rowsPerBand: number,
+    fontSize = 11,
   ): void {
     if (!rowLevels.length || !levelYs.length) return;
 
@@ -1270,13 +1278,14 @@ export class PdfGeneratorService {
       if (!bandLevel.has(band)) bandLevel.set(band, level);
     }
 
-    pdf.setFontSize(12);
     pdf.setTextColor('#2c1810');
+    pdf.setFontSize(fontSize);
     for (const [band, level] of bandLevel) {
       const label = level === 0 ? 'M' : String(level);
-      const y = levelYs[band];
-      // Baseline légèrement sous le centre pour centrage optique dans le rond
-      pdf.text(label, pxToMmX(levelX), pxToMmY(y + 4), { align: 'center' });
+      const centerXMm = pxToMmX(levelX);
+      const centerYMm = pxToMmY(levelYs[band]);
+      const dims = pdf.getTextDimensions(label);
+      pdf.text(label, centerXMm, centerYMm + dims.h * 0.18, { align: 'center' });
     }
   }
 
@@ -1292,10 +1301,7 @@ export class PdfGeneratorService {
       effectWidthMm: number;
       nameSize: number;
       effectSize: number;
-      effectHeader?: string;
-      effectBody?: string;
-      effectRowsNeeded?: number;
-      effectMaxLines?: number;
+      effectLayout?: GrimoireEffectLayout;
       effectLineHMm?: number;
     },
   ): void {
@@ -1310,33 +1316,21 @@ export class PdfGeneratorService {
     const effectX = pxToMmX(cols.effectX);
     const baseY = pxToMmY(y);
 
-    if (cols.effectHeader !== undefined || cols.effectBody !== undefined) {
-      pdf.setFontSize(cols.effectSize);
-      const header = cols.effectHeader ?? '';
-      const body = cols.effectBody ?? '';
-      const rowsNeeded = cols.effectRowsNeeded ?? 1;
-      if (rowsNeeded === 1) {
-        const single = body ? [header, body].filter(Boolean).join(' · ') : header;
-        if (single) {
-          const lines = pdf.splitTextToSize(single, cols.effectWidthMm) as string[];
-          lines.slice(0, 2).forEach((line, li) => {
-            if (line) pdf.text(line, effectX, baseY + li * lineHMm);
-          });
-        }
-      } else {
-        if (header) pdf.text(header, effectX, baseY);
-        if (body) {
-          const bodyLines = pdf.splitTextToSize(body, cols.effectWidthMm) as string[];
-          pdf.text(bodyLines[0] ?? '', effectX, baseY + lineHMm);
-        }
-      }
+    if (cols.effectLayout) {
+      this.drawGrimoireEffectLines(
+        pdf,
+        cols.effectLayout,
+        effectX,
+        baseY,
+        lineHMm,
+        cols.effectSize,
+      );
     } else if (spell.effectSummary) {
       pdf.setFontSize(cols.effectSize);
-      const lines = pdf.splitTextToSize(spell.effectSummary, cols.effectWidthMm);
-      const maxLines = cols.effectMaxLines ?? 1;
-      lines.slice(0, maxLines).forEach((line: string, li: number) => {
-        pdf.text(line, effectX, baseY + li * lineHMm);
-      });
+      const split = (text: string, maxWidth: number) =>
+        pdf.splitTextToSize(text, maxWidth) as string[];
+      const layout = layoutGrimoireEffect(spell.effectSummary, split, cols.effectWidthMm);
+      this.drawGrimoireEffectLines(pdf, layout, effectX, baseY, lineHMm, cols.effectSize);
     }
 
     if (cols.pageX != null && spell.pageRef) {
@@ -1397,11 +1391,15 @@ export class PdfGeneratorService {
       S.levelX,
       S.levelYs,
       S.rowsPerBand,
+      SPELL_TABLE_LEVEL.labelFontSize,
     );
+
+    const split = (text: string, maxWidth: number) =>
+      pdf.splitTextToSize(text, maxWidth) as string[];
 
     spells.slice(0, S.maxRows).forEach((spell, i) => {
       const y = S.tableStartY + i * S.rowH;
-      const layout = this.grimoireEffectLayout(spell.effectSummary ?? '');
+      const effectLayout = layoutGrimoireEffect(spell.effectSummary ?? '', split, effectWidthMm);
       this.drawSpellTableRow(pdf, spell, y, {
         preparedX: S.preparedX,
         nameX: S.nameX,
@@ -1409,9 +1407,7 @@ export class PdfGeneratorService {
         effectWidthMm,
         nameSize: 9,
         effectSize: 6.5,
-        effectHeader: layout.header,
-        effectBody: layout.body,
-        effectRowsNeeded: layout.rowsNeeded,
+        effectLayout,
         effectLineHMm: pxToMmY(S.rowH),
       });
     });
@@ -1499,15 +1495,16 @@ export class PdfGeneratorService {
     const P = PANEL_CLERIC;
     pdf.setFontSize(P.valueFontSize);
 
-    // Divinité — Domaine (sur la ligne sous le label, pas sur le titre)
+    // Divinité — Domaine
     const deityDomain = [sc.deity, sc.domain].filter(Boolean).join(' — ');
     if (deityDomain) {
-      this.textWrapped(pdf, deityDomain, P.line1X, P.line1Y, pxToMmX(140), 3.5, 1);
+      this.textWrapped(pdf, deityDomain, P.line1X, P.line1Y, pxToMmX(130), 3.5, 1);
     }
 
-    // Focaliseur arcanique
+    // Symbole sacré (champ « Focaliseur arcanique » sur la fiche)
     if (sc.focus) {
-      this.textWrapped(pdf, labelForGameId(sc.focus), P.line2X, P.line2Y, pxToMmX(140), 3.5, 1);
+      pdf.setFontSize(P.focusFontSize);
+      this.text(pdf, labelForGameId(sc.focus), P.line2X, P.line2Y);
     }
 
     // Conduits divins

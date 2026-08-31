@@ -1,4 +1,4 @@
-{
+﻿{
   "schema_version": "2.0",
   "id": "spl-projectile-magique",
   "name": "Projectile magique",
@@ -30,7 +30,7 @@
     "cls-ensorceleur",
     "cls-magicien"
   ],
-  "description": "ous créez trois fléchettes luisantes de force magique. Chacune touche une créature de votre choix que vous voyez à",
+  "description": "Vous créez trois fléchettes luisantes de force magique. Chacune touche une créature de votre choix que vous voyez à",
   "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, il crée une fléchette de plus par niveau d'emplacement au-dessus du 1ᵉʳ.",
   "modular_options": []
 }

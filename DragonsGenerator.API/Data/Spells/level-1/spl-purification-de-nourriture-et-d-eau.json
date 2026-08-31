@@ -1,4 +1,4 @@
-{
+﻿{
   "schema_version": "2.0",
   "id": "spl-purification-de-nourriture-et-d-eau",
   "name": "Purification de nourriture et d'eau",
@@ -32,6 +32,6 @@
     "cls-pretre",
     "cls-rodeur"
   ],
-  "description": "ous purifiez et rendez comestible et potables la nourriture et les boissons non magiques situées dans une sphère de 1,50 m de rayon centrée sur un point de votre choix à portée.",
+  "description": "Vous purifiez et rendez comestible et potables la nourriture et les boissons non magiques situées dans une sphère de 1,50 m de rayon centrée sur un point de votre choix à portée.",
   "modular_options": []
 }

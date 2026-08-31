@@ -1,4 +1,4 @@
-{
+﻿{
   "schema_version": "2.0",
   "id": "spl-debilite",
   "name": "Débilité",
@@ -32,6 +32,6 @@
     "cls-magicien",
     "cls-sorcier"
   ],
-  "description": "ous vous attaquez à l'esprit d'une créature que vous voyez à portée, en tentant d'anéantir son intelligence et de briser sa personnalité. La cible subit 4d6 dégâts psychiques et doit effectuer un JS Intelligence. En cas d'échec, ses valeurs d'Intelligence et de Charisme tombent à 1. La créature ne peut plus lancer de sorts ni activer d'objets magiques, elle ne comprend plus aucune langue ou se révèle incapable de communiquer de manière intelligible. Elle reconnaît néanmoins ses amis, peut les suivre et même les protéger. Tous les 30 jours, elle peut réitérer son jet de sauvegarde contre ce sort. En cas de réussite, le sort prend fin. Guérison, restauration suprême ou souhait peuvent aussi mettre un terme au sort.",
+  "description": "Vous vous attaquez à l'esprit d'une créature que vous voyez à portée, en tentant d'anéantir son intelligence et de briser sa personnalité. La cible subit 4d6 dégâts psychiques et doit effectuer un JS Intelligence. En cas d'échec, ses valeurs d'Intelligence et de Charisme tombent à 1. La créature ne peut plus lancer de sorts ni activer d'objets magiques, elle ne comprend plus aucune langue ou se révèle incapable de communiquer de manière intelligible. Elle reconnaît néanmoins ses amis, peut les suivre et même les protéger. Tous les 30 jours, elle peut réitérer son jet de sauvegarde contre ce sort. En cas de réussite, le sort prend fin. Guérison, restauration suprême ou souhait peuvent aussi mettre un terme au sort.",
   "modular_options": []
 }

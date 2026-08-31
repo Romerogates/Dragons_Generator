@@ -1,4 +1,4 @@
-{
+﻿{
   "schema_version": "2.0",
   "id": "spl-nappe-de-brouillard",
   "name": "Nappe de brouillard",
@@ -32,7 +32,7 @@
     "cls-magicien",
     "cls-rodeur"
   ],
-  "description": "ous créez une sphère de brouillard de 6 m de rayon centrée sur un point situé à portée. Elle contourne les coins et sa zone est grandement voilée. Elle persiste pour toute la durée du sort ou jusqu'à ce qu'un vent modéré ou plus impor tant (au moins 15 km/h) ne la disperse.",
+  "description": "Vous créez une sphère de brouillard de 6 m de rayon centrée sur un point situé à portée. Elle contourne les coins et sa zone est grandement voilée. Elle persiste pour toute la durée du sort ou jusqu'à ce qu'un vent modéré ou plus impor tant (au moins 15 km/h) ne la disperse.",
   "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, le rayon de la sphère augmente de 6 m par niveau d'emplacement au-dessus du 1ᵉʳ.",
   "modular_options": []
 }

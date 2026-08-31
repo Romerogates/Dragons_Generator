@@ -1,4 +1,4 @@
-{
+﻿{
   "schema_version": "2.0",
   "id": "spl-lenteur",
   "name": "Lenteur",
@@ -30,7 +30,7 @@
     "cls-ensorceleur",
     "cls-magicien"
   ],
-  "description": "Ous modifiez l'écoulement du temps autour d'un maximum de six créatures de votre choix dans un cube de 12 m d'arête à portée. Chaque cible doit réussir un JS Sagesse sous peine d'être affectée. La VD d'une créature affectée est réduite de moitié, elle subit un malus de −2 à la CA et aux JS Dextérité et ne peut pas jouer de réaction. À son tour de jeu, elle peut utiliser une action ou une action bonus, mais pas les deux. Quels que soient ses capacités ou objets magiques, elle ne peut pas effectuer plus d'une attaque à distance ou de corps à corps durant son tour de jeu. Si la créature tente de lancer un sort avec un temps d'incantation de 1 action, lancez un d20. Sur un résultat de 11 ou plus, le sort ne prend pas effet avant son tour de jeu suivant durant lequel elle devra utiliser son action pour achever l'incantation. Si elle est dans l'impossibilité de le faire, le sort est gâché. Une créature affectée par ce sort effectue un autre JS Sagesse à la fin de chacun de ses tours de jeu. En cas de réussite, l'effet prend fin la concernant.",
+  "description": "Vous modifiez l'écoulement du temps autour d'un maximum de six créatures de votre choix dans un cube de 12 m d'arête à portée. Chaque cible doit réussir un JS Sagesse sous peine d'être affectée. La VD d'une créature affectée est réduite de moitié, elle subit un malus de −2 à la CA et aux JS Dextérité et ne peut pas jouer de réaction. À son tour de jeu, elle peut utiliser une action ou une action bonus, mais pas les deux. Quels que soient ses capacités ou objets magiques, elle ne peut pas effectuer plus d'une attaque à distance ou de corps à corps durant son tour de jeu. Si la créature tente de lancer un sort avec un temps d'incantation de 1 action, lancez un d20. Sur un résultat de 11 ou plus, le sort ne prend pas effet avant son tour de jeu suivant durant lequel elle devra utiliser son action pour achever l'incantation. Si elle est dans l'impossibilité de le faire, le sort est gâché. Une créature affectée par ce sort effectue un autre JS Sagesse à la fin de chacun de ses tours de jeu. En cas de réussite, l'effet prend fin la concernant.",
   "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, chaque niveau d'emplacement au-dessus du 3e vous permet de cibler deux créatures supplémentaires.",
   "modular_options": []
 }
