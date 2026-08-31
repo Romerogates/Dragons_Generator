@@ -60,6 +60,8 @@ import type { GuideAudience, GuideChecklistItem, GuideQuickCard, GuideStep } fro
 
 const AUDIENCE_KEY = 'dragons-guide-audience';
 const FEEDBACK_KEY = 'dragons-guide-feedback';
+const GUIDE_PATH = '/guide';
+const SCROLL_OFFSET_PX = 88;
 
 @Component({
   selector: 'app-guide',
@@ -211,7 +213,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         const id = location.hash.replace('#', '');
-        if (id) this.applyHash(id);
+        if (id) this.navigateToHash(id, false);
       });
 
     fromEvent(window, 'scroll')
@@ -222,8 +224,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
 
     const hash = location.hash.replace('#', '');
     if (hash) {
-      this.applyHash(hash);
-      queueMicrotask(() => this.scrollToHash(hash));
+      queueMicrotask(() => this.navigateToHash(hash, false));
     }
   }
 
@@ -238,7 +239,11 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     } catch {
       /* ignore */
     }
-    queueMicrotask(() => this.setupScrollSpy());
+    queueMicrotask(() => {
+      this.setupScrollSpy();
+      const hash = location.hash.replace('#', '');
+      if (hash) this.scrollToHash(hash);
+    });
   }
 
   onSearchInput(ev: Event): void {
@@ -267,7 +272,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async copySectionLink(sectionId: string): Promise<void> {
-    const url = `${location.origin}${location.pathname}#${sectionId}`;
+    const url = `${location.origin}${GUIDE_PATH}#${sectionId}`;
     try {
       await navigator.clipboard.writeText(url);
       this.copyToast.set('Lien copié');
@@ -275,6 +280,10 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
       this.copyToast.set('Impossible de copier');
     }
     setTimeout(() => this.copyToast.set(null), 1800);
+  }
+
+  sectionHref(sectionId: string): string {
+    return `#${sectionId}`;
   }
 
   setSectionFeedback(sectionId: string, value: 'yes' | 'no'): void {
@@ -302,15 +311,31 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
 
   scrollToSection(sectionId: string, event?: Event): void {
     event?.preventDefault();
-    if (sectionId.startsWith('faq-')) {
-      this.openFaqId.set(sectionId);
-      this.activeSection.set('faq');
-    } else {
-      this.activeSection.set(sectionId);
+    this.navigateToHash(sectionId, true);
+  }
+
+  private navigateToHash(sectionId: string, updateHistory: boolean): void {
+    this.ensureSectionVisible(sectionId);
+    this.applyHash(sectionId);
+    if (updateHistory) {
+      const url = `${GUIDE_PATH}#${sectionId}`;
+      history.replaceState(null, '', url);
     }
-    const url = `${location.pathname}${location.search}#${sectionId}`;
-    history.replaceState(null, '', url);
     queueMicrotask(() => this.scrollToHash(sectionId));
+  }
+
+  private ensureSectionVisible(sectionId: string): void {
+    if (sectionId.startsWith('faq-')) return;
+    const item = this.allNav.find((n) => n.id === sectionId);
+    if (item?.audience === 'dm' && this.audience() === 'player') {
+      this.audience.set('all');
+      try {
+        localStorage.setItem(AUDIENCE_KEY, 'all');
+      } catch {
+        /* ignore */
+      }
+      queueMicrotask(() => this.setupScrollSpy());
+    }
   }
 
   private applyHash(sectionId: string): void {
@@ -324,10 +349,16 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private scrollToHash(sectionId: string): void {
+  private scrollToHash(sectionId: string, attempt = 0): void {
     const el = document.getElementById(sectionId);
-    if (!el) return;
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!el) {
+      if (attempt < 12) {
+        window.setTimeout(() => this.scrollToHash(sectionId, attempt + 1), 50);
+      }
+      return;
+    }
+    const top = el.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET_PX;
+    window.scrollTo({ top: Math.max(0, top), behavior: attempt === 0 ? 'smooth' : 'auto' });
   }
 
   prefetch(key?: GuideQuickCard['prefetch']): void {
@@ -370,7 +401,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
 
   private setupScrollSpy(): void {
     this.observer?.disconnect();
-    const ids = this.allNav.map((n) => n.id);
+    const ids = this.nav().map((n) => n.id);
     const elements = ids
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => !!el);
