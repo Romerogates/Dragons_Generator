@@ -99,6 +99,7 @@ export const GUIDE_QUICK_CARDS: GuideQuickCard[] = [
 
 export const GUIDE_BLOG_POSTS: GuideBlogPost[] = [
     {
+      id: 'news-campagne-vide-handout',
       date: '31 août 2026',
       tag: 'Campagnes',
       title: 'Campagne vide, handout carte & résumé joueur',
@@ -110,6 +111,7 @@ export const GUIDE_BLOG_POSTS: GuideBlogPost[] = [
       isNew: true,
     },
     {
+      id: 'news-donjon-v1',
       date: '31 août 2026',
       tag: 'Cartes MJ',
       title: 'Générateur de donjons v1',
@@ -121,6 +123,7 @@ export const GUIDE_BLOG_POSTS: GuideBlogPost[] = [
       isNew: true,
     },
     {
+      id: 'news-parametres-profil',
       date: '31 août 2026',
       tag: 'Compte',
       title: 'Paramètres, profil & notifications',
@@ -132,6 +135,7 @@ export const GUIDE_BLOG_POSTS: GuideBlogPost[] = [
       isNew: true,
     },
     {
+      id: 'news-proposition-validation',
       date: '30 août 2026',
       tag: 'Campagnes',
       title: 'Boucle proposition → validation',
@@ -143,6 +147,7 @@ export const GUIDE_BLOG_POSTS: GuideBlogPost[] = [
       isNew: true,
     },
     {
+      id: 'news-table-stabilisee',
       date: '30 août 2026',
       tag: 'Table MJ',
       title: 'Table de jeu stabilisée',
@@ -154,6 +159,7 @@ export const GUIDE_BLOG_POSTS: GuideBlogPost[] = [
       isNew: true,
     },
     {
+      id: 'news-guide-v12',
       date: '30 août 2026',
       tag: 'Wiki',
       title: 'Guide forgeron v1.2',
@@ -164,6 +170,7 @@ export const GUIDE_BLOG_POSTS: GuideBlogPost[] = [
       tagColor: 'text-violet-400 bg-violet-950/40',
     },
     {
+      id: 'news-fiches-joueurs',
       date: '30 août 2026',
       tag: 'Campagnes MJ',
       title: 'Fiches joueurs + retrait de membres',
@@ -174,6 +181,7 @@ export const GUIDE_BLOG_POSTS: GuideBlogPost[] = [
       tagColor: 'text-violet-400 bg-violet-950/40',
     },
     {
+      id: 'news-double-arme-guerrier',
       date: '30 août 2026',
       tag: 'Équipement',
       title: 'Double arme de guerre (Guerrier)',
@@ -184,6 +192,7 @@ export const GUIDE_BLOG_POSTS: GuideBlogPost[] = [
       tagColor: 'text-emerald-400 bg-emerald-950/40',
     },
     {
+      id: 'news-rappels-combats',
       date: '30 août 2026',
       tag: 'Sessions',
       title: 'Rappels & historique combats',
@@ -193,6 +202,7 @@ export const GUIDE_BLOG_POSTS: GuideBlogPost[] = [
       tagColor: 'text-amber-400 bg-amber-950/40',
     },
     {
+      id: 'news-collecte-initiative',
       date: '30 août 2026',
       tag: 'Initiative',
       title: 'Collecte côté joueurs',
@@ -203,6 +213,7 @@ export const GUIDE_BLOG_POSTS: GuideBlogPost[] = [
       tagColor: 'text-sky-400 bg-sky-950/40',
     },
     {
+      id: 'news-handouts-markdown',
       date: '29 août 2026',
       tag: 'Documents',
       title: 'Handouts markdown & activité',

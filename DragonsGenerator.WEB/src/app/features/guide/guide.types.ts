@@ -10,6 +10,7 @@ export interface GuideNavItem {
 }
 
 export interface GuideBlogPost {
+  id: string;
   date: string;
   tag: string;
   title: string;

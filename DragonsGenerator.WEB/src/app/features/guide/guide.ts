@@ -60,6 +60,7 @@ import type { GuideAudience, GuideChecklistItem, GuideQuickCard, GuideStep } fro
 
 const AUDIENCE_KEY = 'dragons-guide-audience';
 const FEEDBACK_KEY = 'dragons-guide-feedback';
+const READ_NEWS_KEY = 'dragons-guide-read-news';
 const GUIDE_PATH = '/guide';
 const SCROLL_OFFSET_PX = 88;
 
@@ -89,6 +90,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   readonly showBackToTop = signal(false);
   readonly copyToast = signal<string | null>(null);
   readonly sectionFeedback = signal<Record<string, 'yes' | 'no'>>({});
+  readonly readNewsIds = signal<Record<string, true>>({});
 
   readonly tipOfDay = computed(() => {
     const day = Math.floor(Date.now() / 86_400_000);
@@ -117,6 +119,13 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   readonly faqItems = GUIDE_FAQ_ITEMS;
   readonly glossary = GUIDE_GLOSSARY;
   readonly featureIndex = GUIDE_FEATURE_INDEX;
+
+  readonly visibleBlogPosts = computed(() => {
+    const read = this.readNewsIds();
+    return this.blogPosts.filter((post) => !read[post.id]);
+  });
+
+  readonly unreadNewsCount = computed(() => this.visibleBlogPosts().length);
 
   readonly nav = computed(() => {
     const a = this.audience();
@@ -202,6 +211,34 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
       }
       const fb = localStorage.getItem(FEEDBACK_KEY);
       if (fb) this.sectionFeedback.set(JSON.parse(fb) as Record<string, 'yes' | 'no'>);
+      const readNews = localStorage.getItem(READ_NEWS_KEY);
+      if (readNews) {
+        const ids = JSON.parse(readNews) as string[];
+        this.readNewsIds.set(Object.fromEntries(ids.map((id) => [id, true as const])));
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  markNewsRead(newsId: string): void {
+    if (this.readNewsIds()[newsId]) return;
+    this.readNewsIds.update((current) => {
+      const next = { ...current, [newsId]: true as const };
+      try {
+        localStorage.setItem(READ_NEWS_KEY, JSON.stringify(Object.keys(next)));
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  }
+
+  markAllNewsRead(): void {
+    const next = Object.fromEntries(this.blogPosts.map((post) => [post.id, true as const]));
+    this.readNewsIds.set(next);
+    try {
+      localStorage.setItem(READ_NEWS_KEY, JSON.stringify(Object.keys(next)));
     } catch {
       /* ignore */
     }
