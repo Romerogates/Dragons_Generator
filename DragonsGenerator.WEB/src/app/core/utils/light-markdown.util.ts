@@ -35,9 +35,21 @@ export function renderLightMarkdown(text: string): string {
     const h2 = trimmed.match(/^## (.+)$/);
     const h3 = trimmed.match(/^### (.+)$/);
     const li = trimmed.match(/^[-*] (.+)$/);
+    const img = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
 
-    if (h1 || h2 || h3 || li || trimmed === '') {
+    if (h1 || h2 || h3 || li || img || trimmed === '') {
       closeList();
+    }
+
+    if (img) {
+      const src = img[2].trim();
+      if (src.startsWith('data:image/')) {
+        const alt = escapeHtml(img[1]);
+        out.push(
+          `<img src="${src}" alt="${alt}" class="my-3 max-w-full rounded-lg border border-slate-700/80 bg-[#0f1218]" loading="lazy" />`,
+        );
+      }
+      continue;
     }
 
     if (h1) {

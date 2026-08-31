@@ -115,15 +115,24 @@ export function dungeonMapToAscii(map: CampaignDungeonMap): string {
   return lines.join('\n');
 }
 
+export function dungeonMapToPngDataUrl(map: CampaignDungeonMap, cellSize = 10): string {
+  const canvas = document.createElement('canvas');
+  drawDungeonToCanvas(map, canvas, cellSize, { showRoomNumbers: true });
+  return canvas.toDataURL('image/png');
+}
+
 export function buildHandoutBody(
   map: CampaignDungeonMap,
   encounters: EncounterGroup[],
 ): string {
+  const imageUrl = dungeonMapToPngDataUrl(map);
   const lines: string[] = [
     `# ${map.name}`,
     '',
     `Thème : ${DUNGEON_THEME_LABELS[map.theme]}`,
     map.regionName ? `Région : ${map.regionName}` : '',
+    '',
+    `![${map.name}](${imageUrl})`,
     '',
     '## Légende des salles',
     '',
@@ -157,7 +166,6 @@ export function buildHandoutBody(
     }
   }
 
-  lines.push('', '_Carte visuelle : exportez PNG/PDF depuis l’éditeur._');
   return lines.join('\n');
 }
 

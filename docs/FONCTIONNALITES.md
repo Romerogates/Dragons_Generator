@@ -77,9 +77,10 @@ Brouillon localStorage avec reprise.
 
 ## 5. Campagnes multijoueur
 
-- Création depuis scénario ou campagne vide
+- Création depuis **assistant scénario** ou bouton **Campagne vide** (Mes campagnes)
 - **MJ** : édition, invitations amis, rencontres, XP, approbation persos joueurs
-- **Joueur** : proposer un personnage cloud
+- **Joueur** : proposer un personnage cloud ; résumé perso (XP, sessions passées)
+- Handouts carte : image PNG embarquée + légende des salles
 - **4 onglets** : Vue d'ensemble, Créatures, Rencontres, Joueurs
 - PDF campagne (bestiaire, pack MJ, fiches joueurs)
 

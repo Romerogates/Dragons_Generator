@@ -88,6 +88,17 @@
                   <p class="text-2xl font-bold text-emerald-400">{{ totalXpAwarded() }}</p>
                   <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">XP distribuée</p>
                 </div>
+              } @else {
+                <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
+                  <p class="text-2xl font-bold text-emerald-400">{{ myXpEarned() }}</p>
+                  <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Mon XP</p>
+                </div>
+                @if (myPlayerMember()?.approvedCharacterName; as charName) {
+                  <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center col-span-2 md:col-span-1">
+                    <p class="text-lg font-bold text-sky-400 truncate">{{ charName }}</p>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Mon personnage</p>
+                  </div>
+                }
               }
             </div>
 
@@ -450,6 +461,29 @@
                 } @empty {
                   <p class="text-sm text-slate-500 italic">Aucune session à venir.</p>
                 }
+
+                @if (pastSessions().length) {
+                  <div class="mt-6 pt-6 border-t border-slate-800 space-y-3">
+                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-500">Sessions passées</h3>
+                    @for (session of pastSessions(); track session.id) {
+                      <div class="rounded-xl border border-slate-800 bg-[#171b22] px-4 py-3">
+                        <div class="flex flex-wrap items-center gap-2 mb-1">
+                          <p class="font-serif text-slate-200">{{ session.title }}</p>
+                          <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border border-slate-700 text-slate-400 bg-slate-900/40">
+                            {{ sessionStatusLabel(session.status) }}
+                          </span>
+                        </div>
+                        <p class="text-sm text-slate-500">
+                          {{ formatSessionDate(session.scheduledAt) }}
+                          @if (session.location) { · {{ session.location }} }
+                        </p>
+                        @if (session.notes) {
+                          <p class="text-xs text-slate-600 mt-2 line-clamp-3">{{ session.notes }}</p>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
               }
             </div>
 
@@ -466,7 +500,11 @@
               </button>
             }
 
-            <p class="text-xs text-slate-500">XP total distribué aux joueurs : <strong class="text-violet-400">{{ totalXpAwarded() }}</strong></p>
+            @if (c.isOwner) {
+              <p class="text-xs text-slate-500">XP total distribué aux joueurs : <strong class="text-violet-400">{{ totalXpAwarded() }}</strong></p>
+            } @else if (myPlayerMember()) {
+              <p class="text-xs text-slate-500">Mon XP gagné dans cette campagne : <strong class="text-emerald-400">{{ myXpEarned() }}</strong></p>
+            }
           </section>
         }
 

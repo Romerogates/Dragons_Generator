@@ -137,7 +137,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
       'Publiez un handout : les joueurs le voient dans Activité et Documents.',
       'Terminez le combat pour archiver un résumé dans l’historique MJ.',
       'Générez un donjon depuis Cartes & donjons — le thème suit souvent la région Eana.',
-      'Handout brouillon : les joueurs ne voient la carte qu’après publication dans Documents.',
+      'Handout brouillon carte : image PNG + légende — les joueurs ne voient qu’après publication.',
       'Paramètres → onglet Notifications : filtrez amis, campagnes et push par type.',
     ];
     const day = Math.floor(Date.now() / 86_400_000);
@@ -216,6 +216,17 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   readonly blogPosts: GuideBlogPost[] = [
+    {
+      date: '31 août 2026',
+      tag: 'Campagnes',
+      title: 'Campagne vide, handout carte & résumé joueur',
+      summary:
+        'Créez une campagne sans wizard scénario. Les handouts carte embarquent l’image PNG. Les joueurs voient leur XP et les sessions passées dans le Résumé.',
+      icon: 'fluent-emoji:world-map',
+      border: 'border-violet-500/30',
+      tagColor: 'text-violet-400 bg-violet-950/40',
+      isNew: true,
+    },
     {
       date: '31 août 2026',
       tag: 'Cartes MJ',
@@ -335,6 +346,20 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
 
   readonly flashCards: GuideFlashCard[] = [
     {
+      title: 'Campagne vide',
+      bullets: ['Mes campagnes → Campagne vide', 'Inviter amis · ajouter contenu à la main', 'Sans assistant scénario'],
+      audience: 'dm',
+      icon: 'fluent-emoji:memo',
+      sectionId: 'scenario',
+    },
+    {
+      title: 'Mon résumé joueur',
+      bullets: ['Campagne → Résumé', 'Mon XP et mon personnage', 'Sessions à venir et passées'],
+      audience: 'player',
+      icon: 'fluent-emoji:bar-chart',
+      sectionId: 'scenario',
+    },
+    {
       title: 'Publier un handout',
       bullets: ['Documents → Créer', 'Rédiger (markdown léger)', 'Publier → push joueurs'],
       audience: 'dm',
@@ -420,7 +445,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     },
     {
       title: 'Lancer une campagne',
-      body: 'MJ : nouvelle campagne, invitez un ami, planifiez une session.',
+      body: 'MJ : assistant scénario (synopsis IA) ou bouton Campagne vide depuis Mes campagnes — puis invitez vos amis.',
       badge: 'MJ',
       link: '/campaigns',
       linkLabel: 'Campagnes',
@@ -468,7 +493,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   readonly campaignMjFlow = [
-    'Créer campagne',
+    'Scénario ou campagne vide',
     'Inviter amis',
     'Valider persos',
     'Préparer donjon / docs',
@@ -479,6 +504,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     'Accepter invite',
     'Proposer perso',
     'Notif MJ → validation',
+    'Résumé (XP, sessions)',
     'Lire documents',
     'Saisir initiative',
   ];
@@ -552,12 +578,12 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     },
     {
       title: 'Exporter & partager',
-      body: 'PNG, PDF (carte + légende), JSON (réouvrir plus tard). Handout brouillon → onglet Documents.',
+      body: 'PNG, PDF (carte + légende), JSON (réouvrir plus tard). Handout brouillon → image PNG + légende dans Documents.',
       badge: 'MJ',
     },
     {
       title: 'Publier aux joueurs',
-      body: 'Documents → ouvrir le handout carte → Publier. Les joueurs voient la légende ; fog of war = prochaine version.',
+      body: 'Documents → ouvrir le handout carte → Publier. Les joueurs voient la carte en image et la légende des salles. Fog of war = prochaine version.',
       badge: 'MJ',
     },
   ];
@@ -580,7 +606,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   readonly dmChecklist: GuideChecklistItem[] = [
-    { id: 'dm-1', label: 'Campagne créée avec synopsis' },
+    { id: 'dm-1', label: 'Campagne créée (scénario ou vide)' },
     { id: 'dm-2', label: 'Amis invités (déjà dans la liste d’amis)' },
     { id: 'dm-3', label: 'Personnages joueurs validés (fiche consultée)' },
     { id: 'dm-4', label: 'Notifications push activées (propositions incluses)' },
@@ -598,7 +624,8 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     { id: 'pl-4', label: 'Personnage proposé à la campagne' },
     { id: 'pl-5', label: 'Notifications push activées' },
     { id: 'pl-6', label: 'Personnage accepté (ou re-proposé après refus)' },
-    { id: 'pl-7', label: 'Prêt pour la collecte d’initiative' },
+    { id: 'pl-7', label: 'Consulter mon résumé (XP, sessions passées)' },
+    { id: 'pl-8', label: 'Prêt pour la collecte d’initiative' },
   ];
 
   readonly faqItems: GuideFaqItem[] = [
@@ -613,8 +640,22 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
       id: 'faq-handout-carte',
       question: 'Les joueurs voient-ils la carte tout de suite ?',
       answer:
-        'Non tant que le handout n’est pas publié. Le bouton Handout brouillon crée un document type « Carte » dans l’onglet Documents, invisible pour les joueurs. Publiez-le quand vous êtes prêt. La révélation progressive (fog of war) arrivera dans une prochaine version.',
+        'Non tant que le handout n’est pas publié. Le bouton Handout brouillon crée un document type « Carte » dans l’onglet Documents, avec l’image PNG de la carte et la légende des salles — invisible pour les joueurs tant qu’il reste en brouillon. Publiez-le quand vous êtes prêt. La révélation progressive (fog of war) arrivera dans une prochaine version.',
       audience: 'dm',
+    },
+    {
+      id: 'faq-campagne-vide',
+      question: 'Puis-je créer une campagne sans passer par l’assistant scénario ?',
+      answer:
+        'Oui. Mes campagnes → Campagne vide : une table vierge est créée (titre modifiable ensuite). Invitez vos amis, ajoutez créatures, donjons et sessions à la main — idéal pour une campagne longue ou une table déjà préparée ailleurs.',
+      audience: 'dm',
+    },
+    {
+      id: 'faq-resume-joueur',
+      question: 'Où voir mon XP et l’historique des sessions ?',
+      answer:
+        'Joueur : ouvrez la campagne → onglet Résumé. Vous y voyez votre XP gagné, votre personnage approuvé, les sessions à venir et les sessions déjà jouées. Le total XP du groupe reste réservé au MJ.',
+      audience: 'player',
     },
     {
       id: 'faq-pdf',
@@ -708,7 +749,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   readonly glossary: GuideGlossaryItem[] = [
     { term: 'Table', definition: 'Espace de jeu en direct du MJ : notes, rencontres, tracker de combat.' },
     { term: 'Pré-tiré', definition: 'Personnage préparé par le MJ, assignable puis revendiquable par un joueur.' },
-    { term: 'Handout', definition: 'Document publié aux joueurs (lettre, carte, résumé…) en markdown léger.' },
+    { term: 'Handout', definition: 'Document publié aux joueurs (lettre, carte, résumé…) en markdown léger ; les cartes embarquent une image PNG.' },
     {
       term: 'Carte & donjon',
       definition:

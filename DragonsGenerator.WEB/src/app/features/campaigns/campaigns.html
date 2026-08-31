@@ -21,13 +21,23 @@
     </div>
 
     @if (isLoggedIn() && list().length > 0) {
-      <a
-        routerLink="/story/create"
-        class="px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-violet-600 text-white shadow-md hover:bg-violet-500 hover:scale-[1.02] active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-200 flex items-center gap-2"
-      >
-        <span class="text-lg"><iconify-icon icon="fluent-emoji:sparkles"></iconify-icon></span>
-        Nouveau scénario
-      </a>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <a
+          routerLink="/story/create"
+          class="px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-violet-600 text-white shadow-md hover:bg-violet-500 hover:scale-[1.02] active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-200 flex items-center justify-center gap-2"
+        >
+          <span class="text-lg"><iconify-icon icon="fluent-emoji:sparkles"></iconify-icon></span>
+          Nouveau scénario
+        </a>
+        <button
+          type="button"
+          class="px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest border border-slate-600 text-slate-200 hover:border-violet-500/50 hover:text-violet-300 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-50"
+          [disabled]="creatingEmpty()"
+          (click)="createEmptyCampaign()"
+        >
+          @if (creatingEmpty()) { Création… } @else { Campagne vide }
+        </button>
+      </div>
     }
   </header>
 
@@ -120,15 +130,25 @@
           Parchemins vierges
         </h2>
         <p class="text-slate-400 mb-8 max-w-md leading-relaxed">
-          Aucune campagne pour l'instant. Créez votre premier scénario et rassemblez vos héros pour
-          une nouvelle aventure.
+          Aucune campagne pour l'instant. Lancez un scénario guidé ou créez une campagne vide pour
+          inviter vos joueurs et préparer la table à la main.
         </p>
-        <a
-          routerLink="/story/create"
-          class="px-10 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-violet-500 text-slate-950 shadow-md hover:bg-violet-400 hover:scale-[1.02] active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-200"
-        >
-          Lancer un scénario
-        </a>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <a
+            routerLink="/story/create"
+            class="px-10 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-violet-500 text-slate-950 shadow-md hover:bg-violet-400 hover:scale-[1.02] active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-200"
+          >
+            Lancer un scénario
+          </a>
+          <button
+            type="button"
+            class="px-10 py-4 rounded-xl text-sm font-black uppercase tracking-widest border border-slate-600 text-slate-200 hover:border-violet-500/50 hover:text-violet-300 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-50"
+            [disabled]="creatingEmpty()"
+            (click)="createEmptyCampaign()"
+          >
+            @if (creatingEmpty()) { Création… } @else { Campagne vide }
+          </button>
+        </div>
       </div>
     } @else {
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

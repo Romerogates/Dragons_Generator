@@ -148,6 +148,21 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       .reduce((s, m) => s + m.xpEarnedInCampaign, 0),
   );
 
+  readonly myPlayerMember = computed(() => {
+    const userId = this.auth.user()?.id;
+    if (!userId) return undefined;
+    return this.players().find((p) => p.userId === userId);
+  });
+
+  readonly myXpEarned = computed(() => this.myPlayerMember()?.xpEarnedInCampaign ?? 0);
+
+  readonly pastSessions = computed(() => {
+    const sessions = this.campaign()?.data.sessions ?? [];
+    return [...sessions]
+      .filter((s) => s.status === 'played')
+      .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime());
+  });
+
   readonly activeSession = computed(() => {
     const c = this.campaign();
     const id = c?.data.activeSessionId;
@@ -1006,9 +1021,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   isMyPlayerMember(): CampaignMember | undefined {
-    const userId = this.auth.user()?.id;
-    if (!userId) return undefined;
-    return this.players().find((p) => p.userId === userId);
+    return this.myPlayerMember();
   }
 
   editScenario(): void {

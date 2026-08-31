@@ -28,6 +28,10 @@ bazel-out/
 coverage/
 TestResults/
 
+# Playwright E2E artifacts
+DragonsGenerator.WEB/playwright-report/
+DragonsGenerator.WEB/test-results/
+
 # Environment files (Security)
 .env
 .env.local

@@ -10,7 +10,7 @@ import { AuthService } from '@core/services/auth.service';
 import { DataService } from '@core/services/data.service';
 import { getCampaignPdfService } from '@core/services/campaign-pdf.loader';
 import type { CreaturePrintEntry } from '@core/services/campaign-pdf.types';
-import { CampaignData, CampaignInvite, CampaignSummary } from '@core/models/Campaign/campaign';
+import { CampaignData, CampaignInvite, CampaignSummary, emptyCampaignData } from '@core/models/Campaign/campaign';
 import { forkJoin, catchError, map, of, Observable } from 'rxjs';
 
 @Component({
@@ -44,6 +44,7 @@ export class Campaigns implements OnInit {
   readonly deleting = signal(false);
   readonly actionError = signal<string | null>(null);
   readonly cardActionId = signal<string | null>(null);
+  readonly creatingEmpty = signal(false);
   readonly isLoggedIn = this.auth.isLoggedIn;
 
   ngOnInit(): void {
@@ -76,6 +77,32 @@ export class Campaigns implements OnInit {
         this.list.set(this.offlineSync.mergeCampaignLists([]));
         this.actionError.set('Impossible de charger vos campagnes. Affichage des brouillons locaux.');
         this.loading.set(false);
+      },
+    });
+  }
+
+  createEmptyCampaign(): void {
+    if (!this.auth.isLoggedIn() || this.creatingEmpty()) return;
+    this.creatingEmpty.set(true);
+    this.actionError.set(null);
+    const title = 'Nouvelle campagne';
+    const data = emptyCampaignData();
+
+    if (!this.connectivity.isOnline()) {
+      const local = this.offlineSync.queueCampaignCreate(title, data);
+      this.creatingEmpty.set(false);
+      this.router.navigate(['/campaigns', local.id]);
+      return;
+    }
+
+    this.campaigns.create(title, data).subscribe({
+      next: (created) => {
+        this.creatingEmpty.set(false);
+        this.router.navigate(['/campaigns', created.id]);
+      },
+      error: () => {
+        this.actionError.set('Impossible de créer la campagne vide.');
+        this.creatingEmpty.set(false);
       },
     });
   }
