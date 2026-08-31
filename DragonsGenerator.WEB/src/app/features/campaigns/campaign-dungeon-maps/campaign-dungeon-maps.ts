@@ -6,7 +6,6 @@ import {
   effect,
   ElementRef,
   HostListener,
-  inject,
   input,
   output,
   signal,
@@ -246,7 +245,7 @@ export class CampaignDungeonMaps {
     const markerKind = tool as DungeonMarkerKind;
     if (markerKind === 'trap' || markerKind === 'chest' || markerKind === 'stairs') {
       const existing = map.markers.findIndex((m) => m.x === x && m.y === y);
-      let markers = [...map.markers];
+      const markers = [...map.markers];
       if (existing >= 0) {
         markers.splice(existing, 1);
       }

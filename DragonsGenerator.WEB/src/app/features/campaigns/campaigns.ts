@@ -45,6 +45,8 @@ export class Campaigns implements OnInit {
   readonly actionError = signal<string | null>(null);
   readonly cardActionId = signal<string | null>(null);
   readonly creatingEmpty = signal(false);
+  readonly showEmptyCampaignModal = signal(false);
+  readonly emptyCampaignTitle = signal('Nouvelle campagne');
   readonly isLoggedIn = this.auth.isLoggedIn;
 
   ngOnInit(): void {
@@ -81,11 +83,23 @@ export class Campaigns implements OnInit {
     });
   }
 
+  openEmptyCampaignModal(): void {
+    if (!this.auth.isLoggedIn() || this.creatingEmpty()) return;
+    this.emptyCampaignTitle.set('Nouvelle campagne');
+    this.showEmptyCampaignModal.set(true);
+  }
+
+  cancelEmptyCampaignModal(): void {
+    if (this.creatingEmpty()) return;
+    this.showEmptyCampaignModal.set(false);
+  }
+
   createEmptyCampaign(): void {
     if (!this.auth.isLoggedIn() || this.creatingEmpty()) return;
+    const title = this.emptyCampaignTitle().trim() || 'Nouvelle campagne';
+    this.showEmptyCampaignModal.set(false);
     this.creatingEmpty.set(true);
     this.actionError.set(null);
-    const title = 'Nouvelle campagne';
     const data = emptyCampaignData();
 
     if (!this.connectivity.isOnline()) {

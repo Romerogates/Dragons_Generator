@@ -226,7 +226,7 @@ export async function exportDungeonPdf(
       pdf.addPage();
       y = margin;
     }
-    let text = '';
+    let text: string;
     if (room.encounterId) {
       const enc = encounters.find((e) => e.id === room.encounterId);
       text = enc

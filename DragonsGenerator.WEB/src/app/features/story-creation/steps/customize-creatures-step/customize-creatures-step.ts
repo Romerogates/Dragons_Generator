@@ -14,7 +14,6 @@ import { AiGenerationProgressService } from '@core/services/ai-generation-progre
 import { isAiRateLimitHttpError } from '@core/utils/ai-rate-limit.util';
 import { StoryBuilderService } from '@core/services/story-builder.service';
 import {
-  ADVENTURE_TONE_LABELS,
   CREATURE_ROLE_LABELS,
   CreatureRole,
   StoryCreatureSelection,

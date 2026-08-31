@@ -11,7 +11,6 @@ import type { Civilisation } from '@core/models/Civilisations/civilisations';
 import type { Language } from '@core/models/Languages/language';
 import type { Species } from '@core/models/Species/species';
 import type { Spell } from '@core/models/Spells/spell';
-import type { Skill } from '@core/models/Skills/skill';
 import { normalizeBackgrounds } from '@core/utils/background-data.adapter';
 import { normalizeCharacterClasses } from '@core/utils/class-data.adapter';
 import {

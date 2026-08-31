@@ -24,14 +24,12 @@ import {
   EquipmentSlot,
   Currency,
   SpellInstance,
-  CatalogRef,
   ABILITY_POINT_COSTS,
   STARTING_POINTS,
   DEFAULT_ABILITY_SCORE,
   MIN_ABILITY_SCORE,
   MAX_ABILITY_SCORE,
   CURRENT_SCHEMA_VERSION,
-  ABILITY_KEY_TO_LABEL,
   ABILITY_LABEL_TO_KEY,
   getAbilityModifier,
   formatModifier,
@@ -1950,7 +1948,7 @@ export class CharacterBuilderService {
         const isRanged = props.some((p) => p.includes('projectile') || p.includes('lancer'));
         const isFinesse = props.some((p) => p.includes('finesse'));
         const monkWeapon = canUseMartialArts && this.isMonkWeapon(eq, props, wd.subtype);
-        let abilityMod = isRanged
+        const abilityMod = isRanged
           ? modifiers.dexterite
           : isFinesse || monkWeapon
             ? Math.max(modifiers.force, modifiers.dexterite)

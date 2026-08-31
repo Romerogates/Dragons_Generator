@@ -9,7 +9,6 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of, switchMap } from 'rxjs';
 import { DataService } from '@core/services/data.service';
-import { Spell } from '@core/models/Spells/spell';
 
 @Component({
   selector: 'app-spell-by-id',

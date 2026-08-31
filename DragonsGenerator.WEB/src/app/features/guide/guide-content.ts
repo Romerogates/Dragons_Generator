@@ -507,7 +507,7 @@ export const GUIDE_FAQ_ITEMS: GuideFaqItem[] = [
       id: 'faq-campagne-vide',
       question: 'Puis-je créer une campagne sans passer par l’assistant scénario ?',
       answer:
-        'Oui. Mes campagnes → Campagne vide : une table vierge est créée (titre modifiable ensuite). Invitez vos amis, ajoutez créatures, donjons et sessions à la main — idéal pour une campagne longue ou une table déjà préparée ailleurs.',
+        'Oui. Mes campagnes → Campagne vide : choisissez un titre, une table vierge est créée. Invitez vos amis, ajoutez créatures, donjons et sessions à la main — idéal pour une campagne longue ou une table déjà préparée ailleurs.',
       audience: 'dm',
     },
     {

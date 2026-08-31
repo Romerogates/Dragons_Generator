@@ -18,7 +18,6 @@ import {
   MIN_ABILITY_SCORE,
   MAX_ABILITY_SCORE,
   type AbilityKey,
-  type AbilityScores,
   type AsiChoiceSlot,
 } from '@core/models/Character/character';
 import { asiLevelsForClass, countAsiSlots } from '@core/utils/progression-choices.util';

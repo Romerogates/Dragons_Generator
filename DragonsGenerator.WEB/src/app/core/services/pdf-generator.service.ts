@@ -4,9 +4,6 @@ import type { jsPDF } from 'jspdf';
 import { labelForGameId } from '@core/utils/game-id-labels';
 import {
   Character,
-  Attack,
-  AbilityScores,
-  Ability,
   SpellInstance,
   CharacterSpellcasting,
   SpellcastingKind,

@@ -1,6 +1,5 @@
 import { Injectable, inject, Injector } from '@angular/core';
 import type { jsPDF } from 'jspdf';
-import { Creature } from '@core/models/Creatures/creature';
 import { Character, Attack } from '@core/models/Character/character';
 import { CampaignData, EncounterGroup } from '@core/models/Campaign/campaign';
 import { CREATURE_ROLE_LABELS, ADVENTURE_TONE_LABELS, AdventureTone } from '@core/models/Story/story';

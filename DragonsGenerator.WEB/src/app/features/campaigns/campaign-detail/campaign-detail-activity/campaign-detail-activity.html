@@ -1,0 +1,37 @@
+<section class="relative space-y-0 pl-2">
+  @if (loading()) {
+    <p class="text-center text-violet-400 animate-pulse py-8">Chargement de l'activité…</p>
+  } @else if (items().length) {
+    <div class="absolute left-[1.15rem] top-2 bottom-2 w-px bg-slate-800" aria-hidden="true"></div>
+    @for (item of items(); track item.id) {
+      <article
+        class="relative flex gap-4 py-3 pl-1"
+        [class.cursor-pointer]="item.kind === 'handout_published'"
+        (click)="itemClick.emit(item)"
+      >
+        <div class="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1b2028] border border-slate-700 text-base">
+          <iconify-icon [icon]="activityIcon(item.kind)"></iconify-icon>
+        </div>
+        <div
+          class="flex-1 min-w-0 bg-[#1b2028] border border-slate-800 rounded-xl px-4 py-3"
+          [class.hover:border-sky-700/50]="item.kind === 'handout_published'"
+        >
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <p class="text-sm text-slate-200">
+              <span class="text-violet-400 font-semibold">{{ item.actorDisplayName }}</span>
+              · {{ activityLabel(item.kind) }}
+            </p>
+            <time class="text-[10px] text-slate-500 shrink-0" [attr.title]="item.createdAt | date: 'medium'">
+              {{ relativeActivityTime(item.createdAt) }}
+            </time>
+          </div>
+          @if (activityDetail(item); as detail) {
+            <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">{{ detail }}</p>
+          }
+        </div>
+      </article>
+    }
+  } @else {
+    <p class="text-slate-500 italic text-center py-12">Aucune activité enregistrée.</p>
+  }
+</section>

@@ -32,8 +32,8 @@ import {
 } from '@core/utils/equipment.utils';
 import { extractScalarResources, extractSpellSlotsFromResources, resolveFeatureUses } from '@core/utils/feature-uses.util';
 import { classBonusLanguageCount, extractProgressionChoices, extractToolProficiencyChoices, extractWeaponProficiencyChoices } from '@core/utils/progression-choices.util';
-import { buildSkillMap, normalizeSkillId, resolveSkillInfo, type SkillInfo } from '@core/utils/skill.utils';
-import { pickRandom, randomHeroName } from '@core/utils/pregen-random.util';
+import { buildSkillMap, normalizeSkillId, type SkillInfo } from '@core/utils/skill.utils';
+import { pickRandom } from '@core/utils/pregen-random.util';
 import { proficiencyBonusForLevel } from '@core/services/character-builder.service';
 
 export interface EquipmentCatalogItem {
@@ -300,7 +300,7 @@ export function buildAutoBackgroundSelection(bg: Background, skillMap: Record<st
     backgroundId: bg.id,
     backgroundName: bg.name,
     backgroundPreset: true,
-    skills: fixedSkills,
+    skills: [...fixedSkills, ...extraSkills],
     tools: bgTools,
     proficiencies: data.proficiencies,
     languages: [],
