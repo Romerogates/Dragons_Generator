@@ -145,6 +145,36 @@ jobs:
             chmod +x scripts/ensure-vapid-keys.sh
             ./scripts/ensure-vapid-keys.sh "$ENV_FILE"
 
+            wait_for_docker_hub() {
+              for i in $(seq 1 12); do
+                if getent hosts auth.docker.io >/dev/null 2>&1; then
+                  echo "Docker Hub DNS OK"
+                  return 0
+                fi
+                echo "Waiting for Docker Hub DNS… ($i/12)"
+                sleep 5
+              done
+              echo "WARN: Docker Hub DNS still flaky — retrying compose anyway"
+            }
+
+            compose_up() {
+              local attempt=1
+              local max=3
+              while [ "$attempt" -le "$max" ]; do
+                echo "docker compose up --build -d $* (attempt ${attempt}/${max})"
+                wait_for_docker_hub
+                if docker compose -f docker-compose.prod.yml up --build -d "$@"; then
+                  return 0
+                fi
+                if [ "$attempt" -eq "$max" ]; then
+                  return 1
+                fi
+                echo "WARN: compose failed (often transient DNS/registry) — retry in 30s"
+                sleep 30
+                attempt=$((attempt + 1))
+              done
+            }
+
             docker compose -f docker-compose.prod.yml up --build -d ollama || echo "WARN: Ollama container failed to start"
             chmod +x scripts/ensure-ollama-model.sh
             if ./scripts/ensure-ollama-model.sh docker-compose.prod.yml; then
@@ -152,7 +182,7 @@ jobs:
             else
               echo "WARN: Ollama model unavailable — API will fall back to Groq for short generations"
             fi
-            docker compose -f docker-compose.prod.yml up --build -d dragons-api dragons-web
+            compose_up dragons-api dragons-web
 
             for i in $(seq 1 30); do
               if curl -sf https://dragons-generator.top/api/health >/dev/null; then
