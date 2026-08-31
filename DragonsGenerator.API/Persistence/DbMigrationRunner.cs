@@ -240,7 +240,7 @@ public static class DbMigrationRunner
         await db.Database.ExecuteSqlRawAsync(
             """
             UPDATE "Users"
-            SET "PreferencesJson" = '{}'
+            SET "PreferencesJson" = '{{}}'
             WHERE "PreferencesJson" IS NULL OR TRIM("PreferencesJson") = '';
             """,
             ct);
