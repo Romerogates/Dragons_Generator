@@ -7,6 +7,7 @@ import type { CampaignDetail } from '@core/models/Campaign/campaign';
 import type { Character } from '@core/models/Character/character';
 import { pickRandom } from '@core/utils/pregen-random.util';
 import { buildPregenPhysicalDescription } from '@core/utils/pregen-narrative.util';
+import { AiGenerationProgressService } from './ai-generation-progress.service';
 
 export interface GeneratedPregenCharacter {
   characterId: string;
@@ -22,6 +23,7 @@ export class CampaignPregenGeneratorService {
   private readonly data = inject(DataService);
   private readonly characters = inject(CharacterCloudService);
   private readonly autoGenerator = inject(CharacterAutoGeneratorService);
+  private readonly aiProgress = inject(AiGenerationProgressService);
 
   /** Génère un héros original niveau 1 — fiche complète, jouable après claim. */
   generateOriginalPlayable(campaign: CampaignDetail, withAiStory = true): Promise<GeneratedPregenCharacter> {
@@ -33,6 +35,27 @@ export class CampaignPregenGeneratorService {
     campaign: CampaignDetail,
     sourceCharacterId: string,
     withAiStory = true,
+  ): Promise<GeneratedPregenCharacter> {
+    if (withAiStory) {
+      await this.aiProgress.begin('pregen-story');
+      this.aiProgress.setStageLabel('Copie du personnage…');
+    }
+    try {
+      return await this.generatePlayableDuplicateInner(campaign, sourceCharacterId, withAiStory);
+    } catch (err) {
+      if (withAiStory) this.aiProgress.cancel();
+      throw err;
+    } finally {
+      if (withAiStory && this.aiProgress.active()) {
+        this.aiProgress.complete();
+      }
+    }
+  }
+
+  private async generatePlayableDuplicateInner(
+    campaign: CampaignDetail,
+    sourceCharacterId: string,
+    withAiStory: boolean,
   ): Promise<GeneratedPregenCharacter> {
     const res = await firstValueFrom(this.characters.get(sourceCharacterId));
     const source = structuredClone(res.data as Character);
@@ -53,6 +76,7 @@ export class CampaignPregenGeneratorService {
 
     if (withAiStory) {
       try {
+        this.aiProgress.setStageLabel('Génération IA du récit…');
         const storyRes = await firstValueFrom(
           this.data.generateBackstory({
             name: copy.name,

@@ -18,12 +18,14 @@ import {
 import { ALIGNMENTS } from '@core/models/Character/character';
 import { DataService } from '@core/services/data.service';
 import { AiRateLimitDialogService } from '@core/services/ai-rate-limit-dialog.service';
+import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
 import { isAiRateLimitHttpError } from '@core/utils/ai-rate-limit.util';
+import { AiGenerationProgressBar } from '@shared/components/ai-generation-progress-bar/ai-generation-progress-bar';
 
 @Component({
   selector: 'app-identity-step',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AiGenerationProgressBar],
   templateUrl: './identity-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -32,10 +34,9 @@ export class IdentityStep implements OnInit {
   readonly builder = inject(CharacterBuilderService);
   readonly dataService = inject(DataService);
   private readonly aiRateLimit = inject(AiRateLimitDialogService);
+  readonly aiProgress = inject(AiGenerationProgressService);
   readonly alignments = ALIGNMENTS;
 
-  /** État de la génération IA */
-  readonly isGenerating = signal(false);
   readonly generationError = signal<string | null>(null);
 
   /** Raccourci vers l'état actuel de la création. */
@@ -85,33 +86,30 @@ export class IdentityStep implements OnInit {
     }
     if (this.aiRateLimit.showIfBlocked()) return;
 
-    this.isGenerating.set(true);
     this.generationError.set(null);
 
-    this.dataService
-      .generateBackstory({
-        name: char.name,
-        sex: char.sex || 'X',
-        speciesName: char.speciesName,
-        subspeciesName: char.subspeciesName,
-        civilizationName: char.civilizationName ?? 'Inconnue',
-        className: char.className,
-        alignment: char.alignment || null,
-        traits: char.traits || null,
-        bonds: char.bonds || null,
-        flaws: char.flaws || null,
-        background: char.background || null,
-      })
+    this.aiProgress
+      .run('character-backstory', () =>
+        this.dataService.generateBackstory({
+          name: char.name,
+          sex: char.sex || 'X',
+          speciesName: char.speciesName!,
+          subspeciesName: char.subspeciesName,
+          civilizationName: char.civilizationName ?? 'Inconnue',
+          className: char.className!,
+          alignment: char.alignment || null,
+          traits: char.traits || null,
+          bonds: char.bonds || null,
+          flaws: char.flaws || null,
+          background: char.background || null,
+        }),
+      )
       .subscribe({
         next: (response) => {
           this.builder.setIdentity({ story: response.story });
-          this.isGenerating.set(false);
         },
         error: (err) => {
-          if (isAiRateLimitHttpError(err)) {
-            this.isGenerating.set(false);
-            return;
-          }
+          if (isAiRateLimitHttpError(err)) return;
           const e = (err as { error?: Record<string, unknown>; status?: number })?.error;
           const apiMsg =
             (e?.['errors'] as { generalErrors?: string[] })?.generalErrors?.[0] ||
@@ -123,7 +121,6 @@ export class IdentityStep implements OnInit {
               ? apiMsg
               : "L'inspiration cosmique est momentanément indisponible. Vérifiez la clé Groq côté API.",
           );
-          this.isGenerating.set(false);
         },
       });
   }

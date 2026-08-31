@@ -38,6 +38,7 @@ import { validateCharacterExport } from '@core/utils/character-export-validation
 import { normalizeSkillId, type SkillInfo } from '@core/utils/skill.utils';
 import type { GeneratedPregenCharacter } from './campaign-pregen-generator.service';
 import { buildPregenPhysicalDescription } from '@core/utils/pregen-narrative.util';
+import { AiGenerationProgressService } from './ai-generation-progress.service';
 
 interface GameCatalogs {
   species: Species[];
@@ -55,17 +56,39 @@ export class CharacterAutoGeneratorService {
   private readonly builder = inject(CharacterBuilderService);
   private readonly data = inject(DataService);
   private readonly characters = inject(CharacterCloudService);
+  private readonly aiProgress = inject(AiGenerationProgressService);
 
   async generateOriginalPlayable(
     campaign: CampaignDetail,
     withAiStory = true,
   ): Promise<GeneratedPregenCharacter> {
+    if (withAiStory) {
+      await this.aiProgress.begin('pregen-hero');
+    }
+    try {
+      return await this.generateOriginalPlayableInner(campaign, withAiStory);
+    } catch (err) {
+      if (withAiStory) this.aiProgress.cancel();
+      throw err;
+    } finally {
+      if (withAiStory && this.aiProgress.active()) {
+        this.aiProgress.complete();
+      }
+    }
+  }
+
+  private async generateOriginalPlayableInner(
+    campaign: CampaignDetail,
+    withAiStory: boolean,
+  ): Promise<GeneratedPregenCharacter> {
+    this.aiProgress.setStageLabel('Chargement du codex…');
     const catalogs = await this.loadCatalogs();
     const maxAttempts = 12;
     let lastErrors: string[] = [];
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       try {
+        this.aiProgress.setStageLabel('Tirage aléatoire — espèce, classe, équipement…');
         const character = this.buildRandomLevel1(catalogs);
         const validation = validateCharacterExport(character);
         if (!validation.valid) {
@@ -77,6 +100,7 @@ export class CharacterAutoGeneratorService {
         copy.id = '';
         copy.cloudSynced = false;
         copy.name = `${character.name} (pré-tiré)`;
+        this.aiProgress.setStageLabel('Enregistrement de la fiche…');
         const newId = await firstValueFrom(this.characters.save(copy));
 
         const speciesLabel = character.species.subspeciesLabel
@@ -89,6 +113,7 @@ export class CharacterAutoGeneratorService {
 
         if (withAiStory) {
           try {
+            this.aiProgress.setStageLabel('Génération IA du récit…');
             const storyRes = await firstValueFrom(
               this.data.generateBackstory({
                 name: copy.name,
@@ -121,6 +146,7 @@ export class CharacterAutoGeneratorService {
 
         copy.id = newId;
         copy.cloudSynced = true;
+        this.aiProgress.setStageLabel('Finalisation du pré-tiré…');
         copy.personality = {
           ...copy.personality,
           story: dmBackstory,

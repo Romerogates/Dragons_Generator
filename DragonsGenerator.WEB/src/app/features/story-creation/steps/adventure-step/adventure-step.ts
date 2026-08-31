@@ -10,17 +10,19 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '@core/services/data.service';
 import { AiRateLimitDialogService } from '@core/services/ai-rate-limit-dialog.service';
+import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
 import { isAiRateLimitHttpError } from '@core/utils/ai-rate-limit.util';
 import { StoryBuilderService } from '@core/services/story-builder.service';
 import { ConnectivityService } from '@core/services/connectivity.service';
 import { ADVENTURE_TONE_LABELS, AdventureTone, StoryRegionChoice } from '@core/models/Story/story';
 import { EanaMapPicker } from '@shared/components/eana-map-picker/eana-map-picker';
+import { AiGenerationProgressBar } from '@shared/components/ai-generation-progress-bar/ai-generation-progress-bar';
 import { storyLocationContext } from '@core/utils/story-location.util';
 
 @Component({
   selector: 'app-adventure-step',
   standalone: true,
-  imports: [CommonModule, FormsModule, EanaMapPicker],
+  imports: [CommonModule, FormsModule, EanaMapPicker, AiGenerationProgressBar],
   templateUrl: './adventure-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -32,8 +34,8 @@ export class AdventureStep implements OnInit {
   private readonly connectivity = inject(ConnectivityService);
 
   readonly isOnline = this.connectivity.isOnline;
+  readonly aiProgress = inject(AiGenerationProgressService);
 
-  readonly isGenerating = signal(false);
   readonly generationError = signal<string | null>(null);
 
   readonly tones = Object.entries(ADVENTURE_TONE_LABELS) as [AdventureTone, string][];
@@ -58,35 +60,31 @@ export class AdventureStep implements OnInit {
     }
     if (this.aiRateLimit.showIfBlocked()) return;
 
-    this.isGenerating.set(true);
     this.generationError.set(null);
 
-    this.dataService
-      .generateAdventure({
-        title: this.builder.title().trim(),
-        setting: storyLocationContext(this.builder.region(), this.builder.setting()),
-        partyLevel: this.builder.partyLevel(),
-        tone: this.builder.tone(),
-        creatures: this.builder.creatures().map((c) => ({
-          creatureId: c.creatureId,
-          creatureName: c.creatureName,
-          customName: c.customName.trim(),
-          role: c.role,
-          backstory: c.backstory.trim() || null,
-        })),
-      })
+    this.aiProgress
+      .run('adventure', () =>
+        this.dataService.generateAdventure({
+          title: this.builder.title().trim(),
+          setting: storyLocationContext(this.builder.region(), this.builder.setting()),
+          partyLevel: this.builder.partyLevel(),
+          tone: this.builder.tone(),
+          creatures: this.builder.creatures().map((c) => ({
+            creatureId: c.creatureId,
+            creatureName: c.creatureName,
+            customName: c.customName.trim(),
+            role: c.role,
+            backstory: c.backstory.trim() || null,
+          })),
+        }),
+      )
       .subscribe({
         next: (res) => {
           this.builder.setAdventure(res.adventure);
-          this.isGenerating.set(false);
         },
         error: (err) => {
-          if (isAiRateLimitHttpError(err)) {
-            this.isGenerating.set(false);
-            return;
-          }
+          if (isAiRateLimitHttpError(err)) return;
           this.generationError.set(this.extractError(err));
-          this.isGenerating.set(false);
         },
       });
   }

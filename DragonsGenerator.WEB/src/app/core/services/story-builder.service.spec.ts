@@ -60,6 +60,57 @@ describe('StoryBuilderService', () => {
     expect(service.buildCampaignData().notes).toBe('Note MJ');
   });
 
+  it('preserves sessions, handouts, dungeon maps and active session on scenario re-save', () => {
+    const campaign: CampaignDetail = {
+      ...sampleCampaign,
+      data: {
+        ...sampleCampaign.data,
+        sessions: [
+          {
+            id: 'sess-1',
+            title: 'Session 1',
+            scheduledAt: '2026-02-01T20:00:00Z',
+            status: 'planned',
+          },
+        ],
+        handouts: [
+          {
+            id: 'ho-1',
+            title: 'Lettre',
+            body: 'Contenu',
+            kind: 'letter',
+            published: true,
+            publishedAt: '2026-01-15T12:00:00Z',
+            createdAt: '2026-01-15T12:00:00Z',
+          },
+        ],
+        dungeonMaps: [
+          {
+            id: 'map-1',
+            name: 'Crypte',
+            theme: 'crypt',
+            gridWidth: 4,
+            gridHeight: 4,
+            tiles: [['wall', 'floor'], ['floor', 'wall']],
+            rooms: [],
+            markers: [],
+            createdAt: '2026-01-10T12:00:00Z',
+            updatedAt: '2026-01-10T12:00:00Z',
+          },
+        ],
+        activeSessionId: 'sess-1',
+      },
+    };
+
+    service.loadCampaignIntoBuilder(campaign);
+    const data = service.buildCampaignData();
+
+    expect(data.sessions).toEqual(campaign.data.sessions);
+    expect(data.handouts).toEqual(campaign.data.handouts);
+    expect(data.dungeonMaps).toEqual(campaign.data.dungeonMaps);
+    expect(data.activeSessionId).toBe('sess-1');
+  });
+
   it('builds unknown region campaign data', () => {
     service.loadCampaignIntoBuilder({
       ...sampleCampaign,

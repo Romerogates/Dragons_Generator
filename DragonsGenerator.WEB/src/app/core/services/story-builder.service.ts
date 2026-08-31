@@ -8,10 +8,13 @@ import {
 import {
   CampaignData,
   CampaignDetail,
+  CampaignHandout,
   CampaignPregen,
+  CampaignSession,
   EncounterGroup,
   emptyCampaignData,
 } from '../models/Campaign/campaign';
+import type { CampaignDungeonMap } from '../models/Campaign/dungeon-map';
 import { CreatureSummary } from '../models/Creatures/creature-summary';
 import {
   getLevelRangePreset,
@@ -52,6 +55,10 @@ export class StoryBuilderService {
   readonly preservedEncounters = signal<EncounterGroup[]>([]);
   readonly preservedNotes = signal('');
   readonly preservedPregens = signal<CampaignPregen[]>([]);
+  readonly preservedSessions = signal<CampaignSession[]>([]);
+  readonly preservedHandouts = signal<CampaignHandout[]>([]);
+  readonly preservedDungeonMaps = signal<CampaignDungeonMap[]>([]);
+  readonly preservedActiveSessionId = signal<string | null>(null);
 
   readonly isEditingCampaign = computed(() => this.editingCampaignId() !== null);
   readonly isCreaturesOnlyEdit = computed(() => this.editScope() === 'creatures-only');
@@ -251,6 +258,10 @@ export class StoryBuilderService {
     this.preservedEncounters.set(structuredClone(campaign.data.encounters ?? []));
     this.preservedNotes.set(campaign.data.notes ?? '');
     this.preservedPregens.set(structuredClone(campaign.data.pregenCharacters ?? []));
+    this.preservedSessions.set(structuredClone(campaign.data.sessions ?? []));
+    this.preservedHandouts.set(structuredClone(campaign.data.handouts ?? []));
+    this.preservedDungeonMaps.set(structuredClone(campaign.data.dungeonMaps ?? []));
+    this.preservedActiveSessionId.set(campaign.data.activeSessionId ?? null);
     this.title.set(campaign.title);
     this.setting.set(campaign.data.setting ?? '');
     this.region.set(campaignRegionFromData(campaign.data.regionId, campaign.data.regionName));
@@ -275,6 +286,10 @@ export class StoryBuilderService {
       encounters: structuredClone(this.preservedEncounters()),
       notes: this.preservedNotes(),
       pregenCharacters: structuredClone(this.preservedPregens()),
+      sessions: structuredClone(this.preservedSessions()),
+      handouts: structuredClone(this.preservedHandouts()),
+      dungeonMaps: structuredClone(this.preservedDungeonMaps()),
+      activeSessionId: this.preservedActiveSessionId(),
     };
   }
 
@@ -296,6 +311,10 @@ export class StoryBuilderService {
     this.preservedEncounters.set([]);
     this.preservedNotes.set('');
     this.preservedPregens.set([]);
+    this.preservedSessions.set([]);
+    this.preservedHandouts.set([]);
+    this.preservedDungeonMaps.set([]);
+    this.preservedActiveSessionId.set(null);
     localStorage.removeItem(STORAGE_KEY);
   }
 
@@ -318,6 +337,10 @@ export class StoryBuilderService {
       preservedEncounters: this.preservedEncounters(),
       preservedNotes: this.preservedNotes(),
       preservedPregens: this.preservedPregens(),
+      preservedSessions: this.preservedSessions(),
+      preservedHandouts: this.preservedHandouts(),
+      preservedDungeonMaps: this.preservedDungeonMaps(),
+      preservedActiveSessionId: this.preservedActiveSessionId(),
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
   }
@@ -351,6 +374,18 @@ export class StoryBuilderService {
       }
       if (Array.isArray(draft.preservedPregens)) {
         this.preservedPregens.set(draft.preservedPregens);
+      }
+      if (Array.isArray(draft.preservedSessions)) {
+        this.preservedSessions.set(draft.preservedSessions);
+      }
+      if (Array.isArray(draft.preservedHandouts)) {
+        this.preservedHandouts.set(draft.preservedHandouts);
+      }
+      if (Array.isArray(draft.preservedDungeonMaps)) {
+        this.preservedDungeonMaps.set(draft.preservedDungeonMaps);
+      }
+      if (draft.preservedActiveSessionId !== undefined) {
+        this.preservedActiveSessionId.set(draft.preservedActiveSessionId);
       }
     } catch {
       /* ignore corrupt draft */

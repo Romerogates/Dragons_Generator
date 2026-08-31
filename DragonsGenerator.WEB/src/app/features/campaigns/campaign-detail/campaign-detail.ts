@@ -48,6 +48,8 @@ import { ADVENTURE_TONE_LABELS } from '@core/models/Story/story';
 import { formatChallengeRating, getCreatureCategoryLabel } from '@core/utils/creature-display.util';
 import { StoryBuilderService } from '@core/services/story-builder.service';
 import { CampaignPregenGeneratorService } from '@core/services/campaign-pregen-generator.service';
+import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
+import { AiGenerationProgressBar } from '@shared/components/ai-generation-progress-bar/ai-generation-progress-bar';
 import { CampaignPlayPanel } from '../campaign-play-panel/campaign-play-panel';
 import { CampaignDungeonMaps } from '../campaign-dungeon-maps/campaign-dungeon-maps';
 import { LightMarkdownPipe } from '@shared/pipes/light-markdown.pipe';
@@ -58,7 +60,7 @@ type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'ac
 @Component({
   selector: 'app-campaign-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ProfileAvatarComponent, CampaignPlayPanel, CampaignDungeonMaps, LightMarkdownPipe],
+  imports: [CommonModule, FormsModule, RouterLink, ProfileAvatarComponent, CampaignPlayPanel, CampaignDungeonMaps, LightMarkdownPipe, AiGenerationProgressBar],
   templateUrl: './campaign-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -76,6 +78,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   private sanitizer = inject(DomSanitizer);
   private storyBuilder = inject(StoryBuilderService);
   private pregenGenerator = inject(CampaignPregenGeneratorService);
+  readonly aiProgress = inject(AiGenerationProgressService);
 
   readonly loading = signal(true);
   readonly saving = signal(false);

@@ -22,14 +22,16 @@
       <div class="mb-4 p-3 bg-red-950/40 border border-red-900/50 rounded-xl text-sm text-red-300">{{ err }}</div>
     }
 
+    <app-ai-generation-progress-bar class="block mb-4" />
+
     <button
       type="button"
       class="mb-6 w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest bg-violet-950/30 border border-violet-800/50 text-violet-300 hover:bg-violet-950/50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-      [disabled]="!!generatingId()"
+      [disabled]="!!generatingId() || aiProgress.active()"
       (click)="generateAllBackstories()"
     >
-      @if (generatingId()) {
-        <span class="animate-spin">⏳</span> Génération en cours...
+      @if (generatingId() || aiProgress.active()) {
+        Génération en cours…
       } @else {
         <iconify-icon icon="fluent-emoji:sparkles"></iconify-icon> Générer toutes les vies (IA)
       }
@@ -88,7 +90,7 @@
             <button
               type="button"
               class="text-[10px] font-black uppercase tracking-widest text-violet-400 hover:text-violet-300 flex items-center gap-1 disabled:opacity-50"
-              [disabled]="generatingId() === creature.creatureId"
+              [disabled]="generatingId() === creature.creatureId || aiProgress.active()"
               (click)="generateBackstory(creature.creatureId)"
             >
               @if (generatingId() === creature.creatureId) {

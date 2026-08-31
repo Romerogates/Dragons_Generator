@@ -175,6 +175,7 @@ export class CampaignCloudService {
           }))
         : [],
       activeSessionId: raw.activeSessionId ?? null,
+      dungeonMaps: Array.isArray(raw.dungeonMaps) ? raw.dungeonMaps : [],
     };
   }
 

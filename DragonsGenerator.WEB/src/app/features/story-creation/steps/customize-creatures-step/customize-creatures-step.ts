@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '@core/services/data.service';
 import { AiRateLimitDialogService } from '@core/services/ai-rate-limit-dialog.service';
+import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
 import { isAiRateLimitHttpError } from '@core/utils/ai-rate-limit.util';
 import { StoryBuilderService } from '@core/services/story-builder.service';
 import {
@@ -19,12 +20,13 @@ import {
   StoryCreatureSelection,
 } from '@core/models/Story/story';
 import { formatChallengeRating } from '@core/utils/creature-display.util';
+import { AiGenerationProgressBar } from '@shared/components/ai-generation-progress-bar/ai-generation-progress-bar';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-customize-creatures-step',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AiGenerationProgressBar],
   templateUrl: './customize-creatures-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -33,6 +35,7 @@ export class CustomizeCreaturesStep implements OnInit {
   readonly builder = inject(StoryBuilderService);
   private readonly dataService = inject(DataService);
   private readonly aiRateLimit = inject(AiRateLimitDialogService);
+  readonly aiProgress = inject(AiGenerationProgressService);
 
   readonly generatingId = signal<string | null>(null);
   readonly generationError = signal<string | null>(null);
@@ -66,13 +69,15 @@ export class CustomizeCreaturesStep implements OnInit {
     this.generatingId.set(creatureId);
     this.generationError.set(null);
 
-    this.dataService
-      .generateCreatureStory({
-        creatureId: creature.creatureId,
-        customName: creature.customName.trim(),
-        role: creature.role,
-        setting: this.builder.setting().trim() || null,
-      })
+    this.aiProgress
+      .run('creature-backstory', () =>
+        this.dataService.generateCreatureStory({
+          creatureId: creature.creatureId,
+          customName: creature.customName.trim(),
+          role: creature.role,
+          setting: this.builder.setting().trim() || null,
+        }),
+      )
       .subscribe({
         next: (res) => {
           this.builder.updateCreature(creatureId, { backstory: res.backstory });
@@ -104,15 +109,20 @@ export class CustomizeCreaturesStep implements OnInit {
       return;
     }
 
-    this.dataService
-      .generateCreatureStoriesBatch({
-        setting: this.builder.setting().trim() || null,
-        creatures: pending.map((c) => ({
-          creatureId: c.creatureId,
-          customName: c.customName.trim(),
-          role: c.role,
-        })),
-      })
+    this.aiProgress
+      .run(
+        'creature-batch',
+        () =>
+          this.dataService.generateCreatureStoriesBatch({
+            setting: this.builder.setting().trim() || null,
+            creatures: pending.map((c) => ({
+              creatureId: c.creatureId,
+              customName: c.customName.trim(),
+              role: c.role,
+            })),
+          }),
+        { batchTotal: pending.length },
+      )
       .subscribe({
         next: (res) => {
           const generated = new Set(res.backstories.map((item) => item.creatureId));
@@ -141,7 +151,11 @@ export class CustomizeCreaturesStep implements OnInit {
     this.generationError.set(null);
     let failed = 0;
 
-    for (const creature of pending) {
+    await this.aiProgress.begin('creature-batch', { batchIndex: 0, batchTotal: pending.length });
+
+    for (let i = 0; i < pending.length; i++) {
+      const creature = pending[i];
+      this.aiProgress.setBatchProgress(i, pending.length);
       try {
         const res = await firstValueFrom(
           this.dataService.generateCreatureStory({
@@ -157,6 +171,7 @@ export class CustomizeCreaturesStep implements OnInit {
       }
     }
 
+    this.aiProgress.complete();
     this.generatingId.set(null);
     if (failed > 0) {
       this.generationError.set(

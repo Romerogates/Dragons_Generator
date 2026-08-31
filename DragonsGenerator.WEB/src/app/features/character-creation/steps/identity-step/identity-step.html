@@ -160,13 +160,10 @@
         <button
           class="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-500 text-[10px] font-black uppercase tracking-widest hover:bg-amber-500/20 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-50"
           (click)="generateStory()"
-          [disabled]="isGenerating() || !c().name.trim()"
+          [disabled]="aiProgress.active() || !c().name.trim()"
         >
-          @if (isGenerating()) {
-            <span
-              class="w-3 h-3 border-2 border-amber-500 border-t-transparent rounded-full animate-spin"
-            ></span>
-            Inspiration...
+          @if (aiProgress.active()) {
+            Inspiration…
           } @else {
             <iconify-icon icon="fluent-emoji:sparkles"></iconify-icon> Générer avec l'IA
           }
@@ -181,6 +178,8 @@
             <iconify-icon icon="fluent-emoji:warning"></iconify-icon> {{ generationError() }}
           </div>
         }
+
+        <app-ai-generation-progress-bar tone="amber" />
 
         <div class="relative">
           <textarea
