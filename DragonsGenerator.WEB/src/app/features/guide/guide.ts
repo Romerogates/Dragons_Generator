@@ -505,8 +505,11 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        if (visible[0]?.target?.id) {
-          this.activeSection.set(visible[0].target.id);
+        const id = visible[0]?.target?.id;
+        if (!id) return;
+        this.activeSection.set(id);
+        if (!id.startsWith('faq-')) {
+          this.guidePrefs.markSectionRead(id);
         }
       },
       { rootMargin: '-20% 0px -55% 0px', threshold: [0.1, 0.25, 0.5] },
