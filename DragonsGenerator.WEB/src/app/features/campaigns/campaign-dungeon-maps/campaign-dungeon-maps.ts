@@ -34,23 +34,34 @@ import { generateDungeonMap } from '@core/utils/dungeon-generator.util';
 import {
   buildHandoutBody,
   drawDungeonToCanvas,
+  dungeonMapToPngDataUrl,
   exportDungeonPdf,
   exportDungeonPng,
   roomAt,
-  tileAt,
+  themePalette,
 } from '@core/utils/dungeon-render.util';
 import { rollRandomEncounter, suggestThemeFromRegion } from '@core/utils/dungeon-theme-pools';
 
 type EditorTool = 'select' | 'floor' | 'wall' | 'door' | 'trap' | 'chest' | 'stairs';
 
-const MIN_SCALE = 0.5;
-const MAX_SCALE = 2.5;
+interface UndoSnapshot {
+  tiles: DungeonTileKind[][];
+  markers: CampaignDungeonMap['markers'];
+}
+
+const MIN_SCALE = 0.35;
+const MAX_SCALE = 3;
+const EDITOR_CELL = 12;
+const PREVIEW_CELL = 4;
+const THUMB_CELL = 3;
+const MAX_UNDO = 40;
 
 @Component({
   selector: 'app-campaign-dungeon-maps',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './campaign-dungeon-maps.html',
+  styleUrl: './campaign-dungeon-maps.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
@@ -58,17 +69,28 @@ export class CampaignDungeonMaps {
   readonly campaign = input.required<CampaignDetail>();
   readonly dataChange = output<Partial<CampaignData>>();
 
-  readonly canvasRef = viewChild<ElementRef<HTMLCanvasElement>>('mapCanvas');
+  readonly editorCanvasRef = viewChild<ElementRef<HTMLCanvasElement>>('editorCanvas');
+  readonly previewCanvasRef = viewChild<ElementRef<HTMLCanvasElement>>('previewCanvas');
+  readonly viewportRef = viewChild<ElementRef<HTMLDivElement>>('viewport');
 
   readonly editingMapId = signal<string | null>(null);
   readonly showGenerator = signal(false);
   readonly exportBusy = signal(false);
+  readonly generating = signal(false);
+  readonly revealMap = signal(false);
   readonly message = signal<string | null>(null);
+  readonly thumbUrls = signal<Record<string, string>>({});
 
   readonly scale = signal(1);
+  readonly panX = signal(0);
+  readonly panY = signal(0);
   readonly selectedRoomId = signal<string | null>(null);
   readonly selectedMarkerId = signal<string | null>(null);
   readonly activeTool = signal<EditorTool>('select');
+  readonly spaceHeld = signal(false);
+  readonly isPanning = signal(false);
+  readonly isPainting = signal(false);
+  readonly previewMap = signal<CampaignDungeonMap | null>(null);
 
   readonly genName = signal('Donjon');
   readonly genGridW = signal(56);
@@ -80,7 +102,15 @@ export class CampaignDungeonMaps {
   readonly themeLabels = DUNGEON_THEME_LABELS;
   readonly markerLabels = DUNGEON_MARKER_LABELS;
   readonly themes: DungeonTheme[] = ['crypt', 'cave', 'ruins', 'temple', 'sewer', 'forest', 'generic'];
-  readonly cellPx = 14;
+  readonly tools: { id: EditorTool; label: string; hint: string }[] = [
+    { id: 'select', label: 'Sélection', hint: 'Cliquer une salle' },
+    { id: 'floor', label: 'Sol', hint: 'Peindre le sol' },
+    { id: 'wall', label: 'Mur', hint: 'Peindre des murs' },
+    { id: 'door', label: 'Porte', hint: 'Poser une porte' },
+    { id: 'trap', label: 'Piège', hint: 'Marqueur piège' },
+    { id: 'chest', label: 'Coffre', hint: 'Marqueur coffre' },
+    { id: 'stairs', label: 'Escalier', hint: 'Marqueur escalier' },
+  ];
 
   readonly maps = computed(() => this.campaign().data.dungeonMaps ?? []);
   readonly encounters = computed(() => this.campaign().data.encounters ?? []);
@@ -97,15 +127,78 @@ export class CampaignDungeonMaps {
     ),
   );
 
+  readonly themeAccent = computed(() => {
+    const map = this.editingMap() ?? this.previewMap();
+    return themePalette(map?.theme ?? this.genTheme()).accent;
+  });
+
+  readonly undoDepth = signal(0);
+  readonly canUndo = computed(() => this.undoDepth() > 0);
+
+  private undoStack: UndoSnapshot[] = [];
+  private previewTimer: ReturnType<typeof setTimeout> | null = null;
+  private saveTimer: ReturnType<typeof setTimeout> | null = null;
+  private panOrigin: { x: number; y: number; panX: number; panY: number } | null = null;
+  private lastPaintKey: string | null = null;
+  private strokeStarted = false;
+
   constructor() {
     effect(() => {
       const map = this.editingMap();
-      const canvas = this.canvasRef()?.nativeElement;
+      const canvas = this.editorCanvasRef()?.nativeElement;
       if (!map || !canvas) return;
-      drawDungeonToCanvas(map, canvas, this.cellPx, {
+      drawDungeonToCanvas(map, canvas, EDITOR_CELL, {
         showRoomNumbers: true,
         selectedRoomId: this.selectedRoomId(),
+        vignette: true,
       });
+    });
+
+    effect(() => {
+      const preview = this.previewMap();
+      const canvas = this.previewCanvasRef()?.nativeElement;
+      if (!this.showGenerator()) return;
+      if (!canvas) return;
+      if (!preview) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          canvas.width = 320;
+          canvas.height = 240;
+          ctx.fillStyle = '#0f1218';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        return;
+      }
+      drawDungeonToCanvas(preview, canvas, PREVIEW_CELL, {
+        showRoomNumbers: true,
+        vignette: true,
+      });
+    });
+
+    effect(() => {
+      const maps = this.sortedMaps();
+      const next: Record<string, string> = {};
+      for (const map of maps) {
+        try {
+          next[map.id] = dungeonMapToPngDataUrl(map, THUMB_CELL, {
+            showRoomNumbers: false,
+            vignette: true,
+          });
+        } catch {
+          /* ignore thumb failures in SSR-like contexts */
+        }
+      }
+      this.thumbUrls.set(next);
+    });
+
+    effect(() => {
+      if (!this.showGenerator()) return;
+      this.genGridW();
+      this.genGridH();
+      this.genRoomCount();
+      this.genCorridorDensity();
+      this.genTheme();
+      this.scheduleLivePreview();
     });
   }
 
@@ -114,42 +207,99 @@ export class CampaignDungeonMaps {
     this.genName.set(`Donjon — ${c.title}`);
     this.genTheme.set(suggestThemeFromRegion(c.data.regionName));
     this.showGenerator.set(true);
+    this.scheduleLivePreview(true);
   }
 
   closeGenerator(): void {
     this.showGenerator.set(false);
+    this.previewMap.set(null);
   }
 
-  generateMap(): void {
+  async generateMap(): Promise<void> {
+    if (this.generating()) return;
+    this.generating.set(true);
+    this.revealMap.set(false);
+    await new Promise((r) => setTimeout(r, 420));
+
     const c = this.campaign();
-    const params: DungeonGenParams = {
-      gridWidth: this.genGridW(),
-      gridHeight: this.genGridH(),
-      roomCount: this.genRoomCount(),
-      corridorDensity: this.genCorridorDensity(),
-      theme: this.genTheme(),
+    const map =
+      this.previewMap() ??
+      generateDungeonMap(this.buildGenParams(), {
+        name: this.genName().trim() || 'Donjon',
+        regionId: c.data.regionId,
+        regionName: c.data.regionName,
+      });
+    const named = {
+      ...map,
+      name: this.genName().trim() || map.name,
+      id: crypto.randomUUID?.() ?? `map-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
-    const map = generateDungeonMap(params, {
-      name: this.genName().trim() || 'Donjon',
-      regionId: c.data.regionId,
-      regionName: c.data.regionName,
-    });
-    this.persistMaps([...(c.data.dungeonMaps ?? []), map], true);
+
+    this.persistMaps([...(c.data.dungeonMaps ?? []), named], true);
     this.showGenerator.set(false);
-    this.editingMapId.set(map.id);
-    this.selectedRoomId.set(map.rooms[0]?.id ?? null);
-    this.message.set('Donjon généré.');
+    this.previewMap.set(null);
+    this.editingMapId.set(named.id);
+    this.selectedRoomId.set(named.rooms[0]?.id ?? null);
+    this.undoStack = [];
+    this.undoDepth.set(0);
+    this.fitMapInView(named);
+    this.generating.set(false);
+    this.revealMap.set(true);
+    this.message.set('Donjon gravé — peignez, zoomez, partagez.');
+    setTimeout(() => this.revealMap.set(false), 900);
+  }
+
+  regenerateEditingMap(): void {
+    const current = this.editingMap();
+    if (!current || !confirm('Régénérer ce donjon ? Les modifications de cases seront perdues.')) {
+      return;
+    }
+    this.pushUndo(current);
+    const c = this.campaign();
+    const next = generateDungeonMap(
+      {
+        gridWidth: current.gridWidth,
+        gridHeight: current.gridHeight,
+        roomCount: Math.max(4, current.rooms.length || 8),
+        corridorDensity: 50,
+        theme: current.theme,
+      },
+      {
+        name: current.name,
+        regionId: c.data.regionId,
+        regionName: c.data.regionName,
+      },
+    );
+    const merged: CampaignDungeonMap = {
+      ...next,
+      id: current.id,
+      name: current.name,
+      handoutId: current.handoutId,
+      createdAt: current.createdAt,
+      updatedAt: new Date().toISOString(),
+    };
+    this.updateMap(merged);
+    this.selectedRoomId.set(merged.rooms[0]?.id ?? null);
+    this.fitMapInView(merged);
+    this.message.set('Donjon régénéré.');
   }
 
   openEditor(mapId: string): void {
     this.editingMapId.set(mapId);
     this.selectedRoomId.set(null);
     this.selectedMarkerId.set(null);
-    this.scale.set(1);
+    this.undoStack = [];
+    this.undoDepth.set(0);
+    const map = this.maps().find((m) => m.id === mapId);
+    if (map) this.fitMapInView(map);
   }
 
   closeEditor(): void {
     this.editingMapId.set(null);
+    this.undoStack = [];
+    this.undoDepth.set(0);
   }
 
   deleteMap(mapId: string): void {
@@ -181,18 +331,6 @@ export class CampaignDungeonMaps {
     this.updateMap({ ...map, rooms });
   }
 
-  markerAt(map: CampaignDungeonMap, x: number, y: number) {
-    return map.markers.find((m) => m.x === x && m.y === y) ?? null;
-  }
-
-  rowIndices(map: CampaignDungeonMap): number[] {
-    return Array.from({ length: map.gridHeight }, (_, i) => i);
-  }
-
-  colIndices(map: CampaignDungeonMap): number[] {
-    return Array.from({ length: map.gridWidth }, (_, i) => i);
-  }
-
   onEncounterChange(roomId: string, encounterId: string): void {
     const map = this.editingMap();
     if (!map) return;
@@ -221,11 +359,27 @@ export class CampaignDungeonMaps {
     });
   }
 
-  onTileClick(x: number, y: number): void {
+  focusRoom(roomId: string): void {
     const map = this.editingMap();
     if (!map) return;
-    const tool = this.activeTool();
+    this.selectedRoomId.set(roomId);
+    const room = map.rooms.find((r) => r.id === roomId);
+    if (!room) return;
+    const viewport = this.viewportRef()?.nativeElement;
+    if (!viewport) return;
+    const s = this.scale();
+    const cx = (room.x + room.width / 2) * EDITOR_CELL * s;
+    const cy = (room.y + room.height / 2) * EDITOR_CELL * s;
+    this.panX.set(viewport.clientWidth / 2 - cx);
+    this.panY.set(viewport.clientHeight / 2 - cy);
+  }
 
+  applyTileAt(x: number, y: number, recordUndo: boolean): void {
+    const map = this.editingMap();
+    if (!map) return;
+    if (x < 0 || y < 0 || x >= map.gridWidth || y >= map.gridHeight) return;
+
+    const tool = this.activeTool();
     if (tool === 'select') {
       const rid = roomAt(map, x, y);
       this.selectedRoomId.set(rid);
@@ -234,7 +388,17 @@ export class CampaignDungeonMaps {
       return;
     }
 
+    const key = `${tool}:${x},${y}`;
+    if (this.lastPaintKey === key) return;
+    this.lastPaintKey = key;
+
+    if (recordUndo && !this.strokeStarted) {
+      this.pushUndo(map);
+      this.strokeStarted = true;
+    }
+
     if (tool === 'floor' || tool === 'wall' || tool === 'door') {
+      if (map.tiles[y][x] === tool) return;
       const tiles = map.tiles.map((row, ry) =>
         row.map((cell, rx) => (rx === x && ry === y ? (tool as DungeonTileKind) : cell)),
       );
@@ -247,23 +411,99 @@ export class CampaignDungeonMaps {
       const existing = map.markers.findIndex((m) => m.x === x && m.y === y);
       const markers = [...map.markers];
       if (existing >= 0) {
-        markers.splice(existing, 1);
+        if (markers[existing].kind === markerKind) {
+          markers.splice(existing, 1);
+        } else {
+          markers[existing] = {
+            ...markers[existing],
+            kind: markerKind,
+            label: DUNGEON_MARKER_LABELS[markerKind],
+          };
+        }
+      } else {
+        markers.push({
+          id: crypto.randomUUID?.() ?? `mk-${Date.now()}`,
+          x,
+          y,
+          kind: markerKind,
+          label: DUNGEON_MARKER_LABELS[markerKind],
+          linkedRoomId: roomAt(map, x, y),
+        });
       }
-      markers.push({
-        id: crypto.randomUUID?.() ?? `mk-${Date.now()}`,
-        x,
-        y,
-        kind: markerKind,
-        label: DUNGEON_MARKER_LABELS[markerKind],
-        linkedRoomId: roomAt(map, x, y),
-      });
       this.updateMap({ ...map, markers });
     }
+  }
+
+  onPointerDown(event: PointerEvent): void {
+    const map = this.editingMap();
+    const viewport = this.viewportRef()?.nativeElement;
+    if (!map || !viewport) return;
+
+    const wantPan =
+      event.button === 1 || event.button === 2 || this.spaceHeld() || this.activeTool() === 'select' && event.altKey;
+
+    if (wantPan || (this.activeTool() === 'select' && event.button === 0 && event.shiftKey)) {
+      event.preventDefault();
+      this.isPanning.set(true);
+      this.panOrigin = {
+        x: event.clientX,
+        y: event.clientY,
+        panX: this.panX(),
+        panY: this.panY(),
+      };
+      viewport.setPointerCapture(event.pointerId);
+      return;
+    }
+
+    if (event.button !== 0) return;
+    event.preventDefault();
+    this.isPainting.set(true);
+    this.strokeStarted = false;
+    this.lastPaintKey = null;
+    viewport.setPointerCapture(event.pointerId);
+    const tile = this.clientToTile(event.clientX, event.clientY);
+    if (tile) this.applyTileAt(tile.x, tile.y, true);
+  }
+
+  onPointerMove(event: PointerEvent): void {
+    if (this.isPanning() && this.panOrigin) {
+      const dx = event.clientX - this.panOrigin.x;
+      const dy = event.clientY - this.panOrigin.y;
+      this.panX.set(this.panOrigin.panX + dx);
+      this.panY.set(this.panOrigin.panY + dy);
+      return;
+    }
+    if (!this.isPainting()) return;
+    if (this.activeTool() === 'select') return;
+    const tile = this.clientToTile(event.clientX, event.clientY);
+    if (tile) this.applyTileAt(tile.x, tile.y, true);
+  }
+
+  onPointerUp(event: PointerEvent): void {
+    const viewport = this.viewportRef()?.nativeElement;
+    if (viewport?.hasPointerCapture(event.pointerId)) {
+      viewport.releasePointerCapture(event.pointerId);
+    }
+    this.isPanning.set(false);
+    this.isPainting.set(false);
+    this.panOrigin = null;
+    this.lastPaintKey = null;
+    this.strokeStarted = false;
+  }
+
+  undo(): void {
+    const map = this.editingMap();
+    const snap = this.undoStack.pop();
+    if (!map || !snap) return;
+    this.undoDepth.set(this.undoStack.length);
+    this.updateMap({ ...map, tiles: snap.tiles, markers: snap.markers });
+    this.message.set('Annulé.');
   }
 
   removeMarker(markerId: string): void {
     const map = this.editingMap();
     if (!map) return;
+    this.pushUndo(map);
     this.updateMap({
       ...map,
       markers: map.markers.filter((m) => m.id !== markerId),
@@ -276,37 +516,12 @@ export class CampaignDungeonMaps {
   }
 
   zoom(delta: number): void {
-    this.scale.update((s) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, s + delta)));
+    this.scale.update((s) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, +(s + delta).toFixed(2))));
   }
 
-  tileClass(map: CampaignDungeonMap, x: number, y: number): string {
-    const kind = tileAt(map, x, y);
-    const marker = map.markers.find((m) => m.x === x && m.y === y);
-    const rid = roomAt(map, x, y);
-    const base =
-      kind === 'wall'
-        ? 'bg-[#1e2430]'
-        : kind === 'door'
-          ? 'bg-amber-700'
-          : 'bg-[#3d4a5c]';
-    const selected = rid && rid === this.selectedRoomId() ? ' ring-1 ring-amber-400 ring-inset' : '';
-    const markerRing = marker ? ' outline outline-1 outline-violet-400' : '';
-    return base + selected + markerRing;
-  }
-
-  markerIcon(kind: DungeonMarkerKind): string {
-    switch (kind) {
-      case 'door':
-        return 'D';
-      case 'trap':
-        return '!';
-      case 'chest':
-        return '$';
-      case 'stairs':
-        return 'S';
-      default:
-        return '?';
-    }
+  resetView(): void {
+    const map = this.editingMap();
+    if (map) this.fitMapInView(map);
   }
 
   encounterLabel(room: CampaignDungeonMap['rooms'][0], encounters: EncounterGroup[]): string {
@@ -317,9 +532,7 @@ export class CampaignDungeonMaps {
       }
     }
     if (room.randomEncounter?.creatures.length) {
-      return room.randomEncounter.creatures
-        .map((c) => `${c.quantity}× ${c.name}`)
-        .join(', ');
+      return room.randomEncounter.creatures.map((c) => `${c.quantity}× ${c.name}`).join(', ');
     }
     return '—';
   }
@@ -409,7 +622,85 @@ export class CampaignDungeonMaps {
     this.genTheme.set(normalizeDungeonTheme(raw));
   }
 
-  private saveTimer: ReturnType<typeof setTimeout> | null = null;
+  themeSwatch(theme: DungeonTheme): string {
+    return themePalette(theme).floor;
+  }
+
+  cursorClass(): string {
+    if (this.isPanning() || this.spaceHeld()) return 'cursor-grabbing';
+    if (this.activeTool() === 'select') return 'cursor-default';
+    return 'cursor-crosshair';
+  }
+
+  private buildGenParams(): DungeonGenParams {
+    return {
+      gridWidth: this.genGridW(),
+      gridHeight: this.genGridH(),
+      roomCount: this.genRoomCount(),
+      corridorDensity: this.genCorridorDensity(),
+      theme: this.genTheme(),
+    };
+  }
+
+  private scheduleLivePreview(immediate = false): void {
+    if (this.previewTimer) clearTimeout(this.previewTimer);
+    const run = () => {
+      this.previewTimer = null;
+      if (!this.showGenerator()) return;
+      const c = this.campaign();
+      const map = generateDungeonMap(this.buildGenParams(), {
+        name: this.genName().trim() || 'Aperçu',
+        regionId: c.data.regionId,
+        regionName: c.data.regionName,
+      });
+      this.previewMap.set(map);
+    };
+    if (immediate) run();
+    else this.previewTimer = setTimeout(run, 280);
+  }
+
+  private pushUndo(map: CampaignDungeonMap): void {
+    this.undoStack.push({
+      tiles: map.tiles.map((row) => [...row]),
+      markers: map.markers.map((m) => ({ ...m })),
+    });
+    if (this.undoStack.length > MAX_UNDO) this.undoStack.shift();
+    this.undoDepth.set(this.undoStack.length);
+  }
+
+  private fitMapInView(map: CampaignDungeonMap): void {
+    queueMicrotask(() => {
+      const viewport = this.viewportRef()?.nativeElement;
+      if (!viewport) {
+        this.scale.set(1);
+        this.panX.set(16);
+        this.panY.set(16);
+        return;
+      }
+      const pad = 48;
+      const sx = (viewport.clientWidth - pad) / (map.gridWidth * EDITOR_CELL);
+      const sy = (viewport.clientHeight - pad) / (map.gridHeight * EDITOR_CELL);
+      const next = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.min(sx, sy, 1.25)));
+      this.scale.set(+next.toFixed(2));
+      const w = map.gridWidth * EDITOR_CELL * next;
+      const h = map.gridHeight * EDITOR_CELL * next;
+      this.panX.set((viewport.clientWidth - w) / 2);
+      this.panY.set((viewport.clientHeight - h) / 2);
+    });
+  }
+
+  private clientToTile(clientX: number, clientY: number): { x: number; y: number } | null {
+    const viewport = this.viewportRef()?.nativeElement;
+    const map = this.editingMap();
+    if (!viewport || !map) return null;
+    const rect = viewport.getBoundingClientRect();
+    const localX = (clientX - rect.left - this.panX()) / this.scale();
+    const localY = (clientY - rect.top - this.panY()) / this.scale();
+    const x = Math.floor(localX / EDITOR_CELL);
+    const y = Math.floor(localY / EDITOR_CELL);
+    if (x < 0 || y < 0 || x >= map.gridWidth || y >= map.gridHeight) return null;
+    return { x, y };
+  }
 
   private persistMaps(maps: CampaignDungeonMap[], immediate = false): void {
     if (immediate) {
@@ -427,11 +718,46 @@ export class CampaignDungeonMaps {
     }, 600);
   }
 
+  @HostListener('window:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent): void {
+    if (event.code === 'Space' && this.editingMap()) {
+      if (!(event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement)) {
+        event.preventDefault();
+        this.spaceHeld.set(true);
+      }
+    }
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z' && this.editingMap()) {
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
+      event.preventDefault();
+      this.undo();
+    }
+  }
+
+  @HostListener('window:keyup', ['$event'])
+  onKeyUp(event: KeyboardEvent): void {
+    if (event.code === 'Space') this.spaceHeld.set(false);
+  }
+
   @HostListener('wheel', ['$event'])
   onWheel(event: WheelEvent): void {
     if (!this.editingMap()) return;
-    if (!event.ctrlKey && !event.metaKey) return;
+    const viewport = this.viewportRef()?.nativeElement;
+    if (!viewport) return;
+    if (!viewport.contains(event.target as Node) && !event.ctrlKey && !event.metaKey) return;
+
     event.preventDefault();
-    this.zoom(event.deltaY > 0 ? -0.1 : 0.1);
+    const rect = viewport.getBoundingClientRect();
+    const mx = event.clientX - rect.left;
+    const my = event.clientY - rect.top;
+    const before = this.scale();
+    const delta = event.deltaY > 0 ? -0.12 : 0.12;
+    const after = Math.min(MAX_SCALE, Math.max(MIN_SCALE, +(before + delta).toFixed(2)));
+    if (after === before) return;
+
+    const worldX = (mx - this.panX()) / before;
+    const worldY = (my - this.panY()) / before;
+    this.scale.set(after);
+    this.panX.set(mx - worldX * after);
+    this.panY.set(my - worldY * after);
   }
 }

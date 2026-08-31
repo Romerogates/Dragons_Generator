@@ -1,15 +1,126 @@
 import type {
   CampaignDungeonMap,
   DungeonMarkerKind,
+  DungeonTheme,
   DungeonTileKind,
 } from '@core/models/Campaign/dungeon-map';
 import { DUNGEON_MARKER_LABELS, DUNGEON_THEME_LABELS } from '@core/models/Campaign/dungeon-map';
 import type { EncounterGroup } from '@core/models/Campaign/campaign';
 
-const TILE_COLORS: Record<DungeonTileKind, string> = {
-  wall: '#1e2430',
-  floor: '#3d4a5c',
-  door: '#b45309',
+export interface DungeonThemePalette {
+  bg: string;
+  wall: string;
+  wallEdge: string;
+  floor: string;
+  floorAlt: string;
+  door: string;
+  doorEdge: string;
+  grid: string;
+  roomText: string;
+  roomTextSelected: string;
+  roomHighlight: string;
+  accent: string;
+}
+
+export const DUNGEON_THEME_PALETTES: Record<DungeonTheme, DungeonThemePalette> = {
+  crypt: {
+    bg: '#0c0e12',
+    wall: '#1a1f2a',
+    wallEdge: '#0d1016',
+    floor: '#3a4252',
+    floorAlt: '#343c4a',
+    door: '#a16207',
+    doorEdge: '#854d0e',
+    grid: 'rgba(226,232,240,0.06)',
+    roomText: '#e2e8f0',
+    roomTextSelected: '#fde68a',
+    roomHighlight: 'rgba(253,230,138,0.18)',
+    accent: '#94a3b8',
+  },
+  cave: {
+    bg: '#0f0c0a',
+    wall: '#2a211c',
+    wallEdge: '#1a1410',
+    floor: '#5c4638',
+    floorAlt: '#524032',
+    door: '#b45309',
+    doorEdge: '#92400e',
+    grid: 'rgba(251,191,36,0.05)',
+    roomText: '#f5e6d3',
+    roomTextSelected: '#fcd34d',
+    roomHighlight: 'rgba(251,191,36,0.16)',
+    accent: '#d6a77a',
+  },
+  ruins: {
+    bg: '#0c100e',
+    wall: '#243028',
+    wallEdge: '#151c18',
+    floor: '#4a5c4e',
+    floorAlt: '#425446',
+    door: '#a16207',
+    doorEdge: '#854d0e',
+    grid: 'rgba(167,243,208,0.06)',
+    roomText: '#e2e8f0',
+    roomTextSelected: '#a7f3d0',
+    roomHighlight: 'rgba(52,211,153,0.15)',
+    accent: '#86efac',
+  },
+  temple: {
+    bg: '#120e0a',
+    wall: '#3d3226',
+    wallEdge: '#2a221a',
+    floor: '#8b7355',
+    floorAlt: '#7e684c',
+    door: '#ca8a04',
+    doorEdge: '#a16207',
+    grid: 'rgba(253,224,71,0.07)',
+    roomText: '#fef3c7',
+    roomTextSelected: '#fde68a',
+    roomHighlight: 'rgba(250,204,21,0.18)',
+    accent: '#f0c674',
+  },
+  sewer: {
+    bg: '#0a100e',
+    wall: '#1c2a24',
+    wallEdge: '#101a16',
+    floor: '#3d5448',
+    floorAlt: '#364c42',
+    door: '#78716c',
+    doorEdge: '#57534e',
+    grid: 'rgba(134,239,172,0.05)',
+    roomText: '#d1fae5',
+    roomTextSelected: '#6ee7b7',
+    roomHighlight: 'rgba(16,185,129,0.16)',
+    accent: '#5eead4',
+  },
+  forest: {
+    bg: '#08110c',
+    wall: '#1a2e22',
+    wallEdge: '#0f1c15',
+    floor: '#2f4a38',
+    floorAlt: '#294232',
+    door: '#92400e',
+    doorEdge: '#78350f',
+    grid: 'rgba(134,239,172,0.06)',
+    roomText: '#dcfce7',
+    roomTextSelected: '#bbf7d0',
+    roomHighlight: 'rgba(74,222,128,0.15)',
+    accent: '#4ade80',
+  },
+  generic: {
+    bg: '#0f1218',
+    wall: '#1e2430',
+    wallEdge: '#141820',
+    floor: '#3d4a5c',
+    floorAlt: '#364254',
+    door: '#b45309',
+    doorEdge: '#92400e',
+    grid: 'rgba(226,232,240,0.06)',
+    roomText: '#e2e8f0',
+    roomTextSelected: '#fde68a',
+    roomHighlight: 'rgba(253,230,138,0.16)',
+    accent: '#a78bfa',
+  },
 };
 
 const MARKER_COLORS: Record<DungeonMarkerKind, string> = {
@@ -17,7 +128,7 @@ const MARKER_COLORS: Record<DungeonMarkerKind, string> = {
   trap: '#ef4444',
   chest: '#eab308',
   stairs: '#8b5cf6',
-  note: '#64748b',
+  note: '#94a3b8',
 };
 
 const MARKER_SYMBOLS: Record<DungeonMarkerKind, string> = {
@@ -27,6 +138,11 @@ const MARKER_SYMBOLS: Record<DungeonMarkerKind, string> = {
   stairs: 'S',
   note: '?',
 };
+
+export function themePalette(theme: DungeonTheme | string | undefined): DungeonThemePalette {
+  const key = (theme ?? 'generic') as DungeonTheme;
+  return DUNGEON_THEME_PALETTES[key] ?? DUNGEON_THEME_PALETTES.generic;
+}
 
 export function tileAt(map: CampaignDungeonMap, x: number, y: number): DungeonTileKind {
   return map.tiles[y]?.[x] ?? 'wall';
@@ -45,39 +161,93 @@ export function roomLabelAt(map: CampaignDungeonMap, roomId: string): string {
   return map.rooms.find((r) => r.id === roomId)?.label ?? '';
 }
 
+export interface DrawDungeonOptions {
+  showRoomNumbers?: boolean;
+  selectedRoomId?: string | null;
+  showGrid?: boolean;
+  vignette?: boolean;
+}
+
 export function drawDungeonToCanvas(
   map: CampaignDungeonMap,
   canvas: HTMLCanvasElement,
   cellSize = 12,
-  options?: { showRoomNumbers?: boolean; selectedRoomId?: string | null },
+  options?: DrawDungeonOptions,
 ): void {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
+  const palette = themePalette(map.theme);
   const w = map.gridWidth * cellSize;
   const h = map.gridHeight * cellSize;
   canvas.width = w;
   canvas.height = h;
 
-  ctx.fillStyle = '#0f1218';
+  ctx.fillStyle = palette.bg;
   ctx.fillRect(0, 0, w, h);
 
   for (let y = 0; y < map.gridHeight; y++) {
     for (let x = 0; x < map.gridWidth; x++) {
       const kind = tileAt(map, x, y);
-      ctx.fillStyle = TILE_COLORS[kind];
-      ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+      const px = x * cellSize;
+      const py = y * cellSize;
+
+      if (kind === 'wall') {
+        ctx.fillStyle = palette.wall;
+        ctx.fillRect(px, py, cellSize, cellSize);
+        ctx.fillStyle = palette.wallEdge;
+        ctx.fillRect(px, py + cellSize - 1, cellSize, 1);
+        ctx.fillRect(px + cellSize - 1, py, 1, cellSize);
+      } else if (kind === 'door') {
+        ctx.fillStyle = palette.door;
+        ctx.fillRect(px, py, cellSize, cellSize);
+        ctx.strokeStyle = palette.doorEdge;
+        ctx.lineWidth = Math.max(1, cellSize * 0.12);
+        ctx.strokeRect(px + 1, py + 1, cellSize - 2, cellSize - 2);
+      } else {
+        ctx.fillStyle = (x + y) % 2 === 0 ? palette.floor : palette.floorAlt;
+        ctx.fillRect(px, py, cellSize, cellSize);
+        if (options?.showGrid !== false && cellSize >= 8) {
+          ctx.strokeStyle = palette.grid;
+          ctx.lineWidth = 1;
+          ctx.strokeRect(px + 0.5, py + 0.5, cellSize - 1, cellSize - 1);
+        }
+      }
+    }
+  }
+
+  if (options?.selectedRoomId) {
+    const room = map.rooms.find((r) => r.id === options.selectedRoomId);
+    if (room) {
+      ctx.fillStyle = palette.roomHighlight;
+      ctx.fillRect(
+        room.x * cellSize,
+        room.y * cellSize,
+        room.width * cellSize,
+        room.height * cellSize,
+      );
+      ctx.strokeStyle = palette.roomTextSelected;
+      ctx.lineWidth = Math.max(1, cellSize * 0.15);
+      ctx.strokeRect(
+        room.x * cellSize + 1,
+        room.y * cellSize + 1,
+        room.width * cellSize - 2,
+        room.height * cellSize - 2,
+      );
     }
   }
 
   if (options?.showRoomNumbers !== false) {
-    ctx.font = `bold ${Math.max(8, cellSize - 2)}px sans-serif`;
+    ctx.font = `bold ${Math.max(8, cellSize - 2)}px "Segoe UI", system-ui, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     for (const room of map.rooms) {
       const cx = (room.x + room.width / 2) * cellSize;
       const cy = (room.y + room.height / 2) * cellSize;
       const num = room.label.replace(/\D/g, '') || '?';
-      ctx.fillStyle = room.id === options?.selectedRoomId ? '#fde68a' : '#e2e8f0';
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillText(num, cx + 1, cy + 1);
+      ctx.fillStyle =
+        room.id === options?.selectedRoomId ? palette.roomTextSelected : palette.roomText;
       ctx.fillText(num, cx, cy);
     }
   }
@@ -85,15 +255,28 @@ export function drawDungeonToCanvas(
   for (const marker of map.markers) {
     const cx = marker.x * cellSize + cellSize / 2;
     const cy = marker.y * cellSize + cellSize / 2;
-    ctx.fillStyle = MARKER_COLORS[marker.kind];
+    const r = cellSize * 0.38;
     ctx.beginPath();
-    ctx.arc(cx, cy, cellSize * 0.35, 0, Math.PI * 2);
+    ctx.arc(cx, cy, r + 1, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = MARKER_COLORS[marker.kind];
     ctx.fill();
     ctx.fillStyle = '#0f1218';
-    ctx.font = `bold ${Math.max(7, cellSize - 4)}px sans-serif`;
+    ctx.font = `bold ${Math.max(7, cellSize - 4)}px "Segoe UI", system-ui, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(MARKER_SYMBOLS[marker.kind], cx, cy);
+    ctx.fillText(MARKER_SYMBOLS[marker.kind], cx, cy + 0.5);
+  }
+
+  if (options?.vignette !== false && cellSize >= 6) {
+    const g = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.25, w / 2, h / 2, Math.max(w, h) * 0.72);
+    g.addColorStop(0, 'rgba(0,0,0,0)');
+    g.addColorStop(1, 'rgba(0,0,0,0.35)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
   }
 }
 
@@ -115,9 +298,17 @@ export function dungeonMapToAscii(map: CampaignDungeonMap): string {
   return lines.join('\n');
 }
 
-export function dungeonMapToPngDataUrl(map: CampaignDungeonMap, cellSize = 10): string {
+export function dungeonMapToPngDataUrl(
+  map: CampaignDungeonMap,
+  cellSize = 10,
+  options?: DrawDungeonOptions,
+): string {
   const canvas = document.createElement('canvas');
-  drawDungeonToCanvas(map, canvas, cellSize, { showRoomNumbers: true });
+  drawDungeonToCanvas(map, canvas, cellSize, {
+    showRoomNumbers: true,
+    vignette: true,
+    ...options,
+  });
   return canvas.toDataURL('image/png');
 }
 
@@ -171,7 +362,7 @@ export function buildHandoutBody(
 
 export async function exportDungeonPng(map: CampaignDungeonMap, filename: string): Promise<void> {
   const canvas = document.createElement('canvas');
-  drawDungeonToCanvas(map, canvas, 14, { showRoomNumbers: true });
+  drawDungeonToCanvas(map, canvas, 14, { showRoomNumbers: true, vignette: true });
   const url = canvas.toDataURL('image/png');
   const a = document.createElement('a');
   a.href = url;
@@ -186,7 +377,7 @@ export async function exportDungeonPdf(
 ): Promise<void> {
   const { jsPDF } = await import('jspdf');
   const canvas = document.createElement('canvas');
-  drawDungeonToCanvas(map, canvas, 10, { showRoomNumbers: true });
+  drawDungeonToCanvas(map, canvas, 10, { showRoomNumbers: true, vignette: true });
 
   const imgData = canvas.toDataURL('image/png');
   const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });

@@ -1,16 +1,16 @@
 @if (!editingMap()) {
-  <section class="space-y-6">
+  <section class="space-y-6 dungeon-shell">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div>
-        <h2 class="font-serif text-xl text-violet-300">Cartes &amp; donjons</h2>
-        <p class="text-xs text-slate-500 mt-1">
-          Générez des donjons procéduraux, éditez-les et exportez-les. Handouts en brouillon jusqu’à publication.
+        <h2 class="font-serif text-2xl text-amber-200/90 tracking-tight">Cartes &amp; donjons</h2>
+        <p class="text-sm text-slate-500 mt-1 max-w-xl">
+          Gravure procédurale, édition fluide au pinceau, export table-ready.
         </p>
       </div>
       @if (campaign().isOwner) {
         <button
           type="button"
-          class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white"
+          class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide bg-amber-700 text-amber-50 shadow-lg shadow-amber-950/40 hover:bg-amber-600 transition-colors"
           (click)="openGenerator()"
         >
           Nouveau donjon
@@ -19,198 +19,233 @@
     </div>
 
     @if (message(); as msg) {
-      <p class="text-sm text-emerald-400">{{ msg }}</p>
+      <p class="text-sm text-emerald-400/90 animate-fade-in">{{ msg }}</p>
     }
 
     @if (showGenerator()) {
-      <div class="rounded-2xl border border-violet-800/40 bg-violet-950/20 p-5 space-y-4">
-        <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-400">Générer un donjon</h3>
+      <div class="dungeon-generator rounded-2xl border border-amber-900/40 bg-gradient-to-br from-[#1a1410] via-[#141820] to-[#0f1218] p-5 md:p-6 overflow-hidden relative">
+        <div class="absolute inset-0 pointer-events-none opacity-30 dungeon-generator__glow"></div>
+        <div class="relative grid lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.9fr)] gap-6">
+          <div class="space-y-4">
+            <h3 class="font-serif text-lg text-amber-100/90">Forger la carte</h3>
 
-        <label class="block text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-          Nom
-          <input
-            type="text"
-            class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2 text-sm"
-            [ngModel]="genName()"
-            (ngModelChange)="genName.set($event)"
-          />
-        </label>
+            <label class="block text-[11px] uppercase tracking-widest text-slate-500 font-semibold">
+              Nom
+              <input
+                type="text"
+                class="mt-1.5 w-full rounded-xl bg-black/30 border border-slate-700/80 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-600/60 outline-none"
+                [ngModel]="genName()"
+                (ngModelChange)="genName.set($event)"
+              />
+            </label>
 
-        <label class="block text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-          Thème
-          <select
-            class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2 text-sm"
-            [ngModel]="genTheme()"
-            (ngModelChange)="onThemeChange($event)"
-          >
-            @for (t of themes; track t) {
-              <option [value]="t">{{ themeLabels[t] }}</option>
+            <div>
+              <p class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold mb-2">Thème</p>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                @for (t of themes; track t) {
+                  <button
+                    type="button"
+                    class="theme-chip flex items-center gap-2 rounded-xl border px-2.5 py-2 text-left transition-all"
+                    [class.theme-chip--active]="genTheme() === t"
+                    (click)="onThemeChange(t)"
+                  >
+                    <span class="h-3.5 w-3.5 rounded-full shrink-0 ring-1 ring-black/40" [style.background]="themeSwatch(t)"></span>
+                    <span class="text-[11px] font-semibold text-slate-200 truncate">{{ themeLabels[t] }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-4">
+              <label class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">
+                Largeur · {{ genGridW() }}
+                <input type="range" min="32" max="80" [ngModel]="genGridW()" (ngModelChange)="genGridW.set(+$event)" class="w-full mt-2 accent-amber-600" />
+              </label>
+              <label class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">
+                Hauteur · {{ genGridH() }}
+                <input type="range" min="32" max="80" [ngModel]="genGridH()" (ngModelChange)="genGridH.set(+$event)" class="w-full mt-2 accent-amber-600" />
+              </label>
+              <label class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">
+                Salles · {{ genRoomCount() }}
+                <input type="range" min="4" max="20" [ngModel]="genRoomCount()" (ngModelChange)="genRoomCount.set(+$event)" class="w-full mt-2 accent-amber-600" />
+              </label>
+              <label class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">
+                Couloirs · {{ genCorridorDensity() }}%
+                <input type="range" min="20" max="100" [ngModel]="genCorridorDensity()" (ngModelChange)="genCorridorDensity.set(+$event)" class="w-full mt-2 accent-amber-600" />
+              </label>
+            </div>
+
+            <div class="flex flex-wrap gap-2 pt-1">
+              <button
+                type="button"
+                class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide bg-amber-600 text-amber-50 hover:bg-amber-500 disabled:opacity-50 transition-colors"
+                [disabled]="generating()"
+                (click)="generateMap()"
+              >
+                {{ generating() ? 'Gravure…' : 'Gravure' }}
+              </button>
+              <button
+                type="button"
+                class="px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide border border-slate-700 text-slate-400 hover:text-slate-200"
+                [disabled]="generating()"
+                (click)="closeGenerator()"
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+
+          <div class="relative min-h-[240px] rounded-xl border border-slate-800/80 bg-black/40 overflow-hidden flex items-center justify-center">
+            @if (generating()) {
+              <div class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-[#0a0c10]/75 backdrop-blur-[2px]">
+                <div class="dungeon-pulse h-16 w-16 rounded-full border border-amber-500/40"></div>
+                <p class="font-serif text-amber-100/90 text-lg">Gravure de la carte…</p>
+              </div>
             }
-          </select>
-        </label>
-
-        <div class="grid sm:grid-cols-2 gap-4">
-          <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-            Largeur grille : {{ genGridW() }}
-            <input type="range" min="32" max="80" [ngModel]="genGridW()" (ngModelChange)="genGridW.set(+$event)" class="w-full mt-1" />
-          </label>
-          <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-            Hauteur grille : {{ genGridH() }}
-            <input type="range" min="32" max="80" [ngModel]="genGridH()" (ngModelChange)="genGridH.set(+$event)" class="w-full mt-1" />
-          </label>
-          <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-            Nombre de salles : {{ genRoomCount() }}
-            <input type="range" min="4" max="20" [ngModel]="genRoomCount()" (ngModelChange)="genRoomCount.set(+$event)" class="w-full mt-1" />
-          </label>
-          <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-            Densité couloirs : {{ genCorridorDensity() }}%
-            <input type="range" min="20" max="100" [ngModel]="genCorridorDensity()" (ngModelChange)="genCorridorDensity.set(+$event)" class="w-full mt-1" />
-          </label>
-        </div>
-
-        <div class="flex flex-wrap gap-2">
-          <button type="button" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white" (click)="generateMap()">
-            Générer
-          </button>
-          <button type="button" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-400" (click)="closeGenerator()">
-            Annuler
-          </button>
+            <canvas #previewCanvas class="max-w-full max-h-[360px] dungeon-preview-canvas"></canvas>
+            @if (!previewMap() && !generating()) {
+              <p class="absolute text-xs text-slate-600">Ajustez les paramètres pour l’aperçu</p>
+            }
+          </div>
         </div>
       </div>
     }
 
-    @if (sortedMaps().length === 0) {
-      <div class="rounded-2xl border border-dashed border-slate-700 p-12 text-center text-slate-500">
-        Aucune carte — créez un donjon pour préparer vos sessions.
+    @if (sortedMaps().length === 0 && !showGenerator()) {
+      <div class="rounded-2xl border border-dashed border-slate-700/80 p-14 text-center bg-[#12161d]/50">
+        <p class="font-serif text-xl text-slate-400">Aucune carte</p>
+        <p class="text-sm text-slate-600 mt-2">Créez un donjon pour préparer vos sessions.</p>
       </div>
-    } @else {
-      <div class="grid gap-3">
+    } @else if (sortedMaps().length) {
+      <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
         @for (map of sortedMaps(); track map.id) {
-          <article class="rounded-2xl border border-slate-800 bg-[#1b2028] p-4 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h3 class="font-serif text-lg text-slate-100">{{ map.name }}</h3>
-              <p class="text-[10px] text-slate-500 mt-1">
-                {{ themeLabels[map.theme] }}
-                · {{ map.rooms.length }} salles
-                · {{ map.gridWidth }}×{{ map.gridHeight }}
-                · {{ formatDate(map.updatedAt) }}
-              </p>
-              @if (handoutForMap(map); as ho) {
-                <p class="text-[10px] mt-1" [class]="ho.published ? 'text-emerald-400' : 'text-amber-400'">
-                  Handout : {{ ho.published ? 'publié' : 'brouillon' }}
+          <article class="map-card group rounded-2xl border border-slate-800/90 bg-[#141820] overflow-hidden hover:border-amber-800/50 transition-colors">
+            <button type="button" class="block w-full text-left" (click)="openEditor(map.id)">
+              <div class="aspect-[4/3] bg-[#0a0c10] overflow-hidden relative">
+                @if (thumbUrls()[map.id]; as thumb) {
+                  <img [src]="thumb" [alt]="map.name" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-300" />
+                } @else {
+                  <div class="absolute inset-0 animate-pulse bg-slate-900"></div>
+                }
+                <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#141820] to-transparent"></div>
+              </div>
+              <div class="p-4 pt-2">
+                <h3 class="font-serif text-lg text-slate-100 truncate">{{ map.name }}</h3>
+                <p class="text-[11px] text-slate-500 mt-1">
+                  {{ themeLabels[map.theme] }}
+                  · {{ map.rooms.length }} salles
+                  · {{ map.gridWidth }}×{{ map.gridHeight }}
                 </p>
-              }
-            </div>
-            <div class="flex flex-wrap gap-2">
-              <button type="button" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-violet-600 text-white" (click)="openEditor(map.id)">
-                Éditer
-              </button>
-              @if (campaign().isOwner) {
-                <button type="button" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-red-900/50 text-red-400" (click)="deleteMap(map.id)">
-                  Supprimer
+                <p class="text-[10px] text-slate-600 mt-1">{{ formatDate(map.updatedAt) }}</p>
+                @if (handoutForMap(map); as ho) {
+                  <p class="text-[11px] mt-2" [class]="ho.published ? 'text-emerald-400' : 'text-amber-400/90'">
+                    Handout {{ ho.published ? 'publié' : 'brouillon' }}
+                  </p>
+                }
+              </div>
+            </button>
+            @if (campaign().isOwner) {
+              <div class="px-4 pb-4 flex gap-2">
+                <button type="button" class="flex-1 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase bg-amber-800/50 text-amber-100 hover:bg-amber-700/60" (click)="openEditor(map.id)">
+                  Éditer
                 </button>
-              }
-            </div>
+                <button type="button" class="px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase border border-red-900/40 text-red-400/90 hover:bg-red-950/30" (click)="deleteMap(map.id)">
+                  Suppr.
+                </button>
+              </div>
+            }
           </article>
         }
       </div>
     }
   </section>
 } @else if (editingMap(); as map) {
-  <section class="space-y-4">
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <button type="button" class="text-[10px] font-black uppercase text-slate-500 hover:text-violet-400 mb-2" (click)="closeEditor()">
-          ← Retour à la liste
+  <section class="space-y-4 dungeon-shell" [class.dungeon-reveal]="revealMap()">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div class="min-w-0 flex-1">
+        <button type="button" class="text-[11px] font-bold uppercase tracking-wide text-slate-500 hover:text-amber-300 mb-2" (click)="closeEditor()">
+          ← Liste des cartes
         </button>
         <input
           type="text"
-          class="font-serif text-xl text-violet-300 bg-transparent border-b border-slate-700 focus:border-violet-500 outline-none w-full max-w-md"
+          class="font-serif text-2xl text-amber-100/90 bg-transparent border-b border-slate-700/80 focus:border-amber-500/70 outline-none w-full max-w-lg"
           [ngModel]="map.name"
           (ngModelChange)="patchEditingMap({ name: $event })"
         />
+        <p class="text-[11px] text-slate-500 mt-1">
+          {{ themeLabels[map.theme] }} · molette zoom · espace + glisser pour déplacer · Ctrl+Z annuler
+        </p>
       </div>
       <div class="flex flex-wrap gap-2">
-        <button type="button" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300" [disabled]="exportBusy()" (click)="exportPng()">PNG</button>
-        <button type="button" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300" [disabled]="exportBusy()" (click)="exportPdf()">PDF</button>
-        <button type="button" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300" (click)="exportJson()">JSON</button>
-        <button type="button" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-amber-700/40 border border-amber-700/50 text-amber-200" (click)="createOrUpdateHandout()">
-          Handout brouillon
-        </button>
+        <button type="button" class="editor-action" [disabled]="!canUndo()" (click)="undo()">Annuler</button>
+        <button type="button" class="editor-action" (click)="regenerateEditingMap()">Régénérer</button>
+        <button type="button" class="editor-action" [disabled]="exportBusy()" (click)="exportPng()">PNG</button>
+        <button type="button" class="editor-action" [disabled]="exportBusy()" (click)="exportPdf()">PDF</button>
+        <button type="button" class="editor-action" (click)="exportJson()">JSON</button>
+        <button type="button" class="editor-action editor-action--accent" (click)="createOrUpdateHandout()">Handout</button>
       </div>
     </div>
 
     @if (message(); as msg) {
-      <p class="text-sm text-emerald-400">{{ msg }}</p>
+      <p class="text-sm text-emerald-400/90">{{ msg }}</p>
     }
 
-    <div class="flex flex-wrap gap-1">
-      @for (tool of [
-        { id: 'select', label: 'Sélection' },
-        { id: 'floor', label: 'Sol' },
-        { id: 'wall', label: 'Mur' },
-        { id: 'door', label: 'Porte' },
-        { id: 'trap', label: 'Piège' },
-        { id: 'chest', label: 'Coffre' },
-        { id: 'stairs', label: 'Escalier' }
-      ]; track tool.id) {
+    <div class="flex flex-wrap items-center gap-1.5">
+      @for (tool of tools; track tool.id) {
         <button
           type="button"
-          class="px-2 py-1 rounded-lg text-[9px] font-black uppercase border"
-          [class.border-violet-500]="activeTool() === tool.id"
-          [class.text-violet-300]="activeTool() === tool.id"
-          [class.border-slate-700]="activeTool() !== tool.id"
-          [class.text-slate-500]="activeTool() !== tool.id"
-          (click)="setTool($any(tool.id))"
+          class="tool-btn"
+          [class.tool-btn--active]="activeTool() === tool.id"
+          [title]="tool.hint"
+          (click)="setTool(tool.id)"
         >
           {{ tool.label }}
         </button>
       }
-      <span class="mx-2 text-slate-600">|</span>
-      <button type="button" class="px-2 py-1 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-500" (click)="zoom(-0.15)">−</button>
-      <span class="text-[10px] text-slate-500 self-center">{{ (scale() * 100) | number: '1.0-0' }}%</span>
-      <button type="button" class="px-2 py-1 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-500" (click)="zoom(0.15)">+</button>
+      <span class="mx-1 h-5 w-px bg-slate-700/80"></span>
+      <button type="button" class="tool-btn" (click)="zoom(-0.15)" title="Dézoomer">−</button>
+      <span class="text-[11px] text-slate-500 tabular-nums w-12 text-center">{{ (scale() * 100) | number: '1.0-0' }}%</span>
+      <button type="button" class="tool-btn" (click)="zoom(0.15)" title="Zoomer">+</button>
+      <button type="button" class="tool-btn" (click)="resetView()" title="Recadrer">Fit</button>
     </div>
 
-    <div class="grid lg:grid-cols-[1fr_280px] gap-4">
-      <div class="rounded-xl border border-slate-800 bg-[#0f1218] overflow-auto max-h-[65vh] p-2">
-        <div [style.transform]="'scale(' + scale() + ')'" [style.transformOrigin]="'top left'" class="inline-block">
-          <div class="inline-grid gap-0" [style.gridTemplateColumns]="'repeat(' + map.gridWidth + ', ' + cellPx + 'px)'">
-            @for (row of rowIndices(map); track row) {
-              @for (col of colIndices(map); track col) {
-                <button
-                  type="button"
-                  class="relative shrink-0 p-0 border-0"
-                  [style.width.px]="cellPx"
-                  [style.height.px]="cellPx"
-                  [class]="tileClass(map, col, row)"
-                  (click)="onTileClick(col, row)"
-                >
-                  @if (markerAt(map, col, row); as mk) {
-                    <span class="absolute inset-0 flex items-center justify-center text-[8px] font-black text-violet-200 pointer-events-none">{{ markerIcon(mk.kind) }}</span>
-                  }
-                </button>
-              }
-            }
-          </div>
+    <div class="grid lg:grid-cols-[1fr_300px] gap-4">
+      <div
+        #viewport
+        class="dungeon-viewport relative rounded-2xl border border-slate-800 bg-[#080a0e] overflow-hidden h-[min(70vh,720px)] touch-none select-none"
+        [ngClass]="cursorClass()"
+        (pointerdown)="onPointerDown($event)"
+        (pointermove)="onPointerMove($event)"
+        (pointerup)="onPointerUp($event)"
+        (pointercancel)="onPointerUp($event)"
+        (contextmenu)="$event.preventDefault()"
+      >
+        <div
+          class="absolute origin-top-left will-change-transform"
+          [style.transform]="'translate(' + panX() + 'px,' + panY() + 'px) scale(' + scale() + ')'"
+        >
+          <canvas #editorCanvas class="block shadow-2xl shadow-black/50"></canvas>
+        </div>
+        <div class="pointer-events-none absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-black/35 to-transparent"></div>
+        <div
+          class="pointer-events-none absolute bottom-3 left-3 rounded-lg px-2 py-1 text-[10px] uppercase tracking-wider text-slate-400 bg-black/50 border border-white/5"
+          [style.borderColor]="themeAccent() + '44'"
+        >
+          {{ map.gridWidth }}×{{ map.gridHeight }} · {{ map.rooms.length }} salles
         </div>
       </div>
 
-      <aside class="space-y-4">
-        <div class="rounded-xl border border-slate-800 bg-[#1b2028] p-4">
-          <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Aperçu export</h4>
-          <canvas #mapCanvas class="max-w-full border border-slate-700 rounded-lg bg-[#0f1218]"></canvas>
-        </div>
-
-        <div class="rounded-xl border border-slate-800 bg-[#1b2028] p-4 max-h-[40vh] overflow-y-auto">
-          <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Salles</h4>
-          <div class="space-y-3">
+      <aside class="space-y-4 max-h-[min(70vh,720px)] overflow-y-auto pr-1">
+        <div class="rounded-xl border border-slate-800 bg-[#141820] p-4">
+          <h4 class="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-3">Salles</h4>
+          <div class="space-y-2.5">
             @for (room of map.rooms; track room.id) {
               <div
                 class="rounded-lg border px-3 py-2 cursor-pointer transition-colors"
-                [class.border-violet-600]="selectedRoomId() === room.id"
-                [class.border-slate-700]="selectedRoomId() !== room.id"
-                (click)="selectedRoomId.set(room.id)"
+                [class.border-amber-600/70]="selectedRoomId() === room.id"
+                [class.bg-amber-950/20]="selectedRoomId() === room.id"
+                [class.border-slate-700/80]="selectedRoomId() !== room.id"
+                (click)="focusRoom(room.id)"
               >
                 <input
                   type="text"
@@ -223,7 +258,7 @@
 
                 <label class="block text-[9px] uppercase text-slate-600 mt-2">Rencontre campagne</label>
                 <select
-                  class="w-full mt-0.5 rounded bg-[#171b22] border border-slate-700 text-xs px-2 py-1"
+                  class="w-full mt-0.5 rounded bg-[#0f1218] border border-slate-700 text-xs px-2 py-1"
                   [ngModel]="room.encounterId ?? ''"
                   (ngModelChange)="onEncounterChange(room.id, $event)"
                   (click)="$event.stopPropagation()"
@@ -234,16 +269,14 @@
                   }
                 </select>
 
-                <div class="flex gap-1 mt-2">
-                  <button type="button" class="text-[9px] font-black uppercase text-violet-400" (click)="rerollRoomEncounter(room.id); $event.stopPropagation()">
-                    Relancer aléatoire
-                  </button>
-                </div>
+                <button type="button" class="text-[10px] font-bold uppercase text-amber-400/90 mt-2" (click)="rerollRoomEncounter(room.id); $event.stopPropagation()">
+                  Relancer aléatoire
+                </button>
 
                 <textarea
                   rows="2"
                   placeholder="Notes MJ…"
-                  class="w-full mt-2 rounded bg-[#171b22] border border-slate-700 text-xs px-2 py-1 resize-none"
+                  class="w-full mt-2 rounded bg-[#0f1218] border border-slate-700 text-xs px-2 py-1 resize-none"
                   [ngModel]="room.notes ?? ''"
                   (ngModelChange)="patchRoom(room.id, { notes: $event })"
                   (click)="$event.stopPropagation()"
@@ -254,9 +287,9 @@
         </div>
 
         @if (map.markers.length) {
-          <div class="rounded-xl border border-slate-800 bg-[#1b2028] p-4">
-            <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Marqueurs</h4>
-            <ul class="space-y-2 text-xs">
+          <div class="rounded-xl border border-slate-800 bg-[#141820] p-4">
+            <h4 class="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-3">Marqueurs</h4>
+            <ul class="space-y-2 text-xs text-slate-300">
               @for (mk of map.markers; track mk.id) {
                 <li class="flex items-center justify-between gap-2">
                   <span>{{ markerLabels[mk.kind] }} ({{ mk.x }}, {{ mk.y }})</span>

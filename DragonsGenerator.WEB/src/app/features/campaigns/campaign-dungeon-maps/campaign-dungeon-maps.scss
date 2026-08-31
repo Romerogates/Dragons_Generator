@@ -1,0 +1,131 @@
+.dungeon-shell {
+  animation: dungeon-fade-in 0.35s ease-out;
+}
+
+.dungeon-reveal {
+  animation: dungeon-reveal 0.85s ease-out;
+}
+
+.dungeon-generator__glow {
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 20%, rgba(180, 83, 9, 0.18), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 70%, rgba(69, 26, 3, 0.25), transparent 55%);
+}
+
+.theme-chip {
+  border-color: rgb(51 65 85 / 0.8);
+  background: rgb(0 0 0 / 0.25);
+}
+
+.theme-chip:hover {
+  border-color: rgb(146 64 14 / 0.5);
+}
+
+.theme-chip--active {
+  border-color: rgb(217 119 6 / 0.7);
+  background: rgb(120 53 15 / 0.25);
+  box-shadow: 0 0 0 1px rgb(245 158 11 / 0.15);
+}
+
+.dungeon-pulse {
+  animation: dungeon-pulse 1.2s ease-in-out infinite;
+  box-shadow: 0 0 24px rgb(245 158 11 / 0.25);
+}
+
+.dungeon-preview-canvas {
+  image-rendering: auto;
+}
+
+.dungeon-viewport canvas {
+  image-rendering: pixelated;
+}
+
+.map-card img {
+  image-rendering: pixelated;
+}
+
+.tool-btn {
+  padding: 0.4rem 0.7rem;
+  border-radius: 0.65rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid rgb(51 65 85 / 0.9);
+  color: rgb(148 163 184);
+  background: rgb(15 18 24 / 0.8);
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.tool-btn:hover {
+  color: rgb(226 232 240);
+  border-color: rgb(100 116 139);
+}
+
+.tool-btn--active {
+  color: rgb(254 243 199);
+  border-color: rgb(217 119 6 / 0.75);
+  background: rgb(120 53 15 / 0.35);
+}
+
+.editor-action {
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.65rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid rgb(51 65 85);
+  color: rgb(203 213 225);
+  background: transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.editor-action:hover:not(:disabled) {
+  border-color: rgb(148 163 184);
+}
+
+.editor-action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.editor-action--accent {
+  border-color: rgb(180 83 9 / 0.55);
+  color: rgb(253 230 138);
+  background: rgb(120 53 15 / 0.35);
+}
+
+@keyframes dungeon-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes dungeon-reveal {
+  0% {
+    opacity: 0.4;
+    filter: brightness(0.6) saturate(0.8);
+  }
+  100% {
+    opacity: 1;
+    filter: none;
+  }
+}
+
+@keyframes dungeon-pulse {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}

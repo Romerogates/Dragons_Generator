@@ -7,6 +7,7 @@ import {
   exportDungeonPng,
   roomAt,
   roomLabelAt,
+  themePalette,
   tileAt,
 } from './dungeon-render.util';
 import type { EncounterGroup } from '@core/models/Campaign/campaign';
@@ -68,6 +69,11 @@ describe('dungeon-render helpers', () => {
     expect(ascii.split('\n').length).toBe(3);
     expect(ascii).toContain('#');
     expect(ascii).toContain('$');
+  });
+
+  it('exposes distinct theme palettes', () => {
+    expect(themePalette('crypt').floor).not.toBe(themePalette('temple').floor);
+    expect(themePalette('unknown').bg).toBe(themePalette('generic').bg);
   });
 
   it('draws canvas and exports png data url', () => {
