@@ -31,6 +31,7 @@ public class GuidePreferencesIntegrationTests
             put.Content = JsonContent.Create(new
             {
                 readNewsIds = new[] { "news-donjon-v1", "news-campagne-vide-handout" },
+                audience = "dm",
             });
             var res = await _client.SendAsync(put);
             res.EnsureSuccessStatusCode();

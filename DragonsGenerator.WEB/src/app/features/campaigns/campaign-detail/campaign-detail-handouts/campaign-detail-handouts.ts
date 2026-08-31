@@ -31,6 +31,7 @@ export class CampaignDetailHandouts {
   readonly editingHandoutId = input<string | null>(null);
   readonly focusHandoutId = input<string | null>(null);
   readonly previewHandout = input<CampaignHandout | null>(null);
+  readonly pinnedHandoutId = input<string | null>(null);
 
   readonly handoutKinds: HandoutKind[] = ['letter', 'map', 'summary', 'other'];
   readonly handoutKindLabels = HANDOUT_KIND_LABELS;
@@ -45,6 +46,7 @@ export class CampaignDetailHandouts {
   readonly handoutPatch = output<HandoutPatchEvent>();
   readonly handoutPatchImmediate = output<HandoutPatchEvent>();
   readonly togglePublished = output<HandoutPublishEvent>();
+  readonly pinHandout = output<string>();
 
   formatHandoutDate(iso?: string): string {
     if (!iso) return '';

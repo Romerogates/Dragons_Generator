@@ -8,6 +8,9 @@ public sealed class UserPreferences
 {
     [JsonPropertyName("guideReadNewsIds")]
     public List<string> GuideReadNewsIds { get; set; } = [];
+
+    [JsonPropertyName("guideAudience")]
+    public string? GuideAudience { get; set; }
 }
 
 public static class UserPreferencesHelper
@@ -62,13 +65,39 @@ public static class UserPreferencesHelper
         return list.ToArray();
     }
 
-    public static void ApplyReadNewsIds(AppUser user, IEnumerable<string> ids)
+    public static string? NormalizeGuideAudience(string? raw, out string? error)
+    {
+        error = null;
+        if (string.IsNullOrWhiteSpace(raw)) return null;
+        var v = raw.Trim().ToLowerInvariant();
+        return v switch
+        {
+            "all" or "dm" or "player" => v,
+            _ => null,
+        };
+    }
+
+    public static void ApplyGuidePreferences(AppUser user, IEnumerable<string> ids, string? audience)
     {
         var prefs = Parse(user.PreferencesJson);
         prefs.GuideReadNewsIds = ids.Distinct(StringComparer.Ordinal).ToList();
+        prefs.GuideAudience = audience;
         user.PreferencesJson = Serialize(prefs);
     }
 
     public static string[] GetReadNewsIds(AppUser user) =>
         Parse(user.PreferencesJson).GuideReadNewsIds.ToArray();
+
+    public static string? GetGuideAudience(AppUser user) =>
+        NormalizeGuideAudience(Parse(user.PreferencesJson).GuideAudience, out _);
+
+    public static object GetGuidePreferencesExport(AppUser user)
+    {
+        var prefs = Parse(user.PreferencesJson);
+        return new
+        {
+            readNewsIds = prefs.GuideReadNewsIds,
+            audience = NormalizeGuideAudience(prefs.GuideAudience, out _),
+        };
+    }
 }

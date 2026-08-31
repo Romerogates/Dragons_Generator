@@ -20,6 +20,10 @@ export interface EncounterGroup {
   id: string;
   name: string;
   description?: string;
+  /** Résumé visible côté joueur (sans spoilers MJ). */
+  playerSummary?: string;
+  /** Lien vers une carte donjon associée. */
+  dungeonMapId?: string;
   creatures: EncounterCreature[];
   xpAwarded?: boolean;
 }
@@ -86,6 +90,18 @@ export interface ActiveCombat {
   turnOrderIds?: string[];
 }
 
+export type SessionTimelineKind = 'encounter' | 'break' | 'note' | 'handout';
+
+export interface SessionTimelineItem {
+  id: string;
+  kind: SessionTimelineKind;
+  label: string;
+  encounterId?: string;
+  handoutId?: string;
+  dungeonMapId?: string;
+  durationMin?: number;
+}
+
 export interface CampaignSession {
   id: string;
   title: string;
@@ -99,6 +115,8 @@ export interface CampaignSession {
   status: CampaignSessionStatus;
   /** Combats terminés durant cette session (MJ). */
   combatHistory?: CombatHistoryEntry[];
+  /** Ordre de la soirée (MJ) — rencontres, pauses, notes. */
+  timeline?: SessionTimelineItem[];
 }
 
 export interface CombatHistoryEntry {
@@ -126,6 +144,8 @@ export interface CampaignData {
   handouts: CampaignHandout[];
   /** Session en cours côté table de jeu MJ. */
   activeSessionId?: string | null;
+  /** Document épinglé visible par les joueurs (overlay). */
+  pinnedHandoutId?: string | null;
   /** Cartes / donjons générés (MJ uniquement). */
   dungeonMaps?: CampaignDungeonMap[];
 }

@@ -216,6 +216,7 @@
         <button type="button" class="editor-action" [disabled]="!canUndo()" (click)="undo()">Annuler</button>
         <button type="button" class="editor-action" (click)="regenerateEditingMap()">Régénérer</button>
         <button type="button" class="editor-action" [disabled]="exportBusy()" (click)="exportPng()">PNG</button>
+        <button type="button" class="editor-action" [disabled]="exportBusy()" (click)="sharePng()">Partager</button>
         <button type="button" class="editor-action" [disabled]="exportBusy()" (click)="exportPdf()">PDF</button>
         <button type="button" class="editor-action" (click)="exportJson()">JSON</button>
         <button type="button" class="editor-action editor-action--accent" (click)="createOrUpdateHandout()">Handout</button>

@@ -205,25 +205,29 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     try {
-      const saved = localStorage.getItem(AUDIENCE_KEY) as GuideAudience | null;
-      if (saved === 'all' || saved === 'dm' || saved === 'player') {
-        this.audience.set(saved);
-      }
       const fb = localStorage.getItem(FEEDBACK_KEY);
       if (fb) this.sectionFeedback.set(JSON.parse(fb) as Record<string, 'yes' | 'no'>);
     } catch {
       /* ignore */
     }
-    void this.guidePrefs.load();
+    void this.guidePrefs.load().then(() => {
+      this.audience.set(this.guidePrefs.audience());
+    });
   }
 
   markNewsRead(newsId: string): void {
     this.guidePrefs.markRead(newsId);
   }
 
+  markNewsUnread(newsId: string): void {
+    this.guidePrefs.markUnread(newsId);
+  }
+
   markAllNewsRead(): void {
     this.guidePrefs.markAll(this.blogPosts.map((post) => post.id));
   }
+
+  readonly readPosts = computed(() => this.guidePrefs.readPosts());
 
   ngAfterViewInit(): void {
     this.setupScrollSpy();
@@ -252,11 +256,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
 
   setAudience(value: GuideAudience): void {
     this.audience.set(value);
-    try {
-      localStorage.setItem(AUDIENCE_KEY, value);
-    } catch {
-      /* ignore */
-    }
+    this.guidePrefs.setAudience(value);
     queueMicrotask(() => {
       this.setupScrollSpy();
       const hash = location.hash.replace('#', '');

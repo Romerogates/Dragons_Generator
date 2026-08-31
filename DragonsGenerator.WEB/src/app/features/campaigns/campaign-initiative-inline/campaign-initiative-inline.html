@@ -1,0 +1,44 @@
+<div class="rounded-xl border border-amber-700/40 bg-amber-950/20 p-4 space-y-3">
+  <p class="text-xs text-amber-100 font-semibold">Saisie rapide d'initiative</p>
+  @if (myCombatants().length > 1) {
+    <select
+      class="w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200"
+      [ngModel]="selectedId()"
+      (ngModelChange)="selectedId.set($event)"
+    >
+      <option value="">Personnage…</option>
+      @for (c of myCombatants(); track c.id) {
+        <option [value]="c.id" [disabled]="c.hasRoll">{{ combatantLabel(c) }}</option>
+      }
+    </select>
+  } @else if (myCombatants().length === 1) {
+    <p class="text-sm text-slate-300">{{ myCombatants()[0].name }}</p>
+  }
+  <div class="flex flex-wrap gap-2 items-end">
+    <label class="flex flex-col gap-1 text-[10px] uppercase tracking-wider text-slate-500">
+      Jet d20
+      <input
+        type="number"
+        min="1"
+        max="30"
+        class="w-24 bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200"
+        [ngModel]="roll()"
+        (ngModelChange)="roll.set($event === '' || $event == null ? null : +$event)"
+      />
+    </label>
+    <button
+      type="button"
+      class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-amber-600 text-white hover:bg-amber-500 disabled:opacity-50"
+      [disabled]="submitting() || (myCombatants().length === 1 && myCombatants()[0].hasRoll)"
+      (click)="myCombatants().length === 1 && !selectedId() ? selectedId.set(myCombatants()[0].id) : null; submit()"
+    >
+      {{ submitting() ? 'Envoi…' : 'Envoyer' }}
+    </button>
+  </div>
+  @if (error(); as err) {
+    <p class="text-xs text-red-300">{{ err }}</p>
+  }
+  @if (success(); as ok) {
+    <p class="text-xs text-emerald-300">{{ ok }}</p>
+  }
+</div>

@@ -25,6 +25,7 @@ import {
   encounterPendingXp,
   encounterTotalXp,
   EncounterGroup,
+  SessionTimelineItem,
   type CampaignDetail as CampaignDetailModel,
 } from '@core/models/Campaign/campaign';
 import {
@@ -45,11 +46,12 @@ import {
   sortedTurnOrder,
   syncEncountersFromCombatants,
 } from '@core/utils/combat-tracker.util';
+import { CampaignSessionTimeline } from '../campaign-session-timeline/campaign-session-timeline';
 
 @Component({
   selector: 'app-campaign-play-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, CampaignSessionTimeline],
   templateUrl: './campaign-play-panel.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -190,6 +192,15 @@ export class CampaignPlayPanel implements OnDestroy {
     if (!this.campaign().isOwner) return;
     this.flushSessionSave();
     this.saveData({ activeSessionId: sessionId });
+  }
+
+  onSessionTimelineChange(timeline: SessionTimelineItem[]): void {
+    const session = this.activeSession();
+    if (!session) return;
+    const sessions = (this.campaign().data.sessions ?? []).map((s) =>
+      s.id === session.id ? { ...s, timeline } : s,
+    );
+    this.saveData({ sessions });
   }
 
   endPlaySession(): void {

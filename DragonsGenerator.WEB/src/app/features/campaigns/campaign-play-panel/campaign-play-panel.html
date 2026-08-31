@@ -40,6 +40,11 @@
       </p>
     }
 
+    <app-campaign-session-timeline
+      [session]="playSession"
+      (timelineChange)="onSessionTimelineChange($event)"
+    />
+
     @if (feedback(); as fb) {
       <div
         role="status"

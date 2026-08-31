@@ -46,6 +46,15 @@
     @apply px-5 py-2 bg-emerald-950/30 text-emerald-400 border border-emerald-800/50 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2;
   }
 
+  /* Guide sommaire — scroll sans barre visible (immersion) */
+  .guide-sommaire {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
   /* Species / class wizard carousel — centered snap, no page sideways shift */
   .species-carousel {
     @apply flex items-stretch gap-5 sm:gap-8 overflow-x-auto overflow-y-hidden scroll-smooth;

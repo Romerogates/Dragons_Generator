@@ -1,9 +1,24 @@
 <section class="relative space-y-0 pl-2">
+  <div class="flex flex-wrap gap-2 mb-6">
+    @for (f of filters; track f.id) {
+      <button
+        type="button"
+        class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase border transition-colors"
+        [class.border-violet-600]="filter() === f.id"
+        [class.text-violet-300]="filter() === f.id"
+        [class.border-slate-700]="filter() !== f.id"
+        [class.text-slate-500]="filter() !== f.id"
+        (click)="filter.set(f.id)"
+      >
+        {{ f.label }}
+      </button>
+    }
+  </div>
   @if (loading()) {
     <p class="text-center text-violet-400 animate-pulse py-8">Chargement de l'activité…</p>
-  } @else if (items().length) {
-    <div class="absolute left-[1.15rem] top-2 bottom-2 w-px bg-slate-800" aria-hidden="true"></div>
-    @for (item of items(); track item.id) {
+  } @else if (filteredItems().length) {
+    <div class="absolute left-[1.15rem] top-14 bottom-2 w-px bg-slate-800" aria-hidden="true"></div>
+    @for (item of filteredItems(); track item.id) {
       <article
         class="relative flex gap-4 py-3 pl-1"
         [class.cursor-pointer]="item.kind === 'handout_published'"
@@ -32,6 +47,6 @@
       </article>
     }
   } @else {
-    <p class="text-slate-500 italic text-center py-12">Aucune activité enregistrée.</p>
+    <p class="text-slate-500 italic text-center py-12">Aucune activité pour ce filtre.</p>
   }
 </section>

@@ -166,7 +166,7 @@
     <div class="lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10 xl:gap-14">
       <!-- Sidebar + scrollspy -->
       <aside class="hidden lg:block">
-        <nav class="sticky top-6 space-y-0.5 max-h-[calc(100vh-3rem)] overflow-y-auto pr-1">
+        <nav class="guide-sommaire sticky top-6 space-y-0.5 max-h-[calc(100vh-3rem)] overflow-y-auto pr-1">
           <p class="text-[10px] font-black uppercase tracking-widest text-slate-600 mb-3 px-3">
             Sommaire
           </p>
@@ -387,6 +387,27 @@
               </p>
             }
           </div>
+          @if (readPosts().length) {
+            <details class="mt-8 rounded-xl border border-slate-800 bg-[#1b2028]/50 p-4">
+              <summary class="text-[10px] font-black uppercase tracking-widest text-slate-500 cursor-pointer">
+                Historique ({{ readPosts().length }} lues)
+              </summary>
+              <ul class="mt-4 space-y-2">
+                @for (post of readPosts(); track post.id) {
+                  <li class="flex flex-wrap items-center justify-between gap-2 text-sm text-slate-500 py-2 border-b border-slate-800/60 last:border-0">
+                    <span>{{ post.title }}</span>
+                    <button
+                      type="button"
+                      class="text-[9px] font-black uppercase tracking-wider text-violet-400 hover:text-violet-300"
+                      (click)="markNewsUnread(post.id)"
+                    >
+                      Marquer non lu
+                    </button>
+                  </li>
+                }
+              </ul>
+            </details>
+          }
         </section>
 
         <!-- Premiers pas -->

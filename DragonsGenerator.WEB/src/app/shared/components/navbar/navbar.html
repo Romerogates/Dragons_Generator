@@ -235,10 +235,15 @@
                 >
                 <a
                   routerLink="/guide"
-                  class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
+                  class="relative block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
                   (click)="closeMenus()"
-                  >Guide</a
-                >
+                  >Guide
+                  @if (guideNewsCount() > 0) {
+                    <span class="ml-1 inline-flex min-w-[1.1rem] h-[1.1rem] items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 px-1">{{
+                      formatBadgeCount(guideNewsCount())
+                    }}</span>
+                  }
+                </a>
                 <a
                   routerLink="/support"
                   class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
@@ -406,11 +411,16 @@
           </a>
           <a
             routerLink="/guide"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+            class="relative flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
             (click)="closeMenus()"
           >
             <span class="text-xl"><iconify-icon noobserver icon="fluent-emoji:open-book"></iconify-icon></span>
             <span class="text-sm font-bold tracking-wide">Guide</span>
+            @if (guideNewsCount() > 0) {
+              <span class="ml-auto min-w-[1.25rem] h-5 px-1.5 flex items-center justify-center rounded-full bg-amber-500 text-[10px] font-black text-slate-950">{{
+                formatBadgeCount(guideNewsCount())
+              }}</span>
+            }
           </a>
           <a
             routerLink="/support"

@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
+import { GuidePreferencesService } from '@core/services/guide-preferences.service';
 import { NotificationService } from '@core/services/notification.service';
 import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
 
@@ -32,6 +33,7 @@ export interface NavLink {
 export class Navbar implements OnInit, OnDestroy {
   readonly auth = inject(AuthService);
   private readonly notifications = inject(NotificationService);
+  readonly guidePrefs = inject(GuidePreferencesService);
   private routerSub?: Subscription;
 
   readonly mobileOpen = signal(false);
@@ -41,6 +43,7 @@ export class Navbar implements OnInit, OnDestroy {
   readonly friendsActionCount = this.notifications.friendsActionCount;
   readonly campaignsActionCount = this.notifications.campaignsActionCount;
   readonly notificationCount = this.notifications.totalCount;
+  readonly guideNewsCount = this.guidePrefs.unreadCount;
 
   private savedScrollY = 0;
   private bodyScrollLocked = false;
@@ -63,6 +66,7 @@ export class Navbar implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.preloadNavbarIcons();
+    void this.guidePrefs.load();
     this.routerSub = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe(() => this.closeMenus());

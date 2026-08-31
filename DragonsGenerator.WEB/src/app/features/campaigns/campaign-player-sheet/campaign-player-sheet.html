@@ -1,0 +1,32 @@
+<section class="bg-sky-950/20 border border-sky-800/40 rounded-2xl p-5 space-y-4">
+  <h2 class="text-[10px] font-black uppercase tracking-widest text-sky-400 flex items-center gap-2">
+    <iconify-icon icon="fluent-emoji:shield"></iconify-icon> Ma fiche à la table
+  </h2>
+  @if (member(); as m) {
+    <div class="grid sm:grid-cols-2 gap-4 text-sm">
+      <div>
+        <p class="text-[10px] uppercase tracking-wider text-slate-500 mb-1">Personnage</p>
+        <p class="text-sky-200 font-serif text-lg">{{ m.approvedCharacterName ?? '—' }}</p>
+        @if (m.approvedCharacterLevel) {
+          <p class="text-xs text-slate-500">Niv. {{ m.approvedCharacterLevel }}</p>
+        }
+      </div>
+      <div>
+        <p class="text-[10px] uppercase tracking-wider text-slate-500 mb-1">XP campagne</p>
+        <p class="text-amber-300 font-bold text-lg">{{ xpEarned() }}</p>
+      </div>
+    </div>
+    @if (nextSession(); as s) {
+      <div class="rounded-xl bg-[#1b2028]/80 border border-slate-800 px-4 py-3">
+        <p class="text-[10px] uppercase tracking-wider text-slate-500">Prochaine session</p>
+        <p class="text-slate-200 font-semibold">{{ s.title }}</p>
+        <p class="text-xs text-slate-500">{{ s.scheduledAt | date: 'fullDate' }} · {{ s.scheduledAt | date: 'shortTime' }}</p>
+      </div>
+    }
+    @if (lastHandoutTitle()) {
+      <p class="text-xs text-slate-400">Dernier document : <span class="text-sky-300">{{ lastHandoutTitle() }}</span></p>
+    }
+  } @else {
+    <p class="text-sm text-slate-500 italic">Aucun personnage approuvé pour l'instant.</p>
+  }
+</section>

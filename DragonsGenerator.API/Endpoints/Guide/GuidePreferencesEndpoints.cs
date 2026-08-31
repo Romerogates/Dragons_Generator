@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DragonsGenerator.API.Endpoints.Guide;
 
-public record GuidePreferencesDto(string[] ReadNewsIds);
+public record GuidePreferencesDto(string[] ReadNewsIds, string? Audience);
 
-public record UpdateGuidePreferencesRequest(string[] ReadNewsIds);
+public record UpdateGuidePreferencesRequest(string[] ReadNewsIds, string? Audience);
 
 public class GetGuidePreferencesEndpoint(AppDbContext db) : EndpointWithoutRequest<GuidePreferencesDto>
 {
@@ -29,7 +29,13 @@ public class GetGuidePreferencesEndpoint(AppDbContext db) : EndpointWithoutReque
             return;
         }
 
-        await Send.OkAsync(new GuidePreferencesDto(UserPreferencesHelper.GetReadNewsIds(user)), ct);
+        await Send.OkAsync(
+            new GuidePreferencesDto(
+                UserPreferencesHelper.GetReadNewsIds(user),
+                UserPreferencesHelper.GetGuideAudience(user)
+            ),
+            ct
+        );
     }
 }
 
@@ -47,10 +53,18 @@ public class UpdateGuidePreferencesEndpoint(AppDbContext db)
             return;
         }
 
-        var ids = UserPreferencesHelper.NormalizeReadNewsIds(req.ReadNewsIds, out var error);
-        if (error is not null)
+        var ids = UserPreferencesHelper.NormalizeReadNewsIds(req.ReadNewsIds, out var idsError);
+        if (idsError is not null)
         {
-            AddError(error);
+            AddError(idsError);
+            await Send.ErrorsAsync(cancellation: ct);
+            return;
+        }
+
+        var audience = UserPreferencesHelper.NormalizeGuideAudience(req.Audience, out var audError);
+        if (audError is not null || (req.Audience is not null && audience is null))
+        {
+            AddError("Audience guide invalide.");
             await Send.ErrorsAsync(cancellation: ct);
             return;
         }
@@ -62,8 +76,8 @@ public class UpdateGuidePreferencesEndpoint(AppDbContext db)
             return;
         }
 
-        UserPreferencesHelper.ApplyReadNewsIds(user, ids);
+        UserPreferencesHelper.ApplyGuidePreferences(user, ids, audience);
         await db.SaveChangesAsync(ct);
-        await Send.OkAsync(new GuidePreferencesDto(ids), ct);
+        await Send.OkAsync(new GuidePreferencesDto(ids, audience), ct);
     }
 }

@@ -141,6 +141,19 @@
             }
           </div>
           <div class="flex flex-wrap gap-2">
+            @if (handout.published) {
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border"
+                [class.border-amber-600]="pinnedHandoutId() === handout.id"
+                [class.text-amber-300]="pinnedHandoutId() === handout.id"
+                [class.border-slate-700]="pinnedHandoutId() !== handout.id"
+                [class.text-slate-400]="pinnedHandoutId() !== handout.id"
+                (click)="pinHandout.emit(handout.id)"
+              >
+                {{ pinnedHandoutId() === handout.id ? 'Épinglé' : 'Épingler' }}
+              </button>
+            }
             <button
               type="button"
               class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-sky-800/40 text-sky-300"

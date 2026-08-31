@@ -156,6 +156,9 @@ export class CampaignDungeonMaps {
   private previewTimer: ReturnType<typeof setTimeout> | null = null;
   private saveTimer: ReturnType<typeof setTimeout> | null = null;
   private panOrigin: { x: number; y: number; panX: number; panY: number } | null = null;
+  private touchPointers = new Map<number, { x: number; y: number }>();
+  private pinchStartDistance = 0;
+  private pinchStartScale = 1;
   private lastPaintKey: string | null = null;
   private strokeStarted = false;
 
@@ -456,6 +459,16 @@ export class CampaignDungeonMaps {
     const viewport = this.viewportRef()?.nativeElement;
     if (!map || !viewport) return;
 
+    this.touchPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (this.touchPointers.size === 2) {
+      this.isPainting.set(false);
+      this.isPanning.set(false);
+      const pts = [...this.touchPointers.values()];
+      this.pinchStartDistance = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+      this.pinchStartScale = this.scale();
+      return;
+    }
+
     const wantPan =
       event.button === 1 || event.button === 2 || this.spaceHeld() || this.activeTool() === 'select' && event.altKey;
 
@@ -483,6 +496,19 @@ export class CampaignDungeonMaps {
   }
 
   onPointerMove(event: PointerEvent): void {
+    if (this.touchPointers.has(event.pointerId)) {
+      this.touchPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    }
+    if (this.touchPointers.size === 2 && this.pinchStartDistance > 0) {
+      const pts = [...this.touchPointers.values()];
+      const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+      const next = Math.min(
+        MAX_SCALE,
+        Math.max(MIN_SCALE, this.pinchStartScale * (dist / this.pinchStartDistance)),
+      );
+      this.scale.set(+next.toFixed(2));
+      return;
+    }
     if (this.isPanning() && this.panOrigin) {
       const dx = event.clientX - this.panOrigin.x;
       const dy = event.clientY - this.panOrigin.y;
@@ -497,6 +523,8 @@ export class CampaignDungeonMaps {
   }
 
   onPointerUp(event: PointerEvent): void {
+    this.touchPointers.delete(event.pointerId);
+    if (this.touchPointers.size < 2) this.pinchStartDistance = 0;
     const viewport = this.viewportRef()?.nativeElement;
     if (viewport?.hasPointerCapture(event.pointerId)) {
       viewport.releasePointerCapture(event.pointerId);
@@ -566,6 +594,27 @@ export class CampaignDungeonMaps {
     try {
       await exportDungeonPng(map, `${map.name.replace(/\s+/g, '-')}.png`);
       this.message.set('PNG exporté.');
+    } finally {
+      this.exportBusy.set(false);
+    }
+  }
+
+  async sharePng(): Promise<void> {
+    const map = this.editingMap();
+    if (!map || this.exportBusy()) return;
+    this.exportBusy.set(true);
+    try {
+      const dataUrl = dungeonMapToPngDataUrl(map);
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
+      const file = new File([blob], `${map.name.replace(/\s+/g, '-')}.png`, { type: 'image/png' });
+      if (typeof navigator.share === 'function' && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: map.name });
+        this.message.set('Carte partagée.');
+      } else {
+        await exportDungeonPng(map, `${map.name.replace(/\s+/g, '-')}.png`);
+        this.message.set('PNG téléchargé (partage natif indisponible).');
+      }
     } finally {
       this.exportBusy.set(false);
     }

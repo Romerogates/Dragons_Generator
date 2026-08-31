@@ -1,0 +1,57 @@
+<div class="rounded-xl border border-emerald-800/40 bg-emerald-950/15 p-4 space-y-3">
+  <div class="flex flex-wrap items-center justify-between gap-2">
+    <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400">Timeline de la soirée</p>
+    <div class="flex flex-wrap gap-1">
+      @for (k of kinds; track k.id) {
+        <button
+          type="button"
+          class="px-2 py-1 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-400 hover:border-emerald-600 hover:text-emerald-300"
+          (click)="add(k.id)"
+        >
+          + {{ k.label }}
+        </button>
+      }
+    </div>
+  </div>
+  @if (items().length) {
+    <ol class="space-y-2">
+      @for (item of items(); track item.id; let i = $index) {
+        <li class="flex gap-2 items-start bg-[#1b2028] border border-slate-800 rounded-xl p-3">
+          <span class="text-lg shrink-0 opacity-80"><iconify-icon [icon]="kindIcon(item.kind)"></iconify-icon></span>
+          <div class="flex-1 min-w-0 space-y-2">
+            <input
+              class="w-full bg-transparent border-b border-slate-700 text-sm text-slate-200 py-1"
+              [ngModel]="item.label"
+              (ngModelChange)="patch(item.id, { label: $event })"
+            />
+            @if (item.kind === 'encounter') {
+              <input
+                class="w-full bg-[#171b22] border border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-400"
+                placeholder="ID rencontre (optionnel)"
+                [ngModel]="item.encounterId ?? ''"
+                (ngModelChange)="patch(item.id, { encounterId: $event || undefined })"
+              />
+            }
+            @if (item.durationMin != null || item.kind === 'break') {
+              <input
+                type="number"
+                min="1"
+                class="w-24 bg-[#171b22] border border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-400"
+                placeholder="min"
+                [ngModel]="item.durationMin ?? ''"
+                (ngModelChange)="patch(item.id, { durationMin: $event ? +$event : undefined })"
+              />
+            }
+          </div>
+          <div class="flex flex-col gap-1 shrink-0">
+            <button type="button" class="text-slate-500 hover:text-slate-200 text-xs" [disabled]="i === 0" (click)="move(item.id, -1)">↑</button>
+            <button type="button" class="text-slate-500 hover:text-slate-200 text-xs" [disabled]="i === items().length - 1" (click)="move(item.id, 1)">↓</button>
+            <button type="button" class="text-red-400/70 hover:text-red-300 text-xs" (click)="remove(item.id)">✕</button>
+          </div>
+        </li>
+      }
+    </ol>
+  } @else {
+    <p class="text-xs text-slate-500 italic">Ajoutez des étapes pour structurer la session.</p>
+  }
+</div>

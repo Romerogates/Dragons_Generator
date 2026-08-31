@@ -11,6 +11,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
 import { HomeSummary, HomeSummaryService } from '@core/services/home-summary.service';
+import { GuidePreferencesService } from '@core/services/guide-preferences.service';
 import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
 
 interface StatItem {
@@ -39,7 +40,10 @@ export class Home implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly cloud = inject(CharacterCloudService);
   private readonly homeSummary = inject(HomeSummaryService);
+  private readonly guidePrefs = inject(GuidePreferencesService);
   private readonly router = inject(Router);
+
+  readonly guideNewsCount = this.guidePrefs.unreadCount;
 
   readonly isLoggedIn = this.auth.isLoggedIn;
   readonly user = this.auth.user;
@@ -117,6 +121,7 @@ export class Home implements OnInit {
     this.refreshHeroStats();
     this.loadSummary();
     this.maybeShowRoleOnboarding();
+    void this.guidePrefs.load();
   }
 
   chooseRole(role: 'dm' | 'player'): void {
@@ -126,6 +131,7 @@ export class Home implements OnInit {
     } catch {
       /* ignore */
     }
+    this.guidePrefs.setAudience(role);
     this.showRoleOnboarding.set(false);
     void this.router.navigate(['/guide']);
   }

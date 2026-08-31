@@ -47,6 +47,7 @@ export class Campaigns implements OnInit {
   readonly creatingEmpty = signal(false);
   readonly showEmptyCampaignModal = signal(false);
   readonly emptyCampaignTitle = signal('Nouvelle campagne');
+  readonly emptyCampaignTemplate = signal<'blank' | 'oneshot-classic' | 'oneshot-dungeon' | 'oneshot-intrigue'>('blank');
   readonly isLoggedIn = this.auth.isLoggedIn;
 
   ngOnInit(): void {
@@ -86,6 +87,7 @@ export class Campaigns implements OnInit {
   openEmptyCampaignModal(): void {
     if (!this.auth.isLoggedIn() || this.creatingEmpty()) return;
     this.emptyCampaignTitle.set('Nouvelle campagne');
+    this.emptyCampaignTemplate.set('blank');
     this.showEmptyCampaignModal.set(true);
   }
 
@@ -100,7 +102,7 @@ export class Campaigns implements OnInit {
     this.showEmptyCampaignModal.set(false);
     this.creatingEmpty.set(true);
     this.actionError.set(null);
-    const data = emptyCampaignData();
+    const data = this.buildEmptyCampaignData(this.emptyCampaignTemplate());
 
     if (!this.connectivity.isOnline()) {
       const local = this.offlineSync.queueCampaignCreate(title, data);
@@ -283,5 +285,75 @@ export class Campaigns implements OnInit {
         ),
       ),
     ).pipe(map((list) => list.filter((x): x is CreaturePrintEntry => x !== null)));
+  }
+
+  private buildEmptyCampaignData(
+    template: 'blank' | 'oneshot-classic' | 'oneshot-dungeon' | 'oneshot-intrigue',
+  ): CampaignData {
+    const data = emptyCampaignData();
+    if (template === 'blank') return data;
+
+    const sessionId = crypto.randomUUID?.() ?? `s-${Date.now()}`;
+    const scheduledAt = new Date(Date.now() + 7 * 86_400_000).toISOString();
+
+    if (template === 'oneshot-classic') {
+      return {
+        ...data,
+        notes: 'Acte 1 — Accroche · Acte 2 — Confrontation · Acte 3 — Twist + boss',
+        sessions: [
+          {
+            id: sessionId,
+            title: 'One-shot — 3 actes',
+            scheduledAt,
+            status: 'planned',
+            timeline: [
+              { id: 'tl-1', kind: 'note', label: 'Accroche (10 min)' },
+              { id: 'tl-2', kind: 'encounter', label: 'Rencontre principale' },
+              { id: 'tl-3', kind: 'break', label: 'Pause', durationMin: 10 },
+              { id: 'tl-4', kind: 'encounter', label: 'Boss final' },
+            ],
+          },
+        ],
+      };
+    }
+
+    if (template === 'oneshot-dungeon') {
+      return {
+        ...data,
+        notes: 'Exploration donjon — pièges, salles, boss',
+        sessions: [
+          {
+            id: sessionId,
+            title: 'One-shot donjon',
+            scheduledAt,
+            status: 'planned',
+            timeline: [
+              { id: 'tl-1', kind: 'note', label: 'Entrée du donjon' },
+              { id: 'tl-2', kind: 'encounter', label: 'Salles 1 à 3' },
+              { id: 'tl-3', kind: 'encounter', label: 'Boss salle finale' },
+            ],
+          },
+        ],
+      };
+    }
+
+    return {
+      ...data,
+      tone: 'mysterious',
+      notes: 'Intrigue sociale — indices, PNJ, révélation',
+      sessions: [
+        {
+          id: sessionId,
+          title: 'One-shot intrigue',
+          scheduledAt,
+          status: 'planned',
+          timeline: [
+            { id: 'tl-1', kind: 'note', label: 'Mise en place des PNJ' },
+            { id: 'tl-2', kind: 'handout', label: 'Indice #1' },
+            { id: 'tl-3', kind: 'note', label: 'Révélation finale' },
+          ],
+        },
+      ],
+    };
   }
 }

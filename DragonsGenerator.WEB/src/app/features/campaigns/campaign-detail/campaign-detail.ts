@@ -59,8 +59,14 @@ import type { MemberCharacterAction } from './campaign-detail-roster/campaign-de
 import type { SessionDateChangeEvent, SessionPatchEvent } from './campaign-detail-sessions/campaign-detail-sessions';
 import type { HandoutPatchEvent, HandoutPublishEvent } from './campaign-detail-handouts/campaign-detail-handouts';
 import { handoutIdFromActivity } from './campaign-activity.util';
+import { CampaignSessionCacheService } from '@core/services/campaign-session-cache.service';
+import { CampaignInitiativeInline } from '../campaign-initiative-inline/campaign-initiative-inline';
+import { CampaignPlayerSheet } from '../campaign-player-sheet/campaign-player-sheet';
+import type { SessionTimelineItem } from '@core/models/Campaign/campaign';
+import { LightMarkdownPipe } from '@shared/pipes/light-markdown.pipe';
 
 type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'activity' | 'handouts' | 'maps';
+type TabDef = { id: Tab; label: string; icon: string };
 
 @Component({
   selector: 'app-campaign-detail',
@@ -78,6 +84,9 @@ type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'ac
     CampaignDetailActivity,
     CampaignDetailHandouts,
     AiGenerationProgressBar,
+    CampaignInitiativeInline,
+    CampaignPlayerSheet,
+    LightMarkdownPipe,
   ],
   templateUrl: './campaign-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -96,6 +105,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   private sanitizer = inject(DomSanitizer);
   private storyBuilder = inject(StoryBuilderService);
   private pregenGenerator = inject(CampaignPregenGeneratorService);
+  private sessionCache = inject(CampaignSessionCacheService);
   readonly aiProgress = inject(AiGenerationProgressService);
 
   readonly loading = signal(true);
@@ -124,6 +134,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly focusHandoutId = signal<string | null>(null);
   readonly handoutKindFilter = signal<HandoutKind | 'all'>('all');
   readonly initiativeBoard = signal<InitiativeBoard | null>(null);
+  readonly rosterSheetOpen = signal(false);
+  readonly pinnedOverlayDismissed = signal(false);
 
   private initiativePollTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -208,25 +220,55 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       ?? null;
   });
 
-  /** Onglets visibles : créatures / rencontres réservés au MJ. */
-  readonly visibleTabs = computed(() => {
+  readonly visibleTabs = computed((): TabDef[] => {
     const owner = this.campaign()?.isOwner === true;
-    const tabs: { id: Tab; label: string }[] = [
-      { id: 'overview', label: 'Résumé' },
-      { id: 'activity', label: 'Activité' },
-      { id: 'handouts', label: 'Documents' },
+    const tabs: TabDef[] = [
+      { id: 'overview', label: 'Résumé', icon: 'fluent-emoji:clipboard' },
+      { id: 'activity', label: 'Activité', icon: 'fluent-emoji:bell' },
+      { id: 'handouts', label: 'Documents', icon: 'fluent-emoji:page-facing-up' },
     ];
     if (owner) {
-      tabs.push({ id: 'creatures', label: 'Personnages & créatures' });
-      tabs.push({ id: 'maps', label: 'Cartes & donjons' });
+      tabs.push({ id: 'creatures', label: 'Créatures', icon: 'fluent-emoji:dragon' });
+      tabs.push({ id: 'maps', label: 'Donjons', icon: 'fluent-emoji:world-map' });
     }
-    tabs.push({ id: 'pregens', label: 'Héros pré-tirés' });
+    tabs.push({ id: 'pregens', label: 'Pré-tirés', icon: 'fluent-emoji:performing-arts' });
     if (owner) {
-      tabs.push({ id: 'encounters', label: 'Rencontres & XP' });
+      tabs.push({ id: 'encounters', label: 'Rencontres', icon: 'fluent-emoji:crossed-swords' });
     }
-    tabs.push({ id: 'players', label: 'Joueurs' });
+    tabs.push({ id: 'players', label: 'Joueurs', icon: 'fluent-emoji:busts-in-silhouette' });
     return tabs;
   });
+
+  readonly pinnedHandout = computed(() => {
+    const c = this.campaign();
+    const pinId = c?.data.pinnedHandoutId;
+    if (!pinId) return null;
+    return (c?.data.handouts ?? []).find((h) => h.id === pinId && h.published) ?? null;
+  });
+
+  readonly showPinnedOverlay = computed(
+    () => !this.campaign()?.isOwner && !!this.pinnedHandout() && !this.pinnedOverlayDismissed(),
+  );
+
+  readonly lastPublishedHandoutTitle = computed(() => {
+    const list = (this.campaign()?.data.handouts ?? []).filter((h) => h.published);
+    if (!list.length) return null;
+    return [...list].sort(
+      (a, b) =>
+        new Date(b.publishedAt ?? b.createdAt).getTime() - new Date(a.publishedAt ?? a.createdAt).getTime(),
+    )[0].title;
+  });
+
+  readonly activePlaySession = computed(() => {
+    const c = this.campaign();
+    const id = c?.data.activeSessionId;
+    if (!id) return null;
+    return (c?.data.sessions ?? []).find((s) => s.id === id) ?? null;
+  });
+
+  readonly showMobileSessionBar = computed(
+    () => !!this.activePlaySession() || this.tab() === 'handouts' || this.tab() === 'activity',
+  );
 
   readonly publishedHandoutsCount = computed(
     () => (this.campaign()?.data.handouts ?? []).filter((h) => h.published).length,
@@ -332,6 +374,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       next: (c) => {
         this.campaign.set(c);
         this.loading.set(false);
+        this.sessionCache.cache(c.id, c.title, c.data);
         this.notifications.refresh();
         const t = this.tab();
         if (!c.isOwner && (t === 'creatures' || t === 'encounters')) {
@@ -506,6 +549,56 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       ? { published: true, publishedAt: new Date().toISOString() }
       : { published: false };
     this.updateHandout(handoutId, patch, { immediate: true });
+  }
+
+  pinHandout(handoutId: string): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    const next = c.data.pinnedHandoutId === handoutId ? null : handoutId;
+    this.saveData({ pinnedHandoutId: next });
+  }
+
+  patchEncounter(encId: string, patch: Partial<EncounterGroup>): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    const encounters = (c.data.encounters ?? []).map((e) =>
+      e.id === encId ? { ...e, ...patch } : e,
+    );
+    this.saveData({ encounters });
+  }
+
+  openDungeonForEncounter(enc: EncounterGroup): void {
+    if (enc.dungeonMapId) {
+      this.setTab('maps');
+      return;
+    }
+    this.setTab('maps');
+  }
+
+  onInitiativeSubmitted(): void {
+    const id = this.campaign()?.id;
+    if (!id) return;
+    this.campaigns.getInitiativeBoard(id).subscribe((board) => this.initiativeBoard.set(board));
+  }
+
+  dismissPinnedOverlay(): void {
+    this.pinnedOverlayDismissed.set(true);
+  }
+
+  openHandoutTab(): void {
+    this.setTab('handouts');
+  }
+
+  openActivityTab(): void {
+    this.setTab('activity');
+  }
+
+  openOverviewTab(): void {
+    this.setTab('overview');
+  }
+
+  toggleRosterSheet(): void {
+    this.rosterSheetOpen.update((v) => !v);
   }
 
   deleteHandout(handoutId: string): void {
