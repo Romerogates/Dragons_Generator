@@ -15,7 +15,7 @@ test.describe('Profil utilisateur', () => {
     await page.getByRole('button', { name: 'Enregistrer le profil' }).click();
     await expect(page.getByText('Profil mis à jour.')).toBeVisible({ timeout: 15_000 });
 
-    await page.getByRole('link', { name: 'Voir le profil →' }).click();
+    await page.getByRole('link', { name: 'Voir mon profil →' }).click();
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText(bioText)).toBeVisible({ timeout: 15_000 });
   });
