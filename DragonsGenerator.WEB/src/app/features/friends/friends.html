@@ -83,7 +83,18 @@
         @case ('discover') {
           <div class="space-y-8">
             <div>
-              <label class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-2 block">Rechercher un joueur</label>
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <label class="text-[10px] font-black uppercase tracking-widest text-violet-500">Rechercher un joueur</label>
+                @if (myDisplayName()) {
+                  <button
+                    type="button"
+                    class="text-[9px] font-black uppercase tracking-wider text-sky-400 hover:text-sky-300"
+                    (click)="copyMyPseudo()"
+                  >
+                    Copier mon pseudo
+                  </button>
+                }
+              </div>
               <input
                 type="search"
                 placeholder="Pseudo (min. {{ searchMinLength }} caractères)…"

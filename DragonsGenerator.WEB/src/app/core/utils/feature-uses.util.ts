@@ -90,6 +90,14 @@ export function extractSpellSlotsFromResources(
     .sort((a, b) => a.level - b.level);
 }
 
+/** Niveau de sort max accessible depuis les emplacements JSON (0 si aucun). */
+export function maxSpellLevelFromSlots(
+  slots: { level: number; max: number }[] | undefined,
+): number {
+  if (!slots?.length) return 0;
+  return Math.max(...slots.map((s) => s.level));
+}
+
 /** Emplacements de pacte (sorcier) depuis `pact_slots_count` / `pact_slot_level`. */
 export function extractPactSlotsFromResources(
   resources: Record<string, unknown> | undefined,

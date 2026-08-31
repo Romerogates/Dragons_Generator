@@ -162,9 +162,9 @@ const PANEL_WIZARD = {
 // Lignes mesurées sur grimoire-pretre.jpg (espace 595×842)
 const PANEL_CLERIC = {
   line1X: 448, // Divinité — Domaine (valeur sur la ligne sous le label)
-  line1Y: 258,
-  line2X: 448, // Focaliseur arcanique
-  line2Y: 285,
+  line1Y: 268,
+  line2X: 448, // Symbole sacré / focaliseur
+  line2Y: 298,
   channelsStartY: 365,
   channelsSpacing: 22,
   channelsX: 448,
@@ -1335,6 +1335,10 @@ export class PdfGeneratorService {
 
     spells.slice(0, S.maxRows).forEach((spell, i) => {
       const y = S.tableStartY + i * S.rowH;
+      const effectWidthMm = pxToMmX(S.effectEndX - S.effectX - 8);
+      const approxCharW = 1.85;
+      const maxChars = Math.max(20, Math.floor(effectWidthMm / approxCharW));
+      const effectLines = this.wrapEffectPreview(spell.effectSummary ?? '', maxChars, 2);
       this.drawSpellTableRow(pdf, spell, y, {
         preparedX: S.preparedX,
         nameX: S.nameX,
@@ -1342,7 +1346,7 @@ export class PdfGeneratorService {
         effectWidthMm,
         nameSize: 9,
         effectSize: 6.5,
-        effectMaxLines: 1,
+        effectMaxLines: effectLines.length,
         effectLineHMm: pxToMmY(S.rowH),
       });
     });

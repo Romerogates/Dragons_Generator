@@ -68,6 +68,7 @@ export class FriendsPage implements OnInit, OnDestroy {
   readonly removing = signal(false);
   readonly activeTab = signal<FriendsTab>('discover');
   readonly isLoggedIn = this.auth.isLoggedIn;
+  readonly myDisplayName = computed(() => this.auth.user()?.displayName ?? '');
 
   private searchTimer?: ReturnType<typeof setTimeout>;
 
@@ -250,5 +251,14 @@ export class FriendsPage implements OnInit, OnDestroy {
 
   cardMemberSince(card: DiscoverCard): string {
     return card.memberSince;
+  }
+
+  copyMyPseudo(): void {
+    const name = this.myDisplayName().trim();
+    if (!name) return;
+    navigator.clipboard.writeText(name).then(
+      () => this.message.set('Pseudo copié — partagez-le sur Discord !'),
+      () => this.message.set('Impossible de copier le pseudo.'),
+    );
   }
 }

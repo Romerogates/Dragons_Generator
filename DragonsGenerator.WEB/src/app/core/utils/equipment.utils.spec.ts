@@ -14,6 +14,9 @@ describe('equipment.utils', () => {
   it('resolveEquipmentRefId maps aliases', () => {
     expect(resolveEquipmentRefId('wp-cat-martial')).toBe('category-martial-weapons');
     expect(resolveEquipmentRefId('gr-sac-erudit')).toBe('gr-sac-derudit');
+    expect(resolveEquipmentRefId('gr-sac-dexplorateur')).toBe('gr-sac-dexplorateur');
+    expect(resolveEquipmentRefId('ar-cuir')).toBe('ar-armure-de-cuir');
+    expect(resolveEquipmentRefId('tl-necessaire-alchimiste')).toBe('tl-necessaire-dalchimiste');
     expect(resolveEquipmentRefId('gr-carreau')).toBe('it-carreaux');
     expect(resolveEquipmentRefId('tl-sacoche-a-composantes')).toBe('it-sacoche-a-composantes');
     expect(resolveEquipmentRefId('wp-dague')).toBe('wp-dague');

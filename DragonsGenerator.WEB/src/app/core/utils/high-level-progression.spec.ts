@@ -1,4 +1,4 @@
-import { extractSpellSlotsFromResources, extractPactSlotsFromResources } from './feature-uses.util';
+import { extractSpellSlotsFromResources, extractPactSlotsFromResources, maxSpellLevelFromSlots } from './feature-uses.util';
 import {
   classBonusLanguageCount,
   extractWeaponProficiencyChoices,
@@ -21,6 +21,7 @@ describe('High-level progression (6–20)', () => {
       { level: 4, max: 3 },
       { level: 5, max: 2 },
     ]);
+    expect(maxSpellLevelFromSlots(slots)).toBe(5);
   });
 
   it('counts ASI slots at level 5 vs 20 from progression features', () => {

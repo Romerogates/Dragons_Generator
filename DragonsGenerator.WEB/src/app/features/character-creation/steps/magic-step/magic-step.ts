@@ -18,6 +18,7 @@ import type { Spell } from '@core/models/Spells/spell';
 import type { Deity } from '@core/models/Deities/deity';
 import type { SpellcastingKind, AbilityKey } from '@core/models/Character/character';
 import { warlockArcanumSpellLevels, spellProgressionMilestones } from '@core/utils/progression-choices.util';
+import { maxSpellLevelFromSlots } from '@core/utils/feature-uses.util';
 import {
   spellCastTimeLabel,
   spellComponentsLabel,
@@ -369,10 +370,12 @@ export class MagicStep implements OnInit {
     return this.builder.proficiencyBonus() + mod;
   });
 
-  /** Niveau de sort max accessible (selon emplacements / half-caster). */
+  /** Niveau de sort max accessible (selon emplacements JSON ou repli SRD). */
   readonly maxSpellLevel = computed(() => {
     const kind = this.spellcastingKind();
     const level = this.builder.targetLevel();
+    const fromJson = maxSpellLevelFromSlots(this.builder.creation().classSpellSlots);
+    if (fromJson > 0) return fromJson;
     if (!kind) return 1;
     if (kind === 'warlock') {
       if (level >= 9) return 5;
@@ -404,12 +407,17 @@ export class MagicStep implements OnInit {
 
   private spellsForClass(level: number): Spell[] {
     const classId = this.classId();
+    const targetLevel = this.builder.targetLevel();
+    const kind = this.spellcastingKind();
     return this.allSpells()
       .filter((s) => s.level === level)
       .filter((s) => {
         if (!classId) return true;
         if (!s.classes?.length) return false;
-        return s.classes.includes(classId);
+        if (s.classes.includes(classId)) return true;
+        // Secrets magiques (barde L10+) : sorts de niv. ≤ 5 de toute classe
+        if (kind === 'bard' && targetLevel >= 10 && level <= 5) return true;
+        return false;
       })
       .sort((a, b) => a.name.localeCompare(b.name));
   }
@@ -587,7 +595,8 @@ export class MagicStep implements OnInit {
 
     const grimoireSpells =
       typeof spellcasting?.grimoire?.initial_spells === 'number'
-        ? spellcasting.grimoire.initial_spells + Math.max(0, (targetLevel - 1) * 2)
+        ? spellcasting.grimoire.initial_spells +
+          Math.max(0, (targetLevel - 1) * (spellcasting.grimoire.spells_per_level_up ?? 2))
         : fallback.grimoireSpells;
 
     const isClericOrDruid = kind === 'cleric' || kind === 'druid';
