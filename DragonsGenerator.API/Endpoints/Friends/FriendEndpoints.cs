@@ -5,8 +5,34 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DragonsGenerator.API.Endpoints.Friends;
 
-public record UserSearchResultDto(Guid Id, string DisplayName, string? AvatarEmoji, string AccentColor);
-public record FriendUserDto(Guid Id, string DisplayName, string? AvatarEmoji, string AccentColor);
+public record UserSearchResultDto(
+    Guid Id,
+    string DisplayName,
+    string? AvatarEmoji,
+    string AccentColor,
+    string? Bio,
+    DateTimeOffset MemberSince,
+    string RelationshipStatus
+);
+public record UserSuggestionDto(
+    Guid Id,
+    string DisplayName,
+    string? AvatarEmoji,
+    string AccentColor,
+    string? Bio,
+    DateTimeOffset MemberSince,
+    string RelationshipStatus,
+    string SuggestionReason,
+    int SharedCampaignCount,
+    string? SampleCampaignTitle
+);
+public record FriendUserDto(
+    Guid Id,
+    string DisplayName,
+    string? AvatarEmoji,
+    string AccentColor,
+    DateTimeOffset FriendSince
+);
 public record FriendRequestDto(Guid Id, Guid UserId, string DisplayName, string? AvatarEmoji, string AccentColor, DateTimeOffset CreatedAt);
 public record SendFriendRequestBody(Guid UserId);
 
@@ -28,20 +54,35 @@ public class SearchUsersEndpoint(AppDbContext db) : EndpointWithoutRequest<List<
         }
 
         var q = (Query<string>("q", false) ?? "").Trim();
-        if (q.Length < 2)
+        if (q.Length < FriendDiscoveryHelper.MinSearchLength)
         {
             await Send.OkAsync([], ct);
             return;
         }
 
         var qLower = q.ToLowerInvariant();
-        var results = await db.Users.AsNoTracking()
+        var users = await db.Users.AsNoTracking()
             .Where(u => u.Id != userId && u.EmailConfirmed &&
                 u.DisplayName.ToLower().Contains(qLower))
             .OrderBy(u => u.DisplayName)
             .Take(20)
-            .Select(u => new UserSearchResultDto(u.Id, u.DisplayName, u.AvatarEmoji, u.AccentColor))
             .ToListAsync(ct);
+
+        var relations = await FriendDiscoveryHelper.LoadRelationshipsAsync(
+            db,
+            userId.Value,
+            users.Select(u => u.Id),
+            ct);
+
+        var results = users.Select(u => new UserSearchResultDto(
+            u.Id,
+            u.DisplayName,
+            u.AvatarEmoji,
+            u.AccentColor,
+            u.Bio,
+            u.CreatedAt,
+            FriendDiscoveryHelper.ResolveRelationship(userId.Value, u.Id, relations)
+        )).ToList();
 
         await Send.OkAsync(results, ct);
     }
@@ -70,8 +111,14 @@ public class ListFriendsEndpoint(AppDbContext db) : EndpointWithoutRequest<List<
         var friends = friendships.Select(f =>
         {
             var friend = f.RequesterId == userId ? f.Addressee : f.Requester;
-            return new FriendUserDto(friend.Id, friend.DisplayName, friend.AvatarEmoji, friend.AccentColor);
-        }).OrderBy(f => f.DisplayName).ToList();
+            return new FriendUserDto(
+                friend.Id,
+                friend.DisplayName,
+                friend.AvatarEmoji,
+                friend.AccentColor,
+                f.CreatedAt
+            );
+        }).OrderByDescending(f => f.FriendSince).ThenBy(f => f.DisplayName).ToList();
 
         await Send.OkAsync(friends, ct);
     }
@@ -269,5 +316,80 @@ public class DeclineFriendRequestEndpoint(AppDbContext db) : EndpointWithoutRequ
         friendship.Status = FriendStatuses.Declined;
         await db.SaveChangesAsync(ct);
         await Send.NoContentAsync(ct);
+    }
+}
+
+public class ListFriendSuggestionsEndpoint(AppDbContext db) : EndpointWithoutRequest<List<UserSuggestionDto>>
+{
+    public override void Configure() => Get("/me/friends/suggestions");
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var userId = AuthHelpers.GetUserId(User);
+        if (userId is null)
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        var myCampaignIds = await db.CampaignMembers.AsNoTracking()
+            .Where(m => m.UserId == userId)
+            .Select(m => m.CampaignId)
+            .ToListAsync(ct);
+
+        if (myCampaignIds.Count == 0)
+        {
+            await Send.OkAsync([], ct);
+            return;
+        }
+
+        var coMembers = await db.CampaignMembers.AsNoTracking()
+            .Where(m => myCampaignIds.Contains(m.CampaignId) && m.UserId != userId)
+            .Include(m => m.User)
+            .Include(m => m.Campaign)
+            .Where(m => m.User.EmailConfirmed)
+            .ToListAsync(ct);
+
+        var grouped = coMembers
+            .GroupBy(m => m.UserId)
+            .Select(g =>
+            {
+                var sample = g.OrderByDescending(x => x.Campaign.UpdatedAt).First();
+                return new
+                {
+                    User = sample.User,
+                    SharedCampaignCount = g.Select(x => x.CampaignId).Distinct().Count(),
+                    SampleCampaignTitle = sample.Campaign.Title,
+                };
+            })
+            .OrderByDescending(x => x.SharedCampaignCount)
+            .ThenBy(x => x.User.DisplayName)
+            .Take(20)
+            .ToList();
+
+        var otherIds = grouped.Select(x => x.User.Id).ToList();
+        var relations = await FriendDiscoveryHelper.LoadRelationshipsAsync(
+            db,
+            userId.Value,
+            otherIds,
+            ct);
+
+        var results = grouped
+            .Select(x => new UserSuggestionDto(
+                x.User.Id,
+                x.User.DisplayName,
+                x.User.AvatarEmoji,
+                x.User.AccentColor,
+                x.User.Bio,
+                x.User.CreatedAt,
+                FriendDiscoveryHelper.ResolveRelationship(userId.Value, x.User.Id, relations),
+                "Coéquipier de campagne",
+                x.SharedCampaignCount,
+                x.SampleCampaignTitle
+            ))
+            .Where(x => x.RelationshipStatus == "none")
+            .ToList();
+
+        await Send.OkAsync(results, ct);
     }
 }

@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
+  OnDestroy,
   OnInit,
   signal,
   CUSTOM_ELEMENTS_SCHEMA,
@@ -14,10 +15,27 @@ import { FriendChatService, FriendChatSummary } from '@core/services/friend-chat
 import { FriendChatDockService } from '@core/services/friend-chat-dock.service';
 import { NotificationService } from '@core/services/notification.service';
 import { AuthService } from '@core/services/auth.service';
-import { CampaignInvite, FriendRequest, FriendUser } from '@core/models/Campaign/campaign';
+import {
+  CampaignInvite,
+  FriendRelationshipStatus,
+  FriendRequest,
+  FriendUser,
+  UserSearchResult,
+  UserSuggestion,
+} from '@core/models/Campaign/campaign';
 import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
+import {
+  FRIENDS_SEARCH_DEBOUNCE_MS,
+  FRIENDS_SEARCH_MIN_LENGTH,
+  formatMemberSince,
+  pickRecentFriends,
+  relationshipStatusLabel,
+  shouldTriggerFriendsSearch,
+} from '@core/utils/friends-search.util';
 
-type SearchStatus = 'none' | 'friend' | 'pending_sent' | 'pending_received';
+type FriendsTab = 'discover' | 'friends' | 'requests';
+
+type DiscoverCard = UserSearchResult | UserSuggestion;
 
 @Component({
   selector: 'app-friends',
@@ -27,15 +45,19 @@ type SearchStatus = 'none' | 'friend' | 'pending_sent' | 'pending_received';
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class FriendsPage implements OnInit {
+export class FriendsPage implements OnInit, OnDestroy {
   private friends = inject(FriendsService);
   private chat = inject(FriendChatService);
   private dock = inject(FriendChatDockService);
   private auth = inject(AuthService);
   private notifications = inject(NotificationService);
 
+  readonly searchMinLength = FRIENDS_SEARCH_MIN_LENGTH;
+  readonly shouldTriggerFriendsSearch = shouldTriggerFriendsSearch;
   readonly searchQuery = signal('');
-  readonly searchResults = signal<FriendUser[]>([]);
+  readonly searchResults = signal<UserSearchResult[]>([]);
+  readonly suggestions = signal<UserSuggestion[]>([]);
+  readonly searching = signal(false);
   readonly friendsList = signal<FriendUser[]>([]);
   readonly chatSummaries = signal<FriendChatSummary[]>([]);
   readonly requests = signal<FriendRequest[]>([]);
@@ -44,7 +66,10 @@ export class FriendsPage implements OnInit {
   readonly message = signal<string | null>(null);
   readonly friendToRemove = signal<FriendUser | null>(null);
   readonly removing = signal(false);
+  readonly activeTab = signal<FriendsTab>('discover');
   readonly isLoggedIn = this.auth.isLoggedIn;
+
+  private searchTimer?: ReturnType<typeof setTimeout>;
 
   readonly unreadByFriendId = computed(() => {
     const map = new Map<string, number>();
@@ -54,9 +79,24 @@ export class FriendsPage implements OnInit {
     return map;
   });
 
+  readonly recentFriends = computed(() => pickRecentFriends(this.friendsList()));
+
+  readonly pendingRequestsCount = computed(
+    () => this.requests().length + this.sentRequests().length + this.campaignInvites().length,
+  );
+
+  readonly showSuggestions = computed(
+    () => !shouldTriggerFriendsSearch(this.searchQuery()) && this.suggestions().length > 0,
+  );
+
   ngOnInit(): void {
     if (!this.auth.isLoggedIn()) return;
     this.reload();
+    this.loadSuggestions();
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.searchTimer);
   }
 
   reload(): void {
@@ -68,20 +108,42 @@ export class FriendsPage implements OnInit {
     this.notifications.refresh();
   }
 
-  searchStatus(userId: string): SearchStatus {
-    if (this.friendsList().some((f) => f.id === userId)) return 'friend';
-    if (this.sentRequests().some((r) => r.userId === userId)) return 'pending_sent';
-    if (this.requests().some((r) => r.userId === userId)) return 'pending_received';
-    return 'none';
+  loadSuggestions(): void {
+    this.friends.listSuggestions().subscribe((s) => this.suggestions.set(s));
   }
 
-  search(): void {
-    const q = this.searchQuery().trim();
-    if (q.length < 2) {
+  onSearchInput(value: string): void {
+    this.searchQuery.set(value);
+    clearTimeout(this.searchTimer);
+
+    if (!shouldTriggerFriendsSearch(value)) {
       this.searchResults.set([]);
+      this.searching.set(false);
       return;
     }
-    this.friends.searchUsers(q).subscribe((r) => this.searchResults.set(r));
+
+    this.searching.set(true);
+    this.searchTimer = setTimeout(() => this.runSearch(), FRIENDS_SEARCH_DEBOUNCE_MS);
+  }
+
+  runSearch(): void {
+    const q = this.searchQuery().trim();
+    if (!shouldTriggerFriendsSearch(q)) {
+      this.searchResults.set([]);
+      this.searching.set(false);
+      return;
+    }
+
+    this.friends.searchUsers(q).subscribe({
+      next: (r) => {
+        this.searchResults.set(r);
+        this.searching.set(false);
+      },
+      error: () => {
+        this.searchResults.set([]);
+        this.searching.set(false);
+      },
+    });
   }
 
   sendRequest(userId: string): void {
@@ -90,6 +152,8 @@ export class FriendsPage implements OnInit {
       next: () => {
         this.message.set('Demande envoyée !');
         this.reload();
+        this.runSearch();
+        this.loadSuggestions();
       },
       error: (err) => this.message.set(err?.error?.errors?.[0]?.reason ?? 'Échec de la demande.'),
     });
@@ -139,6 +203,7 @@ export class FriendsPage implements OnInit {
         this.friendToRemove.set(null);
         this.message.set(`${friend.displayName} retiré de vos amis.`);
         this.reload();
+        this.loadSuggestions();
       },
       error: () => {
         this.removing.set(false);
@@ -153,5 +218,37 @@ export class FriendsPage implements OnInit {
 
   openChat(friend: FriendUser): void {
     this.dock.openThread(friend.id, friend.displayName, friend.avatarEmoji, friend.accentColor);
+  }
+
+  setTab(tab: FriendsTab): void {
+    this.activeTab.set(tab);
+  }
+
+  statusLabel(status: FriendRelationshipStatus): string | null {
+    return relationshipStatusLabel(status);
+  }
+
+  memberSinceLabel(iso: string): string {
+    return formatMemberSince(iso);
+  }
+
+  friendSinceLabel(friend: FriendUser): string {
+    return friend.friendSince ? formatMemberSince(friend.friendSince) : '';
+  }
+
+  isSuggestion(card: DiscoverCard): card is UserSuggestion {
+    return 'suggestionReason' in card;
+  }
+
+  cardRelationship(card: DiscoverCard): FriendRelationshipStatus {
+    return card.relationshipStatus;
+  }
+
+  cardBio(card: DiscoverCard): string | null | undefined {
+    return card.bio;
+  }
+
+  cardMemberSince(card: DiscoverCard): string {
+    return card.memberSince;
   }
 }

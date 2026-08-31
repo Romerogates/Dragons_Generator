@@ -193,6 +193,25 @@ export interface FriendUser {
   displayName: string;
   avatarEmoji?: string | null;
   accentColor?: string;
+  friendSince?: string;
+}
+
+export type FriendRelationshipStatus = 'none' | 'friend' | 'pending_sent' | 'pending_received';
+
+export interface UserSearchResult {
+  id: string;
+  displayName: string;
+  avatarEmoji?: string | null;
+  accentColor?: string;
+  bio?: string | null;
+  memberSince: string;
+  relationshipStatus: FriendRelationshipStatus;
+}
+
+export interface UserSuggestion extends UserSearchResult {
+  suggestionReason: string;
+  sharedCampaignCount: number;
+  sampleCampaignTitle?: string | null;
 }
 
 export interface FriendRequest {

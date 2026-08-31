@@ -1,12 +1,12 @@
 <div class="w-full min-h-screen bg-[#171b22] text-slate-300 pb-20 animate-fade-in overflow-x-clip">
-  <section class="border-b border-slate-800 pt-16 pb-12 px-4 text-center">
-    <h1 class="text-3xl sm:text-4xl font-extrabold text-violet-400 font-serif uppercase mb-4">Amis</h1>
+  <section class="border-b border-slate-800 pt-16 pb-10 px-4 text-center">
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-violet-400 font-serif uppercase mb-3">Amis</h1>
     <p class="text-sm text-slate-400 italic max-w-xl mx-auto">
-      Trouvez des joueurs, discutez et gérez vos campagnes ensemble.
+      Découvrez des joueurs, gérez vos amis et vos demandes en un seul endroit.
     </p>
   </section>
 
-  <section class="max-w-2xl mx-auto px-4 py-10 space-y-10 min-w-0">
+  <section class="max-w-2xl mx-auto px-4 py-8 space-y-8 min-w-0">
     @if (!isLoggedIn()) {
       <p class="text-center text-slate-400 py-12">Connectez-vous pour gérer vos amis.</p>
       <div class="text-center">
@@ -20,8 +20,7 @@
       @if (friendToRemove(); as target) {
         <div class="p-4 rounded-xl border border-red-900/50 bg-red-950/20 space-y-3">
           <p class="text-sm text-red-200">
-            Retirer <strong>{{ target.displayName }}</strong> de vos amis ? L'historique de chat sera
-            supprimé.
+            Retirer <strong>{{ target.displayName }}</strong> de vos amis ? L'historique de chat sera supprimé.
           </p>
           <div class="flex flex-wrap gap-2">
             <button
@@ -44,168 +43,304 @@
         </div>
       }
 
-      <div>
-        <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Mes amis ({{ friendsList().length }})</h2>
-        @for (f of friendsList(); track f.id) {
-          <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-3 mb-2 flex flex-wrap items-center justify-between gap-3">
-            <div class="min-w-0 flex items-center gap-3">
-              <app-profile-avatar
-                [displayName]="f.displayName"
-                [avatarEmoji]="f.avatarEmoji"
-                [accentColor]="f.accentColor"
-                size="sm"
-              />
-              <div class="min-w-0 flex items-center gap-2">
-                <p class="font-serif text-slate-200 truncate">
-                  <a [routerLink]="['/profile', f.id]" class="hover:text-violet-300">{{ f.displayName }}</a>
-                </p>
-              @if (unreadCount(f.id) > 0) {
-                <span class="min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950">{{ unreadCount(f.id) }}</span>
-              }
-              </div>
-            </div>
-            <div class="flex flex-wrap gap-2 shrink-0 w-full sm:w-auto">
-              <button
-                type="button"
-                class="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-[10px] font-black uppercase bg-violet-600 text-white hover:bg-violet-500 transition-colors"
-                (click)="openChat(f)"
-                >Chatter</button
-              >
-              <button
-                type="button"
-                class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-[10px] font-black uppercase text-red-300 border border-red-800/50 hover:bg-red-950/30 transition-colors"
-                (click)="confirmRemove(f)"
-              >
-                Retirer
-              </button>
-            </div>
-          </div>
-        } @empty {
-          <p class="text-sm text-slate-500 italic">Aucun ami pour l'instant — cherchez un joueur ci-dessous.</p>
-        }
-      </div>
-
-      <div>
-        <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Rechercher un joueur</h2>
-        <div class="flex flex-col sm:flex-row gap-2">
-          <input
-            type="search"
-            placeholder="Pseudo du joueur..."
-            class="flex-1 min-w-0 bg-[#1b2028] border border-slate-700 rounded-xl py-3 px-4 text-sm"
-            [value]="searchQuery()"
-            (input)="searchQuery.set($any($event.target).value)"
-            (keyup.enter)="search()"
-          />
-          <button type="button" class="px-4 py-3 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white shrink-0" (click)="search()">Chercher</button>
-        </div>
-        <div class="mt-3 space-y-2">
-          @for (u of searchResults(); track u.id) {
-            <div class="flex flex-wrap items-center justify-between gap-2 bg-[#1b2028] border border-slate-800 rounded-xl p-3">
-              <div class="min-w-0 flex items-center gap-3">
-                <app-profile-avatar
-                  [displayName]="u.displayName"
-                  [avatarEmoji]="u.avatarEmoji"
-                  [accentColor]="u.accentColor"
-                  size="sm"
-                />
-                <p class="font-serif text-slate-200 min-w-0 truncate">{{ u.displayName }}</p>
-              </div>
-              @switch (searchStatus(u.id)) {
-                @case ('friend') {
-                  <div class="flex flex-wrap gap-2 shrink-0 w-full sm:w-auto">
-                    <button
-                      type="button"
-                      class="flex-1 sm:flex-none text-center px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-violet-600 text-white"
-                      (click)="openChat(u)"
-                      >Chatter</button
-                    >
-                    <button
-                      type="button"
-                      class="flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-[10px] font-black uppercase text-red-300 border border-red-800/50"
-                      (click)="confirmRemove(u)"
-                    >
-                      Retirer
-                    </button>
-                  </div>
-                }
-                @case ('pending_sent') {
-                  <span class="text-[10px] uppercase text-sky-400 font-bold">Demande envoyée</span>
-                }
-                @case ('pending_received') {
-                  <span class="text-[10px] uppercase text-amber-400 font-bold">Vous a demandé</span>
-                }
-                @default {
-                  <button type="button" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase border border-violet-800/40 text-violet-300 shrink-0" (click)="sendRequest(u.id)">Ajouter</button>
-                }
-              }
-            </div>
+      <div class="flex gap-1 p-1 rounded-xl bg-[#1b2028] border border-slate-800">
+        <button
+          type="button"
+          class="flex-1 py-2.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-colors"
+          [class.text-violet-300]="activeTab() === 'discover'"
+          [class.bg-violet-950/40]="activeTab() === 'discover'"
+          [class.text-slate-500]="activeTab() !== 'discover'"
+          (click)="setTab('discover')"
+        >
+          Découvrir
+        </button>
+        <button
+          type="button"
+          class="flex-1 py-2.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-colors"
+          [class.text-violet-300]="activeTab() === 'friends'"
+          [class.bg-violet-950/40]="activeTab() === 'friends'"
+          [class.text-slate-500]="activeTab() !== 'friends'"
+          (click)="setTab('friends')"
+        >
+          Amis ({{ friendsList().length }})
+        </button>
+        <button
+          type="button"
+          class="flex-1 py-2.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-colors relative"
+          [class.text-violet-300]="activeTab() === 'requests'"
+          [class.bg-violet-950/40]="activeTab() === 'requests'"
+          [class.text-slate-500]="activeTab() !== 'requests'"
+          (click)="setTab('requests')"
+        >
+          Demandes
+          @if (pendingRequestsCount() > 0) {
+            <span class="absolute -top-1 -right-1 min-w-[1rem] h-4 px-1 flex items-center justify-center rounded-full bg-amber-500 text-[8px] font-black text-slate-950">{{ pendingRequestsCount() }}</span>
           }
-        </div>
+        </button>
       </div>
 
-      @if (sentRequests().length) {
-        <div>
-          <h2 class="text-[10px] font-black uppercase tracking-widest text-sky-500 mb-3">Demandes envoyées</h2>
-          @for (r of sentRequests(); track r.id) {
-            <div class="flex flex-wrap items-center justify-between gap-2 bg-[#1b2028] border border-sky-900/30 rounded-xl p-3 mb-2">
-              <div class="min-w-0 flex items-center gap-3">
-                <app-profile-avatar
-                  [displayName]="r.displayName"
-                  [avatarEmoji]="r.avatarEmoji"
-                  [accentColor]="r.accentColor"
-                  size="sm"
-                />
-                <div class="min-w-0">
-                  <span class="font-serif text-slate-200 block truncate">{{ r.displayName }}</span>
-                  <span class="text-[10px] text-slate-500 uppercase tracking-widest">En attente</span>
+      @switch (activeTab()) {
+        @case ('discover') {
+          <div class="space-y-8">
+            <div>
+              <label class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-2 block">Rechercher un joueur</label>
+              <input
+                type="search"
+                placeholder="Pseudo (min. {{ searchMinLength }} caractères)…"
+                class="w-full bg-[#1b2028] border border-slate-700 rounded-xl py-3 px-4 text-sm focus:border-violet-600 outline-none"
+                [value]="searchQuery()"
+                (input)="onSearchInput($any($event.target).value)"
+              />
+              <p class="mt-2 text-[10px] text-slate-500">
+                @if (searchQuery().trim().length > 0 && searchQuery().trim().length < searchMinLength) {
+                  Saisissez au moins {{ searchMinLength }} caractères pour lancer la recherche.
+                } @else if (searching()) {
+                  Recherche en cours…
+                }
+              </p>
+            </div>
+
+            @if (shouldTriggerFriendsSearch(searchQuery())) {
+              <div class="space-y-3">
+                <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500">Résultats</h2>
+                @for (u of searchResults(); track u.id) {
+                  <ng-container *ngTemplateOutlet="playerCard; context: { $implicit: u }"></ng-container>
+                } @empty {
+                  @if (!searching()) {
+                    <p class="text-sm text-slate-500 italic">Aucun joueur trouvé.</p>
+                  }
+                }
+              </div>
+            } @else {
+              @if (showSuggestions()) {
+                <div class="space-y-3">
+                  <h2 class="text-[10px] font-black uppercase tracking-widest text-sky-500">Coéquipiers de campagne</h2>
+                  @for (u of suggestions(); track u.id) {
+                    <ng-container *ngTemplateOutlet="playerCard; context: { $implicit: u, suggestion: true }"></ng-container>
+                  }
+                </div>
+              }
+
+              @if (recentFriends().length) {
+                <div class="space-y-3">
+                  <h2 class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Amis récents</h2>
+                  @for (f of recentFriends(); track f.id) {
+                    <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
+                      <div class="min-w-0 flex items-center gap-3">
+                        <app-profile-avatar
+                          [displayName]="f.displayName"
+                          [avatarEmoji]="f.avatarEmoji"
+                          [accentColor]="f.accentColor"
+                          size="lg"
+                        />
+                        <div class="min-w-0">
+                          <p class="font-serif text-slate-100 truncate">
+                            <a [routerLink]="['/profile', f.id]" class="hover:text-violet-300">{{ f.displayName }}</a>
+                          </p>
+                          @if (friendSinceLabel(f); as since) {
+                            <p class="text-[10px] text-slate-500 uppercase tracking-widest">Amis depuis {{ since }}</p>
+                          }
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        class="px-4 py-2 rounded-lg text-[10px] font-black uppercase bg-violet-600 text-white"
+                        (click)="openChat(f)"
+                      >
+                        Chatter
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+
+              @if (!showSuggestions() && !recentFriends().length) {
+                <p class="text-sm text-slate-500 italic text-center py-8">
+                  Recherchez un joueur ou rejoignez une campagne pour voir des suggestions.
+                </p>
+              }
+            }
+          </div>
+        }
+
+        @case ('friends') {
+          <div class="space-y-3">
+            @for (f of friendsList(); track f.id) {
+              <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
+                <div class="min-w-0 flex items-center gap-3">
+                  <app-profile-avatar
+                    [displayName]="f.displayName"
+                    [avatarEmoji]="f.avatarEmoji"
+                    [accentColor]="f.accentColor"
+                    size="lg"
+                  />
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                      <p class="font-serif text-slate-100 truncate">
+                        <a [routerLink]="['/profile', f.id]" class="hover:text-violet-300">{{ f.displayName }}</a>
+                      </p>
+                      @if (unreadCount(f.id) > 0) {
+                        <span class="min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950">{{ unreadCount(f.id) }}</span>
+                      }
+                    </div>
+                    @if (friendSinceLabel(f); as since) {
+                      <p class="text-[10px] text-slate-500 uppercase tracking-widest">Amis depuis {{ since }}</p>
+                    }
+                  </div>
+                </div>
+                <div class="flex flex-wrap gap-2 shrink-0 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-[10px] font-black uppercase bg-violet-600 text-white"
+                    (click)="openChat(f)"
+                  >
+                    Chatter
+                  </button>
+                  <button
+                    type="button"
+                    class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-[10px] font-black uppercase text-red-300 border border-red-800/50"
+                    (click)="confirmRemove(f)"
+                  >
+                    Retirer
+                  </button>
                 </div>
               </div>
-              <button type="button" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase text-red-400 border border-red-900/30 shrink-0" (click)="cancelSent(r.id)">Annuler</button>
-            </div>
-          }
-        </div>
-      }
+            } @empty {
+              <p class="text-sm text-slate-500 italic text-center py-12">Aucun ami pour l'instant — explorez l'onglet Découvrir.</p>
+            }
+          </div>
+        }
 
-      @if (requests().length) {
-        <div>
-          <h2 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-3">Demandes reçues</h2>
-          @for (r of requests(); track r.id) {
-            <div class="flex flex-wrap items-center justify-between gap-2 bg-[#1b2028] border border-slate-800 rounded-xl p-3 mb-2">
-              <div class="min-w-0 flex items-center gap-3">
-                <app-profile-avatar
-                  [displayName]="r.displayName"
-                  [avatarEmoji]="r.avatarEmoji"
-                  [accentColor]="r.accentColor"
-                  size="sm"
-                />
-                <span class="font-serif min-w-0 truncate">{{ r.displayName }}</span>
+        @case ('requests') {
+          <div class="space-y-8">
+            @if (requests().length) {
+              <div>
+                <h2 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-3">Demandes reçues</h2>
+                @for (r of requests(); track r.id) {
+                  <div class="flex flex-wrap items-center justify-between gap-2 bg-[#1b2028] border border-slate-800 rounded-xl p-3 mb-2">
+                    <div class="min-w-0 flex items-center gap-3">
+                      <app-profile-avatar
+                        [displayName]="r.displayName"
+                        [avatarEmoji]="r.avatarEmoji"
+                        [accentColor]="r.accentColor"
+                        size="sm"
+                      />
+                      <span class="font-serif min-w-0 truncate">{{ r.displayName }}</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 shrink-0">
+                      <button type="button" class="px-3 py-1 text-[10px] font-black uppercase text-emerald-400" (click)="accept(r.id)">Accepter</button>
+                      <button type="button" class="px-3 py-1 text-[10px] font-black uppercase text-slate-500" (click)="decline(r.id)">Refuser</button>
+                    </div>
+                  </div>
+                }
               </div>
-              <div class="flex flex-wrap gap-2 shrink-0">
-                <button type="button" class="px-3 py-1 text-[10px] font-black uppercase text-emerald-400" (click)="accept(r.id)">Accepter</button>
-                <button type="button" class="px-3 py-1 text-[10px] font-black uppercase text-slate-500" (click)="decline(r.id)">Refuser</button>
-              </div>
-            </div>
-          }
-        </div>
-      }
+            }
 
-      @if (campaignInvites().length) {
-        <div>
-          <h2 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-3">Invitations campagne</h2>
-          @for (inv of campaignInvites(); track inv.id) {
-            <div class="bg-amber-950/20 border border-amber-900/40 rounded-xl p-3 mb-2 flex flex-wrap justify-between items-center gap-3">
-              <div class="min-w-0">
-                <p class="font-serif truncate">{{ inv.campaignTitle }}</p>
-                <p class="text-xs text-slate-500 truncate">par {{ inv.invitedByName }}</p>
+            @if (sentRequests().length) {
+              <div>
+                <h2 class="text-[10px] font-black uppercase tracking-widest text-sky-500 mb-3">Demandes envoyées</h2>
+                @for (r of sentRequests(); track r.id) {
+                  <div class="flex flex-wrap items-center justify-between gap-2 bg-[#1b2028] border border-sky-900/30 rounded-xl p-3 mb-2">
+                    <div class="min-w-0 flex items-center gap-3">
+                      <app-profile-avatar
+                        [displayName]="r.displayName"
+                        [avatarEmoji]="r.avatarEmoji"
+                        [accentColor]="r.accentColor"
+                        size="sm"
+                      />
+                      <div class="min-w-0">
+                        <span class="font-serif text-slate-200 block truncate">{{ r.displayName }}</span>
+                        <span class="text-[10px] text-slate-500 uppercase tracking-widest">En attente</span>
+                      </div>
+                    </div>
+                    <button type="button" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase text-red-400 border border-red-900/30 shrink-0" (click)="cancelSent(r.id)">Annuler</button>
+                  </div>
+                }
               </div>
-              <div class="flex flex-wrap gap-2 shrink-0">
-                <button type="button" class="px-3 py-1 text-[10px] font-black uppercase text-emerald-400" (click)="acceptCampaign(inv.id)">Rejoindre</button>
-                <button type="button" class="px-3 py-1 text-[10px] font-black uppercase text-slate-500" (click)="declineCampaign(inv.id)">Refuser</button>
+            }
+
+            @if (campaignInvites().length) {
+              <div>
+                <h2 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-3">Invitations campagne</h2>
+                @for (inv of campaignInvites(); track inv.id) {
+                  <div class="bg-amber-950/20 border border-amber-900/40 rounded-xl p-3 mb-2 flex flex-wrap justify-between items-center gap-3">
+                    <div class="min-w-0">
+                      <p class="font-serif truncate">{{ inv.campaignTitle }}</p>
+                      <p class="text-xs text-slate-500 truncate">par {{ inv.invitedByName }}</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 shrink-0">
+                      <button type="button" class="px-3 py-1 text-[10px] font-black uppercase text-emerald-400" (click)="acceptCampaign(inv.id)">Rejoindre</button>
+                      <button type="button" class="px-3 py-1 text-[10px] font-black uppercase text-slate-500" (click)="declineCampaign(inv.id)">Refuser</button>
+                    </div>
+                  </div>
+                }
               </div>
-            </div>
-          }
-        </div>
+            }
+
+            @if (!pendingRequestsCount()) {
+              <p class="text-sm text-slate-500 italic text-center py-12">Aucune demande en attente.</p>
+            }
+          </div>
+        }
       }
     }
   </section>
 </div>
+
+<ng-template #playerCard let-u let-suggestion="suggestion">
+  <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 space-y-3">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div class="min-w-0 flex items-start gap-3">
+        <app-profile-avatar
+          [displayName]="u.displayName"
+          [avatarEmoji]="u.avatarEmoji"
+          [accentColor]="u.accentColor"
+          size="lg"
+        />
+        <div class="min-w-0">
+          <div class="flex flex-wrap items-center gap-2">
+            <p class="font-serif text-slate-100 truncate">
+              <a [routerLink]="['/profile', u.id]" class="hover:text-violet-300">{{ u.displayName }}</a>
+            </p>
+            @if (statusLabel(cardRelationship(u)); as badge) {
+              <span class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">{{ badge }}</span>
+            }
+          </div>
+          @if (memberSinceLabel(cardMemberSince(u)); as joined) {
+            <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Membre depuis {{ joined }}</p>
+          }
+          @if (suggestion && isSuggestion(u)) {
+            <p class="text-xs text-sky-400/90 mt-1">
+              {{ u.suggestionReason }}
+              @if (u.sharedCampaignCount > 1) {
+                · {{ u.sharedCampaignCount }} campagnes communes
+              } @else if (u.sampleCampaignTitle) {
+                · {{ u.sampleCampaignTitle }}
+              }
+            </p>
+          }
+          @if (cardBio(u); as bio) {
+            <p class="text-sm text-slate-400 mt-2 line-clamp-2">{{ bio }}</p>
+          }
+        </div>
+      </div>
+    </div>
+    @switch (cardRelationship(u)) {
+      @case ('friend') {
+        <div class="flex flex-wrap gap-2">
+          <button type="button" class="px-4 py-2 rounded-lg text-[10px] font-black uppercase bg-violet-600 text-white" (click)="openChat(u)">Chatter</button>
+          <button type="button" class="px-4 py-2 rounded-lg text-[10px] font-black uppercase text-red-300 border border-red-800/50" (click)="confirmRemove(u)">Retirer</button>
+        </div>
+      }
+      @case ('pending_sent') {
+        <span class="text-[10px] uppercase text-sky-400 font-bold">Demande envoyée</span>
+      }
+      @case ('pending_received') {
+        <span class="text-[10px] uppercase text-amber-400 font-bold">Vous a demandé en ami</span>
+      }
+      @default {
+        <button type="button" class="px-4 py-2 rounded-lg text-[10px] font-black uppercase border border-violet-800/40 text-violet-300" (click)="sendRequest(u.id)">Ajouter</button>
+      }
+    }
+  </div>
+</ng-template>

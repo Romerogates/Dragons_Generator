@@ -3,8 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, tap } from 'rxjs';
 import { environment } from '@env/environment';
 import { AuthService } from './auth.service';
-import { CampaignInvite, FriendRequest, FriendUser } from '../models/Campaign/campaign';
+import { CampaignInvite, FriendRequest, FriendUser, UserSearchResult, UserSuggestion } from '../models/Campaign/campaign';
 import { OfflineProfileService } from './offline-profile.service';
+import { FRIENDS_SEARCH_MIN_LENGTH } from '../utils/friends-search.util';
 
 @Injectable({ providedIn: 'root' })
 export class FriendsService {
@@ -13,9 +14,14 @@ export class FriendsService {
   private readonly offline = inject(OfflineProfileService);
   private readonly api = environment.apiUrl;
 
-  searchUsers(q: string): Observable<FriendUser[]> {
-    if (!this.auth.isLoggedIn() || q.trim().length < 2) return of([]);
-    return this.http.get<FriendUser[]>(`${this.api}/users/search`, { params: { q } });
+  searchUsers(q: string): Observable<UserSearchResult[]> {
+    if (!this.auth.isLoggedIn() || q.trim().length < FRIENDS_SEARCH_MIN_LENGTH) return of([]);
+    return this.http.get<UserSearchResult[]>(`${this.api}/users/search`, { params: { q } });
+  }
+
+  listSuggestions(): Observable<UserSuggestion[]> {
+    if (!this.auth.isLoggedIn()) return of([]);
+    return this.http.get<UserSuggestion[]>(`${this.api}/me/friends/suggestions`);
   }
 
   listFriends(): Observable<FriendUser[]> {
