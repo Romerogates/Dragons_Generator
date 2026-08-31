@@ -45,6 +45,12 @@ jobs:
           npm ci
           npm test
 
+      - name: Angular lint
+        working-directory: DragonsGenerator.WEB
+        run: |
+          npm ci
+          npm run lint
+
   e2e:
     needs: test
     runs-on: ubuntu-latest

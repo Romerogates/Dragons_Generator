@@ -67,166 +67,35 @@
       @switch (tab()) {
         @case ('overview') {
           <section class="space-y-6">
-            <!-- Tableau de bord (créatures / rencontres / XP = MJ seulement) -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-              @if (c.isOwner) {
-                <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
-                  <p class="text-2xl font-bold text-violet-400">{{ c.data.creatures.length }}</p>
-                  <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Créatures</p>
-                </div>
-                <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
-                  <p class="text-2xl font-bold text-violet-400">{{ c.data.encounters.length }}</p>
-                  <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Rencontres</p>
-                </div>
-              }
-              <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
-                <p class="text-2xl font-bold text-violet-400">{{ players().length }}</p>
-                <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Joueurs</p>
-              </div>
-              @if (c.isOwner) {
-                <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
-                  <p class="text-2xl font-bold text-emerald-400">{{ totalXpAwarded() }}</p>
-                  <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">XP distribuée</p>
-                </div>
-              } @else {
-                <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
-                  <p class="text-2xl font-bold text-emerald-400">{{ myXpEarned() }}</p>
-                  <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Mon XP</p>
-                </div>
-                @if (myPlayerMember()?.approvedCharacterName; as charName) {
-                  <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center col-span-2 md:col-span-1">
-                    <p class="text-lg font-bold text-sky-400 truncate">{{ charName }}</p>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Mon personnage</p>
-                  </div>
-                }
-              }
-            </div>
+            <app-campaign-detail-stats
+              [isOwner]="c.isOwner"
+              [creatureCount]="c.data.creatures.length"
+              [encounterCount]="c.data.encounters.length"
+              [playerCount]="players().length"
+              [totalXpAwarded]="totalXpAwarded()"
+              [myXpEarned]="myXpEarned()"
+              [approvedCharacterName]="myPlayerMember()?.approvedCharacterName"
+            />
 
             @if (c.isOwner) {
               <app-campaign-play-panel [campaign]="c" (campaignChange)="campaign.set($event)" />
             }
 
-            @if (c.isOwner && (approvedPlayersWithCharacter().length || pendingProposals().length || playersNeedingCharacter().length)) {
-              <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5 space-y-4">
-                <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-400">
-                  <iconify-icon icon="fluent-emoji:busts-in-silhouette"></iconify-icon> Groupe — personnages joueurs
-                </h2>
-
-                @if (rosterFeedback(); as fb) {
-                  <p class="text-sm text-emerald-400">{{ fb }}</p>
-                }
-
-                @if (playersNeedingCharacter().length) {
-                  <div class="space-y-3">
-                    <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">Sans personnage</p>
-                    @for (m of playersNeedingCharacter(); track m.id) {
-                      <article class="p-4 rounded-xl border border-sky-900/40 bg-sky-950/15">
-                        <p class="font-bold text-slate-100">{{ m.displayName }}</p>
-                        <p class="text-sm text-sky-300 mt-1">
-                          @if (m.proposalStatus === 'rejected') {
-                            Proposition refusée — en attente d’un nouveau choix
-                          } @else {
-                            A rejoint la table — pas encore de personnage proposé
-                          }
-                        </p>
-                        <div class="flex flex-wrap gap-2 mt-3">
-                          <button
-                            type="button"
-                            class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-sky-950/40 border border-sky-700/50 text-sky-200 disabled:opacity-50"
-                            [disabled]="isCharacterRequestLoading(m.id)"
-                            (click)="requestCharacterPick(m)"
-                          >
-                            {{ isCharacterRequestLoading(m.id) ? 'Envoi…' : 'Demander un personnage' }}
-                          </button>
-                          <button type="button" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40" (click)="removeMember(m)">Retirer</button>
-                        </div>
-                      </article>
-                    }
-                  </div>
-                }
-
-                @if (pendingProposals().length) {
-                  <div class="space-y-3">
-                    <p class="text-[10px] font-black uppercase tracking-widest text-amber-500">En attente d'approbation</p>
-                    @for (m of pendingProposals(); track m.id) {
-                      <article class="p-4 rounded-xl border border-amber-900/40 bg-amber-950/20">
-                        <p class="font-bold text-slate-100">{{ m.displayName }}</p>
-                        <p class="text-sm text-amber-300 mt-1">
-                          Propose : {{ m.proposedCharacterName }} (niv. {{ m.proposedCharacterLevel ?? '?' }})
-                        </p>
-                        <div class="flex flex-wrap gap-2 mt-3">
-                          <button
-                            type="button"
-                            class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
-                            [disabled]="isMemberCharacterLoading(m.id, 'proposed')"
-                            (click)="viewMemberCharacter(m, 'proposed')"
-                          >
-                            @if (isMemberCharacterLoading(m.id, 'proposed')) { Chargement… }
-                            @else { Voir la fiche proposée }
-                          </button>
-                          <button
-                            type="button"
-                            class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
-                            [disabled]="isMemberCharacterLoading(m.id, 'proposed')"
-                            (click)="printMemberFullSheet(m, 'proposed')"
-                          >
-                            PDF fiche complète
-                          </button>
-                          <button type="button" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-emerald-950/30 text-emerald-300 border border-emerald-800/40" (click)="approveMember(m)">Accepter</button>
-                          <button type="button" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40" (click)="rejectMember(m)">Refuser</button>
-                          <button type="button" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40" (click)="removeMember(m)">Retirer</button>
-                        </div>
-                      </article>
-                    }
-                  </div>
-                }
-
-                @if (approvedPlayersWithCharacter().length) {
-                  <div class="space-y-3">
-                    @if (pendingProposals().length) {
-                      <p class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Approuvés</p>
-                    }
-                    @for (m of approvedPlayersWithCharacter(); track m.id) {
-                      <article class="p-4 rounded-xl border border-slate-800 bg-[#171b22] flex flex-wrap items-center justify-between gap-3">
-                        <div>
-                          <p class="font-bold text-slate-100">{{ m.displayName }}</p>
-                          <p class="text-sm text-violet-300 mt-1">
-                            {{ m.approvedCharacterName }} (niv. {{ m.approvedCharacterLevel ?? '?' }})
-                          </p>
-                          <p class="text-[10px] text-emerald-400/80 uppercase tracking-widest mt-1">{{ m.xpEarnedInCampaign }} XP</p>
-                        </div>
-                        <div class="flex flex-wrap gap-2">
-                          <button
-                            type="button"
-                            class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-violet-950/30 border border-violet-800/50 text-violet-300 disabled:opacity-50"
-                            [disabled]="isMemberCharacterLoading(m.id, 'approved')"
-                            (click)="viewMemberCharacter(m, 'approved')"
-                          >
-                            @if (isMemberCharacterLoading(m.id, 'approved')) { Chargement… }
-                            @else { Voir la fiche }
-                          </button>
-                          <button
-                            type="button"
-                            class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-[#1b2028] border border-violet-800/50 text-violet-300 disabled:opacity-50"
-                            [disabled]="isMemberCharacterLoading(m.id, 'approved')"
-                            (click)="printMemberFullSheet(m, 'approved')"
-                          >
-                            PDF fiche complète
-                          </button>
-                          <button
-                            type="button"
-                            class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 border border-red-900/40 text-red-300"
-                            (click)="removeMember(m)"
-                          >
-                            Retirer
-                          </button>
-                        </div>
-                      </article>
-                    }
-                  </div>
-                }
-              </div>
-            }
+            <app-campaign-detail-roster
+              [visible]="showOverviewRoster()"
+              [feedback]="rosterFeedback()"
+              [playersNeedingCharacter]="playersNeedingCharacter()"
+              [pendingProposals]="pendingProposals()"
+              [approvedPlayers]="approvedPlayersWithCharacter()"
+              [characterRequestLoadingId]="characterRequestLoadingId()"
+              [memberCharacterLoadingKey]="memberCharacterLoadingId()"
+              (requestCharacterPick)="requestCharacterPick($event)"
+              (removeMember)="removeMember($event)"
+              (approveMember)="approveMember($event)"
+              (rejectMember)="rejectMember($event)"
+              (viewMemberCharacter)="onRosterMemberCharacterAction($event, 'view')"
+              (printMemberFullSheet)="onRosterMemberCharacterAction($event, 'print')"
+            />
 
             @if (c.isOwner) {
               <div class="bg-violet-950/20 border border-violet-800/40 rounded-2xl p-5">
@@ -305,187 +174,22 @@
             </div>
             }
 
-            <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5 space-y-4">
-              <div class="flex flex-wrap items-center justify-between gap-3">
-                <h2 class="text-[10px] font-black uppercase tracking-widest text-amber-500">
-                  Sessions
-                </h2>
-                @if (c.isOwner) {
-                  <button
-                    type="button"
-                    class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-amber-950/30 border border-amber-800/50 text-amber-300"
-                    (click)="addSession()"
-                  >
-                    + Planifier
-                  </button>
-                }
-              </div>
-
-              @if (c.isOwner) {
-                @for (session of sortedSessions(); track session.id) {
-                  <article class="rounded-xl border border-slate-700/60 overflow-hidden">
-                    @if (editingSessionId() === session.id) {
-                      <div class="p-4 space-y-3 bg-[#171b22]/60">
-                        <div class="flex flex-wrap gap-2 items-center justify-between">
-                          <p class="text-[10px] font-black uppercase tracking-widest text-amber-500">Modifier la session</p>
-                          <button
-                            type="button"
-                            class="px-2 py-1 rounded-lg text-[10px] font-black uppercase text-slate-400 border border-slate-700"
-                            (click)="stopEditSession()"
-                          >
-                            Terminé
-                          </button>
-                        </div>
-                        <label class="block">
-                          <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Titre</span>
-                          <input
-                            type="text"
-                            class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200"
-                            [ngModel]="session.title"
-                            (ngModelChange)="updateSession(session.id, { title: $event })"
-                          />
-                        </label>
-                        <div class="flex flex-wrap gap-2 items-end">
-                          <label class="flex-1 min-w-[8rem]">
-                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Statut</span>
-                            <select
-                              class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-2 py-2 text-[10px] font-black uppercase text-slate-400"
-                              [ngModel]="session.status"
-                              (ngModelChange)="updateSession(session.id, { status: $event }, { immediate: true })"
-                            >
-                              <option value="planned">Planifiée</option>
-                              <option value="played">Jouée</option>
-                              <option value="cancelled">Annulée</option>
-                            </select>
-                          </label>
-                          <button
-                            type="button"
-                            class="px-2 py-2 rounded-lg text-[10px] font-black uppercase text-red-400 border border-red-900/40"
-                            (click)="removeSession(session.id)"
-                          >
-                            Supprimer
-                          </button>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          <label>
-                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Date & heure</span>
-                            <input
-                              type="datetime-local"
-                              class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300"
-                              [ngModel]="sessionInputValue(session.scheduledAt)"
-                              (ngModelChange)="onSessionDateChange(session.id, $event)"
-                            />
-                          </label>
-                          <label>
-                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Lieu</span>
-                            <input
-                              type="text"
-                              placeholder="En ligne, salle…"
-                              class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300"
-                              [ngModel]="session.location ?? ''"
-                              (ngModelChange)="updateSession(session.id, { location: $event || undefined })"
-                            />
-                          </label>
-                        </div>
-                        <label class="block">
-                          <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Notes MJ</span>
-                          <textarea
-                            rows="2"
-                            placeholder="Préparation, objectifs…"
-                            class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-400"
-                            [ngModel]="session.notes ?? ''"
-                            (ngModelChange)="updateSession(session.id, { notes: $event || undefined })"
-                          ></textarea>
-                        </label>
-                      </div>
-                    } @else {
-                      <div class="px-4 py-3 flex flex-wrap items-start justify-between gap-3">
-                        <div class="min-w-0">
-                          <div class="flex flex-wrap items-center gap-2 mb-1">
-                            <h3 class="font-serif text-amber-200 text-lg truncate">{{ session.title }}</h3>
-                            <span
-                              class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border"
-                              [class]="sessionStatusChipClass(session.status)"
-                            >
-                              {{ sessionStatusLabel(session.status) }}
-                            </span>
-                          </div>
-                          <p class="text-sm text-slate-400">
-                            {{ formatSessionDate(session.scheduledAt) }}
-                            @if (session.location) {
-                              <span class="text-slate-500"> · {{ session.location }}</span>
-                            }
-                          </p>
-                          @if (session.notes) {
-                            <p class="text-xs text-slate-500 mt-2 line-clamp-2">{{ session.notes }}</p>
-                          }
-                        </div>
-                        <div class="flex flex-wrap gap-2">
-                          @if (session.status === 'planned' && !activeSession()) {
-                            <button
-                              type="button"
-                              class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-emerald-800/50 text-emerald-300 hover:border-emerald-500/50"
-                              (click)="startPlaySession(session.id)"
-                            >
-                              Démarrer
-                            </button>
-                          }
-                          <button
-                            type="button"
-                            class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:border-amber-500/50 hover:text-amber-300"
-                            (click)="startEditSession(session.id)"
-                          >
-                            Modifier
-                          </button>
-                        </div>
-                      </div>
-                    }
-                  </article>
-                } @empty {
-                  <p class="text-sm text-slate-500 italic">Aucune session planifiée.</p>
-                }
-              } @else {
-                @for (session of upcomingSessions(); track session.id) {
-                  <div class="rounded-xl border border-amber-900/30 bg-amber-950/10 px-4 py-3">
-                    <div class="flex flex-wrap items-center gap-2 mb-1">
-                      <p class="font-serif text-amber-200 text-lg">{{ session.title }}</p>
-                      <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border border-amber-800/50 text-amber-300 bg-amber-950/30">
-                        {{ sessionStatusLabel(session.status) }}
-                      </span>
-                    </div>
-                    <p class="text-sm text-slate-400">
-                      {{ formatSessionDate(session.scheduledAt) }}
-                      @if (session.location) { · {{ session.location }} }
-                    </p>
-                  </div>
-                } @empty {
-                  <p class="text-sm text-slate-500 italic">Aucune session à venir.</p>
-                }
-
-                @if (pastSessions().length) {
-                  <div class="mt-6 pt-6 border-t border-slate-800 space-y-3">
-                    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-500">Sessions passées</h3>
-                    @for (session of pastSessions(); track session.id) {
-                      <div class="rounded-xl border border-slate-800 bg-[#171b22] px-4 py-3">
-                        <div class="flex flex-wrap items-center gap-2 mb-1">
-                          <p class="font-serif text-slate-200">{{ session.title }}</p>
-                          <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border border-slate-700 text-slate-400 bg-slate-900/40">
-                            {{ sessionStatusLabel(session.status) }}
-                          </span>
-                        </div>
-                        <p class="text-sm text-slate-500">
-                          {{ formatSessionDate(session.scheduledAt) }}
-                          @if (session.location) { · {{ session.location }} }
-                        </p>
-                        @if (session.notes) {
-                          <p class="text-xs text-slate-600 mt-2 line-clamp-3">{{ session.notes }}</p>
-                        }
-                      </div>
-                    }
-                  </div>
-                }
-              }
-            </div>
+            <app-campaign-detail-sessions
+              [isOwner]="c.isOwner"
+              [sortedSessions]="sortedSessions()"
+              [upcomingSessions]="upcomingSessions()"
+              [pastSessions]="pastSessions()"
+              [editingSessionId]="editingSessionId()"
+              [hasActiveSession]="!!activeSession()"
+              (addSession)="addSession()"
+              (startEditSession)="startEditSession($event)"
+              (stopEditSession)="stopEditSession()"
+              (startPlaySession)="startPlaySession($event)"
+              (removeSession)="removeSession($event)"
+              (sessionPatch)="onSessionPatch($event)"
+              (sessionPatchImmediate)="onSessionPatchImmediate($event)"
+              (sessionDateChange)="onSessionDateChangeEvent($event)"
+            />
 
             @if (!c.isOwner && publishedHandoutsCount() > 0) {
               <button

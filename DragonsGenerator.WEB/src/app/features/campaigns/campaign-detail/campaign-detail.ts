@@ -52,6 +52,11 @@ import { AiGenerationProgressService } from '@core/services/ai-generation-progre
 import { AiGenerationProgressBar } from '@shared/components/ai-generation-progress-bar/ai-generation-progress-bar';
 import { CampaignPlayPanel } from '../campaign-play-panel/campaign-play-panel';
 import { CampaignDungeonMaps } from '../campaign-dungeon-maps/campaign-dungeon-maps';
+import { CampaignDetailStats } from './campaign-detail-stats/campaign-detail-stats';
+import { CampaignDetailRoster } from './campaign-detail-roster/campaign-detail-roster';
+import { CampaignDetailSessions } from './campaign-detail-sessions/campaign-detail-sessions';
+import type { MemberCharacterAction } from './campaign-detail-roster/campaign-detail-roster';
+import type { SessionDateChangeEvent, SessionPatchEvent } from './campaign-detail-sessions/campaign-detail-sessions';
 import { LightMarkdownPipe } from '@shared/pipes/light-markdown.pipe';
 import { firstValueFrom } from 'rxjs';
 
@@ -60,7 +65,19 @@ type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'ac
 @Component({
   selector: 'app-campaign-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ProfileAvatarComponent, CampaignPlayPanel, CampaignDungeonMaps, LightMarkdownPipe, AiGenerationProgressBar],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    ProfileAvatarComponent,
+    CampaignPlayPanel,
+    CampaignDungeonMaps,
+    CampaignDetailStats,
+    CampaignDetailRoster,
+    CampaignDetailSessions,
+    LightMarkdownPipe,
+    AiGenerationProgressBar,
+  ],
   templateUrl: './campaign-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -161,6 +178,16 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     return [...sessions]
       .filter((s) => s.status === 'played')
       .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime());
+  });
+
+  readonly showOverviewRoster = computed(() => {
+    const c = this.campaign();
+    if (!c?.isOwner) return false;
+    return (
+      this.approvedPlayersWithCharacter().length > 0 ||
+      this.pendingProposals().length > 0 ||
+      this.playersNeedingCharacter().length > 0
+    );
   });
 
   readonly activeSession = computed(() => {
@@ -489,14 +516,21 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     return this.focusHandoutId() === handoutId;
   }
 
-  formatSessionDate(iso: string): string {
-    return new Date(iso).toLocaleString('fr-FR', {
-      weekday: 'short',
-      day: 'numeric',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  onSessionPatch(event: SessionPatchEvent): void {
+    this.updateSession(event.sessionId, event.patch);
+  }
+
+  onSessionPatchImmediate(event: SessionPatchEvent): void {
+    this.updateSession(event.sessionId, event.patch, { immediate: true });
+  }
+
+  onSessionDateChangeEvent(event: SessionDateChangeEvent): void {
+    this.onSessionDateChange(event.sessionId, event.value);
+  }
+
+  onRosterMemberCharacterAction(action: MemberCharacterAction, mode: 'view' | 'print'): void {
+    if (mode === 'view') this.viewMemberCharacter(action.member, action.scope);
+    else this.printMemberFullSheet(action.member, action.scope);
   }
 
   formatHandoutDate(iso?: string): string {
@@ -658,33 +692,6 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.saveData({
       sessions: (c.data.sessions ?? []).filter((s) => s.id !== sessionId),
     });
-  }
-
-  sessionStatusLabel(status: CampaignSessionStatus): string {
-    const labels: Record<CampaignSessionStatus, string> = {
-      planned: 'Planifiée',
-      played: 'Jouée',
-      cancelled: 'Annulée',
-    };
-    return labels[status];
-  }
-
-  sessionStatusChipClass(status: CampaignSessionStatus): string {
-    switch (status) {
-      case 'played':
-        return 'border-emerald-800/50 text-emerald-300 bg-emerald-950/30';
-      case 'cancelled':
-        return 'border-red-900/40 text-red-300 bg-red-950/20';
-      default:
-        return 'border-amber-800/50 text-amber-300 bg-amber-950/30';
-    }
-  }
-
-  sessionInputValue(iso: string): string {
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return '';
-    const pad = (n: number) => String(n).padStart(2, '0');
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
   onSessionDateChange(sessionId: string, value: string): void {

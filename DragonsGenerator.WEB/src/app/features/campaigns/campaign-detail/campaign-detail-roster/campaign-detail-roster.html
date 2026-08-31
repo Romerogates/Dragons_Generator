@@ -1,0 +1,145 @@
+@if (visible()) {
+  <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5 space-y-4">
+    <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-400">
+      <iconify-icon icon="fluent-emoji:busts-in-silhouette"></iconify-icon> Groupe — personnages joueurs
+    </h2>
+
+    @if (feedback(); as fb) {
+      <p class="text-sm text-emerald-400">{{ fb }}</p>
+    }
+
+    @if (playersNeedingCharacter().length) {
+      <div class="space-y-3">
+        <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">Sans personnage</p>
+        @for (m of playersNeedingCharacter(); track m.id) {
+          <article class="p-4 rounded-xl border border-sky-900/40 bg-sky-950/15">
+            <p class="font-bold text-slate-100">{{ m.displayName }}</p>
+            <p class="text-sm text-sky-300 mt-1">
+              @if (m.proposalStatus === 'rejected') {
+                Proposition refusée — en attente d’un nouveau choix
+              } @else {
+                A rejoint la table — pas encore de personnage proposé
+              }
+            </p>
+            <div class="flex flex-wrap gap-2 mt-3">
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-sky-950/40 border border-sky-700/50 text-sky-200 disabled:opacity-50"
+                [disabled]="characterRequestLoadingId() === m.id"
+                (click)="requestCharacterPick.emit(m)"
+              >
+                {{ characterRequestLoadingId() === m.id ? 'Envoi…' : 'Demander un personnage' }}
+              </button>
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40"
+                (click)="removeMember.emit(m)"
+              >
+                Retirer
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    }
+
+    @if (pendingProposals().length) {
+      <div class="space-y-3">
+        <p class="text-[10px] font-black uppercase tracking-widest text-amber-500">En attente d'approbation</p>
+        @for (m of pendingProposals(); track m.id) {
+          <article class="p-4 rounded-xl border border-amber-900/40 bg-amber-950/20">
+            <p class="font-bold text-slate-100">{{ m.displayName }}</p>
+            <p class="text-sm text-amber-300 mt-1">
+              Propose : {{ m.proposedCharacterName }} (niv. {{ m.proposedCharacterLevel ?? '?' }})
+            </p>
+            <div class="flex flex-wrap gap-2 mt-3">
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
+                [disabled]="isMemberCharacterLoading(m.id, 'proposed')"
+                (click)="viewMemberCharacter.emit({ member: m, scope: 'proposed' })"
+              >
+                @if (isMemberCharacterLoading(m.id, 'proposed')) { Chargement… }
+                @else { Voir la fiche proposée }
+              </button>
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
+                [disabled]="isMemberCharacterLoading(m.id, 'proposed')"
+                (click)="printMemberFullSheet.emit({ member: m, scope: 'proposed' })"
+              >
+                PDF fiche complète
+              </button>
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-emerald-950/30 text-emerald-300 border border-emerald-800/40"
+                (click)="approveMember.emit(m)"
+              >
+                Accepter
+              </button>
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40"
+                (click)="rejectMember.emit(m)"
+              >
+                Refuser
+              </button>
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40"
+                (click)="removeMember.emit(m)"
+              >
+                Retirer
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    }
+
+    @if (approvedPlayers().length) {
+      <div class="space-y-3">
+        @if (pendingProposals().length) {
+          <p class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Approuvés</p>
+        }
+        @for (m of approvedPlayers(); track m.id) {
+          <article class="p-4 rounded-xl border border-slate-800 bg-[#171b22] flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p class="font-bold text-slate-100">{{ m.displayName }}</p>
+              <p class="text-sm text-violet-300 mt-1">
+                {{ m.approvedCharacterName }} (niv. {{ m.approvedCharacterLevel ?? '?' }})
+              </p>
+              <p class="text-[10px] text-emerald-400/80 uppercase tracking-widest mt-1">{{ m.xpEarnedInCampaign }} XP</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-violet-950/30 border border-violet-800/50 text-violet-300 disabled:opacity-50"
+                [disabled]="isMemberCharacterLoading(m.id, 'approved')"
+                (click)="viewMemberCharacter.emit({ member: m, scope: 'approved' })"
+              >
+                @if (isMemberCharacterLoading(m.id, 'approved')) { Chargement… }
+                @else { Voir la fiche }
+              </button>
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-[#1b2028] border border-violet-800/50 text-violet-300 disabled:opacity-50"
+                [disabled]="isMemberCharacterLoading(m.id, 'approved')"
+                (click)="printMemberFullSheet.emit({ member: m, scope: 'approved' })"
+              >
+                PDF fiche complète
+              </button>
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 border border-red-900/40 text-red-300"
+                (click)="removeMember.emit(m)"
+              >
+                Retirer
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </div>
+}

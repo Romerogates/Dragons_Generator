@@ -1,0 +1,33 @@
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+  @if (isOwner()) {
+    <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
+      <p class="text-2xl font-bold text-violet-400">{{ creatureCount() }}</p>
+      <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Créatures</p>
+    </div>
+    <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
+      <p class="text-2xl font-bold text-violet-400">{{ encounterCount() }}</p>
+      <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Rencontres</p>
+    </div>
+  }
+  <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
+    <p class="text-2xl font-bold text-violet-400">{{ playerCount() }}</p>
+    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Joueurs</p>
+  </div>
+  @if (isOwner()) {
+    <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
+      <p class="text-2xl font-bold text-emerald-400">{{ totalXpAwarded() }}</p>
+      <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">XP distribuée</p>
+    </div>
+  } @else {
+    <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
+      <p class="text-2xl font-bold text-emerald-400">{{ myXpEarned() }}</p>
+      <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Mon XP</p>
+    </div>
+    @if (approvedCharacterName(); as charName) {
+      <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center col-span-2 md:col-span-1">
+        <p class="text-lg font-bold text-sky-400 truncate">{{ charName }}</p>
+        <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Mon personnage</p>
+      </div>
+    }
+  }
+</div>

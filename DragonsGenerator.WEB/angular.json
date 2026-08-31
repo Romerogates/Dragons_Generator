@@ -33,9 +33,13 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.scss"],
+            "styles": [
+              "src/styles.scss"
+            ],
             "stylePreprocessorOptions": {
-              "includePaths": ["src/styles"]
+              "includePaths": [
+                "src/styles"
+              ]
             }
           },
           "configurations": {
@@ -91,8 +95,13 @@
             "inlineStyleLanguage": "scss",
             "codeCoverage": true,
             "karmaConfig": "karma.conf.js",
-            "browsers": ["ChromeHeadless"],
-            "reporters": ["progress", "coverage"],
+            "browsers": [
+              "ChromeHeadless"
+            ],
+            "reporters": [
+              "progress",
+              "coverage"
+            ],
             "codeCoverageExclude": [
               "src/**/*.spec.ts",
               "src/main.ts",
@@ -124,10 +133,26 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.scss"]
+            "styles": [
+              "src/styles.scss"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
           }
         }
       }
     }
+  },
+  "cli": {
+    "schematicCollections": [
+      "angular-eslint"
+    ]
   }
 }
