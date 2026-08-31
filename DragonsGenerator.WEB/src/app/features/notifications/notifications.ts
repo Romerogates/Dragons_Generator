@@ -20,6 +20,7 @@ const FRIEND_KINDS: NotificationType[] = ['friend_request', 'friend_message'];
 const CAMPAIGN_KINDS: NotificationType[] = [
   'campaign_invite',
   'character_proposal',
+  'character_pick_requested',
   'proposal_rejected',
   'proposal_approved',
 ];
@@ -104,6 +105,8 @@ export class NotificationsPage implements OnInit {
         return 'fluent-emoji:world-map';
       case 'character_proposal':
         return 'fluent-emoji:bust-in-silhouette';
+      case 'character_pick_requested':
+        return 'fluent-emoji:shield';
       case 'proposal_rejected':
         return 'fluent-emoji:warning';
       case 'proposal_approved':

@@ -95,11 +95,44 @@
               <app-campaign-play-panel [campaign]="c" (campaignChange)="campaign.set($event)" />
             }
 
-            @if (c.isOwner && (approvedPlayersWithCharacter().length || pendingProposals().length)) {
+            @if (c.isOwner && (approvedPlayersWithCharacter().length || pendingProposals().length || playersNeedingCharacter().length)) {
               <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5 space-y-4">
                 <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-400">
                   <iconify-icon icon="fluent-emoji:busts-in-silhouette"></iconify-icon> Groupe — personnages joueurs
                 </h2>
+
+                @if (rosterFeedback(); as fb) {
+                  <p class="text-sm text-emerald-400">{{ fb }}</p>
+                }
+
+                @if (playersNeedingCharacter().length) {
+                  <div class="space-y-3">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">Sans personnage</p>
+                    @for (m of playersNeedingCharacter(); track m.id) {
+                      <article class="p-4 rounded-xl border border-sky-900/40 bg-sky-950/15">
+                        <p class="font-bold text-slate-100">{{ m.displayName }}</p>
+                        <p class="text-sm text-sky-300 mt-1">
+                          @if (m.proposalStatus === 'rejected') {
+                            Proposition refusée — en attente d’un nouveau choix
+                          } @else {
+                            A rejoint la table — pas encore de personnage proposé
+                          }
+                        </p>
+                        <div class="flex flex-wrap gap-2 mt-3">
+                          <button
+                            type="button"
+                            class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-sky-950/40 border border-sky-700/50 text-sky-200 disabled:opacity-50"
+                            [disabled]="isCharacterRequestLoading(m.id)"
+                            (click)="requestCharacterPick(m)"
+                          >
+                            {{ isCharacterRequestLoading(m.id) ? 'Envoi…' : 'Demander un personnage' }}
+                          </button>
+                          <button type="button" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40" (click)="removeMember(m)">Retirer</button>
+                        </div>
+                      </article>
+                    }
+                  </div>
+                }
 
                 @if (pendingProposals().length) {
                   <div class="space-y-3">
@@ -1019,6 +1052,9 @@
 
         @case ('players') {
           <section class="space-y-6">
+            @if (c.isOwner && rosterFeedback(); as fb) {
+              <p class="text-sm text-emerald-400">{{ fb }}</p>
+            }
             @if (c.isOwner) {
               <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
                 <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Inviter un ami</h3>
@@ -1075,6 +1111,24 @@
                           <button type="button" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-emerald-950/30 text-emerald-300 border border-emerald-800/40" (click)="approveMember(m)">Accepter</button>
                           <button type="button" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40" (click)="rejectMember(m)">Refuser</button>
                         </div>
+                      } @else if (canRequestCharacterPick(m)) {
+                        <p class="text-sm text-sky-300 mt-2">
+                          @if (m.proposalStatus === 'rejected') {
+                            Proposition refusée — le joueur doit en choisir un autre.
+                          } @else {
+                            Pas encore de personnage — envoyez-lui un rappel.
+                          }
+                        </p>
+                        <div class="flex flex-wrap gap-2 mt-3">
+                          <button
+                            type="button"
+                            class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-sky-950/40 border border-sky-700/50 text-sky-200 disabled:opacity-50"
+                            [disabled]="isCharacterRequestLoading(m.id)"
+                            (click)="requestCharacterPick(m)"
+                          >
+                            {{ isCharacterRequestLoading(m.id) ? 'Envoi…' : 'Demander un personnage' }}
+                          </button>
+                        </div>
                       } @else if (m.approvedCharacterName) {
                         <div class="flex flex-wrap gap-2 mt-3">
                           <button
@@ -1117,19 +1171,29 @@
                   } @else if (me.proposalStatus === 'pending') {
                     <p class="text-amber-400 text-sm">En attente d'approbation : {{ me.proposedCharacterName }}</p>
                   } @else if (me.proposalStatus === 'rejected') {
+                    <div class="rounded-xl border border-amber-800/40 bg-amber-950/20 p-3 mb-4">
+                      <p class="text-sm text-amber-200">Le MJ attend un nouveau personnage — choisissez un héros ou créez-en un.</p>
+                    </div>
                     <p class="text-red-400 text-sm mb-3">Proposition refusée. Choisissez un autre personnage :</p>
                     <div class="flex flex-wrap gap-2">
                       @for (ch of myCharacters(); track ch.id) {
                         <button type="button" class="px-3 py-2 rounded-xl text-xs border border-slate-700 hover:border-violet-500/50" (click)="proposeCharacter(ch.id)">{{ ch.name }}</button>
                       }
+                      <a routerLink="/create" class="px-3 py-2 rounded-xl text-xs border border-violet-800/50 text-violet-300">Créer un personnage →</a>
                     </div>
                   } @else {
+                    <div class="rounded-xl border border-amber-800/40 bg-amber-950/20 p-3 mb-4">
+                      <p class="text-sm text-amber-200">
+                        Le MJ attend votre personnage — choisissez un héros existant ou
+                        <a routerLink="/create" class="text-amber-100 underline hover:text-white">créez-en un</a>.
+                      </p>
+                    </div>
                     <p class="text-sm text-slate-400 mb-3">Proposez un de vos personnages au MJ :</p>
                     <div class="flex flex-wrap gap-2">
                       @for (ch of myCharacters(); track ch.id) {
                         <button type="button" class="px-3 py-2 rounded-xl text-xs border border-slate-700 hover:border-violet-500/50" (click)="proposeCharacter(ch.id)">{{ ch.name }}</button>
                       } @empty {
-                        <a routerLink="/create" class="text-violet-400 text-sm">Créer un personnage →</a>
+                        <a routerLink="/create" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-violet-600 text-white">Créer mon premier personnage →</a>
                       }
                     </div>
                   }

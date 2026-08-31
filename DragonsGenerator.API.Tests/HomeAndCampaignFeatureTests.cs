@@ -838,6 +838,67 @@ public class HomeAndCampaignFeatureTests
         }
     }
 
+    [Fact]
+    public async Task Character_pick_request_logs_activity_and_notifies_player()
+    {
+        var (_, ownerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "pickowner");
+        var (_, playerToken, playerId) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "pickplayer");
+
+        Guid campaignId;
+        using (var createReq = ApiTestAuth.Authed(HttpMethod.Post, "/me/campaigns", ownerToken))
+        {
+            createReq.Content = JsonContent.Create(new
+            {
+                title = "Campagne rappel perso",
+                data = JsonDocument.Parse("{}").RootElement,
+            });
+            var create = await _client.SendAsync(createReq);
+            create.EnsureSuccessStatusCode();
+            var created = await create.Content.ReadFromJsonAsync<JsonElement>();
+            campaignId = created!.GetProperty("id").GetGuid();
+        }
+
+        await InvitePlayerToCampaignAsync(ownerToken, playerToken, playerId, campaignId);
+
+        Guid memberId;
+        using (var detailReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}", ownerToken))
+        {
+            var detail = await _client.SendAsync(detailReq);
+            detail.EnsureSuccessStatusCode();
+            var body = await detail.Content.ReadFromJsonAsync<JsonElement>();
+            memberId = body!.GetProperty("members").EnumerateArray()
+                .First(m => m.GetProperty("userId").GetGuid() == playerId)
+                .GetProperty("id").GetGuid();
+        }
+
+        using (var requestReq = ApiTestAuth.Authed(
+            HttpMethod.Post,
+            $"/me/campaigns/{campaignId}/members/{memberId}/request-character",
+            ownerToken))
+        {
+            (await _client.SendAsync(requestReq)).EnsureSuccessStatusCode();
+        }
+
+        using (var actReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}/activity", ownerToken))
+        {
+            var act = await _client.SendAsync(actReq);
+            act.EnsureSuccessStatusCode();
+            var raw = await act.Content.ReadAsStringAsync();
+            Assert.Contains("character_pick_requested", raw);
+        }
+
+        using (var playerNotifReq = ApiTestAuth.Authed(HttpMethod.Get, "/me/notifications", playerToken))
+        {
+            var notif = await _client.SendAsync(playerNotifReq);
+            notif.EnsureSuccessStatusCode();
+            var body = await notif.Content.ReadFromJsonAsync<JsonElement>();
+            var kinds = body!.GetProperty("notifications").EnumerateArray()
+                .Select(n => n.GetProperty("kind").GetString())
+                .ToList();
+            Assert.Contains("character_pick_requested", kinds);
+        }
+    }
+
     private async Task InvitePlayerToCampaignAsync(
         string ownerToken,
         string playerToken,

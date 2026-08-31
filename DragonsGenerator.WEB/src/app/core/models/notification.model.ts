@@ -3,6 +3,7 @@ export type NotificationType =
   | 'friend_message'
   | 'campaign_invite'
   | 'character_proposal'
+  | 'character_pick_requested'
   | 'proposal_rejected'
   | 'proposal_approved';
 

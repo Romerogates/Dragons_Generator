@@ -160,6 +160,43 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
             );
         }
 
+        var needsCharacter = await db.CampaignMembers.AsNoTracking()
+            .Where(m =>
+                m.UserId == userId
+                && m.Role == CampaignMemberRoles.Player
+                && m.ApprovedCharacterId == null
+                && m.ProposalStatus != CharacterProposalStatuses.Pending)
+            .Include(m => m.Campaign)
+            .ToListAsync(ct);
+
+        var pickCampaignIds = needsCharacter.Select(m => m.CampaignId).Distinct().ToList();
+        var pickAtByMember = await LatestActivityTimesAsync(
+            db,
+            pickCampaignIds,
+            CampaignActivityKinds.CharacterPickRequested,
+            matchActorUserId: false,
+            memberUserIds: [userId.Value],
+            ct);
+
+        foreach (var m in needsCharacter.OrderByDescending(m =>
+                     pickAtByMember.GetValueOrDefault((m.CampaignId, userId.Value), DateTimeOffset.MinValue)))
+        {
+            var createdAt = pickAtByMember.GetValueOrDefault((m.CampaignId, userId.Value), DateTimeOffset.MinValue);
+            if (createdAt == DateTimeOffset.MinValue)
+                continue;
+
+            items.Add(
+                new NotificationItemDto(
+                    $"pick-{m.Id}",
+                    "character_pick_requested",
+                    "Personnage à choisir",
+                    $"Dans « {m.Campaign.Title} », choisissez un héros existant ou créez-en un.",
+                    $"/campaigns/{m.CampaignId}?tab=players",
+                    createdAt
+                )
+            );
+        }
+
         var approvedSince = DateTimeOffset.UtcNow - ApprovedNotificationWindow;
         var approvedActs = (await db.CampaignActivities.AsNoTracking()
                 .Where(a => a.Kind == CampaignActivityKinds.CharacterApproved)

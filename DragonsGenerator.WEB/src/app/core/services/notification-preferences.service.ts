@@ -102,6 +102,8 @@ export class NotificationPreferencesService {
         return p.friendMessages;
       case 'campaign_invite':
         return p.campaignInvites;
+      case 'character_pick_requested':
+        return p.campaignInvites;
       case 'character_proposal':
         return p.characterProposals;
       case 'proposal_rejected':

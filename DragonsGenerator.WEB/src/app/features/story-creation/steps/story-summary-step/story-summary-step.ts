@@ -61,8 +61,8 @@ export class StorySummaryStep implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (this.builder.creatures().length) {
-      this.loadBestiaryPreview();
+    if (this.builder.adventure().trim() || this.builder.creatures().length) {
+      this.loadPackPreview();
     }
   }
 
@@ -77,21 +77,23 @@ export class StorySummaryStep implements OnInit, OnDestroy {
     }
   }
 
-  private loadBestiaryPreview(): void {
+  private loadPackPreview(): void {
     this.isLoadingPreview.set(true);
     this.loadEntries().subscribe({
       next: async (entries) => {
         try {
-          if (!entries.length) return;
           this.revokePreviewUrl();
-          const url = await this.pdf.generateCreaturesPdfBlob(
+          const b = this.builder;
+          const data = b.buildCampaignData();
+          const url = await this.pdf.generateCampaignPackBlob(
+            b.title().trim() || 'Scénario',
+            data,
             entries,
-            this.builder.title().trim() || 'Scénario',
           );
           this.rawBlobUrl = url;
           this.pdfPreviewUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
         } catch (err) {
-          console.error('Erreur génération aperçu bestiaire :', err);
+          console.error('Erreur génération aperçu pack MJ :', err);
         } finally {
           this.isLoadingPreview.set(false);
         }

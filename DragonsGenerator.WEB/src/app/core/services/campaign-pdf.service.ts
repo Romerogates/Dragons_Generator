@@ -62,30 +62,20 @@ export class CampaignPdfService {
     creatureEntries: CreaturePrintEntry[],
     playerSummaries: PlayerGmSummary[],
   ): Promise<void> {
-    const { jsPDF } = await import('jspdf');
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    const bg = await this.loadImage(PARCHMENT);
-
-    this.drawCoverPage(pdf, bg, title, data, { kind: 'pack-mj' });
-    this.drawSynopsisPage(pdf, bg, data);
-
-    if (creatureEntries.length) {
-      await this.appendCreaturesToPdf(pdf, bg, creatureEntries, 'Créatures de l\'aventure');
-    }
-
-    if (data.encounters.length) {
-      this.drawEncountersSection(pdf, bg, data.encounters);
-    }
-
-    if (playerSummaries.length) {
-      this.drawPlayerSummariesSection(pdf, bg, playerSummaries);
-    }
-
-    if (data.notes?.trim()) {
-      this.drawNotesSection(pdf, bg, data.notes);
-    }
-
+    const pdf = await this.buildCampaignPackPdf(title, data, creatureEntries, playerSummaries);
     pdf.save(this.safeName(`${title}-pack-mj.pdf`));
+  }
+
+  /** Génère le pack MJ complet et retourne une blob URL pour l'aperçu in-page. */
+  async generateCampaignPackBlob(
+    title: string,
+    data: CampaignData,
+    creatureEntries: CreaturePrintEntry[],
+    playerSummaries: PlayerGmSummary[] = [],
+  ): Promise<string> {
+    const pdf = await this.buildCampaignPackPdf(title, data, creatureEntries, playerSummaries);
+    const blob = pdf.output('blob');
+    return URL.createObjectURL(blob);
   }
 
   async downloadPlayerSummaries(title: string, summaries: PlayerGmSummary[]): Promise<void> {
@@ -413,12 +403,38 @@ export class CampaignPdfService {
           ? 'Distribuable aux joueurs — sans secrets MJ'
           : 'Bestiaire — usage table';
     pdf.text(footer, PAGE_W / 2, PAGE_H - 16, { align: 'center' });
-    pdf.text(
-      new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }),
-      PAGE_W / 2,
-      PAGE_H - 10,
-      { align: 'center' },
-    );
+  }
+
+  private async buildCampaignPackPdf(
+    title: string,
+    data: CampaignData,
+    creatureEntries: CreaturePrintEntry[],
+    playerSummaries: PlayerGmSummary[],
+  ): Promise<jsPDF> {
+    const { jsPDF } = await import('jspdf');
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const bg = await this.loadImage(PARCHMENT);
+
+    this.drawCoverPage(pdf, bg, title, data, { kind: 'pack-mj' });
+    this.drawSynopsisPage(pdf, bg, data);
+
+    if (creatureEntries.length) {
+      await this.appendCreaturesToPdf(pdf, bg, creatureEntries, 'Créatures de l\'aventure');
+    }
+
+    if (data.encounters.length) {
+      this.drawEncountersSection(pdf, bg, data.encounters);
+    }
+
+    if (playerSummaries.length) {
+      this.drawPlayerSummariesSection(pdf, bg, playerSummaries);
+    }
+
+    if (data.notes?.trim()) {
+      this.drawNotesSection(pdf, bg, data.notes);
+    }
+
+    return pdf;
   }
 
   private drawDecorativeBorder(pdf: jsPDF): void {

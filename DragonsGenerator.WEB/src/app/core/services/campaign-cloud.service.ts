@@ -96,6 +96,13 @@ export class CampaignCloudService {
     );
   }
 
+  requestCharacterPick(campaignId: string, memberId: string): Observable<void> {
+    return this.http.post<void>(
+      `${this.api}/me/campaigns/${campaignId}/members/${memberId}/request-character`,
+      {},
+    );
+  }
+
   removeMember(campaignId: string, memberId: string): Observable<void> {
     return this.http.delete<void>(`${this.api}/me/campaigns/${campaignId}/members/${memberId}`);
   }

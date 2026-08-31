@@ -90,6 +90,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly generatingAutoPregen = signal(false);
   readonly pregenPdfLoadingId = signal<string | null>(null);
   readonly memberCharacterLoadingId = signal<string | null>(null);
+  readonly characterRequestLoadingId = signal<string | null>(null);
+  readonly rosterFeedback = signal<string | null>(null);
   readonly activity = signal<CampaignActivityItem[]>([]);
   readonly activityLoading = signal(false);
   /** Session en mode édition (MJ) — sinon carte lecture. */
@@ -124,6 +126,12 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
   readonly pendingProposals = computed(() =>
     this.players().filter((p) => p.proposalStatus === 'pending' && p.proposedCharacterId),
+  );
+
+  readonly playersNeedingCharacter = computed(() =>
+    this.players().filter(
+      (p) => !p.approvedCharacterId && p.proposalStatus !== 'pending',
+    ),
   );
 
   readonly invitableFriends = computed(() => {
@@ -336,6 +344,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       member_joined: 'Joueur rejoint',
       member_removed: 'Joueur retiré',
       character_proposed: 'Personnage proposé',
+      character_pick_requested: 'Personnage demandé',
       character_approved: 'Personnage approuvé',
       character_rejected: 'Personnage refusé',
       xp_awarded: 'XP attribuée',
@@ -355,6 +364,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       member_joined: 'fluent-emoji:waving-hand',
       member_removed: 'fluent-emoji:door',
       character_proposed: 'fluent-emoji:scroll',
+      character_pick_requested: 'fluent-emoji:shield',
       character_approved: 'fluent-emoji:check-mark-button',
       character_rejected: 'fluent-emoji:cross-mark',
       xp_awarded: 'fluent-emoji:sparkles',
@@ -887,6 +897,33 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       },
       error: () => this.error.set('Impossible de refuser ce personnage.'),
     });
+  }
+
+  canRequestCharacterPick(member: CampaignMember): boolean {
+    return !member.approvedCharacterId && member.proposalStatus !== 'pending';
+  }
+
+  requestCharacterPick(member: CampaignMember): void {
+    const c = this.campaign();
+    if (!c || !this.canRequestCharacterPick(member) || this.characterRequestLoadingId()) return;
+    this.characterRequestLoadingId.set(member.id);
+    this.rosterFeedback.set(null);
+    this.campaigns.requestCharacterPick(c.id, member.id).subscribe({
+      next: () => {
+        this.characterRequestLoadingId.set(null);
+        this.rosterFeedback.set(`Rappel envoyé à ${member.displayName}.`);
+        this.notifications.refresh();
+        if (this.tab() === 'activity') this.loadActivity();
+      },
+      error: () => {
+        this.characterRequestLoadingId.set(null);
+        this.error.set('Impossible d’envoyer la demande.');
+      },
+    });
+  }
+
+  isCharacterRequestLoading(memberId: string): boolean {
+    return this.characterRequestLoadingId() === memberId;
   }
 
   removeMember(member: CampaignMember): void {

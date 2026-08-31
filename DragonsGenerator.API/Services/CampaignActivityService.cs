@@ -13,6 +13,7 @@ public static class CampaignActivityKinds
     public const string CharacterProposed = "character_proposed";
     public const string CharacterApproved = "character_approved";
     public const string CharacterRejected = "character_rejected";
+    public const string CharacterPickRequested = "character_pick_requested";
     public const string XpAwarded = "xp_awarded";
     public const string SessionScheduled = "session_scheduled";
     public const string SessionUpdated = "session_updated";
