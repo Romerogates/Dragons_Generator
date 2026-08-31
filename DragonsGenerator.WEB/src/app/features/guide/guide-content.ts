@@ -449,10 +449,11 @@ export const GUIDE_DUNGEON_GEN_STEPS: GuideStep[] = [
   ];
 
 export const GUIDE_DUNGEON_EDITOR_TOOLS: GuideEditorTool[] = [
-    { tool: 'Sélection', detail: 'Cliquer une salle ou un marqueur dans le panneau' },
-    { tool: 'Sol / Mur / Porte', detail: 'Peindre la grille case par case' },
-    { tool: 'Piège / Coffre / Escalier', detail: 'Placer un marqueur (re-clic pour retirer)' },
-    { tool: 'Notes de salle', detail: 'Texte libre MJ dans le panneau latéral' },
+    { tool: 'Sélection', detail: 'Cliquer une salle pour la surligner et éditer ses notes / rencontre' },
+    { tool: 'Sol / Mur / Porte', detail: 'Peindre au clic ou en glissant sur le canvas' },
+    { tool: 'Piège / Coffre / Escalier', detail: 'Marqueurs ronds (! $ S) — re-clic pour retirer ou changer' },
+    { tool: 'Navigation', detail: 'Molette = zoom · Espace + glisser = déplacer · Ctrl+Z = annuler' },
+    { tool: 'Numéros de salle', detail: 'Affichés au centre de chaque pièce sur la carte' },
   ];
 
 export const GUIDE_DUNGEON_THEMES = [

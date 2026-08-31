@@ -172,13 +172,14 @@
           </p>
           @for (item of nav(); track item.id) {
             <a
-              [href]="'#' + item.id"
+              [href]="'/guide#' + item.id"
               class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm border transition-colors"
               [class]="
                 activeSection() === item.id
                   ? 'bg-[#1b2028] border-amber-500/40 text-slate-100'
                   : 'border-transparent text-slate-400 hover:text-slate-100 hover:bg-[#1b2028] hover:border-slate-800'
               "
+              (click)="scrollToSection(item.id, $event)"
             >
               <span class="text-lg shrink-0 {{ item.accent }}"
                 ><iconify-icon [icon]="item.icon"></iconify-icon
@@ -195,13 +196,14 @@
       <nav class="lg:hidden flex flex-wrap gap-2 mb-10 pb-6 border-b border-slate-800">
         @for (item of nav(); track item.id) {
           <a
-            [href]="'#' + item.id"
+            [href]="'/guide#' + item.id"
             class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider border transition-colors"
             [class]="
               activeSection() === item.id
                 ? 'bg-amber-500/15 border-amber-500/50 text-amber-300'
                 : 'bg-[#1b2028] border-slate-800 text-slate-400'
             "
+            (click)="scrollToSection(item.id, $event)"
           >
             {{ item.label }}
           </a>
@@ -232,7 +234,7 @@
                   <li>3. Préparer rencontres & documents</li>
                   <li>4. Planifier une session → démarrer la table</li>
                 </ol>
-                <a href="#checklists" class="text-xs font-bold uppercase tracking-wider text-violet-400 hover:text-violet-300">Checklist MJ →</a>
+                <a href="/guide#checklists" class="text-xs font-bold uppercase tracking-wider text-violet-400 hover:text-violet-300" (click)="scrollToSection('checklists', $event)">Checklist MJ →</a>
               </div>
             }
             @if (showPlayer()) {
@@ -246,7 +248,7 @@
                   <li>3. Proposer le personnage</li>
                   <li>4. Activer les notifs · rejoindre la collecte d’init</li>
                 </ol>
-                <a href="#checklists" class="text-xs font-bold uppercase tracking-wider text-sky-400 hover:text-sky-300">Checklist joueur →</a>
+                <a href="/guide#checklists" class="text-xs font-bold uppercase tracking-wider text-sky-400 hover:text-sky-300" (click)="scrollToSection('checklists', $event)">Checklist joueur →</a>
               </div>
             }
           </div>
@@ -311,7 +313,7 @@
           </div>
           <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             @for (card of filteredFlashCards(); track card.title) {
-              <a [href]="'#' + card.sectionId" class="p-4 rounded-xl bg-[#1b2028] border border-slate-800 hover:border-amber-500/30 transition-colors block">
+              <a [href]="'/guide#' + card.sectionId" class="p-4 rounded-xl bg-[#1b2028] border border-slate-800 hover:border-amber-500/30 transition-colors block" (click)="scrollToSection(card.sectionId, $event)">
                 <div class="flex items-center gap-2 mb-3">
                   <span class="text-xl"><iconify-icon [icon]="card.icon"></iconify-icon></span>
                   <h3 class="text-sm font-bold text-slate-100">{{ card.title }}</h3>
@@ -1215,8 +1217,9 @@
           <div class="grid sm:grid-cols-2 gap-2">
             @for (item of filteredIndex(); track item.label) {
               <a
-                [href]="'#' + item.sectionId"
+                [href]="'/guide#' + item.sectionId"
                 class="flex items-start justify-between gap-3 p-3 rounded-xl bg-[#1b2028] border border-slate-800 hover:border-amber-500/30 transition-colors"
+                (click)="scrollToSection(item.sectionId, $event)"
               >
                 <div>
                   <p class="text-sm font-bold text-slate-100">{{ item.label }}</p>

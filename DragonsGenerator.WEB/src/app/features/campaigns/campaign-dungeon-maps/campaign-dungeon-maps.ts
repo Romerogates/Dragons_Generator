@@ -111,6 +111,23 @@ export class CampaignDungeonMaps {
     { id: 'chest', label: 'Coffre', hint: 'Marqueur coffre' },
     { id: 'stairs', label: 'Escalier', hint: 'Marqueur escalier' },
   ];
+  readonly legendTiles: { kind: 'wall' | 'floor' | 'door'; label: string; desc: string }[] = [
+    { kind: 'wall', label: 'Mur', desc: 'Blocage — impassable' },
+    { kind: 'floor', label: 'Sol', desc: 'Salles et couloirs praticables' },
+    { kind: 'door', label: 'Porte', desc: 'Passage entre deux zones' },
+  ];
+  readonly legendMarkers: { symbol: string; label: string; desc: string; color: string }[] = [
+    { symbol: '1', label: 'Numéro de salle', desc: 'Chaque pièce générée (Salle 1, 2…)', color: '#e2e8f0' },
+    { symbol: '!', label: 'Piège', desc: 'Zone dangereuse MJ', color: '#ef4444' },
+    { symbol: '$', label: 'Coffre', desc: 'Butin, trésor ou secret', color: '#eab308' },
+    { symbol: 'S', label: 'Escalier', desc: 'Étage, sortie ou fosse', color: '#8b5cf6' },
+  ];
+  readonly genParamHints: { label: string; desc: string }[] = [
+    { label: 'Grille', desc: 'Taille de la carte en cases (ex. 56×56)' },
+    { label: 'Salles', desc: 'Nombre de pièces avec rencontre possible' },
+    { label: 'Couloirs', desc: 'Plus c’est haut, plus les salles sont reliées' },
+    { label: 'Thème', desc: 'Palette visuelle + créatures du pool thématique' },
+  ];
 
   readonly maps = computed(() => this.campaign().data.dungeonMaps ?? []);
   readonly encounters = computed(() => this.campaign().data.encounters ?? []);
@@ -624,6 +641,13 @@ export class CampaignDungeonMaps {
 
   themeSwatch(theme: DungeonTheme): string {
     return themePalette(theme).floor;
+  }
+
+  legendTileColor(kind: 'wall' | 'floor' | 'door', theme?: DungeonTheme): string {
+    const p = themePalette(theme ?? this.editingMap()?.theme ?? this.genTheme());
+    if (kind === 'wall') return p.wall;
+    if (kind === 'door') return p.door;
+    return p.floor;
   }
 
   cursorClass(): string {

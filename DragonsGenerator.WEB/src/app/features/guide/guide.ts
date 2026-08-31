@@ -211,10 +211,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         const id = location.hash.replace('#', '');
-        if (id) {
-          this.activeSection.set(id);
-          if (id.startsWith('faq-')) this.openFaqId.set(id);
-        }
+        if (id) this.applyHash(id);
       });
 
     fromEvent(window, 'scroll')
@@ -224,9 +221,9 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
     this.updateScrollChrome();
 
     const hash = location.hash.replace('#', '');
-    if (hash.startsWith('faq-')) {
-      this.openFaqId.set(hash);
-      this.activeSection.set('faq');
+    if (hash) {
+      this.applyHash(hash);
+      queueMicrotask(() => this.scrollToHash(hash));
     }
   }
 
@@ -301,6 +298,36 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
 
   scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  scrollToSection(sectionId: string, event?: Event): void {
+    event?.preventDefault();
+    if (sectionId.startsWith('faq-')) {
+      this.openFaqId.set(sectionId);
+      this.activeSection.set('faq');
+    } else {
+      this.activeSection.set(sectionId);
+    }
+    const url = `${location.pathname}${location.search}#${sectionId}`;
+    history.replaceState(null, '', url);
+    queueMicrotask(() => this.scrollToHash(sectionId));
+  }
+
+  private applyHash(sectionId: string): void {
+    if (sectionId.startsWith('faq-')) {
+      this.openFaqId.set(sectionId);
+      this.activeSection.set('faq');
+      return;
+    }
+    if (this.allNav.some((n) => n.id === sectionId)) {
+      this.activeSection.set(sectionId);
+    }
+  }
+
+  private scrollToHash(sectionId: string): void {
+    const el = document.getElementById(sectionId);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   prefetch(key?: GuideQuickCard['prefetch']): void {

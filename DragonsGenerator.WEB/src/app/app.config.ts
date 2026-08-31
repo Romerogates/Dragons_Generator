@@ -21,7 +21,10 @@ export const appConfig: ApplicationConfig = {
       routes,
       withComponentInputBinding(),
       withPreloading(IdlePreloadStrategy),
-      withInMemoryScrolling({ scrollPositionRestoration: 'enabled' }),
+      withInMemoryScrolling({
+        scrollPositionRestoration: 'enabled',
+        anchorScrolling: 'enabled',
+      }),
     ),
 
     provideHttpClient(withFetch(), withInterceptors([authInterceptor, aiRateLimitInterceptor])),
