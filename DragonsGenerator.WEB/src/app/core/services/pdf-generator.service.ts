@@ -5,8 +5,10 @@ import { firstValueFrom } from 'rxjs';
 import { labelForGameId } from '@core/utils/game-id-labels';
 import {
   buildGrimoireEffectSummary,
-  layoutGrimoireEffect,
+  paginateGrimoireOverflow,
+  planGrimoireTable,
   type GrimoireEffectLayout,
+  type GrimoireTablePlan,
 } from '@core/utils/spell-grimoire-effect.util';
 import { DataService } from '@core/services/data.service';
 import type { Spell } from '@core/models/Spells/spell';
@@ -104,11 +106,11 @@ const SUPP_COORDS = {
 
 /** Médaillons « Niveau » du tableau de sorts (grimoires classes standards). */
 const SPELL_TABLE_LEVEL = {
-  levelX: 43,
-  /** Centres optiques des médaillons ouroboros (1re bande = sorts mineurs). */
-  levelYs: [507, 620, 733],
+  levelX: 44,
+  levelYs: [505, 618, 731],
   rowsPerBand: 5,
-  labelFontSize: 11,
+  labelFontSize: 10,
+  labelBaselineFactor: 0.14,
 };
 
 const BASE_COORDS: GrimoireBaseCoords = {
@@ -170,10 +172,10 @@ const PANEL_WIZARD = {
 
 // Prêtre : "Magie Divine" → Divinité–Domaine, Symbole sacré, Conduits divins
 const PANEL_CLERIC = {
-  line1X: 448, // Divinité — Domaine
-  line1Y: 252,
-  line2X: 448, // Symbole sacré (sous « Focaliseur arcanique »)
-  line2Y: 296,
+  line1X: 448,
+  line1Y: 248,
+  line2X: 448,
+  line2Y: 300,
   channelsStartY: 365,
   channelsSpacing: 22,
   channelsX: 448,
@@ -390,17 +392,22 @@ export class PdfGeneratorService {
       const grimoireImg = await this.loadImage(grimoireUrl);
       pdf.addPage();
       pdf.addImage(grimoireImg, 'JPEG', 0, 0, 210, 297);
-      this.drawGrimoire(pdf, enriched);
 
-      // Pages supplémentaires si trop de sorts (ou table absente sur GRP)
-      const overflow = this.getGrimoireOverflowSpells(enriched, pdf);
+      const sc = enriched.spellcasting;
+      const isGrp =
+        sc.kind === 'ranger' || sc.kind === 'paladin' || sc.kind === 'fighter_eldritch_knight';
+      const mainPlan = isGrp ? null : this.planMainGrimoireTable(pdf, enriched);
+
+      this.drawGrimoire(pdf, enriched, mainPlan);
+
+      const overflow = isGrp ? this.sortedKnownSpells(enriched) : (mainPlan?.overflow ?? []);
       if (overflow.length > 0) {
         const suppImg = await this.loadImage(GRIMOIRE_SUPP_IMAGE);
-        const pages = this.chunkSpellsForSuppPages(overflow);
-        for (const pageSpells of pages) {
+        const suppPages = this.planSuppGrimoirePages(pdf, overflow);
+        for (const pagePlan of suppPages) {
           pdf.addPage();
           pdf.addImage(suppImg, 'JPEG', 0, 0, 210, 297);
-          this.drawGrimoireSupp(pdf, pageSpells);
+          this.drawGrimoireSupp(pdf, pagePlan);
         }
       }
     }
@@ -993,22 +1000,18 @@ export class PdfGeneratorService {
   // PAGE 5 — GRIMOIRE (dispatcher)
   // =========================================================================
 
-  private drawGrimoire(pdf: jsPDF, c: Character): void {
+  private drawGrimoire(pdf: jsPDF, c: Character, mainPlan: GrimoireTablePlan | null): void {
     if (!c.spellcasting) return;
     const dark = '#2c1810';
     pdf.setTextColor(dark);
     const sc = c.spellcasting;
 
-    // Les martiaux ont un layout complètement différent
     if (sc.kind === 'ranger' || sc.kind === 'paladin' || sc.kind === 'fighter_eldritch_knight') {
       this.drawGrimoireGRP(pdf, c);
       return;
     }
 
-    // === PARTIE GAUCHE : commune à tous les casters standards ===
-    this.drawGrimoireBase(pdf, c);
-
-    // === PARTIE DROITE : spécifique à chaque classe ===
+    this.drawGrimoireBase(pdf, c, mainPlan);
     this.drawGrimoirePanel(pdf, sc);
   }
 
@@ -1016,7 +1019,7 @@ export class PdfGeneratorService {
   // GRIMOIRE — Base commune (côté gauche + table de sorts)
   // =========================================================================
 
-  private drawGrimoireBase(pdf: jsPDF, c: Character): void {
+  private drawGrimoireBase(pdf: jsPDF, c: Character, mainPlan: GrimoireTablePlan | null): void {
     if (!c.spellcasting) return;
     const sc = c.spellcasting;
     const fmt = (n: number) => this.formatBonus(n);
@@ -1044,8 +1047,9 @@ export class PdfGeneratorService {
     // Cercles emplacements de sorts
     this.drawSpellSlotCircles(pdf, sc);
 
-    // Table des sorts
-    this.drawSpellTable(pdf, c);
+    if (mainPlan) {
+      this.drawSpellTableFromPlan(pdf, mainPlan);
+    }
   }
 
   // =========================================================================
@@ -1094,24 +1098,27 @@ export class PdfGeneratorService {
     );
   }
 
-  /**
-   * Sorts qui ne tiennent pas sur le grimoire principal.
-   * GRP n'a pas de table → tous les sorts partent en page(s) supp.
-   * Les sorts à effet 2 lignes consomment 2 lignages imprimés.
-   */
-  private getGrimoireOverflowSpells(c: Character, pdf: jsPDF): SpellInstance[] {
-    if (!c.spellcasting) return [];
+  private grimoireEffectSplit(
+    pdf: jsPDF,
+    fontSize: number,
+  ): (text: string, maxWidth: number) => string[] {
+    pdf.setFontSize(fontSize);
+    return (text: string, maxWidth: number) => pdf.splitTextToSize(text, maxWidth) as string[];
+  }
+
+  private planMainGrimoireTable(pdf: jsPDF, c: Character): GrimoireTablePlan {
     const sorted = this.sortedKnownSpells(c);
-    if (!sorted.length) return [];
-
-    const kind = c.spellcasting.kind;
-    const isGrp =
-      kind === 'ranger' || kind === 'paladin' || kind === 'fighter_eldritch_knight';
-    if (isGrp) return sorted;
-
     const B = BASE_COORDS;
     const effectWidthMm = pxToMmX(B.colPage - B.colEffect - 8);
-    return this.layoutSpellsOnMainTable(pdf, sorted, effectWidthMm).overflow;
+    const split = this.grimoireEffectSplit(pdf, 7);
+    return planGrimoireTable(sorted, split, effectWidthMm, B.spellTableMaxRows, 2);
+  }
+
+  private planSuppGrimoirePages(pdf: jsPDF, spells: SpellInstance[]): GrimoireTablePlan[] {
+    const S = SUPP_COORDS;
+    const effectWidthMm = pxToMmX(S.effectEndX - S.effectX - 8);
+    const split = this.grimoireEffectSplit(pdf, 6.5);
+    return paginateGrimoireOverflow(spells, split, effectWidthMm, S.maxRows, 3);
   }
 
   /**
@@ -1143,49 +1150,6 @@ export class PdfGeneratorService {
     return { ...character, knownSpells };
   }
 
-  /**
-   * Place les sorts sur les lignages du tableau principal.
-   * Ligne 1 effet : composants · durée ; lignes suivantes : description (colonne Effet).
-   */
-  private layoutSpellsOnMainTable(
-    pdf: jsPDF,
-    sorted: SpellInstance[],
-    effectWidthMm: number,
-  ): {
-    entries: {
-      spell: SpellInstance;
-      row: number;
-      layout: GrimoireEffectLayout;
-    }[];
-    overflow: SpellInstance[];
-  } {
-    const B = BASE_COORDS;
-    const split = (text: string, maxWidth: number) =>
-      pdf.splitTextToSize(text, maxWidth) as string[];
-
-    const entries: {
-      spell: SpellInstance;
-      row: number;
-      layout: GrimoireEffectLayout;
-    }[] = [];
-    const overflow: SpellInstance[] = [];
-    let row = 0;
-
-    for (const spell of sorted) {
-      const layout = layoutGrimoireEffect(spell.effectSummary ?? '', split, effectWidthMm);
-      if (row + layout.rowsNeeded > B.spellTableMaxRows) {
-        overflow.push(spell);
-        const idx = sorted.indexOf(spell);
-        overflow.push(...sorted.slice(idx + 1));
-        break;
-      }
-      entries.push({ spell, row, layout });
-      row += layout.rowsNeeded;
-    }
-
-    return { entries, overflow };
-  }
-
   private drawGrimoireEffectLines(
     pdf: jsPDF,
     layout: GrimoireEffectLayout,
@@ -1213,27 +1177,22 @@ export class PdfGeneratorService {
     writeLines(layout.bodyLines);
   }
 
-  private drawSpellTable(pdf: jsPDF, c: Character): void {
+  private drawSpellTableFromPlan(pdf: jsPDF, plan: GrimoireTablePlan): void {
     const B = BASE_COORDS;
-    const sorted = this.sortedKnownSpells(c);
-    if (!sorted.length) return;
-
-    const effectWidthMm = pxToMmX(B.colPage - B.colEffect - 8);
     const lineHMm = pxToMmY(B.spellTableRowH);
-    pdf.setFontSize(7);
-    const { entries } = this.layoutSpellsOnMainTable(pdf, sorted, effectWidthMm);
 
     this.drawSpellLevelMedallions(
       pdf,
-      entries.map((e) => ({ row: e.row, level: e.spell.level })),
+      plan.placements.map((p) => ({ row: p.startRow, level: p.spell.level })),
       SPELL_TABLE_LEVEL.levelX,
       SPELL_TABLE_LEVEL.levelYs,
       SPELL_TABLE_LEVEL.rowsPerBand,
       SPELL_TABLE_LEVEL.labelFontSize,
+      SPELL_TABLE_LEVEL.labelBaselineFactor,
     );
 
-    for (const { spell, row, layout } of entries) {
-      const y = B.spellTableStartY + row * B.spellTableRowH;
+    for (const { spell, startRow, layout } of plan.placements) {
+      const y = B.spellTableStartY + startRow * B.spellTableRowH;
 
       if (spell.alwaysPrepared || spell.prepared) {
         this.drawFilledCircle(pdf, B.colPrepared, y - 2, 1.8);
@@ -1267,7 +1226,8 @@ export class PdfGeneratorService {
     levelX: number,
     levelYs: number[],
     rowsPerBand: number,
-    fontSize = 11,
+    fontSize = 10,
+    baselineFactor = 0.14,
   ): void {
     if (!rowLevels.length || !levelYs.length) return;
 
@@ -1285,132 +1245,49 @@ export class PdfGeneratorService {
       const centerXMm = pxToMmX(levelX);
       const centerYMm = pxToMmY(levelYs[band]);
       const dims = pdf.getTextDimensions(label);
-      pdf.text(label, centerXMm, centerYMm + dims.h * 0.18, { align: 'center' });
-    }
-  }
-
-  private drawSpellTableRow(
-    pdf: jsPDF,
-    spell: SpellInstance,
-    y: number,
-    cols: {
-      preparedX: number;
-      nameX: number;
-      effectX: number;
-      pageX?: number;
-      effectWidthMm: number;
-      nameSize: number;
-      effectSize: number;
-      effectLayout?: GrimoireEffectLayout;
-      effectLineHMm?: number;
-    },
-  ): void {
-    if (spell.alwaysPrepared || spell.prepared) {
-      this.drawFilledCircle(pdf, cols.preparedX, y - 2, 1.8);
-    }
-
-    pdf.setFontSize(cols.nameSize);
-    this.text(pdf, spell.name, cols.nameX, y);
-
-    const lineHMm = cols.effectLineHMm ?? pxToMmY(BASE_COORDS.spellTableRowH);
-    const effectX = pxToMmX(cols.effectX);
-    const baseY = pxToMmY(y);
-
-    if (cols.effectLayout) {
-      this.drawGrimoireEffectLines(
-        pdf,
-        cols.effectLayout,
-        effectX,
-        baseY,
-        lineHMm,
-        cols.effectSize,
-      );
-    } else if (spell.effectSummary) {
-      pdf.setFontSize(cols.effectSize);
-      const split = (text: string, maxWidth: number) =>
-        pdf.splitTextToSize(text, maxWidth) as string[];
-      const layout = layoutGrimoireEffect(spell.effectSummary, split, cols.effectWidthMm);
-      this.drawGrimoireEffectLines(pdf, layout, effectX, baseY, lineHMm, cols.effectSize);
-    }
-
-    if (cols.pageX != null && spell.pageRef) {
-      pdf.setFontSize(7);
-      this.text(pdf, spell.pageRef, cols.pageX, y);
+      pdf.text(label, centerXMm, centerYMm + dims.h * baselineFactor, { align: 'center' });
     }
   }
 
   /**
-   * Remplit une page grimoire-supp.jpg : médaillons de niveau + lignes Nom / Effet.
+   * Remplit une page grimoire-supp.jpg à partir d'un plan (lignages multi-rang).
    */
-  private chunkSpellsForSuppPages(spells: SpellInstance[]): SpellInstance[][] {
-    const S = SUPP_COORDS;
-    const pages: SpellInstance[][] = [];
-    let i = 0;
-
-    while (i < spells.length) {
-      const page: SpellInstance[] = [];
-      let bands = 0;
-      let rowsInBand = 0;
-      let lastLevel: number | null = null;
-
-      while (i < spells.length && page.length < S.maxRows) {
-        const spell = spells[i];
-        const levelChanged = lastLevel === null || spell.level !== lastLevel;
-        if (levelChanged || rowsInBand >= S.rowsPerBand) {
-          if (bands >= S.levelYs.length) break;
-          bands++;
-          rowsInBand = 0;
-          lastLevel = spell.level;
-        }
-        page.push(spell);
-        rowsInBand++;
-        i++;
-      }
-
-      if (!page.length) break;
-      pages.push(page);
-    }
-
-    return pages;
-  }
-
-  /**
-   * Remplit une page grimoire-supp.jpg : médaillons de niveau + lignes Nom / Effet.
-   */
-  private drawGrimoireSupp(pdf: jsPDF, spells: SpellInstance[]): void {
-    if (!spells.length) return;
+  private drawGrimoireSupp(pdf: jsPDF, plan: GrimoireTablePlan): void {
+    if (!plan.placements.length) return;
     const dark = '#2c1810';
     pdf.setTextColor(dark);
     const S = SUPP_COORDS;
-    const effectWidthMm = pxToMmX(S.effectEndX - S.effectX - 8);
+    const lineHMm = pxToMmY(S.rowH);
 
-    // Niveaux : une entrée par bande (1re ligne de la bande)
     this.drawSpellLevelMedallions(
       pdf,
-      spells.slice(0, S.maxRows).map((spell, i) => ({ row: i, level: spell.level })),
+      plan.placements.map((p) => ({ row: p.startRow, level: p.spell.level })),
       S.levelX,
       S.levelYs,
       S.rowsPerBand,
       SPELL_TABLE_LEVEL.labelFontSize,
+      SPELL_TABLE_LEVEL.labelBaselineFactor,
     );
 
-    const split = (text: string, maxWidth: number) =>
-      pdf.splitTextToSize(text, maxWidth) as string[];
+    for (const { spell, startRow, layout } of plan.placements) {
+      const y = S.tableStartY + startRow * S.rowH;
 
-    spells.slice(0, S.maxRows).forEach((spell, i) => {
-      const y = S.tableStartY + i * S.rowH;
-      const effectLayout = layoutGrimoireEffect(spell.effectSummary ?? '', split, effectWidthMm);
-      this.drawSpellTableRow(pdf, spell, y, {
-        preparedX: S.preparedX,
-        nameX: S.nameX,
-        effectX: S.effectX,
-        effectWidthMm,
-        nameSize: 9,
-        effectSize: 6.5,
-        effectLayout,
-        effectLineHMm: pxToMmY(S.rowH),
-      });
-    });
+      if (spell.alwaysPrepared || spell.prepared) {
+        this.drawFilledCircle(pdf, S.preparedX, y - 2, 1.8);
+      }
+
+      pdf.setFontSize(9);
+      this.text(pdf, spell.name, S.nameX, y);
+
+      this.drawGrimoireEffectLines(
+        pdf,
+        layout,
+        pxToMmX(S.effectX),
+        pxToMmY(y),
+        lineHMm,
+        6.5,
+      );
+    }
   }
 
   // =========================================================================

@@ -1,5 +1,6 @@
 import type { Spell } from '@core/models/Spells/spell';
-import { spellComponentsLabel, spellDurationLabel } from './spell-display.util';
+import type { SpellInstance } from '@core/models/Character/character';
+import { spellDurationLabel } from './spell-display.util';
 
 /** Corrige les descriptions tronquées (ex. « ous poussez » → « Vous poussez »). */
 export function normalizeSpellDescription(description: string): string {
@@ -15,19 +16,28 @@ function formatGrimoireComponents(components: Spell['components']): string {
   if (components.v) parts.push('V');
   if (components.s) parts.push('S');
   if (components.m) {
-    const mat = components.m.length > 20 ? `${components.m.substring(0, 18)}…` : components.m;
+    const mat = components.m.length > 24 ? `${components.m.substring(0, 22)}…` : components.m;
     parts.push(`M(${mat})`);
   }
   return parts.join(',');
 }
 
+function shortenDurationLabel(label: string): string {
+  return label
+    .replace(/^Instantané$/i, 'Instantanée')
+    .replace(/^(\d+)\s+heure(s)?$/i, '$1 h')
+    .replace(/^(\d+)\s+minute(s)?$/i, '$1 min')
+    .replace(/^(\d+)\s+round(s)?$/i, '$1 rd')
+    .replace(/^(\d+)\s+jour(s)?$/i, '$1 j');
+}
+
 function formatGrimoireDuration(spell: Pick<Spell, 'duration'>): string {
   const label = spellDurationLabel(spell);
   if (!label || label === '—') return '';
-  return label.replace(/^Instantané$/i, 'Instantanée');
+  return shortenDurationLabel(label);
 }
 
-/** Résumé compact pour la colonne Effet du grimoire PDF. */
+/** Résumé pour la colonne Effet — description complète (césure PDF, pas troncature ici). */
 export function buildGrimoireEffectSummary(spell: Spell): string {
   const parts: string[] = [];
 
@@ -43,9 +53,7 @@ export function buildGrimoireEffectSummary(spell: Spell): string {
     parts.push(firstSentence);
   }
 
-  const full = parts.join(' | ');
-  if (full.length <= 140) return full;
-  return `${full.substring(0, 137)}…`;
+  return parts.join(' | ');
 }
 
 /** Sépare composants/durée (ligne 1) et description (lignes suivantes). */
@@ -72,8 +80,8 @@ export interface GrimoireEffectLayout {
 }
 
 /**
- * Calcule le découpage effet (en-tête + description) et le nombre de lignages consommés.
- * `splitTextToSize` évite les coupures au milieu des mots.
+ * Calcule le découpage effet et le nombre de lignages consommés.
+ * `splitTextToSize` (jsPDF, bonne police) évite les coupures au milieu des mots.
  */
 export function layoutGrimoireEffect(
   summary: string,
@@ -117,4 +125,66 @@ export function layoutGrimoireEffect(
     bodyLines,
     rowsNeeded: Math.max(1, headerLines.length + bodyLines.length),
   };
+}
+
+export interface GrimoireSpellPlacement {
+  spell: SpellInstance;
+  startRow: number;
+  layout: GrimoireEffectLayout;
+}
+
+export interface GrimoireTablePlan {
+  placements: GrimoireSpellPlacement[];
+  overflow: SpellInstance[];
+}
+
+/** Planifie les sorts sur un tableau à lignages limités (page principale ou supp). */
+export function planGrimoireTable(
+  spells: SpellInstance[],
+  splitTextToSize: (text: string, maxWidth: number) => string[],
+  effectWidthMm: number,
+  maxRows: number,
+  maxBodyLines = 2,
+): GrimoireTablePlan {
+  const placements: GrimoireSpellPlacement[] = [];
+  let row = 0;
+
+  for (let i = 0; i < spells.length; i++) {
+    const spell = spells[i];
+    const layout = layoutGrimoireEffect(
+      spell.effectSummary ?? '',
+      splitTextToSize,
+      effectWidthMm,
+      maxBodyLines,
+    );
+    if (row + layout.rowsNeeded > maxRows) {
+      return { placements, overflow: spells.slice(i) };
+    }
+    placements.push({ spell, startRow: row, layout });
+    row += layout.rowsNeeded;
+  }
+
+  return { placements, overflow: [] };
+}
+
+/** Découpe une liste de sorts overflow en pages supplémentaires. */
+export function paginateGrimoireOverflow(
+  spells: SpellInstance[],
+  splitTextToSize: (text: string, maxWidth: number) => string[],
+  effectWidthMm: number,
+  maxRowsPerPage: number,
+  maxBodyLines = 3,
+): GrimoireTablePlan[] {
+  const pages: GrimoireTablePlan[] = [];
+  let queue = spells;
+
+  while (queue.length) {
+    const plan = planGrimoireTable(queue, splitTextToSize, effectWidthMm, maxRowsPerPage, maxBodyLines);
+    if (!plan.placements.length) break;
+    pages.push({ placements: plan.placements, overflow: [] });
+    if (!plan.overflow.length) break;
+    queue = plan.overflow;
+  }
+
+  return pages;
 }

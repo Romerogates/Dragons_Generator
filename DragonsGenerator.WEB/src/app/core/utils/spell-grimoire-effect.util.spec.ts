@@ -2,9 +2,12 @@ import {
   buildGrimoireEffectSummary,
   layoutGrimoireEffect,
   normalizeSpellDescription,
+  paginateGrimoireOverflow,
+  planGrimoireTable,
   splitEffectForGrimoire,
 } from './spell-grimoire-effect.util';
 import type { Spell } from '@core/models/Spells/spell';
+import type { SpellInstance } from '@core/models/Character/character';
 
 describe('spell-grimoire-effect.util', () => {
   const mockSpell = (overrides: Partial<Spell> = {}): Spell =>
@@ -26,6 +29,14 @@ describe('spell-grimoire-effect.util', () => {
       ...overrides,
     }) as Spell;
 
+  const inst = (name: string, summary: string, level = 1): SpellInstance => ({
+    refId: `spl-${name}`,
+    name,
+    level,
+    prepared: true,
+    effectSummary: summary,
+  });
+
   it('normalizeSpellDescription fixes truncated Vous', () => {
     expect(normalizeSpellDescription('ous poussez un cri.')).toBe('Vous poussez un cri.');
     expect(normalizeSpellDescription('D Jous modifiez.')).toBe('Vous modifiez.');
@@ -38,6 +49,24 @@ describe('spell-grimoire-effect.util', () => {
     expect(summary).toContain('Vous infligez des dégâts.');
   });
 
+  it('buildGrimoireEffectSummary shortens hour duration', () => {
+    const summary = buildGrimoireEffectSummary(
+      mockSpell({ duration: { amount: 1, unit: 'heure' } }),
+    );
+    expect(summary).toContain('1 h');
+    expect(summary).not.toContain('heure');
+  });
+
+  it('buildGrimoireEffectSummary keeps full first sentence (no 140 char cut)', () => {
+    const summary = buildGrimoireEffectSummary(
+      mockSpell({
+        description: `${'Mot '.repeat(80)}.`,
+      }),
+    );
+    expect(summary.endsWith('…')).toBeFalse();
+    expect(summary.length).toBeGreaterThan(140);
+  });
+
   it('splitEffectForGrimoire separates components, duration and description', () => {
     const split = splitEffectForGrimoire('V,S | Instantanée | Vous touchez une créature.');
     expect(split.header).toBe('V,S · Instantanée');
@@ -48,16 +77,6 @@ describe('spell-grimoire-effect.util', () => {
     const split = splitEffectForGrimoire('V,S · Instantanée | Vous touchez une créature.');
     expect(split.header).toBe('V,S · Instantanée');
     expect(split.body).toBe('Vous touchez une créature.');
-  });
-
-  it('buildGrimoireEffectSummary truncates very long summaries', () => {
-    const summary = buildGrimoireEffectSummary(
-      mockSpell({
-        description: `${'Mot '.repeat(80)}.`,
-      }),
-    );
-    expect(summary.endsWith('…')).toBeTrue();
-    expect(summary.length).toBeLessThanOrEqual(140);
   });
 
   it('layoutGrimoireEffect counts wrapped lines for row allocation', () => {
@@ -94,6 +113,43 @@ describe('spell-grimoire-effect.util', () => {
     const layout = layoutGrimoireEffect('V,S · Instantanée', split, 80);
     expect(layout.bodyLines).toEqual([]);
     expect(layout.headerLines).toEqual(['V,S · Instantanée']);
+  });
+
+  it('planGrimoireTable returns empty plan for no spells', () => {
+    const split = (text: string) => [text];
+    const plan = planGrimoireTable([], split, 80, 12);
+    expect(plan.placements).toEqual([]);
+    expect(plan.overflow).toEqual([]);
+  });
+
+  it('paginateGrimoireOverflow returns empty for no spells', () => {
+    const split = (text: string) => [text];
+    expect(paginateGrimoireOverflow([], split, 80, 12)).toEqual([]);
+  });
+
+  it('planGrimoireTable moves spells that exceed maxRows to overflow', () => {
+    const split = (text: string) => (text.length > 10 ? [text.slice(0, 10), text.slice(10)] : [text]);
+    const spells = [
+      inst('A', 'V,S | Instantanée | Court.'),
+      inst('B', 'V,S | Instantanée | Un texte volontairement long pour overflow.'),
+      inst('C', 'V,S | Instantanée | Autre.'),
+    ];
+    const plan = planGrimoireTable(spells, split, 50, 3, 2);
+    expect(plan.placements.length).toBe(1);
+    expect(plan.overflow.map((s) => s.name)).toEqual(['B', 'C']);
+  });
+
+  it('paginateGrimoireOverflow splits overflow across pages', () => {
+    const split = (text: string) => [text];
+    const spells = [
+      inst('A', 'V,S | Instantanée | A.'),
+      inst('B', 'V,S | Instantanée | B.'),
+      inst('C', 'V,S | Instantanée | C.'),
+    ];
+    const pages = paginateGrimoireOverflow(spells, split, 80, 2, 1);
+    expect(pages.length).toBe(2);
+    expect(pages[0].placements.length).toBe(2);
+    expect(pages[1].placements.length).toBe(1);
   });
 
   it('buildGrimoireEffectSummary includes material component', () => {
