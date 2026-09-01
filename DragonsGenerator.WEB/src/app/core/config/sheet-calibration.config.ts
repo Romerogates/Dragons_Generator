@@ -118,7 +118,7 @@ const SHEET_PAGE2_ANCHORS: SheetCalibrationAnchor[] = [
   anchor('language-1', 'Langue 1', 'Langues', 396, 255, 'Cyrillan', 10),
   anchor('feature-name', 'Aptitude nom', 'Aptitudes', 15, 255, 'Artificier', 9),
   anchor('feature-uses', 'Aptitude uses', 'Aptitudes', 170, 255, '∞', 9),
-  anchor('spell-slot-1', 'Emplacement sort', 'Magie', 463, 554, '●', 10),
+  anchor('spell-slot-1', 'Emplacement sort', 'Magie', 466, 553, '●', 10),
 ];
 
 const SHEET_PAGE3_ANCHORS: SheetCalibrationAnchor[] = [

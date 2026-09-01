@@ -58,7 +58,7 @@ const SUPP_COORDS = {
   /** Centre X des médaillons ouroboros (niveau). */
   levelX: 46,
   /** Centres Y des 6 médaillons (alignés sur la 1re ligne de chaque bande). */
-  levelYs: [172, 284, 396, 508, 620, 732],
+  levelYs: [175, 284, 396, 508, 620, 732],
   /** Lignes par bande de niveau. */
   rowsPerBand: 5,
   preparedX: 76,
@@ -66,7 +66,7 @@ const SUPP_COORDS = {
   effectX: 288,
   effectEndX: 537,
   /** Baseline texte de la 1re ligne imprimée. */
-  tableStartY: 168,
+  tableStartY: 163,
   rowH: 22.5,
   maxRows: 30,
 };
@@ -170,8 +170,8 @@ const PAGE2 = {
   longRestCol2UsesX: 360,
 
   // --- Emplacements de sorts (parchemin bas-droite) ---
-  spellSlotX: 463,
-  spellSlotStartY: 554,
+  spellSlotX: 466,
+  spellSlotStartY: 553,
   spellSlotRowH: 22,
   spellSlotCircleSpacing: 15,
   spellSlotMaxPerRow: [4, 3, 3, 3, 3, 2, 2, 1, 1],

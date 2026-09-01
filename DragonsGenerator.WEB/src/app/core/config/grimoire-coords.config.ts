@@ -59,7 +59,7 @@ export const GRIMOIRE_BASE_COORDS: GrimoireBaseCoords = {
   spellTableRowH: 22.5,
   /** 3 bandes × 5 lignes = 15 (comme grimoire-pretre.jpg). */
   spellTableMaxRows: 15,
-  colPrepared: 78,
+  colPrepared: 79,
   preparedMarkYOffset: 3,
   colName: 103,
   colEffect: 276,
@@ -68,8 +68,8 @@ export const GRIMOIRE_BASE_COORDS: GrimoireBaseCoords = {
 
 /** Médaillons « Niveau » (ouroboros) — calibrés sur grimoire-pretre.jpg. */
 export const GRIMOIRE_SPELL_TABLE_LEVEL = {
-  levelX: 37,
-  levelYs: [514, 628, 740],
+  levelX: 39,
+  levelYs: [512, 626, 740],
   rowsPerBand: 5,
   labelFontSize: 11,
   labelBaselineFactor: 0.18,
