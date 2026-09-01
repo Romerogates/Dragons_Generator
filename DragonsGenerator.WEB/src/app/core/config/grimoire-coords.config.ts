@@ -22,6 +22,8 @@ export interface GrimoireBaseCoords {
   spellTableRowH: number;
   spellTableMaxRows: number;
   colPrepared: number;
+  /** Décalage vertical (px) du point « préparé » sous la baseline de ligne. */
+  preparedMarkYOffset: number;
   colName: number;
   colEffect: number;
   colPage: number;
@@ -53,12 +55,13 @@ export const GRIMOIRE_BASE_COORDS: GrimoireBaseCoords = {
     { y: 384, maxCircles: 1 },
     { y: 406, maxCircles: 1 },
   ],
-  spellTableStartY: 492,
+  spellTableStartY: 491,
   spellTableRowH: 22.5,
   /** 3 bandes × 5 lignes = 15 (comme grimoire-pretre.jpg). */
   spellTableMaxRows: 15,
-  colPrepared: 76,
-  colName: 97,
+  colPrepared: 78,
+  preparedMarkYOffset: 3,
+  colName: 103,
   colEffect: 276,
   colPage: 530,
 };
@@ -77,9 +80,9 @@ export const GRIMOIRE_PANEL_CLERIC = {
   line1Y: 259,
   line2X: 438,
   line2Y: 307,
-  channelsStartY: 384,
+  channelsStartY: 385,
   channelsSpacing: 22,
-  channelsX: 433,
+  channelsX: 432,
   valueFontSize: 10,
   focusFontSize: 9,
 };

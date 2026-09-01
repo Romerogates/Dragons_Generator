@@ -29,7 +29,7 @@ describe('grimoire-calibration-coords.util', () => {
     expect(coords.base.cantripXStart).toBe(250);
     expect(coords.base.cantripY).toBe(221);
     expect(coords.base.colPrepared).toBe(76);
-    expect(coords.base.spellTableStartY).toBe(492);
+    expect(coords.base.spellTableStartY).toBe(493);
     expect(coords.base.nameX).toBe(GRIMOIRE_BASE_COORDS.nameX);
   });
 

@@ -1093,7 +1093,7 @@ export class PdfGeneratorService {
       const y = B.spellTableStartY + startRow * B.spellTableRowH;
 
       if (spell.alwaysPrepared || spell.prepared) {
-        this.drawFilledCircle(pdf, B.colPrepared, y - 2, 1.8);
+        this.drawFilledCircle(pdf, B.colPrepared, y - B.preparedMarkYOffset, 1.8);
       }
 
       pdf.setFontSize(10);

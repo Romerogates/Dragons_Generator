@@ -59,7 +59,7 @@ function grimoireClericAnchors(): SheetCalibrationAnchor[] {
     anchor('attack-mod', 'Mod. attaque', 'En-tête', B.attackModX, B.attackModY, '+4', 12),
     anchor('cantrip-1', 'Sort mineur 1', 'Mineurs', B.cantripXStart, B.cantripY, '', 10, 'circle-row', 5, B.cantripSpacing),
     anchor('slot-1', 'Emplacement 1', 'Emplacements', B.slotXStart, B.slotRows[0]?.y ?? 255, '', 10, 'circle'),
-    anchor('prep-1', 'Préparé', 'Tableau', B.colPrepared, B.spellTableStartY - 2, '', 8, 'circle'),
+    anchor('prep-1', 'Préparé', 'Tableau', B.colPrepared, B.spellTableStartY - B.preparedMarkYOffset, '', 8, 'circle'),
     anchor('spell-name', 'Nom sort', 'Tableau', B.colName, B.spellTableStartY, 'Imprécation', 10),
     anchor(
       'effect',

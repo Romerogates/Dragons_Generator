@@ -39,7 +39,7 @@ export function grimoireCoordsFromAnchors(anchors: SheetCalibrationAnchor[]): Gr
   const spellName = m.get('spell-name');
   if (prep) {
     base.colPrepared = prep.x;
-    if (!spellName) base.spellTableStartY = prep.y + 2;
+    if (!spellName) base.spellTableStartY = prep.y + base.preparedMarkYOffset;
   }
   if (spellName) {
     base.colName = spellName.x;
