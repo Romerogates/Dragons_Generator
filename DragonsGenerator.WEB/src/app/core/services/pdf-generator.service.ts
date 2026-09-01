@@ -4,6 +4,20 @@ import type { jsPDF } from 'jspdf';
 import { firstValueFrom } from 'rxjs';
 import { labelForGameId } from '@core/utils/game-id-labels';
 import {
+  GRIMOIRE_BASE_COORDS as BASE_COORDS,
+  GRIMOIRE_IMAGES,
+  GRIMOIRE_PANEL_BARD as PANEL_BARD,
+  GRIMOIRE_PANEL_CLERIC as PANEL_CLERIC,
+  GRIMOIRE_PANEL_DRUID as PANEL_DRUID,
+  GRIMOIRE_PANEL_SORCERER as PANEL_SORCERER,
+  GRIMOIRE_PANEL_WARLOCK as PANEL_WARLOCK,
+  GRIMOIRE_PANEL_WIZARD as PANEL_WIZARD,
+  GRIMOIRE_SPELL_TABLE_LEVEL as SPELL_TABLE_LEVEL,
+  GRIMOIRE_SUPP_IMAGE,
+  listGrimoireCalibrationPoints,
+} from '@core/config/grimoire-coords.config';
+import { drawGrimoireCalibrationOverlay } from '@core/utils/grimoire-calibration.util';
+import {
   buildGrimoireEffectSummary,
   paginateGrimoireOverflow,
   planGrimoireTable,
@@ -34,58 +48,12 @@ function pxToMmY(px: number): number {
 }
 
 // ---------------------------------------------------------------------------
-// Correspondance kind → image de grimoire
+// Coordonnées grimoire : voir core/config/grimoire-coords.config.ts
+// Outil visuel : /tools/grimoire-calibrate/cleric
 // ---------------------------------------------------------------------------
-const GRIMOIRE_IMAGES: Record<SpellcastingKind, string> = {
-  wizard: '/images/sheets/grimoires/grimoire-mage.jpg',
-  sorcerer: '/images/sheets/grimoires/grimoire-ensorceleur.jpg',
-  warlock: '/images/sheets/grimoires/grimoire-sorcier.jpg',
-  cleric: '/images/sheets/grimoires/grimoire-pretre.jpg',
-  druid: '/images/sheets/grimoires/grimoire-druide.jpg',
-  bard: '/images/sheets/grimoires/grimoire-barde.jpg',
-  ranger: '/images/sheets/grimoires/grimoire-guerrier-rodeur-paladin.jpg',
-  paladin: '/images/sheets/grimoires/grimoire-guerrier-rodeur-paladin.jpg',
-  fighter_eldritch_knight: '/images/sheets/grimoires/grimoire-guerrier-rodeur-paladin.jpg',
-};
-
-/** Page de continuation — sorts qui ne tiennent pas sur le grimoire principal. */
-const GRIMOIRE_SUPP_IMAGE = '/images/sheets/grimoires/grimoire-supp.jpg';
-
-// ---------------------------------------------------------------------------
-// Coordonnées BASE (côté gauche) — partagées par tous les casters standards
-// ⚠️ ESTIMATIONS — à calibrer avec le PDF réel
-// ---------------------------------------------------------------------------
-interface GrimoireBaseCoords {
-  nameX: number;
-  nameY: number;
-  abilityX: number;
-  abilityY: number;
-  saveDCX: number;
-  saveDCY: number;
-  attackModX: number;
-  attackModY: number;
-  cantripY: number;
-  cantripXStart: number;
-  cantripSpacing: number;
-  slotXStart: number;
-  slotSpacing: number;
-  slotRows: { y: number; maxCircles: number }[];
-  spellTableStartY: number;
-  spellTableRowH: number;
-  spellTableMaxRows: number;
-  colPrepared: number;
-  colName: number;
-  colEffect: number;
-  colPage: number;
-}
 
 /**
- * Coordonnées page supplémentaire (image native 1241×1754 → espace 595×842).
- * 25 lignes, 6 médaillons « Niveau » à gauche.
- */
-/**
- * Coordonnées page supplémentaire (image native 1241×1754 → espace 595×842).
- * 6 médaillons ouroboros × ~5 lignes.
+ * Coordonnées page supplémentaire (grimoire-supp.jpg).
  */
 const SUPP_COORDS = {
   /** Centre X des médaillons ouroboros (niveau). */
@@ -102,127 +70,6 @@ const SUPP_COORDS = {
   tableStartY: 168,
   rowH: 22.5,
   maxRows: 30,
-};
-
-/** Médaillons « Niveau » du tableau de sorts (grimoires classes standards). */
-const SPELL_TABLE_LEVEL = {
-  levelX: 44,
-  levelYs: [505, 618, 731],
-  rowsPerBand: 5,
-  labelFontSize: 10,
-  labelBaselineFactor: 0.14,
-};
-
-const BASE_COORDS: GrimoireBaseCoords = {
-  nameX: 130,
-  nameY: 160,
-  abilityX: 94,
-  abilityY: 241,
-  saveDCX: 110,
-  saveDCY: 325,
-  attackModX: 110,
-  attackModY: 405,
-  cantripY: 220,
-  cantripXStart: 260,
-  cantripSpacing: 15,
-  slotXStart: 261,
-  slotSpacing: 15,
-  slotRows: [
-    { y: 255, maxCircles: 4 }, // 1er
-    { y: 250, maxCircles: 3 }, // 2e  ← vérifier, semble inversé avec le 1er
-    { y: 274, maxCircles: 3 }, // 3e
-    { y: 296, maxCircles: 3 }, // 4e
-    { y: 318, maxCircles: 3 }, // 5e
-    { y: 340, maxCircles: 2 }, // 6e
-    { y: 362, maxCircles: 2 }, // 7e
-    { y: 384, maxCircles: 1 }, // 8e
-    { y: 406, maxCircles: 1 }, // 9e
-  ],
-  /** 1re ligne du tableau (juste au-dessus du lignage ~492). */
-  spellTableStartY: 490,
-  spellTableRowH: 22.5,
-  spellTableMaxRows: 12,
-  colPrepared: 82,
-  colName: 95,
-  colEffect: 276,
-  colPage: 530,
-};
-
-// ---------------------------------------------------------------------------
-// Coordonnées PANNEAU DROIT — une config par grimoire
-// Chaque grimoire a ses propres positions pour l'encart de classe.
-// ⚠️ ESTIMATIONS — à calibrer avec le PDF réel
-// ---------------------------------------------------------------------------
-
-// Barde : "Magie Bardique" → Collège bardique, Focaliseur arcanique
-const PANEL_BARD = {
-  line1X: 450, // Collège bardique (valeur)
-  line1Y: 255,
-  line2X: 450, // Focaliseur arcanique (valeur)
-  line2Y: 310,
-};
-
-// Mage : "Magie Arcanique" → Tradition arcanique, Focaliseur arcanique
-const PANEL_WIZARD = {
-  line1X: 450, // Tradition arcanique (valeur)
-  line1Y: 250,
-  line2X: 450, // Focaliseur arcanique (valeur)
-  line2Y: 305,
-};
-
-// Prêtre : "Magie Divine" → Divinité–Domaine, Symbole sacré, Conduits divins
-const PANEL_CLERIC = {
-  line1X: 448,
-  line1Y: 248,
-  line2X: 448,
-  line2Y: 300,
-  channelsStartY: 365,
-  channelsSpacing: 22,
-  channelsX: 448,
-  valueFontSize: 10,
-  focusFontSize: 9,
-};
-
-// Druide : "Magie druidique" → Cercle, Focaliseur, cases à cocher, notes
-const PANEL_DRUID = {
-  line1X: 450, // Cercle druidique (valeur)
-  line1Y: 245,
-  line2X: 435, // Focaliseur arcanique (valeur)
-  line2Y: 268,
-  circleSpellsCheckX: 443, // case "Sorts de cercle"
-  circleSpellsCheckY: 345,
-  mysticTranceCheckX: 443, // case "Transe mystique"
-  mysticTranceCheckY: 368,
-  notesX: 440,
-  notesStartY: 410,
-  notesSpacing: 22,
-};
-
-// Sorcier : "Sorcellerie" → Suzerain, Pacte, Focaliseur (serrés sur le parchemin), puis Manifestations
-const PANEL_WARLOCK = {
-  line1X: 448, // Suzerain (valeur)
-  line1Y: 248,
-  line2X: 448, // Pacte (valeur)
-  line2Y: 272,
-  line3X: 448, // Focaliseur arcanique (valeur) — trop bas (345) écrivait sur Manifestations
-  line3Y: 296,
-  invocationsX: 448,
-  invocationsStartY: 378,
-  invocationsSpacing: 18,
-};
-
-// Ensorceleur : "Ensorcellement" → Atavisme, Focaliseur, Points arcaniques, Métamagie
-const PANEL_SORCERER = {
-  line1X: 450, // Atavisme (valeur)
-  line1Y: 245,
-  line2X: 435, // Focaliseur arcanique (valeur)
-  line2Y: 280,
-  pointsLabelX: 440, // Points arcaniques (valeur dans l'ovale)
-  pointsValueX: 530,
-  pointsY: 350,
-  metamagicX: 440,
-  metamagicStartY: 395,
-  metamagicSpacing: 22,
 };
 
 // ---------------------------------------------------------------------------
@@ -354,6 +201,17 @@ export class PdfGeneratorService {
     const pdf = await this.buildPdf(character);
     const blob = pdf.output('blob');
     return URL.createObjectURL(blob);
+  }
+
+  /** PDF debug : fond grimoire + croix rouges aux coordonnées configurées. */
+  async generateGrimoireCalibrationPdf(kind: SpellcastingKind = 'cleric'): Promise<void> {
+    const { jsPDF } = await import('jspdf');
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const grimoireUrl = GRIMOIRE_IMAGES[kind] ?? GRIMOIRE_IMAGES.cleric;
+    const grimoireImg = await this.loadImage(grimoireUrl);
+    pdf.addImage(grimoireImg, 'JPEG', 0, 0, 210, 297);
+    drawGrimoireCalibrationOverlay(pdf, listGrimoireCalibrationPoints(kind));
+    pdf.save(`grimoire-calibration-${kind}.pdf`);
   }
 
   // =========================================================================
@@ -1111,7 +969,7 @@ export class PdfGeneratorService {
     const B = BASE_COORDS;
     const effectWidthMm = pxToMmX(B.colPage - B.colEffect - 8);
     const split = this.grimoireEffectSplit(pdf, 7);
-    return planGrimoireTable(sorted, split, effectWidthMm, B.spellTableMaxRows, 2);
+    return planGrimoireTable(sorted, split, effectWidthMm, B.spellTableMaxRows, 3);
   }
 
   private planSuppGrimoirePages(pdf: jsPDF, spells: SpellInstance[]): GrimoireTablePlan[] {

@@ -188,5 +188,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('@features/character-sheet/character-sheet').then((m) => m.CharacterSheet),
   },
+  {
+    path: 'tools/grimoire-calibrate/:kind',
+    loadComponent: () =>
+      import('@features/tools/grimoire-calibrate/grimoire-calibrate').then(
+        (m) => m.GrimoireCalibratePage,
+      ),
+  },
   { path: '**', redirectTo: '' },
 ];

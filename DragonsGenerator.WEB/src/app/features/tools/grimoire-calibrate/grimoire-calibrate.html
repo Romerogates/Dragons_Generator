@@ -1,0 +1,73 @@
+<div class="page">
+  <header class="page__header">
+    <a routerLink="/">← Accueil</a>
+    <h1>Calibration grimoire — {{ kind() }}</h1>
+    <p>
+      Clique sur le JPG pour obtenir des coordonnées <strong>595×842</strong>. Les croix rouges
+      montrent la config actuelle. Ajuste <code>grimoire-coords.config.ts</code> puis regénère le
+      PDF de calibration.
+    </p>
+  </header>
+
+  <div class="page__actions">
+    <button type="button" (click)="downloadCalibrationPdf()" [disabled]="exporting()">
+      {{ exporting() ? 'Export…' : 'PDF calibration (croix rouges)' }}
+    </button>
+    <button type="button" (click)="copyAnchorsJson()">Copier ancres JSON</button>
+    <button type="button" (click)="copyLastClick()" [disabled]="!clicks().length">
+      Copier dernier clic
+    </button>
+    <button type="button" (click)="clearClicks()">Effacer clics</button>
+  </div>
+
+  <div class="layout">
+    <div class="canvas-wrap">
+      <img
+        class="canvas-wrap__img"
+        [src]="imageUrl()"
+        [alt]="'Grimoire ' + kind()"
+        [width]="sheet.width"
+        [height]="sheet.height"
+        (click)="onImageClick($event)"
+      />
+      @for (pt of anchors(); track pt.id) {
+        <span
+          class="marker marker--anchor"
+          [style.left.%]="(pt.x / sheet.width) * 100"
+          [style.top.%]="(pt.y / sheet.height) * 100"
+          [title]="pt.label + ' (' + pt.x + ',' + pt.y + ')'"
+        >
+          {{ pt.label }}
+        </span>
+      }
+      @for (c of clicks(); track $index) {
+        <span
+          class="marker marker--click"
+          [style.left.%]="(c.x / sheet.width) * 100"
+          [style.top.%]="(c.y / sheet.height) * 100"
+          [title]="c.x + ',' + c.y"
+        >
+          {{ c.x }},{{ c.y }}
+        </span>
+      }
+    </div>
+
+    <aside class="sidebar">
+      <h2>Ancres actuelles</h2>
+      <ul>
+        @for (pt of anchors(); track pt.id) {
+          <li><strong>{{ pt.label }}</strong> — {{ pt.group }} · ({{ pt.x }}, {{ pt.y }})</li>
+        }
+      </ul>
+
+      @if (clicks().length) {
+        <h2>Derniers clics</h2>
+        <ul>
+          @for (c of clicks().slice().reverse(); track $index) {
+            <li>({{ c.x }}, {{ c.y }})</li>
+          }
+        </ul>
+      }
+    </aside>
+  </div>
+</div>

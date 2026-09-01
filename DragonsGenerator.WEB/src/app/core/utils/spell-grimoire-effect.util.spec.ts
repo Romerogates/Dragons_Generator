@@ -49,12 +49,28 @@ describe('spell-grimoire-effect.util', () => {
     expect(summary).toContain('Vous infligez des dégâts.');
   });
 
+  it('buildGrimoireEffectSummary handles spell without description', () => {
+    const summary = buildGrimoireEffectSummary(mockSpell({ description: '' }));
+    expect(summary).toBe('V,S | Instantanée');
+  });
+
   it('buildGrimoireEffectSummary shortens hour duration', () => {
     const summary = buildGrimoireEffectSummary(
       mockSpell({ duration: { amount: 1, unit: 'heure' } }),
     );
     expect(summary).toContain('1 h');
     expect(summary).not.toContain('heure');
+  });
+
+  it('buildGrimoireEffectSummary shortens round and day durations', () => {
+    const round = buildGrimoireEffectSummary(
+      mockSpell({ duration: { amount: 2, unit: 'rounds' } }),
+    );
+    const day = buildGrimoireEffectSummary(
+      mockSpell({ duration: { amount: 3, unit: 'jours' } }),
+    );
+    expect(round).toContain('2 rd');
+    expect(day).toContain('3 j');
   });
 
   it('buildGrimoireEffectSummary keeps full first sentence (no 140 char cut)', () => {
