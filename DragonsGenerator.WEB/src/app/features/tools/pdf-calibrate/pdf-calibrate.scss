@@ -1,0 +1,161 @@
+.page {
+  padding: 1rem 1.5rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page__header h1 {
+  margin: 0.5rem 0;
+}
+
+.sheet-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.sheet-nav__btn {
+  padding: 0.35rem 0.6rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+}
+
+.sheet-nav__btn--active {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.page__actions button {
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 595px) 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.calibrate-canvas {
+  position: relative;
+  width: 100%;
+  max-width: 595px;
+  border: 1px solid #ccc;
+  background: #f5f0e6;
+  touch-action: none;
+  user-select: none;
+}
+
+.calibrate-canvas img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.anchor {
+  position: absolute;
+  transform: translate(0, -100%);
+  margin: 0;
+  padding: 0 2px;
+  border: 1px dashed transparent;
+  background: rgb(255 255 255 / 55%);
+  color: #2c1810;
+  cursor: grab;
+  font-family: inherit;
+  line-height: 1.15;
+  max-width: 45%;
+  text-align: left;
+  white-space: pre-wrap;
+}
+
+.anchor--selected {
+  border-color: #2563eb;
+  background: rgb(219 234 254 / 75%);
+  z-index: 2;
+}
+
+.anchor--dragging {
+  cursor: grabbing;
+  border-color: #dc2626;
+  z-index: 3;
+}
+
+.sidebar {
+  font-size: 0.9rem;
+}
+
+.sidebar ul {
+  padding-left: 1.1rem;
+  margin: 0.25rem 0 0.75rem;
+}
+
+.hint {
+  color: #555;
+  font-size: 0.85rem;
+}
+
+.editor {
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fafafa;
+}
+
+.editor label {
+  display: block;
+  margin-bottom: 0.6rem;
+}
+
+.editor textarea,
+.editor input {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  font: inherit;
+}
+
+.coords {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.muted {
+  color: #888;
+  font-weight: normal;
+}
+
+.group summary {
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #2563eb;
+  cursor: pointer;
+  text-decoration: underline;
+  font: inherit;
+}
+
+@media (max-width: 960px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

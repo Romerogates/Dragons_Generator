@@ -14,9 +14,7 @@ import {
   GRIMOIRE_PANEL_WIZARD as PANEL_WIZARD,
   GRIMOIRE_SPELL_TABLE_LEVEL as SPELL_TABLE_LEVEL,
   GRIMOIRE_SUPP_IMAGE,
-  listGrimoireCalibrationPoints,
 } from '@core/config/grimoire-coords.config';
-import { drawGrimoireCalibrationOverlay } from '@core/utils/grimoire-calibration.util';
 import {
   buildGrimoireEffectSummary,
   paginateGrimoireOverflow,
@@ -203,15 +201,31 @@ export class PdfGeneratorService {
     return URL.createObjectURL(blob);
   }
 
-  /** PDF debug : fond grimoire + croix rouges aux coordonnées configurées. */
-  async generateGrimoireCalibrationPdf(kind: SpellcastingKind = 'cleric'): Promise<void> {
+  /** PDF debug : fond + textes d'aperçu aux positions calibrées. */
+  async generateSheetCalibrationPdf(
+    sheetId: string,
+    imageUrl: string,
+    anchors: import('@core/config/sheet-calibration.config').SheetCalibrationAnchor[],
+  ): Promise<void> {
     const { jsPDF } = await import('jspdf');
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    const grimoireUrl = GRIMOIRE_IMAGES[kind] ?? GRIMOIRE_IMAGES.cleric;
-    const grimoireImg = await this.loadImage(grimoireUrl);
-    pdf.addImage(grimoireImg, 'JPEG', 0, 0, 210, 297);
-    drawGrimoireCalibrationOverlay(pdf, listGrimoireCalibrationPoints(kind));
-    pdf.save(`grimoire-calibration-${kind}.pdf`);
+    const img = await this.loadImage(imageUrl);
+    pdf.addImage(img, 'JPEG', 0, 0, 210, 297);
+    const { drawSheetCalibrationPreview } = await import('@core/utils/sheet-calibration-pdf.util');
+    drawSheetCalibrationPreview(pdf, anchors);
+    pdf.save(`calibration-${sheetId}.pdf`);
+  }
+
+  /** @deprecated Utiliser generateSheetCalibrationPdf */
+  async generateGrimoireCalibrationPdf(kind: SpellcastingKind = 'cleric'): Promise<void> {
+    const { getSheetCalibrationTemplate } = await import('@core/config/sheet-calibration.config');
+    const { mergeAnchors } = await import('@core/services/sheet-calibration.storage');
+    const { loadCalibrationOverrides } = await import('@core/services/sheet-calibration.storage');
+    const sheetId = `grimoire-${kind}`;
+    const tpl = getSheetCalibrationTemplate(sheetId) ?? getSheetCalibrationTemplate('grimoire-cleric');
+    if (!tpl) return;
+    const anchors = mergeAnchors(tpl.anchors, loadCalibrationOverrides()[tpl.id]);
+    await this.generateSheetCalibrationPdf(tpl.id, tpl.imageUrl, anchors);
   }
 
   // =========================================================================
