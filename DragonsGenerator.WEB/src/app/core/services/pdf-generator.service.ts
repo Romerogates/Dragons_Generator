@@ -170,8 +170,8 @@ const PAGE2 = {
   longRestCol2UsesX: 360,
 
   // --- Emplacements de sorts (parchemin bas-droite) ---
-  spellSlotX: 472,
-  spellSlotStartY: 551,
+  spellSlotX: 473,
+  spellSlotStartY: 550,
   spellSlotRowH: 22,
   spellSlotCircleSpacing: 15,
   spellSlotMaxPerRow: [4, 3, 3, 3, 3, 2, 2, 1, 1],
