@@ -68,8 +68,8 @@ export const GRIMOIRE_BASE_COORDS: GrimoireBaseCoords = {
 
 /** Médaillons « Niveau » (ouroboros) — calibrés sur grimoire-pretre.jpg. */
 export const GRIMOIRE_SPELL_TABLE_LEVEL = {
-  levelX: 41,
-  levelYs: [512, 626, 740],
+  levelX: 44,
+  levelYs: [511, 625, 739],
   rowsPerBand: 5,
   labelFontSize: 11,
   labelBaselineFactor: 0.18,
