@@ -154,6 +154,44 @@
   font: inherit;
 }
 
+.anchor--circle-hit {
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: grab;
+}
+
+.anchor__circle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: #2c1810;
+  pointer-events: none;
+}
+
+.anchor--circle-hit.anchor--selected .anchor__circle {
+  box-shadow: 0 0 0 2px #2563eb;
+}
+
+.real-preview {
+  grid-column: 1 / -1;
+  margin-top: 0.5rem;
+}
+
+.real-preview iframe {
+  width: 100%;
+  height: 70vh;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
 @media (max-width: 960px) {
   .layout {
     grid-template-columns: 1fr;

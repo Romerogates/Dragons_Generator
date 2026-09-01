@@ -3,8 +3,9 @@
     <a routerLink="/">← Accueil</a>
     <h1>Calibration PDF personnage</h1>
     <p>
-      Glisse les textes sur le JPG pour calibrer. Modifie le contenu et la taille à droite pour
-      vérifier le rendu. Exporte tout en JSON et envoie-moi le fichier.
+      Glisse les repères sur le JPG. Pour le grimoire, utilise
+      <strong>PDF réel (générateur)</strong> : c'est le même moteur que l'export personnage.
+      Les cercles (mineurs, emplacements, préparé) se déplacent comme dans le PDF final.
     </p>
   </header>
 
@@ -22,8 +23,13 @@
   </nav>
 
   <div class="page__actions">
+    @if (isGrimoire()) {
+      <button type="button" (click)="refreshRealPreview()" [disabled]="exporting() || !template()">
+        {{ exporting() ? 'Génération…' : 'PDF réel (générateur)' }}
+      </button>
+    }
     <button type="button" (click)="downloadPreviewPdf()" [disabled]="exporting() || !template()">
-      {{ exporting() ? 'Export…' : 'PDF aperçu (textes)' }}
+      {{ exporting() ? 'Export…' : isGrimoire() ? 'Télécharger PDF réel' : 'PDF aperçu (textes)' }}
     </button>
     <button type="button" (click)="exportSheetJson()" [disabled]="!template()">Export feuille JSON</button>
     <button type="button" (click)="exportAllJson()">Export TOUT (JSON)</button>
@@ -47,19 +53,39 @@
           draggable="false"
         />
         @for (a of anchors(); track a.id) {
-          <button
-            type="button"
-            class="anchor"
-            [class.anchor--selected]="a.id === selectedId()"
-            [class.anchor--dragging]="a.id === draggingId()"
-            [style.left.%]="(a.x / sheetSize.width) * 100"
-            [style.top.%]="(a.y / sheetSize.height) * 100"
-            [style.font-size.px]="a.fontSize"
-            [title]="a.label"
-            (pointerdown)="onCanvasPointerDown($event, a.id)"
-          >
-            {{ a.sampleText }}
-          </button>
+          @if (a.render === 'circle' || a.render === 'circle-row') {
+            <button
+              type="button"
+              class="anchor anchor--circle-hit"
+              [class.anchor--selected]="a.id === selectedId()"
+              [class.anchor--dragging]="a.id === draggingId()"
+              [style.left.%]="(a.x / sheetSize.width) * 100"
+              [style.top.%]="(a.y / sheetSize.height) * 100"
+              [title]="a.label"
+              (pointerdown)="onCanvasPointerDown($event, a.id)"
+            >
+              @for (i of circlePreviewIndices(a); track i) {
+                <span
+                  class="anchor__circle"
+                  [style.left.px]="i * (a.circleSpacing ?? 15)"
+                ></span>
+              }
+            </button>
+          } @else {
+            <button
+              type="button"
+              class="anchor"
+              [class.anchor--selected]="a.id === selectedId()"
+              [class.anchor--dragging]="a.id === draggingId()"
+              [style.left.%]="(a.x / sheetSize.width) * 100"
+              [style.top.%]="(a.y / sheetSize.height) * 100"
+              [style.font-size.px]="a.fontSize"
+              [title]="a.label"
+              (pointerdown)="onCanvasPointerDown($event, a.id)"
+            >
+              {{ a.sampleText }}
+            </button>
+          }
         }
       </div>
 
@@ -120,6 +146,13 @@
           </details>
         }
       </aside>
+
+      @if (isGrimoire() && safePreviewUrl()) {
+        <section class="real-preview">
+          <h2>Aperçu PDF réel (page grimoire incluse)</h2>
+          <iframe [src]="safePreviewUrl()" title="Aperçu PDF grimoire"></iframe>
+        </section>
+      }
     </div>
   }
 </div>

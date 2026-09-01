@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import {
   buildCalibrationExport,
@@ -37,10 +38,12 @@ export class PdfCalibratePage {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly pdfService = inject(PdfGeneratorService);
+  private readonly sanitizer = inject(DomSanitizer);
 
   readonly sheetSize = PDF_SHEET_SIZE;
   readonly templates = SHEET_CALIBRATION_TEMPLATES;
   readonly exporting = signal(false);
+  readonly realPreviewUrl = signal<string | null>(null);
   readonly selectedId = signal<string | null>(null);
   readonly draggingId = signal<string | null>(null);
 
@@ -52,6 +55,8 @@ export class PdfCalibratePage {
     const raw = fromSheet ?? fromKind ?? 'sheet-page1';
     return resolveSheetCalibrationId(raw);
   });
+
+  readonly isGrimoire = computed(() => this.sheetId().startsWith('grimoire-'));
 
   readonly template = computed(() => getSheetCalibrationTemplate(this.sheetId()));
 
@@ -66,6 +71,11 @@ export class PdfCalibratePage {
     return this.anchors().find((a) => a.id === id) ?? null;
   });
 
+  readonly safePreviewUrl = computed(() => {
+    const url = this.realPreviewUrl();
+    return url ? this.sanitizer.bypassSecurityTrustResourceUrl(url) : null;
+  });
+
   readonly groupedAnchors = computed(() => {
     const groups = new Map<string, SheetCalibrationAnchor[]>();
     for (const a of this.anchors()) {
@@ -75,6 +85,19 @@ export class PdfCalibratePage {
     }
     return [...groups.entries()];
   });
+
+  circlePreviewIndices(anchor: SheetCalibrationAnchor): number[] {
+    if (anchor.render === 'circle-row') {
+      const count = anchor.circleCount ?? 5;
+      return Array.from({ length: count }, (_, i) => i);
+    }
+    return [0];
+  }
+
+  anchorCircleX(anchor: SheetCalibrationAnchor, index: number): number {
+    const spacing = anchor.circleSpacing ?? 15;
+    return anchor.x + index * spacing;
+  }
 
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
@@ -141,7 +164,31 @@ export class PdfCalibratePage {
     if (!tpl) return;
     this.exporting.set(true);
     try {
+      if (this.isGrimoire()) {
+        await this.refreshRealPreview();
+        const url = this.realPreviewUrl();
+        if (url) {
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `calibration-${tpl.id}-reel.pdf`;
+          a.click();
+        }
+        return;
+      }
       await this.pdfService.generateSheetCalibrationPdf(tpl.id, tpl.imageUrl, this.anchors());
+    } finally {
+      this.exporting.set(false);
+    }
+  }
+
+  async refreshRealPreview(): Promise<void> {
+    if (!this.isGrimoire()) return;
+    this.exporting.set(true);
+    try {
+      const prev = this.realPreviewUrl();
+      if (prev) URL.revokeObjectURL(prev);
+      const url = await this.pdfService.generateGrimoireCalibrationPreviewBlob(this.anchors());
+      this.realPreviewUrl.set(url);
     } finally {
       this.exporting.set(false);
     }

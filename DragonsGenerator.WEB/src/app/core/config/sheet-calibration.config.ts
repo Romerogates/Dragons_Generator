@@ -9,6 +9,8 @@ import {
 
 export const PDF_SHEET_SIZE = GRIMOIRE_SHEET;
 
+export type SheetAnchorRender = 'text' | 'circle' | 'circle-row';
+
 export interface SheetCalibrationAnchor {
   id: string;
   label: string;
@@ -17,6 +19,11 @@ export interface SheetCalibrationAnchor {
   y: number;
   sampleText: string;
   fontSize: number;
+  render?: SheetAnchorRender;
+  /** Pour circle-row : nombre de cercles (ex. sorts mineurs = 5). */
+  circleCount?: number;
+  /** Espacement horizontal entre cercles (px). */
+  circleSpacing?: number;
 }
 
 export interface SheetCalibrationTemplate {
@@ -34,8 +41,11 @@ function anchor(
   y: number,
   sampleText: string,
   fontSize = 10,
+  render: SheetAnchorRender = 'text',
+  circleCount?: number,
+  circleSpacing?: number,
 ): SheetCalibrationAnchor {
-  return { id, label, group, x, y, sampleText, fontSize };
+  return { id, label, group, x, y, sampleText, fontSize, render, circleCount, circleSpacing };
 }
 
 function grimoireClericAnchors(): SheetCalibrationAnchor[] {
@@ -47,9 +57,9 @@ function grimoireClericAnchors(): SheetCalibrationAnchor[] {
     anchor('ability', 'Caractéristique', 'En-tête', B.abilityX, B.abilityY, 'Sagesse', 10),
     anchor('save-dc', 'DD sauvegarde', 'En-tête', B.saveDCX, B.saveDCY, '12', 12),
     anchor('attack-mod', 'Mod. attaque', 'En-tête', B.attackModX, B.attackModY, '+4', 12),
-    anchor('cantrip-1', 'Sort mineur 1', 'Mineurs', B.cantripXStart, B.cantripY, '●', 10),
-    anchor('slot-1', 'Emplacement 1', 'Emplacements', B.slotXStart, B.slotRows[0]?.y ?? 255, '●', 10),
-    anchor('prep-1', 'Préparé', 'Tableau', B.colPrepared, B.spellTableStartY, '●', 8),
+    anchor('cantrip-1', 'Sort mineur 1', 'Mineurs', B.cantripXStart, B.cantripY, '', 10, 'circle-row', 5, B.cantripSpacing),
+    anchor('slot-1', 'Emplacement 1', 'Emplacements', B.slotXStart, B.slotRows[0]?.y ?? 255, '', 10, 'circle'),
+    anchor('prep-1', 'Préparé', 'Tableau', B.colPrepared, B.spellTableStartY - 2, '', 8, 'circle'),
     anchor('spell-name', 'Nom sort', 'Tableau', B.colName, B.spellTableStartY, 'Imprécation', 10),
     anchor(
       'effect',
