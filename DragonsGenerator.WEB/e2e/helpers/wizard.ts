@@ -6,6 +6,11 @@ const isCi = !!process.env['CI'];
 const CARD_TITLES: Record<string, string | RegExp> = {
   'sp-humain': 'Humains',
   'cls-lettre': 'Lettré',
+  'cls-guerrier': 'Guerrier',
+  'cls-magicien': 'Magicien',
+  'cls-pretre': 'Prêtre',
+  'subcls-domaine-de-la-vie': 'Vie',
+  'feat-style-duel': 'Duel',
   'feat-astuce-audace': 'Audace',
   'feat-astuce-brio': 'Brio',
 };

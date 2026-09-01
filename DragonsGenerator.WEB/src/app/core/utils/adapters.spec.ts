@@ -42,6 +42,31 @@ describe('class-data.adapter', () => {
     expect(normalized.data.proficiencies.saving_throws).toContain('Intelligence');
     expect(normalized.data.starting_equipment.length).toBeGreaterThan(1);
   });
+
+  it('maps roublard equipment choice_pools from root choice_pools', () => {
+    const normalized = normalizeCharacterClass({
+      id: 'cls-roublard',
+      name: 'Roublard',
+      data: {
+        hit_die: '1d8',
+        choice_pools: [
+          {
+            id: 'choice-equipment-1-cls-roublard',
+            name: 'Arme principale',
+            type: 'equipment',
+            pool: [
+              { option_id: 'opt-a', items: [{ id: 'wp-rapiere', qty: 1 }] },
+              { option_id: 'opt-b', items: [{ id: 'wp-epee-courte', qty: 1 }] },
+            ],
+          },
+        ],
+        starting_equipment: { fixed: [], choice_pools: [] },
+      },
+    } as any);
+
+    expect(normalized.data.starting_equipment.length).toBe(1);
+    expect(normalized.data.starting_equipment[0].alternatives?.length).toBe(2);
+  });
 });
 
 describe('background-data.adapter', () => {

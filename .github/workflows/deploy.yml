@@ -24,6 +24,9 @@ jobs:
       - name: Restore API solution
         run: dotnet restore DragonsGenerator.API.sln
 
+      - name: Validate class JSON data
+        run: node scripts/validate-class-json.mjs
+
       - name: API tests
         run: >
           dotnet test DragonsGenerator.API.Tests/DragonsGenerator.API.Tests.csproj
