@@ -188,15 +188,5 @@ export const routes: Routes = [
     loadComponent: () =>
       import('@features/character-sheet/character-sheet').then((m) => m.CharacterSheet),
   },
-  {
-    path: 'tools/pdf-calibrate/:sheetId',
-    loadComponent: () =>
-      import('@features/tools/pdf-calibrate/pdf-calibrate').then((m) => m.PdfCalibratePage),
-  },
-  {
-    path: 'tools/grimoire-calibrate/:kind',
-    loadComponent: () =>
-      import('@features/tools/pdf-calibrate/pdf-calibrate').then((m) => m.PdfCalibratePage),
-  },
   { path: '**', redirectTo: '' },
 ];

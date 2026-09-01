@@ -1,7 +1,7 @@
 import {
   GRIMOIRE_BASE_COORDS,
   GRIMOIRE_PANEL_CLERIC,
-  listGrimoireCalibrationPoints,
+  GRIMOIRE_SPELL_TABLE_LEVEL,
 } from './grimoire-coords.config';
 
 describe('grimoire-coords.config', () => {
@@ -9,21 +9,9 @@ describe('grimoire-coords.config', () => {
     expect(GRIMOIRE_BASE_COORDS.spellTableMaxRows).toBe(15);
   });
 
-  it('lists cleric calibration anchors including panel and medallions', () => {
-    const points = listGrimoireCalibrationPoints('cleric');
-    expect(points.some((p) => p.id === 'deity')).toBeTrue();
-    expect(points.some((p) => p.id === 'focus')).toBeTrue();
-    expect(points.some((p) => p.id === 'level-0')).toBeTrue();
+  it('exposes calibrated cleric panel and medallion coords', () => {
     expect(GRIMOIRE_PANEL_CLERIC.line2Y).toBe(307);
-  });
-
-  it('defaults to cleric kind', () => {
-    expect(listGrimoireCalibrationPoints().some((p) => p.id === 'deity')).toBeTrue();
-  });
-
-  it('omits cleric panel anchors for other kinds', () => {
-    const points = listGrimoireCalibrationPoints('wizard');
-    expect(points.some((p) => p.id === 'deity')).toBeFalse();
-    expect(points.some((p) => p.id === 'name')).toBeTrue();
+    expect(GRIMOIRE_SPELL_TABLE_LEVEL.levelX).toBe(44);
+    expect(GRIMOIRE_BASE_COORDS.colPrepared).toBe(80);
   });
 });

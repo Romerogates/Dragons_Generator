@@ -4,12 +4,15 @@ import type { jsPDF } from 'jspdf';
 import { firstValueFrom } from 'rxjs';
 import { labelForGameId } from '@core/utils/game-id-labels';
 import {
+  GRIMOIRE_BASE_COORDS as BASE_COORDS,
   GRIMOIRE_IMAGES,
   GRIMOIRE_PANEL_BARD as PANEL_BARD,
+  GRIMOIRE_PANEL_CLERIC as PANEL_CLERIC,
   GRIMOIRE_PANEL_DRUID as PANEL_DRUID,
   GRIMOIRE_PANEL_SORCERER as PANEL_SORCERER,
   GRIMOIRE_PANEL_WARLOCK as PANEL_WARLOCK,
   GRIMOIRE_PANEL_WIZARD as PANEL_WIZARD,
+  GRIMOIRE_SPELL_TABLE_LEVEL as SPELL_TABLE_LEVEL,
   GRIMOIRE_SUPP_IMAGE,
 } from '@core/config/grimoire-coords.config';
 import {
@@ -20,16 +23,11 @@ import {
   type GrimoireTablePlan,
 } from '@core/utils/spell-grimoire-effect.util';
 import { DataService } from '@core/services/data.service';
-import { GrimoireCalibrationContext } from '@core/services/grimoire-calibration-context.service';
-import { buildGrimoireCalibrationSampleCharacter } from '@core/config/pdf-calibration-sample.character';
-import type { SheetCalibrationAnchor } from '@core/config/sheet-calibration.config';
-import { grimoireCoordsFromAnchors } from '@core/utils/grimoire-calibration-coords.util';
 import type { Spell } from '@core/models/Spells/spell';
 import {
   Character,
   SpellInstance,
   CharacterSpellcasting,
-  SpellcastingKind,
 } from '@core/models/Character/character';
 
 // ---------------------------------------------------------------------------
@@ -48,7 +46,6 @@ function pxToMmY(px: number): number {
 
 // ---------------------------------------------------------------------------
 // Coordonnées grimoire : voir core/config/grimoire-coords.config.ts
-// Outil visuel : /tools/grimoire-calibrate/cleric
 // ---------------------------------------------------------------------------
 
 /**
@@ -182,19 +179,6 @@ const PAGE2 = {
 })
 export class PdfGeneratorService {
   private readonly dataService = inject(DataService);
-  private readonly grimoireCalibration = inject(GrimoireCalibrationContext);
-
-  private grimoireBase() {
-    return this.grimoireCalibration.getBaseCoords();
-  }
-
-  private grimoireSpellLevel() {
-    return this.grimoireCalibration.getSpellTableLevel();
-  }
-
-  private grimoirePanelCleric() {
-    return this.grimoireCalibration.getPanelCleric();
-  }
 
   // =========================================================================
   // API PUBLIQUE
@@ -213,44 +197,6 @@ export class PdfGeneratorService {
     const pdf = await this.buildPdf(character);
     const blob = pdf.output('blob');
     return URL.createObjectURL(blob);
-  }
-
-  /** PDF debug : fond + textes d'aperçu aux positions calibrées. */
-  async generateSheetCalibrationPdf(
-    sheetId: string,
-    imageUrl: string,
-    anchors: import('@core/config/sheet-calibration.config').SheetCalibrationAnchor[],
-  ): Promise<void> {
-    const { jsPDF } = await import('jspdf');
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    const img = await this.loadImage(imageUrl);
-    pdf.addImage(img, 'JPEG', 0, 0, 210, 297);
-    const { drawSheetCalibrationPreview } = await import('@core/utils/sheet-calibration-pdf.util');
-    drawSheetCalibrationPreview(pdf, anchors);
-    pdf.save(`calibration-${sheetId}.pdf`);
-  }
-
-  async generateGrimoireCalibrationPreviewBlob(
-    anchors: SheetCalibrationAnchor[],
-  ): Promise<string> {
-    this.grimoireCalibration.setOverride(grimoireCoordsFromAnchors(anchors));
-    try {
-      return await this.generatePdfBlob(buildGrimoireCalibrationSampleCharacter());
-    } finally {
-      this.grimoireCalibration.setOverride(null);
-    }
-  }
-
-  /** @deprecated Utiliser generateSheetCalibrationPdf */
-  async generateGrimoireCalibrationPdf(kind: SpellcastingKind = 'cleric'): Promise<void> {
-    const { getSheetCalibrationTemplate } = await import('@core/config/sheet-calibration.config');
-    const { mergeAnchors } = await import('@core/services/sheet-calibration.storage');
-    const { loadCalibrationOverrides } = await import('@core/services/sheet-calibration.storage');
-    const sheetId = `grimoire-${kind}`;
-    const tpl = getSheetCalibrationTemplate(sheetId) ?? getSheetCalibrationTemplate('grimoire-cleric');
-    if (!tpl) return;
-    const anchors = mergeAnchors(tpl.anchors, loadCalibrationOverrides()[tpl.id]);
-    await this.generateSheetCalibrationPdf(tpl.id, tpl.imageUrl, anchors);
   }
 
   // =========================================================================
@@ -920,7 +866,7 @@ export class PdfGeneratorService {
     if (!c.spellcasting) return;
     const sc = c.spellcasting;
     const fmt = (n: number) => this.formatBonus(n);
-    const B = this.grimoireBase();
+    const B = BASE_COORDS;
 
     // Nom du personnage
     pdf.setFontSize(15);
@@ -954,7 +900,7 @@ export class PdfGeneratorService {
   // =========================================================================
 
   private drawCantripCircles(pdf: jsPDF, sc: CharacterSpellcasting): void {
-    const B = this.grimoireBase();
+    const B = BASE_COORDS;
     const totalCircles = 5;
     const radius = 2.5;
     const known = sc.cantrips.max;
@@ -971,7 +917,7 @@ export class PdfGeneratorService {
   // =========================================================================
 
   private drawSpellSlotCircles(pdf: jsPDF, sc: CharacterSpellcasting): void {
-    const B = this.grimoireBase();
+    const B = BASE_COORDS;
     const radius = 2.5;
 
     for (let lvl = 0; lvl < B.slotRows.length; lvl++) {
@@ -1005,7 +951,7 @@ export class PdfGeneratorService {
 
   private planMainGrimoireTable(pdf: jsPDF, c: Character): GrimoireTablePlan {
     const sorted = this.sortedKnownSpells(c);
-    const B = this.grimoireBase();
+    const B = BASE_COORDS;
     const effectWidthMm = pxToMmX(B.colPage - B.colEffect - 8);
     const split = this.grimoireEffectSplit(pdf, 7);
     return planGrimoireTable(sorted, split, effectWidthMm, B.spellTableMaxRows, 3);
@@ -1075,10 +1021,10 @@ export class PdfGeneratorService {
   }
 
   private drawSpellTableFromPlan(pdf: jsPDF, plan: GrimoireTablePlan): void {
-    const B = this.grimoireBase();
+    const B = BASE_COORDS;
     const lineHMm = pxToMmY(B.spellTableRowH);
 
-    const L = this.grimoireSpellLevel();
+    const L = SPELL_TABLE_LEVEL;
     this.drawSpellLevelMedallions(
       pdf,
       plan.placements.map((p) => ({ row: p.startRow, level: p.spell.level })),
@@ -1156,7 +1102,7 @@ export class PdfGeneratorService {
     pdf.setTextColor(dark);
     const S = SUPP_COORDS;
     const lineHMm = pxToMmY(S.rowH);
-    const L = this.grimoireSpellLevel();
+    const L = SPELL_TABLE_LEVEL;
 
     this.drawSpellLevelMedallions(
       pdf,
@@ -1268,7 +1214,7 @@ export class PdfGeneratorService {
     pdf: jsPDF,
     sc: Extract<CharacterSpellcasting, { kind: 'cleric' }>,
   ): void {
-    const P = this.grimoirePanelCleric();
+    const P = PANEL_CLERIC;
     pdf.setFontSize(P.valueFontSize);
 
     // Divinité — Domaine
