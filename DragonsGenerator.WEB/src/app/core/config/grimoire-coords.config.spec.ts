@@ -14,7 +14,7 @@ describe('grimoire-coords.config', () => {
     expect(points.some((p) => p.id === 'deity')).toBeTrue();
     expect(points.some((p) => p.id === 'focus')).toBeTrue();
     expect(points.some((p) => p.id === 'level-0')).toBeTrue();
-    expect(GRIMOIRE_PANEL_CLERIC.line2Y).toBe(296);
+    expect(GRIMOIRE_PANEL_CLERIC.line2Y).toBe(307);
   });
 
   it('defaults to cleric kind', () => {

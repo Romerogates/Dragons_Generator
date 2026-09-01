@@ -169,8 +169,8 @@ const PAGE2 = {
   longRestCol2UsesX: 360,
 
   // --- Emplacements de sorts (parchemin bas-droite) ---
-  spellSlotX: 474,
-  spellSlotStartY: 546,
+  spellSlotX: 463,
+  spellSlotStartY: 554,
   spellSlotRowH: 22,
   spellSlotCircleSpacing: 15,
   spellSlotMaxPerRow: [4, 3, 3, 3, 3, 2, 2, 1, 1],
@@ -434,7 +434,7 @@ export class PdfGeneratorService {
     this.text(pdf, classLabel, 400, 43);
     // Emplacement « Niveau » sur la fiche (pas les XP — un perso niv. 1 a 0 XP).
     const pdfLevel = Math.max(1, c.totalLevel || c.classes[0]?.level || 1);
-    this.text(pdf, String(pdfLevel), 400, 90);
+    this.text(pdf, String(pdfLevel), 432, 94);
 
     this.text(pdf, String(c.vitality.hitPointsCurrent), 230, 123);
     this.text(pdf, String(c.vitality.hitPointsTemporary), 250, 171);
@@ -451,7 +451,7 @@ export class PdfGeneratorService {
     this.text(pdf, String(c.defense.armorClass), 360, 220);
 
     pdf.setFontSize(15);
-    this.text(pdf, String(c.abilities.force), 118, 221);
+    this.text(pdf, String(c.abilities.force), 118, 225);
     this.text(pdf, String(c.abilities.dexterite), 118, 291);
     this.text(pdf, String(c.abilities.constitution), 118, 388);
     this.text(pdf, String(c.abilities.intelligence), 118, 442);
@@ -459,7 +459,7 @@ export class PdfGeneratorService {
     this.text(pdf, String(c.abilities.charisme), 118, 700);
 
     pdf.setFontSize(10);
-    this.text(pdf, fmt(c.abilityModifiers.force), 165, 225);
+    this.text(pdf, fmt(c.abilityModifiers.force), 160, 228);
     this.text(pdf, fmt(c.abilityModifiers.dexterite), 165, 296);
     this.text(pdf, fmt(c.abilityModifiers.constitution), 165, 392);
     this.text(pdf, fmt(c.abilityModifiers.intelligence), 165, 445);
@@ -533,16 +533,16 @@ export class PdfGeneratorService {
     skillRow('Tromperie', 779);
 
     pdf.setFontSize(12);
-    this.text(pdf, String(c.movement.walk), 238, 360);
+    this.text(pdf, String(c.movement.walk), 232, 359);
     this.text(pdf, String(c.movement.climb), 312, 360);
     this.text(pdf, String(c.movement.swim), 365, 360);
     this.text(pdf, String(c.movement.jumpHeight), 286, 381);
     this.text(pdf, String(c.movement.jumpLength), 361, 381);
 
-    const attackTops = [476, 500, 523, 545, 570];
-    const colName = 210;
-    const colBonus = 450;
-    const colDamage = 515;
+    const attackTops = [477, 501, 524, 546, 571];
+    const colName = 222;
+    const colBonus = 442;
+    const colDamage = 517;
 
     if (c.attacks.length > 0) {
       pdf.setFontSize(10);

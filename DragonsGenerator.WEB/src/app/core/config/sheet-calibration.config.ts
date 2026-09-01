@@ -83,21 +83,21 @@ const SHEET_PAGE1_ANCHORS: SheetCalibrationAnchor[] = [
   anchor('species', 'Espèce', 'Identité', 140, 66, 'Gnome (des roches)', 15),
   anchor('civilization', 'Civilisation', 'Identité', 140, 90, 'Cité Franche', 15),
   anchor('class', 'Classe', 'Identité', 400, 43, 'Prêtre (Indicible)', 15),
-  anchor('level', 'Niveau', 'Identité', 400, 90, '1', 15),
+  anchor('level', 'Niveau', 'Identité', 432, 94, '1', 15),
   anchor('hp-current', 'PV actuels', 'Combat', 230, 123, '8', 15),
   anchor('hp-max', 'PV max', 'Combat', 370, 171, '8', 15),
   anchor('proficiency', 'Maîtrise', 'Combat', 55, 173, '+2', 15),
   anchor('ac', 'CA', 'Combat', 360, 220, '16', 15),
   anchor('initiative', 'Initiative', 'Combat', 270, 220, '+1', 15),
   anchor('passive-perception', 'Perception passive', 'Combat', 520, 220, '14', 15),
-  anchor('ability-for', 'FOR', 'Caractéristiques', 118, 221, '10', 15),
-  anchor('mod-for', 'Mod FOR', 'Caractéristiques', 165, 225, '+0', 10),
+  anchor('ability-for', 'FOR', 'Caractéristiques', 118, 225, '10', 15),
+  anchor('mod-for', 'Mod FOR', 'Caractéristiques', 160, 228, '+0', 10),
   anchor('ability-sag', 'SAG', 'Caractéristiques', 118, 565, '16', 15),
   anchor('mod-sag', 'Mod SAG', 'Caractéristiques', 165, 570, '+3', 10),
-  anchor('attack-name', 'Attaque nom', 'Attaques', 300, 255, "Masse d'armes", 10),
-  anchor('attack-bonus', 'Attaque bonus', 'Attaques', 430, 255, '+4', 10),
-  anchor('attack-damage', 'Attaque dégâts', 'Attaques', 480, 255, '1d6+2 cont.', 10),
-  anchor('walk', 'Marche', 'Déplacements', 238, 360, '7,5', 10),
+  anchor('attack-name', 'Attaque nom', 'Attaques', 222, 477, "Masse d'armes", 10),
+  anchor('attack-bonus', 'Attaque bonus', 'Attaques', 442, 478, '+4', 10),
+  anchor('attack-damage', 'Attaque dégâts', 'Attaques', 517, 477, '1d6+2 cont.', 10),
+  anchor('walk', 'Marche', 'Déplacements', 232, 359, '7,5', 10),
 ];
 
 const SHEET_PAGE2_ANCHORS: SheetCalibrationAnchor[] = [
@@ -108,7 +108,7 @@ const SHEET_PAGE2_ANCHORS: SheetCalibrationAnchor[] = [
   anchor('language-1', 'Langue 1', 'Langues', 396, 255, 'Cyrillan', 10),
   anchor('feature-name', 'Aptitude nom', 'Aptitudes', 15, 255, 'Artificier', 9),
   anchor('feature-uses', 'Aptitude uses', 'Aptitudes', 170, 255, '∞', 9),
-  anchor('spell-slot-1', 'Emplacement sort', 'Magie', 474, 546, '●', 10),
+  anchor('spell-slot-1', 'Emplacement sort', 'Magie', 463, 554, '●', 10),
 ];
 
 const SHEET_PAGE3_ANCHORS: SheetCalibrationAnchor[] = [
