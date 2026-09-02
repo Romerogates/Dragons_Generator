@@ -55,6 +55,7 @@ export class AppContextMenu {
   onDocumentContextMenu(event: MouseEvent): void {
     if (!this.isDesktopPointer()) return;
     if (this.shouldKeepNativeMenu(event)) return;
+    if (this.isWizardFlipCard(event)) return;
 
     event.preventDefault();
     this.showAt(event.clientX, event.clientY);
@@ -112,5 +113,11 @@ export class AppContextMenu {
     return !!target.closest(
       'input, textarea, select, option, [contenteditable="true"], [data-native-contextmenu]',
     );
+  }
+
+  /** Clic droit réservé au retournement des cartes du wizard (pas le menu global). */
+  private isWizardFlipCard(event: MouseEvent): boolean {
+    const target = event.target as HTMLElement | null;
+    return !!target?.closest('[data-wizard-flip-card]');
   }
 }

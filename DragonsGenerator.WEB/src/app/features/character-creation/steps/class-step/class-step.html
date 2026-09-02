@@ -52,6 +52,7 @@
         @for (card of currentCards(); track card.id; let i = $index) {
           <div
             class="species-carousel-card relative cursor-pointer group transition-[transform,opacity,filter] duration-200"
+            data-wizard-flip-card
             [attr.data-card-id]="card.id"
             [attr.data-carousel-index]="i"
             [ngClass]="{
@@ -106,6 +107,7 @@
           @for (card of currentCards(); track card.id; let i = $index) {
             <div
               class="relative w-72 sm:w-80 h-[min(440px,62dvh)] sm:h-[440px] cursor-pointer group transition-[transform,opacity,filter] duration-200 shrink-0"
+              data-wizard-flip-card
               [attr.data-card-id]="card.id"
               [style.left]="getWrapOffset(i)"
               [ngClass]="{
@@ -239,6 +241,11 @@
       <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
         ← Étape précédente
       </button>
+      @if (canGoPrevPhase()) {
+        <button type="button" class="wizard-nav-secondary" (click)="prevPhase()">
+          ← Choix précédent
+        </button>
+      }
       @if (currentPhase() !== 'class') {
         <button type="button" class="wizard-nav-secondary" (click)="clearSelection()">
           ← Réinitialiser la classe

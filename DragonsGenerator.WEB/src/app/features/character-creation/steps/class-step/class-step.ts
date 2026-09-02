@@ -469,12 +469,20 @@ export class ClassStep implements OnInit {
     if (this.nextUnresolvedSubChoice()) return 'sub_choice';
     if (this.nextUnresolvedProgChoice()) return 'prog_choice';
 
-    if (this.activeProgChoices().length > 0) return 'prog_choice';
-    if (this.activeSubChoices().length > 0) return 'sub_choice';
-    if (this.requiresSubclass()) return 'subclass';
+    if (this.requiresSubclass() && this.selectedSubclassId()) return 'subclass';
     if (this.requiresCombatStyle()) return 'combat_style';
     return 'class';
   });
+
+  /** Pool de sous-classe affiché (en cours ou dernier choisi en relecture). */
+  private subChoiceForDisplay(): SubChoice | null {
+    return this.nextUnresolvedSubChoice() ?? this.activeSubChoices().at(-1) ?? null;
+  }
+
+  /** Pool de progression affiché (en cours ou dernier choisi en relecture). */
+  private progChoiceForDisplay(): ProgressionChoiceDef | null {
+    return this.nextUnresolvedProgChoice() ?? this.activeProgChoices().at(-1) ?? null;
+  }
 
   readonly phaseTitle = computed<string>(() => {
     switch (this.currentPhase()) {
@@ -553,7 +561,7 @@ export class ClassStep implements OnInit {
       }
 
       case 'sub_choice': {
-        const choice = this.nextUnresolvedSubChoice();
+        const choice = this.subChoiceForDisplay();
         if (!choice) return [];
         const picked = new Set(this.subChoiceAnswers().get(choice.id) ?? []);
         return choice.options.map((opt) => ({
@@ -566,7 +574,7 @@ export class ClassStep implements OnInit {
       }
 
       case 'prog_choice': {
-        const choice = this.nextUnresolvedProgChoice();
+        const choice = this.progChoiceForDisplay();
         if (!choice) return [];
         const picked = new Set(this.progChoiceAnswers().get(choice.id) ?? []);
         const takenElsewhere = this.idsTakenInOtherProgChoices(choice.id);
@@ -787,6 +795,7 @@ export class ClassStep implements OnInit {
 
   onRightClick(event: Event, cardId: string): void {
     event.preventDefault();
+    event.stopPropagation();
     this.flippedCards.update((set) => {
       const newSet = new Set(set);
       if (newSet.has(cardId)) newSet.delete(cardId);
@@ -932,6 +941,49 @@ export class ClassStep implements OnInit {
   prevStep(): void {
     this.builder.previousStep();
   }
+
+  /** Revient au sous-choix précédent (atavisme, dragon, métamagie…) sans quitter l'étape classe. */
+  prevPhase(): void {
+    this.holdPhase.set(null);
+    this.flippedCards.set(new Set());
+    const phase = this.currentPhase();
+
+    if (phase === 'prog_choice') {
+      const choice = this.nextUnresolvedProgChoice() ?? this.activeProgChoices().at(-1);
+      if (choice) {
+        this.progChoiceAnswers.update((m) => {
+          const next = new Map(m);
+          next.delete(choice.id);
+          return this.trimInvalidProgPicks(next);
+        });
+      }
+      this.syncCarouselIndexFromSelection();
+      return;
+    }
+
+    if (phase === 'sub_choice' || (phase === 'subclass' && this.subChoiceAnswers().size > 0)) {
+      this.subChoiceAnswers.set(new Map());
+      this.selectedSubclassId.set(null);
+      this.syncCarouselIndexFromSelection();
+      return;
+    }
+
+    if (phase === 'subclass') {
+      this.selectedSubclassId.set(null);
+      this.subChoiceAnswers.set(new Map());
+      this.syncCarouselIndexFromSelection();
+      return;
+    }
+
+    if (phase === 'combat_style') {
+      this.selectedCombatStyleIds.set([]);
+      this.syncCarouselIndexFromSelection();
+    }
+  }
+
+  readonly canGoPrevPhase = computed(
+    () => this.currentPhase() !== 'class' && !!this.selectedClassId(),
+  );
 
   // === CONFIRMATION ===
   confirmSelection(): void {
