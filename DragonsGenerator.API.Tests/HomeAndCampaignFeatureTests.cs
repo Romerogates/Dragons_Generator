@@ -415,7 +415,7 @@ public class HomeAndCampaignFeatureTests
         {
             duplicateReq.Content = JsonContent.Create(new { code = "AB12", combatantId, roll = 12 });
             var duplicate = await _client.SendAsync(duplicateReq);
-            Assert.Equal(System.Net.HttpStatusCode.BadRequest, duplicate.StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.Conflict, duplicate.StatusCode);
         }
 
         using (var boardReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}/initiative", playerToken))
