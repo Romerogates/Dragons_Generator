@@ -721,9 +721,14 @@ export class CharacterBuilderService {
   }
 
   goToStep(step: number): void {
-    if (step >= 1 && step <= this.totalSteps()) {
-      this.currentStep.set(step);
+    const total = this.totalSteps();
+    if (step < 1 || step > total) return;
+    if (step > this.currentStep()) {
+      for (let s = this.currentStep(); s < step; s++) {
+        if (!this.isStepValid(s)) return;
+      }
     }
+    this.currentStep.set(step);
   }
 
   get isEditMode(): boolean {

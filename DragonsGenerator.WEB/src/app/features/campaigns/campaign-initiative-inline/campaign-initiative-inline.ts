@@ -41,9 +41,8 @@ export class CampaignInitiativeInline {
   readonly myCombatants = computed(() => {
     const userId = this.auth.user()?.id;
     const list = this.board().combatants ?? [];
-    if (!userId) return list;
-    const linked = list.filter((c) => c.memberUserId === userId);
-    return linked.length ? linked : list;
+    if (!userId) return [];
+    return list.filter((c) => c.memberUserId === userId);
   });
 
   submit(): void {

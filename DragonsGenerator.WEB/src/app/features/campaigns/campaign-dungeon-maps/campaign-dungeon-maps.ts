@@ -68,6 +68,7 @@ const MAX_UNDO = 40;
 })
 export class CampaignDungeonMaps {
   readonly campaign = input.required<CampaignDetail>();
+  readonly focusMapId = input<string | null>(null);
   readonly dataChange = output<Partial<CampaignData>>();
 
   readonly editorCanvasRef = viewChild<ElementRef<HTMLCanvasElement>>('editorCanvas');
@@ -164,6 +165,14 @@ export class CampaignDungeonMaps {
   private strokeStarted = false;
 
   constructor() {
+    effect(() => {
+      const id = this.focusMapId();
+      if (!id) return;
+      if (!this.maps().some((m) => m.id === id)) return;
+      if (this.editingMapId() === id) return;
+      this.openEditor(id);
+    });
+
     effect(() => {
       const map = this.editingMap();
       const canvas = this.editorCanvasRef()?.nativeElement;

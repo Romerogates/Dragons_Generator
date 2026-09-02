@@ -767,6 +767,8 @@ export class MagicStep implements OnInit {
   }
 
   confirm(): void {
+    if (!this.selectionComplete()) return;
+
     const allMap = new Map(this.allSpells().map((s) => [s.id, s]));
 
     const racialCantripInstances = this.racialSpellGrants()

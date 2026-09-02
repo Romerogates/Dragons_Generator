@@ -411,6 +411,13 @@ public class HomeAndCampaignFeatureTests
             Assert.Equal(System.Net.HttpStatusCode.NoContent, submit.StatusCode);
         }
 
+        using (var duplicateReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaigns/{campaignId}/initiative/submit", playerToken))
+        {
+            duplicateReq.Content = JsonContent.Create(new { code = "AB12", combatantId, roll = 12 });
+            var duplicate = await _client.SendAsync(duplicateReq);
+            Assert.Equal(System.Net.HttpStatusCode.BadRequest, duplicate.StatusCode);
+        }
+
         using (var boardReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}/initiative", playerToken))
         {
             var board = await _client.SendAsync(boardReq);

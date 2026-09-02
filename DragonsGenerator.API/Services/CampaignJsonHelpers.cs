@@ -417,16 +417,28 @@ public static class CampaignJsonHelpers
                 return null;
             }
 
+            if (target["playerSubmitted"]?.GetValue<bool>() == true)
+            {
+                error = "Initiative déjà enregistrée pour ce personnage.";
+                return null;
+            }
+
             if (preferredUserId is not null)
             {
                 var linked = target["memberUserId"]?.GetValue<string>();
-                if (!string.IsNullOrWhiteSpace(linked)
-                    && Guid.TryParse(linked, out var linkedId)
-                    && linkedId != preferredUserId.Value)
+                if (string.IsNullOrWhiteSpace(linked)
+                    || !Guid.TryParse(linked, out var linkedId)
+                    || linkedId != preferredUserId.Value)
                 {
-                    error = "Ce personnage est lié à un autre joueur.";
+                    error = "Ce personnage n'est pas lié à votre compte.";
                     return null;
                 }
+            }
+            else if (target["memberUserId"] is not null
+                     && !string.IsNullOrWhiteSpace(target["memberUserId"]?.GetValue<string>()))
+            {
+                error = "Connexion requise pour enregistrer l'initiative.";
+                return null;
             }
 
             target["initiativeRoll"] = roll;

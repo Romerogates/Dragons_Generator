@@ -49,9 +49,8 @@ export class CampaignInitiativePage implements OnInit, OnDestroy {
   readonly myCombatants = computed(() => {
     const userId = this.auth.user()?.id;
     const list = this.combatants();
-    if (!userId) return list;
-    const linked = list.filter((c) => c.memberUserId === userId);
-    return linked.length ? linked : list;
+    if (!userId) return [];
+    return list.filter((c) => c.memberUserId === userId);
   });
 
   ngOnInit(): void {

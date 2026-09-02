@@ -134,6 +134,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly editingHandoutId = signal<string | null>(null);
   readonly previewHandoutId = signal<string | null>(null);
   readonly focusHandoutId = signal<string | null>(null);
+  readonly focusDungeonMapId = signal<string | null>(null);
   readonly handoutKindFilter = signal<HandoutKind | 'all'>('all');
   readonly initiativeBoard = signal<InitiativeBoard | null>(null);
   readonly rosterSheetOpen = signal(false);
@@ -571,11 +572,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   openDungeonForEncounter(enc: EncounterGroup): void {
-    if (enc.dungeonMapId) {
-      this.setTab('maps');
-      return;
-    }
     this.setTab('maps');
+    this.focusDungeonMapId.set(enc.dungeonMapId ?? null);
   }
 
   onInitiativeSubmitted(): void {

@@ -17,6 +17,29 @@ export function racialSpellsComplete(
   });
 }
 
+function asiChoicesComplete(c: CharacterCreation): boolean {
+  const slots = c.asiChoices ?? [];
+  if (slots.length === 0) return true;
+  return slots.every((s) => {
+    if (s.mode === 'feat') return !!s.featId;
+    if (s.mode === 'plus2') return !!s.primary;
+    return !!s.primary && !!s.secondary && s.primary !== s.secondary;
+  });
+}
+
+function languagesStepComplete(c: CharacterCreation): boolean {
+  if (c.languages.length === 0) return false;
+  const bonusNeeded = c.bonusLanguageCount ?? 0;
+  if (bonusNeeded <= 0) return true;
+  const locked = new Set<string>([
+    ...(c.speciesLanguages ?? []),
+    ...(c.civilizationLanguages ?? []),
+    ...(c.backgroundLanguages ?? []),
+  ]);
+  const bonusPicked = c.languages.filter((l) => !locked.has(l)).length;
+  return bonusPicked >= bonusNeeded;
+}
+
 export function isWizardStepValid(
   step: number,
   c: CharacterCreation,
@@ -32,13 +55,13 @@ export function isWizardStepValid(
     case 4:
       return c.classId !== null;
     case 5:
-      return c.pointsRemaining >= 0;
+      return c.pointsRemaining === 0 && asiChoicesComplete(c);
     case 6:
-      return true;
+      return c.classId !== null;
     case 7:
-      return true;
+      return c.selectedEquipment.length > 0;
     case 8:
-      return c.languages.length > 0;
+      return languagesStepComplete(c);
     case 9:
       if (ctx.needsMagicStep) {
         if (!racialSpellsComplete(c)) return false;

@@ -202,6 +202,11 @@ describe('MagicStep', () => {
     expect(component.canSelectSpell('spl-light')).toBeFalse();
   });
 
+  it('confirm() does nothing when selection is incomplete', () => {
+    component.confirm();
+    expect(nextStepSpy).not.toHaveBeenCalled();
+  });
+
   it('confirm() persists spellcasting details and advances the wizard', () => {
     for (const id of ['spl-ray', 'spl-mage-hand', 'spl-prestidigitation']) {
       component.toggleCantrip(id);

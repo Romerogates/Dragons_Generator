@@ -511,7 +511,7 @@ export class CampaignPlayPanel implements OnDestroy {
         return;
       }
       this.reload();
-    }, 4000);
+    }, 1500);
   }
 
   private stopInitiativePoll(): void {
@@ -811,7 +811,19 @@ export class CampaignPlayPanel implements OnDestroy {
   private reload(): void {
     const c = this.campaign();
     this.campaigns.get(c.id).subscribe({
-      next: (updated) => this.campaignChange.emit(updated),
+      next: (updated) => {
+        this.campaignChange.emit(updated);
+        const session = updated.data.sessions?.find(
+          (s) => s.id === updated.data.activeSessionId,
+        );
+        const combat = session?.activeCombat;
+        if (!combat?.collectingInitiative) return;
+        const players = combat.combatants.filter((cb) => cb.kind === 'player');
+        if (players.length > 0 && players.every((cb) => cb.playerSubmitted)) {
+          this.setFeedback('ok', 'Tous les jets d’initiative reçus.');
+          this.closeInitiativeCollection();
+        }
+      },
     });
   }
 }
