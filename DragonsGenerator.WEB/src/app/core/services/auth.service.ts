@@ -198,7 +198,7 @@ export class AuthService {
   private clearLocalSession(navigate: boolean): void {
     sessionStorage.removeItem(USER_KEY);
     this.userSignal.set(null);
-    this.purgeLegacyLocalStorage();
+    // Ne pas purger les artefacts Phase 1 ici : la bannière de migration doit rester visible.
     if (navigate) void this.router.navigateByUrl('/login');
   }
 

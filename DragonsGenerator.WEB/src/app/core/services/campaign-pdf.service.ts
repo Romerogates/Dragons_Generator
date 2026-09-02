@@ -353,7 +353,6 @@ export class CampaignPdfService {
       y += 8;
       if (data?.regionName?.trim()) {
         pdf.text(data.regionName.trim(), PAGE_W / 2, y, { align: 'center' });
-        y += 6;
       }
     } else if (kind === 'pregen-hero') {
       if (options.pregenMeta?.trim()) {
@@ -365,9 +364,9 @@ export class CampaignPdfService {
         pdf.setFont('helvetica', 'italic');
         pdf.setFontSize(10);
         const hookLines = pdf.splitTextToSize(`« ${options.pregenHook.trim()} »`, CONTENT_W - 20);
-        for (const line of hookLines) {
-          pdf.text(line, PAGE_W / 2, y, { align: 'center' });
-          y += 5;
+        const hookStartY = y;
+        for (let i = 0; i < hookLines.length; i++) {
+          pdf.text(hookLines[i], PAGE_W / 2, hookStartY + i * 5, { align: 'center' });
         }
         pdf.setFont('helvetica', 'normal');
       }
@@ -383,13 +382,12 @@ export class CampaignPdfService {
         data.regionName?.trim(),
         data.setting?.trim(),
       ].filter(Boolean);
-      for (const line of info) {
-        pdf.text(line!, PAGE_W / 2, y, { align: 'center' });
-        y += 6;
+      for (let i = 0; i < info.length; i++) {
+        pdf.text(info[i]!, PAGE_W / 2, y + i * 6, { align: 'center' });
       }
       if (data.regionId) {
-        this.drawRegionPin(pdf, data.regionId, 105, y + 8);
-        y += 18;
+        const pinY = y + info.length * 6;
+        this.drawRegionPin(pdf, data.regionId, 105, pinY + 8);
       }
     }
 

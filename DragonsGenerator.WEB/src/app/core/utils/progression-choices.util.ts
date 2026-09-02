@@ -3,11 +3,97 @@
  * Expertise / ASI sont marqués deferred (gérés ailleurs dans le wizard).
  */
 
+import type { CharacterClass, FeatureDetail } from '@core/models/CharacterClasses/character-class';
 import { invocationsForLevel, PACT_BOONS } from '../data/warlock-invocations.data';
 import { metamagicLabel } from '../data/metamagic-labels.data';
 import { labelForGameId } from './game-id-labels';
 
 export const PROGRESSION_MAX_LEVEL = 20;
+
+interface ClassChoicePool {
+  id?: string;
+  type?: string;
+  name?: string;
+  quantity?: number;
+  pool?: unknown[];
+  options?: unknown[];
+  unlocked_at_level?: number;
+  unlock_level?: number;
+  unlocked_at_levels?: number[];
+  constraint_max_price_po?: number;
+  fixed_features?: string[];
+}
+
+interface ProgressionChoicePoolActive {
+  type?: string;
+  quantity?: number;
+  cumulative_total?: number;
+  pool?: unknown[];
+  label?: string;
+  name?: string;
+}
+
+interface ProgressionSpellChoice {
+  count?: number;
+  quantity?: number;
+  label?: string;
+  name?: string;
+}
+
+interface ExtendedProgressionLevel {
+  level: number;
+  features?: string[];
+  choice_pools_active?: ProgressionChoicePoolActive[];
+  invocation_choices?: { count?: number }[];
+  resources?: Record<string, number | string>;
+  spell_choices?: ProgressionSpellChoice[];
+  pact_boon_choices?: PactBoonChoice[];
+  skill_choices?: SkillChoiceEntry[];
+  level_up_choice_pools?: LevelUpChoicePool[];
+}
+
+interface PactBoonChoice {
+  id?: string;
+  pool?: string[];
+  options?: string[];
+  label?: string;
+  count?: number;
+  quantity?: number;
+}
+
+interface SkillChoiceEntry {
+  id?: string;
+  type?: string;
+  label?: string;
+  name?: string;
+  quantity?: number;
+  count?: number;
+}
+
+interface LevelUpChoicePool extends ClassChoicePool {
+  pool_ref?: string;
+}
+
+type ProgressionClassData = CharacterClass['data'] & {
+  choice_pools?: ClassChoicePool[];
+  progression?: ExtendedProgressionLevel[];
+  features_details?: FeatureDetail[];
+};
+
+interface MetamagicFeatureDetail extends FeatureDetail {
+  mechanics?: {
+    metamagic_options?: {
+      id: string;
+      name: string;
+      effect?: string;
+      cost_arcane_points?: unknown;
+    }[];
+  };
+}
+
+function progressionData(cls: CharacterClass): ProgressionClassData {
+  return cls.data as ProgressionClassData;
+}
 
 export interface ProgressionChoiceOption {
   id: string;
@@ -43,7 +129,7 @@ const ROOT_SKIP_TYPES = new Set([
 
 const ASI_FEATURE_RE = /augmentation.*caracteristique|feat-asi/i;
 
-function isFightingStylePool(pool: any): boolean {
+function isFightingStylePool(pool: ClassChoicePool): boolean {
   const t = String(pool?.type ?? '');
   const id = String(pool?.id ?? '');
   return (
@@ -53,7 +139,7 @@ function isFightingStylePool(pool: any): boolean {
   );
 }
 
-function unlockLevelOf(pool: any): number {
+function unlockLevelOf(pool: ClassChoicePool): number {
   if (typeof pool?.unlocked_at_level === 'number') return pool.unlocked_at_level;
   if (typeof pool?.unlock_level === 'number') return pool.unlock_level;
   if (Array.isArray(pool?.unlocked_at_levels) && pool.unlocked_at_levels.length) {
@@ -65,7 +151,7 @@ function unlockLevelOf(pool: any): number {
   return 1;
 }
 
-function poolActiveAtLevel(pool: any, level: number): boolean {
+function poolActiveAtLevel(pool: ClassChoicePool, level: number): boolean {
   if (Array.isArray(pool?.unlocked_at_levels) && pool.unlocked_at_levels.length) {
     return pool.unlocked_at_levels.some((l: number) => Number(l) <= level);
   }
@@ -73,7 +159,7 @@ function poolActiveAtLevel(pool: any, level: number): boolean {
 }
 
 /** Quantité effective : pour unlocked_at_levels, 1 choix par palier atteint. */
-function poolQuantityAtLevel(pool: any, level: number): number {
+function poolQuantityAtLevel(pool: ClassChoicePool, level: number): number {
   if (Array.isArray(pool?.unlocked_at_levels) && pool.unlocked_at_levels.length) {
     const hits = pool.unlocked_at_levels.filter((l: number) => Number(l) <= level).length;
     return Math.max(hits, pool.quantity ?? 1);
@@ -119,8 +205,9 @@ function optionsFromPoolIds(
   });
 }
 
-function metamagicOptions(cls: any): ProgressionChoiceOption[] {
-  const feat = (cls?.data?.features_details ?? []).find((f: any) => f.id === 'feat-metamagie');
+function metamagicOptions(cls: CharacterClass): ProgressionChoiceOption[] {
+  const details = progressionData(cls).features_details ?? [];
+  const feat = details.find((f) => f.id === 'feat-metamagie') as MetamagicFeatureDetail | undefined;
   const opts = feat?.mechanics?.metamagic_options as
     | { id: string; name: string; effect?: string; cost_arcane_points?: unknown }[]
     | undefined;
@@ -139,11 +226,12 @@ function isAsiFeatureId(id: string): boolean {
 }
 
 /** Niveaux où la classe gagne un ASI (dans la progression ≤ level). */
-export function asiLevelsForClass(cls: any, level: number, maxLevel = PROGRESSION_MAX_LEVEL): number[] {
-  if (!cls?.data?.progression) return [];
+export function asiLevelsForClass(cls: CharacterClass, level: number, maxLevel = PROGRESSION_MAX_LEVEL): number[] {
+  const data = progressionData(cls);
+  if (!data.progression) return [];
   const effective = Math.min(Math.max(1, level), maxLevel);
   const levels: number[] = [];
-  for (const prog of cls.data.progression) {
+  for (const prog of data.progression) {
     if (prog.level < 1 || prog.level > effective) continue;
     const feats: string[] = prog.features ?? [];
     if (feats.some((id) => isAsiFeatureId(String(id)))) {
@@ -153,7 +241,7 @@ export function asiLevelsForClass(cls: any, level: number, maxLevel = PROGRESSIO
   return levels;
 }
 
-export function countAsiSlots(cls: any, level: number, maxLevel = PROGRESSION_MAX_LEVEL): number {
+export function countAsiSlots(cls: CharacterClass, level: number, maxLevel = PROGRESSION_MAX_LEVEL): number {
   return asiLevelsForClass(cls, level, maxLevel).length;
 }
 
@@ -161,14 +249,15 @@ export function countAsiSlots(cls: any, level: number, maxLevel = PROGRESSION_MA
  * Choix interactifs de classe jusqu'à `maxLevel` (inclus), hors skills/équipement/style déjà gérés.
  */
 export function extractProgressionChoices(
-  cls: any,
+  cls: CharacterClass,
   level: number,
   maxLevel = PROGRESSION_MAX_LEVEL,
   ctx?: { pactBoonId?: string | null },
 ): ProgressionChoiceDef[] {
-  if (!cls?.data) return [];
+  const data = progressionData(cls);
+  if (!data) return [];
   const effective = Math.min(Math.max(1, level), maxLevel);
-  const details = (cls.data.features_details ?? []) as any[];
+  const details = data.features_details ?? [];
   const choices: ProgressionChoiceDef[] = [];
   const seen = new Set<string>();
 
@@ -180,7 +269,7 @@ export function extractProgressionChoices(
   };
 
   // --- Root choice_pools ---
-  for (const pool of cls.data.choice_pools ?? []) {
+  for (const pool of data.choice_pools ?? []) {
     if (!poolActiveAtLevel(pool, effective)) continue;
 
     const type = String(pool.type ?? 'option');
@@ -188,7 +277,7 @@ export function extractProgressionChoices(
 
     if (type === 'weapon_proficiency' || type === 'tool_proficiency') {
       push({
-        id: pool.id,
+        id: pool.id ?? `choice-${type}`,
         type,
         label:
           pool.name ??
@@ -212,7 +301,7 @@ export function extractProgressionChoices(
 
     if (type === 'expertise' || type === 'expertise_proficiency') {
       push({
-        id: pool.id,
+        id: pool.id ?? `choice-${type}`,
         type,
         label: pool.name ?? 'Expertise',
         count: qty,
@@ -224,7 +313,7 @@ export function extractProgressionChoices(
 
     const rawPool = pool.pool ?? pool.options ?? [];
     push({
-      id: pool.id,
+      id: pool.id ?? `choice-${type}`,
       type,
       label: pool.name ?? 'Choix de classe',
       count: qty,
@@ -234,7 +323,7 @@ export function extractProgressionChoices(
   }
 
   // --- Progression lines ≤ effective ---
-  for (const prog of cls.data.progression ?? []) {
+  for (const prog of data.progression ?? []) {
     if (prog.level < 1 || prog.level > effective) continue;
 
     // Métamagie (cumul : un seul choix avec le total au niveau cible)
@@ -268,9 +357,9 @@ export function extractProgressionChoices(
     // Invocations (cumul)
     if ((prog.invocation_choices ?? []).length > 0) {
       const totalKnown =
-        typeof prog.resources?.invocations_known === 'number'
-          ? prog.resources.invocations_known
-          : (prog.invocation_choices[0].count ?? 2);
+        typeof prog.resources?.['invocations_known'] === 'number'
+          ? Number(prog.resources['invocations_known'])
+          : (prog.invocation_choices?.[0]?.count ?? 2);
       const entry: ProgressionChoiceDef = {
         id: 'choice-invocations-cumulative',
         type: 'invocation',
@@ -295,7 +384,7 @@ export function extractProgressionChoices(
     for (const pb of prog.pact_boon_choices ?? []) {
       const poolIds: string[] = pb.pool ?? pb.options ?? [];
       push({
-        id: pb.id,
+        id: pb.id ?? 'choice-pact-boon',
         type: 'pact_boon',
         label: pb.label ?? 'Faveur du pacte',
         count: pb.count ?? pb.quantity ?? 1,
@@ -314,7 +403,7 @@ export function extractProgressionChoices(
     for (const sc of prog.skill_choices ?? []) {
       if (sc.type === 'expertise' || sc.type === 'expertise_proficiency') {
         push({
-          id: sc.id,
+          id: sc.id ?? `choice-expertise-${prog.level}`,
           type: 'expertise',
           label: sc.label ?? sc.name ?? `Expertise (niv. ${prog.level})`,
           count: sc.quantity ?? sc.count ?? 2,
@@ -329,14 +418,14 @@ export function extractProgressionChoices(
       let pool = lup;
       if (lup.pool_ref) {
         const ref =
-          (cls.data.choice_pools ?? []).find((p: any) => p.id === lup.pool_ref) ?? null;
+          (data.choice_pools ?? []).find((p) => p.id === lup.pool_ref) ?? null;
         if (ref) {
           pool = { ...ref, id: lup.id, name: lup.name ?? ref.name, quantity: lup.quantity ?? 1 };
         }
       }
       const rawPool = pool.pool ?? [];
       push({
-        id: pool.id,
+        id: pool.id ?? `choice-${String(pool.type ?? 'option')}`,
         type: String(pool.type ?? 'option'),
         label: pool.name ?? `Choix de progression (niv. ${prog.level})`,
         count: pool.quantity ?? 1,
@@ -390,14 +479,15 @@ export function warlockArcanumSpellLevels(characterLevel: number): number[] {
 
 /** Jalons d'apprentissage de sorts (niv. 1–20) pour l'étape Magie. */
 export function spellProgressionMilestones(
-  cls: any,
+  cls: CharacterClass,
   level: number,
   maxLevel = PROGRESSION_MAX_LEVEL,
 ): { level: number; count: number; label: string }[] {
-  if (!cls?.data?.progression) return [];
+  const data = progressionData(cls);
+  if (!data.progression) return [];
   const effective = Math.min(Math.max(1, level), maxLevel);
   const out: { level: number; count: number; label: string }[] = [];
-  for (const prog of cls.data.progression) {
+  for (const prog of data.progression) {
     if (prog.level < 1 || prog.level > effective) continue;
     for (const sc of prog.spell_choices ?? []) {
       out.push({
@@ -427,7 +517,7 @@ export function spellProgressionMilestones(
 }
 
 export function extractExpertiseChoices(
-  cls: any,
+  cls: CharacterClass,
   level: number,
   maxLevel = PROGRESSION_MAX_LEVEL,
 ): ProgressionChoiceDef[] {
@@ -437,7 +527,7 @@ export function extractExpertiseChoices(
 }
 
 export function extractWeaponProficiencyChoices(
-  cls: any,
+  cls: CharacterClass,
   level: number,
   maxLevel = PROGRESSION_MAX_LEVEL,
 ): ProgressionChoiceDef[] {
@@ -447,7 +537,7 @@ export function extractWeaponProficiencyChoices(
 }
 
 export function extractToolProficiencyChoices(
-  cls: any,
+  cls: CharacterClass,
   level: number,
   maxLevel = PROGRESSION_MAX_LEVEL,
 ): ProgressionChoiceDef[] {
@@ -457,11 +547,16 @@ export function extractToolProficiencyChoices(
 }
 
 /** Langues supplémentaires de classe (ex. Lettré ×3) → étape Langues. */
-export function classBonusLanguageCount(cls: any, level: number, maxLevel = PROGRESSION_MAX_LEVEL): number {
-  if (!cls?.data?.choice_pools) return 0;
+export function classBonusLanguageCount(
+  cls: CharacterClass,
+  level: number,
+  maxLevel = PROGRESSION_MAX_LEVEL,
+): number {
+  const pools = progressionData(cls).choice_pools;
+  if (!pools?.length) return 0;
   const effective = Math.min(Math.max(1, level), maxLevel);
   let total = 0;
-  for (const pool of cls.data.choice_pools) {
+  for (const pool of pools) {
     const type = String(pool.type ?? '');
     if (type !== 'language_proficiency' && type !== 'language') continue;
     if (!poolActiveAtLevel(pool, effective)) continue;
@@ -471,7 +566,7 @@ export function classBonusLanguageCount(cls: any, level: number, maxLevel = PROG
 }
 
 export function classNeedsAsi(
-  cls: any,
+  cls: CharacterClass,
   level: number,
   maxLevel = PROGRESSION_MAX_LEVEL,
 ): boolean {

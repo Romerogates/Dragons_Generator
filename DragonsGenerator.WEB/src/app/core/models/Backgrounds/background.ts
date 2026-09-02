@@ -89,7 +89,17 @@ export interface BackgroundEquipment {
   custom?: boolean;
   budgetRules?: BackgroundBudgetRules;
   /** Choix d'équipement (livre vs moulin, etc.). */
-  choose?: any[];
+  choose?: BackgroundEquipmentChooseGroup[];
+}
+
+export interface BackgroundEquipmentChooseOption {
+  id: string;
+  qty?: number;
+}
+
+export interface BackgroundEquipmentChooseGroup {
+  name?: string;
+  pool?: BackgroundEquipmentChooseOption[];
 }
 
 export interface BackgroundBudgetRules {
@@ -126,6 +136,8 @@ export interface PersonalityTables {
   bonds: PersonalityTable;
   flaws: PersonalityTable;
 }
+
+export type PersonalityTableKey = keyof PersonalityTables;
 
 export interface PersonalityTable {
   die: string;

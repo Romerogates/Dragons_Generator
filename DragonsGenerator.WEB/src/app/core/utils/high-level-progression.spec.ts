@@ -92,13 +92,15 @@ describe('High-level progression (6–20)', () => {
 
   it('lists spell progression milestones up to target level', () => {
     const cls = {
+      id: 'cls-sorcier',
+      name: 'Sorcier',
       data: {
         progression: [
           { level: 6, spell_choices: [{ count: 1, label: 'Sort occulte' }] },
           { level: 11, choice_pools_active: [{ type: 'spell_known', quantity: 1, label: 'Arcane' }] },
         ],
       },
-    };
+    } as unknown as import('@core/models/CharacterClasses/character-class').CharacterClass;
     expect(spellProgressionMilestones(cls, 10)).toEqual([
       { level: 6, count: 1, label: 'Sort occulte' },
     ]);

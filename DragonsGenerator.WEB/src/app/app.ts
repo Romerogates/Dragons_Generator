@@ -40,6 +40,7 @@ export class App implements OnInit {
   readonly showReconnectBanner = signal(shouldShowReconnectBanner());
 
   ngOnInit(): void {
+    this.showReconnectBanner.set(shouldShowReconnectBanner());
     this.gameLabels.warmUp();
     this.auth.initSessionSync();
     this.offlineSync.init();

@@ -6,27 +6,29 @@ import { normalizeBackground } from '@core/utils/background-data.adapter';
 import { DataService } from '@core/services/data.service';
 import { CharacterBuilderService } from '@core/services/character-builder.service';
 import { BackgroundStep } from './background-step';
+import type { Background } from '@core/models/Backgrounds/background';
 
 const MOCK_ERUDIT = normalizeBackground({
   id: 'bg-erudit',
   name: 'Érudit',
   data: {
     preset: true,
+    source: { book: '', pages: '' },
     proficiencies: {
-      skills: { fixed: ['skill-arcanes'], choose: { count: 0, options: [] } },
+      skills: { fixed: ['skill-arcanes'], chooseCount: 0, options: [] },
       tools: {
         fixed: [],
         choose: [
           {
             chooseCount: 1,
-            options: [{ type: 'tool_category', category: 'instrument', name: 'Instrument' }],
+            options: [{ type: 'instrument', any: true }],
           },
         ],
       },
-      languages: { fixed: ['lang-commun'], choiceCount: 2 },
+      languages: { choiceCount: 2 },
     },
     equipment: {
-      fixed: [{ id: 'gr-sac-derudit', name: "Sac d'érudit", qty: 1 }],
+      fixed: [{ id: 'gr-sac-derudit', name: "Sac d'érudit", qty: 1, location: 'backpack' }],
       choose: [
         {
           name: 'Outil de calligraphie',
@@ -36,31 +38,33 @@ const MOCK_ERUDIT = normalizeBackground({
       currency: { or: 10 },
     },
     privilege: { id: 'priv-erudit', name: 'Bibliothèque', desc: 'Accès privilégié aux archives.' },
-    flavor: { summary: 'Une vie passée à étudier.' },
+    flavor: { summary: 'Une vie passée à étudier.', adventureHook: null },
     personalityTables: {
-      traits: { entries: [{ text: 'Je cite des textes anciens.' }] },
-      ideals: { entries: [{ text: 'La connaissance doit être partagée.' }] },
-      bonds: { entries: [{ text: 'Mon mentor compte plus que tout.' }] },
-      flaws: { entries: [{ text: 'Je cache mes sources.' }] },
+      traits: { die: 'd8', entries: [{ roll: 1, text: 'Je cite des textes anciens.' }] },
+      ideals: { die: 'd8', entries: [{ roll: 1, text: 'La connaissance doit être partagée.', alignment: 'LB' }] },
+      bonds: { die: 'd8', entries: [{ roll: 1, text: 'Mon mentor compte plus que tout.' }] },
+      flaws: { die: 'd8', entries: [{ roll: 1, text: 'Je cache mes sources.' }] },
     },
   },
-} as any);
+} satisfies Background);
 
 const MOCK_CUSTOM = normalizeBackground({
   id: 'bg-custom',
   name: 'Personnalisé',
   data: {
     preset: false,
+    source: { book: '', pages: '' },
     proficiencies: {
-      skills: { fixed: [], choose: { count: 0, options: [] } },
+      skills: { chooseCount: 0, options: [] },
       tools: { fixed: [], choose: [] },
-      languages: { fixed: [], choiceCount: 0 },
+      languages: { choiceCount: 0 },
     },
     equipment: { fixed: [], choose: [], currency: { or: 0 } },
-    privilege: { id: 'priv-custom', name: '', desc: '' },
-    flavor: { summary: 'Historique sur mesure.' },
+    privilege: { id: 'priv-custom', name: null, desc: null },
+    flavor: { summary: 'Historique sur mesure.', adventureHook: null },
+    personalityTables: null,
   },
-} as any);
+} satisfies Background);
 
 describe('BackgroundStep', () => {
   let component: BackgroundStep;
@@ -128,6 +132,13 @@ describe('BackgroundStep', () => {
     component.customPrivilegeDesc.set('Un réseau d’informateurs.');
     fixture.detectChanges();
     expect(component.isConfigValid()).toBeTrue();
+  });
+
+  it('isEntrySelected reflects picked personality entry', () => {
+    component.selectBackground('bg-erudit');
+    component.pickEntry('traits', 'Je cite des textes anciens.');
+    expect(component.isEntrySelected('traits', 'Je cite des textes anciens.')).toBeTrue();
+    expect(component.isEntrySelected('traits', 'Autre')).toBeFalse();
   });
 
   it('confirm pushes preset background with equipment slots and skills', () => {

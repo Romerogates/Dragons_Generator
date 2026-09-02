@@ -26,6 +26,7 @@ import { DataService } from '@core/services/data.service';
 import type { Spell } from '@core/models/Spells/spell';
 import {
   Character,
+  FeatureInstance,
   SpellInstance,
   CharacterSpellcasting,
 } from '@core/models/Character/character';
@@ -526,7 +527,9 @@ export class PdfGeneratorService {
     } else {
       pdf.setFontSize(12);
       const weapons = c.equipment.filter(
-        (e) => e.refId.startsWith('wp-') || (e.customData as any)?.isWeapon === true,
+        (e) =>
+          e.refId.startsWith('wp-') ||
+          (e.customData as { isWeapon?: boolean })?.isWeapon === true,
       );
       weapons.slice(0, 5).forEach((item, i) => {
         this.text(pdf, item.name, colName, attackTops[i]);
@@ -654,7 +657,7 @@ export class PdfGeneratorService {
     const allFeatures = c.features.filter((f) => !EXCLUDED_IDS.has(f.refId ?? ''));
 
     // Trier par source : species/subspecies d'abord, puis class/subclass
-    const sortBySource = (a: any, b: any) => {
+    const sortBySource = (a: FeatureInstance, b: FeatureInstance) => {
       const order: Record<string, number> = {
         species: 0,
         subspecies: 1,
@@ -713,7 +716,7 @@ export class PdfGeneratorService {
    */
   private drawFeatureLines(
     pdf: jsPDF,
-    features: any[],
+    features: FeatureInstance[],
     nameX: number,
     usesX: number,
     startY: number,

@@ -97,6 +97,36 @@ describe('background-data.adapter', () => {
     expect(firstOpt?.any).toBe(true);
     expect(firstOpt?.type).toBe('instrument');
   });
+
+  it('normalizes class with subclass array shape', () => {
+    const normalized = normalizeCharacterClass({
+      id: 'cls-test',
+      name: 'Test',
+      data: {
+        hit_die: '1d8',
+        primary_abilities: ['int'],
+        saving_throw_proficiencies: ['int'],
+        armor_proficiencies: [],
+        weapon_proficiencies: [],
+        tool_proficiencies: [],
+        choice_pools: [],
+        starting_equipment: { fixed: [], choice_pools: [] },
+        features_details: [],
+        subclasses: [
+          {
+            id: 'sub-a',
+            name: 'Voie A',
+            flavor: { summary: 'Desc A' },
+            features_details: [{ id: 'feat-a', name: 'A', desc: 'x' }],
+            choice_pools: [],
+          },
+        ],
+      },
+    } as any);
+    const subs = normalized.data.subclasses;
+    expect(Array.isArray(subs)).toBeTrue();
+    expect((subs as { id: string }[])[0]?.id).toBe('sub-a');
+  });
 });
 
 describe('class-icons', () => {

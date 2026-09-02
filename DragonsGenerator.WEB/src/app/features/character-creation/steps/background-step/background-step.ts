@@ -19,10 +19,15 @@ import {
   BackgroundData,
   BackgroundToolRef,
   PersonalityTable,
+  PersonalityTableKey,
   PersonalityTableWithAlignment,
 } from '@core/models/Backgrounds/background';
-import { Currency, EquipmentSlot, EquipmentInstance } from '@core/models/Character/character';
+import { Currency } from '@core/models/Character/character';
 import { normalizeBackgrounds } from '@core/utils/background-data.adapter';
+import {
+  mapBackgroundEquipmentChoiceSlots,
+  mapBackgroundFixedEquipment,
+} from '@core/utils/character-background-equipment.util';
 import { normalizeSkillId } from '@core/utils/skill.utils';
 import { labelForGameId } from '@core/utils/game-id-labels';
 
@@ -74,7 +79,7 @@ export class BackgroundStep implements OnInit {
   readonly rolledFlaw = signal<string | null>(null);
 
   // ── Personality table keys ──
-  readonly personalityTableKeys: ('traits' | 'ideals' | 'bonds' | 'flaws')[] = [
+  readonly personalityTableKeys: PersonalityTableKey[] = [
     'traits',
     'ideals',
     'bonds',
@@ -229,28 +234,26 @@ export class BackgroundStep implements OnInit {
 
   // ── Actions : Tables de personnalité ──
 
-  rollOnTable(tableType: 'traits' | 'ideals' | 'bonds' | 'flaws'): void {
+  rollOnTable(tableType: PersonalityTableKey): void {
     const table = this.getTable(tableType);
     if (!table) return;
     const idx = Math.floor(Math.random() * table.entries.length);
     this.setRolledValue(tableType, table.entries[idx].text);
   }
 
-  pickEntry(tableType: 'traits' | 'ideals' | 'bonds' | 'flaws', text: string): void {
+  pickEntry(tableType: PersonalityTableKey, text: string): void {
     this.setRolledValue(tableType, text);
   }
 
-  isEntrySelected(tableType: string, text: string): boolean {
-    return this.getSelectedText(tableType as any) === text;
+  isEntrySelected(tableType: PersonalityTableKey, text: string): boolean {
+    return this.getSelectedText(tableType) === text;
   }
 
-  getTable(
-    key: 'traits' | 'ideals' | 'bonds' | 'flaws',
-  ): PersonalityTable | PersonalityTableWithAlignment | null {
+  getTable(key: PersonalityTableKey): PersonalityTable | PersonalityTableWithAlignment | null {
     return this.selectedData()?.personalityTables?.[key] ?? null;
   }
 
-  getSelectedText(key: 'traits' | 'ideals' | 'bonds' | 'flaws'): string | null {
+  getSelectedText(key: PersonalityTableKey): string | null {
     switch (key) {
       case 'traits':
         return this.rolledTrait();
@@ -263,7 +266,7 @@ export class BackgroundStep implements OnInit {
     }
   }
 
-  private setRolledValue(key: 'traits' | 'ideals' | 'bonds' | 'flaws', text: string): void {
+  private setRolledValue(key: PersonalityTableKey, text: string): void {
     switch (key) {
       case 'traits':
         this.rolledTrait.set(text);
@@ -289,26 +292,8 @@ export class BackgroundStep implements OnInit {
 
     const isCustom = this.isCustom();
 
-    const fixedEquipment: EquipmentInstance[] = (data.equipment?.fixed ?? []).map((item: any) => ({
-      instanceId: crypto.randomUUID(),
-      refId: item.id,
-      name: item.name,
-      qty: item.qty ?? 1,
-      location: item.location ?? 'backpack',
-      equipped: item.location === 'equipped',
-      wKg: null,
-      customData: undefined,
-    }));
-
-    const choiceSlots: EquipmentSlot[] = (data.equipment?.choose ?? []).map(
-      (choice: any, i: number) => ({
-        slot: 100 + i,
-        description: choice.name ?? "Choix d'équipement",
-        alternatives: (choice.pool ?? []).map((item: any) => [
-          { id: item.id, qty: item.qty ?? 1 },
-        ]),
-      }),
-    );
+    const fixedEquipment = mapBackgroundFixedEquipment(data.equipment?.fixed ?? []);
+    const choiceSlots = mapBackgroundEquipmentChoiceSlots(data.equipment?.choose ?? []);
 
     const goldAmount = isCustom ? this.customGold() : (data.equipment?.currency?.or ?? 0);
     const bgCurrency: Currency = { cuivre: 0, argent: 0, or: goldAmount, platine: 0 };
@@ -391,23 +376,23 @@ export class BackgroundStep implements OnInit {
     return icons[bgId] ?? 'fluent-emoji:scroll';
   }
 
-  tableIcon(type: string): string {
-    const icons: Record<string, string> = {
+  tableIcon(type: PersonalityTableKey): string {
+    const icons: Record<PersonalityTableKey, string> = {
       traits: 'fluent-emoji:smiling-face-with-halo',
       ideals: 'fluent-emoji:glowing-star',
       bonds: 'fluent-emoji:handshake',
       flaws: 'fluent-emoji:broken-heart',
     };
-    return icons[type] ?? 'fluent-emoji:game-die';
+    return icons[type];
   }
 
-  tableLabel(type: string): string {
-    const labels: Record<string, string> = {
+  tableLabel(type: PersonalityTableKey): string {
+    const labels: Record<PersonalityTableKey, string> = {
       traits: 'Traits de personnalité',
       ideals: 'Idéal',
       bonds: 'Obligations',
       flaws: 'Failles',
     };
-    return labels[type] ?? type;
+    return labels[type];
   }
 }

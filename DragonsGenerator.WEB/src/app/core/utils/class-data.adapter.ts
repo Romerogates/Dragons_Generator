@@ -1,7 +1,59 @@
-import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
+import type {
+  CharacterClass,
+  FeatureDetail,
+  Subclass,
+  SubclassCatalog,
+} from '@core/models/CharacterClasses/character-class';
 import type { Ability } from '@core/models/CharacterClasses/character-class';
 import { normalizeSkillId } from './skill.utils';
 import { normalizeItemRef } from './equipment.utils';
+
+interface RawFeatureDetail {
+  id?: string;
+  name?: string;
+  desc?: string;
+  flavor?: { summary?: string };
+  level?: number;
+  unlocks_at_level?: number;
+  recharge?: string;
+  uses?: unknown;
+}
+
+interface RawChoicePool {
+  id?: string;
+  type?: string;
+  name?: string;
+  quantity?: number;
+  pool?: unknown[];
+  options?: unknown[];
+  level_unlocked?: number;
+  unlocked_at_level?: number;
+}
+
+interface RawSubChoice {
+  count?: number;
+  quantity?: number;
+  level_required?: number;
+  level_unlocked?: number;
+  label?: string;
+  name?: string;
+  options?: unknown[];
+  pool?: unknown[];
+}
+
+interface RawSubclassOption extends Subclass {
+  flavor?: { summary?: string };
+  features_details?: RawFeatureDetail[];
+  choice_pools?: RawChoicePool[];
+  sub_choices?: RawSubChoice[];
+}
+
+interface RawSubclassCatalog {
+  level_unlocked?: number;
+  unlocked_at_level?: number;
+  subclass_level_unlocked?: number;
+  options?: RawSubclassOption[];
+}
 
 const ABILITY_MAP: Record<string, Ability> = {
   str: 'Force',
@@ -60,9 +112,11 @@ function mapSavingThrows(raw: string[] | undefined): Ability[] {
     .filter(Boolean);
 }
 
-function normalizeFeaturesDetails(features: any[]): any[] {
+function normalizeFeaturesDetails(features: RawFeatureDetail[]): FeatureDetail[] {
   return (features ?? []).map((f) => ({
     ...f,
+    id: f.id ?? '',
+    name: f.name ?? '',
     desc: f.desc ?? f.flavor?.summary ?? '',
     level: f.level ?? f.unlocks_at_level ?? 1,
     rechargeType: mapRecharge(f.recharge),
@@ -97,7 +151,7 @@ function mapOptionItems(opt: unknown): { id: string; qty: number }[] {
   return [];
 }
 
-function normalizeStartingEquipment(se: unknown, topLevelPools: any[] = []): unknown[] {
+function normalizeStartingEquipment(se: unknown, topLevelPools: RawChoicePool[] = []): unknown[] {
   if (Array.isArray(se)) return se;
 
   const slots: unknown[] = [];
@@ -114,7 +168,7 @@ function normalizeStartingEquipment(se: unknown, topLevelPools: any[] = []): unk
     });
   }
 
-  const pools = (obj['choice_pools'] as any[]) ?? [];
+  const pools = (obj['choice_pools'] as RawChoicePool[]) ?? [];
   for (const pool of pools) {
     slots.push({
       slot: slotNum++,
@@ -140,7 +194,7 @@ function normalizeStartingEquipment(se: unknown, topLevelPools: any[] = []): unk
   return slots;
 }
 
-function extractChoiceLevel(pool: any): number {
+function extractChoiceLevel(pool: RawChoicePool): number {
   if (typeof pool?.level_unlocked === 'number') return pool.level_unlocked;
   if (typeof pool?.unlocked_at_level === 'number') return pool.unlocked_at_level;
   const id = String(pool?.id ?? '');
@@ -150,9 +204,9 @@ function extractChoiceLevel(pool: any): number {
 }
 
 /** Convertit choice_pools de sous-classe en sub_choices consommables par le wizard. */
-function normalizeSubChoices(sub: any): any[] {
-  if (Array.isArray(sub?.sub_choices) && sub.sub_choices.length > 0) {
-    return sub.sub_choices.map((sc: any) => ({
+function normalizeSubChoices(sub: RawSubclassOption): RawSubChoice[] {
+  if (Array.isArray(sub.sub_choices) && sub.sub_choices.length > 0) {
+    return sub.sub_choices.map((sc) => ({
       ...sc,
       count: sc.count ?? sc.quantity ?? 1,
       level_required: sc.level_required ?? sc.level_unlocked ?? 1,
@@ -161,13 +215,12 @@ function normalizeSubChoices(sub: any): any[] {
     }));
   }
 
-  return (sub?.choice_pools ?? [])
-    .filter((pool: any) => {
-      const t = String(pool?.type ?? '');
-      // Outils / langues : gérés plus loin. skill_proficiency sous-classe (ex. collège des conteurs) reste ici.
+  return (sub.choice_pools ?? [])
+    .filter((pool) => {
+      const t = String(pool.type ?? '');
       return !['tool_proficiency', 'language', 'language_proficiency'].includes(t);
     })
-    .map((pool: any) => ({
+    .map((pool) => ({
       id: pool.id,
       type: pool.type ?? 'option',
       count: pool.quantity ?? 1,
@@ -177,23 +230,34 @@ function normalizeSubChoices(sub: any): any[] {
     }));
 }
 
-function normalizeSubclasses(subclasses: any): any {
+function normalizeSubclasses(subclasses: RawSubclassCatalog | Subclass[] | undefined): SubclassCatalog | Subclass[] | undefined {
   if (!subclasses) return subclasses;
 
+  if (Array.isArray(subclasses)) {
+    return subclasses.map((sub) => ({
+      ...sub,
+      desc: sub.desc ?? (sub as RawSubclassOption).flavor?.summary ?? '',
+      features: normalizeFeaturesDetails(
+        (sub as RawSubclassOption).features_details ?? sub.features ?? [],
+      ),
+      sub_choices: normalizeSubChoices(sub as RawSubclassOption),
+    }));
+  }
+
+  const catalog = subclasses as RawSubclassCatalog;
   const levelUnlocked =
-    subclasses.level_unlocked ?? subclasses.unlocked_at_level ?? subclasses.subclass_level_unlocked ?? 3;
+    catalog.level_unlocked ?? catalog.unlocked_at_level ?? catalog.subclass_level_unlocked ?? 3;
 
   return {
-    ...subclasses,
+    ...catalog,
     level_unlocked: levelUnlocked,
-    options: (subclasses.options ?? []).map((sub: any) => ({
+    options: (catalog.options ?? []).map((sub) => ({
       ...sub,
       desc: sub.desc ?? sub.flavor?.summary ?? '',
-      // Ne pas filtrer ici : le wizard filtre selon targetLevel à l'application.
       features: normalizeFeaturesDetails(sub.features_details ?? sub.features ?? []),
       sub_choices: normalizeSubChoices(sub),
     })),
-  };
+  } as SubclassCatalog;
 }
 
 /** Adapte le schema 3.0 API vers le format attendu par le wizard. */
@@ -215,11 +279,11 @@ export function normalizeCharacterClass(cls: CharacterClass): CharacterClass {
     };
   }
 
-  const choicePools = (d['choice_pools'] as any[]) ?? [];
+  const choicePools = (d['choice_pools'] as RawChoicePool[]) ?? [];
   const skillPool = choicePools.find((p) => p.type === 'skill_proficiency');
   const fallback = DEFAULT_SKILL_POOLS[cls.id];
 
-  const rawOptions: string[] = skillPool?.pool ?? fallback?.options ?? [];
+  const rawOptions = (skillPool?.pool as string[] | undefined) ?? fallback?.options ?? [];
   const skillOptions = rawOptions.map((id: string) =>
     id === 'any' || id === 'any-skills' || id === 'skill-any' ? 'any' : normalizeSkillId(id),
   );
@@ -245,8 +309,8 @@ export function normalizeCharacterClass(cls: CharacterClass): CharacterClass {
           options: skillOptions,
         },
       },
-      features_details: normalizeFeaturesDetails(d['features_details'] as any[]),
-      subclasses: normalizeSubclasses(d['subclasses']),
+      features_details: normalizeFeaturesDetails((d['features_details'] as RawFeatureDetail[]) ?? []),
+      subclasses: normalizeSubclasses(d['subclasses'] as RawSubclassCatalog | Subclass[] | undefined),
       starting_equipment: normalizeStartingEquipment(
         d['starting_equipment'],
         choicePools,

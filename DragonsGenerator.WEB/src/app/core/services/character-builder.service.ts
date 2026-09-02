@@ -20,7 +20,16 @@ import {
 import {
   buildClassFeaturesForLevel,
 } from '../utils/character-class-features.util';
+import { mergeCreationLanguages } from '../utils/character-languages.util';
+import {
+  mergeToolProficiencies,
+  mergeWeaponProficiencies,
+  normalizeBackgroundSkillId,
+  stripProgressionChoiceFeatures,
+  toggleSkillSelection,
+} from '../utils/character-proficiencies.util';
 import { proficiencyBonusForLevel } from '../utils/character-progression.util';
+import { isWizardStepValid } from '../utils/character-wizard-validation.util';
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { DataService } from './data.service';
 import { CharacterHandoffService } from './character-handoff.service';
@@ -199,56 +208,10 @@ export class CharacterBuilderService {
     return parts.length > 0 ? parts.join(' · ') : 'Brouillon en cours';
   });
 
-  /** Tous les sorts raciaux requis ont été choisis (étape Magie). */
-  private racialSpellsComplete(c: CharacterCreation): boolean {
-    const grants = c.racialSpellGrants ?? [];
-    if (!grants.length) return true;
-    const answers = c.speciesChoiceAnswers ?? {};
-    return grants.every((g) => {
-      const pick = answers[g.choiceId]?.[0];
-      return !!pick && pick !== 'any_wizard_cantrip';
-    });
-  }
-
   isStepValid(step: number): boolean {
-    const c = this.creation();
-
-    switch (step) {
-      case 1:
-        return c.speciesId !== null;
-      case 2:
-        return c.civilizationId !== null;
-      case 3:
-        return c.backgroundId !== null;
-      case 4:
-        return c.classId !== null;
-      case 5:
-        return c.pointsRemaining >= 0;
-      case 6:
-        return true;
-      case 7:
-        return true;
-      case 8:
-        return c.languages.length > 0;
-      case 9:
-        if (this.needsMagicStep()) {
-          if (!this.racialSpellsComplete(c)) return false;
-          if (c.hasSpellcasting) {
-            const details = c.spellcastingDetails as Record<string, unknown> | undefined;
-            return !!details && Object.keys(details).length > 0;
-          }
-          const details = c.spellcastingDetails as { cantrips?: unknown[] } | undefined;
-          return !!(details?.cantrips?.length);
-        }
-        return c.name.trim().length > 0;
-      case 10:
-        if (this.needsMagicStep()) return c.name.trim().length > 0;
-        return true;
-      case 11:
-        return true;
-      default:
-        return false;
-    }
+    return isWizardStepValid(step, this.creation(), {
+      needsMagicStep: this.needsMagicStep(),
+    });
   }
 
   setSpecies(selection: SpeciesSelection): void {
@@ -277,13 +240,11 @@ export class CharacterBuilderService {
         racialSpellGrants: selection.racialSpellGrants,
         bonusLanguageCount: newBonusTotal,
         speciesBonusLangApplied: selection.bonusLanguageCount,
-        languages: [
-          ...new Set([
-            ...selection.languages.map((l) => this.normalizeLanguageName(l)),
-            ...c.civilizationLanguages.map((l) => this.normalizeLanguageName(l)),
-            ...c.backgroundLanguages.map((l) => this.normalizeLanguageName(l)),
-          ]),
-        ],
+        languages: mergeCreationLanguages(
+          selection.languages,
+          c.civilizationLanguages,
+          c.backgroundLanguages,
+        ),
       };
     });
   }
@@ -312,12 +273,7 @@ export class CharacterBuilderService {
         racialSpellGrants: [],
         bonusLanguageCount: (c.bonusLanguageCount || 0) - prevSpBonus,
         speciesBonusLangApplied: 0,
-        languages: [
-          ...new Set([
-            ...c.civilizationLanguages.map((l) => this.normalizeLanguageName(l)),
-            ...c.backgroundLanguages.map((l) => this.normalizeLanguageName(l)),
-          ]),
-        ],
+        languages: mergeCreationLanguages(c.civilizationLanguages, c.backgroundLanguages),
       };
     });
   }
@@ -329,13 +285,11 @@ export class CharacterBuilderService {
       civilizationName: selection.civilizationName,
       civilizationLanguages: selection.languages,
       civilizationWritingSystems: selection.writingSystems,
-      languages: [
-        ...new Set([
-          ...c.speciesLanguages.map((l) => this.normalizeLanguageName(l)),
-          ...selection.languages.map((l) => this.normalizeLanguageName(l)),
-          ...c.backgroundLanguages.map((l) => this.normalizeLanguageName(l)),
-        ]),
-      ],
+      languages: mergeCreationLanguages(
+        c.speciesLanguages,
+        selection.languages,
+        c.backgroundLanguages,
+      ),
     }));
   }
 
@@ -346,12 +300,7 @@ export class CharacterBuilderService {
       civilizationName: null,
       civilizationLanguages: [],
       civilizationWritingSystems: [],
-      languages: [
-        ...new Set([
-          ...c.speciesLanguages.map((l) => this.normalizeLanguageName(l)),
-          ...c.backgroundLanguages.map((l) => this.normalizeLanguageName(l)),
-        ]),
-      ],
+      languages: mergeCreationLanguages(c.speciesLanguages, c.backgroundLanguages),
     }));
   }
 
@@ -367,13 +316,7 @@ export class CharacterBuilderService {
         backgroundName: selection.backgroundName,
         backgroundPreset: selection.backgroundPreset,
         backgroundProficiencies: selection.proficiencies ?? null,
-        backgroundSkills: (selection.skills ?? []).map((s) =>
-          s.startsWith('skill-') || s.startsWith('ski-')
-            ? s.startsWith('ski-')
-              ? `skill-${s.slice(4)}`
-              : s
-            : s,
-        ),
+        backgroundSkills: (selection.skills ?? []).map(normalizeBackgroundSkillId),
         backgroundTools: [],
         toolEquipmentSlots: [],
         backgroundLanguages: [],
@@ -395,12 +338,7 @@ export class CharacterBuilderService {
         handicap: selection.handicap || c.handicap,
         bonusLanguageCount: newBonusTotal,
         backgroundBonusLangApplied: selection.bonusLanguageCount,
-        languages: [
-          ...new Set([
-            ...c.speciesLanguages.map((l) => this.normalizeLanguageName(l)),
-            ...c.civilizationLanguages.map((l) => this.normalizeLanguageName(l)),
-          ]),
-        ],
+        languages: mergeCreationLanguages(c.speciesLanguages, c.civilizationLanguages),
       };
     });
   }
@@ -435,7 +373,7 @@ export class CharacterBuilderService {
         handicap: '',
         bonusLanguageCount: (c.bonusLanguageCount || 0) - prevBgBonus,
         backgroundBonusLangApplied: 0,
-        languages: [...new Set([...c.speciesLanguages, ...c.civilizationLanguages])],
+        languages: mergeCreationLanguages(c.speciesLanguages, c.civilizationLanguages),
       };
     });
   }
@@ -547,8 +485,8 @@ export class CharacterBuilderService {
   ): void {
     this.creation.update((c) => ({
       ...c,
-      weaponProficiencies: [...new Set([...(c.weaponProficiencies ?? []), ...extraWeapons])],
-      toolProficiencies: [...new Set([...(c.toolProficiencies ?? []), ...extraTools])],
+      weaponProficiencies: mergeWeaponProficiencies(c.weaponProficiencies ?? [], extraWeapons),
+      toolProficiencies: mergeToolProficiencies(c.toolProficiencies ?? [], extraTools),
       classChoiceAnswers: { ...c.classChoiceAnswers, ...choiceAnswers },
     }));
   }
@@ -562,21 +500,7 @@ export class CharacterBuilderService {
   }): void {
     this.creation.update((c) => {
       const extras = payload.extraFeatures ?? [];
-      const stripPrefixes = [
-        'invoc-',
-        'meta-',
-        'pact-boon-',
-        'ennemi-',
-        'terrain-',
-        'dragon-',
-        'feat-astuce-',
-        'feat-conquete-',
-      ];
-      const withoutOld = (c.classFeatures ?? []).filter((f) => {
-        const id = f.refId ?? '';
-        if (extras.some((e) => e.refId === id)) return false;
-        return !stripPrefixes.some((p) => id.startsWith(p));
-      });
+      const withoutOld = stripProgressionChoiceFeatures(c.classFeatures ?? [], extras);
       return {
         ...c,
         classChoiceAnswers: payload.classChoiceAnswers,
@@ -722,15 +646,10 @@ export class CharacterBuilderService {
   }
 
   toggleSkill(skill: string): void {
-    this.creation.update((c) => {
-      if (c.selectedSkills.includes(skill)) {
-        return { ...c, selectedSkills: c.selectedSkills.filter((s) => s !== skill) };
-      }
-      if (c.selectedSkills.length < c.skillChooseCount) {
-        return { ...c, selectedSkills: [...c.selectedSkills, skill] };
-      }
-      return c;
-    });
+    this.creation.update((c) => ({
+      ...c,
+      selectedSkills: toggleSkillSelection(c.selectedSkills, skill, c.skillChooseCount),
+    }));
   }
 
   clearSkills(): void {
@@ -876,16 +795,5 @@ export class CharacterBuilderService {
 
   private clearStorage(): void {
     localStorage.removeItem(STORAGE_KEY);
-  }
-
-  private normalizeLanguageName(lang: string): string {
-    // Si c'est un ID (commence par "lg-"), on le convertit en nom lisible
-    if (lang.startsWith('lg-')) {
-      return lang
-        .replace(/^lg-/, '')
-        .replace(/-/g, ' ')
-        .replace(/\b\w/g, (c) => c.toUpperCase());
-    }
-    return lang;
   }
 }

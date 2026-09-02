@@ -2,16 +2,92 @@ import type {
   Background,
   BackgroundData,
   BackgroundEquipment,
+  BackgroundEquipmentChooseGroup,
   BackgroundProficiencies,
   BackgroundSkillChoice,
-  BackgroundToolChoice,
   BackgroundToolChooseGroup,
   BackgroundToolRef,
   PersonalityTables,
 } from '@core/models/Backgrounds/background';
 import { normalizeSkillId } from './skill.utils';
 
-function mapToolRef(opt: any): BackgroundToolRef {
+/** Formes brutes renvoyées par l'API avant normalisation wizard. */
+interface RawBackgroundToolOption {
+  type?: string;
+  id?: string;
+  category?: string;
+  any?: boolean;
+}
+
+interface RawBackgroundToolChooseGroup {
+  chooseCount?: number;
+  choose_count?: number;
+  count?: number;
+  note?: string;
+  options?: unknown[];
+  category_options?: unknown[];
+  categoryOptions?: unknown[];
+}
+
+interface RawBackgroundSkillChoose {
+  count?: number;
+  chooseCount?: number;
+  choose_count?: number;
+  options?: string[] | 'any';
+}
+
+interface RawBackgroundSkills {
+  fixed?: string[];
+  choose?: RawBackgroundSkillChoose | 'any';
+}
+
+interface RawPersonalityTables {
+  traits?: PersonalityTables['traits'];
+  ideals?: PersonalityTables['ideals'];
+  bonds?: PersonalityTables['bonds'];
+  flaws?: PersonalityTables['flaws'];
+}
+
+interface RawBackgroundProficiencies {
+  skills?: RawBackgroundSkills;
+  tools?: { fixed?: unknown[]; choose?: unknown };
+  languages?: {
+    choiceCount?: number;
+    choose_count?: number;
+    choice_count?: number;
+    note?: string;
+  };
+}
+
+interface RawBackgroundEquipment {
+  fixed?: BackgroundEquipment['fixed'];
+  currency?: { or?: number; gp?: number };
+  fromToolProficiency?: boolean;
+  from_tool_proficiency?: boolean;
+  custom?: boolean;
+  budgetRules?: BackgroundEquipment['budgetRules'];
+  budget_rules?: BackgroundEquipment['budgetRules'];
+  choose?: BackgroundEquipmentChooseGroup[];
+}
+
+interface RawBackgroundData {
+  proficiencies?: RawBackgroundProficiencies;
+  equipment?: RawBackgroundEquipment;
+  personality_tables?: PersonalityTables;
+  personalityTables?: PersonalityTables;
+  handicaps_compatible?: string[];
+  handicapsCompatible?: string[];
+  flavor?: { summary?: string; adventureHook?: string; adventure_hook?: string };
+  privilege?: BackgroundData['privilege'];
+  preset?: boolean;
+  source?: BackgroundData['source'];
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function mapToolRef(opt: unknown): BackgroundToolRef {
   if (typeof opt === 'string') {
     const id = opt.toLowerCase();
     if (id === 'tool' || id === 'artisan') return { type: 'tool', any: true };
@@ -26,8 +102,14 @@ function mapToolRef(opt: any): BackgroundToolRef {
     return { type: 'tool', id: opt };
   }
 
-  if (opt?.type === 'tool_category') {
-    const cat = String(opt.category ?? opt.id ?? '').toLowerCase();
+  if (!isRecord(opt)) {
+    return { type: 'tool', any: true };
+  }
+
+  const raw = opt as RawBackgroundToolOption;
+
+  if (raw.type === 'tool_category') {
+    const cat = String(raw.category ?? raw.id ?? '').toLowerCase();
     if (cat.includes('instrument') || cat === 'musical') {
       return { type: 'instrument', any: true };
     }
@@ -37,36 +119,33 @@ function mapToolRef(opt: any): BackgroundToolRef {
     if (cat.includes('vehic') || cat === 'vehicle') {
       return { type: 'vehicle', any: true };
     }
-    // artisan / tool / défaut
     return { type: 'tool', any: true };
   }
 
-  if (opt?.type === 'instrument' || opt?.type === 'gameSet' || opt?.type === 'vehicle') {
-    const id = String(opt.id ?? '');
-    // Placeholders de catégorie (pas d'objets concrets dans le catalogue)
+  if (raw.type === 'instrument' || raw.type === 'gameSet' || raw.type === 'vehicle') {
+    const id = String(raw.id ?? '');
     if (
       !id ||
       id.startsWith('tl-vehicules') ||
       id === 'tl-materiel-de-jeu' ||
       id.includes('category')
     ) {
-      return { type: opt.type, any: true };
+      return { type: raw.type, any: true };
     }
     return {
-      type: opt.type,
-      id: opt.id,
-      any: opt.any ?? false,
+      type: raw.type,
+      id: raw.id,
+      any: raw.any ?? false,
     };
   }
 
-  if (opt?.id) {
-    const id = String(opt.id);
+  if (raw.id) {
+    const id = String(raw.id);
     if (id.startsWith('tl-vehicules') || id === 'tl-materiel-de-jeu') {
       return id.includes('jeu')
         ? { type: 'gameSet', any: true }
         : { type: 'vehicle', any: true };
     }
-    // Alias données : alchimiste
     if (id === 'tl-outils-dalchimiste') {
       return { type: 'tool', id: 'tl-necessaire-dalchimiste' };
     }
@@ -80,15 +159,21 @@ function normalizeToolChoose(raw: unknown): BackgroundToolChooseGroup[] {
   if (!raw) return [];
   const groups = Array.isArray(raw) ? raw : [raw];
 
-  return groups.map((group: any) => ({
-    chooseCount: group.chooseCount ?? group.choose_count ?? group.count ?? 1,
-    note: group.note,
-    options: (group.options ?? group.category_options ?? []).map(mapToolRef),
-    categoryOptions: group.categoryOptions ?? group.category_options,
-  }));
+  return groups.map((group) => {
+    const g = group as RawBackgroundToolChooseGroup;
+    const categoryOptions = g.categoryOptions ?? g.category_options;
+    return {
+      chooseCount: g.chooseCount ?? g.choose_count ?? g.count ?? 1,
+      note: g.note,
+      options: (g.options ?? g.category_options ?? []).map(mapToolRef),
+      categoryOptions: Array.isArray(categoryOptions)
+        ? categoryOptions.filter((x): x is string => typeof x === 'string')
+        : undefined,
+    };
+  });
 }
 
-function normalizeSkills(raw: any): BackgroundSkillChoice & { fixed: string[] } {
+function normalizeSkills(raw: RawBackgroundSkills | undefined): BackgroundSkillChoice & { fixed: string[] } {
   const fixed = ((raw?.fixed as string[]) ?? []).map(normalizeSkillId);
   const choose = raw?.choose;
 
@@ -100,38 +185,44 @@ function normalizeSkills(raw: any): BackgroundSkillChoice & { fixed: string[] } 
     };
   }
 
-  if (choose === 'any' || choose?.options === 'any') {
+  if (choose === 'any' || (isRecord(choose) && choose['options'] === 'any')) {
+    const chooseObj = isRecord(choose) ? choose : {};
     return {
       fixed,
-      chooseCount: choose?.count ?? choose?.chooseCount ?? choose?.choose_count ?? 2,
+      chooseCount:
+        (chooseObj as RawBackgroundSkillChoose).count ??
+        (chooseObj as RawBackgroundSkillChoose).chooseCount ??
+        (chooseObj as RawBackgroundSkillChoose).choose_count ??
+        2,
       options: 'any',
     };
   }
 
+  const chooseObj = choose as RawBackgroundSkillChoose;
   return {
     fixed,
-    chooseCount: choose.count ?? choose.chooseCount ?? choose.choose_count ?? 0,
-    options: ((choose.options as string[]) ?? []).map(normalizeSkillId),
+    chooseCount: chooseObj.count ?? chooseObj.chooseCount ?? chooseObj.choose_count ?? 0,
+    options: ((chooseObj.options as string[]) ?? []).map(normalizeSkillId),
   };
 }
 
-function normalizePersonalityTables(raw: any): PersonalityTables | null {
+function normalizePersonalityTables(raw: RawPersonalityTables | null | undefined): PersonalityTables | null {
   if (!raw) return null;
   return {
-    traits: raw.traits,
-    ideals: raw.ideals,
-    bonds: raw.bonds,
-    flaws: raw.flaws,
+    traits: raw.traits!,
+    ideals: raw.ideals!,
+    bonds: raw.bonds!,
+    flaws: raw.flaws!,
   };
 }
 
-function normalizeProficiencies(raw: any): BackgroundProficiencies & {
+function normalizeProficiencies(raw: RawBackgroundProficiencies | undefined): BackgroundProficiencies & {
   skills: BackgroundSkillChoice & { fixed: string[] };
 } {
   const skills = normalizeSkills(raw?.skills);
   const toolsRaw = raw?.tools ?? {};
-  const tools: BackgroundToolChoice = {
-    fixed: (toolsRaw.fixed ?? []).map(mapToolRef),
+  const tools = {
+    fixed: ((toolsRaw.fixed ?? []) as unknown[]).map(mapToolRef),
     choose: normalizeToolChoose(toolsRaw.choose),
   };
 
@@ -149,7 +240,7 @@ function normalizeProficiencies(raw: any): BackgroundProficiencies & {
   };
 }
 
-function normalizeEquipment(raw: any): BackgroundEquipment & { choose?: any[] } {
+function normalizeEquipment(raw: RawBackgroundEquipment | undefined): BackgroundEquipment {
   return {
     fixed: raw?.fixed ?? [],
     currency: {
@@ -159,12 +250,12 @@ function normalizeEquipment(raw: any): BackgroundEquipment & { choose?: any[] } 
     custom: raw?.custom,
     budgetRules: raw?.budgetRules ?? raw?.budget_rules,
     choose: raw?.choose ?? [],
-  } as BackgroundEquipment & { choose?: any[] };
+  };
 }
 
 /** Adapte le schema 2.0 API (snake_case + choose.count) vers le modèle wizard. */
 export function normalizeBackground(bg: Background): Background {
-  const raw = bg.data as any;
+  const raw = bg.data as RawBackgroundData;
 
   // Déjà normalisé
   if (raw?.proficiencies?.skills && 'chooseCount' in (raw.proficiencies.skills ?? {})) {
@@ -174,7 +265,7 @@ export function normalizeBackground(bg: Background): Background {
         data: {
           ...raw,
           personalityTables: normalizePersonalityTables(raw.personality_tables),
-        },
+        } as BackgroundData,
       };
     }
     return bg;

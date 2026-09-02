@@ -1,19 +1,16 @@
-Character-builder refactor — point de retour avant découpage
-============================================================
+Character-builder refactor — TERMINÉ
+========================================
 
 Commit de référence (main, avant refactor) :
   d7e1cc6f623dabae7b98ae8bccb7109e2d5b3826
   Fix CI E2E: fast smoke suite instead of 30min full wizard paths.
 
-Branche de travail : refactor/character-builder
+Métriques finales :
+  character-builder.service.ts : ~2280 → ~799 lignes, 0 any
+  Tests unitaires : 273 (seuil branches karma 85 %, actuel ~85,3 %)
+  E2E CI : reconnect-banner.spec.ts inclus dans e2e:ci
 
-Revenir à l'état d'avant refactor (tout le repo) :
-  git checkout d7e1cc6f623dabae7b98ae8bccb7109e2d5b3826
-
-Revenir uniquement le service monolithique :
-  git checkout d7e1cc6f623dabae7b98ae8bccb7109e2d5b3826 -- DragonsGenerator.WEB/src/app/core/services/character-builder.service.ts
-
-Lots prévus :
+Lots réalisés :
   1 — types + INITIAL_CREATION_STATE (character-builder.types.ts) ✓
   2 — localStorage — annulé (Phase 2 cloud-only)
   3 — combat (character-combat.util.ts) ✓
@@ -21,3 +18,32 @@ Lots prévus :
   5 — build orchestrator (character-build.util.ts) ✓
   6 — edit mapper + validation (character-edit.mapper.ts) ✓
   7 — abilities + class features (character-abilities.util.ts, character-class-features.util.ts) ✓
+  8 — languages + proficiencies (character-languages.util.ts, character-proficiencies.util.ts) ✓
+  9 — wizard validation (character-wizard-validation.util.ts) ✓
+ 10 — clôture : background-step typé + character-background-equipment.util.ts ✓
+
+Modules utils extraits (core/utils/) :
+  character-build.util.ts
+  character-combat.util.ts
+  character-spellcasting.util.ts
+  character-edit.mapper.ts
+  character-abilities.util.ts
+  character-class-features.util.ts
+  character-languages.util.ts
+  character-proficiencies.util.ts
+  character-wizard-validation.util.ts
+  character-background-equipment.util.ts
+
+Typage adapters (0 any) :
+  background-data.adapter.ts
+  class-data.adapter.ts
+  progression-choices.util.ts
+
+Hors scope — any restants dans les *-step.ts wizard (refactor UI futur) :
+  magic-step.ts, class-step.ts, skills-step.ts, equipment-step.ts, abilities-step.ts
+
+Revenir à l'état d'avant refactor (tout le repo) :
+  git checkout d7e1cc6f623dabae7b98ae8bccb7109e2d5b3826
+
+Revenir uniquement le service monolithique :
+  git checkout d7e1cc6f623dabae7b98ae8bccb7109e2d5b3826 -- DragonsGenerator.WEB/src/app/core/services/character-builder.service.ts
