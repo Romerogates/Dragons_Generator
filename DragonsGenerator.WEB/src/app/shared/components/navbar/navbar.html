@@ -3,6 +3,7 @@
 >
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between gap-2 sm:gap-4 h-16 min-w-0">
+      <!-- Brand -->
       <a
         routerLink="/"
         class="flex items-center gap-2.5 group min-w-0 shrink"
@@ -16,13 +17,13 @@
         <span
           class="font-serif font-bold text-base sm:text-lg text-slate-100 group-hover:text-amber-400 transition-colors tracking-wide truncate"
         >
-          <span class="hidden min-[400px]:inline">Dragons </span
-          ><span class="text-amber-500">Generator</span>
+          <span class="hidden min-[400px]:inline">Dragons </span><span class="text-amber-500">Generator</span>
         </span>
       </a>
 
+      <!-- Desktop + actions -->
       <div class="flex items-center gap-1 sm:gap-2 min-w-0 shrink-0">
-        <!-- Desktop primary -->
+        <!-- Desktop primary links -->
         <div class="hidden lg:flex items-center gap-1">
           <a
             routerLink="/create"
@@ -34,16 +35,42 @@
           </a>
 
           <a
-            routerLink="/campaigns"
-            routerLinkActive="text-amber-400"
-            class="relative h-10 flex items-center px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-amber-400 hover:bg-slate-800/60 transition-colors"
+            routerLink="/story/create"
+            routerLinkActive="text-violet-400"
+            class="h-10 flex items-center px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-violet-400 hover:bg-slate-800/60 transition-colors"
             (click)="closeMenus()"
           >
-            Campagnes
-            @if (auth.isLoggedIn() && campaignsActionCount() > 0) {
+            Scénario
+          </a>
+
+          @if (auth.isLoggedIn()) {
+            <a
+              routerLink="/guide"
+              routerLinkActive="text-emerald-400"
+              class="relative h-10 flex items-center px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-emerald-400 hover:bg-slate-800/60 transition-colors"
+              (click)="closeMenus()"
+            >
+              Guide
+              @if (guideNewsCount() > 0) {
+                <span
+                  class="absolute top-1 right-1 min-w-[1rem] h-4 px-1 flex items-center justify-center rounded-full bg-emerald-500 text-[9px] font-black text-slate-950 leading-none"
+                  >{{ formatBadgeCount(guideNewsCount()) }}</span
+                >
+              }
+            </a>
+          }
+
+          <a
+            routerLink="/friends"
+            routerLinkActive="text-violet-400"
+            class="relative h-10 flex items-center px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-violet-400 hover:bg-slate-800/60 transition-colors"
+            (click)="closeMenus()"
+          >
+            Amis
+            @if (auth.isLoggedIn() && friendsActionCount() > 0) {
               <span
-                class="absolute top-1 right-0.5 min-w-[1rem] h-4 px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none"
-                >{{ formatBadgeCount(campaignsActionCount()) }}</span
+                class="absolute top-1 right-1 min-w-[1rem] h-4 px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none"
+                >{{ formatBadgeCount(friendsActionCount()) }}</span
               >
             }
           </a>
@@ -70,9 +97,12 @@
             </button>
 
             @if (codexOpen()) {
-              <div class="absolute top-full right-0 pt-2 z-50" role="menu">
+              <div
+                class="absolute top-full right-0 pt-2 z-50"
+                role="menu"
+              >
                 <div
-                  class="w-80 rounded-2xl border border-slate-700/80 bg-[#171b22] shadow-[0_20px_50px_rgba(0,0,0,0.55)] p-2 grid grid-cols-1 gap-0.5 max-h-[70vh] overflow-y-auto custom-scrollbar"
+                  class="w-80 rounded-2xl border border-slate-700/80 bg-[#171b22] shadow-[0_20px_50px_rgba(0,0,0,0.55)] p-2 grid grid-cols-1 gap-0.5"
                 >
                   @for (link of codexLinks; track link.path) {
                     <a
@@ -94,11 +124,95 @@
           </div>
         </div>
 
-        <!-- Account (sm+) -->
+        <a
+          routerLink="/create"
+          class="hidden sm:inline-flex lg:hidden items-center px-3 py-2 rounded-full text-[10px] font-black uppercase tracking-widest text-amber-400 border border-amber-900/50 bg-amber-950/20 hover:border-amber-500/50 transition-colors"
+          (click)="closeMenus()"
+        >
+          Forger
+        </a>
+
+        @if (auth.isLoggedIn()) {
+          <a
+            routerLink="/guide"
+            class="hidden sm:inline-flex lg:hidden relative items-center px-3 py-2 rounded-full text-[10px] font-black uppercase tracking-widest text-emerald-400 border border-emerald-900/50 bg-emerald-950/20 hover:border-emerald-500/50 transition-colors"
+            (click)="closeMenus()"
+          >
+            Guide
+            @if (guideNewsCount() > 0) {
+              <span class="ml-1 min-w-[1rem] h-4 px-1 inline-flex items-center justify-center rounded-full bg-emerald-500 text-[9px] font-black text-slate-950">{{
+                formatBadgeCount(guideNewsCount())
+              }}</span>
+            }
+          </a>
+        }
+
+        <div class="hidden lg:flex items-center gap-2">
+          <a
+            routerLink="/characters"
+            routerLinkActive="border-emerald-500/50"
+            class="flex items-center gap-2 bg-[#171b22] border border-slate-700 hover:border-emerald-500/50 px-3 sm:px-4 py-2 rounded-full shadow-inner group transition-[colors,transform,opacity,box-shadow] duration-200"
+            (click)="closeMenus()"
+          >
+            <span
+              class="text-[10px] font-black uppercase tracking-widest text-slate-300 group-hover:text-emerald-400"
+              >Héros</span
+            >
+          </a>
+
+          <a
+            routerLink="/campaigns"
+            routerLinkActive="border-violet-500/50"
+            class="relative flex items-center gap-2 bg-[#171b22] border border-slate-700 hover:border-violet-500/50 px-3 sm:px-4 py-2 rounded-full shadow-inner group transition-[colors,transform,opacity,box-shadow] duration-200"
+            (click)="closeMenus()"
+          >
+            <span
+              class="text-[10px] font-black uppercase tracking-widest text-slate-300 group-hover:text-violet-400"
+              >Campagnes</span
+            >
+            @if (auth.isLoggedIn() && campaignsActionCount() > 0) {
+              <span
+                class="absolute -top-1.5 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none border-2 border-[#1b2028]"
+                >{{ formatBadgeCount(campaignsActionCount()) }}</span
+              >
+            }
+          </a>
+        </div>
+
+        @if (auth.isLoggedIn()) {
+          <a
+            routerLink="/notifications"
+            routerLinkActive="text-amber-400 border-amber-700/50"
+            class="relative hidden sm:flex items-center justify-center w-10 h-10 rounded-xl border border-slate-700 text-slate-400 hover:text-amber-400 hover:border-amber-700/50 transition-colors"
+            title="Notifications"
+            (click)="closeMenus()"
+          >
+            <iconify-icon noobserver icon="mdi:bell-outline" class="text-lg"></iconify-icon>
+            @if (notificationCount() > 0) {
+              <span
+                class="absolute -top-1 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none border-2 border-[#1b2028]"
+                >{{ formatBadgeCount(notificationCount()) }}</span
+              >
+            }
+          </a>
+        }
+
+        @if (auth.isLoggedIn()) {
+          <a
+            routerLink="/settings"
+            routerLinkActive="text-amber-400 border-amber-700/50"
+            class="hidden sm:flex items-center justify-center w-10 h-10 rounded-xl border border-slate-700 text-slate-400 hover:text-amber-400 hover:border-amber-700/50 transition-colors"
+            title="Paramètres"
+            (click)="closeMenus()"
+          >
+            <iconify-icon noobserver icon="mdi:cog-outline" class="text-lg"></iconify-icon>
+          </a>
+        }
+
         <div class="relative hidden sm:block" data-account-menu>
           <button
             type="button"
-            class="relative h-10 flex items-center gap-2 px-2 sm:px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-amber-400 hover:bg-slate-800/60 transition-colors"
+            class="h-10 flex items-center gap-2 px-2 sm:px-3 rounded-lg text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 hover:text-amber-400 hover:bg-slate-800/60 transition-colors"
             (click)="toggleAccount($event)"
           >
             @if (auth.isLoggedIn() && auth.user(); as u) {
@@ -109,12 +223,6 @@
                 size="xs"
               />
               <span class="max-w-[8rem] truncate hidden min-[480px]:inline">{{ u.displayName }}</span>
-              @if (notificationCount() + friendsActionCount() + guideNewsCount() > 0) {
-                <span
-                  class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-500 border border-[#1b2028]"
-                  aria-hidden="true"
-                ></span>
-              }
             } @else {
               <span>Compte</span>
             }
@@ -140,56 +248,11 @@
                   }
                 </div>
                 <a
-                  routerLink="/characters"
+                  routerLink="/notifications"
                   class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
                   (click)="closeMenus()"
-                  >Mes héros</a
+                  >Notifications</a
                 >
-                <a
-                  routerLink="/story/create"
-                  class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-violet-400"
-                  (click)="closeMenus()"
-                  >Nouveau scénario</a
-                >
-                <a
-                  routerLink="/guide"
-                  class="flex items-center justify-between px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-emerald-400"
-                  (click)="closeMenus()"
-                >
-                  <span>Guide</span>
-                  @if (guideNewsCount() > 0) {
-                    <span
-                      class="min-w-[1rem] h-4 px-1 inline-flex items-center justify-center rounded-full bg-emerald-500 text-[9px] font-black text-slate-950"
-                      >{{ formatBadgeCount(guideNewsCount()) }}</span
-                    >
-                  }
-                </a>
-                <a
-                  routerLink="/friends"
-                  class="flex items-center justify-between px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-violet-400"
-                  (click)="closeMenus()"
-                >
-                  <span>Amis</span>
-                  @if (friendsActionCount() > 0) {
-                    <span
-                      class="min-w-[1rem] h-4 px-1 inline-flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950"
-                      >{{ formatBadgeCount(friendsActionCount()) }}</span
-                    >
-                  }
-                </a>
-                <a
-                  routerLink="/notifications"
-                  class="flex items-center justify-between px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-amber-400"
-                  (click)="closeMenus()"
-                >
-                  <span>Notifications</span>
-                  @if (notificationCount() > 0) {
-                    <span
-                      class="min-w-[1rem] h-4 px-1 inline-flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950"
-                      >{{ formatBadgeCount(notificationCount()) }}</span
-                    >
-                  }
-                </a>
                 <a
                   routerLink="/profile"
                   class="block px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-violet-400"
@@ -241,10 +304,9 @@
           }
         </div>
 
-        <!-- Burger -->
         <button
           type="button"
-          class="relative lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl border border-slate-700 text-slate-300 hover:text-amber-400 hover:border-amber-700/50 transition-colors"
+          class="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl border border-slate-700 text-slate-300 hover:text-amber-400 hover:border-amber-700/50 transition-colors"
           [attr.aria-expanded]="mobileOpen()"
           aria-label="Ouvrir le menu"
           (click)="toggleMobile()"
@@ -258,20 +320,15 @@
               <span class="block h-0.5 w-full bg-current rounded-full"></span>
             </span>
           }
-          @if (!mobileOpen() && hasMobileActionBadge()) {
-            <span
-              class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-500 border border-[#1b2028]"
-              aria-hidden="true"
-            ></span>
-          }
         </button>
       </div>
     </div>
   </div>
 
+  <!-- Mobile panel -->
   @if (mobileOpen()) {
     <div
-      class="lg:hidden border-t border-slate-800 bg-[#171b22]/98 backdrop-blur-md max-h-[calc(100dvh-4rem-env(safe-area-inset-top))] overflow-y-auto overscroll-contain custom-scrollbar"
+      class="lg:hidden border-t border-slate-800 bg-[#171b22]/98 backdrop-blur-md max-h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain"
     >
       <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-1">
         <a
@@ -337,7 +394,9 @@
               }}</span>
             }
           </a>
+        }
 
+        @if (auth.isLoggedIn()) {
           <a
             routerLink="/notifications"
             class="relative flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
@@ -354,7 +413,6 @@
               >
             }
           </a>
-
           <a
             routerLink="/profile"
             class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
@@ -363,7 +421,6 @@
             <span class="text-xl"><iconify-icon noobserver icon="fluent-emoji:bust-in-silhouette"></iconify-icon></span>
             <span class="text-sm font-bold tracking-wide">Mon profil</span>
           </a>
-
           <a
             routerLink="/friends"
             routerLinkActive="bg-violet-950/30 text-violet-400 border-violet-900/40"
@@ -381,7 +438,9 @@
               >
             }
           </a>
+        }
 
+        @if (auth.isLoggedIn()) {
           <a
             routerLink="/settings"
             class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
@@ -390,7 +449,6 @@
             <span class="text-xl"><iconify-icon noobserver icon="mdi:cog-outline"></iconify-icon></span>
             <span class="text-sm font-bold tracking-wide">Paramètres</span>
           </a>
-
           <a
             routerLink="/support"
             class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
@@ -399,7 +457,6 @@
             <span class="text-xl"><iconify-icon noobserver icon="fluent-emoji:envelope"></iconify-icon></span>
             <span class="text-sm font-bold tracking-wide">Support</span>
           </a>
-
           @if (auth.isAdmin()) {
             <a
               routerLink="/admin"
@@ -410,7 +467,6 @@
               <span class="text-sm font-bold tracking-wide">Admin</span>
             </a>
           }
-
           <button
             type="button"
             class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-slate-800/70 text-left"
@@ -435,7 +491,9 @@
           </a>
         }
 
-        <p class="px-4 pt-4 pb-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+        <p
+          class="px-4 pt-4 pb-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500"
+        >
           Codex
         </p>
 

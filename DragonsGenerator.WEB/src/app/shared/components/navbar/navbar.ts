@@ -123,17 +123,6 @@ export class Navbar implements OnInit, OnDestroy {
     this.syncBodyScrollLock();
   }
 
-  /** Badge sur le burger : notifs, amis ou campagnes. */
-  hasMobileActionBadge(): boolean {
-    if (!this.auth.isLoggedIn()) return false;
-    return (
-      this.notificationCount() > 0 ||
-      this.friendsActionCount() > 0 ||
-      this.campaignsActionCount() > 0 ||
-      this.guideNewsCount() > 0
-    );
-  }
-
   logout(): void {
     this.closeMenus();
     this.auth.logout();
