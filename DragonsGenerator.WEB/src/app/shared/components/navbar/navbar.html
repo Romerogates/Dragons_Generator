@@ -1,6 +1,9 @@
 <nav
-  class="w-full bg-[#1b2028]/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 overflow-x-clip pt-[env(safe-area-inset-top)]"
+  class="w-full sticky top-0 z-[90] pt-[env(safe-area-inset-top)]"
 >
+  <div
+    class="w-full bg-[#1b2028]/95 backdrop-blur-md border-b border-slate-800 overflow-x-clip"
+  >
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between gap-2 sm:gap-4 h-16 min-w-0">
       <a
@@ -268,23 +271,25 @@
       </div>
     </div>
   </div>
+  </div>
+</nav>
 
-  <!-- Mobile drawer overlay -->
-  @if (mobileOpen()) {
-    <div class="lg:hidden fixed inset-0 top-16 z-40" role="presentation">
-      <button
-        type="button"
-        class="absolute inset-0 bg-black/55 backdrop-blur-[2px]"
-        aria-label="Fermer le menu"
-        (click)="closeMenus()"
-      ></button>
-      <div
-        class="absolute inset-y-0 right-0 w-full max-w-sm bg-[#171b22] border-l border-slate-800 shadow-2xl flex flex-col max-h-[calc(100dvh-4rem)] animate-fade-in"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Menu de navigation"
-      >
-        <div class="flex-1 overflow-y-auto overscroll-contain px-4 py-4 flex flex-col gap-5 pb-[max(1rem,env(safe-area-inset-bottom))]">
+<!-- Drawer hors de <nav> : évite clip / containing-block du backdrop-blur -->
+@if (mobileOpen()) {
+  <div class="lg:hidden fixed inset-0 z-[80]" role="presentation">
+    <button
+      type="button"
+      class="absolute inset-0 bg-black/55 backdrop-blur-[2px]"
+      aria-label="Fermer le menu"
+      (click)="closeMenus()"
+    ></button>
+    <div
+      class="absolute top-[calc(4rem+env(safe-area-inset-top))] right-0 bottom-0 w-full max-w-sm bg-[#171b22] border-l border-slate-800 shadow-2xl flex flex-col animate-fade-in"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Menu de navigation"
+    >
+      <div class="flex-1 overflow-y-auto overscroll-contain px-4 py-4 flex flex-col gap-5 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <a
             routerLink="/create"
             class="flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-amber-500 text-slate-950 text-sm font-black uppercase tracking-widest hover:bg-amber-400 transition-colors"
@@ -528,5 +533,4 @@
         </div>
       </div>
     </div>
-  }
-</nav>
+}
