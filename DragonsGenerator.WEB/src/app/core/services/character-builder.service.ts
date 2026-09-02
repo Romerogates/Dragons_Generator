@@ -34,227 +34,26 @@ import {
   getAbilityModifier,
   formatModifier,
 } from '../models/Character/character';
+import {
+  INITIAL_CREATION_STATE,
+  type BackgroundSelection,
+  type CivilizationSelection,
+  type ClassSelection,
+  type ExtendedCharacterCreation,
+  type IdentitySelection,
+  type RacialSpellGrant,
+  type SpeciesSelection,
+} from '../models/Character/character-builder.types';
 
-/** Sort racial à choisir à l'étape Magie (ex. sort mineur de magicien pour l'Elfe). */
-export interface RacialSpellGrant {
-  choiceId: string;
-  label: string;
-  desc: string;
-  pool: string[];
-  spellLevel: number;
-  spellcastingAbility: string;
-}
-
-export interface SpeciesSelection {
-  speciesId: string;
-  speciesName: string;
-  subspeciesId: string | null;
-  subspeciesName: string | null;
-  racialBonuses: Partial<AbilityScores>;
-  traits: FeatureInstance[];
-  speed: number;
-  size: Size;
-  languages: string[];
-  bonusLanguageCount: number;
-  /** Compétences d'espèce à choisir à l'étape Savoirs (ex. Polyvalence). */
-  bonusSkillCount: number;
-  /** Outils d'espèce à choisir à l'étape Savoirs. */
-  bonusToolCount: number;
-  resistances: string[];
-  hasDarkvision: boolean;
-  darkvisionRadius: number;
-  /** Creation-choice answers (lineage, tools, etc.) for restore when revisiting the step. */
-  choiceAnswers: Record<string, string[]>;
-  /** Sorts raciaux différés à l'étape Magie. */
-  racialSpellGrants: RacialSpellGrant[];
-}
-
-export interface CivilizationSelection {
-  civilizationId: string;
-  civilizationName: string;
-  languages: string[];
-  writingSystems: string[];
-}
-
-export interface BackgroundSelection {
-  backgroundId: string;
-  backgroundName: string;
-  backgroundPreset: boolean;
-  skills: string[];
-  tools: string[];
-  proficiencies?: any;
-  languages: string[];
-  bonusLanguageCount: number;
-  equipmentSlots: EquipmentSlot[];
-  equipment: EquipmentInstance[];
-  currency: Currency;
-  privilegeId: string | null;
-  privilegeName: string | null;
-  privilegeDesc: string | null;
-  selectedHandicaps: string[];
-  handicapCompensationType: string | null;
-  backgroundText: string;
-  traits?: string;
-  ideal?: string;
-  bonds?: string;
-  flaws?: string;
-  handicap?: string;
-}
-
-export interface ClassSelection {
-  classId: string;
-  className: string;
-  subclassId?: string;
-  subclassName?: string;
-  hitDie: number;
-  hpAtLevel1?: number;
-  hpPerLevelAverage?: number;
-  hasSpellcasting: boolean;
-  spellcastingKind: SpellcastingKind | null;
-  spellcastingAbility: Ability | null;
-  savingThrows: Ability[];
-  armorProficiencies: string[];
-  weaponProficiencies: string[];
-  toolProficiencies: string[];
-  skillOptions: string[];
-  skillChooseCount: number;
-  classFeatures: FeatureInstance[];
-  startingEquipmentSlots: EquipmentSlot[];
-  classProgressionResources?: Record<string, number | string | null>;
-  /** Langues bonus de classe (ex. Lettré) — fusionnées dans bonusLanguageCount. */
-  classBonusLanguageCount?: number;
-  /** Emplacements de sorts au niveau cible (JSON progression). */
-  classSpellSlots?: { level: number; max: number }[];
-}
-
-export interface IdentitySelection {
-  name?: string;
-  sex?: 'M' | 'F' | 'X'; // <-- AJOUTÉ
-  description?: string;
-  background?: string;
-  alignment?: string;
-  traits?: string;
-  ideal?: string;
-  bonds?: string;
-  flaws?: string;
-  handicap?: string;
-  story?: string;
-}
-
-export type ExtendedCharacterCreation = CharacterCreation & {
-  backgroundEquipmentSlots?: EquipmentSlot[];
-  toolEquipmentSlots?: EquipmentSlot[];
-  backgroundProficiencies?: any;
-};
-
-const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
-  speciesId: null,
-  speciesName: null,
-  subspeciesId: null,
-  subspeciesName: null,
-  racialBonuses: {},
-  speciesTraits: [],
-  speciesSpeed: 9,
-  speciesSize: 'M',
-  speciesLanguages: [],
-  speciesResistances: [],
-  hasDarkvision: false,
-  darkvisionRadius: 0,
-  speciesChoiceAnswers: {},
-  speciesBonusSkillCount: 0,
-  speciesBonusToolCount: 0,
-  racialSpellGrants: [],
-
-  civilizationId: null,
-  civilizationName: null,
-  civilizationLanguages: [],
-  civilizationWritingSystems: [],
-
-  backgroundId: null,
-  backgroundName: null,
-  backgroundPreset: false,
-  backgroundSkills: [],
-  backgroundTools: [],
-  backgroundProficiencies: null,
-  backgroundLanguages: [],
-  backgroundEquipment: [],
-  backgroundEquipmentSlots: [],
-  toolEquipmentSlots: [],
-  backgroundCurrency: { cuivre: 0, argent: 0, or: 0, platine: 0 },
-  privilegeId: null,
-  privilegeName: null,
-  privilegeDesc: null,
-  selectedHandicaps: [],
-  handicapCompensationType: null,
-
-  targetLevel: 1,
-  classId: null,
-  className: null,
-  subclassId: null,
-  subclassName: null,
-  hitDie: 0,
-  hpAtLevel1: 0,
-  hpPerLevelAverage: 0,
-  hasSpellcasting: false,
-  spellcastingKind: null,
-  spellcastingAbility: null,
-  savingThrows: [],
-  armorProficiencies: [],
-  weaponProficiencies: [],
-  toolProficiencies: [],
-  skillOptions: [],
-  skillChooseCount: 0,
-  classFeatures: [],
-  startingEquipmentSlots: [],
-  classProgressionResources: {},
-  classBonusLanguageCount: 0,
-  classSpellSlots: [],
-  classChoiceAnswers: {},
-  asiBonuses: {},
-  selectedFeatId: null,
-  selectedFeatIds: [],
-  asiChoices: [],
-  expertiseSkills: [],
-  metamagicOptions: [],
-  eldritchInvocations: [],
-  pactBoon: null,
-  mysticArcanumPicks: {},
-  spellMasteryPicks: {},
-  signatureSpellIds: [],
-
-  baseAbilities: {
-    force: DEFAULT_ABILITY_SCORE,
-    dexterite: DEFAULT_ABILITY_SCORE,
-    constitution: DEFAULT_ABILITY_SCORE,
-    intelligence: DEFAULT_ABILITY_SCORE,
-    sagesse: DEFAULT_ABILITY_SCORE,
-    charisme: DEFAULT_ABILITY_SCORE,
-  },
-  pointsRemaining: STARTING_POINTS,
-
-  selectedSkills: [],
-
-  selectedEquipment: [],
-  currency: { cuivre: 0, argent: 0, or: 0, platine: 0 },
-
-  languages: [],
-  bonusLanguageCount: 0,
-
-  name: '',
-  sex: 'X' as const,
-
-  description: '',
-  background: '',
-  alignment: '',
-  traits: '',
-  ideal: '',
-  bonds: '',
-  flaws: '',
-  handicap: '',
-  story: '',
-
-  spellcastingDetails: {},
-};
+export type {
+  BackgroundSelection,
+  CivilizationSelection,
+  ClassSelection,
+  ExtendedCharacterCreation,
+  IdentitySelection,
+  RacialSpellGrant,
+  SpeciesSelection,
+} from '../models/Character/character-builder.types';
 
 const STORAGE_KEY = 'dragon_character_builder_v6';
 
