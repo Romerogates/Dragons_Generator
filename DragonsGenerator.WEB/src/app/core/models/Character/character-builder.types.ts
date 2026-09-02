@@ -10,6 +10,7 @@ import type {
   SpellcastingKind,
 } from './character';
 import { DEFAULT_ABILITY_SCORE, STARTING_POINTS } from './character';
+import type { BackgroundProficiencies } from '../Backgrounds/background';
 
 /** Sort racial à choisir à l'étape Magie (ex. sort mineur de magicien pour l'Elfe). */
 export interface RacialSpellGrant {
@@ -58,7 +59,7 @@ export interface BackgroundSelection {
   backgroundPreset: boolean;
   skills: string[];
   tools: string[];
-  proficiencies?: any;
+  proficiencies?: BackgroundProficiencies;
   languages: string[];
   bonusLanguageCount: number;
   equipmentSlots: EquipmentSlot[];
@@ -120,7 +121,11 @@ export interface IdentitySelection {
 export type ExtendedCharacterCreation = CharacterCreation & {
   backgroundEquipmentSlots?: EquipmentSlot[];
   toolEquipmentSlots?: EquipmentSlot[];
-  backgroundProficiencies?: any;
+  backgroundProficiencies?: BackgroundProficiencies | null;
+  /** Compteur interne wizard : langues bonus déjà comptées pour l'espèce. */
+  speciesBonusLangApplied?: number;
+  /** Compteur interne wizard : langues bonus déjà comptées pour l'historique. */
+  backgroundBonusLangApplied?: number;
 };
 
 export const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {

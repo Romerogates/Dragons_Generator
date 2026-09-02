@@ -20,3 +20,4 @@ Lots prévus :
   4 — spellcasting (character-spellcasting.util.ts) ✓
   5 — build orchestrator (character-build.util.ts) ✓
   6 — edit mapper + validation (character-edit.mapper.ts) ✓
+  7 — abilities + class features (character-abilities.util.ts, character-class-features.util.ts) ✓

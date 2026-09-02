@@ -1,10 +1,4 @@
 ﻿import {
-  resolveFeatureUses,
-  extractScalarResources,
-  type FeatureUsesInput,
-} from '../utils/feature-uses.util';
-import { annotateAuraDesc } from '../utils/aura-range.util';
-import {
   buildCharacterFromCreation,
   type CharacterBuildEditingRef,
 } from '../utils/character-build.util';
@@ -15,6 +9,17 @@ import {
 import {
   computeCharacterArmorClass,
 } from '../utils/character-combat.util';
+import {
+  aggregateAsiChoices,
+  canAffordAbilityScore,
+  computeAbilityModifiersFromScores,
+  computeFinalAbilities,
+  computeHitPointsMax,
+  computePassivePerception,
+} from '../utils/character-abilities.util';
+import {
+  buildClassFeaturesForLevel,
+} from '../utils/character-class-features.util';
 import { proficiencyBonusForLevel } from '../utils/character-progression.util';
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { DataService } from './data.service';
@@ -45,7 +50,6 @@ import {
   type ClassSelection,
   type ExtendedCharacterCreation,
   type IdentitySelection,
-  type RacialSpellGrant,
   type SpeciesSelection,
 } from '../models/Character/character-builder.types';
 
@@ -62,12 +66,6 @@ export type {
 const STORAGE_KEY = 'dragon_character_builder_v6';
 
 export { proficiencyBonusForLevel } from '../utils/character-progression.util';
-
-function isConcreteStyleRef(id: string): boolean {
-  if (!id) return false;
-  if (id.includes('style-de-combat')) return false;
-  return id.startsWith('style-') || id.startsWith('feat-style-');
-}
 
 @Injectable({ providedIn: 'root' })
 export class CharacterBuilderService {
@@ -126,52 +124,25 @@ export class CharacterBuilderService {
 
   readonly finalAbilities = computed<AbilityScores>(() => {
     const c = this.creation();
-    const base = c.baseAbilities;
-    const bonuses = c.racialBonuses;
-    const asi = c.asiBonuses ?? {};
-    const clamp = (n: number) => Math.min(20, n);
-    return {
-      force: clamp(base.force + (bonuses.force ?? 0) + (asi.force ?? 0)),
-      dexterite: clamp(base.dexterite + (bonuses.dexterite ?? 0) + (asi.dexterite ?? 0)),
-      constitution: clamp(
-        base.constitution + (bonuses.constitution ?? 0) + (asi.constitution ?? 0),
-      ),
-      intelligence: clamp(
-        base.intelligence + (bonuses.intelligence ?? 0) + (asi.intelligence ?? 0),
-      ),
-      sagesse: clamp(base.sagesse + (bonuses.sagesse ?? 0) + (asi.sagesse ?? 0)),
-      charisme: clamp(base.charisme + (bonuses.charisme ?? 0) + (asi.charisme ?? 0)),
-    };
+    return computeFinalAbilities(c.baseAbilities, c.racialBonuses, c.asiBonuses ?? {});
   });
 
-  readonly abilityModifiers = computed<AbilityScores>(() => {
-    const a = this.finalAbilities();
-    return {
-      force: getAbilityModifier(a.force),
-      dexterite: getAbilityModifier(a.dexterite),
-      constitution: getAbilityModifier(a.constitution),
-      intelligence: getAbilityModifier(a.intelligence),
-      sagesse: getAbilityModifier(a.sagesse),
-      charisme: getAbilityModifier(a.charisme),
-    };
-  });
+  readonly abilityModifiers = computed<AbilityScores>(() =>
+    computeAbilityModifiersFromScores(this.finalAbilities()),
+  );
 
   readonly hitPointsMax = computed<number>(() => {
     const c = this.creation();
-    const level = Math.min(20, Math.max(1, c.targetLevel || 1));
-    const con = this.abilityModifiers().constitution;
-    const hp1 = c.hpAtLevel1 > 0 ? c.hpAtLevel1 : c.hitDie || 8;
-    const hpAvg =
-      c.hpPerLevelAverage > 0 ? c.hpPerLevelAverage : Math.floor((c.hitDie || 8) / 2) + 1;
-    let hp = hp1 + con + (level - 1) * (hpAvg + con);
-    // Lignée draconique : +1 PV max par niveau d'ensorceleur
-    const hasDraconic =
-      c.subclassId === 'subcls-lignee-draconique' ||
-      (c.classFeatures ?? []).some((f) => f.refId === 'feat-resistance-draconique');
-    if (hasDraconic && c.classId === 'cls-ensorceleur') {
-      hp += level;
-    }
-    return hp;
+    return computeHitPointsMax({
+      targetLevel: c.targetLevel || 1,
+      hpAtLevel1: c.hpAtLevel1,
+      hpPerLevelAverage: c.hpPerLevelAverage,
+      hitDie: c.hitDie,
+      constitutionMod: this.abilityModifiers().constitution,
+      classId: c.classId,
+      subclassId: c.subclassId,
+      classFeatures: c.classFeatures ?? [],
+    });
   });
 
   readonly proficiencyBonus = computed<number>(() =>
@@ -199,11 +170,15 @@ export class CharacterBuilderService {
   });
 
   readonly passivePerception = computed<number>(() => {
-    const mods = this.abilityModifiers();
+    const c = this.creation();
     const hasPerception =
-      this.creation().selectedSkills.includes('skill-perception') ||
-      this.creation().backgroundSkills.includes('skill-perception');
-    return 10 + mods.sagesse + (hasPerception ? 2 : 0);
+      c.selectedSkills.includes('skill-perception') ||
+      c.backgroundSkills.includes('skill-perception');
+    return computePassivePerception(
+      this.abilityModifiers().sagesse,
+      hasPerception,
+      this.proficiencyBonus(),
+    );
   });
 
   readonly isCurrentStepValid = computed<boolean>(() => {
@@ -278,12 +253,11 @@ export class CharacterBuilderService {
 
   setSpecies(selection: SpeciesSelection): void {
     this.creation.update((c) => {
-      const cAny = c as any;
-      const prevSpBonus = cAny._spBonusLang || 0;
+      const prevSpBonus = c.speciesBonusLangApplied ?? 0;
       const newBonusTotal =
         (c.bonusLanguageCount || 0) - prevSpBonus + selection.bonusLanguageCount;
 
-      const newState: any = {
+      return {
         ...c,
         speciesId: selection.speciesId,
         speciesName: selection.speciesName,
@@ -302,6 +276,7 @@ export class CharacterBuilderService {
         speciesBonusToolCount: selection.bonusToolCount,
         racialSpellGrants: selection.racialSpellGrants,
         bonusLanguageCount: newBonusTotal,
+        speciesBonusLangApplied: selection.bonusLanguageCount,
         languages: [
           ...new Set([
             ...selection.languages.map((l) => this.normalizeLanguageName(l)),
@@ -310,18 +285,14 @@ export class CharacterBuilderService {
           ]),
         ],
       };
-
-      newState._spBonusLang = selection.bonusLanguageCount;
-      return newState as ExtendedCharacterCreation;
     });
   }
 
   clearSpecies(): void {
     this.creation.update((c) => {
-      const cAny = c as any;
-      const prevSpBonus = cAny._spBonusLang || 0;
+      const prevSpBonus = c.speciesBonusLangApplied ?? 0;
 
-      const newState: any = {
+      return {
         ...c,
         speciesId: null,
         speciesName: null,
@@ -340,6 +311,7 @@ export class CharacterBuilderService {
         speciesBonusToolCount: 0,
         racialSpellGrants: [],
         bonusLanguageCount: (c.bonusLanguageCount || 0) - prevSpBonus,
+        speciesBonusLangApplied: 0,
         languages: [
           ...new Set([
             ...c.civilizationLanguages.map((l) => this.normalizeLanguageName(l)),
@@ -347,9 +319,6 @@ export class CharacterBuilderService {
           ]),
         ],
       };
-
-      newState._spBonusLang = 0;
-      return newState as ExtendedCharacterCreation;
     });
   }
 
@@ -388,12 +357,11 @@ export class CharacterBuilderService {
 
   setBackground(selection: BackgroundSelection): void {
     this.creation.update((c) => {
-      const cAny = c as any;
-      const prevBgBonus = cAny._bgBonusLang || 0;
+      const prevBgBonus = c.backgroundBonusLangApplied ?? 0;
       const newBonusTotal =
         (c.bonusLanguageCount || 0) - prevBgBonus + selection.bonusLanguageCount;
 
-      const newState: ExtendedCharacterCreation = {
+      return {
         ...c,
         backgroundId: selection.backgroundId,
         backgroundName: selection.backgroundName,
@@ -426,6 +394,7 @@ export class CharacterBuilderService {
         flaws: selection.flaws || c.flaws,
         handicap: selection.handicap || c.handicap,
         bonusLanguageCount: newBonusTotal,
+        backgroundBonusLangApplied: selection.bonusLanguageCount,
         languages: [
           ...new Set([
             ...c.speciesLanguages.map((l) => this.normalizeLanguageName(l)),
@@ -433,18 +402,14 @@ export class CharacterBuilderService {
           ]),
         ],
       };
-
-      (newState as any)._bgBonusLang = selection.bonusLanguageCount;
-      return newState;
     });
   }
 
   clearBackground(): void {
     this.creation.update((c) => {
-      const cAny = c as any;
-      const prevBgBonus = cAny._bgBonusLang || 0;
+      const prevBgBonus = c.backgroundBonusLangApplied ?? 0;
 
-      const newState: ExtendedCharacterCreation = {
+      return {
         ...c,
         backgroundId: null,
         backgroundName: null,
@@ -469,11 +434,9 @@ export class CharacterBuilderService {
         flaws: '',
         handicap: '',
         bonusLanguageCount: (c.bonusLanguageCount || 0) - prevBgBonus,
+        backgroundBonusLangApplied: 0,
         languages: [...new Set([...c.speciesLanguages, ...c.civilizationLanguages])],
       };
-
-      (newState as any)._bgBonusLang = 0;
-      return newState;
     });
   }
 
@@ -498,97 +461,22 @@ export class CharacterBuilderService {
 
     this.dataService.getClassById(c.classId).subscribe({
       next: (cls) => {
-        const features: FeatureInstance[] = [];
-        const progression = (cls.data?.progression ?? []) as {
-          level: number;
-          features?: string[];
-          resources?: Record<string, unknown>;
-        }[];
-        const details = (cls.data?.features_details ?? []) as (FeatureUsesInput & {
-          id: string;
-          name: string;
-          desc: string;
-          level?: number;
-        })[];
-        const profBonus = proficiencyBonusForLevel(targetLevel);
-
-        for (const prog of progression) {
-          if (prog.level < 1 || prog.level > targetLevel) continue;
-          for (const id of prog.features ?? []) {
-            const feat = details.find((f) => f.id === id);
-            if (!feat || features.some((f) => f.refId === feat.id)) continue;
-            features.push({
-              refId: feat.id,
-              name: feat.name,
-              desc: annotateAuraDesc(feat as any, targetLevel),
-              source: 'class',
-              sourceDetail: `${cls.name} ${prog.level}`,
-              level: prog.level,
-              uses: resolveFeatureUses(feat, cls, targetLevel, profBonus),
-            });
-          }
-        }
-
-        const subId = c.subclassId;
-        const options = (cls.data as any)?.subclasses?.options ?? [];
-        const sub = subId ? options.find((o: any) => o.id === subId) : null;
-        if (sub?.features) {
-          for (const feat of sub.features as (FeatureUsesInput & {
-            id: string;
-            name: string;
-            desc: string;
-            level: number;
-          })[]) {
-            if ((feat.level ?? 1) > targetLevel) continue;
-            if (features.some((f) => f.refId === feat.id)) continue;
-            features.push({
-              refId: feat.id,
-              name: feat.name,
-              desc: annotateAuraDesc(feat as any, targetLevel),
-              source: 'subclass',
-              sourceDetail: `${sub.name} ${feat.level}`,
-              level: feat.level,
-              uses: resolveFeatureUses(feat, cls, targetLevel, profBonus),
-            });
-          }
-        }
-
-        // Conserve les styles de combat déjà présents (ids style-* ou feat-style-*)
-        const combatStyles = (c.classFeatures ?? []).filter((f) =>
-          isConcreteStyleRef(f.refId ?? ''),
+        const result = buildClassFeaturesForLevel(
+          cls,
+          {
+            classId: c.classId!,
+            subclassId: c.subclassId,
+            hasSpellcasting: c.hasSpellcasting,
+            spellcastingKind: c.spellcastingKind,
+            spellcastingAbility: c.spellcastingAbility,
+            existingClassFeatures: c.classFeatures ?? [],
+          },
+          targetLevel,
         );
-
-        // Paladin / Rôdeur : débloque l'incantation à partir du niv. 2
-        let hasSpellcasting = c.hasSpellcasting;
-        let spellcastingKind = c.spellcastingKind;
-        let spellcastingAbility = c.spellcastingAbility;
-        if (c.classId === 'cls-paladin' && targetLevel >= 2) {
-          hasSpellcasting = true;
-          spellcastingKind = 'paladin';
-          spellcastingAbility = 'Charisme';
-        } else if (c.classId === 'cls-rodeur' && targetLevel >= 2) {
-          hasSpellcasting = true;
-          spellcastingKind = 'ranger';
-          spellcastingAbility = 'Sagesse';
-        } else if (
-          (c.classId === 'cls-paladin' || c.classId === 'cls-rodeur') &&
-          targetLevel < 2
-        ) {
-          hasSpellcasting = false;
-          spellcastingKind = null;
-          spellcastingAbility = null;
-        }
-
-        const progAtLevel = progression.find((p) => p.level === targetLevel);
-        const classProgressionResources = extractScalarResources(progAtLevel?.resources);
 
         this.creation.update((cur) => ({
           ...cur,
-          classFeatures: [...features, ...combatStyles],
-          classProgressionResources,
-          hasSpellcasting,
-          spellcastingKind,
-          spellcastingAbility,
+          ...result,
         }));
       },
       error: () => {
@@ -712,21 +600,7 @@ export class CharacterBuilderService {
 
   /** Applique N slots ASI (niveaux 4–20) : somme des bonus + liste des dons. */
   setAsiChoices(slots: AsiChoiceSlot[]): void {
-    const bonuses: Partial<AbilityScores> = {};
-    const featIds: string[] = [];
-    for (const slot of slots) {
-      if (slot.mode === 'feat' && slot.featId) {
-        featIds.push(slot.featId);
-        continue;
-      }
-      if (slot.mode === 'plus2' && slot.primary) {
-        bonuses[slot.primary] = (bonuses[slot.primary] ?? 0) + 2;
-      } else if (slot.mode === 'plus1plus1' && slot.primary && slot.secondary) {
-        bonuses[slot.primary] = (bonuses[slot.primary] ?? 0) + 1;
-        bonuses[slot.secondary] = (bonuses[slot.secondary] ?? 0) + 1;
-      }
-    }
-    // Cap soft à 20 côté affichage final (apply dans finalAbilities si besoin)
+    const { bonuses, featIds } = aggregateAsiChoices(slots);
     this.creation.update((c) => ({
       ...c,
       asiChoices: slots.map((s) => ({ ...s })),
@@ -799,24 +673,22 @@ export class CharacterBuilderService {
     bgTools: string[],
     toolSlots: EquipmentSlot[],
   ): void {
-    this.creation.update(
-      (c) =>
-        ({
-          ...c,
-          selectedSkills: classSkills,
-          backgroundSkills: bgSkills,
-          backgroundTools: bgTools,
-          toolEquipmentSlots: toolSlots,
-        }) as ExtendedCharacterCreation,
-    );
+    this.creation.update((c) => ({
+      ...c,
+      selectedSkills: classSkills,
+      backgroundSkills: bgSkills,
+      backgroundTools: bgTools,
+      toolEquipmentSlots: toolSlots,
+    }));
   }
 
   setAbilityScore(key: AbilityKey, value: number): void {
     if (value < MIN_ABILITY_SCORE || value > MAX_ABILITY_SCORE) return;
     const c = this.creation();
-    const currentCost = ABILITY_POINT_COSTS[c.baseAbilities[key]] ?? 0;
+    const current = c.baseAbilities[key];
+    if (!canAffordAbilityScore(current, value, c.pointsRemaining)) return;
+    const currentCost = ABILITY_POINT_COSTS[current] ?? 0;
     const newCost = ABILITY_POINT_COSTS[value] ?? 0;
-    if (c.pointsRemaining + currentCost - newCost < 0) return;
     this.creation.update((state) => ({
       ...state,
       baseAbilities: { ...state.baseAbilities, [key]: value },

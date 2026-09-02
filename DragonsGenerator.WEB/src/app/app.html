@@ -1,4 +1,26 @@
 <div class="min-h-screen bg-[#171b22] text-slate-200 font-sans antialiased flex flex-col overflow-x-clip">
+  @if (showReconnectBanner()) {
+    <div
+      class="sticky top-0 z-[60] bg-violet-950/95 border-b border-violet-800/60 text-violet-100 flex flex-wrap items-center justify-center gap-3 text-xs sm:text-sm px-3 py-2"
+      role="status"
+    >
+      <span>Connexion mise à jour — reconnectez-vous pour accéder à vos personnages et campagnes.</span>
+      <a
+        routerLink="/login"
+        class="px-3 py-1 rounded-lg font-black uppercase tracking-widest text-[10px] bg-violet-600 text-white hover:bg-violet-500"
+      >
+        Se connecter
+      </a>
+      <button
+        type="button"
+        class="px-2 py-1 text-[10px] uppercase tracking-widest text-violet-400/80 hover:text-violet-200"
+        (click)="dismissReconnectBanner()"
+      >
+        Fermer
+      </button>
+    </div>
+  }
+
   @if (!isOnline()) {
     <div
       class="sticky top-0 z-[60] bg-amber-950/95 border-b border-amber-800/60 text-amber-100 text-center text-xs sm:text-sm px-3 py-2"

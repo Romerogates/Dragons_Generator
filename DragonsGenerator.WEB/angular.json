@@ -133,7 +133,10 @@
               "src/app/core/utils/character-spellcasting.util.ts",
               "src/app/core/utils/character-progression.util.ts",
               "src/app/core/utils/character-build.util.ts",
-              "src/app/core/utils/character-edit.mapper.ts"
+              "src/app/core/utils/character-edit.mapper.ts",
+              "src/app/core/utils/character-abilities.util.ts",
+              "src/app/core/utils/character-class-features.util.ts",
+              "src/app/core/utils/legacy-auth-migration.util.ts"
             ],
             "assets": [
               {

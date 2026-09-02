@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { Navbar } from './shared/components/navbar/navbar';
 import { AppContextMenu } from './shared/components/app-context-menu/app-context-menu';
 import { AiRateLimitDialogComponent } from './shared/components/ai-rate-limit-dialog/ai-rate-limit-dialog';
@@ -13,10 +13,14 @@ import { ConnectivityService } from '@core/services/connectivity.service';
 import { PwaLifecycleService } from '@core/services/pwa-lifecycle.service';
 import { FriendChatDockComponent } from './shared/components/friend-chat-dock/friend-chat-dock';
 import { clearPersistedAiRateLimit } from '@core/utils/ai-rate-limit.util';
+import {
+  dismissAuthCookieMigrationBanner,
+  shouldShowReconnectBanner,
+} from '@core/utils/legacy-auth-migration.util';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Navbar, SiteFooterComponent, AppContextMenu, AiRateLimitDialogComponent, FriendChatDockComponent],
+  imports: [RouterOutlet, RouterLink, Navbar, SiteFooterComponent, AppContextMenu, AiRateLimitDialogComponent, FriendChatDockComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
@@ -33,6 +37,7 @@ export class App implements OnInit {
   readonly isOnline = this.connectivity.isOnline;
   readonly pendingSyncCount = this.offlineSync.pendingCount;
   readonly updateReady = this.pwa.updateReady;
+  readonly showReconnectBanner = signal(shouldShowReconnectBanner());
 
   ngOnInit(): void {
     this.gameLabels.warmUp();
@@ -52,5 +57,10 @@ export class App implements OnInit {
 
   dismissUpdate(): void {
     this.pwa.dismissUpdate();
+  }
+
+  dismissReconnectBanner(): void {
+    dismissAuthCookieMigrationBanner();
+    this.showReconnectBanner.set(false);
   }
 }

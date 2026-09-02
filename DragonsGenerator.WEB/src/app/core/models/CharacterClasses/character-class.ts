@@ -58,6 +58,11 @@ export interface Subclass {
   [key: string]: unknown;
 }
 
+/** Catalogue JSON : `{ "options": [ … ] }` ou tableau direct. */
+export interface SubclassCatalog {
+  options?: Subclass[];
+}
+
 export interface Spellcasting {
   ability: Ability;
   ritual?: boolean;
@@ -72,7 +77,7 @@ export interface CharacterClassData {
   starting_equipment: EquipmentSlot[];
   progression: ProgressionLevel[];
   features_details?: FeatureDetail[];
-  subclasses?: Subclass[];
+  subclasses?: Subclass[] | SubclassCatalog;
   spellcasting?: Spellcasting;
   flavor?: { summary?: string; lore_note?: string; loreNote?: string };
   // Spécifiques (moine, sorcier…)
