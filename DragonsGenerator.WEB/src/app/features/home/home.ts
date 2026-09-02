@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
+  computed,
   inject,
   OnInit,
   signal,
@@ -12,7 +13,6 @@ import { AuthService } from '@core/services/auth.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
 import { HomeSummary, HomeSummaryService } from '@core/services/home-summary.service';
 import { GuidePreferencesService } from '@core/services/guide-preferences.service';
-import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
 
 interface StatItem {
   value: string;
@@ -28,7 +28,7 @@ interface FeatureItem {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, ProfileAvatarComponent],
+  imports: [CommonModule, RouterLink],
   templateUrl: './home.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -49,6 +49,20 @@ export class Home implements OnInit {
   readonly summaryLoading = signal(false);
   readonly showRoleOnboarding = signal(false);
 
+  readonly resumeLink = computed((): string[] => {
+    const s = this.summary();
+    if (s?.nextSession) return ['/campaigns', s.nextSession.campaignId];
+    if (s?.recentCampaign) return ['/campaigns', s.recentCampaign.id];
+    return ['/characters'];
+  });
+
+  readonly resumeLabel = computed(() => {
+    const s = this.summary();
+    if (s?.nextSession) return 'Reprendre la session';
+    if (s?.recentCampaign) return 'Reprendre la campagne';
+    return 'Mes héros';
+  });
+
   readonly stats: StatItem[] = [
     { value: '9', label: 'Peuples' },
     { value: '13', label: 'Classes' },
@@ -58,60 +72,31 @@ export class Home implements OnInit {
 
   readonly features: FeatureItem[] = [
     {
-      title: 'Création Guidée',
+      title: 'Création guidée',
       description:
         "Un assistant pas à pas pour forger votre héros, de l'espèce à l'équipement final.",
       icon: 'fluent-emoji:man-mage',
     },
     {
-      title: 'Fiches de Héros',
-      description:
-        'Consultez vos personnages, exportez en PDF et retrouvez toutes leurs aptitudes et sorts.',
-      icon: 'fluent-emoji:scroll',
-    },
-    {
-      title: 'Sauvegarde Cloud',
-      description:
-        'Connecté ? Vos héros et scénarios sont synchronisés sur votre compte, accessibles partout.',
-      icon: 'fluent-emoji:cloud-with-lightning',
-    },
-    {
-      title: 'Campagnes & Scénarios',
-      description:
-        'Créez des aventures, invitez des joueurs et gérez vos campagnes en ligne.',
+      title: 'Campagnes & scénarios',
+      description: 'Créez des aventures, invitez des joueurs et gérez votre table en ligne.',
       icon: 'fluent-emoji:world-map',
     },
     {
-      title: 'Amis & Messages',
+      title: 'Grimoire de règles',
       description:
-        'Profil personnalisable, liste d\'amis et chat intégré pour organiser vos parties.',
-      icon: 'fluent-emoji:speech-balloon',
-    },
-    {
-      title: 'Grimoire de Règles',
-      description:
-        "Codex complet : espèces, sorts, équipement, bestiaire et règles d'Eana à portée de main.",
+        "Espèces, sorts, équipement et bestiaire d'Eana à portée de main pendant la séance.",
       icon: 'fluent-emoji:books',
     },
   ];
 
-  readonly grimoireLinks: { label: string; path: string; icon: string; hover: string }[] = [
-    { label: 'Espèces', path: '/species', icon: 'fluent-emoji:dna', hover: 'amber' },
-    { label: 'Classes', path: '/classes', icon: 'fluent-emoji:crossed-swords', hover: 'amber' },
-    {
-      label: 'Civilisations',
-      path: '/civilisations',
-      icon: 'fluent-emoji:japanese-castle',
-      hover: 'amber',
-    },
-    { label: 'Sorts', path: '/spells', icon: 'fluent-emoji:magic-wand', hover: 'amber' },
-    { label: 'Bestiaire', path: '/creatures', icon: 'fluent-emoji:dragon', hover: 'rose' },
-    { label: 'Équipements', path: '/equipments', icon: 'fluent-emoji:shield', hover: 'amber' },
-    { label: 'Compétences', path: '/skills', icon: 'fluent-emoji:bookmark-tabs', hover: 'sky' },
-    { label: 'Dons', path: '/feats', icon: 'fluent-emoji:trophy', hover: 'amber' },
-    { label: 'Historiques', path: '/backgrounds', icon: 'fluent-emoji:scroll', hover: 'teal' },
-    { label: 'Combat', path: '/combat-actions', icon: 'fluent-emoji:collision', hover: 'rose' },
-    { label: 'Divinités', path: '/deities', icon: 'fluent-emoji:glowing-star', hover: 'violet' },
+  readonly grimoireLinks: { label: string; path: string; icon: string }[] = [
+    { label: 'Espèces', path: '/species', icon: 'fluent-emoji:dna' },
+    { label: 'Classes', path: '/classes', icon: 'fluent-emoji:crossed-swords' },
+    { label: 'Sorts', path: '/spells', icon: 'fluent-emoji:magic-wand' },
+    { label: 'Bestiaire', path: '/creatures', icon: 'fluent-emoji:dragon' },
+    { label: 'Équipements', path: '/equipments', icon: 'fluent-emoji:shield' },
+    { label: 'Historiques', path: '/backgrounds', icon: 'fluent-emoji:scroll' },
   ];
 
   ngOnInit(): void {
@@ -141,6 +126,16 @@ export class Home implements OnInit {
     });
   }
 
+  hasTableReminders(s: HomeSummary): boolean {
+    return (
+      s.unreadChatCount > 0 ||
+      s.pendingFriendRequests > 0 ||
+      s.pendingCampaignInvites > 0 ||
+      !!s.nextSession ||
+      !!s.recentCampaign
+    );
+  }
+
   private maybeShowRoleOnboarding(): void {
     this.showRoleOnboarding.set(
       this.auth.isLoggedIn() && this.guidePrefs.needsRoleOnboarding(),
@@ -163,40 +158,6 @@ export class Home implements OnInit {
         this.summaryLoading.set(false);
       },
     });
-  }
-
-  hoverBorder(kind: string): string {
-    switch (kind) {
-      case 'sky':
-        return 'hover:border-sky-500/50';
-      case 'rose':
-        return 'hover:border-rose-500/50';
-      case 'violet':
-        return 'hover:border-violet-500/50';
-      case 'teal':
-        return 'hover:border-teal-500/50';
-      default:
-        return 'hover:border-amber-500/50';
-    }
-  }
-
-  hoverText(kind: string): string {
-    switch (kind) {
-      case 'sky':
-        return 'group-hover:text-sky-500';
-      case 'rose':
-        return 'group-hover:text-rose-400';
-      case 'violet':
-        return 'group-hover:text-violet-400';
-      case 'teal':
-        return 'group-hover:text-teal-400';
-      default:
-        return 'group-hover:text-amber-500';
-    }
-  }
-
-  scrollToStats(): void {
-    document.getElementById('stats-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   private refreshHeroStats(): void {

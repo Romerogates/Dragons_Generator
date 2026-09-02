@@ -37,6 +37,7 @@ export class Navbar implements OnInit, OnDestroy {
   private routerSub?: Subscription;
 
   readonly mobileOpen = signal(false);
+  readonly mobileCodexOpen = signal(false);
   readonly codexOpen = signal(false);
   readonly accountOpen = signal(false);
 
@@ -111,16 +112,33 @@ export class Navbar implements OnInit, OnDestroy {
     this.mobileOpen.update((v) => !v);
     this.syncBodyScrollLock();
     if (!this.mobileOpen()) {
+      this.mobileCodexOpen.set(false);
       this.codexOpen.set(false);
       this.accountOpen.set(false);
     }
   }
 
+  toggleMobileCodex(): void {
+    this.mobileCodexOpen.update((v) => !v);
+  }
+
   closeMenus(): void {
     this.mobileOpen.set(false);
+    this.mobileCodexOpen.set(false);
     this.codexOpen.set(false);
     this.accountOpen.set(false);
     this.syncBodyScrollLock();
+  }
+
+  /** Badge sur le burger : notifs, amis ou campagnes. */
+  hasMobileActionBadge(): boolean {
+    if (!this.auth.isLoggedIn()) return false;
+    return (
+      this.notificationCount() > 0 ||
+      this.friendsActionCount() > 0 ||
+      this.campaignsActionCount() > 0 ||
+      this.guideNewsCount() > 0
+    );
   }
 
   logout(): void {
