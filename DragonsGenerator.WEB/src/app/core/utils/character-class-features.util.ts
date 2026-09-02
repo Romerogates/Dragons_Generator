@@ -47,6 +47,8 @@ function listSubclassOptions(data: CharacterClass['data']): Subclass[] {
   return raw.options ?? [];
 }
 
+export { listSubclassOptions };
+
 export function buildClassFeaturesForLevel(
   cls: CharacterClass,
   input: ClassFeatureRefreshInput,

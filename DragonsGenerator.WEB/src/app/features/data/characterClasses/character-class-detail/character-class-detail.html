@@ -264,7 +264,7 @@
         </section>
       }
 
-      @if (c.data.subclasses?.length) {
+      @if (subclassOptions(c).length) {
         <section class="bg-[#1b2028] p-8 rounded-3xl border border-slate-800 shadow-xl mb-8">
           <h2
             class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase border-b border-slate-800 pb-4 mb-6"
@@ -272,7 +272,7 @@
             Sous-classes
           </h2>
           <div class="space-y-3">
-            @for (sub of c.data.subclasses; track sub.id) {
+            @for (sub of subclassOptions(c); track sub.id) {
               <details
                 class="group/details bg-[#171b22] border border-indigo-900/40 rounded-xl overflow-hidden"
               >

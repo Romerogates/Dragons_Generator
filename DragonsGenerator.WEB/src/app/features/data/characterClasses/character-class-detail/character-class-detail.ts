@@ -5,11 +5,13 @@ import {
   input,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
+import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { map, switchMap } from 'rxjs';
 import { DataService } from '@core/services/data.service';
 import { normalizeCharacterClass } from '@core/utils/class-data.adapter';
+import { listSubclassOptions } from '@core/utils/character-class-features.util';
 import { getClassIcon } from '@core/utils/class-icons';
 import { formatClassResources, resolveFeatureNames } from '@core/utils/catalog-display.util';
 import {
@@ -54,5 +56,9 @@ export class CharacterClassDetail {
     details: { id?: string; name?: string }[] | null | undefined,
   ): string {
     return resolveFeatureNames(featureIds, details);
+  }
+
+  protected subclassOptions(cls: CharacterClass) {
+    return listSubclassOptions(cls.data);
   }
 }

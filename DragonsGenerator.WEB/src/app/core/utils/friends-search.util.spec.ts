@@ -33,6 +33,14 @@ describe('friends-search.util', () => {
     expect(pickRecentFriends(friends)[0]?.id).toBe('2');
   });
 
+  it('sorts friends without friendSince alphabetically', () => {
+    const friends = [
+      { id: '2', displayName: 'Zeta' },
+      { id: '1', displayName: 'Alpha' },
+    ];
+    expect(pickRecentFriends(friends).map((f) => f.displayName)).toEqual(['Alpha', 'Zeta']);
+  });
+
   it('labels relationship statuses', () => {
     expect(relationshipStatusLabel('friend')).toBe('Ami');
     expect(relationshipStatusLabel('pending_sent')).toBe('Demande envoyée');

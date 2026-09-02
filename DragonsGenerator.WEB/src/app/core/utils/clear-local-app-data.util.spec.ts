@@ -19,4 +19,11 @@ describe('clear-local-app-data.util', () => {
     expect(sessionStorage.getItem('dragons-current-character')).toBeNull();
     expect(sessionStorage.getItem('dragons_auth_user')).toBeNull();
   });
+
+  it('ignores unrelated keys and handles empty storage', () => {
+    localStorage.setItem('other', '1');
+    clearLocalAppData();
+    expect(localStorage.getItem('other')).toBe('1');
+    clearLocalAppData();
+  });
 });
