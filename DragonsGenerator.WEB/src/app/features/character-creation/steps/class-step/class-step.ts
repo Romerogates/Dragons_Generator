@@ -104,6 +104,7 @@ interface SubChoice {
   level_required: number;
   label: string;
   options: string[];
+  option_labels?: Record<string, string>;
 }
 
 interface CombatStyleOption {
@@ -566,10 +567,15 @@ export class ClassStep implements OnInit {
         const picked = new Set(this.subChoiceAnswers().get(choice.id) ?? []);
         return choice.options.map((opt) => ({
           id: opt,
-          title: this.getSubChoiceLabel(choice.type, opt),
-          desc: this.getSubChoiceDescription(opt, choice.type),
+          title: this.getSubChoiceLabel(choice.type, opt, choice.option_labels),
+          desc: this.getSubChoiceDescription(opt, choice.type, choice.option_labels?.[opt]),
           badge: picked.has(opt) ? 'Sélectionné' : 'Option',
-          icon: choice.type === 'dragon_ancestry' ? 'fluent-emoji:dragon' : 'fluent-emoji:sparkles',
+          icon:
+            choice.type === 'dragon_ancestry'
+              ? 'fluent-emoji:dragon'
+              : choice.type === 'fielon_lord'
+                ? 'fluent-emoji:smiling-face-with-horns'
+                : 'fluent-emoji:sparkles',
         }));
       }
 
@@ -1267,7 +1273,12 @@ export class ClassStep implements OnInit {
     return null;
   }
 
-  getSubChoiceLabel(choiceType: string, value: string): string {
+  getSubChoiceLabel(
+    choiceType: string,
+    value: string,
+    optionLabels?: Record<string, string>,
+  ): string {
+    if (optionLabels?.[value]) return optionLabels[value];
     if (value.startsWith('meta-')) return metamagicLabel(value);
     const fromFeatures = this.resolveOptionFeature(value);
     if (fromFeatures?.name) {
@@ -1286,13 +1297,25 @@ export class ClassStep implements OnInit {
     return pretty.charAt(0).toUpperCase() + pretty.slice(1);
   }
 
-  getSubChoiceDescription(value: string, choiceType?: string): string {
+  getSubChoiceDescription(value: string, choiceType?: string, optionLabel?: string): string {
     if (value.startsWith('meta-')) {
       return `Option de métamagie : ${metamagicLabel(value)}.`;
     }
     if (choiceType === 'dragon_ancestry' || /^dragon-/.test(value)) {
-      const name = this.getSubChoiceLabel('dragon_ancestry', value);
+      const name = optionLabel ?? this.getSubChoiceLabel('dragon_ancestry', value);
       return `Ancêtre draconique : ${name}. Détermine votre affinité élémentaire et votre résistance.`;
+    }
+    if (choiceType === 'fielon_lord' || value.startsWith('lord-')) {
+      const name = optionLabel ?? this.getSubChoiceLabel('fielon_lord', value);
+      return `Seigneur fiélon : ${name}. Détermine votre liste de sorts élargie et votre patron.`;
+    }
+    if (choiceType === 'arcane_school' || /^(abjuration|divination|enchantement|evocation|illusion|invocation|necromancie|transmutation)$/.test(value)) {
+      const name = this.getSubChoiceLabel(choiceType ?? 'arcane_school', value);
+      return `École de magie : ${name}. Spécialisation arcanique du magicien.`;
+    }
+    if (choiceType === 'terrain_type') {
+      const name = this.getSubChoiceLabel('terrain_type', value);
+      return `Terrain d'initiation : ${name}. Influence les sorts bonus du cercle druidique.`;
     }
     return (
       this.resolveOptionFeature(value)?.desc ||

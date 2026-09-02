@@ -26,11 +26,14 @@ interface RawChoicePool {
   quantity?: number;
   pool?: unknown[];
   options?: unknown[];
+  pool_filter?: unknown;
   level_unlocked?: number;
   unlocked_at_level?: number;
 }
 
 interface RawSubChoice {
+  id?: string;
+  type?: string;
   count?: number;
   quantity?: number;
   level_required?: number;
@@ -39,6 +42,7 @@ interface RawSubChoice {
   name?: string;
   options?: unknown[];
   pool?: unknown[];
+  option_labels?: Record<string, string>;
 }
 
 interface RawSubclassOption extends Subclass {
@@ -46,6 +50,7 @@ interface RawSubclassOption extends Subclass {
   features_details?: RawFeatureDetail[];
   choice_pools?: RawChoicePool[];
   sub_choices?: RawSubChoice[];
+  sub_identity_choice?: RawSubChoice;
 }
 
 interface RawSubclassCatalog {
@@ -203,6 +208,29 @@ function extractChoiceLevel(pool: RawChoicePool): number {
   return 1;
 }
 
+/** Types de pools gérés ailleurs (compétences, magie…) ou dynamiques (pool_filter sans liste statique). */
+const DEFERRED_SUBCHOICE_TYPES = new Set([
+  'tool_proficiency',
+  'language',
+  'language_proficiency',
+  'spell_proficiency',
+  'animal_totem',
+]);
+
+function extractOptionLabels(raw: unknown[] | undefined): Record<string, string> {
+  const labels: Record<string, string> = {};
+  if (!Array.isArray(raw)) return labels;
+  for (const entry of raw) {
+    if (entry && typeof entry === 'object') {
+      const obj = entry as Record<string, unknown>;
+      if (typeof obj['id'] === 'string' && typeof obj['name'] === 'string') {
+        labels[obj['id']] = String(obj['name']).trim();
+      }
+    }
+  }
+  return labels;
+}
+
 /** Les pools API (ex. dragon_ancestry) peuvent contenir des objets { id, … } au lieu de strings. */
 function normalizeSubChoiceOptionIds(raw: unknown[] | undefined): string[] {
   if (!Array.isArray(raw)) return [];
@@ -219,31 +247,55 @@ function normalizeSubChoiceOptionIds(raw: unknown[] | undefined): string[] {
     .filter(Boolean);
 }
 
+function isDeferredSubChoicePool(pool: RawChoicePool): boolean {
+  const t = String(pool.type ?? '');
+  if (DEFERRED_SUBCHOICE_TYPES.has(t)) return true;
+  const poolIds = normalizeSubChoiceOptionIds(pool.pool);
+  return !!pool.pool_filter && poolIds.length === 0;
+}
+
+function buildSubChoiceFromRaw(sc: RawSubChoice): RawSubChoice {
+  const rawOpts = sc.options ?? sc.pool ?? [];
+  return {
+    ...sc,
+    id: sc.id,
+    type: sc.type ?? 'option',
+    count: sc.count ?? sc.quantity ?? 1,
+    level_required: sc.level_required ?? sc.level_unlocked ?? 1,
+    label: sc.label ?? sc.name ?? 'Choix',
+    options: normalizeSubChoiceOptionIds(rawOpts),
+    option_labels: { ...extractOptionLabels(rawOpts), ...(sc.option_labels ?? {}) },
+  };
+}
+
+function buildSubChoiceFromPool(pool: RawChoicePool): RawSubChoice {
+  const rawOpts = pool.pool ?? pool.options ?? [];
+  return {
+    id: pool.id,
+    type: pool.type ?? 'option',
+    count: pool.quantity ?? 1,
+    level_required: extractChoiceLevel(pool),
+    label: pool.name ?? 'Choix',
+    options: normalizeSubChoiceOptionIds(rawOpts),
+    option_labels: extractOptionLabels(rawOpts),
+  };
+}
+
 /** Convertit choice_pools de sous-classe en sub_choices consommables par le wizard. */
 function normalizeSubChoices(sub: RawSubclassOption): RawSubChoice[] {
   if (Array.isArray(sub.sub_choices) && sub.sub_choices.length > 0) {
-    return sub.sub_choices.map((sc) => ({
-      ...sc,
-      count: sc.count ?? sc.quantity ?? 1,
-      level_required: sc.level_required ?? sc.level_unlocked ?? 1,
-      label: sc.label ?? sc.name ?? 'Choix',
-      options: normalizeSubChoiceOptionIds(sc.options ?? sc.pool),
-    }));
+    return sub.sub_choices.map(buildSubChoiceFromRaw).filter((sc) => (sc.options?.length ?? 0) > 0);
   }
 
-  return (sub.choice_pools ?? [])
-    .filter((pool) => {
-      const t = String(pool.type ?? '');
-      return !['tool_proficiency', 'language', 'language_proficiency'].includes(t);
-    })
-    .map((pool) => ({
-      id: pool.id,
-      type: pool.type ?? 'option',
-      count: pool.quantity ?? 1,
-      level_required: extractChoiceLevel(pool),
-      label: pool.name ?? 'Choix',
-      options: normalizeSubChoiceOptionIds(pool.pool),
-    }));
+  const choices: RawSubChoice[] = (sub.choice_pools ?? [])
+    .filter((pool) => !isDeferredSubChoicePool(pool))
+    .map(buildSubChoiceFromPool);
+
+  if (sub.sub_identity_choice) {
+    choices.push(buildSubChoiceFromRaw(sub.sub_identity_choice));
+  }
+
+  return choices.filter((sc) => (sc.options?.length ?? 0) > 0);
 }
 
 function normalizeSubclasses(subclasses: RawSubclassCatalog | Subclass[] | undefined): SubclassCatalog | Subclass[] | undefined {

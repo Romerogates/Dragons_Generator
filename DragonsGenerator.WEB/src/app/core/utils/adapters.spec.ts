@@ -90,6 +90,123 @@ describe('class-data.adapter', () => {
     expect(sub.sub_choices?.[0].options).toEqual(['dragon-rouge', 'dragon-bleu']);
   });
 
+  it('maps sorcier sub_identity_choice to wizard sub_choices with labels', () => {
+    const normalized = normalizeCharacterClass({
+      id: 'cls-sorcier',
+      name: 'Sorcier',
+      data: {
+        hit_die: '1d8',
+        primary_abilities: ['cha'],
+        saving_throw_proficiencies: ['wis', 'cha'],
+        armor_proficiencies: [],
+        weapon_proficiencies: [],
+        tool_proficiencies: [],
+        choice_pools: [],
+        starting_equipment: { fixed: [], choice_pools: [] },
+        features_details: [],
+        subclasses: {
+          name: 'Patron',
+          level_unlocked: 1,
+          options: [
+            {
+              id: 'subcls-seigneur-fielon',
+              name: 'Le seigneur fiélon',
+              flavor: { summary: 'Pacte infernal.' },
+              sub_identity_choice: {
+                id: 'choice-seigneur-fielon-identite',
+                type: 'fielon_lord',
+                level_required: 1,
+                count: 1,
+                label: 'Choisissez votre seigneur fiélon',
+                options: [
+                  { id: 'lord-akhlitol', name: 'Akhlitôl la vengeresse', type: 'demon' },
+                  { id: 'lord-askinos', name: 'Hospodar Askinos le buveur de douleur', type: 'devil' },
+                ],
+              },
+              features_details: [],
+            },
+          ],
+        },
+      },
+    } as any);
+
+    const sub = (normalized.data.subclasses as {
+      options: { sub_choices?: { id: string; options: string[]; option_labels?: Record<string, string> }[] }[];
+    }).options[0];
+    expect(sub.sub_choices?.length).toBe(1);
+    expect(sub.sub_choices?.[0].id).toBe('choice-seigneur-fielon-identite');
+    expect(sub.sub_choices?.[0].options).toEqual(['lord-akhlitol', 'lord-askinos']);
+    expect(sub.sub_choices?.[0].option_labels?.['lord-akhlitol']).toBe('Akhlitôl la vengeresse');
+  });
+
+  it('defers druid dynamic subclass pools without static options', () => {
+    const normalized = normalizeCharacterClass({
+      id: 'cls-druide',
+      name: 'Druide',
+      data: {
+        hit_die: '1d8',
+        primary_abilities: ['wis'],
+        saving_throw_proficiencies: ['int', 'wis'],
+        armor_proficiencies: [],
+        weapon_proficiencies: [],
+        tool_proficiencies: [],
+        choice_pools: [],
+        starting_equipment: { fixed: [], choice_pools: [] },
+        features_details: [],
+        subclasses: {
+          name: 'Cercle',
+          level_unlocked: 2,
+          options: [
+            {
+              id: 'subcls-cercle-de-la-terre',
+              name: 'Cercle de la Terre',
+              flavor: { summary: 'Terre.' },
+              choice_pools: [
+                {
+                  id: 'choice-terrain-subcls-cercle-de-la-terre',
+                  name: 'Terrain',
+                  type: 'terrain_type',
+                  quantity: 1,
+                  pool: ['desert', 'foret'],
+                },
+                {
+                  id: 'choice-cantrip-subcls-cercle-de-la-terre',
+                  name: 'Sort mineur',
+                  type: 'spell_proficiency',
+                  quantity: 1,
+                  pool_filter: { spell_level: 0, class: 'cls-druide' },
+                },
+              ],
+              features_details: [],
+            },
+            {
+              id: 'subcls-cercle-des-esprits',
+              name: 'Cercle des Esprits',
+              flavor: { summary: 'Esprits.' },
+              choice_pools: [
+                {
+                  id: 'choice-totem-subcls-cercle-des-esprits',
+                  name: 'Animal totem',
+                  type: 'animal_totem',
+                  quantity: 1,
+                  pool_filter: { source: 'wild_shape_eligible_beasts' },
+                },
+              ],
+              features_details: [],
+            },
+          ],
+        },
+      },
+    } as any);
+
+    const options = (normalized.data.subclasses as { options: { id: string; sub_choices?: { id: string }[] }[] })
+      .options;
+    const earth = options.find((o) => o.id === 'subcls-cercle-de-la-terre');
+    expect(earth?.sub_choices?.map((c) => c.id)).toEqual(['choice-terrain-subcls-cercle-de-la-terre']);
+    const spirits = options.find((o) => o.id === 'subcls-cercle-des-esprits');
+    expect(spirits?.sub_choices?.length ?? 0).toBe(0);
+  });
+
   it('maps roublard equipment choice_pools from root choice_pools', () => {
     const normalized = normalizeCharacterClass({
       id: 'cls-roublard',
