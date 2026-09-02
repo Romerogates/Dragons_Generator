@@ -1,7 +1,7 @@
 # Dragons Generator — Fonctionnalités de l'application
 
 > Inventaire des fonctionnalités (frontend Angular + API .NET), univers **Eana (Dragons)**.  
-> Dernière mise à jour : août 2026.
+> Dernière mise à jour : septembre 2026.
 
 ---
 
@@ -11,7 +11,7 @@
 |-------|-------------|-------|
 | `/` | Accueil, stats univers, liens création/codex | Public |
 | `/create` | Assistant création de personnage (10–11 étapes) | Public |
-| `/characters` | Bibliothèque de personnages (local ou cloud) | Public / cloud si connecté |
+| `/characters` | Bibliothèque de personnages (cloud, compte requis) | Connecté |
 | `/character-sheet` | Fiche personnage + aperçu PDF | Public |
 | `/story/create` | Assistant scénario / aventure (4 étapes) | Public |
 | `/campaigns` | Campagnes MJ et joueur | Connecté |
@@ -33,7 +33,8 @@ Routes lazy-loaded : `/species`, `/classes`, `/civilisations`, `/equipments`, `/
 
 - **10 étapes** (sans magie) ou **11** (avec magie)
 - **Niveaux 1–20** (choix verrouillé après l'étape Classe)
-- Brouillon auto (localStorage), mode édition depuis la bibliothèque
+- **Brouillon wizard** : `localStorage` (`dragon_character_builder_v6`) — reprise du parcours en cours uniquement, **pas** une sauvegarde cloud
+- Mode édition depuis la bibliothèque (persos cloud)
 
 | # | Étape | Contenu principal |
 |---|--------|-------------------|
@@ -68,10 +69,11 @@ Brouillon localStorage avec reprise.
 
 ## 4. Personnages sauvegardés
 
-- **Local** : `localStorage` sans compte
-- **Cloud** : CRUD `/me/characters` (JWT)
-- Actions : voir fiche, éditer, dupliquer, PDF, supprimer
-- Sauvegarde en attente après login (personnage forgé avant inscription)
+- **Cloud uniquement** : CRUD `/me/characters` (compte obligatoire)
+- **Sans compte** : création et fiche PDF possibles ; pas de persistance serveur
+- Actions (connecté) : voir fiche, éditer, dupliquer, PDF, supprimer
+- **Sauvegarde en attente** : personnage forgé hors ligne ou avant login → file `dragons-offline-sync-queue`, envoyée au cloud à la reconnexion
+- **Handoff** : navigation inter-pages (fiche, édition) via `sessionStorage` (`character-handoff.service`)
 
 ---
 
@@ -90,7 +92,11 @@ Brouillon localStorage avec reprise.
 
 - Inscription (email + pseudo + MDP 8+)
 - Confirmation email obligatoire
-- Login JWT, mot de passe oublié / reset (lien 2 h)
+- **Session cookie HttpOnly** (`dg_session`) : JWT signé côté serveur, **non** stocké en `localStorage`
+- Login pose le cookie ; logout le supprime ; le front envoie `credentials: include` sur `/api/*`
+- Profil affiché en `sessionStorage` (`dragons_auth_user`) ; validé via `GET /auth/me`
+- Compatibilité **Bearer** pour tests et clients API
+- Mot de passe oublié / reset (lien 2 h)
 - Rôles **User** / **Admin**
 - Emails SMTP (OVH Zimbra en prod, MailHog en local)
 
@@ -125,7 +131,7 @@ Brouillon localStorage avec reprise.
 
 | Domaine | Exemples de routes |
 |---------|-------------------|
-| Auth | `/auth/register`, `/auth/login`, `/auth/me`, … |
+| Auth | `/auth/register`, `/auth/login`, `/auth/logout`, `/auth/me`, … |
 | Personnages | `/me/characters`, `/me/characters/{id}` |
 | Campagnes | `/me/campaigns`, invites, XP, approbation persos |
 | Amis | `/users/search`, `/me/friends`, demandes |
@@ -149,7 +155,8 @@ Swagger : `/swagger` (API directe).
 
 | Élément | Détail |
 |---------|--------|
-| Wizard personnage | 10–11 étapes, niveaux 1–20 |
+| Wizard personnage | 10–11 étapes, niveaux 1–20, brouillon local wizard |
+| Persos sauvegardés | Cloud only (compte requis) |
 | Wizard scénario | 4 étapes, IA créatures + aventure |
 | Codex | 10 catégories navigables |
 | Endpoints API | ~90 |

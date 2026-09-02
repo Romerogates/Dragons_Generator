@@ -10,6 +10,10 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
     public HttpClient CreateTestClient() =>
         CreateClient(new WebApplicationFactoryClientOptions { HandleCookies = false });
 
+    /// <summary>HttpClient avec cookie jar — simule le navigateur (auth Phase 2).</summary>
+    public HttpClient CreateCookieTestClient() =>
+        CreateClient(new WebApplicationFactoryClientOptions { HandleCookies = true });
+
     private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"dragons-test-{Guid.NewGuid():N}.db");
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)

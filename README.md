@@ -7,7 +7,7 @@ Application web de création de personnages et de gestion de campagnes JDR (Angu
 | Dossier | Rôle |
 |---------|------|
 | `DragonsGenerator.WEB/` | Front Angular (PWA, wizard perso, campagnes, guide) |
-| `DragonsGenerator.API/` | API REST .NET 9 (FastEndpoints, SQLite, auth JWT) |
+| `DragonsGenerator.API/` | API REST .NET 9 (FastEndpoints, SQLite, auth cookie HttpOnly) |
 | `DragonsGenerator.API.Tests/` | Tests d'intégration API |
 | `docs/` | Documentation fonctionnelle et ops |
 | `scripts/` | Scripts deploy (Ollama, VAPID, etc.) |
@@ -112,6 +112,18 @@ Push sur `main` → GitHub Actions (`.github/workflows/deploy.yml`) :
 3. Deploy SSH sur le serveur de production  
 
 Les secrets prod (`Jwt__Key`, `Admin__*`, SMTP…) restent dans `.env` sur le serveur, jamais commités.
+
+## Authentification (Phase 2)
+
+| Élément | Comportement |
+|---------|--------------|
+| **Session** | Cookie HttpOnly `dg_session` (JWT côté serveur, **non** exposé au JS) |
+| **Front** | `withCredentials: true` sur `/api/*` ; profil utilisateur en `sessionStorage` |
+| **Création perso** | Sans compte (wizard + brouillon local) |
+| **Sauvegarde perso / campagnes** | Compte obligatoire ; file d’attente offline si déconnecté |
+| **Compat API** | Header `Authorization: Bearer` toujours accepté (tests, outils) |
+
+Après un deploy majeur auth, les utilisateurs doivent **se reconnecter** une fois.
 
 ## Données
 
