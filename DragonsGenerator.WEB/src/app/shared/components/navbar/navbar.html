@@ -72,7 +72,7 @@
             @if (codexOpen()) {
               <div class="absolute top-full right-0 pt-2 z-50" role="menu">
                 <div
-                  class="w-80 rounded-2xl border border-slate-700/80 bg-[#171b22] shadow-[0_20px_50px_rgba(0,0,0,0.55)] p-2 grid grid-cols-1 gap-0.5 max-h-[70vh] overflow-y-auto"
+                  class="w-80 rounded-2xl border border-slate-700/80 bg-[#171b22] shadow-[0_20px_50px_rgba(0,0,0,0.55)] p-2 grid grid-cols-1 gap-0.5 max-h-[70vh] overflow-y-auto custom-scrollbar"
                 >
                   @for (link of codexLinks; track link.path) {
                     <a
@@ -271,7 +271,7 @@
 
   @if (mobileOpen()) {
     <div
-      class="lg:hidden border-t border-slate-800 bg-[#171b22]/98 backdrop-blur-md max-h-[calc(100dvh-4rem-env(safe-area-inset-top))] overflow-y-auto overscroll-contain"
+      class="lg:hidden border-t border-slate-800 bg-[#171b22]/98 backdrop-blur-md max-h-[calc(100dvh-4rem-env(safe-area-inset-top))] overflow-y-auto overscroll-contain custom-scrollbar"
     >
       <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-1">
         <a

@@ -22,16 +22,50 @@ if ($Down) {
 
 function Test-DockerReady {
     try {
+        $prev = $ErrorActionPreference
+        $ErrorActionPreference = 'SilentlyContinue'
         docker info *> $null
-        return $LASTEXITCODE -eq 0
+        $ok = $LASTEXITCODE -eq 0
+        $ErrorActionPreference = $prev
+        return $ok
     } catch {
         return $false
     }
 }
 
-if (-not (Test-DockerReady)) {
-    Write-Error "Docker n'est pas démarré. Lance Docker Desktop puis relance ce script."
+function Start-DockerDesktopIfNeeded {
+    if (Test-DockerReady) { return }
+
+    $candidates = @(
+        (Join-Path ${env:ProgramFiles} 'Docker\Docker\Docker Desktop.exe'),
+        (Join-Path ${env:ProgramFiles(x86)} 'Docker\Docker\Docker Desktop.exe'),
+        (Join-Path $env:LOCALAPPDATA 'Programs\Docker Desktop\Docker Desktop.exe'),
+        (Join-Path $env:LOCALAPPDATA 'Programs\DockerDesktop\Docker Desktop.exe')
+    )
+
+    foreach ($exe in $candidates) {
+        if (-not (Test-Path $exe)) { continue }
+        Write-Host "Docker Desktop n'est pas prêt — lancement…" -ForegroundColor Yellow
+        Start-Process $exe
+        for ($i = 1; $i -le 36; $i++) {
+            Start-Sleep -Seconds 5
+            if (Test-DockerReady) {
+                Write-Host "Docker prêt après $($i * 5)s." -ForegroundColor Green
+                return
+            }
+            Write-Host "  … attente Docker ($i/36)"
+        }
+        break
+    }
+
+    Write-Error @"
+Docker n'est pas démarré.
+1. Ouvre Docker Desktop manuellement et attends l'icône verte.
+2. Relance : .\scripts\start-local.ps1
+"@
 }
+
+Start-DockerDesktopIfNeeded
 
 $composeArgs = @('-f', $ComposeFile, 'up', '-d')
 if ($Build) { $composeArgs += '--build' }

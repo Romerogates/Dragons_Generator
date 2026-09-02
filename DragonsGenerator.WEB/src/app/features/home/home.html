@@ -316,32 +316,42 @@
     </ul>
   </section>
 
-  <section class="w-full border-y border-slate-800 py-12 px-4 bg-[#1b2028]/40">
-    <div class="max-w-3xl mx-auto">
+  <section class="w-full border-y border-slate-800 py-12 bg-[#1b2028]/40">
+    <div class="max-w-4xl mx-auto px-4">
       <h2
         class="text-[10px] font-black uppercase tracking-[0.22em] text-slate-500 mb-6 text-center"
       >
         Explorer le Grimoire
       </h2>
-      <div
-        class="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 snap-x snap-mandatory scrollbar-thin"
-        style="scrollbar-width: thin"
-      >
+    </div>
+    <div class="grimoire-marquee" aria-label="Sections du Grimoire">
+      <div class="grimoire-marquee-track">
         @for (link of grimoireLinks; track link.path) {
+          <a [routerLink]="link.path" class="grimoire-fiche">
+            <span class="grimoire-fiche-icon">
+              <iconify-icon [icon]="link.icon" width="1.35em" height="1.35em"></iconify-icon>
+            </span>
+            <span class="grimoire-fiche-label">{{ link.label }}</span>
+          </a>
+        }
+        @for (link of grimoireLinks; track 'clone-' + link.path) {
           <a
             [routerLink]="link.path"
-            class="snap-start shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-slate-700 bg-[#171b22] text-slate-300 hover:border-amber-500/45 hover:text-amber-300 transition-colors"
+            class="grimoire-fiche grimoire-fiche-clone"
+            tabindex="-1"
+            aria-hidden="true"
           >
-            <span class="text-lg leading-none"
-              ><iconify-icon [icon]="link.icon" width="1em" height="1em"></iconify-icon
-            ></span>
-            <span class="text-[10px] font-black uppercase tracking-widest whitespace-nowrap">{{
-              link.label
-            }}</span>
+            <span class="grimoire-fiche-icon">
+              <iconify-icon [icon]="link.icon" width="1.35em" height="1.35em"></iconify-icon>
+            </span>
+            <span class="grimoire-fiche-label">{{ link.label }}</span>
           </a>
         }
       </div>
     </div>
+    <p class="mt-5 px-4 text-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-600">
+      Survolez pour pause · cliquez une fiche
+    </p>
   </section>
 
   <section class="w-full py-16 px-4 text-center">
