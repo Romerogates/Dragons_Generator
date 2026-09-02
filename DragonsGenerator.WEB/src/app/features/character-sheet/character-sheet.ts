@@ -14,6 +14,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { PdfGeneratorService } from '@core/services/pdf-generator.service';
 import type { Character } from '@core/models/Character/character';
 import { visibleClassResources } from '@core/utils/class-resource-labels';
+import { CharacterHandoffService } from '@core/services/character-handoff.service';
 
 @Component({
   selector: 'app-character-sheet',
@@ -27,6 +28,7 @@ export class CharacterSheet implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly pdfService = inject(PdfGeneratorService);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly handoff = inject(CharacterHandoffService);
 
   readonly character = signal<Character | null>(null);
   readonly loading = signal(true);
@@ -107,13 +109,12 @@ export class CharacterSheet implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     try {
-      const raw = localStorage.getItem('dragons-current-character');
-      if (!raw) {
+      const character = this.handoff.peekCurrent();
+      if (!character) {
         this.error.set('Aucun personnage sélectionné.');
         this.loading.set(false);
         return;
       }
-      const character = JSON.parse(raw) as Character;
       this.character.set(character);
 
       const url = await this.pdfService.generatePdfBlob(character);
@@ -176,7 +177,7 @@ export class CharacterSheet implements OnInit, OnDestroy {
   editCharacter(): void {
     const c = this.character();
     if (!c) return;
-    localStorage.setItem('dragons-edit-character', JSON.stringify(c));
+    this.handoff.stashEdit(c);
     this.router.navigate(['/create']);
   }
 

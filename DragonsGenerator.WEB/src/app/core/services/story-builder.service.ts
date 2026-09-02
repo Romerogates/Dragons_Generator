@@ -1,4 +1,4 @@
-import { Injectable, computed, effect, signal } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 import {
   AdventureTone,
   CreatureRole,
@@ -93,10 +93,7 @@ export class StoryBuilderService {
   });
 
   constructor() {
-    this.loadDraft();
-    effect(() => {
-      this.saveDraft();
-    });
+    localStorage.removeItem(STORAGE_KEY);
   }
 
   hasPendingDraft(): boolean {
@@ -316,79 +313,5 @@ export class StoryBuilderService {
     this.preservedDungeonMaps.set([]);
     this.preservedActiveSessionId.set(null);
     localStorage.removeItem(STORAGE_KEY);
-  }
-
-  private saveDraft(): void {
-    const draft = {
-      currentStep: this.currentStep(),
-      title: this.title(),
-      setting: this.setting(),
-      region: this.region(),
-      partyLevel: this.partyLevel(),
-      tone: this.tone(),
-      creatures: this.creatures(),
-      adventure: this.adventure(),
-      selectionMode: this.selectionMode(),
-      levelRangeId: this.levelRangeId(),
-      autoCreatureCount: this.autoCreatureCount(),
-      editingCampaignId: this.editingCampaignId(),
-      editScope: this.editScope(),
-      baselineCreatureIds: [...this.baselineCreatureIds()],
-      preservedEncounters: this.preservedEncounters(),
-      preservedNotes: this.preservedNotes(),
-      preservedPregens: this.preservedPregens(),
-      preservedSessions: this.preservedSessions(),
-      preservedHandouts: this.preservedHandouts(),
-      preservedDungeonMaps: this.preservedDungeonMaps(),
-      preservedActiveSessionId: this.preservedActiveSessionId(),
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
-  }
-
-  private loadDraft(): void {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const draft = JSON.parse(raw);
-      if (draft.currentStep) this.currentStep.set(draft.currentStep);
-      if (draft.title) this.title.set(draft.title);
-      if (draft.setting) this.setting.set(draft.setting);
-      if (draft.region) this.region.set(draft.region);
-      if (draft.partyLevel) this.partyLevel.set(draft.partyLevel);
-      if (draft.tone) this.tone.set(draft.tone);
-      if (Array.isArray(draft.creatures)) this.creatures.set(draft.creatures);
-      if (draft.adventure) this.adventure.set(draft.adventure);
-      if (draft.selectionMode) this.selectionMode.set(draft.selectionMode);
-      if (draft.levelRangeId) this.levelRangeId.set(draft.levelRangeId);
-      if (draft.autoCreatureCount) this.autoCreatureCount.set(draft.autoCreatureCount);
-      if (draft.editingCampaignId) this.editingCampaignId.set(draft.editingCampaignId);
-      if (draft.editScope) this.editScope.set(draft.editScope);
-      if (Array.isArray(draft.baselineCreatureIds)) {
-        this.baselineCreatureIds.set(new Set(draft.baselineCreatureIds));
-      }
-      if (Array.isArray(draft.preservedEncounters)) {
-        this.preservedEncounters.set(draft.preservedEncounters);
-      }
-      if (typeof draft.preservedNotes === 'string') {
-        this.preservedNotes.set(draft.preservedNotes);
-      }
-      if (Array.isArray(draft.preservedPregens)) {
-        this.preservedPregens.set(draft.preservedPregens);
-      }
-      if (Array.isArray(draft.preservedSessions)) {
-        this.preservedSessions.set(draft.preservedSessions);
-      }
-      if (Array.isArray(draft.preservedHandouts)) {
-        this.preservedHandouts.set(draft.preservedHandouts);
-      }
-      if (Array.isArray(draft.preservedDungeonMaps)) {
-        this.preservedDungeonMaps.set(draft.preservedDungeonMaps);
-      }
-      if (draft.preservedActiveSessionId !== undefined) {
-        this.preservedActiveSessionId.set(draft.preservedActiveSessionId);
-      }
-    } catch {
-      /* ignore corrupt draft */
-    }
   }
 }

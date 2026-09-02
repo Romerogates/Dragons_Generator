@@ -35,6 +35,7 @@ export const routes: Routes = [
   },
   {
     path: 'guide',
+    canActivate: [authGuard],
     loadComponent: () => import('./features/guide/guide').then((m) => m.GuidePage),
   },
   {

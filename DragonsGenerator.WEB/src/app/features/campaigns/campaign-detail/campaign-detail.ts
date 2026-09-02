@@ -17,6 +17,7 @@ import { CampaignCloudService, CampaignActivityItem, InitiativeBoard } from '@co
 import { FriendsService } from '@core/services/friends.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
 import { AuthService } from '@core/services/auth.service';
+import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import { NotificationService } from '@core/services/notification.service';
 import { DataService } from '@core/services/data.service';
 import { forkJoin, catchError, map, of, Observable, throwError } from 'rxjs';
@@ -106,6 +107,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   private storyBuilder = inject(StoryBuilderService);
   private pregenGenerator = inject(CampaignPregenGeneratorService);
   private sessionCache = inject(CampaignSessionCacheService);
+  private handoff = inject(CharacterHandoffService);
   readonly aiProgress = inject(AiGenerationProgressService);
 
   readonly loading = signal(true);
@@ -982,7 +984,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.error.set(null);
     this.loadMemberCharacter(member, scope).subscribe({
       next: (character) => {
-        localStorage.setItem('dragons-current-character', JSON.stringify(character));
+        this.handoff.setCurrent(character);
         this.memberCharacterLoadingId.set(null);
         this.router.navigate(['/character-sheet']);
       },
@@ -1176,7 +1178,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.error.set(null);
     this.loadPregenCharacter(pregen).subscribe({
       next: (character) => {
-        localStorage.setItem('dragons-current-character', JSON.stringify(character));
+        this.handoff.setCurrent(character);
         this.pregenPdfLoadingId.set(null);
         this.router.navigate(['/character-sheet']);
       },

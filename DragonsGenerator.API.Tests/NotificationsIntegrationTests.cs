@@ -9,7 +9,7 @@ public class NotificationsIntegrationTests
 
     public NotificationsIntegrationTests(CustomWebApplicationFactory factory)
     {
-        _client = factory.CreateClient();
+        _client = factory.CreateTestClient();
     }
 
     [Fact]

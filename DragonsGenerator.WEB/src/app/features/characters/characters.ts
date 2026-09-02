@@ -16,6 +16,7 @@ import { AuthService } from '@core/services/auth.service';
 import { PendingCharacterSaveService } from '@core/services/pending-character-save.service';
 import { OfflineSyncService } from '@core/services/offline-sync.service';
 import { ConnectivityService } from '@core/services/connectivity.service';
+import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import type { Character } from '../../core/models/Character/character';
 
 @Component({
@@ -34,6 +35,7 @@ export class Characters implements OnInit {
   private pendingSave = inject(PendingCharacterSaveService);
   private readonly offlineSync = inject(OfflineSyncService);
   private readonly connectivity = inject(ConnectivityService);
+  private readonly handoff = inject(CharacterHandoffService);
 
   readonly isOnline = this.connectivity.isOnline;
   readonly pendingSyncCount = this.offlineSync.pendingCount;
@@ -68,47 +70,43 @@ export class Characters implements OnInit {
 
   private reloadFromCloud(): void {
     this.loading.set(true);
-    this.cloud.syncFromCloud().subscribe({
+    this.cloud.loadAll().subscribe({
       next: (list) => {
-        this.applyList(list as any[]);
+        this.applyList(this.mergeWithPending(list));
         this.loading.set(false);
       },
       error: () => {
-        this.loadCharacters();
+        this.characters.set([]);
         this.loading.set(false);
-        if (!this.connectivity.isOnline()) {
-          this.offlineSync.flushIfPossible();
-        }
       },
     });
   }
 
-  private applyList(parsed: any[]): void {
-    const safeCharacters = (parsed ?? []).map((c: any, index: number) => {
+  private mergeWithPending(cloud: Character[]): Character[] {
+    const pending = this.offlineSync.getPendingCharacters();
+    const byId = new Map<string, Character>();
+    for (const c of cloud) {
+      if (c.id) byId.set(c.id, c);
+    }
+    for (const p of pending) {
+      if (p.id) byId.set(p.id, p);
+    }
+    return [...byId.values()];
+  }
+
+  private applyList(parsed: Character[]): void {
+    const safeCharacters = (parsed ?? []).map((c, index) => {
       if (!c.id) {
         c.id = crypto.randomUUID ? crypto.randomUUID() : `legacy-${index}-${Date.now()}`;
       }
       return c;
     });
-    safeCharacters.sort((a: any, b: any) => {
+    safeCharacters.sort((a, b) => {
       const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
       const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
       return dateB - dateA;
     });
     this.characters.set(safeCharacters);
-    localStorage.setItem('dragons-characters', JSON.stringify(safeCharacters));
-  }
-
-  private loadCharacters(): void {
-    try {
-      const saved = localStorage.getItem('dragons-characters');
-      if (saved) {
-        this.applyList(JSON.parse(saved));
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement des personnages:', error);
-      this.characters.set([]);
-    }
   }
 
   // === ACCESSEURS SÉCURISÉS (Adaptés au nouveau modèle Character.ts) ===
@@ -198,20 +196,20 @@ export class Characters implements OnInit {
 
   // === ACTIONS ===
 
-  viewCharacter(character: any): void {
-    localStorage.setItem('dragons-current-character', JSON.stringify(character));
+  viewCharacter(character: Character): void {
+    this.handoff.setCurrent(character);
     this.router.navigate(['/character-sheet']);
   }
 
-  editCharacter(character: any, event: Event): void {
+  editCharacter(character: Character, event: Event): void {
     event.stopPropagation();
-    localStorage.setItem('dragons-edit-character', JSON.stringify(character));
+    this.handoff.stashEdit(character);
     this.router.navigate(['/create']);
   }
 
-  duplicateCharacter(character: any, event: Event): void {
+  duplicateCharacter(character: Character, event: Event): void {
     event.stopPropagation();
-    const duplicate = {
+    const duplicate: Character = {
       ...character,
       id: crypto.randomUUID(),
       name: `${this.getCharName(character)} (copie)`,
@@ -219,8 +217,7 @@ export class Characters implements OnInit {
       updatedAt: new Date().toISOString(),
     };
 
-        this.characters.update((chars) => [duplicate, ...chars]);
-    localStorage.setItem('dragons-characters', JSON.stringify(this.characters()));
+    this.characters.update((chars) => [duplicate, ...chars]);
     if (this.auth.isLoggedIn()) {
       this.cloud.save(duplicate).subscribe({ error: () => {} });
     }
@@ -257,7 +254,6 @@ export class Characters implements OnInit {
 
     const removeLocal = (): void => {
       this.characters.update((chars) => chars.filter((c) => c.id !== toDelete.id));
-      localStorage.setItem('dragons-characters', JSON.stringify(this.characters()));
       this.deleteConfirmName.set('');
       this.deleteError.set(null);
       this.characterToDelete.set(null);

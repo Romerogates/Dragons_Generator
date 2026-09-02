@@ -6,6 +6,10 @@ namespace DragonsGenerator.API.Tests;
 
 public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
+    /// <summary>HttpClient sans cookie jar — évite que dg_session pollue les requêtes Bearer/anonymes.</summary>
+    public HttpClient CreateTestClient() =>
+        CreateClient(new WebApplicationFactoryClientOptions { HandleCookies = false });
+
     private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"dragons-test-{Guid.NewGuid():N}.db");
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)

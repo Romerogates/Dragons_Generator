@@ -14,9 +14,9 @@ Revenir uniquement le service monolithique :
   git checkout d7e1cc6f623dabae7b98ae8bccb7109e2d5b3826 -- DragonsGenerator.WEB/src/app/core/services/character-builder.service.ts
 
 Lots prévus :
-  1 — types + INITIAL_CREATION_STATE (character-builder.types.ts)
-  2 — localStorage (character-builder-storage.ts)
-  3 — combat (character-combat.util.ts)
-  4 — spellcasting (character-spellcasting.util.ts)
-  5 — build orchestrator
-  6 — edit mapper + validation
+  1 — types + INITIAL_CREATION_STATE (character-builder.types.ts) ✓
+  2 — localStorage — annulé (Phase 2 cloud-only)
+  3 — combat (character-combat.util.ts) ✓
+  4 — spellcasting (character-spellcasting.util.ts) ✓
+  5 — build orchestrator (character-build.util.ts) ✓
+  6 — edit mapper + validation (character-edit.mapper.ts) ✓

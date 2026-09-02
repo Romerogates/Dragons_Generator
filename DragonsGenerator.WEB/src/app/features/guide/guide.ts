@@ -60,8 +60,6 @@ export type {
 import type { GuideAudience, GuideChecklistItem, GuideNavItem, GuideQuickCard, GuideStep } from './guide.types';
 import { GuidePreferencesService } from '@core/services/guide-preferences.service';
 
-const AUDIENCE_KEY = 'dragons-guide-audience';
-const FEEDBACK_KEY = 'dragons-guide-feedback';
 const GUIDE_PATH = '/guide';
 const SCROLL_OFFSET_PX = 88;
 
@@ -247,12 +245,6 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   readonly showPlayer = computed(() => this.audience() !== 'dm');
 
   ngOnInit(): void {
-    try {
-      const fb = localStorage.getItem(FEEDBACK_KEY);
-      if (fb) this.sectionFeedback.set(JSON.parse(fb) as Record<string, 'yes' | 'no'>);
-    } catch {
-      /* ignore */
-    }
     void this.guidePrefs.load().then(() => {
       this.audience.set(this.guidePrefs.audience());
     });
@@ -348,15 +340,7 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   setSectionFeedback(sectionId: string, value: 'yes' | 'no'): void {
-    this.sectionFeedback.update((m) => {
-      const next = { ...m, [sectionId]: value };
-      try {
-        localStorage.setItem(FEEDBACK_KEY, JSON.stringify(next));
-      } catch {
-        /* ignore */
-      }
-      return next;
-    });
+    this.sectionFeedback.update((m) => ({ ...m, [sectionId]: value }));
   }
 
   supportQuery(sectionLabel: string): { subject: string; message: string } {

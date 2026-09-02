@@ -7,10 +7,6 @@ import { AuthService } from './auth.service';
 
 export type GuideAudiencePref = 'all' | 'dm' | 'player';
 
-const READ_NEWS_KEY = 'dragons-guide-read-news';
-const READ_SECTIONS_KEY = 'dragons-guide-read-sections';
-const AUDIENCE_KEY = 'dragons-guide-audience';
-
 interface GuidePreferencesDto {
   readNewsIds: string[];
   readSectionIds: string[];
@@ -26,6 +22,8 @@ export class GuidePreferencesService {
   readonly readNewsIds = signal<Record<string, true>>({});
   readonly readSectionIds = signal<Record<string, true>>({});
   readonly audience = signal<GuideAudiencePref>('all');
+  /** true tant que l'utilisateur n'a pas choisi (ou ignoré) l'onboarding rôle MJ/joueur. */
+  readonly needsRoleOnboarding = signal(false);
   private persistTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly unreadNewsCount = computed(() => {
@@ -54,13 +52,11 @@ export class GuidePreferencesService {
   }
 
   async load(): Promise<void> {
-    const localNews = this.loadLocalArray(READ_NEWS_KEY);
-    const localSections = this.loadLocalArray(READ_SECTIONS_KEY);
-    const localAudience = this.loadLocalAudience();
     if (!this.auth.isLoggedIn()) {
-      this.readNewsIds.set(this.toRecord(localNews));
-      this.readSectionIds.set(this.toRecord(localSections));
-      this.audience.set(localAudience);
+      this.readNewsIds.set({});
+      this.readSectionIds.set({});
+      this.audience.set('all');
+      this.needsRoleOnboarding.set(false);
       return;
     }
 
@@ -68,29 +64,12 @@ export class GuidePreferencesService {
       const remote = await firstValueFrom(
         this.http.get<GuidePreferencesDto>(`${this.api}/me/guide-preferences`),
       );
-      const remoteNews = remote.readNewsIds ?? [];
-      const remoteSections = remote.readSectionIds ?? [];
-      const mergedNews = [...new Set([...localNews, ...remoteNews])];
-      const mergedSections = [...new Set([...localSections, ...remoteSections])];
-      const mergedAudience = remote.audience ?? localAudience;
-      this.readNewsIds.set(this.toRecord(mergedNews));
-      this.readSectionIds.set(this.toRecord(mergedSections));
-      this.audience.set(mergedAudience);
-      const needsSync =
-        mergedNews.length !== remoteNews.length ||
-        mergedSections.length !== remoteSections.length ||
-        localNews.some((id) => !remoteNews.includes(id)) ||
-        localSections.some((id) => !remoteSections.includes(id)) ||
-        (remote.audience == null && localAudience !== 'all');
-      if (needsSync) {
-        await this.persistRemote(mergedNews, mergedSections, mergedAudience);
-      }
-      if (localNews.length) this.clearLocalKey(READ_NEWS_KEY);
-      if (localSections.length) this.clearLocalKey(READ_SECTIONS_KEY);
+      this.readNewsIds.set(this.toRecord(remote.readNewsIds ?? []));
+      this.readSectionIds.set(this.toRecord(remote.readSectionIds ?? []));
+      this.audience.set(remote.audience ?? 'all');
+      this.needsRoleOnboarding.set(remote.audience == null);
     } catch {
-      this.readNewsIds.set(this.toRecord(localNews));
-      this.readSectionIds.set(this.toRecord(localSections));
-      this.audience.set(localAudience);
+      /* garde l'état en mémoire — pas de repli localStorage */
     }
   }
 
@@ -120,11 +99,7 @@ export class GuidePreferencesService {
 
   setAudience(value: GuideAudiencePref): void {
     this.audience.set(value);
-    try {
-      localStorage.setItem(AUDIENCE_KEY, value);
-    } catch {
-      /* ignore */
-    }
+    this.needsRoleOnboarding.set(false);
     this.schedulePersist();
   }
 
@@ -134,28 +109,11 @@ export class GuidePreferencesService {
   }
 
   private persistNow(): void {
+    if (!this.auth.isLoggedIn()) return;
     const newsIds = Object.keys(this.readNewsIds());
     const sectionIds = Object.keys(this.readSectionIds());
     const aud = this.audience();
-    if (this.auth.isLoggedIn()) {
-      void this.persistRemote(newsIds, sectionIds, aud).catch(() => {
-        this.saveLocalArray(READ_NEWS_KEY, newsIds);
-        this.saveLocalArray(READ_SECTIONS_KEY, sectionIds);
-        try {
-          localStorage.setItem(AUDIENCE_KEY, aud);
-        } catch {
-          /* ignore */
-        }
-      });
-    } else {
-      this.saveLocalArray(READ_NEWS_KEY, newsIds);
-      this.saveLocalArray(READ_SECTIONS_KEY, sectionIds);
-      try {
-        localStorage.setItem(AUDIENCE_KEY, aud);
-      } catch {
-        /* ignore */
-      }
-    }
+    void this.persistRemote(newsIds, sectionIds, aud);
   }
 
   private async persistRemote(
@@ -170,43 +128,6 @@ export class GuidePreferencesService {
         audience: aud,
       }),
     );
-  }
-
-  private loadLocalArray(key: string): string[] {
-    try {
-      const raw = localStorage.getItem(key);
-      if (!raw) return [];
-      const parsed = JSON.parse(raw) as unknown;
-      return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string') : [];
-    } catch {
-      return [];
-    }
-  }
-
-  private loadLocalAudience(): GuideAudiencePref {
-    try {
-      const raw = localStorage.getItem(AUDIENCE_KEY);
-      if (raw === 'dm' || raw === 'player' || raw === 'all') return raw;
-    } catch {
-      /* ignore */
-    }
-    return 'all';
-  }
-
-  private saveLocalArray(key: string, ids: string[]): void {
-    try {
-      localStorage.setItem(key, JSON.stringify(ids));
-    } catch {
-      /* ignore */
-    }
-  }
-
-  private clearLocalKey(key: string): void {
-    try {
-      localStorage.removeItem(key);
-    } catch {
-      /* ignore */
-    }
   }
 
   private toRecord(ids: string[]): Record<string, true> {

@@ -13,6 +13,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CharacterBuilderService } from '../../core/services/character-builder.service';
 import { ConnectivityService } from '@core/services/connectivity.service';
 import { OfflineCodexService } from '@core/services/offline-codex.service';
+import { CharacterHandoffService } from '@core/services/character-handoff.service';
 
 // Steps
 import { SpeciesStep } from './steps/species-step/species-step';
@@ -54,6 +55,7 @@ export class CharacterCreation implements OnInit {
   private readonly router = inject(Router);
   private readonly connectivity = inject(ConnectivityService);
   private readonly offlineCodex = inject(OfflineCodexService);
+  private readonly handoff = inject(CharacterHandoffService);
 
   readonly isOnline = this.connectivity.isOnline;
   readonly codexReady = signal(this.offlineCodex.isDownloaded());
@@ -66,7 +68,7 @@ export class CharacterCreation implements OnInit {
 
   ngOnInit(): void {
     // 1. Mode édition depuis /characters → priorité absolue
-    const hasEditData = !!localStorage.getItem('dragons-edit-character');
+    const hasEditData = this.handoff.hasEditPending();
     if (hasEditData) {
       this.builder.checkForEditMode();
       return;
@@ -101,7 +103,7 @@ export class CharacterCreation implements OnInit {
 
   finishCreation(): void {
     const character = this.builder.build();
-    localStorage.setItem('dragons-current-character', JSON.stringify(character));
+    this.handoff.setCurrent(character);
     this.router.navigate(['/character-sheet']);
   }
 }

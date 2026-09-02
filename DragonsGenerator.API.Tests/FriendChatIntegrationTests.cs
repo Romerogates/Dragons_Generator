@@ -11,7 +11,7 @@ public class FriendChatIntegrationTests
 
     public FriendChatIntegrationTests(CustomWebApplicationFactory factory)
     {
-        _client = factory.CreateClient();
+        _client = factory.CreateTestClient();
     }
 
     [Fact]

@@ -5,6 +5,7 @@ using DragonsGenerator.API.Services;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -80,6 +81,20 @@ builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationSc
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(opt.Key)),
             ClockSkew = TimeSpan.FromMinutes(2),
         };
+        o.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = ctx =>
+            {
+                if (
+                    string.IsNullOrEmpty(ctx.Token)
+                    && ctx.Request.Cookies.TryGetValue(AuthCookieHelper.CookieName, out var cookieToken)
+                )
+                {
+                    ctx.Token = cookieToken;
+                }
+                return Task.CompletedTask;
+            },
+        };
     });
 builder.Services.AddAuthorization();
 
@@ -118,10 +133,27 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        var origins = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "http://localhost:4200",
+            "http://localhost:8081",
+            "https://dragons-generator.top",
+        };
+        var publicUrl = builder.Configuration["App:PublicWebUrl"];
+        if (!string.IsNullOrWhiteSpace(publicUrl))
+            origins.Add(publicUrl.TrimEnd('/'));
+
+        policy
+            .WithOrigins(origins.ToArray())
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
+});
+
+builder.Services.Configure<ForwardedHeadersOptions>(o =>
+{
+    o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
 
 builder.WebHost.ConfigureKestrel(o =>
@@ -133,6 +165,7 @@ var app = builder.Build();
 
 await DbSeeder.SeedAsync(app.Services);
 
+app.UseForwardedHeaders();
 app.UseCors("AllowAngular");
 app.UseAuthentication();
 app.UseAuthorization();

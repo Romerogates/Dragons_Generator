@@ -20,6 +20,7 @@ import { PendingCharacterSaveService } from '@core/services/pending-character-sa
 import { ConnectivityService } from '@core/services/connectivity.service';
 import { OfflineCodexService } from '@core/services/offline-codex.service';
 import { OfflineSyncService } from '@core/services/offline-sync.service';
+import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import {
   ABILITY_KEY_TO_LABEL,
   ABILITY_KEYS,
@@ -50,6 +51,7 @@ export class SummaryStep implements OnInit, OnDestroy {
   private readonly connectivity = inject(ConnectivityService);
   private readonly offlineCodex = inject(OfflineCodexService);
   private readonly offlineSync = inject(OfflineSyncService);
+  private readonly handoff = inject(CharacterHandoffService);
 
   readonly isOnline = this.connectivity.isOnline;
   readonly codexReady = computed(() => this.offlineCodex.isDownloaded());
@@ -153,7 +155,7 @@ export class SummaryStep implements OnInit, OnDestroy {
         cloudSynced: false,
       };
       this.offlineSync.queueCharacterSave(withId, this.isEditMode());
-      localStorage.setItem('dragons-current-character', JSON.stringify(withId));
+      this.handoff.setCurrent(withId);
       this.pendingSave.clear();
       this.saving.set(false);
       this.builder.reset();
@@ -168,8 +170,7 @@ export class SummaryStep implements OnInit, OnDestroy {
           id: serverId || character.id,
           cloudSynced: true,
         };
-        this.upsertLocal(updated);
-        localStorage.setItem('dragons-current-character', JSON.stringify(updated));
+        this.handoff.setCurrent(updated);
         this.pendingSave.clear();
         this.saving.set(false);
         this.builder.reset();
@@ -182,7 +183,7 @@ export class SummaryStep implements OnInit, OnDestroy {
           cloudSynced: false,
         };
         this.offlineSync.queueCharacterSave(withId, this.isEditMode());
-        localStorage.setItem('dragons-current-character', JSON.stringify(withId));
+        this.handoff.setCurrent(withId);
         this.pendingSave.clear();
         this.saving.set(false);
         this.saveError.set(
@@ -192,14 +193,6 @@ export class SummaryStep implements OnInit, OnDestroy {
         void this.router.navigate(['/characters']);
       },
     });
-  }
-
-  private upsertLocal(character: Character): void {
-    const saved = this.getSavedCharacters();
-    const idx = saved.findIndex((c: any) => c.id === character.id);
-    if (idx >= 0) saved[idx] = character;
-    else saved.push(character);
-    localStorage.setItem('dragons-characters', JSON.stringify(saved));
   }
 
   async downloadPdf(): Promise<void> {
@@ -217,14 +210,5 @@ export class SummaryStep implements OnInit, OnDestroy {
 
   prevStep(): void {
     this.builder.previousStep();
-  }
-
-  private getSavedCharacters(): any[] {
-    try {
-      const raw = localStorage.getItem('dragons-characters');
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
   }
 }

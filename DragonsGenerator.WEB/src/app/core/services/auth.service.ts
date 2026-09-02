@@ -1,5 +1,5 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap, catchError, of } from 'rxjs';
 import { clearPersistedAiRateLimit } from '@core/utils/ai-rate-limit.util';
@@ -27,11 +27,10 @@ export interface UpdateProfilePayload {
 }
 
 interface AuthResponse {
-  token: string;
+  token?: string | null;
   user: AuthUser;
 }
 
-const TOKEN_KEY = 'dragons_auth_token';
 const USER_KEY = 'dragons_auth_user';
 
 @Injectable({ providedIn: 'root' })
@@ -42,12 +41,12 @@ export class AuthService {
   private readonly api = environment.apiUrl;
 
   private readonly userSignal = signal<AuthUser | null>(this.readUser());
-  private readonly tokenSignal = signal<string | null>(localStorage.getItem(TOKEN_KEY));
+  private readonly sessionChecked = signal(false);
 
   readonly user = this.userSignal.asReadonly();
-  readonly token = this.tokenSignal.asReadonly();
-  readonly isLoggedIn = computed(() => !!this.tokenSignal() && !!this.userSignal());
+  readonly isLoggedIn = computed(() => !!this.userSignal());
   readonly isAdmin = computed(() => this.userSignal()?.role === 'Admin');
+  readonly sessionReady = this.sessionChecked.asReadonly();
 
   register(email: string, password: string, displayName: string, acceptTerms: boolean): Observable<unknown> {
     const webUrl = typeof window !== 'undefined' ? window.location.origin : undefined;
@@ -72,13 +71,12 @@ export class AuthService {
     return this.http.patch<AuthUser>(`${this.api}/auth/me`, payload).pipe(
       tap((u) => {
         this.userSignal.set(u);
-        localStorage.setItem(USER_KEY, JSON.stringify(u));
+        this.persistUser(u);
         this.writeThroughPublicProfileCache(u);
       }),
     );
   }
 
-  /** Garde le cache profil public aligné après édition Settings. */
   private writeThroughPublicProfileCache(u: AuthUser): void {
     type CachedProfile = {
       id: string;
@@ -123,7 +121,7 @@ export class AuthService {
 
   login(email: string, password: string): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.api}/auth/login`, { email, password }).pipe(
-      tap((res) => this.persist(res.token, res.user)),
+      tap((res) => this.persist(res.user)),
     );
   }
 
@@ -141,62 +139,96 @@ export class AuthService {
   }
 
   refreshMe(): Observable<AuthUser | null> {
-    if (!this.tokenSignal()) return of(null);
     return this.http.get<AuthUser>(`${this.api}/auth/me`).pipe(
       tap((u) => {
         this.userSignal.set(u);
-        localStorage.setItem(USER_KEY, JSON.stringify(u));
+        this.persistUser(u);
+        this.sessionChecked.set(true);
       }),
-      catchError(() => {
-        this.logout(false);
-        return of(null);
+      catchError((err: unknown) => {
+        this.sessionChecked.set(true);
+        if (err instanceof HttpErrorResponse && err.status === 401) {
+          this.clearLocalSession(false);
+          return of(null);
+        }
+        return of(this.userSignal());
       }),
     );
   }
 
-  /** Vérifie le token au démarrage et au retour sur l'app (PWA / onglet). */
+  /** Valide le cookie de session au démarrage et au retour sur l'app. */
   initSessionSync(): void {
     if (typeof window === 'undefined') return;
-    if (this.tokenSignal()) {
-      this.refreshMe().subscribe();
-    }
+    this.refreshMe().subscribe();
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible' && this.tokenSignal()) {
+      if (document.visibilityState === 'visible' && this.isLoggedIn()) {
         this.refreshMe().subscribe();
       }
     });
     window.addEventListener('focus', () => {
-      if (this.tokenSignal()) {
+      if (this.isLoggedIn()) {
         this.refreshMe().subscribe();
       }
     });
   }
 
   logout(navigate = true): void {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
-    this.tokenSignal.set(null);
+    this.http.post(`${this.api}/auth/logout`, {}).subscribe({
+      complete: () => this.clearLocalSession(navigate),
+      error: () => this.clearLocalSession(navigate),
+    });
+  }
+
+  logoutAndClearLocalData(): void {
+    clearLocalAppData();
+    this.http.post(`${this.api}/auth/logout`, {}).subscribe({
+      complete: () => this.clearLocalSession(true),
+      error: () => this.clearLocalSession(true),
+    });
+  }
+
+  private persist(user: AuthUser): void {
+    this.userSignal.set(user);
+    this.persistUser(user);
+    this.sessionChecked.set(true);
+    this.purgeLegacyLocalStorage();
+    if (user.role === 'Admin') clearPersistedAiRateLimit();
+  }
+
+  private clearLocalSession(navigate: boolean): void {
+    sessionStorage.removeItem(USER_KEY);
     this.userSignal.set(null);
+    this.purgeLegacyLocalStorage();
     if (navigate) void this.router.navigateByUrl('/login');
   }
 
-  /** Déconnexion + effacement complet des données locales après suppression de compte. */
-  logoutAndClearLocalData(): void {
-    clearLocalAppData();
-    this.logout(true);
+  /** Anciennes clés localStorage (Phase 1) — nettoyage à la connexion / déconnexion. */
+  private purgeLegacyLocalStorage(): void {
+    if (typeof localStorage === 'undefined') return;
+    const legacyKeys = [
+      'dragons_auth_token',
+      'dragons_auth_user',
+      'dragons-characters',
+      'dragons-campaigns-local',
+      'dragons-current-character',
+      'dragons-edit-character',
+    ];
+    for (const key of legacyKeys) {
+      localStorage.removeItem(key);
+    }
   }
 
-  private persist(token: string, user: AuthUser): void {
-    localStorage.setItem(TOKEN_KEY, token);
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
-    this.tokenSignal.set(token);
-    this.userSignal.set(user);
-    if (user.role === 'Admin') clearPersistedAiRateLimit();
+  private persistUser(user: AuthUser): void {
+    try {
+      sessionStorage.setItem(USER_KEY, JSON.stringify(user));
+    } catch {
+      /* ignore */
+    }
   }
 
   private readUser(): AuthUser | null {
     try {
-      const raw = localStorage.getItem(USER_KEY);
+      const raw = sessionStorage.getItem(USER_KEY);
       return raw ? (JSON.parse(raw) as AuthUser) : null;
     } catch {
       return null;

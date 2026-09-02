@@ -29,7 +29,7 @@ export class CharacterCloudService {
   private readonly auth = inject(AuthService);
   private readonly api = environment.apiUrl;
 
-  /** Dernier échec partiel ou total lors d'un syncFromCloud(). */
+  /** Dernier échec partiel ou total lors d'un loadAll(). */
   readonly lastSyncError = signal<string | null>(null);
 
   list(): Observable<CloudCharacterSummary[]> {
@@ -75,41 +75,32 @@ export class CharacterCloudService {
     return this.http.delete<void>(`${this.api}/me/characters/${id}`);
   }
 
-  /** Merge cloud → localStorage pour la page Héros. */
-  syncFromCloud(): Observable<unknown[]> {
+  /** Charge tous les personnages depuis le cloud (mémoire uniquement — pas de cache localStorage). */
+  loadAll(): Observable<Character[]> {
     if (!this.auth.isLoggedIn()) {
-      return of(this.readLocal());
+      return of([]);
     }
     this.lastSyncError.set(null);
     return this.list().pipe(
       switchMap((summaries) => {
-        if (!summaries.length) return of([] as unknown[]);
+        if (!summaries.length) return of([] as Character[]);
         return this.loadSummariesSequentially(summaries);
-      }),
-      tap((merged) => {
-        const pendingLocal = this.readLocal().filter(
-          (c): c is { id?: string; cloudSynced?: boolean } =>
-            typeof c === 'object' &&
-            c !== null &&
-            (c as { cloudSynced?: boolean }).cloudSynced === false,
-        );
-        const mergedIds = new Set(
-          (merged as { id?: string }[]).map((c) => c.id).filter(Boolean),
-        );
-        const extras = pendingLocal.filter((c) => !mergedIds.has(c.id));
-        const combined = [...(merged as unknown[]), ...extras];
-        localStorage.setItem('dragons-characters', JSON.stringify(combined));
       }),
       catchError((err) => {
         this.lastSyncError.set(formatCharacterCloudListError(err));
-        return of(this.readLocal());
+        return of([] as Character[]);
       }),
     );
   }
 
+  /** @deprecated Utiliser loadAll() — alias pour compatibilité interne. */
+  syncFromCloud(): Observable<Character[]> {
+    return this.loadAll();
+  }
+
   private loadSummariesSequentially(
     summaries: CloudCharacterSummary[],
-  ): Observable<unknown[]> {
+  ): Observable<Character[]> {
     const loadErrors: string[] = [];
     return summaries.reduce(
       (acc$, summary) =>
@@ -122,7 +113,7 @@ export class CharacterCloudService {
                   id: full.id,
                   name: full.name,
                   cloudSynced: true,
-                };
+                } as Character;
                 return [...arr, data];
               }),
               catchError((err) => {
@@ -132,7 +123,7 @@ export class CharacterCloudService {
             ),
           ),
         ),
-      of([] as unknown[]),
+      of([] as Character[]),
     ).pipe(
       tap(() => {
         if (loadErrors.length > 0) {
@@ -144,14 +135,5 @@ export class CharacterCloudService {
 
   private createCharacter(body: { name: string; data: Character }): Observable<string> {
     return this.http.post<{ id: string }>(`${this.api}/me/characters`, body).pipe(map((r) => r.id));
-  }
-
-  private readLocal(): unknown[] {
-    try {
-      const raw = localStorage.getItem('dragons-characters');
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
   }
 }

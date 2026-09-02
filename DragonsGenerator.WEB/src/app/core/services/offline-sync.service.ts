@@ -1,5 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, of, switchMap, map, catchError, tap } from 'rxjs';
+import { Observable, of, switchMap, map, catchError } from 'rxjs';
 import type { Character } from '@core/models/Character/character';
 import { CampaignData, CampaignSummary } from '@core/models/Campaign/campaign';
 import { AuthService } from './auth.service';
@@ -9,7 +9,6 @@ import { CampaignCloudService } from './campaign-cloud.service';
 import { formatOfflineSyncError } from '@core/utils/offline-sync-error.util';
 
 const QUEUE_KEY = 'dragons-offline-sync-queue';
-const LOCAL_CAMPAIGNS_KEY = 'dragons-campaigns-local';
 
 export interface LocalCampaignRecord {
   id: string;
@@ -33,6 +32,7 @@ type SyncQueueItem =
       title: string;
       data: CampaignData;
       queuedAt: string;
+      serverId?: string;
     }
   | {
       type: 'campaign-update';
@@ -67,6 +67,12 @@ export class OfflineSyncService {
     this.pendingCount.set(this.readQueue().length);
   }
 
+  getPendingCharacters(): Character[] {
+    return this.readQueue()
+      .filter((x): x is Extract<SyncQueueItem, { type: 'character-save' }> => x.type === 'character-save')
+      .map((x) => x.character);
+  }
+
   queueCharacterSave(character: Character, updateExisting?: boolean): void {
     const queued: SyncQueueItem = {
       type: 'character-save',
@@ -75,7 +81,6 @@ export class OfflineSyncService {
       queuedAt: new Date().toISOString(),
     };
     this.pushQueue(queued);
-    this.upsertLocalCharacter(queued.character);
   }
 
   queueCampaignCreate(title: string, data: CampaignData): LocalCampaignRecord {
@@ -87,7 +92,6 @@ export class OfflineSyncService {
       cloudSynced: false,
       updatedAt: new Date().toISOString(),
     };
-    this.upsertLocalCampaign(record);
     this.pushQueue({
       type: 'campaign-create',
       localId,
@@ -99,16 +103,6 @@ export class OfflineSyncService {
   }
 
   queueCampaignUpdate(id: string, title: string, data: CampaignData): void {
-    const record = this.getLocalCampaign(id);
-    if (record) {
-      this.upsertLocalCampaign({
-        ...record,
-        title,
-        data,
-        cloudSynced: false,
-        updatedAt: new Date().toISOString(),
-      });
-    }
     this.pushQueue({
       type: 'campaign-update',
       id,
@@ -119,27 +113,55 @@ export class OfflineSyncService {
   }
 
   getLocalCampaignSummaries(): CampaignSummary[] {
-    return this.readLocalCampaigns()
-      .filter((c) => !c.cloudSynced)
-      .map((c) => ({
-        id: c.serverId ?? c.id,
-        title: c.title,
+    return this.readQueue()
+      .filter(
+        (x): x is Extract<SyncQueueItem, { type: 'campaign-create' }> => x.type === 'campaign-create',
+      )
+      .map((x) => ({
+        id: x.serverId ?? x.localId,
+        title: x.title,
         role: 'dm' as const,
-        updatedAt: c.updatedAt,
+        updatedAt: x.queuedAt,
         playerCount: 0,
-        regionName: c.data.regionName ?? null,
+        regionName: x.data.regionName ?? null,
         pendingSync: true,
-        localId: c.id,
+        localId: x.localId,
       }));
   }
 
   getLocalCampaign(id: string): LocalCampaignRecord | null {
-    return (
-      this.readLocalCampaigns().find((c) => c.id === id || c.serverId === id) ?? null
+    const queue = this.readQueue();
+    const create = queue.find(
+      (x): x is Extract<SyncQueueItem, { type: 'campaign-create' }> =>
+        x.type === 'campaign-create' && (x.localId === id || x.serverId === id),
     );
+    if (create) {
+      return {
+        id: create.localId,
+        title: create.title,
+        data: create.data,
+        cloudSynced: false,
+        serverId: create.serverId,
+        updatedAt: create.queuedAt,
+      };
+    }
+    const update = queue.find(
+      (x): x is Extract<SyncQueueItem, { type: 'campaign-update' }> =>
+        x.type === 'campaign-update' && x.id === id,
+    );
+    if (update) {
+      return {
+        id: update.id,
+        title: update.title,
+        data: update.data,
+        cloudSynced: false,
+        serverId: update.id,
+        updatedAt: update.queuedAt,
+      };
+    }
+    return null;
   }
 
-  /** Fusionne campagnes cloud + brouillons locaux non synchronisés. */
   mergeCampaignLists(cloud: CampaignSummary[]): CampaignSummary[] {
     const pending = this.getLocalCampaignSummaries().filter((p) => p.pendingSync);
     const cloudIds = new Set(cloud.map((c) => c.id));
@@ -194,51 +216,16 @@ export class OfflineSyncService {
   private processItem(item: SyncQueueItem): Observable<void> {
     if (item.type === 'character-save') {
       return this.characters.save(item.character, { updateExisting: item.updateExisting }).pipe(
-        tap((serverId) => {
-          const updated = {
-            ...item.character,
-            id: serverId || item.character.id,
-            cloudSynced: true,
-          };
-          this.upsertLocalCharacter(updated);
-        }),
         map(() => undefined),
       );
     }
 
     if (item.type === 'campaign-create') {
-      return this.campaigns.create(item.title, item.data).pipe(
-        tap((summary) => {
-          const local = this.getLocalCampaign(item.localId);
-          if (local) {
-            this.upsertLocalCampaign({
-              ...local,
-              cloudSynced: true,
-              serverId: summary.id,
-              updatedAt: summary.updatedAt ?? new Date().toISOString(),
-            });
-          }
-        }),
-        map(() => undefined),
-      );
+      return this.campaigns.create(item.title, item.data).pipe(map(() => undefined));
     }
 
     const campaignId = item.id;
-    return this.campaigns.update(campaignId, item.title, item.data).pipe(
-      tap((summary) => {
-        const local = this.getLocalCampaign(campaignId);
-        if (local) {
-          this.upsertLocalCampaign({
-            ...local,
-            cloudSynced: true,
-            serverId: summary.id,
-            title: summary.title,
-            updatedAt: summary.updatedAt ?? new Date().toISOString(),
-          });
-        }
-      }),
-      map(() => undefined),
-    );
+    return this.campaigns.update(campaignId, item.title, item.data).pipe(map(() => undefined));
   }
 
   private formatSyncError(item: SyncQueueItem, err: unknown): string {
@@ -291,41 +278,5 @@ export class OfflineSyncService {
   private writeQueue(items: SyncQueueItem[]): void {
     localStorage.setItem(QUEUE_KEY, JSON.stringify(items));
     this.refreshPendingCount();
-  }
-
-  private upsertLocalCharacter(character: Character): void {
-    let list: Character[] = [];
-    try {
-      const raw = localStorage.getItem('dragons-characters');
-      list = raw ? JSON.parse(raw) : [];
-    } catch {
-      list = [];
-    }
-    const id = character.id;
-    const idx = list.findIndex((c) => c.id === id);
-    const withMeta = {
-      ...character,
-      updatedAt: new Date().toISOString(),
-    };
-    if (idx >= 0) list[idx] = withMeta;
-    else list.push(withMeta);
-    localStorage.setItem('dragons-characters', JSON.stringify(list));
-  }
-
-  private readLocalCampaigns(): LocalCampaignRecord[] {
-    try {
-      const raw = localStorage.getItem(LOCAL_CAMPAIGNS_KEY);
-      return raw ? (JSON.parse(raw) as LocalCampaignRecord[]) : [];
-    } catch {
-      return [];
-    }
-  }
-
-  private upsertLocalCampaign(record: LocalCampaignRecord): void {
-    const list = this.readLocalCampaigns();
-    const idx = list.findIndex((c) => c.id === record.id);
-    if (idx >= 0) list[idx] = record;
-    else list.push(record);
-    localStorage.setItem(LOCAL_CAMPAIGNS_KEY, JSON.stringify(list));
   }
 }

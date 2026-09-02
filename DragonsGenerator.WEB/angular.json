@@ -75,6 +75,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "DragonsGenerator.WEB:build:production"
@@ -125,7 +128,12 @@
               "src/app/core/utils/creature-display.util.ts",
               "src/app/core/utils/spell-display.util.ts",
               "src/app/core/utils/story-creature-picker.util.ts",
-              "src/app/core/utils/support-download.util.ts"
+              "src/app/core/utils/support-download.util.ts",
+              "src/app/core/utils/character-combat.util.ts",
+              "src/app/core/utils/character-spellcasting.util.ts",
+              "src/app/core/utils/character-progression.util.ts",
+              "src/app/core/utils/character-build.util.ts",
+              "src/app/core/utils/character-edit.mapper.ts"
             ],
             "assets": [
               {

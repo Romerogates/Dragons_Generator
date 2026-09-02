@@ -10,7 +10,7 @@ public class GuidePreferencesIntegrationTests
 
     public GuidePreferencesIntegrationTests(CustomWebApplicationFactory factory)
     {
-        _client = factory.CreateClient();
+        _client = factory.CreateTestClient();
     }
 
     [Fact]

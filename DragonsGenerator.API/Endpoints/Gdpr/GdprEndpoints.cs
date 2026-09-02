@@ -159,7 +159,7 @@ public class ExportMyDataEndpoint(AppDbContext db) : EndpointWithoutRequest
     }
 }
 
-public class DeleteAccountEndpoint(AppDbContext db, ILogger<DeleteAccountEndpoint> logger)
+public class DeleteAccountEndpoint(AppDbContext db, IHostEnvironment env, ILogger<DeleteAccountEndpoint> logger)
     : Endpoint<DeleteAccountRequest>
 {
     public override void Configure() => Delete("/auth/me");
@@ -205,6 +205,7 @@ public class DeleteAccountEndpoint(AppDbContext db, ILogger<DeleteAccountEndpoin
 
         db.Users.Remove(user);
         await db.SaveChangesAsync(ct);
+        AuthCookieHelper.ClearAuthCookie(HttpContext.Response, env.IsProduction());
         await Send.NoContentAsync(ct);
     }
 }

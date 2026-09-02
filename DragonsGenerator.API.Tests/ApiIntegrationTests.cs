@@ -11,7 +11,7 @@ public class ApiIntegrationTests
 
     public ApiIntegrationTests(CustomWebApplicationFactory factory)
     {
-        _client = factory.CreateClient();
+        _client = factory.CreateTestClient();
     }
 
   [Theory]
@@ -77,8 +77,7 @@ public class ApiIntegrationTests
         var login = await _client.PostAsJsonAsync("/auth/login", new { email, password });
         var loginBody = await login.Content.ReadAsStringAsync();
         Assert.True(login.IsSuccessStatusCode, $"login → {(int)login.StatusCode} {loginBody}");
-        var auth = JsonDocument.Parse(loginBody).RootElement;
-        var token = auth.GetProperty("token").GetString();
+        var token = ApiTestAuth.ExtractSessionToken(login);
         Assert.False(string.IsNullOrWhiteSpace(token));
 
         using var req = ApiTestAuth.Authed(HttpMethod.Get, "/auth/me", token!);
@@ -98,8 +97,9 @@ public class ApiIntegrationTests
             "/auth/login",
             new { email = "admin@dragons.local", password = "AdminDragons!2026" }
         );
-        var auth = await login.Content.ReadFromJsonAsync<JsonElement>();
-        var token = auth.GetProperty("token").GetString();
+        login.EnsureSuccessStatusCode();
+        var token = ApiTestAuth.ExtractSessionToken(login);
+        Assert.False(string.IsNullOrWhiteSpace(token));
 
         using var req = new HttpRequestMessage(HttpMethod.Get, "/me/campaigns");
         req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);

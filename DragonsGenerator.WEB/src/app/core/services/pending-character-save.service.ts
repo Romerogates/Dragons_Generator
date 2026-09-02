@@ -5,6 +5,7 @@ import {
   validateCharacterExport,
 } from '@core/utils/character-export-validation.util';
 import { CharacterCloudService } from './character-cloud.service';
+import { CharacterHandoffService } from './character-handoff.service';
 import { AuthService } from './auth.service';
 
 const PENDING_KEY = 'dragons-pending-character-save';
@@ -17,6 +18,7 @@ const PENDING_KEY = 'dragons-pending-character-save';
 export class PendingCharacterSaveService {
   private readonly cloud = inject(CharacterCloudService);
   private readonly auth = inject(AuthService);
+  private readonly handoff = inject(CharacterHandoffService);
 
   stash(character: unknown): void {
     sessionStorage.setItem(PENDING_KEY, JSON.stringify(character));
@@ -40,7 +42,7 @@ export class PendingCharacterSaveService {
   }
 
   /**
-   * Si connecté + pending : pousse en DB, met à jour le cache local, nettoie.
+   * Si connecté + pending : pousse en DB, met à jour le handoff, nettoie.
    * Retourne le personnage final (avec id serveur) ou null.
    */
   flushIfPossible(): Observable<unknown | null> {
@@ -61,30 +63,11 @@ export class PendingCharacterSaveService {
           id: serverId || character.id,
           cloudSynced: true,
         };
-        this.upsertLocal(updated);
-        localStorage.setItem('dragons-current-character', JSON.stringify(updated));
+        this.handoff.setCurrent(updated);
         this.clear();
         return updated;
       }),
-      catchError(() => {
-        // garde le pending pour retenter
-        return of(null);
-      }),
+      catchError(() => of(null)),
     );
-  }
-
-  private upsertLocal(character: { id?: string }): void {
-    let list: any[] = [];
-    try {
-      const raw = localStorage.getItem('dragons-characters');
-      list = raw ? JSON.parse(raw) : [];
-    } catch {
-      list = [];
-    }
-    const id = character.id;
-    const idx = list.findIndex((c) => c?.id === id);
-    if (idx >= 0) list[idx] = character;
-    else list.push(character);
-    localStorage.setItem('dragons-characters', JSON.stringify(list));
   }
 }

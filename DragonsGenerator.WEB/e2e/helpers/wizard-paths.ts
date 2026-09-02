@@ -1,4 +1,4 @@
-import { type Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 import {
   expectStepHeading,
   incrementAbility,
@@ -26,4 +26,5 @@ export async function completeSpeciesCivilizationBackground(
     .filter({ has: page.getByRole('heading', { name: backgroundName }) })
     .click();
   await page.getByRole('button', { name: "Valider l'Historique" }).click();
+  await expect(page.getByText('La Vocation')).toBeVisible({ timeout: 20_000 });
 }

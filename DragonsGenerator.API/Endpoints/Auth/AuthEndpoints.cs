@@ -21,7 +21,7 @@ public record ResendConfirmationRequest(string Email, string? WebUrl);
 public record ResetPasswordRequest(string Token, string NewPassword);
 public record UpdateProfileRequest(string DisplayName, string? Bio, string? AvatarEmoji, string? AccentColor);
 public record ChangePasswordRequest(string CurrentPassword, string NewPassword);
-public record AuthResponse(string Token, UserDto User);
+public record AuthResponse(string? Token, UserDto User);
 
 internal static class AuthEmailHelper
 {
@@ -274,7 +274,8 @@ public class ConfirmEmailEndpoint(AppDbContext db) : EndpointWithoutRequest
     }
 }
 
-public class LoginEndpoint(AppDbContext db, IOptions<JwtOptions> jwt) : Endpoint<LoginRequest, AuthResponse>
+public class LoginEndpoint(AppDbContext db, IOptions<JwtOptions> jwt, IHostEnvironment env)
+    : Endpoint<LoginRequest, AuthResponse>
 {
     public override void Configure()
     {
@@ -304,13 +305,29 @@ public class LoginEndpoint(AppDbContext db, IOptions<JwtOptions> jwt) : Endpoint
         await db.SaveChangesAsync(ct);
 
         var token = AuthHelpers.CreateJwt(user, jwt.Value);
+        AuthCookieHelper.SetAuthCookie(HttpContext.Response, token, jwt.Value, env.IsProduction());
         await Send.OkAsync(
             new AuthResponse(
-                token,
+                null,
                 UserProfileHelper.ToUserDto(user)
             ),
             ct
         );
+    }
+}
+
+public class LogoutEndpoint(IHostEnvironment env) : EndpointWithoutRequest
+{
+    public override void Configure()
+    {
+        Post("/auth/logout");
+        AllowAnonymous();
+    }
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        AuthCookieHelper.ClearAuthCookie(HttpContext.Response, env.IsProduction());
+        await Send.NoContentAsync(ct);
     }
 }
 

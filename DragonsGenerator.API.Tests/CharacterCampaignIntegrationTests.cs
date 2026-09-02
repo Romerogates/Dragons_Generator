@@ -11,7 +11,7 @@ public class CharacterCampaignIntegrationTests
 
     public CharacterCampaignIntegrationTests(CustomWebApplicationFactory factory)
     {
-        _client = factory.CreateClient();
+        _client = factory.CreateTestClient();
     }
 
     private static JsonElement LettredCharacterData() =>

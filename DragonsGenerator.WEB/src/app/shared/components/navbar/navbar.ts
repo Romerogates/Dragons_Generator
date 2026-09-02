@@ -66,7 +66,9 @@ export class Navbar implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.preloadNavbarIcons();
-    void this.guidePrefs.load();
+    if (this.auth.isLoggedIn()) {
+      void this.guidePrefs.load();
+    }
     this.routerSub = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe(() => this.closeMenus());

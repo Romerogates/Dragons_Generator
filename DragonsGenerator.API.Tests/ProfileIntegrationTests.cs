@@ -10,12 +10,13 @@ public class ProfileIntegrationTests
 
     public ProfileIntegrationTests(CustomWebApplicationFactory factory)
     {
-        _client = factory.CreateClient();
+        _client = factory.CreateTestClient();
     }
 
     [Fact]
     public async Task Profile_update_and_public_view()
     {
+        var uniqueName = $"DragonMaster{Guid.NewGuid():N}"[..16];
         var (_, tokenA, userAId) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "profila");
         var (_, tokenB, userBId) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "profilb");
 
@@ -23,16 +24,16 @@ public class ProfileIntegrationTests
         {
             patchReq.Content = JsonContent.Create(new
             {
-                displayName = "DragonMaster",
+                displayName = uniqueName,
                 bio = "MJ et forgeron de héros.",
                 avatarEmoji = "fluent-emoji:dragon",
                 accentColor = "amber",
             });
             var patched = await _client.SendAsync(patchReq);
-            patched.EnsureSuccessStatusCode();
-            var body = await patched.Content.ReadAsStringAsync();
-            Assert.Contains("DragonMaster", body);
-            Assert.Contains("MJ et forgeron", body);
+            var patchBody = await patched.Content.ReadAsStringAsync();
+            Assert.True(patched.IsSuccessStatusCode, $"PATCH /auth/me → {(int)patched.StatusCode} {patchBody}");
+            Assert.Contains(uniqueName, patchBody);
+            Assert.Contains("MJ et forgeron", patchBody);
         }
 
         using (var meReq = ApiTestAuth.Authed(HttpMethod.Get, $"/users/{userAId}/profile", tokenB))
@@ -40,7 +41,7 @@ public class ProfileIntegrationTests
             var profile = await _client.SendAsync(meReq);
             profile.EnsureSuccessStatusCode();
             var json = await profile.Content.ReadFromJsonAsync<JsonElement>();
-            Assert.Equal("DragonMaster", json.GetProperty("displayName").GetString());
+            Assert.Equal(uniqueName, json.GetProperty("displayName").GetString());
             Assert.False(json.GetProperty("isFriend").GetBoolean());
         }
 

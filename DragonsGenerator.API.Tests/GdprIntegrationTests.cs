@@ -11,7 +11,7 @@ public class GdprIntegrationTests
 
     public GdprIntegrationTests(CustomWebApplicationFactory factory)
     {
-        _client = factory.CreateClient();
+        _client = factory.CreateTestClient();
     }
 
     [Fact]

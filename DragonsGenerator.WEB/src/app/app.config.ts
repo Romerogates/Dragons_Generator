@@ -10,6 +10,7 @@ import { provideServiceWorker } from '@angular/service-worker';
 
 import { routes } from './app.routes';
 import { IdlePreloadStrategy } from './core/routing/idle-preload.strategy';
+import { credentialsInterceptor } from './core/interceptors/credentials.interceptor';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { aiRateLimitInterceptor } from './core/interceptors/ai-rate-limit.interceptor';
 
@@ -27,7 +28,10 @@ export const appConfig: ApplicationConfig = {
       }),
     ),
 
-    provideHttpClient(withFetch(), withInterceptors([authInterceptor, aiRateLimitInterceptor])),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([credentialsInterceptor, authInterceptor, aiRateLimitInterceptor]),
+    ),
 
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),

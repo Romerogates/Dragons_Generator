@@ -25,9 +25,6 @@ interface FeatureItem {
   icon: string;
 }
 
-const GUIDE_AUDIENCE_KEY = 'dragons-guide-audience';
-const ONBOARDING_SEEN_KEY = 'dragons-onboarding-role-seen';
-
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -120,31 +117,17 @@ export class Home implements OnInit {
   ngOnInit(): void {
     this.refreshHeroStats();
     this.loadSummary();
-    this.maybeShowRoleOnboarding();
-    void this.guidePrefs.load();
+    void this.guidePrefs.load().then(() => this.maybeShowRoleOnboarding());
   }
 
   chooseRole(role: 'dm' | 'player'): void {
-    try {
-      localStorage.setItem(GUIDE_AUDIENCE_KEY, role);
-      localStorage.setItem(ONBOARDING_SEEN_KEY, '1');
-    } catch {
-      /* ignore */
-    }
     this.guidePrefs.setAudience(role);
     this.showRoleOnboarding.set(false);
     void this.router.navigate(['/guide']);
   }
 
   skipRoleOnboarding(): void {
-    try {
-      localStorage.setItem(ONBOARDING_SEEN_KEY, '1');
-      if (!localStorage.getItem(GUIDE_AUDIENCE_KEY)) {
-        localStorage.setItem(GUIDE_AUDIENCE_KEY, 'all');
-      }
-    } catch {
-      /* ignore */
-    }
+    this.guidePrefs.setAudience('all');
     this.showRoleOnboarding.set(false);
   }
 
@@ -159,20 +142,9 @@ export class Home implements OnInit {
   }
 
   private maybeShowRoleOnboarding(): void {
-    if (!this.auth.isLoggedIn()) {
-      this.showRoleOnboarding.set(false);
-      return;
-    }
-    try {
-      const seen = localStorage.getItem(ONBOARDING_SEEN_KEY);
-      if (seen) {
-        this.showRoleOnboarding.set(false);
-        return;
-      }
-      this.showRoleOnboarding.set(true);
-    } catch {
-      this.showRoleOnboarding.set(false);
-    }
+    this.showRoleOnboarding.set(
+      this.auth.isLoggedIn() && this.guidePrefs.needsRoleOnboarding(),
+    );
   }
 
   private loadSummary(): void {
@@ -238,16 +210,6 @@ export class Home implements OnInit {
       return;
     }
 
-    const raw = localStorage.getItem('dragons-characters');
-    if (!raw) {
-      this.savedCharactersCount.set(0);
-      return;
-    }
-    try {
-      const chars = JSON.parse(raw);
-      this.savedCharactersCount.set(Array.isArray(chars) ? chars.length : 0);
-    } catch {
-      this.savedCharactersCount.set(0);
-    }
+    this.savedCharactersCount.set(0);
   }
 }

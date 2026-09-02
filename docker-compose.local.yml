@@ -60,16 +60,15 @@ services:
       Admin__Password: AdminDragons!2026
       # Comptes de test auto-créés (Development uniquement, email confirmé)
       DevSeed__Enabled: "true"
-      DevSeed__Users__0__Email: anthony.martinr@hotmail.be
-      DevSeed__Users__0__Password: Ma3ds3ds
-      DevSeed__Users__0__DisplayName: Anthony
-      DevSeed__Users__1__Email: test@dragons.local
-      DevSeed__Users__1__Password: TestDragons!2026
-      DevSeed__Users__1__DisplayName: TestHero
+      DevSeed__Users__0__Email: test@dragons.local
+      DevSeed__Users__0__Password: TestDragons!2026
+      DevSeed__Users__0__DisplayName: TestHero
     volumes:
       - dragons-api-data:/app/data
     env_file:
       - path: .env
+        required: false
+      - path: .env.local
         required: false
     depends_on:
       mailhog:

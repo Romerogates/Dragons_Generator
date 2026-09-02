@@ -1,50 +1,75 @@
-import { expect, type APIRequestContext, type Page } from '@playwright/test';
+import { expect, type APIRequestContext, type APIResponse, type Page } from '@playwright/test';
 
 const TEST_EMAIL = 'test@dragons.local';
 const TEST_PASSWORD = 'TestDragons!2026';
 const ONBOARDING_SEEN_KEY = 'dragons-onboarding-role-seen';
+const USER_KEY = 'dragons_auth_user';
 
 export type AuthSession = {
   email: string;
   password: string;
-  token: string;
+  token: string | null;
   user: { id: string; displayName: string; email: string };
 };
 
-/** Connexion via l'API seed (compte test@dragons.local) puis navigation. */
-export async function loginViaUi(page: Page, returnUrl = '/'): Promise<void> {
-  const loginRes = await page.request.post('/api/auth/login', {
-    data: { email: TEST_EMAIL, password: TEST_PASSWORD },
-  });
-  expect(loginRes.ok(), `Login API failed: ${loginRes.status()} ${await loginRes.text()}`).toBeTruthy();
-  const auth = (await loginRes.json()) as { token: string; user: unknown };
+/** Copie le cookie dg_session de la réponse API dans le contexte navigateur Playwright. */
+async function ensureSessionCookie(page: Page, loginRes: APIResponse): Promise<void> {
+  const baseUrl = process.env.E2E_BASE_URL ?? 'http://localhost:8081';
+  for (const header of loginRes.headersArray()) {
+    if (header.name.toLowerCase() !== 'set-cookie') continue;
+    const match = header.value.match(/^dg_session=([^;]+)/);
+    if (!match) continue;
+    await page.context().addCookies([
+      {
+        name: 'dg_session',
+        value: match[1],
+        url: baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`,
+        httpOnly: true,
+        sameSite: 'Lax',
+      },
+    ]);
+    return;
+  }
+}
 
+async function seedBrowserSession(
+  page: Page,
+  user: { id: string; displayName: string; email: string },
+  returnUrl: string,
+): Promise<void> {
   await page.goto('/');
   await page.evaluate(
-    ({ token, user, seenKey }) => {
-      localStorage.setItem('dragons_auth_token', token);
-      localStorage.setItem('dragons_auth_user', JSON.stringify(user));
+    ({ storedUser, seenKey, userKey }) => {
+      sessionStorage.setItem(userKey, JSON.stringify(storedUser));
       localStorage.setItem(seenKey, '1');
     },
-    { token: auth.token, user: auth.user, seenKey: ONBOARDING_SEEN_KEY },
+    { storedUser: user, seenKey: ONBOARDING_SEEN_KEY, userKey: USER_KEY },
   );
-
   await page.goto(returnUrl);
   await expect(page).not.toHaveURL(/\/login/, { timeout: 30_000 });
 }
 
+/** Connexion via l'API seed (cookie HttpOnly) puis navigation. */
+export async function loginViaUi(page: Page, returnUrl = '/'): Promise<void> {
+  await page.goto('/');
+  const loginRes = await page.request.post('/api/auth/login', {
+    data: { email: TEST_EMAIL, password: TEST_PASSWORD },
+  });
+  expect(loginRes.ok(), `Login API failed: ${loginRes.status()} ${await loginRes.text()}`).toBeTruthy();
+  await ensureSessionCookie(page, loginRes);
+  const auth = (await loginRes.json()) as { user: { id: string; displayName: string; email: string } };
+  await seedBrowserSession(page, auth.user, returnUrl);
+}
+
 export async function applyAuthSession(page: Page, session: AuthSession, returnUrl = '/'): Promise<void> {
   await page.goto('/');
-  await page.evaluate(
-    ({ token, user, seenKey }) => {
-      localStorage.setItem('dragons_auth_token', token);
-      localStorage.setItem('dragons_auth_user', JSON.stringify(user));
-      localStorage.setItem(seenKey, '1');
-    },
-    { token: session.token, user: session.user, seenKey: ONBOARDING_SEEN_KEY },
-  );
-  await page.goto(returnUrl);
-  await expect(page).not.toHaveURL(/\/login/, { timeout: 30_000 });
+  const loginRes = await page.request.post('/api/auth/login', {
+    data: { email: session.email, password: session.password },
+  });
+  expect(loginRes.ok(), `Login API failed: ${loginRes.status()} ${await loginRes.text()}`).toBeTruthy();
+  await ensureSessionCookie(page, loginRes);
+  const auth = (await loginRes.json()) as { user: { id: string; displayName: string; email: string } };
+  await seedBrowserSession(page, auth.user, returnUrl);
 }
 
 export async function registerConfirmAndLogin(
@@ -77,11 +102,11 @@ export async function registerConfirmAndLogin(
   });
   expect(loginRes.ok(), `Login failed: ${loginRes.status()}`).toBeTruthy();
   const auth = (await loginRes.json()) as {
-    token: string;
+    token: string | null;
     user: { id: string; displayName: string; email: string };
   };
 
-  return { email, password, token: auth.token, user: auth.user };
+  return { email, password, token: auth.token ?? null, user: auth.user };
 }
 
 export async function loginSeedSession(request: APIRequestContext): Promise<AuthSession> {
@@ -90,13 +115,13 @@ export async function loginSeedSession(request: APIRequestContext): Promise<Auth
   });
   expect(loginRes.ok(), `Seed login failed: ${loginRes.status()}`).toBeTruthy();
   const auth = (await loginRes.json()) as {
-    token: string;
+    token: string | null;
     user: { id: string; displayName: string; email: string };
   };
   return {
     email: TEST_EMAIL,
     password: TEST_PASSWORD,
-    token: auth.token,
+    token: auth.token ?? null,
     user: auth.user,
   };
 }

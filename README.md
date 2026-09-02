@@ -19,18 +19,49 @@ Application web de création de personnages et de gestion de campagnes JDR (Angu
 - **.NET SDK** 9.0
 - **Docker** (stack locale complète + E2E)
 
-## Démarrage local (Docker)
+## Démarrage local (Docker) — recommandé avant push
 
-```bash
-# Depuis la racine du repo
-docker compose -f docker-compose.local.yml up --build
+```powershell
+# Windows — depuis la racine du repo
+.\scripts\start-local.ps1 -Build
 ```
 
-- Front : http://localhost:8081  
-- API health : http://localhost:8081/api/health  
-- MailHog (emails dev) : http://localhost:8025  
+Équivalent manuel :
 
-Copier `.env.local.example` vers `.env.local` si besoin de overrides.
+```bash
+docker compose -f docker-compose.local.yml up --build -d
+```
+
+| Service | URL |
+|---------|-----|
+| **App (front + API proxy)** | http://localhost:8081 |
+| API directe / Swagger | http://localhost:8080/swagger |
+| MailHog (emails dev) | http://localhost:8025 |
+
+Comptes seed (Development) : `test@dragons.local` / `TestDragons!2026`, `admin@dragons.local` / `AdminDragons!2026`
+
+Compte perso en local : copier `.env.local.example` → `.env.local` (gitignored) et ajouter un `DevSeed__Users__1__*`.
+
+### Front hot-reload + API Docker
+
+```bash
+# Terminal 1 — API seule (si la stack complète n'est pas déjà up)
+docker compose -f docker-compose.local.yml up -d mailhog ollama dragons-api
+
+# Terminal 2
+cd DragonsGenerator.WEB
+npm start
+```
+
+→ http://localhost:4200 — le proxy `/api` pointe vers **localhost:8080** (API Docker).
+
+Pour `dotnet run` sur le port **5117** à la place :
+
+```bash
+ng serve --proxy-config proxy.conf.dotnet.json
+```
+
+Copier `.env.local.example` vers `.env.local` si besoin de overrides Groq, etc.
 
 ## Développement front seul
 
@@ -44,6 +75,12 @@ Par défaut : http://localhost:4200 (API à configurer via `environment.developm
 
 ## Tests
 
+```powershell
+# Windows — API + unitaires (+ option E2E comme la CI)
+.\scripts\run-tests.ps1
+.\scripts\run-tests.ps1 -E2E -Build
+```
+
 ```bash
 # API
 dotnet test DragonsGenerator.API.Tests/DragonsGenerator.API.Tests.csproj -c Release
@@ -52,8 +89,11 @@ dotnet test DragonsGenerator.API.Tests/DragonsGenerator.API.Tests.csproj -c Rele
 cd DragonsGenerator.WEB
 npm test
 
-# E2E Playwright (stack Docker requise)
-npm run e2e
+# E2E Playwright (stack Docker sur :8081)
+docker compose -f docker-compose.local.yml up -d --build
+cd DragonsGenerator.WEB
+set E2E_BASE_URL=http://localhost:8081   # Windows
+npm run e2e:ci
 ```
 
 ## Lint

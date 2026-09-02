@@ -16,10 +16,39 @@ internal static class ApiTestAuth
     {
         var login = await client.PostAsJsonAsync("/auth/login", new { email, password });
         login.EnsureSuccessStatusCode();
-        var auth = await login.Content.ReadFromJsonAsync<JsonElement>();
-        var token = auth.GetProperty("token").GetString();
+        var token = ExtractSessionToken(login);
         Assert.False(string.IsNullOrWhiteSpace(token));
         return token!;
+    }
+
+    /// <summary>JWT depuis le cookie HttpOnly dg_session (Phase 2) ou le corps JSON legacy.</summary>
+    internal static string? ExtractSessionToken(HttpResponseMessage login)
+    {
+        if (login.Headers.TryGetValues("Set-Cookie", out var setCookies))
+        {
+            foreach (var header in setCookies)
+            {
+                const string prefix = "dg_session=";
+                var idx = header.IndexOf(prefix, StringComparison.Ordinal);
+                if (idx < 0)
+                    continue;
+                var start = idx + prefix.Length;
+                var end = header.IndexOf(';', start);
+                var value = end < 0 ? header[start..] : header[start..end];
+                if (!string.IsNullOrWhiteSpace(value))
+                    return value;
+            }
+        }
+
+        var auth = login.Content.ReadFromJsonAsync<JsonElement>().GetAwaiter().GetResult();
+        if (auth.TryGetProperty("token", out var tokenProp))
+        {
+            var bodyToken = tokenProp.GetString();
+            if (!string.IsNullOrWhiteSpace(bodyToken))
+                return bodyToken;
+        }
+
+        return null;
     }
 
     internal static async Task<(string Email, string Token, Guid UserId)> RegisterConfirmAndLoginAsync(

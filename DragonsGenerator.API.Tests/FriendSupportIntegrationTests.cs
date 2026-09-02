@@ -11,7 +11,7 @@ public class FriendSupportIntegrationTests
 
     public FriendSupportIntegrationTests(CustomWebApplicationFactory factory)
     {
-        _client = factory.CreateClient();
+        _client = factory.CreateTestClient();
     }
 
     [Fact]
