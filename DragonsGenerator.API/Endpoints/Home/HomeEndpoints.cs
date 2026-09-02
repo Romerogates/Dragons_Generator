@@ -23,7 +23,8 @@ public record HomeSessionPreviewDto(
     string SessionTitle,
     DateTimeOffset ScheduledAt);
 
-public class GetHomeSummaryEndpoint(AppDbContext db) : EndpointWithoutRequest<HomeSummaryDto>
+public class GetHomeSummaryEndpoint(AppDbContext db, ILogger<GetHomeSummaryEndpoint> logger)
+    : EndpointWithoutRequest<HomeSummaryDto>
 {
     public override void Configure() => Get("/me/home-summary");
 
@@ -36,6 +37,19 @@ public class GetHomeSummaryEndpoint(AppDbContext db) : EndpointWithoutRequest<Ho
             return;
         }
 
+        try
+        {
+            await Send.OkAsync(await BuildSummaryAsync(userId.Value, ct), ct);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "home-summary failed for user {UserId}", userId);
+            await Send.ErrorsAsync(500, ct);
+        }
+    }
+
+    internal static async Task<HomeSummaryDto> BuildSummaryAsync(Guid userId, CancellationToken ct)
+    {
         var charCount = await db.Characters.CountAsync(c => c.UserId == userId, ct);
 
         var pendingFriends = await db.Friendships.CountAsync(
@@ -89,27 +103,46 @@ public class GetHomeSummaryEndpoint(AppDbContext db) : EndpointWithoutRequest<Ho
                 (f.RequesterId == userId || f.AddresseeId == userId))
             .ToListAsync(ct);
 
-        var readMarkers = await db.FriendChatReads.AsNoTracking()
-            .Where(r => r.UserId == userId)
-            .ToDictionaryAsync(r => r.FriendUserId, r => r.LastReadAt, ct);
+        var friendIds = friendships
+            .Select(f => f.RequesterId == userId ? f.AddresseeId : f.RequesterId)
+            .Distinct()
+            .ToList();
 
+        var readMarkers = new Dictionary<Guid, DateTimeOffset>();
         var unreadTotal = 0;
-        foreach (var f in friendships)
+        try
         {
-            var friendId = f.RequesterId == userId ? f.AddresseeId : f.RequesterId;
-            var lastRead = readMarkers.GetValueOrDefault(friendId, DateTimeOffset.MinValue);
-            unreadTotal += await FriendAccess.ConversationQuery(db, userId.Value, friendId)
-                .CountAsync(m => m.RecipientId == userId && m.SenderId == friendId && m.CreatedAt > lastRead, ct);
+            readMarkers = await db.FriendChatReads.AsNoTracking()
+                .Where(r => r.UserId == userId)
+                .ToDictionaryAsync(r => r.FriendUserId, r => r.LastReadAt, ct);
+
+            if (friendIds.Count > 0)
+            {
+                var inbound = await db.FriendMessages.AsNoTracking()
+                    .Where(m => m.RecipientId == userId && friendIds.Contains(m.SenderId))
+                    .Select(m => new { m.SenderId, m.CreatedAt })
+                    .ToListAsync(ct);
+
+                foreach (var friendId in friendIds)
+                {
+                    var lastRead = readMarkers.GetValueOrDefault(friendId, DateTimeOffset.MinValue);
+                    unreadTotal += inbound.Count(m => m.SenderId == friendId && m.CreatedAt > lastRead);
+                }
+            }
+        }
+        catch
+        {
+            unreadTotal = 0;
         }
 
-        await Send.OkAsync(new HomeSummaryDto(
+        return new HomeSummaryDto(
             charCount,
             unreadTotal,
             pendingFriends,
             pendingInvites,
             allCampaigns.Count,
             recentDto,
-            nextSession), ct);
+            nextSession);
     }
 
     private static string SessionTitleFromJson(string json, DateTimeOffset when)
