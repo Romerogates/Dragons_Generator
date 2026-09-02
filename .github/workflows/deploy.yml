@@ -87,14 +87,14 @@ jobs:
           docker compose -f docker-compose.local.yml logs
           exit 1
 
-      - name: Playwright E2E (Lettré L1)
+      - name: Playwright E2E (CI smoke)
         working-directory: DragonsGenerator.WEB
         env:
           E2E_BASE_URL: http://localhost:8081
         run: |
           npm ci
           npx playwright install --with-deps chromium
-          npm run e2e
+          npm run e2e:ci
 
       - name: Stop local stack
         if: always()

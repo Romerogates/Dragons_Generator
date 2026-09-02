@@ -9,6 +9,7 @@
     "test": "ng test --no-watch --browsers=ChromeHeadless --code-coverage",
     "test:watch": "ng test --browsers=ChromeHeadless",
     "e2e": "playwright test",
+    "e2e:ci": "playwright test e2e/lettre-creation.spec.ts e2e/catalog-smoke.spec.ts e2e/offline-banner.spec.ts e2e/profile.spec.ts e2e/class-creation.spec.ts",
     "e2e:ui": "playwright test --ui",
     "lint": "ng lint"
   },
