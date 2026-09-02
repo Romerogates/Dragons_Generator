@@ -43,6 +43,53 @@ describe('class-data.adapter', () => {
     expect(normalized.data.starting_equipment.length).toBeGreaterThan(1);
   });
 
+  it('normalizes subclass dragon_ancestry choice_pools to string option ids', () => {
+    const normalized = normalizeCharacterClass({
+      id: 'cls-ensorceleur',
+      name: 'Ensorceleur',
+      data: {
+        hit_die: '1d6',
+        primary_abilities: ['cha'],
+        saving_throw_proficiencies: ['con', 'cha'],
+        armor_proficiencies: [],
+        weapon_proficiencies: [],
+        tool_proficiencies: [],
+        choice_pools: [],
+        starting_equipment: { fixed: [], choice_pools: [] },
+        features_details: [],
+        subclasses: {
+          name: 'Atavisme',
+          level_unlocked: 1,
+          options: [
+            {
+              id: 'subcls-lignee-draconique',
+              name: 'Lignée draconique',
+              flavor: { summary: 'Magie draconique.' },
+              choice_pools: [
+                {
+                  id: 'choice-ancetre-draconique',
+                  name: 'Ancêtre draconique',
+                  type: 'dragon_ancestry',
+                  quantity: 1,
+                  pool: [
+                    { id: 'dragon-rouge', damage_type: 'feu' },
+                    { id: 'dragon-bleu', damage_type: 'foudre' },
+                  ],
+                },
+              ],
+              features_details: [],
+            },
+          ],
+        },
+      },
+    } as any);
+
+    const sub = (normalized.data.subclasses as { options: { sub_choices?: { options: string[] }[] }[] })
+      .options[0];
+    expect(sub.sub_choices?.length).toBe(1);
+    expect(sub.sub_choices?.[0].options).toEqual(['dragon-rouge', 'dragon-bleu']);
+  });
+
   it('maps roublard equipment choice_pools from root choice_pools', () => {
     const normalized = normalizeCharacterClass({
       id: 'cls-roublard',

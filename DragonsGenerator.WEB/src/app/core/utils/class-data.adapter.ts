@@ -203,6 +203,22 @@ function extractChoiceLevel(pool: RawChoicePool): number {
   return 1;
 }
 
+/** Les pools API (ex. dragon_ancestry) peuvent contenir des objets { id, … } au lieu de strings. */
+function normalizeSubChoiceOptionIds(raw: unknown[] | undefined): string[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((entry) => {
+      if (typeof entry === 'string') return entry.trim();
+      if (entry && typeof entry === 'object') {
+        const obj = entry as Record<string, unknown>;
+        if (typeof obj['id'] === 'string') return obj['id'].trim();
+        if (typeof obj['option_id'] === 'string') return obj['option_id'].trim();
+      }
+      return String(entry ?? '').trim();
+    })
+    .filter(Boolean);
+}
+
 /** Convertit choice_pools de sous-classe en sub_choices consommables par le wizard. */
 function normalizeSubChoices(sub: RawSubclassOption): RawSubChoice[] {
   if (Array.isArray(sub.sub_choices) && sub.sub_choices.length > 0) {
@@ -211,7 +227,7 @@ function normalizeSubChoices(sub: RawSubclassOption): RawSubChoice[] {
       count: sc.count ?? sc.quantity ?? 1,
       level_required: sc.level_required ?? sc.level_unlocked ?? 1,
       label: sc.label ?? sc.name ?? 'Choix',
-      options: sc.options ?? sc.pool ?? [],
+      options: normalizeSubChoiceOptionIds(sc.options ?? sc.pool),
     }));
   }
 
@@ -226,7 +242,7 @@ function normalizeSubChoices(sub: RawSubclassOption): RawSubChoice[] {
       count: pool.quantity ?? 1,
       level_required: extractChoiceLevel(pool),
       label: pool.name ?? 'Choix',
-      options: pool.pool ?? [],
+      options: normalizeSubChoiceOptionIds(pool.pool),
     }));
 }
 

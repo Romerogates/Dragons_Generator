@@ -559,9 +559,9 @@ export class ClassStep implements OnInit {
         return choice.options.map((opt) => ({
           id: opt,
           title: this.getSubChoiceLabel(choice.type, opt),
-          desc: this.getSubChoiceDescription(opt),
+          desc: this.getSubChoiceDescription(opt, choice.type),
           badge: picked.has(opt) ? 'Sélectionné' : 'Option',
-          icon: 'fluent-emoji:sparkles',
+          icon: choice.type === 'dragon_ancestry' ? 'fluent-emoji:dragon' : 'fluent-emoji:sparkles',
         }));
       }
 
@@ -628,10 +628,15 @@ export class ClassStep implements OnInit {
     }
 
     const answers = current.classChoiceAnswers ?? {};
+    const subChoiceIds = new Set(this.activeSubChoices().map((sc) => sc.id));
     const progMap = new Map<string, string[]>();
+    const subMap = new Map<string, string[]>();
     for (const [k, v] of Object.entries(answers)) {
-      if (Array.isArray(v) && v.length > 0) progMap.set(k, v);
+      if (!Array.isArray(v) || v.length === 0) continue;
+      if (subChoiceIds.has(k)) subMap.set(k, v);
+      else progMap.set(k, v);
     }
+    if (subMap.size) this.subChoiceAnswers.set(subMap);
     if (progMap.size) this.progChoiceAnswers.set(progMap);
 
     this.syncCarouselIndexFromSelection();
@@ -1090,6 +1095,11 @@ export class ClassStep implements OnInit {
       let pactBoon: string | null = null;
       const extraFeatures: FeatureInstance[] = [];
 
+      for (const sc of this.activeSubChoices()) {
+        const picks = this.subChoiceAnswers().get(sc.id) ?? [];
+        if (picks.length) classChoiceAnswers[sc.id] = picks;
+      }
+
       for (const choice of this.activeProgChoices()) {
         const picks = this.progChoiceAnswers().get(choice.id) ?? [];
         classChoiceAnswers[choice.id] = picks;
@@ -1224,9 +1234,13 @@ export class ClassStep implements OnInit {
     return pretty.charAt(0).toUpperCase() + pretty.slice(1);
   }
 
-  getSubChoiceDescription(value: string): string {
+  getSubChoiceDescription(value: string, choiceType?: string): string {
     if (value.startsWith('meta-')) {
       return `Option de métamagie : ${metamagicLabel(value)}.`;
+    }
+    if (choiceType === 'dragon_ancestry' || /^dragon-/.test(value)) {
+      const name = this.getSubChoiceLabel('dragon_ancestry', value);
+      return `Ancêtre draconique : ${name}. Détermine votre affinité élémentaire et votre résistance.`;
     }
     return (
       this.resolveOptionFeature(value)?.desc ||
