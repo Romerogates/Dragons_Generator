@@ -39,7 +39,7 @@ public class GetHomeSummaryEndpoint(AppDbContext db, ILogger<GetHomeSummaryEndpo
 
         try
         {
-            await Send.OkAsync(await BuildSummaryAsync(userId.Value, ct), ct);
+            await Send.OkAsync(await BuildSummaryAsync(db, userId.Value, ct), ct);
         }
         catch (Exception ex)
         {
@@ -48,7 +48,7 @@ public class GetHomeSummaryEndpoint(AppDbContext db, ILogger<GetHomeSummaryEndpo
         }
     }
 
-    internal static async Task<HomeSummaryDto> BuildSummaryAsync(Guid userId, CancellationToken ct)
+    internal static async Task<HomeSummaryDto> BuildSummaryAsync(AppDbContext db, Guid userId, CancellationToken ct)
     {
         var charCount = await db.Characters.CountAsync(c => c.UserId == userId, ct);
 
