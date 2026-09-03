@@ -930,6 +930,48 @@ export function subclassBonusProficiencies(
   };
 }
 
+/**
+ * Résistances aux dégâts fixes/passives accordées par une feature de sous-classe
+ * (ex. Druide Cercle des Esprits → résistance psychique niv. 6). Les résistances
+ * conditionnelles (Rage du Barbare, tant que…) ne sont pas modélisées ici : elles restent
+ * décrites sur la feature elle-même, pas sur la fiche comme un bonus permanent.
+ */
+export function subclassBonusResistances(
+  cls: CharacterClass,
+  subclassId?: string | null,
+  level: number = PROGRESSION_MAX_LEVEL,
+): string[] {
+  if (!subclassId) return [];
+  const data = progressionData(cls);
+  const subs = data.subclasses as
+    | { options?: { id?: string; features?: SubclassFeatureLike[]; features_details?: SubclassFeatureLike[] }[] }
+    | undefined;
+  const options = Array.isArray(subs) ? subs : (subs?.options ?? []);
+  const sub = options.find((o) => o?.id === subclassId);
+  if (!sub) return [];
+
+  const result = new Set<string>();
+  const feats = dedupeSubclassFeatures(sub);
+  for (const feat of feats) {
+    const featLevel = Number(feat.level ?? 1);
+    if (featLevel > level) continue;
+    const mech = feat.mechanics ?? {};
+    const raw = (mech['resistances'] ?? feat['resistances']) as unknown;
+    if (!Array.isArray(raw)) continue;
+    for (const entry of raw) {
+      if (entry && typeof entry === 'object') {
+        const obj = entry as { type?: string; damage_type?: string };
+        if (obj.type === 'damage_type' && typeof obj.damage_type === 'string') {
+          result.add(obj.damage_type.trim());
+        }
+      }
+      // Formes string simples (ex. Rage du Barbare) volontairement ignorées : ce sont
+      // des bonus conditionnels/temporaires, pas des résistances passives de fiche.
+    }
+  }
+  return [...result];
+}
+
 /** Jets de sauvegarde accordés par une feature de la classe RACINE (ex. Esprit fuyant, Roublard niv. 15). */
 export function classRootSavingThrowGrants(cls: CharacterClass, level: number): string[] {
   const data = progressionData(cls);

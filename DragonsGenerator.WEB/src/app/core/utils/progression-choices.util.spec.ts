@@ -1,5 +1,6 @@
 import {
   subclassBonusProficiencies,
+  subclassBonusResistances,
   classRootSavingThrowGrants,
   extractSubclassSkillProficiencyChoices,
 } from './progression-choices.util';
@@ -165,6 +166,40 @@ describe('subclassBonusProficiencies', () => {
     const res = subclassBonusProficiencies(cls, 'subcls-domaine-du-partage', 20);
     expect(res.bonusLanguages).toBe(3);
     expect(res.requiredExoticLanguages).toBe(1);
+  });
+});
+
+describe('subclassBonusResistances', () => {
+  function makeClsWithFeature(feature: unknown): CharacterClass {
+    return {
+      id: 'cls-druide',
+      name: 'Druide',
+      data: {
+        subclasses: {
+          options: [{ id: 'subcls-cercle-des-esprits', features: [feature] }],
+        },
+      } as any,
+    } as unknown as CharacterClass;
+  }
+
+  it('extracts a fixed damage_type resistance (Esprit solide, niv. 6)', () => {
+    const cls = makeClsWithFeature({
+      id: 'feat-esprit-solide',
+      level: 6,
+      mechanics: { resistances: [{ type: 'damage_type', damage_type: 'psychic' }] },
+    });
+    expect(subclassBonusResistances(cls, 'subcls-cercle-des-esprits', 5)).toEqual([]);
+    expect(subclassBonusResistances(cls, 'subcls-cercle-des-esprits', 6)).toEqual(['psychic']);
+  });
+
+  it('ignores plain-string conditional resistances (ex. Rage) and returns [] without subclass', () => {
+    const cls = makeClsWithFeature({
+      id: 'feat-fougue',
+      level: 1,
+      mechanics: { resistances: ['bludgeoning', 'piercing', 'slashing'] },
+    });
+    expect(subclassBonusResistances(cls, 'subcls-cercle-des-esprits', 20)).toEqual([]);
+    expect(subclassBonusResistances(cls, null, 20)).toEqual([]);
   });
 });
 

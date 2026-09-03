@@ -102,6 +102,8 @@ export interface ClassSelection {
   classBonusLanguageCount?: number;
   /** Parmi les langues bonus, nombre devant être exotiques (ex. Prêtre Domaine du Partage). */
   classRequiredExoticLanguageCount?: number;
+  /** Résistances passives accordées par la sous-classe (ex. Druide Cercle des Esprits → psychique). */
+  classResistances?: string[];
   /** Emplacements de sorts au niveau cible (JSON progression). */
   classSpellSlots?: { level: number; max: number }[];
 }
@@ -133,6 +135,8 @@ export type ExtendedCharacterCreation = CharacterCreation & {
     alt: Record<string, number>;
     category: Record<string, string[]>;
   } | null;
+  /** Résistances passives accordées par la sous-classe choisie (fusionnées à la fiche). */
+  classResistances?: string[];
 };
 
 export const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
@@ -197,6 +201,7 @@ export const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   classProgressionResources: {},
   classBonusLanguageCount: 0,
   classSpellSlots: [],
+  classResistances: [],
   classChoiceAnswers: {},
   asiBonuses: {},
   selectedFeatId: null,

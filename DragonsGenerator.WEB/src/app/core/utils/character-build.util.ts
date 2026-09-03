@@ -160,7 +160,7 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
       hasShield: allEquipment.some(
         (e) => e.equipped && e.name.toLowerCase().includes('bouclier'),
       ),
-      resistances: c.speciesResistances,
+      resistances: [...new Set([...c.speciesResistances, ...(c.classResistances ?? [])])],
       immunities: [],
       vulnerabilities: [],
       conditionImmunities: [],
