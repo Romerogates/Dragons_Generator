@@ -26,7 +26,9 @@ import {
   extractExpertiseChoices,
   extractWeaponProficiencyChoices,
   extractToolProficiencyChoices,
+  extractSubclassSkillProficiencyChoices,
   subclassBonusProficiencies,
+  type SubclassSkillChoicePool,
 } from '@core/utils/progression-choices.util';
 
 export type { SkillInfo };
@@ -65,6 +67,8 @@ export class SkillsStep implements OnInit {
   /** Armes/outils de classe différés (ex. Lettré). */
   readonly classWeaponAnswers = signal<Map<string, string[]>>(new Map());
   readonly classToolAnswers = signal<Map<string, string[]>>(new Map());
+  /** Choix imbriqués de sous-classe (skill_proficiency / skill_or_tool_proficiency). */
+  readonly subclassSkillChoiceAnswers = signal<Map<string, string[]>>(new Map());
   readonly classJson = signal<any>(null);
 
   // Pour les historiques personnalisés
@@ -126,6 +130,13 @@ export class SkillsStep implements OnInit {
           if (fixedExpertise.size) {
             this.selectedExpertise.update((arr) => arr.filter((id) => !fixedExpertise.has(normalizeSkillId(id))));
           }
+          // Restaure les choix imbriqués de sous-classe (ex. Rôdeur Ombre urbaine, Lettré, Paladin Corbeau)
+          const nestedMap = new Map<string, string[]>();
+          for (const pool of this.subclassSkillChoicePools()) {
+            const saved = (c.classChoiceAnswers ?? {})[pool.id];
+            if (Array.isArray(saved) && saved.length) nestedMap.set(pool.id, [...saved]);
+          }
+          this.subclassSkillChoiceAnswers.set(nestedMap);
         },
       });
     }
@@ -193,20 +204,92 @@ export class SkillsStep implements OnInit {
     }
   }
 
-  /** Bonus fixes (armure/armes/compétences/expertise) accordés par le domaine/sous-classe. */
+  /** Bonus fixes (armure/armes/compétences/expertise/outils/langues) accordés par le domaine/sous-classe. */
   readonly subclassBonus = computed(() =>
-    subclassBonusProficiencies(this.classJson(), this.builder.creation().subclassId),
+    subclassBonusProficiencies(
+      this.classJson(),
+      this.builder.creation().subclassId,
+      this.builder.targetLevel(),
+    ),
   );
+
+  /** Compétences déjà connues avant application des bonus fixes de sous-classe (pour la logique « déjà maîtrisé »). */
+  private readonly knownSkillsBeforeSubclassBonus = computed(() => {
+    const conditional = new Set(this.subclassBonus().conditionalSkills.map(normalizeSkillId));
+    return new Set(
+      [...this.selectedClassSkills(), ...this.selectedBgSkills(), ...this.selectedSpeciesSkills()]
+        .map(normalizeSkillId)
+        .filter((id) => !conditional.has(id)),
+    );
+  });
 
   /** Compétences accordées automatiquement par le domaine/sous-classe (non un choix). */
-  readonly subclassFixedSkills = computed(() =>
-    this.subclassBonus().skills.map(normalizeSkillId),
-  );
+  readonly subclassFixedSkills = computed(() => {
+    const bonus = this.subclassBonus();
+    const conditional = new Set(bonus.conditionalSkills.map(normalizeSkillId));
+    const known = this.knownSkillsBeforeSubclassBonus();
+    return bonus.skills
+      .map(normalizeSkillId)
+      .filter((id) => !(conditional.has(id) && known.has(id)));
+  });
 
   /** Expertise accordée automatiquement par le domaine/sous-classe (non un choix). */
-  readonly subclassFixedExpertise = computed(() =>
-    this.subclassBonus().expertise.map(normalizeSkillId),
+  readonly subclassFixedExpertise = computed(() => {
+    const bonus = this.subclassBonus();
+    const conditional = new Set(bonus.conditionalSkills.map(normalizeSkillId));
+    const known = this.knownSkillsBeforeSubclassBonus();
+    const fromConditional = bonus.skills.map(normalizeSkillId).filter((id) => conditional.has(id) && known.has(id));
+    return [...new Set([...bonus.expertise.map(normalizeSkillId), ...fromConditional])];
+  });
+
+  /** Choix de compétences/outils imbriqués dans une feature de sous-classe (Rôdeur Ombre urbaine, Lettré…). */
+  readonly subclassSkillChoicePools = computed<SubclassSkillChoicePool[]>(() => {
+    const cls = this.classJson();
+    if (!cls) return [];
+    return extractSubclassSkillProficiencyChoices(
+      cls,
+      this.builder.targetLevel(),
+      this.builder.creation().subclassId,
+    );
+  });
+
+  readonly subclassSkillChoiceNeeded = computed(() =>
+    this.subclassSkillChoicePools().reduce((sum, p) => sum + p.count, 0),
   );
+
+  readonly subclassSkillChoicePicked = computed(() =>
+    [...this.subclassSkillChoiceAnswers().values()].reduce((sum, ids) => sum + ids.length, 0),
+  );
+
+  readonly subclassSkillChoiceRemaining = computed(() =>
+    Math.max(0, this.subclassSkillChoiceNeeded() - this.subclassSkillChoicePicked()),
+  );
+
+  /** Libellé lisible pour une option de pool imbriqué (compétence ou outil). */
+  subclassChoiceOptionLabel(id: string): string {
+    return id.startsWith('tl-') ? this.getToolName(id) : this.prettifySkill(id);
+  }
+
+  isSubclassSkillChoiceOptionSelected(poolId: string, optionId: string): boolean {
+    return (this.subclassSkillChoiceAnswers().get(poolId) ?? []).includes(optionId);
+  }
+
+  toggleSubclassSkillChoiceOption(poolId: string, optionId: string): void {
+    const pool = this.subclassSkillChoicePools().find((p) => p.id === poolId);
+    if (!pool) return;
+    this.subclassSkillChoiceAnswers.update((map) => {
+      const next = new Map(map);
+      const prev = [...(next.get(poolId) ?? [])];
+      const idx = prev.indexOf(optionId);
+      if (idx >= 0) {
+        prev.splice(idx, 1);
+      } else if (prev.length < pool.count) {
+        prev.push(optionId);
+      }
+      next.set(poolId, prev);
+      return next;
+    });
+  }
 
   // === COMPÉTENCES D'HISTORIQUE ===
   readonly bgProf = computed(() => (this.builder.creation() as any).backgroundProficiencies);
@@ -780,6 +863,7 @@ export class SkillsStep implements OnInit {
     if (this.expertiseRemaining() > 0) return false;
     if (this.classWeaponsRemaining() > 0) return false;
     if (this.classToolsRemaining() > 0) return false;
+    if (this.subclassSkillChoiceRemaining() > 0) return false;
 
     if (this.isCustomBg()) {
       if (this.customBgToolsRemaining() > 0) return false;
@@ -911,8 +995,32 @@ export class SkillsStep implements OnInit {
       }
     }
 
-    // 2. Sauvegarde centralisée
+    // 1.5 Répartition des choix imbriqués de sous-classe (compétences/outils + expertise conditionnelle)
+    const nestedPicks = [...this.subclassSkillChoiceAnswers().values()].flat();
+    const nestedToolPicks = nestedPicks.filter((id) => id.startsWith('tl-'));
+    const nestedSkillPicks = nestedPicks
+      .filter((id) => !id.startsWith('tl-'))
+      .map(normalizeSkillId);
+    const expertiseEligibleIds = new Set(
+      this.subclassSkillChoicePools()
+        .filter((p) => p.expertiseIfAlreadyProficient)
+        .flatMap((p) => this.subclassSkillChoiceAnswers().get(p.id) ?? [])
+        .filter((id) => !id.startsWith('tl-'))
+        .map(normalizeSkillId),
+    );
     const subclassSkills = this.subclassFixedSkills();
+    const knownBeforeNested = new Set([
+      ...this.selectedClassSkills(),
+      ...this.selectedBgSkills(),
+      ...this.selectedSpeciesSkills(),
+      ...subclassSkills,
+    ].map(normalizeSkillId));
+    const nestedExpertiseFinal = [
+      ...new Set(nestedSkillPicks.filter((id) => expertiseEligibleIds.has(id) && knownBeforeNested.has(id))),
+    ];
+    const nestedSkillsFinal = [...new Set(nestedSkillPicks.filter((id) => !nestedExpertiseFinal.includes(id)))];
+
+    // 2. Sauvegarde centralisée
     const subclassExpertise = this.subclassFixedExpertise();
     this.builder.setProficiencies(
       [
@@ -920,6 +1028,7 @@ export class SkillsStep implements OnInit {
           ...this.selectedClassSkills(),
           ...this.selectedSpeciesSkills(),
           ...subclassSkills,
+          ...nestedSkillsFinal,
         ]),
       ],
       this.selectedBgSkills(),
@@ -927,14 +1036,15 @@ export class SkillsStep implements OnInit {
       bgSlots,
     );
     this.builder.setExpertiseSkills([
-      ...new Set([...this.selectedExpertise(), ...subclassExpertise]),
+      ...new Set([...this.selectedExpertise(), ...subclassExpertise, ...nestedExpertiseFinal]),
     ]);
 
     const extraWeapons = [...this.classWeaponAnswers().values()].flat();
-    const extraTools = [...this.classToolAnswers().values()].flat();
+    const extraTools = [...this.classToolAnswers().values(), nestedToolPicks].flat();
     const profAnswers: Record<string, string[]> = {};
     for (const [k, v] of this.classWeaponAnswers()) profAnswers[k] = v;
     for (const [k, v] of this.classToolAnswers()) profAnswers[k] = v;
+    for (const [k, v] of this.subclassSkillChoiceAnswers()) profAnswers[k] = v;
     if (extraWeapons.length || extraTools.length || Object.keys(profAnswers).length) {
       this.builder.mergeClassProficiencies(extraWeapons, extraTools, profAnswers);
     }

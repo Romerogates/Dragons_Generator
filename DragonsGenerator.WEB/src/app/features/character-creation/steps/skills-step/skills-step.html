@@ -555,6 +555,59 @@
       </div>
     }
 
+    @for (pool of subclassSkillChoicePools(); track pool.id) {
+      <div
+        class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl"
+        data-testid="wizard-subclass-skill-choice"
+      >
+        <div class="flex justify-between items-center mb-2">
+          <h4
+            class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
+          >
+            <iconify-icon icon="fluent-emoji:crystal-ball"></iconify-icon>
+            {{ pool.label }}
+            @if (pool.expertiseIfAlreadyProficient) {
+              <span class="normal-case font-semibold text-amber-500/70"
+                >(expertise si déjà maîtrisée)</span
+              >
+            }
+          </h4>
+          <span
+            class="text-[10px] font-black uppercase tracking-widest"
+            [ngClass]="
+              (subclassSkillChoiceAnswers().get(pool.id) ?? []).length >= pool.count
+                ? 'text-emerald-400'
+                : 'text-slate-500'
+            "
+          >
+            {{ (subclassSkillChoiceAnswers().get(pool.id) ?? []).length }} / {{ pool.count }}
+          </span>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          @for (optId of pool.poolIds; track optId) {
+            <button
+              type="button"
+              class="px-3 py-2 rounded-xl border-2 text-xs font-bold transition-[colors,transform,opacity,box-shadow] duration-150"
+              [ngClass]="
+                isSubclassSkillChoiceOptionSelected(pool.id, optId)
+                  ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
+                  : (subclassSkillChoiceAnswers().get(pool.id) ?? []).length >= pool.count
+                    ? 'bg-slate-900 border-slate-800 text-slate-600 opacity-40 cursor-not-allowed'
+                    : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+              "
+              [disabled]="
+                (subclassSkillChoiceAnswers().get(pool.id) ?? []).length >= pool.count &&
+                !isSubclassSkillChoiceOptionSelected(pool.id, optId)
+              "
+              (click)="toggleSubclassSkillChoiceOption(pool.id, optId)"
+            >
+              {{ subclassChoiceOptionLabel(optId) }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
     @if (expertiseNeeded() > 0) {
       <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-violet-900/50 shadow-xl">
         <div class="flex justify-between items-center mb-2">

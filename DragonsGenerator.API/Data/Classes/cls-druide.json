@@ -12,7 +12,10 @@
   "primary_abilities": [
     "wis"
   ],
-  "saving_throw_proficiencies": [],
+  "saving_throw_proficiencies": [
+    "int",
+    "wis"
+  ],
   "armor_proficiencies": [
     "ar-light",
     "ar-medium",

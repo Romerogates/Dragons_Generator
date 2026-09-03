@@ -737,6 +737,8 @@ export interface CharacterCreation {
   // Étape 8 - Langues (anciennement 7)
   languages: string[];
   bonusLanguageCount: number;
+  /** Parmi les langues bonus, nombre devant être exotiques (ex. Prêtre Domaine du Partage). */
+  requiredExoticLanguageCount: number;
 
   // Étape 9 - Identité (anciennement 8)
   name: string;

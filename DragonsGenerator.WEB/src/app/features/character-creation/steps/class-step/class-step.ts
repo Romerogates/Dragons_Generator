@@ -37,6 +37,7 @@ import {
   classBonusLanguageCount,
   subclassFixedToolProficiencies,
   subclassBonusProficiencies,
+  classRootSavingThrowGrants,
   type ProgressionChoiceDef,
 } from '@core/utils/progression-choices.util';
 import type {
@@ -108,6 +109,16 @@ interface SubChoice {
   options: string[];
   option_labels?: Record<string, string>;
 }
+
+/** Codes courts (JSON) → libellés français utilisés par `Ability`. */
+const ABILITY_CODE_TO_LABEL: Record<string, Ability> = {
+  str: 'Force',
+  dex: 'Dextérité',
+  con: 'Constitution',
+  int: 'Intelligence',
+  wis: 'Sagesse',
+  cha: 'Charisme',
+};
 
 interface CombatStyleOption {
   id: string;
@@ -1118,15 +1129,26 @@ export class ClassStep implements OnInit {
         pactSlots.length > 0
           ? pactSlots
           : extractSpellSlotsFromResources(progAtLevel?.resources);
-      const langBonus = classBonusLanguageCount(cls, targetLevel, undefined, sub?.id);
+      const subBonus = subclassBonusProficiencies(cls, sub?.id, targetLevel);
+      const langBonus =
+        classBonusLanguageCount(cls, targetLevel, undefined, sub?.id) + subBonus.bonusLanguages;
       const subclassTools = subclassFixedToolProficiencies(cls, targetLevel, sub?.id);
       const baseTools = Array.isArray(prof.tools) ? prof.tools : [];
-      const toolProficiencies = [...new Set([...baseTools, ...subclassTools])];
-      const subBonus = subclassBonusProficiencies(cls, sub?.id);
+      const toolProficiencies = [...new Set([...baseTools, ...subclassTools, ...subBonus.tools])];
       const baseArmor = Array.isArray(prof.armor) ? prof.armor : [];
       const baseWeapons = Array.isArray(prof.weapons) ? prof.weapons : [];
       const armorProficiencies = [...new Set([...baseArmor, ...subBonus.armor])];
       const weaponProficiencies = [...new Set([...baseWeapons, ...subBonus.weapons])];
+      const bonusSaveCodes = [
+        ...subBonus.savingThrows,
+        ...classRootSavingThrowGrants(cls, targetLevel),
+      ];
+      const savingThrows = [
+        ...new Set([
+          ...((prof.saving_throws ?? []) as Ability[]),
+          ...bonusSaveCodes.map((code) => ABILITY_CODE_TO_LABEL[code]).filter((a): a is Ability => !!a),
+        ]),
+      ];
 
       const data = cls.data as Record<string, unknown>;
       const selection: ClassSelection = {
@@ -1144,7 +1166,7 @@ export class ClassStep implements OnInit {
         hasSpellcasting: spellInfo !== null,
         spellcastingKind: spellInfo?.kind ?? null,
         spellcastingAbility: spellInfo?.ability ?? null,
-        savingThrows: (prof.saving_throws ?? []) as Ability[],
+        savingThrows,
         armorProficiencies,
         weaponProficiencies,
         toolProficiencies,
@@ -1154,6 +1176,7 @@ export class ClassStep implements OnInit {
         startingEquipmentSlots: cls.data.starting_equipment ?? [],
         classProgressionResources,
         classBonusLanguageCount: langBonus,
+        classRequiredExoticLanguageCount: subBonus.requiredExoticLanguages,
         classSpellSlots,
       };
 

@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 import { DataService } from '@core/services/data.service';
 import { CharacterBuilderService } from '@core/services/character-builder.service';
 import type { Language } from '@core/models/Languages/language';
+import { subclassBonusProficiencies } from '@core/utils/progression-choices.util';
 
 const CLASS_GRANTED_LANGUAGES: Record<string, string> = {
   'cls-druide': 'Langue des druides',
@@ -35,16 +36,45 @@ export class LanguagesStep implements OnInit {
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly expandedId = signal<string | null>(null);
+  readonly classJson = signal<any>(null);
+
+  /** Langues fixes accordées par la sous-classe (ex. draconique, argot des voleurs…), en noms. */
+  readonly subclassFixedLanguageNames = computed<string[]>(() => {
+    const cls = this.classJson();
+    const c = this.builder.creation();
+    if (!cls || !c.subclassId) return [];
+    const ids = subclassBonusProficiencies(cls, c.subclassId, this.builder.targetLevel()).languages;
+    if (!ids.length) return [];
+    const idToName = new Map<string, string>();
+    this.allLanguages().forEach((l) => idToName.set(l.id, l.name));
+    return ids.map((id) => idToName.get(id) ?? id).filter(Boolean);
+  });
 
   readonly lockedLanguages = computed<string[]>(() => {
     const c = this.builder.creation();
     const set = new Set([...c.speciesLanguages, ...c.civilizationLanguages]);
     const classLang = CLASS_GRANTED_LANGUAGES[c.classId ?? ''];
     if (classLang) set.add(classLang);
+    for (const l of this.subclassFixedLanguageNames()) set.add(l);
     return [...set];
   });
 
   readonly bonusCount = computed<number>(() => this.builder.creation().bonusLanguageCount);
+
+  /** Nombre de langues bonus devant être exotiques (ex. Prêtre Domaine du Partage). */
+  readonly requiredExoticCount = computed<number>(
+    () => this.builder.creation().requiredExoticLanguageCount || 0,
+  );
+
+  readonly chosenExoticCount = computed<number>(() => {
+    const map = new Map(this.allLanguages().map((l) => [l.name, l] as const));
+    return this.chosenBonusLanguages().filter((name) => map.get(name)?.category === 'exotique')
+      .length;
+  });
+
+  readonly exoticRemaining = computed(() =>
+    Math.max(0, this.requiredExoticCount() - this.chosenExoticCount()),
+  );
 
   readonly chosenBonusLanguages = computed<string[]>(() => {
     const locked = new Set(this.lockedLanguages());
@@ -83,6 +113,15 @@ export class LanguagesStep implements OnInit {
 
   ngOnInit(): void {
     this.loading.set(true);
+    const c = this.builder.creation();
+    if (c.classId && c.subclassId) {
+      this.dataService.getClassById(c.classId).subscribe({
+        next: (cls) => {
+          this.classJson.set(cls);
+          this.ensureLockedLanguages();
+        },
+      });
+    }
     this.dataService.getLanguages().subscribe({
       next: (langs) => {
         this.allLanguages.set(langs);
@@ -121,6 +160,7 @@ export class LanguagesStep implements OnInit {
     if (c.speciesLanguages.includes(langName)) return 'Espèce';
     if (c.civilizationLanguages.includes(langName)) return 'Civilisation';
     if (CLASS_GRANTED_LANGUAGES[c.classId ?? ''] === langName) return 'Classe';
+    if (this.subclassFixedLanguageNames().includes(langName)) return 'Sous-classe';
     return 'Bonus';
   }
 
@@ -134,7 +174,7 @@ export class LanguagesStep implements OnInit {
   }
 
   confirm(): void {
-    if (this.remainingPicks() === 0) {
+    if (this.remainingPicks() === 0 && this.exoticRemaining() === 0) {
       this.builder.nextStep();
     }
   }

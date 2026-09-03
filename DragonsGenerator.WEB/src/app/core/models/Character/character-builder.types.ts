@@ -100,6 +100,8 @@ export interface ClassSelection {
   classProgressionResources?: Record<string, number | string | null>;
   /** Langues bonus de classe (ex. Lettré) — fusionnées dans bonusLanguageCount. */
   classBonusLanguageCount?: number;
+  /** Parmi les langues bonus, nombre devant être exotiques (ex. Prêtre Domaine du Partage). */
+  classRequiredExoticLanguageCount?: number;
   /** Emplacements de sorts au niveau cible (JSON progression). */
   classSpellSlots?: { level: number; max: number }[];
 }
@@ -226,6 +228,7 @@ export const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
 
   languages: [],
   bonusLanguageCount: 0,
+  requiredExoticLanguageCount: 0,
 
   name: '',
   sex: 'X' as const,

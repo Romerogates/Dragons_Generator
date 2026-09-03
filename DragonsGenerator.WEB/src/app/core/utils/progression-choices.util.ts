@@ -752,18 +752,90 @@ export function subclassFixedToolProficiencies(
   return [...new Set(tools)];
 }
 
+export interface SubclassBonusProficiencies {
+  armor: string[];
+  weapons: string[];
+  skills: string[];
+  expertise: string[];
+  tools: string[];
+  /** IDs de langue (ex. lang-draconique) accordées automatiquement. */
+  languages: string[];
+  /** Codes courts (str/dex/con/int/wis/cha) de jets de sauvegarde accordés. */
+  savingThrows: string[];
+  /** Nombre de langues bonus au choix (ex. Domaine du Partage : 3). */
+  bonusLanguages: number;
+  /** Parmi les langues bonus, nombre devant être exotiques. */
+  requiredExoticLanguages: number;
+  /**
+   * Compétences accordées dont le bonus de maîtrise est doublé (expertise) si le
+   * personnage la possède déjà par ailleurs (sinon simple maîtrise, déjà incluse dans `skills`).
+   */
+  conditionalSkills: string[];
+}
+
+const EMPTY_SUBCLASS_BONUS: SubclassBonusProficiencies = {
+  armor: [],
+  weapons: [],
+  skills: [],
+  expertise: [],
+  tools: [],
+  languages: [],
+  savingThrows: [],
+  bonusLanguages: 0,
+  requiredExoticLanguages: 0,
+  conditionalSkills: [],
+};
+
+type SubclassFeatureLike = Record<string, unknown> & {
+  level?: number;
+  mechanics?: Record<string, unknown>;
+};
+
+function dedupeStrings(arr?: (string | undefined | null)[]): string[] {
+  return [
+    ...new Set(
+      (arr ?? []).filter((v): v is string => typeof v === 'string' && v.trim().length > 0).map((v) => v.trim()),
+    ),
+  ];
+}
+
+function toStringArray(raw: unknown): string[] {
+  if (Array.isArray(raw)) return dedupeStrings(raw as string[]);
+  if (typeof raw === 'string' && raw.trim()) return [raw.trim()];
+  return [];
+}
+
 /**
- * Proficiences/expertises "fixes" accordées directement par le domaine/sous-classe choisi
- * (ex : Domaine de la Force → armes de guerre + Acrobaties/Athlétisme ;
- * Domaine de la Vie → armure lourde ; Domaine du Partage → expertise Persuasion).
+ * Certains JSON de sous-classe exposent `features` (déjà normalisé par l'adapter) ET
+ * `features_details` (copie brute conservée par le spread `...sub`). On dédoublonne par id
+ * pour ne jamais compter deux fois une même feature (ex. bonus_languages, choix imbriqués).
+ */
+function dedupeSubclassFeatures(sub: {
+  features?: SubclassFeatureLike[];
+  features_details?: SubclassFeatureLike[];
+}): SubclassFeatureLike[] {
+  const byId = new Map<string, SubclassFeatureLike>();
+  for (const feat of [...(sub.features ?? []), ...(sub.features_details ?? [])]) {
+    const id = String(feat?.['id'] ?? '');
+    const key = id || `anon-${byId.size}`;
+    if (!byId.has(key)) byId.set(key, feat);
+  }
+  return [...byId.values()];
+}
+
+/**
+ * Proficiences/expertises/langues "fixes" accordées directement par le domaine/sous-classe choisi,
+ * y compris celles nichées dans les features individuelles (grants_proficiency, grants_language,
+ * languages_granted, grants_saving_throw_proficiency, bonus_languages…), en plus du bloc
+ * `bonus_proficiencies` déjà présent sur certaines sous-classes.
  * Ces bonus ne sont pas des choix : ils doivent être appliqués automatiquement.
  */
 export function subclassBonusProficiencies(
   cls: CharacterClass,
   subclassId?: string | null,
-): { armor: string[]; weapons: string[]; skills: string[]; expertise: string[] } {
-  const empty = { armor: [], weapons: [], skills: [], expertise: [] };
-  if (!subclassId) return empty;
+  level: number = PROGRESSION_MAX_LEVEL,
+): SubclassBonusProficiencies {
+  if (!subclassId) return EMPTY_SUBCLASS_BONUS;
   const data = progressionData(cls);
   const subs = data.subclasses as
     | {
@@ -775,20 +847,200 @@ export function subclassBonusProficiencies(
             skills?: string[];
             expertise?: string[];
           };
+          features?: SubclassFeatureLike[];
+          features_details?: SubclassFeatureLike[];
         }[];
       }
     | undefined;
   const options = Array.isArray(subs) ? subs : (subs?.options ?? []);
   const sub = options.find((o) => o?.id === subclassId);
-  const bonus = sub?.bonus_proficiencies;
-  if (!bonus) return empty;
-  const dedupe = (arr?: string[]): string[] => (Array.isArray(arr) ? [...new Set<string>(arr)] : []);
+  if (!sub) return EMPTY_SUBCLASS_BONUS;
+
+  const bonus = sub.bonus_proficiencies;
+  const armor = new Set(dedupeStrings(bonus?.armor));
+  const weapons = new Set(dedupeStrings(bonus?.weapons));
+  const skills = new Set(dedupeStrings(bonus?.skills));
+  const expertise = new Set(dedupeStrings(bonus?.expertise));
+  const tools = new Set<string>();
+  const languages = new Set<string>();
+  const savingThrows = new Set<string>();
+  const conditionalSkills = new Set<string>();
+  let bonusLanguages = 0;
+  let requiredExoticLanguages = 0;
+
+  const feats = dedupeSubclassFeatures(sub);
+  for (const feat of feats) {
+    const featLevel = Number(feat.level ?? 1);
+    if (featLevel > level) continue;
+    const mech = feat.mechanics ?? {};
+
+    const grantedIds = [
+      ...toStringArray(feat['grants_proficiency']),
+      ...toStringArray(feat['grant_proficiency']),
+      ...toStringArray(mech['grants_proficiency']),
+      ...toStringArray(mech['grant_proficiency']),
+    ];
+    for (const id of grantedIds) {
+      if (id.startsWith('tl-')) tools.add(id);
+      else if (id.startsWith('ar-')) armor.add(id);
+      else if (id.startsWith('wp-')) weapons.add(id);
+      else skills.add(id);
+    }
+
+    const doubleFlag =
+      feat['double_prof_if_already_proficient'] ??
+      mech['double_prof_if_already_proficient'] ??
+      feat['expertise_if_already_proficient'] ??
+      mech['expertise_if_already_proficient'];
+    if (doubleFlag) {
+      const doubleIds =
+        typeof doubleFlag === 'boolean'
+          ? grantedIds
+          : Array.isArray(doubleFlag)
+            ? toStringArray(doubleFlag)
+            : toStringArray(doubleFlag);
+      for (const id of doubleIds) conditionalSkills.add(id);
+    }
+
+    for (const id of toStringArray(feat['grants_language'])) languages.add(id);
+    for (const id of toStringArray(mech['grants_language'])) languages.add(id);
+    for (const id of toStringArray(feat['languages_granted'])) languages.add(id);
+    for (const id of toStringArray(mech['languages_granted'])) languages.add(id);
+
+    const saveGrant = feat['grants_saving_throw_proficiency'] ?? mech['grants_saving_throw_proficiency'];
+    for (const code of toStringArray(saveGrant)) savingThrows.add(code.toLowerCase());
+
+    const bonusLangRaw = mech['bonus_languages'] ?? feat['bonus_languages'];
+    if (typeof bonusLangRaw === 'number') bonusLanguages += bonusLangRaw;
+    const reqExoticRaw = mech['required_exotic_count'] ?? feat['required_exotic_count'];
+    if (typeof reqExoticRaw === 'number') requiredExoticLanguages += reqExoticRaw;
+  }
+
   return {
-    armor: dedupe(bonus.armor),
-    weapons: dedupe(bonus.weapons),
-    skills: dedupe(bonus.skills),
-    expertise: dedupe(bonus.expertise),
+    armor: [...armor],
+    weapons: [...weapons],
+    skills: [...skills],
+    expertise: [...expertise],
+    tools: [...tools],
+    languages: [...languages],
+    savingThrows: [...savingThrows],
+    bonusLanguages,
+    requiredExoticLanguages,
+    conditionalSkills: [...conditionalSkills],
   };
+}
+
+/** Jets de sauvegarde accordés par une feature de la classe RACINE (ex. Esprit fuyant, Roublard niv. 15). */
+export function classRootSavingThrowGrants(cls: CharacterClass, level: number): string[] {
+  const data = progressionData(cls);
+  const feats = (data.features_details ?? []) as SubclassFeatureLike[];
+  const codes = new Set<string>();
+  for (const feat of feats) {
+    const featLevel = Number(feat.level ?? 1);
+    if (featLevel > level) continue;
+    const mech = feat.mechanics ?? {};
+    const saveGrant = feat['grants_saving_throw_proficiency'] ?? mech['grants_saving_throw_proficiency'];
+    for (const code of toStringArray(saveGrant)) codes.add(code.toLowerCase());
+  }
+  return [...codes];
+}
+
+export interface SubclassSkillChoicePool {
+  id: string;
+  label: string;
+  count: number;
+  poolIds: string[];
+  /** Doublement (expertise) si la compétence est déjà maîtrisée par ailleurs. */
+  expertiseIfAlreadyProficient: boolean;
+}
+
+/**
+ * Choix de compétences/outils imbriqués dans une feature de sous-classe (au lieu d'être au
+ * niveau racine de la sous-classe) — ex. Rôdeur Ombre urbaine, Lettré Exploration de l'âme,
+ * Paladin Serment du Corbeau. Différés vers l'étape Savoirs, comme les armes/outils de classe.
+ */
+export function extractSubclassSkillProficiencyChoices(
+  cls: CharacterClass,
+  level: number,
+  subclassId?: string | null,
+): SubclassSkillChoicePool[] {
+  if (!subclassId) return [];
+  const data = progressionData(cls);
+  const subs = data.subclasses as
+    | { options?: { id?: string; features?: SubclassFeatureLike[]; features_details?: SubclassFeatureLike[] }[] }
+    | undefined;
+  const options = Array.isArray(subs) ? subs : (subs?.options ?? []);
+  const sub = options.find((o) => o?.id === subclassId);
+  if (!sub) return [];
+
+  const out: SubclassSkillChoicePool[] = [];
+  const pushPool = (
+    rawIds: unknown,
+    quantity: number,
+    poolId: string,
+    label: string,
+    expertiseFlag: unknown,
+  ) => {
+    const ids = (Array.isArray(rawIds) ? rawIds : []).filter(
+      (v): v is string => typeof v === 'string' && v.trim().length > 0,
+    );
+    if (!ids.length) return;
+    out.push({
+      id: poolId,
+      label,
+      count: Math.max(1, quantity),
+      poolIds: ids,
+      expertiseIfAlreadyProficient: !!expertiseFlag,
+    });
+  };
+
+  const feats = dedupeSubclassFeatures(sub);
+  for (const feat of feats) {
+    const featLevel = Number(feat.level ?? 1);
+    if (featLevel > level) continue;
+    const featId = String(feat['id'] ?? 'feat');
+    const mech = feat.mechanics ?? {};
+
+    const pools = (feat['choice_pools'] as Record<string, unknown>[] | undefined) ?? [];
+    for (const pool of pools) {
+      const t = String(pool['type'] ?? '');
+      if (t !== 'skill_proficiency' && t !== 'skill_or_tool_proficiency') continue;
+      pushPool(
+        pool['pool'] ?? pool['options'],
+        Number(pool['quantity'] ?? 1),
+        String(pool['id'] ?? `choice-skill-${featId}`),
+        String(pool['name'] ?? 'Compétences au choix'),
+        pool['expertise_if_already_proficient'],
+      );
+    }
+
+    const singlePool = feat['choice_pool'] as Record<string, unknown> | undefined;
+    if (singlePool) {
+      const t = String(singlePool['type'] ?? '');
+      if (t === 'skill_proficiency' || t === 'skill_or_tool_proficiency') {
+        pushPool(
+          singlePool['pool'] ?? singlePool['options'],
+          Number(singlePool['quantity'] ?? 1),
+          String(singlePool['id'] ?? `choice-skill-${featId}`),
+          String(singlePool['name'] ?? 'Compétences au choix'),
+          singlePool['expertise_if_already_proficient'],
+        );
+      }
+    }
+
+    const mechPool = mech['choice_pool'];
+    if (Array.isArray(mechPool) && mechPool.every((v) => typeof v === 'string')) {
+      pushPool(
+        mechPool,
+        1,
+        `choice-skill-${featId}`,
+        'Compétence au choix',
+        mech['grant_type'] === 'proficiency_or_expertise',
+      );
+    }
+  }
+
+  return out;
 }
 
 export function classNeedsAsi(
