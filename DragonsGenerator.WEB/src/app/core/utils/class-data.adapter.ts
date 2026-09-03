@@ -17,6 +17,7 @@ interface RawFeatureDetail {
   unlocks_at_level?: number;
   recharge?: string;
   uses?: unknown;
+  mechanics?: { choice_quantity?: number; options?: unknown[] } & Record<string, unknown>;
 }
 
 interface RawChoicePool {
@@ -43,6 +44,7 @@ interface RawSubChoice {
   options?: unknown[];
   pool?: unknown[];
   option_labels?: Record<string, string>;
+  option_descs?: Record<string, string>;
 }
 
 interface RawSubclassOption extends Subclass {
@@ -243,6 +245,23 @@ function extractOptionLabels(raw: unknown[] | undefined): Record<string, string>
   return labels;
 }
 
+/** Descriptions des options (ex. technique de combat "Proie du chasseur"), pour affichage fidèle aux règles. */
+function extractOptionDescs(raw: unknown[] | undefined): Record<string, string> {
+  const descs: Record<string, string> = {};
+  if (!Array.isArray(raw)) return descs;
+  for (const entry of raw) {
+    if (entry && typeof entry === 'object') {
+      const obj = entry as Record<string, unknown>;
+      const id = obj['id'];
+      const desc = obj['description'] ?? obj['desc'];
+      if (typeof id === 'string' && typeof desc === 'string' && desc.trim()) {
+        descs[id] = desc.trim();
+      }
+    }
+  }
+  return descs;
+}
+
 /** Les pools API (ex. dragon_ancestry) peuvent contenir des objets { id, … } au lieu de strings. */
 function normalizeSubChoiceOptionIds(raw: unknown[] | undefined): string[] {
   if (!Array.isArray(raw)) return [];
@@ -279,6 +298,32 @@ function buildSubChoiceFromRaw(sc: RawSubChoice): RawSubChoice {
     label: sc.label ?? sc.name ?? 'Choix',
     options: normalizeSubChoiceOptionIds(rawOpts),
     option_labels: { ...extractOptionLabels(rawOpts), ...(sc.option_labels ?? {}) },
+    option_descs: { ...extractOptionDescs(rawOpts), ...(sc.option_descs ?? {}) },
+  };
+}
+
+/**
+ * Convertit une feature dotée de `mechanics.options` + `choice_quantity` (ex. Rôdeur Chasseur
+ * "Proie du chasseur" niv. 3 : choisir 1 technique parmi 3) en sub_choice consommable par le
+ * wizard. Sans cela, ce choix permanent n'était jamais proposé au joueur.
+ */
+function buildSubChoiceFromFeatureOptions(feat: RawFeatureDetail): RawSubChoice | null {
+  const mech = feat.mechanics;
+  const quantity = mech?.choice_quantity;
+  const rawOpts = mech?.options;
+  if (typeof quantity !== 'number' || quantity < 1) return null;
+  if (!Array.isArray(rawOpts) || rawOpts.length === 0) return null;
+  const ids = normalizeSubChoiceOptionIds(rawOpts);
+  if (ids.length === 0) return null;
+  return {
+    id: `choice-feature-${feat.id}`,
+    type: 'feature_option',
+    count: quantity,
+    level_required: feat.level ?? feat.unlocks_at_level ?? 1,
+    label: feat.name ?? 'Choix',
+    options: ids,
+    option_labels: extractOptionLabels(rawOpts),
+    option_descs: extractOptionDescs(rawOpts),
   };
 }
 
@@ -298,21 +343,31 @@ function buildSubChoiceFromPool(pool: RawChoicePool): RawSubChoice {
     label: pool.name ?? 'Choix',
     options: normalizeSubChoiceOptionIds(rawOpts),
     option_labels: extractOptionLabels(rawOpts),
+    option_descs: extractOptionDescs(rawOpts),
   };
 }
 
 /** Convertit choice_pools de sous-classe en sub_choices consommables par le wizard. */
 function normalizeSubChoices(sub: RawSubclassOption): RawSubChoice[] {
+  let choices: RawSubChoice[];
+
   if (Array.isArray(sub.sub_choices) && sub.sub_choices.length > 0) {
-    return sub.sub_choices.map(buildSubChoiceFromRaw).filter((sc) => (sc.options?.length ?? 0) > 0);
+    choices = sub.sub_choices.map(buildSubChoiceFromRaw);
+  } else {
+    choices = (sub.choice_pools ?? [])
+      .filter((pool) => !isDeferredSubChoicePool(pool))
+      .map(buildSubChoiceFromPool);
+
+    if (sub.sub_identity_choice) {
+      choices.push(buildSubChoiceFromRaw(sub.sub_identity_choice));
+    }
   }
 
-  const choices: RawSubChoice[] = (sub.choice_pools ?? [])
-    .filter((pool) => !isDeferredSubChoicePool(pool))
-    .map(buildSubChoiceFromPool);
-
-  if (sub.sub_identity_choice) {
-    choices.push(buildSubChoiceFromRaw(sub.sub_identity_choice));
+  // Choix imbriqués dans une feature individuelle (ex. Rôdeur Chasseur : techniques de combat
+  // niv. 3/7/11/15). Toujours ajoutés en plus des sources ci-dessus (sources différentes).
+  for (const feat of sub.features_details ?? []) {
+    const fromFeat = buildSubChoiceFromFeatureOptions(feat);
+    if (fromFeat) choices.push(fromFeat);
   }
 
   return choices.filter((sc) => (sc.options?.length ?? 0) > 0);

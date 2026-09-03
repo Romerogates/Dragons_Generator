@@ -110,6 +110,7 @@ interface SubChoice {
   label: string;
   options: string[];
   option_labels?: Record<string, string>;
+  option_descs?: Record<string, string>;
 }
 
 /** Codes courts (JSON) → libellés français utilisés par `Ability`. */
@@ -583,7 +584,12 @@ export class ClassStep implements OnInit {
         return choice.options.map((opt) => ({
           id: opt,
           title: this.getSubChoiceLabel(choice.type, opt, choice.option_labels),
-          desc: this.getSubChoiceDescription(opt, choice.type, choice.option_labels?.[opt]),
+          desc: this.getSubChoiceDescription(
+            opt,
+            choice.type,
+            choice.option_labels?.[opt],
+            choice.option_descs?.[opt],
+          ),
           badge: picked.has(opt) ? 'Sélectionné' : 'Option',
           icon:
             choice.type === 'dragon_ancestry'
@@ -592,7 +598,9 @@ export class ClassStep implements OnInit {
                 ? 'fluent-emoji:smiling-face-with-horns'
                 : choice.type === 'animal_totem'
                   ? 'fluent-emoji:wolf'
-                  : 'fluent-emoji:sparkles',
+                  : choice.type === 'feature_option'
+                    ? 'fluent-emoji:crossed-swords'
+                    : 'fluent-emoji:sparkles',
         }));
       }
 
@@ -1096,7 +1104,28 @@ export class ClassStep implements OnInit {
             const fromClass = (cls.data.features_details ?? []).find(
               (f: any) => f.id === pickId,
             ) as FeatureJson | undefined;
-            const feat = fromSub ?? fromClass;
+            let feat = fromSub ?? fromClass;
+            // Choix imbriqués (mechanics.options + choice_quantity, ex. Rôdeur Chasseur) :
+            // l'id sélectionné n'est pas une feature de premier niveau mais une option nichée
+            // dans `mechanics.options` d'une feature parente. On synthétise une carte dédiée
+            // avec le nom/texte réel de la technique choisie, pour rester fidèle aux règles.
+            if (!feat) {
+              const allFeats = [...sub.features, ...((cls.data.features_details ?? []) as any[])];
+              for (const parent of allFeats) {
+                const opt = (parent?.mechanics?.options as any[] | undefined)?.find(
+                  (o) => o && typeof o === 'object' && o.id === pickId,
+                );
+                if (opt) {
+                  feat = {
+                    id: pickId,
+                    name: opt.name ?? sc.option_labels?.[pickId] ?? pickId,
+                    desc: opt.description ?? opt.desc ?? '',
+                    level: parent.level ?? sc.level_required,
+                  } as FeatureJson;
+                  break;
+                }
+              }
+            }
             if (!feat || features.some((f) => f.refId === feat.id)) continue;
             features.push({
               refId: feat.id,
@@ -1341,7 +1370,13 @@ export class ClassStep implements OnInit {
     return pretty.charAt(0).toUpperCase() + pretty.slice(1);
   }
 
-  getSubChoiceDescription(value: string, choiceType?: string, optionLabel?: string): string {
+  getSubChoiceDescription(
+    value: string,
+    choiceType?: string,
+    optionLabel?: string,
+    optionDesc?: string,
+  ): string {
+    if (optionDesc) return optionDesc;
     if (value.startsWith('meta-')) {
       return `Option de métamagie : ${metamagicLabel(value)}.`;
     }

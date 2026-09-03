@@ -90,6 +90,69 @@ describe('class-data.adapter', () => {
     expect(sub.sub_choices?.[0].options).toEqual(['dragon-rouge', 'dragon-bleu']);
   });
 
+  it('extracts a mechanics.options + choice_quantity feature choice (Rôdeur Chasseur "Proie du chasseur", niv. 3)', () => {
+    const normalized = normalizeCharacterClass({
+      id: 'cls-rodeur',
+      name: 'Rôdeur',
+      data: {
+        hit_die: '1d10',
+        primary_abilities: ['dex', 'wis'],
+        saving_throw_proficiencies: ['str', 'dex'],
+        armor_proficiencies: [],
+        weapon_proficiencies: [],
+        tool_proficiencies: [],
+        choice_pools: [],
+        starting_equipment: { fixed: [], choice_pools: [] },
+        features_details: [],
+        subclasses: {
+          name: 'Conclave',
+          level_unlocked: 3,
+          options: [
+            {
+              id: 'subcls-chasseur',
+              name: 'Chasseur',
+              flavor: { summary: 'Rempart entre la civilisation et le monde sauvage.' },
+              features_details: [
+                {
+                  id: 'feat-proie-du-chasseur',
+                  name: 'Proie du chasseur',
+                  unlocks_at_level: 3,
+                  mechanics: {
+                    description: 'Choisissez une des trois options suivantes.',
+                    choice_quantity: 1,
+                    options: [
+                      { id: 'proie-fleau-de-la-horde', name: 'Fléau de la horde', description: 'Attaque bonus contre un ennemi adjacent.' },
+                      { id: 'proie-soif-de-sang', name: 'Soif de sang', description: '+1d8 contre une cible blessée.' },
+                      { id: 'proie-tueur-de-geants', name: 'Tueur de géants', description: 'Réaction contre les créatures de grande taille.' },
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      },
+    } as any);
+
+    const sub = (
+      normalized.data.subclasses as {
+        options: {
+          sub_choices?: { id: string; type: string; level_required: number; options: string[]; option_labels?: Record<string, string> }[];
+        }[];
+      }
+    ).options[0];
+    expect(sub.sub_choices?.length).toBe(1);
+    const choice = sub.sub_choices?.[0];
+    expect(choice?.type).toBe('feature_option');
+    expect(choice?.level_required).toBe(3);
+    expect(choice?.options).toEqual([
+      'proie-fleau-de-la-horde',
+      'proie-soif-de-sang',
+      'proie-tueur-de-geants',
+    ]);
+    expect(choice?.option_labels?.['proie-soif-de-sang']).toBe('Soif de sang');
+  });
+
   it('maps sorcier sub_identity_choice to wizard sub_choices with labels', () => {
     const normalized = normalizeCharacterClass({
       id: 'cls-sorcier',
