@@ -752,6 +752,45 @@ export function subclassFixedToolProficiencies(
   return [...new Set(tools)];
 }
 
+/**
+ * Proficiences/expertises "fixes" accordées directement par le domaine/sous-classe choisi
+ * (ex : Domaine de la Force → armes de guerre + Acrobaties/Athlétisme ;
+ * Domaine de la Vie → armure lourde ; Domaine du Partage → expertise Persuasion).
+ * Ces bonus ne sont pas des choix : ils doivent être appliqués automatiquement.
+ */
+export function subclassBonusProficiencies(
+  cls: CharacterClass,
+  subclassId?: string | null,
+): { armor: string[]; weapons: string[]; skills: string[]; expertise: string[] } {
+  const empty = { armor: [], weapons: [], skills: [], expertise: [] };
+  if (!subclassId) return empty;
+  const data = progressionData(cls);
+  const subs = data.subclasses as
+    | {
+        options?: {
+          id?: string;
+          bonus_proficiencies?: {
+            armor?: string[];
+            weapons?: string[];
+            skills?: string[];
+            expertise?: string[];
+          };
+        }[];
+      }
+    | undefined;
+  const options = Array.isArray(subs) ? subs : (subs?.options ?? []);
+  const sub = options.find((o) => o?.id === subclassId);
+  const bonus = sub?.bonus_proficiencies;
+  if (!bonus) return empty;
+  const dedupe = (arr?: string[]): string[] => (Array.isArray(arr) ? [...new Set<string>(arr)] : []);
+  return {
+    armor: dedupe(bonus.armor),
+    weapons: dedupe(bonus.weapons),
+    skills: dedupe(bonus.skills),
+    expertise: dedupe(bonus.expertise),
+  };
+}
+
 export function classNeedsAsi(
   cls: CharacterClass,
   level: number,

@@ -36,6 +36,7 @@ import {
   extractProgressionChoices,
   classBonusLanguageCount,
   subclassFixedToolProficiencies,
+  subclassBonusProficiencies,
   type ProgressionChoiceDef,
 } from '@core/utils/progression-choices.util';
 import type {
@@ -1121,6 +1122,11 @@ export class ClassStep implements OnInit {
       const subclassTools = subclassFixedToolProficiencies(cls, targetLevel, sub?.id);
       const baseTools = Array.isArray(prof.tools) ? prof.tools : [];
       const toolProficiencies = [...new Set([...baseTools, ...subclassTools])];
+      const subBonus = subclassBonusProficiencies(cls, sub?.id);
+      const baseArmor = Array.isArray(prof.armor) ? prof.armor : [];
+      const baseWeapons = Array.isArray(prof.weapons) ? prof.weapons : [];
+      const armorProficiencies = [...new Set([...baseArmor, ...subBonus.armor])];
+      const weaponProficiencies = [...new Set([...baseWeapons, ...subBonus.weapons])];
 
       const data = cls.data as Record<string, unknown>;
       const selection: ClassSelection = {
@@ -1139,8 +1145,8 @@ export class ClassStep implements OnInit {
         spellcastingKind: spellInfo?.kind ?? null,
         spellcastingAbility: spellInfo?.ability ?? null,
         savingThrows: (prof.saving_throws ?? []) as Ability[],
-        armorProficiencies: prof.armor ?? [],
-        weaponProficiencies: prof.weapons ?? [],
+        armorProficiencies,
+        weaponProficiencies,
         toolProficiencies,
         skillOptions: Array.isArray(prof.skills?.options) ? prof.skills.options : [],
         skillChooseCount: prof.skills?.count ?? 0,

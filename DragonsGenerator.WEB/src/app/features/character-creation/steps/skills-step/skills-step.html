@@ -68,6 +68,45 @@
       </div>
     </div>
 
+    @if (subclassFixedSkills().length > 0 || subclassFixedExpertise().length > 0) {
+      <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+        <h4
+          class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2 mb-5"
+        >
+          <iconify-icon icon="fluent-emoji:crystal-ball"></iconify-icon> Accordées par votre
+          domaine / sous-classe
+        </h4>
+        <div class="flex flex-wrap gap-2">
+          @for (id of subclassFixedSkills(); track id) {
+            <span
+              class="px-3 py-2 rounded-xl border border-slate-600/80 bg-slate-900/70 text-slate-300 text-sm font-bold flex items-center gap-2 cursor-default"
+              title="Accordée par votre domaine — non modifiable"
+            >
+              <span class="text-[10px] text-slate-500">🔒</span>
+              {{ prettifySkill(id) }}
+              <span
+                class="text-[9px] ml-0.5 px-1.5 rounded bg-slate-800 text-slate-400">
+                {{ getModifierForSkill(id) }}
+              </span>
+            </span>
+          }
+          @for (id of subclassFixedExpertise(); track id) {
+            <span
+              class="px-3 py-2 rounded-xl border border-amber-700/60 bg-amber-950/30 text-amber-300 text-sm font-bold flex items-center gap-2 cursor-default"
+              title="Expertise accordée par votre domaine — non modifiable"
+            >
+              <span class="text-[10px] text-amber-500">⭐</span>
+              {{ prettifySkill(id) }}
+              <span
+                class="text-[9px] uppercase tracking-widest text-amber-500 border border-amber-700/60 rounded px-1.5 py-0.5"
+                >Expertise</span
+              >
+            </span>
+          }
+        </div>
+      </div>
+    }
+
     <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
       <div class="flex justify-between items-center mb-2">
         <h4

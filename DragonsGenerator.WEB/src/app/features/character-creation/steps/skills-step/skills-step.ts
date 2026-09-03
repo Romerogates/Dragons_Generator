@@ -22,7 +22,12 @@ import {
   type SkillInfo,
 } from '@core/utils/skill.utils';
 import { labelForGameId } from '@core/utils/game-id-labels';
-import { extractExpertiseChoices, extractWeaponProficiencyChoices, extractToolProficiencyChoices } from '@core/utils/progression-choices.util';
+import {
+  extractExpertiseChoices,
+  extractWeaponProficiencyChoices,
+  extractToolProficiencyChoices,
+  subclassBonusProficiencies,
+} from '@core/utils/progression-choices.util';
 
 export type { SkillInfo };
 
@@ -108,7 +113,20 @@ export class SkillsStep implements OnInit {
 
     if (c.classId) {
       this.dataService.getClassById(c.classId).subscribe({
-        next: (cls) => this.classJson.set(cls),
+        next: (cls) => {
+          this.classJson.set(cls);
+          // Retire les compétences/expertises fixes de sous-classe des listes restaurées
+          // (elles sont ré-appliquées automatiquement à la confirmation, pas un choix).
+          const fixedSkills = new Set(this.subclassFixedSkills());
+          if (fixedSkills.size) {
+            this.selectedClassSkills.update((arr) => arr.filter((id) => !fixedSkills.has(normalizeSkillId(id))));
+            this.selectedSpeciesSkills.update((arr) => arr.filter((id) => !fixedSkills.has(normalizeSkillId(id))));
+          }
+          const fixedExpertise = new Set(this.subclassFixedExpertise());
+          if (fixedExpertise.size) {
+            this.selectedExpertise.update((arr) => arr.filter((id) => !fixedExpertise.has(normalizeSkillId(id))));
+          }
+        },
       });
     }
 
@@ -174,6 +192,21 @@ export class SkillsStep implements OnInit {
       this.selectedClassSkills.update((arr) => [...arr, id]);
     }
   }
+
+  /** Bonus fixes (armure/armes/compétences/expertise) accordés par le domaine/sous-classe. */
+  readonly subclassBonus = computed(() =>
+    subclassBonusProficiencies(this.classJson(), this.builder.creation().subclassId),
+  );
+
+  /** Compétences accordées automatiquement par le domaine/sous-classe (non un choix). */
+  readonly subclassFixedSkills = computed(() =>
+    this.subclassBonus().skills.map(normalizeSkillId),
+  );
+
+  /** Expertise accordée automatiquement par le domaine/sous-classe (non un choix). */
+  readonly subclassFixedExpertise = computed(() =>
+    this.subclassBonus().expertise.map(normalizeSkillId),
+  );
 
   // === COMPÉTENCES D'HISTORIQUE ===
   readonly bgProf = computed(() => (this.builder.creation() as any).backgroundProficiencies);
@@ -879,13 +912,23 @@ export class SkillsStep implements OnInit {
     }
 
     // 2. Sauvegarde centralisée
+    const subclassSkills = this.subclassFixedSkills();
+    const subclassExpertise = this.subclassFixedExpertise();
     this.builder.setProficiencies(
-      [...this.selectedClassSkills(), ...this.selectedSpeciesSkills()],
+      [
+        ...new Set([
+          ...this.selectedClassSkills(),
+          ...this.selectedSpeciesSkills(),
+          ...subclassSkills,
+        ]),
+      ],
       this.selectedBgSkills(),
       [...this.selectedBgTools(), ...this.selectedSpeciesTools()],
       bgSlots,
     );
-    this.builder.setExpertiseSkills(this.selectedExpertise());
+    this.builder.setExpertiseSkills([
+      ...new Set([...this.selectedExpertise(), ...subclassExpertise]),
+    ]);
 
     const extraWeapons = [...this.classWeaponAnswers().values()].flat();
     const extraTools = [...this.classToolAnswers().values()].flat();
