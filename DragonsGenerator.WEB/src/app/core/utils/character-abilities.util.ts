@@ -1,8 +1,15 @@
-import type { AbilityScores, AsiChoiceSlot, FeatureInstance } from '@core/models/Character/character';
+import type { AbilityKey, AbilityScores, AsiChoiceSlot, FeatureInstance } from '@core/models/Character/character';
 import {
   ABILITY_POINT_COSTS,
   getAbilityModifier,
 } from '@core/models/Character/character';
+import {
+  featAsiValue,
+  featBonusArmorProficiencies,
+  featDarkvisionRadius,
+  resolveFeatAsiAbilityKey,
+  type RawFeatData,
+} from '@core/utils/feat-benefits.util';
 
 export function computeFinalAbilities(
   base: AbilityScores,
@@ -44,7 +51,14 @@ export interface HitPointsInput {
   classId: string | null;
   subclassId: string | null;
   classFeatures: FeatureInstance[];
+  /** Sous-espèce, pour les bonus de PV/niveau raciaux (ex. Nain bâtisseur). */
+  subspeciesId?: string | null;
 }
+
+/** Sous-espèces accordant un bonus de PV max fixe à chaque niveau (trait `hp_per_level_bonus`). */
+const SPECIES_HP_PER_LEVEL_BONUS: Record<string, number> = {
+  'sp-nain-batisseur': 1, // Trait "Robustesse naine"
+};
 
 export function computeHitPointsMax(input: HitPointsInput): number {
   const level = Math.min(20, Math.max(1, input.targetLevel || 1));
@@ -59,6 +73,10 @@ export function computeHitPointsMax(input: HitPointsInput): number {
   if (hasDraconic && input.classId === 'cls-ensorceleur') {
     hp += level;
   }
+
+  const speciesBonus = input.subspeciesId ? SPECIES_HP_PER_LEVEL_BONUS[input.subspeciesId] : undefined;
+  if (speciesBonus) hp += speciesBonus * level;
+
   return hp;
 }
 
@@ -70,15 +88,36 @@ export function computePassivePerception(
   return 10 + wisdomMod + (hasPerceptionProficiency ? proficiencyBonus : 0);
 }
 
-export function aggregateAsiChoices(slots: AsiChoiceSlot[]): {
+export function aggregateAsiChoices(
+  slots: AsiChoiceSlot[],
+  ctx?: { feats?: Map<string, RawFeatData>; spellcastingAbility?: AbilityKey | null },
+): {
   bonuses: Partial<AbilityScores>;
   featIds: string[];
+  featDarkvisionRadius: number;
+  featBonusArmor: string[];
 } {
   const bonuses: Partial<AbilityScores> = {};
   const featIds: string[] = [];
+  let darkvisionRadius = 0;
+  const bonusArmor = new Set<string>();
   for (const slot of slots) {
     if (slot.mode === 'feat' && slot.featId) {
       featIds.push(slot.featId);
+      const feat = ctx?.feats?.get(slot.featId);
+      if (feat) {
+        const value = featAsiValue(feat);
+        if (value > 0) {
+          const key = resolveFeatAsiAbilityKey(
+            feat,
+            ctx?.spellcastingAbility ?? null,
+            slot.featAbilityChoice,
+          );
+          if (key) bonuses[key] = (bonuses[key] ?? 0) + value;
+        }
+        darkvisionRadius = Math.max(darkvisionRadius, featDarkvisionRadius(feat));
+        featBonusArmorProficiencies(feat).forEach((id) => bonusArmor.add(id));
+      }
       continue;
     }
     if (slot.mode === 'plus2' && slot.primary) {
@@ -88,7 +127,7 @@ export function aggregateAsiChoices(slots: AsiChoiceSlot[]): {
       bonuses[slot.secondary] = (bonuses[slot.secondary] ?? 0) + 1;
     }
   }
-  return { bonuses, featIds };
+  return { bonuses, featIds, featDarkvisionRadius: darkvisionRadius, featBonusArmor: [...bonusArmor] };
 }
 
 export function abilityPointCostForScore(score: number): number {

@@ -50,6 +50,8 @@ export interface AsiChoiceSlot {
   primary?: AbilityKey | null;
   secondary?: AbilityKey | null;
   featId?: string | null;
+  /** Caractéristique choisie quand le don propose un ASI flexible ("any" ou "X ou Y"). */
+  featAbilityChoice?: AbilityKey | null;
 }
 
 export const ABILITY_KEYS: readonly AbilityKey[] = [
@@ -612,6 +614,16 @@ export interface Character {
 
   // === Roleplay ===
   personality: Personality;
+
+  // === Réédition (montée de niveau) ===
+  /**
+   * Réponses brutes aux choix de progression de classe/sous-classe (ancêtre draconique, domaine,
+   * métamagie, invocations…), persistées pour permettre une réédition fiable à un niveau supérieur
+   * sans perdre les choix précédents.
+   */
+  classChoiceAnswers?: Record<string, string[]>;
+  /** Slots ASI/dons choisis (niveaux 4, 8, 12…), persistés pour la réédition. */
+  asiChoices?: AsiChoiceSlot[];
 }
 
 // =============================================================================

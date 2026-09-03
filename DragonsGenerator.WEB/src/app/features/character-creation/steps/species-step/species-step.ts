@@ -23,9 +23,14 @@ import {
   RacialSpellGrant,
 } from '@core/services/character-builder.service';
 import type { Species, Subspecies, Trait, CreationChoice } from '@core/models/Species/species';
-import type { FeatureInstance, Size } from '@core/models/Character/character';
+import type { FeatureInstance, Size, SpellInstance } from '@core/models/Character/character';
+import type { Spell } from '@core/models/Spells/spell';
 import { apiAsiToPartialScores, mergePartialScores, apiCodeToAbilityKey } from '@core/utils/ability-mapping';
 import { ABILITY_KEY_TO_LABEL, ABILITY_IMPACT_DESC, type AbilityScores } from '@core/models/Character/character';
+import {
+  speciesResistancesFromTraits,
+  speciesTraitBonusProficiencies,
+} from '@core/utils/species-proficiencies.util';
 
 interface CardOption {
   id: string;
@@ -77,6 +82,7 @@ export class SpeciesStep implements OnInit {
   readonly selectedSubspeciesId = signal<string | null>(null);
   readonly choiceAnswers = signal<Map<string, string[]>>(new Map());
   readonly languageIdToName = signal<Map<string, string>>(new Map());
+  private readonly spellById = signal<Map<string, Spell>>(new Map());
 
   // --- CARROUSEL ---
   readonly currentIndex = signal(0);
@@ -333,47 +339,78 @@ export class SpeciesStep implements OnInit {
   });
 
   readonly resistances = computed<string[]>(() => {
-    const res: string[] = [];
     const answers = this.choiceAnswers();
     const lineageId =
       answers.get('choice-lignee-draconique')?.[0] ??
       answers.get('choice-heritage-draconique')?.[0];
+    return speciesResistancesFromTraits(
+      this.combinedTraits(),
+      this.selectedSpecies(),
+      this.selectedSubspecies(),
+      lineageId,
+    );
+  });
+
+  /**
+   * Maîtrises FIXES accordées par des traits d'espèce/sous-espèce (ex. Elfe "Sens aiguisés" →
+   * Perception, Nain "Formation martiale naine" → 4 armes, Nains gardiens "Gardien" → bouclier,
+   * Gnome des roches "Bricoleur" → outils de rétameur). Ce ne sont PAS des choix : elles doivent
+   * s'appliquer automatiquement.
+   */
+  private readonly traitBonusProficiencies = computed(() =>
+    speciesTraitBonusProficiencies(this.combinedTraits()),
+  );
+
+  /**
+   * Sorts innés fixes accordés par un trait `innate_spellcasting` (ex. Tieffelin "Héritier des
+   * ténèbres" : thaumaturgie niv.1, réprimande maléfique niv.3, ténèbres niv.5). Contrairement à
+   * `racialSpellGrants` (choix parmi un pool, différé à l'étape Magie — qui est SAUTÉE pour les
+   * classes non lanceuses), ces sorts sont fixes et doivent être connus dès la création, quelle
+   * que soit la classe.
+   */
+  readonly racialInnateSpells = computed<SpellInstance[]>(() => {
+    const level = this.builder.targetLevel();
+    const catalog = this.spellById();
+    const out: SpellInstance[] = [];
 
     for (const trait of this.combinedTraits()) {
       const mech = trait.mechanics as Record<string, unknown> | undefined;
-      if (!mech) continue;
+      if (!mech || mech['type'] !== 'innate_spellcasting') continue;
+      const innate = mech['innate_spells'];
+      if (!Array.isArray(innate)) continue;
 
-      if (mech['damage_resistance']) {
-        const dr = mech['damage_resistance'];
-        if (Array.isArray(dr)) {
-          for (const item of dr) {
-            if (item === 'damage-from-lineage' || item === 'damage_from_lineage') {
-              const dmg = this.resolveLineageDamageType(lineageId);
-              if (dmg) res.push(dmg);
-            } else if (typeof item === 'string') {
-              res.push(item);
-            }
-          }
-        }
-      }
+      for (const entry of innate) {
+        if (!entry || typeof entry !== 'object') continue;
+        const e = entry as Record<string, unknown>;
+        const unlockLevel = Number(e['unlocks_at_level'] ?? 1);
+        if (unlockLevel > level) continue;
+        const spellId = e['spell_id'];
+        if (typeof spellId !== 'string' || !spellId.trim()) continue;
 
-      if (Array.isArray(mech['resistances'])) {
-        for (const item of mech['resistances'] as unknown[]) {
-          if (item === 'damage-from-lineage' || item === 'damage_from_lineage') {
-            const dmg = this.resolveLineageDamageType(lineageId);
-            if (dmg) res.push(dmg);
-          } else if (typeof item === 'string') {
-            res.push(item);
-          }
-        }
-      }
+        const raw = catalog.get(spellId);
+        const castLevel = Number(e['cast_as_spell_level'] ?? raw?.level ?? 0);
+        const recharge = typeof e['recharge'] === 'string' ? (e['recharge'] as string) : 'at_will';
+        const rechargeLabel =
+          recharge === 'at_will'
+            ? 'à volonté'
+            : recharge === 'long_rest'
+              ? '1× / repos long'
+              : recharge === 'short_rest'
+                ? '1× / repos court'
+                : recharge;
 
-      if (mech['type'] === 'damage_resistance' && mech['damage_type_from'] === 'heritage_draconique') {
-        const dmg = this.resolveLineageDamageType(lineageId);
-        if (dmg) res.push(dmg);
+        out.push({
+          refId: spellId,
+          name: raw?.name ?? spellId.replace(/^spl-/, '').replace(/-/g, ' '),
+          level: castLevel,
+          prepared: true,
+          alwaysPrepared: true,
+          effectSummary: `Inné (${rechargeLabel}) · ${(raw?.description ?? '').slice(0, 100)}`,
+        });
       }
     }
-    return [...new Set(res)];
+
+    return out;
   });
 
   readonly selectionComplete = computed(() => {
@@ -404,13 +441,18 @@ export class SpeciesStep implements OnInit {
     forkJoin({
       species: this.dataService.getSpecies(),
       languages: this.dataService.getLanguagesSummary(),
+      spells: this.dataService.getSpells(),
     }).subscribe({
-      next: ({ species, languages }) => {
+      next: ({ species, languages, spells }) => {
         this.allSpecies.set(species);
 
         const map = new Map<string, string>();
         languages.forEach((l) => map.set(l.id, l.name));
         this.languageIdToName.set(map);
+
+        const spellMap = new Map<string, Spell>();
+        spells.forEach((s) => spellMap.set(s.id, s));
+        this.spellById.set(spellMap);
 
         this.restoreFromBuilder();
         this.loading.set(false);
@@ -713,6 +755,11 @@ export class SpeciesStep implements OnInit {
       resistances: this.resistances(),
       hasDarkvision: (species.baseStats.darkvisionM ?? 0) > 0,
       darkvisionRadius: species.baseStats.darkvisionM ?? 0,
+      bonusSkills: this.traitBonusProficiencies().skills,
+      bonusWeapons: this.traitBonusProficiencies().weapons,
+      bonusArmor: this.traitBonusProficiencies().armor,
+      bonusTools: this.traitBonusProficiencies().tools,
+      innateSpells: this.racialInnateSpells(),
       choiceAnswers,
       racialSpellGrants: this.extractRacialSpellGrants(),
     };
@@ -925,20 +972,4 @@ export class SpeciesStep implements OnInit {
     return parts.join('');
   }
 
-  private resolveLineageDamageType(lineageOptionId: string | undefined): string | null {
-    if (!lineageOptionId) return null;
-    const species = this.selectedSpecies();
-    const choice = species?.creationChoices.find(
-      (c) => c.id === 'choice-lignee-draconique' || c.id === 'choice-heritage-draconique',
-    );
-    if (!choice) return null;
-    for (const raw of this.rawChoiceOptions(choice)) {
-      if (typeof raw !== 'object' || !raw) continue;
-      const opt = raw as Record<string, unknown>;
-      if (opt['id'] === lineageOptionId && typeof opt['damage_type'] === 'string') {
-        return opt['damage_type'];
-      }
-    }
-    return null;
-  }
 }

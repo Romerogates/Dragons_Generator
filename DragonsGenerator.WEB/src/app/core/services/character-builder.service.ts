@@ -29,6 +29,7 @@ import {
   toggleSkillSelection,
 } from '../utils/character-proficiencies.util';
 import { proficiencyBonusForLevel } from '../utils/character-progression.util';
+import type { RawFeatData } from '../utils/feat-benefits.util';
 import { isWizardStepValid } from '../utils/character-wizard-validation.util';
 import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { DataService } from './data.service';
@@ -157,6 +158,7 @@ export class CharacterBuilderService {
       constitutionMod: this.abilityModifiers().constitution,
       classId: c.classId,
       subclassId: c.subclassId,
+      subspeciesId: c.subspeciesId,
       classFeatures: c.classFeatures ?? [],
     });
   });
@@ -241,6 +243,11 @@ export class CharacterBuilderService {
         speciesResistances: selection.resistances,
         hasDarkvision: selection.hasDarkvision,
         darkvisionRadius: selection.darkvisionRadius,
+        speciesFixedSkills: selection.bonusSkills ?? [],
+        speciesFixedWeapons: selection.bonusWeapons ?? [],
+        speciesFixedArmor: selection.bonusArmor ?? [],
+        speciesFixedTools: selection.bonusTools ?? [],
+        speciesInnateSpells: selection.innateSpells ?? [],
         speciesChoiceAnswers: selection.choiceAnswers,
         speciesBonusSkillCount: selection.bonusSkillCount,
         speciesBonusToolCount: selection.bonusToolCount,
@@ -274,6 +281,11 @@ export class CharacterBuilderService {
         speciesResistances: [],
         hasDarkvision: false,
         darkvisionRadius: 0,
+        speciesFixedSkills: [],
+        speciesFixedWeapons: [],
+        speciesFixedArmor: [],
+        speciesFixedTools: [],
+        speciesInnateSpells: [],
         speciesChoiceAnswers: {},
         speciesBonusSkillCount: 0,
         speciesBonusToolCount: 0,
@@ -535,14 +547,24 @@ export class CharacterBuilderService {
   }
 
   /** Applique N slots ASI (niveaux 4–20) : somme des bonus + liste des dons. */
-  setAsiChoices(slots: AsiChoiceSlot[]): void {
-    const { bonuses, featIds } = aggregateAsiChoices(slots);
+  setAsiChoices(
+    slots: AsiChoiceSlot[],
+    ctx?: {
+      feats?: Map<string, RawFeatData>;
+      spellcastingAbility?: AbilityKey | null;
+      featDetailsById?: Record<string, { name: string; desc: string }>;
+    },
+  ): void {
+    const { bonuses, featIds, featDarkvisionRadius, featBonusArmor } = aggregateAsiChoices(slots, ctx);
     this.creation.update((c) => ({
       ...c,
       asiChoices: slots.map((s) => ({ ...s })),
       asiBonuses: bonuses,
       selectedFeatIds: featIds,
       selectedFeatId: featIds[0] ?? null,
+      featDarkvisionRadius,
+      featBonusArmor,
+      featDetailsById: ctx?.featDetailsById ?? c.featDetailsById,
     }));
   }
 

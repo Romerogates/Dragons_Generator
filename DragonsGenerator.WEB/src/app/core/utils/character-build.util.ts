@@ -59,10 +59,11 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
         : [];
   for (const featId of featIds) {
     const featSlot = c.asiChoices?.find((s) => s.mode === 'feat' && s.featId === featId);
+    const details = c.featDetailsById?.[featId];
     features.push({
       refId: featId,
-      name: featId.replace(/^don-/, '').replace(/-/g, ' '),
-      desc: 'Don choisi à la place d’une augmentation de caractéristique.',
+      name: details?.name ?? featId.replace(/^don-/, '').replace(/-/g, ' '),
+      desc: details?.desc ?? 'Don choisi à la place d’une augmentation de caractéristique.',
       source: 'feat',
       sourceDetail: 'ASI',
       level: featSlot?.level ?? 4,
@@ -70,7 +71,10 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
   }
 
   const allEquipmentForAttacks = [...c.selectedEquipment, ...(c.backgroundEquipment ?? [])];
-  const knownSpells = buildKnownSpellsFromCreation(c);
+  const knownSpells = [
+    ...buildKnownSpellsFromCreation(c),
+    ...(c.speciesInnateSpells ?? []),
+  ];
   const attacks = buildCharacterAttacks(
     allEquipmentForAttacks,
     modifiers,
@@ -103,7 +107,13 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
     platine: c.currency.platine + c.backgroundCurrency.platine,
   };
 
-  const allTools = [...new Set([...c.toolProficiencies, ...c.backgroundTools])];
+  const allTools = [
+    ...new Set([...c.toolProficiencies, ...c.backgroundTools, ...(c.speciesFixedTools ?? [])]),
+  ];
+  const allArmor = [
+    ...new Set([...c.armorProficiencies, ...(c.speciesFixedArmor ?? []), ...(c.featBonusArmor ?? [])]),
+  ];
+  const allWeapons = [...new Set([...c.weaponProficiencies, ...(c.speciesFixedWeapons ?? [])])];
 
   return {
     id: editing?.id ?? crypto.randomUUID(),
@@ -178,18 +188,25 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
     },
     senses: {
       passivePerception,
-      hasDarkvision: c.hasDarkvision || (c.classDarkvisionRadius ?? 0) > 0,
-      darkvisionRadius: Math.max(c.darkvisionRadius, c.classDarkvisionRadius ?? 0),
+      hasDarkvision:
+        c.hasDarkvision || (c.classDarkvisionRadius ?? 0) > 0 || (c.featDarkvisionRadius ?? 0) > 0,
+      darkvisionRadius: Math.max(
+        c.darkvisionRadius,
+        c.classDarkvisionRadius ?? 0,
+        c.featDarkvisionRadius ?? 0,
+      ),
       hasBlindsight: c.classHasBlindsight ?? false,
       blindsightRadius: c.classBlindsightRadius ?? 0,
     },
 
     proficiencies: {
-      armor: c.armorProficiencies,
-      weapons: c.weaponProficiencies,
+      armor: allArmor,
+      weapons: allWeapons,
       tools: allTools,
       savingThrows: c.savingThrows,
-      skills: [...new Set([...c.selectedSkills, ...c.backgroundSkills])],
+      skills: [
+        ...new Set([...c.selectedSkills, ...c.backgroundSkills, ...(c.speciesFixedSkills ?? [])]),
+      ],
       expertiseSkills: c.expertiseSkills ?? [],
       languages: c.languages,
       writingSystems: c.civilizationWritingSystems,
@@ -237,5 +254,9 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
       madness: '',
       corruption: { stage1: 0, stage2: 0, stage3: 0, stage4: 0 },
     },
+
+    // Persistés pour permettre une réédition fiable (montée de niveau) sans reperdre les choix.
+    classChoiceAnswers: c.classChoiceAnswers,
+    asiChoices: c.asiChoices,
   };
 }

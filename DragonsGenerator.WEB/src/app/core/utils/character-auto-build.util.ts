@@ -31,7 +31,21 @@ import {
   resolveEquipmentRefId,
 } from '@core/utils/equipment.utils';
 import { extractScalarResources, extractSpellSlotsFromResources, resolveFeatureUses } from '@core/utils/feature-uses.util';
-import { classBonusLanguageCount, extractProgressionChoices, extractToolProficiencyChoices, extractWeaponProficiencyChoices } from '@core/utils/progression-choices.util';
+import {
+  classBonusLanguageCount,
+  classBonusSenses,
+  classRootSavingThrowGrants,
+  extractProgressionChoices,
+  extractToolProficiencyChoices,
+  extractWeaponProficiencyChoices,
+  featureUnlockLevel,
+  subclassBonusProficiencies,
+  subclassBonusResistances,
+} from '@core/utils/progression-choices.util';
+import {
+  speciesResistancesFromTraits,
+  speciesTraitBonusProficiencies,
+} from '@core/utils/species-proficiencies.util';
 import { buildSkillMap, normalizeSkillId, type SkillInfo } from '@core/utils/skill.utils';
 import { pickRandom } from '@core/utils/pregen-random.util';
 import { proficiencyBonusForLevel } from '@core/services/character-builder.service';
@@ -168,7 +182,7 @@ function asiFromChoiceAnswers(species: Species, sub: Subspecies | null, answers:
   return result;
 }
 
-export function buildAutoSpeciesSelection(species: Species): SpeciesSelection {
+export function buildAutoSpeciesSelection(species: Species, targetLevel = 1, spells: Spell[] = []): SpeciesSelection {
   const playableSubs = (species.subspecies ?? []).filter((s) => s.playable);
   const sub: Subspecies | null = playableSubs.length ? pickRandom(playableSubs) : null;
   const choiceAnswers = autoSpeciesChoiceAnswers(species, sub);
@@ -205,6 +219,48 @@ export function buildAutoSpeciesSelection(species: Species): SpeciesSelection {
     }))
     .filter((g) => g.pool.length > 0);
 
+  const rawTraits = [...(species.traits ?? []), ...(sub?.traits ?? [])];
+  const traitBonus = speciesTraitBonusProficiencies(rawTraits);
+  const lineageId =
+    choiceAnswers['choice-lignee-draconique']?.[0] ?? choiceAnswers['choice-heritage-draconique']?.[0];
+  const resistances = speciesResistancesFromTraits(rawTraits, species, sub, lineageId);
+
+  const spellMap = new Map(spells.map((s) => [s.id, s]));
+  const innateSpells: SpeciesSelection['innateSpells'] = [];
+  for (const trait of rawTraits) {
+    const mech = trait.mechanics as Record<string, unknown> | undefined;
+    if (!mech || mech['type'] !== 'innate_spellcasting') continue;
+    const innate = mech['innate_spells'];
+    if (!Array.isArray(innate)) continue;
+    for (const entry of innate) {
+      if (!entry || typeof entry !== 'object') continue;
+      const e = entry as Record<string, unknown>;
+      const unlockLevel = Number(e['unlocks_at_level'] ?? 1);
+      if (unlockLevel > targetLevel) continue;
+      const spellId = e['spell_id'];
+      if (typeof spellId !== 'string' || !spellId.trim()) continue;
+      const raw = spellMap.get(spellId);
+      const castLevel = Number(e['cast_as_spell_level'] ?? raw?.level ?? 0);
+      const recharge = typeof e['recharge'] === 'string' ? (e['recharge'] as string) : 'at_will';
+      const rechargeLabel =
+        recharge === 'at_will'
+          ? 'à volonté'
+          : recharge === 'long_rest'
+            ? '1× / repos long'
+            : recharge === 'short_rest'
+              ? '1× / repos court'
+              : recharge;
+      innateSpells.push({
+        refId: spellId,
+        name: raw?.name ?? spellId.replace(/^spl-/, '').replace(/-/g, ' '),
+        level: castLevel,
+        prepared: true,
+        alwaysPrepared: true,
+        effectSummary: `Inné (${rechargeLabel}) · ${(raw?.description ?? '').slice(0, 100)}`,
+      });
+    }
+  }
+
   return {
     speciesId: species.id,
     speciesName: species.name,
@@ -218,9 +274,14 @@ export function buildAutoSpeciesSelection(species: Species): SpeciesSelection {
     bonusLanguageCount,
     bonusSkillCount,
     bonusToolCount,
-    resistances: [],
+    resistances,
     hasDarkvision: (species.baseStats.darkvisionM ?? 0) > 0,
     darkvisionRadius: species.baseStats.darkvisionM ?? 0,
+    bonusSkills: traitBonus.skills,
+    bonusWeapons: traitBonus.weapons,
+    bonusArmor: traitBonus.armor,
+    bonusTools: traitBonus.tools,
+    innateSpells,
     choiceAnswers,
     racialSpellGrants,
   };
@@ -372,6 +433,63 @@ export function buildStandardAbilityScores(primaryKeys: AbilityKey[]): Record<Ab
   return scores;
 }
 
+const SAVE_CODE_TO_LABEL: Record<string, Ability> = {
+  str: 'Force',
+  dex: 'Dextérité',
+  con: 'Constitution',
+  int: 'Intelligence',
+  wis: 'Sagesse',
+  cha: 'Charisme',
+};
+
+interface AutoSubclassOption {
+  id: string;
+  name: string;
+  desc?: string;
+  features?: { id: string; name: string; desc: string; level?: number; [k: string]: unknown }[];
+  sub_choices?: {
+    id: string;
+    type: string;
+    count?: number;
+    level_required?: number;
+    label?: string;
+    options?: string[];
+    option_labels?: Record<string, string>;
+    option_descs?: Record<string, string>;
+  }[];
+}
+
+/** Sélectionne aléatoirement une sous-classe pour un pregen, si la classe en propose et que le
+ * niveau cible l'autorise. Retourne aussi les réponses aux sous-choix (ancêtre draconique, domaine…). */
+function pickAutoSubclass(
+  cls: CharacterClass,
+  level: number,
+): { sub: AutoSubclassOption | null; classChoiceAnswers: Record<string, string[]> } {
+  const raw = cls.data.subclasses as unknown;
+  if (!raw) return { sub: null, classChoiceAnswers: {} };
+  const options = (Array.isArray(raw) ? raw : ((raw as { options?: unknown[] }).options ?? [])) as AutoSubclassOption[];
+  const levelUnlocked = Array.isArray(raw)
+    ? 1
+    : Number(
+        (raw as { level_unlocked?: number; unlocked_at_level?: number }).level_unlocked ??
+          (raw as { unlocked_at_level?: number }).unlocked_at_level ??
+          3,
+      );
+  if (!options.length || level < levelUnlocked) return { sub: null, classChoiceAnswers: {} };
+
+  const sub = pickRandom(options);
+  if (!sub) return { sub: null, classChoiceAnswers: {} };
+
+  const classChoiceAnswers: Record<string, string[]> = {};
+  for (const sc of sub.sub_choices ?? []) {
+    if ((sc.level_required ?? 1) > level) continue;
+    if (!sc.options?.length) continue;
+    classChoiceAnswers[sc.id] = pickRandomSubset(sc.options, sc.count || 1);
+  }
+
+  return { sub, classChoiceAnswers };
+}
+
 function resolveClassFeature(
   cls: CharacterClass,
   featureId: string,
@@ -448,9 +566,40 @@ export function buildAutoClassSelection(cls: CharacterClass, level = 1): {
   const progAtLevel = progression.find((p) => p.level === level);
   const data = cls.data as Record<string, unknown>;
 
+  const { sub, classChoiceAnswers: subChoiceAnswers } = pickAutoSubclass(cls, level);
+  for (const feat of sub?.features ?? []) {
+    if (featureUnlockLevel(feat as Record<string, unknown>) > level) continue;
+    features.push({
+      refId: feat.id,
+      name: feat.name,
+      desc: feat.desc,
+      source: 'class',
+      sourceDetail: `${cls.name} · ${sub!.name}`,
+      level: featureUnlockLevel(feat as Record<string, unknown>),
+      uses: resolveFeatureUses(feat, cls, level, profBonus),
+    });
+  }
+
   const activeChoices = extractProgressionChoices(cls, level).filter((c) => !c.deferred && c.options.length);
-  const classChoiceAnswers: Record<string, string[]> = {};
+  const classChoiceAnswers: Record<string, string[]> = { ...subChoiceAnswers };
   const extraFeatures: FeatureInstance[] = [];
+
+  // Sous-choix de sous-classe (ancêtre draconique, domaine, totem…) : matérialiser en features.
+  for (const [scId, picks] of Object.entries(subChoiceAnswers)) {
+    const sc = sub?.sub_choices?.find((s) => s.id === scId);
+    for (const pickId of picks) {
+      const feat = cls.data.features_details?.find((f) => f.id === pickId);
+      extraFeatures.push({
+        refId: pickId,
+        name: feat?.name ?? sc?.option_labels?.[pickId] ?? pickId,
+        desc: feat?.desc ?? sc?.option_descs?.[pickId] ?? '',
+        source: 'class',
+        sourceDetail: `${cls.name} · ${sub?.name ?? ''}`,
+        level: feat ? featureUnlockLevel(feat as Record<string, unknown>) : (sc?.level_required ?? 1),
+        uses: feat ? resolveFeatureUses(feat, cls, level, profBonus) : undefined,
+      });
+    }
+  }
 
   for (const choice of activeChoices) {
     const picks = pickRandomSubset(
@@ -486,9 +635,25 @@ export function buildAutoClassSelection(cls: CharacterClass, level = 1): {
     }
   }
 
+  const subBonus = subclassBonusProficiencies(cls, sub?.id, level);
+  const baseArmor = Array.isArray(prof.armor) ? prof.armor : [];
+  const baseWeapons = Array.isArray(prof.weapons) ? prof.weapons : [];
+  const baseTools = Array.isArray(prof.tools) ? prof.tools : [];
+  const bonusSaveCodes = [...subBonus.savingThrows, ...classRootSavingThrowGrants(cls, level)];
+  const savingThrows = [
+    ...new Set([
+      ...(prof.saving_throws ?? []),
+      ...bonusSaveCodes.map((code) => SAVE_CODE_TO_LABEL[code]).filter((a): a is Ability => !!a),
+    ]),
+  ];
+  const classResistances = subclassBonusResistances(cls, sub?.id, level);
+  const classSenses = classBonusSenses(cls, sub?.id, level, []);
+
   const selection: ClassSelection = {
     classId: cls.id,
     className: cls.name,
+    subclassId: sub?.id,
+    subclassName: sub?.name,
     hitDie: cls.data.hit_die,
     hpAtLevel1: typeof data['hp_at_level_1'] === 'number' ? data['hp_at_level_1'] : cls.data.hit_die,
     hpPerLevelAverage:
@@ -498,16 +663,21 @@ export function buildAutoClassSelection(cls: CharacterClass, level = 1): {
     hasSpellcasting: spellInfo !== null,
     spellcastingKind: spellInfo?.kind ?? null,
     spellcastingAbility: spellInfo?.ability ?? null,
-    savingThrows: prof.saving_throws ?? [],
-    armorProficiencies: prof.armor ?? [],
-    weaponProficiencies: prof.weapons ?? [],
-    toolProficiencies: Array.isArray(prof.tools) ? prof.tools : [],
+    savingThrows,
+    armorProficiencies: [...new Set([...baseArmor, ...subBonus.armor])],
+    weaponProficiencies: [...new Set([...baseWeapons, ...subBonus.weapons])],
+    toolProficiencies: [...new Set([...baseTools, ...subBonus.tools])],
     skillOptions: Array.isArray(prof.skills?.options) ? prof.skills.options : [],
     skillChooseCount: prof.skills?.count ?? 0,
     classFeatures: features,
     startingEquipmentSlots: cls.data.starting_equipment ?? [],
     classProgressionResources: extractScalarResources(progAtLevel?.resources),
-    classBonusLanguageCount: classBonusLanguageCount(cls, level),
+    classBonusLanguageCount: classBonusLanguageCount(cls, level, undefined, sub?.id) + subBonus.bonusLanguages,
+    classRequiredExoticLanguageCount: subBonus.requiredExoticLanguages,
+    classResistances,
+    classDarkvisionRadius: classSenses.darkvisionRadius,
+    classHasBlindsight: classSenses.hasBlindsight,
+    classBlindsightRadius: classSenses.blindsightRadius,
     classSpellSlots: extractSpellSlotsFromResources(progAtLevel?.resources),
   };
 

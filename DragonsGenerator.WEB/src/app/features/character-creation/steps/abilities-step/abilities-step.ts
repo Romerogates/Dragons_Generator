@@ -21,6 +21,12 @@ import {
   type AsiChoiceSlot,
 } from '@core/models/Character/character';
 import { asiLevelsForClass, countAsiSlots } from '@core/utils/progression-choices.util';
+import {
+  featAsiAbilityOptions,
+  featAsiNeedsAbilityChoice,
+  type RawFeatData,
+} from '@core/utils/feat-benefits.util';
+import { apiCodeToAbilityKey } from '@core/utils/ability-mapping';
 
 interface AbilityRow {
   key: AbilityKey;
@@ -36,6 +42,14 @@ interface AsiSlotUi {
   primary: AbilityKey | null;
   secondary: AbilityKey | null;
   featId: string | null;
+  featAbilityChoice: AbilityKey | null;
+}
+
+interface FeatUi {
+  id: string;
+  name: string;
+  description: string;
+  raw: RawFeatData;
 }
 
 @Component({
@@ -52,8 +66,39 @@ export class AbilitiesStep implements OnInit {
 
   readonly activeSlotIndex = signal(0);
   readonly asiSlots = signal<AsiSlotUi[]>([]);
-  readonly feats = signal<{ id: string; name: string; description: string }[]>([]);
+  readonly feats = signal<FeatUi[]>([]);
   readonly classJson = signal<any>(null);
+
+  private readonly featsById = computed(() => new Map(this.feats().map((f) => [f.id, f.raw])));
+
+  readonly classSpellcastingAbility = computed<AbilityKey | null>(() => {
+    const cls = this.classJson();
+    const code = cls?.data?.spellcasting?.ability;
+    return typeof code === 'string' ? apiCodeToAbilityKey(code) : null;
+  });
+
+  getFeat(id: string | null): FeatUi | null {
+    if (!id) return null;
+    return this.feats().find((f) => f.id === id) ?? null;
+  }
+
+  activeSlotNeedsAbilityChoice(): boolean {
+    const feat = this.getFeat(this.activeSlot()?.featId ?? null);
+    return featAsiNeedsAbilityChoice(feat?.raw);
+  }
+
+  activeSlotAbilityOptions(): AbilityKey[] {
+    const feat = this.getFeat(this.activeSlot()?.featId ?? null);
+    return featAsiAbilityOptions(feat?.raw);
+  }
+
+  selectFeatAbilityChoice(key: AbilityKey): void {
+    this.patchActiveSlot({ featAbilityChoice: key });
+  }
+
+  abilityLabel(key: AbilityKey): string {
+    return ABILITY_KEY_TO_LABEL[key];
+  }
 
   getIconForAbility(key: AbilityKey): string {
     const icons: Record<AbilityKey, string> = {
@@ -99,7 +144,12 @@ export class AbilitiesStep implements OnInit {
     const slots = this.asiSlots();
     if (slots.length < this.asiSlotCount()) return false;
     return slots.every((s) => {
-      if (s.mode === 'feat') return !!s.featId;
+      if (s.mode === 'feat') {
+        if (!s.featId) return false;
+        const feat = this.getFeat(s.featId);
+        if (featAsiNeedsAbilityChoice(feat?.raw)) return !!s.featAbilityChoice;
+        return true;
+      }
       if (s.mode === 'plus2') return !!s.primary;
       return !!s.primary && !!s.secondary && s.primary !== s.secondary;
     });
@@ -132,6 +182,7 @@ export class AbilitiesStep implements OnInit {
             primary: null,
             secondary: null,
             featId: null,
+            featAbilityChoice: null,
           }
         );
       });
@@ -155,6 +206,7 @@ export class AbilitiesStep implements OnInit {
             id: f.id,
             name: f.name,
             description: f.description ?? f.data?.description ?? '',
+            raw: (f.data ?? {}) as RawFeatData,
           })),
         );
       },
@@ -169,6 +221,7 @@ export class AbilitiesStep implements OnInit {
           primary: s.primary ?? null,
           secondary: s.secondary ?? null,
           featId: s.featId ?? null,
+          featAbilityChoice: s.featAbilityChoice ?? null,
         })),
       );
     } else if (c.selectedFeatId || Object.keys(c.asiBonuses ?? {}).length) {
@@ -179,6 +232,7 @@ export class AbilitiesStep implements OnInit {
         primary: null,
         secondary: null,
         featId: null,
+        featAbilityChoice: null,
       };
       if (c.selectedFeatId) {
         slot.mode = 'feat';
@@ -257,6 +311,7 @@ export class AbilitiesStep implements OnInit {
         primary: null,
         secondary: null,
         featId: null,
+        featAbilityChoice: null,
       })),
     );
   }
@@ -266,7 +321,7 @@ export class AbilitiesStep implements OnInit {
   }
 
   setAsiMode(mode: AsiMode): void {
-    this.patchActiveSlot({ mode, primary: null, secondary: null, featId: null });
+    this.patchActiveSlot({ mode, primary: null, secondary: null, featId: null, featAbilityChoice: null });
   }
 
   selectAsiPrimary(key: AbilityKey): void {
@@ -286,7 +341,7 @@ export class AbilitiesStep implements OnInit {
   }
 
   selectFeat(id: string): void {
-    this.patchActiveSlot({ featId: id });
+    this.patchActiveSlot({ featId: id, featAbilityChoice: null });
   }
 
   private patchActiveSlot(patch: Partial<AsiSlotUi>): void {
@@ -307,8 +362,15 @@ export class AbilitiesStep implements OnInit {
       primary: s.primary,
       secondary: s.secondary,
       featId: s.featId,
+      featAbilityChoice: s.featAbilityChoice,
     }));
-    this.builder.setAsiChoices(slots);
+    const featDetailsById: Record<string, { name: string; desc: string }> = {};
+    for (const f of this.feats()) featDetailsById[f.id] = { name: f.name, desc: f.description };
+    this.builder.setAsiChoices(slots, {
+      feats: this.featsById(),
+      spellcastingAbility: this.classSpellcastingAbility(),
+      featDetailsById,
+    });
   }
 
   confirmSelection(): void {

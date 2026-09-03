@@ -91,4 +91,71 @@ describe('character-abilities.util', () => {
     expect(Object.keys(bonuses).length).toBe(0);
     expect(featIds.length).toBe(0);
   });
+
+  it('aggregateAsiChoices applies a feat ASI with a fixed ability code', () => {
+    const feats = new Map([
+      ['don-ambidextre', { ability_score_increase: { ability: 'DEX', value: 1 } }],
+    ]);
+    const { bonuses, featIds } = aggregateAsiChoices(
+      [{ level: 4, mode: 'feat', featId: 'don-ambidextre' }],
+      { feats },
+    );
+    expect(bonuses.dexterite).toBe(1);
+    expect(featIds).toEqual(['don-ambidextre']);
+  });
+
+  it('aggregateAsiChoices resolves "spellcasting" ASI via ctx.spellcastingAbility', () => {
+    const feats = new Map([
+      ['don-abjurateur', { ability_score_increase: { ability: 'spellcasting', value: 1 } }],
+    ]);
+    const { bonuses } = aggregateAsiChoices([{ level: 4, mode: 'feat', featId: 'don-abjurateur' }], {
+      feats,
+      spellcastingAbility: 'intelligence',
+    });
+    expect(bonuses.intelligence).toBe(1);
+  });
+
+  it('aggregateAsiChoices applies a flexible ASI using the player featAbilityChoice', () => {
+    const feats = new Map([['don-parangon', { ability_score_increase: { ability: 'any', value: 1 } }]]);
+    const { bonuses } = aggregateAsiChoices(
+      [{ level: 4, mode: 'feat', featId: 'don-parangon', featAbilityChoice: 'charisme' }],
+      { feats },
+    );
+    expect(bonuses.charisme).toBe(1);
+  });
+
+  it('aggregateAsiChoices surfaces feat darkvision and armor benefits', () => {
+    const feats = new Map([
+      [
+        'don-pilier-de-taverne',
+        {
+          benefits: [
+            { type: 'darkvision', range_m: 9 },
+            { type: 'proficiency', proficiency_type: 'armor', value: 'bouclier' },
+          ],
+        },
+      ],
+    ]);
+    const { featDarkvisionRadius, featBonusArmor } = aggregateAsiChoices(
+      [{ level: 4, mode: 'feat', featId: 'don-pilier-de-taverne' }],
+      { feats },
+    );
+    expect(featDarkvisionRadius).toBe(9);
+    expect(featBonusArmor).toEqual(['ar-bouclier']);
+  });
+
+  it('computeHitPointsMax applies the Nain bâtisseur HP-per-level bonus', () => {
+    const hp = computeHitPointsMax({
+      targetLevel: 3,
+      hpAtLevel1: 10,
+      hpPerLevelAverage: 6,
+      hitDie: 10,
+      constitutionMod: 0,
+      classId: 'cls-guerrier',
+      subclassId: null,
+      classFeatures: [],
+      subspeciesId: 'sp-nain-batisseur',
+    });
+    expect(hp).toBe(10 + 2 * 6 + 3);
+  });
 });

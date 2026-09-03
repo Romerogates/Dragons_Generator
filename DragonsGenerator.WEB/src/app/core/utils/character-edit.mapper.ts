@@ -4,6 +4,7 @@ import {
   type ExtendedCharacterCreation,
 } from '@core/models/Character/character-builder.types';
 import type { CharacterBuildEditingRef } from './character-build.util';
+import { aggregateAsiChoices } from './character-abilities.util';
 
 export interface CharacterEditLoadResult {
   creation: ExtendedCharacterCreation;
@@ -74,6 +75,16 @@ export function mapCharacterToEditState(saved: Character): CharacterEditLoadResu
     (f) => f.source === 'class' || f.source === 'subclass',
   );
   creation.expertiseSkills = saved.proficiencies.expertiseSkills ?? [];
+  // Restaure les choix de progression (ancêtre draconique, domaine, métamagie…) et les dons/ASI
+  // pour que la réédition à un niveau supérieur ne perde pas les choix déjà faits.
+  creation.classChoiceAnswers = saved.classChoiceAnswers ?? {};
+  creation.asiChoices = saved.asiChoices ?? [];
+  if (creation.asiChoices.length) {
+    const { bonuses, featIds } = aggregateAsiChoices(creation.asiChoices);
+    creation.asiBonuses = bonuses;
+    creation.selectedFeatIds = featIds;
+    creation.selectedFeatId = featIds[0] ?? null;
+  }
 
   if (sc?.kind === 'sorcerer') {
     creation.metamagicOptions = sc.metamagic ?? [];

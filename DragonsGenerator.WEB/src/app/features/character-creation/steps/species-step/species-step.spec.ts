@@ -106,6 +106,7 @@ describe('SpeciesStep', () => {
           useValue: {
             getSpecies: () => of([MOCK_HUMAIN, MOCK_DRAKEIDE]),
             getLanguagesSummary: () => of(MOCK_LANGUAGES),
+            getSpells: () => of([]),
           },
         },
         {
@@ -116,6 +117,7 @@ describe('SpeciesStep', () => {
             clearSpecies: clearSpeciesSpy,
             nextStep: nextStepSpy,
             previousStep: jasmine.createSpy('previousStep'),
+            targetLevel: () => 1,
           },
         },
       ],
@@ -204,6 +206,7 @@ describe('SpeciesStep', () => {
           useValue: {
             getSpecies: () => of([MOCK_HUMAIN, MOCK_DRAKEIDE]),
             getLanguagesSummary: () => of(MOCK_LANGUAGES),
+            getSpells: () => of([]),
           },
         },
         {
@@ -253,6 +256,7 @@ describe('SpeciesStep', () => {
           useValue: {
             getSpecies: () => throwError(() => new Error('network')),
             getLanguagesSummary: () => of([]),
+            getSpells: () => of([]),
           },
         },
         {
@@ -273,3 +277,4 @@ describe('SpeciesStep', () => {
     expect(errFixture.componentInstance.error()).toBe('Impossible de charger les données.');
   });
 });
+

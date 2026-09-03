@@ -33,6 +33,7 @@ import {
   type EquipmentCatalogItem,
 } from '@core/utils/character-auto-build.util';
 import { pickRandom, randomHeroName } from '@core/utils/pregen-random.util';
+import { subclassBonusProficiencies } from '@core/utils/progression-choices.util';
 import { validateCharacterExport } from '@core/utils/character-export-validation.util';
 import { normalizeSkillId, type SkillInfo } from '@core/utils/skill.utils';
 import type { GeneratedPregenCharacter } from './campaign-pregen-generator.service';
@@ -212,7 +213,7 @@ export class CharacterAutoGeneratorService {
       throw new Error('Catalogue incomplet');
     }
 
-    const speciesSel = buildAutoSpeciesSelection(species);
+    const speciesSel = buildAutoSpeciesSelection(species, 1, catalogs.spells);
     this.builder.setSpecies(speciesSel);
     this.builder.setCivilization(buildAutoCivilizationSelection(civ));
 
@@ -254,6 +255,11 @@ export class CharacterAutoGeneratorService {
       takenSkills,
     );
 
+    // Compétences/expertise fixes accordées automatiquement par la sous-classe (ex. Prêtre, Roublard
+    // Espion) : non un choix, doivent apparaître sur la fiche sans compter dans les quotas ci-dessus.
+    const subBonus = subclassBonusProficiencies(cls, selection.subclassId, 1);
+    if (subBonus.expertise.length) this.builder.setExpertiseSkills(subBonus.expertise);
+
     const weaponCatalog = catalogs.equipments
       .filter((e) => e.type === 'WEAPON')
       .map((e) => ({ id: e.id, costPo: Number(e.cost?.v ?? 0) || 0 }));
@@ -277,7 +283,7 @@ export class CharacterAutoGeneratorService {
     });
     const bgToolSlots = buildBackgroundToolSlots(bgSel.tools, catalogs.equipments);
     this.builder.setProficiencies(
-      [...classSkills, ...speciesSkills],
+      [...new Set([...classSkills, ...speciesSkills, ...subBonus.skills])],
       [...bgSel.skills, ...bgSkillsExtra],
       resolvedBgTools,
       bgToolSlots,

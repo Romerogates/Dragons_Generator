@@ -817,7 +817,7 @@ function toStringArray(raw: unknown): string[] {
  * Sans ce fallback, `feat.level` est `undefined` sur les données brutes et tout bonus se
  * retrouvait appliqué dès le niveau 1 au lieu de son vrai niveau de déblocage.
  */
-function featureUnlockLevel(feat: Record<string, unknown> | undefined | null): number {
+export function featureUnlockLevel(feat: Record<string, unknown> | undefined | null): number {
   const raw = (feat?.['level'] ?? feat?.['unlocks_at_level']) as unknown;
   const n = Number(raw);
   return Number.isFinite(n) && n > 0 ? n : 1;

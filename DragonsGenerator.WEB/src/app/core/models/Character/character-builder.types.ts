@@ -8,6 +8,7 @@ import type {
   FeatureInstance,
   Size,
   SpellcastingKind,
+  SpellInstance,
 } from './character';
 import { DEFAULT_ABILITY_SCORE, STARTING_POINTS } from './character';
 import type { BackgroundProficiencies } from '../Backgrounds/background';
@@ -40,6 +41,13 @@ export interface SpeciesSelection {
   resistances: string[];
   hasDarkvision: boolean;
   darkvisionRadius: number;
+  /** Maîtrises fixes accordées par des traits d'espèce/sous-espèce (ex. Elfe "Sens aiguisés" → Perception). */
+  bonusSkills: string[];
+  bonusWeapons: string[];
+  bonusArmor: string[];
+  bonusTools: string[];
+  /** Sorts innés fixes (ex. Tieffelin "Héritier des ténèbres"), déjà résolus (nom/effet). */
+  innateSpells: SpellInstance[];
   /** Creation-choice answers (lineage, tools, etc.) for restore when revisiting the step. */
   choiceAnswers: Record<string, string[]>;
   /** Sorts raciaux différés à l'étape Magie. */
@@ -140,6 +148,18 @@ export type ExtendedCharacterCreation = CharacterCreation & {
     alt: Record<string, number>;
     category: Record<string, string[]>;
   } | null;
+  /** Maîtrises fixes accordées par des traits d'espèce/sous-espèce (fusionnées à la fiche). */
+  speciesFixedSkills?: string[];
+  speciesFixedWeapons?: string[];
+  speciesFixedArmor?: string[];
+  speciesFixedTools?: string[];
+  /** Sorts innés fixes accordés par l'espèce (ex. Tieffelin), fusionnés dans `knownSpells`. */
+  speciesInnateSpells?: SpellInstance[];
+  /** Vision dans le noir et maîtrises fixes accordées par un don pris à la place d'un ASI. */
+  featDarkvisionRadius?: number;
+  featBonusArmor?: string[];
+  /** Nom/description dénormalisés des dons choisis (pour la fiche, hors mécaniques agrégées). */
+  featDetailsById?: Record<string, { name: string; desc: string }>;
   /** Résistances passives accordées par la sous-classe choisie (fusionnées à la fiche). */
   classResistances?: string[];
   /** Vision dans le noir/aveugle accordée par la classe/sous-classe (fusionnées à la fiche). */
@@ -214,6 +234,14 @@ export const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   classDarkvisionRadius: 0,
   classHasBlindsight: false,
   classBlindsightRadius: 0,
+  speciesFixedSkills: [],
+  speciesFixedWeapons: [],
+  speciesFixedArmor: [],
+  speciesFixedTools: [],
+  speciesInnateSpells: [],
+  featDarkvisionRadius: 0,
+  featBonusArmor: [],
+  featDetailsById: {},
   classChoiceAnswers: {},
   asiBonuses: {},
   selectedFeatId: null,
