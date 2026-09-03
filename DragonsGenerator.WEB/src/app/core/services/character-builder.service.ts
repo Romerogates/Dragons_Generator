@@ -30,7 +30,7 @@ import {
 } from '../utils/character-proficiencies.util';
 import { proficiencyBonusForLevel } from '../utils/character-progression.util';
 import { isWizardStepValid } from '../utils/character-wizard-validation.util';
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { DataService } from './data.service';
 import { CharacterHandoffService } from './character-handoff.service';
 import {
@@ -85,7 +85,14 @@ export class CharacterBuilderService {
   private readonly editingRef = signal<CharacterBuildEditingRef | null>(null);
 
   constructor() {
-    this.purgeLegacyDraftStorage();
+    this.purgeLegacyDraftKeys();
+    this.restoreDraftFromStorage();
+    effect(() => {
+      const creation = this.creation();
+      const step = this.currentStep();
+      if (this.editingRef()) return;
+      this.persistDraft(creation, step);
+    });
   }
 
   readonly steps = computed(() => {
@@ -656,8 +663,15 @@ export class CharacterBuilderService {
     this.creation.update((c) => ({ ...c, selectedSkills: [] }));
   }
 
-  setEquipment(items: EquipmentInstance[]): void {
-    this.creation.update((c) => ({ ...c, selectedEquipment: items }));
+  setEquipment(
+    items: EquipmentInstance[],
+    wizardPicks?: { alt: Record<string, number>; category: Record<string, string[]> } | null,
+  ): void {
+    this.creation.update((c) => ({
+      ...c,
+      selectedEquipment: items,
+      equipmentWizardPicks: wizardPicks ?? c.equipmentWizardPicks ?? null,
+    }));
   }
 
   addEquipmentItem(item: EquipmentInstance): void {
@@ -792,10 +806,51 @@ export class CharacterBuilderService {
     return formatModifier(getAbilityModifier(score));
   }
 
-  private purgeLegacyDraftStorage(): void {
-    this.clearStorage();
+  private purgeLegacyDraftKeys(): void {
     localStorage.removeItem('dragon_character_builder_v5');
     localStorage.removeItem('dragon_character_builder_v4');
+  }
+
+  private restoreDraftFromStorage(): void {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as {
+        creation?: ExtendedCharacterCreation;
+        currentStep?: number;
+      };
+      if (!parsed?.creation?.speciesId) {
+        this.clearStorage();
+        return;
+      }
+      this.creation.set({
+        ...structuredClone(INITIAL_CREATION_STATE),
+        ...parsed.creation,
+      });
+      const step = Number(parsed.currentStep) || 1;
+      this.currentStep.set(Math.max(1, Math.min(step, 20)));
+    } catch {
+      this.clearStorage();
+    }
+  }
+
+  private persistDraft(creation: ExtendedCharacterCreation, step: number): void {
+    try {
+      if (!creation.speciesId) {
+        this.clearStorage();
+        return;
+      }
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          creation,
+          currentStep: step,
+          savedAt: Date.now(),
+        }),
+      );
+    } catch {
+      /* quota / private mode */
+    }
   }
 
   private clearStorage(): void {

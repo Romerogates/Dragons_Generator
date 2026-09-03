@@ -34,7 +34,27 @@ describe('character-wizard-validation.util', () => {
     expect(
       isWizardStepValid(1, { ...base, speciesId: 'sp-humain' }, { needsMagicStep: false }),
     ).toBeTrue();
+    expect(isWizardStepValid(4, { ...base, classId: 'cls-guerrier' }, { needsMagicStep: false })).toBeFalse();
+    expect(
+      isWizardStepValid(
+        4,
+        { ...base, classId: 'cls-guerrier', hitDie: 10 },
+        { needsMagicStep: false },
+      ),
+    ).toBeTrue();
     expect(isWizardStepValid(6, base, { needsMagicStep: false })).toBeFalse();
+    expect(
+      isWizardStepValid(
+        6,
+        {
+          ...base,
+          classId: 'cls-guerrier',
+          skillChooseCount: 2,
+          selectedSkills: ['skill-athletisme', 'skill-intimidation'],
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeTrue();
     expect(
       isWizardStepValid(8, { ...base, languages: ['Commun'] }, { needsMagicStep: false }),
     ).toBeTrue();

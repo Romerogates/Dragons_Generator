@@ -36,8 +36,30 @@ function languagesStepComplete(c: CharacterCreation): boolean {
     ...(c.civilizationLanguages ?? []),
     ...(c.backgroundLanguages ?? []),
   ]);
+  // Langues de classe verrouillées côté UI (Druide / Roublard)
+  if (c.classId === 'cls-druide') locked.add('Langue des druides');
+  if (c.classId === 'cls-roublard') locked.add('Argot des voleurs');
   const bonusPicked = c.languages.filter((l) => !locked.has(l)).length;
   return bonusPicked >= bonusNeeded;
+}
+
+function classStepComplete(c: CharacterCreation): boolean {
+  // setClass() pose hitDie > 0 ; classId seul peut rester d'un état partiel
+  return c.classId !== null && (c.hitDie ?? 0) > 0;
+}
+
+function skillsStepComplete(c: CharacterCreation): boolean {
+  if (!c.classId) return false;
+  const needed =
+    (c.skillChooseCount ?? 0) + (c.speciesBonusSkillCount ?? 0);
+  if ((c.selectedSkills?.length ?? 0) < needed) return false;
+  // Historique preset : au moins les compétences BG si choose attendu — on exige
+  // que setProficiencies ait été appelé (selectedSkills peuplé OU skillChooseCount 0)
+  if (needed === 0 && (c.selectedSkills?.length ?? 0) === 0 && (c.skillChooseCount ?? 0) === 0) {
+    // Classes sans skill choose (rare) : OK si la classe est posée
+    return true;
+  }
+  return true;
 }
 
 export function isWizardStepValid(
@@ -53,11 +75,11 @@ export function isWizardStepValid(
     case 3:
       return c.backgroundId !== null;
     case 4:
-      return c.classId !== null;
+      return classStepComplete(c);
     case 5:
       return c.pointsRemaining === 0 && asiChoicesComplete(c);
     case 6:
-      return c.classId !== null;
+      return skillsStepComplete(c);
     case 7:
       return c.selectedEquipment.length > 0;
     case 8:

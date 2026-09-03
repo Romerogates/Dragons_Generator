@@ -161,6 +161,7 @@ export class EquipmentStep implements OnInit {
         const normalized = normalizeEquipments(items) as unknown as EquipmentRaw[];
         this.catalog.set(normalized);
         registerGameLabels(normalized.map((e) => [e.id, e.name]));
+        this.restorePicksFromBuilder();
         this.loading.set(false);
       },
       error: () => {
@@ -168,6 +169,26 @@ export class EquipmentStep implements OnInit {
         this.loading.set(false);
       },
     });
+  }
+
+  private restorePicksFromBuilder(): void {
+    const picks = (this.builder.creation() as { equipmentWizardPicks?: {
+      alt?: Record<string, number>;
+      category?: Record<string, string[]>;
+    } | null }).equipmentWizardPicks;
+    if (!picks) return;
+
+    const alt = new Map<number, number>();
+    for (const [k, v] of Object.entries(picks.alt ?? {})) {
+      const slot = Number(k);
+      if (!Number.isNaN(slot)) alt.set(slot, v);
+    }
+    const category = new Map<string, string[]>();
+    for (const [k, v] of Object.entries(picks.category ?? {})) {
+      if (Array.isArray(v) && v.length) category.set(k, v);
+    }
+    if (alt.size) this.pickedAlt.set(alt);
+    if (category.size) this.pickedCategory.set(category);
   }
 
   nextSlot(): void {
@@ -292,7 +313,10 @@ export class EquipmentStep implements OnInit {
       }
     });
 
-    this.builder.setEquipment(result);
+    this.builder.setEquipment(result, {
+      alt: Object.fromEntries([...this.pickedAlt()].map(([k, v]) => [String(k), v])),
+      category: Object.fromEntries(this.pickedCategory()),
+    });
     this.builder.nextStep();
   }
 

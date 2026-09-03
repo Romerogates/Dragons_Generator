@@ -338,6 +338,7 @@ export class MagicStep implements OnInit {
   readonly bonusSpellsTitle = computed(() => {
     if (this.isPaladin()) return 'Sorts de serment (toujours préparés)';
     if (this.isCleric()) return 'Sorts de domaine (toujours préparés)';
+    if (this.spellcastingKind() === 'druid') return 'Sorts de terrain (toujours préparés)';
     return 'Sorts bonus (toujours préparés)';
   });
 
@@ -632,28 +633,51 @@ export class MagicStep implements OnInit {
 
   private extractDomainSpells(cls: any): void {
     const kind = this.spellcastingKind();
-    if (!cls || (kind !== 'cleric' && kind !== 'paladin')) {
-      this.domainSpellIds.set([]);
-      this.subclassBonusSpells = [];
-      return;
-    }
     const subclassId = this.builder.creation().subclassId;
     const options = cls?.data?.subclasses?.options ?? [];
     const sub = options.find((o: any) => o.id === subclassId);
-    if (!sub) {
+
+    if (!cls || !sub) {
       this.domainSpellIds.set([]);
       this.subclassBonusSpells = [];
       return;
     }
-    const granted = (sub.bonus_spells_granted ?? []) as {
-      level_unlocked?: number;
-      spells?: string[];
-    }[];
-    this.subclassBonusSpells = granted;
-    const ids = granted
-      .filter((g) => (g.level_unlocked ?? 99) <= this.builder.targetLevel())
-      .flatMap((g) => g.spells ?? []);
-    this.domainSpellIds.set([...new Set(ids)]);
+
+    if (kind === 'cleric' || kind === 'paladin') {
+      const granted = (sub.bonus_spells_granted ?? []) as {
+        level_unlocked?: number;
+        spells?: string[];
+      }[];
+      this.subclassBonusSpells = granted;
+      const ids = granted
+        .filter((g) => (g.level_unlocked ?? 99) <= this.builder.targetLevel())
+        .flatMap((g) => g.spells ?? []);
+      this.domainSpellIds.set([...new Set(ids)]);
+      return;
+    }
+
+    if (kind === 'druid' && sub.bonus_spells_by_terrain) {
+      const answers = this.builder.creation().classChoiceAnswers ?? {};
+      const terrain =
+        answers['choice-terrain-subcls-cercle-de-la-terre']?.[0] ??
+        Object.entries(answers).find(([k]) => /terrain/i.test(k))?.[1]?.[0] ??
+        null;
+      const terrainBlock = terrain
+        ? (sub.bonus_spells_by_terrain as Record<string, { grants?: { level_unlocked?: number; spells?: string[] }[] }>)[
+            terrain
+          ]
+        : null;
+      const granted = terrainBlock?.grants ?? [];
+      this.subclassBonusSpells = granted;
+      const ids = granted
+        .filter((g) => (g.level_unlocked ?? 99) <= this.builder.targetLevel())
+        .flatMap((g) => g.spells ?? []);
+      this.domainSpellIds.set([...new Set(ids)]);
+      return;
+    }
+
+    this.domainSpellIds.set([]);
+    this.subclassBonusSpells = [];
   }
 
   /** Recadre les sélections si le quota ou le niveau max diminue. */

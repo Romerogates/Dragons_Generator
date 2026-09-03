@@ -35,6 +35,7 @@ import { annotateAuraDesc } from '@core/utils/aura-range.util';
 import {
   extractProgressionChoices,
   classBonusLanguageCount,
+  subclassFixedToolProficiencies,
   type ProgressionChoiceDef,
 } from '@core/utils/progression-choices.util';
 import type {
@@ -1116,7 +1117,10 @@ export class ClassStep implements OnInit {
         pactSlots.length > 0
           ? pactSlots
           : extractSpellSlotsFromResources(progAtLevel?.resources);
-      const langBonus = classBonusLanguageCount(cls, targetLevel);
+      const langBonus = classBonusLanguageCount(cls, targetLevel, undefined, sub?.id);
+      const subclassTools = subclassFixedToolProficiencies(cls, targetLevel, sub?.id);
+      const baseTools = Array.isArray(prof.tools) ? prof.tools : [];
+      const toolProficiencies = [...new Set([...baseTools, ...subclassTools])];
 
       const data = cls.data as Record<string, unknown>;
       const selection: ClassSelection = {
@@ -1137,7 +1141,7 @@ export class ClassStep implements OnInit {
         savingThrows: (prof.saving_throws ?? []) as Ability[],
         armorProficiencies: prof.armor ?? [],
         weaponProficiencies: prof.weapons ?? [],
-        toolProficiencies: Array.isArray(prof.tools) ? prof.tools : [],
+        toolProficiencies,
         skillOptions: Array.isArray(prof.skills?.options) ? prof.skills.options : [],
         skillChooseCount: prof.skills?.count ?? 0,
         classFeatures: features,

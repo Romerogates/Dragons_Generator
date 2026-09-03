@@ -126,6 +126,11 @@ export type ExtendedCharacterCreation = CharacterCreation & {
   speciesBonusLangApplied?: number;
   /** Compteur interne wizard : langues bonus déjà comptées pour l'historique. */
   backgroundBonusLangApplied?: number;
+  /** Picks UI de l'étape Équipement (restore au retour arrière). */
+  equipmentWizardPicks?: {
+    alt: Record<string, number>;
+    category: Record<string, string[]>;
+  } | null;
 };
 
 export const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
@@ -216,6 +221,7 @@ export const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   selectedSkills: [],
 
   selectedEquipment: [],
+  equipmentWizardPicks: null,
   currency: { cuivre: 0, argent: 0, or: 0, platine: 0 },
 
   languages: [],

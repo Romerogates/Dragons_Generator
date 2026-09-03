@@ -614,7 +614,35 @@ export class SkillsStep implements OnInit {
   readonly classToolChoices = computed(() => {
     const cls = this.classJson();
     if (!cls) return [];
-    return extractToolProficiencyChoices(cls, this.builder.targetLevel());
+    return extractToolProficiencyChoices(
+      cls,
+      this.builder.targetLevel(),
+      undefined,
+      this.builder.creation().subclassId,
+    );
+  });
+
+  readonly classToolOptions = computed(() => {
+    const choice = this.classToolChoices()[0];
+    const poolIds = ((choice?.meta?.['poolIds'] as unknown[]) ?? []).map(String);
+    const wantsGaming = poolIds.some(
+      (id) => /jeu|gaming|game/i.test(id) || id.includes('materiel-de-jeu'),
+    );
+    return this.toolCatalog().filter((t) => {
+      if (wantsGaming) {
+        return (
+          t.subtype === 'gaming_set' ||
+          /jeu|des|cartes|dice|cards/i.test(t.id) ||
+          /jeu|dés|cartes/i.test(t.name)
+        );
+      }
+      return true;
+    });
+  });
+
+  readonly displayedClassTools = computed(() => {
+    const filtered = this.classToolOptions();
+    return filtered.length ? filtered : this.toolCatalog();
   });
 
   readonly classWeaponsNeeded = computed(() =>

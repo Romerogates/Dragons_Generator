@@ -589,29 +589,167 @@ export function extractToolProficiencyChoices(
   cls: CharacterClass,
   level: number,
   maxLevel = PROGRESSION_MAX_LEVEL,
+  subclassId?: string | null,
 ): ProgressionChoiceDef[] {
-  return extractProgressionChoices(cls, level, maxLevel).filter(
+  const fromRoot = extractProgressionChoices(cls, level, maxLevel).filter(
     (c) => c.deferred && c.type === 'tool_proficiency',
   );
+  const fromSubclass = extractSubclassToolProficiencyChoices(cls, level, maxLevel, subclassId);
+  const seen = new Set(fromRoot.map((c) => c.id));
+  return [...fromRoot, ...fromSubclass.filter((c) => !seen.has(c.id))];
 }
 
-/** Langues supplémentaires de classe (ex. Lettré ×3) → étape Langues. */
+/** Outils de sous-classe (ex. Espion matériel de jeu) différés vers Savoirs. */
+function extractSubclassToolProficiencyChoices(
+  cls: CharacterClass,
+  level: number,
+  maxLevel = PROGRESSION_MAX_LEVEL,
+  subclassId?: string | null,
+): ProgressionChoiceDef[] {
+  if (!subclassId) return [];
+  const data = progressionData(cls);
+  const subs = data.subclasses as
+    | {
+        options?: {
+          id?: string;
+          choice_pools?: ClassChoicePool[];
+          features?: { id?: string; level?: number; mechanics?: Record<string, unknown> }[];
+          features_details?: { id?: string; level?: number; mechanics?: Record<string, unknown> }[];
+        }[];
+      }
+    | undefined;
+  const options = Array.isArray(subs) ? subs : (subs?.options ?? []);
+  const sub = options.find((o) => o?.id === subclassId);
+  if (!sub) return [];
+
+  const effective = Math.min(Math.max(1, level), maxLevel);
+  const out: ProgressionChoiceDef[] = [];
+
+  for (const pool of sub.choice_pools ?? []) {
+    if (String(pool.type ?? '') !== 'tool_proficiency') continue;
+    if (!poolActiveAtLevel(pool, effective)) continue;
+    out.push({
+      id: pool.id ?? `choice-tool-${subclassId}`,
+      type: 'tool_proficiency',
+      label: pool.name ?? "Maîtrises d'outils",
+      count: poolQuantityAtLevel(pool, effective),
+      options: [],
+      deferred: true,
+      meta: { poolIds: pool.pool ?? pool.options ?? [] },
+    });
+  }
+
+  const feats = [...(sub.features ?? []), ...(sub.features_details ?? [])];
+  for (const feat of feats) {
+    const featLevel = Number(feat.level ?? 1);
+    if (featLevel > effective) continue;
+    const choice = feat.mechanics?.['grants_tool_proficiency_choice'] as
+      | { type?: string; pool?: unknown[]; quantity?: number }
+      | undefined;
+    if (!choice) continue;
+    out.push({
+      id: `choice-tool-${feat.id ?? subclassId}`,
+      type: 'tool_proficiency',
+      label: "Matériel de jeu (Espion)",
+      count: choice.quantity ?? 1,
+      options: [],
+      deferred: true,
+      meta: { poolIds: choice.pool ?? [] },
+    });
+  }
+
+  return out;
+}
+
+/** Langues supplémentaires de classe (ex. Lettré ×3, Espion) → étape Langues. */
 export function classBonusLanguageCount(
   cls: CharacterClass,
   level: number,
   maxLevel = PROGRESSION_MAX_LEVEL,
+  subclassId?: string | null,
 ): number {
   const pools = progressionData(cls).choice_pools;
-  if (!pools?.length) return 0;
   const effective = Math.min(Math.max(1, level), maxLevel);
   let total = 0;
-  for (const pool of pools) {
-    const type = String(pool.type ?? '');
-    if (type !== 'language_proficiency' && type !== 'language') continue;
-    if (!poolActiveAtLevel(pool, effective)) continue;
-    total += poolQuantityAtLevel(pool, effective);
+  if (pools?.length) {
+    for (const pool of pools) {
+      const type = String(pool.type ?? '');
+      if (type !== 'language_proficiency' && type !== 'language') continue;
+      if (!poolActiveAtLevel(pool, effective)) continue;
+      total += poolQuantityAtLevel(pool, effective);
+    }
+  }
+  total += subclassBonusLanguageCount(cls, effective, subclassId);
+  return total;
+}
+
+function subclassBonusLanguageCount(
+  cls: CharacterClass,
+  level: number,
+  subclassId?: string | null,
+): number {
+  if (!subclassId) return 0;
+  const data = progressionData(cls);
+  const subs = data.subclasses as
+    | {
+        options?: {
+          id?: string;
+          features?: { level?: number; mechanics?: Record<string, unknown> }[];
+          features_details?: { level?: number; mechanics?: Record<string, unknown> }[];
+        }[];
+      }
+    | undefined;
+  const options = Array.isArray(subs) ? subs : (subs?.options ?? []);
+  const sub = options.find((o) => o?.id === subclassId);
+  if (!sub) return 0;
+
+  let total = 0;
+  const feats = [...(sub.features ?? []), ...(sub.features_details ?? [])];
+  for (const feat of feats) {
+    const bonuses = feat.mechanics?.['language_bonus'] as
+      | { at_level?: number; quantity?: number }[]
+      | undefined;
+    if (!Array.isArray(bonuses)) continue;
+    for (const b of bonuses) {
+      if ((b.at_level ?? 99) <= level) total += b.quantity ?? 1;
+    }
   }
   return total;
+}
+
+/** Outils fixes accordés par une sous-classe (ex. Espion déguisement / faussaire). */
+export function subclassFixedToolProficiencies(
+  cls: CharacterClass,
+  level: number,
+  subclassId?: string | null,
+): string[] {
+  if (!subclassId) return [];
+  const data = progressionData(cls);
+  const subs = data.subclasses as
+    | {
+        options?: {
+          id?: string;
+          features?: { level?: number; mechanics?: Record<string, unknown> }[];
+          features_details?: { level?: number; mechanics?: Record<string, unknown> }[];
+        }[];
+      }
+    | undefined;
+  const options = Array.isArray(subs) ? subs : (subs?.options ?? []);
+  const sub = options.find((o) => o?.id === subclassId);
+  if (!sub) return [];
+
+  const tools: string[] = [];
+  const feats = [...(sub.features ?? []), ...(sub.features_details ?? [])];
+  for (const feat of feats) {
+    if ((feat.level ?? 1) > level) continue;
+    const granted = feat.mechanics?.['grants_tool_proficiencies'];
+    if (Array.isArray(granted)) {
+      for (const id of granted) {
+        if (typeof id === 'string' && id.trim()) tools.push(id.trim());
+      }
+    }
+  }
+  return [...new Set(tools)];
 }
 
 export function classNeedsAsi(
