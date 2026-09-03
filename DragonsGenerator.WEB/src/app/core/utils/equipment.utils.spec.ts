@@ -44,6 +44,10 @@ describe('equipment.utils', () => {
       qty: 1,
     });
     expect(normalizeItemRef(null)).toEqual({ id: 'unknown', qty: 1 });
+    expect(normalizeItemRef({ id: 'gr-sac-derudit' })).toEqual({
+      id: 'gr-sac-derudit',
+      qty: 1,
+    });
   });
 
   it('normalizeEquipments maps API damage fields', () => {
@@ -60,6 +64,15 @@ describe('equipment.utils', () => {
     const data = items[0].data as unknown as Record<string, unknown>;
     expect(data['dmg_d']).toBe('1d4');
     expect(data['props']).toEqual(jasmine.arrayContaining(['prop-finesse']));
+  });
+
+  it('normalizeEquipments defaults missing data to an empty object', () => {
+    const items = normalizeEquipments([
+      { id: 'gr-corde', name: 'Corde', type: 'gear', subtype: null } as any,
+    ]);
+    const data = items[0].data as unknown as Record<string, unknown>;
+    expect(data['dmg_d']).toBeNull();
+    expect(data['props']).toEqual([]);
   });
 
   it('CATEGORY_FILTERS contains expected weapon groups', () => {

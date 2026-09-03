@@ -9,6 +9,14 @@ describe('renderLightMarkdown', () => {
     expect(html).toContain('item');
   });
 
+  it('renders level 2 and 3 headings', () => {
+    const html = renderLightMarkdown('## Sous-titre\n\n### Sous-sous-titre');
+    expect(html).toContain('<h3');
+    expect(html).toContain('Sous-titre');
+    expect(html).toContain('<h4');
+    expect(html).toContain('Sous-sous-titre');
+  });
+
   it('embeds safe data:image PNG markdown images', () => {
     const src = 'data:image/png;base64,iVBORw0KGgo=';
     const html = renderLightMarkdown(`![Carte](${src})`);

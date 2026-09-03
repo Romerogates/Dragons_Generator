@@ -33,6 +33,18 @@ describe('character-proficiencies.util', () => {
     expect(kept.map((f) => f.refId)).toEqual(['style-duel']);
   });
 
+  it('stripProgressionChoiceFeatures also removes existing features re-granted as extras', () => {
+    const existing = [
+      { name: 'Style', desc: '', source: 'class' as const, refId: 'style-duel' },
+      { name: 'Old pick', desc: '', source: 'class' as const, refId: 'skill-athletisme' },
+    ];
+    const extras = [
+      { name: 'New pick', desc: '', source: 'class' as const, refId: 'skill-athletisme' },
+    ];
+    const kept = stripProgressionChoiceFeatures(existing, extras);
+    expect(kept.map((f) => f.refId)).toEqual(['style-duel']);
+  });
+
   it('toggleSkillSelection respects maxCount', () => {
     expect(toggleSkillSelection(['skill-a'], 'skill-b', 2)).toEqual(['skill-a', 'skill-b']);
     expect(toggleSkillSelection(['skill-a', 'skill-b'], 'skill-c', 2)).toEqual([

@@ -19,6 +19,7 @@ describe('offline-sync-error.util', () => {
     expect(
       offlineSyncItemLabel({ type: 'campaign-update', title: 'Acte II' }),
     ).toContain('(mise à jour)');
+    expect(offlineSyncItemLabel({ type: 'campaign-update' })).toContain('sans titre');
   });
 
   it('formats network and auth errors', () => {
