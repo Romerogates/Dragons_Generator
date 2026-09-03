@@ -887,6 +887,79 @@ public class RemoveCampaignMemberEndpoint(AppDbContext db) : EndpointWithoutRequ
     }
 }
 
+public class LeaveCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest
+{
+    public override void Configure() => Delete("/me/campaigns/{id}/leave");
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var userId = AuthHelpers.GetUserId(User);
+        if (userId is null)
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        var campaignId = Route<Guid>("id");
+        var campaign = await db.Campaigns
+            .Include(c => c.Members)
+            .ThenInclude(m => m.User)
+            .FirstOrDefaultAsync(c => c.Id == campaignId, ct);
+        if (campaign is null)
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        if (campaign.OwnerUserId == userId)
+        {
+            AddError("Le MJ ne peut pas quitter sa propre campagne. Supprimez-la si besoin.");
+            await Send.ErrorsAsync(StatusCodes.Status400BadRequest, ct);
+            return;
+        }
+
+        var member = campaign.Members.FirstOrDefault(
+            m => m.UserId == userId && m.Role == CampaignMemberRoles.Player);
+        if (member is null)
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        var displayName = member.User?.DisplayName ?? "Joueur";
+
+        var data = CampaignPregenHelpers.ParseDataObject(campaign.JsonData);
+        if (data["pregenCharacters"] is JsonArray pregenArr)
+        {
+            var userIdStr = userId.Value.ToString();
+            foreach (var node in pregenArr)
+            {
+                if (node is not JsonObject obj) continue;
+                if (obj["assignedUserId"]?.GetValue<string>() != userIdStr) continue;
+                obj.Remove("assignedUserId");
+                obj.Remove("assignedDisplayName");
+                obj["status"] = "ready";
+            }
+
+            campaign.JsonData = data.ToJsonString();
+        }
+
+        db.CampaignMembers.Remove(member);
+        campaign.UpdatedAt = DateTimeOffset.UtcNow;
+        await db.SaveChangesAsync(ct);
+
+        await CampaignActivityService.LogAsync(
+            db,
+            campaignId,
+            userId.Value,
+            CampaignActivityKinds.MemberLeft,
+            new { displayName, userId = userId.Value },
+            ct);
+
+        await Send.NoContentAsync(ct);
+    }
+}
+
 public class AwardCampaignXpEndpoint(AppDbContext db) : Endpoint<AwardXpBody>
 {
     public override void Configure() => Post("/me/campaigns/{id}/award-xp");

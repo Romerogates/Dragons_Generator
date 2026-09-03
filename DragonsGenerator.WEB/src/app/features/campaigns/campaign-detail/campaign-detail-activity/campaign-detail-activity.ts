@@ -63,6 +63,7 @@ export class CampaignDetailActivity {
           'invite_accepted',
           'member_joined',
           'member_removed',
+          'member_left',
           'character_proposed',
           'character_pick_requested',
           'character_approved',

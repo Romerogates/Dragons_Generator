@@ -967,6 +967,26 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     });
   }
 
+  readonly leaving = signal(false);
+
+  /** Le joueur connecté quitte volontairement la campagne. */
+  leaveCampaign(): void {
+    const c = this.campaign();
+    if (!c || c.isOwner || this.leaving()) return;
+    if (!confirm(`Quitter « ${c.title} » ? Vous devrez être réinvité pour revenir.`)) return;
+    this.leaving.set(true);
+    this.campaigns.leaveCampaign(c.id).subscribe({
+      next: () => {
+        this.leaving.set(false);
+        this.router.navigate(['/campaigns']);
+      },
+      error: () => {
+        this.leaving.set(false);
+        this.error.set('Impossible de quitter la campagne.');
+      },
+    });
+  }
+
   memberLoadingKey(memberId: string, scope: 'proposed' | 'approved'): string {
     return `${memberId}-${scope}`;
   }

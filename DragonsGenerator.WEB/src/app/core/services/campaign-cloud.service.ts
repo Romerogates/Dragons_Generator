@@ -107,6 +107,11 @@ export class CampaignCloudService {
     return this.http.delete<void>(`${this.api}/me/campaigns/${campaignId}/members/${memberId}`);
   }
 
+  /** Le joueur connecté quitte lui-même la campagne (le MJ ne peut pas quitter la sienne). */
+  leaveCampaign(campaignId: string): Observable<void> {
+    return this.http.delete<void>(`${this.api}/me/campaigns/${campaignId}/leave`);
+  }
+
   awardXp(campaignId: string, memberId: string, xp: number): Observable<{ xpEarnedInCampaign: number }> {
     return this.http.post<{ xpEarnedInCampaign: number }>(
       `${this.api}/me/campaigns/${campaignId}/award-xp`,
