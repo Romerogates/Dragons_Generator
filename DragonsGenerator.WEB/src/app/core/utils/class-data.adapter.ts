@@ -211,11 +211,23 @@ function extractChoiceLevel(pool: RawChoicePool): number {
 /** Types de pools gérés ailleurs (compétences, magie…) ou dynamiques (pool_filter sans liste statique). */
 const DEFERRED_SUBCHOICE_TYPES = new Set([
   'tool_proficiency',
+  'weapon_proficiency',
   'language',
   'language_proficiency',
   'spell_proficiency',
-  'animal_totem',
 ]);
+
+/** Totems animaux de secours (Cercle des Esprits) quand le JSON n'a qu'un pool_filter. */
+const DEFAULT_ANIMAL_TOTEM_OPTIONS: { id: string; name: string }[] = [
+  { id: 'beast-loup', name: 'Loup' },
+  { id: 'beast-ours', name: 'Ours' },
+  { id: 'beast-aigle', name: 'Aigle' },
+  { id: 'beast-cerf', name: 'Cerf' },
+  { id: 'beast-sanglier', name: 'Sanglier' },
+  { id: 'beast-panthere', name: 'Panthère' },
+  { id: 'beast-serpent-constricteur', name: 'Serpent constricteur' },
+  { id: 'beast-crocodile', name: 'Crocodile' },
+];
 
 function extractOptionLabels(raw: unknown[] | undefined): Record<string, string> {
   const labels: Record<string, string> = {};
@@ -250,6 +262,8 @@ function normalizeSubChoiceOptionIds(raw: unknown[] | undefined): string[] {
 function isDeferredSubChoicePool(pool: RawChoicePool): boolean {
   const t = String(pool.type ?? '');
   if (DEFERRED_SUBCHOICE_TYPES.has(t)) return true;
+  // animal_totem : on injecte une liste de secours plutôt que différer
+  if (t === 'animal_totem') return false;
   const poolIds = normalizeSubChoiceOptionIds(pool.pool);
   return !!pool.pool_filter && poolIds.length === 0;
 }
@@ -269,7 +283,13 @@ function buildSubChoiceFromRaw(sc: RawSubChoice): RawSubChoice {
 }
 
 function buildSubChoiceFromPool(pool: RawChoicePool): RawSubChoice {
-  const rawOpts = pool.pool ?? pool.options ?? [];
+  let rawOpts = pool.pool ?? pool.options ?? [];
+  if (
+    String(pool.type ?? '') === 'animal_totem' &&
+    normalizeSubChoiceOptionIds(rawOpts).length === 0
+  ) {
+    rawOpts = DEFAULT_ANIMAL_TOTEM_OPTIONS;
+  }
   return {
     id: pool.id,
     type: pool.type ?? 'option',

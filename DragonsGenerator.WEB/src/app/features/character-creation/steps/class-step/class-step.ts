@@ -575,7 +575,9 @@ export class ClassStep implements OnInit {
               ? 'fluent-emoji:dragon'
               : choice.type === 'fielon_lord'
                 ? 'fluent-emoji:smiling-face-with-horns'
-                : 'fluent-emoji:sparkles',
+                : choice.type === 'animal_totem'
+                  ? 'fluent-emoji:wolf'
+                  : 'fluent-emoji:sparkles',
         }));
       }
 
@@ -1316,6 +1318,10 @@ export class ClassStep implements OnInit {
     if (choiceType === 'terrain_type') {
       const name = this.getSubChoiceLabel('terrain_type', value);
       return `Terrain d'initiation : ${name}. Influence les sorts bonus du cercle druidique.`;
+    }
+    if (choiceType === 'animal_totem' || value.startsWith('beast-')) {
+      const name = optionLabel ?? this.getSubChoiceLabel('animal_totem', value);
+      return `Animal totem : ${name}. Esprit gardien du Cercle des Esprits.`;
     }
     return (
       this.resolveOptionFeature(value)?.desc ||

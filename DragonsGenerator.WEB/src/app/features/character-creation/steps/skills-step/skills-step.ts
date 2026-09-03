@@ -67,9 +67,29 @@ export class SkillsStep implements OnInit {
 
   ngOnInit(): void {
     const c = this.builder.creation();
-    this.selectedClassSkills.set([...c.selectedSkills]);
+    const classCount = c.skillChooseCount || 0;
+    const speciesSkillCount = c.speciesBonusSkillCount || 0;
+    const allSkills = (c.selectedSkills ?? []).map(normalizeSkillId);
+    // Confirm order: [...classSkills, ...speciesSkills]
+    if (speciesSkillCount > 0 && allSkills.length > classCount) {
+      this.selectedClassSkills.set(allSkills.slice(0, classCount));
+      this.selectedSpeciesSkills.set(allSkills.slice(classCount, classCount + speciesSkillCount));
+    } else {
+      this.selectedClassSkills.set(allSkills);
+      this.selectedSpeciesSkills.set([]);
+    }
+
     this.selectedBgSkills.set([...c.backgroundSkills]);
-    this.selectedBgTools.set([...c.backgroundTools]);
+    const speciesToolCount = c.speciesBonusToolCount || 0;
+    const allTools = [...(c.backgroundTools ?? [])];
+    // Confirm order: [...bgTools, ...speciesTools]
+    if (speciesToolCount > 0 && allTools.length >= speciesToolCount) {
+      this.selectedBgTools.set(allTools.slice(0, allTools.length - speciesToolCount));
+      this.selectedSpeciesTools.set(allTools.slice(-speciesToolCount));
+    } else {
+      this.selectedBgTools.set(allTools);
+      this.selectedSpeciesTools.set([]);
+    }
     this.selectedExpertise.set([...(c.expertiseSkills ?? [])]);
     const weaponMap = new Map<string, string[]>();
     const toolMap = new Map<string, string[]>();
@@ -80,8 +100,6 @@ export class SkillsStep implements OnInit {
     }
     this.classWeaponAnswers.set(weaponMap);
     this.classToolAnswers.set(toolMap);
-    this.selectedSpeciesSkills.set([]);
-    this.selectedSpeciesTools.set([]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     this.dataService.getSkills().subscribe({
@@ -585,7 +603,12 @@ export class SkillsStep implements OnInit {
   readonly classWeaponChoices = computed(() => {
     const cls = this.classJson();
     if (!cls) return [];
-    return extractWeaponProficiencyChoices(cls, this.builder.targetLevel());
+    return extractWeaponProficiencyChoices(
+      cls,
+      this.builder.targetLevel(),
+      undefined,
+      this.builder.creation().subclassId,
+    );
   });
 
   readonly classToolChoices = computed(() => {

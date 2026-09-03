@@ -301,27 +301,30 @@ export class SpeciesStep implements OnInit {
     const langs = species.languages.fixed.map(resolve);
     if (sub?.languages?.fixed) langs.push(...sub.languages.fixed.map(resolve));
 
-    // 2. Langues issues des creation choices
+    // 2. Langues issues des creation choices (single_select, fiend_ancestry, …)
     const answers = this.choiceAnswers();
     for (const choice of this.allCreationChoices()) {
-      if (choice.type === 'single_select' && Array.isArray(choice.options)) {
-        const selectedIds = answers.get(choice.id);
-        if (!selectedIds) continue;
+      if (!Array.isArray(choice.options)) continue;
+      const selectedIds = answers.get(choice.id);
+      if (!selectedIds?.length) continue;
 
-        for (const raw of choice.options) {
-          const opt = raw as Record<string, unknown>;
-          const optId = opt['id'] as string;
+      for (const raw of choice.options) {
+        const opt = raw as Record<string, unknown>;
+        const optId = typeof raw === 'string' ? raw : (opt['id'] as string);
 
-          if (!selectedIds.includes(optId)) continue;
+        if (!selectedIds.includes(optId)) continue;
 
-          // Cas 1 : l'option a un grants_language explicite
-          if (opt['grants_language']) {
-            langs.push(resolve(opt['grants_language'] as string));
-          }
-          // Cas 2 : l'option EST une langue (id commence par "lg-")
-          else if (optId?.startsWith('lg-')) {
-            langs.push((opt['name'] as string) ?? resolve(optId));
-          }
+        // Cas 1 : l'option a un grants_language explicite
+        if (opt && typeof opt === 'object' && opt['grants_language']) {
+          langs.push(resolve(opt['grants_language'] as string));
+        }
+        // Cas 2 : l'option EST une langue (id commence par "lg-")
+        else if (optId?.startsWith('lg-')) {
+          const name =
+            opt && typeof opt === 'object'
+              ? ((opt['name'] as string) ?? resolve(optId))
+              : resolve(optId);
+          langs.push(name);
         }
       }
     }
@@ -772,7 +775,12 @@ export class SpeciesStep implements OnInit {
       result.push({
         id: opt['id'] as string,
         name: (opt['name'] as string) ?? this.prettyOptionId(String(opt['id'] ?? '')),
-        desc: (opt['desc'] as string) ?? (opt['lore_note'] as string) ?? undefined,
+        desc:
+          (opt['desc'] as string) ??
+          (opt['lore_note'] as string) ??
+          (opt['grants_language']
+            ? `Langue intuitive : ${this.prettyOptionId(String(opt['grants_language']))}.`
+            : undefined),
         note: (opt['note'] as string) ?? perPick,
         damageType: (opt['damage_type'] as string) ?? undefined,
         areaShape: area?.['shape'] as string | undefined,
@@ -870,6 +878,12 @@ export class SpeciesStep implements OnInit {
         cha: 'fluent-emoji:sparkles',
       };
       return icons[optId] ?? 'fluent-emoji:glowing-star';
+    }
+    if (choice.type === 'fiend_ancestry' || optId.startsWith('gen-')) {
+      return 'fluent-emoji:smiling-face-with-horns';
+    }
+    if (choice.type === 'dragon_lineage' || optId.startsWith('drag-')) {
+      return 'fluent-emoji:dragon';
     }
     return 'fluent-emoji:sparkles';
   }

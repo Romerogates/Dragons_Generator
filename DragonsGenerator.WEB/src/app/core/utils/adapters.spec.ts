@@ -199,12 +199,56 @@ describe('class-data.adapter', () => {
       },
     } as any);
 
-    const options = (normalized.data.subclasses as { options: { id: string; sub_choices?: { id: string }[] }[] })
+    const options = (normalized.data.subclasses as { options: { id: string; sub_choices?: { id: string; options: string[] }[] }[] })
       .options;
     const earth = options.find((o) => o.id === 'subcls-cercle-de-la-terre');
     expect(earth?.sub_choices?.map((c) => c.id)).toEqual(['choice-terrain-subcls-cercle-de-la-terre']);
     const spirits = options.find((o) => o.id === 'subcls-cercle-des-esprits');
-    expect(spirits?.sub_choices?.length ?? 0).toBe(0);
+    expect(spirits?.sub_choices?.[0]?.id).toBe('choice-totem-subcls-cercle-des-esprits');
+    expect(spirits?.sub_choices?.[0]?.options?.length).toBeGreaterThan(0);
+  });
+
+  it('defers mage de guerre weapon_proficiency out of class-step sub_choices', () => {
+    const normalized = normalizeCharacterClass({
+      id: 'cls-magicien',
+      name: 'Magicien',
+      data: {
+        hit_die: '1d6',
+        primary_abilities: ['int'],
+        saving_throw_proficiencies: ['int', 'wis'],
+        armor_proficiencies: [],
+        weapon_proficiencies: [],
+        tool_proficiencies: [],
+        choice_pools: [],
+        starting_equipment: { fixed: [], choice_pools: [] },
+        features_details: [],
+        subclasses: {
+          name: 'Tradition',
+          level_unlocked: 2,
+          options: [
+            {
+              id: 'subcls-mage-de-guerre',
+              name: 'Mage de Guerre',
+              flavor: { summary: 'Martial.' },
+              choice_pools: [
+                {
+                  id: 'choice-weapons-subcls-mage-de-guerre-niv2',
+                  name: '3 armes',
+                  type: 'weapon_proficiency',
+                  quantity: 3,
+                  level_unlocked: 2,
+                  pool: ['category-any-weapon'],
+                },
+              ],
+              features_details: [],
+            },
+          ],
+        },
+      },
+    } as any);
+
+    const sub = (normalized.data.subclasses as { options: { sub_choices?: unknown[] }[] }).options[0];
+    expect(sub.sub_choices?.length ?? 0).toBe(0);
   });
 
   it('maps roublard equipment choice_pools from root choice_pools', () => {

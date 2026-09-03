@@ -587,6 +587,9 @@ export class MagicStep implements OnInit {
       typeof resources.cantrips_known === 'number'
         ? resources.cantrips_known
         : fallback.cantrips;
+    // Cercle de la Terre : sort mineur supplémentaire (pool différé hors class-step)
+    const bonusSubclassCantrips =
+      this.builder.creation().subclassId === 'subcls-cercle-de-la-terre' ? 1 : 0;
 
     const knownSpells =
       typeof resources.spells_known === 'number'
@@ -617,7 +620,7 @@ export class MagicStep implements OnInit {
     else if (knownSpells > 0) modeLabel = 'Sorts connus';
 
     return {
-      cantrips,
+      cantrips: cantrips + bonusSubclassCantrips,
       knownSpells: isClericOrDruid || isPaladin ? 0 : knownSpells,
       grimoireSpells: kind === 'wizard' ? grimoireSpells : 0,
       preparedSpells,

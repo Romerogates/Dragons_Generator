@@ -19,6 +19,7 @@ interface ClassChoicePool {
   options?: unknown[];
   unlocked_at_level?: number;
   unlock_level?: number;
+  level_unlocked?: number;
   unlocked_at_levels?: number[];
   constraint_max_price_po?: number;
   fixed_features?: string[];
@@ -141,6 +142,7 @@ function isFightingStylePool(pool: ClassChoicePool): boolean {
 
 function unlockLevelOf(pool: ClassChoicePool): number {
   if (typeof pool?.unlocked_at_level === 'number') return pool.unlocked_at_level;
+  if (typeof pool?.level_unlocked === 'number') return pool.level_unlocked;
   if (typeof pool?.unlock_level === 'number') return pool.unlock_level;
   if (Array.isArray(pool?.unlocked_at_levels) && pool.unlocked_at_levels.length) {
     return Math.min(...pool.unlocked_at_levels.map(Number));
@@ -530,10 +532,57 @@ export function extractWeaponProficiencyChoices(
   cls: CharacterClass,
   level: number,
   maxLevel = PROGRESSION_MAX_LEVEL,
+  subclassId?: string | null,
 ): ProgressionChoiceDef[] {
-  return extractProgressionChoices(cls, level, maxLevel).filter(
+  const fromRoot = extractProgressionChoices(cls, level, maxLevel).filter(
     (c) => c.deferred && c.type === 'weapon_proficiency',
   );
+  const fromSubclass = extractSubclassWeaponProficiencyChoices(cls, level, maxLevel, subclassId);
+  const seen = new Set(fromRoot.map((c) => c.id));
+  return [...fromRoot, ...fromSubclass.filter((c) => !seen.has(c.id))];
+}
+
+/** Armes de sous-classe (ex. Mage de Guerre) différées vers l'étape Savoirs. */
+function extractSubclassWeaponProficiencyChoices(
+  cls: CharacterClass,
+  level: number,
+  maxLevel = PROGRESSION_MAX_LEVEL,
+  subclassId?: string | null,
+): ProgressionChoiceDef[] {
+  if (!subclassId) return [];
+  const data = progressionData(cls);
+  const subs = data.subclasses as
+    | { options?: { id?: string; choice_pools?: ClassChoicePool[] }[] }
+    | { id?: string; choice_pools?: ClassChoicePool[] }[]
+    | undefined;
+  if (!subs) return [];
+
+  const options = Array.isArray(subs) ? subs : (subs.options ?? []);
+  const sub = options.find((o) => o.id === subclassId);
+  if (!sub?.choice_pools?.length) return [];
+
+  const effective = Math.min(Math.max(1, level), maxLevel);
+  const out: ProgressionChoiceDef[] = [];
+  for (const pool of sub.choice_pools) {
+    if (String(pool.type ?? '') !== 'weapon_proficiency') continue;
+    if (!poolActiveAtLevel(pool, effective)) continue;
+    out.push({
+      id: pool.id ?? `choice-weapon-${subclassId}`,
+      type: 'weapon_proficiency',
+      label: pool.name ?? 'Armes maîtrisées',
+      count: poolQuantityAtLevel(pool, effective),
+      options: [],
+      deferred: true,
+      meta: {
+        poolIds: pool.pool ?? pool.options ?? [],
+        maxPricePo:
+          typeof pool.constraint_max_price_po === 'number'
+            ? pool.constraint_max_price_po
+            : undefined,
+      },
+    });
+  }
+  return out;
 }
 
 export function extractToolProficiencyChoices(
