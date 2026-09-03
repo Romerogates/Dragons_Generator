@@ -1,6 +1,7 @@
 import {
   subclassBonusProficiencies,
   subclassBonusResistances,
+  classBonusSenses,
   classRootSavingThrowGrants,
   extractSubclassSkillProficiencyChoices,
 } from './progression-choices.util';
@@ -182,10 +183,10 @@ describe('subclassBonusResistances', () => {
     } as unknown as CharacterClass;
   }
 
-  it('extracts a fixed damage_type resistance (Esprit solide, niv. 6)', () => {
+  it('extracts a fixed damage_type resistance (Esprit solide, niv. 6, données API réelles : unlocks_at_level)', () => {
     const cls = makeClsWithFeature({
       id: 'feat-esprit-solide',
-      level: 6,
+      unlocks_at_level: 6,
       mechanics: { resistances: [{ type: 'damage_type', damage_type: 'psychic' }] },
     });
     expect(subclassBonusResistances(cls, 'subcls-cercle-des-esprits', 5)).toEqual([]);
@@ -195,7 +196,7 @@ describe('subclassBonusResistances', () => {
   it('ignores plain-string conditional resistances (ex. Rage) and returns [] without subclass', () => {
     const cls = makeClsWithFeature({
       id: 'feat-fougue',
-      level: 1,
+      unlocks_at_level: 1,
       mechanics: { resistances: ['bludgeoning', 'piercing', 'slashing'] },
     });
     expect(subclassBonusResistances(cls, 'subcls-cercle-des-esprits', 20)).toEqual([]);
@@ -204,7 +205,29 @@ describe('subclassBonusResistances', () => {
 });
 
 describe('classRootSavingThrowGrants', () => {
-  it('returns saving throws granted by a root class feature unlocked at the target level', () => {
+  it('returns saving throws granted by a root class feature unlocked at the target level (données API réelles : unlocks_at_level)', () => {
+    // Forme réelle de l'API (cls-roublard.json "Esprit fuyant") : le champ s'appelle
+    // `unlocks_at_level`, pas `level`. Sans fallback, ce bonus s'appliquait dès le niveau 1.
+    const cls: CharacterClass = {
+      id: 'cls-roublard',
+      name: 'Roublard',
+      data: {
+        features_details: [
+          {
+            id: 'feat-esprit-fuyant',
+            unlocks_at_level: 15,
+            mechanics: { grants_saving_throw_proficiency: 'wis' },
+          },
+        ],
+      } as any,
+    } as unknown as CharacterClass;
+
+    expect(classRootSavingThrowGrants(cls, 1)).toEqual([]);
+    expect(classRootSavingThrowGrants(cls, 14)).toEqual([]);
+    expect(classRootSavingThrowGrants(cls, 15)).toEqual(['wis']);
+  });
+
+  it('still supports a pre-normalized `level` field', () => {
     const cls: CharacterClass = {
       id: 'cls-roublard',
       name: 'Roublard',
@@ -217,6 +240,122 @@ describe('classRootSavingThrowGrants', () => {
 
     expect(classRootSavingThrowGrants(cls, 14)).toEqual([]);
     expect(classRootSavingThrowGrants(cls, 15)).toEqual(['wis']);
+  });
+});
+
+describe('classBonusSenses', () => {
+  it('reads blindsight from a root class feature (Rôdeur "Perception sauvage", niv. 18, unlocks_at_level)', () => {
+    const cls: CharacterClass = {
+      id: 'cls-rodeur',
+      name: 'Rôdeur',
+      data: {
+        features_details: [
+          {
+            id: 'feat-perception-sauvage',
+            unlocks_at_level: 18,
+            mechanics: { blindsight_radius_m: 9 },
+          },
+        ],
+      } as any,
+    } as unknown as CharacterClass;
+
+    expect(classBonusSenses(cls, null, 17)).toEqual({
+      darkvisionRadius: 0,
+      hasBlindsight: false,
+      blindsightRadius: 0,
+    });
+    expect(classBonusSenses(cls, null, 18)).toEqual({
+      darkvisionRadius: 0,
+      hasBlindsight: true,
+      blindsightRadius: 9,
+    });
+  });
+
+  it('reads darkvision from a subclass feature (Rôdeur Ombre urbaine "Ombre mouvante", niv. 7)', () => {
+    const cls: CharacterClass = {
+      id: 'cls-rodeur',
+      name: 'Rôdeur',
+      data: {
+        subclasses: {
+          options: [
+            {
+              id: 'subcls-ombre-urbaine',
+              features: [
+                {
+                  id: 'feat-ombre-mouvante',
+                  unlocks_at_level: 7,
+                  mechanics: { darkvision_radius_m: 18 },
+                },
+              ],
+            },
+          ],
+        },
+      } as any,
+    } as unknown as CharacterClass;
+
+    expect(classBonusSenses(cls, 'subcls-ombre-urbaine', 6).darkvisionRadius).toBe(0);
+    expect(classBonusSenses(cls, 'subcls-ombre-urbaine', 7).darkvisionRadius).toBe(18);
+    expect(classBonusSenses(cls, null, 20).darkvisionRadius).toBe(0);
+  });
+
+  it('reads a `sense_type: blindsight` root feature (Roublard "Perception aveugle", niv. 14)', () => {
+    const cls: CharacterClass = {
+      id: 'cls-roublard',
+      name: 'Roublard',
+      data: {
+        features_details: [
+          {
+            id: 'feat-perception-aveugle-cls-roublard',
+            unlocks_at_level: 14,
+            mechanics: { sense_type: 'blindsight', range_m: 3 },
+          },
+        ],
+      } as any,
+    } as unknown as CharacterClass;
+
+    expect(classBonusSenses(cls, null, 13).hasBlindsight).toBe(false);
+    expect(classBonusSenses(cls, null, 14)).toEqual({
+      darkvisionRadius: 0,
+      hasBlindsight: true,
+      blindsightRadius: 3,
+    });
+  });
+
+  it('only counts a choice-option sense grant (Rôdeur "Œil des profondeurs", niv. 15) if it was picked', () => {
+    const cls: CharacterClass = {
+      id: 'cls-rodeur',
+      name: 'Rôdeur',
+      data: {
+        subclasses: {
+          options: [
+            {
+              id: 'subcls-traqueur',
+              features: [
+                {
+                  id: 'feat-oeil-des-profondeurs',
+                  unlocks_at_level: 15,
+                  mechanics: {
+                    choice_quantity: 1,
+                    options: [
+                      { id: 'oeil-critique-redondant', name: 'Critique redondant' },
+                      { id: 'oeil-vision-aveugle', name: 'Vision aveugle', blindsight_radius_m: 18 },
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      } as any,
+    } as unknown as CharacterClass;
+
+    expect(classBonusSenses(cls, 'subcls-traqueur', 15, []).hasBlindsight).toBe(false);
+    expect(classBonusSenses(cls, 'subcls-traqueur', 15, ['oeil-critique-redondant']).hasBlindsight).toBe(
+      false,
+    );
+    expect(
+      classBonusSenses(cls, 'subcls-traqueur', 15, ['oeil-vision-aveugle']),
+    ).toEqual({ darkvisionRadius: 0, hasBlindsight: true, blindsightRadius: 18 });
   });
 });
 

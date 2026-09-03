@@ -38,6 +38,7 @@ import {
   subclassFixedToolProficiencies,
   subclassBonusProficiencies,
   subclassBonusResistances,
+  classBonusSenses,
   classRootSavingThrowGrants,
   type ProgressionChoiceDef,
 } from '@core/utils/progression-choices.util';
@@ -1145,6 +1146,8 @@ export class ClassStep implements OnInit {
         ...classRootSavingThrowGrants(cls, targetLevel),
       ];
       const classResistances = subclassBonusResistances(cls, sub?.id, targetLevel);
+      const allSubChoicePicks = [...this.subChoiceAnswers().values()].flat();
+      const classSenses = classBonusSenses(cls, sub?.id, targetLevel, allSubChoicePicks);
       const savingThrows = [
         ...new Set([
           ...((prof.saving_throws ?? []) as Ability[]),
@@ -1180,6 +1183,9 @@ export class ClassStep implements OnInit {
         classBonusLanguageCount: langBonus,
         classRequiredExoticLanguageCount: subBonus.requiredExoticLanguages,
         classResistances,
+        classDarkvisionRadius: classSenses.darkvisionRadius,
+        classHasBlindsight: classSenses.hasBlindsight,
+        classBlindsightRadius: classSenses.blindsightRadius,
         classSpellSlots,
       };
 

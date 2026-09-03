@@ -596,6 +596,9 @@ export class PdfGeneratorService {
     if (c.senses.hasDarkvision) {
       entries.push(`Vision dans le noir (${c.senses.darkvisionRadius}m)`);
     }
+    if (c.senses.hasBlindsight) {
+      entries.push(`Vision aveugle (${c.senses.blindsightRadius}m)`);
+    }
 
     c.defense.resistances.forEach((r) => entries.push(`Rés. ${r}`));
     c.defense.immunities.forEach((im) => entries.push(`Imm. ${im}`));

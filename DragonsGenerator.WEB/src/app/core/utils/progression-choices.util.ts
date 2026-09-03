@@ -641,7 +641,7 @@ function extractSubclassToolProficiencyChoices(
 
   const feats = [...(sub.features ?? []), ...(sub.features_details ?? [])];
   for (const feat of feats) {
-    const featLevel = Number(feat.level ?? 1);
+    const featLevel = featureUnlockLevel(feat as Record<string, unknown>);
     if (featLevel > effective) continue;
     const choice = feat.mechanics?.['grants_tool_proficiency_choice'] as
       | { type?: string; pool?: unknown[]; quantity?: number }
@@ -741,7 +741,7 @@ export function subclassFixedToolProficiencies(
   const tools: string[] = [];
   const feats = [...(sub.features ?? []), ...(sub.features_details ?? [])];
   for (const feat of feats) {
-    if ((feat.level ?? 1) > level) continue;
+    if (featureUnlockLevel(feat as Record<string, unknown>) > level) continue;
     const granted = feat.mechanics?.['grants_tool_proficiencies'];
     if (Array.isArray(granted)) {
       for (const id of granted) {
@@ -810,6 +810,19 @@ function toStringArray(raw: unknown): string[] {
  * `features_details` (copie brute conservée par le spread `...sub`). On dédoublonne par id
  * pour ne jamais compter deux fois une même feature (ex. bonus_languages, choix imbriqués).
  */
+/**
+ * Niveau de déblocage d'une feature brute de l'API. Les features de classe racine ET de
+ * sous-classe utilisent `unlocks_at_level` dans le JSON (`level` n'existe que sur les
+ * structures déjà adaptées par `class-data.adapter.ts`, ex. `sub.features` côté wizard UI).
+ * Sans ce fallback, `feat.level` est `undefined` sur les données brutes et tout bonus se
+ * retrouvait appliqué dès le niveau 1 au lieu de son vrai niveau de déblocage.
+ */
+function featureUnlockLevel(feat: Record<string, unknown> | undefined | null): number {
+  const raw = (feat?.['level'] ?? feat?.['unlocks_at_level']) as unknown;
+  const n = Number(raw);
+  return Number.isFinite(n) && n > 0 ? n : 1;
+}
+
 function dedupeSubclassFeatures(sub: {
   features?: SubclassFeatureLike[];
   features_details?: SubclassFeatureLike[];
@@ -870,7 +883,7 @@ export function subclassBonusProficiencies(
 
   const feats = dedupeSubclassFeatures(sub);
   for (const feat of feats) {
-    const featLevel = Number(feat.level ?? 1);
+    const featLevel = featureUnlockLevel(feat as Record<string, unknown>);
     if (featLevel > level) continue;
     const mech = feat.mechanics ?? {};
 
@@ -953,7 +966,7 @@ export function subclassBonusResistances(
   const result = new Set<string>();
   const feats = dedupeSubclassFeatures(sub);
   for (const feat of feats) {
-    const featLevel = Number(feat.level ?? 1);
+    const featLevel = featureUnlockLevel(feat as Record<string, unknown>);
     if (featLevel > level) continue;
     const mech = feat.mechanics ?? {};
     const raw = (mech['resistances'] ?? feat['resistances']) as unknown;
@@ -972,13 +985,106 @@ export function subclassBonusResistances(
   return [...result];
 }
 
+export interface ClassBonusSenses {
+  darkvisionRadius: number;
+  hasBlindsight: boolean;
+  blindsightRadius: number;
+}
+
+const EMPTY_CLASS_SENSES: ClassBonusSenses = {
+  darkvisionRadius: 0,
+  hasBlindsight: false,
+  blindsightRadius: 0,
+};
+
+/** Lit vision dans le noir / vision aveugle sur une feature ou une option de choix brute. */
+function readSenseGrant(obj: Record<string, unknown> | undefined | null): {
+  darkvision: number;
+  blindsight: number;
+} {
+  let darkvision = 0;
+  let blindsight = 0;
+  if (!obj) return { darkvision, blindsight };
+  const dv = Number(obj['darkvision_radius_m']);
+  if (Number.isFinite(dv) && dv > 0) darkvision = dv;
+  const bs = Number(obj['blindsight_radius_m']);
+  if (Number.isFinite(bs) && bs > 0) blindsight = bs;
+  if (obj['sense_type'] === 'blindsight') {
+    const range = Number(obj['range_m']);
+    if (Number.isFinite(range) && range > 0) blindsight = Math.max(blindsight, range);
+  }
+  return { darkvision, blindsight };
+}
+
+/**
+ * Vision dans le noir / vision aveugle fixes accordées par la classe racine ou la sous-classe
+ * (ex. Rôdeur "Perception sauvage" niv. 18 → vision aveugle 9 m, Rôdeur Ombre urbaine "Ombre
+ * mouvante" niv. 7 → vision dans le noir 18 m, Roublard "Perception aveugle" niv. 14 → vision
+ * aveugle 3 m). Les options de choix imbriquées (ex. Rôdeur "Œil des profondeurs" niv. 15) ne
+ * sont comptées que si leur id figure dans `selectedFeatureIds` (picks du joueur).
+ */
+export function classBonusSenses(
+  cls: CharacterClass,
+  subclassId: string | null | undefined,
+  level: number,
+  selectedFeatureIds: string[] = [],
+): ClassBonusSenses {
+  const data = progressionData(cls);
+  const selected = new Set(selectedFeatureIds);
+  let darkvisionRadius = 0;
+  let blindsightRadius = 0;
+
+  const scan = (feat: Record<string, unknown> | undefined | null) => {
+    if (!feat) return;
+    if (featureUnlockLevel(feat) > level) return;
+    const mech = (feat['mechanics'] ?? {}) as Record<string, unknown>;
+    const g = readSenseGrant(mech);
+    darkvisionRadius = Math.max(darkvisionRadius, g.darkvision);
+    blindsightRadius = Math.max(blindsightRadius, g.blindsight);
+
+    const options = mech['options'];
+    if (Array.isArray(options)) {
+      for (const opt of options) {
+        if (!opt || typeof opt !== 'object') continue;
+        const o = opt as Record<string, unknown>;
+        const optId = typeof o['id'] === 'string' ? o['id'] : undefined;
+        if (optId && !selected.has(optId)) continue;
+        const og = readSenseGrant(o);
+        darkvisionRadius = Math.max(darkvisionRadius, og.darkvision);
+        blindsightRadius = Math.max(blindsightRadius, og.blindsight);
+      }
+    }
+  };
+
+  const rootFeats = (data.features_details ?? []) as Record<string, unknown>[];
+  for (const feat of rootFeats) scan(feat);
+
+  if (subclassId) {
+    const subs = data.subclasses as
+      | { options?: { id?: string; features?: SubclassFeatureLike[]; features_details?: SubclassFeatureLike[] }[] }
+      | undefined;
+    const options = Array.isArray(subs) ? subs : (subs?.options ?? []);
+    const sub = options.find((o) => o?.id === subclassId);
+    if (sub) {
+      for (const feat of dedupeSubclassFeatures(sub)) scan(feat as Record<string, unknown>);
+    }
+  }
+
+  if (darkvisionRadius === 0 && blindsightRadius === 0) return EMPTY_CLASS_SENSES;
+  return {
+    darkvisionRadius,
+    hasBlindsight: blindsightRadius > 0,
+    blindsightRadius,
+  };
+}
+
 /** Jets de sauvegarde accordés par une feature de la classe RACINE (ex. Esprit fuyant, Roublard niv. 15). */
 export function classRootSavingThrowGrants(cls: CharacterClass, level: number): string[] {
   const data = progressionData(cls);
   const feats = (data.features_details ?? []) as SubclassFeatureLike[];
   const codes = new Set<string>();
   for (const feat of feats) {
-    const featLevel = Number(feat.level ?? 1);
+    const featLevel = featureUnlockLevel(feat as Record<string, unknown>);
     if (featLevel > level) continue;
     const mech = feat.mechanics ?? {};
     const saveGrant = feat['grants_saving_throw_proficiency'] ?? mech['grants_saving_throw_proficiency'];
@@ -1038,7 +1144,7 @@ export function extractSubclassSkillProficiencyChoices(
 
   const feats = dedupeSubclassFeatures(sub);
   for (const feat of feats) {
-    const featLevel = Number(feat.level ?? 1);
+    const featLevel = featureUnlockLevel(feat as Record<string, unknown>);
     if (featLevel > level) continue;
     const featId = String(feat['id'] ?? 'feat');
     const mech = feat.mechanics ?? {};

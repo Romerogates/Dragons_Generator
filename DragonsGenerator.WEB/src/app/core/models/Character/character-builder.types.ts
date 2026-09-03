@@ -104,6 +104,11 @@ export interface ClassSelection {
   classRequiredExoticLanguageCount?: number;
   /** Résistances passives accordées par la sous-classe (ex. Druide Cercle des Esprits → psychique). */
   classResistances?: string[];
+  /** Vision dans le noir accordée par la classe/sous-classe (ex. Rôdeur Ombre urbaine niv. 7). */
+  classDarkvisionRadius?: number;
+  /** Vision aveugle accordée par la classe/sous-classe (ex. Rôdeur niv. 18, Roublard niv. 14). */
+  classHasBlindsight?: boolean;
+  classBlindsightRadius?: number;
   /** Emplacements de sorts au niveau cible (JSON progression). */
   classSpellSlots?: { level: number; max: number }[];
 }
@@ -137,6 +142,10 @@ export type ExtendedCharacterCreation = CharacterCreation & {
   } | null;
   /** Résistances passives accordées par la sous-classe choisie (fusionnées à la fiche). */
   classResistances?: string[];
+  /** Vision dans le noir/aveugle accordée par la classe/sous-classe (fusionnées à la fiche). */
+  classDarkvisionRadius?: number;
+  classHasBlindsight?: boolean;
+  classBlindsightRadius?: number;
 };
 
 export const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
@@ -202,6 +211,9 @@ export const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   classBonusLanguageCount: 0,
   classSpellSlots: [],
   classResistances: [],
+  classDarkvisionRadius: 0,
+  classHasBlindsight: false,
+  classBlindsightRadius: 0,
   classChoiceAnswers: {},
   asiBonuses: {},
   selectedFeatId: null,

@@ -178,8 +178,10 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
     },
     senses: {
       passivePerception,
-      hasDarkvision: c.hasDarkvision,
-      darkvisionRadius: c.darkvisionRadius,
+      hasDarkvision: c.hasDarkvision || (c.classDarkvisionRadius ?? 0) > 0,
+      darkvisionRadius: Math.max(c.darkvisionRadius, c.classDarkvisionRadius ?? 0),
+      hasBlindsight: c.classHasBlindsight ?? false,
+      blindsightRadius: c.classBlindsightRadius ?? 0,
     },
 
     proficiencies: {
