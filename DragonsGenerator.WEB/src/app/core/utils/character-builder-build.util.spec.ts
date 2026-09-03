@@ -250,4 +250,61 @@ describe('character-build.util', () => {
     expect(character.vitality.hitPointsMax).toBe(28);
     expect(character.updatedAt).toBe('2026-09-02T00:00:00.000Z');
   });
+
+  it('merges species resistances/darkvision with class-granted resistances and blindsight', () => {
+    const creation = structuredClone(INITIAL_CREATION_STATE);
+    creation.name = 'Rôdeur test';
+    creation.speciesId = 'spc-elfe';
+    creation.speciesName = 'Elfe';
+    creation.speciesResistances = ['charme'];
+    creation.hasDarkvision = true;
+    creation.darkvisionRadius = 18;
+    creation.civilizationId = 'civ-nordique';
+    creation.civilizationName = 'Nordique';
+    creation.classId = 'cls-rodeur';
+    creation.className = 'Rôdeur';
+    creation.hitDie = 10;
+    creation.targetLevel = 18;
+    // Bonus de classe/sous-classe calculés par class-step.ts (subclassBonusResistances,
+    // classBonusSenses) — ici on simule directement l'état persisté par le wizard.
+    creation.classResistances = ['psychic'];
+    creation.classDarkvisionRadius = 0;
+    creation.classHasBlindsight = true;
+    creation.classBlindsightRadius = 9;
+
+    const abilities = {
+      force: 10,
+      dexterite: 16,
+      constitution: 14,
+      intelligence: 10,
+      sagesse: 14,
+      charisme: 8,
+    };
+    const modifiers = {
+      force: 0,
+      dexterite: 3,
+      constitution: 2,
+      intelligence: 0,
+      sagesse: 2,
+      charisme: -1,
+    };
+
+    const character = buildCharacterFromCreation({
+      creation,
+      abilities,
+      modifiers,
+      hpMax: 120,
+      proficiencyBonus: proficiencyBonusForLevel(18),
+      targetLevel: 18,
+      passivePerception: 16,
+      editing: { id: 'edit-id-2', createdAt: '2026-01-01T00:00:00.000Z', cloudSynced: false },
+      now: '2026-09-03T00:00:00.000Z',
+    });
+
+    expect(character.defense.resistances).toEqual(['charme', 'psychic']);
+    expect(character.senses.hasDarkvision).toBeTrue();
+    expect(character.senses.darkvisionRadius).toBe(18);
+    expect(character.senses.hasBlindsight).toBeTrue();
+    expect(character.senses.blindsightRadius).toBe(9);
+  });
 });
