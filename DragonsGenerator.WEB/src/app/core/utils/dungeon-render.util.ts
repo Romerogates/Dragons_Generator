@@ -1,6 +1,7 @@
 import type {
   CampaignDungeonMap,
   DungeonMarkerKind,
+  DungeonRoom,
   DungeonTheme,
   DungeonTileKind,
 } from '@core/models/Campaign/dungeon-map';
@@ -443,8 +444,36 @@ export function dungeonMapToPngDataUrl(
 }
 
 export interface HandoutBuildOptions {
-  /** Applique le fog of war pour la vue joueur (salles révélées uniquement). */
+  /** Applique le fog of war (défaut : oui — vue joueur). Passer `false` pour une carte MJ complète. */
   playerFog?: boolean;
+  /** Notes MJ + bestiaire. Jamais pour un handout publié. */
+  includeGmDetails?: boolean;
+}
+
+export function playerExportDrawOptions(map: CampaignDungeonMap): DrawDungeonOptions {
+  return {
+    showRoomNumbers: true,
+    vignette: true,
+    revealedRoomIds: fogRevealSet(map),
+  };
+}
+
+function roomEncounterSummary(room: DungeonRoom, encounters: EncounterGroup[]): string {
+  if (room.encounterId) {
+    const enc = encounters.find((e) => e.id === room.encounterId);
+    if (enc) {
+      return enc.creatures
+        .map((c) => `${c.quantity}× ${c.customName || c.creatureName}`)
+        .join(', ');
+    }
+    return '—';
+  }
+  if (room.randomEncounter?.creatures.length) {
+    return room.randomEncounter.creatures
+      .map((c) => `${c.quantity}× ${c.name}${c.cr ? ` (FP ${c.cr})` : ''}`)
+      .join(', ');
+  }
+  return '—';
 }
 
 export function buildHandoutBody(
@@ -452,13 +481,14 @@ export function buildHandoutBody(
   encounters: EncounterGroup[],
   options?: HandoutBuildOptions,
 ): string {
-  const revealed =
-    options?.playerFog && map.fogOfWarEnabled ? fogRevealSet(map) : null;
-  const imageUrl = dungeonMapToPngDataUrl(map, 10, {
-    showRoomNumbers: true,
-    vignette: true,
-    revealedRoomIds: revealed,
-  });
+  const gm = options?.includeGmDetails === true;
+  const useFog = options?.playerFog !== false;
+  const revealed = useFog && map.fogOfWarEnabled ? fogRevealSet(map) : null;
+  const imageUrl = dungeonMapToPngDataUrl(
+    map,
+    10,
+    useFog ? playerExportDrawOptions(map) : { showRoomNumbers: true, vignette: true },
+  );
   const lines: string[] = [
     `# ${map.name}`,
     '',
@@ -473,31 +503,25 @@ export function buildHandoutBody(
 
   for (const room of map.rooms) {
     if (revealed && !revealed.has(room.id)) continue;
-    let encounterText = '';
-    if (room.encounterId) {
-      const enc = encounters.find((e) => e.id === room.encounterId);
-      if (enc) {
-        encounterText = enc.creatures
-          .map((c) => `${c.quantity}× ${c.customName || c.creatureName}`)
-          .join(', ');
-      }
-    } else if (room.randomEncounter?.creatures.length) {
-      encounterText = room.randomEncounter.creatures
-        .map((c) => `${c.quantity}× ${c.name}${c.cr ? ` (FP ${c.cr})` : ''}`)
-        .join(', ');
+    if (gm) {
+      lines.push(`- **${room.label}** : ${roomEncounterSummary(room, encounters)}`);
+      if (room.notes?.trim()) lines.push(`  - _${room.notes.trim()}_`);
     } else {
-      encounterText = '—';
+      lines.push(`- **${room.label}**`);
     }
-    lines.push(`- **${room.label}** : ${encounterText}`);
-    if (room.notes?.trim()) lines.push(`  - _${room.notes.trim()}_`);
   }
 
-  if (map.markers.length) {
+  const markers = map.markers.filter((m) => {
+    if (revealed && !isCellRevealed(map, m.x, m.y, revealed)) return false;
+    if (!gm && (m.kind === 'trap' || m.kind === 'note')) return false;
+    return true;
+  });
+  if (markers.length) {
     lines.push('', '## Points d’intérêt', '');
-    for (const m of map.markers) {
-      if (revealed && !isCellRevealed(map, m.x, m.y, revealed)) continue;
+    for (const m of markers) {
       const label = m.label || DUNGEON_MARKER_LABELS[m.kind];
-      lines.push(`- ${label} (${m.x}, ${m.y})${m.notes ? ` — ${m.notes}` : ''}`);
+      const notes = gm && m.notes?.trim() ? ` — ${m.notes.trim()}` : '';
+      lines.push(`- ${label} (${m.x}, ${m.y})${notes}`);
     }
   }
 
@@ -506,7 +530,7 @@ export function buildHandoutBody(
 
 export async function exportDungeonPng(map: CampaignDungeonMap, filename: string): Promise<void> {
   const canvas = document.createElement('canvas');
-  drawDungeonToCanvas(map, canvas, 14, { showRoomNumbers: true, vignette: true });
+  drawDungeonToCanvas(map, canvas, 14, playerExportDrawOptions(map));
   const url = canvas.toDataURL('image/png');
   const a = document.createElement('a');
   a.href = url;
@@ -518,10 +542,19 @@ export async function exportDungeonPdf(
   map: CampaignDungeonMap,
   encounters: EncounterGroup[],
   filename: string,
+  options?: HandoutBuildOptions,
 ): Promise<void> {
   const { jsPDF } = await import('jspdf');
   const canvas = document.createElement('canvas');
-  drawDungeonToCanvas(map, canvas, 10, { showRoomNumbers: true, vignette: true });
+  const useFog = options?.playerFog !== false;
+  drawDungeonToCanvas(
+    map,
+    canvas,
+    10,
+    useFog ? playerExportDrawOptions(map) : { showRoomNumbers: true, vignette: true },
+  );
+  const gm = options?.includeGmDetails === true;
+  const revealed = useFog && map.fogOfWarEnabled ? fogRevealSet(map) : null;
 
   const imgData = canvas.toDataURL('image/png');
   const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
@@ -557,22 +590,13 @@ export async function exportDungeonPdf(
   pdf.setFontSize(8);
 
   for (const room of map.rooms) {
+    if (revealed && !revealed.has(room.id)) continue;
     if (y > pageH - margin) {
       pdf.addPage();
       y = margin;
     }
-    let text: string;
-    if (room.encounterId) {
-      const enc = encounters.find((e) => e.id === room.encounterId);
-      text = enc
-        ? enc.creatures.map((c) => `${c.quantity}× ${c.customName || c.creatureName}`).join(', ')
-        : '—';
-    } else if (room.randomEncounter?.creatures.length) {
-      text = room.randomEncounter.creatures.map((c) => `${c.quantity}× ${c.name}`).join(', ');
-    } else {
-      text = '—';
-    }
-    pdf.text(`${room.label}: ${text}`, margin, y);
+    const text = gm ? `${room.label}: ${roomEncounterSummary(room, encounters)}` : room.label;
+    pdf.text(text, margin, y);
     y += 4;
   }
 

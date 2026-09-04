@@ -38,6 +38,7 @@ import {
   exportDungeonPdf,
   exportDungeonPng,
   fogRevealSet,
+  playerExportDrawOptions,
   roomAt,
   themePalette,
 } from '@core/utils/dungeon-render.util';
@@ -615,7 +616,7 @@ export class CampaignDungeonMaps {
     if (!map || this.exportBusy()) return;
     this.exportBusy.set(true);
     try {
-      const dataUrl = dungeonMapToPngDataUrl(map);
+      const dataUrl = dungeonMapToPngDataUrl(map, 10, playerExportDrawOptions(map));
       const res = await fetch(dataUrl);
       const blob = await res.blob();
       const file = new File([blob], `${map.name.replace(/\s+/g, '-')}.png`, { type: 'image/png' });
@@ -647,9 +648,7 @@ export class CampaignDungeonMaps {
     const map = this.editingMap();
     if (!map) return;
     const c = this.campaign();
-    const body = buildHandoutBody(map, this.encounters(), {
-      playerFog: !!map.fogOfWarEnabled,
-    });
+    const body = buildHandoutBody(map, this.encounters());
     const now = new Date().toISOString();
     let handouts = [...(c.data.handouts ?? [])];
     let handoutId = map.handoutId ?? null;

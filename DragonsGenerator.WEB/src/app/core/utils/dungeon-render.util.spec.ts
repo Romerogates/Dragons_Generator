@@ -92,9 +92,12 @@ describe('dungeon-render helpers', () => {
     expect(body).toContain('# Crypte test');
     expect(body).toContain('## Légende des salles');
     expect(body).toContain('**Salle 1**');
-    expect(body).toContain('2× Squelette');
+    expect(body).not.toContain('Squelette');
+    expect(body).not.toContain('Note salle');
     expect(body).toContain('## Points d’intérêt');
     expect(body).toContain('Coffre');
+    expect(body).not.toContain(' — or');
+    expect(body).not.toContain('Indice');
     expect(body).toMatch(/!\[Crypte test\]\(data:image\/png;base64,/);
   });
 
@@ -144,7 +147,7 @@ describe('dungeon-render helpers', () => {
         ],
       },
     ];
-    const body = buildHandoutBody(map, encounters);
+    const body = buildHandoutBody(map, encounters, { includeGmDetails: true, playerFog: false });
     expect(body).toContain('1× Archiliche');
     expect(body).toContain('**Manquant**');
   });
@@ -155,7 +158,7 @@ describe('dungeon-render helpers', () => {
       markers: [],
       regionName: undefined,
     });
-    const body = buildHandoutBody(map, []);
+    const body = buildHandoutBody(map, [], { includeGmDetails: true, playerFog: false });
     expect(body).toContain('**Vide** : —');
   });
 
@@ -222,7 +225,9 @@ describe('dungeon-render helpers', () => {
         ],
       },
     ];
-    await expectAsync(exportDungeonPdf(map, encounters, 'branches.pdf')).toBeResolved();
+    await expectAsync(
+      exportDungeonPdf(map, encounters, 'branches.pdf', { includeGmDetails: true, playerFog: false }),
+    ).toBeResolved();
   });
 
   it('fogRevealSet returns null when fog disabled', () => {
@@ -238,6 +243,34 @@ describe('dungeon-render helpers', () => {
     expect(body).not.toContain('**Salle 1**');
     expect(body).not.toContain('Coffre');
     expect(body).toMatch(/!\[Crypte test\]\(data:image\/png;base64,/);
+  });
+
+  it('buildHandoutBody GM details keep notes and random encounters', () => {
+    const body = buildHandoutBody(sampleMap(), [], { includeGmDetails: true, playerFog: false });
+    expect(body).toContain('2× Squelette (FP 1/4)');
+    expect(body).toContain('Note salle');
+    expect(body).toContain(' — or');
+  });
+
+  it('exportDungeonPng applies fog when enabled', async () => {
+    const anchor = document.createElement('a');
+    spyOn(anchor, 'click');
+    const original = Document.prototype.createElement;
+    spyOn(document, 'createElement').and.callFake(function (
+      this: Document,
+      tagName: string,
+      options?: string | ElementCreationOptions,
+    ) {
+      if (tagName.toLowerCase() === 'a') return anchor;
+      return original.call(this, tagName, options as ElementCreationOptions);
+    } as typeof document.createElement);
+
+    await exportDungeonPng(
+      sampleMap({ fogOfWarEnabled: true, revealedRoomIds: ['r1'] }),
+      'fog.png',
+    );
+    expect(anchor.download).toBe('fog.png');
+    expect(anchor.click).toHaveBeenCalled();
   });
 
   it('drawDungeonToCanvas applies fog overlay for unrevealed rooms', () => {
