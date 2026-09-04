@@ -602,8 +602,8 @@ export class PdfGeneratorService {
     }
 
     c.defense.resistances.forEach((r) => entries.push(`Rés. ${resistanceLabel(r)}`));
-    c.defense.immunities.forEach((im) => entries.push(`Imm. ${im}`));
-    c.defense.conditionImmunities.forEach((ci) => entries.push(`Imm. ${ci}`));
+    c.defense.immunities.forEach((im) => entries.push(`Imm. ${resistanceLabel(im)}`));
+    c.defense.conditionImmunities.forEach((ci) => entries.push(`Imm. ${labelForGameId(ci)}`));
 
     entries.slice(0, P.resYs.length).forEach((entry, i) => {
       this.text(pdf, entry, P.resX, P.resYs[i]);
