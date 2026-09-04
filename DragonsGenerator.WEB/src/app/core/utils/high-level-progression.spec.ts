@@ -1,6 +1,7 @@
 import { extractSpellSlotsFromResources, extractPactSlotsFromResources, maxSpellLevelFromSlots } from './feature-uses.util';
 import {
   classBonusLanguageCount,
+  classRootRequiredExoticLanguageCount,
   extractWeaponProficiencyChoices,
   extractToolProficiencyChoices,
   countAsiSlots,
@@ -83,6 +84,47 @@ describe('High-level progression (6–20)', () => {
     expect(tools.length).toBe(1);
     expect(tools[0].count).toBe(3);
     expect(classBonusLanguageCount(lettre, 1)).toBe(3);
+    // Pool "lang-any" : pas de contrainte exotique (choix libre parmi toutes les langues).
+    expect(classRootRequiredExoticLanguageCount(lettre, 1)).toBe(0);
+  });
+
+  it('flags class-root language pools restricted to exotic-only tokens (Prêtre/Magicien/Sorcier)', () => {
+    const pretre = normalizeCharacterClass({
+      id: 'cls-pretre',
+      name: 'Prêtre',
+      data: {
+        choice_pools: [
+          {
+            id: 'choice-language-cls-pretre',
+            type: 'language_proficiency',
+            quantity: 1,
+            pool: ['category-exotic-languages'],
+            unlocked_at_level: 1,
+          },
+        ],
+        progression: [{ level: 1, features: [] }],
+      },
+    } as any);
+    expect(classBonusLanguageCount(pretre, 1)).toBe(1);
+    expect(classRootRequiredExoticLanguageCount(pretre, 1)).toBe(1);
+
+    const magicien = normalizeCharacterClass({
+      id: 'cls-magicien',
+      name: 'Magicien',
+      data: {
+        choice_pools: [
+          {
+            id: 'choice-language-cls-magicien',
+            type: 'language_proficiency',
+            quantity: 1,
+            pool: ['lang-category-exotique'],
+            unlocked_at_level: 1,
+          },
+        ],
+        progression: [{ level: 1, features: [] }],
+      },
+    } as any);
+    expect(classRootRequiredExoticLanguageCount(magicien, 1)).toBe(1);
   });
 
   it('extracts warlock pact slots from JSON resources', () => {

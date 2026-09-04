@@ -661,6 +661,16 @@ function extractSubclassToolProficiencyChoices(
   return out;
 }
 
+/** Jetons de pool signalant une contrainte « doit être une langue exotique » (ex. Prêtre
+ * `category-exotic-languages`, Magicien `lang-category-exotique`, Sorcier `lang-exotic`). */
+const EXOTIC_LANGUAGE_POOL_TOKENS = new Set([
+  'category-exotic-languages',
+  'category-exotique-languages',
+  'lang-category-exotique',
+  'lang-exotic',
+  'lang-exotique',
+]);
+
 /** Langues supplémentaires de classe (ex. Lettré ×3, Espion) → étape Langues. */
 export function classBonusLanguageCount(
   cls: CharacterClass,
@@ -680,6 +690,35 @@ export function classBonusLanguageCount(
     }
   }
   total += subclassBonusLanguageCount(cls, effective, subclassId);
+  return total;
+}
+
+/**
+ * Parmi les langues bonus de `classBonusLanguageCount`, combien doivent obligatoirement être
+ * exotiques d'après le `pool` du choix racine de classe (ex. Prêtre "Langue exotique", Magicien,
+ * Sorcier). Contrairement au pool générique ("any"), un pool ne contenant QUE des jetons exotiques
+ * restreint tout le choix — sans ça, le joueur peut piocher une langue courante à la place.
+ */
+export function classRootRequiredExoticLanguageCount(
+  cls: CharacterClass,
+  level: number,
+  maxLevel = PROGRESSION_MAX_LEVEL,
+): number {
+  const pools = progressionData(cls).choice_pools;
+  const effective = Math.min(Math.max(1, level), maxLevel);
+  let total = 0;
+  if (pools?.length) {
+    for (const pool of pools) {
+      const type = String(pool.type ?? '');
+      if (type !== 'language_proficiency' && type !== 'language') continue;
+      if (!poolActiveAtLevel(pool, effective)) continue;
+      const raw = (pool as { pool?: unknown; options?: unknown }).pool ?? (pool as { options?: unknown }).options ?? [];
+      const tokens = Array.isArray(raw) ? raw.map(String) : [];
+      if (tokens.length > 0 && tokens.every((t) => EXOTIC_LANGUAGE_POOL_TOKENS.has(t))) {
+        total += poolQuantityAtLevel(pool, effective);
+      }
+    }
+  }
   return total;
 }
 

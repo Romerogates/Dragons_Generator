@@ -42,6 +42,7 @@ export const EQUIPMENT_ID_ALIASES: Record<string, string> = {
   'tl-necessaire-calligraphe': 'tl-necessaire-de-calligraphe',
   'tl-necessaire-cartographe': 'tl-necessaire-de-cartographe',
   'tl-necessaire-herboristerie': 'tl-necessaire-dherboristerie',
+  'tl-instruments-navigation': 'tl-instruments-de-navigation',
 };
 
 export const CATEGORY_FILTERS: Record<
@@ -65,6 +66,7 @@ export const CATEGORY_FILTERS: Record<
   },
   'category-light-armor': { type: 'ARMOR', subtypes: ['LIGHT'], label: 'Armure légère' },
   'category-medium-armor': { type: 'ARMOR', subtypes: ['MEDIUM'], label: 'Armure intermédiaire' },
+  'category-heavy-armor': { type: 'ARMOR', subtypes: ['HEAVY'], label: 'Armure lourde' },
   'category-shield': { type: 'ARMOR', subtypes: ['SHIELD'], label: 'Bouclier' },
   'category-musical-instruments': {
     type: 'TOOL',

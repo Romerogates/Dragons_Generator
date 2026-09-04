@@ -319,4 +319,88 @@ describe('SkillsStep', () => {
     expect(allItems).toEqual(component.toolGroups().flatMap((g) => g.items.map((t) => t.id)));
     expect(allItems.length).toBeGreaterThan(0);
   });
+
+  it('expands abstract instrument/artisan category tokens (Mélesse "Polyvalence") for the species tool choice', () => {
+    creationSignal.set(
+      skillsCreation({
+        speciesBonusToolCount: 1,
+        speciesBonusToolPoolIds: ['tl-instrument-de-musique', 'tl-outils-artisan'],
+        speciesBonusToolChoiceLabel: 'Polyvalence',
+      }),
+    );
+    fixture.detectChanges();
+
+    const allItems = component.speciesToolGroups().flatMap((g) => g.items.map((t) => t.id));
+    expect(allItems).toContain('tl-lyre');
+    expect(allItems).toContain('tl-necessaire-de-brasseur');
+    expect(allItems).toContain('tl-outils-de-forgeron');
+    expect(allItems).toContain('tl-outils-de-macon');
+    expect(allItems).not.toContain('tl-des');
+    expect(allItems).not.toContain('vhc-chariot');
+  });
+
+  it('restricts the class tool choice to the concrete pool once category tokens are expanded (ex. Barde instruments)', async () => {
+    await TestBed.resetTestingModule();
+    creationSignal = signal(skillsCreation());
+    await TestBed.configureTestingModule({
+      imports: [SkillsStep],
+      providers: [
+        ...zonelessTestProviders,
+        {
+          provide: DataService,
+          useValue: {
+            getSkills: () => of(MOCK_SKILLS),
+            getClassById: () =>
+              of({
+                id: 'cls-barde',
+                name: 'Barde',
+                data: {
+                  progression: [],
+                  choice_pools: [
+                    {
+                      id: 'choice-tools-cls-barde',
+                      name: 'Instruments de musique',
+                      type: 'tool_proficiency',
+                      allow_choice: true,
+                      quantity: 3,
+                      pool: ['category-musical-instruments'],
+                    },
+                  ],
+                },
+              }),
+            getEquipments: () => of(MOCK_TOOLS),
+          },
+        },
+        {
+          provide: CharacterBuilderService,
+          useValue: {
+            creation: creationSignal,
+            targetLevel: () => 1,
+            abilityModifiers: () => ({
+              force: 0,
+              dexterite: 1,
+              constitution: 0,
+              intelligence: 2,
+              sagesse: 1,
+              charisme: 0,
+            }),
+            setProficiencies: jasmine.createSpy('setProficiencies'),
+            setExpertiseSkills: jasmine.createSpy('setExpertiseSkills'),
+            mergeClassProficiencies: jasmine.createSpy('mergeClassProficiencies'),
+            nextStep: jasmine.createSpy('nextStep'),
+            previousStep: jasmine.createSpy('previousStep'),
+          },
+        },
+      ],
+    }).compileComponents();
+
+    const bardeFixture = TestBed.createComponent(SkillsStep);
+    bardeFixture.detectChanges();
+    const barde = bardeFixture.componentInstance;
+
+    const allItems = barde.displayedClassTools().map((t) => t.id);
+    expect(allItems).toEqual(['tl-lyre']);
+    expect(allItems).not.toContain('tl-des');
+    expect(allItems).not.toContain('tl-necessaire-de-brasseur');
+  });
 });

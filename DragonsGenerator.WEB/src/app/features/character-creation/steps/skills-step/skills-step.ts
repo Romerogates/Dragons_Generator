@@ -22,6 +22,7 @@ import {
   type SkillInfo,
 } from '@core/utils/skill.utils';
 import { labelForGameId } from '@core/utils/game-id-labels';
+import { resolveEquipmentRefId } from '@core/utils/equipment.utils';
 import {
   extractExpertiseChoices,
   extractWeaponProficiencyChoices,
@@ -683,20 +684,45 @@ export class SkillsStep implements OnInit {
     'tl-vehicules-aeriens': 'air',
   };
 
-  /** Étend les jetons de catégorie abstraits (ex. `tl-vehicules-terrestres`) en identifiants
-   * concrets du catalogue (ex. `vhc-char`, `vhc-chariot`…) pour permettre un filtrage réel. */
-  private expandSpeciesToolPoolIds(poolIds: string[]): Set<string> {
+  /** Correspondance entre jetons de catégorie abstraits d'outils (espèce/classe — ex. Mélesse
+   * "Polyvalence" `tl-instrument-de-musique`/`tl-outils-artisan`, Moine `tl-cat-outils-artisan`/
+   * `tl-cat-instrument-musique`, Barde `category-musical-instruments`) et le libellé de groupe du
+   * catalogue (voir `toolGroups()`) dont il faut prendre tous les items. */
+  private static readonly TOOL_POOL_GROUP_LABELS: Record<string, string> = {
+    'tl-instrument-de-musique': 'Instruments de musique',
+    'tl-cat-instrument-musique': 'Instruments de musique',
+    'category-musical-instruments': 'Instruments de musique',
+    'tl-outils-artisan': "Outils d'artisan",
+    'tl-cat-outils-artisan': "Outils d'artisan",
+    'category-tools': "Outils d'artisan",
+    'tl-materiel-de-jeu': 'Matériel de jeu',
+    'category-gaming-sets': 'Matériel de jeu',
+  };
+
+  /** Étend un pool brut d'ids/jetons abstraits d'un `choice_pool` d'outils (véhicules par
+   * sous-type, catégories d'outils par groupe catalogue, alias/coquilles d'ids concrets) en
+   * identifiants concrets du catalogue réellement affichables. Utilisé pour les choix d'espèce
+   * (ex. Gnome des roches/Mélesse "Pilote"/"Polyvalence") et de classe (ex. Moine, Barde,
+   * Magicien) afin d'éviter le repli silencieux sur tout le catalogue quand un jeton ne matche
+   * aucun id littéral. */
+  private expandToolPoolIds(poolIds: string[]): Set<string> {
     const catalog = this.toolCatalog();
+    const groups = this.toolGroups();
     const expanded = new Set<string>();
-    for (const id of poolIds) {
-      const subtype = SkillsStep.VEHICLE_CATEGORY_SUBTYPES[id];
-      if (subtype) {
+    for (const raw of poolIds) {
+      const vehicleSubtype = SkillsStep.VEHICLE_CATEGORY_SUBTYPES[raw];
+      if (vehicleSubtype) {
         catalog
-          .filter((t) => t.type === 'VEHICLE' && t.subtype === subtype)
+          .filter((t) => t.type === 'VEHICLE' && t.subtype === vehicleSubtype)
           .forEach((t) => expanded.add(t.id));
         continue;
       }
-      expanded.add(id);
+      const groupLabel = SkillsStep.TOOL_POOL_GROUP_LABELS[raw];
+      if (groupLabel) {
+        groups.find((g) => g.label === groupLabel)?.items.forEach((t) => expanded.add(t.id));
+        continue;
+      }
+      expanded.add(resolveEquipmentRefId(raw));
     }
     return expanded;
   }
@@ -704,12 +730,13 @@ export class SkillsStep implements OnInit {
   /**
    * Groupes d'outils affichés pour le choix d'espèce différé. Restreint au pool concret défini
    * côté API (ex. Nain : nécessaire de brasseur/outils de forgeron/outils de maçon ; Gnome des
-   * roches/Mélesse "Pilote" : véhicules terrestres/maritimes/aériens, une fois les jetons de
-   * catégorie développés en identifiants concrets) quand ce pool matche des entrées réelles du
-   * catalogue. Repli sur le catalogue complet si le pool est vide ou ne matche vraiment rien.
+   * roches/Mélesse "Pilote"/"Polyvalence" : véhicules par sous-type, instruments, outils
+   * d'artisan, une fois les jetons de catégorie développés en identifiants concrets) quand ce
+   * pool matche des entrées réelles du catalogue. Repli sur le catalogue complet si le pool est
+   * vide ou ne matche vraiment rien.
    */
   readonly speciesToolGroups = computed(() => {
-    const poolIds = this.expandSpeciesToolPoolIds(this.speciesBonusToolPoolIds());
+    const poolIds = this.expandToolPoolIds(this.speciesBonusToolPoolIds());
     if (poolIds.size === 0) return this.toolGroups();
     const filtered = this.toolGroups()
       .map((g) => ({ ...g, items: g.items.filter((t) => poolIds.has(t.id)) }))
@@ -791,22 +818,21 @@ export class SkillsStep implements OnInit {
     );
   });
 
+  /**
+   * Options d'outils affichées pour le choix de classe (ex. Moine `tl-cat-outils-artisan`/
+   * `tl-cat-instrument-musique`/`tl-outils-de-la-ferme`, Barde `category-musical-instruments`,
+   * Magicien `tl-necessaire-calligraphe`/`-alchimiste`/`-cartographe`). Restreint au pool réel
+   * une fois les jetons de catégorie développés (voir `expandToolPoolIds`) ; repli sur le
+   * catalogue complet si le choix n'a pas de pool concret ou ne matche rien.
+   */
   readonly classToolOptions = computed(() => {
     const choice = this.classToolChoices()[0];
     const poolIds = ((choice?.meta?.['poolIds'] as unknown[]) ?? []).map(String);
-    const wantsGaming = poolIds.some(
-      (id) => /jeu|gaming|game/i.test(id) || id.includes('materiel-de-jeu'),
-    );
-    return this.toolCatalog().filter((t) => {
-      if (wantsGaming) {
-        return (
-          t.subtype === 'gaming_set' ||
-          /jeu|des|cartes|dice|cards/i.test(t.id) ||
-          /jeu|dés|cartes/i.test(t.name)
-        );
-      }
-      return true;
-    });
+    if (poolIds.length === 0) return this.toolCatalog();
+    const expanded = this.expandToolPoolIds(poolIds);
+    if (expanded.size === 0) return this.toolCatalog();
+    const filtered = this.toolCatalog().filter((t) => expanded.has(t.id));
+    return filtered.length > 0 ? filtered : this.toolCatalog();
   });
 
   readonly displayedClassTools = computed(() => {

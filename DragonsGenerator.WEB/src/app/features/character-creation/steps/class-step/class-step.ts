@@ -35,6 +35,7 @@ import { annotateAuraDesc } from '@core/utils/aura-range.util';
 import {
   extractProgressionChoices,
   classBonusLanguageCount,
+  classRootRequiredExoticLanguageCount,
   subclassFixedToolProficiencies,
   subclassBonusProficiencies,
   subclassBonusResistances,
@@ -1213,7 +1214,9 @@ export class ClassStep implements OnInit {
         startingEquipmentSlots: cls.data.starting_equipment ?? [],
         classProgressionResources,
         classBonusLanguageCount: langBonus,
-        classRequiredExoticLanguageCount: subBonus.requiredExoticLanguages,
+        classRequiredExoticLanguageCount:
+          subBonus.requiredExoticLanguages +
+          classRootRequiredExoticLanguageCount(cls, targetLevel),
         classResistances,
         classDarkvisionRadius: classSenses.darkvisionRadius,
         classHasBlindsight: classSenses.hasBlindsight,
