@@ -300,6 +300,34 @@ export class PdfGeneratorService {
     pdf.text(String(text), pxToMmX(xPx), pxToMmY(yPx));
   }
 
+  /**
+   * Texte avec réduction automatique de la police (par palier de 1, jusqu'à `minFontSize`)
+   * tant qu'il dépasse `maxWidthPx`. Utilisé pour les libellés d'identité de sous-classe
+   * (collège bardique, tradition arcanique, suzerain, atavisme, cercle druidique…) dont
+   * la longueur varie beaucoup et qui peuvent sinon chevaucher le bord droit du parchemin.
+   * Remet la police à `baseFontSize` après coup pour ne pas affecter le texte suivant.
+   */
+  private textFit(
+    pdf: jsPDF,
+    text: string,
+    xPx: number,
+    yPx: number,
+    maxWidthPx: number,
+    baseFontSize: number,
+    minFontSize: number = 8,
+  ): void {
+    if (!text) return;
+    let size = baseFontSize;
+    pdf.setFontSize(size);
+    const maxWidthMm = pxToMmX(maxWidthPx);
+    while (size > minFontSize && pdf.getTextWidth(text) > maxWidthMm) {
+      size -= 1;
+      pdf.setFontSize(size);
+    }
+    this.text(pdf, text, xPx, yPx);
+    pdf.setFontSize(baseFontSize);
+  }
+
   private textWrapped(
     pdf: jsPDF,
     text: string,
@@ -1190,11 +1218,13 @@ export class PdfGeneratorService {
   // --- BARDE ---
   private drawPanelBard(pdf: jsPDF, sc: Extract<CharacterSpellcasting, { kind: 'bard' }>): void {
     const P = PANEL_BARD;
-    pdf.setFontSize(15);
 
+    // Police réduite (15 → 11 de base, avec repli auto jusqu'à 8) : le nom du collège
+    // bardique (ex. « Collège des conteurs/bateleurs ») dépassait sinon le bord droit.
     if (sc.bardicCollege) {
-      this.text(pdf, sc.bardicCollege, P.line1X, P.line1Y);
+      this.textFit(pdf, sc.bardicCollege, P.line1X, P.line1Y, 578 - P.line1X, 11);
     }
+    pdf.setFontSize(15);
     if (sc.focus) {
       this.text(pdf, labelForGameId(sc.focus), P.line2X, P.line2Y);
     }
@@ -1206,11 +1236,12 @@ export class PdfGeneratorService {
     sc: Extract<CharacterSpellcasting, { kind: 'wizard' }>,
   ): void {
     const P = PANEL_WIZARD;
-    pdf.setFontSize(15);
 
+    // Même repli auto que le Barde : « École de la nécromancie/divination… » peut être long.
     if (sc.arcaneTradition) {
-      this.text(pdf, sc.arcaneTradition, P.line1X, P.line1Y);
+      this.textFit(pdf, sc.arcaneTradition, P.line1X, P.line1Y, 578 - P.line1X, 11);
     }
+    pdf.setFontSize(15);
     if (sc.focus) {
       this.text(pdf, labelForGameId(sc.focus), P.line2X, P.line2Y);
     }
@@ -1272,11 +1303,10 @@ export class PdfGeneratorService {
   // --- DRUIDE ---
   private drawPanelDruid(pdf: jsPDF, sc: Extract<CharacterSpellcasting, { kind: 'druid' }>): void {
     const P = PANEL_DRUID;
-    pdf.setFontSize(12);
 
-    // Cercle druidique
+    // Cercle druidique (ex. « Cercle de la lune/terre… ») : même repli auto que les autres classes.
     if (sc.druidCircle) {
-      this.text(pdf, sc.druidCircle, P.line1X, P.line1Y);
+      this.textFit(pdf, sc.druidCircle, P.line1X, P.line1Y, 578 - P.line1X, 11);
     }
 
     pdf.setFontSize(10);
@@ -1311,18 +1341,16 @@ export class PdfGeneratorService {
     sc: Extract<CharacterSpellcasting, { kind: 'warlock' }>,
   ): void {
     const P = PANEL_WARLOCK;
-    pdf.setFontSize(15);
 
-    // Suzerain (patron)
+    // Suzerain (patron) et Pacte : même repli auto (ex. « Le Grand Ancien », « Pacte de la Lame »).
     if (sc.patron) {
-      this.text(pdf, sc.patron, P.line1X, P.line1Y);
+      this.textFit(pdf, sc.patron, P.line1X, P.line1Y, 578 - P.line1X, 11);
     }
-
-    // Pacte
     if (sc.pact) {
-      this.text(pdf, sc.pact, P.line2X, P.line2Y);
+      this.textFit(pdf, sc.pact, P.line2X, P.line2Y, 578 - P.line2X, 11);
     }
 
+    pdf.setFontSize(15);
     // Focaliseur arcanique
     if (sc.focus) {
       this.text(pdf, labelForGameId(sc.focus), P.line3X, P.line3Y);
@@ -1359,13 +1387,13 @@ export class PdfGeneratorService {
     sc: Extract<CharacterSpellcasting, { kind: 'sorcerer' }>,
   ): void {
     const P = PANEL_SORCERER;
-    pdf.setFontSize(15);
 
-    // Atavisme (origine)
+    // Atavisme (origine) : même repli auto (ex. « Lignée draconique », « Origine sauvage »).
     if (sc.atavism) {
-      this.text(pdf, sc.atavism, P.line1X, P.line1Y);
+      this.textFit(pdf, sc.atavism, P.line1X, P.line1Y, 578 - P.line1X, 11);
     }
 
+    pdf.setFontSize(15);
     // Focaliseur arcanique
     if (sc.focus) {
       this.text(pdf, labelForGameId(sc.focus), P.line2X, P.line2Y);
