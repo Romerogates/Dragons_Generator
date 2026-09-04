@@ -826,7 +826,7 @@ export class SpeciesStep implements OnInit {
           (opt['desc'] as string) ??
           (opt['lore_note'] as string) ??
           (opt['grants_language']
-            ? `Langue intuitive : ${this.prettyOptionId(String(opt['grants_language']))}.`
+            ? `Langue intuitive : ${this.languageDisplayName(String(opt['grants_language']))}.`
             : undefined),
         note: (opt['note'] as string) ?? perPick,
         damageType: (opt['damage_type'] as string) ?? undefined,
@@ -903,6 +903,11 @@ export class SpeciesStep implements OnInit {
     if (Array.isArray(opts)) return opts;
     // JsonElement parfois sérialisé en objet { valueKind, ... } — rare
     return [];
+  }
+
+  /** Résout un id de langue (`lg-demoniaque`) en son nom affichable via le catalogue, avec repli sur le slug. */
+  private languageDisplayName(id: string): string {
+    return this.languageIdToName().get(id) ?? this.prettyOptionId(id);
   }
 
   private prettyOptionId(id: string): string {
