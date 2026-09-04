@@ -806,6 +806,16 @@ function toStringArray(raw: unknown): string[] {
 }
 
 /**
+ * Certains JSON de classe utilisent le préfixe `lang-` pour `grants_language` (ex.
+ * `lang-draconique`, `lang-argot-des-voleurs`) alors que le catalogue des langues utilise
+ * toujours `lg-` (ex. `lg-draconique`). Sans cette normalisation, l'id brut fuit tel quel
+ * dans l'UI (étape Langues) faute de correspondance dans le catalogue.
+ */
+function normalizeLanguageId(id: string): string {
+  return id.startsWith('lang-') ? `lg-${id.slice('lang-'.length)}` : id;
+}
+
+/**
  * Certains JSON de sous-classe exposent `features` (déjà normalisé par l'adapter) ET
  * `features_details` (copie brute conservée par le spread `...sub`). On dédoublonne par id
  * pour ne jamais compter deux fois une même feature (ex. bonus_languages, choix imbriqués).
@@ -915,10 +925,10 @@ export function subclassBonusProficiencies(
       for (const id of doubleIds) conditionalSkills.add(id);
     }
 
-    for (const id of toStringArray(feat['grants_language'])) languages.add(id);
-    for (const id of toStringArray(mech['grants_language'])) languages.add(id);
-    for (const id of toStringArray(feat['languages_granted'])) languages.add(id);
-    for (const id of toStringArray(mech['languages_granted'])) languages.add(id);
+    for (const id of toStringArray(feat['grants_language'])) languages.add(normalizeLanguageId(id));
+    for (const id of toStringArray(mech['grants_language'])) languages.add(normalizeLanguageId(id));
+    for (const id of toStringArray(feat['languages_granted'])) languages.add(normalizeLanguageId(id));
+    for (const id of toStringArray(mech['languages_granted'])) languages.add(normalizeLanguageId(id));
 
     const saveGrant = feat['grants_saving_throw_proficiency'] ?? mech['grants_saving_throw_proficiency'];
     for (const code of toStringArray(saveGrant)) savingThrows.add(code.toLowerCase());

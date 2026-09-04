@@ -139,7 +139,8 @@ describe('subclassBonusProficiencies', () => {
     expect(res.tools).toEqual(['tl-necessaire-alchimiste']);
     expect(res.skills).toEqual(['skill-intimidation']);
     expect(res.conditionalSkills).toEqual(['skill-intimidation']);
-    expect(res.languages).toEqual(['lang-draconique']);
+    // `lang-` normalisé en `lg-` pour matcher le catalogue des langues.
+    expect(res.languages).toEqual(['lg-draconique']);
     expect(res.savingThrows).toEqual(['wis']);
     expect(res.bonusLanguages).toBe(3);
     expect(res.requiredExoticLanguages).toBe(1);
