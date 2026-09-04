@@ -12,13 +12,17 @@ import { ABILITY_LABEL_TO_KEY } from '@core/models/Character/character';
 export interface CombatBuildContext {
   spellAbility?: Ability | null;
   classId?: string | null;
+  /** Classe primaire + secondaires (moine / attaque supplémentaire / UD). */
+  classIds?: string[];
   classFeatures?: FeatureInstance[];
   resources?: Record<string, number | string | null>;
 }
 
 export interface ArmorClassContext {
   classId?: string | null;
+  classIds?: string[];
   subclassId?: string | null;
+  subclassIds?: string[];
   classFeatures?: FeatureInstance[];
 }
 
@@ -30,7 +34,8 @@ export function buildCharacterAttacks(
   ctx: CombatBuildContext = {},
 ): Attack[] {
   const spellAbility = ctx.spellAbility ?? null;
-  const isMonk = ctx.classId === 'cls-moine';
+  const classIds = collectClassIds(ctx.classId, ctx.classIds);
+  const isMonk = classIds.has('cls-moine');
   const martialArtsDie =
     typeof ctx.resources?.['martial_arts_die'] === 'string'
       ? String(ctx.resources['martial_arts_die'])
@@ -40,6 +45,10 @@ export function buildCharacterAttacks(
   const unarmored = isUnarmoredForMonk(equipment);
   const canUseMartialArts = isMonk && unarmored && !!martialArtsDie;
   const extraAttacks = Math.max(0, Number(ctx.resources?.['extra_attacks'] ?? 0) || 0);
+  const sneakDice =
+    typeof ctx.resources?.['sneak_attack_dice'] === 'string'
+      ? String(ctx.resources['sneak_attack_dice'])
+      : null;
 
   const weaponAttacks = equipment
     .filter(
@@ -85,6 +94,7 @@ export function buildCharacterAttacks(
         properties: [
           ...(wd.properties ?? []),
           ...(extraAttacks > 0 ? [`Attaques ×${1 + extraAttacks}`] : []),
+          ...(sneakDice && (isFinesse || isRanged) ? [`Attaque sournoise ${sneakDice}`] : []),
         ],
       };
     });
@@ -145,15 +155,27 @@ export function computeCharacterWalkSpeed(
   equipment: EquipmentInstance[],
 ): number {
   let walk = c.speciesSpeed || 9;
+  const secondaryIds = ((c as { secondaryClasses?: { classId: string }[] }).secondaryClasses ?? []).map(
+    (sc) => sc.classId,
+  );
   const isMonk =
     c.classId === 'cls-moine' ||
+    secondaryIds.includes('cls-moine') ||
     (c.classFeatures ?? []).some(
       (f) =>
         f.refId === 'feat-deplacement-sans-armure' ||
         f.refId === 'feat-mouvement-sans-armure',
     );
   if (isMonk && isUnarmoredForMonk(equipment)) {
-    const bonus = Number(c.classProgressionResources?.['unarmored_movement_bonus_m'] ?? 0);
+    const extras = (
+      (c as { secondaryClasses?: { classProgressionResources?: Record<string, number | string | null> }[] })
+        .secondaryClasses ?? []
+    ).map((sc) => sc.classProgressionResources ?? {});
+    const bonus = Number(
+      mergeClassProgressionResources(c.classProgressionResources ?? {}, extras)[
+        'unarmored_movement_bonus_m'
+      ] ?? 0,
+    );
     if (!Number.isNaN(bonus) && bonus > 0) walk += bonus;
   }
   return walk;
@@ -227,17 +249,19 @@ export function computeCharacterArmorClass(
     (e) => e.equipped && (e.customData as { isShield?: boolean })?.isShield,
   );
 
-  const classId = ctx?.classId ?? null;
-  const subclassId = ctx?.subclassId ?? null;
+  const classIds = collectClassIds(ctx?.classId, ctx?.classIds);
+  const subclassIds = new Set(
+    [ctx?.subclassId, ...(ctx?.subclassIds ?? [])].filter((id): id is string => !!id),
+  );
   const features = ctx?.classFeatures ?? [];
   const featureIds = new Set(features.map((f) => f.refId));
 
   const hasBarbarianUD =
-    classId === 'cls-barbare' || featureIds.has('feat-defense-sans-armure');
+    classIds.has('cls-barbare') || featureIds.has('feat-defense-sans-armure');
   const hasMonkUD =
-    classId === 'cls-moine' || featureIds.has('feat-defense-sans-armure-moine');
+    classIds.has('cls-moine') || featureIds.has('feat-defense-sans-armure-moine');
   const hasDraconicResilience =
-    subclassId === 'subcls-lignee-draconique' ||
+    subclassIds.has('subcls-lignee-draconique') ||
     featureIds.has('feat-resistance-draconique');
   const hasDefenseStyle = features.some(
     (f) =>
@@ -299,4 +323,44 @@ export function findEquippedArmorName(equipment: EquipmentInstance[]): string {
     equipment.find((e) => e.equipped && (e.customData as { isArmor?: boolean })?.isArmor)?.name ??
     'Aucune'
   );
+}
+
+export function collectClassIds(
+  primary?: string | null,
+  extra?: string[] | null,
+): Set<string> {
+  return new Set([primary, ...(extra ?? [])].filter((id): id is string => !!id));
+}
+
+/** Fusionne rage/ki/extra_attacks/dés de moine/roublard entre classes. */
+export function mergeClassProgressionResources(
+  primary: Record<string, number | string | null>,
+  extras: Record<string, number | string | null>[],
+): Record<string, number | string | null> {
+  const out: Record<string, number | string | null> = { ...primary };
+  for (const extra of extras) {
+    for (const [key, value] of Object.entries(extra)) {
+      if (value == null) continue;
+      if (key === 'extra_attacks' || key === 'unarmored_movement_bonus_m') {
+        out[key] = Math.max(Number(out[key] ?? 0) || 0, Number(value) || 0);
+        continue;
+      }
+      if (
+        (key === 'martial_arts_die' || key === 'sneak_attack_dice') &&
+        typeof value === 'string'
+      ) {
+        const current = out[key];
+        out[key] = typeof current === 'string' ? pickHigherDie(current, value) : value;
+        continue;
+      }
+      if (out[key] == null) {
+        out[key] = value;
+        continue;
+      }
+      if (typeof value === 'number' && typeof out[key] === 'number') {
+        out[key] = Math.max(out[key] as number, value);
+      }
+    }
+  }
+  return out;
 }

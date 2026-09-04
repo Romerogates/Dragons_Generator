@@ -9,6 +9,24 @@
       Canalisez les flux arcaniques, divins ou primordiaux. Les mots ont un pouvoir, choisissez les
       vôtres.
     </p>
+    @if (casterSources().length > 1) {
+      <div class="flex flex-wrap justify-center gap-2 mt-4">
+        @for (src of casterSources(); track src.classId; let i = $index) {
+          <button
+            type="button"
+            class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-colors"
+            [ngClass]="
+              i === activeCasterIndex()
+                ? 'bg-fuchsia-950/40 text-fuchsia-300 border-fuchsia-700/60'
+                : 'bg-[#1b2028] text-slate-400 border-slate-700 hover:border-slate-500'
+            "
+            (click)="selectCaster(i)"
+          >
+            {{ src.className }} {{ src.level }}
+          </button>
+        }
+      </div>
+    }
     @if (spellMilestones().length) {
       <p class="text-[10px] text-slate-500 max-w-xl mx-auto mt-2 leading-relaxed">
         Jalons de progression (niv. 1–{{ builder.targetLevel() }}) :

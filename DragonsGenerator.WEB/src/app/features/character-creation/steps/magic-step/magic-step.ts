@@ -18,6 +18,7 @@ import type { Spell } from '@core/models/Spells/spell';
 import type { Deity } from '@core/models/Deities/deity';
 import type { SpellcastingKind, AbilityKey } from '@core/models/Character/character';
 import { warlockArcanumSpellLevels, spellProgressionMilestones } from '@core/utils/progression-choices.util';
+import { collectCasterSources, type CasterSource } from '@core/utils/class-spellcasting.util';
 import { maxSpellLevelFromSlots } from '@core/utils/feature-uses.util';
 import {
   spellCastTimeLabel,
@@ -141,6 +142,15 @@ const SPELL_QUOTAS_FALLBACK: Record<string, SpellQuota> = {
     hasFullListAccess: false,
     modeLabel: 'Sorts connus (niv. 2+)',
   },
+  fighter_eldritch_knight: {
+    cantrips: 2,
+    knownSpells: 3,
+    grimoireSpells: 0,
+    preparedSpells: 0,
+    isPrepared: false,
+    hasFullListAccess: false,
+    modeLabel: 'Sorts connus (élu arcanique)',
+  },
 };
 
 /** subcls-domaine-de-la-vie → dom-vie */
@@ -180,6 +190,12 @@ export class MagicStep implements OnInit {
   readonly expandedSpellId = signal<string | null>(null);
   /** Snapshot JSON classe pour recalculer les quotas si le niveau change. */
   private readonly loadedClass = signal<any>(null);
+  private readonly loadedClasses = signal<Map<string, unknown>>(new Map());
+  readonly activeCasterIndex = signal(0);
+  private picksByClass: Record<
+    string,
+    { cantrips: string[]; spells: string[]; deityId: string | null }
+  > = {};
 
   readonly selectedCantrips = signal<Set<string>>(new Set());
   readonly selectedSpells = signal<Set<string>>(new Set());
@@ -200,10 +216,10 @@ export class MagicStep implements OnInit {
 
   constructor() {
     effect(() => {
-      const level = this.builder.targetLevel();
+      const caster = this.activeCaster();
       const cls = this.loadedClass();
       if (!cls) return;
-      void level;
+      void caster?.level;
       untracked(() => {
         this.applyClassSpellData(cls);
         this.trimSelectionsToQuota();
@@ -213,13 +229,23 @@ export class MagicStep implements OnInit {
 
   // === Computed ===
 
+  readonly casterSources = computed<CasterSource[]>(() =>
+    collectCasterSources(this.builder.creation() as never),
+  );
+
+  readonly activeCaster = computed<CasterSource | null>(() => {
+    const sources = this.casterSources();
+    if (!sources.length) return null;
+    return sources[this.activeCasterIndex()] ?? sources[0] ?? null;
+  });
+
   readonly spellcastingKind = computed<SpellcastingKind | null>(
-    () => this.builder.creation().spellcastingKind,
+    () => this.activeCaster()?.kind ?? this.builder.creation().spellcastingKind,
   );
 
   readonly racialSpellGrants = computed(() => this.builder.creation().racialSpellGrants ?? []);
 
-  readonly hasClassSpellcasting = computed(() => this.builder.creation().hasSpellcasting);
+  readonly hasClassSpellcasting = computed(() => this.casterSources().length > 0);
 
   readonly racialSpellsComplete = computed(() =>
     this.racialSpellGrants().every((g) => {
@@ -240,13 +266,13 @@ export class MagicStep implements OnInit {
   /** Emplacements d'Arcane (sorcier L11+). */
   readonly arcanumSpellLevels = computed(() => {
     if (!this.isWarlock()) return [] as number[];
-    return warlockArcanumSpellLevels(this.builder.targetLevel());
+    return warlockArcanumSpellLevels(this.casterLevel());
   });
 
   readonly spellMilestones = computed(() => {
     const cls = this.loadedClass();
     if (!cls) return [];
-    return spellProgressionMilestones(cls, this.builder.targetLevel());
+    return spellProgressionMilestones(cls, this.casterLevel());
   });
 
   readonly arcanumComplete = computed(() => {
@@ -258,11 +284,11 @@ export class MagicStep implements OnInit {
 
   /** Magicien L17 : maîtrise 1 sort niv.1 + 1 niv.2 parmi le grimoire. */
   readonly needsSpellMastery = computed(
-    () => this.isWizard() && this.builder.targetLevel() >= 17,
+    () => this.isWizard() && this.casterLevel() >= 17,
   );
   /** Magicien L19 : 2 sorts attitrés de niv.3. */
   readonly needsSignatureSpells = computed(
-    () => this.isWizard() && this.builder.targetLevel() >= 19,
+    () => this.isWizard() && this.casterLevel() >= 19,
   );
 
   readonly masteryComplete = computed(() => {
@@ -342,7 +368,15 @@ export class MagicStep implements OnInit {
     return 'Sorts bonus (toujours préparés)';
   });
 
-  readonly classId = computed(() => this.builder.creation().classId);
+  readonly classId = computed(() => this.activeCaster()?.classId ?? this.builder.creation().classId);
+
+  readonly activeSubclassId = computed(
+    () => this.activeCaster()?.subclassId ?? this.builder.creation().subclassId,
+  );
+
+  readonly casterLevel = computed(
+    () => this.activeCaster()?.level ?? this.builder.targetLevel(),
+  );
 
   readonly quota = computed<SpellQuota | null>(() => {
     const fromClass = this.classQuota();
@@ -351,7 +385,9 @@ export class MagicStep implements OnInit {
     return kind ? (SPELL_QUOTAS_FALLBACK[kind] ?? null) : null;
   });
 
-  readonly spellcastingAbility = computed(() => this.builder.creation().spellcastingAbility);
+  readonly spellcastingAbility = computed(
+    () => this.activeCaster()?.ability ?? this.builder.creation().spellcastingAbility,
+  );
 
   /** DD de sauvegarde des sorts. */
   readonly spellSaveDC = computed(() => {
@@ -374,8 +410,10 @@ export class MagicStep implements OnInit {
   /** Niveau de sort max accessible (selon emplacements JSON ou repli SRD). */
   readonly maxSpellLevel = computed(() => {
     const kind = this.spellcastingKind();
-    const level = this.builder.targetLevel();
-    const fromJson = maxSpellLevelFromSlots(this.builder.creation().classSpellSlots);
+    const level = this.casterLevel();
+    const fromJson = this.activeCaster()?.isPrimary
+      ? maxSpellLevelFromSlots(this.builder.creation().classSpellSlots)
+      : 0;
     if (fromJson > 0) return fromJson;
     if (!kind) return 1;
     if (kind === 'warlock') {
@@ -385,7 +423,15 @@ export class MagicStep implements OnInit {
       if (level >= 3) return 2;
       return 1;
     }
-    const half = kind === 'paladin' || kind === 'ranger' || kind === 'fighter_eldritch_knight';
+    const half = kind === 'paladin' || kind === 'ranger';
+    const third = kind === 'fighter_eldritch_knight';
+    if (third) {
+      if (level < 3) return 0;
+      if (level >= 19) return 4;
+      if (level >= 13) return 3;
+      if (level >= 7) return 2;
+      return 1;
+    }
     if (half) {
       if (level < 2) return 0;
       if (level >= 17) return 5;
@@ -408,7 +454,7 @@ export class MagicStep implements OnInit {
 
   private spellsForClass(level: number): Spell[] {
     const classId = this.classId();
-    const targetLevel = this.builder.targetLevel();
+    const targetLevel = this.casterLevel();
     const kind = this.spellcastingKind();
     return this.allSpells()
       .filter((s) => s.level === level)
@@ -489,7 +535,7 @@ export class MagicStep implements OnInit {
     const forCleric = all.filter((d) =>
       (d.grantsPowersTo ?? []).some((g) => g.toLowerCase().includes('pretre')),
     );
-    const domainId = SUBCLASS_TO_DOMAIN[this.builder.creation().subclassId ?? ''];
+    const domainId = SUBCLASS_TO_DOMAIN[this.activeSubclassId() ?? ''];
     if (!domainId) return forCleric;
     return forCleric.filter((d) => (d.domains ?? []).includes(domainId));
   });
@@ -532,6 +578,40 @@ export class MagicStep implements OnInit {
     return spellsOk;
   });
 
+  selectCaster(index: number): void {
+    const sources = this.casterSources();
+    if (index < 0 || index >= sources.length || index === this.activeCasterIndex()) return;
+    this.persistActivePicks();
+    this.activeCasterIndex.set(index);
+    const next = sources[index];
+    const cls = this.loadedClasses().get(next.classId) ?? null;
+    this.loadedClass.set(cls);
+    this.applyClassSpellData(cls);
+    this.restorePicksFor(next.classId);
+  }
+
+  private persistActivePicks(): void {
+    const id = this.activeCaster()?.classId;
+    if (!id) return;
+    this.picksByClass[id] = {
+      cantrips: [...this.selectedCantrips()],
+      spells: [...this.selectedSpells()],
+      deityId: this.selectedDeityId(),
+    };
+  }
+
+  private restorePicksFor(classId: string): void {
+    const saved = this.picksByClass[classId];
+    if (!saved) {
+      this.selectedCantrips.set(new Set());
+      this.selectedSpells.set(new Set());
+      return;
+    }
+    this.selectedCantrips.set(new Set(saved.cantrips));
+    this.selectedSpells.set(new Set(saved.spells));
+    this.selectedDeityId.set(saved.deityId);
+  }
+
   readonly isConfirmed = computed(() => {
     const details = this.builder.creation().spellcastingDetails;
     return !!(details && (details as any).cantrips);
@@ -541,22 +621,31 @@ export class MagicStep implements OnInit {
 
   ngOnInit(): void {
     this.loading.set(true);
-    const classId = this.builder.creation().classId;
+    const casterIds = [
+      ...new Set(collectCasterSources(this.builder.creation() as never).map((s) => s.classId)),
+    ];
 
     const requests: Record<string, any> = {
       spells: this.dataService.getSpells(),
       deities: this.dataService.getDeities(),
     };
-    if (classId) {
-      requests['cls'] = this.dataService.getClassById(classId);
+    for (const id of casterIds) {
+      requests[`cls:${id}`] = this.dataService.getClassById(id);
     }
 
     forkJoin(requests).subscribe({
       next: (res: any) => {
         this.allSpells.set(res.spells);
         this.deities.set(res.deities);
-        this.loadedClass.set(res.cls ?? null);
-        this.applyClassSpellData(res.cls);
+        const map = new Map<string, unknown>();
+        for (const id of casterIds) {
+          if (res[`cls:${id}`]) map.set(id, res[`cls:${id}`]);
+        }
+        this.loadedClasses.set(map);
+        const first = this.casterSources()[0];
+        const firstCls = first ? map.get(first.classId) : null;
+        this.loadedClass.set(firstCls ?? null);
+        this.applyClassSpellData(firstCls);
         this.loading.set(false);
         this.restoreFromBuilder();
       },
@@ -578,7 +667,7 @@ export class MagicStep implements OnInit {
     const fallback = SPELL_QUOTAS_FALLBACK[kind];
     if (!fallback) return null;
 
-    const targetLevel = this.builder.targetLevel();
+    const targetLevel = this.casterLevel();
     const prog = (cls?.data?.progression as any[])?.find((p) => p.level === targetLevel)
       ?? (cls?.data?.progression as any[])?.find((p) => p.level === 1);
     const resources = prog?.resources ?? {};
@@ -590,7 +679,7 @@ export class MagicStep implements OnInit {
         : fallback.cantrips;
     // Cercle de la Terre : sort mineur supplémentaire (pool différé hors class-step)
     const bonusSubclassCantrips =
-      this.builder.creation().subclassId === 'subcls-cercle-de-la-terre' ? 1 : 0;
+      this.activeSubclassId() === 'subcls-cercle-de-la-terre' ? 1 : 0;
 
     const knownSpells =
       typeof resources.spells_known === 'number'
@@ -633,7 +722,7 @@ export class MagicStep implements OnInit {
 
   private extractDomainSpells(cls: any): void {
     const kind = this.spellcastingKind();
-    const subclassId = this.builder.creation().subclassId;
+    const subclassId = this.activeSubclassId();
     const options = cls?.data?.subclasses?.options ?? [];
     const sub = options.find((o: any) => o.id === subclassId);
 
@@ -650,7 +739,7 @@ export class MagicStep implements OnInit {
       }[];
       this.subclassBonusSpells = granted;
       const ids = granted
-        .filter((g) => (g.level_unlocked ?? 99) <= this.builder.targetLevel())
+        .filter((g) => (g.level_unlocked ?? 99) <= this.casterLevel())
         .flatMap((g) => g.spells ?? []);
       this.domainSpellIds.set([...new Set(ids)]);
       return;
@@ -670,7 +759,7 @@ export class MagicStep implements OnInit {
       const granted = terrainBlock?.grants ?? [];
       this.subclassBonusSpells = granted;
       const ids = granted
-        .filter((g) => (g.level_unlocked ?? 99) <= this.builder.targetLevel())
+        .filter((g) => (g.level_unlocked ?? 99) <= this.casterLevel())
         .flatMap((g) => g.spells ?? []);
       this.domainSpellIds.set([...new Set(ids)]);
       return;
@@ -796,6 +885,17 @@ export class MagicStep implements OnInit {
   confirm(): void {
     if (!this.selectionComplete()) return;
 
+    this.persistActivePicks();
+    const mergedCantripIds = new Set<string>();
+    const mergedSpellIds = new Set<string>();
+    for (const src of this.casterSources()) {
+      const p = this.picksByClass[src.classId];
+      (p?.cantrips ?? []).forEach((id) => mergedCantripIds.add(id));
+      (p?.spells ?? []).forEach((id) => mergedSpellIds.add(id));
+    }
+    if (!mergedCantripIds.size) this.selectedCantrips().forEach((id) => mergedCantripIds.add(id));
+    if (!mergedSpellIds.size) this.selectedSpells().forEach((id) => mergedSpellIds.add(id));
+
     const allMap = new Map(this.allSpells().map((s) => [s.id, s]));
 
     const racialCantripInstances = this.racialSpellGrants()
@@ -815,7 +915,7 @@ export class MagicStep implements OnInit {
 
     const cantripInstances = [
       ...racialCantripInstances,
-      ...[...this.selectedCantrips()].map((id) => {
+      ...[...mergedCantripIds].map((id) => {
         const raw = allMap.get(id);
         return {
           refId: id,
@@ -827,7 +927,7 @@ export class MagicStep implements OnInit {
       }),
     ];
 
-    const chosenSpellIds = [...this.selectedSpells()];
+    const chosenSpellIds = [...mergedSpellIds];
     const domainIds = this.domainSpellIds().filter((id) => !chosenSpellIds.includes(id));
     const spellInstances = [...chosenSpellIds, ...domainIds].map((id) => {
       const raw = allMap.get(id);
@@ -915,12 +1015,13 @@ export class MagicStep implements OnInit {
       spells: spellInstances,
       deity: deity?.name ?? '',
       deityId: deity?.id ?? '',
-      domain: this.builder.creation().subclassName ?? '',
-      domainId: this.builder.creation().subclassId ?? '',
-      hasFullSpellList: this.quota()?.hasFullListAccess ?? false,
-      preparedCount: this.quota()?.preparedSpells ?? 0,
-      patron: this.builder.creation().subclassName ?? '',
-      arcaneTradition: this.builder.creation().subclassName ?? '',
+      domain: this.activeCaster()?.subclassName ?? this.builder.creation().subclassName ?? '',
+      domainId: this.activeSubclassId() ?? '',
+        hasFullSpellList: this.quota()?.hasFullListAccess ?? false,
+        preparedCount: this.quota()?.preparedSpells ?? 0,
+        byClass: this.picksByClass,
+      patron: this.activeCaster()?.subclassName ?? this.builder.creation().subclassName ?? '',
+      arcaneTradition: this.activeCaster()?.subclassName ?? this.builder.creation().subclassName ?? '',
       mysticArcanum,
       spellMastery,
       signatureSpells,
@@ -1091,13 +1192,25 @@ export class MagicStep implements OnInit {
         .filter(Boolean),
     );
     if (details?.cantrips) {
+      const byClass = details.byClass as Record<string, { cantrips?: string[] }> | undefined;
+      const activeId = this.activeCaster()?.classId;
+      const fromClass = activeId && byClass?.[activeId]?.cantrips;
       this.selectedCantrips.set(
         new Set(
-          details.cantrips
-            .map((c: any) => c.refId)
-            .filter((id: string) => !racialIds.has(id)),
+          (fromClass ?? details.cantrips.map((c: any) => c.refId)).filter(
+            (id: string) => !racialIds.has(id),
+          ),
         ),
       );
+      if (byClass) {
+        for (const [id, p] of Object.entries(byClass)) {
+          this.picksByClass[id] = {
+            cantrips: p.cantrips ?? [],
+            spells: (p as { spells?: string[] }).spells ?? [],
+            deityId: (p as { deityId?: string | null }).deityId ?? null,
+          };
+        }
+      }
     }
     if (details?.spells) {
       this.selectedSpells.set(

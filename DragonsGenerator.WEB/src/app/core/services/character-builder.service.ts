@@ -33,6 +33,7 @@ import { proficiencyBonusForLevel } from '../utils/character-progression.util';
 import type { RawFeatData } from '../utils/feat-benefits.util';
 import type { Spell } from '../models/Spells/spell';
 import { isWizardStepValid } from '../utils/character-wizard-validation.util';
+import { creationNeedsMagicStep } from '../utils/class-spellcasting.util';
 import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { DataService } from './data.service';
@@ -126,11 +127,7 @@ export class CharacterBuilderService {
     return base;
   });
 
-  /** Étape Magie si la classe incante ou si l'espèce accorde un sort racial. */
-  readonly needsMagicStep = computed(
-    () =>
-      this.creation().hasSpellcasting || (this.creation().racialSpellGrants?.length ?? 0) > 0,
-  );
+  readonly needsMagicStep = computed(() => creationNeedsMagicStep(this.creation()));
 
   readonly totalSteps = computed(() => this.steps().length);
   readonly summaryStep = computed(() => this.totalSteps());
@@ -925,22 +922,23 @@ export class CharacterBuilderService {
     // On recharge ensuite avec le contexte complet (dons + sorts) pour recalculer fidèlement
     // les bonus dérivés des dons (don "Talent" à 4 points, darkvision, résistances…), sans
     // attendre que le joueur retraverse l'étape Caractéristiques.
-    if (savedCharacter.asiChoices?.length) {
+    if (savedCharacter.asiChoices?.length || (savedCharacter.classes?.length ?? 0) > 1) {
       forkJoin({
         feats: this.dataService.getFeats(),
         spells: this.dataService.getSpells(),
+        classes: this.dataService.getClasses(),
       }).subscribe({
-        next: ({ feats, spells }) => {
+        next: ({ feats, spells, classes }) => {
           const featsById = new Map<string, RawFeatData>(
             (feats ?? []).map((f) => [f.id, (f.data ?? {}) as RawFeatData]),
           );
           const spellsById = new Map<string, Spell>((spells ?? []).map((s) => [s.id, s]));
+          const classesById = new Map((classes ?? []).map((cls) => [cls.id, cls]));
           const { creation: refined } = mapCharacterToEditState(savedCharacter, {
             feats: featsById,
             spells: spellsById,
+            classes: classesById,
           });
-          // Ne réapplique que si on est toujours en train d'éditer ce même personnage (l'utilisateur
-          // n'a pas déjà réinitialisé ou changé de page pendant le chargement asynchrone).
           if (this.editingRef()?.id === editing.id) {
             this.creation.set(refined);
           }

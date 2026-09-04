@@ -197,8 +197,9 @@ export function spellSlotsForCharacterLevel(
 export function buildCharacterSpellcasting(
   c: CharacterCreation,
   modifiers: AbilityScores,
+  opts?: { totalLevel?: number; warlockLevel?: number },
 ): CharacterSpellcasting | null {
-  if (!c.hasSpellcasting || !c.spellcastingKind || !c.spellcastingAbility) return null;
+  if (!c.spellcastingKind || !c.spellcastingAbility) return null;
   const abilityKey = ABILITY_LABEL_TO_KEY[c.spellcastingAbility];
   const spellMod = modifiers[abilityKey] ?? 0;
   const details = c.spellcastingDetails as
@@ -206,11 +207,17 @@ export function buildCharacterSpellcasting(
     | undefined;
   const cantripCount = Array.isArray(details?.cantrips) ? details.cantrips.length : 0;
   const focus = detectSpellcastingFocus(c);
-  const level = Math.min(20, Math.max(1, c.targetLevel || 1));
-  const prof = proficiencyBonusForLevel(level);
-  const slots = spellSlotsForCharacterLevel(c.spellcastingKind, level, c.classSpellSlots).map(
+  const classLevel = Math.min(20, Math.max(1, c.targetLevel || 1));
+  const profLevel = Math.min(20, Math.max(1, opts?.totalLevel ?? classLevel));
+  const prof = proficiencyBonusForLevel(profLevel);
+  const slots = spellSlotsForCharacterLevel(c.spellcastingKind, classLevel, c.classSpellSlots).map(
     (s) => ({ ...s, used: 0 }),
   );
+  const warlockLevel = opts?.warlockLevel;
+  const pactSlots =
+    warlockLevel && warlockLevel > 0
+      ? spellSlotsForCharacterLevel('warlock', warlockLevel).map((s) => ({ ...s, used: 0 }))
+      : undefined;
   const base = {
     ability: c.spellcastingAbility,
     spellSaveDC: 8 + prof + spellMod,
@@ -218,6 +225,7 @@ export function buildCharacterSpellcasting(
     focus,
     spellSlots: slots,
     cantrips: { max: cantripCount, used: 0 },
+    ...(pactSlots?.length && c.spellcastingKind !== 'warlock' ? { pactSlots } : {}),
   };
   const d = (details ?? {}) as Record<string, unknown>;
   const detailStr = (key: string, fallback = ''): string => {

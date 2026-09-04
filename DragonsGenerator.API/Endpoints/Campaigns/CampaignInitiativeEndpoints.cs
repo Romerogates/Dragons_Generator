@@ -1,6 +1,7 @@
 using DragonsGenerator.API.Persistence;
 using DragonsGenerator.API.Services;
 using FastEndpoints;
+using Microsoft.EntityFrameworkCore;
 
 namespace DragonsGenerator.API.Endpoints.Campaigns;
 
@@ -55,13 +56,6 @@ public class SubmitInitiativeEndpoint(AppDbContext db) : Endpoint<SubmitInitiati
         }
 
         var id = Route<Guid>("id");
-        var (campaign, membership, isOwner) = await CampaignAccess.LoadAsync(db, id, userId.Value, ct);
-        if (campaign is null || !CampaignAccess.CanView(isOwner, membership))
-        {
-            await Send.NotFoundAsync(ct);
-            return;
-        }
-
         if (string.IsNullOrWhiteSpace(req.Code) || string.IsNullOrWhiteSpace(req.CombatantId))
         {
             AddError("Code et combattant requis.");
@@ -69,25 +63,48 @@ public class SubmitInitiativeEndpoint(AppDbContext db) : Endpoint<SubmitInitiati
             return;
         }
 
-        var newJson = CampaignJsonHelpers.TryApplyInitiativeRoll(
-            campaign.JsonData,
-            req.Code,
-            req.CombatantId,
-            req.Roll,
-            isOwner ? null : userId,
-            out var error);
-
-        if (newJson is null)
+        string? lastError = null;
+        for (var attempt = 0; attempt < 3; attempt++)
         {
-            AddError(error ?? "Impossible d'enregistrer le jet.");
-            await Send.ErrorsAsync(StatusCodes.Status409Conflict, ct);
-            return;
+            var (campaign, membership, isOwner) = await CampaignAccess.LoadAsync(db, id, userId.Value, ct);
+            if (campaign is null || !CampaignAccess.CanView(isOwner, membership))
+            {
+                await Send.NotFoundAsync(ct);
+                return;
+            }
+
+            var newJson = CampaignJsonHelpers.TryApplyInitiativeRoll(
+                campaign.JsonData,
+                req.Code,
+                req.CombatantId,
+                req.Roll,
+                isOwner ? null : userId,
+                out lastError);
+
+            if (newJson is null)
+            {
+                AddError(lastError ?? "Impossible d'enregistrer le jet.");
+                await Send.ErrorsAsync(StatusCodes.Status409Conflict, ct);
+                return;
+            }
+
+            campaign.JsonData = newJson;
+            campaign.UpdatedAt = DateTimeOffset.UtcNow;
+            try
+            {
+                await db.SaveChangesAsync(ct);
+                await Send.NoContentAsync(ct);
+                return;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                foreach (var entry in db.ChangeTracker.Entries())
+                    await entry.ReloadAsync(ct);
+            }
         }
 
-        campaign.JsonData = newJson;
-        campaign.UpdatedAt = DateTimeOffset.UtcNow;
-        await db.SaveChangesAsync(ct);
-        await Send.NoContentAsync(ct);
+        AddError(lastError ?? "Impossible d'enregistrer le jet (concurrence).");
+        await Send.ErrorsAsync(StatusCodes.Status409Conflict, ct);
     }
 }
 

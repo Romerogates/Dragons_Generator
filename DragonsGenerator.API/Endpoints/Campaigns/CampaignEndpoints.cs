@@ -214,7 +214,8 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
         if (req.Data.ValueKind != JsonValueKind.Undefined)
         {
             var merged = CampaignJsonHelpers.StripDmOnlyFieldsFromUpdate(req.Data, campaign.JsonData, isOwner);
-            var newJson = merged.GetRawText();
+            var incomingRaw = merged.GetRawText();
+            var newJson = CampaignJsonHelpers.MergeLiveCombatIntoIncoming(incomingRaw, campaign.JsonData);
             if (isOwner)
             {
                 var change = CampaignJsonHelpers.AnalyzeSessionChanges(campaign.JsonData, newJson);
@@ -267,7 +268,27 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
             campaign.JsonData = newJson;
         }
         campaign.UpdatedAt = DateTimeOffset.UtcNow;
-        await db.SaveChangesAsync(ct);
+        for (var attempt = 0; ; attempt++)
+        {
+            try
+            {
+                await db.SaveChangesAsync(ct);
+                break;
+            }
+            catch (DbUpdateConcurrencyException) when (attempt < 2)
+            {
+                foreach (var entry in db.ChangeTracker.Entries())
+                    await entry.ReloadAsync(ct);
+                if (req.Data.ValueKind != JsonValueKind.Undefined)
+                {
+                    var incomingRaw = req.Data.GetRawText();
+                    var replay = CampaignJsonHelpers.StripDmOnlyFieldsFromUpdate(req.Data, campaign.JsonData, isOwner);
+                    campaign.JsonData = CampaignJsonHelpers.MergeLiveCombatIntoIncoming(
+                        replay.GetRawText(), campaign.JsonData);
+                }
+                campaign.UpdatedAt = DateTimeOffset.UtcNow;
+            }
+        }
 
         if (sessionChange is not null)
         {

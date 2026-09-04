@@ -50,6 +50,7 @@ import type {
   SpellcastingKind,
 } from '../../../../core/models/Character/character';
 import { MulticlassPanel } from './multiclass-panel/multiclass-panel';
+import { CLASS_SPELLCASTING, resolveClassSpellcasting } from '@core/utils/class-spellcasting.util';
 
 // ============================================================================
 // TYPES
@@ -252,28 +253,6 @@ function isConcreteCombatStyleId(id: string): boolean {
 // ============================================================================
 // CONSTANTES
 // ============================================================================
-
-const CLASS_SPELLCASTING: Record<string, { kind: SpellcastingKind; ability: Ability } | null> = {
-  'cls-barbare': null,
-  'cls-barde': { kind: 'bard', ability: 'Charisme' },
-  'cls-druide': { kind: 'druid', ability: 'Sagesse' },
-  'cls-ensorceleur': { kind: 'sorcerer', ability: 'Charisme' },
-  'cls-guerrier': null,
-  'cls-lettre': null,
-  'cls-magicien': { kind: 'wizard', ability: 'Intelligence' },
-  'cls-moine': null,
-  'cls-paladin': { kind: 'paladin', ability: 'Charisme' },
-  'cls-pretre': { kind: 'cleric', ability: 'Sagesse' },
-  'cls-rodeur': { kind: 'ranger', ability: 'Sagesse' },
-  'cls-roublard': null,
-  'cls-sorcier': { kind: 'warlock', ability: 'Charisme' },
-};
-
-/** Niveau à partir duquel l'incantation de classe est active. */
-const SPELLCASTING_FROM_LEVEL: Record<string, number> = {
-  'cls-paladin': 2,
-  'cls-rodeur': 2,
-};
 
 // ============================================================================
 // COMPOSANT
@@ -1296,10 +1275,8 @@ export class ClassStep implements OnInit {
   private resolveSpellcasting(
     cls: CharacterClass,
   ): { kind: SpellcastingKind; ability: Ability } | null {
-    const fromLevel = SPELLCASTING_FROM_LEVEL[cls.id] ?? 1;
-    if (this.targetLevel() < fromLevel) return null;
     return (
-      CLASS_SPELLCASTING[cls.id] ??
+      resolveClassSpellcasting(cls.id, this.targetLevel(), this.selectedSubclassId()) ??
       ((cls.data as any).spellcasting ? this.inferSpellcasting(cls) : null)
     );
   }

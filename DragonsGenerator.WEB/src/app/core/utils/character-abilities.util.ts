@@ -7,6 +7,7 @@ import type {
 } from '@core/models/Character/character';
 import {
   ABILITY_POINT_COSTS,
+  ABILITY_KEYS,
   getAbilityModifier,
 } from '@core/models/Character/character';
 import type { Spell } from '@core/models/Spells/spell';
@@ -37,6 +38,20 @@ export function computeFinalAbilities(
     sagesse: clamp(base.sagesse + (racialBonuses.sagesse ?? 0) + (asiBonuses.sagesse ?? 0)),
     charisme: clamp(base.charisme + (racialBonuses.charisme ?? 0) + (asiBonuses.charisme ?? 0)),
   };
+}
+
+/** Inverse de `computeFinalAbilities` (sans clamp) : scores de point-buy à partir du total sauvegardé. */
+export function subtractPartialScores(
+  total: AbilityScores,
+  ...parts: Partial<AbilityScores>[]
+): AbilityScores {
+  const next: AbilityScores = { ...total };
+  for (const part of parts) {
+    for (const key of ABILITY_KEYS) {
+      next[key] = next[key] - (part[key] ?? 0);
+    }
+  }
+  return next;
 }
 
 export function computeAbilityModifiersFromScores(scores: AbilityScores): AbilityScores {

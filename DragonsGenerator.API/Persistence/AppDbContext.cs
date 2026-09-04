@@ -67,6 +67,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<CampaignRecord>(e =>
         {
             e.Property(x => x.Title).HasMaxLength(200);
+            e.Property(x => x.UpdatedAt).IsConcurrencyToken();
             e.HasOne(x => x.Owner)
                 .WithMany(u => u.OwnedCampaigns)
                 .HasForeignKey(x => x.OwnerUserId)

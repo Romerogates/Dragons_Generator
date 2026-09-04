@@ -1,13 +1,15 @@
 import { abilityLabelToKey, type Character, type SpellInstance } from '@core/models/Character/character';
 import type { Spell } from '@core/models/Spells/spell';
+import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
 import {
   INITIAL_CREATION_STATE,
   type ExtendedCharacterCreation,
   type SecondaryClassSelection,
 } from '@core/models/Character/character-builder.types';
 import type { CharacterBuildEditingRef } from './character-build.util';
-import { aggregateAsiChoices } from './character-abilities.util';
+import { aggregateAsiChoices, subtractPartialScores } from './character-abilities.util';
 import type { RawFeatData } from './feat-benefits.util';
+import { buildSecondaryClassSelection } from './class-spellcasting.util';
 
 /** Contexte optionnel permettant de ré-agréger fidèlement les dons (ASI fixe/flexible,
  * darkvision, résistances, don "Talent" à 4 points…) à partir des catalogues chargés côté
@@ -17,6 +19,7 @@ import type { RawFeatData } from './feat-benefits.util';
 export interface CharacterEditMapperContext {
   feats?: Map<string, RawFeatData>;
   spells?: Map<string, Spell>;
+  classes?: Map<string, CharacterClass>;
 }
 
 export interface CharacterEditLoadResult {
@@ -81,7 +84,7 @@ export function mapCharacterToEditState(
   creation.hpPerLevelAverage = primaryClass?.hitDie
     ? Math.floor(primaryClass.hitDie / 2) + 1
     : 0;
-  creation.hasSpellcasting = sc !== null;
+  creation.hasSpellcasting = sc !== null || (saved.secondaryClassSelections ?? []).some((s) => s.hasSpellcasting);
   creation.spellcastingKind = sc?.kind ?? null;
   creation.spellcastingAbility = sc?.ability ?? null;
   creation.savingThrows = saved.proficiencies.savingThrows;
@@ -93,32 +96,22 @@ export function mapCharacterToEditState(
     (f) => f.source === 'class' || f.source === 'subclass',
   );
   creation.expertiseSkills = saved.proficiencies.expertiseSkills ?? [];
-  // Multiclassage (RAW) : reconstruit les classes secondaires depuis `saved.classes[1..]`.
-  // Best-effort : maîtrises/aptitudes détaillées de CES classes sont déjà fusionnées dans les
-  // champs globaux ci-dessus (`armorProficiencies`/`weaponProficiencies`/`toolProficiencies`/
-  // `classFeatures`) au moment de la sauvegarde initiale — rien n'est donc perdu sur la fiche.
-  // Seul l'affichage du panneau "Multiclassage" au sein du wizard se recalcule dès que le joueur
-  // touche à nouveau au niveau/à la sous-classe de la classe concernée.
-  creation.secondaryClasses = saved.classes.slice(1).map(
-    (cls): SecondaryClassSelection => ({
-      classId: cls.classId,
-      className: cls.classLabel,
-      subclassId: cls.subclassId ?? null,
-      subclassName: cls.subclassLabel ?? null,
-      level: cls.level,
-      hitDie: cls.hitDie,
-      hpPerLevelAverage: Math.floor(cls.hitDie / 2) + 1,
-      hasSpellcasting: false,
-      spellcastingKind: null,
-      spellcastingAbility: null,
-      armorProficiencies: [],
-      weaponProficiencies: [],
-      toolProficiencies: [],
-      skillChooseCount: 0,
-      skillOptions: [],
-      classFeatures: [],
-    }),
+  creation.secondaryClasses = restoreSecondaryClasses(saved, ctx?.classes);
+  const secondaryFeatIds = new Set(
+    (creation.secondaryClasses ?? []).flatMap((sc) => sc.classFeatures.map((f) => f.refId).filter(Boolean)),
   );
+  if (secondaryFeatIds.size) {
+    creation.classFeatures = creation.classFeatures.filter((f) => !secondaryFeatIds.has(f.refId));
+  }
+  if (ctx?.classes && primaryClass?.classId) {
+    const primaryCls = ctx.classes.get(primaryClass.classId);
+    if (primaryCls?.data?.proficiencies?.skills) {
+      creation.skillChooseCount =
+        primaryCls.data.proficiencies.skills.count ?? creation.skillChooseCount;
+      const opts = primaryCls.data.proficiencies.skills.options;
+      if (Array.isArray(opts)) creation.skillOptions = opts;
+    }
+  }
   // Restaure les choix de progression (ancêtre draconique, domaine, métamagie…) et les dons/ASI
   // pour que la réédition à un niveau supérieur ne perde pas les choix déjà faits.
   creation.classChoiceAnswers = saved.classChoiceAnswers ?? {};
@@ -170,7 +163,16 @@ export function mapCharacterToEditState(
     creation.signatureSpellIds = (sc.signatureSpells ?? []).map((s) => s.spellId);
   }
 
-  creation.baseAbilities = saved.abilities;
+  const snapshot = saved.wizardAbilitySnapshot;
+  if (snapshot?.baseAbilities) {
+    creation.baseAbilities = snapshot.baseAbilities;
+    creation.racialBonuses = snapshot.racialBonuses ?? {};
+  } else {
+    creation.baseAbilities = subtractPartialScores(
+      saved.abilities,
+      creation.asiBonuses ?? {},
+    );
+  }
   creation.pointsRemaining = 0;
   creation.selectedSkills = saved.proficiencies.skills;
   creation.selectedEquipment = saved.equipment;
@@ -225,4 +227,47 @@ function mapKnownSpellsToSpellcastingDetails(
         effectSummary: s.effectSummary ?? '',
       })),
   };
+}
+
+function restoreSecondaryClasses(
+  saved: Character,
+  classes?: Map<string, CharacterClass>,
+): SecondaryClassSelection[] {
+  const persisted = saved.secondaryClassSelections;
+  if (persisted?.length) {
+    return persisted.map((sc) => ({
+      ...sc,
+      subclassId: sc.subclassId ?? null,
+      subclassName: sc.subclassName ?? null,
+    }));
+  }
+  return saved.classes.slice(1).map((cls): SecondaryClassSelection => {
+    const catalog = classes?.get(cls.classId);
+    if (catalog) {
+      return buildSecondaryClassSelection(
+        catalog,
+        cls.level,
+        cls.subclassId ?? null,
+        cls.subclassLabel ?? null,
+      );
+    }
+    return {
+      classId: cls.classId,
+      className: cls.classLabel,
+      subclassId: cls.subclassId ?? null,
+      subclassName: cls.subclassLabel ?? null,
+      level: cls.level,
+      hitDie: cls.hitDie,
+      hpPerLevelAverage: Math.floor(cls.hitDie / 2) + 1,
+      hasSpellcasting: false,
+      spellcastingKind: null,
+      spellcastingAbility: null,
+      armorProficiencies: [],
+      weaponProficiencies: [],
+      toolProficiencies: [],
+      skillChooseCount: 0,
+      skillOptions: [],
+      classFeatures: [],
+    };
+  });
 }

@@ -796,8 +796,8 @@ export class CampaignPlayPanel implements OnDestroy {
     const c = this.campaign();
     this.saving.set(true);
     this.campaigns.update(c.id, title, data).subscribe({
-      next: () => {
-        this.campaignChange.emit({ ...c, data });
+      next: (summary) => {
+        this.campaignChange.emit({ ...c, data, updatedAt: summary.updatedAt });
         this.saving.set(false);
         onSuccess?.();
       },

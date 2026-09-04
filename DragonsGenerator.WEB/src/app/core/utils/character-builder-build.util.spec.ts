@@ -6,6 +6,7 @@ import {
   computeCharacterWalkSpeed,
   findEquippedArmorName,
   isMonkWeapon,
+  mergeClassProgressionResources,
   pickHigherDie,
 } from './character-combat.util';
 import { proficiencyBonusForLevel } from './character-progression.util';
@@ -116,6 +117,39 @@ describe('character-combat.util', () => {
 
   it('findEquippedArmorName returns fallback', () => {
     expect(findEquippedArmorName([])).toBe('Aucune');
+  });
+
+  it('computeCharacterArmorClass uses barbarian UD on a secondary class id', () => {
+    const ac = computeCharacterArmorClass([], mods, {
+      classId: 'cls-magicien',
+      classIds: ['cls-magicien', 'cls-barbare'],
+      classFeatures: [],
+    });
+    expect(ac).toBe(10 + mods.dexterite + mods.constitution);
+  });
+
+  it('buildCharacterAttacks tags extra attacks and sneak dice from merged resources', () => {
+    const dagger = weapon('wp-dague', 'Dague', {
+      customData: { isWeapon: true, damage: '1d4', damageType: 'perforant', properties: ['Finesse'] },
+    });
+    const attacks = buildCharacterAttacks([dagger], mods, 3, [], {
+      classId: 'cls-magicien',
+      classIds: ['cls-magicien', 'cls-guerrier', 'cls-roublard'],
+      resources: { extra_attacks: 1, sneak_attack_dice: '2d6' },
+    });
+    const daggerAtk = attacks.find((a) => a.refId === 'wp-dague');
+    expect(daggerAtk?.properties).toContain('Attaques ×2');
+    expect(daggerAtk?.properties).toContain('Attaque sournoise 2d6');
+  });
+
+  it('mergeClassProgressionResources keeps the best extra_attacks and dice', () => {
+    const merged = mergeClassProgressionResources(
+      { extra_attacks: 0, martial_arts_die: '1d4' },
+      [{ extra_attacks: 1, sneak_attack_dice: '2d6' }, { martial_arts_die: '1d6' }],
+    );
+    expect(merged['extra_attacks']).toBe(1);
+    expect(merged['martial_arts_die']).toBe('1d6');
+    expect(merged['sneak_attack_dice']).toBe('2d6');
   });
 });
 
@@ -416,5 +450,236 @@ describe('character-build.util', () => {
       { level: 1, max: 4, used: 0 },
       { level: 2, max: 2, used: 0 },
     ]);
+  });
+
+  it('multiclassage : Magicien + Barbare secondaire utilise la défense sans armure', () => {
+    const creation = structuredClone(INITIAL_CREATION_STATE);
+    creation.classId = 'cls-magicien';
+    creation.className = 'Magicien';
+    creation.hasSpellcasting = true;
+    creation.spellcastingKind = 'wizard';
+    creation.spellcastingAbility = 'Intelligence';
+    creation.targetLevel = 1;
+    creation.secondaryClasses = [
+      {
+        classId: 'cls-barbare',
+        className: 'Barbare',
+        subclassId: null,
+        subclassName: null,
+        level: 1,
+        hitDie: 12,
+        hpPerLevelAverage: 7,
+        hasSpellcasting: false,
+        spellcastingKind: null,
+        spellcastingAbility: null,
+        armorProficiencies: [],
+        weaponProficiencies: [],
+        toolProficiencies: [],
+        skillChooseCount: 0,
+        skillOptions: [],
+        classFeatures: [
+          {
+            refId: 'feat-defense-sans-armure',
+            name: 'Défense sans armure',
+            desc: '',
+            source: 'class',
+            sourceDetail: '',
+            level: 1,
+          },
+        ],
+      },
+    ];
+    const abilities = {
+      force: 16,
+      dexterite: 14,
+      constitution: 16,
+      intelligence: 14,
+      sagesse: 10,
+      charisme: 8,
+    };
+    const modifiers = {
+      force: 3,
+      dexterite: 2,
+      constitution: 3,
+      intelligence: 2,
+      sagesse: 0,
+      charisme: -1,
+    };
+    const character = buildCharacterFromCreation({
+      creation,
+      abilities,
+      modifiers,
+      hpMax: 20,
+      proficiencyBonus: 2,
+      targetLevel: 1,
+      passivePerception: 10,
+    });
+    expect(character.defense.armorClass).toBe(10 + 2 + 3);
+  });
+
+  it('multiclassage : Guerrier primaire + Magicien secondaire produit un bloc spellcasting wizard', () => {
+    const creation = structuredClone(INITIAL_CREATION_STATE);
+    creation.name = 'Guerrier-mage';
+    creation.speciesId = 'spc-humain';
+    creation.speciesName = 'Humain';
+    creation.civilizationId = 'civ-nordique';
+    creation.civilizationName = 'Nordique';
+    creation.classId = 'cls-guerrier';
+    creation.className = 'Guerrier';
+    creation.hitDie = 10;
+    creation.targetLevel = 5;
+    creation.hasSpellcasting = false;
+    creation.spellcastingKind = null;
+    creation.spellcastingAbility = null;
+    creation.spellcastingDetails = {
+      cantrips: [{ refId: 'spl-lueur', name: 'Lueur', level: 0, prepared: true }],
+      spells: [{ refId: 'spl-projectile-magique', name: 'Projectile magique', level: 1, prepared: true }],
+    };
+    creation.secondaryClasses = [
+      {
+        classId: 'cls-magicien',
+        className: 'Magicien',
+        subclassId: null,
+        subclassName: null,
+        level: 3,
+        hitDie: 6,
+        hpPerLevelAverage: 4,
+        hasSpellcasting: true,
+        spellcastingKind: 'wizard',
+        spellcastingAbility: 'Intelligence',
+        armorProficiencies: [],
+        weaponProficiencies: ['wp-dague'],
+        toolProficiencies: [],
+        skillChooseCount: 0,
+        skillOptions: [],
+        classFeatures: [],
+      },
+    ];
+
+    const abilities = {
+      force: 16,
+      dexterite: 12,
+      constitution: 14,
+      intelligence: 14,
+      sagesse: 10,
+      charisme: 8,
+    };
+    const modifiers = {
+      force: 3,
+      dexterite: 1,
+      constitution: 2,
+      intelligence: 2,
+      sagesse: 0,
+      charisme: -1,
+    };
+
+    const character = buildCharacterFromCreation({
+      creation,
+      abilities,
+      modifiers,
+      hpMax: 40,
+      proficiencyBonus: proficiencyBonusForLevel(8),
+      targetLevel: 5,
+      passivePerception: 10,
+    });
+
+    expect(character.spellcasting).not.toBeNull();
+    expect(character.spellcasting?.kind).toBe('wizard');
+    expect(character.spellcasting?.ability).toBe('Intelligence');
+    // PB total niv. 8 = +3, INT +2 → DD 13, attaque +5
+    expect(character.spellcasting?.spellSaveDC).toBe(13);
+    expect(character.spellcasting?.spellAttackBonus).toBe(5);
+    expect(character.wizardAbilitySnapshot?.baseAbilities).toEqual(creation.baseAbilities);
+    expect(character.secondaryClassSelections?.[0].classId).toBe('cls-magicien');
+  });
+
+  it('buildCharacterSpellcasting attaches pactSlots when a warlock is mixed with another caster', () => {
+    const c = {
+      hasSpellcasting: true,
+      spellcastingKind: 'wizard',
+      spellcastingAbility: 'Intelligence',
+      targetLevel: 3,
+      selectedEquipment: [],
+      backgroundEquipment: [],
+      spellcastingDetails: { cantrips: [] },
+      classProgressionResources: {},
+    } as unknown as CharacterCreation;
+    const sc = buildCharacterSpellcasting(c, mods, { totalLevel: 8, warlockLevel: 5 });
+    expect(sc?.spellSaveDC).toBe(8 + 3 + mods.intelligence);
+    expect(sc?.pactSlots).toEqual([{ level: 3, max: 2, used: 0 }]);
+  });
+
+  it('buildCharacterSpellcasting does not duplicate pactSlots on a pure warlock', () => {
+    const c = {
+      hasSpellcasting: true,
+      spellcastingKind: 'warlock',
+      spellcastingAbility: 'Charisme',
+      targetLevel: 5,
+      selectedEquipment: [],
+      backgroundEquipment: [],
+      spellcastingDetails: { cantrips: [], patron: 'Fiélon' },
+      classProgressionResources: {},
+    } as unknown as CharacterCreation;
+    const sc = buildCharacterSpellcasting(c, mods, { totalLevel: 5, warlockLevel: 5 });
+    expect(sc?.kind).toBe('warlock');
+    expect(sc?.pactSlots).toBeUndefined();
+  });
+
+  it('buildCharacterFromCreation keeps warlock pact slots when Guerrier dips Sorcier', () => {
+    const creation = structuredClone(INITIAL_CREATION_STATE);
+    creation.classId = 'cls-magicien';
+    creation.className = 'Magicien';
+    creation.hasSpellcasting = true;
+    creation.spellcastingKind = 'wizard';
+    creation.spellcastingAbility = 'Intelligence';
+    creation.targetLevel = 3;
+    creation.secondaryClasses = [
+      {
+        classId: 'cls-sorcier',
+        className: 'Sorcier',
+        subclassId: null,
+        subclassName: null,
+        level: 2,
+        hitDie: 8,
+        hpPerLevelAverage: 5,
+        hasSpellcasting: true,
+        spellcastingKind: 'warlock',
+        spellcastingAbility: 'Charisme',
+        armorProficiencies: [],
+        weaponProficiencies: [],
+        toolProficiencies: [],
+        skillChooseCount: 0,
+        skillOptions: [],
+        classFeatures: [],
+      },
+    ];
+    const abilities = {
+      force: 10,
+      dexterite: 14,
+      constitution: 12,
+      intelligence: 16,
+      sagesse: 10,
+      charisme: 14,
+    };
+    const modifiers = {
+      force: 0,
+      dexterite: 2,
+      constitution: 1,
+      intelligence: 3,
+      sagesse: 0,
+      charisme: 2,
+    };
+    const character = buildCharacterFromCreation({
+      creation,
+      abilities,
+      modifiers,
+      hpMax: 20,
+      proficiencyBonus: proficiencyBonusForLevel(5),
+      targetLevel: 3,
+      passivePerception: 10,
+    });
+    expect(character.spellcasting?.kind).toBe('wizard');
+    expect(character.spellcasting?.pactSlots?.length).toBeGreaterThan(0);
+    expect(character.totalLevel).toBe(5);
   });
 });

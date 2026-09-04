@@ -51,6 +51,9 @@ import {
 import { buildSkillMap, normalizeSkillId, type SkillInfo } from '@core/utils/skill.utils';
 import { pickRandom } from '@core/utils/pregen-random.util';
 import { proficiencyBonusForLevel } from '@core/services/character-builder.service';
+import { CLASS_SPELLCASTING, resolveClassSpellcasting } from '@core/utils/class-spellcasting.util';
+
+export { CLASS_SPELLCASTING };
 
 export interface EquipmentCatalogItem {
   id: string;
@@ -61,27 +64,6 @@ export interface EquipmentCatalogItem {
   wKg: number | null;
   data: Record<string, unknown>;
 }
-
-export const CLASS_SPELLCASTING: Record<string, { kind: SpellcastingKind; ability: Ability } | null> = {
-  'cls-barbare': null,
-  'cls-barde': { kind: 'bard', ability: 'Charisme' },
-  'cls-druide': { kind: 'druid', ability: 'Sagesse' },
-  'cls-ensorceleur': { kind: 'sorcerer', ability: 'Charisme' },
-  'cls-guerrier': null,
-  'cls-lettre': null,
-  'cls-magicien': { kind: 'wizard', ability: 'Intelligence' },
-  'cls-moine': null,
-  'cls-paladin': { kind: 'paladin', ability: 'Charisme' },
-  'cls-pretre': { kind: 'cleric', ability: 'Sagesse' },
-  'cls-rodeur': { kind: 'ranger', ability: 'Sagesse' },
-  'cls-roublard': null,
-  'cls-sorcier': { kind: 'warlock', ability: 'Charisme' },
-};
-
-const SPELLCASTING_FROM_LEVEL: Record<string, number> = {
-  'cls-paladin': 2,
-  'cls-rodeur': 2,
-};
 
 const SPELL_QUOTAS: Record<
   string,
@@ -128,9 +110,7 @@ function isFightingStylePool(pool: Record<string, unknown>): boolean {
 }
 
 function resolveSpellcasting(cls: CharacterClass, level: number): { kind: SpellcastingKind; ability: Ability } | null {
-  const fromLevel = SPELLCASTING_FROM_LEVEL[cls.id] ?? 1;
-  if (level < fromLevel) return null;
-  return CLASS_SPELLCASTING[cls.id] ?? null;
+  return resolveClassSpellcasting(cls.id, level);
 }
 
 function autoSpeciesChoiceAnswers(species: Species, sub: Subspecies | null): Record<string, string[]> {

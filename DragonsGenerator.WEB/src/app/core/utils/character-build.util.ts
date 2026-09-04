@@ -11,6 +11,7 @@ import {
   computeCharacterArmorClass,
   computeCharacterWalkSpeed,
   findEquippedArmorName,
+  mergeClassProgressionResources,
 } from './character-combat.util';
 import {
   buildCharacterSpellcasting,
@@ -20,6 +21,7 @@ import {
   combinedCasterLevel,
   multiclassSpellSlotsForCasterLevel,
 } from './progression-choices.util';
+import { collectCasterSources } from './class-spellcasting.util';
 
 export interface CharacterBuildEditingRef {
   id: string;
@@ -58,24 +60,44 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
   const secondaryTotalLevel = secondaryClasses.reduce((sum, sc) => sum + (sc.level || 0), 0);
   const totalCharacterLevel = targetLevel + secondaryTotalLevel;
 
-  // Emplacements de sorts combinés (RAW, table du multiclassage) : appliqué UNIQUEMENT si des
-  // classes secondaires existent, pour ne rien changer au comportement mono-classe existant — la
-  // table multiclasse redonne d'ailleurs exactement la table standard pour un seul lanceur complet.
-  let creationForSpellcasting = c;
-  if (secondaryClasses.length > 0) {
+  const casters = collectCasterSources(c);
+  const leadCaster = casters[0] ?? null;
+  let creationForSpellcasting = leadCaster
+    ? {
+        ...c,
+        hasSpellcasting: true,
+        spellcastingKind: leadCaster.kind,
+        spellcastingAbility: leadCaster.ability,
+      }
+    : c;
+  if (casters.length > 1 || (leadCaster && !leadCaster.isPrimary)) {
+    const casterLevel = combinedCasterLevel(
+      casters.map((src) => ({ level: src.level, spellcastingKind: src.kind })),
+    );
+    if (casterLevel > 0 && leadCaster?.kind !== 'warlock') {
+      creationForSpellcasting = {
+        ...creationForSpellcasting,
+        classSpellSlots: multiclassSpellSlotsForCasterLevel(casterLevel),
+      };
+    }
+  } else if (secondaryClasses.length > 0) {
     const casterLevel = combinedCasterLevel([
       { level: targetLevel, spellcastingKind: c.spellcastingKind },
       ...secondaryClasses.map((sc) => ({ level: sc.level, spellcastingKind: sc.spellcastingKind })),
     ]);
     if (casterLevel > 0) {
       creationForSpellcasting = {
-        ...c,
+        ...creationForSpellcasting,
         classSpellSlots: multiclassSpellSlotsForCasterLevel(casterLevel),
       };
     }
   }
 
-  const spellcasting = buildCharacterSpellcasting(creationForSpellcasting, modifiers);
+  const warlockCaster = casters.find((src) => src.kind === 'warlock');
+  const spellcasting = buildCharacterSpellcasting(creationForSpellcasting, modifiers, {
+    totalLevel: totalCharacterLevel,
+    warlockLevel: warlockCaster?.level,
+  });
   const features: FeatureInstance[] = [
     ...c.speciesTraits,
     ...c.classFeatures,
@@ -106,6 +128,20 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
     ...(c.speciesInnateSpells ?? []),
     ...(c.talentBonusCantrips ?? []),
   ];
+  const mergedFeatures = [
+    ...c.classFeatures,
+    ...secondaryClasses.flatMap((sc) => sc.classFeatures),
+  ];
+  const mergedResources = mergeClassProgressionResources(
+    c.classProgressionResources ?? {},
+    secondaryClasses.map((sc) => sc.classProgressionResources ?? {}),
+  );
+  const classIds = [c.classId, ...secondaryClasses.map((sc) => sc.classId)].filter(
+    (id): id is string => !!id,
+  );
+  const subclassIds = [c.subclassId, ...secondaryClasses.map((sc) => sc.subclassId)].filter(
+    (id): id is string => !!id,
+  );
   const attacks = buildCharacterAttacks(
     allEquipmentForAttacks,
     modifiers,
@@ -114,8 +150,9 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
     {
       spellAbility: c.spellcastingAbility,
       classId: c.classId,
-      classFeatures: c.classFeatures,
-      resources: c.classProgressionResources ?? {},
+      classIds,
+      classFeatures: mergedFeatures,
+      resources: mergedResources,
     },
   );
 
@@ -125,8 +162,10 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
 
   const armorClass = computeCharacterArmorClass(allEquipment, modifiers, {
     classId: c.classId,
+    classIds,
     subclassId: c.subclassId,
-    classFeatures: c.classFeatures,
+    subclassIds,
+    classFeatures: mergedFeatures,
   });
 
   const walkSpeed = computeCharacterWalkSpeed(c, allEquipment);
@@ -313,7 +352,7 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
     spellcasting,
     knownSpells,
     classResources: Object.fromEntries(
-      Object.entries(c.classProgressionResources ?? {})
+      Object.entries(mergedResources)
         .filter(([, v]) => typeof v === 'number' && Number.isFinite(v))
         .map(([k, v]) => [k, Number(v)]),
     ),
@@ -340,5 +379,10 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
     // Persistés pour permettre une réédition fiable (montée de niveau) sans reperdre les choix.
     classChoiceAnswers: c.classChoiceAnswers,
     asiChoices: c.asiChoices,
+    wizardAbilitySnapshot: {
+      baseAbilities: c.baseAbilities,
+      racialBonuses: c.racialBonuses ?? {},
+    },
+    secondaryClassSelections: secondaryClasses.length ? secondaryClasses : undefined,
   };
 }

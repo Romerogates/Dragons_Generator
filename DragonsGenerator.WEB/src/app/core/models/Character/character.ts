@@ -429,6 +429,8 @@ interface CharacterSpellcastingBase {
   focus: string | null; // Focaliseur arcanique
   spellSlots: SpellSlotPool[]; // Emplacements de sorts niveaux 1-9
   cantrips: CantripTracker;
+  /** Magie de pacte (Occultiste), y compris en multiclasse avec un autre lanceur. */
+  pactSlots?: SpellSlotPool[];
 }
 
 // =============================================================================
@@ -660,6 +662,33 @@ export interface Character {
   classChoiceAnswers?: Record<string, string[]>;
   /** Slots ASI/dons choisis (niveaux 4, 8, 12…), persistés pour la réédition. */
   asiChoices?: AsiChoiceSlot[];
+  /** Snapshot wizard : scores AVANT bonus raciaux/ASI, pour une réédition sans double application. */
+  wizardAbilitySnapshot?: {
+    baseAbilities: AbilityScores;
+    racialBonuses: Partial<AbilityScores>;
+  };
+  /**
+   * Classes secondaires telles que le wizard les a saisies (maîtrises réduites, features, magie).
+   * Absent des anciens exports : la réédition les reconstruit depuis le catalogue de classes.
+   */
+  secondaryClassSelections?: {
+    classId: string;
+    className: string;
+    subclassId?: string | null;
+    subclassName?: string | null;
+    level: number;
+    hitDie: number;
+    hpPerLevelAverage: number;
+    hasSpellcasting: boolean;
+    spellcastingKind: SpellcastingKind | null;
+    spellcastingAbility: Ability | null;
+    armorProficiencies: string[];
+    weaponProficiencies: string[];
+    toolProficiencies: string[];
+    skillChooseCount: number;
+    skillOptions: string[];
+    classFeatures: FeatureInstance[];
+  }[];
 }
 
 // =============================================================================

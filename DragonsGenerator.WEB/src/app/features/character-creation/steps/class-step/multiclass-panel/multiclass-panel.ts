@@ -17,20 +17,13 @@ import {
   type SecondaryClassSelection,
 } from '../../../../../core/services/character-builder.service';
 import type { CharacterClass, Subclass } from '../../../../../core/models/CharacterClasses/character-class';
-import { buildClassFeaturesForLevel, listSubclassOptions } from '@core/utils/character-class-features.util';
-import { CLASS_SPELLCASTING } from '@core/utils/character-auto-build.util';
+import { listSubclassOptions } from '@core/utils/character-class-features.util';
+import { buildSecondaryClassSelection } from '@core/utils/class-spellcasting.util';
 import {
   multiclassPrerequisiteLabel,
   multiclassPrerequisitesMet,
-  multiclassProficiencies,
 } from '@core/utils/progression-choices.util';
 import { getClassIcon } from '@core/utils/class-icons';
-
-/** Paliers de déblocage de la magie plus tardifs que le niveau 1 (RAW : Paladin/Rôdeur niv. 2). */
-const SPELLCASTING_FROM_LEVEL: Record<string, number> = {
-  'cls-paladin': 2,
-  'cls-rodeur': 2,
-};
 
 interface SecondaryClassRow {
   entry: SecondaryClassSelection;
@@ -114,58 +107,13 @@ export class MulticlassPanel implements OnInit {
     return { options, levelUnlocked: raw.level_unlocked ?? raw.unlocked_at_level ?? 3 };
   }
 
-  private spellcastingFor(
-    classId: string,
-    level: number,
-  ): { hasSpellcasting: boolean; spellcastingKind: SecondaryClassSelection['spellcastingKind']; spellcastingAbility: SecondaryClassSelection['spellcastingAbility'] } {
-    const fromLevel = SPELLCASTING_FROM_LEVEL[classId] ?? 1;
-    const info = level >= fromLevel ? (CLASS_SPELLCASTING[classId] ?? null) : null;
-    return {
-      hasSpellcasting: info !== null,
-      spellcastingKind: info?.kind ?? null,
-      spellcastingAbility: info?.ability ?? null,
-    };
-  }
-
   private buildSelectionFor(
     cls: CharacterClass,
     level: number,
     subclassId: string | null,
     subclassName: string | null,
   ): SecondaryClassSelection {
-    const hitDie = cls.data.hit_die || 8;
-    const prof = multiclassProficiencies(cls);
-    const spell = this.spellcastingFor(cls.id, level);
-    const { classFeatures } = buildClassFeaturesForLevel(
-      cls,
-      {
-        classId: cls.id,
-        subclassId,
-        hasSpellcasting: spell.hasSpellcasting,
-        spellcastingKind: spell.spellcastingKind,
-        spellcastingAbility: spell.spellcastingAbility,
-        existingClassFeatures: [],
-      },
-      level,
-    );
-    return {
-      classId: cls.id,
-      className: cls.name,
-      subclassId,
-      subclassName,
-      level,
-      hitDie,
-      hpPerLevelAverage: Math.floor(hitDie / 2) + 1,
-      hasSpellcasting: spell.hasSpellcasting,
-      spellcastingKind: spell.spellcastingKind,
-      spellcastingAbility: spell.spellcastingAbility,
-      armorProficiencies: prof.armor,
-      weaponProficiencies: prof.weapons,
-      toolProficiencies: prof.tools,
-      skillChooseCount: prof.skillChooseCount,
-      skillOptions: prof.skillOptions,
-      classFeatures,
-    };
+    return buildSecondaryClassSelection(cls, level, subclassId, subclassName);
   }
 
   addSelectedClass(): void {

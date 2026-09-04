@@ -7,6 +7,7 @@ import {
   computeHitPointsMax,
   computeSecondaryClassesHitPoints,
   computePassivePerception,
+  subtractPartialScores,
 } from './character-abilities.util';
 
 const base: AbilityScores = {
@@ -23,6 +24,11 @@ describe('character-abilities.util', () => {
     const final = computeFinalAbilities(base, { force: 4 }, { force: 10 });
     expect(final.force).toBe(20);
     expect(final.dexterite).toBe(14);
+  });
+
+  it('subtractPartialScores reverses racial and ASI bonuses', () => {
+    const total = computeFinalAbilities(base, { dexterite: 2 }, { intelligence: 2 });
+    expect(subtractPartialScores(total, { dexterite: 2 }, { intelligence: 2 })).toEqual(base);
   });
 
   it('computeAbilityModifiersFromScores follows D&D tiers', () => {

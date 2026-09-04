@@ -590,6 +590,77 @@ public static class CampaignJsonHelpers
         return newSessions.LastOrDefault() ?? oldSessions.LastOrDefault();
     }
 
+    /// <summary>
+    /// Conserve les jets d'initiative déjà saisis (joueur) quand un PUT MJ réécrit le blob combat.
+    /// Les PV / conditions du JSON entrant (MJ) restent autoritaires.
+    /// </summary>
+    public static string MergeLiveCombatIntoIncoming(string incomingJson, string storedJson)
+    {
+        try
+        {
+            var incoming = JsonNode.Parse(string.IsNullOrWhiteSpace(incomingJson) ? "{}" : incomingJson) as JsonObject
+                ?? new JsonObject();
+            var stored = JsonNode.Parse(string.IsNullOrWhiteSpace(storedJson) ? "{}" : storedJson) as JsonObject
+                ?? new JsonObject();
+            if (incoming["sessions"] is not JsonArray inSessions || stored["sessions"] is not JsonArray stSessions)
+                return incoming.ToJsonString();
+
+            var storedById = new Dictionary<string, JsonObject>(StringComparer.Ordinal);
+            foreach (var item in stSessions)
+            {
+                if (item is not JsonObject session) continue;
+                var id = session["id"]?.GetValue<string>();
+                if (!string.IsNullOrWhiteSpace(id)) storedById[id] = session;
+            }
+
+            foreach (var item in inSessions)
+            {
+                if (item is not JsonObject session) continue;
+                var id = session["id"]?.GetValue<string>();
+                if (string.IsNullOrWhiteSpace(id) || !storedById.TryGetValue(id, out var storedSession))
+                    continue;
+                MergeCombatantRolls(
+                    session["activeCombat"] as JsonObject,
+                    storedSession["activeCombat"] as JsonObject);
+            }
+
+            return incoming.ToJsonString();
+        }
+        catch
+        {
+            return incomingJson;
+        }
+    }
+
+    private static void MergeCombatantRolls(JsonObject? incomingCombat, JsonObject? storedCombat)
+    {
+        if (incomingCombat is null || storedCombat is null) return;
+        if (incomingCombat["combatants"] is not JsonArray inList || storedCombat["combatants"] is not JsonArray stList)
+            return;
+
+        var storedById = new Dictionary<string, JsonObject>(StringComparer.Ordinal);
+        foreach (var item in stList)
+        {
+            if (item is not JsonObject cb) continue;
+            var id = cb["id"]?.GetValue<string>();
+            if (!string.IsNullOrWhiteSpace(id)) storedById[id] = cb;
+        }
+
+        foreach (var item in inList)
+        {
+            if (item is not JsonObject incoming) continue;
+            var id = incoming["id"]?.GetValue<string>();
+            if (string.IsNullOrWhiteSpace(id) || !storedById.TryGetValue(id, out var stored))
+                continue;
+            var storedSubmitted = stored["playerSubmitted"]?.GetValue<bool>() == true;
+            var incomingSubmitted = incoming["playerSubmitted"]?.GetValue<bool>() == true;
+            if (!storedSubmitted || incomingSubmitted) continue;
+            incoming["playerSubmitted"] = true;
+            if (stored["initiativeRoll"] is JsonNode roll)
+                incoming["initiativeRoll"] = roll.DeepClone();
+        }
+    }
+
     private sealed record SessionSnapshot(
         string Id,
         string Title,

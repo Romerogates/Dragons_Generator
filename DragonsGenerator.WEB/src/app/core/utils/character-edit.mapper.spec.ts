@@ -188,6 +188,28 @@ describe('character-edit.mapper', () => {
     const { creation } = mapCharacterToEditState(saved);
     expect(creation.asiBonuses.intelligence).toBe(2);
     expect(creation.talentBonusSkills).toEqual([]);
+    // Scores sauvegardés = totaux ; sans snapshot on retire l'ASI pour retrouver le point-buy.
+    expect(creation.baseAbilities.intelligence).toBe(saved.abilities.intelligence - 2);
+  });
+
+  it('mapCharacterToEditState prefers wizardAbilitySnapshot over subtracting ASI from totals', () => {
+    const saved = sampleCharacter({
+      asiChoices: [{ level: 4, mode: 'plus2', primary: 'intelligence' }],
+      wizardAbilitySnapshot: {
+        baseAbilities: {
+          force: 8,
+          dexterite: 14,
+          constitution: 12,
+          intelligence: 15,
+          sagesse: 10,
+          charisme: 10,
+        },
+        racialBonuses: { dexterite: 2 },
+      },
+    });
+    const { creation } = mapCharacterToEditState(saved);
+    expect(creation.baseAbilities.intelligence).toBe(15);
+    expect(creation.racialBonuses.dexterite).toBe(2);
   });
 
   it('mapCharacterToEditState re-aggregates "Talent" spends when feats/spells ctx is provided', () => {
@@ -254,5 +276,107 @@ describe('character-edit.mapper', () => {
   it('mapCharacterToEditState leaves secondaryClasses empty for a single-class character', () => {
     const { creation } = mapCharacterToEditState(sampleCharacter());
     expect(creation.secondaryClasses).toEqual([]);
+  });
+
+  it('mapCharacterToEditState prefers persisted secondaryClassSelections and strips duplicate class features', () => {
+    const saved = sampleCharacter({
+      classes: [
+        { classId: 'cls-mage', classLabel: 'Mage', level: 3, hitDie: 6 },
+        { classId: 'cls-guerrier', classLabel: 'Guerrier', level: 2, hitDie: 10 },
+      ],
+      totalLevel: 5,
+      secondaryClassSelections: [
+        {
+          classId: 'cls-guerrier',
+          className: 'Guerrier',
+          subclassId: 'sub-champion',
+          subclassName: 'Champion',
+          level: 2,
+          hitDie: 10,
+          hpPerLevelAverage: 6,
+          hasSpellcasting: false,
+          spellcastingKind: null,
+          spellcastingAbility: null,
+          armorProficiencies: ['ar-light'],
+          weaponProficiencies: [],
+          toolProficiencies: [],
+          skillChooseCount: 0,
+          skillOptions: [],
+          classFeatures: [
+            {
+              refId: 'feat-action-supplementaire',
+              name: 'Action',
+              desc: '',
+              source: 'class',
+              sourceDetail: '',
+              level: 2,
+            },
+          ],
+        },
+      ],
+      features: [
+        { refId: 'feat-trait-elfe', name: 'Vision', desc: '', source: 'species', sourceDetail: '', level: 1 },
+        { refId: 'feat-tradition', name: 'Tradition', desc: '', source: 'class', sourceDetail: '', level: 2 },
+        {
+          refId: 'feat-action-supplementaire',
+          name: 'Action',
+          desc: '',
+          source: 'class',
+          sourceDetail: '',
+          level: 2,
+        },
+      ],
+    });
+    const { creation } = mapCharacterToEditState(saved);
+    expect(creation.secondaryClasses?.[0].armorProficiencies).toEqual(['ar-light']);
+    expect(creation.classFeatures.some((f) => f.refId === 'feat-action-supplementaire')).toBeFalse();
+    expect(creation.classFeatures.some((f) => f.refId === 'feat-tradition')).toBeTrue();
+  });
+
+  it('mapCharacterToEditState rebuilds secondaries and primary skill quota from the class catalog', () => {
+    const saved = sampleCharacter({
+      classes: [
+        { classId: 'cls-mage', classLabel: 'Mage', level: 3, hitDie: 6 },
+        { classId: 'cls-magicien', classLabel: 'Magicien', level: 1, hitDie: 6 },
+      ],
+      totalLevel: 4,
+    });
+    const classes = new Map([
+      [
+        'cls-mage',
+        {
+          id: 'cls-mage',
+          name: 'Mage',
+          data: {
+            hit_die: 6,
+            primary_abilities: ['Intelligence'],
+            proficiencies: { armor: [], weapons: [], saving_throws: [], skills: { count: 2, options: ['skill-arcana'] } },
+            starting_equipment: [],
+            progression: [{ level: 1, prof_bonus: 2, features: [] }],
+            features_details: [],
+          },
+        },
+      ],
+      [
+        'cls-magicien',
+        {
+          id: 'cls-magicien',
+          name: 'Magicien',
+          data: {
+            hit_die: 6,
+            primary_abilities: ['Intelligence'],
+            proficiencies: { armor: [], weapons: [], saving_throws: [], skills: { count: 0, options: [] } },
+            starting_equipment: [],
+            progression: [{ level: 1, prof_bonus: 2, features: [] }],
+            features_details: [],
+          },
+        },
+      ],
+    ]);
+    const { creation } = mapCharacterToEditState(saved, { classes: classes as never });
+    expect(creation.skillChooseCount).toBe(2);
+    expect(creation.skillOptions).toEqual(['skill-arcana']);
+    expect(creation.secondaryClasses?.[0].classId).toBe('cls-magicien');
+    expect(creation.secondaryClasses?.[0].hasSpellcasting).toBeTrue();
   });
 });

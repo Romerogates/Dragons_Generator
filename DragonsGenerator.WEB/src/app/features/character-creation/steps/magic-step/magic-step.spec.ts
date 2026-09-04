@@ -225,10 +225,84 @@ describe('MagicStep', () => {
     expect(nextStepSpy).toHaveBeenCalled();
   });
 
+  it('loads both caster classes and switches tabs without losing picks', async () => {
+    TestBed.resetTestingModule();
+    creationSignal = signal(
+      wizardCreation({
+        secondaryClasses: [
+          {
+            classId: CLERIC_CLASS_ID,
+            className: 'Prêtre',
+            subclassId: 'subcls-domaine-de-la-vie',
+            subclassName: 'Vie',
+            level: 1,
+            hitDie: 8,
+            hpPerLevelAverage: 5,
+            hasSpellcasting: true,
+            spellcastingKind: 'cleric',
+            spellcastingAbility: 'Sagesse',
+            armorProficiencies: [],
+            weaponProficiencies: [],
+            toolProficiencies: [],
+            skillChooseCount: 0,
+            skillOptions: [],
+            classFeatures: [],
+          },
+        ],
+      }),
+    );
+    const mixedSpells = [
+      ...MOCK_CANTrips,
+      ...MOCK_LEVEL1,
+      ...MOCK_CANTrips.map((s) => mockSpell(`${s.id}-cleric`, 0, CLERIC_CLASS_ID)),
+    ];
+    await TestBed.configureTestingModule({
+      imports: [MagicStep],
+      providers: [
+        ...zonelessTestProviders,
+        {
+          provide: DataService,
+          useValue: {
+            getSpells: () => of(mixedSpells),
+            getDeities: () => of(MOCK_DEITIES),
+            getClassById: (id: string) =>
+              of(id === CLERIC_CLASS_ID ? MOCK_CLERIC_CLASS : MOCK_WIZARD_CLASS),
+          },
+        },
+        {
+          provide: CharacterBuilderService,
+          useValue: builderMock(creationSignal),
+        },
+      ],
+    }).compileComponents();
+
+    const mixedFixture = TestBed.createComponent(MagicStep);
+    const mixed = mixedFixture.componentInstance;
+    mixedFixture.detectChanges();
+
+    expect(mixed.casterSources().length).toBe(2);
+    mixed.selectCaster(-1);
+    mixed.selectCaster(99);
+    mixed.selectCaster(0);
+    mixed.toggleCantrip('spl-ray');
+    mixed.selectCaster(1);
+    mixedFixture.detectChanges();
+    expect(mixed.activeCaster()?.classId).toBe(CLERIC_CLASS_ID);
+    expect(mixed.selectedCantrips().size).toBe(0);
+    mixed.selectCaster(0);
+    mixedFixture.detectChanges();
+    expect(mixed.isCantripSelected('spl-ray')).toBeTrue();
+  });
+
   it('skips spell picks when the class has no spellcasting', async () => {
     TestBed.resetTestingModule();
     creationSignal = signal(
-      wizardCreation({ hasSpellcasting: false, spellcastingKind: null }),
+      wizardCreation({
+        classId: 'cls-guerrier',
+        hasSpellcasting: false,
+        spellcastingKind: null,
+        spellcastingAbility: null,
+      }),
     );
 
     await TestBed.configureTestingModule({

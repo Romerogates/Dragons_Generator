@@ -794,8 +794,10 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (!c) return;
     this.saving.set(true);
     this.campaigns.update(c.id, title, data).subscribe({
-      next: () => {
-        this.campaign.update((prev) => (prev ? { ...prev, title, data } : prev));
+      next: (summary) => {
+        this.campaign.update((prev) =>
+          prev ? { ...prev, title, data, updatedAt: summary.updatedAt } : prev,
+        );
         this.saving.set(false);
         if (this.tab() === 'activity') this.loadActivity();
       },
