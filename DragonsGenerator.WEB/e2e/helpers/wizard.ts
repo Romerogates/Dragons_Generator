@@ -24,6 +24,11 @@ export async function startFreshWizard(page: Page): Promise<void> {
   if (await restart.isVisible().catch(() => false)) {
     await restart.click();
   }
+  // Étape 0 — Niveau : valide le niveau par défaut (1) pour atteindre l'étape Espèce.
+  const levelContinue = page.getByTestId('level-step-continue');
+  if (await levelContinue.isVisible().catch(() => false)) {
+    await levelContinue.click();
+  }
 }
 
 function visibleCarouselCard(page: Page, cardId: string) {

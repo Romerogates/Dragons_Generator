@@ -29,23 +29,28 @@ describe('character-wizard-validation.util', () => {
     ).toBeFalse();
   });
 
+  it('isWizardStepValid always accepts the level step (default value always set)', () => {
+    expect(isWizardStepValid(1, base, { needsMagicStep: false })).toBeTrue();
+    expect(isWizardStepValid(1, { ...base, targetLevel: 12 }, { needsMagicStep: false })).toBeTrue();
+  });
+
   it('isWizardStepValid gates species, class and languages', () => {
-    expect(isWizardStepValid(1, base, { needsMagicStep: false })).toBeFalse();
+    expect(isWizardStepValid(2, base, { needsMagicStep: false })).toBeFalse();
     expect(
-      isWizardStepValid(1, { ...base, speciesId: 'sp-humain' }, { needsMagicStep: false }),
+      isWizardStepValid(2, { ...base, speciesId: 'sp-humain' }, { needsMagicStep: false }),
     ).toBeTrue();
-    expect(isWizardStepValid(4, { ...base, classId: 'cls-guerrier' }, { needsMagicStep: false })).toBeFalse();
+    expect(isWizardStepValid(5, { ...base, classId: 'cls-guerrier' }, { needsMagicStep: false })).toBeFalse();
     expect(
       isWizardStepValid(
-        4,
+        5,
         { ...base, classId: 'cls-guerrier', hitDie: 10 },
         { needsMagicStep: false },
       ),
     ).toBeTrue();
-    expect(isWizardStepValid(6, base, { needsMagicStep: false })).toBeFalse();
+    expect(isWizardStepValid(7, base, { needsMagicStep: false })).toBeFalse();
     expect(
       isWizardStepValid(
-        6,
+        7,
         {
           ...base,
           classId: 'cls-guerrier',
@@ -56,7 +61,7 @@ describe('character-wizard-validation.util', () => {
       ),
     ).toBeTrue();
     expect(
-      isWizardStepValid(8, { ...base, languages: ['Commun'] }, { needsMagicStep: false }),
+      isWizardStepValid(9, { ...base, languages: ['Commun'] }, { needsMagicStep: false }),
     ).toBeTrue();
   });
 
@@ -68,19 +73,19 @@ describe('character-wizard-validation.util', () => {
       spellcastingDetails: { cantrips: ['sp-light'] },
       name: 'Aldric',
     };
-    expect(isWizardStepValid(9, withMagic, { needsMagicStep: true })).toBeTrue();
+    expect(isWizardStepValid(10, withMagic, { needsMagicStep: true })).toBeTrue();
     expect(
-      isWizardStepValid(9, { ...withMagic, spellcastingDetails: {} }, { needsMagicStep: true }),
+      isWizardStepValid(10, { ...withMagic, spellcastingDetails: {} }, { needsMagicStep: true }),
     ).toBeFalse();
     expect(
-      isWizardStepValid(9, { ...base, name: 'Aldric' }, { needsMagicStep: false }),
+      isWizardStepValid(10, { ...base, name: 'Aldric' }, { needsMagicStep: false }),
     ).toBeTrue();
   });
 
   it('isWizardStepValid requires bonus languages to be picked', () => {
     expect(
       isWizardStepValid(
-        8,
+        9,
         {
           ...base,
           languages: ['Commun'],
@@ -92,7 +97,7 @@ describe('character-wizard-validation.util', () => {
     ).toBeFalse();
     expect(
       isWizardStepValid(
-        8,
+        9,
         {
           ...base,
           languages: ['Commun', 'Elfique'],
@@ -107,7 +112,7 @@ describe('character-wizard-validation.util', () => {
   it('isWizardStepValid counts background languages as locked', () => {
     expect(
       isWizardStepValid(
-        8,
+        9,
         {
           ...base,
           languages: ['Commun', 'Gobelin'],
@@ -123,7 +128,7 @@ describe('character-wizard-validation.util', () => {
   it('isWizardStepValid rejects incomplete ASI choices', () => {
     expect(
       isWizardStepValid(
-        5,
+        6,
         {
           ...base,
           pointsRemaining: 0,
@@ -134,7 +139,7 @@ describe('character-wizard-validation.util', () => {
     ).toBeFalse();
     expect(
       isWizardStepValid(
-        5,
+        6,
         {
           ...base,
           pointsRemaining: 0,
@@ -145,7 +150,7 @@ describe('character-wizard-validation.util', () => {
     ).toBeTrue();
     expect(
       isWizardStepValid(
-        5,
+        6,
         {
           ...base,
           pointsRemaining: 0,
@@ -156,7 +161,7 @@ describe('character-wizard-validation.util', () => {
     ).toBeTrue();
     expect(
       isWizardStepValid(
-        5,
+        6,
         {
           ...base,
           pointsRemaining: 0,
@@ -167,7 +172,7 @@ describe('character-wizard-validation.util', () => {
     ).toBeFalse();
     expect(
       isWizardStepValid(
-        5,
+        6,
         {
           ...base,
           pointsRemaining: 0,
@@ -180,7 +185,7 @@ describe('character-wizard-validation.util', () => {
     ).toBeTrue();
     expect(
       isWizardStepValid(
-        5,
+        6,
         {
           ...base,
           pointsRemaining: 0,
@@ -194,14 +199,14 @@ describe('character-wizard-validation.util', () => {
   });
 
   it('isWizardStepValid gates abilities, equipment and languages', () => {
-    expect(isWizardStepValid(5, { ...base, pointsRemaining: 3 }, { needsMagicStep: false })).toBeFalse();
+    expect(isWizardStepValid(6, { ...base, pointsRemaining: 3 }, { needsMagicStep: false })).toBeFalse();
     expect(
-      isWizardStepValid(5, { ...base, pointsRemaining: 0 }, { needsMagicStep: false }),
+      isWizardStepValid(6, { ...base, pointsRemaining: 0 }, { needsMagicStep: false }),
     ).toBeTrue();
-    expect(isWizardStepValid(7, base, { needsMagicStep: false })).toBeFalse();
+    expect(isWizardStepValid(8, base, { needsMagicStep: false })).toBeFalse();
     expect(
       isWizardStepValid(
-        7,
+        8,
         { ...base, selectedEquipment: [{ instanceId: '1', refId: 'wp-dagger', name: 'Dague', qty: 1 }] as never },
         { needsMagicStep: false },
       ),
@@ -209,15 +214,15 @@ describe('character-wizard-validation.util', () => {
   });
 
   it('isWizardStepValid covers optional steps and unknown step', () => {
-    expect(isWizardStepValid(6, { ...base, classId: 'cls-guerrier' }, { needsMagicStep: false })).toBeTrue();
-    expect(isWizardStepValid(10, base, { needsMagicStep: false })).toBeTrue();
-    expect(isWizardStepValid(11, base, { needsMagicStep: true })).toBeTrue();
+    expect(isWizardStepValid(7, { ...base, classId: 'cls-guerrier' }, { needsMagicStep: false })).toBeTrue();
+    expect(isWizardStepValid(11, base, { needsMagicStep: false })).toBeTrue();
+    expect(isWizardStepValid(12, base, { needsMagicStep: true })).toBeTrue();
     expect(isWizardStepValid(99, base, { needsMagicStep: false })).toBeFalse();
     expect(racialSpellsComplete({ ...base, racialSpellGrants: [] })).toBeTrue();
   });
 
-  it('isWizardStepValid requires identity on step 10 when magic step active', () => {
-    expect(isWizardStepValid(10, { ...base, name: '' }, { needsMagicStep: true })).toBeFalse();
-    expect(isWizardStepValid(10, { ...base, name: 'Hero' }, { needsMagicStep: true })).toBeTrue();
+  it('isWizardStepValid requires identity on step 11 when magic step active', () => {
+    expect(isWizardStepValid(11, { ...base, name: '' }, { needsMagicStep: true })).toBeFalse();
+    expect(isWizardStepValid(11, { ...base, name: 'Hero' }, { needsMagicStep: true })).toBeTrue();
   });
 });

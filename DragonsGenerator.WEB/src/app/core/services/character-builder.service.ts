@@ -100,23 +100,24 @@ export class CharacterBuilderService {
 
   readonly steps = computed(() => {
     const base = [
-      { number: 1, title: 'Espèce', icon: '🧬' },
-      { number: 2, title: 'Civilisation', icon: '🏰' },
-      { number: 3, title: 'Historique', icon: '📖' },
-      { number: 4, title: 'Classe', icon: '⚔️' },
-      { number: 5, title: 'Caractéristiques', icon: '📊' },
-      { number: 6, title: 'Savoirs & Maîtrises', icon: '🎯' },
-      { number: 7, title: 'Équipement', icon: '🎒' },
-      { number: 8, title: 'Langues', icon: '🗣️' },
+      { number: 1, title: 'Niveau', icon: '🔢' },
+      { number: 2, title: 'Espèce', icon: '🧬' },
+      { number: 3, title: 'Civilisation', icon: '🏰' },
+      { number: 4, title: 'Historique', icon: '📖' },
+      { number: 5, title: 'Classe', icon: '⚔️' },
+      { number: 6, title: 'Caractéristiques', icon: '📊' },
+      { number: 7, title: 'Savoirs & Maîtrises', icon: '🎯' },
+      { number: 8, title: 'Équipement', icon: '🎒' },
+      { number: 9, title: 'Langues', icon: '🗣️' },
     ];
 
     if (this.needsMagicStep()) {
-      base.push({ number: 9, title: 'Magie', icon: '✨' });
+      base.push({ number: 10, title: 'Magie', icon: '✨' });
+      base.push({ number: 11, title: 'Identité', icon: '📜' });
+      base.push({ number: 12, title: 'Récapitulatif', icon: '✅' });
+    } else {
       base.push({ number: 10, title: 'Identité', icon: '📜' });
       base.push({ number: 11, title: 'Récapitulatif', icon: '✅' });
-    } else {
-      base.push({ number: 9, title: 'Identité', icon: '📜' });
-      base.push({ number: 10, title: 'Récapitulatif', icon: '✅' });
     }
 
     return base;
@@ -132,12 +133,12 @@ export class CharacterBuilderService {
   readonly summaryStep = computed(() => this.totalSteps());
 
   /** Étape « Classe » (fixe dans le wizard). */
-  readonly classStepNumber = 4;
+  readonly classStepNumber = 5;
 
   /**
    * Niveau verrouillé une fois l'étape Classe dépassée :
    * ASI, expertise, sorts, ressources dépendent du niveau déjà choisi.
-   * Revenir à Classe (≤ 4) le déverrouille.
+   * Revenir à Classe (≤ 5) ou avant le déverrouille.
    */
   readonly isLevelLocked = computed(() => this.currentStep() > this.classStepNumber);
 

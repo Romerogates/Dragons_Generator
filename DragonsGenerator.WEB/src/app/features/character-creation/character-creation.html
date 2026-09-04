@@ -119,44 +119,47 @@
   <div class="w-full flex-1 flex flex-col min-h-0">
     @switch (builder.currentStep()) {
       @case (1) {
-        <app-species-step />
+        <app-level-step />
       }
       @case (2) {
-        <app-civilization-step />
+        <app-species-step />
       }
       @case (3) {
-        <app-background-step />
+        <app-civilization-step />
       }
       @case (4) {
-        <app-class-step />
+        <app-background-step />
       }
       @case (5) {
-        <app-abilities-step />
+        <app-class-step />
       }
       @case (6) {
-        <app-skills-step />
+        <app-abilities-step />
       }
       @case (7) {
-        <app-equipment-step />
+        <app-skills-step />
       }
       @case (8) {
-        <app-languages-step />
+        <app-equipment-step />
       }
       @case (9) {
+        <app-languages-step />
+      }
+      @case (10) {
         @if (builder.needsMagicStep()) {
           <app-magic-step />
         } @else {
           <app-identity-step />
         }
       }
-      @case (10) {
+      @case (11) {
         @if (builder.needsMagicStep()) {
           <app-identity-step />
         } @else {
           <app-summary-step />
         }
       }
-      @case (11) {
+      @case (12) {
         <app-summary-step />
       }
       @default {

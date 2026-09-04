@@ -16,6 +16,7 @@ import { OfflineCodexService } from '@core/services/offline-codex.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
 
 // Steps
+import { LevelStep } from './steps/level-step/level-step';
 import { SpeciesStep } from './steps/species-step/species-step';
 import { CivilizationStep } from './steps/civilization-step/civilization-step';
 import { ClassStep } from './steps/class-step/class-step';
@@ -34,6 +35,7 @@ import { BackgroundStep } from './steps/background-step/background-step';
   imports: [
     CommonModule,
     RouterLink,
+    LevelStep,
     SpeciesStep,
     CivilizationStep,
     BackgroundStep,

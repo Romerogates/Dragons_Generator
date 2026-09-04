@@ -69,22 +69,25 @@ export function isWizardStepValid(
 ): boolean {
   switch (step) {
     case 1:
-      return c.speciesId !== null;
+      // Étape Niveau : toujours valide (valeur par défaut 1, ajustable via les boutons).
+      return true;
     case 2:
-      return c.civilizationId !== null;
+      return c.speciesId !== null;
     case 3:
-      return c.backgroundId !== null;
+      return c.civilizationId !== null;
     case 4:
-      return classStepComplete(c);
+      return c.backgroundId !== null;
     case 5:
-      return c.pointsRemaining === 0 && asiChoicesComplete(c);
+      return classStepComplete(c);
     case 6:
-      return skillsStepComplete(c);
+      return c.pointsRemaining === 0 && asiChoicesComplete(c);
     case 7:
-      return c.selectedEquipment.length > 0;
+      return skillsStepComplete(c);
     case 8:
-      return languagesStepComplete(c);
+      return c.selectedEquipment.length > 0;
     case 9:
+      return languagesStepComplete(c);
+    case 10:
       if (ctx.needsMagicStep) {
         if (!racialSpellsComplete(c)) return false;
         if (c.hasSpellcasting) {
@@ -95,10 +98,10 @@ export function isWizardStepValid(
         return !!(details?.cantrips?.length);
       }
       return c.name.trim().length > 0;
-    case 10:
+    case 11:
       if (ctx.needsMagicStep) return c.name.trim().length > 0;
       return true;
-    case 11:
+    case 12:
       return true;
     default:
       return false;
