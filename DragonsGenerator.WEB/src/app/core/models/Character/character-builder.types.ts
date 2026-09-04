@@ -169,6 +169,16 @@ export type ExtendedCharacterCreation = CharacterCreation & {
   classDarkvisionRadius?: number;
   classHasBlindsight?: boolean;
   classBlindsightRadius?: number;
+  /** Don "Talent" (système à 4 points flexibles) : bénéfices agrégés depuis `featTalentSpends`. */
+  talentBonusSkills?: string[];
+  talentExpertiseSkills?: string[];
+  talentBonusWeapons?: string[];
+  talentSavingThrows?: string[];
+  talentBonusCantrips?: SpellInstance[];
+  /** Compteur interne wizard : langues bonus déjà comptées pour le don Talent (delta additif). */
+  talentBonusLangApplied?: number;
+  /** Compteur interne wizard : langues exotiques déjà comptées pour le don Talent (delta additif). */
+  talentExoticLangApplied?: number;
 };
 
 export const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
@@ -247,6 +257,13 @@ export const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   featBonusTools: [],
   featResistances: [],
   featDetailsById: {},
+  talentBonusSkills: [],
+  talentExpertiseSkills: [],
+  talentBonusWeapons: [],
+  talentSavingThrows: [],
+  talentBonusCantrips: [],
+  talentBonusLangApplied: 0,
+  talentExoticLangApplied: 0,
   classChoiceAnswers: {},
   asiBonuses: {},
   selectedFeatId: null,

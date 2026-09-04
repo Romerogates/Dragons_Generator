@@ -1,4 +1,6 @@
-import type { AbilityKey } from '@core/models/Character/character';
+import type { AbilityKey, TalentSpend, TalentSpendType } from '@core/models/Character/character';
+
+export type { TalentSpend, TalentSpendType };
 
 /** Représentation minimale d'un don (`Feat.data` brut, clés snake_case telles quelles). */
 export interface RawFeatData {
@@ -8,6 +10,91 @@ export interface RawFeatData {
     max?: number;
   };
   benefits?: unknown[];
+}
+
+/** Coût en points d'un type de dépense de Talent (1 pt ou 2 pts selon la description du don). */
+export const TALENT_SPEND_COST: Record<TalentSpendType, number> = {
+  skill: 1,
+  tool: 1,
+  weapon: 1,
+  languages_common: 1,
+  saving_throw: 2,
+  language_exotic: 2,
+  ability_score: 2,
+  armor: 2,
+  expertise: 2,
+  attack_bonus: 2,
+  cantrips: 2,
+};
+
+export const TALENT_SPEND_LABEL: Record<TalentSpendType, string> = {
+  skill: 'Maîtrise de compétence',
+  tool: "Maîtrise d'outil",
+  weapon: "Maîtrise d'une arme",
+  languages_common: '2 langues communes',
+  saving_throw: 'Maîtrise de jet de sauvegarde',
+  language_exotic: 'Langue exotique',
+  ability_score: '+1 caractéristique',
+  armor: "Maîtrise d'armures (palier suivant)",
+  expertise: 'Expertise (double maîtrise)',
+  attack_bonus: "+1 aux jets d'attaque (catégorie d'arme)",
+  cantrips: '2 sorts mineurs',
+};
+
+/** Un don utilise-t-il le système de points flexibles (ex. "Talent") plutôt qu'un bénéfice fixe ? */
+export function featIsFlexiblePoints(feat: RawFeatData | null | undefined): boolean {
+  const benefits = Array.isArray(feat?.benefits) ? feat!.benefits! : [];
+  return benefits.some(
+    (b) => b && typeof b === 'object' && (b as Record<string, unknown>)['type'] === 'flexible_points',
+  );
+}
+
+/** Nombre total de points flexibles accordés par le don (ex. 4 pour "Talent"). */
+export function featFlexiblePointsTotal(feat: RawFeatData | null | undefined): number {
+  const benefits = Array.isArray(feat?.benefits) ? feat!.benefits! : [];
+  const b = benefits.find(
+    (x) => x && typeof x === 'object' && (x as Record<string, unknown>)['type'] === 'flexible_points',
+  ) as Record<string, unknown> | undefined;
+  const total = b?.['total'];
+  return typeof total === 'number' ? total : 0;
+}
+
+/** Coût total (en points) d'une liste de dépenses de Talent. */
+export function talentSpendsTotalCost(spends: TalentSpend[] | null | undefined): number {
+  return (spends ?? []).reduce((sum, s) => sum + (TALENT_SPEND_COST[s.type] ?? 0), 0);
+}
+
+/** Une dépense de Talent a-t-elle bien tous ses sous-choix requis renseignés ? */
+export function isTalentSpendComplete(spend: TalentSpend): boolean {
+  switch (spend.type) {
+    case 'skill':
+      return !!spend.skillId;
+    case 'tool':
+      return !!spend.toolId;
+    case 'weapon':
+      return !!spend.weaponId;
+    case 'languages_common':
+      // Le choix des langues précises se fait plus loin dans l'assistant (étape Langues), qui lit
+      // le compteur de langues bonus agrégé : rien à valider ici.
+      return true;
+    case 'saving_throw':
+      return !!spend.savingThrow;
+    case 'language_exotic':
+      // Idem : résolu à l'étape Langues via le compteur de langues exotiques requises.
+      return true;
+    case 'ability_score':
+      return !!spend.abilityKey;
+    case 'armor':
+      return !!spend.armorTier;
+    case 'expertise':
+      return !!spend.expertiseSkillId;
+    case 'attack_bonus':
+      return !!spend.attackCategory;
+    case 'cantrips':
+      return (spend.cantripIds ?? []).length === 2;
+    default:
+      return false;
+  }
 }
 
 const ABILITY_CODE_TO_KEY: Record<string, AbilityKey> = {

@@ -4,7 +4,7 @@ import type {
   Currency,
   FeatureInstance,
 } from '@core/models/Character/character';
-import { CURRENT_SCHEMA_VERSION } from '@core/models/Character/character';
+import { ABILITY_KEY_TO_LABEL, CURRENT_SCHEMA_VERSION } from '@core/models/Character/character';
 import type { ExtendedCharacterCreation } from '@core/models/Character/character-builder.types';
 import {
   buildCharacterAttacks,
@@ -74,6 +74,7 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
   const knownSpells = [
     ...buildKnownSpellsFromCreation(c),
     ...(c.speciesInnateSpells ?? []),
+    ...(c.talentBonusCantrips ?? []),
   ];
   const attacks = buildCharacterAttacks(
     allEquipmentForAttacks,
@@ -118,7 +119,13 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
   const allArmor = [
     ...new Set([...c.armorProficiencies, ...(c.speciesFixedArmor ?? []), ...(c.featBonusArmor ?? [])]),
   ];
-  const allWeapons = [...new Set([...c.weaponProficiencies, ...(c.speciesFixedWeapons ?? [])])];
+  const allWeapons = [
+    ...new Set([
+      ...c.weaponProficiencies,
+      ...(c.speciesFixedWeapons ?? []),
+      ...(c.talentBonusWeapons ?? []),
+    ]),
+  ];
 
   return {
     id: editing?.id ?? crypto.randomUUID(),
@@ -210,11 +217,23 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
       armor: allArmor,
       weapons: allWeapons,
       tools: allTools,
-      savingThrows: c.savingThrows,
-      skills: [
-        ...new Set([...c.selectedSkills, ...c.backgroundSkills, ...(c.speciesFixedSkills ?? [])]),
+      savingThrows: [
+        ...new Set([
+          ...c.savingThrows,
+          ...(c.talentSavingThrows ?? []).map((k) => ABILITY_KEY_TO_LABEL[k as keyof typeof ABILITY_KEY_TO_LABEL]),
+        ]),
       ],
-      expertiseSkills: c.expertiseSkills ?? [],
+      skills: [
+        ...new Set([
+          ...c.selectedSkills,
+          ...c.backgroundSkills,
+          ...(c.speciesFixedSkills ?? []),
+          ...(c.talentBonusSkills ?? []),
+        ]),
+      ],
+      expertiseSkills: [
+        ...new Set([...(c.expertiseSkills ?? []), ...(c.talentExpertiseSkills ?? [])]),
+      ],
       languages: c.languages,
       writingSystems: c.civilizationWritingSystems,
     },

@@ -26,10 +26,19 @@ import {
   featAsiNeedsAbilityChoice,
   featNeedsResistanceChoice,
   featResistanceOptions,
+  featIsFlexiblePoints,
+  featFlexiblePointsTotal,
+  talentSpendsTotalCost,
+  isTalentSpendComplete,
+  TALENT_SPEND_COST,
+  TALENT_SPEND_LABEL,
   type RawFeatData,
+  type TalentSpend,
+  type TalentSpendType,
 } from '@core/utils/feat-benefits.util';
 import { resistanceLabel } from '@core/utils/equipment-display.util';
 import { apiCodeToAbilityKey } from '@core/utils/ability-mapping';
+import type { Spell } from '@core/models/Spells/spell';
 
 interface AbilityRow {
   key: AbilityKey;
@@ -47,7 +56,34 @@ interface AsiSlotUi {
   featId: string | null;
   featAbilityChoice: AbilityKey | null;
   featResistanceChoice: string | null;
+  featTalentSpends: TalentSpend[];
 }
+
+/** Ordre d'affichage des types de dépenses du don "Talent" (4 points flexibles). */
+const TALENT_SPEND_TYPES: TalentSpendType[] = [
+  'skill',
+  'tool',
+  'weapon',
+  'languages_common',
+  'saving_throw',
+  'language_exotic',
+  'ability_score',
+  'armor',
+  'expertise',
+  'attack_bonus',
+  'cantrips',
+];
+
+const ARMOR_TIER_LABEL: Record<'ar-light' | 'ar-medium' | 'ar-heavy', string> = {
+  'ar-light': 'Armures légères',
+  'ar-medium': 'Armures intermédiaires',
+  'ar-heavy': 'Armures lourdes',
+};
+
+const ATTACK_CATEGORY_LABEL: Record<'wp-cat-simple' | 'wp-cat-martial', string> = {
+  'wp-cat-simple': 'Armes courantes',
+  'wp-cat-martial': 'Armes de guerre',
+};
 
 interface FeatUi {
   id: string;
@@ -72,6 +108,13 @@ export class AbilitiesStep implements OnInit {
   readonly asiSlots = signal<AsiSlotUi[]>([]);
   readonly feats = signal<FeatUi[]>([]);
   readonly classJson = signal<any>(null);
+
+  /** Catalogues chargés pour les sous-choix du don "Talent" (4 points flexibles). */
+  readonly talentSkillCatalog = signal<{ id: string; name: string }[]>([]);
+  readonly talentToolCatalog = signal<{ id: string; name: string }[]>([]);
+  readonly talentWeaponCatalog = signal<{ id: string; name: string }[]>([]);
+  readonly talentCantripCatalog = signal<{ id: string; name: string }[]>([]);
+  private readonly spellsById = signal<Map<string, Spell>>(new Map());
 
   private readonly featsById = computed(() => new Map(this.feats().map((f) => [f.id, f.raw])));
 
@@ -116,6 +159,89 @@ export class AbilitiesStep implements OnInit {
 
   selectFeatResistanceChoice(id: string): void {
     this.patchActiveSlot({ featResistanceChoice: id });
+  }
+
+  // --- Don "Talent" (système à 4 points flexibles) ---------------------------------------------
+
+  readonly talentSpendTypes = TALENT_SPEND_TYPES;
+  readonly talentSpendCost = TALENT_SPEND_COST;
+  readonly talentSpendLabel = TALENT_SPEND_LABEL;
+  readonly armorTierLabel = ARMOR_TIER_LABEL;
+  readonly attackCategoryLabel = ATTACK_CATEGORY_LABEL;
+  readonly armorTiers: Array<'ar-light' | 'ar-medium' | 'ar-heavy'> = ['ar-light', 'ar-medium', 'ar-heavy'];
+  readonly attackCategories: Array<'wp-cat-simple' | 'wp-cat-martial'> = ['wp-cat-simple', 'wp-cat-martial'];
+
+  setTalentArmorTier(spendId: string, tier: 'ar-light' | 'ar-medium' | 'ar-heavy'): void {
+    this.updateTalentSpend(spendId, { armorTier: tier });
+  }
+
+  setTalentAttackCategory(spendId: string, cat: 'wp-cat-simple' | 'wp-cat-martial'): void {
+    this.updateTalentSpend(spendId, { attackCategory: cat });
+  }
+
+  activeSlotIsTalent(): boolean {
+    const feat = this.getFeat(this.activeSlot()?.featId ?? null);
+    return featIsFlexiblePoints(feat?.raw);
+  }
+
+  talentPointsTotal(): number {
+    const feat = this.getFeat(this.activeSlot()?.featId ?? null);
+    return featFlexiblePointsTotal(feat?.raw);
+  }
+
+  talentSpends(): TalentSpend[] {
+    return this.activeSlot()?.featTalentSpends ?? [];
+  }
+
+  talentPointsSpent(): number {
+    return talentSpendsTotalCost(this.talentSpends());
+  }
+
+  talentPointsRemaining(): number {
+    return this.talentPointsTotal() - this.talentPointsSpent();
+  }
+
+  canAddTalentSpend(type: TalentSpendType): boolean {
+    return this.talentPointsRemaining() >= (TALENT_SPEND_COST[type] ?? 0);
+  }
+
+  isTalentSpendOk(spend: TalentSpend): boolean {
+    return isTalentSpendComplete(spend);
+  }
+
+  talentAllSpent(): boolean {
+    return this.talentPointsRemaining() === 0;
+  }
+
+  talentAllComplete(): boolean {
+    return this.talentAllSpent() && this.talentSpends().every((s) => isTalentSpendComplete(s));
+  }
+
+  addTalentSpend(type: TalentSpendType): void {
+    if (!this.canAddTalentSpend(type)) return;
+    const spend: TalentSpend = { id: `talent-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, type };
+    this.patchActiveSlot({ featTalentSpends: [...this.talentSpends(), spend] });
+  }
+
+  removeTalentSpend(id: string): void {
+    this.patchActiveSlot({ featTalentSpends: this.talentSpends().filter((s) => s.id !== id) });
+  }
+
+  updateTalentSpend(id: string, patch: Partial<TalentSpend>): void {
+    this.patchActiveSlot({
+      featTalentSpends: this.talentSpends().map((s) => (s.id === id ? { ...s, ...patch } : s)),
+    });
+  }
+
+  toggleTalentCantrip(id: string, spellId: string): void {
+    const spend = this.talentSpends().find((s) => s.id === id);
+    if (!spend) return;
+    const current = spend.cantripIds ?? [];
+    if (current.includes(spellId)) {
+      this.updateTalentSpend(id, { cantripIds: current.filter((c) => c !== spellId) });
+    } else if (current.length < 2) {
+      this.updateTalentSpend(id, { cantripIds: [...current, spellId] });
+    }
   }
 
   abilityLabel(key: AbilityKey): string {
@@ -169,6 +295,12 @@ export class AbilitiesStep implements OnInit {
       if (s.mode === 'feat') {
         if (!s.featId) return false;
         const feat = this.getFeat(s.featId);
+        if (featIsFlexiblePoints(feat?.raw)) {
+          const total = featFlexiblePointsTotal(feat?.raw);
+          const spends = s.featTalentSpends ?? [];
+          if (talentSpendsTotalCost(spends) !== total) return false;
+          return spends.every((sp) => isTalentSpendComplete(sp));
+        }
         if (featAsiNeedsAbilityChoice(feat?.raw) && !s.featAbilityChoice) return false;
         if (featNeedsResistanceChoice(feat?.raw) && !s.featResistanceChoice) return false;
         return true;
@@ -207,6 +339,7 @@ export class AbilitiesStep implements OnInit {
             featId: null,
             featAbilityChoice: null,
             featResistanceChoice: null,
+            featTalentSpends: [],
           }
         );
       });
@@ -236,6 +369,35 @@ export class AbilitiesStep implements OnInit {
       },
     });
 
+    // Catalogues pour les sous-choix du don "Talent" (4 points flexibles).
+    this.dataService.getSkills().subscribe({
+      next: (list) => this.talentSkillCatalog.set((list ?? []).map((s) => ({ id: s.id, name: s.name }))),
+    });
+    this.dataService.getEquipments().subscribe({
+      next: (items: any[]) => {
+        this.talentToolCatalog.set(
+          (items ?? [])
+            .filter((e) => String(e.type ?? '').toUpperCase() === 'TOOL')
+            .map((e) => ({ id: e.id, name: e.name })),
+        );
+        this.talentWeaponCatalog.set(
+          (items ?? [])
+            .filter((e) => String(e.type ?? '').toUpperCase() === 'WEAPON')
+            .map((e) => ({ id: e.id, name: e.name })),
+        );
+      },
+    });
+    this.dataService.getSpells().subscribe({
+      next: (list) => {
+        const map = new Map<string, Spell>();
+        (list ?? []).forEach((s) => map.set(s.id, s));
+        this.spellsById.set(map);
+        this.talentCantripCatalog.set(
+          (list ?? []).filter((s) => s.level === 0).map((s) => ({ id: s.id, name: s.name })),
+        );
+      },
+    });
+
     const c = this.builder.creation();
     if (c.asiChoices?.length) {
       this.asiSlots.set(
@@ -247,6 +409,7 @@ export class AbilitiesStep implements OnInit {
           featId: s.featId ?? null,
           featAbilityChoice: s.featAbilityChoice ?? null,
           featResistanceChoice: s.featResistanceChoice ?? null,
+          featTalentSpends: s.featTalentSpends ?? [],
         })),
       );
     } else if (c.selectedFeatId || Object.keys(c.asiBonuses ?? {}).length) {
@@ -259,6 +422,7 @@ export class AbilitiesStep implements OnInit {
         featId: null,
         featAbilityChoice: null,
         featResistanceChoice: null,
+        featTalentSpends: [],
       };
       if (c.selectedFeatId) {
         slot.mode = 'feat';
@@ -339,6 +503,7 @@ export class AbilitiesStep implements OnInit {
         featId: null,
         featAbilityChoice: null,
         featResistanceChoice: null,
+        featTalentSpends: [],
       })),
     );
   }
@@ -355,6 +520,7 @@ export class AbilitiesStep implements OnInit {
       featId: null,
       featAbilityChoice: null,
       featResistanceChoice: null,
+      featTalentSpends: [],
     });
   }
 
@@ -375,7 +541,12 @@ export class AbilitiesStep implements OnInit {
   }
 
   selectFeat(id: string): void {
-    this.patchActiveSlot({ featId: id, featAbilityChoice: null, featResistanceChoice: null });
+    this.patchActiveSlot({
+      featId: id,
+      featAbilityChoice: null,
+      featResistanceChoice: null,
+      featTalentSpends: [],
+    });
   }
 
   private patchActiveSlot(patch: Partial<AsiSlotUi>): void {
@@ -398,6 +569,7 @@ export class AbilitiesStep implements OnInit {
       featId: s.featId,
       featAbilityChoice: s.featAbilityChoice,
       featResistanceChoice: s.featResistanceChoice,
+      featTalentSpends: s.featTalentSpends,
     }));
     const featDetailsById: Record<string, { name: string; desc: string }> = {};
     for (const f of this.feats()) featDetailsById[f.id] = { name: f.name, desc: f.description };
@@ -405,6 +577,7 @@ export class AbilitiesStep implements OnInit {
       feats: this.featsById(),
       spellcastingAbility: this.classSpellcastingAbility(),
       featDetailsById,
+      spells: this.spellsById(),
     });
   }
 

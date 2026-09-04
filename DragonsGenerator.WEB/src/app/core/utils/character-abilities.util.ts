@@ -1,8 +1,15 @@
-import type { AbilityKey, AbilityScores, AsiChoiceSlot, FeatureInstance } from '@core/models/Character/character';
+import type {
+  AbilityKey,
+  AbilityScores,
+  AsiChoiceSlot,
+  FeatureInstance,
+  SpellInstance,
+} from '@core/models/Character/character';
 import {
   ABILITY_POINT_COSTS,
   getAbilityModifier,
 } from '@core/models/Character/character';
+import type { Spell } from '@core/models/Spells/spell';
 import {
   featAsiValue,
   featBonusArmorProficiencies,
@@ -91,7 +98,11 @@ export function computePassivePerception(
 
 export function aggregateAsiChoices(
   slots: AsiChoiceSlot[],
-  ctx?: { feats?: Map<string, RawFeatData>; spellcastingAbility?: AbilityKey | null },
+  ctx?: {
+    feats?: Map<string, RawFeatData>;
+    spellcastingAbility?: AbilityKey | null;
+    spells?: Map<string, Spell>;
+  },
 ): {
   bonuses: Partial<AbilityScores>;
   featIds: string[];
@@ -99,6 +110,14 @@ export function aggregateAsiChoices(
   featBonusArmor: string[];
   featBonusTools: string[];
   featResistances: string[];
+  /** Système "Talent" (don `don-talent`, 4 points flexibles) : agrégats des dépenses choisies. */
+  talentBonusSkills: string[];
+  talentExpertiseSkills: string[];
+  talentBonusWeapons: string[];
+  talentSavingThrows: string[];
+  talentBonusLanguageCount: number;
+  talentRequiredExoticLanguages: number;
+  talentBonusCantrips: SpellInstance[];
 } {
   const bonuses: Partial<AbilityScores> = {};
   const featIds: string[] = [];
@@ -106,6 +125,14 @@ export function aggregateAsiChoices(
   const bonusArmor = new Set<string>();
   const bonusTools = new Set<string>();
   const resistances = new Set<string>();
+  const talentSkills = new Set<string>();
+  const talentExpertise = new Set<string>();
+  const talentWeapons = new Set<string>();
+  const talentSaves = new Set<string>();
+  let talentBonusLanguageCount = 0;
+  let talentRequiredExoticLanguages = 0;
+  const talentCantrips: SpellInstance[] = [];
+
   for (const slot of slots) {
     if (slot.mode === 'feat' && slot.featId) {
       featIds.push(slot.featId);
@@ -125,6 +152,59 @@ export function aggregateAsiChoices(
         featBonusToolProficiencies(feat).forEach((id) => bonusTools.add(id));
         if (slot.featResistanceChoice) resistances.add(slot.featResistanceChoice);
       }
+
+      // Don "Talent" (système à 4 points flexibles) : chaque dépense choisie applique son propre
+      // bénéfice mécanique (compétence, outil, arme, langues, JS, +1 carac, armure, expertise…).
+      for (const spend of slot.featTalentSpends ?? []) {
+        switch (spend.type) {
+          case 'skill':
+            if (spend.skillId) talentSkills.add(spend.skillId);
+            break;
+          case 'tool':
+            if (spend.toolId) bonusTools.add(spend.toolId);
+            break;
+          case 'weapon':
+            if (spend.weaponId) talentWeapons.add(spend.weaponId);
+            break;
+          case 'languages_common':
+            talentBonusLanguageCount += 2;
+            break;
+          case 'saving_throw':
+            if (spend.savingThrow) talentSaves.add(spend.savingThrow);
+            break;
+          case 'language_exotic':
+            talentBonusLanguageCount += 1;
+            talentRequiredExoticLanguages += 1;
+            break;
+          case 'ability_score':
+            if (spend.abilityKey) bonuses[spend.abilityKey] = (bonuses[spend.abilityKey] ?? 0) + 1;
+            break;
+          case 'armor':
+            if (spend.armorTier) bonusArmor.add(spend.armorTier);
+            break;
+          case 'expertise':
+            if (spend.expertiseSkillId) talentExpertise.add(spend.expertiseSkillId);
+            break;
+          case 'cantrips':
+            for (const spellId of spend.cantripIds ?? []) {
+              const raw = ctx?.spells?.get(spellId);
+              talentCantrips.push({
+                refId: spellId,
+                name: raw?.name ?? spellId.replace(/^spl-/, '').replace(/-/g, ' '),
+                level: 0,
+                prepared: true,
+                alwaysPrepared: true,
+                effectSummary: `Talent (sort mineur) · ${(raw?.description ?? '').slice(0, 100)}`,
+              });
+            }
+            break;
+          case 'attack_bonus':
+            // Bonus situationnel aux jets d'attaque avec une catégorie d'arme : non modélisé dans
+            // le moteur de combat actuel (pas de calcul par catégorie), conservé à titre indicatif
+            // dans `featTalentSpends` pour affichage seulement.
+            break;
+        }
+      }
       continue;
     }
     if (slot.mode === 'plus2' && slot.primary) {
@@ -141,6 +221,13 @@ export function aggregateAsiChoices(
     featBonusArmor: [...bonusArmor],
     featBonusTools: [...bonusTools],
     featResistances: [...resistances],
+    talentBonusSkills: [...talentSkills],
+    talentExpertiseSkills: [...talentExpertise],
+    talentBonusWeapons: [...talentWeapons],
+    talentSavingThrows: [...talentSaves],
+    talentBonusLanguageCount,
+    talentRequiredExoticLanguages,
+    talentBonusCantrips: talentCantrips,
   };
 }
 

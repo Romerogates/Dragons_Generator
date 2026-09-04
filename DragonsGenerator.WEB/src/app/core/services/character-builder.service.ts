@@ -30,6 +30,7 @@ import {
 } from '../utils/character-proficiencies.util';
 import { proficiencyBonusForLevel } from '../utils/character-progression.util';
 import type { RawFeatData } from '../utils/feat-benefits.util';
+import type { Spell } from '../models/Spells/spell';
 import { isWizardStepValid } from '../utils/character-wizard-validation.util';
 import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { DataService } from './data.service';
@@ -553,10 +554,24 @@ export class CharacterBuilderService {
       feats?: Map<string, RawFeatData>;
       spellcastingAbility?: AbilityKey | null;
       featDetailsById?: Record<string, { name: string; desc: string }>;
+      spells?: Map<string, Spell>;
     },
   ): void {
-    const { bonuses, featIds, featDarkvisionRadius, featBonusArmor, featBonusTools, featResistances } =
-      aggregateAsiChoices(slots, ctx);
+    const {
+      bonuses,
+      featIds,
+      featDarkvisionRadius,
+      featBonusArmor,
+      featBonusTools,
+      featResistances,
+      talentBonusSkills,
+      talentExpertiseSkills,
+      talentBonusWeapons,
+      talentSavingThrows,
+      talentBonusLanguageCount,
+      talentRequiredExoticLanguages,
+      talentBonusCantrips,
+    } = aggregateAsiChoices(slots, ctx);
     this.creation.update((c) => ({
       ...c,
       asiChoices: slots.map((s) => ({ ...s })),
@@ -568,6 +583,22 @@ export class CharacterBuilderService {
       featBonusTools,
       featResistances,
       featDetailsById: ctx?.featDetailsById ?? c.featDetailsById,
+      talentBonusSkills,
+      talentExpertiseSkills,
+      talentBonusWeapons,
+      talentSavingThrows,
+      talentBonusCantrips,
+      // Delta additif : on retire l'ancienne contribution du Talent avant d'appliquer la nouvelle,
+      // pour ne jamais compter deux fois si le joueur modifie ses dépenses (même pattern que les
+      // langues bonus espèce/historique/classe ci-dessus).
+      bonusLanguageCount:
+        (c.bonusLanguageCount || 0) - (c.talentBonusLangApplied || 0) + talentBonusLanguageCount,
+      requiredExoticLanguageCount:
+        (c.requiredExoticLanguageCount || 0) -
+        (c.talentExoticLangApplied || 0) +
+        talentRequiredExoticLanguages,
+      talentBonusLangApplied: talentBonusLanguageCount,
+      talentExoticLangApplied: talentRequiredExoticLanguages,
     }));
   }
 

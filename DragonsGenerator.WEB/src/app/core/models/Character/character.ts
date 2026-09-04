@@ -54,6 +54,38 @@ export interface AsiChoiceSlot {
   featAbilityChoice?: AbilityKey | null;
   /** Type de dégâts choisi quand le don propose une résistance au choix (ex. Gladiateur). */
   featResistanceChoice?: string | null;
+  /** Dépenses choisies quand le don utilise le système à points flexibles (ex. "Talent", 4 pts). */
+  featTalentSpends?: TalentSpend[];
+}
+
+/** Type d'achat possible pour un don à points flexibles (ex. "Talent", 4 pts à répartir). */
+export type TalentSpendType =
+  | 'skill'
+  | 'tool'
+  | 'weapon'
+  | 'languages_common'
+  | 'saving_throw'
+  | 'language_exotic'
+  | 'ability_score'
+  | 'armor'
+  | 'expertise'
+  | 'attack_bonus'
+  | 'cantrips';
+
+/** Une dépense de point choisie par le joueur pour un don à points flexibles (ex. Talent). */
+export interface TalentSpend {
+  id: string;
+  type: TalentSpendType;
+  skillId?: string | null;
+  toolId?: string | null;
+  weaponId?: string | null;
+  languageIds?: string[];
+  savingThrow?: AbilityKey | null;
+  abilityKey?: AbilityKey | null;
+  armorTier?: 'ar-light' | 'ar-medium' | 'ar-heavy' | null;
+  expertiseSkillId?: string | null;
+  attackCategory?: 'wp-cat-simple' | 'wp-cat-martial' | null;
+  cantripIds?: string[];
 }
 
 export const ABILITY_KEYS: readonly AbilityKey[] = [

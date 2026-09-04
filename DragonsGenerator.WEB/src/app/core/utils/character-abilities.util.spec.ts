@@ -168,6 +168,59 @@ describe('character-abilities.util', () => {
     expect(featResistances).toEqual(['damage-tranchant']);
   });
 
+  it('aggregateAsiChoices applies every "Talent" (flexible_points) spend type', () => {
+    const feats = new Map([['don-talent', { benefits: [{ type: 'flexible_points', total: 4 }] }]]);
+    const spells = new Map([['spl-lueur', { id: 'spl-lueur', name: 'Lueur', level: 0, description: 'Un sort.' } as any]]);
+    const result = aggregateAsiChoices(
+      [
+        {
+          level: 4,
+          mode: 'feat',
+          featId: 'don-talent',
+          featTalentSpends: [
+            { id: '1', type: 'skill', skillId: 'skill-arcanes' },
+            { id: '2', type: 'tool', toolId: 'tl-alchimiste' },
+            { id: '3', type: 'weapon', weaponId: 'wp-dague' },
+            { id: '4', type: 'languages_common' },
+            { id: '5', type: 'saving_throw', savingThrow: 'sagesse' },
+            { id: '6', type: 'language_exotic' },
+            { id: '7', type: 'ability_score', abilityKey: 'force' },
+            { id: '8', type: 'armor', armorTier: 'ar-light' },
+            { id: '9', type: 'expertise', expertiseSkillId: 'skill-arcanes' },
+            { id: '10', type: 'attack_bonus', attackCategory: 'wp-cat-simple' },
+            { id: '11', type: 'cantrips', cantripIds: ['spl-lueur'] },
+          ],
+        },
+      ],
+      { feats, spells },
+    );
+    expect(result.bonuses.force).toBe(1);
+    expect(result.talentBonusSkills).toEqual(['skill-arcanes']);
+    expect(result.featBonusTools).toEqual(['tl-alchimiste']);
+    expect(result.talentBonusWeapons).toEqual(['wp-dague']);
+    expect(result.talentSavingThrows).toEqual(['sagesse']);
+    expect(result.talentBonusLanguageCount).toBe(3); // 2 (commune) + 1 (exotique)
+    expect(result.talentRequiredExoticLanguages).toBe(1);
+    expect(result.featBonusArmor).toEqual(['ar-light']);
+    expect(result.talentExpertiseSkills).toEqual(['skill-arcanes']);
+    expect(result.talentBonusCantrips.length).toBe(1);
+    expect(result.talentBonusCantrips[0].name).toBe('Lueur');
+  });
+
+  it('aggregateAsiChoices skips talent spends when the feat is not resolvable', () => {
+    const result = aggregateAsiChoices([
+      {
+        level: 4,
+        mode: 'feat',
+        featId: 'don-talent',
+        featTalentSpends: [{ id: '1', type: 'skill', skillId: 'skill-arcanes' }],
+      },
+    ]);
+    // Sans map `feats` (don introuvable), les dépenses sont tout de même agrégées (elles ne
+    // dépendent pas de la définition brute du don, seulement du choix du joueur).
+    expect(result.talentBonusSkills).toEqual(['skill-arcanes']);
+  });
+
   it('computeHitPointsMax applies the Nain bâtisseur HP-per-level bonus', () => {
     const hp = computeHitPointsMax({
       targetLevel: 3,

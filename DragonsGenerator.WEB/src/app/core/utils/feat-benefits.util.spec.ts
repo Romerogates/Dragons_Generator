@@ -7,8 +7,13 @@ import {
   featDarkvisionRadius,
   featNeedsResistanceChoice,
   featResistanceOptions,
+  featFlexiblePointsTotal,
+  featIsFlexiblePoints,
+  isTalentSpendComplete,
   resolveFeatAsiAbilityKey,
+  talentSpendsTotalCost,
   type RawFeatData,
+  type TalentSpend,
 } from './feat-benefits.util';
 
 describe('featAsiNeedsAbilityChoice', () => {
@@ -176,5 +181,69 @@ describe('featNeedsResistanceChoice / featResistanceOptions', () => {
   it('is false/empty when feat is undefined', () => {
     expect(featNeedsResistanceChoice(undefined)).toBeFalse();
     expect(featResistanceOptions(undefined)).toEqual([]);
+  });
+});
+
+describe('featIsFlexiblePoints / featFlexiblePointsTotal (don "Talent")', () => {
+  it('detects the flexible_points benefit and reads its total', () => {
+    const feat: RawFeatData = { benefits: [{ type: 'flexible_points', total: 4 }] };
+    expect(featIsFlexiblePoints(feat)).toBeTrue();
+    expect(featFlexiblePointsTotal(feat)).toBe(4);
+  });
+
+  it('is false/0 for a regular feat without flexible_points', () => {
+    const feat: RawFeatData = { benefits: [{ type: 'darkvision', range_m: 9 }] };
+    expect(featIsFlexiblePoints(feat)).toBeFalse();
+    expect(featFlexiblePointsTotal(feat)).toBe(0);
+  });
+
+  it('is false/0 when feat is null/undefined', () => {
+    expect(featIsFlexiblePoints(undefined)).toBeFalse();
+    expect(featIsFlexiblePoints(null)).toBeFalse();
+    expect(featFlexiblePointsTotal(undefined)).toBe(0);
+  });
+});
+
+describe('talentSpendsTotalCost / isTalentSpendComplete', () => {
+  it('sums 1pt and 2pts spends correctly', () => {
+    const spends: TalentSpend[] = [
+      { id: '1', type: 'skill', skillId: 'skill-arcanes' },
+      { id: '2', type: 'ability_score', abilityKey: 'force' },
+    ];
+    expect(talentSpendsTotalCost(spends)).toBe(3);
+  });
+
+  it('returns 0 for an empty or missing list', () => {
+    expect(talentSpendsTotalCost([])).toBe(0);
+    expect(talentSpendsTotalCost(undefined)).toBe(0);
+  });
+
+  it('validates each spend type requires its sub-choice, except deferred languages', () => {
+    expect(isTalentSpendComplete({ id: '1', type: 'skill', skillId: 'skill-arcanes' })).toBeTrue();
+    expect(isTalentSpendComplete({ id: '1', type: 'skill' })).toBeFalse();
+    expect(isTalentSpendComplete({ id: '1', type: 'tool', toolId: 'tl-alchimiste' })).toBeTrue();
+    expect(isTalentSpendComplete({ id: '1', type: 'tool' })).toBeFalse();
+    expect(isTalentSpendComplete({ id: '1', type: 'weapon', weaponId: 'wp-dague' })).toBeTrue();
+    expect(isTalentSpendComplete({ id: '1', type: 'weapon' })).toBeFalse();
+    expect(isTalentSpendComplete({ id: '1', type: 'languages_common' })).toBeTrue();
+    expect(isTalentSpendComplete({ id: '1', type: 'language_exotic' })).toBeTrue();
+    expect(isTalentSpendComplete({ id: '1', type: 'saving_throw', savingThrow: 'sagesse' })).toBeTrue();
+    expect(isTalentSpendComplete({ id: '1', type: 'saving_throw' })).toBeFalse();
+    expect(isTalentSpendComplete({ id: '1', type: 'ability_score', abilityKey: 'force' })).toBeTrue();
+    expect(isTalentSpendComplete({ id: '1', type: 'ability_score' })).toBeFalse();
+    expect(isTalentSpendComplete({ id: '1', type: 'armor', armorTier: 'ar-light' })).toBeTrue();
+    expect(isTalentSpendComplete({ id: '1', type: 'armor' })).toBeFalse();
+    expect(
+      isTalentSpendComplete({ id: '1', type: 'expertise', expertiseSkillId: 'skill-arcanes' }),
+    ).toBeTrue();
+    expect(isTalentSpendComplete({ id: '1', type: 'expertise' })).toBeFalse();
+    expect(
+      isTalentSpendComplete({ id: '1', type: 'attack_bonus', attackCategory: 'wp-cat-simple' }),
+    ).toBeTrue();
+    expect(isTalentSpendComplete({ id: '1', type: 'attack_bonus' })).toBeFalse();
+    expect(
+      isTalentSpendComplete({ id: '1', type: 'cantrips', cantripIds: ['spl-1', 'spl-2'] }),
+    ).toBeTrue();
+    expect(isTalentSpendComplete({ id: '1', type: 'cantrips', cantripIds: ['spl-1'] })).toBeFalse();
   });
 });

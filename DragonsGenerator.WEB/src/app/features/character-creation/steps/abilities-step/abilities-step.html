@@ -384,6 +384,228 @@
                     </div>
                   </div>
                 }
+                @if (slot.featId && activeSlotIsTalent()) {
+                  <div class="mt-3 pt-3 border-t border-slate-700">
+                    <div class="flex items-center justify-between mb-2">
+                      <p class="text-[10px] text-slate-400 uppercase tracking-wider">
+                        Points à répartir
+                      </p>
+                      <p
+                        class="text-xs font-black"
+                        [class.text-emerald-400]="talentAllSpent()"
+                        [class.text-amber-400]="!talentAllSpent()"
+                      >
+                        {{ talentPointsRemaining() }} / {{ talentPointsTotal() }} restants
+                      </p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-1.5 mb-3">
+                      @for (type of talentSpendTypes; track type) {
+                        <button
+                          type="button"
+                          class="px-2.5 py-1.5 rounded-lg border text-[10px] font-bold disabled:opacity-30 disabled:cursor-not-allowed border-slate-700 hover:border-sky-500/60"
+                          [disabled]="!canAddTalentSpend(type)"
+                          (click)="addTalentSpend(type)"
+                        >
+                          + {{ talentSpendLabel[type] }} ({{ talentSpendCost[type] }} pt{{
+                            talentSpendCost[type] > 1 ? 's' : ''
+                          }})
+                        </button>
+                      }
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                      @for (spend of talentSpends(); track spend.id) {
+                        <div
+                          class="rounded-lg border p-2.5"
+                          [class.border-emerald-700]="isTalentSpendOk(spend)"
+                          [class.border-slate-700]="!isTalentSpendOk(spend)"
+                        >
+                          <div class="flex items-center justify-between mb-1.5">
+                            <span class="text-[11px] font-bold text-amber-400">
+                              {{ talentSpendLabel[spend.type] }}
+                            </span>
+                            <button
+                              type="button"
+                              class="text-[10px] text-red-400 hover:text-red-300 font-bold"
+                              (click)="removeTalentSpend(spend.id)"
+                            >
+                              ✕ retirer
+                            </button>
+                          </div>
+
+                          @if (spend.type === 'skill') {
+                            <div class="flex flex-wrap gap-1">
+                              @for (opt of talentSkillCatalog(); track opt.id) {
+                                <button
+                                  type="button"
+                                  class="px-2 py-1 rounded border text-[10px]"
+                                  [class.border-sky-400]="spend.skillId === opt.id"
+                                  [class.bg-sky-950]="spend.skillId === opt.id"
+                                  [class.border-slate-700]="spend.skillId !== opt.id"
+                                  (click)="updateTalentSpend(spend.id, { skillId: opt.id })"
+                                >
+                                  {{ opt.name }}
+                                </button>
+                              }
+                            </div>
+                          }
+
+                          @if (spend.type === 'expertise') {
+                            <div class="flex flex-wrap gap-1">
+                              @for (opt of talentSkillCatalog(); track opt.id) {
+                                <button
+                                  type="button"
+                                  class="px-2 py-1 rounded border text-[10px]"
+                                  [class.border-sky-400]="spend.expertiseSkillId === opt.id"
+                                  [class.bg-sky-950]="spend.expertiseSkillId === opt.id"
+                                  [class.border-slate-700]="spend.expertiseSkillId !== opt.id"
+                                  (click)="updateTalentSpend(spend.id, { expertiseSkillId: opt.id })"
+                                >
+                                  {{ opt.name }}
+                                </button>
+                              }
+                            </div>
+                          }
+
+                          @if (spend.type === 'tool') {
+                            <div class="flex flex-wrap gap-1">
+                              @for (opt of talentToolCatalog(); track opt.id) {
+                                <button
+                                  type="button"
+                                  class="px-2 py-1 rounded border text-[10px]"
+                                  [class.border-sky-400]="spend.toolId === opt.id"
+                                  [class.bg-sky-950]="spend.toolId === opt.id"
+                                  [class.border-slate-700]="spend.toolId !== opt.id"
+                                  (click)="updateTalentSpend(spend.id, { toolId: opt.id })"
+                                >
+                                  {{ opt.name }}
+                                </button>
+                              }
+                            </div>
+                          }
+
+                          @if (spend.type === 'weapon') {
+                            <div class="flex flex-wrap gap-1 max-h-32 overflow-y-auto">
+                              @for (opt of talentWeaponCatalog(); track opt.id) {
+                                <button
+                                  type="button"
+                                  class="px-2 py-1 rounded border text-[10px]"
+                                  [class.border-sky-400]="spend.weaponId === opt.id"
+                                  [class.bg-sky-950]="spend.weaponId === opt.id"
+                                  [class.border-slate-700]="spend.weaponId !== opt.id"
+                                  (click)="updateTalentSpend(spend.id, { weaponId: opt.id })"
+                                >
+                                  {{ opt.name }}
+                                </button>
+                              }
+                            </div>
+                          }
+
+                          @if (spend.type === 'saving_throw') {
+                            <div class="flex flex-wrap gap-1">
+                              @for (key of abilities; track key.key) {
+                                <button
+                                  type="button"
+                                  class="px-2 py-1 rounded border text-[10px]"
+                                  [class.border-sky-400]="spend.savingThrow === key.key"
+                                  [class.bg-sky-950]="spend.savingThrow === key.key"
+                                  [class.border-slate-700]="spend.savingThrow !== key.key"
+                                  (click)="updateTalentSpend(spend.id, { savingThrow: key.key })"
+                                >
+                                  {{ key.label }}
+                                </button>
+                              }
+                            </div>
+                          }
+
+                          @if (spend.type === 'ability_score') {
+                            <div class="flex flex-wrap gap-1">
+                              @for (key of abilities; track key.key) {
+                                <button
+                                  type="button"
+                                  class="px-2 py-1 rounded border text-[10px]"
+                                  [class.border-sky-400]="spend.abilityKey === key.key"
+                                  [class.bg-sky-950]="spend.abilityKey === key.key"
+                                  [class.border-slate-700]="spend.abilityKey !== key.key"
+                                  (click)="updateTalentSpend(spend.id, { abilityKey: key.key })"
+                                >
+                                  {{ key.label }} +1
+                                </button>
+                              }
+                            </div>
+                          }
+
+                          @if (spend.type === 'armor') {
+                            <div class="flex flex-wrap gap-1">
+                              @for (tier of armorTiers; track tier) {
+                                <button
+                                  type="button"
+                                  class="px-2 py-1 rounded border text-[10px]"
+                                  [class.border-sky-400]="spend.armorTier === tier"
+                                  [class.bg-sky-950]="spend.armorTier === tier"
+                                  [class.border-slate-700]="spend.armorTier !== tier"
+                                  (click)="setTalentArmorTier(spend.id, tier)"
+                                >
+                                  {{ armorTierLabel[tier] }}
+                                </button>
+                              }
+                            </div>
+                          }
+
+                          @if (spend.type === 'attack_bonus') {
+                            <div class="flex flex-wrap gap-1">
+                              @for (cat of attackCategories; track cat) {
+                                <button
+                                  type="button"
+                                  class="px-2 py-1 rounded border text-[10px]"
+                                  [class.border-sky-400]="spend.attackCategory === cat"
+                                  [class.bg-sky-950]="spend.attackCategory === cat"
+                                  [class.border-slate-700]="spend.attackCategory !== cat"
+                                  (click)="setTalentAttackCategory(spend.id, cat)"
+                                >
+                                  {{ attackCategoryLabel[cat] }}
+                                </button>
+                              }
+                            </div>
+                          }
+
+                          @if (spend.type === 'cantrips') {
+                            <div class="flex flex-wrap gap-1 max-h-32 overflow-y-auto">
+                              @for (opt of talentCantripCatalog(); track opt.id) {
+                                <button
+                                  type="button"
+                                  class="px-2 py-1 rounded border text-[10px]"
+                                  [class.border-sky-400]="(spend.cantripIds ?? []).includes(opt.id)"
+                                  [class.bg-sky-950]="(spend.cantripIds ?? []).includes(opt.id)"
+                                  [class.border-slate-700]="!(spend.cantripIds ?? []).includes(opt.id)"
+                                  (click)="toggleTalentCantrip(spend.id, opt.id)"
+                                >
+                                  {{ opt.name }}
+                                </button>
+                              }
+                            </div>
+                            <p class="text-[9px] text-slate-500 mt-1">
+                              {{ (spend.cantripIds ?? []).length }} / 2 sélectionné(s)
+                            </p>
+                          }
+
+                          @if (spend.type === 'languages_common' || spend.type === 'language_exotic') {
+                            <p class="text-[9px] text-slate-500 italic">
+                              Résolu à l'étape « Langues » (compteur de langues bonus mis à jour).
+                            </p>
+                          }
+                        </div>
+                      }
+                    </div>
+
+                    @if (!talentAllComplete()) {
+                      <p class="text-[10px] text-amber-500/80 font-bold uppercase tracking-wider mt-2">
+                        Répartissez les {{ talentPointsTotal() }} points et complétez chaque choix
+                      </p>
+                    }
+                  </div>
+                }
               }
             }
 
