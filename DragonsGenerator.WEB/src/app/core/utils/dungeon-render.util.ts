@@ -185,10 +185,9 @@ const NEIGHBOR_DIRS: [number, number][] = [
 
 /**
  * Cellules de couloir/porte (hors salles) qui relient DEUX salles révélées ou plus.
- * BFS multi-source depuis chaque salle révélée, en restant hors de toute salle (murs et
- * intérieurs de salles bloquent l'expansion) : une cellule atteinte depuis au moins 2 salles
- * révélées différentes se trouve donc sur le chemin qui les relie, et perd tout son brouillard
- * (pas juste le halo d'1 case adjacente à chaque salle comme avant).
+ * BFS multi-source depuis chaque salle révélée. Les murs bloquent ; l'intérieur des
+ * autres salles (même non révélées) est traversable pour trouver le couloir, mais
+ * ces salles restent foguées — seuls les carreaux hors salle (couloir/porte) sont dévoilés.
  */
 function computeConnectingCorridorCells(
   map: CampaignDungeonMap,
@@ -208,7 +207,6 @@ function computeConnectingCorridorCells(
     const queue: [number, number][] = [];
     const seed = (x: number, y: number) => {
       if (x < 0 || y < 0 || x >= w || y >= h) return;
-      if (roomAt(map, x, y)) return; // on ne sème qu'à l'extérieur des salles
       if (tileAt(map, x, y) === 'wall') return;
       const k = key(x, y);
       if (visited.has(k)) return;
@@ -229,13 +227,14 @@ function computeConnectingCorridorCells(
         if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
         const k = key(nx, ny);
         if (visited.has(k)) continue;
-        if (roomAt(map, nx, ny)) continue; // ne traverse pas l'intérieur d'une autre salle
         if (tileAt(map, nx, ny) === 'wall') continue;
         visited.add(k);
         queue.push([nx, ny]);
       }
     }
     for (const k of visited) {
+      const [sx, sy] = k.split(',').map(Number);
+      if (roomAt(map, sx, sy)) continue; // salles non révélées restent foguées
       const markKey = `${room.id}|${k}`;
       if (seenBySource.has(markKey)) continue;
       seenBySource.add(markKey);
@@ -252,12 +251,13 @@ function computeConnectingCorridorCells(
 
 // Mémoïsation simple : une passe de rendu (canvas ou handout) réutilise le même objet
 // `revealed`, on ne recalcule donc le BFS des couloirs qu'une fois par passe.
-let lastRevealedRef: Set<string> | null = null;
+let lastConnectingKey: string | null = null;
 let lastConnectingCorridors: Set<string> = new Set();
 
 function connectingCorridorsFor(map: CampaignDungeonMap, revealed: Set<string>): Set<string> {
-  if (revealed !== lastRevealedRef) {
-    lastRevealedRef = revealed;
+  const key = `${map.id}:${[...revealed].sort().join(',')}`;
+  if (key !== lastConnectingKey) {
+    lastConnectingKey = key;
     lastConnectingCorridors = computeConnectingCorridorCells(map, revealed);
   }
   return lastConnectingCorridors;

@@ -371,6 +371,14 @@ public class HomeAndCampaignFeatureTests
                                     },
                                     new
                                     {
+                                        id = "cb-ally",
+                                        name = "Allié SECRET",
+                                        kind = "player",
+                                        initiativeBonus = 4,
+                                        memberUserId = Guid.NewGuid().ToString(),
+                                    },
+                                    new
+                                    {
                                         id = "cb-gob",
                                         name = "Gobelin",
                                         kind = "monster",

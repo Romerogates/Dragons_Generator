@@ -326,7 +326,17 @@ export class AbilitiesStep implements OnInit {
   readonly multiclassBlockers = computed<{ className: string; label: string | null }[]>(() => {
     const abilities = this.builder.finalAbilities();
     const blockers: { className: string; label: string | null }[] = [];
-    for (const sc of this.builder.secondaryClasses()) {
+    const secondaries = this.builder.secondaryClasses();
+    if (secondaries.length) {
+      const primary = this.classJson();
+      if (primary && !multiclassPrerequisitesMet(primary, abilities)) {
+        blockers.push({
+          className: this.builder.creation().className ?? primary.name,
+          label: multiclassPrerequisiteLabel(primary),
+        });
+      }
+    }
+    for (const sc of secondaries) {
       const cls = this.secondaryClassJsonById().get(sc.classId);
       if (!cls) continue;
       if (!multiclassPrerequisitesMet(cls, abilities)) {

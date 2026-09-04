@@ -33,6 +33,8 @@ public class GetInitiativeBoardEndpoint(AppDbContext db) : EndpointWithoutReques
             return;
         }
 
+        board = CampaignJsonHelpers.FilterInitiativeBoardForViewer(board, userId.Value, isOwner);
+
         await Send.OkAsync(new InitiativeBoardDto(
             board.Open,
             board.Code,

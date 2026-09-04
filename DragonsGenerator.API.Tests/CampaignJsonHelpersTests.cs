@@ -65,4 +65,27 @@ public class CampaignJsonHelpersTests
         var pc = JsonNode.Parse(merged)!["sessions"]![0]!["activeCombat"]!["combatants"]![0]!;
         Assert.Equal(19, pc["initiativeRoll"]!.GetValue<int>());
     }
+
+    [Fact]
+    public void FilterInitiativeBoardForViewer_hides_other_members_from_players()
+    {
+        var me = Guid.NewGuid();
+        var other = Guid.NewGuid();
+        var board = new InitiativeBoardInfo(
+            true,
+            "AB12",
+            "Embuscade",
+            [
+                new InitiativeCombatantInfo("a", "Moi", "player", 2, false, me.ToString()),
+                new InitiativeCombatantInfo("b", "Allié", "player", 1, false, other.ToString()),
+                new InitiativeCombatantInfo("c", "PNJ", "npc", 0, false, null),
+            ]);
+
+        var filtered = CampaignJsonHelpers.FilterInitiativeBoardForViewer(board, me, isOwner: false);
+        var ownerView = CampaignJsonHelpers.FilterInitiativeBoardForViewer(board, me, isOwner: true);
+
+        Assert.Single(filtered.Combatants);
+        Assert.Equal("Moi", filtered.Combatants[0].Name);
+        Assert.Equal(3, ownerView.Combatants.Count);
+    }
 }

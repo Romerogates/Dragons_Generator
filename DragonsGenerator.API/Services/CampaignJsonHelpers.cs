@@ -328,6 +328,18 @@ public static class CampaignJsonHelpers
         }
     }
 
+    public static InitiativeBoardInfo FilterInitiativeBoardForViewer(
+        InitiativeBoardInfo board,
+        Guid userId,
+        bool isOwner)
+    {
+        if (isOwner) return board;
+        var mine = board.Combatants
+            .Where(c => Guid.TryParse(c.MemberUserId, out var linked) && linked == userId)
+            .ToList();
+        return board with { Combatants = mine };
+    }
+
     /// <summary>
     /// Applique un jet d'initiative joueur dans le JSON campagne. Retourne le nouveau JSON ou null si échec.
     /// </summary>

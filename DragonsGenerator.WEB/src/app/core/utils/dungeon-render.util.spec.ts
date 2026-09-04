@@ -329,4 +329,31 @@ describe('dungeon-render helpers', () => {
     // Plus loin dans le couloir, toujours dans le brouillard tant que rb n'est pas révélée.
     expect(cellRgb(canvas, cellSize, 3, 0)).toBe(FOG_RGB);
   });
+
+  it('révèle le couloir entre deux salles même si une salle non révélée est sur le chemin', () => {
+    const map = sampleMap({
+      id: 'through-room',
+      gridWidth: 7,
+      gridHeight: 1,
+      tiles: [['floor', 'floor', 'floor', 'floor', 'floor', 'floor', 'floor']],
+      rooms: [
+        { id: 'ra', label: 'A', x: 0, y: 0, width: 1, height: 1 },
+        { id: 'rc', label: 'C', x: 3, y: 0, width: 1, height: 1 },
+        { id: 'rb', label: 'B', x: 6, y: 0, width: 1, height: 1 },
+      ],
+      markers: [],
+    });
+    const canvas = document.createElement('canvas');
+    const cellSize = 10;
+    drawDungeonToCanvas(map, canvas, cellSize, {
+      revealedRoomIds: new Set(['ra', 'rb']),
+      showGrid: false,
+      vignette: false,
+    });
+    expect(cellRgb(canvas, cellSize, 1, 0)).not.toBe(FOG_RGB);
+    expect(cellRgb(canvas, cellSize, 2, 0)).not.toBe(FOG_RGB);
+    expect(cellRgb(canvas, cellSize, 4, 0)).not.toBe(FOG_RGB);
+    expect(cellRgb(canvas, cellSize, 5, 0)).not.toBe(FOG_RGB);
+    expect(cellRgb(canvas, cellSize, 3, 0)).toBe(FOG_RGB);
+  });
 });
