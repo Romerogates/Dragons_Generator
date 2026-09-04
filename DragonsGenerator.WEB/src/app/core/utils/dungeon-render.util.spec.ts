@@ -246,4 +246,54 @@ describe('dungeon-render helpers', () => {
     drawDungeonToCanvas(map, canvas, 8, { revealedRoomIds: fogRevealSet(map) });
     expect(canvas.width).toBe(32);
   });
+
+  /** Petite carte dédiée : 2 salles reliées par un couloir de 3 cases (x=1,2,3). */
+  function corridorMap(): CampaignDungeonMap {
+    return sampleMap({
+      gridWidth: 5,
+      gridHeight: 1,
+      tiles: [['floor', 'floor', 'floor', 'floor', 'floor']],
+      rooms: [
+        { id: 'ra', label: 'Salle A', x: 0, y: 0, width: 1, height: 1 },
+        { id: 'rb', label: 'Salle B', x: 4, y: 0, width: 1, height: 1 },
+      ],
+      markers: [],
+    });
+  }
+
+  const FOG_RGB = '6,8,12'; // '#06080c'
+
+  function cellRgb(canvas: HTMLCanvasElement, cellSize: number, x: number, y: number): string {
+    const ctx = canvas.getContext('2d')!;
+    const [r, g, b] = ctx.getImageData(x * cellSize + 1, y * cellSize + 1, 1, 1).data;
+    return `${r},${g},${b}`;
+  }
+
+  it('lève tout le brouillard du couloir quand SES DEUX salles sont révélées', () => {
+    const map = corridorMap();
+    const canvas = document.createElement('canvas');
+    const cellSize = 10;
+    drawDungeonToCanvas(map, canvas, cellSize, {
+      revealedRoomIds: new Set(['ra', 'rb']),
+      showGrid: false,
+      vignette: false,
+    });
+    // Cellule médiane du couloir (x=2), loin des halos d'1 case de chaque salle.
+    expect(cellRgb(canvas, cellSize, 2, 0)).not.toBe(FOG_RGB);
+  });
+
+  it("ne révèle qu'un halo d'1 case quand une seule extrémité du couloir est révélée", () => {
+    const map = corridorMap();
+    const canvas = document.createElement('canvas');
+    const cellSize = 10;
+    drawDungeonToCanvas(map, canvas, cellSize, {
+      revealedRoomIds: new Set(['ra']),
+      showGrid: false,
+      vignette: false,
+    });
+    // Adjacente à la salle révélée : visible (halo).
+    expect(cellRgb(canvas, cellSize, 1, 0)).not.toBe(FOG_RGB);
+    // Plus loin dans le couloir, toujours dans le brouillard tant que rb n'est pas révélée.
+    expect(cellRgb(canvas, cellSize, 3, 0)).toBe(FOG_RGB);
+  });
 });
