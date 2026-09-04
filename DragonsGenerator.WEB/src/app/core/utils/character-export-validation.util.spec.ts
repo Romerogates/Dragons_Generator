@@ -92,4 +92,49 @@ describe('character-export-validation.util', () => {
     expect(msg).toContain('Export incomplet');
     expect(msg).toContain('Nom manquant');
   });
+
+  it('formatCharacterExportErrors handles the empty and single-error cases', () => {
+    expect(formatCharacterExportErrors([])).toBe('');
+    expect(formatCharacterExportErrors(['Seule erreur.'])).toBe('Seule erreur.');
+  });
+
+  it('reports every structural error at once (schema version, name, classes, species, level)', () => {
+    const broken = {
+      schemaVersion: CURRENT_SCHEMA_VERSION - 1,
+      name: '   ',
+      species: { id: '', label: '' },
+      classes: [{ classId: '  ', classLabel: '', level: 1, hitDie: 8 }],
+      totalLevel: 0,
+      proficiencies: {
+        weapons: ['wp-mastered-any-choice-not-that', 'any', 'skill-any', 'wp-epee-longue'],
+        tools: ['category-outils', ''],
+        armor: [],
+        languages: [],
+      },
+      equipment: [{ refId: '   ', name: '', qty: 1 }],
+    } as unknown as Character;
+
+    const result = validateCharacterExport(broken);
+    expect(result.valid).toBeFalse();
+    expect(result.errors.some((e) => e.includes('schéma'))).toBeTrue();
+    expect(result.errors.some((e) => e.includes('nom'))).toBeTrue();
+    expect(result.errors.some((e) => e.includes('Classe sans identifiant'))).toBeTrue();
+    expect(result.errors.some((e) => e.includes('Espèce manquante'))).toBeTrue();
+    expect(result.errors.some((e) => e.includes('Niveau total invalide'))).toBeTrue();
+    expect(result.errors.some((e) => e.includes("sans référence"))).toBeTrue();
+  });
+
+  it('accepts an empty classes array without a "classe sans identifiant" error but flags the missing class', () => {
+    const broken = {
+      schemaVersion: CURRENT_SCHEMA_VERSION,
+      name: 'Test',
+      species: { id: 'spc-humain', label: 'Humain' },
+      classes: [],
+      totalLevel: 1,
+      proficiencies: { weapons: [], tools: [], armor: [], languages: [] },
+      equipment: [],
+    } as unknown as Character;
+    const result = validateCharacterExport(broken);
+    expect(result.errors).toContain('Au moins une classe est requise.');
+  });
 });

@@ -16,4 +16,9 @@ describe('local-dev.util', () => {
     expect(mailhogWebUrl('127.0.0.1')).toBe('http://localhost:8025');
     expect(mailhogWebUrl('10.0.0.8')).toBe('http://10.0.0.8:8025');
   });
+
+  it('falls back to window.location.hostname when no hostname is provided', () => {
+    expect(typeof isLocalDevHost()).toBe('boolean');
+    expect(mailhogWebUrl()).toMatch(/^http:\/\/.+:8025$/);
+  });
 });

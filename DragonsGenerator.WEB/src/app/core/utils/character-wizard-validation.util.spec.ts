@@ -225,4 +225,126 @@ describe('character-wizard-validation.util', () => {
     expect(isWizardStepValid(11, { ...base, name: '' }, { needsMagicStep: true })).toBeFalse();
     expect(isWizardStepValid(11, { ...base, name: 'Hero' }, { needsMagicStep: true })).toBeTrue();
   });
+
+  it('isWizardStepValid locks the Druide/Roublard class languages out of the bonus count', () => {
+    expect(
+      isWizardStepValid(
+        9,
+        {
+          ...base,
+          classId: 'cls-druide',
+          languages: ['Langue des druides'],
+          bonusLanguageCount: 1,
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+    expect(
+      isWizardStepValid(
+        9,
+        {
+          ...base,
+          classId: 'cls-roublard',
+          languages: ['Commun', 'Argot des voleurs', 'Gobelin'],
+          bonusLanguageCount: 1,
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeTrue();
+  });
+
+  it('isWizardStepValid case 10 (magic step) falls back to cantrips when hasSpellcasting is false', () => {
+    expect(
+      isWizardStepValid(
+        10,
+        { ...base, hasSpellcasting: false, spellcastingDetails: { cantrips: ['sp-light'] } },
+        { needsMagicStep: true },
+      ),
+    ).toBeTrue();
+    expect(
+      isWizardStepValid(
+        10,
+        { ...base, hasSpellcasting: false, spellcastingDetails: { cantrips: [] } },
+        { needsMagicStep: true },
+      ),
+    ).toBeFalse();
+    expect(
+      isWizardStepValid(
+        10,
+        { ...base, hasSpellcasting: false, spellcastingDetails: undefined as never },
+        { needsMagicStep: true },
+      ),
+    ).toBeFalse();
+  });
+
+  it('isWizardStepValid rejects an empty languages list even with no bonus needed', () => {
+    expect(isWizardStepValid(9, { ...base, languages: [] }, { needsMagicStep: false })).toBeFalse();
+  });
+
+  it('isWizardStepValid requires a classId even if hitDie is already set', () => {
+    expect(
+      isWizardStepValid(5, { ...base, classId: null, hitDie: 10 }, { needsMagicStep: false }),
+    ).toBeFalse();
+  });
+
+  it('racialSpellsComplete defaults missing grants/answers collections to empty', () => {
+    expect(racialSpellsComplete({ racialSpellGrants: undefined as never, speciesChoiceAnswers: undefined as never })).toBeTrue();
+  });
+
+  it('asiChoicesComplete defaults a missing asiChoices array to empty (always valid)', () => {
+    expect(
+      isWizardStepValid(6, { ...base, pointsRemaining: 0, asiChoices: undefined as never }, { needsMagicStep: false }),
+    ).toBeTrue();
+  });
+
+  it('languagesStepComplete defaults missing species/civilization/background language lists to empty', () => {
+    expect(
+      isWizardStepValid(
+        9,
+        {
+          ...base,
+          languages: ['Commun'],
+          bonusLanguageCount: 1,
+          speciesLanguages: undefined as never,
+          civilizationLanguages: undefined as never,
+          backgroundLanguages: undefined as never,
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeTrue();
+  });
+
+  it('isWizardStepValid blocks the magic step when a racial spell grant is still unresolved', () => {
+    expect(
+      isWizardStepValid(
+        10,
+        {
+          ...base,
+          hasSpellcasting: false,
+          spellcastingDetails: { cantrips: ['sp-light'] },
+          racialSpellGrants: [
+            { choiceId: 'elf-cantrip', label: '', desc: '', pool: ['sp-light'], spellLevel: 0, spellcastingAbility: 'INT' },
+          ],
+          speciesChoiceAnswers: {},
+        },
+        { needsMagicStep: true },
+      ),
+    ).toBeFalse();
+  });
+
+  it('skillsStepComplete accepts a class with no skill choice once skills are already populated', () => {
+    expect(
+      isWizardStepValid(
+        7,
+        {
+          ...base,
+          classId: 'cls-moine',
+          skillChooseCount: 0,
+          speciesBonusSkillCount: 0,
+          selectedSkills: ['skill-acrobaties'],
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeTrue();
+  });
 });

@@ -45,6 +45,12 @@ describe('character-proficiencies.util', () => {
     expect(kept.map((f) => f.refId)).toEqual(['style-duel']);
   });
 
+  it('stripProgressionChoiceFeatures keeps a feature with no refId at all', () => {
+    const existing = [{ name: 'Sans refId', desc: '', source: 'class' as const }];
+    const kept = stripProgressionChoiceFeatures(existing, []);
+    expect(kept.length).toBe(1);
+  });
+
   it('toggleSkillSelection respects maxCount', () => {
     expect(toggleSkillSelection(['skill-a'], 'skill-b', 2)).toEqual(['skill-a', 'skill-b']);
     expect(toggleSkillSelection(['skill-a', 'skill-b'], 'skill-c', 2)).toEqual([
