@@ -21,6 +21,9 @@ const MOCK_TOOLS = [
   { id: 'tl-necessaire-de-brasseur', name: 'Nécessaire de brasseur', type: 'TOOL', subtype: 'artisan_tool' },
   { id: 'tl-outils-de-forgeron', name: 'Outils de forgeron', type: 'TOOL', subtype: 'artisan_tool' },
   { id: 'tl-outils-de-macon', name: 'Outils de maçon', type: 'TOOL', subtype: 'artisan_tool' },
+  { id: 'vhc-chariot', name: 'Chariot', type: 'VEHICLE', subtype: 'land' },
+  { id: 'vhc-barque', name: 'Barque', type: 'VEHICLE', subtype: 'water' },
+  { id: 'vhc-nefelytre', name: 'Néfélytre', type: 'VEHICLE', subtype: 'air' },
 ];
 
 function skillsCreation(overrides: Record<string, unknown> = {}) {
@@ -283,7 +286,7 @@ describe('SkillsStep', () => {
     expect(allItems).not.toContain('tl-des');
   });
 
-  it('falls back to the full tool catalog when the species pool matches nothing (e.g. vehicle categories)', () => {
+  it('expands abstract vehicle category tokens (Gnome des roches/Mélesse "Pilote") into concrete catalog vehicles', () => {
     creationSignal.set(
       skillsCreation({
         speciesBonusToolCount: 1,
@@ -294,6 +297,24 @@ describe('SkillsStep', () => {
     fixture.detectChanges();
 
     expect(component.speciesBonusToolChoiceLabel()).toBe('Pilote');
+    const allItems = component.speciesToolGroups().flatMap((g) => g.items.map((t) => t.id));
+    // Seuls les véhicules terrestres/maritimes concrets sont proposés (pas l'aérien, non inclus
+    // dans le pool ; pas les outils d'artisan/instruments/jeux du catalogue complet).
+    expect(allItems.sort()).toEqual(['vhc-barque', 'vhc-chariot'].sort());
+    expect(allItems).not.toContain('vhc-nefelytre');
+    expect(allItems).not.toContain('tl-lyre');
+  });
+
+  it('falls back to the full tool catalog when the species pool truly matches nothing', () => {
+    creationSignal.set(
+      skillsCreation({
+        speciesBonusToolCount: 1,
+        speciesBonusToolPoolIds: ['tl-outil-inconnu'],
+        speciesBonusToolChoiceLabel: 'Polyvalence',
+      }),
+    );
+    fixture.detectChanges();
+
     const allItems = component.speciesToolGroups().flatMap((g) => g.items.map((t) => t.id));
     expect(allItems).toEqual(component.toolGroups().flatMap((g) => g.items.map((t) => t.id)));
     expect(allItems.length).toBeGreaterThan(0);

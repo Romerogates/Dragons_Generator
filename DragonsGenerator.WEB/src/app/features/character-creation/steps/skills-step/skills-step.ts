@@ -675,15 +675,41 @@ export class SkillsStep implements OnInit {
     ].filter((g) => g.items.length > 0);
   });
 
+  /** Correspondance entre les jetons de catégorie de véhicules (ex. Gnome des roches/Mélesse
+   * "Pilote") et le `subtype` réel des véhicules au catalogue (voir `subcategory` en JSON API). */
+  private static readonly VEHICLE_CATEGORY_SUBTYPES: Record<string, string> = {
+    'tl-vehicules-terrestres': 'land',
+    'tl-vehicules-maritimes': 'water',
+    'tl-vehicules-aeriens': 'air',
+  };
+
+  /** Étend les jetons de catégorie abstraits (ex. `tl-vehicules-terrestres`) en identifiants
+   * concrets du catalogue (ex. `vhc-char`, `vhc-chariot`…) pour permettre un filtrage réel. */
+  private expandSpeciesToolPoolIds(poolIds: string[]): Set<string> {
+    const catalog = this.toolCatalog();
+    const expanded = new Set<string>();
+    for (const id of poolIds) {
+      const subtype = SkillsStep.VEHICLE_CATEGORY_SUBTYPES[id];
+      if (subtype) {
+        catalog
+          .filter((t) => t.type === 'VEHICLE' && t.subtype === subtype)
+          .forEach((t) => expanded.add(t.id));
+        continue;
+      }
+      expanded.add(id);
+    }
+    return expanded;
+  }
+
   /**
    * Groupes d'outils affichés pour le choix d'espèce différé. Restreint au pool concret défini
-   * côté API (ex. Nain : nécessaire de brasseur/outils de forgeron/outils de maçon) quand ce pool
-   * matche des entrées réelles du catalogue. Repli sur le catalogue complet si le pool est vide
-   * ou ne matche rien (ex. catégories de véhicules abstraites, pas d'objet concret au catalogue) —
-   * comportement identique à avant pour ne rien casser dans ce cas.
+   * côté API (ex. Nain : nécessaire de brasseur/outils de forgeron/outils de maçon ; Gnome des
+   * roches/Mélesse "Pilote" : véhicules terrestres/maritimes/aériens, une fois les jetons de
+   * catégorie développés en identifiants concrets) quand ce pool matche des entrées réelles du
+   * catalogue. Repli sur le catalogue complet si le pool est vide ou ne matche vraiment rien.
    */
   readonly speciesToolGroups = computed(() => {
-    const poolIds = new Set(this.speciesBonusToolPoolIds());
+    const poolIds = this.expandSpeciesToolPoolIds(this.speciesBonusToolPoolIds());
     if (poolIds.size === 0) return this.toolGroups();
     const filtered = this.toolGroups()
       .map((g) => ({ ...g, items: g.items.filter((t) => poolIds.has(t.id)) }))
