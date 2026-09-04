@@ -169,6 +169,105 @@ describe('subclassBonusProficiencies', () => {
     expect(res.bonusLanguages).toBe(3);
     expect(res.requiredExoticLanguages).toBe(1);
   });
+
+  it('extracts fixed skills from "skill_proficiency_grant" mechanics with double-if-known (Barde Bateleur)', () => {
+    const cls = makeCls({
+      options: [
+        {
+          id: 'subcls-college-bateleurs',
+          features_details: [
+            {
+              id: 'feat-physique-acrobate',
+              unlocks_at_level: 3,
+              mechanics: {
+                type: 'skill_proficiency_grant',
+                skills: ['skill-acrobaties', 'skill-athletisme'],
+                upgrade_rule: 'if_already_proficient_double_proficiency_bonus',
+              },
+            },
+          ],
+        },
+      ],
+    });
+    const res = subclassBonusProficiencies(cls, 'subcls-college-bateleurs', 3);
+    expect(res.skills).toEqual(['skill-acrobaties', 'skill-athletisme']);
+    expect(res.conditionalSkills).toEqual(['skill-acrobaties', 'skill-athletisme']);
+  });
+
+  it('does not treat an open "skill_proficiency_grant" pool (pool: "any") as a fixed grant (Barde Conteurs)', () => {
+    const cls = makeCls({
+      options: [
+        {
+          id: 'subcls-college-conteurs',
+          features_details: [
+            {
+              id: 'feat-maitrise-supp-conteurs',
+              unlocks_at_level: 3,
+              mechanics: { type: 'skill_proficiency_grant', quantity: 3, pool: 'any' },
+            },
+          ],
+        },
+      ],
+    });
+    const res = subclassBonusProficiencies(cls, 'subcls-college-conteurs', 3);
+    expect(res.skills).toEqual([]);
+    expect(res.conditionalSkills).toEqual([]);
+  });
+
+  it('resolves a tiered armor_grant based on already-known proficiencies (Magicien Mage de guerre)', () => {
+    const cls = makeCls({
+      options: [
+        {
+          id: 'subcls-mage-de-guerre',
+          features_details: [
+            {
+              id: 'feat-formation-martiale',
+              unlocks_at_level: 2,
+              mechanics: {
+                armor_grant: { condition_not_proficient: 'ar-light', condition_already_light: 'ar-medium' },
+              },
+            },
+            {
+              id: 'feat-formation-martiale-avancee',
+              unlocks_at_level: 6,
+              mechanics: {
+                weapons_grant: ['category-all-weapons'],
+                armor_grant: { condition_not_proficient: 'ar-medium', condition_already_medium: 'ar-heavy' },
+              },
+            },
+          ],
+        },
+      ],
+    });
+    // Niveau 2 seul : pas encore légère → octroi léger.
+    expect(subclassBonusProficiencies(cls, 'subcls-mage-de-guerre', 2).armor).toEqual(['ar-light']);
+    // Niveau 6 : légère déjà acquise au niv. 2, pas encore intermédiaire → octroi intermédiaire (pas lourde).
+    const res6 = subclassBonusProficiencies(cls, 'subcls-mage-de-guerre', 6);
+    expect(res6.armor).toEqual(['ar-light', 'ar-medium']);
+    expect(res6.weapons).toEqual(['wp-cat-simple', 'wp-cat-martial']);
+  });
+
+  it('upgrades the armor tier when the base proficiency is already known (baseArmorProficiencies)', () => {
+    const cls = makeCls({
+      options: [
+        {
+          id: 'subcls-mage-de-guerre',
+          features_details: [
+            {
+              id: 'feat-formation-martiale',
+              unlocks_at_level: 2,
+              mechanics: {
+                armor_grant: { condition_not_proficient: 'ar-light', condition_already_light: 'ar-medium' },
+              },
+            },
+          ],
+        },
+      ],
+    });
+    // Le personnage maîtrise déjà les armures légères (ex. espèce/historique) : on saute direct à intermédiaire.
+    const res = subclassBonusProficiencies(cls, 'subcls-mage-de-guerre', 2, ['ar-light']);
+    expect(res.armor).toEqual(['ar-medium']);
+  });
 });
 
 describe('subclassBonusResistances', () => {
@@ -395,6 +494,7 @@ describe('extractSubclassSkillProficiencyChoices', () => {
         label: 'Connaissance de la rue : maîtrises',
         count: 2,
         poolIds: ['skill-acrobaties', 'skill-discretion', 'tl-outils-de-voleur'],
+        isOpenPool: false,
         expertiseIfAlreadyProficient: true,
       },
     ]);
@@ -434,7 +534,28 @@ describe('extractSubclassSkillProficiencyChoices', () => {
         label: 'Compétence au choix',
         count: 1,
         poolIds: ['skill-discretion', 'skill-investigation'],
+        isOpenPool: false,
         expertiseIfAlreadyProficient: true,
+      },
+    ]);
+  });
+
+  it('extracts an open "any" pool from skill_proficiency_grant mechanics (Barde Conteurs)', () => {
+    const cls = makeClsWithFeature({
+      id: 'feat-maitrise-supp-conteurs',
+      name: 'Maîtrises supplémentaires',
+      unlocks_at_level: 3,
+      mechanics: { type: 'skill_proficiency_grant', quantity: 3, pool: 'any' },
+    });
+    const res = extractSubclassSkillProficiencyChoices(cls, 3, 'subcls-ombre-urbaine');
+    expect(res).toEqual([
+      {
+        id: 'choice-skill-feat-maitrise-supp-conteurs',
+        label: 'Maîtrises supplémentaires',
+        count: 3,
+        poolIds: [],
+        isOpenPool: true,
+        expertiseIfAlreadyProficient: false,
       },
     ]);
   });

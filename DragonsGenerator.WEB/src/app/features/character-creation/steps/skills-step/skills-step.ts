@@ -246,11 +246,15 @@ export class SkillsStep implements OnInit {
   readonly subclassSkillChoicePools = computed<SubclassSkillChoicePool[]>(() => {
     const cls = this.classJson();
     if (!cls) return [];
-    return extractSubclassSkillProficiencyChoices(
+    const pools = extractSubclassSkillProficiencyChoices(
       cls,
       this.builder.targetLevel(),
       this.builder.creation().subclassId,
     );
+    // Pool ouvert (ex. Barde Conteurs "Maîtrises supplémentaires") : `poolIds` arrive vide du
+    // util pur (pas d'accès au catalogue) ; on l'étend ici vers toutes les compétences connues.
+    const allSkillIds = Object.keys(this.skillMap());
+    return pools.map((p) => (p.isOpenPool ? { ...p, poolIds: allSkillIds } : p));
   });
 
   readonly subclassSkillChoiceNeeded = computed(() =>

@@ -1160,13 +1160,16 @@ export class ClassStep implements OnInit {
         pactSlots.length > 0
           ? pactSlots
           : extractSpellSlotsFromResources(progAtLevel?.resources);
-      const subBonus = subclassBonusProficiencies(cls, sub?.id, targetLevel);
+      const baseArmor = Array.isArray(prof.armor) ? prof.armor : [];
+      // Passé pour résoudre les octrois d'armure à palier conditionnel (ex. Magicien "Mage de
+      // guerre" : légère, ou intermédiaire si déjà légère) — sans ça, chaque palier serait résolu
+      // comme si le personnage n'avait jamais rien maîtrisé, faussant la progression niv. 2 → 6.
+      const subBonus = subclassBonusProficiencies(cls, sub?.id, targetLevel, baseArmor);
       const langBonus =
         classBonusLanguageCount(cls, targetLevel, undefined, sub?.id) + subBonus.bonusLanguages;
       const subclassTools = subclassFixedToolProficiencies(cls, targetLevel, sub?.id);
       const baseTools = Array.isArray(prof.tools) ? prof.tools : [];
       const toolProficiencies = [...new Set([...baseTools, ...subclassTools, ...subBonus.tools])];
-      const baseArmor = Array.isArray(prof.armor) ? prof.armor : [];
       const baseWeapons = Array.isArray(prof.weapons) ? prof.weapons : [];
       const armorProficiencies = [...new Set([...baseArmor, ...subBonus.armor])];
       const weaponProficiencies = [...new Set([...baseWeapons, ...subBonus.weapons])];

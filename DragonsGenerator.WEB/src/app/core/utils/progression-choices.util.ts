@@ -816,6 +816,39 @@ function normalizeLanguageId(id: string): string {
 }
 
 /**
+ * Certaines features accordent une catégorie entière d'armes via un jeton abstrait
+ * (`category-all-weapons`) plutôt qu'une liste d'ids concrets (ex. Magicien "Mage de guerre"
+ * niv. 6 : "maîtrisez toutes les armes courantes et de guerre"). On l'étend vers les vrais ids
+ * de proficience de catégorie utilisés ailleurs dans le jeu (`wp-cat-simple`/`wp-cat-martial`).
+ */
+function expandWeaponCategoryToken(id: string): string[] {
+  if (id === 'category-all-weapons') return ['wp-cat-simple', 'wp-cat-martial'];
+  return [id];
+}
+
+/**
+ * Résout un octroi d'armure à palier conditionnel (ex. Magicien "Mage de guerre" : "maîtrisez
+ * les armures légères, ou intermédiaires si vous maîtrisiez déjà les légères"). Forme JSON :
+ * `{ condition_not_proficient: "ar-X", condition_already_Y: "ar-Z" }` — le suffixe de la clé
+ * `condition_already_Y` indique le palier à vérifier (`ar-Y`) ; s'il est déjà connu, on octroie
+ * la valeur associée (palier supérieur), sinon on retombe sur `condition_not_proficient`.
+ */
+function resolveTieredArmorGrant(
+  grant: Record<string, unknown>,
+  known: (armorId: string) => boolean,
+): string | null {
+  const alreadyEntry = Object.entries(grant).find(([k]) => k.startsWith('condition_already_'));
+  if (alreadyEntry) {
+    const tierWord = alreadyEntry[0].slice('condition_already_'.length);
+    if (tierWord && known(`ar-${tierWord}`) && typeof alreadyEntry[1] === 'string') {
+      return alreadyEntry[1];
+    }
+  }
+  const base = grant['condition_not_proficient'];
+  return typeof base === 'string' ? base : null;
+}
+
+/**
  * Certains JSON de sous-classe exposent `features` (déjà normalisé par l'adapter) ET
  * `features_details` (copie brute conservée par le spread `...sub`). On dédoublonne par id
  * pour ne jamais compter deux fois une même feature (ex. bonus_languages, choix imbriqués).
@@ -857,6 +890,12 @@ export function subclassBonusProficiencies(
   cls: CharacterClass,
   subclassId?: string | null,
   level: number = PROGRESSION_MAX_LEVEL,
+  /**
+   * Maîtrises d'armure déjà connues avant l'application des bonus de sous-classe (classe racine +
+   * espèce + historique). Nécessaire pour résoudre les octrois à palier conditionnel (ex. Magicien
+   * "Mage de guerre" : légère → intermédiaire si déjà légère, niveau après niveau).
+   */
+  baseArmorProficiencies: string[] = [],
 ): SubclassBonusProficiencies {
   if (!subclassId) return EMPTY_SUBCLASS_BONUS;
   const data = progressionData(cls);
@@ -897,11 +936,21 @@ export function subclassBonusProficiencies(
     if (featLevel > level) continue;
     const mech = feat.mechanics ?? {};
 
+    // Forme alternative "skill_proficiency_grant" avec liste de compétences FIXES (ex. Barde
+    // Bateleur "Physique d'acrobate" : Acrobaties + Athlétisme, doublées si déjà maîtrisées).
+    // Le pool ouvert ("pool": "any") est un CHOIX joueur, pas un octroi fixe : géré séparément
+    // par `extractSubclassSkillProficiencyChoices`, ignoré ici.
+    const skillGrantMech =
+      mech['type'] === 'skill_proficiency_grant' && Array.isArray(mech['skills'])
+        ? toStringArray(mech['skills'])
+        : [];
+
     const grantedIds = [
       ...toStringArray(feat['grants_proficiency']),
       ...toStringArray(feat['grant_proficiency']),
       ...toStringArray(mech['grants_proficiency']),
       ...toStringArray(mech['grant_proficiency']),
+      ...skillGrantMech,
     ];
     for (const id of grantedIds) {
       if (id.startsWith('tl-')) tools.add(id);
@@ -910,11 +959,34 @@ export function subclassBonusProficiencies(
       else skills.add(id);
     }
 
+    // Octroi d'arme(s) par catégorie abstraite (ex. Magicien "Mage de guerre" niv. 6 :
+    // "category-all-weapons" → toutes les armes courantes ET de guerre).
+    for (const id of toStringArray(mech['weapons_grant'])) {
+      expandWeaponCategoryToken(id).forEach((w) => weapons.add(w));
+    }
+
+    // Octroi d'armure à palier conditionnel selon ce qu'on maîtrise déjà (ex. Magicien "Mage de
+    // guerre" : légère, ou intermédiaire si légère déjà maîtrisée). On résout séquentiellement
+    // (les features sont dans l'ordre de niveau croissant) en tenant compte des maîtrises de base
+    // ET de celles déjà accordées par une feature de sous-classe précédente dans cette boucle.
+    const armorGrant = mech['armor_grant'];
+    if (armorGrant && typeof armorGrant === 'object') {
+      const resolved = resolveTieredArmorGrant(armorGrant as Record<string, unknown>, (id) =>
+        armor.has(id) || baseArmorProficiencies.includes(id),
+      );
+      if (resolved) armor.add(resolved);
+    }
+
+    const upgradeRuleDoublesSkills =
+      mech['type'] === 'skill_proficiency_grant' &&
+      mech['upgrade_rule'] === 'if_already_proficient_double_proficiency_bonus';
+
     const doubleFlag =
       feat['double_prof_if_already_proficient'] ??
       mech['double_prof_if_already_proficient'] ??
       feat['expertise_if_already_proficient'] ??
-      mech['expertise_if_already_proficient'];
+      mech['expertise_if_already_proficient'] ??
+      (upgradeRuleDoublesSkills ? true : undefined);
     if (doubleFlag) {
       const doubleIds =
         typeof doubleFlag === 'boolean'
@@ -1110,6 +1182,12 @@ export interface SubclassSkillChoicePool {
   poolIds: string[];
   /** Doublement (expertise) si la compétence est déjà maîtrisée par ailleurs. */
   expertiseIfAlreadyProficient: boolean;
+  /**
+   * `true` quand le pool JSON est ouvert (`"pool": "any"`, ex. Barde Conteurs "Maîtrises
+   * supplémentaires" : 3 compétences libres). `poolIds` est alors vide : c'est à l'appelant
+   * (étape Savoirs, qui a accès au catalogue complet) de proposer toutes les compétences.
+   */
+  isOpenPool: boolean;
 }
 
 /**
@@ -1139,15 +1217,20 @@ export function extractSubclassSkillProficiencyChoices(
     label: string,
     expertiseFlag: unknown,
   ) => {
-    const ids = (Array.isArray(rawIds) ? rawIds : []).filter(
-      (v): v is string => typeof v === 'string' && v.trim().length > 0,
-    );
-    if (!ids.length) return;
+    const arr = Array.isArray(rawIds) ? rawIds : typeof rawIds === 'string' ? [rawIds] : [];
+    // Pool ouvert (ex. Barde Conteurs "Maîtrises supplémentaires" : "pool": "any") : pas de liste
+    // fermée à proposer, l'étape Savoirs doit alors afficher tout le catalogue de compétences.
+    const isOpenPool = arr.length === 1 && arr[0] === 'any';
+    const ids = isOpenPool
+      ? []
+      : arr.filter((v): v is string => typeof v === 'string' && v.trim().length > 0);
+    if (!isOpenPool && !ids.length) return;
     out.push({
       id: poolId,
       label,
       count: Math.max(1, quantity),
       poolIds: ids,
+      isOpenPool,
       expertiseIfAlreadyProficient: !!expertiseFlag,
     });
   };
@@ -1194,6 +1277,19 @@ export function extractSubclassSkillProficiencyChoices(
         `choice-skill-${featId}`,
         'Compétence au choix',
         mech['grant_type'] === 'proficiency_or_expertise',
+      );
+    }
+
+    // Forme alternative "skill_proficiency_grant" avec pool OUVERT (ex. Barde Conteurs
+    // "Maîtrises supplémentaires" : "pool": "any", "quantity": 3). Le pendant à liste fixe
+    // (`skills: [...]`) est un octroi automatique, géré par `subclassBonusProficiencies`, pas ici.
+    if (mech['type'] === 'skill_proficiency_grant' && mech['pool'] === 'any') {
+      pushPool(
+        mech['pool'],
+        Number(mech['quantity'] ?? 1),
+        `choice-skill-${featId}`,
+        String(feat['name'] ?? 'Compétences au choix'),
+        false,
       );
     }
   }

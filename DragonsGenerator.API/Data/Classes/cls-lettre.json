@@ -1074,6 +1074,7 @@
             "unlocks_at_level": 3,
             "recharge": "passive",
             "grants_proficiency": "tl-necessaire-alchimiste",
+            "double_prof_if_already_proficient": true,
             "flavor": {
               "summary": "Ingrédients de base de l'art alchimique, condition sine qua non de la marotte.",
               "lore_note": null
@@ -1192,6 +1193,7 @@
             "unlocks_at_level": 3,
             "recharge": "passive",
             "grants_proficiency": "skill-intuition",
+            "double_prof_if_already_proficient": true,
             "choice_pool": {
               "id": "choice-aisance-sociale-subcls-lettre",
               "name": "Compétences sociales supplémentaires",
@@ -1203,7 +1205,8 @@
                 "skill-investigation",
                 "skill-persuasion",
                 "skill-tromperie"
-              ]
+              ],
+              "expertise_if_already_proficient": true
             },
             "flavor": {
               "summary": "Expertise sociale étendue dès le choix de la marotte.",
