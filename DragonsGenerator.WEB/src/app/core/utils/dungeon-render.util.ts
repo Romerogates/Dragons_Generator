@@ -175,6 +175,93 @@ export function fogRevealSet(map: CampaignDungeonMap): Set<string> | null {
   return new Set(map.revealedRoomIds ?? []);
 }
 
+const NEIGHBOR_DIRS: [number, number][] = [
+  [0, 1],
+  [0, -1],
+  [1, 0],
+  [-1, 0],
+];
+
+/**
+ * Cellules de couloir/porte (hors salles) qui relient DEUX salles révélées ou plus.
+ * BFS multi-source depuis chaque salle révélée, en restant hors de toute salle (murs et
+ * intérieurs de salles bloquent l'expansion) : une cellule atteinte depuis au moins 2 salles
+ * révélées différentes se trouve donc sur le chemin qui les relie, et perd tout son brouillard
+ * (pas juste le halo d'1 case adjacente à chaque salle comme avant).
+ */
+function computeConnectingCorridorCells(
+  map: CampaignDungeonMap,
+  revealed: Set<string>,
+): Set<string> {
+  const w = map.gridWidth;
+  const h = map.gridHeight;
+  const key = (x: number, y: number) => `${x},${y}`;
+  const revealedRooms = map.rooms.filter((r) => revealed.has(r.id));
+  const sourceCount = new Map<string, number>();
+  const seenBySource = new Set<string>(); // `${roomId}|${cellKey}` dédoublonnage par salle
+
+  if (revealedRooms.length < 2) return new Set();
+
+  for (const room of revealedRooms) {
+    const visited = new Set<string>();
+    const queue: [number, number][] = [];
+    const seed = (x: number, y: number) => {
+      if (x < 0 || y < 0 || x >= w || y >= h) return;
+      if (roomAt(map, x, y)) return; // on ne sème qu'à l'extérieur des salles
+      if (tileAt(map, x, y) === 'wall') return;
+      const k = key(x, y);
+      if (visited.has(k)) return;
+      visited.add(k);
+      queue.push([x, y]);
+    };
+    for (let ry = room.y; ry < room.y + room.height; ry++) {
+      for (let rx = room.x; rx < room.x + room.width; rx++) {
+        for (const [dx, dy] of NEIGHBOR_DIRS) seed(rx + dx, ry + dy);
+      }
+    }
+    let qi = 0;
+    while (qi < queue.length) {
+      const [x, y] = queue[qi++];
+      for (const [dx, dy] of NEIGHBOR_DIRS) {
+        const nx = x + dx;
+        const ny = y + dy;
+        if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+        const k = key(nx, ny);
+        if (visited.has(k)) continue;
+        if (roomAt(map, nx, ny)) continue; // ne traverse pas l'intérieur d'une autre salle
+        if (tileAt(map, nx, ny) === 'wall') continue;
+        visited.add(k);
+        queue.push([nx, ny]);
+      }
+    }
+    for (const k of visited) {
+      const markKey = `${room.id}|${k}`;
+      if (seenBySource.has(markKey)) continue;
+      seenBySource.add(markKey);
+      sourceCount.set(k, (sourceCount.get(k) ?? 0) + 1);
+    }
+  }
+
+  const connecting = new Set<string>();
+  for (const [cellKey, count] of sourceCount) {
+    if (count >= 2) connecting.add(cellKey);
+  }
+  return connecting;
+}
+
+// Mémoïsation simple : une passe de rendu (canvas ou handout) réutilise le même objet
+// `revealed`, on ne recalcule donc le BFS des couloirs qu'une fois par passe.
+let lastRevealedRef: Set<string> | null = null;
+let lastConnectingCorridors: Set<string> = new Set();
+
+function connectingCorridorsFor(map: CampaignDungeonMap, revealed: Set<string>): Set<string> {
+  if (revealed !== lastRevealedRef) {
+    lastRevealedRef = revealed;
+    lastConnectingCorridors = computeConnectingCorridorCells(map, revealed);
+  }
+  return lastConnectingCorridors;
+}
+
 function isCellRevealed(
   map: CampaignDungeonMap,
   x: number,
@@ -186,13 +273,8 @@ function isCellRevealed(
   if (roomId) return revealed.has(roomId);
   const kind = tileAt(map, x, y);
   if (kind === 'wall') return false;
-  const neighbors: [number, number][] = [
-    [0, 1],
-    [0, -1],
-    [1, 0],
-    [-1, 0],
-  ];
-  for (const [dx, dy] of neighbors) {
+  if (connectingCorridorsFor(map, revealed).has(`${x},${y}`)) return true;
+  for (const [dx, dy] of NEIGHBOR_DIRS) {
     const nx = x + dx;
     const ny = y + dy;
     if (nx < 0 || ny < 0 || nx >= map.gridWidth || ny >= map.gridHeight) continue;

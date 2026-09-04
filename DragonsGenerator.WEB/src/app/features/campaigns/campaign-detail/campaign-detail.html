@@ -34,7 +34,7 @@
                 type="button"
                 class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40 disabled:opacity-50"
                 [disabled]="leaving()"
-                (click)="leaveCampaign()"
+                (click)="requestLeaveCampaign()"
               >
                 {{ leaving() ? 'Départ…' : 'Quitter la campagne' }}
               </button>
@@ -785,6 +785,39 @@
         }
       }
     </div>
+
+    @if (showLeaveConfirm()) {
+      <div class="fixed inset-0 z-[95] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" (click)="cancelLeaveCampaign()">
+        <div class="max-w-md w-full rounded-2xl border border-red-900/40 bg-[#1b2028] shadow-2xl p-5" (click)="$event.stopPropagation()">
+          <p class="text-[10px] font-black uppercase tracking-widest text-red-400 mb-2">Quitter la campagne</p>
+          <p class="text-sm text-slate-300 mb-4">
+            Cette action est irréversible sans nouvelle invitation. Pour confirmer, retapez le nom de la campagne :
+            <span class="font-bold text-slate-100">« {{ c.title }} »</span>
+          </p>
+          <input
+            type="text"
+            [value]="leaveConfirmInput()"
+            (input)="leaveConfirmInput.set($any($event.target).value)"
+            [placeholder]="c.title"
+            class="w-full rounded-xl border border-slate-700 bg-[#12151b] px-3 py-2 text-sm text-slate-100 mb-4 focus:outline-none focus:border-red-500/60"
+            autofocus
+          />
+          <div class="flex justify-end gap-3">
+            <button type="button" class="px-3 py-2 rounded-xl text-xs font-black uppercase text-slate-400 hover:text-slate-200" (click)="cancelLeaveCampaign()">
+              Annuler
+            </button>
+            <button
+              type="button"
+              class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-600 text-white disabled:opacity-40 disabled:cursor-not-allowed"
+              [disabled]="!canConfirmLeave() || leaving()"
+              (click)="leaveCampaign()"
+            >
+              {{ leaving() ? 'Départ…' : 'Quitter définitivement' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
 
     @if (showPinnedOverlay() && pinnedHandout(); as pin) {
       <div class="fixed inset-x-0 z-[90] p-3 sm:p-4 pointer-events-none" [class.bottom-16]="showMobileSessionBar()" [class.bottom-0]="!showMobileSessionBar()">

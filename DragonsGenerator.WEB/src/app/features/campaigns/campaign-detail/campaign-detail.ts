@@ -978,16 +978,37 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   readonly leaving = signal(false);
+  readonly showLeaveConfirm = signal(false);
+  readonly leaveConfirmInput = signal('');
 
-  /** Le joueur connecté quitte volontairement la campagne. */
-  leaveCampaign(): void {
+  /** Ouvre la boîte de confirmation (retaper le nom de la campagne pour la quitter). */
+  requestLeaveCampaign(): void {
     const c = this.campaign();
     if (!c || c.isOwner || this.leaving()) return;
-    if (!confirm(`Quitter « ${c.title} » ? Vous devrez être réinvité pour revenir.`)) return;
+    this.leaveConfirmInput.set('');
+    this.showLeaveConfirm.set(true);
+  }
+
+  cancelLeaveCampaign(): void {
+    this.showLeaveConfirm.set(false);
+    this.leaveConfirmInput.set('');
+  }
+
+  /** Le nom retapé doit correspondre exactement au titre de la campagne pour débloquer le départ. */
+  readonly canConfirmLeave = computed(() => {
+    const c = this.campaign();
+    return !!c && this.leaveConfirmInput().trim() === c.title.trim();
+  });
+
+  /** Le joueur connecté quitte volontairement la campagne, après avoir retapé son nom. */
+  leaveCampaign(): void {
+    const c = this.campaign();
+    if (!c || c.isOwner || this.leaving() || !this.canConfirmLeave()) return;
     this.leaving.set(true);
     this.campaigns.leaveCampaign(c.id).subscribe({
       next: () => {
         this.leaving.set(false);
+        this.showLeaveConfirm.set(false);
         this.router.navigate(['/campaigns']);
       },
       error: () => {

@@ -618,13 +618,30 @@ export class PdfGeneratorService {
     const P = PAGE2;
     pdf.setFontSize(15);
 
-    c.proficiencies.armor.slice(0, 2).forEach((a, i) => {
-      this.text(pdf, this.prettify(a), P.armorX, P.armorYs[i]);
-    });
+    this.prioritizeCategoryTokens(c.proficiencies.armor)
+      .slice(0, 2)
+      .forEach((a, i) => {
+        this.text(pdf, this.prettify(a), P.armorX, P.armorYs[i]);
+      });
 
-    c.proficiencies.weapons.slice(0, 2).forEach((w, i) => {
-      this.text(pdf, this.prettify(w), P.weaponX, P.weaponYs[i]);
-    });
+    this.prioritizeCategoryTokens(c.proficiencies.weapons)
+      .slice(0, 2)
+      .forEach((w, i) => {
+        this.text(pdf, this.prettify(w), P.weaponX, P.weaponYs[i]);
+      });
+  }
+
+  /**
+   * Seules 2 lignes d'armure/d'arme sont imprimables ici (gabarit fixe). Sans tri, un
+   * personnage avec beaucoup de maîtrises (ex. Mage de guerre niv. 6, qui gagne
+   * "wp-cat-simple"/"wp-cat-martial" = toutes les armes) pouvait n'afficher que 2 armes
+   * nommées individuellement et perdre complètement la mention "Armes courantes/de guerre",
+   * pourtant bien plus informative. On fait donc passer les jetons de catégorie en tête
+   * (tri stable : l'ordre relatif du reste est conservé).
+   */
+  private prioritizeCategoryTokens(ids: string[]): string[] {
+    const isCategory = (id: string) => /^(wp-cat-|category-)/.test(id);
+    return [...ids].sort((a, b) => Number(isCategory(b)) - Number(isCategory(a)));
   }
 
   /**
