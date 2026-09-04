@@ -38,6 +38,16 @@ export interface SpeciesSelection {
   bonusSkillCount: number;
   /** Outils d'espèce à choisir à l'étape Savoirs. */
   bonusToolCount: number;
+  /**
+   * Ids concrets du pool d'outils dans lequel piocher `bonusToolCount` maîtrises (ex. Nain :
+   * nécessaire de brasseur/outils de forgeron/outils de maçon ; Gnome des roches "Pilote" :
+   * véhicules terrestres/maritimes/aériens). Vide si le choix n'a pas de pool fermé défini côté
+   * API (ex. Melesse "Polyvalence" à catégories larges) : l'étape Savoirs retombe alors sur le
+   * catalogue complet, comme avant.
+   */
+  bonusToolPoolIds: string[];
+  /** Nom du/des choix d'outil d'espèce différés (ex. "Maîtrise d'outils artisan", "Pilote"), pour affichage à l'étape Savoirs au lieu du libellé générique "Polyvalence". */
+  bonusToolChoiceLabel: string;
   resistances: string[];
   hasDarkvision: boolean;
   darkvisionRadius: number;
@@ -197,6 +207,8 @@ export const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   speciesChoiceAnswers: {},
   speciesBonusSkillCount: 0,
   speciesBonusToolCount: 0,
+  speciesBonusToolPoolIds: [],
+  speciesBonusToolChoiceLabel: '',
   racialSpellGrants: [],
 
   civilizationId: null,

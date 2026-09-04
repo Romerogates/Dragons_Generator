@@ -81,6 +81,29 @@ const MOCK_DRAKEIDE: Species = {
   optionalRules: [],
 };
 
+const MOCK_NAIN: Species = {
+  id: 'sp-nain',
+  name: 'Nain',
+  nameAlt: [],
+  source: { book: 'Test', pages: '3' },
+  flavor: { summary: 'Peuple robuste.' },
+  baseStats: baseStats(),
+  traits: [{ id: 'trait-vision-nain', name: 'Vision dans le noir', desc: 'Voit dans le noir.' }],
+  creationChoices: [
+    {
+      id: 'choice-maitrise-outils-nain',
+      name: 'Maîtrise d\'outils artisan',
+      desc: 'Choisissez un outil.',
+      type: 'tool_proficiency',
+      choiceCount: 1,
+      options: ['tl-necessaire-de-brasseur', 'tl-outils-de-forgeron', 'tl-outils-de-macon'],
+    },
+  ],
+  languages: { fixed: ['lg-nain'], choiceCount: 0 },
+  subspecies: [],
+  optionalRules: [],
+};
+
 const MOCK_LANGUAGES = [{ id: 'lg-commun', name: 'Commun' }];
 
 describe('SpeciesStep', () => {
@@ -104,7 +127,7 @@ describe('SpeciesStep', () => {
         {
           provide: DataService,
           useValue: {
-            getSpecies: () => of([MOCK_HUMAIN, MOCK_DRAKEIDE]),
+            getSpecies: () => of([MOCK_HUMAIN, MOCK_DRAKEIDE, MOCK_NAIN]),
             getLanguagesSummary: () => of(MOCK_LANGUAGES),
             getSpells: () => of([]),
           },
@@ -130,7 +153,7 @@ describe('SpeciesStep', () => {
 
   it('loads species and exposes carousel cards', () => {
     expect(component.loading()).toBeFalse();
-    expect(component.allSpecies().length).toBe(2);
+    expect(component.allSpecies().length).toBe(3);
     expect(component.currentPhase()).toBe('species');
     expect(component.currentCards().some((c) => c.id === 'sp-humain')).toBeTrue();
   });
@@ -243,6 +266,21 @@ describe('SpeciesStep', () => {
 
     expect(clearSpeciesSpy).toHaveBeenCalled();
     expect(component.selectedSpeciesId()).toBeNull();
+  });
+
+  it('confirmSelection exposes the concrete tool pool for a closed species choice (Nain)', () => {
+    component.selectedSpeciesId.set('sp-nain');
+    fixture.detectChanges();
+    component.confirmSelection();
+
+    const selection = setSpeciesSpy.calls.mostRecent().args[0] as SpeciesSelection;
+    expect(selection.bonusToolCount).toBe(1);
+    expect(selection.bonusToolPoolIds).toEqual([
+      'tl-necessaire-de-brasseur',
+      'tl-outils-de-forgeron',
+      'tl-outils-de-macon',
+    ]);
+    expect(selection.bonusToolChoiceLabel).toBe("Maîtrise d'outils artisan");
   });
 
   it('shows load error when species fail', async () => {

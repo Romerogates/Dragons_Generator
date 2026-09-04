@@ -730,9 +730,27 @@ export class SpeciesStep implements OnInit {
       .filter((c) => this.isDeferredSkillChoice(c))
       .reduce((sum, c) => sum + (c.choiceCount ?? 1), 0);
 
-    const bonusToolCount = this.allCreationChoices()
-      .filter((c) => this.isDeferredToolChoice(c))
-      .reduce((sum, c) => sum + (c.choiceCount ?? 1), 0);
+    const deferredToolChoices = this.allCreationChoices().filter((c) => this.isDeferredToolChoice(c));
+    const bonusToolCount = deferredToolChoices.reduce((sum, c) => sum + (c.choiceCount ?? 1), 0);
+    // Pool concret d'outils (ex. Nain "Maîtrise d'outils artisan" → brasseur/forgeron/maçon ;
+    // Gnome des roches "Pilote" → véhicules terrestres/maritimes/aériens) : on le propage pour
+    // que l'étape Savoirs restreigne le choix, au lieu de laisser piocher dans tout le catalogue.
+    const bonusToolPoolIds = [
+      ...new Set(
+        deferredToolChoices.flatMap((c) =>
+          this.rawChoiceOptions(c)
+            .map((o) => {
+              if (typeof o === 'string') return o;
+              if (o && typeof o === 'object' && typeof (o as Record<string, unknown>)['id'] === 'string') {
+                return (o as Record<string, unknown>)['id'] as string;
+              }
+              return null;
+            })
+            .filter((id): id is string => !!id && id !== 'any'),
+        ),
+      ),
+    ];
+    const bonusToolChoiceLabel = deferredToolChoices.map((c) => c.name).join(' / ');
 
     const choiceAnswers: Record<string, string[]> = {};
     for (const [k, v] of this.choiceAnswers()) {
@@ -752,6 +770,8 @@ export class SpeciesStep implements OnInit {
       bonusLanguageCount: bonusLangCount,
       bonusSkillCount,
       bonusToolCount,
+      bonusToolPoolIds,
+      bonusToolChoiceLabel,
       resistances: this.resistances(),
       hasDarkvision: (species.baseStats.darkvisionM ?? 0) > 0,
       darkvisionRadius: species.baseStats.darkvisionM ?? 0,

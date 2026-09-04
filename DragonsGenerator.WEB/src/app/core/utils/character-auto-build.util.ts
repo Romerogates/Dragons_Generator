@@ -274,6 +274,8 @@ export function buildAutoSpeciesSelection(species: Species, targetLevel = 1, spe
     bonusLanguageCount,
     bonusSkillCount,
     bonusToolCount,
+    bonusToolPoolIds: [],
+    bonusToolChoiceLabel: '',
     resistances,
     hasDarkvision: (species.baseStats.darkvisionM ?? 0) > 0,
     darkvisionRadius: species.baseStats.darkvisionM ?? 0,

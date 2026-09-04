@@ -430,7 +430,7 @@
             class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
           >
             <iconify-icon icon="fluent-emoji:hammer-and-wrench"></iconify-icon> Outil d'espèce
-            (Polyvalence)
+            ({{ speciesBonusToolChoiceLabel() }})
           </h4>
           <span
             class="text-[10px] font-black uppercase tracking-widest"
@@ -442,7 +442,7 @@
         <p class="text-xs text-slate-500 mb-5">
           Choisissez {{ speciesBonusToolCount() }} maîtrise(s) d'outil liée(s) à votre peuple.
         </p>
-        @for (group of toolGroups(); track group.label) {
+        @for (group of speciesToolGroups(); track group.label) {
           <div class="mb-5">
             <div class="flex items-center gap-2 mb-3">
               <iconify-icon [icon]="group.icon" class="text-lg"></iconify-icon>

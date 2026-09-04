@@ -684,6 +684,11 @@ export interface CharacterCreation {
   speciesBonusSkillCount: number;
   /** Outils bonus d'espèce à choisir. */
   speciesBonusToolCount: number;
+  /** Pool concret d'ids d'outils dans lequel piocher `speciesBonusToolCount` maîtrises (ex. Nain :
+   * nécessaire de brasseur/forgeron/maçon). Vide → l'étape Savoirs retombe sur le catalogue complet. */
+  speciesBonusToolPoolIds: string[];
+  /** Libellé du choix d'outil d'espèce différé, pour affichage à l'étape Savoirs. */
+  speciesBonusToolChoiceLabel: string;
   /** Sorts raciaux à choisir à l'étape Magie (ex. sort mineur de magicien). */
   racialSpellGrants: {
     choiceId: string;

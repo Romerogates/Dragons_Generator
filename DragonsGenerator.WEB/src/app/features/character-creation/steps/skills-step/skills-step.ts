@@ -586,6 +586,13 @@ export class SkillsStep implements OnInit {
     Math.max(0, this.speciesBonusToolCount() - this.selectedSpeciesTools().length),
   );
 
+  /** Pool concret d'outils défini côté API pour ce choix d'espèce (ex. Nain : brasseur/forgeron/maçon). */
+  readonly speciesBonusToolPoolIds = computed(() => this.builder.creation().speciesBonusToolPoolIds ?? []);
+  /** Libellé du choix (ex. "Maîtrise d'outils artisan", "Pilote") ; repli sur "Polyvalence" si absent. */
+  readonly speciesBonusToolChoiceLabel = computed(
+    () => this.builder.creation().speciesBonusToolChoiceLabel || 'Polyvalence',
+  );
+
   readonly speciesSkillOptions = computed(() => Object.values(this.skillMap()));
 
   toggleSpeciesSkill(skillId: string): void {
@@ -662,6 +669,22 @@ export class SkillsStep implements OnInit {
       { label: 'Matériel de jeu', icon: 'fluent-emoji:game-die', items: games },
       { label: 'Véhicules', icon: 'fluent-emoji:horse', items: vehicles },
     ].filter((g) => g.items.length > 0);
+  });
+
+  /**
+   * Groupes d'outils affichés pour le choix d'espèce différé. Restreint au pool concret défini
+   * côté API (ex. Nain : nécessaire de brasseur/outils de forgeron/outils de maçon) quand ce pool
+   * matche des entrées réelles du catalogue. Repli sur le catalogue complet si le pool est vide
+   * ou ne matche rien (ex. catégories de véhicules abstraites, pas d'objet concret au catalogue) —
+   * comportement identique à avant pour ne rien casser dans ce cas.
+   */
+  readonly speciesToolGroups = computed(() => {
+    const poolIds = new Set(this.speciesBonusToolPoolIds());
+    if (poolIds.size === 0) return this.toolGroups();
+    const filtered = this.toolGroups()
+      .map((g) => ({ ...g, items: g.items.filter((t) => poolIds.has(t.id)) }))
+      .filter((g) => g.items.length > 0);
+    return filtered.length > 0 ? filtered : this.toolGroups();
   });
 
   isToolSelected(toolId: string): boolean {

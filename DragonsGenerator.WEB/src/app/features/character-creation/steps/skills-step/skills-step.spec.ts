@@ -18,6 +18,9 @@ const MOCK_TOOLS = [
   { id: 'tl-lyre', name: 'Lyre', type: 'TOOL', subtype: 'musical_instrument' },
   { id: 'tl-des', name: 'Dés', type: 'TOOL', subtype: 'gaming_set' },
   { id: 'tl-necessaire-dherboristerie', name: "Nécessaire d'herboristerie", type: 'TOOL', subtype: 'artisan_tools' },
+  { id: 'tl-necessaire-de-brasseur', name: 'Nécessaire de brasseur', type: 'TOOL', subtype: 'artisan_tool' },
+  { id: 'tl-outils-de-forgeron', name: 'Outils de forgeron', type: 'TOOL', subtype: 'artisan_tool' },
+  { id: 'tl-outils-de-macon', name: 'Outils de maçon', type: 'TOOL', subtype: 'artisan_tool' },
 ];
 
 function skillsCreation(overrides: Record<string, unknown> = {}) {
@@ -221,5 +224,78 @@ describe('SkillsStep', () => {
     expect(bgSlots.length).toBeGreaterThan(0);
     expect(setExpertiseSpy).toHaveBeenCalled();
     expect(nextStepSpy).toHaveBeenCalled();
+  });
+
+  it('restricts the species tool choice to the concrete API pool (Nain) instead of the whole catalog', async () => {
+    await TestBed.resetTestingModule();
+    creationSignal = signal(
+      skillsCreation({
+        speciesBonusToolCount: 1,
+        speciesBonusToolPoolIds: ['tl-necessaire-de-brasseur', 'tl-outils-de-forgeron', 'tl-outils-de-macon'],
+        speciesBonusToolChoiceLabel: "Maîtrise d'outils artisan",
+      }),
+    );
+    await TestBed.configureTestingModule({
+      imports: [SkillsStep],
+      providers: [
+        ...zonelessTestProviders,
+        {
+          provide: DataService,
+          useValue: {
+            getSkills: () => of(MOCK_SKILLS),
+            getClassById: () => of({ id: 'cls-lettre', name: 'Lettré', data: { progression: [] } }),
+            getEquipments: () => of(MOCK_TOOLS),
+          },
+        },
+        {
+          provide: CharacterBuilderService,
+          useValue: {
+            creation: creationSignal,
+            targetLevel: () => 1,
+            abilityModifiers: () => ({
+              force: 0,
+              dexterite: 1,
+              constitution: 0,
+              intelligence: 2,
+              sagesse: 1,
+              charisme: 0,
+            }),
+            setProficiencies: jasmine.createSpy('setProficiencies'),
+            setExpertiseSkills: jasmine.createSpy('setExpertiseSkills'),
+            mergeClassProficiencies: jasmine.createSpy('mergeClassProficiencies'),
+            nextStep: jasmine.createSpy('nextStep'),
+            previousStep: jasmine.createSpy('previousStep'),
+          },
+        },
+      ],
+    }).compileComponents();
+
+    const restrictedFixture = TestBed.createComponent(SkillsStep);
+    restrictedFixture.detectChanges();
+    const restricted = restrictedFixture.componentInstance;
+
+    expect(restricted.speciesBonusToolChoiceLabel()).toBe("Maîtrise d'outils artisan");
+    const allItems = restricted.speciesToolGroups().flatMap((g) => g.items.map((t) => t.id));
+    expect(allItems.sort()).toEqual(
+      ['tl-necessaire-de-brasseur', 'tl-outils-de-forgeron', 'tl-outils-de-macon'].sort(),
+    );
+    expect(allItems).not.toContain('tl-lyre');
+    expect(allItems).not.toContain('tl-des');
+  });
+
+  it('falls back to the full tool catalog when the species pool matches nothing (e.g. vehicle categories)', () => {
+    creationSignal.set(
+      skillsCreation({
+        speciesBonusToolCount: 1,
+        speciesBonusToolPoolIds: ['tl-vehicules-terrestres', 'tl-vehicules-maritimes'],
+        speciesBonusToolChoiceLabel: 'Pilote',
+      }),
+    );
+    fixture.detectChanges();
+
+    expect(component.speciesBonusToolChoiceLabel()).toBe('Pilote');
+    const allItems = component.speciesToolGroups().flatMap((g) => g.items.map((t) => t.id));
+    expect(allItems).toEqual(component.toolGroups().flatMap((g) => g.items.map((t) => t.id)));
+    expect(allItems.length).toBeGreaterThan(0);
   });
 });
