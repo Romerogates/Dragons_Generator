@@ -76,6 +76,21 @@ export class LanguagesStep implements OnInit {
     Math.max(0, this.requiredExoticCount() - this.chosenExoticCount()),
   );
 
+  /** Nombre de langues bonus devant être courantes (ex. Barde "Langues communes" ×2). */
+  readonly requiredBaseCount = computed<number>(
+    () => this.builder.creation().requiredBaseLanguageCount || 0,
+  );
+
+  readonly chosenBaseCount = computed<number>(() => {
+    const map = new Map(this.allLanguages().map((l) => [l.name, l] as const));
+    return this.chosenBonusLanguages().filter((name) => map.get(name)?.category === 'base')
+      .length;
+  });
+
+  readonly baseRemaining = computed(() =>
+    Math.max(0, this.requiredBaseCount() - this.chosenBaseCount()),
+  );
+
   readonly chosenBonusLanguages = computed<string[]>(() => {
     const locked = new Set(this.lockedLanguages());
     return this.builder.creation().languages.filter((l) => !locked.has(l));
@@ -174,7 +189,7 @@ export class LanguagesStep implements OnInit {
   }
 
   confirm(): void {
-    if (this.remainingPicks() === 0 && this.exoticRemaining() === 0) {
+    if (this.remainingPicks() === 0 && this.exoticRemaining() === 0 && this.baseRemaining() === 0) {
       this.builder.nextStep();
     }
   }

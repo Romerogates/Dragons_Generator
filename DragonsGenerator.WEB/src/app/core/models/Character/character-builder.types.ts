@@ -120,6 +120,8 @@ export interface ClassSelection {
   classBonusLanguageCount?: number;
   /** Parmi les langues bonus, nombre devant être exotiques (ex. Prêtre Domaine du Partage). */
   classRequiredExoticLanguageCount?: number;
+  /** Parmi les langues bonus, nombre devant être courantes (ex. Barde "Langues communes" ×2). */
+  classRequiredBaseLanguageCount?: number;
   /** Résistances passives accordées par la sous-classe (ex. Druide Cercle des Esprits → psychique). */
   classResistances?: string[];
   /** Vision dans le noir accordée par la classe/sous-classe (ex. Rôdeur Ombre urbaine niv. 7). */
@@ -308,6 +310,7 @@ export const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   languages: [],
   bonusLanguageCount: 0,
   requiredExoticLanguageCount: 0,
+  requiredBaseLanguageCount: 0,
 
   name: '',
   sex: 'X' as const,

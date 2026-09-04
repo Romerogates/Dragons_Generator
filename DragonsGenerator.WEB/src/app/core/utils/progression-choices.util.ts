@@ -671,6 +671,16 @@ const EXOTIC_LANGUAGE_POOL_TOKENS = new Set([
   'lang-exotique',
 ]);
 
+/** Jetons de pool signalant une contrainte « doit être une langue courante » (ex. Barde
+ * `category-common-languages` "Langues communes"). */
+const BASE_LANGUAGE_POOL_TOKENS = new Set([
+  'category-common-languages',
+  'category-base-languages',
+  'lang-category-commune',
+  'lang-common',
+  'lang-commune',
+]);
+
 /** Langues supplémentaires de classe (ex. Lettré ×3, Espion) → étape Langues. */
 export function classBonusLanguageCount(
   cls: CharacterClass,
@@ -693,16 +703,14 @@ export function classBonusLanguageCount(
   return total;
 }
 
-/**
- * Parmi les langues bonus de `classBonusLanguageCount`, combien doivent obligatoirement être
- * exotiques d'après le `pool` du choix racine de classe (ex. Prêtre "Langue exotique", Magicien,
- * Sorcier). Contrairement au pool générique ("any"), un pool ne contenant QUE des jetons exotiques
- * restreint tout le choix — sans ça, le joueur peut piocher une langue courante à la place.
- */
-export function classRootRequiredExoticLanguageCount(
+/** Compte les slots des choix racine `language_proficiency`/`language` de classe dont le `pool`
+ * JSON ne contient QUE des jetons de `matchTokens` (ex. uniquement exotique, ou uniquement
+ * courant) — un pool générique ("any"/mixte) ne compte pas comme restreint. */
+function classRootLanguagePoolCountMatching(
   cls: CharacterClass,
   level: number,
-  maxLevel = PROGRESSION_MAX_LEVEL,
+  maxLevel: number,
+  matchTokens: Set<string>,
 ): number {
   const pools = progressionData(cls).choice_pools;
   const effective = Math.min(Math.max(1, level), maxLevel);
@@ -714,12 +722,39 @@ export function classRootRequiredExoticLanguageCount(
       if (!poolActiveAtLevel(pool, effective)) continue;
       const raw = (pool as { pool?: unknown; options?: unknown }).pool ?? (pool as { options?: unknown }).options ?? [];
       const tokens = Array.isArray(raw) ? raw.map(String) : [];
-      if (tokens.length > 0 && tokens.every((t) => EXOTIC_LANGUAGE_POOL_TOKENS.has(t))) {
+      if (tokens.length > 0 && tokens.every((t) => matchTokens.has(t))) {
         total += poolQuantityAtLevel(pool, effective);
       }
     }
   }
   return total;
+}
+
+/**
+ * Parmi les langues bonus de `classBonusLanguageCount`, combien doivent obligatoirement être
+ * exotiques d'après le `pool` du choix racine de classe (ex. Prêtre "Langue exotique", Magicien,
+ * Sorcier). Contrairement au pool générique ("any"), un pool ne contenant QUE des jetons exotiques
+ * restreint tout le choix — sans ça, le joueur peut piocher une langue courante à la place.
+ */
+export function classRootRequiredExoticLanguageCount(
+  cls: CharacterClass,
+  level: number,
+  maxLevel = PROGRESSION_MAX_LEVEL,
+): number {
+  return classRootLanguagePoolCountMatching(cls, level, maxLevel, EXOTIC_LANGUAGE_POOL_TOKENS);
+}
+
+/**
+ * Symétrique de `classRootRequiredExoticLanguageCount` pour les pools restreints aux langues
+ * courantes (ex. Barde "Langues communes" ×2) : sans cette contrainte, le joueur pouvait piocher
+ * une langue exotique à la place dans le pool bonus générique.
+ */
+export function classRootRequiredBaseLanguageCount(
+  cls: CharacterClass,
+  level: number,
+  maxLevel = PROGRESSION_MAX_LEVEL,
+): number {
+  return classRootLanguagePoolCountMatching(cls, level, maxLevel, BASE_LANGUAGE_POOL_TOKENS);
 }
 
 function subclassBonusLanguageCount(

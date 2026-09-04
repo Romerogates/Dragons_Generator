@@ -2,6 +2,7 @@ import { extractSpellSlotsFromResources, extractPactSlotsFromResources, maxSpell
 import {
   classBonusLanguageCount,
   classRootRequiredExoticLanguageCount,
+  classRootRequiredBaseLanguageCount,
   extractWeaponProficiencyChoices,
   extractToolProficiencyChoices,
   countAsiSlots,
@@ -125,6 +126,28 @@ describe('High-level progression (6–20)', () => {
       },
     } as any);
     expect(classRootRequiredExoticLanguageCount(magicien, 1)).toBe(1);
+  });
+
+  it('flags class-root language pools restricted to common-only tokens (Barde "Langues communes")', () => {
+    const barde = normalizeCharacterClass({
+      id: 'cls-barde',
+      name: 'Barde',
+      data: {
+        choice_pools: [
+          {
+            id: 'choice-languages-cls-barde',
+            type: 'language_proficiency',
+            quantity: 2,
+            pool: ['category-common-languages'],
+            unlocked_at_level: 1,
+          },
+        ],
+        progression: [{ level: 1, features: [] }],
+      },
+    } as any);
+    expect(classBonusLanguageCount(barde, 1)).toBe(2);
+    expect(classRootRequiredBaseLanguageCount(barde, 1)).toBe(2);
+    expect(classRootRequiredExoticLanguageCount(barde, 1)).toBe(0);
   });
 
   it('extracts warlock pact slots from JSON resources', () => {

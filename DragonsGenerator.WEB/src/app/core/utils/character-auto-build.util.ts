@@ -34,6 +34,7 @@ import { extractScalarResources, extractSpellSlotsFromResources, resolveFeatureU
 import {
   classBonusLanguageCount,
   classRootRequiredExoticLanguageCount,
+  classRootRequiredBaseLanguageCount,
   classBonusSenses,
   classRootSavingThrowGrants,
   extractProgressionChoices,
@@ -678,6 +679,7 @@ export function buildAutoClassSelection(cls: CharacterClass, level = 1): {
     classBonusLanguageCount: classBonusLanguageCount(cls, level, undefined, sub?.id) + subBonus.bonusLanguages,
     classRequiredExoticLanguageCount:
       subBonus.requiredExoticLanguages + classRootRequiredExoticLanguageCount(cls, level),
+    classRequiredBaseLanguageCount: classRootRequiredBaseLanguageCount(cls, level),
     classResistances,
     classDarkvisionRadius: classSenses.darkvisionRadius,
     classHasBlindsight: classSenses.hasBlindsight,

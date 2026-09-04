@@ -171,6 +171,26 @@
             </div>
           }
 
+          @if (requiredBaseCount() > 0) {
+            <div class="flex justify-center w-full mb-8 -mt-4">
+              <div
+                class="px-6 py-2.5 rounded-full border text-[10px] font-black uppercase tracking-widest flex items-center gap-3 shadow-lg"
+                [ngClass]="
+                  baseRemaining() === 0
+                    ? 'bg-emerald-950/30 text-emerald-400 border-emerald-800/50'
+                    : 'bg-amber-950/30 text-amber-400 border-amber-800/50'
+                "
+              >
+                <iconify-icon icon="fluent-emoji:open-book"></iconify-icon>
+                @if (baseRemaining() === 0) {
+                  Exigence de langues communes remplie ({{ chosenBaseCount() }} / {{ requiredBaseCount() }})
+                } @else {
+                  Dont {{ baseRemaining() }} langue(s) commune(s) obligatoire(s)
+                }
+              </div>
+            </div>
+          }
+
           @if (remainingPicks() > 0) {
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full max-w-5xl">
               @for (lang of availableBaseLanguages(); track lang.id) {
@@ -234,7 +254,7 @@
           <button
             type="button"
             class="wizard-nav-primary"
-            [disabled]="remainingPicks() > 0 || exoticRemaining() > 0"
+            [disabled]="remainingPicks() > 0 || exoticRemaining() > 0 || baseRemaining() > 0"
             (click)="confirm()"
           >
             Inscrire ces langues au registre

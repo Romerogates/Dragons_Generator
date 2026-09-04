@@ -790,6 +790,8 @@ export interface CharacterCreation {
   bonusLanguageCount: number;
   /** Parmi les langues bonus, nombre devant être exotiques (ex. Prêtre Domaine du Partage). */
   requiredExoticLanguageCount: number;
+  /** Parmi les langues bonus, nombre devant être courantes (ex. Barde "Langues communes" ×2). */
+  requiredBaseLanguageCount: number;
 
   // Étape 9 - Identité (anciennement 8)
   name: string;

@@ -36,6 +36,7 @@ import {
   extractProgressionChoices,
   classBonusLanguageCount,
   classRootRequiredExoticLanguageCount,
+  classRootRequiredBaseLanguageCount,
   subclassFixedToolProficiencies,
   subclassBonusProficiencies,
   subclassBonusResistances,
@@ -1217,6 +1218,7 @@ export class ClassStep implements OnInit {
         classRequiredExoticLanguageCount:
           subBonus.requiredExoticLanguages +
           classRootRequiredExoticLanguageCount(cls, targetLevel),
+        classRequiredBaseLanguageCount: classRootRequiredBaseLanguageCount(cls, targetLevel),
         classResistances,
         classDarkvisionRadius: classSenses.darkvisionRadius,
         classHasBlindsight: classSenses.hasBlindsight,
