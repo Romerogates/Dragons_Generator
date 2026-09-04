@@ -180,4 +180,39 @@ describe('character-edit.mapper', () => {
     expect(creation.eldritchInvocations).toEqual(['invoc-arme-du-pacte']);
     expect(creation.mysticArcanumPicks['6']).toBe('spl-circle-death');
   });
+
+  it('mapCharacterToEditState restores asiChoices without ctx (bonuses/featIds only)', () => {
+    const saved = sampleCharacter({
+      asiChoices: [{ level: 4, mode: 'plus2', primary: 'intelligence' }],
+    });
+    const { creation } = mapCharacterToEditState(saved);
+    expect(creation.asiBonuses.intelligence).toBe(2);
+    expect(creation.talentBonusSkills).toEqual([]);
+  });
+
+  it('mapCharacterToEditState re-aggregates "Talent" spends when feats/spells ctx is provided', () => {
+    const saved = sampleCharacter({
+      asiChoices: [
+        {
+          level: 4,
+          mode: 'feat',
+          featId: 'don-talent',
+          featTalentSpends: [
+            { id: '1', type: 'skill', skillId: 'skill-arcanes' },
+            { id: '2', type: 'cantrips', cantripIds: ['spl-lueur'] },
+          ],
+        },
+      ],
+    });
+    const feats = new Map([['don-talent', { benefits: [{ type: 'flexible_points', total: 4 }] }]]);
+    const spells = new Map([
+      ['spl-lueur', { id: 'spl-lueur', name: 'Lueur', level: 0, description: '' } as any],
+    ]);
+
+    const { creation } = mapCharacterToEditState(saved, { feats, spells });
+    expect(creation.talentBonusSkills).toEqual(['skill-arcanes']);
+    expect(creation.talentBonusCantrips?.length).toBe(1);
+    expect(creation.talentBonusCantrips?.[0].name).toBe('Lueur');
+    expect(creation.selectedFeatIds).toEqual(['don-talent']);
+  });
 });

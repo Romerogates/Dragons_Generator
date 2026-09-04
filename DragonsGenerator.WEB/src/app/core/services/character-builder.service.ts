@@ -33,6 +33,7 @@ import type { RawFeatData } from '../utils/feat-benefits.util';
 import type { Spell } from '../models/Spells/spell';
 import { isWizardStepValid } from '../utils/character-wizard-validation.util';
 import { Injectable, signal, computed, inject, effect } from '@angular/core';
+import { forkJoin } from 'rxjs';
 import { DataService } from './data.service';
 import { CharacterHandoffService } from './character-handoff.service';
 import {
@@ -828,10 +829,43 @@ export class CharacterBuilderService {
     if (errors.length) {
       throw new Error(`Personnage invalide pour édition : ${errors.join(', ')}`);
     }
+    // Chargement initial sans les catalogues dons/sorts : les bonus déjà fusionnés dans le
+    // personnage sauvegardé restent corrects, seuls les caches `talentBonus*`/`featBonus*`
+    // attendent le contexte ci-dessous (remplacé dès qu'il arrive, cf. plus bas).
     const { creation, editing } = mapCharacterToEditState(savedCharacter);
     this.editingRef.set(editing);
     this.creation.set(creation);
     this.currentStep.set(this.summaryStep());
+
+    // On recharge ensuite avec le contexte complet (dons + sorts) pour recalculer fidèlement
+    // les bonus dérivés des dons (don "Talent" à 4 points, darkvision, résistances…), sans
+    // attendre que le joueur retraverse l'étape Caractéristiques.
+    if (savedCharacter.asiChoices?.length) {
+      forkJoin({
+        feats: this.dataService.getFeats(),
+        spells: this.dataService.getSpells(),
+      }).subscribe({
+        next: ({ feats, spells }) => {
+          const featsById = new Map<string, RawFeatData>(
+            (feats ?? []).map((f) => [f.id, (f.data ?? {}) as RawFeatData]),
+          );
+          const spellsById = new Map<string, Spell>((spells ?? []).map((s) => [s.id, s]));
+          const { creation: refined } = mapCharacterToEditState(savedCharacter, {
+            feats: featsById,
+            spells: spellsById,
+          });
+          // Ne réapplique que si on est toujours en train d'éditer ce même personnage (l'utilisateur
+          // n'a pas déjà réinitialisé ou changé de page pendant le chargement asynchrone).
+          if (this.editingRef()?.id === editing.id) {
+            this.creation.set(refined);
+          }
+        },
+        error: () => {
+          // Silencieux : le personnage reste éditable avec les bonus déjà fusionnés au moment
+          // de la sauvegarde, seuls les caches internes ne sont pas rafraîchis.
+        },
+      });
+    }
   }
 
   checkForEditMode(): void {

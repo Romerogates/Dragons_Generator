@@ -1,10 +1,22 @@
-import type { Character, SpellInstance } from '@core/models/Character/character';
+import { abilityLabelToKey, type Character, type SpellInstance } from '@core/models/Character/character';
+import type { Spell } from '@core/models/Spells/spell';
 import {
   INITIAL_CREATION_STATE,
   type ExtendedCharacterCreation,
 } from '@core/models/Character/character-builder.types';
 import type { CharacterBuildEditingRef } from './character-build.util';
 import { aggregateAsiChoices } from './character-abilities.util';
+import type { RawFeatData } from './feat-benefits.util';
+
+/** Contexte optionnel permettant de ré-agréger fidèlement les dons (ASI fixe/flexible,
+ * darkvision, résistances, don "Talent" à 4 points…) à partir des catalogues chargés côté
+ * appelant. Sans ce contexte, les bonus déjà appliqués au personnage sauvegardé restent
+ * corrects (ils sont fusionnés dans `saved.*`), mais les caches `creation.talentBonus*` /
+ * `creation.featBonus*` ne sont recalculés qu'à la ré-confirmation de l'étape Caractéristiques. */
+export interface CharacterEditMapperContext {
+  feats?: Map<string, RawFeatData>;
+  spells?: Map<string, Spell>;
+}
 
 export interface CharacterEditLoadResult {
   creation: ExtendedCharacterCreation;
@@ -23,7 +35,10 @@ export function validateCharacterForEdit(saved: Character): string[] {
 }
 
 /** Reconstruit l'état wizard à partir d'un personnage sauvegardé. */
-export function mapCharacterToEditState(saved: Character): CharacterEditLoadResult {
+export function mapCharacterToEditState(
+  saved: Character,
+  ctx?: CharacterEditMapperContext,
+): CharacterEditLoadResult {
   const creation = structuredClone(INITIAL_CREATION_STATE);
   const species = saved.species;
   const primaryClass = saved.classes[0];
@@ -80,10 +95,33 @@ export function mapCharacterToEditState(saved: Character): CharacterEditLoadResu
   creation.classChoiceAnswers = saved.classChoiceAnswers ?? {};
   creation.asiChoices = saved.asiChoices ?? [];
   if (creation.asiChoices.length) {
-    const { bonuses, featIds } = aggregateAsiChoices(creation.asiChoices);
-    creation.asiBonuses = bonuses;
-    creation.selectedFeatIds = featIds;
-    creation.selectedFeatId = featIds[0] ?? null;
+    // On repasse le contexte (dons + sorts) quand l'appelant le fournit, pour que les bonus
+    // dérivés des dons (darkvision, armure, résistances, don "Talent" à 4 points…) soient
+    // recalculés fidèlement dès le chargement, sans attendre que le joueur retraverse l'étape
+    // Caractéristiques. Sans contexte (ex. anciens appels/tests), on se limite au strict
+    // minimum (ASI + liste des dons), comme avant.
+    const agg = aggregateAsiChoices(creation.asiChoices, {
+      feats: ctx?.feats,
+      spells: ctx?.spells,
+      spellcastingAbility: sc?.ability ? abilityLabelToKey(sc.ability) : null,
+    });
+    creation.asiBonuses = agg.bonuses;
+    creation.selectedFeatIds = agg.featIds;
+    creation.selectedFeatId = agg.featIds[0] ?? null;
+    creation.featDarkvisionRadius = agg.featDarkvisionRadius;
+    creation.featBonusArmor = agg.featBonusArmor;
+    creation.featBonusTools = agg.featBonusTools;
+    creation.featResistances = agg.featResistances;
+    creation.talentBonusSkills = agg.talentBonusSkills;
+    creation.talentExpertiseSkills = agg.talentExpertiseSkills;
+    creation.talentBonusWeapons = agg.talentBonusWeapons;
+    creation.talentSavingThrows = agg.talentSavingThrows;
+    creation.talentBonusCantrips = agg.talentBonusCantrips;
+    creation.bonusLanguageCount = (creation.bonusLanguageCount || 0) + agg.talentBonusLanguageCount;
+    creation.requiredExoticLanguageCount =
+      (creation.requiredExoticLanguageCount || 0) + agg.talentRequiredExoticLanguages;
+    creation.talentBonusLangApplied = agg.talentBonusLanguageCount;
+    creation.talentExoticLangApplied = agg.talentRequiredExoticLanguages;
   }
 
   if (sc?.kind === 'sorcerer') {
