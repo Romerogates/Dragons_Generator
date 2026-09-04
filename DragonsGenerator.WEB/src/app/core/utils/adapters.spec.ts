@@ -314,6 +314,49 @@ describe('class-data.adapter', () => {
     expect(sub.sub_choices?.length ?? 0).toBe(0);
   });
 
+  it('defers a subclass-root "skill_proficiency" pool with an open "any" pool (Barde Conteurs) instead of showing an unusable class-step card', () => {
+    const normalized = normalizeCharacterClass({
+      id: 'cls-barde',
+      name: 'Barde',
+      data: {
+        subclasses: {
+          name: 'Collège',
+          level_unlocked: 3,
+          options: [
+            {
+              id: 'subcls-college-conteurs',
+              name: 'Collège des conteurs',
+              flavor: { summary: 'Érudit.' },
+              choice_pools: [
+                {
+                  id: 'choice-skills-subcls-college-conteurs-niv3',
+                  name: 'Maîtrises supplémentaires',
+                  type: 'skill_proficiency',
+                  quantity: 3,
+                  unlocks_at_level: 3,
+                  pool: ['any'],
+                },
+              ],
+              features_details: [
+                {
+                  id: 'feat-maitrise-supp-conteurs',
+                  name: 'Maîtrises supplémentaires',
+                  unlocks_at_level: 3,
+                  mechanics: { type: 'skill_proficiency_grant', quantity: 3, pool: 'any' },
+                },
+              ],
+            },
+          ],
+        },
+      },
+    } as any);
+
+    const sub = (normalized.data.subclasses as { options: { sub_choices?: unknown[] }[] }).options[0];
+    // Aucune carte de choix générée à l'étape Classe : le pool "any" est différé (déjà proposé
+    // à l'étape Savoirs via la mécanique de feature `skill_proficiency_grant`).
+    expect(sub.sub_choices?.length ?? 0).toBe(0);
+  });
+
   it('maps roublard equipment choice_pools from root choice_pools', () => {
     const normalized = normalizeCharacterClass({
       id: 'cls-roublard',

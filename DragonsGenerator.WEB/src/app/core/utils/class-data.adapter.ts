@@ -217,6 +217,12 @@ const DEFERRED_SUBCHOICE_TYPES = new Set([
   'language',
   'language_proficiency',
   'spell_proficiency',
+  // Ex. Barde Collège des conteurs "Maîtrises supplémentaires" (pool: ["any"], quantity 3) :
+  // ce choix existe AUSSI comme mécanique de feature (mechanics.type: skill_proficiency_grant),
+  // déjà câblé et proposé à l'étape Savoirs via `extractSubclassSkillProficiencyChoices`. Sans ce
+  // différé, le pool racine de sous-classe générait en plus une carte "1/3" à l'étape Classe avec
+  // une seule option littérale "any", non sélectionnable et bloquante.
+  'skill_proficiency',
 ]);
 
 /** Totems animaux de secours (Cercle des Esprits) quand le JSON n'a qu'un pool_filter. */
