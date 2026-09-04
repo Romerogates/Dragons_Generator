@@ -44,16 +44,21 @@ export const GRIMOIRE_BASE_COORDS: GrimoireBaseCoords = {
   cantripSpacing: 15,
   slotXStart: 261,
   slotSpacing: 15,
+  // Repéré visuellement sur le fond (grimoire-*.jpg) : la ligne « 2e » est imprimée
+  // ~22px sous la ligne « 1er », pas juste au-dessus (l'ancienne valeur 250 < 255
+  // faisait chevaucher les cercles remplis du niveau 2 avec ceux du niveau 1,
+  // rendant la ligne « 2e » visuellement vide). Toutes les lignes suivantes sont
+  // ensuite espacées uniformément de 22px, d'où l'extrapolation du niveau 9 (428).
   slotRows: [
     { y: 255, maxCircles: 4 },
-    { y: 250, maxCircles: 3 },
     { y: 274, maxCircles: 3 },
     { y: 296, maxCircles: 3 },
     { y: 318, maxCircles: 3 },
-    { y: 340, maxCircles: 2 },
+    { y: 340, maxCircles: 3 },
     { y: 362, maxCircles: 2 },
-    { y: 384, maxCircles: 1 },
+    { y: 384, maxCircles: 2 },
     { y: 406, maxCircles: 1 },
+    { y: 428, maxCircles: 1 },
   ],
   spellTableStartY: 491,
   spellTableRowH: 22.5,
@@ -88,9 +93,12 @@ export const GRIMOIRE_PANEL_CLERIC = {
 };
 
 export const GRIMOIRE_PANEL_BARD = {
-  line1X: 450,
+  // 450 collait le nom du collège bardique (ex. « Collège des conteurs/bateleurs »,
+  // ~20 caractères) contre le bord droit déchiré du parchemin. Aligné avec le début
+  // des libellés « Collège bardique »/« Focaliseur arcanique » au-dessus (~408).
+  line1X: 408,
   line1Y: 255,
-  line2X: 450,
+  line2X: 408,
   line2Y: 310,
 };
 

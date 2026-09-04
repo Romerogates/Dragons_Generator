@@ -404,7 +404,20 @@ export class PdfGeneratorService {
     this.text(pdf, c.name, 140, 43);
     this.text(pdf, speciesLabel, 140, 66);
     this.text(pdf, c.civilization.label, 140, 90);
+
+    // Nom de classe : avec la sous-classe entre parenthèses (ex. « Barde (Collège
+    // des conteurs) »), le texte à taille 15 dépasse la bordure droite décorative
+    // de la page. On réduit la police par paliers jusqu'à ce qu'il tienne dans
+    // l'espace disponible (de x=400 à ~565, avant la bordure).
+    const classLabelMaxWidthMm = pxToMmX(565 - 400);
+    let classFontSize = 15;
+    pdf.setFontSize(classFontSize);
+    while (classFontSize > 9 && pdf.getTextWidth(classLabel) > classLabelMaxWidthMm) {
+      classFontSize -= 1;
+      pdf.setFontSize(classFontSize);
+    }
     this.text(pdf, classLabel, 400, 43);
+    pdf.setFontSize(15);
     // Emplacement « Niveau » sur la fiche (pas les XP — un perso niv. 1 a 0 XP).
     const pdfLevel = Math.max(1, c.totalLevel || c.classes[0]?.level || 1);
     this.text(pdf, String(pdfLevel), 432, 94);
@@ -432,7 +445,9 @@ export class PdfGeneratorService {
     this.text(pdf, String(c.abilities.charisme), 118, 700);
 
     pdf.setFontSize(10);
-    this.text(pdf, fmt(c.abilityModifiers.force), 160, 228);
+    // Même colonne x que les autres modificateurs (165) — l'ancien 160 décalait le
+    // « +3 » de Force d'une colonne par rapport aux cercles de +2 Dex/+0 Con etc.
+    this.text(pdf, fmt(c.abilityModifiers.force), 165, 228);
     this.text(pdf, fmt(c.abilityModifiers.dexterite), 165, 296);
     this.text(pdf, fmt(c.abilityModifiers.constitution), 165, 392);
     this.text(pdf, fmt(c.abilityModifiers.intelligence), 165, 445);
