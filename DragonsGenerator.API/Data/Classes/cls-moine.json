@@ -25,6 +25,22 @@
     "wp-ceste"
   ],
   "tool_proficiencies": [],
+  "multiclass_prerequisites": {
+    "all": [
+      "dex",
+      "wis"
+    ]
+  },
+  "multiclass_proficiencies": {
+    "armor": [],
+    "weapons": [
+      "wp-cat-simple",
+      "wp-epee-courte"
+    ],
+    "tools": [],
+    "skillChooseCount": 0,
+    "skillOptions": []
+  },
   "choice_pools": [
     {
       "id": "choice-skills-cls-moine",

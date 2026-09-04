@@ -16,6 +16,10 @@ import {
   buildCharacterSpellcasting,
   buildKnownSpellsFromCreation,
 } from './character-spellcasting.util';
+import {
+  combinedCasterLevel,
+  multiclassSpellSlotsForCasterLevel,
+} from './progression-choices.util';
 
 export interface CharacterBuildEditingRef {
   id: string;
@@ -49,8 +53,34 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
     now = new Date().toISOString(),
   } = input;
 
-  const spellcasting = buildCharacterSpellcasting(c, modifiers);
-  const features: FeatureInstance[] = [...c.speciesTraits, ...c.classFeatures];
+  // Multiclassage (RAW) : classes secondaires ajoutées en plus de la classe primaire ci-dessus.
+  const secondaryClasses = c.secondaryClasses ?? [];
+  const secondaryTotalLevel = secondaryClasses.reduce((sum, sc) => sum + (sc.level || 0), 0);
+  const totalCharacterLevel = targetLevel + secondaryTotalLevel;
+
+  // Emplacements de sorts combinés (RAW, table du multiclassage) : appliqué UNIQUEMENT si des
+  // classes secondaires existent, pour ne rien changer au comportement mono-classe existant — la
+  // table multiclasse redonne d'ailleurs exactement la table standard pour un seul lanceur complet.
+  let creationForSpellcasting = c;
+  if (secondaryClasses.length > 0) {
+    const casterLevel = combinedCasterLevel([
+      { level: targetLevel, spellcastingKind: c.spellcastingKind },
+      ...secondaryClasses.map((sc) => ({ level: sc.level, spellcastingKind: sc.spellcastingKind })),
+    ]);
+    if (casterLevel > 0) {
+      creationForSpellcasting = {
+        ...c,
+        classSpellSlots: multiclassSpellSlotsForCasterLevel(casterLevel),
+      };
+    }
+  }
+
+  const spellcasting = buildCharacterSpellcasting(creationForSpellcasting, modifiers);
+  const features: FeatureInstance[] = [
+    ...c.speciesTraits,
+    ...c.classFeatures,
+    ...secondaryClasses.flatMap((sc) => sc.classFeatures),
+  ];
   const featIds =
     c.selectedFeatIds?.length > 0
       ? c.selectedFeatIds
@@ -114,18 +144,37 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
       ...c.backgroundTools,
       ...(c.speciesFixedTools ?? []),
       ...(c.featBonusTools ?? []),
+      ...secondaryClasses.flatMap((sc) => sc.toolProficiencies),
     ]),
   ];
   const allArmor = [
-    ...new Set([...c.armorProficiencies, ...(c.speciesFixedArmor ?? []), ...(c.featBonusArmor ?? [])]),
+    ...new Set([
+      ...c.armorProficiencies,
+      ...(c.speciesFixedArmor ?? []),
+      ...(c.featBonusArmor ?? []),
+      ...secondaryClasses.flatMap((sc) => sc.armorProficiencies),
+    ]),
   ];
   const allWeapons = [
     ...new Set([
       ...c.weaponProficiencies,
       ...(c.speciesFixedWeapons ?? []),
       ...(c.talentBonusWeapons ?? []),
+      ...secondaryClasses.flatMap((sc) => sc.weaponProficiencies),
     ]),
   ];
+
+  // PV par classe (RAW : dés de vie groupés par type, ex. "1×d10 + 1×d6").
+  const hitDiceByType = new Map<number, number>();
+  hitDiceByType.set(c.hitDie, (hitDiceByType.get(c.hitDie) ?? 0) + targetLevel);
+  for (const sc of secondaryClasses) {
+    hitDiceByType.set(sc.hitDie, (hitDiceByType.get(sc.hitDie) ?? 0) + sc.level);
+  }
+  const hitDice = [...hitDiceByType.entries()].map(([dieType, total]) => ({
+    dieType,
+    total,
+    used: 0,
+  }));
 
   return {
     id: editing?.id ?? crypto.randomUUID(),
@@ -158,8 +207,15 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
         level: targetLevel,
         hitDie: c.hitDie,
       },
+      ...secondaryClasses.map((sc) => ({
+        classId: sc.classId,
+        classLabel: sc.className,
+        ...(sc.subclassId ? { subclassId: sc.subclassId, subclassLabel: sc.subclassName! } : {}),
+        level: sc.level,
+        hitDie: sc.hitDie,
+      })),
     ],
-    totalLevel: targetLevel,
+    totalLevel: totalCharacterLevel,
     experience: 0,
 
     abilities,
@@ -171,7 +227,7 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
       hitPointsCurrent: hpMax,
       hitPointsTemporary: 0,
       woundThreshold: Math.ceil(hpMax / 2),
-      hitDice: [{ dieType: c.hitDie, total: targetLevel, used: 0 }],
+      hitDice,
       fatigue: 0,
       deathSaves: { successes: 0, failures: 0 },
       inspiration: false,

@@ -307,4 +307,114 @@ describe('character-build.util', () => {
     expect(character.senses.hasBlindsight).toBeTrue();
     expect(character.senses.blindsightRadius).toBe(9);
   });
+
+  it('multiclassage (RAW) : fusionne classes/PV/maîtrises/emplacements de sorts des classes secondaires', () => {
+    const creation = structuredClone(INITIAL_CREATION_STATE);
+    creation.name = 'Multiclasse test';
+    creation.speciesId = 'spc-humain';
+    creation.speciesName = 'Humain';
+    creation.civilizationId = 'civ-nordique';
+    creation.civilizationName = 'Nordique';
+    creation.classId = 'cls-magicien';
+    creation.className = 'Magicien';
+    creation.hitDie = 6;
+    creation.targetLevel = 3;
+    creation.armorProficiencies = [];
+    creation.weaponProficiencies = ['wp-dague'];
+    creation.toolProficiencies = [];
+    creation.hasSpellcasting = true;
+    creation.spellcastingKind = 'wizard';
+    creation.spellcastingAbility = 'Intelligence';
+    creation.secondaryClasses = [
+      {
+        classId: 'cls-guerrier',
+        className: 'Guerrier',
+        subclassId: null,
+        subclassName: null,
+        level: 2,
+        hitDie: 10,
+        hpPerLevelAverage: 6,
+        hasSpellcasting: false,
+        spellcastingKind: null,
+        spellcastingAbility: null,
+        armorProficiencies: ['ar-light', 'ar-medium', 'ar-shield'],
+        weaponProficiencies: ['wp-cat-simple', 'wp-cat-martial'],
+        toolProficiencies: [],
+        skillChooseCount: 0,
+        skillOptions: [],
+        classFeatures: [
+          {
+            refId: 'feat-second-souffle',
+            name: 'Second souffle',
+            desc: 'Test',
+            source: 'class',
+            sourceDetail: 'Guerrier 1',
+            level: 1,
+          },
+        ],
+      },
+    ];
+
+    const abilities = {
+      force: 12,
+      dexterite: 12,
+      constitution: 14,
+      intelligence: 16,
+      sagesse: 10,
+      charisme: 8,
+    };
+    const modifiers = {
+      force: 1,
+      dexterite: 1,
+      constitution: 2,
+      intelligence: 3,
+      sagesse: 0,
+      charisme: -1,
+    };
+
+    const character = buildCharacterFromCreation({
+      creation,
+      abilities,
+      modifiers,
+      hpMax: 42,
+      proficiencyBonus: proficiencyBonusForLevel(5),
+      targetLevel: 3,
+      passivePerception: 10,
+      editing: { id: 'edit-multi-1', createdAt: '2026-01-01T00:00:00.000Z', cloudSynced: false },
+      now: '2026-09-04T00:00:00.000Z',
+    });
+
+    // Niveau total = classe primaire (3) + classe secondaire (2).
+    expect(character.totalLevel).toBe(5);
+    expect(character.classes.length).toBe(2);
+    expect(character.classes[0].classLabel).toBe('Magicien');
+    expect(character.classes[1]).toEqual(
+      jasmine.objectContaining({ classLabel: 'Guerrier', level: 2, hitDie: 10 }),
+    );
+
+    // Dés de vie groupés par type (1×d6 classe primaire + 1×d10 classe secondaire).
+    expect(character.vitality.hitDice).toEqual(
+      jasmine.arrayContaining([
+        jasmine.objectContaining({ dieType: 6, total: 3 }),
+        jasmine.objectContaining({ dieType: 10, total: 2 }),
+      ]),
+    );
+
+    // Maîtrises réduites de multiclassage unionnées aux maîtrises de la classe primaire.
+    expect(character.proficiencies.armor).toEqual(['ar-light', 'ar-medium', 'ar-shield']);
+    expect(character.proficiencies.weapons).toEqual(
+      jasmine.arrayContaining(['wp-dague', 'wp-cat-simple', 'wp-cat-martial']),
+    );
+
+    // Aptitudes de la classe secondaire fusionnées dans les features du personnage.
+    expect(character.features.some((f) => f.refId === 'feat-second-souffle')).toBeTrue();
+
+    // Niveau de lanceur combiné = 3 (Magicien plein lanceur) + 0 (Guerrier non lanceur) = 3 →
+    // emplacements de sorts niveau 1/2 de la table multiclasse standard.
+    const sc = character.spellcasting as { spellSlots?: { level: number; max: number; used: number }[] } | null;
+    expect(sc?.spellSlots).toEqual([
+      { level: 1, max: 4, used: 0 },
+      { level: 2, max: 2, used: 0 },
+    ]);
+  });
 });

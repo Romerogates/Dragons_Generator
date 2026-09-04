@@ -25,6 +25,18 @@
     "wp-fronde"
   ],
   "tool_proficiencies": [],
+  "multiclass_prerequisites": {
+    "all": [
+      "cha"
+    ]
+  },
+  "multiclass_proficiencies": {
+    "armor": [],
+    "weapons": [],
+    "tools": [],
+    "skillChooseCount": 0,
+    "skillOptions": []
+  },
   "choice_pools": [
     {
       "id": "choice-skills-cls-ensorceleur",

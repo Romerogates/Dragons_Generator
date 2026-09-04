@@ -28,6 +28,26 @@
     "wp-cat-martial"
   ],
   "tool_proficiencies": [],
+  "multiclass_prerequisites": {
+    "any": [
+      "str",
+      "dex"
+    ]
+  },
+  "multiclass_proficiencies": {
+    "armor": [
+      "ar-light",
+      "ar-medium",
+      "ar-shield"
+    ],
+    "weapons": [
+      "wp-cat-simple",
+      "wp-cat-martial"
+    ],
+    "tools": [],
+    "skillChooseCount": 0,
+    "skillOptions": []
+  },
   "choice_pools": [
     {
       "id": "choice-skills-cls-guerrier",

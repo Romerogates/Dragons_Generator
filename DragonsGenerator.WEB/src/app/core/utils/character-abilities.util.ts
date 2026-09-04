@@ -88,6 +88,26 @@ export function computeHitPointsMax(input: HitPointsInput): number {
   return hp;
 }
 
+/**
+ * PV apportés par les classes de multiclassage (RAW : jamais de "PV max au niveau 1" — cette
+ * ligne n'existe que pour la toute première classe/niveau 1 du personnage, déjà comptée par
+ * `computeHitPointsMax` ci-dessus). Chaque niveau de chaque classe secondaire ajoute
+ * `hpPerLevelAverage + modificateur de Constitution`.
+ */
+export function computeSecondaryClassesHitPoints(
+  secondaryClasses: { level: number; hitDie: number; hpPerLevelAverage: number }[],
+  constitutionMod: number,
+): number {
+  return secondaryClasses.reduce((sum, entry) => {
+    const level = Math.max(0, entry.level || 0);
+    const avg =
+      entry.hpPerLevelAverage > 0
+        ? entry.hpPerLevelAverage
+        : Math.floor((entry.hitDie || 8) / 2) + 1;
+    return sum + level * (avg + constitutionMod);
+  }, 0);
+}
+
 export function computePassivePerception(
   wisdomMod: number,
   hasPerceptionProficiency: boolean,

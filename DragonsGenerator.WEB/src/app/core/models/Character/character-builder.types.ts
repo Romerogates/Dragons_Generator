@@ -133,6 +133,38 @@ export interface ClassSelection {
   classSpellSlots?: { level: number; max: number }[];
 }
 
+/**
+ * Classe de multiclassage (RAW 5e) : ajoutée EN PLUS de la classe primaire (`ClassSelection`
+ * ci-dessus, dont le flux/les champs restent inchangés pour un personnage mono-classe). Chaque
+ * classe secondaire a son propre compteur de niveau indépendant (1–20, plafonné par le niveau
+ * total restant) et n'accorde que les maîtrises RÉDUITES de multiclassage
+ * (`multiclass_proficiencies` JSON), jamais les maîtrises de départ complètes ni de nouvelles
+ * maîtrises de jets de sauvegarde.
+ */
+export interface SecondaryClassSelection {
+  classId: string;
+  className: string;
+  subclassId?: string | null;
+  subclassName?: string | null;
+  /** Niveau dans CETTE classe (indépendant du niveau de la classe primaire). */
+  level: number;
+  hitDie: number;
+  hpPerLevelAverage: number;
+  hasSpellcasting: boolean;
+  spellcastingKind: SpellcastingKind | null;
+  spellcastingAbility: Ability | null;
+  /** Maîtrises réduites de multiclassage (jamais les maîtrises de départ complètes). */
+  armorProficiencies: string[];
+  weaponProficiencies: string[];
+  toolProficiencies: string[];
+  /** Nombre de compétences de multiclassage au choix (souvent 0 ou 1 — ex. Barde/Rôdeur/Roublard). */
+  skillChooseCount: number;
+  skillOptions: string[];
+  /** Aptitudes de classe/sous-classe déjà résolues au niveau `level` de cette classe. */
+  classFeatures: FeatureInstance[];
+  classProgressionResources?: Record<string, number | string | null>;
+}
+
 export interface IdentitySelection {
   name?: string;
   sex?: 'M' | 'F' | 'X';
@@ -191,6 +223,14 @@ export type ExtendedCharacterCreation = CharacterCreation & {
   talentBonusLangApplied?: number;
   /** Compteur interne wizard : langues exotiques déjà comptées pour le don Talent (delta additif). */
   talentExoticLangApplied?: number;
+  /**
+   * Classes de multiclassage (RAW), en plus de la classe primaire ci-dessus. Vide pour tout
+   * personnage mono-classe (comportement strictement identique à avant). Voir
+   * `SecondaryClassSelection` pour le détail des champs et des règles appliquées.
+   */
+  secondaryClasses?: SecondaryClassSelection[];
+  /** Compétences choisies au titre des maîtrises RÉDUITES de multiclassage (étape Savoirs). */
+  secondaryClassSelectedSkills?: string[];
 };
 
 export const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
@@ -278,6 +318,8 @@ export const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   talentBonusCantrips: [],
   talentBonusLangApplied: 0,
   talentExoticLangApplied: 0,
+  secondaryClasses: [],
+  secondaryClassSelectedSkills: [],
   classChoiceAnswers: {},
   asiBonuses: {},
   selectedFeatId: null,

@@ -15,6 +15,7 @@ import {
   computeAbilityModifiersFromScores,
   computeFinalAbilities,
   computeHitPointsMax,
+  computeSecondaryClassesHitPoints,
   computePassivePerception,
 } from '../utils/character-abilities.util';
 import {
@@ -62,6 +63,7 @@ import {
   type ClassSelection,
   type ExtendedCharacterCreation,
   type IdentitySelection,
+  type SecondaryClassSelection,
   type SpeciesSelection,
 } from '../models/Character/character-builder.types';
 
@@ -72,6 +74,7 @@ export type {
   ExtendedCharacterCreation,
   IdentitySelection,
   RacialSpellGrant,
+  SecondaryClassSelection,
   SpeciesSelection,
 } from '../models/Character/character-builder.types';
 
@@ -151,9 +154,23 @@ export class CharacterBuilderService {
     computeAbilityModifiersFromScores(this.finalAbilities()),
   );
 
+  /**
+   * Somme des niveaux de toutes les classes de multiclassage (0 si aucun multiclassage). Le
+   * niveau de la classe PRIMAIRE reste `targetLevel` (comportement inchangé pour un personnage
+   * mono-classe) ; chaque classe secondaire a son propre compteur de niveau indépendant.
+   */
+  readonly secondaryClassesTotalLevel = computed<number>(() =>
+    (this.creation().secondaryClasses ?? []).reduce((sum, sc) => sum + (sc.level || 0), 0),
+  );
+
+  /** Niveau TOTAL du personnage (primaire + multiclassage), utilisé pour le bonus de maîtrise et l'affichage. */
+  readonly totalCharacterLevel = computed<number>(() =>
+    Math.min(20, (this.creation().targetLevel || 1) + this.secondaryClassesTotalLevel()),
+  );
+
   readonly hitPointsMax = computed<number>(() => {
     const c = this.creation();
-    return computeHitPointsMax({
+    const primary = computeHitPointsMax({
       targetLevel: c.targetLevel || 1,
       hpAtLevel1: c.hpAtLevel1,
       hpPerLevelAverage: c.hpPerLevelAverage,
@@ -164,13 +181,22 @@ export class CharacterBuilderService {
       subspeciesId: c.subspeciesId,
       classFeatures: c.classFeatures ?? [],
     });
+    const secondary = computeSecondaryClassesHitPoints(
+      c.secondaryClasses ?? [],
+      this.abilityModifiers().constitution,
+    );
+    return primary + secondary;
   });
 
   readonly proficiencyBonus = computed<number>(() =>
-    proficiencyBonusForLevel(this.creation().targetLevel || 1),
+    proficiencyBonusForLevel(this.totalCharacterLevel()),
   );
 
   readonly targetLevel = computed(() => Math.min(20, Math.max(1, this.creation().targetLevel || 1)));
+
+  readonly secondaryClasses = computed<SecondaryClassSelection[]>(
+    () => this.creation().secondaryClasses ?? [],
+  );
 
   readonly woundThreshold = computed<number>(() => {
     return Math.ceil(this.hitPointsMax() / 2);
@@ -509,6 +535,55 @@ export class CharacterBuilderService {
     });
   }
 
+  // ==========================================================================
+  // MULTICLASSAGE (RAW) — classes secondaires, en plus de la classe primaire ci-dessus.
+  // ==========================================================================
+
+  /** Ajoute une classe de multiclassage. Aucun effet si la classe est déjà primaire ou déjà ajoutée. */
+  addSecondaryClass(selection: SecondaryClassSelection): void {
+    this.creation.update((c) => {
+      const existing = c.secondaryClasses ?? [];
+      if (c.classId === selection.classId) return c;
+      if (existing.some((sc) => sc.classId === selection.classId)) return c;
+      return { ...c, secondaryClasses: [...existing, selection] };
+    });
+  }
+
+  /** Change le niveau d'une classe secondaire déjà ajoutée (plafonné à 20 - reste des niveaux). */
+  updateSecondaryClassLevel(index: number, level: number): void {
+    this.creation.update((c) => {
+      const list = [...(c.secondaryClasses ?? [])];
+      if (!list[index]) return c;
+      const clamped = Math.max(1, Math.floor(Number(level)) || 1);
+      list[index] = { ...list[index], level: clamped };
+      return { ...c, secondaryClasses: list };
+    });
+  }
+
+  /** Met à jour la sous-classe et/ou les aptitudes recalculées d'une classe secondaire. */
+  updateSecondaryClassDetails(index: number, patch: Partial<Omit<SecondaryClassSelection, 'classId'>>): void {
+    this.creation.update((c) => {
+      const list = [...(c.secondaryClasses ?? [])];
+      if (!list[index]) return c;
+      list[index] = { ...list[index], ...patch };
+      return { ...c, secondaryClasses: list };
+    });
+  }
+
+  /** Compétences choisies à l'étape Savoirs au titre des maîtrises réduites de multiclassage. */
+  setSecondaryClassSkills(skills: string[]): void {
+    this.creation.update((c) => ({ ...c, secondaryClassSelectedSkills: [...new Set(skills)] }));
+  }
+
+  removeSecondaryClass(index: number): void {
+    this.creation.update((c) => {
+      const list = [...(c.secondaryClasses ?? [])];
+      if (!list[index]) return c;
+      list.splice(index, 1);
+      return { ...c, secondaryClasses: list };
+    });
+  }
+
   /** Fusionne les maîtrises d'armes/outils choisies à l'étape Savoirs. */
   mergeClassProficiencies(
     extraWeapons: string[],
@@ -654,6 +729,9 @@ export class CharacterBuilderService {
       bonusLanguageCount: (c.bonusLanguageCount || 0) - (c.classBonusLanguageCount || 0),
       requiredExoticLanguageCount: 0,
       requiredBaseLanguageCount: 0,
+      // Changer/retirer la classe primaire invalide toute configuration de multiclassage
+      // (prérequis, maîtrises réduites, sous-classes recalculées à partir d'un autre niveau).
+      secondaryClasses: [],
       classChoiceAnswers: {},
       asiBonuses: {},
       selectedFeatId: null,

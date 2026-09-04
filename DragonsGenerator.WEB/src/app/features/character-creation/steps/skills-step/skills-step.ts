@@ -71,6 +71,8 @@ export class SkillsStep implements OnInit {
   /** Choix imbriqués de sous-classe (skill_proficiency / skill_or_tool_proficiency). */
   readonly subclassSkillChoiceAnswers = signal<Map<string, string[]>>(new Map());
   readonly classJson = signal<any>(null);
+  /** Compétences choisies au titre des maîtrises réduites de multiclassage (Barde/Rôdeur/Roublard...). */
+  readonly selectedSecondaryClassSkills = signal<string[]>([]);
 
   // Pour les historiques personnalisés
   readonly customSkillInput = signal<string>('');
@@ -110,6 +112,7 @@ export class SkillsStep implements OnInit {
     }
     this.classWeaponAnswers.set(weaponMap);
     this.classToolAnswers.set(toolMap);
+    this.selectedSecondaryClassSkills.set([...(c.secondaryClassSelectedSkills ?? [])]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     this.dataService.getSkills().subscribe({
@@ -202,6 +205,39 @@ export class SkillsStep implements OnInit {
       !this.selectedSpeciesSkills().map(normalizeSkillId).includes(id)
     ) {
       this.selectedClassSkills.update((arr) => [...arr, id]);
+    }
+  }
+
+  // === COMPÉTENCES DE MULTICLASSAGE (maîtrises RÉDUITES, ex. Barde/Rôdeur/Roublard +1) ===
+  readonly secondaryClassSkillChooseCount = computed(() =>
+    this.builder.secondaryClasses().reduce((sum, sc) => sum + (sc.skillChooseCount || 0), 0),
+  );
+
+  readonly secondaryClassSkillOptions = computed(() => {
+    const secondaries = this.builder.secondaryClasses();
+    if (secondaries.some((sc) => sc.skillOptions.includes('any'))) {
+      return Object.values(this.skillMap());
+    }
+    const ids = new Set(secondaries.flatMap((sc) => sc.skillOptions));
+    return [...ids].map((id) => resolveSkillInfo(id, this.skillMap())).filter((s): s is SkillInfo => !!s);
+  });
+
+  readonly secondaryClassSkillsRemaining = computed(() =>
+    Math.max(0, this.secondaryClassSkillChooseCount() - this.selectedSecondaryClassSkills().length),
+  );
+
+  toggleSecondaryClassSkill(skillId: string): void {
+    const id = normalizeSkillId(skillId);
+    const current = this.selectedSecondaryClassSkills().map(normalizeSkillId);
+    if (current.includes(id)) {
+      this.selectedSecondaryClassSkills.update((arr) => arr.filter((x) => normalizeSkillId(x) !== id));
+    } else if (
+      current.length < this.secondaryClassSkillChooseCount() &&
+      !this.selectedClassSkills().map(normalizeSkillId).includes(id) &&
+      !this.selectedBgSkills().map(normalizeSkillId).includes(id) &&
+      !this.selectedSpeciesSkills().map(normalizeSkillId).includes(id)
+    ) {
+      this.selectedSecondaryClassSkills.update((arr) => [...arr, id]);
     }
   }
 
@@ -943,6 +979,7 @@ export class SkillsStep implements OnInit {
     if (this.classWeaponsRemaining() > 0) return false;
     if (this.classToolsRemaining() > 0) return false;
     if (this.subclassSkillChoiceRemaining() > 0) return false;
+    if (this.secondaryClassSkillsRemaining() > 0) return false;
 
     if (this.isCustomBg()) {
       if (this.customBgToolsRemaining() > 0) return false;
@@ -1108,6 +1145,7 @@ export class SkillsStep implements OnInit {
           ...this.selectedSpeciesSkills(),
           ...subclassSkills,
           ...nestedSkillsFinal,
+          ...this.selectedSecondaryClassSkills(),
         ]),
       ],
       this.selectedBgSkills(),
@@ -1117,6 +1155,7 @@ export class SkillsStep implements OnInit {
     this.builder.setExpertiseSkills([
       ...new Set([...this.selectedExpertise(), ...subclassExpertise, ...nestedExpertiseFinal]),
     ]);
+    this.builder.setSecondaryClassSkills(this.selectedSecondaryClassSkills());
 
     const extraWeapons = [...this.classWeaponAnswers().values()].flat();
     const extraTools = [...this.classToolAnswers().values(), nestedToolPicks].flat();

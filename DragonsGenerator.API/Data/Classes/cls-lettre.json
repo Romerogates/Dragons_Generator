@@ -25,6 +25,19 @@
     "wp-baton-de-combat"
   ],
   "tool_proficiencies": [],
+  "multiclass_prerequisites": {
+    "any": [
+      "int",
+      "wis"
+    ]
+  },
+  "multiclass_proficiencies": {
+    "armor": [],
+    "weapons": [],
+    "tools": [],
+    "skillChooseCount": 0,
+    "skillOptions": []
+  },
   "choice_pools": [
     {
       "id": "choice-weapons-cls-lettre",

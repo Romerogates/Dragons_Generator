@@ -25,6 +25,18 @@
     "wp-fronde"
   ],
   "tool_proficiencies": [],
+  "multiclass_prerequisites": {
+    "all": [
+      "int"
+    ]
+  },
+  "multiclass_proficiencies": {
+    "armor": [],
+    "weapons": [],
+    "tools": [],
+    "skillChooseCount": 0,
+    "skillOptions": []
+  },
   "choice_pools": [
     {
       "id": "choice-skills-cls-magicien",

@@ -3,6 +3,7 @@ import type { Spell } from '@core/models/Spells/spell';
 import {
   INITIAL_CREATION_STATE,
   type ExtendedCharacterCreation,
+  type SecondaryClassSelection,
 } from '@core/models/Character/character-builder.types';
 import type { CharacterBuildEditingRef } from './character-build.util';
 import { aggregateAsiChoices } from './character-abilities.util';
@@ -72,7 +73,9 @@ export function mapCharacterToEditState(
   creation.className = primaryClass?.classLabel ?? null;
   creation.subclassId = primaryClass?.subclassId ?? null;
   creation.subclassName = primaryClass?.subclassLabel ?? null;
-  creation.targetLevel = saved.totalLevel || primaryClass?.level || 1;
+  // Niveau de la classe PRIMAIRE uniquement (pas `saved.totalLevel`, qui inclut les classes de
+  // multiclassage reconstruites séparément ci-dessous dans `secondaryClasses`).
+  creation.targetLevel = primaryClass?.level || 1;
   creation.hitDie = primaryClass?.hitDie ?? 0;
   creation.hpAtLevel1 = primaryClass?.hitDie ?? 0;
   creation.hpPerLevelAverage = primaryClass?.hitDie
@@ -90,6 +93,32 @@ export function mapCharacterToEditState(
     (f) => f.source === 'class' || f.source === 'subclass',
   );
   creation.expertiseSkills = saved.proficiencies.expertiseSkills ?? [];
+  // Multiclassage (RAW) : reconstruit les classes secondaires depuis `saved.classes[1..]`.
+  // Best-effort : maîtrises/aptitudes détaillées de CES classes sont déjà fusionnées dans les
+  // champs globaux ci-dessus (`armorProficiencies`/`weaponProficiencies`/`toolProficiencies`/
+  // `classFeatures`) au moment de la sauvegarde initiale — rien n'est donc perdu sur la fiche.
+  // Seul l'affichage du panneau "Multiclassage" au sein du wizard se recalcule dès que le joueur
+  // touche à nouveau au niveau/à la sous-classe de la classe concernée.
+  creation.secondaryClasses = saved.classes.slice(1).map(
+    (cls): SecondaryClassSelection => ({
+      classId: cls.classId,
+      className: cls.classLabel,
+      subclassId: cls.subclassId ?? null,
+      subclassName: cls.subclassLabel ?? null,
+      level: cls.level,
+      hitDie: cls.hitDie,
+      hpPerLevelAverage: Math.floor(cls.hitDie / 2) + 1,
+      hasSpellcasting: false,
+      spellcastingKind: null,
+      spellcastingAbility: null,
+      armorProficiencies: [],
+      weaponProficiencies: [],
+      toolProficiencies: [],
+      skillChooseCount: 0,
+      skillOptions: [],
+      classFeatures: [],
+    }),
+  );
   // Restaure les choix de progression (ancêtre draconique, domaine, métamagie…) et les dons/ASI
   // pour que la réédition à un niveau supérieur ne perde pas les choix déjà faits.
   creation.classChoiceAnswers = saved.classChoiceAnswers ?? {};

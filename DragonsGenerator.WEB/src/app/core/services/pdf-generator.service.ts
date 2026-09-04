@@ -422,10 +422,14 @@ export class PdfGeneratorService {
       ? `${c.species.label} (${c.species.subspeciesLabel})`
       : c.species.label;
     const classLabel = (() => {
-      const cls = c.classes[0];
-      return cls.subclassLabel
-        ? `${cls.classLabel} (${cls.subclassLabel})`
-        : cls.classLabel;
+      // Multiclassage (RAW) : "Guerrier 5 (Champion) / Magicien 3" — le libellé complet se
+      // rétrécit automatiquement (voir classFontSize ci-dessous) pour tenir sur la ligne.
+      const labelFor = (cls: Character['classes'][number], withLevel: boolean) => {
+        const base = cls.subclassLabel ? `${cls.classLabel} (${cls.subclassLabel})` : cls.classLabel;
+        return withLevel ? `${base} ${cls.level}` : base;
+      };
+      if (c.classes.length <= 1) return labelFor(c.classes[0], false);
+      return c.classes.map((cls) => labelFor(cls, true)).join(' / ');
     })();
 
     pdf.setFontSize(15);
@@ -452,7 +456,8 @@ export class PdfGeneratorService {
 
     this.text(pdf, String(c.vitality.hitPointsCurrent), 230, 123);
     this.text(pdf, String(c.vitality.hitPointsTemporary), 250, 171);
-    this.text(pdf, `1d${c.classes[0].hitDie}`, 438, 123);
+    const hitDiceLabel = c.vitality.hitDice.map((hd) => `${hd.total}d${hd.dieType}`).join('+');
+    this.text(pdf, hitDiceLabel || `1d${c.classes[0].hitDie}`, 438, 123);
 
     pdf.setFontSize(15);
     this.text(pdf, `+${c.proficiencyBonus}`, 55, 173);

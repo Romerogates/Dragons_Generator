@@ -23,6 +23,22 @@
     "wp-simple"
   ],
   "tool_proficiencies": [],
+  "multiclass_prerequisites": {
+    "all": [
+      "cha"
+    ]
+  },
+  "multiclass_proficiencies": {
+    "armor": [
+      "ar-light"
+    ],
+    "weapons": [
+      "wp-cat-simple"
+    ],
+    "tools": [],
+    "skillChooseCount": 0,
+    "skillOptions": []
+  },
   "choice_pools": [
     {
       "id": "choice-skills-cls-sorcier",

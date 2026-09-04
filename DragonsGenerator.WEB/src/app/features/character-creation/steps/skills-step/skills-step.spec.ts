@@ -82,6 +82,8 @@ describe('SkillsStep', () => {
           provide: CharacterBuilderService,
           useValue: {
             creation: creationSignal,
+            secondaryClasses: () => [],
+            setSecondaryClassSkills: () => {},
             targetLevel: () => 1,
             abilityModifiers: () => ({
               force: 0,
@@ -137,6 +139,8 @@ describe('SkillsStep', () => {
           provide: CharacterBuilderService,
           useValue: {
             creation: creationSignal,
+            secondaryClasses: () => [],
+            setSecondaryClassSkills: () => {},
             targetLevel: () => 1,
             abilityModifiers: () => ({
               force: 0,
@@ -254,6 +258,8 @@ describe('SkillsStep', () => {
           provide: CharacterBuilderService,
           useValue: {
             creation: creationSignal,
+            secondaryClasses: () => [],
+            setSecondaryClassSkills: () => {},
             targetLevel: () => 1,
             abilityModifiers: () => ({
               force: 0,
@@ -375,6 +381,8 @@ describe('SkillsStep', () => {
           provide: CharacterBuilderService,
           useValue: {
             creation: creationSignal,
+            secondaryClasses: () => [],
+            setSecondaryClassSkills: () => {},
             targetLevel: () => 1,
             abilityModifiers: () => ({
               force: 0,

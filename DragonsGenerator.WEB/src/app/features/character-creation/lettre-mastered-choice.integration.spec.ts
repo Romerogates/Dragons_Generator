@@ -134,6 +134,8 @@ describe('Lettré mastered-choice integration', () => {
           provide: CharacterBuilderService,
           useValue: {
             creation: creationSignal,
+            secondaryClasses: () => [],
+            setSecondaryClassSkills: () => {},
             targetLevel: () => 1,
             abilityModifiers: () => ({
               force: 0,
@@ -190,6 +192,8 @@ describe('Lettré mastered-choice integration', () => {
           provide: CharacterBuilderService,
           useValue: {
             creation: creationSignal,
+            secondaryClasses: () => [],
+            setSecondaryClassSkills: () => {},
             nextStep: jasmine.createSpy('nextStep'),
             previousStep: jasmine.createSpy('previousStep'),
           },

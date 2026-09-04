@@ -27,6 +27,23 @@
     "wp-martial"
   ],
   "tool_proficiencies": [],
+  "multiclass_prerequisites": {
+    "all": [
+      "str"
+    ]
+  },
+  "multiclass_proficiencies": {
+    "armor": [
+      "ar-shield"
+    ],
+    "weapons": [
+      "wp-cat-simple",
+      "wp-cat-martial"
+    ],
+    "tools": [],
+    "skillChooseCount": 0,
+    "skillOptions": []
+  },
   "choice_pools": [
     {
       "id": "choice-skills-cls-barbare",

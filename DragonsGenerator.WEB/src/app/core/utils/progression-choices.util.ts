@@ -4,6 +4,7 @@
  */
 
 import type { CharacterClass, FeatureDetail } from '@core/models/CharacterClasses/character-class';
+import type { AbilityKey, AbilityScores, SpellcastingKind } from '@core/models/Character/character';
 import { invocationsForLevel, PACT_BOONS } from '../data/warlock-invocations.data';
 import { metamagicLabel } from '../data/metamagic-labels.data';
 import { labelForGameId } from './game-id-labels';
@@ -1377,4 +1378,193 @@ export function classNeedsAsi(
   maxLevel = PROGRESSION_MAX_LEVEL,
 ): boolean {
   return countAsiSlots(cls, level, maxLevel) > 0;
+}
+
+// =============================================================================
+// MULTICLASSAGE (RAW 5e)
+// =============================================================================
+// Une classe "primaire" (`ClassSelection`) garde tout le flux/toutes les mécaniques existantes
+// inchangées. Une classe secondaire (`SecondaryClassSelection`) est ajoutée EN PLUS, avec :
+// - des prérequis de caractéristiques pour pouvoir être prise (`multiclass_prerequisites`),
+// - des maîtrises RÉDUITES au lieu des maîtrises de départ complètes (`multiclass_proficiencies`),
+// - jamais de nouvelle maîtrise de jet de sauvegarde (RAW),
+// - ses propres paliers ASI (sur SON niveau, pas le niveau total du personnage),
+// - des emplacements de sorts combinés via la table multiclasse officielle (voir plus bas).
+
+const MULTICLASS_ABILITY_KEY: Record<string, AbilityKey> = {
+  str: 'force',
+  dex: 'dexterite',
+  con: 'constitution',
+  int: 'intelligence',
+  wis: 'sagesse',
+  cha: 'charisme',
+};
+
+export interface MulticlassPrerequisites {
+  /** Toutes ces caractéristiques doivent être ≥ 13 (ex. Paladin : Force ET Charisme). */
+  all?: string[];
+  /** Au moins une de ces caractéristiques doit être ≥ 13 (ex. Guerrier : Force OU Dextérité). */
+  any?: string[];
+}
+
+const MULTICLASS_PREREQUISITE_SCORE = 13;
+
+/**
+ * Vérifie les prérequis de caractéristiques (RAW) pour prendre/continuer une classe en
+ * multiclassage, d'après le champ JSON `multiclass_prerequisites` de la classe
+ * (`{ all?: string[]; any?: string[] }`, clés courtes `str/dex/con/int/wis/cha`). Une classe sans
+ * ce champ (ou vide) n'a aucun prérequis — les scores finaux sont toujours acceptés.
+ */
+export function multiclassPrerequisitesMet(
+  cls: CharacterClass,
+  abilities: AbilityScores,
+): boolean {
+  const raw = (cls.data as Record<string, unknown>)['multiclass_prerequisites'] as
+    | MulticlassPrerequisites
+    | undefined;
+  if (!raw) return true;
+  const scoreFor = (code: string): number => {
+    const key = MULTICLASS_ABILITY_KEY[code.toLowerCase()];
+    return key ? (abilities[key] ?? 0) : 0;
+  };
+  if (raw.all?.length && !raw.all.every((code) => scoreFor(code) >= MULTICLASS_PREREQUISITE_SCORE)) {
+    return false;
+  }
+  if (raw.any?.length && !raw.any.some((code) => scoreFor(code) >= MULTICLASS_PREREQUISITE_SCORE)) {
+    return false;
+  }
+  return true;
+}
+
+/** Libellé humain des prérequis de multiclassage (ex. "Force 13" ou "Force 13 ou Dextérité 13"). */
+export function multiclassPrerequisiteLabel(cls: CharacterClass): string | null {
+  const raw = (cls.data as Record<string, unknown>)['multiclass_prerequisites'] as
+    | MulticlassPrerequisites
+    | undefined;
+  if (!raw) return null;
+  const labelFor = (code: string) => {
+    const map: Record<string, string> = {
+      str: 'Force',
+      dex: 'Dextérité',
+      con: 'Constitution',
+      int: 'Intelligence',
+      wis: 'Sagesse',
+      cha: 'Charisme',
+    };
+    return `${map[code.toLowerCase()] ?? code} ${MULTICLASS_PREREQUISITE_SCORE}`;
+  };
+  const parts: string[] = [];
+  if (raw.all?.length) parts.push(raw.all.map(labelFor).join(' et '));
+  if (raw.any?.length) parts.push(raw.any.map(labelFor).join(' ou '));
+  return parts.length ? parts.join(' et ') : null;
+}
+
+export interface MulticlassProficiencies {
+  armor: string[];
+  weapons: string[];
+  tools: string[];
+  /** Nombre de compétences de multiclassage au choix (souvent 0 ou 1). */
+  skillChooseCount: number;
+  skillOptions: string[];
+}
+
+const EMPTY_MULTICLASS_PROFICIENCIES: MulticlassProficiencies = {
+  armor: [],
+  weapons: [],
+  tools: [],
+  skillChooseCount: 0,
+  skillOptions: [],
+};
+
+/**
+ * Maîtrises RÉDUITES accordées quand une classe est prise en multiclassage (pas comme classe
+ * primaire) — RAW : jamais les maîtrises de départ complètes, jamais de nouvelle maîtrise de jet
+ * de sauvegarde. Lit le champ JSON `multiclass_proficiencies` de la classe ; classe absente du
+ * champ (ex. Magicien/Ensorceleur : aucune maîtrise de multiclassage) → bloc vide.
+ */
+export function multiclassProficiencies(cls: CharacterClass): MulticlassProficiencies {
+  const raw = (cls.data as Record<string, unknown>)['multiclass_proficiencies'] as
+    | Partial<MulticlassProficiencies>
+    | undefined;
+  if (!raw) return EMPTY_MULTICLASS_PROFICIENCIES;
+  return {
+    armor: raw.armor ?? [],
+    weapons: raw.weapons ?? [],
+    tools: raw.tools ?? [],
+    skillChooseCount: raw.skillChooseCount ?? 0,
+    skillOptions: raw.skillOptions ?? [],
+  };
+}
+
+/** Fraction de niveau de lanceur (RAW) selon le `kind` de grimoire de chaque classe lanceuse. */
+const FULL_CASTER_KINDS = new Set<SpellcastingKind>(['wizard', 'sorcerer', 'cleric', 'druid', 'bard']);
+const HALF_CASTER_KINDS = new Set<SpellcastingKind>(['ranger', 'paladin']);
+const THIRD_CASTER_KINDS = new Set<SpellcastingKind>(['fighter_eldritch_knight']);
+
+/** Fraction de niveau de lanceur qu'une classe apporte à la table multiclasse combinée. */
+function casterLevelFraction(kind: SpellcastingKind | null | undefined): 'full' | 'half' | 'third' | null {
+  if (!kind) return null;
+  if (FULL_CASTER_KINDS.has(kind)) return 'full';
+  if (HALF_CASTER_KINDS.has(kind)) return 'half';
+  if (THIRD_CASTER_KINDS.has(kind)) return 'third';
+  // Magie de Pacte (Occultiste) et non-lanceurs ne contribuent JAMAIS à la table combinée
+  // (Pacte reste toujours un pool d'emplacements séparé, déjà géré par `pactSlots`).
+  return null;
+}
+
+/**
+ * Niveau de lanceur combiné (RAW, table du multiclassage p. 165 PHB) : lanceurs complets comptent
+ * pour leur niveau entier, demi-lanceurs pour `floor(niveau / 2)`, tiers-lanceurs pour
+ * `floor(niveau / 3)`. L'Occultiste (Magie de Pacte) est exclu de cette somme.
+ */
+export function combinedCasterLevel(
+  entries: { level: number; spellcastingKind: SpellcastingKind | null | undefined }[],
+): number {
+  let total = 0;
+  for (const entry of entries) {
+    const fraction = casterLevelFraction(entry.spellcastingKind);
+    if (!fraction) continue;
+    if (fraction === 'full') total += entry.level;
+    else if (fraction === 'half') total += Math.floor(entry.level / 2);
+    else total += Math.floor(entry.level / 3);
+  }
+  return total;
+}
+
+/** Table RAW des emplacements de sorts pour un lanceur "complet" niveau 1–20 (PHB p. 165), utilisée
+ * telle quelle pour le niveau de lanceur COMBINÉ en multiclassage. Index = niveau de lanceur - 1,
+ * valeur = emplacements par niveau de sort (indices 0-8 = sorts niv. 1 à 9). */
+export const MULTICLASS_SPELL_SLOTS_TABLE: number[][] = [
+  [2, 0, 0, 0, 0, 0, 0, 0, 0],
+  [3, 0, 0, 0, 0, 0, 0, 0, 0],
+  [4, 2, 0, 0, 0, 0, 0, 0, 0],
+  [4, 3, 0, 0, 0, 0, 0, 0, 0],
+  [4, 3, 2, 0, 0, 0, 0, 0, 0],
+  [4, 3, 3, 0, 0, 0, 0, 0, 0],
+  [4, 3, 3, 1, 0, 0, 0, 0, 0],
+  [4, 3, 3, 2, 0, 0, 0, 0, 0],
+  [4, 3, 3, 3, 1, 0, 0, 0, 0],
+  [4, 3, 3, 3, 2, 0, 0, 0, 0],
+  [4, 3, 3, 3, 2, 1, 0, 0, 0],
+  [4, 3, 3, 3, 2, 1, 0, 0, 0],
+  [4, 3, 3, 3, 2, 1, 1, 0, 0],
+  [4, 3, 3, 3, 2, 1, 1, 0, 0],
+  [4, 3, 3, 3, 2, 1, 1, 1, 0],
+  [4, 3, 3, 3, 2, 1, 1, 1, 0],
+  [4, 3, 3, 3, 2, 1, 1, 1, 1],
+  [4, 3, 3, 3, 3, 1, 1, 1, 1],
+  [4, 3, 3, 3, 3, 2, 1, 1, 1],
+  [4, 3, 3, 3, 3, 2, 2, 1, 1],
+];
+
+/**
+ * Emplacements de sorts au niveau de lanceur combiné donné (1–20), au format déjà utilisé par
+ * `classSpellSlots` (`{ level, max }[]`, sans entrée pour les niveaux à 0 emplacement).
+ */
+export function multiclassSpellSlotsForCasterLevel(casterLevel: number): { level: number; max: number }[] {
+  if (casterLevel < 1) return [];
+  const row = MULTICLASS_SPELL_SLOTS_TABLE[Math.min(20, casterLevel) - 1];
+  return row
+    .map((max, idx) => ({ level: idx + 1, max }))
+    .filter((s) => s.max > 0);
 }

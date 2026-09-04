@@ -20,7 +20,12 @@ import {
   type AbilityKey,
   type AsiChoiceSlot,
 } from '@core/models/Character/character';
-import { asiLevelsForClass, countAsiSlots } from '@core/utils/progression-choices.util';
+import {
+  asiLevelsForClass,
+  countAsiSlots,
+  multiclassPrerequisiteLabel,
+  multiclassPrerequisitesMet,
+} from '@core/utils/progression-choices.util';
 import {
   featAsiAbilityOptions,
   featAsiNeedsAbilityChoice,
@@ -50,6 +55,9 @@ type AsiMode = 'plus2' | 'plus1plus1' | 'feat';
 
 interface AsiSlotUi {
   level: number;
+  /** Classe d'origine du palier (multiclassage) ; absent = classe primaire. */
+  classId?: string | null;
+  className?: string | null;
   mode: AsiMode;
   primary: AbilityKey | null;
   secondary: AbilityKey | null;
@@ -108,6 +116,8 @@ export class AbilitiesStep implements OnInit {
   readonly asiSlots = signal<AsiSlotUi[]>([]);
   readonly feats = signal<FeatUi[]>([]);
   readonly classJson = signal<any>(null);
+  /** JSON des classes de multiclassage, indexé par classId (pour leurs propres paliers ASI/prérequis). */
+  readonly secondaryClassJsonById = signal<Map<string, any>>(new Map());
 
   /** Catalogues chargés pour les sous-choix du don "Talent" (4 points flexibles). */
   readonly talentSkillCatalog = signal<{ id: string; name: string }[]>([]);
@@ -271,19 +281,60 @@ export class AbilitiesStep implements OnInit {
   readonly maxScore = MAX_ABILITY_SCORE;
   readonly availableScores = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
-  readonly asiSlotCount = computed(() => {
-    const cls = this.classJson();
-    if (!cls) return this.builder.targetLevel() >= 4 ? 1 : 0;
-    return countAsiSlots(cls, this.builder.targetLevel());
-  });
-
-  readonly asiLevels = computed(() => {
+  readonly primaryAsiLevels = computed(() => {
     const cls = this.classJson();
     if (!cls) return this.builder.targetLevel() >= 4 ? [4] : [];
     return asiLevelsForClass(cls, this.builder.targetLevel());
   });
 
+  /**
+   * Paliers ASI COMBINÉS : ceux de la classe primaire (sur `targetLevel`, comportement inchangé)
+   * PLUS ceux de chaque classe de multiclassage — calculés sur LEUR PROPRE niveau, pas le niveau
+   * total du personnage (RAW : Guerrier 5/Magicien 3 ne donne pas les paliers ASI du Magicien
+   * niveau 3 s'il n'atteint pas encore ses propres seuils).
+   */
+  readonly combinedAsiLevels = computed<
+    { level: number; classId: string | null; className: string | null }[]
+  >(() => {
+    const primaryId = this.builder.creation().classId;
+    const primary = this.primaryAsiLevels().map((level) => ({
+      level,
+      classId: primaryId,
+      className: null,
+    }));
+    const secondary = this.builder.secondaryClasses().flatMap((sc) => {
+      const cls = this.secondaryClassJsonById().get(sc.classId);
+      if (!cls) return [];
+      return asiLevelsForClass(cls, sc.level).map((level) => ({
+        level,
+        classId: sc.classId,
+        className: sc.className,
+      }));
+    });
+    return [...primary, ...secondary];
+  });
+
+  readonly asiSlotCount = computed(() => this.combinedAsiLevels().length);
+
+  /** @deprecated conservé pour compat template existant — utiliser `combinedAsiLevels`. */
+  readonly asiLevels = computed(() => this.combinedAsiLevels().map((l) => l.level));
+
   readonly needsAsi = computed(() => this.asiSlotCount() > 0);
+
+  /** Classes de multiclassage dont les prérequis de caractéristiques (RAW) ne sont pas respectés
+   * par les scores finaux actuels — bloque la confirmation de l'étape. */
+  readonly multiclassBlockers = computed<{ className: string; label: string | null }[]>(() => {
+    const abilities = this.builder.finalAbilities();
+    const blockers: { className: string; label: string | null }[] = [];
+    for (const sc of this.builder.secondaryClasses()) {
+      const cls = this.secondaryClassJsonById().get(sc.classId);
+      if (!cls) continue;
+      if (!multiclassPrerequisitesMet(cls, abilities)) {
+        blockers.push({ className: sc.className, label: multiclassPrerequisiteLabel(cls) });
+      }
+    }
+    return blockers;
+  });
 
   readonly activeSlot = computed(() => this.asiSlots()[this.activeSlotIndex()] ?? null);
 
@@ -311,28 +362,32 @@ export class AbilitiesStep implements OnInit {
   });
 
   readonly canConfirm = computed(
-    () => this.builder.creation().pointsRemaining === 0 && this.asiComplete(),
+    () =>
+      this.builder.creation().pointsRemaining === 0 &&
+      this.asiComplete() &&
+      this.multiclassBlockers().length === 0,
   );
 
   constructor() {
     effect(() => {
-      const levels = this.asiLevels();
+      const levels = this.combinedAsiLevels();
       const current = this.asiSlots();
+      const sameKey = (a: { level: number; classId?: string | null }, b: { level: number; classId?: string | null }) =>
+        a.level === b.level && (a.classId ?? null) === (b.classId ?? null);
       if (levels.length === 0) {
         if (current.length) this.asiSlots.set([]);
         return;
       }
-      if (
-        current.length === levels.length &&
-        current.every((s, i) => s.level === levels[i])
-      ) {
+      if (current.length === levels.length && current.every((s, i) => sameKey(s, levels[i]))) {
         return;
       }
-      const next = levels.map((level, i) => {
-        const prev = current.find((s) => s.level === level) ?? current[i];
+      const next = levels.map((entry, i) => {
+        const prev = current.find((s) => sameKey(s, entry)) ?? current[i];
         return (
           prev ?? {
-            level,
+            level: entry.level,
+            classId: entry.classId,
+            className: entry.className,
             mode: 'plus2' as AsiMode,
             primary: null,
             secondary: null,
@@ -354,6 +409,15 @@ export class AbilitiesStep implements OnInit {
     if (classId) {
       this.dataService.getClassById(classId).subscribe({
         next: (cls) => this.classJson.set(cls),
+      });
+    }
+    for (const sc of this.builder.secondaryClasses()) {
+      this.dataService.getClassById(sc.classId).subscribe({
+        next: (cls) => {
+          const map = new Map(this.secondaryClassJsonById());
+          map.set(sc.classId, cls);
+          this.secondaryClassJsonById.set(map);
+        },
       });
     }
     this.dataService.getFeats().subscribe({
@@ -403,6 +467,7 @@ export class AbilitiesStep implements OnInit {
       this.asiSlots.set(
         c.asiChoices.map((s) => ({
           level: s.level,
+          classId: s.classId ?? null,
           mode: s.mode,
           primary: s.primary ?? null,
           secondary: s.secondary ?? null,
@@ -563,6 +628,7 @@ export class AbilitiesStep implements OnInit {
   private applyAsiPreview(): void {
     const slots: AsiChoiceSlot[] = this.asiSlots().map((s) => ({
       level: s.level,
+      classId: s.classId ?? null,
       mode: s.mode,
       primary: s.primary,
       secondary: s.secondary,

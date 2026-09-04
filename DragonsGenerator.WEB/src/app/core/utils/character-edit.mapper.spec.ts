@@ -215,4 +215,44 @@ describe('character-edit.mapper', () => {
     expect(creation.talentBonusCantrips?.[0].name).toBe('Lueur');
     expect(creation.selectedFeatIds).toEqual(['don-talent']);
   });
+
+  it('mapCharacterToEditState reconstructs secondaryClasses[] from a multiclass character and keeps targetLevel on the primary class only', () => {
+    const saved = sampleCharacter({
+      classes: [
+        { classId: 'cls-mage', classLabel: 'Mage', level: 3, hitDie: 6 },
+        {
+          classId: 'cls-guerrier',
+          classLabel: 'Guerrier',
+          subclassId: 'sub-champion',
+          subclassLabel: 'Champion',
+          level: 2,
+          hitDie: 10,
+        },
+      ],
+      totalLevel: 5,
+    });
+
+    const { creation } = mapCharacterToEditState(saved);
+
+    // targetLevel ne reflète QUE le niveau de la classe primaire, pas le total multiclasse.
+    expect(creation.classId).toBe('cls-mage');
+    expect(creation.targetLevel).toBe(3);
+
+    expect(creation.secondaryClasses?.length).toBe(1);
+    expect(creation.secondaryClasses?.[0]).toEqual(
+      jasmine.objectContaining({
+        classId: 'cls-guerrier',
+        className: 'Guerrier',
+        subclassId: 'sub-champion',
+        subclassName: 'Champion',
+        level: 2,
+        hitDie: 10,
+      }),
+    );
+  });
+
+  it('mapCharacterToEditState leaves secondaryClasses empty for a single-class character', () => {
+    const { creation } = mapCharacterToEditState(sampleCharacter());
+    expect(creation.secondaryClasses).toEqual([]);
+  });
 });

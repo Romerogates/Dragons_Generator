@@ -46,6 +46,8 @@ export interface AbilityScores {
 /** Un palier ASI (ou don à la place). */
 export interface AsiChoiceSlot {
   level: number;
+  /** Classe d'origine du palier (multiclassage) — absent/primaire si non renseigné. */
+  classId?: string | null;
   mode: 'plus2' | 'plus1plus1' | 'feat';
   primary?: AbilityKey | null;
   secondary?: AbilityKey | null;

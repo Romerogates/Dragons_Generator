@@ -214,7 +214,7 @@
 
             @if (asiSlotCount() > 1) {
               <div class="flex flex-wrap gap-1.5">
-                @for (slot of asiSlots(); track slot.level; let i = $index) {
+                @for (slot of asiSlots(); track i; let i = $index) {
                   <button
                     type="button"
                     class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border"
@@ -223,7 +223,7 @@
                     [class.border-slate-600]="activeSlotIndex() !== i"
                     (click)="selectAsiSlot(i)"
                   >
-                    Niv. {{ slot.level }}
+                    Niv. {{ slot.level }}{{ slot.className ? ' (' + slot.className + ')' : '' }}
                     @if (
                       (slot.mode === 'feat' && slot.featId) ||
                       (slot.mode === 'plus2' && slot.primary) ||
@@ -644,6 +644,14 @@
       </div>
 
       <div class="mt-auto flex flex-col gap-3">
+        @if (multiclassBlockers().length > 0) {
+          <div class="text-[11px] text-red-400 bg-red-950/40 border border-red-900 rounded-lg p-2">
+            Prérequis de multiclassage non respectés :
+            @for (b of multiclassBlockers(); track b.className) {
+              <div>{{ b.className }} — {{ b.label }}</div>
+            }
+          </div>
+        }
         <button
           class="wizard-nav-primary w-full"
           [disabled]="!canConfirm()"

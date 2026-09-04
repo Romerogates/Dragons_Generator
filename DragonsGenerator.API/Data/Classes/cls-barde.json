@@ -28,6 +28,24 @@
     "wp-rapiere"
   ],
   "tool_proficiencies": [],
+  "multiclass_prerequisites": {
+    "all": [
+      "cha"
+    ]
+  },
+  "multiclass_proficiencies": {
+    "armor": [
+      "ar-light"
+    ],
+    "weapons": [],
+    "tools": [
+      "category-musical-instruments"
+    ],
+    "skillChooseCount": 1,
+    "skillOptions": [
+      "any"
+    ]
+  },
   "choice_pools": [
     {
       "id": "choice-skills-cls-barde",

@@ -5,6 +5,7 @@ import {
   computeAbilityModifiersFromScores,
   computeFinalAbilities,
   computeHitPointsMax,
+  computeSecondaryClassesHitPoints,
   computePassivePerception,
 } from './character-abilities.util';
 
@@ -234,5 +235,26 @@ describe('character-abilities.util', () => {
       subspeciesId: 'sp-nain-batisseur',
     });
     expect(hp).toBe(10 + 2 * 6 + 3);
+  });
+
+  it('computeSecondaryClassesHitPoints returns 0 for an empty list', () => {
+    expect(computeSecondaryClassesHitPoints([], 2)).toBe(0);
+  });
+
+  it('computeSecondaryClassesHitPoints sums average-per-level + CON for each secondary class', () => {
+    // Guerrier niv. 2 en multiclassage (d10, moyenne 6) + Magicien niv. 1 (d6, moyenne 4), CON +1.
+    const hp = computeSecondaryClassesHitPoints(
+      [
+        { level: 2, hitDie: 10, hpPerLevelAverage: 6 },
+        { level: 1, hitDie: 6, hpPerLevelAverage: 4 },
+      ],
+      1,
+    );
+    expect(hp).toBe(2 * (6 + 1) + 1 * (4 + 1));
+  });
+
+  it('computeSecondaryClassesHitPoints falls back to floor(hitDie/2)+1 when no average is given', () => {
+    const hp = computeSecondaryClassesHitPoints([{ level: 1, hitDie: 8, hpPerLevelAverage: 0 }], 0);
+    expect(hp).toBe(5); // floor(8/2)+1 = 5
   });
 });

@@ -49,6 +49,7 @@ import type {
   FeatureInstance,
   SpellcastingKind,
 } from '../../../../core/models/Character/character';
+import { MulticlassPanel } from './multiclass-panel/multiclass-panel';
 
 // ============================================================================
 // TYPES
@@ -281,7 +282,7 @@ const SPELLCASTING_FROM_LEVEL: Record<string, number> = {
 @Component({
   selector: 'app-class-step',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MulticlassPanel],
   templateUrl: './class-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

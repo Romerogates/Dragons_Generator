@@ -1,0 +1,112 @@
+@if (builder.creation().classId) {
+  <div class="w-full max-w-3xl mx-auto mt-6 mb-2 p-4 bg-[#1b2028] border border-slate-700 rounded-xl text-left">
+    <h3 class="text-amber-500 font-bold text-sm uppercase tracking-wide mb-1">⚔️ Multiclassage (optionnel)</h3>
+    <p class="text-slate-400 text-[11px] italic mb-3">
+      Ajoutez une classe supplémentaire (règles RAW). Chaque classe secondaire a son propre
+      niveau et n'accorde que des maîtrises réduites (jamais les maîtrises de départ complètes).
+      Les prérequis de caractéristiques sont vérifiés à l'étape Caractéristiques.
+    </p>
+
+    @for (row of secondaryRows(); track row.entry.classId) {
+      <div class="border border-slate-700 rounded-lg p-3 mb-3 bg-slate-900/40">
+        <div class="flex items-center justify-between gap-2 mb-2">
+          <strong class="text-slate-100 text-sm">{{ row.entry.className }}</strong>
+          @if (row.prerequisiteLabel) {
+            <span
+              class="text-[11px] px-2 py-0.5 rounded"
+              [class.text-emerald-400]="row.prerequisitesMet"
+              [class.text-red-400]="!row.prerequisitesMet"
+            >
+              Prérequis : {{ row.prerequisiteLabel }} {{ row.prerequisitesMet ? '✓' : '✗' }}
+            </span>
+          }
+          <button
+            type="button"
+            class="text-red-400 text-[11px] hover:text-red-300 underline"
+            (click)="removeClass(row)"
+          >
+            ✕ Retirer
+          </button>
+        </div>
+
+        <label class="flex items-center gap-2 text-[11px] text-slate-300 mb-2">
+          Niveau dans cette classe
+          <input
+            type="number"
+            min="1"
+            [max]="row.maxLevel"
+            [ngModel]="row.entry.level"
+            (ngModelChange)="onLevelChange(row, $event)"
+            class="w-16 bg-slate-800 border border-slate-600 rounded px-2 py-1 text-slate-100"
+          />
+        </label>
+
+        @if (row.subclassOptions.length > 0 && row.entry.level >= row.subclassLevelUnlocked) {
+          <label class="flex items-center gap-2 text-[11px] text-slate-300 mb-2">
+            Sous-classe (débloquée niv. {{ row.subclassLevelUnlocked }})
+            <select
+              [ngModel]="row.entry.subclassId"
+              (ngModelChange)="onSubclassChange(row, $event)"
+              class="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-slate-100"
+            >
+              <option [ngValue]="null">— Aucune —</option>
+              @for (opt of row.subclassOptions; track opt.id) {
+                <option [value]="opt.id">{{ opt.name }}</option>
+              }
+            </select>
+          </label>
+        }
+
+        <div class="flex flex-col gap-0.5 text-[10px] text-slate-400">
+          @if (row.entry.armorProficiencies.length) {
+            <span>Armures : {{ row.entry.armorProficiencies.join(', ') }}</span>
+          }
+          @if (row.entry.weaponProficiencies.length) {
+            <span>Armes : {{ row.entry.weaponProficiencies.join(', ') }}</span>
+          }
+          @if (row.entry.toolProficiencies.length) {
+            <span>Outils : {{ row.entry.toolProficiencies.join(', ') }}</span>
+          }
+          @if (row.entry.skillChooseCount > 0) {
+            <span>+ {{ row.entry.skillChooseCount }} compétence(s) au choix (étape Savoirs)</span>
+          }
+          @if (
+            !row.entry.armorProficiencies.length &&
+            !row.entry.weaponProficiencies.length &&
+            !row.entry.toolProficiencies.length &&
+            row.entry.skillChooseCount === 0
+          ) {
+            <span>Aucune maîtrise supplémentaire de multiclassage pour cette classe.</span>
+          }
+        </div>
+      </div>
+    }
+
+    @if (canAddClass()) {
+      <div class="flex items-center gap-2">
+        <select
+          [ngModel]="selectedClassIdToAdd()"
+          (ngModelChange)="selectedClassIdToAdd.set($event)"
+          class="flex-1 bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-[11px] text-slate-100"
+        >
+          <option value="">— Choisir une classe à ajouter —</option>
+          @for (cls of availableClassesToAdd(); track cls.id) {
+            <option [value]="cls.id">{{ cls.name }}</option>
+          }
+        </select>
+        <button
+          type="button"
+          [disabled]="!selectedClassIdToAdd()"
+          (click)="addSelectedClass()"
+          class="bg-amber-600 disabled:bg-slate-700 disabled:text-slate-500 text-slate-950 disabled:text-slate-500 text-[11px] font-bold px-3 py-1.5 rounded"
+        >
+          + Ajouter cette classe
+        </button>
+      </div>
+    } @else if (remainingLevels() === 0) {
+      <p class="text-slate-500 text-[11px] italic">
+        Niveau total (20) déjà atteint : aucune classe supplémentaire possible.
+      </p>
+    }
+  </div>
+}

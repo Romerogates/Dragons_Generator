@@ -29,6 +29,24 @@
   "tool_proficiencies": [
     "tl-outils-de-voleur"
   ],
+  "multiclass_prerequisites": {
+    "all": [
+      "dex"
+    ]
+  },
+  "multiclass_proficiencies": {
+    "armor": [
+      "ar-light"
+    ],
+    "weapons": [],
+    "tools": [
+      "tl-outils-de-voleur"
+    ],
+    "skillChooseCount": 1,
+    "skillOptions": [
+      "any"
+    ]
+  },
   "choice_pools": [
     {
       "id": "choice-skills-cls-roublard",

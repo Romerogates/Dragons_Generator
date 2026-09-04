@@ -36,6 +36,22 @@
   "tool_proficiencies": [
     "tl-necessaire-dherboristerie"
   ],
+  "multiclass_prerequisites": {
+    "all": [
+      "wis"
+    ]
+  },
+  "multiclass_proficiencies": {
+    "armor": [
+      "ar-light",
+      "ar-medium",
+      "ar-shield"
+    ],
+    "weapons": [],
+    "tools": [],
+    "skillChooseCount": 0,
+    "skillOptions": []
+  },
   "choice_pools": [
     {
       "id": "choice-skills-cls-druide",

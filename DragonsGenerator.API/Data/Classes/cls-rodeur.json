@@ -29,6 +29,28 @@
   "tool_proficiencies": [
     "tl-necessaire-herboristerie"
   ],
+  "multiclass_prerequisites": {
+    "all": [
+      "dex",
+      "wis"
+    ]
+  },
+  "multiclass_proficiencies": {
+    "armor": [
+      "ar-light",
+      "ar-medium",
+      "ar-shield"
+    ],
+    "weapons": [
+      "wp-cat-simple",
+      "wp-cat-martial"
+    ],
+    "tools": [],
+    "skillChooseCount": 1,
+    "skillOptions": [
+      "any"
+    ]
+  },
   "choice_pools": [
     {
       "id": "choice-skills-cls-rodeur",
