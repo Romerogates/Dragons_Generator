@@ -108,7 +108,12 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
   };
 
   const allTools = [
-    ...new Set([...c.toolProficiencies, ...c.backgroundTools, ...(c.speciesFixedTools ?? [])]),
+    ...new Set([
+      ...c.toolProficiencies,
+      ...c.backgroundTools,
+      ...(c.speciesFixedTools ?? []),
+      ...(c.featBonusTools ?? []),
+    ]),
   ];
   const allArmor = [
     ...new Set([...c.armorProficiencies, ...(c.speciesFixedArmor ?? []), ...(c.featBonusArmor ?? [])]),
@@ -170,7 +175,9 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
       hasShield: allEquipment.some(
         (e) => e.equipped && e.name.toLowerCase().includes('bouclier'),
       ),
-      resistances: [...new Set([...c.speciesResistances, ...(c.classResistances ?? [])])],
+      resistances: [
+        ...new Set([...c.speciesResistances, ...(c.classResistances ?? []), ...(c.featResistances ?? [])]),
+      ],
       immunities: [],
       vulnerabilities: [],
       conditionImmunities: [],

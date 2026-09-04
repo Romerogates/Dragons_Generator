@@ -555,7 +555,8 @@ export class CharacterBuilderService {
       featDetailsById?: Record<string, { name: string; desc: string }>;
     },
   ): void {
-    const { bonuses, featIds, featDarkvisionRadius, featBonusArmor } = aggregateAsiChoices(slots, ctx);
+    const { bonuses, featIds, featDarkvisionRadius, featBonusArmor, featBonusTools, featResistances } =
+      aggregateAsiChoices(slots, ctx);
     this.creation.update((c) => ({
       ...c,
       asiChoices: slots.map((s) => ({ ...s })),
@@ -564,6 +565,8 @@ export class CharacterBuilderService {
       selectedFeatId: featIds[0] ?? null,
       featDarkvisionRadius,
       featBonusArmor,
+      featBonusTools,
+      featResistances,
       featDetailsById: ctx?.featDetailsById ?? c.featDetailsById,
     }));
   }

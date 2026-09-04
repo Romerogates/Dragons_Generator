@@ -84,16 +84,75 @@ const ARMOR_NAME_TO_ID: Record<string, string> = {
   bouclier: 'ar-bouclier',
 };
 
-export function featBonusArmorProficiencies(feat: RawFeatData | undefined): string[] {
+/** Maîtrise d'outil fixe accordée par un don (seuls des noms connus sont mappés vers un id). */
+const TOOL_NAME_TO_ID: Record<string, string> = {
+  "nécessaire d'herboristerie": 'tl-necessaire-dherboristerie',
+};
+
+function featBonusProficienciesOfType(feat: RawFeatData | undefined, kind: string, map: Record<string, string>): string[] {
   const benefits = Array.isArray(feat?.benefits) ? feat!.benefits! : [];
   const out: string[] = [];
   for (const b of benefits) {
     if (!b || typeof b !== 'object') continue;
     const rec = b as Record<string, unknown>;
-    if (rec['type'] !== 'proficiency' || rec['proficiency_type'] !== 'armor') continue;
+    if (rec['type'] !== 'proficiency' || rec['proficiency_type'] !== kind) continue;
     const value = typeof rec['value'] === 'string' ? rec['value'].toLowerCase().trim() : '';
-    const id = ARMOR_NAME_TO_ID[value];
+    const id = map[value];
     if (id) out.push(id);
   }
   return out;
+}
+
+export function featBonusArmorProficiencies(feat: RawFeatData | undefined): string[] {
+  return featBonusProficienciesOfType(feat, 'armor', ARMOR_NAME_TO_ID);
+}
+
+export function featBonusToolProficiencies(feat: RawFeatData | undefined): string[] {
+  return featBonusProficienciesOfType(feat, 'tool', TOOL_NAME_TO_ID);
+}
+
+/** Mots FR (singulier ou pluriel) → id `damage-*` utilisé par l'app pour les résistances. */
+const DAMAGE_WORD_TO_ID: Record<string, string> = {
+  contondant: 'damage-contondant',
+  contondants: 'damage-contondant',
+  tranchant: 'damage-tranchant',
+  tranchants: 'damage-tranchant',
+  perforant: 'damage-perforant',
+  perforants: 'damage-perforant',
+  acide: 'damage-acide',
+  feu: 'damage-feu',
+  foudre: 'damage-foudre',
+  froid: 'damage-froid',
+  tonnerre: 'damage-tonnerre',
+  poison: 'damage-poison',
+  necrotique: 'damage-necrotique',
+  radiant: 'damage-radiant',
+  psychique: 'damage-psychique',
+};
+
+/** Un don propose-t-il un choix de résistance à un type de dégâts (ex. Gladiateur, Insensibilité élémentaire) ? */
+export function featNeedsResistanceChoice(feat: RawFeatData | undefined): boolean {
+  const benefits = Array.isArray(feat?.benefits) ? feat!.benefits! : [];
+  return benefits.some(
+    (b) =>
+      b &&
+      typeof b === 'object' &&
+      (b as Record<string, unknown>)['type'] === 'damage_resistance' &&
+      Array.isArray((b as Record<string, unknown>)['choose_from']),
+  );
+}
+
+/** Options de résistance proposées par un don à choix (id `damage-*` + libellé FR d'origine). */
+export function featResistanceOptions(feat: RawFeatData | undefined): { id: string; label: string }[] {
+  const benefits = Array.isArray(feat?.benefits) ? feat!.benefits! : [];
+  for (const b of benefits) {
+    if (!b || typeof b !== 'object') continue;
+    const rec = b as Record<string, unknown>;
+    if (rec['type'] !== 'damage_resistance' || !Array.isArray(rec['choose_from'])) continue;
+    return (rec['choose_from'] as unknown[])
+      .filter((w): w is string => typeof w === 'string')
+      .map((word) => ({ id: DAMAGE_WORD_TO_ID[word.toLowerCase().trim()] ?? word, label: word }))
+      .filter((o) => !!o.id);
+  }
+  return [];
 }

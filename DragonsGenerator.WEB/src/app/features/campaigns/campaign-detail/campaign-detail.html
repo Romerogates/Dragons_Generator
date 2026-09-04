@@ -277,6 +277,15 @@
         @case ('creatures') {
           @if (c.isOwner) {
           <section class="space-y-6">
+            <div class="flex flex-wrap items-center justify-end">
+              <button
+                type="button"
+                class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-amber-900/30 border border-amber-700/50 text-amber-300 hover:bg-amber-900/50"
+                (click)="addCreaturesOnly()"
+              >
+                Modifier les créatures
+              </button>
+            </div>
             @if (c.data.creatures.length) {
               <div class="flex flex-col gap-3">
                 <div class="flex flex-wrap items-center justify-between gap-2">

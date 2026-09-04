@@ -166,7 +166,7 @@
               class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:border-sky-500/50 hover:text-sky-300"
               (click)="startEdit.emit(handout.id)"
             >
-              Modifier
+              {{ handout.kind === 'map' ? 'Éditer la carte' : 'Modifier' }}
             </button>
           </div>
         </div>

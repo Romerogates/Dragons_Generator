@@ -158,6 +158,9 @@ export type ExtendedCharacterCreation = CharacterCreation & {
   /** Vision dans le noir et maîtrises fixes accordées par un don pris à la place d'un ASI. */
   featDarkvisionRadius?: number;
   featBonusArmor?: string[];
+  featBonusTools?: string[];
+  /** Résistances choisies par le joueur pour un don à choix (ex. Gladiateur, Insensibilité élémentaire). */
+  featResistances?: string[];
   /** Nom/description dénormalisés des dons choisis (pour la fiche, hors mécaniques agrégées). */
   featDetailsById?: Record<string, { name: string; desc: string }>;
   /** Résistances passives accordées par la sous-classe choisie (fusionnées à la fiche). */
@@ -241,6 +244,8 @@ export const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   speciesInnateSpells: [],
   featDarkvisionRadius: 0,
   featBonusArmor: [],
+  featBonusTools: [],
+  featResistances: [],
   featDetailsById: {},
   classChoiceAnswers: {},
   asiBonuses: {},

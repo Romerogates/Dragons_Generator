@@ -53,6 +53,14 @@ function labelDamageType(raw: string): string {
   return DAMAGE_TYPE_LABELS[key] ?? raw;
 }
 
+/** Libellé FR lisible pour un id de résistance (`damage-feu` → "Feu"). Passe les autres chaînes telles quelles. */
+export function resistanceLabel(id: string): string {
+  if (!id) return id;
+  const stripped = id.toLowerCase().startsWith('damage-') ? id.slice('damage-'.length) : id;
+  const label = labelDamageType(stripped);
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
 function formatWeaponRange(data: Record<string, unknown>): string | null {
   const throwRange = data['throw_range'] ?? data['throwRange'];
   const ammoRange = data['ammo_range'] ?? data['ammoRange'];

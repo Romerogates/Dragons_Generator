@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import type { jsPDF } from 'jspdf';
 import { firstValueFrom } from 'rxjs';
 import { labelForGameId } from '@core/utils/game-id-labels';
+import { resistanceLabel } from '@core/utils/equipment-display.util';
 import {
   GRIMOIRE_BASE_COORDS as BASE_COORDS,
   GRIMOIRE_IMAGES,
@@ -600,7 +601,7 @@ export class PdfGeneratorService {
       entries.push(`Vision aveugle (${c.senses.blindsightRadius}m)`);
     }
 
-    c.defense.resistances.forEach((r) => entries.push(`Rés. ${r}`));
+    c.defense.resistances.forEach((r) => entries.push(`Rés. ${resistanceLabel(r)}`));
     c.defense.immunities.forEach((im) => entries.push(`Imm. ${im}`));
     c.defense.conditionImmunities.forEach((ci) => entries.push(`Imm. ${ci}`));
 

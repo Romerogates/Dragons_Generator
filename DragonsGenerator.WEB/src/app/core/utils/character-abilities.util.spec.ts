@@ -144,6 +144,30 @@ describe('character-abilities.util', () => {
     expect(featBonusArmor).toEqual(['ar-bouclier']);
   });
 
+  it('aggregateAsiChoices surfaces feat tool proficiencies and a chosen resistance', () => {
+    const feats = new Map([
+      [
+        'don-herboriste',
+        {
+          benefits: [{ type: 'proficiency', proficiency_type: 'tool', value: "nécessaire d'herboristerie" }],
+        },
+      ],
+      [
+        'don-gladiateur',
+        { benefits: [{ type: 'damage_resistance', choose_from: ['contondants', 'tranchants', 'perforants'] }] },
+      ],
+    ]);
+    const { featBonusTools, featResistances } = aggregateAsiChoices(
+      [
+        { level: 4, mode: 'feat', featId: 'don-herboriste' },
+        { level: 8, mode: 'feat', featId: 'don-gladiateur', featResistanceChoice: 'damage-tranchant' },
+      ],
+      { feats },
+    );
+    expect(featBonusTools).toEqual(['tl-necessaire-dherboristerie']);
+    expect(featResistances).toEqual(['damage-tranchant']);
+  });
+
   it('computeHitPointsMax applies the Nain bâtisseur HP-per-level bonus', () => {
     const hp = computeHitPointsMax({
       targetLevel: 3,

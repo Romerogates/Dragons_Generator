@@ -508,6 +508,16 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   startEditHandout(handoutId: string): void {
+    const c = this.campaign();
+    const handout = c?.data.handouts?.find((h) => h.id === handoutId);
+    if (handout?.kind === 'map') {
+      const map = c?.data.dungeonMaps?.find((m) => m.handoutId === handoutId);
+      if (map) {
+        this.setTab('maps');
+        this.focusDungeonMapId.set(map.id);
+        return;
+      }
+    }
     this.flushHandoutSave();
     this.editingHandoutId.set(handoutId);
   }

@@ -24,8 +24,11 @@ import { asiLevelsForClass, countAsiSlots } from '@core/utils/progression-choice
 import {
   featAsiAbilityOptions,
   featAsiNeedsAbilityChoice,
+  featNeedsResistanceChoice,
+  featResistanceOptions,
   type RawFeatData,
 } from '@core/utils/feat-benefits.util';
+import { resistanceLabel } from '@core/utils/equipment-display.util';
 import { apiCodeToAbilityKey } from '@core/utils/ability-mapping';
 
 interface AbilityRow {
@@ -43,6 +46,7 @@ interface AsiSlotUi {
   secondary: AbilityKey | null;
   featId: string | null;
   featAbilityChoice: AbilityKey | null;
+  featResistanceChoice: string | null;
 }
 
 interface FeatUi {
@@ -96,6 +100,24 @@ export class AbilitiesStep implements OnInit {
     this.patchActiveSlot({ featAbilityChoice: key });
   }
 
+  activeSlotNeedsResistanceChoice(): boolean {
+    const feat = this.getFeat(this.activeSlot()?.featId ?? null);
+    return featNeedsResistanceChoice(feat?.raw);
+  }
+
+  activeSlotResistanceOptions(): { id: string; label: string }[] {
+    const feat = this.getFeat(this.activeSlot()?.featId ?? null);
+    return featResistanceOptions(feat?.raw);
+  }
+
+  resistanceOptionLabel(id: string): string {
+    return resistanceLabel(id);
+  }
+
+  selectFeatResistanceChoice(id: string): void {
+    this.patchActiveSlot({ featResistanceChoice: id });
+  }
+
   abilityLabel(key: AbilityKey): string {
     return ABILITY_KEY_TO_LABEL[key];
   }
@@ -147,7 +169,8 @@ export class AbilitiesStep implements OnInit {
       if (s.mode === 'feat') {
         if (!s.featId) return false;
         const feat = this.getFeat(s.featId);
-        if (featAsiNeedsAbilityChoice(feat?.raw)) return !!s.featAbilityChoice;
+        if (featAsiNeedsAbilityChoice(feat?.raw) && !s.featAbilityChoice) return false;
+        if (featNeedsResistanceChoice(feat?.raw) && !s.featResistanceChoice) return false;
         return true;
       }
       if (s.mode === 'plus2') return !!s.primary;
@@ -183,6 +206,7 @@ export class AbilitiesStep implements OnInit {
             secondary: null,
             featId: null,
             featAbilityChoice: null,
+            featResistanceChoice: null,
           }
         );
       });
@@ -222,6 +246,7 @@ export class AbilitiesStep implements OnInit {
           secondary: s.secondary ?? null,
           featId: s.featId ?? null,
           featAbilityChoice: s.featAbilityChoice ?? null,
+          featResistanceChoice: s.featResistanceChoice ?? null,
         })),
       );
     } else if (c.selectedFeatId || Object.keys(c.asiBonuses ?? {}).length) {
@@ -233,6 +258,7 @@ export class AbilitiesStep implements OnInit {
         secondary: null,
         featId: null,
         featAbilityChoice: null,
+        featResistanceChoice: null,
       };
       if (c.selectedFeatId) {
         slot.mode = 'feat';
@@ -312,6 +338,7 @@ export class AbilitiesStep implements OnInit {
         secondary: null,
         featId: null,
         featAbilityChoice: null,
+        featResistanceChoice: null,
       })),
     );
   }
@@ -321,7 +348,14 @@ export class AbilitiesStep implements OnInit {
   }
 
   setAsiMode(mode: AsiMode): void {
-    this.patchActiveSlot({ mode, primary: null, secondary: null, featId: null, featAbilityChoice: null });
+    this.patchActiveSlot({
+      mode,
+      primary: null,
+      secondary: null,
+      featId: null,
+      featAbilityChoice: null,
+      featResistanceChoice: null,
+    });
   }
 
   selectAsiPrimary(key: AbilityKey): void {
@@ -341,7 +375,7 @@ export class AbilitiesStep implements OnInit {
   }
 
   selectFeat(id: string): void {
-    this.patchActiveSlot({ featId: id, featAbilityChoice: null });
+    this.patchActiveSlot({ featId: id, featAbilityChoice: null, featResistanceChoice: null });
   }
 
   private patchActiveSlot(patch: Partial<AsiSlotUi>): void {
@@ -363,6 +397,7 @@ export class AbilitiesStep implements OnInit {
       secondary: s.secondary,
       featId: s.featId,
       featAbilityChoice: s.featAbilityChoice,
+      featResistanceChoice: s.featResistanceChoice,
     }));
     const featDetailsById: Record<string, { name: string; desc: string }> = {};
     for (const f of this.feats()) featDetailsById[f.id] = { name: f.name, desc: f.description };

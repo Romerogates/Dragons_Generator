@@ -52,6 +52,8 @@ export interface AsiChoiceSlot {
   featId?: string | null;
   /** Caractéristique choisie quand le don propose un ASI flexible ("any" ou "X ou Y"). */
   featAbilityChoice?: AbilityKey | null;
+  /** Type de dégâts choisi quand le don propose une résistance au choix (ex. Gladiateur). */
+  featResistanceChoice?: string | null;
 }
 
 export const ABILITY_KEYS: readonly AbilityKey[] = [

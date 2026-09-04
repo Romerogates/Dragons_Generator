@@ -6,6 +6,7 @@ import {
 import {
   featAsiValue,
   featBonusArmorProficiencies,
+  featBonusToolProficiencies,
   featDarkvisionRadius,
   resolveFeatAsiAbilityKey,
   type RawFeatData,
@@ -96,11 +97,15 @@ export function aggregateAsiChoices(
   featIds: string[];
   featDarkvisionRadius: number;
   featBonusArmor: string[];
+  featBonusTools: string[];
+  featResistances: string[];
 } {
   const bonuses: Partial<AbilityScores> = {};
   const featIds: string[] = [];
   let darkvisionRadius = 0;
   const bonusArmor = new Set<string>();
+  const bonusTools = new Set<string>();
+  const resistances = new Set<string>();
   for (const slot of slots) {
     if (slot.mode === 'feat' && slot.featId) {
       featIds.push(slot.featId);
@@ -117,6 +122,8 @@ export function aggregateAsiChoices(
         }
         darkvisionRadius = Math.max(darkvisionRadius, featDarkvisionRadius(feat));
         featBonusArmorProficiencies(feat).forEach((id) => bonusArmor.add(id));
+        featBonusToolProficiencies(feat).forEach((id) => bonusTools.add(id));
+        if (slot.featResistanceChoice) resistances.add(slot.featResistanceChoice);
       }
       continue;
     }
@@ -127,7 +134,14 @@ export function aggregateAsiChoices(
       bonuses[slot.secondary] = (bonuses[slot.secondary] ?? 0) + 1;
     }
   }
-  return { bonuses, featIds, featDarkvisionRadius: darkvisionRadius, featBonusArmor: [...bonusArmor] };
+  return {
+    bonuses,
+    featIds,
+    featDarkvisionRadius: darkvisionRadius,
+    featBonusArmor: [...bonusArmor],
+    featBonusTools: [...bonusTools],
+    featResistances: [...resistances],
+  };
 }
 
 export function abilityPointCostForScore(score: number): number {

@@ -3,7 +3,10 @@ import {
   featAsiNeedsAbilityChoice,
   featAsiValue,
   featBonusArmorProficiencies,
+  featBonusToolProficiencies,
   featDarkvisionRadius,
+  featNeedsResistanceChoice,
+  featResistanceOptions,
   resolveFeatAsiAbilityKey,
   type RawFeatData,
 } from './feat-benefits.util';
@@ -115,5 +118,63 @@ describe('featBonusArmorProficiencies', () => {
 
   it('returns empty array when feat has no benefits', () => {
     expect(featBonusArmorProficiencies(undefined)).toEqual([]);
+  });
+});
+
+describe('featBonusToolProficiencies', () => {
+  it('maps a known tool name to its id (ex. Herboriste)', () => {
+    const feat: RawFeatData = {
+      benefits: [{ type: 'proficiency', proficiency_type: 'tool', value: "nécessaire d'herboristerie" }],
+    };
+    expect(featBonusToolProficiencies(feat)).toEqual(['tl-necessaire-dherboristerie']);
+  });
+
+  it('ignores unknown tool names', () => {
+    const feat: RawFeatData = {
+      benefits: [{ type: 'proficiency', proficiency_type: 'tool', value: 'outil inconnu' }],
+    };
+    expect(featBonusToolProficiencies(feat)).toEqual([]);
+  });
+
+  it('returns empty array when feat is undefined', () => {
+    expect(featBonusToolProficiencies(undefined)).toEqual([]);
+  });
+});
+
+describe('featNeedsResistanceChoice / featResistanceOptions', () => {
+  it('detects a feat offering a damage resistance choice (ex. Gladiateur)', () => {
+    const feat: RawFeatData = {
+      benefits: [{ type: 'damage_resistance', choose_from: ['contondants', 'tranchants', 'perforants'] }],
+    };
+    expect(featNeedsResistanceChoice(feat)).toBeTrue();
+    expect(featResistanceOptions(feat)).toEqual([
+      { id: 'damage-contondant', label: 'contondants' },
+      { id: 'damage-tranchant', label: 'tranchants' },
+      { id: 'damage-perforant', label: 'perforants' },
+    ]);
+  });
+
+  it('maps elemental resistance words (ex. Insensibilité élémentaire)', () => {
+    const feat: RawFeatData = {
+      benefits: [{ type: 'damage_resistance', choose_from: ['acide', 'feu', 'foudre', 'froid', 'tonnerre'] }],
+    };
+    expect(featResistanceOptions(feat).map((o) => o.id)).toEqual([
+      'damage-acide',
+      'damage-feu',
+      'damage-foudre',
+      'damage-froid',
+      'damage-tonnerre',
+    ]);
+  });
+
+  it('is false/empty for feats without a resistance choice', () => {
+    const feat: RawFeatData = { benefits: [{ type: 'damage_resistance', condition: "attaques d'opportunité" }] };
+    expect(featNeedsResistanceChoice(feat)).toBeFalse();
+    expect(featResistanceOptions(feat)).toEqual([]);
+  });
+
+  it('is false/empty when feat is undefined', () => {
+    expect(featNeedsResistanceChoice(undefined)).toBeFalse();
+    expect(featResistanceOptions(undefined)).toEqual([]);
   });
 });
