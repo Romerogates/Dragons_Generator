@@ -144,31 +144,6 @@
             }
 
             @if (c.isOwner) {
-              <div class="bg-violet-950/20 border border-violet-800/40 rounded-2xl p-5">
-                <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-4">
-                  <iconify-icon icon="fluent-emoji:printer"></iconify-icon> Imprimer (fond parchemin)
-                </h2>
-                <div class="flex flex-wrap gap-2">
-                  <button type="button" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white disabled:opacity-50" [disabled]="printing()" (click)="printPackMj()">
-                    Pack MJ complet
-                  </button>
-                  <button type="button" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-violet-800/50 text-violet-300 disabled:opacity-50" [disabled]="printing()" (click)="printBestiary()">
-                    Bestiaire (stats)
-                  </button>
-                  <button type="button" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-violet-800/50 text-violet-300 disabled:opacity-50" [disabled]="printing()" (click)="printPlayerSummariesPdf()">
-                    Synthèse joueurs (MJ)
-                  </button>
-                  <button type="button" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-violet-800/50 text-violet-300 disabled:opacity-50" [disabled]="printing()" (click)="printAllPlayerSheets()">
-                    Fiches joueurs complètes
-                  </button>
-                </div>
-                @if (printing()) {
-                  <p class="text-xs text-violet-400/80 mt-3 animate-pulse">Génération PDF...</p>
-                }
-              </div>
-            }
-
-            @if (c.isOwner) {
               <input
                 type="text"
                 class="w-full bg-[#1b2028] border border-slate-700 rounded-xl py-3 px-4 text-lg font-serif text-violet-300"
@@ -210,7 +185,18 @@
               (sessionDateChange)="onSessionDateChangeEvent($event)"
             />
 
-            @if (!c.isOwner && publishedHandoutsCount() > 0) {
+            @if (c.isOwner) {
+              <button
+                type="button"
+                class="w-full text-left bg-violet-950/20 border border-violet-800/40 rounded-xl px-4 py-3 hover:border-violet-600/50 transition-colors"
+                (click)="setTab('handouts')"
+              >
+                <p class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-1">Documents & PDF</p>
+                <p class="text-sm text-slate-300">
+                  Pack MJ, bestiaire, fiches et documents joueurs
+                </p>
+              </button>
+            } @else if (publishedHandoutsCount() > 0) {
               <button
                 type="button"
                 class="w-full text-left bg-sky-950/20 border border-sky-800/40 rounded-xl px-4 py-3 hover:border-sky-600/50 transition-colors"
@@ -248,6 +234,15 @@
             [focusHandoutId]="focusHandoutId()"
             [previewHandout]="previewHandout()"
             [pinnedHandoutId]="c.data.pinnedHandoutId ?? null"
+            [printing]="printing()"
+            [pdfPreviewUrl]="pdfPreviewUrl()"
+            [isLoadingPreview]="isLoadingPreview()"
+            [pdfPreviewKind]="pdfPreviewKind()"
+            [hasCreatures]="!!c.data.creatures.length"
+            [pregens]="c.data.pregenCharacters"
+            [sheetMembers]="pdfSheetMembers()"
+            [pregenPdfLoadingId]="pregenPdfLoadingId()"
+            [memberSheetLoadingKey]="memberCharacterLoadingId()"
             (addHandout)="addHandout()"
             (kindFilterChange)="setHandoutKindFilter($event)"
             (startEdit)="startEditHandout($event)"
@@ -259,6 +254,16 @@
             (handoutPatchImmediate)="onHandoutPatchImmediate($event)"
             (togglePublished)="onHandoutTogglePublished($event)"
             (pinHandout)="pinHandout($event)"
+            (printPackMj)="printPackMj()"
+            (printBestiary)="printBestiary()"
+            (printPlayerSummaries)="printPlayerSummariesPdf()"
+            (printAllPlayerSheets)="printAllPlayerSheets()"
+            (loadPackPreview)="loadPackPreview()"
+            (loadBestiaryPreview)="loadBestiaryPreview()"
+            (openPdfFullscreen)="openBestiaryFullscreen()"
+            (printPregenFullSheet)="printPregenFullSheet($event)"
+            (printPregenHandout)="printPregenHandout($event)"
+            (printMemberFullSheet)="printMemberFullSheet($event.member, $event.scope)"
           />
         }
 
@@ -286,42 +291,8 @@
                 Modifier les créatures
               </button>
             </div>
-            @if (c.data.creatures.length) {
-              <div class="flex flex-col gap-3">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                  <h2 class="text-[10px] font-black uppercase tracking-widest text-amber-500">
-                    Aperçu du bestiaire
-                  </h2>
-                  @if (pdfPreviewUrl()) {
-                    <button
-                      type="button"
-                      class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-400 hover:border-amber-500/50"
-                      (click)="openBestiaryFullscreen()"
-                    >
-                      Plein écran
-                    </button>
-                  }
-                </div>
-                <div
-                  class="relative w-full bg-[#0f1117] border border-slate-800 rounded-2xl overflow-hidden shadow-xl"
-                  style="aspect-ratio: 210 / 297; max-height: 70vh"
-                >
-                  @if (isLoadingPreview()) {
-                    <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[#0f1117]">
-                      <div class="w-10 h-10 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin"></div>
-                      <p class="text-slate-500 text-xs font-bold uppercase tracking-widest animate-pulse">Gravure du bestiaire...</p>
-                    </div>
-                  }
-                  @if (!isLoadingPreview() && pdfPreviewUrl()) {
-                    <iframe [src]="pdfPreviewUrl()" class="w-full h-full border-0" title="Aperçu du bestiaire"></iframe>
-                  }
-                  @if (!isLoadingPreview() && !pdfPreviewUrl()) {
-                    <div class="absolute inset-0 flex items-center justify-center text-xs text-slate-500 italic px-4 text-center">
-                      L'aperçu n'a pas pu être généré. Utilisez le bouton d'impression dans le résumé.
-                    </div>
-                  }
-                </div>
-              </div>
+            @if (!c.data.creatures.length) {
+              <p class="text-slate-500 italic text-center py-12">Aucune créature dans cette campagne.</p>
             }
 
             @for (cr of c.data.creatures; track cr.creatureId) {
@@ -336,8 +307,6 @@
                   <p class="text-sm text-slate-400 italic">{{ cr.backstory }}</p>
                 }
               </article>
-            } @empty {
-              <p class="text-slate-500 italic text-center py-12">Aucune créature dans cette campagne.</p>
             }
           </section>
           }
@@ -394,7 +363,7 @@
                 <p class="text-xs text-slate-400 mb-4">
                   Génère un héros original niveau 1 (espèce, classe, équipement, sorts). Chaque pré-tiré apparaît ci-dessous et aussi dans
                   <a routerLink="/characters" class="text-violet-400 hover:underline">Mes héros</a>
-                  (nom « … (pré-tiré) »). Boutons Voir la fiche et PDF fiche complète : armes, compétences et stats.
+                  (nom « … (pré-tiré) »). Exports PDF : onglet Documents.
                 </p>
                 <app-ai-generation-progress-bar class="block mb-4" />
                 <div class="flex flex-wrap gap-2 mb-4">
@@ -445,16 +414,6 @@
                       >
                         Voir la fiche
                       </button>
-                      <button
-                        type="button"
-                        class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-emerald-800/50 text-emerald-300 hover:border-emerald-500/50 disabled:opacity-50"
-                        [disabled]="pregenPdfLoadingId() === p.id"
-                        (click)="printPregenFullSheet(p)"
-                      >
-                        @if (pregenPdfLoadingId() === p.id) { PDF… }
-                        @else { PDF fiche complète }
-                      </button>
-                      <button type="button" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400" (click)="printPregenHandout(p)">PDF accroche</button>
                       <button type="button" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-red-900/40 text-red-400" (click)="removePregen(p.id)">Supprimer</button>
                     </div>
                   </div>
@@ -686,14 +645,6 @@
                             @if (isMemberCharacterLoading(m.id, 'proposed')) { Chargement… }
                             @else { Voir la fiche proposée }
                           </button>
-                          <button
-                            type="button"
-                            class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
-                            [disabled]="isMemberCharacterLoading(m.id, 'proposed')"
-                            (click)="printMemberFullSheet(m, 'proposed')"
-                          >
-                            PDF fiche complète
-                          </button>
                           <button type="button" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-emerald-950/30 text-emerald-300 border border-emerald-800/40" (click)="approveMember(m)">Accepter</button>
                           <button type="button" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40" (click)="rejectMember(m)">Refuser</button>
                         </div>
@@ -725,14 +676,6 @@
                           >
                             @if (isMemberCharacterLoading(m.id, 'approved')) { Chargement… }
                             @else { Voir la fiche }
-                          </button>
-                          <button
-                            type="button"
-                            class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
-                            [disabled]="isMemberCharacterLoading(m.id, 'approved')"
-                            (click)="printMemberFullSheet(m, 'approved')"
-                          >
-                            PDF fiche complète
                           </button>
                         </div>
                       }

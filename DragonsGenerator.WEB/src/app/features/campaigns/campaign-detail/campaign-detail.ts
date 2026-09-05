@@ -149,8 +149,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly creatureXpMap = signal<Record<string, number>>({});
   readonly isLoadingPreview = signal(false);
   readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
+  readonly pdfPreviewKind = signal<'pack' | 'bestiary'>('pack');
   private rawBlobUrl: string | null = null;
-  private previewCampaignId: string | null = null;
+  private previewCacheKey: string | null = null;
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
   private handoutSaveTimer: ReturnType<typeof setTimeout> | null = null;
   private softPersistTimer: ReturnType<typeof setTimeout> | null = null;
@@ -167,6 +168,15 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
   readonly approvedPlayersWithCharacter = computed(() =>
     this.players().filter((p) => p.proposalStatus === 'approved' && p.approvedCharacterId),
+  );
+
+  /** Membres avec une fiche PDF (proposée ou approuvée) — hub Documents. */
+  readonly pdfSheetMembers = computed(() =>
+    this.players().filter(
+      (p) =>
+        (p.proposalStatus === 'pending' && !!p.proposedCharacterId) ||
+        (p.proposalStatus === 'approved' && !!p.approvedCharacterId),
+    ),
   );
 
   readonly pendingProposals = computed(() =>
@@ -466,9 +476,6 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       this.dungeonMapsComp()?.flushPendingSave();
     }
     this.tab.set(t);
-    if (t === 'creatures') {
-      this.loadBestiaryPreview();
-    }
     if (t === 'activity') {
       this.loadActivity();
     }
@@ -806,17 +813,59 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       this.rawBlobUrl = null;
     }
     this.pdfPreviewUrl.set(null);
-    this.previewCampaignId = null;
+    this.previewCacheKey = null;
   }
 
-  private loadBestiaryPreview(): void {
+  loadPackPreview(): void {
+    const c = this.campaign();
+    if (!c?.isOwner) {
+      this.revokePreviewUrl();
+      return;
+    }
+    const cacheKey = `${c.id}:pack`;
+    if (this.previewCacheKey === cacheKey && this.pdfPreviewUrl()) {
+      this.pdfPreviewKind.set('pack');
+      return;
+    }
+
+    this.pdfPreviewKind.set('pack');
+    this.isLoadingPreview.set(true);
+    this.loadCreatureEntries(c.data).subscribe({
+      next: async (entries) => {
+        try {
+          this.revokePreviewUrl();
+          const summaries = await this.loadPlayerSummaries();
+          const pdf = await getCampaignPdfService(this.injector);
+          const url = await pdf.generateCampaignPackBlob(c.title, c.data, entries, summaries);
+          this.rawBlobUrl = url;
+          this.previewCacheKey = cacheKey;
+          this.pdfPreviewUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+        } catch {
+          this.revokePreviewUrl();
+        } finally {
+          this.isLoadingPreview.set(false);
+        }
+      },
+      error: () => {
+        this.revokePreviewUrl();
+        this.isLoadingPreview.set(false);
+      },
+    });
+  }
+
+  loadBestiaryPreview(): void {
     const c = this.campaign();
     if (!c?.isOwner || !c.data.creatures.length) {
       this.revokePreviewUrl();
       return;
     }
-    if (this.previewCampaignId === c.id && this.pdfPreviewUrl()) return;
+    const cacheKey = `${c.id}:bestiary`;
+    if (this.previewCacheKey === cacheKey && this.pdfPreviewUrl()) {
+      this.pdfPreviewKind.set('bestiary');
+      return;
+    }
 
+    this.pdfPreviewKind.set('bestiary');
     this.isLoadingPreview.set(true);
     this.loadCreatureEntries(c.data).subscribe({
       next: async (entries) => {
@@ -829,7 +878,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
           const pdf = await getCampaignPdfService(this.injector);
           const url = await pdf.generateCreaturesPdfBlob(entries, c.title, c.data);
           this.rawBlobUrl = url;
-          this.previewCampaignId = c.id;
+          this.previewCacheKey = cacheKey;
           this.pdfPreviewUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
         } catch {
           this.revokePreviewUrl();
@@ -1418,11 +1467,28 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   printPackMj(): void {
-    this.runPrint(async (entries) => {
-      const c = this.campaign()!;
-      const summaries = await this.loadPlayerSummaries();
-      const pdf = await getCampaignPdfService(this.injector);
-      await pdf.downloadCampaignPack(c.title, c.data, entries, summaries);
+    const c = this.campaign();
+    if (!c) return;
+    this.printing.set(true);
+    this.error.set(null);
+    this.loadCreatureEntries(c.data).subscribe({
+      next: (entries) => {
+        void (async () => {
+          try {
+            const summaries = await this.loadPlayerSummaries();
+            const pdf = await getCampaignPdfService(this.injector);
+            await pdf.downloadCampaignPack(c.title, c.data, entries, summaries);
+          } catch {
+            this.error.set('Échec de la génération PDF.');
+          } finally {
+            this.printing.set(false);
+          }
+        })();
+      },
+      error: () => {
+        this.error.set('Impossible de charger les fiches créatures.');
+        this.printing.set(false);
+      },
     });
   }
 

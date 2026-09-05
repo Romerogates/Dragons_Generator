@@ -280,14 +280,6 @@
                 </button>
                 @if (c.role === 'dm') {
                   <button
-                    class="w-8 h-8 rounded-lg bg-[#1b2028] border border-slate-700 flex items-center justify-center text-xs text-slate-400 hover:text-amber-400 hover:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-40"
-                    title="PDF Bestiaire"
-                    [disabled]="isCardBusy(c)"
-                    (click)="downloadBestiary(c, $event)"
-                  >
-                    <iconify-icon icon="fluent-emoji:page-facing-up"></iconify-icon>
-                  </button>
-                  <button
                     class="w-8 h-8 rounded-lg bg-[#1b2028] border border-slate-700 flex items-center justify-center text-xs text-slate-400 hover:text-emerald-400 hover:border-emerald-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-40"
                     title="Dupliquer"
                     [disabled]="isCardBusy(c)"

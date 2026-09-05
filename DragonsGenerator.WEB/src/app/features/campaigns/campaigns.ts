@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Injector, inject, OnDestroy, OnInit, signal, computed, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal, computed, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
@@ -7,11 +7,7 @@ import { ConnectivityService } from '@core/services/connectivity.service';
 import { FriendsService } from '@core/services/friends.service';
 import { NotificationService } from '@core/services/notification.service';
 import { AuthService } from '@core/services/auth.service';
-import { DataService } from '@core/services/data.service';
-import { getCampaignPdfService } from '@core/services/campaign-pdf.loader';
-import type { CreaturePrintEntry } from '@core/services/campaign-pdf.types';
 import { CampaignData, CampaignInvite, CampaignSummary, emptyCampaignData } from '@core/models/Campaign/campaign';
-import { forkJoin, catchError, map, of, Observable } from 'rxjs';
 
 type RoleFilter = 'all' | 'dm' | 'player';
 
@@ -29,8 +25,6 @@ export class Campaigns implements OnInit, OnDestroy {
   private notifications = inject(NotificationService);
   private auth = inject(AuthService);
   private router = inject(Router);
-  private data = inject(DataService);
-  private injector = inject(Injector);
   private readonly offlineSync = inject(OfflineSyncService);
   private readonly connectivity = inject(ConnectivityService);
 
@@ -267,42 +261,6 @@ export class Campaigns implements OnInit, OnDestroy {
     });
   }
 
-  downloadBestiary(c: CampaignSummary, event: Event): void {
-    event.stopPropagation();
-    if (c.role !== 'dm') return;
-    this.cardActionId.set(c.id);
-    this.actionError.set(null);
-    this.campaigns.get(c.id).subscribe({
-      next: (detail) => {
-        if (!detail.data.creatures.length) {
-          this.actionError.set('Cette campagne ne contient aucune créature.');
-          this.cardActionId.set(null);
-          return;
-        }
-        this.loadCreatureEntries(detail.data).subscribe({
-          next: async (entries) => {
-            try {
-              const pdf = await getCampaignPdfService(this.injector);
-              await pdf.downloadCreaturesCompilation(entries, detail.title);
-            } catch {
-              this.actionError.set('Échec de la génération du PDF bestiaire.');
-            } finally {
-              this.cardActionId.set(null);
-            }
-          },
-          error: () => {
-            this.actionError.set('Impossible de charger les fiches créatures.');
-            this.cardActionId.set(null);
-          },
-        });
-      },
-      error: () => {
-        this.actionError.set('Campagne introuvable.');
-        this.cardActionId.set(null);
-      },
-    });
-  }
-
   isCardBusy(c: CampaignSummary): boolean {
     return this.cardActionId() === c.id;
   }
@@ -316,29 +274,6 @@ export class Campaigns implements OnInit, OnDestroy {
       month: 'short',
       year: 'numeric',
     }).format(date);
-  }
-
-  private loadCreatureEntries(data: CampaignData): Observable<CreaturePrintEntry[]> {
-    const selections = data.creatures;
-    if (!selections.length) return of([]);
-    return forkJoin(
-      selections.map((s) =>
-        this.data.getCreatureById(s.creatureId).pipe(
-          catchError(() => of(null)),
-          map(
-            (creature): CreaturePrintEntry | null =>
-              creature
-                ? {
-                    creature,
-                    customName: s.customName,
-                    role: s.role,
-                    backstory: s.backstory,
-                  }
-                : null,
-          ),
-        ),
-      ),
-    ).pipe(map((list) => list.filter((x): x is CreaturePrintEntry => x !== null)));
   }
 
   private buildEmptyCampaignData(
