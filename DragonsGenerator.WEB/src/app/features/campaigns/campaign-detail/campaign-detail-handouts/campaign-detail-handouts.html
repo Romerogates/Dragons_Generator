@@ -71,7 +71,7 @@
           <textarea
             rows="8"
             class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-300"
-            placeholder="Contenu visible par les joueurs (letter, résumé de scène, carte en texte…)"
+            placeholder="Contenu visible par les joueurs (lettre, résumé de scène, carte en texte…)"
             [ngModel]="handout.body"
             (ngModelChange)="handoutPatch.emit({ handoutId: handout.id, patch: { body: $event } })"
           ></textarea>
@@ -188,7 +188,7 @@
   } @empty {
     <p class="text-slate-500 italic text-center py-12">
       @if (isOwner()) {
-        Aucun document — créez un handout pour vos joueurs.
+        Aucun document — créez un document pour vos joueurs.
       } @else {
         Aucun document publié pour l'instant.
       }

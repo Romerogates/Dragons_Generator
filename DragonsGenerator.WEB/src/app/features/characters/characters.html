@@ -230,7 +230,7 @@
             type="text"
             class="w-full bg-[#171b22] border border-slate-700 rounded-xl py-3 px-4 text-slate-200 font-serif focus:border-red-500/50 focus:outline-none"
             [value]="deleteConfirmName()"
-            (input)="deleteConfirmName.set($any($event.target).value)"
+            (input)="onDeleteConfirmNameInput($event)"
             [placeholder]="getCharName(char)"
             autocomplete="off"
           />

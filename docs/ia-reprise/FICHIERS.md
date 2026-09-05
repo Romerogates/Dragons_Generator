@@ -13,7 +13,9 @@ Chemins depuis la racine du repo `Dragons_Generator`. Lire seulement ceux du suj
 - `DragonsGenerator.WEB/src/app/core/utils/class-spellcasting.util.ts`
 - `DragonsGenerator.WEB/src/app/core/utils/spell-quota.util.ts`
 - `DragonsGenerator.WEB/src/app/core/utils/character-spellcasting.util.ts`
+- `DragonsGenerator.WEB/src/app/core/utils/character-spellcasting-display.util.ts`
 - `DragonsGenerator.WEB/src/app/core/utils/progression-choices.util.ts`
+- `DragonsGenerator.WEB/src/app/core/utils/campaign-persist.util.ts`
 - `DragonsGenerator.WEB/src/app/features/character-creation/character-creation.ts`
 
 ## Étapes wizard
@@ -29,15 +31,16 @@ Chemins depuis la racine du repo `Dragons_Generator`. Lire seulement ceux du suj
 - `.../steps/equipment-step/equipment-step.ts`
 - `.../steps/languages-step/languages-step.ts`
 - `.../steps/magic-step/magic-step.ts`
-- `.../steps/identity-step/identity-step.ts`
-- `.../steps/summary-step/summary-step.ts`
+- `.../steps/identity-step/identity-step.ts` (+ `identity-step.spec.ts`)
+- `.../steps/summary-step/summary-step.ts` (+ `summary-step.spec.ts`)
 
 (`...` = `DragonsGenerator.WEB/src/app/features/character-creation`)
 
-## Fiche + PDF
+## Liste héros / fiche / PDF
 
+- `DragonsGenerator.WEB/src/app/features/characters/characters.ts` (+ `characters.spec.ts`)
 - `DragonsGenerator.WEB/src/app/features/character-sheet/character-sheet.ts`
-- `DragonsGenerator.WEB/src/app/features/character-sheet/character-play-view.ts`
+- `DragonsGenerator.WEB/src/app/features/character-sheet/character-play-view.ts` (+ `character-play-view.spec.ts`)
 - `DragonsGenerator.WEB/src/app/core/services/pdf-generator.service.ts`
 - `DragonsGenerator.WEB/src/app/core/config/grimoire-coords.config.ts`
 
@@ -59,6 +62,8 @@ Chemins depuis la racine du repo `Dragons_Generator`. Lire seulement ceux du suj
 - `DragonsGenerator.API/Endpoints/Campaigns/CampaignEndpoints.cs`
 - `DragonsGenerator.API/Persistence/AppDbContext.cs`
 - `DragonsGenerator.API/Persistence/Entities.cs`
+- `DragonsGenerator.API.Tests/HomeAndCampaignFeatureTests.cs`
+- `DragonsGenerator.API.Tests/SpellDataIntegrityTests.cs`
 
 ## Campagne front (si sujet table)
 
@@ -66,6 +71,7 @@ Chemins depuis la racine du repo `Dragons_Generator`. Lire seulement ceux du suj
 - `DragonsGenerator.WEB/src/app/features/campaigns/campaign-play-panel/campaign-play-panel.ts`
 - `DragonsGenerator.WEB/src/app/features/campaigns/campaign-dungeon-maps/campaign-dungeon-maps.ts`
 - `DragonsGenerator.WEB/src/app/core/utils/campaign-persist.util.ts`
+- `DragonsGenerator.WEB/src/app/core/utils/campaign-initiative.util.ts` (+ spec)
 - `DragonsGenerator.WEB/src/app/core/services/story-builder.service.ts`
 - `DragonsGenerator.WEB/src/app/core/services/campaign-cloud.service.ts`
 - `DragonsGenerator.WEB/src/app/core/services/campaign-pdf.service.ts`
@@ -81,6 +87,7 @@ Chemins depuis la racine du repo `Dragons_Generator`. Lire seulement ceux du suj
 
 - `README.md`
 - `docs/FONCTIONNALITES.md`
+- `docs/CHECKLIST-TESTS-MANUELS.md` ← checklist cochable Anthony
 - `docs/DEPLOY-PROD.md`
 - `.env.example`
 - `docker-compose.local.yml`
@@ -88,3 +95,4 @@ Chemins depuis la racine du repo `Dragons_Generator`. Lire seulement ceux du suj
 - `.github/workflows/deploy.yml`
 - `scripts/start-local.ps1`
 - `scripts/run-tests.ps1`
+- `DragonsGenerator.WEB/karma.conf.js` (seuil branches 85%)

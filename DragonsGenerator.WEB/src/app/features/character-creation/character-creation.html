@@ -61,23 +61,6 @@
         Étape {{ builder.currentStep() }} / {{ builder.totalSteps() }}
       </p>
       <div class="flex items-center gap-3 min-w-0 justify-end">
-        <span
-          class="flex items-center gap-2 shrink-0 text-[10px] font-black uppercase tracking-widest text-slate-400"
-          title="Niveau choisi à l’étape Niveau — revenez-y pour le modifier"
-          data-testid="wizard-level-indicator"
-        >
-          Niveau
-          <span
-            class="w-11 shrink-0 bg-[#12151a] border border-slate-800 rounded-lg px-1 py-1 text-amber-400 text-xs font-bold text-center tabular-nums"
-            >{{ builder.targetLevel() }}</span
-          >
-        </span>
-        <span
-          class="hidden sm:inline-block w-[7.5rem] shrink-0 text-right text-[10px] font-mono text-slate-500 tabular-nums"
-        >
-          BM +{{ builder.proficiencyBonus() }}
-          · PV {{ builder.hitPointsMax() }}
-        </span>
         <p class="text-[11px] font-serif text-amber-500/90 truncate min-w-0 text-right">
           {{ builder.steps()[builder.currentStep() - 1]?.title }}
         </p>

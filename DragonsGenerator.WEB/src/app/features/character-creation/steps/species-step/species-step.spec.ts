@@ -113,12 +113,14 @@ describe('SpeciesStep', () => {
   let setSpeciesSpy: jasmine.Spy;
   let clearSpeciesSpy: jasmine.Spy;
   let nextStepSpy: jasmine.Spy;
+  let previousStepSpy: jasmine.Spy;
 
   beforeEach(async () => {
     creationSignal = signal({});
     setSpeciesSpy = jasmine.createSpy('setSpecies');
     clearSpeciesSpy = jasmine.createSpy('clearSpecies');
     nextStepSpy = jasmine.createSpy('nextStep');
+    previousStepSpy = jasmine.createSpy('previousStep');
 
     await TestBed.configureTestingModule({
       imports: [SpeciesStep],
@@ -139,7 +141,7 @@ describe('SpeciesStep', () => {
             setSpecies: setSpeciesSpy,
             clearSpecies: clearSpeciesSpy,
             nextStep: nextStepSpy,
-            previousStep: jasmine.createSpy('previousStep'),
+            previousStep: previousStepSpy,
             targetLevel: () => 1,
           },
         },
@@ -210,6 +212,11 @@ describe('SpeciesStep', () => {
     component.continueToNextStep();
     expect(setSpeciesSpy).toHaveBeenCalled();
     expect(nextStepSpy).toHaveBeenCalled();
+  });
+
+  it('prevStep goes back to level step', () => {
+    component.prevStep();
+    expect(previousStepSpy).toHaveBeenCalled();
   });
 
   it('restoreFromBuilder rehydrates saved species picks', async () => {

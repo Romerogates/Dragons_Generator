@@ -79,16 +79,17 @@ export class EquipmentsList implements OnInit {
           : 'fluent-emoji:crossed-swords';
       case 'ARMOR':
         return eq.subtype === 'SHIELD' ? 'fluent-emoji:shield' : 'fluent-emoji:military-helmet';
-      case 'MOUNT':
+      case 'MOUNT': {
         const nameMount = eq.name.toLowerCase();
         if (nameMount.includes('éléphant')) return 'fluent-emoji:elephant';
         if (nameMount.includes('chameau')) return 'fluent-emoji:camel';
         return 'fluent-emoji:horse';
+      }
       case 'VEHICLE':
         if (eq.subtype === 'WATER') return 'fluent-emoji:sailboat';
         if (eq.subtype === 'AIR') return 'fluent-emoji:cloud';
         return 'fluent-emoji:shopping-cart'; // Véhicules terrestres
-      case 'TOOL':
+      case 'TOOL': {
         const nameTool = eq.name.toLowerCase();
         // Instruments de musique
         if (
@@ -100,7 +101,8 @@ export class EquipmentsList implements OnInit {
         if (nameTool.includes('jeu') || nameTool.includes('dés') || nameTool.includes('échecs'))
           return 'fluent-emoji:game-die';
         return 'fluent-emoji:hammer-and-wrench';
-      case 'GEAR':
+      }
+      case 'GEAR': {
         if (eq.subtype === 'CONTAINER') return 'fluent-emoji:backpack';
         const nameGear = eq.name.toLowerCase();
         // Alchimie et potions
@@ -119,6 +121,7 @@ export class EquipmentsList implements OnInit {
         )
           return 'fluent-emoji:scroll';
         return 'fluent-emoji:compass'; // Matériel générique
+      }
       case 'SERVICE':
         if (eq.name.toLowerCase().includes('repas') || eq.name.toLowerCase().includes('vin'))
           return 'fluent-emoji:beer-mug';

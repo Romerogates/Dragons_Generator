@@ -32,7 +32,7 @@
                 (ngModelChange)="patch(item.id, { encounterId: $event || undefined })"
               />
             }
-            @if (item.durationMin != null || item.kind === 'break') {
+            @if (typeof item.durationMin === 'number' || item.kind === 'break') {
               <input
                 type="number"
                 min="1"

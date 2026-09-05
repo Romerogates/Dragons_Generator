@@ -14,6 +14,10 @@ public sealed class UserPreferences
 
     [JsonPropertyName("guideAudience")]
     public string? GuideAudience { get; set; }
+
+    /// <summary>Dernier changement de pseudo (cooldown 7 jours).</summary>
+    [JsonPropertyName("displayNameChangedAt")]
+    public DateTimeOffset? DisplayNameChangedAt { get; set; }
 }
 
 public static class UserPreferencesHelper

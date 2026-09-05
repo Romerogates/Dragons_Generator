@@ -175,7 +175,7 @@
                 <p class="text-[10px] text-slate-600 mt-1">{{ formatDate(map.updatedAt) }}</p>
                 @if (handoutForMap(map); as ho) {
                   <p class="text-[11px] mt-2" [class]="ho.published ? 'text-emerald-400' : 'text-amber-400/90'">
-                    Handout {{ ho.published ? 'publié' : 'brouillon' }}
+                    Document {{ ho.published ? 'publié' : 'brouillon' }}
                   </p>
                 }
               </div>
@@ -219,7 +219,7 @@
         <button type="button" class="editor-action" [disabled]="exportBusy()" (click)="sharePng()">Partager</button>
         <button type="button" class="editor-action" [disabled]="exportBusy()" (click)="exportPdf()">PDF</button>
         <button type="button" class="editor-action" (click)="exportJson()">JSON</button>
-        <button type="button" class="editor-action editor-action--accent" (click)="createOrUpdateHandout()">Handout</button>
+        <button type="button" class="editor-action editor-action--accent" (click)="createOrUpdateHandout()">Document</button>
       </div>
     </div>
 
@@ -294,7 +294,7 @@
 
         <div class="rounded-xl border border-slate-800 bg-[#141820] p-4">
           <div class="flex items-center justify-between gap-2 mb-2">
-            <h4 class="text-[11px] font-bold uppercase tracking-widest text-violet-400/90">Fog of war</h4>
+            <h4 class="text-[11px] font-bold uppercase tracking-widest text-violet-400/90">Brouillard de guerre</h4>
             <button
               type="button"
               class="text-[10px] font-black uppercase px-2 py-1 rounded border transition-colors"
@@ -304,7 +304,7 @@
               [class.text-slate-500]="!map.fogOfWarEnabled"
               (click)="toggleFogOfWar()"
             >
-              {{ map.fogOfWarEnabled ? 'Activé' : 'Off' }}
+              {{ map.fogOfWarEnabled ? 'Activé' : 'Désactivé' }}
             </button>
           </div>
           @if (map.fogOfWarEnabled) {

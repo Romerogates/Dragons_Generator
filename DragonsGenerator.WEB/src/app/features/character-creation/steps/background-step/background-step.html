@@ -145,7 +145,7 @@
               class="list-disc list-inside text-sm text-amber-400 font-bold space-y-1.5 ml-2 mb-4"
             >
               @if (isCustom()) {
-                <li>2 compétences (au choix)</li>
+                <li>{{ customExtraSkill() ? 3 : 2 }} compétences (au choix)</li>
                 <li>2 maîtrises (outils, véhicules ou langues)</li>
               } @else {
                 @if (maxSkills() > 0) {
@@ -159,6 +159,21 @@
                 }
               }
             </ul>
+            @if (isCustom()) {
+              <label class="mt-1 mb-3 flex items-start gap-2 cursor-pointer text-xs text-slate-300">
+                <input
+                  type="checkbox"
+                  class="mt-0.5 accent-amber-500 shrink-0"
+                  [ngModel]="customExtraSkill()"
+                  (ngModelChange)="customExtraSkill.set($event)"
+                />
+                <span>
+                  Accorder une compétence / savoir
+                  <strong class="text-amber-400">en plus</strong>
+                  (3 au total au lieu de 2)
+                </span>
+              </label>
+            }
             <p class="text-xs text-slate-400 italic mt-auto flex items-start gap-2">
               <span class="text-amber-500">
                 <iconify-icon icon="fluent-emoji:information"></iconify-icon>
@@ -260,6 +275,47 @@
               placeholder="Décrivez l'effet de votre privilège..."
               class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 resize-none custom-scrollbar"
             ></textarea>
+            <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+              <button
+                type="button"
+                class="wizard-nav-secondary text-[10px]"
+                (click)="saveCurrentAsTemplate()"
+              >
+                Sauvegarder ce modèle
+              </button>
+              @if (templateMsg(); as msg) {
+                <p class="text-[11px] text-emerald-400/90">{{ msg }}</p>
+              }
+            </div>
+            @if (savedTemplates().length > 0) {
+              <div class="mt-2 border-t border-slate-800 pt-4">
+                <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">
+                  Modèles enregistrés
+                </p>
+                <ul class="flex flex-col gap-2">
+                  @for (t of savedTemplates(); track t.id) {
+                    <li
+                      class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900/60 border border-slate-800"
+                    >
+                      <button
+                        type="button"
+                        class="flex-1 text-left text-xs text-amber-400 hover:text-amber-300 font-serif truncate"
+                        (click)="applyTemplate(t)"
+                      >
+                        {{ t.name }}
+                      </button>
+                      <button
+                        type="button"
+                        class="text-[10px] text-slate-500 hover:text-red-400 shrink-0"
+                        (click)="removeTemplate(t.id)"
+                      >
+                        Suppr.
+                      </button>
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
           </div>
         </div>
       }

@@ -234,7 +234,7 @@ export interface CampaignInvite {
 export type HandoutKind = 'letter' | 'map' | 'summary' | 'other';
 
 export const HANDOUT_KIND_LABELS: Record<HandoutKind, string> = {
-  letter: 'Letter',
+  letter: 'Lettre',
   map: 'Carte',
   summary: 'Résumé',
   other: 'Autre',

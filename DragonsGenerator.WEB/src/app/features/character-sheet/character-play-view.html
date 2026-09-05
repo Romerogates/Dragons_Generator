@@ -7,7 +7,9 @@
           {{ c.vitality.hitPointsCurrent }}/{{ c.vitality.hitPointsMax }}
         </div>
         @if (c.vitality.hitPointsTemporary) {
-          <div class="text-[10px] text-sky-400">+{{ c.vitality.hitPointsTemporary }} temp</div>
+          <div class="text-[10px] text-sky-400">
+            +{{ c.vitality.hitPointsTemporary }} temporaires
+          </div>
         }
       </div>
       <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-3 text-center">
@@ -17,14 +19,18 @@
       </div>
       <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-3 text-center">
         <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Init</div>
-        <div class="text-lg font-serif text-amber-300">{{ c.initiative >= 0 ? '+' : '' }}{{ c.initiative }}</div>
+        <div class="text-lg font-serif text-amber-300">
+          {{ c.initiative >= 0 ? '+' : '' }}{{ c.initiative }}
+        </div>
       </div>
       <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-3 text-center">
         <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Maîtrise</div>
         <div class="text-lg font-serif text-slate-200">+{{ c.proficiencyBonus }}</div>
       </div>
       <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-3 text-center">
-        <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Perception</div>
+        <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">
+          Perception
+        </div>
         <div class="text-lg font-serif text-slate-200">{{ c.senses.passivePerception }}</div>
       </div>
       <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-3 text-center">
@@ -33,7 +39,7 @@
       </div>
     </div>
 
-    <p class="text-sm text-slate-400">{{ classLine() }} · Niv. {{ c.totalLevel }}</p>
+    <p class="text-sm text-slate-400">{{ classLine() }} · Total niv. {{ c.totalLevel }}</p>
 
     <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
       @for (key of abilityKeys; track key) {
@@ -50,7 +56,7 @@
       }
     </div>
 
-    @if (c.attacks?.length) {
+    @if (c.attacks.length) {
       <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-4">
         <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-3">Attaques</h3>
         <div class="overflow-x-auto">
@@ -69,10 +75,14 @@
                   <td class="py-2 pr-3">
                     {{ atk.name }}
                     @if (atk.properties?.length) {
-                      <span class="block text-[10px] text-slate-500">{{ atk.properties?.join(', ') }}</span>
+                      <span class="block text-[10px] text-slate-500">{{
+                        atk.properties?.join(', ')
+                      }}</span>
                     }
                   </td>
-                  <td class="py-2 pr-3 text-amber-300">{{ atk.attackBonus >= 0 ? '+' : '' }}{{ atk.attackBonus }}</td>
+                  <td class="py-2 pr-3 text-amber-300">
+                    {{ atk.attackBonus >= 0 ? '+' : '' }}{{ atk.attackBonus }}
+                  </td>
                   <td class="py-2 pr-3">{{ atk.damage }} {{ atk.damageType }}</td>
                   <td class="py-2 text-slate-400">{{ atk.range }}</td>
                 </tr>
@@ -85,12 +95,19 @@
 
     @if (resourceChips().length) {
       <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-4">
-        <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-3">Ressources</h3>
+        <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-1">
+          Ressources de classe
+        </h3>
+        <p class="text-[11px] text-slate-500 mb-3">
+          Points et usages (rage, ki, inspiration…) — hors emplacements de sorts.
+        </p>
         <ul class="grid sm:grid-cols-2 gap-1.5">
           @for (r of resourceChips(); track r.key) {
-            <li class="flex justify-between text-xs text-slate-300 bg-[#171b22] rounded-lg px-3 py-2 border border-slate-800">
+            <li
+              class="flex justify-between gap-3 text-xs text-slate-300 bg-[#171b22] rounded-lg px-3 py-2 border border-slate-800"
+            >
               <span>{{ r.label }}</span>
-              <span class="font-bold text-amber-400">{{ r.value }}</span>
+              <span class="font-bold text-amber-400 shrink-0">{{ r.value }}</span>
             </li>
           }
         </ul>
@@ -98,59 +115,111 @@
     }
 
     @if (c.spellcasting; as sc) {
-      <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-4 space-y-3">
-        <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500">Incantation</h3>
-        <p class="text-sm text-slate-300">
-          {{ sc.ability }} · DD {{ sc.spellSaveDC }} · Att. {{ sc.spellAttackBonus >= 0 ? '+' : '' }}{{ sc.spellAttackBonus }}
-          @if (focusLabel()) {
-            · {{ focusLabel() }}
+      <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-4 space-y-4">
+        <div>
+          <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-2">
+            Incantation
+          </h3>
+          <p class="text-sm text-slate-300">
+            Caractéristique : {{ sc.ability }} · DD des sorts {{ sc.spellSaveDC }} · Attaque de sort
+            {{ sc.spellAttackBonus >= 0 ? '+' : '' }}{{ sc.spellAttackBonus }}
+            @if (focusLabel()) {
+              · Focaliseur : {{ focusLabel() }}
+            }
+          </p>
+          @for (line of spellcastingLines(); track line) {
+            <p class="text-xs text-sky-300/90 mt-1">{{ line }}</p>
           }
-        </p>
-        @for (line of spellcastingLines(); track line) {
-          <p class="text-xs text-sky-300/90">{{ line }}</p>
+        </div>
+
+        @if (sc.cantrips.max > 0) {
+          <p class="text-xs text-slate-400">
+            Tours de magie connus : {{ sc.cantrips.max }}
+          </p>
         }
-        @if (sc.spellSlots?.length) {
-          <div class="flex flex-wrap gap-2">
-            @for (slot of sc.spellSlots; track slot.level) {
-              <span class="text-[11px] px-2 py-1 rounded-lg bg-[#171b22] border border-slate-700 text-slate-300">
-                Niv. {{ slot.level }} · {{ slot.max - slot.used }}/{{ slot.max }}
-              </span>
-            }
-          </div>
-        }
-        @if (sc.pactSlots?.length) {
-          <div class="flex flex-wrap gap-2">
-            @for (slot of sc.pactSlots; track slot.level) {
-              <span class="text-[11px] px-2 py-1 rounded-lg bg-violet-950/40 border border-violet-800/50 text-violet-200">
-                Pacte {{ slot.level }} · {{ slot.max }}
-              </span>
-            }
-          </div>
-        }
-        @for (group of spellsByLevel(); track group.level) {
+
+        @if (sc.spellSlots.length) {
           <div>
-            <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">
-              {{ group.level === 0 ? 'Tours de magie' : 'Niveau ' + group.level }}
+            <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
+              Emplacements de sorts
             </h4>
-            <ul class="text-sm text-slate-300 space-y-1">
-              @for (sp of group.spells; track sp.refId) {
-                <li>
-                  <span class="font-bold text-slate-100">{{ sp.name }}</span>
-                  @if (sp.prepared) {
-                    <span class="text-[10px] text-emerald-400 ml-1">préparé</span>
-                  }
-                  @if (sp.effectSummary) {
-                    <span class="block text-[11px] text-slate-500">{{ sp.effectSummary }}</span>
-                  }
-                </li>
+            <div class="flex flex-wrap gap-2">
+              @for (slot of sc.spellSlots; track slot.level) {
+                <span
+                  class="text-[11px] px-2.5 py-1.5 rounded-lg bg-[#171b22] border border-slate-700 text-slate-300"
+                >
+                  Niv. {{ slot.level }} —
+                  <span class="text-amber-300 font-semibold">{{
+                    slotRemaining(slot.max, slot.used)
+                  }}</span>
+                  / {{ slot.max }} restants
+                </span>
               }
-            </ul>
+            </div>
           </div>
+        }
+
+        @if (sc.pactSlots?.length) {
+          <div>
+            <h4 class="text-[10px] font-black uppercase tracking-widest text-violet-400/90 mb-2">
+              Magie de pacte
+            </h4>
+            <div class="flex flex-wrap gap-2">
+              @for (slot of sc.pactSlots!; track slot.level) {
+                <span
+                  class="text-[11px] px-2.5 py-1.5 rounded-lg bg-violet-950/40 border border-violet-800/50 text-violet-200"
+                >
+                  Emplacement niv. {{ slot.level }} —
+                  <span class="font-semibold">{{ slotRemaining(slot.max, slot.used) }}</span>
+                  / {{ slot.max }}
+                </span>
+              }
+            </div>
+          </div>
+        }
+
+        @if (spellsByLevel().length) {
+          <div class="space-y-3 border-t border-slate-800 pt-3">
+            <div class="flex flex-wrap items-baseline justify-between gap-2">
+              <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                Grimoire
+              </h4>
+              @if (preparedSpellCount() > 0) {
+                <span class="text-[11px] text-emerald-400/90"
+                  >{{ preparedSpellCount() }} sort(s) préparé(s)</span
+                >
+              }
+            </div>
+            @for (group of spellsByLevel(); track group.level) {
+              <div>
+                <h5 class="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-1">
+                  {{ group.title }}
+                </h5>
+                <ul class="text-sm text-slate-300 space-y-1">
+                  @for (sp of group.spells; track sp.refId) {
+                    <li>
+                      <span class="font-bold text-slate-100">{{ sp.name }}</span>
+                      @if (sp.prepared) {
+                        <span class="text-[10px] text-emerald-400 ml-1">préparé</span>
+                      }
+                      @if (sp.effectSummary) {
+                        <span class="block text-[11px] text-slate-500">{{ sp.effectSummary }}</span>
+                      }
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="text-xs text-slate-500 italic border-t border-slate-800 pt-3">
+            Aucun sort listé dans le grimoire pour l’instant.
+          </p>
         }
       </section>
     }
 
-    @if (c.features?.length) {
+    @if (c.features.length) {
       <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-4 space-y-3">
         <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500">Aptitudes</h3>
         @for (feat of c.features; track feat.refId || feat.name) {
@@ -173,7 +242,9 @@
             </h3>
             <ul class="flex flex-wrap gap-2">
               @for (sk of skillList(); track sk.id) {
-                <li class="text-[11px] px-2 py-1 rounded-lg bg-[#171b22] border border-slate-700 text-slate-300">
+                <li
+                  class="text-[11px] px-2 py-1 rounded-lg bg-[#171b22] border border-slate-700 text-slate-300"
+                >
                   {{ sk.label }}
                   @if (sk.expertise) {
                     <span class="text-amber-400"> ×2</span>
@@ -202,9 +273,11 @@
       </section>
     }
 
-    @if (c.equipment?.length) {
+    @if (c.equipment.length) {
       <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-4">
-        <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-2">Équipement</h3>
+        <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-2">
+          Équipement
+        </h3>
         <ul class="text-sm text-slate-300 space-y-1">
           @for (item of c.equipment; track item.instanceId) {
             <li>{{ item.qty > 1 ? item.qty + '× ' : '' }}{{ item.name }}</li>

@@ -1,4 +1,4 @@
-import type { AbilityScores, AsiChoiceSlot, FeatureInstance } from '@core/models/Character/character';
+import type { AbilityScores, AsiChoiceSlot } from '@core/models/Character/character';
 import {
   aggregateAsiChoices,
   canAffordAbilityScore,

@@ -183,14 +183,10 @@ export class SummaryStep implements OnInit, OnDestroy {
           cloudSynced: false,
         };
         this.offlineSync.queueCharacterSave(withId, this.isEditMode());
-        this.handoff.setCurrent(withId);
-        this.pendingSave.clear();
         this.saving.set(false);
         this.saveError.set(
-          'Hors ligne : personnage enregistré localement. Il sera envoyé au cloud dès que la connexion reviendra.',
+          'La sauvegarde cloud a échoué. Une copie locale est en file d’attente — réessayez, ou téléchargez le PDF en attendant.',
         );
-        this.builder.reset();
-        void this.router.navigate(['/characters']);
       },
     });
   }

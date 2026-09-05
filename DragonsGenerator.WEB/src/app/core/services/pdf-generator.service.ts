@@ -774,7 +774,7 @@ export class PdfGeneratorService {
     if (!chips.length) return;
     const P = PAGE2;
     pdf.setFontSize(7);
-    let y = P.shortRestStartY - 18;
+    const y = P.shortRestStartY - 18;
     const line = chips.map((r) => `${r.label} : ${r.value}`).join('  ·  ');
     this.text(pdf, line, P.shortRestNameX, y);
   }

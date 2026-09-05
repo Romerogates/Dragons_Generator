@@ -15,6 +15,20 @@ import {
 } from '@core/utils/character-spellcasting-display.util';
 import { labelForGameId } from '@core/utils/game-id-labels';
 
+/** Clés déjà couvertes par le bloc Incantation — évite le doublon dans Ressources. */
+const SPELLCASTING_RESOURCE_DUPES = new Set([
+  'cantrips_known',
+  'cantrips',
+  'spells_known',
+  'known_spells',
+  'spells_prepared',
+  'prepared_spells',
+  'spell_slots',
+  'pact_magic',
+  'pact_slots_count',
+  'pact_slot_level',
+]);
+
 @Component({
   selector: 'app-character-play-view',
   standalone: true,
@@ -33,13 +47,17 @@ export class CharacterPlayView {
     return (c.classes ?? [])
       .map((cls) =>
         cls.subclassLabel
-          ? `${cls.classLabel} ${cls.subclassLabel} ${cls.level}`
-          : `${cls.classLabel} ${cls.level}`,
+          ? `${cls.classLabel} — ${cls.subclassLabel} (niv. ${cls.level})`
+          : `${cls.classLabel} (niv. ${cls.level})`,
       )
-      .join(' / ');
+      .join(' · ');
   });
 
-  readonly resourceChips = computed(() => visibleClassResources(this.character().classResources));
+  readonly resourceChips = computed(() => {
+    const chips = visibleClassResources(this.character().classResources);
+    if (!this.character().spellcasting) return chips;
+    return chips.filter((r) => !SPELLCASTING_RESOURCE_DUPES.has(r.key));
+  });
 
   readonly saveSet = computed(() => new Set(this.character().proficiencies?.savingThrows ?? []));
 
@@ -70,8 +88,16 @@ export class CharacterPlayView {
     }
     return [...groups.entries()]
       .sort((a, b) => a[0] - b[0])
-      .map(([level, spells]) => ({ level, spells }));
+      .map(([level, spells]) => ({
+        level,
+        title: level === 0 ? 'Tours de magie' : `Sorts de niveau ${level}`,
+        spells: [...spells].sort((a, b) => a.name.localeCompare(b.name, 'fr')),
+      }));
   });
+
+  readonly preparedSpellCount = computed(() =>
+    (this.character().knownSpells ?? []).filter((s) => s.level > 0 && s.prepared).length,
+  );
 
   readonly spellcastingLines = computed(() =>
     spellcastingDisplayLines(this.character().spellcasting),
@@ -91,5 +117,9 @@ export class CharacterPlayView {
 
   isSave(key: AbilityKey): boolean {
     return this.saveSet().has(this.abilityLabel[key]);
+  }
+
+  slotRemaining(max: number, used: number): number {
+    return Math.max(0, max - used);
   }
 }

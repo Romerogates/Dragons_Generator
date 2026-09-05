@@ -117,6 +117,23 @@ describe('LanguagesStep', () => {
     expect(nextStepSpy).toHaveBeenCalled();
   });
 
+  it('hides common languages when remaining picks must be exotic', () => {
+    creationSignal.set(
+      languagesCreation({ bonusLanguageCount: 1, requiredExoticLanguageCount: 1 }),
+    );
+    fixture.detectChanges();
+
+    expect(component.mustReserveExoticSlots()).toBeTrue();
+    expect(component.availableBaseLanguages().length).toBe(0);
+    expect(component.availableExoticLanguages().length).toBe(2);
+
+    component.addLanguage('Commun');
+    expect(addLanguageSpy).not.toHaveBeenCalled();
+
+    component.addLanguage('Draconique');
+    expect(addLanguageSpy).toHaveBeenCalledWith('Draconique');
+  });
+
   it('does not gate on base languages when no class requirement is set', () => {
     expect(component.requiredBaseCount()).toBe(0);
     expect(component.baseRemaining()).toBe(0);

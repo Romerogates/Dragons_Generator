@@ -62,7 +62,7 @@
       <div class="border-b border-amber-900/40 bg-amber-950/25">
         <div class="max-w-5xl mx-auto px-4 py-4 space-y-3">
           <p class="text-sm text-amber-100">
-            <span class="font-semibold">Le MJ attend ton initiative.</span>
+            <span class="font-semibold">Le MJ attend votre initiative.</span>
           </p>
           <app-campaign-initiative-inline
             [campaignId]="c.id"
@@ -617,10 +617,15 @@
                 @if (c.isOwner && encounterTotalXp(enc) > 0 && !enc.xpAwarded) {
                   <button
                     type="button"
-                    class="mt-4 w-full py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-950/30 border border-emerald-800/40 text-emerald-300"
+                    class="mt-4 w-full py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-950/30 border border-emerald-800/40 text-emerald-300 disabled:opacity-50"
+                    [disabled]="awardingXpId() === enc.id"
                     (click)="distributeEncounterXp(enc)"
                   >
-                    Distribuer {{ encounterTotalXp(enc) }} XP aux joueurs
+                    @if (awardingXpId() === enc.id) {
+                      Distribution…
+                    } @else {
+                      Distribuer {{ encounterTotalXp(enc) }} XP aux joueurs
+                    }
                   </button>
                 }
               </article>

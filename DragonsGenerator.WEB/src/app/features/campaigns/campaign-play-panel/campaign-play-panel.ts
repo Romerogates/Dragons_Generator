@@ -120,6 +120,8 @@ export class CampaignPlayPanel implements OnDestroy {
     this.players().filter((p) => p.proposalStatus === 'approved' && p.approvedCharacterId),
   );
 
+  readonly awardingXpId = signal<string | null>(null);
+
   readonly combatMissingInitCount = computed(() => {
     const combat = this.activeCombat();
     if (!combat) return 0;
@@ -642,6 +644,7 @@ export class CampaignPlayPanel implements OnDestroy {
       this.setFeedback('err', 'XP déjà distribuée ou action impossible.');
       return;
     }
+    if (this.awardingXpId()) return;
     const xpGained = encounterTotalXp(encounter);
     if (xpGained <= 0) {
       this.setFeedback('err', 'Aucun XP à distribuer pour cette rencontre.');
@@ -660,6 +663,7 @@ export class CampaignPlayPanel implements OnDestroy {
       return;
     }
 
+    this.awardingXpId.set(encounter.id);
     let completed = 0;
     let failed = 0;
     for (const player of approved) {
@@ -667,12 +671,12 @@ export class CampaignPlayPanel implements OnDestroy {
         next: () => {
           completed++;
           if (completed + failed === approved.length) {
+            this.awardingXpId.set(null);
             if (failed === 0) {
               const encounters = c.data.encounters.map((e) =>
                 e.id === encounter.id ? { ...e, xpAwarded: true } : e,
               );
               this.saveData({ encounters });
-              this.reload();
               this.setFeedback(
                 'ok',
                 `+${share} XP × ${approved.length} joueur(s) (${xpGained} XP total).`,
@@ -688,6 +692,7 @@ export class CampaignPlayPanel implements OnDestroy {
         error: () => {
           failed++;
           if (completed + failed === approved.length) {
+            this.awardingXpId.set(null);
             this.setFeedback(
               'err',
               `Échec XP (${completed}/${approved.length} OK). Vérifiez la connexion.`,

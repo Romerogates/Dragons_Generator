@@ -674,7 +674,7 @@ export class CampaignDungeonMaps implements OnDestroy {
       m.id === map.id ? { ...m, handoutId, updatedAt: now } : m,
     );
     this.dataChange.emit({ dungeonMaps: maps, handouts });
-    this.message.set('Handout brouillon enregistré (Documents).');
+    this.message.set('Document brouillon enregistré (onglet Documents — publiez pour les joueurs).');
   }
 
   exportJson(): void {
@@ -706,7 +706,11 @@ export class CampaignDungeonMaps implements OnDestroy {
       fogOfWarEnabled: enabled,
       revealedRoomIds: enabled ? (map.revealedRoomIds ?? []) : [],
     });
-    this.message.set(enabled ? 'Fog of war activé — révélez les salles une par une.' : 'Fog of war désactivé.');
+    this.message.set(
+      enabled
+        ? 'Brouillard de guerre activé — révélez les salles une par une.'
+        : 'Brouillard de guerre désactivé.',
+    );
   }
 
   isRoomRevealed(roomId: string): boolean {

@@ -222,7 +222,7 @@
                 [accentColor]="u.accentColor"
                 size="xs"
               />
-              <span class="max-w-[8rem] truncate hidden min-[480px]:inline">{{ u.displayName }}</span>
+              <span class="max-w-[12rem] sm:max-w-[16rem] truncate hidden min-[480px]:inline" [title]="u.displayName">{{ u.displayName }}</span>
             } @else {
               <span>Compte</span>
             }

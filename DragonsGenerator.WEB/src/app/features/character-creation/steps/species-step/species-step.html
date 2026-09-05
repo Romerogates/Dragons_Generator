@@ -21,6 +21,11 @@
 
   @if (!loading() && !error()) {
     <div class="text-center w-full px-4 mt-2 flex-none z-10">
+      <div class="mb-3 flex justify-start">
+        <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
+          ← Retour au niveau
+        </button>
+      </div>
       <div
         class="transition-opacity duration-300 w-full max-w-4xl mx-auto"
         [ngClass]="transitioning() ? 'opacity-0' : 'opacity-100'"
@@ -193,10 +198,15 @@
         <button type="button" class="wizard-nav-secondary" (click)="clearSelection()">
           ← Revenir au choix des peuples
         </button>
-      } @else if (canContinue()) {
-        <button type="button" class="wizard-nav-secondary" (click)="clearSelection()">
-          ← Changer de peuple
+      } @else {
+        <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
+          ← Étape précédente
         </button>
+        @if (canContinue()) {
+          <button type="button" class="wizard-nav-secondary" (click)="clearSelection()">
+            ← Changer de peuple
+          </button>
+        }
       }
 
       @if (canContinue()) {

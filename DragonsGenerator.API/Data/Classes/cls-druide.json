@@ -1268,7 +1268,7 @@
         "id": "subcls-cercle-des-esprits",
         "name": "Cercle des Esprits",
         "flavor": {
-          "summary": "Héritiers de traditions chamaniques, ces druides communiquent avec les esprits gardiens de la nature via des transes rituelles et un animal totem.",
+          "summary": "Héritiers de traditions chamaniques, ces druides communiquent avec les esprits gardiens de la nature via des transes rituelles et un animal totem (parmi les bêtes éligibles à la forme sauvage selon votre niveau — loup, ours, aigle, cerf, serpent, etc.).",
           "lore_note": "Le monde des esprits sauvages est un territoire onirique d'Eana, farouche et d'une beauté intense. Les membres du cercle sont respectés et craints."
         },
         "choice_pools": [

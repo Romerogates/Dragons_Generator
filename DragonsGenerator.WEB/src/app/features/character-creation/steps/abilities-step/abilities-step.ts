@@ -22,10 +22,10 @@ import {
 } from '@core/models/Character/character';
 import {
   asiLevelsForClass,
-  countAsiSlots,
   multiclassPrerequisiteLabel,
   multiclassPrerequisitesMet,
 } from '@core/utils/progression-choices.util';
+import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
 import {
   featAsiAbilityOptions,
   featAsiNeedsAbilityChoice,
@@ -117,9 +117,9 @@ export class AbilitiesStep implements OnInit {
   readonly activeSlotIndex = signal(0);
   readonly asiSlots = signal<AsiSlotUi[]>([]);
   readonly feats = signal<FeatUi[]>([]);
-  readonly classJson = signal<any>(null);
+  readonly classJson = signal<CharacterClass | null>(null);
   /** JSON des classes de multiclassage, indexé par classId (pour leurs propres paliers ASI/prérequis). */
-  readonly secondaryClassJsonById = signal<Map<string, any>>(new Map());
+  readonly secondaryClassJsonById = signal<Map<string, CharacterClass>>(new Map());
 
   /** Catalogues chargés pour les sous-choix du don "Talent" (4 points flexibles). */
   readonly talentSkillCatalog = signal<{ id: string; name: string }[]>([]);

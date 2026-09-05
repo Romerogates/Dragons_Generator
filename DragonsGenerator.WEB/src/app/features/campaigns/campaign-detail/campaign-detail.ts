@@ -46,6 +46,7 @@ import {
 } from '@core/models/Campaign/campaign';
 import { ADVENTURE_TONE_LABELS } from '@core/models/Story/story';
 import { formatChallengeRating, getCreatureCategoryLabel } from '@core/utils/creature-display.util';
+import { shouldShowPlayerInitiativePrompt } from '@core/utils/campaign-initiative.util';
 import { StoryBuilderService } from '@core/services/story-builder.service';
 import { CampaignPregenGeneratorService } from '@core/services/campaign-pregen-generator.service';
 import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
@@ -282,17 +283,11 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     () => (this.campaign()?.data.handouts ?? []).filter((h) => h.published).length,
   );
 
-  readonly showInitiativeBanner = computed(() => {
-    const board = this.initiativeBoard();
-    if (!board?.open || !board.code) return false;
-    const userId = this.auth.user()?.id;
-    const list = board.combatants;
-    if (!list.length) return false;
-    if (!userId) return list.some((c) => !c.hasRoll);
-    const linked = list.filter((c) => c.memberUserId === userId);
-    const targets = linked.length ? linked : list;
-    return targets.some((c) => !c.hasRoll);
-  });
+  readonly showInitiativeBanner = computed(() =>
+    shouldShowPlayerInitiativePrompt(this.initiativeBoard(), this.auth.user()?.id),
+  );
+
+  readonly awardingXpId = signal<string | null>(null);
 
   readonly initiativeBannerCode = computed(() => this.initiativeBoard()?.code ?? null);
 
@@ -920,6 +915,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   distributeEncounterXp(encounter: EncounterGroup): void {
     const c = this.campaign();
     if (!c || !c.isOwner || encounter.xpAwarded) return;
+    if (this.awardingXpId()) return;
     const xpGained = encounterTotalXp(encounter);
     if (xpGained <= 0) return;
 
@@ -932,17 +928,35 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const share = Math.floor(xpGained / approved.length);
     if (share <= 0) return;
 
+    this.awardingXpId.set(encounter.id);
+    this.error.set(null);
     let completed = 0;
+    let failed = 0;
     for (const player of approved) {
       this.campaigns.awardXp(c.id, player.id, share).subscribe({
         next: () => {
           completed++;
-          if (completed === approved.length) {
-            const encounters = c.data.encounters.map((e) =>
-              e.id === encounter.id ? { ...e, xpAwarded: true } : e,
+          if (completed + failed === approved.length) {
+            this.awardingXpId.set(null);
+            if (failed === 0) {
+              const encounters = c.data.encounters.map((e) =>
+                e.id === encounter.id ? { ...e, xpAwarded: true } : e,
+              );
+              this.saveData({ encounters });
+            } else {
+              this.error.set(
+                `XP partiellement envoyée (${completed}/${approved.length}). Réessayez.`,
+              );
+            }
+          }
+        },
+        error: () => {
+          failed++;
+          if (completed + failed === approved.length) {
+            this.awardingXpId.set(null);
+            this.error.set(
+              `Échec XP (${completed}/${approved.length} OK). Vérifiez la connexion.`,
             );
-            this.saveData({ encounters });
-            this.reload();
           }
         },
       });

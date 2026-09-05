@@ -406,11 +406,12 @@ export class SkillsStep implements OnInit {
   readonly isCustomBg = computed(() => this.builder.creation().backgroundPreset === false);
 
   readonly bgSkillChooseCount = computed(() => {
-    if (this.isCustomBg()) return 2;
     const skills = this.bgProf()?.skills as
       | (BackgroundSkillChoice & { choose_count?: number })
       | undefined;
-    return skills?.chooseCount ?? skills?.choose_count ?? 0;
+    const fromProf = skills?.chooseCount ?? skills?.choose_count;
+    if (this.isCustomBg()) return fromProf ?? 2;
+    return fromProf ?? 0;
   });
 
   readonly bgFixedSkills = computed(() => {

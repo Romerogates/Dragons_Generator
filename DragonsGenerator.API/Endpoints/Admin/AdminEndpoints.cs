@@ -191,10 +191,7 @@ public class AdminSendResetEmailEndpoint(
             await email.SendAsync(
                 user.Email,
                 "Réinitialisation du mot de passe (admin) — Dragons Generator",
-                $"""
-                <h2>Réinitialisation demandée par un administrateur</h2>
-                <p><a href="{link}">Choisir un nouveau mot de passe</a></p>
-                """,
+                AuthEmailTemplates.PasswordReset(user.DisplayName, link),
                 ct
             );
         }

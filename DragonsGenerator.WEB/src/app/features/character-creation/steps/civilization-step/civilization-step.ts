@@ -245,6 +245,12 @@ export class CivilizationStep implements OnInit, OnDestroy {
     this.builder.nextStep();
   }
 
+  /** Déjà confirmé (retour depuis une étape suivante) : avancer sans réécrire la sélection. */
+  continueToNextStep(): void {
+    if (!this.isConfirmed()) return;
+    this.builder.nextStep();
+  }
+
   clearSelection(): void {
     this.selectedCivId.set(null);
     this.builder.clearCivilization();

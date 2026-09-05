@@ -9,36 +9,36 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 - **Import JSON joueur** : hors scope (pas d’UI d’import fichier perso).
 - Ne pas committer `.env` / secrets. Commit + push seulement si Anthony le demande.
 - UI touchée → vérifier dans le navigateur (pas juste un screenshot).
+- PowerShell : `;` pas `&&`.
+- Couverture Angular : **branches ≥ 85%** (karma) — si le seuil casse, ajouter des tests, ne pas baisser le seuil.
 
 ## À faire (priorité)
 
-_(Backlog qualité vide — Anthony choisit le prochain sujet produit / polish.)_
+*(vide — feedback tests 2.1 traité. Suite = suite checklist manuelle.)*
+
+**Livré suite feedback 2.1 :** mails parchemin + auto-login confirm ; pseudo navbar + cooldown 1×/sem ; wizard sans BM/PV trompeurs ; retour niveau espèce ; restore historique/personnalité ; modèles custom localStorage ; compétence/savoir +1 optionnel (custom) ; langues exotiques contraintes + source bonus ; totem druide icônes + lore.
+
+**Tests manuels** : cocher `docs/CHECKLIST-TESTS-MANUELS.md`.
 
 ## Déjà livré (ne pas refaire)
 
-- **Languages / identity UX + typage** — `classJson: CharacterClass` ; erreur langues affichée ; catégories FR ; identity sexe typé, placeholders traits, résumé avec sous-classe ; alignment option sans `selected` cassé.
-- **Typage equipment-step + fiche** — slots historique via `ExtendedCharacterCreation` (plus de `as any`) ; `character-sheet` getSpecies/getClass typés sur `Character`.
-- **Typage auth/admin + lint campagne** — `confirm-email` / `admin` sans `any` ; import inutilisé `SessionTimelineItem` retiré.
-- **Typage class-step / abilities-step** — plus de `any` : `ClassChoicePool` / `FeatureJson` enrichi, helpers `asChoicePools`/`asFeatureJsonList` ; callbacks `Feat[]` / `Equipment[]` côté caracs.
-- **Tests invites reject/decline** — cas limites API : decline + re-invite, decline par tiers → 404, non-ami → 400 / doublon pending → 409, reject perso sans proposition pending / non-MJ → 404.
-- **Typage skills-step** — groupes outils (`BgToolChoiceGroup` / `ToolCatalogGroup`) + handlers UI ; `normalizeToolOption(unknown)` ; plus de `any` dans l’étape Compétences.
-- **Typage magic-step** — `CharacterClass` / `SpellcastingDetailsDraft` ; plus de `any` dans l’étape Magie.
-- **Audit sorts `classes`** — 380/380 JSON ont `classes` non vide ; 21 BOM UTF-8 retirés ; garde-fou `SpellDataIntegrityTests`.
-- **Tests wizard** — specs déjà présentes : `class-step`, `skills-step`, `background-step`, `equipment-step`, `languages-step`, `magic-step`.
-- **Tests API métier** — intégration déjà en place : `CharacterCampaignIntegrationTests`, `HomeAndCampaignFeatureTests` (invites), `FriendSupportIntegrationTests` (tickets).
-- **Persistance table / campagne** — PUT sérialisés ; succès ne réapplique plus le blob envoyé (évite last-write-wins local) ; debounce notes/titre ; flush cartes donjon onDestroy / changement d’onglet / edit scénario ; `pinnedHandoutId` conservé au re-save story ; poll initiative = merge jets seulement ; navigation `/play` après PUT OK.
-- **IDs d’équipement ambigus** — kits classes normalisés (moine fléchettes/cestes, munitions barbare/sorcier, sacs, druide serpe/masse, paladin focus, espion matériel de jeu) ; aliases + `item_id`/`quantity` dans `equipment.utils`.
-- **PDF / Ensorceleur / Paladin** — overflow grimoire-supp ne perd plus de sorts ; `GRIMOIRE_SUPP_COORDS` centralisé ; métamagie FR + reverse map réédition ; sorts de serment restaurés à l’édition / extract JSON ; auras sous-classe annotées en auto-build.
-- **Quotas de sorts depuis le JSON classe** — `resolveSpellQuota` (`spell-quota.util`) : `cantrips_known` / `spells_known` / grimoire / `prepared_formula` ; magic-step + auto-build branchés ; plus de table hardcodée niveau 1.
-- **Fiche web** — compétences/outils/langues en libellés FR ; blocs magie (arcanes, invocations, métamagie, serment, maîtrise…) alignés sur le résumé PDF.
-- **Lettré** — astuces multi-paliers (dédup + Empressement), conquêtes relecturables, PA persistés à l’édition, descriptions JSON, PDF ressources / Besace.
-- **Magicien L17/L19** — Maîtrise des sorts + Sorts attitrés : choix Magie, validation wizard, persistance / réédition, fiche web + PDF.
-- Validation wizard = UI (sous-classe, pacte primaire **et** secondaire, magie, équipement, langues).
-- Fiche HTML de jeu + PDF en aperçu (`pdfFailed` ne vide plus la page).
-- Pacte / invocations sorcier **classe secondaire**.
-- SMTP prod : refuse `log` / `mailhog` / `localhost` sauf `Smtp:AllowLogSink` ; retry 3× ; seed admin + reset ciblé `Admin__Email`.
-- Guide : sommaire scrollable ; badges « nouveau » hydratés au login (plus de 9+ faux).
+- **Fiche de jeu (`character-play-view`)** — ressources sans doublons magie ; blocs Incantation (emplacements restants, pacte, grimoire) ; libellés FR ; spec (6).
+- **Campagne table UX** — banner init seulement si PJ lié ; empty state `/init` + inline ; XP avec erreurs + lock + plus de `reload()` post-award ; labels FR (Lettre, Document, brouillard de guerre) ; util `campaign-initiative.util` + specs.
+- **Wizard UX polish** — species : « Étape précédente » ; civ : « Continuer » si déjà confirmée ; background : restore custom + fallback pick si id manquant ; summary : erreur cloud visible (pas de navigation/reset), vousvoiement FR ; specs species/background/summary.
+- **Spec identity-step** — `identity-step.spec.ts` (18) : résumé, sexe, confirm/prev, generateStory (validations, rate-limit, succès, erreurs API).
+- **Lint warnings résiduels** — `npm run lint` clean (0) ; imports inutilisés, `prefer-const` PDF, `eqeqeq` initiative/timeline, `CharacterClass` abilities-step, filter magic-step, `no-case-declarations` équipements, `inject()` navbar.
+- **Liste Héros (`characters.ts`)** — signals / getters / PDF / delete typés `Character` (+ `LegacyListFields` lecture seule) ; spec `characters.spec.ts` (15) ; plus de `$any` sur le confirm delete.
+- **Languages / identity UX + typage** — `classJson: CharacterClass` ; erreur langues affichée ; catégories FR ; identity sexe typé, placeholders traits, résumé avec sous-classe.
+- **Typage equipment-step + fiche** — `ExtendedCharacterCreation` ; `character-sheet` getSpecies/getClass typés.
+- **Typage auth/admin** — `confirm-email` / `admin` / `AuthService.confirmEmail` ; import inutilisé campagne retiré.
+- **Typage class / abilities / skills / magic** — plus de `any` sur ces étapes wizard.
+- **Tests invites reject/decline** — cas limites API (decline, 404 tiers, non-ami 400, doublon 409, reject sans proposition).
+- **Audit sorts `classes`** — 380/380 + `SpellDataIntegrityTests` ; BOM retirés.
+- **Persistance table / campagne** — PUT sérialisés, pas de réapplication blob, debounce, flush cartes, `pinnedHandoutId`, poll initiative merge-only.
+- **Quotas sorts JSON** — `spell-quota.util` ; magic-step + auto-build.
+- **PDF / Ensorceleur / Paladin / Lettré / Magicien L17-L19** — déjà stabilisés (voir historique commits).
+- Validation wizard = UI ; fiche HTML + PDF aperçu ; pacte secondaire ; SMTP prod ; guide badges.
 
 ## Comment choisir une tâche
 
-Anthony dit ce qu’on attaque. Si « au jugé » : polish produit / UX / bugs signalés.
+Anthony dit ce qu’on attaque. File `PROCHAINES` planifiée = terminée.

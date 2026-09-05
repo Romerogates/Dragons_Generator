@@ -30,6 +30,12 @@ import {
 } from '@core/utils/character-background-equipment.util';
 import { normalizeSkillId } from '@core/utils/skill.utils';
 import { labelForGameId } from '@core/utils/game-id-labels';
+import {
+  deleteCustomBackgroundTemplate,
+  listCustomBackgroundTemplates,
+  saveCustomBackgroundTemplate,
+  type CustomBackgroundTemplate,
+} from '@core/utils/custom-background-templates.util';
 
 // ─── Types locaux ────────────────────────────────────────────────────────────
 
@@ -71,6 +77,10 @@ export class BackgroundStep implements OnInit {
   readonly customIdeal = signal('');
   readonly customBond = signal('');
   readonly customFlaw = signal('');
+  /** Option : 3 compétences d'historique au lieu de 2 (custom only). */
+  readonly customExtraSkill = signal(false);
+  readonly savedTemplates = signal<CustomBackgroundTemplate[]>([]);
+  readonly templateMsg = signal<string | null>(null);
 
   // ── Personnalité (tables) ──
   readonly rolledTrait = signal<string | null>(null);
@@ -183,6 +193,7 @@ export class BackgroundStep implements OnInit {
 
   ngOnInit(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    this.savedTemplates.set(listCustomBackgroundTemplates());
 
     this.dataService.getBackgrounds().subscribe({
       next: (bgs) => {
@@ -191,12 +202,14 @@ export class BackgroundStep implements OnInit {
 
         const existing = this.c().backgroundId;
         if (existing) {
-          this.selectedBgId.set(existing);
-          this.phase.set('configure');
-
-          if (this.c().backgroundPreset === false) {
-            this.customPrivilegeName.set(this.c().privilegeName || '');
-            this.customPrivilegeDesc.set(this.c().privilegeDesc || '');
+          const found = this.backgrounds().some((b) => b.id === existing);
+          if (!found) {
+            this.phase.set('pick');
+            this.selectedBgId.set(null);
+          } else {
+            this.selectedBgId.set(existing);
+            this.phase.set('configure');
+            this.hydrateFieldsFromCreation();
           }
         }
       },
@@ -219,6 +232,7 @@ export class BackgroundStep implements OnInit {
     this.customIdeal.set('');
     this.customBond.set('');
     this.customFlaw.set('');
+    this.customExtraSkill.set(false);
     this.rolledTrait.set(null);
     this.rolledIdeal.set(null);
     this.rolledBond.set(null);
@@ -230,6 +244,48 @@ export class BackgroundStep implements OnInit {
   backToPick(): void {
     this.phase.set('pick');
     this.selectedBgId.set(null);
+    this.templateMsg.set(null);
+  }
+
+  saveCurrentAsTemplate(): void {
+    if (!this.isCustom()) return;
+    const name = this.customBgName().trim();
+    if (!name) {
+      this.templateMsg.set('Indiquez un nom d’historique avant de sauvegarder le modèle.');
+      return;
+    }
+    this.savedTemplates.set(
+      saveCustomBackgroundTemplate({
+        name,
+        privilegeName: this.customPrivilegeName(),
+        privilegeDesc: this.customPrivilegeDesc(),
+        gold: this.customGold(),
+        trait: this.customTrait(),
+        ideal: this.customIdeal(),
+        bond: this.customBond(),
+        flaw: this.customFlaw(),
+        extraSkill: this.customExtraSkill(),
+      }),
+    );
+    this.templateMsg.set('Modèle sauvegardé sur cet appareil.');
+  }
+
+  applyTemplate(t: CustomBackgroundTemplate): void {
+    this.customBgName.set(t.name);
+    this.customPrivilegeName.set(t.privilegeName);
+    this.customPrivilegeDesc.set(t.privilegeDesc);
+    this.customGold.set(t.gold);
+    this.customTrait.set(t.trait);
+    this.customIdeal.set(t.ideal);
+    this.customBond.set(t.bond);
+    this.customFlaw.set(t.flaw);
+    this.customExtraSkill.set(!!t.extraSkill);
+    this.templateMsg.set(`Modèle « ${t.name} » chargé.`);
+  }
+
+  removeTemplate(id: string): void {
+    this.savedTemplates.set(deleteCustomBackgroundTemplate(id));
+    this.templateMsg.set('Modèle supprimé.');
   }
 
   // ── Actions : Tables de personnalité ──
@@ -286,6 +342,7 @@ export class BackgroundStep implements OnInit {
   // ── Confirmation ──
 
   confirm(): void {
+    if (!this.isConfigValid()) return;
     const bg = this.selectedBg();
     const data = this.selectedData();
     if (!bg || !data) return;
@@ -308,13 +365,25 @@ export class BackgroundStep implements OnInit {
 
     const fixedSkills = (data.proficiencies?.skills?.fixed ?? []).map(normalizeSkillId);
 
+    const customSkillCount = this.customExtraSkill() ? 3 : 2;
+    const proficiencies = isCustom
+      ? {
+          ...data.proficiencies,
+          skills: {
+            fixed: [] as string[],
+            chooseCount: customSkillCount,
+            options: 'any' as const,
+          },
+        }
+      : data.proficiencies;
+
     const selection: BackgroundSelection = {
       backgroundId: bg.id,
       backgroundName: bgName,
       backgroundPreset: data.preset,
       skills: fixedSkills,
       tools: [],
-      proficiencies: data.proficiencies,
+      proficiencies,
       languages: [],
       bonusLanguageCount: isCustom ? 0 : this.maxLanguages(),
       equipment: fixedEquipment,
@@ -340,6 +409,34 @@ export class BackgroundStep implements OnInit {
 
   prevStep(): void {
     this.builder.previousStep();
+  }
+
+  /** Recharge les champs UI depuis le builder (retour depuis une étape suivante). */
+  private hydrateFieldsFromCreation(): void {
+    const cr = this.c();
+    const isCustom = cr.backgroundPreset === false || cr.privilegeId === 'priv-custom';
+
+    if (isCustom) {
+      this.customBgName.set(cr.backgroundName || '');
+      this.customPrivilegeName.set(cr.privilegeName || '');
+      this.customPrivilegeDesc.set(cr.privilegeDesc || '');
+      this.customGold.set(cr.backgroundCurrency?.or ?? 15);
+      this.customTrait.set(cr.traits || '');
+      this.customIdeal.set(cr.ideal || '');
+      this.customBond.set(cr.bonds || '');
+      this.customFlaw.set(cr.flaws || '');
+      const choose =
+        cr.backgroundProficiencies?.skills?.chooseCount ??
+        (cr.backgroundProficiencies?.skills as { choose_count?: number } | undefined)?.choose_count ??
+        2;
+      this.customExtraSkill.set(choose >= 3);
+      return;
+    }
+
+    this.rolledTrait.set(cr.traits?.trim() ? cr.traits : null);
+    this.rolledIdeal.set(cr.ideal?.trim() ? cr.ideal : null);
+    this.rolledBond.set(cr.bonds?.trim() ? cr.bonds : null);
+    this.rolledFlaw.set(cr.flaws?.trim() ? cr.flaws : null);
   }
 
   // ── Helpers ──

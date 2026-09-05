@@ -552,16 +552,18 @@ export class MagicStep implements OnInit {
       if (tag === 'concentration' && !spell.isConcentration) return false;
       if (tag === 'ritual' && !spell.isRitual) return false;
       if (tag === 'selected') {
-        let selected = false;
-        if (scope === 'cantrip') selected = selectedCantrips.has(spell.id);
-        else if (scope === 'leveled') selected = selectedSpells.has(spell.id);
-        else if (scope === 'racial') selected = racialPicks.has(spell.id);
-        else if (scope === 'arcanum') selected = arcanumPicks.has(spell.id);
-        else
-          selected =
-            masteryPicks.has(spell.id) ||
-            signaturePicks.has(spell.id) ||
-            selectedSpells.has(spell.id);
+        const selected =
+          scope === 'cantrip'
+            ? selectedCantrips.has(spell.id)
+            : scope === 'leveled'
+              ? selectedSpells.has(spell.id)
+              : scope === 'racial'
+                ? racialPicks.has(spell.id)
+                : scope === 'arcanum'
+                  ? arcanumPicks.has(spell.id)
+                  : masteryPicks.has(spell.id) ||
+                    signaturePicks.has(spell.id) ||
+                    selectedSpells.has(spell.id);
         if (!selected) return false;
       }
       if (!q) return true;

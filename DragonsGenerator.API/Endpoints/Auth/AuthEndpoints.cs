@@ -43,12 +43,7 @@ internal static class AuthEmailHelper
             await email.SendAsync(
                 user.Email,
                 "Confirmez votre compte — Dragons Generator",
-                $"""
-                <h2>Bonjour {user.DisplayName} !</h2>
-                <p>Confirmez votre adresse email pour activer votre compte :</p>
-                <p><a href="{link}">Confirmer mon compte</a></p>
-                <p>Ou copiez ce lien :<br/><code>{link}</code></p>
-                """,
+                AuthEmailTemplates.Confirmation(user.DisplayName, link),
                 ct
             );
             return (true, link);
@@ -241,7 +236,8 @@ public class RegisterEndpoint(
     }
 }
 
-public class ConfirmEmailEndpoint(AppDbContext db) : EndpointWithoutRequest
+public class ConfirmEmailEndpoint(AppDbContext db, IOptions<JwtOptions> jwt, IHostEnvironment env)
+    : EndpointWithoutRequest
 {
     public override void Configure()
     {
@@ -269,8 +265,15 @@ public class ConfirmEmailEndpoint(AppDbContext db) : EndpointWithoutRequest
 
         user.EmailConfirmed = true;
         user.EmailConfirmToken = null;
+        user.LastLoginAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
-        await Send.OkAsync(new { message = "Email confirmé. Vous pouvez vous connecter." }, ct);
+
+        var jwtToken = AuthHelpers.CreateJwt(user, jwt.Value);
+        AuthCookieHelper.SetAuthCookie(HttpContext.Response, jwtToken, jwt.Value, env.IsProduction());
+        await Send.OkAsync(
+            new AuthResponse(null, UserProfileHelper.ToUserDto(user)),
+            ct
+        );
     }
 }
 
@@ -377,12 +380,7 @@ public class ForgotPasswordEndpoint(
             await email.SendAsync(
                 user.Email,
                 "Réinitialisation du mot de passe — Dragons Generator",
-                $"""
-                <h2>Réinitialisation</h2>
-                <p>Cliquez pour choisir un nouveau mot de passe (valable 2 h) :</p>
-                <p><a href="{link}">Réinitialiser mon mot de passe</a></p>
-                <p>Ou copiez ce lien :<br/><code>{link}</code></p>
-                """,
+                AuthEmailTemplates.PasswordReset(user.DisplayName, link),
                 ct
             );
         }
@@ -557,14 +555,36 @@ public class UpdateProfileEndpoint(AppDbContext db) : Endpoint<UpdateProfileRequ
             return;
         }
 
+        var nameChanged = !string.Equals(user.DisplayName, normalized, StringComparison.Ordinal);
+
         if (
-            !string.Equals(user.DisplayName, normalized, StringComparison.OrdinalIgnoreCase)
+            nameChanged
             && await AuthHelpers.IsDisplayNameTakenAsync(db, normalized, user.Id, ct)
         )
         {
             AddError("Ce pseudo est déjà pris.");
             await Send.ErrorsAsync(cancellation: ct);
             return;
+        }
+
+        if (nameChanged)
+        {
+            var prefs = UserPreferencesHelper.Parse(user.PreferencesJson);
+            if (
+                prefs.DisplayNameChangedAt is { } lastChange
+                && lastChange.AddDays(7) > DateTimeOffset.UtcNow
+            )
+            {
+                var next = lastChange.AddDays(7);
+                AddError(
+                    $"Vous pourrez changer votre pseudo à nouveau le {next.ToLocalTime():dd/MM/yyyy à HH:mm} (1 fois par semaine)."
+                );
+                await Send.ErrorsAsync(cancellation: ct);
+                return;
+            }
+
+            prefs.DisplayNameChangedAt = DateTimeOffset.UtcNow;
+            user.PreferencesJson = UserPreferencesHelper.Serialize(prefs);
         }
 
         user.DisplayName = normalized;

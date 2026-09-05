@@ -7,7 +7,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { PendingCharacterSaveService } from '@core/services/pending-character-save.service';
 
@@ -23,26 +23,18 @@ import { PendingCharacterSaveService } from '@core/services/pending-character-sa
           <p class="text-slate-400 text-sm">Vérification…</p>
         } @else if (ok()) {
           <p class="text-emerald-400 text-sm mb-4">{{ message() }}</p>
-          @if (hasPendingSave()) {
-            <p class="text-slate-400 text-xs mb-4">
-              Connecte-toi pour enregistrer le héros en attente dans ton compte.
-            </p>
+          @if (redirecting()) {
+            <p class="text-slate-400 text-xs">Redirection…</p>
+          } @else {
+            <a [routerLink]="homeLink" class="wizard-nav-primary inline-block">Continuer</a>
           }
-          <a
-            routerLink="/login"
-            [queryParams]="loginQueryParams"
-            class="wizard-nav-primary inline-block"
-            >Se connecter</a
-          >
         } @else {
           <p class="text-red-400 text-sm mb-4">{{ message() }}</p>
           <div class="flex flex-col gap-2">
             <a routerLink="/register" class="wizard-nav-primary inline-block text-xs"
               >Réessayer l'inscription</a
             >
-            <a routerLink="/login" [queryParams]="loginQueryParams" class="text-amber-500 text-xs hover:underline"
-              >Se connecter</a
-            >
+            <a routerLink="/login" class="text-amber-500 text-xs hover:underline">Se connecter</a>
           </div>
         }
       </div>
@@ -54,18 +46,18 @@ import { PendingCharacterSaveService } from '@core/services/pending-character-sa
 export class ConfirmEmailPage implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly pendingSave = inject(PendingCharacterSaveService);
 
   readonly loading = signal(true);
   readonly ok = signal(false);
+  readonly redirecting = signal(false);
   readonly message = signal('');
-  readonly hasPendingSave = signal(false);
-  loginQueryParams: Record<string, string> = { returnUrl: '/' };
+  homeLink = '/';
 
   ngOnInit(): void {
     if (this.pendingSave.hasPending()) {
-      this.hasPendingSave.set(true);
-      this.loginQueryParams = { returnUrl: '/characters', intent: 'save' };
+      this.homeLink = '/characters';
     }
 
     const token = this.route.snapshot.queryParamMap.get('token') ?? '';
@@ -75,10 +67,13 @@ export class ConfirmEmailPage implements OnInit {
       return;
     }
     this.auth.confirmEmail(token).subscribe({
-      next: (res: { message?: string } | null) => {
+      next: () => {
         this.loading.set(false);
         this.ok.set(true);
-        this.message.set(res?.message || 'Email confirmé.');
+        this.message.set('Email confirmé — vous êtes connecté.');
+        this.redirecting.set(true);
+        const target = this.pendingSave.hasPending() ? '/characters' : '/';
+        setTimeout(() => void this.router.navigateByUrl(target), 900);
       },
       error: (err: { error?: { errors?: { reason?: string }[] } }) => {
         this.loading.set(false);

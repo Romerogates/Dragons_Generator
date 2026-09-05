@@ -17,7 +17,24 @@ import { PendingCharacterSaveService } from '@core/services/pending-character-sa
 import { OfflineSyncService } from '@core/services/offline-sync.service';
 import { ConnectivityService } from '@core/services/connectivity.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
-import type { Character } from '../../core/models/Character/character';
+import type { Character, SpeciesRef } from '@core/models/Character/character';
+
+/**
+ * Champs d’anciens exports encore tolérés en lecture liste.
+ * Le modèle courant est `Character` (comme character-sheet).
+ */
+type LegacyListFields = {
+  level?: number;
+  speciesName?: string;
+  className?: string;
+  /** Ancien format : libellé de classe en string. */
+  class?: string;
+  hitPointsMax?: number;
+  armorClass?: number;
+};
+
+/** Entrée liste : Character + tolérance lecture legacy. */
+type ListCharacter = Character & LegacyListFields;
 
 @Component({
   selector: 'app-characters',
@@ -41,8 +58,8 @@ export class Characters implements OnInit {
   readonly pendingSyncCount = this.offlineSync.pendingCount;
   readonly cloudSyncError = this.cloud.lastSyncError;
 
-  readonly characters = signal<any[]>([]);
-  readonly characterToDelete = signal<any | null>(null);
+  readonly characters = signal<Character[]>([]);
+  readonly characterToDelete = signal<Character | null>(null);
   readonly deleteConfirmName = signal('');
   readonly deleteError = signal<string | null>(null);
   readonly deleting = signal(false);
@@ -111,21 +128,22 @@ export class Characters implements OnInit {
 
   // === ACCESSEURS SÉCURISÉS (Adaptés au nouveau modèle Character.ts) ===
 
-  getCharName(c: any): string {
+  getCharName(c: ListCharacter): string {
     return c?.name || 'Héros Inconnu';
   }
-  getCharLevel(c: any): number {
+  getCharLevel(c: ListCharacter): number {
     return c?.totalLevel || c?.level || 1;
   }
 
-  getCharSpecies(c: any): string {
+  getCharSpecies(c: ListCharacter): string {
+    const species = c?.species as SpeciesRef | string | undefined;
     // Nouveau format (SpeciesRef / CatalogRef)
-    if (c?.species && typeof c.species === 'object') return c.species.label || 'Espèce inconnue';
+    if (species && typeof species === 'object') return species.label || 'Espèce inconnue';
     // Ancien format (legacy)
-    return c?.speciesName || c?.species || 'Espèce inconnue';
+    return c?.speciesName || (typeof species === 'string' ? species : '') || 'Espèce inconnue';
   }
 
-  getCharClass(c: any): string {
+  getCharClass(c: ListCharacter): string {
     if (Array.isArray(c?.classes) && c.classes.length > 0) {
       const cls = c.classes[0];
       if (cls.subclassLabel) return `${cls.classLabel} — ${cls.subclassLabel}`;
@@ -134,17 +152,17 @@ export class Characters implements OnInit {
     return c?.className || c?.class || 'Classe inconnue';
   }
 
-  getCharSubclass(c: any): string {
+  getCharSubclass(c: ListCharacter): string {
     if (Array.isArray(c?.classes) && c.classes.length > 0) {
       return c.classes[0].subclassLabel || '';
     }
     return '';
   }
 
-  getCharHp(c: any): number {
+  getCharHp(c: ListCharacter): number {
     return c?.vitality?.hitPointsMax || c?.hitPointsMax || 0;
   }
-  getCharAc(c: any): number {
+  getCharAc(c: ListCharacter): number {
     return c?.defense?.armorClass || c?.armorClass || 10;
   }
 
@@ -194,6 +212,11 @@ export class Characters implements OnInit {
     }).format(date);
   }
 
+  onDeleteConfirmNameInput(event: Event): void {
+    const value = (event.target as HTMLInputElement | null)?.value ?? '';
+    this.deleteConfirmName.set(value);
+  }
+
   // === ACTIONS ===
 
   viewCharacter(character: Character): void {
@@ -223,13 +246,13 @@ export class Characters implements OnInit {
     }
   }
 
-  downloadPdf(character: any, event: Event): void {
+  downloadPdf(character: Character, event: Event): void {
     event.stopPropagation();
 
     this.pdfService.generatePdf(character);
   }
 
-  confirmDelete(character: any, event: Event): void {
+  confirmDelete(character: Character, event: Event): void {
     event.stopPropagation();
     this.deleteConfirmName.set('');
     this.deleteError.set(null);

@@ -632,7 +632,9 @@ export class ClassStep implements OnInit {
               : choice.type === 'fielon_lord'
                 ? 'fluent-emoji:smiling-face-with-horns'
                 : choice.type === 'animal_totem'
-                  ? 'fluent-emoji:wolf'
+                  ? this.animalTotemIcon(
+                      this.getSubChoiceLabel(choice.type, opt, choice.option_labels),
+                    )
                   : choice.type === 'feature_option'
                     ? 'fluent-emoji:crossed-swords'
                     : 'fluent-emoji:sparkles',
@@ -1381,6 +1383,30 @@ export class ClassStep implements OnInit {
     const kind = CLASS_SPELLCASTING[cls.id]?.kind;
     if (kind && ability) return { kind, ability };
     return null;
+  }
+
+  /** Icône fluent-emoji approximative selon le nom de la bête totem. */
+  animalTotemIcon(label: string): string {
+    const n = (label || '').toLowerCase();
+    if (/loup|wolf/.test(n)) return 'fluent-emoji:wolf';
+    if (/ours|bear/.test(n)) return 'fluent-emoji:bear';
+    if (/aigle|eagle|faucon|hawk/.test(n)) return 'fluent-emoji:eagle';
+    if (/cerf|elk|deer|chevreuil/.test(n)) return 'fluent-emoji:deer';
+    if (/serpent|snake|vipère/.test(n)) return 'fluent-emoji:snake';
+    if (/chat|panth|tigre|lion|félin|cougar|lynx/.test(n)) return 'fluent-emoji:cat';
+    if (/corbeau|raven|crow|oiseau|oiseau|hibou|owl/.test(n)) return 'fluent-emoji:bird';
+    if (/cheval|horse|poney/.test(n)) return 'fluent-emoji:horse';
+    if (/sanglier|boar|porc/.test(n)) return 'fluent-emoji:boar';
+    if (/requin|shark/.test(n)) return 'fluent-emoji:shark';
+    if (/araign|spider/.test(n)) return 'fluent-emoji:spider';
+    if (/crocodil|alligator/.test(n)) return 'fluent-emoji:crocodile';
+    if (/grenouille|frog|crapaud/.test(n)) return 'fluent-emoji:frog';
+    if (/rat|souris|mouse/.test(n)) return 'fluent-emoji:rat';
+    if (/chouette/.test(n)) return 'fluent-emoji:owl';
+    if (/dauphin|dolphin/.test(n)) return 'fluent-emoji:dolphin';
+    if (/requin/.test(n)) return 'fluent-emoji:shark';
+    if (/abeille|bee|guêpe/.test(n)) return 'fluent-emoji:honeybee';
+    return 'fluent-emoji:paw-prints';
   }
 
   getSubChoiceLabel(

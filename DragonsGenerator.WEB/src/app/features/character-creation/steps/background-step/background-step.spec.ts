@@ -189,4 +189,127 @@ describe('BackgroundStep', () => {
     errFixture.detectChanges();
     expect(errFixture.componentInstance.error()).toBe('Impossible de charger les historiques.');
   });
+
+  it('restores custom background fields when returning to the step', async () => {
+    TestBed.resetTestingModule();
+    await TestBed.configureTestingModule({
+      imports: [BackgroundStep],
+      providers: [
+        ...zonelessTestProviders,
+        {
+          provide: DataService,
+          useValue: { getBackgrounds: () => of([MOCK_ERUDIT, MOCK_CUSTOM]) },
+        },
+        {
+          provide: CharacterBuilderService,
+          useValue: {
+            creation: signal({
+              speciesName: 'Humain',
+              civilizationName: 'Ajagar',
+              backgroundId: 'bg-custom',
+              backgroundPreset: false,
+              backgroundName: 'Vagabond des dunes',
+              privilegeName: 'Caravane',
+              privilegeDesc: 'Logement chez les marchands.',
+              backgroundCurrency: { cuivre: 0, argent: 0, or: 42, platine: 0 },
+              traits: 'Curieux',
+              ideal: 'Liberté',
+              bonds: 'Ma caravane',
+              flaws: 'Impulsif',
+            }),
+            setBackground: jasmine.createSpy(),
+            nextStep: jasmine.createSpy(),
+            previousStep: jasmine.createSpy(),
+          },
+        },
+      ],
+    }).compileComponents();
+
+    const restoreFixture = TestBed.createComponent(BackgroundStep);
+    restoreFixture.detectChanges();
+    const c = restoreFixture.componentInstance;
+
+    expect(c.phase()).toBe('configure');
+    expect(c.customBgName()).toBe('Vagabond des dunes');
+    expect(c.customPrivilegeName()).toBe('Caravane');
+    expect(c.customPrivilegeDesc()).toBe('Logement chez les marchands.');
+    expect(c.customGold()).toBe(42);
+    expect(c.customTrait()).toBe('Curieux');
+    expect(c.customIdeal()).toBe('Liberté');
+    expect(c.customBond()).toBe('Ma caravane');
+    expect(c.customFlaw()).toBe('Impulsif');
+    expect(c.isConfigValid()).toBeTrue();
+  });
+
+  it('restores preset personality rolls when returning to the step', async () => {
+    TestBed.resetTestingModule();
+    await TestBed.configureTestingModule({
+      imports: [BackgroundStep],
+      providers: [
+        ...zonelessTestProviders,
+        {
+          provide: DataService,
+          useValue: { getBackgrounds: () => of([MOCK_ERUDIT, MOCK_CUSTOM]) },
+        },
+        {
+          provide: CharacterBuilderService,
+          useValue: {
+            creation: signal({
+              backgroundId: 'bg-erudit',
+              backgroundPreset: true,
+              backgroundName: 'Érudit',
+              traits: 'Je cite toujours un vieux sage',
+              ideal: 'Savoir',
+              bonds: 'Ma bibliothèque',
+              flaws: 'Orgueil',
+            }),
+            setBackground: jasmine.createSpy(),
+            nextStep: jasmine.createSpy(),
+            previousStep: jasmine.createSpy(),
+          },
+        },
+      ],
+    }).compileComponents();
+
+    const restoreFixture = TestBed.createComponent(BackgroundStep);
+    restoreFixture.detectChanges();
+    const c = restoreFixture.componentInstance;
+
+    expect(c.phase()).toBe('configure');
+    expect(c.rolledTrait()).toBe('Je cite toujours un vieux sage');
+    expect(c.rolledIdeal()).toBe('Savoir');
+    expect(c.rolledBond()).toBe('Ma bibliothèque');
+    expect(c.rolledFlaw()).toBe('Orgueil');
+  });
+
+  it('falls back to pick when saved background id is missing from catalogue', async () => {
+    TestBed.resetTestingModule();
+    await TestBed.configureTestingModule({
+      imports: [BackgroundStep],
+      providers: [
+        ...zonelessTestProviders,
+        {
+          provide: DataService,
+          useValue: { getBackgrounds: () => of([MOCK_ERUDIT, MOCK_CUSTOM]) },
+        },
+        {
+          provide: CharacterBuilderService,
+          useValue: {
+            creation: signal({
+              backgroundId: 'bg-gone',
+              backgroundPreset: false,
+            }),
+            setBackground: jasmine.createSpy(),
+            nextStep: jasmine.createSpy(),
+            previousStep: jasmine.createSpy(),
+          },
+        },
+      ],
+    }).compileComponents();
+
+    const missingFixture = TestBed.createComponent(BackgroundStep);
+    missingFixture.detectChanges();
+    expect(missingFixture.componentInstance.phase()).toBe('pick');
+    expect(missingFixture.componentInstance.selectedBgId()).toBeNull();
+  });
 });

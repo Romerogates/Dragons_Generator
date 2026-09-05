@@ -160,6 +160,28 @@
             </div>
           </div>
 
+          @if (bonusSourceHint(); as hint) {
+            <p class="text-center text-[11px] text-slate-500 mb-6 max-w-xl mx-auto -mt-4">{{ hint }}</p>
+          }
+
+          @if (mustReserveExoticSlots()) {
+            <p
+              class="text-center text-xs text-cyan-300/90 mb-6 max-w-xl mx-auto px-4 py-2 rounded-xl border border-cyan-800/40 bg-cyan-950/20"
+            >
+              Il ne reste que des emplacements pour des langues <strong>exotiques</strong> obligatoires —
+              les langues communes sont temporairement masquées.
+            </p>
+          }
+
+          @if (stuckWithCommons()) {
+            <p
+              class="text-center text-xs text-amber-300/90 mb-6 max-w-xl mx-auto px-4 py-2 rounded-xl border border-amber-800/40 bg-amber-950/20"
+            >
+              Retirez au moins une langue commune ci-dessus, puis choisissez une langue exotique
+              pour débloquer « Inscrire ces langues ».
+            </p>
+          }
+
           @if (requiredExoticCount() > 0) {
             <div class="flex justify-center w-full mb-8 -mt-4">
               <div

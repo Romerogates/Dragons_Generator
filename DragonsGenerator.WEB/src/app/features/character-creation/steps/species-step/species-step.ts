@@ -708,6 +708,10 @@ export class SpeciesStep implements OnInit {
     this.builder.nextStep();
   }
 
+  prevStep(): void {
+    this.builder.previousStep();
+  }
+
   confirmSelection(): void {
     const species = this.selectedSpecies();
     if (!species || !this.selectionComplete()) return;

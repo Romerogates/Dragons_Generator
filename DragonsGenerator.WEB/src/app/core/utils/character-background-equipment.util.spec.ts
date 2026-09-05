@@ -1,4 +1,4 @@
-import type { Background, BackgroundEquipmentItem } from '@core/models/Backgrounds/background';
+import type { BackgroundEquipmentItem } from '@core/models/Backgrounds/background';
 import {
   mapBackgroundEquipmentChoiceSlots,
   mapBackgroundFixedEquipment,

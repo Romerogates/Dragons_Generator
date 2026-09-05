@@ -70,7 +70,7 @@ export class Navbar implements OnInit, OnDestroy {
     { label: 'Divinités', path: '/deities', icon: 'fluent-emoji:glowing-star' },
   ];
 
-  constructor(private readonly router: Router) {}
+  private readonly router = inject(Router);
 
   ngOnInit(): void {
     this.preloadNavbarIcons();

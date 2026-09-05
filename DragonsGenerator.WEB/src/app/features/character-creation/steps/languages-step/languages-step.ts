@@ -108,10 +108,44 @@ export class LanguagesStep implements OnInit {
   );
 
   readonly availableBaseLanguages = computed<Language[]>(() => {
+    if (this.mustReserveExoticSlots()) return [];
     const taken = new Set(this.builder.creation().languages);
     return this.allLanguages()
       .filter((l) => l.category === 'base' && !taken.has(l.name) && !l.speakers.isExtinct)
       .sort((a, b) => a.name.localeCompare(b.name));
+  });
+
+  /** Quand il ne reste que des slots pour les exotiques obligatoires, bloquer les communes. */
+  readonly mustReserveExoticSlots = computed(() => {
+    const rem = this.remainingPicks();
+    const exotic = this.exoticRemaining();
+    return rem > 0 && exotic > 0 && exotic >= rem;
+  });
+
+  readonly stuckWithCommons = computed(
+    () => this.remainingPicks() === 0 && this.exoticRemaining() > 0,
+  );
+
+  readonly bonusSourceHint = computed(() => {
+    const c = this.builder.creation();
+    const parts: string[] = [];
+    if ((c.speciesBonusLangApplied ?? 0) > 0) {
+      parts.push(`espèce (+${c.speciesBonusLangApplied})`);
+    }
+    if ((c.backgroundBonusLangApplied ?? 0) > 0) {
+      parts.push(`historique (+${c.backgroundBonusLangApplied})`);
+    }
+    if ((c.classBonusLanguageCount ?? 0) > 0) {
+      parts.push(`classe (+${c.classBonusLanguageCount})`);
+    }
+    if ((c.talentBonusLangApplied ?? 0) > 0) {
+      parts.push(`talent (+${c.talentBonusLangApplied})`);
+    }
+    if (!parts.length && this.bonusCount() > 0) {
+      return 'Origine du bonus : cumul espèce / historique / classe / talents.';
+    }
+    if (!parts.length) return null;
+    return `Ces langues bonus viennent de : ${parts.join(', ')}.`;
   });
 
   readonly availableExoticLanguages = computed<Language[]>(() => {
@@ -161,6 +195,8 @@ export class LanguagesStep implements OnInit {
 
   addLanguage(langName: string): void {
     if (this.remainingPicks() <= 0) return;
+    const lang = this.allLanguages().find((l) => l.name === langName);
+    if (this.mustReserveExoticSlots() && lang?.category !== 'exotique') return;
     this.builder.addLanguage(langName);
   }
 

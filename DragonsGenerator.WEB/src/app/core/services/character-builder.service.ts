@@ -40,7 +40,6 @@ import { DataService } from './data.service';
 import { CharacterHandoffService } from './character-handoff.service';
 import {
   Character,
-  CharacterCreation,
   AbilityKey,
   AbilityScores,
   AsiChoiceSlot,

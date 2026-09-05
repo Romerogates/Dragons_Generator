@@ -1,6 +1,5 @@
 import type { Ability, CharacterClass, FeatureDetail, Subclass } from '@core/models/CharacterClasses/character-class';
 import type {
-  AbilityScores,
   FeatureInstance,
   SpellcastingKind,
 } from '@core/models/Character/character';
