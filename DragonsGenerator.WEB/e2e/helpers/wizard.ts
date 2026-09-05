@@ -43,9 +43,26 @@ function visibleCarouselCard(page: Page, cardId: string) {
 }
 
 async function isCarouselCardCentered(page: Page, cardId: string): Promise<boolean> {
-  const card = visibleCarouselCard(page, cardId);
-  if ((await card.count()) === 0) return false;
-  return card.evaluate((el) => {
+  const cards = page.locator(`[data-card-id="${cardId}"]`).filter({ visible: true });
+  const count = await cards.count();
+  for (let i = 0; i < count; i++) {
+    const ok = await cards.nth(i).evaluate((el) => {
+      const style = getComputedStyle(el);
+      if (style.pointerEvents === 'none') return false;
+      return parseFloat(style.opacity) > 0.9;
+    });
+    if (ok) return true;
+  }
+
+  // Fallback titre (si data-card-id absent sur un vieux build).
+  const title = CARD_TITLES[cardId];
+  if (!title) return false;
+  const byTitle = page
+    .getByRole('heading', { name: title, level: 3 })
+    .locator('xpath=ancestor::*[@data-wizard-flip-card][1]')
+    .filter({ visible: true });
+  if ((await byTitle.count()) === 0) return false;
+  return byTitle.first().evaluate((el) => {
     const style = getComputedStyle(el);
     if (style.pointerEvents === 'none') return false;
     return parseFloat(style.opacity) > 0.9;
@@ -58,38 +75,50 @@ export type PickCarouselOptions = {
 };
 
 /**
- * Sélectionne une carte carrousel.
- * L'app centre d'abord (flèches ou clic sur carte latérale), puis un clic sur la carte centrée valide.
+ * Sélectionne une carte carrousel (espèce / classe).
+ * Navigation uniquement via flèches : les cartes latérales (classe desktop)
+ * ont `pointer-events-none` et un wrapper overflow intercepte les clics.
  */
 export async function pickCarouselCard(
   page: Page,
   cardId: string,
   _options: PickCarouselOptions = {},
 ): Promise<void> {
-  const clickTimeout = isCi ? 15_000 : 5_000;
-  const settleDelay = isCi ? 400 : 200;
-  const scrollDelay = isCi ? 500 : 350;
+  const clickTimeout = isCi ? 15_000 : 8_000;
+  const settleDelay = isCi ? 450 : 350;
   const nextBtn = page.getByRole('button', { name: 'Carte suivante' }).filter({ visible: true }).first();
+  const prevBtn = page
+    .getByRole('button', { name: 'Carte précédente' })
+    .filter({ visible: true })
+    .first();
 
-  for (let attempt = 0; attempt < 50; attempt++) {
-    if ((await visibleCarouselCard(page, cardId).count()) > 0 && (await isCarouselCardCentered(page, cardId))) {
+  // Attendre qu'au moins une carte du carrousel soit dans le DOM.
+  await page.locator('[data-wizard-flip-card]').filter({ visible: true }).first().waitFor({
+    state: 'visible',
+    timeout: 20_000,
+  });
+
+  for (let attempt = 0; attempt < 80; attempt++) {
+    if (await isCarouselCardCentered(page, cardId)) {
       break;
     }
 
-    if (await nextBtn.isVisible().catch(() => false)) {
-      await nextBtn.click();
-      await page.waitForTimeout(settleDelay);
-      continue;
+    const advanced =
+      (await nextBtn.isVisible().catch(() => false)) &&
+      (await nextBtn.click().then(
+        () => true,
+        () => false,
+      ));
+    if (!advanced) {
+      const wentBack =
+        (await prevBtn.isVisible().catch(() => false)) &&
+        (await prevBtn.click().then(
+          () => true,
+          () => false,
+        ));
+      if (!wentBack) break;
     }
-
-    const sideCard = visibleCarouselCard(page, cardId);
-    if ((await sideCard.count()) > 0) {
-      await sideCard.click({ timeout: clickTimeout });
-      await page.waitForTimeout(scrollDelay);
-      continue;
-    }
-
-    break;
+    await page.waitForTimeout(settleDelay);
   }
 
   if (!(await isCarouselCardCentered(page, cardId))) {

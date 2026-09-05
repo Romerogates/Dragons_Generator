@@ -25,7 +25,7 @@ test.describe('Lettré L1 wizard', () => {
     await expect(page.getByTestId('wizard-level-select')).toHaveCount(0);
     await expect(page.getByTestId('wizard-level-indicator')).toHaveCount(0);
     await expect(page.getByRole('button', { name: /Retour au niveau/i })).toHaveCount(0);
-    await expect(page.getByRole('button', { name: /Étape précédente|précédente/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: '← Étape précédente' })).toBeVisible();
   });
 
   test('completes full Lettré L1 creation path to summary', async ({ page }) => {
