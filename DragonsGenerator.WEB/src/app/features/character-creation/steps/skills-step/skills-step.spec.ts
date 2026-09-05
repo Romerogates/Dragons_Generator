@@ -524,4 +524,94 @@ describe('SkillsStep', () => {
     expect(c.selectedBgTools()).toContain('tl-outils-de-voleur');
     expect(c.bgToolChoiceGroups()[0].options[0].selected).toBeTrue();
   });
+
+  it('keeps Condottiere game-set and vehicle picks in one group without cross-panel steal', async () => {
+    await TestBed.resetTestingModule();
+    creationSignal = signal(
+      skillsCreation({
+        backgroundProficiencies: {
+          skills: { fixed: [], chooseCount: 0, options: [] },
+          tools: {
+            fixed: [
+              { type: 'tool_category', id: 'tl-materiel-de-jeu', category: 'jeu' },
+              { type: 'vehicle', id: 'tl-vehicules-terrestres' },
+            ],
+            choose: [],
+          },
+        },
+        skillChooseCount: 0,
+        skillOptions: [],
+      }),
+    );
+    await TestBed.configureTestingModule({
+      imports: [SkillsStep],
+      providers: [
+        ...zonelessTestProviders,
+        {
+          provide: DataService,
+          useValue: {
+            getSkills: () => of(MOCK_SKILLS),
+            getClassById: () => of({ id: 'cls-lettre', name: 'Lettré', data: { progression: [] } }),
+            getEquipments: () => of(MOCK_TOOLS),
+          },
+        },
+        {
+          provide: CharacterBuilderService,
+          useValue: {
+            creation: creationSignal.asReadonly(),
+            secondaryClasses: () => [],
+            setSecondaryClassSkills: () => {},
+            targetLevel: () => 1,
+            abilityModifiers: () => ({
+              force: 0,
+              dexterite: 1,
+              constitution: 0,
+              intelligence: 2,
+              sagesse: 1,
+              charisme: 0,
+            }),
+            setProficiencies: jasmine.createSpy('setProficiencies'),
+            setExpertiseSkills: jasmine.createSpy('setExpertiseSkills'),
+            mergeClassProficiencies: jasmine.createSpy('mergeClassProficiencies'),
+            nextStep: jasmine.createSpy('nextStep'),
+            previousStep: jasmine.createSpy('previousStep'),
+          },
+        },
+      ],
+    }).compileComponents();
+
+    const f = TestBed.createComponent(SkillsStep);
+    f.detectChanges();
+    const c = f.componentInstance;
+
+    expect(c.bgToolChoiceGroups().length).toBe(1);
+    const group = c.bgToolChoiceGroups()[0];
+    expect(group.chooseCount).toBe(2);
+    expect(group.options.map((o) => o.category)).toEqual(['gameSet', 'vehicle']);
+
+    c.onBgToolOptionClick(group.options[0], group);
+    f.detectChanges();
+    expect(c.expandedBgToolCategory()).toBe('gameSet');
+    expect(c.groupOwnsExpandedCategory(group, 'gameSet')).toBeTrue();
+    expect(c.toolsForExpandedCategory().some((t) => t.id === 'tl-des')).toBeTrue();
+    expect(c.toolsForExpandedCategory().some((t) => t.id === 'vhc-chariot')).toBeFalse();
+
+    c.pickConcreteBgTool('tl-des', 'gameSet', group);
+    f.detectChanges();
+    expect(c.selectedBgTools()).toContain('tl-des');
+
+    c.onBgToolOptionClick(group.options[1], group);
+    f.detectChanges();
+    expect(c.expandedBgToolCategory()).toBe('vehicle');
+    c.pickConcreteBgTool('vhc-chariot', 'vehicle', group);
+    f.detectChanges();
+    expect(c.selectedBgTools()).toEqual(jasmine.arrayContaining(['tl-des', 'vhc-chariot']));
+    expect(c.selectedBgTools()).toContain('tl-des');
+
+    // Recliquer le matériel de jeu rouvre la liste (sans retirer le choix)
+    c.onBgToolOptionClick(group.options[0], group);
+    f.detectChanges();
+    expect(c.expandedBgToolCategory()).toBe('gameSet');
+    expect(c.selectedBgTools()).toContain('tl-des');
+  });
 });

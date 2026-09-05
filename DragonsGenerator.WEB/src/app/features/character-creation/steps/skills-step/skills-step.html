@@ -394,26 +394,28 @@
             </div>
 
             @if (expandedBgToolCategory(); as cat) {
-              <div
-                class="mb-6 p-4 rounded-xl border border-amber-800/40 bg-amber-950/20"
-              >
-                <p
-                  class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-3"
+              @if (groupOwnsExpandedCategory(group, cat)) {
+                <div
+                  class="mb-6 p-4 rounded-xl border border-amber-800/40 bg-amber-950/20"
                 >
-                  Choisissez l'outil précis
-                </p>
-                <div class="flex flex-wrap gap-2">
-                  @for (tool of toolsForExpandedCategory(); track tool.id) {
-                    <button
-                      type="button"
-                      class="px-3 py-2 rounded-xl border-2 text-xs font-bold transition-[colors,transform,opacity,box-shadow] duration-150 bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer"
-                      (click)="pickConcreteBgTool(tool.id, cat, group)"
-                    >
-                      {{ tool.name }}
-                    </button>
-                  }
+                  <p
+                    class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-3"
+                  >
+                    Choisissez l'outil précis
+                  </p>
+                  <div class="flex flex-wrap gap-2">
+                    @for (tool of toolsForExpandedCategory(); track tool.id) {
+                      <button
+                        type="button"
+                        class="px-3 py-2 rounded-xl border-2 text-xs font-bold transition-[colors,transform,opacity,box-shadow] duration-150 bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer"
+                        (click)="pickConcreteBgTool(tool.id, cat, group)"
+                      >
+                        {{ tool.name }}
+                      </button>
+                    }
+                  </div>
                 </div>
-              </div>
+              }
             }
           }
         }

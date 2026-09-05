@@ -482,24 +482,24 @@ export class SkillsStep implements OnInit {
 
     const groups: BgToolChoiceGroup[] = [];
 
-    // Maîtrises fixes qui sont des catégories → il faut choisir l'objet concret
-    const fixed = this.bgProf()?.tools?.fixed ?? [];
-    for (const raw of fixed) {
-      const ref = this.normalizeToolOption(raw);
-      if (!ref?.any) continue;
-      const key = this.toolRefKey(ref);
+    // Maîtrises fixes qui sont des catégories → un seul groupe (ex. Condottiere : jeu + véhicule).
+    const fixedCategoryRefs = (this.bgProf()?.tools?.fixed ?? [])
+      .map((raw) => this.normalizeToolOption(raw))
+      .filter((ref) => !!ref?.any);
+    if (fixedCategoryRefs.length > 0) {
       groups.push({
         groupIndex: groups.length,
-        chooseCount: 1,
+        chooseCount: fixedCategoryRefs.length,
         note: 'Maîtrise d’historique (choix concret)',
-        options: [
-          {
+        options: fixedCategoryRefs.map((ref) => {
+          const key = this.toolRefKey(ref);
+          return {
             key,
             label: this.prettifyTool(ref),
             category: String(ref.type),
             selected: this.isBgGroupOptionSatisfied(key, ref),
-          },
-        ],
+          };
+        }),
       });
     }
 
@@ -645,8 +645,13 @@ export class SkillsStep implements OnInit {
         this.toolBelongsToCategory(id, opt.category!),
       );
       if (concrete) {
-        this.selectedBgTools.update((arr) => arr.filter((x) => x !== concrete));
-        this.expandedBgToolCategory.set(null);
+        // Déjà choisi : rouvrir la liste pour changer ; 2ᵉ clic (liste ouverte) → retirer.
+        if (this.expandedBgToolCategory() === opt.category) {
+          this.selectedBgTools.update((arr) => arr.filter((x) => x !== concrete));
+          this.expandedBgToolCategory.set(null);
+        } else {
+          this.expandedBgToolCategory.set(opt.category);
+        }
         return;
       }
       const next =
@@ -729,6 +734,11 @@ export class SkillsStep implements OnInit {
 
   groupHasCategoryOptions(group: BgToolChoiceGroup): boolean {
     return group.options.some((o) => !!o.category);
+  }
+
+  /** Panneau d'expansion uniquement sous le groupe qui possède cette catégorie. */
+  groupOwnsExpandedCategory(group: BgToolChoiceGroup, category: string): boolean {
+    return group.options.some((o) => o.category === category);
   }
 
   // Historique Custom : 2 outils max par défaut
