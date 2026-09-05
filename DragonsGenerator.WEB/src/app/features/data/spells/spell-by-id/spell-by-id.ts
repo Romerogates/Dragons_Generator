@@ -9,11 +9,12 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of, switchMap } from 'rxjs';
 import { DataService } from '@core/services/data.service';
+import { GameIdLabelPipe } from '@shared/pipes/game-id-label.pipe';
 
 @Component({
   selector: 'app-spell-by-id',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, GameIdLabelPipe],
   templateUrl: './spell-by-id.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>

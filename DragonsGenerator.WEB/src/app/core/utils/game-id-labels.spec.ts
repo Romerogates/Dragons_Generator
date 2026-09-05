@@ -53,6 +53,11 @@ describe('game-id-labels', () => {
     expect(labelForGameId('wp-nouvelle-arme-magique')).toBe('Nouvelle Arme Magique');
   });
 
+  it('strips cls- prefix for class invoker labels', () => {
+    expect(labelForGameId('cls-ensorceleur')).toBe('Ensorceleur');
+    expect(labelForGameId('cls-magicien')).toBe('Magicien');
+  });
+
   it('falls back to the raw id when the slug resolves to an empty string', () => {
     expect(labelForGameId('wp-')).toBe('wp-');
   });

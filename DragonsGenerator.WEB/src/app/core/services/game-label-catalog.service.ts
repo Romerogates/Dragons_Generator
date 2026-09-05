@@ -21,9 +21,10 @@ export class GameLabelCatalogService {
     forkJoin({
       equipment: this.data.getEquipments().pipe(catchError(() => of([]))),
       skills: this.data.getSkills().pipe(catchError(() => of([]))),
+      classes: this.data.getClassesSummary().pipe(catchError(() => of([]))),
     })
       .pipe(
-        tap(({ equipment, skills }) => {
+        tap(({ equipment, skills, classes }) => {
           for (const eq of equipment) {
             if (eq?.id && eq?.name) registerGameLabel(eq.id, eq.name);
           }
@@ -32,6 +33,9 @@ export class GameLabelCatalogService {
               registerGameLabel(sk.id, sk.name);
               registerGameLabel(normalizeSkillId(sk.id), sk.name);
             }
+          }
+          for (const cls of classes) {
+            if (cls?.id && cls?.name) registerGameLabel(cls.id, cls.name);
           }
         }),
       )

@@ -647,27 +647,18 @@ describe('character-wizard-validation.util', () => {
     ).toBeFalse();
   });
 
-  it('isWizardStepValid counts base and exotic language requirements', () => {
+  it('isWizardStepValid treats exotic/base requirements as constraints within bonus slots', () => {
+    // Régression : ne pas exiger bonusCount + exoticCount (ex. 4+1=5) — l'UI compte 4 slots.
     expect(
       isWizardStepValid(
         9,
         {
           ...base,
-          languages: ['Commun'],
+          languages: ['Commun', 'Cyfand', 'Nain', 'Karphûd', 'Inkulomo', 'Démoniaque'],
           speciesLanguages: ['Commun'],
-          requiredBaseLanguageCount: 1,
-        },
-        { needsMagicStep: false },
-      ),
-    ).toBeFalse();
-    expect(
-      isWizardStepValid(
-        9,
-        {
-          ...base,
-          languages: ['Commun', 'Elfique'],
-          speciesLanguages: ['Commun'],
-          requiredBaseLanguageCount: 1,
+          civilizationLanguages: ['Cyfand'],
+          bonusLanguageCount: 4,
+          requiredExoticLanguageCount: 1,
         },
         { needsMagicStep: false },
       ),
@@ -677,8 +668,24 @@ describe('character-wizard-validation.util', () => {
         9,
         {
           ...base,
-          languages: ['Commun', 'Céleste'],
+          languages: ['Commun', 'Cyfand', 'Démoniaque'],
+          speciesLanguages: ['Commun'],
+          civilizationLanguages: ['Cyfand'],
+          bonusLanguageCount: 4,
           requiredExoticLanguageCount: 1,
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+    expect(
+      isWizardStepValid(
+        9,
+        {
+          ...base,
+          languages: ['Commun', 'Elfique', 'Nain'],
+          speciesLanguages: ['Commun'],
+          bonusLanguageCount: 2,
+          requiredBaseLanguageCount: 2,
         },
         { needsMagicStep: false },
       ),

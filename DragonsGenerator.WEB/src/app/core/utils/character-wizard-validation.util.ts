@@ -43,10 +43,9 @@ function asiChoicesComplete(c: CharacterCreation): boolean {
 function languagesStepComplete(c: CharacterCreation): boolean {
   if (c.languages.length === 0) return false;
   const bonusNeeded = c.bonusLanguageCount ?? 0;
-  const exoticNeeded = c.requiredExoticLanguageCount ?? 0;
-  const baseNeeded = c.requiredBaseLanguageCount ?? 0;
-  const extraNeeded = bonusNeeded + exoticNeeded + baseNeeded;
-  if (extraNeeded <= 0) return true;
+  // Exotique / commune obligatoire = contraintes *parmi* les slots bonus, pas des slots en plus.
+  if (bonusNeeded <= 0) return true;
+
   const locked = new Set<string>([
     ...(c.speciesLanguages ?? []),
     ...(c.civilizationLanguages ?? []),
@@ -55,7 +54,7 @@ function languagesStepComplete(c: CharacterCreation): boolean {
   if (c.classId === 'cls-druide') locked.add('Langue des druides');
   if (c.classId === 'cls-roublard') locked.add('Argot des voleurs');
   const bonusPicked = c.languages.filter((l) => !locked.has(l)).length;
-  return bonusPicked >= extraNeeded;
+  return bonusPicked >= bonusNeeded;
 }
 
 function secondaryProgressionComplete(c: CharacterCreation): boolean {

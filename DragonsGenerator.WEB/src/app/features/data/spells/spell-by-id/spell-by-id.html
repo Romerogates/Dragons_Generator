@@ -173,12 +173,13 @@
                 Invocateurs Capables
               </h2>
               <div class="flex flex-wrap gap-2">
-                @for (className of s.classes; track className) {
-                  <span
-                    class="bg-slate-900 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold tracking-wider"
+                @for (classId of s.classes; track classId) {
+                  <a
+                    [routerLink]="['/classes', classId]"
+                    class="bg-slate-900 text-amber-400/95 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold tracking-wider hover:border-amber-500/50 hover:text-amber-300 hover:underline underline-offset-2 transition-colors"
                   >
-                    {{ className }}
-                  </span>
+                    {{ classId | gameIdLabel }}
+                  </a>
                 }
               </div>
             </section>
