@@ -6,6 +6,7 @@ import {
   exportDungeonPdf,
   exportDungeonPng,
   fogRevealSet,
+  playerExportDrawOptions,
   roomAt,
   roomLabelAt,
   themePalette,
@@ -355,5 +356,30 @@ describe('dungeon-render helpers', () => {
     expect(cellRgb(canvas, cellSize, 4, 0)).not.toBe(FOG_RGB);
     expect(cellRgb(canvas, cellSize, 5, 0)).not.toBe(FOG_RGB);
     expect(cellRgb(canvas, cellSize, 3, 0)).toBe(FOG_RGB);
+  });
+
+  it('dungeonMapToAscii renders doors and playerExportDrawOptions respects fog', () => {
+    const ascii = dungeonMapToAscii(sampleMap({ markers: [] }));
+    expect(ascii).toContain('+');
+    const opts = playerExportDrawOptions(sampleMap({ fogOfWarEnabled: true, revealedRoomIds: ['r1'] }));
+    expect(opts.revealedRoomIds).toEqual(new Set(['r1']));
+  });
+
+  it('buildHandoutBody lists random encounter CR when present', () => {
+    const map = sampleMap({
+      rooms: [
+        {
+          id: 'r1',
+          label: 'Salle 1',
+          x: 1,
+          y: 0,
+          width: 2,
+          height: 2,
+          randomEncounter: { creatures: [{ name: 'Rat', quantity: 1, cr: '0' }] },
+        },
+      ],
+    });
+    const body = buildHandoutBody(map, [], { includeGmDetails: true, playerFog: false });
+    expect(body).toContain('FP 0');
   });
 });

@@ -150,10 +150,26 @@ describe('character-edit.mapper', () => {
     const details = creation.spellcastingDetails as {
       cantrips?: unknown[];
       spells?: unknown[];
+      spellMastery?: { spellLevel: number; spellId: string; spellName?: string }[];
+      signatureSpells?: { spellId: string; spellName?: string }[];
     };
     expect(details.cantrips?.length).toBe(1);
     expect(details.spells?.length).toBe(1);
+    expect(details.spellMastery?.[0]?.spellId).toBe('spl-magic-missile');
+    expect(details.spellMastery?.[0]?.spellName).toBe('Projectile magique');
+    expect(details.signatureSpells?.[0]?.spellId).toBe('spl-shield');
+    expect(details.signatureSpells?.[0]?.spellName).toBe('Bouclier');
     expect(creation.pointsRemaining).toBe(0);
+  });
+
+  it('mapCharacterToEditState restores classProgressionResources from classResources', () => {
+    const { creation } = mapCharacterToEditState(
+      sampleCharacter({
+        classResources: { points_astuce: 7, astuces_known: 4 },
+      }),
+    );
+    expect(creation.classProgressionResources['points_astuce']).toBe(7);
+    expect(creation.classProgressionResources['astuces_known']).toBe(4);
   });
 
   it('mapCharacterToEditState maps warlock pact fields', () => {

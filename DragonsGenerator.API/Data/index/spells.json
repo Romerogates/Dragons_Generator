@@ -1,4 +1,4 @@
-﻿{
+{
     "schema_version":  "2.0",
     "description":  "Index des sorts. Chaque entrée référence le fichier JSON de détail dans Spells/level-X/.",
     "source_books":  [

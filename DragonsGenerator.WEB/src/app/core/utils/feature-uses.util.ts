@@ -15,6 +15,8 @@ export interface FeatureUsesInput {
   id?: string;
   rechargeType?: string;
   recharge?: string;
+  /** Clé de ressource de progression (ex. points_astuce pour Besace). */
+  resource_key?: string;
   uses?:
     | number
     | {
@@ -212,8 +214,20 @@ export function resolveFeatureUses(
     }
   }
 
+  // Ressource de table (ex. Besace → points_astuce)
+  if (!resolved || max === 0) {
+    const resourceKey = feat.resource_key;
+    if (resourceKey) {
+      const fromTable = resourceAtLevel(cls, level, resourceKey);
+      if (fromTable !== undefined) {
+        max = parseResourceMax(fromTable);
+        resolved = true;
+      }
+    }
+  }
+
   if (!resolved && !rechargeRaw) return undefined;
-  if (!resolved && rawUses == null && !feat.mechanics) return undefined;
+  if (!resolved && rawUses == null && !feat.mechanics && !feat.resource_key) return undefined;
 
   return { max, current: max, recharge };
 }

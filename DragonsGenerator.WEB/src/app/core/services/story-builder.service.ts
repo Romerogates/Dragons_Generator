@@ -59,6 +59,7 @@ export class StoryBuilderService {
   readonly preservedHandouts = signal<CampaignHandout[]>([]);
   readonly preservedDungeonMaps = signal<CampaignDungeonMap[]>([]);
   readonly preservedActiveSessionId = signal<string | null>(null);
+  readonly preservedPinnedHandoutId = signal<string | null>(null);
 
   readonly isEditingCampaign = computed(() => this.editingCampaignId() !== null);
   readonly isCreaturesOnlyEdit = computed(() => this.editScope() === 'creatures-only');
@@ -259,6 +260,7 @@ export class StoryBuilderService {
     this.preservedHandouts.set(structuredClone(campaign.data.handouts ?? []));
     this.preservedDungeonMaps.set(structuredClone(campaign.data.dungeonMaps ?? []));
     this.preservedActiveSessionId.set(campaign.data.activeSessionId ?? null);
+    this.preservedPinnedHandoutId.set(campaign.data.pinnedHandoutId ?? null);
     this.title.set(campaign.title);
     this.setting.set(campaign.data.setting ?? '');
     this.region.set(campaignRegionFromData(campaign.data.regionId, campaign.data.regionName));
@@ -287,6 +289,7 @@ export class StoryBuilderService {
       handouts: structuredClone(this.preservedHandouts()),
       dungeonMaps: structuredClone(this.preservedDungeonMaps()),
       activeSessionId: this.preservedActiveSessionId(),
+      pinnedHandoutId: this.preservedPinnedHandoutId(),
     };
   }
 
@@ -312,6 +315,7 @@ export class StoryBuilderService {
     this.preservedHandouts.set([]);
     this.preservedDungeonMaps.set([]);
     this.preservedActiveSessionId.set(null);
+    this.preservedPinnedHandoutId.set(null);
     localStorage.removeItem(STORAGE_KEY);
   }
 }

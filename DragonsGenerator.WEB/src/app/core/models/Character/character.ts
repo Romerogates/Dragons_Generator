@@ -453,7 +453,7 @@ export interface WizardSpellcasting extends CharacterSpellcastingBase {
   arcaneTradition: string;
   /** Maîtrise des sorts (L17) : 1 sort niv.1 + 1 sort niv.2 à volonté. */
   spellMastery: { spellLevel: number; spellId: string; spellName: string }[];
-  /** Sorts attitrés (L19) : 2 sorts niv.3 toujours préparés, 1× / repos long chacun. */
+  /** Sorts attitrés (L19) : 2 sorts niv.3 toujours préparés, 1× / repos court ou long chacun. */
   signatureSpells: { spellId: string; spellName: string }[];
 }
 

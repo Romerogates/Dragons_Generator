@@ -1,9 +1,12 @@
 import {
+  canReorderCombatantInTurnOrder,
   createActiveCombat,
+  createCombatantId,
   createCombatHistoryEntry,
   createCombatant,
   combatantInitiativeTotal,
   advanceTurn,
+  currentTurnCombatant,
   duplicateCombatant,
   expandEncounterToCombatants,
   formatCombatArchiveSummary,
@@ -143,5 +146,56 @@ describe('combat-tracker.util', () => {
     expect(combat.round).toBe(1);
     expect(combat.turnIndex).toBe(0);
     expect(combat.combatants).toEqual([]);
+  });
+
+  it('createCombatantId falls back when crypto.randomUUID is unavailable', () => {
+    const orig = crypto.randomUUID;
+    Object.defineProperty(crypto, 'randomUUID', { configurable: true, value: undefined });
+    expect(createCombatantId()).toMatch(/^cb-/);
+    Object.defineProperty(crypto, 'randomUUID', { configurable: true, value: orig });
+  });
+
+  it('sortCombatants orders nameless rolls via turnOrderIds', () => {
+    const bravo = createCombatant({ name: 'Bravo', kind: 'player' });
+    const alpha = createCombatant({ name: 'Alpha', kind: 'player' });
+    const sorted = sortCombatants([bravo, alpha], [alpha.id, bravo.id]);
+    expect(sorted.map((c) => c.name)).toEqual(['Alpha', 'Bravo']);
+  });
+
+  it('reorderCombatantInTurnOrder rejects invalid or mismatched swaps', () => {
+    const high = createCombatant({ name: 'High', kind: 'player', initiativeRoll: 18, initiativeBonus: 0 });
+    const low = createCombatant({ name: 'Low', kind: 'player', initiativeRoll: 8, initiativeBonus: 0 });
+    const combat = createActiveCombat([high, low]);
+    expect(reorderCombatantInTurnOrder(combat, 'missing', 1)).toEqual({});
+    expect(reorderCombatantInTurnOrder(combat, high.id, 1)).toEqual({});
+    expect(canReorderCombatantInTurnOrder(combat, high.id, 1)).toBeFalse();
+  });
+
+  it('advanceTurn moves backward and never drops below round 1', () => {
+    const solo = createCombatant({ name: 'Solo', kind: 'player', initiativeRoll: 12, initiativeBonus: 0 });
+    let combat = createActiveCombat([solo]);
+    expect(advanceTurn(combat, -1)).toEqual({ turnIndex: 0, round: 1 });
+    combat = { ...combat, turnIndex: 0, round: 2 };
+    expect(advanceTurn(combat, -1)).toEqual({ turnIndex: 0, round: 1 });
+    expect(advanceTurn(createActiveCombat([]), 1)).toEqual({ turnIndex: 0, round: 1 });
+  });
+
+  it('currentTurnCombatant returns null when no active combatants remain', () => {
+    const dead = createCombatant({ name: 'Dead', kind: 'monster', defeated: true, currentHp: 0 });
+    expect(currentTurnCombatant(createActiveCombat([dead]))).toBeNull();
+  });
+
+  it('duplicateCombatant handles numbered names, copies and blank labels', () => {
+    expect(duplicateCombatant(createCombatant({ name: 'Gobelin 2', kind: 'monster' })).name).toBe('Gobelin 3');
+    expect(duplicateCombatant(createCombatant({ name: 'Bob (copie)', kind: 'player' })).name).toBe('Bob (copie)');
+    expect(duplicateCombatant(createCombatant({ name: '  ', kind: 'player' })).name).toBe('Copie');
+  });
+
+  it('formatCombatArchiveSummary covers default labels and partial hp lines', () => {
+    const unnamed = createCombatant({ name: '  ', kind: 'player', currentHp: 5 });
+    const text = formatCombatArchiveSummary(createActiveCombat([unnamed], { label: '  ' }));
+    expect(text).toContain('Fin combat : Combat');
+    expect(text).toContain('Sans nom : vivant (5 PV)');
+    expect(text).toContain('1 manche');
   });
 });

@@ -69,7 +69,7 @@
                   <td class="py-2 pr-3">
                     {{ atk.name }}
                     @if (atk.properties?.length) {
-                      <span class="block text-[10px] text-slate-500">{{ atk.properties.join(', ') }}</span>
+                      <span class="block text-[10px] text-slate-500">{{ atk.properties?.join(', ') }}</span>
                     }
                   </td>
                   <td class="py-2 pr-3 text-amber-300">{{ atk.attackBonus >= 0 ? '+' : '' }}{{ atk.attackBonus }}</td>
@@ -102,15 +102,12 @@
         <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500">Incantation</h3>
         <p class="text-sm text-slate-300">
           {{ sc.ability }} · DD {{ sc.spellSaveDC }} · Att. {{ sc.spellAttackBonus >= 0 ? '+' : '' }}{{ sc.spellAttackBonus }}
-          @if (sc.focus) {
-            · {{ sc.focus }}
+          @if (focusLabel()) {
+            · {{ focusLabel() }}
           }
         </p>
-        @if (sc.pact) {
-          <p class="text-xs text-violet-300">Pacte : {{ sc.pact }}</p>
-        }
-        @if (sc.eldritchInvocations?.length) {
-          <p class="text-xs text-slate-400">Invocations : {{ sc.eldritchInvocations.join(', ') }}</p>
+        @for (line of spellcastingLines(); track line) {
+          <p class="text-xs text-sky-300/90">{{ line }}</p>
         }
         @if (sc.spellSlots?.length) {
           <div class="flex flex-wrap gap-2">
@@ -167,19 +164,41 @@
       </section>
     }
 
-    @if (skillList().length) {
-      <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-4">
-        <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-2">Compétences</h3>
-        <ul class="flex flex-wrap gap-2">
-          @for (sk of skillList(); track sk.id) {
-            <li class="text-[11px] px-2 py-1 rounded-lg bg-[#171b22] border border-slate-700 text-slate-300">
-              {{ sk.label }}
-              @if (sk.expertise) {
-                <span class="text-amber-400"> ×2</span>
+    @if (skillList().length || toolLabels().length || languageLabels().length) {
+      <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-4 space-y-3">
+        @if (skillList().length) {
+          <div>
+            <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-2">
+              Compétences
+            </h3>
+            <ul class="flex flex-wrap gap-2">
+              @for (sk of skillList(); track sk.id) {
+                <li class="text-[11px] px-2 py-1 rounded-lg bg-[#171b22] border border-slate-700 text-slate-300">
+                  {{ sk.label }}
+                  @if (sk.expertise) {
+                    <span class="text-amber-400"> ×2</span>
+                  }
+                </li>
               }
-            </li>
-          }
-        </ul>
+            </ul>
+          </div>
+        }
+        @if (toolLabels().length) {
+          <div>
+            <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-2">
+              Outils
+            </h3>
+            <p class="text-xs text-slate-300">{{ toolLabels().join(', ') }}</p>
+          </div>
+        }
+        @if (languageLabels().length) {
+          <div>
+            <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-2">
+              Langues
+            </h3>
+            <p class="text-xs text-slate-300">{{ languageLabels().join(', ') }}</p>
+          </div>
+        }
       </section>
     }
 
@@ -192,7 +211,7 @@
           }
         </ul>
         <p class="text-[11px] text-slate-500 mt-3">
-          {{ c.currency.gold }} po · {{ c.currency.silver }} pa · {{ c.currency.copper }} pc
+          {{ c.currency.or }} po · {{ c.currency.argent }} pa · {{ c.currency.cuivre }} pc
         </p>
       </section>
     }

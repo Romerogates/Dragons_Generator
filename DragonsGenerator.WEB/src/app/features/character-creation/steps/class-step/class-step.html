@@ -29,6 +29,27 @@
       <p class="text-slate-400 text-xs sm:text-sm max-w-xl mx-auto italic px-1">
         {{ phaseSubtitle() }}
       </p>
+      @if (currentPhase() === 'prog_choice' && activeProgChoices().length > 1) {
+        <div class="flex flex-wrap justify-center gap-2 mt-3 max-w-2xl mx-auto px-2">
+          @for (pc of activeProgChoices(); track pc.id) {
+            <button
+              type="button"
+              class="text-[10px] sm:text-xs px-2.5 py-1 rounded-lg border transition-colors"
+              [class.border-amber-500]="displayedProgChoice()?.id === pc.id"
+              [class.bg-amber-950]="displayedProgChoice()?.id === pc.id"
+              [class.text-amber-300]="displayedProgChoice()?.id === pc.id"
+              [class.border-slate-700]="displayedProgChoice()?.id !== pc.id"
+              [class.text-slate-400]="displayedProgChoice()?.id !== pc.id"
+              (click)="focusProgChoice(pc.id)"
+            >
+              {{ pc.label }}
+              @if ((progChoiceAnswers().get(pc.id)?.length ?? 0) >= (pc.count || 1)) {
+                <span class="text-emerald-400">✓</span>
+              }
+            </button>
+          }
+        </div>
+      }
     </div>
 
     <!-- Mobile / tablette : carrousel scroll-snap (comme espèces) -->

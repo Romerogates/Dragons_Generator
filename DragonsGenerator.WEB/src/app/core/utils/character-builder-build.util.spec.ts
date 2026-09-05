@@ -208,6 +208,12 @@ describe('character-spellcasting.util', () => {
     expect(sc?.spellSaveDC).toBe(8 + 3 + mods.intelligence);
     if (sc?.kind === 'wizard') {
       expect(sc.arcaneTradition).toBe('Évocation');
+      expect(sc.spellMastery).toEqual([
+        { spellLevel: 2, spellId: 'spl-magic-missile', spellName: 'Projectile magique' },
+      ]);
+      expect(sc.signatureSpells).toEqual([
+        { spellId: 'spl-shield', spellName: 'spl-shield' },
+      ]);
     }
   });
 
@@ -218,7 +224,7 @@ describe('character-spellcasting.util', () => {
       spellcastingAbility: 'Charisme',
       targetLevel: 3,
       subclassName: 'Lignée draconique',
-      metamagicOptions: ['meta-subtle-spell'],
+      metamagicOptions: ['meta-sort-discret'],
       selectedEquipment: [],
       backgroundEquipment: [],
       spellcastingDetails: { cantrips: [] },
@@ -226,7 +232,7 @@ describe('character-spellcasting.util', () => {
     } as unknown as CharacterCreation;
     const sc = buildCharacterSpellcasting(c, mods);
     expect(sc?.kind).toBe('sorcerer');
-    expect((sc as { metamagic?: string[] }).metamagic?.length).toBe(1);
+    expect((sc as { metamagic?: string[] }).metamagic).toEqual(['Sort discret']);
   });
 });
 

@@ -115,6 +115,35 @@ function equipmentStepComplete(c: CharacterCreation): boolean {
   return choosable.every((slot) => picks.alt[String(slot.slot)] != null);
 }
 
+/** Niveau dans la classe Magicien (primaire ou secondaire). */
+function wizardClassLevel(c: CharacterCreation): number {
+  if (c.classId === 'cls-magicien' || c.spellcastingKind === 'wizard') {
+    return c.targetLevel || 1;
+  }
+  const secondary = (asExtended(c).secondaryClasses ?? []).find(
+    (sc) => sc.classId === 'cls-magicien' || sc.spellcastingKind === 'wizard',
+  );
+  return secondary?.level ?? 0;
+}
+
+/** Magicien L17+ : maîtrise niv.1+2 ; L19+ : 2 sorts attitrés niv.3. */
+function wizardHighLevelPicksComplete(c: CharacterCreation): boolean {
+  const level = wizardClassLevel(c);
+  if (level < 17) return true;
+  const details = c.spellcastingDetails as
+    | { spellMastery?: unknown[]; signatureSpells?: unknown[] }
+    | undefined;
+  const masteryOk =
+    (Array.isArray(details?.spellMastery) && details.spellMastery.length >= 2) ||
+    (!!c.spellMasteryPicks?.['1'] && !!c.spellMasteryPicks?.['2']);
+  if (!masteryOk) return false;
+  if (level < 19) return true;
+  return (
+    (Array.isArray(details?.signatureSpells) && details.signatureSpells.length >= 2) ||
+    (c.signatureSpellIds?.length ?? 0) >= 2
+  );
+}
+
 function magicDetailsComplete(c: CharacterCreation): boolean {
   if (!racialSpellsComplete(c)) return false;
   const details = c.spellcastingDetails as
@@ -136,6 +165,7 @@ function magicDetailsComplete(c: CharacterCreation): boolean {
     return false;
   }
   if (c.spellcastingKind === 'cleric' && !(details.deityId || details.deity)) return false;
+  if (!wizardHighLevelPicksComplete(c)) return false;
   return !!(cantrips?.length || spells?.length || details.deityId || details.deity);
 }
 

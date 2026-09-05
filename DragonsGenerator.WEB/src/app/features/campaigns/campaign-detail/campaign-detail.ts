@@ -7,6 +7,7 @@ import {
   OnDestroy,
   OnInit,
   signal,
+  viewChild,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -20,7 +21,7 @@ import { AuthService } from '@core/services/auth.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import { NotificationService } from '@core/services/notification.service';
 import { DataService } from '@core/services/data.service';
-import { forkJoin, catchError, map, of, Observable, throwError } from 'rxjs';
+import { forkJoin, catchError, map, of, Observable, throwError, firstValueFrom } from 'rxjs';
 import { getCampaignPdfService } from '@core/services/campaign-pdf.loader';
 import type { CreaturePrintEntry, PlayerGmSummary } from '@core/services/campaign-pdf.types';
 import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
@@ -149,6 +150,11 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   private previewCampaignId: string | null = null;
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
   private handoutSaveTimer: ReturnType<typeof setTimeout> | null = null;
+  private softPersistTimer: ReturnType<typeof setTimeout> | null = null;
+  private persistSeq = 0;
+  private persistTail: Promise<void> = Promise.resolve();
+
+  private readonly dungeonMapsComp = viewChild(CampaignDungeonMaps);
 
   readonly isLoggedIn = this.auth.isLoggedIn;
 
@@ -320,11 +326,14 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   startPlaySession(sessionId: string): void {
     const c = this.campaign();
     if (!c?.isOwner) return;
+    this.flushSoftPersistTimer();
     this.flushSessionSave();
-    const data = { ...c.data, activeSessionId: sessionId };
+    this.dungeonMapsComp()?.flushPendingSave();
+    const data = { ...this.campaign()!.data, activeSessionId: sessionId };
     this.campaign.update((prev) => (prev ? { ...prev, data } : prev));
-    this.persist(c.title, data);
-    this.router.navigate(['/campaigns', c.id, 'play']);
+    this.persist(c.title, data, () => {
+      this.router.navigate(['/campaigns', c.id, 'play']);
+    });
   }
 
   ngOnInit(): void {
@@ -363,8 +372,10 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.flushSoftPersistTimer();
     this.flushSessionSave();
     this.flushHandoutSave();
+    this.dungeonMapsComp()?.flushPendingSave();
     this.stopInitiativeBannerPoll();
     this.revokePreviewUrl();
   }
@@ -401,6 +412,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (!this.campaign()?.isOwner && (t === 'creatures' || t === 'encounters' || t === 'maps')) {
       this.tab.set('overview');
       return;
+    }
+    if (this.tab() === 'maps' && t !== 'maps') {
+      this.dungeonMapsComp()?.flushPendingSave();
     }
     this.tab.set(t);
     if (t === 'creatures') {
@@ -618,8 +632,13 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (!confirm('Supprimer ce document ?')) return;
     this.flushHandoutSave();
     if (this.editingHandoutId() === handoutId) this.editingHandoutId.set(null);
+    const dungeonMaps = (c.data.dungeonMaps ?? []).map((m) =>
+      m.handoutId === handoutId ? { ...m, handoutId: null } : m,
+    );
     this.saveData({
       handouts: (c.data.handouts ?? []).filter((h) => h.id !== handoutId),
+      pinnedHandoutId: c.data.pinnedHandoutId === handoutId ? null : c.data.pinnedHandoutId,
+      dungeonMaps,
     });
   }
 
@@ -780,32 +799,79 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (!c) return;
     const data = { ...c.data, ...patch };
     this.campaign.update((prev) => (prev ? { ...prev, data } : prev));
-    this.persist(c.title, data);
+
+    const keys = Object.keys(patch);
+    if (keys.length === 1 && keys[0] === 'notes') {
+      this.scheduleSoftPersist();
+      return;
+    }
+
+    this.clearSoftPersistTimer();
+    const latest = this.campaign();
+    if (!latest) return;
+    this.persist(latest.title, latest.data);
   }
 
   saveTitle(title: string): void {
     const c = this.campaign();
     if (!c) return;
-    this.persist(title, c.data);
+    this.campaign.update((prev) => (prev ? { ...prev, title } : prev));
+    this.scheduleSoftPersist();
   }
 
-  private persist(title: string, data: CampaignData): void {
+  private scheduleSoftPersist(): void {
+    if (this.softPersistTimer) clearTimeout(this.softPersistTimer);
+    this.softPersistTimer = setTimeout(() => {
+      this.softPersistTimer = null;
+      const latest = this.campaign();
+      if (!latest?.isOwner) return;
+      this.persist(latest.title, latest.data);
+    }, 450);
+  }
+
+  private clearSoftPersistTimer(): void {
+    if (!this.softPersistTimer) return;
+    clearTimeout(this.softPersistTimer);
+    this.softPersistTimer = null;
+  }
+
+  private flushSoftPersistTimer(): void {
+    if (!this.softPersistTimer) return;
+    this.clearSoftPersistTimer();
+    const latest = this.campaign();
+    if (!latest?.isOwner) return;
+    this.persist(latest.title, latest.data);
+  }
+
+  private persist(title: string, data: CampaignData, onSuccess?: () => void): void {
     const c = this.campaign();
     if (!c) return;
+    const campaignId = c.id;
+    const seq = ++this.persistSeq;
     this.saving.set(true);
-    this.campaigns.update(c.id, title, data).subscribe({
-      next: (summary) => {
-        this.campaign.update((prev) =>
-          prev ? { ...prev, title, data, updatedAt: summary.updatedAt } : prev,
-        );
-        this.saving.set(false);
-        if (this.tab() === 'activity') this.loadActivity();
-      },
-      error: () => {
-        this.error.set('Échec de la sauvegarde.');
-        this.saving.set(false);
-      },
-    });
+    this.error.set(null);
+
+    this.persistTail = this.persistTail
+      .catch(() => undefined)
+      .then(async () => {
+        try {
+          const summary = await firstValueFrom(this.campaigns.update(campaignId, title, data));
+          this.campaign.update((prev) => {
+            if (!prev || prev.id !== campaignId) return prev;
+            // Ne jamais réappliquer le blob envoyé : l'état local est la source de vérité.
+            return { ...prev, updatedAt: summary.updatedAt };
+          });
+          this.sessionCache.cache(campaignId, this.campaign()?.title ?? title, this.campaign()?.data ?? data);
+          if (seq === this.persistSeq) this.saving.set(false);
+          if (this.tab() === 'activity') this.loadActivity();
+          onSuccess?.();
+        } catch {
+          if (seq === this.persistSeq) {
+            this.error.set('Échec de la sauvegarde.');
+            this.saving.set(false);
+          }
+        }
+      });
   }
 
   generateEncountersFromStory(): void {
@@ -1087,6 +1153,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   editScenario(): void {
+    if (!this.campaign()?.isOwner) return;
+    this.flushSoftPersistTimer();
+    this.dungeonMapsComp()?.flushPendingSave();
     const c = this.campaign();
     if (!c?.isOwner) return;
     this.storyBuilder.loadCampaignIntoBuilder(c, 'full');
@@ -1094,6 +1163,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   addCreaturesOnly(): void {
+    if (!this.campaign()?.isOwner) return;
+    this.flushSoftPersistTimer();
+    this.dungeonMapsComp()?.flushPendingSave();
     const c = this.campaign();
     if (!c?.isOwner) return;
     this.storyBuilder.loadCampaignIntoBuilder(c, 'creatures-only');

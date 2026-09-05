@@ -65,7 +65,7 @@
   "starting_equipment": {
     "fixed": [
       {
-        "id": "gr-sac-aventurier",
+        "id": "gr-sac-daventurier",
         "qty": 1
       }
     ],
@@ -133,14 +133,14 @@
             "option_id": "B",
             "items": [
               "wp-sarbacane",
-              "gr-flechettes-x10"
+              { "id": "wp-flechette", "qty": 10 }
             ]
           },
           {
             "option_id": "C",
             "items": [
               "wp-arc-court",
-              "gr-carquois-fleches-x20"
+              { "id": "it-carquois-20-fleches", "qty": 1 }
             ]
           }
         ]

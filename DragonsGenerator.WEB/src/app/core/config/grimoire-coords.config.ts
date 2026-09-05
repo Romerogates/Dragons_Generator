@@ -161,3 +161,20 @@ export const GRIMOIRE_IMAGES: Record<SpellcastingKind, string> = {
 };
 
 export const GRIMOIRE_SUPP_IMAGE = '/images/sheets/grimoires/grimoire-supp.jpg';
+
+/**
+ * Coordonnées page supplémentaire (grimoire-supp.jpg).
+ * 6 bandes × 5 lignes = 30 lignages (médaillons ouroboros à gauche).
+ */
+export const GRIMOIRE_SUPP_COORDS = {
+  levelX: 46,
+  levelYs: [182, 284, 396, 508, 620, 732],
+  rowsPerBand: 5,
+  preparedX: 76,
+  nameX: 101,
+  effectX: 288,
+  effectEndX: 537,
+  tableStartY: 150,
+  rowH: 22.5,
+  maxRows: 30,
+} as const;

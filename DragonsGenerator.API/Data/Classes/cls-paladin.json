@@ -135,8 +135,7 @@
     "enabled": true,
     "spell_list": "paladin",
     "focus_options": [
-      "tl-symbole-sacre",
-      "tl-focaliseur-personnel"
+      "tl-symbole-sacre"
     ],
     "prepared_formula": "cha_mod + floor(paladin_level / 2)",
     "prepared_minimum": 1,

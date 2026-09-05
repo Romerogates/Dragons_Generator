@@ -20,6 +20,10 @@ describe('equipment.utils', () => {
     expect(resolveEquipmentRefId('gr-carreau')).toBe('it-carreaux');
     expect(resolveEquipmentRefId('tl-sacoche-a-composantes')).toBe('it-sacoche-a-composantes');
     expect(resolveEquipmentRefId('wp-dague')).toBe('wp-dague');
+    expect(resolveEquipmentRefId('tl-focaliseur-personnel')).toBe('category-holy-symbol');
+    expect(resolveEquipmentRefId('gr-paire-de-cestes')).toBe('wp-ceste');
+    expect(resolveEquipmentRefId('wp-faucille')).toBe('wp-serpe');
+    expect(resolveEquipmentRefId('wp-masse-d-armes')).toBe('wp-masse-darmes');
   });
 
   it('isEquipmentCategoryId detects categories and mastered choices', () => {
@@ -47,6 +51,18 @@ describe('equipment.utils', () => {
     expect(normalizeItemRef({ id: 'gr-sac-derudit' })).toEqual({
       id: 'gr-sac-derudit',
       qty: 1,
+    });
+    // Packs déjà « ×20 » dans le catalogue → qty 1 (alias plein avant strip -xN)
+    expect(normalizeItemRef('gr-carreaux-x20')).toEqual({ id: 'it-carreaux', qty: 1 });
+    expect(normalizeItemRef('gr-carquois-fleches-x20')).toEqual({
+      id: 'it-carquois-20-fleches',
+      qty: 1,
+    });
+    // Fléchettes unitaires : le suffixe -xN reste un multiplicateur
+    expect(normalizeItemRef('gr-flechettes-x10')).toEqual({ id: 'wp-flechette', qty: 10 });
+    expect(normalizeItemRef({ item_id: 'gr-flechette', quantity: 10 })).toEqual({
+      id: 'wp-flechette',
+      qty: 10,
     });
   });
 

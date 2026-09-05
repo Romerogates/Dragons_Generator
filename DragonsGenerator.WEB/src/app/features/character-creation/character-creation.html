@@ -61,33 +61,17 @@
         Étape {{ builder.currentStep() }} / {{ builder.totalSteps() }}
       </p>
       <div class="flex items-center gap-3 min-w-0 justify-end">
-        <label
+        <span
           class="flex items-center gap-2 shrink-0 text-[10px] font-black uppercase tracking-widest text-slate-400"
-          [attr.title]="
-            builder.isLevelLocked()
-              ? 'Niveau verrouillé — revenez à l’étape Classe pour le modifier'
-              : 'Niveau du personnage (1–20)'
-          "
+          title="Niveau choisi à l’étape Niveau — revenez-y pour le modifier"
+          data-testid="wizard-level-indicator"
         >
           Niveau
-          @if (builder.isLevelLocked()) {
-            <span
-              class="w-11 shrink-0 bg-[#12151a] border border-slate-800 rounded-lg px-1 py-1 text-slate-500 text-xs font-bold text-center tabular-nums cursor-not-allowed"
-              >{{ builder.targetLevel() }}</span
-            >
-          } @else {
-            <select
-              data-testid="wizard-level-select"
-              class="w-11 shrink-0 bg-[#171b22] border border-slate-700 rounded-lg px-1 py-1 text-amber-400 text-xs font-bold text-center tabular-nums appearance-none focus:outline-none focus:border-amber-500/50 cursor-pointer"
-              [value]="builder.targetLevel()"
-              (change)="onLevelChange($event)"
-            >
-              @for (lvl of levels; track lvl) {
-                <option [value]="lvl">{{ lvl }}</option>
-              }
-            </select>
-          }
-        </label>
+          <span
+            class="w-11 shrink-0 bg-[#12151a] border border-slate-800 rounded-lg px-1 py-1 text-amber-400 text-xs font-bold text-center tabular-nums"
+            >{{ builder.targetLevel() }}</span
+          >
+        </span>
         <span
           class="hidden sm:inline-block w-[7.5rem] shrink-0 text-right text-[10px] font-mono text-slate-500 tabular-nums"
         >

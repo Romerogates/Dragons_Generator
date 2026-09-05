@@ -178,6 +178,81 @@ describe('MagicStep', () => {
     expect(component.selectionComplete()).toBeTrue();
   });
 
+  it('filters cantrips by name only and by school select', () => {
+    expect(component.filteredCantrips().length).toBe(component.availableCantrips().length);
+    component.spellSearchQuery.set('ray');
+    fixture.detectChanges();
+    expect(component.filteredCantrips().every((s) => /ray/i.test(s.name))).toBeTrue();
+
+    // Description / école ne doivent pas matcher via le champ texte
+    const evocation = component.availableCantrips().find((s) =>
+      s.school.toLowerCase().includes('evocation'),
+    );
+    if (evocation) {
+      component.spellSearchQuery.set(evocation.school);
+      fixture.detectChanges();
+      expect(component.filteredCantrips().some((s) => s.id === evocation.id)).toBeFalse();
+    }
+
+    component.clearSpellFilters();
+    component.spellSchoolFilter.set('evocation');
+    fixture.detectChanges();
+    expect(component.spellFiltersActive()).toBeTrue();
+    expect(
+      component.filteredCantrips().every((s) => s.school.toLowerCase().includes('evocation')),
+    ).toBeTrue();
+  });
+
+  it('gates mastery (L17) and signature spells (L19) for high-level wizard', async () => {
+    TestBed.resetTestingModule();
+    const highCreation = signal(wizardCreation({ targetLevel: 19 }));
+    const level2 = ['spl-invisibility', 'spl-misty'].map((id) => mockSpell(id, 2));
+    const level3 = ['spl-fireball', 'spl-counterspell'].map((id) => mockSpell(id, 3));
+    await TestBed.configureTestingModule({
+      imports: [MagicStep],
+      providers: [
+        ...zonelessTestProviders,
+        {
+          provide: DataService,
+          useValue: {
+            getSpells: () => of([...MOCK_CANTrips, ...MOCK_LEVEL1, ...level2, ...level3]),
+            getDeities: () => of([]),
+            getClassById: () => of(MOCK_WIZARD_CLASS),
+          },
+        },
+        {
+          provide: CharacterBuilderService,
+          useValue: builderMock(highCreation),
+        },
+      ],
+    }).compileComponents();
+
+    const highFixture = TestBed.createComponent(MagicStep);
+    const high = highFixture.componentInstance;
+    highFixture.detectChanges();
+
+    expect(high.needsSpellMastery()).toBeTrue();
+    expect(high.needsSignatureSpells()).toBeTrue();
+    expect(high.masteryComplete()).toBeFalse();
+
+    high.selectedSpells.set(
+      new Set(['spl-magic-missile', 'spl-invisibility', 'spl-fireball', 'spl-counterspell']),
+    );
+    high.pickMastery(1, 'spl-magic-missile');
+    high.pickMastery(2, 'spl-invisibility');
+    high.toggleSignature('spl-fireball');
+    high.toggleSignature('spl-counterspell');
+    highFixture.detectChanges();
+
+    expect(high.masteryComplete()).toBeTrue();
+    expect(high.signatureComplete()).toBeTrue();
+
+    high.toggleSpell('spl-magic-missile');
+    highFixture.detectChanges();
+    expect(high.masteryComplete()).toBeFalse();
+    expect(high.masteryPicks()[1]).toBeUndefined();
+  });
+
   it('respects cantrip and spell quotas when toggling', () => {
     component.toggleCantrip('spl-ray');
     component.toggleCantrip('spl-mage-hand');

@@ -49,6 +49,28 @@ export function createLettreClass(): CharacterClass {
           ],
           unlocked_at_level: 1,
         },
+        {
+          id: 'choice-astuce-gain-cls-lettre',
+          name: 'Nouvelle astuce',
+          type: 'feature_selection',
+          quantity: 1,
+          pool: [
+            'feat-astuce-audace',
+            'feat-astuce-brio',
+            'feat-astuce-diversion',
+            'feat-astuce-expedient',
+          ],
+          unlocked_at_levels: [5, 9, 11, 15, 18],
+        },
+        {
+          id: 'choice-conquete-methodique-tier1-cls-lettre',
+          name: 'Conquête méthodique (niv. 3)',
+          type: 'feature_selection',
+          quantity: 1,
+          replaceable: true,
+          pool: ['feat-conquete-alerte', 'feat-conquete-langue-universelle'],
+          unlocked_at_level: 3,
+        },
       ],
       starting_equipment: {
         fixed: [{ id: 'ar-armure-de-cuir', qty: 1 }],
@@ -69,8 +91,33 @@ export function createLettreClass(): CharacterClass {
           },
         ],
       },
-      progression: [{ level: 1, features: ['feat-astuces'] }],
+      progression: [
+        {
+          level: 1,
+          features: ['feat-besace-a-astuces', 'feat-astuces'],
+          resources: { points_astuce: 4, astuces_known: 3 },
+        },
+        {
+          level: 3,
+          features: ['feat-conquete-methodique'],
+          resources: { points_astuce: 5, astuces_known: 3, conquete_methodique_effects: 1 },
+        },
+        {
+          level: 5,
+          features: ['feat-gain-astuce'],
+          resources: { points_astuce: 7, astuces_known: 4 },
+        },
+      ],
       features_details: [
+        {
+          id: 'feat-besace-a-astuces',
+          name: 'Besace à astuces',
+          description: 'Points d’astuce complets pour les tests.',
+          flavor: { summary: 'Résumé court besace.' },
+          recharge: 'short_rest',
+          resource_key: 'points_astuce',
+          unlocks_at_level: 1,
+        },
         {
           id: 'feat-astuce-audace',
           name: 'Audace',
@@ -100,6 +147,19 @@ export function createLettreClass(): CharacterClass {
           name: 'Empressement',
           desc: 'Astuce fixe.',
           level: 1,
+        },
+        {
+          id: 'feat-conquete-alerte',
+          name: 'Alerte',
+          description: 'Conquête Alerte — texte long.',
+          flavor: { summary: 'Alerte (résumé).' },
+          unlocks_at_level: 3,
+        },
+        {
+          id: 'feat-conquete-langue-universelle',
+          name: 'Langue universelle',
+          desc: 'Conquête langue.',
+          level: 3,
         },
       ],
     },

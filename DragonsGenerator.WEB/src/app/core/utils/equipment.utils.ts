@@ -19,7 +19,8 @@ export const EQUIPMENT_CATEGORY_ALIASES: Record<string, string> = {
   'tl-focaliseur-druidique': 'category-druidic-focus',
   'tl-focaliseur-arcanique': 'category-arcane-focus',
   'tl-symbole-sacre': 'category-holy-symbol',
-  'tl-focaliseur-personnel': 'category-arcane-focus',
+  'tl-focaliseur-personnel': 'category-holy-symbol',
+  'tl-category-materiel-de-jeu': 'category-gaming-sets',
   'tl-mastered-choice': 'tl-mastered-choice',
   'wp-mastered-choice': 'wp-mastered-choice',
 };
@@ -28,11 +29,18 @@ export const EQUIPMENT_CATEGORY_ALIASES: Record<string, string> = {
 export const EQUIPMENT_ID_ALIASES: Record<string, string> = {
   'gr-sac-d-aventurier': 'gr-sac-daventurier',
   'gr-sac-aventurier': 'gr-sac-daventurier',
-  'gr-sac-dexplorateur': 'gr-sac-dexplorateur',
   'gr-sac-explorateur': 'gr-sac-dexplorateur',
   'gr-sac-erudit': 'gr-sac-derudit',
+  'gr-carreaux': 'it-carreaux',
   'gr-carreaux-x20': 'it-carreaux',
   'gr-carreau': 'it-carreaux',
+  'gr-flechettes': 'wp-flechette',
+  'gr-flechette': 'wp-flechette',
+  'gr-paire-de-cestes': 'wp-ceste',
+  'gr-carquois-fleches': 'it-carquois-20-fleches',
+  'gr-carquois-fleches-x20': 'it-carquois-20-fleches',
+  'wp-faucille': 'wp-serpe',
+  'wp-masse-d-armes': 'wp-masse-darmes',
   'ar-cuir': 'ar-armure-de-cuir',
   'tl-sacoche-a-composantes': 'it-sacoche-a-composantes',
   'tl-sacoche-composantes': 'it-sacoche-a-composantes',
@@ -142,9 +150,14 @@ export function masteredProficiencyChoiceLabel(id: string): string {
   return 'Choix';
 }
 
-/** Normalise une ref d'item (string | {id,qty}) vers {id, qty}. */
+/** Normalise une ref d'item (string | {id,qty} | {item_id,quantity}) vers {id, qty}. */
 export function normalizeItemRef(raw: unknown): { id: string; qty: number } {
   if (typeof raw === 'string') {
+    // Alias complets d'abord (ex. gr-carreaux-x20) avant le strip -xN
+    const aliasedFull = resolveEquipmentRefId(raw);
+    if (aliasedFull !== raw) {
+      return { id: aliasedFull, qty: 1 };
+    }
     const xMatch = raw.match(/^(.+)-x(\d+)$/i);
     if (xMatch) {
       return { id: resolveEquipmentRefId(xMatch[1]), qty: parseInt(xMatch[2], 10) };
@@ -152,9 +165,11 @@ export function normalizeItemRef(raw: unknown): { id: string; qty: number } {
     return { id: resolveEquipmentRefId(raw), qty: 1 };
   }
   if (raw && typeof raw === 'object') {
-    const obj = raw as { id?: string; qty?: number };
-    if (obj.id) {
-      return { id: resolveEquipmentRefId(obj.id), qty: obj.qty ?? 1 };
+    const obj = raw as { id?: string; item_id?: string; qty?: number; quantity?: number };
+    const id = obj.id ?? obj.item_id;
+    const qty = obj.qty ?? obj.quantity ?? 1;
+    if (id) {
+      return { id: resolveEquipmentRefId(id), qty };
     }
   }
   return { id: 'unknown', qty: 1 };

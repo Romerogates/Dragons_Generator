@@ -99,6 +99,7 @@ describe('StoryBuilderService', () => {
           },
         ],
         activeSessionId: 'sess-1',
+        pinnedHandoutId: 'ho-1',
       },
     };
 
@@ -109,6 +110,7 @@ describe('StoryBuilderService', () => {
     expect(data.handouts).toEqual(campaign.data.handouts);
     expect(data.dungeonMaps).toEqual(campaign.data.dungeonMaps);
     expect(data.activeSessionId).toBe('sess-1');
+    expect(data.pinnedHandoutId).toBe('ho-1');
   });
 
   it('builds unknown region campaign data', () => {

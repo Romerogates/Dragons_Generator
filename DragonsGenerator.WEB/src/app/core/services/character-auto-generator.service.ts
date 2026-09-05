@@ -319,6 +319,8 @@ export class CharacterAutoGeneratorService {
       catalogs.spells,
       speciesSel.racialSpellGrants,
       speciesSel.choiceAnswers,
+      this.builder.abilityModifiers(),
+      { level: 1, subclassId: selection.subclassId },
     );
     if (spellDetails) {
       this.builder.setSpellcastingDetails(spellDetails);

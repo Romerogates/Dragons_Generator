@@ -168,6 +168,17 @@ describe('spell-grimoire-effect.util', () => {
     expect(pages[1].placements.length).toBe(1);
   });
 
+  it('paginateGrimoireOverflow never drops a spell that alone exceeds maxRows', () => {
+    const split = (text: string) => text.split('|').map((p) => p.trim()).filter(Boolean);
+    const huge = 'V,S | Instantanée | ' + Array.from({ length: 12 }, (_, i) => `Phrase ${i}.`).join(' ');
+    const spells = [inst('Géant', huge), inst('Suivant', 'V,S | Instantanée | Court.')];
+    const pages = paginateGrimoireOverflow(spells, split, 40, 2, 8);
+    expect(pages.length).toBeGreaterThanOrEqual(2);
+    const names = pages.flatMap((p) => p.placements.map((x) => x.spell.name));
+    expect(names).toContain('Géant');
+    expect(names).toContain('Suivant');
+  });
+
   it('buildGrimoireEffectSummary includes material component', () => {
     const summary = buildGrimoireEffectSummary(
       mockSpell({
@@ -179,5 +190,33 @@ describe('spell-grimoire-effect.util', () => {
     );
     expect(summary).toContain('M(une goutte de sang)');
     expect(summary).toContain('1 min');
+  });
+
+  it('layoutGrimoireEffect handles whitespace-only summaries as header-only layout', () => {
+    const split = (text: string) => [text];
+    const layout = layoutGrimoireEffect('   ', split, 80);
+    expect(layout.body).toBe('');
+    expect(layout.headerLines.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('planGrimoireTable truncates an oversized first spell instead of dropping it', () => {
+    const split = (text: string) => (text.length > 8 ? [text.slice(0, 8), text.slice(8)] : [text]);
+    const huge = inst('Huge', 'V,S | Instantanée | ' + 'Mot '.repeat(20));
+    const plan = planGrimoireTable([huge], split, 30, 1, 2);
+    expect(plan.placements.length).toBe(1);
+    expect(plan.overflow).toEqual([]);
+  });
+
+  it('buildGrimoireEffectSummary omits components when none are present', () => {
+    const summary = buildGrimoireEffectSummary(
+      mockSpell({
+        components: { v: false, s: false, m: null },
+        duration: { amount: null, unit: 'instantane' },
+        description: 'Effet.',
+      }),
+    );
+    expect(summary).toContain('Instantanée');
+    expect(summary).toContain('Effet.');
+    expect(summary).not.toContain('V,S');
   });
 });

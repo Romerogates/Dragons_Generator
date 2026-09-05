@@ -120,15 +120,21 @@ function mapSavingThrows(raw: string[] | undefined): Ability[] {
 }
 
 function normalizeFeaturesDetails(features: RawFeatureDetail[]): FeatureDetail[] {
-  return (features ?? []).map((f) => ({
-    ...f,
-    id: f.id ?? '',
-    name: f.name ?? '',
-    desc: f.desc ?? f.flavor?.summary ?? '',
-    level: f.level ?? f.unlocks_at_level ?? 1,
-    rechargeType: mapRecharge(f.recharge),
-    uses: f.uses ?? undefined,
-  }));
+  return (features ?? []).map((f) => {
+    const description =
+      typeof (f as { description?: unknown }).description === 'string'
+        ? (f as { description: string }).description
+        : '';
+    return {
+      ...f,
+      id: f.id ?? '',
+      name: f.name ?? '',
+      desc: description || f.desc || f.flavor?.summary || '',
+      level: f.level ?? f.unlocks_at_level ?? 1,
+      rechargeType: mapRecharge(f.recharge),
+      uses: f.uses ?? undefined,
+    };
+  });
 }
 
 function mapRecharge(recharge: string | undefined): string | undefined {

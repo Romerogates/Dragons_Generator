@@ -17,9 +17,15 @@ import { CharacterBuilderService } from '@core/services/character-builder.servic
 import type { Spell } from '@core/models/Spells/spell';
 import type { Deity } from '@core/models/Deities/deity';
 import type { SpellcastingKind, AbilityKey } from '@core/models/Character/character';
+import type { CharacterClass, Subclass } from '@core/models/CharacterClasses/character-class';
 import { warlockArcanumSpellLevels, spellProgressionMilestones } from '@core/utils/progression-choices.util';
 import { collectCasterSources, type CasterSource } from '@core/utils/class-spellcasting.util';
 import { maxSpellLevelFromSlots } from '@core/utils/feature-uses.util';
+import {
+  resolveSpellQuota,
+  spellPickCount,
+  type SpellQuota,
+} from '@core/utils/spell-quota.util';
 import {
   spellCastTimeLabel,
   spellComponentsLabel,
@@ -27,6 +33,7 @@ import {
   spellRangeLabel,
   spellSchoolLabel,
   spellStatsLine,
+  SPELL_SCHOOL_LABELS,
 } from '@core/utils/spell-display.util';
 
 // ============================================================================
@@ -51,107 +58,43 @@ export interface SpellRaw {
   higherLevels: string | null;
 }
 
-/** Quotas de sorts au niveau 1. */
-interface SpellQuota {
-  cantrips: number;
-  /** Sorts de niv 1 choisis définitivement (known casters). */
-  knownSpells: number;
-  /** Sorts de niv 1 dans le grimoire (wizard uniquement). */
-  grimoireSpells: number;
-  /** Sorts préparés au niv. 1 (prêtre / druide). */
-  preparedSpells: number;
-  /** True si le lanceur prépare ses sorts. */
-  isPrepared: boolean;
-  /** Accès à toute la liste (prépare un sous-ensemble). */
-  hasFullListAccess: boolean;
-  /** Label du mode de sort pour l'UI. */
-  modeLabel: string;
+interface SpellDetailEntry {
+  refId: string;
+  name?: string;
+  level?: number;
+  prepared?: boolean;
+  alwaysPrepared?: boolean;
+  effectSummary?: string;
 }
 
-/** Fallback si le JSON classe n'a pas encore les resources. */
-const SPELL_QUOTAS_FALLBACK: Record<string, SpellQuota> = {
-  wizard: {
-    cantrips: 3,
-    knownSpells: 0,
-    grimoireSpells: 6,
-    preparedSpells: 0,
-    isPrepared: true,
-    hasFullListAccess: false,
-    modeLabel: 'Grimoire (sorts copiés)',
-  },
-  bard: {
-    cantrips: 2,
-    knownSpells: 4,
-    grimoireSpells: 0,
-    preparedSpells: 0,
-    isPrepared: false,
-    hasFullListAccess: false,
-    modeLabel: 'Sorts connus',
-  },
-  druid: {
-    cantrips: 2,
-    knownSpells: 0,
-    grimoireSpells: 0,
-    preparedSpells: 0,
-    isPrepared: true,
-    hasFullListAccess: true,
-    modeLabel: 'Sorts préparés',
-  },
-  sorcerer: {
-    cantrips: 4,
-    knownSpells: 2,
-    grimoireSpells: 0,
-    preparedSpells: 0,
-    isPrepared: false,
-    hasFullListAccess: false,
-    modeLabel: 'Sorts connus',
-  },
-  cleric: {
-    cantrips: 3,
-    knownSpells: 0,
-    grimoireSpells: 0,
-    preparedSpells: 0,
-    isPrepared: true,
-    hasFullListAccess: true,
-    modeLabel: 'Sorts préparés',
-  },
-  warlock: {
-    cantrips: 2,
-    knownSpells: 2,
-    grimoireSpells: 0,
-    preparedSpells: 0,
-    isPrepared: false,
-    hasFullListAccess: false,
-    modeLabel: 'Sorts connus',
-  },
-  paladin: {
-    cantrips: 0,
-    knownSpells: 0,
-    grimoireSpells: 0,
-    preparedSpells: 0,
-    isPrepared: true,
-    hasFullListAccess: true,
-    modeLabel: 'Sorts préparés (serment)',
-  },
-  ranger: {
-    cantrips: 0,
-    knownSpells: 0,
-    grimoireSpells: 0,
-    preparedSpells: 0,
-    isPrepared: false,
-    hasFullListAccess: false,
-    modeLabel: 'Sorts connus (niv. 2+)',
-  },
-  fighter_eldritch_knight: {
-    cantrips: 2,
-    knownSpells: 3,
-    grimoireSpells: 0,
-    preparedSpells: 0,
-    isPrepared: false,
-    hasFullListAccess: false,
-    modeLabel: 'Sorts connus (élu arcanique)',
-  },
-};
+/** Forme brouillon de `creation.spellcastingDetails` lue / écrite par l’étape Magie. */
+interface SpellcastingDetailsDraft {
+  cantrips?: SpellDetailEntry[];
+  spells?: SpellDetailEntry[];
+  deity?: string;
+  deityId?: string | null;
+  mysticArcanum?: { spellLevel: number; spellId: string }[];
+  spellMastery?: { spellLevel: number; spellId: string }[];
+  signatureSpells?: { spellId: string }[];
+  byClass?: Record<string, { cantrips?: string[]; spells?: string[]; deityId?: string | null }>;
+}
+
+interface BonusSpellGrant {
+  level_unlocked?: number;
+  spells?: string[];
+}
+
+interface SubclassWithBonusSpells extends Subclass {
+  bonus_spells_granted?: BonusSpellGrant[];
+  bonus_spells_by_terrain?: Record<string, { grants?: BonusSpellGrant[] }>;
+}
+
+function subclassOptions(cls: CharacterClass | null | undefined): SubclassWithBonusSpells[] {
+  const raw = cls?.data?.subclasses;
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw as SubclassWithBonusSpells[];
+  return (raw.options ?? []) as SubclassWithBonusSpells[];
+}
 
 /** subcls-domaine-de-la-vie → dom-vie */
 const SUBCLASS_TO_DOMAIN: Record<string, string> = {
@@ -189,8 +132,8 @@ export class MagicStep implements OnInit {
   readonly error = signal<string | null>(null);
   readonly expandedSpellId = signal<string | null>(null);
   /** Snapshot JSON classe pour recalculer les quotas si le niveau change. */
-  private readonly loadedClass = signal<any>(null);
-  private readonly loadedClasses = signal<Map<string, unknown>>(new Map());
+  private readonly loadedClass = signal<CharacterClass | null>(null);
+  private readonly loadedClasses = signal<Map<string, CharacterClass>>(new Map());
   readonly activeCasterIndex = signal(0);
   private picksByClass: Record<
     string,
@@ -199,6 +142,10 @@ export class MagicStep implements OnInit {
 
   readonly selectedCantrips = signal<Set<string>>(new Set());
   readonly selectedSpells = signal<Set<string>>(new Set());
+  /** Recherche / filtres de la liste de sorts. */
+  readonly spellSearchQuery = signal('');
+  readonly spellSchoolFilter = signal('');
+  readonly spellTagFilter = signal<'all' | 'selected' | 'concentration' | 'ritual'>('all');
   /** Sorts raciaux (espèce) : choiceId → spellId */
   readonly racialCantripPicks = signal<Record<string, string>>({});
   /** Arcanes sorcier : niveau de sort → id sort */
@@ -220,6 +167,7 @@ export class MagicStep implements OnInit {
       const cls = this.loadedClass();
       if (!cls) return;
       void caster?.level;
+      void this.builder.abilityModifiers();
       untracked(() => {
         this.applyClassSpellData(cls);
         this.trimSelectionsToQuota();
@@ -294,24 +242,27 @@ export class MagicStep implements OnInit {
   readonly masteryComplete = computed(() => {
     if (!this.needsSpellMastery()) return true;
     const p = this.masteryPicks();
-    return !!p[1] && !!p[2];
+    const ids = this.selectedSpells();
+    return !!p[1] && !!p[2] && ids.has(p[1]) && ids.has(p[2]);
   });
 
   readonly signatureComplete = computed(() => {
     if (!this.needsSignatureSpells()) return true;
-    return this.signatureIds().length >= 2;
+    const ids = this.selectedSpells();
+    return this.signatureIds().filter((id) => ids.has(id)).length >= 2;
   });
 
   /** Sorts du grimoire/préparés pour un niveau donné (candidats maîtrise / attitrés). */
   preparedSpellsOfLevel(level: number): Spell[] {
     const ids = this.selectedSpells();
-    return this.allSpells()
+    const list = this.allSpells()
       .filter((s) => s.level === level && ids.has(s.id))
       .sort((a, b) => a.name.localeCompare(b.name));
+    return this.filterSpellList(list, 'mastery');
   }
 
   spellsForArcanum(level: number): Spell[] {
-    return this.spellsForClass(level);
+    return this.filterSpellList(this.spellsForClass(level), 'arcanum');
   }
 
   arcanumPickName(level: number): string {
@@ -381,8 +332,13 @@ export class MagicStep implements OnInit {
   readonly quota = computed<SpellQuota | null>(() => {
     const fromClass = this.classQuota();
     if (fromClass) return fromClass;
-    const kind = this.spellcastingKind();
-    return kind ? (SPELL_QUOTAS_FALLBACK[kind] ?? null) : null;
+    return resolveSpellQuota({
+      cls: this.loadedClass(),
+      kind: this.spellcastingKind(),
+      classLevel: this.casterLevel(),
+      abilityModifiers: this.builder.abilityModifiers(),
+      bonusCantrips: this.activeSubclassId() === 'subcls-cercle-de-la-terre' ? 1 : 0,
+    });
   });
 
   readonly spellcastingAbility = computed(
@@ -472,11 +428,16 @@ export class MagicStep implements OnInit {
   /** Cantrips disponibles (level 0) pour la classe. */
   readonly availableCantrips = computed(() => this.spellsForClass(0));
 
+  /** Cantrips après recherche / filtres. */
+  readonly filteredCantrips = computed(() =>
+    this.filterSpellList(this.availableCantrips(), 'cantrip'),
+  );
+
   /** Sorts mineurs de magicien pour les octrois raciaux (ex. Elfe). */
   availableRacialCantrips(grant: { pool: string[]; spellLevel?: number }): Spell[] {
     const level = grant.spellLevel ?? 0;
     const pool = grant.pool ?? [];
-    return this.allSpells()
+    const list = this.allSpells()
       .filter((s) => s.level === level)
       .filter((s) => {
         if (pool.includes('any_wizard_cantrip')) {
@@ -485,6 +446,7 @@ export class MagicStep implements OnInit {
         return pool.includes(s.id);
       })
       .sort((a, b) => a.name.localeCompare(b.name));
+    return this.filterSpellList(list, 'racial');
   }
 
   pickRacialCantrip(choiceId: string, spellId: string): void {
@@ -526,8 +488,93 @@ export class MagicStep implements OnInit {
     return out;
   });
 
-  /** @deprecated alias pour templates existants */
-  readonly availableLevel1 = computed(() => this.availableLeveledSpells());
+  readonly availableLevel1 = computed(() =>
+    this.filterSpellList(this.availableLeveledSpells(), 'leveled'),
+  );
+
+  readonly spellSchoolOptions = computed(() => {
+    const keys = new Set<string>();
+    for (const s of this.availableCantrips()) keys.add(this.getSchoolKey(s.school));
+    for (const s of this.availableLeveledSpells()) keys.add(this.getSchoolKey(s.school));
+    return [...keys]
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b))
+      .map((key) => ({
+        key,
+        label: SPELL_SCHOOL_LABELS[key] ?? spellSchoolLabel(key),
+      }));
+  });
+
+  readonly spellFiltersActive = computed(
+    () =>
+      !!this.spellSearchQuery().trim() ||
+      !!this.spellSchoolFilter() ||
+      this.spellTagFilter() !== 'all',
+  );
+
+  onSpellSearchInput(event: Event): void {
+    const value = (event.target as HTMLInputElement | null)?.value ?? '';
+    this.spellSearchQuery.set(value);
+  }
+
+  setSpellSchoolFilter(event: Event): void {
+    const value = (event.target as HTMLSelectElement | null)?.value ?? '';
+    this.spellSchoolFilter.set(value);
+  }
+
+  setSpellTagFilter(tag: 'all' | 'selected' | 'concentration' | 'ritual'): void {
+    this.spellTagFilter.set(tag);
+  }
+
+  clearSpellFilters(): void {
+    this.spellSearchQuery.set('');
+    this.spellSchoolFilter.set('');
+    this.spellTagFilter.set('all');
+  }
+
+  /** Filtre une liste de sorts selon la barre de recherche. */
+  filterSpellList(
+    spells: Spell[],
+    scope: 'cantrip' | 'leveled' | 'racial' | 'arcanum' | 'mastery',
+  ): Spell[] {
+    const q = this.normalizeSearch(this.spellSearchQuery().trim());
+    const school = this.spellSchoolFilter();
+    const tag = this.spellTagFilter();
+    const selectedCantrips = this.selectedCantrips();
+    const selectedSpells = this.selectedSpells();
+    const racialPicks = new Set(Object.values(this.racialCantripPicks()));
+    const arcanumPicks = new Set(Object.values(this.arcanumPicks()));
+    const masteryPicks = new Set(Object.values(this.masteryPicks()));
+    const signaturePicks = new Set(this.signatureIds());
+
+    return spells.filter((spell) => {
+      if (school && this.getSchoolKey(spell.school) !== school) return false;
+      if (tag === 'concentration' && !spell.isConcentration) return false;
+      if (tag === 'ritual' && !spell.isRitual) return false;
+      if (tag === 'selected') {
+        let selected = false;
+        if (scope === 'cantrip') selected = selectedCantrips.has(spell.id);
+        else if (scope === 'leveled') selected = selectedSpells.has(spell.id);
+        else if (scope === 'racial') selected = racialPicks.has(spell.id);
+        else if (scope === 'arcanum') selected = arcanumPicks.has(spell.id);
+        else
+          selected =
+            masteryPicks.has(spell.id) ||
+            signaturePicks.has(spell.id) ||
+            selectedSpells.has(spell.id);
+        if (!selected) return false;
+      }
+      if (!q) return true;
+      return this.normalizeSearch(spell.name).includes(q);
+    });
+  }
+
+  private normalizeSearch(value: string): string {
+    return value
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+  }
 
   /** Divinités filtrées (prêtre + domaine compatible). */
   readonly availableDeities = computed(() => {
@@ -555,14 +602,13 @@ export class MagicStep implements OnInit {
   readonly spellsRemaining = computed(() => {
     const q = this.quota();
     if (!q) return 0;
-    const total = q.knownSpells || q.grimoireSpells || q.preparedSpells;
-    return Math.max(0, total - this.selectedSpells().size);
+    return Math.max(0, spellPickCount(q) - this.selectedSpells().size);
   });
 
   /** Nombre total de sorts niv 1 à choisir. */
   readonly spellsToChoose = computed(() => {
     const q = this.quota();
-    return q ? q.knownSpells || q.grimoireSpells || q.preparedSpells : 0;
+    return q ? spellPickCount(q) : 0;
   });
 
   readonly selectionComplete = computed(() => {
@@ -613,8 +659,8 @@ export class MagicStep implements OnInit {
   }
 
   readonly isConfirmed = computed(() => {
-    const details = this.builder.creation().spellcastingDetails;
-    return !!(details && (details as any).cantrips);
+    const details = this.builder.creation().spellcastingDetails as SpellcastingDetailsDraft;
+    return !!details?.cantrips;
   });
 
   // === Lifecycle ===
@@ -625,7 +671,12 @@ export class MagicStep implements OnInit {
       ...new Set(collectCasterSources(this.builder.creation() as never).map((s) => s.classId)),
     ];
 
-    const requests: Record<string, any> = {
+    const requests: Record<
+      string,
+      | ReturnType<DataService['getSpells']>
+      | ReturnType<DataService['getDeities']>
+      | ReturnType<DataService['getClassById']>
+    > = {
       spells: this.dataService.getSpells(),
       deities: this.dataService.getDeities(),
     };
@@ -634,17 +685,18 @@ export class MagicStep implements OnInit {
     }
 
     forkJoin(requests).subscribe({
-      next: (res: any) => {
-        this.allSpells.set(res.spells);
-        this.deities.set(res.deities);
-        const map = new Map<string, unknown>();
+      next: (res) => {
+        this.allSpells.set(res['spells'] as Spell[]);
+        this.deities.set(res['deities'] as Deity[]);
+        const map = new Map<string, CharacterClass>();
         for (const id of casterIds) {
-          if (res[`cls:${id}`]) map.set(id, res[`cls:${id}`]);
+          const cls = res[`cls:${id}`] as CharacterClass | undefined;
+          if (cls) map.set(id, cls);
         }
         this.loadedClasses.set(map);
         const first = this.casterSources()[0];
-        const firstCls = first ? map.get(first.classId) : null;
-        this.loadedClass.set(firstCls ?? null);
+        const firstCls = first ? map.get(first.classId) ?? null : null;
+        this.loadedClass.set(firstCls);
         this.applyClassSpellData(firstCls);
         this.loading.set(false);
         this.restoreFromBuilder();
@@ -656,75 +708,26 @@ export class MagicStep implements OnInit {
     });
   }
 
-  private applyClassSpellData(cls: any): void {
+  private applyClassSpellData(cls: CharacterClass | null | undefined): void {
     this.extractDomainSpells(cls);
     this.classQuota.set(this.buildQuotaFromClass(cls));
   }
 
-  private buildQuotaFromClass(cls: any): SpellQuota | null {
-    const kind = this.spellcastingKind();
-    if (!kind) return null;
-    const fallback = SPELL_QUOTAS_FALLBACK[kind];
-    if (!fallback) return null;
-
-    const targetLevel = this.casterLevel();
-    const prog = (cls?.data?.progression as any[])?.find((p) => p.level === targetLevel)
-      ?? (cls?.data?.progression as any[])?.find((p) => p.level === 1);
-    const resources = prog?.resources ?? {};
-    const spellcasting = cls?.data?.spellcasting ?? {};
-
-    const cantrips =
-      typeof resources.cantrips_known === 'number'
-        ? resources.cantrips_known
-        : fallback.cantrips;
-    // Cercle de la Terre : sort mineur supplémentaire (pool différé hors class-step)
-    const bonusSubclassCantrips =
-      this.activeSubclassId() === 'subcls-cercle-de-la-terre' ? 1 : 0;
-
-    const knownSpells =
-      typeof resources.spells_known === 'number'
-        ? resources.spells_known
-        : fallback.knownSpells;
-
-    const grimoireSpells =
-      typeof spellcasting?.grimoire?.initial_spells === 'number'
-        ? spellcasting.grimoire.initial_spells +
-          Math.max(0, (targetLevel - 1) * (spellcasting.grimoire.spells_per_level_up ?? 2))
-        : fallback.grimoireSpells;
-
-    const isClericOrDruid = kind === 'cleric' || kind === 'druid';
-    const isPaladin = kind === 'paladin';
-    let preparedSpells = 0;
-    if (isClericOrDruid || isPaladin) {
-      const ability = this.spellcastingAbility();
-      const key = ability ? this.abilityToKey(ability) : null;
-      const mod = key ? (this.builder.abilityModifiers()[key] ?? 0) : 0;
-      const levelTerm = isPaladin ? Math.floor(targetLevel / 2) : targetLevel;
-      preparedSpells = Math.max(1, mod + levelTerm);
-    }
-
-    let modeLabel = fallback.modeLabel;
-    if (kind === 'wizard') modeLabel = 'Grimoire (sorts copiés)';
-    else if (isClericOrDruid || isPaladin)
-      modeLabel = `Sorts préparés (${preparedSpells} au choix)`;
-    else if (knownSpells > 0) modeLabel = 'Sorts connus';
-
-    return {
-      cantrips: cantrips + bonusSubclassCantrips,
-      knownSpells: isClericOrDruid || isPaladin ? 0 : knownSpells,
-      grimoireSpells: kind === 'wizard' ? grimoireSpells : 0,
-      preparedSpells,
-      isPrepared: fallback.isPrepared || isClericOrDruid || isPaladin,
-      hasFullListAccess: isClericOrDruid || isPaladin,
-      modeLabel,
-    };
+  private buildQuotaFromClass(cls: CharacterClass | null | undefined): SpellQuota | null {
+    return resolveSpellQuota({
+      cls,
+      kind: this.spellcastingKind(),
+      classLevel: this.casterLevel(),
+      abilityModifiers: this.builder.abilityModifiers(),
+      bonusCantrips: this.activeSubclassId() === 'subcls-cercle-de-la-terre' ? 1 : 0,
+    });
   }
 
-  private extractDomainSpells(cls: any): void {
+  private extractDomainSpells(cls: CharacterClass | null | undefined): void {
     const kind = this.spellcastingKind();
     const subclassId = this.activeSubclassId();
-    const options = cls?.data?.subclasses?.options ?? [];
-    const sub = options.find((o: any) => o.id === subclassId);
+    const options = subclassOptions(cls);
+    const sub = options.find((o) => o.id === subclassId);
 
     if (!cls || !sub) {
       this.domainSpellIds.set([]);
@@ -733,10 +736,7 @@ export class MagicStep implements OnInit {
     }
 
     if (kind === 'cleric' || kind === 'paladin') {
-      const granted = (sub.bonus_spells_granted ?? []) as {
-        level_unlocked?: number;
-        spells?: string[];
-      }[];
+      const granted = sub.bonus_spells_granted ?? [];
       this.subclassBonusSpells = granted;
       const ids = granted
         .filter((g) => (g.level_unlocked ?? 99) <= this.casterLevel())
@@ -751,11 +751,7 @@ export class MagicStep implements OnInit {
         answers['choice-terrain-subcls-cercle-de-la-terre']?.[0] ??
         Object.entries(answers).find(([k]) => /terrain/i.test(k))?.[1]?.[0] ??
         null;
-      const terrainBlock = terrain
-        ? (sub.bonus_spells_by_terrain as Record<string, { grants?: { level_unlocked?: number; spells?: string[] }[] }>)[
-            terrain
-          ]
-        : null;
+      const terrainBlock = terrain ? sub.bonus_spells_by_terrain[terrain] : null;
       const granted = terrainBlock?.grants ?? [];
       this.subclassBonusSpells = granted;
       const ids = granted
@@ -814,6 +810,7 @@ export class MagicStep implements OnInit {
   }
 
   toggleSpell(spellId: string): void {
+    const wasSelected = this.selectedSpells().has(spellId);
     this.selectedSpells.update((set) => {
       const next = new Set(set);
       if (next.has(spellId)) {
@@ -823,6 +820,16 @@ export class MagicStep implements OnInit {
       }
       return next;
     });
+    if (wasSelected) {
+      this.masteryPicks.update((m) => {
+        const next = { ...m };
+        for (const lvl of [1, 2] as const) {
+          if (next[lvl] === spellId) delete next[lvl];
+        }
+        return next;
+      });
+      this.signatureIds.update((arr) => arr.filter((id) => id !== spellId));
+    }
 
     // Vérifie s'il faut scroller
     this.checkScrollToBottom();
@@ -989,7 +996,7 @@ export class MagicStep implements OnInit {
       const existing = spellInstances.find((x) => x.refId === s.spellId);
       if (existing) {
         existing.alwaysPrepared = true;
-        existing.effectSummary = `Sort attitré (1× / repos long) · ${existing.effectSummary}`;
+        existing.effectSummary = `Sort attitré (1× / repos court ou long) · ${existing.effectSummary}`;
       }
     }
     // Maîtrise : annotation
@@ -1128,7 +1135,14 @@ export class MagicStep implements OnInit {
     this.selectedCantrips.set(new Set());
     this.selectedSpells.set(new Set());
     this.selectedDeityId.set(null);
-    this.builder.creation.update((c) => ({ ...c, spellcastingDetails: {} }));
+    this.masteryPicks.set({});
+    this.signatureIds.set([]);
+    this.builder.creation.update((c) => ({
+      ...c,
+      spellcastingDetails: {},
+      spellMasteryPicks: {},
+      signatureSpellIds: [],
+    }));
   }
 
   // === Display helpers ===
@@ -1185,29 +1199,26 @@ export class MagicStep implements OnInit {
     if (Object.keys(racial).length) this.racialCantripPicks.set(racial);
     const racialIds = new Set(Object.values(racial));
 
-    const details = this.builder.creation().spellcastingDetails as any;
+    const details = this.builder.creation().spellcastingDetails as SpellcastingDetailsDraft;
     const arcanumIds = new Set(
-      ((details?.mysticArcanum ?? []) as { spellId: string }[])
+      (details?.mysticArcanum ?? [])
         .map((a) => a.spellId)
         .filter(Boolean),
     );
     if (details?.cantrips) {
-      const byClass = details.byClass as Record<string, { cantrips?: string[] }> | undefined;
+      const byClass = details.byClass;
       const activeId = this.activeCaster()?.classId;
-      const fromClass = activeId && byClass?.[activeId]?.cantrips;
+      const fromClass = activeId ? byClass?.[activeId]?.cantrips : undefined;
+      const cantripIds = fromClass ?? details.cantrips.map((c) => c.refId);
       this.selectedCantrips.set(
-        new Set(
-          (fromClass ?? details.cantrips.map((c: any) => c.refId)).filter(
-            (id: string) => !racialIds.has(id),
-          ),
-        ),
+        new Set(cantripIds.filter((id): id is string => typeof id === 'string' && !racialIds.has(id))),
       );
       if (byClass) {
         for (const [id, p] of Object.entries(byClass)) {
           this.picksByClass[id] = {
             cantrips: p.cantrips ?? [],
-            spells: (p as { spells?: string[] }).spells ?? [],
-            deityId: (p as { deityId?: string | null }).deityId ?? null,
+            spells: p.spells ?? [],
+            deityId: p.deityId ?? null,
           };
         }
       }
@@ -1216,8 +1227,8 @@ export class MagicStep implements OnInit {
       this.selectedSpells.set(
         new Set(
           details.spells
-            .filter((s: any) => !s.alwaysPrepared && !arcanumIds.has(s.refId))
-            .map((s: any) => s.refId),
+            .filter((s) => !s.alwaysPrepared && !arcanumIds.has(s.refId))
+            .map((s) => s.refId),
         ),
       );
     }

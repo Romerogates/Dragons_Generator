@@ -19,13 +19,12 @@ test.describe('Lettré L1 wizard', () => {
     await expect(page.getByText('Choisissez votre peuple')).toBeVisible({ timeout: 15_000 });
   });
 
-  test('reaches class step with level selector 1–20', async ({ page }) => {
+  test('shows level as read-only indicator after level step', async ({ page }) => {
     await expect(page.getByText('Choisissez votre peuple')).toBeVisible({ timeout: 15_000 });
-    const levelSelect = page.getByTestId('wizard-level-select');
-    await expect(levelSelect).toBeVisible();
-    const options = await levelSelect.locator('option').allTextContents();
-    expect(options).toContain('1');
-    expect(options).toContain('20');
+    const levelIndicator = page.getByTestId('wizard-level-indicator');
+    await expect(levelIndicator).toBeVisible();
+    await expect(levelIndicator).toContainText('1');
+    await expect(page.getByTestId('wizard-level-select')).toHaveCount(0);
   });
 
   test('completes full Lettré L1 creation path to summary', async ({ page }) => {

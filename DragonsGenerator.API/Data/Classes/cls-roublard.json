@@ -826,7 +826,7 @@
               "grants_tool_proficiency_choice": {
                 "type": "tool_proficiency",
                 "pool": [
-                  "tl-category-materiel-de-jeu"
+                  "category-gaming-sets"
                 ],
                 "quantity": 1
               },

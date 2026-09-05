@@ -10,9 +10,12 @@ import {
   combinedCasterLevel,
   multiclassSpellSlotsForCasterLevel,
   MULTICLASS_SPELL_SLOTS_TABLE,
+  extractProgressionChoices,
+  collectProgressionPicksFromAnswers,
 } from './progression-choices.util';
 import type { AbilityScores } from '@core/models/Character/character';
 import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
+import { createLettreClass } from '@testing/lettre-fixtures';
 
 function makeCls(subclasses: unknown): CharacterClass {
   return {
@@ -723,5 +726,39 @@ describe('multiclassSpellSlotsForCasterLevel', () => {
   it('exposes a 20-row table with 9 spell levels each', () => {
     expect(MULTICLASS_SPELL_SLOTS_TABLE.length).toBe(20);
     expect(MULTICLASS_SPELL_SLOTS_TABLE.every((row) => row.length === 9)).toBe(true);
+  });
+});
+
+describe('Lettré progression choices (astuces / conquêtes)', () => {
+  it('extracts initial astuces at L1 and gain+conquête at higher levels', () => {
+    const cls = createLettreClass();
+    const at1 = extractProgressionChoices(cls, 1).filter((c) => c.type === 'feature_selection');
+    expect(at1.map((c) => c.id)).toContain('choice-astuces-initial-cls-lettre');
+    expect(at1.find((c) => c.id === 'choice-astuces-initial-cls-lettre')?.count).toBe(2);
+    expect(at1.find((c) => c.id === 'choice-astuces-initial-cls-lettre')?.fixedFeatureIds).toContain(
+      'feat-astuce-empressement',
+    );
+
+    const at5 = extractProgressionChoices(cls, 5).filter((c) => c.type === 'feature_selection');
+    expect(at5.some((c) => c.id === 'choice-astuce-gain-cls-lettre')).toBeTrue();
+    expect(at5.find((c) => c.id === 'choice-astuce-gain-cls-lettre')?.count).toBe(1);
+    expect(at5.some((c) => c.id === 'choice-conquete-methodique-tier1-cls-lettre')).toBeTrue();
+
+    const collected = collectProgressionPicksFromAnswers(cls, 5, {
+      'choice-astuces-initial-cls-lettre': ['feat-astuce-audace', 'feat-astuce-brio'],
+      'choice-astuce-gain-cls-lettre': ['feat-astuce-audace'],
+      'choice-conquete-methodique-tier1-cls-lettre': ['feat-conquete-alerte'],
+    });
+    expect(collected.extraFeatures.map((f) => f.refId)).toContain('feat-astuce-empressement');
+    expect(collected.extraFeatures.map((f) => f.refId)).toContain('feat-astuce-audace');
+    expect(collected.extraFeatures.map((f) => f.refId)).toContain('feat-astuce-brio');
+    expect(collected.classChoiceAnswers['choice-astuce-gain-cls-lettre']).toEqual([]);
+    expect(collected.extraFeatures.map((f) => f.refId)).toContain('feat-conquete-alerte');
+  });
+
+  it('prefers JSON description over flavor summary for features', () => {
+    const cls = createLettreClass();
+    const besace = cls.data.features_details?.find((f) => f.id === 'feat-besace-a-astuces');
+    expect(besace?.desc).toContain('Points d');
   });
 });

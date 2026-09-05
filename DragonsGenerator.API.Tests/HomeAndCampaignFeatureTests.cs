@@ -914,11 +914,167 @@ public class HomeAndCampaignFeatureTests
         }
     }
 
-    private async Task InvitePlayerToCampaignAsync(
-        string ownerToken,
-        string playerToken,
-        Guid playerId,
-        Guid campaignId)
+    [Fact]
+    public async Task Campaign_invite_decline_clears_pending_and_allows_reinvite()
+    {
+        var (_, ownerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "declowner");
+        var (_, playerToken, playerId) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "declplayer");
+
+        var campaignId = await CreateEmptyCampaignAsync(ownerToken, "Campagne decline");
+        await EnsureFriendsAsync(ownerToken, playerToken, playerId);
+        var inviteId = await SendCampaignInviteAsync(ownerToken, playerToken, playerId, campaignId);
+
+        using (var declineReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaign-invites/{inviteId}/decline", playerToken))
+        {
+            (await _client.SendAsync(declineReq)).EnsureSuccessStatusCode();
+        }
+
+        using (var listInv = ApiTestAuth.Authed(HttpMethod.Get, "/me/campaign-invites", playerToken))
+        {
+            var inv = await _client.SendAsync(listInv);
+            inv.EnsureSuccessStatusCode();
+            var arr = await inv.Content.ReadFromJsonAsync<JsonElement>();
+            Assert.Empty(arr!.EnumerateArray());
+        }
+
+        using (var detailReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}", ownerToken))
+        {
+            var detail = await _client.SendAsync(detailReq);
+            detail.EnsureSuccessStatusCode();
+            var body = await detail.Content.ReadFromJsonAsync<JsonElement>();
+            var members = body!.GetProperty("members").EnumerateArray().ToList();
+            Assert.DoesNotContain(members, m => m.GetProperty("userId").GetGuid() == playerId);
+        }
+
+        using (var declineAgain = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaign-invites/{inviteId}/decline", playerToken))
+        {
+            var res = await _client.SendAsync(declineAgain);
+            Assert.Equal(HttpStatusCode.NotFound, res.StatusCode);
+        }
+
+        using (var acceptDeclined = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaign-invites/{inviteId}/accept", playerToken))
+        {
+            var res = await _client.SendAsync(acceptDeclined);
+            Assert.Equal(HttpStatusCode.NotFound, res.StatusCode);
+        }
+
+        var reinviteId = await SendCampaignInviteAsync(ownerToken, playerToken, playerId, campaignId);
+        using (var acceptReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaign-invites/{reinviteId}/accept", playerToken))
+        {
+            (await _client.SendAsync(acceptReq)).EnsureSuccessStatusCode();
+        }
+
+        using (var detailAfter = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}", ownerToken))
+        {
+            var detail = await _client.SendAsync(detailAfter);
+            detail.EnsureSuccessStatusCode();
+            var body = await detail.Content.ReadFromJsonAsync<JsonElement>();
+            var members = body!.GetProperty("members").EnumerateArray().ToList();
+            Assert.Contains(members, m => m.GetProperty("userId").GetGuid() == playerId);
+        }
+    }
+
+    [Fact]
+    public async Task Campaign_invite_decline_by_other_user_returns_not_found()
+    {
+        var (_, ownerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "declothowner");
+        var (_, playerToken, playerId) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "declothplayer");
+        var (_, strangerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "declothstranger");
+
+        var campaignId = await CreateEmptyCampaignAsync(ownerToken, "Campagne invite étrangère");
+        await EnsureFriendsAsync(ownerToken, playerToken, playerId);
+        var inviteId = await SendCampaignInviteAsync(ownerToken, playerToken, playerId, campaignId);
+
+        using (var declineReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaign-invites/{inviteId}/decline", strangerToken))
+        {
+            var res = await _client.SendAsync(declineReq);
+            Assert.Equal(HttpStatusCode.NotFound, res.StatusCode);
+        }
+
+        using (var listInv = ApiTestAuth.Authed(HttpMethod.Get, "/me/campaign-invites", playerToken))
+        {
+            var inv = await _client.SendAsync(listInv);
+            inv.EnsureSuccessStatusCode();
+            var arr = await inv.Content.ReadFromJsonAsync<JsonElement>();
+            Assert.Contains(arr!.EnumerateArray(), i => i.GetProperty("id").GetGuid() == inviteId);
+        }
+    }
+
+    [Fact]
+    public async Task Campaign_invite_duplicate_pending_and_non_friend_are_rejected()
+    {
+        var (_, ownerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "dupowner");
+        var (_, playerToken, playerId) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "dupplayer");
+        var (_, _, strangerId) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "dupstranger");
+
+        var campaignId = await CreateEmptyCampaignAsync(ownerToken, "Campagne conflits invite");
+
+        using (var nonFriendInvite = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaigns/{campaignId}/invites", ownerToken))
+        {
+            nonFriendInvite.Content = JsonContent.Create(new { userId = strangerId });
+            var res = await _client.SendAsync(nonFriendInvite);
+            Assert.Equal(HttpStatusCode.BadRequest, res.StatusCode);
+        }
+
+        await EnsureFriendsAsync(ownerToken, playerToken, playerId);
+        _ = await SendCampaignInviteAsync(ownerToken, playerToken, playerId, campaignId);
+
+        using (var dupInvite = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaigns/{campaignId}/invites", ownerToken))
+        {
+            dupInvite.Content = JsonContent.Create(new { userId = playerId });
+            var res = await _client.SendAsync(dupInvite);
+            Assert.Equal(HttpStatusCode.Conflict, res.StatusCode);
+        }
+    }
+
+    [Fact]
+    public async Task Character_reject_without_pending_proposal_returns_not_found()
+    {
+        var (_, ownerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "rejedgeowner");
+        var (_, playerToken, playerId) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "rejedgeplayer");
+
+        var campaignId = await CreateEmptyCampaignAsync(ownerToken, "Campagne reject edge");
+        await InvitePlayerToCampaignAsync(ownerToken, playerToken, playerId, campaignId);
+
+        Guid memberId;
+        using (var detailReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}", ownerToken))
+        {
+            var detail = await _client.SendAsync(detailReq);
+            detail.EnsureSuccessStatusCode();
+            var body = await detail.Content.ReadFromJsonAsync<JsonElement>();
+            memberId = body!.GetProperty("members").EnumerateArray()
+                .First(m => m.GetProperty("userId").GetGuid() == playerId)
+                .GetProperty("id").GetGuid();
+        }
+
+        using (var rejectReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaigns/{campaignId}/members/{memberId}/reject", ownerToken))
+        {
+            var res = await _client.SendAsync(rejectReq);
+            Assert.Equal(HttpStatusCode.NotFound, res.StatusCode);
+        }
+
+        using (var rejectAsPlayer = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaigns/{campaignId}/members/{memberId}/reject", playerToken))
+        {
+            var res = await _client.SendAsync(rejectAsPlayer);
+            Assert.Equal(HttpStatusCode.NotFound, res.StatusCode);
+        }
+    }
+
+    private async Task<Guid> CreateEmptyCampaignAsync(string ownerToken, string title)
+    {
+        using var createReq = ApiTestAuth.Authed(HttpMethod.Post, "/me/campaigns", ownerToken);
+        createReq.Content = JsonContent.Create(new
+        {
+            title,
+            data = JsonDocument.Parse("{}").RootElement,
+        });
+        var created = await _client.SendAsync(createReq);
+        created.EnsureSuccessStatusCode();
+        var body = await created.Content.ReadFromJsonAsync<JsonElement>();
+        return body!.GetProperty("id").GetGuid();
+    }
+
+    private async Task EnsureFriendsAsync(string ownerToken, string playerToken, Guid playerId)
     {
         using (var friendReq = ApiTestAuth.Authed(HttpMethod.Post, "/me/friends/request", ownerToken))
         {
@@ -939,25 +1095,37 @@ public class HomeAndCampaignFeatureTests
         {
             (await _client.SendAsync(acceptFriend)).EnsureSuccessStatusCode();
         }
+    }
 
+    private async Task<Guid> SendCampaignInviteAsync(
+        string ownerToken,
+        string playerToken,
+        Guid playerId,
+        Guid campaignId)
+    {
         using (var inviteReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaigns/{campaignId}/invites", ownerToken))
         {
             inviteReq.Content = JsonContent.Create(new { userId = playerId });
             (await _client.SendAsync(inviteReq)).EnsureSuccessStatusCode();
         }
 
-        Guid inviteId;
-        using (var listInv = ApiTestAuth.Authed(HttpMethod.Get, "/me/campaign-invites", playerToken))
-        {
-            var inv = await _client.SendAsync(listInv);
-            inv.EnsureSuccessStatusCode();
-            var arr = await inv.Content.ReadFromJsonAsync<JsonElement>();
-            inviteId = arr[0].GetProperty("id").GetGuid();
-        }
+        using var listInv = ApiTestAuth.Authed(HttpMethod.Get, "/me/campaign-invites", playerToken);
+        var inv = await _client.SendAsync(listInv);
+        inv.EnsureSuccessStatusCode();
+        var arr = await inv.Content.ReadFromJsonAsync<JsonElement>();
+        return arr![0].GetProperty("id").GetGuid();
+    }
 
-        using (var acceptReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaign-invites/{inviteId}/accept", playerToken))
-        {
-            (await _client.SendAsync(acceptReq)).EnsureSuccessStatusCode();
-        }
+    private async Task InvitePlayerToCampaignAsync(
+        string ownerToken,
+        string playerToken,
+        Guid playerId,
+        Guid campaignId)
+    {
+        await EnsureFriendsAsync(ownerToken, playerToken, playerId);
+        var inviteId = await SendCampaignInviteAsync(ownerToken, playerToken, playerId, campaignId);
+
+        using var acceptReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaign-invites/{inviteId}/accept", playerToken);
+        (await _client.SendAsync(acceptReq)).EnsureSuccessStatusCode();
     }
 }

@@ -25,13 +25,13 @@
     "wp-baton-de-combat",
     "wp-cimeterre",
     "wp-dague",
-    "wp-faucille",
+    "wp-serpe",
     "wp-flechette",
     "wp-fronde",
     "wp-gourdin",
     "wp-javeline",
     "wp-lance",
-    "wp-masse-d-armes"
+    "wp-masse-darmes"
   ],
   "tool_proficiencies": [
     "tl-necessaire-dherboristerie"
@@ -87,7 +87,7 @@
         "qty": 1
       },
       {
-        "id": "gr-sac-d-aventurier",
+        "id": "gr-sac-daventurier",
         "qty": 1
       },
       {

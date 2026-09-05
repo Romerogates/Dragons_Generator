@@ -187,15 +187,23 @@ function prettyId(id: string): string {
 
 function optionsFromPoolIds(
   ids: unknown[],
-  details: { id: string; name?: string; desc?: string; flavor?: { summary?: string } }[],
+  details: {
+    id: string;
+    name?: string;
+    desc?: string;
+    description?: string;
+    flavor?: { summary?: string };
+  }[],
 ): ProgressionChoiceOption[] {
+  const descOf = (feat: (typeof details)[number] | undefined) =>
+    feat?.desc || feat?.description || feat?.flavor?.summary || '';
   return ids.map((raw) => {
     if (typeof raw === 'string') {
       const feat = details.find((f) => f.id === raw);
       return {
         id: raw,
         name: feat?.name ?? prettyId(raw),
-        desc: feat?.desc || feat?.flavor?.summary || '',
+        desc: descOf(feat),
       };
     }
     if (raw && typeof raw === 'object') {
@@ -206,7 +214,7 @@ function optionsFromPoolIds(
       return {
         id,
         name: (obj.name || feat?.name || prettyId(id)) + dmg,
-        desc: feat?.desc || feat?.flavor?.summary || '',
+        desc: descOf(feat),
       };
     }
     return { id: 'unknown', name: 'Option', desc: '' };
@@ -1598,10 +1606,19 @@ export function collectProgressionPicksFromAnswers(
   const metamagicOptions: string[] = [];
   const extraFeatures: FeatureInstance[] = [];
   let pactBoon: string | null = null;
+  /** Dédup inter-pools feature_selection (astuces Lettré, etc.). */
+  const takenFeatureIds = new Set<string>();
 
   for (const choice of choices) {
     if (choice.deferred) continue;
-    const picks = answers[choice.id] ?? [];
+    let picks = [...(answers[choice.id] ?? [])];
+    if (choice.type === 'feature_selection') {
+      picks = picks.filter((id) => !takenFeatureIds.has(id));
+      const need = choice.count || 1;
+      if (picks.length > need) picks = picks.slice(0, need);
+      for (const id of picks) takenFeatureIds.add(id);
+      for (const fid of choice.fixedFeatureIds ?? []) takenFeatureIds.add(fid);
+    }
     classChoiceAnswers[choice.id] = picks;
     if (choice.type === 'invocation') eldritchInvocations.push(...picks);
     if (choice.type === 'metamagic') metamagicOptions.push(...picks);
@@ -1616,6 +1633,18 @@ export function collectProgressionPicksFromAnswers(
         source: 'class',
         sourceDetail: `${cls.name} · ${choice.label}`,
         level: 1,
+      });
+    }
+    for (const fid of choice.fixedFeatureIds ?? []) {
+      if (extraFeatures.some((f) => f.refId === fid)) continue;
+      const feat = (cls.data.features_details ?? []).find((f) => f.id === fid);
+      extraFeatures.push({
+        refId: fid,
+        name: feat?.name ?? fid,
+        desc: feat?.desc ?? '',
+        source: 'class',
+        sourceDetail: `${cls.name} · ${choice.label}`,
+        level: feat?.level ?? 1,
       });
     }
   }

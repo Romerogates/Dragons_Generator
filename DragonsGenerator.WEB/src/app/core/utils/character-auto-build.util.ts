@@ -9,6 +9,7 @@ import type { Skill } from '@core/models/Skills/skill';
 import type {
   Ability,
   AbilityKey,
+  AbilityScores,
   EquipmentInstance,
   EquipmentSlot,
   FeatureInstance,
@@ -52,6 +53,8 @@ import { buildSkillMap, normalizeSkillId, type SkillInfo } from '@core/utils/ski
 import { pickRandom } from '@core/utils/pregen-random.util';
 import { proficiencyBonusForLevel } from '@core/services/character-builder.service';
 import { CLASS_SPELLCASTING, resolveClassSpellcasting } from '@core/utils/class-spellcasting.util';
+import { resolveSpellQuota, spellPickCount } from '@core/utils/spell-quota.util';
+import { extractSubclassBonusSpells } from '@core/utils/subclass-bonus-spells.util';
 
 export { CLASS_SPELLCASTING };
 
@@ -64,18 +67,6 @@ export interface EquipmentCatalogItem {
   wKg: number | null;
   data: Record<string, unknown>;
 }
-
-const SPELL_QUOTAS: Record<
-  string,
-  { cantrips: number; knownSpells: number; grimoireSpells: number; preparedSpells: number }
-> = {
-  wizard: { cantrips: 3, knownSpells: 0, grimoireSpells: 6, preparedSpells: 0 },
-  bard: { cantrips: 2, knownSpells: 4, grimoireSpells: 0, preparedSpells: 0 },
-  druid: { cantrips: 2, knownSpells: 0, grimoireSpells: 0, preparedSpells: 2 },
-  sorcerer: { cantrips: 4, knownSpells: 2, grimoireSpells: 0, preparedSpells: 0 },
-  cleric: { cantrips: 3, knownSpells: 0, grimoireSpells: 0, preparedSpells: 2 },
-  warlock: { cantrips: 2, knownSpells: 2, grimoireSpells: 0, preparedSpells: 0 },
-};
 
 const STANDARD_ARRAY = [15, 14, 13, 12, 10, 8] as const;
 const ABILITY_LABEL_TO_KEY: Record<string, AbilityKey> = {
@@ -556,7 +547,7 @@ export function buildAutoClassSelection(cls: CharacterClass, level = 1): {
     features.push({
       refId: feat.id,
       name: feat.name,
-      desc: feat.desc,
+      desc: annotateAuraDesc(feat as never, level),
       source: 'class',
       sourceDetail: `${cls.name} · ${sub!.name}`,
       level: featureUnlockLevel(feat as Record<string, unknown>),
@@ -586,10 +577,20 @@ export function buildAutoClassSelection(cls: CharacterClass, level = 1): {
   }
 
   for (const choice of activeChoices) {
-    const picks = pickRandomSubset(
-      choice.options.map((o) => o.id),
-      choice.count || 1,
+    const taken = new Set(
+      Object.entries(classChoiceAnswers)
+        .filter(([id]) => {
+          const peer = activeChoices.find((c) => c.id === id);
+          return peer?.type === 'feature_selection' && choice.type === 'feature_selection';
+        })
+        .flatMap(([, ids]) => ids),
     );
+    for (const peer of activeChoices) {
+      if (peer.type !== 'feature_selection' || peer.id === choice.id) continue;
+      for (const fid of peer.fixedFeatureIds ?? []) taken.add(fid);
+    }
+    const pool = choice.options.map((o) => o.id).filter((id) => !taken.has(id));
+    const picks = pickRandomSubset(pool, choice.count || 1);
     classChoiceAnswers[choice.id] = picks;
     for (const pickId of picks) {
       const opt = choice.options.find((o) => o.id === pickId);
@@ -607,6 +608,7 @@ export function buildAutoClassSelection(cls: CharacterClass, level = 1): {
     for (const fid of choice.fixedFeatureIds ?? []) {
       const feat = cls.data.features_details?.find((f) => f.id === fid);
       if (!feat) continue;
+      if (extraFeatures.some((f) => f.refId === fid)) continue;
       extraFeatures.push({
         refId: fid,
         name: feat.name,
@@ -888,10 +890,18 @@ export function buildAutoSpellcastingDetails(
   spells: Spell[],
   racialGrants: SpeciesSelection['racialSpellGrants'],
   speciesChoiceAnswers: Record<string, string[]>,
+  abilityModifiers?: Partial<AbilityScores> | null,
+  opts?: { level?: number; subclassId?: string | null },
 ): Record<string, unknown> | null {
-  const spellInfo = resolveSpellcasting(cls, 1);
+  const level = opts?.level ?? 1;
+  const spellInfo = resolveSpellcasting(cls, level);
   if (!spellInfo?.kind) return null;
-  const quota = SPELL_QUOTAS[spellInfo.kind];
+  const quota = resolveSpellQuota({
+    cls,
+    kind: spellInfo.kind,
+    classLevel: level,
+    abilityModifiers: abilityModifiers ?? null,
+  });
   if (!quota) return { cantrips: [], spells: [] };
 
   const classSpells = spells.filter((s) => s.classes?.includes(cls.id) || s.classes?.some((c) => c.includes(cls.id.replace('cls-', ''))));
@@ -908,10 +918,15 @@ export function buildAutoSpellcastingDetails(
     .filter((x): x is string => !!x);
 
   const allCantripIds = [...new Set([...racialCantrips, ...cantripIds])];
-  const spellPickCount = quota.knownSpells || quota.grimoireSpells || quota.preparedSpells;
-  const spellIds = pickRandomSubset(level1Pool.map((s) => s.id), spellPickCount);
+  const spellIds = pickRandomSubset(level1Pool.map((s) => s.id), spellPickCount(quota));
 
   const spellMap = new Map(spells.map((s) => [s.id, s]));
+  const nameById = new Map(spells.map((s) => [s.id, s.name]));
+  const oathSpells =
+    spellInfo.kind === 'paladin'
+      ? extractSubclassBonusSpells(cls, opts?.subclassId ?? null, level, nameById)
+      : [];
+
   return {
     cantrips: allCantripIds.map((id) => {
       const raw = spellMap.get(id);
@@ -933,6 +948,7 @@ export function buildAutoSpellcastingDetails(
         effectSummary: raw?.description?.slice(0, 120) ?? '',
       };
     }),
+    ...(oathSpells.length ? { oathSpells } : {}),
   };
 }
 

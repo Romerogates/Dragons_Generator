@@ -44,6 +44,8 @@ import {
 import { resistanceLabel } from '@core/utils/equipment-display.util';
 import { apiCodeToAbilityKey } from '@core/utils/ability-mapping';
 import type { Spell } from '@core/models/Spells/spell';
+import type { Feat } from '@core/models/Feats/feat';
+import type { Equipment } from '@core/models/Equipments/equipment';
 
 interface AbilityRow {
   key: AbilityKey;
@@ -431,14 +433,18 @@ export class AbilitiesStep implements OnInit {
       });
     }
     this.dataService.getFeats().subscribe({
-      next: (list: any[]) => {
+      next: (list: Feat[]) => {
         this.feats.set(
-          (list ?? []).map((f) => ({
-            id: f.id,
-            name: f.name,
-            description: f.description ?? f.data?.description ?? '',
-            raw: (f.data ?? {}) as RawFeatData,
-          })),
+          (list ?? []).map((f) => {
+            const dataDesc = f.data?.['description'];
+            return {
+              id: f.id,
+              name: f.name,
+              description:
+                f.description ?? (typeof dataDesc === 'string' ? dataDesc : '') ?? '',
+              raw: (f.data ?? {}) as RawFeatData,
+            };
+          }),
         );
       },
     });
@@ -448,7 +454,7 @@ export class AbilitiesStep implements OnInit {
       next: (list) => this.talentSkillCatalog.set((list ?? []).map((s) => ({ id: s.id, name: s.name }))),
     });
     this.dataService.getEquipments().subscribe({
-      next: (items: any[]) => {
+      next: (items: Equipment[]) => {
         this.talentToolCatalog.set(
           (items ?? [])
             .filter((e) => String(e.type ?? '').toUpperCase() === 'TOOL')

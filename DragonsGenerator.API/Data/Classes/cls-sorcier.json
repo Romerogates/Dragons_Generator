@@ -78,7 +78,7 @@
           "option_id": "equip-a1",
           "items": [
             "wp-arbalete-legere",
-            "gr-carreaux-x20"
+            { "id": "it-carreaux", "qty": 1 }
           ]
         },
         {
@@ -120,13 +120,13 @@
         {
           "option_id": "equip-c1",
           "items": [
-            "gr-sac-erudit"
+            "gr-sac-derudit"
           ]
         },
         {
           "option_id": "equip-c2",
           "items": [
-            "gr-sac-explorateur"
+            "gr-sac-dexplorateur"
           ]
         }
       ]

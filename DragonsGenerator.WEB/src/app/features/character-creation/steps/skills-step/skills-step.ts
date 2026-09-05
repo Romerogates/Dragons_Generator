@@ -23,6 +23,9 @@ import {
 } from '@core/utils/skill.utils';
 import { labelForGameId } from '@core/utils/game-id-labels';
 import { resolveEquipmentRefId } from '@core/utils/equipment.utils';
+import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
+import type { Equipment } from '@core/models/Equipments/equipment';
+import type { BackgroundToolRef, BackgroundSkillChoice } from '@core/models/Backgrounds/background';
 import {
   extractExpertiseChoices,
   extractWeaponProficiencyChoices,
@@ -33,6 +36,59 @@ import {
 } from '@core/utils/progression-choices.util';
 
 export type { SkillInfo };
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+interface ToolCatalogEntry {
+  id: string;
+  name: string;
+  type: string;
+  subtype: string | null;
+}
+
+interface ToolCatalogGroup {
+  label: string;
+  icon: string;
+  items: ToolCatalogEntry[];
+}
+
+interface BgToolChoiceOption {
+  key: string;
+  label: string;
+  category: string | null;
+  selected: boolean;
+}
+
+interface BgToolChoiceGroup {
+  groupIndex: number;
+  chooseCount: number;
+  note?: string;
+  options: BgToolChoiceOption[];
+}
+
+/** Groupe `tools.choose` tel que renvoyé par l’API (camelCase ou snake_case). */
+interface BgToolChooseGroupRaw {
+  chooseCount?: number;
+  choose_count?: number;
+  count?: number;
+  note?: string;
+  options?: unknown[];
+  category_options?: unknown[];
+  categoryOptions?: unknown[];
+}
+
+/** Option d’outil brute avant `normalizeToolOption`. */
+type RawToolOption =
+  | string
+  | BackgroundToolRef
+  | {
+      type?: string;
+      id?: string;
+      any?: boolean;
+      category?: string;
+    };
 
 @Component({
   selector: 'app-skills-step',
@@ -48,9 +104,7 @@ export class SkillsStep implements OnInit {
   private readonly dataService = inject(DataService);
 
   readonly skillMap = signal<Record<string, SkillInfo>>({});
-  readonly toolCatalog = signal<
-    { id: string; name: string; type: string; subtype: string | null }[]
-  >([]);
+  readonly toolCatalog = signal<ToolCatalogEntry[]>([]);
   readonly weaponCatalog = signal<{ id: string; name: string; costPo: number }[]>([]);
 
   // === ÉTATS LOCAUX ===
@@ -70,7 +124,7 @@ export class SkillsStep implements OnInit {
   readonly classToolAnswers = signal<Map<string, string[]>>(new Map());
   /** Choix imbriqués de sous-classe (skill_proficiency / skill_or_tool_proficiency). */
   readonly subclassSkillChoiceAnswers = signal<Map<string, string[]>>(new Map());
-  readonly classJson = signal<any>(null);
+  readonly classJson = signal<CharacterClass | null>(null);
   /** Compétences choisies au titre des maîtrises réduites de multiclassage (Barde/Rôdeur/Roublard...). */
   readonly selectedSecondaryClassSkills = signal<string[]>([]);
 
@@ -146,7 +200,7 @@ export class SkillsStep implements OnInit {
     }
 
     this.dataService.getEquipments().subscribe({
-      next: (items: any[]) => {
+      next: (items: Equipment[]) => {
         this.toolCatalog.set(
           items
             .filter((e) => {
@@ -166,7 +220,7 @@ export class SkillsStep implements OnInit {
             .map((e) => ({
               id: e.id,
               name: e.name,
-              costPo: Number(e.cost?.v ?? e.cost ?? 0) || 0,
+              costPo: Number(e.cost?.v ?? 0) || 0,
             })),
         );
       },
@@ -242,13 +296,28 @@ export class SkillsStep implements OnInit {
   }
 
   /** Bonus fixes (armure/armes/compétences/expertise/outils/langues) accordés par le domaine/sous-classe. */
-  readonly subclassBonus = computed(() =>
-    subclassBonusProficiencies(
-      this.classJson(),
+  readonly subclassBonus = computed(() => {
+    const cls = this.classJson();
+    if (!cls) {
+      return {
+        armor: [] as string[],
+        weapons: [] as string[],
+        skills: [] as string[],
+        expertise: [] as string[],
+        tools: [] as string[],
+        languages: [] as string[],
+        savingThrows: [] as string[],
+        bonusLanguages: 0,
+        requiredExoticLanguages: 0,
+        conditionalSkills: [] as string[],
+      };
+    }
+    return subclassBonusProficiencies(
+      cls,
       this.builder.creation().subclassId,
       this.builder.targetLevel(),
-    ),
-  );
+    );
+  });
 
   /** Compétences déjà connues avant application des bonus fixes de sous-classe (pour la logique « déjà maîtrisé »). */
   private readonly knownSkillsBeforeSubclassBonus = computed(() => {
@@ -333,12 +402,15 @@ export class SkillsStep implements OnInit {
   }
 
   // === COMPÉTENCES D'HISTORIQUE ===
-  readonly bgProf = computed(() => (this.builder.creation() as any).backgroundProficiencies);
+  readonly bgProf = computed(() => this.builder.creation().backgroundProficiencies);
   readonly isCustomBg = computed(() => this.builder.creation().backgroundPreset === false);
 
   readonly bgSkillChooseCount = computed(() => {
     if (this.isCustomBg()) return 2;
-    return this.bgProf()?.skills?.chooseCount ?? this.bgProf()?.skills?.choose_count ?? 0;
+    const skills = this.bgProf()?.skills as
+      | (BackgroundSkillChoice & { choose_count?: number })
+      | undefined;
+    return skills?.chooseCount ?? skills?.choose_count ?? 0;
   });
 
   readonly bgFixedSkills = computed(() => {
@@ -404,20 +476,10 @@ export class SkillsStep implements OnInit {
   }
 
   // === OUTILS D'HISTORIQUE ===
-  readonly bgToolChoiceGroups = computed(() => {
+  readonly bgToolChoiceGroups = computed((): BgToolChoiceGroup[] => {
     if (this.isCustomBg()) return [];
 
-    const groups: {
-      groupIndex: number;
-      chooseCount: number;
-      note?: string;
-      options: {
-        key: string;
-        label: string;
-        category: string | null;
-        selected: boolean;
-      }[];
-    }[] = [];
+    const groups: BgToolChoiceGroup[] = [];
 
     // Maîtrises fixes qui sont des catégories → il faut choisir l'objet concret
     const fixed = this.bgProf()?.tools?.fixed ?? [];
@@ -442,21 +504,23 @@ export class SkillsStep implements OnInit {
 
     let choose = this.bgProf()?.tools?.choose || [];
     if (choose && !Array.isArray(choose)) choose = [choose];
-    for (const group of choose) {
+    for (const group of choose as BgToolChooseGroupRaw[]) {
       groups.push({
         groupIndex: groups.length,
         chooseCount: group.chooseCount || group.choose_count || group.count || 1,
         note: group.note,
-        options: (group.options || group.category_options || []).map((opt: any) => {
-          const ref = this.normalizeToolOption(opt);
-          const key = this.toolRefKey(ref);
-          return {
-            key,
-            label: this.prettifyTool(ref),
-            category: ref.any ? String(ref.type) : null,
-            selected: this.isBgGroupOptionSatisfied(key, ref),
-          };
-        }),
+        options: (group.options || group.category_options || group.categoryOptions || []).map(
+          (opt): BgToolChoiceOption => {
+            const ref = this.normalizeToolOption(opt);
+            const key = this.toolRefKey(ref);
+            return {
+              key,
+              label: this.prettifyTool(ref),
+              category: ref.any ? String(ref.type) : null,
+              selected: this.isBgGroupOptionSatisfied(key, ref),
+            };
+          },
+        ),
       });
     }
 
@@ -464,7 +528,7 @@ export class SkillsStep implements OnInit {
   });
 
   /** L'option de catégorie est satisfaite si un outil concret de cette catégorie est choisi. */
-  private isBgGroupOptionSatisfied(key: string, ref: any): boolean {
+  private isBgGroupOptionSatisfied(key: string, ref: BackgroundToolRef): boolean {
     const selected = this.selectedBgTools();
     if (selected.includes(key)) return true;
     if (!ref?.any) return false;
@@ -472,7 +536,7 @@ export class SkillsStep implements OnInit {
     return selected.some((id) => this.toolBelongsToCategory(id, cat));
   }
 
-  private normalizeToolOption(opt: any): any {
+  private normalizeToolOption(opt: unknown): BackgroundToolRef {
     if (typeof opt === 'string') {
       const id = opt.toLowerCase();
       if (id === 'tool' || id === 'artisan') return { type: 'tool', any: true };
@@ -482,31 +546,55 @@ export class SkillsStep implements OnInit {
       if (id === 'tl-outils-dalchimiste') return { type: 'tool', id: 'tl-necessaire-dalchimiste' };
       return { type: 'tool', id: opt };
     }
-    // Déjà normalisé (BackgroundToolRef)
-    if (opt?.any === true && opt?.type) {
-      return { type: opt.type, any: true };
+
+    if (!opt || typeof opt !== 'object') {
+      return { type: 'tool', any: true };
     }
-    if (opt?.type === 'tool_category') {
-      const cat = String(opt.category ?? opt.id ?? '').toLowerCase();
+
+    const raw = opt as RawToolOption & object;
+
+    // Déjà normalisé (BackgroundToolRef)
+    if (
+      'any' in raw &&
+      raw.any === true &&
+      'type' in raw &&
+      typeof raw.type === 'string' &&
+      (raw.type === 'tool' ||
+        raw.type === 'instrument' ||
+        raw.type === 'gameSet' ||
+        raw.type === 'vehicle')
+    ) {
+      return { type: raw.type, any: true };
+    }
+    if ('type' in raw && raw.type === 'tool_category') {
+      const cat = String(
+        ('category' in raw ? raw.category : undefined) ??
+          ('id' in raw ? raw.id : undefined) ??
+          '',
+      ).toLowerCase();
       if (cat.includes('instrument')) return { type: 'instrument', any: true };
       if (cat.includes('game') || cat === 'jeu') return { type: 'gameSet', any: true };
       if (cat.includes('vehic')) return { type: 'vehicle', any: true };
       return { type: 'tool', any: true };
     }
-    if (opt?.type === 'instrument' || opt?.type === 'gameSet' || opt?.type === 'vehicle') {
-      const id = String(opt.id ?? '');
+    if (
+      'type' in raw &&
+      (raw.type === 'instrument' || raw.type === 'gameSet' || raw.type === 'vehicle')
+    ) {
+      const id = String(('id' in raw ? raw.id : undefined) ?? '');
       if (!id || id.startsWith('tl-vehicules') || id === 'tl-materiel-de-jeu') {
-        return { type: opt.type, any: true };
+        return { type: raw.type, any: true };
       }
-      return { type: opt.type, id: opt.id, any: false };
+      return { type: raw.type, id: String(raw.id), any: false };
     }
-    if (typeof opt === 'object' && opt.id) {
-      if (opt.id === 'tl-outils-dalchimiste') {
+    if ('id' in raw && raw.id) {
+      const oid = String(raw.id);
+      if (oid === 'tl-outils-dalchimiste') {
         return { type: 'tool', id: 'tl-necessaire-dalchimiste' };
       }
-      return { type: 'tool', id: opt.id };
+      return { type: 'tool', id: oid };
     }
-    return typeof opt === 'string' ? { type: opt, any: true } : opt;
+    return { type: 'tool', any: true };
   }
 
   /** Libellé de groupe catalogue pour une catégorie wizard. */
@@ -524,7 +612,7 @@ export class SkillsStep implements OnInit {
   }
 
   /** Clic sur une option d'historique : catégorie → expand, sinon toggle direct. */
-  onBgToolOptionClick(opt: { key: string; category: string | null }, group: any): void {
+  onBgToolOptionClick(opt: BgToolChoiceOption, group: BgToolChoiceGroup): void {
     if (opt.category) {
       // Déjà un outil concret de cette catégorie ? → désélection
       const concrete = this.selectedBgTools().find((id) =>
@@ -544,7 +632,7 @@ export class SkillsStep implements OnInit {
     this.toggleBgTool(opt.key, group);
   }
 
-  toggleBgTool(toolKey: string, group: any): void {
+  toggleBgTool(toolKey: string, group: BgToolChoiceGroup): void {
     const current = this.selectedBgTools();
     if (current.includes(toolKey)) {
       this.selectedBgTools.update((arr) => arr.filter((x) => x !== toolKey));
@@ -557,13 +645,13 @@ export class SkillsStep implements OnInit {
   }
 
   /** Choisit un outil concret pour la catégorie expandée (Notable, Reclus, etc.). */
-  pickConcreteBgTool(toolId: string, category: string, group: any): void {
+  pickConcreteBgTool(toolId: string, category: string, group: BgToolChoiceGroup): void {
     const withoutCat = this.selectedBgTools().filter(
       (id) => !this.toolBelongsToCategory(id, category) && id !== `${category}-any`,
     );
     const otherCount = withoutCat.filter((id) =>
       group.options.some(
-        (o: any) =>
+        (o) =>
           o.key === id || (o.category && this.toolBelongsToCategory(id, o.category)),
       ),
     ).length;
@@ -577,7 +665,7 @@ export class SkillsStep implements OnInit {
     this.expandedBgToolCategory.set(null);
   }
 
-  private countSelectedInBgGroup(group: any): number {
+  private countSelectedInBgGroup(group: BgToolChoiceGroup): number {
     const selected = this.selectedBgTools();
     let count = 0;
     for (const opt of group.options) {
@@ -585,7 +673,8 @@ export class SkillsStep implements OnInit {
         count++;
         continue;
       }
-      if (opt.category && selected.some((id) => this.toolBelongsToCategory(id, opt.category))) {
+      const category = opt.category;
+      if (category && selected.some((id) => this.toolBelongsToCategory(id, category))) {
         count++;
       }
     }
@@ -664,7 +753,7 @@ export class SkillsStep implements OnInit {
 
   // === CATALOGUE D'OUTILS GROUPÉS ===
 
-  readonly toolGroups = computed(() => {
+  readonly toolGroups = computed((): ToolCatalogGroup[] => {
     const catalog = this.toolCatalog();
     if (catalog.length === 0) return [];
 
@@ -732,6 +821,7 @@ export class SkillsStep implements OnInit {
     'tl-cat-outils-artisan': "Outils d'artisan",
     'category-tools': "Outils d'artisan",
     'tl-materiel-de-jeu': 'Matériel de jeu',
+    'tl-category-materiel-de-jeu': 'Matériel de jeu',
     'category-gaming-sets': 'Matériel de jeu',
   };
 
@@ -1006,12 +1096,6 @@ export class SkillsStep implements OnInit {
     return id ? this.getToolName(id) : fallback;
   }
 
-  getToolName(toolId: string): string {
-    const found = this.toolCatalog().find((t) => t.id === toolId);
-    if (found) return found.name;
-    return this.prettifyTool({ id: toolId });
-  }
-
   getModifierForSkill(skillId: string): string {
     const info = resolveSkillInfo(skillId, this.skillMap());
     if (!info) return '+0';
@@ -1040,24 +1124,35 @@ export class SkillsStep implements OnInit {
     return prettifySkillId(id, this.skillMap());
   }
 
-  prettifyTool(ref: any): string {
+  prettifyTool(ref: BackgroundToolRef | { id: string; type?: BackgroundToolRef['type']; any?: boolean }): string {
     if (ref?.any) {
-      return labelForGameId(ref.type);
+      return labelForGameId(ref.type ?? 'tool');
     }
     if (ref?.id) return labelForGameId(ref.id);
     return labelForGameId(ref?.type);
   }
 
-  toolRefKey(ref: any): string {
+  toolRefKey(ref: BackgroundToolRef): string {
     if (ref.id) return ref.id;
     return `${ref.type}-any`;
+  }
+
+  getToolName(toolId: string): string {
+    const found = this.toolCatalog().find((t) => t.id === toolId);
+    if (found) return found.name;
+    return this.prettifyTool({ type: 'tool', id: toolId });
   }
 
   // === NAVIGATION ET SAUVEGARDE ===
   confirmSelection(): void {
     if (!this.isSelectionComplete()) return;
     const c = this.builder.creation();
-    const bgProf = (c as any).backgroundProficiencies;
+    const bgProf = c.backgroundProficiencies as
+      | (NonNullable<typeof c.backgroundProficiencies> & {
+          equipment?: { fromToolProficiency?: boolean; from_tool_proficiency?: boolean };
+        })
+      | null
+      | undefined;
     const isCustom = c.backgroundPreset === false;
 
     // 1. Génération des slots d'équipement liés aux outils d'historique
@@ -1071,8 +1166,8 @@ export class SkillsStep implements OnInit {
     if (givesToolsAsEq) {
       // Les catégories (any) sont déjà résolues dans selectedBgTools → ne pas re-pousser les placeholders.
       const fixedConcrete = (bgProf?.tools?.fixed ?? [])
-        .filter((t: any) => t && !t.any && t.id)
-        .map((t: any) => t.id as string);
+        .filter((t): t is BackgroundToolRef & { id: string } => !!t && !t.any && !!t.id)
+        .map((t) => t.id);
       const toolsToGive = [...new Set([...fixedConcrete, ...this.selectedBgTools()])];
 
       for (const tool of toolsToGive) {

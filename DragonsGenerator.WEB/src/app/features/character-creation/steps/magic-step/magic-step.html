@@ -57,6 +57,98 @@
 
   @if (!loading() && !error()) {
     <div class="w-full max-w-5xl px-4 flex flex-col items-center pb-8">
+      <div
+        class="sticky top-2 z-30 w-full mb-8 rounded-xl border border-slate-700/80 bg-[#12161d]/95 backdrop-blur-md shadow-lg p-3 sm:p-4"
+      >
+        <div class="flex flex-col sm:flex-row gap-2 sm:items-center">
+          <label class="relative flex-1 min-w-0">
+            <span class="sr-only">Rechercher un sort</span>
+            <iconify-icon
+              icon="fluent-emoji:magnifying-glass-tilted-left"
+              class="absolute left-3 top-1/2 -translate-y-1/2 text-base opacity-80 pointer-events-none"
+            ></iconify-icon>
+            <input
+              type="search"
+              class="w-full rounded-lg border border-slate-700 bg-[#171b22] pl-10 pr-3 py-2.5 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-amber-500/60"
+              placeholder="Rechercher un sort par nom…"
+              [value]="spellSearchQuery()"
+              (input)="onSpellSearchInput($event)"
+              autocomplete="off"
+            />
+          </label>
+          <select
+            class="rounded-lg border border-slate-700 bg-[#171b22] px-3 py-2.5 text-xs font-bold uppercase tracking-widest text-slate-300 focus:outline-none focus:border-amber-500/60 sm:w-44"
+            [value]="spellSchoolFilter()"
+            (change)="setSpellSchoolFilter($event)"
+            aria-label="Filtrer par école"
+          >
+            <option value="">Toutes les écoles</option>
+            @for (opt of spellSchoolOptions(); track opt.key) {
+              <option [value]="opt.key">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 mt-3">
+          <button
+            type="button"
+            class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-colors"
+            [class.border-amber-500]="spellTagFilter() === 'all'"
+            [class.bg-amber-950/40]="spellTagFilter() === 'all'"
+            [class.text-amber-300]="spellTagFilter() === 'all'"
+            [class.border-slate-700]="spellTagFilter() !== 'all'"
+            [class.text-slate-400]="spellTagFilter() !== 'all'"
+            (click)="setSpellTagFilter('all')"
+          >
+            Tous
+          </button>
+          <button
+            type="button"
+            class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-colors"
+            [class.border-amber-500]="spellTagFilter() === 'selected'"
+            [class.bg-amber-950/40]="spellTagFilter() === 'selected'"
+            [class.text-amber-300]="spellTagFilter() === 'selected'"
+            [class.border-slate-700]="spellTagFilter() !== 'selected'"
+            [class.text-slate-400]="spellTagFilter() !== 'selected'"
+            (click)="setSpellTagFilter('selected')"
+          >
+            Sélectionnés
+          </button>
+          <button
+            type="button"
+            class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-colors"
+            [class.border-fuchsia-500]="spellTagFilter() === 'concentration'"
+            [class.bg-fuchsia-950/40]="spellTagFilter() === 'concentration'"
+            [class.text-fuchsia-300]="spellTagFilter() === 'concentration'"
+            [class.border-slate-700]="spellTagFilter() !== 'concentration'"
+            [class.text-slate-400]="spellTagFilter() !== 'concentration'"
+            (click)="setSpellTagFilter('concentration')"
+          >
+            Concentration
+          </button>
+          <button
+            type="button"
+            class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-colors"
+            [class.border-amber-500]="spellTagFilter() === 'ritual'"
+            [class.bg-amber-950/40]="spellTagFilter() === 'ritual'"
+            [class.text-amber-300]="spellTagFilter() === 'ritual'"
+            [class.border-slate-700]="spellTagFilter() !== 'ritual'"
+            [class.text-slate-400]="spellTagFilter() !== 'ritual'"
+            (click)="setSpellTagFilter('ritual')"
+          >
+            Rituel
+          </button>
+          @if (spellFiltersActive()) {
+            <button
+              type="button"
+              class="ml-auto px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-600 text-slate-300 hover:border-red-700/60 hover:text-red-300 transition-colors"
+              (click)="clearSpellFilters()"
+            >
+              Effacer
+            </button>
+          }
+        </div>
+      </div>
+
       @if (racialSpellGrants().length) {
         @for (grant of racialSpellGrants(); track grant.choiceId) {
           <div class="w-full mb-12">
@@ -212,7 +304,7 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 magic-spell-grid">
-          @for (spell of availableCantrips(); track spell.id) {
+          @for (spell of filteredCantrips(); track spell.id) {
             <div
               class="relative w-full group transition-[colors,transform,opacity,box-shadow] duration-200"
               [ngClass]="{
@@ -334,6 +426,11 @@
             </div>
           }
         </div>
+        @if (spellFiltersActive() && filteredCantrips().length === 0) {
+          <p class="text-center text-xs text-slate-500 mt-4 italic">
+            Aucun sort mineur ne correspond à la recherche.
+          </p>
+        }
       </div>
 
       @if (q.hasFullListAccess && spellsToChoose() > 0) {
@@ -665,6 +762,11 @@
               </div>
             }
           </div>
+          @if (spellFiltersActive() && availableLevel1().length === 0) {
+            <p class="text-center text-xs text-slate-500 mt-4 italic">
+              Aucun sort ne correspond à la recherche.
+            </p>
+          }
         </div>
       }
 
@@ -685,7 +787,7 @@
           </div>
           <p class="text-center text-[11px] text-slate-400 mb-6 max-w-xl mx-auto italic">
             Choisissez parmi les sorts déjà dans votre grimoire. Maîtrise = à volonté · Attitrés =
-            toujours préparés (1× / repos long).
+            toujours préparés (1× / repos court ou long chacun).
           </p>
 
           @if (needsSpellMastery()) {

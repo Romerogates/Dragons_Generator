@@ -65,6 +65,13 @@ interface CardOption {
   badge?: string;
   icon: string;
 }
+interface FeatureMechanicsOption {
+  id?: string;
+  name?: string;
+  description?: string;
+  desc?: string;
+}
+
 interface FeatureJson {
   id: string;
   name: string;
@@ -72,6 +79,8 @@ interface FeatureJson {
   desc: string;
   rechargeType?: 'unlimited' | 'short_rest' | 'long_rest' | 'special';
   recharge?: string;
+  resource_key?: string;
+  unlocks_at_level?: number;
   uses?:
     | number
     | {
@@ -85,6 +94,11 @@ interface FeatureJson {
     points_formula?: string;
     uses_key?: string;
     upgrades?: { at_level: number; uses?: number; value?: number }[];
+    options?: FeatureMechanicsOption[];
+    range_m_initial?: number;
+    range_m_improved?: number;
+    range_improves_at_level?: number;
+    [key: string]: unknown;
   };
   resolves_to_choice_pool?: string;
 }
@@ -115,6 +129,13 @@ interface SubChoice {
   options: string[];
   option_labels?: Record<string, string>;
   option_descs?: Record<string, string>;
+}
+
+interface ClassChoicePool {
+  id?: string;
+  name?: string;
+  type?: string;
+  pool?: string[];
 }
 
 /** Codes courts (JSON) → libellés français utilisés par `Ability`. */
@@ -229,7 +250,7 @@ const COMBAT_STYLE_FALLBACK: Record<string, CombatStyleOption> = {
   },
 };
 
-function isFightingStylePool(pool: { id?: string; name?: string; type?: string }): boolean {
+function isFightingStylePool(pool: ClassChoicePool): boolean {
   const blob = `${pool.id ?? ''} ${pool.name ?? ''} ${pool.type ?? ''}`.toLowerCase();
   return (
     blob.includes('style-combat') ||
@@ -237,6 +258,16 @@ function isFightingStylePool(pool: { id?: string; name?: string; type?: string }
     blob.includes('fighting_style') ||
     blob.includes('style de combat')
   );
+}
+
+function asChoicePools(raw: unknown): ClassChoicePool[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((p): p is ClassChoicePool => !!p && typeof p === 'object');
+}
+
+function asFeatureJsonList(raw: unknown): FeatureJson[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((f): f is FeatureJson => !!f && typeof f === 'object' && typeof (f as FeatureJson).id === 'string');
 }
 
 function isConcreteCombatStyleId(id: string): boolean {
@@ -302,6 +333,8 @@ export class ClassStep implements OnInit {
   readonly transitioning = signal(false);
   /** Figé la phase pendant la confirmation pour éviter un flash de cartes. */
   private readonly holdPhase = signal<Phase | null>(null);
+  /** Pool de progression en relecture (conquêtes replaceable, correction d’astuces…). */
+  readonly focusedProgChoiceId = signal<string | null>(null);
 
   // === Computed ===
   readonly selectedClass = computed<CharacterClass | null>(() => {
@@ -384,13 +417,12 @@ export class ClassStep implements OnInit {
   readonly availableCombatStyles = computed<CombatStyleOption[]>(() => {
     const cls = this.selectedClass();
     if (!cls) return [];
-    const data = cls.data as Record<string, unknown>;
-    const pools = (data['choice_pools'] as any[]) ?? [];
+    const pools = asChoicePools(cls.data['choice_pools']);
     const pool = pools.find((p) => isFightingStylePool(p));
     if (!pool?.pool?.length) return [];
 
-    const details = (cls.data.features_details ?? []) as FeatureJson[];
-    return (pool.pool as string[]).map((id) => {
+    const details = asFeatureJsonList(cls.data.features_details);
+    return pool.pool.map((id) => {
       const feat = details.find((f) => f.id === id);
       const fallback = COMBAT_STYLE_FALLBACK[id];
       const rawName = feat?.name ?? fallback?.name ?? id;
@@ -407,7 +439,7 @@ export class ClassStep implements OnInit {
     const cls = this.selectedClass();
     if (!cls) return 99;
     if (COMBAT_STYLE_UNLOCK_LEVEL[cls.id]) return COMBAT_STYLE_UNLOCK_LEVEL[cls.id];
-    const details = (cls.data.features_details ?? []) as FeatureJson[];
+    const details = asFeatureJsonList(cls.data.features_details);
     const grant = details.find(
       (f) =>
         typeof f.resolves_to_choice_pool === 'string' &&
@@ -429,18 +461,18 @@ export class ClassStep implements OnInit {
     const lvl = this.targetLevel();
     const sub = this.selectedSubclass();
     const extraSub = sub?.features?.find(
-      (f: any) =>
+      (f) =>
         f.id === 'feat-style-de-combat-supplementaire' ||
         /combat-supplementaire|style.*supplementaire/i.test(String(f.id)),
     );
     if (extraSub && (extraSub.level ?? 10) <= lvl) n = 2;
     const cls = this.selectedClass();
-    const extraCls = (cls?.data?.features_details ?? []).find(
-      (f: any) =>
+    const extraCls = asFeatureJsonList(cls?.data?.features_details).find(
+      (f) =>
         f.id === 'feat-style-de-combat-supplementaire' ||
         /combat-supplementaire|style.*supplementaire/i.test(String(f.id ?? '')),
-    ) as { unlocks_at_level?: number; level?: number } | undefined;
-    const extraLvl = Number(extraCls?.['unlocks_at_level'] ?? extraCls?.level ?? 10);
+    );
+    const extraLvl = Number(extraCls?.unlocks_at_level ?? extraCls?.level ?? 10);
     if (extraCls && extraLvl <= lvl) n = 2;
     return n;
   });
@@ -467,6 +499,7 @@ export class ClassStep implements OnInit {
       return 'combat_style';
     if (this.nextUnresolvedSubChoice()) return 'sub_choice';
     if (this.nextUnresolvedProgChoice()) return 'prog_choice';
+    if (this.focusedProgChoiceId() && this.activeProgChoices().length) return 'prog_choice';
 
     if (this.requiresSubclass() && this.selectedSubclassId()) return 'subclass';
     if (this.requiresCombatStyle()) return 'combat_style';
@@ -478,9 +511,29 @@ export class ClassStep implements OnInit {
     return this.nextUnresolvedSubChoice() ?? this.activeSubChoices().at(-1) ?? null;
   }
 
-  /** Pool de progression affiché (en cours ou dernier choisi en relecture). */
+  /** Pool de progression affiché (en cours, focus relecture, ou dernier). */
+  readonly displayedProgChoice = computed<ProgressionChoiceDef | null>(() => {
+    const unresolved = this.nextUnresolvedProgChoice();
+    if (unresolved) return unresolved;
+    const focusedId = this.focusedProgChoiceId();
+    if (focusedId) {
+      const hit = this.activeProgChoices().find((c) => c.id === focusedId);
+      if (hit) return hit;
+    }
+    return this.activeProgChoices().at(-1) ?? null;
+  });
+
   private progChoiceForDisplay(): ProgressionChoiceDef | null {
-    return this.nextUnresolvedProgChoice() ?? this.activeProgChoices().at(-1) ?? null;
+    return this.displayedProgChoice();
+  }
+
+  /** Relecture / correction d’un pool déjà rempli (ex. conquête replaceable). */
+  focusProgChoice(choiceId: string): void {
+    if (!this.activeProgChoices().some((c) => c.id === choiceId)) return;
+    this.focusedProgChoiceId.set(choiceId);
+    this.holdPhase.set(null);
+    this.flippedCards.set(new Set());
+    this.currentIndex.set(0);
   }
 
   readonly phaseTitle = computed<string>(() => {
@@ -499,7 +552,7 @@ export class ClassStep implements OnInit {
         return need > 1 ? `${choice.label} (${picked}/${need})` : choice.label;
       }
       case 'prog_choice': {
-        const choice = this.nextUnresolvedProgChoice();
+        const choice = this.progChoiceForDisplay();
         if (!choice) return 'Faites votre choix';
         const picked = this.progChoiceAnswers().get(choice.id)?.length ?? 0;
         const need = choice.count || 1;
@@ -901,9 +954,10 @@ export class ClassStep implements OnInit {
         break;
       }
       case 'prog_choice': {
-        const choice = this.nextUnresolvedProgChoice();
+        const choice = this.progChoiceForDisplay();
         if (choice) {
           this.holdPhase.set(null);
+          this.focusedProgChoiceId.set(choice.id);
           this.progChoiceAnswers.update((m) => {
             const newMap = new Map(m);
             const need = choice.count || 1;
@@ -940,6 +994,7 @@ export class ClassStep implements OnInit {
 
   clearSelection(): void {
     this.holdPhase.set(null);
+    this.focusedProgChoiceId.set(null);
     this.selectedClassId.set(null);
     this.selectedSubclassId.set(null);
     this.selectedCombatStyleIds.set([]);
@@ -1033,9 +1088,7 @@ export class ClassStep implements OnInit {
       for (const prog of progression) {
         if (prog.level < 1 || prog.level > targetLevel) continue;
         for (const id of prog.features ?? []) {
-          const feat = cls.data.features_details?.find((f: any) => f.id === id) as
-            | FeatureJson
-            | undefined;
+          const feat = asFeatureJsonList(cls.data.features_details).find((f) => f.id === id);
           if (!feat) continue;
           // Remplacé par le style concret choisi
           if (
@@ -1052,7 +1105,7 @@ export class ClassStep implements OnInit {
           features.push({
             refId: feat.id,
             name: feat.name,
-            desc: annotateAuraDesc(feat as any, targetLevel),
+            desc: annotateAuraDesc(feat, targetLevel),
             source: 'class',
             sourceDetail: `${cls.name} ${prog.level}`,
             level: prog.level,
@@ -1070,7 +1123,7 @@ export class ClassStep implements OnInit {
             features.push({
               refId: feat.id,
               name: feat.name,
-              desc: annotateAuraDesc(feat as any, targetLevel),
+              desc: annotateAuraDesc(feat, targetLevel),
               source: 'subclass',
               sourceDetail: `${sub.name} ${feat.level}`,
               level: feat.level,
@@ -1083,27 +1136,25 @@ export class ClassStep implements OnInit {
           const picks = this.subChoiceAnswers().get(sc.id) ?? [];
           for (const pickId of picks) {
             const fromSub = sub.features.find((f) => f.id === pickId);
-            const fromClass = (cls.data.features_details ?? []).find(
-              (f: any) => f.id === pickId,
-            ) as FeatureJson | undefined;
+            const fromClass = asFeatureJsonList(cls.data.features_details).find(
+              (f) => f.id === pickId,
+            );
             let feat = fromSub ?? fromClass;
             // Choix imbriqués (mechanics.options + choice_quantity, ex. Rôdeur Chasseur) :
             // l'id sélectionné n'est pas une feature de premier niveau mais une option nichée
             // dans `mechanics.options` d'une feature parente. On synthétise une carte dédiée
             // avec le nom/texte réel de la technique choisie, pour rester fidèle aux règles.
             if (!feat) {
-              const allFeats = [...sub.features, ...((cls.data.features_details ?? []) as any[])];
+              const allFeats = [...sub.features, ...asFeatureJsonList(cls.data.features_details)];
               for (const parent of allFeats) {
-                const opt = (parent?.mechanics?.options as any[] | undefined)?.find(
-                  (o) => o && typeof o === 'object' && o.id === pickId,
-                );
+                const opt = parent.mechanics?.options?.find((o) => o?.id === pickId);
                 if (opt) {
                   feat = {
                     id: pickId,
                     name: opt.name ?? sc.option_labels?.[pickId] ?? pickId,
                     desc: opt.description ?? opt.desc ?? '',
                     level: parent.level ?? sc.level_required,
-                  } as FeatureJson;
+                  };
                   break;
                 }
               }
@@ -1112,7 +1163,7 @@ export class ClassStep implements OnInit {
             features.push({
               refId: feat.id,
               name: feat.name,
-              desc: annotateAuraDesc(feat as any, targetLevel),
+              desc: annotateAuraDesc(feat, targetLevel),
               source: 'subclass',
               sourceDetail: `${sub.name} · ${sc.label}`,
               level: feat.level || sc.level_required,
@@ -1277,7 +1328,7 @@ export class ClassStep implements OnInit {
   ): { kind: SpellcastingKind; ability: Ability } | null {
     return (
       resolveClassSpellcasting(cls.id, this.targetLevel(), this.selectedSubclassId()) ??
-      ((cls.data as any).spellcasting ? this.inferSpellcasting(cls) : null)
+      (cls.data.spellcasting ? this.inferSpellcasting(cls) : null)
     );
   }
 
@@ -1304,7 +1355,7 @@ export class ClassStep implements OnInit {
 
   getClassDescription(cls: CharacterClass): string {
     const spell =
-      CLASS_SPELLCASTING[cls.id] || (cls.data as any).spellcasting
+      CLASS_SPELLCASTING[cls.id] || cls.data.spellcasting
         ? 'Maîtrise les arts arcaniques ou divins. '
         : 'Spécialiste des aptitudes martiales ou physiques. ';
     const weapons = cls.data.proficiencies?.weapons?.length
@@ -1320,7 +1371,7 @@ export class ClassStep implements OnInit {
   private inferSpellcasting(
     cls: CharacterClass,
   ): { kind: SpellcastingKind; ability: Ability } | null {
-    const abilityRaw = (cls.data as any).spellcasting?.ability as string | undefined;
+    const abilityRaw = cls.data.spellcasting?.ability as string | undefined;
     const abilityMap: Record<string, Ability> = {
       cha: 'Charisme',
       wis: 'Sagesse',
@@ -1394,9 +1445,7 @@ export class ClassStep implements OnInit {
 
   private resolveOptionFeature(id: string): FeatureJson | undefined {
     const cls = this.selectedClass();
-    const fromClass = (cls?.data.features_details ?? []).find((f: any) => f.id === id) as
-      | FeatureJson
-      | undefined;
+    const fromClass = asFeatureJsonList(cls?.data.features_details).find((f) => f.id === id);
     if (fromClass) return fromClass;
     return this.selectedSubclass()?.features.find((f) => f.id === id);
   }

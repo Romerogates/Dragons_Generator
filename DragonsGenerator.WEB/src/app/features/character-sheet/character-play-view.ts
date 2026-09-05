@@ -9,6 +9,11 @@ import {
   type SpellInstance,
 } from '@core/models/Character/character';
 import { visibleClassResources } from '@core/utils/class-resource-labels';
+import {
+  spellcastingDisplayLines,
+  spellcastingFocusLabel,
+} from '@core/utils/character-spellcasting-display.util';
+import { labelForGameId } from '@core/utils/game-id-labels';
 
 @Component({
   selector: 'app-character-play-view',
@@ -43,10 +48,18 @@ export class CharacterPlayView {
     const expertise = new Set(p?.expertiseSkills ?? []);
     return (p?.skills ?? []).map((id) => ({
       id,
-      label: this.skillLabel(id),
+      label: labelForGameId(id),
       expertise: expertise.has(id),
     }));
   });
+
+  readonly toolLabels = computed(() =>
+    (this.character().proficiencies?.tools ?? []).map((id) => labelForGameId(id)),
+  );
+
+  readonly languageLabels = computed(() =>
+    (this.character().proficiencies?.languages ?? []).map((id) => labelForGameId(id)),
+  );
 
   readonly spellsByLevel = computed(() => {
     const groups = new Map<number, SpellInstance[]>();
@@ -60,6 +73,14 @@ export class CharacterPlayView {
       .map(([level, spells]) => ({ level, spells }));
   });
 
+  readonly spellcastingLines = computed(() =>
+    spellcastingDisplayLines(this.character().spellcasting),
+  );
+
+  readonly focusLabel = computed(() =>
+    spellcastingFocusLabel(this.character().spellcasting?.focus ?? null),
+  );
+
   score(key: AbilityKey): number {
     return this.character().abilities?.[key] ?? 10;
   }
@@ -70,9 +91,5 @@ export class CharacterPlayView {
 
   isSave(key: AbilityKey): boolean {
     return this.saveSet().has(this.abilityLabel[key]);
-  }
-
-  private skillLabel(id: string): string {
-    return id.replace(/^skill-/, '').replace(/-/g, ' ');
   }
 }

@@ -151,13 +151,19 @@ export function planGrimoireTable(
 
   for (let i = 0; i < spells.length; i++) {
     const spell = spells[i];
-    const layout = layoutGrimoireEffect(
+    let layout = layoutGrimoireEffect(
       spell.effectSummary ?? '',
       splitTextToSize,
       effectWidthMm,
       maxBodyLines,
     );
     if (row + layout.rowsNeeded > maxRows) {
+      // Premier sort trop haut pour la page : on le force tronqué plutôt que de le perdre.
+      if (placements.length === 0 && maxRows > 0) {
+        layout = truncateGrimoireLayout(layout, maxRows);
+        placements.push({ spell, startRow: 0, layout });
+        return { placements, overflow: spells.slice(1) };
+      }
       return { placements, overflow: spells.slice(i) };
     }
     placements.push({ spell, startRow: row, layout });
@@ -165,6 +171,23 @@ export function planGrimoireTable(
   }
 
   return { placements, overflow: [] };
+}
+
+/** Tronque un layout pour tenir dans `maxRows` lignages. */
+export function truncateGrimoireLayout(
+  layout: GrimoireEffectLayout,
+  maxRows: number,
+): GrimoireEffectLayout {
+  const cap = Math.max(1, maxRows);
+  const headerLines = layout.headerLines.slice(0, cap);
+  const remaining = Math.max(0, cap - headerLines.length);
+  const bodyLines = layout.bodyLines.slice(0, remaining);
+  return {
+    ...layout,
+    headerLines,
+    bodyLines,
+    rowsNeeded: Math.max(1, headerLines.length + bodyLines.length),
+  };
 }
 
 /** Découpe une liste de sorts overflow en pages supplémentaires. */
@@ -179,8 +202,32 @@ export function paginateGrimoireOverflow(
   let queue = spells;
 
   while (queue.length) {
-    const plan = planGrimoireTable(queue, splitTextToSize, effectWidthMm, maxRowsPerPage, maxBodyLines);
-    if (!plan.placements.length) break;
+    const plan = planGrimoireTable(
+      queue,
+      splitTextToSize,
+      effectWidthMm,
+      maxRowsPerPage,
+      maxBodyLines,
+    );
+    if (!plan.placements.length) {
+      // Sécurité : ne jamais abandonner silencieusement le reste de la file.
+      const spell = queue[0];
+      const layout = truncateGrimoireLayout(
+        layoutGrimoireEffect(
+          spell.effectSummary ?? '',
+          splitTextToSize,
+          effectWidthMm,
+          maxBodyLines,
+        ),
+        Math.max(1, maxRowsPerPage),
+      );
+      pages.push({
+        placements: [{ spell, startRow: 0, layout }],
+        overflow: [],
+      });
+      queue = queue.slice(1);
+      continue;
+    }
     pages.push({ placements: plan.placements, overflow: [] });
     if (!plan.overflow.length) break;
     queue = plan.overflow;

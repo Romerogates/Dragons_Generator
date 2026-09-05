@@ -12,7 +12,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { forkJoin, of } from 'rxjs';
+import { forkJoin, of, firstValueFrom } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import type { Character } from '@core/models/Character/character';
@@ -46,6 +46,7 @@ import {
   sortedTurnOrder,
   syncEncountersFromCombatants,
 } from '@core/utils/combat-tracker.util';
+import { mergeRemoteInitiativeRolls } from '@core/utils/campaign-persist.util';
 import { CampaignSessionTimeline } from '../campaign-session-timeline/campaign-session-timeline';
 
 @Component({
@@ -71,6 +72,8 @@ export class CampaignPlayPanel implements OnDestroy {
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
   private initiativePollTimer: ReturnType<typeof setInterval> | null = null;
   private feedbackTimer: ReturnType<typeof setTimeout> | null = null;
+  private persistSeq = 0;
+  private persistTail: Promise<void> = Promise.resolve();
 
   readonly activeSession = computed(() => {
     const c = this.campaign();
@@ -510,7 +513,7 @@ export class CampaignPlayPanel implements OnDestroy {
         this.stopInitiativePoll();
         return;
       }
-      this.reload();
+      this.pollInitiativeRolls();
     }, 1500);
   }
 
@@ -789,21 +792,52 @@ export class CampaignPlayPanel implements OnDestroy {
   private saveData(patch: Partial<CampaignData>, onSuccess?: () => void): void {
     const c = this.campaign();
     const data = { ...c.data, ...patch };
+    this.patchCampaign(data);
     this.persist(c.title, data, onSuccess);
   }
 
   private persist(title: string, data: CampaignData, onSuccess?: () => void): void {
     const c = this.campaign();
+    const campaignId = c.id;
+    const seq = ++this.persistSeq;
     this.saving.set(true);
-    this.campaigns.update(c.id, title, data).subscribe({
-      next: (summary) => {
-        this.campaignChange.emit({ ...c, data, updatedAt: summary.updatedAt });
-        this.saving.set(false);
-        onSuccess?.();
-      },
-      error: () => {
-        this.saving.set(false);
-        this.setFeedback('err', 'Sauvegarde échouée — vérifiez la connexion.', 6000);
+
+    this.persistTail = this.persistTail
+      .catch(() => undefined)
+      .then(async () => {
+        try {
+          const summary = await firstValueFrom(this.campaigns.update(campaignId, title, data));
+          const current = this.campaign();
+          this.campaignChange.emit({
+            ...current,
+            updatedAt: summary.updatedAt,
+          });
+          if (seq === this.persistSeq) this.saving.set(false);
+          onSuccess?.();
+        } catch {
+          if (seq === this.persistSeq) {
+            this.saving.set(false);
+            this.setFeedback('err', 'Sauvegarde échouée — vérifiez la connexion.', 6000);
+          }
+        }
+      });
+  }
+
+  /** Poll jets joueurs sans écraser notes / timeline locales. */
+  private pollInitiativeRolls(): void {
+    const c = this.campaign();
+    this.campaigns.get(c.id).subscribe({
+      next: (remote) => {
+        const merged = mergeRemoteInitiativeRolls(this.campaign(), remote);
+        this.campaignChange.emit(merged);
+        const session = merged.data.sessions?.find((s) => s.id === merged.data.activeSessionId);
+        const combat = session?.activeCombat;
+        if (!combat?.collectingInitiative) return;
+        const players = combat.combatants.filter((cb) => cb.kind === 'player');
+        if (players.length > 0 && players.every((cb) => cb.playerSubmitted)) {
+          this.setFeedback('ok', 'Tous les jets d’initiative reçus.');
+          this.closeInitiativeCollection();
+        }
       },
     });
   }

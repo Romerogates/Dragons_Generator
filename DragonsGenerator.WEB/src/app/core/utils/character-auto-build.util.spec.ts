@@ -27,6 +27,7 @@ import {
   CLASS_SPELLCASTING,
   type EquipmentCatalogItem,
 } from './character-auto-build.util';
+import { createLettreClass } from '../../../testing/lettre-fixtures';
 
 // --- Fixtures -----------------------------------------------------------
 
@@ -1356,6 +1357,111 @@ describe('character-auto-build.util', () => {
         cantrips: { refId: string }[];
       };
       expect(details.cantrips.map((c) => c.refId)).toContain('spl-lueur');
+    });
+  });
+
+  describe('buildAutoEquipment — armor ac fallbacks', () => {
+    it('uses ac_base when ac is missing and defaults heavy armor to 10', () => {
+      const catalog: EquipmentCatalogItem[] = [
+        {
+          id: 'ar-plate',
+          name: 'Armure de plates',
+          type: 'ARMOR',
+          subtype: 'HEAVY',
+          cost: { v: 0, u: 'po' },
+          wKg: 0,
+          data: { ac_base: 18, dex_modifier: false },
+        },
+        {
+          id: 'ar-weird',
+          name: 'Armure étrange',
+          type: 'ARMOR',
+          subtype: 'LIGHT',
+          cost: { v: 0, u: 'po' },
+          wKg: 0,
+          data: {},
+        },
+      ];
+      const withBase = buildAutoEquipment(
+        [{ slot: 1, fixed: [{ id: 'ar-plate', qty: 1 }] }],
+        catalog,
+        [],
+        [],
+      );
+      expect((withBase[0].customData as Record<string, unknown>)['ac']).toBe(18);
+
+      const defaulted = buildAutoEquipment(
+        [{ slot: 1, fixed: [{ id: 'ar-weird', qty: 1 }] }],
+        catalog,
+        [],
+        [],
+      );
+      expect((defaulted[0].customData as Record<string, unknown>)['ac']).toBe(10);
+    });
+  });
+
+  describe('buildAutoClassSelection — Lettré feature_selection dedup', () => {
+    it('deduplicates fixed astuces across feature_selection pools', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const { classChoiceAnswers, extraFeatures } = buildAutoClassSelection(createLettreClass(), 5);
+      expect(classChoiceAnswers['choice-astuces-initial-cls-lettre']?.length).toBe(2);
+      expect(extraFeatures.some((f) => f.refId === 'feat-astuce-empressement')).toBeTrue();
+    });
+  });
+
+  describe('buildAutoSpellcastingDetails — paladin oath spells', () => {
+    it('includes subclass oath spell grants for paladins', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const paladin = {
+        id: 'cls-paladin',
+        name: 'Paladin',
+        data: {
+          spellcasting: { type: 'prepared', ability: 'cha', prepared_formula: 'cha_mod + floor(paladin_level / 2)' },
+          progression: [{ level: 5, resources: {} }],
+          subclasses: {
+            options: [
+              {
+                id: 'subcls-serment-de-devotion',
+                bonus_spells_granted: [{ level_unlocked: 5, spells: ['spl-protection'] }],
+              },
+            ],
+          },
+        },
+      } as unknown as CharacterClass;
+      const spells: Spell[] = [
+        { id: 'spl-protection', name: 'Protection', level: 1, description: '', classes: ['cls-paladin'] } as unknown as Spell,
+      ];
+      const details = buildAutoSpellcastingDetails(
+        paladin,
+        spells,
+        [],
+        {},
+        { charisme: 2 },
+        { level: 5, subclassId: 'subcls-serment-de-devotion' },
+      ) as { oathSpells?: { spells: string[] }[] };
+      expect(details.oathSpells?.length).toBe(1);
+      expect(details.oathSpells?.[0].spells).toContain('Protection');
+    });
+  });
+
+  describe('buildAutoSpeciesSelection — object option ids', () => {
+    it('reads option ids from object-shaped creation choice entries', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const species: Species = {
+        ...makeElfSpecies(),
+        subspecies: [],
+        creationChoices: [
+          {
+            id: 'choice-obj',
+            name: 'Objet',
+            desc: '',
+            type: 'single_select',
+            options: [{ id: 'opt-a', name: 'A' }, { id: 'opt-b', name: 'B' }],
+          },
+        ],
+      };
+      const sel = buildAutoSpeciesSelection(species, 1, []);
+      expect(sel.choiceAnswers['choice-obj']).toEqual(['opt-a']);
     });
   });
 });

@@ -14,6 +14,7 @@ import {
   GRIMOIRE_PANEL_WARLOCK as PANEL_WARLOCK,
   GRIMOIRE_PANEL_WIZARD as PANEL_WIZARD,
   GRIMOIRE_SPELL_TABLE_LEVEL as SPELL_TABLE_LEVEL,
+  GRIMOIRE_SUPP_COORDS as SUPP_COORDS,
   GRIMOIRE_SUPP_IMAGE,
 } from '@core/config/grimoire-coords.config';
 import {
@@ -25,6 +26,7 @@ import {
 } from '@core/utils/spell-grimoire-effect.util';
 import { DataService } from '@core/services/data.service';
 import type { Spell } from '@core/models/Spells/spell';
+import { visibleClassResources } from '@core/utils/class-resource-labels';
 import {
   Character,
   FeatureInstance,
@@ -49,26 +51,6 @@ function pxToMmY(px: number): number {
 // ---------------------------------------------------------------------------
 // Coordonnées grimoire : voir core/config/grimoire-coords.config.ts
 // ---------------------------------------------------------------------------
-
-/**
- * Coordonnées page supplémentaire (grimoire-supp.jpg).
- */
-const SUPP_COORDS = {
-  /** Centre X des médaillons ouroboros (niveau). */
-  levelX: 46,
-  /** Centres Y des 6 médaillons (alignés sur la 1re ligne de chaque bande). */
-  levelYs: [182, 284, 396, 508, 620, 732],
-  /** Lignes par bande de niveau. */
-  rowsPerBand: 5,
-  preparedX: 76,
-  nameX: 101,
-  effectX: 288,
-  effectEndX: 537,
-  /** Baseline texte de la 1re ligne imprimée. */
-  tableStartY: 150,
-  rowH: 22.5,
-  maxRows: 30,
-};
 
 // ---------------------------------------------------------------------------
 // Coordonnées GRIMOIRE MARTIAL (Guerrier / Rôdeur / Paladin)
@@ -605,6 +587,7 @@ export class PdfGeneratorService {
 
     // ── 4. Features dispatchées par rechargeType ──
     this.drawPage2Features(pdf, c);
+    this.drawPage2ClassResources(pdf, c);
 
     // ── 5. Emplacements de sorts ──
     if (c.spellcasting) {
@@ -721,6 +704,9 @@ export class PdfGeneratorService {
       'feat-faveur-du-pacte',
       'feat-marotte',
       'feat-aptitude-darchetype',
+      'feat-astuces',
+      'feat-gain-astuce',
+      'feat-conquete-methodique',
     ]);
 
     const allFeatures = c.features.filter((f) => !EXCLUDED_IDS.has(f.refId ?? ''));
@@ -778,6 +764,19 @@ export class PdfGeneratorService {
       P.longRestLineH,
       P.longRestMaxLines,
     );
+  }
+
+  /** Points d'astuce, rage, ki… (ressources de progression visibles). */
+  private drawPage2ClassResources(pdf: jsPDF, c: Character): void {
+    const chips = visibleClassResources(c.classResources).filter(
+      (r) => r.key === 'points_astuce' || r.key === 'astuces_known' || r.key === 'rage' || r.key === 'ki' || r.key === 'ki_points' || r.key === 'arcane_points',
+    );
+    if (!chips.length) return;
+    const P = PAGE2;
+    pdf.setFontSize(7);
+    let y = P.shortRestStartY - 18;
+    const line = chips.map((r) => `${r.label} : ${r.value}`).join('  ·  ');
+    this.text(pdf, line, P.shortRestNameX, y);
   }
 
   /**
@@ -1140,7 +1139,7 @@ export class PdfGeneratorService {
     pdf: jsPDF,
     rowLevels: { row: number; level: number }[],
     levelX: number,
-    levelYs: number[],
+    levelYs: readonly number[],
     rowsPerBand: number,
     fontSize = 10,
     baselineFactor = 0.14,
@@ -1432,12 +1431,11 @@ export class PdfGeneratorService {
       );
     }
 
-    // Métamagie
+    // Métamagie (libellés FR, repli largeur pour les noms longs)
     if (sc.metamagic.length > 0) {
-      pdf.setFontSize(8);
       sc.metamagic.forEach((mm: string, i: number) => {
         if (i < 5) {
-          this.text(pdf, mm, P.metamagicX, P.metamagicStartY + i * P.metamagicSpacing);
+          this.textFit(pdf, mm, P.metamagicX, P.metamagicStartY + i * P.metamagicSpacing, 578 - P.metamagicX, 8);
         }
       });
     }

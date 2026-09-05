@@ -10,6 +10,8 @@ import type { CharacterBuildEditingRef } from './character-build.util';
 import { aggregateAsiChoices, subtractPartialScores } from './character-abilities.util';
 import type { RawFeatData } from './feat-benefits.util';
 import { buildSecondaryClassSelection } from './class-spellcasting.util';
+import { metamagicIdFromLabel } from '@core/data/metamagic-labels.data';
+import { extractSubclassBonusSpells } from './subclass-bonus-spells.util';
 
 /** Contexte optionnel permettant de ré-agréger fidèlement les dons (ASI fixe/flexible,
  * darkvision, résistances, don "Talent" à 4 points…) à partir des catalogues chargés côté
@@ -115,6 +117,7 @@ export function mapCharacterToEditState(
   // Restaure les choix de progression (ancêtre draconique, domaine, métamagie…) et les dons/ASI
   // pour que la réédition à un niveau supérieur ne perde pas les choix déjà faits.
   creation.classChoiceAnswers = saved.classChoiceAnswers ?? {};
+  creation.classProgressionResources = { ...(saved.classResources ?? {}) };
   creation.asiChoices = saved.asiChoices ?? [];
   if (creation.asiChoices.length) {
     // On repasse le contexte (dons + sorts) quand l'appelant le fournit, pour que les bonus
@@ -147,7 +150,7 @@ export function mapCharacterToEditState(
   }
 
   if (sc?.kind === 'sorcerer') {
-    creation.metamagicOptions = sc.metamagic ?? [];
+    creation.metamagicOptions = (sc.metamagic ?? []).map(metamagicIdFromLabel);
   }
   if (sc?.kind === 'warlock') {
     creation.eldritchInvocations = sc.eldritchInvocations ?? [];
@@ -198,6 +201,40 @@ export function mapCharacterToEditState(
   creation.story = saved.personality.story;
 
   creation.spellcastingDetails = mapKnownSpellsToSpellcastingDetails(saved.knownSpells);
+  if (sc?.kind === 'wizard') {
+    creation.spellcastingDetails = {
+      ...creation.spellcastingDetails,
+      arcaneTradition: sc.arcaneTradition,
+      spellMastery: sc.spellMastery ?? [],
+      signatureSpells: sc.signatureSpells ?? [],
+    };
+  }
+  if (sc?.kind === 'warlock' && sc.mysticArcanum?.length) {
+    creation.spellcastingDetails = {
+      ...creation.spellcastingDetails,
+      mysticArcanum: sc.mysticArcanum,
+      patron: sc.patron,
+    };
+  }
+  if (sc?.kind === 'paladin') {
+    let oathSpells = sc.oathSpells ?? [];
+    if (!oathSpells.length && ctx?.classes && creation.classId && creation.subclassId) {
+      const cls = ctx.classes.get(creation.classId);
+      const nameById = ctx.spells
+        ? new Map([...ctx.spells.entries()].map(([id, s]) => [id, s.name]))
+        : null;
+      oathSpells = extractSubclassBonusSpells(
+        cls,
+        creation.subclassId,
+        creation.targetLevel,
+        nameById,
+      );
+    }
+    creation.spellcastingDetails = {
+      ...creation.spellcastingDetails,
+      oathSpells,
+    };
+  }
 
   return {
     creation,

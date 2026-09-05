@@ -150,6 +150,42 @@ describe('coverage 85 — feature-uses.util branches', () => {
     );
     expect(badString?.max).toBe(0);
   });
+
+  it('covers null_means_unlimited, resource_key and ki fallback without table data', () => {
+    const unlimited = resolveFeatureUses(
+      { recharge: 'long_rest', uses: { source_column: 'special', null_means_unlimited: true } },
+      { data: { progression: [{ level: 5, resources: { special: null } }] } },
+      5,
+    );
+    expect(unlimited?.recharge).toBe('unlimited');
+    expect(unlimited?.max).toBe(99);
+
+    const kiFallback = resolveFeatureUses(
+      { id: 'feat-ki', recharge: 'short_rest' },
+      { data: { progression: [{ level: 5, resources: {} }] } },
+      5,
+    );
+    expect(kiFallback?.max).toBe(5);
+
+    const conduitUpgrades = resolveFeatureUses(
+      {
+        recharge: 'long_rest',
+        mechanics: { uses_key: 'missing', upgrades: [{ at_level: 5, uses: 3 }] },
+      },
+      { data: { progression: [{ level: 5, resources: {} }] } },
+      5,
+    );
+    expect(conduitUpgrades?.max).toBe(3);
+
+    const resourceKey = resolveFeatureUses(
+      { recharge: 'long_rest', resource_key: 'points_astuce' },
+      { data: { progression: [{ level: 5, resources: { points_astuce: 4 } }] } },
+      5,
+    );
+    expect(resourceKey?.max).toBe(4);
+
+    expect(resolveFeatureUses({ recharge: 'long_rest' }, {}, 5)).toBeUndefined();
+  });
 });
 
 describe('coverage 85 — aura-range.util branches', () => {

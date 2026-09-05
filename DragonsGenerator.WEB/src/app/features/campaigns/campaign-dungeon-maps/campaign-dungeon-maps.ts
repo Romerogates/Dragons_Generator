@@ -7,6 +7,7 @@ import {
   ElementRef,
   HostListener,
   input,
+  OnDestroy,
   output,
   signal,
   viewChild,
@@ -67,7 +68,7 @@ const MAX_UNDO = 40;
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class CampaignDungeonMaps {
+export class CampaignDungeonMaps implements OnDestroy {
   readonly campaign = input.required<CampaignDetail>();
   readonly focusMapId = input<string | null>(null);
   readonly dataChange = output<Partial<CampaignData>>();
@@ -158,6 +159,7 @@ export class CampaignDungeonMaps {
   private undoStack: UndoSnapshot[] = [];
   private previewTimer: ReturnType<typeof setTimeout> | null = null;
   private saveTimer: ReturnType<typeof setTimeout> | null = null;
+  private pendingMaps: CampaignDungeonMap[] | null = null;
   private panOrigin: { x: number; y: number; panX: number; panY: number } | null = null;
   private touchPointers = new Map<number, { x: number; y: number }>();
   private pinchStartDistance = 0;
@@ -828,20 +830,42 @@ export class CampaignDungeonMaps {
     return { x, y };
   }
 
+  ngOnDestroy(): void {
+    this.flushPendingSave();
+  }
+
+  /** Force l'émission d'un save debounce (changement d'onglet / navigation). */
+  flushPendingSave(): void {
+    if (!this.saveTimer && !this.pendingMaps) return;
+    if (this.saveTimer) {
+      clearTimeout(this.saveTimer);
+      this.saveTimer = null;
+    }
+    this.emitPendingMaps();
+  }
+
   private persistMaps(maps: CampaignDungeonMap[], immediate = false): void {
+    this.pendingMaps = maps;
     if (immediate) {
       if (this.saveTimer) {
         clearTimeout(this.saveTimer);
         this.saveTimer = null;
       }
-      this.dataChange.emit({ dungeonMaps: maps });
+      this.emitPendingMaps();
       return;
     }
     if (this.saveTimer) clearTimeout(this.saveTimer);
     this.saveTimer = setTimeout(() => {
       this.saveTimer = null;
-      this.dataChange.emit({ dungeonMaps: maps });
+      this.emitPendingMaps();
     }, 600);
+  }
+
+  private emitPendingMaps(): void {
+    if (!this.pendingMaps) return;
+    const maps = this.pendingMaps;
+    this.pendingMaps = null;
+    this.dataChange.emit({ dungeonMaps: maps });
   }
 
   @HostListener('window:keydown', ['$event'])

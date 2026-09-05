@@ -79,7 +79,7 @@
       "pool": [
         "wp-epee-courte",
         "wp-cimeterre",
-        "gr-paire-de-cestes",
+        "wp-ceste",
         "wp-cat-simple-cac-au-choix"
       ]
     },
@@ -90,8 +90,8 @@
       "allow_choice": true,
       "quantity": 1,
       "pool": [
-        "gr-sac-explorateur",
-        "gr-sac-aventurier"
+        "gr-sac-dexplorateur",
+        "gr-sac-daventurier"
       ]
     }
   ],
@@ -99,8 +99,8 @@
   "starting_equipment": {
     "fixed": [
       {
-        "item_id": "gr-flechette",
-        "quantity": 10
+        "id": "wp-flechette",
+        "qty": 10
       }
     ],
     "choice_pools": []
