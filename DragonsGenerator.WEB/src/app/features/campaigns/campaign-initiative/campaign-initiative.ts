@@ -17,11 +17,12 @@ import {
   InitiativeBoardCombatant,
 } from '@core/services/campaign-cloud.service';
 import { AuthService } from '@core/services/auth.service';
+import { DiceRollComponent } from '@shared/components/dice-roll/dice-roll';
 
 @Component({
   selector: 'app-campaign-initiative',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, DiceRollComponent],
   templateUrl: './campaign-initiative.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -41,6 +42,7 @@ export class CampaignInitiativePage implements OnInit, OnDestroy {
   readonly code = signal('');
   readonly selectedId = signal('');
   readonly roll = signal<number | null>(null);
+  readonly useDice = signal(true);
 
   private pollTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -98,6 +100,10 @@ export class CampaignInitiativePage implements OnInit, OnDestroy {
 
   selectedCombatant(): InitiativeBoardCombatant | null {
     return this.combatants().find((c) => c.id === this.selectedId()) ?? null;
+  }
+
+  onDieRolled(value: number): void {
+    this.roll.set(value);
   }
 
   submit(): void {

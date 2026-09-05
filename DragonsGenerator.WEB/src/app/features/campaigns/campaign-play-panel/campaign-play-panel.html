@@ -13,10 +13,19 @@
         <h2 [class]="fullscreen() ? 'text-2xl md:text-3xl font-serif text-emerald-200' : 'text-xl font-serif text-emerald-200'">
           {{ playSession.title }}
         </h2>
-        <p class="text-xs text-slate-400 mt-1">{{ formatSessionDate(playSession.scheduledAt) }}</p>
+        <p class="text-xs text-slate-400 mt-1">
+          {{ formatSessionDate(playSession.scheduledAt) }}
+          · {{ sessionModeLabel(playSession.mode) }}
+        </p>
+        <p class="text-[10px] text-slate-500 mt-1 max-w-xl">
+          {{ sessionModeHint(playSession.mode) }}
+          @if (isDm()) {
+            — Déroulez : importer party / rencontre → initiative → combattre.
+          }
+        </p>
       </div>
       <div class="flex flex-wrap gap-2">
-        @if (!fullscreen()) {
+        @if (isDm() && !fullscreen()) {
           <a
             [routerLink]="['/campaigns', c.id, 'play']"
             class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-emerald-700/50 text-emerald-300 hover:border-emerald-500/50"
@@ -24,13 +33,15 @@
             Plein écran
           </a>
         }
-        <button
-          type="button"
-          class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-900/40 border border-emerald-700/50 text-emerald-300 hover:bg-emerald-800/50"
-          (click)="endPlaySession()"
-        >
-          Terminer la session
-        </button>
+        @if (isDm()) {
+          <button
+            type="button"
+            class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-900/40 border border-emerald-700/50 text-emerald-300 hover:bg-emerald-800/50"
+            (click)="endPlaySession()"
+          >
+            Terminer la session
+          </button>
+        }
       </div>
     </div>
 
@@ -40,10 +51,12 @@
       </p>
     }
 
-    <app-campaign-session-timeline
-      [session]="playSession"
-      (timelineChange)="onSessionTimelineChange($event)"
-    />
+    @if (isDm()) {
+      <app-campaign-session-timeline
+        [session]="playSession"
+        (timelineChange)="onSessionTimelineChange($event)"
+      />
+    }
 
     @if (feedback(); as fb) {
       <div
@@ -67,57 +80,91 @@
       </div>
     }
 
-    <label class="block">
-      <span class="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-1"
-        >Notes en direct</span
-      >
-      <textarea
-        [rows]="fullscreen() ? 6 : 4"
-        placeholder="Scènes, PNJ rencontrés, décisions des joueurs…"
-        class="w-full bg-[#171b22] border border-emerald-900/40 rounded-xl p-3 text-sm text-slate-300"
-        [ngModel]="playSession.playNotes ?? ''"
-        (ngModelChange)="updateSession(playSession.id, { playNotes: $event || undefined })"
-      ></textarea>
-    </label>
+    @if (isDm()) {
+      <label class="block">
+        <span class="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-1"
+          >Notes en direct</span
+        >
+        <textarea
+          [rows]="fullscreen() ? 6 : 4"
+          placeholder="Scènes, PNJ rencontrés, décisions des joueurs…"
+          class="w-full bg-[#171b22] border border-emerald-900/40 rounded-xl p-3 text-sm text-slate-300"
+          [ngModel]="playSession.playNotes ?? ''"
+          (ngModelChange)="updateSession(playSession.id, { playNotes: $event || undefined })"
+        ></textarea>
+      </label>
+    }
 
-    <!-- Initiative / ordre de combat -->
+    <!-- Combat face-à-face -->
     <section class="space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-400">
-          Initiative & ordre de combat
+          Combat — alliés & adversaires
         </h3>
         @if (activeCombat(); as combat) {
           <div class="flex flex-wrap gap-2 items-center">
             <span class="text-xs text-slate-500 self-center">
               Manche {{ combat.round }} · {{ combat.label || 'Combat' }}
             </span>
-            @if (combat.collectingInitiative) {
+            @if (isDm()) {
+              @if (combat.collectingInitiative) {
+                <button
+                  type="button"
+                  class="min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase border border-amber-700/50 text-amber-200"
+                  (click)="closeInitiativeCollection()"
+                >
+                  Fermer collecte
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  class="min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase border border-sky-800/50 text-sky-300"
+                  (click)="openInitiativeCollection()"
+                >
+                  Collecter l’init
+                </button>
+              }
               <button
                 type="button"
-                class="min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase border border-amber-700/50 text-amber-200"
-                (click)="closeInitiativeCollection()"
+                class="min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:text-slate-200"
+                (click)="endCombat()"
               >
-                Fermer collecte
-              </button>
-            } @else {
-              <button
-                type="button"
-                class="min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase border border-sky-800/50 text-sky-300"
-                (click)="openInitiativeCollection()"
-              >
-                Collecter l’init
+                Fin combat
               </button>
             }
-            <button
-              type="button"
-              class="min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:text-slate-200"
-              (click)="endCombat()"
-            >
-              Fin combat
-            </button>
           </div>
         }
       </div>
+
+      @if (sessionMode() === 'other' && (isDm() || isMyTurn())) {
+        <div class="flex flex-wrap gap-2 items-center text-[10px]">
+          <span class="font-black uppercase tracking-widest text-violet-400">Tirage :</span>
+          <button
+            type="button"
+            class="px-3 py-1.5 rounded-lg font-black uppercase border"
+            [class.bg-violet-700]="rollChoice() === 'dice'"
+            [class.text-white]="rollChoice() === 'dice'"
+            [class.border-violet-500]="rollChoice() === 'dice'"
+            [class.border-slate-700]="rollChoice() !== 'dice'"
+            [class.text-slate-400]="rollChoice() !== 'dice'"
+            (click)="setRollChoice('dice')"
+          >
+            Lancer le dé
+          </button>
+          <button
+            type="button"
+            class="px-3 py-1.5 rounded-lg font-black uppercase border"
+            [class.bg-slate-600]="rollChoice() === 'encode'"
+            [class.text-white]="rollChoice() === 'encode'"
+            [class.border-slate-400]="rollChoice() === 'encode'"
+            [class.border-slate-700]="rollChoice() !== 'encode'"
+            [class.text-slate-400]="rollChoice() !== 'encode'"
+            (click)="setRollChoice('encode')"
+          >
+            Encoder
+          </button>
+        </div>
+      }
 
       @if (activeCombat(); as combat) {
         @if (currentTurn(); as turn) {
@@ -126,25 +173,30 @@
           >
             <p [class]="fullscreen() ? 'text-lg font-serif text-amber-200' : 'font-serif text-amber-200'">
               Tour de <strong>{{ turn.name || 'Sans nom' }}</strong>
+              @if (isMyTurn()) {
+                <span class="text-sky-300 text-sm font-sans"> · c’est votre tour</span>
+              }
             </p>
-            <div class="flex gap-2">
-              <button
-                type="button"
-                class="min-h-11 px-4 py-2 rounded-lg text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-300"
-                aria-label="Tour précédent"
-                (click)="prevTurn()"
-              >
-                ◀ Préc.
-              </button>
-              <button
-                type="button"
-                class="min-h-11 px-4 py-2 rounded-lg text-[10px] font-black uppercase bg-amber-900/40 border border-amber-700/50 text-amber-200"
-                aria-label="Tour suivant"
-                (click)="nextTurn()"
-              >
-                Suiv. ▶
-              </button>
-            </div>
+            @if (isDm()) {
+              <div class="flex gap-2">
+                <button
+                  type="button"
+                  class="min-h-11 px-4 py-2 rounded-lg text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-300"
+                  aria-label="Tour précédent"
+                  (click)="prevTurn()"
+                >
+                  ◀ Préc.
+                </button>
+                <button
+                  type="button"
+                  class="min-h-11 px-4 py-2 rounded-lg text-[10px] font-black uppercase bg-amber-900/40 border border-amber-700/50 text-amber-200"
+                  aria-label="Tour suivant"
+                  (click)="nextTurn()"
+                >
+                  Suiv. ▶
+                </button>
+              </div>
+            }
           </div>
         } @else if (activeCombat()?.combatants?.length) {
           <p class="text-xs text-slate-500 italic px-1">Tous les combattants actifs sont hors combat.</p>
@@ -164,7 +216,7 @@
           </div>
         }
 
-        @if (activeCombat()?.collectingInitiative) {
+        @if (activeCombat()?.collectingInitiative && isDm()) {
           <div class="bg-sky-950/20 border border-sky-800/40 rounded-xl px-4 py-3 space-y-2">
             <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">
               Collecte ouverte · code {{ activeCombat()!.initiativeCode }}
@@ -192,249 +244,316 @@
           </div>
         }
 
-        <div class="overflow-x-auto rounded-xl border border-slate-800">
-          <table class="w-full min-w-[640px] text-sm">
-            <thead>
-              <tr class="text-[9px] font-black uppercase tracking-widest text-slate-500 bg-[#1b2028]">
-                <th class="p-2 w-12 text-center">Ordre</th>
-                <th class="text-left p-2 pl-3">Nom</th>
-                <th class="text-left p-2 w-20">Type</th>
-                <th class="text-center p-2 w-14">Bonus</th>
-                <th class="text-center p-2 w-16">Jet</th>
-                <th class="text-center p-2 w-14">Total</th>
-                <th class="text-center p-2 w-24">PV</th>
-                <th class="text-left p-2 w-28">Statut</th>
-                <th class="p-2 w-20"></th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (cb of combatTurnOrder(); track cb.id) {
-                <tr
-                  class="border-t border-slate-800/80"
-                  [class.bg-amber-950/25]="isCurrentTurn(cb.id) && !isCombatantDefeated(cb)"
-                  [class.opacity-50]="isCombatantDefeated(cb)"
-                  [class.bg-amber-950/10]="combatantNeedsInit(cb) || combatantNeedsHp(cb)"
-                >
-                  <td class="p-2 text-center">
-                    <div class="flex flex-col gap-1 items-center">
-                      <button
-                        type="button"
-                        title="Monter (égalité d'initiative)"
-                        aria-label="Monter {{ cb.name || 'combattant' }} dans l’ordre"
-                        class="min-h-9 min-w-9 px-1 py-1 rounded text-[12px] leading-none border border-slate-700 text-slate-400 disabled:opacity-25 disabled:cursor-not-allowed"
-                        [disabled]="!canMoveCombatantTurn(cb.id, -1)"
-                        (click)="moveCombatantTurn(cb.id, -1)"
-                      >
-                        ↑
-                      </button>
-                      <button
-                        type="button"
-                        title="Descendre (égalité d'initiative)"
-                        aria-label="Descendre {{ cb.name || 'combattant' }} dans l’ordre"
-                        class="min-h-9 min-w-9 px-1 py-1 rounded text-[12px] leading-none border border-slate-700 text-slate-400 disabled:opacity-25 disabled:cursor-not-allowed"
-                        [disabled]="!canMoveCombatantTurn(cb.id, 1)"
-                        (click)="moveCombatantTurn(cb.id, 1)"
-                      >
-                        ↓
-                      </button>
-                    </div>
-                  </td>
-                  <td class="p-2 pl-3">
-                    <input
-                      type="text"
-                      placeholder="Nom"
-                      aria-label="Nom du combattant"
-                      class="w-full min-w-[8rem] min-h-10 bg-transparent border-b border-slate-700/50 text-slate-200 text-sm py-1"
-                      [class.line-through]="isCombatantDefeated(cb)"
-                      [ngModel]="cb.name"
-                      (ngModelChange)="updateCombatant(cb.id, { name: $event })"
-                    />
-                  </td>
-                  <td class="p-2">
-                    <select
-                      aria-label="Type de combattant"
-                      class="w-full min-h-10 bg-[#171b22] border border-slate-700 rounded text-xs text-slate-300 py-1.5"
-                      [ngModel]="cb.kind"
-                      (ngModelChange)="updateCombatant(cb.id, { kind: $event }, { immediate: true })"
+        <!-- Battlefield -->
+        <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-3 items-start">
+          <div class="space-y-2">
+            <p class="text-[10px] font-black uppercase tracking-widest text-sky-400 px-1">Alliés</p>
+            @for (cb of allyCombatants(); track cb.id) {
+              <button
+                type="button"
+                class="w-full text-left rounded-xl border p-3 transition-colors"
+                [class.border-amber-500]="isCurrentTurn(cb.id) && !isCombatantDefeated(cb)"
+                [class.bg-amber-950/30]="isCurrentTurn(cb.id) && !isCombatantDefeated(cb)"
+                [class.border-sky-700/50]="!isCurrentTurn(cb.id) && selectedTargetId() !== cb.id"
+                [class.bg-sky-950/20]="!isCurrentTurn(cb.id)"
+                [class.ring-2]="selectedTargetId() === cb.id"
+                [class.ring-violet-500]="selectedTargetId() === cb.id"
+                [class.opacity-45]="isCombatantDefeated(cb)"
+                (click)="selectTarget(cb.id)"
+              >
+                <div class="flex justify-between gap-2">
+                  <span class="font-serif text-sky-100" [class.line-through]="isCombatantDefeated(cb)">{{
+                    cb.name || 'Sans nom'
+                  }}</span>
+                  <span class="text-[9px] uppercase text-slate-500">{{ combatantKindLabels[cb.kind] }}</span>
+                </div>
+                <div class="mt-2 flex flex-wrap gap-3 text-xs text-slate-300">
+                  <span>PV {{ cb.currentHp ?? '—' }}/{{ cb.maxHp ?? '—' }}</span>
+                  <span>CA {{ cb.armorClass ?? '—' }}</span>
+                  <span class="font-mono text-amber-300/90"
+                    >Init {{ combatantInitiativeTotal(cb) ?? '—' }}</span
+                  >
+                </div>
+                @if (isDm()) {
+                  <div class="mt-2 flex flex-wrap gap-1" (click)="$event.stopPropagation()">
+                    <button
+                      type="button"
+                      class="px-2 py-1 rounded text-[9px] font-black uppercase border border-red-800/40 text-red-300"
+                      (click)="adjustHp(cb.id, -hpAdjustAmount())"
                     >
-                      <option value="player">PJ</option>
-                      <option value="monster">Monstre</option>
-                      <option value="npc">PNJ</option>
-                    </select>
-                  </td>
-                  <td class="p-2 text-center">
-                    <input
-                      type="number"
-                      aria-label="Bonus d’initiative"
-                      class="w-12 min-h-10 bg-[#171b22] border border-slate-700 rounded text-center text-xs text-slate-300 py-1"
-                      [ngModel]="cb.initiativeBonus"
-                      (ngModelChange)="updateCombatant(cb.id, { initiativeBonus: +$event || 0 })"
-                    />
-                  </td>
-                  <td class="p-2 text-center">
-                    <input
-                      type="number"
-                      min="1"
-                      max="30"
-                      placeholder="—"
-                      aria-label="Jet d’initiative"
-                      class="w-12 min-h-10 bg-[#171b22] border rounded text-center text-xs text-slate-300 py-1"
-                      [class.border-amber-600/70]="combatantNeedsInit(cb)"
-                      [class.border-slate-700]="!combatantNeedsInit(cb)"
-                      [class.ring-1]="combatantNeedsInit(cb)"
-                      [class.ring-amber-600/40]="combatantNeedsInit(cb)"
-                      [ngModel]="cb.initiativeRoll ?? ''"
-                      (ngModelChange)="updateCombatant(cb.id, { initiativeRoll: $event === '' ? undefined : +$event })"
-                    />
-                  </td>
-                  <td class="p-2 text-center font-mono text-amber-300/90">
-                    {{ combatantInitiativeTotal(cb) ?? '—' }}
-                    @if (combatantNeedsInit(cb)) {
-                      <span class="block text-[8px] text-amber-400/90 uppercase tracking-wide">manque</span>
-                    } @else if (cb.playerSubmitted) {
-                      <span class="block text-[8px] text-sky-400/80 uppercase tracking-wide">joueur</span>
-                    }
-                  </td>
-                  <td class="p-2">
-                    <div class="flex items-center justify-center gap-1">
-                      <input
-                        type="number"
-                        placeholder="—"
-                        aria-label="PV actuels"
-                        class="w-10 min-h-10 bg-[#171b22] border rounded text-center text-xs text-slate-300 py-1"
-                        [class.border-amber-600/70]="combatantNeedsHp(cb)"
-                        [class.border-slate-700]="!combatantNeedsHp(cb)"
-                        [class.ring-1]="combatantNeedsHp(cb)"
-                        [class.ring-amber-600/40]="combatantNeedsHp(cb)"
-                        [ngModel]="cb.currentHp ?? ''"
-                        (ngModelChange)="updateCombatantHp(cb.id, $event)"
-                      />
-                      <span class="text-slate-600 text-xs">/</span>
-                      <input
-                        type="number"
-                        placeholder="—"
-                        aria-label="PV max"
-                        class="w-10 min-h-10 bg-[#171b22] border rounded text-center text-xs text-slate-300 py-1"
-                        [class.border-amber-600/70]="combatantNeedsHp(cb)"
-                        [class.border-slate-700]="!combatantNeedsHp(cb)"
-                        [ngModel]="cb.maxHp ?? ''"
-                        (ngModelChange)="updateCombatant(cb.id, { maxHp: $event === '' ? undefined : +$event })"
-                      />
-                    </div>
-                    @if (combatantNeedsHp(cb)) {
-                      <span class="block text-center text-[8px] text-amber-400/90 uppercase tracking-wide mt-0.5"
-                        >PV ?</span
-                      >
-                    }
-                  </td>
-                  <td class="p-2">
-                    <input
-                      type="text"
-                      placeholder="—"
-                      aria-label="Conditions"
-                      class="w-full min-h-10 bg-[#171b22] border border-slate-700 rounded text-xs text-slate-400 px-2 py-1"
-                      [ngModel]="cb.conditions?.join(', ') ?? ''"
-                      (ngModelChange)="updateCombatantConditions(cb.id, $event)"
-                    />
-                  </td>
-                  <td class="p-2 text-right">
-                    <div class="flex justify-end gap-1">
-                      @if (cb.kind === 'monster' || cb.kind === 'npc') {
-                        @if (isCombatantDefeated(cb)) {
-                          <button
-                            type="button"
-                            title="Relever"
-                            aria-label="Relever {{ cb.name || 'combattant' }}"
-                            class="min-h-9 min-w-9 px-2 py-1.5 rounded text-[9px] font-black uppercase border border-emerald-800/50 text-emerald-400"
-                            (click)="reviveCombatant(cb.id)"
-                          >
-                            ↩
-                          </button>
-                        } @else {
-                          <button
-                            type="button"
-                            title="Mort (sync rencontre si lié)"
-                            aria-label="Marquer {{ cb.name || 'combattant' }} mort"
-                            class="min-h-9 px-2 py-1.5 rounded text-[9px] font-black uppercase bg-red-950/40 border border-red-800/50 text-red-300"
-                            (click)="markCombatantDead(cb.id)"
-                          >
-                            Mort
-                          </button>
-                          <button
-                            type="button"
-                            title="Dupliquer (sans lien rencontre)"
-                            aria-label="Dupliquer {{ cb.name || 'combattant' }}"
-                            class="min-h-9 min-w-9 px-2 py-1.5 rounded text-[9px] font-black uppercase border border-slate-600 text-slate-400"
-                            (click)="duplicateCombatantRow(cb.id)"
-                          >
-                            +
-                          </button>
-                          <button
-                            type="button"
-                            title="Jet d20 aléatoire"
-                            aria-label="Jet d20 initiative pour {{ cb.name || 'combattant' }}"
-                            class="min-h-9 px-2 py-1.5 rounded text-[9px] font-black uppercase border border-violet-800/50 text-violet-300"
-                            (click)="rollInitiativeFor(cb.id)"
-                          >
-                            d20
-                          </button>
-                        }
-                      }
+                      −{{ hpAdjustAmount() }}
+                    </button>
+                    <button
+                      type="button"
+                      class="px-2 py-1 rounded text-[9px] font-black uppercase border border-emerald-800/40 text-emerald-300"
+                      (click)="adjustHp(cb.id, hpAdjustAmount())"
+                    >
+                      +{{ hpAdjustAmount() }}
+                    </button>
+                    @if (!isCombatantDefeated(cb)) {
                       <button
                         type="button"
-                        title="Retirer du combat"
-                        aria-label="Retirer {{ cb.name || 'combattant' }}"
-                        class="min-h-9 min-w-9 px-2 py-1.5 rounded text-[9px] font-black uppercase border border-red-900/40 text-red-400/80"
-                        (click)="removeCombatant(cb.id)"
+                        class="px-2 py-1 rounded text-[9px] font-black uppercase border border-red-900/50 text-red-400"
+                        (click)="markCombatantDead(cb.id)"
                       >
-                        ✕
+                        Vaincu
                       </button>
+                    } @else {
+                      <button
+                        type="button"
+                        class="px-2 py-1 rounded text-[9px] font-black uppercase border border-emerald-800/50 text-emerald-400"
+                        (click)="reviveCombatant(cb.id)"
+                      >
+                        Relever
+                      </button>
+                    }
+                    @if (combatantNeedsInit(cb) && pendingInitCombatantId() !== cb.id) {
+                      <button
+                        type="button"
+                        class="px-2 py-1 rounded text-[9px] font-black uppercase border border-violet-800/50 text-violet-300"
+                        (click)="rollInitiativeFor(cb.id)"
+                      >
+                        Init
+                      </button>
+                    }
+                  </div>
+                  @if (pendingInitCombatantId() === cb.id) {
+                    <div class="mt-2" (click)="$event.stopPropagation()">
+                      <app-dice-roll
+                        [faces]="20"
+                        [method]="rollMethod()"
+                        (rolled)="onInitiativeDieRolled(cb.id, $event)"
+                      />
                     </div>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
+                  }
+                }
+              </button>
+            } @empty {
+              <p class="text-xs text-slate-500 italic px-1">Aucun allié</p>
+            }
+          </div>
+
+          <div class="hidden lg:flex flex-col items-center justify-center px-2 py-8 text-slate-600">
+            <span class="text-2xl">⚔</span>
+            <span class="text-[9px] font-black uppercase tracking-widest mt-2">vs</span>
+          </div>
+
+          <div class="space-y-2">
+            <p class="text-[10px] font-black uppercase tracking-widest text-red-400 px-1">Adversaires</p>
+            @for (cb of enemyCombatants(); track cb.id) {
+              <button
+                type="button"
+                class="w-full text-left rounded-xl border p-3 transition-colors"
+                [class.border-amber-500]="isCurrentTurn(cb.id) && !isCombatantDefeated(cb)"
+                [class.bg-amber-950/30]="isCurrentTurn(cb.id) && !isCombatantDefeated(cb)"
+                [class.border-red-800/40]="!isCurrentTurn(cb.id) && selectedTargetId() !== cb.id"
+                [class.bg-red-950/15]="!isCurrentTurn(cb.id)"
+                [class.ring-2]="selectedTargetId() === cb.id"
+                [class.ring-violet-500]="selectedTargetId() === cb.id"
+                [class.opacity-45]="isCombatantDefeated(cb)"
+                (click)="selectTarget(cb.id)"
+              >
+                <div class="flex justify-between gap-2">
+                  <span class="font-serif text-red-100" [class.line-through]="isCombatantDefeated(cb)">{{
+                    cb.name || 'Sans nom'
+                  }}</span>
+                </div>
+                <div class="mt-2 flex flex-wrap gap-3 text-xs text-slate-300">
+                  <span>PV {{ cb.currentHp ?? '—' }}/{{ cb.maxHp ?? '—' }}</span>
+                  <span>CA {{ cb.armorClass ?? '—' }}</span>
+                  <span class="font-mono text-amber-300/90"
+                    >Init {{ combatantInitiativeTotal(cb) ?? '—' }}</span
+                  >
+                </div>
+                @if (isDm()) {
+                  <div class="mt-2 flex flex-wrap gap-1" (click)="$event.stopPropagation()">
+                    <button
+                      type="button"
+                      class="px-2 py-1 rounded text-[9px] font-black uppercase border border-red-800/40 text-red-300"
+                      (click)="adjustHp(cb.id, -hpAdjustAmount())"
+                    >
+                      −{{ hpAdjustAmount() }}
+                    </button>
+                    <button
+                      type="button"
+                      class="px-2 py-1 rounded text-[9px] font-black uppercase border border-emerald-800/40 text-emerald-300"
+                      (click)="adjustHp(cb.id, hpAdjustAmount())"
+                    >
+                      +{{ hpAdjustAmount() }}
+                    </button>
+                    @if (!isCombatantDefeated(cb)) {
+                      <button
+                        type="button"
+                        class="px-2 py-1 rounded text-[9px] font-black uppercase border border-red-900/50 text-red-400"
+                        (click)="markCombatantDead(cb.id)"
+                      >
+                        Vaincu
+                      </button>
+                      <button
+                        type="button"
+                        class="px-2 py-1 rounded text-[9px] font-black uppercase border border-slate-600 text-slate-400"
+                        (click)="duplicateCombatantRow(cb.id)"
+                      >
+                        +
+                      </button>
+                    } @else {
+                      <button
+                        type="button"
+                        class="px-2 py-1 rounded text-[9px] font-black uppercase border border-emerald-800/50 text-emerald-400"
+                        (click)="reviveCombatant(cb.id)"
+                      >
+                        Relever
+                      </button>
+                    }
+                    @if (combatantNeedsInit(cb) && pendingInitCombatantId() !== cb.id) {
+                      <button
+                        type="button"
+                        class="px-2 py-1 rounded text-[9px] font-black uppercase border border-violet-800/50 text-violet-300"
+                        (click)="rollInitiativeFor(cb.id)"
+                      >
+                        Init
+                      </button>
+                    }
+                    <button
+                      type="button"
+                      class="px-2 py-1 rounded text-[9px] font-black uppercase border border-red-900/40 text-red-400/80"
+                      (click)="removeCombatant(cb.id)"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  @if (pendingInitCombatantId() === cb.id) {
+                    <div class="mt-2" (click)="$event.stopPropagation()">
+                      <app-dice-roll
+                        [faces]="20"
+                        [method]="rollMethod()"
+                        (rolled)="onInitiativeDieRolled(cb.id, $event)"
+                      />
+                    </div>
+                  }
+                  @if (isDm()) {
+                    <div class="mt-2 grid grid-cols-2 gap-1" (click)="$event.stopPropagation()">
+                      <input
+                        type="number"
+                        placeholder="CA"
+                        class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300"
+                        [ngModel]="cb.armorClass ?? ''"
+                        (ngModelChange)="
+                          updateCombatant(cb.id, { armorClass: $event === '' ? undefined : +$event })
+                        "
+                      />
+                      <input
+                        type="number"
+                        placeholder="Bonus init"
+                        class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300"
+                        [ngModel]="cb.initiativeBonus"
+                        (ngModelChange)="updateCombatant(cb.id, { initiativeBonus: +$event || 0 })"
+                      />
+                    </div>
+                  }
+                }
+              </button>
+            } @empty {
+              <p class="text-xs text-slate-500 italic px-1">Aucun adversaire</p>
+            }
+          </div>
         </div>
 
-        <div class="flex flex-wrap gap-2">
-          <button
-            type="button"
-            class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-amber-800/40 text-amber-300 hover:border-amber-600/50"
-            (click)="addCombatant()"
-          >
-            + Combattant
-          </button>
-          <button
-            type="button"
-            class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-400 hover:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed"
-            [disabled]="importingParty() || !approvedPlayers().length"
-            [attr.title]="
-              approvedPlayers().length
-                ? 'Importer les personnages approuvés'
-                : 'Aucun personnage approuvé — ajoutez un combattant manuellement'
-            "
-            (click)="importPartyIntoCombat()"
-          >
-            @if (importingParty()) {
-              Import…
+        <!-- Panneau d'action -->
+        @if (canActOnTurn() && currentTurn(); as actor) {
+          <div class="rounded-xl border border-violet-800/40 bg-violet-950/20 p-4 space-y-3">
+            <p class="text-[10px] font-black uppercase tracking-widest text-violet-300">
+              Action — {{ actor.name }}
+            </p>
+            <p class="text-xs text-slate-400">
+              Cible :
+              @if (selectedTarget(); as t) {
+                <span class="text-slate-200">{{ t.name }}</span>
+                (CA {{ t.armorClass ?? '?' }})
+              } @else {
+                <span class="italic">cliquez une carte adverse (ou allié pour soin MJ)</span>
+              }
+            </p>
+            @if (currentTurnAttacks().length) {
+              <label class="block">
+                <span class="text-[10px] uppercase text-slate-500">Attaque</span>
+                <select
+                  class="mt-1 w-full bg-[#171b22] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200"
+                  [ngModel]="selectedAttackIndex()"
+                  (ngModelChange)="selectedAttackIndex.set(+$event)"
+                >
+                  @for (a of currentTurnAttacks(); track a.name; let i = $index) {
+                    <option [ngValue]="i">
+                      {{ a.name }} ({{ a.attackBonus >= 0 ? '+' : '' }}{{ a.attackBonus }})
+                      @if (a.damageDice) {
+                        · {{ a.damageDice }}
+                      }
+                    </option>
+                  }
+                </select>
+              </label>
             } @else {
-              + Party campagne
+              <p class="text-xs text-slate-500">
+                Pas d’attaque snapshot — jet générique d20 (dégâts 1d6 si touché).
+              </p>
             }
-          </button>
-        </div>
-        @if (!approvedPlayers().length) {
-          <p class="text-[10px] text-amber-500/80">
-            Aucun PJ approuvé : utilisez « + Combattant » pour ajouter la party à la main.
-          </p>
+            @if (selectedTarget()) {
+              <app-dice-roll
+                [faces]="20"
+                [method]="rollMethod()"
+                (rolled)="resolveAttackWithDie($event)"
+              />
+            }
+          </div>
         }
-        <p class="text-[10px] text-slate-500 italic">
-          Saisissez les jets annoncés à la table. Les morts sont ignorés au changement de tour.
-        </p>
-      } @else {
+
+        @if (combatLogLines().length) {
+          <div class="rounded-xl border border-slate-800 bg-[#171b22]/60 p-3 space-y-1">
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Journal</p>
+            @for (line of combatLogLines(); track $index) {
+              <p class="text-[11px] text-slate-400 font-mono">{{ line }}</p>
+            }
+          </div>
+        }
+
+        @if (isDm()) {
+          <div class="flex flex-wrap gap-2 items-center">
+            <button
+              type="button"
+              class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-amber-800/40 text-amber-300 hover:border-amber-600/50"
+              (click)="addCombatant()"
+            >
+              + Combattant
+            </button>
+            <button
+              type="button"
+              class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-400 hover:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed"
+              [disabled]="importingParty() || !approvedPlayers().length"
+              (click)="importPartyIntoCombat()"
+            >
+              @if (importingParty()) {
+                Import…
+              } @else {
+                + Party campagne
+              }
+            </button>
+            <label class="flex items-center gap-2 text-[10px] text-slate-500">
+              Δ PV
+              <input
+                type="number"
+                min="1"
+                class="w-14 bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-slate-300"
+                [ngModel]="hpAdjustAmount()"
+                (ngModelChange)="setHpAdjustAmount($event)"
+              />
+            </label>
+          </div>
+        }
+      } @else if (isDm()) {
         <div class="bg-[#1b2028]/80 border border-dashed border-amber-800/40 rounded-xl p-4 space-y-3">
           <p class="text-sm text-slate-400">
-            Combat autonome : encodez l’initiative des PJ et des ennemis sans dépendre des joueurs connectés.
+            Démarrez un combat : les alliés à gauche, les adversaires à droite. Mode table :
+            <strong class="text-slate-200">{{ sessionModeLabel(sessionMode()) }}</strong>.
           </p>
           <div class="flex flex-wrap gap-2">
             <button
@@ -448,11 +567,6 @@
               type="button"
               class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed"
               [disabled]="importingParty() || !approvedPlayers().length"
-              [attr.title]="
-                approvedPlayers().length
-                  ? 'Démarrer avec les PJ approuvés'
-                  : 'Aucun personnage approuvé'
-              "
               (click)="importPartyIntoCombat()"
             >
               @if (importingParty()) {
@@ -463,6 +577,8 @@
             </button>
           </div>
         </div>
+      } @else {
+        <p class="text-sm text-slate-500 italic">En attente que le MJ lance un combat…</p>
       }
     </section>
 

@@ -96,7 +96,7 @@
               />
             }
 
-            @if (c.isOwner) {
+            @if (c.isOwner || c.data.activeSessionId) {
               <app-campaign-play-panel [campaign]="c" (campaignChange)="campaign.set($event)" />
             }
 

@@ -101,4 +101,43 @@ public class CampaignJsonHelpersTests
         Assert.Null(CampaignJsonHelpers.LevelFromCharacterJson("{}"));
         Assert.Null(CampaignJsonHelpers.LevelFromCharacterJson(null));
     }
+
+    [Fact]
+    public void FilterForPlayerView_keeps_active_combat_for_battlefield()
+    {
+        const string raw = """
+            {
+              "adventure": "secret",
+              "notes": "mj",
+              "activeSessionId": "ses-1",
+              "sessions": [{
+                "id": "ses-1",
+                "mode": "online",
+                "notes": "prep",
+                "playNotes": "live",
+                "activeCombat": {
+                  "id": "c1",
+                  "round": 1,
+                  "turnIndex": 0,
+                  "combatants": [
+                    { "id": "pc-1", "name": "Aria", "kind": "player", "initiativeBonus": 2 }
+                  ]
+                },
+                "combatHistory": [{ "id": "h1" }]
+              }],
+              "creatures": [{ "id": "x" }],
+              "encounters": [{ "id": "e" }]
+            }
+            """;
+        using var doc = System.Text.Json.JsonDocument.Parse(raw);
+        var filtered = CampaignJsonHelpers.FilterForPlayerView(doc.RootElement, Guid.NewGuid());
+        Assert.Equal("ses-1", filtered.GetProperty("activeSessionId").GetString());
+        Assert.Equal("", filtered.GetProperty("adventure").GetString());
+        var session = filtered.GetProperty("sessions")[0];
+        Assert.Equal("", session.GetProperty("notes").GetString());
+        Assert.Equal("", session.GetProperty("playNotes").GetString());
+        Assert.Equal("c1", session.GetProperty("activeCombat").GetProperty("id").GetString());
+        Assert.Equal(0, session.GetProperty("combatHistory").GetArrayLength());
+        Assert.Equal(0, filtered.GetProperty("creatures").GetArrayLength());
+    }
 }

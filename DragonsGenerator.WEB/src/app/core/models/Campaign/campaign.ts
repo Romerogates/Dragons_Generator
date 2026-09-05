@@ -47,6 +47,9 @@ export interface CampaignPregen {
 
 export type CampaignSessionStatus = 'planned' | 'played' | 'cancelled';
 
+/** Mode de table pour la session (jets dés vs encodage MJ). */
+export type CampaignSessionMode = 'online' | 'in_person' | 'other';
+
 export type CombatantKind = 'player' | 'monster' | 'npc';
 
 export interface CombatantEncounterLink {
@@ -54,6 +57,16 @@ export interface CombatantEncounterLink {
   creatureIndex: number;
   /** Index de l'unité dans le groupe (0 … quantity−1). */
   unitIndex: number;
+}
+
+/** Snapshot d'attaque pour le tracker (import party / créature). */
+export interface CombatantAttack {
+  name: string;
+  attackBonus: number;
+  /** Ex. "1d8+3" ou "1d6". */
+  damageDice?: string;
+  damageBonus?: number;
+  damageType?: string;
 }
 
 export interface Combatant {
@@ -73,6 +86,12 @@ export interface Combatant {
   memberUserId?: string | null;
   /** Jet soumis par le joueur via la collecte. */
   playerSubmitted?: boolean;
+  /** CA snapshot (affichage / résolution d'attaque). */
+  armorClass?: number;
+  /** Attaques snapshot à l'import. */
+  attacks?: CombatantAttack[];
+  /** Perso cloud lié (PJ). */
+  characterId?: string | null;
 }
 
 export interface ActiveCombat {
@@ -107,6 +126,11 @@ export interface CampaignSession {
   title: string;
   scheduledAt: string;
   location?: string;
+  /**
+   * Mode de table : en ligne (dés), présentiel (MJ encode), autre (choix à chaque jet).
+   * Absent → traité comme `online` pour rétrocompat.
+   */
+  mode?: CampaignSessionMode;
   notes?: string;
   /** Notes prises en direct pendant la session (MJ). */
   playNotes?: string;
@@ -117,6 +141,8 @@ export interface CampaignSession {
   combatHistory?: CombatHistoryEntry[];
   /** Ordre de la soirée (MJ) — rencontres, pauses, notes. */
   timeline?: SessionTimelineItem[];
+  /** Journal court des actions de combat (MJ / table). */
+  combatLog?: string[];
 }
 
 export interface CombatHistoryEntry {

@@ -33,8 +33,6 @@ Stack locale : `http://localhost:8081` (ou `ng serve` + API).
 
 ---
 
-
-
 ## 1. Auth & compte ⚙️
 
 - [x] 🔴 Inscription → mail (Mailhog en local) → confirmation email
@@ -45,8 +43,6 @@ Stack locale : `http://localhost:8081` (ou `ng serve` + API).
 - [x] 🟢 Pas d’UI « importer un JSON joueur » (hors scope produit)
 
 ---
-
-
 
 ## 2. Wizard — parcours complet 👤 🔴
 
@@ -70,8 +66,6 @@ Créer un perso **niveau 3**, classe **lanceur** (ex. Magicien ou Prêtre), jusq
 - [x] 🔴 Sauvegarde cloud connecté → fiche / liste Héros
 - [x] 🟢 Reprendre un brouillon wizard après refresh
 
-
-
 ### 2.2 Classes / sorts à fumer (régressions connues)
 
 - [x] 🟠 **Guerrier + Élu arcanique** : **pas** de lanceur 1/3 type Eldritch Knight PHB (étape Magie absente ou sans slots PHB)
@@ -81,8 +75,6 @@ Créer un perso **niveau 3**, classe **lanceur** (ex. Magicien ou Prêtre), jusq
 - [x] 🟠 Lettré / Magicien **niveaux 17–19** (si tu as le temps) : maîtrise / sorts attitrés
 
 ---
-
-
 
 ## 3. Liste Héros 👤 🟠
 
@@ -94,8 +86,6 @@ Créer un perso **niveau 3**, classe **lanceur** (ex. Magicien ou Prêtre), jusq
 - [x] 🔴 Supprimer : taper le **nom exact** ; succès cloud ; erreur si réseau KO (message visible)
 
 ---
-
-
 
 ## 4. Fiche de jeu (play view + PDF) 👤 🟠
 
@@ -112,8 +102,6 @@ Ouvrir un lanceur sauvegardé (idéalement Magicien / Sorcier).
 
 ---
 
-
-
 ## 5. Campagne — côté MJ 🎲 🔴
 
 Prérequis : campagne créée, ≥ 1 joueur avec perso **approuvé**, rencontre avec XP.
@@ -122,25 +110,24 @@ Prérequis : campagne créée, ≥ 1 joueur avec perso **approuvé**, rencontre 
 
 - [x] 🔴 Ouvrir campagne → panneau de jeu MJ
 - [ ] 🟠 Importer les PJ en combat
-  - *Où :* panneau de jeu (session active) → bouton **« Combat + party »** (démarre un combat avec les PJ approuvés) ou, combat déjà ouvert, **« + Party campagne »**.
-  - *Prérequis :* joueurs avec personnage **approuvé** dans l’onglet Joueurs.
+  - *Où :* panneau de jeu (session active) → **« Combat + party »** ou **« + Party campagne »**.
+  - *Prérequis :* joueurs avec personnage **approuvé**.
+- [ ] 🟠 Mode de session (**En ligne / Présentiel / Autre**) à la planification — dés vs encode.
+- [ ] 🟠 Combat face-à-face : alliés à gauche, adversaires à droite ; tour mis en avant.
 - [ ] 🔴 Collecter l’initiative (code + lien)
-  - *Où :* dans le combat actif, activer la **collecte d’initiative** (génère un code / lien `/campaigns/:id/init` pour les joueurs).
+  - *Où :* combat actif → **Collecter l’init** ; page `/campaigns/:id/init` avec **lancer le dé**.
+- [ ] 🟠 Attaque sur le tour : cibler une carte → jet d20 (dés ou encode) → PV / vaincu.
 - [ ] 🟠 Voir les jets arriver ; fin de collecte / ordre de tour
 - [ ] 🔴 **Distribuer XP** : succès → bouton disparaît (`xpAwarded`) ; pas de double distribution après refresh
 - [ ] 🟠 Échec réseau simulé (DevTools offline) : message d’erreur XP, pas de navigation bizarre
 - [ ] 🟢 Terminer combat / notes / timeline session
-
-
-
+- [ ] 🟢 Joueur en ligne : voit le battlefield ; sur **son** tour peut lancer l’attaque (dés)
 ### 5.2 Documents & cartes
 
 - [ ] 🟠 Documents : créer, type **Lettre** (pas « Letter »), publier, épingler
 - [ ] 🟠 Empty state : « créez un **document** » (pas « handout »)
 - [ ] 🟠 Cartes donjon : bouton **Document** ; toast « brouillon… publiez » ; **Brouillard de guerre** (pas Fog of war)
 - [ ] 🟢 Joueur voit documents **publiés** seulement
-
-
 
 ### 5.3 Persistance
 
@@ -149,13 +136,11 @@ Prérequis : campagne créée, ≥ 1 joueur avec perso **approuvé**, rencontre 
 
 ---
 
-
-
 ## 6. Campagne — côté joueur 👤 🔴
 
 Avec un 2ᵉ compte membre de la campagne.
 
-- [ ] 🔴 Proposition de perso → MJ approuve
+- [x] 🔴 Proposition de perso → MJ approuve
 - [ ] 🔴 Pendant collecte init : **banner** seulement si **ton** PJ est dans le combat
 - [ ] 🔴 Si **pas** importé : pas de faux « Le MJ attend votre initiative » / ou message « pas dans ce combat »
 - [ ] 🟠 Page `/campaigns/:id/init` : même empty state clair si non importé
@@ -165,46 +150,36 @@ Avec un 2ᵉ compte membre de la campagne.
 
 ---
 
-
-
 ## 7. Amis & invites ⚙️ 🟠
 
 - [ ] 🟠 Demande d’ami → accepter / refuser
 - [ ] 🟠 Invitation campagne → accepter / décliner
-- [ ] 🟢 Cas limites : non-ami, doublon, invitation déjà traitée (messages d’erreur OK)
+- [x] 🟢 Cas limites : non-ami, doublon, invitation déjà traitée (messages d’erreur OK)
 
 ---
-
-
 
 ## 8. Scénario / aventure 🎲 🟢
 
-- [ ] 🟢 `/story/create` : choisir créatures → rôles → aventure IA → export / sauver en campagne
-- [ ] 🟢 PDF bestiaire / pack MJ
+- [x] 🟢 `/story/create` : choisir créatures → rôles → aventure IA → export / sauver en campagne
+- [x] 🟢 PDF bestiaire / pack MJ
 
 ---
-
-
 
 ## 9. Codex & guide 🟢
 
-- [ ] 🟢 Parcourir Classes / Espèces / Sorts (fiche détail s’ouvre)
-- [ ] 🟢 Guide / badges navigation (si activés)
+- [x] 🟢 Parcourir Classes / Espèces / Sorts (fiche détail s’ouvre)
+- [x] 🟢 Guide / badges navigation (si activés)
 
 ---
-
-
 
 ## 10. Régressions « ne jamais casser » 🔴
 
-- [ ] 🔴 `Élu arcanique` ≠ Eldritch Knight PHB (cf. §2.2)
-- [ ] 🔴 Pas d’import JSON joueur dans l’UI
-- [ ] 🔴 Libellés joueur en **français** (pas Letter / Handout / Fog / viewer)
-- [ ] 🔴 Sauvegarde cloud en échec sur récap : **reste sur la page** avec message (pas reset silencieux)
+- [x] 🔴 `Élu arcanique` ≠ Eldritch Knight PHB (cf. §2.2)
+- [x] 🔴 Pas d’import JSON joueur dans l’UI
+- [x] 🔴 Libellés joueur en **français** (pas Letter / Handout / Fog / viewer)
+- [x] 🔴 Sauvegarde cloud en échec sur récap : **reste sur la page** avec message (pas reset silencieux)
 
 ---
-
-
 
 ## Matrice rapide (smoke 15 min)
 
@@ -218,8 +193,6 @@ Si tu n’as que 15 minutes, coche uniquement ça :
 6. [ ] Document type Lettre + label FR cartes
 
 ---
-
-
 
 ## Bugs à noter
 

@@ -709,6 +709,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       title: 'Nouvelle session',
       scheduledAt: new Date(Date.now() + 7 * 86400000).toISOString(),
       status: 'planned',
+      mode: 'online',
     };
     this.editingSessionId.set(session.id);
     this.saveData({ sessions: [...(c.data.sessions ?? []), session] });

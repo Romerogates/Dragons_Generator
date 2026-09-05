@@ -96,12 +96,12 @@ public static class CampaignJsonHelpers
                 if (item is not JsonObject session) continue;
                 session["notes"] = "";
                 session["playNotes"] = "";
-                session["activeCombat"] = null;
+                // Garder activeCombat pour le battlefield joueur (face-à-face).
                 session["combatHistory"] = new JsonArray();
             }
         }
 
-        node["activeSessionId"] = null;
+        // activeSessionId conservé pour que les joueurs voient la table en cours.
 
         if (node["handouts"] is JsonArray handouts)
         {

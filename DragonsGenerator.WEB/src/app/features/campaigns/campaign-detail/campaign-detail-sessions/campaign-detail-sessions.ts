@@ -4,8 +4,12 @@ import type { CampaignSession } from '@core/models/Campaign/campaign';
 import {
   formatSessionDate,
   sessionInputValue,
+  sessionModeChipClass,
+  sessionModeHint,
+  sessionModeLabel,
   sessionStatusChipClass,
   sessionStatusLabel,
+  normalizeSessionMode,
 } from '../campaign-session.util';
 
 export interface SessionPatchEvent {
@@ -45,5 +49,9 @@ export class CampaignDetailSessions {
   readonly formatSessionDate = formatSessionDate;
   readonly sessionStatusLabel = sessionStatusLabel;
   readonly sessionStatusChipClass = sessionStatusChipClass;
+  readonly sessionModeLabel = sessionModeLabel;
+  readonly sessionModeChipClass = sessionModeChipClass;
+  readonly sessionModeHint = sessionModeHint;
+  readonly normalizeSessionMode = normalizeSessionMode;
   readonly sessionInputValue = sessionInputValue;
 }

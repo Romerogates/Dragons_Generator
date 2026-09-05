@@ -68,16 +68,29 @@
                 />
               </label>
               <label>
-                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Lieu</span>
-                <input
-                  type="text"
-                  placeholder="En ligne, salle…"
-                  class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300"
-                  [ngModel]="session.location ?? ''"
-                  (ngModelChange)="sessionPatch.emit({ sessionId: session.id, patch: { location: $event || undefined } })"
-                />
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Mode de table</span>
+                <select
+                  class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-2 py-2 text-[10px] font-black uppercase text-slate-300"
+                  [ngModel]="normalizeSessionMode(session.mode)"
+                  (ngModelChange)="sessionPatchImmediate.emit({ sessionId: session.id, patch: { mode: $event } })"
+                >
+                  <option value="online">En ligne</option>
+                  <option value="in_person">Présentiel</option>
+                  <option value="other">Autre (choix du tirage)</option>
+                </select>
+                <p class="mt-1 text-[10px] text-slate-500">{{ sessionModeHint(session.mode) }}</p>
               </label>
             </div>
+            <label class="block">
+              <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Lieu</span>
+              <input
+                type="text"
+                placeholder="Discord, salle…"
+                class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300"
+                [ngModel]="session.location ?? ''"
+                (ngModelChange)="sessionPatch.emit({ sessionId: session.id, patch: { location: $event || undefined } })"
+              />
+            </label>
             <label class="block">
               <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Notes MJ</span>
               <textarea
@@ -100,6 +113,12 @@
                 >
                   {{ sessionStatusLabel(session.status) }}
                 </span>
+                <span
+                  class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border"
+                  [class]="sessionModeChipClass(session.mode)"
+                >
+                  {{ sessionModeLabel(session.mode) }}
+                </span>
               </div>
               <p class="text-sm text-slate-400">
                 {{ formatSessionDate(session.scheduledAt) }}
@@ -107,6 +126,7 @@
                   <span class="text-slate-500"> · {{ session.location }}</span>
                 }
               </p>
+              <p class="text-[10px] text-slate-500 mt-1">{{ sessionModeHint(session.mode) }}</p>
               @if (session.notes) {
                 <p class="text-xs text-slate-500 mt-2 line-clamp-2">{{ session.notes }}</p>
               }
@@ -142,6 +162,12 @@
           <p class="font-serif text-amber-200 text-lg">{{ session.title }}</p>
           <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border border-amber-800/50 text-amber-300 bg-amber-950/30">
             {{ sessionStatusLabel(session.status) }}
+          </span>
+          <span
+            class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border"
+            [class]="sessionModeChipClass(session.mode)"
+          >
+            {{ sessionModeLabel(session.mode) }}
           </span>
         </div>
         <p class="text-sm text-slate-400">

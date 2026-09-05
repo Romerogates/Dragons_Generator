@@ -15,13 +15,16 @@ import { Router, RouterLink } from '@angular/router';
 import { forkJoin, of, firstValueFrom } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
+import { AuthService } from '@core/services/auth.service';
 import type { Character } from '@core/models/Character/character';
 import {
   ActiveCombat,
   CampaignData,
   CampaignSession,
+  CampaignSessionMode,
   CampaignSessionStatus,
   Combatant,
+  CombatantAttack,
   encounterPendingXp,
   encounterTotalXp,
   EncounterGroup,
@@ -46,13 +49,34 @@ import {
   sortedTurnOrder,
   syncEncountersFromCombatants,
 } from '@core/utils/combat-tracker.util';
+import {
+  appendCombatLog,
+  applyHpDelta,
+  formatCombatLogLine,
+  isAllyCombatant,
+  isEnemyCombatant,
+  snapshotAttacksFromCharacter,
+} from '@core/utils/combat-action.util';
+import {
+  resolveAttackRoll,
+  resolveRollPolicy,
+  rollDamageTotal,
+  rollDie,
+  type RollChoice,
+} from '@core/utils/combat-roll.util';
 import { mergeRemoteInitiativeRolls } from '@core/utils/campaign-persist.util';
+import {
+  normalizeSessionMode,
+  sessionModeHint,
+  sessionModeLabel,
+} from '../campaign-detail/campaign-session.util';
 import { CampaignSessionTimeline } from '../campaign-session-timeline/campaign-session-timeline';
+import { DiceRollComponent } from '@shared/components/dice-roll/dice-roll';
 
 @Component({
   selector: 'app-campaign-play-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, CampaignSessionTimeline],
+  imports: [CommonModule, FormsModule, RouterLink, CampaignSessionTimeline, DiceRollComponent],
   templateUrl: './campaign-play-panel.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -60,6 +84,7 @@ import { CampaignSessionTimeline } from '../campaign-session-timeline/campaign-s
 export class CampaignPlayPanel implements OnDestroy {
   private readonly campaigns = inject(CampaignCloudService);
   private readonly router = inject(Router);
+  private readonly auth = inject(AuthService);
 
   readonly campaign = input.required<CampaignDetailModel>();
   readonly fullscreen = input(false);
@@ -68,6 +93,12 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly saving = signal(false);
   readonly importingParty = signal(false);
   readonly feedback = signal<{ kind: 'ok' | 'err'; text: string } | null>(null);
+  /** Mode « Autre » : choix ponctuel dés / encode. */
+  readonly rollChoice = signal<RollChoice>('dice');
+  readonly selectedTargetId = signal<string | null>(null);
+  readonly selectedAttackIndex = signal(0);
+  readonly hpAdjustAmount = signal(5);
+  readonly pendingInitCombatantId = signal<string | null>(null);
 
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
   private initiativePollTimer: ReturnType<typeof setInterval> | null = null;
@@ -75,12 +106,22 @@ export class CampaignPlayPanel implements OnDestroy {
   private persistSeq = 0;
   private persistTail: Promise<void> = Promise.resolve();
 
+  readonly isDm = computed(() => this.campaign().isOwner === true);
+
   readonly activeSession = computed(() => {
     const c = this.campaign();
     const id = c.data.activeSessionId;
-    if (!c.isOwner || !id) return null;
+    if (!id) return null;
     return (c.data.sessions ?? []).find((s) => s.id === id) ?? null;
   });
+
+  readonly sessionMode = computed((): CampaignSessionMode =>
+    normalizeSessionMode(this.activeSession()?.mode),
+  );
+
+  readonly rollMethod = computed(() =>
+    resolveRollPolicy(this.sessionMode(), this.rollChoice()),
+  );
 
   readonly activeCombat = computed(() => this.activeSession()?.activeCombat ?? null);
 
@@ -89,14 +130,55 @@ export class CampaignPlayPanel implements OnDestroy {
     return combat ? sortedTurnOrder(combat) : [];
   });
 
+  readonly allyCombatants = computed(() =>
+    this.combatTurnOrder().filter((c) => isAllyCombatant(c)),
+  );
+
+  readonly enemyCombatants = computed(() =>
+    this.combatTurnOrder().filter((c) => isEnemyCombatant(c)),
+  );
+
   readonly sessionCombatHistory = computed(() => {
     const session = this.activeSession();
     return [...(session?.combatHistory ?? [])].reverse();
   });
 
+  readonly combatLogLines = computed(() =>
+    [...(this.activeSession()?.combatLog ?? [])].slice().reverse().slice(0, 12),
+  );
+
   readonly currentTurn = computed(() => {
     const combat = this.activeCombat();
     return combat ? currentTurnCombatant(combat) : null;
+  });
+
+  /** Joueur : combattant lié à mon compte. */
+  readonly myCombatant = computed(() => {
+    const userId = this.auth.user()?.id;
+    if (!userId) return null;
+    return this.combatTurnOrder().find((c) => c.memberUserId === userId) ?? null;
+  });
+
+  readonly isMyTurn = computed(() => {
+    const turn = this.currentTurn();
+    const mine = this.myCombatant();
+    return !!turn && !!mine && turn.id === mine.id;
+  });
+
+  readonly canActOnTurn = computed(() => {
+    if (this.isDm()) return !!this.currentTurn();
+    return this.isMyTurn();
+  });
+
+  readonly selectedTarget = computed(() => {
+    const id = this.selectedTargetId();
+    if (!id) return null;
+    return this.combatTurnOrder().find((c) => c.id === id) ?? null;
+  });
+
+  readonly currentTurnAttacks = computed((): CombatantAttack[] => {
+    const turn = this.currentTurn();
+    return turn?.attacks?.length ? turn.attacks : [];
   });
 
   readonly nextPlannedSession = computed(() => {
@@ -145,6 +227,8 @@ export class CampaignPlayPanel implements OnDestroy {
   protected combatantInitiativeTotal = combatantInitiativeTotal;
   protected combatantKindLabels = COMBATANT_KIND_LABELS;
   protected isCombatantDefeated = isCombatantDefeated;
+  protected sessionModeLabel = sessionModeLabel;
+  protected sessionModeHint = sessionModeHint;
 
   ngOnDestroy(): void {
     this.flushSessionSave();
@@ -167,6 +251,10 @@ export class CampaignPlayPanel implements OnDestroy {
       this.feedback.set(null);
       this.feedbackTimer = null;
     }, ttlMs);
+  }
+
+  setHpAdjustAmount(raw: string | number): void {
+    this.hpAdjustAmount.set(Math.max(1, Number(raw) || 1));
   }
 
   combatantNeedsInit(cb: Combatant): boolean {
@@ -194,14 +282,14 @@ export class CampaignPlayPanel implements OnDestroy {
   }
 
   startPlaySession(sessionId: string): void {
-    if (!this.campaign().isOwner) return;
+    if (!this.isDm()) return;
     this.flushSessionSave();
     this.saveData({ activeSessionId: sessionId });
   }
 
   onSessionTimelineChange(timeline: SessionTimelineItem[]): void {
     const session = this.activeSession();
-    if (!session) return;
+    if (!session || !this.isDm()) return;
     const sessions = (this.campaign().data.sessions ?? []).map((s) =>
       s.id === session.id ? { ...s, timeline } : s,
     );
@@ -284,6 +372,7 @@ export class CampaignPlayPanel implements OnDestroy {
         map((res): ImportRow => {
           const character = {
             ...(res.data as object),
+            id: res.id,
             name: res.name ?? p.approvedCharacterName,
           } as Character;
           const combatant = this.combatantFromCharacter(character, p.userId);
@@ -466,20 +555,106 @@ export class CampaignPlayPanel implements OnDestroy {
   }
 
   rollInitiativeFor(combatantId: string): void {
-    const roll = Math.floor(Math.random() * 20) + 1;
-    this.updateCombatant(combatantId, { initiativeRoll: roll }, { immediate: true });
+    if (!this.isDm()) return;
+    this.pendingInitCombatantId.set(combatantId);
+  }
+
+  onInitiativeDieRolled(combatantId: string, roll: number): void {
+    this.updateCombatant(
+      combatantId,
+      { initiativeRoll: roll, playerSubmitted: false },
+      { immediate: true },
+    );
+    this.pendingInitCombatantId.set(null);
+    this.setFeedback('ok', `Initiative ${roll} pour ce combattant.`);
+  }
+
+  selectTarget(combatantId: string): void {
+    const cb = this.combatTurnOrder().find((c) => c.id === combatantId);
+    if (!cb || isCombatantDefeated(cb)) return;
+    this.selectedTargetId.set(combatantId);
+  }
+
+  setRollChoice(choice: RollChoice): void {
+    this.rollChoice.set(choice);
+  }
+
+  adjustHp(combatantId: string, delta: number): void {
+    if (!this.isDm()) return;
+    const combat = this.activeCombat();
+    if (!combat) return;
+    const combatants = combat.combatants.map((c) =>
+      c.id === combatantId ? applyHpDelta(c, delta) : c,
+    );
+    this.applyCombatWithEncounterSync({ ...combat, combatants });
+  }
+
+  resolveAttackWithDie(d20: number): void {
+    const turn = this.currentTurn();
+    const target = this.selectedTarget();
+    if (!turn || !target || !this.canActOnTurn()) return;
+
+    const attacks = turn.attacks ?? [];
+    const atk = attacks[this.selectedAttackIndex()] ?? {
+      name: 'Attaque',
+      attackBonus: 0,
+      damageDice: '1d6',
+    };
+    const resolution = resolveAttackRoll(d20, atk.attackBonus, target.armorClass);
+    let damage: number | null = null;
+    if (resolution.hit === true) {
+      damage =
+        rollDamageTotal(atk.damageDice, atk.damageBonus ?? 0) ??
+        Math.max(1, (atk.damageBonus ?? 0) + rollDie(6));
+      if (this.isDm()) {
+        this.adjustHp(target.id, -damage);
+      }
+    }
+
+    const line = formatCombatLogLine({
+      actor: turn.name || 'Sans nom',
+      target: target.name || 'Cible',
+      attackName: atk.name,
+      d20: resolution.d20,
+      total: resolution.total,
+      ac: resolution.targetAc,
+      hit: resolution.hit,
+      damage,
+    });
+    if (this.isDm()) this.appendLog(line);
+
+    const hitMsg =
+      resolution.hit === true
+        ? `Touché ! ${damage ?? '?'} dégâts${this.isDm() ? '' : ' — le MJ applique les PV'}`
+        : resolution.hit === false
+          ? 'Raté'
+          : `Jet ${resolution.total} (pas de CA cible)`;
+    this.setFeedback('ok', `${turn.name} → ${target.name} : ${hitMsg}`);
+  }
+
+  private appendLog(line: string): void {
+    const session = this.activeSession();
+    if (!session || !this.isDm()) return;
+    this.patchSession(
+      { combatLog: appendCombatLog(session.combatLog, line) },
+      { immediate: true },
+    );
   }
 
   nextTurn(): void {
+    if (!this.isDm()) return;
     const combat = this.activeCombat();
     if (!combat) return;
+    this.selectedTargetId.set(null);
     const patch = advanceTurn(combat, 1);
     this.patchCombat({ ...combat, ...patch }, { immediate: true });
   }
 
   prevTurn(): void {
+    if (!this.isDm()) return;
     const combat = this.activeCombat();
     if (!combat) return;
+    this.selectedTargetId.set(null);
     const patch = advanceTurn(combat, -1);
     this.patchCombat({ ...combat, ...patch }, { immediate: true });
   }
@@ -708,12 +883,19 @@ export class CampaignPlayPanel implements OnDestroy {
       typeof character.vitality?.hitPointsMax === 'number'
         ? character.vitality.hitPointsMax
         : undefined;
+    const armorClass =
+      typeof character.defense?.armorClass === 'number'
+        ? character.defense.armorClass
+        : undefined;
     return createCombatant({
       name: character.name || 'Sans nom',
       kind: 'player',
       initiativeBonus: character.initiative ?? 0,
       maxHp,
       currentHp: maxHp,
+      armorClass,
+      attacks: snapshotAttacksFromCharacter(character.attacks),
+      characterId: (character as { id?: string }).id ?? null,
       memberUserId: memberUserId ?? null,
     });
   }
