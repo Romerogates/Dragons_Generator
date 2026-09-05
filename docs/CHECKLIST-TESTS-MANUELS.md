@@ -55,13 +55,13 @@ Créer un perso **niveau 3**, classe **lanceur** (ex. Magicien ou Prêtre), jusq
 ### 2.1 Navigation & brouillon
 
 - [x] 🔴 Niveau 1–20 sélectionnable ; Continuer → Espèce
-- [ ] 🔴 Espèce : **« ← Étape précédente »** ramène au Niveau
+- [x] 🔴 Espèce : **« ← Étape précédente »** ramène au Niveau
 - [x] 🟠 Carrousel peuples : sélection, sous-espèce si besoin, Continuer
 - [x] 🔴 Civilisation : confirmer une civ → avancer
-- [ ] 🔴 Revenir sur Civilisation après Historique : **« Continuer → »** visible (pas bloqué sur « Terre natale confirmée »)
+- [x] 🔴 Revenir sur Civilisation après Historique : **« Continuer → »** visible (pas bloqué sur « Terre natale confirmée »)
 - [x] 🟠 Historique preset : Valider → Classe
 - [x] 🔴 Historique **custom** : remplir nom + privilège → Valider → plus loin → **revenir** : champs custom encore là (pas de mur de validation)
-- [ ] 🟠 Classe + sous-classe ; niveau encore modifiable jusqu’ici
+- [x] 🟠 Classe + sous-classe ; niveau plus modifiable jusqu’ici
 - [x] 🟠 Caractéristiques (point-buy / ASI si niveau ≥ 4)
 - [x] 🟠 Savoirs, équipement, langues (erreurs visibles si incomplet)
 - [x] 🟠 Magie (si lanceur) : quotas / grimoire cohérents
@@ -74,11 +74,11 @@ Créer un perso **niveau 3**, classe **lanceur** (ex. Magicien ou Prêtre), jusq
 
 ### 2.2 Classes / sorts à fumer (régressions connues)
 
-- [ ] 🟠 **Guerrier + Élu arcanique** : **pas** de lanceur 1/3 type Eldritch Knight PHB (étape Magie absente ou sans slots PHB)
+- [x] 🟠 **Guerrier + Élu arcanique** : **pas** de lanceur 1/3 type Eldritch Knight PHB (étape Magie absente ou sans slots PHB)
   - *Rappel : sous-classe Eana (pas EK PHB). Le test vérifie qu’on ne lui donne pas de lanceur 1/3 — ce n’est pas un perso « fun » à créer pour le plaisir.*
-- [ ] 🟠 Ensorceleur : métamagie / points arcaniques OK
-- [ ] 🟠 Paladin : serment + sorts
-- [ ] 🟠 Lettré / Magicien **niveaux 17–19** (si tu as le temps) : maîtrise / sorts attitrés
+- [x] 🟠 Ensorceleur : métamagie / points arcaniques OK
+- [x] 🟠 Paladin : serment + sorts
+- [x] 🟠 Lettré / Magicien **niveaux 17–19** (si tu as le temps) : maîtrise / sorts attitrés
 
 ---
 
@@ -86,12 +86,12 @@ Créer un perso **niveau 3**, classe **lanceur** (ex. Magicien ou Prêtre), jusq
 
 ## 3. Liste Héros 👤 🟠
 
-- [ ] 🔴 Déconnecté : écran « Compte requis »
-- [ ] 🔴 Connecté : cartes (nom, espèce, classe, niv., PV, CA)
-- [ ] 🟠 Voir → fiche ; Modifier → wizard en édition
-- [ ] 🟠 Dupliquer → copie dans la liste
-- [ ] 🟠 PDF téléchargeable
-- [ ] 🔴 Supprimer : taper le **nom exact** ; succès cloud ; erreur si réseau KO (message visible)
+- [x] 🔴 Déconnecté : écran « Compte requis »
+- [x] 🔴 Connecté : cartes (nom, espèce, classe, niv., PV, CA)
+- [x] 🟠 Voir → fiche ; Modifier → wizard en édition
+- [x] 🟠 Dupliquer → copie dans la liste
+- [x] 🟠 PDF téléchargeable
+- [x] 🔴 Supprimer : taper le **nom exact** ; succès cloud ; erreur si réseau KO (message visible)
 
 ---
 
@@ -101,14 +101,14 @@ Créer un perso **niveau 3**, classe **lanceur** (ex. Magicien ou Prêtre), jusq
 
 Ouvrir un lanceur sauvegardé (idéalement Magicien / Sorcier).
 
-- [ ] 🔴 En-tête : nom, espèce, classe, niveau
-- [ ] 🟠 Bandeau combat : PV (temporaires en FR), CA, Init, maîtrise, perception, VD
-- [ ] 🟠 **Ressources de classe** : rage / ki / etc. visibles ; **pas** de doublon « cantrips connus / sorts connus » si bloc Incantation présent
-- [ ] 🔴 **Incantation** : caractéristique, DD, Attaque de sort, emplacements **restants**, grimoire par niveau, badge « préparé »
-- [ ] 🟠 Sorcier : section Magie de pacte si applicable
-- [ ] 🟠 Aptitudes / compétences / équipement lisibles
-- [ ] 🔴 Aperçu PDF + Télécharger PDF
-- [ ] 🟢 Empty grimoire : message « Aucun sort listé… » si perso sans sorts
+- [x] 🔴 En-tête : nom, espèce, classe, niveau
+- [x] 🟠 Bandeau combat : PV (temporaires en FR), CA, Init, maîtrise, perception, VD
+- [x] 🟠 **Ressources de classe** : rage / ki / etc. visibles ; **pas** de doublon « cantrips connus / sorts connus » si bloc Incantation présent
+- [x] 🔴 **Incantation** : caractéristique, DD, Attaque de sort, emplacements **restants**, grimoire par niveau, badge « préparé »
+- [x] 🟠 Sorcier : section Magie de pacte si applicable
+- [x] 🟠 Aptitudes / compétences / équipement lisibles
+- [x] 🔴 Aperçu PDF + Télécharger PDF
+- [x] 🟢 Empty grimoire : message « Aucun sort listé… » si perso sans sorts
 
 ---
 
@@ -120,9 +120,12 @@ Prérequis : campagne créée, ≥ 1 joueur avec perso **approuvé**, rencontre 
 
 ### 5.1 Table / play panel
 
-- [ ] 🔴 Ouvrir campagne → panneau de jeu MJ
+- [x] 🔴 Ouvrir campagne → panneau de jeu MJ
 - [ ] 🟠 Importer les PJ en combat
+  - *Où :* panneau de jeu (session active) → bouton **« Combat + party »** (démarre un combat avec les PJ approuvés) ou, combat déjà ouvert, **« + Party campagne »**.
+  - *Prérequis :* joueurs avec personnage **approuvé** dans l’onglet Joueurs.
 - [ ] 🔴 Collecter l’initiative (code + lien)
+  - *Où :* dans le combat actif, activer la **collecte d’initiative** (génère un code / lien `/campaigns/:id/init` pour les joueurs).
 - [ ] 🟠 Voir les jets arriver ; fin de collecte / ordre de tour
 - [ ] 🔴 **Distribuer XP** : succès → bouton disparaît (`xpAwarded`) ; pas de double distribution après refresh
 - [ ] 🟠 Échec réseau simulé (DevTools offline) : message d’erreur XP, pas de navigation bizarre

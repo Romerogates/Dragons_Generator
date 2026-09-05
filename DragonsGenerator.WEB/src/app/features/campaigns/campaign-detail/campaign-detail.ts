@@ -126,6 +126,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly memberCharacterLoadingId = signal<string | null>(null);
   readonly characterRequestLoadingId = signal<string | null>(null);
   readonly rosterFeedback = signal<string | null>(null);
+  /** Amis déjà invités (en attente d’acceptation) — masqués de la liste invitable. */
+  readonly pendingInviteUserIds = signal<Set<string>>(new Set());
   readonly activity = signal<CampaignActivityItem[]>([]);
   readonly activityLoading = signal(false);
   /** Session en mode édition (MJ) — sinon carte lecture. */
@@ -142,6 +144,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly pinnedOverlayDismissed = signal(false);
 
   private initiativePollTimer: ReturnType<typeof setInterval> | null = null;
+  private softPollTimer: ReturnType<typeof setInterval> | null = null;
 
   readonly creatureXpMap = signal<Record<string, number>>({});
   readonly isLoadingPreview = signal(false);
@@ -178,7 +181,14 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
   readonly invitableFriends = computed(() => {
     const memberUserIds = new Set(this.players().map((m) => m.userId));
-    return this.friendsList().filter((f) => !memberUserIds.has(f.id));
+    const pending = this.pendingInviteUserIds();
+    return this.friendsList().filter((f) => !memberUserIds.has(f.id) && !pending.has(f.id));
+  });
+
+  /** Autres joueurs (pas soi) — pour voir leurs fiches approuvées. */
+  readonly otherPlayers = computed(() => {
+    const me = this.auth.user()?.id;
+    return this.players().filter((p) => p.userId !== me);
   });
 
   readonly totalXpAwarded = computed(() =>
@@ -357,6 +367,11 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       }
     });
 
+    this.softPollTimer = setInterval(() => this.softReload(), 12_000);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', this.onWindowFocus);
+    }
+
     const tab = this.route.snapshot.queryParamMap.get('tab');
     const handoutId = this.route.snapshot.queryParamMap.get('handout');
     if (tab === 'handouts' || tab === 'players' || tab === 'activity' || tab === 'overview' || tab === 'maps') {
@@ -371,7 +386,47 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.flushHandoutSave();
     this.dungeonMapsComp()?.flushPendingSave();
     this.stopInitiativeBannerPoll();
+    if (this.softPollTimer) clearInterval(this.softPollTimer);
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('focus', this.onWindowFocus);
+    }
     this.revokePreviewUrl();
+  }
+
+  private readonly onWindowFocus = (): void => {
+    if (this.auth.isLoggedIn()) this.softReload();
+  };
+
+  /** Recharge sans spinner (invitations acceptées, propositions, etc.). */
+  private softReload(): void {
+    const campaignId = this.campaign()?.id;
+    if (!campaignId || this.loading() || this.saving()) return;
+    this.campaigns.get(campaignId).subscribe({
+      next: (c) => {
+        const current = this.campaign();
+        if (!current || current.id !== c.id) {
+          this.campaign.set(c);
+        } else {
+          // Ne pas écraser data locale (notes / combat) — maj roster + titre seulement.
+          this.campaign.set({
+            ...current,
+            title: c.title,
+            members: c.members,
+            updatedAt: c.updatedAt,
+            isOwner: c.isOwner,
+            role: c.role,
+          });
+        }
+        const memberIds = new Set(c.members.filter((m) => m.role === 'player').map((m) => m.userId));
+        this.pendingInviteUserIds.update((prev) => {
+          const next = new Set([...prev].filter((id) => !memberIds.has(id)));
+          return next.size === prev.size ? prev : next;
+        });
+      },
+      error: () => {
+        /* ignore soft poll */
+      },
+    });
   }
 
   reload(id?: string): void {
@@ -969,6 +1024,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.campaigns.invitePlayer(c.id, userId).subscribe({
       next: () => {
         this.error.set(null);
+        this.pendingInviteUserIds.update((prev) => new Set([...prev, userId]));
+        const name = this.friendsList().find((f) => f.id === userId)?.displayName ?? 'ami';
+        this.rosterFeedback.set(`Invitation envoyée à ${name}.`);
         if (this.tab() === 'activity') this.loadActivity();
       },
       error: (err) => {

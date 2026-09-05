@@ -131,6 +131,51 @@ public class GetMyCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest<Cam
             ? doc.RootElement.Clone()
             : CampaignJsonHelpers.FilterForPlayerView(doc.RootElement, userId.Value);
 
+        var membersNeedingLevel = campaign.Members
+            .Where(m =>
+                (m.ApprovedCharacterId is not null && m.ApprovedCharacterLevel is null)
+                || (m.ProposedCharacterId is not null && m.ProposedCharacterLevel is null))
+            .ToList();
+        if (membersNeedingLevel.Count > 0)
+        {
+            var charIds = membersNeedingLevel
+                .SelectMany(m => new Guid?[] { m.ApprovedCharacterId, m.ProposedCharacterId })
+                .Where(id => id is not null)
+                .Select(id => id!.Value)
+                .Distinct()
+                .ToList();
+            var chars = await db.Characters.AsNoTracking()
+                .Where(c => charIds.Contains(c.Id))
+                .Select(c => new { c.Id, c.JsonData })
+                .ToListAsync(ct);
+            var levelById = chars.ToDictionary(
+                c => c.Id,
+                c => CampaignJsonHelpers.LevelFromCharacterJson(c.JsonData));
+
+            var dirty = false;
+            foreach (var m in membersNeedingLevel)
+            {
+                if (m.ApprovedCharacterId is Guid aid
+                    && m.ApprovedCharacterLevel is null
+                    && levelById.TryGetValue(aid, out var aLvl)
+                    && aLvl is not null)
+                {
+                    m.ApprovedCharacterLevel = aLvl;
+                    dirty = true;
+                }
+                if (m.ProposedCharacterId is Guid pid
+                    && m.ProposedCharacterLevel is null
+                    && levelById.TryGetValue(pid, out var pLvl)
+                    && pLvl is not null)
+                {
+                    m.ProposedCharacterLevel = pLvl;
+                    dirty = true;
+                }
+            }
+            if (dirty)
+                await db.SaveChangesAsync(ct);
+        }
+
         var members = campaign.Members.Select(m => new CampaignMemberDto(
             m.Id, m.UserId, m.User.DisplayName, m.Role, m.ProposalStatus,
             m.ApprovedCharacterId, m.ApprovedCharacterName, m.ApprovedCharacterLevel,
@@ -590,14 +635,7 @@ public class ProposeCharacterEndpoint(AppDbContext db, PushNotificationService p
             return;
         }
 
-        int? level = null;
-        try
-        {
-            using var doc = JsonDocument.Parse(character.JsonData);
-            if (doc.RootElement.TryGetProperty("level", out var lvl) && lvl.TryGetInt32(out var l))
-                level = l;
-        }
-        catch { /* ignore */ }
+        var level = CampaignJsonHelpers.LevelFromCharacterJson(character.JsonData);
 
         member.ProposedCharacterId = character.Id;
         member.ProposedCharacterName = character.Name;
@@ -1170,14 +1208,7 @@ public class ClaimCampaignPregenEndpoint(AppDbContext db) : EndpointWithoutReque
         var member = campaign.Members.FirstOrDefault(m => m.UserId == userId && m.Role == CampaignMemberRoles.Player);
         if (member is not null)
         {
-            int? level = null;
-            try
-            {
-                using var doc = JsonDocument.Parse(source.JsonData);
-                if (doc.RootElement.TryGetProperty("level", out var lvl) && lvl.TryGetInt32(out var l))
-                    level = l;
-            }
-            catch { /* ignore */ }
+            var level = CampaignJsonHelpers.LevelFromCharacterJson(source.JsonData);
 
             member.ApprovedCharacterId = copy.Id;
             member.ApprovedCharacterName = copyName;
@@ -1292,12 +1323,7 @@ public class GetCampaignMemberCharacterEndpoint(AppDbContext db) : EndpointWitho
             return;
         }
 
-        if (!isOwner && membership?.Id != memberId)
-        {
-            await Send.ForbiddenAsync(ct);
-            return;
-        }
-
+        // MJ : fiches proposées + approuvées. Joueurs : fiches approuvées des joueurs de la table uniquement.
         if (!isOwner && scope == "proposed")
         {
             await Send.ForbiddenAsync(ct);
@@ -1335,12 +1361,6 @@ public class GetCampaignMemberCharacterEndpoint(AppDbContext db) : EndpointWitho
         if (character is null)
         {
             await Send.NotFoundAsync(ct);
-            return;
-        }
-
-        if (!isOwner && character.UserId != userId)
-        {
-            await Send.ForbiddenAsync(ct);
             return;
         }
 

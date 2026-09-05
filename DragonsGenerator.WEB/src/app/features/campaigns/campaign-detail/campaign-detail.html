@@ -753,7 +753,18 @@
                 <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
                   <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Mon personnage</h3>
                   @if (me.approvedCharacterName) {
-                    <p class="text-violet-300 font-serif">{{ me.approvedCharacterName }} — approuvé · {{ me.xpEarnedInCampaign }} XP</p>
+                    <p class="text-violet-300 font-serif">{{ me.approvedCharacterName }} — approuvé · niv. {{ me.approvedCharacterLevel ?? '?' }} · {{ me.xpEarnedInCampaign }} XP</p>
+                    <div class="flex flex-wrap gap-2 mt-3">
+                      <button
+                        type="button"
+                        class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
+                        [disabled]="isMemberCharacterLoading(me.id, 'approved')"
+                        (click)="viewMemberCharacter(me, 'approved')"
+                      >
+                        @if (isMemberCharacterLoading(me.id, 'approved')) { Chargement… }
+                        @else { Voir ma fiche }
+                      </button>
+                    </div>
                   } @else if (me.proposalStatus === 'pending') {
                     <p class="text-amber-400 text-sm">En attente d'approbation : {{ me.proposedCharacterName }}</p>
                   } @else if (me.proposalStatus === 'rejected') {
@@ -782,6 +793,33 @@
                         <a routerLink="/create" class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-violet-600 text-white">Créer mon premier personnage →</a>
                       }
                     </div>
+                  }
+                </div>
+              }
+
+              @if (otherPlayers().length) {
+                <div class="space-y-3">
+                  <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-500">Autres joueurs</h3>
+                  @for (m of otherPlayers(); track m.id) {
+                    <article class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
+                      <h4 class="font-bold text-slate-100">{{ m.displayName }}</h4>
+                      @if (m.approvedCharacterName) {
+                        <p class="text-sm text-violet-300 mt-2">{{ m.approvedCharacterName }} (niv. {{ m.approvedCharacterLevel ?? '?' }})</p>
+                        <div class="flex flex-wrap gap-2 mt-3">
+                          <button
+                            type="button"
+                            class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-[#171b22] border border-violet-800/50 text-violet-300 disabled:opacity-50"
+                            [disabled]="isMemberCharacterLoading(m.id, 'approved')"
+                            (click)="viewMemberCharacter(m, 'approved')"
+                          >
+                            @if (isMemberCharacterLoading(m.id, 'approved')) { Chargement… }
+                            @else { Voir la fiche }
+                          </button>
+                        </div>
+                      } @else {
+                        <p class="text-sm text-slate-500 mt-2 italic">Pas encore de personnage approuvé</p>
+                      }
+                    </article>
                   }
                 </div>
               }

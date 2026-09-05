@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Injector, inject, OnInit, signal, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Injector, inject, OnDestroy, OnInit, signal, computed, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
@@ -13,6 +13,8 @@ import type { CreaturePrintEntry } from '@core/services/campaign-pdf.types';
 import { CampaignData, CampaignInvite, CampaignSummary, emptyCampaignData } from '@core/models/Campaign/campaign';
 import { forkJoin, catchError, map, of, Observable } from 'rxjs';
 
+type RoleFilter = 'all' | 'dm' | 'player';
+
 @Component({
   selector: 'app-campaigns',
   standalone: true,
@@ -21,7 +23,7 @@ import { forkJoin, catchError, map, of, Observable } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class Campaigns implements OnInit {
+export class Campaigns implements OnInit, OnDestroy {
   private campaigns = inject(CampaignCloudService);
   private friends = inject(FriendsService);
   private notifications = inject(NotificationService);
@@ -37,6 +39,7 @@ export class Campaigns implements OnInit {
 
   readonly list = signal<CampaignSummary[]>([]);
   readonly invites = signal<CampaignInvite[]>([]);
+  readonly roleFilter = signal<RoleFilter>('all');
   readonly loading = signal(true);
   readonly toDelete = signal<CampaignSummary | null>(null);
   readonly deleteConfirmName = signal('');
@@ -50,13 +53,63 @@ export class Campaigns implements OnInit {
   readonly emptyCampaignTemplate = signal<'blank' | 'oneshot-classic' | 'oneshot-dungeon' | 'oneshot-intrigue'>('blank');
   readonly isLoggedIn = this.auth.isLoggedIn;
 
+  private softPollTimer: ReturnType<typeof setInterval> | null = null;
+
+  readonly filteredList = computed(() => {
+    const filter = this.roleFilter();
+    const items = this.list();
+    if (filter === 'all') return items;
+    return items.filter((c) => c.role === filter);
+  });
+
+  readonly dmCount = computed(() => this.list().filter((c) => c.role === 'dm').length);
+  readonly playerCount = computed(() => this.list().filter((c) => c.role === 'player').length);
+
   ngOnInit(): void {
     if (!this.auth.isLoggedIn()) {
       this.loading.set(false);
       return;
     }
     this.reload();
+    this.refreshInvites();
+    this.softPollTimer = setInterval(() => this.softRefresh(), 12_000);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', this.onWindowFocus);
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.softPollTimer) clearInterval(this.softPollTimer);
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('focus', this.onWindowFocus);
+    }
+  }
+
+  private readonly onWindowFocus = (): void => {
+    if (this.auth.isLoggedIn()) this.softRefresh();
+  };
+
+  setRoleFilter(filter: RoleFilter): void {
+    this.roleFilter.set(filter);
+  }
+
+  private refreshInvites(): void {
     this.friends.listCampaignInvites().subscribe((i) => this.invites.set(i));
+  }
+
+  /** Sans spinner : invitations + liste (ex. acceptation ailleurs). */
+  private softRefresh(): void {
+    if (!this.auth.isLoggedIn() || !this.connectivity.isOnline()) return;
+    this.refreshInvites();
+    this.campaigns.list().subscribe({
+      next: (items) => {
+        this.list.set(this.offlineSync.mergeCampaignLists(items));
+        this.notifications.refresh();
+      },
+      error: () => {
+        /* ignore soft poll errors */
+      },
+    });
   }
 
   reload(): void {
@@ -70,6 +123,7 @@ export class Campaigns implements OnInit {
     }
 
     this.offlineSync.flushIfPossible();
+    this.refreshInvites();
     this.campaigns.list().subscribe({
       next: (items) => {
         this.list.set(this.offlineSync.mergeCampaignLists(items));
@@ -136,13 +190,13 @@ export class Campaigns implements OnInit {
   acceptInvite(inv: CampaignInvite): void {
     this.friends.acceptCampaignInvite(inv.id).subscribe(() => {
       this.reload();
-      this.friends.listCampaignInvites().subscribe((i) => this.invites.set(i));
+      this.refreshInvites();
     });
   }
 
   declineInvite(inv: CampaignInvite): void {
     this.friends.declineCampaignInvite(inv.id).subscribe(() => {
-      this.friends.listCampaignInvites().subscribe((i) => this.invites.set(i));
+      this.refreshInvites();
     });
   }
 

@@ -5,6 +5,42 @@ namespace DragonsGenerator.API.Services;
 
 public static class CampaignJsonHelpers
 {
+    /// <summary>
+    /// Niveau personnage depuis le JSON export (totalLevel prioritaire, puis level, puis somme des classes).
+    /// </summary>
+    public static int? LevelFromCharacterJson(string? json)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(json) ? "{}" : json);
+            var root = doc.RootElement;
+            if (root.TryGetProperty("totalLevel", out var totalEl)
+                && totalEl.TryGetInt32(out var total)
+                && total > 0)
+                return total;
+            if (root.TryGetProperty("level", out var levelEl)
+                && levelEl.TryGetInt32(out var level)
+                && level > 0)
+                return level;
+            if (root.TryGetProperty("classes", out var classes) && classes.ValueKind == JsonValueKind.Array)
+            {
+                var sum = 0;
+                foreach (var c in classes.EnumerateArray())
+                {
+                    if (c.TryGetProperty("level", out var cl) && cl.TryGetInt32(out var cli) && cli > 0)
+                        sum += cli;
+                }
+                if (sum > 0) return sum;
+            }
+        }
+        catch
+        {
+            /* ignore malformed JSON */
+        }
+
+        return null;
+    }
+
     public static string? RegionNameFromJson(string json)
     {
         try

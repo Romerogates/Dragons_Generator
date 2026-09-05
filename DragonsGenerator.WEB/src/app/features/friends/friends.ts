@@ -94,11 +94,27 @@ export class FriendsPage implements OnInit, OnDestroy {
     if (!this.auth.isLoggedIn()) return;
     this.reload();
     this.loadSuggestions();
+    this.softPollTimer = setInterval(() => {
+      if (this.auth.isLoggedIn()) this.reload();
+    }, 12_000);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', this.onWindowFocus);
+    }
   }
 
   ngOnDestroy(): void {
     clearTimeout(this.searchTimer);
+    if (this.softPollTimer) clearInterval(this.softPollTimer);
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('focus', this.onWindowFocus);
+    }
   }
+
+  private softPollTimer: ReturnType<typeof setInterval> | null = null;
+
+  private readonly onWindowFocus = (): void => {
+    if (this.auth.isLoggedIn()) this.reload();
+  };
 
   reload(): void {
     this.friends.listFriends().subscribe((f) => this.friendsList.set(f));

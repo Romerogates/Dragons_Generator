@@ -88,4 +88,17 @@ public class CampaignJsonHelpersTests
         Assert.Equal("Moi", filtered.Combatants[0].Name);
         Assert.Equal(3, ownerView.Combatants.Count);
     }
+
+    [Fact]
+    public void LevelFromCharacterJson_prefers_totalLevel()
+    {
+        Assert.Equal(5, CampaignJsonHelpers.LevelFromCharacterJson(
+            """{"name":"A","totalLevel":5,"level":1,"classes":[{"level":2}]}"""));
+        Assert.Equal(3, CampaignJsonHelpers.LevelFromCharacterJson(
+            """{"name":"B","level":3}"""));
+        Assert.Equal(4, CampaignJsonHelpers.LevelFromCharacterJson(
+            """{"name":"C","classes":[{"level":1},{"level":3}]}"""));
+        Assert.Null(CampaignJsonHelpers.LevelFromCharacterJson("{}"));
+        Assert.Null(CampaignJsonHelpers.LevelFromCharacterJson(null));
+    }
 }

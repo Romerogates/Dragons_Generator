@@ -5,7 +5,6 @@ import { CampaignData, EncounterGroup } from '@core/models/Campaign/campaign';
 import { CREATURE_ROLE_LABELS, ADVENTURE_TONE_LABELS, AdventureTone } from '@core/models/Story/story';
 import { formatChallengeRating, ABILITY_LABELS } from '@core/utils/creature-display.util';
 import { encounterTotalXp } from '@core/models/Campaign/campaign';
-import { getEanaMapCoordinates } from '@core/utils/eana-map';
 import type { CreaturePrintEntry, PlayerGmSummary } from './campaign-pdf.types';
 
 export type { CreaturePrintEntry, PlayerGmSummary } from './campaign-pdf.types';
@@ -82,7 +81,7 @@ export class CampaignPdfService {
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const bg = await this.loadImage(PARCHMENT);
     this.drawCoverPage(pdf, bg, title, null, { kind: 'pack-mj', subtitle: 'Synthèse des héros — MJ' });
-    this.drawPlayerSummariesSection(pdf, bg, summaries);
+    this.drawPlayerSummariesSection(pdf, bg, summaries, { forceNewPage: true });
     pdf.save(this.safeName(`${title}-joueurs-mj.pdf`));
   }
 
@@ -385,10 +384,6 @@ export class CampaignPdfService {
       for (let i = 0; i < info.length; i++) {
         pdf.text(info[i]!, PAGE_W / 2, y + i * 6, { align: 'center' });
       }
-      if (data.regionId) {
-        const pinY = y + info.length * 6;
-        this.drawRegionPin(pdf, data.regionId, 105, pinY + 8);
-      }
     }
 
     pdf.setFontSize(8);
@@ -413,7 +408,9 @@ export class CampaignPdfService {
     const bg = await this.loadImage(PARCHMENT);
 
     this.drawCoverPage(pdf, bg, title, data, { kind: 'pack-mj' });
-    this.drawSynopsisPage(pdf, bg, data);
+    // Continuer sur la page de couverture si possible (évite une page quasi vide).
+    let y = this.estimateCoverContentBottom(data);
+    y = this.drawSynopsisSection(pdf, bg, data, y);
 
     if (creatureEntries.length) {
       await this.appendCreaturesToPdf(pdf, bg, creatureEntries, 'Créatures de l\'aventure');
@@ -442,35 +439,31 @@ export class CampaignPdfService {
     pdf.rect(13, 13, PAGE_W - 26, PAGE_H - 26);
   }
 
-  private drawRegionPin(pdf: jsPDF, regionId: string, centerX: number, centerY: number): void {
-    const coords = getEanaMapCoordinates(regionId);
-    const mapW = 36;
-    const mapH = mapW / (1500 / 1061);
-    const mapX = centerX - mapW / 2;
-    const mapY = centerY - mapH / 2;
-
-    pdf.setFillColor(210, 195, 165);
-    pdf.setDrawColor(90, 45, 15);
-    pdf.setLineWidth(0.3);
-    pdf.roundedRect(mapX, mapY, mapW, mapH, 2, 2, 'FD');
-
-    const pinX = mapX + (coords.x / 100) * mapW;
-    const pinY = mapY + (coords.y / 100) * mapH;
-    pdf.setFillColor(139, 92, 246);
-    pdf.circle(pinX, pinY, 1.2, 'F');
-    pdf.setDrawColor(70, 35, 10);
-    pdf.circle(pinX, pinY, 1.2, 'S');
-  }
-
   private toneLabel(tone: AdventureTone): string {
     return ADVENTURE_TONE_LABELS[tone] ?? tone;
   }
 
-  private drawSynopsisPage(pdf: jsPDF, bg: string, data: CampaignData): void {
-    if (!data.adventure?.trim()) return;
-    pdf.addPage();
-    pdf.addImage(bg, 'JPEG', 0, 0, PAGE_W, PAGE_H);
-    let y = MARGIN + 4;
+  /** Bas approximatif du bloc titre/infos sur la couverture (sans carte). */
+  private estimateCoverContentBottom(data: CampaignData): number {
+    let y = 72 + 28;
+    if (data.tone) y += 7;
+    const infoLines = [
+      `Niveau des héros : ${data.partyLevel}`,
+      data.regionName?.trim(),
+      data.setting?.trim(),
+    ].filter(Boolean).length;
+    y += infoLines * 6;
+    return y + 14;
+  }
+
+  private drawSynopsisSection(pdf: jsPDF, bg: string, data: CampaignData, startY: number): number {
+    if (!data.adventure?.trim()) return startY;
+    let y = startY;
+    if (y > PAGE_H - 50) {
+      pdf.addPage();
+      pdf.addImage(bg, 'JPEG', 0, 0, PAGE_W, PAGE_H);
+      y = MARGIN + 4;
+    }
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(14);
     pdf.setTextColor(70, 35, 10);
@@ -478,17 +471,16 @@ export class CampaignPdfService {
     y += 8;
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(9);
-    this.writeParagraph(pdf, bg, data.adventure, y, 9, false);
+    return this.writeParagraph(pdf, bg, data.adventure, y, 9, false) + 6;
   }
 
-  private drawEncountersSection(pdf: jsPDF, bg: string, encounters: EncounterGroup[]): void {
-    pdf.addPage();
-    pdf.addImage(bg, 'JPEG', 0, 0, PAGE_W, PAGE_H);
-    let y = MARGIN + 4;
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(14);
-    pdf.text('Rencontres', MARGIN, y);
-    y += 10;
+  private drawEncountersSection(
+    pdf: jsPDF,
+    bg: string,
+    encounters: EncounterGroup[],
+    options: { forceNewPage?: boolean } = {},
+  ): void {
+    let y = this.startSection(pdf, bg, 'Rencontres', options.forceNewPage !== false);
 
     for (const enc of encounters) {
       if (y > PAGE_H - 30) {
@@ -498,6 +490,7 @@ export class CampaignPdfService {
       }
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(11);
+      pdf.setTextColor(70, 35, 10);
       pdf.text(enc.name, MARGIN, y);
       y += 5;
       pdf.setFont('helvetica', 'normal');
@@ -512,14 +505,13 @@ export class CampaignPdfService {
     }
   }
 
-  private drawPlayerSummariesSection(pdf: jsPDF, bg: string, summaries: PlayerGmSummary[]): void {
-    pdf.addPage();
-    pdf.addImage(bg, 'JPEG', 0, 0, PAGE_W, PAGE_H);
-    let y = MARGIN + 4;
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(14);
-    pdf.text('Synthèse des héros (MJ)', MARGIN, y);
-    y += 10;
+  private drawPlayerSummariesSection(
+    pdf: jsPDF,
+    bg: string,
+    summaries: PlayerGmSummary[],
+    options: { forceNewPage?: boolean } = {},
+  ): void {
+    let y = this.startSection(pdf, bg, 'Synthèse des héros (MJ)', options.forceNewPage !== false);
 
     for (const p of summaries) {
       if (y > PAGE_H - 35) {
@@ -529,6 +521,7 @@ export class CampaignPdfService {
       }
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(11);
+      pdf.setTextColor(70, 35, 10);
       pdf.text(p.name, MARGIN, y);
       y += 5;
       pdf.setFont('helvetica', 'normal');
@@ -545,16 +538,28 @@ export class CampaignPdfService {
     }
   }
 
-  private drawNotesSection(pdf: jsPDF, bg: string, notes: string): void {
-    pdf.addPage();
-    pdf.addImage(bg, 'JPEG', 0, 0, PAGE_W, PAGE_H);
+  private drawNotesSection(
+    pdf: jsPDF,
+    bg: string,
+    notes: string,
+    options: { forceNewPage?: boolean } = {},
+  ): void {
+    const y = this.startSection(pdf, bg, 'Notes MJ', options.forceNewPage !== false);
+    pdf.setFont('helvetica', 'normal');
+    this.writeParagraph(pdf, bg, notes, y, 9, false);
+  }
+
+  private startSection(pdf: jsPDF, bg: string, title: string, newPage: boolean): number {
+    if (newPage) {
+      pdf.addPage();
+      pdf.addImage(bg, 'JPEG', 0, 0, PAGE_W, PAGE_H);
+    }
     let y = MARGIN + 4;
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(14);
-    pdf.text('Notes MJ', MARGIN, y);
-    y += 8;
-    pdf.setFont('helvetica', 'normal');
-    this.writeParagraph(pdf, bg, notes, y, 9, false);
+    pdf.setTextColor(70, 35, 10);
+    pdf.text(title, MARGIN, y);
+    return y + 10;
   }
 
   private writeParagraph(
