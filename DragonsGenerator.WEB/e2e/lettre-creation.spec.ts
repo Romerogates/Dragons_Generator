@@ -19,12 +19,12 @@ test.describe('Lettré L1 wizard', () => {
     await expect(page.getByText('Choisissez votre peuple')).toBeVisible({ timeout: 15_000 });
   });
 
-  test('shows level as read-only indicator after level step', async ({ page }) => {
+  test('keeps level editable only via previous step after leaving level', async ({ page }) => {
     await expect(page.getByText('Choisissez votre peuple')).toBeVisible({ timeout: 15_000 });
-    const levelIndicator = page.getByTestId('wizard-level-indicator');
-    await expect(levelIndicator).toBeVisible();
-    await expect(levelIndicator).toContainText('1');
+    // Plus d'indicateur sticky Niveau/BM/PV — le niveau se change en revenant à l'étape Niveau.
     await expect(page.getByTestId('wizard-level-select')).toHaveCount(0);
+    await expect(page.getByTestId('wizard-level-indicator')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /Retour au niveau/i })).toBeVisible();
   });
 
   test('completes full Lettré L1 creation path to summary', async ({ page }) => {
