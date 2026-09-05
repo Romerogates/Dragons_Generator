@@ -21,10 +21,11 @@ test.describe('Lettré L1 wizard', () => {
 
   test('keeps level editable only via previous step after leaving level', async ({ page }) => {
     await expect(page.getByText('Choisissez votre peuple')).toBeVisible({ timeout: 15_000 });
-    // Plus d'indicateur sticky Niveau/BM/PV — le niveau se change en revenant à l'étape Niveau.
+    // Plus d'indicateur sticky ni bouton « Retour au niveau » — on revient via la nav wizard.
     await expect(page.getByTestId('wizard-level-select')).toHaveCount(0);
     await expect(page.getByTestId('wizard-level-indicator')).toHaveCount(0);
-    await expect(page.getByRole('button', { name: /Retour au niveau/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Retour au niveau/i })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /Étape précédente|précédente/i })).toBeVisible();
   });
 
   test('completes full Lettré L1 creation path to summary', async ({ page }) => {
