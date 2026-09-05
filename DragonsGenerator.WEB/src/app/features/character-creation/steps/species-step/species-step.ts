@@ -155,7 +155,8 @@ export class SpeciesStep implements OnInit {
     if (!this.selectedSpeciesId()) return 'species';
     if (this.requiresSubspecies() && !this.selectedSubspeciesId()) return 'subspecies';
     if (this.nextUnresolvedChoice()) return 'choice';
-    // Selection finished — stay on species overview so Continuer / Changer work.
+    // Sélection terminée : rester sur la lignée (pas le carrousel peuples) au retour Atlas.
+    if (this.requiresSubspecies() && this.selectedSubspeciesId()) return 'subspecies';
     return 'species';
   });
 

@@ -14,9 +14,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
-*(vide — feedback tests 2.1 traité. Suite = suite checklist manuelle.)*
-
-**Livré suite feedback 2.1 :** mails parchemin + auto-login confirm ; pseudo navbar + cooldown 1×/sem ; wizard sans BM/PV trompeurs ; retour niveau espèce ; restore historique/personnalité ; modèles custom localStorage ; compétence/savoir +1 optionnel (custom) ; langues exotiques contraintes + source bonus ; totem druide icônes + lore.
+*(Feedback checklist §3 en cours — Drakeide / fiche / copie traités.)*
 
 **Tests manuels** : cocher `docs/CHECKLIST-TESTS-MANUELS.md`.
 

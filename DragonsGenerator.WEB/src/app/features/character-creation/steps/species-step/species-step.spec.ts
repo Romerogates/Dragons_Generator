@@ -205,6 +205,15 @@ describe('SpeciesStep', () => {
     expect(selection.traits.some((t) => t.refId === 'trait-breath')).toBeTrue();
   });
 
+  it('keeps finished drakeide selection on subspecies phase', () => {
+    component.selectedSpeciesId.set('sp-drakeide');
+    component.selectedSubspeciesId.set('sub-drakeide-rouge');
+    component.choiceAnswers.update((m) => new Map(m).set('choice-drakeide-asi', ['str']));
+    fixture.detectChanges();
+    expect(component.selectionComplete()).toBeTrue();
+    expect(component.currentPhase()).toBe('subspecies');
+  });
+
   it('continueToNextStep confirms and advances when selection is complete', () => {
     component.selectedSpeciesId.set('sp-humain');
     fixture.detectChanges();
@@ -259,6 +268,7 @@ describe('SpeciesStep', () => {
     expect(restored.selectedSpeciesId()).toBe('sp-drakeide');
     expect(restored.selectedSubspeciesId()).toBe('sub-drakeide-bleu');
     expect(restored.selectionComplete()).toBeTrue();
+    expect(restored.currentPhase()).toBe('subspecies');
   });
 
   it('clearSelection resets local picks and builder species', () => {

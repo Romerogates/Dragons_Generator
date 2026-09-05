@@ -16,6 +16,19 @@ import type { Character } from '@core/models/Character/character';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import { CharacterPlayView } from './character-play-view';
 
+type SheetViewMode = 'pdf' | 'ui';
+
+const VIEW_MODE_KEY = 'dg_character_sheet_view';
+
+function readStoredViewMode(): SheetViewMode {
+  try {
+    const v = localStorage.getItem(VIEW_MODE_KEY);
+    return v === 'ui' ? 'ui' : 'pdf';
+  } catch {
+    return 'pdf';
+  }
+}
+
 @Component({
   selector: 'app-character-sheet',
   standalone: true,
@@ -35,6 +48,8 @@ export class CharacterSheet implements OnInit, OnDestroy {
   readonly error = signal<string | null>(null);
   readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
   readonly pdfFailed = signal(false);
+  /** Interface affichée : PDF par défaut, bascule UI en un clic. */
+  readonly viewMode = signal<SheetViewMode>(readStoredViewMode());
   private rawBlobUrl: string | null = null;
 
   readonly auraFeatures = computed(() => {
@@ -64,6 +79,7 @@ export class CharacterSheet implements OnInit, OnDestroy {
       } catch (e) {
         console.error(e);
         this.pdfFailed.set(true);
+        if (this.viewMode() === 'pdf') this.viewMode.set('ui');
       }
     } finally {
       this.loading.set(false);
@@ -72,6 +88,19 @@ export class CharacterSheet implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     if (this.rawBlobUrl) URL.revokeObjectURL(this.rawBlobUrl);
+  }
+
+  setViewMode(mode: SheetViewMode): void {
+    this.viewMode.set(mode);
+    try {
+      localStorage.setItem(VIEW_MODE_KEY, mode);
+    } catch {
+      /* ignore quota / private mode */
+    }
+  }
+
+  toggleViewMode(): void {
+    this.setViewMode(this.viewMode() === 'pdf' ? 'ui' : 'pdf');
   }
 
   getName(): string {

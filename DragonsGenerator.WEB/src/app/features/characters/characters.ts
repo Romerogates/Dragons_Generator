@@ -232,18 +232,38 @@ export class Characters implements OnInit {
 
   duplicateCharacter(character: Character, event: Event): void {
     event.stopPropagation();
+    const localId = crypto.randomUUID();
     const duplicate: Character = {
       ...character,
-      id: crypto.randomUUID(),
+      id: localId,
       name: `${this.getCharName(character)} (copie)`,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      // Évite un PUT sur un id fantôme (copie d'un perso déjà cloudSynced).
+      cloudSynced: false,
     };
 
     this.characters.update((chars) => [duplicate, ...chars]);
-    if (this.auth.isLoggedIn()) {
-      this.cloud.save(duplicate).subscribe({ error: () => {} });
-    }
+    if (!this.auth.isLoggedIn()) return;
+
+    this.cloud.save(duplicate).subscribe({
+      next: (serverId) => {
+        if (!serverId || serverId === localId) {
+          this.characters.update((chars) =>
+            chars.map((c) => (c.id === localId ? { ...c, cloudSynced: true } : c)),
+          );
+          return;
+        }
+        this.characters.update((chars) =>
+          chars.map((c) =>
+            c.id === localId ? { ...c, id: serverId, cloudSynced: true } : c,
+          ),
+        );
+      },
+      error: () => {
+        this.offlineSync.queueCharacterSave(duplicate, false);
+      },
+    });
   }
 
   downloadPdf(character: Character, event: Event): void {
@@ -290,7 +310,17 @@ export class Characters implements OnInit {
           removeLocal();
           this.deleting.set(false);
         },
-        error: () => {
+        error: (err: unknown) => {
+          // Copie jamais synchronisée / déjà absente côté serveur : on retire quand même.
+          const status =
+            err && typeof err === 'object' && 'status' in err
+              ? Number((err as { status?: number }).status)
+              : 0;
+          if (status === 404) {
+            removeLocal();
+            this.deleting.set(false);
+            return;
+          }
           this.deleteError.set('Échec de la suppression cloud. Réessayez dans un instant.');
           this.deleting.set(false);
         },

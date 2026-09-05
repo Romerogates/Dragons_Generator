@@ -178,6 +178,7 @@ describe('Characters', () => {
             pendingCount: signal(0),
             flushIfPossible: () => undefined,
             getPendingCharacters: getPendingSpy,
+            queueCharacterSave: jasmine.createSpy('queueCharacterSave'),
           },
         },
         {
@@ -385,13 +386,17 @@ describe('Characters', () => {
 
     it('duplicates when logged in', () => {
       isLoggedInSignal.set(true);
-      const c = sampleCharacter();
+      const c = sampleCharacter({ cloudSynced: true });
       const ev = new Event('click');
       component.characters.set([c]);
       component.duplicateCharacter(c, ev);
       expect(component.characters().length).toBe(2);
       expect(component.characters()[0].name).toBe('Aria (copie)');
       expect(cloudSaveSpy).toHaveBeenCalled();
+      const saved = cloudSaveSpy.calls.mostRecent().args[0] as Character;
+      expect(saved.cloudSynced).toBeFalse();
+      expect(component.characters()[0].id).toBe('char-dup');
+      expect(component.characters()[0].cloudSynced).toBeTrue();
     });
 
     it('confirms delete only when names match', () => {
@@ -448,6 +453,19 @@ describe('Characters', () => {
       component.deleteCharacter();
       expect(component.deleteError()).toContain('Échec de la suppression');
       expect(component.characters().length).toBe(1);
+      expect(component.deleting()).toBe(false);
+    });
+
+    it('removes locally when cloud delete returns 404', () => {
+      isLoggedInSignal.set(true);
+      cloudDeleteSpy.and.returnValue(throwError(() => ({ status: 404 })));
+      const c = sampleCharacter();
+      component.characters.set([c]);
+      component.characterToDelete.set(c);
+      component.deleteConfirmName.set('Aria');
+      component.deleteCharacter();
+      expect(component.characters()).toEqual([]);
+      expect(component.deleteError()).toBeNull();
       expect(component.deleting()).toBe(false);
     });
   });
