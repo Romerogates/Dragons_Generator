@@ -118,9 +118,9 @@ export class AdminPage implements OnInit {
 
   sendReset(id: string): void {
     this.message.set(null);
-    this.http.post(`${this.api}/admin/users/${id}/send-reset-email`, {}).subscribe({
-      next: (res: any) => this.message.set(res?.message || 'Email envoyé.'),
-      error: (err) =>
+    this.http.post<{ message?: string }>(`${this.api}/admin/users/${id}/send-reset-email`, {}).subscribe({
+      next: (res) => this.message.set(res?.message || 'Email envoyé.'),
+      error: (err: { error?: { errors?: { reason?: string }[] } }) =>
         this.error.set(err?.error?.errors?.[0]?.reason || "Échec d'envoi email."),
     });
   }

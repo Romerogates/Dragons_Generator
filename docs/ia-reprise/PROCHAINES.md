@@ -16,6 +16,9 @@ _(Backlog qualité vide — Anthony choisit le prochain sujet produit / polish.)
 
 ## Déjà livré (ne pas refaire)
 
+- **Languages / identity UX + typage** — `classJson: CharacterClass` ; erreur langues affichée ; catégories FR ; identity sexe typé, placeholders traits, résumé avec sous-classe ; alignment option sans `selected` cassé.
+- **Typage equipment-step + fiche** — slots historique via `ExtendedCharacterCreation` (plus de `as any`) ; `character-sheet` getSpecies/getClass typés sur `Character`.
+- **Typage auth/admin + lint campagne** — `confirm-email` / `admin` sans `any` ; import inutilisé `SessionTimelineItem` retiré.
 - **Typage class-step / abilities-step** — plus de `any` : `ClassChoicePool` / `FeatureJson` enrichi, helpers `asChoicePools`/`asFeatureJsonList` ; callbacks `Feat[]` / `Equipment[]` côté caracs.
 - **Tests invites reject/decline** — cas limites API : decline + re-invite, decline par tiers → 404, non-ami → 400 / doublon pending → 409, reject perso sans proposition pending / non-MJ → 404.
 - **Typage skills-step** — groupes outils (`BgToolChoiceGroup` / `ToolCatalogGroup`) + handlers UI ; `normalizeToolOption(unknown)` ; plus de `any` dans l’étape Compétences.

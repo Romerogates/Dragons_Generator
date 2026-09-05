@@ -800,7 +800,10 @@ export class SpeciesStep implements OnInit {
     return Object.entries(asi)
       .filter(([, v]) => v !== 0)
       .map(([code, value]) => {
-        const label = (ABILITY_KEY_TO_LABEL as any)[code] ?? code;
+        const label =
+          code in ABILITY_KEY_TO_LABEL
+            ? ABILITY_KEY_TO_LABEL[code as keyof typeof ABILITY_KEY_TO_LABEL]
+            : code;
         return `${label} ${value > 0 ? '+' : ''}${value}`;
       })
       .join(', ');

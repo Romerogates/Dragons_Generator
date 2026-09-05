@@ -46,7 +46,7 @@
           >
           <select
             [ngModel]="c().sex"
-            (ngModelChange)="updateIdentity('sex', $event)"
+            (ngModelChange)="updateSex($event)"
             class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 cursor-pointer appearance-none"
           >
             <option value="X">Indéfini</option>
@@ -64,7 +64,7 @@
             (ngModelChange)="updateIdentity('alignment', $event)"
             class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 cursor-pointer appearance-none"
           >
-            <option value="" disabled selected>Choisir un alignement...</option>
+            <option value="">Choisir un alignement...</option>
             @for (align of alignments; track align) {
               <option [value]="align">{{ align }}</option>
             }
@@ -107,6 +107,7 @@
             [ngModel]="c().traits"
             (ngModelChange)="updateIdentity('traits', $event)"
             rows="3"
+            placeholder="Ex. : franc, curieux, loyal envers ses compagnons…"
             class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 resize-none text-xs leading-relaxed"
           ></textarea>
         </div>
@@ -119,6 +120,7 @@
             [ngModel]="c().ideal"
             (ngModelChange)="updateIdentity('ideal', $event)"
             rows="3"
+            placeholder="Ex. : la liberté, la connaissance, la justice…"
             class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 resize-none text-xs leading-relaxed"
           ></textarea>
         </div>
@@ -131,6 +133,7 @@
             [ngModel]="c().bonds"
             (ngModelChange)="updateIdentity('bonds', $event)"
             rows="3"
+            placeholder="Ex. : ma famille, mon mentor, mon village natal…"
             class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 resize-none text-xs leading-relaxed"
           ></textarea>
         </div>
@@ -143,6 +146,7 @@
             [ngModel]="c().flaws"
             (ngModelChange)="updateIdentity('flaws', $event)"
             rows="3"
+            placeholder="Ex. : trop confiant, cupide, impulsif…"
             class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 resize-none text-xs leading-relaxed"
           ></textarea>
         </div>

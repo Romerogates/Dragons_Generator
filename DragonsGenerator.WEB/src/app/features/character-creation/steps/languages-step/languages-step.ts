@@ -13,11 +13,18 @@ import { CommonModule } from '@angular/common';
 import { DataService } from '@core/services/data.service';
 import { CharacterBuilderService } from '@core/services/character-builder.service';
 import type { Language } from '@core/models/Languages/language';
+import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
 import { subclassBonusProficiencies } from '@core/utils/progression-choices.util';
 
 const CLASS_GRANTED_LANGUAGES: Record<string, string> = {
   'cls-druide': 'Langue des druides',
   'cls-roublard': 'Argot des voleurs',
+};
+
+const LANGUAGE_CATEGORY_LABEL: Record<string, string> = {
+  base: 'Commune',
+  exotique: 'Exotique',
+  secret: 'Secrète',
 };
 
 @Component({
@@ -36,7 +43,7 @@ export class LanguagesStep implements OnInit {
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly expandedId = signal<string | null>(null);
-  readonly classJson = signal<any>(null);
+  readonly classJson = signal<CharacterClass | null>(null);
 
   /** Langues fixes accordées par la sous-classe (ex. draconique, argot des voleurs…), en noms. */
   readonly subclassFixedLanguageNames = computed<string[]>(() => {
@@ -186,6 +193,11 @@ export class LanguagesStep implements OnInit {
 
   speakersLabel(lang: Language): string {
     return lang.speakers.primary.map((s) => s.label).join(', ');
+  }
+
+  categoryLabel(category: string | null | undefined): string {
+    if (!category) return '';
+    return LANGUAGE_CATEGORY_LABEL[category] ?? category;
   }
 
   confirm(): void {

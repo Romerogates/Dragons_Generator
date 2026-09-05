@@ -22,6 +22,15 @@
     </div>
   }
 
+  @if (error(); as errMsg) {
+    <div
+      class="mt-4 max-w-lg w-full mx-4 px-4 py-3 rounded-xl bg-red-950/40 border border-red-900/50 text-red-300 text-sm text-center"
+      role="alert"
+    >
+      {{ errMsg }}
+    </div>
+  }
+
   @if (!loading() && !error()) {
     <div class="w-full max-w-6xl px-4 flex flex-col items-center pb-8">
       <div class="w-full flex flex-col items-center mb-10">
@@ -89,7 +98,7 @@
                           'text-red-400 border-red-900/50': lang.data!.category === 'secret',
                         }"
                       >
-                        {{ lang.data!.category }}
+                        {{ categoryLabel(lang.data!.category) }}
                       </span>
                     </div>
 

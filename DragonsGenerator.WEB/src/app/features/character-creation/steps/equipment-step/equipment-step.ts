@@ -99,10 +99,10 @@ export class EquipmentStep implements OnInit {
     const map = this.catalogMap();
     if (map.size === 0) return [];
 
-    const cAny = this.builder.creation() as any;
+    const c = this.builder.creation();
     const rawSlots: RawSlot[] = [
-      ...(this.builder.creation().startingEquipmentSlots ?? []),
-      ...(cAny.backgroundEquipmentSlots ?? []),
+      ...(c.startingEquipmentSlots ?? []),
+      ...(c.backgroundEquipmentSlots ?? []),
     ];
 
     return rawSlots.map((raw) => {
@@ -430,7 +430,7 @@ export class EquipmentStep implements OnInit {
   private buildInstance(eq: EquipmentRaw | undefined, qty: number): EquipmentInstance | null {
     if (!eq) return null;
 
-    const data = (eq.data ?? {}) as Record<string, any>;
+    const data = (eq.data ?? {}) as Record<string, unknown>;
     const isArmor = eq.type === 'ARMOR';
     const isShield = isArmor && eq.subtype === 'SHIELD';
     const isWeapon = eq.type === 'WEAPON';
@@ -469,7 +469,7 @@ export class EquipmentStep implements OnInit {
   }
 
   readonly backgroundFixedItems = computed<EquipmentInstance[]>(() => {
-    return (this.builder.creation() as any).backgroundEquipment ?? [];
+    return this.builder.creation().backgroundEquipment ?? [];
   });
 
   readonly backgroundName = computed<string | null>(() => {

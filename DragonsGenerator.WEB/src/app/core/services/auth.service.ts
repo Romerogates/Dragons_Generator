@@ -125,8 +125,8 @@ export class AuthService {
     );
   }
 
-  confirmEmail(token: string): Observable<unknown> {
-    return this.http.get(`${this.api}/auth/confirm-email`, { params: { token } });
+  confirmEmail(token: string): Observable<{ message?: string }> {
+    return this.http.get<{ message?: string }>(`${this.api}/auth/confirm-email`, { params: { token } });
   }
 
   forgotPassword(email: string): Observable<unknown> {

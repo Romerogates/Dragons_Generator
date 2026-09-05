@@ -75,12 +75,12 @@ export class ConfirmEmailPage implements OnInit {
       return;
     }
     this.auth.confirmEmail(token).subscribe({
-      next: (res: any) => {
+      next: (res: { message?: string } | null) => {
         this.loading.set(false);
         this.ok.set(true);
         this.message.set(res?.message || 'Email confirmé.');
       },
-      error: (err) => {
+      error: (err: { error?: { errors?: { reason?: string }[] } }) => {
         this.loading.set(false);
         this.message.set(err?.error?.errors?.[0]?.reason || 'Confirmation impossible.');
       },

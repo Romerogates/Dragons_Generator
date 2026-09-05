@@ -64,7 +64,6 @@ import { handoutIdFromActivity } from './campaign-activity.util';
 import { CampaignSessionCacheService } from '@core/services/campaign-session-cache.service';
 import { CampaignInitiativeInline } from '../campaign-initiative-inline/campaign-initiative-inline';
 import { CampaignPlayerSheet } from '../campaign-player-sheet/campaign-player-sheet';
-import type { SessionTimelineItem } from '@core/models/Campaign/campaign';
 import { LightMarkdownPipe } from '@shared/pipes/light-markdown.pipe';
 
 type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'activity' | 'handouts' | 'maps';

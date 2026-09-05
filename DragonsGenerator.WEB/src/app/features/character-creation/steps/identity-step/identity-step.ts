@@ -51,7 +51,9 @@ export class IdentityStep implements OnInit {
     const cr = this.c();
     const parts: string[] = [];
     if (cr.speciesName) parts.push(cr.speciesName);
-    if (cr.className) parts.push(cr.className);
+    if (cr.className) {
+      parts.push(cr.subclassName ? `${cr.className} (${cr.subclassName})` : cr.className);
+    }
     if (cr.backgroundName) parts.push(cr.backgroundName);
     return parts.join(' · ') || 'Aventurier';
   });
@@ -61,8 +63,17 @@ export class IdentityStep implements OnInit {
     this.builder.setIdentity({ [field]: value });
   }
 
+  updateSex(value: string): void {
+    const sex = value === 'M' || value === 'F' || value === 'X' ? value : 'X';
+    this.builder.setIdentity({ sex });
+  }
+
   /** Navigation vers l'étape suivante (Récapitulatif). */
   confirm(): void {
+    if (!this.c().name.trim()) {
+      this.generationError.set('Le nom est requis.');
+      return;
+    }
     this.builder.nextStep();
   }
 

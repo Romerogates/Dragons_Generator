@@ -79,20 +79,17 @@ export class CharacterSheet implements OnInit, OnDestroy {
   }
 
   getSpecies(): string {
-    const c: any = this.character();
-    if (c?.species && typeof c.species === 'object') return c.species.label || '';
-    return c?.speciesName || '';
+    const c = this.character();
+    return c?.species?.label || '';
   }
 
   getClass(): string {
-    const c: any = this.character();
-    if (Array.isArray(c?.classes) && c.classes.length > 0) {
-      const cls = c.classes[0];
-      return cls.subclassLabel
-        ? `${cls.classLabel} — ${cls.subclassLabel}`
-        : cls.classLabel || '';
-    }
-    return c?.className || '';
+    const c = this.character();
+    const cls = c?.classes?.[0];
+    if (!cls) return '';
+    return cls.subclassLabel
+      ? `${cls.classLabel} — ${cls.subclassLabel}`
+      : cls.classLabel || '';
   }
 
   getLevel(): number {
