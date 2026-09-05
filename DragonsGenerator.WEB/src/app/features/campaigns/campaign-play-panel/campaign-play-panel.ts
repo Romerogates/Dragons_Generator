@@ -20,6 +20,7 @@ import type { Character } from '@core/models/Character/character';
 import {
   ActiveCombat,
   CampaignData,
+  CampaignMember,
   CampaignSession,
   CampaignSessionMode,
   CampaignSessionStatus,
@@ -202,6 +203,19 @@ export class CampaignPlayPanel implements OnDestroy {
     this.players().filter((p) => p.proposalStatus === 'approved' && p.approvedCharacterId),
   );
 
+  /** PJ approuvés pas encore dans le combat actif. */
+  readonly availablePlayerAllies = computed(() => {
+    const inCombat = new Set(
+      (this.activeCombat()?.combatants ?? [])
+        .map((c) => c.memberUserId)
+        .filter((id): id is string => !!id),
+    );
+    return this.approvedPlayers().filter((p) => !inCombat.has(p.userId));
+  });
+
+  readonly allyPickerOpen = signal(false);
+  readonly importingAllyId = signal<string | null>(null);
+
   readonly awardingXpId = signal<string | null>(null);
 
   readonly combatMissingInitCount = computed(() => {
@@ -337,37 +351,54 @@ export class CampaignPlayPanel implements OnDestroy {
   }
 
   importPartyIntoCombat(): void {
-    const session = this.activeSession();
-    if (!session || this.importingParty()) return;
-
     const approved = this.approvedPlayers();
     if (!approved.length) {
       this.setFeedback(
         'err',
-        'Aucun personnage joueur approuvé. Ajoutez des combattants manuellement.',
+        'Aucun personnage joueur approuvé. Ajoutez un allié joueur ou un PNJ.',
       );
       return;
     }
-
-    this.importingParty.set(true);
-    this.clearFeedback();
-    const campaignId = this.campaign().id;
     const existing = this.activeCombat();
     const existingMemberIds = new Set(
       (existing?.combatants ?? [])
         .map((c) => c.memberUserId)
         .filter((id): id is string => !!id),
     );
-
     const toImport = approved.filter((p) => !existingMemberIds.has(p.userId));
     if (!toImport.length) {
-      this.importingParty.set(false);
       this.setFeedback('ok', 'Tous les PJ approuvés sont déjà dans le combat.');
       return;
     }
+    this.importMembersIntoCombat(toImport);
+  }
+
+  toggleAllyPicker(): void {
+    this.allyPickerOpen.update((v) => !v);
+  }
+
+  /** Ajoute un PJ approuvé comme allié (crée le combat s’il n’existe pas). */
+  importPlayerAlly(member: CampaignMember): void {
+    this.importMembersIntoCombat([member], { closePicker: true });
+  }
+
+  private importMembersIntoCombat(
+    members: CampaignMember[],
+    options?: { closePicker?: boolean },
+  ): void {
+    const session = this.activeSession();
+    if (!session || !members.length) return;
+    if (this.importingParty() || this.importingAllyId()) return;
+
+    this.importingParty.set(true);
+    if (members.length === 1) this.importingAllyId.set(members[0]!.id);
+    this.clearFeedback();
+
+    const campaignId = this.campaign().id;
+    const existing = this.activeCombat();
 
     type ImportRow = { combatant: Combatant; incomplete: boolean };
-    const requests = toImport.map((p) =>
+    const requests = members.map((p) =>
       this.campaigns.getMemberCharacter(campaignId, p.id, 'approved').pipe(
         map((res): ImportRow => {
           const character = {
@@ -389,6 +420,7 @@ export class CampaignPlayPanel implements OnDestroy {
               kind: 'player',
               initiativeBonus: 0,
               memberUserId: p.userId,
+              armorClass: 10,
             }),
             incomplete: true,
           } satisfies ImportRow),
@@ -399,21 +431,27 @@ export class CampaignPlayPanel implements OnDestroy {
     forkJoin(requests).subscribe({
       next: (rows) => {
         this.importingParty.set(false);
+        this.importingAllyId.set(null);
+        if (options?.closePicker) this.allyPickerOpen.set(false);
+
         const partyCombatants = rows.map((r) => r.combatant);
         const incomplete = rows.filter((r) => r.incomplete).length;
-        const skipped = approved.length - toImport.length;
+        const current = this.activeCombat();
 
-        if (existing) {
+        if (current) {
           this.patchCombat({
-            ...existing,
-            combatants: [...existing.combatants, ...partyCombatants],
+            ...current,
+            combatants: [...current.combatants, ...partyCombatants],
           });
         } else {
-          this.setActiveCombat(createActiveCombat(partyCombatants, { label: 'Party' }));
+          this.setActiveCombat(createActiveCombat(partyCombatants, { label: 'Combat' }));
         }
 
-        const parts = [`+${partyCombatants.length} PJ importé(s)`];
-        if (skipped > 0) parts.push(`${skipped} déjà présent(s) ignoré(s)`);
+        const parts = [
+          members.length === 1
+            ? `${partyCombatants[0]?.name ?? 'Héros'} ajouté`
+            : `+${partyCombatants.length} PJ importé(s)`,
+        ];
         if (incomplete > 0) {
           parts.push(`${incomplete} fiche(s) incomplète(s) — vérifiez PV / init`);
         }
@@ -421,7 +459,8 @@ export class CampaignPlayPanel implements OnDestroy {
       },
       error: () => {
         this.importingParty.set(false);
-        this.setFeedback('err', 'Impossible d’importer la party. Réessayez.');
+        this.importingAllyId.set(null);
+        this.setFeedback('err', 'Impossible d’ajouter le personnage. Réessayez.');
       },
     });
   }
@@ -466,8 +505,9 @@ export class CampaignPlayPanel implements OnDestroy {
     this.addAllyCombatant();
   }
 
-  /** Allié PNJ vide (CA 10 par défaut règles) — ou démarre un combat s’il n’y en a pas. */
+  /** Allié PNJ générique (CA 10) — pour un héros joueur, utiliser le sélecteur. */
   addAllyCombatant(): void {
+    this.allyPickerOpen.set(false);
     const combat = this.activeCombat();
     if (!combat) {
       if (!this.confirmReplaceCombat()) return;
