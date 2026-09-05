@@ -105,19 +105,7 @@ export class CampaignPdfService {
       pregenHook: publicHook,
       pregenMeta: meta,
     });
-    if (publicHook.trim()) {
-      pdf.addPage();
-      pdf.addImage(bg, 'JPEG', 0, 0, PAGE_W, PAGE_H);
-      let y = MARGIN + 4;
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(14);
-      pdf.setTextColor(70, 35, 10);
-      pdf.text('Accroche', MARGIN, y);
-      y += 8;
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(10);
-      this.writeParagraph(pdf, bg, publicHook, y, 10, false);
-    }
+    // Accroche déjà sur la couverture — pas de 2ᵉ page quasi vide.
     pdf.save(this.safeName(`${characterName}-pre-tire.pdf`));
   }
 
@@ -177,19 +165,14 @@ export class CampaignPdfService {
     bg: string,
     entries: CreaturePrintEntry[],
     sectionTitle: string,
-  ): Promise<void> {
-    pdf.addPage();
-    pdf.addImage(bg, 'JPEG', 0, 0, PAGE_W, PAGE_H);
-    let y = MARGIN + 4;
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(16);
-    pdf.setTextColor(60, 40, 20);
-    pdf.text(sectionTitle, MARGIN, y);
-    y += 12;
+    continueAtY?: number,
+  ): Promise<number> {
+    let y = this.startSection(pdf, bg, sectionTitle, { continueAtY });
 
     for (const entry of entries) {
       y = this.drawCreatureBlock(pdf, bg, entry, y);
     }
+    return y;
   }
 
   private drawCreatureBlock(pdf: jsPDF, bg: string, entry: CreaturePrintEntry, startY: number): number {
@@ -269,7 +252,7 @@ export class CampaignPdfService {
     y = this.drawNamedEntries(pdf, bg, 'RÉACTIONS', c.reactions, y);
     y = this.drawNamedEntries(pdf, bg, 'ACTIONS LÉGENDAIRES', c.legendaryActions, y);
 
-    return y + 8;
+    return y + 4;
   }
 
   private drawNamedEntries(
@@ -325,9 +308,9 @@ export class CampaignPdfService {
     pdf.setTextColor(90, 45, 15);
     pdf.text('DRAGONS', PAGE_W / 2, 28, { align: 'center' });
 
-    pdf.setFontSize(kind === 'pregen-hero' ? 24 : 22);
+    pdf.setFontSize(kind === 'pregen-hero' ? 22 : 18);
     pdf.setTextColor(70, 35, 10);
-    const titleY = kind === 'pregen-hero' ? 78 : 72;
+    const titleY = kind === 'pregen-hero' ? 58 : 42;
     pdf.text(title, PAGE_W / 2, titleY, { align: 'center', maxWidth: CONTENT_W });
 
     pdf.setFont('helvetica', 'normal');
@@ -340,9 +323,9 @@ export class CampaignPdfService {
         : kind === 'pregen-hero'
           ? options.subtitle ?? 'Personnage pré-tiré'
           : 'Pack Maître du Jeu';
-    pdf.text(options.subtitle ?? defaultSubtitle, PAGE_W / 2, titleY + 14, { align: 'center' });
+    pdf.text(options.subtitle ?? defaultSubtitle, PAGE_W / 2, titleY + 10, { align: 'center' });
 
-    let y = titleY + 28;
+    let y = titleY + 20;
 
     if (kind === 'bestiary') {
       pdf.setFontSize(10);
@@ -413,19 +396,19 @@ export class CampaignPdfService {
     y = this.drawSynopsisSection(pdf, bg, data, y);
 
     if (creatureEntries.length) {
-      await this.appendCreaturesToPdf(pdf, bg, creatureEntries, 'Créatures de l\'aventure');
+      y = await this.appendCreaturesToPdf(pdf, bg, creatureEntries, 'Créatures de l\'aventure', y);
     }
 
     if (data.encounters.length) {
-      this.drawEncountersSection(pdf, bg, data.encounters);
+      y = this.drawEncountersSection(pdf, bg, data.encounters, { continueAtY: y });
     }
 
     if (playerSummaries.length) {
-      this.drawPlayerSummariesSection(pdf, bg, playerSummaries);
+      y = this.drawPlayerSummariesSection(pdf, bg, playerSummaries, { continueAtY: y });
     }
 
     if (data.notes?.trim()) {
-      this.drawNotesSection(pdf, bg, data.notes);
+      this.drawNotesSection(pdf, bg, data.notes, { continueAtY: y });
     }
 
     return pdf;
@@ -445,7 +428,7 @@ export class CampaignPdfService {
 
   /** Bas approximatif du bloc titre/infos sur la couverture (sans carte). */
   private estimateCoverContentBottom(data: CampaignData): number {
-    let y = 72 + 28;
+    let y = 42 + 20;
     if (data.tone) y += 7;
     const infoLines = [
       `Niveau des héros : ${data.partyLevel}`,
@@ -453,34 +436,34 @@ export class CampaignPdfService {
       data.setting?.trim(),
     ].filter(Boolean).length;
     y += infoLines * 6;
-    return y + 14;
+    return y + 8;
   }
 
   private drawSynopsisSection(pdf: jsPDF, bg: string, data: CampaignData, startY: number): number {
     if (!data.adventure?.trim()) return startY;
     let y = startY;
-    if (y > PAGE_H - 50) {
+    if (y > PAGE_H - 40) {
       pdf.addPage();
       pdf.addImage(bg, 'JPEG', 0, 0, PAGE_W, PAGE_H);
       y = MARGIN + 4;
     }
     pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(14);
+    pdf.setFontSize(12);
     pdf.setTextColor(70, 35, 10);
     pdf.text('Synopsis', MARGIN, y);
-    y += 8;
+    y += 6;
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(9);
-    return this.writeParagraph(pdf, bg, data.adventure, y, 9, false) + 6;
+    return this.writeParagraph(pdf, bg, data.adventure, y, 9, false) + 4;
   }
 
   private drawEncountersSection(
     pdf: jsPDF,
     bg: string,
     encounters: EncounterGroup[],
-    options: { forceNewPage?: boolean } = {},
-  ): void {
-    let y = this.startSection(pdf, bg, 'Rencontres', options.forceNewPage !== false);
+    options: { forceNewPage?: boolean; continueAtY?: number } = {},
+  ): number {
+    let y = this.startSection(pdf, bg, 'Rencontres', options);
 
     for (const enc of encounters) {
       if (y > PAGE_H - 30) {
@@ -489,77 +472,90 @@ export class CampaignPdfService {
         y = MARGIN;
       }
       pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(11);
+      pdf.setFontSize(10);
       pdf.setTextColor(70, 35, 10);
       pdf.text(enc.name, MARGIN, y);
-      y += 5;
+      y += 4;
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(8);
       pdf.text(`XP vaincus : ${encounterTotalXp(enc)}`, MARGIN, y);
-      y += 5;
+      y += 4;
       for (const cr of enc.creatures) {
         const line = `• ${cr.customName || cr.creatureName} ×${cr.quantity} (${cr.xp} XP/u) — ${cr.defeated}/${cr.quantity} vaincus`;
         y = this.writeLines(pdf, bg, pdf.splitTextToSize(line, CONTENT_W), y, 8);
       }
-      y += 4;
+      y += 2.5;
     }
+    return y;
   }
 
   private drawPlayerSummariesSection(
     pdf: jsPDF,
     bg: string,
     summaries: PlayerGmSummary[],
-    options: { forceNewPage?: boolean } = {},
-  ): void {
-    let y = this.startSection(pdf, bg, 'Synthèse des héros (MJ)', options.forceNewPage !== false);
+    options: { forceNewPage?: boolean; continueAtY?: number } = {},
+  ): number {
+    let y = this.startSection(pdf, bg, 'Synthèse des héros (MJ)', options);
 
     for (const p of summaries) {
-      if (y > PAGE_H - 35) {
+      if (y > PAGE_H - 28) {
         pdf.addPage();
         pdf.addImage(bg, 'JPEG', 0, 0, PAGE_W, PAGE_H);
         y = MARGIN;
       }
       pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(11);
+      pdf.setFontSize(10);
       pdf.setTextColor(70, 35, 10);
       pdf.text(p.name, MARGIN, y);
-      y += 5;
+      y += 4;
       pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(9);
+      pdf.setFontSize(8);
       const lines = [
         `Espèce : ${p.species}  ·  Classe : ${p.className}`,
         `CA ${p.armorClass}  ·  PV ${p.hitPoints}  ·  Init. ${p.initiative}`,
         `Attaques : ${p.attacks}`,
       ];
       for (const line of lines) {
-        y = this.writeLines(pdf, bg, pdf.splitTextToSize(line, CONTENT_W), y, 9);
+        y = this.writeLines(pdf, bg, pdf.splitTextToSize(line, CONTENT_W), y, 8);
       }
-      y += 6;
+      y += 3;
     }
+    return y;
   }
 
   private drawNotesSection(
     pdf: jsPDF,
     bg: string,
     notes: string,
-    options: { forceNewPage?: boolean } = {},
-  ): void {
-    const y = this.startSection(pdf, bg, 'Notes MJ', options.forceNewPage !== false);
+    options: { forceNewPage?: boolean; continueAtY?: number } = {},
+  ): number {
+    const y = this.startSection(pdf, bg, 'Notes MJ', options);
     pdf.setFont('helvetica', 'normal');
-    this.writeParagraph(pdf, bg, notes, y, 9, false);
+    return this.writeParagraph(pdf, bg, notes, y, 9, false);
   }
 
-  private startSection(pdf: jsPDF, bg: string, title: string, newPage: boolean): number {
-    if (newPage) {
+  private startSection(
+    pdf: jsPDF,
+    bg: string,
+    title: string,
+    options: { forceNewPage?: boolean; continueAtY?: number } = {},
+  ): number {
+    const continueAt = options.continueAtY;
+    const force = options.forceNewPage === true;
+    const needNewPage =
+      force || continueAt == null || continueAt > PAGE_H - 36;
+
+    if (needNewPage) {
       pdf.addPage();
       pdf.addImage(bg, 'JPEG', 0, 0, PAGE_W, PAGE_H);
     }
-    let y = MARGIN + 4;
+
+    let y = needNewPage ? MARGIN + 4 : continueAt! + 5;
     pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(14);
+    pdf.setFontSize(12);
     pdf.setTextColor(70, 35, 10);
     pdf.text(title, MARGIN, y);
-    return y + 10;
+    return y + 7;
   }
 
   private writeParagraph(

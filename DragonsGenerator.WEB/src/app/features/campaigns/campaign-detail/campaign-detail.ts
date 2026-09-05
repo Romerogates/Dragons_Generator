@@ -2,11 +2,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   Injector,
   OnDestroy,
   OnInit,
   signal,
+  untracked,
   viewChild,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
@@ -51,7 +53,6 @@ import { StoryBuilderService } from '@core/services/story-builder.service';
 import { CampaignPregenGeneratorService } from '@core/services/campaign-pregen-generator.service';
 import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
 import { AiGenerationProgressBar } from '@shared/components/ai-generation-progress-bar/ai-generation-progress-bar';
-import { CampaignPlayPanel } from '../campaign-play-panel/campaign-play-panel';
 import { CampaignDungeonMaps } from '../campaign-dungeon-maps/campaign-dungeon-maps';
 import { CampaignDetailStats } from './campaign-detail-stats/campaign-detail-stats';
 import { CampaignDetailRoster } from './campaign-detail-roster/campaign-detail-roster';
@@ -63,6 +64,7 @@ import type { SessionDateChangeEvent, SessionPatchEvent } from './campaign-detai
 import type { HandoutPatchEvent, HandoutPublishEvent } from './campaign-detail-handouts/campaign-detail-handouts';
 import { handoutIdFromActivity } from './campaign-activity.util';
 import { CampaignSessionCacheService } from '@core/services/campaign-session-cache.service';
+import { CampaignSessionDockService } from '@core/services/campaign-session-dock.service';
 import { CampaignInitiativeInline } from '../campaign-initiative-inline/campaign-initiative-inline';
 import { CampaignPlayerSheet } from '../campaign-player-sheet/campaign-player-sheet';
 import { LightMarkdownPipe } from '@shared/pipes/light-markdown.pipe';
@@ -78,7 +80,6 @@ type TabDef = { id: Tab; label: string; icon: string };
     FormsModule,
     RouterLink,
     ProfileAvatarComponent,
-    CampaignPlayPanel,
     CampaignDungeonMaps,
     CampaignDetailStats,
     CampaignDetailRoster,
@@ -108,6 +109,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   private storyBuilder = inject(StoryBuilderService);
   private pregenGenerator = inject(CampaignPregenGeneratorService);
   private sessionCache = inject(CampaignSessionCacheService);
+  private sessionDock = inject(CampaignSessionDockService);
   private handoff = inject(CharacterHandoffService);
   readonly aiProgress = inject(AiGenerationProgressService);
 
@@ -159,6 +161,19 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   private persistTail: Promise<void> = Promise.resolve();
 
   private readonly dungeonMapsComp = viewChild(CampaignDungeonMaps);
+
+  constructor() {
+    effect(() => {
+      const c = this.campaign();
+      untracked(() => this.sessionDock.bindCampaign(c));
+    });
+    effect(() => {
+      const live = this.sessionDock.liveCampaign();
+      const cur = this.campaign();
+      if (!live || !cur || live.id !== cur.id || live === cur) return;
+      untracked(() => this.campaign.set(live));
+    });
+  }
 
   readonly isLoggedIn = this.auth.isLoggedIn;
 
@@ -346,8 +361,14 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const data = { ...this.campaign()!.data, activeSessionId: sessionId };
     this.campaign.update((prev) => (prev ? { ...prev, data } : prev));
     this.persist(c.title, data, () => {
-      this.router.navigate(['/campaigns', c.id, 'play']);
+      this.sessionDock.bindCampaign(this.campaign());
+      this.sessionDock.open();
     });
+  }
+
+  openSessionDock(): void {
+    this.sessionDock.bindCampaign(this.campaign());
+    this.sessionDock.open();
   }
 
   ngOnInit(): void {
@@ -476,6 +497,13 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       this.dungeonMapsComp()?.flushPendingSave();
     }
     this.tab.set(t);
+    if (t === 'handouts' && this.campaign()?.isOwner) {
+      if (this.pdfPreviewKind() === 'bestiary' && this.campaign()!.data.creatures.length) {
+        this.loadBestiaryPreview();
+      } else {
+        this.loadPackPreview();
+      }
+    }
     if (t === 'activity') {
       this.loadActivity();
     }

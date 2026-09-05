@@ -96,8 +96,36 @@
               />
             }
 
-            @if (c.isOwner || c.data.activeSessionId) {
-              <app-campaign-play-panel [campaign]="c" (campaignChange)="campaign.set($event)" />
+            @if (c.data.activeSessionId) {
+              <div
+                class="bg-emerald-950/25 border border-emerald-700/50 rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-3"
+              >
+                <div class="min-w-0">
+                  <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                    Session en cours
+                  </p>
+                  <p class="text-sm font-serif text-emerald-100 truncate">
+                    {{ activePlaySession()?.title ?? 'Table de jeu' }}
+                  </p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    class="px-3 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-700 text-white"
+                    (click)="openSessionDock()"
+                  >
+                    Ouvrir
+                  </button>
+                  @if (c.isOwner) {
+                    <a
+                      [routerLink]="['/campaigns', c.id, 'play']"
+                      class="px-3 py-2 rounded-xl text-[10px] font-black uppercase border border-emerald-700/50 text-emerald-300"
+                    >
+                      Plein écran
+                    </a>
+                  }
+                </div>
+              </div>
             }
 
             <app-campaign-detail-roster
@@ -262,7 +290,6 @@
             (loadBestiaryPreview)="loadBestiaryPreview()"
             (openPdfFullscreen)="openBestiaryFullscreen()"
             (printPregenFullSheet)="printPregenFullSheet($event)"
-            (printPregenHandout)="printPregenHandout($event)"
             (printMemberFullSheet)="printMemberFullSheet($event.member, $event.scope)"
           />
         }

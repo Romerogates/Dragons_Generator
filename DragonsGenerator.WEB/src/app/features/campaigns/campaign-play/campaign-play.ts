@@ -1,15 +1,18 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  effect,
   inject,
   OnInit,
   signal,
+  untracked,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { AuthService } from '@core/services/auth.service';
+import { CampaignSessionDockService } from '@core/services/campaign-session-dock.service';
 import { CampaignPlayPanel } from '../campaign-play-panel/campaign-play-panel';
 import type { CampaignDetail as CampaignDetailModel } from '@core/models/Campaign/campaign';
 
@@ -26,10 +29,18 @@ export class CampaignPlayPage implements OnInit {
   private readonly router = inject(Router);
   private readonly campaigns = inject(CampaignCloudService);
   private readonly auth = inject(AuthService);
+  private readonly sessionDock = inject(CampaignSessionDockService);
 
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly campaign = signal<CampaignDetailModel | null>(null);
+
+  constructor() {
+    effect(() => {
+      const c = this.campaign();
+      untracked(() => this.sessionDock.bindCampaign(c));
+    });
+  }
 
   ngOnInit(): void {
     if (!this.auth.isLoggedIn()) {
@@ -61,5 +72,6 @@ export class CampaignPlayPage implements OnInit {
 
   onCampaignChange(updated: CampaignDetailModel): void {
     this.campaign.set(updated);
+    this.sessionDock.patchLiveCampaign(updated);
   }
 }

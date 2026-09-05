@@ -78,7 +78,6 @@ export class CampaignDetailHandouts {
   readonly loadBestiaryPreview = output<void>();
   readonly openPdfFullscreen = output<void>();
   readonly printPregenFullSheet = output<CampaignPregen>();
-  readonly printPregenHandout = output<CampaignPregen>();
   readonly printMemberFullSheet = output<MemberSheetPdfEvent>();
 
   formatHandoutDate(iso?: string): string {
