@@ -20,8 +20,11 @@ import type { CharacterClass, Subclass } from '../../../../../core/models/Charac
 import { listSubclassOptions } from '@core/utils/character-class-features.util';
 import { buildSecondaryClassSelection } from '@core/utils/class-spellcasting.util';
 import {
+  collectProgressionPicksFromAnswers,
+  extractProgressionChoices,
   multiclassPrerequisiteLabel,
   multiclassPrerequisitesMet,
+  type ProgressionChoiceDef,
 } from '@core/utils/progression-choices.util';
 import { getClassIcon } from '@core/utils/class-icons';
 
@@ -34,6 +37,7 @@ interface SecondaryClassRow {
   prerequisiteLabel: string | null;
   prerequisitesMet: boolean;
   maxLevel: number;
+  progChoices: ProgressionChoiceDef[];
 }
 
 @Component({
@@ -87,6 +91,12 @@ export class MulticlassPanel implements OnInit {
       const cls = map.get(entry.classId) ?? null;
       const subclassBlock = cls ? this.subclassBlockFor(cls) : null;
       const otherLevels = this.usedLevels() - entry.level;
+      const pactBoonId = entry.pactBoon ?? null;
+      const progChoices = cls
+        ? extractProgressionChoices(cls, entry.level, 20, { pactBoonId }).filter(
+            (c) => !c.deferred && (c.type === 'pact_boon' || c.type === 'invocation' || c.type === 'metamagic'),
+          )
+        : [];
       return {
         entry,
         index,
@@ -96,6 +106,7 @@ export class MulticlassPanel implements OnInit {
         prerequisiteLabel: cls ? multiclassPrerequisiteLabel(cls) : null,
         prerequisitesMet: cls ? multiclassPrerequisitesMet(cls, this.builder.finalAbilities()) : true,
         maxLevel: Math.max(1, 20 - otherLevels),
+        progChoices,
       };
     });
   });
@@ -112,8 +123,11 @@ export class MulticlassPanel implements OnInit {
     level: number,
     subclassId: string | null,
     subclassName: string | null,
+    previous?: SecondaryClassSelection,
   ): SecondaryClassSelection {
-    return buildSecondaryClassSelection(cls, level, subclassId, subclassName);
+    const answers = previous?.classChoiceAnswers ?? {};
+    const picks = collectProgressionPicksFromAnswers(cls, level, answers);
+    return buildSecondaryClassSelection(cls, level, subclassId, subclassName, picks);
   }
 
   addSelectedClass(): void {
@@ -131,14 +145,52 @@ export class MulticlassPanel implements OnInit {
     const subclassBlock = this.subclassBlockFor(row.cls);
     const keepsSubclass = subclassBlock && level >= subclassBlock.levelUnlocked ? row.entry.subclassId ?? null : null;
     const keepsSubclassName = keepsSubclass ? row.entry.subclassName ?? null : null;
-    const updated = this.buildSelectionFor(row.cls, level, keepsSubclass, keepsSubclassName);
+    const updated = this.buildSelectionFor(row.cls, level, keepsSubclass, keepsSubclassName, row.entry);
     this.builder.updateSecondaryClassDetails(row.index, updated);
   }
 
   onSubclassChange(row: SecondaryClassRow, subclassId: string): void {
     if (!row.cls) return;
     const option = row.subclassOptions.find((o) => o.id === subclassId) ?? null;
-    const updated = this.buildSelectionFor(row.cls, row.entry.level, option?.id ?? null, option?.name ?? null);
+    const updated = this.buildSelectionFor(
+      row.cls,
+      row.entry.level,
+      option?.id ?? null,
+      option?.name ?? null,
+      row.entry,
+    );
+    this.builder.updateSecondaryClassDetails(row.index, updated);
+  }
+
+  isPicked(row: SecondaryClassRow, choiceId: string, optionId: string): boolean {
+    return (row.entry.classChoiceAnswers?.[choiceId] ?? []).includes(optionId);
+  }
+
+  toggleProgPick(row: SecondaryClassRow, choice: ProgressionChoiceDef, optionId: string): void {
+    if (!row.cls) return;
+    const current = [...(row.entry.classChoiceAnswers?.[choice.id] ?? [])];
+    const idx = current.indexOf(optionId);
+    if (idx >= 0) current.splice(idx, 1);
+    else {
+      if (choice.count <= 1) {
+        current.length = 0;
+        current.push(optionId);
+      } else if (current.length < choice.count) {
+        current.push(optionId);
+      } else {
+        current.shift();
+        current.push(optionId);
+      }
+    }
+    const answers = { ...(row.entry.classChoiceAnswers ?? {}), [choice.id]: current };
+    const previous: SecondaryClassSelection = { ...row.entry, classChoiceAnswers: answers };
+    const updated = this.buildSelectionFor(
+      row.cls,
+      row.entry.level,
+      row.entry.subclassId ?? null,
+      row.entry.subclassName ?? null,
+      previous,
+    );
     this.builder.updateSecondaryClassDetails(row.index, updated);
   }
 

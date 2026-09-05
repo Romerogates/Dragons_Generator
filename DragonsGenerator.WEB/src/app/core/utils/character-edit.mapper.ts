@@ -155,6 +155,12 @@ export function mapCharacterToEditState(
     creation.mysticArcanumPicks = Object.fromEntries(
       (sc.mysticArcanum ?? []).map((a) => [String(a.spellLevel), a.spellId]),
     );
+  } else {
+    const warlockSecondary = saved.secondaryClassSelections?.find((s) => s.classId === 'cls-sorcier');
+    if (warlockSecondary) {
+      creation.eldritchInvocations = warlockSecondary.eldritchInvocations ?? [];
+      creation.pactBoon = warlockSecondary.pactBoon ?? null;
+    }
   }
   if (sc?.kind === 'wizard') {
     creation.spellMasteryPicks = Object.fromEntries(

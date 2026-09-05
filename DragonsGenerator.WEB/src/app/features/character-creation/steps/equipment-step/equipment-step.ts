@@ -276,6 +276,7 @@ export class EquipmentStep implements OnInit {
   }
 
   confirm(): void {
+    if (!this.selectionComplete()) return;
     const map = this.catalogMap();
     const result: EquipmentInstance[] = [];
 

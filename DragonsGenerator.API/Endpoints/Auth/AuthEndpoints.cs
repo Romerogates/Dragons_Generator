@@ -388,7 +388,7 @@ public class ForgotPasswordEndpoint(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Email reset non envoyé");
+            logger.LogError(ex, "ForgotPassword : email reset non envoyé (réponse HTTP toujours 200 pour ne pas énumérer les comptes)");
         }
 
         if (env.IsDevelopment())

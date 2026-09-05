@@ -1,5 +1,6 @@
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using MimeKit;
 
@@ -40,25 +41,37 @@ public class SmtpEmailSender(IOptionsMonitor<SmtpOptions> options, ILogger<SmtpE
 
         try
         {
-            using var client = new SmtpClient();
-            // OVH Zimbra : 465 = SSL, 587 = STARTTLS ; MailHog local : 1025 sans chiffrement
-            var secure = opt.Port switch
+            const int attempts = 3;
+            for (var attempt = 1; attempt <= attempts; attempt++)
             {
-                465 => SecureSocketOptions.SslOnConnect,
-                587 => SecureSocketOptions.StartTls,
-                _ when opt.UseSsl => SecureSocketOptions.StartTls,
-                _ => SecureSocketOptions.None,
-            };
+                try
+                {
+                    using var client = new SmtpClient();
+                    var secure = opt.Port switch
+                    {
+                        465 => SecureSocketOptions.SslOnConnect,
+                        587 => SecureSocketOptions.StartTls,
+                        _ when opt.UseSsl => SecureSocketOptions.StartTls,
+                        _ => SecureSocketOptions.None,
+                    };
 
-            await client.ConnectAsync(opt.Host, opt.Port, secure, ct);
-            if (!string.IsNullOrWhiteSpace(opt.UserName))
-            {
-                await client.AuthenticateAsync(opt.UserName, opt.Password ?? "", ct);
+                    await client.ConnectAsync(opt.Host, opt.Port, secure, ct);
+                    if (!string.IsNullOrWhiteSpace(opt.UserName))
+                    {
+                        await client.AuthenticateAsync(opt.UserName, opt.Password ?? "", ct);
+                    }
+
+                    await client.SendAsync(message, ct);
+                    await client.DisconnectAsync(true, ct);
+                    logger.LogInformation("Email envoyé à {Email} : {Subject}", toEmail, subject);
+                    return;
+                }
+                catch (Exception ex) when (attempt < attempts)
+                {
+                    logger.LogWarning(ex, "SMTP tentative {Attempt}/{Attempts} échouée pour {Email}", attempt, attempts, toEmail);
+                    await Task.Delay(TimeSpan.FromMilliseconds(250 * attempt), ct);
+                }
             }
-
-            await client.SendAsync(message, ct);
-            await client.DisconnectAsync(true, ct);
-            logger.LogInformation("Email envoyé à {Email} : {Subject}", toEmail, subject);
         }
         catch (Exception ex)
         {
@@ -69,7 +82,7 @@ public class SmtpEmailSender(IOptionsMonitor<SmtpOptions> options, ILogger<SmtpE
 }
 
 /// <summary>Fallback dev : log le mail sans SMTP (si Smtp:Host=log).</summary>
-public class LoggingEmailSender(ILogger<LoggingEmailSender> logger) : IEmailSender
+public class LoggingEmailSender(ILogger<LoggingEmailSender> logger, IHostEnvironment env) : IEmailSender
 {
     public Task SendAsync(
         string toEmail,
@@ -78,12 +91,23 @@ public class LoggingEmailSender(ILogger<LoggingEmailSender> logger) : IEmailSend
         CancellationToken ct = default
     )
     {
-        logger.LogWarning(
-            "[EMAIL-LOG] To={To} Subject={Subject}\n{Body}",
-            toEmail,
-            subject,
-            htmlBody
-        );
+        if (env.IsProduction())
+        {
+            logger.LogError(
+                "[EMAIL-LOG] Production : mail non envoyé (Smtp__Host=log). To={To} Subject={Subject}",
+                toEmail,
+                subject
+            );
+        }
+        else
+        {
+            logger.LogWarning(
+                "[EMAIL-LOG] To={To} Subject={Subject}\n{Body}",
+                toEmail,
+                subject,
+                htmlBody
+            );
+        }
         return Task.CompletedTask;
     }
 }

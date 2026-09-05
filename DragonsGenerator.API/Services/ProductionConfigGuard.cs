@@ -49,5 +49,17 @@ public static class ProductionConfigGuard
                 "Production : définissez Admin__Password dans .env (min. 12 caractères, pas le mot de passe dev)."
             );
         }
+
+        var allowLogSink = string.Equals(config["Smtp:AllowLogSink"], "true", StringComparison.OrdinalIgnoreCase);
+        var smtpHost = (config["Smtp:Host"] ?? "").Trim();
+        if (!allowLogSink && (string.IsNullOrWhiteSpace(smtpHost)
+            || smtpHost.Equals("log", StringComparison.OrdinalIgnoreCase)
+            || smtpHost.Equals("mailhog", StringComparison.OrdinalIgnoreCase)
+            || smtpHost.Equals("localhost", StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new InvalidOperationException(
+                "Production : définissez Smtp__Host (pas log/mailhog/localhost). Smtp__AllowLogSink=true pour forcer le sink de logs."
+            );
+        }
     }
 }

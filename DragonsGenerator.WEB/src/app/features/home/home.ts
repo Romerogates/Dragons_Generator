@@ -40,7 +40,7 @@ export class Home implements OnInit {
   private readonly guidePrefs = inject(GuidePreferencesService);
   private readonly router = inject(Router);
 
-  readonly guideNewsCount = this.guidePrefs.unreadCount;
+  readonly guideNewsCount = this.guidePrefs.unreadNewsCount;
 
   readonly isLoggedIn = this.auth.isLoggedIn;
   readonly user = this.auth.user;

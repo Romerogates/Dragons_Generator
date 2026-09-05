@@ -13,13 +13,13 @@ import { Router, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { PdfGeneratorService } from '@core/services/pdf-generator.service';
 import type { Character } from '@core/models/Character/character';
-import { visibleClassResources } from '@core/utils/class-resource-labels';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
+import { CharacterPlayView } from './character-play-view';
 
 @Component({
   selector: 'app-character-sheet',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, CharacterPlayView],
   templateUrl: './character-sheet.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -34,6 +34,7 @@ export class CharacterSheet implements OnInit, OnDestroy {
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
+  readonly pdfFailed = signal(false);
   private rawBlobUrl: string | null = null;
 
   readonly resourceChips = computed(() =>
@@ -117,12 +118,14 @@ export class CharacterSheet implements OnInit, OnDestroy {
       }
       this.character.set(character);
 
-      const url = await this.pdfService.generatePdfBlob(character);
-      this.rawBlobUrl = url;
-      this.pdfPreviewUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
-    } catch (e) {
-      console.error(e);
-      this.error.set('Impossible de charger la fiche PDF.');
+      try {
+        const url = await this.pdfService.generatePdfBlob(character);
+        this.rawBlobUrl = url;
+        this.pdfPreviewUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+      } catch (e) {
+        console.error(e);
+        this.pdfFailed.set(true);
+      }
     } finally {
       this.loading.set(false);
     }

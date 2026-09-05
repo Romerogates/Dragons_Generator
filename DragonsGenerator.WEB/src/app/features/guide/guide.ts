@@ -486,15 +486,18 @@ export class GuidePage implements OnInit, AfterViewInit, OnDestroy {
 
     this.observer = new IntersectionObserver(
       (entries) => {
+        for (const entry of entries) {
+          const sid = entry.target?.id;
+          if (entry.isIntersecting && sid && !sid.startsWith('faq-')) {
+            this.guidePrefs.markSectionRead(sid);
+          }
+        }
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
         const id = visible[0]?.target?.id;
         if (!id) return;
         this.activeSection.set(id);
-        if (!id.startsWith('faq-')) {
-          this.guidePrefs.markSectionRead(id);
-        }
       },
       { rootMargin: '-20% 0px -55% 0px', threshold: [0.1, 0.25, 0.5] },
     );

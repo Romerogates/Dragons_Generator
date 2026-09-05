@@ -14,6 +14,7 @@ import {
   mergeClassProgressionResources,
 } from './character-combat.util';
 import {
+  attachWarlockFlavor,
   buildCharacterSpellcasting,
   buildKnownSpellsFromCreation,
 } from './character-spellcasting.util';
@@ -94,10 +95,11 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
   }
 
   const warlockCaster = casters.find((src) => src.kind === 'warlock');
-  const spellcasting = buildCharacterSpellcasting(creationForSpellcasting, modifiers, {
+  const built = buildCharacterSpellcasting(creationForSpellcasting, modifiers, {
     totalLevel: totalCharacterLevel,
     warlockLevel: warlockCaster?.level,
   });
+  const spellcasting = built ? attachWarlockFlavor(built, creationForSpellcasting) : null;
   const features: FeatureInstance[] = [
     ...c.speciesTraits,
     ...c.classFeatures,

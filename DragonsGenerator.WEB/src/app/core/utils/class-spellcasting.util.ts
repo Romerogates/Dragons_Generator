@@ -1,5 +1,5 @@
 import type { Ability, CharacterClass } from '@core/models/CharacterClasses/character-class';
-import type { SpellcastingKind } from '@core/models/Character/character';
+import type { FeatureInstance, SpellcastingKind } from '@core/models/Character/character';
 import type {
   ExtendedCharacterCreation,
   SecondaryClassSelection,
@@ -123,10 +123,18 @@ export function buildSecondaryClassSelection(
   level: number,
   subclassId: string | null,
   subclassName: string | null,
+  extras?: {
+    classChoiceAnswers?: Record<string, string[]>;
+    pactBoon?: string | null;
+    eldritchInvocations?: string[];
+    metamagicOptions?: string[];
+    extraFeatures?: FeatureInstance[];
+  },
 ): SecondaryClassSelection {
   const hitDie = cls.data.hit_die || 8;
   const prof = multiclassProficiencies(cls);
   const spell = resolveClassSpellcasting(cls.id, level, subclassId);
+  const extraFeatures = extras?.extraFeatures ?? [];
   const { classFeatures, classProgressionResources } = buildClassFeaturesForLevel(
     cls,
     {
@@ -135,10 +143,14 @@ export function buildSecondaryClassSelection(
       hasSpellcasting: spell !== null,
       spellcastingKind: spell?.kind ?? null,
       spellcastingAbility: spell?.ability ?? null,
-      existingClassFeatures: [],
+      existingClassFeatures: extraFeatures,
     },
     level,
   );
+  const mergedFeatures = [
+    ...classFeatures.filter((f) => !extraFeatures.some((e) => e.refId && e.refId === f.refId)),
+    ...extraFeatures,
+  ];
   return {
     classId: cls.id,
     className: cls.name,
@@ -155,7 +167,11 @@ export function buildSecondaryClassSelection(
     toolProficiencies: prof.tools,
     skillChooseCount: prof.skillChooseCount,
     skillOptions: prof.skillOptions,
-    classFeatures,
+    classFeatures: mergedFeatures,
     classProgressionResources,
+    classChoiceAnswers: extras?.classChoiceAnswers,
+    pactBoon: extras?.pactBoon ?? null,
+    eldritchInvocations: extras?.eldritchInvocations ?? [],
+    metamagicOptions: extras?.metamagicOptions ?? [],
   };
 }

@@ -4,7 +4,12 @@
  */
 
 import type { CharacterClass, FeatureDetail } from '@core/models/CharacterClasses/character-class';
-import type { AbilityKey, AbilityScores, SpellcastingKind } from '@core/models/Character/character';
+import type {
+  AbilityKey,
+  AbilityScores,
+  FeatureInstance,
+  SpellcastingKind,
+} from '@core/models/Character/character';
 import { invocationsForLevel, PACT_BOONS } from '../data/warlock-invocations.data';
 import { metamagicLabel } from '../data/metamagic-labels.data';
 import { labelForGameId } from './game-id-labels';
@@ -1567,4 +1572,53 @@ export function multiclassSpellSlotsForCasterLevel(casterLevel: number): { level
   return row
     .map((max, idx) => ({ level: idx + 1, max }))
     .filter((s) => s.max > 0);
+}
+
+/** Applique les réponses UI (pacte, invocations, métamagie) aux choix extraits. */
+export function collectProgressionPicksFromAnswers(
+  cls: CharacterClass,
+  level: number,
+  answers: Record<string, string[]>,
+): {
+  classChoiceAnswers: Record<string, string[]>;
+  pactBoon: string | null;
+  eldritchInvocations: string[];
+  metamagicOptions: string[];
+  extraFeatures: FeatureInstance[];
+} {
+  const pactChoice = extractProgressionChoices(cls, level, PROGRESSION_MAX_LEVEL).find(
+    (c) => c.type === 'pact_boon',
+  );
+  const pactBoonId = (pactChoice ? answers[pactChoice.id]?.[0] : null) ?? null;
+  const choices = extractProgressionChoices(cls, level, PROGRESSION_MAX_LEVEL, {
+    pactBoonId,
+  });
+  const classChoiceAnswers: Record<string, string[]> = {};
+  const eldritchInvocations: string[] = [];
+  const metamagicOptions: string[] = [];
+  const extraFeatures: FeatureInstance[] = [];
+  let pactBoon: string | null = null;
+
+  for (const choice of choices) {
+    if (choice.deferred) continue;
+    const picks = answers[choice.id] ?? [];
+    classChoiceAnswers[choice.id] = picks;
+    if (choice.type === 'invocation') eldritchInvocations.push(...picks);
+    if (choice.type === 'metamagic') metamagicOptions.push(...picks);
+    if (choice.type === 'pact_boon' && picks[0]) pactBoon = picks[0];
+    for (const pickId of picks) {
+      if (extraFeatures.some((f) => f.refId === pickId)) continue;
+      const opt = choice.options.find((o) => o.id === pickId);
+      extraFeatures.push({
+        refId: pickId,
+        name: opt?.name ?? pickId,
+        desc: opt?.desc ?? '',
+        source: 'class',
+        sourceDetail: `${cls.name} · ${choice.label}`,
+        level: 1,
+      });
+    }
+  }
+
+  return { classChoiceAnswers, pactBoon, eldritchInvocations, metamagicOptions, extraFeatures };
 }

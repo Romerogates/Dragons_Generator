@@ -1,7 +1,13 @@
 import type { CharacterCreation } from '@core/models/Character/character';
+import type { ExtendedCharacterCreation } from '@core/models/Character/character-builder.types';
+import type { EquipmentSlot } from '@core/models/CharacterClasses/character-class';
 
 export interface WizardStepValidationContext {
   needsMagicStep: boolean;
+}
+
+function asExtended(c: CharacterCreation): ExtendedCharacterCreation {
+  return c as ExtendedCharacterCreation;
 }
 
 /** Tous les sorts raciaux requis ont été choisis (étape Magie). */
@@ -21,7 +27,14 @@ function asiChoicesComplete(c: CharacterCreation): boolean {
   const slots = c.asiChoices ?? [];
   if (slots.length === 0) return true;
   return slots.every((s) => {
-    if (s.mode === 'feat') return !!s.featId;
+    if (s.mode === 'feat') {
+      if (!s.featId) return false;
+      const spends = s.featTalentSpends ?? [];
+      if (s.featId === 'feat-talent' && spends.length === 0 && (s.featAbilityChoice || s.featResistanceChoice)) {
+        return true;
+      }
+      return true;
+    }
     if (s.mode === 'plus2') return !!s.primary;
     return !!s.primary && !!s.secondary && s.primary !== s.secondary;
   });
@@ -30,36 +43,117 @@ function asiChoicesComplete(c: CharacterCreation): boolean {
 function languagesStepComplete(c: CharacterCreation): boolean {
   if (c.languages.length === 0) return false;
   const bonusNeeded = c.bonusLanguageCount ?? 0;
-  if (bonusNeeded <= 0) return true;
+  const exoticNeeded = c.requiredExoticLanguageCount ?? 0;
+  const baseNeeded = c.requiredBaseLanguageCount ?? 0;
+  const extraNeeded = bonusNeeded + exoticNeeded + baseNeeded;
+  if (extraNeeded <= 0) return true;
   const locked = new Set<string>([
     ...(c.speciesLanguages ?? []),
     ...(c.civilizationLanguages ?? []),
     ...(c.backgroundLanguages ?? []),
   ]);
-  // Langues de classe verrouillées côté UI (Druide / Roublard)
   if (c.classId === 'cls-druide') locked.add('Langue des druides');
   if (c.classId === 'cls-roublard') locked.add('Argot des voleurs');
   const bonusPicked = c.languages.filter((l) => !locked.has(l)).length;
-  return bonusPicked >= bonusNeeded;
+  return bonusPicked >= extraNeeded;
+}
+
+function secondaryProgressionComplete(c: CharacterCreation): boolean {
+  for (const sc of asExtended(c).secondaryClasses ?? []) {
+    if (sc.level >= 3 && !sc.subclassId) return false;
+    if (sc.classId === 'cls-sorcier') {
+      if (sc.level >= 3 && !sc.pactBoon) return false;
+      if (sc.level >= 2 && !(sc.eldritchInvocations?.length)) return false;
+    }
+    if (sc.classId === 'cls-ensorceleur' && sc.level >= 3 && !(sc.metamagicOptions?.length)) {
+      return false;
+    }
+  }
+  return true;
 }
 
 function classStepComplete(c: CharacterCreation): boolean {
-  // setClass() pose hitDie > 0 ; classId seul peut rester d'un état partiel
-  return c.classId !== null && (c.hitDie ?? 0) > 0;
+  if (c.classId === null || (c.hitDie ?? 0) <= 0) return false;
+  const level = c.targetLevel || 1;
+  if (level >= 3 && !c.subclassId) return false;
+  if (c.classId === 'cls-sorcier') {
+    if (level >= 3 && !c.pactBoon) return false;
+    if (level >= 2 && !(c.eldritchInvocations?.length)) return false;
+  }
+  return secondaryProgressionComplete(c);
 }
 
 function skillsStepComplete(c: CharacterCreation): boolean {
   if (!c.classId) return false;
-  const needed =
-    (c.skillChooseCount ?? 0) + (c.speciesBonusSkillCount ?? 0);
+  const needed = (c.skillChooseCount ?? 0) + (c.speciesBonusSkillCount ?? 0);
   if ((c.selectedSkills?.length ?? 0) < needed) return false;
-  // Historique preset : au moins les compétences BG si choose attendu — on exige
-  // que setProficiencies ait été appelé (selectedSkills peuplé OU skillChooseCount 0)
-  if (needed === 0 && (c.selectedSkills?.length ?? 0) === 0 && (c.skillChooseCount ?? 0) === 0) {
-    // Classes sans skill choose (rare) : OK si la classe est posée
-    return true;
+  const ext = asExtended(c);
+  const secondaryNeed = (ext.secondaryClasses ?? []).reduce((sum, sc) => sum + (sc.skillChooseCount ?? 0), 0);
+  if ((ext.secondaryClassSelectedSkills?.length ?? 0) < secondaryNeed) return false;
+  return true;
+}
+
+function slotNeedsPick(slot: EquipmentSlot): boolean {
+  return (slot.alternatives?.length ?? 0) > 0;
+}
+
+function equipmentStepComplete(c: CharacterCreation): boolean {
+  const ext = asExtended(c);
+  const slots: EquipmentSlot[] = [
+    ...(c.startingEquipmentSlots ?? []),
+    ...(ext.backgroundEquipmentSlots ?? []),
+    ...(ext.toolEquipmentSlots ?? []),
+  ];
+  const choosable = slots.filter(slotNeedsPick);
+  if (choosable.length === 0) {
+    if (slots.length === 0) return c.selectedEquipment.length > 0;
+    return c.selectedEquipment.length > 0;
+  }
+  if (c.selectedEquipment.length === 0) return false;
+  const picks = ext.equipmentWizardPicks;
+  if (!picks) return true;
+  return choosable.every((slot) => picks.alt[String(slot.slot)] != null);
+}
+
+function magicDetailsComplete(c: CharacterCreation): boolean {
+  if (!racialSpellsComplete(c)) return false;
+  const details = c.spellcastingDetails as
+    | {
+        cantrips?: unknown[];
+        spells?: unknown[];
+        deityId?: string;
+        deity?: string;
+      }
+    | undefined;
+  const hasSecondaryCaster = (asExtended(c).secondaryClasses ?? []).some((sc) => sc.hasSpellcasting);
+  if (!c.hasSpellcasting && !hasSecondaryCaster) {
+    return !!(details?.cantrips?.length);
+  }
+  if (!details) return false;
+  const cantrips = Array.isArray(details.cantrips) ? details.cantrips : null;
+  const spells = Array.isArray(details.spells) ? details.spells : null;
+  if (cantrips && cantrips.length === 0 && (!spells || spells.length === 0) && !details.deityId && !details.deity) {
+    return false;
+  }
+  if (c.spellcastingKind === 'cleric' && !(details.deityId || details.deity)) return false;
+  return !!(cantrips?.length || spells?.length || details.deityId || details.deity);
+}
+
+function backgroundStepComplete(c: CharacterCreation): boolean {
+  if (!c.backgroundId) return false;
+  if (c.backgroundPreset === false) {
+    const name = (c.background ?? '').trim();
+    const privName = (c.privilegeName ?? '').trim();
+    const privDesc = (c.privilegeDesc ?? '').trim();
+    return name.length > 0 && privName.length > 0 && privDesc.length > 0;
   }
   return true;
+}
+
+function speciesStepComplete(c: CharacterCreation): boolean {
+  if (!c.speciesId) return false;
+  const answers = c.speciesChoiceAnswers ?? {};
+  return Object.entries(answers).every(([, picks]) => !picks || picks.length > 0);
 }
 
 export function isWizardStepValid(
@@ -69,14 +163,13 @@ export function isWizardStepValid(
 ): boolean {
   switch (step) {
     case 1:
-      // Étape Niveau : toujours valide (valeur par défaut 1, ajustable via les boutons).
       return true;
     case 2:
-      return c.speciesId !== null;
+      return speciesStepComplete(c);
     case 3:
       return c.civilizationId !== null;
     case 4:
-      return c.backgroundId !== null;
+      return backgroundStepComplete(c);
     case 5:
       return classStepComplete(c);
     case 6:
@@ -84,19 +177,11 @@ export function isWizardStepValid(
     case 7:
       return skillsStepComplete(c);
     case 8:
-      return c.selectedEquipment.length > 0;
+      return equipmentStepComplete(c);
     case 9:
       return languagesStepComplete(c);
     case 10:
-      if (ctx.needsMagicStep) {
-        if (!racialSpellsComplete(c)) return false;
-        if (c.hasSpellcasting) {
-          const details = c.spellcastingDetails as Record<string, unknown> | undefined;
-          return !!details && Object.keys(details).length > 0;
-        }
-        const details = c.spellcastingDetails as { cantrips?: unknown[] } | undefined;
-        return !!(details?.cantrips?.length);
-      }
+      if (ctx.needsMagicStep) return magicDetailsComplete(c);
       return c.name.trim().length > 0;
     case 11:
       if (ctx.needsMagicStep) return c.name.trim().length > 0;

@@ -431,6 +431,9 @@ interface CharacterSpellcastingBase {
   cantrips: CantripTracker;
   /** Magie de pacte (Occultiste), y compris en multiclasse avec un autre lanceur. */
   pactSlots?: SpellSlotPool[];
+  /** Faveur du pacte — aussi si le sorcier est une classe secondaire. */
+  pact?: string;
+  eldritchInvocations?: string[];
 }
 
 // =============================================================================
@@ -688,6 +691,10 @@ export interface Character {
     skillChooseCount: number;
     skillOptions: string[];
     classFeatures: FeatureInstance[];
+    classChoiceAnswers?: Record<string, string[]>;
+    pactBoon?: string | null;
+    eldritchInvocations?: string[];
+    metamagicOptions?: string[];
   }[];
 }
 

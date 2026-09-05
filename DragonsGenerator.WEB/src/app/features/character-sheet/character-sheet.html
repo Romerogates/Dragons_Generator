@@ -52,83 +52,30 @@
       <a routerLink="/characters" class="text-amber-400 underline text-sm">Retour à la liste</a>
     </div>
   } @else {
-    <div class="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-4 mb-4">
-      <aside class="bg-[#1b2028] border border-slate-800 rounded-2xl p-4 flex flex-col gap-4">
-        <div class="grid grid-cols-2 gap-2">
-          <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-3 text-center">
-            <div class="text-[9px] font-black uppercase tracking-widest text-red-500/80 mb-1">
-              PV Max
-            </div>
-            <div class="text-xl font-serif text-red-400">{{ getHp() }}</div>
-          </div>
-          <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-3 text-center">
-            <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">
-              CA
-            </div>
-            <div class="text-xl font-serif text-slate-200">{{ getAc() }}</div>
-          </div>
-        </div>
-
-        @if (resourceChips().length) {
-          <div>
-            <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-2">
-              Ressources
-            </h3>
-            <ul class="flex flex-col gap-1.5">
-              @for (r of resourceChips(); track r.key) {
-                <li
-                  class="flex justify-between text-xs text-slate-300 bg-[#171b22] rounded-lg px-3 py-2 border border-slate-800"
-                >
-                  <span>{{ r.label }}</span>
-                  <span class="font-bold text-amber-400">{{ r.value }}</span>
-                </li>
-              }
-            </ul>
-          </div>
-        }
-
-        @if (auraFeatures().length) {
-          <div>
-            <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-2">
-              Auras
-            </h3>
-            <ul class="flex flex-col gap-1 text-[11px] text-slate-300">
-              @for (a of auraFeatures(); track a) {
-                <li class="leading-snug">{{ a }}</li>
-              }
-            </ul>
-          </div>
-        }
-
-        @if (spellcastingSummary().length) {
-          <div>
-            <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-2">
-              Incantation
-            </h3>
-            <ul class="flex flex-col gap-2 text-[11px] text-slate-300">
-              @for (line of spellcastingSummary(); track line) {
-                <li class="leading-snug border-l-2 border-amber-900/60 pl-2">{{ line }}</li>
-              }
-            </ul>
-          </div>
-        }
-      </aside>
+    <div class="space-y-4 mb-4">
+      @if (character(); as hero) {
+        <app-character-play-view [character]="hero" />
+      }
 
       <div class="bg-[#1b2028] border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
         <div class="flex justify-between items-center px-4 py-3 border-b border-slate-800">
           <span class="text-[10px] font-black uppercase tracking-widest text-slate-500"
-            >Aperçu de la fiche</span
+            >Aperçu PDF</span
           >
-          <button
-            type="button"
-            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-amber-400"
-            (click)="openFullscreen()"
-          >
-            Plein écran
-          </button>
+          @if (pdfPreviewUrl()) {
+            <button
+              type="button"
+              class="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-amber-400"
+              (click)="openFullscreen()"
+            >
+              Plein écran
+            </button>
+          }
         </div>
         @if (pdfPreviewUrl(); as url) {
-          <iframe [src]="url" class="w-full h-[75vh] bg-slate-900" title="Fiche personnage"></iframe>
+          <iframe [src]="url" class="w-full h-[55vh] bg-slate-900" title="Fiche personnage PDF"></iframe>
+        } @else if (pdfFailed()) {
+          <p class="p-6 text-sm text-slate-500">Aperçu PDF indisponible — la fiche de jeu ci-dessus reste utilisable.</p>
         }
       </div>
     </div>

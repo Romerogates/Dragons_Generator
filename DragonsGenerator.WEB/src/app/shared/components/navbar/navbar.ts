@@ -3,6 +3,7 @@ import {
   OnInit,
   OnDestroy,
   ChangeDetectionStrategy,
+  computed,
   signal,
   HostListener,
   CUSTOM_ELEMENTS_SCHEMA,
@@ -13,6 +14,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/ro
 import { filter, Subscription } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
 import { GuidePreferencesService } from '@core/services/guide-preferences.service';
+import { NotificationPreferencesService } from '@core/services/notification-preferences.service';
 import { NotificationService } from '@core/services/notification.service';
 import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
 
@@ -33,6 +35,7 @@ export interface NavLink {
 export class Navbar implements OnInit, OnDestroy {
   readonly auth = inject(AuthService);
   private readonly notifications = inject(NotificationService);
+  private readonly notifPrefs = inject(NotificationPreferencesService);
   readonly guidePrefs = inject(GuidePreferencesService);
   private routerSub?: Subscription;
 
@@ -42,8 +45,13 @@ export class Navbar implements OnInit, OnDestroy {
 
   readonly friendsActionCount = this.notifications.friendsActionCount;
   readonly campaignsActionCount = this.notifications.campaignsActionCount;
-  readonly notificationCount = this.notifications.totalCount;
-  readonly guideNewsCount = this.guidePrefs.unreadCount;
+  readonly notificationCount = computed(() =>
+    this.notifications
+      .items()
+      .filter((item) => this.notifPrefs.isKindEnabled(item.kind) && !this.notifPrefs.isDismissed(item.key))
+      .length,
+  );
+  readonly guideNewsCount = this.guidePrefs.unreadNewsCount;
 
   private savedScrollY = 0;
   private bodyScrollLocked = false;
@@ -66,9 +74,6 @@ export class Navbar implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.preloadNavbarIcons();
-    if (this.auth.isLoggedIn()) {
-      void this.guidePrefs.load();
-    }
     this.routerSub = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe(() => this.closeMenus());

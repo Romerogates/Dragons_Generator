@@ -1055,6 +1055,7 @@ export class SkillsStep implements OnInit {
 
   // === NAVIGATION ET SAUVEGARDE ===
   confirmSelection(): void {
+    if (!this.isSelectionComplete()) return;
     const c = this.builder.creation();
     const bgProf = (c as any).backgroundProficiencies;
     const isCustom = c.backgroundPreset === false;

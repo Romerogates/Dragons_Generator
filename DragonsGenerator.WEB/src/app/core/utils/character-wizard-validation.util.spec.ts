@@ -332,19 +332,64 @@ describe('character-wizard-validation.util', () => {
     ).toBeFalse();
   });
 
-  it('skillsStepComplete accepts a class with no skill choice once skills are already populated', () => {
+  it('isWizardStepValid requires subclass at level 3+', () => {
     expect(
       isWizardStepValid(
-        7,
-        {
-          ...base,
-          classId: 'cls-moine',
-          skillChooseCount: 0,
-          speciesBonusSkillCount: 0,
-          selectedSkills: ['skill-acrobaties'],
-        },
+        5,
+        { ...base, classId: 'cls-guerrier', hitDie: 10, targetLevel: 3 },
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+    expect(
+      isWizardStepValid(
+        5,
+        { ...base, classId: 'cls-guerrier', hitDie: 10, targetLevel: 3, subclassId: 'sub-champion' },
         { needsMagicStep: false },
       ),
     ).toBeTrue();
+  });
+
+  it('isWizardStepValid requires warlock pact/invocations on a secondary class', () => {
+    expect(
+      isWizardStepValid(
+        5,
+        {
+          ...base,
+          classId: 'cls-guerrier',
+          hitDie: 10,
+          targetLevel: 5,
+          subclassId: 'sub-champion',
+          secondaryClasses: [
+            {
+              classId: 'cls-sorcier',
+              className: 'Sorcier',
+              level: 3,
+              hitDie: 8,
+              hpPerLevelAverage: 5,
+              hasSpellcasting: true,
+              spellcastingKind: 'warlock',
+              spellcastingAbility: 'Charisme',
+              armorProficiencies: [],
+              weaponProficiencies: [],
+              toolProficiencies: [],
+              skillChooseCount: 0,
+              skillOptions: [],
+              classFeatures: [],
+            },
+          ],
+        } as CharacterCreation,
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+  });
+
+  it('isWizardStepValid rejects empty cantrip lists for class casters', () => {
+    expect(
+      isWizardStepValid(
+        10,
+        { ...base, hasSpellcasting: true, spellcastingDetails: { cantrips: [], spells: [] } },
+        { needsMagicStep: true },
+      ),
+    ).toBeFalse();
   });
 });

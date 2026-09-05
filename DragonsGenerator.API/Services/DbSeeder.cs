@@ -21,27 +21,19 @@ public static class DbSeeder
         var adminOpt = scope.ServiceProvider.GetRequiredService<IOptions<AdminSeedOptions>>().Value;
         var email = (adminOpt.Email ?? "").Trim().ToLowerInvariant();
 
-        if (!string.IsNullOrWhiteSpace(email))
+        if (string.IsNullOrWhiteSpace(email))
         {
-            if (adminOpt.ResetPassword && !string.IsNullOrWhiteSpace(adminOpt.Password))
+            logger?.LogWarning("Seed admin ignoré : Admin__Email vide.");
+        }
+        else if (string.IsNullOrWhiteSpace(adminOpt.Password))
         {
-            var admins = await db.Users.Where(u => u.Role == AppRoles.Admin).ToListAsync();
+            logger?.LogError("Seed admin ignoré : Admin__Password vide pour {Email}.", email);
+        }
+        else if (adminOpt.ResetPassword)
+        {
             var hash = AuthHelpers.HashPassword(adminOpt.Password);
-            if (admins.Count > 0)
-            {
-                foreach (var admin in admins)
-                {
-                    admin.PasswordHash = hash;
-                    admin.EmailConfirmed = true;
-                }
-                await db.SaveChangesAsync();
-                logger?.LogInformation(
-                    "Mot de passe admin réinitialisé pour {Count} compte(s) : {Emails}",
-                    admins.Count,
-                    string.Join(", ", admins.Select(a => a.Email))
-                );
-            }
-            else
+            var target = await db.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (target is null)
             {
                 db.Users.Add(
                     new AppUser
@@ -54,7 +46,15 @@ public static class DbSeeder
                     }
                 );
                 await db.SaveChangesAsync();
-                logger?.LogInformation("Compte admin créé : {Email}", email);
+                logger?.LogInformation("Compte admin créé (ResetPassword) : {Email}", email);
+            }
+            else
+            {
+                target.PasswordHash = hash;
+                target.EmailConfirmed = true;
+                target.Role = AppRoles.Admin;
+                await db.SaveChangesAsync();
+                logger?.LogInformation("Mot de passe admin réinitialisé pour {Email}", email);
             }
         }
         else
@@ -73,14 +73,22 @@ public static class DbSeeder
                     }
                 );
                 await db.SaveChangesAsync();
+                logger?.LogInformation("Compte admin créé : {Email}", email);
             }
             else if (existing.Role != AppRoles.Admin)
             {
                 existing.Role = AppRoles.Admin;
                 existing.EmailConfirmed = true;
                 await db.SaveChangesAsync();
+                logger?.LogInformation("Compte promu admin : {Email}", email);
             }
-        }
+            else
+            {
+                logger?.LogInformation(
+                    "Compte admin déjà présent ({Email}) — mot de passe inchangé (Admin__ResetPassword=true pour le rotator).",
+                    email
+                );
+            }
         }
 
         if (env.IsDevelopment())

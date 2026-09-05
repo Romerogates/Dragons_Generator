@@ -163,6 +163,10 @@ export interface SecondaryClassSelection {
   /** Aptitudes de classe/sous-classe déjà résolues au niveau `level` de cette classe. */
   classFeatures: FeatureInstance[];
   classProgressionResources?: Record<string, number | string | null>;
+  classChoiceAnswers?: Record<string, string[]>;
+  pactBoon?: string | null;
+  eldritchInvocations?: string[];
+  metamagicOptions?: string[];
 }
 
 export interface IdentitySelection {

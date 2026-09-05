@@ -9,6 +9,7 @@ import type {
   SpellcastingKind,
   SpellInstance,
 } from '@core/models/Character/character';
+import type { ExtendedCharacterCreation } from '@core/models/Character/character-builder.types';
 import { ABILITY_LABEL_TO_KEY } from '@core/models/Character/character';
 import { proficiencyBonusForLevel } from './character-progression.util';
 
@@ -194,6 +195,34 @@ export function spellSlotsForCharacterLevel(
   return counts.map((max, i) => ({ level: i + 1, max })).filter((s) => s.max > 0);
 }
 
+export function warlockFlavorFromCreation(c: CharacterCreation): {
+  pact: string;
+  invocationIds: string[];
+} {
+  const secondary = (c as ExtendedCharacterCreation).secondaryClasses?.find(
+    (sc) => sc.classId === 'cls-sorcier',
+  );
+  const boon = c.pactBoon || secondary?.pactBoon || null;
+  const invocationIds = c.eldritchInvocations?.length
+    ? c.eldritchInvocations
+    : (secondary?.eldritchInvocations ?? []);
+  return { pact: pactBoonLabel(boon), invocationIds };
+}
+
+export function attachWarlockFlavor<T extends CharacterSpellcasting>(
+  sc: T,
+  c: CharacterCreation,
+): T {
+  const flavor = warlockFlavorFromCreation(c);
+  if (!flavor.pact && !flavor.invocationIds.length) return sc;
+  return {
+    ...sc,
+    pact: sc.pact || flavor.pact,
+    eldritchInvocations:
+      sc.eldritchInvocations?.length ? sc.eldritchInvocations : flavor.invocationIds.map(invocationLabel),
+  };
+}
+
 export function buildCharacterSpellcasting(
   c: CharacterCreation,
   modifiers: AbilityScores,
@@ -302,8 +331,11 @@ export function buildCharacterSpellcasting(
         ...base,
         kind: 'warlock',
         patron: detailStr('patron', c.subclassName ?? ''),
-        pact: pactBoonLabel(c.pactBoon),
-        eldritchInvocations: (c.eldritchInvocations ?? []).map(invocationLabel),
+        pact: pactBoonLabel(c.pactBoon) || warlockFlavorFromCreation(c).pact,
+        eldritchInvocations: (c.eldritchInvocations?.length
+          ? c.eldritchInvocations
+          : warlockFlavorFromCreation(c).invocationIds
+        ).map(invocationLabel),
         mysticArcanum,
       };
     }
