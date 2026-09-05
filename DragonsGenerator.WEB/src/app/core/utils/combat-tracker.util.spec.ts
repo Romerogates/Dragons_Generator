@@ -91,6 +91,31 @@ describe('combat-tracker.util', () => {
     expect(advanceTurn(combat, 1)).toEqual({ turnIndex: 0, round: 2 });
   });
 
+  it('createCombatant defaults armor class to 10 for monsters and npcs', () => {
+    expect(createCombatant({ name: 'Gobelin', kind: 'monster' }).armorClass).toBe(10);
+    expect(createCombatant({ name: 'Allié', kind: 'npc' }).armorClass).toBe(10);
+    expect(createCombatant({ name: 'Héro', kind: 'player' }).armorClass).toBeUndefined();
+    expect(createCombatant({ name: 'Boss', kind: 'monster', armorClass: 18 }).armorClass).toBe(18);
+  });
+
+  it('duplicateCombatant copies armor class and stats', () => {
+    const src = createCombatant({
+      name: 'Espion',
+      kind: 'monster',
+      armorClass: 15,
+      maxHp: 22,
+      currentHp: 18,
+      initiativeBonus: 2,
+    });
+    const copy = duplicateCombatant(src);
+    expect(copy.name).toBe('Espion (copie)');
+    expect(copy.armorClass).toBe(15);
+    expect(copy.maxHp).toBe(22);
+    expect(copy.currentHp).toBe(22);
+    expect(copy.initiativeBonus).toBe(2);
+    expect(copy.id).not.toBe(src.id);
+  });
+
   it('duplicateCombatant increments numbered names', () => {
     const src = createCombatant({ name: 'Gobelin 2', kind: 'monster', initiativeBonus: 1, maxHp: 7 });
     const copy = duplicateCombatant(src);

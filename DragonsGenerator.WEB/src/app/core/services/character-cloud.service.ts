@@ -8,6 +8,7 @@ import {
   formatCharacterCloudLoadError,
   formatCharacterCloudSyncSummary,
 } from '@core/utils/character-cloud-sync.util';
+import { MAX_CHARACTERS_PER_USER } from '@core/constants/character-limits';
 import { AuthService } from './auth.service';
 
 export interface CloudCharacterSummary {
@@ -134,6 +135,26 @@ export class CharacterCloudService {
   }
 
   private createCharacter(body: { name: string; data: Character }): Observable<string> {
-    return this.http.post<{ id: string }>(`${this.api}/me/characters`, body).pipe(map((r) => r.id));
+    return this.list().pipe(
+      map((summaries) => summaries.length),
+      catchError(() => of(-1)),
+      switchMap((count) => {
+        if (count >= MAX_CHARACTERS_PER_USER) {
+          return throwError(
+            () =>
+              new HttpErrorResponse({
+                status: 400,
+                statusText: 'Bad Request',
+                error: {
+                  message: `Limite atteinte : maximum ${MAX_CHARACTERS_PER_USER} personnages par compte.`,
+                },
+              }),
+          );
+        }
+        return this.http
+          .post<{ id: string }>(`${this.api}/me/characters`, body)
+          .pipe(map((r) => r.id));
+      }),
+    );
   }
 }

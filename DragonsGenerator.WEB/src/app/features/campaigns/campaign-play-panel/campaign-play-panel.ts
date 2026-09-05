@@ -463,18 +463,57 @@ export class CampaignPlayPanel implements OnDestroy {
   }
 
   addCombatant(): void {
+    this.addAllyCombatant();
+  }
+
+  /** Allié PNJ vide (CA 10 par défaut règles) — ou démarre un combat s’il n’y en a pas. */
+  addAllyCombatant(): void {
     const combat = this.activeCombat();
     if (!combat) {
-      this.startStandaloneCombat();
+      if (!this.confirmReplaceCombat()) return;
+      this.setActiveCombat(
+        createActiveCombat(
+          [createCombatant({ name: 'Allié', kind: 'npc', armorClass: 10, initiativeBonus: 0 })],
+          { label: 'Combat' },
+        ),
+      );
       return;
     }
     this.patchCombat({
       ...combat,
       combatants: [
         ...combat.combatants,
-        createCombatant({ name: '', kind: 'npc', initiativeBonus: 0 }),
+        createCombatant({ name: 'Allié', kind: 'npc', armorClass: 10, initiativeBonus: 0 }),
       ],
     });
+  }
+
+  /** Adversaire avec CA 10 (règles) — randomisable via le dé à côté du champ. */
+  addEnemyCombatant(): void {
+    const combat = this.activeCombat();
+    if (!combat) {
+      if (!this.confirmReplaceCombat()) return;
+      this.setActiveCombat(
+        createActiveCombat(
+          [createCombatant({ name: 'Adversaire', kind: 'monster', armorClass: 10, initiativeBonus: 0 })],
+          { label: 'Combat' },
+        ),
+      );
+      return;
+    }
+    this.patchCombat({
+      ...combat,
+      combatants: [
+        ...combat.combatants,
+        createCombatant({ name: 'Adversaire', kind: 'monster', armorClass: 10, initiativeBonus: 0 }),
+      ],
+    });
+  }
+
+  /** Randomise la CA autour de la base règles (10 + 0–8). */
+  randomizeArmorClass(combatantId: string): void {
+    const ac = 10 + rollDie(8) - 1; // 10..17
+    this.updateCombatant(combatantId, { armorClass: ac }, { immediate: true });
   }
 
   removeCombatant(combatantId: string): void {

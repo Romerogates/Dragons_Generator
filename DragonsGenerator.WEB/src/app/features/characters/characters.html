@@ -12,7 +12,7 @@
         @if (!isLoggedIn()) {
           Tes héros cloud, accessibles partout.
         } @else {
-          {{ characters().length }} destinée{{ characters().length > 1 ? 's' : '' }} forgée{{
+          {{ characters().length }} / {{ maxCharacters }} destinée{{ characters().length > 1 ? 's' : '' }} forgée{{
             characters().length > 1 ? 's' : ''
           }}
           dans le grimoire.
@@ -20,7 +20,7 @@
       </p>
     </div>
 
-    @if (isLoggedIn() && characters().length > 0) {
+    @if (isLoggedIn() && characters().length > 0 && canCreateMore()) {
       <a
         routerLink="/create"
         class="px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-emerald-600 text-white shadow-md hover:bg-emerald-500 hover:scale-[1.02] active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-200 flex items-center gap-2"
@@ -28,6 +28,10 @@
         <span class="text-lg"><iconify-icon icon="fluent-emoji:sparkles"></iconify-icon></span>
         Forger un nouveau héros
       </a>
+    } @else if (isLoggedIn() && !canCreateMore()) {
+      <p class="text-xs text-amber-400/90 max-w-xs text-right">
+        Limite de {{ maxCharacters }} personnages atteinte. Supprimez un héros pour en créer un autre.
+      </p>
     }
   </header>
 

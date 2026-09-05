@@ -18,6 +18,7 @@ import { OfflineSyncService } from '@core/services/offline-sync.service';
 import { ConnectivityService } from '@core/services/connectivity.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import type { Character, SpeciesRef } from '@core/models/Character/character';
+import { MAX_CHARACTERS_PER_USER } from '@core/constants/character-limits';
 
 /**
  * Champs d’anciens exports encore tolérés en lecture liste.
@@ -65,6 +66,11 @@ export class Characters implements OnInit {
   readonly deleting = signal(false);
   readonly isLoggedIn = this.auth.isLoggedIn;
   readonly loading = signal(true);
+  readonly maxCharacters = MAX_CHARACTERS_PER_USER;
+
+  canCreateMore(): boolean {
+    return this.characters().length < MAX_CHARACTERS_PER_USER;
+  }
 
   ngOnInit(): void {
     if (!this.auth.isLoggedIn()) {

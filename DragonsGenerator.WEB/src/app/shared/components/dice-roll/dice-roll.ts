@@ -1,10 +1,12 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  CUSTOM_ELEMENTS_SCHEMA,
   input,
   output,
   signal,
 } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { rollDie } from '@core/utils/combat-roll.util';
 
@@ -13,24 +15,25 @@ export type DiceRollPhase = 'idle' | 'rolling' | 'result';
 @Component({
   selector: 'app-dice-roll',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, NgClass],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `
-    <div class="inline-flex flex-col items-start gap-2">
+    <div class="inline-flex flex-col items-start gap-1.5">
       @if (method() === 'encode') {
         <div class="flex flex-wrap items-center gap-2">
           <input
             type="number"
             [min]="1"
             [max]="faces()"
-            class="w-16 min-h-10 bg-[#171b22] border border-slate-700 rounded-lg text-center text-sm text-slate-200 py-1"
+            class="w-14 min-h-9 bg-[#171b22] border border-slate-700 rounded-lg text-center text-sm text-slate-200 py-1"
             [ngModel]="encodeValue()"
             (ngModelChange)="encodeValue.set(+$event || 1)"
             [attr.aria-label]="'Encoder un d' + faces()"
           />
           <button
             type="button"
-            class="min-h-10 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-amber-800/50 text-amber-200 hover:bg-amber-950/40 disabled:opacity-40"
+            class="min-h-9 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-amber-800/50 text-amber-200 hover:bg-amber-950/40 disabled:opacity-40"
             [disabled]="disabled()"
             (click)="confirmEncode()"
           >
@@ -38,51 +41,54 @@ export type DiceRollPhase = 'idle' | 'rolling' | 'result';
           </button>
         </div>
       } @else {
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="flex flex-wrap items-center gap-2">
           <div
-            class="dice-face relative w-12 h-12 rounded-xl border-2 border-amber-700/60 bg-gradient-to-br from-amber-900/80 to-slate-900 flex items-center justify-center font-mono text-lg text-amber-100 shadow-inner"
-            [class.dice-rolling]="phase() === 'rolling'"
+            class="dice-face relative rounded-lg border border-amber-700/60 bg-gradient-to-br from-amber-900/80 to-slate-900 flex items-center justify-center font-mono text-amber-100 shadow-inner"
+            [ngClass]="[
+              compact() ? 'w-8 h-8 text-xs' : 'w-10 h-10 text-sm',
+              phase() === 'rolling' ? 'dice-rolling' : '',
+            ]"
             aria-live="polite"
           >
             {{ displayFace() }}
           </div>
           <button
             type="button"
-            class="min-h-10 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-sky-800/50 text-sky-200 hover:bg-sky-950/40 disabled:opacity-40"
+            class="min-h-9 px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase border border-sky-800/50 text-sky-200 hover:bg-sky-950/40 disabled:opacity-40"
             [disabled]="disabled() || phase() === 'rolling'"
             (click)="launchDice()"
           >
             @if (phase() === 'rolling') {
-              Lancer…
+              …
             } @else {
               Lancer d{{ faces() }}
             }
           </button>
         </div>
       }
-      @if (phase() === 'result' && lastResult() != null) {
+      @if (phase() === 'result' && lastResult() != null && showResult()) {
         <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400">
-          Résultat : {{ lastResult() }}
+          {{ lastResult() }}
         </p>
       }
     </div>
   `,
   styles: `
     .dice-rolling {
-      animation: dice-tumble 0.9s ease-in-out;
+      animation: dice-tumble 0.75s ease-in-out;
     }
     @keyframes dice-tumble {
       0% {
         transform: rotate(0deg) scale(1);
       }
       25% {
-        transform: rotate(90deg) scale(1.08);
+        transform: rotate(90deg) scale(1.06);
       }
       50% {
-        transform: rotate(180deg) scale(0.95);
+        transform: rotate(180deg) scale(0.96);
       }
       75% {
-        transform: rotate(270deg) scale(1.05);
+        transform: rotate(270deg) scale(1.04);
       }
       100% {
         transform: rotate(360deg) scale(1);
@@ -96,6 +102,9 @@ export class DiceRollComponent {
   readonly method = input<'dice' | 'encode'>('dice');
   readonly disabled = input(false);
   readonly label = input('Jet');
+  /** Version compacte pour les panneaux combat densifiés. */
+  readonly compact = input(false);
+  readonly showResult = input(true);
 
   readonly rolled = output<number>();
 
@@ -110,36 +119,28 @@ export class DiceRollComponent {
     return `d${this.faces()}`;
   }
 
-  confirmEncode(): void {
-    if (this.disabled()) return;
-    const faces = Math.max(1, this.faces());
-    const value = Math.min(faces, Math.max(1, Math.floor(this.encodeValue()) || 1));
-    this.lastResult.set(value);
-    this.phase.set('result');
-    this.rolled.emit(value);
-  }
-
-  async launchDice(): Promise<void> {
+  launchDice(): void {
     if (this.disabled() || this.phase() === 'rolling') return;
     this.phase.set('rolling');
-    const faces = Math.max(1, this.faces());
-    const final = rollDie(faces);
-    const started = Date.now();
-    const tick = () => {
-      if (Date.now() - started < 900) {
-        this.spinFace.set(rollDie(faces));
-        requestAnimationFrame(tick);
-      } else {
-        this.lastResult.set(final);
-        this.phase.set('result');
-        this.rolled.emit(final);
-      }
-    };
-    requestAnimationFrame(tick);
+    const spin = setInterval(() => {
+      this.spinFace.set(rollDie(this.faces()));
+    }, 70);
+    window.setTimeout(() => {
+      clearInterval(spin);
+      const result = rollDie(this.faces());
+      this.lastResult.set(result);
+      this.phase.set('result');
+      this.rolled.emit(result);
+    }, 750);
   }
 
-  reset(): void {
-    this.phase.set('idle');
-    this.lastResult.set(null);
+  confirmEncode(): void {
+    if (this.disabled()) return;
+    const max = this.faces();
+    const v = Math.min(max, Math.max(1, this.encodeValue() || 1));
+    this.encodeValue.set(v);
+    this.lastResult.set(v);
+    this.phase.set('result');
+    this.rolled.emit(v);
   }
 }

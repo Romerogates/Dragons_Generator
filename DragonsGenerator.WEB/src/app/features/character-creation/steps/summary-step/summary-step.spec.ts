@@ -163,7 +163,10 @@ describe('SummaryStep', () => {
         },
         {
           provide: CharacterCloudService,
-          useValue: { save: cloudSaveSpy },
+          useValue: {
+            save: cloudSaveSpy,
+            list: () => of([]),
+          },
         },
         {
           provide: AuthService,

@@ -60,6 +60,8 @@ public class GetMyCharacterEndpoint(AppDbContext db) : EndpointWithoutRequest<Ch
 
 public class CreateMyCharacterEndpoint(AppDbContext db) : Endpoint<UpsertCharacterRequest, CharacterSummaryDto>
 {
+    public const int MaxCharactersPerUser = 10;
+
     public override void Configure() => Post("/me/characters");
 
     public override async Task HandleAsync(UpsertCharacterRequest req, CancellationToken ct)
@@ -68,6 +70,14 @@ public class CreateMyCharacterEndpoint(AppDbContext db) : Endpoint<UpsertCharact
         if (userId is null)
         {
             await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        var count = await db.Characters.CountAsync(c => c.UserId == userId.Value, ct);
+        if (count >= MaxCharactersPerUser)
+        {
+            AddError($"Limite atteinte : maximum {MaxCharactersPerUser} personnages par compte.");
+            await Send.ErrorsAsync(StatusCodes.Status400BadRequest, ct);
             return;
         }
 

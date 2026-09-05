@@ -322,6 +322,7 @@
                       <app-dice-roll
                         [faces]="20"
                         [method]="rollMethod()"
+                        [compact]="true"
                         (rolled)="onInitiativeDieRolled(cb.id, $event)"
                       />
                     </div>
@@ -329,7 +330,7 @@
                 }
               </button>
             } @empty {
-              <p class="text-xs text-slate-500 italic px-1">Aucun allié</p>
+              <p class="text-xs text-slate-500 italic px-1">Aucun allié — importez la party ou + Allié</p>
             }
           </div>
 
@@ -427,25 +428,39 @@
                       <app-dice-roll
                         [faces]="20"
                         [method]="rollMethod()"
+                        [compact]="true"
                         (rolled)="onInitiativeDieRolled(cb.id, $event)"
                       />
                     </div>
                   }
                   @if (isDm()) {
-                    <div class="mt-2 grid grid-cols-2 gap-1" (click)="$event.stopPropagation()">
+                    <div class="mt-2 grid grid-cols-[1fr_auto_1fr] gap-1 items-center" (click)="$event.stopPropagation()">
                       <input
                         type="number"
+                        inputmode="numeric"
                         placeholder="CA"
-                        class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300"
-                        [ngModel]="cb.armorClass ?? ''"
+                        class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
+                        [ngModel]="cb.armorClass ?? 10"
                         (ngModelChange)="
-                          updateCombatant(cb.id, { armorClass: $event === '' ? undefined : +$event })
+                          updateCombatant(cb.id, {
+                            armorClass: $event === '' || $event == null ? 10 : +$event
+                          })
                         "
                       />
+                      <button
+                        type="button"
+                        class="w-8 h-8 flex items-center justify-center rounded-lg border border-amber-800/50 text-amber-300 hover:bg-amber-950/40"
+                        title="Randomiser la CA (base règles 10)"
+                        aria-label="Randomiser la CA"
+                        (click)="randomizeArmorClass(cb.id)"
+                      >
+                        <iconify-icon icon="mdi:dice-d20" class="text-base"></iconify-icon>
+                      </button>
                       <input
                         type="number"
+                        inputmode="numeric"
                         placeholder="Bonus init"
-                        class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300"
+                        class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
                         [ngModel]="cb.initiativeBonus"
                         (ngModelChange)="updateCombatant(cb.id, { initiativeBonus: +$event || 0 })"
                       />
@@ -498,11 +513,14 @@
               </p>
             }
             @if (selectedTarget()) {
-              <app-dice-roll
-                [faces]="20"
-                [method]="rollMethod()"
-                (rolled)="resolveAttackWithDie($event)"
-              />
+              <div class="pt-1">
+                <app-dice-roll
+                  [faces]="20"
+                  [method]="rollMethod()"
+                  [compact]="true"
+                  (rolled)="resolveAttackWithDie($event)"
+                />
+              </div>
             }
           </div>
         }
@@ -520,10 +538,17 @@
           <div class="flex flex-wrap gap-2 items-center">
             <button
               type="button"
-              class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-amber-800/40 text-amber-300 hover:border-amber-600/50"
-              (click)="addCombatant()"
+              class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-sky-800/40 text-sky-300 hover:border-sky-600/50"
+              (click)="addAllyCombatant()"
             >
-              + Combattant
+              + Allié
+            </button>
+            <button
+              type="button"
+              class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-red-900/40 text-red-300 hover:border-red-700/50"
+              (click)="addEnemyCombatant()"
+            >
+              + Adversaire
             </button>
             <button
               type="button"
@@ -541,6 +566,7 @@
               Δ PV
               <input
                 type="number"
+                inputmode="numeric"
                 min="1"
                 class="w-14 bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-slate-300"
                 [ngModel]="hpAdjustAmount()"
@@ -552,7 +578,7 @@
       } @else if (isDm()) {
         <div class="bg-[#1b2028]/80 border border-dashed border-amber-800/40 rounded-xl p-4 space-y-3">
           <p class="text-sm text-slate-400">
-            Démarrez un combat : les alliés à gauche, les adversaires à droite. Mode table :
+            Démarrez un combat vide, puis ajoutez des alliés (party ou PNJ) et des adversaires. Mode table :
             <strong class="text-slate-200">{{ sessionModeLabel(sessionMode()) }}</strong>.
           </p>
           <div class="flex flex-wrap gap-2">

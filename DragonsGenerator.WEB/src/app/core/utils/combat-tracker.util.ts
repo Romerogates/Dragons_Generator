@@ -24,6 +24,10 @@ export function createCombatant(
   return {
     id: createCombatantId(),
     initiativeBonus: 0,
+    // CA de base des règles (10) pour PNJ / monstres si absente.
+    ...(partial.armorClass === undefined && (partial.kind === 'monster' || partial.kind === 'npc')
+      ? { armorClass: 10 }
+      : {}),
     ...partial,
   };
 }
@@ -205,8 +209,15 @@ export function duplicateCombatant(source: Combatant): Combatant {
     name: nextDuplicateName(source.name),
     kind: source.kind,
     initiativeBonus: source.initiativeBonus,
+    initiativeRoll: undefined,
     maxHp: source.maxHp,
-    currentHp: source.maxHp,
+    currentHp: source.maxHp ?? source.currentHp,
+    armorClass: source.armorClass,
+    attacks: source.attacks ? source.attacks.map((a) => ({ ...a })) : undefined,
+    characterId: source.characterId,
+    memberUserId: undefined,
+    conditions: source.conditions ? [...source.conditions] : undefined,
+    defeated: false,
   });
 }
 

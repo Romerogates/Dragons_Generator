@@ -31,6 +31,8 @@ import {
   formatCharacterExportErrors,
   validateCharacterExport,
 } from '@core/utils/character-export-validation.util';
+import { MAX_CHARACTERS_PER_USER } from '@core/constants/character-limits';
+import { switchMap, of } from 'rxjs';
 
 @Component({
   selector: 'app-summary-step',
@@ -163,8 +165,24 @@ export class SummaryStep implements OnInit, OnDestroy {
       return;
     }
 
-    this.cloud.save(character as Character).subscribe({
+    const save$ = this.isEditMode()
+      ? this.cloud.save(character as Character, { updateExisting: true })
+      : this.cloud.list().pipe(
+          switchMap((list) => {
+            if (list.length >= MAX_CHARACTERS_PER_USER) {
+              this.saving.set(false);
+              this.saveError.set(
+                `Limite atteinte : maximum ${MAX_CHARACTERS_PER_USER} personnages par compte. Supprimez un héros avant d’en créer un autre.`,
+              );
+              return of(null);
+            }
+            return this.cloud.save(character as Character);
+          }),
+        );
+
+    save$.subscribe({
       next: (serverId) => {
+        if (serverId == null) return;
         const updated = {
           ...character,
           id: serverId || character.id,
@@ -176,7 +194,16 @@ export class SummaryStep implements OnInit, OnDestroy {
         this.builder.reset();
         void this.router.navigate(['/character-sheet']);
       },
-      error: () => {
+      error: (err: unknown) => {
+        const msg =
+          err && typeof err === 'object' && 'error' in err
+            ? String((err as { error?: { message?: string } }).error?.message ?? '')
+            : '';
+        if (msg.toLowerCase().includes('limite')) {
+          this.saving.set(false);
+          this.saveError.set(msg);
+          return;
+        }
         const withId = {
           ...character,
           id: character.id ?? crypto.randomUUID(),
