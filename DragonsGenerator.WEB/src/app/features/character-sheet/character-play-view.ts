@@ -14,6 +14,7 @@ import {
   spellcastingFocusLabel,
 } from '@core/utils/character-spellcasting-display.util';
 import { labelForGameId } from '@core/utils/game-id-labels';
+import { normalizeSkillId } from '@core/utils/skill.utils';
 
 /** Clés déjà couvertes par le bloc Incantation — évite le doublon dans Ressources. */
 const SPELLCASTING_RESOURCE_DUPES = new Set([
@@ -63,12 +64,15 @@ export class CharacterPlayView {
 
   readonly skillList = computed(() => {
     const p = this.character().proficiencies;
-    const expertise = new Set(p?.expertiseSkills ?? []);
-    return (p?.skills ?? []).map((id) => ({
-      id,
-      label: labelForGameId(id),
-      expertise: expertise.has(id),
-    }));
+    const expertise = new Set((p?.expertiseSkills ?? []).map(normalizeSkillId));
+    return (p?.skills ?? []).map((rawId) => {
+      const id = normalizeSkillId(rawId);
+      return {
+        id,
+        label: labelForGameId(rawId) || labelForGameId(id),
+        expertise: expertise.has(id),
+      };
+    });
   });
 
   readonly toolLabels = computed(() =>

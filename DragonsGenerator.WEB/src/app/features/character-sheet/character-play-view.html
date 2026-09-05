@@ -198,7 +198,17 @@
                 <ul class="text-sm text-slate-300 space-y-1">
                   @for (sp of group.spells; track sp.refId) {
                     <li>
-                      <span class="font-bold text-slate-100">{{ sp.name }}</span>
+                      @if (sp.refId) {
+                        <a
+                          class="font-bold text-amber-400/95 hover:text-amber-300 hover:underline underline-offset-2"
+                          [href]="'/spells/' + sp.refId"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          >{{ sp.name }}</a
+                        >
+                      } @else {
+                        <span class="font-bold text-slate-100">{{ sp.name }}</span>
+                      }
                       @if (sp.prepared) {
                         <span class="text-[10px] text-emerald-400 ml-1">préparé</span>
                       }
@@ -245,7 +255,13 @@
                 <li
                   class="text-[11px] px-2 py-1 rounded-lg bg-[#171b22] border border-slate-700 text-slate-300"
                 >
-                  {{ sk.label }}
+                  <a
+                    class="text-amber-400/95 hover:text-amber-300 hover:underline underline-offset-2"
+                    [href]="'/skills/' + sk.id"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >{{ sk.label }}</a
+                  >
                   @if (sk.expertise) {
                     <span class="text-amber-400"> ×2</span>
                   }

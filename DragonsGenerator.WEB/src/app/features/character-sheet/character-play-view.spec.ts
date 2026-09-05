@@ -194,4 +194,19 @@ describe('CharacterPlayView', () => {
     expect(component.isSave('intelligence')).toBeTrue();
     expect(component.isSave('force')).toBeFalse();
   });
+
+  it('links spells and skills to Codex pages in a new tab', () => {
+    const root = fixture.nativeElement as HTMLElement;
+    const spellLink = root.querySelector('a[href="/spells/spl-shield"]') as HTMLAnchorElement | null;
+    expect(spellLink).toBeTruthy();
+    expect(spellLink!.textContent?.trim()).toBe('Bouclier');
+    expect(spellLink!.target).toBe('_blank');
+    expect(spellLink!.rel).toContain('noopener');
+
+    const skillLink = root.querySelector(
+      'a[href="/skills/skill-arcana"]',
+    ) as HTMLAnchorElement | null;
+    expect(skillLink).toBeTruthy();
+    expect(skillLink!.target).toBe('_blank');
+  });
 });

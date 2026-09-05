@@ -122,7 +122,7 @@ function mapToolRef(opt: unknown): BackgroundToolRef {
     return { type: 'tool', any: true };
   }
 
-  if (raw.type === 'instrument' || raw.type === 'gameSet' || raw.type === 'vehicle') {
+  if (raw.type === 'instrument' || raw.type === 'gameSet' || raw.type === 'vehicle' || raw.type === 'tool') {
     const id = String(raw.id ?? '');
     if (
       !id ||
@@ -130,12 +130,15 @@ function mapToolRef(opt: unknown): BackgroundToolRef {
       id === 'tl-materiel-de-jeu' ||
       id.includes('category')
     ) {
-      return { type: raw.type, any: true };
+      return { type: raw.type === 'tool' ? 'tool' : raw.type, any: true };
+    }
+    if (id === 'tl-outils-dalchimiste') {
+      return { type: 'tool', id: 'tl-necessaire-dalchimiste', any: false };
     }
     return {
       type: raw.type,
       id: raw.id,
-      any: raw.any ?? false,
+      any: false,
     };
   }
 
@@ -147,9 +150,9 @@ function mapToolRef(opt: unknown): BackgroundToolRef {
         : { type: 'vehicle', any: true };
     }
     if (id === 'tl-outils-dalchimiste') {
-      return { type: 'tool', id: 'tl-necessaire-dalchimiste' };
+      return { type: 'tool', id: 'tl-necessaire-dalchimiste', any: false };
     }
-    return { type: 'tool', id };
+    return { type: 'tool', id, any: false };
   }
 
   return { type: 'tool', any: true };

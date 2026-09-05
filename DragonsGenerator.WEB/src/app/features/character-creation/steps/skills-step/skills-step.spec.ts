@@ -411,4 +411,117 @@ describe('SkillsStep', () => {
     expect(allItems).not.toContain('tl-des');
     expect(allItems).not.toContain('tl-necessaire-de-brasseur');
   });
+
+  it('selects concrete Larron tools without requiring a second pick list', async () => {
+    await TestBed.resetTestingModule();
+    creationSignal = signal(
+      skillsCreation({
+        backgroundProficiencies: {
+          skills: {
+            fixed: [],
+            chooseCount: 2,
+            options: [
+              'skill-discretion',
+              'skill-escamotage',
+              'skill-investigation',
+              'skill-tromperie',
+            ],
+          },
+          tools: {
+            fixed: [],
+            choose: [
+              {
+                chooseCount: 1,
+                options: [
+                  { type: 'tool', id: 'tl-outils-de-voleur', name: 'Outils de voleur' },
+                  {
+                    type: 'tool',
+                    id: 'tl-necessaire-de-deguisement',
+                    name: 'Nécessaire de déguisement',
+                  },
+                  {
+                    type: 'tool',
+                    id: 'tl-necessaire-de-faussaire',
+                    name: 'Nécessaire de faussaire',
+                  },
+                ],
+              },
+            ],
+          },
+          equipment: { fromToolProficiency: true },
+        },
+        skillChooseCount: 0,
+        skillOptions: [],
+      }),
+    );
+    setProficienciesSpy = jasmine.createSpy('setProficiencies');
+    setExpertiseSpy = jasmine.createSpy('setExpertiseSkills');
+    nextStepSpy = jasmine.createSpy('nextStep');
+    await TestBed.configureTestingModule({
+      imports: [SkillsStep],
+      providers: [
+        ...zonelessTestProviders,
+        {
+          provide: DataService,
+          useValue: {
+            getSkills: () => of(MOCK_SKILLS),
+            getClassById: () => of({ id: 'cls-lettre', name: 'Lettré', data: { progression: [] } }),
+            getEquipments: () =>
+              of([
+                ...MOCK_TOOLS,
+                {
+                  id: 'tl-outils-de-voleur',
+                  name: 'Outils de voleur',
+                  type: 'TOOL',
+                  subtype: 'thieves_tools',
+                },
+                {
+                  id: 'tl-necessaire-de-deguisement',
+                  name: 'Nécessaire de déguisement',
+                  type: 'TOOL',
+                  subtype: 'special_kit',
+                },
+              ]),
+          },
+        },
+        {
+          provide: CharacterBuilderService,
+          useValue: {
+            creation: creationSignal.asReadonly(),
+            secondaryClasses: () => [],
+            setSecondaryClassSkills: () => {},
+            targetLevel: () => 1,
+            abilityModifiers: () => ({
+              force: 0,
+              dexterite: 1,
+              constitution: 0,
+              intelligence: 2,
+              sagesse: 1,
+              charisme: 0,
+            }),
+            setProficiencies: setProficienciesSpy,
+            setExpertiseSkills: setExpertiseSpy,
+            mergeClassProficiencies: jasmine.createSpy('mergeClassProficiencies'),
+            nextStep: nextStepSpy,
+            previousStep: jasmine.createSpy('previousStep'),
+          },
+        },
+      ],
+    }).compileComponents();
+
+    const f = TestBed.createComponent(SkillsStep);
+    f.detectChanges();
+    const c = f.componentInstance;
+
+    const group = c.bgToolChoiceGroups()[0];
+    expect(group.options.length).toBe(3);
+    expect(group.options.every((o) => o.category === null)).toBeTrue();
+
+    c.onBgToolOptionClick(group.options[0], group);
+    f.detectChanges();
+
+    expect(c.expandedBgToolCategory()).toBeNull();
+    expect(c.selectedBgTools()).toContain('tl-outils-de-voleur');
+    expect(c.bgToolChoiceGroups()[0].options[0].selected).toBeTrue();
+  });
 });

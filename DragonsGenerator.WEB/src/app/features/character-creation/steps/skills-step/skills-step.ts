@@ -545,7 +545,11 @@ export class SkillsStep implements OnInit {
       if (id === 'game_set' || id === 'gameset' || id === 'jeu') return { type: 'gameSet', any: true };
       if (id === 'vehicle' || id === 'vehicule') return { type: 'vehicle', any: true };
       if (id === 'tl-outils-dalchimiste') return { type: 'tool', id: 'tl-necessaire-dalchimiste' };
-      return { type: 'tool', id: opt };
+      // Id catalogue concret (ex. Larron : outils de voleur)
+      if (id.startsWith('tl-') || id.startsWith('vhc-')) {
+        return { type: 'tool', id: opt, any: false };
+      }
+      return { type: 'tool', id: opt, any: false };
     }
 
     if (!opt || typeof opt !== 'object') {
@@ -554,7 +558,7 @@ export class SkillsStep implements OnInit {
 
     const raw = opt as RawToolOption & object;
 
-    // Déjà normalisé (BackgroundToolRef)
+    // Catégorie libre (any) — sans id concret
     if (
       'any' in raw &&
       raw.any === true &&
@@ -563,7 +567,8 @@ export class SkillsStep implements OnInit {
       (raw.type === 'tool' ||
         raw.type === 'instrument' ||
         raw.type === 'gameSet' ||
-        raw.type === 'vehicle')
+        raw.type === 'vehicle') &&
+      !('id' in raw && raw.id)
     ) {
       return { type: raw.type, any: true };
     }
@@ -578,22 +583,39 @@ export class SkillsStep implements OnInit {
       if (cat.includes('vehic')) return { type: 'vehicle', any: true };
       return { type: 'tool', any: true };
     }
+    // Outil / instrument / véhicule concret (ex. Larron type:"tool" + id)
     if (
       'type' in raw &&
-      (raw.type === 'instrument' || raw.type === 'gameSet' || raw.type === 'vehicle')
+      (raw.type === 'tool' ||
+        raw.type === 'instrument' ||
+        raw.type === 'gameSet' ||
+        raw.type === 'vehicle')
     ) {
-      const id = String(('id' in raw ? raw.id : undefined) ?? '');
-      if (!id || id.startsWith('tl-vehicules') || id === 'tl-materiel-de-jeu') {
+      const oid = String(('id' in raw ? raw.id : undefined) ?? '');
+      if (
+        !oid ||
+        oid.startsWith('tl-vehicules') ||
+        oid === 'tl-materiel-de-jeu' ||
+        oid.includes('category')
+      ) {
         return { type: raw.type, any: true };
       }
-      return { type: raw.type, id: String(raw.id), any: false };
+      if (oid === 'tl-outils-dalchimiste') {
+        return { type: 'tool', id: 'tl-necessaire-dalchimiste', any: false };
+      }
+      return { type: raw.type, id: oid, any: false };
     }
     if ('id' in raw && raw.id) {
       const oid = String(raw.id);
       if (oid === 'tl-outils-dalchimiste') {
-        return { type: 'tool', id: 'tl-necessaire-dalchimiste' };
+        return { type: 'tool', id: 'tl-necessaire-dalchimiste', any: false };
       }
-      return { type: 'tool', id: oid };
+      if (oid.startsWith('tl-vehicules') || oid === 'tl-materiel-de-jeu') {
+        return oid.includes('jeu')
+          ? { type: 'gameSet', any: true }
+          : { type: 'vehicle', any: true };
+      }
+      return { type: 'tool', id: oid, any: false };
     }
     return { type: 'tool', any: true };
   }
@@ -612,10 +634,13 @@ export class SkillsStep implements OnInit {
     return map[category] ?? null;
   }
 
-  /** Clic sur une option d'historique : catégorie → expand, sinon toggle direct. */
+  /** Clic sur une option d'historique : catégorie → expand, outil concret → toggle. */
   onBgToolOptionClick(opt: BgToolChoiceOption, group: BgToolChoiceGroup): void {
-    if (opt.category) {
-      // Déjà un outil concret de cette catégorie ? → désélection
+    // Id catalogue concret (Larron, etc.) : toujours basculer, même si mal tagué « catégorie ».
+    const concreteKey =
+      opt.key.startsWith('tl-') || opt.key.startsWith('vhc-') ? opt.key : null;
+
+    if (opt.category && !concreteKey) {
       const concrete = this.selectedBgTools().find((id) =>
         this.toolBelongsToCategory(id, opt.category!),
       );
@@ -624,13 +649,18 @@ export class SkillsStep implements OnInit {
         this.expandedBgToolCategory.set(null);
         return;
       }
-      this.expandedBgToolCategory.set(
-        this.expandedBgToolCategory() === opt.category ? null : opt.category,
-      );
+      const next =
+        this.expandedBgToolCategory() === opt.category ? null : opt.category;
+      this.expandedBgToolCategory.set(next);
+      if (next && this.toolsForExpandedCategory().length === 0) {
+        // Catégorie sans items catalogue → ne pas bloquer le joueur
+        this.expandedBgToolCategory.set(null);
+        this.toggleBgTool(opt.key, group);
+      }
       return;
     }
     this.expandedBgToolCategory.set(null);
-    this.toggleBgTool(opt.key, group);
+    this.toggleBgTool(concreteKey ?? opt.key, group);
   }
 
   toggleBgTool(toolKey: string, group: BgToolChoiceGroup): void {
@@ -695,6 +725,10 @@ export class SkillsStep implements OnInit {
     const label = this.categoryGroupLabel(cat);
     if (!label) return [];
     return this.toolGroups().find((g) => g.label === label)?.items ?? [];
+  }
+
+  groupHasCategoryOptions(group: BgToolChoiceGroup): boolean {
+    return group.options.some((o) => !!o.category);
   }
 
   // Historique Custom : 2 outils max par défaut
@@ -782,20 +816,38 @@ export class SkillsStep implements OnInit {
           ['tl-des', 'tl-echecs', 'tl-go', 'tl-jeu-de-cartes', 'tl-osselets'].includes(t.id)),
     );
     const vehicles = catalog.filter((t) => t.type === 'VEHICLE');
+    const specialKits = catalog.filter(
+      (t) =>
+        t.type === 'TOOL' &&
+        (t.subtype === 'special_kit' ||
+          t.subtype === 'thieves_tools' ||
+          [
+            'tl-outils-de-voleur',
+            'tl-necessaire-de-deguisement',
+            'tl-necessaire-de-faussaire',
+            'tl-necessaire-dempoisonneur',
+          ].includes(t.id)),
+    );
     const artisan = catalog.filter((t) => {
       if (t.type !== 'TOOL') return false;
-      if (t.subtype === 'artisan_tool') return true;
+      if (specialKits.some((s) => s.id === t.id)) return false;
+      if (t.subtype === 'artisan_tool' || t.subtype === 'artisan_tools') return true;
       // Fallback si subtype manquant : outils hors instruments / jeux / kits spéciaux
       if (t.subtype) return false;
       return (
         !instruments.some((i) => i.id === t.id) &&
         !games.some((g) => g.id === t.id) &&
-        !['tl-outils-de-voleur', 'tl-necessaire-dempoisonneur'].includes(t.id)
+        !specialKits.some((s) => s.id === t.id)
       );
     });
 
     return [
       { label: "Outils d'artisan", icon: 'fluent-emoji:hammer-and-wrench', items: artisan },
+      {
+        label: 'Kits et outils spéciaux',
+        icon: 'fluent-emoji:locked-with-key',
+        items: specialKits,
+      },
       { label: 'Instruments de musique', icon: 'fluent-emoji:violin', items: instruments },
       { label: 'Matériel de jeu', icon: 'fluent-emoji:game-die', items: games },
       { label: 'Véhicules', icon: 'fluent-emoji:horse', items: vehicles },

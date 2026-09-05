@@ -362,7 +362,9 @@
           @for (group of bgToolChoiceGroups(); track group.groupIndex) {
             <p class="text-xs text-slate-500 mb-4 mt-3">
               Choisissez {{ group.chooseCount }} maîtrise{{ group.chooseCount > 1 ? 's' : '' }}
-              — puis l'outil précis dans la liste.
+              @if (groupHasCategoryOptions(group)) {
+                — puis l'outil précis dans la liste.
+              }
               @if (group.note) {
                 <span class="italic text-slate-600 ml-1">{{ group.note }}</span>
               }
@@ -370,6 +372,7 @@
             <div class="flex flex-wrap gap-3 mb-4">
               @for (opt of group.options; track opt.key) {
                 <button
+                  type="button"
                   class="px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition-[colors,transform,opacity,box-shadow] duration-150"
                   [ngClass]="
                     opt.selected
@@ -402,6 +405,7 @@
                 <div class="flex flex-wrap gap-2">
                   @for (tool of toolsForExpandedCategory(); track tool.id) {
                     <button
+                      type="button"
                       class="px-3 py-2 rounded-xl border-2 text-xs font-bold transition-[colors,transform,opacity,box-shadow] duration-150 bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer"
                       (click)="pickConcreteBgTool(tool.id, cat, group)"
                     >
