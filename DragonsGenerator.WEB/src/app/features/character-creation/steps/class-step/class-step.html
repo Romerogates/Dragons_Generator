@@ -180,7 +180,11 @@
               class="text-6xl sm:text-7xl mb-5 sm:mb-6 mt-3 sm:mt-4 transition-transform duration-300 drop-shadow-lg"
               [ngClass]="{ 'scale-110 sm:scale-125': centered }"
             >
-              <iconify-icon [icon]="card.icon"></iconify-icon>
+              @if (card.emoji) {
+                <span class="leading-none select-none" aria-hidden="true">{{ card.emoji }}</span>
+              } @else {
+                <iconify-icon [icon]="card.icon"></iconify-icon>
+              }
             </div>
 
             <h3

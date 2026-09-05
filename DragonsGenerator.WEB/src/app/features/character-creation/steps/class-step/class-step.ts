@@ -32,6 +32,7 @@ import {
   extractPactSlotsFromResources,
 } from '@core/utils/feature-uses.util';
 import { annotateAuraDesc } from '@core/utils/aura-range.util';
+import { animalTotemEmoji, animalTotemIconify } from '@core/utils/animal-totem-icon.util';
 import {
   extractProgressionChoices,
   classBonusLanguageCount,
@@ -64,6 +65,8 @@ interface CardOption {
   stats?: string;
   badge?: string;
   icon: string;
+  /** Emoji natif (totems animaux) — plus fiable qu’Iconify sur le carrousel. */
+  emoji?: string;
 }
 interface FeatureMechanicsOption {
   id?: string;
@@ -616,29 +619,31 @@ export class ClassStep implements OnInit {
         const choice = this.subChoiceForDisplay();
         if (!choice) return [];
         const picked = new Set(this.subChoiceAnswers().get(choice.id) ?? []);
-        return choice.options.map((opt) => ({
-          id: opt,
-          title: this.getSubChoiceLabel(choice.type, opt, choice.option_labels),
-          desc: this.getSubChoiceDescription(
-            opt,
-            choice.type,
-            choice.option_labels?.[opt],
-            choice.option_descs?.[opt],
-          ),
-          badge: picked.has(opt) ? 'Sélectionné' : 'Option',
-          icon:
-            choice.type === 'dragon_ancestry'
-              ? 'fluent-emoji:dragon'
-              : choice.type === 'fielon_lord'
-                ? 'fluent-emoji:smiling-face-with-horns'
-                : choice.type === 'animal_totem'
-                  ? this.animalTotemIcon(
-                      this.getSubChoiceLabel(choice.type, opt, choice.option_labels),
-                    )
+        return choice.options.map((opt) => {
+          const title = this.getSubChoiceLabel(choice.type, opt, choice.option_labels);
+          const isTotem = choice.type === 'animal_totem';
+          return {
+            id: opt,
+            title,
+            desc: this.getSubChoiceDescription(
+              opt,
+              choice.type,
+              choice.option_labels?.[opt],
+              choice.option_descs?.[opt],
+            ),
+            badge: picked.has(opt) ? 'Sélectionné' : 'Option',
+            icon: isTotem
+              ? animalTotemIconify(opt, title)
+              : choice.type === 'dragon_ancestry'
+                ? 'fluent-emoji:dragon'
+                : choice.type === 'fielon_lord'
+                  ? 'fluent-emoji:smiling-face-with-horns'
                   : choice.type === 'feature_option'
                     ? 'fluent-emoji:crossed-swords'
                     : 'fluent-emoji:sparkles',
-        }));
+            emoji: isTotem ? animalTotemEmoji(opt, title) : undefined,
+          };
+        });
       }
 
       case 'prog_choice': {
@@ -1387,26 +1392,7 @@ export class ClassStep implements OnInit {
 
   /** Icône fluent-emoji approximative selon le nom de la bête totem. */
   animalTotemIcon(label: string): string {
-    const n = (label || '').toLowerCase();
-    if (/loup|wolf/.test(n)) return 'fluent-emoji:wolf';
-    if (/ours|bear/.test(n)) return 'fluent-emoji:bear';
-    if (/aigle|eagle|faucon|hawk/.test(n)) return 'fluent-emoji:eagle';
-    if (/cerf|elk|deer|chevreuil/.test(n)) return 'fluent-emoji:deer';
-    if (/serpent|snake|vipère/.test(n)) return 'fluent-emoji:snake';
-    if (/chat|panth|tigre|lion|félin|cougar|lynx/.test(n)) return 'fluent-emoji:cat';
-    if (/corbeau|raven|crow|oiseau|oiseau|hibou|owl/.test(n)) return 'fluent-emoji:bird';
-    if (/cheval|horse|poney/.test(n)) return 'fluent-emoji:horse';
-    if (/sanglier|boar|porc/.test(n)) return 'fluent-emoji:boar';
-    if (/requin|shark/.test(n)) return 'fluent-emoji:shark';
-    if (/araign|spider/.test(n)) return 'fluent-emoji:spider';
-    if (/crocodil|alligator/.test(n)) return 'fluent-emoji:crocodile';
-    if (/grenouille|frog|crapaud/.test(n)) return 'fluent-emoji:frog';
-    if (/rat|souris|mouse/.test(n)) return 'fluent-emoji:rat';
-    if (/chouette/.test(n)) return 'fluent-emoji:owl';
-    if (/dauphin|dolphin/.test(n)) return 'fluent-emoji:dolphin';
-    if (/requin/.test(n)) return 'fluent-emoji:shark';
-    if (/abeille|bee|guêpe/.test(n)) return 'fluent-emoji:honeybee';
-    return 'fluent-emoji:paw-prints';
+    return animalTotemIconify(label);
   }
 
   getSubChoiceLabel(
