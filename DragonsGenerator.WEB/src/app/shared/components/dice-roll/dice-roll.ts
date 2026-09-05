@@ -66,7 +66,7 @@ export type DiceRollPhase = 'idle' | 'rolling' | 'result';
           </button>
         </div>
       }
-      @if (phase() === 'result' && lastResult() != null && showResult()) {
+      @if (phase() === 'result' && lastResult() !== null && showResult()) {
         <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400">
           {{ lastResult() }}
         </p>
@@ -115,7 +115,7 @@ export class DiceRollComponent {
 
   displayFace(): string | number {
     if (this.phase() === 'rolling') return this.spinFace();
-    if (this.lastResult() != null) return this.lastResult()!;
+    if (this.lastResult() !== null) return this.lastResult()!;
     return `d${this.faces()}`;
   }
 

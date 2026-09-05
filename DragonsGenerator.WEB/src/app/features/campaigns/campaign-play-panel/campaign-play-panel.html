@@ -443,7 +443,7 @@
                         [ngModel]="cb.armorClass ?? 10"
                         (ngModelChange)="
                           updateCombatant(cb.id, {
-                            armorClass: $event === '' || $event == null ? 10 : +$event
+                            armorClass: $event === '' || $event === null ? 10 : +$event
                           })
                         "
                       />
@@ -554,9 +554,16 @@
               <button
                 type="button"
                 class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-red-900/40 text-red-300 hover:border-red-700/50"
+                (click)="toggleEnemyPicker()"
+              >
+                + Créature campagne
+              </button>
+              <button
+                type="button"
+                class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-400 hover:text-slate-200"
                 (click)="addEnemyCombatant()"
               >
-                + Adversaire
+                + Adversaire libre
               </button>
               <button
                 type="button"
@@ -614,12 +621,50 @@
                 }
               </div>
             }
+
+            @if (enemyPickerOpen()) {
+              <div class="rounded-xl border border-red-900/40 bg-red-950/20 p-3 space-y-2">
+                <p class="text-[10px] font-black uppercase tracking-widest text-red-300">
+                  Choisir une créature de la campagne
+                </p>
+                @if (!campaignCreatures().length) {
+                  <p class="text-xs text-slate-500 italic">
+                    Aucune créature dans le bestiaire de campagne — ajoutez-en dans l’onglet Créatures, ou utilisez « Adversaire libre ».
+                  </p>
+                } @else {
+                  <div class="flex flex-wrap gap-2">
+                    @for (cr of campaignCreatures(); track cr.creatureId + (cr.customName || '')) {
+                      <button
+                        type="button"
+                        class="px-3 py-2 rounded-xl text-left text-xs border border-red-900/50 text-red-100 hover:border-red-600/60 hover:bg-red-950/40 disabled:opacity-50"
+                        [disabled]="importingParty() || importingCreatureId() === cr.creatureId"
+                        (click)="addCampaignCreatureEnemy(cr)"
+                      >
+                        <span class="font-serif block">{{ cr.customName || cr.creatureName }}</span>
+                        <span class="text-[10px] text-slate-500">
+                          {{ cr.creatureName }}
+                          @if (cr.challengeRating) {
+                            · FP {{ cr.challengeRating }}
+                          }
+                          @if (cr.role) {
+                            · {{ cr.role }}
+                          }
+                        </span>
+                        @if (importingCreatureId() === cr.creatureId) {
+                          <span class="text-[10px] text-red-400 ml-1">…</span>
+                        }
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            }
           </div>
         }
       } @else if (isDm()) {
         <div class="bg-[#1b2028]/80 border border-dashed border-amber-800/40 rounded-xl p-4 space-y-3">
           <p class="text-sm text-slate-400">
-            Démarrez un combat, choisissez un ou plusieurs héros joueurs comme alliés, puis ajoutez des adversaires. Mode table :
+            Démarrez un combat, choisissez les héros, puis les adversaires du bestiaire de campagne. Mode table :
             <strong class="text-slate-200">{{ sessionModeLabel(sessionMode()) }}</strong>.
           </p>
           <div class="flex flex-wrap gap-2">
@@ -667,6 +712,31 @@
               Pas encore de héros approuvé — approuvez un personnage dans Joueurs, ou lancez un combat puis ajoutez un PNJ / adversaire.
             </p>
           }
+          @if (campaignCreatures().length) {
+            <div class="pt-1 space-y-2 border-t border-slate-800/80">
+              <p class="text-[10px] font-black uppercase tracking-widest text-red-300">
+                Ou démarrer avec une créature
+              </p>
+              <div class="flex flex-wrap gap-2">
+                @for (cr of campaignCreatures(); track cr.creatureId + (cr.customName || '')) {
+                  <button
+                    type="button"
+                    class="px-3 py-2 rounded-xl text-left text-xs border border-red-900/50 text-red-100 hover:border-red-600/60 disabled:opacity-50"
+                    [disabled]="importingParty() || importingCreatureId() === cr.creatureId"
+                    (click)="addCampaignCreatureEnemy(cr)"
+                  >
+                    <span class="font-serif block">{{ cr.customName || cr.creatureName }}</span>
+                    <span class="text-[10px] text-slate-500">
+                      FP {{ cr.challengeRating || '?' }}
+                      @if (cr.role) {
+                        · {{ cr.role }}
+                      }
+                    </span>
+                  </button>
+                }
+              </div>
+            </div>
+          }
         </div>
       } @else {
         <p class="text-sm text-slate-500 italic">En attente que le MJ lance un combat…</p>
@@ -711,10 +781,17 @@
                 </span>
                 <button
                   type="button"
-                  class="px-3 py-1 rounded-lg text-[9px] font-black uppercase bg-amber-950/30 border border-amber-800/40 text-amber-300"
-                  (click)="startCombatFromEncounter(enc)"
+                  class="px-3 py-1 rounded-lg text-[9px] font-black uppercase bg-amber-950/30 border border-amber-800/40 text-amber-300 disabled:opacity-50"
+                  [disabled]="importingParty()"
+                  (click)="addEncounterToCombat(enc)"
                 >
-                  Initiative
+                  @if (importingParty()) {
+                    Chargement…
+                  } @else if (activeCombat()) {
+                    + Au combat
+                  } @else {
+                    Lancer le combat
+                  }
                 </button>
               </div>
             </div>

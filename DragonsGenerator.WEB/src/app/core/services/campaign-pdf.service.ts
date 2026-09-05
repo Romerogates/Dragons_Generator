@@ -550,7 +550,7 @@ export class CampaignPdfService {
       pdf.addImage(bg, 'JPEG', 0, 0, PAGE_W, PAGE_H);
     }
 
-    let y = needNewPage ? MARGIN + 4 : continueAt! + 5;
+    const y = needNewPage ? MARGIN + 4 : continueAt! + 5;
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(12);
     pdf.setTextColor(70, 35, 10);

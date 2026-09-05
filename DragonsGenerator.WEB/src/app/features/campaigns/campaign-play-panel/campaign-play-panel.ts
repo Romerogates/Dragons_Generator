@@ -16,7 +16,10 @@ import { forkJoin, of, firstValueFrom } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { AuthService } from '@core/services/auth.service';
+import { DataService } from '@core/services/data.service';
 import type { Character } from '@core/models/Character/character';
+import type { Creature } from '@core/models/Creatures/creature';
+import type { StoryCreatureSelection } from '@core/models/Story/story';
 import {
   ActiveCombat,
   CampaignData,
@@ -84,6 +87,7 @@ import { DiceRollComponent } from '@shared/components/dice-roll/dice-roll';
 })
 export class CampaignPlayPanel implements OnDestroy {
   private readonly campaigns = inject(CampaignCloudService);
+  private readonly data = inject(DataService);
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
 
@@ -214,7 +218,11 @@ export class CampaignPlayPanel implements OnDestroy {
   });
 
   readonly allyPickerOpen = signal(false);
+  readonly enemyPickerOpen = signal(false);
   readonly importingAllyId = signal<string | null>(null);
+  readonly importingCreatureId = signal<string | null>(null);
+
+  readonly campaignCreatures = computed(() => this.campaign().data.creatures ?? []);
 
   readonly awardingXpId = signal<string | null>(null);
 
@@ -375,11 +383,157 @@ export class CampaignPlayPanel implements OnDestroy {
 
   toggleAllyPicker(): void {
     this.allyPickerOpen.update((v) => !v);
+    if (this.allyPickerOpen()) this.enemyPickerOpen.set(false);
+  }
+
+  toggleEnemyPicker(): void {
+    this.enemyPickerOpen.update((v) => !v);
+    if (this.enemyPickerOpen()) this.allyPickerOpen.set(false);
   }
 
   /** Ajoute un PJ approuvé comme allié (crée le combat s’il n’existe pas). */
   importPlayerAlly(member: CampaignMember): void {
     this.importMembersIntoCombat([member], { closePicker: true });
+  }
+
+  /** Ajoute une créature de la campagne comme adversaire (stats bestiaire). */
+  addCampaignCreatureEnemy(selection: StoryCreatureSelection): void {
+    if (this.importingCreatureId() || this.importingParty()) return;
+    this.importingCreatureId.set(selection.creatureId);
+    this.clearFeedback();
+
+    this.data.getCreatureById(selection.creatureId).subscribe({
+      next: (creature) => {
+        this.importingCreatureId.set(null);
+        this.enemyPickerOpen.set(false);
+        const combatant = this.combatantFromCreature(
+          creature,
+          selection.customName?.trim() || selection.creatureName,
+        );
+        this.appendCombatants([combatant], selection.customName || selection.creatureName);
+      },
+      error: () => {
+        this.importingCreatureId.set(null);
+        // Fallback sans fiche bestiaire
+        const combatant = createCombatant({
+          name: selection.customName?.trim() || selection.creatureName,
+          kind: 'monster',
+          armorClass: 10,
+          initiativeBonus: 0,
+        });
+        this.appendCombatants([combatant], combatant.name);
+        this.setFeedback('err', 'Fiche créature incomplète — CA/PV à saisir manuellement.');
+      },
+    });
+  }
+
+  /** Lance / ajoute la rencontre avec stats bestiaire. */
+  addEncounterToCombat(encounter: EncounterGroup): void {
+    const base = expandEncounterToCombatants(encounter);
+    if (!base.length) {
+      this.setFeedback('err', 'Cette rencontre n’a aucune créature.');
+      return;
+    }
+
+    const requests = encounter.creatures.flatMap((cr, creatureIndex) =>
+      Array.from({ length: cr.quantity }, (_, unitIndex) =>
+        this.data.getCreatureById(cr.creatureId).pipe(
+          map((creature) => {
+            const baseName = cr.customName || cr.creatureName || creature.name;
+            const name = cr.quantity > 1 ? `${baseName} ${unitIndex + 1}` : baseName;
+            const combatant = this.combatantFromCreature(creature, name);
+            return {
+              ...combatant,
+              encounterLink: { encounterId: encounter.id, creatureIndex, unitIndex },
+              defeated: unitIndex < cr.defeated,
+              currentHp: unitIndex < cr.defeated ? 0 : combatant.currentHp,
+            } satisfies Combatant;
+          }),
+          catchError(() => {
+            const fallback = base.find(
+              (c) =>
+                c.encounterLink?.creatureIndex === creatureIndex &&
+                c.encounterLink?.unitIndex === unitIndex,
+            );
+            return of(
+              fallback ??
+                createCombatant({
+                  name: cr.customName || cr.creatureName,
+                  kind: 'monster',
+                  armorClass: 10,
+                }),
+            );
+          }),
+        ),
+      ),
+    );
+
+    this.importingParty.set(true);
+    forkJoin(requests).subscribe({
+      next: (combatants) => {
+        this.importingParty.set(false);
+        const current = this.activeCombat();
+        if (current) {
+          this.patchCombat({
+            ...current,
+            combatants: [...current.combatants, ...combatants],
+            label: current.label || encounter.name,
+            encounterId: current.encounterId || encounter.id,
+          });
+        } else {
+          this.setActiveCombat(
+            createActiveCombat(combatants, { label: encounter.name, encounterId: encounter.id }),
+          );
+        }
+        this.setFeedback(
+          'ok',
+          `Rencontre « ${encounter.name} » ajoutée (${combatants.length} adversaire(s)).`,
+        );
+      },
+      error: () => {
+        this.importingParty.set(false);
+        this.startCombatFromEncounter(encounter);
+      },
+    });
+  }
+
+  private appendCombatants(combatants: Combatant[], feedbackName?: string): void {
+    const current = this.activeCombat();
+    if (current) {
+      this.patchCombat({
+        ...current,
+        combatants: [...current.combatants, ...combatants],
+      });
+    } else {
+      this.setActiveCombat(createActiveCombat(combatants, { label: 'Combat' }));
+    }
+    if (feedbackName) {
+      this.setFeedback('ok', `${feedbackName} ajouté au combat.`);
+    }
+  }
+
+  private combatantFromCreature(creature: Creature, displayName: string): Combatant {
+    const maxHp = parseCreatureHitPoints(creature.hitPoints);
+    const abilities = creature.abilities ?? {};
+    const dexMod =
+      parseAbilityModifier(abilities['dex']?.modifier) ??
+      parseAbilityModifier(abilities['dexterite']?.modifier) ??
+      parseAbilityModifier(abilities['dexterity']?.modifier) ??
+      0;
+    const attacks: CombatantAttack[] = (creature.actions ?? []).slice(0, 5).map((a) => ({
+      name: a.name,
+      attackBonus: parseAttackBonusFromText(a.description),
+      damageDice: parseDamageDiceFromText(a.description),
+    }));
+    return createCombatant({
+      name: displayName,
+      kind: 'monster',
+      armorClass: creature.armorClass || 10,
+      maxHp,
+      currentHp: maxHp,
+      initiativeBonus: dexMod,
+      attacks: attacks.length ? attacks : undefined,
+    });
   }
 
   private importMembersIntoCombat(
@@ -395,7 +549,6 @@ export class CampaignPlayPanel implements OnDestroy {
     this.clearFeedback();
 
     const campaignId = this.campaign().id;
-    const existing = this.activeCombat();
 
     type ImportRow = { combatant: Combatant; incomplete: boolean };
     const requests = members.map((p) =>
@@ -1126,4 +1279,31 @@ export class CampaignPlayPanel implements OnDestroy {
       },
     });
   }
+}
+
+function parseCreatureHitPoints(raw: string | undefined | null): number | undefined {
+  if (!raw) return undefined;
+  const m = String(raw).trim().match(/^(\d+)/);
+  return m ? Number(m[1]) : undefined;
+}
+
+function parseAbilityModifier(raw: string | undefined | null): number | undefined {
+  if (!raw) return undefined;
+  const m = String(raw).trim().match(/^([+-]?\d+)/);
+  return m ? Number(m[1]) : undefined;
+}
+
+function parseAttackBonusFromText(text: string | undefined | null): number {
+  if (!text) return 0;
+  const m =
+    text.match(/\+\s*(\d+)\s*(?:au\s+jet\s+d['']attaque|pour\s+toucher|à\s+toucher)?/i) ??
+    text.match(/jet\s+d['']attaque\s+([+-]\d+)/i) ??
+    text.match(/([+-]\d+)\s*(?:pour\s+toucher|à\s+toucher)/i);
+  return m ? Number(m[1]) : 0;
+}
+
+function parseDamageDiceFromText(text: string | undefined | null): string | undefined {
+  if (!text) return undefined;
+  const m = text.match(/(\d+d\d+(?:\s*[+-]\s*\d+)?)/i);
+  return m ? m[1]!.replace(/\s+/g, '') : undefined;
 }
