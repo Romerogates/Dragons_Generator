@@ -353,19 +353,15 @@ export class CampaignPdfService {
         pdf.setFont('helvetica', 'normal');
       }
     } else if (data) {
-      if (data.tone) {
-        pdf.setFontSize(9);
-        pdf.text(this.toneLabel(data.tone), PAGE_W / 2, y, { align: 'center' });
-        y += 7;
-      }
+      // Page de garde Pack MJ : titre + méta (thème, niveau, région…) — pas de synopsis ici.
       pdf.setFontSize(10);
-      const info = [
-        `Niveau des héros : ${data.partyLevel}`,
-        data.regionName?.trim(),
-        data.setting?.trim(),
-      ].filter(Boolean);
-      for (let i = 0; i < info.length; i++) {
-        pdf.text(info[i]!, PAGE_W / 2, y + i * 6, { align: 'center' });
+      const meta: string[] = [];
+      if (data.tone) meta.push(`Thème : ${this.toneLabel(data.tone)}`);
+      meta.push(`Niveau des héros : ${data.partyLevel}`);
+      if (data.regionName?.trim()) meta.push(`Région : ${data.regionName.trim()}`);
+      if (data.setting?.trim()) meta.push(`Cadre : ${data.setting.trim()}`);
+      for (let i = 0; i < meta.length; i++) {
+        pdf.text(meta[i]!, PAGE_W / 2, y + i * 7, { align: 'center' });
       }
     }
 
@@ -391,8 +387,17 @@ export class CampaignPdfService {
     const bg = await this.loadImage(PARCHMENT);
 
     this.drawCoverPage(pdf, bg, title, data, { kind: 'pack-mj' });
-    // Continuer sur la page de couverture si possible (évite une page quasi vide).
-    let y = this.estimateCoverContentBottom(data);
+
+    // Comme le bestiaire : contenu compact à partir de la page 2.
+    pdf.addPage();
+    pdf.addImage(bg, 'JPEG', 0, 0, PAGE_W, PAGE_H);
+    let y = MARGIN + 4;
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(16);
+    pdf.setTextColor(60, 40, 20);
+    pdf.text('Dossier de campagne', MARGIN, y);
+    y += 12;
+
     y = this.drawSynopsisSection(pdf, bg, data, y);
 
     if (creatureEntries.length) {
@@ -424,19 +429,6 @@ export class CampaignPdfService {
 
   private toneLabel(tone: AdventureTone): string {
     return ADVENTURE_TONE_LABELS[tone] ?? tone;
-  }
-
-  /** Bas approximatif du bloc titre/infos sur la couverture (sans carte). */
-  private estimateCoverContentBottom(data: CampaignData): number {
-    let y = 42 + 20;
-    if (data.tone) y += 7;
-    const infoLines = [
-      `Niveau des héros : ${data.partyLevel}`,
-      data.regionName?.trim(),
-      data.setting?.trim(),
-    ].filter(Boolean).length;
-    y += infoLines * 6;
-    return y + 8;
   }
 
   private drawSynopsisSection(pdf: jsPDF, bg: string, data: CampaignData, startY: number): number {
