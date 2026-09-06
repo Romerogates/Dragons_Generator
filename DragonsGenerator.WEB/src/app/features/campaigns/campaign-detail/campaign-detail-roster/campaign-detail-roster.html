@@ -30,13 +30,15 @@
               >
                 {{ characterRequestLoadingId() === m.id ? 'Envoi…' : 'Demander un personnage' }}
               </button>
-              <button
-                type="button"
-                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40"
-                (click)="removeMember.emit(m)"
-              >
-                Retirer
-              </button>
+              @if (allowRemove()) {
+                <button
+                  type="button"
+                  class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40"
+                  (click)="removeMember.emit(m)"
+                >
+                  Retirer
+                </button>
+              }
             </div>
           </article>
         }
@@ -76,13 +78,15 @@
               >
                 Refuser
               </button>
-              <button
-                type="button"
-                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40"
-                (click)="removeMember.emit(m)"
-              >
-                Retirer
-              </button>
+              @if (allowRemove()) {
+                <button
+                  type="button"
+                  class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40"
+                  (click)="removeMember.emit(m)"
+                >
+                  Retirer
+                </button>
+              }
             </div>
           </article>
         }
@@ -113,13 +117,15 @@
                 @if (isMemberCharacterLoading(m.id, 'approved')) { Chargement… }
                 @else { Voir la fiche }
               </button>
-              <button
-                type="button"
-                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 border border-red-900/40 text-red-300"
-                (click)="removeMember.emit(m)"
-              >
-                Retirer
-              </button>
+              @if (allowRemove()) {
+                <button
+                  type="button"
+                  class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 border border-red-900/40 text-red-300"
+                  (click)="removeMember.emit(m)"
+                >
+                  Retirer
+                </button>
+              }
             </div>
           </article>
         }

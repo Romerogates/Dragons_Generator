@@ -106,6 +106,7 @@
 
             <app-campaign-detail-roster
               [visible]="showOverviewRoster()"
+              [allowRemove]="false"
               [feedback]="rosterFeedback()"
               [playersNeedingCharacter]="playersNeedingCharacter()"
               [pendingProposals]="pendingProposals()"
@@ -978,6 +979,7 @@
           <div class="flex-1 overflow-y-auto px-4 pb-4 guide-sommaire safe-area-pb">
             <app-campaign-detail-roster
               [visible]="true"
+              [allowRemove]="true"
               [feedback]="rosterFeedback()"
               [playersNeedingCharacter]="playersNeedingCharacter()"
               [pendingProposals]="pendingProposals()"

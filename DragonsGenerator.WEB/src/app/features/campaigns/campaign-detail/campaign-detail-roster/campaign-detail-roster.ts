@@ -23,6 +23,8 @@ export interface MemberCharacterAction {
 })
 export class CampaignDetailRoster {
   readonly visible = input(false);
+  /** Afficher « Retirer » (onglet Joueurs / sheet) — masqué sur le Résumé. */
+  readonly allowRemove = input(false);
   readonly feedback = input<string | null>(null);
   readonly playersNeedingCharacter = input<CampaignMember[]>([]);
   readonly pendingProposals = input<CampaignMember[]>([]);

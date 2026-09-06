@@ -19,9 +19,12 @@ export class CampaignSessionDockService {
   /** Detail vivant fourni par campaign-detail / play page (évite double fetch). */
   readonly liveCampaign = signal<CampaignDetail | null>(null);
 
-  readonly isVisible = computed(
-    () => !!this.campaignId() && !!this.liveCampaign()?.data.activeSessionId,
-  );
+  readonly isVisible = computed(() => {
+    const detail = this.liveCampaign();
+    const id = detail?.data.activeSessionId;
+    if (!detail || !id) return false;
+    return (detail.data.sessions ?? []).some((s) => s.id === id);
+  });
 
   bindCampaign(detail: CampaignDetail | null): void {
     if (!detail) {
@@ -32,13 +35,17 @@ export class CampaignSessionDockService {
       if (this.campaignId() === detail.id) this.clear();
       return;
     }
+    const session = detail.data.sessions.find((s) => s.id === detail.data.activeSessionId);
+    if (!session) {
+      if (this.campaignId() === detail.id) this.clear();
+      return;
+    }
     this.campaignId.set(detail.id);
     this.campaignTitle.set(detail.title);
-    const session = detail.data.sessions.find((s) => s.id === detail.data.activeSessionId);
-    this.sessionTitle.set(session?.title ?? 'Session');
-    this.hasActiveCombat.set(!!session?.activeCombat);
-    this.combatRound.set(session?.activeCombat?.round ?? null);
-    this.recentLog.set((session?.combatLog ?? []).slice(-8).reverse());
+    this.sessionTitle.set(session.title ?? 'Session');
+    this.hasActiveCombat.set(!!session.activeCombat);
+    this.combatRound.set(session.activeCombat?.round ?? null);
+    this.recentLog.set((session.combatLog ?? []).slice(-8).reverse());
     this.liveCampaign.set(detail);
   }
 

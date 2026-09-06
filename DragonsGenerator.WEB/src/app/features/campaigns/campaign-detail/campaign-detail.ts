@@ -197,6 +197,21 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         }
       });
     });
+    /** Répare un activeSessionId orphelin (session supprimée). */
+    effect(() => {
+      const c = this.campaign();
+      if (!c?.isOwner) return;
+      const activeId = c.data.activeSessionId;
+      if (!activeId) return;
+      if ((c.data.sessions ?? []).some((s) => s.id === activeId)) return;
+      untracked(() => {
+        this.saveData({ activeSessionId: null });
+        this.sessionDock.bindCampaign({
+          ...c,
+          data: { ...c.data, activeSessionId: null },
+        });
+      });
+    });
   }
 
   readonly isLoggedIn = this.auth.isLoggedIn;
@@ -302,7 +317,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       approvedPlayerCount: this.approvedPlayersWithCharacter().length,
       playerCount: this.players().length,
       hasPlannedSession: !!(data?.sessions ?? []).some((s) => s.status === 'planned'),
-      hasActiveSession: !!data?.activeSessionId,
+      hasActiveSession: !!this.activePlaySession(),
       nextSessionTitle: this.nextPlannedSession()?.title ?? null,
       mapsSkipped: this.mapsStepSkipped(),
     };
@@ -928,9 +943,18 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (!confirm('Supprimer cette session ?')) return;
     this.flushSessionSave();
     if (this.editingSessionId() === sessionId) this.editingSessionId.set(null);
+    const sessions = (c.data.sessions ?? []).filter((s) => s.id !== sessionId);
+    const clearingActive = c.data.activeSessionId === sessionId;
     this.saveData({
-      sessions: (c.data.sessions ?? []).filter((s) => s.id !== sessionId),
+      sessions,
+      ...(clearingActive ? { activeSessionId: null } : {}),
     });
+    if (clearingActive) {
+      this.sessionDock.bindCampaign({
+        ...c,
+        data: { ...c.data, sessions, activeSessionId: null },
+      });
+    }
   }
 
   onSessionDateChange(sessionId: string, value: string): void {
