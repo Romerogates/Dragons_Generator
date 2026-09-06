@@ -19,9 +19,6 @@
         </p>
         <p class="text-[10px] text-slate-500 mt-1 max-w-xl">
           {{ sessionModeHint(playSession.mode) }}
-          @if (isDm()) {
-            — Déroulez : importer party / rencontre → initiative → combattre.
-          }
         </p>
       </div>
       <div class="flex flex-wrap gap-2">
@@ -80,7 +77,58 @@
       </div>
     }
 
-    @if (isDm()) {
+    @if (isDm() && sessionView() === 'hub') {
+      <section class="rounded-2xl border border-emerald-800/40 bg-emerald-950/20 p-5 space-y-4">
+        <div>
+          <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-1">À la table</p>
+          <h3 class="text-lg font-serif text-emerald-100">Que voulez-vous faire ?</h3>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <button
+            type="button"
+            class="min-h-14 px-4 py-3 rounded-xl text-left border border-amber-700/50 bg-amber-950/30 hover:border-amber-500/60"
+            (click)="enterCombatFlow()"
+          >
+            <span class="block text-[10px] font-black uppercase tracking-widest text-amber-300">Combattre</span>
+            <span class="text-xs text-slate-400">
+              @if (activeCombat()) {
+                Reprendre le combat en cours
+              } @else {
+                Alliés → initiative → tours
+              }
+            </span>
+          </button>
+          <button
+            type="button"
+            class="min-h-14 px-4 py-3 rounded-xl text-left border border-slate-700 bg-[#1b2028]/80 hover:border-slate-500"
+            (click)="openSessionNotes()"
+          >
+            <span class="block text-[10px] font-black uppercase tracking-widest text-slate-300">Notes / scène</span>
+            <span class="text-xs text-slate-500">Écrire ce qui se passe</span>
+          </button>
+          <button
+            type="button"
+            class="min-h-14 px-4 py-3 rounded-xl text-left border border-violet-800/50 bg-violet-950/20 hover:border-violet-600/50"
+            (click)="openSessionEncounters()"
+          >
+            <span class="block text-[10px] font-black uppercase tracking-widest text-violet-300">Rencontres</span>
+            <span class="text-xs text-slate-500">Lancer un groupe préparé</span>
+          </button>
+        </div>
+      </section>
+    }
+
+    @if (isDm() && sessionView() !== 'hub') {
+      <button
+        type="button"
+        class="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-300"
+        (click)="backToSessionHub()"
+      >
+        ← Menu de session
+      </button>
+    }
+
+    @if (isDm() && (sessionView() === 'notes' || sessionView() === 'hub')) {
       <label class="block">
         <span class="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-1"
           >Notes en direct</span
@@ -96,10 +144,21 @@
     }
 
     <!-- Combat face-à-face -->
+    @if (!isDm() || sessionView() === 'combat' || (sessionView() === 'hub' && activeCombat())) {
     <section class="space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-400">
-          Combat — alliés & adversaires
+          Combat
+          @if (combatFlowPhase(); as phase) {
+            <span class="text-slate-500 font-sans normal-case tracking-normal">
+              ·
+              @switch (phase) {
+                @case ('setup') { préparation }
+                @case ('initiative') { initiative (ordre des tours) }
+                @case ('fight') { combat }
+              }
+            </span>
+          }
         </h3>
         @if (activeCombat(); as combat) {
           <div class="flex flex-wrap gap-2 items-center">
@@ -200,6 +259,40 @@
           </div>
         } @else if (activeCombat()?.combatants?.length) {
           <p class="text-xs text-slate-500 italic px-1">Tous les combattants actifs sont hors combat.</p>
+        }
+
+        @if (isDm() && combatFlowPhase() === 'setup') {
+          <div class="rounded-xl border border-amber-800/40 bg-amber-950/20 p-4 space-y-3">
+            <p class="text-sm text-amber-100 font-serif">Qui participe au combat ?</p>
+            <p class="text-xs text-slate-400">
+              Ajoutez alliés et adversaires, puis passez à l’initiative pour fixer l’ordre des tours.
+            </p>
+            <button
+              type="button"
+              class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-amber-600 text-white disabled:opacity-40"
+              [disabled]="!canContinueToInitiative()"
+              (click)="continueToInitiativePhase()"
+            >
+              Continuer → Initiative
+            </button>
+          </div>
+        }
+
+        @if (isDm() && combatFlowPhase() === 'initiative') {
+          <div class="rounded-xl border border-sky-800/40 bg-sky-950/20 p-4 space-y-3">
+            <p class="text-sm text-sky-100 font-serif">Initiative = ordre d’attaque</p>
+            <p class="text-xs text-slate-400">
+              Chaque combattant doit avoir un jet. Ensuite on ouvre le combat tour par tour.
+            </p>
+            <button
+              type="button"
+              class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-sky-600 text-white disabled:opacity-40"
+              [disabled]="!canEnterFight()"
+              (click)="openFightPhase()"
+            >
+              Ouvrir le combat
+            </button>
+          </div>
         }
 
         @if (combatMissingInitCount() || combatMissingHpCount()) {
@@ -474,53 +567,147 @@
           </div>
         </div>
 
-        <!-- Panneau d'action -->
-        @if (canActOnTurn() && currentTurn(); as actor) {
-          <div class="rounded-xl border border-violet-800/40 bg-violet-950/20 p-4 space-y-3">
+        <!-- Menu Pokémon (phase fight) -->
+        @if (combatFlowPhase() === 'fight' && canActOnTurn() && currentTurn(); as actor) {
+          <div class="rounded-2xl border-2 border-violet-700/50 bg-violet-950/25 p-5 space-y-4">
             <p class="text-[10px] font-black uppercase tracking-widest text-violet-300">
-              Action — {{ actor.name }}
+              Tour de {{ actor.name }}
             </p>
-            <p class="text-xs text-slate-400">
-              Cible :
-              @if (selectedTarget(); as t) {
-                <span class="text-slate-200">{{ t.name }}</span>
-                (CA {{ t.armorClass ?? '?' }})
-              } @else {
-                <span class="italic">cliquez une carte adverse (ou allié pour soin MJ)</span>
-              }
-            </p>
-            @if (currentTurnAttacks().length) {
-              <label class="block">
-                <span class="text-[10px] uppercase text-slate-500">Attaque</span>
-                <select
-                  class="mt-1 w-full bg-[#171b22] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200"
-                  [ngModel]="selectedAttackIndex()"
-                  (ngModelChange)="selectedAttackIndex.set(+$event)"
+
+            @if (fightStep() === 'menu') {
+              <h4 class="text-lg font-serif text-violet-100">Que voulez-vous faire ?</h4>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  class="min-h-14 px-4 py-3 rounded-xl border border-red-800/50 bg-red-950/30 text-left hover:border-red-600/60"
+                  (click)="beginAttackFlow()"
                 >
-                  @for (a of currentTurnAttacks(); track a.name; let i = $index) {
-                    <option [ngValue]="i">
-                      {{ a.name }} ({{ a.attackBonus >= 0 ? '+' : '' }}{{ a.attackBonus }})
-                      @if (a.damageDice) {
-                        · {{ a.damageDice }}
-                      }
-                    </option>
-                  }
-                </select>
-              </label>
-            } @else {
-              <p class="text-xs text-slate-500">
-                Pas d’attaque snapshot — jet générique d20 (dégâts 1d6 si touché).
-              </p>
-            }
-            @if (selectedTarget()) {
-              <div class="pt-1">
-                <app-dice-roll
-                  [faces]="20"
-                  [method]="rollMethod()"
-                  [compact]="true"
-                  (rolled)="resolveAttackWithDie($event)"
-                />
+                  <span class="block text-[10px] font-black uppercase text-red-300">Attaquer</span>
+                  <span class="text-xs text-slate-400">Choisir une attaque</span>
+                </button>
+                <button
+                  type="button"
+                  class="min-h-14 px-4 py-3 rounded-xl border border-slate-700 bg-[#1b2028] text-left hover:border-slate-500"
+                  (click)="skipTurn()"
+                >
+                  <span class="block text-[10px] font-black uppercase text-slate-300">Passer</span>
+                  <span class="text-xs text-slate-500">Tour suivant</span>
+                </button>
+                @if (isDm()) {
+                  <button
+                    type="button"
+                    class="min-h-14 px-4 py-3 rounded-xl border border-amber-800/50 bg-amber-950/20 text-left hover:border-amber-600/50"
+                    (click)="endCombat()"
+                  >
+                    <span class="block text-[10px] font-black uppercase text-amber-300">Fuir / Fin</span>
+                    <span class="text-xs text-slate-500">Terminer le combat</span>
+                  </button>
+                }
               </div>
+            }
+
+            @if (fightStep() === 'pickAttack') {
+              <p class="text-sm text-slate-300">1. Choisissez l’attaque</p>
+              @if (currentTurnAttacks().length) {
+                <div class="flex flex-col gap-2">
+                  @for (a of currentTurnAttacks(); track a.name; let i = $index) {
+                    <button
+                      type="button"
+                      class="px-3 py-2 rounded-xl text-left text-sm border"
+                      [class]="selectedAttackIndex() === i ? 'border-violet-500 bg-violet-950/40 text-violet-100' : 'border-slate-700 text-slate-300'"
+                      (click)="selectedAttackIndex.set(i)"
+                    >
+                      {{ a.name }}
+                      <span class="text-slate-500 text-xs">
+                        ({{ a.attackBonus >= 0 ? '+' : '' }}{{ a.attackBonus }})
+                        @if (a.damageDice) {
+                          · {{ a.damageDice }}
+                        }
+                      </span>
+                    </button>
+                  }
+                </div>
+              } @else {
+                <p class="text-xs text-slate-500">Attaque générique (d20, dégâts 1d6).</p>
+              }
+              <div class="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white"
+                  (click)="confirmAttackChoice()"
+                >
+                  Continuer → Cible
+                </button>
+                <button
+                  type="button"
+                  class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-400"
+                  (click)="resetFightStep()"
+                >
+                  Retour
+                </button>
+              </div>
+            }
+
+            @if (fightStep() === 'pickTarget') {
+              <p class="text-sm text-slate-300">2. Choisissez la cible (cliquez une carte)</p>
+              <p class="text-xs text-slate-500">
+                Cible :
+                @if (selectedTarget(); as t) {
+                  <span class="text-slate-200">{{ t.name }}</span> (CA {{ t.armorClass ?? '?' }})
+                } @else {
+                  <span class="italic">aucune</span>
+                }
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white disabled:opacity-40"
+                  [disabled]="!selectedTarget()"
+                  (click)="confirmTargetChoice()"
+                >
+                  Continuer → Jet pour toucher
+                </button>
+                <button
+                  type="button"
+                  class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-400"
+                  (click)="fightStep.set('pickAttack')"
+                >
+                  Retour
+                </button>
+              </div>
+            }
+
+            @if (fightStep() === 'toHit') {
+              <p class="text-sm text-slate-300">3. Jet pour toucher (d20)</p>
+              <app-dice-roll
+                [faces]="20"
+                [method]="rollMethod()"
+                [compact]="true"
+                (rolled)="resolveAttackWithDie($event)"
+              />
+              <button
+                type="button"
+                class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-400"
+                (click)="fightStep.set('pickTarget')"
+              >
+                Retour
+              </button>
+            }
+
+            @if (fightStep() === 'damage') {
+              <p class="text-sm text-slate-300">
+                4. Dégâts
+                @if (pendingDamageDice(); as dmg) {
+                  <span class="text-violet-300 font-mono">({{ dmg }})</span>
+                }
+              </p>
+              <button
+                type="button"
+                class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-red-600 text-white"
+                (click)="resolveDamageWithDie()"
+              >
+                Lancer les dégâts
+              </button>
             }
           </div>
         }
@@ -534,8 +721,11 @@
           </div>
         }
 
-        @if (isDm()) {
+        @if (isDm() && (combatFlowPhase() === 'setup' || advancedToolsOpen())) {
           <div class="space-y-3">
+            @if (combatFlowPhase() !== 'setup') {
+              <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Outils avancés</p>
+            }
             <div class="flex flex-wrap gap-2 items-center">
               <button
                 type="button"
@@ -661,6 +851,16 @@
             }
           </div>
         }
+
+        @if (isDm() && combatFlowPhase() === 'fight') {
+          <button
+            type="button"
+            class="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-300"
+            (click)="advancedToolsOpen.update((v) => !v)"
+          >
+            {{ advancedToolsOpen() ? 'Masquer outils avancés' : 'Outils avancés (PV, roster…)' }}
+          </button>
+        }
       } @else if (isDm()) {
         <div class="bg-[#1b2028]/80 border border-dashed border-amber-800/40 rounded-xl p-4 space-y-3">
           <p class="text-sm text-slate-400">
@@ -742,8 +942,9 @@
         <p class="text-sm text-slate-500 italic">En attente que le MJ lance un combat…</p>
       }
     </section>
+    }
 
-    @if (sessionCombatHistory().length) {
+    @if (sessionCombatHistory().length && (sessionView() === 'combat' || sessionView() === 'hub')) {
       <section class="space-y-3">
         <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-500">
           Historique des combats
@@ -763,7 +964,7 @@
       </section>
     }
 
-    @if (c.data.encounters.length) {
+    @if (c.data.encounters.length && (sessionView() === 'encounters' || sessionView() === 'combat' || sessionView() === 'hub')) {
       <div class="space-y-4">
         <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-400">Rencontres</h3>
         @for (enc of c.data.encounters; track enc.id) {
@@ -783,7 +984,7 @@
                   type="button"
                   class="px-3 py-1 rounded-lg text-[9px] font-black uppercase bg-amber-950/30 border border-amber-800/40 text-amber-300 disabled:opacity-50"
                   [disabled]="importingParty()"
-                  (click)="addEncounterToCombat(enc)"
+                  (click)="addEncounterToCombat(enc); sessionView.set('combat')"
                 >
                   @if (importingParty()) {
                     Chargement…

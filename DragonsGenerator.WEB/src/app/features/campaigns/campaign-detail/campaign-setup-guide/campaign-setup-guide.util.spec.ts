@@ -52,6 +52,7 @@ describe('buildCampaignSetupGuide', () => {
     const g = buildCampaignSetupGuide(base({ hasActiveSession: true, hasAdventure: true }));
     expect(g.liveSession).toBe(true);
     expect(g.current?.primaryAction).toBe('openPlay');
+    expect(g.current?.tip).toBe('');
   });
 
   it('is ready when every step is complete', () => {
@@ -69,5 +70,6 @@ describe('buildCampaignSetupGuide', () => {
     );
     expect(g.allReady).toBe(true);
     expect(g.current?.primaryAction).toBe('startNextSession');
+    expect(g.current?.title).toBe('Soirée 1');
   });
 });

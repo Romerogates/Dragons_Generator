@@ -38,6 +38,8 @@ import {
 import {
   COMBATANT_KIND_LABELS,
   advanceTurn,
+  canAdvanceFromSetup,
+  canOpenFightPhase,
   canReorderCombatantInTurnOrder,
   combatantInitiativeTotal,
   createActiveCombat,
@@ -50,8 +52,10 @@ import {
   formatCombatArchiveSummary,
   isCombatantDefeated,
   reorderCombatantInTurnOrder,
+  resolveCombatFlowPhase,
   sortedTurnOrder,
   syncEncountersFromCombatants,
+  type CombatFlowPhase,
 } from '@core/utils/combat-tracker.util';
 import {
   appendCombatLog,
@@ -105,6 +109,14 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly hpAdjustAmount = signal(5);
   readonly pendingInitCombatantId = signal<string | null>(null);
 
+  /** Hub de session : menu « que faire ». */
+  readonly sessionView = signal<'hub' | 'combat' | 'notes' | 'encounters'>('hub');
+  /** Sous-étapes du tour Pokémon. */
+  readonly fightStep = signal<'menu' | 'pickAttack' | 'pickTarget' | 'toHit' | 'damage'>('menu');
+  readonly pendingHitTotal = signal<number | null>(null);
+  readonly pendingDamageDice = signal<string | null>(null);
+  readonly advancedToolsOpen = signal(false);
+
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
   private initiativePollTimer: ReturnType<typeof setInterval> | null = null;
   private feedbackTimer: ReturnType<typeof setTimeout> | null = null;
@@ -129,6 +141,21 @@ export class CampaignPlayPanel implements OnDestroy {
   );
 
   readonly activeCombat = computed(() => this.activeSession()?.activeCombat ?? null);
+
+  readonly combatFlowPhase = computed((): CombatFlowPhase | null => {
+    const combat = this.activeCombat();
+    return combat ? resolveCombatFlowPhase(combat) : null;
+  });
+
+  readonly canContinueToInitiative = computed(() => {
+    const combat = this.activeCombat();
+    return combat ? canAdvanceFromSetup(combat) : false;
+  });
+
+  readonly canEnterFight = computed(() => {
+    const combat = this.activeCombat();
+    return combat ? canOpenFightPhase(combat) : false;
+  });
 
   readonly combatTurnOrder = computed(() => {
     const combat = this.activeCombat();
@@ -348,6 +375,93 @@ export class CampaignPlayPanel implements OnDestroy {
   startStandaloneCombat(): void {
     if (!this.confirmReplaceCombat()) return;
     this.setActiveCombat(createActiveCombat([], { label: 'Combat' }));
+    this.sessionView.set('combat');
+    this.resetFightStep();
+  }
+
+  enterCombatFlow(): void {
+    this.sessionView.set('combat');
+    if (!this.activeCombat()) {
+      this.setActiveCombat(createActiveCombat([], { label: 'Combat' }));
+    }
+    this.resetFightStep();
+  }
+
+  backToSessionHub(): void {
+    this.sessionView.set('hub');
+    this.resetFightStep();
+  }
+
+  openSessionNotes(): void {
+    this.sessionView.set('notes');
+  }
+
+  openSessionEncounters(): void {
+    this.sessionView.set('encounters');
+  }
+
+  continueToInitiativePhase(): void {
+    const combat = this.activeCombat();
+    if (!combat || !canAdvanceFromSetup(combat)) {
+      this.setFeedback('err', 'Ajoutez au moins un allié et un adversaire.');
+      return;
+    }
+    this.patchCombat(
+      {
+        ...combat,
+        flowPhase: 'initiative',
+        collectingInitiative: true,
+        initiativeCode: combat.initiativeCode || createInitiativeCode(),
+      },
+      { immediate: true },
+    );
+    this.startInitiativePoll();
+    this.setFeedback('ok', 'Initiative : ces jets fixent l’ordre des tours.');
+  }
+
+  openFightPhase(): void {
+    const combat = this.activeCombat();
+    if (!combat || !canOpenFightPhase(combat)) {
+      this.setFeedback('err', 'Tous les combattants actifs doivent avoir une initiative.');
+      return;
+    }
+    this.patchCombat(
+      { ...combat, flowPhase: 'fight', collectingInitiative: false },
+      { immediate: true },
+    );
+    this.stopInitiativePoll();
+    this.resetFightStep();
+    this.setFeedback('ok', 'Combat ouvert — suivez l’ordre d’initiative.');
+  }
+
+  resetFightStep(): void {
+    this.fightStep.set('menu');
+    this.pendingHitTotal.set(null);
+    this.pendingDamageDice.set(null);
+    this.selectedTargetId.set(null);
+    this.selectedAttackIndex.set(0);
+  }
+
+  beginAttackFlow(): void {
+    if (!this.canActOnTurn()) return;
+    this.fightStep.set('pickAttack');
+  }
+
+  confirmAttackChoice(): void {
+    this.fightStep.set('pickTarget');
+  }
+
+  confirmTargetChoice(): void {
+    if (!this.selectedTarget()) {
+      this.setFeedback('err', 'Choisissez une cible.');
+      return;
+    }
+    this.fightStep.set('toHit');
+  }
+
+  skipTurn(): void {
+    this.resetFightStep();
+    this.nextTurn();
   }
 
   startCombatFromEncounter(encounter: EncounterGroup): void {
@@ -356,6 +470,8 @@ export class CampaignPlayPanel implements OnDestroy {
     this.setActiveCombat(
       createActiveCombat(combatants, { label: encounter.name, encounterId: encounter.id }),
     );
+    this.sessionView.set('combat');
+    this.resetFightStep();
   }
 
   importPartyIntoCombat(): void {
@@ -630,6 +746,8 @@ export class CampaignPlayPanel implements OnDestroy {
     const playNotes = [session.playNotes?.trim(), archive].filter(Boolean).join('\n\n');
     const combatHistory = [...(session.combatHistory ?? []), entry];
     this.patchSession({ activeCombat: null, playNotes, combatHistory }, { immediate: true });
+    this.resetFightStep();
+    this.sessionView.set('hub');
     this.setFeedback('ok', 'Combat terminé — résumé ajouté aux notes et à l’historique.');
   }
 
@@ -825,6 +943,7 @@ export class CampaignPlayPanel implements OnDestroy {
     const turn = this.currentTurn();
     const target = this.selectedTarget();
     if (!turn || !target || !this.canActOnTurn()) return;
+    if (this.fightStep() !== 'toHit' && this.combatFlowPhase() === 'fight') return;
 
     const attacks = turn.attacks ?? [];
     const atk = attacks[this.selectedAttackIndex()] ?? {
@@ -833,35 +952,76 @@ export class CampaignPlayPanel implements OnDestroy {
       damageDice: '1d6',
     };
     const resolution = resolveAttackRoll(d20, atk.attackBonus, target.armorClass);
-    let damage: number | null = null;
-    if (resolution.hit === true) {
-      damage =
-        rollDamageTotal(atk.damageDice, atk.damageBonus ?? 0) ??
-        Math.max(1, (atk.damageBonus ?? 0) + rollDie(6));
-      if (this.isDm()) {
-        this.adjustHp(target.id, -damage);
-      }
+
+    if (resolution.hit !== true) {
+      const line = formatCombatLogLine({
+        actor: turn.name || 'Sans nom',
+        target: target.name || 'Cible',
+        attackName: atk.name,
+        d20: resolution.d20,
+        total: resolution.total,
+        ac: resolution.targetAc,
+        hit: resolution.hit,
+        damage: null,
+      });
+      if (this.isDm()) this.appendLog(line);
+      const hitMsg =
+        resolution.hit === false
+          ? 'Raté'
+          : `Jet ${resolution.total} (pas de CA cible)`;
+      this.setFeedback('ok', `${turn.name} → ${target.name} : ${hitMsg}`);
+      this.resetFightStep();
+      return;
     }
 
+    this.pendingHitTotal.set(resolution.total);
+    const dice = atk.damageDice?.trim() || '1d6';
+    this.pendingDamageDice.set(dice);
+    this.fightStep.set('damage');
+    this.setFeedback(
+      'ok',
+      `${turn.name} touche ${target.name} (${resolution.total} vs CA ${resolution.targetAc ?? '?'}) — lancez les dégâts.`,
+    );
+  }
+
+  resolveDamageWithDie(_ignored?: number): void {
+    const turn = this.currentTurn();
+    const target = this.selectedTarget();
+    if (!turn || !target || !this.canActOnTurn()) return;
+    if (this.fightStep() !== 'damage') return;
+
+    const attacks = turn.attacks ?? [];
+    const atk = attacks[this.selectedAttackIndex()] ?? {
+      name: 'Attaque',
+      attackBonus: 0,
+      damageDice: '1d6',
+    };
+    const formula = this.pendingDamageDice() ?? atk.damageDice ?? '1d6';
+    const damage =
+      rollDamageTotal(formula, atk.damageBonus ?? 0) ??
+      Math.max(1, (atk.damageBonus ?? 0) + rollDie(6));
+
+    if (this.isDm()) {
+      this.adjustHp(target.id, -damage);
+    }
+
+    const hitTotal = this.pendingHitTotal() ?? 0;
     const line = formatCombatLogLine({
       actor: turn.name || 'Sans nom',
       target: target.name || 'Cible',
       attackName: atk.name,
-      d20: resolution.d20,
-      total: resolution.total,
-      ac: resolution.targetAc,
-      hit: resolution.hit,
+      d20: hitTotal,
+      total: hitTotal,
+      ac: target.armorClass,
+      hit: true,
       damage,
     });
     if (this.isDm()) this.appendLog(line);
-
-    const hitMsg =
-      resolution.hit === true
-        ? `Touché ! ${damage ?? '?'} dégâts${this.isDm() ? '' : ' — le MJ applique les PV'}`
-        : resolution.hit === false
-          ? 'Raté'
-          : `Jet ${resolution.total} (pas de CA cible)`;
-    this.setFeedback('ok', `${turn.name} → ${target.name} : ${hitMsg}`);
+    this.setFeedback(
+      'ok',
+      `${turn.name} → ${target.name} : ${damage} dégâts (${formula})${this.isDm() ? '' : ' — le MJ applique les PV'}`,
+    );
+    this.resetFightStep();
   }
 
   private appendLog(line: string): void {

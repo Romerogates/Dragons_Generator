@@ -100,10 +100,9 @@ export function buildCampaignSetupGuide(input: CampaignSetupGuideInput): Campaig
       liveSession: true,
       current: {
         id: 'play',
-        title: 'Session en cours',
-        proposal:
-          'La table est ouverte. Lance les combats depuis le tracker : héros d’abord, puis créatures de campagne ou rencontres.',
-        tip: 'Astuce : dans le combat, utilise « + Créature campagne » pour piocher dans ton bestiaire.',
+        title: 'Table ouverte',
+        proposal: 'La session est active. Ouvre la table pour jouer (combat guidé, notes, rencontres).',
+        tip: '',
         primaryLabel: 'Ouvrir la table',
         primaryAction: 'openPlay',
         secondaryLabel: 'Plein écran',
@@ -122,13 +121,15 @@ export function buildCampaignSetupGuide(input: CampaignSetupGuideInput): Campaig
       liveSession: false,
       current: {
         id: 'play',
-        title: 'Prêt pour la table',
+        title: input.nextSessionTitle ?? 'Nouvelle session',
         proposal: input.nextSessionTitle
-          ? `Tout est en place. Démarre « ${input.nextSessionTitle} » pour jouer avec tes joueurs.`
-          : 'Tout est en place. Planifie une session pour ouvrir la table de jeu.',
-        tip: 'Pendant la table : alliés joueurs → adversaires (créatures / rencontres) → initiative.',
+          ? `Démarre « ${input.nextSessionTitle} » pour jouer avec tes joueurs.`
+          : 'Planifie une session pour ouvrir la table de jeu.',
+        tip: '',
         primaryLabel: input.nextSessionTitle ? 'Démarrer la session' : 'Planifier une session',
         primaryAction: input.nextSessionTitle ? 'startNextSession' : 'addSession',
+        secondaryLabel: 'Onglet Sessions',
+        secondaryAction: 'openSessions',
       },
     };
   }

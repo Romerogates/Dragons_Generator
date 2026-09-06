@@ -107,6 +107,11 @@ export interface ActiveCombat {
   initiativeCode?: string;
   /** Ordre manuel entre combattants à égalité d'initiative (ids). */
   turnOrderIds?: string[];
+  /**
+   * Fil guidé MJ : setup (roster) → initiative (ordre) → fight (menu Pokémon).
+   * Absent → déduit (rétrocompat).
+   */
+  flowPhase?: 'setup' | 'initiative' | 'fight';
 }
 
 export type SessionTimelineKind = 'encounter' | 'break' | 'note' | 'handout';

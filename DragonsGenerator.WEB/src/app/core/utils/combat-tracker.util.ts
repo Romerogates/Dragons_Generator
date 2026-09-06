@@ -43,7 +43,42 @@ export function createActiveCombat(
     round: 1,
     turnIndex: 0,
     combatants,
+    flowPhase: 'setup',
   };
+}
+
+export type CombatFlowPhase = 'setup' | 'initiative' | 'fight';
+
+/** Phase affichée du fil guidé (respecte flowPhase + garde-fous). */
+export function resolveCombatFlowPhase(combat: ActiveCombat): CombatFlowPhase {
+  const allies = combat.combatants.filter((c) => c.kind === 'player' || c.kind === 'npc');
+  const enemies = combat.combatants.filter((c) => c.kind === 'monster');
+  const hasSides = allies.length > 0 && enemies.length > 0;
+  const missingInit = combat.combatants.filter(
+    (c) => !isCombatantDefeated(c) && combatantInitiativeTotal(c) == null,
+  ).length;
+
+  if (combat.flowPhase === 'fight' && hasSides && missingInit === 0) return 'fight';
+  if (combat.flowPhase === 'initiative' && hasSides) return 'initiative';
+  if (combat.flowPhase === 'setup') return 'setup';
+
+  // Rétrocompat sans flowPhase
+  if (!hasSides) return 'setup';
+  if (missingInit > 0) return 'initiative';
+  return 'fight';
+}
+
+export function canAdvanceFromSetup(combat: ActiveCombat): boolean {
+  const allies = combat.combatants.filter((c) => c.kind === 'player' || c.kind === 'npc');
+  const enemies = combat.combatants.filter((c) => c.kind === 'monster');
+  return allies.length > 0 && enemies.length > 0;
+}
+
+export function canOpenFightPhase(combat: ActiveCombat): boolean {
+  if (!canAdvanceFromSetup(combat)) return false;
+  return combat.combatants.every(
+    (c) => isCombatantDefeated(c) || combatantInitiativeTotal(c) != null,
+  );
 }
 
 export function combatantInitiativeTotal(c: Combatant): number | null {
