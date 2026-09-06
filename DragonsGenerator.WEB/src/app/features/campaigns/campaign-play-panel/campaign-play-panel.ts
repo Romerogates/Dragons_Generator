@@ -434,6 +434,10 @@ export class CampaignPlayPanel implements OnDestroy {
     this.setFeedback('ok', 'Combat ouvert — suivez l’ordre d’initiative.');
   }
 
+  toggleAdvancedTools(): void {
+    this.advancedToolsOpen.update((v) => !v);
+  }
+
   resetFightStep(): void {
     this.fightStep.set('menu');
     this.pendingHitTotal.set(null);
@@ -1012,7 +1016,7 @@ export class CampaignPlayPanel implements OnDestroy {
       attackName: atk.name,
       d20: hitTotal,
       total: hitTotal,
-      ac: target.armorClass,
+      ac: target.armorClass ?? null,
       hit: true,
       damage,
     });

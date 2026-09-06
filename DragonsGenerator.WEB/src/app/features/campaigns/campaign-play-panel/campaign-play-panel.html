@@ -856,7 +856,7 @@
           <button
             type="button"
             class="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-300"
-            (click)="advancedToolsOpen.update((v) => !v)"
+            (click)="toggleAdvancedTools()"
           >
             {{ advancedToolsOpen() ? 'Masquer outils avancés' : 'Outils avancés (PV, roster…)' }}
           </button>
