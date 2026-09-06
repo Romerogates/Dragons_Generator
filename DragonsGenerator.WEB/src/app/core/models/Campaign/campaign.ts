@@ -139,6 +139,8 @@ export interface CampaignSession {
   notes?: string;
   /** Notes prises en direct pendant la session (MJ). */
   playNotes?: string;
+  /** Mode / encre de la page de notes live (stylet). */
+  playNotebook?: NotebookPage;
   /** Tracker initiative / ordre de combat en cours (MJ). */
   activeCombat?: ActiveCombat | null;
   status: CampaignSessionStatus;
@@ -169,6 +171,8 @@ export interface CampaignData {
   creatures: StoryCreatureSelection[];
   encounters: EncounterGroup[];
   notes: string;
+  /** Carnet MJ (texte + pages manuscrites). */
+  notebookPages?: NotebookPage[];
   pregenCharacters: CampaignPregen[];
   sessions: CampaignSession[];
   /** Documents distribuables aux joueurs (MJ publie, joueurs voient published uniquement). */
@@ -311,6 +315,7 @@ export function emptyCampaignData(partyLevel = 3): CampaignData {
     creatures: [],
     encounters: [],
     notes: '',
+    notebookPages: [],
     pregenCharacters: [],
     sessions: [],
     handouts: [],
@@ -318,6 +323,47 @@ export function emptyCampaignData(partyLevel = 3): CampaignData {
     dungeonMaps: [],
   };
 }
+
+export type NotebookMode = 'text' | 'ink';
+
+export interface InkPoint {
+  x: number;
+  y: number;
+}
+
+export interface InkStroke {
+  color: string;
+  width: number;
+  points: InkPoint[];
+}
+
+/** Page du carnet MJ (clavier et/ou stylet). */
+export interface NotebookPage {
+  id: string;
+  title: string;
+  mode: NotebookMode;
+  text?: string;
+  inkStrokes?: InkStroke[];
+  /** Aperçu compressé (JPEG data URL) — pas d’OCR en V1. */
+  inkImageDataUrl?: string;
+  updatedAt: string;
+}
+
+export function createNotebookPage(title = 'Nouvelle page'): NotebookPage {
+  return {
+    id: crypto.randomUUID?.() ?? `nb-${Date.now()}`,
+    title,
+    mode: 'text',
+    text: '',
+    inkStrokes: [],
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+/** Plafond soft pour éviter d’exploser le JSON campagne. */
+export const NOTEBOOK_MAX_PAGES = 24;
+export const NOTEBOOK_INK_MAX_DIMENSION = 1280;
+export const NOTEBOOK_INK_JPEG_QUALITY = 0.55;
 
 export function createEncounterFromCreatures(
   name: string,

@@ -152,15 +152,18 @@
               <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Synopsis</h2>
               <div class="text-sm leading-relaxed whitespace-pre-wrap font-serif text-slate-300">{{ c.data.adventure || '—' }}</div>
             </div>
-            <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
-              <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Notes du MJ</h2>
-              <textarea
-                rows="4"
-                class="w-full bg-[#171b22] border border-slate-700 rounded-xl p-3 text-sm text-slate-300"
-                [ngModel]="c.data.notes"
-                (ngModelChange)="saveData({ notes: $event })"
-                placeholder="Notes privées..."
-              ></textarea>
+            <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5 space-y-3">
+              <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-500">Notes du MJ</h2>
+              <p class="text-sm text-slate-400">
+                Clavier ou stylet dans le carnet — bascule Texte / Main.
+              </p>
+              <button
+                type="button"
+                class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-900/40 border border-emerald-700/50 text-emerald-200 hover:border-emerald-500/50"
+                (click)="setTab('notebook')"
+              >
+                Ouvrir le carnet
+              </button>
             </div>
             }
 
@@ -215,6 +218,19 @@
             (sessionPatchImmediate)="onSessionPatchImmediate($event)"
             (sessionDateChange)="onSessionDateChangeEvent($event)"
           />
+        }
+
+        @case ('notebook') {
+          @if (c.isOwner) {
+            <app-campaign-notebook
+              [pages]="notebookPages()"
+              [page]="activeNotebookPage()"
+              (pageChange)="onNotebookPageChange($event)"
+              (pagesChange)="onNotebookPagesChange($event)"
+            />
+          } @else {
+            <p class="text-slate-500 italic text-center py-12">Réservé au MJ.</p>
+          }
         }
 
         @case ('activity') {

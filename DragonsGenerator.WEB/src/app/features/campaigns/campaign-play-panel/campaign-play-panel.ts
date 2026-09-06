@@ -79,12 +79,22 @@ import {
   sessionModeLabel,
 } from '../campaign-detail/campaign-session.util';
 import { CampaignSessionTimeline } from '../campaign-session-timeline/campaign-session-timeline';
+import { CampaignNotebook } from '../campaign-notebook/campaign-notebook';
 import { DiceRollComponent } from '@shared/components/dice-roll/dice-roll';
+import type { NotebookPage } from '@core/models/Campaign/campaign';
+import { sessionNotebookFromPlay } from '@core/utils/notebook.util';
 
 @Component({
   selector: 'app-campaign-play-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, CampaignSessionTimeline, DiceRollComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    CampaignSessionTimeline,
+    CampaignNotebook,
+    DiceRollComponent,
+  ],
   templateUrl: './campaign-play-panel.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -408,6 +418,24 @@ export class CampaignPlayPanel implements OnDestroy {
 
   openSessionNotes(): void {
     this.sessionView.set('notes');
+  }
+
+  readonly sessionNotebookPage = computed(() => {
+    const session = this.activeSession();
+    return sessionNotebookFromPlay(
+      session?.title ?? 'Session',
+      session?.playNotes,
+      session?.playNotebook,
+    );
+  });
+
+  onSessionNotebookChange(page: NotebookPage): void {
+    const session = this.activeSession();
+    if (!session) return;
+    this.updateSession(session.id, {
+      playNotes: page.text ?? '',
+      playNotebook: page,
+    });
   }
 
   openSessionEncounters(): void {

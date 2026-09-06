@@ -129,18 +129,32 @@
     }
 
     @if (isDm() && (sessionView() === 'notes' || sessionView() === 'hub')) {
-      <label class="block">
-        <span class="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-1"
-          >Notes en direct</span
-        >
-        <textarea
-          [rows]="fullscreen() ? 6 : 4"
-          placeholder="Scènes, PNJ rencontrés, décisions des joueurs…"
-          class="w-full bg-[#171b22] border border-emerald-900/40 rounded-xl p-3 text-sm text-slate-300"
-          [ngModel]="playSession.playNotes ?? ''"
-          (ngModelChange)="updateSession(playSession.id, { playNotes: $event || undefined })"
-        ></textarea>
-      </label>
+      <div [class.opacity-90]="sessionView() === 'hub'">
+        @if (sessionView() === 'hub') {
+          <button
+            type="button"
+            class="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-2 hover:text-emerald-300"
+            (click)="openSessionNotes()"
+          >
+            Notes en direct →
+          </button>
+          <textarea
+            [rows]="fullscreen() ? 4 : 3"
+            placeholder="Aperçu rapide… (ouvrir Notes pour stylet)"
+            class="w-full bg-[#171b22] border border-emerald-900/40 rounded-xl p-3 text-sm text-slate-300"
+            [ngModel]="playSession.playNotes ?? ''"
+            (ngModelChange)="updateSession(playSession.id, { playNotes: $event || undefined })"
+          ></textarea>
+        } @else {
+          <app-campaign-notebook
+            [page]="sessionNotebookPage()"
+            [pages]="null"
+            [showPageList]="false"
+            [compact]="!fullscreen()"
+            (pageChange)="onSessionNotebookChange($event)"
+          />
+        }
+      </div>
     }
 
     <!-- Combat face-à-face -->

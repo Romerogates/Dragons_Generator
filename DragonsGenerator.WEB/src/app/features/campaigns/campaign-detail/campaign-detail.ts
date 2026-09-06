@@ -36,19 +36,23 @@ import {
   CampaignPregen,
   CampaignSession,
   CREATURE_ROLE_LABELS,
+  NOTEBOOK_MAX_PAGES,
   PREGEN_STATUS_LABELS,
   createCampaignPregenEntry,
   createCampaignHandout,
   createEncounterFromCreatures,
+  createNotebookPage,
   encounterPendingXp,
   encounterTotalXp,
   EncounterGroup,
   FriendUser,
   type CampaignDetail as CampaignDetailModel,
+  type NotebookPage,
 } from '@core/models/Campaign/campaign';
 import { ADVENTURE_TONE_LABELS, CreatureRole, StoryCreatureSelection } from '@core/models/Story/story';
 import { formatChallengeRating, getCreatureCategoryLabel } from '@core/utils/creature-display.util';
 import { shouldShowPlayerInitiativePrompt } from '@core/utils/campaign-initiative.util';
+import { seedNotebookFromLegacyNotes } from '@core/utils/notebook.util';
 import { StoryBuilderService } from '@core/services/story-builder.service';
 import { CampaignPregenGeneratorService } from '@core/services/campaign-pregen-generator.service';
 import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
@@ -59,6 +63,7 @@ import { CampaignDetailRoster } from './campaign-detail-roster/campaign-detail-r
 import { CampaignDetailSessions } from './campaign-detail-sessions/campaign-detail-sessions';
 import { CampaignDetailActivity } from './campaign-detail-activity/campaign-detail-activity';
 import { CampaignDetailHandouts } from './campaign-detail-handouts/campaign-detail-handouts';
+import { CampaignNotebook } from '../campaign-notebook/campaign-notebook';
 import type { MemberCharacterAction } from './campaign-detail-roster/campaign-detail-roster';
 import type { SessionDateChangeEvent, SessionPatchEvent } from './campaign-detail-sessions/campaign-detail-sessions';
 import type { HandoutPatchEvent, HandoutPublishEvent } from './campaign-detail-handouts/campaign-detail-handouts';
@@ -79,7 +84,7 @@ import {
 } from './campaign-session.util';
 import { LightMarkdownPipe } from '@shared/pipes/light-markdown.pipe';
 
-type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'activity' | 'handouts' | 'maps' | 'sessions';
+type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'activity' | 'handouts' | 'maps' | 'sessions' | 'notebook';
 type TabDef = { id: Tab; label: string; icon: string };
 
 @Component({
@@ -96,6 +101,7 @@ type TabDef = { id: Tab; label: string; icon: string };
     CampaignDetailSessions,
     CampaignDetailActivity,
     CampaignDetailHandouts,
+    CampaignNotebook,
     CampaignSetupGuide,
     AiGenerationProgressBar,
     CampaignInitiativeInline,
@@ -155,6 +161,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly initiativeBoard = signal<InitiativeBoard | null>(null);
   readonly rosterSheetOpen = signal(false);
   readonly pinnedOverlayDismissed = signal(false);
+  readonly activeNotebookPageId = signal<string | null>(null);
 
   private initiativePollTimer: ReturnType<typeof setInterval> | null = null;
   private softPollTimer: ReturnType<typeof setInterval> | null = null;
@@ -334,6 +341,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (owner) {
       tabs.push({ id: 'creatures', label: 'Créatures', icon: 'fluent-emoji:dragon' });
       tabs.push({ id: 'maps', label: 'Donjons', icon: 'fluent-emoji:world-map' });
+      tabs.push({ id: 'notebook', label: 'Carnet', icon: 'fluent-emoji:memo' });
     }
     tabs.push({ id: 'pregens', label: 'Pré-tirés', icon: 'fluent-emoji:performing-arts' });
     if (owner) {
@@ -394,6 +402,22 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   });
 
   readonly creatureRoleOptions = Object.entries(CREATURE_ROLE_LABELS) as [CreatureRole, string][];
+
+  readonly notebookPages = computed((): NotebookPage[] => {
+    return this.campaign()?.data.notebookPages ?? [];
+  });
+
+  readonly activeNotebookPage = computed((): NotebookPage => {
+    const pages = this.notebookPages();
+    const id = this.activeNotebookPageId();
+    return (
+      pages.find((p) => p.id === id) ??
+      pages[0] ??
+      this.draftNotebookPage()
+    );
+  });
+
+  private readonly draftNotebookPage = signal(createNotebookPage('Notes du MJ'));
 
   readonly showMobileSessionBar = computed(
     () =>
@@ -497,7 +521,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
     const tab = this.route.snapshot.queryParamMap.get('tab');
     const handoutId = this.route.snapshot.queryParamMap.get('handout');
-    if (tab === 'handouts' || tab === 'players' || tab === 'activity' || tab === 'overview' || tab === 'maps' || tab === 'sessions' || tab === 'creatures') {
+    if (tab === 'handouts' || tab === 'players' || tab === 'activity' || tab === 'overview' || tab === 'maps' || tab === 'sessions' || tab === 'creatures' || tab === 'notebook') {
       this.tab.set(tab);
       if (tab === 'handouts' && handoutId) this.focusHandoutId.set(handoutId);
     }
@@ -581,7 +605,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   setTab(t: Tab): void {
-    if (!this.campaign()?.isOwner && (t === 'creatures' || t === 'encounters' || t === 'maps')) {
+    if (!this.campaign()?.isOwner && (t === 'creatures' || t === 'encounters' || t === 'maps' || t === 'notebook')) {
       this.tab.set('overview');
       return;
     }
@@ -589,6 +613,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       this.dungeonMapsComp()?.flushPendingSave();
     }
     this.tab.set(t);
+    if (t === 'notebook') {
+      this.ensureNotebookPages();
+    }
     if (t === 'handouts' && this.campaign()?.isOwner) {
       if (this.pdfPreviewKind() === 'bestiary' && this.campaign()!.data.creatures.length) {
         this.loadBestiaryPreview();
@@ -1506,6 +1533,34 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         : entry,
     );
     this.saveData({ creatures });
+  }
+
+  onNotebookPageChange(page: NotebookPage): void {
+    this.activeNotebookPageId.set(page.id);
+  }
+
+  onNotebookPagesChange(pages: NotebookPage[]): void {
+    const capped = pages.slice(0, NOTEBOOK_MAX_PAGES);
+    const firstText = capped.find((p) => p.text?.trim())?.text?.trim() ?? '';
+    this.saveData({
+      notebookPages: capped,
+      notes: firstText || this.campaign()?.data.notes || '',
+    });
+  }
+
+  private ensureNotebookPages(): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    if (c.data.notebookPages?.length) {
+      if (!this.activeNotebookPageId()) {
+        this.activeNotebookPageId.set(c.data.notebookPages[0]!.id);
+      }
+      return;
+    }
+    const seeded = seedNotebookFromLegacyNotes(c.data.notes);
+    const pages = seeded.length ? seeded : [this.draftNotebookPage()];
+    this.activeNotebookPageId.set(pages[0]!.id);
+    this.saveData({ notebookPages: pages });
   }
 
   async generateAutoPregen(): Promise<void> {

@@ -1,0 +1,145 @@
+<section class="space-y-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h2 class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Carnet</h2>
+      <p class="text-xs text-slate-500 mt-1">
+        Texte au clavier ou notes à la main (stylet). Transcription OCR plus tard.
+      </p>
+    </div>
+    <div class="inline-flex rounded-xl border border-slate-700 overflow-hidden" role="group" aria-label="Mode de saisie">
+      <button
+        type="button"
+        class="min-h-11 px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-colors"
+        [class]="
+          page().mode === 'text'
+            ? 'bg-emerald-900/50 text-emerald-200'
+            : 'bg-[#1b2028] text-slate-500 hover:text-slate-300'
+        "
+        (click)="setMode('text')"
+      >
+        Texte
+      </button>
+      <button
+        type="button"
+        class="min-h-11 px-4 py-2 text-[10px] font-black uppercase tracking-widest border-l border-slate-700 transition-colors"
+        [class]="
+          page().mode === 'ink'
+            ? 'bg-emerald-900/50 text-emerald-200'
+            : 'bg-[#1b2028] text-slate-500 hover:text-slate-300'
+        "
+        (click)="setMode('ink')"
+      >
+        Main
+      </button>
+    </div>
+  </div>
+
+  @if (showPageList() && pages()) {
+    <div class="flex flex-wrap gap-2 items-center">
+      @for (p of listPages(); track p.id) {
+        <button
+          type="button"
+          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border max-w-[10rem] truncate"
+          [class]="
+            page().id === p.id
+              ? 'border-emerald-600/60 text-emerald-200 bg-emerald-950/40'
+              : 'border-slate-700 text-slate-500 hover:text-slate-300'
+          "
+          (click)="selectPage(p.id)"
+        >
+          {{ p.title || 'Sans titre' }}
+        </button>
+      }
+      <button
+        type="button"
+        class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:border-emerald-600/50 disabled:opacity-40"
+        [disabled]="listPages().length >= maxPages()"
+        (click)="addPage()"
+      >
+        + Page
+      </button>
+      @if (listPages().length > 1) {
+        <button
+          type="button"
+          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-red-900/40 text-red-400/80"
+          (click)="removePage(page().id)"
+        >
+          Suppr.
+        </button>
+      }
+    </div>
+  }
+
+  <label class="block">
+    <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">Titre</span>
+    <input
+      type="text"
+      class="mt-0.5 w-full bg-[#171b22] border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200"
+      [ngModel]="page().title"
+      (ngModelChange)="onTitleChange($event)"
+    />
+  </label>
+
+  @if (page().mode === 'text') {
+    <label class="block">
+      <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">Notes</span>
+      <textarea
+        [rows]="compact() ? 8 : 14"
+        placeholder="Scènes, PNJ, décisions des joueurs…"
+        class="mt-0.5 w-full bg-[#171b22] border border-emerald-900/40 rounded-xl p-3 text-sm text-slate-300 min-h-[12rem]"
+        [ngModel]="page().text ?? ''"
+        (ngModelChange)="onTextChange($event)"
+      ></textarea>
+    </label>
+  } @else {
+    <div class="space-y-2">
+      <div class="flex flex-wrap gap-2 items-center">
+        <label class="flex items-center gap-2 text-[10px] text-slate-500">
+          Épaisseur
+          <input
+            type="range"
+            min="1"
+            max="10"
+            step="0.5"
+            class="w-24 accent-emerald-500"
+            [ngModel]="penWidth()"
+            (ngModelChange)="setPenWidth($event)"
+          />
+        </label>
+        <button
+          type="button"
+          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border"
+          [class]="
+            erasing()
+              ? 'border-amber-600/60 text-amber-200 bg-amber-950/40'
+              : 'border-slate-700 text-slate-400'
+          "
+          (click)="toggleEraser()"
+        >
+          {{ erasing() ? 'Gomme on' : 'Gomme' }}
+        </button>
+        <button
+          type="button"
+          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-red-900/40 text-red-400/80"
+          (click)="clearInk()"
+        >
+          Effacer
+        </button>
+        <span class="text-[10px] text-slate-600 italic">Stylet recommandé · pas d’OCR pour l’instant</span>
+      </div>
+      <div
+        class="rounded-xl border border-emerald-900/40 bg-[#171b22] overflow-hidden touch-none"
+        style="touch-action: none"
+      >
+        <canvas
+          #inkCanvas
+          class="block w-full cursor-crosshair"
+          (pointerdown)="onPointerDown($event)"
+          (pointermove)="onPointerMove($event)"
+          (pointerup)="onPointerUp($event)"
+          (pointercancel)="onPointerUp($event)"
+        ></canvas>
+      </div>
+    </div>
+  }
+</section>
