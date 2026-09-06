@@ -276,7 +276,7 @@
               </p>
             </a>
           }
-          @if (s.recentCampaign; as recent) {
+          @if (showRecentCampaign(s) && s.recentCampaign; as recent) {
             <a
               [routerLink]="['/campaigns', recent.id]"
               class="perf-card bg-[#171b22] border border-slate-700 rounded-xl p-4 hover:border-violet-500/50 transition-colors"
@@ -293,7 +293,7 @@
           s.pendingFriendRequests === 0 &&
           s.pendingCampaignInvites === 0 &&
           !s.nextSession &&
-          !s.recentCampaign
+          !showRecentCampaign(s)
         ) {
           <p class="text-center text-sm text-slate-500 italic mt-2">Rien à signaler pour l'instant.</p>
         }

@@ -141,6 +141,13 @@ export class Home implements OnInit {
     });
   }
 
+  /** Hide "campagne récente" when it's already covered by the next-session card. */
+  showRecentCampaign(s: HomeSummary): boolean {
+    if (!s.recentCampaign) return false;
+    if (s.nextSession && s.recentCampaign.id === s.nextSession.campaignId) return false;
+    return true;
+  }
+
   private maybeShowRoleOnboarding(): void {
     this.showRoleOnboarding.set(
       this.auth.isLoggedIn() && this.guidePrefs.needsRoleOnboarding(),

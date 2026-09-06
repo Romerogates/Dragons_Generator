@@ -81,11 +81,6 @@ public class GetHomeSummaryEndpoint(AppDbContext db, ILogger<GetHomeSummaryEndpo
             .OrderByDescending(c => c.UpdatedAt)
             .ToList();
 
-        var recent = allCampaigns.FirstOrDefault();
-        HomeCampaignPreviewDto? recentDto = recent is null
-            ? null
-            : new HomeCampaignPreviewDto(recent.Id, recent.Title, recent.Role, recent.UpdatedAt);
-
         HomeSessionPreviewDto? nextSession = null;
         foreach (var c in allCampaigns)
         {
@@ -97,6 +92,13 @@ public class GetHomeSummaryEndpoint(AppDbContext db, ILogger<GetHomeSummaryEndpo
                     c.Id, c.Title, SessionTitleFromJson(c.JsonData, when.Value), when.Value);
             }
         }
+
+        // Avoid duplicating the same campaign when a scheduled session already covers it.
+        var recent = allCampaigns.FirstOrDefault(c =>
+            nextSession is null || c.Id != nextSession.CampaignId);
+        HomeCampaignPreviewDto? recentDto = recent is null
+            ? null
+            : new HomeCampaignPreviewDto(recent.Id, recent.Title, recent.Role, recent.UpdatedAt);
 
         var friendships = await db.Friendships.AsNoTracking()
             .Where(f => f.Status == FriendStatuses.Accepted &&
