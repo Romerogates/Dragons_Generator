@@ -10,6 +10,7 @@ import {
   HANDOUT_KIND_LABELS,
 } from '@core/models/Campaign/campaign';
 import { LightMarkdownPipe } from '@shared/pipes/light-markdown.pipe';
+import { prefersNativePdfFallback } from '@core/utils/pdf-preview.util';
 
 export interface HandoutPatchEvent {
   handoutId: string;
@@ -47,6 +48,7 @@ export class CampaignDetailHandouts {
   /** Hub PDF (MJ) — centralisé ici pour ne pas encombrer Résumé / Créatures. */
   readonly printing = input(false);
   readonly pdfPreviewUrl = input<SafeResourceUrl | null>(null);
+  readonly pdfPreviewRawUrl = input<string | null>(null);
   readonly isLoadingPreview = input(false);
   readonly pdfPreviewKind = input<CampaignPdfKind>('pack');
   readonly hasCreatures = input(false);
@@ -54,6 +56,9 @@ export class CampaignDetailHandouts {
   readonly sheetMembers = input<CampaignMember[]>([]);
   readonly pregenPdfLoadingId = input<string | null>(null);
   readonly memberSheetLoadingKey = input<string | null>(null);
+
+  /** true sur tablette / mobile : iframe PDF souvent inutilisable. */
+  readonly usePdfFallback = prefersNativePdfFallback();
 
   readonly handoutKinds: HandoutKind[] = ['letter', 'map', 'summary', 'other'];
   readonly handoutKindLabels = HANDOUT_KIND_LABELS;
@@ -77,8 +82,13 @@ export class CampaignDetailHandouts {
   readonly loadPackPreview = output<void>();
   readonly loadBestiaryPreview = output<void>();
   readonly openPdfFullscreen = output<void>();
+  readonly downloadPdfPreview = output<void>();
   readonly printPregenFullSheet = output<CampaignPregen>();
   readonly printMemberFullSheet = output<MemberSheetPdfEvent>();
+
+  previewLabel(): string {
+    return this.pdfPreviewKind() === 'bestiary' ? 'Bestiaire' : 'Pack MJ';
+  }
 
   formatHandoutDate(iso?: string): string {
     if (!iso) return '';

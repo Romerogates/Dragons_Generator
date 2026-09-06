@@ -53,6 +53,11 @@ import { ADVENTURE_TONE_LABELS, CreatureRole, StoryCreatureSelection } from '@co
 import { formatChallengeRating, getCreatureCategoryLabel } from '@core/utils/creature-display.util';
 import { shouldShowPlayerInitiativePrompt } from '@core/utils/campaign-initiative.util';
 import { seedNotebookFromLegacyNotes } from '@core/utils/notebook.util';
+import {
+  downloadBlobUrl,
+  namedPdfObjectUrl,
+  prefersNativePdfFallback,
+} from '@core/utils/pdf-preview.util';
 import { StoryBuilderService } from '@core/services/story-builder.service';
 import { CampaignPregenGeneratorService } from '@core/services/campaign-pregen-generator.service';
 import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
@@ -169,6 +174,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly creatureXpMap = signal<Record<string, number>>({});
   readonly isLoadingPreview = signal(false);
   readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
+  readonly pdfPreviewRawUrl = signal<string | null>(null);
   readonly pdfPreviewKind = signal<'pack' | 'bestiary'>('pack');
   private rawBlobUrl: string | null = null;
   private previewCacheKey: string | null = null;
@@ -1031,7 +1037,28 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   openBestiaryFullscreen(): void {
-    if (this.rawBlobUrl) window.open(this.rawBlobUrl, '_blank');
+    const url = this.rawBlobUrl;
+    if (!url) return;
+    // Sur tablette, window.open(blob) affiche souvent juste le nom — forcer un téléchargement nommé.
+    if (prefersNativePdfFallback()) {
+      const name =
+        this.pdfPreviewKind() === 'bestiary'
+          ? `bestiaire-${this.campaign()?.title ?? 'campagne'}.pdf`
+          : `pack-mj-${this.campaign()?.title ?? 'campagne'}.pdf`;
+      downloadBlobUrl(url, name.replace(/\s+/g, '-'));
+      return;
+    }
+    window.open(url, '_blank');
+  }
+
+  downloadPdfPreview(): void {
+    const url = this.rawBlobUrl;
+    if (!url) return;
+    const name =
+      this.pdfPreviewKind() === 'bestiary'
+        ? `bestiaire-${this.campaign()?.title ?? 'campagne'}.pdf`
+        : `pack-mj-${this.campaign()?.title ?? 'campagne'}.pdf`;
+    downloadBlobUrl(url, name.replace(/\s+/g, '-'));
   }
 
   private revokePreviewUrl(): void {
@@ -1040,7 +1067,21 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       this.rawBlobUrl = null;
     }
     this.pdfPreviewUrl.set(null);
+    this.pdfPreviewRawUrl.set(null);
     this.previewCacheKey = null;
+  }
+
+  private async setPreviewBlobUrl(url: string, filename: string): Promise<void> {
+    let named = url;
+    try {
+      named = await namedPdfObjectUrl(url, filename);
+      if (named !== url) URL.revokeObjectURL(url);
+    } catch {
+      named = url;
+    }
+    this.rawBlobUrl = named;
+    this.pdfPreviewRawUrl.set(named);
+    this.pdfPreviewUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(named));
   }
 
   loadPackPreview(): void {
@@ -1064,9 +1105,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
           const summaries = await this.loadPlayerSummaries();
           const pdf = await getCampaignPdfService(this.injector);
           const url = await pdf.generateCampaignPackBlob(c.title, c.data, entries, summaries);
-          this.rawBlobUrl = url;
+          await this.setPreviewBlobUrl(url, `pack-mj-${c.title.replace(/\s+/g, '-')}.pdf`);
           this.previewCacheKey = cacheKey;
-          this.pdfPreviewUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
         } catch {
           this.revokePreviewUrl();
         } finally {
@@ -1104,9 +1144,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
           this.revokePreviewUrl();
           const pdf = await getCampaignPdfService(this.injector);
           const url = await pdf.generateCreaturesPdfBlob(entries, c.title, c.data);
-          this.rawBlobUrl = url;
+          await this.setPreviewBlobUrl(url, `bestiaire-${c.title.replace(/\s+/g, '-')}.pdf`);
           this.previewCacheKey = cacheKey;
-          this.pdfPreviewUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
         } catch {
           this.revokePreviewUrl();
         } finally {

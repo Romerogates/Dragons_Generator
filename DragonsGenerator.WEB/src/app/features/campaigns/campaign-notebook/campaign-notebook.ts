@@ -49,14 +49,22 @@ export class CampaignNotebook implements AfterViewInit, OnDestroy {
   private emitTimer: ReturnType<typeof setTimeout> | null = null;
   private resizeObserver: ResizeObserver | null = null;
   private lastPageId: string | null = null;
+  private lastStrokeCount = -1;
 
   constructor() {
     effect(() => {
       const page = this.page();
       if (page.mode !== 'ink') return;
+      // Ne pas repaindre pendant un trait (sinon les points disparaissent).
+      if (this.drawing) return;
+      const strokeCount = page.inkStrokes?.length ?? 0;
       const idChanged = this.lastPageId !== page.id;
+      const strokesChanged = strokeCount !== this.lastStrokeCount;
       this.lastPageId = page.id;
+      this.lastStrokeCount = strokeCount;
+      if (!idChanged && !strokesChanged) return;
       queueMicrotask(() => {
+        if (this.drawing) return;
         if (idChanged) this.setupCanvasSize();
         this.paintPage();
       });
@@ -70,6 +78,7 @@ export class CampaignNotebook implements AfterViewInit, OnDestroy {
     const host = canvas?.parentElement;
     if (host && typeof ResizeObserver !== 'undefined') {
       this.resizeObserver = new ResizeObserver(() => {
+        if (this.drawing) return;
         this.setupCanvasSize();
         this.paintPage();
       });
@@ -163,19 +172,20 @@ export class CampaignNotebook implements AfterViewInit, OnDestroy {
     canvas.setPointerCapture(ev.pointerId);
     this.drawing = true;
     const pt = this.pointerToCanvas(ev, canvas);
-    const width = this.erasing() ? Math.max(10, this.penWidth() * 4) : this.penWidth();
+    const width = this.erasing() ? Math.max(10, this.penWidth() * 4) : Math.max(2, this.penWidth());
     const color = this.erasing() ? '#171b22' : this.penColor();
     this.currentStroke = { color, width, points: [pt] };
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
+    ctx.fillStyle = color;
     ctx.strokeStyle = color;
     ctx.lineWidth = width;
+    // Point immédiat (tap tablette)
     ctx.beginPath();
-    ctx.moveTo(pt.x, pt.y);
-    ctx.lineTo(pt.x + 0.01, pt.y);
-    ctx.stroke();
+    ctx.arc(pt.x, pt.y, Math.max(width / 2, 1.75), 0, Math.PI * 2);
+    ctx.fill();
   }
 
   onPointerMove(ev: PointerEvent): void {
@@ -188,6 +198,10 @@ export class CampaignNotebook implements AfterViewInit, OnDestroy {
     this.currentStroke.points.push(pt);
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+    ctx.strokeStyle = this.currentStroke.color;
+    ctx.lineWidth = this.currentStroke.width;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
     ctx.beginPath();
     ctx.moveTo(prev.x, prev.y);
     ctx.lineTo(pt.x, pt.y);
@@ -210,15 +224,20 @@ export class CampaignNotebook implements AfterViewInit, OnDestroy {
       return;
     }
     const strokes = [...(this.page().inkStrokes ?? []), this.currentStroke];
+    const shortTap = this.currentStroke.points.length <= 2;
     this.currentStroke = null;
+    this.lastStrokeCount = strokes.length;
     const imageDataUrl = canvas ? exportInkDataUrl(canvas) : this.page().inkImageDataUrl;
-    this.emitPageDebounced({
+    const next: NotebookPage = {
       ...this.page(),
       mode: 'ink',
       inkStrokes: strokes,
       inkImageDataUrl: imageDataUrl,
       updatedAt: new Date().toISOString(),
-    });
+    };
+    // Les taps doivent être persistés tout de suite (sinon un repaint les efface).
+    if (shortTap) this.emitPage(next);
+    else this.emitPageDebounced(next);
   }
 
   private pointerToCanvas(ev: PointerEvent, canvas: HTMLCanvasElement): { x: number; y: number } {

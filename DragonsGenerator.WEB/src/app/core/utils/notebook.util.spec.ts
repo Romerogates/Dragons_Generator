@@ -1,4 +1,8 @@
-import { seedNotebookFromLegacyNotes, sessionNotebookFromPlay } from './notebook.util';
+import {
+  redrawInkStrokes,
+  seedNotebookFromLegacyNotes,
+  sessionNotebookFromPlay,
+} from './notebook.util';
 import { createNotebookPage } from '@core/models/Campaign/campaign';
 
 describe('notebook.util', () => {
@@ -28,5 +32,16 @@ describe('notebook.util', () => {
     const page = sessionNotebookFromPlay('Soirée', 'from playNotes', existing);
     expect(page.mode).toBe('ink');
     expect(page.text).toBe('from notebook');
+  });
+
+  it('draws a visible filled circle for a single-point stroke', () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 40;
+    canvas.height = 40;
+    const ctx = canvas.getContext('2d')!;
+    redrawInkStrokes(ctx, [{ color: '#ffffff', width: 4, points: [{ x: 20, y: 20 }] }], true);
+    const pixel = ctx.getImageData(20, 20, 1, 1).data;
+    expect(pixel[0]).toBeGreaterThan(200);
+    expect(pixel[3]).toBeGreaterThan(200);
   });
 });

@@ -252,6 +252,7 @@
             [pinnedHandoutId]="c.data.pinnedHandoutId ?? null"
             [printing]="printing()"
             [pdfPreviewUrl]="pdfPreviewUrl()"
+            [pdfPreviewRawUrl]="pdfPreviewRawUrl()"
             [isLoadingPreview]="isLoadingPreview()"
             [pdfPreviewKind]="pdfPreviewKind()"
             [hasCreatures]="!!c.data.creatures.length"
@@ -277,6 +278,7 @@
             (loadPackPreview)="loadPackPreview()"
             (loadBestiaryPreview)="loadBestiaryPreview()"
             (openPdfFullscreen)="openBestiaryFullscreen()"
+            (downloadPdfPreview)="downloadPdfPreview()"
             (printPregenFullSheet)="printPregenFullSheet($event)"
             (printMemberFullSheet)="printMemberFullSheet($event.member, $event.scope)"
           />

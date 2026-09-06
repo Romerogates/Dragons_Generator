@@ -74,8 +74,17 @@
             class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-400"
             (click)="openPdfFullscreen.emit()"
           >
-            Plein écran
+            {{ usePdfFallback ? 'Télécharger' : 'Plein écran' }}
           </button>
+          @if (usePdfFallback) {
+            <button
+              type="button"
+              class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-amber-700/50 text-amber-300"
+              (click)="downloadPdfPreview.emit()"
+            >
+              Sauver PDF
+            </button>
+          }
         }
       </div>
       @if (printing()) {
@@ -93,8 +102,26 @@
             </p>
           </div>
         }
-        @if (!isLoadingPreview() && pdfPreviewUrl()) {
+        @if (!isLoadingPreview() && pdfPreviewUrl() && !usePdfFallback) {
           <iframe [src]="pdfPreviewUrl()" class="w-full h-full border-0" title="Aperçu PDF"></iframe>
+        }
+        @if (!isLoadingPreview() && pdfPreviewUrl() && usePdfFallback) {
+          <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center bg-[#0f1117]">
+            <p class="text-sm text-slate-300 font-serif">
+              Aperçu PDF limité sur tablette / mobile
+            </p>
+            <p class="text-xs text-slate-500 max-w-sm">
+              Safari et Chrome mobile n’affichent souvent que le nom du fichier dans l’iframe.
+              Télécharge {{ previewLabel() }} pour l’ouvrir dans ton lecteur PDF.
+            </p>
+            <button
+              type="button"
+              class="min-h-11 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase bg-amber-600 text-white"
+              (click)="downloadPdfPreview.emit()"
+            >
+              Télécharger {{ previewLabel() }}
+            </button>
+          </div>
         }
         @if (!isLoadingPreview() && !pdfPreviewUrl()) {
           <div class="absolute inset-0 flex items-center justify-center text-xs text-slate-500 italic px-4 text-center">
