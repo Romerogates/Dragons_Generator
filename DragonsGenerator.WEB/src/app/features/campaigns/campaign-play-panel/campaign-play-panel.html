@@ -431,56 +431,62 @@
                   }
                   @if (isDm() && (combatFlowPhase() === 'setup' || advancedToolsOpen())) {
                     <div
-                      class="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-1"
+                      class="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2"
                       (click)="$event.stopPropagation()"
                     >
-                      <input
-                        type="text"
-                        placeholder="Nom"
-                        class="col-span-2 sm:col-span-3 bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-200 min-w-0"
-                        [ngModel]="cb.name"
-                        (ngModelChange)="updateCombatant(cb.id, { name: $event }, { immediate: true })"
-                      />
-                      <input
-                        type="number"
-                        inputmode="numeric"
-                        placeholder="PV"
-                        title="PV actuels"
-                        class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
-                        [ngModel]="cb.currentHp ?? ''"
-                        (ngModelChange)="updateCombatantHp(cb.id, $event)"
-                      />
-                      <input
-                        type="number"
-                        inputmode="numeric"
-                        placeholder="PV max"
-                        title="PV max"
-                        class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
-                        [ngModel]="cb.maxHp ?? ''"
-                        (ngModelChange)="updateCombatantMaxHp(cb.id, $event)"
-                      />
-                      <input
-                        type="number"
-                        inputmode="numeric"
-                        placeholder="CA"
-                        title="Classe d’armure"
-                        class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
-                        [ngModel]="cb.armorClass ?? 10"
-                        (ngModelChange)="
-                          updateCombatant(cb.id, {
-                            armorClass: $event === '' || $event === null ? 10 : +$event
-                          })
-                        "
-                      />
-                      <input
-                        type="number"
-                        inputmode="numeric"
-                        placeholder="Bonus init"
-                        title="Bonus d’initiative"
-                        class="col-span-2 sm:col-span-1 bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
-                        [ngModel]="cb.initiativeBonus"
-                        (ngModelChange)="updateCombatant(cb.id, { initiativeBonus: +$event || 0 })"
-                      />
+                      <label class="col-span-2 sm:col-span-3 block">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">Nom</span>
+                        <input
+                          type="text"
+                          class="mt-0.5 w-full bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-200 min-w-0"
+                          [ngModel]="cb.name"
+                          (ngModelChange)="updateCombatant(cb.id, { name: $event }, { immediate: true })"
+                        />
+                      </label>
+                      <label class="block">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">PV</span>
+                        <input
+                          type="number"
+                          inputmode="numeric"
+                          class="mt-0.5 w-full bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
+                          [ngModel]="cb.currentHp ?? ''"
+                          (ngModelChange)="updateCombatantHp(cb.id, $event)"
+                        />
+                      </label>
+                      <label class="block">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">PV max</span>
+                        <input
+                          type="number"
+                          inputmode="numeric"
+                          class="mt-0.5 w-full bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
+                          [ngModel]="cb.maxHp ?? ''"
+                          (ngModelChange)="updateCombatantMaxHp(cb.id, $event)"
+                        />
+                      </label>
+                      <label class="block">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">CA</span>
+                        <input
+                          type="number"
+                          inputmode="numeric"
+                          class="mt-0.5 w-full bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
+                          [ngModel]="cb.armorClass ?? 10"
+                          (ngModelChange)="
+                            updateCombatant(cb.id, {
+                              armorClass: $event === '' || $event === null ? 10 : +$event
+                            })
+                          "
+                        />
+                      </label>
+                      <label class="block col-span-2 sm:col-span-1">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">Bonus init</span>
+                        <input
+                          type="number"
+                          inputmode="numeric"
+                          class="mt-0.5 w-full bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
+                          [ngModel]="cb.initiativeBonus"
+                          (ngModelChange)="updateCombatant(cb.id, { initiativeBonus: +$event || 0 })"
+                        />
+                      </label>
                     </div>
                   }
                 }
@@ -593,67 +599,73 @@
                   }
                   @if (isDm() && (combatFlowPhase() === 'setup' || advancedToolsOpen())) {
                     <div
-                      class="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-1"
+                      class="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2"
                       (click)="$event.stopPropagation()"
                     >
-                      <input
-                        type="text"
-                        placeholder="Nom"
-                        class="col-span-2 sm:col-span-3 bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-200 min-w-0"
-                        [ngModel]="cb.name"
-                        (ngModelChange)="updateCombatant(cb.id, { name: $event }, { immediate: true })"
-                      />
-                      <input
-                        type="number"
-                        inputmode="numeric"
-                        placeholder="PV"
-                        title="PV actuels"
-                        class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
-                        [ngModel]="cb.currentHp ?? ''"
-                        (ngModelChange)="updateCombatantHp(cb.id, $event)"
-                      />
-                      <input
-                        type="number"
-                        inputmode="numeric"
-                        placeholder="PV max"
-                        title="PV max"
-                        class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
-                        [ngModel]="cb.maxHp ?? ''"
-                        (ngModelChange)="updateCombatantMaxHp(cb.id, $event)"
-                      />
-                      <div class="flex gap-1 min-w-0">
+                      <label class="col-span-2 sm:col-span-3 block">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">Nom</span>
+                        <input
+                          type="text"
+                          class="mt-0.5 w-full bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-200 min-w-0"
+                          [ngModel]="cb.name"
+                          (ngModelChange)="updateCombatant(cb.id, { name: $event }, { immediate: true })"
+                        />
+                      </label>
+                      <label class="block">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">PV</span>
                         <input
                           type="number"
                           inputmode="numeric"
-                          placeholder="CA"
-                          title="Classe d’armure"
-                          class="flex-1 bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
-                          [ngModel]="cb.armorClass ?? 10"
-                          (ngModelChange)="
-                            updateCombatant(cb.id, {
-                              armorClass: $event === '' || $event === null ? 10 : +$event
-                            })
-                          "
+                          class="mt-0.5 w-full bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
+                          [ngModel]="cb.currentHp ?? ''"
+                          (ngModelChange)="updateCombatantHp(cb.id, $event)"
                         />
-                        <button
-                          type="button"
-                          class="w-8 h-8 shrink-0 flex items-center justify-center rounded-lg border border-amber-800/50 text-amber-300 hover:bg-amber-950/40"
-                          title="Randomiser la CA (base règles 10)"
-                          aria-label="Randomiser la CA"
-                          (click)="randomizeArmorClass(cb.id)"
-                        >
-                          <iconify-icon icon="mdi:dice-d20" class="text-base"></iconify-icon>
-                        </button>
-                      </div>
-                      <input
-                        type="number"
-                        inputmode="numeric"
-                        placeholder="Bonus init"
-                        title="Bonus d’initiative"
-                        class="col-span-2 sm:col-span-1 bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
-                        [ngModel]="cb.initiativeBonus"
-                        (ngModelChange)="updateCombatant(cb.id, { initiativeBonus: +$event || 0 })"
-                      />
+                      </label>
+                      <label class="block">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">PV max</span>
+                        <input
+                          type="number"
+                          inputmode="numeric"
+                          class="mt-0.5 w-full bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
+                          [ngModel]="cb.maxHp ?? ''"
+                          (ngModelChange)="updateCombatantMaxHp(cb.id, $event)"
+                        />
+                      </label>
+                      <label class="block">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">CA</span>
+                        <div class="mt-0.5 flex gap-1 min-w-0">
+                          <input
+                            type="number"
+                            inputmode="numeric"
+                            class="flex-1 bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
+                            [ngModel]="cb.armorClass ?? 10"
+                            (ngModelChange)="
+                              updateCombatant(cb.id, {
+                                armorClass: $event === '' || $event === null ? 10 : +$event
+                              })
+                            "
+                          />
+                          <button
+                            type="button"
+                            class="w-8 h-8 shrink-0 flex items-center justify-center rounded-lg border border-amber-800/50 text-amber-300 hover:bg-amber-950/40"
+                            title="Randomiser la CA (base règles 10)"
+                            aria-label="Randomiser la CA"
+                            (click)="randomizeArmorClass(cb.id)"
+                          >
+                            <iconify-icon icon="mdi:dice-d20" class="text-base"></iconify-icon>
+                          </button>
+                        </div>
+                      </label>
+                      <label class="block col-span-2 sm:col-span-1">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">Bonus init</span>
+                        <input
+                          type="number"
+                          inputmode="numeric"
+                          class="mt-0.5 w-full bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
+                          [ngModel]="cb.initiativeBonus"
+                          (ngModelChange)="updateCombatant(cb.id, { initiativeBonus: +$event || 0 })"
+                        />
+                      </label>
                     </div>
                   }
                 }
