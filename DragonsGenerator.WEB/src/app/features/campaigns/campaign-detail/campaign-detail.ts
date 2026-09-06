@@ -67,6 +67,11 @@ import { CampaignSessionCacheService } from '@core/services/campaign-session-cac
 import { CampaignSessionDockService } from '@core/services/campaign-session-dock.service';
 import { CampaignInitiativeInline } from '../campaign-initiative-inline/campaign-initiative-inline';
 import { CampaignPlayerSheet } from '../campaign-player-sheet/campaign-player-sheet';
+import { CampaignSetupGuide } from './campaign-setup-guide/campaign-setup-guide';
+import type {
+  CampaignSetupAction,
+  CampaignSetupGuideInput,
+} from './campaign-setup-guide/campaign-setup-guide.util';
 import { LightMarkdownPipe } from '@shared/pipes/light-markdown.pipe';
 
 type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'activity' | 'handouts' | 'maps';
@@ -86,6 +91,7 @@ type TabDef = { id: Tab; label: string; icon: string };
     CampaignDetailSessions,
     CampaignDetailActivity,
     CampaignDetailHandouts,
+    CampaignSetupGuide,
     AiGenerationProgressBar,
     CampaignInitiativeInline,
     CampaignPlayerSheet,
@@ -172,6 +178,19 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       const cur = this.campaign();
       if (!live || !cur || live.id !== cur.id || live === cur) return;
       untracked(() => this.campaign.set(live));
+    });
+    effect(() => {
+      const id = this.campaign()?.id;
+      if (!id) return;
+      untracked(() => {
+        try {
+          this.mapsStepSkipped.set(
+            sessionStorage.getItem(`dg-campaign-skip-maps:${id}`) === '1',
+          );
+        } catch {
+          this.mapsStepSkipped.set(false);
+        }
+      });
     });
   }
 
@@ -262,6 +281,26 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       .find((s) => new Date(s.scheduledAt).getTime() >= now)
       ?? (this.campaign()?.data.sessions ?? []).find((s) => s.status === 'planned')
       ?? null;
+  });
+
+  /** Skip optionnel de l’étape carte (local, par campagne). */
+  readonly mapsStepSkipped = signal(false);
+
+  readonly setupGuideState = computed((): CampaignSetupGuideInput => {
+    const c = this.campaign();
+    const data = c?.data;
+    return {
+      hasAdventure: !!(data?.adventure?.trim()),
+      creatureCount: data?.creatures?.length ?? 0,
+      mapCount: data?.dungeonMaps?.length ?? 0,
+      encounterCount: data?.encounters?.length ?? 0,
+      approvedPlayerCount: this.approvedPlayersWithCharacter().length,
+      playerCount: this.players().length,
+      hasPlannedSession: !!(data?.sessions ?? []).some((s) => s.status === 'planned'),
+      hasActiveSession: !!data?.activeSessionId,
+      nextSessionTitle: this.nextPlannedSession()?.title ?? null,
+      mapsSkipped: this.mapsStepSkipped(),
+    };
   });
 
   readonly visibleTabs = computed((): TabDef[] => {
@@ -507,6 +546,60 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (t === 'activity') {
       this.loadActivity();
     }
+  }
+
+  onSetupGuideAction(action: CampaignSetupAction): void {
+    const c = this.campaign();
+    switch (action) {
+      case 'editScenario':
+        this.editScenario();
+        break;
+      case 'openCreatures':
+        this.setTab('creatures');
+        break;
+      case 'openMaps':
+        this.setTab('maps');
+        break;
+      case 'openEncounters':
+        this.setTab('encounters');
+        break;
+      case 'generateEncounters':
+        this.generateEncountersFromStory();
+        this.setTab('encounters');
+        break;
+      case 'openPlayers':
+        this.setTab('players');
+        break;
+      case 'addSession':
+        this.addSession();
+        break;
+      case 'startNextSession': {
+        const next = this.nextPlannedSession();
+        if (next) this.startPlaySession(next.id);
+        else this.addSession();
+        break;
+      }
+      case 'openPlay':
+        this.openSessionDock();
+        break;
+      case 'openPlayFullscreen':
+        if (c) void this.router.navigate(['/campaigns', c.id, 'play']);
+        break;
+      case 'skipMaps':
+        this.mapsStepSkipped.set(true);
+        if (c) {
+          try {
+            sessionStorage.setItem(`dg-campaign-skip-maps:${c.id}`, '1');
+          } catch {
+            /* ignore */
+          }
+        }
+        break;
+    }
+  }
+
+  onStatsNavigate(tab: 'creatures' | 'encounters' | 'players' | 'handouts'): void {
+    this.setTab(tab);
   }
 
   loadActivity(): void {

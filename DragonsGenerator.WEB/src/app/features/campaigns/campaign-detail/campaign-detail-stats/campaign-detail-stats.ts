@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+
+export type CampaignStatsNav = 'creatures' | 'encounters' | 'players' | 'handouts';
 
 @Component({
   selector: 'app-campaign-detail-stats',
@@ -14,4 +16,6 @@ export class CampaignDetailStats {
   readonly totalXpAwarded = input(0);
   readonly myXpEarned = input(0);
   readonly approvedCharacterName = input<string | null | undefined>(null);
+
+  readonly navigate = output<CampaignStatsNav>();
 }
