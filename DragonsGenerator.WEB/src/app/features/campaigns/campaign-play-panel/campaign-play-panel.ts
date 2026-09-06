@@ -836,10 +836,14 @@ export class CampaignPlayPanel implements OnDestroy {
     if (!combat) return;
     const target = combat.combatants.find((c) => c.id === combatantId);
     const label = target?.name?.trim() || 'ce combattant';
-    if (!confirm(`Retirer ${label} du combat ?`)) return;
+    const inSetup = resolveCombatFlowPhase(combat) === 'setup';
+    if (!inSetup && !confirm(`Retirer ${label} du combat ?`)) return;
     const combatants = combat.combatants.filter((c) => c.id !== combatantId);
+    const turnOrderIds = combat.turnOrderIds?.filter((id) => id !== combatantId);
     const turnIndex = Math.min(combat.turnIndex, Math.max(0, combatants.length - 1));
-    this.patchCombat({ ...combat, combatants, turnIndex }, { immediate: true });
+    if (this.selectedTargetId() === combatantId) this.selectedTargetId.set(null);
+    if (this.pendingInitCombatantId() === combatantId) this.pendingInitCombatantId.set(null);
+    this.patchCombat({ ...combat, combatants, turnOrderIds, turnIndex }, { immediate: true });
   }
 
   updateCombatantConditions(combatantId: string, raw: string): void {
