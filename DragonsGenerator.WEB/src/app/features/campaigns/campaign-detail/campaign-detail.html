@@ -338,14 +338,34 @@
 
               @for (group of creatureGroups(); track group.id) {
                 <div class="space-y-3">
-                  <h3
-                    class="text-[10px] font-black uppercase tracking-widest px-1"
-                    [class.text-sky-400]="group.id === 'ally'"
-                    [class.text-red-400]="group.id === 'adversary'"
-                    [class.text-slate-500]="group.id === 'other'"
-                  >
-                    {{ group.label }}
-                  </h3>
+                  <div class="flex flex-wrap items-center justify-between gap-2 px-1">
+                    <h3
+                      class="text-[10px] font-black uppercase tracking-widest"
+                      [class.text-sky-400]="group.id === 'ally'"
+                      [class.text-red-400]="group.id === 'adversary'"
+                      [class.text-slate-500]="group.id === 'other'"
+                    >
+                      {{ group.label }}
+                    </h3>
+                    @if (group.id === 'other') {
+                      <div class="flex flex-wrap gap-1.5">
+                        <button
+                          type="button"
+                          class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase border border-sky-800/50 text-sky-300"
+                          (click)="bulkClassifyUnsorted('ally')"
+                        >
+                          Tous → Alliés
+                        </button>
+                        <button
+                          type="button"
+                          class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase border border-red-900/50 text-red-300"
+                          (click)="bulkClassifyUnsorted('antagonist')"
+                        >
+                          Tous → Adversaires
+                        </button>
+                      </div>
+                    }
+                  </div>
                   @for (cr of group.items; track creatureTrackKey(cr)) {
                     <article
                       class="bg-[#1b2028] border rounded-2xl p-5"

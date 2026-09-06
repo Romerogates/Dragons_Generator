@@ -170,6 +170,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
   private initiativePollTimer: ReturnType<typeof setInterval> | null = null;
   private softPollTimer: ReturnType<typeof setInterval> | null = null;
+  private softPollIntervalMs = 12_000;
 
   readonly creatureXpMap = signal<Record<string, number>>({});
   readonly isLoadingPreview = signal(false);
@@ -550,17 +551,17 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (this.auth.isLoggedIn()) this.softReload();
   };
 
-  /** Recharge sans spinner (invitations acceptées, propositions, etc.). */
+  /** Recharge sans spinner (invitations acceptées, propositions, combat live joueur…). */
   private softReload(): void {
     const campaignId = this.campaign()?.id;
     if (!campaignId || this.loading() || this.saving()) return;
     this.campaigns.get(campaignId).subscribe({
       next: (c) => {
         const current = this.campaign();
-        if (!current || current.id !== c.id) {
+        if (!current || current.id !== c.id || !current.isOwner) {
+          // Joueurs : sync complète (combat / tours / PV). MJ : ne pas écraser data locale.
           this.campaign.set(c);
         } else {
-          // Ne pas écraser data locale (notes / combat) — maj roster + titre seulement.
           this.campaign.set({
             ...current,
             title: c.title,
@@ -575,11 +576,27 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
           const next = new Set([...prev].filter((id) => !memberIds.has(id)));
           return next.size === prev.size ? prev : next;
         });
+        this.tuneSoftPollInterval(c);
       },
       error: () => {
         /* ignore soft poll */
       },
     });
+  }
+
+  /** Poll plus fréquent pour les joueurs pendant une session / combat live. */
+  private tuneSoftPollInterval(c: CampaignDetailModel): void {
+    const sessionId = c.data.activeSessionId;
+    const session = sessionId
+      ? (c.data.sessions ?? []).find((s) => s.id === sessionId)
+      : undefined;
+    const live =
+      !c.isOwner && !!(sessionId || session?.activeCombat?.combatants?.length);
+    const nextMs = live ? 4_000 : 12_000;
+    if (this.softPollIntervalMs === nextMs) return;
+    this.softPollIntervalMs = nextMs;
+    if (this.softPollTimer) clearInterval(this.softPollTimer);
+    this.softPollTimer = setInterval(() => this.softReload(), nextMs);
   }
 
   reload(id?: string): void {
@@ -1570,6 +1587,20 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       entry.creatureId === cr.creatureId && entry.customName === cr.customName
         ? { ...entry, role }
         : entry,
+    );
+    this.saveData({ creatures });
+  }
+
+  bulkClassifyUnsorted(role: 'ally' | 'antagonist'): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    const unsorted = this.otherCreatures();
+    if (!unsorted.length) return;
+    const label = role === 'ally' ? 'alliés' : 'adversaires';
+    if (!confirm(`Classer ${unsorted.length} créature(s) non classée(s) en ${label} ?`)) return;
+    const keys = new Set(unsorted.map((cr) => this.creatureTrackKey(cr)));
+    const creatures = (c.data.creatures ?? []).map((entry) =>
+      keys.has(this.creatureTrackKey(entry)) ? { ...entry, role } : entry,
     );
     this.saveData({ creatures });
   }

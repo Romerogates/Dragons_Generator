@@ -240,6 +240,47 @@
       }
 
       @if (activeCombat(); as combat) {
+        @if (!isDm() && combatTurnOrder().length) {
+          <div
+            class="rounded-xl border border-emerald-800/40 bg-emerald-950/15 p-3 space-y-2"
+            role="status"
+            aria-label="Ordre de combat en direct"
+          >
+            <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400">
+              Roster live · manche {{ combat.round }}
+            </p>
+            <ol class="space-y-1.5">
+              @for (cb of combatTurnOrder(); track cb.id; let i = $index) {
+                <li
+                  class="flex flex-wrap items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-xs border"
+                  [class.border-amber-500]="isCurrentTurn(cb.id) && !isCombatantDefeated(cb)"
+                  [class.bg-amber-950/35]="isCurrentTurn(cb.id) && !isCombatantDefeated(cb)"
+                  [class.border-slate-800]="!isCurrentTurn(cb.id)"
+                  [class.bg-[#171b22]/60]="!isCurrentTurn(cb.id)"
+                  [class.opacity-45]="isCombatantDefeated(cb)"
+                >
+                  <div class="flex items-center gap-2 min-w-0">
+                    <span class="text-[10px] font-mono text-slate-500 w-4 shrink-0">{{ i + 1 }}</span>
+                    <span class="font-serif text-slate-200 truncate" [class.line-through]="isCombatantDefeated(cb)">
+                      {{ cb.name || 'Sans nom' }}
+                    </span>
+                    @if (myCombatant()?.id === cb.id) {
+                      <span class="text-[8px] font-black uppercase tracking-widest text-sky-400">vous</span>
+                    }
+                  </div>
+                  <div class="flex flex-wrap items-center gap-2 text-[11px] text-slate-400">
+                    <span>PV {{ cb.currentHp ?? '—' }}/{{ cb.maxHp ?? '—' }}</span>
+                    <span>CA {{ cb.armorClass ?? '—' }}</span>
+                    @if (cb.conditions?.length) {
+                      <span class="text-violet-300">{{ cb.conditions!.join(', ') }}</span>
+                    }
+                  </div>
+                </li>
+              }
+            </ol>
+          </div>
+        }
+
         @if (currentTurn(); as turn) {
           <div
             class="flex flex-wrap items-center justify-between gap-3 bg-amber-950/20 border border-amber-800/40 rounded-xl px-4 py-3"
@@ -381,6 +422,16 @@
                     >Init {{ combatantInitiativeTotal(cb) ?? '—' }}</span
                   >
                 </div>
+                @if (cb.conditions?.length) {
+                  <div class="mt-1.5 flex flex-wrap gap-1">
+                    @for (cond of cb.conditions; track cond) {
+                      <span
+                        class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest bg-violet-950/50 text-violet-300 border border-violet-800/40"
+                        >{{ cond }}</span
+                      >
+                    }
+                  </div>
+                }
                 @if (isDm()) {
                   <div class="mt-2 flex flex-wrap gap-1" (click)="$event.stopPropagation()">
                     <button
@@ -501,6 +552,47 @@
                           (ngModelChange)="updateCombatant(cb.id, { initiativeBonus: +$event || 0 })"
                         />
                       </label>
+                      <label class="col-span-2 sm:col-span-3 block">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-500"
+                          >Conditions (séparées par des virgules)</span
+                        >
+                        <input
+                          type="text"
+                          placeholder="empoisonné, à terre…"
+                          class="mt-0.5 w-full bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
+                          [ngModel]="(cb.conditions ?? []).join(', ')"
+                          (ngModelChange)="updateCombatantConditions(cb.id, $event)"
+                        />
+                      </label>
+                      @if (cb.attacks?.length) {
+                        <div class="col-span-2 sm:col-span-3 space-y-1">
+                          <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Attaques</p>
+                          @for (atk of cb.attacks; track $index) {
+                            <div class="grid grid-cols-3 gap-1">
+                              <input
+                                type="text"
+                                class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-[11px] text-slate-300"
+                                [ngModel]="atk.name"
+                                (ngModelChange)="patchCombatantAttack(cb.id, $index, { name: $event })"
+                              />
+                              <input
+                                type="number"
+                                class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-[11px] text-slate-300"
+                                title="Bonus d’attaque"
+                                [ngModel]="atk.attackBonus"
+                                (ngModelChange)="patchCombatantAttack(cb.id, $index, { attackBonus: +$event || 0 })"
+                              />
+                              <input
+                                type="text"
+                                class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-[11px] text-slate-300"
+                                placeholder="dégâts"
+                                [ngModel]="atk.damageDice ?? ''"
+                                (ngModelChange)="patchCombatantAttack(cb.id, $index, { damageDice: $event || undefined })"
+                              />
+                            </div>
+                          }
+                        </div>
+                      }
                     </div>
                   }
                 }
@@ -542,6 +634,16 @@
                     >Init {{ combatantInitiativeTotal(cb) ?? '—' }}</span
                   >
                 </div>
+                @if (cb.conditions?.length) {
+                  <div class="mt-1.5 flex flex-wrap gap-1">
+                    @for (cond of cb.conditions; track cond) {
+                      <span
+                        class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest bg-violet-950/50 text-violet-300 border border-violet-800/40"
+                        >{{ cond }}</span
+                      >
+                    }
+                  </div>
+                }
                 @if (isDm()) {
                   <div class="mt-2 flex flex-wrap gap-1" (click)="$event.stopPropagation()">
                     <button
@@ -680,6 +782,47 @@
                           (ngModelChange)="updateCombatant(cb.id, { initiativeBonus: +$event || 0 })"
                         />
                       </label>
+                      <label class="col-span-2 sm:col-span-3 block">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-500"
+                          >Conditions (séparées par des virgules)</span
+                        >
+                        <input
+                          type="text"
+                          placeholder="empoisonné, à terre…"
+                          class="mt-0.5 w-full bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
+                          [ngModel]="(cb.conditions ?? []).join(', ')"
+                          (ngModelChange)="updateCombatantConditions(cb.id, $event)"
+                        />
+                      </label>
+                      @if (cb.attacks?.length) {
+                        <div class="col-span-2 sm:col-span-3 space-y-1">
+                          <p class="text-[9px] font-black uppercase tracking-widest text-slate-500">Attaques</p>
+                          @for (atk of cb.attacks; track $index) {
+                            <div class="grid grid-cols-3 gap-1">
+                              <input
+                                type="text"
+                                class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-[11px] text-slate-300"
+                                [ngModel]="atk.name"
+                                (ngModelChange)="patchCombatantAttack(cb.id, $index, { name: $event })"
+                              />
+                              <input
+                                type="number"
+                                class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-[11px] text-slate-300"
+                                title="Bonus d’attaque"
+                                [ngModel]="atk.attackBonus"
+                                (ngModelChange)="patchCombatantAttack(cb.id, $index, { attackBonus: +$event || 0 })"
+                              />
+                              <input
+                                type="text"
+                                class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-[11px] text-slate-300"
+                                placeholder="dégâts"
+                                [ngModel]="atk.damageDice ?? ''"
+                                (ngModelChange)="patchCombatantAttack(cb.id, $index, { damageDice: $event || undefined })"
+                              />
+                            </div>
+                          }
+                        </div>
+                      }
                     </div>
                   }
                 }

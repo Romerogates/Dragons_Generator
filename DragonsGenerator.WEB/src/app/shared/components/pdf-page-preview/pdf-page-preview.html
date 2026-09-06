@@ -1,0 +1,39 @@
+<div class="absolute inset-0 flex flex-col bg-[#0f1117]">
+  @if (loading()) {
+    <div class="flex-1 flex flex-col items-center justify-center gap-3">
+      <div class="w-8 h-8 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin"></div>
+      <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest animate-pulse">Rendu PDF…</p>
+    </div>
+  } @else if (error()) {
+    <div class="flex-1 flex items-center justify-center px-4 text-center text-sm text-red-300">
+      {{ error() }}
+    </div>
+  } @else {
+    <div class="flex-1 overflow-auto flex items-start justify-center p-2">
+      <canvas #pdfCanvas class="max-w-full h-auto shadow-lg"></canvas>
+    </div>
+    @if (pageCount() > 1) {
+      <div class="flex items-center justify-center gap-3 py-2 border-t border-slate-800 shrink-0">
+        <button
+          type="button"
+          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300 disabled:opacity-40"
+          [disabled]="page() <= 1"
+          (click)="prevPage()"
+        >
+          ←
+        </button>
+        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+          {{ page() }} / {{ pageCount() }}
+        </span>
+        <button
+          type="button"
+          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300 disabled:opacity-40"
+          [disabled]="page() >= pageCount()"
+          (click)="nextPage()"
+        >
+          →
+        </button>
+      </div>
+    }
+  }
+</div>

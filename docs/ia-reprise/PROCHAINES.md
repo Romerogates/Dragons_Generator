@@ -14,12 +14,11 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
-*(Feedback checklist §3 en cours — Drakeide / fiche / copie traités.)*
-
-**Tests manuels** : cocher `docs/CHECKLIST-TESTS-MANUELS.md`.
+**Tests manuels campagne** : cocher `docs/CHECKLIST-TESTS-MANUELS.md` (§5.4–5.6 carnet/PDF/combat + §6 roster live).
 
 ## Déjà livré (ne pas refaire)
 
+- **Vague carnet + PDF + combat** — classer Neutre en masse ; stylet couleurs / surligneur / undo + export PNG/PDF ; PDF.js aperçu Documents ; OCR `POST /ai/transcribe-notebook` (Groq vision) → Transcrire ; conditions + édition attaques combat ; roster live joueur (poll data complète + UI lecture seule).
 - **Fiche de jeu (`character-play-view`)** — ressources sans doublons magie ; blocs Incantation (emplacements restants, pacte, grimoire) ; libellés FR ; spec (6).
 - **Campagne table UX** — banner init seulement si PJ lié ; empty state `/init` + inline ; XP avec erreurs + lock + plus de `reload()` post-award ; labels FR (Lettre, Document, brouillard de guerre) ; util `campaign-initiative.util` + specs.
 - **Wizard UX polish** — species : « Étape précédente » ; civ : « Continuer » si déjà confirmée ; background : restore custom + fallback pick si id manquant ; summary : erreur cloud visible (pas de navigation/reset), vousvoiement FR ; specs species/background/summary.

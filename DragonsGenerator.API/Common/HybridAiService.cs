@@ -116,6 +116,30 @@ public sealed class HybridAiService
         return last ?? new GroqChatResult(false, null, "La génération IA a échoué.", false);
     }
 
+    /// <summary>OCR manuscrit FR via modèle vision Groq.</summary>
+    public async Task<GroqChatResult> TranscribeInkAsync(string imageDataUrl, CancellationToken ct)
+    {
+        var visionModel = _config["Groq:VisionModel"];
+        if (string.IsNullOrWhiteSpace(visionModel))
+            visionModel = "meta-llama/llama-4-scout-17b-16e-instruct";
+
+        const string system =
+            "Tu es un outil d'OCR pour notes manuscrites de jeu de rôle. " +
+            "Tu transcris uniquement le texte visible, en français, sans inventer. " +
+            "Si rien n'est lisible, réponds exactement : (illisible).";
+
+        const string user =
+            "Transcris ces notes manuscrites. Texte brut uniquement, pas de markdown ni de commentaire.";
+
+        return await _remote.SendVisionChatAsync(
+            imageDataUrl,
+            user,
+            system,
+            maxTokens: 1200,
+            ct,
+            [visionModel]);
+    }
+
     private IReadOnlyList<string> GetAdventureModelChain()
     {
         var primary = _config["Groq:AdventureModel"];

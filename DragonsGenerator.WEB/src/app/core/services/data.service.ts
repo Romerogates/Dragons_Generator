@@ -351,6 +351,12 @@ export class DataService {
     return this.http.post<GenerateCreatureStoryResponse>(`${this.apiUrl}/generate-creature-story`, request);
   }
 
+  transcribeNotebook(imageDataUrl: string): Observable<{ text: string }> {
+    return this.http.post<{ text: string }>(`${this.apiUrl}/ai/transcribe-notebook`, {
+      imageDataUrl,
+    });
+  }
+
   generateCreatureStoriesBatch(
     request: GenerateCreatureStoriesBatchRequest,
   ): Observable<GenerateCreatureStoriesBatchResponse> {

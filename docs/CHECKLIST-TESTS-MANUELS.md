@@ -134,6 +134,26 @@ Prérequis : campagne créée, ≥ 1 joueur avec perso **approuvé**, rencontre 
 - [ ] 🔴 Éditer notes / handout / carte → attendre debounce → refresh page → **données encore là**
 - [ ] 🟠 Deux onglets MJ : pas de perte grossière au save (smoke)
 
+### 5.4 Carnet MJ (Texte / Main)
+
+- [ ] 🔴 Onglet **Carnet** : bascule Texte ↔ Main ; traits stylet visibles après refresh
+- [ ] 🟠 Palette couleurs + stylo / surligneur + Undo
+- [ ] 🟠 Export **PNG** et **PDF** des pages Main
+- [ ] 🟠 Bouton **Transcrire** (OCR) → texte éditable en mode Texte (clé Groq vision OK)
+- [ ] 🟢 Même carnet accessible depuis session → Notes
+
+### 5.5 Documents / PDF tablette
+
+- [ ] 🔴 Aperçu PDF page par page (PDF.js) dans Documents — pas seulement télécharger
+- [ ] 🟠 Navigation pages précédente / suivante
+- [ ] 🟢 Bouton télécharger toujours dispo
+
+### 5.6 Combat polish (MJ)
+
+- [ ] 🔴 Conditions éditables (chips + champ virgules) alliés **et** adversaires
+- [ ] 🟠 Édition multi-attaques (nom / bonus / dés) en setup / outils avancés
+- [ ] 🟠 Classer en masse les créatures **Neutre** → Allié ou Adversaire
+
 ---
 
 ## 6. Campagne — côté joueur 👤 🔴
@@ -146,6 +166,7 @@ Avec un 2ᵉ compte membre de la campagne.
 - [ ] 🟠 Page `/campaigns/:id/init` : même empty state clair si non importé
 - [ ] 🟠 Saisir un jet → confirmation ; total avec bonus
 - [ ] 🟠 Document épinglé / overlay joueur
+- [ ] 🔴 **Roster live** : ordre des tours + PV / CA / conditions mis à jour sans F5 (poll ~4 s)
 - [ ] 🟢 XP reçue visible côté joueur (si UI le montre)
 
 ---

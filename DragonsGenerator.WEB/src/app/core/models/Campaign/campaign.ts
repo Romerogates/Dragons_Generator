@@ -335,6 +335,8 @@ export interface InkStroke {
   color: string;
   width: number;
   points: InkPoint[];
+  /** pen = trait opaque ; highlighter = semi-transparent */
+  tool?: 'pen' | 'highlighter';
 }
 
 /** Page du carnet MJ (clavier et/ou stylet). */

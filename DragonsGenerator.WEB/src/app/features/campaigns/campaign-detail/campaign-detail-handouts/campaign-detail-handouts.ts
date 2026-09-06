@@ -10,6 +10,7 @@ import {
   HANDOUT_KIND_LABELS,
 } from '@core/models/Campaign/campaign';
 import { LightMarkdownPipe } from '@shared/pipes/light-markdown.pipe';
+import { PdfPagePreview } from '@shared/components/pdf-page-preview/pdf-page-preview';
 import { prefersNativePdfFallback } from '@core/utils/pdf-preview.util';
 
 export interface HandoutPatchEvent {
@@ -32,7 +33,7 @@ export interface MemberSheetPdfEvent {
 @Component({
   selector: 'app-campaign-detail-handouts',
   standalone: true,
-  imports: [CommonModule, FormsModule, LightMarkdownPipe],
+  imports: [CommonModule, FormsModule, LightMarkdownPipe, PdfPagePreview],
   templateUrl: './campaign-detail-handouts.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

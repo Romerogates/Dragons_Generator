@@ -3,7 +3,7 @@
     <div>
       <h2 class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Carnet</h2>
       <p class="text-xs text-slate-500 mt-1">
-        Texte au clavier ou notes à la main (stylet). Transcription OCR plus tard.
+        Texte au clavier ou notes à la main (stylet). Export PNG / PDF disponible.
       </p>
     </div>
     <div class="inline-flex rounded-xl border border-slate-700 overflow-hidden" role="group" aria-label="Mode de saisie">
@@ -94,6 +94,43 @@
   } @else {
     <div class="space-y-2">
       <div class="flex flex-wrap gap-2 items-center">
+        <div class="flex flex-wrap gap-1.5 items-center" role="group" aria-label="Couleur">
+          @for (c of penColors; track c) {
+            <button
+              type="button"
+              class="w-7 h-7 rounded-full border-2"
+              [style.background]="c"
+              [class.border-white]="penColor() === c && !erasing()"
+              [class.border-slate-700]="penColor() !== c || erasing()"
+              [attr.aria-label]="'Couleur ' + c"
+              (click)="setPenColor(c)"
+            ></button>
+          }
+        </div>
+        <button
+          type="button"
+          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border"
+          [class]="
+            inkTool() === 'pen' && !erasing()
+              ? 'border-emerald-600/60 text-emerald-200 bg-emerald-950/40'
+              : 'border-slate-700 text-slate-400'
+          "
+          (click)="setInkTool('pen')"
+        >
+          Stylo
+        </button>
+        <button
+          type="button"
+          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border"
+          [class]="
+            inkTool() === 'highlighter' && !erasing()
+              ? 'border-amber-600/60 text-amber-200 bg-amber-950/40'
+              : 'border-slate-700 text-slate-400'
+          "
+          (click)="setInkTool('highlighter')"
+        >
+          Surligneur
+        </button>
         <label class="flex items-center gap-2 text-[10px] text-slate-500">
           Épaisseur
           <input
@@ -120,13 +157,45 @@
         </button>
         <button
           type="button"
+          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400 disabled:opacity-40"
+          [disabled]="!canUndo()"
+          (click)="undoStroke()"
+        >
+          Undo
+        </button>
+        <button
+          type="button"
           class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-red-900/40 text-red-400/80"
           (click)="clearInk()"
         >
           Effacer
         </button>
-        <span class="text-[10px] text-slate-600 italic">Stylet recommandé · pas d’OCR pour l’instant</span>
+        <button
+          type="button"
+          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-sky-800/50 text-sky-300"
+          (click)="exportCurrentPng()"
+        >
+          PNG
+        </button>
+        <button
+          type="button"
+          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-violet-800/50 text-violet-300"
+          (click)="exportInkPdf()"
+        >
+          PDF
+        </button>
+        <button
+          type="button"
+          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-emerald-700/50 text-emerald-200 disabled:opacity-40"
+          [disabled]="transcribing()"
+          (click)="transcribeInk()"
+        >
+          {{ transcribing() ? 'OCR…' : 'Transcrire' }}
+        </button>
       </div>
+      @if (transcribeError()) {
+        <p class="text-xs text-red-400">{{ transcribeError() }}</p>
+      }
       <div
         class="rounded-xl border border-emerald-900/40 bg-[#171b22] overflow-hidden touch-none"
         style="touch-action: none"

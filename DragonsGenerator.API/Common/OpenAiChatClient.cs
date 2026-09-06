@@ -40,6 +40,48 @@ public sealed class OpenAiChatClient
         CancellationToken ct,
         IReadOnlyList<string>? modelChainOverride = null)
     {
+        return await SendChatInternalAsync(
+            BuildTextUserContent(userPrompt),
+            systemPrompt,
+            maxTokens,
+            ct,
+            modelChainOverride,
+            temperature: 0.8);
+    }
+
+    /// <summary>OCR / vision : image data URL (jpeg/png) + prompt texte.</summary>
+    public async Task<GroqChatResult> SendVisionChatAsync(
+        string imageDataUrl,
+        string userPrompt,
+        string systemPrompt,
+        int maxTokens,
+        CancellationToken ct,
+        IReadOnlyList<string>? modelChainOverride = null)
+    {
+        object[] userContent =
+        [
+            new { type = "text", text = userPrompt },
+            new { type = "image_url", image_url = new { url = imageDataUrl } },
+        ];
+        return await SendChatInternalAsync(
+            userContent,
+            systemPrompt,
+            maxTokens,
+            ct,
+            modelChainOverride,
+            temperature: 0.2);
+    }
+
+    private static object BuildTextUserContent(string userPrompt) => userPrompt;
+
+    private async Task<GroqChatResult> SendChatInternalAsync(
+        object userContent,
+        string systemPrompt,
+        int maxTokens,
+        CancellationToken ct,
+        IReadOnlyList<string>? modelChainOverride,
+        double temperature)
+    {
         var maxAttempts = Math.Clamp(_config.GetValue($"{_configSection}:MaxAttempts", 5), 1, 8);
         var maxRetryWindowMs = Math.Clamp(_config.GetValue($"{_configSection}:MaxRetryWindowMs", 90_000), 10_000, 240_000);
         var startedUtc = DateTime.UtcNow;
@@ -67,7 +109,7 @@ public sealed class OpenAiChatClient
                 if (_coordinator is not null)
                     await _coordinator.WaitTurnAsync(ct);
 
-                last = await SendChatOnceAsync(userPrompt, systemPrompt, maxTokens, model, ct);
+                last = await SendChatOnceAsync(userContent, systemPrompt, maxTokens, model, temperature, ct);
                 if (last.Ok)
                     return last;
 
@@ -118,10 +160,11 @@ public sealed class OpenAiChatClient
     }
 
     private async Task<GroqChatResult> SendChatOnceAsync(
-        string userPrompt,
+        object userContent,
         string systemPrompt,
         int maxTokens,
         string model,
+        double temperature,
         CancellationToken ct)
     {
         var apiKey = _config[$"{_configSection}:ApiKey"];
@@ -145,9 +188,9 @@ public sealed class OpenAiChatClient
             messages = new object[]
             {
                 new { role = "system", content = systemPrompt.Trim() + FrenchSystemSuffix },
-                new { role = "user", content = userPrompt }
+                new { role = "user", content = userContent }
             },
-            temperature = 0.8,
+            temperature,
             max_tokens = maxTokens
         };
 

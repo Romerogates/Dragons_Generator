@@ -926,6 +926,21 @@ export class CampaignPlayPanel implements OnDestroy {
     this.updateCombatant(combatantId, { conditions });
   }
 
+  patchCombatantAttack(
+    combatantId: string,
+    index: number,
+    patch: Partial<CombatantAttack>,
+  ): void {
+    const combat = this.activeCombat();
+    if (!combat) return;
+    const combatants = combat.combatants.map((c) => {
+      if (c.id !== combatantId || !c.attacks?.length) return c;
+      const attacks = c.attacks.map((a, i) => (i === index ? { ...a, ...patch } : a));
+      return { ...c, attacks };
+    });
+    this.patchCombat({ ...combat, combatants });
+  }
+
   updateCombatant(combatantId: string, patch: Partial<Combatant>, options?: { immediate?: boolean }): void {
     const combat = this.activeCombat();
     if (!combat) return;
