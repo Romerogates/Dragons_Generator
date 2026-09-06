@@ -524,6 +524,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.softPollTimer = setInterval(() => this.softReload(), 12_000);
     if (typeof window !== 'undefined') {
       window.addEventListener('focus', this.onWindowFocus);
+      this.preloadCampaignTabIcons();
     }
 
     const tab = this.route.snapshot.queryParamMap.get('tab');
@@ -545,6 +546,26 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       window.removeEventListener('focus', this.onWindowFocus);
     }
     this.revokePreviewUrl();
+  }
+
+  /** Précharge les smileys d’onglets (évite le pop au scroll — même idée que `noobserver` navbar). */
+  private preloadCampaignTabIcons(): void {
+    const icons = [
+      'fluent-emoji:clipboard',
+      'fluent-emoji:calendar',
+      'fluent-emoji:bell',
+      'fluent-emoji:page-facing-up',
+      'fluent-emoji:dragon',
+      'fluent-emoji:world-map',
+      'fluent-emoji:memo',
+      'fluent-emoji:performing-arts',
+      'fluent-emoji:crossed-swords',
+      'fluent-emoji:busts-in-silhouette',
+    ];
+    const api = (
+      window as unknown as { Iconify?: { preloadIcons?: (names: string[]) => void } }
+    ).Iconify;
+    api?.preloadIcons?.(icons);
   }
 
   private readonly onWindowFocus = (): void => {
@@ -1089,7 +1110,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   private async setPreviewBlobUrl(url: string, filename: string): Promise<void> {
-    let named = url;
+    let named: string;
     try {
       named = await namedPdfObjectUrl(url, filename);
       if (named !== url) URL.revokeObjectURL(url);
