@@ -5,12 +5,13 @@
       <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest animate-pulse">Rendu PDF…</p>
     </div>
   } @else if (error()) {
-    <div class="flex-1 flex items-center justify-center px-4 text-center text-sm text-red-300">
-      {{ error() }}
+    <div class="flex-1 flex flex-col items-center justify-center gap-2 px-4 text-center">
+      <p class="text-sm text-red-300">{{ error() }}</p>
+      <p class="text-[11px] text-slate-500">Bascule automatique vers l’aperçu classique…</p>
     </div>
   } @else {
-    <div class="flex-1 overflow-auto flex items-start justify-center p-2">
-      <canvas #pdfCanvas class="max-w-full h-auto shadow-lg"></canvas>
+    <div class="flex-1 overflow-auto flex items-start justify-center p-2 min-h-0">
+      <canvas #pdfCanvas class="max-w-full h-auto shadow-lg bg-white"></canvas>
     </div>
     @if (pageCount() > 1) {
       <div class="flex items-center justify-center gap-3 py-2 border-t border-slate-800 shrink-0">

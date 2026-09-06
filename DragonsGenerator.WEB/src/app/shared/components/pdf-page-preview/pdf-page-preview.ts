@@ -3,18 +3,19 @@ import {
   Component,
   ElementRef,
   OnDestroy,
+  afterNextRender,
   effect,
+  inject,
+  Injector,
   input,
+  output,
   signal,
   viewChild,
 } from '@angular/core';
-import { getDocument, GlobalWorkerOptions, type PDFDocumentProxy } from 'pdfjs-dist';
+import { getDocument, GlobalWorkerOptions, version, type PDFDocumentProxy } from 'pdfjs-dist';
 
-// Worker PDF.js (v4) — chemin ESM bundlé par Angular.
-GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url,
-).toString();
+/** Worker servi en asset Angular (chemin absolu — évite 404 sous /campaigns/…). */
+GlobalWorkerOptions.workerSrc = `/assets/pdfjs/pdf.worker.min.mjs?v=${version}`;
 
 @Component({
   selector: 'app-pdf-page-preview',
@@ -25,7 +26,11 @@ GlobalWorkerOptions.workerSrc = new URL(
 export class PdfPagePreview implements OnDestroy {
   /** blob: URL du PDF */
   readonly src = input.required<string | null>();
+  /** Émis si PDF.js ne peut pas charger — le parent peut basculer sur iframe. */
+  readonly loadFailed = output<void>();
+
   readonly canvasRef = viewChild<ElementRef<HTMLCanvasElement>>('pdfCanvas');
+  private readonly injector = inject(Injector);
 
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
@@ -34,6 +39,7 @@ export class PdfPagePreview implements OnDestroy {
 
   private pdf: PDFDocumentProxy | null = null;
   private loadSeq = 0;
+  private failedEmitted = false;
 
   constructor() {
     effect(() => {
@@ -61,6 +67,7 @@ export class PdfPagePreview implements OnDestroy {
 
   private async loadPdf(url: string | null): Promise<void> {
     const seq = ++this.loadSeq;
+    this.failedEmitted = false;
     await this.pdf?.destroy();
     this.pdf = null;
     this.page.set(1);
@@ -74,7 +81,13 @@ export class PdfPagePreview implements OnDestroy {
 
     this.loading.set(true);
     try {
-      const task = getDocument({ url, withCredentials: false });
+      // Charger en bytes : plus fiable que blob: URL avec le worker.
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`fetch PDF ${res.status}`);
+      const data = new Uint8Array(await res.arrayBuffer());
+      if (seq !== this.loadSeq) return;
+
+      const task = getDocument({ data, isEvalSupported: false });
       const pdf = await task.promise;
       if (seq !== this.loadSeq) {
         await pdf.destroy();
@@ -83,13 +96,22 @@ export class PdfPagePreview implements OnDestroy {
       this.pdf = pdf;
       this.pageCount.set(pdf.numPages);
       this.page.set(1);
+      this.loading.set(false);
+      // Canvas présent seulement hors loading — attendre le prochain rendu DOM.
+      await new Promise<void>((resolve) => {
+        afterNextRender(() => resolve(), { injector: this.injector });
+      });
+      if (seq !== this.loadSeq) return;
       await this.renderPage();
     } catch (e) {
       if (seq !== this.loadSeq) return;
+      console.warn('[pdf-page-preview]', e);
       this.error.set('Impossible d’afficher le PDF dans le navigateur.');
-      console.warn(e);
-    } finally {
-      if (seq === this.loadSeq) this.loading.set(false);
+      this.loading.set(false);
+      if (!this.failedEmitted) {
+        this.failedEmitted = true;
+        this.loadFailed.emit();
+      }
     }
   }
 
@@ -100,7 +122,7 @@ export class PdfPagePreview implements OnDestroy {
     const page = await pdf.getPage(this.page());
     const parentW = canvas.parentElement?.clientWidth || 640;
     const unscaled = page.getViewport({ scale: 1 });
-    const scale = Math.min(2, parentW / unscaled.width);
+    const scale = Math.min(2, Math.max(0.5, parentW / unscaled.width));
     const viewport = page.getViewport({ scale });
     canvas.width = Math.floor(viewport.width);
     canvas.height = Math.floor(viewport.height);

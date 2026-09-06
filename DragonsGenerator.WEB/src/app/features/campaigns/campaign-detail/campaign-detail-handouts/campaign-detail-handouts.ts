@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import type { SafeResourceUrl } from '@angular/platform-browser';
@@ -60,6 +60,8 @@ export class CampaignDetailHandouts {
 
   /** true sur tablette / mobile : iframe PDF souvent inutilisable. */
   readonly usePdfFallback = prefersNativePdfFallback();
+  /** PDF.js a échoué → bascule iframe (PC) ou message téléchargement (tablette). */
+  readonly pdfJsFailed = signal(false);
 
   readonly handoutKinds: HandoutKind[] = ['letter', 'map', 'summary', 'other'];
   readonly handoutKindLabels = HANDOUT_KIND_LABELS;
@@ -86,6 +88,22 @@ export class CampaignDetailHandouts {
   readonly downloadPdfPreview = output<void>();
   readonly printPregenFullSheet = output<CampaignPregen>();
   readonly printMemberFullSheet = output<MemberSheetPdfEvent>();
+
+  constructor() {
+    effect(() => {
+      this.pdfPreviewRawUrl();
+      this.pdfJsFailed.set(false);
+    });
+  }
+
+  onPdfJsFailed(): void {
+    this.pdfJsFailed.set(true);
+  }
+
+  /** Afficher le renderer PDF.js tant qu’il n’a pas échoué. */
+  usePdfJsPreview(): boolean {
+    return !!this.pdfPreviewRawUrl() && !this.pdfJsFailed();
+  }
 
   previewLabel(): string {
     return this.pdfPreviewKind() === 'bestiary' ? 'Bestiaire' : 'Pack MJ';
