@@ -46,7 +46,7 @@ import {
   FriendUser,
   type CampaignDetail as CampaignDetailModel,
 } from '@core/models/Campaign/campaign';
-import { ADVENTURE_TONE_LABELS } from '@core/models/Story/story';
+import { ADVENTURE_TONE_LABELS, CreatureRole, StoryCreatureSelection } from '@core/models/Story/story';
 import { formatChallengeRating, getCreatureCategoryLabel } from '@core/utils/creature-display.util';
 import { shouldShowPlayerInitiativePrompt } from '@core/utils/campaign-initiative.util';
 import { StoryBuilderService } from '@core/services/story-builder.service';
@@ -370,6 +370,31 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     return (c?.data.sessions ?? []).find((s) => s.id === id) ?? null;
   });
 
+  readonly allyCreatures = computed(() =>
+    (this.campaign()?.data.creatures ?? []).filter((cr) => cr.role === 'ally'),
+  );
+
+  readonly adversaryCreatures = computed(() =>
+    (this.campaign()?.data.creatures ?? []).filter((cr) => cr.role === 'antagonist'),
+  );
+
+  readonly otherCreatures = computed(() =>
+    (this.campaign()?.data.creatures ?? []).filter(
+      (cr) => cr.role !== 'ally' && cr.role !== 'antagonist',
+    ),
+  );
+
+  readonly creatureGroups = computed(() => {
+    const groups: { id: string; label: string; items: StoryCreatureSelection[] }[] = [
+      { id: 'ally', label: 'Alliés', items: this.allyCreatures() },
+      { id: 'adversary', label: 'Adversaires', items: this.adversaryCreatures() },
+      { id: 'other', label: 'Autres (à classer)', items: this.otherCreatures() },
+    ];
+    return groups.filter((g) => g.items.length > 0);
+  });
+
+  readonly creatureRoleOptions = Object.entries(CREATURE_ROLE_LABELS) as [CreatureRole, string][];
+
   readonly showMobileSessionBar = computed(
     () =>
       !!this.activePlaySession() ||
@@ -472,7 +497,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
     const tab = this.route.snapshot.queryParamMap.get('tab');
     const handoutId = this.route.snapshot.queryParamMap.get('handout');
-    if (tab === 'handouts' || tab === 'players' || tab === 'activity' || tab === 'overview' || tab === 'maps') {
+    if (tab === 'handouts' || tab === 'players' || tab === 'activity' || tab === 'overview' || tab === 'maps' || tab === 'sessions' || tab === 'creatures') {
       this.tab.set(tab);
       if (tab === 'handouts' && handoutId) this.focusHandoutId.set(handoutId);
     }
@@ -1466,6 +1491,21 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (!c?.isOwner) return;
     this.storyBuilder.loadCampaignIntoBuilder(c, 'creatures-only');
     this.router.navigate(['/story/create']);
+  }
+
+  creatureTrackKey(cr: StoryCreatureSelection): string {
+    return `${cr.creatureId}::${cr.customName || cr.creatureName}`;
+  }
+
+  updateCreatureRole(cr: StoryCreatureSelection, role: CreatureRole): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    const creatures = (c.data.creatures ?? []).map((entry) =>
+      entry.creatureId === cr.creatureId && entry.customName === cr.customName
+        ? { ...entry, role }
+        : entry,
+    );
+    this.saveData({ creatures });
   }
 
   async generateAutoPregen(): Promise<void> {

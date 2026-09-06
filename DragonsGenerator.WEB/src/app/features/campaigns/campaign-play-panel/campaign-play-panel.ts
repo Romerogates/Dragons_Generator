@@ -19,7 +19,7 @@ import { AuthService } from '@core/services/auth.service';
 import { DataService } from '@core/services/data.service';
 import type { Character } from '@core/models/Character/character';
 import type { Creature } from '@core/models/Creatures/creature';
-import type { StoryCreatureSelection } from '@core/models/Story/story';
+import { CREATURE_ROLE_LABELS, type StoryCreatureSelection } from '@core/models/Story/story';
 import {
   ActiveCombat,
   CampaignData,
@@ -246,10 +246,23 @@ export class CampaignPlayPanel implements OnDestroy {
 
   readonly allyPickerOpen = signal(false);
   readonly enemyPickerOpen = signal(false);
+  readonly campaignAllyPickerOpen = signal(false);
   readonly importingAllyId = signal<string | null>(null);
   readonly importingCreatureId = signal<string | null>(null);
 
   readonly campaignCreatures = computed(() => this.campaign().data.creatures ?? []);
+
+  readonly campaignAllyCreatures = computed(() =>
+    this.campaignCreatures().filter((cr) => cr.role === 'ally'),
+  );
+
+  readonly campaignEnemyCreatures = computed(() =>
+    this.campaignCreatures().filter((cr) => cr.role === 'antagonist' || cr.role === 'wildcard'),
+  );
+
+  readonly campaignUnsortedCreatures = computed(() =>
+    this.campaignCreatures().filter((cr) => cr.role === 'neutral'),
+  );
 
   readonly awardingXpId = signal<string | null>(null);
 
@@ -275,6 +288,7 @@ export class CampaignPlayPanel implements OnDestroy {
   protected encounterPendingXp = encounterPendingXp;
   protected combatantInitiativeTotal = combatantInitiativeTotal;
   protected combatantKindLabels = COMBATANT_KIND_LABELS;
+  protected roleLabels = CREATURE_ROLE_LABELS;
   protected isCombatantDefeated = isCombatantDefeated;
   protected sessionModeLabel = sessionModeLabel;
   protected sessionModeHint = sessionModeHint;
@@ -503,12 +517,26 @@ export class CampaignPlayPanel implements OnDestroy {
 
   toggleAllyPicker(): void {
     this.allyPickerOpen.update((v) => !v);
-    if (this.allyPickerOpen()) this.enemyPickerOpen.set(false);
+    if (this.allyPickerOpen()) {
+      this.enemyPickerOpen.set(false);
+      this.campaignAllyPickerOpen.set(false);
+    }
+  }
+
+  toggleCampaignAllyPicker(): void {
+    this.campaignAllyPickerOpen.update((v) => !v);
+    if (this.campaignAllyPickerOpen()) {
+      this.allyPickerOpen.set(false);
+      this.enemyPickerOpen.set(false);
+    }
   }
 
   toggleEnemyPicker(): void {
     this.enemyPickerOpen.update((v) => !v);
-    if (this.enemyPickerOpen()) this.allyPickerOpen.set(false);
+    if (this.enemyPickerOpen()) {
+      this.allyPickerOpen.set(false);
+      this.campaignAllyPickerOpen.set(false);
+    }
   }
 
   /** Ajoute un PJ approuvé comme allié (crée le combat s’il n’existe pas). */
@@ -516,8 +544,20 @@ export class CampaignPlayPanel implements OnDestroy {
     this.importMembersIntoCombat([member], { closePicker: true });
   }
 
+  /** Ajoute une créature de campagne comme allié PNJ (stats bestiaire). */
+  addCampaignCreatureAlly(selection: StoryCreatureSelection): void {
+    this.addCampaignCreature(selection, 'ally');
+  }
+
   /** Ajoute une créature de la campagne comme adversaire (stats bestiaire). */
   addCampaignCreatureEnemy(selection: StoryCreatureSelection): void {
+    this.addCampaignCreature(selection, 'enemy');
+  }
+
+  private addCampaignCreature(
+    selection: StoryCreatureSelection,
+    side: 'ally' | 'enemy',
+  ): void {
     if (this.importingCreatureId() || this.importingParty()) return;
     this.importingCreatureId.set(selection.creatureId);
     this.clearFeedback();
@@ -526,18 +566,19 @@ export class CampaignPlayPanel implements OnDestroy {
       next: (creature) => {
         this.importingCreatureId.set(null);
         this.enemyPickerOpen.set(false);
+        this.campaignAllyPickerOpen.set(false);
         const combatant = this.combatantFromCreature(
           creature,
           selection.customName?.trim() || selection.creatureName,
+          side === 'ally' ? 'npc' : 'monster',
         );
         this.appendCombatants([combatant], selection.customName || selection.creatureName);
       },
       error: () => {
         this.importingCreatureId.set(null);
-        // Fallback sans fiche bestiaire
         const combatant = createCombatant({
           name: selection.customName?.trim() || selection.creatureName,
-          kind: 'monster',
+          kind: side === 'ally' ? 'npc' : 'monster',
           armorClass: 10,
           initiativeBonus: 0,
         });
@@ -632,7 +673,11 @@ export class CampaignPlayPanel implements OnDestroy {
     }
   }
 
-  private combatantFromCreature(creature: Creature, displayName: string): Combatant {
+  private combatantFromCreature(
+    creature: Creature,
+    displayName: string,
+    kind: Combatant['kind'] = 'monster',
+  ): Combatant {
     const maxHp = parseCreatureHitPoints(creature.hitPoints);
     const abilities = creature.abilities ?? {};
     const dexMod =
@@ -647,7 +692,7 @@ export class CampaignPlayPanel implements OnDestroy {
     }));
     return createCombatant({
       name: displayName,
-      kind: 'monster',
+      kind,
       armorClass: creature.armorClass || 10,
       maxHp,
       currentHp: maxHp,
@@ -886,6 +931,17 @@ export class CampaignPlayPanel implements OnDestroy {
     });
 
     this.applyCombatWithEncounterSync({ ...combat, combatants });
+  }
+
+  updateCombatantMaxHp(combatantId: string, raw: string | number): void {
+    const maxHp = raw === '' || raw === undefined ? undefined : Math.max(0, +raw);
+    const combat = this.activeCombat();
+    if (!combat) return;
+    const current = combat.combatants.find((c) => c.id === combatantId);
+    if (!current) return;
+    let currentHp = current.currentHp;
+    if (maxHp != null && currentHp != null && currentHp > maxHp) currentHp = maxHp;
+    this.updateCombatant(combatantId, { maxHp, currentHp }, { immediate: true });
   }
 
   markCombatantDead(combatantId: string): void {

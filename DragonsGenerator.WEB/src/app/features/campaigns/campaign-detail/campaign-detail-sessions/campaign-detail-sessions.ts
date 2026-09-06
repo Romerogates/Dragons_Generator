@@ -51,6 +51,7 @@ export class CampaignDetailSessions {
   readonly startEditSession = output<string>();
   readonly stopEditSession = output<void>();
   readonly startPlaySession = output<string>();
+  readonly openLiveSession = output<void>();
   readonly removeSession = output<string>();
   readonly sessionPatch = output<SessionPatchEvent>();
   readonly sessionPatchImmediate = output<SessionPatchEvent>();
@@ -66,17 +67,26 @@ export class CampaignDetailSessions {
 
   readonly filteredSessions = computed(() => {
     const f = this.filter();
+    let list: CampaignSession[];
     if (f === 'upcoming') {
-      return this.upcomingSessions().length
+      list = this.upcomingSessions().length
         ? this.upcomingSessions()
         : this.sortedSessions().filter((s) => s.status === 'planned');
-    }
-    if (f === 'past') {
-      return this.pastSessions().length
+    } else if (f === 'past') {
+      list = this.pastSessions().length
         ? this.pastSessions()
         : this.sortedSessions().filter((s) => s.status !== 'planned');
+    } else {
+      list = this.sortedSessions();
     }
-    return this.sortedSessions();
+
+    const activeId = this.activeSessionId();
+    if (!activeId || f === 'past') return list;
+
+    const active = this.sortedSessions().find((s) => s.id === activeId);
+    if (!active) return list;
+    const without = list.filter((s) => s.id !== activeId);
+    return [active, ...without];
   });
 
   readonly formatSessionDate = formatSessionDate;

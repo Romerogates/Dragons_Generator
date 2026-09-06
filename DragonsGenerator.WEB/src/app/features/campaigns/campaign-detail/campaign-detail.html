@@ -203,12 +203,13 @@
             [upcomingSessions]="upcomingSessions()"
             [pastSessions]="pastSessions()"
             [editingSessionId]="editingSessionId()"
-            [hasActiveSession]="!!activeSession()"
+            [hasActiveSession]="!!activePlaySession()"
             [activeSessionId]="c.data.activeSessionId ?? null"
             (addSession)="addSession()"
             (startEditSession)="startEditSession($event)"
             (stopEditSession)="stopEditSession()"
             (startPlaySession)="startPlaySession($event)"
+            (openLiveSession)="openSessionDock()"
             (removeSession)="removeSession($event)"
             (sessionPatch)="onSessionPatch($event)"
             (sessionPatchImmediate)="onSessionPatchImmediate($event)"
@@ -284,9 +285,9 @@
               <div class="rounded-2xl border border-dashed border-amber-800/50 bg-amber-950/15 p-6 text-center space-y-4">
                 <div>
                   <p class="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-2">Bestiaire de campagne</p>
-                  <h2 class="text-xl font-serif text-slate-100 mb-2">Ajoute tes monstres ici</h2>
+                  <h2 class="text-xl font-serif text-slate-100 mb-2">Alliés et adversaires</h2>
                   <p class="text-sm text-slate-400 max-w-md mx-auto">
-                    Ces créatures serviront pour les rencontres et pour choisir les adversaires en combat. Commence par un antagoniste et quelques sbires.
+                    Crée d’abord tes créatures ici, en les marquant allié ou adversaire. Tu pourras ensuite les choisir rapidement en combat.
                   </p>
                 </div>
                 <button
@@ -301,7 +302,12 @@
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p class="text-[10px] font-black uppercase tracking-widest text-amber-400">Bestiaire</p>
-                  <p class="text-sm text-slate-400">{{ c.data.creatures.length }} créature(s) — utilisables en rencontre et en combat</p>
+                  <p class="text-sm text-slate-400">
+                    {{ allyCreatures().length }} allié(s) · {{ adversaryCreatures().length }} adversaire(s)
+                    @if (otherCreatures().length) {
+                      · {{ otherCreatures().length }} autre(s)
+                    }
+                  </p>
                 </div>
                 <button
                   type="button"
@@ -311,20 +317,50 @@
                   Ajouter / modifier
                 </button>
               </div>
-            }
 
-            @for (cr of c.data.creatures; track cr.creatureId) {
-              <article class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
-                <div class="flex items-baseline gap-2 mb-1">
-                  <h3 class="font-bold text-slate-100 font-serif">{{ cr.customName }}</h3>
-                  <span class="text-[10px] uppercase text-slate-500">{{ roleLabels[cr.role] }}</span>
-                  <span class="text-[10px] text-red-400/80">{{ formatCr(cr.challengeRating) }}</span>
+              @for (group of creatureGroups(); track group.id) {
+                <div class="space-y-3">
+                  <h3
+                    class="text-[10px] font-black uppercase tracking-widest px-1"
+                    [class.text-sky-400]="group.id === 'ally'"
+                    [class.text-red-400]="group.id === 'adversary'"
+                    [class.text-slate-500]="group.id === 'other'"
+                  >
+                    {{ group.label }}
+                  </h3>
+                  @for (cr of group.items; track creatureTrackKey(cr)) {
+                    <article
+                      class="bg-[#1b2028] border rounded-2xl p-5"
+                      [class.border-sky-800/40]="cr.role === 'ally'"
+                      [class.border-red-900/40]="cr.role === 'antagonist'"
+                      [class.border-slate-800]="cr.role !== 'ally' && cr.role !== 'antagonist'"
+                    >
+                      <div class="flex flex-wrap items-baseline gap-2 mb-2">
+                        <h3 class="font-bold text-slate-100 font-serif">{{ cr.customName }}</h3>
+                        <span class="text-[10px] text-red-400/80">{{ formatCr(cr.challengeRating) }}</span>
+                      </div>
+                      <p class="text-[10px] text-slate-600 mb-3">
+                        {{ cr.creatureName }} · {{ categoryLabel(cr.category) }}
+                      </p>
+                      <label class="block max-w-xs mb-3">
+                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Camp</span>
+                        <select
+                          class="mt-1 w-full bg-[#171b22] border border-slate-700 rounded-lg px-2 py-2 text-[10px] font-black uppercase text-slate-300"
+                          [ngModel]="cr.role"
+                          (ngModelChange)="updateCreatureRole(cr, $event)"
+                        >
+                          @for (opt of creatureRoleOptions; track opt[0]) {
+                            <option [value]="opt[0]">{{ opt[1] }}</option>
+                          }
+                        </select>
+                      </label>
+                      @if (cr.backstory) {
+                        <p class="text-sm text-slate-400 italic">{{ cr.backstory }}</p>
+                      }
+                    </article>
+                  }
                 </div>
-                <p class="text-[10px] text-slate-600 mb-2">{{ cr.creatureName }} · {{ categoryLabel(cr.category) }}</p>
-                @if (cr.backstory) {
-                  <p class="text-sm text-slate-400 italic">{{ cr.backstory }}</p>
-                }
-              </article>
+              }
             }
           </section>
           }

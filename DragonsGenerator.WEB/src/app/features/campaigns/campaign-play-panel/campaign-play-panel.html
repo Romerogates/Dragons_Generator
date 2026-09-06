@@ -429,10 +429,64 @@
                       />
                     </div>
                   }
+                  @if (isDm() && (combatFlowPhase() === 'setup' || advancedToolsOpen())) {
+                    <div
+                      class="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-1"
+                      (click)="$event.stopPropagation()"
+                    >
+                      <input
+                        type="text"
+                        placeholder="Nom"
+                        class="col-span-2 sm:col-span-3 bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-200 min-w-0"
+                        [ngModel]="cb.name"
+                        (ngModelChange)="updateCombatant(cb.id, { name: $event }, { immediate: true })"
+                      />
+                      <input
+                        type="number"
+                        inputmode="numeric"
+                        placeholder="PV"
+                        title="PV actuels"
+                        class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
+                        [ngModel]="cb.currentHp ?? ''"
+                        (ngModelChange)="updateCombatantHp(cb.id, $event)"
+                      />
+                      <input
+                        type="number"
+                        inputmode="numeric"
+                        placeholder="PV max"
+                        title="PV max"
+                        class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
+                        [ngModel]="cb.maxHp ?? ''"
+                        (ngModelChange)="updateCombatantMaxHp(cb.id, $event)"
+                      />
+                      <input
+                        type="number"
+                        inputmode="numeric"
+                        placeholder="CA"
+                        title="Classe d’armure"
+                        class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
+                        [ngModel]="cb.armorClass ?? 10"
+                        (ngModelChange)="
+                          updateCombatant(cb.id, {
+                            armorClass: $event === '' || $event === null ? 10 : +$event
+                          })
+                        "
+                      />
+                      <input
+                        type="number"
+                        inputmode="numeric"
+                        placeholder="Bonus init"
+                        title="Bonus d’initiative"
+                        class="col-span-2 sm:col-span-1 bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
+                        [ngModel]="cb.initiativeBonus"
+                        (ngModelChange)="updateCombatant(cb.id, { initiativeBonus: +$event || 0 })"
+                      />
+                    </div>
+                  }
                 }
               </button>
             } @empty {
-              <p class="text-xs text-slate-500 italic px-1">Aucun allié — + Allié joueur ou + PNJ</p>
+              <p class="text-xs text-slate-500 italic px-1">Aucun allié — + Allié joueur ou + Allié campagne</p>
             }
           </div>
 
@@ -537,34 +591,66 @@
                       />
                     </div>
                   }
-                  @if (isDm()) {
-                    <div class="mt-2 grid grid-cols-[1fr_auto_1fr] gap-1 items-center" (click)="$event.stopPropagation()">
+                  @if (isDm() && (combatFlowPhase() === 'setup' || advancedToolsOpen())) {
+                    <div
+                      class="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-1"
+                      (click)="$event.stopPropagation()"
+                    >
+                      <input
+                        type="text"
+                        placeholder="Nom"
+                        class="col-span-2 sm:col-span-3 bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-200 min-w-0"
+                        [ngModel]="cb.name"
+                        (ngModelChange)="updateCombatant(cb.id, { name: $event }, { immediate: true })"
+                      />
                       <input
                         type="number"
                         inputmode="numeric"
-                        placeholder="CA"
+                        placeholder="PV"
+                        title="PV actuels"
                         class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
-                        [ngModel]="cb.armorClass ?? 10"
-                        (ngModelChange)="
-                          updateCombatant(cb.id, {
-                            armorClass: $event === '' || $event === null ? 10 : +$event
-                          })
-                        "
+                        [ngModel]="cb.currentHp ?? ''"
+                        (ngModelChange)="updateCombatantHp(cb.id, $event)"
                       />
-                      <button
-                        type="button"
-                        class="w-8 h-8 flex items-center justify-center rounded-lg border border-amber-800/50 text-amber-300 hover:bg-amber-950/40"
-                        title="Randomiser la CA (base règles 10)"
-                        aria-label="Randomiser la CA"
-                        (click)="randomizeArmorClass(cb.id)"
-                      >
-                        <iconify-icon icon="mdi:dice-d20" class="text-base"></iconify-icon>
-                      </button>
+                      <input
+                        type="number"
+                        inputmode="numeric"
+                        placeholder="PV max"
+                        title="PV max"
+                        class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
+                        [ngModel]="cb.maxHp ?? ''"
+                        (ngModelChange)="updateCombatantMaxHp(cb.id, $event)"
+                      />
+                      <div class="flex gap-1 min-w-0">
+                        <input
+                          type="number"
+                          inputmode="numeric"
+                          placeholder="CA"
+                          title="Classe d’armure"
+                          class="flex-1 bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
+                          [ngModel]="cb.armorClass ?? 10"
+                          (ngModelChange)="
+                            updateCombatant(cb.id, {
+                              armorClass: $event === '' || $event === null ? 10 : +$event
+                            })
+                          "
+                        />
+                        <button
+                          type="button"
+                          class="w-8 h-8 shrink-0 flex items-center justify-center rounded-lg border border-amber-800/50 text-amber-300 hover:bg-amber-950/40"
+                          title="Randomiser la CA (base règles 10)"
+                          aria-label="Randomiser la CA"
+                          (click)="randomizeArmorClass(cb.id)"
+                        >
+                          <iconify-icon icon="mdi:dice-d20" class="text-base"></iconify-icon>
+                        </button>
+                      </div>
                       <input
                         type="number"
                         inputmode="numeric"
                         placeholder="Bonus init"
-                        class="bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
+                        title="Bonus d’initiative"
+                        class="col-span-2 sm:col-span-1 bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 min-w-0"
                         [ngModel]="cb.initiativeBonus"
                         (ngModelChange)="updateCombatant(cb.id, { initiativeBonus: +$event || 0 })"
                       />
@@ -573,7 +659,7 @@
                 }
               </button>
             } @empty {
-              <p class="text-xs text-slate-500 italic px-1">Aucun adversaire</p>
+              <p class="text-xs text-slate-500 italic px-1">Aucun adversaire — ajoutez depuis le bestiaire</p>
             }
           </div>
         </div>
@@ -747,24 +833,17 @@
               </button>
               <button
                 type="button"
-                class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-400 hover:text-slate-200"
-                (click)="addAllyCombatant()"
+                class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-sky-800/40 text-sky-200 hover:border-sky-600/50"
+                (click)="toggleCampaignAllyPicker()"
               >
-                + PNJ allié
+                + Allié campagne
               </button>
               <button
                 type="button"
                 class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-red-900/40 text-red-300 hover:border-red-700/50"
                 (click)="toggleEnemyPicker()"
               >
-                + Créature campagne
-              </button>
-              <button
-                type="button"
-                class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-400 hover:text-slate-200"
-                (click)="addEnemyCombatant()"
-              >
-                + Adversaire libre
+                + Adversaire campagne
               </button>
               <button
                 type="button"
@@ -798,7 +877,7 @@
                 </p>
                 @if (!approvedPlayers().length) {
                   <p class="text-xs text-slate-500 italic">
-                    Aucun personnage approuvé dans la campagne. Approuvez un héros dans l’onglet Joueurs, ou ajoutez un PNJ allié.
+                    Aucun personnage approuvé dans la campagne. Approuvez un héros dans l’onglet Joueurs, ou ajoutez un allié campagne.
                   </p>
                 } @else if (!availablePlayerAllies().length) {
                   <p class="text-xs text-slate-500 italic">Tous les PJ approuvés sont déjà dans ce combat.</p>
@@ -823,23 +902,23 @@
               </div>
             }
 
-            @if (enemyPickerOpen()) {
-              <div class="rounded-xl border border-red-900/40 bg-red-950/20 p-3 space-y-2">
-                <p class="text-[10px] font-black uppercase tracking-widest text-red-300">
-                  Choisir une créature de la campagne
+            @if (campaignAllyPickerOpen()) {
+              <div class="rounded-xl border border-sky-800/40 bg-sky-950/20 p-3 space-y-2">
+                <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">
+                  Alliés du bestiaire de campagne
                 </p>
-                @if (!campaignCreatures().length) {
+                @if (!campaignAllyCreatures().length) {
                   <p class="text-xs text-slate-500 italic">
-                    Aucune créature dans le bestiaire de campagne — ajoutez-en dans l’onglet Créatures, ou utilisez « Adversaire libre ».
+                    Aucun allié marqué dans l’onglet Créatures. Ajoutez une créature et choisissez le camp « Allié ».
                   </p>
                 } @else {
                   <div class="flex flex-wrap gap-2">
-                    @for (cr of campaignCreatures(); track cr.creatureId + (cr.customName || '')) {
+                    @for (cr of campaignAllyCreatures(); track cr.creatureId + (cr.customName || '')) {
                       <button
                         type="button"
-                        class="px-3 py-2 rounded-xl text-left text-xs border border-red-900/50 text-red-100 hover:border-red-600/60 hover:bg-red-950/40 disabled:opacity-50"
+                        class="px-3 py-2 rounded-xl text-left text-xs border border-sky-800/50 text-sky-100 hover:border-sky-500/60 hover:bg-sky-950/40 disabled:opacity-50"
                         [disabled]="importingParty() || importingCreatureId() === cr.creatureId"
-                        (click)="addCampaignCreatureEnemy(cr)"
+                        (click)="addCampaignCreatureAlly(cr)"
                       >
                         <span class="font-serif block">{{ cr.customName || cr.creatureName }}</span>
                         <span class="text-[10px] text-slate-500">
@@ -847,16 +926,69 @@
                           @if (cr.challengeRating) {
                             · FP {{ cr.challengeRating }}
                           }
-                          @if (cr.role) {
-                            · {{ cr.role }}
-                          }
                         </span>
                         @if (importingCreatureId() === cr.creatureId) {
-                          <span class="text-[10px] text-red-400 ml-1">…</span>
+                          <span class="text-[10px] text-sky-400 ml-1">…</span>
                         }
                       </button>
                     }
                   </div>
+                }
+              </div>
+            }
+
+            @if (enemyPickerOpen()) {
+              <div class="rounded-xl border border-red-900/40 bg-red-950/20 p-3 space-y-2">
+                <p class="text-[10px] font-black uppercase tracking-widest text-red-300">
+                  Adversaires du bestiaire de campagne
+                </p>
+                @if (!campaignEnemyCreatures().length && !campaignUnsortedCreatures().length) {
+                  <p class="text-xs text-slate-500 italic">
+                    Aucune créature dans le bestiaire — ajoutez-en dans l’onglet Créatures (camp Antagoniste).
+                  </p>
+                } @else {
+                  @if (campaignEnemyCreatures().length) {
+                    <div class="flex flex-wrap gap-2">
+                      @for (cr of campaignEnemyCreatures(); track cr.creatureId + (cr.customName || '')) {
+                        <button
+                          type="button"
+                          class="px-3 py-2 rounded-xl text-left text-xs border border-red-900/50 text-red-100 hover:border-red-600/60 hover:bg-red-950/40 disabled:opacity-50"
+                          [disabled]="importingParty() || importingCreatureId() === cr.creatureId"
+                          (click)="addCampaignCreatureEnemy(cr)"
+                        >
+                          <span class="font-serif block">{{ cr.customName || cr.creatureName }}</span>
+                          <span class="text-[10px] text-slate-500">
+                            {{ cr.creatureName }}
+                            @if (cr.challengeRating) {
+                              · FP {{ cr.challengeRating }}
+                            }
+                            · {{ roleLabels[cr.role] }}
+                          </span>
+                          @if (importingCreatureId() === cr.creatureId) {
+                            <span class="text-[10px] text-red-400 ml-1">…</span>
+                          }
+                        </button>
+                      }
+                    </div>
+                  }
+                  @if (campaignUnsortedCreatures().length) {
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 pt-1">
+                      Non classés (neutres)
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                      @for (cr of campaignUnsortedCreatures(); track cr.creatureId + (cr.customName || '')) {
+                        <button
+                          type="button"
+                          class="px-3 py-2 rounded-xl text-left text-xs border border-slate-700 text-slate-300 hover:border-red-700/50 disabled:opacity-50"
+                          [disabled]="importingParty() || importingCreatureId() === cr.creatureId"
+                          (click)="addCampaignCreatureEnemy(cr)"
+                        >
+                          <span class="font-serif block">{{ cr.customName || cr.creatureName }}</span>
+                          <span class="text-[10px] text-slate-500">À classer adversaire dans Créatures</span>
+                        </button>
+                      }
+                    </div>
+                  }
                 }
               </div>
             }
@@ -920,16 +1052,36 @@
             </div>
           } @else {
             <p class="text-xs text-amber-400/80">
-              Pas encore de héros approuvé — approuvez un personnage dans Joueurs, ou lancez un combat puis ajoutez un PNJ / adversaire.
+              Pas encore de héros approuvé — approuvez un personnage dans Joueurs, ou démarrez un combat puis ajoutez un allié / adversaire depuis l’onglet Créatures.
             </p>
           }
-          @if (campaignCreatures().length) {
+          @if (campaignAllyCreatures().length) {
             <div class="pt-1 space-y-2 border-t border-slate-800/80">
-              <p class="text-[10px] font-black uppercase tracking-widest text-red-300">
-                Ou démarrer avec une créature
+              <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">
+                Ou démarrer avec un allié campagne
               </p>
               <div class="flex flex-wrap gap-2">
-                @for (cr of campaignCreatures(); track cr.creatureId + (cr.customName || '')) {
+                @for (cr of campaignAllyCreatures(); track cr.creatureId + (cr.customName || '')) {
+                  <button
+                    type="button"
+                    class="px-3 py-2 rounded-xl text-left text-xs border border-sky-800/50 text-sky-100 hover:border-sky-500/60 disabled:opacity-50"
+                    [disabled]="importingParty() || importingCreatureId() === cr.creatureId"
+                    (click)="addCampaignCreatureAlly(cr)"
+                  >
+                    <span class="font-serif block">{{ cr.customName || cr.creatureName }}</span>
+                    <span class="text-[10px] text-slate-500">FP {{ cr.challengeRating || '?' }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+          @if (campaignEnemyCreatures().length || campaignUnsortedCreatures().length) {
+            <div class="pt-1 space-y-2 border-t border-slate-800/80">
+              <p class="text-[10px] font-black uppercase tracking-widest text-red-300">
+                Ou démarrer avec un adversaire
+              </p>
+              <div class="flex flex-wrap gap-2">
+                @for (cr of campaignEnemyCreatures(); track cr.creatureId + (cr.customName || '')) {
                   <button
                     type="button"
                     class="px-3 py-2 rounded-xl text-left text-xs border border-red-900/50 text-red-100 hover:border-red-600/60 disabled:opacity-50"
@@ -938,11 +1090,19 @@
                   >
                     <span class="font-serif block">{{ cr.customName || cr.creatureName }}</span>
                     <span class="text-[10px] text-slate-500">
-                      FP {{ cr.challengeRating || '?' }}
-                      @if (cr.role) {
-                        · {{ cr.role }}
-                      }
+                      FP {{ cr.challengeRating || '?' }} · {{ roleLabels[cr.role] }}
                     </span>
+                  </button>
+                }
+                @for (cr of campaignUnsortedCreatures(); track cr.creatureId + (cr.customName || '')) {
+                  <button
+                    type="button"
+                    class="px-3 py-2 rounded-xl text-left text-xs border border-slate-700 text-slate-300 hover:border-red-700/50 disabled:opacity-50"
+                    [disabled]="importingParty() || importingCreatureId() === cr.creatureId"
+                    (click)="addCampaignCreatureEnemy(cr)"
+                  >
+                    <span class="font-serif block">{{ cr.customName || cr.creatureName }}</span>
+                    <span class="text-[10px] text-slate-500">Non classé</span>
                   </button>
                 }
               </div>
