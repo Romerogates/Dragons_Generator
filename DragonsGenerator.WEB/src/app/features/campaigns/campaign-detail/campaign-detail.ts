@@ -72,9 +72,14 @@ import type {
   CampaignSetupAction,
   CampaignSetupGuideInput,
 } from './campaign-setup-guide/campaign-setup-guide.util';
+import {
+  formatSessionDate,
+  sessionModeLabel,
+  sessionStatusLabel,
+} from './campaign-session.util';
 import { LightMarkdownPipe } from '@shared/pipes/light-markdown.pipe';
 
-type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'activity' | 'handouts' | 'maps';
+type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'activity' | 'handouts' | 'maps' | 'sessions';
 type TabDef = { id: Tab; label: string; icon: string };
 
 @Component({
@@ -252,7 +257,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly pastSessions = computed(() => {
     const sessions = this.campaign()?.data.sessions ?? [];
     return [...sessions]
-      .filter((s) => s.status === 'played')
+      .filter((s) => s.status === 'played' || s.status === 'cancelled')
       .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime());
   });
 
@@ -307,6 +312,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const owner = this.campaign()?.isOwner === true;
     const tabs: TabDef[] = [
       { id: 'overview', label: 'Résumé', icon: 'fluent-emoji:clipboard' },
+      { id: 'sessions', label: 'Sessions', icon: 'fluent-emoji:calendar' },
       { id: 'activity', label: 'Activité', icon: 'fluent-emoji:bell' },
       { id: 'handouts', label: 'Documents', icon: 'fluent-emoji:page-facing-up' },
     ];
@@ -350,7 +356,11 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   });
 
   readonly showMobileSessionBar = computed(
-    () => !!this.activePlaySession() || this.tab() === 'handouts' || this.tab() === 'activity',
+    () =>
+      !!this.activePlaySession() ||
+      this.tab() === 'handouts' ||
+      this.tab() === 'activity' ||
+      this.tab() === 'sessions',
   );
 
   readonly publishedHandoutsCount = computed(
@@ -386,6 +396,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   protected roleLabels = CREATURE_ROLE_LABELS;
   protected toneLabels = ADVENTURE_TONE_LABELS;
   protected pregenStatusLabels = PREGEN_STATUS_LABELS;
+  protected formatSessionDate = formatSessionDate;
+  protected sessionStatusLabel = sessionStatusLabel;
+  protected sessionModeLabel = sessionModeLabel;
   protected formatCr = formatChallengeRating;
   protected categoryLabel = getCreatureCategoryLabel;
   protected encounterTotalXp = encounterTotalXp;
@@ -572,6 +585,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         break;
       case 'addSession':
         this.addSession();
+        break;
+      case 'openSessions':
+        this.setTab('sessions');
         break;
       case 'startNextSession': {
         const next = this.nextPlannedSession();
@@ -840,12 +856,26 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       mode: 'online',
     };
     this.editingSessionId.set(session.id);
-    this.saveData({ sessions: [...(c.data.sessions ?? []), session] });
+    this.setTab('sessions');
+    this.saveData({ sessions: [session, ...(c.data.sessions ?? [])] });
+    setTimeout(() => {
+      document.getElementById('session-edit-panel')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }, 80);
   }
 
   startEditSession(sessionId: string): void {
     this.flushSessionSave();
     this.editingSessionId.set(sessionId);
+    if (this.tab() !== 'sessions') this.setTab('sessions');
+    setTimeout(() => {
+      document.getElementById('session-edit-panel')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }, 80);
   }
 
   stopEditSession(): void {

@@ -1,10 +1,19 @@
-<div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5 space-y-4">
+<section class="space-y-4">
   <div class="flex flex-wrap items-center justify-between gap-3">
-    <h2 class="text-[10px] font-black uppercase tracking-widest text-amber-500">Sessions</h2>
+    <div>
+      <h2 class="text-[10px] font-black uppercase tracking-widest text-amber-500">Sessions</h2>
+      <p class="text-xs text-slate-500 mt-1">
+        @if (isOwner()) {
+          Planifie, édite et démarre tes soirées ici — hors du résumé.
+        } @else {
+          Prochaines dates et historique de la campagne.
+        }
+      </p>
+    </div>
     @if (isOwner()) {
       <button
         type="button"
-        class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-amber-950/30 border border-amber-800/50 text-amber-300"
+        class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-amber-600 text-white hover:bg-amber-500"
         (click)="addSession.emit()"
       >
         + Planifier
@@ -12,194 +21,198 @@
     }
   </div>
 
-  @if (isOwner()) {
-    @for (session of sortedSessions(); track session.id) {
-      <article class="rounded-xl border border-slate-700/60 overflow-hidden">
-        @if (editingSessionId() === session.id) {
-          <div class="p-4 space-y-3 bg-[#171b22]/60">
-            <div class="flex flex-wrap gap-2 items-center justify-between">
-              <p class="text-[10px] font-black uppercase tracking-widest text-amber-500">Modifier la session</p>
-              <button
-                type="button"
-                class="px-2 py-1 rounded-lg text-[10px] font-black uppercase text-slate-400 border border-slate-700"
-                (click)="stopEditSession.emit()"
-              >
-                Terminé
-              </button>
-            </div>
-            <label class="block">
-              <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Titre</span>
-              <input
-                type="text"
-                class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200"
-                [ngModel]="session.title"
-                (ngModelChange)="sessionPatch.emit({ sessionId: session.id, patch: { title: $event } })"
-              />
-            </label>
-            <div class="flex flex-wrap gap-2 items-end">
-              <label class="flex-1 min-w-[8rem]">
-                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Statut</span>
-                <select
-                  class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-2 py-2 text-[10px] font-black uppercase text-slate-400"
-                  [ngModel]="session.status"
-                  (ngModelChange)="sessionPatchImmediate.emit({ sessionId: session.id, patch: { status: $event } })"
-                >
-                  <option value="planned">Planifiée</option>
-                  <option value="played">Jouée</option>
-                  <option value="cancelled">Annulée</option>
-                </select>
-              </label>
-              <button
-                type="button"
-                class="px-2 py-2 rounded-lg text-[10px] font-black uppercase text-red-400 border border-red-900/40"
-                (click)="removeSession.emit(session.id)"
-              >
-                Supprimer
-              </button>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <label>
-                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Date & heure</span>
-                <input
-                  type="datetime-local"
-                  class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300"
-                  [ngModel]="sessionInputValue(session.scheduledAt)"
-                  (ngModelChange)="sessionDateChange.emit({ sessionId: session.id, value: $event })"
-                />
-              </label>
-              <label>
-                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Mode de table</span>
-                <select
-                  class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-2 py-2 text-[10px] font-black uppercase text-slate-300"
-                  [ngModel]="normalizeSessionMode(session.mode)"
-                  (ngModelChange)="sessionPatchImmediate.emit({ sessionId: session.id, patch: { mode: $event } })"
-                >
-                  <option value="online">En ligne</option>
-                  <option value="in_person">Présentiel</option>
-                  <option value="other">Autre (choix du tirage)</option>
-                </select>
-                <p class="mt-1 text-[10px] text-slate-500">{{ sessionModeHint(session.mode) }}</p>
-              </label>
-            </div>
-            <label class="block">
-              <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Lieu</span>
-              <input
-                type="text"
-                placeholder="Discord, salle…"
-                class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300"
-                [ngModel]="session.location ?? ''"
-                (ngModelChange)="sessionPatch.emit({ sessionId: session.id, patch: { location: $event || undefined } })"
-              />
-            </label>
-            <label class="block">
-              <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Notes MJ</span>
-              <textarea
-                rows="2"
-                placeholder="Préparation, objectifs…"
-                class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-400"
-                [ngModel]="session.notes ?? ''"
-                (ngModelChange)="sessionPatch.emit({ sessionId: session.id, patch: { notes: $event || undefined } })"
-              ></textarea>
-            </label>
-          </div>
-        } @else {
-          <div class="px-4 py-3 flex flex-wrap items-start justify-between gap-3">
-            <div class="min-w-0">
-              <div class="flex flex-wrap items-center gap-2 mb-1">
-                <h3 class="font-serif text-amber-200 text-lg truncate">{{ session.title }}</h3>
-                <span
-                  class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border"
-                  [class]="sessionStatusChipClass(session.status)"
-                >
-                  {{ sessionStatusLabel(session.status) }}
-                </span>
-                <span
-                  class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border"
-                  [class]="sessionModeChipClass(session.mode)"
-                >
-                  {{ sessionModeLabel(session.mode) }}
-                </span>
-              </div>
-              <p class="text-sm text-slate-400">
-                {{ formatSessionDate(session.scheduledAt) }}
-                @if (session.location) {
-                  <span class="text-slate-500"> · {{ session.location }}</span>
-                }
-              </p>
-              <p class="text-[10px] text-slate-500 mt-1">{{ sessionModeHint(session.mode) }}</p>
-              @if (session.notes) {
-                <p class="text-xs text-slate-500 mt-2 line-clamp-2">{{ session.notes }}</p>
-              }
-            </div>
-            <div class="flex flex-wrap gap-2">
-              @if (session.status === 'planned' && !hasActiveSession()) {
-                <button
-                  type="button"
-                  class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-emerald-800/50 text-emerald-300 hover:border-emerald-500/50"
-                  (click)="startPlaySession.emit(session.id)"
-                >
-                  Démarrer
-                </button>
-              }
-              <button
-                type="button"
-                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:border-amber-500/50 hover:text-amber-300"
-                (click)="startEditSession.emit(session.id)"
-              >
-                Modifier
-              </button>
-            </div>
-          </div>
-        }
-      </article>
-    } @empty {
-      <p class="text-sm text-slate-500 italic">Aucune session planifiée.</p>
-    }
-  } @else {
-    @for (session of upcomingSessions(); track session.id) {
-      <div class="rounded-xl border border-amber-900/30 bg-amber-950/10 px-4 py-3">
-        <div class="flex flex-wrap items-center gap-2 mb-1">
-          <p class="font-serif text-amber-200 text-lg">{{ session.title }}</p>
-          <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border border-amber-800/50 text-amber-300 bg-amber-950/30">
-            {{ sessionStatusLabel(session.status) }}
-          </span>
-          <span
-            class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border"
-            [class]="sessionModeChipClass(session.mode)"
+  @if (isOwner() && editingSession(); as session) {
+    <article
+      id="session-edit-panel"
+      class="rounded-2xl border border-amber-700/50 bg-amber-950/20 p-4 space-y-3 scroll-mt-24"
+    >
+      <div class="flex flex-wrap gap-2 items-center justify-between">
+        <p class="text-[10px] font-black uppercase tracking-widest text-amber-400">Édition</p>
+        <button
+          type="button"
+          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase text-slate-300 border border-slate-700 hover:border-amber-600/50"
+          (click)="stopEditSession.emit()"
+        >
+          Terminé
+        </button>
+      </div>
+      <label class="block">
+        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Titre</span>
+        <input
+          type="text"
+          class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200"
+          [ngModel]="session.title"
+          (ngModelChange)="sessionPatch.emit({ sessionId: session.id, patch: { title: $event } })"
+        />
+      </label>
+      <div class="flex flex-wrap gap-2 items-end">
+        <label class="flex-1 min-w-[8rem]">
+          <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Statut</span>
+          <select
+            class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-2 py-2 text-[10px] font-black uppercase text-slate-400"
+            [ngModel]="session.status"
+            (ngModelChange)="sessionPatchImmediate.emit({ sessionId: session.id, patch: { status: $event } })"
           >
-            {{ sessionModeLabel(session.mode) }}
-          </span>
+            <option value="planned">Planifiée</option>
+            <option value="played">Jouée</option>
+            <option value="cancelled">Annulée</option>
+          </select>
+        </label>
+        <button
+          type="button"
+          class="px-3 py-2 rounded-lg text-[10px] font-black uppercase text-red-400 border border-red-900/40"
+          (click)="removeSession.emit(session.id)"
+        >
+          Supprimer
+        </button>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <label>
+          <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Date & heure</span>
+          <input
+            type="datetime-local"
+            class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300"
+            [ngModel]="sessionInputValue(session.scheduledAt)"
+            (ngModelChange)="sessionDateChange.emit({ sessionId: session.id, value: $event })"
+          />
+        </label>
+        <label>
+          <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Mode de table</span>
+          <select
+            class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-2 py-2 text-[10px] font-black uppercase text-slate-300"
+            [ngModel]="normalizeSessionMode(session.mode)"
+            (ngModelChange)="sessionPatchImmediate.emit({ sessionId: session.id, patch: { mode: $event } })"
+          >
+            <option value="online">En ligne</option>
+            <option value="in_person">Présentiel</option>
+            <option value="other">Autre (choix du tirage)</option>
+          </select>
+          <p class="mt-1 text-[10px] text-slate-500">{{ sessionModeHint(session.mode) }}</p>
+        </label>
+      </div>
+      <label class="block">
+        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Lieu</span>
+        <input
+          type="text"
+          placeholder="Discord, salle…"
+          class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300"
+          [ngModel]="session.location ?? ''"
+          (ngModelChange)="sessionPatch.emit({ sessionId: session.id, patch: { location: $event || undefined } })"
+        />
+      </label>
+      <label class="block">
+        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Notes MJ</span>
+        <textarea
+          rows="2"
+          placeholder="Préparation, objectifs…"
+          class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-400"
+          [ngModel]="session.notes ?? ''"
+          (ngModelChange)="sessionPatch.emit({ sessionId: session.id, patch: { notes: $event || undefined } })"
+        ></textarea>
+      </label>
+      @if (session.status === 'planned' && !hasActiveSession()) {
+        <button
+          type="button"
+          class="w-full min-h-11 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
+          (click)="startPlaySession.emit(session.id)"
+        >
+          Démarrer cette session
+        </button>
+      }
+    </article>
+  }
+
+  <div class="flex flex-wrap gap-1.5" role="tablist" aria-label="Filtrer les sessions">
+    @for (f of [
+      { id: 'upcoming', label: 'À venir' },
+      { id: 'past', label: 'Passées' },
+      { id: 'all', label: 'Toutes' }
+    ]; track f.id) {
+      <button
+        type="button"
+        role="tab"
+        class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-colors"
+        [attr.aria-selected]="filter() === f.id"
+        [class]="
+          filter() === f.id
+            ? 'border-amber-600/60 text-amber-200 bg-amber-950/40'
+            : 'border-slate-700 text-slate-500 hover:text-slate-300'
+        "
+        (click)="setFilter($any(f.id))"
+      >
+        {{ f.label }}
+      </button>
+    }
+  </div>
+
+  <div class="rounded-2xl border border-slate-800 overflow-hidden divide-y divide-slate-800/80">
+    @for (session of filteredSessions(); track session.id) {
+      <div
+        class="px-3 py-2.5 flex flex-wrap items-center gap-2 bg-[#1b2028]/80"
+        [class.ring-1]="editingSessionId() === session.id || isActive(session)"
+        [class.ring-inset]="editingSessionId() === session.id || isActive(session)"
+        [class.ring-amber-600/40]="editingSessionId() === session.id"
+        [class.ring-emerald-600/40]="isActive(session) && editingSessionId() !== session.id"
+      >
+        <div class="min-w-0 flex-1">
+          <div class="flex flex-wrap items-center gap-1.5">
+            <p class="font-serif text-slate-100 truncate">{{ session.title }}</p>
+            @if (isActive(session)) {
+              <span class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest bg-emerald-950/50 text-emerald-300 border border-emerald-800/40">
+                En cours
+              </span>
+            }
+            <span
+              class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border"
+              [class]="sessionStatusChipClass(session.status)"
+            >
+              {{ sessionStatusLabel(session.status) }}
+            </span>
+            <span
+              class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border"
+              [class]="sessionModeChipClass(session.mode)"
+            >
+              {{ sessionModeLabel(session.mode) }}
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-500 truncate">
+            {{ formatSessionDate(session.scheduledAt) }}
+            @if (session.location) {
+              · {{ session.location }}
+            }
+          </p>
         </div>
-        <p class="text-sm text-slate-400">
-          {{ formatSessionDate(session.scheduledAt) }}
-          @if (session.location) { · {{ session.location }} }
-        </p>
+        <div class="flex flex-wrap gap-1.5 shrink-0">
+          @if (isOwner() && session.status === 'planned' && !hasActiveSession()) {
+            <button
+              type="button"
+              class="px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase border border-emerald-800/50 text-emerald-300 hover:border-emerald-500/50"
+              (click)="startPlaySession.emit(session.id)"
+            >
+              Démarrer
+            </button>
+          }
+          @if (isOwner()) {
+            <button
+              type="button"
+              class="px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-400 hover:border-amber-500/50 hover:text-amber-300"
+              (click)="startEditSession.emit(session.id)"
+            >
+              {{ editingSessionId() === session.id ? 'Édite…' : 'Modifier' }}
+            </button>
+          }
+        </div>
       </div>
     } @empty {
-      <p class="text-sm text-slate-500 italic">Aucune session à venir.</p>
-    }
-
-    @if (pastSessions().length) {
-      <div class="mt-6 pt-6 border-t border-slate-800 space-y-3">
-        <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-500">Sessions passées</h3>
-        @for (session of pastSessions(); track session.id) {
-          <div class="rounded-xl border border-slate-800 bg-[#171b22] px-4 py-3">
-            <div class="flex flex-wrap items-center gap-2 mb-1">
-              <p class="font-serif text-slate-200">{{ session.title }}</p>
-              <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border border-slate-700 text-slate-400 bg-slate-900/40">
-                {{ sessionStatusLabel(session.status) }}
-              </span>
-            </div>
-            <p class="text-sm text-slate-500">
-              {{ formatSessionDate(session.scheduledAt) }}
-              @if (session.location) { · {{ session.location }} }
-            </p>
-            @if (session.notes) {
-              <p class="text-xs text-slate-600 mt-2 line-clamp-3">{{ session.notes }}</p>
-            }
-          </div>
+      <p class="px-4 py-8 text-sm text-slate-500 italic text-center">
+        @if (filter() === 'upcoming') {
+          Aucune session à venir.
+        } @else if (filter() === 'past') {
+          Aucune session passée.
+        } @else {
+          Aucune session pour l’instant.
         }
-      </div>
+      </p>
     }
-  }
-</div>
+  </div>
+</section>

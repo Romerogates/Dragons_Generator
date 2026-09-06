@@ -15,6 +15,7 @@ export type CampaignSetupAction =
   | 'generateEncounters'
   | 'openPlayers'
   | 'addSession'
+  | 'openSessions'
   | 'startNextSession'
   | 'openPlay'
   | 'openPlayFullscreen'
@@ -226,6 +227,8 @@ function describeStep(
         tip: 'Une fois démarrée, le tracker de combat et les rencontres sont à portée.',
         primaryLabel: 'Planifier une session',
         primaryAction: 'addSession',
+        secondaryLabel: 'Voir les sessions',
+        secondaryAction: 'openSessions',
       };
     default:
       return {
