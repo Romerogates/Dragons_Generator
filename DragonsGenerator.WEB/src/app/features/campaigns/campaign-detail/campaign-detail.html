@@ -209,7 +209,10 @@
 
             <!-- Activité en bas du résumé -->
             <div id="campaign-activity" class="space-y-3 pt-2">
-              <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500">Activité récente</h2>
+              <div class="flex flex-wrap items-end justify-between gap-2">
+                <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500">Activité récente</h2>
+                <p class="text-[9px] font-black uppercase tracking-widest text-slate-600">Fil compact — défiler pour plus</p>
+              </div>
               <app-campaign-detail-activity
                 [loading]="activityLoading()"
                 [items]="activity()"
