@@ -205,19 +205,15 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
         var memberCampaignSet = memberCampaignIds.ToHashSet();
 
         var approvedActs = (await db.CampaignActivities.AsNoTracking()
-                .Where(a =>
-                    a.Kind == CampaignActivityKinds.CharacterApproved
-                    && memberCampaignIds.Contains(a.CampaignId)
-                    && a.CreatedAt >= approvedSince)
+                .Where(a => a.Kind == CampaignActivityKinds.CharacterApproved)
                 .ToListAsync(ct))
+            .Where(a => a.CreatedAt >= approvedSince && memberCampaignSet.Contains(a.CampaignId))
             .OrderByDescending(a => a.CreatedAt)
             .Take(100)
             .ToList();
 
         foreach (var act in approvedActs)
         {
-            if (!memberCampaignSet.Contains(act.CampaignId))
-                continue;
             if (!TryGetMemberUserId(act.PayloadJson, out var memberUserId) || memberUserId != userId)
                 continue;
 
