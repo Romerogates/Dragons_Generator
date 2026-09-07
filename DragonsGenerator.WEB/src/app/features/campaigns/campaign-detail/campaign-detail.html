@@ -91,6 +91,89 @@
                 [state]="setupGuideState()"
                 (action)="onSetupGuideAction($event)"
               />
+
+              <div class="grid gap-3 sm:grid-cols-2">
+                <div class="rounded-2xl border border-slate-800 bg-[#1b2028]/70 p-4 space-y-2">
+                  <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Préparer</p>
+                  <p class="font-serif text-slate-100 text-sm">Hub de campagne</p>
+                  <p class="text-xs text-slate-500 leading-relaxed">
+                    Joueurs, créatures, cartes, documents — tout se prépare ici, hors combat.
+                  </p>
+                  <div class="flex flex-wrap gap-2 pt-1">
+                    <button
+                      type="button"
+                      class="px-3 py-2 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-300 hover:border-violet-500/50"
+                      (click)="setTab('players')"
+                    >
+                      Joueurs
+                    </button>
+                    <button
+                      type="button"
+                      class="px-3 py-2 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-300 hover:border-violet-500/50"
+                      (click)="setTab('creatures')"
+                    >
+                      Créatures
+                    </button>
+                    <button
+                      type="button"
+                      class="px-3 py-2 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-300 hover:border-violet-500/50"
+                      (click)="setTab('handouts')"
+                    >
+                      Docs
+                    </button>
+                  </div>
+                </div>
+
+                <div class="rounded-2xl border border-emerald-800/40 bg-emerald-950/20 p-4 space-y-2">
+                  <p class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Jouer</p>
+                  <p class="font-serif text-emerald-100 text-sm">
+                    @if (activePlaySession(); as live) {
+                      Session en cours — {{ live.title }}
+                    } @else if (nextPlannedSession(); as next) {
+                      Prochaine : {{ next.title }}
+                    } @else {
+                      Aucune session planifiée
+                    }
+                  </p>
+                  <p class="text-xs text-slate-500 leading-relaxed">
+                    Entre en session pour ouvrir la table. Le combat n’est disponible qu’après.
+                  </p>
+                  <div class="flex flex-wrap gap-2 pt-1">
+                    @if (activePlaySession()) {
+                      <button
+                        type="button"
+                        class="min-h-10 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
+                        (click)="openSessionDock()"
+                      >
+                        Ouvrir la table
+                      </button>
+                    } @else if (nextPlannedSession(); as next) {
+                      <button
+                        type="button"
+                        class="min-h-10 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
+                        (click)="startPlaySession(next.id)"
+                      >
+                        Entrer en session
+                      </button>
+                    } @else {
+                      <button
+                        type="button"
+                        class="min-h-10 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
+                        (click)="setTab('sessions'); addSession()"
+                      >
+                        Planifier une session
+                      </button>
+                    }
+                    <button
+                      type="button"
+                      class="min-h-10 px-3 py-2 rounded-xl text-[10px] font-black uppercase border border-emerald-800/50 text-emerald-300"
+                      (click)="setTab('sessions')"
+                    >
+                      Sessions
+                    </button>
+                  </div>
+                </div>
+              </div>
             }
 
             <app-campaign-detail-stats

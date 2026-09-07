@@ -10,12 +10,10 @@
       </h1>
       <p class="text-slate-400 text-sm italic">
         @if (!isLoggedIn()) {
-          Tes aventures cloud, accessibles partout.
+          Prépare tes campagnes cloud, puis joue en session.
         } @else {
-          {{ list().length }} aventure{{ list().length > 1 ? 's' : '' }} écrite{{
-            list().length > 1 ? 's' : ''
-          }}
-          dans le grimoire.
+          {{ list().length }} campagne{{ list().length > 1 ? 's' : '' }} —
+          préparation ici, combat seulement en session.
         }
       </p>
     </div>

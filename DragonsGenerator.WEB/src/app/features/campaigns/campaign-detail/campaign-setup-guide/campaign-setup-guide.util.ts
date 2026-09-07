@@ -100,8 +100,9 @@ export function buildCampaignSetupGuide(input: CampaignSetupGuideInput): Campaig
       liveSession: true,
       current: {
         id: 'play',
-        title: 'Table ouverte',
-        proposal: 'La session est active. Ouvre la table pour jouer (combat guidé, notes, rencontres).',
+        title: 'Session en cours',
+        proposal:
+          'Tu es en session. Ouvre la table pour noter, lancer des rencontres et combattre — le combat n’existe qu’ici.',
         tip: '',
         primaryLabel: 'Ouvrir la table',
         primaryAction: 'openPlay',
@@ -123,10 +124,10 @@ export function buildCampaignSetupGuide(input: CampaignSetupGuideInput): Campaig
         id: 'play',
         title: input.nextSessionTitle ?? 'Nouvelle session',
         proposal: input.nextSessionTitle
-          ? `Démarre « ${input.nextSessionTitle} » pour jouer avec tes joueurs.`
-          : 'Planifie une session pour ouvrir la table de jeu.',
+          ? `Entre en session « ${input.nextSessionTitle} » pour ouvrir la table. Le combat n’est disponible qu’après.`
+          : 'Planifie une session : la préparation reste ici, le jeu commence seulement en session.',
         tip: '',
-        primaryLabel: input.nextSessionTitle ? 'Démarrer la session' : 'Planifier une session',
+        primaryLabel: input.nextSessionTitle ? 'Entrer en session' : 'Planifier une session',
         primaryAction: input.nextSessionTitle ? 'startNextSession' : 'addSession',
         secondaryLabel: 'Onglet Sessions',
         secondaryAction: 'openSessions',
@@ -222,10 +223,10 @@ function describeStep(
     case 'session':
       return {
         id,
-        title: 'Fixe une date de jeu',
+        title: 'Planifie une session',
         proposal:
-          'Planifie une session (soirée Discord, table physique…). C’est le moment où tu ouvres vraiment la table de jeu.',
-        tip: 'Une fois démarrée, le tracker de combat et les rencontres sont à portée.',
+          'Cette page prépare la campagne. Pour jouer (et combattre), planifie puis entre dans une session.',
+        tip: 'Sans session active, la table de combat reste fermée.',
         primaryLabel: 'Planifier une session',
         primaryAction: 'addSession',
         secondaryLabel: 'Voir les sessions',

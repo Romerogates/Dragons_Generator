@@ -1394,21 +1394,29 @@
     [class]="fullscreen() ? 'bg-[#1b2028] border border-emerald-800/40 rounded-2xl p-6' : 'bg-[#1b2028] border border-dashed border-emerald-800/40 rounded-2xl p-5'"
   >
     <div>
-      <p class="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-1">Prochaine session</p>
+      <p class="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-1">Pas encore en session</p>
       <p [class]="fullscreen() ? 'text-lg font-serif text-slate-200' : 'font-serif text-slate-200'">
         {{ nextSession.title }} · {{ formatSessionDate(nextSession.scheduledAt) }}
       </p>
+      <p class="text-xs text-slate-500 mt-2 max-w-md">
+        Entre en session pour ouvrir la table. Combattre, notes et rencontres ne sont disponibles qu’après.
+      </p>
     </div>
-    <button
-      type="button"
-      class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
-      (click)="startPlaySession(nextSession.id)"
-    >
-      Démarrer la table
-    </button>
+    @if (isDm()) {
+      <button
+        type="button"
+        class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
+        (click)="startPlaySession(nextSession.id)"
+      >
+        Entrer en session
+      </button>
+    }
   </div>
 } @else {
-  <p class="text-sm text-slate-500 italic text-center py-8">
-    Planifiez une session dans la campagne pour démarrer la table de jeu.
-  </p>
+  <div class="text-center py-8 px-4 space-y-2">
+    <p class="text-sm text-slate-400 font-serif">Aucune session active</p>
+    <p class="text-xs text-slate-500 max-w-sm mx-auto">
+      Planifie une session dans la campagne, puis entre dedans pour jouer. Le combat n’est pas accessible depuis le hub de préparation.
+    </p>
+  </div>
 }

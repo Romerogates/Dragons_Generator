@@ -52,6 +52,7 @@ describe('buildCampaignSetupGuide', () => {
     const g = buildCampaignSetupGuide(base({ hasActiveSession: true, hasAdventure: true }));
     expect(g.liveSession).toBe(true);
     expect(g.current?.primaryAction).toBe('openPlay');
+    expect(g.current?.primaryLabel).toBe('Ouvrir la table');
     expect(g.current?.tip).toBe('');
   });
 
@@ -70,6 +71,23 @@ describe('buildCampaignSetupGuide', () => {
     );
     expect(g.allReady).toBe(true);
     expect(g.current?.primaryAction).toBe('startNextSession');
+    expect(g.current?.primaryLabel).toBe('Entrer en session');
     expect(g.current?.title).toBe('Soirée 1');
+  });
+
+  it('session step explains prep vs play', () => {
+    const g = buildCampaignSetupGuide(
+      base({
+        hasAdventure: true,
+        creatureCount: 1,
+        mapsSkipped: true,
+        encounterCount: 1,
+        approvedPlayerCount: 1,
+        playerCount: 1,
+      }),
+    );
+    expect(g.current?.id).toBe('session');
+    expect(g.current?.primaryLabel).toBe('Planifier une session');
+    expect(g.current?.proposal).toContain('combat');
   });
 });

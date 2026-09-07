@@ -404,6 +404,10 @@ export class CampaignPlayPanel implements OnDestroy {
   }
 
   enterCombatFlow(): void {
+    if (!this.activeSession()) {
+      this.setFeedback('err', 'Entre d’abord en session pour combattre.');
+      return;
+    }
     this.sessionView.set('combat');
     if (!this.activeCombat()) {
       this.setActiveCombat(createActiveCombat([], { label: 'Combat' }));
@@ -511,6 +515,10 @@ export class CampaignPlayPanel implements OnDestroy {
   }
 
   startCombatFromEncounter(encounter: EncounterGroup): void {
+    if (!this.activeSession()) {
+      this.setFeedback('err', 'Entre d’abord en session pour combattre.');
+      return;
+    }
     if (!this.confirmReplaceCombat()) return;
     const combatants = expandEncounterToCombatants(encounter);
     this.setActiveCombat(
