@@ -89,8 +89,20 @@ import {
 } from './campaign-session.util';
 import { LightMarkdownPipe } from '@shared/pipes/light-markdown.pipe';
 
-type Tab = 'overview' | 'creatures' | 'encounters' | 'players' | 'pregens' | 'activity' | 'handouts' | 'maps' | 'sessions' | 'notebook';
-type TabDef = { id: Tab; label: string; icon: string };
+/** Onglets de la nav haute (max 5). */
+type PrimaryTab = 'overview' | 'sessions' | 'handouts' | 'prep' | 'players';
+/** Sous-onglets de Préparation. */
+type PrepSub = 'scenario' | 'creatures' | 'maps' | 'pregens' | 'encounters' | 'notebook';
+/** Cibles acceptées par setTab (compat deep-links / guide / stats). */
+type Tab = PrimaryTab | PrepSub | 'activity' | 'creatures' | 'encounters' | 'maps' | 'pregens' | 'notebook';
+type TabDef = { id: PrimaryTab; label: string; icon: string };
+type PrepSubDef = { id: PrepSub; label: string; icon: string };
+
+const PREP_SUBS: PrepSub[] = ['scenario', 'creatures', 'maps', 'pregens', 'encounters', 'notebook'];
+
+function isPrepSub(t: string): t is PrepSub {
+  return (PREP_SUBS as string[]).includes(t);
+}
 
 @Component({
   selector: 'app-campaign-detail',
@@ -138,7 +150,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly loading = signal(true);
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
-  readonly tab = signal<Tab>('overview');
+  readonly tab = signal<PrimaryTab>('overview');
+  readonly prepSub = signal<PrepSub>('scenario');
   readonly campaign = signal<CampaignDetailModel | null>(null);
   readonly printing = signal(false);
   readonly friendsList = signal<FriendUser[]>([]);
@@ -337,25 +350,49 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     };
   });
 
-  readonly visibleTabs = computed((): TabDef[] => {
+  readonly visibleTabs = computed((): TabDef[] => [
+    { id: 'overview', label: 'Résumé', icon: 'fluent-emoji:clipboard' },
+    { id: 'sessions', label: 'Sessions', icon: 'fluent-emoji:calendar' },
+    { id: 'handouts', label: 'Documents', icon: 'fluent-emoji:page-facing-up' },
+    { id: 'prep', label: 'Préparation', icon: 'fluent-emoji:hammer-and-wrench' },
+    { id: 'players', label: 'Joueurs', icon: 'fluent-emoji:busts-in-silhouette' },
+  ]);
+
+  readonly prepSubTabs = computed((): PrepSubDef[] => {
     const owner = this.campaign()?.isOwner === true;
-    const tabs: TabDef[] = [
-      { id: 'overview', label: 'Résumé', icon: 'fluent-emoji:clipboard' },
-      { id: 'sessions', label: 'Sessions', icon: 'fluent-emoji:calendar' },
-      { id: 'activity', label: 'Activité', icon: 'fluent-emoji:bell' },
-      { id: 'handouts', label: 'Documents', icon: 'fluent-emoji:page-facing-up' },
+    if (!owner) {
+      return [{ id: 'pregens', label: 'Pré-tirés', icon: 'fluent-emoji:performing-arts' }];
+    }
+    return [
+      { id: 'scenario', label: 'Scénario', icon: 'fluent-emoji:scroll' },
+      { id: 'creatures', label: 'Créatures', icon: 'fluent-emoji:dragon' },
+      { id: 'maps', label: 'Donjons', icon: 'fluent-emoji:world-map' },
+      { id: 'pregens', label: 'Pré-tirés', icon: 'fluent-emoji:performing-arts' },
+      { id: 'encounters', label: 'Rencontres', icon: 'fluent-emoji:crossed-swords' },
+      { id: 'notebook', label: 'Carnet', icon: 'fluent-emoji:memo' },
     ];
-    if (owner) {
-      tabs.push({ id: 'creatures', label: 'Créatures', icon: 'fluent-emoji:dragon' });
-      tabs.push({ id: 'maps', label: 'Donjons', icon: 'fluent-emoji:world-map' });
-      tabs.push({ id: 'notebook', label: 'Carnet', icon: 'fluent-emoji:memo' });
-    }
-    tabs.push({ id: 'pregens', label: 'Pré-tirés', icon: 'fluent-emoji:performing-arts' });
-    if (owner) {
-      tabs.push({ id: 'encounters', label: 'Rencontres', icon: 'fluent-emoji:crossed-swords' });
-    }
-    tabs.push({ id: 'players', label: 'Joueurs', icon: 'fluent-emoji:busts-in-silhouette' });
-    return tabs;
+  });
+
+  readonly plannedSessionCount = computed(
+    () => (this.campaign()?.data.sessions ?? []).filter((s) => s.status === 'planned').length,
+  );
+
+  readonly playedSessionCount = computed(
+    () => (this.campaign()?.data.sessions ?? []).filter((s) => s.status === 'played').length,
+  );
+
+  readonly documentCount = computed(() => {
+    const c = this.campaign();
+    if (!c) return 0;
+    if (c.isOwner) return (c.data.handouts ?? []).length;
+    return (c.data.handouts ?? []).filter((h) => h.published).length;
+  });
+
+  readonly adventureExcerpt = computed(() => {
+    const text = (this.campaign()?.data.adventure ?? '').trim();
+    if (!text) return null;
+    if (text.length <= 280) return text;
+    return `${text.slice(0, 277).trimEnd()}…`;
   });
 
   readonly pinnedHandout = computed(() => {
@@ -430,8 +467,10 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     () =>
       !!this.activePlaySession() ||
       this.tab() === 'handouts' ||
-      this.tab() === 'activity' ||
-      this.tab() === 'sessions',
+      this.tab() === 'overview' ||
+      this.tab() === 'sessions' ||
+      this.tab() === 'prep' ||
+      this.tab() === 'players',
   );
 
   readonly publishedHandoutsCount = computed(
@@ -529,9 +568,25 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
     const tab = this.route.snapshot.queryParamMap.get('tab');
     const handoutId = this.route.snapshot.queryParamMap.get('handout');
-    if (tab === 'handouts' || tab === 'players' || tab === 'activity' || tab === 'overview' || tab === 'maps' || tab === 'sessions' || tab === 'creatures' || tab === 'notebook') {
-      this.tab.set(tab);
+    if (tab) {
+      this.applyTabFromRoute(tab, handoutId);
+    }
+  }
+
+  /** Deep-link `?tab=` → nav haute + sous-onglet Préparation si besoin. */
+  private applyTabFromRoute(tab: string, handoutId: string | null): void {
+    if (tab === 'handouts' || tab === 'players' || tab === 'overview' || tab === 'sessions' || tab === 'prep') {
+      this.setTab(tab as PrimaryTab);
       if (tab === 'handouts' && handoutId) this.focusHandoutId.set(handoutId);
+      return;
+    }
+    if (tab === 'activity') {
+      this.setTab('overview');
+      return;
+    }
+    if (isPrepSub(tab)) {
+      this.setTab(tab);
+      return;
     }
   }
 
@@ -553,14 +608,16 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const icons = [
       'fluent-emoji:clipboard',
       'fluent-emoji:calendar',
-      'fluent-emoji:bell',
       'fluent-emoji:page-facing-up',
+      'fluent-emoji:hammer-and-wrench',
+      'fluent-emoji:busts-in-silhouette',
+      'fluent-emoji:scroll',
       'fluent-emoji:dragon',
       'fluent-emoji:world-map',
       'fluent-emoji:memo',
       'fluent-emoji:performing-arts',
       'fluent-emoji:crossed-swords',
-      'fluent-emoji:busts-in-silhouette',
+      'fluent-emoji:bell',
     ];
     const api = (
       window as unknown as { Iconify?: { preloadIcons?: (names: string[]) => void } }
@@ -631,14 +688,21 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         this.sessionCache.cache(c.id, c.title, c.data);
         this.notifications.refresh();
         const t = this.tab();
-        if (!c.isOwner && (t === 'creatures' || t === 'encounters')) {
-          this.tab.set('overview');
+        const sub = this.prepSub();
+        if (!c.isOwner && t === 'prep' && sub !== 'pregens') {
+          this.prepSub.set('pregens');
+        }
+        if (!c.isOwner && (sub === 'creatures' || sub === 'encounters' || sub === 'maps' || sub === 'notebook' || sub === 'scenario')) {
+          this.prepSub.set('pregens');
         }
         if (!c.isOwner) {
           this.startInitiativeBannerPoll(c.id);
         } else {
           this.stopInitiativeBannerPoll();
           this.initiativeBoard.set(null);
+        }
+        if (this.tab() === 'overview') {
+          this.loadActivity();
         }
       },
       error: () => {
@@ -648,26 +712,65 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     });
   }
 
-  setTab(t: Tab): void {
-    if (!this.campaign()?.isOwner && (t === 'creatures' || t === 'encounters' || t === 'maps' || t === 'notebook')) {
-      this.tab.set('overview');
+  private isOnMapsView(): boolean {
+    return this.tab() === 'prep' && this.prepSub() === 'maps';
+  }
+
+  setPrepSub(sub: PrepSub): void {
+    if (!this.campaign()?.isOwner && sub !== 'pregens') {
+      this.prepSub.set('pregens');
       return;
     }
-    if (this.tab() === 'maps' && t !== 'maps') {
+    if (this.isOnMapsView() && sub !== 'maps') {
       this.dungeonMapsComp()?.flushPendingSave();
     }
-    this.tab.set(t);
-    if (t === 'notebook') {
+    this.prepSub.set(sub);
+    if (sub === 'notebook') {
       this.ensureNotebookPages();
     }
-    if (t === 'handouts' && this.campaign()?.isOwner) {
+  }
+
+  setTab(t: Tab): void {
+    const owner = this.campaign()?.isOwner === true;
+
+    if (t === 'activity') {
+      if (this.isOnMapsView()) this.dungeonMapsComp()?.flushPendingSave();
+      this.tab.set('overview');
+      this.loadActivity();
+      return;
+    }
+
+    if (isPrepSub(t) || t === 'prep') {
+      const finalSub: PrepSub = (() => {
+        if (t === 'prep') {
+          if (!owner) return 'pregens';
+          return PREP_SUBS.includes(this.prepSub()) ? this.prepSub() : 'scenario';
+        }
+        if (!owner && t !== 'pregens') return 'pregens';
+        return t as PrepSub;
+      })();
+
+      if (this.isOnMapsView() && finalSub !== 'maps') {
+        this.dungeonMapsComp()?.flushPendingSave();
+      }
+      this.tab.set('prep');
+      this.prepSub.set(finalSub);
+      if (finalSub === 'notebook') this.ensureNotebookPages();
+      return;
+    }
+
+    if (this.isOnMapsView()) {
+      this.dungeonMapsComp()?.flushPendingSave();
+    }
+    this.tab.set(t as PrimaryTab);
+    if (t === 'handouts' && owner) {
       if (this.pdfPreviewKind() === 'bestiary' && this.campaign()!.data.creatures.length) {
         this.loadBestiaryPreview();
       } else {
         this.loadPackPreview();
       }
     }
-    if (t === 'activity') {
+    if (t === 'overview') {
       this.loadActivity();
     }
   }
@@ -725,8 +828,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     }
   }
 
-  onStatsNavigate(tab: 'creatures' | 'encounters' | 'players' | 'handouts'): void {
-    this.setTab(tab);
+  onStatsNavigate(target: 'creatures' | 'encounters' | 'players' | 'handouts' | 'sessions' | 'prep'): void {
+    if (target === 'prep') this.setTab('prep');
+    else this.setTab(target);
   }
 
   loadActivity(): void {
@@ -919,11 +1023,16 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   openActivityTab(): void {
-    this.setTab('activity');
+    this.setTab('overview');
+    this.loadActivity();
   }
 
   openOverviewTab(): void {
     this.setTab('overview');
+  }
+
+  openPrepScenario(): void {
+    this.setTab('scenario');
   }
 
   toggleRosterSheet(): void {
@@ -1266,7 +1375,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
           });
           this.sessionCache.cache(campaignId, this.campaign()?.title ?? title, this.campaign()?.data ?? data);
           if (seq === this.persistSeq) this.saving.set(false);
-          if (this.tab() === 'activity') this.loadActivity();
+          if (this.tab() === 'overview') this.loadActivity();
           onSuccess?.();
         } catch {
           if (seq === this.persistSeq) {
@@ -1381,7 +1490,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         this.pendingInviteUserIds.update((prev) => new Set([...prev, userId]));
         const name = this.friendsList().find((f) => f.id === userId)?.displayName ?? 'ami';
         this.rosterFeedback.set(`Invitation envoyée à ${name}.`);
-        if (this.tab() === 'activity') this.loadActivity();
+        if (this.tab() === 'overview') this.loadActivity();
       },
       error: (err) => {
         const msg = err?.error?.errors?.[0]?.reason ?? 'Invitation impossible.';
@@ -1397,7 +1506,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       next: () => {
         this.reload();
         this.notifications.refresh();
-        if (this.tab() === 'activity') this.loadActivity();
+        if (this.tab() === 'overview') this.loadActivity();
       },
       error: () => this.error.set('Impossible de proposer ce personnage.'),
     });
@@ -1410,7 +1519,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       next: () => {
         this.reload();
         this.notifications.refresh();
-        if (this.tab() === 'activity') this.loadActivity();
+        if (this.tab() === 'overview') this.loadActivity();
       },
       error: () => this.error.set('Impossible d’approuver ce personnage.'),
     });
@@ -1423,7 +1532,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       next: () => {
         this.reload();
         this.notifications.refresh();
-        if (this.tab() === 'activity') this.loadActivity();
+        if (this.tab() === 'overview') this.loadActivity();
       },
       error: () => this.error.set('Impossible de refuser ce personnage.'),
     });
@@ -1443,7 +1552,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         this.characterRequestLoadingId.set(null);
         this.rosterFeedback.set(`Rappel envoyé à ${member.displayName}.`);
         this.notifications.refresh();
-        if (this.tab() === 'activity') this.loadActivity();
+        if (this.tab() === 'overview') this.loadActivity();
       },
       error: () => {
         this.characterRequestLoadingId.set(null);
@@ -1464,7 +1573,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       next: () => {
         this.error.set(null);
         this.reload();
-        if (this.tab() === 'activity') this.loadActivity();
+        if (this.tab() === 'overview') this.loadActivity();
       },
       error: () => this.error.set('Impossible de retirer ce joueur.'),
     });

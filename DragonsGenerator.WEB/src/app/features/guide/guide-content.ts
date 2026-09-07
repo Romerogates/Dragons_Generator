@@ -256,7 +256,7 @@ export const GUIDE_ONESHOT_STEPS: GuideOneshotStep[] = [
     { role: 'MJ', title: 'Valider les fiches', detail: 'Notif / Activité → Voir la fiche → Accepter (ou Refuser).' },
     { role: 'Joueur', title: 'Confirmation', detail: 'Push « approuvé » ou « refusé » → re-proposer si besoin.' },
     { role: 'MJ', title: 'Préparer & planifier', detail: 'Rencontre + session + push activés.' },
-    { role: 'MJ', title: 'Démarrer la table', detail: 'Notes live · import party · combat.' },
+    { role: 'MJ', title: 'Entrer en session', detail: 'Notes live · import party · combat.' },
     { role: 'Joueur', title: 'Saisir l’initiative', detail: 'Bandeau / notification → jet d20.' },
     { role: 'MJ', title: 'Fin de session', detail: 'Terminer combat → historique · Terminer session.' },
   ];
@@ -392,7 +392,7 @@ export const GUIDE_CAMPAIGN_MJ_FLOW = [
     'Valider persos',
     'Préparer donjon / docs',
     'Planifier session',
-    'Démarrer la table',
+    'Entrer en session',
   ];
 
 export const GUIDE_CAMPAIGN_PLAYER_FLOW = [
@@ -436,7 +436,7 @@ export const GUIDE_NOTIFICATION_EVENTS = [
   ];
 
 export const GUIDE_TABLE_PLAY_STEPS: GuideLabeledFlowStep[] = [
-    { label: 'Démarrer', detail: 'Session en cours' },
+    { label: 'Session', detail: 'Entrer en session' },
     { label: 'Notes live', detail: 'Sauvegardées auto' },
     { label: 'Import party', detail: 'PJ approuvés' },
     { label: 'Tracker', detail: 'Init · PV · tours' },

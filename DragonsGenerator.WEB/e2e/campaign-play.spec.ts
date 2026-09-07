@@ -3,7 +3,7 @@ import { loginViaUi } from './helpers/auth';
 import { createPlayableCampaign } from './helpers/campaign';
 
 test.describe('Mode table MJ', () => {
-  test('session → combat → collecte init → mort → fin combat → fin session', async ({ page }) => {
+  test('session → combat → collecte init → fin combat → fin session', async ({ page }) => {
     test.setTimeout(120_000);
 
     page.on('dialog', (dialog) => dialog.accept());
@@ -12,37 +12,32 @@ test.describe('Mode table MJ', () => {
     const campaignId = await createPlayableCampaign(page);
     await page.goto(`/campaigns/${campaignId}/play`);
 
-    await expect(page.getByRole('button', { name: 'Démarrer la table' })).toBeVisible({
+    await expect(page.getByRole('button', { name: 'Entrer en session' })).toBeVisible({
       timeout: 30_000,
     });
-    await page.getByRole('button', { name: 'Démarrer la table' }).click();
+    await page.getByRole('button', { name: 'Entrer en session' }).click();
 
     await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({ timeout: 15_000 });
-    await page.getByRole('button', { name: 'Nouveau combat (vide)' }).click();
+    await page.getByRole('button', { name: 'Combattre' }).click();
 
-    await page.getByRole('button', { name: '+ Combattant' }).click();
+    await page.getByRole('button', { name: '+ Allié PNJ' }).click();
+    await page.getByRole('button', { name: '+ Adversaire', exact: true }).click();
 
-    const row = page.locator('tbody tr').first();
-    await row.getByPlaceholder('Nom').fill('Gobelin test');
-    await row.locator('select').selectOption('monster');
-    await row.locator('input[min="1"]').fill('12');
-
-    await page.getByRole('button', { name: 'Collecter l’init' }).click();
+    await page.getByRole('button', { name: 'Continuer → Initiative' }).click();
     await expect(page.getByText(/Collecte ouverte/i)).toBeVisible({ timeout: 15_000 });
 
-    await page.getByRole('button', { name: 'Mort' }).click();
-    await expect(page.locator('tr.opacity-50')).toBeVisible({ timeout: 10_000 });
-
-    await page.getByRole('button', { name: 'Fin combat' }).click();
-    await expect(page.getByRole('button', { name: 'Nouveau combat (vide)' })).toBeVisible({
+    await page.getByRole('button', { name: 'Fin combat' }).first().click();
+    await expect(page.getByRole('heading', { name: 'Que voulez-vous faire ?' })).toBeVisible({
       timeout: 15_000,
     });
+    await expect(page.getByRole('button', { name: 'Combattre' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Terminer la session' }).click();
     await expect(page).toHaveURL(new RegExp(`/campaigns/${campaignId}$`), { timeout: 20_000 });
     await expect(page.getByText('Table de jeu — session en cours')).not.toBeVisible({
       timeout: 20_000,
     });
-    await expect(page.getByText(/Planifiez une session/i)).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByRole('button', { name: 'Résumé' })).toBeVisible();
+    await expect(page.getByRole('navigation', { name: 'Sections de la campagne' }).getByRole('button', { name: 'Préparation' })).toBeVisible();
   });
 });

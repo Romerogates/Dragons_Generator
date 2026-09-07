@@ -67,14 +67,22 @@ Chemins depuis la racine du repo `Dragons_Generator`. Lire seulement ceux du suj
 
 ## Campagne front (si sujet table)
 
+- `DragonsGenerator.WEB/src/app/features/campaigns/campaigns.ts`
 - `DragonsGenerator.WEB/src/app/features/campaigns/campaign-detail/campaign-detail.ts`
+- `DragonsGenerator.WEB/src/app/features/campaigns/campaign-detail/campaign-detail-sessions/`
+- `DragonsGenerator.WEB/src/app/features/campaigns/campaign-detail/campaign-setup-guide/`
 - `DragonsGenerator.WEB/src/app/features/campaigns/campaign-play-panel/campaign-play-panel.ts`
+- `DragonsGenerator.WEB/src/app/features/campaigns/campaign-play/campaign-play.ts`
 - `DragonsGenerator.WEB/src/app/features/campaigns/campaign-dungeon-maps/campaign-dungeon-maps.ts`
 - `DragonsGenerator.WEB/src/app/core/utils/campaign-persist.util.ts`
 - `DragonsGenerator.WEB/src/app/core/utils/campaign-initiative.util.ts` (+ spec)
-- `DragonsGenerator.WEB/src/app/core/services/story-builder.service.ts`
 - `DragonsGenerator.WEB/src/app/core/services/campaign-cloud.service.ts`
-- `DragonsGenerator.WEB/src/app/core/services/campaign-pdf.service.ts`
+- `DragonsGenerator.WEB/src/app/core/services/campaign-session-dock.service.ts`
+- `DragonsGenerator.WEB/src/app/shared/components/campaign-session-dock/`
+- `DragonsGenerator.WEB/src/app/core/services/notification.service.ts`
+- `DragonsGenerator.API/Endpoints/Notifications/NotificationsEndpoints.cs`
+- `docs/ia-reprise/POLISH-P1-CAMPAGNE.md`
+- `docs/ia-reprise/POLISH-P3-NAV.md`
 
 ## Guide / nav
 

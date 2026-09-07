@@ -598,7 +598,7 @@
                 }
               </button>
             } @empty {
-              <p class="text-xs text-slate-500 italic px-1">Aucun allié — + Allié joueur ou + Allié campagne</p>
+              <p class="text-xs text-slate-500 italic px-1">Aucun allié — + Allié joueur, campagne ou PNJ</p>
             }
           </div>
 
@@ -828,7 +828,7 @@
                 }
               </button>
             } @empty {
-              <p class="text-xs text-slate-500 italic px-1">Aucun adversaire — ajoutez depuis le bestiaire</p>
+              <p class="text-xs text-slate-500 italic px-1">Aucun adversaire — bestiaire ou + Adversaire</p>
             }
           </div>
         </div>
@@ -1009,10 +1009,24 @@
               </button>
               <button
                 type="button"
+                class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-300 hover:border-sky-600/50"
+                (click)="addAllyCombatant()"
+              >
+                + Allié PNJ
+              </button>
+              <button
+                type="button"
                 class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-red-900/40 text-red-300 hover:border-red-700/50"
                 (click)="toggleEnemyPicker()"
               >
                 + Adversaire campagne
+              </button>
+              <button
+                type="button"
+                class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-300 hover:border-red-700/50"
+                (click)="addEnemyCombatant()"
+              >
+                + Adversaire
               </button>
               <button
                 type="button"
@@ -1221,7 +1235,7 @@
             </div>
           } @else {
             <p class="text-xs text-amber-400/80">
-              Pas encore de héros approuvé — approuvez un personnage dans Joueurs, ou démarrez un combat puis ajoutez un allié / adversaire depuis l’onglet Créatures.
+              Pas encore de héros approuvé — approuvez un personnage dans Joueurs, ou démarrez un combat puis ajoutez un allié PNJ / adversaire (ou depuis Créatures).
             </p>
           }
           @if (campaignAllyCreatures().length) {

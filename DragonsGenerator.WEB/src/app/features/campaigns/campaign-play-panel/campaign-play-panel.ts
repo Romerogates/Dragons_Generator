@@ -2,11 +2,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   input,
   OnDestroy,
   output,
   signal,
+  untracked,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -260,6 +262,29 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly importingAllyId = signal<string | null>(null);
   readonly importingCreatureId = signal<string | null>(null);
 
+  /** Réinitialise la vue table si on change / quitte la session (dock réutilisé). */
+  private lastBoundSessionId: string | null | undefined = undefined;
+
+  constructor() {
+    effect(() => {
+      const sessionId = this.campaign().data.activeSessionId ?? null;
+      untracked(() => {
+        if (this.lastBoundSessionId === undefined) {
+          this.lastBoundSessionId = sessionId;
+          return;
+        }
+        if (this.lastBoundSessionId === sessionId) return;
+        this.lastBoundSessionId = sessionId;
+        this.sessionView.set('hub');
+        this.resetFightStep();
+        this.allyPickerOpen.set(false);
+        this.enemyPickerOpen.set(false);
+        this.campaignAllyPickerOpen.set(false);
+        this.advancedToolsOpen.set(false);
+      });
+    });
+  }
+
   readonly campaignCreatures = computed(() => this.campaign().data.creatures ?? []);
 
   readonly campaignAllyCreatures = computed(() =>
@@ -357,6 +382,8 @@ export class CampaignPlayPanel implements OnDestroy {
   startPlaySession(sessionId: string): void {
     if (!this.isDm()) return;
     this.flushSessionSave();
+    this.sessionView.set('hub');
+    this.resetFightStep();
     this.saveData({ activeSessionId: sessionId });
   }
 
@@ -375,6 +402,8 @@ export class CampaignPlayPanel implements OnDestroy {
     if (!c.isOwner || !session) return;
     if (!confirm('Terminer la session en cours ? Les notes de jeu seront archivées.')) return;
     this.flushSessionSave();
+    this.sessionView.set('hub');
+    this.resetFightStep();
     const sessions = (c.data.sessions ?? []).map((s) => {
       if (s.id !== session.id) return s;
       const playBlock = s.playNotes?.trim();
@@ -397,6 +426,10 @@ export class CampaignPlayPanel implements OnDestroy {
   }
 
   startStandaloneCombat(): void {
+    if (!this.activeSession()) {
+      this.setFeedback('err', 'Entre d’abord en session pour combattre.');
+      return;
+    }
     if (!this.confirmReplaceCombat()) return;
     this.setActiveCombat(createActiveCombat([], { label: 'Combat' }));
     this.sessionView.set('combat');
@@ -863,6 +896,10 @@ export class CampaignPlayPanel implements OnDestroy {
 
   /** Allié PNJ générique (CA 10) — pour un héros joueur, utiliser le sélecteur. */
   addAllyCombatant(): void {
+    if (!this.activeSession()) {
+      this.setFeedback('err', 'Entre d’abord en session pour combattre.');
+      return;
+    }
     this.allyPickerOpen.set(false);
     const combat = this.activeCombat();
     if (!combat) {
@@ -886,6 +923,10 @@ export class CampaignPlayPanel implements OnDestroy {
 
   /** Adversaire avec CA 10 (règles) — randomisable via le dé à côté du champ. */
   addEnemyCombatant(): void {
+    if (!this.activeSession()) {
+      this.setFeedback('err', 'Entre d’abord en session pour combattre.');
+      return;
+    }
     const combat = this.activeCombat();
     if (!combat) {
       if (!this.confirmReplaceCombat()) return;

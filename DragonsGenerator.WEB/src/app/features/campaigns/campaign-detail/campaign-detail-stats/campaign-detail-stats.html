@@ -1,4 +1,36 @@
-<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+  <button
+    type="button"
+    class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center hover:border-violet-700/50 transition-colors"
+    (click)="navigate.emit('players')"
+  >
+    <p class="text-2xl font-bold text-violet-400">{{ playerCount() }}</p>
+    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Joueurs</p>
+  </button>
+  <button
+    type="button"
+    class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center hover:border-amber-700/50 transition-colors"
+    (click)="navigate.emit('sessions')"
+  >
+    <p class="text-2xl font-bold text-amber-400">{{ plannedSessionCount() }}</p>
+    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">À venir</p>
+  </button>
+  <button
+    type="button"
+    class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center hover:border-amber-700/50 transition-colors"
+    (click)="navigate.emit('sessions')"
+  >
+    <p class="text-2xl font-bold text-slate-300">{{ playedSessionCount() }}</p>
+    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Jouées</p>
+  </button>
+  <button
+    type="button"
+    class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center hover:border-sky-700/50 transition-colors"
+    (click)="navigate.emit('handouts')"
+  >
+    <p class="text-2xl font-bold text-sky-400">{{ documentCount() }}</p>
+    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Documents</p>
+  </button>
   @if (isOwner()) {
     <button
       type="button"
@@ -16,30 +48,22 @@
       <p class="text-2xl font-bold text-violet-400">{{ encounterCount() }}</p>
       <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Rencontres</p>
     </button>
-  }
-  <button
-    type="button"
-    class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center hover:border-violet-700/50 transition-colors"
-    (click)="navigate.emit('players')"
-  >
-    <p class="text-2xl font-bold text-violet-400">{{ playerCount() }}</p>
-    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Joueurs</p>
-  </button>
-  @if (isOwner()) {
-    <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
-      <p class="text-2xl font-bold text-emerald-400">{{ totalXpAwarded() }}</p>
-      <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">XP distribuée</p>
-    </div>
   } @else {
     <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
       <p class="text-2xl font-bold text-emerald-400">{{ myXpEarned() }}</p>
       <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Mon XP</p>
     </div>
     @if (approvedCharacterName(); as charName) {
-      <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center col-span-2 md:col-span-1">
+      <div class="bg-[#1b2028] border border-slate-800 rounded-xl p-4 text-center">
         <p class="text-lg font-bold text-sky-400 truncate">{{ charName }}</p>
         <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Mon personnage</p>
       </div>
     }
   }
 </div>
+@if (isOwner()) {
+  <p class="text-xs text-slate-500 mt-2">
+    XP totale distribuée :
+    <strong class="text-emerald-400">{{ totalXpAwarded() }}</strong>
+  </p>
+}
