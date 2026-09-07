@@ -17,12 +17,21 @@ import { GuidePreferencesService } from '@core/services/guide-preferences.servic
 import { NotificationPreferencesService } from '@core/services/notification-preferences.service';
 import { NotificationService } from '@core/services/notification.service';
 import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
+import type { NotificationType } from '@core/models/notification.model';
 
 export interface NavLink {
   label: string;
   path: string;
   icon: string;
 }
+
+const FRIEND_ACTION_KINDS: NotificationType[] = ['friend_request', 'friend_message'];
+const CAMPAIGN_ACTION_KINDS: NotificationType[] = [
+  'campaign_invite',
+  'character_proposal',
+  'character_pick_requested',
+  'proposal_rejected',
+];
 
 @Component({
   selector: 'app-navbar',
@@ -43,13 +52,30 @@ export class Navbar implements OnInit, OnDestroy {
   readonly codexOpen = signal(false);
   readonly accountOpen = signal(false);
 
-  readonly friendsActionCount = this.notifications.friendsActionCount;
-  readonly campaignsActionCount = this.notifications.campaignsActionCount;
-  readonly notificationCount = computed(() =>
-    this.notifications
-      .items()
-      .filter((item) => this.notifPrefs.isKindEnabled(item.kind) && !this.notifPrefs.isDismissed(item.key))
-      .length,
+  readonly friendsActionCount = computed(
+    () =>
+      this.notifications
+        .items()
+        .filter(
+          (item) =>
+            FRIEND_ACTION_KINDS.includes(item.kind) &&
+            this.notifPrefs.isKindEnabled(item.kind) &&
+            !this.notifPrefs.isDismissed(item.key),
+        ).length,
+  );
+  readonly campaignsActionCount = computed(
+    () =>
+      this.notifications
+        .items()
+        .filter(
+          (item) =>
+            CAMPAIGN_ACTION_KINDS.includes(item.kind) &&
+            this.notifPrefs.isKindEnabled(item.kind) &&
+            !this.notifPrefs.isDismissed(item.key),
+        ).length,
+  );
+  readonly notificationCount = computed(
+    () => this.friendsActionCount() + this.campaignsActionCount(),
   );
   readonly guideNewsCount = this.guidePrefs.unreadNewsCount;
 

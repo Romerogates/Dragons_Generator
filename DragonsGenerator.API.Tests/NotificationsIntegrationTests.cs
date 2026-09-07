@@ -52,6 +52,22 @@ public class NotificationsIntegrationTests
         Assert.Equal(1, body.TotalCount);
         Assert.Contains(body.Notifications, i => i.Kind == "friend_request");
     }
+
+    [Fact]
+    public async Task Notifications_approved_omitted_when_not_a_member()
+    {
+        // Couvre le cas « quitté toutes les campagnes » : l’activité CharacterApproved
+        // ne doit plus remonter si l’utilisateur n’est plus membre.
+        var (_, tokenPlayer, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "notifleave");
+
+        using var notifReq = ApiTestAuth.Authed(HttpMethod.Get, "/me/notifications", tokenPlayer);
+        var notif = await _client.SendAsync(notifReq);
+        notif.EnsureSuccessStatusCode();
+
+        var body = await notif.Content.ReadFromJsonAsync<NotificationsSummaryResponse>();
+        Assert.NotNull(body);
+        Assert.DoesNotContain(body!.Notifications, i => i.Kind == "proposal_approved");
+    }
 }
 
 internal sealed class NotificationsSummaryResponse

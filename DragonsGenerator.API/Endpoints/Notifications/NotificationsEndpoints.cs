@@ -198,16 +198,26 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
         }
 
         var approvedSince = DateTimeOffset.UtcNow - ApprovedNotificationWindow;
+        var memberCampaignIds = await db.CampaignMembers.AsNoTracking()
+            .Where(m => m.UserId == userId)
+            .Select(m => m.CampaignId)
+            .ToListAsync(ct);
+        var memberCampaignSet = memberCampaignIds.ToHashSet();
+
         var approvedActs = (await db.CampaignActivities.AsNoTracking()
-                .Where(a => a.Kind == CampaignActivityKinds.CharacterApproved)
+                .Where(a =>
+                    a.Kind == CampaignActivityKinds.CharacterApproved
+                    && memberCampaignIds.Contains(a.CampaignId)
+                    && a.CreatedAt >= approvedSince)
                 .ToListAsync(ct))
-            .Where(a => a.CreatedAt >= approvedSince)
             .OrderByDescending(a => a.CreatedAt)
             .Take(100)
             .ToList();
 
         foreach (var act in approvedActs)
         {
+            if (!memberCampaignSet.Contains(act.CampaignId))
+                continue;
             if (!TryGetMemberUserId(act.PayloadJson, out var memberUserId) || memberUserId != userId)
                 continue;
 
@@ -273,11 +283,17 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
 
         items = items.OrderByDescending(i => i.CreatedAt).ToList();
 
+        // « Personnage approuvé » = info, pas une action en attente (badge Campagnes / cloche action).
         var friendsCount = items.Count(i => i.Kind is "friend_request" or "friend_message");
-        var campaignsCount = items.Count - friendsCount;
+        var campaignsCount = items.Count(i =>
+            i.Kind is "campaign_invite"
+                or "character_proposal"
+                or "character_pick_requested"
+                or "proposal_rejected");
+        var totalCount = friendsCount + campaignsCount;
 
         await Send.OkAsync(
-            new NotificationsSummaryDto(friendsCount, campaignsCount, items.Count, items),
+            new NotificationsSummaryDto(friendsCount, campaignsCount, totalCount, items),
             ct
         );
     }
