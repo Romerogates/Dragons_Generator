@@ -366,12 +366,16 @@ export interface SessionChecklistItem {
 export type SessionPlayPadKind = 'note' | 'checklist';
 
 /** Calepin de notes live (session). */
+export type SessionPlayPadWidgetSize = 'third' | 'half' | 'full';
+
 export interface SessionPlayPad {
   id: string;
   kind: SessionPlayPadKind;
   title: string;
   collapsed?: boolean;
   order: number;
+  /** Largeur widget dans la grille (1/3, 1/2, 1/1). */
+  widgetSize?: SessionPlayPadWidgetSize;
   page?: NotebookPage;
   items?: SessionChecklistItem[];
 }
@@ -410,6 +414,7 @@ export function createSessionPlayPad(
       title: title ?? 'Liste',
       order,
       collapsed: false,
+      widgetSize: 'half',
       items: [createChecklistItem('')],
     };
   }
@@ -420,6 +425,7 @@ export function createSessionPlayPad(
     title: page.title,
     order,
     collapsed: false,
+    widgetSize: 'half',
     page,
   };
 }

@@ -98,54 +98,64 @@
       [rows]="compact() ? 8 : 14"
       placeholder="Scènes, PNJ, décisions des joueurs…"
       class="mt-0.5 w-full bg-[#171b22] border border-emerald-900/40 rounded-xl p-3 text-sm text-slate-300 min-h-[12rem]"
+      [class.opacity-90]="readonly()"
       [ngModel]="page().text ?? ''"
       (ngModelChange)="onTextChange($event)"
+      [readonly]="readonly()"
     ></textarea>
   </label>
 
-  <div class="flex flex-wrap items-center gap-2">
-    <button
-      type="button"
-      class="min-h-11 inline-flex items-center gap-2 rounded-full px-4 text-[11px] font-semibold border border-emerald-700/50 bg-emerald-950/40 text-emerald-200 hover:border-emerald-500/60"
-      (click)="openInkFullscreen()"
-    >
-      <iconify-icon icon="mdi:draw" class="text-lg"></iconify-icon>
-      Écrire à la main
-    </button>
+  @if (!readonly()) {
+    <div class="flex flex-wrap items-center gap-2">
+      <button
+        type="button"
+        class="min-h-11 inline-flex items-center gap-2 rounded-full px-4 text-[11px] font-semibold border border-emerald-700/50 bg-emerald-950/40 text-emerald-200 hover:border-emerald-500/60"
+        (click)="openInkFullscreen()"
+      >
+        <iconify-icon icon="mdi:draw" class="text-lg"></iconify-icon>
+        Écrire à la main
+      </button>
+      @if (hasInkPreview()) {
+        <button
+          type="button"
+          class="min-h-11 px-3 rounded-full text-[10px] font-black uppercase border border-sky-800/50 text-sky-300"
+          (click)="exportCurrentPng()"
+        >
+          PNG
+        </button>
+        <button
+          type="button"
+          class="min-h-11 px-3 rounded-full text-[10px] font-black uppercase border border-violet-800/50 text-violet-300"
+          (click)="exportInkPdf()"
+        >
+          PDF
+        </button>
+      }
+    </div>
+
     @if (hasInkPreview()) {
       <button
         type="button"
-        class="min-h-11 px-3 rounded-full text-[10px] font-black uppercase border border-sky-800/50 text-sky-300"
-        (click)="exportCurrentPng()"
+        class="block w-full rounded-xl border border-slate-800 overflow-hidden text-left hover:border-emerald-800/50"
+        (click)="openInkFullscreen()"
       >
-        PNG
-      </button>
-      <button
-        type="button"
-        class="min-h-11 px-3 rounded-full text-[10px] font-black uppercase border border-violet-800/50 text-violet-300"
-        (click)="exportInkPdf()"
-      >
-        PDF
+        @if (page().inkImageDataUrl) {
+          <img
+            [src]="page().inkImageDataUrl"
+            alt="Aperçu notes manuscrites"
+            class="w-full max-h-40 object-cover object-top opacity-90"
+          />
+        } @else {
+          <p class="px-3 py-6 text-center text-xs text-slate-500 italic">Aperçu manuscrit — cliquer pour éditer</p>
+        }
       </button>
     }
-  </div>
-
-  @if (hasInkPreview()) {
-    <button
-      type="button"
-      class="block w-full rounded-xl border border-slate-800 overflow-hidden text-left hover:border-emerald-800/50"
-      (click)="openInkFullscreen()"
-    >
-      @if (page().inkImageDataUrl) {
-        <img
-          [src]="page().inkImageDataUrl"
-          alt="Aperçu notes manuscrites"
-          class="w-full max-h-40 object-cover object-top opacity-90"
-        />
-      } @else {
-        <p class="px-3 py-6 text-center text-xs text-slate-500 italic">Aperçu manuscrit — cliquer pour éditer</p>
-      }
-    </button>
+  } @else if (hasInkPreview() && page().inkImageDataUrl) {
+    <img
+      [src]="page().inkImageDataUrl"
+      alt="Aperçu notes manuscrites"
+      class="w-full max-h-40 object-cover object-top opacity-90 rounded-xl border border-slate-800"
+    />
   }
 </section>
 

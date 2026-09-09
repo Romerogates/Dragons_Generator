@@ -66,6 +66,7 @@ describe('notebook.util', () => {
     expect(pads.length).toBe(1);
     expect(pads[0]!.kind).toBe('note');
     expect(pads[0]!.page?.text).toBe('hello');
+    expect(pads[0]!.widgetSize).toBe('full');
   });
 
   it('ensureSessionPlayPads normalizes existing pads order and titles', () => {
@@ -89,6 +90,8 @@ describe('notebook.util', () => {
     expect(pads.map((p) => p.id)).toEqual(['a', 'b']);
     expect(pads[0]!.title).toBe('Page');
     expect(pads[1]!.title).toBe('Liste');
+    expect(pads[0]!.widgetSize).toBe('half');
+    expect(pads[1]!.widgetSize).toBe('half');
   });
 
   it('createSessionPlayPad builds note and checklist', () => {
@@ -96,6 +99,7 @@ describe('notebook.util', () => {
     const list = createSessionPlayPad('checklist', undefined, 1);
     expect(note.kind).toBe('note');
     expect(note.page?.title).toBe('N');
+    expect(note.widgetSize).toBe('half');
     expect(list.kind).toBe('checklist');
     expect(list.title).toBe('Liste');
     expect(list.items?.length).toBe(1);

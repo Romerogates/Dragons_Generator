@@ -551,6 +551,16 @@ export class CampaignPlayPanel implements OnDestroy {
     this.dungeonPickerOpen.set(false);
   }
 
+  focusDungeonPicker(): void {
+    this.dungeonPickerOpen.set(true);
+    queueMicrotask(() => {
+      document.getElementById('session-dungeon-picker')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    });
+  }
+
   onDungeonMapsDataChange(patch: Partial<CampaignData>): void {
     this.saveData(patch);
   }

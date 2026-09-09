@@ -38,6 +38,8 @@ export class CampaignNotebook implements OnDestroy {
   readonly showPageList = input(true);
   /** Masque en-tête Carnet + champ titre (calepin parent). */
   readonly embedded = input(false);
+  /** Consultation seule : pas de saisie texte / encre. */
+  readonly readonly = input(false);
   readonly maxPages = input(NOTEBOOK_MAX_PAGES);
 
   readonly pageChange = output<NotebookPage>();
@@ -100,6 +102,7 @@ export class CampaignNotebook implements OnDestroy {
   }
 
   openInkFullscreen(): void {
+    if (this.readonly()) return;
     this.transcribeError.set(null);
     this.inkFullscreen.set(true);
     this.inkSizeLocked = false;

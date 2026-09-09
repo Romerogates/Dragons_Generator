@@ -41,6 +41,7 @@ export function ensureSessionPlayPads(session: CampaignSession): SessionPlayPad[
         ...p,
         order: typeof p.order === 'number' ? p.order : i,
         title: p.title?.trim() || (p.kind === 'checklist' ? 'Liste' : p.page?.title || 'Notes'),
+        widgetSize: p.widgetSize === 'third' || p.widgetSize === 'half' || p.widgetSize === 'full' ? p.widgetSize : 'half',
       }))
       .sort((a, b) => a.order - b.order);
   }
@@ -53,6 +54,7 @@ export function ensureSessionPlayPads(session: CampaignSession): SessionPlayPad[
       title: page.title || `Session · ${session.title}`,
       order: 0,
       collapsed: false,
+      widgetSize: 'full',
       page,
     },
   ];

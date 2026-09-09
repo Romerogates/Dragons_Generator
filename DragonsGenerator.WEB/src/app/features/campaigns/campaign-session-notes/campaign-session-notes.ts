@@ -14,6 +14,7 @@ import {
   SESSION_PLAY_PAD_MAX,
   SessionChecklistItem,
   SessionPlayPad,
+  SessionPlayPadWidgetSize,
   createChecklistItem,
   createSessionPlayPad,
 } from '@core/models/Campaign/campaign';
@@ -24,8 +25,6 @@ import {
   syncLegacyPlayNotesFromPads,
 } from '@core/utils/notebook.util';
 import { CampaignNotebook } from '../campaign-notebook/campaign-notebook';
-
-export type PadLayoutCols = 1 | 2 | 3;
 
 @Component({
   selector: 'app-campaign-session-notes',
@@ -48,27 +47,34 @@ export class CampaignSessionNotes {
   }>();
 
   readonly resumeCollapsed = signal(false);
-  /** null = défaut selon compact (1 dock / 2 plein écran). */
-  readonly padLayoutOverride = signal<PadLayoutCols | null>(null);
+  readonly editingPadId = signal<string | null>(null);
   readonly padMax = SESSION_PLAY_PAD_MAX;
+  readonly widgetSizes: { id: SessionPlayPadWidgetSize; label: string }[] = [
+    { id: 'third', label: '1/3' },
+    { id: 'half', label: '1/2' },
+    { id: 'full', label: '1/1' },
+  ];
 
   readonly resumePage = computed(() => ensureSessionResume(this.sessionResume()));
-
   readonly pads = computed(() => ensureSessionPlayPads(this.session()));
 
-  readonly padLayout = computed<PadLayoutCols>(
-    () => this.padLayoutOverride() ?? (this.compact() ? 1 : 2),
-  );
+  padSpanClass(pad: SessionPlayPad): string {
+    const size = pad.widgetSize ?? 'half';
+    if (size === 'full') return 'col-span-6';
+    if (size === 'third') return 'col-span-6 sm:col-span-2';
+    return 'col-span-6 sm:col-span-3';
+  }
 
-  readonly padGridClass = computed(() => {
-    const n = this.padLayout();
-    if (n === 3) return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3';
-    if (n === 2) return 'grid grid-cols-1 sm:grid-cols-2 gap-3';
-    return 'grid grid-cols-1 gap-3';
-  });
+  isEditing(padId: string): boolean {
+    return this.editingPadId() === padId;
+  }
 
-  setPadLayout(cols: PadLayoutCols): void {
-    this.padLayoutOverride.set(cols);
+  startEditPad(id: string): void {
+    this.editingPadId.set(id);
+  }
+
+  stopEditPad(): void {
+    this.editingPadId.set(null);
   }
 
   toggleResume(): void {
@@ -84,6 +90,7 @@ export class CampaignSessionNotes {
     if (current.length >= this.padMax) return;
     const pad = createSessionPlayPad('note', `Notes ${current.length + 1}`, current.length);
     this.emitPads([...current, pad]);
+    this.editingPadId.set(pad.id);
   }
 
   addChecklistPad(): void {
@@ -91,6 +98,7 @@ export class CampaignSessionNotes {
     if (current.length >= this.padMax) return;
     const pad = createSessionPlayPad('checklist', `Liste ${current.length + 1}`, current.length);
     this.emitPads([...current, pad]);
+    this.editingPadId.set(pad.id);
   }
 
   togglePad(id: string): void {
@@ -112,6 +120,10 @@ export class CampaignSessionNotes {
     );
   }
 
+  setPadWidgetSize(id: string, widgetSize: SessionPlayPadWidgetSize): void {
+    this.emitPads(this.pads().map((p) => (p.id === id ? { ...p, widgetSize } : p)));
+  }
+
   movePad(id: string, dir: -1 | 1): void {
     const list = [...this.pads()].sort((a, b) => a.order - b.order);
     const idx = list.findIndex((p) => p.id === id);
@@ -130,6 +142,7 @@ export class CampaignSessionNotes {
       return;
     }
     if (!confirm('Supprimer ce calepin ?')) return;
+    if (this.editingPadId() === id) this.editingPadId.set(null);
     this.emitPads(
       list
         .filter((p) => p.id !== id)

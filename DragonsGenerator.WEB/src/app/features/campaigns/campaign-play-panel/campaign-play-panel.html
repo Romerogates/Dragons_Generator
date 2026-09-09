@@ -256,18 +256,14 @@
             </h3>
           </div>
           <div class="flex flex-wrap gap-2">
-            <button
-              type="button"
-              class="min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase border border-sky-800/50 text-sky-300"
-              (click)="dungeonPickerOpen.set(!dungeonPickerOpen())"
-            >
-              @if (activeSessionMap()) {
-                Changer
-              } @else {
-                Attribuer
-              }
-            </button>
             @if (activeSessionMap()) {
+              <button
+                type="button"
+                class="min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase border border-sky-800/50 text-sky-300"
+                (click)="dungeonPickerOpen.set(!dungeonPickerOpen())"
+              >
+                Changer
+              </button>
               <button
                 type="button"
                 class="min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400"
@@ -275,29 +271,50 @@
               >
                 Retirer
               </button>
+            } @else if (campaignDungeonMaps().length === 1) {
+              <button
+                type="button"
+                class="min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase bg-sky-600 text-white hover:bg-sky-500"
+                (click)="assignSessionMap(campaignDungeonMaps()[0]!.id)"
+              >
+                Attribuer
+              </button>
+            } @else if (campaignDungeonMaps().length > 1) {
+              <button
+                type="button"
+                class="min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase bg-sky-600 text-white hover:bg-sky-500"
+                (click)="focusDungeonPicker()"
+              >
+                Attribuer
+              </button>
             }
           </div>
         </div>
 
         @if (dungeonPickerOpen() || !activeSessionMap()) {
           @if (campaignDungeonMaps().length) {
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              @for (map of campaignDungeonMaps(); track map.id) {
-                <button
-                  type="button"
-                  class="min-h-12 px-4 py-3 rounded-xl text-left border hover:border-sky-600/50"
-                  [class.border-sky-600]="playSession.activeMapId === map.id"
-                  [class.bg-sky-950/30]="playSession.activeMapId === map.id"
-                  [class.border-slate-700]="playSession.activeMapId !== map.id"
-                  [class.bg-[#1b2028]/80]="playSession.activeMapId !== map.id"
-                  (click)="assignSessionMap(map.id)"
-                >
-                  <span class="block font-serif text-slate-200">{{ map.name }}</span>
-                  <span class="text-[10px] text-slate-500 uppercase tracking-widest">
-                    {{ map.gridWidth }}×{{ map.gridHeight }}
-                  </span>
-                </button>
+            <div id="session-dungeon-picker" class="space-y-2 scroll-mt-24">
+              @if (!activeSessionMap()) {
+                <p class="text-xs text-slate-400">Choisissez un donjon pour cette session :</p>
               }
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                @for (map of campaignDungeonMaps(); track map.id) {
+                  <button
+                    type="button"
+                    class="min-h-12 px-4 py-3 rounded-xl text-left border hover:border-sky-600/50"
+                    [class.border-sky-600]="playSession.activeMapId === map.id"
+                    [class.bg-sky-950/30]="playSession.activeMapId === map.id"
+                    [class.border-slate-700]="playSession.activeMapId !== map.id"
+                    [class.bg-[#1b2028]/80]="playSession.activeMapId !== map.id"
+                    (click)="assignSessionMap(map.id)"
+                  >
+                    <span class="block font-serif text-slate-200">{{ map.name }}</span>
+                    <span class="text-[10px] text-slate-500 uppercase tracking-widest">
+                      {{ map.gridWidth }}×{{ map.gridHeight }}
+                    </span>
+                  </button>
+                }
+              </div>
             </div>
           } @else {
             <div class="rounded-2xl border border-dashed border-sky-900/50 bg-sky-950/15 p-6 text-center space-y-2">

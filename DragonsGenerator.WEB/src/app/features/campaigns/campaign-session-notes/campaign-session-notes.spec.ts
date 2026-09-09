@@ -135,10 +135,32 @@ describe('CampaignSessionNotes', () => {
     expect(component.resumeCollapsed()).toBe(true);
   });
 
-  it('defaults pad layout to 2 when not compact', () => {
-    expect(component.padLayout()).toBe(2);
-    component.setPadLayout(3);
-    expect(component.padLayout()).toBe(3);
-    expect(component.padGridClass()).toContain('lg:grid-cols-3');
+  it('enters edit mode and changes widget size', () => {
+    const pad = createSessionPlayPad('note', 'A', 0);
+    fixture.componentRef.setInput('session', { ...baseSession, playPads: [pad], playNotes: '' });
+    fixture.detectChanges();
+
+    expect(component.isEditing(pad.id)).toBe(false);
+    component.startEditPad(pad.id);
+    expect(component.isEditing(pad.id)).toBe(true);
+
+    const spy = jasmine.createSpy('pads');
+    component.padsChange.subscribe((payload) => {
+      spy(payload);
+      fixture.componentRef.setInput('session', {
+        ...baseSession,
+        playPads: payload.playPads,
+        playNotes: payload.playNotes,
+        playNotebook: payload.playNotebook,
+      });
+      fixture.detectChanges();
+    });
+
+    component.setPadWidgetSize(pad.id, 'third');
+    expect(spy.calls.mostRecent().args[0].playPads[0].widgetSize).toBe('third');
+    expect(component.padSpanClass(spy.calls.mostRecent().args[0].playPads[0])).toContain('sm:col-span-2');
+
+    component.stopEditPad();
+    expect(component.isEditing(pad.id)).toBe(false);
   });
 });
