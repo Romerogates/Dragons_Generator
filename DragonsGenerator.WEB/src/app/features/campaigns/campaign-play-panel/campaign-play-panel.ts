@@ -21,6 +21,7 @@ import { AuthService } from '@core/services/auth.service';
 import { DataService } from '@core/services/data.service';
 import type { Character } from '@core/models/Character/character';
 import type { Creature } from '@core/models/Creatures/creature';
+import type { CreatureSummary } from '@core/models/Creatures/creature-summary';
 import { CREATURE_ROLE_LABELS, type StoryCreatureSelection } from '@core/models/Story/story';
 import {
   ActiveCombat,
@@ -81,11 +82,15 @@ import {
   sessionModeLabel,
 } from '../campaign-detail/campaign-session.util';
 import { CampaignSessionTimeline } from '../campaign-session-timeline/campaign-session-timeline';
-import { CampaignNotebook } from '../campaign-notebook/campaign-notebook';
+import { CampaignSessionNotes } from '../campaign-session-notes/campaign-session-notes';
 import { CampaignDungeonMaps } from '../campaign-dungeon-maps/campaign-dungeon-maps';
 import { DiceRollComponent } from '@shared/components/dice-roll/dice-roll';
-import type { NotebookPage } from '@core/models/Campaign/campaign';
-import { sessionNotebookFromPlay } from '@core/utils/notebook.util';
+import type { NotebookPage, SessionPlayPad } from '@core/models/Campaign/campaign';
+import {
+  archivePlayPadsText,
+  ensureSessionPlayPads,
+  syncLegacyPlayNotesFromPads,
+} from '@core/utils/notebook.util';
 
 export type PlaySessionView =
   | 'resume'
@@ -103,7 +108,7 @@ export type PlaySessionView =
     FormsModule,
     RouterLink,
     CampaignSessionTimeline,
-    CampaignNotebook,
+    CampaignSessionNotes,
     CampaignDungeonMaps,
     DiceRollComponent,
   ],
@@ -288,6 +293,9 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly campaignAllyPickerOpen = signal(false);
   readonly importingAllyId = signal<string | null>(null);
   readonly importingCreatureId = signal<string | null>(null);
+  readonly codexCreatureSummaries = signal<CreatureSummary[]>([]);
+  readonly codexCreatureSearch = signal('');
+  readonly codexCreaturesLoading = signal(false);
 
   /** Réinitialise la vue table si on change / quitte la session (dock réutilisé). */
   private lastBoundSessionId: string | null | undefined = undefined;
@@ -309,6 +317,7 @@ export class CampaignPlayPanel implements OnDestroy {
         this.campaignAllyPickerOpen.set(false);
         this.advancedToolsOpen.set(false);
         this.dungeonPickerOpen.set(false);
+        this.codexCreatureSearch.set('');
       });
     });
   }
@@ -326,6 +335,21 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly campaignUnsortedCreatures = computed(() =>
     this.campaignCreatures().filter((cr) => cr.role === 'neutral'),
   );
+
+  readonly filteredCodexCreatures = computed(() => {
+    const q = this.codexCreatureSearch().trim().toLowerCase();
+    const list = this.codexCreatureSummaries();
+    if (!q) return list.slice(0, 24);
+    return list
+      .filter(
+        (c) =>
+          c.name.toLowerCase().includes(q) ||
+          c.category.toLowerCase().includes(q) ||
+          (c.section?.toLowerCase().includes(q) ?? false) ||
+          (c.part?.toLowerCase().includes(q) ?? false),
+      )
+      .slice(0, 36);
+  });
 
   readonly awardingXpId = signal<string | null>(null);
 
@@ -434,7 +458,8 @@ export class CampaignPlayPanel implements OnDestroy {
     this.resetFightStep();
     const sessions = (c.data.sessions ?? []).map((s) => {
       if (s.id !== session.id) return s;
-      const playBlock = s.playNotes?.trim();
+      const pads = ensureSessionPlayPads(s);
+      const playBlock = archivePlayPadsText(pads) || s.playNotes?.trim() || '';
       const mergedNotes = playBlock
         ? [s.notes?.trim(), playBlock].filter(Boolean).join('\n\n--- Notes de session ---\n\n')
         : s.notes;
@@ -443,6 +468,8 @@ export class CampaignPlayPanel implements OnDestroy {
         status: 'played' as CampaignSessionStatus,
         notes: mergedNotes || s.notes,
         playNotes: '',
+        playNotebook: undefined,
+        playPads: [],
         activeCombat: null,
       };
     });
@@ -477,6 +504,10 @@ export class CampaignPlayPanel implements OnDestroy {
   }
 
   setSessionView(view: PlaySessionView): void {
+    if (view === 'notes') {
+      this.openSessionNotes();
+      return;
+    }
     this.sessionView.set(view);
     if (view !== 'combat') this.resetFightStep();
     if (view !== 'dungeon') this.dungeonPickerOpen.set(false);
@@ -489,6 +520,16 @@ export class CampaignPlayPanel implements OnDestroy {
   }
 
   openSessionNotes(): void {
+    const session = this.activeSession();
+    if (session && !session.playPads?.length) {
+      const pads = ensureSessionPlayPads(session);
+      const legacy = syncLegacyPlayNotesFromPads(pads);
+      this.updateSession(session.id, {
+        playPads: pads,
+        playNotes: legacy.playNotes,
+        playNotebook: legacy.playNotebook,
+      });
+    }
     this.sessionView.set('notes');
   }
 
@@ -514,21 +555,22 @@ export class CampaignPlayPanel implements OnDestroy {
     this.saveData(patch);
   }
 
-  readonly sessionNotebookPage = computed(() => {
-    const session = this.activeSession();
-    return sessionNotebookFromPlay(
-      session?.title ?? 'Session',
-      session?.playNotes,
-      session?.playNotebook,
-    );
-  });
+  onSessionResumeChange(page: NotebookPage): void {
+    if (!this.isDm()) return;
+    this.saveData({ sessionResume: page });
+  }
 
-  onSessionNotebookChange(page: NotebookPage): void {
+  onSessionPadsChange(payload: {
+    playPads: SessionPlayPad[];
+    playNotes: string;
+    playNotebook: NotebookPage | undefined;
+  }): void {
     const session = this.activeSession();
     if (!session) return;
     this.updateSession(session.id, {
-      playNotes: page.text ?? '',
-      playNotebook: page,
+      playPads: payload.playPads,
+      playNotes: payload.playNotes,
+      playNotebook: payload.playNotebook,
     });
   }
 
@@ -658,7 +700,23 @@ export class CampaignPlayPanel implements OnDestroy {
     if (this.enemyPickerOpen()) {
       this.allyPickerOpen.set(false);
       this.campaignAllyPickerOpen.set(false);
+      this.ensureCodexCreatureSummaries();
+    } else {
+      this.codexCreatureSearch.set('');
     }
+  }
+
+  setCodexCreatureSearch(value: string): void {
+    this.codexCreatureSearch.set(value);
+  }
+
+  /** Pseudo du joueur lié au combattant (si PJ importé). */
+  playerDisplayName(combatant: Combatant): string | null {
+    const userId = combatant.memberUserId;
+    if (!userId) return null;
+    const member = this.campaign().members.find((m) => m.userId === userId);
+    const name = member?.displayName?.trim();
+    return name || null;
   }
 
   /** Ajoute un PJ approuvé comme allié (crée le combat s’il n’existe pas). */
@@ -674,6 +732,56 @@ export class CampaignPlayPanel implements OnDestroy {
   /** Ajoute une créature de la campagne comme adversaire (stats bestiaire). */
   addCampaignCreatureEnemy(selection: StoryCreatureSelection): void {
     this.addCampaignCreature(selection, 'enemy');
+  }
+
+  /** Ajoute une créature du codex comme adversaire (stats bestiaire). */
+  addCodexCreatureEnemy(summary: CreatureSummary): void {
+    if (this.importingCreatureId() || this.importingParty()) return;
+    this.importingCreatureId.set(summary.id);
+    this.clearFeedback();
+
+    this.data.getCreatureById(summary.id).subscribe({
+      next: (creature) => {
+        this.importingCreatureId.set(null);
+        this.enemyPickerOpen.set(false);
+        this.codexCreatureSearch.set('');
+        const combatant = this.combatantFromCreature(creature, creature.name || summary.name, 'monster');
+        this.appendCombatants([combatant], combatant.name);
+      },
+      error: () => {
+        this.importingCreatureId.set(null);
+        const combatant = createCombatant({
+          name: summary.name,
+          kind: 'monster',
+          armorClass: summary.armorClass || 10,
+          initiativeBonus: 0,
+        });
+        this.appendCombatants([combatant], combatant.name);
+        this.setFeedback('err', 'Fiche créature incomplète — CA/PV à saisir manuellement.');
+      },
+    });
+  }
+
+  /** Adversaire vide (CA 10) — dernier recours hors bestiaire. */
+  addBlankEnemyCombatant(): void {
+    this.enemyPickerOpen.set(false);
+    this.codexCreatureSearch.set('');
+    this.addEnemyCombatant();
+  }
+
+  private ensureCodexCreatureSummaries(): void {
+    if (this.codexCreatureSummaries().length || this.codexCreaturesLoading()) return;
+    this.codexCreaturesLoading.set(true);
+    this.data.getCreaturesSummary().subscribe({
+      next: (list) => {
+        this.codexCreatureSummaries.set(list ?? []);
+        this.codexCreaturesLoading.set(false);
+      },
+      error: () => {
+        this.codexCreaturesLoading.set(false);
+        this.setFeedback('err', 'Impossible de charger le bestiaire codex.');
+      },
+    });
   }
 
   private addCampaignCreature(

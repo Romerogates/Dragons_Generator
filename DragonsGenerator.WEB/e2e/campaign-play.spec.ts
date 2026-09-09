@@ -23,6 +23,7 @@ test.describe('Mode table MJ', () => {
 
     await page.getByRole('button', { name: '+ Allié PNJ' }).click();
     await page.getByRole('button', { name: '+ Adversaire', exact: true }).click();
+    await page.getByRole('button', { name: 'Adversaire vierge' }).click();
 
     await page.getByRole('button', { name: 'Continuer → Initiative' }).click();
     await expect(page.getByText(/Collecte ouverte/i)).toBeVisible({ timeout: 15_000 });

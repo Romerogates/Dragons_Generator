@@ -141,6 +141,8 @@ export interface CampaignSession {
   playNotes?: string;
   /** Mode / encre de la page de notes live (stylet). */
   playNotebook?: NotebookPage;
+  /** Calepins de session (notes + checklists). */
+  playPads?: SessionPlayPad[];
   /** Tracker initiative / ordre de combat en cours (MJ). */
   activeCombat?: ActiveCombat | null;
   status: CampaignSessionStatus;
@@ -175,6 +177,8 @@ export interface CampaignData {
   notes: string;
   /** Carnet MJ (texte + pages manuscrites). */
   notebookPages?: NotebookPage[];
+  /** Résumé de campagne (persiste d’une session à l’autre). */
+  sessionResume?: NotebookPage;
   pregenCharacters: CampaignPregen[];
   sessions: CampaignSession[];
   /** Documents distribuables aux joueurs (MJ publie, joueurs voient published uniquement). */
@@ -353,6 +357,27 @@ export interface NotebookPage {
   updatedAt: string;
 }
 
+export interface SessionChecklistItem {
+  id: string;
+  text: string;
+  done?: boolean;
+}
+
+export type SessionPlayPadKind = 'note' | 'checklist';
+
+/** Calepin de notes live (session). */
+export interface SessionPlayPad {
+  id: string;
+  kind: SessionPlayPadKind;
+  title: string;
+  collapsed?: boolean;
+  order: number;
+  page?: NotebookPage;
+  items?: SessionChecklistItem[];
+}
+
+export const SESSION_PLAY_PAD_MAX = 8;
+
 export function createNotebookPage(title = 'Nouvelle page'): NotebookPage {
   return {
     id: crypto.randomUUID?.() ?? `nb-${Date.now()}`,
@@ -361,6 +386,41 @@ export function createNotebookPage(title = 'Nouvelle page'): NotebookPage {
     text: '',
     inkStrokes: [],
     updatedAt: new Date().toISOString(),
+  };
+}
+
+export function createChecklistItem(text = ''): SessionChecklistItem {
+  return {
+    id: crypto.randomUUID?.() ?? `cli-${Date.now()}`,
+    text,
+    done: false,
+  };
+}
+
+export function createSessionPlayPad(
+  kind: SessionPlayPadKind,
+  title?: string,
+  order = 0,
+): SessionPlayPad {
+  const id = crypto.randomUUID?.() ?? `pad-${Date.now()}`;
+  if (kind === 'checklist') {
+    return {
+      id,
+      kind,
+      title: title ?? 'Liste',
+      order,
+      collapsed: false,
+      items: [createChecklistItem('')],
+    };
+  }
+  const page = createNotebookPage(title ?? 'Notes');
+  return {
+    id,
+    kind: 'note',
+    title: page.title,
+    order,
+    collapsed: false,
+    page,
   };
 }
 

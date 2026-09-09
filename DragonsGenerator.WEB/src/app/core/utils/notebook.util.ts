@@ -1,8 +1,13 @@
 import {
+  CampaignSession,
   InkStroke,
   NOTEBOOK_INK_JPEG_QUALITY,
   NOTEBOOK_INK_MAX_DIMENSION,
   NotebookPage,
+  SESSION_PLAY_PAD_MAX,
+  SessionPlayPad,
+  createNotebookPage,
+  createSessionPlayPad,
 } from '@core/models/Campaign/campaign';
 
 export function seedNotebookFromLegacyNotes(notes: string | undefined | null): NotebookPage[] {
@@ -19,6 +24,77 @@ export function seedNotebookFromLegacyNotes(notes: string | undefined | null): N
     },
   ];
 }
+
+export function ensureSessionResume(page?: NotebookPage | null): NotebookPage {
+  if (page) {
+    return { ...page, title: page.title?.trim() || 'Résumé' };
+  }
+  return createNotebookPage('Résumé');
+}
+
+/** Construit / migre les calepins depuis playNotebook / playNotes. */
+export function ensureSessionPlayPads(session: CampaignSession): SessionPlayPad[] {
+  const existing = session.playPads;
+  if (existing?.length) {
+    return [...existing]
+      .map((p, i) => ({
+        ...p,
+        order: typeof p.order === 'number' ? p.order : i,
+        title: p.title?.trim() || (p.kind === 'checklist' ? 'Liste' : p.page?.title || 'Notes'),
+      }))
+      .sort((a, b) => a.order - b.order);
+  }
+
+  const page = sessionNotebookFromPlay(session.title, session.playNotes, session.playNotebook);
+  return [
+    {
+      id: page.id || 'session-live-notes',
+      kind: 'note',
+      title: page.title || `Session · ${session.title}`,
+      order: 0,
+      collapsed: false,
+      page,
+    },
+  ];
+}
+
+export function syncLegacyPlayNotesFromPads(pads: SessionPlayPad[]): {
+  playNotes: string;
+  playNotebook: NotebookPage | undefined;
+} {
+  const sorted = [...pads].sort((a, b) => a.order - b.order);
+  const firstNote = sorted.find((p) => p.kind === 'note' && p.page);
+  if (!firstNote?.page) {
+    return { playNotes: '', playNotebook: undefined };
+  }
+  return {
+    playNotes: firstNote.page.text ?? '',
+    playNotebook: {
+      ...firstNote.page,
+      title: firstNote.title || firstNote.page.title,
+    },
+  };
+}
+
+export function archivePlayPadsText(pads: SessionPlayPad[]): string {
+  const blocks: string[] = [];
+  for (const pad of [...pads].sort((a, b) => a.order - b.order)) {
+    const title = pad.title?.trim() || (pad.kind === 'checklist' ? 'Liste' : 'Notes');
+    if (pad.kind === 'checklist') {
+      const lines = (pad.items ?? [])
+        .map((it) => `${it.done ? '[x]' : '[ ]'} ${it.text || ''}`.trimEnd())
+        .filter((l) => l !== '[ ]' && l !== '[x]');
+      if (!lines.length) continue;
+      blocks.push(`## ${title}\n${lines.join('\n')}`);
+      continue;
+    }
+    const text = pad.page?.text?.trim();
+    if (text) blocks.push(`## ${title}\n${text}`);
+  }
+  return blocks.join('\n\n');
+}
+
+export { SESSION_PLAY_PAD_MAX, createSessionPlayPad };
 
 export function redrawInkStrokes(
   ctx: CanvasRenderingContext2D,

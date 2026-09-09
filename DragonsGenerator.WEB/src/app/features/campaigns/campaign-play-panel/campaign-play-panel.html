@@ -233,12 +233,12 @@
     }
 
     @if (isDm() && sessionView() === 'notes') {
-      <app-campaign-notebook
-        [page]="sessionNotebookPage()"
-        [pages]="null"
-        [showPageList]="false"
+      <app-campaign-session-notes
+        [session]="playSession"
+        [sessionResume]="c.data.sessionResume ?? null"
         [compact]="!fullscreen()"
-        (pageChange)="onSessionNotebookChange($event)"
+        (resumeChange)="onSessionResumeChange($event)"
+        (padsChange)="onSessionPadsChange($event)"
       />
     }
 
@@ -463,6 +463,9 @@
                     <span class="font-serif text-slate-200 truncate" [class.line-through]="isCombatantDefeated(cb)">
                       {{ cb.name || 'Sans nom' }}
                     </span>
+                    @if (playerDisplayName(cb); as playerName) {
+                      <span class="text-[10px] text-slate-500 truncate">· {{ playerName }}</span>
+                    }
                     @if (myCombatant()?.id === cb.id) {
                       <span class="text-[8px] font-black uppercase tracking-widest text-sky-400">vous</span>
                     }
@@ -486,6 +489,9 @@
           >
             <p [class]="fullscreen() ? 'text-lg font-serif text-amber-200' : 'font-serif text-amber-200'">
               Tour de <strong>{{ turn.name || 'Sans nom' }}</strong>
+              @if (playerDisplayName(turn); as playerName) {
+                <span class="text-slate-400 text-sm font-sans"> · {{ playerName }}</span>
+              }
               @if (isMyTurn()) {
                 <span class="text-sky-300 text-sm font-sans"> · c’est votre tour</span>
               }
@@ -609,10 +615,15 @@
                 (click)="selectTarget(cb.id)"
               >
                 <div class="flex justify-between gap-2">
-                  <span class="font-serif text-sky-100" [class.line-through]="isCombatantDefeated(cb)">{{
-                    cb.name || 'Sans nom'
-                  }}</span>
-                  <span class="text-[9px] uppercase text-slate-500">{{ combatantKindLabels[cb.kind] }}</span>
+                  <div class="min-w-0">
+                    <span class="font-serif text-sky-100" [class.line-through]="isCombatantDefeated(cb)">{{
+                      cb.name || 'Sans nom'
+                    }}</span>
+                    @if (playerDisplayName(cb); as playerName) {
+                      <span class="ml-1.5 text-[10px] text-slate-500">· {{ playerName }}</span>
+                    }
+                  </div>
+                  <span class="text-[9px] uppercase text-slate-500 shrink-0">{{ combatantKindLabels[cb.kind] }}</span>
                 </div>
                 <div class="mt-2 flex flex-wrap gap-3 text-xs text-slate-300">
                   <span>PV {{ cb.currentHp ?? '—' }}/{{ cb.maxHp ?? '—' }}</span>
@@ -699,7 +710,14 @@
                       (click)="$event.stopPropagation()"
                     >
                       <label class="col-span-2 sm:col-span-3 block">
-                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">Nom</span>
+                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">
+                          Nom
+                          @if (playerDisplayName(cb); as playerName) {
+                            <span class="normal-case tracking-normal font-sans text-slate-500">
+                              · joué par {{ playerName }}</span
+                            >
+                          }
+                        </span>
                         <input
                           type="text"
                           class="mt-0.5 w-full bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-200 min-w-0"
@@ -918,7 +936,14 @@
                       (click)="$event.stopPropagation()"
                     >
                       <label class="col-span-2 sm:col-span-3 block">
-                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">Nom</span>
+                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">
+                          Nom
+                          @if (playerDisplayName(cb); as playerName) {
+                            <span class="normal-case tracking-normal font-sans text-slate-500">
+                              · joué par {{ playerName }}</span
+                            >
+                          }
+                        </span>
                         <input
                           type="text"
                           class="mt-0.5 w-full bg-[#171b22] border border-slate-700 rounded px-2 py-1 text-xs text-slate-200 min-w-0"
@@ -1027,7 +1052,7 @@
                 }
               </button>
             } @empty {
-              <p class="text-xs text-slate-500 italic px-1">Aucun adversaire — bestiaire ou + Adversaire</p>
+              <p class="text-xs text-slate-500 italic px-1">Aucun adversaire — + Adversaire (bestiaire / codex)</p>
             }
           </div>
         </div>
@@ -1218,13 +1243,6 @@
                 class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-red-900/40 text-red-300 hover:border-red-700/50"
                 (click)="toggleEnemyPicker()"
               >
-                + Adversaire campagne
-              </button>
-              <button
-                type="button"
-                class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-300 hover:border-red-700/50"
-                (click)="addEnemyCombatant()"
-              >
                 + Adversaire
               </button>
               <button
@@ -1320,58 +1338,118 @@
             }
 
             @if (enemyPickerOpen()) {
-              <div class="rounded-xl border border-red-900/40 bg-red-950/20 p-3 space-y-2">
+              <div class="rounded-xl border border-red-900/40 bg-red-950/20 p-3 space-y-3">
                 <p class="text-[10px] font-black uppercase tracking-widest text-red-300">
-                  Adversaires du bestiaire de campagne
+                  Ajouter un adversaire
                 </p>
-                @if (!campaignEnemyCreatures().length && !campaignUnsortedCreatures().length) {
-                  <p class="text-xs text-slate-500 italic">
-                    Aucune créature dans le bestiaire — ajoutez-en dans l’onglet Créatures (camp Antagoniste).
+
+                @if (campaignEnemyCreatures().length || campaignUnsortedCreatures().length) {
+                  <div class="space-y-2">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                      Bestiaire de campagne
+                    </p>
+                    @if (campaignEnemyCreatures().length) {
+                      <div class="flex flex-wrap gap-2">
+                        @for (cr of campaignEnemyCreatures(); track cr.creatureId + (cr.customName || '')) {
+                          <button
+                            type="button"
+                            class="px-3 py-2 rounded-xl text-left text-xs border border-red-900/50 text-red-100 hover:border-red-600/60 hover:bg-red-950/40 disabled:opacity-50"
+                            [disabled]="importingParty() || importingCreatureId() === cr.creatureId"
+                            (click)="addCampaignCreatureEnemy(cr)"
+                          >
+                            <span class="font-serif block">{{ cr.customName || cr.creatureName }}</span>
+                            <span class="text-[10px] text-slate-500">
+                              {{ cr.creatureName }}
+                              @if (cr.challengeRating) {
+                                · FP {{ cr.challengeRating }}
+                              }
+                              · {{ roleLabels[cr.role] }}
+                            </span>
+                            @if (importingCreatureId() === cr.creatureId) {
+                              <span class="text-[10px] text-red-400 ml-1">…</span>
+                            }
+                          </button>
+                        }
+                      </div>
+                    }
+                    @if (campaignUnsortedCreatures().length) {
+                      <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 pt-1">
+                        Non classés (neutres)
+                      </p>
+                      <div class="flex flex-wrap gap-2">
+                        @for (cr of campaignUnsortedCreatures(); track cr.creatureId + (cr.customName || '')) {
+                          <button
+                            type="button"
+                            class="px-3 py-2 rounded-xl text-left text-xs border border-slate-700 text-slate-300 hover:border-red-700/50 disabled:opacity-50"
+                            [disabled]="importingParty() || importingCreatureId() === cr.creatureId"
+                            (click)="addCampaignCreatureEnemy(cr)"
+                          >
+                            <span class="font-serif block">{{ cr.customName || cr.creatureName }}</span>
+                            <span class="text-[10px] text-slate-500">À classer adversaire dans Créatures</span>
+                          </button>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+
+                <div class="space-y-2 border-t border-red-900/30 pt-3">
+                  <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                    Codex (bestiaire)
                   </p>
-                } @else {
-                  @if (campaignEnemyCreatures().length) {
-                    <div class="flex flex-wrap gap-2">
-                      @for (cr of campaignEnemyCreatures(); track cr.creatureId + (cr.customName || '')) {
+                  <input
+                    type="search"
+                    placeholder="Rechercher un gobelin, orc, type…"
+                    class="w-full bg-[#171b22] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200"
+                    [ngModel]="codexCreatureSearch()"
+                    (ngModelChange)="setCodexCreatureSearch($event)"
+                  />
+                  @if (codexCreaturesLoading()) {
+                    <p class="text-xs text-slate-500 italic">Chargement du codex…</p>
+                  } @else if (!filteredCodexCreatures().length) {
+                    <p class="text-xs text-slate-500 italic">
+                      @if (codexCreatureSearch().trim()) {
+                        Aucune créature pour « {{ codexCreatureSearch() }} ».
+                      } @else {
+                        Tapez un nom ou un type pour filtrer le bestiaire.
+                      }
+                    </p>
+                  } @else {
+                    <div class="flex flex-wrap gap-2 max-h-48 overflow-y-auto overscroll-contain">
+                      @for (cr of filteredCodexCreatures(); track cr.id) {
                         <button
                           type="button"
-                          class="px-3 py-2 rounded-xl text-left text-xs border border-red-900/50 text-red-100 hover:border-red-600/60 hover:bg-red-950/40 disabled:opacity-50"
-                          [disabled]="importingParty() || importingCreatureId() === cr.creatureId"
-                          (click)="addCampaignCreatureEnemy(cr)"
+                          class="px-3 py-2 rounded-xl text-left text-xs border border-red-900/40 text-red-100 hover:border-red-600/60 hover:bg-red-950/40 disabled:opacity-50"
+                          [disabled]="importingParty() || importingCreatureId() === cr.id"
+                          (click)="addCodexCreatureEnemy(cr)"
                         >
-                          <span class="font-serif block">{{ cr.customName || cr.creatureName }}</span>
+                          <span class="font-serif block">{{ cr.name }}</span>
                           <span class="text-[10px] text-slate-500">
-                            {{ cr.creatureName }}
+                            {{ cr.category }}
                             @if (cr.challengeRating) {
                               · FP {{ cr.challengeRating }}
                             }
-                            · {{ roleLabels[cr.role] }}
+                            · CA {{ cr.armorClass || 10 }}
                           </span>
-                          @if (importingCreatureId() === cr.creatureId) {
+                          @if (importingCreatureId() === cr.id) {
                             <span class="text-[10px] text-red-400 ml-1">…</span>
                           }
                         </button>
                       }
                     </div>
                   }
-                  @if (campaignUnsortedCreatures().length) {
-                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 pt-1">
-                      Non classés (neutres)
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                      @for (cr of campaignUnsortedCreatures(); track cr.creatureId + (cr.customName || '')) {
-                        <button
-                          type="button"
-                          class="px-3 py-2 rounded-xl text-left text-xs border border-slate-700 text-slate-300 hover:border-red-700/50 disabled:opacity-50"
-                          [disabled]="importingParty() || importingCreatureId() === cr.creatureId"
-                          (click)="addCampaignCreatureEnemy(cr)"
-                        >
-                          <span class="font-serif block">{{ cr.customName || cr.creatureName }}</span>
-                          <span class="text-[10px] text-slate-500">À classer adversaire dans Créatures</span>
-                        </button>
-                      }
-                    </div>
-                  }
-                }
+                </div>
+
+                <div class="border-t border-red-900/30 pt-3">
+                  <button
+                    type="button"
+                    class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:border-red-700/50 hover:text-red-200"
+                    (click)="addBlankEnemyCombatant()"
+                  >
+                    Adversaire vierge
+                  </button>
+                  <p class="text-[10px] text-slate-600 mt-1.5">Sans fiche — CA 10, à remplir à la main.</p>
+                </div>
               </div>
             }
           </div>

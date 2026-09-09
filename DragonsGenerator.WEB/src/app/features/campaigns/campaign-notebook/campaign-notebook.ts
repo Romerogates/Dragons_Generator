@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
+  CUSTOM_ELEMENTS_SCHEMA,
   ElementRef,
   OnDestroy,
   effect,
@@ -15,7 +16,6 @@ import { FormsModule } from '@angular/forms';
 import {
   InkStroke,
   NOTEBOOK_MAX_PAGES,
-  NotebookMode,
   NotebookPage,
   createNotebookPage,
 } from '@core/models/Campaign/campaign';
@@ -28,6 +28,7 @@ import { DataService } from '@core/services/data.service';
   imports: [FormsModule],
   templateUrl: './campaign-notebook.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class CampaignNotebook implements AfterViewInit, OnDestroy {
   private readonly data = inject(DataService);
@@ -36,6 +37,8 @@ export class CampaignNotebook implements AfterViewInit, OnDestroy {
   readonly page = input.required<NotebookPage>();
   readonly compact = input(false);
   readonly showPageList = input(true);
+  /** Masque en-tête Carnet + champ titre (calepin parent). */
+  readonly embedded = input(false);
   readonly maxPages = input(NOTEBOOK_MAX_PAGES);
 
   readonly pageChange = output<NotebookPage>();
@@ -51,19 +54,19 @@ export class CampaignNotebook implements AfterViewInit, OnDestroy {
   readonly canUndo = signal(false);
   readonly transcribing = signal(false);
   readonly transcribeError = signal<string | null>(null);
+  readonly inkFullscreen = signal(false);
 
   private drawing = false;
   private currentStroke: InkStroke | null = null;
   private emitTimer: ReturnType<typeof setTimeout> | null = null;
-  private resizeObserver: ResizeObserver | null = null;
   private lastPageId: string | null = null;
   private lastStrokeCount = -1;
+  private inkSizeLocked = false;
 
   constructor() {
     effect(() => {
       const page = this.page();
-      if (page.mode !== 'ink') return;
-      // Ne pas repaindre pendant un trait (sinon les points disparaissent).
+      if (!this.inkFullscreen()) return;
       if (this.drawing) return;
       const strokeCount = page.inkStrokes?.length ?? 0;
       const idChanged = this.lastPageId !== page.id;
@@ -73,46 +76,68 @@ export class CampaignNotebook implements AfterViewInit, OnDestroy {
       this.canUndo.set(strokeCount > 0);
       if (!idChanged && !strokesChanged) return;
       queueMicrotask(() => {
-        if (this.drawing) return;
-        if (idChanged) this.setupCanvasSize();
+        if (this.drawing || !this.inkFullscreen()) return;
+        if (idChanged) {
+          this.inkSizeLocked = false;
+          this.setupFullscreenCanvasSize();
+        }
         this.paintPage();
       });
     });
   }
 
   ngAfterViewInit(): void {
-    this.setupCanvasSize();
-    this.paintPage();
-    const canvas = this.canvasRef()?.nativeElement;
-    const host = canvas?.parentElement;
-    if (host && typeof ResizeObserver !== 'undefined') {
-      this.resizeObserver = new ResizeObserver(() => {
-        if (this.drawing) return;
-        this.setupCanvasSize();
-        this.paintPage();
-      });
-      this.resizeObserver.observe(host);
-    }
+    /* canvas monté seulement en overlay */
   }
 
   ngOnDestroy(): void {
-    this.resizeObserver?.disconnect();
     if (this.emitTimer) clearTimeout(this.emitTimer);
+    this.unlockBodyScroll();
   }
 
   listPages(): NotebookPage[] {
     return this.pages() ?? [this.page()];
   }
 
-  setMode(mode: NotebookMode): void {
-    if (this.page().mode === mode) return;
-    this.emitPage({ ...this.page(), mode, updatedAt: new Date().toISOString() });
-    if (mode === 'ink') {
-      queueMicrotask(() => {
-        this.setupCanvasSize();
-        this.paintPage();
-      });
+  hasInkPreview(): boolean {
+    const p = this.page();
+    return !!(p.inkImageDataUrl || (p.inkStrokes?.length ?? 0) > 0);
+  }
+
+  openInkFullscreen(): void {
+    this.transcribeError.set(null);
+    this.inkFullscreen.set(true);
+    this.inkSizeLocked = false;
+    this.lockBodyScroll();
+    const next: NotebookPage = {
+      ...this.page(),
+      mode: 'ink',
+      updatedAt: new Date().toISOString(),
+    };
+    if (this.page().mode !== 'ink') this.emitPage(next);
+    queueMicrotask(() => {
+      this.setupFullscreenCanvasSize();
+      this.paintPage();
+    });
+  }
+
+  closeInkFullscreen(toText = true): void {
+    const canvas = this.canvasRef()?.nativeElement;
+    let page = this.page();
+    if (canvas && (page.inkStrokes?.length ?? 0) > 0) {
+      page = {
+        ...page,
+        inkImageDataUrl: exportInkDataUrl(canvas),
+        mode: toText ? 'text' : 'ink',
+        updatedAt: new Date().toISOString(),
+      };
+      this.emitPage(page);
+    } else if (toText && page.mode !== 'text') {
+      this.emitPage({ ...page, mode: 'text', updatedAt: new Date().toISOString() });
     }
+    this.inkFullscreen.set(false);
+    this.inkSizeLocked = false;
+    this.unlockBodyScroll();
   }
 
   selectPage(id: string): void {
@@ -215,9 +240,9 @@ export class CampaignNotebook implements AfterViewInit, OnDestroy {
     const page = this.page();
     let url = page.inkImageDataUrl;
     const canvas = this.canvasRef()?.nativeElement;
-    if (!url && canvas && page.mode === 'ink') url = exportInkDataUrl(canvas);
+    if (!url && canvas && this.inkFullscreen()) url = exportInkDataUrl(canvas);
     if (!url) {
-      alert('Rien à exporter — dessine d’abord en mode Main.');
+      alert('Rien à exporter — dessine d’abord à la main.');
       return;
     }
     const a = document.createElement('a');
@@ -284,6 +309,7 @@ export class CampaignNotebook implements AfterViewInit, OnDestroy {
           mode: 'text',
           updatedAt: new Date().toISOString(),
         });
+        this.closeInkFullscreen(true);
       },
       error: (err) => {
         this.transcribing.set(false);
@@ -297,7 +323,7 @@ export class CampaignNotebook implements AfterViewInit, OnDestroy {
   }
 
   onPointerDown(ev: PointerEvent): void {
-    if (this.page().mode !== 'ink') return;
+    if (!this.inkFullscreen()) return;
     const canvas = this.canvasRef()?.nativeElement;
     if (!canvas) return;
     ev.preventDefault();
@@ -395,15 +421,15 @@ export class CampaignNotebook implements AfterViewInit, OnDestroy {
     };
   }
 
-  private setupCanvasSize(): void {
+  private setupFullscreenCanvasSize(): void {
     const canvas = this.canvasRef()?.nativeElement;
-    if (!canvas) return;
+    if (!canvas || this.inkSizeLocked) return;
     const parent = canvas.parentElement;
-    const cssW = Math.max(280, parent?.clientWidth || canvas.clientWidth || 640);
-    const cssH = this.compact() ? 280 : Math.max(360, Math.min(520, Math.round(cssW * 0.62)));
-    if (canvas.width === cssW && canvas.height === cssH) return;
+    const cssW = Math.max(320, Math.floor(parent?.clientWidth || window.innerWidth || 800));
+    const cssH = Math.max(320, Math.floor(parent?.clientHeight || window.innerHeight * 0.75 || 600));
     canvas.width = cssW;
     canvas.height = cssH;
+    this.inkSizeLocked = true;
   }
 
   private paintBlank(): void {
@@ -417,7 +443,7 @@ export class CampaignNotebook implements AfterViewInit, OnDestroy {
   private paintPage(): void {
     const canvas = this.canvasRef()?.nativeElement;
     const ctx = canvas?.getContext('2d');
-    if (!canvas || !ctx || this.page().mode !== 'ink') return;
+    if (!canvas || !ctx || !this.inkFullscreen()) return;
     this.paintBlank();
     redrawInkStrokes(ctx, this.page().inkStrokes ?? [], false);
   }
@@ -433,5 +459,15 @@ export class CampaignNotebook implements AfterViewInit, OnDestroy {
   private emitPageDebounced(page: NotebookPage): void {
     if (this.emitTimer) clearTimeout(this.emitTimer);
     this.emitTimer = setTimeout(() => this.emitPage(page), 280);
+  }
+
+  private lockBodyScroll(): void {
+    if (typeof document === 'undefined') return;
+    document.body.style.overflow = 'hidden';
+  }
+
+  private unlockBodyScroll(): void {
+    if (typeof document === 'undefined') return;
+    document.body.style.overflow = '';
   }
 }

@@ -1,38 +1,46 @@
 <section class="space-y-4">
-  <div class="flex flex-wrap items-center justify-between gap-3">
-    <div>
-      <h2 class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Carnet</h2>
-      <p class="text-xs text-slate-500 mt-1">
-        Texte au clavier ou notes à la main (stylet). Export PNG / PDF disponible.
-      </p>
-    </div>
-    <div class="inline-flex rounded-xl border border-slate-700 overflow-hidden" role="group" aria-label="Mode de saisie">
-      <button
-        type="button"
-        class="min-h-11 px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-colors"
-        [class]="
-          page().mode === 'text'
-            ? 'bg-emerald-900/50 text-emerald-200'
-            : 'bg-[#1b2028] text-slate-500 hover:text-slate-300'
-        "
-        (click)="setMode('text')"
+  @if (!embedded()) {
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h2 class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Carnet</h2>
+        <p class="text-xs text-slate-500 mt-1">
+          Texte au clavier ou notes à la main (stylet). Export PNG / PDF disponible.
+        </p>
+      </div>
+      <div
+        class="inline-flex items-center gap-0.5 rounded-full border border-slate-700/80 bg-[#141a16] p-1"
+        role="group"
+        aria-label="Mode de saisie"
       >
-        Texte
-      </button>
-      <button
-        type="button"
-        class="min-h-11 px-4 py-2 text-[10px] font-black uppercase tracking-widest border-l border-slate-700 transition-colors"
-        [class]="
-          page().mode === 'ink'
-            ? 'bg-emerald-900/50 text-emerald-200'
-            : 'bg-[#1b2028] text-slate-500 hover:text-slate-300'
-        "
-        (click)="setMode('ink')"
-      >
-        Main
-      </button>
+        <button
+          type="button"
+          class="min-h-10 inline-flex items-center gap-1.5 rounded-full px-3.5 text-[11px] font-semibold transition-colors"
+          [class]="
+            !inkFullscreen()
+              ? 'bg-emerald-800/60 text-emerald-100 shadow-sm'
+              : 'text-slate-500 hover:text-slate-300'
+          "
+          (click)="closeInkFullscreen(true)"
+        >
+          <iconify-icon icon="mdi:keyboard-outline" class="text-base"></iconify-icon>
+          Texte
+        </button>
+        <button
+          type="button"
+          class="min-h-10 inline-flex items-center gap-1.5 rounded-full px-3.5 text-[11px] font-semibold transition-colors"
+          [class]="
+            inkFullscreen()
+              ? 'bg-emerald-800/60 text-emerald-100 shadow-sm'
+              : 'text-slate-500 hover:text-slate-300'
+          "
+          (click)="openInkFullscreen()"
+        >
+          <iconify-icon icon="mdi:draw" class="text-base"></iconify-icon>
+          Main
+        </button>
+      </div>
     </div>
-  </div>
+  }
 
   @if (showPageList() && pages()) {
     <div class="flex flex-wrap gap-2 items-center">
@@ -70,145 +78,241 @@
     </div>
   }
 
+  @if (!embedded()) {
+    <label class="block">
+      <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">Titre</span>
+      <input
+        type="text"
+        class="mt-0.5 w-full bg-[#171b22] border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200"
+        [ngModel]="page().title"
+        (ngModelChange)="onTitleChange($event)"
+      />
+    </label>
+  }
+
   <label class="block">
-    <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">Titre</span>
-    <input
-      type="text"
-      class="mt-0.5 w-full bg-[#171b22] border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200"
-      [ngModel]="page().title"
-      (ngModelChange)="onTitleChange($event)"
-    />
+    @if (!embedded()) {
+      <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">Notes</span>
+    }
+    <textarea
+      [rows]="compact() ? 8 : 14"
+      placeholder="Scènes, PNJ, décisions des joueurs…"
+      class="mt-0.5 w-full bg-[#171b22] border border-emerald-900/40 rounded-xl p-3 text-sm text-slate-300 min-h-[12rem]"
+      [ngModel]="page().text ?? ''"
+      (ngModelChange)="onTextChange($event)"
+    ></textarea>
   </label>
 
-  @if (page().mode === 'text') {
-    <label class="block">
-      <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">Notes</span>
-      <textarea
-        [rows]="compact() ? 8 : 14"
-        placeholder="Scènes, PNJ, décisions des joueurs…"
-        class="mt-0.5 w-full bg-[#171b22] border border-emerald-900/40 rounded-xl p-3 text-sm text-slate-300 min-h-[12rem]"
-        [ngModel]="page().text ?? ''"
-        (ngModelChange)="onTextChange($event)"
-      ></textarea>
-    </label>
-  } @else {
-    <div class="space-y-2">
-      <div class="flex flex-wrap gap-2 items-center">
-        <div class="flex flex-wrap gap-1.5 items-center" role="group" aria-label="Couleur">
-          @for (c of penColors; track c) {
-            <button
-              type="button"
-              class="w-7 h-7 rounded-full border-2"
-              [style.background]="c"
-              [class.border-white]="penColor() === c && !erasing()"
-              [class.border-slate-700]="penColor() !== c || erasing()"
-              [attr.aria-label]="'Couleur ' + c"
-              (click)="setPenColor(c)"
-            ></button>
-          }
+  <div class="flex flex-wrap items-center gap-2">
+    <button
+      type="button"
+      class="min-h-11 inline-flex items-center gap-2 rounded-full px-4 text-[11px] font-semibold border border-emerald-700/50 bg-emerald-950/40 text-emerald-200 hover:border-emerald-500/60"
+      (click)="openInkFullscreen()"
+    >
+      <iconify-icon icon="mdi:draw" class="text-lg"></iconify-icon>
+      Écrire à la main
+    </button>
+    @if (hasInkPreview()) {
+      <button
+        type="button"
+        class="min-h-11 px-3 rounded-full text-[10px] font-black uppercase border border-sky-800/50 text-sky-300"
+        (click)="exportCurrentPng()"
+      >
+        PNG
+      </button>
+      <button
+        type="button"
+        class="min-h-11 px-3 rounded-full text-[10px] font-black uppercase border border-violet-800/50 text-violet-300"
+        (click)="exportInkPdf()"
+      >
+        PDF
+      </button>
+    }
+  </div>
+
+  @if (hasInkPreview()) {
+    <button
+      type="button"
+      class="block w-full rounded-xl border border-slate-800 overflow-hidden text-left hover:border-emerald-800/50"
+      (click)="openInkFullscreen()"
+    >
+      @if (page().inkImageDataUrl) {
+        <img
+          [src]="page().inkImageDataUrl"
+          alt="Aperçu notes manuscrites"
+          class="w-full max-h-40 object-cover object-top opacity-90"
+        />
+      } @else {
+        <p class="px-3 py-6 text-center text-xs text-slate-500 italic">Aperçu manuscrit — cliquer pour éditer</p>
+      }
+    </button>
+  }
+</section>
+
+@if (inkFullscreen()) {
+  <div
+    class="fixed inset-0 z-[80] flex flex-col bg-[#0a0d13] text-slate-200"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Notes à la main"
+  >
+    <header
+      class="shrink-0 flex flex-wrap items-center justify-between gap-2 border-b border-emerald-900/40 bg-[#141a16] px-3 py-2"
+    >
+      <div class="min-w-0">
+        <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400">Main · plein écran</p>
+        <p class="text-sm font-serif text-emerald-100 truncate">{{ page().title || 'Notes' }}</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <div
+          class="inline-flex items-center gap-0.5 rounded-full border border-slate-700/80 bg-[#0f1410] p-1"
+          role="group"
+          aria-label="Mode"
+        >
+          <button
+            type="button"
+            class="min-h-10 inline-flex items-center gap-1.5 rounded-full px-3 text-[11px] font-semibold text-slate-500 hover:text-slate-300"
+            (click)="closeInkFullscreen(true)"
+          >
+            <iconify-icon icon="mdi:keyboard-outline" class="text-base"></iconify-icon>
+            Texte
+          </button>
+          <button
+            type="button"
+            class="min-h-10 inline-flex items-center gap-1.5 rounded-full px-3 text-[11px] font-semibold bg-emerald-800/60 text-emerald-100"
+          >
+            <iconify-icon icon="mdi:draw" class="text-base"></iconify-icon>
+            Main
+          </button>
         </div>
         <button
           type="button"
-          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border"
-          [class]="
-            inkTool() === 'pen' && !erasing()
-              ? 'border-emerald-600/60 text-emerald-200 bg-emerald-950/40'
-              : 'border-slate-700 text-slate-400'
-          "
-          (click)="setInkTool('pen')"
+          class="min-h-11 px-4 rounded-full text-[10px] font-black uppercase bg-emerald-700 text-white hover:bg-emerald-600"
+          (click)="closeInkFullscreen(true)"
         >
-          Stylo
-        </button>
-        <button
-          type="button"
-          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border"
-          [class]="
-            inkTool() === 'highlighter' && !erasing()
-              ? 'border-amber-600/60 text-amber-200 bg-amber-950/40'
-              : 'border-slate-700 text-slate-400'
-          "
-          (click)="setInkTool('highlighter')"
-        >
-          Surligneur
-        </button>
-        <label class="flex items-center gap-2 text-[10px] text-slate-500">
-          Épaisseur
-          <input
-            type="range"
-            min="1"
-            max="10"
-            step="0.5"
-            class="w-24 accent-emerald-500"
-            [ngModel]="penWidth()"
-            (ngModelChange)="setPenWidth($event)"
-          />
-        </label>
-        <button
-          type="button"
-          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border"
-          [class]="
-            erasing()
-              ? 'border-amber-600/60 text-amber-200 bg-amber-950/40'
-              : 'border-slate-700 text-slate-400'
-          "
-          (click)="toggleEraser()"
-        >
-          {{ erasing() ? 'Gomme on' : 'Gomme' }}
-        </button>
-        <button
-          type="button"
-          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400 disabled:opacity-40"
-          [disabled]="!canUndo()"
-          (click)="undoStroke()"
-        >
-          Undo
-        </button>
-        <button
-          type="button"
-          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-red-900/40 text-red-400/80"
-          (click)="clearInk()"
-        >
-          Effacer
-        </button>
-        <button
-          type="button"
-          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-sky-800/50 text-sky-300"
-          (click)="exportCurrentPng()"
-        >
-          PNG
-        </button>
-        <button
-          type="button"
-          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-violet-800/50 text-violet-300"
-          (click)="exportInkPdf()"
-        >
-          PDF
-        </button>
-        <button
-          type="button"
-          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-emerald-700/50 text-emerald-200 disabled:opacity-40"
-          [disabled]="transcribing()"
-          (click)="transcribeInk()"
-        >
-          {{ transcribing() ? 'OCR…' : 'Transcrire' }}
+          Terminé
         </button>
       </div>
-      @if (transcribeError()) {
-        <p class="text-xs text-red-400">{{ transcribeError() }}</p>
-      }
-      <div
-        class="rounded-xl border border-emerald-900/40 bg-[#171b22] overflow-hidden touch-none"
-        style="touch-action: none"
+    </header>
+
+    <div class="shrink-0 flex flex-wrap gap-2 items-center px-3 py-2 border-b border-slate-800 bg-[#12161c]">
+      <div class="flex flex-wrap gap-1.5 items-center" role="group" aria-label="Couleur">
+        @for (c of penColors; track c) {
+          <button
+            type="button"
+            class="w-7 h-7 rounded-full border-2"
+            [style.background]="c"
+            [class.border-white]="penColor() === c && !erasing()"
+            [class.border-slate-700]="penColor() !== c || erasing()"
+            [attr.aria-label]="'Couleur ' + c"
+            (click)="setPenColor(c)"
+          ></button>
+        }
+      </div>
+      <button
+        type="button"
+        class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase border"
+        [class]="
+          inkTool() === 'pen' && !erasing()
+            ? 'border-emerald-600/60 text-emerald-200 bg-emerald-950/40'
+            : 'border-slate-700 text-slate-400'
+        "
+        (click)="setInkTool('pen')"
       >
-        <canvas
-          #inkCanvas
-          class="block w-full cursor-crosshair"
-          (pointerdown)="onPointerDown($event)"
-          (pointermove)="onPointerMove($event)"
-          (pointerup)="onPointerUp($event)"
-          (pointercancel)="onPointerUp($event)"
-        ></canvas>
-      </div>
+        Stylo
+      </button>
+      <button
+        type="button"
+        class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase border"
+        [class]="
+          inkTool() === 'highlighter' && !erasing()
+            ? 'border-amber-600/60 text-amber-200 bg-amber-950/40'
+            : 'border-slate-700 text-slate-400'
+        "
+        (click)="setInkTool('highlighter')"
+      >
+        Surligneur
+      </button>
+      <label class="flex items-center gap-2 text-[10px] text-slate-500">
+        Épaisseur
+        <input
+          type="range"
+          min="1"
+          max="10"
+          step="0.5"
+          class="w-24 accent-emerald-500"
+          [ngModel]="penWidth()"
+          (ngModelChange)="setPenWidth($event)"
+        />
+      </label>
+      <button
+        type="button"
+        class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase border"
+        [class]="
+          erasing()
+            ? 'border-amber-600/60 text-amber-200 bg-amber-950/40'
+            : 'border-slate-700 text-slate-400'
+        "
+        (click)="toggleEraser()"
+      >
+        {{ erasing() ? 'Gomme on' : 'Gomme' }}
+      </button>
+      <button
+        type="button"
+        class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase border border-slate-700 text-slate-400 disabled:opacity-40"
+        [disabled]="!canUndo()"
+        (click)="undoStroke()"
+      >
+        Undo
+      </button>
+      <button
+        type="button"
+        class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase border border-red-900/40 text-red-400/80"
+        (click)="clearInk()"
+      >
+        Effacer
+      </button>
+      <button
+        type="button"
+        class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase border border-sky-800/50 text-sky-300"
+        (click)="exportCurrentPng()"
+      >
+        PNG
+      </button>
+      <button
+        type="button"
+        class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase border border-violet-800/50 text-violet-300"
+        (click)="exportInkPdf()"
+      >
+        PDF
+      </button>
+      <button
+        type="button"
+        class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase border border-emerald-700/50 text-emerald-200 disabled:opacity-40"
+        [disabled]="transcribing()"
+        (click)="transcribeInk()"
+      >
+        {{ transcribing() ? 'OCR…' : 'Transcrire' }}
+      </button>
     </div>
-  }
-</section>
+
+    @if (transcribeError()) {
+      <p class="shrink-0 px-3 py-1 text-xs text-red-400">{{ transcribeError() }}</p>
+    }
+
+    <div
+      class="flex-1 min-h-0 bg-[#171b22] overflow-hidden overscroll-none"
+      style="touch-action: none; overscroll-behavior: none"
+    >
+      <canvas
+        #inkCanvas
+        class="block w-full h-full cursor-crosshair"
+        style="touch-action: none"
+        (pointerdown)="onPointerDown($event)"
+        (pointermove)="onPointerMove($event)"
+        (pointerup)="onPointerUp($event)"
+        (pointercancel)="onPointerUp($event)"
+      ></canvas>
+    </div>
+  </div>
+}
