@@ -102,12 +102,10 @@ export function buildCampaignSetupGuide(input: CampaignSetupGuideInput): Campaig
         id: 'play',
         title: 'Session en cours',
         proposal:
-          'Tu es en session. Ouvre la table pour noter, lancer des rencontres et combattre — le combat n’existe qu’ici.',
+          'Tu es en session. Ouvre la table plein écran pour noter, lancer des rencontres et combattre — le combat n’existe qu’ici.',
         tip: '',
         primaryLabel: 'Ouvrir la table',
-        primaryAction: 'openPlay',
-        secondaryLabel: 'Plein écran',
-        secondaryAction: 'openPlayFullscreen',
+        primaryAction: 'openPlayFullscreen',
       },
     };
   }

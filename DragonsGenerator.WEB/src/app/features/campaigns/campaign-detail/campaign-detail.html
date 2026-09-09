@@ -82,144 +82,53 @@
       </div>
     }
 
-    <div class="max-w-5xl mx-auto px-4 py-8">
+    <div class="max-w-5xl mx-auto px-4 pt-10 pb-8">
       @switch (tab()) {
         @case ('overview') {
-          <section class="space-y-6">
-            <!-- État session (garde) -->
-            <div class="rounded-2xl border border-emerald-800/40 bg-emerald-950/20 p-5 space-y-3">
-              <p class="text-[10px] font-black uppercase tracking-widest text-emerald-500">État de la table</p>
-              @if (activePlaySession(); as live) {
-                <h2 class="text-lg font-serif text-emerald-100">Session en cours — {{ live.title }}</h2>
-                <p class="text-xs text-slate-500">{{ formatSessionDate(live.scheduledAt) }} · {{ sessionModeLabel(live.mode) }}</p>
-                @if (c.isOwner) {
-                  <button
-                    type="button"
-                    class="min-h-10 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
-                    (click)="openSessionDock()"
-                  >
-                    Ouvrir la table
-                  </button>
-                }
-              } @else if (nextPlannedSession(); as next) {
-                <h2 class="text-lg font-serif text-emerald-100">Prochaine : {{ next.title }}</h2>
-                <p class="text-xs text-slate-500">{{ formatSessionDate(next.scheduledAt) }} · {{ sessionModeLabel(next.mode) }}</p>
-                <div class="flex flex-wrap gap-2">
-                  @if (c.isOwner) {
-                    <button
-                      type="button"
-                      class="min-h-10 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
-                      (click)="startPlaySession(next.id)"
-                    >
-                      Entrer en session
-                    </button>
-                  }
-                  <button
-                    type="button"
-                    class="min-h-10 px-3 py-2 rounded-xl text-[10px] font-black uppercase border border-emerald-800/50 text-emerald-300"
-                    (click)="setTab('sessions')"
-                  >
-                    Voir les sessions
-                  </button>
-                </div>
-              } @else {
-                <h2 class="text-lg font-serif text-slate-200">Aucune session planifiée</h2>
-                <p class="text-xs text-slate-500">La préparation se fait dans Préparation. Pour jouer, planifie une session.</p>
-                <button
-                  type="button"
-                  class="min-h-10 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
-                  (click)="setTab('sessions')"
-                >
-                  Aller aux sessions
-                </button>
-              }
-            </div>
-
-            <app-campaign-detail-stats
-              [isOwner]="c.isOwner"
-              [creatureCount]="c.data.creatures.length"
-              [encounterCount]="c.data.encounters.length"
-              [playerCount]="players().length"
-              [plannedSessionCount]="plannedSessionCount()"
-              [playedSessionCount]="playedSessionCount()"
-              [documentCount]="documentCount()"
-              [totalXpAwarded]="totalXpAwarded()"
-              [myXpEarned]="myXpEarned()"
-              [approvedCharacterName]="myPlayerMember()?.approvedCharacterName"
-              (navigate)="onStatsNavigate($event)"
-            />
-
-            @if (!c.isOwner) {
-              <app-campaign-player-sheet
-                [member]="myPlayerMember() ?? null"
-                [xpEarned]="myXpEarned()"
-                [nextSession]="nextPlannedSession()"
-                [lastHandoutTitle]="lastPublishedHandoutTitle()"
-              />
-            }
-
-            <!-- Synopsis lecture seule -->
-            <div class="rounded-2xl border border-slate-800 bg-[#1b2028]/70 p-5 space-y-3">
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-500">Synopsis</h2>
-                @if (c.isOwner) {
-                  <button
-                    type="button"
-                    class="text-[10px] font-black uppercase tracking-widest text-violet-400 hover:text-violet-300"
-                    (click)="openPrepScenario()"
-                  >
-                    Modifier dans Préparation →
-                  </button>
-                }
-              </div>
-              <p class="text-sm leading-relaxed font-serif text-slate-300 whitespace-pre-wrap">
-                {{ adventureExcerpt() || 'Aucun synopsis pour l’instant.' }}
-              </p>
-            </div>
-
-            <app-campaign-detail-roster
-              [visible]="showOverviewRoster()"
-              [allowRemove]="false"
-              [feedback]="rosterFeedback()"
-              [playersNeedingCharacter]="playersNeedingCharacter()"
-              [pendingProposals]="pendingProposals()"
-              [approvedPlayers]="approvedPlayersWithCharacter()"
-              [characterRequestLoadingId]="characterRequestLoadingId()"
-              [memberCharacterLoadingKey]="memberCharacterLoadingId()"
-              (requestCharacterPick)="requestCharacterPick($event)"
-              (removeMember)="removeMember($event)"
-              (approveMember)="approveMember($event)"
-              (rejectMember)="rejectMember($event)"
-              (viewMemberCharacter)="onRosterMemberCharacterAction($event, 'view')"
-              (printMemberFullSheet)="onRosterMemberCharacterAction($event, 'print')"
-            />
-
-            @if (publishedHandoutsCount() > 0 && !c.isOwner) {
-              <button
-                type="button"
-                class="w-full text-left bg-sky-950/20 border border-sky-800/40 rounded-xl px-4 py-3 hover:border-sky-600/50 transition-colors"
-                (click)="setTab('handouts')"
-              >
-                <p class="text-[10px] font-black uppercase tracking-widest text-sky-400 mb-1">Documents MJ</p>
-                <p class="text-sm text-slate-300">
-                  {{ publishedHandoutsCount() }} document{{ publishedHandoutsCount() > 1 ? 's' : '' }} disponible{{ publishedHandoutsCount() > 1 ? 's' : '' }}
-                </p>
-              </button>
-            }
-
-            <!-- Activité en bas du résumé -->
-            <div id="campaign-activity" class="space-y-3 pt-2">
-              <div class="flex flex-wrap items-end justify-between gap-2">
-                <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500">Activité récente</h2>
-                <p class="text-[9px] font-black uppercase tracking-widest text-slate-600">Fil compact — défiler pour plus</p>
-              </div>
-              <app-campaign-detail-activity
-                [loading]="activityLoading()"
-                [items]="activity()"
-                (itemClick)="openHandoutFromActivity($event)"
-              />
-            </div>
-          </section>
+          <app-campaign-detail-overview
+            [isOwner]="c.isOwner"
+            [liveSession]="activePlaySession() ?? null"
+            [nextSession]="nextPlannedSession() ?? null"
+            [liveSessionDateLabel]="activePlaySession() ? formatSessionDate(activePlaySession()!.scheduledAt) : ''"
+            [liveSessionModeLabel]="activePlaySession() ? sessionModeLabel(activePlaySession()!.mode) : ''"
+            [nextSessionDateLabel]="nextPlannedSession() ? formatSessionDate(nextPlannedSession()!.scheduledAt) : ''"
+            [nextSessionModeLabel]="nextPlannedSession() ? sessionModeLabel(nextPlannedSession()!.mode) : ''"
+            [creatureCount]="c.data.creatures.length"
+            [encounterCount]="c.data.encounters.length"
+            [playerCount]="players().length"
+            [plannedSessionCount]="plannedSessionCount()"
+            [playedSessionCount]="playedSessionCount()"
+            [documentCount]="documentCount()"
+            [totalXpAwarded]="totalXpAwarded()"
+            [myXpEarned]="myXpEarned()"
+            [approvedCharacterName]="myPlayerMember()?.approvedCharacterName"
+            [adventureExcerpt]="adventureExcerpt()"
+            [showRoster]="showOverviewRoster()"
+            [rosterFeedback]="rosterFeedback()"
+            [playersNeedingCharacter]="playersNeedingCharacter()"
+            [pendingProposals]="pendingProposals()"
+            [approvedPlayers]="approvedPlayersWithCharacter()"
+            [characterRequestLoadingId]="characterRequestLoadingId()"
+            [memberCharacterLoadingKey]="memberCharacterLoadingId()"
+            [myPlayerMember]="myPlayerMember() ?? null"
+            [lastHandoutTitle]="lastPublishedHandoutTitle()"
+            [publishedHandoutsCount]="publishedHandoutsCount()"
+            [activityLoading]="activityLoading()"
+            [activity]="activity()"
+            (openPlayFullscreen)="openPlayFullscreen()"
+            (startPlaySession)="startPlaySession($event)"
+            (goSessions)="setTab('sessions')"
+            (openPrepScenario)="openPrepScenario()"
+            (statsNavigate)="onStatsNavigate($event)"
+            (requestCharacterPick)="requestCharacterPick($event)"
+            (removeMember)="removeMember($event)"
+            (approveMember)="approveMember($event)"
+            (rejectMember)="rejectMember($event)"
+            (viewMemberCharacter)="onRosterMemberCharacterAction($event, 'view')"
+            (printMemberFullSheet)="onRosterMemberCharacterAction($event, 'print')"
+            (activityItemClick)="openHandoutFromActivity($event)"
+            (goHandouts)="setTab('handouts')"
+          />
         }
 
         @case ('sessions') {
@@ -235,7 +144,7 @@
             (startEditSession)="startEditSession($event)"
             (stopEditSession)="stopEditSession()"
             (startPlaySession)="startPlaySession($event)"
-            (openLiveSession)="openSessionDock()"
+            (openLiveSession)="openPlayFullscreen()"
             (removeSession)="removeSession($event)"
             (sessionPatch)="onSessionPatch($event)"
             (sessionPatchImmediate)="onSessionPatchImmediate($event)"

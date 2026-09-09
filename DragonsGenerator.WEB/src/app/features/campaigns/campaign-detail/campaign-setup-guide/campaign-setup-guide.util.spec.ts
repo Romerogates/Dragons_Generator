@@ -51,7 +51,7 @@ describe('buildCampaignSetupGuide', () => {
   it('shows live session mode when active', () => {
     const g = buildCampaignSetupGuide(base({ hasActiveSession: true, hasAdventure: true }));
     expect(g.liveSession).toBe(true);
-    expect(g.current?.primaryAction).toBe('openPlay');
+    expect(g.current?.primaryAction).toBe('openPlayFullscreen');
     expect(g.current?.primaryLabel).toBe('Ouvrir la table');
     expect(g.current?.tip).toBe('');
   });

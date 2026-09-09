@@ -25,6 +25,8 @@ import {
 } from '@core/utils/notebook.util';
 import { CampaignNotebook } from '../campaign-notebook/campaign-notebook';
 
+export type PadLayoutCols = 1 | 2 | 3;
+
 @Component({
   selector: 'app-campaign-session-notes',
   standalone: true,
@@ -46,11 +48,28 @@ export class CampaignSessionNotes {
   }>();
 
   readonly resumeCollapsed = signal(false);
+  /** null = défaut selon compact (1 dock / 2 plein écran). */
+  readonly padLayoutOverride = signal<PadLayoutCols | null>(null);
   readonly padMax = SESSION_PLAY_PAD_MAX;
 
   readonly resumePage = computed(() => ensureSessionResume(this.sessionResume()));
 
   readonly pads = computed(() => ensureSessionPlayPads(this.session()));
+
+  readonly padLayout = computed<PadLayoutCols>(
+    () => this.padLayoutOverride() ?? (this.compact() ? 1 : 2),
+  );
+
+  readonly padGridClass = computed(() => {
+    const n = this.padLayout();
+    if (n === 3) return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3';
+    if (n === 2) return 'grid grid-cols-1 sm:grid-cols-2 gap-3';
+    return 'grid grid-cols-1 gap-3';
+  });
+
+  setPadLayout(cols: PadLayoutCols): void {
+    this.padLayoutOverride.set(cols);
+  }
 
   toggleResume(): void {
     this.resumeCollapsed.update((v) => !v);

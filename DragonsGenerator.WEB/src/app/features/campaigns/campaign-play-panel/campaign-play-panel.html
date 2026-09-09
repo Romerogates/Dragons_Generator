@@ -72,7 +72,7 @@
 
     @if (isDm() && fullscreen()) {
       <nav
-        class="sticky top-0 z-20 -mx-1 flex flex-wrap gap-1 rounded-xl border border-emerald-900/40 bg-[#141a16]/95 p-1 backdrop-blur-sm"
+        class="sticky top-0 z-20 -mx-1 mb-6 flex flex-wrap gap-1 rounded-xl border border-emerald-900/40 bg-[#141a16]/95 p-1 backdrop-blur-sm"
         aria-label="Sections de la session"
       >
         @for (tab of sessionTabs; track tab.id) {

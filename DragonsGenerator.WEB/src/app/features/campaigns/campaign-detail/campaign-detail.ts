@@ -63,10 +63,9 @@ import { CampaignPregenGeneratorService } from '@core/services/campaign-pregen-g
 import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
 import { AiGenerationProgressBar } from '@shared/components/ai-generation-progress-bar/ai-generation-progress-bar';
 import { CampaignDungeonMaps } from '../campaign-dungeon-maps/campaign-dungeon-maps';
-import { CampaignDetailStats } from './campaign-detail-stats/campaign-detail-stats';
+import { CampaignDetailOverview } from './campaign-detail-overview/campaign-detail-overview';
 import { CampaignDetailRoster } from './campaign-detail-roster/campaign-detail-roster';
 import { CampaignDetailSessions } from './campaign-detail-sessions/campaign-detail-sessions';
-import { CampaignDetailActivity } from './campaign-detail-activity/campaign-detail-activity';
 import { CampaignDetailHandouts } from './campaign-detail-handouts/campaign-detail-handouts';
 import { CampaignNotebook } from '../campaign-notebook/campaign-notebook';
 import type { MemberCharacterAction } from './campaign-detail-roster/campaign-detail-roster';
@@ -76,7 +75,6 @@ import { handoutIdFromActivity } from './campaign-activity.util';
 import { CampaignSessionCacheService } from '@core/services/campaign-session-cache.service';
 import { CampaignSessionDockService } from '@core/services/campaign-session-dock.service';
 import { CampaignInitiativeInline } from '../campaign-initiative-inline/campaign-initiative-inline';
-import { CampaignPlayerSheet } from '../campaign-player-sheet/campaign-player-sheet';
 import { CampaignSetupGuide } from './campaign-setup-guide/campaign-setup-guide';
 import type {
   CampaignSetupAction,
@@ -113,16 +111,14 @@ function isPrepSub(t: string): t is PrepSub {
     RouterLink,
     ProfileAvatarComponent,
     CampaignDungeonMaps,
-    CampaignDetailStats,
+    CampaignDetailOverview,
     CampaignDetailRoster,
     CampaignDetailSessions,
-    CampaignDetailActivity,
     CampaignDetailHandouts,
     CampaignNotebook,
     CampaignSetupGuide,
     AiGenerationProgressBar,
     CampaignInitiativeInline,
-    CampaignPlayerSheet,
     LightMarkdownPipe,
   ],
   templateUrl: './campaign-detail.html',
@@ -533,6 +529,14 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.sessionDock.open();
   }
 
+  /** Table plein écran (session déjà active). */
+  openPlayFullscreen(): void {
+    const c = this.campaign();
+    if (!c?.data.activeSessionId) return;
+    this.sessionDock.close();
+    void this.router.navigate(['/campaigns', c.id, 'play']);
+  }
+
   ngOnInit(): void {
     if (!this.auth.isLoggedIn()) {
       this.loading.set(false);
@@ -813,7 +817,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         this.openSessionDock();
         break;
       case 'openPlayFullscreen':
-        if (c) void this.router.navigate(['/campaigns', c.id, 'play']);
+        this.openPlayFullscreen();
         break;
       case 'skipMaps':
         this.mapsStepSkipped.set(true);

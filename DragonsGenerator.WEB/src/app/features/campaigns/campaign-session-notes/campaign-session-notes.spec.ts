@@ -134,4 +134,11 @@ describe('CampaignSessionNotes', () => {
     component.toggleResume();
     expect(component.resumeCollapsed()).toBe(true);
   });
+
+  it('defaults pad layout to 2 when not compact', () => {
+    expect(component.padLayout()).toBe(2);
+    component.setPadLayout(3);
+    expect(component.padLayout()).toBe(3);
+    expect(component.padGridClass()).toContain('lg:grid-cols-3');
+  });
 });

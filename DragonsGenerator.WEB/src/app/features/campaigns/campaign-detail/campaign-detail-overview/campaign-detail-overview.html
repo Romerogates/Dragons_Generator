@@ -1,0 +1,191 @@
+<section class="space-y-10">
+  <!-- Page de garde -->
+  <header class="relative overflow-hidden rounded-3xl border border-violet-900/40 bg-gradient-to-br from-violet-950/40 via-[#1b2028] to-emerald-950/30 px-6 py-8 md:px-8 md:py-10">
+    <div
+      class="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-violet-600/10 blur-3xl"
+      aria-hidden="true"
+    ></div>
+    <div
+      class="pointer-events-none absolute -bottom-24 -left-10 h-48 w-48 rounded-full bg-emerald-600/10 blur-3xl"
+      aria-hidden="true"
+    ></div>
+
+    <p class="relative text-[10px] font-black uppercase tracking-[0.2em] text-violet-400/90 mb-3">
+      Page de garde
+    </p>
+    <h2 class="relative text-2xl md:text-3xl font-serif text-slate-100 leading-snug max-w-2xl">
+      @if (liveSession(); as live) {
+        Session en cours — {{ live.title }}
+      } @else if (nextSession(); as next) {
+        Prochaine table — {{ next.title }}
+      } @else {
+        Bienvenue sur le hub de campagne
+      }
+    </h2>
+    <p class="relative mt-3 text-sm text-slate-400 max-w-xl leading-relaxed">
+      @if (liveSession(); as live) {
+        {{ liveSessionDateLabel() }}
+        @if (liveSessionModeLabel()) {
+          · {{ liveSessionModeLabel() }}
+        }
+        — ouvre la table plein écran pour jouer.
+      } @else if (nextSession(); as next) {
+        {{ nextSessionDateLabel() }}
+        @if (nextSessionModeLabel()) {
+          · {{ nextSessionModeLabel() }}
+        }
+        — entre en session pour ouvrir le panneau de table.
+      } @else {
+        Prépare le monde dans Préparation, planifie dans Sessions, puis joue à la table.
+      }
+    </p>
+
+    <div class="relative mt-6 flex flex-wrap gap-2">
+      @if (liveSession(); as live) {
+        @if (isOwner()) {
+          <button
+            type="button"
+            class="min-h-11 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg shadow-emerald-950/40"
+            (click)="openPlayFullscreen.emit()"
+          >
+            Ouvrir la table
+          </button>
+        }
+      } @else if (nextSession(); as next) {
+        @if (isOwner()) {
+          <button
+            type="button"
+            class="min-h-11 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg shadow-emerald-950/40"
+            (click)="startPlaySession.emit(next.id)"
+          >
+            Entrer en session
+          </button>
+        }
+        <button
+          type="button"
+          class="min-h-11 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-violet-700/50 text-violet-200 hover:border-violet-500/60"
+          (click)="goSessions.emit()"
+        >
+          Voir les sessions
+        </button>
+      } @else {
+        <button
+          type="button"
+          class="min-h-11 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500"
+          (click)="goSessions.emit()"
+        >
+          Aller aux sessions
+        </button>
+      }
+    </div>
+  </header>
+
+  <!-- Sommaire -->
+  <div class="space-y-4">
+    <div class="max-w-2xl">
+      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500 mb-2">Sommaire</p>
+      <h3 class="text-xl font-serif text-slate-100">Comment utiliser ce hub</h3>
+      <p class="mt-2 text-sm text-slate-400 leading-relaxed">
+        @if (isOwner()) {
+          <span class="text-amber-300/90">Sessions</span> pour planifier et ouvrir la table,
+          <span class="text-violet-300/90">Préparation</span> pour scénario, créatures et rencontres,
+          <span class="text-sky-300/90">Documents</span> pour partager avec la table,
+          <span class="text-slate-300">Joueurs</span> pour le roster. Le combat n’existe qu’en session.
+        } @else {
+          Consulte les prochaines dates, tes documents MJ et ton personnage. La table s’ouvre quand le MJ lance la session.
+        }
+      </p>
+    </div>
+
+    <app-campaign-detail-stats
+      [isOwner]="isOwner()"
+      [creatureCount]="creatureCount()"
+      [encounterCount]="encounterCount()"
+      [playerCount]="playerCount()"
+      [plannedSessionCount]="plannedSessionCount()"
+      [playedSessionCount]="playedSessionCount()"
+      [documentCount]="documentCount()"
+      [totalXpAwarded]="totalXpAwarded()"
+      [myXpEarned]="myXpEarned()"
+      [approvedCharacterName]="approvedCharacterName()"
+      (navigate)="statsNavigate.emit($event)"
+    />
+  </div>
+
+  @if (!isOwner()) {
+    <app-campaign-player-sheet
+      [member]="myPlayerMember()"
+      [xpEarned]="myXpEarned()"
+      [nextSession]="nextSession()"
+      [lastHandoutTitle]="lastHandoutTitle()"
+    />
+  }
+
+  <!-- Détails -->
+  <div class="space-y-6 pt-2 border-t border-slate-800/80">
+    <div>
+      <p class="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500 mb-2">Détails</p>
+      <h3 class="text-lg font-serif text-slate-200">Synopsis & table</h3>
+    </div>
+
+    <article class="rounded-2xl border border-slate-800/80 bg-[#1b2028]/40 px-5 py-6 md:px-6">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+        <h4 class="text-[10px] font-black uppercase tracking-widest text-violet-400">Synopsis</h4>
+        @if (isOwner()) {
+          <button
+            type="button"
+            class="text-[10px] font-black uppercase tracking-widest text-violet-400 hover:text-violet-300"
+            (click)="openPrepScenario.emit()"
+          >
+            Modifier dans Préparation →
+          </button>
+        }
+      </div>
+      <p class="text-base md:text-lg leading-relaxed font-serif text-slate-300/95 whitespace-pre-wrap">
+        {{ adventureExcerpt() || 'Aucun synopsis pour l’instant.' }}
+      </p>
+    </article>
+
+    <app-campaign-detail-roster
+      [visible]="showRoster()"
+      [allowRemove]="false"
+      [feedback]="rosterFeedback()"
+      [playersNeedingCharacter]="playersNeedingCharacter()"
+      [pendingProposals]="pendingProposals()"
+      [approvedPlayers]="approvedPlayers()"
+      [characterRequestLoadingId]="characterRequestLoadingId()"
+      [memberCharacterLoadingKey]="memberCharacterLoadingKey()"
+      (requestCharacterPick)="requestCharacterPick.emit($event)"
+      (removeMember)="removeMember.emit($event)"
+      (approveMember)="approveMember.emit($event)"
+      (rejectMember)="rejectMember.emit($event)"
+      (viewMemberCharacter)="viewMemberCharacter.emit($event)"
+      (printMemberFullSheet)="printMemberFullSheet.emit($event)"
+    />
+
+    @if (publishedHandoutsCount() > 0 && !isOwner()) {
+      <button
+        type="button"
+        class="w-full text-left bg-sky-950/20 border border-sky-800/40 rounded-xl px-4 py-3 hover:border-sky-600/50 transition-colors"
+        (click)="goHandouts.emit()"
+      >
+        <p class="text-[10px] font-black uppercase tracking-widest text-sky-400 mb-1">Documents MJ</p>
+        <p class="text-sm text-slate-300">
+          {{ publishedHandoutsCount() }} document{{ publishedHandoutsCount() > 1 ? 's' : '' }} disponible{{ publishedHandoutsCount() > 1 ? 's' : '' }}
+        </p>
+      </button>
+    }
+
+    <div id="campaign-activity" class="space-y-3">
+      <div class="flex flex-wrap items-end justify-between gap-2">
+        <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-500">Activité récente</h4>
+        <p class="text-[9px] font-black uppercase tracking-widest text-slate-600">Fil compact — défiler pour plus</p>
+      </div>
+      <app-campaign-detail-activity
+        [loading]="activityLoading()"
+        [items]="activity()"
+        (itemClick)="activityItemClick.emit($event)"
+      />
+    </div>
+  </div>
+</section>

@@ -31,7 +31,26 @@
 
   <div class="flex flex-wrap items-center justify-between gap-2">
     <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Calepins de session</p>
-    <div class="flex flex-wrap gap-2">
+    <div class="flex flex-wrap items-center gap-2">
+      <div
+        class="inline-flex rounded-full border border-slate-700 p-0.5"
+        role="group"
+        aria-label="Colonnes des calepins"
+      >
+        @for (cols of [1, 2, 3]; track cols) {
+          <button
+            type="button"
+            class="min-h-9 min-w-9 rounded-full text-[10px] font-black uppercase transition-colors"
+            [class.bg-emerald-900/60]="padLayout() === cols"
+            [class.text-emerald-200]="padLayout() === cols"
+            [class.text-slate-500]="padLayout() !== cols"
+            [attr.aria-pressed]="padLayout() === cols"
+            (click)="setPadLayout($any(cols))"
+          >
+            {{ cols }}
+          </button>
+        }
+      </div>
       <button
         type="button"
         class="min-h-10 px-3 rounded-full text-[10px] font-black uppercase border border-slate-700 text-slate-300 hover:border-emerald-600/50 disabled:opacity-40"
@@ -51,9 +70,9 @@
     </div>
   </div>
 
-  <div class="space-y-3">
+  <div [class]="padGridClass()">
     @for (pad of pads(); track pad.id; let i = $index) {
-      <article class="rounded-2xl border border-slate-800 bg-[#1b2028]/70 overflow-hidden">
+      <article class="rounded-2xl border border-slate-800 bg-[#1b2028]/70 overflow-hidden flex flex-col min-h-0">
         <div class="flex flex-wrap items-center gap-2 px-3 py-2 border-b border-slate-800/80">
           <button
             type="button"
@@ -68,7 +87,7 @@
           </button>
           <input
             type="text"
-            class="flex-1 min-w-[8rem] bg-transparent border-0 text-sm font-serif text-slate-200 focus:outline-none focus:ring-0"
+            class="flex-1 min-w-[6rem] bg-transparent border-0 text-sm font-serif text-slate-200 focus:outline-none focus:ring-0"
             [ngModel]="pad.title"
             (ngModelChange)="setPadTitle(pad.id, $event)"
             [attr.aria-label]="'Titre du calepin'"
@@ -105,7 +124,7 @@
         </div>
 
         @if (!pad.collapsed) {
-          <div class="p-3">
+          <div class="p-3 flex-1">
             @if (pad.kind === 'note' && pad.page) {
               <app-campaign-notebook
                 [page]="pad.page"
