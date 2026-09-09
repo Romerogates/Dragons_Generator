@@ -16,6 +16,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<PushSubscription> PushSubscriptions => Set<PushSubscription>();
     public DbSet<CampaignActivity> CampaignActivities => Set<CampaignActivity>();
     public DbSet<SessionReminderLog> SessionReminderLogs => Set<SessionReminderLog>();
+    public DbSet<GuideComment> GuideComments => Set<GuideComment>();
+    public DbSet<GuideCommentLike> GuideCommentLikes => Set<GuideCommentLike>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -165,6 +167,34 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasIndex(x => new { x.CampaignId, x.SessionId, x.UserId, x.ReminderKind }).IsUnique();
             e.Property(x => x.SessionId).HasMaxLength(128);
             e.Property(x => x.ReminderKind).HasMaxLength(8);
+        });
+
+        modelBuilder.Entity<GuideComment>(e =>
+        {
+            e.Property(x => x.TopicId).HasMaxLength(64);
+            e.Property(x => x.Body).HasMaxLength(2000);
+            e.HasIndex(x => new { x.TopicId, x.CreatedAt });
+            e.HasOne(x => x.User)
+                .WithMany()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(x => x.Parent)
+                .WithMany(c => c.Replies)
+                .HasForeignKey(x => x.ParentId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<GuideCommentLike>(e =>
+        {
+            e.HasKey(x => new { x.CommentId, x.UserId });
+            e.HasOne(x => x.Comment)
+                .WithMany(c => c.Likes)
+                .HasForeignKey(x => x.CommentId)
+                .OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(x => x.User)
+                .WithMany()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

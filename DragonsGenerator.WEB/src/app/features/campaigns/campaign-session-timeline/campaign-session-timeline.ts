@@ -19,6 +19,7 @@ import type { CampaignSession, SessionTimelineItem, SessionTimelineKind } from '
 export class CampaignSessionTimeline {
   readonly session = input.required<CampaignSession>();
   readonly encounterNames = input<Record<string, string>>({});
+  readonly readonly = input(false);
   readonly timelineChange = output<SessionTimelineItem[]>();
 
   readonly kinds: { id: SessionTimelineKind; label: string }[] = [

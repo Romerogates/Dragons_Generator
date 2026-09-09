@@ -31,6 +31,7 @@ public static class DbMigrationRunner
         new("007_message_attachments", Apply007MessageAttachmentsAsync),
         new("008_session_reminder_logs", Apply008SessionReminderLogsAsync),
         new("009_user_preferences_json", Apply009UserPreferencesJsonAsync),
+        new("010_guide_comments", Apply010GuideCommentsAsync),
     ];
 
     private sealed record Migration(string Id, Func<AppDbContext, CancellationToken, Task> Apply);
@@ -242,6 +243,34 @@ public static class DbMigrationRunner
             UPDATE "Users"
             SET "PreferencesJson" = '{{}}'
             WHERE "PreferencesJson" IS NULL OR TRIM("PreferencesJson") = '';
+            """,
+            ct);
+    }
+
+    private static async Task Apply010GuideCommentsAsync(AppDbContext db, CancellationToken ct)
+    {
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            CREATE TABLE IF NOT EXISTS "GuideComments" (
+                "Id" TEXT NOT NULL CONSTRAINT "PK_GuideComments" PRIMARY KEY,
+                "TopicId" TEXT NOT NULL,
+                "UserId" TEXT NOT NULL,
+                "Body" TEXT NOT NULL,
+                "ParentId" TEXT NULL,
+                "CreatedAt" TEXT NOT NULL,
+                CONSTRAINT "FK_GuideComments_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE,
+                CONSTRAINT "FK_GuideComments_GuideComments_ParentId" FOREIGN KEY ("ParentId") REFERENCES "GuideComments" ("Id") ON DELETE CASCADE
+            );
+            CREATE INDEX IF NOT EXISTS "IX_GuideComments_TopicId_CreatedAt"
+                ON "GuideComments" ("TopicId", "CreatedAt");
+            CREATE TABLE IF NOT EXISTS "GuideCommentLikes" (
+                "CommentId" TEXT NOT NULL,
+                "UserId" TEXT NOT NULL,
+                "CreatedAt" TEXT NOT NULL,
+                CONSTRAINT "PK_GuideCommentLikes" PRIMARY KEY ("CommentId", "UserId"),
+                CONSTRAINT "FK_GuideCommentLikes_GuideComments_CommentId" FOREIGN KEY ("CommentId") REFERENCES "GuideComments" ("Id") ON DELETE CASCADE,
+                CONSTRAINT "FK_GuideCommentLikes_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE
+            );
             """,
             ct);
     }

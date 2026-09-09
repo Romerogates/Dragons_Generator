@@ -58,40 +58,28 @@ export class Home implements OnInit {
 
   readonly features: FeatureItem[] = [
     {
-      title: 'Création Guidée',
+      title: 'Création guidée',
       description:
-        "Un assistant pas à pas pour forger votre héros, de l'espèce à l'équipement final.",
+        "Un assistant pas à pas pour forger votre héros, de l'espèce à l'équipement.",
       icon: 'fluent-emoji:man-mage',
     },
     {
-      title: 'Fiches de Héros',
+      title: 'Campagnes & table',
       description:
-        'Consultez vos personnages, exportez en PDF et retrouvez toutes leurs aptitudes et sorts.',
-      icon: 'fluent-emoji:scroll',
-    },
-    {
-      title: 'Sauvegarde Cloud',
-      description:
-        'Connecté ? Vos héros et scénarios sont synchronisés sur votre compte, accessibles partout.',
-      icon: 'fluent-emoji:cloud-with-lightning',
-    },
-    {
-      title: 'Campagnes & Scénarios',
-      description:
-        'Créez des aventures, invitez des joueurs et gérez vos campagnes en ligne.',
+        'Scénarios, invitations, sessions live et combats — le MJ et les joueurs sur la même table.',
       icon: 'fluent-emoji:world-map',
     },
     {
-      title: 'Amis & Messages',
+      title: 'Guide communautaire',
       description:
-        'Profil personnalisable, liste d\'amis et chat intégré pour organiser vos parties.',
-      icon: 'fluent-emoji:speech-balloon',
+        'Sommaire type forum : fiches, commentaires et likes pour progresser ensemble.',
+      icon: 'fluent-emoji:books',
     },
     {
-      title: 'Grimoire de Règles',
+      title: 'Grimoire d’Eana',
       description:
-        "Codex complet : espèces, sorts, équipement, bestiaire et règles d'Eana à portée de main.",
-      icon: 'fluent-emoji:books',
+        'Espèces, sorts, bestiaire et règles à portée de main, synchronisés sur votre compte.',
+      icon: 'fluent-emoji:scroll',
     },
   ];
 

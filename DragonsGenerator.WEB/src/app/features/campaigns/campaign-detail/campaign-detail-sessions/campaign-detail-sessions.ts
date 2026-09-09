@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  CUSTOM_ELEMENTS_SCHEMA,
   input,
   output,
   signal,
@@ -18,6 +19,7 @@ import {
   sessionStatusLabel,
   normalizeSessionMode,
 } from '../campaign-session.util';
+import { CampaignSessionTimeline } from '../../campaign-session-timeline/campaign-session-timeline';
 
 export interface SessionPatchEvent {
   sessionId: string;
@@ -34,9 +36,10 @@ export type SessionListFilter = 'upcoming' | 'past' | 'all';
 @Component({
   selector: 'app-campaign-detail-sessions',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, CampaignSessionTimeline],
   templateUrl: './campaign-detail-sessions.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class CampaignDetailSessions {
   readonly isOwner = input.required<boolean>();
@@ -58,11 +61,23 @@ export class CampaignDetailSessions {
   readonly sessionDateChange = output<SessionDateChangeEvent>();
 
   readonly filter = signal<SessionListFilter>('upcoming');
+  readonly viewingSessionId = signal<string | null>(null);
 
   readonly editingSession = computed(() => {
     const id = this.editingSessionId();
     if (!id) return null;
     return this.sortedSessions().find((s) => s.id === id) ?? null;
+  });
+
+  readonly viewingSession = computed(() => {
+    const id = this.viewingSessionId();
+    if (!id) return null;
+    return (
+      this.sortedSessions().find((s) => s.id === id) ??
+      this.pastSessions().find((s) => s.id === id) ??
+      this.upcomingSessions().find((s) => s.id === id) ??
+      null
+    );
   });
 
   readonly filteredSessions = computed(() => {
@@ -104,5 +119,36 @@ export class CampaignDetailSessions {
 
   isActive(session: CampaignSession): boolean {
     return this.activeSessionId() === session.id;
+  }
+
+  canViewArchive(session: CampaignSession): boolean {
+    return session.status === 'played' || session.status === 'cancelled';
+  }
+
+  openViewSession(id: string): void {
+    this.viewingSessionId.set(id);
+    queueMicrotask(() => {
+      document.getElementById('session-view-panel')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    });
+  }
+
+  closeViewSession(): void {
+    this.viewingSessionId.set(null);
+  }
+
+  formatCombatHistoryDate(iso: string): string {
+    try {
+      return new Date(iso).toLocaleString('fr-FR', {
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return iso;
+    }
   }
 }

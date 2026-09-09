@@ -36,7 +36,16 @@ export const routes: Routes = [
   {
     path: 'guide',
     canActivate: [authGuard],
-    loadComponent: () => import('./features/guide/guide').then((m) => m.GuidePage),
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/guide/guide-index').then((m) => m.GuideIndexPage),
+      },
+      {
+        path: ':topicId',
+        loadComponent: () => import('./features/guide/guide-topic').then((m) => m.GuideTopicPage),
+      },
+    ],
   },
   {
     path: 'settings',

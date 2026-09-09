@@ -207,3 +207,26 @@ public class CampaignActivity
     public string PayloadJson { get; set; } = "{}";
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }
+
+public class GuideComment
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string TopicId { get; set; } = "";
+    public Guid UserId { get; set; }
+    public AppUser User { get; set; } = null!;
+    public string Body { get; set; } = "";
+    public Guid? ParentId { get; set; }
+    public GuideComment? Parent { get; set; }
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public ICollection<GuideCommentLike> Likes { get; set; } = [];
+    public ICollection<GuideComment> Replies { get; set; } = [];
+}
+
+public class GuideCommentLike
+{
+    public Guid CommentId { get; set; }
+    public GuideComment Comment { get; set; } = null!;
+    public Guid UserId { get; set; }
+    public AppUser User { get; set; } = null!;
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+}

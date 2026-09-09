@@ -81,123 +81,89 @@
   }
 
   <section
-    class="relative w-full min-h-[85dvh] flex flex-col items-center border-b border-slate-800"
+    class="relative w-full min-h-[88dvh] flex flex-col items-center border-b border-slate-800 overflow-hidden"
   >
     <div
-      class="absolute inset-0 z-0 bg-[#111] opacity-80"
+      class="absolute inset-0 z-0"
       style="
-        background-image: radial-gradient(
-          circle at 50% 50%,
-          rgba(245, 158, 11, 0.05) 2px,
-          transparent 2px
-        );
-        background-size: 30px 30px;
+        background:
+          radial-gradient(ellipse 80% 55% at 50% -10%, rgba(245, 158, 11, 0.18), transparent 55%),
+          radial-gradient(ellipse 50% 40% at 85% 70%, rgba(124, 58, 237, 0.12), transparent 50%),
+          radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.04) 1.5px, transparent 1.5px),
+          #111418;
+        background-size: auto, auto, 28px 28px, auto;
       "
     ></div>
     <div
-      class="absolute inset-0 z-0 bg-gradient-to-b from-transparent via-[#171b22]/80 to-[#171b22]"
+      class="absolute inset-0 z-0 bg-gradient-to-b from-transparent via-[#171b22]/50 to-[#171b22]"
+    ></div>
+    <div
+      class="pointer-events-none absolute -left-24 top-1/3 h-64 w-64 rounded-full bg-amber-500/10 blur-3xl animate-[fadeInDown_1.2s_ease-out]"
+      aria-hidden="true"
+    ></div>
+    <div
+      class="pointer-events-none absolute -right-16 bottom-1/4 h-52 w-52 rounded-full bg-violet-600/15 blur-3xl"
+      aria-hidden="true"
     ></div>
 
-    <div class="relative z-10 flex flex-1 flex-col items-center justify-center text-center px-4 max-w-4xl py-10 sm:py-12">
+    <div class="relative z-10 flex flex-1 flex-col items-center justify-center text-center px-4 max-w-3xl py-14 sm:py-16">
       <img
         src="dragon_512x512.png"
-        alt="Logo Dragons"
+        alt=""
         decoding="async"
         fetchpriority="high"
-        class="h-24 w-24 object-contain mb-6 drop-shadow-md animate-[fadeInDown_0.35s_ease-out]"
+        class="h-28 w-28 sm:h-32 sm:w-32 object-contain mb-5 drop-shadow-[0_12px_28px_rgba(245,158,11,0.25)] animate-[fadeInDown_0.45s_ease-out]"
       />
       <h1
-        class="text-4xl sm:text-5xl md:text-7xl font-extrabold text-slate-100 font-serif tracking-wide mb-4 sm:mb-6 drop-shadow-lg"
+        class="text-5xl sm:text-6xl md:text-7xl font-extrabold text-slate-50 font-serif tracking-wide drop-shadow-lg animate-[fadeInDown_0.55s_ease-out]"
       >
         Dragons <span class="text-amber-500">Generator</span>
       </h1>
-      <p class="text-base sm:text-lg md:text-xl text-slate-400 italic mb-6 sm:mb-10 max-w-2xl leading-relaxed">
+      <p
+        class="mt-5 text-base sm:text-lg text-slate-400 max-w-xl leading-relaxed animate-[fadeInDown_0.7s_ease-out]"
+      >
         @if (isLoggedIn() && user(); as u) {
-          <span class="flex flex-col items-center gap-3 sm:gap-4 not-italic">
-            <a routerLink="/profile" class="hover:scale-105 transition-transform" title="Mon profil">
-              <app-profile-avatar
-                [displayName]="u.displayName"
-                [avatarEmoji]="u.avatarEmoji"
-                [accentColor]="u.accentColor"
-                size="lg"
-              />
-            </a>
-            <span>
-              Bon retour, <span class="text-amber-400/90 font-semibold">{{ u.displayName }}</span> — votre
-              table de jeu Dragons vous attend.
-            </span>
-          </span>
+          Bon retour, <span class="text-amber-400/90 font-semibold">{{ u.displayName }}</span> —
+          forgez, jouez, et consultez le guide communautaire.
         } @else {
-          Créez et gérez vos personnages pour le jeu de rôle Dragons.<br />
-          L'aventure commence ici !
+          Forgez un héros, lancez une campagne, et explorez le guide pour jouer sur Eana.
         }
       </p>
 
-      <div class="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center max-w-3xl">
+      <div
+        class="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center w-full max-w-lg animate-[fadeInDown_0.85s_ease-out]"
+      >
         <a
           routerLink="/create"
-          class="px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-amber-500 text-slate-950 shadow-md hover:bg-amber-400 hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
+          class="flex-1 min-h-12 px-6 py-3.5 rounded-xl text-sm font-black uppercase tracking-widest bg-amber-500 text-slate-950 shadow-md shadow-amber-900/30 hover:bg-amber-400 hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-2"
         >
-          <span><iconify-icon icon="fluent-emoji:sparkles"></iconify-icon></span> Forger une Légende
-        </a>
-        <a
-          routerLink="/characters"
-          class="px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-[#1b2028] text-slate-300 border border-slate-700 hover:border-emerald-500/50 hover:text-emerald-400 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
-        >
-          <span><iconify-icon icon="fluent-emoji:scroll"></iconify-icon></span> Mes Héros
-          @if (savedCharactersCount() > 0) {
-            <span
-              class="bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-900 text-[10px]"
-              >{{ savedCharactersCount() }}</span
-            >
-          }
-        </a>
-        <a
-          routerLink="/campaigns"
-          class="px-8 py-3.5 sm:py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-sky-950/30 text-sky-300 border border-sky-800/50 hover:border-sky-500/50 hover:text-sky-200 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
-        >
-          <span><iconify-icon icon="fluent-emoji:world-map"></iconify-icon></span> Campagnes
+          <span><iconify-icon icon="fluent-emoji:sparkles"></iconify-icon></span>
+          Forger une légende
         </a>
         @if (isLoggedIn()) {
           <a
             routerLink="/guide"
-            class="px-8 py-3.5 sm:py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-violet-950/30 text-violet-300 border border-violet-800/50 hover:border-violet-500/50 hover:text-violet-200 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
+            class="flex-1 min-h-12 px-6 py-3.5 rounded-xl text-sm font-black uppercase tracking-widest bg-violet-950/50 text-violet-200 border border-violet-500/40 hover:border-violet-400/60 hover:bg-violet-950/70 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-2"
           >
-            <span><iconify-icon icon="fluent-emoji:books"></iconify-icon></span> Guide
+            <span><iconify-icon icon="fluent-emoji:books"></iconify-icon></span>
+            Guide
             @if (guideNewsCount() > 0) {
-              <span class="bg-amber-500 text-slate-950 px-2 py-0.5 rounded-full text-[10px] font-black">{{ guideNewsCount() }}</span>
+              <span class="bg-amber-500 text-slate-950 px-2 py-0.5 rounded-full text-[10px] font-black">{{
+                guideNewsCount()
+              }}</span>
             }
           </a>
-        }
-        @if (!isLoggedIn()) {
+        } @else {
           <a
             routerLink="/login"
             [queryParams]="{ returnUrl: '/' }"
-            class="px-8 py-3.5 sm:py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-violet-950/30 text-violet-300 border border-violet-800/50 hover:border-violet-500/50 hover:text-violet-200 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-3"
+            class="flex-1 min-h-12 px-6 py-3.5 rounded-xl text-sm font-black uppercase tracking-widest bg-[#1b2028]/90 text-slate-200 border border-slate-600 hover:border-amber-500/40 hover:text-amber-200 shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-transform transition-colors duration-200 flex items-center justify-center gap-2"
           >
-            <span><iconify-icon icon="fluent-emoji:locked"></iconify-icon></span> Se connecter
+            <span><iconify-icon icon="fluent-emoji:locked"></iconify-icon></span>
+            Se connecter
           </a>
         }
       </div>
-
-      @if (isLoggedIn()) {
-        <div class="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-slate-500">
-          <a routerLink="/story/create" class="hover:text-violet-300 transition-colors">Nouveau scénario</a>
-          <span aria-hidden="true">·</span>
-          <a routerLink="/friends" class="hover:text-violet-300 transition-colors">Amis</a>
-          <span aria-hidden="true">·</span>
-          <a routerLink="/profile" class="hover:text-violet-300 transition-colors">Profil</a>
-        </div>
-      } @else {
-        <div class="mt-4">
-          <a
-            routerLink="/story/create"
-            class="text-xs text-slate-500 hover:text-violet-300 transition-colors"
-          >
-            Ou créer un scénario →
-          </a>
-        </div>
-      }
     </div>
 
     <button
@@ -205,15 +171,45 @@
       class="relative z-10 pb-8 sm:pb-10 flex flex-col items-center gap-2 opacity-50 hover:opacity-100 cursor-pointer text-amber-500 transition-opacity duration-200 focus:outline-none shrink-0"
     >
       <span class="text-[9px] font-black uppercase tracking-widest">Découvrir</span>
-      <span class="text-xl">↓</span>
+      <span class="text-xl animate-bounce">↓</span>
     </button>
   </section>
+
+  @if (isLoggedIn()) {
+    <section class="w-full px-4 py-5 border-b border-slate-800/80 bg-[#171b22]/60">
+      <div class="max-w-3xl mx-auto flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-slate-500">
+        <a routerLink="/characters" class="hover:text-emerald-300 transition-colors"
+          >Mes héros
+          @if (savedCharactersCount() > 0) {
+            <span class="text-emerald-400/80">({{ savedCharactersCount() }})</span>
+          }
+        </a>
+        <span aria-hidden="true">·</span>
+        <a routerLink="/campaigns" class="hover:text-sky-300 transition-colors">Campagnes</a>
+        <span aria-hidden="true">·</span>
+        <a routerLink="/story/create" class="hover:text-violet-300 transition-colors">Nouveau scénario</a>
+        <span aria-hidden="true">·</span>
+        <a routerLink="/friends" class="hover:text-violet-300 transition-colors">Amis</a>
+        <span aria-hidden="true">·</span>
+        <a routerLink="/profile" class="hover:text-amber-300 transition-colors inline-flex items-center gap-1.5">
+          @if (user(); as u) {
+            <app-profile-avatar
+              [displayName]="u.displayName"
+              [avatarEmoji]="u.avatarEmoji"
+              [accentColor]="u.accentColor"
+              size="sm"
+            />
+          }
+          Profil
+        </a>
+      </div>
+    </section>
+  }
 
   @if (isLoggedIn() && guideNewsCount() > 0) {
     <section class="w-full px-4 py-6">
       <a
-        routerLink="/guide"
-        fragment="journal"
+        routerLink="/guide/journal"
         class="max-w-2xl mx-auto block rounded-xl border border-amber-500/30 bg-amber-950/20 px-5 py-4 text-left hover:border-amber-500/50 transition-colors"
       >
         <p class="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-1">Nouveautés guide</p>
@@ -327,7 +323,7 @@
       <div class="h-px flex-grow bg-gradient-to-l from-transparent to-slate-700"></div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl">
       @for (feature of features; track feature.title) {
         <div
           class="perf-card bg-[#1b2028] p-8 rounded-2xl border border-slate-800 shadow-xl group hover:border-amber-500/50 transition-transform transition-colors duration-200 hover:-translate-y-1"
