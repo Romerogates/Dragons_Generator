@@ -48,13 +48,6 @@
       </p>
     }
 
-    @if (isDm()) {
-      <app-campaign-session-timeline
-        [session]="playSession"
-        (timelineChange)="onSessionTimelineChange($event)"
-      />
-    }
-
     @if (feedback(); as fb) {
       <div
         role="status"
@@ -77,13 +70,108 @@
       </div>
     }
 
-    @if (isDm() && sessionView() === 'hub') {
-      <section class="rounded-2xl border border-emerald-800/40 bg-emerald-950/20 p-5 space-y-4">
+    @if (isDm() && fullscreen()) {
+      <nav
+        class="sticky top-0 z-20 -mx-1 flex flex-wrap gap-1 rounded-xl border border-emerald-900/40 bg-[#141a16]/95 p-1 backdrop-blur-sm"
+        aria-label="Sections de la session"
+      >
+        @for (tab of sessionTabs; track tab.id) {
+          <button
+            type="button"
+            class="min-h-10 flex-1 px-2.5 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-colors"
+            [class.bg-emerald-900/50]="sessionView() === tab.id"
+            [class.text-emerald-200]="sessionView() === tab.id"
+            [class.text-slate-500]="sessionView() !== tab.id"
+            [attr.aria-current]="sessionView() === tab.id ? 'page' : null"
+            (click)="setSessionView(tab.id)"
+          >
+            {{ tab.label }}
+          </button>
+        }
+      </nav>
+    }
+
+    <!-- Dock compact : menu 3 actions -->
+    @if (isDm() && !fullscreen() && sessionView() === 'resume') {
+      <section class="rounded-2xl border border-emerald-800/40 bg-emerald-950/20 p-4 space-y-3">
         <div>
           <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-1">À la table</p>
-          <h3 class="text-lg font-serif text-emerald-100">Que voulez-vous faire ?</h3>
+          <h3 class="text-base font-serif text-emerald-100">Que voulez-vous faire ?</h3>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div class="grid grid-cols-1 gap-2">
+          <button
+            type="button"
+            class="min-h-14 px-4 py-3 rounded-xl text-left border border-amber-700/50 bg-amber-950/30 hover:border-amber-500/60 flex flex-col gap-0.5"
+            (click)="enterCombatFlow()"
+          >
+            <span class="block text-[10px] font-black uppercase tracking-widest text-amber-300">Combattre</span>
+            <span class="text-xs text-slate-400 truncate">
+              @if (activeCombat()) {
+                Reprendre le combat
+              } @else {
+                Alliés → init → tours
+              }
+            </span>
+          </button>
+          <button
+            type="button"
+            class="min-h-14 px-4 py-3 rounded-xl text-left border border-slate-700 bg-[#1b2028]/80 hover:border-slate-500 flex flex-col gap-0.5"
+            (click)="openSessionNotes()"
+          >
+            <span class="block text-[10px] font-black uppercase tracking-widest text-slate-300">Notes / scène</span>
+            <span class="text-xs text-slate-500 truncate">Écrire ce qui se passe</span>
+          </button>
+          <button
+            type="button"
+            class="min-h-14 px-4 py-3 rounded-xl text-left border border-violet-800/50 bg-violet-950/20 hover:border-violet-600/50 flex flex-col gap-0.5"
+            (click)="openSessionEncounters()"
+          >
+            <span class="block text-[10px] font-black uppercase tracking-widest text-violet-300">Rencontres</span>
+            <span class="text-xs text-slate-500 truncate">Lancer un groupe préparé</span>
+          </button>
+        </div>
+        <div>
+          <button
+            type="button"
+            class="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-2 hover:text-emerald-300"
+            (click)="openSessionNotes()"
+          >
+            Notes en direct →
+          </button>
+          <textarea
+            rows="3"
+            placeholder="Aperçu rapide… (ouvrir Notes pour stylet)"
+            class="w-full bg-[#171b22] border border-emerald-900/40 rounded-xl p-3 text-sm text-slate-300"
+            [ngModel]="playSession.playNotes ?? ''"
+            (ngModelChange)="updateSession(playSession.id, { playNotes: $event || undefined })"
+          ></textarea>
+        </div>
+      </section>
+    }
+
+    @if (isDm() && !fullscreen() && sessionView() !== 'resume') {
+      <button
+        type="button"
+        class="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-300"
+        (click)="backToSessionHub()"
+      >
+        ← Menu de session
+      </button>
+    }
+
+    <!-- Résumé plein écran -->
+    @if (isDm() && fullscreen() && sessionView() === 'resume') {
+      <section class="space-y-4">
+        <div class="rounded-2xl border border-emerald-800/40 bg-emerald-950/20 p-5 space-y-3">
+          <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400">État de la table</p>
+          <p class="text-sm text-slate-300">
+            Mode {{ sessionModeLabel(playSession.mode) }}
+            · {{ formatSessionDate(playSession.scheduledAt) }}
+          </p>
+          <p class="text-xs text-slate-500">{{ sessionModeHint(playSession.mode) }}</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <button
             type="button"
             class="min-h-14 px-4 py-3 rounded-xl text-left border border-amber-700/50 bg-amber-950/30 hover:border-amber-500/60"
@@ -91,8 +179,8 @@
           >
             <span class="block text-[10px] font-black uppercase tracking-widest text-amber-300">Combattre</span>
             <span class="text-xs text-slate-400">
-              @if (activeCombat()) {
-                Reprendre le combat en cours
+              @if (activeCombat(); as cb) {
+                Reprendre · manche {{ cb.round }} · {{ cb.label || 'Combat' }}
               } @else {
                 Alliés → initiative → tours
               }
@@ -103,8 +191,8 @@
             class="min-h-14 px-4 py-3 rounded-xl text-left border border-slate-700 bg-[#1b2028]/80 hover:border-slate-500"
             (click)="openSessionNotes()"
           >
-            <span class="block text-[10px] font-black uppercase tracking-widest text-slate-300">Notes / scène</span>
-            <span class="text-xs text-slate-500">Écrire ce qui se passe</span>
+            <span class="block text-[10px] font-black uppercase tracking-widest text-slate-300">Notes</span>
+            <span class="text-xs text-slate-500">Carnet de session (texte / stylet)</span>
           </button>
           <button
             type="button"
@@ -112,53 +200,164 @@
             (click)="openSessionEncounters()"
           >
             <span class="block text-[10px] font-black uppercase tracking-widest text-violet-300">Rencontres</span>
-            <span class="text-xs text-slate-500">Lancer un groupe préparé</span>
+            <span class="text-xs text-slate-500">
+              {{ c.data.encounters.length }} préparée{{ c.data.encounters.length > 1 ? 's' : '' }}
+            </span>
+          </button>
+          <button
+            type="button"
+            class="min-h-14 px-4 py-3 rounded-xl text-left border border-sky-800/50 bg-sky-950/20 hover:border-sky-600/50"
+            (click)="openSessionDungeon()"
+          >
+            <span class="block text-[10px] font-black uppercase tracking-widest text-sky-300">Donjon</span>
+            <span class="text-xs text-slate-500">
+              @if (activeSessionMap(); as map) {
+                {{ map.name }}
+              } @else {
+                Aucun donjon attribué
+              }
+            </span>
           </button>
         </div>
+
+        @if (sessionCombatHistory().length) {
+          <button
+            type="button"
+            class="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-300"
+            (click)="openSessionHistory()"
+          >
+            Voir l’historique →
+          </button>
+        }
       </section>
     }
 
-    @if (isDm() && sessionView() !== 'hub') {
-      <button
-        type="button"
-        class="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-300"
-        (click)="backToSessionHub()"
-      >
-        ← Menu de session
-      </button>
+    @if (isDm() && sessionView() === 'notes') {
+      <app-campaign-notebook
+        [page]="sessionNotebookPage()"
+        [pages]="null"
+        [showPageList]="false"
+        [compact]="!fullscreen()"
+        (pageChange)="onSessionNotebookChange($event)"
+      />
     }
 
-    @if (isDm() && (sessionView() === 'notes' || sessionView() === 'hub')) {
-      <div [class.opacity-90]="sessionView() === 'hub'">
-        @if (sessionView() === 'hub') {
-          <button
-            type="button"
-            class="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-2 hover:text-emerald-300"
-            (click)="openSessionNotes()"
-          >
-            Notes en direct →
-          </button>
-          <textarea
-            [rows]="fullscreen() ? 4 : 3"
-            placeholder="Aperçu rapide… (ouvrir Notes pour stylet)"
-            class="w-full bg-[#171b22] border border-emerald-900/40 rounded-xl p-3 text-sm text-slate-300"
-            [ngModel]="playSession.playNotes ?? ''"
-            (ngModelChange)="updateSession(playSession.id, { playNotes: $event || undefined })"
-          ></textarea>
-        } @else {
-          <app-campaign-notebook
-            [page]="sessionNotebookPage()"
-            [pages]="null"
-            [showPageList]="false"
-            [compact]="!fullscreen()"
-            (pageChange)="onSessionNotebookChange($event)"
+    @if (isDm() && sessionView() === 'dungeon') {
+      <section class="space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-sky-400 mb-1">Donjon de session</p>
+            <h3 class="text-lg font-serif text-sky-100">
+              @if (activeSessionMap(); as map) {
+                {{ map.name }}
+              } @else {
+                Aucun donjon attribué
+              }
+            </h3>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              class="min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase border border-sky-800/50 text-sky-300"
+              (click)="dungeonPickerOpen.set(!dungeonPickerOpen())"
+            >
+              @if (activeSessionMap()) {
+                Changer
+              } @else {
+                Attribuer
+              }
+            </button>
+            @if (activeSessionMap()) {
+              <button
+                type="button"
+                class="min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400"
+                (click)="assignSessionMap(null)"
+              >
+                Retirer
+              </button>
+            }
+          </div>
+        </div>
+
+        @if (dungeonPickerOpen() || !activeSessionMap()) {
+          @if (campaignDungeonMaps().length) {
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              @for (map of campaignDungeonMaps(); track map.id) {
+                <button
+                  type="button"
+                  class="min-h-12 px-4 py-3 rounded-xl text-left border hover:border-sky-600/50"
+                  [class.border-sky-600]="playSession.activeMapId === map.id"
+                  [class.bg-sky-950/30]="playSession.activeMapId === map.id"
+                  [class.border-slate-700]="playSession.activeMapId !== map.id"
+                  [class.bg-[#1b2028]/80]="playSession.activeMapId !== map.id"
+                  (click)="assignSessionMap(map.id)"
+                >
+                  <span class="block font-serif text-slate-200">{{ map.name }}</span>
+                  <span class="text-[10px] text-slate-500 uppercase tracking-widest">
+                    {{ map.gridWidth }}×{{ map.gridHeight }}
+                  </span>
+                </button>
+              }
+            </div>
+          } @else {
+            <div class="rounded-2xl border border-dashed border-sky-900/50 bg-sky-950/15 p-6 text-center space-y-2">
+              <p class="text-sm text-slate-300">Aucun donjon dans cette campagne.</p>
+              <p class="text-xs text-slate-500">
+                Créez-en un dans Préparation → Donjons, puis revenez ici pour l’attribuer.
+              </p>
+              <a
+                [routerLink]="['/campaigns', c.id]"
+                [queryParams]="{ tab: 'maps' }"
+                class="inline-flex min-h-11 items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-sky-800/50 text-sky-300"
+              >
+                Ouvrir Préparation → Donjons
+              </a>
+            </div>
+          }
+        }
+
+        @if (activeSessionMap(); as map) {
+          <app-campaign-dungeon-maps
+            [campaign]="c"
+            [focusMapId]="map.id"
+            (dataChange)="onDungeonMapsDataChange($event)"
           />
         }
-      </div>
+      </section>
+    }
+
+    @if (isDm() && sessionView() === 'history') {
+      <section class="space-y-5">
+        <app-campaign-session-timeline
+          [session]="playSession"
+          (timelineChange)="onSessionTimelineChange($event)"
+        />
+        @if (sessionCombatHistory().length) {
+          <div class="space-y-3">
+            <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+              Historique des combats
+            </h3>
+            @for (entry of sessionCombatHistory(); track entry.id + entry.endedAt) {
+              <details class="bg-[#1b2028]/80 border border-slate-800 rounded-xl overflow-hidden group">
+                <summary class="cursor-pointer px-4 py-3 flex flex-wrap items-center justify-between gap-2 hover:bg-slate-800/30">
+                  <span class="font-serif text-slate-200">
+                    {{ entry.label || 'Combat' }}
+                    <span class="text-slate-500 text-sm font-sans">· manche {{ entry.round }}</span>
+                  </span>
+                  <time class="text-[10px] text-slate-500">{{ formatCombatHistoryDate(entry.endedAt) }}</time>
+                </summary>
+                <pre class="px-4 pb-4 text-xs text-slate-400 whitespace-pre-wrap leading-relaxed border-t border-slate-800/80 pt-3">{{ entry.summary }}</pre>
+              </details>
+            }
+          </div>
+        } @else {
+          <p class="text-sm text-slate-500 italic">Aucun combat terminé pour l’instant.</p>
+        }
+      </section>
     }
 
     <!-- Combat face-à-face -->
-    @if (!isDm() || sessionView() === 'combat' || (sessionView() === 'hub' && activeCombat())) {
+    @if (!isDm() || sessionView() === 'combat') {
     <section class="space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-400">
@@ -1298,108 +1497,90 @@
     </section>
     }
 
-    @if (sessionCombatHistory().length && (sessionView() === 'combat' || sessionView() === 'hub')) {
-      <section class="space-y-3">
-        <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-500">
-          Historique des combats
-        </h3>
-        @for (entry of sessionCombatHistory(); track entry.id + entry.endedAt) {
-          <details class="bg-[#1b2028]/80 border border-slate-800 rounded-xl overflow-hidden group">
-            <summary class="cursor-pointer px-4 py-3 flex flex-wrap items-center justify-between gap-2 hover:bg-slate-800/30">
-              <span class="font-serif text-slate-200">
-                {{ entry.label || 'Combat' }}
-                <span class="text-slate-500 text-sm font-sans">· manche {{ entry.round }}</span>
-              </span>
-              <time class="text-[10px] text-slate-500">{{ formatCombatHistoryDate(entry.endedAt) }}</time>
-            </summary>
-            <pre class="px-4 pb-4 text-xs text-slate-400 whitespace-pre-wrap leading-relaxed border-t border-slate-800/80 pt-3">{{ entry.summary }}</pre>
-          </details>
-        }
-      </section>
-    }
-
-    @if (c.data.encounters.length && (sessionView() === 'encounters' || sessionView() === 'combat' || sessionView() === 'hub')) {
+    @if (isDm() && sessionView() === 'encounters') {
       <div class="space-y-4">
         <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-400">Rencontres</h3>
-        @for (enc of c.data.encounters; track enc.id) {
-          <article
-            class="bg-[#1b2028]/80 border border-slate-800 rounded-xl p-4"
-            [class.md:p-5]="fullscreen()"
-          >
-            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-              <h4 [class]="fullscreen() ? 'text-lg font-serif text-violet-300' : 'font-serif text-violet-300'">
-                {{ enc.name }}
-              </h4>
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">
-                  {{ encounterTotalXp(enc) }} XP · {{ encounterPendingXp(enc) }} restants
-                </span>
-                <button
-                  type="button"
-                  class="px-3 py-1 rounded-lg text-[9px] font-black uppercase bg-amber-950/30 border border-amber-800/40 text-amber-300 disabled:opacity-50"
-                  [disabled]="importingParty()"
-                  (click)="addEncounterToCombat(enc); sessionView.set('combat')"
-                >
-                  @if (importingParty()) {
-                    Chargement…
-                  } @else if (activeCombat()) {
-                    + Au combat
-                  } @else {
-                    Lancer le combat
-                  }
-                </button>
-              </div>
-            </div>
-            @for (cr of enc.creatures; track $index) {
-              <div class="flex flex-wrap items-center justify-between gap-2 py-2 border-b border-slate-800/50 last:border-0">
-                <span [class]="fullscreen() ? 'text-base text-slate-200' : 'text-sm text-slate-300'">
-                  {{ cr.customName || cr.creatureName }}
-                  @if (cr.quantity > 1) {
-                    <span class="text-slate-500">×{{ cr.quantity }}</span>
-                  }
-                </span>
-                <div class="flex items-center gap-2">
-                  <span class="text-xs text-slate-500">{{ cr.defeated }}/{{ cr.quantity }}</span>
-                  @if (cr.defeated > 0) {
-                    <button
-                      type="button"
-                      class="px-2 py-1 rounded text-[9px] font-black uppercase border border-slate-700 text-slate-400"
-                      (click)="undoDefeated(enc.id, $index)"
-                    >
-                      −1
-                    </button>
-                  }
-                  @if (cr.defeated < cr.quantity) {
-                    <button
-                      type="button"
-                      class="px-2 py-1 rounded text-[9px] font-black uppercase bg-red-950/30 border border-red-900/40 text-red-300"
-                      (click)="markDefeated(enc.id, $index)"
-                    >
-                      +1 kill
-                    </button>
-                  }
+        @if (c.data.encounters.length) {
+          @for (enc of c.data.encounters; track enc.id) {
+            <article
+              class="bg-[#1b2028]/80 border border-slate-800 rounded-xl p-4"
+              [class.md:p-5]="fullscreen()"
+            >
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <h4 [class]="fullscreen() ? 'text-lg font-serif text-violet-300' : 'font-serif text-violet-300'">
+                  {{ enc.name }}
+                </h4>
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                    {{ encounterTotalXp(enc) }} XP · {{ encounterPendingXp(enc) }} restants
+                  </span>
+                  <button
+                    type="button"
+                    class="px-3 py-1 rounded-lg text-[9px] font-black uppercase bg-amber-950/30 border border-amber-800/40 text-amber-300 disabled:opacity-50"
+                    [disabled]="importingParty()"
+                    (click)="addEncounterToCombat(enc); sessionView.set('combat')"
+                  >
+                    @if (importingParty()) {
+                      Chargement…
+                    } @else if (activeCombat()) {
+                      + Au combat
+                    } @else {
+                      Lancer le combat
+                    }
+                  </button>
                 </div>
               </div>
-            }
-            @if (encounterTotalXp(enc) > 0 && !enc.xpAwarded) {
-              <button
-                type="button"
-                class="mt-3 w-full py-2 rounded-lg text-[10px] font-black uppercase bg-emerald-950/30 border border-emerald-800/40 text-emerald-300 disabled:opacity-50"
-                [disabled]="awardingXpId() === enc.id"
-                (click)="distributeEncounterXp(enc)"
-              >
-                @if (awardingXpId() === enc.id) {
-                  Distribution…
-                } @else {
-                  Distribuer {{ encounterTotalXp(enc) }} XP
-                }
-              </button>
-            }
-          </article>
+              @for (cr of enc.creatures; track $index) {
+                <div class="flex flex-wrap items-center justify-between gap-2 py-2 border-b border-slate-800/50 last:border-0">
+                  <span [class]="fullscreen() ? 'text-base text-slate-200' : 'text-sm text-slate-300'">
+                    {{ cr.customName || cr.creatureName }}
+                    @if (cr.quantity > 1) {
+                      <span class="text-slate-500">×{{ cr.quantity }}</span>
+                    }
+                  </span>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs text-slate-500">{{ cr.defeated }}/{{ cr.quantity }}</span>
+                    @if (cr.defeated > 0) {
+                      <button
+                        type="button"
+                        class="px-2 py-1 rounded text-[9px] font-black uppercase border border-slate-700 text-slate-400"
+                        (click)="undoDefeated(enc.id, $index)"
+                      >
+                        −1
+                      </button>
+                    }
+                    @if (cr.defeated < cr.quantity) {
+                      <button
+                        type="button"
+                        class="px-2 py-1 rounded text-[9px] font-black uppercase bg-red-950/30 border border-red-900/40 text-red-300"
+                        (click)="markDefeated(enc.id, $index)"
+                      >
+                        +1 kill
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+              @if (encounterTotalXp(enc) > 0 && !enc.xpAwarded) {
+                <button
+                  type="button"
+                  class="mt-3 w-full py-2 rounded-lg text-[10px] font-black uppercase bg-emerald-950/30 border border-emerald-800/40 text-emerald-300 disabled:opacity-50"
+                  [disabled]="awardingXpId() === enc.id"
+                  (click)="distributeEncounterXp(enc)"
+                >
+                  @if (awardingXpId() === enc.id) {
+                    Distribution…
+                  } @else {
+                    Distribuer {{ encounterTotalXp(enc) }} XP
+                  }
+                </button>
+              }
+            </article>
+          }
+        } @else {
+          <p class="text-sm text-slate-500 italic">Aucune rencontre — générez-en depuis Préparation → Rencontres.</p>
         }
       </div>
-    } @else {
-      <p class="text-sm text-slate-500 italic">Aucune rencontre — générez-en depuis l’onglet Rencontres & XP.</p>
     }
   </div>
 } @else if (nextPlannedSession(); as nextSession) {

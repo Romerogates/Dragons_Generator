@@ -82,9 +82,18 @@ import {
 } from '../campaign-detail/campaign-session.util';
 import { CampaignSessionTimeline } from '../campaign-session-timeline/campaign-session-timeline';
 import { CampaignNotebook } from '../campaign-notebook/campaign-notebook';
+import { CampaignDungeonMaps } from '../campaign-dungeon-maps/campaign-dungeon-maps';
 import { DiceRollComponent } from '@shared/components/dice-roll/dice-roll';
 import type { NotebookPage } from '@core/models/Campaign/campaign';
 import { sessionNotebookFromPlay } from '@core/utils/notebook.util';
+
+export type PlaySessionView =
+  | 'resume'
+  | 'notes'
+  | 'combat'
+  | 'encounters'
+  | 'dungeon'
+  | 'history';
 
 @Component({
   selector: 'app-campaign-play-panel',
@@ -95,6 +104,7 @@ import { sessionNotebookFromPlay } from '@core/utils/notebook.util';
     RouterLink,
     CampaignSessionTimeline,
     CampaignNotebook,
+    CampaignDungeonMaps,
     DiceRollComponent,
   ],
   templateUrl: './campaign-play-panel.html',
@@ -121,13 +131,22 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly hpAdjustAmount = signal(5);
   readonly pendingInitCombatantId = signal<string | null>(null);
 
-  /** Hub de session : menu « que faire ». */
-  readonly sessionView = signal<'hub' | 'combat' | 'notes' | 'encounters'>('hub');
+  /** Vues exclusives de la table (plein écran = onglets ; dock = résumé compact). */
+  readonly sessionView = signal<PlaySessionView>('resume');
+  readonly sessionTabs: { id: PlaySessionView; label: string }[] = [
+    { id: 'resume', label: 'Résumé' },
+    { id: 'notes', label: 'Notes' },
+    { id: 'combat', label: 'Combat' },
+    { id: 'encounters', label: 'Rencontres' },
+    { id: 'dungeon', label: 'Donjon' },
+    { id: 'history', label: 'Historique' },
+  ];
   /** Sous-étapes du tour Pokémon. */
   readonly fightStep = signal<'menu' | 'pickAttack' | 'pickTarget' | 'toHit' | 'damage'>('menu');
   readonly pendingHitTotal = signal<number | null>(null);
   readonly pendingDamageDice = signal<string | null>(null);
   readonly advancedToolsOpen = signal(false);
+  readonly dungeonPickerOpen = signal(false);
 
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
   private initiativePollTimer: ReturnType<typeof setInterval> | null = null;
@@ -186,6 +205,14 @@ export class CampaignPlayPanel implements OnDestroy {
     const session = this.activeSession();
     return [...(session?.combatHistory ?? [])].reverse();
   });
+
+  readonly activeSessionMap = computed(() => {
+    const mapId = this.activeSession()?.activeMapId;
+    if (!mapId) return null;
+    return (this.campaign().data.dungeonMaps ?? []).find((m) => m.id === mapId) ?? null;
+  });
+
+  readonly campaignDungeonMaps = computed(() => this.campaign().data.dungeonMaps ?? []);
 
   readonly combatLogLines = computed(() =>
     [...(this.activeSession()?.combatLog ?? [])].slice().reverse().slice(0, 12),
@@ -275,12 +302,13 @@ export class CampaignPlayPanel implements OnDestroy {
         }
         if (this.lastBoundSessionId === sessionId) return;
         this.lastBoundSessionId = sessionId;
-        this.sessionView.set('hub');
+        this.sessionView.set('resume');
         this.resetFightStep();
         this.allyPickerOpen.set(false);
         this.enemyPickerOpen.set(false);
         this.campaignAllyPickerOpen.set(false);
         this.advancedToolsOpen.set(false);
+        this.dungeonPickerOpen.set(false);
       });
     });
   }
@@ -382,7 +410,7 @@ export class CampaignPlayPanel implements OnDestroy {
   startPlaySession(sessionId: string): void {
     if (!this.isDm()) return;
     this.flushSessionSave();
-    this.sessionView.set('hub');
+    this.sessionView.set('resume');
     this.resetFightStep();
     this.saveData({ activeSessionId: sessionId });
   }
@@ -402,7 +430,7 @@ export class CampaignPlayPanel implements OnDestroy {
     if (!c.isOwner || !session) return;
     if (!confirm('Terminer la session en cours ? Les notes de jeu seront archivées.')) return;
     this.flushSessionSave();
-    this.sessionView.set('hub');
+    this.sessionView.set('resume');
     this.resetFightStep();
     const sessions = (c.data.sessions ?? []).map((s) => {
       if (s.id !== session.id) return s;
@@ -448,13 +476,42 @@ export class CampaignPlayPanel implements OnDestroy {
     this.resetFightStep();
   }
 
+  setSessionView(view: PlaySessionView): void {
+    this.sessionView.set(view);
+    if (view !== 'combat') this.resetFightStep();
+    if (view !== 'dungeon') this.dungeonPickerOpen.set(false);
+  }
+
   backToSessionHub(): void {
-    this.sessionView.set('hub');
+    this.sessionView.set('resume');
     this.resetFightStep();
+    this.dungeonPickerOpen.set(false);
   }
 
   openSessionNotes(): void {
     this.sessionView.set('notes');
+  }
+
+  openSessionEncounters(): void {
+    this.sessionView.set('encounters');
+  }
+
+  openSessionDungeon(): void {
+    this.sessionView.set('dungeon');
+  }
+
+  openSessionHistory(): void {
+    this.sessionView.set('history');
+  }
+
+  assignSessionMap(mapId: string | null): void {
+    if (!this.isDm() || !this.activeSession()) return;
+    this.patchSession({ activeMapId: mapId }, { immediate: true });
+    this.dungeonPickerOpen.set(false);
+  }
+
+  onDungeonMapsDataChange(patch: Partial<CampaignData>): void {
+    this.saveData(patch);
   }
 
   readonly sessionNotebookPage = computed(() => {
@@ -473,10 +530,6 @@ export class CampaignPlayPanel implements OnDestroy {
       playNotes: page.text ?? '',
       playNotebook: page,
     });
-  }
-
-  openSessionEncounters(): void {
-    this.sessionView.set('encounters');
   }
 
   continueToInitiativePhase(): void {
@@ -865,7 +918,7 @@ export class CampaignPlayPanel implements OnDestroy {
     const combatHistory = [...(session.combatHistory ?? []), entry];
     this.patchSession({ activeCombat: null, playNotes, combatHistory }, { immediate: true });
     this.resetFightStep();
-    this.sessionView.set('hub');
+    this.sessionView.set('resume');
     this.setFeedback('ok', 'Combat terminé — résumé ajouté aux notes et à l’historique.');
   }
 

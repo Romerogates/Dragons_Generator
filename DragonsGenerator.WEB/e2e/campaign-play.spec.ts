@@ -18,6 +18,7 @@ test.describe('Mode table MJ', () => {
     await page.getByRole('button', { name: 'Entrer en session' }).click();
 
     await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('navigation', { name: 'Sections de la session' })).toBeVisible();
     await page.getByRole('button', { name: 'Combattre' }).click();
 
     await page.getByRole('button', { name: '+ Allié PNJ' }).click();
@@ -27,10 +28,11 @@ test.describe('Mode table MJ', () => {
     await expect(page.getByText(/Collecte ouverte/i)).toBeVisible({ timeout: 15_000 });
 
     await page.getByRole('button', { name: 'Fin combat' }).first().click();
-    await expect(page.getByRole('heading', { name: 'Que voulez-vous faire ?' })).toBeVisible({
+    await expect(page.getByRole('navigation', { name: 'Sections de la session' }).getByRole('button', { name: 'Résumé' })).toBeVisible({
       timeout: 15_000,
     });
     await expect(page.getByRole('button', { name: 'Combattre' })).toBeVisible();
+    await expect(page.getByRole('navigation', { name: 'Sections de la session' }).getByRole('button', { name: 'Donjon' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Terminer la session' }).click();
     await expect(page).toHaveURL(new RegExp(`/campaigns/${campaignId}$`), { timeout: 20_000 });

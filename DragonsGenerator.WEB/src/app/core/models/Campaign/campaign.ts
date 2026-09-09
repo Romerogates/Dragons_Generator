@@ -150,6 +150,8 @@ export interface CampaignSession {
   timeline?: SessionTimelineItem[];
   /** Journal court des actions de combat (MJ / table). */
   combatLog?: string[];
+  /** Donjon de campagne consulté pendant cette session (id dans data.dungeonMaps). */
+  activeMapId?: string | null;
 }
 
 export interface CombatHistoryEntry {
