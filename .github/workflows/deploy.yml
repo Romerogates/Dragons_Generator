@@ -93,6 +93,11 @@ jobs:
           E2E_BASE_URL: http://localhost:8081
         run: |
           npm ci
+          # ubuntu-latest ships Google Chrome apt sources that flake with
+          # "Hash Sum mismatch" during `playwright install --with-deps`.
+          # Playwright bundles its own Chromium; that repo is unused.
+          sudo rm -f /etc/apt/sources.list.d/google-chrome*.list \
+            /etc/apt/sources.list.d/google-chrome*.sources 2>/dev/null || true
           npx playwright install --with-deps chromium
           npm run e2e:ci
 
