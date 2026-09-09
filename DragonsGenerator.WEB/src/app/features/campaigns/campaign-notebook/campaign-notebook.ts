@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
@@ -30,7 +29,7 @@ import { DataService } from '@core/services/data.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class CampaignNotebook implements AfterViewInit, OnDestroy {
+export class CampaignNotebook implements OnDestroy {
   private readonly data = inject(DataService);
   /** Liste de pages (carnet campagne). Si null, mode page unique (session). */
   readonly pages = input<NotebookPage[] | null>(null);
@@ -84,10 +83,6 @@ export class CampaignNotebook implements AfterViewInit, OnDestroy {
         this.paintPage();
       });
     });
-  }
-
-  ngAfterViewInit(): void {
-    /* canvas monté seulement en overlay */
   }
 
   ngOnDestroy(): void {

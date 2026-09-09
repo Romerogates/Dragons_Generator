@@ -1,9 +1,30 @@
 import {
+  archivePlayPadsText,
+  ensureSessionPlayPads,
+  ensureSessionResume,
+  exportInkDataUrl,
   redrawInkStrokes,
   seedNotebookFromLegacyNotes,
   sessionNotebookFromPlay,
+  syncLegacyPlayNotesFromPads,
 } from './notebook.util';
-import { createNotebookPage } from '@core/models/Campaign/campaign';
+import {
+  CampaignSession,
+  createChecklistItem,
+  createNotebookPage,
+  createSessionPlayPad,
+  SessionPlayPad,
+} from '@core/models/Campaign/campaign';
+
+function session(partial: Partial<CampaignSession> = {}): CampaignSession {
+  return {
+    id: 's1',
+    title: 'Soirée 1',
+    scheduledAt: new Date().toISOString(),
+    status: 'planned',
+    ...partial,
+  };
+}
 
 describe('notebook.util', () => {
   it('seeds a text page from legacy notes', () => {
@@ -34,6 +55,86 @@ describe('notebook.util', () => {
     expect(page.text).toBe('from notebook');
   });
 
+  it('ensureSessionResume keeps title or defaults', () => {
+    expect(ensureSessionResume(null).title).toBe('Résumé');
+    expect(ensureSessionResume(createNotebookPage('  ')).title).toBe('Résumé');
+    expect(ensureSessionResume(createNotebookPage('Arc')).title).toBe('Arc');
+  });
+
+  it('ensureSessionPlayPads migrates from playNotes', () => {
+    const pads = ensureSessionPlayPads(session({ playNotes: 'hello' }));
+    expect(pads.length).toBe(1);
+    expect(pads[0]!.kind).toBe('note');
+    expect(pads[0]!.page?.text).toBe('hello');
+  });
+
+  it('ensureSessionPlayPads normalizes existing pads order and titles', () => {
+    const padsIn: SessionPlayPad[] = [
+      {
+        id: 'b',
+        kind: 'checklist',
+        title: '  ',
+        order: 2,
+        items: [createChecklistItem('x')],
+      },
+      {
+        id: 'a',
+        kind: 'note',
+        title: '',
+        order: 0,
+        page: createNotebookPage('Page'),
+      },
+    ];
+    const pads = ensureSessionPlayPads(session({ playPads: padsIn }));
+    expect(pads.map((p) => p.id)).toEqual(['a', 'b']);
+    expect(pads[0]!.title).toBe('Page');
+    expect(pads[1]!.title).toBe('Liste');
+  });
+
+  it('createSessionPlayPad builds note and checklist', () => {
+    const note = createSessionPlayPad('note', 'N', 0);
+    const list = createSessionPlayPad('checklist', undefined, 1);
+    expect(note.kind).toBe('note');
+    expect(note.page?.title).toBe('N');
+    expect(list.kind).toBe('checklist');
+    expect(list.title).toBe('Liste');
+    expect(list.items?.length).toBe(1);
+  });
+
+  it('syncLegacyPlayNotesFromPads mirrors first note pad', () => {
+    const note = createSessionPlayPad('note', 'Main', 0);
+    note.page = { ...note.page!, text: 'body' };
+    const list = createSessionPlayPad('checklist', 'Todo', 1);
+    const synced = syncLegacyPlayNotesFromPads([list, note]);
+    expect(synced.playNotes).toBe('body');
+    expect(synced.playNotebook?.title).toBe('Main');
+  });
+
+  it('syncLegacyPlayNotesFromPads handles no note pads', () => {
+    const synced = syncLegacyPlayNotesFromPads([createSessionPlayPad('checklist', 'L', 0)]);
+    expect(synced.playNotes).toBe('');
+    expect(synced.playNotebook).toBeUndefined();
+  });
+
+  it('archivePlayPadsText concatenates notes and checklists', () => {
+    const note = createSessionPlayPad('note', 'Scène', 0);
+    note.page = { ...note.page!, text: 'Les joueurs fuient' };
+    const list = createSessionPlayPad('checklist', 'Todo', 1);
+    list.items = [
+      { id: '1', text: 'Loot', done: true },
+      { id: '2', text: '  ', done: false },
+      { id: '3', text: 'PNJ', done: false },
+    ];
+    const empty = createSessionPlayPad('note', 'Vide', 2);
+    empty.page = { ...empty.page!, text: '   ' };
+    const text = archivePlayPadsText([empty, list, note]);
+    expect(text).toContain('## Scène');
+    expect(text).toContain('Les joueurs fuient');
+    expect(text).toContain('[x] Loot');
+    expect(text).toContain('[ ] PNJ');
+    expect(text).not.toContain('## Vide');
+  });
+
   it('draws a visible filled circle for a single-point stroke', () => {
     const canvas = document.createElement('canvas');
     canvas.width = 40;
@@ -43,5 +144,40 @@ describe('notebook.util', () => {
     const pixel = ctx.getImageData(20, 20, 1, 1).data;
     expect(pixel[0]).toBeGreaterThan(200);
     expect(pixel[3]).toBeGreaterThan(200);
+  });
+
+  it('redraws multi-point and highlighter strokes', () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 40;
+    canvas.height = 40;
+    const ctx = canvas.getContext('2d')!;
+    redrawInkStrokes(
+      ctx,
+      [
+        {
+          color: '#fbbf24',
+          width: 8,
+          tool: 'highlighter',
+          points: [
+            { x: 5, y: 5 },
+            { x: 20, y: 20 },
+          ],
+        },
+        { color: '#fff', width: 2, points: [] },
+      ],
+      true,
+    );
+    expect(ctx).toBeTruthy();
+  });
+
+  it('exportInkDataUrl returns a jpeg data url', () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 20;
+    canvas.height = 10;
+    const ctx = canvas.getContext('2d')!;
+    ctx.fillStyle = '#123456';
+    ctx.fillRect(0, 0, 20, 10);
+    const url = exportInkDataUrl(canvas, 8);
+    expect(url.startsWith('data:image/jpeg')).toBe(true);
   });
 });
