@@ -347,7 +347,25 @@
         <span class="text-[10px] uppercase text-sky-400 font-bold">Demande envoyée</span>
       }
       @case ('pending_received') {
-        <span class="text-[10px] uppercase text-amber-400 font-bold">Vous a demandé en ami</span>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-[10px] uppercase text-amber-400 font-bold">Vous a demandé en ami</span>
+          @if (incomingRequestId(u.id); as reqId) {
+            <button
+              type="button"
+              class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase text-emerald-300 border border-emerald-800/50"
+              (click)="accept(reqId)"
+            >
+              Accepter
+            </button>
+            <button
+              type="button"
+              class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase text-slate-400 border border-slate-700"
+              (click)="decline(reqId)"
+            >
+              Refuser
+            </button>
+          }
+        </div>
       }
       @default {
         <button type="button" class="px-4 py-2 rounded-lg text-[10px] font-black uppercase border border-violet-800/40 text-violet-300" (click)="sendRequest(u.id)">Ajouter</button>

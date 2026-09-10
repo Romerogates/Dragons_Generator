@@ -30,12 +30,29 @@
               <span class="text-[10px] font-black uppercase tracking-widest text-violet-500 animate-pulse">Sauvegarde...</span>
             }
             @if (syncNotice(); as notice) {
-              <span
-                class="max-w-xs text-[10px] font-semibold leading-snug"
-                [class.text-amber-300]="!notice.includes('XP reçue')"
-                [class.text-emerald-300]="notice.includes('XP reçue')"
-                data-testid="campaign-sync-notice"
-              >{{ notice }}</span>
+              <div class="flex flex-wrap items-center gap-2 max-w-md" data-testid="campaign-sync-notice">
+                <span
+                  class="text-[10px] font-semibold leading-snug"
+                  [class.text-amber-300]="!notice.includes('XP reçue')"
+                  [class.text-emerald-300]="notice.includes('XP reçue')"
+                >{{ notice }}</span>
+                @if (staleRemote()) {
+                  <button
+                    type="button"
+                    class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase bg-amber-700 text-white hover:bg-amber-600"
+                    (click)="applyStaleRemote()"
+                  >
+                    Recharger
+                  </button>
+                  <button
+                    type="button"
+                    class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase border border-slate-600 text-slate-400"
+                    (click)="dismissStaleRemote()"
+                  >
+                    Garder
+                  </button>
+                }
+              </div>
             }
             @if (!c.isOwner) {
               <button

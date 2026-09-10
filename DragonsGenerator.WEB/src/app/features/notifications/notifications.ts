@@ -23,6 +23,7 @@ const CAMPAIGN_KINDS: NotificationType[] = [
   'character_pick_requested',
   'proposal_rejected',
   'proposal_approved',
+  'xp_awarded',
 ];
 
 @Component({
@@ -111,6 +112,8 @@ export class NotificationsPage implements OnInit {
         return 'fluent-emoji:warning';
       case 'proposal_approved':
         return 'fluent-emoji:check-mark-button';
+      case 'xp_awarded':
+        return 'fluent-emoji:sparkles';
     }
   }
 

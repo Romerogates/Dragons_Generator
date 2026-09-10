@@ -10,6 +10,7 @@ export interface NotificationPreferences {
   campaignInvites: boolean;
   characterProposals: boolean;
   characterResults: boolean;
+  xpAwards: boolean;
   sessionReminders: boolean;
   handouts: boolean;
   initiative: boolean;
@@ -54,6 +55,12 @@ export const NOTIFICATION_PREF_OPTIONS: NotificationPrefOption[] = [
     group: 'campaign',
   },
   {
+    id: 'xpAwards',
+    label: 'XP reçue',
+    hint: 'Quand le MJ vous attribue de l’expérience.',
+    group: 'campaign',
+  },
+  {
     id: 'sessionReminders',
     label: 'Rappels de session',
     hint: 'Push 24 h et 1 h avant une session planifiée.',
@@ -79,6 +86,7 @@ const DEFAULT_PREFS: NotificationPreferences = {
   campaignInvites: true,
   characterProposals: true,
   characterResults: true,
+  xpAwards: true,
   sessionReminders: true,
   handouts: true,
   initiative: true,
@@ -109,6 +117,8 @@ export class NotificationPreferencesService {
       case 'proposal_rejected':
       case 'proposal_approved':
         return p.characterResults;
+      case 'xp_awarded':
+        return p.xpAwards;
     }
   }
 

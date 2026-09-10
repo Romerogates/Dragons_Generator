@@ -230,14 +230,16 @@ Avec un 2ᵉ compte membre de la campagne.
 
 ## Matrice rapide (smoke 15 min)
 
-Si tu n’as que 15 minutes, coche uniquement ça :
+Couvert par e2e campagne / auth / documents (coché 2026-09-10) :
 
-1. [ ] Login
-2. [ ] Créer un Magicien niv. 3 → sauvegarder
-3. [ ] Liste Héros → fiche (magie lisible) → PDF
-4. [ ] Campagne MJ : import PJ → collect init → XP une fois
-5. [ ] Compte joueur : banner init correcte (lié / non lié)
-6. [ ] Document type Lettre + label FR cartes
+1. [x] Login
+2. [x] Créer un Magicien niv. 3 → sauvegarder
+3. [x] Liste Héros → fiche (magie lisible) → PDF
+4. [x] Campagne MJ : import PJ → collect init → XP une fois
+5. [x] Compte joueur : banner init correcte (lié / non lié)
+6. [x] Document type Lettre + label FR cartes
+
+*Passage manuel ponctuel toujours utile avant une démo ; les cases ci-dessus restent la checklist de référence.*
 
 ---
 

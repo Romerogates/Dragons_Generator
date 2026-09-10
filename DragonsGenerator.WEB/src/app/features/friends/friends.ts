@@ -181,6 +181,8 @@ export class FriendsPage implements OnInit, OnDestroy {
       next: () => {
         this.message.set('Demande d’ami acceptée.');
         this.reload();
+        this.runSearch();
+        this.loadSuggestions();
       },
       error: () => this.message.set('Impossible d’accepter cette demande.'),
     });
@@ -191,9 +193,16 @@ export class FriendsPage implements OnInit, OnDestroy {
       next: () => {
         this.message.set('Demande refusée.');
         this.reload();
+        this.runSearch();
+        this.loadSuggestions();
       },
       error: () => this.message.set('Impossible de refuser cette demande.'),
     });
+  }
+
+  /** Id de demande entrante pour un user affiché sur Découvrir. */
+  incomingRequestId(userId: string): string | undefined {
+    return this.requests().find((r) => r.userId === userId)?.id;
   }
 
   cancelSent(id: string): void {

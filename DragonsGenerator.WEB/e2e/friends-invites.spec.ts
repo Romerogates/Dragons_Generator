@@ -81,4 +81,33 @@ test.describe('Amis & invitations campagne (UI)', () => {
     await aCtx.close();
     await bCtx.close();
   });
+
+  test('demande d’ami → accepter depuis Découvrir', async ({ browser }) => {
+    test.setTimeout(90_000);
+
+    const aCtx = await browser.newContext();
+    const bCtx = await browser.newContext();
+    const aPage = await aCtx.newPage();
+    const bPage = await bCtx.newPage();
+
+    const a = await loginSeedSession(aPage.request);
+    const b = await registerConfirmAndLogin(bPage.request, 'Disc');
+
+    const friendReq = await aPage.request.post('/api/me/friends/request', {
+      headers: bearer(a.token),
+      data: { userId: b.user.id },
+    });
+    expect(friendReq.ok(), await friendReq.text()).toBeTruthy();
+
+    await applyAuthSession(bPage, b, '/friends');
+    const search = bPage.locator('input').first();
+    await search.fill(a.user.displayName);
+    await bPage.waitForTimeout(800);
+    await expect(bPage.getByText(/Vous a demandé en ami/i).first()).toBeVisible({ timeout: 20_000 });
+    await bPage.getByRole('button', { name: 'Accepter' }).first().click();
+    await expect(bPage.getByText(/Demande d’ami acceptée/i)).toBeVisible({ timeout: 15_000 });
+
+    await aCtx.close();
+    await bCtx.close();
+  });
 });

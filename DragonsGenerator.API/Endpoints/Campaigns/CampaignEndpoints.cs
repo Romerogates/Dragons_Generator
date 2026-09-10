@@ -1060,7 +1060,7 @@ public class LeaveCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest
     }
 }
 
-public class AwardCampaignXpEndpoint(AppDbContext db) : Endpoint<AwardXpBody>
+public class AwardCampaignXpEndpoint(AppDbContext db, PushNotificationService push) : Endpoint<AwardXpBody>
 {
     public override void Configure() => Post("/me/campaigns/{id}/award-xp");
 
@@ -1098,6 +1098,7 @@ public class AwardCampaignXpEndpoint(AppDbContext db) : Endpoint<AwardXpBody>
         member.XpEarnedInCampaign += req.Xp;
         campaign.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
+        var message = $"+{req.Xp} XP dans « {campaign.Title} »";
         await CampaignActivityService.LogAsync(
             db,
             campaign.Id,
@@ -1106,11 +1107,18 @@ public class AwardCampaignXpEndpoint(AppDbContext db) : Endpoint<AwardXpBody>
             new
             {
                 memberId = member.Id,
+                memberUserId = member.UserId,
                 xp = req.Xp,
                 xpTotal = member.XpEarnedInCampaign,
                 displayName = member.User?.DisplayName ?? "Joueur",
                 message = $"+{req.Xp} XP",
             },
+            ct);
+        await push.NotifyUserAsync(
+            member.UserId,
+            "XP attribuée",
+            message,
+            $"/campaigns/{campaign.Id}",
             ct);
         await Send.OkAsync(new { member.XpEarnedInCampaign }, ct);
     }

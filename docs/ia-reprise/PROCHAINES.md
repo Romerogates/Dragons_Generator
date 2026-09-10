@@ -15,10 +15,11 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
-*(file vide — checklist §10 smoke manuel si besoin.)*
+*(file vide.)*
 
 ## Déjà livré (ne pas refaire)
 
+- **Polish cloche / amis / onglets** (2026-09-10) — Discover Accepter/Refuser ; notif `xp_awarded` + push + préférence ; conflit MJ = banner Recharger/Garder ; smoke §10 coché (e2e).
 - **XP joueur + amis e2e** (2026-09-10) — banner `+N XP reçue` (hub /play poll) ; activité `xp_awarded` loguée ; toasts amis accept/refus ; e2e UI amis/invites + XP visible joueur.
 - **Polish reste** (2026-09-10) — toasts jets init + `turnOrderIds` figé ; sync MJ au focus si `updatedAt` plus récent ; empty states pré-tirés / rencontres / session ; setup-guide vousvoiement ; confirmation jet joueur avec total.
 - **P2 live table** (2026-09-10) — édition combat repliée en fight (`Éditer combattants / roster`) ; face-à-face mobile (séparateur vs + bandeau tour sticky) ; fog live : carte de session active filtrée pour joueurs + canvas live + poll `/play` 4 s ; révélations fog persistées immédiatement.

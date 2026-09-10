@@ -235,6 +235,37 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
             );
         }
 
+        var xpActs = (await db.CampaignActivities.AsNoTracking()
+                .Where(a => a.Kind == CampaignActivityKinds.XpAwarded)
+                .ToListAsync(ct))
+            .Where(a => a.CreatedAt >= approvedSince && memberCampaignSet.Contains(a.CampaignId))
+            .OrderByDescending(a => a.CreatedAt)
+            .Take(100)
+            .ToList();
+
+        foreach (var act in xpActs)
+        {
+            if (!TryGetMemberUserId(act.PayloadJson, out var memberUserId) || memberUserId != userId)
+                continue;
+
+            var xpLabel = TryGetString(act.PayloadJson, "message") ?? "+XP";
+            var campaignTitle = await db.Campaigns.AsNoTracking()
+                .Where(c => c.Id == act.CampaignId)
+                .Select(c => c.Title)
+                .FirstOrDefaultAsync(ct) ?? "campagne";
+
+            items.Add(
+                new NotificationItemDto(
+                    $"xp-{act.Id}",
+                    "xp_awarded",
+                    "XP attribuée",
+                    $"{xpLabel} dans « {campaignTitle} ».",
+                    $"/campaigns/{act.CampaignId}",
+                    act.CreatedAt
+                )
+            );
+        }
+
         var acceptedFriendships = await db.Friendships.AsNoTracking()
             .Where(f =>
                 f.Status == FriendStatuses.Accepted

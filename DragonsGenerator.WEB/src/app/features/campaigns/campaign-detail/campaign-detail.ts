@@ -150,6 +150,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly error = signal<string | null>(null);
   /** Bannière sync multi-onglets MJ. */
   readonly syncNotice = signal<string | null>(null);
+  /** Version distante plus récente (MJ) — à appliquer manuellement. */
+  readonly staleRemote = signal<CampaignDetailModel | null>(null);
   readonly tab = signal<PrimaryTab>('overview');
   readonly prepSub = signal<PrepSub>('scenario');
   readonly campaign = signal<CampaignDetailModel | null>(null);
@@ -673,18 +675,22 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
           opts?.syncOwnerIfNewer &&
           this.isRemoteNewer(c.updatedAt, current.updatedAt)
         ) {
-          this.campaign.set(c);
-          this.sessionCache.cache(c.id, c.title, c.data);
+          this.staleRemote.set(c);
           this.syncNotice.set(
-            'Campagne rechargée — un autre onglet avait des changements plus récents.',
+            'Un autre onglet a une version plus récente de cette campagne.',
           );
-          window.setTimeout(() => this.syncNotice.set(null), 5_000);
         } else {
+          if (this.isRemoteNewer(c.updatedAt, current.updatedAt)) {
+            this.staleRemote.set(c);
+            this.syncNotice.set(
+              'Un autre onglet a une version plus récente de cette campagne.',
+            );
+          }
           this.campaign.set({
             ...current,
             title: c.title,
             members: c.members,
-            // Garder updatedAt local tant que data MJ n’est pas resync (focus).
+            // Garder updatedAt local tant que data MJ n’est pas resync.
             isOwner: c.isOwner,
             role: c.role,
           });
@@ -723,12 +729,31 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       next.members.find((m) => m.userId === userId && m.role === 'player')?.xpEarnedInCampaign ?? 0;
     const delta = after - before;
     if (delta <= 0) return;
+    this.staleRemote.set(null);
     this.syncNotice.set(`+${delta} XP reçue — total campagne ${after}`);
     window.setTimeout(() => {
       if (this.syncNotice()?.startsWith('+') && this.syncNotice()?.includes('XP reçue')) {
         this.syncNotice.set(null);
       }
     }, 6_000);
+  }
+
+  applyStaleRemote(): void {
+    const remote = this.staleRemote();
+    if (!remote) return;
+    this.campaign.set(remote);
+    this.sessionCache.cache(remote.id, remote.title, remote.data);
+    this.staleRemote.set(null);
+    this.syncNotice.set('Campagne rechargée depuis l’autre onglet.');
+    window.setTimeout(() => this.syncNotice.set(null), 4_000);
+    if (this.tab() === 'overview') this.loadActivity();
+  }
+
+  dismissStaleRemote(): void {
+    this.staleRemote.set(null);
+    if (this.syncNotice()?.includes('version plus récente')) {
+      this.syncNotice.set(null);
+    }
   }
 
   /** Poll plus fréquent pour les joueurs pendant une session / combat live. */
