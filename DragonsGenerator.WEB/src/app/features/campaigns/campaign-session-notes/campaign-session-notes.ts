@@ -25,7 +25,6 @@ import {
   archivePlayPadsText,
   ensureSessionPlayPads,
   ensureSessionResume,
-  syncLegacyPlayNotesFromPads,
 } from '@core/utils/notebook.util';
 import {
   PAD_DEFAULT_H,
@@ -74,8 +73,6 @@ export class CampaignSessionNotes {
   readonly resumeChange = output<NotebookPage>();
   readonly padsChange = output<{
     playPads: SessionPlayPad[];
-    playNotes: string;
-    playNotebook: NotebookPage | undefined;
   }>();
 
   private readonly boardRef = viewChild<ElementRef<HTMLElement>>('board');
@@ -353,11 +350,6 @@ export class CampaignSessionNotes {
       order: i,
       layout: clampLayout(p.layout ?? { x: 0, y: 0, w: PAD_DEFAULT_W, h: PAD_DEFAULT_H }),
     }));
-    const legacy = syncLegacyPlayNotesFromPads(normalized);
-    this.padsChange.emit({
-      playPads: normalized,
-      playNotes: legacy.playNotes,
-      playNotebook: legacy.playNotebook,
-    });
+    this.padsChange.emit({ playPads: normalized });
   }
 }

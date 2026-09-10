@@ -42,8 +42,17 @@ describe('CampaignNotebook', () => {
     component.onTitleChange('Nouveau');
     expect(spy.calls.mostRecent().args[0].title).toBe('Nouveau');
     component.onTextChange('corps');
-    // debounced — flush by calling again via open path
-    expect(spy).toHaveBeenCalled();
+    expect(spy.calls.count()).toBe(1);
+    component.flushPendingEmit();
+    expect(spy.calls.mostRecent().args[0].text).toBe('corps');
+  });
+
+  it('flushes pending text on destroy', () => {
+    const spy = jasmine.createSpy('page');
+    component.pageChange.subscribe(spy);
+    component.onTextChange('avant destroy');
+    fixture.destroy();
+    expect(spy.calls.mostRecent().args[0].text).toBe('avant destroy');
   });
 
   it('setPen tools update signals', () => {

@@ -63,8 +63,6 @@ describe('CampaignSessionNotes', () => {
       fixture.componentRef.setInput('session', {
         ...baseSession,
         playPads: payload.playPads,
-        playNotes: payload.playNotes,
-        playNotebook: payload.playNotebook,
       });
       fixture.detectChanges();
     });
@@ -79,6 +77,7 @@ describe('CampaignSessionNotes', () => {
     component.addNotePad();
     expect(spy.calls.mostRecent().args[0].playPads.length).toBe(2);
     expect(spy.calls.mostRecent().args[0].playPads[1].layout).toBeTruthy();
+    expect(spy.calls.mostRecent().args[0].playNotes).toBeUndefined();
 
     component.addChecklistPad();
     expect(spy.calls.mostRecent().args[0].playPads.length).toBe(3);
@@ -96,8 +95,6 @@ describe('CampaignSessionNotes', () => {
       fixture.componentRef.setInput('session', {
         ...baseSession,
         playPads: payload.playPads,
-        playNotes: payload.playNotes,
-        playNotebook: payload.playNotebook,
       });
       fixture.detectChanges();
     });

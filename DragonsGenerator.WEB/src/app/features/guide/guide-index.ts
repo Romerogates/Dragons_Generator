@@ -14,6 +14,8 @@ import type { GuideAudience } from './guide.types';
 import { GUIDE_NAV_GROUPS, GUIDE_QUICK_CARDS, GUIDE_START_STEPS } from './guide-content';
 import { GUIDE_TOPICS, guideTopicsByGroup } from './guide-topics';
 
+const FEATURED_TOPIC_IDS = ['demarrage', 'parcours', 'personnage', 'scenario', 'table', 'faq'] as const;
+
 @Component({
   selector: 'app-guide-index',
   standalone: true,
@@ -31,9 +33,14 @@ export class GuideIndexPage implements OnInit {
   readonly groups = GUIDE_NAV_GROUPS;
   readonly quickCards = GUIDE_QUICK_CARDS;
   readonly startSteps = GUIDE_START_STEPS;
-  readonly featured = GUIDE_TOPICS.filter((t) =>
-    ['demarrage', 'parcours', 'personnage', 'scenario', 'table', 'faq'].includes(t.id),
-  );
+
+  readonly featured = computed(() => {
+    const aud = this.audience();
+    return GUIDE_TOPICS.filter((t) => {
+      if (!(FEATURED_TOPIC_IDS as readonly string[]).includes(t.id)) return false;
+      return aud === 'all' || t.audience === 'all' || t.audience === aud;
+    });
+  });
 
   readonly sections = computed(() => guideTopicsByGroup(this.audience(), this.query(), 'all'));
   readonly searchEmpty = computed(

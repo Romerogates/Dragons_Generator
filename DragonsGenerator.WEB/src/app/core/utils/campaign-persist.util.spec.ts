@@ -27,6 +27,22 @@ function baseCampaign(overrides: Partial<CampaignDetail['data']> = {}): Campaign
           scheduledAt: '2026-01-01T20:00:00Z',
           status: 'planned',
           playNotes: 'brouillon MJ',
+          playPads: [
+            {
+              id: 'pad-1',
+              kind: 'note',
+              title: 'Notes',
+              order: 0,
+              page: {
+                id: 'nb-1',
+                title: 'Notes',
+                mode: 'text',
+                text: 'calepin local',
+                inkStrokes: [],
+                updatedAt: '2026-01-01T00:00:00Z',
+              },
+            },
+          ],
           activeCombat: {
             id: 'combat-1',
             label: 'Combat',
@@ -62,12 +78,13 @@ function baseCampaign(overrides: Partial<CampaignDetail['data']> = {}): Campaign
 }
 
 describe('mergeRemoteInitiativeRolls', () => {
-  it('keeps local play notes while merging player rolls', () => {
+  it('keeps local play pads while merging player rolls', () => {
     const local = baseCampaign();
     const remote = baseCampaign();
     remote.updatedAt = '2026-01-01T00:01:00Z';
     remote.data.notes = 'notes serveur périmées';
     remote.data.sessions![0].playNotes = 'notes serveur';
+    remote.data.sessions![0].playPads = [];
     remote.data.sessions![0].activeCombat!.combatants[0] = {
       id: 'p1',
       name: 'Héro',
@@ -80,7 +97,7 @@ describe('mergeRemoteInitiativeRolls', () => {
     const merged = mergeRemoteInitiativeRolls(local, remote);
 
     expect(merged.data.notes).toBe('notes locales');
-    expect(merged.data.sessions![0].playNotes).toBe('brouillon MJ');
+    expect(merged.data.sessions![0].playPads?.[0]?.page?.text).toBe('calepin local');
     expect(merged.data.sessions![0].activeCombat!.combatants[0].initiativeRoll).toBe(15);
     expect(merged.data.sessions![0].activeCombat!.combatants[0].playerSubmitted).toBe(true);
     expect(merged.updatedAt).toBe(remote.updatedAt);
@@ -100,8 +117,8 @@ describe('mergeRemoteInitiativeRolls', () => {
     expect(mergeRemoteInitiativeRolls(local, remoteNoCombat).updatedAt).toBe(
       remoteNoCombat.updatedAt,
     );
-    expect(mergeRemoteInitiativeRolls(local, remoteNoCombat).data.sessions![0].playNotes).toBe(
-      'brouillon MJ',
+    expect(mergeRemoteInitiativeRolls(local, remoteNoCombat).data.sessions![0].playPads?.[0]?.page?.text).toBe(
+      'calepin local',
     );
   });
 

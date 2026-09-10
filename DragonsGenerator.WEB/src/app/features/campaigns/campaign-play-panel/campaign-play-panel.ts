@@ -91,7 +91,6 @@ import {
   archivePlayPadsText,
   ensureSessionPlayPads,
   sessionPlayPadsPreview,
-  syncLegacyPlayNotesFromPads,
 } from '@core/utils/notebook.util';
 
 export type PlaySessionView =
@@ -154,12 +153,19 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly pendingDamageDice = signal<string | null>(null);
   readonly advancedToolsOpen = signal(false);
   readonly dungeonPickerOpen = signal(false);
+  readonly confirmDialog = signal<{
+    title: string;
+    body: string;
+    confirmLabel: string;
+    onConfirm: () => void;
+  } | null>(null);
 
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
   private initiativePollTimer: ReturnType<typeof setInterval> | null = null;
   private feedbackTimer: ReturnType<typeof setTimeout> | null = null;
   private persistSeq = 0;
   private persistTail: Promise<void> = Promise.resolve();
+  private readonly onPageHide = (): void => this.flushPendingSessionWork();
 
   readonly isDm = computed(() => this.campaign().isOwner === true);
 
@@ -303,6 +309,9 @@ export class CampaignPlayPanel implements OnDestroy {
   private lastBoundSessionId: string | null | undefined = undefined;
 
   constructor() {
+    if (typeof window !== 'undefined') {
+      window.addEventListener('pagehide', this.onPageHide);
+    }
     effect(() => {
       const sessionId = this.campaign().data.activeSessionId ?? null;
       untracked(() => {
@@ -383,9 +392,41 @@ export class CampaignPlayPanel implements OnDestroy {
   protected sessionModeHint = sessionModeHint;
 
   ngOnDestroy(): void {
-    this.flushSessionSave();
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('pagehide', this.onPageHide);
+    }
+    this.flushPendingSessionWork();
     this.stopInitiativePoll();
     if (this.feedbackTimer) clearTimeout(this.feedbackTimer);
+  }
+
+  cancelConfirmDialog(): void {
+    this.confirmDialog.set(null);
+  }
+
+  runConfirmDialog(): void {
+    const dialog = this.confirmDialog();
+    if (!dialog) return;
+    this.confirmDialog.set(null);
+    dialog.onConfirm();
+  }
+
+  publishedHandoutsCount(): number {
+    return (this.campaign().data.handouts ?? []).filter((h) => h.published).length;
+  }
+
+  private askConfirm(
+    title: string,
+    body: string,
+    onConfirm: () => void,
+    confirmLabel = 'Confirmer',
+  ): void {
+    this.confirmDialog.set({ title, body, confirmLabel, onConfirm });
+  }
+
+  /** Flush notes locales (debounce) + persist session. */
+  private flushPendingSessionWork(): void {
+    this.flushSessionSave();
   }
 
   clearFeedback(): void {
@@ -454,8 +495,19 @@ export class CampaignPlayPanel implements OnDestroy {
     const c = this.campaign();
     const session = this.activeSession();
     if (!c.isOwner || !session) return;
-    if (!confirm('Terminer la session en cours ? Les notes de jeu seront archivées.')) return;
-    this.flushSessionSave();
+    this.askConfirm(
+      'Terminer la session',
+      'Les notes de jeu seront archivées dans le résumé de session.',
+      () => this.doEndPlaySession(),
+      'Terminer',
+    );
+  }
+
+  private doEndPlaySession(): void {
+    const c = this.campaign();
+    const session = this.activeSession();
+    if (!c.isOwner || !session) return;
+    this.flushPendingSessionWork();
     this.sessionView.set('resume');
     this.resetFightStep();
     const sessions = (c.data.sessions ?? []).map((s) => {
@@ -487,10 +539,11 @@ export class CampaignPlayPanel implements OnDestroy {
       this.setFeedback('err', 'Entre d’abord en session pour combattre.');
       return;
     }
-    if (!this.confirmReplaceCombat()) return;
-    this.setActiveCombat(createActiveCombat([], { label: 'Combat' }));
-    this.sessionView.set('combat');
-    this.resetFightStep();
+    this.withReplaceCombatConfirm(() => {
+      this.setActiveCombat(createActiveCombat([], { label: 'Combat' }));
+      this.sessionView.set('combat');
+      this.resetFightStep();
+    });
   }
 
   enterCombatFlow(): void {
@@ -510,12 +563,18 @@ export class CampaignPlayPanel implements OnDestroy {
       this.openSessionNotes();
       return;
     }
+    if (this.sessionView() === 'notes') {
+      this.flushPendingSessionWork();
+    }
     this.sessionView.set(view);
     if (view !== 'combat') this.resetFightStep();
     if (view !== 'dungeon') this.dungeonPickerOpen.set(false);
   }
 
   backToSessionHub(): void {
+    if (this.sessionView() === 'notes') {
+      this.flushPendingSessionWork();
+    }
     this.sessionView.set('resume');
     this.resetFightStep();
     this.dungeonPickerOpen.set(false);
@@ -525,12 +584,7 @@ export class CampaignPlayPanel implements OnDestroy {
     const session = this.activeSession();
     if (session && !session.playPads?.length) {
       const pads = ensureSessionPlayPads(session);
-      const legacy = syncLegacyPlayNotesFromPads(pads);
-      this.updateSession(session.id, {
-        playPads: pads,
-        playNotes: legacy.playNotes,
-        playNotebook: legacy.playNotebook,
-      });
+      this.updateSession(session.id, { playPads: pads }, { immediate: true });
     }
     this.sessionView.set('notes');
   }
@@ -577,18 +631,10 @@ export class CampaignPlayPanel implements OnDestroy {
     this.saveData({ sessionResume: page });
   }
 
-  onSessionPadsChange(payload: {
-    playPads: SessionPlayPad[];
-    playNotes: string;
-    playNotebook: NotebookPage | undefined;
-  }): void {
+  onSessionPadsChange(payload: { playPads: SessionPlayPad[] }): void {
     const session = this.activeSession();
     if (!session) return;
-    this.updateSession(session.id, {
-      playPads: payload.playPads,
-      playNotes: payload.playNotes,
-      playNotebook: payload.playNotebook,
-    });
+    this.updateSession(session.id, { playPads: payload.playPads });
   }
 
   continueToInitiativePhase(): void {
@@ -664,13 +710,14 @@ export class CampaignPlayPanel implements OnDestroy {
       this.setFeedback('err', 'Entre d’abord en session pour combattre.');
       return;
     }
-    if (!this.confirmReplaceCombat()) return;
-    const combatants = expandEncounterToCombatants(encounter);
-    this.setActiveCombat(
-      createActiveCombat(combatants, { label: encounter.name, encounterId: encounter.id }),
-    );
-    this.sessionView.set('combat');
-    this.resetFightStep();
+    this.withReplaceCombatConfirm(() => {
+      const combatants = expandEncounterToCombatants(encounter);
+      this.setActiveCombat(
+        createActiveCombat(combatants, { label: encounter.name, encounterId: encounter.id }),
+      );
+      this.sessionView.set('combat');
+      this.resetFightStep();
+    });
   }
 
   importPartyIntoCombat(): void {
@@ -1034,20 +1081,28 @@ export class CampaignPlayPanel implements OnDestroy {
     const combat = this.activeCombat();
     const session = this.activeSession();
     if (!combat || !session) return;
-    if (!confirm('Terminer le combat en cours ? Un résumé sera ajouté aux notes de session.')) return;
+    this.askConfirm(
+      'Terminer le combat',
+      'Un résumé sera ajouté aux notes de session et à l’historique.',
+      () => this.doEndCombat(),
+      'Terminer',
+    );
+  }
+
+  private doEndCombat(): void {
+    const combat = this.activeCombat();
+    const session = this.activeSession();
+    if (!combat || !session) return;
 
     this.stopInitiativePoll();
     const archive = formatCombatArchiveSummary(combat);
     const entry = createCombatHistoryEntry(combat);
     const nextPads = appendTextToFirstNotePad(ensureSessionPlayPads(session), archive);
-    const legacy = syncLegacyPlayNotesFromPads(nextPads);
     const combatHistory = [...(session.combatHistory ?? []), entry];
     this.patchSession(
       {
         activeCombat: null,
         playPads: nextPads,
-        playNotes: legacy.playNotes,
-        playNotebook: legacy.playNotebook,
         combatHistory,
       },
       { immediate: true },
@@ -1091,13 +1146,14 @@ export class CampaignPlayPanel implements OnDestroy {
     this.allyPickerOpen.set(false);
     const combat = this.activeCombat();
     if (!combat) {
-      if (!this.confirmReplaceCombat()) return;
-      this.setActiveCombat(
-        createActiveCombat(
-          [createCombatant({ name: 'Allié', kind: 'npc', armorClass: 10, initiativeBonus: 0 })],
-          { label: 'Combat' },
-        ),
-      );
+      this.withReplaceCombatConfirm(() => {
+        this.setActiveCombat(
+          createActiveCombat(
+            [createCombatant({ name: 'Allié', kind: 'npc', armorClass: 10, initiativeBonus: 0 })],
+            { label: 'Combat' },
+          ),
+        );
+      });
       return;
     }
     this.patchCombat({
@@ -1117,13 +1173,21 @@ export class CampaignPlayPanel implements OnDestroy {
     }
     const combat = this.activeCombat();
     if (!combat) {
-      if (!this.confirmReplaceCombat()) return;
-      this.setActiveCombat(
-        createActiveCombat(
-          [createCombatant({ name: 'Adversaire', kind: 'monster', armorClass: 10, initiativeBonus: 0 })],
-          { label: 'Combat' },
-        ),
-      );
+      this.withReplaceCombatConfirm(() => {
+        this.setActiveCombat(
+          createActiveCombat(
+            [
+              createCombatant({
+                name: 'Adversaire',
+                kind: 'monster',
+                armorClass: 10,
+                initiativeBonus: 0,
+              }),
+            ],
+            { label: 'Combat' },
+          ),
+        );
+      });
       return;
     }
     this.patchCombat({
@@ -1147,7 +1211,21 @@ export class CampaignPlayPanel implements OnDestroy {
     const target = combat.combatants.find((c) => c.id === combatantId);
     const label = target?.name?.trim() || 'ce combattant';
     const inSetup = resolveCombatFlowPhase(combat) === 'setup';
-    if (!inSetup && !confirm(`Retirer ${label} du combat ?`)) return;
+    if (inSetup) {
+      this.doRemoveCombatant(combatantId);
+      return;
+    }
+    this.askConfirm(
+      'Retirer du combat',
+      `Retirer ${label} du combat ?`,
+      () => this.doRemoveCombatant(combatantId),
+      'Retirer',
+    );
+  }
+
+  private doRemoveCombatant(combatantId: string): void {
+    const combat = this.activeCombat();
+    if (!combat) return;
     const combatants = combat.combatants.filter((c) => c.id !== combatantId);
     const turnOrderIds = combat.turnOrderIds?.filter((id) => id !== combatantId);
     const turnIndex = Math.min(combat.turnIndex, Math.max(0, combatants.length - 1));
@@ -1636,9 +1714,17 @@ export class CampaignPlayPanel implements OnDestroy {
     });
   }
 
-  private confirmReplaceCombat(): boolean {
-    if (!this.activeCombat()) return true;
-    return confirm('Remplacer le combat en cours ?');
+  private withReplaceCombatConfirm(then: () => void): void {
+    if (!this.activeCombat()) {
+      then();
+      return;
+    }
+    this.askConfirm(
+      'Remplacer le combat',
+      'Un combat est déjà en cours. Le remplacer ?',
+      then,
+      'Remplacer',
+    );
   }
 
   private setActiveCombat(combat: ActiveCombat): void {

@@ -60,11 +60,16 @@ export class CampaignNotebook implements OnDestroy {
   private drawing = false;
   private currentStroke: InkStroke | null = null;
   private emitTimer: ReturnType<typeof setTimeout> | null = null;
+  private pendingEmit: NotebookPage | null = null;
   private lastPageId: string | null = null;
   private lastStrokeCount = -1;
   private inkSizeLocked = false;
+  private readonly onPageHide = (): void => this.flushPendingEmit();
 
   constructor() {
+    if (typeof window !== 'undefined') {
+      window.addEventListener('pagehide', this.onPageHide);
+    }
     effect(() => {
       const page = this.page();
       if (!this.inkFullscreen()) return;
@@ -88,7 +93,10 @@ export class CampaignNotebook implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.emitTimer) clearTimeout(this.emitTimer);
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('pagehide', this.onPageHide);
+    }
+    this.flushPendingEmit();
     this.unlockBodyScroll();
   }
 
@@ -454,9 +462,26 @@ export class CampaignNotebook implements OnDestroy {
     }
   }
 
+  /** Force l’émission du texte / encre en attente (sortie de vue, destroy, pagehide). */
+  flushPendingEmit(): void {
+    if (this.emitTimer) {
+      clearTimeout(this.emitTimer);
+      this.emitTimer = null;
+    }
+    const page = this.pendingEmit;
+    this.pendingEmit = null;
+    if (page) this.emitPage(page);
+  }
+
   private emitPageDebounced(page: NotebookPage): void {
+    this.pendingEmit = page;
     if (this.emitTimer) clearTimeout(this.emitTimer);
-    this.emitTimer = setTimeout(() => this.emitPage(page), 280);
+    this.emitTimer = setTimeout(() => {
+      this.emitTimer = null;
+      const pending = this.pendingEmit;
+      this.pendingEmit = null;
+      if (pending) this.emitPage(pending);
+    }, 280);
   }
 
   private lockBodyScroll(): void {
