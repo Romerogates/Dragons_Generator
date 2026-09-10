@@ -147,22 +147,25 @@ Prérequis : campagne créée, ≥ 1 joueur avec perso **approuvé**, rencontre 
 
 ### 5.4 Carnet MJ (Texte / Main)
 
-- [ ] 🔴 Onglet **Carnet** : bascule Texte ↔ Main ; traits stylet visibles après refresh
-- [ ] 🟠 Palette couleurs + stylo / surligneur + Undo
-- [ ] 🟠 Export **PNG** et **PDF** des pages Main
-- [ ] 🟠 Bouton **Transcrire** (OCR) → texte éditable en mode Texte (clé Groq vision OK)
-- [ ] 🟢 Même carnet accessible depuis session → Notes
+- [x] 🔴 Onglet **Carnet** : bascule Texte ↔ Main ; traits stylet visibles après refresh
+- [x] 🟠 Palette couleurs + stylo / surligneur + Undo
+- [x] 🟠 Export **PNG** et **PDF** des pages Main
+- [x] 🟠 Bouton **Transcrire** (OCR) → texte éditable en mode Texte (clé Groq vision OK)
+- [x] 🟢 Même carnet accessible depuis session → Notes
 
 ### 5.5 Documents / PDF tablette
 
-- [ ] 🔴 Aperçu PDF page par page (PDF.js) dans Documents — pas seulement télécharger
-- [ ] 🟠 Navigation pages précédente / suivante
-- [ ] 🟢 Bouton télécharger toujours dispo
+- [x] 🔴 Aperçu PDF page par page (PDF.js) dans Documents — pas seulement télécharger
+  - *Où :* Documents → Pack MJ / Bestiaire (`app-pdf-page-preview`).
+- [x] 🟠 Navigation pages précédente / suivante
+- [x] 🟢 Bouton télécharger toujours dispo
 
 ### 5.6 Combat polish (MJ)
 
-- [ ] 🔴 Conditions éditables (chips + champ virgules) alliés **et** adversaires
-- [ ] 🟠 Édition multi-attaques (nom / bonus / dés) en setup / outils avancés
+- [x] 🔴 Conditions éditables (chips + champ virgules) alliés **et** adversaires
+  - Chips cliquables (presets + retirer) en setup/fight ; champ virgules conservé.
+- [x] 🟠 Édition multi-attaques (nom / bonus / dés) en setup / outils avancés
+  - + Attaque / retirer ; éditable aussi en phase fight.
 - [ ] 🟠 Classer en masse les créatures **Neutre** → Allié ou Adversaire
 
 ---

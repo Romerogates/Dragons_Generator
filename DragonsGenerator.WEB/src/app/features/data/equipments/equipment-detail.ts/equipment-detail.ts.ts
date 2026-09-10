@@ -20,11 +20,12 @@ import {
   equipmentDetailCards,
   equipmentDetailDescription,
 } from '@core/utils/equipment-detail-cards.util';
+import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
 
 @Component({
   selector: 'app-equipment-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, CodexDetailShell],
   templateUrl: './equipment-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

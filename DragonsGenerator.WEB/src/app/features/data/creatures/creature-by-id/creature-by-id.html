@@ -1,12 +1,9 @@
-<div class="w-full min-h-screen bg-[#171b22] text-slate-300 animate-fade-in select-none pb-20">
-  <div class="max-w-5xl mx-auto px-4 pt-10">
-    <a
-      routerLink="/creatures"
-      class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-red-500 transition-colors mb-8 group"
-    >
-      <span class="group-hover:-translate-x-1 transition-transform">←</span> Retour au Bestiaire
-    </a>
-
+<app-codex-detail-shell
+  [title]="creature()?.name ?? 'Créature'"
+  backLink="/creatures"
+  backLabel="Bestiaire"
+  accent="red"
+>
     @if (creature() === undefined) {
       <div class="flex flex-col items-center justify-center py-32 animate-pulse text-red-500">
         <span class="text-6xl mb-6"><iconify-icon icon="fluent-emoji:dragon"></iconify-icon></span>
@@ -136,5 +133,4 @@
         </div>
       </div>
     }
-  </div>
-</div>
+</app-codex-detail-shell>

@@ -9,11 +9,12 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of, switchMap } from 'rxjs';
 import { DataService } from '@core/services/data.service';
+import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
 
 @Component({
   selector: 'app-deity-by-id',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, CodexDetailShell],
   templateUrl: './deity-by-id.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

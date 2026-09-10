@@ -14,6 +14,7 @@ import {
   formatFeatBenefits,
   formatFeatPrerequisites,
 } from '@core/utils/catalog-display.util';
+import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
 
 const CATEGORY_LABELS: Record<string, string> = {
   survival: 'Survie',
@@ -25,7 +26,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 @Component({
   selector: 'app-feat-by-id',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, CodexDetailShell],
   templateUrl: './feat-by-id.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

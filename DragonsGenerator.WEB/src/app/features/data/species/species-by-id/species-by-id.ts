@@ -10,12 +10,13 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DataService } from '@core/services/data.service';
 import { Species } from '@core/models/Species/species';
+import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
 import { SpeciesMechanicsPanel } from '../species-mechanics-panel/species-mechanics-panel';
 
 @Component({
   selector: 'app-species-by-id',
   standalone: true,
-  imports: [CommonModule, RouterLink, SpeciesMechanicsPanel],
+  imports: [CommonModule, RouterLink, SpeciesMechanicsPanel, CodexDetailShell],
   templateUrl: './species-by-id.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>

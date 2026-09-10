@@ -15,11 +15,14 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
-1. **Reste checklist manuelle** (§5–6) hors e2e : face-à-face layout mobile, jets/ordre de collecte, carnet Main/OCR, PDF tablette, conditions combat, attaque joueur persistée (API).
+1. **Reste checklist** : classer Neutre→Allié/Adversaire en masse ; attaque joueur persistée (API) ; amis/invites manuels.
 2. *(optionnel)* peaufinages mineurs guide / empty states hors flux critique.
 
 ## Déjà livré (ne pas refaire)
 
+- **Codex fiches plein écran** (2026-09-10) — `app-codex-detail-shell` sur les 11 catalogues ; Fermer / Escape / lien catalogue.
+- **Combat conditions + multi-attaques** — chips presets, édition en fight, +/✕ attaques.
+- **Documents PDF.js + carnet Main** — aperçu page à page (nav tactile) ; export PNG/PDF/OCR déjà en place (export PNG en `.png`).
 - **E2E attaque tour MJ** (2026-09-10) — `campaign-combat-attack.spec.ts` : Attaquer → clic carte → encode d20 → dégâts → PV/journal ; jet raté sans baisse PV. UX : clic cible passe au jet ; bandeau tour sticky.
 - **E2E live polish 1–5** (2026-09-10) — `campaign-live-polish.spec.ts` : jet initiative joueur ; doc publié/épinglé (pas brouillon) ; mode session Autre (Encoder / Lancer le dé) ; XP offline erreur ; roster live MJ→joueur PV sans F5. Branches karma **≥ 90%**.
 - **Smoke e2e combat/XP/init** (2026-09-10) — import party + Distribuer XP une fois ; banner initiative seulement si PJ lié ; documents type Lettre ; confirms in-app + home retry + dock joueur.

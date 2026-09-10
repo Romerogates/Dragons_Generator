@@ -11,11 +11,12 @@ import { DataService } from '@core/services/data.service';
 
 // N'oublie pas d'importer ton interface (le chemin peut varier selon ton dossier)
 import { Civilisation } from '@core/models/Civilisations/civilisations';
+import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
 
 @Component({
   selector: 'app-civilisation-by-id',
   standalone: true, // Pense bien à l'ajouter pour Angular 17+
-  imports: [RouterLink],
+  imports: [RouterLink, CodexDetailShell],
   templateUrl: './civilisation-by-id.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>

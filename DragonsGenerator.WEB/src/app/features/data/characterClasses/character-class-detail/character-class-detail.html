@@ -1,14 +1,11 @@
 @let c = cls();
 
-<div class="w-full min-h-screen bg-[#171b22] text-slate-300 animate-fade-in select-none pb-20">
-  <div class="max-w-5xl mx-auto px-4 pt-10">
-    <a
-      routerLink="/classes"
-      class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-amber-500 transition-colors mb-8 group"
-    >
-      <span class="group-hover:-translate-x-1 transition-transform">←</span> Retour aux classes
-    </a>
-
+<app-codex-detail-shell
+  [title]="c?.name ?? 'Classe'"
+  backLink="/classes"
+  backLabel="Classes"
+  accent="amber"
+>
     @if (!c) {
       <p class="text-center py-32 text-slate-500 animate-pulse font-serif tracking-widest uppercase">
         Consultation des archives...
@@ -353,5 +350,4 @@
         </section>
       }
     }
-  </div>
-</div>
+</app-codex-detail-shell>

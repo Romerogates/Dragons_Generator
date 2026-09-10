@@ -1,13 +1,10 @@
-<div class="w-full min-h-screen bg-[#171b22] text-slate-300 animate-fade-in pb-20">
-  <div class="max-w-4xl mx-auto px-4 pt-10">
-    <a
-      routerLink="/feats"
-      class="text-xs font-black uppercase tracking-widest text-slate-500 hover:text-amber-500 mb-8 inline-block"
-    >
-      ← Retour aux dons
-    </a>
-
-    10|    @if (feat() === undefined) {
+<app-codex-detail-shell
+  [title]="feat()?.name ?? 'Don'"
+  backLink="/feats"
+  backLabel="Dons"
+  accent="amber"
+>
+    @if (feat() === undefined) {
       <p class="text-center py-32 text-slate-500 animate-pulse">Chargement...</p>
     } @else if (notFound()) {
       <div class="text-center py-32">
@@ -92,5 +89,4 @@
         </section>
       }
     }
-  </div>
-</div>
+</app-codex-detail-shell>

@@ -14,6 +14,7 @@ import { normalizeCharacterClass } from '@core/utils/class-data.adapter';
 import { listSubclassOptions } from '@core/utils/character-class-features.util';
 import { getClassIcon } from '@core/utils/class-icons';
 import { formatClassResources, resolveFeatureNames } from '@core/utils/catalog-display.util';
+import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
 import {
   GameIdLabelPipe,
   GameIdLabelsPipe,
@@ -23,7 +24,7 @@ import {
 @Component({
   selector: 'app-character-class-detail',
   standalone: true,
-  imports: [RouterLink, GameIdLabelPipe, GameIdLabelsPipe, GameItemLabelPipe],
+  imports: [RouterLink, GameIdLabelPipe, GameIdLabelsPipe, GameItemLabelPipe, CodexDetailShell],
   templateUrl: './character-class-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

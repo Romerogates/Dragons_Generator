@@ -15,11 +15,12 @@ import {
   formatChallengeRating,
   getCreatureCategoryLabel,
 } from '@core/utils/creature-display.util';
+import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
 
 @Component({
   selector: 'app-creature-by-id',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, CodexDetailShell],
   templateUrl: './creature-by-id.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

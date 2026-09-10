@@ -1,13 +1,10 @@
-<div class="w-full min-h-screen bg-[#171b22] text-slate-300 animate-fade-in select-none pb-20">
-  <div class="max-w-4xl mx-auto px-4 pt-10">
-    <a
-      routerLink="/equipments"
-      class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-amber-500 transition-colors mb-8 group"
-    >
-      <span class="group-hover:-translate-x-1 transition-transform">←</span> Retour à l'Arsenal
-    </a>
-
-    10|    @if (loading()) {
+<app-codex-detail-shell
+  [title]="equipment()?.name ?? 'Équipement'"
+  backLink="/equipments"
+  backLabel="Arsenal"
+  accent="amber"
+>
+    @if (loading()) {
       <div class="flex flex-col items-center justify-center py-32 animate-pulse text-amber-500">
         <span class="text-6xl mb-6"
           ><iconify-icon icon="fluent-emoji:magnifying-glass-tilted-right"></iconify-icon
@@ -17,7 +14,7 @@
         </p>
       </div>
     } @else if (error()) {
-    20|      <div class="flex flex-col items-center justify-center py-32 text-center">
+      <div class="flex flex-col items-center justify-center py-32 text-center">
         <span class="text-7xl mb-6 drop-shadow-md animate-pulse"
           ><iconify-icon icon="fluent-emoji:fire"></iconify-icon
         ></span>
@@ -27,7 +24,7 @@
         <p class="text-lg text-slate-400 italic max-w-md leading-relaxed mb-8">{{ error() }}</p>
         <a
           routerLink="/equipments"
-    30|          class="px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest bg-slate-800 text-slate-300 hover:bg-slate-700 transition-[colors,transform,opacity,box-shadow] duration-200 border border-slate-700 shadow-lg hover:-translate-y-1"
+          class="px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest bg-slate-800 text-slate-300 hover:bg-slate-700 transition-[colors,transform,opacity,box-shadow] duration-200 border border-slate-700 shadow-lg hover:-translate-y-1"
           >Retourner au marché</a
         >
       </div>
@@ -37,7 +34,7 @@
           class="text-5xl md:text-6xl font-extrabold text-amber-500 font-serif tracking-wide mb-4 drop-shadow-lg"
         >
           {{ eq.name }}
-    40|        </h1>
+        </h1>
         <div class="flex flex-wrap items-center justify-center gap-3">
           <a
             [routerLink]="['/equipments/type', eq.type.toLowerCase()]"
@@ -48,7 +45,7 @@
           </a>
           <span class="text-slate-500 text-xs font-bold italic">
             {{ translateSubtype(eq.subtype) }}
-    50|          </span>
+          </span>
         </div>
       </header>
 
@@ -58,7 +55,7 @@
             class="bg-[#1b2028] p-6 rounded-3xl border border-slate-800 shadow-xl group hover:border-amber-500/30 transition-colors"
           >
             <h2
-    60|              class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-4"
+              class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-4"
             >
               Identification
             </h2>
@@ -164,5 +161,4 @@
         </div>
       </div>
     }
-  </div>
-</div>
+</app-codex-detail-shell>

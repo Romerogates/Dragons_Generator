@@ -10,6 +10,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of, switchMap } from 'rxjs';
 import { DataService } from '@core/services/data.service';
 import { buildSkillMap, normalizeSkillId } from '@core/utils/skill.utils';
+import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
 
 const ABILITY_LABELS: Record<string, string> = {
   FOR: 'Force',
@@ -23,7 +24,7 @@ const ABILITY_LABELS: Record<string, string> = {
 @Component({
   selector: 'app-skill-by-id',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, CodexDetailShell],
   templateUrl: './skill-by-id.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

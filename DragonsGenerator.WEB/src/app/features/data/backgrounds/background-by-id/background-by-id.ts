@@ -11,13 +11,14 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap } from 'rxjs';
 import { DataService } from '@core/services/data.service';
 import { normalizeBackground } from '@core/utils/background-data.adapter';
+import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
 import { GameIdLabelPipe, GameIdLabelsPipe } from '@shared/pipes/game-id-label.pipe';
 import type { BackgroundToolRef } from '@core/models/Backgrounds/background';
 
 @Component({
   selector: 'app-background-by-id',
   standalone: true,
-  imports: [RouterLink, GameIdLabelPipe, GameIdLabelsPipe],
+  imports: [RouterLink, GameIdLabelPipe, GameIdLabelsPipe, CodexDetailShell],
   templateUrl: './background-by-id.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

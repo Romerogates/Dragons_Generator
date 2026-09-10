@@ -1241,6 +1241,65 @@ export class CampaignPlayPanel implements OnDestroy {
     this.updateCombatant(combatantId, { conditions });
   }
 
+  /** Presets rapides pour le tracker (chips). */
+  readonly commonConditions = [
+    'à terre',
+    'empoisonné',
+    'inconscient',
+    'entravé',
+    'aveuglé',
+    'charmé',
+  ] as const;
+
+  toggleCondition(combatantId: string, condition: string): void {
+    const combat = this.activeCombat();
+    if (!combat || !this.isDm()) return;
+    const cb = combat.combatants.find((c) => c.id === combatantId);
+    if (!cb) return;
+    const next = new Set(cb.conditions ?? []);
+    if (next.has(condition)) next.delete(condition);
+    else next.add(condition);
+    this.updateCombatant(combatantId, {
+      conditions: next.size ? [...next] : undefined,
+    });
+  }
+
+  removeCondition(combatantId: string, condition: string): void {
+    const combat = this.activeCombat();
+    if (!combat || !this.isDm()) return;
+    const cb = combat.combatants.find((c) => c.id === combatantId);
+    if (!cb?.conditions?.length) return;
+    const conditions = cb.conditions.filter((c) => c !== condition);
+    this.updateCombatant(combatantId, {
+      conditions: conditions.length ? conditions : undefined,
+    });
+  }
+
+  addCombatantAttack(combatantId: string): void {
+    const combat = this.activeCombat();
+    if (!combat || !this.isDm()) return;
+    const combatants = combat.combatants.map((c) => {
+      if (c.id !== combatantId) return c;
+      const attacks = [
+        ...(c.attacks ?? []),
+        { name: 'Attaque', attackBonus: 0, damageDice: '1d6' },
+      ];
+      return { ...c, attacks };
+    });
+    this.patchCombat({ ...combat, combatants });
+  }
+
+  removeCombatantAttack(combatantId: string, index: number): void {
+    const combat = this.activeCombat();
+    if (!combat || !this.isDm()) return;
+    const combatants = combat.combatants.map((c) => {
+      if (c.id !== combatantId || !c.attacks?.length) return c;
+      const attacks = c.attacks.filter((_, i) => i !== index);
+      return { ...c, attacks: attacks.length ? attacks : undefined };
+    });
+    this.patchCombat({ ...combat, combatants });
+  }
+
   patchCombatantAttack(
     combatantId: string,
     index: number,

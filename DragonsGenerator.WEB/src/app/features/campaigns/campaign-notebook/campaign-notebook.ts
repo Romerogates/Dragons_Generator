@@ -269,7 +269,7 @@ export class CampaignNotebook implements OnDestroy {
     this.exportHint.set(null);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${(page.title || 'carnet').replace(/\s+/g, '-')}.jpg`;
+    a.download = `${(page.title || 'carnet').replace(/\s+/g, '-')}.png`;
     a.click();
   }
 
