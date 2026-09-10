@@ -218,6 +218,9 @@ public class GuideComment
     public Guid? ParentId { get; set; }
     public GuideComment? Parent { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    /// <summary>third | half | full — layout widget (racines uniquement).</summary>
+    public string WidgetSize { get; set; } = "half";
+    public int SortOrder { get; set; }
     public ICollection<GuideCommentLike> Likes { get; set; } = [];
     public ICollection<GuideComment> Replies { get; set; } = [];
 }

@@ -1,25 +1,49 @@
-<div class="min-h-screen bg-[#0f1218] text-slate-300 pb-20">
-  <header class="border-b border-slate-800/80 bg-[#141820]/90">
-    <div class="max-w-3xl mx-auto px-4 py-8">
+<div class="min-h-screen bg-[#0f1218] text-slate-300 pb-24">
+  <header class="relative border-b border-slate-800/80 overflow-hidden">
+    <div
+      class="absolute inset-0 opacity-90"
+      style="
+        background:
+          radial-gradient(ellipse 70% 80% at 10% 0%, rgba(245, 158, 11, 0.12), transparent 55%),
+          radial-gradient(ellipse 50% 60% at 90% 20%, rgba(124, 58, 237, 0.14), transparent 50%),
+          #141820;
+      "
+    ></div>
+    <div class="relative max-w-5xl mx-auto px-4 py-12 md:py-14">
       <a routerLink="/" class="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-amber-400">
         ← Accueil
       </a>
-      <h1 class="mt-4 text-3xl md:text-4xl font-serif text-slate-50 tracking-tight">Guide</h1>
-      <p class="mt-2 text-sm text-slate-400 max-w-xl leading-relaxed">
-        Sommaire communautaire — ouvrez une fiche, lisez, commentez et likez les réponses utiles.
+      <h1 class="mt-5 text-4xl md:text-5xl font-serif text-slate-50 tracking-tight">Guide</h1>
+      <p class="mt-3 text-base text-slate-400 max-w-2xl leading-relaxed">
+        Mode d’emploi d’Eana : parcours MJ & joueur, liens vers chaque outil, et discussions en widgets
+        sur chaque fiche.
       </p>
 
-      <div class="mt-6 flex flex-col sm:flex-row gap-2">
+      <div class="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        @for (card of quickCards; track card.link) {
+          <a
+            [routerLink]="card.link"
+            class="rounded-2xl border p-4 transition-colors hover:-translate-y-0.5 duration-200"
+            [class]="card.accent"
+          >
+            <span class="text-2xl block mb-2"><iconify-icon [icon]="card.icon"></iconify-icon></span>
+            <p class="text-sm font-bold text-slate-100">{{ card.title }}</p>
+            <p class="text-xs text-slate-400 mt-1 leading-relaxed">{{ card.description }}</p>
+          </a>
+        }
+      </div>
+
+      <div class="mt-8 flex flex-col sm:flex-row gap-2">
         <input
           type="search"
-          placeholder="Rechercher une fiche…"
-          class="flex-1 min-h-11 rounded-xl bg-[#1b2028] border border-slate-700 px-4 text-sm text-slate-200 placeholder:text-slate-600"
+          placeholder="Rechercher une fiche, un outil, une étape…"
+          class="flex-1 min-h-12 rounded-xl bg-[#1b2028] border border-slate-700 px-4 text-sm text-slate-200 placeholder:text-slate-600"
           [ngModel]="query()"
           (ngModelChange)="query.set($event)"
         />
       </div>
 
-      <div class="mt-4 flex flex-wrap gap-1.5">
+      <div class="mt-5 flex flex-wrap gap-1.5">
         @for (a of [
           { id: 'all', label: 'Tout' },
           { id: 'dm', label: 'MJ' },
@@ -27,7 +51,7 @@
         ]; track a.id) {
           <button
             type="button"
-            class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-colors"
+            class="px-3.5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition-colors"
             [class]="
               audience() === a.id
                 ? 'border-amber-500/60 bg-amber-950/40 text-amber-200'
@@ -38,10 +62,10 @@
             {{ a.label }}
           </button>
         }
-        <span class="w-px h-6 bg-slate-800 mx-1 self-center" aria-hidden="true"></span>
+        <span class="w-px h-7 bg-slate-800 mx-1 self-center" aria-hidden="true"></span>
         <button
           type="button"
-          class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-colors"
+          class="px-3.5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition-colors"
           [class]="
             groupFilter() === 'all'
               ? 'border-violet-500/50 bg-violet-950/30 text-violet-200'
@@ -54,7 +78,7 @@
         @for (g of groups; track g.id) {
           <button
             type="button"
-            class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-colors"
+            class="px-3.5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition-colors"
             [class]="
               groupFilter() === g.id
                 ? 'border-violet-500/50 bg-violet-950/30 text-violet-200'
@@ -69,49 +93,57 @@
     </div>
   </header>
 
-  <main class="max-w-3xl mx-auto px-4 py-8 space-y-10">
+  <main class="max-w-5xl mx-auto px-4 py-12 space-y-14">
     @for (section of sections(); track section.groupId) {
-      <section class="space-y-3">
-        <h2 class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">
-          {{ section.groupLabel }}
-        </h2>
-        <div class="space-y-2">
+      <section class="space-y-5">
+        <div class="flex items-end justify-between gap-4 border-b border-slate-800/80 pb-3">
+          <h2 class="text-2xl font-serif text-slate-100 tracking-tight">{{ section.groupLabel }}</h2>
+          <span class="text-[10px] font-black uppercase tracking-widest text-slate-600"
+            >{{ section.topics.length }} fiche(s)</span
+          >
+        </div>
+        <div class="grid md:grid-cols-2 gap-4">
           @for (topic of section.topics; track topic.id) {
             <a
               [routerLink]="['/guide', topic.id]"
-              class="block rounded-2xl border border-slate-800/90 bg-[#1b2028]/85 px-4 py-4 hover:border-amber-700/40 transition-colors"
+              class="group flex flex-col rounded-2xl border border-slate-800/90 bg-[#1b2028]/70 p-5 hover:border-amber-700/45 hover:bg-[#1e2430] transition-colors min-h-[11rem]"
             >
-              <div class="flex flex-wrap gap-1.5 mb-2">
+              <div class="flex flex-wrap gap-1.5 mb-3">
                 @for (tag of topic.tags; track tag) {
-                  <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border border-slate-700 text-slate-400">
+                  <span
+                    class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border border-slate-700 text-slate-500"
+                  >
                     {{ tag }}
                   </span>
                 }
               </div>
-              <div class="flex items-start gap-3">
-                <span class="text-2xl shrink-0 opacity-90"><iconify-icon [icon]="topic.icon"></iconify-icon></span>
+              <div class="flex items-start gap-3 flex-1">
+                <span class="text-3xl shrink-0 opacity-90"><iconify-icon [icon]="topic.icon"></iconify-icon></span>
                 <div class="min-w-0 flex-1">
-                  <h3 class="text-lg font-semibold text-slate-50 leading-snug">{{ topic.title }}</h3>
-                  <p class="mt-1 text-sm text-emerald-400/90">
-                    <span class="text-slate-400">{{ topic.summary }}</span>
-                  </p>
-                  <div class="mt-3 flex flex-wrap items-center gap-3 text-[11px] text-slate-500">
-                    <span class="inline-flex items-center gap-1">
-                      <iconify-icon icon="mdi:comment-outline" class="text-base"></iconify-icon>
-                      {{ stats()[topic.id]?.commentCount ?? 0 }}
-                    </span>
-                    @if (stats()[topic.id]?.lastCommentAt; as last) {
-                      <span>{{ relativeTime(last) }}</span>
-                    }
-                  </div>
+                  <h3 class="text-xl font-serif text-slate-50 group-hover:text-amber-100 transition-colors">
+                    {{ topic.title }}
+                  </h3>
+                  <p class="mt-2 text-sm text-slate-400 leading-relaxed line-clamp-3">{{ topic.summary }}</p>
                 </div>
+              </div>
+              <div class="mt-4 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
+                <span class="inline-flex items-center gap-1.5">
+                  <iconify-icon icon="mdi:comment-outline" class="text-base"></iconify-icon>
+                  {{ stats()[topic.id]?.commentCount ?? 0 }}
+                  @if (stats()[topic.id]?.lastCommentAt; as last) {
+                    <span class="text-slate-600">· {{ relativeTime(last) }}</span>
+                  }
+                </span>
+                <span class="text-[10px] font-black uppercase tracking-widest text-amber-500/70 group-hover:text-amber-400"
+                  >Lire →</span
+                >
               </div>
             </a>
           }
         </div>
       </section>
     } @empty {
-      <p class="text-center text-slate-500 py-16 italic">Aucune fiche pour ces filtres.</p>
+      <p class="text-center text-slate-500 py-20 italic">Aucune fiche pour ces filtres.</p>
     }
   </main>
 </div>

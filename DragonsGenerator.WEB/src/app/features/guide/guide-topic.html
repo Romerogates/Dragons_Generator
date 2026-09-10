@@ -1,7 +1,7 @@
 <div class="min-h-screen bg-[#0f1218] text-slate-300 pb-24">
   @if (topic(); as t) {
-    <header class="border-b border-slate-800/80">
-      <div class="max-w-3xl mx-auto px-4 py-8 space-y-4">
+    <header class="border-b border-slate-800/80 bg-[#141820]/80">
+      <div class="max-w-5xl mx-auto px-4 py-10 space-y-5">
         <a
           routerLink="/guide"
           class="inline-flex text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-amber-400"
@@ -10,32 +10,148 @@
         </a>
         <div class="flex flex-wrap gap-1.5">
           @for (tag of t.tags; track tag) {
-            <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border border-slate-700 text-slate-400">
+            <span
+              class="px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border border-slate-700 text-slate-400"
+            >
               {{ tag }}
             </span>
           }
         </div>
-        <div class="flex items-start gap-3">
-          <span class="text-3xl"><iconify-icon [icon]="t.icon"></iconify-icon></span>
-          <div>
-            <h1 class="text-3xl font-serif text-slate-50">{{ t.title }}</h1>
-            <p class="mt-2 text-sm text-slate-400 leading-relaxed">{{ t.summary }}</p>
+        <div class="flex items-start gap-4">
+          <span class="text-4xl shrink-0"><iconify-icon [icon]="t.icon"></iconify-icon></span>
+          <div class="min-w-0">
+            <h1 class="text-3xl md:text-4xl font-serif text-slate-50 tracking-tight">{{ t.title }}</h1>
+            <p class="mt-3 text-base text-slate-400 leading-relaxed max-w-2xl">{{ t.summary }}</p>
           </div>
         </div>
+
+        @if (t.links.length) {
+          <div class="flex flex-wrap gap-2 pt-2">
+            @for (link of t.links; track link.path + link.label) {
+              <a
+                [routerLink]="link.path"
+                class="inline-flex items-center gap-2 min-h-10 px-4 rounded-full text-[10px] font-black uppercase tracking-widest border border-amber-700/40 bg-amber-950/25 text-amber-200 hover:border-amber-500/60 hover:bg-amber-950/40 transition-colors"
+              >
+                {{ link.label }}
+                @if (link.hint) {
+                  <span class="text-amber-200/50 normal-case tracking-normal font-semibold text-[10px]">{{
+                    link.hint
+                  }}</span>
+                }
+              </a>
+            }
+          </div>
+        }
       </div>
     </header>
 
-    <main class="max-w-3xl mx-auto px-4 py-8 space-y-10">
-      <article class="space-y-4 rounded-2xl border border-slate-800 bg-[#1b2028]/60 p-5 md:p-6">
+    <main class="max-w-5xl mx-auto px-4 py-10 space-y-12">
+      <article class="space-y-5">
         @for (p of t.paragraphs; track $index) {
-          <p class="text-sm md:text-base text-slate-300 leading-relaxed">{{ p }}</p>
+          <p class="text-base md:text-lg text-slate-300 leading-relaxed max-w-3xl">{{ p }}</p>
         }
       </article>
 
-      <section class="space-y-4">
+      @if (t.flow.length) {
+        <section class="space-y-3">
+          <h2 class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Parcours</h2>
+          <div class="flex flex-wrap gap-2">
+            @for (step of t.flow; track $index) {
+              <span
+                class="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-800 bg-[#1b2028]/70 text-sm text-slate-300"
+              >
+                <span class="text-[10px] font-black text-amber-500/80">{{ $index + 1 }}</span>
+                {{ step }}
+              </span>
+            }
+          </div>
+        </section>
+      }
+
+      @if (t.steps.length) {
+        <section class="space-y-4">
+          <h2 class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Étapes</h2>
+          <ol class="space-y-3">
+            @for (step of t.steps; track step.title + $index) {
+              <li
+                class="rounded-2xl border border-slate-800/90 bg-[#1b2028]/55 px-5 py-4 flex flex-col sm:flex-row sm:items-start gap-3"
+              >
+                <div class="min-w-0 flex-1 space-y-1">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <h3 class="text-lg font-serif text-slate-100">{{ step.title }}</h3>
+                    @if (step.badge) {
+                      <span
+                        class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border border-violet-800/50 text-violet-300"
+                        >{{ step.badge }}</span
+                      >
+                    }
+                  </div>
+                  <p class="text-sm text-slate-400 leading-relaxed">{{ step.body }}</p>
+                </div>
+                @if (step.link) {
+                  <a
+                    [routerLink]="step.link"
+                    class="shrink-0 self-start min-h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest border border-emerald-800/50 text-emerald-300 hover:border-emerald-500/50"
+                  >
+                    {{ step.linkLabel || 'Ouvrir' }} →
+                  </a>
+                }
+              </li>
+            }
+          </ol>
+        </section>
+      }
+
+      @if (t.flashes.length) {
+        <section class="space-y-4">
+          <h2 class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">En bref</h2>
+          <div class="grid sm:grid-cols-2 gap-3">
+            @for (flash of t.flashes; track flash.title) {
+              <div class="rounded-2xl border border-slate-800 bg-[#171b22]/80 p-4 space-y-2">
+                <div class="flex items-center gap-2">
+                  <span class="text-xl"><iconify-icon [icon]="flash.icon"></iconify-icon></span>
+                  <h3 class="font-serif text-slate-100">{{ flash.title }}</h3>
+                </div>
+                <ul class="space-y-1 text-sm text-slate-400">
+                  @for (b of flash.bullets; track b) {
+                    <li class="flex gap-2">
+                      <span class="text-amber-500/70">·</span>
+                      <span>{{ b }}</span>
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      @if (t.checklist.length) {
+        <section class="space-y-3">
+          <h2 class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Checklist</h2>
+          <ul class="grid sm:grid-cols-2 gap-2">
+            @for (item of t.checklist; track item.id) {
+              <li
+                class="flex items-start gap-2 rounded-xl border border-slate-800/80 bg-[#1b2028]/40 px-3 py-2.5 text-sm text-slate-300"
+              >
+                <span class="text-emerald-500/80 mt-0.5">☐</span>
+                {{ item.label }}
+              </li>
+            }
+          </ul>
+        </section>
+      }
+
+      <section class="space-y-5 pt-4 border-t border-slate-800/80">
         <div class="flex flex-wrap items-end justify-between gap-2">
-          <h2 class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Commentaires</h2>
-          <p class="text-[10px] text-slate-600">Triés par likes, puis récence</p>
+          <div>
+            <h2 class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">
+              Commentaires · widgets
+            </h2>
+            <p class="text-[11px] text-slate-600 mt-1">
+              Comme les calepins de session : 1/3 · 1/2 · 1/1, Monter / Descendre en mode Modifier
+            </p>
+          </div>
         </div>
 
         <div class="rounded-2xl border border-slate-800 bg-[#1b2028]/70 p-4 space-y-3">
@@ -43,6 +159,26 @@
             <div class="flex items-center justify-between text-xs text-amber-300/90">
               <span>Réponse en cours…</span>
               <button type="button" class="underline" (click)="cancelReply()">Annuler</button>
+            </div>
+          } @else {
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-[10px] font-black uppercase tracking-widest text-slate-500"
+                >Taille du widget</span
+              >
+              <div class="inline-flex rounded-full border border-slate-700 p-0.5" role="group">
+                @for (size of widgetSizes; track size.id) {
+                  <button
+                    type="button"
+                    class="min-h-8 px-2.5 rounded-full text-[9px] font-black uppercase transition-colors"
+                    [class.bg-amber-900/50]="newWidgetSize() === size.id"
+                    [class.text-amber-200]="newWidgetSize() === size.id"
+                    [class.text-slate-500]="newWidgetSize() !== size.id"
+                    (click)="newWidgetSize.set(size.id)"
+                  >
+                    {{ size.label }}
+                  </button>
+                }
+              </div>
             </div>
           }
           <textarea
@@ -69,82 +205,141 @@
         @if (loading()) {
           <p class="text-sm text-slate-500 animate-pulse">Chargement…</p>
         } @else if (roots().length === 0) {
-          <p class="text-sm text-slate-500 italic py-6 text-center">Soyez le premier à commenter.</p>
+          <p class="text-sm text-slate-500 italic py-8 text-center">
+            Soyez le premier — votre commentaire devient un widget déplaçable.
+          </p>
         } @else {
-          <ul class="space-y-3">
-            @for (c of roots(); track c.id) {
-              <li class="rounded-2xl border border-slate-800 bg-[#1b2028]/80 p-4 space-y-3">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                  <p class="text-sm font-semibold text-emerald-300">{{ c.authorName }}</p>
-                  <time class="text-[10px] text-slate-500">{{ formatDate(c.createdAt) }}</time>
-                </div>
-                <p class="text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">{{ c.body }}</p>
-                <div class="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    class="min-h-9 px-3 rounded-lg text-[10px] font-black uppercase border transition-colors"
-                    [class]="
-                      c.likedByMe
-                        ? 'border-amber-600/50 bg-amber-950/30 text-amber-200'
-                        : 'border-slate-700 text-slate-400 hover:border-amber-700/40'
-                    "
-                    (click)="toggleLike(c)"
-                  >
-                    ▲ {{ c.likeCount }}
-                  </button>
-                  <button
-                    type="button"
-                    class="min-h-9 px-3 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400"
-                    (click)="startReply(c.id)"
-                  >
-                    Répondre
-                  </button>
-                  @if (meId() === c.userId) {
+          <div class="grid grid-cols-6 gap-3">
+            @for (c of roots(); track c.id; let i = $index) {
+              <article
+                [class]="
+                  padSpanClass(c) +
+                  ' rounded-2xl border bg-[#1b2028]/80 overflow-hidden flex flex-col min-h-0 ' +
+                  (isEditing(c.id) ? 'border-emerald-700/50' : 'border-slate-800')
+                "
+              >
+                <div class="flex flex-wrap items-center gap-2 px-3 py-2 border-b border-slate-800/80">
+                  <p class="flex-1 min-w-0 text-sm font-semibold text-emerald-300 truncate">
+                    {{ c.authorName }}
+                  </p>
+                  <time class="text-[10px] text-slate-600">{{ formatDate(c.createdAt) }}</time>
+                  @if (isEditing(c.id)) {
+                    <div class="inline-flex rounded-full border border-slate-700 p-0.5" role="group">
+                      @for (size of widgetSizes; track size.id) {
+                        <button
+                          type="button"
+                          class="min-h-8 px-2 rounded-full text-[9px] font-black uppercase"
+                          [class.bg-emerald-900/60]="c.widgetSize === size.id"
+                          [class.text-emerald-200]="c.widgetSize === size.id"
+                          [class.text-slate-500]="c.widgetSize !== size.id"
+                          (click)="setWidgetSize(c, size.id)"
+                        >
+                          {{ size.label }}
+                        </button>
+                      }
+                    </div>
                     <button
                       type="button"
-                      class="min-h-9 px-3 rounded-lg text-[10px] font-black uppercase border border-red-900/40 text-red-300/80"
-                      (click)="remove(c)"
+                      class="w-9 h-9 rounded-lg text-slate-500 hover:text-slate-300 disabled:opacity-30"
+                      [disabled]="i === 0"
+                      (click)="moveWidget(c, -1)"
+                      aria-label="Monter"
                     >
-                      Suppr.
+                      ↑
+                    </button>
+                    <button
+                      type="button"
+                      class="w-9 h-9 rounded-lg text-slate-500 hover:text-slate-300 disabled:opacity-30"
+                      [disabled]="i === roots().length - 1"
+                      (click)="moveWidget(c, 1)"
+                      aria-label="Descendre"
+                    >
+                      ↓
+                    </button>
+                    <button
+                      type="button"
+                      class="min-h-8 px-3 rounded-lg text-[9px] font-black uppercase bg-emerald-800/50 text-emerald-100"
+                      (click)="doneEditWidget()"
+                    >
+                      OK
+                    </button>
+                  } @else {
+                    <button
+                      type="button"
+                      class="min-h-8 px-3 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-400 hover:text-slate-200"
+                      (click)="startEditWidget(c.id)"
+                    >
+                      Modifier
                     </button>
                   }
                 </div>
 
-                @if (repliesOf().get(c.id); as replies) {
-                  <ul class="mt-2 space-y-2 border-l border-slate-800 pl-3">
-                    @for (r of replies; track r.id) {
-                      <li class="rounded-xl bg-[#141820]/80 border border-slate-800/80 p-3 space-y-2">
-                        <div class="flex flex-wrap items-center justify-between gap-2">
-                          <p class="text-xs font-semibold text-sky-300">{{ r.authorName }}</p>
-                          <time class="text-[10px] text-slate-600">{{ formatDate(r.createdAt) }}</time>
-                        </div>
-                        <p class="text-sm text-slate-400 whitespace-pre-wrap">{{ r.body }}</p>
-                        <button
-                          type="button"
-                          class="min-h-8 px-2 rounded-lg text-[9px] font-black uppercase border"
-                          [class]="
-                            r.likedByMe
-                              ? 'border-amber-600/50 text-amber-200'
-                              : 'border-slate-700 text-slate-500'
-                          "
-                          (click)="toggleLike(r)"
-                        >
-                          ▲ {{ r.likeCount }}
-                        </button>
-                      </li>
+                <div class="px-4 py-3 space-y-3 flex-1">
+                  <p class="text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">{{ c.body }}</p>
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      class="min-h-9 px-3 rounded-lg text-[10px] font-black uppercase border transition-colors"
+                      [class]="
+                        c.likedByMe
+                          ? 'border-amber-600/50 bg-amber-950/30 text-amber-200'
+                          : 'border-slate-700 text-slate-400'
+                      "
+                      (click)="toggleLike(c)"
+                    >
+                      ▲ {{ c.likeCount }}
+                    </button>
+                    <button
+                      type="button"
+                      class="min-h-9 px-3 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400"
+                      (click)="startReply(c.id)"
+                    >
+                      Répondre
+                    </button>
+                    @if (meId() === c.userId) {
+                      <button
+                        type="button"
+                        class="min-h-9 px-3 rounded-lg text-[10px] font-black uppercase border border-red-900/40 text-red-300/80"
+                        (click)="remove(c)"
+                      >
+                        Suppr.
+                      </button>
                     }
-                  </ul>
-                }
-              </li>
+                  </div>
+
+                  @if (repliesOf().get(c.id); as replies) {
+                    <ul class="space-y-2 border-t border-slate-800/80 pt-3">
+                      @for (r of replies; track r.id) {
+                        <li class="rounded-xl bg-[#141820]/80 border border-slate-800/60 p-3 space-y-2">
+                          <div class="flex justify-between gap-2">
+                            <p class="text-xs font-semibold text-sky-300">{{ r.authorName }}</p>
+                            <time class="text-[10px] text-slate-600">{{ formatDate(r.createdAt) }}</time>
+                          </div>
+                          <p class="text-sm text-slate-400 whitespace-pre-wrap">{{ r.body }}</p>
+                          <button
+                            type="button"
+                            class="min-h-8 px-2 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-500"
+                            (click)="toggleLike(r)"
+                          >
+                            ▲ {{ r.likeCount }}
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  }
+                </div>
+              </article>
             }
-          </ul>
+          </div>
         }
       </section>
     </main>
   } @else {
     <div class="max-w-lg mx-auto px-4 py-24 text-center space-y-4">
       <p class="text-slate-400">Fiche introuvable.</p>
-      <a routerLink="/guide" class="text-amber-400 text-sm font-bold uppercase tracking-widest">Retour au sommaire</a>
+      <a routerLink="/guide" class="text-amber-400 text-sm font-bold uppercase tracking-widest"
+        >Retour au sommaire</a
+      >
     </div>
   }
 </div>

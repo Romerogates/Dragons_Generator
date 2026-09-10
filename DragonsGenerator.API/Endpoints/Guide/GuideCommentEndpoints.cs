@@ -16,10 +16,42 @@ public record GuideCommentDto(
     Guid? ParentId,
     DateTimeOffset CreatedAt,
     int LikeCount,
-    bool LikedByMe
+    bool LikedByMe,
+    string WidgetSize,
+    int SortOrder
 );
 
-public record CreateGuideCommentRequest(string Body, Guid? ParentId);
+public record CreateGuideCommentRequest(string Body, Guid? ParentId, string? WidgetSize);
+
+public record PatchGuideCommentLayoutRequest(string? WidgetSize, int? SortOrder);
+
+file static class GuideCommentMapping
+{
+    public static readonly HashSet<string> AllowedSizes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "third",
+        "half",
+        "full",
+    };
+
+    public static string NormalizeSize(string? size) =>
+        AllowedSizes.Contains(size ?? "") ? size!.ToLowerInvariant() : "half";
+
+    public static GuideCommentDto ToDto(GuideComment c, Guid? viewerId) =>
+        new(
+            c.Id,
+            c.TopicId,
+            c.UserId,
+            string.IsNullOrWhiteSpace(c.User.DisplayName) ? c.User.Email : c.User.DisplayName!,
+            c.Body,
+            c.ParentId,
+            c.CreatedAt,
+            c.Likes.Count,
+            viewerId is Guid uid && c.Likes.Any(l => l.UserId == uid),
+            NormalizeSize(c.WidgetSize),
+            c.SortOrder
+        );
+}
 
 public class ListGuideTopicStatsEndpoint(AppDbContext db) : EndpointWithoutRequest<List<GuideTopicStatsDto>>
 {
@@ -67,18 +99,10 @@ public class ListGuideCommentsEndpoint(AppDbContext db) : EndpointWithoutRequest
             .ToListAsync(ct);
 
         var dtos = rows
-            .Select(c => new GuideCommentDto(
-                c.Id,
-                c.TopicId,
-                c.UserId,
-                string.IsNullOrWhiteSpace(c.User.DisplayName) ? c.User.Email : c.User.DisplayName!,
-                c.Body,
-                c.ParentId,
-                c.CreatedAt,
-                c.Likes.Count,
-                userId is Guid uid && c.Likes.Any(l => l.UserId == uid)
-            ))
-            .OrderByDescending(c => c.LikeCount)
+            .Select(c => GuideCommentMapping.ToDto(c, userId))
+            .OrderBy(c => c.ParentId.HasValue ? 1 : 0)
+            .ThenBy(c => c.SortOrder)
+            .ThenByDescending(c => c.LikeCount)
             .ThenByDescending(c => c.CreatedAt)
             .ToList();
 
@@ -141,30 +165,83 @@ public class CreateGuideCommentEndpoint(AppDbContext db) : Endpoint<CreateGuideC
             return;
         }
 
+        var maxOrder = await db.GuideComments.AsNoTracking()
+            .Where(c => c.TopicId == topicId && c.ParentId == null)
+            .Select(c => (int?)c.SortOrder)
+            .MaxAsync(ct) ?? -1;
+
         var comment = new GuideComment
         {
             TopicId = topicId,
             UserId = userId.Value,
             Body = body,
             ParentId = req.ParentId,
+            WidgetSize = req.ParentId is null ? GuideCommentMapping.NormalizeSize(req.WidgetSize) : "half",
+            SortOrder = req.ParentId is null ? maxOrder + 1 : 0,
         };
         db.GuideComments.Add(comment);
         await db.SaveChangesAsync(ct);
 
-        await Send.OkAsync(
-            new GuideCommentDto(
-                comment.Id,
-                comment.TopicId,
-                comment.UserId,
-                string.IsNullOrWhiteSpace(user.DisplayName) ? user.Email : user.DisplayName!,
-                comment.Body,
-                comment.ParentId,
-                comment.CreatedAt,
-                0,
-                false
-            ),
-            ct
-        );
+        comment.User = user;
+        comment.Likes = [];
+        await Send.OkAsync(GuideCommentMapping.ToDto(comment, userId), ct);
+    }
+}
+
+public class PatchGuideCommentLayoutEndpoint(AppDbContext db) : Endpoint<PatchGuideCommentLayoutRequest, GuideCommentDto>
+{
+    public override void Configure() => Patch("/guide/comments/{id}/layout");
+
+    public override async Task HandleAsync(PatchGuideCommentLayoutRequest req, CancellationToken ct)
+    {
+        var userId = AuthHelpers.GetUserId(User);
+        if (userId is null)
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        if (!Guid.TryParse(Route<string>("id"), out var id))
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        var comment = await db.GuideComments
+            .Include(c => c.User)
+            .Include(c => c.Likes)
+            .FirstOrDefaultAsync(c => c.Id == id, ct);
+        if (comment is null)
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        if (comment.ParentId is not null)
+        {
+            AddError("Seuls les commentaires racines sont des widgets.");
+            await Send.ErrorsAsync(cancellation: ct);
+            return;
+        }
+
+        if (req.WidgetSize is not null)
+            comment.WidgetSize = GuideCommentMapping.NormalizeSize(req.WidgetSize);
+
+        if (req.SortOrder is int order)
+        {
+            var siblings = await db.GuideComments
+                .Where(c => c.TopicId == comment.TopicId && c.ParentId == null && c.Id != comment.Id)
+                .OrderBy(c => c.SortOrder)
+                .ToListAsync(ct);
+
+            var clamped = Math.Clamp(order, 0, siblings.Count);
+            siblings.Insert(clamped, comment);
+            for (var i = 0; i < siblings.Count; i++)
+                siblings[i].SortOrder = i;
+        }
+
+        await db.SaveChangesAsync(ct);
+        await Send.OkAsync(GuideCommentMapping.ToDto(comment, userId), ct);
     }
 }
 
@@ -245,22 +322,7 @@ public class ToggleGuideCommentLikeEndpoint(AppDbContext db) : EndpointWithoutRe
 
         await db.SaveChangesAsync(ct);
 
-        var likeCount = await db.GuideCommentLikes.CountAsync(l => l.CommentId == comment.Id, ct);
-        var likedByMe = await db.GuideCommentLikes.AnyAsync(l => l.CommentId == comment.Id && l.UserId == userId, ct);
-
-        await Send.OkAsync(
-            new GuideCommentDto(
-                comment.Id,
-                comment.TopicId,
-                comment.UserId,
-                string.IsNullOrWhiteSpace(comment.User.DisplayName) ? comment.User.Email : comment.User.DisplayName!,
-                comment.Body,
-                comment.ParentId,
-                comment.CreatedAt,
-                likeCount,
-                likedByMe
-            ),
-            ct
-        );
+        await db.Entry(comment).Collection(c => c.Likes).LoadAsync(ct);
+        await Send.OkAsync(GuideCommentMapping.ToDto(comment, userId), ct);
     }
 }

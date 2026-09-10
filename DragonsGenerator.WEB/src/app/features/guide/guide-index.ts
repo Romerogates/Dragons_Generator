@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { GuideCommentsService, type GuideTopicStats } from '@core/services/guide-comments.service';
 import { GuidePreferencesService } from '@core/services/guide-preferences.service';
 import type { GuideAudience } from './guide.types';
-import { GUIDE_NAV_GROUPS } from './guide-content';
+import { GUIDE_NAV_GROUPS, GUIDE_QUICK_CARDS } from './guide-content';
 import { guideTopicsByGroup } from './guide-topics';
 
 @Component({
@@ -33,6 +33,7 @@ export class GuideIndexPage implements OnInit {
   readonly stats = signal<Record<string, GuideTopicStats>>({});
 
   readonly groups = GUIDE_NAV_GROUPS;
+  readonly quickCards = GUIDE_QUICK_CARDS;
 
   readonly sections = computed(() =>
     guideTopicsByGroup(this.audience(), this.query(), this.groupFilter()),

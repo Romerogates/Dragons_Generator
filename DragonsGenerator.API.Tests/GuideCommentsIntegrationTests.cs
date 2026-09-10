@@ -30,15 +30,28 @@ public class GuideCommentsIntegrationTests
             var json = await res.Content.ReadFromJsonAsync<JsonElement>();
             rootId = json.GetProperty("id").GetGuid();
             Assert.Equal(0, json.GetProperty("likeCount").GetInt32());
+            Assert.Equal("half", json.GetProperty("widgetSize").GetString());
         }
 
         Guid popularId;
         using (var post = ApiTestAuth.Authed(HttpMethod.Post, $"/guide/topics/{topic}/comments", tokenB))
         {
-            post.Content = JsonContent.Create(new { body = "Réponse très likée" });
+            post.Content = JsonContent.Create(new { body = "Réponse très likée", widgetSize = "third" });
             var res = await _client.SendAsync(post);
             res.EnsureSuccessStatusCode();
-            popularId = (await res.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("id").GetGuid();
+            var json = await res.Content.ReadFromJsonAsync<JsonElement>();
+            popularId = json.GetProperty("id").GetGuid();
+            Assert.Equal("third", json.GetProperty("widgetSize").GetString());
+        }
+
+        using (var layout = ApiTestAuth.Authed(HttpMethod.Patch, $"/guide/comments/{popularId}/layout", tokenA))
+        {
+            layout.Content = JsonContent.Create(new { widgetSize = "full", sortOrder = 0 });
+            var res = await _client.SendAsync(layout);
+            res.EnsureSuccessStatusCode();
+            var json = await res.Content.ReadFromJsonAsync<JsonElement>();
+            Assert.Equal("full", json.GetProperty("widgetSize").GetString());
+            Assert.Equal(0, json.GetProperty("sortOrder").GetInt32());
         }
 
         using (var like = ApiTestAuth.Authed(HttpMethod.Post, $"/guide/comments/{popularId}/like", tokenA))

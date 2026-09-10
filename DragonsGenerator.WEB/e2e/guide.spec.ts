@@ -16,7 +16,8 @@ test.describe('Guide forum', () => {
     await topicLink.click();
 
     await expect(page).toHaveURL(/\/guide\/[a-z0-9-]+/, { timeout: 15_000 });
-    await expect(page.getByRole('heading', { name: 'Commentaires' })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: /Commentaires/i })).toBeVisible({ timeout: 15_000 });
     await expect(page.getByPlaceholder('Ajouter un commentaire…')).toBeVisible();
+    await expect(page.getByText(/Lire →|Étapes|Parcours|widgets/i).first()).toBeVisible();
   });
 });

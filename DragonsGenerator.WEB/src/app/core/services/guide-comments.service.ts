@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
 
+export type GuideCommentWidgetSize = 'third' | 'half' | 'full';
+
 export interface GuideTopicStats {
   topicId: string;
   commentCount: number;
@@ -19,6 +21,8 @@ export interface GuideComment {
   createdAt: string;
   likeCount: number;
   likedByMe: boolean;
+  widgetSize: GuideCommentWidgetSize;
+  sortOrder: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -34,11 +38,24 @@ export class GuideCommentsService {
     return this.http.get<GuideComment[]>(`${this.api}/guide/topics/${encodeURIComponent(topicId)}/comments`);
   }
 
-  createComment(topicId: string, body: string, parentId?: string | null): Observable<GuideComment> {
+  createComment(
+    topicId: string,
+    body: string,
+    parentId?: string | null,
+    widgetSize?: GuideCommentWidgetSize,
+  ): Observable<GuideComment> {
     return this.http.post<GuideComment>(`${this.api}/guide/topics/${encodeURIComponent(topicId)}/comments`, {
       body,
       parentId: parentId || null,
+      widgetSize: widgetSize ?? 'half',
     });
+  }
+
+  patchLayout(
+    id: string,
+    patch: { widgetSize?: GuideCommentWidgetSize; sortOrder?: number },
+  ): Observable<GuideComment> {
+    return this.http.patch<GuideComment>(`${this.api}/guide/comments/${id}/layout`, patch);
   }
 
   deleteComment(id: string): Observable<void> {

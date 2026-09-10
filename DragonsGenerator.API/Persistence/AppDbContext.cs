@@ -173,7 +173,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         {
             e.Property(x => x.TopicId).HasMaxLength(64);
             e.Property(x => x.Body).HasMaxLength(2000);
+            e.Property(x => x.WidgetSize).HasMaxLength(16);
             e.HasIndex(x => new { x.TopicId, x.CreatedAt });
+            e.HasIndex(x => new { x.TopicId, x.SortOrder });
             e.HasOne(x => x.User)
                 .WithMany()
                 .HasForeignKey(x => x.UserId)

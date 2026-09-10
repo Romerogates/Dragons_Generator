@@ -32,6 +32,7 @@ public static class DbMigrationRunner
         new("008_session_reminder_logs", Apply008SessionReminderLogsAsync),
         new("009_user_preferences_json", Apply009UserPreferencesJsonAsync),
         new("010_guide_comments", Apply010GuideCommentsAsync),
+        new("011_guide_comment_widgets", Apply011GuideCommentWidgetsAsync),
     ];
 
     private sealed record Migration(string Id, Func<AppDbContext, CancellationToken, Task> Apply);
@@ -275,6 +276,19 @@ public static class DbMigrationRunner
             ct);
     }
 
+    private static async Task Apply011GuideCommentWidgetsAsync(AppDbContext db, CancellationToken ct)
+    {
+        await TryAddColumnAsync(db, "GuideComments", "WidgetSize", "TEXT NOT NULL DEFAULT 'half'", ct);
+        await TryAddColumnAsync(db, "GuideComments", "SortOrder", "INTEGER NOT NULL DEFAULT 0", ct);
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            UPDATE "GuideComments" SET "WidgetSize" = 'half' WHERE "WidgetSize" IS NULL OR TRIM("WidgetSize") = '';
+            CREATE INDEX IF NOT EXISTS "IX_GuideComments_TopicId_SortOrder"
+                ON "GuideComments" ("TopicId", "SortOrder");
+            """,
+            ct);
+    }
+
     private static async Task TryAddColumnAsync(
         AppDbContext db,
         string table,
@@ -314,5 +328,7 @@ public static class DbMigrationRunner
 
     private static bool IsSafeSqlTypeDefinition(string definition) =>
         definition is "TEXT NULL"
-            or "TEXT NOT NULL DEFAULT 'violet'";
+            or "TEXT NOT NULL DEFAULT 'violet'"
+            or "TEXT NOT NULL DEFAULT 'half'"
+            or "INTEGER NOT NULL DEFAULT 0";
 }

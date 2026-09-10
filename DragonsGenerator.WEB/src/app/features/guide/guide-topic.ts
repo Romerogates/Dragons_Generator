@@ -10,7 +10,11 @@ import {
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '@core/services/auth.service';
-import { GuideCommentsService, type GuideComment } from '@core/services/guide-comments.service';
+import {
+  GuideCommentsService,
+  type GuideComment,
+  type GuideCommentWidgetSize,
+} from '@core/services/guide-comments.service';
 import { GuidePreferencesService } from '@core/services/guide-preferences.service';
 import { getGuideTopic } from './guide-topics';
 
@@ -36,8 +40,22 @@ export class GuideTopicPage implements OnInit {
   readonly draft = signal('');
   readonly replyTo = signal<string | null>(null);
   readonly posting = signal(false);
+  readonly editingWidgetId = signal<string | null>(null);
+  readonly newWidgetSize = signal<GuideCommentWidgetSize>('half');
 
-  readonly roots = computed(() => this.comments().filter((c) => !c.parentId));
+  readonly widgetSizes: { id: GuideCommentWidgetSize; label: string }[] = [
+    { id: 'third', label: '1/3' },
+    { id: 'half', label: '1/2' },
+    { id: 'full', label: '1/1' },
+  ];
+
+  readonly roots = computed(() =>
+    this.comments()
+      .filter((c) => !c.parentId)
+      .slice()
+      .sort((a, b) => a.sortOrder - b.sortOrder || b.likeCount - a.likeCount),
+  );
+
   readonly repliesOf = computed(() => {
     const map = new Map<string, GuideComment[]>();
     for (const c of this.comments()) {
@@ -56,6 +74,7 @@ export class GuideTopicPage implements OnInit {
       const id = p.get('topicId') ?? '';
       this.topicId.set(id);
       if (id) this.prefs.markSectionRead(id);
+      this.editingWidgetId.set(null);
       this.reload();
     });
   }
@@ -67,7 +86,13 @@ export class GuideTopicPage implements OnInit {
     this.error.set(null);
     this.commentsApi.listComments(id).subscribe({
       next: (list) => {
-        this.comments.set(list);
+        this.comments.set(
+          list.map((c) => ({
+            ...c,
+            widgetSize: (c.widgetSize as GuideCommentWidgetSize) || 'half',
+            sortOrder: c.sortOrder ?? 0,
+          })),
+        );
         this.loading.set(false);
       },
       error: () => {
@@ -82,29 +107,25 @@ export class GuideTopicPage implements OnInit {
     const id = this.topicId();
     if (!body || !id || this.posting()) return;
     this.posting.set(true);
-    this.commentsApi.createComment(id, body, this.replyTo()).subscribe({
-      next: () => {
-        this.draft.set('');
-        this.replyTo.set(null);
-        this.posting.set(false);
-        this.reload();
-      },
-      error: () => {
-        this.posting.set(false);
-        this.error.set('Envoi impossible.');
-      },
-    });
+    this.commentsApi
+      .createComment(id, body, this.replyTo(), this.replyTo() ? undefined : this.newWidgetSize())
+      .subscribe({
+        next: () => {
+          this.draft.set('');
+          this.replyTo.set(null);
+          this.posting.set(false);
+          this.reload();
+        },
+        error: () => {
+          this.posting.set(false);
+          this.error.set('Envoi impossible.');
+        },
+      });
   }
 
   toggleLike(c: GuideComment): void {
     this.commentsApi.toggleLike(c.id).subscribe({
-      next: (updated) => {
-        this.comments.update((list) =>
-          list
-            .map((x) => (x.id === updated.id ? updated : x))
-            .sort((a, b) => b.likeCount - a.likeCount || +new Date(b.createdAt) - +new Date(a.createdAt)),
-        );
-      },
+      next: (updated) => this.mergeComment(updated),
     });
   }
 
@@ -117,10 +138,47 @@ export class GuideTopicPage implements OnInit {
 
   startReply(id: string): void {
     this.replyTo.set(id);
+    this.editingWidgetId.set(null);
   }
 
   cancelReply(): void {
     this.replyTo.set(null);
+  }
+
+  isEditing(id: string): boolean {
+    return this.editingWidgetId() === id;
+  }
+
+  startEditWidget(id: string): void {
+    this.editingWidgetId.set(id);
+    this.replyTo.set(null);
+  }
+
+  doneEditWidget(): void {
+    this.editingWidgetId.set(null);
+  }
+
+  setWidgetSize(c: GuideComment, size: GuideCommentWidgetSize): void {
+    this.commentsApi.patchLayout(c.id, { widgetSize: size }).subscribe({
+      next: (updated) => this.mergeComment(updated),
+    });
+  }
+
+  moveWidget(c: GuideComment, dir: -1 | 1): void {
+    const roots = this.roots();
+    const idx = roots.findIndex((x) => x.id === c.id);
+    const next = idx + dir;
+    if (idx < 0 || next < 0 || next >= roots.length) return;
+    this.commentsApi.patchLayout(c.id, { sortOrder: next }).subscribe({
+      next: () => this.reload(),
+    });
+  }
+
+  padSpanClass(c: GuideComment): string {
+    const size = c.widgetSize ?? 'half';
+    if (size === 'full') return 'col-span-6';
+    if (size === 'third') return 'col-span-6 sm:col-span-2';
+    return 'col-span-6 sm:col-span-3';
   }
 
   formatDate(iso: string): string {
@@ -134,5 +192,19 @@ export class GuideTopicPage implements OnInit {
     } catch {
       return iso;
     }
+  }
+
+  private mergeComment(updated: GuideComment): void {
+    this.comments.update((list) =>
+      list.map((x) =>
+        x.id === updated.id
+          ? {
+              ...updated,
+              widgetSize: (updated.widgetSize as GuideCommentWidgetSize) || 'half',
+              sortOrder: updated.sortOrder ?? x.sortOrder,
+            }
+          : x,
+      ),
+    );
   }
 }
