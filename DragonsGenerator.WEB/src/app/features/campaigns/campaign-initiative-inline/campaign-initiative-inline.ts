@@ -94,7 +94,15 @@ export class CampaignInitiativeInline {
     this.campaigns.submitInitiative(this.campaignId(), { code, combatantId, roll }).subscribe({
       next: () => {
         this.submitting.set(false);
-        this.success.set('Jet enregistré !');
+        const sel = this.selectedCombatant();
+        const bonus = sel?.initiativeBonus ?? 0;
+        const bonusLabel = bonus >= 0 ? `+${bonus}` : `${bonus}`;
+        const total = (this.roll() ?? 0) + bonus;
+        this.success.set(
+          sel
+            ? `Jet enregistré : ${this.roll()}${bonusLabel} = ${total}`
+            : 'Jet enregistré !',
+        );
         this.submitted.emit();
       },
       error: (err) => {

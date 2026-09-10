@@ -54,6 +54,13 @@ describe('buildCampaignSetupGuide', () => {
     expect(g.current?.primaryAction).toBe('openPlayFullscreen');
     expect(g.current?.primaryLabel).toBe('Ouvrir la table');
     expect(g.current?.tip).toBe('');
+    expect(g.current?.proposal).toContain('Vous êtes en session');
+  });
+
+  it('uses vousvoiement in guide copy', () => {
+    const g = buildCampaignSetupGuide(base());
+    expect(g.current?.proposal).not.toMatch(/\b(Tu |toi |tes |ton |ta )\b/i);
+    expect(g.current?.proposal).toMatch(/Vous |Écrivez|Ajoutez|Planifiez|Invitez|Générez|Regroupez|Entrez/i);
   });
 
   it('is ready when every step is complete', () => {

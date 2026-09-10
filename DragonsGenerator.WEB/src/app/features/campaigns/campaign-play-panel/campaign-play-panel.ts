@@ -55,6 +55,7 @@ import {
   duplicateCombatant,
   expandEncounterToCombatants,
   formatCombatArchiveSummary,
+  freezeTurnOrderIds,
   isCombatantDefeated,
   reorderCombatantInTurnOrder,
   resolveCombatFlowPhase,
@@ -177,6 +178,8 @@ export class CampaignPlayPanel implements OnDestroy {
   private persistSeq = 0;
   private persistTail: Promise<void> = Promise.resolve();
   private readonly onPageHide = (): void => this.flushPendingSessionWork();
+  /** Ids déjà notifiés pendant la collecte d’init (toasts par jet). */
+  private seenInitiativeSubmissions = new Set<string>();
 
   readonly isDm = computed(() => this.campaign().isOwner === true);
 
@@ -749,6 +752,9 @@ export class CampaignPlayPanel implements OnDestroy {
       },
       { immediate: true },
     );
+    this.seenInitiativeSubmissions = new Set(
+      combat.combatants.filter((c) => c.kind === 'player' && c.playerSubmitted).map((c) => c.id),
+    );
     this.startInitiativePoll();
     this.setFeedback('ok', 'Initiative : ces jets fixent l’ordre des tours.');
   }
@@ -760,7 +766,13 @@ export class CampaignPlayPanel implements OnDestroy {
       return;
     }
     this.patchCombat(
-      { ...combat, flowPhase: 'fight', collectingInitiative: false },
+      {
+        ...combat,
+        flowPhase: 'fight',
+        collectingInitiative: false,
+        turnOrderIds: freezeTurnOrderIds(combat),
+        turnIndex: 0,
+      },
       { immediate: true },
     );
     this.stopInitiativePoll();
@@ -1697,6 +1709,9 @@ export class CampaignPlayPanel implements OnDestroy {
   openInitiativeCollection(): void {
     const combat = this.activeCombat();
     if (!combat) return;
+    this.seenInitiativeSubmissions = new Set(
+      combat.combatants.filter((c) => c.kind === 'player' && c.playerSubmitted).map((c) => c.id),
+    );
     this.patchCombat(
       {
         ...combat,
@@ -1713,7 +1728,12 @@ export class CampaignPlayPanel implements OnDestroy {
     if (!combat) return;
     this.stopInitiativePoll();
     this.patchCombat(
-      { ...combat, collectingInitiative: false },
+      {
+        ...combat,
+        collectingInitiative: false,
+        turnOrderIds: freezeTurnOrderIds(combat),
+        turnIndex: 0,
+      },
       { immediate: true },
     );
   }
@@ -2063,13 +2083,33 @@ export class CampaignPlayPanel implements OnDestroy {
         const session = merged.data.sessions?.find((s) => s.id === merged.data.activeSessionId);
         const combat = session?.activeCombat;
         if (!combat?.collectingInitiative) return;
+        this.notifyNewInitiativeRolls(combat);
         const players = combat.combatants.filter((cb) => cb.kind === 'player');
         if (players.length > 0 && players.every((cb) => cb.playerSubmitted)) {
-          this.setFeedback('ok', 'Tous les jets d’initiative reçus.');
+          this.setFeedback('ok', 'Tous les jets d’initiative reçus — ordre des tours prêt.');
           this.closeInitiativeCollection();
         }
       },
     });
+  }
+
+  private notifyNewInitiativeRolls(combat: ActiveCombat): void {
+    for (const cb of combat.combatants) {
+      if (cb.kind !== 'player' || !cb.playerSubmitted || this.seenInitiativeSubmissions.has(cb.id)) {
+        continue;
+      }
+      this.seenInitiativeSubmissions.add(cb.id);
+      const bonus = cb.initiativeBonus ?? 0;
+      const bonusLabel = bonus >= 0 ? `+${bonus}` : `${bonus}`;
+      const total = combatantInitiativeTotal(cb);
+      const who = this.playerDisplayName(cb) || cb.name || 'Joueur';
+      this.setFeedback(
+        'ok',
+        total != null
+          ? `${who} : ${cb.initiativeRoll}${bonusLabel} = ${total}`
+          : `${who} a envoyé son jet.`,
+      );
+    }
   }
 
   private reload(): void {
@@ -2082,9 +2122,10 @@ export class CampaignPlayPanel implements OnDestroy {
         );
         const combat = session?.activeCombat;
         if (!combat?.collectingInitiative) return;
+        this.notifyNewInitiativeRolls(combat);
         const players = combat.combatants.filter((cb) => cb.kind === 'player');
         if (players.length > 0 && players.every((cb) => cb.playerSubmitted)) {
-          this.setFeedback('ok', 'Tous les jets d’initiative reçus.');
+          this.setFeedback('ok', 'Tous les jets d’initiative reçus — ordre des tours prêt.');
           this.closeInitiativeCollection();
         }
       },

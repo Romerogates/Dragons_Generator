@@ -122,7 +122,8 @@ Prérequis : campagne créée, ≥ 1 joueur avec perso **approuvé**, rencontre 
   - *E2E :* collecte ouverte (`campaign-play`) + banner joueur (`campaign-combat-xp`).
 - [x] 🟠 Attaque sur le tour : cibler une carte → jet d20 (dés ou encode) → PV / vaincu.
   - *E2E :* `campaign-combat-attack.spec.ts` (clic carte → encode → dégâts → PV + journal ; jet raté).
-- [ ] 🟠 Voir les jets arriver ; fin de collecte / ordre de tour
+- [x] 🟠 Voir les jets arriver ; fin de collecte / ordre de tour
+  - Toast par jet (dé+bonus=total) ; fin de collecte fige `turnOrderIds` ; message « ordre des tours prêt ».
 - [x] 🔴 **Distribuer XP** : succès → bouton disparaît (`xpAwarded`) ; pas de double distribution après refresh
   - *E2E :* `campaign-combat-xp.spec.ts`.
 - [x] 🟠 Échec réseau simulé (DevTools offline) : message d’erreur XP, pas de navigation bizarre
@@ -146,10 +147,8 @@ Prérequis : campagne créée, ≥ 1 joueur avec perso **approuvé**, rencontre 
 
 - [x] 🔴 Éditer notes / handout / carte → attendre debounce → refresh page → **données encore là**
   - *E2E partiel :* notes calepin (`campaign-play.spec.ts`).
-- [ ] 🟠 Deux onglets MJ : pas de perte grossière au save (smoke)
-
-### 5.4 Carnet MJ (Texte / Main)
-
+- [x] 🟠 Deux onglets MJ : pas de perte grossière au save (smoke)
+  - Au focus : si `updatedAt` distant plus récent → reload data + bannière sync.
 - [x] 🔴 Onglet **Carnet** : bascule Texte ↔ Main ; traits stylet visibles après refresh
 - [x] 🟠 Palette couleurs + stylo / surligneur + Undo
 - [x] 🟠 Export **PNG** et **PDF** des pages Main
@@ -184,7 +183,8 @@ Avec un 2ᵉ compte membre de la campagne.
 - [x] 🔴 Si **pas** importé : pas de faux « Le MJ attend votre initiative » / ou message « pas dans ce combat »
   - *E2E :* `campaign-combat-xp.spec.ts`.
 - [x] 🟠 Page `/campaigns/:id/init` : même empty state clair si non importé
-- [ ] 🟠 Saisir un jet → confirmation ; total avec bonus
+- [x] 🟠 Saisir un jet → confirmation ; total avec bonus
+  - Inline + `/init` : « Jet enregistré : X+Y = Z ».
   - *E2E partiel :* `campaign-live-polish.spec.ts` (banner → Envoyer jet).
 - [x] 🟠 Document épinglé / overlay joueur
   - *E2E :* `campaign-live-polish.spec.ts`.

@@ -29,6 +29,9 @@
             @if (saving()) {
               <span class="text-[10px] font-black uppercase tracking-widest text-violet-500 animate-pulse">Sauvegarde...</span>
             }
+            @if (syncNotice(); as notice) {
+              <span class="max-w-xs text-[10px] font-semibold text-amber-300 leading-snug">{{ notice }}</span>
+            }
             @if (!c.isOwner) {
               <button
                 type="button"
@@ -242,7 +245,7 @@
                         <p class="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-2">Bestiaire de campagne</p>
                         <h2 class="text-xl font-serif text-slate-100 mb-2">Alliés et adversaires</h2>
                         <p class="text-sm text-slate-400 max-w-md mx-auto">
-                          Crée d’abord tes créatures ici, en les marquant allié ou adversaire. Tu pourras ensuite les choisir rapidement en combat.
+                          Créez d’abord vos créatures ici, en les marquant allié ou adversaire. Vous pourrez ensuite les choisir rapidement en combat.
                         </p>
                       </div>
                       <button
@@ -506,10 +509,18 @@
                         </div>
                       </article>
                     } @empty {
-                      <p class="text-slate-500 italic text-center py-12">Aucun héros pré-tiré. Importez un personnage depuis vos héros ou créez-en un nouveau.</p>
+                      <div class="rounded-2xl border border-dashed border-violet-800/50 bg-violet-950/15 p-6 text-center space-y-3">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-violet-400">Pré-tirés</p>
+                        <p class="text-sm text-slate-300 max-w-md mx-auto">
+                          Aucun héros pré-tiré. Importez un personnage depuis vos héros ou générez-en un ci-dessus.
+                        </p>
+                      </div>
                     }
                   } @else if (!myAssignedPregens().length) {
-                    <p class="text-slate-500 italic text-center py-12">Le MJ n'a pas encore publié de personnages pré-tirés.</p>
+                    <div class="rounded-2xl border border-dashed border-slate-700 bg-[#1b2028]/50 p-6 text-center space-y-2">
+                      <p class="text-sm text-slate-300">Aucun pré-tiré publié pour vous.</p>
+                      <p class="text-xs text-slate-500">Le MJ peut en préparer dans Préparation → Pré-tirés.</p>
+                    </div>
                   }
                 </section>
               }
@@ -618,7 +629,35 @@
                       }
                     </article>
                   } @empty {
-                    <p class="text-slate-500 italic text-center py-12">Aucune rencontre. Générez-en depuis les créatures de l'histoire.</p>
+                    <div class="rounded-2xl border border-dashed border-violet-800/50 bg-violet-950/15 p-6 text-center space-y-4">
+                      <div>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-2">Rencontres</p>
+                        <p class="text-sm text-slate-300 max-w-md mx-auto">
+                          @if (c.data.creatures.length) {
+                            Aucune rencontre pour l’instant. Générez des groupes depuis votre bestiaire.
+                          } @else {
+                            Ajoutez d’abord des créatures, puis générez des rencontres ici.
+                          }
+                        </p>
+                      </div>
+                      @if (c.data.creatures.length) {
+                        <button
+                          type="button"
+                          class="min-h-11 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white hover:bg-violet-500"
+                          (click)="generateEncountersFromStory()"
+                        >
+                          Générer des rencontres
+                        </button>
+                      } @else {
+                        <button
+                          type="button"
+                          class="min-h-11 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase border border-amber-700/50 text-amber-300"
+                          (click)="setPrepSub('creatures')"
+                        >
+                          Aller aux créatures
+                        </button>
+                      }
+                    </div>
                   }
                 </section>
                 }

@@ -1883,7 +1883,11 @@
             </article>
           }
         } @else {
-          <p class="text-sm text-slate-500 italic">Aucune rencontre — générez-en depuis Préparation → Rencontres.</p>
+          <div class="rounded-2xl border border-dashed border-violet-800/40 bg-violet-950/15 p-5 text-center space-y-2">
+            <p class="text-[10px] font-black uppercase tracking-widest text-violet-400">Rencontres</p>
+            <p class="text-sm text-slate-300">Aucune rencontre préparée.</p>
+            <p class="text-xs text-slate-500">Générez-en depuis Préparation → Rencontres.</p>
+          </div>
         }
       </div>
     }
@@ -1899,7 +1903,7 @@
         {{ nextSession.title }} · {{ formatSessionDate(nextSession.scheduledAt) }}
       </p>
       <p class="text-xs text-slate-500 mt-2 max-w-md">
-        Entre en session pour ouvrir la table. Combattre, notes et rencontres ne sont disponibles qu’après.
+        Entrez en session pour ouvrir la table. Combattre, notes et rencontres ne sont disponibles qu’après.
       </p>
     </div>
     @if (isDm()) {
@@ -1913,10 +1917,14 @@
     }
   </div>
 } @else {
-  <div class="text-center py-8 px-4 space-y-2">
-    <p class="text-sm text-slate-400 font-serif">Aucune session active</p>
+  <div
+    class="text-center space-y-2"
+    [class]="fullscreen() ? 'bg-[#1b2028] border border-dashed border-emerald-800/40 rounded-2xl p-8' : 'bg-[#1b2028] border border-dashed border-emerald-800/40 rounded-2xl p-6'"
+  >
+    <p class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Aucune session active</p>
+    <p class="text-sm text-slate-300 font-serif">Planifiez une session pour jouer.</p>
     <p class="text-xs text-slate-500 max-w-sm mx-auto">
-      Planifie une session dans la campagne, puis entre dedans pour jouer. Le combat n’est pas accessible depuis le hub de préparation.
+      La préparation reste dans le hub ; le combat n’est accessible qu’après être entré en session.
     </p>
   </div>
 }

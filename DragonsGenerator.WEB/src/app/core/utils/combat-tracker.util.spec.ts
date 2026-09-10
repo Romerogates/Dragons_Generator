@@ -10,6 +10,7 @@ import {
   duplicateCombatant,
   expandEncounterToCombatants,
   formatCombatArchiveSummary,
+  freezeTurnOrderIds,
   isCombatantDefeated,
   sortCombatants,
   syncEncountersFromCombatants,
@@ -185,6 +186,23 @@ describe('combat-tracker.util', () => {
     const alpha = createCombatant({ name: 'Alpha', kind: 'player' });
     const sorted = sortCombatants([bravo, alpha], [alpha.id, bravo.id]);
     expect(sorted.map((c) => c.name)).toEqual(['Alpha', 'Bravo']);
+  });
+
+  it('freezeTurnOrderIds sorts by initiative total', () => {
+    const low = createCombatant({
+      name: 'Low',
+      kind: 'player',
+      initiativeRoll: 5,
+      initiativeBonus: 0,
+    });
+    const high = createCombatant({
+      name: 'High',
+      kind: 'monster',
+      initiativeRoll: 18,
+      initiativeBonus: 2,
+    });
+    const combat = createActiveCombat([low, high]);
+    expect(freezeTurnOrderIds(combat)).toEqual([high.id, low.id]);
   });
 
   it('reorderCombatantInTurnOrder rejects invalid or mismatched swaps', () => {

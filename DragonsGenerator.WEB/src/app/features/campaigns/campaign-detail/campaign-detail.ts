@@ -148,6 +148,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly loading = signal(true);
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
+  /** Bannière sync multi-onglets MJ. */
+  readonly syncNotice = signal<string | null>(null);
   readonly tab = signal<PrimaryTab>('overview');
   readonly prepSub = signal<PrepSub>('scenario');
   readonly campaign = signal<CampaignDetailModel | null>(null);
@@ -650,25 +652,37 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   private readonly onWindowFocus = (): void => {
-    if (this.auth.isLoggedIn()) this.softReload();
+    if (this.auth.isLoggedIn()) this.softReload({ syncOwnerIfNewer: true });
   };
 
   /** Recharge sans spinner (invitations acceptées, propositions, combat live joueur…). */
-  private softReload(): void {
+  private softReload(opts?: { syncOwnerIfNewer?: boolean }): void {
     const campaignId = this.campaign()?.id;
     if (!campaignId || this.loading() || this.saving()) return;
     this.campaigns.get(campaignId).subscribe({
       next: (c) => {
         const current = this.campaign();
-        if (!current || current.id !== c.id || !current.isOwner) {
-          // Joueurs : sync complète (combat / tours / PV). MJ : ne pas écraser data locale.
+        if (!current || current.id !== c.id) {
           this.campaign.set(c);
+        } else if (!current.isOwner) {
+          // Joueurs : sync complète (combat / tours / PV / fog).
+          this.campaign.set(c);
+        } else if (
+          opts?.syncOwnerIfNewer &&
+          this.isRemoteNewer(c.updatedAt, current.updatedAt)
+        ) {
+          this.campaign.set(c);
+          this.sessionCache.cache(c.id, c.title, c.data);
+          this.syncNotice.set(
+            'Campagne rechargée — un autre onglet avait des changements plus récents.',
+          );
+          window.setTimeout(() => this.syncNotice.set(null), 5_000);
         } else {
           this.campaign.set({
             ...current,
             title: c.title,
             members: c.members,
-            updatedAt: c.updatedAt,
+            // Garder updatedAt local tant que data MJ n’est pas resync (focus).
             isOwner: c.isOwner,
             role: c.role,
           });
@@ -679,11 +693,19 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
           return next.size === prev.size ? prev : next;
         });
         this.tuneSoftPollInterval(c);
+        if (current?.isOwner) this.loadPendingInvites();
       },
       error: () => {
         /* ignore soft poll */
       },
     });
+  }
+
+  private isRemoteNewer(remoteIso: string, localIso: string): boolean {
+    const remote = Date.parse(remoteIso);
+    const local = Date.parse(localIso);
+    if (Number.isNaN(remote) || Number.isNaN(local)) return remoteIso > localIso;
+    return remote > local;
   }
 
   /** Poll plus fréquent pour les joueurs pendant une session / combat live. */

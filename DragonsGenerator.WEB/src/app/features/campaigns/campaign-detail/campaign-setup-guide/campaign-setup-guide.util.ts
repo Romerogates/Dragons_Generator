@@ -102,7 +102,7 @@ export function buildCampaignSetupGuide(input: CampaignSetupGuideInput): Campaig
         id: 'play',
         title: 'Session en cours',
         proposal:
-          'Tu es en session. Ouvre la table plein écran pour noter, lancer des rencontres et combattre — le combat n’existe qu’ici.',
+          'Vous êtes en session. Ouvrez la table plein écran pour noter, lancer des rencontres et combattre — le combat n’existe qu’ici.',
         tip: '',
         primaryLabel: 'Ouvrir la table',
         primaryAction: 'openPlayFullscreen',
@@ -122,8 +122,8 @@ export function buildCampaignSetupGuide(input: CampaignSetupGuideInput): Campaig
         id: 'play',
         title: input.nextSessionTitle ?? 'Nouvelle session',
         proposal: input.nextSessionTitle
-          ? `Entre en session « ${input.nextSessionTitle} » pour ouvrir la table. Le combat n’est disponible qu’après.`
-          : 'Planifie une session : la préparation reste ici, le jeu commence seulement en session.',
+          ? `Entrez en session « ${input.nextSessionTitle} » pour ouvrir la table. Le combat n’est disponible qu’après.`
+          : 'Planifiez une session : la préparation reste ici, le jeu commence seulement en session.',
         tip: '',
         primaryLabel: input.nextSessionTitle ? 'Entrer en session' : 'Planifier une session',
         primaryAction: input.nextSessionTitle ? 'startNextSession' : 'addSession',
@@ -155,30 +155,30 @@ function describeStep(
     case 'scenario':
       return {
         id,
-        title: 'Pose le décor',
+        title: 'Posez le décor',
         proposal:
-          'Écris ou régénère le synopsis de campagne. Les joueurs comprennent mieux l’aventure, et toi tu gardes une boussole claire.',
-        tip: 'Tu peux aussi affiner titre, région et ton via « Modifier le scénario ».',
+          'Écrivez ou régénérez le synopsis de campagne. Les joueurs comprennent mieux l’aventure, et vous gardez une boussole claire.',
+        tip: 'Vous pouvez aussi affiner titre, région et ton via « Modifier le scénario ».',
         primaryLabel: 'Modifier le scénario',
         primaryAction: 'editScenario',
       };
     case 'creatures':
       return {
         id,
-        title: 'Choisis les adversaires',
+        title: 'Choisissez les adversaires',
         proposal:
-          'Ajoute les monstres et PNJ de cette campagne dans l’onglet Créatures. Ce bestiaire alimentera rencontres et combats.',
-        tip: 'Propose au moins un antagoniste (boss) et 2–3 sbires pour varier les scènes.',
+          'Ajoutez les monstres et PNJ de cette campagne dans l’onglet Créatures. Ce bestiaire alimentera rencontres et combats.',
+        tip: 'Proposez au moins un antagoniste (boss) et 2–3 sbires pour varier les scènes.',
         primaryLabel: 'Aller aux créatures',
         primaryAction: 'openCreatures',
       };
     case 'maps':
       return {
         id,
-        title: 'Donne un lieu à explorer',
+        title: 'Donnez un lieu à explorer',
         proposal:
-          'Génère une carte de donjon (ou ruines) pour que la table ait un endroit concret où se déplacer et déclencher des combats.',
-        tip: 'Pas obligatoire pour un one-shot social — tu peux passer cette étape.',
+          'Générez une carte de donjon (ou ruines) pour que la table ait un endroit concret où se déplacer et déclencher des combats.',
+        tip: 'Pas obligatoire pour un one-shot social — vous pouvez passer cette étape.',
         primaryLabel: 'Créer une carte',
         primaryAction: 'openMaps',
         secondaryLabel: 'Passer pour l’instant',
@@ -187,12 +187,12 @@ function describeStep(
     case 'encounters':
       return {
         id,
-        title: 'Compose les combats',
+        title: 'Composez les combats',
         proposal:
           input.creatureCount > 0
-            ? 'Regroupe tes créatures en rencontres (escarmouche, boss…). Tu pourras les lancer d’un clic à la table.'
-            : 'Il te faut d’abord des créatures pour monter des rencontres.',
-        tip: 'Tu peux générer automatiquement des groupes depuis le bestiaire.',
+            ? 'Regroupez vos créatures en rencontres (escarmouche, boss…). Vous pourrez les lancer d’un clic à la table.'
+            : 'Il vous faut d’abord des créatures pour monter des rencontres.',
+        tip: 'Vous pouvez générer automatiquement des groupes depuis le bestiaire.',
         primaryLabel:
           input.creatureCount > 0 && input.encounterCount === 0
             ? 'Générer les rencontres'
@@ -209,21 +209,21 @@ function describeStep(
     case 'players':
       return {
         id,
-        title: 'Invite la table',
+        title: 'Invitez la table',
         proposal:
           input.playerCount === 0
-            ? 'Invite tes amis, puis approuve leur personnage. Sans héros approuvé, le combat n’a personne à mettre du côté allié.'
-            : 'Des joueurs sont là — approuve au moins un personnage pour pouvoir l’importer en combat.',
-        tip: 'Tu peux aussi préparer des pré-tirés si quelqu’un n’a pas encore de fiche.',
+            ? 'Invitez vos amis, puis approuvez leur personnage. Sans héros approuvé, le combat n’a personne à mettre du côté allié.'
+            : 'Des joueurs sont là — approuvez au moins un personnage pour pouvoir l’importer en combat.',
+        tip: 'Vous pouvez aussi préparer des pré-tirés si quelqu’un n’a pas encore de fiche.',
         primaryLabel: 'Gérer les joueurs',
         primaryAction: 'openPlayers',
       };
     case 'session':
       return {
         id,
-        title: 'Planifie une session',
+        title: 'Planifiez une session',
         proposal:
-          'Cette page prépare la campagne. Pour jouer (et combattre), planifie puis entre dans une session.',
+          'Cette page prépare la campagne. Pour jouer (et combattre), planifiez puis entrez dans une session.',
         tip: 'Sans session active, la table de combat reste fermée.',
         primaryLabel: 'Planifier une session',
         primaryAction: 'addSession',
@@ -234,7 +234,7 @@ function describeStep(
       return {
         id: 'play',
         title: 'Prêt',
-        proposal: 'Tu peux démarrer.',
+        proposal: 'Vous pouvez continuer.',
         tip: '',
         primaryLabel: 'Continuer',
         primaryAction: 'openPlay',

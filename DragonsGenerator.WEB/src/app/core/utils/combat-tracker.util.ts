@@ -202,6 +202,11 @@ export function sortedTurnOrder(combat: ActiveCombat): Combatant[] {
   return sortCombatants(combat.combatants, combat.turnOrderIds);
 }
 
+/** Figé l’ordre des tours d’après les jets (appelé en fin de collecte / ouverture du combat). */
+export function freezeTurnOrderIds(combat: ActiveCombat): string[] {
+  return sortCombatants(combat.combatants).map((c) => c.id);
+}
+
 /** Ordre de combat sans les unités mortes (suiv./préc.). */
 export function activeTurnOrder(combat: ActiveCombat): Combatant[] {
   return sortedTurnOrder(combat).filter((c) => !isCombatantDefeated(c));
