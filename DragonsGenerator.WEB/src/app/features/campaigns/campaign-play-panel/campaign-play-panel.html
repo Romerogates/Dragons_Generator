@@ -609,13 +609,35 @@
         }
 
         @if (activeCombat()?.collectingInitiative && isDm()) {
-          <div class="bg-sky-950/20 border border-sky-800/40 rounded-xl px-4 py-3 space-y-2">
+          <div class="bg-sky-950/20 border border-sky-800/40 rounded-xl px-4 py-3 space-y-3">
             <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">
               Collecte ouverte · code {{ activeCombat()!.initiativeCode }}
             </p>
             <p class="text-xs text-slate-400">
               Jets joueurs : {{ submittedPlayerCount() }}/{{ playerCombatantCount() }}
             </p>
+            <ul class="space-y-1.5" aria-label="État de la collecte d’initiative">
+              @for (row of initiativeCollectionRows(); track row.id) {
+                <li class="flex flex-wrap items-baseline justify-between gap-2 text-sm">
+                  <span class="text-slate-200">
+                    {{ row.name }}
+                    @if (row.submitted) {
+                      <span class="text-emerald-400 font-black">✓</span>
+                    } @else {
+                      <span class="text-slate-600">…</span>
+                    }
+                  </span>
+                  <span class="font-mono text-xs text-slate-400">
+                    @if (row.submitted && row.roll != null) {
+                      {{ row.roll }}{{ row.bonus >= 0 ? '+' : '' }}{{ row.bonus }} =
+                      <span class="text-amber-300">{{ row.total }}</span>
+                    } @else {
+                      en attente
+                    }
+                  </span>
+                </li>
+              }
+            </ul>
             <div class="flex flex-wrap gap-2">
               <a
                 [routerLink]="['/campaigns', c.id, 'init']"

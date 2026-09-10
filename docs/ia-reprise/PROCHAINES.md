@@ -15,11 +15,13 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
-1. **Reste checklist** : amis/invites manuels ; face-à-face mobile ; jets/ordre de collecte init.
-2. *(optionnel)* peaufinages mineurs guide / empty states hors flux critique.
+1. **P1 prépa** : run sheet session ; attribuer donjon à la planification ; invites en attente + lien ; recap joueur après Terminer.
+2. **P2 live** : face-à-face mobile ; fog live ; édition combat repliée.
+3. *(optionnel)* peaufinages guide / empty states hors flux critique.
 
 ## Déjà livré (ne pas refaire)
 
+- **P0 table joueur + init** (2026-09-10) — `/play` ouvert aux joueurs (badge Joueur) ; CTA « Rejoindre la table » sur Résumé ; bandeau init = dé + encode + total ; collecte MJ liste Alice ✓ / Bob… ; guide aligné (Préparation → Donjons, document, + Toute la party).
 - **Plein écran UX** (2026-09-10) — icône maximize partagée (`app-fullscreen-enter-btn` / link) ; sortie **Escape** (Atlas, donjon, table `/play`, carnet Main, Codex sans bouton Fermer).
 - **Atlas Eana plein écran** (2026-09-10) — `/civilisations` : icône + clic fond → overlay `Carte.jpg` + pins.
 - **Éditeur donjon plein écran** (2026-09-10) — icône ; Escape sort du plein écran (pas de la liste).

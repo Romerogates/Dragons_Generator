@@ -188,6 +188,25 @@ export class CampaignPlayPanel implements OnDestroy {
 
   readonly activeCombat = computed(() => this.activeSession()?.activeCombat ?? null);
 
+  /** Collecte d’init MJ : qui a envoyé / jet + bonus = total. */
+  readonly initiativeCollectionRows = computed(() => {
+    const combat = this.activeCombat();
+    if (!combat) return [];
+    return combat.combatants
+      .filter((c) => c.kind === 'player')
+      .map((c) => {
+        const playerName = this.playerDisplayName(c);
+        return {
+          id: c.id,
+          name: playerName || c.name || 'Joueur',
+          submitted: !!c.playerSubmitted,
+          roll: c.initiativeRoll ?? null,
+          bonus: c.initiativeBonus ?? 0,
+          total: combatantInitiativeTotal(c),
+        };
+      });
+  });
+
   readonly combatFlowPhase = computed((): CombatFlowPhase | null => {
     const combat = this.activeCombat();
     return combat ? resolveCombatFlowPhase(combat) : null;
@@ -331,6 +350,13 @@ export class CampaignPlayPanel implements OnDestroy {
         this.advancedToolsOpen.set(false);
         this.dungeonPickerOpen.set(false);
         this.codexCreatureSearch.set('');
+      });
+    });
+    effect(() => {
+      const collecting = !!this.activeCombat()?.collectingInitiative && this.isDm();
+      untracked(() => {
+        if (collecting) this.startInitiativePoll();
+        else this.stopInitiativePoll();
       });
     });
   }

@@ -267,7 +267,7 @@ function contentFor(id: string): Pick<
     case 'donjons':
       return {
         paragraphs: [
-          'Onglet Cartes & donjons (MJ) : générer, éditer, exporter, ou publier en handout.',
+          'Préparation → Donjons (MJ) : générer, éditer, exporter, ou publier en document.',
           'Attribuez une carte à une session pour l’avoir sous la main à la table.',
         ],
         steps: GUIDE_DUNGEON_GEN_STEPS,
@@ -300,7 +300,7 @@ function contentFor(id: string): Pick<
     case 'documents':
       return {
         paragraphs: [
-          'Handouts markdown : créer, publier, les joueurs sont notifiés. Une carte PNG peut être jointe.',
+          'Documents : créer, publier, les joueurs sont notifiés. Une carte PNG peut être jointe.',
         ],
         steps: [
           {

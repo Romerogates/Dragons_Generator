@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   input,
   output,
@@ -15,11 +16,12 @@ import {
   InitiativeBoardCombatant,
 } from '@core/services/campaign-cloud.service';
 import { AuthService } from '@core/services/auth.service';
+import { DiceRollComponent } from '@shared/components/dice-roll/dice-roll';
 
 @Component({
   selector: 'app-campaign-initiative-inline',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, DiceRollComponent],
   templateUrl: './campaign-initiative-inline.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -34,6 +36,7 @@ export class CampaignInitiativeInline {
 
   readonly selectedId = signal('');
   readonly roll = signal<number | null>(null);
+  readonly useDice = signal(true);
   readonly submitting = signal(false);
   readonly error = signal<string | null>(null);
   readonly success = signal<string | null>(null);
@@ -45,12 +48,45 @@ export class CampaignInitiativeInline {
     return list.filter((c) => c.memberUserId === userId);
   });
 
+  constructor() {
+    effect(() => {
+      const mine = this.myCombatants();
+      if (!this.selectedId() && mine.length === 1 && !mine[0].hasRoll) {
+        this.selectedId.set(mine[0].id);
+      }
+    });
+  }
+
+  selectedCombatant(): InitiativeBoardCombatant | null {
+    const id = this.selectedId();
+    return this.myCombatants().find((c) => c.id === id) ?? null;
+  }
+
+  formatBonus(bonus: number): string {
+    return bonus >= 0 ? `+${bonus}` : `${bonus}`;
+  }
+
+  onDieRolled(value: number): void {
+    this.roll.set(value);
+  }
+
+  ensureSelection(): void {
+    if (!this.selectedId() && this.myCombatants().length === 1) {
+      this.selectedId.set(this.myCombatants()[0].id);
+    }
+  }
+
   submit(): void {
+    this.ensureSelection();
     const combatantId = this.selectedId();
     const roll = this.roll();
     const code = this.board().code;
     if (!combatantId || roll == null || !code) {
       this.error.set('Choisissez un personnage et un jet.');
+      return;
+    }
+    if (roll < 1 || roll > 30) {
+      this.error.set('Le jet doit être entre 1 et 30.');
       return;
     }
     this.submitting.set(true);

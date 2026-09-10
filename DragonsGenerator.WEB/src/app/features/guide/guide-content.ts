@@ -26,10 +26,10 @@ export const GUIDE_TIPS: string[] = [
       'Import party : les PJ déjà dans le combat sont ignorés ; un bandeau signale les fiches incomplètes.',
       'La table surligne les combattants sans initiative ou sans PV.',
       'Utilisez le bandeau campagne pour saisir votre initiative rapidement.',
-      'Publiez un handout : les joueurs le voient dans Activité et Documents.',
+      'Publiez un document : les joueurs le voient dans Activité et Documents.',
       'Terminez le combat pour archiver un résumé dans l’historique MJ.',
-      'Générez un donjon depuis Cartes & donjons — le thème suit souvent la région Eana.',
-      'Handout brouillon carte : image PNG + légende — les joueurs ne voient qu’après publication.',
+      'Générez un donjon depuis Préparation → Donjons — le thème suit souvent la région Eana.',
+      'document brouillon carte : image PNG + légende — les joueurs ne voient qu’après publication.',
       'Paramètres → onglet Notifications : filtrez amis, campagnes et push par type.',
 ];
 
@@ -126,9 +126,9 @@ export const GUIDE_BLOG_POSTS: GuideBlogPost[] = [
       id: 'news-campagne-vide-handout',
       date: '31 août 2026',
       tag: 'Campagnes',
-      title: 'Campagne vide, handout carte & résumé joueur',
+      title: 'Campagne vide, document carte & résumé joueur',
       summary:
-        'Créez une campagne sans wizard scénario. Les handouts carte embarquent l’image PNG. Les joueurs voient leur XP et les sessions passées dans le Résumé.',
+        'Créez une campagne sans wizard scénario. Les documents carte embarquent l’image PNG. Les joueurs voient leur XP et les sessions passées dans le Résumé.',
       icon: 'fluent-emoji:world-map',
       border: 'border-violet-500/30',
       tagColor: 'text-violet-400 bg-violet-950/40',
@@ -140,7 +140,7 @@ export const GUIDE_BLOG_POSTS: GuideBlogPost[] = [
       tag: 'Cartes MJ',
       title: 'Générateur de donjons v1',
       summary:
-        'Onglet Cartes & donjons : génération procédurale, édition grille, rencontres par salle, export PNG/PDF/JSON et handout brouillon.',
+        'Onglet Préparation → Donjons : génération procédurale, édition grille, rencontres par salle, export PNG/PDF/JSON et document brouillon.',
       icon: 'fluent-emoji:castle',
       border: 'border-violet-500/30',
       tagColor: 'text-violet-400 bg-violet-950/40',
@@ -240,7 +240,7 @@ export const GUIDE_BLOG_POSTS: GuideBlogPost[] = [
       id: 'news-handouts-markdown',
       date: '29 août 2026',
       tag: 'Documents',
-      title: 'Handouts markdown & activité',
+      title: 'Documents markdown & activité',
       summary: 'Publication joueurs, aperçu depuis l’activité, markdown léger (gras, titres, listes).',
       icon: 'fluent-emoji:scroll',
       border: 'border-sky-500/30',
@@ -277,7 +277,7 @@ export const GUIDE_FLASH_CARDS: GuideFlashCard[] = [
       sectionId: 'scenario',
     },
     {
-      title: 'Publier un handout',
+      title: 'Publier un document',
       bullets: ['Documents → Créer', 'Rédiger (markdown léger)', 'Publier → push joueurs'],
       audience: 'dm',
       icon: 'fluent-emoji:scroll',
@@ -292,14 +292,14 @@ export const GUIDE_FLASH_CARDS: GuideFlashCard[] = [
     },
     {
       title: 'Importer la party',
-      bullets: ['Table → + Party campagne', 'Lire le bandeau de feedback', 'Compléter init / PV manquants'],
+      bullets: ['Table → + Toute la party', 'Lire le bandeau de feedback', 'Compléter init / PV manquants'],
       audience: 'dm',
       icon: 'fluent-emoji:busts-in-silhouette',
       sectionId: 'table',
     },
     {
       title: 'Générer un donjon',
-      bullets: ['Campagne → Cartes & donjons', 'Curseurs + thème → Générer', 'Export ou handout brouillon'],
+      bullets: ['Campagne → Préparation → Donjons', 'Curseurs + thème → Générer', 'Export ou document brouillon'],
       audience: 'dm',
       icon: 'fluent-emoji:castle',
       sectionId: 'donjons',
@@ -446,7 +446,7 @@ export const GUIDE_TABLE_PLAY_STEPS: GuideLabeledFlowStep[] = [
 export const GUIDE_DUNGEON_GEN_STEPS: GuideStep[] = [
     {
       title: 'Ouvrir l’onglet',
-      body: 'Campagne → Cartes & donjons (MJ uniquement). Plusieurs cartes possibles par campagne.',
+      body: 'Campagne → Préparation → Donjons (MJ uniquement). Plusieurs cartes possibles par campagne.',
       badge: 'MJ',
       link: '/campaigns',
       linkLabel: 'Mes campagnes',
@@ -473,12 +473,12 @@ export const GUIDE_DUNGEON_GEN_STEPS: GuideStep[] = [
     },
     {
       title: 'Exporter & partager',
-      body: 'PNG, PDF (carte + légende), JSON (réouvrir plus tard). Handout brouillon → image PNG + légende dans Documents.',
+      body: 'PNG, PDF (carte + légende), JSON (réouvrir plus tard). document brouillon → image PNG + légende dans Documents.',
       badge: 'MJ',
     },
     {
       title: 'Publier aux joueurs',
-      body: 'Documents → ouvrir le handout carte → Publier. Les joueurs voient la carte en image et la légende des salles révélées (fog of war activable dans l’éditeur de donjon).',
+      body: 'Documents → ouvrir le document carte → Publier. Les joueurs voient la carte en image et la légende des salles révélées (fog of war activable dans l’éditeur de donjon).',
       badge: 'MJ',
     },
   ];
@@ -507,9 +507,9 @@ export const GUIDE_DM_CHECKLIST: GuideChecklistItem[] = [
     { id: 'dm-3', label: 'Personnages joueurs validés (fiche consultée)' },
     { id: 'dm-4', label: 'Notifications push activées (propositions incluses)' },
     { id: 'dm-5', label: 'Rencontres / créatures préparées' },
-    { id: 'dm-6', label: 'Donjon ou carte préparée (Cartes & donjons)' },
+    { id: 'dm-6', label: 'Donjon ou carte préparée (Préparation → Donjons)' },
     { id: 'dm-7', label: 'Session planifiée (rappels push activés)' },
-    { id: 'dm-8', label: 'Documents / handouts prêts si besoin' },
+    { id: 'dm-8', label: 'Documents prêts si besoin' },
     { id: 'dm-9', label: 'Table démarrée le jour J · party importée' },
   ];
 
@@ -529,14 +529,14 @@ export const GUIDE_FAQ_ITEMS: GuideFaqItem[] = [
       id: 'faq-donjon',
       question: 'Où générer un donjon pour ma campagne ?',
       answer:
-        'MJ : ouvrez votre campagne → onglet Cartes & donjons → Nouveau donjon. Ajustez les curseurs (taille grille, nombre de salles, densité des couloirs), choisissez un thème, puis Générer. Éditez, exportez en PNG/PDF ou créez un handout brouillon.',
+        'MJ : ouvrez votre campagne → onglet Préparation → Donjons → Nouveau donjon. Ajustez les curseurs (taille grille, nombre de salles, densité des couloirs), choisissez un thème, puis Générer. Éditez, exportez en PNG/PDF ou créez un document brouillon.',
       audience: 'dm',
     },
     {
       id: 'faq-handout-carte',
       question: 'Les joueurs voient-ils la carte tout de suite ?',
       answer:
-        'Non tant que le handout n’est pas publié. Le bouton Handout brouillon crée un document type « Carte » dans l’onglet Documents, avec l’image PNG de la carte et la légende des salles révélées — invisible pour les joueurs tant qu’il reste en brouillon. Activez le fog of war dans l’éditeur, révélez les salles une par une, puis regénérez le handout avant publication.',
+        'Non tant que le document n’est pas publié. Le bouton Document (éditeur de donjon) crée un document type « Carte » dans l’onglet Documents, avec l’image PNG de la carte et la légende des salles révélées — invisible pour les joueurs tant qu’il reste en brouillon. Activez le fog of war dans l’éditeur, révélez les salles une par une, puis regénérez le document avant publication.',
       audience: 'dm',
     },
     {
@@ -635,11 +635,11 @@ export const GUIDE_FAQ_ITEMS: GuideFaqItem[] = [
 export const GUIDE_GLOSSARY: GuideGlossaryItem[] = [
     { term: 'Table', definition: 'Espace de jeu en direct du MJ : notes, rencontres, tracker de combat.' },
     { term: 'Pré-tiré', definition: 'Personnage préparé par le MJ, assignable puis revendiquable par un joueur.' },
-    { term: 'Handout', definition: 'Document publié aux joueurs (lettre, carte, résumé…) en markdown léger ; les cartes embarquent une image PNG.' },
+    { term: 'Document', definition: 'Fiche publiée aux joueurs (lettre, carte, résumé…) en markdown léger ; les cartes embarquent une image PNG.' },
     {
-      term: 'Carte & donjon',
+      term: 'Donjon',
       definition:
-        'Layout procédural MJ (salles, couloirs, marqueurs) sauvegardé dans la campagne. Export PNG/PDF ou handout brouillon.',
+        'Layout procédural MJ (salles, couloirs, marqueurs) dans Préparation → Donjons. Export PNG/PDF ou document brouillon.',
     },
     {
       term: 'Collecte d’initiative',
@@ -659,7 +659,7 @@ export const GUIDE_GLOSSARY: GuideGlossaryItem[] = [
       definition:
         'Sur la table, ajoute les personnages approuvés au tracker. Ignore les doublons et signale les fiches sans PV.',
     },
-    { term: 'Activité', definition: 'Journal de campagne : invites, propositions, handouts, sessions…' },
+    { term: 'Activité', definition: 'Journal de campagne : invites, propositions, documents, sessions…' },
     { term: 'Codex', definition: 'Référence de règles du site : espèces, classes, sorts, bestiaire…' },
     { term: 'PWA', definition: 'Application installable + notifications push hors navigateur classique.' },
   ];
@@ -669,9 +669,9 @@ export const GUIDE_FEATURE_INDEX: GuideIndexItem[] = [
     { label: 'Arsenal de départ', description: 'Équipement et choix d’armes', sectionId: 'personnage', audience: 'all' },
     { label: 'Bestiaire / créatures', description: 'Préparation MJ et PDF', sectionId: 'scenario', audience: 'dm' },
     { label: 'Campagnes', description: 'Création, joueurs, sessions', sectionId: 'scenario', audience: 'all' },
-    { label: 'Cartes & donjons', description: 'Génération procédurale MJ', sectionId: 'donjons', audience: 'dm' },
+    { label: 'Préparation → Donjons', description: 'Génération procédurale MJ', sectionId: 'donjons', audience: 'dm' },
     { label: 'Collecte d’initiative', description: 'Jets joueurs synchronisés', sectionId: 'initiative', audience: 'all' },
-    { label: 'Documents / handouts', description: 'Publication markdown', sectionId: 'documents', audience: 'all' },
+    { label: 'Documents', description: 'Publication markdown', sectionId: 'documents', audience: 'all' },
     { label: 'Fiche personnage PDF', description: 'Export & sauvegarde', sectionId: 'pdf', audience: 'all' },
     { label: 'Historique des combats', description: 'Résumé après combat', sectionId: 'initiative', audience: 'dm' },
     { label: 'Import party', description: 'PJ approuvés dans le tracker', sectionId: 'table', audience: 'dm' },

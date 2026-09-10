@@ -28,7 +28,11 @@
         @if (liveSessionModeLabel()) {
           · {{ liveSessionModeLabel() }}
         }
-        — ouvre la table plein écran pour jouer.
+        @if (isOwner()) {
+          — ouvre la table plein écran pour jouer.
+        } @else {
+          — rejoins la table pour voir le combat, ton tour et les documents.
+        }
       } @else if (nextSession(); as next) {
         {{ nextSessionDateLabel() }}
         @if (nextSessionModeLabel()) {
@@ -49,6 +53,14 @@
             (click)="openPlayFullscreen.emit()"
           >
             Ouvrir la table
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="min-h-11 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg shadow-emerald-950/40"
+            (click)="openPlayFullscreen.emit()"
+          >
+            Rejoindre la table
           </button>
         }
       } @else if (nextSession(); as next) {

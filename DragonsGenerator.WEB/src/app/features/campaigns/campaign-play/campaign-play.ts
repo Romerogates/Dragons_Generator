@@ -82,10 +82,6 @@ export class CampaignPlayPage implements OnInit {
 
     this.campaigns.get(id).subscribe({
       next: (c) => {
-        if (!c.isOwner) {
-          this.router.navigate(['/campaigns', id]);
-          return;
-        }
         this.campaign.set(c);
         this.loading.set(false);
       },
