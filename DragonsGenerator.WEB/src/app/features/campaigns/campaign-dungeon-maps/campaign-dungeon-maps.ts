@@ -45,6 +45,7 @@ import {
 } from '@core/utils/dungeon-render.util';
 import { rollRandomEncounter, suggestThemeFromRegion } from '@core/utils/dungeon-theme-pools';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
+import { FullscreenEnterBtn } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-btn';
 
 type EditorTool = 'select' | 'floor' | 'wall' | 'door' | 'trap' | 'chest' | 'stairs';
 
@@ -63,7 +64,7 @@ const MAX_UNDO = 40;
 @Component({
   selector: 'app-campaign-dungeon-maps',
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmDialog],
+  imports: [CommonModule, FormsModule, ConfirmDialog, FullscreenEnterBtn],
   templateUrl: './campaign-dungeon-maps.html',
   styleUrl: './campaign-dungeon-maps.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -89,8 +90,13 @@ export class CampaignDungeonMaps implements OnDestroy {
   readonly exportBusy = signal(false);
   readonly generating = signal(false);
   readonly revealMap = signal(false);
+  /** Éditeur carte en overlay plein viewport (canvas + outils). */
+  readonly editorFullscreen = signal(false);
   readonly message = signal<string | null>(null);
   readonly thumbUrls = signal<Record<string, string>>({});
+
+  private previousBodyOverflow = '';
+  private editorBodyLocked = false;
 
   readonly scale = signal(1);
   readonly panX = signal(0);
@@ -343,9 +349,37 @@ export class CampaignDungeonMaps implements OnDestroy {
   }
 
   closeEditor(): void {
+    this.setEditorFullscreen(false);
     this.editingMapId.set(null);
     this.undoStack = [];
     this.undoDepth.set(0);
+  }
+
+  toggleEditorFullscreen(): void {
+    if (this.editorFullscreen()) return;
+    this.setEditorFullscreen(true);
+  }
+
+  private setEditorFullscreen(open: boolean): void {
+    if (this.editorFullscreen() === open) return;
+    this.editorFullscreen.set(open);
+    if (open) {
+      if (typeof document !== 'undefined' && !this.editorBodyLocked) {
+        this.previousBodyOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        this.editorBodyLocked = true;
+      }
+      queueMicrotask(() => this.resetView());
+    } else {
+      this.unlockEditorBody();
+      queueMicrotask(() => this.resetView());
+    }
+  }
+
+  private unlockEditorBody(): void {
+    if (!this.editorBodyLocked || typeof document === 'undefined') return;
+    document.body.style.overflow = this.previousBodyOverflow;
+    this.editorBodyLocked = false;
   }
 
   deleteMap(mapId: string): void {
@@ -868,6 +902,7 @@ export class CampaignDungeonMaps implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.unlockEditorBody();
     this.flushPendingSave();
   }
 
@@ -905,8 +940,13 @@ export class CampaignDungeonMaps implements OnDestroy {
     this.dataChange.emit({ dungeonMaps: maps });
   }
 
-  @HostListener('window:keydown', ['$event'])
+  @HostListener('document:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent): void {
+    if (event.key === 'Escape' && this.editorFullscreen()) {
+      event.preventDefault();
+      this.setEditorFullscreen(false);
+      return;
+    }
     if (event.code === 'Space' && this.editingMap()) {
       if (!(event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement)) {
         event.preventDefault();
@@ -920,7 +960,7 @@ export class CampaignDungeonMaps implements OnDestroy {
     }
   }
 
-  @HostListener('window:keyup', ['$event'])
+  @HostListener('document:keyup', ['$event'])
   onKeyUp(event: KeyboardEvent): void {
     if (event.code === 'Space') this.spaceHeld.set(false);
   }

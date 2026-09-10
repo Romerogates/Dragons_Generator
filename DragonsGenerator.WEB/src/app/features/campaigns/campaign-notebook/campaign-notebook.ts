@@ -3,6 +3,7 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   ElementRef,
+  HostListener,
   OnDestroy,
   effect,
   inject,
@@ -133,6 +134,13 @@ export class CampaignNotebook implements OnDestroy {
       this.setupFullscreenCanvasSize();
       this.paintPage();
     });
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onDocumentKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'Escape' || !this.inkFullscreen()) return;
+    event.preventDefault();
+    this.closeInkFullscreen(true);
   }
 
   closeInkFullscreen(toText = true): void {

@@ -12,7 +12,7 @@ import { Router, RouterLink } from '@angular/router';
 
 /**
  * Coquille plein écran pour les fiches Codex (bestiaire, sorts, …).
- * Conserve la route `/:id` pour deep links ; Fermer = history.back() ou fallback catalogue.
+ * Sortie = Escape (ou lien catalogue). Pas de bouton Fermer texte.
  */
 @Component({
   selector: 'app-codex-detail-shell',
@@ -29,24 +29,17 @@ import { Router, RouterLink } from '@angular/router';
       <header
         class="shrink-0 sticky top-0 z-10 flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 bg-[#12161c]/95 px-3 py-2.5 backdrop-blur-sm"
       >
-        <button
-          type="button"
-          class="min-h-11 min-w-11 inline-flex items-center justify-center rounded-xl border border-slate-700 bg-[#1b2028] px-3 text-[10px] font-black uppercase tracking-widest text-slate-300 hover:border-slate-500 hover:text-white"
-          (click)="close()"
-          aria-label="Fermer la fiche"
-        >
-          Fermer
-        </button>
-        <div class="min-w-0 flex-1 text-center px-2">
-          <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Codex</p>
-          <p class="text-sm font-serif truncate" [class]="accentTextClass()">{{ title() }}</p>
-        </div>
         <a
           [routerLink]="backLink()"
           class="min-h-11 inline-flex items-center rounded-xl border border-slate-700 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-200"
         >
-          {{ backLabel() }}
+          ← {{ backLabel() }}
         </a>
+        <div class="min-w-0 flex-1 text-center px-2">
+          <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Codex · Échap</p>
+          <p class="text-sm font-serif truncate" [class]="accentTextClass()">{{ title() }}</p>
+        </div>
+        <span class="min-w-11 w-11" aria-hidden="true"></span>
       </header>
 
       <div class="flex-1 overflow-y-auto overscroll-contain">

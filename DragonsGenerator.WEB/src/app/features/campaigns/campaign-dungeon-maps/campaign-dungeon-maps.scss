@@ -2,6 +2,19 @@
   animation: dungeon-fade-in 0.35s ease-out;
 }
 
+.dungeon-shell--fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0.75rem 1rem 1rem;
+  overflow: hidden;
+  background: #0a0d13;
+  animation: dungeon-fade-in 0.2s ease-out;
+}
+
 .dungeon-reveal {
   animation: dungeon-reveal 0.85s ease-out;
 }

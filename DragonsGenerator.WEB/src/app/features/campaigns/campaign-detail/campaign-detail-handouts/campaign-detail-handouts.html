@@ -69,13 +69,17 @@
           Bestiaire
         </button>
         @if (pdfPreviewUrl()) {
-          <button
-            type="button"
-            class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-400"
-            (click)="openPdfFullscreen.emit()"
-          >
-            {{ usePdfFallback ? 'Télécharger' : 'Plein écran' }}
-          </button>
+          @if (usePdfFallback) {
+            <button
+              type="button"
+              class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-400"
+              (click)="openPdfFullscreen.emit()"
+            >
+              Télécharger
+            </button>
+          } @else {
+            <app-fullscreen-enter-btn tone="violet" (enter)="openPdfFullscreen.emit()" />
+          }
           @if (usePdfFallback) {
             <button
               type="button"

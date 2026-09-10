@@ -15,6 +15,7 @@ import { filter, map, startWith } from 'rxjs';
 import { CampaignSessionDockService } from '@core/services/campaign-session-dock.service';
 import { AuthService } from '@core/services/auth.service';
 import { DiceRollComponent } from '@shared/components/dice-roll/dice-roll';
+import { FullscreenEnterBtn } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-btn';
 import { CampaignPlayPanel } from '../../../features/campaigns/campaign-play-panel/campaign-play-panel';
 import type { CampaignDetail } from '@core/models/Campaign/campaign';
 import { sessionModeLabel } from '../../../features/campaigns/campaign-detail/campaign-session.util';
@@ -24,7 +25,7 @@ type DockTab = 'live' | 'table' | 'dice';
 @Component({
   selector: 'app-campaign-session-dock',
   standalone: true,
-  imports: [CommonModule, DiceRollComponent, CampaignPlayPanel],
+  imports: [CommonModule, DiceRollComponent, CampaignPlayPanel, FullscreenEnterBtn],
   templateUrl: './campaign-session-dock.html',
   styleUrl: './campaign-session-dock.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

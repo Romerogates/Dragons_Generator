@@ -85,6 +85,7 @@ import { CampaignSessionTimeline } from '../campaign-session-timeline/campaign-s
 import { CampaignSessionNotes } from '../campaign-session-notes/campaign-session-notes';
 import { CampaignDungeonMaps } from '../campaign-dungeon-maps/campaign-dungeon-maps';
 import { DiceRollComponent } from '@shared/components/dice-roll/dice-roll';
+import { FullscreenEnterLink } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-link';
 import type { NotebookPage, SessionPlayPad } from '@core/models/Campaign/campaign';
 import {
   appendTextToFirstNotePad,
@@ -112,6 +113,7 @@ export type PlaySessionView =
     CampaignSessionNotes,
     CampaignDungeonMaps,
     DiceRollComponent,
+    FullscreenEnterLink,
   ],
   templateUrl: './campaign-play-panel.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

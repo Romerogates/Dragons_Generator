@@ -20,9 +20,12 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## Déjà livré (ne pas refaire)
 
+- **Plein écran UX** (2026-09-10) — icône maximize partagée (`app-fullscreen-enter-btn` / link) ; sortie **Escape** (Atlas, donjon, table `/play`, carnet Main, Codex sans bouton Fermer).
+- **Atlas Eana plein écran** (2026-09-10) — `/civilisations` : icône + clic fond → overlay `Carte.jpg` + pins.
+- **Éditeur donjon plein écran** (2026-09-10) — icône ; Escape sort du plein écran (pas de la liste).
+- **Codex fiches overlay** (2026-09-10) — `app-codex-detail-shell` ; Escape / lien catalogue (*pas* l’Atlas).
 - **Attaque joueur persistée** (2026-09-10) — `POST /me/campaigns/{id}/combat/resolve-attack` ; merge HP/journal vs PUT MJ stale ; front joueur plus de toast « MJ applique ».
 - **Bulk Neutre → Allié/Adversaire** aussi en setup combat (raccourci play-panel).
-- **Codex fiches plein écran** (2026-09-10) — `app-codex-detail-shell` sur les 11 catalogues ; Fermer / Escape / lien catalogue.
 - **Combat conditions + multi-attaques** — chips presets, édition en fight, +/✕ attaques.
 - **Documents PDF.js + carnet Main** — aperçu page à page (nav tactile) ; export PNG/PDF/OCR déjà en place (export PNG en `.png`).
 - **E2E attaque tour MJ** (2026-09-10) — `campaign-combat-attack.spec.ts` : Attaquer → clic carte → encode d20 → dégâts → PV/journal ; jet raté sans baisse PV. UX : clic cible passe au jet ; bandeau tour sticky.

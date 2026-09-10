@@ -11,6 +11,7 @@ import {
 } from '@core/models/Campaign/campaign';
 import { LightMarkdownPipe } from '@shared/pipes/light-markdown.pipe';
 import { PdfPagePreview } from '@shared/components/pdf-page-preview/pdf-page-preview';
+import { FullscreenEnterBtn } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-btn';
 import { prefersNativePdfFallback } from '@core/utils/pdf-preview.util';
 
 export interface HandoutPatchEvent {
@@ -33,7 +34,7 @@ export interface MemberSheetPdfEvent {
 @Component({
   selector: 'app-campaign-detail-handouts',
   standalone: true,
-  imports: [CommonModule, FormsModule, LightMarkdownPipe, PdfPagePreview],
+  imports: [CommonModule, FormsModule, LightMarkdownPipe, PdfPagePreview, FullscreenEnterBtn],
   templateUrl: './campaign-detail-handouts.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

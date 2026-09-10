@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   effect,
+  HostListener,
   inject,
   OnInit,
   signal,
@@ -40,6 +41,31 @@ export class CampaignPlayPage implements OnInit {
       const c = this.campaign();
       untracked(() => this.sessionDock.bindCampaign(c));
     });
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onDocumentKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'Escape' || event.defaultPrevented) return;
+    const target = event.target as HTMLElement | null;
+    if (
+      target instanceof HTMLInputElement ||
+      target instanceof HTMLTextAreaElement ||
+      target?.isContentEditable
+    ) {
+      return;
+    }
+    // Sous-overlays (donjon / carnet Main) gèrent Escape en premier.
+    if (
+      typeof document !== 'undefined' &&
+      (document.querySelector('.dungeon-shell--fullscreen') ||
+        document.querySelector('[aria-label="Notes à la main"]'))
+    ) {
+      return;
+    }
+    const c = this.campaign();
+    if (!c) return;
+    event.preventDefault();
+    void this.router.navigate(['/campaigns', c.id]);
   }
 
   ngOnInit(): void {
