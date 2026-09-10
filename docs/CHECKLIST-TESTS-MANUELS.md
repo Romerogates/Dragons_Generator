@@ -128,7 +128,8 @@ Prérequis : campagne créée, ≥ 1 joueur avec perso **approuvé**, rencontre 
   - *E2E :* `campaign-live-polish.spec.ts` (`setOffline`).
 - [x] 🟢 Terminer combat / notes / timeline session
   - *E2E :* `campaign-play.spec.ts` (fin combat + notes calepin).
-- [ ] 🟢 Joueur en ligne : voit le battlefield ; sur **son** tour peut lancer l’attaque (dés)
+- [x] 🟢 Joueur en ligne : voit le battlefield ; sur **son** tour peut lancer l’attaque (dés)
+  - *API :* `POST .../combat/resolve-attack` (PV + journal) ; refresh campagne.
 ### 5.2 Documents & cartes
 
 - [x] 🟠 Documents : créer, type **Lettre** (pas « Letter »), publier, épingler
@@ -166,7 +167,8 @@ Prérequis : campagne créée, ≥ 1 joueur avec perso **approuvé**, rencontre 
   - Chips cliquables (presets + retirer) en setup/fight ; champ virgules conservé.
 - [x] 🟠 Édition multi-attaques (nom / bonus / dés) en setup / outils avancés
   - + Attaque / retirer ; éditable aussi en phase fight.
-- [ ] 🟠 Classer en masse les créatures **Neutre** → Allié ou Adversaire
+- [x] 🟠 Classer en masse les créatures **Neutre** → Allié ou Adversaire
+  - Préparation Créatures + raccourci setup combat (`Tous → Alliés/Adversaires`).
 
 ---
 

@@ -15,11 +15,13 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
-1. **Reste checklist** : classer Neutre→Allié/Adversaire en masse ; attaque joueur persistée (API) ; amis/invites manuels.
+1. **Reste checklist** : amis/invites manuels ; face-à-face mobile ; jets/ordre de collecte init.
 2. *(optionnel)* peaufinages mineurs guide / empty states hors flux critique.
 
 ## Déjà livré (ne pas refaire)
 
+- **Attaque joueur persistée** (2026-09-10) — `POST /me/campaigns/{id}/combat/resolve-attack` ; merge HP/journal vs PUT MJ stale ; front joueur plus de toast « MJ applique ».
+- **Bulk Neutre → Allié/Adversaire** aussi en setup combat (raccourci play-panel).
 - **Codex fiches plein écran** (2026-09-10) — `app-codex-detail-shell` sur les 11 catalogues ; Fermer / Escape / lien catalogue.
 - **Combat conditions + multi-attaques** — chips presets, édition en fight, +/✕ attaques.
 - **Documents PDF.js + carnet Main** — aperçu page à page (nav tactile) ; export PNG/PDF/OCR déjà en place (export PNG en `.png`).

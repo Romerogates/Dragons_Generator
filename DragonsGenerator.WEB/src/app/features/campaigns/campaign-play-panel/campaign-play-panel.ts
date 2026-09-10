@@ -22,7 +22,7 @@ import { DataService } from '@core/services/data.service';
 import type { Character } from '@core/models/Character/character';
 import type { Creature } from '@core/models/Creatures/creature';
 import type { CreatureSummary } from '@core/models/Creatures/creature-summary';
-import { CREATURE_ROLE_LABELS, type StoryCreatureSelection } from '@core/models/Story/story';
+import { CREATURE_ROLE_LABELS, type CreatureRole, type StoryCreatureSelection } from '@core/models/Story/story';
 import {
   ActiveCombat,
   CampaignData,
@@ -346,6 +346,41 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly campaignUnsortedCreatures = computed(() =>
     this.campaignCreatures().filter((cr) => cr.role === 'neutral'),
   );
+
+  private creatureTrackKey(cr: StoryCreatureSelection): string {
+    return `${cr.creatureId}::${cr.customName || cr.creatureName}`;
+  }
+
+  /** Classer tous les Neutres de la campagne en Alliés ou Adversaires (préparation + setup combat). */
+  bulkClassifyUnsorted(role: 'ally' | 'antagonist'): void {
+    if (!this.isDm()) return;
+    const unsorted = this.campaignUnsortedCreatures();
+    if (!unsorted.length) return;
+    const label = role === 'ally' ? 'alliés' : 'adversaires';
+    this.askConfirm(
+      'Classer les créatures',
+      `Classer ${unsorted.length} créature(s) neutre(s) en ${label} ?`,
+      () => {
+        const keys = new Set(unsorted.map((cr) => this.creatureTrackKey(cr)));
+        const creatures = (this.campaign().data.creatures ?? []).map((entry) =>
+          keys.has(this.creatureTrackKey(entry)) ? { ...entry, role } : entry,
+        );
+        this.saveData({ creatures });
+        this.setFeedback('ok', `${unsorted.length} créature(s) → ${label}.`);
+      },
+      'Classer',
+    );
+  }
+
+  updateCreatureRole(cr: StoryCreatureSelection, role: CreatureRole): void {
+    if (!this.isDm()) return;
+    const creatures = (this.campaign().data.creatures ?? []).map((entry) =>
+      entry.creatureId === cr.creatureId && entry.customName === cr.customName
+        ? { ...entry, role }
+        : entry,
+    );
+    this.saveData({ creatures });
+  }
 
   readonly filteredCodexCreatures = computed(() => {
     const q = this.codexCreatureSearch().trim().toLowerCase();
@@ -1449,6 +1484,15 @@ export class CampaignPlayPanel implements OnDestroy {
         damage: null,
       });
       if (this.isDm()) this.appendLog(line);
+      else {
+        this.persistPlayerAttack({
+          actorId: turn.id,
+          targetId: target.id,
+          hit: false,
+          damage: null,
+          logLine: line,
+        });
+      }
       const hitMsg =
         resolution.hit === false
           ? 'Raté'
@@ -1519,13 +1563,46 @@ export class CampaignPlayPanel implements OnDestroy {
         );
         this.saveData({ sessions, encounters });
       }
+      this.setFeedback('ok', `${turn.name} → ${target.name} : ${damage} dégâts (${formula})`);
+    } else {
+      this.persistPlayerAttack({
+        actorId: turn.id,
+        targetId: target.id,
+        hit: true,
+        damage,
+        logLine: line,
+      });
+      this.setFeedback('ok', `${turn.name} → ${target.name} : ${damage} dégâts (${formula})`);
     }
-
-    this.setFeedback(
-      'ok',
-      `${turn.name} → ${target.name} : ${damage} dégâts (${formula})${this.isDm() ? '' : ' — le MJ applique les PV'}`,
-    );
     this.resetFightStep();
+  }
+
+  private persistPlayerAttack(body: {
+    actorId: string;
+    targetId: string;
+    hit: boolean;
+    damage: number | null;
+    logLine: string;
+  }): void {
+    const campaignId = this.campaign().id;
+    this.campaigns
+      .resolveCombatAttack(campaignId, {
+        actorId: body.actorId,
+        targetId: body.targetId,
+        hit: body.hit,
+        damage: body.damage,
+        logLine: body.logLine,
+      })
+      .subscribe({
+        next: () => {
+          this.campaigns.get(campaignId).subscribe({
+            next: (fresh) => this.campaignChange.emit(fresh),
+            error: () => undefined,
+          });
+        },
+        error: () =>
+          this.setFeedback('err', 'Impossible d’enregistrer l’attaque — réessayez.', 6000),
+      });
   }
 
   private appendLog(line: string): void {

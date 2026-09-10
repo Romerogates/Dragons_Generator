@@ -201,6 +201,20 @@ export class CampaignCloudService {
   ): Observable<void> {
     return this.http.post<void>(`${this.api}/me/campaigns/${campaignId}/initiative/submit`, body);
   }
+
+  /** Persiste PV + journal pour une attaque du joueur à son tour. */
+  resolveCombatAttack(
+    campaignId: string,
+    body: {
+      actorId: string;
+      targetId: string;
+      hit: boolean;
+      damage?: number | null;
+      logLine?: string | null;
+    },
+  ): Observable<void> {
+    return this.http.post<void>(`${this.api}/me/campaigns/${campaignId}/combat/resolve-attack`, body);
+  }
 }
 
 export interface InitiativeBoard {

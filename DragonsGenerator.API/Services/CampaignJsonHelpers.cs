@@ -503,6 +503,186 @@ public static class CampaignJsonHelpers
     }
 
     /// <summary>
+    /// Applique une résolution d'attaque du joueur (dégâts + journal) sur le combat actif.
+    /// </summary>
+    public static string? TryApplyPlayerCombatAttack(
+        string json,
+        Guid userId,
+        string actorId,
+        string targetId,
+        bool hit,
+        int damage,
+        string? logLine,
+        out string? error)
+    {
+        error = null;
+        if (hit && damage < 0)
+        {
+            error = "Dégâts invalides.";
+            return null;
+        }
+
+        try
+        {
+            var node = JsonNode.Parse(string.IsNullOrWhiteSpace(json) ? "{}" : json) as JsonObject ?? new JsonObject();
+            var activeSessionId = node["activeSessionId"]?.GetValue<string>();
+            if (string.IsNullOrWhiteSpace(activeSessionId))
+            {
+                error = "Aucune session de jeu en cours.";
+                return null;
+            }
+
+            if (node["sessions"] is not JsonArray sessions)
+            {
+                error = "Session introuvable.";
+                return null;
+            }
+
+            JsonObject? sessionObj = null;
+            JsonObject? combat = null;
+            foreach (var item in sessions)
+            {
+                if (item is not JsonObject session) continue;
+                if (session["id"]?.GetValue<string>() != activeSessionId) continue;
+                sessionObj = session;
+                combat = session["activeCombat"] as JsonObject;
+                break;
+            }
+
+            if (sessionObj is null || combat is null)
+            {
+                error = "Aucun combat actif.";
+                return null;
+            }
+
+            var flow = combat["flowPhase"]?.GetValue<string>();
+            if (!string.IsNullOrWhiteSpace(flow) && flow != "fight")
+            {
+                error = "Le combat n'est pas en phase de combat.";
+                return null;
+            }
+
+            if (combat["combatants"] is not JsonArray combatants)
+            {
+                error = "Combattants introuvables.";
+                return null;
+            }
+
+            JsonObject? actor = null;
+            JsonObject? target = null;
+            foreach (var item in combatants)
+            {
+                if (item is not JsonObject cb) continue;
+                var id = cb["id"]?.GetValue<string>();
+                if (id == actorId) actor = cb;
+                if (id == targetId) target = cb;
+            }
+
+            if (actor is null || target is null)
+            {
+                error = "Acteur ou cible introuvable.";
+                return null;
+            }
+
+            var linked = actor["memberUserId"]?.GetValue<string>();
+            if (!Guid.TryParse(linked, out var linkedId) || linkedId != userId)
+            {
+                error = "Ce n'est pas votre personnage.";
+                return null;
+            }
+
+            if (!IsCurrentTurnCombatant(combat, combatants, actorId))
+            {
+                error = "Ce n'est pas votre tour.";
+                return null;
+            }
+
+            if (hit && damage > 0)
+            {
+                ApplyHpDeltaNode(target, -damage);
+            }
+
+            if (!string.IsNullOrWhiteSpace(logLine))
+            {
+                var log = sessionObj["combatLog"] as JsonArray ?? new JsonArray();
+                log.Add(logLine.Trim());
+                while (log.Count > 40)
+                    log.RemoveAt(0);
+                sessionObj["combatLog"] = log;
+            }
+
+            return node.ToJsonString();
+        }
+        catch
+        {
+            error = "Données de campagne invalides.";
+            return null;
+        }
+    }
+
+    private static bool IsCurrentTurnCombatant(JsonObject combat, JsonArray combatants, string actorId)
+    {
+        var alive = new List<(string Id, int? Total, string Name)>();
+        foreach (var item in combatants)
+        {
+            if (item is not JsonObject cb) continue;
+            var id = cb["id"]?.GetValue<string>();
+            if (string.IsNullOrWhiteSpace(id)) continue;
+            if (IsDefeatedNode(cb)) continue;
+            int? total = null;
+            if (cb["initiativeRoll"] is JsonNode rollNode && rollNode.AsValue().TryGetValue<int>(out var roll))
+            {
+                var bonus = cb["initiativeBonus"]?.GetValue<int>() ?? 0;
+                total = roll + bonus;
+            }
+            var name = cb["name"]?.GetValue<string>() ?? "";
+            alive.Add((id, total, name));
+        }
+
+        alive.Sort((a, b) =>
+        {
+            if (a.Total is null && b.Total is null) return string.Compare(a.Name, b.Name, StringComparison.Ordinal);
+            if (a.Total is null) return 1;
+            if (b.Total is null) return -1;
+            var cmp = b.Total.Value.CompareTo(a.Total.Value);
+            return cmp != 0 ? cmp : string.Compare(a.Name, b.Name, StringComparison.Ordinal);
+        });
+
+        if (alive.Count == 0) return false;
+        var turnIndex = combat["turnIndex"]?.GetValue<int>() ?? 0;
+        turnIndex = Math.Clamp(turnIndex, 0, alive.Count - 1);
+        return alive[turnIndex].Id == actorId;
+    }
+
+    private static bool IsDefeatedNode(JsonObject cb)
+    {
+        if (cb["defeated"]?.GetValue<bool>() == true) return true;
+        if (cb["currentHp"] is JsonNode hpNode && hpNode.AsValue().TryGetValue<int>(out var hp) && hp <= 0)
+            return true;
+        return false;
+    }
+
+    private static void ApplyHpDeltaNode(JsonObject cb, int delta)
+    {
+        int? current = cb["currentHp"] is JsonNode curNode && curNode.AsValue().TryGetValue<int>(out var c) ? c : null;
+        int? max = cb["maxHp"] is JsonNode maxNode && maxNode.AsValue().TryGetValue<int>(out var m) ? m : null;
+
+        if (current is null && max is null)
+        {
+            cb["currentHp"] = Math.Max(0, delta);
+            if (delta <= 0) cb["defeated"] = true;
+            return;
+        }
+
+        var cap = max ?? current ?? 0;
+        var cur = current ?? cap;
+        var next = Math.Max(0, Math.Min(cap, cur + delta));
+        cb["currentHp"] = next;
+        if (next <= 0) cb["defeated"] = true;
+        else if (cb["defeated"]?.GetValue<bool>() == true) cb["defeated"] = false;
+    }
+
+    /// <summary>
     /// Compare les tableaux sessions et résume le changement pour activité + push.
     /// </summary>
     public static SessionChangeInfo AnalyzeSessionChanges(string oldJson, string newJson)
@@ -641,8 +821,8 @@ public static class CampaignJsonHelpers
     }
 
     /// <summary>
-    /// Conserve les jets d'initiative déjà saisis (joueur) quand un PUT MJ réécrit le blob combat.
-    /// Les PV / conditions du JSON entrant (MJ) restent autoritaires.
+    /// Conserve les jets d'initiative joueur et les PV/journal plus avancés (dégâts joueur)
+    /// quand un PUT MJ réécrit le blob combat.
     /// </summary>
     public static string MergeLiveCombatIntoIncoming(string incomingJson, string storedJson)
     {
@@ -672,6 +852,10 @@ public static class CampaignJsonHelpers
                 MergeCombatantRolls(
                     session["activeCombat"] as JsonObject,
                     storedSession["activeCombat"] as JsonObject);
+                MergeCombatantHp(
+                    session["activeCombat"] as JsonObject,
+                    storedSession["activeCombat"] as JsonObject);
+                MergeCombatLog(session, storedSession);
             }
 
             return incoming.ToJsonString();
@@ -709,6 +893,57 @@ public static class CampaignJsonHelpers
             if (stored["initiativeRoll"] is JsonNode roll)
                 incoming["initiativeRoll"] = roll.DeepClone();
         }
+    }
+
+    /// <summary>Si le stocké a moins de PV (dégâts joueur), on les conserve face à un PUT MJ stale.</summary>
+    private static void MergeCombatantHp(JsonObject? incomingCombat, JsonObject? storedCombat)
+    {
+        if (incomingCombat is null || storedCombat is null) return;
+        if (incomingCombat["combatants"] is not JsonArray inList || storedCombat["combatants"] is not JsonArray stList)
+            return;
+
+        var storedById = new Dictionary<string, JsonObject>(StringComparer.Ordinal);
+        foreach (var item in stList)
+        {
+            if (item is not JsonObject cb) continue;
+            var id = cb["id"]?.GetValue<string>();
+            if (!string.IsNullOrWhiteSpace(id)) storedById[id] = cb;
+        }
+
+        foreach (var item in inList)
+        {
+            if (item is not JsonObject incoming) continue;
+            var id = incoming["id"]?.GetValue<string>();
+            if (string.IsNullOrWhiteSpace(id) || !storedById.TryGetValue(id, out var stored))
+                continue;
+
+            var inHp = ReadNullableInt(incoming, "currentHp");
+            var stHp = ReadNullableInt(stored, "currentHp");
+            if (stHp is null) continue;
+            if (inHp is null || stHp.Value < inHp.Value)
+            {
+                incoming["currentHp"] = stHp.Value;
+                if (stored["defeated"] is JsonNode def)
+                    incoming["defeated"] = def.DeepClone();
+                else if (stHp.Value <= 0)
+                    incoming["defeated"] = true;
+            }
+        }
+    }
+
+    private static void MergeCombatLog(JsonObject incomingSession, JsonObject storedSession)
+    {
+        var inLog = incomingSession["combatLog"] as JsonArray;
+        var stLog = storedSession["combatLog"] as JsonArray;
+        if (stLog is null || stLog.Count == 0) return;
+        if (inLog is null || stLog.Count > inLog.Count)
+            incomingSession["combatLog"] = stLog.DeepClone();
+    }
+
+    private static int? ReadNullableInt(JsonObject obj, string prop)
+    {
+        if (obj[prop] is not JsonNode node) return null;
+        return node.AsValue().TryGetValue<int>(out var v) ? v : null;
     }
 
     private sealed record SessionSnapshot(

@@ -1497,9 +1497,27 @@
                       </div>
                     }
                     @if (campaignUnsortedCreatures().length) {
-                      <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 pt-1">
-                        Non classés (neutres)
-                      </p>
+                      <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                          Non classés (neutres)
+                        </p>
+                        <div class="flex flex-wrap gap-1">
+                          <button
+                            type="button"
+                            class="px-2 py-1 rounded-lg text-[8px] font-black uppercase border border-sky-800/50 text-sky-300"
+                            (click)="bulkClassifyUnsorted('ally')"
+                          >
+                            Tous → Alliés
+                          </button>
+                          <button
+                            type="button"
+                            class="px-2 py-1 rounded-lg text-[8px] font-black uppercase border border-red-800/50 text-red-300"
+                            (click)="bulkClassifyUnsorted('antagonist')"
+                          >
+                            Tous → Adversaires
+                          </button>
+                        </div>
+                      </div>
                       <div class="flex flex-wrap gap-2">
                         @for (cr of campaignUnsortedCreatures(); track cr.creatureId + (cr.customName || '')) {
                           <button
@@ -1509,7 +1527,7 @@
                             (click)="addCampaignCreatureEnemy(cr)"
                           >
                             <span class="font-serif block">{{ cr.customName || cr.creatureName }}</span>
-                            <span class="text-[10px] text-slate-500">À classer adversaire dans Créatures</span>
+                            <span class="text-[10px] text-slate-500">Ou importer comme adversaire</span>
                           </button>
                         }
                       </div>
@@ -1664,6 +1682,24 @@
               <p class="text-[10px] font-black uppercase tracking-widest text-red-300">
                 Ou démarrer avec un adversaire
               </p>
+              @if (isDm() && campaignUnsortedCreatures().length) {
+                <div class="flex flex-wrap gap-1">
+                  <button
+                    type="button"
+                    class="px-2 py-1 rounded-lg text-[8px] font-black uppercase border border-sky-800/50 text-sky-300"
+                    (click)="bulkClassifyUnsorted('ally')"
+                  >
+                    Neutres → Alliés
+                  </button>
+                  <button
+                    type="button"
+                    class="px-2 py-1 rounded-lg text-[8px] font-black uppercase border border-red-800/50 text-red-300"
+                    (click)="bulkClassifyUnsorted('antagonist')"
+                  >
+                    Neutres → Adversaires
+                  </button>
+                </div>
+              }
               <div class="flex flex-wrap gap-2">
                 @for (cr of campaignEnemyCreatures(); track cr.creatureId + (cr.customName || '')) {
                   <button
