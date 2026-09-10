@@ -15,11 +15,12 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
-1. **P2 live** : face-à-face mobile ; fog live ; édition combat repliée.
-2. *(optionnel)* peaufinages guide / empty states hors flux critique.
+1. *(optionnel)* peaufinages guide / empty states hors flux critique.
+2. Checklist manuelle restante : jets d’init qui arrivent ; deux onglets MJ.
 
 ## Déjà livré (ne pas refaire)
 
+- **P2 live table** (2026-09-10) — édition combat repliée en fight (`Éditer combattants / roster`) ; face-à-face mobile (séparateur vs + bandeau tour sticky) ; fog live : carte de session active filtrée pour joueurs + canvas live + poll `/play` 4 s ; révélations fog persistées immédiatement.
 - **P1 prépa session** (2026-09-10) — run sheet (objectifs / scènes / checklist) + `activeMapId` à la planification ; `playerRecap` à la fin de session (dialog Terminer) ; archive joueur si récap ; invites en attente MJ + copier lien Amis ; onglet Préparation masqué côté joueur sans pré-tiré ; API filtre run sheet, conserve récap/`activeMapId` ; `GET …/invites`.
 - **P0 table joueur + init** (2026-09-10) — `/play` ouvert aux joueurs (badge Joueur) ; CTA « Rejoindre la table » sur Résumé ; bandeau init = dé + encode + total ; collecte MJ liste Alice ✓ / Bob… ; guide aligné (Préparation → Donjons, document, + Toute la party).
 - **Plein écran UX** (2026-09-10) — icône maximize partagée (`app-fullscreen-enter-btn` / link) ; sortie **Escape** (Atlas, donjon, table `/play`, carnet Main, Codex sans bouton Fermer).

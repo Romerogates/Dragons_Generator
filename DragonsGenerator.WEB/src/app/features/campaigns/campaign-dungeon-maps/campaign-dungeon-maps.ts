@@ -410,19 +410,19 @@ export class CampaignDungeonMaps implements OnDestroy {
     this.confirmDialog.set({ title, body, confirmLabel, onConfirm });
   }
 
-  updateMap(map: CampaignDungeonMap): void {
+  updateMap(map: CampaignDungeonMap, immediate = false): void {
     const now = new Date().toISOString();
     const updated = { ...map, updatedAt: now };
     const list = (this.campaign().data.dungeonMaps ?? []).map((m) =>
       m.id === map.id ? updated : m,
     );
-    this.persistMaps(list);
+    this.persistMaps(list, immediate);
   }
 
-  patchEditingMap(patch: Partial<CampaignDungeonMap>): void {
+  patchEditingMap(patch: Partial<CampaignDungeonMap>, immediate = false): void {
     const current = this.editingMap();
     if (!current) return;
-    this.updateMap({ ...current, ...patch });
+    this.updateMap({ ...current, ...patch }, immediate);
   }
 
   patchRoom(roomId: string, patch: Partial<CampaignDungeonMap['rooms'][0]>): void {
@@ -769,10 +769,13 @@ export class CampaignDungeonMaps implements OnDestroy {
     const map = this.editingMap();
     if (!map) return;
     const enabled = !map.fogOfWarEnabled;
-    this.patchEditingMap({
-      fogOfWarEnabled: enabled,
-      revealedRoomIds: enabled ? (map.revealedRoomIds ?? []) : [],
-    });
+    this.patchEditingMap(
+      {
+        fogOfWarEnabled: enabled,
+        revealedRoomIds: enabled ? (map.revealedRoomIds ?? []) : [],
+      },
+      true,
+    );
     this.message.set(
       enabled
         ? 'Brouillard de guerre activé — révélez les salles une par une.'
@@ -793,21 +796,21 @@ export class CampaignDungeonMaps implements OnDestroy {
     const current = new Set(map.revealedRoomIds ?? []);
     if (current.has(roomId)) current.delete(roomId);
     else current.add(roomId);
-    this.patchEditingMap({ revealedRoomIds: [...current] });
+    this.patchEditingMap({ revealedRoomIds: [...current] }, true);
   }
 
   revealAllRooms(): void {
     const map = this.editingMap();
     if (!map) return;
-    this.patchEditingMap({ revealedRoomIds: map.rooms.map((r) => r.id) });
+    this.patchEditingMap({ revealedRoomIds: map.rooms.map((r) => r.id) }, true);
     this.message.set('Toutes les salles révélées.');
   }
 
   hideAllRooms(): void {
     const map = this.editingMap();
     if (!map) return;
-    this.patchEditingMap({ revealedRoomIds: [] });
-    this.message.set('Salles masquées — régénérez le handout pour les joueurs.');
+    this.patchEditingMap({ revealedRoomIds: [] }, true);
+    this.message.set('Salles masquées — la table live se met à jour ; régénérez le document PNG si besoin.');
   }
 
   onThemeChange(raw: string): void {

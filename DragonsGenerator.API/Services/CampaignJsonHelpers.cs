@@ -123,10 +123,72 @@ public static class CampaignJsonHelpers
             node["handouts"] = visibleHandouts;
         }
 
-        node["dungeonMaps"] = new JsonArray();
+        // Carte live de la session active seulement (fog), sans spoilers MJ.
+        node["dungeonMaps"] = BuildPlayerLiveDungeonMaps(node);
 
         using var doc = JsonDocument.Parse(node.ToJsonString());
         return doc.RootElement.Clone();
+    }
+
+    private static JsonArray BuildPlayerLiveDungeonMaps(JsonObject node)
+    {
+        var liveMapId = ResolveActiveSessionMapId(node);
+        if (string.IsNullOrWhiteSpace(liveMapId) || node["dungeonMaps"] is not JsonArray maps)
+            return new JsonArray();
+
+        foreach (var item in maps)
+        {
+            if (item is not JsonObject map) continue;
+            var id = map["id"]?.GetValue<string>();
+            if (!string.Equals(id, liveMapId, StringComparison.Ordinal)) continue;
+            return new JsonArray { SanitizeDungeonMapForPlayer(map) };
+        }
+
+        return new JsonArray();
+    }
+
+    private static string? ResolveActiveSessionMapId(JsonObject node)
+    {
+        var activeSessionId = node["activeSessionId"]?.GetValue<string>();
+        if (string.IsNullOrWhiteSpace(activeSessionId) || node["sessions"] is not JsonArray sessions)
+            return null;
+
+        foreach (var item in sessions)
+        {
+            if (item is not JsonObject session) continue;
+            if (!string.Equals(session["id"]?.GetValue<string>(), activeSessionId, StringComparison.Ordinal))
+                continue;
+            var mapId = session["activeMapId"]?.GetValue<string>();
+            return string.IsNullOrWhiteSpace(mapId) ? null : mapId;
+        }
+
+        return null;
+    }
+
+    private static JsonObject SanitizeDungeonMapForPlayer(JsonObject source)
+    {
+        var map = source.DeepClone()!.AsObject();
+        if (map["rooms"] is JsonArray rooms)
+        {
+            foreach (var item in rooms)
+            {
+                if (item is not JsonObject room) continue;
+                room["notes"] = "";
+                room["encounterId"] = null;
+                room.Remove("randomEncounter");
+            }
+        }
+
+        if (map["markers"] is JsonArray markers)
+        {
+            foreach (var item in markers)
+            {
+                if (item is not JsonObject marker) continue;
+                marker["notes"] = "";
+            }
+        }
+
+        return map;
     }
 
     private static readonly HashSet<string> ActivitySpoilerKeys = new(StringComparer.OrdinalIgnoreCase)

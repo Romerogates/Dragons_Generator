@@ -115,7 +115,8 @@ Prérequis : campagne créée, ≥ 1 joueur avec perso **approuvé**, rencontre 
   - *E2E :* `campaign-combat-xp.spec.ts` (`+ Toute la party`).
 - [x] 🟠 Mode de session (**En ligne / Présentiel / Autre**) à la planification — dés vs encode.
   - *E2E :* `campaign-live-polish.spec.ts` (mode Autre → Encoder / Lancer le dé).
-- [ ] 🟠 Combat face-à-face : alliés à gauche, adversaires à droite ; tour mis en avant.
+- [x] 🟠 Combat face-à-face : alliés à gauche, adversaires à droite ; tour mis en avant.
+  - Desktop `lg` colonnes ; mobile stack + séparateur « vs » ; bandeau « Tour de… » sticky.
 - [x] 🔴 Collecter l’initiative (code + lien)
   - *Où :* combat actif → **Collecter l’init** ; page `/campaigns/:id/init` avec **lancer le dé**.
   - *E2E :* collecte ouverte (`campaign-play`) + banner joueur (`campaign-combat-xp`).
@@ -137,6 +138,7 @@ Prérequis : campagne créée, ≥ 1 joueur avec perso **approuvé**, rencontre 
 - [x] 🟠 Empty state : « créez un **document** » (pas « handout »)
 - [x] 🟠 Cartes donjon : bouton **Document** ; toast « brouillon… publiez » ; **Brouillard de guerre** (pas Fog of war)
   - *Vérifié code :* libellé « Brouillard de guerre » dans `campaign-dungeon-maps`.
+  - *Live :* joueurs reçoivent la carte de session active (fog) via GET + canvas table ; poll `/play` 4 s.
 - [x] 🟢 Joueur voit documents **publiés** seulement
   - *E2E :* `campaign-live-polish.spec.ts`.
 
@@ -166,7 +168,7 @@ Prérequis : campagne créée, ≥ 1 joueur avec perso **approuvé**, rencontre 
 - [x] 🔴 Conditions éditables (chips + champ virgules) alliés **et** adversaires
   - Chips cliquables (presets + retirer) en setup/fight ; champ virgules conservé.
 - [x] 🟠 Édition multi-attaques (nom / bonus / dés) en setup / outils avancés
-  - + Attaque / retirer ; éditable aussi en phase fight.
+  - + Attaque / retirer ; en fight : formes repliées sauf « Éditer combattants / roster ».
 - [x] 🟠 Classer en masse les créatures **Neutre** → Allié ou Adversaire
   - Préparation Créatures + raccourci setup combat (`Tous → Alliés/Adversaires`).
 

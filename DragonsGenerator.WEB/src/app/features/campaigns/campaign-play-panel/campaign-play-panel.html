@@ -524,7 +524,10 @@
 
         @if (currentTurn(); as turn) {
           <div
-            class="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-800/40 bg-amber-950/90 px-4 py-3 backdrop-blur-sm"
+            class="sticky z-20 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-800/40 bg-amber-950/90 px-4 py-3 backdrop-blur-sm shadow-lg shadow-black/20"
+            [class.top-0]="!fullscreen()"
+            [class.top-14]="fullscreen() && !isDm()"
+            [class.top-28]="fullscreen() && isDm()"
           >
             <p [class]="fullscreen() ? 'text-lg font-serif text-amber-200' : 'font-serif text-amber-200'">
               Tour de <strong>{{ turn.name || 'Sans nom' }}</strong>
@@ -558,6 +561,24 @@
           </div>
         } @else if (activeCombat()?.combatants?.length) {
           <p class="text-xs text-slate-500 italic px-1">Tous les combattants actifs sont hors combat.</p>
+        }
+
+        @if (!isDm() && activeSessionMap(); as liveMap) {
+          <div class="rounded-xl border border-sky-900/40 bg-sky-950/20 p-3 space-y-2">
+            <div class="flex flex-wrap items-baseline justify-between gap-2">
+              <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">
+                Carte · {{ liveMap.name }}
+              </p>
+              @if (liveMap.fogOfWarEnabled) {
+                <p class="text-[10px] text-slate-500">Brouillard de guerre — révélations en direct</p>
+              }
+            </div>
+            <canvas
+              #liveDungeonCanvas
+              class="max-w-full w-full rounded-lg border border-slate-800 bg-[#0a0d13]"
+              aria-label="Carte de session"
+            ></canvas>
+          </div>
         }
 
         @if (isDm() && combatFlowPhase() === 'setup') {
@@ -776,7 +797,7 @@
                       />
                     </div>
                   }
-                  @if (isDm() && (combatFlowPhase() === 'setup' || combatFlowPhase() === 'fight' || advancedToolsOpen())) {
+                  @if (isDm() && (combatFlowPhase() === 'setup' || advancedToolsOpen())) {
                     <div
                       class="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2"
                       (click)="$event.stopPropagation()"
@@ -922,9 +943,14 @@
             }
           </div>
 
-          <div class="hidden lg:flex flex-col items-center justify-center px-2 py-8 text-slate-600">
-            <span class="text-2xl">⚔</span>
-            <span class="text-[9px] font-black uppercase tracking-widest mt-2">vs</span>
+          <div class="flex flex-col items-center justify-center px-2 py-2 lg:py-8 text-slate-600">
+            <span class="hidden lg:block text-2xl" aria-hidden="true">⚔</span>
+            <div class="flex lg:hidden w-full items-center gap-3 py-1" aria-hidden="true">
+              <span class="flex-1 h-px bg-slate-800"></span>
+              <span class="text-[9px] font-black uppercase tracking-widest">⚔ vs</span>
+              <span class="flex-1 h-px bg-slate-800"></span>
+            </div>
+            <span class="hidden lg:block text-[9px] font-black uppercase tracking-widest mt-2">vs</span>
           </div>
 
           <div class="space-y-2">
@@ -1044,7 +1070,7 @@
                       />
                     </div>
                   }
-                  @if (isDm() && (combatFlowPhase() === 'setup' || combatFlowPhase() === 'fight' || advancedToolsOpen())) {
+                  @if (isDm() && (combatFlowPhase() === 'setup' || advancedToolsOpen())) {
                     <div
                       class="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2"
                       (click)="$event.stopPropagation()"
@@ -1624,7 +1650,7 @@
             class="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-300"
             (click)="toggleAdvancedTools()"
           >
-            {{ advancedToolsOpen() ? 'Masquer outils avancés' : 'Outils avancés (PV, roster…)' }}
+            {{ advancedToolsOpen() ? 'Masquer édition / roster' : 'Éditer combattants / roster' }}
           </button>
         }
       } @else if (isDm()) {

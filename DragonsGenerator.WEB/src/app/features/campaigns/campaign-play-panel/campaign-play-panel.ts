@@ -3,12 +3,14 @@ import {
   Component,
   computed,
   effect,
+  ElementRef,
   inject,
   input,
   OnDestroy,
   output,
   signal,
   untracked,
+  viewChild,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -87,12 +89,17 @@ import { CampaignDungeonMaps } from '../campaign-dungeon-maps/campaign-dungeon-m
 import { DiceRollComponent } from '@shared/components/dice-roll/dice-roll';
 import { FullscreenEnterLink } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-link';
 import type { NotebookPage, SessionPlayPad } from '@core/models/Campaign/campaign';
+import type { CampaignDungeonMap } from '@core/models/Campaign/dungeon-map';
 import {
   appendTextToFirstNotePad,
   archivePlayPadsText,
   ensureSessionPlayPads,
   sessionPlayPadsPreview,
 } from '@core/utils/notebook.util';
+import {
+  drawDungeonToCanvas,
+  playerExportDrawOptions,
+} from '@core/utils/dungeon-render.util';
 
 export type PlaySessionView =
   | 'resume'
@@ -328,6 +335,9 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly codexCreatureSearch = signal('');
   readonly codexCreaturesLoading = signal(false);
 
+  /** Canvas carte live (vue joueur). */
+  private readonly liveDungeonCanvas = viewChild<ElementRef<HTMLCanvasElement>>('liveDungeonCanvas');
+
   /** Réinitialise la vue table si on change / quitte la session (dock réutilisé). */
   private lastBoundSessionId: string | null | undefined = undefined;
 
@@ -335,6 +345,12 @@ export class CampaignPlayPanel implements OnDestroy {
     if (typeof window !== 'undefined') {
       window.addEventListener('pagehide', this.onPageHide);
     }
+    effect(() => {
+      const map = this.activeSessionMap();
+      const canvasRef = this.liveDungeonCanvas();
+      const isDm = this.isDm();
+      untracked(() => this.paintLiveDungeon(map, canvasRef?.nativeElement ?? null, isDm));
+    });
     effect(() => {
       const sessionId = this.campaign().data.activeSessionId ?? null;
       untracked(() => {
@@ -695,6 +711,16 @@ export class CampaignPlayPanel implements OnDestroy {
 
   onDungeonMapsDataChange(patch: Partial<CampaignData>): void {
     this.saveData(patch);
+  }
+
+  private paintLiveDungeon(
+    map: CampaignDungeonMap | null,
+    canvas: HTMLCanvasElement | null,
+    isDm: boolean,
+  ): void {
+    if (isDm || !map || !canvas) return;
+    const cell = Math.max(4, Math.min(14, Math.floor(560 / Math.max(1, map.gridWidth))));
+    drawDungeonToCanvas(map, canvas, cell, playerExportDrawOptions(map));
   }
 
   onSessionResumeChange(page: NotebookPage): void {

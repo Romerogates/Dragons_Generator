@@ -4,6 +4,7 @@ import {
   effect,
   HostListener,
   inject,
+  OnDestroy,
   OnInit,
   signal,
   untracked,
@@ -25,7 +26,7 @@ import type { CampaignDetail as CampaignDetailModel } from '@core/models/Campaig
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class CampaignPlayPage implements OnInit {
+export class CampaignPlayPage implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly campaigns = inject(CampaignCloudService);
@@ -35,6 +36,8 @@ export class CampaignPlayPage implements OnInit {
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly campaign = signal<CampaignDetailModel | null>(null);
+
+  private softPollTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     effect(() => {
@@ -84,6 +87,7 @@ export class CampaignPlayPage implements OnInit {
       next: (c) => {
         this.campaign.set(c);
         this.loading.set(false);
+        this.startSoftPoll(c);
       },
       error: () => {
         this.error.set('Campagne introuvable.');
@@ -92,8 +96,40 @@ export class CampaignPlayPage implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this.stopSoftPoll();
+  }
+
   onCampaignChange(updated: CampaignDetailModel): void {
     this.campaign.set(updated);
     this.sessionDock.patchLiveCampaign(updated);
+  }
+
+  /** Joueurs : poll 4 s pour fog live + combat ; MJ : pas besoin (écrit déjà). */
+  private startSoftPoll(c: CampaignDetailModel): void {
+    this.stopSoftPoll();
+    if (c.isOwner) return;
+    this.softPollTimer = setInterval(() => this.softReload(), 4_000);
+  }
+
+  private stopSoftPoll(): void {
+    if (this.softPollTimer) {
+      clearInterval(this.softPollTimer);
+      this.softPollTimer = null;
+    }
+  }
+
+  private softReload(): void {
+    const c = this.campaign();
+    if (!c || c.isOwner) return;
+    this.campaigns.get(c.id).subscribe({
+      next: (updated) => {
+        this.campaign.set(updated);
+        this.sessionDock.patchLiveCampaign(updated);
+      },
+      error: () => {
+        /* ignore poll errors */
+      },
+    });
   }
 }

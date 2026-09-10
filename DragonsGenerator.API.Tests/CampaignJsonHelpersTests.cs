@@ -171,4 +171,62 @@ public class CampaignJsonHelpersTests
         Assert.Equal("map-1", session.GetProperty("activeMapId").GetString());
         Assert.Equal("", session.GetProperty("notes").GetString());
     }
+
+    [Fact]
+    public void FilterForPlayerView_keeps_active_session_map_with_fog_strips_spoilers()
+    {
+        const string raw = """
+            {
+              "activeSessionId": "ses-1",
+              "sessions": [{ "id": "ses-1", "activeMapId": "map-live" }],
+              "dungeonMaps": [
+                {
+                  "id": "map-live",
+                  "name": "Crypte",
+                  "fogOfWarEnabled": true,
+                  "revealedRoomIds": ["r1"],
+                  "rooms": [
+                    {
+                      "id": "r1",
+                      "label": "A",
+                      "notes": "trésor secret",
+                      "encounterId": "enc-1",
+                      "randomEncounter": { "creatures": [{ "name": "Gobelin", "quantity": 2 }] }
+                    }
+                  ],
+                  "markers": [{ "id": "m1", "notes": "piège MJ", "kind": "trap", "x": 1, "y": 1 }]
+                },
+                { "id": "map-other", "name": "Autre", "rooms": [], "markers": [] }
+              ]
+            }
+            """;
+        using var doc = System.Text.Json.JsonDocument.Parse(raw);
+        var filtered = CampaignJsonHelpers.FilterForPlayerView(doc.RootElement, Guid.NewGuid());
+        var maps = filtered.GetProperty("dungeonMaps");
+        Assert.Equal(1, maps.GetArrayLength());
+        var map = maps[0];
+        Assert.Equal("map-live", map.GetProperty("id").GetString());
+        Assert.True(map.GetProperty("fogOfWarEnabled").GetBoolean());
+        Assert.Equal("r1", map.GetProperty("revealedRoomIds")[0].GetString());
+        var room = map.GetProperty("rooms")[0];
+        Assert.Equal("", room.GetProperty("notes").GetString());
+        Assert.Equal(System.Text.Json.JsonValueKind.Null, room.GetProperty("encounterId").ValueKind);
+        Assert.False(room.TryGetProperty("randomEncounter", out _));
+        Assert.Equal("", map.GetProperty("markers")[0].GetProperty("notes").GetString());
+    }
+
+    [Fact]
+    public void FilterForPlayerView_strips_all_maps_when_no_active_session_map()
+    {
+        const string raw = """
+            {
+              "activeSessionId": null,
+              "sessions": [{ "id": "ses-1", "activeMapId": "map-1" }],
+              "dungeonMaps": [{ "id": "map-1", "name": "Crypte", "rooms": [], "markers": [] }]
+            }
+            """;
+        using var doc = System.Text.Json.JsonDocument.Parse(raw);
+        var filtered = CampaignJsonHelpers.FilterForPlayerView(doc.RootElement, Guid.NewGuid());
+        Assert.Equal(0, filtered.GetProperty("dungeonMaps").GetArrayLength());
+    }
 }
