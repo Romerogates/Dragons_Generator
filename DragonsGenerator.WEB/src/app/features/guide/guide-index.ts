@@ -9,11 +9,10 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { GuideCommentsService, type GuideTopicStats } from '@core/services/guide-comments.service';
 import { GuidePreferencesService } from '@core/services/guide-preferences.service';
 import type { GuideAudience } from './guide.types';
-import { GUIDE_NAV_GROUPS, GUIDE_QUICK_CARDS } from './guide-content';
-import { guideTopicsByGroup } from './guide-topics';
+import { GUIDE_NAV_GROUPS, GUIDE_QUICK_CARDS, GUIDE_START_STEPS } from './guide-content';
+import { GUIDE_TOPICS, guideTopicsByGroup } from './guide-topics';
 
 @Component({
   selector: 'app-guide-index',
@@ -24,32 +23,23 @@ import { guideTopicsByGroup } from './guide-topics';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class GuideIndexPage implements OnInit {
-  private readonly commentsApi = inject(GuideCommentsService);
   private readonly prefs = inject(GuidePreferencesService);
 
   readonly query = signal('');
   readonly audience = signal<GuideAudience | 'all'>('all');
-  readonly groupFilter = signal<string | 'all'>('all');
-  readonly stats = signal<Record<string, GuideTopicStats>>({});
 
   readonly groups = GUIDE_NAV_GROUPS;
   readonly quickCards = GUIDE_QUICK_CARDS;
-
-  readonly sections = computed(() =>
-    guideTopicsByGroup(this.audience(), this.query(), this.groupFilter()),
+  readonly startSteps = GUIDE_START_STEPS;
+  readonly featured = GUIDE_TOPICS.filter((t) =>
+    ['demarrage', 'parcours', 'personnage', 'scenario', 'table', 'faq'].includes(t.id),
   );
+
+  readonly sections = computed(() => guideTopicsByGroup(this.audience(), this.query(), 'all'));
 
   ngOnInit(): void {
     const aud = this.prefs.audience();
     if (aud === 'dm' || aud === 'player') this.audience.set(aud);
-    this.commentsApi.listStats().subscribe({
-      next: (list) => {
-        const map: Record<string, GuideTopicStats> = {};
-        for (const s of list) map[s.topicId] = s;
-        this.stats.set(map);
-      },
-      error: () => this.stats.set({}),
-    });
   }
 
   setAudience(a: GuideAudience | 'all'): void {
@@ -57,16 +47,7 @@ export class GuideIndexPage implements OnInit {
     if (a === 'dm' || a === 'player') this.prefs.setAudience(a);
   }
 
-  relativeTime(iso: string | null | undefined): string {
-    if (!iso) return '';
-    const t = new Date(iso).getTime();
-    if (Number.isNaN(t)) return '';
-    const diff = Date.now() - t;
-    const mins = Math.floor(diff / 60_000);
-    if (mins < 60) return `Il y a ${Math.max(1, mins)} min`;
-    const hours = Math.floor(mins / 60);
-    if (hours < 48) return `Il y a ${hours} h`;
-    const days = Math.floor(hours / 24);
-    return `Il y a ${days} j`;
+  isUnread(id: string): boolean {
+    return this.prefs.isSectionUnread(id);
   }
 }

@@ -33,7 +33,7 @@ describe('GuideCommentsService', () => {
     service.createComment('faq', 'Hello', 'parent-1').subscribe();
     const req = http.expectOne(`${api}/guide/topics/faq/comments`);
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ body: 'Hello', parentId: 'parent-1', widgetSize: 'half' });
+    expect(req.request.body).toEqual({ body: 'Hello', parentId: 'parent-1' });
     req.flush({
       id: 'c1',
       topicId: 'faq',
@@ -44,16 +44,13 @@ describe('GuideCommentsService', () => {
       createdAt: new Date().toISOString(),
       likeCount: 0,
       likedByMe: false,
-      widgetSize: 'half',
-      sortOrder: 0,
     });
   });
 
-  it('patches widget layout', () => {
-    service.patchLayout('c1', { widgetSize: 'full', sortOrder: 2 }).subscribe();
-    const req = http.expectOne(`${api}/guide/comments/c1/layout`);
-    expect(req.request.method).toBe('PATCH');
-    expect(req.request.body).toEqual({ widgetSize: 'full', sortOrder: 2 });
+  it('toggles like', () => {
+    service.toggleLike('c1').subscribe();
+    const req = http.expectOne(`${api}/guide/comments/c1/like`);
+    expect(req.request.method).toBe('POST');
     req.flush({
       id: 'c1',
       topicId: 'faq',
@@ -62,10 +59,8 @@ describe('GuideCommentsService', () => {
       body: 'x',
       parentId: null,
       createdAt: new Date().toISOString(),
-      likeCount: 0,
-      likedByMe: false,
-      widgetSize: 'full',
-      sortOrder: 2,
+      likeCount: 1,
+      likedByMe: true,
     });
   });
 });

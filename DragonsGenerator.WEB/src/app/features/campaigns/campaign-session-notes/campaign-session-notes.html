@@ -1,5 +1,4 @@
 <section class="space-y-4">
-  <!-- Résumé campagne (persistant) -->
   <div class="rounded-2xl border border-emerald-800/40 bg-emerald-950/20 overflow-hidden">
     <button
       type="button"
@@ -31,10 +30,28 @@
 
   <div class="flex flex-wrap items-center justify-between gap-2">
     <div>
-      <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Calepins de session</p>
-      <p class="text-[11px] text-slate-600 mt-0.5">Widgets — choisissez 1/3, 1/2 ou 1/1 en mode Modifier</p>
+      <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Calepins · widgets</p>
+      <p class="text-[11px] text-slate-600 mt-0.5">
+        @if (boardLocked()) {
+          Tableau verrouillé — déverrouillez pour glisser / étirer
+        } @else {
+          Glissez l’en-tête · étirez le coin bas-droit
+        }
+      </p>
     </div>
     <div class="flex flex-wrap items-center gap-2">
+      <button
+        type="button"
+        class="min-h-10 px-3 rounded-full text-[10px] font-black uppercase border transition-colors"
+        [class]="
+          boardLocked()
+            ? 'border-slate-700 text-slate-300 hover:border-amber-600/50'
+            : 'border-amber-600/50 bg-amber-950/30 text-amber-200'
+        "
+        (click)="toggleBoardLock()"
+      >
+        {{ boardLocked() ? 'Éditer le tableau' : 'Verrouiller' }}
+      </button>
       <button
         type="button"
         class="min-h-10 px-3 rounded-full text-[10px] font-black uppercase border border-slate-700 text-slate-300 hover:border-emerald-600/50 disabled:opacity-40"
@@ -54,20 +71,41 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-6 gap-3">
-    @for (pad of pads(); track pad.id; let i = $index) {
+  <div
+    #board
+    class="relative w-full rounded-2xl border border-slate-800/80 bg-[#12161c]/50 p-2 select-none"
+    [class.touch-none]="!boardLocked()"
+    [style.display]="'grid'"
+    [style.gridTemplateColumns]="'repeat(' + gridCols + ', minmax(0, 1fr))'"
+    [style.gridAutoRows.px]="rowPx"
+    [style.gap.px]="8"
+    [style.minHeight.px]="boardRows() * rowPx"
+    (pointermove)="onBoardPointerMove($event)"
+    (pointerup)="onBoardPointerUp()"
+    (pointercancel)="onBoardPointerUp()"
+  >
+    @for (pad of pads(); track pad.id) {
       <article
-        [class]="
-          padSpanClass(pad) +
-          ' rounded-2xl border bg-[#1b2028]/70 overflow-hidden flex flex-col min-h-0 ' +
-          (isEditing(pad.id) ? 'border-emerald-700/50' : 'border-slate-800')
-        "
+        class="relative min-h-0 rounded-2xl border bg-[#1b2028]/90 overflow-hidden flex flex-col shadow-lg shadow-black/20"
+        [style.gridColumn]="padStyle(pad)['gridColumn']"
+        [style.gridRow]="padStyle(pad)['gridRow']"
+        [class.border-emerald-700/50]="isEditing(pad.id)"
+        [class.border-amber-600/40]="!boardLocked() && !isEditing(pad.id)"
+        [class.border-slate-800]="boardLocked() && !isEditing(pad.id)"
+        [class.z-20]="!boardLocked()"
+        [class.opacity-90]="!boardLocked()"
       >
-        <div class="flex flex-wrap items-center gap-2 px-3 py-2 border-b border-slate-800/80">
+        <div
+          class="flex flex-wrap items-center gap-2 px-3 py-2 border-b border-slate-800/80 shrink-0"
+          [class.cursor-grab]="!boardLocked()"
+          [class.active:cursor-grabbing]="!boardLocked()"
+          (pointerdown)="onDragHandlePointerDown($event, pad)"
+        >
           <button
             type="button"
             class="w-9 h-9 rounded-lg text-slate-500 hover:text-slate-300"
             [attr.aria-label]="pad.collapsed ? 'Déplier' : 'Réduire'"
+            (pointerdown)="$event.stopPropagation()"
             (click)="togglePad(pad.id)"
           >
             <iconify-icon
@@ -82,67 +120,33 @@
               class="flex-1 min-w-[6rem] bg-transparent border-0 text-sm font-serif text-slate-200 focus:outline-none focus:ring-0"
               [ngModel]="pad.title"
               (ngModelChange)="setPadTitle(pad.id, $event)"
+              (pointerdown)="$event.stopPropagation()"
               [attr.aria-label]="'Titre du calepin'"
             />
           } @else {
-            <p class="flex-1 min-w-[6rem] text-sm font-serif text-slate-200 truncate">
+            <p class="flex-1 min-w-[6rem] text-sm font-serif text-slate-200 truncate pointer-events-none">
               {{ pad.title || (pad.kind === 'checklist' ? 'Liste' : 'Notes') }}
             </p>
           }
 
-          <span class="text-[9px] font-black uppercase tracking-widest text-slate-600">
+          <span class="text-[9px] font-black uppercase tracking-widest text-slate-600 pointer-events-none">
             {{ pad.kind === 'checklist' ? 'Liste' : 'Note' }}
           </span>
 
           @if (isEditing(pad.id)) {
-            <div
-              class="inline-flex rounded-full border border-slate-700 p-0.5"
-              role="group"
-              aria-label="Taille du widget"
-            >
-              @for (size of widgetSizes; track size.id) {
-                <button
-                  type="button"
-                  class="min-h-8 px-2 rounded-full text-[9px] font-black uppercase transition-colors"
-                  [class.bg-emerald-900/60]="(pad.widgetSize ?? 'half') === size.id"
-                  [class.text-emerald-200]="(pad.widgetSize ?? 'half') === size.id"
-                  [class.text-slate-500]="(pad.widgetSize ?? 'half') !== size.id"
-                  [attr.aria-pressed]="(pad.widgetSize ?? 'half') === size.id"
-                  (click)="setPadWidgetSize(pad.id, size.id)"
-                >
-                  {{ size.label }}
-                </button>
-              }
-            </div>
-            <button
-              type="button"
-              class="w-9 h-9 rounded-lg text-slate-500 hover:text-slate-300 disabled:opacity-30"
-              [disabled]="i === 0"
-              aria-label="Monter"
-              (click)="movePad(pad.id, -1)"
-            >
-              <iconify-icon icon="mdi:arrow-up" class="text-lg"></iconify-icon>
-            </button>
-            <button
-              type="button"
-              class="w-9 h-9 rounded-lg text-slate-500 hover:text-slate-300 disabled:opacity-30"
-              [disabled]="i === pads().length - 1"
-              aria-label="Descendre"
-              (click)="movePad(pad.id, 1)"
-            >
-              <iconify-icon icon="mdi:arrow-down" class="text-lg"></iconify-icon>
-            </button>
             <button
               type="button"
               class="w-9 h-9 rounded-lg text-red-400/70 hover:text-red-300"
               aria-label="Supprimer"
+              (pointerdown)="$event.stopPropagation()"
               (click)="removePad(pad.id)"
             >
               <iconify-icon icon="mdi:trash-can-outline" class="text-lg"></iconify-icon>
             </button>
             <button
               type="button"
-              class="min-h-9 px-3 rounded-lg text-[10px] font-black uppercase bg-emerald-800/50 text-emerald-100 hover:bg-emerald-700/50"
+              class="min-h-9 px-3 rounded-lg text-[10px] font-black uppercase bg-emerald-800/50 text-emerald-100"
+              (pointerdown)="$event.stopPropagation()"
               (click)="stopEditPad()"
             >
               OK
@@ -151,6 +155,7 @@
             <button
               type="button"
               class="min-h-9 px-3 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300 hover:border-emerald-600/50"
+              (pointerdown)="$event.stopPropagation()"
               (click)="startEditPad(pad.id)"
             >
               Modifier
@@ -159,7 +164,7 @@
         </div>
 
         @if (!pad.collapsed) {
-          <div class="p-3 flex-1">
+          <div class="p-3 flex-1 min-h-0 overflow-auto" (pointerdown)="$event.stopPropagation()">
             @if (pad.kind === 'note' && pad.page) {
               <app-campaign-notebook
                 [page]="pad.page"
@@ -214,7 +219,7 @@
               @if (isEditing(pad.id)) {
                 <button
                   type="button"
-                  class="mt-3 min-h-10 px-3 rounded-full text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:border-violet-600/50"
+                  class="mt-3 min-h-10 px-3 rounded-full text-[10px] font-black uppercase border border-slate-700 text-slate-400"
                   (click)="addChecklistItem(pad.id)"
                 >
                   + Ligne
@@ -222,6 +227,17 @@
               }
             }
           </div>
+        }
+
+        @if (!boardLocked()) {
+          <button
+            type="button"
+            class="absolute bottom-1 right-1 w-7 h-7 rounded-md bg-amber-950/80 border border-amber-600/50 text-amber-200 cursor-se-resize flex items-center justify-center z-30"
+            aria-label="Redimensionner"
+            (pointerdown)="onResizeHandlePointerDown($event, pad)"
+          >
+            <iconify-icon icon="mdi:arrow-expand-all" class="text-sm"></iconify-icon>
+          </button>
         }
       </article>
     }

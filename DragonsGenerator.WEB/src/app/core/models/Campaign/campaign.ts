@@ -365,8 +365,16 @@ export interface SessionChecklistItem {
 
 export type SessionPlayPadKind = 'note' | 'checklist';
 
-/** Calepin de notes live (session). */
+/** @deprecated Prefer layout cells; kept for migration. */
 export type SessionPlayPadWidgetSize = 'third' | 'half' | 'full';
+
+/** Position / taille sur grille 12 colonnes. */
+export interface SessionPlayPadLayout {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
 
 export interface SessionPlayPad {
   id: string;
@@ -374,8 +382,10 @@ export interface SessionPlayPad {
   title: string;
   collapsed?: boolean;
   order: number;
-  /** Largeur widget dans la grille (1/3, 1/2, 1/1). */
+  /** @deprecated Migrated to layout. */
   widgetSize?: SessionPlayPadWidgetSize;
+  /** Grille aimantée (x,y,w,h en cellules). */
+  layout?: SessionPlayPadLayout;
   page?: NotebookPage;
   items?: SessionChecklistItem[];
 }
@@ -405,8 +415,10 @@ export function createSessionPlayPad(
   kind: SessionPlayPadKind,
   title?: string,
   order = 0,
+  layout?: SessionPlayPadLayout,
 ): SessionPlayPad {
   const id = crypto.randomUUID?.() ?? `pad-${Date.now()}`;
+  const resolvedLayout = layout ?? { x: (order % 2) * 6, y: Math.floor(order / 2) * 6, w: 6, h: 6 };
   if (kind === 'checklist') {
     return {
       id,
@@ -414,7 +426,7 @@ export function createSessionPlayPad(
       title: title ?? 'Liste',
       order,
       collapsed: false,
-      widgetSize: 'half',
+      layout: resolvedLayout,
       items: [createChecklistItem('')],
     };
   }
@@ -425,7 +437,7 @@ export function createSessionPlayPad(
     title: page.title,
     order,
     collapsed: false,
-    widgetSize: 'half',
+    layout: resolvedLayout,
     page,
   };
 }

@@ -9,6 +9,7 @@ import {
   createNotebookPage,
   createSessionPlayPad,
 } from '@core/models/Campaign/campaign';
+import { ensurePadsHaveLayouts } from './pad-layout.util';
 
 export function seedNotebookFromLegacyNotes(notes: string | undefined | null): NotebookPage[] {
   const trimmed = notes?.trim();
@@ -36,18 +37,18 @@ export function ensureSessionResume(page?: NotebookPage | null): NotebookPage {
 export function ensureSessionPlayPads(session: CampaignSession): SessionPlayPad[] {
   const existing = session.playPads;
   if (existing?.length) {
-    return [...existing]
+    const sorted = [...existing]
       .map((p, i) => ({
         ...p,
         order: typeof p.order === 'number' ? p.order : i,
         title: p.title?.trim() || (p.kind === 'checklist' ? 'Liste' : p.page?.title || 'Notes'),
-        widgetSize: p.widgetSize === 'third' || p.widgetSize === 'half' || p.widgetSize === 'full' ? p.widgetSize : 'half',
       }))
       .sort((a, b) => a.order - b.order);
+    return ensurePadsHaveLayouts(sorted);
   }
 
   const page = sessionNotebookFromPlay(session.title, session.playNotes, session.playNotebook);
-  return [
+  return ensurePadsHaveLayouts([
     {
       id: page.id || 'session-live-notes',
       kind: 'note',
@@ -55,9 +56,10 @@ export function ensureSessionPlayPads(session: CampaignSession): SessionPlayPad[
       order: 0,
       collapsed: false,
       widgetSize: 'full',
+      layout: { x: 0, y: 0, w: 12, h: 8 },
       page,
     },
-  ];
+  ]);
 }
 
 export function syncLegacyPlayNotesFromPads(pads: SessionPlayPad[]): {

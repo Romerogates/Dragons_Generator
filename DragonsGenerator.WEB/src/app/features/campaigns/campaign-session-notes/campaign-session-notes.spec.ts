@@ -135,7 +135,7 @@ describe('CampaignSessionNotes', () => {
     expect(component.resumeCollapsed()).toBe(true);
   });
 
-  it('enters edit mode and changes widget size', () => {
+  it('enters edit mode and updates layout width via setPadWidgetSize helper', () => {
     const pad = createSessionPlayPad('note', 'A', 0);
     fixture.componentRef.setInput('session', { ...baseSession, playPads: [pad], playNotes: '' });
     fixture.detectChanges();
@@ -157,9 +157,10 @@ describe('CampaignSessionNotes', () => {
     });
 
     component.setPadWidgetSize(pad.id, 'third');
-    expect(spy.calls.mostRecent().args[0].playPads[0].widgetSize).toBe('third');
-    expect(component.padSpanClass(spy.calls.mostRecent().args[0].playPads[0])).toContain('sm:col-span-2');
+    expect(spy.calls.mostRecent().args[0].playPads[0].layout.w).toBe(4);
 
+    component.toggleBoardLock();
+    expect(component.boardLocked()).toBe(false);
     component.stopEditPad();
     expect(component.isEditing(pad.id)).toBe(false);
   });
