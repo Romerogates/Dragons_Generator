@@ -87,8 +87,10 @@ import { CampaignDungeonMaps } from '../campaign-dungeon-maps/campaign-dungeon-m
 import { DiceRollComponent } from '@shared/components/dice-roll/dice-roll';
 import type { NotebookPage, SessionPlayPad } from '@core/models/Campaign/campaign';
 import {
+  appendTextToFirstNotePad,
   archivePlayPadsText,
   ensureSessionPlayPads,
+  sessionPlayPadsPreview,
   syncLegacyPlayNotesFromPads,
 } from '@core/utils/notebook.util';
 
@@ -531,6 +533,11 @@ export class CampaignPlayPanel implements OnDestroy {
       });
     }
     this.sessionView.set('notes');
+  }
+
+  /** Aperçu lecture seule dérivé des calepins (pas d’édition via playNotes). */
+  sessionNotesPreview(session: CampaignSession): string {
+    return sessionPlayPadsPreview(session);
   }
 
   openSessionEncounters(): void {
@@ -1032,9 +1039,19 @@ export class CampaignPlayPanel implements OnDestroy {
     this.stopInitiativePoll();
     const archive = formatCombatArchiveSummary(combat);
     const entry = createCombatHistoryEntry(combat);
-    const playNotes = [session.playNotes?.trim(), archive].filter(Boolean).join('\n\n');
+    const nextPads = appendTextToFirstNotePad(ensureSessionPlayPads(session), archive);
+    const legacy = syncLegacyPlayNotesFromPads(nextPads);
     const combatHistory = [...(session.combatHistory ?? []), entry];
-    this.patchSession({ activeCombat: null, playNotes, combatHistory }, { immediate: true });
+    this.patchSession(
+      {
+        activeCombat: null,
+        playPads: nextPads,
+        playNotes: legacy.playNotes,
+        playNotebook: legacy.playNotebook,
+        combatHistory,
+      },
+      { immediate: true },
+    );
     this.resetFightStep();
     this.sessionView.set('resume');
     this.setFeedback('ok', 'Combat terminé — résumé ajouté aux notes et à l’historique.');

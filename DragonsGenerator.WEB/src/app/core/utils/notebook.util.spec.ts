@@ -1,4 +1,5 @@
 import {
+  appendTextToFirstNotePad,
   archivePlayPadsText,
   ensureSessionPlayPads,
   ensureSessionResume,
@@ -6,6 +7,7 @@ import {
   redrawInkStrokes,
   seedNotebookFromLegacyNotes,
   sessionNotebookFromPlay,
+  sessionPlayPadsPreview,
   syncLegacyPlayNotesFromPads,
 } from './notebook.util';
 import {
@@ -118,6 +120,35 @@ describe('notebook.util', () => {
     const synced = syncLegacyPlayNotesFromPads([createSessionPlayPad('checklist', 'L', 0)]);
     expect(synced.playNotes).toBe('');
     expect(synced.playNotebook).toBeUndefined();
+  });
+
+  it('appendTextToFirstNotePad appends to first note', () => {
+    const note = createSessionPlayPad('note', 'Main', 0);
+    note.page = { ...note.page!, text: 'scene' };
+    const list = createSessionPlayPad('checklist', 'Todo', 1);
+    const next = appendTextToFirstNotePad([list, note], '--- Fin combat ---');
+    const main = next.find((p) => p.id === note.id)!;
+    expect(main.page?.text).toContain('scene');
+    expect(main.page?.text).toContain('--- Fin combat ---');
+    expect(next.find((p) => p.id === list.id)?.kind).toBe('checklist');
+  });
+
+  it('appendTextToFirstNotePad creates a note pad when none exist', () => {
+    const list = createSessionPlayPad('checklist', 'Todo', 0);
+    const next = appendTextToFirstNotePad([list], 'archive only');
+    expect(next.length).toBe(2);
+    expect(next.some((p) => p.kind === 'note' && p.page?.text === 'archive only')).toBe(true);
+  });
+
+  it('sessionPlayPadsPreview truncates long archives', () => {
+    const note = createSessionPlayPad('note', 'Scène', 0);
+    note.page = { ...note.page!, text: 'x'.repeat(400) };
+    const preview = sessionPlayPadsPreview(
+      session({ playPads: [note], playNotes: '' }),
+      80,
+    );
+    expect(preview.length).toBeLessThanOrEqual(80);
+    expect(preview.endsWith('…')).toBe(true);
   });
 
   it('archivePlayPadsText concatenates notes and checklists', () => {

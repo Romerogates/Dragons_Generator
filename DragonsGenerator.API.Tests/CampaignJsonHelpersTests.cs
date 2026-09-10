@@ -115,6 +115,8 @@ public class CampaignJsonHelpersTests
                 "mode": "online",
                 "notes": "prep",
                 "playNotes": "live",
+                "playNotebook": { "id": "nb1", "text": "secret" },
+                "playPads": [{ "id": "p1", "kind": "note", "title": "N" }],
                 "activeCombat": {
                   "id": "c1",
                   "round": 1,
@@ -136,6 +138,8 @@ public class CampaignJsonHelpersTests
         var session = filtered.GetProperty("sessions")[0];
         Assert.Equal("", session.GetProperty("notes").GetString());
         Assert.Equal("", session.GetProperty("playNotes").GetString());
+        Assert.Equal(System.Text.Json.JsonValueKind.Null, session.GetProperty("playNotebook").ValueKind);
+        Assert.Equal(0, session.GetProperty("playPads").GetArrayLength());
         Assert.Equal("c1", session.GetProperty("activeCombat").GetProperty("id").GetString());
         Assert.Equal(0, session.GetProperty("combatHistory").GetArrayLength());
         Assert.Equal(0, filtered.GetProperty("creatures").GetArrayLength());

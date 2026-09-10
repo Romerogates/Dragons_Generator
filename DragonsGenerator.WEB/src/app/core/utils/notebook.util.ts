@@ -54,12 +54,45 @@ export function ensureSessionPlayPads(session: CampaignSession): SessionPlayPad[
       kind: 'note',
       title: page.title || `Session · ${session.title}`,
       order: 0,
-      collapsed: false,
-      widgetSize: 'full',
       layout: { x: 0, y: 0, w: 12, h: 8 },
       page,
     },
   ]);
+}
+
+/** Aperçu texte des calepins (hub) — jamais une surface d’édition. */
+export function sessionPlayPadsPreview(session: CampaignSession, maxLen = 280): string {
+  const text = archivePlayPadsText(ensureSessionPlayPads(session)).trim();
+  if (!text) return '';
+  if (text.length <= maxLen) return text;
+  return `${text.slice(0, maxLen - 1).trimEnd()}…`;
+}
+
+/** Ajoute un bloc texte au premier calepin note (ex. fin de combat). */
+export function appendTextToFirstNotePad(pads: SessionPlayPad[], block: string): SessionPlayPad[] {
+  const trimmed = block.trim();
+  if (!trimmed) return pads;
+  const sorted = [...pads].sort((a, b) => a.order - b.order);
+  const targetIdx = sorted.findIndex((p) => p.kind === 'note' && p.page);
+  if (targetIdx < 0) {
+    const created = createSessionPlayPad('note', 'Notes', sorted.length);
+    created.page = {
+      ...created.page!,
+      text: trimmed,
+      updatedAt: new Date().toISOString(),
+    };
+    return ensurePadsHaveLayouts([...sorted, created].map((p, i) => ({ ...p, order: i })));
+  }
+  const target = sorted[targetIdx]!;
+  const nextText = [target.page?.text?.trim(), trimmed].filter(Boolean).join('\n\n');
+  return sorted.map((p, i) =>
+    i === targetIdx && p.kind === 'note' && p.page
+      ? {
+          ...p,
+          page: { ...p.page, text: nextText, updatedAt: new Date().toISOString() },
+        }
+      : p,
+  );
 }
 
 export function syncLegacyPlayNotesFromPads(pads: SessionPlayPad[]): {

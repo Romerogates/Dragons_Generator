@@ -138,13 +138,17 @@
           >
             Notes en direct →
           </button>
-          <textarea
-            rows="3"
-            placeholder="Aperçu rapide… (ouvrir Notes pour stylet)"
-            class="w-full bg-[#171b22] border border-emerald-900/40 rounded-xl p-3 text-sm text-slate-300"
-            [ngModel]="playSession.playNotes ?? ''"
-            (ngModelChange)="updateSession(playSession.id, { playNotes: $event || undefined })"
-          ></textarea>
+          <button
+            type="button"
+            class="w-full text-left bg-[#171b22] border border-emerald-900/40 rounded-xl p-3 text-sm text-slate-300 hover:border-emerald-700/50 transition-colors min-h-[4.5rem]"
+            (click)="openSessionNotes()"
+          >
+            @if (sessionNotesPreview(playSession); as preview) {
+              <span class="whitespace-pre-wrap line-clamp-3">{{ preview }}</span>
+            } @else {
+              <span class="text-slate-600 italic">Ouvrir les calepins pour écrire…</span>
+            }
+          </button>
         </div>
       </section>
     }

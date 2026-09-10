@@ -75,7 +75,6 @@ export class CampaignSessionNotes {
   private readonly boardRef = viewChild<ElementRef<HTMLElement>>('board');
 
   readonly resumeCollapsed = signal(false);
-  readonly editingPadId = signal<string | null>(null);
   /** false = widgets déplaçables / redimensionnables. */
   readonly boardLocked = signal(true);
   readonly dragPreview = signal<Record<string, SessionPlayPadLayout>>({});
@@ -99,18 +98,6 @@ export class CampaignSessionNotes {
     return padGridStyle(pad.layout ?? { x: 0, y: 0, w: PAD_DEFAULT_W, h: PAD_DEFAULT_H });
   }
 
-  isEditing(padId: string): boolean {
-    return this.editingPadId() === padId;
-  }
-
-  startEditPad(id: string): void {
-    this.editingPadId.set(id);
-  }
-
-  stopEditPad(): void {
-    this.editingPadId.set(null);
-  }
-
   toggleBoardLock(): void {
     this.boardLocked.update((v) => !v);
   }
@@ -130,7 +117,6 @@ export class CampaignSessionNotes {
     const layout = findFreeLayout(PAD_DEFAULT_W, PAD_DEFAULT_H, occupied);
     const pad = createSessionPlayPad('note', `Notes ${current.length + 1}`, current.length, layout);
     this.emitPads([...current, pad]);
-    this.editingPadId.set(pad.id);
   }
 
   addChecklistPad(): void {
@@ -145,13 +131,6 @@ export class CampaignSessionNotes {
       layout,
     );
     this.emitPads([...current, pad]);
-    this.editingPadId.set(pad.id);
-  }
-
-  togglePad(id: string): void {
-    this.emitPads(
-      this.pads().map((p) => (p.id === id ? { ...p, collapsed: !p.collapsed } : p)),
-    );
   }
 
   setPadTitle(id: string, title: string): void {
@@ -174,7 +153,6 @@ export class CampaignSessionNotes {
       return;
     }
     if (!confirm('Supprimer ce calepin ?')) return;
-    if (this.editingPadId() === id) this.editingPadId.set(null);
     this.emitPads(list.filter((p) => p.id !== id).map((p, i) => ({ ...p, order: i })));
   }
 
@@ -270,32 +248,6 @@ export class CampaignSessionNotes {
 
   archiveText(): string {
     return archivePlayPadsText(this.pads());
-  }
-
-  /** @deprecated kept for older specs — no-op size buttons removed. */
-  setPadWidgetSize(id: string, _size: string): void {
-    const pad = this.pads().find((p) => p.id === id);
-    if (!pad?.layout) return;
-    const w = _size === 'full' ? 12 : _size === 'third' ? 4 : 6;
-    this.emitPads(
-      this.pads().map((p) =>
-        p.id === id ? { ...p, layout: clampLayout({ ...p.layout!, w }), widgetSize: _size as never } : p,
-      ),
-    );
-  }
-
-  movePad(id: string, dir: -1 | 1): void {
-    const list = [...this.pads()].sort((a, b) => a.order - b.order);
-    const idx = list.findIndex((p) => p.id === id);
-    const swap = idx + dir;
-    if (idx < 0 || swap < 0 || swap >= list.length) return;
-    const a = list[idx]!;
-    const b = list[swap]!;
-    const la = a.layout ?? { x: 0, y: 0, w: PAD_DEFAULT_W, h: PAD_DEFAULT_H };
-    const lb = b.layout ?? { x: 0, y: 0, w: PAD_DEFAULT_W, h: PAD_DEFAULT_H };
-    list[idx] = { ...b, layout: { ...la } };
-    list[swap] = { ...a, layout: { ...lb } };
-    this.emitPads(list.map((p, i) => ({ ...p, order: i })));
   }
 
   private beginDrag(ev: PointerEvent, pad: SessionPlayPad, mode: DragMode): void {

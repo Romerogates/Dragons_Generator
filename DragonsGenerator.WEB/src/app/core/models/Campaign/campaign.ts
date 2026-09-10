@@ -380,7 +380,6 @@ export interface SessionPlayPad {
   id: string;
   kind: SessionPlayPadKind;
   title: string;
-  collapsed?: boolean;
   order: number;
   /** @deprecated Migrated to layout. */
   widgetSize?: SessionPlayPadWidgetSize;
@@ -425,7 +424,6 @@ export function createSessionPlayPad(
       kind,
       title: title ?? 'Liste',
       order,
-      collapsed: false,
       layout: resolvedLayout,
       items: [createChecklistItem('')],
     };
@@ -436,7 +434,6 @@ export function createSessionPlayPad(
     kind: 'note',
     title: page.title,
     order,
-    collapsed: false,
     layout: resolvedLayout,
     page,
   };

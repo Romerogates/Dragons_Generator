@@ -89,9 +89,8 @@
         class="relative min-h-0 rounded-2xl border bg-[#1b2028]/90 overflow-hidden flex flex-col shadow-lg shadow-black/20"
         [style.gridColumn]="padStyle(pad)['gridColumn']"
         [style.gridRow]="padStyle(pad)['gridRow']"
-        [class.border-emerald-700/50]="isEditing(pad.id)"
-        [class.border-amber-600/40]="!boardLocked() && !isEditing(pad.id)"
-        [class.border-slate-800]="boardLocked() && !isEditing(pad.id)"
+        [class.border-amber-600/40]="!boardLocked()"
+        [class.border-slate-800]="boardLocked()"
         [class.z-20]="!boardLocked()"
         [class.opacity-90]="!boardLocked()"
       >
@@ -101,53 +100,29 @@
           [class.active:cursor-grabbing]="!boardLocked()"
           (pointerdown)="onDragHandlePointerDown($event, pad)"
         >
-          @if (isEditing(pad.id)) {
-            <input
-              type="text"
-              class="flex-1 min-w-[6rem] bg-transparent border-0 text-sm font-serif text-slate-200 focus:outline-none focus:ring-0"
-              [ngModel]="pad.title"
-              (ngModelChange)="setPadTitle(pad.id, $event)"
-              (pointerdown)="$event.stopPropagation()"
-              [attr.aria-label]="'Titre du calepin'"
-            />
-          } @else {
-            <p class="flex-1 min-w-[6rem] text-sm font-serif text-slate-200 truncate pointer-events-none">
-              {{ pad.title || (pad.kind === 'checklist' ? 'Liste' : 'Notes') }}
-            </p>
-          }
+          <input
+            type="text"
+            class="flex-1 min-w-[6rem] bg-transparent border-0 text-sm font-serif text-slate-200 focus:outline-none focus:ring-0"
+            [ngModel]="pad.title"
+            (ngModelChange)="setPadTitle(pad.id, $event)"
+            (pointerdown)="$event.stopPropagation()"
+            [attr.aria-label]="'Titre du calepin'"
+            [placeholder]="pad.kind === 'checklist' ? 'Liste' : 'Notes'"
+          />
 
           <span class="text-[9px] font-black uppercase tracking-widest text-slate-600 pointer-events-none">
             {{ pad.kind === 'checklist' ? 'Liste' : 'Note' }}
           </span>
 
-          @if (isEditing(pad.id)) {
-            <button
-              type="button"
-              class="w-9 h-9 rounded-lg text-red-400/70 hover:text-red-300"
-              aria-label="Supprimer"
-              (pointerdown)="$event.stopPropagation()"
-              (click)="removePad(pad.id)"
-            >
-              <iconify-icon icon="mdi:trash-can-outline" class="text-lg"></iconify-icon>
-            </button>
-            <button
-              type="button"
-              class="min-h-9 px-3 rounded-lg text-[10px] font-black uppercase bg-emerald-800/50 text-emerald-100"
-              (pointerdown)="$event.stopPropagation()"
-              (click)="stopEditPad()"
-            >
-              OK
-            </button>
-          } @else {
-            <button
-              type="button"
-              class="min-h-9 px-3 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300 hover:border-emerald-600/50"
-              (pointerdown)="$event.stopPropagation()"
-              (click)="startEditPad(pad.id)"
-            >
-              Modifier
-            </button>
-          }
+          <button
+            type="button"
+            class="w-9 h-9 rounded-lg text-red-400/70 hover:text-red-300"
+            aria-label="Supprimer"
+            (pointerdown)="$event.stopPropagation()"
+            (click)="removePad(pad.id)"
+          >
+            <iconify-icon icon="mdi:trash-can-outline" class="text-lg"></iconify-icon>
+          </button>
         </div>
 
         <div

@@ -56,7 +56,7 @@ describe('CampaignSessionNotes', () => {
     expect(spy.calls.mostRecent().args[0].text).toBe('arc');
   });
 
-  it('adds note and checklist pads then reorders', () => {
+  it('adds note and checklist pads with free layout', () => {
     const spy = jasmine.createSpy('pads');
     component.padsChange.subscribe((payload) => {
       spy(payload);
@@ -78,17 +78,14 @@ describe('CampaignSessionNotes', () => {
 
     component.addNotePad();
     expect(spy.calls.mostRecent().args[0].playPads.length).toBe(2);
+    expect(spy.calls.mostRecent().args[0].playPads[1].layout).toBeTruthy();
 
     component.addChecklistPad();
     expect(spy.calls.mostRecent().args[0].playPads.length).toBe(3);
-
-    const ids = spy.calls.mostRecent().args[0].playPads.map((p: { id: string }) => p.id);
-    component.movePad(ids[2], -1);
-    const after = spy.calls.mostRecent().args[0].playPads;
-    expect(after[1].id).toBe(ids[2]);
+    expect(spy.calls.mostRecent().args[0].playPads[2].kind).toBe('checklist');
   });
 
-  it('toggles collapse and updates checklist items', () => {
+  it('updates checklist items and title inline', () => {
     const pad = createSessionPlayPad('checklist', 'L', 0);
     fixture.componentRef.setInput('session', { ...baseSession, playPads: [pad], playNotes: '' });
     fixture.detectChanges();
@@ -105,8 +102,8 @@ describe('CampaignSessionNotes', () => {
       fixture.detectChanges();
     });
 
-    component.togglePad(pad.id);
-    expect(spy.calls.mostRecent().args[0].playPads[0].collapsed).toBe(true);
+    component.setPadTitle(pad.id, 'Loot');
+    expect(spy.calls.mostRecent().args[0].playPads[0].title).toBe('Loot');
 
     component.addChecklistItem(pad.id);
     const withItem = spy.calls.mostRecent().args[0].playPads[0];
@@ -135,33 +132,11 @@ describe('CampaignSessionNotes', () => {
     expect(component.resumeCollapsed()).toBe(true);
   });
 
-  it('enters edit mode and updates layout width via setPadWidgetSize helper', () => {
-    const pad = createSessionPlayPad('note', 'A', 0);
-    fixture.componentRef.setInput('session', { ...baseSession, playPads: [pad], playNotes: '' });
-    fixture.detectChanges();
-
-    expect(component.isEditing(pad.id)).toBe(false);
-    component.startEditPad(pad.id);
-    expect(component.isEditing(pad.id)).toBe(true);
-
-    const spy = jasmine.createSpy('pads');
-    component.padsChange.subscribe((payload) => {
-      spy(payload);
-      fixture.componentRef.setInput('session', {
-        ...baseSession,
-        playPads: payload.playPads,
-        playNotes: payload.playNotes,
-        playNotebook: payload.playNotebook,
-      });
-      fixture.detectChanges();
-    });
-
-    component.setPadWidgetSize(pad.id, 'third');
-    expect(spy.calls.mostRecent().args[0].playPads[0].layout.w).toBe(4);
-
+  it('toggles board lock for layout editing', () => {
+    expect(component.boardLocked()).toBe(true);
     component.toggleBoardLock();
     expect(component.boardLocked()).toBe(false);
-    component.stopEditPad();
-    expect(component.isEditing(pad.id)).toBe(false);
+    component.toggleBoardLock();
+    expect(component.boardLocked()).toBe(true);
   });
 });

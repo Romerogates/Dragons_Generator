@@ -96,6 +96,8 @@ public static class CampaignJsonHelpers
                 if (item is not JsonObject session) continue;
                 session["notes"] = "";
                 session["playNotes"] = "";
+                session["playNotebook"] = null;
+                session["playPads"] = new JsonArray();
                 // Garder activeCombat pour le battlefield joueur (face-à-face).
                 session["combatHistory"] = new JsonArray();
             }
