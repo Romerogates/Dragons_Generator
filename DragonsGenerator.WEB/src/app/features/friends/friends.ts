@@ -177,11 +177,23 @@ export class FriendsPage implements OnInit, OnDestroy {
   }
 
   accept(id: string): void {
-    this.friends.acceptRequest(id).subscribe(() => this.reload());
+    this.friends.acceptRequest(id).subscribe({
+      next: () => {
+        this.message.set('Demande d’ami acceptée.');
+        this.reload();
+      },
+      error: () => this.message.set('Impossible d’accepter cette demande.'),
+    });
   }
 
   decline(id: string): void {
-    this.friends.declineRequest(id).subscribe(() => this.reload());
+    this.friends.declineRequest(id).subscribe({
+      next: () => {
+        this.message.set('Demande refusée.');
+        this.reload();
+      },
+      error: () => this.message.set('Impossible de refuser cette demande.'),
+    });
   }
 
   cancelSent(id: string): void {
@@ -195,11 +207,23 @@ export class FriendsPage implements OnInit, OnDestroy {
   }
 
   acceptCampaign(id: string): void {
-    this.friends.acceptCampaignInvite(id).subscribe(() => this.reload());
+    this.friends.acceptCampaignInvite(id).subscribe({
+      next: () => {
+        this.message.set('Invitation acceptée — bienvenue à la table.');
+        this.reload();
+      },
+      error: () => this.message.set('Impossible de rejoindre cette campagne.'),
+    });
   }
 
   declineCampaign(id: string): void {
-    this.friends.declineCampaignInvite(id).subscribe(() => this.reload());
+    this.friends.declineCampaignInvite(id).subscribe({
+      next: () => {
+        this.message.set('Invitation déclinée.');
+        this.reload();
+      },
+      error: () => this.message.set('Impossible de décliner cette invitation.'),
+    });
   }
 
   confirmRemove(friend: FriendUser): void {

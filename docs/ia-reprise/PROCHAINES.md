@@ -15,10 +15,11 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
-*(file vide — reprendre la checklist manuelle §10 smoke si besoin.)*
+*(file vide — checklist §10 smoke manuel si besoin.)*
 
 ## Déjà livré (ne pas refaire)
 
+- **XP joueur + amis e2e** (2026-09-10) — banner `+N XP reçue` (hub /play poll) ; activité `xp_awarded` loguée ; toasts amis accept/refus ; e2e UI amis/invites + XP visible joueur.
 - **Polish reste** (2026-09-10) — toasts jets init + `turnOrderIds` figé ; sync MJ au focus si `updatedAt` plus récent ; empty states pré-tirés / rencontres / session ; setup-guide vousvoiement ; confirmation jet joueur avec total.
 - **P2 live table** (2026-09-10) — édition combat repliée en fight (`Éditer combattants / roster`) ; face-à-face mobile (séparateur vs + bandeau tour sticky) ; fog live : carte de session active filtrée pour joueurs + canvas live + poll `/play` 4 s ; révélations fog persistées immédiatement.
 - **P1 prépa session** (2026-09-10) — run sheet (objectifs / scènes / checklist) + `activeMapId` à la planification ; `playerRecap` à la fin de session (dialog Terminer) ; archive joueur si récap ; invites en attente MJ + copier lien Amis ; onglet Préparation masqué côté joueur sans pré-tiré ; API filtre run sheet, conserve récap/`activeMapId` ; `GET …/invites`.

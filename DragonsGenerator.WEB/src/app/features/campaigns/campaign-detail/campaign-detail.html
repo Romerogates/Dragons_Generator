@@ -30,7 +30,12 @@
               <span class="text-[10px] font-black uppercase tracking-widest text-violet-500 animate-pulse">Sauvegarde...</span>
             }
             @if (syncNotice(); as notice) {
-              <span class="max-w-xs text-[10px] font-semibold text-amber-300 leading-snug">{{ notice }}</span>
+              <span
+                class="max-w-xs text-[10px] font-semibold leading-snug"
+                [class.text-amber-300]="!notice.includes('XP reçue')"
+                [class.text-emerald-300]="notice.includes('XP reçue')"
+                data-testid="campaign-sync-notice"
+              >{{ notice }}</span>
             }
             @if (!c.isOwner) {
               <button

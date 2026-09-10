@@ -190,14 +190,17 @@ Avec un 2ᵉ compte membre de la campagne.
   - *E2E :* `campaign-live-polish.spec.ts`.
 - [x] 🔴 **Roster live** : ordre des tours + PV / CA / conditions mis à jour sans F5 (poll ~4 s)
   - *E2E :* `campaign-live-polish.spec.ts` (MJ −5 PV → joueur voit 15/20).
-- [ ] 🟢 XP reçue visible côté joueur (si UI le montre)
+- [x] 🟢 XP reçue visible côté joueur (si UI le montre)
+  - Banner `+N XP reçue` via softReload / poll ; activité `xp_awarded` ; e2e `campaign-combat-xp`.
 
 ---
 
 ## 7. Amis & invites ⚙️ 🟠
 
-- [ ] 🟠 Demande d’ami → accepter / refuser
-- [ ] 🟠 Invitation campagne → accepter / décliner
+- [x] 🟠 Demande d’ami → accepter / refuser
+  - *E2E :* `friends-invites.spec.ts`.
+- [x] 🟠 Invitation campagne → accepter / décliner
+  - *E2E :* `friends-invites.spec.ts` (Rejoindre sur `/campaigns`).
 - [x] 🟢 Cas limites : non-ami, doublon, invitation déjà traitée (messages d’erreur OK)
 
 ---

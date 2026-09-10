@@ -27,6 +27,14 @@
           {{ c.isOwner ? 'MJ' : 'Joueur' }}
         </span>
       </div>
+      @if (xpNotice(); as notice) {
+        <p
+          class="max-w-5xl mx-auto mt-2 text-center text-xs font-semibold text-emerald-300"
+          data-testid="play-xp-notice"
+        >
+          {{ notice }}
+        </p>
+      }
     </header>
 
     <main class="flex-1 w-full max-w-5xl mx-auto px-4 py-6 md:py-8">

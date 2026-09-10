@@ -665,8 +665,10 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         if (!current || current.id !== c.id) {
           this.campaign.set(c);
         } else if (!current.isOwner) {
-          // Joueurs : sync complète (combat / tours / PV / fog).
+          // Joueurs : sync complète (combat / tours / PV / fog) + annonce XP.
+          this.announcePlayerXpGain(current, c);
           this.campaign.set(c);
+          if (this.tab() === 'overview') this.loadActivity();
         } else if (
           opts?.syncOwnerIfNewer &&
           this.isRemoteNewer(c.updatedAt, current.updatedAt)
@@ -706,6 +708,27 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const local = Date.parse(localIso);
     if (Number.isNaN(remote) || Number.isNaN(local)) return remoteIso > localIso;
     return remote > local;
+  }
+
+  private announcePlayerXpGain(
+    previous: CampaignDetailModel,
+    next: CampaignDetailModel,
+  ): void {
+    const userId = this.auth.user()?.id;
+    if (!userId) return;
+    const before =
+      previous.members.find((m) => m.userId === userId && m.role === 'player')?.xpEarnedInCampaign ??
+      0;
+    const after =
+      next.members.find((m) => m.userId === userId && m.role === 'player')?.xpEarnedInCampaign ?? 0;
+    const delta = after - before;
+    if (delta <= 0) return;
+    this.syncNotice.set(`+${delta} XP reçue — total campagne ${after}`);
+    window.setTimeout(() => {
+      if (this.syncNotice()?.startsWith('+') && this.syncNotice()?.includes('XP reçue')) {
+        this.syncNotice.set(null);
+      }
+    }, 6_000);
   }
 
   /** Poll plus fréquent pour les joueurs pendant une session / combat live. */

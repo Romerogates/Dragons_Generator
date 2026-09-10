@@ -1098,6 +1098,20 @@ public class AwardCampaignXpEndpoint(AppDbContext db) : Endpoint<AwardXpBody>
         member.XpEarnedInCampaign += req.Xp;
         campaign.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
+        await CampaignActivityService.LogAsync(
+            db,
+            campaign.Id,
+            userId.Value,
+            CampaignActivityKinds.XpAwarded,
+            new
+            {
+                memberId = member.Id,
+                xp = req.Xp,
+                xpTotal = member.XpEarnedInCampaign,
+                displayName = member.User?.DisplayName ?? "Joueur",
+                message = $"+{req.Xp} XP",
+            },
+            ct);
         await Send.OkAsync(new { member.XpEarnedInCampaign }, ct);
     }
 }

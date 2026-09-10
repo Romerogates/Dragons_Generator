@@ -36,6 +36,7 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly campaign = signal<CampaignDetailModel | null>(null);
+  readonly xpNotice = signal<string | null>(null);
 
   private softPollTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -124,6 +125,7 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
     if (!c || c.isOwner) return;
     this.campaigns.get(c.id).subscribe({
       next: (updated) => {
+        this.announcePlayerXpGain(c, updated);
         this.campaign.set(updated);
         this.sessionDock.patchLiveCampaign(updated);
       },
@@ -131,5 +133,19 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
         /* ignore poll errors */
       },
     });
+  }
+
+  private announcePlayerXpGain(previous: CampaignDetailModel, next: CampaignDetailModel): void {
+    const userId = this.auth.user()?.id;
+    if (!userId) return;
+    const before =
+      previous.members.find((m) => m.userId === userId && m.role === 'player')?.xpEarnedInCampaign ??
+      0;
+    const after =
+      next.members.find((m) => m.userId === userId && m.role === 'player')?.xpEarnedInCampaign ?? 0;
+    const delta = after - before;
+    if (delta <= 0) return;
+    this.xpNotice.set(`+${delta} XP reçue — total campagne ${after}`);
+    window.setTimeout(() => this.xpNotice.set(null), 6_000);
   }
 }
