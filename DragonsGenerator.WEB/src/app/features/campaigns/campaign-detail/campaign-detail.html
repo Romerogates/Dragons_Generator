@@ -953,7 +953,7 @@
     [body]="dialog.body"
     [confirmLabel]="dialog.confirmLabel"
     [danger]="dialog.danger ?? true"
-    (cancel)="cancelConfirmDialog()"
-    (confirm)="runConfirmDialog()"
+    (cancelled)="cancelConfirmDialog()"
+    (confirmed)="runConfirmDialog()"
   />
 }

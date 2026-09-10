@@ -6,7 +6,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
   template: `
     <div
       class="fixed inset-0 z-[95] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-      (click)="cancel.emit()"
+      (click)="cancelled.emit()"
     >
       <div
         class="max-w-md w-full rounded-2xl border bg-[#1b2028] shadow-2xl p-5"
@@ -28,7 +28,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
           <button
             type="button"
             class="px-3 py-2 rounded-xl text-xs font-black uppercase text-slate-400 hover:text-slate-200"
-            (click)="cancel.emit()"
+            (click)="cancelled.emit()"
           >
             Annuler
           </button>
@@ -36,7 +36,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
             type="button"
             class="px-4 py-2 rounded-xl text-xs font-black uppercase text-white"
             [class]="danger() ? 'bg-red-600 hover:bg-red-500' : 'bg-emerald-600 hover:bg-emerald-500'"
-            (click)="confirm.emit()"
+            (click)="confirmed.emit()"
           >
             {{ confirmLabel() }}
           </button>
@@ -52,8 +52,8 @@ export class ConfirmDialog {
   readonly confirmLabel = input('Confirmer');
   readonly danger = input(false);
 
-  readonly cancel = output<void>();
-  readonly confirm = output<void>();
+  readonly cancelled = output<void>();
+  readonly confirmed = output<void>();
 
   readonly titleId = `confirm-title-${Math.random().toString(36).slice(2, 9)}`;
 }

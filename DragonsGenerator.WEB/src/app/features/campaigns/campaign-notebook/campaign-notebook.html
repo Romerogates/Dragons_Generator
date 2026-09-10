@@ -339,7 +339,7 @@
     [body]="dialog.body"
     [confirmLabel]="dialog.confirmLabel"
     [danger]="true"
-    (cancel)="cancelConfirmDialog()"
-    (confirm)="runConfirmDialog()"
+    (cancelled)="cancelConfirmDialog()"
+    (confirmed)="runConfirmDialog()"
   />
 }
