@@ -822,4 +822,636 @@ describe('character-wizard-validation.util', () => {
       ),
     ).toBeFalse();
   });
+
+  it('isWizardStepValid counts species bonus skills toward the skills step', () => {
+    expect(
+      isWizardStepValid(
+        7,
+        {
+          ...base,
+          classId: 'cls-guerrier',
+          skillChooseCount: 1,
+          speciesBonusSkillCount: 1,
+          selectedSkills: ['skill-athletisme'],
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+    expect(
+      isWizardStepValid(
+        7,
+        {
+          ...base,
+          classId: 'cls-guerrier',
+          skillChooseCount: 1,
+          speciesBonusSkillCount: 1,
+          selectedSkills: ['skill-athletisme', 'skill-perception'],
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeTrue();
+  });
+
+  it('isWizardStepValid accepts equipment when choosable slots exist but wizard picks are omitted', () => {
+    expect(
+      isWizardStepValid(
+        8,
+        {
+          ...base,
+          selectedEquipment: [{ instanceId: '1', refId: 'wp-dagger', name: 'Dague', qty: 1 }] as never,
+          backgroundEquipmentSlots: [
+            { slot: 2, alternatives: [[{ id: 'gr-livre', qty: 1 }], [{ id: 'gr-loupe', qty: 1 }]] },
+          ],
+        } as CharacterCreation,
+        { needsMagicStep: false },
+      ),
+    ).toBeTrue();
+  });
+
+  it('isWizardStepValid accepts a complete secondary ensorceleur metamagic pick', () => {
+    expect(
+      isWizardStepValid(
+        5,
+        {
+          ...base,
+          classId: 'cls-guerrier',
+          hitDie: 10,
+          targetLevel: 5,
+          subclassId: 'sub-champion',
+          secondaryClasses: [
+            {
+              classId: 'cls-ensorceleur',
+              className: 'Ensorceleur',
+              level: 3,
+              hitDie: 6,
+              hpPerLevelAverage: 4,
+              hasSpellcasting: true,
+              spellcastingKind: 'sorcerer',
+              spellcastingAbility: 'Charisme',
+              armorProficiencies: [],
+              weaponProficiencies: [],
+              toolProficiencies: [],
+              skillChooseCount: 0,
+              skillOptions: [],
+              classFeatures: [],
+              subclassId: 'sub-wild',
+              metamagicOptions: ['mm-quickened'],
+            },
+          ],
+        } as CharacterCreation,
+        { needsMagicStep: false },
+      ),
+    ).toBeTrue();
+  });
+
+  it('isWizardStepValid rejects skills step without a classId', () => {
+    expect(isWizardStepValid(7, { ...base, classId: null }, { needsMagicStep: false })).toBeFalse();
+  });
+
+  it('isWizardStepValid rejects secondary warlock missing invocations at level 2', () => {
+    expect(
+      isWizardStepValid(
+        5,
+        {
+          ...base,
+          classId: 'cls-guerrier',
+          hitDie: 10,
+          targetLevel: 5,
+          subclassId: 'sub-champion',
+          secondaryClasses: [
+            {
+              classId: 'cls-sorcier',
+              className: 'Sorcier',
+              level: 2,
+              hitDie: 8,
+              hpPerLevelAverage: 5,
+              hasSpellcasting: true,
+              spellcastingKind: 'warlock',
+              spellcastingAbility: 'Charisme',
+              armorProficiencies: [],
+              weaponProficiencies: [],
+              toolProficiencies: [],
+              skillChooseCount: 0,
+              skillOptions: [],
+              classFeatures: [],
+              subclassId: 'sub-fiend',
+              pactBoon: 'chain',
+            },
+          ],
+        } as CharacterCreation,
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+  });
+
+  it('isWizardStepValid rejects primary warlock missing invocations at level 2', () => {
+    expect(
+      isWizardStepValid(
+        5,
+        {
+          ...base,
+          classId: 'cls-sorcier',
+          hitDie: 8,
+          targetLevel: 2,
+          subclassId: 'sub-fiend',
+          pactBoon: 'chain',
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+  });
+
+  it('isWizardStepValid rejects secondary class missing subclass at level 3', () => {
+    expect(
+      isWizardStepValid(
+        5,
+        {
+          ...base,
+          classId: 'cls-guerrier',
+          hitDie: 10,
+          targetLevel: 5,
+          subclassId: 'sub-champion',
+          secondaryClasses: [
+            {
+              classId: 'cls-roublard',
+              className: 'Roublard',
+              level: 3,
+              hitDie: 8,
+              hpPerLevelAverage: 5,
+              hasSpellcasting: false,
+              spellcastingKind: null,
+              spellcastingAbility: null,
+              armorProficiencies: [],
+              weaponProficiencies: [],
+              toolProficiencies: [],
+              skillChooseCount: 0,
+              skillOptions: [],
+              classFeatures: [],
+            },
+          ],
+        } as CharacterCreation,
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+  });
+
+  it('isWizardStepValid accepts equipment with tool slots and no choosable alternatives', () => {
+    expect(
+      isWizardStepValid(
+        8,
+        {
+          ...base,
+          selectedEquipment: [{ instanceId: '1', refId: 'tl-luth', name: 'Luth', qty: 1 }] as never,
+          toolEquipmentSlots: [{ slot: 3, fixed: [{ id: 'tl-luth', qty: 1 }] }],
+        } as CharacterCreation,
+        { needsMagicStep: false },
+      ),
+    ).toBeTrue();
+  });
+
+  it('isWizardStepValid rejects equipment step when nothing is selected', () => {
+    expect(
+      isWizardStepValid(
+        8,
+        {
+          ...base,
+          selectedEquipment: [],
+          startingEquipmentSlots: [{ slot: 1, fixed: [{ id: 'wp-dagger', qty: 1 }] }],
+        } as CharacterCreation,
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+  });
+
+  it('isWizardStepValid resolves wizard level from spellcastingKind alone', () => {
+    expect(
+      isWizardStepValid(
+        10,
+        {
+          ...base,
+          classId: 'cls-rodeur',
+          spellcastingKind: 'wizard',
+          targetLevel: 17,
+          hasSpellcasting: true,
+          spellcastingDetails: { cantrips: ['sp-a'], spells: ['sp-b'] },
+        },
+        { needsMagicStep: true },
+      ),
+    ).toBeFalse();
+  });
+
+  it('isWizardStepValid accepts feat-talent when talent spends are present', () => {
+    expect(
+      isWizardStepValid(
+        6,
+        {
+          ...base,
+          pointsRemaining: 0,
+          asiChoices: [
+            {
+              level: 4,
+              mode: 'feat',
+              primary: null,
+              secondary: null,
+              featId: 'feat-talent',
+              featTalentSpends: [{ id: 's1', type: 'skill', skillId: 'skill-arcanes' }],
+            },
+          ],
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeTrue();
+  });
+
+  it('isWizardStepValid accepts magic details via deity-only cleric setup', () => {
+    expect(
+      isWizardStepValid(
+        10,
+        {
+          ...base,
+          hasSpellcasting: true,
+          spellcastingKind: 'cleric',
+          spellcastingDetails: { cantrips: [], spells: [], deity: 'Pelor' },
+        },
+        { needsMagicStep: true },
+      ),
+    ).toBeTrue();
+  });
+
+  it('isWizardStepValid accepts languages step when no bonus languages are required', () => {
+    expect(
+      isWizardStepValid(
+        9,
+        { ...base, languages: ['Commun'], bonusLanguageCount: 0 },
+        { needsMagicStep: false },
+      ),
+    ).toBeTrue();
+  });
+
+  it('isWizardStepValid accepts caster magic details with spells but no cantrips', () => {
+    expect(
+      isWizardStepValid(
+        10,
+        {
+          ...base,
+          hasSpellcasting: true,
+          spellcastingDetails: { cantrips: [], spells: [{ refId: 'spl-shield' }] },
+        },
+        { needsMagicStep: true },
+      ),
+    ).toBeTrue();
+  });
+
+  it('isWizardStepValid rejects equipment when a choosable slot has no wizard pick', () => {
+    expect(
+      isWizardStepValid(
+        8,
+        {
+          ...base,
+          selectedEquipment: [{ instanceId: '1', refId: 'wp-dagger', name: 'Dague', qty: 1 }] as never,
+          startingEquipmentSlots: [
+            { slot: 1, alternatives: [[{ id: 'wp-dagger', qty: 1 }], [{ id: 'wp-club', qty: 1 }]] },
+            { slot: 2, alternatives: [[{ id: 'gr-livre', qty: 1 }], [{ id: 'gr-loupe', qty: 1 }]] },
+          ],
+          equipmentWizardPicks: { alt: { '1': 0 } },
+        } as CharacterCreation,
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+  });
+
+  it('isWizardStepValid accepts signature spells via spellcastingDetails array at level 19', () => {
+    expect(
+      isWizardStepValid(
+        10,
+        {
+          ...base,
+          classId: 'cls-magicien',
+          spellcastingKind: 'wizard',
+          targetLevel: 19,
+          hasSpellcasting: true,
+          spellcastingDetails: {
+            cantrips: ['sp-a'],
+            spells: ['sp-b'],
+            spellMastery: [{ spellId: '1' }, { spellId: '2' }],
+            signatureSpells: [{ spellId: 's1' }, { spellId: 's2' }],
+          },
+        },
+        { needsMagicStep: true },
+      ),
+    ).toBeTrue();
+  });
+
+  it('isWizardStepValid rejects custom background when privilege name is whitespace only', () => {
+    expect(
+      isWizardStepValid(
+        4,
+        {
+          ...base,
+          backgroundId: 'bg-custom',
+          backgroundPreset: false,
+          background: 'Story',
+          privilegeName: '   ',
+          privilegeDesc: 'Desc',
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+  });
+
+  it('isWizardStepValid gates civilization and background ids', () => {
+    expect(isWizardStepValid(3, { ...base, civilizationId: null }, { needsMagicStep: false })).toBeFalse();
+    expect(isWizardStepValid(4, { ...base, backgroundId: null }, { needsMagicStep: false })).toBeFalse();
+  });
+
+  it('isWizardStepValid accepts complete secondary class skill selections', () => {
+    expect(
+      isWizardStepValid(
+        7,
+        {
+          ...base,
+          classId: 'cls-guerrier',
+          skillChooseCount: 0,
+          selectedSkills: [],
+          secondaryClasses: [
+            {
+              classId: 'cls-roublard',
+              className: 'Roublard',
+              level: 1,
+              hitDie: 8,
+              hpPerLevelAverage: 5,
+              hasSpellcasting: false,
+              spellcastingKind: null,
+              spellcastingAbility: null,
+              armorProficiencies: [],
+              weaponProficiencies: [],
+              toolProficiencies: [],
+              skillChooseCount: 2,
+              skillOptions: ['skill-perception', 'skill-supercherie'],
+              classFeatures: [],
+            },
+          ],
+          secondaryClassSelectedSkills: ['skill-perception', 'skill-supercherie'],
+        } as CharacterCreation,
+        { needsMagicStep: false },
+      ),
+    ).toBeTrue();
+  });
+
+  it('isWizardStepValid rejects magic step when spellcasting details are missing', () => {
+    expect(
+      isWizardStepValid(
+        10,
+        { ...base, hasSpellcasting: true, spellcastingDetails: undefined as never },
+        { needsMagicStep: true },
+      ),
+    ).toBeFalse();
+  });
+
+  it('isWizardStepValid accepts a secondary spellcaster on the magic step without primary spellcasting', () => {
+    expect(
+      isWizardStepValid(
+        10,
+        {
+          ...base,
+          hasSpellcasting: false,
+          secondaryClasses: [
+            {
+              classId: 'cls-druide',
+              className: 'Druide',
+              level: 1,
+              hitDie: 8,
+              hpPerLevelAverage: 5,
+              hasSpellcasting: true,
+              spellcastingKind: 'druid',
+              spellcastingAbility: 'Sagesse',
+              armorProficiencies: [],
+              weaponProficiencies: [],
+              toolProficiencies: [],
+              skillChooseCount: 0,
+              skillOptions: [],
+              classFeatures: [],
+            },
+          ],
+          spellcastingDetails: { spells: [{ refId: 'spl-heal' }] },
+        } as CharacterCreation,
+        { needsMagicStep: true },
+      ),
+    ).toBeTrue();
+  });
+
+  it('isWizardStepValid rejects class step when hit die is zero', () => {
+    expect(
+      isWizardStepValid(
+        5,
+        { ...base, classId: 'cls-guerrier', hitDie: 0 },
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+  });
+
+  it('isWizardStepValid accepts feat-talent with resistance choice and no spends', () => {
+    expect(
+      isWizardStepValid(
+        6,
+        {
+          ...base,
+          pointsRemaining: 0,
+          asiChoices: [
+            {
+              level: 4,
+              mode: 'feat',
+              primary: null,
+              secondary: null,
+              featId: 'feat-talent',
+              featResistanceChoice: 'feu',
+              featTalentSpends: [],
+            },
+          ],
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeTrue();
+  });
+
+  it('isWizardStepValid accepts wizard high-level picks via spellcastingDetails arrays', () => {
+    expect(
+      isWizardStepValid(
+        10,
+        {
+          ...base,
+          classId: 'cls-magicien',
+          spellcastingKind: 'wizard',
+          targetLevel: 19,
+          hasSpellcasting: true,
+          spellcastingDetails: {
+            cantrips: ['sp-a'],
+            spells: ['sp-b'],
+            spellMastery: [{ spellId: '1' }, { spellId: '2' }],
+            signatureSpells: [{ spellId: 's1' }, { spellId: 's2' }],
+          },
+        },
+        { needsMagicStep: true },
+      ),
+    ).toBeTrue();
+  });
+
+  it('isWizardStepValid rejects empty cantrip and spell lists without a deity', () => {
+    expect(
+      isWizardStepValid(
+        10,
+        {
+          ...base,
+          hasSpellcasting: true,
+          spellcastingDetails: { cantrips: [], spells: [] },
+        },
+        { needsMagicStep: true },
+      ),
+    ).toBeFalse();
+  });
+
+  it('isWizardStepValid accepts equipment with background and tool slot sources', () => {
+    expect(
+      isWizardStepValid(
+        8,
+        {
+          ...base,
+          selectedEquipment: [{ instanceId: '1', refId: 'wp-dagger', name: 'Dague', qty: 1 }] as never,
+          startingEquipmentSlots: [{ slot: 1, fixed: [{ id: 'wp-dagger', qty: 1 }] }],
+          backgroundEquipmentSlots: [{ slot: 2, fixed: [{ id: 'gr-livre', qty: 1 }] }],
+          toolEquipmentSlots: [{ slot: 3, fixed: [{ id: 'tl-luth', qty: 1 }] }],
+        } as CharacterCreation,
+        { needsMagicStep: false },
+      ),
+    ).toBeTrue();
+  });
+
+  it('isWizardStepValid accepts a valid secondary warlock at level 3 with pact and invocations', () => {
+    expect(
+      isWizardStepValid(
+        5,
+        {
+          ...base,
+          classId: 'cls-guerrier',
+          hitDie: 10,
+          targetLevel: 5,
+          subclassId: 'sub-champion',
+          secondaryClasses: [
+            {
+              classId: 'cls-sorcier',
+              className: 'Sorcier',
+              level: 3,
+              hitDie: 8,
+              hpPerLevelAverage: 5,
+              hasSpellcasting: true,
+              spellcastingKind: 'warlock',
+              spellcastingAbility: 'Charisme',
+              armorProficiencies: [],
+              weaponProficiencies: [],
+              toolProficiencies: [],
+              skillChooseCount: 0,
+              skillOptions: [],
+              classFeatures: [],
+              subclassId: 'sub-fiend',
+              pactBoon: 'chain',
+              eldritchInvocations: ['inv-armor-of-shadows'],
+            },
+          ],
+        } as CharacterCreation,
+        { needsMagicStep: false },
+      ),
+    ).toBeTrue();
+  });
+
+  it('racialSpellsComplete rejects unresolved wizard cantrip placeholders', () => {
+    expect(
+      racialSpellsComplete({
+        racialSpellGrants: [
+          { choiceId: 'g1', label: '', desc: '', pool: [], spellLevel: 0, spellcastingAbility: 'INT' },
+        ],
+        speciesChoiceAnswers: { g1: ['any_wizard_cantrip'] },
+      }),
+    ).toBeFalse();
+  });
+
+  it('isWizardStepValid rejects custom background missing description text', () => {
+    expect(
+      isWizardStepValid(
+        4,
+        {
+          ...base,
+          backgroundId: 'bg-custom',
+          backgroundPreset: false,
+          background: '   ',
+          privilegeName: 'Titre',
+          privilegeDesc: 'Desc',
+        },
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+  });
+
+  it('isWizardStepValid rejects equipment step when no slots and nothing selected', () => {
+    expect(
+      isWizardStepValid(
+        8,
+        {
+          ...base,
+          selectedEquipment: [],
+          startingEquipmentSlots: [],
+          backgroundEquipmentSlots: [],
+          toolEquipmentSlots: [],
+        } as CharacterCreation,
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+  });
+
+  it('isWizardStepValid rejects secondary warlock at level 2 without invocations', () => {
+    expect(
+      isWizardStepValid(
+        5,
+        {
+          ...base,
+          classId: 'cls-guerrier',
+          hitDie: 10,
+          targetLevel: 5,
+          subclassId: 'sub-champion',
+          secondaryClasses: [
+            {
+              classId: 'cls-sorcier',
+              className: 'Sorcier',
+              level: 2,
+              hitDie: 8,
+              hpPerLevelAverage: 5,
+              hasSpellcasting: true,
+              spellcastingKind: 'warlock',
+              spellcastingAbility: 'Charisme',
+              armorProficiencies: [],
+              weaponProficiencies: [],
+              toolProficiencies: [],
+              skillChooseCount: 0,
+              skillOptions: [],
+              classFeatures: [],
+              subclassId: 'sub-fiend',
+              pactBoon: null,
+              eldritchInvocations: [],
+            },
+          ],
+        } as CharacterCreation,
+        { needsMagicStep: false },
+      ),
+    ).toBeFalse();
+  });
+
+  it('racialSpellsComplete treats missing speciesChoiceAnswers as empty picks', () => {
+    expect(
+      racialSpellsComplete({
+        racialSpellGrants: [
+          { choiceId: 'g1', label: '', desc: '', pool: ['spl-a'], spellLevel: 0, spellcastingAbility: 'INT' },
+        ],
+        speciesChoiceAnswers: {},
+      }),
+    ).toBeFalse();
+  });
 });

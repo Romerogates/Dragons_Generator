@@ -1345,6 +1345,9 @@ export class CampaignPlayPanel implements OnDestroy {
     const cb = this.combatTurnOrder().find((c) => c.id === combatantId);
     if (!cb || isCombatantDefeated(cb)) return;
     this.selectedTargetId.set(combatantId);
+    if (this.fightStep() === 'pickTarget') {
+      this.fightStep.set('toHit');
+    }
   }
 
   setRollChoice(choice: RollChoice): void {
@@ -1423,10 +1426,6 @@ export class CampaignPlayPanel implements OnDestroy {
       rollDamageTotal(formula, atk.damageBonus ?? 0) ??
       Math.max(1, (atk.damageBonus ?? 0) + rollDie(6));
 
-    if (this.isDm()) {
-      this.adjustHp(target.id, -damage);
-    }
-
     const hitTotal = this.pendingHitTotal() ?? 0;
     const line = formatCombatLogLine({
       actor: turn.name || 'Sans nom',
@@ -1438,7 +1437,31 @@ export class CampaignPlayPanel implements OnDestroy {
       hit: true,
       damage,
     });
-    if (this.isDm()) this.appendLog(line);
+
+    // Une seule écriture : éviter que appendLog (input encore stale) écrase les PV.
+    if (this.isDm()) {
+      const combat = this.activeCombat();
+      const session = this.activeSession();
+      const c = this.campaign();
+      if (combat && session) {
+        const combatants = combat.combatants.map((cb) =>
+          cb.id === target.id ? applyHpDelta(cb, -damage) : cb,
+        );
+        const nextCombat = { ...combat, combatants };
+        const encounters = syncEncountersFromCombatants(c.data.encounters, combatants);
+        const sessions = (c.data.sessions ?? []).map((s) =>
+          s.id === session.id
+            ? {
+                ...s,
+                activeCombat: nextCombat,
+                combatLog: appendCombatLog(s.combatLog, line),
+              }
+            : s,
+        );
+        this.saveData({ sessions, encounters });
+      }
+    }
+
     this.setFeedback(
       'ok',
       `${turn.name} → ${target.name} : ${damage} dégâts (${formula})${this.isDm() ? '' : ' — le MJ applique les PV'}`,

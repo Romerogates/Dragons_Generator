@@ -138,4 +138,69 @@ describe('mergeRemoteInitiativeRolls', () => {
     expect(merged.data.sessions![0].activeCombat!.combatants[0].initiativeRoll).toBeUndefined();
     expect(merged.data.sessions![0].activeCombat!.initiativeCode).toBe('ZZZZ');
   });
+
+  it('keeps local initiativeCode and skips non-active sessions', () => {
+    const local = baseCampaign({
+      sessions: [
+        {
+          id: 'other',
+          title: 'Autre',
+          scheduledAt: '2026-01-01T18:00:00Z',
+          status: 'planned',
+          playNotes: '',
+          playPads: [],
+        },
+        {
+          id: 's1',
+          title: 'S1',
+          scheduledAt: '2026-01-01T20:00:00Z',
+          status: 'planned',
+          playNotes: 'brouillon MJ',
+          playPads: [],
+          activeCombat: {
+            id: 'combat-1',
+            label: 'Combat',
+            round: 1,
+            collectingInitiative: true,
+            initiativeCode: 'KEEP',
+            turnIndex: 0,
+            combatants: [
+              {
+                id: 'p1',
+                name: 'Héro',
+                kind: 'player',
+                initiativeBonus: 2,
+                playerSubmitted: false,
+              },
+            ],
+          },
+        },
+      ],
+    });
+    const remote = baseCampaign();
+    remote.updatedAt = '2026-01-04T00:00:00Z';
+    remote.data.sessions![0].activeCombat!.initiativeCode = undefined;
+    remote.data.sessions![0].activeCombat!.combatants[0] = {
+      id: 'p1',
+      name: 'Héro',
+      kind: 'player',
+      initiativeBonus: 2,
+      initiativeRoll: 11,
+      playerSubmitted: true,
+    };
+
+    const merged = mergeRemoteInitiativeRolls(local, remote);
+    expect(merged.data.sessions!.find((s) => s.id === 'other')?.title).toBe('Autre');
+    expect(merged.data.sessions!.find((s) => s.id === 's1')?.activeCombat?.initiativeCode).toBe('KEEP');
+    expect(merged.data.sessions!.find((s) => s.id === 's1')?.activeCombat?.combatants[0]?.initiativeRoll).toBe(11);
+  });
+
+  it('only updates updatedAt when remote active session is missing', () => {
+    const local = baseCampaign();
+    const remote = baseCampaign({ sessions: [], activeSessionId: 's1' });
+    remote.updatedAt = '2026-01-05T00:00:00Z';
+    const merged = mergeRemoteInitiativeRolls(local, remote);
+    expect(merged.updatedAt).toBe(remote.updatedAt);
+    expect(merged.data.sessions![0].playNotes).toBe('brouillon MJ');
+  });
 });

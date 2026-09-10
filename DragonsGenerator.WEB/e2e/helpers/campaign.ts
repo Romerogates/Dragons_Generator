@@ -294,9 +294,13 @@ type SeedCombatOpts = {
   includePlayer: boolean;
   playerUserId: string;
   characterName?: string;
+  collectingInitiative?: boolean;
+  currentHp?: number;
+  maxHp?: number;
+  initiativeRoll?: number;
 };
 
-/** Place un combat en collecte d’initiative sur la session active (API). */
+/** Place un combat sur la session active (API) — collecte init ou combat ouvert. */
 export async function seedCollectingInitiativeAs(
   page: Page,
   owner: AuthSession,
@@ -318,15 +322,21 @@ export async function seedCollectingInitiativeAs(
 
   const activeId = campaign.data.activeSessionId;
   expect(activeId, 'activeSessionId required').toBeTruthy();
+  const collecting = opts.collectingInitiative !== false;
   const code = `E${String(Date.now()).slice(-3)}`;
   const combatantId = opts.includePlayer ? `cb-pj-${Date.now()}` : null;
+  const maxHp = opts.maxHp ?? 20;
+  const currentHp = opts.currentHp ?? maxHp;
   const combatants: Array<Record<string, unknown>> = [
     {
       id: 'cb-gob-e2e',
       name: 'Gobelin',
       kind: 'monster',
       armorClass: 12,
+      maxHp: 7,
+      currentHp: 7,
       initiativeBonus: 0,
+      initiativeRoll: 8,
     },
   ];
   if (opts.includePlayer && combatantId) {
@@ -335,10 +345,11 @@ export async function seedCollectingInitiativeAs(
       name: opts.characterName ?? 'Héros E2E',
       kind: 'player',
       armorClass: 14,
-      maxHp: 12,
-      currentHp: 12,
+      maxHp,
+      currentHp,
       initiativeBonus: 1,
       memberUserId: opts.playerUserId,
+      ...(opts.initiativeRoll != null ? { initiativeRoll: opts.initiativeRoll } : {}),
     });
   }
 
@@ -351,7 +362,8 @@ export async function seedCollectingInitiativeAs(
             label: 'Embuscade E2E',
             round: 1,
             turnIndex: 0,
-            collectingInitiative: true,
+            flowPhase: collecting ? 'initiative' : 'fight',
+            collectingInitiative: collecting,
             initiativeCode: code,
             combatants,
           },
@@ -371,4 +383,167 @@ export async function seedCollectingInitiativeAs(
   });
   expect(putRes.ok(), `Seed combat failed: ${putRes.status()} ${await putRes.text()}`).toBeTruthy();
   return { code, combatantId };
+}
+
+/**
+ * Combat phase fight prêt pour le menu Attaquer (allié PNJ en tour 0 + monstre CA/PV).
+ * Utiliser avec setSessionModeAs(..., 'in_person') pour des jets encode déterministes.
+ */
+export async function seedFightCombatAs(
+  page: Page,
+  owner: AuthSession,
+  campaignId: string,
+  opts?: { allyName?: string; monsterName?: string; monsterHp?: number; monsterAc?: number },
+): Promise<{ allyId: string; monsterId: string }> {
+  const getRes = await page.request.get(`/api/me/campaigns/${campaignId}`, {
+    headers: bearer(owner.token),
+  });
+  expect(getRes.ok(), `Get campaign failed: ${getRes.status()}`).toBeTruthy();
+  const campaign = (await getRes.json()) as {
+    title: string;
+    data: {
+      activeSessionId?: string | null;
+      sessions?: Array<Record<string, unknown> & { id: string }>;
+      [key: string]: unknown;
+    };
+  };
+
+  const activeId = campaign.data.activeSessionId;
+  expect(activeId, 'activeSessionId required').toBeTruthy();
+
+  const allyId = `cb-ally-${Date.now()}`;
+  const monsterId = `cb-gob-${Date.now()}`;
+  const monsterHp = opts?.monsterHp ?? 7;
+  const monsterAc = opts?.monsterAc ?? 12;
+  const combatants: Array<Record<string, unknown>> = [
+    {
+      id: allyId,
+      name: opts?.allyName ?? 'Garde E2E',
+      kind: 'npc',
+      armorClass: 16,
+      maxHp: 20,
+      currentHp: 20,
+      initiativeBonus: 0,
+      initiativeRoll: 20,
+      attacks: [
+        {
+          name: 'Épée longue',
+          attackBonus: 5,
+          damageDice: '1d8+3',
+          damageBonus: 3,
+          damageType: 'tranchant',
+        },
+      ],
+    },
+    {
+      id: monsterId,
+      name: opts?.monsterName ?? 'Gobelin',
+      kind: 'monster',
+      armorClass: monsterAc,
+      maxHp: monsterHp,
+      currentHp: monsterHp,
+      initiativeBonus: 0,
+      initiativeRoll: 5,
+    },
+  ];
+
+  const sessions = (campaign.data.sessions ?? []).map((s) =>
+    s.id === activeId
+      ? {
+          ...s,
+          activeCombat: {
+            id: `combat-fight-${Date.now()}`,
+            label: 'Embuscade Attaque E2E',
+            round: 1,
+            turnIndex: 0,
+            flowPhase: 'fight',
+            collectingInitiative: false,
+            combatants,
+          },
+        }
+      : s,
+  );
+
+  const putRes = await page.request.put(`/api/me/campaigns/${campaignId}`, {
+    headers: bearer(owner.token),
+    data: {
+      title: campaign.title,
+      data: {
+        ...campaign.data,
+        sessions,
+      },
+    },
+  });
+  expect(putRes.ok(), `Seed fight combat failed: ${putRes.status()} ${await putRes.text()}`).toBeTruthy();
+  return { allyId, monsterId };
+}
+
+/** Publie un document (handout) via API PUT campagne. */
+export async function upsertPublishedHandoutAs(
+  page: Page,
+  owner: AuthSession,
+  campaignId: string,
+  opts?: { title?: string; kind?: string; body?: string; published?: boolean },
+): Promise<string> {
+  const getRes = await page.request.get(`/api/me/campaigns/${campaignId}`, {
+    headers: bearer(owner.token),
+  });
+  expect(getRes.ok()).toBeTruthy();
+  const campaign = (await getRes.json()) as {
+    title: string;
+    data: { handouts?: Array<Record<string, unknown>>; [key: string]: unknown };
+  };
+  const id = `e2e-ho-${Date.now()}`;
+  const published = opts?.published !== false;
+  const handout = {
+    id,
+    title: opts?.title ?? 'Lettre E2E',
+    kind: opts?.kind ?? 'letter',
+    body: opts?.body ?? 'Contenu secret du MJ.',
+    published,
+    publishedAt: published ? new Date().toISOString() : undefined,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  const putRes = await page.request.put(`/api/me/campaigns/${campaignId}`, {
+    headers: bearer(owner.token),
+    data: {
+      title: campaign.title,
+      data: {
+        ...campaign.data,
+        handouts: [...(campaign.data.handouts ?? []), handout],
+      },
+    },
+  });
+  expect(putRes.ok(), `Upsert handout failed: ${putRes.status()} ${await putRes.text()}`).toBeTruthy();
+  return id;
+}
+
+/** Met à jour le mode d’une session (online / in_person / other). */
+export async function setSessionModeAs(
+  page: Page,
+  owner: AuthSession,
+  campaignId: string,
+  sessionId: string,
+  mode: 'online' | 'in_person' | 'other',
+): Promise<void> {
+  const getRes = await page.request.get(`/api/me/campaigns/${campaignId}`, {
+    headers: bearer(owner.token),
+  });
+  expect(getRes.ok()).toBeTruthy();
+  const campaign = (await getRes.json()) as {
+    title: string;
+    data: {
+      sessions?: Array<Record<string, unknown> & { id: string }>;
+      [key: string]: unknown;
+    };
+  };
+  const sessions = (campaign.data.sessions ?? []).map((s) =>
+    s.id === sessionId ? { ...s, mode } : s,
+  );
+  const putRes = await page.request.put(`/api/me/campaigns/${campaignId}`, {
+    headers: bearer(owner.token),
+    data: { title: campaign.title, data: { ...campaign.data, sessions } },
+  });
+  expect(putRes.ok(), `Set session mode failed: ${putRes.status()}`).toBeTruthy();
 }

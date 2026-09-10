@@ -26,4 +26,12 @@ describe('clear-local-app-data.util', () => {
     expect(localStorage.getItem('other')).toBe('1');
     clearLocalAppData();
   });
+
+  it('skips null keys returned by storage.key', () => {
+    localStorage.setItem('dragons-keep-scan', '1');
+    const orig = localStorage.key.bind(localStorage);
+    spyOn(localStorage, 'key').and.callFake((index: number) => (index === 0 ? null : orig(index)));
+    clearLocalAppData();
+    expect(localStorage.getItem('dragons-keep-scan')).toBe('1');
+  });
 });

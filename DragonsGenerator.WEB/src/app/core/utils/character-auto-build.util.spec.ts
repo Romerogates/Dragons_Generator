@@ -28,6 +28,33 @@ import {
   type EquipmentCatalogItem,
 } from './character-auto-build.util';
 import { createLettreClass } from '../../../testing/lettre-fixtures';
+import {
+  equipmentDescription,
+  equipmentStatLines,
+  equipmentSubtypeLabel,
+  equipmentSummaryText,
+  equipmentTypeLabel,
+} from './equipment-display.util';
+import {
+  evaluatePreparedFormula,
+  resolveSpellQuota,
+  spellPickCount,
+} from './spell-quota.util';
+import { extractSubclassBonusSpells } from './subclass-bonus-spells.util';
+import {
+  featAsiAbilityOptions,
+  featAsiNeedsAbilityChoice,
+  featBonusArmorProficiencies,
+  featBonusToolProficiencies,
+  featDarkvisionRadius,
+  featFlexiblePointsTotal,
+  featIsFlexiblePoints,
+  featNeedsResistanceChoice,
+  featResistanceOptions,
+  isTalentSpendComplete,
+  resolveFeatAsiAbilityKey,
+  talentSpendsTotalCost,
+} from './feat-benefits.util';
 
 // --- Fixtures -----------------------------------------------------------
 
@@ -996,8 +1023,9 @@ describe('character-auto-build.util', () => {
       const preset = makeErudBackground();
       const custom = { ...makeErudBackground(), id: 'bg-custom' };
       const nonPreset = { ...makeErudBackground(), id: 'bg-other', data: { ...makeErudBackground().data, preset: false } };
-      const result = pickPresetBackgrounds([preset, custom, nonPreset]);
-      expect(result.map((b) => b.id)).toEqual(['bg-erudit']);
+      const noData = { ...makeErudBackground(), id: 'bg-node', data: undefined as never };
+      const result = pickPresetBackgrounds([preset, custom, nonPreset, noData]);
+      expect(result.map((b) => b.id)).toEqual(['bg-erudit', 'bg-node']);
     });
   });
 
@@ -1462,6 +1490,956 @@ describe('character-auto-build.util', () => {
       };
       const sel = buildAutoSpeciesSelection(species, 1, []);
       expect(sel.choiceAnswers['choice-obj']).toEqual(['opt-a']);
+    });
+  });
+
+  describe('branch coverage — high ROI gaps', () => {
+    it('buildAutoBackgroundSelection resolves every tools.choose option shape', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const bg = makeErudBackground();
+      bg.data.proficiencies.tools = {
+        fixed: [],
+        choose: [
+          { chooseCount: 1, options: ['tl-des'] },
+          { chooseCount: 1, options: [{ type: 'gameSet' }] },
+          { chooseCount: 1, options: [{ type: 'vehicle' }] },
+          { chooseCount: 1, options: [{ type: 'unknown' }] },
+        ] as never,
+      };
+      const sel = buildAutoBackgroundSelection(bg, createSkillMapFromList(SKILLS));
+      expect(sel.tools).toEqual(['tl-des', 'gameSet-any', 'vehicle-any', 'tool-any']);
+    });
+
+    it('buildAutoClassSelection waits for the subclass unlock level', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const { selection } = buildAutoClassSelection(makeGuerrierCls(), 2);
+      expect(selection.subclassId).toBeUndefined();
+      expect(selection.classFeatures.some((f) => f.refId === 'feat-critique-ameliore')).toBeFalse();
+    });
+
+    it('buildAutoClassSelection deduplicates overlapping feature_selection pools', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const cls: CharacterClass = {
+        id: 'cls-overlap',
+        name: 'Overlap',
+        data: {
+          hit_die: 8,
+          primary_abilities: [],
+          proficiencies: { armor: [], weapons: [], tools: [], saving_throws: [], skills: { count: 0, options: [] } },
+          starting_equipment: [],
+          progression: [{ level: 1, prof_bonus: 2, features: [], resources: {} }],
+          features_details: [
+            { id: 'feat-a', name: 'A', desc: '' },
+            { id: 'feat-b', name: 'B', desc: '' },
+            { id: 'feat-fixed', name: 'Fixe', desc: '' },
+          ],
+          choice_pools: [
+            {
+              id: 'choice-one',
+              type: 'feature_selection',
+              name: 'Premier',
+              quantity: 1,
+              pool: ['feat-a', 'feat-b'],
+              fixed_features: ['feat-fixed'],
+            },
+            {
+              id: 'choice-two',
+              type: 'feature_selection',
+              name: 'Second',
+              quantity: 1,
+              pool: ['feat-a', 'feat-b'],
+            },
+          ],
+        } as any,
+      } as unknown as CharacterClass;
+      const { classChoiceAnswers, extraFeatures } = buildAutoClassSelection(cls, 1);
+      const picked = new Set(Object.values(classChoiceAnswers).flat());
+      expect(picked.size).toBe(2);
+      expect(extraFeatures.filter((f) => f.refId === 'feat-fixed').length).toBe(1);
+    });
+
+    it('buildAutoEquipment resolves alternative slots and category picks inside alternatives', () => {
+      spyOn(Math, 'random').and.returnValue(0.99);
+      const catalog: EquipmentCatalogItem[] = [
+        {
+          id: 'wp-dague',
+          name: 'Dague',
+          type: 'WEAPON',
+          subtype: 'SIMPLE_MELEE',
+          cost: { v: 2, u: 'po' },
+          wKg: 0.5,
+          data: {},
+        },
+        {
+          id: 'ar-bouclier',
+          name: 'Bouclier',
+          type: 'ARMOR',
+          subtype: 'SHIELD',
+          cost: { v: 10, u: 'po' },
+          wKg: 3,
+          data: { ac: 2 },
+        },
+      ];
+      const result = buildAutoEquipment(
+        [
+          {
+            slot: 1,
+            alternatives: [[{ id: 'wp-dague', qty: 1 }], [{ id: 'category-simple-weapons', qty: 1 }]],
+          },
+          { slot: 2, alternatives: [[{ id: 'ar-bouclier', qty: 1 }], [{ id: 'ar-bouclier', qty: 1 }]] },
+        ],
+        catalog,
+        ['wp-dague'],
+        [],
+      );
+      expect(result.length).toBe(2);
+      expect(result[0].refId).toBe('wp-dague');
+      expect(result[1].refId).toBe('ar-bouclier');
+    });
+
+    it('buildAutoSpellcastingDetails leaves effectSummary empty when spell descriptions are missing', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const spells: Spell[] = [
+        { id: 'spl-lueur', name: 'Lueur', level: 0, classes: ['cls-magicien'] } as unknown as Spell,
+        { id: 'spl-projectile-magique', name: 'Projectile magique', level: 1, classes: ['cls-magicien'] } as unknown as Spell,
+      ];
+      const details = buildAutoSpellcastingDetails(makeMagicienCls(), spells, [], {}) as {
+        cantrips: { effectSummary: string }[];
+        spells: { effectSummary: string }[];
+      };
+      expect(details.cantrips[0].effectSummary).toBe('');
+      expect(details.spells[0].effectSummary).toBe('');
+    });
+
+    it('buildAutoSpeciesSelection keeps string option ids and skips empty option pools', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const species = makeElfSpecies();
+      species.subspecies = [];
+      species.creationChoices = [
+        { id: 'choice-str', name: 'String', desc: '', type: 'single_select', options: ['opt-x', 'opt-y'] },
+        { id: 'choice-empty', name: 'Vide', desc: '', type: 'single_select', options: [] },
+      ];
+      const sel = buildAutoSpeciesSelection(species, 1, []);
+      expect(sel.choiceAnswers['choice-str']).toEqual(['opt-x']);
+      expect(sel.choiceAnswers['choice-empty']).toBeUndefined();
+    });
+
+    it('buildAutoSpeciesSelection merges subspecies choices, languages and spell grants', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const species = makeElfSpecies();
+      species.baseStats.size = undefined as never;
+      species.subspecies = [
+        {
+          id: 'sub-custom',
+          name: 'Custom',
+          playable: true,
+          flavor: '',
+          abilityScoreIncrease: {},
+          traits: [],
+          languages: { fixed: ['lg-gnome'], choiceCount: 0 },
+          creationChoices: [
+            {
+              id: 'choice-sub-skill',
+              name: 'Comp.',
+              desc: '',
+              type: 'single_select',
+              options: ['skill-perception'],
+            },
+          ],
+        },
+      ];
+      species.creationChoices = [
+        {
+          id: 'choice-langue-nom',
+          name: 'Langue bonus',
+          desc: '',
+          type: 'language',
+          choiceCount: 1,
+          options: ['lg-nain'],
+        },
+        {
+          id: 'choice-skill-extra',
+          name: 'Compétence',
+          desc: '',
+          type: 'skill_proficiency',
+          choiceCount: 1,
+          options: ['skill-arcanes'],
+        },
+        {
+          id: 'choice-spell',
+          name: 'Sort',
+          desc: '',
+          type: 'spell',
+          spellLevel: 0,
+          options: ['spl-lueur'],
+        },
+        {
+          id: 'choice-tool',
+          name: 'Outil',
+          desc: '',
+          type: 'tool',
+          choiceCount: 2,
+          options: ['tl-luth'],
+        },
+        {
+          id: 'choice-asi',
+          name: 'Bonus',
+          desc: '',
+          type: 'ability_score_increase',
+          choiceCount: 1,
+          valuePerChoice: 1,
+          options: ['bad-code', 'str'],
+        },
+        {
+          id: 'choice-any',
+          name: 'Any',
+          desc: '',
+          type: 'single_select',
+          options: ['any', 'opt-z'],
+        },
+      ];
+      const sel = buildAutoSpeciesSelection(species, 1, [
+        { id: 'spl-lueur', name: 'Lueur', level: 0, description: 'Lumière.' } as unknown as Spell,
+      ]);
+      expect(sel.size).toBe('M');
+      expect(sel.languages).toContain('lg-gnome');
+      expect(sel.bonusLanguageCount).toBe(1);
+      expect(sel.bonusSkillCount).toBe(1);
+      expect(sel.bonusToolCount).toBe(2);
+      expect(sel.racialSpellGrants.some((g) => g.choiceId === 'choice-spell')).toBeTrue();
+      expect(sel.choiceAnswers['choice-sub-skill']).toEqual(['skill-perception']);
+      expect(sel.choiceAnswers['choice-any']).toEqual(['opt-z']);
+    });
+
+    it('buildAutoBackgroundSelection handles sparse proficiency and equipment metadata', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const bg = makeErudBackground();
+      bg.data.proficiencies = {
+        skills: { fixed: [], chooseCount: 1, options: [] },
+        tools: { fixed: [], choose: [] },
+        languages: { fixed: [], choiceCount: 0 },
+      } as never;
+      bg.data.equipment = {
+        fixed: [{ id: 'it-x', name: 'X', qty: undefined as never }],
+        currency: {},
+        choose: [{ name: undefined as never, pool: [{ id: 'gr-livre', qty: undefined as never }] }],
+      } as never;
+      const sel = buildAutoBackgroundSelection(bg, createSkillMapFromList(SKILLS));
+      expect(sel.skills.length).toBe(1);
+      expect(sel.tools).toEqual([]);
+      expect(sel.currency.or).toBe(0);
+      expect(sel.equipment[0].qty).toBe(1);
+      expect(sel.equipmentSlots[0].description).toContain('Choix');
+    });
+
+    it('pickAutoSubclass honors level_unlocked and returns null below gate', () => {
+      const cls: CharacterClass = {
+        id: 'cls-gated',
+        name: 'Gated',
+        data: {
+          hit_die: 8,
+          primary_abilities: [],
+          proficiencies: { armor: [], weapons: [], tools: [], saving_throws: [], skills: { count: 0, options: [] } },
+          starting_equipment: [],
+          progression: [],
+          features_details: [],
+          choice_pools: [],
+          subclasses: { level_unlocked: 5, options: [{ id: 'sub-a', name: 'A', features: [] }] },
+        } as any,
+      } as unknown as CharacterClass;
+      expect(buildAutoClassSelection(cls, 4).selection.subclassId).toBeUndefined();
+      expect(buildAutoClassSelection(cls, 5).selection.subclassId).toBe('sub-a');
+    });
+
+    it('buildStandardAbilityScores assigns leftover array values to untouched abilities', () => {
+      expect(buildStandardAbilityScores(['force', 'dexterite', 'constitution', 'intelligence'])).toEqual({
+        force: 15,
+        dexterite: 14,
+        constitution: 13,
+        intelligence: 12,
+        sagesse: 10,
+        charisme: 8,
+      });
+    });
+
+    it('buildBackgroundToolSlots maps gameSet-any to gaming set categories', () => {
+      const slots = buildBackgroundToolSlots(['gameSet-any'], TOOL_CATALOG);
+      expect(slots[0].alternatives).toEqual([[{ id: 'category-gaming-sets', qty: 1 }]]);
+    });
+
+    it('resolveBgToolToConcrete resolves gameSet-any through the game branch', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      expect(resolveBgToolToConcrete('gameSet-any', TOOL_CATALOG)).toBe('tl-des');
+    });
+
+    it('buildAutoEquipment resolves tool mastered-choice and weapon customData fallbacks', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const catalog: EquipmentCatalogItem[] = [
+        {
+          id: 'wp-hache',
+          name: 'Hache',
+          type: 'WEAPON',
+          subtype: 'SIMPLE_MELEE',
+          cost: { v: 5, u: 'po' },
+          wKg: 2,
+          data: { damage_dice: '1d6', damage_type: 'tranchant', properties: ['Légère'] },
+        },
+        {
+          id: 'tl-luth',
+          name: 'Luth',
+          type: 'TOOL',
+          subtype: 'instrument',
+          cost: { v: 1, u: 'po' },
+          wKg: 1,
+          data: {},
+        },
+      ];
+      const result = buildAutoEquipment(
+        [
+          { slot: 1, fixed: [{ id: 'wp-hache', qty: 1 }] },
+          { slot: 2, fixed: [{ id: 'wp-mastered-choice', qty: 1 }] },
+        ],
+        catalog,
+        ['wp-hache'],
+        [],
+      );
+      const weaponCd = result[0].customData as Record<string, unknown>;
+      expect(weaponCd['damage']).toBe('1d6');
+      expect(weaponCd['damageType']).toBe('tranchant');
+      expect(result[1].refId).toBe('wp-hache');
+    });
+
+    it('pickCombatStyles uses feat id fallback when style detail is missing', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const cls: CharacterClass = {
+        id: 'cls-style-fallback',
+        name: 'Style',
+        data: {
+          hit_die: 8,
+          primary_abilities: [],
+          proficiencies: { armor: [], weapons: [], tools: [], saving_throws: [], skills: { count: 0, options: [] } },
+          starting_equipment: [],
+          progression: [{ level: 1, prof_bonus: 2, features: [], resources: {} }],
+          features_details: [],
+          choice_pools: [{ id: 'choice-fighting-style', type: 'fighting_style', pool: ['feat-unknown-style'] }],
+        } as any,
+      } as unknown as CharacterClass;
+      const { selection } = buildAutoClassSelection(cls, 1);
+      expect(selection.classFeatures[0]?.name).toBe('Style : feat-unknown-style');
+    });
+
+    it('autoPickClassSkills accepts the any-skills token', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const picked = autoPickClassSkills(['any-skills'], 1, createSkillMapFromList(SKILLS), new Set());
+      expect(picked.length).toBe(1);
+    });
+
+    it('buildAutoBackgroundSelection rolls bonds and flaws tables when present', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const bg = makeErudBackground();
+      const sel = buildAutoBackgroundSelection(bg, createSkillMapFromList(SKILLS));
+      expect(sel.bonds).toBe('Ma bibliothèque.');
+      expect(sel.flaws).toBe("Je m'égare dans mes recherches.");
+    });
+
+    it('buildAutoClassSelection tolerates non-array proficiency lists', () => {
+      const cls: CharacterClass = {
+        id: 'cls-weird-prof',
+        name: 'Weird',
+        data: {
+          hit_die: 6,
+          primary_abilities: [],
+          proficiencies: {
+            armor: null,
+            weapons: null,
+            tools: null,
+            saving_throws: [],
+            skills: { count: 0, options: null },
+          },
+          starting_equipment: [],
+          progression: [],
+          features_details: [],
+          choice_pools: [],
+        } as any,
+      } as unknown as CharacterClass;
+      const { selection } = buildAutoClassSelection(cls, 1);
+      expect(selection.armorProficiencies).toEqual([]);
+      expect(selection.skillOptions).toEqual([]);
+    });
+
+    it('buildAutoSpellcastingDetails matches spells whose classes use a partial id', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const spells: Spell[] = [
+        { id: 'spl-a', name: 'A', level: 0, classes: ['magicien'] } as unknown as Spell,
+        { id: 'spl-b', name: 'B', level: 1, classes: ['magicien'] } as unknown as Spell,
+      ];
+      const details = buildAutoSpellcastingDetails(makeMagicienCls(), spells, [], {}) as {
+        cantrips: unknown[];
+        spells: unknown[];
+      };
+      expect(details.cantrips.length).toBeGreaterThan(0);
+      expect(details.spells.length).toBeGreaterThan(0);
+    });
+
+    it('resolveBgToolToConcrete falls back to hard-coded defaults when catalogs are empty', () => {
+      expect(resolveBgToolToConcrete('instrument-any', [])).toBe('tl-luth');
+      expect(resolveBgToolToConcrete('gameSet-any', [])).toBe('tl-des');
+    });
+
+    it('buildAutoEquipment resolves explicit category id lists', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const catalog: EquipmentCatalogItem[] = [
+        {
+          id: 'tl-des',
+          name: 'Dés',
+          type: 'TOOL',
+          subtype: 'gaming_set',
+          cost: { v: 0, u: 'po' },
+          wKg: 0,
+          data: {},
+        },
+      ];
+      const result = buildAutoEquipment(
+        [{ slot: 1, fixed: [{ id: 'category-gaming-sets', qty: 1 }] }],
+        catalog,
+        [],
+        [],
+      );
+      expect(result[0].refId).toBe('tl-des');
+    });
+
+    it('materializes subclass sub_choices from labels when feature details are absent', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const cls: CharacterClass = {
+        id: 'cls-label-sub',
+        name: 'Label',
+        data: {
+          hit_die: 8,
+          primary_abilities: ['Sagesse'],
+          proficiencies: { armor: [], weapons: [], tools: [], saving_throws: [], skills: { count: 0, options: [] } },
+          starting_equipment: [],
+          progression: [{ level: 1, prof_bonus: 2, features: [], resources: {} }],
+          features_details: [],
+          choice_pools: [],
+          subclasses: {
+            unlocked_at_level: 1,
+            options: [
+              {
+                id: 'sub-x',
+                name: 'X',
+                features: [],
+                sub_choices: [
+                  {
+                    id: 'choice-domaine',
+                    type: 'single_select',
+                    level_required: 1,
+                    options: ['dom-label'],
+                    option_labels: { 'dom-label': 'Domaine étiquette' },
+                    option_descs: { 'dom-label': 'Sans fiche feature.' },
+                  },
+                ],
+              },
+            ],
+          },
+        } as any,
+      } as unknown as CharacterClass;
+      const { extraFeatures } = buildAutoClassSelection(cls, 1);
+      const feat = extraFeatures.find((f) => f.refId === 'dom-label');
+      expect(feat?.name).toBe('Domaine étiquette');
+      expect(feat?.desc).toBe('Sans fiche feature.');
+      expect(feat?.uses).toBeUndefined();
+    });
+
+    it('skips unknown or duplicate fixed features in feature_selection pools', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const cls: CharacterClass = {
+        id: 'cls-fixed-skip',
+        name: 'Fixed',
+        data: {
+          hit_die: 8,
+          primary_abilities: [],
+          proficiencies: { armor: [], weapons: [], tools: [], saving_throws: [], skills: { count: 0, options: [] } },
+          starting_equipment: [],
+          progression: [{ level: 1, prof_bonus: 2, features: [], resources: {} }],
+          features_details: [
+            { id: 'feat-a', name: 'A', desc: '' },
+            { id: 'feat-fixed', name: 'Fixe', desc: '' },
+          ],
+          choice_pools: [
+            {
+              id: 'choice-one',
+              type: 'feature_selection',
+              name: 'Choix',
+              quantity: 1,
+              pool: ['feat-a'],
+              fixed_features: ['feat-fixed', 'feat-missing'],
+            },
+          ],
+        } as any,
+      } as unknown as CharacterClass;
+      const { extraFeatures } = buildAutoClassSelection(cls, 1);
+      expect(extraFeatures.filter((f) => f.refId === 'feat-fixed').length).toBe(1);
+      expect(extraFeatures.some((f) => f.refId === 'feat-missing')).toBeFalse();
+    });
+
+    it('buildAutoSpellcastingDetails falls back to raw ids when spells are absent from the catalog', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const racialGrants = [
+        {
+          choiceId: 'grant-x',
+          label: '',
+          desc: '',
+          pool: ['spl-missing'],
+          spellLevel: 0,
+          spellcastingAbility: 'Intelligence',
+        },
+      ];
+      const details = buildAutoSpellcastingDetails(
+        makeMagicienCls(),
+        [{ id: 'spl-projectile-magique', name: 'PM', level: 1, classes: ['cls-magicien'] } as unknown as Spell],
+        racialGrants as never,
+        { 'grant-x': ['spl-missing'] },
+        null,
+        { level: 1 },
+      ) as { cantrips: { refId: string; name: string; effectSummary: string }[]; spells: { name: string }[] };
+      expect(details.cantrips.some((c) => c.refId === 'spl-missing' && c.name === 'spl-missing')).toBeTrue();
+      expect(details.cantrips.find((c) => c.refId === 'spl-missing')?.effectSummary).toBe('');
+      expect(details.spells[0]?.name).toBe('PM');
+    });
+
+    it('autoResolveClassProficiencies ignores max price when the choice omits it', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const cls = makeGuerrierCls();
+      ((cls.data as unknown as { choice_pools: { constraint_max_price_po?: number }[] }).choice_pools[1]).constraint_max_price_po =
+        undefined;
+      const res = autoResolveClassProficiencies(
+        cls,
+        [{ id: 'wp-hallebarde', costPo: 60 }],
+        [],
+        [],
+        [],
+      );
+      expect(res.weapons).toEqual(['wp-hallebarde']);
+    });
+
+    it('buildAutoEquipment uses shield AC defaults for light armor without stats', () => {
+      const catalog: EquipmentCatalogItem[] = [
+        {
+          id: 'ar-light-weird',
+          name: 'Weird light',
+          type: 'ARMOR',
+          subtype: 'LIGHT',
+          cost: { v: 0, u: 'po' },
+          wKg: 0,
+          data: {},
+        },
+        {
+          id: 'ar-bouclier',
+          name: 'Bouclier',
+          type: 'ARMOR',
+          subtype: 'SHIELD',
+          cost: { v: 0, u: 'po' },
+          wKg: 0,
+          data: {},
+        },
+      ];
+      const light = buildAutoEquipment([{ slot: 1, fixed: [{ id: 'ar-light-weird', qty: 1 }] }], catalog, [], [])[0];
+      const shield = buildAutoEquipment([{ slot: 1, fixed: [{ id: 'ar-bouclier', qty: 1 }] }], catalog, [], [])[0];
+      expect((light.customData as Record<string, unknown>)['ac']).toBe(10);
+      expect((shield.customData as Record<string, unknown>)['ac']).toBe(2);
+    });
+
+    it('buildAutoClassSelection skips high-level progression and subclass features', () => {
+      const cls: CharacterClass = {
+        id: 'cls-gated-feats',
+        name: 'Gated',
+        data: {
+          hit_die: 8,
+          primary_abilities: ['Force'],
+          proficiencies: { armor: [], weapons: [], tools: [], saving_throws: ['str', 'invalid-code'], skills: { count: 0, options: null } },
+          starting_equipment: [],
+          progression: [
+            { level: 1, prof_bonus: 2, features: ['feat-l1'], resources: {} },
+            { level: 5, prof_bonus: 3, features: ['feat-l5'], resources: {} },
+          ],
+          features_details: [
+            { id: 'feat-l1', name: 'L1', desc: '', level: 1 },
+            { id: 'feat-l5', name: 'L5', desc: '', level: 5 },
+            { id: 'feat-style-de-combat-x', name: 'Style', desc: '', level: 1 },
+          ],
+          choice_pools: [],
+          subclasses: {
+            unlocked_at_level: 1,
+            options: [
+              {
+                id: 'sub-y',
+                name: 'Y',
+                features: [{ id: 'sub-f5', name: 'Sub 5', desc: '', level: 5 }],
+              },
+            ],
+          },
+        } as any,
+      } as unknown as CharacterClass;
+      const { selection } = buildAutoClassSelection(cls, 1);
+      expect(selection.classFeatures.some((f) => f.refId === 'feat-l1')).toBeTrue();
+      expect(selection.classFeatures.some((f) => f.refId === 'feat-l5' || f.refId === 'sub-f5')).toBeFalse();
+      expect(selection.savingThrows as string[]).toContain('invalid-code');
+      expect(selection.skillChooseCount).toBe(0);
+    });
+
+    it('buildAutoEquipment prefers alternatives when fixed and alternatives coexist', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const catalog: EquipmentCatalogItem[] = [
+        {
+          id: 'wp-dague',
+          name: 'Dague',
+          type: 'WEAPON',
+          subtype: 'SIMPLE_MELEE',
+          cost: { v: 2, u: 'po' },
+          wKg: 0.5,
+          data: {},
+        },
+      ];
+      const result = buildAutoEquipment(
+        [{ slot: 1, fixed: [{ id: 'wp-dague', qty: 1 }], alternatives: [[{ id: 'wp-dague', qty: 1 }]] }],
+        catalog,
+        [],
+        [],
+      );
+      expect(result.length).toBe(1);
+    });
+
+    it('autoResolveClassProficiencies resolves deferred tool picks', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const res = autoResolveClassProficiencies(
+        makeMagicienCls(),
+        [],
+        [{ id: 'tl-necessaire-de-calligraphe' }, { id: 'tl-necessaire-dalchimiste' }],
+        [],
+        [],
+      );
+      expect(res.tools.length).toBe(1);
+    });
+
+    it('buildAutoSpeciesSelection reads innate spell descriptions when present', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const species = makeElfSpecies();
+      species.subspecies = [];
+      species.traits = [species.traits.find((t) => t.id === 'trait-sorts-innes')!];
+      const sel = buildAutoSpeciesSelection(species, 1, [
+        { id: 'spl-lueur', name: 'Lueur', level: 0, description: 'Une lumière utile en caverne.' } as unknown as Spell,
+      ]);
+      expect(sel.innateSpells[0]?.effectSummary).toContain('Une lumière utile');
+    });
+
+    it('buildAutoBackgroundSelection picks from explicit skill option lists', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const bg = makeErudBackground();
+      bg.data.proficiencies.skills = {
+        fixed: ['skill-arcanes'],
+        chooseCount: 1,
+        options: ['skill-histoire', 'skill-investigation'],
+      };
+      const sel = buildAutoBackgroundSelection(bg, createSkillMapFromList(SKILLS));
+      expect(sel.skills).toEqual(['skill-arcanes', 'skill-histoire']);
+    });
+
+    it('pickBonusLanguages returns empty picks for count zero', () => {
+      expect(pickBonusLanguages([], new Set(), 0)).toEqual([]);
+    });
+
+    it('buildAutoEquipment resolves subtype-based weapon categories', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const catalog: EquipmentCatalogItem[] = [
+        {
+          id: 'wp-club',
+          name: 'Gourdin',
+          type: 'WEAPON',
+          subtype: 'SIMPLE_MELEE',
+          cost: { v: 0, u: 'po' },
+          wKg: 1,
+          data: {},
+        },
+      ];
+      const result = buildAutoEquipment(
+        [{ slot: 1, fixed: [{ id: 'category-simple-weapons', qty: 1 }] }],
+        catalog,
+        [],
+        [],
+      );
+      expect(result[0].refId).toBe('wp-club');
+    });
+
+    it('buildAutoClassSelection uses option labels when picked features lack detail rows', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const cls: CharacterClass = {
+        id: 'cls-opt-label',
+        name: 'Opt',
+        data: {
+          hit_die: 8,
+          primary_abilities: [],
+          proficiencies: { armor: [], weapons: [], tools: [], saving_throws: [], skills: { count: 0, options: [] } },
+          starting_equipment: [],
+          progression: [{ level: 1, prof_bonus: 2, features: [], resources: {} }],
+          features_details: [],
+          choice_pools: [
+            {
+              id: 'choice-opt',
+              type: 'feature_selection',
+              name: 'Choix',
+              quantity: 1,
+              pool: ['feat-sans-fiche'],
+            },
+          ],
+        } as any,
+      } as unknown as CharacterClass;
+      const { extraFeatures } = buildAutoClassSelection(cls, 1);
+      expect(extraFeatures[0]?.name).toBe('Sans Fiche');
+    });
+
+    it('primaryAbilityKeys ignores unmapped ability labels', () => {
+      const cls: CharacterClass = {
+        id: 'cls-weird-ability',
+        name: 'Weird',
+        data: { primary_abilities: ['UnknownStat', 'Force'] } as any,
+      } as unknown as CharacterClass;
+      expect(primaryAbilityKeys(cls)).toEqual(['force']);
+    });
+
+    it('covers equipment display formatters for weapons and armor', () => {
+      expect(equipmentTypeLabel('gear')).toBe('Équipement');
+      expect(equipmentTypeLabel('exotic')).toBe('exotic');
+      expect(equipmentSubtypeLabel(null)).toBe('');
+      expect(equipmentSubtypeLabel('CUSTOM')).toBe('CUSTOM');
+
+      const weapon = {
+        type: 'WEAPON',
+        subtype: 'MARTIAL_RANGED',
+        wKg: 2,
+        cost: { v: 50, u: 'po' },
+        data: {
+          dmg_d: '1d8',
+          dmg_t: 'perforant',
+          props: ['wp-prop'],
+          ammo_range: { normal: 24, max: 96 },
+          str_req: 13,
+        },
+      };
+      const weaponSummary = equipmentSummaryText(weapon);
+      expect(weaponSummary).toContain('1d8');
+      expect(weaponSummary).toContain('Portée 24/96 m');
+      expect(weaponSummary).toContain('For 13');
+
+      const armor = {
+        type: 'ARMOR',
+        subtype: 'HEAVY',
+        wKg: 20,
+        cost: { v: null, u: 'po' },
+        data: {
+          ac_base: 18,
+          dex_modifier: false,
+          stealth_dis: true,
+          description: '  Plates lourdes  ',
+        },
+      };
+      expect(equipmentDescription(armor)).toBe('Plates lourdes');
+      const armorSummary = equipmentSummaryText(armor);
+      expect(armorSummary).toContain('CA 18');
+      expect(armorSummary).toContain('Dex non applicable');
+      expect(armorSummary).toContain('Discrétion −');
+      expect(equipmentStatLines(armor).length).toBe(2);
+
+      const throwOnly = equipmentSummaryText({
+        type: 'WEAPON',
+        subtype: null,
+        data: { throw_range: { normal: 6 } },
+      });
+      expect(throwOnly).toContain('Lancer 6 m');
+
+      const dexPartial = equipmentSummaryText({
+        type: 'ARMOR',
+        subtype: 'MEDIUM',
+        data: { ac: 14, dex_modifier: 'partial', max_dex_bonus: 2 },
+      });
+      expect(dexPartial).toContain('Dex max +2');
+
+      const numericRange = equipmentSummaryText({
+        type: 'WEAPON',
+        subtype: null,
+        data: { range: 12 },
+      });
+      expect(numericRange).toContain('Portée 12 m');
+
+      const stringRange = equipmentSummaryText({
+        type: 'WEAPON',
+        subtype: null,
+        data: { range: 'Contact' },
+      });
+      expect(stringRange).toContain('Contact');
+
+      const throwWithMax = equipmentSummaryText({
+        type: 'WEAPON',
+        subtype: null,
+        data: { throw_range: { normal: 6, max: 18 } },
+      });
+      expect(throwWithMax).toContain('Lancer 6/18 m');
+
+      const dexPartialOnly = equipmentSummaryText({
+        type: 'ARMOR',
+        subtype: 'MEDIUM',
+        data: { ac: 13, dex_modifier: 'partiel' },
+      });
+      expect(dexPartialOnly).toContain('Dex partiel');
+
+      const dexFull = equipmentSummaryText({
+        type: 'ARMOR',
+        subtype: 'LIGHT',
+        data: { ac: 11, dex_modifier: 'full' },
+      });
+      expect(dexFull).toContain('Dex complet');
+
+      expect(equipmentStatLines({ type: 'GEAR', subtype: null, data: {} })).toEqual([]);
+
+      const ammoMax = equipmentSummaryText({
+        type: 'WEAPON',
+        subtype: null,
+        data: { ammo_range: { normal: 30, max: 120 } },
+      });
+      expect(ammoMax).toContain('Portée 30/120 m');
+    });
+
+    it('covers spell quota and feat benefit helper branches', () => {
+      expect(evaluatePreparedFormula(null, 5, {})).toBeNull();
+      expect(evaluatePreparedFormula('invalid * formula', 5, {})).toBeNull();
+      expect(evaluatePreparedFormula('wis_mod + level', 5, { sagesse: 2 })).toBe(7);
+      expect(evaluatePreparedFormula('floor(paladin_level / 2) + cha_mod', 6, { charisme: 3 })).toBe(6);
+
+      const clericQuota = resolveSpellQuota({
+        cls: {
+          data: {
+            spellcasting: { type: 'prepared', ability: 'wis', prepared_formula: 'wis_mod + level' },
+            progression: [{ level: 5, resources: { cantrips_known: 4 } }],
+          },
+        },
+        kind: 'cleric',
+        classLevel: 5,
+        abilityModifiers: { sagesse: 2 },
+      });
+      expect(clericQuota?.preparedSpells).toBeGreaterThan(0);
+      expect(spellPickCount(clericQuota!)).toBe(clericQuota!.preparedSpells);
+
+      const wizardQuota = resolveSpellQuota({
+        cls: {
+          data: {
+            spellcasting: {
+              type: 'prepared',
+              grimoire: { initial_spells: 6, spells_per_level_up: 2 },
+            },
+            progression: [{ level: 3, resources: { cantrips_known: 3 } }],
+          },
+        },
+        kind: 'wizard',
+        classLevel: 3,
+      });
+      expect(wizardQuota?.grimoireSpells).toBe(10);
+
+      const flexibleFeat = {
+        benefits: [{ type: 'flexible_points', total: 4 }],
+        ability_score_increase: { ability: 'CON_or_CHA', value: 1 },
+      };
+      expect(featIsFlexiblePoints(flexibleFeat)).toBeTrue();
+      expect(featFlexiblePointsTotal(flexibleFeat)).toBe(4);
+      expect(featAsiNeedsAbilityChoice(flexibleFeat)).toBeTrue();
+      expect(featAsiAbilityOptions(flexibleFeat)).toEqual(['constitution', 'charisme']);
+      expect(resolveFeatAsiAbilityKey(flexibleFeat, null, 'charisme')).toBe('charisme');
+      expect(resolveFeatAsiAbilityKey({ ability_score_increase: { ability: 'STR' } }, null, null)).toBe('force');
+      expect(resolveFeatAsiAbilityKey({ ability_score_increase: { ability: 'SPELLCASTING' } }, 'intelligence', null)).toBe(
+        'intelligence',
+      );
+
+      const resistanceFeat = {
+        benefits: [{ type: 'damage_resistance', choose_from: ['Feu', 'Foudre'] }],
+      };
+      expect(featNeedsResistanceChoice(resistanceFeat)).toBeTrue();
+      expect(featResistanceOptions(resistanceFeat).map((o) => o.id)).toEqual(['damage-feu', 'damage-foudre']);
+
+      const profFeat = {
+        benefits: [
+          { type: 'proficiency', proficiency_type: 'armor', value: 'Bouclier' },
+          { type: 'proficiency', proficiency_type: 'tool', value: "Nécessaire d'herboristerie" },
+          { type: 'darkvision', range_m: 18 },
+        ],
+      };
+      expect(featBonusArmorProficiencies(profFeat)).toEqual(['ar-bouclier']);
+      expect(featBonusToolProficiencies(profFeat)).toEqual(['tl-necessaire-dherboristerie']);
+      expect(featDarkvisionRadius(profFeat)).toBe(18);
+
+      expect(isTalentSpendComplete({ id: 't1', type: 'skill', skillId: 'skill-stealth' })).toBeTrue();
+      expect(isTalentSpendComplete({ id: 't2', type: 'cantrips', cantripIds: ['a', 'b'] })).toBeTrue();
+      expect(isTalentSpendComplete({ id: 't3', type: 'cantrips', cantripIds: ['a'] })).toBeFalse();
+      expect(
+        talentSpendsTotalCost([
+          { id: 's1', type: 'skill', skillId: 'skill-stealth' },
+          { id: 's2', type: 'saving_throw', savingThrow: 'dexterite' },
+        ]),
+      ).toBe(3);
+      expect(featAsiAbilityOptions({ ability_score_increase: { ability: 'ANY' } }).length).toBe(6);
+      expect(resolveSpellQuota({ cls: null, kind: 'ranger', classLevel: 1, bonusCantrips: 1 })?.cantrips).toBe(1);
+      expect(
+        resolveSpellQuota({
+          cls: { data: { spellcasting: { type: 'known' }, progression: [{ level: 1, resources: {} }] } },
+          kind: 'paladin',
+          classLevel: 1,
+        })?.modeLabel,
+      ).toContain('serment');
+      expect(resolveSpellQuota({ cls: {}, kind: undefined, classLevel: 1 })).toBeNull();
+      expect(isTalentSpendComplete({ id: 'x', type: 'tool', toolId: 'tl-luth' })).toBeTrue();
+      expect(isTalentSpendComplete({ id: 'y', type: 'armor', armorTier: 'ar-medium' })).toBeTrue();
+      expect(isTalentSpendComplete({ id: 'z', type: 'unknown' as never })).toBeFalse();
+      expect(
+        resolveSpellQuota({ cls: null, kind: 'bard', classLevel: 1, bonusCantrips: 0 })?.modeLabel,
+      ).toContain('connus');
+
+      const bonus = extractSubclassBonusSpells(
+        {
+          id: 'cls-paladin',
+          name: 'Paladin',
+          data: {
+            subclasses: {
+              options: [
+                {
+                  id: 'sub-devotion',
+                  bonus_spells_granted: [
+                    { level_unlocked: 3, spells: ['spl-shield'] },
+                    { level_unlocked: 9, spells: ['spl-aura'] },
+                  ],
+                },
+              ],
+            },
+          },
+        } as unknown as CharacterClass,
+        'sub-devotion',
+        5,
+        { 'spl-shield': 'Bouclier de la foi' },
+      );
+      expect(bonus.length).toBe(1);
+      expect(bonus[0]!.spells[0]).toBe('Bouclier de la foi');
+      expect(extractSubclassBonusSpells(null, 'sub-x', 5)).toEqual([]);
+    });
+
+    it('buildAutoSpellcastingDetails at level 3 requests higher-level slots', () => {
+      spyOn(Math, 'random').and.returnValue(0);
+      const spells: Spell[] = [
+        { id: 'spl-lueur', name: 'Lueur', level: 0, description: 'Lumière.', classes: ['cls-magicien'] } as unknown as Spell,
+        { id: 'spl-shield', name: 'Bouclier', level: 1, description: 'Protection.', classes: ['cls-magicien'] } as unknown as Spell,
+        { id: 'spl-misty', name: 'Brume', level: 2, description: 'Brume.', classes: ['cls-magicien'] } as unknown as Spell,
+      ];
+      const details = buildAutoSpellcastingDetails(makeMagicienCls(), spells, [], {}, null, { level: 3 }) as {
+        cantrips: unknown[];
+        spells: unknown[];
+      };
+      expect(details.cantrips.length).toBeGreaterThan(0);
+      expect(details.spells.length).toBeGreaterThan(0);
     });
   });
 });

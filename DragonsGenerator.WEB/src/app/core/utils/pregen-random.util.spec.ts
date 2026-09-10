@@ -15,6 +15,12 @@ describe('pregen-random.util', () => {
     expect(pickRandom(['solo'])).toBe('solo');
   });
 
+  it('pickRandom returns null for a holey array slot', () => {
+    spyOn(Math, 'random').and.returnValue(0);
+    const holey = new Array<string>(1);
+    expect(pickRandom(holey)).toBeNull();
+  });
+
   it('randomHeroName returns a non-empty string', () => {
     const name = randomHeroName();
     expect(typeof name).toBe('string');

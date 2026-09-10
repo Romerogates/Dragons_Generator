@@ -223,4 +223,45 @@ describe('combat-tracker.util', () => {
     expect(text).toContain('Sans nom : vivant (5 PV)');
     expect(text).toContain('1 manche');
   });
+
+  it('covers sort ties, open-fight guard, duplicate conditions and turn clamp', () => {
+    const withRoll = createCombatant({ name: 'A', kind: 'player', initiativeRoll: 10 });
+    const without = createCombatant({ name: 'B', kind: 'player' });
+    expect(sortCombatants([without, withRoll]).map((c) => c.name)).toEqual(['A', 'B']);
+
+    const oneSide = createActiveCombat([withRoll]);
+    expect(canReorderCombatantInTurnOrder(oneSide, withRoll.id, 1)).toBeFalse();
+    expect(
+      reorderCombatantInTurnOrder(
+        createActiveCombat([
+          createCombatant({ name: 'X', kind: 'player', initiativeRoll: 12 }),
+          createCombatant({ name: 'Y', kind: 'player', initiativeRoll: 12 }),
+        ]),
+        'missing-id',
+        1,
+      ),
+    ).toEqual({});
+
+    const dup = duplicateCombatant(
+      createCombatant({
+        name: 'Garde',
+        kind: 'npc',
+        conditions: ['poisoned'],
+        attacks: [{ name: 'Épée', attackBonus: 3, damageDice: '1d8', damageType: 'tranchant' }],
+      }),
+    );
+    expect(dup.conditions).toEqual(['poisoned']);
+    expect(dup.attacks?.[0]?.name).toBe('Épée');
+
+    const live = createCombatant({ name: 'Live', kind: 'player', initiativeRoll: 20 });
+    const combat = { ...createActiveCombat([live]), turnIndex: 99 };
+    expect(currentTurnCombatant(combat)?.name).toBe('Live');
+
+    const plural = formatCombatArchiveSummary({
+      ...createActiveCombat([live]),
+      round: 3,
+      label: 'Boss',
+    });
+    expect(plural).toContain('3 manches');
+  });
 });

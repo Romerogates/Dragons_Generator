@@ -10,16 +10,18 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 - Ne pas committer `.env` / secrets. Commit + push seulement si Anthony le demande.
 - UI touchée → vérifier dans le navigateur (pas juste un screenshot).
 - PowerShell : `;` pas `&&`.
-- Couverture Angular : **branches ≥ 85%** (karma) — si le seuil casse, ajouter des tests, ne pas baisser le seuil.
+- Couverture Angular : **branches ≥ 90%** (karma) — si le seuil casse, ajouter des tests, ne pas baisser le seuil.
 - **Pas de nouvelle feature** dans la passe polish : pas d’idle / Métiers / Bivouac, pas de routes session dédiées.
 
 ## À faire (priorité)
 
-1. **Reste checklist manuelle** (§5–6) hors e2e : mode session dés/encode, attaques tour, roster live poll, XP DevTools offline, document épinglé joueur.
+1. **Reste checklist manuelle** (§5–6) hors e2e : face-à-face layout mobile, jets/ordre de collecte, carnet Main/OCR, PDF tablette, conditions combat, attaque joueur persistée (API).
 2. *(optionnel)* peaufinages mineurs guide / empty states hors flux critique.
 
 ## Déjà livré (ne pas refaire)
 
+- **E2E attaque tour MJ** (2026-09-10) — `campaign-combat-attack.spec.ts` : Attaquer → clic carte → encode d20 → dégâts → PV/journal ; jet raté sans baisse PV. UX : clic cible passe au jet ; bandeau tour sticky.
+- **E2E live polish 1–5** (2026-09-10) — `campaign-live-polish.spec.ts` : jet initiative joueur ; doc publié/épinglé (pas brouillon) ; mode session Autre (Encoder / Lancer le dé) ; XP offline erreur ; roster live MJ→joueur PV sans F5. Branches karma **≥ 90%**.
 - **Smoke e2e combat/XP/init** (2026-09-10) — import party + Distribuer XP une fois ; banner initiative seulement si PJ lié ; documents type Lettre ; confirms in-app + home retry + dock joueur.
 
 - Reset idle (Bivouac / Métiers / Missions retirés) ; baseline post-`c705f2a` + polish session.

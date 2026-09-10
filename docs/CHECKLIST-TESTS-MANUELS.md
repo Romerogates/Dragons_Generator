@@ -113,27 +113,31 @@ Prérequis : campagne créée, ≥ 1 joueur avec perso **approuvé**, rencontre 
   - *Où :* panneau de jeu (session active) → **« Combat + party »** ou **« + Party campagne »**.
   - *Prérequis :* joueurs avec personnage **approuvé**.
   - *E2E :* `campaign-combat-xp.spec.ts` (`+ Toute la party`).
-- [ ] 🟠 Mode de session (**En ligne / Présentiel / Autre**) à la planification — dés vs encode.
+- [x] 🟠 Mode de session (**En ligne / Présentiel / Autre**) à la planification — dés vs encode.
+  - *E2E :* `campaign-live-polish.spec.ts` (mode Autre → Encoder / Lancer le dé).
 - [ ] 🟠 Combat face-à-face : alliés à gauche, adversaires à droite ; tour mis en avant.
 - [x] 🔴 Collecter l’initiative (code + lien)
   - *Où :* combat actif → **Collecter l’init** ; page `/campaigns/:id/init` avec **lancer le dé**.
   - *E2E :* collecte ouverte (`campaign-play`) + banner joueur (`campaign-combat-xp`).
-- [ ] 🟠 Attaque sur le tour : cibler une carte → jet d20 (dés ou encode) → PV / vaincu.
+- [x] 🟠 Attaque sur le tour : cibler une carte → jet d20 (dés ou encode) → PV / vaincu.
+  - *E2E :* `campaign-combat-attack.spec.ts` (clic carte → encode → dégâts → PV + journal ; jet raté).
 - [ ] 🟠 Voir les jets arriver ; fin de collecte / ordre de tour
 - [x] 🔴 **Distribuer XP** : succès → bouton disparaît (`xpAwarded`) ; pas de double distribution après refresh
   - *E2E :* `campaign-combat-xp.spec.ts`.
-- [ ] 🟠 Échec réseau simulé (DevTools offline) : message d’erreur XP, pas de navigation bizarre
+- [x] 🟠 Échec réseau simulé (DevTools offline) : message d’erreur XP, pas de navigation bizarre
+  - *E2E :* `campaign-live-polish.spec.ts` (`setOffline`).
 - [x] 🟢 Terminer combat / notes / timeline session
   - *E2E :* `campaign-play.spec.ts` (fin combat + notes calepin).
 - [ ] 🟢 Joueur en ligne : voit le battlefield ; sur **son** tour peut lancer l’attaque (dés)
 ### 5.2 Documents & cartes
 
 - [x] 🟠 Documents : créer, type **Lettre** (pas « Letter »), publier, épingler
-  - *E2E partiel :* `campaign-documents.spec.ts` (créer + type Lettre).
+  - *E2E :* `campaign-documents.spec.ts` (créer + type Lettre) ; `campaign-live-polish.spec.ts` (publier + épingler).
 - [x] 🟠 Empty state : « créez un **document** » (pas « handout »)
 - [x] 🟠 Cartes donjon : bouton **Document** ; toast « brouillon… publiez » ; **Brouillard de guerre** (pas Fog of war)
   - *Vérifié code :* libellé « Brouillard de guerre » dans `campaign-dungeon-maps`.
-- [ ] 🟢 Joueur voit documents **publiés** seulement
+- [x] 🟢 Joueur voit documents **publiés** seulement
+  - *E2E :* `campaign-live-polish.spec.ts`.
 
 ### 5.3 Persistance
 
@@ -174,8 +178,11 @@ Avec un 2ᵉ compte membre de la campagne.
   - *E2E :* `campaign-combat-xp.spec.ts`.
 - [x] 🟠 Page `/campaigns/:id/init` : même empty state clair si non importé
 - [ ] 🟠 Saisir un jet → confirmation ; total avec bonus
-- [ ] 🟠 Document épinglé / overlay joueur
-- [ ] 🔴 **Roster live** : ordre des tours + PV / CA / conditions mis à jour sans F5 (poll ~4 s)
+  - *E2E partiel :* `campaign-live-polish.spec.ts` (banner → Envoyer jet).
+- [x] 🟠 Document épinglé / overlay joueur
+  - *E2E :* `campaign-live-polish.spec.ts`.
+- [x] 🔴 **Roster live** : ordre des tours + PV / CA / conditions mis à jour sans F5 (poll ~4 s)
+  - *E2E :* `campaign-live-polish.spec.ts` (MJ −5 PV → joueur voit 15/20).
 - [ ] 🟢 XP reçue visible côté joueur (si UI le montre)
 
 ---

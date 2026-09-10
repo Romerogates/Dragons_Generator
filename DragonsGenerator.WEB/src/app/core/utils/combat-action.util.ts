@@ -61,7 +61,8 @@ export function applyHpDelta(c: Combatant, delta: number): Combatant {
   if (c.currentHp == null && c.maxHp == null) {
     return { ...c, currentHp: Math.max(0, delta) };
   }
-  const max = c.maxHp ?? c.currentHp ?? 0;
+  // Après le garde ci-dessus, au moins une des deux valeurs est définie.
+  const max = c.maxHp ?? c.currentHp!;
   const cur = c.currentHp ?? max;
   const next = Math.max(0, Math.min(max, cur + delta));
   return {
