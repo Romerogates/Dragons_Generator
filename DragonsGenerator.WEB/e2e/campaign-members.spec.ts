@@ -2,8 +2,6 @@ import { test, expect } from '@playwright/test';
 import {
   applyAuthSession,
   loginSeedSession,
-  loginViaUi,
-  ONBOARDING_SEEN_KEY,
   registerConfirmAndLogin,
 } from './helpers/auth';
 import {
@@ -17,28 +15,41 @@ test.describe('Onboarding rôle', () => {
   test('choisir MJ ouvre le guide filtré', async ({ page }) => {
     test.setTimeout(60_000);
 
-    await loginViaUi(page, '/');
-    await page.evaluate((key) => {
-      localStorage.removeItem(key);
-      localStorage.removeItem('dragons-guide-audience');
-    }, ONBOARDING_SEEN_KEY);
+    const owner = await loginSeedSession(page.request);
+    expect(owner.token, 'seed JWT').toBeTruthy();
 
-    await page.goto('/');
+    const reset = await page.request.put('/api/me/guide-preferences', {
+      headers: { Authorization: `Bearer ${owner.token}` },
+      data: { readNewsIds: [], readSectionIds: [], audience: null },
+    });
+    expect(reset.ok(), `Reset prefs failed: ${reset.status()}`).toBeTruthy();
+
+    await applyAuthSession(page, owner, '/');
     await expect(page.getByRole('heading', { name: 'Comment jouez-vous ?' })).toBeVisible({
-      timeout: 15_000,
+      timeout: 20_000,
     });
     await page.getByRole('button', { name: /Je suis MJ/i }).click();
     await expect(page).toHaveURL(/\/guide/, { timeout: 15_000 });
 
-    const audience = await page.evaluate(() => localStorage.getItem('dragons-guide-audience'));
-    expect(audience).toBe('dm');
+    await expect
+      .poll(
+        async () => {
+          const prefs = await page.request.get('/api/me/guide-preferences', {
+            headers: { Authorization: `Bearer ${owner.token}` },
+          });
+          if (!prefs.ok()) return null;
+          const body = (await prefs.json()) as { audience: string | null };
+          return body.audience;
+        },
+        { timeout: 10_000 },
+      )
+      .toBe('dm');
   });
 });
 
 test.describe('Campagne — roster joueur', () => {
   test('inviter → proposer → valider fiche → retirer', async ({ page }) => {
     test.setTimeout(120_000);
-    page.on('dialog', (dialog) => dialog.accept());
 
     const owner = await loginSeedSession(page.request);
     const player = await registerConfirmAndLogin(page.request, 'Pl');
@@ -68,7 +79,12 @@ test.describe('Campagne — roster joueur', () => {
       timeout: 15_000,
     });
 
+    await page.getByRole('navigation', { name: 'Sections de la campagne' }).getByRole('button', { name: 'Joueurs' }).click();
     await page.getByRole('button', { name: 'Retirer' }).first().click();
+    const dialog = page.getByRole('dialog').filter({ hasText: 'Retirer le joueur' });
+    await expect(dialog).toBeVisible({ timeout: 10_000 });
+    await dialog.getByRole('button', { name: 'Retirer', exact: true }).click();
+
     await expect(page.getByRole('button', { name: 'Retirer' })).toHaveCount(0, { timeout: 15_000 });
     await expect(page.getByRole('button', { name: 'Accepter' })).toHaveCount(0);
   });

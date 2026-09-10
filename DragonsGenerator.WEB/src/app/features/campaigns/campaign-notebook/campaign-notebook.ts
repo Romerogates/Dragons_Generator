@@ -20,11 +20,12 @@ import {
 } from '@core/models/Campaign/campaign';
 import { exportInkDataUrl, redrawInkStrokes } from '@core/utils/notebook.util';
 import { DataService } from '@core/services/data.service';
+import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-campaign-notebook',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, ConfirmDialog],
   templateUrl: './campaign-notebook.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -56,6 +57,13 @@ export class CampaignNotebook implements OnDestroy {
   readonly transcribing = signal(false);
   readonly transcribeError = signal<string | null>(null);
   readonly inkFullscreen = signal(false);
+  readonly exportHint = signal<string | null>(null);
+  readonly confirmDialog = signal<{
+    title: string;
+    body: string;
+    confirmLabel: string;
+    onConfirm: () => void;
+  } | null>(null);
 
   private drawing = false;
   private currentStroke: InkStroke | null = null;
@@ -165,10 +173,11 @@ export class CampaignNotebook implements OnDestroy {
   removePage(id: string): void {
     const list = this.pages();
     if (!list || list.length <= 1) return;
-    if (!confirm('Supprimer cette page du carnet ?')) return;
-    const next = list.filter((p) => p.id !== id);
-    this.pagesChange.emit(next);
-    this.pageChange.emit(next[0]!);
+    this.askConfirm('Supprimer la page', 'Supprimer cette page du carnet ?', () => {
+      const next = list.filter((p) => p.id !== id);
+      this.pagesChange.emit(next);
+      this.pageChange.emit(next[0]!);
+    });
   }
 
   onTitleChange(title: string): void {
@@ -230,16 +239,22 @@ export class CampaignNotebook implements OnDestroy {
   }
 
   clearInk(): void {
-    if (!confirm('Effacer tout le dessin de cette page ?')) return;
-    this.paintBlank();
-    this.canUndo.set(false);
-    this.emitPage({
-      ...this.page(),
-      inkStrokes: [],
-      inkImageDataUrl: undefined,
-      mode: 'ink',
-      updatedAt: new Date().toISOString(),
-    });
+    this.askConfirm(
+      'Effacer le dessin',
+      'Effacer tout le dessin de cette page ?',
+      () => {
+        this.paintBlank();
+        this.canUndo.set(false);
+        this.emitPage({
+          ...this.page(),
+          inkStrokes: [],
+          inkImageDataUrl: undefined,
+          mode: 'ink',
+          updatedAt: new Date().toISOString(),
+        });
+      },
+      'Effacer',
+    );
   }
 
   exportCurrentPng(): void {
@@ -248,9 +263,10 @@ export class CampaignNotebook implements OnDestroy {
     const canvas = this.canvasRef()?.nativeElement;
     if (!url && canvas && this.inkFullscreen()) url = exportInkDataUrl(canvas);
     if (!url) {
-      alert('Rien à exporter — dessine d’abord à la main.');
+      this.exportHint.set('Rien à exporter — dessine d’abord à la main.');
       return;
     }
+    this.exportHint.set(null);
     const a = document.createElement('a');
     a.href = url;
     a.download = `${(page.title || 'carnet').replace(/\s+/g, '-')}.jpg`;
@@ -260,9 +276,10 @@ export class CampaignNotebook implements OnDestroy {
   async exportInkPdf(): Promise<void> {
     const list = this.listPages().filter((p) => p.inkImageDataUrl || (p.inkStrokes?.length ?? 0) > 0);
     if (!list.length) {
-      alert('Aucune page manuscrite à exporter.');
+      this.exportHint.set('Aucune page manuscrite à exporter.');
       return;
     }
+    this.exportHint.set(null);
     const { jsPDF } = await import('jspdf');
     const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
     const margin = 36;
@@ -492,5 +509,25 @@ export class CampaignNotebook implements OnDestroy {
   private unlockBodyScroll(): void {
     if (typeof document === 'undefined') return;
     document.body.style.overflow = '';
+  }
+
+  cancelConfirmDialog(): void {
+    this.confirmDialog.set(null);
+  }
+
+  runConfirmDialog(): void {
+    const dialog = this.confirmDialog();
+    if (!dialog) return;
+    this.confirmDialog.set(null);
+    dialog.onConfirm();
+  }
+
+  private askConfirm(
+    title: string,
+    body: string,
+    onConfirm: () => void,
+    confirmLabel = 'Supprimer',
+  ): void {
+    this.confirmDialog.set({ title, body, confirmLabel, onConfirm });
   }
 }

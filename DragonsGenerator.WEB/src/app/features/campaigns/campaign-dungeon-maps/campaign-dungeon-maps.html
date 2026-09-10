@@ -399,3 +399,14 @@
     </div>
   </section>
 }
+
+@if (confirmDialog(); as dialog) {
+  <app-confirm-dialog
+    [title]="dialog.title"
+    [body]="dialog.body"
+    [confirmLabel]="dialog.confirmLabel"
+    [danger]="true"
+    (cancel)="cancelConfirmDialog()"
+    (confirm)="runConfirmDialog()"
+  />
+}

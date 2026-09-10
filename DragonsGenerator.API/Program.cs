@@ -85,6 +85,11 @@ builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationSc
         {
             OnMessageReceived = ctx =>
             {
+                // Prefer explicit Authorization (multi-user API / e2e); cookie is for browser sessions.
+                var authHeader = ctx.Request.Headers.Authorization.FirstOrDefault();
+                if (!string.IsNullOrEmpty(authHeader))
+                    return Task.CompletedTask;
+
                 if (
                     string.IsNullOrEmpty(ctx.Token)
                     && ctx.Request.Cookies.TryGetValue(AuthCookieHelper.CookieName, out var cookieToken)

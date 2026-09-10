@@ -12,6 +12,16 @@ export type AuthSession = {
   user: { id: string; displayName: string; email: string };
 };
 
+/** JWT from Set-Cookie dg_session (login body token is null in cookie-auth mode). */
+function extractSessionToken(loginRes: APIResponse): string | null {
+  for (const header of loginRes.headersArray()) {
+    if (header.name.toLowerCase() !== 'set-cookie') continue;
+    const match = header.value.match(/^dg_session=([^;]+)/);
+    if (match?.[1]) return decodeURIComponent(match[1]);
+  }
+  return null;
+}
+
 /** Copie le cookie dg_session de la réponse API dans le contexte navigateur Playwright. */
 async function ensureSessionCookie(page: Page, loginRes: APIResponse): Promise<void> {
   const baseUrl = process.env.E2E_BASE_URL ?? 'http://localhost:8081';
@@ -106,7 +116,7 @@ export async function registerConfirmAndLogin(
     user: { id: string; displayName: string; email: string };
   };
 
-  return { email, password, token: auth.token ?? null, user: auth.user };
+  return { email, password, token: auth.token ?? extractSessionToken(loginRes), user: auth.user };
 }
 
 export async function loginSeedSession(request: APIRequestContext): Promise<AuthSession> {
@@ -121,7 +131,7 @@ export async function loginSeedSession(request: APIRequestContext): Promise<Auth
   return {
     email: TEST_EMAIL,
     password: TEST_PASSWORD,
-    token: auth.token ?? null,
+    token: auth.token ?? extractSessionToken(loginRes),
     user: auth.user,
   };
 }

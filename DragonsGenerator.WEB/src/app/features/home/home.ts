@@ -36,6 +36,7 @@ export class Home implements OnInit {
   readonly savedCharactersCount = signal(0);
   readonly summary = signal<HomeSummary | null>(null);
   readonly summaryLoading = signal(false);
+  readonly summaryError = signal(false);
   readonly showRoleOnboarding = signal(false);
 
   readonly hasPulse = computed(() => {
@@ -121,6 +122,10 @@ export class Home implements OnInit {
     });
   }
 
+  retrySummary(): void {
+    this.loadSummary();
+  }
+
   private maybeShowRoleOnboarding(): void {
     this.showRoleOnboarding.set(this.auth.isLoggedIn() && this.guidePrefs.needsRoleOnboarding());
   }
@@ -128,16 +133,21 @@ export class Home implements OnInit {
   private loadSummary(): void {
     if (!this.auth.isLoggedIn()) {
       this.summary.set(null);
+      this.summaryError.set(false);
       return;
     }
     this.summaryLoading.set(true);
+    this.summaryError.set(false);
     this.homeSummary.getSummary().subscribe({
       next: (s) => {
         this.summary.set(s);
         if (s) this.savedCharactersCount.set(s.savedCharactersCount);
         this.summaryLoading.set(false);
       },
-      error: () => this.summaryLoading.set(false),
+      error: () => {
+        this.summaryLoading.set(false);
+        this.summaryError.set(true);
+      },
     });
   }
 

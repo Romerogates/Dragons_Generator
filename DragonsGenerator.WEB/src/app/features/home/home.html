@@ -191,6 +191,19 @@
         Chargement…
       </div>
     </section>
+  } @else if (isLoggedIn() && summaryError()) {
+    <section class="relative border-y border-slate-800/60 bg-[#12161c]/90">
+      <div class="max-w-3xl mx-auto px-4 py-5 flex flex-wrap items-center justify-center gap-3 text-sm text-slate-400">
+        <span>Impossible de charger votre activité.</span>
+        <button
+          type="button"
+          class="min-h-9 px-3 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-emerald-300 hover:border-emerald-600/50"
+          (click)="retrySummary()"
+        >
+          Réessayer
+        </button>
+      </div>
+    </section>
   } @else if (isLoggedIn() && hasPulse() && summary(); as s) {
     <section class="relative border-y border-slate-800/60 bg-[#12161c]/90">
       <div class="max-w-3xl mx-auto px-4 py-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-slate-400">

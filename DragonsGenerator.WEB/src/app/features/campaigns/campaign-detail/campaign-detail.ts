@@ -62,6 +62,7 @@ import { StoryBuilderService } from '@core/services/story-builder.service';
 import { CampaignPregenGeneratorService } from '@core/services/campaign-pregen-generator.service';
 import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
 import { AiGenerationProgressBar } from '@shared/components/ai-generation-progress-bar/ai-generation-progress-bar';
+import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import { CampaignDungeonMaps } from '../campaign-dungeon-maps/campaign-dungeon-maps';
 import { CampaignDetailOverview } from './campaign-detail-overview/campaign-detail-overview';
 import { CampaignDetailRoster } from './campaign-detail-roster/campaign-detail-roster';
@@ -120,6 +121,7 @@ function isPrepSub(t: string): t is PrepSub {
     AiGenerationProgressBar,
     CampaignInitiativeInline,
     LightMarkdownPipe,
+    ConfirmDialog,
   ],
   templateUrl: './campaign-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -176,6 +178,13 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly rosterSheetOpen = signal(false);
   readonly pinnedOverlayDismissed = signal(false);
   readonly activeNotebookPageId = signal<string | null>(null);
+  readonly confirmDialog = signal<{
+    title: string;
+    body: string;
+    confirmLabel: string;
+    danger?: boolean;
+    onConfirm: () => void;
+  } | null>(null);
 
   private initiativePollTimer: ReturnType<typeof setInterval> | null = null;
   private softPollTimer: ReturnType<typeof setInterval> | null = null;
@@ -1043,19 +1052,41 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.rosterSheetOpen.update((v) => !v);
   }
 
+  cancelConfirmDialog(): void {
+    this.confirmDialog.set(null);
+  }
+
+  runConfirmDialog(): void {
+    const dialog = this.confirmDialog();
+    if (!dialog) return;
+    this.confirmDialog.set(null);
+    dialog.onConfirm();
+  }
+
+  private askConfirm(
+    title: string,
+    body: string,
+    onConfirm: () => void,
+    confirmLabel = 'Supprimer',
+    danger = true,
+  ): void {
+    this.confirmDialog.set({ title, body, confirmLabel, danger, onConfirm });
+  }
+
   deleteHandout(handoutId: string): void {
     const c = this.campaign();
     if (!c?.isOwner) return;
-    if (!confirm('Supprimer ce document ?')) return;
-    this.flushHandoutSave();
-    if (this.editingHandoutId() === handoutId) this.editingHandoutId.set(null);
-    const dungeonMaps = (c.data.dungeonMaps ?? []).map((m) =>
-      m.handoutId === handoutId ? { ...m, handoutId: null } : m,
-    );
-    this.saveData({
-      handouts: (c.data.handouts ?? []).filter((h) => h.id !== handoutId),
-      pinnedHandoutId: c.data.pinnedHandoutId === handoutId ? null : c.data.pinnedHandoutId,
-      dungeonMaps,
+    this.askConfirm('Supprimer le document', 'Supprimer ce document ?', () => {
+      this.flushHandoutSave();
+      if (this.editingHandoutId() === handoutId) this.editingHandoutId.set(null);
+      const dungeonMaps = (c.data.dungeonMaps ?? []).map((m) =>
+        m.handoutId === handoutId ? { ...m, handoutId: null } : m,
+      );
+      this.saveData({
+        handouts: (c.data.handouts ?? []).filter((h) => h.id !== handoutId),
+        pinnedHandoutId: c.data.pinnedHandoutId === handoutId ? null : c.data.pinnedHandoutId,
+        dungeonMaps,
+      });
     });
   }
 
@@ -1149,21 +1180,22 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   removeSession(sessionId: string): void {
     const c = this.campaign();
     if (!c?.isOwner) return;
-    if (!confirm('Supprimer cette session ?')) return;
-    this.flushSessionSave();
-    if (this.editingSessionId() === sessionId) this.editingSessionId.set(null);
-    const sessions = (c.data.sessions ?? []).filter((s) => s.id !== sessionId);
-    const clearingActive = c.data.activeSessionId === sessionId;
-    this.saveData({
-      sessions,
-      ...(clearingActive ? { activeSessionId: null } : {}),
-    });
-    if (clearingActive) {
-      this.sessionDock.bindCampaign({
-        ...c,
-        data: { ...c.data, sessions, activeSessionId: null },
+    this.askConfirm('Supprimer la session', 'Supprimer cette session ?', () => {
+      this.flushSessionSave();
+      if (this.editingSessionId() === sessionId) this.editingSessionId.set(null);
+      const sessions = (c.data.sessions ?? []).filter((s) => s.id !== sessionId);
+      const clearingActive = c.data.activeSessionId === sessionId;
+      this.saveData({
+        sessions,
+        ...(clearingActive ? { activeSessionId: null } : {}),
       });
-    }
+      if (clearingActive) {
+        this.sessionDock.bindCampaign({
+          ...c,
+          data: { ...c.data, sessions, activeSessionId: null },
+        });
+      }
+    });
   }
 
   onSessionDateChange(sessionId: string, value: string): void {
@@ -1572,15 +1604,21 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   removeMember(member: CampaignMember): void {
     const c = this.campaign();
     if (!c) return;
-    if (!confirm(`Retirer ${member.displayName} de la campagne ?`)) return;
-    this.campaigns.removeMember(c.id, member.id).subscribe({
-      next: () => {
-        this.error.set(null);
-        this.reload();
-        if (this.tab() === 'overview') this.loadActivity();
+    this.askConfirm(
+      'Retirer le joueur',
+      `Retirer ${member.displayName} de la campagne ?`,
+      () => {
+        this.campaigns.removeMember(c.id, member.id).subscribe({
+          next: () => {
+            this.error.set(null);
+            this.reload();
+            if (this.tab() === 'overview') this.loadActivity();
+          },
+          error: () => this.error.set('Impossible de retirer ce joueur.'),
+        });
       },
-      error: () => this.error.set('Impossible de retirer ce joueur.'),
-    });
+      'Retirer',
+    );
   }
 
   readonly leaving = signal(false);
@@ -1731,12 +1769,19 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const unsorted = this.otherCreatures();
     if (!unsorted.length) return;
     const label = role === 'ally' ? 'alliés' : 'adversaires';
-    if (!confirm(`Classer ${unsorted.length} créature(s) non classée(s) en ${label} ?`)) return;
-    const keys = new Set(unsorted.map((cr) => this.creatureTrackKey(cr)));
-    const creatures = (c.data.creatures ?? []).map((entry) =>
-      keys.has(this.creatureTrackKey(entry)) ? { ...entry, role } : entry,
+    this.askConfirm(
+      'Classer les créatures',
+      `Classer ${unsorted.length} créature(s) non classée(s) en ${label} ?`,
+      () => {
+        const keys = new Set(unsorted.map((cr) => this.creatureTrackKey(cr)));
+        const creatures = (c.data.creatures ?? []).map((entry) =>
+          keys.has(this.creatureTrackKey(entry)) ? { ...entry, role } : entry,
+        );
+        this.saveData({ creatures });
+      },
+      'Classer',
+      false,
     );
-    this.saveData({ creatures });
   }
 
   onNotebookPageChange(page: NotebookPage): void {

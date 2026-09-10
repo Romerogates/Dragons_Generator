@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '@core/services/auth.service';
 import { GuideCommentsService, type GuideComment } from '@core/services/guide-comments.service';
 import { GuidePreferencesService } from '@core/services/guide-preferences.service';
+import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import { GUIDE_TOPICS, getGuideTopic, guideTopicsByGroup, type GuideTopic } from './guide-topics';
 import { GUIDE_QUICK_CARDS } from './guide-content';
 import type { GuideAudience } from './guide.types';
@@ -21,7 +22,7 @@ const CHECKLIST_STORAGE_KEY = 'dg-guide-checklist';
 @Component({
   selector: 'app-guide-topic',
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, ConfirmDialog],
   templateUrl: './guide-topic.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -43,6 +44,12 @@ export class GuideTopicPage implements OnInit {
   readonly navQuery = signal('');
   readonly audience = signal<GuideAudience | 'all'>('all');
   readonly checklistDone = signal<Record<string, boolean>>(loadChecklistDone());
+  readonly confirmDialog = signal<{
+    title: string;
+    body: string;
+    confirmLabel: string;
+    onConfirm: () => void;
+  } | null>(null);
 
   readonly quickCards = GUIDE_QUICK_CARDS;
   readonly allTopics = GUIDE_TOPICS;
@@ -161,8 +168,24 @@ export class GuideTopicPage implements OnInit {
   }
 
   remove(c: GuideComment): void {
-    if (!confirm('Supprimer ce commentaire ?')) return;
-    this.commentsApi.deleteComment(c.id).subscribe({ next: () => this.reload() });
+    this.askConfirm('Supprimer le commentaire', 'Supprimer ce commentaire ?', () => {
+      this.commentsApi.deleteComment(c.id).subscribe({ next: () => this.reload() });
+    });
+  }
+
+  cancelConfirmDialog(): void {
+    this.confirmDialog.set(null);
+  }
+
+  runConfirmDialog(): void {
+    const dialog = this.confirmDialog();
+    if (!dialog) return;
+    this.confirmDialog.set(null);
+    dialog.onConfirm();
+  }
+
+  private askConfirm(title: string, body: string, onConfirm: () => void, confirmLabel = 'Supprimer'): void {
+    this.confirmDialog.set({ title, body, confirmLabel, onConfirm });
   }
 
   startReply(id: string): void {

@@ -6,11 +6,22 @@ async function authToken(page: Page): Promise<string> {
     data: { email: TEST_EMAIL, password: TEST_PASSWORD },
   });
   expect(loginRes.ok(), `Login API failed: ${loginRes.status()}`).toBeTruthy();
-  const auth = (await loginRes.json()) as { token: string };
-  return auth.token;
+  const auth = (await loginRes.json()) as { token: string | null };
+  const fromCookie = (() => {
+    for (const header of loginRes.headersArray()) {
+      if (header.name.toLowerCase() !== 'set-cookie') continue;
+      const match = header.value.match(/^dg_session=([^;]+)/);
+      if (match?.[1]) return decodeURIComponent(match[1]);
+    }
+    return null;
+  })();
+  const token = auth.token ?? fromCookie;
+  expect(token, 'auth token missing from body and cookie').toBeTruthy();
+  return token!;
 }
 
-function bearer(token: string): Record<string, string> {
+function bearer(token: string | null): Record<string, string> {
+  expect(token, 'Bearer token required for multi-user API helpers').toBeTruthy();
   return { Authorization: `Bearer ${token}` };
 }
 
@@ -159,4 +170,71 @@ export async function proposeCharacterAs(
     data: { characterId },
   });
   expect(res.ok(), `Propose failed: ${res.status()} ${await res.text()}`).toBeTruthy();
+}
+
+/** MJ valide la fiche proposée (API). */
+export async function approveCharacterAs(
+  page: Page,
+  owner: AuthSession,
+  campaignId: string,
+): Promise<void> {
+  const getRes = await page.request.get(`/api/me/campaigns/${campaignId}`, {
+    headers: bearer(owner.token),
+  });
+  expect(getRes.ok(), `Get campaign failed: ${getRes.status()}`).toBeTruthy();
+  const campaign = (await getRes.json()) as {
+    members: Array<{ id: string; proposalStatus: string }>;
+  };
+  const member = campaign.members.find((m) => m.proposalStatus === 'pending');
+  expect(member, 'pending member not found').toBeTruthy();
+
+  const res = await page.request.post(
+    `/api/me/campaigns/${campaignId}/members/${member!.id}/approve`,
+    { headers: bearer(owner.token), data: {} },
+  );
+  expect(res.ok(), `Approve failed: ${res.status()} ${await res.text()}`).toBeTruthy();
+}
+
+/** MJ démarre une session active (API PUT data.activeSessionId). */
+export async function startActiveSessionAs(
+  page: Page,
+  owner: AuthSession,
+  campaignId: string,
+): Promise<string> {
+  const getRes = await page.request.get(`/api/me/campaigns/${campaignId}`, {
+    headers: bearer(owner.token),
+  });
+  expect(getRes.ok(), `Get campaign failed: ${getRes.status()}`).toBeTruthy();
+  const campaign = (await getRes.json()) as {
+    title: string;
+    data: {
+      sessions?: Array<{ id: string; title: string; scheduledAt: string; status: string }>;
+      [key: string]: unknown;
+    };
+  };
+
+  const sessionId = `e2e-live-${Date.now()}`;
+  const sessions = [
+    ...(campaign.data.sessions ?? []),
+    {
+      id: sessionId,
+      title: 'Session live E2E',
+      scheduledAt: new Date().toISOString(),
+      status: 'planned',
+    },
+  ];
+
+  const putRes = await page.request.put(`/api/me/campaigns/${campaignId}`, {
+    headers: bearer(owner.token),
+    data: {
+      title: campaign.title,
+      data: {
+        ...campaign.data,
+        sessions,
+        activeSessionId: sessionId,
+      },
+    },
+  });
+  expect(putRes.ok(), `Start session failed: ${putRes.status()} ${await putRes.text()}`).toBeTruthy();
+  return sessionId;
 }

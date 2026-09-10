@@ -44,6 +44,7 @@ import {
   themePalette,
 } from '@core/utils/dungeon-render.util';
 import { rollRandomEncounter, suggestThemeFromRegion } from '@core/utils/dungeon-theme-pools';
+import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 
 type EditorTool = 'select' | 'floor' | 'wall' | 'door' | 'trap' | 'chest' | 'stairs';
 
@@ -62,7 +63,7 @@ const MAX_UNDO = 40;
 @Component({
   selector: 'app-campaign-dungeon-maps',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmDialog],
   templateUrl: './campaign-dungeon-maps.html',
   styleUrl: './campaign-dungeon-maps.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -78,6 +79,12 @@ export class CampaignDungeonMaps implements OnDestroy {
   readonly viewportRef = viewChild<ElementRef<HTMLDivElement>>('viewport');
 
   readonly editingMapId = signal<string | null>(null);
+  readonly confirmDialog = signal<{
+    title: string;
+    body: string;
+    confirmLabel: string;
+    onConfirm: () => void;
+  } | null>(null);
   readonly showGenerator = signal(false);
   readonly exportBusy = signal(false);
   readonly generating = signal(false);
@@ -287,37 +294,42 @@ export class CampaignDungeonMaps implements OnDestroy {
 
   regenerateEditingMap(): void {
     const current = this.editingMap();
-    if (!current || !confirm('Régénérer ce donjon ? Les modifications de cases seront perdues.')) {
-      return;
-    }
-    this.pushUndo(current);
-    const c = this.campaign();
-    const next = generateDungeonMap(
-      {
-        gridWidth: current.gridWidth,
-        gridHeight: current.gridHeight,
-        roomCount: Math.max(4, current.rooms.length || 8),
-        corridorDensity: 50,
-        theme: current.theme,
+    if (!current) return;
+    this.askConfirm(
+      'Régénérer le donjon',
+      'Régénérer ce donjon ? Les modifications de cases seront perdues.',
+      () => {
+        this.pushUndo(current);
+        const c = this.campaign();
+        const next = generateDungeonMap(
+          {
+            gridWidth: current.gridWidth,
+            gridHeight: current.gridHeight,
+            roomCount: Math.max(4, current.rooms.length || 8),
+            corridorDensity: 50,
+            theme: current.theme,
+          },
+          {
+            name: current.name,
+            regionId: c.data.regionId,
+            regionName: c.data.regionName,
+          },
+        );
+        const merged: CampaignDungeonMap = {
+          ...next,
+          id: current.id,
+          name: current.name,
+          handoutId: current.handoutId,
+          createdAt: current.createdAt,
+          updatedAt: new Date().toISOString(),
+        };
+        this.updateMap(merged);
+        this.selectedRoomId.set(merged.rooms[0]?.id ?? null);
+        this.fitMapInView(merged);
+        this.message.set('Donjon régénéré.');
       },
-      {
-        name: current.name,
-        regionId: c.data.regionId,
-        regionName: c.data.regionName,
-      },
+      'Régénérer',
     );
-    const merged: CampaignDungeonMap = {
-      ...next,
-      id: current.id,
-      name: current.name,
-      handoutId: current.handoutId,
-      createdAt: current.createdAt,
-      updatedAt: new Date().toISOString(),
-    };
-    this.updateMap(merged);
-    this.selectedRoomId.set(merged.rooms[0]?.id ?? null);
-    this.fitMapInView(merged);
-    this.message.set('Donjon régénéré.');
   }
 
   openEditor(mapId: string): void {
@@ -337,10 +349,31 @@ export class CampaignDungeonMaps implements OnDestroy {
   }
 
   deleteMap(mapId: string): void {
-    if (!confirm('Supprimer cette carte ?')) return;
-    const c = this.campaign();
-    this.persistMaps((c.data.dungeonMaps ?? []).filter((m) => m.id !== mapId), true);
-    if (this.editingMapId() === mapId) this.closeEditor();
+    this.askConfirm('Supprimer la carte', 'Supprimer cette carte ?', () => {
+      const c = this.campaign();
+      this.persistMaps((c.data.dungeonMaps ?? []).filter((m) => m.id !== mapId), true);
+      if (this.editingMapId() === mapId) this.closeEditor();
+    });
+  }
+
+  cancelConfirmDialog(): void {
+    this.confirmDialog.set(null);
+  }
+
+  runConfirmDialog(): void {
+    const dialog = this.confirmDialog();
+    if (!dialog) return;
+    this.confirmDialog.set(null);
+    dialog.onConfirm();
+  }
+
+  private askConfirm(
+    title: string,
+    body: string,
+    onConfirm: () => void,
+    confirmLabel = 'Supprimer',
+  ): void {
+    this.confirmDialog.set({ title, body, confirmLabel, onConfirm });
   }
 
   updateMap(map: CampaignDungeonMap): void {

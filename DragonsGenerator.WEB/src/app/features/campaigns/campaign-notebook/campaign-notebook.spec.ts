@@ -88,8 +88,9 @@ describe('CampaignNotebook', () => {
     component.addPage();
     expect(pagesSpy.calls.mostRecent().args[0].length).toBe(3);
 
-    spyOn(window, 'confirm').and.returnValue(true);
     component.removePage(pages[0]!.id);
+    expect(component.confirmDialog()?.title).toBe('Supprimer la page');
+    component.runConfirmDialog();
     expect(pagesSpy.calls.mostRecent().args[0].length).toBe(1);
   });
 
