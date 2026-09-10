@@ -36,6 +36,9 @@ export class GuideIndexPage implements OnInit {
   );
 
   readonly sections = computed(() => guideTopicsByGroup(this.audience(), this.query(), 'all'));
+  readonly searchEmpty = computed(
+    () => this.query().trim().length > 0 && this.sections().length === 0,
+  );
 
   ngOnInit(): void {
     const aud = this.prefs.audience();

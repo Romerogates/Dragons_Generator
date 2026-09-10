@@ -12,9 +12,11 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '@core/services/auth.service';
 import { GuideCommentsService, type GuideComment } from '@core/services/guide-comments.service';
 import { GuidePreferencesService } from '@core/services/guide-preferences.service';
-import { GUIDE_TOPICS, getGuideTopic, type GuideTopic } from './guide-topics';
-import { GUIDE_NAV_GROUPS, GUIDE_QUICK_CARDS } from './guide-content';
+import { GUIDE_TOPICS, getGuideTopic, guideTopicsByGroup, type GuideTopic } from './guide-topics';
+import { GUIDE_QUICK_CARDS } from './guide-content';
 import type { GuideAudience } from './guide.types';
+
+const CHECKLIST_STORAGE_KEY = 'dg-guide-checklist';
 
 @Component({
   selector: 'app-guide-topic',
@@ -40,20 +42,18 @@ export class GuideTopicPage implements OnInit {
   readonly posting = signal(false);
   readonly navQuery = signal('');
   readonly audience = signal<GuideAudience | 'all'>('all');
+  readonly checklistDone = signal<Record<string, boolean>>(loadChecklistDone());
 
-  readonly groups = GUIDE_NAV_GROUPS;
   readonly quickCards = GUIDE_QUICK_CARDS;
   readonly allTopics = GUIDE_TOPICS;
 
-  readonly sidebarTopics = computed(() => {
-    const q = this.navQuery().trim().toLowerCase();
-    const aud = this.audience();
-    return this.allTopics.filter((t) => {
-      if (aud !== 'all' && t.audience !== 'all' && t.audience !== aud) return false;
-      if (!q) return true;
-      return t.title.toLowerCase().includes(q) || t.summary.toLowerCase().includes(q);
-    });
-  });
+  readonly sidebarSections = computed(() =>
+    guideTopicsByGroup(this.audience(), this.navQuery(), 'all'),
+  );
+
+  readonly searchEmpty = computed(
+    () => this.navQuery().trim().length > 0 && this.sidebarSections().length === 0,
+  );
 
   readonly related = computed((): GuideTopic[] => {
     const t = this.topic();
@@ -101,6 +101,19 @@ export class GuideTopicPage implements OnInit {
   setAudience(a: GuideAudience | 'all'): void {
     this.audience.set(a);
     if (a === 'dm' || a === 'player') this.prefs.setAudience(a);
+  }
+
+  toggleChecklist(id: string): void {
+    this.checklistDone.update((m) => {
+      const next = { ...m, [id]: !m[id] };
+      persistChecklistDone(next);
+      return next;
+    });
+  }
+
+  checklistProgress(items: { id: string }[]): { done: number; total: number } {
+    const done = items.filter((i) => this.checklistDone()[i.id]).length;
+    return { done, total: items.length };
   }
 
   reload(): void {
@@ -171,5 +184,24 @@ export class GuideTopicPage implements OnInit {
     } catch {
       return iso;
     }
+  }
+}
+
+function loadChecklistDone(): Record<string, boolean> {
+  try {
+    const raw = localStorage.getItem(CHECKLIST_STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as Record<string, boolean>;
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function persistChecklistDone(map: Record<string, boolean>): void {
+  try {
+    localStorage.setItem(CHECKLIST_STORAGE_KEY, JSON.stringify(map));
+  } catch {
+    /* ignore */
   }
 }

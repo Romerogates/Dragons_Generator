@@ -141,6 +141,16 @@ export class Home implements OnInit {
     });
   }
 
+  journeyLink(step: { path: string }): string {
+    if (step.path === '/guide' && !this.isLoggedIn()) return '/login';
+    return step.path;
+  }
+
+  journeyQueryParams(step: { path: string }): Record<string, string> | undefined {
+    if (step.path === '/guide' && !this.isLoggedIn()) return { returnUrl: '/guide' };
+    return undefined;
+  }
+
   scrollToJourney(): void {
     document.getElementById('journey')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }

@@ -35,7 +35,7 @@
         @if (boardLocked()) {
           Tableau verrouillé — déverrouillez pour glisser / étirer
         } @else {
-          Glissez l’en-tête · étirez le coin bas-droit
+          Poignée à gauche · étirez le coin bas-droit
         }
       </p>
     </div>
@@ -71,10 +71,25 @@
     </div>
   </div>
 
+  @if (padNotice(); as notice) {
+    <div
+      class="flex items-center justify-between gap-3 rounded-xl border border-amber-800/50 bg-amber-950/30 px-3 py-2 text-xs text-amber-100"
+      role="status"
+    >
+      <span>{{ notice }}</span>
+      <button
+        type="button"
+        class="text-[10px] font-black uppercase tracking-widest text-amber-300/80 hover:text-amber-200"
+        (click)="dismissPadNotice()"
+      >
+        OK
+      </button>
+    </div>
+  }
+
   <div
     #board
     class="relative w-full rounded-2xl border border-slate-800/80 bg-[#12161c]/50 p-2 select-none"
-    [class.touch-none]="!boardLocked()"
     [style.display]="'grid'"
     [style.gridTemplateColumns]="'repeat(' + gridCols + ', minmax(0, 1fr))'"
     [style.gridAutoRows.px]="rowPx"
@@ -86,6 +101,7 @@
   >
     @for (pad of pads(); track pad.id) {
       <article
+        [id]="'session-pad-' + pad.id"
         class="relative min-h-0 rounded-2xl border bg-[#1b2028]/90 overflow-hidden flex flex-col shadow-lg shadow-black/20"
         [style.gridColumn]="padStyle(pad)['gridColumn']"
         [style.gridRow]="padStyle(pad)['gridRow']"
@@ -94,15 +110,21 @@
         [class.z-20]="!boardLocked()"
         [class.opacity-90]="!boardLocked()"
       >
-        <div
-          class="flex flex-wrap items-center gap-2 px-3 py-2 border-b border-slate-800/80 shrink-0"
-          [class.cursor-grab]="!boardLocked()"
-          [class.active:cursor-grabbing]="!boardLocked()"
-          (pointerdown)="onDragHandlePointerDown($event, pad)"
-        >
+        <div class="flex flex-wrap items-center gap-1.5 px-2 py-1.5 border-b border-slate-800/80 shrink-0">
+          @if (!boardLocked()) {
+            <button
+              type="button"
+              class="min-w-11 min-h-11 rounded-lg text-slate-500 hover:text-amber-300 touch-none flex items-center justify-center cursor-grab active:cursor-grabbing"
+              aria-label="Déplacer le calepin"
+              (pointerdown)="onDragHandlePointerDown($event, pad)"
+            >
+              <iconify-icon icon="mdi:drag-vertical" class="text-xl"></iconify-icon>
+            </button>
+          }
+
           <input
             type="text"
-            class="flex-1 min-w-[6rem] bg-transparent border-0 text-sm font-serif text-slate-200 focus:outline-none focus:ring-0"
+            class="flex-1 min-w-[6rem] bg-transparent border-0 text-sm font-serif text-slate-200 focus:outline-none focus:ring-0 px-1"
             [ngModel]="pad.title"
             (ngModelChange)="setPadTitle(pad.id, $event)"
             (pointerdown)="$event.stopPropagation()"
@@ -116,10 +138,10 @@
 
           <button
             type="button"
-            class="w-9 h-9 rounded-lg text-red-400/70 hover:text-red-300"
+            class="min-w-11 min-h-11 rounded-lg text-red-400/70 hover:text-red-300 flex items-center justify-center"
             aria-label="Supprimer"
             (pointerdown)="$event.stopPropagation()"
-            (click)="removePad(pad.id)"
+            (click)="requestRemovePad(pad.id)"
           >
             <iconify-icon icon="mdi:trash-can-outline" class="text-lg"></iconify-icon>
           </button>
@@ -182,14 +204,50 @@
         @if (!boardLocked()) {
           <button
             type="button"
-            class="absolute bottom-1 right-1 w-7 h-7 rounded-md bg-amber-950/80 border border-amber-600/50 text-amber-200 cursor-se-resize flex items-center justify-center z-30"
+            class="absolute bottom-0 right-0 min-w-11 min-h-11 rounded-tl-xl bg-amber-950/90 border border-amber-600/50 text-amber-200 cursor-se-resize flex items-center justify-center z-30 touch-none"
             aria-label="Redimensionner"
             (pointerdown)="onResizeHandlePointerDown($event, pad)"
           >
-            <iconify-icon icon="mdi:arrow-expand-all" class="text-sm"></iconify-icon>
+            <iconify-icon icon="mdi:arrow-expand-all" class="text-base"></iconify-icon>
           </button>
         }
       </article>
     }
   </div>
 </section>
+
+@if (padToRemove()) {
+  <div
+    class="fixed inset-0 z-[95] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+    (click)="cancelRemovePad()"
+  >
+    <div
+      class="max-w-md w-full rounded-2xl border border-red-900/40 bg-[#1b2028] shadow-2xl p-5"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="pad-remove-title"
+    >
+      <p id="pad-remove-title" class="text-[10px] font-black uppercase tracking-widest text-red-400 mb-2">
+        Supprimer le calepin
+      </p>
+      <p class="text-sm text-slate-300 mb-4">Cette action retire le widget de la session en cours.</p>
+      <div class="flex justify-end gap-3">
+        <button
+          type="button"
+          class="px-3 py-2 rounded-xl text-xs font-black uppercase text-slate-400 hover:text-slate-200"
+          (click)="cancelRemovePad()"
+        >
+          Annuler
+        </button>
+        <button
+          type="button"
+          class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-600 text-white"
+          (click)="confirmRemovePad()"
+        >
+          Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -86,7 +86,8 @@ Chemins depuis la racine du repo `Dragons_Generator`. Lire seulement ceux du suj
 
 ## Guide / nav
 
-- `DragonsGenerator.WEB/src/app/features/guide/guide.ts`
+- `DragonsGenerator.WEB/src/app/features/guide/guide-index.ts`
+- `DragonsGenerator.WEB/src/app/features/guide/guide-topic.ts`
 - `DragonsGenerator.WEB/src/app/core/services/guide-preferences.service.ts`
 - `DragonsGenerator.WEB/src/app/shared/components/navbar/navbar.ts`
 - `DragonsGenerator.WEB/src/app/app.routes.ts`

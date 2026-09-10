@@ -185,7 +185,13 @@
   </section>
 
   <!-- Soft personal pulse (not dashboard cards) -->
-  @if (isLoggedIn() && hasPulse() && summary(); as s) {
+  @if (isLoggedIn() && summaryLoading()) {
+    <section class="relative border-y border-slate-800/60 bg-[#12161c]/90">
+      <div class="max-w-3xl mx-auto px-4 py-5 text-center text-xs text-slate-600 tracking-widest uppercase">
+        Chargement…
+      </div>
+    </section>
+  } @else if (isLoggedIn() && hasPulse() && summary(); as s) {
     <section class="relative border-y border-slate-800/60 bg-[#12161c]/90">
       <div class="max-w-3xl mx-auto px-4 py-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-slate-400">
         @if (guideNewsCount() > 0) {
@@ -264,7 +270,8 @@
             <h3 class="text-2xl md:text-3xl font-serif text-slate-50">{{ step.title }}</h3>
             <p class="text-base text-slate-400 leading-relaxed max-w-lg">{{ step.body }}</p>
             <a
-              [routerLink]="step.path"
+              [routerLink]="journeyLink(step)"
+              [queryParams]="journeyQueryParams(step)"
               class="inline-flex min-h-11 items-center px-5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors"
               [class]="
                 step.tone === 'amber'

@@ -38,28 +38,32 @@
             </button>
           }
         </div>
-        @for (section of sections(); track section.groupId) {
-          <div class="space-y-1">
-            <p class="text-[9px] font-black uppercase tracking-widest text-slate-600 px-1">
-              {{ section.groupLabel }}
-            </p>
-            <ul class="space-y-0.5">
-              @for (topic of section.topics; track topic.id) {
-                <li>
-                  <a
-                    [routerLink]="['/guide', topic.id]"
-                    class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
-                  >
-                    <span class="text-base"><iconify-icon [icon]="topic.icon"></iconify-icon></span>
-                    <span class="truncate flex-1">{{ topic.title }}</span>
-                    @if (isUnread(topic.id)) {
-                      <span class="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"></span>
-                    }
-                  </a>
-                </li>
-              }
-            </ul>
-          </div>
+        @if (searchEmpty()) {
+          <p class="text-xs text-slate-500 px-1 py-2">Aucune fiche pour « {{ query().trim() }} »</p>
+        } @else {
+          @for (section of sections(); track section.groupId) {
+            <div class="space-y-1">
+              <p class="text-[9px] font-black uppercase tracking-widest text-slate-600 px-1">
+                {{ section.groupLabel }}
+              </p>
+              <ul class="space-y-0.5">
+                @for (topic of section.topics; track topic.id) {
+                  <li>
+                    <a
+                      [routerLink]="['/guide', topic.id]"
+                      class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
+                    >
+                      <span class="text-base"><iconify-icon [icon]="topic.icon"></iconify-icon></span>
+                      <span class="truncate flex-1">{{ topic.title }}</span>
+                      @if (isUnread(topic.id)) {
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"></span>
+                      }
+                    </a>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
         }
       </div>
     </aside>
@@ -162,21 +166,25 @@
 
         <section class="space-y-4 pb-16">
           <h3 class="text-sm font-black uppercase tracking-widest text-slate-500">Tous les chapitres</h3>
-          @for (section of sections(); track section.groupId) {
-            <div class="space-y-2">
-              <p class="text-xs font-serif text-slate-300">{{ section.groupLabel }}</p>
-              <div class="flex flex-wrap gap-2">
-                @for (topic of section.topics; track topic.id) {
-                  <a
-                    [routerLink]="['/guide', topic.id]"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-800 text-xs text-slate-400 hover:text-amber-200 hover:border-amber-700/40"
-                  >
-                    <iconify-icon [icon]="topic.icon"></iconify-icon>
-                    {{ topic.title }}
-                  </a>
-                }
+          @if (searchEmpty()) {
+            <p class="text-sm text-slate-500">Aucune fiche ne correspond à votre recherche.</p>
+          } @else {
+            @for (section of sections(); track section.groupId) {
+              <div class="space-y-2">
+                <p class="text-xs font-serif text-slate-300">{{ section.groupLabel }}</p>
+                <div class="flex flex-wrap gap-2">
+                  @for (topic of section.topics; track topic.id) {
+                    <a
+                      [routerLink]="['/guide', topic.id]"
+                      class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-800 text-xs text-slate-400 hover:text-amber-200 hover:border-amber-700/40"
+                    >
+                      <iconify-icon [icon]="topic.icon"></iconify-icon>
+                      {{ topic.title }}
+                    </a>
+                  }
+                </div>
               </div>
-            </div>
+            }
           }
         </section>
       </div>

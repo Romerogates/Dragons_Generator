@@ -139,4 +139,33 @@ describe('CampaignSessionNotes', () => {
     component.toggleBoardLock();
     expect(component.boardLocked()).toBe(true);
   });
+
+  it('opens in-app confirm before removing a pad', () => {
+    const a = createSessionPlayPad('note', 'A', 0);
+    const b = createSessionPlayPad('note', 'B', 1);
+    fixture.componentRef.setInput('session', {
+      ...baseSession,
+      playPads: [a, b],
+      playNotes: '',
+    });
+    fixture.detectChanges();
+
+    component.requestRemovePad(a.id);
+    expect(component.padToRemove()).toBe(a.id);
+
+    const spy = jasmine.createSpy('pads');
+    component.padsChange.subscribe(spy);
+    component.confirmRemovePad();
+    expect(component.padToRemove()).toBeNull();
+    expect(spy.calls.mostRecent().args[0].playPads.length).toBe(1);
+  });
+
+  it('blocks removing the last pad with a notice', () => {
+    const pad = createSessionPlayPad('note', 'Only', 0);
+    fixture.componentRef.setInput('session', { ...baseSession, playPads: [pad], playNotes: '' });
+    fixture.detectChanges();
+    component.requestRemovePad(pad.id);
+    expect(component.padToRemove()).toBeNull();
+    expect(component.padNotice()).toContain('au moins');
+  });
 });

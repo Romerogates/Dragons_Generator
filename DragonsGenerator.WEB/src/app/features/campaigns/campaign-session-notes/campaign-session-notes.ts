@@ -4,6 +4,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   ElementRef,
   computed,
+  effect,
   input,
   output,
   signal,
@@ -52,6 +53,11 @@ interface DragState {
   colW: number;
 }
 
+interface SessionNotesUiPrefs {
+  boardLocked: boolean;
+  resumeCollapsed: boolean;
+}
+
 @Component({
   selector: 'app-campaign-session-notes',
   standalone: true,
@@ -78,11 +84,14 @@ export class CampaignSessionNotes {
   /** false = widgets déplaçables / redimensionnables. */
   readonly boardLocked = signal(true);
   readonly dragPreview = signal<Record<string, SessionPlayPadLayout>>({});
+  readonly padToRemove = signal<string | null>(null);
+  readonly padNotice = signal<string | null>(null);
   readonly padMax = SESSION_PLAY_PAD_MAX;
   readonly gridCols = PAD_GRID_COLS;
   readonly rowPx = PAD_GRID_ROW_PX;
 
   private drag: DragState | null = null;
+  private skipUiPersist = true;
 
   readonly resumePage = computed(() => ensureSessionResume(this.sessionResume()));
   readonly pads = computed(() => {
@@ -93,6 +102,25 @@ export class CampaignSessionNotes {
   });
 
   readonly boardRows = computed(() => boardRowCount(this.pads()));
+
+  constructor() {
+    effect(() => {
+      const id = this.session().id;
+      this.skipUiPersist = true;
+      this.applyStoredUi(id);
+      queueMicrotask(() => {
+        this.skipUiPersist = false;
+      });
+    });
+
+    effect(() => {
+      const id = this.session().id;
+      const boardLocked = this.boardLocked();
+      const resumeCollapsed = this.resumeCollapsed();
+      if (this.skipUiPersist) return;
+      this.persistUi(id, { boardLocked, resumeCollapsed });
+    });
+  }
 
   padStyle(pad: SessionPlayPad): Record<string, string> {
     return padGridStyle(pad.layout ?? { x: 0, y: 0, w: PAD_DEFAULT_W, h: PAD_DEFAULT_H });
@@ -117,6 +145,7 @@ export class CampaignSessionNotes {
     const layout = findFreeLayout(PAD_DEFAULT_W, PAD_DEFAULT_H, occupied);
     const pad = createSessionPlayPad('note', `Notes ${current.length + 1}`, current.length, layout);
     this.emitPads([...current, pad]);
+    this.scrollPadIntoView(pad.id);
   }
 
   addChecklistPad(): void {
@@ -131,6 +160,7 @@ export class CampaignSessionNotes {
       layout,
     );
     this.emitPads([...current, pad]);
+    this.scrollPadIntoView(pad.id);
   }
 
   setPadTitle(id: string, title: string): void {
@@ -146,14 +176,28 @@ export class CampaignSessionNotes {
     );
   }
 
-  removePad(id: string): void {
-    const list = this.pads();
-    if (list.length <= 1) {
-      alert('Gardez au moins un calepin.');
+  requestRemovePad(id: string): void {
+    this.padNotice.set(null);
+    if (this.pads().length <= 1) {
+      this.padNotice.set('Gardez au moins un calepin.');
       return;
     }
-    if (!confirm('Supprimer ce calepin ?')) return;
-    this.emitPads(list.filter((p) => p.id !== id).map((p, i) => ({ ...p, order: i })));
+    this.padToRemove.set(id);
+  }
+
+  cancelRemovePad(): void {
+    this.padToRemove.set(null);
+  }
+
+  confirmRemovePad(): void {
+    const id = this.padToRemove();
+    if (!id) return;
+    this.padToRemove.set(null);
+    this.emitPads(this.pads().filter((p) => p.id !== id).map((p, i) => ({ ...p, order: i })));
+  }
+
+  dismissPadNotice(): void {
+    this.padNotice.set(null);
   }
 
   onPadPageChange(id: string, page: NotebookPage): void {
@@ -248,6 +292,43 @@ export class CampaignSessionNotes {
 
   archiveText(): string {
     return archivePlayPadsText(this.pads());
+  }
+
+  private scrollPadIntoView(padId: string): void {
+    queueMicrotask(() => {
+      document
+        .getElementById(`session-pad-${padId}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  }
+
+  private uiStorageKey(sessionId: string): string {
+    return `dg-session-notes-ui:${sessionId}`;
+  }
+
+  private applyStoredUi(sessionId: string): void {
+    try {
+      const raw = localStorage.getItem(this.uiStorageKey(sessionId));
+      if (!raw) {
+        this.boardLocked.set(true);
+        this.resumeCollapsed.set(false);
+        return;
+      }
+      const parsed = JSON.parse(raw) as Partial<SessionNotesUiPrefs>;
+      this.boardLocked.set(parsed.boardLocked !== false);
+      this.resumeCollapsed.set(!!parsed.resumeCollapsed);
+    } catch {
+      this.boardLocked.set(true);
+      this.resumeCollapsed.set(false);
+    }
+  }
+
+  private persistUi(sessionId: string, prefs: SessionNotesUiPrefs): void {
+    try {
+      localStorage.setItem(this.uiStorageKey(sessionId), JSON.stringify(prefs));
+    } catch {
+      /* quota / private mode */
+    }
   }
 
   private beginDrag(ev: PointerEvent, pad: SessionPlayPad, mode: DragMode): void {

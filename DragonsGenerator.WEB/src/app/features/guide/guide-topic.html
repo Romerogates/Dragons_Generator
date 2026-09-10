@@ -43,12 +43,18 @@
           }
         </div>
 
-        @for (g of groups; track g.id) {
-          <div class="space-y-1">
-            <p class="text-[9px] font-black uppercase tracking-widest text-slate-600 px-1">{{ g.label }}</p>
-            <ul class="space-y-0.5">
-              @for (t of sidebarTopics(); track t.id) {
-                @if (t.groupId === g.id) {
+        @if (searchEmpty()) {
+          <p class="text-xs text-slate-500 px-1 py-2">
+            Aucune fiche pour « {{ navQuery().trim() }} »
+          </p>
+        } @else {
+          @for (section of sidebarSections(); track section.groupId) {
+            <div class="space-y-1">
+              <p class="text-[9px] font-black uppercase tracking-widest text-slate-600 px-1">
+                {{ section.groupLabel }}
+              </p>
+              <ul class="space-y-0.5">
+                @for (t of section.topics; track t.id) {
                   <li>
                     <a
                       [routerLink]="['/guide', t.id]"
@@ -67,9 +73,9 @@
                     </a>
                   </li>
                 }
-              }
-            </ul>
-          </div>
+              </ul>
+            </div>
+          }
         }
       </div>
     </aside>
@@ -202,11 +208,38 @@
 
           @if (t.checklist.length) {
             <section class="space-y-3">
-              <h2 class="text-xl font-serif text-slate-100 border-b border-slate-800 pb-2">Checklist</h2>
+              <div class="flex items-end justify-between gap-3 border-b border-slate-800 pb-2">
+                <h2 class="text-xl font-serif text-slate-100">Checklist</h2>
+                @if (checklistProgress(t.checklist); as prog) {
+                  <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                    {{ prog.done }} / {{ prog.total }}
+                  </p>
+                }
+              </div>
               <ul class="space-y-2">
                 @for (item of t.checklist; track item.id) {
-                  <li class="flex gap-2 text-sm text-slate-300">
-                    <span class="text-emerald-500/80">☐</span> {{ item.label }}
+                  <li>
+                    <button
+                      type="button"
+                      class="w-full flex items-start gap-3 text-left text-sm rounded-lg px-2 py-2 hover:bg-slate-800/50"
+                      role="checkbox"
+                      [attr.aria-checked]="!!checklistDone()[item.id]"
+                      (click)="toggleChecklist(item.id)"
+                    >
+                      <span
+                        class="mt-0.5 w-5 h-5 shrink-0 rounded border flex items-center justify-center text-[10px] font-black"
+                        [class]="
+                          checklistDone()[item.id]
+                            ? 'bg-emerald-500 border-emerald-400 text-slate-950'
+                            : 'border-slate-600 text-transparent'
+                        "
+                      >
+                        ✓
+                      </span>
+                      <span [class]="checklistDone()[item.id] ? 'text-slate-500 line-through' : 'text-slate-300'">
+                        {{ item.label }}
+                      </span>
+                    </button>
                   </li>
                 }
               </ul>
