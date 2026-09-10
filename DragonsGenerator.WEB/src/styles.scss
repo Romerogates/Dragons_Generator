@@ -61,6 +61,18 @@
     }
   }
 
+  /* Calepins session — scroll sans barre (ambiance table) */
+  .session-notes-scroll,
+  .session-notes-scroll * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .session-notes-scroll::-webkit-scrollbar,
+  .session-notes-scroll *::-webkit-scrollbar {
+    display: none;
+  }
+
   .guide-sommaire-wrap {
     position: relative;
     min-height: 0;

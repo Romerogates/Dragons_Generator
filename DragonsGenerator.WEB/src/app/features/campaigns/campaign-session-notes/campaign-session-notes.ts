@@ -220,7 +220,7 @@ export class CampaignSessionNotes {
   }
 
   onDragHandlePointerDown(ev: PointerEvent, pad: SessionPlayPad): void {
-    if (this.boardLocked() || pad.collapsed) return;
+    if (this.boardLocked()) return;
     this.beginDrag(ev, pad, 'move');
   }
 
