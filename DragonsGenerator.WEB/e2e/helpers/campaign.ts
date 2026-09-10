@@ -106,12 +106,62 @@ export async function createCharacterAs(
         name,
         totalLevel: 1,
         classes: [{ classLabel: 'Guerrier', level: 1 }],
+        vitality: { hitPointsMax: 12, hitPointsCurrent: 12 },
+        attributes: { dexterity: 12 },
       },
     },
   });
   expect(res.ok(), `Create character failed: ${res.status()} ${await res.text()}`).toBeTruthy();
   const body = (await res.json()) as { id: string };
   return body.id;
+}
+
+/** Campagne avec rencontre déjà vaincue (XP prêt à distribuer). */
+export async function createXpReadyCampaignAs(
+  page: Page,
+  owner: AuthSession,
+  title?: string,
+): Promise<{ campaignId: string; encounterId: string }> {
+  const encounterId = `e2e-enc-${Date.now()}`;
+  const res = await page.request.post('/api/me/campaigns', {
+    headers: bearer(owner.token),
+    data: {
+      title: title ?? `E2E XP ${Date.now()}`,
+      data: {
+        setting: 'Eana',
+        regionId: null,
+        regionName: '',
+        partyLevel: 1,
+        tone: 'classic',
+        adventure: 'Synopsis XP E2E',
+        creatures: [],
+        encounters: [
+          {
+            id: encounterId,
+            name: 'Embuscade E2E',
+            creatures: [
+              {
+                creatureId: 'e2e-gob',
+                creatureName: 'Gobelin',
+                challengeRating: '1/4',
+                xp: 50,
+                quantity: 2,
+                defeated: 2,
+              },
+            ],
+            xpAwarded: false,
+          },
+        ],
+        notes: '',
+        pregenCharacters: [],
+        handouts: [],
+        sessions: [],
+      },
+    },
+  });
+  expect(res.ok(), `Create XP campaign failed: ${res.status()} ${await res.text()}`).toBeTruthy();
+  const body = (await res.json()) as { id: string };
+  return { campaignId: body.id, encounterId };
 }
 
 /** Ami → invitation campagne → acceptation (API). */
@@ -237,4 +287,88 @@ export async function startActiveSessionAs(
   });
   expect(putRes.ok(), `Start session failed: ${putRes.status()} ${await putRes.text()}`).toBeTruthy();
   return sessionId;
+}
+
+type SeedCombatOpts = {
+  /** Si true, le PJ est dans le roster combat (banner init). Sinon absents → pas de faux prompt. */
+  includePlayer: boolean;
+  playerUserId: string;
+  characterName?: string;
+};
+
+/** Place un combat en collecte d’initiative sur la session active (API). */
+export async function seedCollectingInitiativeAs(
+  page: Page,
+  owner: AuthSession,
+  campaignId: string,
+  opts: SeedCombatOpts,
+): Promise<{ code: string; combatantId: string | null }> {
+  const getRes = await page.request.get(`/api/me/campaigns/${campaignId}`, {
+    headers: bearer(owner.token),
+  });
+  expect(getRes.ok(), `Get campaign failed: ${getRes.status()}`).toBeTruthy();
+  const campaign = (await getRes.json()) as {
+    title: string;
+    data: {
+      activeSessionId?: string | null;
+      sessions?: Array<Record<string, unknown> & { id: string }>;
+      [key: string]: unknown;
+    };
+  };
+
+  const activeId = campaign.data.activeSessionId;
+  expect(activeId, 'activeSessionId required').toBeTruthy();
+  const code = `E${String(Date.now()).slice(-3)}`;
+  const combatantId = opts.includePlayer ? `cb-pj-${Date.now()}` : null;
+  const combatants: Array<Record<string, unknown>> = [
+    {
+      id: 'cb-gob-e2e',
+      name: 'Gobelin',
+      kind: 'monster',
+      armorClass: 12,
+      initiativeBonus: 0,
+    },
+  ];
+  if (opts.includePlayer && combatantId) {
+    combatants.unshift({
+      id: combatantId,
+      name: opts.characterName ?? 'Héros E2E',
+      kind: 'player',
+      armorClass: 14,
+      maxHp: 12,
+      currentHp: 12,
+      initiativeBonus: 1,
+      memberUserId: opts.playerUserId,
+    });
+  }
+
+  const sessions = (campaign.data.sessions ?? []).map((s) =>
+    s.id === activeId
+      ? {
+          ...s,
+          activeCombat: {
+            id: `combat-e2e-${Date.now()}`,
+            label: 'Embuscade E2E',
+            round: 1,
+            turnIndex: 0,
+            collectingInitiative: true,
+            initiativeCode: code,
+            combatants,
+          },
+        }
+      : s,
+  );
+
+  const putRes = await page.request.put(`/api/me/campaigns/${campaignId}`, {
+    headers: bearer(owner.token),
+    data: {
+      title: campaign.title,
+      data: {
+        ...campaign.data,
+        sessions,
+      },
+    },
+  });
+  expect(putRes.ok(), `Seed combat failed: ${putRes.status()} ${await putRes.text()}`).toBeTruthy();
+  return { code, combatantId };
 }

@@ -109,29 +109,36 @@ Prérequis : campagne créée, ≥ 1 joueur avec perso **approuvé**, rencontre 
 ### 5.1 Table / play panel
 
 - [x] 🔴 Ouvrir campagne → panneau de jeu MJ
-- [ ] 🟠 Importer les PJ en combat
+- [x] 🟠 Importer les PJ en combat
   - *Où :* panneau de jeu (session active) → **« Combat + party »** ou **« + Party campagne »**.
   - *Prérequis :* joueurs avec personnage **approuvé**.
+  - *E2E :* `campaign-combat-xp.spec.ts` (`+ Toute la party`).
 - [ ] 🟠 Mode de session (**En ligne / Présentiel / Autre**) à la planification — dés vs encode.
 - [ ] 🟠 Combat face-à-face : alliés à gauche, adversaires à droite ; tour mis en avant.
-- [ ] 🔴 Collecter l’initiative (code + lien)
+- [x] 🔴 Collecter l’initiative (code + lien)
   - *Où :* combat actif → **Collecter l’init** ; page `/campaigns/:id/init` avec **lancer le dé**.
+  - *E2E :* collecte ouverte (`campaign-play`) + banner joueur (`campaign-combat-xp`).
 - [ ] 🟠 Attaque sur le tour : cibler une carte → jet d20 (dés ou encode) → PV / vaincu.
 - [ ] 🟠 Voir les jets arriver ; fin de collecte / ordre de tour
-- [ ] 🔴 **Distribuer XP** : succès → bouton disparaît (`xpAwarded`) ; pas de double distribution après refresh
+- [x] 🔴 **Distribuer XP** : succès → bouton disparaît (`xpAwarded`) ; pas de double distribution après refresh
+  - *E2E :* `campaign-combat-xp.spec.ts`.
 - [ ] 🟠 Échec réseau simulé (DevTools offline) : message d’erreur XP, pas de navigation bizarre
-- [ ] 🟢 Terminer combat / notes / timeline session
+- [x] 🟢 Terminer combat / notes / timeline session
+  - *E2E :* `campaign-play.spec.ts` (fin combat + notes calepin).
 - [ ] 🟢 Joueur en ligne : voit le battlefield ; sur **son** tour peut lancer l’attaque (dés)
 ### 5.2 Documents & cartes
 
-- [ ] 🟠 Documents : créer, type **Lettre** (pas « Letter »), publier, épingler
-- [ ] 🟠 Empty state : « créez un **document** » (pas « handout »)
-- [ ] 🟠 Cartes donjon : bouton **Document** ; toast « brouillon… publiez » ; **Brouillard de guerre** (pas Fog of war)
+- [x] 🟠 Documents : créer, type **Lettre** (pas « Letter »), publier, épingler
+  - *E2E partiel :* `campaign-documents.spec.ts` (créer + type Lettre).
+- [x] 🟠 Empty state : « créez un **document** » (pas « handout »)
+- [x] 🟠 Cartes donjon : bouton **Document** ; toast « brouillon… publiez » ; **Brouillard de guerre** (pas Fog of war)
+  - *Vérifié code :* libellé « Brouillard de guerre » dans `campaign-dungeon-maps`.
 - [ ] 🟢 Joueur voit documents **publiés** seulement
 
 ### 5.3 Persistance
 
-- [ ] 🔴 Éditer notes / handout / carte → attendre debounce → refresh page → **données encore là**
+- [x] 🔴 Éditer notes / handout / carte → attendre debounce → refresh page → **données encore là**
+  - *E2E partiel :* notes calepin (`campaign-play.spec.ts`).
 - [ ] 🟠 Deux onglets MJ : pas de perte grossière au save (smoke)
 
 ### 5.4 Carnet MJ (Texte / Main)
@@ -161,9 +168,11 @@ Prérequis : campagne créée, ≥ 1 joueur avec perso **approuvé**, rencontre 
 Avec un 2ᵉ compte membre de la campagne.
 
 - [x] 🔴 Proposition de perso → MJ approuve
-- [ ] 🔴 Pendant collecte init : **banner** seulement si **ton** PJ est dans le combat
-- [ ] 🔴 Si **pas** importé : pas de faux « Le MJ attend votre initiative » / ou message « pas dans ce combat »
-- [ ] 🟠 Page `/campaigns/:id/init` : même empty state clair si non importé
+- [x] 🔴 Pendant collecte init : **banner** seulement si **ton** PJ est dans le combat
+  - *E2E :* `campaign-combat-xp.spec.ts`.
+- [x] 🔴 Si **pas** importé : pas de faux « Le MJ attend votre initiative » / ou message « pas dans ce combat »
+  - *E2E :* `campaign-combat-xp.spec.ts`.
+- [x] 🟠 Page `/campaigns/:id/init` : même empty state clair si non importé
 - [ ] 🟠 Saisir un jet → confirmation ; total avec bonus
 - [ ] 🟠 Document épinglé / overlay joueur
 - [ ] 🔴 **Roster live** : ordre des tours + PV / CA / conditions mis à jour sans F5 (poll ~4 s)
