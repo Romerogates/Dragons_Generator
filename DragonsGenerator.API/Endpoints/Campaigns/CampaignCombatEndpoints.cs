@@ -8,7 +8,7 @@ namespace DragonsGenerator.API.Endpoints.Campaigns;
 /// <summary>
 /// Persistance d'une résolution d'attaque joueur (PV + journal) sans ouvrir le PUT campagne.
 /// </summary>
-public class ResolveCombatAttackEndpoint(AppDbContext db) : Endpoint<ResolveCombatAttackRequest>
+public class ResolveCombatAttackEndpoint(AppDbContext db, CampaignLivePublisher live) : Endpoint<ResolveCombatAttackRequest>
 {
     public override void Configure() => Post("/me/campaigns/{id}/combat/resolve-attack");
 
@@ -68,6 +68,7 @@ public class ResolveCombatAttackEndpoint(AppDbContext db) : Endpoint<ResolveComb
             try
             {
                 await db.SaveChangesAsync(ct);
+                await live.NotifyAsync(campaign.Id, campaign.UpdatedAt, CampaignLiveReasons.Combat, ct);
                 await Send.NoContentAsync(ct);
                 return;
             }

@@ -16,9 +16,10 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { forkJoin, of, firstValueFrom } from 'rxjs';
+import { forkJoin, of, firstValueFrom, Subscription } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
+import { CampaignLiveService } from '@core/services/campaign-live.service';
 import { AuthService } from '@core/services/auth.service';
 import { DataService } from '@core/services/data.service';
 import type { Character } from '@core/models/Character/character';
@@ -78,7 +79,7 @@ import {
   rollDie,
   type RollChoice,
 } from '@core/utils/combat-roll.util';
-import { mergeRemoteInitiativeRolls } from '@core/utils/campaign-persist.util';
+import { mergeRemoteLiveTable } from '@core/utils/campaign-persist.util';
 import {
   normalizeSessionMode,
   sessionModeHint,
@@ -129,6 +130,7 @@ export type PlaySessionView =
 })
 export class CampaignPlayPanel implements OnDestroy {
   private readonly campaigns = inject(CampaignCloudService);
+  private readonly live = inject(CampaignLiveService);
   private readonly data = inject(DataService);
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
@@ -174,6 +176,7 @@ export class CampaignPlayPanel implements OnDestroy {
 
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
   private initiativePollTimer: ReturnType<typeof setInterval> | null = null;
+  private initiativeLiveSub: Subscription | null = null;
   private feedbackTimer: ReturnType<typeof setTimeout> | null = null;
   private persistSeq = 0;
   private persistTail: Promise<void> = Promise.resolve();
@@ -340,9 +343,22 @@ export class CampaignPlayPanel implements OnDestroy {
 
   /** Canvas carte live (vue joueur). */
   private readonly liveDungeonCanvas = viewChild<ElementRef<HTMLCanvasElement>>('liveDungeonCanvas');
+  private mapResizeObserver: ResizeObserver | null = null;
 
   /** Réinitialise la vue table si on change / quitte la session (dock réutilisé). */
   private lastBoundSessionId: string | null | undefined = undefined;
+
+  /** Joueur mobile : roster compact (tour + vous) sauf si déplié. */
+  readonly playerRosterExpanded = signal(false);
+
+  readonly playerRosterLines = computed(() => {
+    const order = this.combatTurnOrder();
+    if (this.isDm() || this.playerRosterExpanded()) return order;
+    const turnId = this.currentTurn()?.id;
+    const myId = this.myCombatant()?.id;
+    const compact = order.filter((c) => c.id === turnId || c.id === myId);
+    return compact.length ? compact : order.slice(0, 2);
+  });
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -352,7 +368,7 @@ export class CampaignPlayPanel implements OnDestroy {
       const map = this.activeSessionMap();
       const canvasRef = this.liveDungeonCanvas();
       const isDm = this.isDm();
-      untracked(() => this.paintLiveDungeon(map, canvasRef?.nativeElement ?? null, isDm));
+      untracked(() => this.bindLiveDungeonCanvas(map, canvasRef?.nativeElement ?? null, isDm));
     });
     effect(() => {
       const sessionId = this.campaign().data.activeSessionId ?? null;
@@ -375,6 +391,7 @@ export class CampaignPlayPanel implements OnDestroy {
     });
     effect(() => {
       const collecting = !!this.activeCombat()?.collectingInitiative && this.isDm();
+      this.live.connected();
       untracked(() => {
         if (collecting) this.startInitiativePoll();
         else this.stopInitiativePoll();
@@ -481,6 +498,7 @@ export class CampaignPlayPanel implements OnDestroy {
     }
     this.flushPendingSessionWork();
     this.stopInitiativePoll();
+    this.teardownMapResize();
     if (this.feedbackTimer) clearTimeout(this.feedbackTimer);
   }
 
@@ -716,14 +734,41 @@ export class CampaignPlayPanel implements OnDestroy {
     this.saveData(patch);
   }
 
+  private bindLiveDungeonCanvas(
+    map: CampaignDungeonMap | null,
+    canvas: HTMLCanvasElement | null,
+    isDm: boolean,
+  ): void {
+    this.teardownMapResize();
+    this.paintLiveDungeon(map, canvas, isDm);
+    if (isDm || !map || !canvas?.parentElement) return;
+    if (typeof ResizeObserver === 'undefined') return;
+    const host = canvas.parentElement;
+    this.mapResizeObserver = new ResizeObserver(() => {
+      this.paintLiveDungeon(this.activeSessionMap(), canvas, this.isDm());
+    });
+    this.mapResizeObserver.observe(host);
+  }
+
+  private teardownMapResize(): void {
+    this.mapResizeObserver?.disconnect();
+    this.mapResizeObserver = null;
+  }
+
   private paintLiveDungeon(
     map: CampaignDungeonMap | null,
     canvas: HTMLCanvasElement | null,
     isDm: boolean,
   ): void {
     if (isDm || !map || !canvas) return;
-    const cell = Math.max(4, Math.min(14, Math.floor(560 / Math.max(1, map.gridWidth))));
+    const hostW = canvas.parentElement?.clientWidth ?? 0;
+    const width = Math.max(280, hostW || 360);
+    const cell = Math.max(6, Math.min(20, Math.floor(width / Math.max(1, map.gridWidth))));
     drawDungeonToCanvas(map, canvas, cell, playerExportDrawOptions(map));
+  }
+
+  togglePlayerRoster(): void {
+    this.playerRosterExpanded.update((v) => !v);
   }
 
   onSessionResumeChange(page: NotebookPage): void {
@@ -1740,16 +1785,25 @@ export class CampaignPlayPanel implements OnDestroy {
 
   private startInitiativePoll(): void {
     this.stopInitiativePoll();
+    const campaignId = this.campaign().id;
+    this.initiativeLiveSub = this.live.updates(campaignId).subscribe((evt) => {
+      if (evt.reason === 'initiative' || evt.reason === 'combat' || evt.reason === 'campaign') {
+        this.pollInitiativeRolls();
+      }
+    });
+    const ms = this.live.fallbackPollMs(1_500, 8_000);
     this.initiativePollTimer = setInterval(() => {
       if (!this.activeCombat()?.collectingInitiative) {
         this.stopInitiativePoll();
         return;
       }
       this.pollInitiativeRolls();
-    }, 1500);
+    }, ms);
   }
 
   private stopInitiativePoll(): void {
+    this.initiativeLiveSub?.unsubscribe();
+    this.initiativeLiveSub = null;
     if (!this.initiativePollTimer) return;
     clearInterval(this.initiativePollTimer);
     this.initiativePollTimer = null;
@@ -2078,7 +2132,7 @@ export class CampaignPlayPanel implements OnDestroy {
     const c = this.campaign();
     this.campaigns.get(c.id).subscribe({
       next: (remote) => {
-        const merged = mergeRemoteInitiativeRolls(this.campaign(), remote);
+        const merged = mergeRemoteLiveTable(this.campaign(), remote);
         this.campaignChange.emit(merged);
         const session = merged.data.sessions?.find((s) => s.id === merged.data.activeSessionId);
         const combat = session?.activeCombat;

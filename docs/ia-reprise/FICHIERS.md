@@ -77,7 +77,10 @@ Chemins depuis la racine du repo `Dragons_Generator`. Lire seulement ceux du suj
 - `DragonsGenerator.WEB/src/app/core/utils/campaign-persist.util.ts`
 - `DragonsGenerator.WEB/src/app/core/utils/campaign-initiative.util.ts` (+ spec)
 - `DragonsGenerator.WEB/src/app/core/services/campaign-cloud.service.ts`
+- `DragonsGenerator.WEB/src/app/core/services/campaign-live.service.ts` (+ spec)
 - `DragonsGenerator.WEB/src/app/core/services/campaign-session-dock.service.ts`
+- `DragonsGenerator.API/Hubs/CampaignLiveHub.cs`
+- `DragonsGenerator.API/Services/CampaignLivePublisher.cs`
 - `DragonsGenerator.WEB/src/app/shared/components/campaign-session-dock/`
 - `DragonsGenerator.WEB/src/app/core/services/notification.service.ts`
 - `DragonsGenerator.API/Endpoints/Notifications/NotificationsEndpoints.cs`

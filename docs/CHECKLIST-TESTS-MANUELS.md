@@ -116,7 +116,7 @@ Prérequis : campagne créée, ≥ 1 joueur avec perso **approuvé**, rencontre 
 - [x] 🟠 Mode de session (**En ligne / Présentiel / Autre**) à la planification — dés vs encode.
   - *E2E :* `campaign-live-polish.spec.ts` (mode Autre → Encoder / Lancer le dé).
 - [x] 🟠 Combat face-à-face : alliés à gauche, adversaires à droite ; tour mis en avant.
-  - Desktop `lg` colonnes ; mobile stack + séparateur « vs » ; bandeau « Tour de… » sticky.
+  - Desktop `lg` colonnes ; mobile stack adversaires d’abord + séparateur « vs » ; bandeau « Tour de… » sticky (+ Attaquer/Passer joueur).
 - [x] 🔴 Collecter l’initiative (code + lien)
   - *Où :* combat actif → **Collecter l’init** ; page `/campaigns/:id/init` avec **lancer le dé**.
   - *E2E :* collecte ouverte (`campaign-play`) + banner joueur (`campaign-combat-xp`).
@@ -139,7 +139,7 @@ Prérequis : campagne créée, ≥ 1 joueur avec perso **approuvé**, rencontre 
 - [x] 🟠 Empty state : « créez un **document** » (pas « handout »)
 - [x] 🟠 Cartes donjon : bouton **Document** ; toast « brouillon… publiez » ; **Brouillard de guerre** (pas Fog of war)
   - *Vérifié code :* libellé « Brouillard de guerre » dans `campaign-dungeon-maps`.
-  - *Live :* joueurs reçoivent la carte de session active (fog) via GET + canvas table ; poll `/play` 4 s.
+  - *Live :* joueurs reçoivent la carte de session active (fog) via GET + canvas table ; **SignalR** + poll de secours `/play`.
 - [x] 🟢 Joueur voit documents **publiés** seulement
   - *E2E :* `campaign-live-polish.spec.ts`.
 
@@ -188,10 +188,11 @@ Avec un 2ᵉ compte membre de la campagne.
   - *E2E partiel :* `campaign-live-polish.spec.ts` (banner → Envoyer jet).
 - [x] 🟠 Document épinglé / overlay joueur
   - *E2E :* `campaign-live-polish.spec.ts`.
-- [x] 🔴 **Roster live** : ordre des tours + PV / CA / conditions mis à jour sans F5 (poll ~4 s)
+- [x] 🔴 **Roster live** : ordre des tours + PV / CA / conditions mis à jour sans F5 (poll ~4 s **ou SignalR**)
   - *E2E :* `campaign-live-polish.spec.ts` (MJ −5 PV → joueur voit 15/20).
+  - *P0 2026-09-10 :* hub SignalR `campaignUpdated` + fallback poll 30 s si connecté / 4 s sinon.
 - [x] 🟢 XP reçue visible côté joueur (si UI le montre)
-  - Banner `+N XP reçue` via softReload / poll ; activité `xp_awarded` ; e2e `campaign-combat-xp`.
+  - Banner `+N XP reçue` via softReload / poll / SignalR ; activité `xp_awarded` ; e2e `campaign-combat-xp`.
 
 ---
 

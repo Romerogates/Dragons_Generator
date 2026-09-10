@@ -16,8 +16,6 @@ import { CampaignSessionDockService } from '@core/services/campaign-session-dock
 import { AuthService } from '@core/services/auth.service';
 import { DiceRollComponent } from '@shared/components/dice-roll/dice-roll';
 import { FullscreenEnterBtn } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-btn';
-import { CampaignPlayPanel } from '../../../features/campaigns/campaign-play-panel/campaign-play-panel';
-import type { CampaignDetail } from '@core/models/Campaign/campaign';
 import { sessionModeLabel } from '../../../features/campaigns/campaign-detail/campaign-session.util';
 
 type DockTab = 'live' | 'table' | 'dice';
@@ -25,7 +23,7 @@ type DockTab = 'live' | 'table' | 'dice';
 @Component({
   selector: 'app-campaign-session-dock',
   standalone: true,
-  imports: [CommonModule, DiceRollComponent, CampaignPlayPanel, FullscreenEnterBtn],
+  imports: [CommonModule, DiceRollComponent, FullscreenEnterBtn],
   templateUrl: './campaign-session-dock.html',
   styleUrl: './campaign-session-dock.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -111,9 +109,5 @@ export class CampaignSessionDockComponent implements OnInit {
     if (!id) return;
     this.dock.close();
     void this.router.navigate(['/campaigns', id]);
-  }
-
-  onCampaignChange(detail: CampaignDetail): void {
-    this.dock.patchLiveCampaign(detail);
   }
 }

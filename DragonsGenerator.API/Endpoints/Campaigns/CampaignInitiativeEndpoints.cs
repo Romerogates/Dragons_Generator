@@ -44,7 +44,7 @@ public class GetInitiativeBoardEndpoint(AppDbContext db) : EndpointWithoutReques
     }
 }
 
-public class SubmitInitiativeEndpoint(AppDbContext db) : Endpoint<SubmitInitiativeRequest>
+public class SubmitInitiativeEndpoint(AppDbContext db, CampaignLivePublisher live) : Endpoint<SubmitInitiativeRequest>
 {
     public override void Configure() => Post("/me/campaigns/{id}/initiative/submit");
 
@@ -95,6 +95,7 @@ public class SubmitInitiativeEndpoint(AppDbContext db) : Endpoint<SubmitInitiati
             try
             {
                 await db.SaveChangesAsync(ct);
+                await live.NotifyAsync(campaign.Id, campaign.UpdatedAt, CampaignLiveReasons.Initiative, ct);
                 await Send.NoContentAsync(ct);
                 return;
             }

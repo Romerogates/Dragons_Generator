@@ -230,7 +230,8 @@ public class CreateCampaignEndpoint(AppDbContext db) : Endpoint<UpsertCampaignRe
     }
 }
 
-public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService push) : Endpoint<UpsertCampaignRequest, CampaignSummaryDto>
+public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService push, CampaignLivePublisher live)
+    : Endpoint<UpsertCampaignRequest, CampaignSummaryDto>
 {
     public override void Configure() => Put("/me/campaigns/{id}");
 
@@ -390,6 +391,12 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
                     ct);
             }
         }
+
+        await live.NotifyAsync(
+            campaign.Id,
+            campaign.UpdatedAt,
+            initiativeChange is not null ? CampaignLiveReasons.Initiative : CampaignLiveReasons.Campaign,
+            ct);
 
         var playerCount = campaign.Members.Count(m => m.Role == CampaignMemberRoles.Player);
         await Send.OkAsync(new CampaignSummaryDto(
@@ -1060,7 +1067,8 @@ public class LeaveCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest
     }
 }
 
-public class AwardCampaignXpEndpoint(AppDbContext db, PushNotificationService push) : Endpoint<AwardXpBody>
+public class AwardCampaignXpEndpoint(AppDbContext db, PushNotificationService push, CampaignLivePublisher live)
+    : Endpoint<AwardXpBody>
 {
     public override void Configure() => Post("/me/campaigns/{id}/award-xp");
 
@@ -1120,6 +1128,7 @@ public class AwardCampaignXpEndpoint(AppDbContext db, PushNotificationService pu
             message,
             $"/campaigns/{campaign.Id}",
             ct);
+        await live.NotifyAsync(campaign.Id, campaign.UpdatedAt, CampaignLiveReasons.Xp, ct);
         await Send.OkAsync(new { member.XpEarnedInCampaign }, ct);
     }
 }

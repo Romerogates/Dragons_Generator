@@ -90,6 +90,15 @@ builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationSc
                 if (!string.IsNullOrEmpty(authHeader))
                     return Task.CompletedTask;
 
+                // SignalR WebSockets / SSE : access_token query (cookie aussi OK same-origin).
+                var accessToken = ctx.Request.Query["access_token"].FirstOrDefault();
+                if (!string.IsNullOrEmpty(accessToken)
+                    && ctx.Request.Path.StartsWithSegments("/hubs"))
+                {
+                    ctx.Token = accessToken;
+                    return Task.CompletedTask;
+                }
+
                 if (
                     string.IsNullOrEmpty(ctx.Token)
                     && ctx.Request.Cookies.TryGetValue(AuthCookieHelper.CookieName, out var cookieToken)
@@ -102,6 +111,8 @@ builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationSc
         };
     });
 builder.Services.AddAuthorization();
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<CampaignLivePublisher>();
 
 builder.Services.AddDragonsRateLimiting(builder.Configuration, builder.Environment);
 
@@ -179,6 +190,7 @@ app.UseFastEndpoints(c =>
 {
     c.Errors.UseProblemDetails();
 });
+app.MapHub<DragonsGenerator.API.Hubs.CampaignLiveHub>("/hubs/campaign-live");
 if (!app.Environment.IsProduction())
     app.UseSwaggerGen();
 

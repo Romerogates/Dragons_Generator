@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-[#0a0d13] text-slate-300 flex flex-col">
+<div class="min-h-screen bg-[#0a0d13] text-slate-300 flex flex-col pb-[env(safe-area-inset-bottom,0px)]">
   @if (loading()) {
     <p class="text-center py-24 text-emerald-400 animate-pulse">Chargement de la table…</p>
   } @else if (error(); as err) {
@@ -8,22 +8,23 @@
     </div>
   } @else if (campaign(); as c) {
     <header
-      class="sticky top-0 z-30 border-b border-emerald-900/40 bg-[#171b22]/95 backdrop-blur-md px-4 py-3"
+      class="sticky z-30 border-b border-emerald-900/40 bg-[#171b22]/95 backdrop-blur-md px-3 py-2 sm:px-4 sm:py-3 top-[calc(4rem+env(safe-area-inset-top,0px))]"
     >
-      <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="max-w-5xl mx-auto flex items-center justify-between gap-2 sm:gap-3">
         <a
           [routerLink]="['/campaigns', c.id]"
-          class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-400 transition-colors group"
+          class="min-h-11 inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-400 transition-colors group shrink-0"
         >
-          <span class="group-hover:-translate-x-1 transition-transform">←</span> Campagne
+          <span class="group-hover:-translate-x-1 transition-transform">←</span>
+          <span class="hidden sm:inline">Campagne</span>
         </a>
-        <div class="text-center flex-1 min-w-0 px-2">
-          <p class="text-[10px] font-black uppercase tracking-widest text-emerald-500">
+        <div class="text-center flex-1 min-w-0 px-1">
+          <p class="hidden sm:block text-[10px] font-black uppercase tracking-widest text-emerald-500">
             Table de jeu · Échap pour quitter
           </p>
-          <h1 class="text-lg md:text-xl font-serif text-emerald-200 truncate">{{ c.title }}</h1>
+          <h1 class="text-base sm:text-lg md:text-xl font-serif text-emerald-200 truncate">{{ c.title }}</h1>
         </div>
-        <span class="text-[10px] font-black uppercase tracking-widest text-slate-600 w-20 text-right">
+        <span class="text-[10px] font-black uppercase tracking-widest text-slate-600 shrink-0">
           {{ c.isOwner ? 'MJ' : 'Joueur' }}
         </span>
       </div>
@@ -37,7 +38,7 @@
       }
     </header>
 
-    <main class="flex-1 w-full max-w-5xl mx-auto px-4 py-6 md:py-8">
+    <main class="flex-1 w-full max-w-5xl mx-auto px-3 py-4 sm:px-4 sm:py-6 md:py-8">
       <app-campaign-play-panel
         [campaign]="c"
         [fullscreen]="true"

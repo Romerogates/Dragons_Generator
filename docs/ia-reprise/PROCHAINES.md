@@ -15,10 +15,15 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
-*(file vide.)*
+### Vague V2 — Table live solide
+
+3. **P2** Lien d’invitation campagne (token / deep link)
+4. **P3** (optionnel) Fiche PJ consultable depuis `/play`
 
 ## Déjà livré (ne pas refaire)
 
+- **P1 UX table joueur mobile** (2026-09-10) — adversaires d’abord ; roster compact + Tout voir ; bandeau tour sticky avec Attaquer/Passer ; menu combat avant les cartes ; carte fog repliable + cellule au viewport + scroll ; header `/play` sous navbar ; dock onglet Table → CTA plein écran (plus de panel écrasé).
+- **P0 sync live SignalR** (2026-09-10) — hub `/hubs/campaign-live` ; push `campaignUpdated` sur PUT campagne / init / attaque / XP ; client `CampaignLiveService` ; poll de secours 30 s si hub OK (4 s sinon) ; merge MJ combat/fog sans écraser notes ; nginx WS + proxy `ws:true`.
 - **Polish cloche / amis / onglets** (2026-09-10) — Discover Accepter/Refuser ; notif `xp_awarded` + push + préférence ; conflit MJ = banner Recharger/Garder ; smoke §10 coché (e2e).
 - **XP joueur + amis e2e** (2026-09-10) — banner `+N XP reçue` (hub /play poll) ; activité `xp_awarded` loguée ; toasts amis accept/refus ; e2e UI amis/invites + XP visible joueur.
 - **Polish reste** (2026-09-10) — toasts jets init + `turnOrderIds` figé ; sync MJ au focus si `updatedAt` plus récent ; empty states pré-tirés / rencontres / session ; setup-guide vousvoiement ; confirmation jet joueur avec total.

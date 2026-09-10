@@ -17,13 +17,14 @@ import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CampaignCloudService, CampaignActivityItem, InitiativeBoard } from '@core/services/campaign-cloud.service';
+import { CampaignLiveService } from '@core/services/campaign-live.service';
 import { FriendsService } from '@core/services/friends.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
 import { AuthService } from '@core/services/auth.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import { NotificationService } from '@core/services/notification.service';
 import { DataService } from '@core/services/data.service';
-import { forkJoin, catchError, map, of, Observable, throwError, firstValueFrom } from 'rxjs';
+import { forkJoin, catchError, map, of, Observable, throwError, firstValueFrom, Subscription } from 'rxjs';
 import { getCampaignPdfService } from '@core/services/campaign-pdf.loader';
 import type { CreaturePrintEntry, PlayerGmSummary } from '@core/services/campaign-pdf.types';
 import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
@@ -52,6 +53,7 @@ import {
 import { ADVENTURE_TONE_LABELS, CreatureRole, StoryCreatureSelection } from '@core/models/Story/story';
 import { formatChallengeRating, getCreatureCategoryLabel } from '@core/utils/creature-display.util';
 import { shouldShowPlayerInitiativePrompt } from '@core/utils/campaign-initiative.util';
+import { mergeRemoteLiveTable } from '@core/utils/campaign-persist.util';
 import { seedNotebookFromLegacyNotes } from '@core/utils/notebook.util';
 import {
   downloadBlobUrl,
@@ -131,6 +133,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private campaigns = inject(CampaignCloudService);
+  private live = inject(CampaignLiveService);
   private friends = inject(FriendsService);
   private characters = inject(CharacterCloudService);
   private auth = inject(AuthService);
@@ -196,6 +199,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   private initiativePollTimer: ReturnType<typeof setInterval> | null = null;
   private softPollTimer: ReturnType<typeof setInterval> | null = null;
   private softPollIntervalMs = 12_000;
+  private liveSub: Subscription | null = null;
 
   readonly creatureXpMap = signal<Record<string, number>>({});
   readonly isLoadingPreview = signal(false);
@@ -216,6 +220,13 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     effect(() => {
       const c = this.campaign();
       untracked(() => this.sessionDock.bindCampaign(c));
+    });
+    effect(() => {
+      this.live.connected();
+      const c = this.campaign();
+      untracked(() => {
+        if (c) this.tuneSoftPollInterval(c);
+      });
     });
     effect(() => {
       const live = this.sessionDock.liveCampaign();
@@ -625,6 +636,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.dungeonMapsComp()?.flushPendingSave();
     this.stopInitiativeBannerPoll();
     if (this.softPollTimer) clearInterval(this.softPollTimer);
+    this.liveSub?.unsubscribe();
+    void this.live.unwatch();
     if (typeof window !== 'undefined') {
       window.removeEventListener('focus', this.onWindowFocus);
     }
@@ -709,6 +722,33 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     });
   }
 
+  /** MJ : sync combat / fog / XP membres sans écraser notes locales. */
+  private softReloadLiveTable(): void {
+    const campaignId = this.campaign()?.id;
+    if (!campaignId || this.loading() || this.saving()) return;
+    this.campaigns.get(campaignId).subscribe({
+      next: (remote) => {
+        const current = this.campaign();
+        if (!current || current.id !== remote.id) {
+          this.campaign.set(remote);
+          return;
+        }
+        if (!current.isOwner) {
+          this.announcePlayerXpGain(current, remote);
+          this.campaign.set(remote);
+          return;
+        }
+        const merged = mergeRemoteLiveTable(current, remote);
+        this.announcePlayerXpGain(current, remote);
+        this.campaign.set(merged);
+        this.sessionDock.patchLiveCampaign(merged);
+      },
+      error: () => {
+        /* ignore */
+      },
+    });
+  }
+
   private isRemoteNewer(remoteIso: string, localIso: string): boolean {
     const remote = Date.parse(remoteIso);
     const local = Date.parse(localIso);
@@ -762,9 +802,10 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const session = sessionId
       ? (c.data.sessions ?? []).find((s) => s.id === sessionId)
       : undefined;
-    const live =
+    const liveTable =
       !c.isOwner && !!(sessionId || session?.activeCombat?.combatants?.length);
-    const nextMs = live ? 4_000 : 12_000;
+    const aggressive = liveTable ? 4_000 : 12_000;
+    const nextMs = this.live.fallbackPollMs(aggressive);
     if (this.softPollIntervalMs === nextMs) return;
     this.softPollIntervalMs = nextMs;
     if (this.softPollTimer) clearInterval(this.softPollTimer);
@@ -781,6 +822,22 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         this.loading.set(false);
         this.sessionCache.cache(c.id, c.title, c.data);
         this.notifications.refresh();
+        void this.live.watch(c.id);
+        this.liveSub?.unsubscribe();
+        this.liveSub = this.live.updates(c.id).subscribe((evt) => {
+          const owner = this.campaign()?.isOwner === true;
+          if (owner && (evt.reason === 'combat' || evt.reason === 'initiative' || evt.reason === 'xp')) {
+            this.softReloadLiveTable();
+          } else {
+            this.softReload();
+          }
+          if (evt.reason === 'initiative' || !owner) {
+            this.campaigns.getInitiativeBoard(c.id).subscribe({
+              next: (board) => this.initiativeBoard.set(board),
+              error: () => this.initiativeBoard.set(null),
+            });
+          }
+        });
         const t = this.tab();
         const sub = this.prepSub();
         if (!c.isOwner && (c.data.pregenCharacters?.length ?? 0) === 0 && t === 'prep') {
@@ -1017,7 +1074,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       });
     };
     refresh();
-    this.initiativePollTimer = setInterval(refresh, 8000);
+    const ms = this.live.fallbackPollMs(8_000);
+    this.initiativePollTimer = setInterval(refresh, ms);
   }
 
   private stopInitiativeBannerPoll(): void {

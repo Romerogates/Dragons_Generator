@@ -1,4 +1,4 @@
-import { mergeRemoteInitiativeRolls } from './campaign-persist.util';
+import { mergeRemoteInitiativeRolls, mergeRemoteLiveTable } from './campaign-persist.util';
 import type { CampaignDetail } from '@core/models/Campaign/campaign';
 
 function baseCampaign(overrides: Partial<CampaignDetail['data']> = {}): CampaignDetail {
@@ -202,5 +202,198 @@ describe('mergeRemoteInitiativeRolls', () => {
     const merged = mergeRemoteInitiativeRolls(local, remote);
     expect(merged.updatedAt).toBe(remote.updatedAt);
     expect(merged.data.sessions![0].playNotes).toBe('brouillon MJ');
+  });
+});
+
+describe('mergeRemoteLiveTable', () => {
+  it('merges HP / fog without wiping local notes', () => {
+    const local = baseCampaign({
+      dungeonMaps: [
+        {
+          id: 'm1',
+          name: 'Cave',
+          theme: 'cave',
+          createdAt: '2026-01-01T00:00:00Z',
+          updatedAt: '2026-01-01T00:00:00Z',
+          fogOfWarEnabled: true,
+          revealedRoomIds: [],
+          rooms: [],
+          markers: [],
+          tiles: [],
+          gridWidth: 20,
+          gridHeight: 20,
+        },
+      ],
+    });
+    local.data.sessions![0].activeCombat!.combatants[0] = {
+      id: 'p1',
+      name: 'Héro',
+      kind: 'player',
+      initiativeBonus: 2,
+      currentHp: 20,
+      maxHp: 20,
+      playerSubmitted: false,
+    };
+
+    const remote = baseCampaign({
+      dungeonMaps: [
+        {
+          id: 'm1',
+          name: 'Cave',
+          theme: 'cave',
+          createdAt: '2026-01-01T00:00:00Z',
+          updatedAt: '2026-01-01T00:01:00Z',
+          fogOfWarEnabled: true,
+          revealedRoomIds: ['r1'],
+          rooms: [],
+          markers: [],
+          tiles: [],
+          gridWidth: 20,
+          gridHeight: 20,
+        },
+      ],
+    });
+    remote.updatedAt = '2026-01-01T00:02:00Z';
+    remote.data.notes = 'notes serveur';
+    remote.data.sessions![0].activeCombat!.combatants[0] = {
+      id: 'p1',
+      name: 'Héro',
+      kind: 'player',
+      initiativeBonus: 2,
+      currentHp: 12,
+      maxHp: 20,
+      conditions: ['Empoisonné'],
+      playerSubmitted: true,
+      initiativeRoll: 14,
+    };
+    remote.data.sessions![0].activeCombat!.turnIndex = 2;
+    remote.data.sessions![0].combatLog = ['Attaque'];
+    remote.members = [
+      {
+        id: 'mem1',
+        userId: 'u1',
+        displayName: 'Alice',
+        role: 'player',
+        proposalStatus: 'approved',
+        xpEarnedInCampaign: 50,
+      },
+    ];
+
+    const merged = mergeRemoteLiveTable(local, remote);
+    expect(merged.data.notes).toBe('notes locales');
+    expect(merged.data.sessions![0].activeCombat!.combatants[0].currentHp).toBe(12);
+    expect(merged.data.sessions![0].activeCombat!.combatants[0].conditions).toEqual(['Empoisonné']);
+    expect(merged.data.sessions![0].activeCombat!.turnIndex).toBe(2);
+    expect(merged.data.sessions![0].combatLog).toEqual(['Attaque']);
+    expect(merged.data.dungeonMaps![0].revealedRoomIds).toEqual(['r1']);
+    expect(merged.members[0].xpEarnedInCampaign).toBe(50);
+  });
+
+  it('adds remote-only combatants and handles missing local combat', () => {
+    const local = baseCampaign();
+    local.data.sessions![0].activeCombat = undefined;
+    const remote = baseCampaign();
+    remote.data.sessions![0].activeCombat!.combatants.push({
+      id: 'new',
+      name: 'Nouveau',
+      kind: 'monster',
+      initiativeBonus: 0,
+    });
+    const merged = mergeRemoteLiveTable(local, remote);
+    expect(merged.data.sessions![0].activeCombat?.combatants.some((c) => c.id === 'new')).toBe(true);
+
+    const local2 = baseCampaign();
+    const remote2 = baseCampaign();
+    remote2.data.sessions![0].activeCombat!.combatants.push({
+      id: 'extra',
+      name: 'Extra',
+      kind: 'monster',
+      initiativeBonus: 0,
+    });
+    const merged2 = mergeRemoteLiveTable(local2, remote2);
+    expect(merged2.data.sessions![0].activeCombat!.combatants.some((c) => c.id === 'extra')).toBe(
+      true,
+    );
+  });
+
+  it('handles no active session', () => {
+    const local = baseCampaign({ activeSessionId: null });
+    const remote = baseCampaign({ activeSessionId: null });
+    remote.updatedAt = '2026-01-09T00:00:00Z';
+    const merged = mergeRemoteLiveTable(local, remote);
+    expect(merged.updatedAt).toBe(remote.updatedAt);
+    expect(merged.data.notes).toBe('notes locales');
+  });
+
+  it('merges status when remote has session without combat', () => {
+    const local = baseCampaign();
+    const remote = baseCampaign();
+    remote.updatedAt = '2026-01-10T00:00:00Z';
+    remote.data.sessions![0].activeCombat = undefined;
+    remote.data.sessions![0].status = 'played';
+    const merged = mergeRemoteLiveTable(local, remote);
+    expect(merged.data.sessions![0].status).toBe('played');
+    expect(merged.data.notes).toBe('notes locales');
+  });
+
+  it('keeps local fog when remote map missing and members empty', () => {
+    const local = baseCampaign({
+      dungeonMaps: [
+        {
+          id: 'm1',
+          name: 'Cave',
+          theme: 'cave',
+          createdAt: '2026-01-01T00:00:00Z',
+          updatedAt: '2026-01-01T00:00:00Z',
+          fogOfWarEnabled: true,
+          revealedRoomIds: ['keep'],
+          rooms: [],
+          markers: [],
+          tiles: [],
+          gridWidth: 10,
+          gridHeight: 10,
+        },
+      ],
+    });
+    const remote = baseCampaign({ dungeonMaps: [] });
+    remote.members = [];
+    remote.data.sessions![0].activeCombat!.combatants = [
+      {
+        id: 'gone-locally',
+        name: 'Ghost',
+        kind: 'monster',
+        initiativeBonus: 0,
+        currentHp: 1,
+        maxHp: 1,
+      },
+    ];
+    const merged = mergeRemoteLiveTable(local, remote);
+    expect(merged.data.dungeonMaps![0].revealedRoomIds).toEqual(['keep']);
+    expect(merged.members).toEqual([]);
+    expect(
+      merged.data.sessions![0].activeCombat!.combatants.some((c) => c.id === 'gone-locally'),
+    ).toBe(true);
+  });
+
+  it('skips unrelated sessions and prefers remote empty combatLog', () => {
+    const local = baseCampaign({
+      sessions: [
+        {
+          id: 'other',
+          title: 'Autre',
+          scheduledAt: '2026-01-01T20:00:00Z',
+          status: 'planned',
+        },
+        ...(baseCampaign().data.sessions ?? []),
+      ],
+    });
+    local.data.sessions![1].combatLog = ['local'];
+    const remote = baseCampaign();
+    remote.data.sessions![0].combatLog = [];
+    remote.data.sessions![0].activeCombat!.round = 3;
+    const merged = mergeRemoteLiveTable(local, remote);
+    expect(merged.data.sessions!.find((s) => s.id === 'other')?.title).toBe('Autre');
+    expect(merged.data.sessions!.find((s) => s.id === 's1')?.combatLog).toEqual(['local']);
+    expect(merged.data.sessions!.find((s) => s.id === 's1')?.activeCombat?.round).toBe(3);
   });
 });

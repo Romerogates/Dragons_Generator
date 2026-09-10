@@ -4,18 +4,22 @@ import {
   OnDestroy,
   OnInit,
   computed,
+  effect,
   inject,
   signal,
+  untracked,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 import {
   CampaignCloudService,
   InitiativeBoard,
   InitiativeBoardCombatant,
 } from '@core/services/campaign-cloud.service';
+import { CampaignLiveService } from '@core/services/campaign-live.service';
 import { AuthService } from '@core/services/auth.service';
 import { DiceRollComponent } from '@shared/components/dice-roll/dice-roll';
 
@@ -31,6 +35,7 @@ export class CampaignInitiativePage implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly campaigns = inject(CampaignCloudService);
+  private readonly live = inject(CampaignLiveService);
   private readonly auth = inject(AuthService);
 
   readonly loading = signal(true);
@@ -45,6 +50,7 @@ export class CampaignInitiativePage implements OnInit, OnDestroy {
   readonly useDice = signal(true);
 
   private pollTimer: ReturnType<typeof setInterval> | null = null;
+  private liveSub: Subscription | null = null;
 
   readonly combatants = computed(() => this.board()?.combatants ?? []);
 
@@ -54,6 +60,13 @@ export class CampaignInitiativePage implements OnInit, OnDestroy {
     if (!userId) return [];
     return list.filter((c) => c.memberUserId === userId);
   });
+
+  constructor() {
+    effect(() => {
+      this.live.connected();
+      untracked(() => this.retunePoll());
+    });
+  }
 
   ngOnInit(): void {
     if (!this.auth.isLoggedIn()) {
@@ -72,11 +85,25 @@ export class CampaignInitiativePage implements OnInit, OnDestroy {
     if (qCode) this.code.set(qCode.toUpperCase());
 
     this.refresh();
-    this.pollTimer = setInterval(() => this.refresh(true), 4000);
+    void this.live.watch(id);
+    this.liveSub = this.live.updates(id).subscribe(() => this.refresh(true));
+    this.retunePoll();
   }
 
   ngOnDestroy(): void {
     if (this.pollTimer) clearInterval(this.pollTimer);
+    this.liveSub?.unsubscribe();
+    void this.live.unwatch();
+  }
+
+  private retunePoll(): void {
+    if (this.pollTimer) {
+      clearInterval(this.pollTimer);
+      this.pollTimer = null;
+    }
+    if (!this.campaignId()) return;
+    const ms = this.live.fallbackPollMs(4_000);
+    this.pollTimer = setInterval(() => this.refresh(true), ms);
   }
 
   refresh(silent = false): void {

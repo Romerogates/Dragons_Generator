@@ -180,12 +180,32 @@
 
             @if (tab() === 'table') {
               @if (campaign(); as c) {
-                <div class="p-2 session-dock-table">
-                  <app-campaign-play-panel
-                    [campaign]="c"
-                    [fullscreen]="false"
-                    (campaignChange)="onCampaignChange($event)"
-                  />
+                <div class="p-4 space-y-4">
+                  <p class="text-sm text-slate-300 font-serif">
+                    La table (combat + carte) s’ouvre en plein écran pour rester lisible sur téléphone.
+                  </p>
+                  <p class="text-xs text-slate-500">
+                    Session : {{ activeSession()?.title || '—' }}
+                    @if (combat(); as ac) {
+                      · manche {{ ac.round }}
+                    }
+                  </p>
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-700 text-white hover:bg-emerald-600"
+                      (click)="openFullscreen()"
+                    >
+                      Ouvrir la table
+                    </button>
+                    <button
+                      type="button"
+                      class="min-h-11 px-3 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-300"
+                      (click)="openCampaign()"
+                    >
+                      Retour campagne
+                    </button>
+                  </div>
                 </div>
               }
             }

@@ -12,9 +12,12 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
+import { CampaignLiveService } from '@core/services/campaign-live.service';
 import { AuthService } from '@core/services/auth.service';
 import { CampaignSessionDockService } from '@core/services/campaign-session-dock.service';
+import { mergeRemoteLiveTable } from '@core/utils/campaign-persist.util';
 import { CampaignPlayPanel } from '../campaign-play-panel/campaign-play-panel';
 import type { CampaignDetail as CampaignDetailModel } from '@core/models/Campaign/campaign';
 
@@ -30,6 +33,7 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly campaigns = inject(CampaignCloudService);
+  private readonly live = inject(CampaignLiveService);
   private readonly auth = inject(AuthService);
   private readonly sessionDock = inject(CampaignSessionDockService);
 
@@ -39,11 +43,20 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
   readonly xpNotice = signal<string | null>(null);
 
   private softPollTimer: ReturnType<typeof setInterval> | null = null;
+  private liveSub: Subscription | null = null;
 
   constructor() {
     effect(() => {
       const c = this.campaign();
       untracked(() => this.sessionDock.bindCampaign(c));
+    });
+    effect(() => {
+      // Recaler le poll de secours quand le hub connecte / coupe.
+      this.live.connected();
+      const c = this.campaign();
+      untracked(() => {
+        if (c && !c.isOwner) this.startSoftPoll(c);
+      });
     });
   }
 
@@ -88,6 +101,8 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
       next: (c) => {
         this.campaign.set(c);
         this.loading.set(false);
+        void this.live.watch(c.id);
+        this.liveSub = this.live.updates(c.id).subscribe(() => this.softReload());
         this.startSoftPoll(c);
       },
       error: () => {
@@ -99,6 +114,8 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopSoftPoll();
+    this.liveSub?.unsubscribe();
+    void this.live.unwatch();
   }
 
   onCampaignChange(updated: CampaignDetailModel): void {
@@ -106,11 +123,15 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
     this.sessionDock.patchLiveCampaign(updated);
   }
 
-  /** Joueurs : poll 4 s pour fog live + combat ; MJ : pas besoin (écrit déjà). */
+  /**
+   * Poll de secours : 4 s si hub down ; 30 s si SignalR connecté.
+   * MJ : pas de poll (écrit déjà) mais reste abonné au hub pour jets d’init joueurs.
+   */
   private startSoftPoll(c: CampaignDetailModel): void {
     this.stopSoftPoll();
     if (c.isOwner) return;
-    this.softPollTimer = setInterval(() => this.softReload(), 4_000);
+    const ms = this.live.fallbackPollMs(4_000);
+    this.softPollTimer = setInterval(() => this.softReload(), ms);
   }
 
   private stopSoftPoll(): void {
@@ -122,9 +143,15 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
 
   private softReload(): void {
     const c = this.campaign();
-    if (!c || c.isOwner) return;
+    if (!c) return;
     this.campaigns.get(c.id).subscribe({
       next: (updated) => {
+        if (c.isOwner) {
+          const merged = mergeRemoteLiveTable(c, updated);
+          this.campaign.set(merged);
+          this.sessionDock.patchLiveCampaign(merged);
+          return;
+        }
         this.announcePlayerXpGain(c, updated);
         this.campaign.set(updated);
         this.sessionDock.patchLiveCampaign(updated);
