@@ -163,6 +163,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly rosterFeedback = signal<string | null>(null);
   /** Amis déjà invités (en attente d’acceptation) — masqués de la liste invitable. */
   readonly pendingInviteUserIds = signal<Set<string>>(new Set());
+  readonly pendingInvites = signal<
+    { id: string; userId: string; displayName: string; createdAt: string }[]
+  >([]);
   readonly activity = signal<CampaignActivityItem[]>([]);
   readonly activityLoading = signal(false);
   /** Session en mode édition (MJ) — sinon carte lecture. */
@@ -355,13 +358,21 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     };
   });
 
-  readonly visibleTabs = computed((): TabDef[] => [
-    { id: 'overview', label: 'Résumé', icon: 'fluent-emoji:clipboard' },
-    { id: 'sessions', label: 'Sessions', icon: 'fluent-emoji:calendar' },
-    { id: 'handouts', label: 'Documents', icon: 'fluent-emoji:page-facing-up' },
-    { id: 'prep', label: 'Préparation', icon: 'fluent-emoji:hammer-and-wrench' },
-    { id: 'players', label: 'Joueurs', icon: 'fluent-emoji:busts-in-silhouette' },
-  ]);
+  readonly visibleTabs = computed((): TabDef[] => {
+    const tabs: TabDef[] = [
+      { id: 'overview', label: 'Résumé', icon: 'fluent-emoji:clipboard' },
+      { id: 'sessions', label: 'Sessions', icon: 'fluent-emoji:calendar' },
+      { id: 'handouts', label: 'Documents', icon: 'fluent-emoji:page-facing-up' },
+    ];
+    const c = this.campaign();
+    const showPrep =
+      c?.isOwner === true || (c?.data.pregenCharacters?.length ?? 0) > 0;
+    if (showPrep) {
+      tabs.push({ id: 'prep', label: 'Préparation', icon: 'fluent-emoji:hammer-and-wrench' });
+    }
+    tabs.push({ id: 'players', label: 'Joueurs', icon: 'fluent-emoji:busts-in-silhouette' });
+    return tabs;
+  });
 
   readonly prepSubTabs = computed((): PrepSubDef[] => {
     const owner = this.campaign()?.isOwner === true;
@@ -702,7 +713,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         this.notifications.refresh();
         const t = this.tab();
         const sub = this.prepSub();
-        if (!c.isOwner && t === 'prep' && sub !== 'pregens') {
+        if (!c.isOwner && (c.data.pregenCharacters?.length ?? 0) === 0 && t === 'prep') {
+          this.tab.set('overview');
+        } else if (!c.isOwner && t === 'prep' && sub !== 'pregens') {
           this.prepSub.set('pregens');
         }
         if (!c.isOwner && (sub === 'creatures' || sub === 'encounters' || sub === 'maps' || sub === 'notebook' || sub === 'scenario')) {
@@ -710,9 +723,11 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         }
         if (!c.isOwner) {
           this.startInitiativeBannerPoll(c.id);
+          this.pendingInvites.set([]);
         } else {
           this.stopInitiativeBannerPoll();
           this.initiativeBoard.set(null);
+          this.loadPendingInvites();
         }
         if (this.tab() === 'overview') {
           this.loadActivity();
@@ -723,6 +738,39 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         this.loading.set(false);
       },
     });
+  }
+
+  loadPendingInvites(): void {
+    const c = this.campaign();
+    if (!c?.isOwner) {
+      this.pendingInvites.set([]);
+      return;
+    }
+    this.campaigns.listPendingInvites(c.id).subscribe({
+      next: (list) => {
+        this.pendingInvites.set(list);
+        this.pendingInviteUserIds.set(new Set(list.map((i) => i.userId)));
+      },
+      error: () => {
+        /* ignore */
+      },
+    });
+  }
+
+  copyFriendsInviteLink(): void {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const url = `${origin}/friends`;
+    if (!navigator.clipboard?.writeText) {
+      this.rosterFeedback.set('Presse-papiers indisponible.');
+      return;
+    }
+    void navigator.clipboard.writeText(url).then(
+      () =>
+        this.rosterFeedback.set(
+          'Lien Amis copié — vos invités acceptent l’invitation depuis cette page.',
+        ),
+      () => this.rosterFeedback.set('Impossible de copier le lien.'),
+    );
   }
 
   private isOnMapsView(): boolean {
@@ -754,6 +802,10 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     }
 
     if (isPrepSub(t) || t === 'prep') {
+      if (!owner && (this.campaign()?.data.pregenCharacters?.length ?? 0) === 0) {
+        this.tab.set('overview');
+        return;
+      }
       const finalSub: PrepSub = (() => {
         if (t === 'prep') {
           if (!owner) return 'pregens';
@@ -1526,11 +1578,13 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         this.pendingInviteUserIds.update((prev) => new Set([...prev, userId]));
         const name = this.friendsList().find((f) => f.id === userId)?.displayName ?? 'ami';
         this.rosterFeedback.set(`Invitation envoyée à ${name}.`);
+        this.loadPendingInvites();
         if (this.tab() === 'overview') this.loadActivity();
       },
       error: (err) => {
         const msg = err?.error?.errors?.[0]?.reason ?? 'Invitation impossible.';
         this.error.set(msg);
+        this.loadPendingInvites();
       },
     });
   }

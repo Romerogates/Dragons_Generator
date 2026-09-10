@@ -144,4 +144,31 @@ public class CampaignJsonHelpersTests
         Assert.Equal(0, session.GetProperty("combatHistory").GetArrayLength());
         Assert.Equal(0, filtered.GetProperty("creatures").GetArrayLength());
     }
+
+    [Fact]
+    public void FilterForPlayerView_keeps_player_recap_and_strips_run_sheet()
+    {
+        const string raw = """
+            {
+              "sessions": [{
+                "id": "ses-1",
+                "objectives": "secret obj",
+                "scenes": "secret scenes",
+                "prepChecklist": "secret checklist",
+                "playerRecap": "Vous avez vaincu le dragon.",
+                "activeMapId": "map-1",
+                "notes": "mj only"
+              }]
+            }
+            """;
+        using var doc = System.Text.Json.JsonDocument.Parse(raw);
+        var filtered = CampaignJsonHelpers.FilterForPlayerView(doc.RootElement, Guid.NewGuid());
+        var session = filtered.GetProperty("sessions")[0];
+        Assert.Equal("", session.GetProperty("objectives").GetString());
+        Assert.Equal("", session.GetProperty("scenes").GetString());
+        Assert.Equal("", session.GetProperty("prepChecklist").GetString());
+        Assert.Equal("Vous avez vaincu le dragon.", session.GetProperty("playerRecap").GetString());
+        Assert.Equal("map-1", session.GetProperty("activeMapId").GetString());
+        Assert.Equal("", session.GetProperty("notes").GetString());
+    }
 }

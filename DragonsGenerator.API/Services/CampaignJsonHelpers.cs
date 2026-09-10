@@ -100,6 +100,11 @@ public static class CampaignJsonHelpers
                 session["playPads"] = new JsonArray();
                 // Garder activeCombat pour le battlefield joueur (face-à-face).
                 session["combatHistory"] = new JsonArray();
+                // Run sheet MJ — secrets de préparation
+                session["objectives"] = "";
+                session["scenes"] = "";
+                session["prepChecklist"] = "";
+                // playerRecap + activeMapId conservés pour les joueurs.
             }
         }
 

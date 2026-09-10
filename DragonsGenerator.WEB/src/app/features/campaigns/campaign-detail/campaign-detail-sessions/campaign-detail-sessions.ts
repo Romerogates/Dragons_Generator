@@ -49,6 +49,8 @@ export class CampaignDetailSessions {
   readonly editingSessionId = input<string | null>(null);
   readonly hasActiveSession = input(false);
   readonly activeSessionId = input<string | null>(null);
+  /** Cartes / donjons de la campagne (MJ) pour attribution. */
+  readonly dungeonMaps = input<{ id: string; name: string }[]>([]);
 
   readonly addSession = output<void>();
   readonly startEditSession = output<string>();
@@ -122,7 +124,14 @@ export class CampaignDetailSessions {
   }
 
   canViewArchive(session: CampaignSession): boolean {
-    return session.status === 'played' || session.status === 'cancelled';
+    if (session.status !== 'played' && session.status !== 'cancelled') return false;
+    if (this.isOwner()) return true;
+    return !!(session.playerRecap?.trim());
+  }
+
+  mapName(mapId: string | null | undefined): string | null {
+    if (!mapId) return null;
+    return this.dungeonMaps().find((m) => m.id === mapId)?.name ?? null;
   }
 
   openViewSession(id: string): void {

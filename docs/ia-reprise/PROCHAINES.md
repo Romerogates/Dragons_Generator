@@ -15,12 +15,12 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
-1. **P1 prépa** : run sheet session ; attribuer donjon à la planification ; invites en attente + lien ; recap joueur après Terminer.
-2. **P2 live** : face-à-face mobile ; fog live ; édition combat repliée.
-3. *(optionnel)* peaufinages guide / empty states hors flux critique.
+1. **P2 live** : face-à-face mobile ; fog live ; édition combat repliée.
+2. *(optionnel)* peaufinages guide / empty states hors flux critique.
 
 ## Déjà livré (ne pas refaire)
 
+- **P1 prépa session** (2026-09-10) — run sheet (objectifs / scènes / checklist) + `activeMapId` à la planification ; `playerRecap` à la fin de session (dialog Terminer) ; archive joueur si récap ; invites en attente MJ + copier lien Amis ; onglet Préparation masqué côté joueur sans pré-tiré ; API filtre run sheet, conserve récap/`activeMapId` ; `GET …/invites`.
 - **P0 table joueur + init** (2026-09-10) — `/play` ouvert aux joueurs (badge Joueur) ; CTA « Rejoindre la table » sur Résumé ; bandeau init = dé + encode + total ; collecte MJ liste Alice ✓ / Bob… ; guide aligné (Préparation → Donjons, document, + Toute la party).
 - **Plein écran UX** (2026-09-10) — icône maximize partagée (`app-fullscreen-enter-btn` / link) ; sortie **Escape** (Atlas, donjon, table `/play`, carnet Main, Codex sans bouton Fermer).
 - **Atlas Eana plein écran** (2026-09-10) — `/civilisations` : icône + clic fond → overlay `Carte.jpg` + pins.

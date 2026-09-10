@@ -16,6 +16,7 @@ function session(partial: Partial<CampaignSession>): CampaignSession {
 
 describe('CampaignDetailSessions read-only archive', () => {
   let component: CampaignDetailSessions;
+  let fixture: ComponentFixture<CampaignDetailSessions>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -23,7 +24,7 @@ describe('CampaignDetailSessions read-only archive', () => {
       providers: [...zonelessTestProviders],
     }).compileComponents();
 
-    const fixture: ComponentFixture<CampaignDetailSessions> = TestBed.createComponent(CampaignDetailSessions);
+    fixture = TestBed.createComponent(CampaignDetailSessions);
     component = fixture.componentInstance;
     fixture.componentRef.setInput('isOwner', true);
     fixture.componentRef.setInput('sortedSessions', []);
@@ -41,6 +42,16 @@ describe('CampaignDetailSessions read-only archive', () => {
     expect(component.canViewArchive(session({ status: 'played' }))).toBe(true);
     expect(component.canViewArchive(session({ status: 'cancelled' }))).toBe(true);
     expect(component.canViewArchive(session({ status: 'planned' }))).toBe(false);
+  });
+
+  it('lets players open archive only when playerRecap is set', () => {
+    fixture.componentRef.setInput('isOwner', false);
+    fixture.detectChanges();
+    expect(component.canViewArchive(session({ status: 'played' }))).toBe(false);
+    expect(
+      component.canViewArchive(session({ status: 'played', playerRecap: 'Victoire' })),
+    ).toBe(true);
+    expect(component.canViewArchive(session({ status: 'planned', playerRecap: 'x' }))).toBe(false);
   });
 
   it('opens and closes the read-only panel', () => {

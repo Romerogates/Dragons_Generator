@@ -140,6 +140,7 @@
             [editingSessionId]="editingSessionId()"
             [hasActiveSession]="!!activePlaySession()"
             [activeSessionId]="c.data.activeSessionId ?? null"
+            [dungeonMaps]="c.data.dungeonMaps ?? []"
             (addSession)="addSession()"
             (startEditSession)="startEditSession($event)"
             (stopEditSession)="stopEditSession()"
@@ -677,8 +678,19 @@
               <p class="text-sm text-emerald-400">{{ fb }}</p>
             }
             @if (c.isOwner) {
-              <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
-                <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Inviter un ami</h3>
+              <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-500">
+                    Inviter un ami
+                  </h3>
+                  <button
+                    type="button"
+                    class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-400 hover:text-violet-300"
+                    (click)="copyFriendsInviteLink()"
+                  >
+                    Copier le lien Amis
+                  </button>
+                </div>
                 <div class="flex flex-wrap gap-2">
                   @for (f of invitableFriends(); track f.id) {
                     <button
@@ -695,9 +707,29 @@
                       {{ f.displayName }}
                     </button>
                   } @empty {
-                    <p class="text-sm text-slate-500 italic">Tous vos amis sont déjà dans la campagne, ou ajoutez-en depuis <a routerLink="/friends" class="text-violet-400">Amis</a>.</p>
+                    <p class="text-sm text-slate-500 italic">
+                      Tous vos amis sont déjà dans la campagne, ou ajoutez-en depuis
+                      <a routerLink="/friends" class="text-violet-400">Amis</a>.
+                    </p>
                   }
                 </div>
+                @if (pendingInvites().length) {
+                  <div class="pt-2 border-t border-slate-800 space-y-2">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-amber-500">
+                      En attente ({{ pendingInvites().length }})
+                    </p>
+                    <ul class="space-y-1.5">
+                      @for (inv of pendingInvites(); track inv.id) {
+                        <li class="text-sm text-slate-300 flex flex-wrap items-center gap-2">
+                          <span>{{ inv.displayName }}</span>
+                          <span class="text-[10px] text-slate-600 uppercase tracking-widest"
+                            >invitation envoyée</span
+                          >
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                }
               </div>
 
               @for (m of players(); track m.id) {

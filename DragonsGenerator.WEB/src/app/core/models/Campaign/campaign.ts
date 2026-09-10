@@ -154,6 +154,14 @@ export interface CampaignSession {
   combatLog?: string[];
   /** Donjon de campagne consulté pendant cette session (id dans data.dungeonMaps). */
   activeMapId?: string | null;
+  /** Run sheet MJ — objectifs de la soirée. */
+  objectives?: string;
+  /** Run sheet MJ — scènes / actes prévus. */
+  scenes?: string;
+  /** Run sheet MJ — pense-bête (docs à publier, matériel…). */
+  prepChecklist?: string;
+  /** Récap publié aux joueurs après la session. */
+  playerRecap?: string;
 }
 
 export interface CombatHistoryEntry {

@@ -76,6 +76,11 @@ export class CampaignCloudService {
     return this.http.post<void>(`${this.api}/me/campaigns/${campaignId}/invites`, { userId });
   }
 
+  /** Invitations en attente (vue MJ). */
+  listPendingInvites(campaignId: string): Observable<CampaignPendingInvite[]> {
+    return this.http.get<CampaignPendingInvite[]>(`${this.api}/me/campaigns/${campaignId}/invites`);
+  }
+
   proposeCharacter(campaignId: string, characterId: string): Observable<void> {
     return this.http.post<void>(`${this.api}/me/campaigns/${campaignId}/propose-character`, {
       characterId,
@@ -231,4 +236,11 @@ export interface InitiativeBoardCombatant {
   initiativeBonus: number;
   hasRoll: boolean;
   memberUserId: string | null;
+}
+
+export interface CampaignPendingInvite {
+  id: string;
+  userId: string;
+  displayName: string;
+  createdAt: string;
 }

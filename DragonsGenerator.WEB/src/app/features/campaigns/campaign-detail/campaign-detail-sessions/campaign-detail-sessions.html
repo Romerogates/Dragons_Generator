@@ -122,12 +122,82 @@
         <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Notes MJ</span>
         <textarea
           rows="2"
-          placeholder="Préparation, objectifs…"
+          placeholder="Secrets, préparation privée…"
           class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-400"
           [ngModel]="session.notes ?? ''"
           (ngModelChange)="sessionPatch.emit({ sessionId: session.id, patch: { notes: $event || undefined } })"
         ></textarea>
       </label>
+
+      <div class="rounded-xl border border-amber-900/40 bg-amber-950/15 p-3 space-y-3">
+        <p class="text-[10px] font-black uppercase tracking-widest text-amber-400">Run sheet · ce soir</p>
+        <label class="block">
+          <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Objectifs</span>
+          <textarea
+            rows="2"
+            placeholder="Ce que la table doit accomplir…"
+            class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300"
+            [ngModel]="session.objectives ?? ''"
+            (ngModelChange)="sessionPatch.emit({ sessionId: session.id, patch: { objectives: $event || undefined } })"
+          ></textarea>
+        </label>
+        <label class="block">
+          <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Scènes / actes</span>
+          <textarea
+            rows="3"
+            placeholder="1) Accroche · 2) Exploration · 3) Climax…"
+            class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300"
+            [ngModel]="session.scenes ?? ''"
+            (ngModelChange)="sessionPatch.emit({ sessionId: session.id, patch: { scenes: $event || undefined } })"
+          ></textarea>
+        </label>
+        <label class="block">
+          <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">À préparer</span>
+          <textarea
+            rows="2"
+            placeholder="Docs à publier, matériel, rencontres…"
+            class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300"
+            [ngModel]="session.prepChecklist ?? ''"
+            (ngModelChange)="sessionPatch.emit({ sessionId: session.id, patch: { prepChecklist: $event || undefined } })"
+          ></textarea>
+        </label>
+        <label class="block">
+          <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Donjon attribué</span>
+          <select
+            class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-2 py-2 text-sm text-slate-300"
+            [ngModel]="session.activeMapId ?? ''"
+            (ngModelChange)="
+              sessionPatchImmediate.emit({
+                sessionId: session.id,
+                patch: { activeMapId: $event ? $event : null },
+              })
+            "
+          >
+            <option value="">— Aucun —</option>
+            @for (map of dungeonMaps(); track map.id) {
+              <option [value]="map.id">{{ map.name }}</option>
+            }
+          </select>
+          @if (!dungeonMaps().length) {
+            <p class="mt-1 text-[10px] text-slate-500">
+              Créez un donjon dans Préparation → Donjons.
+            </p>
+          }
+        </label>
+        <label class="block">
+          <span class="text-[10px] font-black uppercase tracking-widest text-slate-500"
+            >Récap joueurs (brouillon)</span
+          >
+          <textarea
+            rows="2"
+            placeholder="Texte visible après la session (peut être complété en terminant)…"
+            class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-300"
+            [ngModel]="session.playerRecap ?? ''"
+            (ngModelChange)="sessionPatch.emit({ sessionId: session.id, patch: { playerRecap: $event || undefined } })"
+          ></textarea>
+        </label>
+      </div>
+
       @if (isActive(session)) {
         <button
           type="button"
@@ -205,6 +275,9 @@
             {{ formatSessionDate(session.scheduledAt) }}
             @if (session.location) {
               · {{ session.location }}
+            }
+            @if (mapName(session.activeMapId); as mapLabel) {
+              · {{ mapLabel }}
             }
           </p>
         </div>
@@ -287,15 +360,26 @@
       </div>
 
       <div class="space-y-2">
-        <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-500">Notes archivées</h4>
-        @if (session.notes?.trim()) {
-          <pre class="whitespace-pre-wrap text-sm text-slate-300 font-sans leading-relaxed rounded-xl border border-slate-800 bg-[#1b2028]/70 p-4">{{ session.notes }}</pre>
+        <h4 class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Récap joueurs</h4>
+        @if (session.playerRecap?.trim()) {
+          <pre class="whitespace-pre-wrap text-sm text-slate-200 font-sans leading-relaxed rounded-xl border border-emerald-900/40 bg-emerald-950/20 p-4">{{ session.playerRecap }}</pre>
         } @else {
-          <p class="text-sm text-slate-500 italic">Aucune note archivée pour cette session.</p>
+          <p class="text-sm text-slate-500 italic">Pas encore de récap publié pour cette session.</p>
         }
       </div>
 
-      @if ((session.combatHistory?.length ?? 0) > 0) {
+      @if (isOwner()) {
+        <div class="space-y-2">
+          <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-500">Notes archivées (MJ)</h4>
+          @if (session.notes?.trim()) {
+            <pre class="whitespace-pre-wrap text-sm text-slate-300 font-sans leading-relaxed rounded-xl border border-slate-800 bg-[#1b2028]/70 p-4">{{ session.notes }}</pre>
+          } @else {
+            <p class="text-sm text-slate-500 italic">Aucune note archivée pour cette session.</p>
+          }
+        </div>
+      }
+
+      @if (isOwner() && (session.combatHistory?.length ?? 0) > 0) {
         <div class="space-y-2">
           <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-500">Historique des combats</h4>
           @for (entry of session.combatHistory!; track entry.id + entry.endedAt) {

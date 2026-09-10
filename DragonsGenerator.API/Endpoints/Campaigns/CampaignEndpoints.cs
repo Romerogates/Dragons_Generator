@@ -459,6 +459,47 @@ public class ListCampaignInvitesEndpoint(AppDbContext db) : EndpointWithoutReque
     }
 }
 
+public record CampaignPendingInviteDto(Guid Id, Guid UserId, string DisplayName, DateTimeOffset CreatedAt);
+
+/// <summary>Invitations en attente pour une campagne (vue MJ).</summary>
+public class ListCampaignPendingInvitesEndpoint(AppDbContext db) : EndpointWithoutRequest<List<CampaignPendingInviteDto>>
+{
+    public override void Configure() => Get("/me/campaigns/{id}/invites");
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var userId = AuthHelpers.GetUserId(User);
+        if (userId is null)
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        var campaignId = Route<Guid>("id");
+        var owns = await db.Campaigns.AsNoTracking()
+            .AnyAsync(c => c.Id == campaignId && c.OwnerUserId == userId, ct);
+        if (!owns)
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        var rows = await (
+            from i in db.CampaignInvites.AsNoTracking()
+            join u in db.Users.AsNoTracking() on i.InvitedUserId equals u.Id
+            where i.CampaignId == campaignId && i.Status == CampaignInviteStatuses.Pending
+            select new { i.Id, i.InvitedUserId, u.DisplayName, i.CreatedAt }
+        ).ToListAsync(ct);
+
+        var invites = rows
+            .OrderByDescending(x => x.CreatedAt)
+            .Select(x => new CampaignPendingInviteDto(x.Id, x.InvitedUserId, x.DisplayName, x.CreatedAt))
+            .ToList();
+
+        await Send.OkAsync(invites, ct);
+    }
+}
+
 public class SendCampaignInviteEndpoint(AppDbContext db, PushNotificationService push) : Endpoint<SendCampaignInviteBody>
 {
     public override void Configure() => Post("/me/campaigns/{id}/invites");

@@ -161,6 +161,8 @@ export class CampaignPlayPanel implements OnDestroy {
     confirmLabel: string;
     onConfirm: () => void;
   } | null>(null);
+  /** Dialogue Terminer : récap joueurs optionnel. */
+  readonly endSessionDialog = signal<{ recap: string } | null>(null);
 
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
   private initiativePollTimer: ReturnType<typeof setInterval> | null = null;
@@ -558,15 +560,20 @@ export class CampaignPlayPanel implements OnDestroy {
     const c = this.campaign();
     const session = this.activeSession();
     if (!c.isOwner || !session) return;
-    this.askConfirm(
-      'Terminer la session',
-      'Les notes de jeu seront archivées dans le résumé de session.',
-      () => this.doEndPlaySession(),
-      'Terminer',
-    );
+    this.endSessionDialog.set({ recap: session.playerRecap ?? '' });
   }
 
-  private doEndPlaySession(): void {
+  cancelEndSessionDialog(): void {
+    this.endSessionDialog.set(null);
+  }
+
+  confirmEndSessionDialog(): void {
+    const draft = this.endSessionDialog();
+    this.endSessionDialog.set(null);
+    this.doEndPlaySession(draft?.recap?.trim() || undefined);
+  }
+
+  private doEndPlaySession(playerRecap?: string): void {
     const c = this.campaign();
     const session = this.activeSession();
     if (!c.isOwner || !session) return;
@@ -584,6 +591,7 @@ export class CampaignPlayPanel implements OnDestroy {
         ...s,
         status: 'played' as CampaignSessionStatus,
         notes: mergedNotes || s.notes,
+        playerRecap: playerRecap || s.playerRecap,
         playNotes: '',
         playNotebook: undefined,
         playPads: [],
