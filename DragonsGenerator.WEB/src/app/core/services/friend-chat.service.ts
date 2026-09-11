@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 import { environment } from '@env/environment';
 import { AuthService } from './auth.service';
 
-export type FriendMessageAttachmentKind = 'character' | 'campaign';
+export type FriendMessageAttachmentKind = 'character' | 'campaign' | 'invite';
 
 export interface FriendMessage {
   id: string;

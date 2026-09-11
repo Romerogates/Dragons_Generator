@@ -6,6 +6,7 @@ public static class FriendChatAttachmentHelper
 {
     public const string Character = "character";
     public const string Campaign = "campaign";
+    public const string Invite = "invite";
 
     public static bool TryValidate(
         string? kind,
@@ -22,7 +23,7 @@ public static class FriendChatAttachmentHelper
             return true;
 
         normalizedKind = kind.Trim().ToLowerInvariant();
-        if (normalizedKind is not Character and not Campaign)
+        if (normalizedKind is not Character and not Campaign and not Invite)
         {
             error = "Type de pièce jointe invalide.";
             return false;
@@ -47,11 +48,31 @@ public static class FriendChatAttachmentHelper
                     return false;
                 }
             }
-            else if (!root.TryGetProperty("campaignId", out var campEl) ||
-                     !Guid.TryParse(campEl.GetString(), out _))
+            else if (normalizedKind == Campaign)
             {
-                error = "Campagne invalide.";
-                return false;
+                if (!root.TryGetProperty("campaignId", out var campEl) ||
+                    !Guid.TryParse(campEl.GetString(), out _))
+                {
+                    error = "Campagne invalide.";
+                    return false;
+                }
+            }
+            else
+            {
+                var token = root.TryGetProperty("joinToken", out var tokEl) ? tokEl.GetString() : null;
+                if (string.IsNullOrWhiteSpace(token) || token.Length is < 8 or > 64
+                    || token.Any(c => !(char.IsAsciiLetterOrDigit(c) || c is '-' or '_')))
+                {
+                    error = "Lien d'invitation invalide.";
+                    return false;
+                }
+
+                if (root.TryGetProperty("campaignId", out var campIdEl)
+                    && !Guid.TryParse(campIdEl.GetString(), out _))
+                {
+                    error = "Campagne invalide.";
+                    return false;
+                }
             }
         }
         catch
@@ -72,6 +93,7 @@ public static class FriendChatAttachmentHelper
             {
                 Character => "📜 Fiche partagée",
                 Campaign => "🗺 Campagne partagée",
+                Invite => "📨 Invitation campagne",
                 _ => "📎 Pièce jointe",
             };
         }

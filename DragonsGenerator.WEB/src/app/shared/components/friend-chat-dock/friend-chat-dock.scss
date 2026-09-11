@@ -18,3 +18,38 @@
     animation: dock-in 0.18s ease-out;
   }
 }
+
+/* Scrollbar discrète (champ message + panneau). */
+.friend-chat-input,
+.friend-chat-panel .overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 116, 139, 0.55) transparent;
+}
+
+.friend-chat-input::-webkit-scrollbar,
+.friend-chat-panel .overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.friend-chat-input::-webkit-scrollbar-track,
+.friend-chat-panel .overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.friend-chat-input::-webkit-scrollbar-thumb,
+.friend-chat-panel .overflow-y-auto::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.45);
+  border-radius: 999px;
+}
+
+.friend-chat-input::-webkit-scrollbar-thumb:hover,
+.friend-chat-panel .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.55);
+}
+
+.friend-chat-input::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}

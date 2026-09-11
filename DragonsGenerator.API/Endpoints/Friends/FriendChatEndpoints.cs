@@ -156,6 +156,20 @@ public class SendFriendMessageEndpoint(AppDbContext db, PushNotificationService 
             }
         }
 
+        if (kind == FriendChatAttachmentHelper.Invite && payload is not null)
+        {
+            using var doc = System.Text.Json.JsonDocument.Parse(payload);
+            var token = doc.RootElement.GetProperty("joinToken").GetString()!;
+            var owned = await db.Campaigns.AsNoTracking()
+                .AnyAsync(c => c.OwnerUserId == userId && c.JoinEnabled && c.JoinToken == token, ct);
+            if (!owned)
+            {
+                AddError("Lien d'invitation inaccessible.");
+                await Send.ErrorsAsync(StatusCodes.Status403Forbidden, ct);
+                return;
+            }
+        }
+
         var sender = await db.Users.AsNoTracking().FirstAsync(u => u.Id == userId, ct);
         var message = new FriendMessage
         {

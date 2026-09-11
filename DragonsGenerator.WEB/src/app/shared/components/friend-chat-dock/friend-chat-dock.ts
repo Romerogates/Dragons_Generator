@@ -13,6 +13,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { AuthService } from '@core/services/auth.service';
 import { FriendChatDockService } from '@core/services/friend-chat-dock.service';
 import {
@@ -29,6 +31,10 @@ import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profil
 import { accentMessageClass, accentGradient } from '@core/utils/profile.util';
 import type { ChatConversation } from '@core/services/friend-chat-dock.service';
 import type { Character } from '@core/models/Character/character';
+import {
+  parseChatBodySegments,
+  type ChatBodySegment,
+} from '@core/utils/chat-body-links.util';
 
 interface ParsedAttachment {
   kind: FriendMessageAttachmentKind;
@@ -36,6 +42,7 @@ interface ParsedAttachment {
   characterName?: string;
   campaignId?: string;
   campaignTitle?: string;
+  joinToken?: string;
 }
 
 @Component({
@@ -151,6 +158,43 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
     this.sendAttachment('campaign', { campaignId: c.id, campaignTitle: c.title });
   }
 
+  /** Partage un deep-link /join (MJ seulement). */
+  shareCampaignInvite(c: CampaignSummary): void {
+    if (c.role !== 'dm' || this.sending()) return;
+    this.sending.set(true);
+    this.threadError.set(null);
+    this.shareMenuOpen.set(false);
+    this.campaigns
+      .getJoinLink(c.id)
+      .pipe(
+        switchMap((link) =>
+          link.enabled && link.token ? of(link) : this.campaigns.createOrRotateJoinLink(c.id),
+        ),
+      )
+      .subscribe({
+        next: (link) => {
+          if (!link.token) {
+            this.sending.set(false);
+            this.threadError.set('Impossible de créer le lien d’invitation.');
+            return;
+          }
+          this.sendAttachment(
+            'invite',
+            {
+              joinToken: link.token,
+              campaignId: c.id,
+              campaignTitle: c.title,
+            },
+            true,
+          );
+        },
+        error: () => {
+          this.sending.set(false);
+          this.threadError.set('Impossible de créer le lien d’invitation.');
+        },
+      });
+  }
+
   openSharedCharacter(characterId: string, characterName?: string, isMine = false): void {
     if (!characterId || this.openingShared()) return;
     this.openingShared.set(true);
@@ -193,9 +237,10 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
   private sendAttachment(
     kind: FriendMessageAttachmentKind,
     payload: Record<string, string>,
+    alreadySending = false,
   ): void {
     const id = this.dock.activeFriendId();
-    if (!id || this.sending()) return;
+    if (!id || (!alreadySending && this.sending())) return;
     this.sending.set(true);
     this.threadError.set(null);
     this.shareMenuOpen.set(false);
@@ -263,7 +308,7 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
   parseAttachment(msg: FriendMessage): ParsedAttachment | null {
     if (!msg.attachmentKind || !msg.attachmentPayload) return null;
     const kind = msg.attachmentKind as FriendMessageAttachmentKind;
-    if (kind !== 'character' && kind !== 'campaign') return null;
+    if (kind !== 'character' && kind !== 'campaign' && kind !== 'invite') return null;
     try {
       const data = JSON.parse(msg.attachmentPayload) as Record<string, string>;
       if (kind === 'character') {
@@ -271,6 +316,14 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
           kind,
           characterId: data['characterId'],
           characterName: data['characterName'],
+        };
+      }
+      if (kind === 'invite') {
+        return {
+          kind,
+          joinToken: data['joinToken'],
+          campaignId: data['campaignId'],
+          campaignTitle: data['campaignTitle'],
         };
       }
       return {
@@ -281,6 +334,10 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
     } catch {
       return { kind };
     }
+  }
+
+  bodySegments(body: string): ChatBodySegment[] {
+    return parseChatBodySegments(body);
   }
 
   myMessageClass(): string {

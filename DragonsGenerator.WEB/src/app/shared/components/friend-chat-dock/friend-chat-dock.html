@@ -177,6 +177,19 @@
                               </p>
                               <p class="text-[10px] mt-1 opacity-70">Consulter (sans appropriation)</p>
                             </button>
+                          } @else if (att.kind === 'invite' && att.joinToken) {
+                            <a
+                              [routerLink]="['/join', att.joinToken]"
+                              class="block rounded-xl border border-violet-400/30 bg-black/20 px-3 py-2 hover:bg-black/30 transition-colors"
+                            >
+                              <p class="text-[10px] font-black uppercase tracking-widest opacity-80">
+                                Invitation campagne
+                              </p>
+                              <p class="font-serif text-sm mt-0.5">
+                                {{ att.campaignTitle || 'Rejoindre la table' }}
+                              </p>
+                              <p class="text-[10px] mt-1 opacity-70">Ouvrir le lien →</p>
+                            </a>
                           } @else if (att.kind === 'campaign' && att.campaignId) {
                             <a
                               [routerLink]="['/campaigns', att.campaignId]"
@@ -192,7 +205,27 @@
                           }
                         }
                         @if (msg.body) {
-                          <p class="whitespace-pre-wrap break-words">{{ msg.body }}</p>
+                          <p class="whitespace-pre-wrap break-words">
+                            @for (seg of bodySegments(msg.body); track $index) {
+                              @if (seg.type === 'text') {
+                                <span>{{ seg.value }}</span>
+                              } @else if (seg.type === 'join') {
+                                <a
+                                  [routerLink]="['/join', seg.token]"
+                                  class="underline underline-offset-2 font-semibold break-all hover:opacity-90"
+                                  >Rejoindre la campagne</a
+                                >
+                              } @else {
+                                <a
+                                  [href]="seg.href"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  class="underline underline-offset-2 break-all hover:opacity-90"
+                                  >{{ seg.label }}</a
+                                >
+                              }
+                            }
+                          </p>
                         }
                         <p
                           class="text-[9px] mt-1 opacity-70"
@@ -235,15 +268,26 @@
                         }
                         @if (myCampaigns().length) {
                           <p class="text-[9px] uppercase text-slate-600 mb-1">Campagnes</p>
-                          <div class="flex flex-wrap gap-1">
+                          <div class="flex flex-col gap-1.5">
                             @for (c of myCampaigns(); track c.id) {
-                              <button
-                                type="button"
-                                class="px-2 py-1 rounded-lg text-[10px] border border-slate-700 text-slate-300 hover:border-sky-500/50"
-                                (click)="shareCampaign(c)"
-                              >
-                                {{ c.title }}
-                              </button>
+                              <div class="flex flex-wrap gap-1">
+                                <button
+                                  type="button"
+                                  class="px-2 py-1 rounded-lg text-[10px] border border-slate-700 text-slate-300 hover:border-sky-500/50"
+                                  (click)="shareCampaign(c)"
+                                >
+                                  {{ c.title }}
+                                </button>
+                                @if (c.role === 'dm') {
+                                  <button
+                                    type="button"
+                                    class="px-2 py-1 rounded-lg text-[10px] border border-violet-700/50 text-violet-300 hover:border-violet-400/60"
+                                    (click)="shareCampaignInvite(c)"
+                                  >
+                                    Lien invitation
+                                  </button>
+                                }
+                              </div>
                             }
                           </div>
                         }
@@ -266,7 +310,7 @@
                       rows="1"
                       maxlength="2000"
                       placeholder="Message…"
-                      class="flex-1 min-w-0 max-h-24 rounded-3xl bg-[#252b36] border border-slate-700/60 px-4 py-2.5 text-sm resize-none outline-none focus:border-violet-600/60"
+                      class="friend-chat-input flex-1 min-w-0 max-h-24 rounded-3xl bg-[#252b36] border border-slate-700/60 px-4 py-2.5 text-sm resize-none outline-none focus:border-violet-600/60 overflow-y-auto"
                       [value]="draft()"
                       (input)="draft.set($any($event.target).value)"
                       (keydown)="onKeydown($event)"
