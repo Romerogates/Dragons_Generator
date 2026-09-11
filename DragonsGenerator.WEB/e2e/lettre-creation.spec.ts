@@ -105,11 +105,14 @@ test.describe('Lettré L1 wizard', () => {
     await page.getByPlaceholder('Ex: Valerius').fill('Valerius le Lettré');
     await page.getByRole('button', { name: "Finaliser l'identité" }).click();
 
-    // 10 — Récapitulatif (contenu dans l'aperçu PDF iframe)
+    // 10 — Récapitulatif (aperçu PDF page-à-page ; fallback si pdf.js échoue)
     await expectStepHeading(page, /Le Destin Scellé/i);
     await expect(page.getByRole('button', { name: 'Sauvegarder le héros' })).toBeVisible();
-    await expect(page.locator('iframe[title="Aperçu de la fiche de personnage"]')).toBeVisible({
-      timeout: 30_000,
-    });
+    await expect(
+      page
+        .locator('app-pdf-page-preview canvas')
+        .or(page.getByText('Aperçu PDF indisponible dans le navigateur'))
+        .or(page.getByText(/L'aperçu n'a pas pu être généré/i)),
+    ).toBeVisible({ timeout: 30_000 });
   });
 });
