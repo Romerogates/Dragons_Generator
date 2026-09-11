@@ -660,7 +660,7 @@ export class CampaignPlayPanel implements OnDestroy {
 
   startStandaloneCombat(): void {
     if (!this.activeSession()) {
-      this.setFeedback('err', 'Entre d’abord en session pour combattre.');
+        this.setFeedback('err', 'Entrez d’abord en session pour combattre.');
       return;
     }
     this.withReplaceCombatConfirm(() => {
@@ -672,7 +672,7 @@ export class CampaignPlayPanel implements OnDestroy {
 
   enterCombatFlow(): void {
     if (!this.activeSession()) {
-      this.setFeedback('err', 'Entre d’abord en session pour combattre.');
+        this.setFeedback('err', 'Entrez d’abord en session pour combattre.');
       return;
     }
     this.sessionView.set('combat');
@@ -877,7 +877,7 @@ export class CampaignPlayPanel implements OnDestroy {
 
   startCombatFromEncounter(encounter: EncounterGroup): void {
     if (!this.activeSession()) {
-      this.setFeedback('err', 'Entre d’abord en session pour combattre.');
+        this.setFeedback('err', 'Entrez d’abord en session pour combattre.');
       return;
     }
     this.withReplaceCombatConfirm(() => {
@@ -1359,7 +1359,7 @@ export class CampaignPlayPanel implements OnDestroy {
   /** Allié PNJ générique (CA 10) — pour un héros joueur, utiliser le sélecteur. */
   addAllyCombatant(): void {
     if (!this.activeSession()) {
-      this.setFeedback('err', 'Entre d’abord en session pour combattre.');
+        this.setFeedback('err', 'Entrez d’abord en session pour combattre.');
       return;
     }
     this.allyPickerOpen.set(false);
@@ -1387,7 +1387,7 @@ export class CampaignPlayPanel implements OnDestroy {
   /** Adversaire avec CA 10 (règles) — randomisable via le dé à côté du champ. */
   addEnemyCombatant(): void {
     if (!this.activeSession()) {
-      this.setFeedback('err', 'Entre d’abord en session pour combattre.');
+        this.setFeedback('err', 'Entrez d’abord en session pour combattre.');
       return;
     }
     const combat = this.activeCombat();

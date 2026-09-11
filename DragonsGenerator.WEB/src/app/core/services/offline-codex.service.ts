@@ -106,7 +106,7 @@ export class OfflineCodexService {
       }),
       catchError(() => {
         this.downloading.set(false);
-        this.downloadError.set('Échec du téléchargement. Vérifie ta connexion et réessaie.');
+        this.downloadError.set('Échec du téléchargement. Vérifiez votre connexion et réessayez.');
         return of(false);
       }),
     );

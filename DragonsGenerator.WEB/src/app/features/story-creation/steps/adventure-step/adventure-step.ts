@@ -47,7 +47,7 @@ export class AdventureStep implements OnInit {
 
   generateAdventure(): void {
     if (!this.connectivity.isOnline()) {
-      this.generationError.set('La génération IA nécessite une connexion. Rédige l\'aventure manuellement ci-dessous.');
+      this.generationError.set('La génération IA nécessite une connexion. Rédigez l\'aventure manuellement ci-dessous.');
       return;
     }
     if (!this.builder.title().trim()) {

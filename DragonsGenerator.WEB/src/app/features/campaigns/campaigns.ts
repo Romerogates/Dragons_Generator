@@ -174,7 +174,7 @@ export class Campaigns implements OnInit, OnDestroy {
   open(c: CampaignSummary): void {
     if (c.pendingSync) {
       this.actionError.set(
-        'Campagne en attente de synchronisation. Reconnecte-toi pour l\'envoyer au cloud.',
+        'Campagne en attente de synchronisation. Reconnectez-vous pour l\'envoyer au cloud.',
       );
       return;
     }

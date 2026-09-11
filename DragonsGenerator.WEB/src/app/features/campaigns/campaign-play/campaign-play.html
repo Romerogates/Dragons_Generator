@@ -13,10 +13,11 @@
       <div class="max-w-5xl mx-auto flex items-center justify-between gap-2 sm:gap-3">
         <a
           [routerLink]="['/campaigns', c.id]"
+          [queryParams]="{ tab: 'sessions' }"
           class="min-h-11 inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-400 transition-colors group shrink-0"
         >
           <span class="group-hover:-translate-x-1 transition-transform">←</span>
-          <span class="hidden sm:inline">Campagne</span>
+          <span class="hidden sm:inline">Sessions</span>
         </a>
         <div class="text-center flex-1 min-w-0 px-1">
           <p class="hidden sm:block text-[10px] font-black uppercase tracking-widest text-emerald-500">

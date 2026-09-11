@@ -22,6 +22,7 @@ import {
   ADVENTURE_TONE_LABELS,
   CREATURE_ROLE_LABELS,
 } from '@core/models/Story/story';
+import { PdfPagePreview } from '@shared/components/pdf-page-preview/pdf-page-preview';
 import {
   storyLocationContext,
   storyRegionLabel,
@@ -30,7 +31,7 @@ import {
 @Component({
   selector: 'app-story-summary-step',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, PdfPagePreview],
   templateUrl: './story-summary-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -57,7 +58,8 @@ export class StorySummaryStep implements OnInit, OnDestroy {
 
   readonly isLoadingPreview = signal(false);
   readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
-  private rawBlobUrl: string | null = null;
+  readonly pdfRawUrl = signal<string | null>(null);
+  readonly pdfJsFailed = signal(false);
 
   ngOnInit(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -71,10 +73,13 @@ export class StorySummaryStep implements OnInit, OnDestroy {
   }
 
   private revokePreviewUrl(): void {
-    if (this.rawBlobUrl) {
-      URL.revokeObjectURL(this.rawBlobUrl);
-      this.rawBlobUrl = null;
+    const url = this.pdfRawUrl();
+    if (url) {
+      URL.revokeObjectURL(url);
+      this.pdfRawUrl.set(null);
     }
+    this.pdfPreviewUrl.set(null);
+    this.pdfJsFailed.set(false);
   }
 
   private loadPackPreview(): void {
@@ -90,7 +95,7 @@ export class StorySummaryStep implements OnInit, OnDestroy {
             data,
             entries,
           );
-          this.rawBlobUrl = url;
+          this.pdfRawUrl.set(url);
           this.pdfPreviewUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
         } catch (err) {
           console.error('Erreur génération aperçu pack MJ :', err);
@@ -102,8 +107,13 @@ export class StorySummaryStep implements OnInit, OnDestroy {
     });
   }
 
+  onPdfJsFailed(): void {
+    this.pdfJsFailed.set(true);
+  }
+
   openFullscreen(): void {
-    if (this.rawBlobUrl) window.open(this.rawBlobUrl, '_blank');
+    const url = this.pdfRawUrl();
+    if (url) window.open(url, '_blank');
   }
 
   saveStory(): void {
@@ -121,7 +131,7 @@ export class StorySummaryStep implements OnInit, OnDestroy {
 
     if (!this.connectivity.isOnline()) {
       if (!b.adventure().trim()) {
-        this.saveError.set('Rédige au moins un résumé d\'aventure (sans IA) avant de sauvegarder hors ligne.');
+        this.saveError.set('Rédigez au moins un résumé d\'aventure (sans IA) avant de sauvegarder hors ligne.');
         return;
       }
       this.saving.set(true);
@@ -154,7 +164,7 @@ export class StorySummaryStep implements OnInit, OnDestroy {
       },
       error: () => {
         if (!b.adventure().trim()) {
-          this.saveError.set('Rédige un résumé d\'aventure avant la sauvegarde locale.');
+          this.saveError.set('Rédigez un résumé d\'aventure avant la sauvegarde locale.');
           this.saving.set(false);
           return;
         }

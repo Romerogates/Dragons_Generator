@@ -1881,14 +1881,23 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   rejectMember(member: CampaignMember): void {
     const c = this.campaign();
     if (!c) return;
-    this.campaigns.rejectProposal(c.id, member.id).subscribe({
-      next: () => {
-        this.reload();
-        this.notifications.refresh();
-        if (this.tab() === 'overview') this.loadActivity();
+    const name = member.proposedCharacterName ?? 'cette proposition';
+    this.askConfirm(
+      'Refuser la proposition',
+      `Refuser « ${name} » de ${member.displayName} ? Le joueur devra en proposer une autre.`,
+      () => {
+        this.campaigns.rejectProposal(c.id, member.id).subscribe({
+          next: () => {
+            this.reload();
+            this.notifications.refresh();
+            if (this.tab() === 'overview') this.loadActivity();
+          },
+          error: () => this.error.set('Impossible de refuser ce personnage.'),
+        });
       },
-      error: () => this.error.set('Impossible de refuser ce personnage.'),
-    });
+      'Refuser',
+      true,
+    );
   }
 
   canRequestCharacterPick(member: CampaignMember): boolean {
@@ -2215,9 +2224,18 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   removePregen(pregenId: string): void {
     const c = this.campaign();
     if (!c) return;
-    this.saveData({
-      pregenCharacters: (c.data.pregenCharacters ?? []).filter((p) => p.id !== pregenId),
-    });
+    const name =
+      (c.data.pregenCharacters ?? []).find((p) => p.id === pregenId)?.characterName ??
+      'ce pré-tiré';
+    this.askConfirm(
+      'Supprimer le pré-tiré',
+      `Supprimer « ${name} » de la campagne ?`,
+      () => {
+        this.saveData({
+          pregenCharacters: (c.data.pregenCharacters ?? []).filter((p) => p.id !== pregenId),
+        });
+      },
+    );
   }
 
   assignPregen(pregen: CampaignPregen, member: CampaignMember): void {

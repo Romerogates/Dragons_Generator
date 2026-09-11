@@ -322,7 +322,7 @@
                   </div>
 
                   <form
-                    class="shrink-0 flex flex-col gap-2 px-3 sm:px-4 py-3 border-t border-slate-800 bg-[#171b22]"
+                    class="shrink-0 flex flex-col gap-2 px-3 sm:px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t border-slate-800 bg-[#171b22]"
                     (ngSubmit)="send()"
                   >
                     @if (shareMenuOpen()) {
@@ -381,24 +381,24 @@
                     <div class="flex items-end gap-2">
                       <button
                         type="button"
-                        class="shrink-0 w-10 h-10 rounded-full border border-slate-700 text-slate-400 flex items-center justify-center hover:border-violet-500/50 hover:text-violet-300"
+                        class="shrink-0 min-h-12 min-w-12 w-12 h-12 rounded-full border border-slate-700 text-slate-400 flex items-center justify-center hover:border-violet-500/50 hover:text-violet-300"
                         aria-label="Partager"
                         (click)="toggleShareMenu()"
                       >
-                        <iconify-icon icon="mdi:paperclip" class="text-lg"></iconify-icon>
+                        <iconify-icon icon="mdi:paperclip" class="text-xl"></iconify-icon>
                       </button>
                       <textarea
-                        rows="1"
+                        [attr.rows]="dock.expanded() ? 2 : 1"
                         maxlength="2000"
                         placeholder="Message…"
-                        class="friend-chat-input flex-1 min-w-0 max-h-32 rounded-3xl bg-[#252b36] border border-slate-700/60 px-4 py-2.5 text-sm resize-none outline-none focus:border-violet-600/60 overflow-y-auto"
+                        class="friend-chat-input flex-1 min-w-0 min-h-12 max-h-40 rounded-3xl bg-[#252b36] border border-slate-700/60 px-4 py-3 text-sm resize-none outline-none focus:border-violet-600/60 overflow-y-auto"
                         [value]="draft()"
                         (input)="draft.set($any($event.target).value)"
                         (keydown)="onKeydown($event)"
                       ></textarea>
                       <button
                         type="submit"
-                        class="shrink-0 w-10 h-10 rounded-full text-white flex items-center justify-center disabled:opacity-40 hover:opacity-90 transition-opacity"
+                        class="shrink-0 min-h-12 min-w-12 w-12 h-12 rounded-full text-white flex items-center justify-center disabled:opacity-40 hover:opacity-90 transition-opacity"
                         [ngClass]="myMessageClass()"
                         [disabled]="sending() || !draft().trim()"
                         aria-label="Envoyer"
@@ -406,7 +406,7 @@
                         @if (sending()) {
                           <span class="text-xs">…</span>
                         } @else {
-                          <iconify-icon icon="mdi:send" class="text-lg"></iconify-icon>
+                          <iconify-icon icon="mdi:send" class="text-xl"></iconify-icon>
                         }
                       </button>
                     </div>
