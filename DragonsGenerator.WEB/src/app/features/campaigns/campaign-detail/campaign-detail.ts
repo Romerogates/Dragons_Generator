@@ -340,6 +340,12 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     );
   });
 
+  /** Badge onglet Joueurs : propositions à accepter / refuser (MJ). */
+  readonly playersTabBadgeCount = computed(() => {
+    if (!this.campaign()?.isOwner) return 0;
+    return this.pendingProposals().length;
+  });
+
   readonly activeSession = computed(() => {
     const c = this.campaign();
     const id = c?.data.activeSessionId;
