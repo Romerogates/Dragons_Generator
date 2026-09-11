@@ -189,6 +189,9 @@ export class FriendsPage implements OnInit, OnDestroy {
   }
 
   decline(id: string): void {
+    const req = this.requests().find((r) => r.id === id);
+    const name = req?.displayName ?? 'cette demande';
+    if (!confirm(`Refuser la demande de ${name} ?`)) return;
     this.friends.declineRequest(id).subscribe({
       next: () => {
         this.message.set('Demande refusée.');

@@ -274,6 +274,7 @@
                             } @else if (att.kind === 'campaign' && att.campaignId) {
                               <a
                                 [routerLink]="['/campaigns', att.campaignId]"
+                                [queryParams]="{ tab: 'overview' }"
                                 class="block rounded-xl border border-white/10 bg-black/20 px-3 py-2 hover:bg-black/30 transition-colors"
                               >
                                 <p class="text-[10px] font-black uppercase tracking-widest opacity-80">

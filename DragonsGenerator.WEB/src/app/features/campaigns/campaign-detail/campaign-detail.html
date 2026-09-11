@@ -2,7 +2,7 @@
   @if (!isLoggedIn()) {
     <div class="max-w-lg mx-auto px-4 py-24 text-center">
       <p class="text-slate-400 mb-6 font-serif italic">Connectez-vous pour accéder à vos campagnes.</p>
-      <a routerLink="/login" class="px-6 py-3 bg-violet-600 text-white rounded-xl text-xs font-black uppercase tracking-widest">Se connecter</a>
+      <a routerLink="/login" [queryParams]="{ returnUrl: '/campaigns' }" class="px-6 py-3 bg-violet-600 text-white rounded-xl text-xs font-black uppercase tracking-widest">Se connecter</a>
     </div>
   } @else if (loading()) {
     <p class="text-center py-24 text-violet-400 animate-pulse">Chargement de la campagne...</p>
@@ -535,6 +535,7 @@
                         }
                         <a
                           routerLink="/create"
+                          [queryParams]="{ campaignId: c.id, returnUrl: '/campaigns/' + c.id + '?tab=players' }"
                           class="px-3 py-2 rounded-xl text-xs border border-violet-800/50 text-violet-300 hover:border-violet-500/50"
                         >
                           Créer un héros →
@@ -721,7 +722,7 @@
                                   class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-red-950/30 border border-red-900/40 text-red-300"
                                   (click)="markDefeated(enc.id, $index)"
                                 >
-                                  +1 kill
+                                  +1 vaincu
                                 </button>
                               }
                             </div>

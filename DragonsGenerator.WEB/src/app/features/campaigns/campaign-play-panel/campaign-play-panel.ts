@@ -736,6 +736,15 @@ export class CampaignPlayPanel implements OnDestroy {
     this.dungeonPickerOpen.set(false);
   }
 
+  clearSessionMap(): void {
+    this.askConfirm(
+      'Retirer le donjon',
+      'Retirer le donjon attribué à cette session ?',
+      () => this.assignSessionMap(null),
+      'Retirer',
+    );
+  }
+
   focusDungeonPicker(): void {
     this.dungeonPickerOpen.set(true);
     queueMicrotask(() => {

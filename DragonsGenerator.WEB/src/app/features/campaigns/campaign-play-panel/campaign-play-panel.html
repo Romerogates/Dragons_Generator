@@ -151,7 +151,7 @@
 
     @if (isDm() && fullscreen()) {
       <nav
-        class="sticky top-0 z-20 -mx-1 mb-6 flex flex-wrap gap-1 rounded-xl border border-emerald-900/40 bg-[#141a16]/95 p-1 backdrop-blur-sm"
+        class="sticky z-20 -mx-1 mb-6 flex flex-wrap gap-1 rounded-xl border border-emerald-900/40 bg-[#141a16]/95 p-1 backdrop-blur-sm top-[calc(4rem+3.25rem+env(safe-area-inset-top,0px))]"
         aria-label="Sections de la session"
       >
         @for (tab of sessionTabs; track tab.id) {
@@ -350,7 +350,7 @@
               <button
                 type="button"
                 class="min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400"
-                (click)="assignSessionMap(null)"
+                (click)="clearSessionMap()"
               >
                 Retirer
               </button>
@@ -1990,7 +1990,7 @@
                         class="px-2 py-1 rounded text-[9px] font-black uppercase bg-red-950/30 border border-red-900/40 text-red-300"
                         (click)="markDefeated(enc.id, $index)"
                       >
-                        +1 kill
+                        +1 vaincu
                       </button>
                     }
                   </div>
@@ -2053,6 +2053,14 @@
       >
         Entrer en session
       </button>
+    } @else {
+      <a
+        [routerLink]="['/campaigns', c.id]"
+        [queryParams]="{ tab: 'sessions' }"
+        class="inline-flex min-h-11 items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-emerald-800/50 text-emerald-300"
+      >
+        Voir les sessions
+      </a>
     }
   </div>
 } @else {
@@ -2076,9 +2084,10 @@
     } @else {
       <a
         [routerLink]="['/campaigns', c.id]"
+        [queryParams]="{ tab: 'sessions' }"
         class="inline-flex min-h-11 items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-emerald-800/50 text-emerald-300"
       >
-        Retour au hub
+        Retour aux sessions
       </a>
     }
   </div>

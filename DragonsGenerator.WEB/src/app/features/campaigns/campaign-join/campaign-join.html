@@ -44,6 +44,7 @@
         <p class="text-sm text-emerald-400">Vous faites déjà partie de cette campagne.</p>
         <a
           [routerLink]="['/campaigns', campaignId()]"
+          [queryParams]="{ tab: 'sessions' }"
           class="inline-block px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-violet-600 text-white"
         >
           Ouvrir la campagne

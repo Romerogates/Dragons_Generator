@@ -58,12 +58,17 @@
       @if (!isLoadingPreview() && pdfRawUrl(); as url) {
         @if (!pdfJsFailed()) {
           <app-pdf-page-preview [src]="url" (loadFailed)="onPdfJsFailed()" />
-        } @else if (pdfPreviewUrl(); as safeUrl) {
-          <iframe
-            [src]="safeUrl"
-            class="w-full h-full border-0"
-            title="Aperçu de la fiche de personnage"
-          ></iframe>
+        } @else {
+          <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center bg-[#0f1117]">
+            <p class="text-sm text-slate-400">Aperçu PDF indisponible dans le navigateur.</p>
+            <button
+              type="button"
+              class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-600 text-white"
+              (click)="downloadPdf()"
+            >
+              Télécharger PDF
+            </button>
+          </div>
         }
       }
 
