@@ -37,6 +37,11 @@
             type="button"
             class="min-h-11 inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-sky-800/50 text-sky-300 hover:border-sky-500/50 disabled:opacity-40"
             [disabled]="!myApprovedMember() || sheetLoadingId() === myApprovedMember()?.id"
+            [attr.title]="
+              !myApprovedMember()
+                ? 'Proposez un héros depuis le hub (onglet Joueurs), puis attendez l’approbation du MJ.'
+                : null
+            "
             (click)="openMySheet()"
           >
             @if (sheetLoadingId() === myApprovedMember()?.id) {
@@ -45,6 +50,17 @@
               Ma fiche
             }
           </button>
+          @if (!myApprovedMember()) {
+            <p class="basis-full text-[10px] text-slate-500 sm:basis-auto sm:max-w-[14rem]">
+              Aucun héros approuvé —
+              <a
+                [routerLink]="['/campaigns', c.id]"
+                [queryParams]="{ tab: 'players' }"
+                class="text-sky-400 underline hover:text-sky-300"
+                >proposer un héros</a
+              >.
+            </p>
+          }
         }
         @if (isDm() && !fullscreen()) {
           <app-fullscreen-enter-link

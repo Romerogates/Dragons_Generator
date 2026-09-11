@@ -15,7 +15,25 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
-_(File vide — reprendre idle / polish manuel ou nouvelle vague produit.)_
+### Vague « Fluide » — perfectionner l’existant (pas de feature neuve)
+
+Ordre = friction joueur. **Interdit** : idle / Bivouac / Métiers, nouvelles routes session, wizard campagne V2.
+
+1. **e2e lien `/join`** — ~~écrit + **vérifié**~~ (`campaign-join-link` + amis + classes : 8/8 OK sur stack docker locale 2026-09-11).
+2. **Forge : navigation fluide** — ~~fait~~ (étapes passées cliquables ; panneau « Corriger une étape »).
+3. **Forge : filets de sécurité** — ~~fait~~ (confirm brouillon ; sticky Continuer ; magie sous barre d’étapes).
+4. **Vousvoiement** — ~~fait~~ (Héros, login/register save-intent, banner offline forge, overview hub).
+5. **Après `/join`** — ~~fait~~ (CTA Proposer / Forger sur hub ; libellé join « Connexion à la table… »).
+6. **Fiche consult depuis `/play`** — ~~fait~~ (vue Fiche par défaut ; Retour à la table ; hint Ma fiche).
+7. **Vocabulaire table** — ~~fait~~ (dock : Panneau table / Table plein écran ; hub inchangé Entrer / Ouvrir / Rejoindre).
+8. **Récap forge mobile** — ~~fait~~ (aperçu PDF plus compact + texte d’aide).
+
+### Vague « Fluide 2 » — boucle correction forge
+
+9. **Retour au récap** — ~~fait~~ (CTA sticky « Retour au récap » après Corriger une étape).
+10. Smoke manuel forge (barre cliquable + confirm brouillon + CTA join hub) sur prod après commit/push.
+
+_(Fluide 1 livrée en local, tests unitaires + e2e join/amis/classes OK — commit/push quand Anthony le demande.)_
 
 ## Déjà livré (ne pas refaire)
 

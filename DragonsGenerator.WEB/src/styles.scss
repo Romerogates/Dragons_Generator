@@ -37,7 +37,9 @@
 @layer components {
   /* Wizard creation — common bottom-centered nav */
   .wizard-step-nav {
-    @apply mt-auto shrink-0 w-full flex flex-wrap justify-center items-center gap-2.5 sm:gap-3 pt-4 pb-2 px-2;
+    @apply mt-auto shrink-0 w-full flex flex-wrap justify-center items-center gap-2.5 sm:gap-3 pt-3 px-2
+      sticky bottom-0 z-20 bg-[#171b22]/95 backdrop-blur-md border-t border-slate-800/70;
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
   }
 
   .wizard-nav-secondary {

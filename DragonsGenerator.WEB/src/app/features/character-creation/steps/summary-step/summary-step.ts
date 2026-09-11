@@ -66,6 +66,12 @@ export class SummaryStep implements OnInit, OnDestroy {
   readonly isEditMode = computed(() => this.builder.isEditMode);
   readonly isLoggedIn = this.auth.isLoggedIn;
 
+  /** Toutes les étapes sauf le récap — pour corriger sans remonter une à une. */
+  readonly editableSteps = computed(() => {
+    const summary = this.builder.summaryStep();
+    return this.builder.steps().filter((s) => s.number < summary);
+  });
+
   readonly isLoadingPreview = signal(true);
   readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
   readonly showAuthGate = signal(false);

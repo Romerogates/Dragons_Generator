@@ -202,6 +202,8 @@ Avec un 2ᵉ compte membre de la campagne.
   - *E2E :* `friends-invites.spec.ts`.
 - [x] 🟠 Invitation campagne → accepter / décliner
   - *E2E :* `friends-invites.spec.ts` (Rejoindre sur `/campaigns`).
+- [x] 🟠 Lien public `/join/{token}` → rejoindre sans amitié → révocation
+  - *E2E :* `campaign-join-link.spec.ts`.
 - [x] 🟢 Cas limites : non-ami, doublon, invitation déjà traitée (messages d’erreur OK)
 
 ---

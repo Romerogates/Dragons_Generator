@@ -164,6 +164,34 @@ export async function createXpReadyCampaignAs(
   return { campaignId: body.id, encounterId };
 }
 
+/** Crée / régénère le lien public /join/{token} (API, MJ). */
+export async function createJoinLinkAs(
+  page: Page,
+  owner: AuthSession,
+  campaignId: string,
+): Promise<{ token: string }> {
+  const res = await page.request.post(`/api/me/campaigns/${campaignId}/join-link`, {
+    headers: bearer(owner.token),
+  });
+  expect(res.ok(), `Create join-link failed: ${res.status()} ${await res.text()}`).toBeTruthy();
+  const body = (await res.json()) as { token: string | null; enabled: boolean };
+  expect(body.enabled, 'join link should be enabled').toBeTruthy();
+  expect(body.token, 'join token missing').toBeTruthy();
+  return { token: body.token! };
+}
+
+/** Désactive le lien public /join (API, MJ). */
+export async function revokeJoinLinkAs(
+  page: Page,
+  owner: AuthSession,
+  campaignId: string,
+): Promise<void> {
+  const res = await page.request.delete(`/api/me/campaigns/${campaignId}/join-link`, {
+    headers: bearer(owner.token),
+  });
+  expect(res.ok(), `Revoke join-link failed: ${res.status()} ${await res.text()}`).toBeTruthy();
+}
+
 /** Ami → invitation campagne → acceptation (API). */
 export async function invitePlayerToCampaign(
   page: Page,

@@ -23,6 +23,7 @@ export async function startFreshWizard(page: Page): Promise<void> {
   const restart = page.getByTestId('wizard-draft-restart');
   if (await restart.isVisible().catch(() => false)) {
     await restart.click();
+    await page.getByRole('button', { name: 'Effacer et recommencer' }).click();
   }
   // Étape 0 — Niveau : valide le niveau par défaut (1) pour atteindre l'étape Espèce.
   const levelContinue = page.getByTestId('level-step-continue');

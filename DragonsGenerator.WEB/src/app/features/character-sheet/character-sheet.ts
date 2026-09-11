@@ -50,9 +50,24 @@ export class CharacterSheet implements OnInit, OnDestroy {
   readonly pdfFailed = signal(false);
   readonly isConsult = signal(false);
   readonly consultSourceLabel = signal<string | null>(null);
-  /** Interface affichée : PDF par défaut, bascule UI en un clic. */
+  readonly consultReturnUrl = signal<string | null>(null);
+  /** Interface affichée : PDF par défaut (fiche Jouer en consultation table). */
   readonly viewMode = signal<SheetViewMode>(readStoredViewMode());
   private rawBlobUrl: string | null = null;
+
+  readonly consultBackLabel = computed(() => {
+    const url = this.consultReturnUrl();
+    if (url?.includes('/play')) return '← Retour à la table';
+    if (this.consultSourceLabel()) return '← Retour';
+    return '← Retour';
+  });
+
+  readonly errorBackLink = computed(() => this.consultReturnUrl() ?? '/characters');
+  readonly errorBackLabel = computed(() =>
+    this.consultReturnUrl()?.includes('/play')
+      ? 'Retour à la table'
+      : 'Retour à la liste',
+  );
 
   readonly auraFeatures = computed(() => {
     const feats = this.character()?.features ?? [];
@@ -75,6 +90,10 @@ export class CharacterSheet implements OnInit, OnDestroy {
       this.character.set(character);
       this.isConsult.set(this.handoff.peekMode() === 'consult');
       this.consultSourceLabel.set(this.handoff.peekSourceLabel());
+      this.consultReturnUrl.set(this.handoff.peekReturnUrl());
+      if (this.isConsult()) {
+        this.viewMode.set('ui');
+      }
 
       try {
         const url = await this.pdfService.generatePdfBlob(character);
@@ -156,7 +175,7 @@ export class CharacterSheet implements OnInit, OnDestroy {
 
   backToList(): void {
     if (this.isConsult()) {
-      const returnUrl = this.handoff.peekReturnUrl();
+      const returnUrl = this.consultReturnUrl() ?? this.handoff.peekReturnUrl();
       if (returnUrl) {
         void this.router.navigateByUrl(returnUrl);
         return;

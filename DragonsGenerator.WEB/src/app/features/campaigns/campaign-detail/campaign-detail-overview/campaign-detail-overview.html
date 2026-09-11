@@ -29,18 +29,18 @@
           · {{ liveSessionModeLabel() }}
         }
         @if (isOwner()) {
-          — ouvre la table plein écran pour jouer.
+          — ouvrez la table plein écran pour jouer.
         } @else {
-          — rejoins la table pour voir le combat, ton tour et les documents.
+          — rejoignez la table pour voir le combat, votre tour et les documents.
         }
       } @else if (nextSession(); as next) {
         {{ nextSessionDateLabel() }}
         @if (nextSessionModeLabel()) {
           · {{ nextSessionModeLabel() }}
         }
-        — entre en session pour ouvrir le panneau de table.
+        — entrez en session pour ouvrir le panneau de table.
       } @else {
-        Prépare le monde dans Préparation, planifie dans Sessions, puis joue à la table.
+        Préparez le monde dans Préparation, planifiez dans Sessions, puis jouez à la table.
       }
     </p>
 
@@ -104,7 +104,7 @@
           <span class="text-sky-300/90">Documents</span> pour partager avec la table,
           <span class="text-slate-300">Joueurs</span> pour le roster. Le combat n’existe qu’en session.
         } @else {
-          Consulte les prochaines dates, tes documents MJ et ton personnage. La table s’ouvre quand le MJ lance la session.
+          Consultez les prochaines dates, vos documents MJ et votre personnage. La table s’ouvre quand le MJ lance la session.
         }
       </p>
     </div>
@@ -126,6 +126,7 @@
 
   @if (!isOwner()) {
     <app-campaign-player-sheet
+      [campaignId]="campaignId()"
       [member]="myPlayerMember()"
       [xpEarned]="myXpEarned()"
       [nextSession]="nextSession()"

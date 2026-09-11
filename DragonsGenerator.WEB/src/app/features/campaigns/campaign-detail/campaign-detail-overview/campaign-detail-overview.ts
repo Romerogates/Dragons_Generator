@@ -59,6 +59,7 @@ export class CampaignDetailOverview {
   readonly myPlayerMember = input<CampaignMember | null>(null);
   readonly lastHandoutTitle = input<string | null>(null);
   readonly publishedHandoutsCount = input(0);
+  readonly campaignId = input.required<string>();
 
   readonly activityLoading = input(false);
   readonly activity = input<CampaignActivityItem[]>([]);

@@ -132,6 +132,7 @@ describe('SummaryStep', () => {
     resetSpy = jasmine.createSpy('reset');
     isOnlineSignal = signal(true);
     isLoggedInSignal = signal(true);
+    const goToStepSpy = jasmine.createSpy('goToStep');
 
     await TestBed.configureTestingModule({
       imports: [SummaryStep],
@@ -150,8 +151,15 @@ describe('SummaryStep', () => {
             }),
             isEditMode: false,
             reset: resetSpy,
-            goToStep: jasmine.createSpy('goToStep'),
+            goToStep: goToStepSpy,
             previousStep: jasmine.createSpy('previousStep'),
+            steps: signal([
+              { number: 1, title: 'Niveau', icon: '🔢' },
+              { number: 2, title: 'Espèce', icon: '🧬' },
+              { number: 10, title: 'Identité', icon: '📜' },
+              { number: 11, title: 'Récapitulatif', icon: '✅' },
+            ]),
+            summaryStep: signal(11),
           },
         },
         {
@@ -242,5 +250,17 @@ describe('SummaryStep', () => {
     expect(component.showDiscardConfirm()).toBeFalse();
     expect(resetSpy).toHaveBeenCalled();
     expect(router.navigate).toHaveBeenCalledWith(['/create']);
+  });
+
+  it('lists editable steps and jumps back via goToStep', () => {
+    const steps = component.editableSteps();
+    expect(steps.map((s) => s.title)).toEqual(['Niveau', 'Espèce', 'Identité']);
+    expect(steps.some((s) => s.title === 'Récapitulatif')).toBeFalse();
+
+    component.goToStep(2);
+    const builder = TestBed.inject(CharacterBuilderService) as unknown as {
+      goToStep: jasmine.Spy;
+    };
+    expect(builder.goToStep).toHaveBeenCalledWith(2);
   });
 });

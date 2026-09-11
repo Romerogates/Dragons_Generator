@@ -88,6 +88,8 @@ export class CharacterBuilderService {
   private readonly handoff = inject(CharacterHandoffService);
   readonly creation = signal<ExtendedCharacterCreation>(structuredClone(INITIAL_CREATION_STATE));
   readonly currentStep = signal<number>(1);
+  /** Après « Corriger une étape » depuis le récap — affiche un raccourci pour y revenir. */
+  readonly returnToSummary = signal(false);
   private readonly editingRef = signal<CharacterBuildEditingRef | null>(null);
 
   constructor() {
@@ -890,7 +892,19 @@ export class CharacterBuilderService {
         if (!this.isStepValid(s)) return;
       }
     }
+    const summary = this.summaryStep();
+    if (this.currentStep() === summary && step < summary) {
+      this.returnToSummary.set(true);
+    }
+    if (step >= summary) {
+      this.returnToSummary.set(false);
+    }
     this.currentStep.set(step);
+  }
+
+  /** Raccourci : revenir au récapitulatif (toutes les étapes intermédiaires doivent être valides). */
+  goToSummary(): void {
+    this.goToStep(this.summaryStep());
   }
 
   get isEditMode(): boolean {
@@ -964,6 +978,7 @@ export class CharacterBuilderService {
     this.creation.set(structuredClone(INITIAL_CREATION_STATE));
     this.currentStep.set(1);
     this.editingRef.set(null);
+    this.returnToSummary.set(false);
     this.clearStorage();
   }
 

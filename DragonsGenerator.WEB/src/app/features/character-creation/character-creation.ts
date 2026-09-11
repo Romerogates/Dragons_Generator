@@ -14,6 +14,7 @@ import { CharacterBuilderService } from '../../core/services/character-builder.s
 import { ConnectivityService } from '@core/services/connectivity.service';
 import { OfflineCodexService } from '@core/services/offline-codex.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
+import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 
 // Steps
 import { LevelStep } from './steps/level-step/level-step';
@@ -35,6 +36,7 @@ import { BackgroundStep } from './steps/background-step/background-step';
   imports: [
     CommonModule,
     RouterLink,
+    ConfirmDialog,
     LevelStep,
     SpeciesStep,
     CivilizationStep,
@@ -64,6 +66,8 @@ export class CharacterCreation implements OnInit {
 
   /** Affiche l'overlay de choix brouillon. */
   readonly showDraftPrompt = signal(false);
+  /** Confirm avant d’effacer le brouillon (Recommencer). */
+  readonly showDraftDiscardConfirm = signal(false);
 
   ngOnInit(): void {
     // 1. Mode édition depuis /characters → priorité absolue
@@ -83,15 +87,33 @@ export class CharacterCreation implements OnInit {
     this.showDraftPrompt.set(false);
   }
 
-  startFresh(): void {
+  /** Ouvre le confirm in-app (pas de reset immédiat). */
+  requestStartFresh(): void {
+    this.showDraftDiscardConfirm.set(true);
+  }
+
+  cancelStartFresh(): void {
+    this.showDraftDiscardConfirm.set(false);
+  }
+
+  confirmStartFresh(): void {
+    this.showDraftDiscardConfirm.set(false);
     this.showDraftPrompt.set(false);
     this.builder.reset();
   }
 
+  /** Revenir à une étape déjà validée (barre de progression). */
+  goToStep(step: number): void {
+    this.builder.goToStep(step);
+  }
+
+  /** Raccourci après correction depuis le récap. */
+  goToSummary(): void {
+    this.builder.goToSummary();
+  }
+
   onReset(): void {
-    if (confirm('Êtes-vous sûr de vouloir recommencer ? Toutes les données seront perdues.')) {
-      this.builder.reset();
-    }
+    this.requestStartFresh();
   }
 
   finishCreation(): void {

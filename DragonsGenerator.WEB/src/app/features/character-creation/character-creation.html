@@ -34,7 +34,7 @@
         <button
           data-testid="wizard-draft-restart"
           class="flex-1 px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 hover:text-white hover:border-slate-500 transition-[colors,transform,opacity,box-shadow] duration-200 flex justify-center items-center gap-2"
-          (click)="startFresh()"
+          (click)="requestStartFresh()"
         >
           <span class="text-lg"><iconify-icon icon="fluent-emoji:sparkles"></iconify-icon></span>
           Recommencer
@@ -44,41 +44,76 @@
   </div>
 }
 
+@if (showDraftDiscardConfirm()) {
+  <app-confirm-dialog
+    title="Recommencer la forge ?"
+    body="Le brouillon en cours sera effacé. Vous ne pourrez pas le récupérer."
+    confirmLabel="Effacer et recommencer"
+    [danger]="true"
+    (cancelled)="cancelStartFresh()"
+    (confirmed)="confirmStartFresh()"
+  />
+}
+
 <div
   class="w-full mx-auto px-2 sm:px-4 lg:px-6 pb-6 pt-2 min-h-[calc(100dvh-4rem)] lg:min-h-[calc(100vh-4rem)] flex flex-col max-w-[90rem] overflow-x-clip"
 >
   @if (!isOnline() && !codexReady()) {
     <div class="mb-3 mx-1 px-4 py-3 rounded-xl border border-amber-800/40 bg-amber-950/20 text-xs text-amber-200">
-      Hors ligne : télécharge le Codex dans <a routerLink="/settings" class="underline text-amber-300">Paramètres</a> pour forger un personnage sans connexion.
+      Hors ligne : téléchargez le Codex dans <a routerLink="/settings" class="underline text-amber-300">Paramètres</a> pour forger un personnage sans connexion.
     </div>
   }
   <!-- Compact progress -->
   <div
-    class="sticky top-0 z-30 -mx-2 sm:mx-0 mb-3 px-2 sm:px-0 py-2 bg-[#171b22]/90 backdrop-blur-md border-b border-slate-800/80"
+    class="sticky z-30 -mx-2 sm:mx-0 mb-3 px-2 sm:px-0 py-2 bg-[#171b22]/90 backdrop-blur-md border-b border-slate-800/80 top-[calc(4rem+env(safe-area-inset-top,0px))]"
   >
     <div class="flex items-center justify-between gap-3 mb-2">
       <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
         Étape {{ builder.currentStep() }} / {{ builder.totalSteps() }}
       </p>
-      <div class="flex items-center gap-3 min-w-0 justify-end">
+      <div class="flex items-center gap-2 min-w-0 justify-end">
+        @if (builder.returnToSummary()) {
+          <button
+            type="button"
+            class="shrink-0 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border border-amber-700/50 text-amber-400 hover:bg-amber-950/40 hover:border-amber-500/60 transition-colors"
+            (click)="goToSummary()"
+          >
+            Retour au récap
+          </button>
+        }
         <p class="text-[11px] font-serif text-amber-500/90 truncate min-w-0 text-right">
           {{ builder.steps()[builder.currentStep() - 1]?.title }}
         </p>
       </div>
     </div>
-    <div class="flex gap-1 overflow-x-auto pb-0.5 custom-scrollbar">
+    <div
+      class="flex gap-1 overflow-x-auto pb-0.5 custom-scrollbar"
+      role="navigation"
+      aria-label="Étapes de la forge"
+    >
       @for (step of builder.steps(); track step.number) {
-        <div
-          class="h-1.5 flex-1 min-w-[1.25rem] rounded-full transition-colors"
-          [class]="
-            step.number < builder.currentStep()
-              ? 'bg-amber-600'
-              : step.number === builder.currentStep()
-                ? 'bg-amber-400'
-                : 'bg-slate-700'
-          "
-          [attr.title]="step.title"
-        ></div>
+        @if (step.number < builder.currentStep()) {
+          <button
+            type="button"
+            class="h-2.5 sm:h-1.5 flex-1 min-w-[1.25rem] rounded-full bg-amber-600 hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-amber-400 transition-colors cursor-pointer"
+            [attr.title]="'Revenir à : ' + step.title"
+            [attr.aria-label]="'Revenir à l’étape ' + step.title"
+            (click)="goToStep(step.number)"
+          ></button>
+        } @else if (step.number === builder.currentStep()) {
+          <div
+            class="h-2.5 sm:h-1.5 flex-1 min-w-[1.25rem] rounded-full bg-amber-400"
+            [attr.title]="step.title"
+            [attr.aria-current]="'step'"
+            [attr.aria-label]="'Étape en cours : ' + step.title"
+          ></div>
+        } @else {
+          <div
+            class="h-2.5 sm:h-1.5 flex-1 min-w-[1.25rem] rounded-full bg-slate-700"
+            [attr.title]="step.title"
+            [attr.aria-label]="'Étape à venir : ' + step.title"
+          ></div>
+        }
       }
     </div>
   </div>

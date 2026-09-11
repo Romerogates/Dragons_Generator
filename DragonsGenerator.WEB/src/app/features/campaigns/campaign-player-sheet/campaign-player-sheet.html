@@ -2,13 +2,13 @@
   <h2 class="text-[10px] font-black uppercase tracking-widest text-sky-400 flex items-center gap-2">
     <iconify-icon icon="fluent-emoji:shield"></iconify-icon> Ma fiche à la table
   </h2>
-  @if (member(); as m) {
+  @if (member()?.approvedCharacterName; as heroName) {
     <div class="grid sm:grid-cols-2 gap-4 text-sm">
       <div>
         <p class="text-[10px] uppercase tracking-wider text-slate-500 mb-1">Personnage</p>
-        <p class="text-sky-200 font-serif text-lg">{{ m.approvedCharacterName ?? '—' }}</p>
-        @if (m.approvedCharacterLevel) {
-          <p class="text-xs text-slate-500">Niv. {{ m.approvedCharacterLevel }}</p>
+        <p class="text-sky-200 font-serif text-lg">{{ heroName }}</p>
+        @if (member()?.approvedCharacterLevel) {
+          <p class="text-xs text-slate-500">Niv. {{ member()!.approvedCharacterLevel }}</p>
         }
       </div>
       <div>
@@ -26,7 +26,33 @@
     @if (lastHandoutTitle()) {
       <p class="text-xs text-slate-400">Dernier document : <span class="text-sky-300">{{ lastHandoutTitle() }}</span></p>
     }
+  } @else if (member()?.proposalStatus === 'pending') {
+    <p class="text-sm text-amber-300">
+      En attente d’approbation
+      @if (member()?.proposedCharacterName; as proposed) {
+        : <span class="font-serif text-amber-200">{{ proposed }}</span>
+      }
+    </p>
+    <p class="text-xs text-slate-500">Le MJ validera votre fiche depuis l’onglet Joueurs.</p>
   } @else {
-    <p class="text-sm text-slate-500 italic">Aucun personnage approuvé pour l'instant.</p>
+    <p class="text-sm text-slate-400">Aucun personnage approuvé pour l’instant.</p>
+    <p class="text-xs text-slate-500">
+      Proposez un héros existant ou forgez-en un pour jouer à cette table.
+    </p>
+    <div class="flex flex-wrap gap-2 pt-1">
+      <a
+        [routerLink]="['/campaigns', campaignId()]"
+        [queryParams]="{ tab: 'players' }"
+        class="min-h-11 inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-sky-700 text-white hover:bg-sky-600"
+      >
+        Proposer un héros
+      </a>
+      <a
+        routerLink="/create"
+        class="min-h-11 inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-sky-800/50 text-sky-200 hover:border-sky-500/50"
+      >
+        Forger un personnage
+      </a>
+    </div>
   }
 </section>
