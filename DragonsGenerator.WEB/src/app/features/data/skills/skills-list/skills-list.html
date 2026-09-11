@@ -77,8 +77,9 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @for (skill of filteredSkills(); track skill.id) {
-          <article
-            class="bg-[#1b2028] rounded-2xl border border-slate-800 shadow-xl group hover:border-sky-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 hover:-translate-y-1 flex flex-col overflow-hidden relative"
+          <a
+            [routerLink]="['/skills', skill.id]"
+            class="block no-underline text-inherit bg-[#1b2028] rounded-2xl border border-slate-800 shadow-xl group hover:border-sky-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 hover:-translate-y-1 flex flex-col overflow-hidden relative cursor-pointer"
           >
             <div class="p-6 md:p-8 flex flex-col flex-grow relative z-10">
               <header class="flex items-start gap-4 mb-4">
@@ -86,10 +87,8 @@
                   ><iconify-icon [icon]="skillIcon(skill)"></iconify-icon
                 ></span>
                 <div>
-                  <h2 class="text-xl font-bold text-sky-400 font-serif">
-                    <a [routerLink]="['/skills', skill.id]" class="hover:underline">{{
-                      skill.name
-                    }}</a>
+                  <h2 class="text-xl font-bold text-sky-400 font-serif group-hover:underline">
+                    {{ skill.name }}
                   </h2>
                   <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">{{
                     abilityLabel(skill.ability)
@@ -118,14 +117,8 @@
                 </div>
               </div>
 
-              <a
-                [routerLink]="['/skills', skill.id]"
-                class="mt-auto block text-center bg-sky-950/20 hover:bg-sky-900/40 text-sky-500 border border-sky-900/30 rounded-lg py-2 text-[10px] font-black uppercase tracking-widest"
-              >
-                Voir le détail
-              </a>
             </div>
-          </article>
+          </a>
         }
       </div>
     }

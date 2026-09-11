@@ -11,6 +11,7 @@ import { SpellSummary } from '@core/models/Spells/spell-summary';
   standalone: true,
   imports: [RouterLink],
   templateUrl: './spells-summary.html',
+  styleUrl: './spells-summary.scss',
 })
 export class SpellsSummary {
   private dataService = inject(DataService);

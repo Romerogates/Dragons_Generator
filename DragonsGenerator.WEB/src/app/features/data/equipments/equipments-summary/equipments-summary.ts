@@ -9,6 +9,7 @@ import { EquipmentSummary } from '@core/models/Equipments/equipment-summary';
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './equipments-summary.html',
+  styleUrl: './equipments-summary.scss',
 })
 export class EquipmentsSummary implements OnInit {
   private dataService = inject(DataService);

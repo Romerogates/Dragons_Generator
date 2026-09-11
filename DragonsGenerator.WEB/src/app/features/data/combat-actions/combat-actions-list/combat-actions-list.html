@@ -95,8 +95,9 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
         @for (action of filteredActions(); track action.id) {
-          <article
-            class="bg-[#1b2028] rounded-2xl border border-slate-800 shadow-xl group hover:border-rose-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 hover:-translate-y-1 flex flex-col overflow-hidden relative"
+          <a
+            [routerLink]="['/combat-actions', action.id]"
+            class="block no-underline text-inherit bg-[#1b2028] rounded-2xl border border-slate-800 shadow-xl group hover:border-rose-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 hover:-translate-y-1 flex flex-col overflow-hidden relative cursor-pointer"
           >
             <div
               class="absolute -top-6 -right-6 text-8xl opacity-5 pointer-events-none group-hover:scale-[1.01] transition-transform duration-500"
@@ -110,13 +111,8 @@
                   <iconify-icon [icon]="costIcon(action.actionCost)" width="1em" height="1em"></iconify-icon>
                 </span>
                 <div class="min-w-0">
-                  <h2 class="text-xl font-bold text-amber-400 font-serif tracking-wide mb-1">
-                    <a
-                      [routerLink]="['/combat-actions', action.id]"
-                      class="hover:underline decoration-rose-500/30 underline-offset-4"
-                    >
-                      {{ action.name }}
-                    </a>
+                  <h2 class="text-xl font-bold text-amber-400 font-serif tracking-wide mb-1 group-hover:underline decoration-rose-500/30 underline-offset-4">
+                    {{ action.name }}
                   </h2>
                   <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest">
                     {{ costLabel(action.actionCost) }} · {{ categoryLabel(action.category) }}
@@ -147,14 +143,8 @@
                 </div>
               </div>
 
-              <a
-                [routerLink]="['/combat-actions', action.id]"
-                class="mt-auto block text-center bg-rose-950/20 text-rose-300 border border-rose-900/30 rounded-lg py-2.5 text-[10px] font-black uppercase tracking-widest hover:border-rose-500/50 transition-colors"
-              >
-                Voir le détail
-              </a>
             </div>
-          </article>
+          </a>
         } @empty {
           <p class="col-span-full text-center text-slate-500 italic py-16">Aucune action trouvée.</p>
         }

@@ -109,8 +109,9 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
         @for (spell of filteredSpells(); track spell.id) {
-          <article
-            class="perf-card bg-[#1b2028] rounded-2xl border border-slate-800 shadow-xl group hover:border-fuchsia-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 hover:-translate-y-1 flex flex-col overflow-hidden relative"
+          <a
+            [routerLink]="['/spells', spell.id]"
+            class="block no-underline text-inherit perf-card bg-[#1b2028] rounded-2xl border border-slate-800 shadow-xl group hover:border-fuchsia-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 hover:-translate-y-1 flex flex-col overflow-hidden relative cursor-pointer"
           >
             <div
               class="absolute -top-4 -right-4 text-8xl opacity-5 pointer-events-none group-hover:scale-[1.01] transition-transform duration-500"
@@ -121,14 +122,9 @@
             <div class="p-6 flex flex-col h-full relative z-10">
               <header class="flex justify-between items-start mb-2">
                 <h2
-                  class="text-xl font-bold text-fuchsia-400 font-serif tracking-wide leading-tight group-hover:text-fuchsia-300 transition-colors"
+                  class="text-xl font-bold text-fuchsia-400 font-serif tracking-wide leading-tight group-hover:text-fuchsia-300 group-hover:underline decoration-fuchsia-500/30 underline-offset-4 transition-colors"
                 >
-                  <a
-                    [routerLink]="['/spells', spell.id]"
-                    class="hover:underline decoration-fuchsia-500/30 underline-offset-4"
-                  >
-                    {{ spell.name }}
-                  </a>
+                  {{ spell.name }}
                 </h2>
                 <div class="flex-shrink-0 ml-4 flex flex-col items-end">
                   <span class="text-2xl drop-shadow-md"
@@ -185,20 +181,11 @@
                 </div>
               </div>
 
-              <p class="text-xs text-slate-400 leading-relaxed italic line-clamp-3 mb-6">
+              <p class="text-xs text-slate-400 leading-relaxed italic line-clamp-3">
                 « {{ spellSummary(spell) }} »
               </p>
-
-              <footer class="mt-auto">
-                <a
-                  [routerLink]="['/spells', spell.id]"
-                  class="w-full block text-center bg-fuchsia-950/20 hover:bg-fuchsia-900/40 text-fuchsia-500 border border-fuchsia-900/30 rounded-lg py-2 text-[10px] font-black uppercase tracking-widest transition-colors"
-                >
-                  Voir le détail
-                </a>
-              </footer>
             </div>
-          </article>
+          </a>
         } @empty {
           <div class="col-span-full py-24 text-center">
             <span class="text-6xl mb-6 block opacity-30"

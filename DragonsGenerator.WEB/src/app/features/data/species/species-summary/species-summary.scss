@@ -1,0 +1,10 @@
+.summary-row {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    background-color: rgba(245, 158, 11, 0.08);
+    outline: none;
+  }
+}

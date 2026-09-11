@@ -10,7 +10,10 @@
 } @else {
   <div>
     @for (civ of civilisations(); track civ.id) {
-      <div>
+      <a
+        [routerLink]="['/civilisations', civ.id]"
+        class="block no-underline text-inherit cursor-pointer hover:opacity-90"
+      >
         <header>
           <h2>{{ civ.name }}</h2>
           <small>ID: {{ civ.id }}</small>
@@ -36,11 +39,7 @@
             }
           </ul>
         </div>
-
-        <div>
-          <button [routerLink]="['/civilisations', civ.id]">Voir les détails</button>
-        </div>
-      </div>
+      </a>
     } @empty {
       <div>
         <p>Le monde est encore vierge. Aucune civilisation n'a été trouvée.</p>

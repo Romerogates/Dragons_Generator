@@ -19,10 +19,13 @@
       </thead>
       <tbody>
         @for (s of summaries(); track s.id) {
-          <tr>
-            <td>
-              <a [routerLink]="['/data/equipments', s.id]">{{ s.name }}</a>
-            </td>
+          <tr
+            [routerLink]="['/data/equipments', s.id]"
+            class="summary-row"
+            tabindex="0"
+            role="link"
+          >
+            <td>{{ s.name }}</td>
             <td>{{ s.type }}</td>
             <td>{{ s.subtype ?? '—' }}</td>
             <td>

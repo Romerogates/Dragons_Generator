@@ -75,8 +75,9 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @for (feat of filteredFeats(); track feat.id) {
-          <article
-            class="bg-[#1b2028] rounded-2xl border border-slate-800 shadow-xl group hover:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 hover:-translate-y-1 flex flex-col overflow-hidden relative"
+          <a
+            [routerLink]="['/feats', feat.id]"
+            class="block no-underline text-inherit bg-[#1b2028] rounded-2xl border border-slate-800 shadow-xl group hover:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 hover:-translate-y-1 flex flex-col overflow-hidden relative cursor-pointer"
           >
             <div class="p-6 md:p-8 flex flex-col flex-grow relative z-10">
               <div class="flex items-start gap-3 mb-4">
@@ -84,8 +85,8 @@
                   ><iconify-icon [icon]="featIcon(feat.category)"></iconify-icon
                 ></span>
                 <div>
-                  <h2 class="text-xl font-bold text-amber-400 font-serif">
-                    <a [routerLink]="['/feats', feat.id]" class="hover:underline">{{ feat.name }}</a>
+                  <h2 class="text-xl font-bold text-amber-400 font-serif group-hover:underline">
+                    {{ feat.name }}
                   </h2>
                   <div class="flex flex-wrap gap-2 mt-1">
                     @if (feat.category) {
@@ -124,14 +125,8 @@
                 </div>
               </div>
 
-              <a
-                [routerLink]="['/feats', feat.id]"
-                class="mt-auto block text-center bg-amber-950/20 text-amber-500 border border-amber-900/30 rounded-lg py-2 text-[10px] font-black uppercase tracking-widest hover:border-amber-500/50 transition-colors"
-              >
-                Voir le détail
-              </a>
             </div>
-          </article>
+          </a>
         }
       </div>
     }

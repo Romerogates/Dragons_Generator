@@ -22,15 +22,17 @@
             <th>Vitesse</th>
             <th>Vision nocturne</th>
             <th>Sous-espèces jouables</th>
-            <th>Détails</th>
           </tr>
         </thead>
         <tbody>
           @for (s of summaries(); track s.id) {
-            <tr>
-              <td>
-                <a [routerLink]="['/species', s.id]">{{ s.name }}</a>
-              </td>
+            <tr
+              [routerLink]="['/species', s.id]"
+              class="summary-row"
+              tabindex="0"
+              role="link"
+            >
+              <td>{{ s.name }}</td>
               <td>{{ s.size }}</td>
               <td>{{ s.speedM }} m</td>
               <td>
@@ -41,9 +43,6 @@
                 }
               </td>
               <td>{{ s.playableSubspeciesCount }}</td>
-              <td>
-                <a class="link" [routerLink]="['/species', s.id]">Voir →</a>
-              </td>
             </tr>
           }
         </tbody>

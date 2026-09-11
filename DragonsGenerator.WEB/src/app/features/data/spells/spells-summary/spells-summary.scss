@@ -4,7 +4,11 @@
 
   &:hover,
   &:focus-visible {
-    background-color: rgba(245, 158, 11, 0.08);
     outline: none;
   }
+}
+
+.spells-table .summary-row:hover,
+.spells-table .summary-row:focus-visible {
+  background-color: rgba(217, 70, 239, 0.08);
 }

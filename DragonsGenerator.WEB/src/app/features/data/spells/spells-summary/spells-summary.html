@@ -24,10 +24,13 @@
       </thead>
       <tbody>
         @for (spell of spells(); track spell.id) {
-          <tr>
-            <td>
-              <a [routerLink]="['/spells', spell.id]">{{ spell.name }}</a>
-            </td>
+          <tr
+            [routerLink]="['/spells', spell.id]"
+            class="summary-row"
+            tabindex="0"
+            role="link"
+          >
+            <td>{{ spell.name }}</td>
             <td>{{ spell.level }}</td>
             <td class="school">{{ spell.school }}</td>
             <td>
