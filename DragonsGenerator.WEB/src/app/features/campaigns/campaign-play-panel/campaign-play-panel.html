@@ -771,7 +771,7 @@
                     }
                   </span>
                   <span class="font-mono text-xs text-slate-400">
-                    @if (row.submitted && row.roll != null) {
+                    @if (row.submitted && row.roll !== null) {
                       {{ row.roll }}{{ row.bonus >= 0 ? '+' : '' }}{{ row.bonus }} =
                       <span class="text-amber-300">{{ row.total }}</span>
                     } @else {
