@@ -15,28 +15,12 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
-### Vague « Fluide » — perfectionner l’existant (pas de feature neuve)
-
-Ordre = friction joueur. **Interdit** : idle / Bivouac / Métiers, nouvelles routes session, wizard campagne V2.
-
-1. **e2e lien `/join`** — ~~écrit + **vérifié**~~ (`campaign-join-link` + amis + classes : 8/8 OK sur stack docker locale 2026-09-11).
-2. **Forge : navigation fluide** — ~~fait~~ (étapes passées cliquables ; panneau « Corriger une étape »).
-3. **Forge : filets de sécurité** — ~~fait~~ (confirm brouillon ; sticky Continuer ; magie sous barre d’étapes).
-4. **Vousvoiement** — ~~fait~~ (Héros, login/register save-intent, banner offline forge, overview hub).
-5. **Après `/join`** — ~~fait~~ (CTA Proposer / Forger sur hub ; libellé join « Connexion à la table… »).
-6. **Fiche consult depuis `/play`** — ~~fait~~ (vue Fiche par défaut ; Retour à la table ; hint Ma fiche).
-7. **Vocabulaire table** — ~~fait~~ (dock : Panneau table / Table plein écran ; hub inchangé Entrer / Ouvrir / Rejoindre).
-8. **Récap forge mobile** — ~~fait~~ (aperçu PDF plus compact + texte d’aide).
-
-### Vague « Fluide 2 » — boucle correction forge
-
-9. **Retour au récap** — ~~fait~~ (CTA sticky « Retour au récap » après Corriger une étape).
-10. Smoke manuel forge (barre cliquable + confirm brouillon + CTA join hub) sur prod après commit/push.
-
-_(Fluide 1 livrée en local, tests unitaires + e2e join/amis/classes OK — commit/push quand Anthony le demande.)_
+_(File vide — smoke prod après deploy.)_
 
 ## Déjà livré (ne pas refaire)
 
+- **Fluide 2 + boucles handoff** (2026-09-11) — CTA sticky + hints « Encore N » ; forge→propose campagne (`?campaignId`) ; feedback saut d’étape ; récap mobile = fiche UI ; bannière post-join/proposé ; empty Sessions + Planifier ; confirms Entrer en session / régénérer lien ; badge sync live ; fiche mobile UI par défaut ; liens Guide forge/hub ; chat amis → `/friends`.
+- **Vague Fluide 1** (2026-09-11) — barre étapes cliquable ; Corriger une étape ; confirm brouillon ; sticky Continuer ; vousvoiement ; CTA post-join hub ; fiche consult /play ; dock vocabulaire ; e2e `/join`.
 - **P3 fiche PJ depuis /play** (2026-09-11) — bloc « Héros à la table » + bouton Ma fiche / Fiche roster ; ouverture en mode `consult` avec retour `/campaigns/:id/play`.
 - **P2 invitation + consultation** (2026-09-11) — lien `/join/{token}` (créer / régénérer / révoquer) sans amitié ; mode fiche `consult` (chat ami + pré-tirés / membres) ; pré-tirés `ready` visibles joueur ; `use-at-table` sans clone ; claim = copie optionnelle Mes héros.
 - **P1 UX table joueur mobile** (2026-09-10) — adversaires d’abord ; roster compact + Tout voir ; bandeau tour sticky avec Attaquer/Passer ; menu combat avant les cartes ; carte fog repliable + cellule au viewport + scroll ; header `/play` sous navbar ; dock onglet Table → CTA plein écran (plus de panel écrasé).

@@ -9,6 +9,18 @@
       <div>
         <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-1">
           Table de jeu — session en cours
+          <span
+            class="ml-2 font-semibold normal-case tracking-normal"
+            [class.text-emerald-300/80]="liveConnected()"
+            [class.text-amber-400/80]="!liveConnected()"
+            [attr.title]="
+              liveConnected()
+                ? 'Synchronisation live active'
+                : 'Sync live indisponible — actualisation périodique'
+            "
+          >
+            · {{ liveConnected() ? 'live' : 'hors sync' }}
+          </span>
         </p>
         <h2 [class]="fullscreen() ? 'text-2xl md:text-3xl font-serif text-emerald-200' : 'text-xl font-serif text-emerald-200'">
           {{ playSession.title }}

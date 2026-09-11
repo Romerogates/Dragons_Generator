@@ -900,6 +900,17 @@
 
       <div class="mt-4 flex flex-col items-center gap-4 animate-[fadeIn_0.5s_ease] w-full">
         <nav class="wizard-step-nav">
+          @if (!isConfirmed() && !selectionComplete()) {
+            <p class="wizard-nav-hint">
+              @if (cantripsRemaining() > 0) {
+                Encore {{ cantripsRemaining() }} tour(s) de magie
+              } @else if (spellsRemaining() > 0) {
+                Encore {{ spellsRemaining() }} sort(s)
+              } @else {
+                Complétez la sélection magique
+              }
+            </p>
+          }
           <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
             ← Étape précédente
           </button>

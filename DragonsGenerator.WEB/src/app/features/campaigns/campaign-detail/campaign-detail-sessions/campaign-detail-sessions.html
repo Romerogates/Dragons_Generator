@@ -320,15 +320,26 @@
         </div>
       </div>
     } @empty {
-      <p class="px-4 py-8 text-sm text-slate-500 italic text-center">
-        @if (filter() === 'upcoming') {
-          Aucune session à venir.
-        } @else if (filter() === 'past') {
-          Aucune session passée.
-        } @else {
-          Aucune session pour l’instant.
+      <div class="px-4 py-8 text-center space-y-3">
+        <p class="text-sm text-slate-500 italic">
+          @if (filter() === 'upcoming') {
+            Aucune session à venir.
+          } @else if (filter() === 'past') {
+            Aucune session passée.
+          } @else {
+            Aucune session pour l’instant.
+          }
+        </p>
+        @if (isOwner() && filter() !== 'past') {
+          <button
+            type="button"
+            class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-violet-600 text-white hover:bg-violet-500"
+            (click)="addSession.emit()"
+          >
+            + Planifier une session
+          </button>
         }
-      </p>
+      </div>
     }
   </div>
 

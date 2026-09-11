@@ -289,23 +289,31 @@
 
           <div class="mt-auto pt-6 border-t-2 border-slate-700 flex flex-col items-center shrink-0 gap-3">
             @if (!isConfirmed()) {
-              <p class="text-sm text-slate-400 italic text-center px-2">
+              <p class="text-sm text-slate-400 italic text-center px-2 sm:hidden">
                 Avez-vous décidé de faire de cette contrée la vôtre ?
               </p>
-              <button type="button" class="wizard-nav-primary" (click)="confirmSelection()">
-                Forger ses origines
-              </button>
             } @else {
-              <span class="wizard-nav-status">
+              <span class="wizard-nav-status sm:hidden">
                 <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
                 Terre natale confirmée
               </span>
-              <button type="button" class="wizard-nav-primary" (click)="continueToNextStep()">
-                Continuer →
-              </button>
             }
 
-            <nav class="wizard-step-nav !pt-1 !pb-0">
+            <nav class="wizard-step-nav !pt-1">
+              @if (!isConfirmed()) {
+                <p class="wizard-nav-hint">Confirmez cette civilisation pour continuer</p>
+                <button type="button" class="wizard-nav-primary" (click)="confirmSelection()">
+                  Forger ses origines
+                </button>
+              } @else {
+                <span class="wizard-nav-status hidden sm:inline-flex">
+                  <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                  Terre natale confirmée
+                </span>
+                <button type="button" class="wizard-nav-primary" (click)="continueToNextStep()">
+                  Continuer →
+                </button>
+              }
               <button type="button" class="wizard-nav-secondary" (click)="clearSelection()">
                 ← Retour à l'Atlas
               </button>

@@ -90,6 +90,8 @@ export class CharacterBuilderService {
   readonly currentStep = signal<number>(1);
   /** Après « Corriger une étape » depuis le récap — affiche un raccourci pour y revenir. */
   readonly returnToSummary = signal(false);
+  /** Message si un saut d’étape avant est bloqué (validation). */
+  readonly stepJumpBlocked = signal<string | null>(null);
   private readonly editingRef = signal<CharacterBuildEditingRef | null>(null);
 
   constructor() {
@@ -884,14 +886,19 @@ export class CharacterBuilderService {
     }
   }
 
-  goToStep(step: number): void {
+  goToStep(step: number): boolean {
     const total = this.totalSteps();
-    if (step < 1 || step > total) return;
+    if (step < 1 || step > total) return false;
     if (step > this.currentStep()) {
       for (let s = this.currentStep(); s < step; s++) {
-        if (!this.isStepValid(s)) return;
+        if (!this.isStepValid(s)) {
+          const title = this.steps()[s - 1]?.title ?? `étape ${s}`;
+          this.stepJumpBlocked.set(`Complétez d’abord « ${title} » avant d’avancer.`);
+          return false;
+        }
       }
     }
+    this.stepJumpBlocked.set(null);
     const summary = this.summaryStep();
     if (this.currentStep() === summary && step < summary) {
       this.returnToSummary.set(true);
@@ -900,11 +907,16 @@ export class CharacterBuilderService {
       this.returnToSummary.set(false);
     }
     this.currentStep.set(step);
+    return true;
   }
 
   /** Raccourci : revenir au récapitulatif (toutes les étapes intermédiaires doivent être valides). */
-  goToSummary(): void {
-    this.goToStep(this.summaryStep());
+  goToSummary(): boolean {
+    return this.goToStep(this.summaryStep());
+  }
+
+  clearStepJumpBlocked(): void {
+    this.stepJumpBlocked.set(null);
   }
 
   get isEditMode(): boolean {
@@ -979,6 +991,7 @@ export class CharacterBuilderService {
     this.currentStep.set(1);
     this.editingRef.set(null);
     this.returnToSummary.set(false);
+    this.stepJumpBlocked.set(null);
     this.clearStorage();
   }
 

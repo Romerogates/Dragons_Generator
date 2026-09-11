@@ -346,23 +346,12 @@
       }
 
       <div class="mt-12 flex flex-col items-center gap-4 w-full">
-        @if (selectionComplete()) {
-          <div
-            class="px-6 py-2.5 bg-emerald-950/30 text-emerald-400 border border-emerald-800/50 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-3 shadow-sm mb-2"
-          >
-            <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
-            Inventaire complet et prêt
-          </div>
-          <button
-            data-testid="wizard-equipment-confirm"
-            class="px-14 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-amber-500 text-slate-950 shadow-md hover:bg-amber-400 hover:scale-[1.02] active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-200"
-            (click)="confirm()"
-          >
-            Forger l'équipement
-          </button>
-        }
-
         <nav class="wizard-step-nav">
+          @if (!selectionComplete()) {
+            <p class="wizard-nav-hint">
+              Choix {{ activeSlotIndex() + 1 }} / {{ resolvedSlots().length }}
+            </p>
+          }
           @if (activeSlotIndex() > 0 && !selectionComplete()) {
             <button type="button" class="wizard-nav-secondary" (click)="prevSlot()">
               ↑ Choix précédent
@@ -370,6 +359,15 @@
           }
           <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
             ← Étape précédente
+          </button>
+          <button
+            type="button"
+            data-testid="wizard-equipment-confirm"
+            class="wizard-nav-primary"
+            [disabled]="!selectionComplete()"
+            (click)="confirm()"
+          >
+            Forger l'équipement
           </button>
         </nav>
       </div>

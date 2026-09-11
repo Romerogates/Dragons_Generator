@@ -141,6 +141,9 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly fullscreen = input(false);
   readonly campaignChange = output<CampaignDetailModel>();
 
+  /** Sync live SignalR (sinon poll de secours). */
+  readonly liveConnected = this.live.connected;
+
   readonly saving = signal(false);
   readonly importingParty = signal(false);
   readonly feedback = signal<{ kind: 'ok' | 'err'; text: string } | null>(null);

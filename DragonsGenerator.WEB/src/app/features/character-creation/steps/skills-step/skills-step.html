@@ -772,6 +772,19 @@
     }
 
     <nav class="wizard-step-nav">
+      @if (!isSelectionComplete()) {
+        <p class="wizard-nav-hint">
+          @if (classSkillsRemaining() > 0) {
+            Encore {{ classSkillsRemaining() }} compétence(s) de classe
+          } @else if (bgSkillsRemaining() > 0) {
+            Encore {{ bgSkillsRemaining() }} compétence(s) d’historique
+          } @else if (expertiseRemaining() > 0) {
+            Encore {{ expertiseRemaining() }} expertise(s)
+          } @else {
+            Complétez vos maîtrises
+          }
+        </p>
+      }
       <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
         ← Étape précédente
       </button>

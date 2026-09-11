@@ -23,10 +23,14 @@ const VIEW_MODE_KEY = 'dg_character_sheet_view';
 function readStoredViewMode(): SheetViewMode {
   try {
     const v = localStorage.getItem(VIEW_MODE_KEY);
-    return v === 'ui' ? 'ui' : 'pdf';
+    if (v === 'ui' || v === 'pdf') return v;
   } catch {
-    return 'pdf';
+    /* ignore */
   }
+  if (typeof window !== 'undefined' && window.matchMedia('(max-width: 639px)').matches) {
+    return 'ui';
+  }
+  return 'pdf';
 }
 
 @Component({

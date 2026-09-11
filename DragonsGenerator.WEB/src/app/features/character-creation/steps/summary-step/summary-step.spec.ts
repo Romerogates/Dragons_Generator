@@ -1,12 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { provideRouter, Router } from '@angular/router';
+import { provideRouter, Router, ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { zonelessTestProviders } from '@testing/zoneless-test-providers';
 import { CURRENT_SCHEMA_VERSION, type Character } from '@core/models/Character/character';
 import { CharacterBuilderService } from '@core/services/character-builder.service';
 import { PdfGeneratorService } from '@core/services/pdf-generator.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
+import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { AuthService } from '@core/services/auth.service';
 import { PendingCharacterSaveService } from '@core/services/pending-character-save.service';
 import { ConnectivityService } from '@core/services/connectivity.service';
@@ -174,6 +175,18 @@ describe('SummaryStep', () => {
           useValue: {
             save: cloudSaveSpy,
             list: () => of([]),
+          },
+        },
+        {
+          provide: CampaignCloudService,
+          useValue: {
+            proposeCharacter: jasmine.createSpy('proposeCharacter').and.returnValue(of(void 0)),
+          },
+        },
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: { queryParamMap: { get: () => null } },
           },
         },
         {

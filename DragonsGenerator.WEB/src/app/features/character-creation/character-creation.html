@@ -57,6 +57,7 @@
 
 <div
   class="w-full mx-auto px-2 sm:px-4 lg:px-6 pb-6 pt-2 min-h-[calc(100dvh-4rem)] lg:min-h-[calc(100vh-4rem)] flex flex-col max-w-[90rem] overflow-x-clip"
+  style="scroll-padding-bottom: 5.5rem"
 >
   @if (!isOnline() && !codexReady()) {
     <div class="mb-3 mx-1 px-4 py-3 rounded-xl border border-amber-800/40 bg-amber-950/20 text-xs text-amber-200">
@@ -116,6 +117,19 @@
         }
       }
     </div>
+    @if (builder.currentStep() > 1) {
+      <p class="mt-1.5 text-[9px] text-slate-600 text-center sm:text-left">
+        Appuyez sur une étape validée (ambre) pour y revenir.
+      </p>
+    }
+    @if (builder.stepJumpBlocked(); as blocked) {
+      <p class="mt-1.5 text-[10px] text-amber-400/90 text-center sm:text-left" role="status">
+        {{ blocked }}
+      </p>
+    }
+    <p class="mt-1 text-[9px] text-slate-600 text-center sm:text-left">
+      <a routerLink="/guide/personnage" class="underline hover:text-amber-400/80">Guide — forger un héros</a>
+    </p>
   </div>
 
   <div class="w-full flex-1 flex flex-col min-h-0">

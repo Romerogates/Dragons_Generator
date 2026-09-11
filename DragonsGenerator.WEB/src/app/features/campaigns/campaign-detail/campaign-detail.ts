@@ -168,6 +168,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly memberCharacterLoadingId = signal<string | null>(null);
   readonly characterRequestLoadingId = signal<string | null>(null);
   readonly rosterFeedback = signal<string | null>(null);
+  /** Bannière one-shot après /join ou proposition depuis la forge. */
+  readonly welcomeBanner = signal<string | null>(null);
   readonly joinLink = signal<{ token: string | null; enabled: boolean } | null>(null);
   readonly joinLinkBusy = signal(false);
   /** Amis déjà invités (en attente d’acceptation) — masqués de la liste invitable. */
@@ -550,15 +552,23 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   startPlaySession(sessionId: string): void {
     const c = this.campaign();
     if (!c?.isOwner) return;
-    this.flushSoftPersistTimer();
-    this.flushSessionSave();
-    this.dungeonMapsComp()?.flushPendingSave();
-    const data = { ...this.campaign()!.data, activeSessionId: sessionId };
-    this.campaign.update((prev) => (prev ? { ...prev, data } : prev));
-    this.persist(c.title, data, () => {
-      this.sessionDock.bindCampaign(this.campaign());
-      this.sessionDock.open();
-    });
+    this.askConfirm(
+      'Entrer en session ?',
+      'La table s’ouvre pour tous les joueurs connectés. Combat, notes et carte deviennent actifs.',
+      () => {
+        this.flushSoftPersistTimer();
+        this.flushSessionSave();
+        this.dungeonMapsComp()?.flushPendingSave();
+        const data = { ...this.campaign()!.data, activeSessionId: sessionId };
+        this.campaign.update((prev) => (prev ? { ...prev, data } : prev));
+        this.persist(c.title, data, () => {
+          this.sessionDock.bindCampaign(this.campaign());
+          this.sessionDock.open();
+        });
+      },
+      'Entrer en session',
+      false,
+    );
   }
 
   openSessionDock(): void {
@@ -612,6 +622,32 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (tab) {
       this.applyTabFromRoute(tab, handoutId);
     }
+    if (this.route.snapshot.queryParamMap.get('joined') === '1') {
+      this.welcomeBanner.set(
+        'Bienvenue à la table — proposez un héros dans l’onglet Joueurs, ou forgez-en un.',
+      );
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { joined: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
+    }
+    if (this.route.snapshot.queryParamMap.get('proposed') === '1') {
+      this.welcomeBanner.set(
+        'Héros proposé au MJ — il apparaîtra ici dès validation.',
+      );
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { proposed: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
+    }
+  }
+
+  dismissWelcomeBanner(): void {
+    this.welcomeBanner.set(null);
   }
 
   /** Deep-link `?tab=` → nav haute + sous-onglet Préparation si besoin. */
@@ -944,18 +980,26 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   regenerateJoinLink(): void {
     const c = this.campaign();
     if (!c?.isOwner || this.joinLinkBusy()) return;
-    this.joinLinkBusy.set(true);
-    this.campaigns.createOrRotateJoinLink(c.id).subscribe({
-      next: (link) => {
-        this.joinLink.set({ token: link.token, enabled: link.enabled });
-        this.joinLinkBusy.set(false);
-        this.rosterFeedback.set('Nouveau lien généré — l’ancien ne fonctionne plus.');
+    this.askConfirm(
+      'Régénérer le lien ?',
+      'L’ancien lien d’invitation ne fonctionnera plus. Les joueurs devront utiliser le nouveau.',
+      () => {
+        this.joinLinkBusy.set(true);
+        this.campaigns.createOrRotateJoinLink(c.id).subscribe({
+          next: (link) => {
+            this.joinLink.set({ token: link.token, enabled: link.enabled });
+            this.joinLinkBusy.set(false);
+            this.rosterFeedback.set('Nouveau lien généré — l’ancien ne fonctionne plus.');
+          },
+          error: () => {
+            this.joinLinkBusy.set(false);
+            this.rosterFeedback.set('Régénération impossible.');
+          },
+        });
       },
-      error: () => {
-        this.joinLinkBusy.set(false);
-        this.rosterFeedback.set('Régénération impossible.');
-      },
-    });
+      'Régénérer',
+      true,
+    );
   }
 
   revokeJoinLink(): void {

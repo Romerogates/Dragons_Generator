@@ -9,12 +9,13 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { CharacterBuilderService } from '@core/services/character-builder.service';
 import { PdfGeneratorService } from '@core/services/pdf-generator.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
+import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { AuthService } from '@core/services/auth.service';
 import { PendingCharacterSaveService } from '@core/services/pending-character-save.service';
 import { ConnectivityService } from '@core/services/connectivity.service';
@@ -22,6 +23,7 @@ import { OfflineCodexService } from '@core/services/offline-codex.service';
 import { OfflineSyncService } from '@core/services/offline-sync.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
+import { CharacterPlayView } from '../../../character-sheet/character-play-view';
 import {
   ABILITY_KEY_TO_LABEL,
   ABILITY_KEYS,
@@ -38,7 +40,7 @@ import { switchMap, of } from 'rxjs';
 @Component({
   selector: 'app-summary-step',
   standalone: true,
-  imports: [CommonModule, ConfirmDialog],
+  imports: [CommonModule, ConfirmDialog, CharacterPlayView, RouterLink],
   templateUrl: './summary-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -46,9 +48,11 @@ import { switchMap, of } from 'rxjs';
 export class SummaryStep implements OnInit, OnDestroy {
   readonly builder = inject(CharacterBuilderService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private pdfService = inject(PdfGeneratorService);
   private sanitizer = inject(DomSanitizer);
   private cloud = inject(CharacterCloudService);
+  private campaigns = inject(CampaignCloudService);
   private auth = inject(AuthService);
   private pendingSave = inject(PendingCharacterSaveService);
   private readonly connectivity = inject(ConnectivityService);
@@ -169,7 +173,7 @@ export class SummaryStep implements OnInit, OnDestroy {
       this.pendingSave.clear();
       this.saving.set(false);
       this.builder.reset();
-      void this.router.navigate(['/character-sheet']);
+      this.afterSaveNavigate(withId);
       return;
     }
 
@@ -200,7 +204,7 @@ export class SummaryStep implements OnInit, OnDestroy {
         this.pendingSave.clear();
         this.saving.set(false);
         this.builder.reset();
-        void this.router.navigate(['/character-sheet']);
+        this.afterSaveNavigate(updated);
       },
       error: (err: unknown) => {
         const msg =
@@ -251,5 +255,27 @@ export class SummaryStep implements OnInit, OnDestroy {
 
   prevStep(): void {
     this.builder.previousStep();
+  }
+
+  /** Si forge lancée depuis une campagne : propose le héros puis retour hub. */
+  private afterSaveNavigate(character: Character): void {
+    const campaignId = this.route.snapshot.queryParamMap.get('campaignId')?.trim();
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl')?.trim();
+    if (campaignId && character.id) {
+      this.campaigns.proposeCharacter(campaignId, character.id).subscribe({
+        next: () => {
+          void this.router.navigate(['/campaigns', campaignId], {
+            queryParams: { tab: 'players', proposed: '1' },
+          });
+        },
+        error: () => {
+          void this.router.navigateByUrl(
+            returnUrl || `/campaigns/${campaignId}?tab=players`,
+          );
+        },
+      });
+      return;
+    }
+    void this.router.navigate(['/character-sheet']);
   }
 }

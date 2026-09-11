@@ -77,7 +77,9 @@ export class CampaignJoinPage implements OnInit {
     this.campaigns.joinByToken(this.token()).subscribe({
       next: (summary) => {
         this.joining.set(false);
-        void this.router.navigate(['/campaigns', summary.id]);
+        void this.router.navigate(['/campaigns', summary.id], {
+          queryParams: { joined: '1' },
+        });
       },
       error: () => {
         this.joining.set(false);

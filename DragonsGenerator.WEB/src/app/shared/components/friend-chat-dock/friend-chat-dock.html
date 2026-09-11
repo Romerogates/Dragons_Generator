@@ -63,7 +63,7 @@
                   ></div>
                 </div>
               } @else if (dock.filteredConversations().length === 0) {
-                <div class="px-6 py-12 text-center">
+                <div class="px-6 py-12 text-center space-y-3">
                   <p class="text-sm text-slate-400">
                     @if (dock.searchQuery().trim()) {
                       Aucun ami trouvé.
@@ -71,6 +71,15 @@
                       Ajoutez des amis pour démarrer une conversation.
                     }
                   </p>
+                  @if (!dock.searchQuery().trim()) {
+                    <a
+                      routerLink="/friends"
+                      class="inline-flex min-h-11 items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-violet-600 text-white hover:bg-violet-500"
+                      (click)="close()"
+                    >
+                      Ouvrir Amis
+                    </a>
+                  }
                 </div>
               } @else {
                 @for (c of dock.filteredConversations(); track trackConversation($index, c)) {

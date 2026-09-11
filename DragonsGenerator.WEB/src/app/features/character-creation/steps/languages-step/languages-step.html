@@ -279,6 +279,17 @@
 
       <div class="mt-12 flex flex-col items-center gap-4 animate-[fadeIn_0.5s_ease] w-full">
         <nav class="wizard-step-nav">
+          @if (remainingPicks() > 0 || exoticRemaining() > 0 || baseRemaining() > 0) {
+            <p class="wizard-nav-hint">
+              @if (remainingPicks() > 0) {
+                Encore {{ remainingPicks() }} langue(s) à choisir
+              } @else if (exoticRemaining() > 0) {
+                Encore {{ exoticRemaining() }} langue(s) exotique(s)
+              } @else {
+                Encore {{ baseRemaining() }} langue(s) de base
+              }
+            </p>
+          }
           <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
             ← Étape précédente
           </button>

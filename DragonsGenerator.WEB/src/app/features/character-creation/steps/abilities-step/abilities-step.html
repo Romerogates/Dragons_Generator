@@ -653,7 +653,7 @@
           </div>
         }
         <button
-          class="wizard-nav-primary w-full"
+          class="wizard-nav-primary w-full sm:hidden"
           [disabled]="!canConfirm()"
           [class.opacity-50]="!canConfirm()"
           (click)="confirmSelection()"
@@ -662,13 +662,13 @@
         </button>
         @if (builder.creation().pointsRemaining !== 0) {
           <p
-            class="text-center text-[9px] text-slate-500 uppercase tracking-widest font-bold animate-pulse"
+            class="text-center text-[9px] text-slate-500 uppercase tracking-widest font-bold animate-pulse sm:hidden"
           >
             Dépensez tous vos points
           </p>
         } @else if (needsAsi() && !asiComplete()) {
           <p
-            class="text-center text-[9px] text-sky-500 uppercase tracking-widest font-bold animate-pulse"
+            class="text-center text-[9px] text-sky-500 uppercase tracking-widest font-bold animate-pulse sm:hidden"
           >
             Choisissez votre ASI
           </p>
@@ -678,8 +678,28 @@
   </div>
 
   <nav class="wizard-step-nav">
+    @if (!canConfirm()) {
+      <p class="wizard-nav-hint">
+        @if (builder.creation().pointsRemaining !== 0) {
+          Dépensez tous vos points
+        } @else if (needsAsi() && !asiComplete()) {
+          Choisissez votre ASI
+        } @else {
+          Complétez la sélection
+        }
+      </p>
+    }
     <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
       ← Étape précédente
+    </button>
+    <button
+      type="button"
+      class="wizard-nav-primary"
+      [disabled]="!canConfirm()"
+      [class.opacity-50]="!canConfirm()"
+      (click)="confirmSelection()"
+    >
+      Valider et continuer
     </button>
   </nav>
 </div>
