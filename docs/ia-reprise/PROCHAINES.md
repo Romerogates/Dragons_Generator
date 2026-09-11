@@ -15,13 +15,12 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
-### Vague V2 — Table live solide
-
-3. **P2** Lien d’invitation campagne (token / deep link)
-4. **P3** (optionnel) Fiche PJ consultable depuis `/play`
+_(File vide — reprendre idle / polish manuel ou nouvelle vague produit.)_
 
 ## Déjà livré (ne pas refaire)
 
+- **P3 fiche PJ depuis /play** (2026-09-11) — bloc « Héros à la table » + bouton Ma fiche / Fiche roster ; ouverture en mode `consult` avec retour `/campaigns/:id/play`.
+- **P2 invitation + consultation** (2026-09-11) — lien `/join/{token}` (créer / régénérer / révoquer) sans amitié ; mode fiche `consult` (chat ami + pré-tirés / membres) ; pré-tirés `ready` visibles joueur ; `use-at-table` sans clone ; claim = copie optionnelle Mes héros.
 - **P1 UX table joueur mobile** (2026-09-10) — adversaires d’abord ; roster compact + Tout voir ; bandeau tour sticky avec Attaquer/Passer ; menu combat avant les cartes ; carte fog repliable + cellule au viewport + scroll ; header `/play` sous navbar ; dock onglet Table → CTA plein écran (plus de panel écrasé).
 - **P0 sync live SignalR** (2026-09-10) — hub `/hubs/campaign-live` ; push `campaignUpdated` sur PUT campagne / init / attaque / XP ; client `CampaignLiveService` ; poll de secours 30 s si hub OK (4 s sinon) ; merge MJ combat/fog sans écraser notes ; nginx WS + proxy `ws:true`.
 - **Polish cloche / amis / onglets** (2026-09-10) — Discover Accepter/Refuser ; notif `xp_awarded` + push + préférence ; conflit MJ = banner Recharger/Garder ; smoke §10 coché (e2e).

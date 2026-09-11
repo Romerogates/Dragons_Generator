@@ -48,6 +48,8 @@ export class CharacterSheet implements OnInit, OnDestroy {
   readonly error = signal<string | null>(null);
   readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
   readonly pdfFailed = signal(false);
+  readonly isConsult = signal(false);
+  readonly consultSourceLabel = signal<string | null>(null);
   /** Interface affichée : PDF par défaut, bascule UI en un clic. */
   readonly viewMode = signal<SheetViewMode>(readStoredViewMode());
   private rawBlobUrl: string | null = null;
@@ -71,6 +73,8 @@ export class CharacterSheet implements OnInit, OnDestroy {
         return;
       }
       this.character.set(character);
+      this.isConsult.set(this.handoff.peekMode() === 'consult');
+      this.consultSourceLabel.set(this.handoff.peekSourceLabel());
 
       try {
         const url = await this.pdfService.generatePdfBlob(character);
@@ -143,6 +147,7 @@ export class CharacterSheet implements OnInit, OnDestroy {
   }
 
   editCharacter(): void {
+    if (this.isConsult()) return;
     const c = this.character();
     if (!c) return;
     this.handoff.stashEdit(c);
@@ -150,6 +155,15 @@ export class CharacterSheet implements OnInit, OnDestroy {
   }
 
   backToList(): void {
+    if (this.isConsult()) {
+      const returnUrl = this.handoff.peekReturnUrl();
+      if (returnUrl) {
+        void this.router.navigateByUrl(returnUrl);
+        return;
+      }
+      void this.router.navigate(['/']);
+      return;
+    }
     this.router.navigate(['/characters']);
   }
 }

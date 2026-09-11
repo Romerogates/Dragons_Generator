@@ -38,6 +38,15 @@ export class FriendChatService {
   private readonly auth = inject(AuthService);
   private readonly api = environment.apiUrl;
 
+  getFriendSharedCharacter(
+    friendUserId: string,
+    characterId: string,
+  ): Observable<{ id: string; name: string; data: unknown }> {
+    return this.http.get<{ id: string; name: string; data: unknown }>(
+      `${this.api}/me/friends/${friendUserId}/characters/${characterId}`,
+    );
+  }
+
   listMessages(friendUserId: string, after?: string): Observable<FriendMessage[]> {
     if (!this.auth.isLoggedIn()) return of([]);
     const params: Record<string, string> = {};

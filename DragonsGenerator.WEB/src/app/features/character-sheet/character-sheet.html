@@ -43,20 +43,30 @@
           Fiche
         </button>
       </div>
-      <button
-        type="button"
-        class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 transition-colors"
-        (click)="backToList()"
-      >
-        ← Mes héros
-      </button>
-      <button
-        type="button"
-        class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 transition-colors"
-        (click)="editCharacter()"
-      >
-        Modifier
-      </button>
+      @if (!isConsult()) {
+        <button
+          type="button"
+          class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 transition-colors"
+          (click)="backToList()"
+        >
+          ← Mes héros
+        </button>
+        <button
+          type="button"
+          class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 transition-colors"
+          (click)="editCharacter()"
+        >
+          Modifier
+        </button>
+      } @else {
+        <button
+          type="button"
+          class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 transition-colors"
+          (click)="backToList()"
+        >
+          ← Retour
+        </button>
+      }
       <button
         type="button"
         class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-500 text-slate-950 hover:bg-amber-400 transition-colors"
@@ -68,6 +78,17 @@
     </div>
   </div>
 
+  @if (isConsult()) {
+    <div
+      class="mb-4 rounded-xl border border-sky-800/40 bg-sky-950/20 px-4 py-3 text-sm text-sky-200/90"
+    >
+      Consultation
+      @if (consultSourceLabel(); as src) {
+        <span class="text-slate-400"> — {{ src }}</span>
+      }
+      . Ce héros n’est pas ajouté à votre bibliothèque.
+    </div>
+  }
   @if (loading()) {
     <div class="flex justify-center py-20">
       <div

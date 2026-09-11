@@ -75,15 +75,17 @@ public static class CampaignJsonHelpers
                 pregen["dmBackstory"] = "";
                 pregen["dmSecrets"] = "";
 
+                var status = pregen["status"]?.GetValue<string>() ?? "";
                 var assignedRaw = pregen["assignedUserId"]?.GetValue<string>();
-                if (string.IsNullOrWhiteSpace(assignedRaw)
-                    || !Guid.TryParse(assignedRaw, out var assignedId)
-                    || assignedId != playerUserId)
-                {
-                    continue;
-                }
+                var assignedToMe = !string.IsNullOrWhiteSpace(assignedRaw)
+                    && Guid.TryParse(assignedRaw, out var assignedId)
+                    && assignedId == playerUserId;
 
-                visiblePregens.Add(pregen.DeepClone());
+                // Joueurs : pool ready (consultation) + les leurs assignés / revendiqués.
+                if ((status is "ready" or "assigned" or "claimed") || assignedToMe)
+                {
+                    visiblePregens.Add(pregen.DeepClone());
+                }
             }
 
             node["pregenCharacters"] = visiblePregens;

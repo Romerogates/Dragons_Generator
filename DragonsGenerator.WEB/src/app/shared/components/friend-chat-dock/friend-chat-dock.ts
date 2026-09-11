@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { FriendChatDockService } from '@core/services/friend-chat-dock.service';
 import {
@@ -22,11 +22,13 @@ import {
 } from '@core/services/friend-chat.service';
 import { CharacterCloudService, CloudCharacterSummary } from '@core/services/character-cloud.service';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
+import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import { CampaignSummary } from '@core/models/Campaign/campaign';
 import { NotificationService } from '@core/services/notification.service';
 import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
 import { accentMessageClass, accentGradient } from '@core/utils/profile.util';
 import type { ChatConversation } from '@core/services/friend-chat-dock.service';
+import type { Character } from '@core/models/Character/character';
 
 interface ParsedAttachment {
   kind: FriendMessageAttachmentKind;
@@ -52,6 +54,8 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
   private readonly characters = inject(CharacterCloudService);
   private readonly campaigns = inject(CampaignCloudService);
   private readonly notifications = inject(NotificationService);
+  private readonly handoff = inject(CharacterHandoffService);
+  private readonly router = inject(Router);
 
   @ViewChild('threadScroll') threadScroll?: ElementRef<HTMLDivElement>;
 
@@ -63,6 +67,7 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
   readonly threadError = signal<string | null>(null);
   readonly shareMenuOpen = signal(false);
   readonly shareLoading = signal(false);
+  readonly openingShared = signal(false);
   readonly myCharacters = signal<CloudCharacterSummary[]>([]);
   readonly myCampaigns = signal<CampaignSummary[]>([]);
 
@@ -144,6 +149,45 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
 
   shareCampaign(c: CampaignSummary): void {
     this.sendAttachment('campaign', { campaignId: c.id, campaignTitle: c.title });
+  }
+
+  openSharedCharacter(characterId: string, characterName?: string, isMine = false): void {
+    if (!characterId || this.openingShared()) return;
+    this.openingShared.set(true);
+    this.threadError.set(null);
+
+    const openConsult = (res: { name?: string; data: unknown }, label: string) => {
+      const character = { ...(res.data as object) } as Character;
+      if (res.name) character.name = res.name;
+      else if (characterName) character.name = characterName;
+      this.handoff.setCurrent(character, { mode: 'consult', sourceLabel: label });
+      this.openingShared.set(false);
+      void this.router.navigate(['/character-sheet']);
+    };
+
+    if (isMine) {
+      this.characters.get(characterId).subscribe({
+        next: (res) => openConsult(res, 'Votre fiche (aperçu depuis le chat)'),
+        error: () => {
+          this.openingShared.set(false);
+          this.threadError.set('Impossible d’ouvrir cette fiche.');
+        },
+      });
+      return;
+    }
+
+    const friendId = this.dock.activeFriendId();
+    if (!friendId) {
+      this.openingShared.set(false);
+      return;
+    }
+    this.chat.getFriendSharedCharacter(friendId, characterId).subscribe({
+      next: (res) => openConsult(res, 'Fiche partagée par un ami'),
+      error: () => {
+        this.openingShared.set(false);
+        this.threadError.set('Impossible d’ouvrir cette fiche partagée.');
+      },
+    });
   }
 
   private sendAttachment(

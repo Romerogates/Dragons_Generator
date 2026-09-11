@@ -33,6 +33,7 @@ public static class DbMigrationRunner
         new("009_user_preferences_json", Apply009UserPreferencesJsonAsync),
         new("010_guide_comments", Apply010GuideCommentsAsync),
         new("011_guide_comment_widgets", Apply011GuideCommentWidgetsAsync),
+        new("012_campaign_join_link", Apply012CampaignJoinLinkAsync),
     ];
 
     private sealed record Migration(string Id, Func<AppDbContext, CancellationToken, Task> Apply);
@@ -289,6 +290,20 @@ public static class DbMigrationRunner
             ct);
     }
 
+    private static async Task Apply012CampaignJoinLinkAsync(AppDbContext db, CancellationToken ct)
+    {
+        await TryAddColumnAsync(db, "Campaigns", "JoinToken", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "Campaigns", "JoinTokenCreatedAt", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "Campaigns", "JoinEnabled", "INTEGER NOT NULL DEFAULT 0", ct);
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS "IX_Campaigns_JoinToken"
+                ON "Campaigns" ("JoinToken")
+                WHERE "JoinToken" IS NOT NULL;
+            """,
+            ct);
+    }
+
     private static async Task TryAddColumnAsync(
         AppDbContext db,
         string table,
@@ -332,3 +347,4 @@ public static class DbMigrationRunner
             or "TEXT NOT NULL DEFAULT 'half'"
             or "INTEGER NOT NULL DEFAULT 0";
 }
+

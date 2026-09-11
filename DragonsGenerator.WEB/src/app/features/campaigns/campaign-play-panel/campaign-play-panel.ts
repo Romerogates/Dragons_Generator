@@ -21,6 +21,7 @@ import { catchError, map } from 'rxjs/operators';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { CampaignLiveService } from '@core/services/campaign-live.service';
 import { AuthService } from '@core/services/auth.service';
+import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import { DataService } from '@core/services/data.service';
 import type { Character } from '@core/models/Character/character';
 import type { Creature } from '@core/models/Creatures/creature';
@@ -134,6 +135,7 @@ export class CampaignPlayPanel implements OnDestroy {
   private readonly data = inject(DataService);
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
+  private readonly handoff = inject(CharacterHandoffService);
 
   readonly campaign = input.required<CampaignDetailModel>();
   readonly fullscreen = input(false);
@@ -321,6 +323,17 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly approvedPlayers = computed(() =>
     this.players().filter((p) => p.proposalStatus === 'approved' && p.approvedCharacterId),
   );
+
+  /** Membre joueur courant (si héros approuvé). */
+  readonly myApprovedMember = computed(() => {
+    const userId = this.auth.user()?.id;
+    if (!userId) return null;
+    return (
+      this.approvedPlayers().find((p) => p.userId === userId) ?? null
+    );
+  });
+
+  readonly sheetLoadingId = signal<string | null>(null);
 
   /** PJ approuvés pas encore dans le combat actif. */
   readonly availablePlayerAllies = computed(() => {
@@ -935,6 +948,55 @@ export class CampaignPlayPanel implements OnDestroy {
     const member = this.campaign().members.find((m) => m.userId === userId);
     const name = member?.displayName?.trim();
     return name || null;
+  }
+
+  memberForCombatant(combatant: Combatant): CampaignMember | null {
+    const userId = combatant.memberUserId;
+    if (!userId) return null;
+    return (
+      this.approvedPlayers().find((m) => m.userId === userId) ?? null
+    );
+  }
+
+  /** Ouvre la fiche du joueur courant (consultation, retour table). */
+  openMySheet(): void {
+    const mine = this.myApprovedMember();
+    if (mine) this.openMemberSheet(mine, 'Votre héros à la table');
+  }
+
+  openCombatantSheet(combatant: Combatant): void {
+    const member = this.memberForCombatant(combatant);
+    if (!member) return;
+    const label =
+      member.userId === this.auth.user()?.id
+        ? 'Votre héros à la table'
+        : `${member.approvedCharacterName ?? member.displayName} (table)`;
+    this.openMemberSheet(member, label);
+  }
+
+  openMemberSheet(member: CampaignMember, sourceLabel = 'Héros de la table'): void {
+    if (!member.approvedCharacterId || this.sheetLoadingId()) return;
+    this.sheetLoadingId.set(member.id);
+    this.clearFeedback();
+    const campaignId = this.campaign().id;
+    const returnUrl = `/campaigns/${campaignId}/play`;
+    this.campaigns.getMemberCharacter(campaignId, member.id, 'approved').subscribe({
+      next: (res) => {
+        const character = { ...(res.data as object) } as Character;
+        if (res.name) character.name = res.name;
+        this.handoff.setCurrent(character, {
+          mode: 'consult',
+          sourceLabel,
+          returnUrl,
+        });
+        this.sheetLoadingId.set(null);
+        void this.router.navigate(['/character-sheet']);
+      },
+      error: () => {
+        this.sheetLoadingId.set(null);
+        this.setFeedback('err', 'Impossible d’ouvrir la fiche.');
+      },
+    });
   }
 
   /** Ajoute un PJ approuvé comme allié (crée le combat s’il n’existe pas). */

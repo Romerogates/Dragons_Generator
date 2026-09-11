@@ -33,13 +33,18 @@
               <span class="text-emerald-400">({{ publishedHandoutsCount() }})</span>
             }
           </a>
-          <a
-            [routerLink]="['/campaigns', c.id]"
-            [queryParams]="{ tab: 'players' }"
-            class="min-h-11 inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-300 hover:border-emerald-600/50"
+          <button
+            type="button"
+            class="min-h-11 inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-sky-800/50 text-sky-300 hover:border-sky-500/50 disabled:opacity-40"
+            [disabled]="!myApprovedMember() || sheetLoadingId() === myApprovedMember()?.id"
+            (click)="openMySheet()"
           >
-            Ma fiche
-          </a>
+            @if (sheetLoadingId() === myApprovedMember()?.id) {
+              Fiche…
+            } @else {
+              Ma fiche
+            }
+          </button>
         }
         @if (isDm() && !fullscreen()) {
           <app-fullscreen-enter-link
@@ -64,6 +69,34 @@
       <p class="text-[10px] font-black uppercase tracking-widest text-emerald-500/80 animate-pulse">
         Sauvegarde…
       </p>
+    }
+
+    @if (approvedPlayers().length) {
+      <div class="rounded-xl border border-sky-800/35 bg-sky-950/15 p-3 space-y-2">
+        <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">
+          Héros à la table
+        </p>
+        <div class="flex flex-wrap gap-2">
+          @for (p of approvedPlayers(); track p.id) {
+            <button
+              type="button"
+              class="px-3 py-2 rounded-xl text-left text-xs border border-sky-800/50 text-sky-100 hover:border-sky-500/60 hover:bg-sky-950/40 disabled:opacity-50"
+              [disabled]="sheetLoadingId() === p.id"
+              (click)="openMemberSheet(p, p.approvedCharacterName || p.displayName)"
+            >
+              <span class="font-serif block">{{ p.approvedCharacterName }}</span>
+              <span class="text-[10px] text-slate-500">
+                {{ p.displayName }}
+                @if (sheetLoadingId() === p.id) {
+                  · …
+                } @else {
+                  · Consulter
+                }
+              </span>
+            </button>
+          }
+        </div>
+      </div>
     }
 
     @if (feedback(); as fb) {
@@ -552,6 +585,20 @@
                     <span>CA {{ cb.armorClass ?? '—' }}</span>
                     @if (cb.conditions?.length) {
                       <span class="text-violet-300">{{ cb.conditions!.join(', ') }}</span>
+                    }
+                    @if (memberForCombatant(cb); as m) {
+                      <button
+                        type="button"
+                        class="min-h-9 px-2 py-1 rounded-lg text-[9px] font-black uppercase border border-sky-800/50 text-sky-300 hover:border-sky-500/50 disabled:opacity-40"
+                        [disabled]="sheetLoadingId() === m.id"
+                        (click)="openCombatantSheet(cb)"
+                      >
+                        @if (sheetLoadingId() === m.id) {
+                          …
+                        } @else {
+                          Fiche
+                        }
+                      </button>
                     }
                   </div>
                 </li>
@@ -1838,13 +1885,18 @@
                 class="text-emerald-400 hover:text-emerald-300 underline-offset-2 hover:underline"
                 >documents</a
               >
-              ou
-              <a
-                [routerLink]="['/campaigns', c.id]"
-                [queryParams]="{ tab: 'players' }"
-                class="text-emerald-400 hover:text-emerald-300 underline-offset-2 hover:underline"
-                >votre fiche</a
-              >.
+              @if (myApprovedMember()) {
+                ou
+                <button
+                  type="button"
+                  class="text-sky-400 hover:text-sky-300 underline-offset-2 hover:underline disabled:opacity-40"
+                  [disabled]="sheetLoadingId() === myApprovedMember()?.id"
+                  (click)="openMySheet()"
+                >
+                  votre fiche
+                </button>
+              }
+              .
             </p>
           }
         </div>

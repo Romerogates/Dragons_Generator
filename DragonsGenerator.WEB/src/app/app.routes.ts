@@ -8,6 +8,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/home/home').then((m) => m.Home),
   },
   {
+    path: 'join/:token',
+    loadComponent: () =>
+      import('./features/campaigns/campaign-join/campaign-join').then((m) => m.CampaignJoinPage),
+  },
+  {
     path: 'login',
     loadComponent: () => import('./features/auth/login').then((m) => m.LoginPage),
   },

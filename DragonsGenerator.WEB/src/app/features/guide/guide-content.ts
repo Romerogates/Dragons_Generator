@@ -618,23 +618,24 @@ export const GUIDE_FAQ_ITEMS: GuideFaqItem[] = [
     },
     {
       id: 'faq-invite',
-      question: 'Je ne peux pas inviter un ami déjà dans la campagne',
+      question: 'Comment inviter quelqu’un qui n’est pas encore ami ?',
       answer:
-        'C’est normal : les membres actuels sont filtrés de la liste d’invitation. Pour le faire revenir après un retrait, utilisez à nouveau Inviter un ami.',
+        'Onglet Joueurs → Copier le lien campagne. Vos invités ouvrent le lien, se connectent, et rejoignent sans amitié préalable. Vous pouvez aussi Inviter un ami (liste Amis) ou régénérer / désactiver le lien.',
       audience: 'dm',
     },
     {
       id: 'faq-pretire',
       question: 'À quoi servent les personnages pré-tirés ?',
       answer:
-        'Le MJ prépare des héros prêts à jouer, les assigne, et le joueur peut les revendiquer. Utile pour une one-shot ou un remplaçant rapide.',
+        'Le MJ prépare des héros pour l’aventure. Les joueurs peuvent les consulter en lecture seule, les utiliser à la table (sans les ajouter à Mes héros), ou en faire une copie optionnelle dans leur bibliothèque.',
       audience: 'all',
     },
   ];
 
 export const GUIDE_GLOSSARY: GuideGlossaryItem[] = [
     { term: 'Table', definition: 'Espace de jeu en direct du MJ : notes, rencontres, tracker de combat.' },
-    { term: 'Pré-tiré', definition: 'Personnage préparé par le MJ, assignable puis revendiquable par un joueur.' },
+    { term: 'Pré-tiré', definition: 'Personnage préparé par le MJ pour l’aventure ; consultation / usage table sans appropriation obligatoire.' },
+    { term: 'Lien d’invitation', definition: 'URL /join/… que le MJ partage pour faire rejoindre une campagne sans être ami.' },
     { term: 'Document', definition: 'Fiche publiée aux joueurs (lettre, carte, résumé…) en markdown léger ; les cartes embarquent une image PNG.' },
     {
       term: 'Donjon',

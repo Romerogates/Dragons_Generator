@@ -136,11 +136,38 @@ export class CampaignCloudService {
     });
   }
 
-  claimPregen(campaignId: string, pregenId: string): Observable<{ characterId: string }> {
-    return this.http.post<{ characterId: string }>(
+  claimPregen(campaignId: string, pregenId: string): Observable<{ id: string; name: string }> {
+    return this.http.post<{ id: string; name: string }>(
       `${this.api}/me/campaigns/${campaignId}/pregens/${pregenId}/claim`,
       {},
     );
+  }
+
+  usePregenAtTable(campaignId: string, pregenId: string): Observable<void> {
+    return this.http.post<void>(
+      `${this.api}/me/campaigns/${campaignId}/pregens/${pregenId}/use-at-table`,
+      {},
+    );
+  }
+
+  getJoinLink(campaignId: string): Observable<CampaignJoinLink> {
+    return this.http.get<CampaignJoinLink>(`${this.api}/me/campaigns/${campaignId}/join-link`);
+  }
+
+  createOrRotateJoinLink(campaignId: string): Observable<CampaignJoinLink> {
+    return this.http.post<CampaignJoinLink>(`${this.api}/me/campaigns/${campaignId}/join-link`, {});
+  }
+
+  revokeJoinLink(campaignId: string): Observable<void> {
+    return this.http.delete<void>(`${this.api}/me/campaigns/${campaignId}/join-link`);
+  }
+
+  previewJoin(token: string): Observable<CampaignJoinPreview> {
+    return this.http.get<CampaignJoinPreview>(`${this.api}/join/${encodeURIComponent(token)}`);
+  }
+
+  joinByToken(token: string): Observable<CampaignSummary> {
+    return this.http.post<CampaignSummary>(`${this.api}/me/join/${encodeURIComponent(token)}`, {});
   }
 
   getPregenCharacter(
@@ -236,6 +263,19 @@ export interface InitiativeBoardCombatant {
   initiativeBonus: number;
   hasRoll: boolean;
   memberUserId: string | null;
+}
+
+export interface CampaignJoinLink {
+  token: string | null;
+  enabled: boolean;
+  createdAt: string | null;
+}
+
+export interface CampaignJoinPreview {
+  campaignId: string;
+  title: string;
+  ownerDisplayName: string;
+  alreadyMember: boolean;
 }
 
 export interface CampaignPendingInvite {

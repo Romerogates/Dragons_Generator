@@ -168,6 +168,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly memberCharacterLoadingId = signal<string | null>(null);
   readonly characterRequestLoadingId = signal<string | null>(null);
   readonly rosterFeedback = signal<string | null>(null);
+  readonly joinLink = signal<{ token: string | null; enabled: boolean } | null>(null);
+  readonly joinLinkBusy = signal(false);
   /** Amis déjà invités (en attente d’acceptation) — masqués de la liste invitable. */
   readonly pendingInviteUserIds = signal<Set<string>>(new Set());
   readonly pendingInvites = signal<
@@ -714,7 +716,10 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
           return next.size === prev.size ? prev : next;
         });
         this.tuneSoftPollInterval(c);
-        if (current?.isOwner) this.loadPendingInvites();
+        if (current?.isOwner) {
+          this.loadPendingInvites();
+          this.loadJoinLink();
+        }
       },
       error: () => {
         /* ignore soft poll */
@@ -855,6 +860,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
           this.stopInitiativeBannerPoll();
           this.initiativeBoard.set(null);
           this.loadPendingInvites();
+          this.loadJoinLink();
         }
         if (this.tab() === 'overview') {
           this.loadActivity();
@@ -884,6 +890,91 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     });
   }
 
+  loadJoinLink(): void {
+    const c = this.campaign();
+    if (!c?.isOwner) {
+      this.joinLink.set(null);
+      return;
+    }
+    this.campaigns.getJoinLink(c.id).subscribe({
+      next: (link) => this.joinLink.set({ token: link.token, enabled: link.enabled }),
+      error: () => this.joinLink.set(null),
+    });
+  }
+
+  copyCampaignJoinLink(): void {
+    const c = this.campaign();
+    if (!c?.isOwner || this.joinLinkBusy()) return;
+    const existing = this.joinLink();
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const write = (token: string) => {
+      const url = `${origin}/join/${token}`;
+      if (!navigator.clipboard?.writeText) {
+        this.rosterFeedback.set('Presse-papiers indisponible.');
+        return;
+      }
+      void navigator.clipboard.writeText(url).then(
+        () =>
+          this.rosterFeedback.set(
+            'Lien d’invitation copié — vos invités rejoignent sans être amis.',
+          ),
+        () => this.rosterFeedback.set('Impossible de copier le lien.'),
+      );
+    };
+
+    if (existing?.enabled && existing.token) {
+      write(existing.token);
+      return;
+    }
+
+    this.joinLinkBusy.set(true);
+    this.campaigns.createOrRotateJoinLink(c.id).subscribe({
+      next: (link) => {
+        this.joinLink.set({ token: link.token, enabled: link.enabled });
+        this.joinLinkBusy.set(false);
+        if (link.token) write(link.token);
+      },
+      error: () => {
+        this.joinLinkBusy.set(false);
+        this.rosterFeedback.set('Impossible de créer le lien d’invitation.');
+      },
+    });
+  }
+
+  regenerateJoinLink(): void {
+    const c = this.campaign();
+    if (!c?.isOwner || this.joinLinkBusy()) return;
+    this.joinLinkBusy.set(true);
+    this.campaigns.createOrRotateJoinLink(c.id).subscribe({
+      next: (link) => {
+        this.joinLink.set({ token: link.token, enabled: link.enabled });
+        this.joinLinkBusy.set(false);
+        this.rosterFeedback.set('Nouveau lien généré — l’ancien ne fonctionne plus.');
+      },
+      error: () => {
+        this.joinLinkBusy.set(false);
+        this.rosterFeedback.set('Régénération impossible.');
+      },
+    });
+  }
+
+  revokeJoinLink(): void {
+    const c = this.campaign();
+    if (!c?.isOwner || this.joinLinkBusy()) return;
+    this.joinLinkBusy.set(true);
+    this.campaigns.revokeJoinLink(c.id).subscribe({
+      next: () => {
+        this.joinLink.set({ token: null, enabled: false });
+        this.joinLinkBusy.set(false);
+        this.rosterFeedback.set('Lien d’invitation désactivé.');
+      },
+      error: () => {
+        this.joinLinkBusy.set(false);
+        this.rosterFeedback.set('Désactivation impossible.');
+      },
+    });
+  }
+
   copyFriendsInviteLink(): void {
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const url = `${origin}/friends`;
@@ -894,7 +985,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     void navigator.clipboard.writeText(url).then(
       () =>
         this.rosterFeedback.set(
-          'Lien Amis copié — vos invités acceptent l’invitation depuis cette page.',
+          'Lien Amis copié — pour inviter un ami déjà dans votre liste.',
         ),
       () => this.rosterFeedback.set('Impossible de copier le lien.'),
     );
@@ -1855,11 +1946,17 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   viewMemberCharacter(member: CampaignMember, scope: 'proposed' | 'approved'): void {
     const key = this.memberLoadingKey(member.id, scope);
     if (this.memberCharacterLoadingId() === key) return;
+    const campaignId = this.campaign()?.id;
+    if (!campaignId) return;
     this.memberCharacterLoadingId.set(key);
     this.error.set(null);
     this.loadMemberCharacter(member, scope).subscribe({
       next: (character) => {
-        this.handoff.setCurrent(character);
+        this.handoff.setCurrent(character, {
+          mode: 'consult',
+          sourceLabel: 'Personnage de campagne',
+          returnUrl: `/campaigns/${campaignId}`,
+        });
         this.memberCharacterLoadingId.set(null);
         this.router.navigate(['/character-sheet']);
       },
@@ -2083,10 +2180,24 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.campaigns.claimPregen(c.id, pregenId).subscribe({
       next: () => {
         this.error.set(null);
+        this.rosterFeedback.set('Copie ajoutée dans Mes héros (la table n’a pas changé).');
         this.reload();
         this.router.navigate(['/characters']);
       },
-      error: () => this.error.set('Impossible de revendiquer ce personnage.'),
+      error: () => this.error.set('Impossible de copier ce personnage dans Mes héros.'),
+    });
+  }
+
+  usePregenAtTable(pregenId: string): void {
+    const c = this.campaign();
+    if (!c) return;
+    this.campaigns.usePregenAtTable(c.id, pregenId).subscribe({
+      next: () => {
+        this.error.set(null);
+        this.rosterFeedback.set('Pré-tiré lié à la table — sans copie dans Mes héros.');
+        this.reload();
+      },
+      error: () => this.error.set('Impossible d’utiliser ce pré-tiré à la table.'),
     });
   }
 
@@ -2119,11 +2230,17 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   viewPregenCharacter(pregen: CampaignPregen): void {
+    const campaignId = this.campaign()?.id;
+    if (!campaignId) return;
     this.pregenPdfLoadingId.set(pregen.id);
     this.error.set(null);
     this.loadPregenCharacter(pregen).subscribe({
       next: (character) => {
-        this.handoff.setCurrent(character);
+        this.handoff.setCurrent(character, {
+          mode: 'consult',
+          sourceLabel: 'Pré-tiré de campagne',
+          returnUrl: `/campaigns/${campaignId}?tab=prep`,
+        });
         this.pregenPdfLoadingId.set(null);
         this.router.navigate(['/character-sheet']);
       },
@@ -2155,8 +2272,15 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const userId = this.auth.user()?.id;
     if (!userId) return [];
     return (this.campaign()?.data.pregenCharacters ?? []).filter(
-      (p) => p.assignedUserId === userId && p.status === 'assigned',
+      (p) => p.assignedUserId === userId && (p.status === 'assigned' || p.status === 'claimed'),
     );
+  }
+
+  /** Pré-tirés prêts à consulter / prendre à la table (vue joueur). */
+  readyPregensForPlayers(): CampaignPregen[] {
+    const c = this.campaign();
+    if (!c || c.isOwner) return [];
+    return (c.data.pregenCharacters ?? []).filter((p) => p.status === 'ready');
   }
 
   printBestiary(): void {

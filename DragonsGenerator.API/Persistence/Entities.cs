@@ -115,6 +115,10 @@ public class CampaignRecord
     public string Title { get; set; } = "";
     /// <summary>JSON: setting, adventure, creatures, encounters, notes, tone, partyLevel...</summary>
     public string JsonData { get; set; } = "{}";
+    /// <summary>Token opaque pour deep-link /join/{token}. Null = lien désactivé.</summary>
+    public string? JoinToken { get; set; }
+    public DateTimeOffset? JoinTokenCreatedAt { get; set; }
+    public bool JoinEnabled { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
     public List<CampaignMember> Members { get; set; } = [];

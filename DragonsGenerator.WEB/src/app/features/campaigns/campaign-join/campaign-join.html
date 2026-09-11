@@ -1,0 +1,67 @@
+<div class="max-w-lg mx-auto px-4 py-16 animate-fade-in">
+  <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-8 shadow-xl text-center space-y-5">
+    <p class="text-[10px] font-black uppercase tracking-widest text-violet-400">Invitation campagne</p>
+
+    @if (loading()) {
+      <div class="flex justify-center py-8">
+        <div
+          class="w-10 h-10 border-4 border-violet-500/30 border-t-violet-500 rounded-full animate-spin"
+        ></div>
+      </div>
+    } @else if (error(); as err) {
+      <p class="text-red-400 text-sm">{{ err }}</p>
+      <a routerLink="/campaigns" class="inline-block text-sm text-violet-400 hover:underline"
+        >Retour aux campagnes</a
+      >
+    } @else {
+      <h1 class="text-2xl font-serif font-bold text-amber-500">{{ title() }}</h1>
+      <p class="text-sm text-slate-400">
+        Animée par <span class="text-slate-200">{{ ownerName() }}</span>
+      </p>
+
+      @if (!isLoggedIn()) {
+        <p class="text-xs text-slate-500">
+          Connectez-vous ou créez un compte pour rejoindre la table. Pas besoin d’être ami avec le
+          MJ.
+        </p>
+        <div class="flex flex-col gap-2">
+          <button
+            type="button"
+            class="w-full px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-violet-600 text-white hover:bg-violet-500"
+            (click)="goLogin()"
+          >
+            Se connecter pour rejoindre
+          </button>
+          <a
+            routerLink="/register"
+            [queryParams]="{ returnUrl: '/join/' + token() }"
+            class="w-full px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-violet-500/50"
+          >
+            Créer un compte
+          </a>
+        </div>
+      } @else if (alreadyMember()) {
+        <p class="text-sm text-emerald-400">Vous faites déjà partie de cette campagne.</p>
+        <a
+          [routerLink]="['/campaigns', campaignId()]"
+          class="inline-block px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-violet-600 text-white"
+        >
+          Ouvrir la campagne
+        </a>
+      } @else {
+        <button
+          type="button"
+          class="w-full px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-violet-600 text-white hover:bg-violet-500 disabled:opacity-50"
+          [disabled]="joining()"
+          (click)="join()"
+        >
+          @if (joining()) {
+            Inscription…
+          } @else {
+            Rejoindre la campagne
+          }
+        </button>
+      }
+    }
+  </div>
+</div>

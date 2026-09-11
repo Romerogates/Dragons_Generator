@@ -163,9 +163,11 @@
                       >
                         @if (parseAttachment(msg); as att) {
                           @if (att.kind === 'character' && att.characterId) {
-                            <a
-                              [routerLink]="['/characters']"
-                              class="block rounded-xl border border-white/10 bg-black/20 px-3 py-2 hover:bg-black/30 transition-colors"
+                            <button
+                              type="button"
+                              class="block w-full text-left rounded-xl border border-white/10 bg-black/20 px-3 py-2 hover:bg-black/30 transition-colors disabled:opacity-50"
+                              [disabled]="openingShared()"
+                              (click)="openSharedCharacter(att.characterId!, att.characterName, msg.isMine)"
                             >
                               <p class="text-[10px] font-black uppercase tracking-widest opacity-80">
                                 Fiche partagée
@@ -173,7 +175,8 @@
                               <p class="font-serif text-sm mt-0.5">
                                 {{ att.characterName || 'Personnage' }}
                               </p>
-                            </a>
+                              <p class="text-[10px] mt-1 opacity-70">Consulter (sans appropriation)</p>
+                            </button>
                           } @else if (att.kind === 'campaign' && att.campaignId) {
                             <a
                               [routerLink]="['/campaigns', att.campaignId]"

@@ -154,15 +154,16 @@ public class HomeAndCampaignFeatureTests
             Assert.DoesNotContain("Seigneur Ombre SECRET", raw);
             Assert.DoesNotContain("BACKSTORY PNJ SECRET", raw);
             Assert.DoesNotContain("Embuscade SECRET", raw);
-            Assert.DoesNotContain("Héros Secret Non Assigné", raw);
-            Assert.DoesNotContain("HOOK SECRET NON ASSIGNÉ", raw);
-            Assert.DoesNotContain("DM SECRET ASSIGNÉ", raw);
+            Assert.DoesNotContain("DM SECRET", raw);
+            Assert.DoesNotContain("SECRETS ASSIGNÉS", raw);
+            Assert.Contains("Héros Secret Non Assigné", raw);
+            Assert.Contains("HOOK SECRET NON ASSIGNÉ", raw);
             Assert.Contains("Mon Héros Assigné", raw);
             Assert.Contains("Hook public assigné", raw);
             var json = JsonDocument.Parse(raw).RootElement;
             Assert.Empty(json.GetProperty("data").GetProperty("creatures").EnumerateArray());
             Assert.Empty(json.GetProperty("data").GetProperty("encounters").EnumerateArray());
-            Assert.Equal(1, json.GetProperty("data").GetProperty("pregenCharacters").GetArrayLength());
+            Assert.Equal(2, json.GetProperty("data").GetProperty("pregenCharacters").GetArrayLength());
         }
 
         using (var getOwnerReq = ApiTestAuth.Authed(HttpMethod.Get, $"/me/campaigns/{campaignId}", ownerToken))
@@ -1127,5 +1128,99 @@ public class HomeAndCampaignFeatureTests
 
         using var acceptReq = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaign-invites/{inviteId}/accept", playerToken);
         (await _client.SendAsync(acceptReq)).EnsureSuccessStatusCode();
+    }
+
+    [Fact]
+    public async Task Campaign_join_link_allows_non_friend_to_join()
+    {
+        var (_, ownerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "joinowner");
+        var (_, playerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "joinplayer");
+        var campaignId = await CreateEmptyCampaignAsync(ownerToken, "Campagne lien");
+
+        string token;
+        using (var createLink = ApiTestAuth.Authed(HttpMethod.Post, $"/me/campaigns/{campaignId}/join-link", ownerToken))
+        {
+            var res = await _client.SendAsync(createLink);
+            res.EnsureSuccessStatusCode();
+            var body = await res.Content.ReadFromJsonAsync<JsonElement>();
+            Assert.True(body!.GetProperty("enabled").GetBoolean());
+            token = body.GetProperty("token").GetString()!;
+            Assert.False(string.IsNullOrWhiteSpace(token));
+        }
+
+        using (var preview = new HttpRequestMessage(HttpMethod.Get, $"/join/{token}"))
+        {
+            var res = await _client.SendAsync(preview);
+            res.EnsureSuccessStatusCode();
+            var body = await res.Content.ReadFromJsonAsync<JsonElement>();
+            Assert.Equal(campaignId, body!.GetProperty("campaignId").GetGuid());
+            Assert.Equal("Campagne lien", body.GetProperty("title").GetString());
+            Assert.False(body.GetProperty("alreadyMember").GetBoolean());
+        }
+
+        using (var join = ApiTestAuth.Authed(HttpMethod.Post, $"/me/join/{token}", playerToken))
+        {
+            var res = await _client.SendAsync(join);
+            res.EnsureSuccessStatusCode();
+            var body = await res.Content.ReadFromJsonAsync<JsonElement>();
+            Assert.Equal(campaignId, body!.GetProperty("id").GetGuid());
+            Assert.Equal("player", body.GetProperty("role").GetString());
+        }
+
+        using (var previewAgain = ApiTestAuth.Authed(HttpMethod.Get, $"/join/{token}", playerToken))
+        {
+            var res = await _client.SendAsync(previewAgain);
+            res.EnsureSuccessStatusCode();
+            var body = await res.Content.ReadFromJsonAsync<JsonElement>();
+            Assert.True(body!.GetProperty("alreadyMember").GetBoolean());
+        }
+
+        using (var revoke = ApiTestAuth.Authed(HttpMethod.Delete, $"/me/campaigns/{campaignId}/join-link", ownerToken))
+        {
+            (await _client.SendAsync(revoke)).EnsureSuccessStatusCode();
+        }
+
+        using (var joinAfterRevoke = ApiTestAuth.Authed(HttpMethod.Post, $"/me/join/{token}", playerToken))
+        {
+            var res = await _client.SendAsync(joinAfterRevoke);
+            Assert.Equal(HttpStatusCode.NotFound, res.StatusCode);
+        }
+    }
+
+    [Fact]
+    public async Task Friend_shared_character_is_readable_by_friend_only()
+    {
+        var (_, ownerToken, ownerId) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "shareowner");
+        var (_, friendToken, friendId) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "sharefriend");
+        var (_, strangerToken, _) = await ApiTestAuth.RegisterConfirmAndLoginAsync(_client, "sharestranger");
+        await EnsureFriendsAsync(ownerToken, friendToken, friendId);
+
+        Guid characterId;
+        using (var createChar = ApiTestAuth.Authed(HttpMethod.Post, "/me/characters", ownerToken))
+        {
+            createChar.Content = JsonContent.Create(new
+            {
+                name = "Héros partagé",
+                data = JsonDocument.Parse("""{"name":"Héros partagé","totalLevel":1}""").RootElement,
+            });
+            var res = await _client.SendAsync(createChar);
+            res.EnsureSuccessStatusCode();
+            var body = await res.Content.ReadFromJsonAsync<JsonElement>();
+            characterId = body!.GetProperty("id").GetGuid();
+        }
+
+        using (var ok = ApiTestAuth.Authed(HttpMethod.Get, $"/me/friends/{ownerId}/characters/{characterId}", friendToken))
+        {
+            var res = await _client.SendAsync(ok);
+            res.EnsureSuccessStatusCode();
+            var body = await res.Content.ReadFromJsonAsync<JsonElement>();
+            Assert.Equal("Héros partagé", body!.GetProperty("name").GetString());
+        }
+
+        using (var denied = ApiTestAuth.Authed(HttpMethod.Get, $"/me/friends/{ownerId}/characters/{characterId}", strangerToken))
+        {
+            var res = await _client.SendAsync(denied);
+            Assert.Equal(HttpStatusCode.NotFound, res.StatusCode);
+        }
     }
 }
