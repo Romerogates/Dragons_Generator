@@ -1998,8 +1998,19 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       next: (character) => {
         this.handoff.setCurrent(character, {
           mode: 'consult',
-          sourceLabel: 'Personnage de campagne',
-          returnUrl: `/campaigns/${campaignId}`,
+          sourceLabel:
+            scope === 'proposed'
+              ? `Proposition de ${member.displayName}`
+              : 'Personnage de campagne',
+          returnUrl: `/campaigns/${campaignId}?tab=players`,
+          proposalReview:
+            scope === 'proposed'
+              ? {
+                  campaignId,
+                  memberId: member.id,
+                  memberDisplayName: member.displayName,
+                }
+              : undefined,
         });
         this.memberCharacterLoadingId.set(null);
         this.router.navigate(['/character-sheet']);

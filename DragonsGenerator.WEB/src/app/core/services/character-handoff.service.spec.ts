@@ -27,6 +27,25 @@ describe('CharacterHandoffService', () => {
     expect(service.peekMode()).toBe('consult');
     expect(service.peekSourceLabel()).toBe('Pré-tiré');
     expect(service.peekReturnUrl()).toBe('/campaigns/1/play');
+    expect(service.peekProposalReview()).toBeNull();
+  });
+
+  it('stores proposal review context for DM accept/reject', () => {
+    service.setCurrent({ name: 'Mira' } as Character, {
+      mode: 'consult',
+      sourceLabel: 'Proposition de Alice',
+      returnUrl: '/campaigns/42?tab=players',
+      proposalReview: {
+        campaignId: '42',
+        memberId: 'm1',
+        memberDisplayName: 'Alice',
+      },
+    });
+    expect(service.peekProposalReview()).toEqual({
+      campaignId: '42',
+      memberId: 'm1',
+      memberDisplayName: 'Alice',
+    });
   });
 
   it('clears mode with character', () => {
@@ -34,11 +53,13 @@ describe('CharacterHandoffService', () => {
       mode: 'consult',
       sourceLabel: 'Chat',
       returnUrl: '/play',
+      proposalReview: { campaignId: '1', memberId: '2' },
     });
     service.clearCurrent();
     expect(service.peekCurrent()).toBeNull();
     expect(service.peekMode()).toBe('own');
     expect(service.peekSourceLabel()).toBeNull();
     expect(service.peekReturnUrl()).toBeNull();
+    expect(service.peekProposalReview()).toBeNull();
   });
 });

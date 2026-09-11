@@ -9,7 +9,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { CharacterBuilderService } from '@core/services/character-builder.service';
@@ -23,6 +23,7 @@ import { OfflineCodexService } from '@core/services/offline-codex.service';
 import { OfflineSyncService } from '@core/services/offline-sync.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
+import { PdfPagePreview } from '@shared/components/pdf-page-preview/pdf-page-preview';
 import { CharacterPlayView } from '../../../character-sheet/character-play-view';
 import {
   ABILITY_KEY_TO_LABEL,
@@ -40,7 +41,7 @@ import { switchMap, of } from 'rxjs';
 @Component({
   selector: 'app-summary-step',
   standalone: true,
-  imports: [CommonModule, ConfirmDialog, CharacterPlayView, RouterLink],
+  imports: [CommonModule, ConfirmDialog, CharacterPlayView, PdfPagePreview],
   templateUrl: './summary-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -78,16 +79,17 @@ export class SummaryStep implements OnInit, OnDestroy {
 
   readonly isLoadingPreview = signal(true);
   readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
+  readonly pdfRawUrl = signal<string | null>(null);
+  readonly pdfJsFailed = signal(false);
   readonly showAuthGate = signal(false);
   readonly showDiscardConfirm = signal(false);
   readonly saving = signal(false);
   readonly saveError = signal<string | null>(null);
-  private rawBlobUrl: string | null = null;
 
   async ngOnInit(): Promise<void> {
     try {
       const url = await this.pdfService.generatePdfBlob(this.character());
-      this.rawBlobUrl = url;
+      this.pdfRawUrl.set(url);
       this.pdfPreviewUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
     } catch (err) {
       console.error('Erreur génération aperçu PDF :', err);
@@ -97,11 +99,17 @@ export class SummaryStep implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.rawBlobUrl) URL.revokeObjectURL(this.rawBlobUrl);
+    const url = this.pdfRawUrl();
+    if (url) URL.revokeObjectURL(url);
   }
 
   openFullscreen(): void {
-    if (this.rawBlobUrl) window.open(this.rawBlobUrl, '_blank');
+    const url = this.pdfRawUrl();
+    if (url) window.open(url, '_blank');
+  }
+
+  onPdfJsFailed(): void {
+    this.pdfJsFailed.set(true);
   }
 
   fmt(n: number): string {

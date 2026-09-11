@@ -29,8 +29,9 @@ export class FriendChatPage implements OnInit {
         match?.displayName ?? 'Ami',
         match?.avatarEmoji,
         match?.accentColor,
+        { expanded: true },
       );
-      this.router.navigate(['/'], { replaceUrl: true });
+      this.router.navigate(['/friends'], { replaceUrl: true });
     });
   }
 }

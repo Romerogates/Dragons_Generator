@@ -82,11 +82,42 @@
     <div
       class="mb-4 rounded-xl border border-sky-800/40 bg-sky-950/20 px-4 py-3 text-sm text-sky-200/90"
     >
-      Consultation
-      @if (consultSourceLabel(); as src) {
-        <span class="text-slate-400"> — {{ src }}</span>
+      @if (proposalReview(); as review) {
+        <p>
+          Proposition en attente
+          @if (review.memberDisplayName) {
+            <span class="text-slate-400"> — {{ review.memberDisplayName }}</span>
+          }
+          . Acceptez ou refusez après lecture.
+        </p>
+        @if (proposalActionError(); as err) {
+          <p class="mt-2 text-sm text-red-300">{{ err }}</p>
+        }
+        <div class="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-50"
+            [disabled]="proposalActionBusy()"
+            (click)="approveProposal()"
+          >
+            {{ proposalActionBusy() ? 'Traitement…' : 'Accepter' }}
+          </button>
+          <button
+            type="button"
+            class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-red-950/40 text-red-300 border border-red-900/50 hover:border-red-700/60 disabled:opacity-50"
+            [disabled]="proposalActionBusy()"
+            (click)="rejectProposal()"
+          >
+            Refuser
+          </button>
+        </div>
+      } @else {
+        Consultation
+        @if (consultSourceLabel(); as src) {
+          <span class="text-slate-400"> — {{ src }}</span>
+        }
+        . Ce héros n’est pas ajouté à votre bibliothèque.
       }
-      . Ce héros n’est pas ajouté à votre bibliothèque.
     </div>
   }
   @if (loading()) {
@@ -124,8 +155,22 @@
           </button>
         }
       </div>
-      @if (pdfPreviewUrl(); as url) {
-        <iframe [src]="url" class="w-full h-[70vh] bg-slate-900" title="Fiche personnage PDF"></iframe>
+      @if (pdfRawUrl(); as url) {
+        @if (!pdfJsFailed()) {
+          <div
+            class="relative w-full bg-[#0f1117]"
+            style="height: min(85dvh, calc(100dvh - 11rem)); min-height: 28rem"
+          >
+            <app-pdf-page-preview [src]="url" (loadFailed)="onPdfJsFailed()" />
+          </div>
+        } @else if (pdfPreviewUrl(); as safeUrl) {
+          <iframe
+            [src]="safeUrl"
+            class="w-full bg-slate-900 border-0"
+            style="height: min(85dvh, calc(100dvh - 11rem)); min-height: 28rem"
+            title="Fiche personnage PDF"
+          ></iframe>
+        }
       } @else if (pdfFailed()) {
         <div class="p-6 text-center space-y-3">
           <p class="text-sm text-slate-500">Aperçu PDF indisponible.</p>

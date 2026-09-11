@@ -2,21 +2,46 @@
   <div class="friend-chat-dock pointer-events-none fixed inset-0 z-[70]">
     @if (dock.isOpen()) {
       <div
-        class="pointer-events-auto fixed inset-0 bg-black/40 lg:bg-transparent lg:pointer-events-none"
+        class="pointer-events-auto fixed inset-0"
+        [class]="
+          dock.expanded()
+            ? 'bg-black/55'
+            : 'bg-black/40 lg:bg-transparent lg:pointer-events-none'
+        "
         (click)="close()"
         aria-hidden="true"
       ></div>
     }
 
     <div
-      class="pointer-events-none fixed bottom-0 right-0 left-0 lg:left-auto lg:bottom-4 lg:right-4 flex flex-col items-end gap-3 p-3 lg:p-0"
+      class="pointer-events-none fixed flex flex-col"
+      [ngClass]="
+        dock.expanded()
+          ? 'inset-0 lg:inset-4 items-stretch justify-center'
+          : 'bottom-0 right-0 left-0 lg:left-auto lg:bottom-4 lg:right-4 items-end gap-3 p-3 lg:p-0'
+      "
     >
       @if (dock.isOpen()) {
         <div
-          class="friend-chat-panel pointer-events-auto flex flex-col w-full lg:w-[360px] h-[min(100dvh,100%)] max-h-[100dvh] lg:h-[min(520px,calc(100dvh-5rem))] lg:max-h-[520px] bg-[#1b2028] border border-slate-700/80 lg:rounded-2xl shadow-[0_12px_48px_rgba(0,0,0,0.55)] overflow-hidden animate-dock-in lg:rounded-2xl rounded-t-2xl"
+          class="friend-chat-panel pointer-events-auto flex overflow-hidden animate-dock-in bg-[#1b2028] border border-slate-700/80 shadow-[0_12px_48px_rgba(0,0,0,0.55)]"
+          [ngClass]="
+            dock.expanded()
+              ? 'flex-col lg:flex-row w-full h-[100dvh] max-h-[100dvh] lg:h-full lg:max-h-none lg:w-full lg:max-w-6xl lg:mx-auto lg:rounded-2xl rounded-none'
+              : 'flex-col w-full lg:w-[360px] h-[min(100dvh,100%)] max-h-[100dvh] lg:h-[min(520px,calc(100dvh-5rem))] lg:max-h-[520px] lg:rounded-2xl rounded-t-2xl'
+          "
           (click)="$event.stopPropagation()"
         >
-          @if (dock.view() === 'list') {
+          <!-- Liste conversations -->
+          <div
+            class="flex flex-col min-h-0 bg-[#1b2028]"
+            [class.hidden]="dock.view() === 'thread' && !dock.expanded()"
+            [class.max-lg:hidden]="dock.view() === 'thread' && dock.expanded()"
+            [ngClass]="
+              dock.expanded()
+                ? 'w-full lg:w-[340px] lg:shrink-0 lg:border-r lg:border-slate-800'
+                : 'w-full h-full'
+            "
+          >
             <header class="shrink-0 flex items-center justify-between gap-2 px-4 py-3 border-b border-slate-800 bg-[#171b22]">
               <button
                 type="button"
@@ -29,14 +54,28 @@
               <h2 class="flex-1 text-center lg:text-left text-sm font-black uppercase tracking-widest text-slate-100">
                 Messages
               </h2>
-              <button
-                type="button"
-                class="w-9 h-9 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-800 hover:text-violet-300"
-                aria-label="Réduire"
-                (click)="close()"
-              >
-                <iconify-icon icon="mdi:chevron-down" class="text-xl"></iconify-icon>
-              </button>
+              <div class="flex items-center gap-0.5">
+                <button
+                  type="button"
+                  class="hidden lg:flex w-9 h-9 items-center justify-center rounded-full text-slate-400 hover:bg-slate-800 hover:text-violet-300"
+                  [attr.aria-label]="dock.expanded() ? 'Réduire' : 'Agrandir'"
+                  [attr.title]="dock.expanded() ? 'Réduire' : 'Agrandir'"
+                  (click)="toggleExpanded()"
+                >
+                  <iconify-icon
+                    [icon]="dock.expanded() ? 'mdi:arrow-collapse' : 'mdi:arrow-expand'"
+                    class="text-xl"
+                  ></iconify-icon>
+                </button>
+                <button
+                  type="button"
+                  class="w-9 h-9 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-800"
+                  aria-label="Fermer"
+                  (click)="close()"
+                >
+                  <iconify-icon icon="mdi:chevron-down" class="text-xl"></iconify-icon>
+                </button>
+              </div>
             </header>
 
             <div class="shrink-0 px-3 py-2 border-b border-slate-800/80">
@@ -86,6 +125,9 @@
                   <button
                     type="button"
                     class="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-800/50 transition-colors text-left border-b border-slate-800/40 last:border-0"
+                    [class.bg-violet-950/30]="dock.activeFriendId() === c.friendUserId"
+                    [class.border-l-2]="dock.activeFriendId() === c.friendUserId"
+                    [class.border-l-violet-500]="dock.activeFriendId() === c.friendUserId"
                     (click)="openConversation(c)"
                   >
                     <app-profile-avatar
@@ -115,233 +157,264 @@
                 }
               }
             </div>
-          } @else {
-            <header class="shrink-0 flex items-center gap-2 px-3 py-3 border-b border-slate-800 bg-[#171b22]">
-              <button
-                type="button"
-                class="w-9 h-9 flex items-center justify-center rounded-full text-slate-300 hover:bg-slate-800"
-                aria-label="Retour"
-                (click)="backToList()"
-              >
-                <iconify-icon icon="mdi:arrow-left" class="text-xl"></iconify-icon>
-              </button>
-              <div class="flex items-center gap-2 min-w-0 flex-1">
-                <app-profile-avatar
-                  [displayName]="dock.activeFriendName()"
-                  [avatarEmoji]="dock.activeFriendAvatar()"
-                  [accentColor]="dock.activeFriendAccent()"
-                  size="sm"
-                />
-                <p class="text-sm font-semibold text-slate-100 truncate">{{ dock.activeFriendName() }}</p>
-              </div>
-              <button
-                type="button"
-                class="w-9 h-9 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-800"
-                aria-label="Réduire"
-                (click)="close()"
-              >
-                <iconify-icon icon="mdi:chevron-down" class="text-xl"></iconify-icon>
-              </button>
-            </header>
+          </div>
 
-            @if (threadLoading()) {
-              <div class="flex-1 flex items-center justify-center min-h-0">
-                <div
-                  class="w-8 h-8 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin"
-                ></div>
+          <!-- Conversation -->
+          <div
+            class="flex flex-col min-h-0 min-w-0 flex-1 bg-[#1b2028]"
+            [class.hidden]="dock.view() === 'list' && !dock.expanded()"
+            [class.max-lg:hidden]="dock.view() === 'list' && dock.expanded()"
+          >
+            @if (!dock.activeFriendId()) {
+              <div class="hidden lg:flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center bg-[#141820]/40">
+                <iconify-icon icon="mdi:message-text-outline" class="text-5xl text-slate-600"></iconify-icon>
+                <p class="text-sm text-slate-400 font-serif">Sélectionnez une conversation</p>
+                <p class="text-xs text-slate-600 max-w-xs">
+                  Vos messages amis s’affichent ici en grand, comme sur Messenger.
+                </p>
               </div>
             } @else {
-              <div class="flex flex-col flex-1 min-h-0">
-                @if (threadError(); as err) {
-                  <p class="text-center text-red-400 text-xs py-3 px-4 shrink-0">{{ err }}</p>
-                }
-
-                <div
-                  #threadScroll
-                  class="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 py-3 space-y-2 bg-[#141820]/50"
+              <header class="shrink-0 flex items-center gap-2 px-3 py-3 border-b border-slate-800 bg-[#171b22]">
+                <button
+                  type="button"
+                  class="w-9 h-9 flex items-center justify-center rounded-full text-slate-300 hover:bg-slate-800"
+                  [class.lg:hidden]="dock.expanded()"
+                  aria-label="Retour"
+                  (click)="backToList()"
                 >
-                  @for (msg of messages(); track trackMessage($index, msg)) {
-                    <div class="flex" [class.justify-end]="msg.isMine">
-                      <div
-                        class="max-w-[82%] rounded-2xl px-3 py-2 text-[13px] leading-snug space-y-2"
-                        [class]="
-                          msg.isMine
-                            ? myMessageClass() + ' text-white rounded-br-sm'
-                            : 'bg-[#252b36] text-slate-100 rounded-bl-sm'
-                        "
-                      >
-                        @if (parseAttachment(msg); as att) {
-                          @if (att.kind === 'character' && att.characterId) {
-                            <button
-                              type="button"
-                              class="block w-full text-left rounded-xl border border-white/10 bg-black/20 px-3 py-2 hover:bg-black/30 transition-colors disabled:opacity-50"
-                              [disabled]="openingShared()"
-                              (click)="openSharedCharacter(att.characterId!, att.characterName, msg.isMine)"
-                            >
-                              <p class="text-[10px] font-black uppercase tracking-widest opacity-80">
-                                Fiche partagée
-                              </p>
-                              <p class="font-serif text-sm mt-0.5">
-                                {{ att.characterName || 'Personnage' }}
-                              </p>
-                              <p class="text-[10px] mt-1 opacity-70">Consulter (sans appropriation)</p>
-                            </button>
-                          } @else if (att.kind === 'invite' && att.joinToken) {
-                            <a
-                              [routerLink]="['/join', att.joinToken]"
-                              class="block rounded-xl border border-violet-400/30 bg-black/20 px-3 py-2 hover:bg-black/30 transition-colors"
-                            >
-                              <p class="text-[10px] font-black uppercase tracking-widest opacity-80">
-                                Invitation campagne
-                              </p>
-                              <p class="font-serif text-sm mt-0.5">
-                                {{ att.campaignTitle || 'Rejoindre la table' }}
-                              </p>
-                              <p class="text-[10px] mt-1 opacity-70">Ouvrir le lien →</p>
-                            </a>
-                          } @else if (att.kind === 'campaign' && att.campaignId) {
-                            <a
-                              [routerLink]="['/campaigns', att.campaignId]"
-                              class="block rounded-xl border border-white/10 bg-black/20 px-3 py-2 hover:bg-black/30 transition-colors"
-                            >
-                              <p class="text-[10px] font-black uppercase tracking-widest opacity-80">
-                                Campagne partagée
-                              </p>
-                              <p class="font-serif text-sm mt-0.5">
-                                {{ att.campaignTitle || 'Campagne' }}
-                              </p>
-                            </a>
-                          }
-                        }
-                        @if (msg.body) {
-                          <p class="whitespace-pre-wrap break-words">
-                            @for (seg of bodySegments(msg.body); track $index) {
-                              @if (seg.type === 'text') {
-                                <span>{{ seg.value }}</span>
-                              } @else if (seg.type === 'join') {
-                                <a
-                                  [routerLink]="['/join', seg.token]"
-                                  class="underline underline-offset-2 font-semibold break-all hover:opacity-90"
-                                  >Rejoindre la campagne</a
-                                >
-                              } @else {
-                                <a
-                                  [href]="seg.href"
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  class="underline underline-offset-2 break-all hover:opacity-90"
-                                  >{{ seg.label }}</a
-                                >
-                              }
-                            }
-                          </p>
-                        }
-                        <p
-                          class="text-[9px] mt-1 opacity-70"
-                          [class.text-right]="msg.isMine"
-                        >
-                          {{ msg.createdAt | date: 'shortTime' }}
-                        </p>
-                      </div>
-                    </div>
-                  } @empty {
-                    <p class="text-center text-slate-500 text-xs italic py-8">Envoyez le premier message</p>
-                  }
+                  <iconify-icon icon="mdi:arrow-left" class="text-xl"></iconify-icon>
+                </button>
+                <div class="flex items-center gap-2 min-w-0 flex-1">
+                  <app-profile-avatar
+                    [displayName]="dock.activeFriendName()"
+                    [avatarEmoji]="dock.activeFriendAvatar()"
+                    [accentColor]="dock.activeFriendAccent()"
+                    size="sm"
+                  />
+                  <p class="text-sm font-semibold text-slate-100 truncate">{{ dock.activeFriendName() }}</p>
                 </div>
+                <div class="flex items-center gap-0.5">
+                  <button
+                    type="button"
+                    class="hidden lg:flex w-9 h-9 items-center justify-center rounded-full text-slate-400 hover:bg-slate-800 hover:text-violet-300"
+                    [attr.aria-label]="dock.expanded() ? 'Réduire' : 'Agrandir'"
+                    (click)="toggleExpanded()"
+                  >
+                    <iconify-icon
+                      [icon]="dock.expanded() ? 'mdi:arrow-collapse' : 'mdi:arrow-expand'"
+                      class="text-xl"
+                    ></iconify-icon>
+                  </button>
+                  <button
+                    type="button"
+                    class="w-9 h-9 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-800"
+                    aria-label="Fermer"
+                    (click)="close()"
+                  >
+                    <iconify-icon icon="mdi:chevron-down" class="text-xl"></iconify-icon>
+                  </button>
+                </div>
+              </header>
 
-                <form
-                  class="shrink-0 flex flex-col gap-2 px-3 py-3 border-t border-slate-800 bg-[#171b22]"
-                  (ngSubmit)="send()"
-                >
-                  @if (shareMenuOpen()) {
-                    <div class="rounded-xl border border-slate-700 bg-[#141820] p-3 max-h-40 overflow-y-auto">
-                      <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
-                        Partager
-                      </p>
-                      @if (shareLoading()) {
-                        <p class="text-xs text-slate-500 italic">Chargement…</p>
-                      } @else {
-                        @if (myCharacters().length) {
-                          <p class="text-[9px] uppercase text-slate-600 mb-1">Personnages</p>
-                          <div class="flex flex-wrap gap-1 mb-2">
-                            @for (ch of myCharacters(); track ch.id) {
+              @if (threadLoading()) {
+                <div class="flex-1 flex items-center justify-center min-h-0">
+                  <div
+                    class="w-8 h-8 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin"
+                  ></div>
+                </div>
+              } @else {
+                <div class="flex flex-col flex-1 min-h-0">
+                  @if (threadError(); as err) {
+                    <p class="text-center text-red-400 text-xs py-3 px-4 shrink-0">{{ err }}</p>
+                  }
+
+                  <div
+                    #threadScroll
+                    class="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 sm:px-5 py-3 space-y-2 bg-[#141820]/50"
+                  >
+                    @for (msg of messages(); track trackMessage($index, msg)) {
+                      <div class="flex" [class.justify-end]="msg.isMine">
+                        <div
+                          class="max-w-[min(82%,36rem)] rounded-2xl px-3 py-2 text-[13px] leading-snug space-y-2"
+                          [class]="
+                            msg.isMine
+                              ? myMessageClass() + ' text-white rounded-br-sm'
+                              : 'bg-[#252b36] text-slate-100 rounded-bl-sm'
+                          "
+                        >
+                          @if (parseAttachment(msg); as att) {
+                            @if (att.kind === 'character' && att.characterId) {
                               <button
                                 type="button"
-                                class="px-2 py-1 rounded-lg text-[10px] border border-slate-700 text-slate-300 hover:border-violet-500/50"
-                                (click)="shareCharacter(ch)"
+                                class="block w-full text-left rounded-xl border border-white/10 bg-black/20 px-3 py-2 hover:bg-black/30 transition-colors disabled:opacity-50"
+                                [disabled]="openingShared()"
+                                (click)="openSharedCharacter(att.characterId!, att.characterName, msg.isMine)"
                               >
-                                {{ ch.name }}
+                                <p class="text-[10px] font-black uppercase tracking-widest opacity-80">
+                                  Fiche partagée
+                                </p>
+                                <p class="font-serif text-sm mt-0.5">
+                                  {{ att.characterName || 'Personnage' }}
+                                </p>
+                                <p class="text-[10px] mt-1 opacity-70">Consulter (sans appropriation)</p>
                               </button>
+                            } @else if (att.kind === 'invite' && att.joinToken) {
+                              <a
+                                [routerLink]="['/join', att.joinToken]"
+                                class="block rounded-xl border border-violet-400/30 bg-black/20 px-3 py-2 hover:bg-black/30 transition-colors"
+                              >
+                                <p class="text-[10px] font-black uppercase tracking-widest opacity-80">
+                                  Invitation campagne
+                                </p>
+                                <p class="font-serif text-sm mt-0.5">
+                                  {{ att.campaignTitle || 'Rejoindre la table' }}
+                                </p>
+                                <p class="text-[10px] mt-1 opacity-70">Ouvrir le lien →</p>
+                              </a>
+                            } @else if (att.kind === 'campaign' && att.campaignId) {
+                              <a
+                                [routerLink]="['/campaigns', att.campaignId]"
+                                class="block rounded-xl border border-white/10 bg-black/20 px-3 py-2 hover:bg-black/30 transition-colors"
+                              >
+                                <p class="text-[10px] font-black uppercase tracking-widest opacity-80">
+                                  Campagne partagée
+                                </p>
+                                <p class="font-serif text-sm mt-0.5">
+                                  {{ att.campaignTitle || 'Campagne' }}
+                                </p>
+                              </a>
                             }
-                          </div>
-                        }
-                        @if (myCampaigns().length) {
-                          <p class="text-[9px] uppercase text-slate-600 mb-1">Campagnes</p>
-                          <div class="flex flex-col gap-1.5">
-                            @for (c of myCampaigns(); track c.id) {
-                              <div class="flex flex-wrap gap-1">
+                          }
+                          @if (msg.body) {
+                            <p class="whitespace-pre-wrap break-words">
+                              @for (seg of bodySegments(msg.body); track $index) {
+                                @if (seg.type === 'text') {
+                                  <span>{{ seg.value }}</span>
+                                } @else if (seg.type === 'join') {
+                                  <a
+                                    [routerLink]="['/join', seg.token]"
+                                    class="underline underline-offset-2 font-semibold break-all hover:opacity-90"
+                                    >Rejoindre la campagne</a
+                                  >
+                                } @else {
+                                  <a
+                                    [href]="seg.href"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="underline underline-offset-2 break-all hover:opacity-90"
+                                    >{{ seg.label }}</a
+                                  >
+                                }
+                              }
+                            </p>
+                          }
+                          <p
+                            class="text-[9px] mt-1 opacity-70"
+                            [class.text-right]="msg.isMine"
+                          >
+                            {{ msg.createdAt | date: 'shortTime' }}
+                          </p>
+                        </div>
+                      </div>
+                    } @empty {
+                      <p class="text-center text-slate-500 text-xs italic py-8">Envoyez le premier message</p>
+                    }
+                  </div>
+
+                  <form
+                    class="shrink-0 flex flex-col gap-2 px-3 sm:px-4 py-3 border-t border-slate-800 bg-[#171b22]"
+                    (ngSubmit)="send()"
+                  >
+                    @if (shareMenuOpen()) {
+                      <div class="rounded-xl border border-slate-700 bg-[#141820] p-3 max-h-48 overflow-y-auto">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
+                          Partager
+                        </p>
+                        @if (shareLoading()) {
+                          <p class="text-xs text-slate-500 italic">Chargement…</p>
+                        } @else {
+                          @if (myCharacters().length) {
+                            <p class="text-[9px] uppercase text-slate-600 mb-1">Personnages</p>
+                            <div class="flex flex-wrap gap-1 mb-2">
+                              @for (ch of myCharacters(); track ch.id) {
                                 <button
                                   type="button"
-                                  class="px-2 py-1 rounded-lg text-[10px] border border-slate-700 text-slate-300 hover:border-sky-500/50"
-                                  (click)="shareCampaign(c)"
+                                  class="px-2 py-1 rounded-lg text-[10px] border border-slate-700 text-slate-300 hover:border-violet-500/50"
+                                  (click)="shareCharacter(ch)"
                                 >
-                                  {{ c.title }}
+                                  {{ ch.name }}
                                 </button>
-                                @if (c.role === 'dm') {
+                              }
+                            </div>
+                          }
+                          @if (myCampaigns().length) {
+                            <p class="text-[9px] uppercase text-slate-600 mb-1">Campagnes</p>
+                            <div class="flex flex-col gap-1.5">
+                              @for (c of myCampaigns(); track c.id) {
+                                <div class="flex flex-wrap gap-1">
                                   <button
                                     type="button"
-                                    class="px-2 py-1 rounded-lg text-[10px] border border-violet-700/50 text-violet-300 hover:border-violet-400/60"
-                                    (click)="shareCampaignInvite(c)"
+                                    class="px-2 py-1 rounded-lg text-[10px] border border-slate-700 text-slate-300 hover:border-sky-500/50"
+                                    (click)="shareCampaign(c)"
                                   >
-                                    Lien invitation
+                                    {{ c.title }}
                                   </button>
-                                }
-                              </div>
-                            }
-                          </div>
+                                  @if (c.role === 'dm') {
+                                    <button
+                                      type="button"
+                                      class="px-2 py-1 rounded-lg text-[10px] border border-violet-700/50 text-violet-300 hover:border-violet-400/60"
+                                      (click)="shareCampaignInvite(c)"
+                                    >
+                                      Lien invitation
+                                    </button>
+                                  }
+                                </div>
+                              }
+                            </div>
+                          }
+                          @if (!myCharacters().length && !myCampaigns().length) {
+                            <p class="text-xs text-slate-500 italic">Aucun élément à partager.</p>
+                          }
                         }
-                        @if (!myCharacters().length && !myCampaigns().length) {
-                          <p class="text-xs text-slate-500 italic">Aucun élément à partager.</p>
+                      </div>
+                    }
+                    <div class="flex items-end gap-2">
+                      <button
+                        type="button"
+                        class="shrink-0 w-10 h-10 rounded-full border border-slate-700 text-slate-400 flex items-center justify-center hover:border-violet-500/50 hover:text-violet-300"
+                        aria-label="Partager"
+                        (click)="toggleShareMenu()"
+                      >
+                        <iconify-icon icon="mdi:paperclip" class="text-lg"></iconify-icon>
+                      </button>
+                      <textarea
+                        rows="1"
+                        maxlength="2000"
+                        placeholder="Message…"
+                        class="friend-chat-input flex-1 min-w-0 max-h-32 rounded-3xl bg-[#252b36] border border-slate-700/60 px-4 py-2.5 text-sm resize-none outline-none focus:border-violet-600/60 overflow-y-auto"
+                        [value]="draft()"
+                        (input)="draft.set($any($event.target).value)"
+                        (keydown)="onKeydown($event)"
+                      ></textarea>
+                      <button
+                        type="submit"
+                        class="shrink-0 w-10 h-10 rounded-full text-white flex items-center justify-center disabled:opacity-40 hover:opacity-90 transition-opacity"
+                        [ngClass]="myMessageClass()"
+                        [disabled]="sending() || !draft().trim()"
+                        aria-label="Envoyer"
+                      >
+                        @if (sending()) {
+                          <span class="text-xs">…</span>
+                        } @else {
+                          <iconify-icon icon="mdi:send" class="text-lg"></iconify-icon>
                         }
-                      }
+                      </button>
                     </div>
-                  }
-                  <div class="flex items-end gap-2">
-                    <button
-                      type="button"
-                      class="shrink-0 w-10 h-10 rounded-full border border-slate-700 text-slate-400 flex items-center justify-center hover:border-violet-500/50 hover:text-violet-300"
-                      aria-label="Partager"
-                      (click)="toggleShareMenu()"
-                    >
-                      <iconify-icon icon="mdi:paperclip" class="text-lg"></iconify-icon>
-                    </button>
-                    <textarea
-                      rows="1"
-                      maxlength="2000"
-                      placeholder="Message…"
-                      class="friend-chat-input flex-1 min-w-0 max-h-24 rounded-3xl bg-[#252b36] border border-slate-700/60 px-4 py-2.5 text-sm resize-none outline-none focus:border-violet-600/60 overflow-y-auto"
-                      [value]="draft()"
-                      (input)="draft.set($any($event.target).value)"
-                      (keydown)="onKeydown($event)"
-                    ></textarea>
-                    <button
-                      type="submit"
-                      class="shrink-0 w-10 h-10 rounded-full text-white flex items-center justify-center disabled:opacity-40 hover:opacity-90 transition-opacity"
-                      [ngClass]="myMessageClass()"
-                      [disabled]="sending() || !draft().trim()"
-                      aria-label="Envoyer"
-                    >
-                      @if (sending()) {
-                        <span class="text-xs">…</span>
-                      } @else {
-                        <iconify-icon icon="mdi:send" class="text-lg"></iconify-icon>
-                      }
-                    </button>
-                  </div>
-                </form>
-              </div>
+                  </form>
+                </div>
+              }
             }
-          }
+          </div>
         </div>
       } @else {
         <button

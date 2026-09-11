@@ -267,7 +267,13 @@ export class FriendsPage implements OnInit, OnDestroy {
   }
 
   openChat(friend: FriendUser): void {
-    this.dock.openThread(friend.id, friend.displayName, friend.avatarEmoji, friend.accentColor);
+    this.dock.openThread(friend.id, friend.displayName, friend.avatarEmoji, friend.accentColor, {
+      expanded: true,
+    });
+  }
+
+  openMessages(): void {
+    this.dock.open({ expanded: true });
   }
 
   setTab(tab: FriendsTab): void {

@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  HostListener,
   OnDestroy,
   afterNextRender,
   effect,
@@ -40,6 +41,8 @@ export class PdfPagePreview implements OnDestroy {
   private pdf: PDFDocumentProxy | null = null;
   private loadSeq = 0;
   private failedEmitted = false;
+  private resizeObserver: ResizeObserver | null = null;
+  private renderSeq = 0;
 
   constructor() {
     effect(() => {
@@ -49,8 +52,24 @@ export class PdfPagePreview implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = null;
     void this.pdf?.destroy();
     this.pdf = null;
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  onKeydown(ev: KeyboardEvent): void {
+    if (ev.defaultPrevented || ev.altKey || ev.ctrlKey || ev.metaKey) return;
+    const t = ev.target as HTMLElement | null;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+    if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') {
+      ev.preventDefault();
+      void this.prevPage();
+    } else if (ev.key === 'ArrowRight' || ev.key === 'PageDown') {
+      ev.preventDefault();
+      void this.nextPage();
+    }
   }
 
   async prevPage(): Promise<void> {
@@ -102,6 +121,7 @@ export class PdfPagePreview implements OnDestroy {
         afterNextRender(() => resolve(), { injector: this.injector });
       });
       if (seq !== this.loadSeq) return;
+      this.bindResizeObserver();
       await this.renderPage();
     } catch (e) {
       if (seq !== this.loadSeq) return;
@@ -115,19 +135,43 @@ export class PdfPagePreview implements OnDestroy {
     }
   }
 
+  private bindResizeObserver(): void {
+    const canvas = this.canvasRef()?.nativeElement;
+    const parent = canvas?.parentElement;
+    if (!parent) return;
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = new ResizeObserver(() => {
+      void this.renderPage();
+    });
+    this.resizeObserver.observe(parent);
+  }
+
   private async renderPage(): Promise<void> {
     const pdf = this.pdf;
     const canvas = this.canvasRef()?.nativeElement;
     if (!pdf || !canvas) return;
+    const seq = ++this.renderSeq;
     const page = await pdf.getPage(this.page());
-    const parentW = canvas.parentElement?.clientWidth || 640;
+    if (seq !== this.renderSeq) return;
+
+    const parent = canvas.parentElement;
+    const pad = 16;
+    const parentW = Math.max(120, (parent?.clientWidth || 640) - pad);
+    const parentH = Math.max(160, (parent?.clientHeight || 800) - pad);
     const unscaled = page.getViewport({ scale: 1 });
-    const scale = Math.min(2, Math.max(0.5, parentW / unscaled.width));
-    const viewport = page.getViewport({ scale });
+    const fit = Math.min(parentW / unscaled.width, parentH / unscaled.height);
+    const cssScale = Math.min(2, Math.max(0.35, fit));
+    const dpr = typeof window !== 'undefined' ? Math.min(2, window.devicePixelRatio || 1) : 1;
+    const viewport = page.getViewport({ scale: cssScale * dpr });
+
     canvas.width = Math.floor(viewport.width);
     canvas.height = Math.floor(viewport.height);
+    canvas.style.width = `${Math.floor(viewport.width / dpr)}px`;
+    canvas.style.height = `${Math.floor(viewport.height / dpr)}px`;
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     await page.render({ canvasContext: ctx, viewport }).promise;
   }
 }

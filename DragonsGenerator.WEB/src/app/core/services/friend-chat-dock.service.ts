@@ -23,6 +23,8 @@ export class FriendChatDockService {
   private readonly auth = inject(AuthService);
 
   readonly isOpen = signal(false);
+  /** Mode Messenger : quasi plein écran, liste + fil côte à côte (desktop). */
+  readonly expanded = signal(false);
   readonly view = signal<'list' | 'thread'>('list');
   readonly activeFriendId = signal<string | null>(null);
   readonly activeFriendName = signal('');
@@ -107,9 +109,10 @@ export class FriendChatDockService {
     else this.open();
   }
 
-  open(): void {
+  open(options?: { expanded?: boolean }): void {
     if (!this.auth.isLoggedIn()) return;
     this.isOpen.set(true);
+    this.expanded.set(options?.expanded === true);
     this.view.set('list');
     this.armHistory();
     this.setBodyScrollLocked(true);
@@ -122,11 +125,22 @@ export class FriendChatDockService {
     this.disarmHistory();
   }
 
+  setExpanded(expanded: boolean): void {
+    if (!this.isOpen()) return;
+    this.expanded.set(expanded);
+    this.setBodyScrollLocked(true);
+  }
+
+  toggleExpanded(): void {
+    this.setExpanded(!this.expanded());
+  }
+
   openThread(
     friendUserId: string,
     displayName: string,
     avatarEmoji?: string | null,
     accentColor?: string | null,
+    options?: { expanded?: boolean },
   ): void {
     if (!this.auth.isLoggedIn()) return;
     this.activeFriendId.set(friendUserId);
@@ -135,6 +149,9 @@ export class FriendChatDockService {
     this.activeFriendAccent.set(accentColor ?? null);
     this.view.set('thread');
     this.isOpen.set(true);
+    if (options?.expanded !== undefined) {
+      this.expanded.set(options.expanded);
+    }
     this.armHistory();
     this.setBodyScrollLocked(true);
     this.refreshList();
@@ -188,6 +205,7 @@ export class FriendChatDockService {
 
   private applyClose(): void {
     this.isOpen.set(false);
+    this.expanded.set(false);
     this.view.set('list');
     this.activeFriendId.set(null);
     this.activeFriendName.set('');
@@ -228,6 +246,6 @@ export class FriendChatDockService {
   private setBodyScrollLocked(lock: boolean): void {
     if (typeof document === 'undefined' || typeof window === 'undefined') return;
     const mobile = window.matchMedia('(max-width: 1023px)').matches;
-    document.body.style.overflow = lock && mobile ? 'hidden' : '';
+    document.body.style.overflow = lock && (mobile || this.expanded()) ? 'hidden' : '';
   }
 }

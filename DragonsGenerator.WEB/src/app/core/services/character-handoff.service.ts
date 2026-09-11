@@ -5,15 +5,25 @@ const CURRENT_KEY = 'dragons-current-character';
 const MODE_KEY = 'dragons-current-character-mode';
 const SOURCE_KEY = 'dragons-current-character-source';
 const RETURN_KEY = 'dragons-current-character-return';
+const PROPOSAL_KEY = 'dragons-current-character-proposal';
 const EDIT_KEY = 'dragons-edit-character';
 
 export type CharacterHandoffMode = 'own' | 'consult';
+
+/** Contexte MJ : accepter / refuser une proposition depuis la fiche consultée. */
+export interface CharacterProposalReview {
+  campaignId: string;
+  memberId: string;
+  memberDisplayName?: string;
+}
 
 export interface CharacterHandoffOptions {
   mode?: CharacterHandoffMode;
   sourceLabel?: string;
   /** Après consultation, retour préféré (ex. table /play). */
   returnUrl?: string;
+  /** Si défini, la fiche consultée propose Accepter / Refuser. */
+  proposalReview?: CharacterProposalReview;
 }
 
 /** Navigation personnage (sessionStorage — pas une bibliothèque persistante). */
@@ -32,6 +42,11 @@ export class CharacterHandoffService {
         sessionStorage.setItem(RETURN_KEY, options.returnUrl);
       } else {
         sessionStorage.removeItem(RETURN_KEY);
+      }
+      if (options?.proposalReview) {
+        sessionStorage.setItem(PROPOSAL_KEY, JSON.stringify(options.proposalReview));
+      } else {
+        sessionStorage.removeItem(PROPOSAL_KEY);
       }
     } catch {
       /* ignore quota */
@@ -71,11 +86,24 @@ export class CharacterHandoffService {
     }
   }
 
+  peekProposalReview(): CharacterProposalReview | null {
+    try {
+      const raw = sessionStorage.getItem(PROPOSAL_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as CharacterProposalReview;
+      if (!parsed?.campaignId || !parsed?.memberId) return null;
+      return parsed;
+    } catch {
+      return null;
+    }
+  }
+
   clearCurrent(): void {
     sessionStorage.removeItem(CURRENT_KEY);
     sessionStorage.removeItem(MODE_KEY);
     sessionStorage.removeItem(SOURCE_KEY);
     sessionStorage.removeItem(RETURN_KEY);
+    sessionStorage.removeItem(PROPOSAL_KEY);
   }
 
   stashEdit(character: Character): void {

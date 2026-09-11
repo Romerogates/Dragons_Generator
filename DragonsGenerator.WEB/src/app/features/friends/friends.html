@@ -4,6 +4,16 @@
     <p class="text-sm text-slate-400 italic max-w-xl mx-auto">
       Découvrez des joueurs, gérez vos amis et vos demandes en un seul endroit.
     </p>
+    @if (isLoggedIn()) {
+      <button
+        type="button"
+        class="mt-5 inline-flex min-h-11 items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-violet-600 text-white hover:bg-violet-500"
+        (click)="openMessages()"
+      >
+        <iconify-icon icon="mdi:message-text" class="text-base"></iconify-icon>
+        Ouvrir les messages
+      </button>
+    }
   </section>
 
   <section class="max-w-2xl mx-auto px-4 py-8 space-y-8 min-w-0">

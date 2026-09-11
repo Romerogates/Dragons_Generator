@@ -12,8 +12,14 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { PdfGeneratorService } from '@core/services/pdf-generator.service';
+import { CampaignCloudService } from '@core/services/campaign-cloud.service';
+import { NotificationService } from '@core/services/notification.service';
 import type { Character } from '@core/models/Character/character';
-import { CharacterHandoffService } from '@core/services/character-handoff.service';
+import {
+  CharacterHandoffService,
+  type CharacterProposalReview,
+} from '@core/services/character-handoff.service';
+import { PdfPagePreview } from '@shared/components/pdf-page-preview/pdf-page-preview';
 import { CharacterPlayView } from './character-play-view';
 
 type SheetViewMode = 'pdf' | 'ui';
@@ -36,7 +42,7 @@ function readStoredViewMode(): SheetViewMode {
 @Component({
   selector: 'app-character-sheet',
   standalone: true,
-  imports: [CommonModule, RouterLink, CharacterPlayView],
+  imports: [CommonModule, RouterLink, CharacterPlayView, PdfPagePreview],
   templateUrl: './character-sheet.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -46,32 +52,40 @@ export class CharacterSheet implements OnInit, OnDestroy {
   private readonly pdfService = inject(PdfGeneratorService);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly handoff = inject(CharacterHandoffService);
+  private readonly campaigns = inject(CampaignCloudService);
+  private readonly notifications = inject(NotificationService);
 
   readonly character = signal<Character | null>(null);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
+  readonly pdfRawUrl = signal<string | null>(null);
   readonly pdfFailed = signal(false);
+  readonly pdfJsFailed = signal(false);
   readonly isConsult = signal(false);
   readonly consultSourceLabel = signal<string | null>(null);
   readonly consultReturnUrl = signal<string | null>(null);
+  readonly proposalReview = signal<CharacterProposalReview | null>(null);
+  readonly proposalActionBusy = signal(false);
+  readonly proposalActionError = signal<string | null>(null);
   /** Interface affichée : PDF par défaut (fiche Jouer en consultation table). */
   readonly viewMode = signal<SheetViewMode>(readStoredViewMode());
-  private rawBlobUrl: string | null = null;
 
   readonly consultBackLabel = computed(() => {
     const url = this.consultReturnUrl();
     if (url?.includes('/play')) return '← Retour à la table';
+    if (url?.includes('tab=players')) return '← Retour aux joueurs';
     if (this.consultSourceLabel()) return '← Retour';
     return '← Retour';
   });
 
   readonly errorBackLink = computed(() => this.consultReturnUrl() ?? '/characters');
-  readonly errorBackLabel = computed(() =>
-    this.consultReturnUrl()?.includes('/play')
-      ? 'Retour à la table'
-      : 'Retour à la liste',
-  );
+  readonly errorBackLabel = computed(() => {
+    const url = this.consultReturnUrl();
+    if (url?.includes('/play')) return 'Retour à la table';
+    if (url?.includes('tab=players')) return 'Retour aux joueurs';
+    return 'Retour à la liste';
+  });
 
   readonly auraFeatures = computed(() => {
     const feats = this.character()?.features ?? [];
@@ -95,13 +109,14 @@ export class CharacterSheet implements OnInit, OnDestroy {
       this.isConsult.set(this.handoff.peekMode() === 'consult');
       this.consultSourceLabel.set(this.handoff.peekSourceLabel());
       this.consultReturnUrl.set(this.handoff.peekReturnUrl());
+      this.proposalReview.set(this.handoff.peekProposalReview());
       if (this.isConsult()) {
         this.viewMode.set('ui');
       }
 
       try {
         const url = await this.pdfService.generatePdfBlob(character);
-        this.rawBlobUrl = url;
+        this.pdfRawUrl.set(url);
         this.pdfPreviewUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
       } catch (e) {
         console.error(e);
@@ -114,7 +129,8 @@ export class CharacterSheet implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.rawBlobUrl) URL.revokeObjectURL(this.rawBlobUrl);
+    const url = this.pdfRawUrl();
+    if (url) URL.revokeObjectURL(url);
   }
 
   setViewMode(mode: SheetViewMode): void {
@@ -128,6 +144,10 @@ export class CharacterSheet implements OnInit, OnDestroy {
 
   toggleViewMode(): void {
     this.setViewMode(this.viewMode() === 'pdf' ? 'ui' : 'pdf');
+  }
+
+  onPdfJsFailed(): void {
+    this.pdfJsFailed.set(true);
   }
 
   getName(): string {
@@ -166,7 +186,8 @@ export class CharacterSheet implements OnInit, OnDestroy {
   }
 
   openFullscreen(): void {
-    if (this.rawBlobUrl) window.open(this.rawBlobUrl, '_blank');
+    const url = this.pdfRawUrl();
+    if (url) window.open(url, '_blank');
   }
 
   editCharacter(): void {
@@ -175,6 +196,42 @@ export class CharacterSheet implements OnInit, OnDestroy {
     if (!c) return;
     this.handoff.stashEdit(c);
     this.router.navigate(['/create']);
+  }
+
+  approveProposal(): void {
+    this.resolveProposal('approve');
+  }
+
+  rejectProposal(): void {
+    this.resolveProposal('reject');
+  }
+
+  private resolveProposal(action: 'approve' | 'reject'): void {
+    const review = this.proposalReview();
+    if (!review || this.proposalActionBusy()) return;
+    this.proposalActionBusy.set(true);
+    this.proposalActionError.set(null);
+    const req =
+      action === 'approve'
+        ? this.campaigns.approveProposal(review.campaignId, review.memberId)
+        : this.campaigns.rejectProposal(review.campaignId, review.memberId);
+    req.subscribe({
+      next: () => {
+        this.notifications.refresh();
+        this.handoff.clearCurrent();
+        this.proposalReview.set(null);
+        this.proposalActionBusy.set(false);
+        this.backToList();
+      },
+      error: () => {
+        this.proposalActionBusy.set(false);
+        this.proposalActionError.set(
+          action === 'approve'
+            ? 'Impossible d’accepter cette proposition.'
+            : 'Impossible de refuser cette proposition.',
+        );
+      },
+    });
   }
 
   backToList(): void {

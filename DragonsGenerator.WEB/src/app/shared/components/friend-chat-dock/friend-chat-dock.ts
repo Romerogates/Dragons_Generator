@@ -83,10 +83,10 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
 
   constructor() {
     effect(() => {
-      if (this.dock.view() === 'thread') {
-        const id = this.dock.activeFriendId();
-        if (id) this.startThread(id);
-      } else {
+      const id = this.dock.activeFriendId();
+      if (this.dock.view() === 'thread' && id) {
+        this.startThread(id);
+      } else if (!id) {
         this.stopThreadPoll();
         this.messages.set([]);
         this.draft.set('');
@@ -112,6 +112,10 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
   close(): void {
     this.stopThreadPoll();
     this.dock.close();
+  }
+
+  toggleExpanded(): void {
+    this.dock.toggleExpanded();
   }
 
   openConversation(c: ChatConversation): void {
