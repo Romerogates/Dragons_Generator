@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, effect, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import type { SafeResourceUrl } from '@angular/platform-browser';
@@ -37,6 +37,7 @@ export interface MemberSheetPdfEvent {
   imports: [CommonModule, FormsModule, LightMarkdownPipe, PdfPagePreview, FullscreenEnterBtn],
   templateUrl: './campaign-detail-handouts.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class CampaignDetailHandouts {
   readonly isOwner = input.required<boolean>();
