@@ -146,6 +146,8 @@ export class MagicStep implements OnInit {
   readonly spellSearchQuery = signal('');
   readonly spellSchoolFilter = signal('');
   readonly spellTagFilter = signal<'all' | 'selected' | 'concentration' | 'ritual'>('all');
+  /** Filtres école / tags repliés sous la recherche (mobile). */
+  readonly spellFiltersOpen = signal(false);
   /** Sorts raciaux (espèce) : choiceId → spellId */
   readonly racialCantripPicks = signal<Record<string, string>>({});
   /** Arcanes sorcier : niveau de sort → id sort */

@@ -76,8 +76,19 @@
               autocomplete="off"
             />
           </label>
+          <button
+            type="button"
+            class="sm:hidden min-h-11 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300"
+            [attr.aria-expanded]="spellFiltersOpen()"
+            (click)="spellFiltersOpen.set(!spellFiltersOpen())"
+          >
+            Filtres
+            @if (spellFiltersActive()) {
+              <span class="ml-1 text-amber-400">●</span>
+            }
+          </button>
           <select
-            class="rounded-lg border border-slate-700 bg-[#171b22] px-3 py-2.5 text-xs font-bold uppercase tracking-widest text-slate-300 focus:outline-none focus:border-amber-500/60 sm:w-44"
+            class="hidden sm:block rounded-lg border border-slate-700 bg-[#171b22] px-3 py-2.5 text-xs font-bold uppercase tracking-widest text-slate-300 focus:outline-none focus:border-amber-500/60 sm:w-44"
             [value]="spellSchoolFilter()"
             (change)="setSpellSchoolFilter($event)"
             aria-label="Filtrer par école"
@@ -88,7 +99,22 @@
             }
           </select>
         </div>
-        <div class="flex flex-wrap items-center gap-2 mt-3">
+        <div
+          class="mt-3 flex-wrap items-center gap-2 sm:flex"
+          [class.flex]="spellFiltersOpen()"
+          [class.hidden]="!spellFiltersOpen()"
+        >
+          <select
+            class="sm:hidden w-full rounded-lg border border-slate-700 bg-[#171b22] px-3 py-2.5 text-xs font-bold uppercase tracking-widest text-slate-300 focus:outline-none focus:border-amber-500/60"
+            [value]="spellSchoolFilter()"
+            (change)="setSpellSchoolFilter($event)"
+            aria-label="Filtrer par école"
+          >
+            <option value="">Toutes les écoles</option>
+            @for (opt of spellSchoolOptions(); track opt.key) {
+              <option [value]="opt.key">{{ opt.label }}</option>
+            }
+          </select>
           <button
             type="button"
             class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-colors"

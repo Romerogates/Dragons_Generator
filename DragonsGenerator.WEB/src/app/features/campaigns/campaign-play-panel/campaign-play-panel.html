@@ -2017,6 +2017,15 @@
             <p class="text-[10px] font-black uppercase tracking-widest text-violet-400">Rencontres</p>
             <p class="text-sm text-slate-300">Aucune rencontre préparée.</p>
             <p class="text-xs text-slate-500">Générez-en depuis Préparation → Rencontres.</p>
+            @if (isDm()) {
+              <a
+                [routerLink]="['/campaigns', c.id]"
+                [queryParams]="{ tab: 'encounters' }"
+                class="inline-flex min-h-11 items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-violet-800/50 text-violet-300"
+              >
+                Ouvrir Préparation → Rencontres
+              </a>
+            }
           </div>
         }
       </div>
@@ -2048,7 +2057,7 @@
   </div>
 } @else {
   <div
-    class="text-center space-y-2"
+    class="text-center space-y-3"
     [class]="fullscreen() ? 'bg-[#1b2028] border border-dashed border-emerald-800/40 rounded-2xl p-8' : 'bg-[#1b2028] border border-dashed border-emerald-800/40 rounded-2xl p-6'"
   >
     <p class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Aucune session active</p>
@@ -2056,6 +2065,22 @@
     <p class="text-xs text-slate-500 max-w-sm mx-auto">
       La préparation reste dans le hub ; le combat n’est accessible qu’après être entré en session.
     </p>
+    @if (isDm()) {
+      <a
+        [routerLink]="['/campaigns', c.id]"
+        [queryParams]="{ tab: 'sessions' }"
+        class="inline-flex min-h-11 items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
+      >
+        Planifier une session
+      </a>
+    } @else {
+      <a
+        [routerLink]="['/campaigns', c.id]"
+        class="inline-flex min-h-11 items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-emerald-800/50 text-emerald-300"
+      >
+        Retour au hub
+      </a>
+    }
   </div>
 }
 
@@ -2075,7 +2100,7 @@
         Terminer la session
       </p>
       <p class="text-sm text-slate-300 mb-3">
-        Les notes de jeu seront archivées. Rédige un récap visible par les joueurs (optionnel).
+        Les notes de jeu seront archivées. Rédigez un récap visible par les joueurs (optionnel).
       </p>
       <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1" for="end-session-recap">
         Récap joueurs

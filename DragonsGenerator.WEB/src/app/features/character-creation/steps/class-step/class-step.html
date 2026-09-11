@@ -265,6 +265,9 @@
     <app-multiclass-panel />
 
     <nav class="wizard-step-nav">
+      @if (!selectionComplete()) {
+        <p class="wizard-nav-hint">Complétez les choix de vocation</p>
+      }
       <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
         ← Étape précédente
       </button>
@@ -276,6 +279,15 @@
       @if (currentPhase() !== 'class') {
         <button type="button" class="wizard-nav-secondary" (click)="clearSelection()">
           ← Réinitialiser la classe
+        </button>
+      }
+      @if (selectionComplete()) {
+        <button
+          type="button"
+          class="wizard-nav-primary"
+          (click)="confirmSelection()"
+        >
+          Forger cette voie
         </button>
       }
     </nav>
