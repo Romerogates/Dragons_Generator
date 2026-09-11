@@ -8,8 +8,10 @@ import { SkillsStep } from './skills-step';
 
 const MOCK_SKILLS = [
   { id: 'ski-acrobaties', name: 'Acrobaties', ability: 'Dextérité', description: '', examples: [], passiveCheck: false },
+  { id: 'ski-athletisme', name: 'Athlétisme', ability: 'Force', description: '', examples: [], passiveCheck: false },
   { id: 'ski-arcanes', name: 'Arcanes', ability: 'Intelligence', description: '', examples: [], passiveCheck: false },
   { id: 'ski-histoire', name: 'Histoire', ability: 'Intelligence', description: '', examples: [], passiveCheck: false },
+  { id: 'ski-intimidation', name: 'Intimidation', ability: 'Charisme', description: '', examples: [], passiveCheck: false },
   { id: 'ski-investigation', name: 'Investigation', ability: 'Intelligence', description: '', examples: [], passiveCheck: false },
   { id: 'ski-perception', name: 'Perception', ability: 'Sagesse', description: '', examples: [], passiveCheck: false },
 ];
@@ -176,6 +178,41 @@ describe('SkillsStep', () => {
 
     expect(component.selectedClassSkills()).not.toContain('skill-histoire');
     expect(component.selectedBgSkills()).toContain('skill-histoire');
+  });
+
+  it('opens full skill catalogue when background pool overlaps class picks', () => {
+    creationSignal.set(
+      skillsCreation({
+        skillChooseCount: 2,
+        skillOptions: ['ski-acrobaties', 'ski-athletisme', 'ski-intimidation'],
+        backgroundProficiencies: {
+          skills: {
+            chooseCount: 2,
+            options: ['ski-acrobaties', 'ski-athletisme', 'ski-intimidation'],
+          },
+          tools: { fixed: [], choose: [] },
+          equipment: {},
+        },
+      }),
+    );
+    fixture.detectChanges();
+
+    component.toggleClassSkill('ski-acrobaties');
+    component.toggleClassSkill('ski-athletisme');
+    fixture.detectChanges();
+
+    expect(component.bgNeedsReplacementPool()).toBeTrue();
+    expect(component.bgSelectableOptions().length).toBeGreaterThan(3);
+    expect(component.bgReplacementOptions().some((s) => s.id === 'skill-perception')).toBeTrue();
+    expect(component.bgReplacementOptions().some((s) => s.id === 'skill-intimidation')).toBeFalse();
+
+    component.toggleBgSkill('ski-intimidation');
+    component.toggleBgSkill('ski-perception');
+    fixture.detectChanges();
+
+    expect(component.selectedBgSkills()).toContain('skill-intimidation');
+    expect(component.selectedBgSkills()).toContain('skill-perception');
+    expect(component.bgSkillsRemaining()).toBe(0);
   });
 
   it('does not allow toggling fixed background skills', () => {

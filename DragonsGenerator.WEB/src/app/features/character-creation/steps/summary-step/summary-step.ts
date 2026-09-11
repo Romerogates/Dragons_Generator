@@ -21,6 +21,7 @@ import { ConnectivityService } from '@core/services/connectivity.service';
 import { OfflineCodexService } from '@core/services/offline-codex.service';
 import { OfflineSyncService } from '@core/services/offline-sync.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
+import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import {
   ABILITY_KEY_TO_LABEL,
   ABILITY_KEYS,
@@ -37,7 +38,7 @@ import { switchMap, of } from 'rxjs';
 @Component({
   selector: 'app-summary-step',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ConfirmDialog],
   templateUrl: './summary-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -68,6 +69,7 @@ export class SummaryStep implements OnInit, OnDestroy {
   readonly isLoadingPreview = signal(true);
   readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
   readonly showAuthGate = signal(false);
+  readonly showDiscardConfirm = signal(false);
   readonly saving = signal(false);
   readonly saveError = signal<string | null>(null);
   private rawBlobUrl: string | null = null;
@@ -222,7 +224,17 @@ export class SummaryStep implements OnInit, OnDestroy {
     this.pdfService.generatePdf(this.character());
   }
 
-  createAnother(): void {
+  /** Demande confirmation : cette action efface la création en cours sans sauvegarder. */
+  requestCreateAnother(): void {
+    this.showDiscardConfirm.set(true);
+  }
+
+  cancelCreateAnother(): void {
+    this.showDiscardConfirm.set(false);
+  }
+
+  confirmCreateAnother(): void {
+    this.showDiscardConfirm.set(false);
     this.builder.reset();
     void this.router.navigate(['/create']);
   }

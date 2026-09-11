@@ -4,7 +4,8 @@
       Le Destin Scellé
     </h2>
     <p class="text-slate-400 text-xs max-w-xl mx-auto italic">
-      Vérifiez la fiche, sauvegardez votre héros, ou recommencez une nouvelle forge.
+      Vérifiez la fiche, puis sauvegardez votre héros pour le conserver. Le PDF reste téléchargeable
+      à tout moment.
     </p>
   </div>
 
@@ -50,13 +51,21 @@
     }
   </div>
 
-  <nav class="wizard-step-nav flex-col sm:flex-row">
+  <nav class="wizard-step-nav flex-col sm:flex-row sm:flex-wrap">
     <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
       ← Étape précédente
     </button>
     <button
       type="button"
-      class="px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-emerald-600 text-white shadow-md hover:bg-emerald-500 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-50"
+      class="wizard-nav-secondary"
+      [disabled]="isLoadingPreview()"
+      (click)="downloadPdf()"
+    >
+      Télécharger PDF
+    </button>
+    <button
+      type="button"
+      class="px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-emerald-600 text-white shadow-md hover:bg-emerald-500 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-50 sm:ml-auto"
       (click)="saveCharacter()"
       [disabled]="saving()"
     >
@@ -68,18 +77,22 @@
         Sauvegarder le héros
       }
     </button>
+  </nav>
+
+  <div class="w-full max-w-4xl px-4 flex flex-col items-center gap-2">
     <button
       type="button"
-      class="wizard-nav-secondary"
-      [disabled]="isLoadingPreview()"
-      (click)="downloadPdf()"
+      class="text-[11px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-400/90 border-b border-transparent hover:border-amber-500/40 pb-0.5 transition-colors"
+      (click)="requestCreateAnother()"
     >
-      Télécharger PDF
+      Recommencer une forge…
     </button>
-    <button type="button" class="wizard-nav-primary" (click)="createAnother()">
-      Créer un nouveau
-    </button>
-  </nav>
+    <p class="text-center text-[10px] text-slate-600 max-w-sm">
+      Efface la création en cours sans la sauvegarder. Préférez
+      <span class="text-emerald-500/80 font-semibold">Sauvegarder le héros</span> si vous souhaitez
+      le conserver.
+    </p>
+  </div>
 
   @if (saveError(); as err) {
     <p class="text-center text-sm text-red-400 px-4">{{ err }}</p>
@@ -92,6 +105,17 @@
     </p>
   }
 </div>
+
+@if (showDiscardConfirm()) {
+  <app-confirm-dialog
+    title="Recommencer une forge ?"
+    body="Votre héros n’est pas encore sauvegardé. Si vous continuez, cette création sera effacée et vous ne pourrez pas la récupérer."
+    confirmLabel="Effacer et recommencer"
+    [danger]="true"
+    (cancelled)="cancelCreateAnother()"
+    (confirmed)="confirmCreateAnother()"
+  />
+}
 
 @if (showAuthGate()) {
   <div
@@ -109,7 +133,7 @@
         <h3 class="text-xl font-bold text-amber-500 font-serif mb-2">Compte requis</h3>
         <p class="text-slate-400 text-sm leading-relaxed">
           Pour sauvegarder <span class="text-slate-200 font-serif">{{ character().name }}</span> et y
-          accéder depuis n’importe où, crée un compte ou connecte-toi. Ton héros sera conservé le
+          accéder depuis n’importe où, créez un compte ou connectez-vous. Votre héros sera conservé le
           temps de l’inscription.
         </p>
       </div>

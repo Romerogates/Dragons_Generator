@@ -227,4 +227,20 @@ describe('SummaryStep', () => {
     expect(resetSpy).toHaveBeenCalled();
     expect(router.navigate).toHaveBeenCalledWith(['/character-sheet']);
   });
+
+  it('asks for confirmation before discarding an unsaved hero', () => {
+    component.requestCreateAnother();
+    expect(component.showDiscardConfirm()).toBeTrue();
+    expect(resetSpy).not.toHaveBeenCalled();
+
+    component.cancelCreateAnother();
+    expect(component.showDiscardConfirm()).toBeFalse();
+    expect(resetSpy).not.toHaveBeenCalled();
+
+    component.requestCreateAnother();
+    component.confirmCreateAnother();
+    expect(component.showDiscardConfirm()).toBeFalse();
+    expect(resetSpy).toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith(['/create']);
+  });
 });

@@ -434,6 +434,51 @@ export class SkillsStep implements OnInit {
     return list.filter((s) => !fixed.has(normalizeSkillId(s.id)));
   });
 
+  /** Compétences déjà maîtrisées hors historique (classe / espèce / multiclass). */
+  readonly bgBlockedByOtherSources = computed(() => {
+    const blocked = new Set<string>();
+    for (const id of this.selectedClassSkills()) blocked.add(normalizeSkillId(id));
+    for (const id of this.selectedSecondaryClassSkills()) blocked.add(normalizeSkillId(id));
+    for (const id of this.selectedSpeciesSkills()) blocked.add(normalizeSkillId(id));
+    return blocked;
+  });
+
+  /**
+   * Si le pool d’historique n’offre plus assez de compétences uniques
+   * (chevauchement avec la classe), ouvrir le catalogue complet pour les remplacements.
+   */
+  readonly bgNeedsReplacementPool = computed(() => {
+    const choose = this.bgSkillChooseCount();
+    if (choose <= 0) return false;
+    const blocked = this.bgBlockedByOtherSources();
+    const uniqueInPool = this.bgSkillOptions().filter(
+      (s) => !blocked.has(normalizeSkillId(s.id)),
+    ).length;
+    return uniqueInPool < choose;
+  });
+
+  /** Options cliquables : pool d’historique, ou catalogue complet en cas de chevauchement. */
+  readonly bgSelectableOptions = computed(() => {
+    if (this.isCustomBg() || !this.bgNeedsReplacementPool()) return this.bgSkillOptions();
+    const fixed = new Set(this.bgFixedSkills());
+    return Object.values(this.skillMap()).filter((s) => !fixed.has(normalizeSkillId(s.id)));
+  });
+
+  /**
+   * Catalogue hors pool d’historique pour les remplacements
+   * (exclut fixes et compétences déjà prises ailleurs).
+   */
+  readonly bgReplacementOptions = computed(() => {
+    if (!this.bgNeedsReplacementPool()) return [];
+    const poolIds = new Set(this.bgSkillOptions().map((s) => normalizeSkillId(s.id)));
+    const fixed = new Set(this.bgFixedSkills());
+    const blocked = this.bgBlockedByOtherSources();
+    return Object.values(this.skillMap()).filter((s) => {
+      const id = normalizeSkillId(s.id);
+      return !fixed.has(id) && !poolIds.has(id) && !blocked.has(id);
+    });
+  });
+
   readonly bgChosenCount = computed(() => {
     const fixed = new Set(this.bgFixedSkills());
     return this.selectedBgSkills().filter((id) => !fixed.has(normalizeSkillId(id))).length;
@@ -443,9 +488,14 @@ export class SkillsStep implements OnInit {
     Math.max(0, this.bgSkillChooseCount() - this.bgChosenCount()),
   );
 
+  isBgSkillOwnedElsewhere(skillId: string): boolean {
+    return this.bgBlockedByOtherSources().has(normalizeSkillId(skillId));
+  }
+
   toggleBgSkill(skillId: string): void {
     const id = normalizeSkillId(skillId);
     if (this.bgFixedSkills().includes(id)) return;
+    if (this.bgBlockedByOtherSources().has(id)) return;
 
     const fixed = new Set(this.bgFixedSkills());
     const current = this.selectedBgSkills().map(normalizeSkillId);
@@ -453,11 +503,7 @@ export class SkillsStep implements OnInit {
 
     if (current.includes(id)) {
       this.selectedBgSkills.update((arr) => arr.filter((x) => normalizeSkillId(x) !== id));
-    } else if (
-      chosen.length < this.bgSkillChooseCount() &&
-      !this.selectedClassSkills().map(normalizeSkillId).includes(id) &&
-      !this.selectedSpeciesSkills().map(normalizeSkillId).includes(id)
-    ) {
+    } else if (chosen.length < this.bgSkillChooseCount()) {
       this.selectedBgSkills.update((arr) => [...arr, id]);
     }
   }
