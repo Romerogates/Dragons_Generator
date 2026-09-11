@@ -287,6 +287,26 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     ),
   );
 
+  /**
+   * Pré-tirés encore « libres » pour le hub Documents :
+   * on masque ceux déjà assignés / revendiqués, ou dont la fiche est déjà
+   * rattachée à un joueur (évite le doublon Mira pré-tiré + Mira joueur).
+   */
+  readonly pdfUnassignedPregens = computed(() => {
+    const pregens = this.campaign()?.data.pregenCharacters ?? [];
+    const usedCharacterIds = new Set(
+      this.pdfSheetMembers().flatMap((m) =>
+        [m.approvedCharacterId, m.proposedCharacterId].filter((id): id is string => !!id),
+      ),
+    );
+    return pregens.filter((p) => {
+      if (p.status === 'assigned' || p.status === 'claimed') return false;
+      if (p.assignedUserId) return false;
+      if (usedCharacterIds.has(p.characterId)) return false;
+      return true;
+    });
+  });
+
   readonly pendingProposals = computed(() =>
     this.players().filter((p) => p.proposalStatus === 'pending' && p.proposedCharacterId),
   );

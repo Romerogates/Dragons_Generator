@@ -815,7 +815,7 @@
             [isLoadingPreview]="isLoadingPreview()"
             [pdfPreviewKind]="pdfPreviewKind()"
             [hasCreatures]="!!c.data.creatures.length"
-            [pregens]="c.data.pregenCharacters"
+            [pregens]="pdfUnassignedPregens()"
             [sheetMembers]="pdfSheetMembers()"
             [pregenPdfLoadingId]="pregenPdfLoadingId()"
             [memberSheetLoadingKey]="memberCharacterLoadingId()"

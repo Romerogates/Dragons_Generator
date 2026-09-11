@@ -52,10 +52,10 @@
   "actions": [
     {
       "name": "Serres",
-      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d4 + 2) dégâts tranchants.\nPOVOAYAAYAYOYTVOY"
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d4 + 2) dégâts tranchants."
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": "Le faucon de sang tire son nom de ses plumes cramoisies et de son tempérament très agressif. Ces volatiles attaquent en nombre lors d’attaques coordonnées. Des dresseurs sont capables d’élever des faucons de sang pour servir de guetteurs ou d’éclaireurs. Ils apprennent à signaler la présence de fugitifs poursuivis, tout en restant eux-mêmes à une altitude suffisante pour ne pas être abattus par le premier archer venu."
+  "description": "Aigle"
 }
