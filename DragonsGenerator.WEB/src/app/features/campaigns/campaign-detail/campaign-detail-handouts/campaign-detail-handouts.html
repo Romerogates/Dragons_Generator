@@ -109,7 +109,10 @@
         @if (!isLoadingPreview() && pdfPreviewUrl() && usePdfJsPreview()) {
           <app-pdf-page-preview [src]="pdfPreviewRawUrl()" (loadFailed)="onPdfJsFailed()" />
         }
-        @if (!isLoadingPreview() && pdfPreviewUrl() && !usePdfJsPreview()) {
+        @if (!isLoadingPreview() && pdfPreviewUrl() && !usePdfJsPreview() && !usePdfFallback) {
+          <iframe [src]="pdfPreviewUrl()" class="w-full h-full border-0" title="Aperçu PDF"></iframe>
+        }
+        @if (!isLoadingPreview() && pdfPreviewUrl() && !usePdfJsPreview() && usePdfFallback) {
           <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center bg-[#0f1117]">
             <p class="text-sm text-slate-300 font-serif">Aperçu indisponible</p>
             <button

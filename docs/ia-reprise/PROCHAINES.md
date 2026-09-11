@@ -19,7 +19,8 @@ _(File vide — prochain polish après Fluide 5.)_
 
 ## Déjà livré (ne pas refaire)
 
-- **Fluide 5** (2026-09-11) — sticky onglets session / scénario sous navbar ; fallback PDF = télécharger (plus d’iframe) ; retours tab=sessions / create pré-tiré ; confirms retirer donjon + refuser ami ; +1 vaincu ; CTA joueur « Voir les sessions ».
+- **Fluide 5** (2026-09-11) — sticky onglets session / scénario sous navbar ; retours tab=sessions / create pré-tiré ; confirms retirer donjon + refuser ami ; +1 vaincu ; CTA joueur « Voir les sessions ».
+- **fix aperçu PDF** (2026-09-11) — worker PDF.js via Blob MIME JS + nginx `.mjs` ; iframe desktop si PDF.js échoue (mobile : télécharger).
 - **Fluide 4** (2026-09-11) — vousvoiement restes ; sticky Historique/Civilisation + Continuer magie ; retours /play→Sessions et init→table ; confirms Refuser/pré-tiré ; empty Amis/Donjons + CTA ; composer chat agrandi ; pack scénario PDF page-à-page.
 - **Fluide 3** (2026-09-11) — sticky « Forger cette voie » (classe) ; filtres magie repliables mobile ; empty /play → Planifier / hub ; CTA Rencontres ; vousvoiement campagnes / sessions / récap fin de session.
 - **Fluide 2 + boucles handoff** (2026-09-11) — CTA sticky + hints « Encore N » ; forge→propose campagne (`?campaignId`) ; feedback saut d’étape ; récap mobile = fiche UI ; bannière post-join/proposé ; empty Sessions + Planifier ; confirms Entrer en session / régénérer lien ; badge sync live ; fiche mobile UI par défaut ; liens Guide forge/hub ; chat amis → `/friends`.

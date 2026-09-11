@@ -25,6 +25,7 @@ import { CharacterHandoffService } from '@core/services/character-handoff.servic
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import { PdfPagePreview } from '@shared/components/pdf-page-preview/pdf-page-preview';
 import { CharacterPlayView } from '../../../character-sheet/character-play-view';
+import { prefersNativePdfFallback } from '@core/utils/pdf-preview.util';
 import {
   ABILITY_KEY_TO_LABEL,
   ABILITY_KEYS,
@@ -81,6 +82,7 @@ export class SummaryStep implements OnInit, OnDestroy {
   readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
   readonly pdfRawUrl = signal<string | null>(null);
   readonly pdfJsFailed = signal(false);
+  readonly useNativePdfFallback = prefersNativePdfFallback();
   readonly showAuthGate = signal(false);
   readonly showDiscardConfirm = signal(false);
   readonly saving = signal(false);

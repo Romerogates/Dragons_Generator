@@ -15,8 +15,30 @@ import {
 } from '@angular/core';
 import { getDocument, GlobalWorkerOptions, version, type PDFDocumentProxy } from 'pdfjs-dist';
 
-/** Worker servi en asset Angular (chemin absolu — évite 404 sous /campaigns/…). */
-GlobalWorkerOptions.workerSrc = `/assets/pdfjs/pdf.worker.min.mjs?v=${version}`;
+/**
+ * nginx sert souvent `.mjs` en `application/octet-stream` → Chrome refuse le module worker.
+ * On recharge le worker en Blob `text/javascript` pour forcer un MIME valide.
+ */
+let workerReady: Promise<void> | null = null;
+
+function ensurePdfWorker(): Promise<void> {
+  if (!workerReady) {
+    workerReady = (async () => {
+      const assetUrl = `/assets/pdfjs/pdf.worker.min.mjs?v=${version}`;
+      try {
+        const res = await fetch(assetUrl);
+        if (!res.ok) throw new Error(`worker HTTP ${res.status}`);
+        const buf = await res.arrayBuffer();
+        const blob = new Blob([buf], { type: 'text/javascript' });
+        GlobalWorkerOptions.workerSrc = URL.createObjectURL(blob);
+      } catch (e) {
+        console.warn('[pdf-page-preview] worker blob fallback failed', e);
+        GlobalWorkerOptions.workerSrc = assetUrl;
+      }
+    })();
+  }
+  return workerReady;
+}
 
 @Component({
   selector: 'app-pdf-page-preview',
@@ -100,6 +122,9 @@ export class PdfPagePreview implements OnDestroy {
 
     this.loading.set(true);
     try {
+      await ensurePdfWorker();
+      if (seq !== this.loadSeq) return;
+
       // Charger en bytes : plus fiable que blob: URL avec le worker.
       const res = await fetch(url);
       if (!res.ok) throw new Error(`fetch PDF ${res.status}`);

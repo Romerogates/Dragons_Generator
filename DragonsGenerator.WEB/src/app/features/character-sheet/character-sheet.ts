@@ -20,6 +20,7 @@ import {
   type CharacterProposalReview,
 } from '@core/services/character-handoff.service';
 import { PdfPagePreview } from '@shared/components/pdf-page-preview/pdf-page-preview';
+import { prefersNativePdfFallback } from '@core/utils/pdf-preview.util';
 import { CharacterPlayView } from './character-play-view';
 
 type SheetViewMode = 'pdf' | 'ui';
@@ -62,6 +63,8 @@ export class CharacterSheet implements OnInit, OnDestroy {
   readonly pdfRawUrl = signal<string | null>(null);
   readonly pdfFailed = signal(false);
   readonly pdfJsFailed = signal(false);
+  /** Tablette / mobile : iframe PDF souvent inutilisable. */
+  readonly useNativePdfFallback = prefersNativePdfFallback();
   readonly isConsult = signal(false);
   readonly consultSourceLabel = signal<string | null>(null);
   readonly consultReturnUrl = signal<string | null>(null);

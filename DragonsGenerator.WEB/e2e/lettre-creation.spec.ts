@@ -111,6 +111,7 @@ test.describe('Lettré L1 wizard', () => {
     await expect(
       page
         .locator('app-pdf-page-preview canvas')
+        .or(page.locator('iframe[title="Aperçu de la fiche de personnage"]'))
         .or(page.getByText('Aperçu PDF indisponible dans le navigateur'))
         .or(page.getByText(/L'aperçu n'a pas pu être généré/i)),
     ).toBeVisible({ timeout: 30_000 });

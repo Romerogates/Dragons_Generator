@@ -23,6 +23,7 @@ import {
   CREATURE_ROLE_LABELS,
 } from '@core/models/Story/story';
 import { PdfPagePreview } from '@shared/components/pdf-page-preview/pdf-page-preview';
+import { prefersNativePdfFallback } from '@core/utils/pdf-preview.util';
 import {
   storyLocationContext,
   storyRegionLabel,
@@ -60,6 +61,7 @@ export class StorySummaryStep implements OnInit, OnDestroy {
   readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
   readonly pdfRawUrl = signal<string | null>(null);
   readonly pdfJsFailed = signal(false);
+  readonly useNativePdfFallback = prefersNativePdfFallback();
 
   ngOnInit(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
