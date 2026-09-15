@@ -1,0 +1,165 @@
+@if (creature(); as c) {
+  <article class="creature-book font-serif text-[#2a1c14]">
+    <header class="mb-6 pb-4 border-b-2 border-[#c4a574]/60">
+      <p class="text-[10px] font-sans font-black uppercase tracking-[0.2em] text-[#8a6a4a] mb-2">
+        Bestiaire · {{ categoryLabel(c.category) }}
+        @if (campaignRoleLabel()) {
+          · {{ campaignRoleLabel() }}
+        }
+      </p>
+      @if (campaignAlias(); as alias) {
+        <p class="text-sm font-sans font-semibold text-[#5c4030] mb-1">{{ alias }}</p>
+      }
+      <h1 class="text-3xl sm:text-4xl font-bold leading-tight text-[#1a1008]">{{ c.name }}</h1>
+      <p class="mt-2 text-sm italic text-[#5c4030]">
+        {{ c.type }}
+        @if (c.part) {
+          · {{ c.part }}
+        }
+        @if (c.section) {
+          · {{ c.section }}
+        }
+      </p>
+      <p class="mt-3 text-xs font-sans font-black uppercase tracking-widest text-[#8a6a4a]">
+        {{ formatCr(c.challengeRating) }} · {{ c.xp }} PX
+      </p>
+    </header>
+
+    @if (campaignBackstory(); as story) {
+      <section class="mb-8 rounded-lg border border-[#c4a574]/50 bg-[#fff8e7]/55 px-4 py-3">
+        <h2 class="text-sm font-bold mb-2">Histoire de campagne</h2>
+        <p class="text-sm leading-relaxed italic whitespace-pre-line">{{ story }}</p>
+      </section>
+    }
+
+    <dl class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2 text-sm mb-6">
+      <div>
+        <dt class="text-[10px] font-sans font-black uppercase tracking-widest text-[#8a6a4a]">CA</dt>
+        <dd class="font-semibold">
+          {{ c.armorClass }}
+          @if (c.armorNote) {
+            <span class="font-normal text-[#5c4030]"> ({{ c.armorNote }})</span>
+          }
+        </dd>
+      </div>
+      <div>
+        <dt class="text-[10px] font-sans font-black uppercase tracking-widest text-[#8a6a4a]">PV</dt>
+        <dd class="font-semibold">{{ c.hitPoints }}</dd>
+      </div>
+      @if (c.woundThreshold != null) {
+        <div>
+          <dt class="text-[10px] font-sans font-black uppercase tracking-widest text-[#8a6a4a]">
+            Seuil de blessure
+          </dt>
+          <dd class="font-semibold">{{ c.woundThreshold }}</dd>
+        </div>
+      }
+      <div class="col-span-2 sm:col-span-1">
+        <dt class="text-[10px] font-sans font-black uppercase tracking-widest text-[#8a6a4a]">
+          Vitesse
+        </dt>
+        <dd class="font-semibold">{{ c.speed }}</dd>
+      </div>
+      <div>
+        <dt class="text-[10px] font-sans font-black uppercase tracking-widest text-[#8a6a4a]">FP</dt>
+        <dd class="font-semibold">{{ c.challengeRating }}</dd>
+      </div>
+      <div>
+        <dt class="text-[10px] font-sans font-black uppercase tracking-widest text-[#8a6a4a]">XP</dt>
+        <dd class="font-semibold">{{ c.xp }}</dd>
+      </div>
+    </dl>
+
+    <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-6">
+      @for (key of abilityKeys(c); track key) {
+        <div class="rounded-lg border border-[#c4a574]/50 bg-[#fff8e7]/50 px-2 py-2 text-center">
+          <p class="text-[9px] font-sans font-black uppercase tracking-widest text-[#8a6a4a]">
+            {{ abilityLabels[key] }}
+          </p>
+          <p class="text-lg font-bold leading-none mt-1">{{ c.abilities[key].score }}</p>
+          <p class="text-xs text-[#5c4030]">{{ c.abilities[key].modifier }}</p>
+        </div>
+      }
+    </div>
+
+    <div class="space-y-2 text-sm mb-8">
+      @if (c.savingThrows) {
+        <p><span class="font-bold">Jets de sauvegarde.</span> {{ c.savingThrows }}</p>
+      }
+      @if (c.skills) {
+        <p><span class="font-bold">Compétences.</span> {{ c.skills }}</p>
+      }
+      @if (c.senses) {
+        <p><span class="font-bold">Sens.</span> {{ c.senses }}</p>
+      }
+      @if (c.languages) {
+        <p><span class="font-bold">Langues.</span> {{ c.languages }}</p>
+      }
+    </div>
+
+    @if (c.description) {
+      <section class="mb-8">
+        <h2 class="text-lg font-bold mb-2 border-b border-[#c4a574]/40 pb-1">Description</h2>
+        <p class="text-sm leading-relaxed whitespace-pre-line">{{ c.description }}</p>
+      </section>
+    }
+
+    @if (c.traits.length) {
+      <section class="mb-8">
+        <h2 class="text-lg font-bold mb-3 border-b border-[#c4a574]/40 pb-1">Particularités</h2>
+        <ul class="space-y-3">
+          @for (t of c.traits; track t.name) {
+            <li class="text-sm leading-relaxed">
+              <span class="font-bold italic">{{ t.name }}.</span>
+              {{ t.description }}
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    @if (c.actions.length) {
+      <section class="mb-8">
+        <h2 class="text-lg font-bold mb-3 border-b border-[#c4a574]/40 pb-1">Actions</h2>
+        <ul class="space-y-3">
+          @for (a of c.actions; track a.name) {
+            <li class="text-sm leading-relaxed">
+              <span class="font-bold italic">{{ a.name }}.</span>
+              {{ a.description }}
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    @if (c.reactions.length) {
+      <section class="mb-8">
+        <h2 class="text-lg font-bold mb-3 border-b border-[#c4a574]/40 pb-1">Réactions</h2>
+        <ul class="space-y-3">
+          @for (r of c.reactions; track r.name) {
+            <li class="text-sm leading-relaxed">
+              <span class="font-bold italic">{{ r.name }}.</span>
+              {{ r.description }}
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    @if (c.legendaryActions.length) {
+      <section class="mb-2">
+        <h2 class="text-lg font-bold mb-3 border-b border-[#c4a574]/40 pb-1">
+          Actions légendaires
+        </h2>
+        <ul class="space-y-3">
+          @for (l of c.legendaryActions; track l.name) {
+            <li class="text-sm leading-relaxed">
+              <span class="font-bold italic">{{ l.name }}.</span>
+              {{ l.description }}
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  </article>
+}

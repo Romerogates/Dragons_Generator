@@ -1,0 +1,73 @@
+<div class="illu-sheet-root">
+  <div
+    class="illu-sheet-page"
+    [style.background-image]="'url(' + bgUrl() + ')'"
+    role="img"
+    [attr.aria-label]="'Fiche de ' + character().name + ', page ' + page()"
+  >
+    @if (page() === 1) {
+      @let f = overlay();
+
+      <span class="illu-field illu-field--title" [ngStyle]="pos(140, 43)">{{ f.name }}</span>
+      <span class="illu-field" [ngStyle]="pos(140, 66)">{{ f.speciesLabel }}</span>
+      <span class="illu-field" [ngStyle]="pos(140, 90)">{{ f.civilization }}</span>
+      <span class="illu-field illu-field--class" [ngStyle]="pos(400, 43)">{{ f.classLabel }}</span>
+      <span class="illu-field illu-field--center" [ngStyle]="pos(432, 94)">{{ f.level }}</span>
+
+      <span class="illu-field illu-field--center" [ngStyle]="pos(230, 123)">{{ f.hpCurrent }}</span>
+      <span class="illu-field illu-field--center" [ngStyle]="pos(250, 171)">{{ f.hpTemp }}</span>
+      <span class="illu-field illu-field--sm" [ngStyle]="pos(438, 123)">{{ f.hitDice }}</span>
+      <span class="illu-field illu-field--center" [ngStyle]="pos(55, 173)">{{ f.proficiency }}</span>
+      <span class="illu-field illu-field--center" [ngStyle]="pos(370, 171)">{{ f.hpMax }}</span>
+      <span class="illu-field illu-field--center" [ngStyle]="pos(530, 171)">{{ f.wound }}</span>
+      <span class="illu-field illu-field--center" [ngStyle]="pos(270, 220)">{{ f.initiative }}</span>
+      <span class="illu-field illu-field--center" [ngStyle]="pos(520, 220)">{{
+        f.passivePerception
+      }}</span>
+      <span class="illu-field illu-field--center" [ngStyle]="pos(360, 220)">{{ f.ac }}</span>
+
+      <!-- Scores : left comme le PDF (pas de centrage → évite le chevauchement des libellés) -->
+      <span class="illu-field illu-field--score" [ngStyle]="pos(118, 225)">{{ f.str }}</span>
+      <span class="illu-field illu-field--score" [ngStyle]="pos(118, 291)">{{ f.dex }}</span>
+      <span class="illu-field illu-field--score" [ngStyle]="pos(118, 388)">{{ f.con }}</span>
+      <span class="illu-field illu-field--score" [ngStyle]="pos(118, 442)">{{ f.int }}</span>
+      <span class="illu-field illu-field--score" [ngStyle]="pos(118, 565)">{{ f.wis }}</span>
+      <span class="illu-field illu-field--score" [ngStyle]="pos(118, 700)">{{ f.cha }}</span>
+
+      <span class="illu-field illu-field--mod" [ngStyle]="pos(165, 228)">{{ f.strMod }}</span>
+      <span class="illu-field illu-field--mod" [ngStyle]="pos(165, 296)">{{ f.dexMod }}</span>
+      <span class="illu-field illu-field--mod" [ngStyle]="pos(165, 392)">{{ f.conMod }}</span>
+      <span class="illu-field illu-field--mod" [ngStyle]="pos(165, 445)">{{ f.intMod }}</span>
+      <span class="illu-field illu-field--mod" [ngStyle]="pos(165, 570)">{{ f.wisMod }}</span>
+      <span class="illu-field illu-field--mod" [ngStyle]="pos(165, 705)">{{ f.chaMod }}</span>
+
+      @for (m of f.marks; track m.x + '-' + m.y) {
+        <span class="illu-mark" [ngStyle]="pos(m.x, m.y)" aria-hidden="true"></span>
+      }
+
+      <span class="illu-field illu-field--sm" [ngStyle]="pos(232, 359)">{{ f.walk }}</span>
+      <span class="illu-field illu-field--sm" [ngStyle]="pos(312, 360)">{{ f.climb }}</span>
+      <span class="illu-field illu-field--sm" [ngStyle]="pos(365, 360)">{{ f.swim }}</span>
+      <span class="illu-field illu-field--sm" [ngStyle]="pos(286, 381)">{{ f.jumpHeight }}</span>
+      <span class="illu-field illu-field--sm" [ngStyle]="pos(361, 381)">{{ f.jumpLength }}</span>
+
+      @for (atk of f.attacks; track atk.y + atk.name) {
+        <span class="illu-field illu-field--atk" [ngStyle]="pos(f.colAtkName, atk.y)">{{
+          atk.name
+        }}</span>
+        @if (atk.bonus) {
+          <span class="illu-field illu-field--atk" [ngStyle]="pos(f.colAtkBonus, atk.y)">{{
+            atk.bonus
+          }}</span>
+        }
+        @if (atk.damage) {
+          <span class="illu-field illu-field--atk" [ngStyle]="pos(f.colAtkDmg, atk.y)">{{
+            atk.damage
+          }}</span>
+        }
+      }
+    } @else {
+      <p class="illu-page-hint">Page {{ page() }} — texte à calibrer (fond officiel affiché)</p>
+    }
+  </div>
+</div>

@@ -1,0 +1,99 @@
+@if (spell(); as s) {
+  <article class="spell-book font-serif text-[#2a1c14]">
+    <header class="mb-6 pb-4 border-b-2 border-[#9b6bb8]/45">
+      <p class="text-[10px] font-sans font-black uppercase tracking-[0.2em] text-[#6b4a7a] mb-2">
+        Grimoire · {{ s.school }}
+      </p>
+      <h1 class="text-3xl sm:text-4xl font-bold leading-tight text-[#1a1008]">{{ s.name }}</h1>
+      <p class="mt-2 text-sm italic text-[#5c4030]">{{ levelLabel(s.level) }}</p>
+      <div class="mt-3 flex flex-wrap gap-2 text-[10px] font-sans font-black uppercase tracking-widest">
+        @if (s.isRitual) {
+          <span class="rounded border border-[#6b8f71]/50 bg-[#e8f0e4]/70 px-2 py-1 text-[#3d5c42]"
+            >Rituel</span
+          >
+        }
+        @if (s.isConcentration) {
+          <span class="rounded border border-[#c4a574]/50 bg-[#fff8e7]/70 px-2 py-1 text-[#8a6a4a]"
+            >Concentration</span
+          >
+        }
+        @if (s.isCorrupted) {
+          <span class="rounded border border-[#a85a5a]/50 bg-[#f5e0e0]/70 px-2 py-1 text-[#7a3030]"
+            >Corrompu</span
+          >
+        }
+      </div>
+    </header>
+
+    <dl class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm mb-6">
+      <div>
+        <dt class="text-[10px] font-sans font-black uppercase tracking-widest text-[#6b4a7a]">
+          Incantation
+        </dt>
+        <dd class="font-semibold">{{ formatMeta(s.castingTime) }}</dd>
+      </div>
+      <div>
+        <dt class="text-[10px] font-sans font-black uppercase tracking-widest text-[#6b4a7a]">
+          Portée
+        </dt>
+        <dd class="font-semibold">{{ formatMeta(s.range) }}</dd>
+      </div>
+      <div>
+        <dt class="text-[10px] font-sans font-black uppercase tracking-widest text-[#6b4a7a]">
+          Durée
+        </dt>
+        <dd class="font-semibold">{{ formatMeta(s.duration) }}</dd>
+      </div>
+    </dl>
+
+    <p class="text-sm mb-6">
+      <span class="font-bold">Composantes.</span> {{ formatComponents(s.components) }}
+    </p>
+
+    @if (s.classes.length) {
+      <section class="mb-6">
+        <h2 class="text-lg font-bold mb-2 border-b border-[#9b6bb8]/35 pb-1">Classes</h2>
+        <div class="flex flex-wrap gap-2">
+          @for (classId of s.classes; track classId) {
+            <a
+              [routerLink]="['/classes', classId]"
+              class="text-xs font-sans font-bold text-[#5c4030] underline underline-offset-2 hover:text-[#6b4a7a]"
+            >
+              {{ classId | gameIdLabel }}
+            </a>
+          }
+        </div>
+      </section>
+    }
+
+    <section class="mb-8">
+      <h2 class="text-lg font-bold mb-2 border-b border-[#9b6bb8]/35 pb-1">Description</h2>
+      <p class="text-sm leading-relaxed whitespace-pre-wrap">{{ s.description }}</p>
+    </section>
+
+    @if (s.higherLevels) {
+      <section class="mb-8">
+        <h2 class="text-lg font-bold mb-2 border-b border-[#9b6bb8]/35 pb-1">
+          Aux niveaux supérieurs
+        </h2>
+        <p class="text-sm leading-relaxed italic">{{ s.higherLevels }}</p>
+      </section>
+    }
+
+    @if (s.modularOptions.length) {
+      <section>
+        <h2 class="text-lg font-bold mb-3 border-b border-[#9b6bb8]/35 pb-1">
+          Options modulaires
+        </h2>
+        <ul class="space-y-3">
+          @for (option of s.modularOptions; track option.name) {
+            <li class="text-sm leading-relaxed">
+              <span class="font-bold italic">{{ option.name }}.</span>
+              {{ option.description }}
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  </article>
+}

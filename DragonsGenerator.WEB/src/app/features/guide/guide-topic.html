@@ -270,27 +270,36 @@
             </div>
 
             <div class="rounded-xl border border-slate-800 bg-[#161b24]/70 p-4 space-y-3">
-              @if (replyTo()) {
-                <div class="flex justify-between text-xs text-amber-300/90">
-                  <span>Réponse en cours…</span>
-                  <button type="button" class="underline" (click)="cancelReply()">Annuler</button>
-                </div>
+              @if (isLoggedIn()) {
+                @if (replyTo()) {
+                  <div class="flex justify-between text-xs text-amber-300/90">
+                    <span>Réponse en cours…</span>
+                    <button type="button" class="underline" (click)="cancelReply()">Annuler</button>
+                  </div>
+                }
+                <textarea
+                  rows="3"
+                  placeholder="Écrire un commentaire…"
+                  class="w-full rounded-lg bg-[#0f1218] border border-slate-700 px-3 py-2 text-sm"
+                  [ngModel]="draft()"
+                  (ngModelChange)="draft.set($event)"
+                ></textarea>
+                <button
+                  type="button"
+                  class="min-h-10 px-4 rounded-lg text-[10px] font-black uppercase bg-amber-600 text-slate-950 hover:bg-amber-500 disabled:opacity-40"
+                  [disabled]="posting() || !draft().trim()"
+                  (click)="submit()"
+                >
+                  Publier
+                </button>
+              } @else {
+                <p class="text-sm text-slate-400">
+                  <a routerLink="/login" [queryParams]="{ returnUrl: '/guide/' + topicId() }" class="text-amber-400 underline"
+                    >Connectez-vous</a
+                  >
+                  pour commenter.
+                </p>
               }
-              <textarea
-                rows="3"
-                placeholder="Écrire un commentaire…"
-                class="w-full rounded-lg bg-[#0f1218] border border-slate-700 px-3 py-2 text-sm"
-                [ngModel]="draft()"
-                (ngModelChange)="draft.set($event)"
-              ></textarea>
-              <button
-                type="button"
-                class="min-h-10 px-4 rounded-lg text-[10px] font-black uppercase bg-amber-600 text-slate-950 hover:bg-amber-500 disabled:opacity-40"
-                [disabled]="posting() || !draft().trim()"
-                (click)="submit()"
-              >
-                Publier
-              </button>
             </div>
 
             @if (error(); as err) {

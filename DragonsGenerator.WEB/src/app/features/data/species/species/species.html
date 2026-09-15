@@ -145,6 +145,13 @@
               </footer>
             </div>
           </a>
+        } @empty {
+          <app-codex-empty-state
+            title="Aucune espèce dans les archives"
+            message="Le registre est vide ou indisponible. Téléchargez le Codex hors-ligne dans Paramètres, ou consultez le Guide."
+            ctaLabel="Ouvrir le Guide"
+            ctaRoute="/guide/demarrage"
+          />
         }
       </div>
     }

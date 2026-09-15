@@ -54,12 +54,9 @@
       @if (printing()) {
         <p class="text-xs text-violet-400/80 animate-pulse">Génération PDF…</p>
       }
-      <div
-        class="relative w-full bg-[#0f1117] border border-slate-800 rounded-2xl overflow-hidden"
-        style="height: min(70dvh, 52rem); min-height: 24rem"
-      >
+      <div class="relative w-full mx-auto max-w-5xl">
         @if (isLoadingPreview()) {
-          <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0f1117]">
+          <div class="flex flex-col items-center justify-center gap-3 py-16">
             <div class="w-8 h-8 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin"></div>
             <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest animate-pulse">
               Gravure…
@@ -68,16 +65,21 @@
         }
         @if (!isLoadingPreview() && pdfPreviewUrl() && usePdfJsPreview()) {
           <app-pdf-page-preview
-            mode="strip"
             [src]="pdfPreviewRawUrl()"
+            [bare]="true"
             (loadFailed)="onPdfJsFailed()"
           />
         }
         @if (!isLoadingPreview() && pdfPreviewUrl() && !usePdfJsPreview() && !usePdfFallback) {
-          <iframe [src]="pdfPreviewUrl()" class="w-full h-full border-0" title="Aperçu PDF"></iframe>
+          <iframe
+            [src]="pdfPreviewUrl()"
+            class="w-full min-h-[24rem] border-0 rounded-2xl bg-slate-900"
+            style="height: min(70dvh, 52rem)"
+            title="Aperçu PDF"
+          ></iframe>
         }
         @if (!isLoadingPreview() && pdfPreviewUrl() && !usePdfJsPreview() && usePdfFallback) {
-          <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center bg-[#0f1117]">
+          <div class="flex flex-col items-center justify-center gap-4 px-6 py-16 text-center">
             <p class="text-sm text-slate-300 font-serif">Aperçu indisponible</p>
             <button
               type="button"
@@ -89,7 +91,7 @@
           </div>
         }
         @if (!isLoadingPreview() && !pdfPreviewUrl()) {
-          <div class="absolute inset-0 flex items-center justify-center text-xs text-slate-500 italic px-4 text-center">
+          <div class="flex items-center justify-center text-xs text-slate-500 italic px-4 py-16 text-center">
             Choisissez Pack MJ ou Bestiaire pour générer un aperçu.
           </div>
         }

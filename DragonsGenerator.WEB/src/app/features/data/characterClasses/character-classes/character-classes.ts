@@ -13,13 +13,14 @@ import { DataService } from '@core/services/data.service';
 import { normalizeCharacterClasses } from '@core/utils/class-data.adapter';
 import { getClassIcon } from '@core/utils/class-icons';
 import { GameIdLabelsPipe } from '@shared/pipes/game-id-label.pipe';
+import { CodexEmptyState } from '@shared/components/codex-empty-state/codex-empty-state';
 import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
 import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-character-classes',
   standalone: true,
-  imports: [CommonModule, RouterLink, GameIdLabelsPipe],
+  imports: [CommonModule, RouterLink, GameIdLabelsPipe, CodexEmptyState],
   templateUrl: './character-classes.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

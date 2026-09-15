@@ -1,4 +1,11 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  effect,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { Navbar } from './shared/components/navbar/navbar';
 import { AppContextMenu } from './shared/components/app-context-menu/app-context-menu';
@@ -18,6 +25,9 @@ import {
   dismissAuthCookieMigrationBanner,
   shouldShowReconnectBanner,
 } from '@core/utils/legacy-auth-migration.util';
+
+/** Hauteur approximative d’une bannière sticky (py-2 + texte). */
+const BANNER_ROW_PX = 40;
 
 @Component({
   selector: 'app-root',
@@ -42,12 +52,32 @@ export class App implements OnInit {
   private readonly push = inject(PushNotificationService);
   private readonly connectivity = inject(ConnectivityService);
   private readonly pwa = inject(PwaLifecycleService);
+  private readonly destroyRef = inject(DestroyRef);
+
   protected readonly title = signal('DragonsGenerator.WEB');
 
   readonly isOnline = this.connectivity.isOnline;
   readonly pendingSyncCount = this.offlineSync.pendingCount;
   readonly updateReady = this.pwa.updateReady;
   readonly showReconnectBanner = signal(shouldShowReconnectBanner());
+
+  constructor() {
+    effect(() => {
+      let rows = 0;
+      if (this.showReconnectBanner()) rows += 1;
+      if (!this.isOnline()) rows += 1;
+      if (this.updateReady()) rows += 1;
+      const px = rows * BANNER_ROW_PX;
+      if (typeof document !== 'undefined') {
+        document.documentElement.style.setProperty('--dg-banner-height', `${px}px`);
+      }
+    });
+    this.destroyRef.onDestroy(() => {
+      if (typeof document !== 'undefined') {
+        document.documentElement.style.removeProperty('--dg-banner-height');
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.showReconnectBanner.set(shouldShowReconnectBanner());

@@ -54,25 +54,35 @@ export type PdfPreviewMode = 'pager' | 'strip';
   selector: 'app-pdf-page-preview',
   standalone: true,
   templateUrl: './pdf-page-preview.html',
+  styleUrl: './pdf-page-preview.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[class.pdf-host--bare]': 'bare()',
+    '[class.pdf-host--framed]': '!bare()',
+  },
 })
 export class PdfPagePreview implements OnDestroy {
   /** blob: URL du PDF */
   readonly src = input.required<string | null>();
   /** pager = une page + flèches ; strip = toutes les pages empilées */
   readonly mode = input<PdfPreviewMode>('pager');
+  /**
+   * Consultation immersive : grande fiche, fond transparent (défaut recommandé à l’écran).
+   * `false` = aperçu encadré sombre (legacy).
+   */
+  readonly bare = input(true);
   /** Émis si PDF.js ne peut pas charger — le parent peut basculer sur iframe. */
   readonly loadFailed = output<void>();
 
   readonly canvasRef = viewChild<ElementRef<HTMLCanvasElement>>('pdfCanvas');
   readonly stripCanvases = viewChildren<ElementRef<HTMLCanvasElement>>('stripCanvas');
+  readonly bookRef = viewChild<ElementRef<HTMLElement>>('bookStage');
   private readonly injector = inject(Injector);
 
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly page = signal(1);
   readonly pageCount = signal(0);
-  /** Indices 1..N pour le mode strip (évite Array.from dans le template). */
   readonly pageIndexes = signal<number[]>([]);
 
   private pdf: PDFDocumentProxy | null = null;
@@ -86,7 +96,6 @@ export class PdfPagePreview implements OnDestroy {
   constructor() {
     effect(() => {
       const url = this.src();
-      // Recharger aussi si le mode change avec la même URL.
       this.mode();
       void this.loadPdf(url);
     });
@@ -181,7 +190,6 @@ export class PdfPagePreview implements OnDestroy {
         await this.renderPagerPage();
       }
       if (seq !== this.loadSeq) return;
-      // Observer après le 1er rendu : sinon le resize du canvas relance un paint concurrent.
       this.bindResizeObserver();
     } catch (e) {
       if (seq !== this.loadSeq) return;
@@ -208,11 +216,10 @@ export class PdfPagePreview implements OnDestroy {
 
   private async waitForLayout(): Promise<void> {
     for (let i = 0; i < 12; i++) {
-      const el =
-        this.mode() === 'strip'
-          ? this.stripCanvases()[0]?.nativeElement?.parentElement
-          : this.canvasRef()?.nativeElement?.parentElement;
-      if (el && el.clientWidth > 32 && el.clientHeight > 32) {
+      const el = this.bare()
+        ? this.bookRef()?.nativeElement
+        : this.canvasRef()?.nativeElement?.parentElement;
+      if (el && el.clientWidth > 32) {
         await new Promise<void>((r) => requestAnimationFrame(() => r()));
         return;
       }
@@ -230,15 +237,12 @@ export class PdfPagePreview implements OnDestroy {
   }
 
   private bindResizeObserver(): void {
-    const canvas =
-      this.mode() === 'strip'
-        ? this.stripCanvases()[0]?.nativeElement
-        : this.canvasRef()?.nativeElement;
-    const parent =
-      this.mode() === 'strip'
-        ? canvas?.closest('[data-pdf-preview-root]') ?? canvas?.parentElement
-        : canvas?.parentElement;
-    if (!parent) return;
+    const host = this.bare()
+      ? this.bookRef()?.nativeElement
+      : this.mode() === 'strip'
+        ? this.stripCanvases()[0]?.nativeElement?.closest('[data-pdf-preview-root]')
+        : this.canvasRef()?.nativeElement?.parentElement;
+    if (!host) return;
     this.teardownResize();
     this.resizeObserver = new ResizeObserver(() => {
       if (this.resizeTimer != null) clearTimeout(this.resizeTimer);
@@ -248,7 +252,7 @@ export class PdfPagePreview implements OnDestroy {
         else void this.renderPagerPage();
       }, 80);
     });
-    this.resizeObserver.observe(parent);
+    this.resizeObserver.observe(host as Element);
   }
 
   private cancelRenders(): void {
@@ -269,11 +273,10 @@ export class PdfPagePreview implements OnDestroy {
     const seq = ++this.renderSeq;
     this.cancelRenders();
 
+    const host = this.bookRef()?.nativeElement ?? canvas.parentElement;
     const page = await pdf.getPage(this.page());
     if (seq !== this.renderSeq) return;
-
-    const parent = canvas.parentElement;
-    await this.paintPage(page, canvas, parent, seq, { fitHeight: true });
+    await this.paintPage(page, canvas, host, seq, { fitHeight: !this.bare() });
   }
 
   private async renderAllPages(): Promise<void> {
@@ -283,7 +286,6 @@ export class PdfPagePreview implements OnDestroy {
     const seq = ++this.renderSeq;
     this.cancelRenders();
 
-    // Une largeur commune basée sur le conteneur scrollable.
     const root = refs[0]?.nativeElement?.closest('[data-pdf-preview-root]') as HTMLElement | null;
     const widthHost = root ?? refs[0]?.nativeElement?.parentElement;
 
@@ -302,25 +304,34 @@ export class PdfPagePreview implements OnDestroy {
     canvas: HTMLCanvasElement,
     host: HTMLElement | null | undefined,
     seq: number,
-    opts: { fitHeight: boolean },
+    opts: { fitHeight?: boolean },
   ): Promise<void> {
     if (seq !== this.renderSeq) return;
 
-    const pad = 16;
-    const parentW = Math.max(120, (host?.clientWidth || 640) - pad);
-    const parentH = Math.max(160, (host?.clientHeight || 800) - pad);
-    const unscaled = page.getViewport({ scale: 1 });
-    const fit = opts.fitHeight
-      ? Math.min(parentW / unscaled.width, parentH / unscaled.height)
-      : parentW / unscaled.width;
-    const cssScale = Math.min(2, Math.max(0.35, fit));
     const dpr = typeof window !== 'undefined' ? Math.min(2, window.devicePixelRatio || 1) : 1;
-    const viewport = page.getViewport({ scale: cssScale * dpr });
+    const unscaled = page.getViewport({ scale: 1 });
+    const pad = this.bare() ? 4 : 16;
+    const parentW = Math.max(160, (host?.clientWidth || 720) - pad);
 
+    let cssW: number;
+    let cssH: number;
+    if (opts.fitHeight && host) {
+      const parentH = Math.max(200, (host.clientHeight || 800) - pad);
+      const fit = Math.min(parentW / unscaled.width, parentH / unscaled.height);
+      const cssScale = Math.min(2.4, Math.max(0.4, fit));
+      cssW = Math.floor(unscaled.width * cssScale);
+      cssH = Math.floor(unscaled.height * cssScale);
+    } else {
+      const cssScale = Math.min(2.4, Math.max(0.45, parentW / unscaled.width));
+      cssW = Math.floor(unscaled.width * cssScale);
+      cssH = Math.floor(unscaled.height * cssScale);
+    }
+
+    const viewport = page.getViewport({ scale: (cssW / unscaled.width) * dpr });
     canvas.width = Math.floor(viewport.width);
     canvas.height = Math.floor(viewport.height);
-    canvas.style.width = `${Math.floor(viewport.width / dpr)}px`;
-    canvas.style.height = `${Math.floor(viewport.height / dpr)}px`;
+    canvas.style.width = `${cssW}px`;
+    canvas.style.height = `${cssH}px`;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;

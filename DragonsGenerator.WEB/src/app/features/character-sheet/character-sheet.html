@@ -1,4 +1,4 @@
-<div class="max-w-6xl mx-auto px-4 py-8 animate-fade-in min-h-[80vh] select-none">
+<div class="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8 animate-fade-in min-h-[80vh] select-none">
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
     <div>
       <h1 class="text-3xl font-extrabold text-amber-500 font-serif tracking-wide">
@@ -22,13 +22,13 @@
           type="button"
           class="px-3 py-2 text-[10px] font-black uppercase tracking-widest transition-colors"
           [class]="
-            viewMode() === 'pdf'
+            viewMode() === 'illustrated'
               ? 'bg-amber-500 text-slate-950'
               : 'bg-[#1b2028] text-slate-400 hover:text-amber-400'
           "
-          (click)="setViewMode('pdf')"
+          (click)="setViewMode('illustrated')"
         >
-          PDF
+          Illustrée
         </button>
         <button
           type="button"
@@ -40,7 +40,7 @@
           "
           (click)="setViewMode('ui')"
         >
-          Fiche
+          Compacte
         </button>
       </div>
       @if (!isConsult()) {
@@ -135,83 +135,90 @@
         errorBackLabel()
       }}</a>
     </div>
+  } @else if (viewMode() === 'illustrated') {
+    @if (character(); as hero) {
+      <div class="space-y-3">
+        @if (pdfRawUrl(); as url) {
+          @if (!illustratedPdfJsFailed()) {
+            <div class="relative w-full mx-auto">
+              <app-pdf-page-preview
+                [src]="url"
+                [bare]="true"
+                (loadFailed)="onIllustratedPdfJsFailed()"
+              />
+            </div>
+            <p class="text-center text-[10px] text-slate-600">
+              Identique au PDF téléchargé — pages avec ← →.
+            </p>
+          } @else {
+            <app-illustrated-character-sheet [character]="hero" [page]="illustratedPage()" />
+            <div class="flex items-center justify-center gap-3">
+              <button
+                type="button"
+                class="min-h-11 min-w-11 px-3 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-300 disabled:opacity-40"
+                [disabled]="illustratedPage() <= 1"
+                aria-label="Page précédente"
+                (click)="prevIllustratedPage()"
+              >
+                ←
+              </button>
+              <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                {{ illustratedPage() }} / 4
+              </span>
+              <button
+                type="button"
+                class="min-h-11 min-w-11 px-3 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-300 disabled:opacity-40"
+                [disabled]="illustratedPage() >= 4"
+                aria-label="Page suivante"
+                (click)="nextIllustratedPage()"
+              >
+                →
+              </button>
+            </div>
+            <p class="text-center text-[10px] text-slate-600">
+              Aperçu de secours (JPEG) — le rendu PDF navigateur a échoué.
+            </p>
+          }
+        } @else if (pdfFailed()) {
+          <app-illustrated-character-sheet [character]="hero" [page]="illustratedPage()" />
+          <div class="flex items-center justify-center gap-3">
+            <button
+              type="button"
+              class="min-h-11 min-w-11 px-3 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-300 disabled:opacity-40"
+              [disabled]="illustratedPage() <= 1"
+              aria-label="Page précédente"
+              (click)="prevIllustratedPage()"
+            >
+              ←
+            </button>
+            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+              {{ illustratedPage() }} / 4
+            </span>
+            <button
+              type="button"
+              class="min-h-11 min-w-11 px-3 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-300 disabled:opacity-40"
+              [disabled]="illustratedPage() >= 4"
+              aria-label="Page suivante"
+              (click)="nextIllustratedPage()"
+            >
+              →
+            </button>
+          </div>
+          <p class="text-center text-[10px] text-amber-600/80">
+            Génération PDF impossible — aperçu JPEG de secours.
+          </p>
+        } @else {
+          <div class="flex justify-center py-16">
+            <div
+              class="w-10 h-10 border-4 border-amber-500/30 border-t-amber-500 rounded-full animate-spin"
+            ></div>
+          </div>
+        }
+      </div>
+    }
   } @else if (viewMode() === 'ui') {
     @if (character(); as hero) {
       <app-character-play-view [character]="hero" />
     }
-  } @else {
-    <div class="bg-[#1b2028] border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-      <div class="flex justify-between items-center px-4 py-3 border-b border-slate-800">
-        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500"
-          >Aperçu PDF</span
-        >
-        @if (pdfPreviewUrl()) {
-          <button
-            type="button"
-            class="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-amber-400"
-            (click)="openFullscreen()"
-          >
-            Plein écran
-          </button>
-        }
-      </div>
-      @if (pdfRawUrl(); as url) {
-        @if (!pdfJsFailed()) {
-          <div
-            class="relative w-full bg-[#0f1117]"
-            style="height: min(85dvh, calc(100dvh - 11rem)); min-height: 28rem"
-          >
-            <app-pdf-page-preview [src]="url" (loadFailed)="onPdfJsFailed()" />
-          </div>
-        } @else if (pdfPreviewUrl(); as safeUrl) {
-          @if (!useNativePdfFallback) {
-            <iframe
-              [src]="safeUrl"
-              class="w-full bg-slate-900 border-0"
-              style="height: min(85dvh, calc(100dvh - 11rem)); min-height: 28rem"
-              title="Fiche personnage PDF"
-            ></iframe>
-          } @else {
-            <div
-              class="p-8 text-center space-y-3 bg-[#0f1117]"
-              style="height: min(85dvh, calc(100dvh - 11rem)); min-height: 28rem"
-            >
-              <p class="text-sm text-slate-400">Aperçu PDF indisponible dans le navigateur.</p>
-              <button
-                type="button"
-                class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-600 text-white"
-                (click)="downloadPdf()"
-              >
-                Télécharger PDF
-              </button>
-              <button
-                type="button"
-                class="block mx-auto text-amber-400 text-xs font-bold uppercase tracking-widest underline"
-                (click)="setViewMode('ui')"
-              >
-                Afficher la fiche UI
-              </button>
-            </div>
-          }
-        }
-      } @else if (pdfFailed()) {
-        <div class="p-6 text-center space-y-3">
-          <p class="text-sm text-slate-500">Aperçu PDF indisponible.</p>
-          <button
-            type="button"
-            class="text-amber-400 text-xs font-bold uppercase tracking-widest underline"
-            (click)="setViewMode('ui')"
-          >
-            Afficher la fiche UI
-          </button>
-        </div>
-      } @else {
-        <div class="flex justify-center py-16">
-          <div
-            class="w-8 h-8 border-4 border-amber-500/30 border-t-amber-500 rounded-full animate-spin"
-          ></div>
-        </div>
-      }
-    </div>
   }
 </div>

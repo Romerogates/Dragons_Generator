@@ -146,7 +146,12 @@
             </div>
           </a>
         } @empty {
-          <p class="col-span-full text-center text-slate-500 italic py-16">Aucune action trouvée.</p>
+          <app-codex-empty-state
+            title="Aucune action trouvée"
+            message="Aucun résultat pour cette recherche. Essayez un autre filtre, ou ouvrez le Guide combat."
+            ctaLabel="Ouvrir le Guide"
+            ctaRoute="/guide/demarrage"
+          />
         }
       </div>
     }

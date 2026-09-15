@@ -1,54 +1,112 @@
-<div class="absolute inset-0 flex flex-col bg-[#0f1117]" data-pdf-preview-root>
-  @if (loading()) {
-    <div class="flex-1 flex flex-col items-center justify-center gap-3">
-      <div class="w-8 h-8 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin"></div>
-      <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest animate-pulse">Rendu PDF…</p>
-    </div>
-  } @else if (error()) {
-    <div class="flex-1 flex flex-col items-center justify-center gap-2 px-4 text-center">
-      <p class="text-sm text-red-300">{{ error() }}</p>
-      <p class="text-[11px] text-slate-500">Bascule automatique vers l’aperçu classique…</p>
-    </div>
-  } @else if (mode() === 'strip') {
-    <div class="flex-1 min-h-0 overflow-y-auto guide-sommaire p-3 space-y-3">
-      @for (n of pageIndexes(); track n) {
-        <div class="flex flex-col items-center gap-1.5">
-          <p class="text-[9px] font-black uppercase tracking-widest text-slate-600">Page {{ n }}</p>
-          <canvas
-            #stripCanvas
-            class="max-w-full h-auto shadow-lg bg-white rounded-sm"
-          ></canvas>
+@if (bare()) {
+  <div class="pdf-bare" data-pdf-preview-root>
+    @if (loading()) {
+      <div class="pdf-bare__status">
+        <div class="pdf-bare__spinner"></div>
+        <p>Rendu PDF…</p>
+      </div>
+    } @else if (error()) {
+      <div class="pdf-bare__status pdf-bare__status--err">
+        <p>{{ error() }}</p>
+      </div>
+    } @else if (mode() === 'strip') {
+      <div class="pdf-strip">
+        @for (n of pageIndexes(); track n) {
+          <div class="pdf-strip__item">
+            <p>Page {{ n }}</p>
+            <canvas #stripCanvas></canvas>
+          </div>
+        }
+      </div>
+    } @else {
+      <div #bookStage class="pdf-book">
+        <div class="pdf-book__stack">
+          <canvas #pdfCanvas class="pdf-book__page"></canvas>
+        </div>
+      </div>
+
+      @if (pageCount() > 0) {
+        <div class="pdf-bare__nav">
+          <button
+            type="button"
+            class="pdf-bare__nav-btn"
+            [disabled]="page() <= 1"
+            aria-label="Page précédente"
+            (click)="prevPage()"
+          >
+            ←
+          </button>
+          <span>{{ page() }} / {{ pageCount() || 1 }}</span>
+          <button
+            type="button"
+            class="pdf-bare__nav-btn"
+            [disabled]="page() >= pageCount()"
+            aria-label="Page suivante"
+            (click)="nextPage()"
+          >
+            →
+          </button>
         </div>
       }
-    </div>
-  } @else {
-    <div class="flex-1 overflow-hidden flex items-center justify-center p-2 min-h-0">
-      <canvas #pdfCanvas class="max-w-full max-h-full shadow-lg bg-white"></canvas>
-    </div>
-    @if (pageCount() > 0) {
-      <div class="flex items-center justify-center gap-3 py-2 border-t border-slate-800 shrink-0">
-        <button
-          type="button"
-          class="min-h-11 min-w-11 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300 disabled:opacity-40"
-          [disabled]="page() <= 1"
-          aria-label="Page précédente"
-          (click)="prevPage()"
-        >
-          ←
-        </button>
-        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">
-          {{ page() }} / {{ pageCount() || 1 }}
-        </span>
-        <button
-          type="button"
-          class="min-h-11 min-w-11 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300 disabled:opacity-40"
-          [disabled]="page() >= pageCount()"
-          aria-label="Page suivante"
-          (click)="nextPage()"
-        >
-          →
-        </button>
-      </div>
     }
-  }
-</div>
+  </div>
+} @else {
+  <div class="pdf-preview pdf-preview--framed absolute inset-0 flex flex-col" data-pdf-preview-root>
+    @if (loading()) {
+      <div class="flex-1 flex flex-col items-center justify-center gap-3">
+        <div
+          class="w-8 h-8 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin"
+        ></div>
+        <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest animate-pulse">
+          Rendu PDF…
+        </p>
+      </div>
+    } @else if (error()) {
+      <div class="flex-1 flex flex-col items-center justify-center gap-2 px-4 text-center">
+        <p class="text-sm text-red-300">{{ error() }}</p>
+        <p class="text-[11px] text-slate-500">Bascule automatique vers l’aperçu classique…</p>
+      </div>
+    } @else if (mode() === 'strip') {
+      <div class="flex-1 min-h-0 overflow-y-auto guide-sommaire p-3 space-y-3">
+        @for (n of pageIndexes(); track n) {
+          <div class="flex flex-col items-center gap-1.5">
+            <p class="text-[9px] font-black uppercase tracking-widest text-slate-600">Page {{ n }}</p>
+            <canvas #stripCanvas class="max-w-full h-auto shadow-lg bg-white rounded-sm"></canvas>
+          </div>
+        }
+      </div>
+    } @else {
+      <div
+        #bookStage
+        class="flex-1 overflow-hidden flex items-center justify-center min-h-0 p-2"
+      >
+        <canvas #pdfCanvas class="max-w-full max-h-full shadow-lg bg-[#f4ecd8]"></canvas>
+      </div>
+      @if (pageCount() > 0) {
+        <div class="flex items-center justify-center gap-3 py-2 border-t border-slate-800 shrink-0">
+          <button
+            type="button"
+            class="min-h-11 min-w-11 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300 disabled:opacity-40"
+            [disabled]="page() <= 1"
+            aria-label="Page précédente"
+            (click)="prevPage()"
+          >
+            ←
+          </button>
+          <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+            {{ page() }} / {{ pageCount() || 1 }}
+          </span>
+          <button
+            type="button"
+            class="min-h-11 min-w-11 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300 disabled:opacity-40"
+            [disabled]="page() >= pageCount()"
+            aria-label="Page suivante"
+            (click)="nextPage()"
+          >
+            →
+          </button>
+        </div>
+      }
+    }
+  </div>
+}

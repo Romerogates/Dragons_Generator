@@ -1,0 +1,60 @@
+@if (loadError(); as err) {
+  <app-book-reader-shell
+    title="Bestiaire"
+    [backLink]="backLink()"
+    backLabel="Campagne"
+  >
+    <p class="text-center text-sm text-red-800 py-16">{{ err }}</p>
+  </app-book-reader-shell>
+} @else if (bundle() === undefined) {
+  <app-book-reader-shell
+    title="Bestiaire"
+    [backLink]="backLink()"
+    backLabel="Campagne"
+  >
+    <p class="text-center text-sm font-serif uppercase tracking-widest text-[#5c4030] py-24 animate-pulse">
+      Ouverture du livre…
+    </p>
+  </app-book-reader-shell>
+} @else if (!entries().length) {
+  <app-book-reader-shell
+    [title]="campaignTitle()"
+    subtitle="Bestiaire vide"
+    [backLink]="backLink()"
+    backLabel="Campagne"
+  >
+    <p class="text-center text-sm text-[#5c4030] py-16">
+      Aucune créature dans cette campagne pour l’instant.
+    </p>
+  </app-book-reader-shell>
+} @else {
+  <app-book-reader-shell
+    [title]="activeEntry()?.customName || activeEntry()?.creatureName || 'Bestiaire'"
+    [subtitle]="campaignTitle()"
+    [backLink]="backLink()"
+    backLabel="Campagne"
+    [showToc]="true"
+    [toc]="toc()"
+    [activeId]="activeId()"
+    (selectItem)="onSelectToc($event)"
+  >
+    @if (!creature() && !creatureError()) {
+      <p class="text-center text-sm font-serif uppercase tracking-widest text-[#5c4030] py-16 animate-pulse">
+        Tourner la page…
+      </p>
+    } @else if (creatureError(); as cerr) {
+      <p class="text-center text-sm text-red-800 py-12">{{ cerr }}</p>
+    } @else if (creature(); as c) {
+      <app-creature-book-page
+        [creature]="c"
+        [campaignAlias]="
+          activeEntry()?.customName !== activeEntry()?.creatureName
+            ? activeEntry()?.customName ?? null
+            : null
+        "
+        [campaignBackstory]="activeEntry()?.backstory || null"
+        [campaignRoleLabel]="roleLabel(activeEntry())"
+      />
+    }
+  </app-book-reader-shell>
+}

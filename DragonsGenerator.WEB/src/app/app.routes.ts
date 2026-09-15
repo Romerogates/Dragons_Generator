@@ -40,7 +40,6 @@ export const routes: Routes = [
   },
   {
     path: 'guide',
-    canActivate: [authGuard],
     children: [
       {
         path: '',
@@ -134,6 +133,14 @@ export const routes: Routes = [
     path: 'campaigns/:id',
     loadComponent: () =>
       import('@features/campaigns/campaign-detail/campaign-detail').then((m) => m.CampaignDetailPage),
+  },
+  {
+    path: 'campaigns/:id/bestiary',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('@features/campaigns/campaign-bestiary-book/campaign-bestiary-book').then(
+        (m) => m.CampaignBestiaryBookPage,
+      ),
   },
   {
     path: 'campaigns/:id/play',

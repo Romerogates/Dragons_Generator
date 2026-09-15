@@ -150,27 +150,17 @@
         >
           Forger une légende
         </a>
-        @if (isLoggedIn()) {
-          <a
-            routerLink="/guide"
-            class="flex-1 min-h-13 px-7 py-4 rounded-2xl text-sm font-black uppercase tracking-widest bg-white/5 text-violet-100 border border-violet-400/30 backdrop-blur-sm hover:bg-violet-950/40 hover:border-violet-400/50 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
-          >
-            Guide
-            @if (guideNewsCount() > 0) {
-              <span class="bg-amber-500 text-slate-950 px-2 py-0.5 rounded-full text-[10px] font-black">{{
-                guideNewsCount()
-              }}</span>
-            }
-          </a>
-        } @else {
-          <a
-            routerLink="/login"
-            [queryParams]="{ returnUrl: '/' }"
-            class="flex-1 min-h-13 px-7 py-4 rounded-2xl text-sm font-black uppercase tracking-widest bg-white/5 text-slate-200 border border-slate-500/40 hover:border-amber-500/40 hover:text-amber-100 hover:scale-[1.02] transition-all flex items-center justify-center"
-          >
-            Se connecter
-          </a>
-        }
+        <a
+          routerLink="/guide"
+          class="flex-1 min-h-13 px-7 py-4 rounded-2xl text-sm font-black uppercase tracking-widest bg-white/5 text-violet-100 border border-violet-400/30 backdrop-blur-sm hover:bg-violet-950/40 hover:border-violet-400/50 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+        >
+          Guide
+          @if (isLoggedIn() && guideNewsCount() > 0) {
+            <span class="bg-amber-500 text-slate-950 px-2 py-0.5 rounded-full text-[10px] font-black">{{
+              guideNewsCount()
+            }}</span>
+          }
+        </a>
       </div>
     </div>
 

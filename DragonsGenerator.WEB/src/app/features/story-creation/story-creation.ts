@@ -40,6 +40,10 @@ export class StoryCreation implements OnInit {
     }
   }
 
+  goToStep(step: number): void {
+    this.builder.goToStep(step);
+  }
+
   resumeDraft(): void {
     this.showDraftPrompt.set(false);
   }

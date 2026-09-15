@@ -10,7 +10,6 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { PdfGeneratorService } from '@core/services/pdf-generator.service';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { NotificationService } from '@core/services/notification.service';
@@ -20,30 +19,29 @@ import {
   type CharacterProposalReview,
 } from '@core/services/character-handoff.service';
 import { PdfPagePreview } from '@shared/components/pdf-page-preview/pdf-page-preview';
-import { prefersNativePdfFallback } from '@core/utils/pdf-preview.util';
 import { CharacterPlayView } from './character-play-view';
+import { IllustratedCharacterSheet } from './illustrated-character-sheet';
 
-type SheetViewMode = 'pdf' | 'ui';
+type SheetViewMode = 'illustrated' | 'ui';
 
 const VIEW_MODE_KEY = 'dg_character_sheet_view';
 
 function readStoredViewMode(): SheetViewMode {
   try {
     const v = localStorage.getItem(VIEW_MODE_KEY);
-    if (v === 'ui' || v === 'pdf') return v;
+    if (v === 'ui') return 'ui';
+    // Anciens modes pdf / sheet → fiche illustrée (PDF.js).
+    if (v === 'illustrated' || v === 'pdf' || v === 'sheet') return 'illustrated';
   } catch {
     /* ignore */
   }
-  if (typeof window !== 'undefined' && window.matchMedia('(max-width: 639px)').matches) {
-    return 'ui';
-  }
-  return 'pdf';
+  return 'illustrated';
 }
 
 @Component({
   selector: 'app-character-sheet',
   standalone: true,
-  imports: [CommonModule, RouterLink, CharacterPlayView, PdfPagePreview],
+  imports: [CommonModule, RouterLink, CharacterPlayView, PdfPagePreview, IllustratedCharacterSheet],
   templateUrl: './character-sheet.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -51,7 +49,6 @@ function readStoredViewMode(): SheetViewMode {
 export class CharacterSheet implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly pdfService = inject(PdfGeneratorService);
-  private readonly sanitizer = inject(DomSanitizer);
   private readonly handoff = inject(CharacterHandoffService);
   private readonly campaigns = inject(CampaignCloudService);
   private readonly notifications = inject(NotificationService);
@@ -59,20 +56,19 @@ export class CharacterSheet implements OnInit, OnDestroy {
   readonly character = signal<Character | null>(null);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
-  readonly pdfPreviewUrl = signal<SafeResourceUrl | null>(null);
   readonly pdfRawUrl = signal<string | null>(null);
   readonly pdfFailed = signal(false);
-  readonly pdfJsFailed = signal(false);
-  /** Tablette / mobile : iframe PDF souvent inutilisable. */
-  readonly useNativePdfFallback = prefersNativePdfFallback();
   readonly isConsult = signal(false);
   readonly consultSourceLabel = signal<string | null>(null);
   readonly consultReturnUrl = signal<string | null>(null);
   readonly proposalReview = signal<CharacterProposalReview | null>(null);
   readonly proposalActionBusy = signal(false);
   readonly proposalActionError = signal<string | null>(null);
-  /** Interface affichée : PDF par défaut (fiche Jouer en consultation table). */
+  /** Interface affichée : fiche = même PDF que le téléchargement (PDF.js), par défaut. */
   readonly viewMode = signal<SheetViewMode>(readStoredViewMode());
+  readonly illustratedPage = signal(1);
+  /** true si le rendu PDF.js a échoué en mode Illustrée → overlay JPEG. */
+  readonly illustratedPdfJsFailed = signal(false);
 
   readonly consultBackLabel = computed(() => {
     const url = this.consultReturnUrl();
@@ -114,17 +110,20 @@ export class CharacterSheet implements OnInit, OnDestroy {
       this.consultReturnUrl.set(this.handoff.peekReturnUrl());
       this.proposalReview.set(this.handoff.peekProposalReview());
       if (this.isConsult()) {
-        this.viewMode.set('ui');
+        this.viewMode.set('illustrated');
       }
 
       try {
         const url = await this.pdfService.generatePdfBlob(character);
         this.pdfRawUrl.set(url);
-        this.pdfPreviewUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
       } catch (e) {
         console.error(e);
         this.pdfFailed.set(true);
-        if (this.viewMode() === 'pdf') this.viewMode.set('ui');
+        if (this.viewMode() === 'illustrated') {
+          /* fallback JPEG géré dans le template */
+        } else {
+          this.viewMode.set('ui');
+        }
       }
     } finally {
       this.loading.set(false);
@@ -138,6 +137,10 @@ export class CharacterSheet implements OnInit, OnDestroy {
 
   setViewMode(mode: SheetViewMode): void {
     this.viewMode.set(mode);
+    if (mode === 'illustrated') {
+      this.illustratedPage.set(1);
+      this.illustratedPdfJsFailed.set(false);
+    }
     try {
       localStorage.setItem(VIEW_MODE_KEY, mode);
     } catch {
@@ -146,11 +149,19 @@ export class CharacterSheet implements OnInit, OnDestroy {
   }
 
   toggleViewMode(): void {
-    this.setViewMode(this.viewMode() === 'pdf' ? 'ui' : 'pdf');
+    this.setViewMode(this.viewMode() === 'illustrated' ? 'ui' : 'illustrated');
   }
 
-  onPdfJsFailed(): void {
-    this.pdfJsFailed.set(true);
+  prevIllustratedPage(): void {
+    this.illustratedPage.update((p) => Math.max(1, p - 1));
+  }
+
+  nextIllustratedPage(): void {
+    this.illustratedPage.update((p) => Math.min(4, p + 1));
+  }
+
+  onIllustratedPdfJsFailed(): void {
+    this.illustratedPdfJsFailed.set(true);
   }
 
   getName(): string {
@@ -186,11 +197,6 @@ export class CharacterSheet implements OnInit, OnDestroy {
   downloadPdf(): void {
     const c = this.character();
     if (c) this.pdfService.generatePdf(c);
-  }
-
-  openFullscreen(): void {
-    const url = this.pdfRawUrl();
-    if (url) window.open(url, '_blank');
   }
 
   editCharacter(): void {

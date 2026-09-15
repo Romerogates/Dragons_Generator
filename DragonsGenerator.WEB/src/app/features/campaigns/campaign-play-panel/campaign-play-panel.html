@@ -151,7 +151,7 @@
 
     @if (isDm() && fullscreen()) {
       <nav
-        class="sticky z-20 -mx-1 mb-6 flex flex-wrap gap-1 rounded-xl border border-emerald-900/40 bg-[#141a16]/95 p-1 backdrop-blur-sm top-[calc(4rem+3.25rem+env(safe-area-inset-top,0px))]"
+        class="sticky z-20 -mx-1 mb-6 flex flex-wrap gap-1 rounded-xl border border-emerald-900/40 bg-[#141a16]/95 p-1 backdrop-blur-sm top-[var(--dg-sticky-below-play)]"
         aria-label="Sections de la session"
       >
         @for (tab of sessionTabs; track tab.id) {
@@ -639,7 +639,7 @@
           <div
             class="sticky z-20 space-y-3 rounded-xl border border-amber-800/40 bg-amber-950/90 px-4 py-3 backdrop-blur-sm shadow-lg shadow-black/20"
             [class.top-0]="!fullscreen()"
-            [class.top-[calc(4rem+env(safe-area-inset-top,0px)+2.75rem)]]="fullscreen()"
+            [class.top-[var(--dg-sticky-below-play)]]="fullscreen()"
           >
             <div class="flex flex-wrap items-center justify-between gap-3">
               <p [class]="fullscreen() ? 'text-base sm:text-lg font-serif text-amber-200' : 'font-serif text-amber-200'">

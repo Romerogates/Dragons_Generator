@@ -10,11 +10,12 @@ import { CommonModule } from '@angular/common'; // Ajout par sécurité
 import { RouterLink } from '@angular/router';
 import { DataService } from '@core/services/data.service';
 import { Species } from '@core/models/Species/species';
+import { CodexEmptyState } from '@shared/components/codex-empty-state/codex-empty-state';
 
 @Component({
   selector: 'app-species',
   standalone: true, // Si tu es en standalone components (fortement probable avec Angular 17+)
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, CodexEmptyState],
   templateUrl: './species.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>

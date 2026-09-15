@@ -89,6 +89,7 @@ export class GuideTopicPage implements OnInit {
   });
 
   readonly meId = computed(() => this.auth.user()?.id ?? null);
+  readonly isLoggedIn = computed(() => this.auth.isLoggedIn());
 
   ngOnInit(): void {
     const aud = this.prefs.audience();
@@ -128,13 +129,18 @@ export class GuideTopicPage implements OnInit {
     if (!id) return;
     this.loading.set(true);
     this.error.set(null);
+    if (!this.auth.isLoggedIn()) {
+      this.comments.set([]);
+      this.loading.set(false);
+      return;
+    }
     this.commentsApi.listComments(id).subscribe({
       next: (list) => {
         this.comments.set(list);
         this.loading.set(false);
       },
       error: () => {
-        this.error.set('Impossible de charger les commentaires.');
+        this.comments.set([]);
         this.loading.set(false);
       },
     });

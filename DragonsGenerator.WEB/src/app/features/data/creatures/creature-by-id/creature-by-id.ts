@@ -1,38 +1,33 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  CUSTOM_ELEMENTS_SCHEMA,
   inject,
   signal,
-  CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of, switchMap } from 'rxjs';
 import { DataService } from '@core/services/data.service';
-import { Creature } from '@core/models/Creatures/creature';
-import {
-  ABILITY_LABELS,
-  formatChallengeRating,
-  getCreatureCategoryLabel,
-} from '@core/utils/creature-display.util';
-import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
+import { BookReaderShell } from '@shared/components/book-reader-shell/book-reader-shell';
+import { CreatureBookPage } from '@shared/components/creature-book-page/creature-book-page';
 
 @Component({
   selector: 'app-creature-by-id',
   standalone: true,
-  imports: [RouterLink, CodexDetailShell],
+  imports: [RouterLink, BookReaderShell, CreatureBookPage],
   templateUrl: './creature-by-id.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class CreatureById {
-  private dataService = inject(DataService);
-  private route = inject(ActivatedRoute);
+  private readonly dataService = inject(DataService);
+  private readonly route = inject(ActivatedRoute);
 
-  protected error = signal<string | null>(null);
-  protected notFound = signal(false);
+  protected readonly error = signal<string | null>(null);
+  protected readonly notFound = signal(false);
 
-  protected creature = toSignal(
+  protected readonly creature = toSignal(
     this.route.paramMap.pipe(
       switchMap((params) => {
         const id = params.get('id') ?? '';
@@ -52,12 +47,4 @@ export class CreatureById {
     ),
     { initialValue: undefined },
   );
-
-  protected abilityLabels = ABILITY_LABELS;
-  protected categoryLabel = getCreatureCategoryLabel;
-  protected formatCr = formatChallengeRating;
-
-  protected abilityKeys(creature: Creature): string[] {
-    return ['str', 'dex', 'con', 'int', 'wis', 'cha'].filter((k) => creature.abilities[k]);
-  }
 }

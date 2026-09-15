@@ -83,6 +83,10 @@ import type {
   CampaignSetupAction,
   CampaignSetupGuideInput,
 } from './campaign-setup-guide/campaign-setup-guide.util';
+import type {
+  FirstSessionAction,
+  FirstSessionChecklistInput,
+} from './campaign-first-session-checklist.util';
 import {
   formatSessionDate,
   sessionModeLabel,
@@ -400,6 +404,17 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       hasActiveSession: !!this.activePlaySession(),
       nextSessionTitle: this.nextPlannedSession()?.title ?? null,
       mapsSkipped: this.mapsStepSkipped(),
+    };
+  });
+
+  readonly firstSessionChecklist = computed((): FirstSessionChecklistInput => {
+    const data = this.campaign()?.data;
+    return {
+      hasInviteActivity: this.pendingInvites().length > 0 || this.players().length > 1,
+      approvedPlayerCount: this.approvedPlayersWithCharacter().length,
+      hasPlannedSession: !!(data?.sessions ?? []).some((s) => s.status === 'planned'),
+      hasActiveSession: !!this.activePlaySession(),
+      playedSessionCount: this.playedSessionCount(),
     };
   });
 
@@ -1178,6 +1193,38 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
           }
         }
         break;
+    }
+  }
+
+  onFirstSessionAction(action: FirstSessionAction): void {
+    switch (action) {
+      case 'invite':
+        this.copyCampaignJoinLink();
+        break;
+      case 'openPlayers':
+        this.setTab('players');
+        break;
+      case 'openSessions':
+        this.setTab('sessions');
+        break;
+      case 'addSession':
+        this.setTab('sessions');
+        this.addSession();
+        break;
+      case 'openPrep':
+        this.setTab('prep');
+        break;
+      case 'openPlay': {
+        const live = this.activePlaySession();
+        const next = this.nextPlannedSession();
+        if (live) this.openPlayFullscreen();
+        else if (next) this.startPlaySession(next.id);
+        else {
+          this.setTab('sessions');
+          this.addSession();
+        }
+        break;
+      }
     }
   }
 
@@ -2119,6 +2166,24 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
   creatureTrackKey(cr: StoryCreatureSelection): string {
     return `${cr.creatureId}::${cr.customName || cr.creatureName}`;
+  }
+
+  openCampaignBestiaryBook(index = 0): void {
+    const c = this.campaign();
+    if (!c?.data.creatures.length) return;
+    void this.router.navigate(['/campaigns', c.id, 'bestiary'], {
+      queryParams: { i: index },
+    });
+  }
+
+  openCreatureInBook(cr: StoryCreatureSelection): void {
+    const c = this.campaign();
+    if (!c) return;
+    const index = (c.data.creatures ?? []).findIndex(
+      (entry) =>
+        entry.creatureId === cr.creatureId && entry.customName === cr.customName,
+    );
+    this.openCampaignBestiaryBook(index >= 0 ? index : 0);
   }
 
   updateCreatureRole(cr: StoryCreatureSelection, role: CreatureRole): void {

@@ -1,0 +1,111 @@
+/* Fiche A4 responsive : coords PDF en % du 595×842. */
+.illu-sheet-root {
+  width: 100%;
+  max-width: min(100%, 52rem);
+  margin-inline: auto;
+  container-type: inline-size;
+  container-name: illu-sheet;
+}
+
+.illu-sheet-page {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 595 / 842;
+  background-color: #1a1410;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgb(0 0 0 / 45%);
+}
+
+.illu-field {
+  position: absolute;
+  /* Offset fixe en cqw (pas en em) pour ne pas faire flotter les gros titres */
+  transform: translateY(-2.4cqw);
+  color: #2a1c14;
+  font-family: 'Palatino Linotype', Palatino, 'Book Antiqua', 'Times New Roman', serif;
+  font-size: clamp(0.55rem, 2.6cqw, 0.95rem);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+  white-space: nowrap;
+  max-width: 42%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+.illu-field--title {
+  font-size: clamp(0.7rem, 3.2cqw, 1.15rem);
+  font-weight: 600;
+  max-width: 40%;
+}
+
+.illu-field--class {
+  max-width: 28%;
+  font-size: clamp(0.55rem, 2.4cqw, 0.9rem);
+}
+
+.illu-field--center {
+  transform: translate(-50%, -2.4cqw);
+  text-align: center;
+  max-width: 18%;
+}
+
+.illu-field--score {
+  font-size: clamp(0.65rem, 3cqw, 1.05rem);
+  font-weight: 600;
+  max-width: 10%;
+  text-align: left;
+}
+
+.illu-field--mod {
+  font-size: clamp(0.5rem, 2.2cqw, 0.8rem);
+  font-weight: 400;
+  transform: translate(-50%, -2.4cqw);
+  text-align: center;
+  max-width: 10%;
+}
+
+.illu-field--sm {
+  font-size: clamp(0.5rem, 2.2cqw, 0.78rem);
+  max-width: 14%;
+}
+
+.illu-field--atk {
+  font-size: clamp(0.42rem, 1.9cqw, 0.68rem);
+  max-width: 30%;
+}
+
+/* Pastilles remplies = même chose que drawFilledCircle du PDF */
+.illu-mark {
+  position: absolute;
+  width: 1.55cqw;
+  height: 1.55cqw;
+  min-width: 5px;
+  min-height: 5px;
+  max-width: 9px;
+  max-height: 9px;
+  border-radius: 50%;
+  background: #2c1810;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.illu-page-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 8%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.5rem;
+  background: rgb(23 27 34 / 75%);
+  color: #cbd5e1;
+  font-size: clamp(0.65rem, 2.5cqw, 0.8rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

@@ -12,11 +12,12 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 import { DataService } from '@core/services/data.service';
 import { Deity } from '@core/models/Deities/deity';
+import { CodexEmptyState } from '@shared/components/codex-empty-state/codex-empty-state';
 
 @Component({
   selector: 'app-deities-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, CodexEmptyState],
   templateUrl: './deities-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

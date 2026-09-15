@@ -92,6 +92,14 @@
     </div>
   </header>
 
+  @if (isOwner() && firstSession(); as fs) {
+    <app-campaign-first-session-checklist
+      [state]="fs"
+      [campaignId]="campaignId()"
+      (action)="firstSessionAction.emit($event)"
+    />
+  }
+
   <!-- Sommaire -->
   <div class="space-y-4">
     <div class="max-w-2xl">

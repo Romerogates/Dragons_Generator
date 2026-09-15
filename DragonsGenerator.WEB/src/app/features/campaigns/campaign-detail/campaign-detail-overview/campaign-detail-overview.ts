@@ -14,6 +14,11 @@ import {
 } from '../campaign-detail-roster/campaign-detail-roster';
 import { CampaignDetailActivity } from '../campaign-detail-activity/campaign-detail-activity';
 import { CampaignPlayerSheet } from '../../campaign-player-sheet/campaign-player-sheet';
+import { CampaignFirstSessionChecklist } from '../campaign-first-session-checklist';
+import type {
+  FirstSessionAction,
+  FirstSessionChecklistInput,
+} from '../campaign-first-session-checklist.util';
 
 @Component({
   selector: 'app-campaign-detail-overview',
@@ -23,6 +28,7 @@ import { CampaignPlayerSheet } from '../../campaign-player-sheet/campaign-player
     CampaignDetailRoster,
     CampaignDetailActivity,
     CampaignPlayerSheet,
+    CampaignFirstSessionChecklist,
   ],
   templateUrl: './campaign-detail-overview.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -64,6 +70,9 @@ export class CampaignDetailOverview {
   readonly activityLoading = input(false);
   readonly activity = input<CampaignActivityItem[]>([]);
 
+  /** Checklist première session (MJ). */
+  readonly firstSession = input<FirstSessionChecklistInput | null>(null);
+
   readonly openPlayFullscreen = output<void>();
   readonly startPlaySession = output<string>();
   readonly goSessions = output<void>();
@@ -77,4 +86,5 @@ export class CampaignDetailOverview {
   readonly printMemberFullSheet = output<MemberCharacterAction>();
   readonly activityItemClick = output<CampaignActivityItem>();
   readonly goHandouts = output<void>();
+  readonly firstSessionAction = output<FirstSessionAction>();
 }

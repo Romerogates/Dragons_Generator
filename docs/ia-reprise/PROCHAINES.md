@@ -15,10 +15,13 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
-_(File vide — prochain polish après Fluide 5.)_
+_(File vide — vague audit P0–P2 livrée.)_
 
 ## Déjà livré (ne pas refaire)
 
+- **Audit P2 excellence** (2026-09-15) — sticky CSS vars (`--dg-sticky-top`…) + hub tabs sticky ; forge scénario étapes cliquables ; grimoire Mode Livre ; tour MJ post-checklist → Prépa ; `FONCTIONNALITES` 5 onglets.
+- **Audit P1 Mode Livre** (2026-09-15) — bestiaire Codex + campagne (parchemin / TOC) ; pré-tirés déjà Illustrée.
+- **Audit P0 découvrabilité** (2026-09-15) — Guide public ; nav Forger/Scénario ; checklist 1ère session + Inviter ; empty Codex.
 - **Fluide 5** (2026-09-11) — sticky onglets session / scénario sous navbar ; retours tab=sessions / create pré-tiré ; confirms retirer donjon + refuser ami ; +1 vaincu ; CTA joueur « Voir les sessions ».
 - **fix aperçu PDF** (2026-09-11) — worker PDF.js via Blob MIME JS + nginx `.mjs` ; iframe desktop si PDF.js échoue (mobile : télécharger).
 - **Fluide 4** (2026-09-11) — vousvoiement restes ; sticky Historique/Civilisation + Continuer magie ; retours /play→Sessions et init→table ; confirms Refuser/pré-tiré ; empty Amis/Donjons + CTA ; composer chat agrandi ; pack scénario PDF page-à-page.

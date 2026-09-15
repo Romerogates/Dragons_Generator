@@ -12,6 +12,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 import { DataService } from '@core/services/data.service';
 import { CombatAction } from '@core/models/CombatActions/combat-action';
+import { CodexEmptyState } from '@shared/components/codex-empty-state/codex-empty-state';
 
 const CATEGORY_LABELS: Record<string, string> = {
   standard: 'Standard',
@@ -35,7 +36,7 @@ const COST_ICONS: Record<string, string> = {
 @Component({
   selector: 'app-combat-actions-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, CodexEmptyState],
   templateUrl: './combat-actions-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

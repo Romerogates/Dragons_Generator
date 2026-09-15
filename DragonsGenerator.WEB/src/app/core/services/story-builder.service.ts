@@ -57,6 +57,8 @@ export class StoryBuilderService {
   readonly preservedPregens = signal<CampaignPregen[]>([]);
   readonly preservedSessions = signal<CampaignSession[]>([]);
   readonly preservedHandouts = signal<CampaignHandout[]>([]);
+  readonly stepJumpBlocked = signal<string | null>(null);
+
   readonly preservedDungeonMaps = signal<CampaignDungeonMap[]>([]);
   readonly preservedActiveSessionId = signal<string | null>(null);
   readonly preservedPinnedHandoutId = signal<string | null>(null);
@@ -160,11 +162,26 @@ export class StoryBuilderService {
     }
   }
 
-  goToStep(step: number): void {
-    if (step >= 1 && step <= this.totalSteps()) {
-      this.currentStep.set(step);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+  goToStep(step: number): boolean {
+    const total = this.totalSteps();
+    if (step < 1 || step > total) return false;
+    if (step > this.currentStep()) {
+      for (let s = this.currentStep(); s < step; s++) {
+        if (!this.isStepValid(s)) {
+          const title = this.steps()[s - 1]?.title ?? `étape ${s}`;
+          this.stepJumpBlocked.set(`Complétez d’abord « ${title} » avant d’avancer.`);
+          return false;
+        }
+      }
     }
+    this.stepJumpBlocked.set(null);
+    this.currentStep.set(step);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return true;
+  }
+
+  clearStepJumpBlocked(): void {
+    this.stepJumpBlocked.set(null);
   }
 
   setSelectionMode(mode: CreatureSelectionMode): void {

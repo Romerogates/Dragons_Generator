@@ -90,7 +90,14 @@
           </div>
         </a>
       } @empty {
-        <p class="col-span-full text-center text-slate-500 italic py-16">Aucune classe trouvée.</p>
+        <app-codex-empty-state
+          title="Aucune classe trouvée"
+          message="Aucun résultat pour cette recherche. Essayez un autre terme, ou ouvrez le Guide pour démarrer."
+          ctaLabel="Ouvrir le Guide"
+          ctaRoute="/guide/demarrage"
+          clearFiltersLabel="Effacer la recherche"
+          (clearFilters)="search.set('')"
+        />
       }
     </div>
   </section>

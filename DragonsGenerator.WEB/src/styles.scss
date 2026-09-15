@@ -3,6 +3,18 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --dg-nav-height: 4rem;
+    --dg-banner-height: 0px;
+    --dg-play-header-height: 3.25rem;
+    --dg-wizard-chrome-height: 3.5rem;
+    --dg-sticky-top: calc(
+      var(--dg-nav-height) + var(--dg-banner-height) + env(safe-area-inset-top, 0px)
+    );
+    --dg-sticky-below-play: calc(var(--dg-sticky-top) + var(--dg-play-header-height));
+    --dg-sticky-below-wizard: calc(var(--dg-sticky-top) + var(--dg-wizard-chrome-height));
+  }
+
   html,
   body {
     overflow-x: clip;

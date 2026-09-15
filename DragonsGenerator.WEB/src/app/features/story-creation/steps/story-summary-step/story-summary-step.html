@@ -49,12 +49,9 @@
             Synopsis, créatures et bestiaire — sessions, joueurs et handouts dans la campagne
           </p>
         </div>
-        <div
-          class="relative w-full bg-[#0f1117] border border-slate-800 rounded-2xl overflow-hidden shadow-2xl"
-          style="height: min(70dvh, 52rem); min-height: 24rem"
-        >
+        <div class="relative w-full mx-auto max-w-5xl">
           @if (isLoadingPreview()) {
-            <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[#0f1117]">
+            <div class="flex flex-col items-center justify-center gap-4 py-16">
               <div
                 class="w-10 h-10 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin"
               ></div>
@@ -66,16 +63,17 @@
 
           @if (!isLoadingPreview() && pdfRawUrl(); as url) {
             @if (!pdfJsFailed()) {
-              <app-pdf-page-preview [src]="url" (loadFailed)="onPdfJsFailed()" />
+              <app-pdf-page-preview [src]="url" [bare]="true" (loadFailed)="onPdfJsFailed()" />
             } @else if (pdfPreviewUrl(); as safeUrl) {
               @if (!useNativePdfFallback) {
                 <iframe
                   [src]="safeUrl"
-                  class="absolute inset-0 w-full h-full border-0 bg-slate-900"
+                  class="w-full min-h-[24rem] border-0 bg-slate-900 rounded-2xl"
+                  style="height: min(70dvh, 52rem)"
                   title="Aperçu Pack MJ PDF"
                 ></iframe>
               } @else {
-                <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center bg-[#0f1117]">
+                <div class="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
                   <p class="text-sm text-slate-400">Aperçu PDF indisponible dans le navigateur.</p>
                   <button
                     type="button"
@@ -90,7 +88,7 @@
           }
 
           @if (!isLoadingPreview() && !pdfRawUrl()) {
-            <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0f1117]">
+            <div class="flex flex-col items-center justify-center gap-3 py-16">
               <span class="text-3xl">⚠️</span>
               <p class="text-slate-400 text-xs text-center max-w-xs">
                 L'aperçu n'a pas pu être généré. Vous pouvez quand même télécharger le PDF.

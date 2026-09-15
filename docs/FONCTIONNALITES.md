@@ -15,7 +15,10 @@
 | `/character-sheet` | Fiche personnage + aperçu PDF | Public |
 | `/story/create` | Assistant scénario / aventure (4 étapes) | Public |
 | `/campaigns` | Campagnes MJ et joueur | Connecté |
-| `/campaigns/:id` | Détail campagne (4 onglets) | Membres |
+| `/campaigns/:id` | Hub campagne (5 onglets : Résumé, Sessions, Documents, Préparation, Joueurs) | Membres |
+| `/campaigns/:id/bestiary` | Bestiaire campagne en Mode Livre | Membres |
+| `/campaigns/:id/play` | Table live (session active) | Membres |
+| `/join/:token` | Rejoindre une campagne via lien d’invitation | Public → login |
 | `/friends` | Amis, demandes, invitations campagne | Connecté |
 | `/login`, `/register` | Connexion / inscription | Public |
 | `/confirm-email`, `/reset-password` | Confirmation email, reset MDP | Public (token URL) |
@@ -83,7 +86,10 @@ Brouillon localStorage avec reprise.
 - **MJ** : édition, invitations amis, rencontres, XP, approbation persos joueurs
 - **Joueur** : proposer un personnage cloud ; résumé perso (XP, sessions passées)
 - Handouts carte : image PNG embarquée + légende des salles
-- **4 onglets** : Vue d'ensemble, Créatures, Rencontres, Joueurs
+- **5 onglets** : Résumé (dashboard + checklist première session MJ), Sessions, Documents (handouts / pack MJ), Préparation (scénario, créatures, donjons, pré-tirés, rencontres, carnet — MJ), Joueurs
+- Préparation masquée côté joueur sauf si pré-tirés disponibles
+- Lien d’invitation `/join/{token}` (créer / régénérer / révoquer) ; pré-tirés consultables sans appropriation
+- Mode Livre pour le bestiaire de campagne ; PDF bestiaire / pack MJ / fiches joueurs
 - PDF campagne (bestiaire, pack MJ, fiches joueurs)
 
 ---

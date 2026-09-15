@@ -53,21 +53,46 @@
         {{ builder.steps()[builder.currentStep() - 1]?.title }}
       </p>
     </div>
-    <div class="flex gap-1 overflow-x-auto pb-0.5">
+    <div
+      class="flex gap-1 overflow-x-auto pb-0.5"
+      role="navigation"
+      aria-label="Étapes du scénario"
+    >
       @for (step of builder.steps(); track step.number) {
-        <div
-          class="h-1.5 flex-1 min-w-[1.25rem] rounded-full transition-colors"
-          [class]="
-            step.number < builder.currentStep()
-              ? 'bg-violet-600'
-              : step.number === builder.currentStep()
-                ? 'bg-violet-400'
-                : 'bg-slate-700'
-          "
-          [attr.title]="step.title"
-        ></div>
+        @if (step.number < builder.currentStep()) {
+          <button
+            type="button"
+            class="h-2.5 sm:h-1.5 flex-1 min-w-[1.25rem] rounded-full bg-violet-600 hover:bg-violet-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-violet-400 transition-colors cursor-pointer"
+            [attr.title]="'Revenir à : ' + step.title"
+            [attr.aria-label]="'Revenir à l’étape ' + step.title"
+            (click)="goToStep(step.number)"
+          ></button>
+        } @else if (step.number === builder.currentStep()) {
+          <div
+            class="h-2.5 sm:h-1.5 flex-1 min-w-[1.25rem] rounded-full bg-violet-400"
+            [attr.title]="step.title"
+            [attr.aria-current]="'step'"
+            [attr.aria-label]="'Étape en cours : ' + step.title"
+          ></div>
+        } @else {
+          <div
+            class="h-2.5 sm:h-1.5 flex-1 min-w-[1.25rem] rounded-full bg-slate-700"
+            [attr.title]="step.title"
+            [attr.aria-label]="'Étape à venir : ' + step.title"
+          ></div>
+        }
       }
     </div>
+    @if (builder.currentStep() > 1) {
+      <p class="mt-1.5 text-[9px] text-slate-600 text-center sm:text-left">
+        Appuyez sur une étape validée (violet) pour y revenir.
+      </p>
+    }
+    @if (builder.stepJumpBlocked(); as blocked) {
+      <p class="mt-1.5 text-[10px] text-violet-300/90 text-center sm:text-left" role="status">
+        {{ blocked }}
+      </p>
+    }
   </div>
 
   <div class="w-full flex-1 flex flex-col min-h-0">
