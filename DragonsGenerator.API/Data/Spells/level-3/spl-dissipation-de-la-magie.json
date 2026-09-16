@@ -35,7 +35,7 @@
     "cls-pretre",
     "cls-sorcier"
   ],
-  "description": "C Choisissez une créature, un objet ou un effet magique à portée. Tout sort du 3e niveau ou inférieur affectant la cible prend fin. Pour chaque sort du 4e niveau ou supérieur affectant la cible, effectuez un test de caractéristique magique. Le DD est égal à 10 + le niveau du sort. En cas de réussite, le sort prend fin.",
+  "description": "Choisissez une créature, un objet ou un effet magique à portée. Tout sort du 3e niveau ou inférieur affectant la cible prend fin. Pour chaque sort du 4e niveau ou supérieur affectant la cible, effectuez un test de caractéristique magique. Le DD est égal à 10 + le niveau du sort. En cas de réussite, le sort prend fin.",
   "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, vous mettez automatiquement fin aux effets d'un sort affectant la cible s'il est d'un niveau inférieur ou égal au niveau de l'emplacement de sort que vous avez utilisé.",
   "modular_options": []
 }

@@ -30,7 +30,7 @@
     "cls-magicien",
     "cls-sorcier"
   ],
-  "description": "Logo and icons Votre main se couvre d'une ombre et vous permet désormais de dérober l'énergie vitale de vos ennemis pour refermer vos blessures. Effectuez une attaque de sort de corps à corps contre une créature située à portée d'allonge. En cas de réussite, la cible subit 3d6 dégâts nécrotiques, et vous récupérez un nombre de points de vie égal à la moitié des dégâts nécrotiques infligés. Tant que le sort persiste, vous pouvez répéter l'attaque à chacun de vos tours de jeu au prix d'une action.",
+  "description": "Votre main se couvre d'une ombre et vous permet désormais de dérober l'énergie vitale de vos ennemis pour refermer vos blessures. Effectuez une attaque de sort de corps à corps contre une créature située à portée d'allonge. En cas de réussite, la cible subit 3d6 dégâts nécrotiques, et vous récupérez un nombre de points de vie égal à la moitié des dégâts nécrotiques infligés. Tant que le sort persiste, vous pouvez répéter l'attaque à chacun de vos tours de jeu au prix d'une action.",
   "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, les dégâts augmentent de 1d6 par niveau d'emplacement au-dessus du 3e.",
   "modular_options": []
 }

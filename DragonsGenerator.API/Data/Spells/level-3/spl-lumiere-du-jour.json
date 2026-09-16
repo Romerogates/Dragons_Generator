@@ -33,7 +33,7 @@
     "cls-pretre",
     "cls-rodeur"
   ],
-  "description": "Logo de sort Une sphère de lumière de 18 m de rayon apparaît autour du point à portée que vous avez choisi. Cette sphère produit une lumière vive dans son rayon et une lumière faible sur 18 m de plus. Si le point que vous avez choisi est sur un objet que vous tenez ou qui n'est ni porté ni transporté, la lumière s'en dégage et se déplace avec lui. Si la source de lumière est recouverte par un objet opaque, comme un bol ou un casque, les effets sont bloqués. Si une partie de la zone de ce sort chevauche une zone de ténèbres créée par un sort du 3e niveau ou inférieur, celui-ci est dissipé.",
+  "description": "Une sphère de lumière de 18 m de rayon apparaît autour du point à portée que vous avez choisi. Cette sphère produit une lumière vive dans son rayon et une lumière faible sur 18 m de plus. Si le point que vous avez choisi est sur un objet que vous tenez ou qui n'est ni porté ni transporté, la lumière s'en dégage et se déplace avec lui. Si la source de lumière est recouverte par un objet opaque, comme un bol ou un casque, les effets sont bloqués. Si une partie de la zone de ce sort chevauche une zone de ténèbres créée par un sort du 3e niveau ou inférieur, celui-ci est dissipé.",
   "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, il dissipe les ténèbres créées par un sort d'un niveau égal ou inférieur à celui de l'emplacement utilisé. Par ailleurs, la durée augmente de 1 heure par niveau d'emplacement de sort au-dessus du 3e.",
   "modular_options": []
 }

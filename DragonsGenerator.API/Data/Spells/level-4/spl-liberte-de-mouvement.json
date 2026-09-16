@@ -32,7 +32,7 @@
     "cls-pretre",
     "cls-rodeur"
   ],
-  "description": "Logo de sort V ous touchez une créature consentante. Pour toute la durée du sort, les déplacements de la cible ne sont pas affectés par les terrains difficiles, tandis que les sorts et autres effets magiques ne peuvent pas la paralyser ou l'entraver ni réduire sa vitesse de déplacement. La cible peut aussi dépenser 1,50 m de déplacement pour s'extraire automatiquement d'entraves non magiques, comme des menottes ou l'étreinte d'une créature qui l'a agrippée. Enfin, la cible attaque et se déplace normalement sous l'eau.",
+  "description": "Vous touchez une créature consentante. Pour toute la durée du sort, les déplacements de la cible ne sont pas affectés par les terrains difficiles, tandis que les sorts et autres effets magiques ne peuvent pas la paralyser ou l'entraver ni réduire sa vitesse de déplacement. La cible peut aussi dépenser 1,50 m de déplacement pour s'extraire automatiquement d'entraves non magiques, comme des menottes ou l'étreinte d'une créature qui l'a agrippée. Enfin, la cible attaque et se déplace normalement sous l'eau.",
   "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, vous pouvez affecter une créature supplémentaire par niveau d'emplacement au-dessus du 4e.",
   "modular_options": []
 }

@@ -30,6 +30,6 @@
     "cls-paladin",
     "cls-pretre"
   ],
-  "description": "Logo and Vous rendez la vie à une créature morte au cours de la dernière minute. Elle est ressuscitée avec 1 point de vie. Si elle avait 6 niveaux de fatigue ou plus, elle revient à la vie avec 5 niveaux de fatigue. Ce sort ne permet pas de ressusciter une créature morte de vieillesse et ne fait pas repousser les parties du corps.",
+  "description": "Vous rendez la vie à une créature morte au cours de la dernière minute. Elle est ressuscitée avec 1 point de vie. Si elle avait 6 niveaux de fatigue ou plus, elle revient à la vie avec 5 niveaux de fatigue. Ce sort ne permet pas de ressusciter une créature morte de vieillesse et ne fait pas repousser les parties du corps.",
   "modular_options": []
 }

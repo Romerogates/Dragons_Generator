@@ -713,10 +713,20 @@
               type="button"
               class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-amber-600 text-white disabled:opacity-40"
               [disabled]="!canContinueToInitiative()"
+              [attr.title]="
+                canContinueToInitiative()
+                  ? null
+                  : 'Ajoutez au moins un allié et un adversaire'
+              "
               (click)="continueToInitiativePhase()"
             >
               Continuer → Initiative
             </button>
+            @if (!canContinueToInitiative()) {
+              <p class="text-xs text-amber-200/80">
+                Bouton gris : il manque encore un allié ou un adversaire.
+              </p>
+            }
           </div>
         }
 
@@ -730,10 +740,18 @@
               type="button"
               class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-sky-600 text-white disabled:opacity-40"
               [disabled]="!canEnterFight()"
+              [attr.title]="
+                canEnterFight() ? null : 'Tous les combattants actifs doivent avoir une initiative'
+              "
               (click)="openFightPhase()"
             >
               Ouvrir le combat
             </button>
+            @if (!canEnterFight()) {
+              <p class="text-xs text-sky-200/80">
+                Encore des jets manquants — ouverts pour les PJ, ou encodez côté MJ.
+              </p>
+            }
           </div>
         }
 

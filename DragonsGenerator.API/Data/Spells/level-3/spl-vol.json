@@ -10,19 +10,19 @@
     "unit": "action"
   },
   "range": {
-    "type": "personnelle",
+    "type": "contact",
     "distance_m": null,
     "area": null
   },
   "duration": {
-    "type": "instantane",
-    "value": null,
-    "unit": null
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
   },
   "components": {
-    "v": false,
-    "s": false,
-    "m": null
+    "v": true,
+    "s": true,
+    "m": "une plume d'oiseau"
   },
   "is_ritual": false,
   "is_concentration": true,
@@ -32,7 +32,7 @@
     "cls-magicien",
     "cls-sorcier"
   ],
-  "description": "",
-  "higher_levels": null,
+  "description": "Vous touchez une créature consentante. La cible gagne une VD en vol de 18 m pour toute la durée du sort. Quand le sort prend fin, la cible tombe si elle était encore en l’air, à moins qu’elle ne puisse empêcher sa chute.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d’emplacement au-dessus du 3e.",
   "modular_options": []
 }

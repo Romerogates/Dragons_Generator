@@ -2,7 +2,7 @@ import type { Spell } from '@core/models/Spells/spell';
 
 export const SPELL_SCHOOL_LABELS: Record<string, string> = {
   abjuration: 'Abjuration',
-  conjuration: 'Conjuration',
+  conjuration: 'Invocation',
   invocation: 'Invocation',
   divination: 'Divination',
   enchantement: 'Enchantement',

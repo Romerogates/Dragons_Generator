@@ -2,7 +2,7 @@
   "schema_version": "2.0",
   "guid": null,
   "id": "spl-etat-gazeux",
-  "name": "Etat gazeux",
+  "name": "État gazeux",
   "level": 3,
   "school": "transmutation",
   "casting_time": {
@@ -10,19 +10,19 @@
     "unit": "action"
   },
   "range": {
-    "type": "personnelle",
+    "type": "contact",
     "distance_m": null,
     "area": null
   },
   "duration": {
-    "type": "instantane",
-    "value": null,
-    "unit": null
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
   },
   "components": {
-    "v": false,
-    "s": false,
-    "m": null
+    "v": true,
+    "s": true,
+    "m": "un peu de gaze et une volute de fumée"
   },
   "is_ritual": false,
   "is_concentration": true,
@@ -32,7 +32,7 @@
     "cls-magicien",
     "cls-sorcier"
   ],
-  "description": "",
-  "higher_levels": null,
+  "description": "Vous transformez une créature consentante que vous touchez – ainsi que tout ce qu’elle porte et transporte – en nuage de brume pour toute la durée du sort. Le sort prend fin si la créature tombe à 0 point de vie. Une créature intangible n’est pas affectée.\n\nSous cette forme, la créature a une vitesse de déplacement en vol de 3 m (il s’agit de son seul mode de déplacement). La cible peut entrer dans l’espace d’une autre créature et l’occuper. Elle bénéficie d’une résistance aux dégâts non magiques et d’un avantage aux jets de sauvegarde de Force, de Dextérité et de Constitution. Elle peut se glisser dans un petit trou, une porte entrebâillée ou une simple fissure. En revanche, les liquides constituent des surfaces solides en ce qui la concerne. La cible ne peut pas chuter et reste comme suspendue dans les airs quand elle est étourdie ou neutralisée.\n\nSous forme de brume, la cible ne peut ni parler ni manipuler d’objets. Les objets qu’elle transportait ou tenait ne peuvent pas être lâchés ou utilisés, il est tout bonnement impossible d’interagir avec eux. Enfin, la cible ne peut ni attaquer ni lancer de sorts.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d’emplacement au-dessus du 3e.",
   "modular_options": []
 }

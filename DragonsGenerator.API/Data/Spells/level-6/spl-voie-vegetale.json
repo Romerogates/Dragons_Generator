@@ -9,27 +9,27 @@
     "unit": "action"
   },
   "range": {
-    "type": "contact",
-    "distance_m": null,
+    "type": "normal",
+    "distance_m": 3,
     "area": null
   },
   "duration": {
-    "type": "concentration",
-    "value": 10,
-    "unit": "minute"
+    "type": "normal",
+    "value": 1,
+    "unit": "round"
   },
   "components": {
     "v": true,
     "s": true,
-    "m": "une plume d'oiseau"
+    "m": null
   },
   "is_ritual": false,
-  "is_concentration": true,
+  "is_concentration": false,
   "is_corrupted": false,
   "classes": [
     "cls-druide"
   ],
-  "description": "Ce sort crée un lien magique entre une plante inanimée de taille G ou supérieure située à portée et une autre plante, qui peut se trouver à n'importe quelle distance mais obligatoirement sur le même plan d'existence. Vous devez avoir vu ou touché la plante de destination au moins une fois. Pour toute la durée, n'importe quelle créature peut entrer dans la plante ciblée et ressortir par l'autre au prix de 1,50 m de déplacement. D Vous touchez une créature consentante. La cible gagne une VD en vol de 18 m pour toute la durée du sort. Quand le sort prend fin, la cible tombe si elle était encore en l'air, à moins qu'elle ne puisse empêcher sa chute.",
-  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 3e.",
+  "description": "Ce sort crée un lien magique entre une plante inanimée de taille G ou supérieure située à portée et une autre plante, qui peut se trouver à n’importe quelle distance mais obligatoirement sur le même plan d’existence. Vous devez avoir vu ou touché la plante de destination au moins une fois. Pour toute la durée, n’importe quelle créature peut entrer dans la plante ciblée et ressortir par l’autre au prix de 1,50 m de déplacement.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau ou supérieur, vous pouvez augmenter la durée de 1 round par niveau d’emplacement au-dessus du 6e.",
   "modular_options": []
 }

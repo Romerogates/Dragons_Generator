@@ -32,7 +32,7 @@
     "cls-magicien",
     "cls-rodeur"
   ],
-  "description": "stamp La chair d'une créature consentante que vous touchez devient aussi robuste que la pierre. Tant que le sort persiste, la cible bénéficie d'une résistance aux dégâts contondants, perforants et tranchants non magiques.",
+  "description": "La chair d'une créature consentante que vous touchez devient aussi robuste que la pierre. Tant que le sort persiste, la cible bénéficie d'une résistance aux dégâts contondants, perforants et tranchants non magiques.",
   "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, la durée augmente de 1 heure par niveau d'emplacement au-dessus du 4e.",
   "modular_options": []
 }

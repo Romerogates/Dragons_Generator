@@ -19,15 +19,30 @@ export function normalizeSpellDescription(description: string): string {
   text = text.replace(/Anthony Martin Romero\s*\(Order\s*#\d+\)/gi, ' ');
   text = text.replace(/<page_number>.*?<\/page_number>/gi, ' ');
 
+  // Préfixes OCR restants (logo / stamp / lettre ornée / and icons).
+  text = text.replace(
+    /^(Logo( de sort)?|Logo,\s*icon,\s*and(\s*stamp)?|stamp|Lettre ornée D|and(\s+icons?)?|icons?)\s+/i,
+    '',
+  );
+  text = text.replace(/\bLogo de sort\b/gi, ' ');
+  text = text.replace(/\bLogo,\s*icon,\s*and(\s*stamp)?\b/gi, ' ');
+  text = text.replace(/\band\s+icons?\b/gi, ' ');
+  text = text.replace(/\bstamp\b/gi, ' ');
+  text = text.replace(/\bLettre ornée D\b/gi, ' ');
+
   // Titres markdown collés au milieu d’un paragraphe.
   text = text.replace(/\s*##\s+/g, '\n\n## ');
   text = text.replace(/\s*###\s+/g, '\n\n### ');
 
   text = text.replace(/\.\s+D Jous\b/g, '. Vous');
   text = text.replace(/\bD Jous\b/g, 'Vous');
+  text = text.replace(/\bV ous\b/g, 'Vous');
+  text = text.replace(/\bD ous\b/g, 'Vous');
+  text = text.replace(/\bJouhait\b/g, 'Souhait');
   if (text.startsWith('ous ')) text = `V${text}`;
   if (/^D\s+Du\b/.test(text)) text = text.replace(/^D\s+/, '');
   if (/^D\s+Vous\b/.test(text)) text = text.replace(/^D\s+/, '');
+  if (/^C\s+Choisissez\b/.test(text)) text = text.replace(/^C\s+/, '');
 
   text = text.replace(/[ \t]{2,}/g, ' ');
   text = text.replace(/ *\n */g, '\n');

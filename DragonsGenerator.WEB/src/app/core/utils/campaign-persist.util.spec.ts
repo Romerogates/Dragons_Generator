@@ -375,6 +375,34 @@ describe('mergeRemoteLiveTable', () => {
     ).toBe(true);
   });
 
+  it('keeps local HP when remote omits currentHp/maxHp', () => {
+    const local = baseCampaign();
+    local.data.sessions![0].activeCombat!.combatants = [
+      {
+        id: 'c1',
+        name: 'Gobelin',
+        kind: 'monster',
+        initiativeBonus: 2,
+        currentHp: 7,
+        maxHp: 7,
+      },
+    ];
+    const remote = baseCampaign();
+    remote.updatedAt = '2026-01-12T00:00:00Z';
+    remote.data.sessions![0].activeCombat!.combatants = [
+      {
+        id: 'c1',
+        name: 'Gobelin',
+        kind: 'monster',
+        initiativeBonus: 2,
+        // omit HP — softReload stale payload must not wipe local values
+      },
+    ];
+    const merged = mergeRemoteLiveTable(local, remote);
+    expect(merged.data.sessions![0].activeCombat!.combatants[0].currentHp).toBe(7);
+    expect(merged.data.sessions![0].activeCombat!.combatants[0].maxHp).toBe(7);
+  });
+
   it('skips unrelated sessions and prefers remote empty combatLog', () => {
     const local = baseCampaign({
       sessions: [

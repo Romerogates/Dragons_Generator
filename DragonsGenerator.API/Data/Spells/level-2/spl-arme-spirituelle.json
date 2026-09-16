@@ -7,30 +7,30 @@
   "school": "evocation",
   "casting_time": {
     "value": 1,
-    "unit": "action"
+    "unit": "bonus_action"
   },
   "range": {
-    "type": "personnelle",
-    "distance_m": null,
+    "type": "normal",
+    "distance_m": 18,
     "area": null
   },
   "duration": {
-    "type": "instantane",
-    "value": null,
-    "unit": null
+    "type": "normal",
+    "value": 1,
+    "unit": "minute"
   },
   "components": {
-    "v": false,
-    "s": false,
+    "v": true,
+    "s": true,
     "m": null
   },
   "is_ritual": false,
-  "is_concentration": true,
+  "is_concentration": false,
   "is_corrupted": false,
   "classes": [
     "cls-pretre"
   ],
-  "description": "",
-  "higher_levels": null,
+  "description": "Une arme spectrale flottante apparaît à portée et persiste pour toute la durée du sort ou jusqu’à ce que vous relanciez ce sort. Au moment de l’incantation, vous pouvez effectuer une attaque de sort de corps à corps contre une créature située dans un rayon de 1,50 m de l’arme. En cas de réussite, la cible subit des dégâts de force égaux à 1d8 + votre modificateur de caractéristique magique.\n\nAu prix d’une action bonus à votre tour de jeu, vous pouvez déplacer l’arme jusqu’à 6 m et répéter l’attaque contre une créature située dans un rayon de 1,50 m de celle-ci.\n\nL’arme prend la forme de votre choix.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, les dégâts augmentent de 1d8 tous les deux niveaux d’emplacement au-dessus du 2e.",
   "modular_options": []
 }

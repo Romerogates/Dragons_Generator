@@ -93,10 +93,10 @@ export function mergeRemoteLiveTable(
       if (!rc) return lc;
       return {
         ...lc,
-        currentHp: rc.currentHp,
-        maxHp: rc.maxHp,
-        conditions: rc.conditions,
-        defeated: rc.defeated,
+        currentHp: rc.currentHp ?? lc.currentHp,
+        maxHp: rc.maxHp ?? lc.maxHp,
+        conditions: rc.conditions ?? lc.conditions,
+        defeated: rc.defeated ?? lc.defeated,
         initiativeRoll: rc.initiativeRoll ?? lc.initiativeRoll,
         playerSubmitted: rc.playerSubmitted || lc.playerSubmitted,
         armorClass: rc.armorClass ?? lc.armorClass,

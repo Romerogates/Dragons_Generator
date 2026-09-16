@@ -4,25 +4,25 @@
   "id": "spl-aide",
   "name": "Aide",
   "level": 2,
-  "school": "enchantement",
+  "school": "abjuration",
   "casting_time": {
     "value": 1,
     "unit": "action"
   },
   "range": {
-    "type": "personnelle",
-    "distance_m": null,
+    "type": "normal",
+    "distance_m": 9,
     "area": null
   },
   "duration": {
-    "type": "instantane",
-    "value": null,
-    "unit": null
+    "type": "normal",
+    "value": 8,
+    "unit": "heure"
   },
   "components": {
-    "v": false,
-    "s": false,
-    "m": null
+    "v": true,
+    "s": true,
+    "m": "une minuscule bande de tissu blanc"
   },
   "is_ritual": false,
   "is_concentration": false,
@@ -31,7 +31,7 @@
     "cls-paladin",
     "cls-pretre"
   ],
-  "description": "",
-  "higher_levels": null,
+  "description": "Votre sort galvanise vos alliés en leur conférant une robustesse et une détermination accrues. Choisissez jusqu’à trois créatures situées à portée. Leurs points de vie maximums et leurs points de vie actuels augmentent de 5 pour toute la durée du sort.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, les cibles gagnent 5 points de vie supplémentaires par niveau d’emplacement au-dessus du 2e.",
   "modular_options": []
 }

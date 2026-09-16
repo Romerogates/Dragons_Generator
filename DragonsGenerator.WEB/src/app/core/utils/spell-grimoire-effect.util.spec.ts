@@ -61,6 +61,16 @@ describe('spell-grimoire-effect.util', () => {
     );
   });
 
+  it('normalizeSpellDescription strips Logo / stamp / and icons / V ous', () => {
+    expect(normalizeSpellDescription('Logo de sort Vous lancez.')).toBe('Vous lancez.');
+    expect(normalizeSpellDescription('and icons Votre main se couvre.')).toBe(
+      'Votre main se couvre.',
+    );
+    expect(normalizeSpellDescription('V ous invoquez des esprits.')).toBe(
+      'Vous invoquez des esprits.',
+    );
+  });
+
   it('buildGrimoireEffectSummary uses Instantanée and first sentence', () => {
     const summary = buildGrimoireEffectSummary(mockSpell());
     expect(summary).toContain('V,S');

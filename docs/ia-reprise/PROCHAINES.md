@@ -15,6 +15,12 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
+### Table + Codex
+1. ~~Fiabilité table (persist / softReload / hints setup)~~ **fait**
+2. ~~Codex sorts (OCR + sorts critiques restaurés)~~ **fait** (reste fiches vides secondaires)
+3. Première session MJ en 15 min — parcours guidé
+4. Mobile `/play` polish soirée
+
 ### Guide (suite)
 1. ~~Découvrabilité + sans checklists~~ **fait**
 2. ~~One-shot 1 feuille + schéma initiative + libellés fiche~~ **fait**
@@ -23,6 +29,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## Déjà livré (ne pas refaire)
 
+- **Fiabilité table + Codex sorts** (2026-09-16) — persist MJ ne réécrit plus `data` stale ; softReload skip pendant `saving` ; merge HP `??` ; adds alliés/adversaires `immediate` ; hints bouton setup/init ; OCR Logo/stamp/and icons ; restauration Vol/Aide/Arme spirituelle/Vision aveugle/Voie végétale/Esprits gardiens/État gazeux/Esprit impénétrable ; libellé Classes + conjuration→Invocation.
 - **Guide oneshot + schéma + alignement fiche + polish campagne** (2026-09-16) — livret `/guide/oneshot` ; schéma initiative ; libellés Pv / Bonus de maîtrise / etc. ; empty states + setup-guide + compteur notifs aligné navbar.
 - **Guide découvrabilité + sans checklists** (2026-09-16) — bandeau home, empty campagnes, CTA post-approbation ; topic Checklists retiré.
 - **Guide contenu IRL + classe** (2026-09-16) — fiche annotée, glossaire, DD Eana, pièges classe, Pack débutant PDF, liens Codex. Voir `GUIDE-REPRISE.md`.

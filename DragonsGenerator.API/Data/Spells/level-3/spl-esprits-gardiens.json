@@ -15,14 +15,14 @@
     "area": null
   },
   "duration": {
-    "type": "instantane",
-    "value": null,
-    "unit": null
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
   },
   "components": {
-    "v": false,
-    "s": false,
-    "m": null
+    "v": true,
+    "s": true,
+    "m": "un symbole sacré"
   },
   "is_ritual": false,
   "is_concentration": true,
@@ -30,7 +30,7 @@
   "classes": [
     "cls-pretre"
   ],
-  "description": "",
-  "higher_levels": null,
+  "description": "Vous appelez des esprits protecteurs qui volettent à une distance de 4,50 m de vous pour toute la durée du sort. Si vous êtes bon ou neutre, les formes spectrales ont une apparence angélique ou féerique (à votre convenance). Si vous êtes mauvais, ils évoquent des fiélons.\n\nAu moment de l’incantation, vous pouvez désigner autant de créatures que vous voyez que vous le souhaitez et qui ne seront pas affectées. La VD d’une créature affectée est réduite de moitié dans la zone, et quand elle y entre pour la première fois d’un tour de jeu ou y commence son tour de jeu, elle doit effectuer un JS Sagesse et subit 3d8 dégâts radiants (si vous êtes bon ou neutre) ou 3d8 dégâts nécrotiques (si vous êtes mauvais) en cas d’échec, la moitié en cas de réussite.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, les dégâts augmentent de 1d8 par niveau d’emplacement au-dessus du 3e.",
   "modular_options": []
 }

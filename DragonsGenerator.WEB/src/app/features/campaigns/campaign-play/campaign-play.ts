@@ -8,6 +8,7 @@ import {
   OnInit,
   signal,
   untracked,
+  viewChild,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -36,6 +37,7 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
   private readonly live = inject(CampaignLiveService);
   private readonly auth = inject(AuthService);
   private readonly sessionDock = inject(CampaignSessionDockService);
+  private readonly playPanel = viewChild(CampaignPlayPanel);
 
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
@@ -144,6 +146,8 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
   private softReload(): void {
     const c = this.campaign();
     if (!c) return;
+    // Pendant une sauvegarde MJ, ne pas fusionner un GET qui pourrait être stale.
+    if (c.isOwner && this.playPanel()?.saving()) return;
     this.campaigns.get(c.id).subscribe({
       next: (updated) => {
         // Toujours reprendre l’état local le plus récent (évite d’écraser un xpAwarded
@@ -151,6 +155,7 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
         const latest = this.campaign();
         if (!latest) return;
         if (latest.isOwner) {
+          if (this.playPanel()?.saving()) return;
           const merged = mergeRemoteLiveTable(latest, updated);
           this.campaign.set(merged);
           this.sessionDock.patchLiveCampaign(merged);

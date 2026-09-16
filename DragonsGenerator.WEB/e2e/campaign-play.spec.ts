@@ -29,7 +29,9 @@ test.describe('Mode table MJ', () => {
     await page.getByRole('button', { name: '+ Adversaire', exact: true }).click();
     await page.getByRole('button', { name: 'Adversaire vierge' }).click();
 
-    await page.getByRole('button', { name: 'Continuer → Initiative' }).click();
+    const continueBtn = page.getByRole('button', { name: 'Continuer → Initiative' });
+    await expect(continueBtn).toBeEnabled({ timeout: 15_000 });
+    await continueBtn.click();
     await expect(page.getByText(/Collecte ouverte/i)).toBeVisible({ timeout: 15_000 });
 
     await page.getByRole('button', { name: 'Fin combat' }).first().click();

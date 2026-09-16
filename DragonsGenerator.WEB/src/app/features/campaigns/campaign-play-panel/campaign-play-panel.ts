@@ -1183,10 +1183,13 @@ export class CampaignPlayPanel implements OnDestroy {
   private appendCombatants(combatants: Combatant[], feedbackName?: string): void {
     const current = this.activeCombat();
     if (current) {
-      this.patchCombat({
-        ...current,
-        combatants: [...current.combatants, ...combatants],
-      });
+      this.patchCombat(
+        {
+          ...current,
+          combatants: [...current.combatants, ...combatants],
+        },
+        { immediate: true },
+      );
     } else {
       this.setActiveCombat(createActiveCombat(combatants, { label: 'Combat' }));
     }
@@ -1390,7 +1393,7 @@ export class CampaignPlayPanel implements OnDestroy {
         ...combat.combatants,
         createCombatant({ name: 'Allié', kind: 'npc', armorClass: 10, initiativeBonus: 0 }),
       ],
-    });
+    }, { immediate: true });
   }
 
   /** Adversaire avec CA 10 (règles) — randomisable via le dé à côté du champ. */
@@ -1424,7 +1427,7 @@ export class CampaignPlayPanel implements OnDestroy {
         ...combat.combatants,
         createCombatant({ name: 'Adversaire', kind: 'monster', armorClass: 10, initiativeBonus: 0 }),
       ],
-    });
+    }, { immediate: true });
   }
 
   /** Randomise la CA autour de la base règles (10 + 0–8). */
@@ -2188,10 +2191,11 @@ export class CampaignPlayPanel implements OnDestroy {
           const summary = await firstValueFrom(this.campaigns.update(campaignId, title, data));
           // Ne pas réappliquer un persist périmé (une sauvegarde plus récente est déjà en cours / faite).
           if (seq !== this.persistSeq) return;
+          // Ne jamais réécrire `data` depuis le payload en vol : le MJ local est source de vérité
+          // (évite qu’un PUT « combat vide » écrase alliés/adversaires ajoutés entre-temps).
           const current = this.campaign();
           this.campaignChange.emit({
             ...current,
-            data,
             updatedAt: summary.updatedAt,
           });
           this.saving.set(false);
