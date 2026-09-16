@@ -15,8 +15,6 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
-## À faire (priorité)
-
 ### Table + Codex
 1. ~~Fiabilité table (persist / softReload / hints setup)~~ **fait**
 2. ~~Codex sorts (OCR + sorts critiques + batch vides)~~ **fait** (reste options modulaires / OCR fragmentés)
