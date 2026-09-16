@@ -47,10 +47,10 @@
   "actions": [
     {
       "name": "Sabots",
-      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 11 (2d6 + 4) dégâts contondants.\n172"
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 11 (2d6 + 4) dégâts contondants."
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": ""
+  "description": "Mort-vivant, le squelette n’existe généralement que grâce à la magie : on y insufflant une âme errante arrachée au Plan Éthéré. Obéissant mais obtus, un squelette de destrier conserve la vitesse et la puissance de charge de sa monture d’origine, sans en garder l’intelligence — idéal pour les nécromanciens en quête de cavalerie macabre."
 }

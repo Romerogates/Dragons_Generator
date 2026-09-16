@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-piton",
+  "name": "Piton",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 5,
+    "unit": "pc"
+  },
+  "weight_kg": 0.125,
+  "description": "Pointe métallique à planter dans la roche ou le bois pour l'escalade ou l'ancrage."
+}

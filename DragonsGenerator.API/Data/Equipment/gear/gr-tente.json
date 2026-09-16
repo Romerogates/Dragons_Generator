@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-tente",
+  "name": "Tente (deux places)",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 2,
+    "unit": "po"
+  },
+  "weight_kg": 10,
+  "description": "Tente simple pour deux personnes."
+}

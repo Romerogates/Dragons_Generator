@@ -3,8 +3,8 @@
   "schema_version": "3.0",
   "name": "Roublard",
   "flavor": {
-    "summary": "",
-    "lore_note": null
+    "summary": "Expert de la discrétion, de la ruse et de l'attaque sournoise. Cambrioleur, espion, assassin ou arnaqueur, le roublard frappe là où ça fait mal et disparaît avant qu'on le voie.",
+    "lore_note": "Sur Eana, les guildes de voleurs tirent souvent fortune de la contrebande. L'honneur d'un voleur se mesure aux butins, à l'échappée face à la justice et au peu de sang versé — les assassins, eux, restent souvent solitaires."
   },
   "hit_die": "1d8",
   "hp_at_level_1": 8,

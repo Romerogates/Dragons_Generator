@@ -57,21 +57,9 @@
     {
       "name": "Coup de boutoir",
       "description": "Attaque d'arme de corps à corps : +2 pour toucher, allonge 1,50 m, une cible. Réussite : 3 (1d6) dégâts contondants."
-    },
-    {
-      "name": "278",
-      "description": ""
-    },
-    {
-      "name": "Saïga",
-      "description": ""
-    },
-    {
-      "name": "Hippotrague puce",
-      "description": ""
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": "Sceau de grégaire"
+  "description": "Les bêtes grégaires de taille moyenne ont des silhouettes fuselées et doivent souvent leur survie à la course ; certaines distancent promptement loups ou arslanikhs. Ce profil couvre biches et antilopes de la steppe — saïga au museau trompeur, hippotrague puce à la robe rouge-brun, cervicapre aux cornes torsadées."
 }

@@ -61,13 +61,9 @@
     {
       "name": "Souffle tonnant (recharge 6)",
       "description": "Le méphite crache un cône orageux de 4,50 m. Chaque créature prise dans cette zone d'effet doit réussir un JS Dextérité DD 10 sous peine d'être **assourdie** pendant 1 minute. En cas de marge d'échec de 5 ou plus, la créature est également **étourdie** pour la même durée. Une créature **assourdie** (et éventuellement **étourdie**) peut réitérer le jet de sauvegarde à la fin de chacun de ses tours de jeu et met un terme aux effets sur elle-même en cas de réussite."
-    },
-    {
-      "name": "305",
-      "description": ""
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": ""
+  "description": "Le méphite orageux apparaît quand le ciel est lourd et que le vent souffle en bourrasques. Son rire évoque des coups de tonnerre assourdissants et sa présence semble rendre l’air chargé électriquement. Il se plaît à provoquer tintamarre et effondrements bruyants qui ruinent une infiltration ou réveillent des dormeurs en sursaut."
 }

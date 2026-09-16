@@ -56,14 +56,10 @@
     },
     {
       "name": "Sabots",
-      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une créature à terre. Réussite : 8 (2d4 + 3) dégâts contondants.\n280"
-    },
-    {
-      "name": "Cerf",
-      "description": ""
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une créature à terre. Réussite : 8 (2d4 + 3) dégâts contondants."
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": "Logo de tête de dragon"
+  "description": "Parmi les grands grégaires figurent des bêtes d’une vigueur supérieure, dotées de cornes pour se défendre. Ce sont toujours des proies qui favoriseront la fuite, mais face à une grave menace elles combattront. Cerfs et élans font partie de ces créatures."
 }

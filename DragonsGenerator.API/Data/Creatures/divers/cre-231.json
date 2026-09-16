@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "id": "cre-231",
-  "name": "231",
+  "name": "Haut chamane",
   "category": "divers",
   "part": "Troisième partie Rencontres dans le Grand Kaan",
   "section": null,
@@ -88,10 +88,10 @@
   "actions": [
     {
       "name": "Bâton",
-      "description": "Attaque d’arme de corps à corps : +3 pour toucher (+7 pour toucher avec gourdin magique), allonge 1,50 m, une cible. Réussite : 3 (1d6) dégâts contondants, 4 (1d8) dégâts contondants si utilisé à deux mains, ou 8 (1d8 + 4) dégâts contondants avec gourdin magique.\n232"
+      "description": "Attaque d’arme de corps à corps : +3 pour toucher (+7 pour toucher avec gourdin magique), allonge 1,50 m, une cible. Réussite : 3 (1d6) dégâts contondants, 4 (1d8) dégâts contondants si utilisé à deux mains, ou 8 (1d8 + 4) dégâts contondants avec gourdin magique."
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": ""
+  "description": "Dans le Kaan, les adeptes du Cercle des esprits — souvent appelés chamanes — sont des sages proches de la nature qui guident une tribu ou vivent en ermites. Le haut chamane est le plus puissant d’entre eux : garant de tradition, fabricant de potions et d’objets magiques, il participe aux décisions au même rang que le chef. Sa foi en Eana est profonde, et sa détermination, une fois une décision prise, est sans faille."
 }

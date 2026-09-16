@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-clochette",
+  "name": "Clochette",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 1,
+    "unit": "po"
+  },
+  "weight_kg": null,
+  "description": "Petite cloche métallique. Son audible à une bonne distance ; utile en alarme ou diversion."
+}

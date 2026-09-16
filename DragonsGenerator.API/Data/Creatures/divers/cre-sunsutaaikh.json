@@ -73,13 +73,9 @@
     {
       "name": "Possession (recharge 4-6)",
       "description": "Une bête, un humanoïde, une monstruosité ou un géant de taille TG ou inférieure visible du sünsutaa et qui se trouve dans un rayon de 9 m de celui-ci doit réussir un JS Charisme DD 20 sous peine d'être **possédé** par lui (cf. **Annexe : États préjudiciables**)."
-    },
-    {
-      "name": "321",
-      "description": ""
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": ""
+  "description": "Passé le siècle, le sünsutaaikh est une calamité morte-vivante capable à elle seule de terrasser de grands héros et de gangrener un royaume entier. Comme les autres êtres de douleur, il possède les vivants pour fonder des sociétés d’âmes mortes dans des corps vivants ; les rescapés souffrent souvent de folie, de maladie ou de vieillissement accéléré."
 }

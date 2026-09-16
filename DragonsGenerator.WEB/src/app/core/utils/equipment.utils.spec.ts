@@ -98,6 +98,8 @@ describe('equipment.utils', () => {
 
   it('normalizeItemRef resolves equipment id aliases', () => {
     expect(normalizeItemRef('gr-sac-erudit').id).toBe('gr-sac-derudit');
+    expect(normalizeItemRef('gr-grimoire').id).toBe('it-grimoire');
+    expect(normalizeItemRef('gr-corde').id).toBe('gr-corde-en-chanvre');
   });
 
   it('normalizeEquipmentType and subtype uppercases values', () => {

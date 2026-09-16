@@ -17,5 +17,5 @@
   ],
   "throw_range": null,
   "ammo_range": null,
-  "description": "Le ceste est un gantelet de cuir renforcé de métal porté à la main. Légère. Spéciale : le ceste ne peut pas être désarmé."
+  "description": "Fixé au poing : vous ne pouvez en être désarmé. Sur un coup critique, la cible doit réussir un JS Constitution (DD = dégâts infligés) ou être étourdie jusqu'au début de votre prochain tour. Tant que vous le portez, désavantage aux tests de caractéristique associés à la Dextérité (finesse et doigté)."
 }

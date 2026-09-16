@@ -2,10 +2,10 @@
   "schema_version": "2.0",
   "description": "Index des équipements (armes, armures, outils, objets, montures, véhicules, services). Chaque entrée référence son fichier JSON dans Equipment/<category>/.",
   "stats": {
-    "total": 195,
+    "total": 214,
     "by_category": {
       "armor": 14,
-      "gear": 78,
+      "gear": 97,
       "mount": 8,
       "service": 4,
       "tool": 39,
@@ -14,21 +14,6 @@
     }
   },
   "items": [
-    {
-      "id": "ar-armure-decailles",
-      "name": "Armure d'écailles",
-      "category": "armor",
-      "subcategory": "medium",
-      "cost": {
-        "value": 50,
-        "unit": "po"
-      },
-      "weight_kg": 22.5,
-      "file": "Equipment/armor/ar-armure-decailles.json",
-      "ac_base": 14,
-      "str_required": 12,
-      "stealth_disadvantage": true
-    },
     {
       "id": "ar-armure-de-cuir",
       "name": "Armure de cuir",
@@ -86,6 +71,21 @@
       "weight_kg": 20,
       "file": "Equipment/armor/ar-armure-de-plaques.json",
       "ac_base": 15,
+      "str_required": 12,
+      "stealth_disadvantage": true
+    },
+    {
+      "id": "ar-armure-decailles",
+      "name": "Armure d'écailles",
+      "category": "armor",
+      "subcategory": "medium",
+      "cost": {
+        "value": 50,
+        "unit": "po"
+      },
+      "weight_kg": 22.5,
+      "file": "Equipment/armor/ar-armure-decailles.json",
+      "ac_base": 14,
       "str_required": 12,
       "stealth_disadvantage": true
     },
@@ -250,18 +250,6 @@
       "file": "Equipment/gear/gr-amulette.json"
     },
     {
-      "id": "it-ss-amulette",
-      "name": "Amulette (symbole sacré)",
-      "category": "gear",
-      "subcategory": "holy_symbol",
-      "cost": {
-        "value": 5,
-        "unit": "po"
-      },
-      "weight_kg": 0.5,
-      "file": "Equipment/gear/it-ss-amulette.json"
-    },
-    {
       "id": "gr-attirail-de-peche",
       "name": "Attirail de pêche",
       "category": "gear",
@@ -272,18 +260,6 @@
       },
       "weight_kg": 2,
       "file": "Equipment/gear/gr-attirail-de-peche.json"
-    },
-    {
-      "id": "it-fa-baguette",
-      "name": "Baguette (focaliseur)",
-      "category": "gear",
-      "subcategory": "arcane_focus",
-      "cost": {
-        "value": 10,
-        "unit": "po"
-      },
-      "weight_kg": 0.5,
-      "file": "Equipment/gear/it-fa-baguette.json"
     },
     {
       "id": "gr-baguette-dif",
@@ -322,30 +298,6 @@
       },
       "weight_kg": 5,
       "file": "Equipment/gear/gr-barre-a-mine.json"
-    },
-    {
-      "id": "it-fa-baton",
-      "name": "Bâton (focaliseur)",
-      "category": "gear",
-      "subcategory": "arcane_focus",
-      "cost": {
-        "value": 5,
-        "unit": "po"
-      },
-      "weight_kg": 2,
-      "file": "Equipment/gear/it-fa-baton.json"
-    },
-    {
-      "id": "it-fd-baton-dif",
-      "name": "Bâton d'if (focaliseur druidique)",
-      "category": "gear",
-      "subcategory": "druidic_focus",
-      "cost": {
-        "value": 5,
-        "unit": "po"
-      },
-      "weight_kg": 2,
-      "file": "Equipment/gear/it-fd-baton-dif.json"
     },
     {
       "id": "gr-batons-encens",
@@ -396,18 +348,6 @@
       "file": "Equipment/gear/gr-bougie.json"
     },
     {
-      "id": "gr-encre-et-plume",
-      "name": "Bouteille d'encre et plume d'écriture",
-      "category": "gear",
-      "subcategory": null,
-      "cost": {
-        "value": 1,
-        "unit": "po"
-      },
-      "weight_kg": null,
-      "file": "Equipment/gear/gr-encre-et-plume.json"
-    },
-    {
       "id": "gr-bouteille-en-verre",
       "name": "Bouteille en verre",
       "category": "gear",
@@ -418,18 +358,6 @@
       },
       "weight_kg": 1,
       "file": "Equipment/gear/gr-bouteille-en-verre.json"
-    },
-    {
-      "id": "it-fd-branche-de-gui",
-      "name": "Branche de gui (focaliseur druidique)",
-      "category": "gear",
-      "subcategory": "druidic_focus",
-      "cost": {
-        "value": 1,
-        "unit": "po"
-      },
-      "weight_kg": 0,
-      "file": "Equipment/gear/it-fd-branche-de-gui.json"
     },
     {
       "id": "gr-cadenas",
@@ -456,30 +384,6 @@
       "file": "Equipment/gear/gr-carnet-de-notes.json"
     },
     {
-      "id": "it-carquois-20-fleches",
-      "name": "Carquois (20 flèches)",
-      "category": "gear",
-      "subcategory": null,
-      "cost": {
-        "value": 1,
-        "unit": "po"
-      },
-      "weight_kg": 1,
-      "file": "Equipment/gear/it-carquois-20-fleches.json"
-    },
-    {
-      "id": "it-carreaux",
-      "name": "Carreaux (20)",
-      "category": "gear",
-      "subcategory": null,
-      "cost": {
-        "value": 1,
-        "unit": "po"
-      },
-      "weight_kg": 0.75,
-      "file": "Equipment/gear/it-carreaux.json"
-    },
-    {
       "id": "gr-chaine-3m",
       "name": "Chaîne (3 m)",
       "category": "gear",
@@ -504,6 +408,18 @@
       "file": "Equipment/gear/gr-chausse-trappes-20.json"
     },
     {
+      "id": "gr-clochette",
+      "name": "Clochette",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": null,
+      "file": "Equipment/gear/gr-clochette.json"
+    },
+    {
       "id": "gr-coffre",
       "name": "Coffre",
       "category": "gear",
@@ -514,6 +430,30 @@
       },
       "weight_kg": 12.5,
       "file": "Equipment/gear/gr-coffre.json"
+    },
+    {
+      "id": "gr-corde-en-chanvre",
+      "name": "Corde en chanvre (15 m)",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 5,
+      "file": "Equipment/gear/gr-corde-en-chanvre.json"
+    },
+    {
+      "id": "gr-corde-en-soie",
+      "name": "Corde en soie (15 m)",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 100,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/gear/gr-corde-en-soie.json"
     },
     {
       "id": "gr-costume-de-scene",
@@ -540,42 +480,16 @@
       "file": "Equipment/gear/gr-couverture.json"
     },
     {
-      "id": "it-fa-cristal",
-      "name": "Cristal (focaliseur)",
-      "category": "gear",
-      "subcategory": "arcane_focus",
-      "cost": {
-        "value": 10,
-        "unit": "po"
-      },
-      "weight_kg": 0.5,
-      "file": "Equipment/gear/it-fa-cristal.json"
-    },
-    {
-      "id": "gr-grigris-ornementaux",
-      "name": "Divers grigris ornementaux",
+      "id": "gr-craie",
+      "name": "Craie (boîte de 10)",
       "category": "gear",
       "subcategory": null,
       "cost": {
-        "value": null,
-        "unit": "po",
-        "note": "Artisanat, prix variable"
-      },
-      "weight_kg": 0.5,
-      "file": "Equipment/gear/gr-grigris-ornementaux.json"
-    },
-    {
-      "id": "gr-sauf-conduits-et-lettres",
-      "name": "Divers sauf-conduits et lettres de recommandation",
-      "category": "gear",
-      "subcategory": null,
-      "cost": {
-        "value": null,
-        "unit": "po",
-        "note": "Document officiel, non vendu"
+        "value": 1,
+        "unit": "pc"
       },
       "weight_kg": null,
-      "file": "Equipment/gear/gr-sauf-conduits-et-lettres.json"
+      "file": "Equipment/gear/gr-craie.json"
     },
     {
       "id": "gr-eau-benite",
@@ -590,28 +504,40 @@
       "file": "Equipment/gear/gr-eau-benite.json"
     },
     {
-      "id": "it-ss-embleme",
-      "name": "Emblème (symbole sacré)",
+      "id": "gr-echelle",
+      "name": "Échelle (3 m)",
       "category": "gear",
-      "subcategory": "holy_symbol",
+      "subcategory": null,
       "cost": {
-        "value": 5,
-        "unit": "po"
+        "value": 1,
+        "unit": "pa"
       },
-      "weight_kg": 0,
-      "file": "Equipment/gear/it-ss-embleme.json"
+      "weight_kg": 12.5,
+      "file": "Equipment/gear/gr-echelle.json"
     },
     {
-      "id": "it-carquois-20-carreaux",
-      "name": "Étui à carreaux (20 carreaux)",
+      "id": "gr-ecurie-jour",
+      "name": "Écurie (par jour)",
+      "category": "service",
+      "subcategory": null,
+      "cost": {
+        "value": 5,
+        "unit": "pa"
+      },
+      "weight_kg": null,
+      "file": "Equipment/service/gr-ecurie-jour.json"
+    },
+    {
+      "id": "gr-encre-et-plume",
+      "name": "Bouteille d'encre et plume d'écriture",
       "category": "gear",
       "subcategory": null,
       "cost": {
         "value": 1,
         "unit": "po"
       },
-      "weight_kg": 0.75,
-      "file": "Equipment/gear/it-carquois-20-carreaux.json"
+      "weight_kg": null,
+      "file": "Equipment/gear/gr-encre-et-plume.json"
     },
     {
       "id": "gr-etui-a-parchemins",
@@ -651,16 +577,16 @@
       "file": "Equipment/gear/gr-feu-gregeois.json"
     },
     {
-      "id": "it-fleches",
-      "name": "Flèches (20)",
+      "id": "gr-ficelle",
+      "name": "Ficelle (3 m)",
       "category": "gear",
       "subcategory": null,
       "cost": {
         "value": 1,
-        "unit": "po"
+        "unit": "pc"
       },
-      "weight_kg": 0.5,
-      "file": "Equipment/gear/it-fleches.json"
+      "weight_kg": null,
+      "file": "Equipment/gear/gr-ficelle.json"
     },
     {
       "id": "gr-fonte",
@@ -687,6 +613,18 @@
       "file": "Equipment/gear/gr-fourrage-jour.json"
     },
     {
+      "id": "gr-gamelle",
+      "name": "Gamelle",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 2,
+        "unit": "pa"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/gr-gamelle.json"
+    },
+    {
       "id": "gr-grappin",
       "name": "Grappin",
       "category": "gear",
@@ -699,28 +637,41 @@
       "file": "Equipment/gear/gr-grappin.json"
     },
     {
-      "id": "gr-grimoire",
-      "name": "Grimoire",
+      "id": "gr-grigris-ornementaux",
+      "name": "Divers grigris ornementaux",
       "category": "gear",
       "subcategory": null,
       "cost": {
-        "value": 50,
-        "unit": "po"
+        "value": null,
+        "unit": "po",
+        "note": "Artisanat, prix variable"
       },
-      "weight_kg": 1,
-      "file": "Equipment/gear/gr-grimoire.json"
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/gr-grigris-ornementaux.json"
     },
     {
-      "id": "it-grimoire",
-      "name": "Grimoire",
+      "id": "gr-huile",
+      "name": "Huile (flasque)",
       "category": "gear",
       "subcategory": null,
       "cost": {
-        "value": 50,
-        "unit": "po"
+        "value": 1,
+        "unit": "pa"
       },
-      "weight_kg": 1.5,
-      "file": "Equipment/gear/it-grimoire.json"
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/gr-huile.json"
+    },
+    {
+      "id": "gr-lampe",
+      "name": "Lampe",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 5,
+        "unit": "pa"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/gr-lampe.json"
     },
     {
       "id": "gr-lanterne-a-capote",
@@ -771,16 +722,16 @@
       "file": "Equipment/gear/gr-livre-de-prieres.json"
     },
     {
-      "id": "gr-moulin-a-prieres",
-      "name": "Moulin à prières",
+      "id": "gr-marteau",
+      "name": "Marteau",
       "category": "gear",
       "subcategory": null,
       "cost": {
         "value": 1,
         "unit": "po"
       },
-      "weight_kg": 0.25,
-      "file": "Equipment/gear/gr-moulin-a-prieres.json"
+      "weight_kg": 1.5,
+      "file": "Equipment/gear/gr-marteau.json"
     },
     {
       "id": "gr-materiel-descalade",
@@ -819,6 +770,18 @@
       "file": "Equipment/gear/gr-mors-et-bride.json"
     },
     {
+      "id": "gr-moulin-a-prieres",
+      "name": "Moulin à prières",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 0.25,
+      "file": "Equipment/gear/gr-moulin-a-prieres.json"
+    },
+    {
       "id": "gr-necessaire-a-feu",
       "name": "Nécessaire à feu",
       "category": "gear",
@@ -831,16 +794,28 @@
       "file": "Equipment/gear/gr-necessaire-a-feu.json"
     },
     {
-      "id": "it-fa-orbe",
-      "name": "Orbe (focaliseur)",
+      "id": "gr-outre",
+      "name": "Outre",
       "category": "gear",
-      "subcategory": "arcane_focus",
+      "subcategory": "container",
       "cost": {
-        "value": 20,
+        "value": 2,
+        "unit": "pa"
+      },
+      "weight_kg": 2.5,
+      "file": "Equipment/gear/gr-outre.json"
+    },
+    {
+      "id": "gr-palan",
+      "name": "Palan",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
         "unit": "po"
       },
-      "weight_kg": 1.5,
-      "file": "Equipment/gear/it-fa-orbe.json"
+      "weight_kg": 2.5,
+      "file": "Equipment/gear/gr-palan.json"
     },
     {
       "id": "gr-parchemins-vierges",
@@ -855,6 +830,18 @@
       "file": "Equipment/gear/gr-parchemins-vierges.json"
     },
     {
+      "id": "gr-pied-de-biche",
+      "name": "Pied-de-biche",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 2,
+        "unit": "po"
+      },
+      "weight_kg": 2.5,
+      "file": "Equipment/gear/gr-pied-de-biche.json"
+    },
+    {
       "id": "gr-piege-a-loups",
       "name": "Piège à loups",
       "category": "gear",
@@ -865,6 +852,18 @@
       },
       "weight_kg": 12.5,
       "file": "Equipment/gear/gr-piege-a-loups.json"
+    },
+    {
+      "id": "gr-piton",
+      "name": "Piton",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 5,
+        "unit": "pc"
+      },
+      "weight_kg": 0.125,
+      "file": "Equipment/gear/gr-piton.json"
     },
     {
       "id": "gr-potion-de-guerison",
@@ -891,16 +890,16 @@
       "file": "Equipment/gear/gr-rations-2j.json"
     },
     {
-      "id": "it-ss-reliquaire",
-      "name": "Reliquaire (symbole sacré)",
+      "id": "gr-sac-a-dos",
+      "name": "Sac à dos",
       "category": "gear",
-      "subcategory": "holy_symbol",
+      "subcategory": "container",
       "cost": {
-        "value": 5,
+        "value": 2,
         "unit": "po"
       },
-      "weight_kg": 1,
-      "file": "Equipment/gear/it-ss-reliquaire.json"
+      "weight_kg": 2.5,
+      "file": "Equipment/gear/gr-sac-a-dos.json"
     },
     {
       "id": "gr-sac-daventurier",
@@ -913,30 +912,6 @@
       },
       "weight_kg": 21.5,
       "file": "Equipment/gear/gr-sac-daventurier.json"
-    },
-    {
-      "id": "gr-sac-derudit",
-      "name": "Sac d'érudit",
-      "category": "gear",
-      "subcategory": "container",
-      "cost": {
-        "value": 40,
-        "unit": "po"
-      },
-      "weight_kg": 3,
-      "file": "Equipment/gear/gr-sac-derudit.json"
-    },
-    {
-      "id": "gr-sac-dexplorateur",
-      "name": "Sac d'explorateur",
-      "category": "gear",
-      "subcategory": "container",
-      "cost": {
-        "value": 12,
-        "unit": "po"
-      },
-      "weight_kg": 23.5,
-      "file": "Equipment/gear/gr-sac-dexplorateur.json"
     },
     {
       "id": "gr-sac-de-bateleur",
@@ -963,6 +938,18 @@
       "file": "Equipment/gear/gr-sac-de-cambrioleur.json"
     },
     {
+      "id": "gr-sac-de-couchage",
+      "name": "Sac de couchage",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 3.5,
+      "file": "Equipment/gear/gr-sac-de-couchage.json"
+    },
+    {
       "id": "gr-sac-de-diplomate",
       "name": "Sac de diplomate",
       "category": "gear",
@@ -987,6 +974,30 @@
       "file": "Equipment/gear/gr-sac-de-religieux.json"
     },
     {
+      "id": "gr-sac-derudit",
+      "name": "Sac d'érudit",
+      "category": "gear",
+      "subcategory": "container",
+      "cost": {
+        "value": 40,
+        "unit": "po"
+      },
+      "weight_kg": 3,
+      "file": "Equipment/gear/gr-sac-derudit.json"
+    },
+    {
+      "id": "gr-sac-dexplorateur",
+      "name": "Sac d'explorateur",
+      "category": "gear",
+      "subcategory": "container",
+      "cost": {
+        "value": 12,
+        "unit": "po"
+      },
+      "weight_kg": 23.5,
+      "file": "Equipment/gear/gr-sac-dexplorateur.json"
+    },
+    {
       "id": "gr-sac-en-toile-de-jute",
       "name": "Sac en toile de jute",
       "category": "gear",
@@ -997,18 +1008,6 @@
       },
       "weight_kg": 0.25,
       "file": "Equipment/gear/gr-sac-en-toile-de-jute.json"
-    },
-    {
-      "id": "it-sacoche-a-composantes",
-      "name": "Sacoche à composantes",
-      "category": "gear",
-      "subcategory": null,
-      "cost": {
-        "value": 25,
-        "unit": "po"
-      },
-      "weight_kg": 1,
-      "file": "Equipment/gear/it-sacoche-a-composantes.json"
     },
     {
       "id": "gr-sauf-conduit",
@@ -1024,28 +1023,29 @@
       "file": "Equipment/gear/gr-sauf-conduit.json"
     },
     {
-      "id": "it-fa-sceptre",
-      "name": "Sceptre (focaliseur)",
-      "category": "gear",
-      "subcategory": "arcane_focus",
-      "cost": {
-        "value": 10,
-        "unit": "po"
-      },
-      "weight_kg": 1,
-      "file": "Equipment/gear/it-fa-sceptre.json"
-    },
-    {
-      "id": "gr-selle-dequitation",
-      "name": "Selle d'équitation",
+      "id": "gr-sauf-conduits-et-lettres",
+      "name": "Divers sauf-conduits et lettres de recommandation",
       "category": "gear",
       "subcategory": null,
       "cost": {
-        "value": 10,
-        "unit": "po"
+        "value": null,
+        "unit": "po",
+        "note": "Document officiel, non vendu"
       },
-      "weight_kg": 12.5,
-      "file": "Equipment/gear/gr-selle-dequitation.json"
+      "weight_kg": null,
+      "file": "Equipment/gear/gr-sauf-conduits-et-lettres.json"
+    },
+    {
+      "id": "gr-savon",
+      "name": "Savon",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 2,
+        "unit": "pc"
+      },
+      "weight_kg": null,
+      "file": "Equipment/gear/gr-savon.json"
     },
     {
       "id": "gr-selle-de-bat",
@@ -1070,6 +1070,18 @@
       },
       "weight_kg": 15,
       "file": "Equipment/gear/gr-selle-de-guerre.json"
+    },
+    {
+      "id": "gr-selle-dequitation",
+      "name": "Selle d'équitation",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 12.5,
+      "file": "Equipment/gear/gr-selle-dequitation.json"
     },
     {
       "id": "gr-selle-speciale",
@@ -1097,16 +1109,28 @@
       "file": "Equipment/gear/gr-souvenir.json"
     },
     {
-      "id": "it-fd-totem",
-      "name": "Totem (focaliseur druidique)",
+      "id": "gr-tente",
+      "name": "Tente (deux places)",
       "category": "gear",
-      "subcategory": "druidic_focus",
+      "subcategory": null,
       "cost": {
-        "value": 1,
+        "value": 2,
         "unit": "po"
       },
-      "weight_kg": 0,
-      "file": "Equipment/gear/it-fd-totem.json"
+      "weight_kg": 10,
+      "file": "Equipment/gear/gr-tente.json"
+    },
+    {
+      "id": "gr-torche",
+      "name": "Torche",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "pc"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/gr-torche.json"
     },
     {
       "id": "gr-trousse-de-guerisseur",
@@ -1179,6 +1203,210 @@
       },
       "weight_kg": 3,
       "file": "Equipment/gear/gr-vetements-raffines.json"
+    },
+    {
+      "id": "it-carquois-20-carreaux",
+      "name": "Étui à carreaux (20 carreaux)",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 0.75,
+      "file": "Equipment/gear/it-carquois-20-carreaux.json"
+    },
+    {
+      "id": "it-carquois-20-fleches",
+      "name": "Carquois (20 flèches)",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/gear/it-carquois-20-fleches.json"
+    },
+    {
+      "id": "it-carreaux",
+      "name": "Carreaux (20)",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 0.75,
+      "file": "Equipment/gear/it-carreaux.json"
+    },
+    {
+      "id": "it-fa-baguette",
+      "name": "Baguette (focaliseur)",
+      "category": "gear",
+      "subcategory": "arcane_focus",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/it-fa-baguette.json"
+    },
+    {
+      "id": "it-fa-baton",
+      "name": "Bâton (focaliseur)",
+      "category": "gear",
+      "subcategory": "arcane_focus",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 2,
+      "file": "Equipment/gear/it-fa-baton.json"
+    },
+    {
+      "id": "it-fa-cristal",
+      "name": "Cristal (focaliseur)",
+      "category": "gear",
+      "subcategory": "arcane_focus",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/it-fa-cristal.json"
+    },
+    {
+      "id": "it-fa-orbe",
+      "name": "Orbe (focaliseur)",
+      "category": "gear",
+      "subcategory": "arcane_focus",
+      "cost": {
+        "value": 20,
+        "unit": "po"
+      },
+      "weight_kg": 1.5,
+      "file": "Equipment/gear/it-fa-orbe.json"
+    },
+    {
+      "id": "it-fa-sceptre",
+      "name": "Sceptre (focaliseur)",
+      "category": "gear",
+      "subcategory": "arcane_focus",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/gear/it-fa-sceptre.json"
+    },
+    {
+      "id": "it-fd-baton-dif",
+      "name": "Bâton d'if (focaliseur druidique)",
+      "category": "gear",
+      "subcategory": "druidic_focus",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 2,
+      "file": "Equipment/gear/it-fd-baton-dif.json"
+    },
+    {
+      "id": "it-fd-branche-de-gui",
+      "name": "Branche de gui (focaliseur druidique)",
+      "category": "gear",
+      "subcategory": "druidic_focus",
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 0,
+      "file": "Equipment/gear/it-fd-branche-de-gui.json"
+    },
+    {
+      "id": "it-fd-totem",
+      "name": "Totem (focaliseur druidique)",
+      "category": "gear",
+      "subcategory": "druidic_focus",
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 0,
+      "file": "Equipment/gear/it-fd-totem.json"
+    },
+    {
+      "id": "it-fleches",
+      "name": "Flèches (20)",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 1,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/it-fleches.json"
+    },
+    {
+      "id": "it-grimoire",
+      "name": "Grimoire",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 50,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/gear/it-grimoire.json"
+    },
+    {
+      "id": "it-sacoche-a-composantes",
+      "name": "Sacoche à composantes",
+      "category": "gear",
+      "subcategory": null,
+      "cost": {
+        "value": 25,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/gear/it-sacoche-a-composantes.json"
+    },
+    {
+      "id": "it-ss-amulette",
+      "name": "Amulette (symbole sacré)",
+      "category": "gear",
+      "subcategory": "holy_symbol",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 0.5,
+      "file": "Equipment/gear/it-ss-amulette.json"
+    },
+    {
+      "id": "it-ss-embleme",
+      "name": "Emblème (symbole sacré)",
+      "category": "gear",
+      "subcategory": "holy_symbol",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 0,
+      "file": "Equipment/gear/it-ss-embleme.json"
+    },
+    {
+      "id": "it-ss-reliquaire",
+      "name": "Reliquaire (symbole sacré)",
+      "category": "gear",
+      "subcategory": "holy_symbol",
+      "cost": {
+        "value": 5,
+        "unit": "po"
+      },
+      "weight_kg": 1,
+      "file": "Equipment/gear/it-ss-reliquaire.json"
     },
     {
       "id": "mnt-ane-ou-mule",
@@ -1275,18 +1503,6 @@
       },
       "weight_kg": null,
       "file": "Equipment/mount/mnt-poney.json"
-    },
-    {
-      "id": "gr-ecurie-jour",
-      "name": "Écurie (par jour)",
-      "category": "service",
-      "subcategory": null,
-      "cost": {
-        "value": 5,
-        "unit": "pa"
-      },
-      "weight_kg": null,
-      "file": "Equipment/service/gr-ecurie-jour.json"
     },
     {
       "id": "sv-hebergement-aise",
@@ -1493,30 +1709,6 @@
       "file": "Equipment/tool/tl-necessaire-dalchimiste.json"
     },
     {
-      "id": "tl-necessaire-dempoisonneur",
-      "name": "Nécessaire d'empoisonneur",
-      "category": "tool",
-      "subcategory": "special_kit",
-      "cost": {
-        "value": 50,
-        "unit": "po"
-      },
-      "weight_kg": 2,
-      "file": "Equipment/tool/tl-necessaire-dempoisonneur.json"
-    },
-    {
-      "id": "tl-necessaire-dherboristerie",
-      "name": "Nécessaire d'herboristerie",
-      "category": "tool",
-      "subcategory": "special_kit",
-      "cost": {
-        "value": 10,
-        "unit": "po"
-      },
-      "weight_kg": 1.5,
-      "file": "Equipment/tool/tl-necessaire-dherboristerie.json"
-    },
-    {
       "id": "tl-necessaire-de-brasseur",
       "name": "Nécessaire de brasseur",
       "category": "tool",
@@ -1587,6 +1779,30 @@
       },
       "weight_kg": 2.5,
       "file": "Equipment/tool/tl-necessaire-de-peintre.json"
+    },
+    {
+      "id": "tl-necessaire-dempoisonneur",
+      "name": "Nécessaire d'empoisonneur",
+      "category": "tool",
+      "subcategory": "special_kit",
+      "cost": {
+        "value": 50,
+        "unit": "po"
+      },
+      "weight_kg": 2,
+      "file": "Equipment/tool/tl-necessaire-dempoisonneur.json"
+    },
+    {
+      "id": "tl-necessaire-dherboristerie",
+      "name": "Nécessaire d'herboristerie",
+      "category": "tool",
+      "subcategory": "special_kit",
+      "cost": {
+        "value": 10,
+        "unit": "po"
+      },
+      "weight_kg": 1.5,
+      "file": "Equipment/tool/tl-necessaire-dherboristerie.json"
     },
     {
       "id": "tl-osselets",
@@ -2179,8 +2395,6 @@
       },
       "weight_kg": 1.5,
       "file": "Equipment/weapon/wp-filet.json",
-      "damage_dice": null,
-      "damage_type": null,
       "properties": [
         "prop-lancer-1-50-4-50",
         "prop-speciale"
@@ -2560,8 +2774,6 @@
       },
       "weight_kg": 0.5,
       "file": "Equipment/weapon/wp-propulseur.json",
-      "damage_dice": null,
-      "damage_type": null,
       "properties": [
         "prop-rechargement",
         "prop-projectiles-24-96",

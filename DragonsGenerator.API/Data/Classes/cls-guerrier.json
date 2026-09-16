@@ -4,7 +4,7 @@
   "name": "Guerrier",
   "flavor": {
     "summary": "Maître des armes et de l'art du combat, le guerrier surpasse ses adversaires par l'expérience, l'habileté et une condition physique hors du commun. Soldat aguerri ou champion autodidacte, il incarne le summum de la puissance martiale.",
-    "lore_note": "Sur Eana, certains guerriers développent une communion mystique avec leurs armes (les yataganS), tandis que d'autres portent l'efficacité physique à un niveau presque surnaturel par un entraînement implacable."
+    "lore_note": "Sur Eana, certains guerriers développent une communion mystique avec leurs armes (les Yatagans), tandis que d'autres portent l'efficacité physique à un niveau presque surnaturel par un entraînement implacable."
   },
   "hit_die": "1d10",
   "hp_at_level_1": 10,

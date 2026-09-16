@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "id": "cre-spider-icon-araignee-sauteuse-geante",
-  "name": "Spider icon Araignée sauteuse géante",
+  "name": "Araignée sauteuse géante",
   "category": "divers",
   "part": "Deuxième partie",
   "section": null,
@@ -60,10 +60,10 @@
   "actions": [
     {
       "name": "Morsure",
-      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une créature. Réussite : 5 (1d6 + 2) dégâts perforants, et la cible doit effectuer un JS Constitution DD 11. Elle subit 7 (2d6) dégâts de poison en cas de sauvegarde ratée et la moitié en cas de réussite. Si ces dégâts de poison font tomber la cible à 0 pv, celle-ci est en état stable mais se retrouve empoisonnée pendant 1 heure, même si elle récupère des pv. Elle reste également paralysée tant qu'elle est intoxiquée par ce venin.\n---"
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une créature. Réussite : 5 (1d6 + 2) dégâts perforants, et la cible doit effectuer un JS Constitution DD 11. Elle subit 7 (2d6) dégâts de poison en cas de sauvegarde ratée et la moitié en cas de réussite. Si ces dégâts de poison font tomber la cible à 0 pv, celle-ci est en état stable mais se retrouve empoisonnée pendant 1 heure, même si elle récupère des pv. Elle reste également paralysée tant qu'elle est intoxiquée par ce venin."
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": ""
+  "description": "Contrairement à la majorité de ses semblables, l’araignée sauteuse est une prédatrice chasseresse qui traque ses proies ou les guette en embuscade. Dotée d’une grande force pour sa taille et capable d’attaques éclair, ses victimes n’ont souvent pas le temps de réagir avant d’être terrassées par son venin puis traînées à l’écart ou dévorées sur place."
 }

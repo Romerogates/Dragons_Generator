@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-marteau",
+  "name": "Marteau",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 1,
+    "unit": "po"
+  },
+  "weight_kg": 1.5,
+  "description": "Marteau utilitaire pour planter des pitons, enfoncer des clous ou des travaux de campement."
+}

@@ -21,5 +21,5 @@
     "normal": 24,
     "long": 96
   },
-  "description": "Le propulseur est un court bâton muni d'un crochet permettant de lancer une javeline ou une lance avec plus de puissance. Il confère à ces armes la propriété Lancer (1,50/4,50 m) si elles ne la possèdent pas déjà, ou étend leur portée de lancer de 50 % si elles la possèdent. Le propulseur ne peut être utilisé avec d'autres armes."
+  "description": "Le propulseur permet de lancer des javelines à plus grande vitesse. Portée projectiles 24/96 m. Les dégâts d'une javeline projetée sont de 1d8 + modificateur de Force. Objet typique des tribus de chasseurs-cueilleurs ; exotique hors de ces contrées."
 }

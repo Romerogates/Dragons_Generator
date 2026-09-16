@@ -25,7 +25,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
    - **`source/Dragons_2_Livre_de_magie.md`** → sorts
    - **`source/Dragons_3_Bestiaire_Créatures.md`** → bestiaire / créatures
    - **`source/Dragons_1_Livre_de_base.md`** → le reste (classes, espèces, équipements, règles…)
-7. Bestiaire suite (reste ~40 fiches description vide) + Livre de base si trous classes/équipement
+7. ~~Bestiaire suite + Livre de base~~ **fait** (lore stubs → source ; Roublard/Yatagans ; ceste/propulseur ; kits gear + index ; grimoire dédoublonné)
 
 ### Guide (suite)
 1. ~~Découvrabilité + sans checklists~~ **fait**
@@ -35,6 +35,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## Déjà livré (ne pas refaire)
 
+- **Bestiaire stubs + Livre de base** (2026-09-16) — lore créatures depuis Dragons_3 (stubs OCR honnêtes pour IDs cassés) ; flavor Roublard ; Yatagans ; ceste/propulseur spéciaux ; 19 objets de kits + index équipements ; grimoire unique `it-grimoire` ; matériels de jeu.
 - **Mobile `/play` + Codex batch 3** (2026-09-16) — onglets session scrollables ; bandeau tour sous tabs ; CTA init joueur ; boutons Cible/Jet courts ; 9 sorts modulaires ; 15 créatures lore/OCR.
 - **Première session MJ 15 min + Codex batch** (2026-09-16) — empty `/campaigns` CTA « Créer une table » ; template oneshot par défaut ; checklist Inviter→Table ; Entrer en session → `/play` ; session « Session 1 » ce soir ; 11 sorts vides restaurés (Livre de magie) ; doppelgänger + rat géant (Bestiaire).
 - **Fiabilité table + Codex sorts** (2026-09-16) — persist MJ ne réécrit plus `data` stale ; softReload skip pendant `saving` ; merge HP `??` ; adds alliés/adversaires `immediate` ; hints bouton setup/init ; OCR Logo/stamp/and icons ; restauration Vol/Aide/Arme spirituelle/Vision aveugle/Voie végétale/Esprits gardiens/État gazeux/Esprit impénétrable ; libellé Classes + conjuration→Invocation.

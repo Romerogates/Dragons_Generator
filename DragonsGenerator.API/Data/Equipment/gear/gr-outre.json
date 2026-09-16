@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-outre",
+  "name": "Outre",
+  "category": "gear",
+  "subcategory": "container",
+  "cost": {
+    "value": 2,
+    "unit": "pa"
+  },
+  "weight_kg": 2.5,
+  "description": "Outre en peau, capacité 2 l (poids indiqué pleine)."
+}

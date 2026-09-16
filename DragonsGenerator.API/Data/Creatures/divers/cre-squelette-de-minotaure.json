@@ -56,10 +56,10 @@
     },
     {
       "name": "Embrochage",
-      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 13 (2d8 + 4) dégâts perforants.\nSquelette de minotaure\n173"
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 13 (2d8 + 4) dégâts perforants.\nSquelette de minotaure"
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": ""
+  "description": "Comme tout squelette, celui d’un minotaure est un serviteur aveugle animé par la nécromancie. Il conserve la charge et la force brutale de la monstruosité qu’il fut, mais perd toute subtilité : sans ordres clairs, il attaque par défaut les vivants qui passent à proximité, poussé par l’énergie nécrotique qui l’anime."
 }

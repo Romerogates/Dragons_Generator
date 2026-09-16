@@ -51,6 +51,10 @@ export const EQUIPMENT_ID_ALIASES: Record<string, string> = {
   'tl-necessaire-cartographe': 'tl-necessaire-de-cartographe',
   'tl-necessaire-herboristerie': 'tl-necessaire-dherboristerie',
   'tl-instruments-navigation': 'tl-instruments-de-navigation',
+  'gr-grimoire': 'it-grimoire',
+  'gr-corde': 'gr-corde-en-chanvre',
+  'gr-huile-flasque': 'gr-huile',
+  'gr-cloche': 'gr-clochette',
 };
 
 export const CATEGORY_FILTERS: Record<

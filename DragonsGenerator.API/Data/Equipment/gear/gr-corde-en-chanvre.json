@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-corde-en-chanvre",
+  "name": "Corde en chanvre (15 m)",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 1,
+    "unit": "po"
+  },
+  "weight_kg": 5,
+  "description": "Corde de 15 m, diamètre ~20 mm. Supporte jusqu'à 3 tonnes avant de rompre. 5 PV face aux dégâts tranchants ou au feu."
+}

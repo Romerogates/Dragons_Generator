@@ -8,6 +8,6 @@
     "value": 50,
     "unit": "po"
   },
-  "weight_kg": 1.5,
-  "description": "Indispensable au magicien. Contient les sorts recopiés. 100 pages, chaque sort occupe 1 page par niveau de sort."
+  "weight_kg": 1,
+  "description": "Indispensable pour les magiciens. Épais volume relié de cuir contenant 350 pages de vélin vierge sur lesquelles inscrire leurs sorts."
 }

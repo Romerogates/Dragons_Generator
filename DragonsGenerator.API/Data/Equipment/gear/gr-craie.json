@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-craie",
+  "name": "Craie (boîte de 10)",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 1,
+    "unit": "pc"
+  },
+  "weight_kg": null,
+  "description": "Boîte de 10 bâtons de craie pour marquer murs, sols ou parchemins."
+}

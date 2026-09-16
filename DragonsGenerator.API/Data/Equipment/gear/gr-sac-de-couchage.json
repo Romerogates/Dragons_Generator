@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-sac-de-couchage",
+  "name": "Sac de couchage",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 1,
+    "unit": "po"
+  },
+  "weight_kg": 3.5,
+  "description": "Couverture rembourrée pour dormir à la belle étoile ou au campement."
+}

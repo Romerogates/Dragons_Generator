@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-savon",
+  "name": "Savon",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 2,
+    "unit": "pc"
+  },
+  "weight_kg": null,
+  "description": "Pain de savon pour la toilette."
+}

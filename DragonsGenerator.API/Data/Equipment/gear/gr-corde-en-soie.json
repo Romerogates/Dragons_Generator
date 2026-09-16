@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-corde-en-soie",
+  "name": "Corde en soie (15 m)",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 100,
+    "unit": "po"
+  },
+  "weight_kg": 1,
+  "description": "Corde de 15 m en soie d'araignée géante, diamètre ~10 mm. Supporte jusqu'à 5 tonnes avant de rompre. 5 PV face aux dégâts tranchants ou au feu."
+}

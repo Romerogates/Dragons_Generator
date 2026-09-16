@@ -69,13 +69,9 @@
     {
       "name": "Arc long",
       "description": "Attaque d'arme à distance : +5 pour toucher, portée 45/180 m, une cible. Réussite : 6 (1d8 + 2) dégâts perforants plus 9 (2d8) dégâts radiants."
-    },
-    {
-      "name": "369",
-      "description": ""
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": "Les delsednaï sont des sednaï promus récemment à leur statut céleste posthume. Ils n’ont pas la puissance des talsednaï, mais sont dévoués à Givreuse et s’emploient à faire respecter ses édits. Ils ont encore de nombreux souvenirs et parfois des proches encore en vie, de sorte qu’ils s’impliquent assez volontiers dans les affaires mortelles."
+  "description": "Les delsednaï sont des sednaï promus récemment à leur statut céleste posthume. Ils n’ont pas la puissance des talsednaï, mais sont dévoués à Givreuse et s’emploient à faire respecter ses édits. Encore liés à leurs souvenirs et parfois à des proches vivants, ils s’impliquent volontiers dans les affaires mortelles — et se retrouvent parfois déchirés entre devoir divin et affect mortel."
 }

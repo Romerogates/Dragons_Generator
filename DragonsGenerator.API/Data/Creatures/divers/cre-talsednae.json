@@ -69,10 +69,6 @@
     {
       "name": "Arc long",
       "description": "Attaque d'arme à distance : +9 pour toucher, portée 45/180 m, une cible. Réussite : 8 (1d8 + 4) dégâts perforants plus 18 (4d8) dégâts radiants."
-    },
-    {
-      "name": "371",
-      "description": "Smilodon"
     }
   ],
   "reactions": [],

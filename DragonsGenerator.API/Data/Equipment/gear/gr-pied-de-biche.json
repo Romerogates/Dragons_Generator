@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-pied-de-biche",
+  "name": "Pied-de-biche",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 2,
+    "unit": "po"
+  },
+  "weight_kg": 2.5,
+  "description": "Confère un avantage aux tests de Force lorsque l'effet de levier s'applique efficacement."
+}

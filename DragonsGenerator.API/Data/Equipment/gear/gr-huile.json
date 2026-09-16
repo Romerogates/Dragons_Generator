@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-huile",
+  "name": "Huile (flasque)",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 1,
+    "unit": "pa"
+  },
+  "weight_kg": 0.5,
+  "description": "Flasque d'un demi-litre. Action pour répandre (1,50 m) ou lancer (6 m) comme arme improvisée : la cible est couverte d'huile. Si elle subit des dégâts de feu avant que l'huile ait séché (1 minute), elle prend 5 dégâts de feu supplémentaires. Peut aussi couvrir une zone de 1,50 m de côté : enflammée, brûle 2 rounds et inflige 5 dégâts de feu (une fois par tour) à qui y entre ou y termine son déplacement."
+}

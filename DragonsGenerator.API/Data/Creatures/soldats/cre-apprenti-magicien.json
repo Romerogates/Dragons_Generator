@@ -47,18 +47,10 @@
   "actions": [
     {
       "name": "Dague",
-      "description": "Attaque d'arme de corps à corps ou à distance : +3 pour toucher, allonge 1,50 m ou portée 6/18 m, une cible. Réussite : 3 (1d4 + 2) dégâts perforants.\nVariante **Variante : Apprenti ensorceleur**\nLe profil ci-dessus peut également s'appliquer à un ensorceleur inexpérimenté, avec les changements suivants :\n• **Modification de caractéristique.** L'Intelligence passe à 11 (+0). Le Charisme passe à 15 (+2).\n• **Jets de sauvegarde** Cha +4\n• **Compétences** Tromperie +4"
-    },
-    {
-      "name": "Réserve arcanique",
-      "description": "(recharge après un repos long). Au prix d'une action bonus, l'apprenti ensorceleur peut récupérer un emplacement de sort de 1ᵉʳ niveau.\n• **Sorts mineurs** (à volonté) : illusion mineure, trait de feu, vivacité\n• • **1ᵉʳ niveau** (3 emplacements) : bouclier, charme-personne, mains brûlantes"
-    },
-    {
-      "name": "Réserve arcanique",
-      "description": "(recharge après un repos long). Au prix d'une action bonus, l'apprenti ensorceleur peut récupérer un emplacement de sort de 1ᵉʳ niveau.\n• **Sorts mineurs** (à volonté) : illusion mineure, trait de feu, vivacité\n• • **1ᵉʳ niveau** (3 emplacements) : bouclier, charme-personne, mains brûlantes"
+      "description": "Attaque d’arme de corps à corps ou à distance : +3 pour toucher, allonge 1,50 m ou portée 6/18 m, une cible. Réussite : 3 (1d4 + 2) dégâts perforants."
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": ""
+  "description": "Tous les arcanistes ne sont pas des magiciens accomplis : beaucoup n’ont pas encore connu l’Éveil, ou n’ont pas la discipline pour progresser au-delà des sorts les plus simples. La plupart deviennent assistants de lanceurs plus talentueux, ou exercent un autre métier où la magie n’est qu’une aide ponctuelle. Dans la Cité Franche, ils sont courants dans les quartiers des Cristaux et de l’Académie, prompts à défendre l’honneur de leur maître."
 }

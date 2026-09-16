@@ -55,10 +55,10 @@
     },
     {
       "name": "Rocher",
-      "description": "Attaque d'arme à distance : +9 pour toucher, portée 18/72 m, une cible. Réussite : 28 (4d10 + 6) dégâts contondants.\n347"
+      "description": "Attaque d'arme à distance : +9 pour toucher, portée 18/72 m, une cible. Réussite : 28 (4d10 + 6) dégâts contondants."
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": ""
+  "description": "Les guerriers géants du givre constituent une grande partie des troupes expérimentées de ce peuple des glaces. Les entraînements quotidiens, couplés à une longévité digne des nains, permettent à ces combattants d’être nombreux. Ils combattent à la grande hache et lancent des rochers avec une force terrifiante."
 }

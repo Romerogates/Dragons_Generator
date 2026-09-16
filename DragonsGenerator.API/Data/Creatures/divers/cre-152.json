@@ -65,13 +65,9 @@
     {
       "name": "Sabots",
       "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 1,50 m, une créature **à terre**. Réussite : 23 (4d8 + 5) dégâts contondants."
-    },
-    {
-      "name": "153",
-      "description": ""
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": ""
+  "description": "Description absente du Bestiaire source (entrée OCR / incomplète)."
 }

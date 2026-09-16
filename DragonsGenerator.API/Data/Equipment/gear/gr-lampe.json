@@ -1,0 +1,13 @@
+{
+  "schema_version": "2.0",
+  "id": "gr-lampe",
+  "name": "Lampe",
+  "category": "gear",
+  "subcategory": null,
+  "cost": {
+    "value": 5,
+    "unit": "pa"
+  },
+  "weight_kg": 0.5,
+  "description": "Lampe à huile : lumière vive 6 m, lumière faible 6 m de plus. Une flasque d'huile (demi-litre) permet de brûler pendant 6 heures."
+}
