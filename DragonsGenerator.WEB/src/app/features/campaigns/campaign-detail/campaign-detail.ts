@@ -409,8 +409,12 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
   readonly firstSessionChecklist = computed((): FirstSessionChecklistInput => {
     const data = this.campaign()?.data;
+    const link = this.joinLink();
     return {
-      hasInviteActivity: this.pendingInvites().length > 0 || this.players().length > 1,
+      hasInviteActivity:
+        this.pendingInvites().length > 0 ||
+        this.players().length > 1 ||
+        !!(link?.enabled && link.token),
       approvedPlayerCount: this.approvedPlayersWithCharacter().length,
       hasPlannedSession: !!(data?.sessions ?? []).some((s) => s.status === 'planned'),
       hasActiveSession: !!this.activePlaySession(),
@@ -605,6 +609,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         this.persist(c.title, data, () => {
           this.sessionDock.bindCampaign(this.campaign());
           this.sessionDock.open();
+          void this.router.navigate(['/campaigns', c.id, 'play']);
         });
       },
       'Entrer en session',
@@ -1208,7 +1213,6 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         this.setTab('sessions');
         break;
       case 'addSession':
-        this.setTab('sessions');
         this.addSession();
         break;
       case 'openPrep':
@@ -1220,7 +1224,6 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         if (live) this.openPlayFullscreen();
         else if (next) this.startPlaySession(next.id);
         else {
-          this.setTab('sessions');
           this.addSession();
         }
         break;
@@ -1493,8 +1496,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.flushSessionSave();
     const session: CampaignSession = {
       id: crypto.randomUUID?.() ?? `session-${Date.now()}`,
-      title: 'Nouvelle session',
-      scheduledAt: new Date(Date.now() + 7 * 86400000).toISOString(),
+      title: 'Session 1',
+      scheduledAt: new Date().toISOString(),
       status: 'planned',
       mode: 'online',
     };

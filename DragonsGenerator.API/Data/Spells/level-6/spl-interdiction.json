@@ -6,23 +6,23 @@
   "level": 6,
   "school": "abjuration",
   "casting_time": {
-    "value": 1,
-    "unit": "action"
+    "value": 10,
+    "unit": "minute"
   },
   "range": {
-    "type": "personnelle",
+    "type": "contact",
     "distance_m": null,
     "area": null
   },
   "duration": {
-    "type": "instantane",
-    "value": null,
-    "unit": null
+    "type": "normal",
+    "value": 1,
+    "unit": "jour"
   },
   "components": {
-    "v": false,
-    "s": false,
-    "m": null
+    "v": true,
+    "s": true,
+    "m": "un peu d’eau bénite, de l’encens rare et de la poudre de rubis d’une valeur minimale de 1 000 po"
   },
   "is_ritual": true,
   "is_concentration": false,
@@ -30,7 +30,7 @@
   "classes": [
     "cls-pretre"
   ],
-  "description": "",
+  "description": "Vous créez une protection contre les déplacements magiques qui affecte une zone dont la surface au sol peut atteindre 4 000 m² et la hauteur 9 m. Pour toute la durée du sort, aucune créature ne peut se téléporter dans la zone ni même utiliser de portails pour y entrer. Le sort protège la zone contre les déplacements planaires et empêche donc les créatures d’y accéder par le Plan Astral, le Plan Éthéré ou le sort changement de plan.\n\nEn outre, le sort blesse les créatures des types choisis au moment de l’incantation. Choisissez-en au moins un parmi les suivants : célestes, élémentaires, fées, fiélons, morts-vivants ou ravageurs du Chancre. Quand une telle créature entre dans la zone de l’abjuration pour la première fois d’un tour de jeu ou qu’elle y commence son tour, elle subit 5d10 dégâts radiants ou nécrotiques (à votre convenance, au moment de l’incantation).\n\nAu moment de l’incantation, vous pouvez également fixer un mot de passe. Le sort n’inflige aucun dégât à une créature qui le prononce en entrant dans la zone. La zone du sort ne peut pas chevaucher celle d’une autre interdiction. Si vous lancez ce sort tous les jours pendant 30 jours au même endroit, le sort persiste jusqu’à ce qu’il soit dissipé, et les composantes matérielles sont détruites à la dernière incantation.",
   "higher_levels": null,
   "modular_options": []
 }

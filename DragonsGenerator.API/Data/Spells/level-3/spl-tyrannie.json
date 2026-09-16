@@ -15,14 +15,14 @@
     "area": null
   },
   "duration": {
-    "type": "instantane",
-    "value": null,
-    "unit": null
+    "type": "concentration",
+    "value": 10,
+    "unit": "minute"
   },
   "components": {
-    "v": false,
-    "s": false,
-    "m": null
+    "v": true,
+    "s": true,
+    "m": "une cravache"
   },
   "is_ritual": false,
   "is_concentration": true,
@@ -33,7 +33,7 @@
     "cls-pretre",
     "cls-sorcier"
   ],
-  "description": "",
-  "higher_levels": null,
+  "description": "Une énergie despotique émane de vous dans un rayon de 6 m. L’aura se déplace avec vous tant que le sort persiste, et vous en restez le centre.\n\nUne fois par round, lors de votre tour, vous pouvez donner un ordre à une créature comprise dans l’aura. Si celle-ci vous comprend, elle peut choisir de vous obéir docilement. Si elle refuse de se soumettre, elle doit réussir un JS Charisme sous peine de subir 5d6 dégâts psychiques, ou la moitié en cas de réussite. Une créature qui ne peut être effrayée est immunisée contre ce sort.\n\nL’ordre doit se limiter à un mot. Si la cible se soumet à votre instruction, elle doit consacrer son tour suivant à s’exécuter (cf. sort injonction). Si, pour une raison ou une autre, elle est incapable d’obéir à votre ordre, elle reste inactive lors de son tour mais ne subit pas de dégâts comme décrit ci-dessus.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, chaque niveau d’emplacement au-dessus du 3e augmente les dégâts de 1d6 et le rayon d’action de 3 m.",
   "modular_options": []
 }

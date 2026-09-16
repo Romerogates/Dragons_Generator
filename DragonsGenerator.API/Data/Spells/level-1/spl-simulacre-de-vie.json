@@ -15,14 +15,14 @@
     "area": null
   },
   "duration": {
-    "type": "instantane",
-    "value": null,
-    "unit": null
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
   },
   "components": {
-    "v": false,
-    "s": false,
-    "m": null
+    "v": true,
+    "s": true,
+    "m": "une petite quantité d’alcool ou d’eau-de-vie"
   },
   "is_ritual": false,
   "is_concentration": false,
@@ -31,7 +31,7 @@
     "cls-ensorceleur",
     "cls-magicien"
   ],
-  "description": "",
-  "higher_levels": null,
+  "description": "Vous vous renforcez au moyen d’un semblant de vie nécromantique, ce qui vous fait gagner 1d4 + 4 points de vie temporaires pour toute la durée du sort.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, vous gagnez 5 points de vie temporaires supplémentaires par niveau d’emplacement au-dessus du 1er.",
   "modular_options": []
 }

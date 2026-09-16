@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
+  computed,
   input,
   output,
 } from '@angular/core';
@@ -15,9 +16,10 @@ import {
 import { CampaignDetailActivity } from '../campaign-detail-activity/campaign-detail-activity';
 import { CampaignPlayerSheet } from '../../campaign-player-sheet/campaign-player-sheet';
 import { CampaignFirstSessionChecklist } from '../campaign-first-session-checklist';
-import type {
-  FirstSessionAction,
-  FirstSessionChecklistInput,
+import {
+  buildFirstSessionChecklist,
+  type FirstSessionAction,
+  type FirstSessionChecklistInput,
 } from '../campaign-first-session-checklist.util';
 
 @Component({
@@ -72,6 +74,11 @@ export class CampaignDetailOverview {
 
   /** Checklist première session (MJ). */
   readonly firstSession = input<FirstSessionChecklistInput | null>(null);
+
+  readonly firstSessionView = computed(() => {
+    const state = this.firstSession();
+    return state ? buildFirstSessionChecklist(state) : null;
+  });
 
   readonly openPlayFullscreen = output<void>();
   readonly startPlaySession = output<string>();

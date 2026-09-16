@@ -15,12 +15,12 @@
     "area": null
   },
   "duration": {
-    "type": "instantane",
-    "value": null,
-    "unit": null
+    "type": "normal",
+    "value": 1,
+    "unit": "heure"
   },
   "components": {
-    "v": false,
+    "v": true,
     "s": false,
     "m": null
   },
@@ -31,7 +31,7 @@
     "cls-barde",
     "cls-sorcier"
   ],
-  "description": "",
+  "description": "Tant que le sort persiste, vous pouvez remplacer par un 15 les résultats obtenus sur le dé de vos tests de Charisme. En outre, quoi que vous disiez, toute magie censée révéler si vous dites la vérité indique qu’on peut vous croire sur parole.",
   "higher_levels": null,
   "modular_options": []
 }

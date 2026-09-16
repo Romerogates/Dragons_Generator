@@ -6,8 +6,8 @@
   "level": 5,
   "school": "divination",
   "casting_time": {
-    "value": 1,
-    "unit": "action"
+    "value": 10,
+    "unit": "minute"
   },
   "range": {
     "type": "personnelle",
@@ -20,9 +20,9 @@
     "unit": null
   },
   "components": {
-    "v": false,
-    "s": false,
-    "m": null
+    "v": true,
+    "s": true,
+    "m": "de l’encens pour une valeur d’au moins 250 po, que le sort détruit, et quatre lamelles d’ivoire d’une valeur minimale de 50 po chacune"
   },
   "is_ritual": false,
   "is_concentration": false,
@@ -32,7 +32,7 @@
     "cls-magicien",
     "cls-pretre"
   ],
-  "description": "",
+  "description": "Nommez ou décrivez une personne, un endroit ou un objet. Le sort vous dévoile les grandes lignes de ce qu’il faut savoir sur la cible citée. Il peut s’agir de récits actuels, d’histoires oubliées ou de connaissances secrètes qui n’ont jamais connu une large diffusion. Si la chose que vous nommez n’est pas d’importance légendaire, vous ne gagnez aucune information. Plus nombreux sont les renseignements dont vous disposez déjà sur la cible, plus ceux que vous glanerez seront précis et détaillés.\n\nLes informations acquises sont exactes, mais peuvent avoir un sens figuré.",
   "higher_levels": null,
   "modular_options": []
 }

@@ -169,8 +169,8 @@
           Parchemins vierges
         </h2>
         <p class="text-slate-400 mb-8 max-w-md leading-relaxed">
-          Aucune campagne pour l'instant. Lancez un scénario guidé ou créez une campagne vide pour
-          inviter vos joueurs et préparer la table à la main.
+          Première session ce soir : créez la table, invitez, planifiez, puis jouez. Le scénario
+          guidé reste disponible si vous voulez forger une intrigue d’abord.
         </p>
         <p class="text-sm text-slate-500 mb-6">
           Première partie ?
@@ -181,20 +181,21 @@
           <a routerLink="/guide" class="text-slate-400 underline hover:text-slate-200">ouvrir le guide</a>.
         </p>
         <div class="flex flex-col sm:flex-row gap-3">
+          <button
+            type="button"
+            class="px-10 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-violet-500 text-slate-950 shadow-md hover:bg-violet-400 hover:scale-[1.02] active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-50"
+            [disabled]="creatingEmpty()"
+            (click)="openEmptyCampaignModal()"
+            data-testid="create-table-cta"
+          >
+            @if (creatingEmpty()) { Création… } @else { Créer une table }
+          </button>
           <a
             routerLink="/story/create"
-            class="px-10 py-4 rounded-xl text-sm font-black uppercase tracking-widest bg-violet-500 text-slate-950 shadow-md hover:bg-violet-400 hover:scale-[1.02] active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-200"
+            class="px-10 py-4 rounded-xl text-sm font-black uppercase tracking-widest border border-slate-600 text-slate-200 hover:border-violet-500/50 hover:text-violet-300 transition-[colors,transform,opacity,box-shadow] duration-200"
           >
             Lancer un scénario
           </a>
-          <button
-            type="button"
-            class="px-10 py-4 rounded-xl text-sm font-black uppercase tracking-widest border border-slate-600 text-slate-200 hover:border-violet-500/50 hover:text-violet-300 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-50"
-            [disabled]="creatingEmpty()"
-            (click)="openEmptyCampaignModal()"
-          >
-            @if (creatingEmpty()) { Création… } @else { Campagne vide }
-          </button>
         </div>
       </div>
     } @else {

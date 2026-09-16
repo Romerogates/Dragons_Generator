@@ -56,10 +56,10 @@
   "actions": [
     {
       "name": "Morsure",
-      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d4 + 2) dégâts perforants.\nLes rats géants sont connus pour être plus agressifs que les rats ordinaires, avec des comportements de prédation coordonnés qui peuvent les conduire à chasser des humanoïdes blessés ou fragiles. Ceux porteurs de maladies se signalent par une témérité particulièrement marquée."
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d4 + 2) dégâts perforants."
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": ""
+  "description": "Les rats géants sont connus pour être plus agressifs que les rats ordinaires, avec des comportements de prédation coordonnés qui peuvent les conduire à chasser des humanoïdes blessés ou fragiles. Ceux porteurs de maladies se signalent par une témérité particulièrement marquée."
 }

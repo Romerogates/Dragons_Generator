@@ -135,7 +135,7 @@ export class Campaigns implements OnInit, OnDestroy {
   openEmptyCampaignModal(): void {
     if (!this.auth.isLoggedIn() || this.creatingEmpty()) return;
     this.emptyCampaignTitle.set('Nouvelle campagne');
-    this.emptyCampaignTemplate.set('blank');
+    this.emptyCampaignTemplate.set('oneshot-classic');
     this.showEmptyCampaignModal.set(true);
   }
 
@@ -155,14 +155,14 @@ export class Campaigns implements OnInit, OnDestroy {
     if (!this.connectivity.isOnline()) {
       const local = this.offlineSync.queueCampaignCreate(title, data);
       this.creatingEmpty.set(false);
-      this.router.navigate(['/campaigns', local.id]);
+      this.router.navigate(['/campaigns', local.id], { queryParams: { tab: 'overview' } });
       return;
     }
 
     this.campaigns.create(title, data).subscribe({
       next: (created) => {
         this.creatingEmpty.set(false);
-        this.router.navigate(['/campaigns', created.id]);
+        this.router.navigate(['/campaigns', created.id], { queryParams: { tab: 'overview' } });
       },
       error: () => {
         this.actionError.set('Impossible de créer la campagne vide.');

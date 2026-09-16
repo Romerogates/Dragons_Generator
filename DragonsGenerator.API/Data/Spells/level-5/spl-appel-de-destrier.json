@@ -6,12 +6,12 @@
   "level": 5,
   "school": "invocation",
   "casting_time": {
-    "value": 1,
-    "unit": "action"
+    "value": 10,
+    "unit": "minute"
   },
   "range": {
-    "type": "personnelle",
-    "distance_m": null,
+    "type": "normal",
+    "distance_m": 9,
     "area": null
   },
   "duration": {
@@ -20,8 +20,8 @@
     "unit": null
   },
   "components": {
-    "v": false,
-    "s": false,
+    "v": true,
+    "s": true,
     "m": null
   },
   "is_ritual": false,
@@ -30,7 +30,7 @@
   "classes": [
     "cls-paladin"
   ],
-  "description": "",
+  "description": "Vous convoquez un esprit qui prend la forme d’un destrier particulièrement intelligent, puissant et fidèle, et créez un lien durable avec lui. Le destrier apparaît dans un espace inoccupé situé à portée et prend la forme de votre choix : un destrier, un poney, un chameau, un élan ou un molosse (votre meneur peut autoriser d’autres types de monture). Il a le profil de la forme choisie, mais son type habituel est remplacé par céleste, fée ou fiélon (à votre convenance). En outre, si votre destrier a une Intelligence inférieure ou égale à 5, elle passe à 6, et il acquiert la faculté de comprendre une langue de votre choix que vous parlez.\n\nVotre destrier vous sert de monture, y compris au combat, et vous partagez avec lui un lien instinctif qui vous permet de combattre comme si vous ne faisiez qu’un. Tant que vous montez votre destrier, tout sort que vous lancez et qui ne cible que vous peut aussi le cibler.\n\nQuand le destrier tombe à 0 point de vie, il disparaît sans laisser de traces. Vous pouvez aussi le révoquer à tout moment au prix d’une action, il disparaît alors. Dans tous les cas, en relançant ce sort, vous invoquez le même destrier, avec ses points de vie maximums.\n\nTant que votre destrier se situe dans un rayon de 1,5 km de vous, vous pouvez communiquer avec lui par télépathie, et vice versa.\n\nVous ne pouvez avoir qu’un seul destrier lié par ce sort ou par appel de destrier volant à la fois. Au prix d’une action, vous pouvez le libérer de son lien à tout moment, auquel cas il disparaît.",
   "higher_levels": null,
   "modular_options": []
 }

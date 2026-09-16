@@ -10,19 +10,19 @@
     "unit": "action"
   },
   "range": {
-    "type": "personnelle",
-    "distance_m": null,
+    "type": "normal",
+    "distance_m": 30,
     "area": null
   },
   "duration": {
-    "type": "instantane",
-    "value": null,
-    "unit": null
+    "type": "concentration",
+    "value": 1,
+    "unit": "minute"
   },
   "components": {
-    "v": false,
-    "s": false,
-    "m": null
+    "v": true,
+    "s": true,
+    "m": "une magnétite et des copeaux de fer"
   },
   "is_ritual": false,
   "is_concentration": true,
@@ -32,7 +32,7 @@
     "cls-ensorceleur",
     "cls-magicien"
   ],
-  "description": "",
+  "description": "Ce sort inverse la gravité dans un cylindre de 30 m de haut et de 15 m de rayon centré sur un point situé à portée. Les créatures et objets pris dans la zone qui ne sont pas ancrés ou fixés au sol tombent vers le haut et atteignent le sommet du cylindre au moment de l’incantation du sort. Une créature peut effectuer un JS Dextérité pour s’agripper à un objet fixé qu’elle peut atteindre, et ainsi éviter la chute.\n\nS’il y a un obstacle (le plafond, par exemple), les objets et créatures le percutent comme ils le feraient au cours d’une chute normale. Si un objet ou une créature atteint le sommet de la zone sans rien percuter, il y reste en oscillant légèrement pour toute la durée du sort.\n\nÀ la fin de la durée du sort, les objets et créatures affectés tombent dans l’autre sens.",
   "higher_levels": null,
   "modular_options": []
 }

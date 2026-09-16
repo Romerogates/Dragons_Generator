@@ -15,13 +15,13 @@
     "area": null
   },
   "duration": {
-    "type": "instantane",
-    "value": null,
-    "unit": null
+    "type": "normal",
+    "value": 10,
+    "unit": "minute"
   },
   "components": {
-    "v": false,
-    "s": false,
+    "v": true,
+    "s": true,
     "m": null
   },
   "is_ritual": false,
@@ -30,7 +30,7 @@
   "classes": [
     "cls-sorcier"
   ],
-  "description": "",
-  "higher_levels": null,
+  "description": "Une énergie vampirique émane de vous dans un rayon de 9 m. L’aura se déplace avec vous tant que le sort persiste, et vous en restez le centre. Une fois par round, quand vous voyez une créature de taille P ou supérieure comprise dans la zone subir des dégâts contondants, perforants ou tranchants, vous pouvez récupérer un nombre de points de vie égal à la moitié des dégâts en question. Les créatures dont le type est l’un des suivants ne vous permettent pas d’activer cet effet : créature artificielle, élémentaire, mort-vivant, plante et vase.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 5e niveau ou supérieur, le rayon d’effet augmente de 3 m par niveau d’emplacement au-dessus du 4e.",
   "modular_options": []
 }

@@ -7,21 +7,21 @@
   "school": "invocation",
   "casting_time": {
     "value": 1,
-    "unit": "action"
+    "unit": "minute"
   },
   "range": {
-    "type": "personnelle",
-    "distance_m": null,
+    "type": "normal",
+    "distance_m": 27,
     "area": null
   },
   "duration": {
-    "type": "instantane",
-    "value": null,
-    "unit": null
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
   },
   "components": {
-    "v": false,
-    "s": false,
+    "v": true,
+    "s": true,
     "m": null
   },
   "is_ritual": false,
@@ -31,7 +31,7 @@
     "cls-druide",
     "cls-sorcier"
   ],
-  "description": "",
-  "higher_levels": null,
+  "description": "Vous invoquez une créature féerique d’un facteur de puissance de 6 ou moins, ou un esprit féerique qui prend la forme d’une bête d’un facteur de puissance de 6 ou moins. La créature apparaît dans un espace inoccupé que vous voyez à portée et disparaît quand elle tombe à 0 point de vie ou quand le sort prend fin.\n\nLa créature féerique invoquée est amicale envers vous et vos compagnons pour toute la durée du sort. Déterminez son initiative ; elle a ses propres tours de jeu. Elle obéit aux ordres verbaux que vous lui donnez (sans que cela ne vous coûte d’action) tant qu’ils n’enfreignent pas son alignement. Si vous ne lui en donnez pas, elle n’entreprend pas d’actions, mais se défend contre les créatures hostiles.\n\nSi votre concentration est interrompue, la créature féerique ne disparaît pas. Vous en perdez le contrôle, elle devient hostile envers vous et vos compagnons, et est susceptible d’attaquer. Vous ne pouvez pas révoquer une créature féerique incontrôlée, qui disparaît 1 heure après que vous l’avez invoquée.\n\nLa variante invocation de ravageur de ce sort invoque un ravageur à la place d’une créature féerique ou d’un esprit féerique.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau ou supérieur, le facteur de puissance augmente de 1 par niveau d’emplacement au-dessus du 6e.",
   "modular_options": []
 }
