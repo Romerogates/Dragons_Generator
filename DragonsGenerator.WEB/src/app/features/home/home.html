@@ -230,6 +230,42 @@
     </section>
   }
 
+  <!-- Première partie → livrets -->
+  <section class="relative border-y border-amber-900/20 bg-[#141820]">
+    <div class="max-w-3xl mx-auto px-4 py-10 text-center space-y-4">
+      <p class="text-[10px] font-black uppercase tracking-[0.3em] text-amber-500/80">Première partie ?</p>
+      <p class="text-base sm:text-lg text-slate-300 leading-relaxed max-w-xl mx-auto">
+        Les livrets expliquent comment jouer — stats, tours, combat — sans feuille à cocher.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center pt-1">
+        <a
+          routerLink="/guide/mj-table"
+          class="min-h-11 px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-violet-600/40 text-violet-200 hover:bg-violet-950/40 transition-colors"
+        >
+          Livret MJ
+        </a>
+        <a
+          routerLink="/guide/joueur-table"
+          class="min-h-11 px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-sky-600/40 text-sky-200 hover:bg-sky-950/40 transition-colors"
+        >
+          Livret joueur
+        </a>
+        <a
+          routerLink="/guide/oneshot"
+          class="min-h-11 px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-pink-600/40 text-pink-200 hover:bg-pink-950/40 transition-colors"
+        >
+          One-shot 1 feuille
+        </a>
+        <a
+          routerLink="/guide"
+          class="min-h-11 px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-600 text-slate-300 hover:border-amber-500/40 hover:text-amber-200 transition-colors"
+        >
+          Tout le guide
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- Journey -->
   <section id="journey" class="relative w-full py-20 md:py-28 px-4">
     <div class="max-w-5xl mx-auto space-y-16 md:space-y-24">
@@ -361,6 +397,12 @@
           class="min-h-12 px-8 py-3.5 rounded-2xl text-sm font-black uppercase tracking-widest bg-amber-500 text-slate-950 hover:bg-amber-400 transition-colors"
         >
           Forger
+        </a>
+        <a
+          routerLink="/guide"
+          class="min-h-12 px-8 py-3.5 rounded-2xl text-sm font-black uppercase tracking-widest border border-violet-500/40 text-violet-200 hover:bg-violet-950/40 transition-colors"
+        >
+          Guide
         </a>
         @if (isLoggedIn()) {
           <a

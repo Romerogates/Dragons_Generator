@@ -82,6 +82,43 @@ describe('buildCampaignSetupGuide', () => {
     expect(g.current?.title).toBe('Soirée 1');
   });
 
+  it('uses session-oriented prep copy (not combat-first)', () => {
+    const creatures = buildCampaignSetupGuide(base({ hasAdventure: true }));
+    expect(creatures.current?.proposal).toContain('alimentera les rencontres (lancées en session)');
+
+    const maps = buildCampaignSetupGuide(base({ hasAdventure: true, creatureCount: 2 }));
+    expect(maps.current?.proposal).toContain('se déplacer pendant la session');
+
+    const encounters = buildCampaignSetupGuide(
+      base({ hasAdventure: true, creatureCount: 2, mapsSkipped: true }),
+    );
+    expect(encounters.current?.title).toBe('Composez les rencontres');
+    expect(encounters.current?.proposal).toContain('lancer d’un clic une fois en session');
+
+    const playersEmpty = buildCampaignSetupGuide(
+      base({
+        hasAdventure: true,
+        creatureCount: 1,
+        mapsSkipped: true,
+        encounterCount: 1,
+      }),
+    );
+    expect(playersEmpty.current?.proposal).toContain(
+      'la table n’aura personne du côté allié en session',
+    );
+
+    const playersReady = buildCampaignSetupGuide(
+      base({
+        hasAdventure: true,
+        creatureCount: 1,
+        mapsSkipped: true,
+        encounterCount: 1,
+        playerCount: 2,
+      }),
+    );
+    expect(playersReady.current?.proposal).toContain('importer à la table');
+  });
+
   it('session step explains prep vs play', () => {
     const g = buildCampaignSetupGuide(
       base({

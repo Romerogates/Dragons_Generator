@@ -49,6 +49,7 @@ export const routes: Routes = [
       { path: 'joueur-debut', redirectTo: 'joueur-table', pathMatch: 'full' },
       { path: 'mj', redirectTo: 'mj-table', pathMatch: 'full' },
       { path: 'joueur', redirectTo: 'joueur-table', pathMatch: 'full' },
+      { path: 'checklists', redirectTo: 'parcours', pathMatch: 'full' },
       {
         path: 'mj-table',
         loadComponent: () =>
@@ -67,11 +68,16 @@ export const routes: Routes = [
           import('./features/guide/guide-rulebook').then((m) => m.GuideRulebookPage),
         data: { rulebookId: 'joueur-table' },
       },
-      {
-        path: 'joueur-en-ligne',
+      { path: 'joueur-en-ligne',
         loadComponent: () =>
           import('./features/guide/guide-rulebook').then((m) => m.GuideRulebookPage),
         data: { rulebookId: 'joueur-en-ligne' },
+      },
+      {
+        path: 'oneshot',
+        loadComponent: () =>
+          import('./features/guide/guide-rulebook').then((m) => m.GuideRulebookPage),
+        data: { rulebookId: 'oneshot' },
       },
       {
         path: 'classe/:classId',

@@ -2044,6 +2044,21 @@
       <p class="text-xs text-slate-500 mt-2 max-w-md">
         Entrez en session pour ouvrir la table. Combattre, notes et rencontres ne sont disponibles qu’après.
       </p>
+      @if (isDm()) {
+        <a
+          routerLink="/guide/mj-table"
+          class="inline-block mt-2 text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline"
+        >
+          Guide sessions →
+        </a>
+      } @else {
+        <a
+          routerLink="/guide/joueur-table"
+          class="inline-block mt-2 text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline"
+        >
+          Comment ça marche →
+        </a>
+      }
     </div>
     @if (isDm()) {
       <button
@@ -2073,6 +2088,21 @@
     <p class="text-xs text-slate-500 max-w-sm mx-auto">
       La préparation reste dans le hub ; le combat n’est accessible qu’après être entré en session.
     </p>
+    @if (isDm()) {
+      <a
+        routerLink="/guide/mj-table"
+        class="inline-block text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline"
+      >
+        Guide sessions →
+      </a>
+    } @else {
+      <a
+        routerLink="/guide/joueur-table"
+        class="inline-block text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline"
+      >
+        Comment ça marche →
+      </a>
+    }
     @if (isDm()) {
       <a
         [routerLink]="['/campaigns', c.id]"

@@ -330,6 +330,21 @@
             Aucune session pour l’instant.
           }
         </p>
+        @if (isOwner()) {
+          <a
+            routerLink="/guide/mj-table"
+            class="inline-block text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline"
+          >
+            Guide sessions →
+          </a>
+        } @else {
+          <a
+            routerLink="/guide/joueur-table"
+            class="inline-block text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline"
+          >
+            Comment ça marche →
+          </a>
+        }
         @if (isOwner() && filter() !== 'past') {
           <button
             type="button"

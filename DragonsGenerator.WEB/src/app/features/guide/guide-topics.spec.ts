@@ -27,6 +27,10 @@ describe('guide-topics', () => {
     expect(getGuideTopic('joueur-debut')).toBeUndefined();
   });
 
+  it('no longer ships checklists topic', () => {
+    expect(getGuideTopic('checklists')).toBeUndefined();
+  });
+
   it('filters by audience and query', () => {
     const dmOnly = guideTopicsByGroup('dm', '', 'all');
     const flat = dmOnly.flatMap((s) => s.topics);
@@ -38,10 +42,11 @@ describe('guide-topics', () => {
 });
 
 describe('guide-rulebooks', () => {
-  it('exposes four distinct table/online rulebooks', () => {
-    expect(GUIDE_RULEBOOKS.length).toBe(4);
+  it('exposes table/online rulebooks plus oneshot sheet', () => {
+    expect(GUIDE_RULEBOOKS.length).toBe(5);
     expect(getGuideRulebook('mj-table')?.mode).toBe('table');
     expect(getGuideRulebook('mj-en-ligne')?.mode).toBe('en-ligne');
+    expect(getGuideRulebook('oneshot')?.mode).toBe('oneshot');
     expect(getGuideRulebook('joueur-table')?.chapters.some((c) => c.id === 'combat')).toBe(true);
     expect(getGuideRulebook('mj-table')?.chapters.some((c) => c.id === 'stats')).toBe(true);
   });
@@ -53,12 +58,23 @@ describe('guide-rulebooks', () => {
       expect(book?.chapters.some((c) => c.id === 'glossaire')).toBe(true);
       const combat = book?.chapters.find((c) => c.id === 'combat');
       expect(combat?.sections.some((s) => s.id === 'init-vs-toucher')).toBe(true);
+      expect(combat?.sections.some((s) => s.id === 'schema-initiative' && !!s.diagram?.length)).toBe(
+        true,
+      );
     }
     const dd = getGuideRulebook('mj-table')
       ?.chapters.find((c) => c.id === 'stats')
       ?.sections.find((s) => s.id === 'dd');
     expect(dd?.bullets?.some((b) => b.includes('Eana'))).toBe(true);
     expect(getGuideRulebook('inconnu')).toBeNull();
+  });
+
+  it('aligns fiche labels with sheet vocabulary (Pv, Bonus de maîtrise)', () => {
+    const fiche = getGuideRulebook('joueur-table')?.chapters.find((c) => c.id === 'fiche');
+    const zones = fiche?.sections.find((s) => s.id === 'zones')?.numbered?.join(' ') ?? '';
+    expect(zones).toContain('Bonus de maîtrise');
+    expect(zones).toContain('Pv');
+    expect(zones).toContain('Perception passive');
   });
 });
 

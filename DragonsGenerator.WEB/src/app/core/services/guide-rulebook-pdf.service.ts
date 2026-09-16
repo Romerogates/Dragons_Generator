@@ -19,6 +19,7 @@ export interface GuidePdfSection {
   paragraphs?: string[];
   bullets?: string[];
   numbered?: string[];
+  diagram?: string[];
 }
 
 const PAGE_W = 210;
@@ -120,6 +121,19 @@ export class GuideRulebookPdfService {
         y = this.writeBullet(pdf, bg, item, y, `${i + 1}.`);
       });
       y += 2;
+    }
+
+    if (section.diagram?.length) {
+      y = this.ensureSpace(pdf, bg, y, section.diagram.length * 3.6 + 4);
+      pdf.setFont('courier', 'normal');
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(40, 32, 22);
+      for (const line of section.diagram) {
+        y = this.ensureSpace(pdf, bg, y, 4);
+        pdf.text(line, MARGIN, y);
+        y += 3.4;
+      }
+      y += 3;
     }
 
     return y + 2;

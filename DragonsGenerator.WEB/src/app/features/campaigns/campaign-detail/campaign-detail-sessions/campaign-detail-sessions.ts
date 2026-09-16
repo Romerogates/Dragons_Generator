@@ -8,6 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import type { CampaignSession } from '@core/models/Campaign/campaign';
 import {
   formatSessionDate,
@@ -36,7 +37,7 @@ export type SessionListFilter = 'upcoming' | 'past' | 'all';
 @Component({
   selector: 'app-campaign-detail-sessions',
   standalone: true,
-  imports: [FormsModule, CampaignSessionTimeline],
+  imports: [FormsModule, RouterLink, CampaignSessionTimeline],
   templateUrl: './campaign-detail-sessions.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

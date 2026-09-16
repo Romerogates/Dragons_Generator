@@ -150,6 +150,22 @@ export interface GuideSidebarSection {
           </div>
           <div>
             <p class="text-[9px] font-black uppercase tracking-widest text-slate-600 px-2 mb-1">
+              One-shot
+            </p>
+            <ul class="grid grid-cols-2 gap-0.5 lg:grid-cols-1">
+              <li>
+                <a
+                  routerLink="/guide/oneshot"
+                  class="block px-2 py-2 lg:py-1.5 rounded-md text-sm"
+                  [class]="linkClass(activeRulebookId() === 'oneshot')"
+                  (click)="closeNavOnMobile()"
+                  >1 feuille</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <p class="text-[9px] font-black uppercase tracking-widest text-slate-600 px-2 mb-1">
               Par classe
             </p>
             <ul class="grid grid-cols-2 gap-0.5 lg:grid-cols-1">

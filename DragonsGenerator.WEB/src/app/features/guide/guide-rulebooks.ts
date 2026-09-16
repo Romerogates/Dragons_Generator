@@ -4,7 +4,8 @@ export type GuideRulebookId =
   | 'mj-table'
   | 'mj-en-ligne'
   | 'joueur-table'
-  | 'joueur-en-ligne';
+  | 'joueur-en-ligne'
+  | 'oneshot';
 
 export interface GuideRulebookSection {
   id: string;
@@ -12,6 +13,8 @@ export interface GuideRulebookSection {
   paragraphs?: string[];
   bullets?: string[];
   numbered?: string[];
+  /** Schéma monospacé (écran + PDF). */
+  diagram?: string[];
 }
 
 export interface GuideRulebookChapter {
@@ -22,8 +25,8 @@ export interface GuideRulebookChapter {
 
 export interface GuideRulebook {
   id: GuideRulebookId;
-  role: 'mj' | 'joueur';
-  mode: 'table' | 'en-ligne';
+  role: 'mj' | 'joueur' | 'all';
+  mode: 'table' | 'en-ligne' | 'oneshot';
   title: string;
   subtitle: string;
   pdfFilename: string;
@@ -102,7 +105,7 @@ const STATS_CHAPTER: GuideRulebookChapter = {
   ],
 };
 
-/** Où lire les chiffres sur la fiche — à imprimer avec le livret table. */
+/** Où lire les chiffres — libellés alignés sur la fiche PDF officielle. */
 const FICHE_ANNOTATED: GuideRulebookChapter = {
   id: 'fiche',
   title: 'Votre fiche annotée',
@@ -111,31 +114,36 @@ const FICHE_ANNOTATED: GuideRulebookChapter = {
       id: 'zones',
       title: 'Où regarder (débutant absolu)',
       paragraphs: [
-        'La fiche PDF ou papier regroupe les mêmes infos. Avant de lancer un dé, pointez du doigt la bonne case — ne recalculez pas de tête si le chiffre est déjà écrit.',
+        'La fiche PDF regroupe les mêmes infos. Avant de lancer un dé, pointez la bonne case — ne recalculez pas de tête si le chiffre est déjà écrit.',
       ],
       numbered: [
         'Score (ex. 16) → gros chiffre de caractéristique. On ne l’ajoute pas au dé.',
-        'Modificateur (ex. +3) → petit chiffre à côté du score. C’est celui qu’on ajoute au d20.',
-        'Bonus de maîtrise (souvent +2 aux premiers niveaux) → une seule case « maîtrise » / niveau. À ajouter seulement si la ligne est maîtrisée.',
-        'Ligne de compétence (ex. Discrétion) → case maîtrisée ? + le mod de la carac liée (souvent DEX). Total = d20 + mod (+ maîtrise).',
-        'Bonus d’attaque (arme) → déjà calculé = mod FOR ou DEX + maîtrise si l’arme est maîtrisée. Jet pour toucher = 1d20 + ce bonus.',
-        'CA (classe d’armure) → ce que l’ennemi doit battre ou égaler pour vous toucher. Ce n’est pas un jet que vous lancez.',
-        'PV / points de vie → votre « jauge ». À 0, vous tombez (règles de mort / stabilisation selon la table).',
+        'Modificateur de caractéristique (ex. +3) → petit chiffre à côté du score. C’est celui qu’on ajoute au d20.',
+        'Bonus de maîtrise (souvent +2 aux premiers niveaux) → case en haut de fiche. À ajouter seulement si la ligne est maîtrisée.',
+        'Ligne de compétence (ex. Discrétion) → pastille maîtrise ? + le mod de carac liée. Total = d20 + mod (+ bonus de maîtrise).',
+        'Colonne Bonus d’attaque (tableau d’armes) → déjà calculé = mod FOR/DEX + bonus de maîtrise si l’arme est maîtrisée. Jet pour toucher = 1d20 + ce bonus.',
+        'CA → seuil que l’ennemi doit battre ou égaler pour vous toucher (classe d’armure). Ce n’est pas un jet que vous lancez.',
+        'Pv (actuels) et Pv max → votre jauge. Pv Temporaires = bonus en plus des Pv. À 0 Pv, vous tombez.',
+        'Dés de vie → ex. 2d8 ; sert aux repos et à la montée de niveau.',
+        'Seuil de blessure → un coup ≥ ce chiffre peut infliger une blessure (selon la table).',
+        'Initiative → 1d20 + modificateur de DEX (pas le Bonus d’attaque).',
+        'Perception passive → score fixe (souvent 10 + mod SAG + bonus de maîtrise si Perception maîtrisée). Pas un jet sauf si le MJ le demande.',
+        'VD (Vitesse) → distance en mètres par round. Peuple = ligne « Peuple » en haut de fiche (espèce).',
       ],
     },
     {
       id: 'exemples-fiche',
       title: 'Trois lectures concrètes',
       bullets: [
-        'Jet de Discrétion maîtrisée : case Discrétion cochée → 1d20 + mod DEX + bonus de maîtrise.',
-        'Attaque à l’épée longue (FOR, maîtrisée) : lisez le « +5 » d’attaque sur la fiche → 1d20 + 5 pour toucher ; si ça touche, dés de dégâts + FOR (sans rajouter la maîtrise).',
-        'Initiative : uniquement 1d20 + mod DEX — ignorez le bonus d’attaque et la maîtrise des armes.',
+        'Jet de Discrétion maîtrisée : pastille Discrétion → 1d20 + mod DEX + Bonus de maîtrise.',
+        'Attaque : lisez la colonne Bonus d’attaque (ex. +5) → 1d20 + 5 pour toucher ; si ça touche, colonne Dégâts/type (+ FOR) sans rajouter le Bonus de maîtrise.',
+        'Initiative : uniquement 1d20 + mod DEX — ignorez Bonus d’attaque et maîtrises d’armes.',
       ],
     },
   ],
 };
 
-/** Glossaire 1 page — livrets table. */
+/** Glossaire — mêmes libellés que la fiche PDF. */
 const GLOSSAIRE: GuideRulebookChapter = {
   id: 'glossaire',
   title: 'Glossaire express',
@@ -144,20 +152,54 @@ const GLOSSAIRE: GuideRulebookChapter = {
       id: 'termes',
       title: 'Mots qu’on entend à la table',
       bullets: [
-        'CA — Classe d’armure : seuil pour toucher quelqu’un (plus haut = plus dur à toucher).',
-        'PV — Points de vie : solidité. Baissent avec les dégâts ; remontent avec les soins / repos.',
-        'DD — Difficulté : seuil fixé par le MJ pour un jet de compétence ou une sauvegarde.',
-        'Modificateur — Petit bonus/malus tiré du score (ex. 16 → +3). C’est lui qu’on ajoute au d20.',
-        'Maîtrise — Bonus de niveau si vous êtes entraîné (compétence, arme, sauvegarde…). Pas un 2ᵉ dé.',
-        'Bonus d’attaque — Chiffre pour toucher avec une arme ou un sort d’attaque (souvent mod + maîtrise).',
+        'CA — Classe d’armure : seuil pour vous toucher (plus haut = plus dur).',
+        'Pv — Points de vie (fiche : Pv / Pv max). Baissent avec les dégâts ; remontent avec soins / repos.',
+        'Pv Temporaires — Bonus temporaire en plus des Pv.',
+        'DD — Difficulté : seuil fixé par le MJ pour un jet ou une sauvegarde.',
+        'DD de sauvegarde des sorts — Seuil que la cible doit égaler ou battre contre vos sorts.',
+        'Modificateur de caractéristique — Petit bonus/malus tiré du score (ex. 16 → +3). On l’ajoute au d20.',
+        'Bonus de maîtrise — Bonus de niveau si entraîné (compétence, arme, JS…). Pas un 2ᵉ dé.',
+        'Bonus d’attaque — Colonne fiche pour toucher (arme ou sort d’attaque).',
+        'Modificateur d’attaque des sorts — 1d20 + ce chiffre pour un sort d’attaque.',
         'Initiative — Jet qui range l’ordre des tours. Ce n’est pas le jet pour toucher.',
-        'Jet de sauvegarde — d20 + mod (+ maîtrise parfois) pour résister à un effet (poison, sort…).',
-        'Concentration — Certains sorts exigent de rester concentré ; un seul à la fois ; un coup peut la casser.',
-        'Emplacement de sort — « Charge » dépensée pour lancer un sort préparé / connu (hors cantrips).',
-        'Avantage / désavantage — 2d20, on garde le meilleur / le pire. Ne remplace pas le bonus de maîtrise.',
-        'Repos court / long — Pause pour récupérer certaines ressources (ki, emplacements de sorcier, PV partiels…).',
+        'JS (jet de sauvegarde) — d20 + mod (+ Bonus de maîtrise si pastille JS cochée) pour résister.',
+        'Perception passive — Score fixe ; le MJ l’utilise sans vous demander un jet.',
+        'VD — Vitesse (case Vitesse (VD) sur la fiche).',
+        'Concentration — Un seul sort concentré à la fois ; un coup peut la casser.',
+        'Emplacements de sort — Pastilles dépensées pour lancer un sort (hors tours de magie).',
+        'Avantage / désavantage — 2d20, on garde le meilleur / le pire.',
+        'Repos court / long — Pause pour récupérer ressources (Regain en repos court / long sur la fiche).',
+        'Seuil de blessure — Dégâts d’un coup ≥ ce chiffre = blessure possible.',
       ],
     },
+  ],
+};
+
+/** Schéma d’ordre d’initiative — traits noirs, lisible écran + PDF. */
+const SCHEMA_INITIATIVE: GuideRulebookSection = {
+  id: 'schema-initiative',
+  title: 'Schéma — ordre du combat',
+  paragraphs: [
+    'Un seul flux. Ne mélangez pas les cases.',
+  ],
+  diagram: [
+    '┌──────────────┐     ┌──────────────┐     ┌────────────────┐',
+    '│ 1. Initiative│ ──► │ 2. Tour (qui)│ ──► │ 3. Action      │',
+    '│ 1d20 + DEX   │     │ ordre décrois.│     │ attaque / sort │',
+    '│ = ordre seul │     └──────────────┘     └────────┬───────┘',
+    '└──────────────┘                                   │',
+    '                                                   ▼',
+    '                                    ┌──────────────────────────┐',
+    '                                    │ 4. Toucher ?             │',
+    '                                    │ 1d20 + Bonus d’attaque   │',
+    '                                    │ ≥ CA → touché            │',
+    '                                    └────────────┬─────────────┘',
+    '                                                 │ oui',
+    '                                                 ▼',
+    '                                    ┌──────────────────────────┐',
+    '                                    │ 5. Dégâts / type         │',
+    '                                    │ dés + mod (pas maîtrise) │',
+    '                                    └──────────────────────────┘',
   ],
 };
 
@@ -242,6 +284,7 @@ const COMBAT_MJ: GuideRulebookChapter = {
   title: 'Combat à la table',
   sections: [
     INIT_VS_TOUCH_MJ,
+    SCHEMA_INITIATIVE,
     {
       id: 'avant',
       title: 'Avant — initiative (ordre seulement)',
@@ -275,15 +318,15 @@ const COMBAT_MJ: GuideRulebookChapter = {
         'Le lanceur choisit un sort connu/préparé et dépense un emplacement si besoin. Les classes sans sorts (barbare, guerrier…) ignorent cette partie.',
       ],
       bullets: [
-        'Attaque magique : 1d20 + bonus d’attaque des sorts (mod de carac de sorts + maîtrise), puis dégâts si touché.',
-        'Sauvegarde : la cible lance 1d20 + son mod (+ maîtrise si sauvegarde maîtrisée) contre votre DD de sort.',
+        'Attaque magique : 1d20 + Modificateur d’attaque des sorts, puis dégâts si touché.',
+        'Sauvegarde : la cible lance un JS contre votre DD de sauvegarde des sorts.',
         'Soin / buff : appliquez l’effet, pas toujours de jet.',
       ],
     },
     {
       id: 'apres',
       title: 'Après',
-      bullets: ['Soins et PV', 'Butin', 'Conséquences', 'Retour hors combat'],
+      bullets: ['Soins et Pv', 'Butin', 'Conséquences', 'Retour hors combat'],
     },
   ],
 };
@@ -293,6 +336,7 @@ const COMBAT_JOUEUR: GuideRulebookChapter = {
   title: 'Combat à la table',
   sections: [
     INIT_VS_TOUCH_JOUEUR,
+    SCHEMA_INITIATIVE,
     {
       id: 'avant',
       title: 'Avant — initiative',
@@ -321,15 +365,15 @@ const COMBAT_JOUEUR: GuideRulebookChapter = {
         'Barbare, guerrier, moine « purs » : en général pas de sorts — sautez cette section. Sinon :',
       ],
       bullets: [
-        'Vérifiez portée, cible, emplacement.',
-        'Attaque magique : même logique d20 + mod de sorts + maîtrise.',
+        'Vérifiez portée, cible, Emplacements de sort.',
+        'Attaque magique : 1d20 + Modificateur d’attaque des sorts.',
         'Notez les emplacements dépensés.',
       ],
     },
     {
       id: 'apres',
       title: 'Après',
-      bullets: ['PV restants', 'Munitions / emplacements', 'Reprise du rôleplay'],
+      bullets: ['Pv restants', 'Munitions / emplacements', 'Reprise du rôleplay'],
     },
   ],
 };
@@ -344,6 +388,7 @@ export const GUIDE_RULEBOOK_MJ_TABLE: GuideRulebook = {
   related: [
     { label: 'MJ en ligne', path: '/guide/mj-en-ligne' },
     { label: 'Joueur à la table', path: '/guide/joueur-table' },
+    { label: 'One-shot 1 feuille', path: '/guide/oneshot' },
   ],
   chapters: [
     {
@@ -474,6 +519,7 @@ export const GUIDE_RULEBOOK_JOUEUR_TABLE: GuideRulebook = {
   related: [
     { label: 'Joueur en ligne', path: '/guide/joueur-en-ligne' },
     { label: 'MJ à la table', path: '/guide/mj-table' },
+    { label: 'One-shot 1 feuille', path: '/guide/oneshot' },
   ],
   chapters: [
     {
@@ -565,11 +611,58 @@ export const GUIDE_RULEBOOK_JOUEUR_ONLINE: GuideRulebook = {
   ],
 };
 
+
+export const GUIDE_RULEBOOK_ONESHOT: GuideRulebook = {
+  id: 'oneshot',
+  role: 'all',
+  mode: 'oneshot',
+  title: 'One-shot — 1 feuille',
+  subtitle: 'Version ultra courte à lire à l’écran avant une soirée.',
+  pdfFilename: 'dragons-oneshot-1-feuille.pdf',
+  related: [
+    { label: 'MJ à la table', path: '/guide/mj-table' },
+    { label: 'Joueur à la table', path: '/guide/joueur-table' },
+  ],
+  chapters: [
+    {
+      id: 'essentiel',
+      title: 'Essentiel',
+      sections: [
+        {
+          id: 'jet',
+          title: 'Un jet = total annoncé',
+          paragraphs: [
+            'Total = 1d20 + modificateur de caractéristique + Bonus de maîtrise (seulement si maîtrisé). Exemple : 15 + 3 + 2 = 20.',
+          ],
+          bullets: [
+            'Compétence : d20 + mod (+ Bonus de maîtrise si pastille).',
+            'Initiative : d20 + DEX seulement (ordre des tours).',
+            'Toucher : d20 + Bonus d’attaque ≥ CA.',
+            'Dégâts : après un toucher — dés + mod, sans Bonus de maîtrise.',
+          ],
+        },
+        SCHEMA_INITIATIVE,
+        {
+          id: 'soirée',
+          title: 'Soirée one-shot',
+          numbered: [
+            'MJ : une scène claire, 1–2 rencontres, un climax.',
+            'Joueurs : fiche prête — savoir où sont CA, Pv, Bonus d’attaque, Bonus de maîtrise.',
+            'Pendant : annoncer les totaux (« 15 + 5 = 20 »), pas seulement le dé.',
+            'Après : 5 min de récap, XP si vous en donnez.',
+          ],
+        },
+      ],
+    },
+  ],
+};
+
 export const GUIDE_RULEBOOKS: GuideRulebook[] = [
   GUIDE_RULEBOOK_MJ_TABLE,
   GUIDE_RULEBOOK_MJ_ONLINE,
   GUIDE_RULEBOOK_JOUEUR_TABLE,
   GUIDE_RULEBOOK_JOUEUR_ONLINE,
+  GUIDE_RULEBOOK_ONESHOT,
 ];
 
 export function getGuideRulebook(id: string | null | undefined): GuideRulebook | null {

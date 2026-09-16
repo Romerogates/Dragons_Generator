@@ -51,38 +51,20 @@ Local : http://localhost:8081 (`docker compose -f docker-compose.local.yml` depu
 
 ## Encore à faire (Guide) — priorisé
 
-1. ~~Relire / étoffer contenu IRL (fiche annotée, DD Eana, init≠toucher)~~ **fait** (reste relecture Anthony à la table réelle)
-2. ~~Guides classe (pièges, Codex, pack débutant)~~ **fait**
-3. **Qualité PDF**  
-   - Calibrer le voile parchemin (plus/moins blanc) après un vrai print test  
-   - Sommaire PDF cliquable / page de garde « Dragons Generator — Règles débutant »  
-   - Police un peu plus grande pour impression A4 (lisibilité table)
-4. **Découvrabilité**  
-   - Lien Guide depuis l’accueil / empty states campagne (« Première partie ? »)  
-   - Badge « Nouveau » ou bandeau une fois sur `/guide`
-5. **Tests**  
-   - ~~E2E hub → mj-table + classe Pack/Codex~~ **fait** (partiel)  
-   - Spec unitaire PDF (mock Image) optionnel
-6. **Commit / push** — seulement si Anthony le demande (pas encore fait pour cette vague Guide)
+1. ~~Relire / étoffer contenu IRL~~ **fait**
+2. ~~Guides classe~~ **fait**
+3. **Qualité PDF** (basse prio — Anthony imprime peu)
+4. ~~Découvrabilité~~ **fait**
+5. ~~Checklists retirées~~ **fait**
+6. ~~One-shot 1 feuille + schéma initiative + alignement libellés fiche~~ **fait**
+7. ~~Polish campagne P1~~ **fait** (voir PROCHAINES)
 
 ---
 
 ## Améliorations suggérées (Guide)
 
-- ~~Mini **glossaire 1 page** en fin de chaque livret table~~ **fait**
-- **Checklist imprimable** détachable (MJ avant session / joueur avant soirée)
-- Version **« 1 feuille recto »** ultra courte pour one-shot (en plus du livret long)
-- Illustrations légères (schéma d’ordre d’initiative) en traits noirs — pas de gros aplats
-- Alignement vocabulaire fiche PDF personnage ↔ livret (mêmes libellés)
-- Relecture IRL Anthony : ajuster exemples DD / formulations après une vraie soirée
-
-## Améliorations suggérées (reste du produit)
-
-- Polish campagne / table (voir `POLISH-P1-CAMPAGNE.md` si encore ouvert)
-- Empty states qui pointent vers le bon livret (MJ vs joueur, table vs online)
-- Après validation d’un perso : toast / activité « Lire comment jouer [Classe] »
-- Smoke manuel print : PDF mj-table + joueur-table + 1 guide classe / pack débutant sur imprimante réelle
-- Ne pas rouvrir : idle / Bivouac / Métiers ; import JSON joueur ; Eldritch Knight PHB sur Élu arcanique
+- Relecture IRL Anthony après une vraie soirée
+- Illustrations supplémentaires si besoin (au-delà du schéma initiative)
 
 ---
 

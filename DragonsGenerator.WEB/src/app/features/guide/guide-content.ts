@@ -1,6 +1,5 @@
 import type {
   GuideBlogPost,
-  GuideChecklistItem,
   GuideEditorTool,
   GuideFaqItem,
   GuideFlashCard,
@@ -46,7 +45,7 @@ export const GUIDE_NAV_GROUPS: GuideNavGroup[] = [
   {
     id: 'tools',
     label: 'Outils',
-    sectionIds: ['checklists', 'schemas', 'captures'],
+    sectionIds: ['schemas', 'captures'],
   },
   {
     id: 'table',
@@ -66,7 +65,6 @@ export const GUIDE_ALL_NAV: GuideNavItem[] = [
     { id: 'actions', label: '30 secondes', icon: 'fluent-emoji:high-voltage', accent: 'text-amber-400', audience: 'all' },
     { id: 'journal', label: 'Journal', icon: 'fluent-emoji:newspaper', accent: 'text-violet-400', audience: 'all' },
     { id: 'demarrage', label: 'Premiers pas', icon: 'fluent-emoji:rocket', accent: 'text-amber-400', audience: 'all' },
-    { id: 'checklists', label: 'Checklists', icon: 'fluent-emoji:check-mark-button', accent: 'text-emerald-400', audience: 'all' },
     { id: 'schemas', label: 'Schémas', icon: 'fluent-emoji:world-map', accent: 'text-sky-400', audience: 'all' },
     { id: 'captures', label: 'Aperçus UI', icon: 'fluent-emoji:framed-picture', accent: 'text-emerald-400', audience: 'all' },
     { id: 'compte', label: 'Compte', icon: 'fluent-emoji:bust-in-silhouette', accent: 'text-sky-400', audience: 'all' },
@@ -499,29 +497,6 @@ export const GUIDE_DUNGEON_THEMES = [
     'Égouts',
     'Forêt souterraine',
     'Générique',
-  ];
-
-export const GUIDE_DM_CHECKLIST: GuideChecklistItem[] = [
-    { id: 'dm-1', label: 'Campagne créée (scénario ou vide)' },
-    { id: 'dm-2', label: 'Amis invités (déjà dans la liste d’amis)' },
-    { id: 'dm-3', label: 'Personnages joueurs validés (fiche consultée)' },
-    { id: 'dm-4', label: 'Notifications push activées (propositions incluses)' },
-    { id: 'dm-5', label: 'Rencontres / créatures préparées' },
-    { id: 'dm-6', label: 'Donjon ou carte préparée (Préparation → Donjons)' },
-    { id: 'dm-7', label: 'Session planifiée (rappels push activés)' },
-    { id: 'dm-8', label: 'Documents prêts si besoin' },
-    { id: 'dm-9', label: 'Table démarrée le jour J · party importée' },
-  ];
-
-export const GUIDE_PLAYER_CHECKLIST: GuideChecklistItem[] = [
-    { id: 'pl-1', label: 'Compte créé et confirmé' },
-    { id: 'pl-2', label: 'Personnage forgé et sauvegardé' },
-    { id: 'pl-3', label: 'Ami avec le MJ + invitation acceptée' },
-    { id: 'pl-4', label: 'Personnage proposé à la campagne' },
-    { id: 'pl-5', label: 'Notifications push activées' },
-    { id: 'pl-6', label: 'Personnage accepté (ou re-proposé après refus)' },
-    { id: 'pl-7', label: 'Consulter mon résumé (XP, sessions passées)' },
-    { id: 'pl-8', label: 'Prêt pour la collecte d’initiative' },
   ];
 
 export const GUIDE_FAQ_ITEMS: GuideFaqItem[] = [

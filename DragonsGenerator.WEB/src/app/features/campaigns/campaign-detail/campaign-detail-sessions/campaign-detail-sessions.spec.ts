@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { zonelessTestProviders } from '@testing/zoneless-test-providers';
 import { CampaignDetailSessions } from './campaign-detail-sessions';
 import type { CampaignSession } from '@core/models/Campaign/campaign';
@@ -21,7 +22,7 @@ describe('CampaignDetailSessions read-only archive', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [CampaignDetailSessions],
-      providers: [...zonelessTestProviders],
+      providers: [...zonelessTestProviders, provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CampaignDetailSessions);

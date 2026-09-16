@@ -167,7 +167,7 @@ function describeStep(
         id,
         title: 'Choisissez les adversaires',
         proposal:
-          'Ajoutez les monstres et PNJ de cette campagne dans l’onglet Créatures. Ce bestiaire alimentera rencontres et combats.',
+          'Ajoutez les monstres et PNJ de cette campagne dans l’onglet Créatures. Ce bestiaire alimentera les rencontres (lancées en session).',
         tip: 'Proposez au moins un antagoniste (boss) et 2–3 sbires pour varier les scènes.',
         primaryLabel: 'Aller aux créatures',
         primaryAction: 'openCreatures',
@@ -177,7 +177,7 @@ function describeStep(
         id,
         title: 'Donnez un lieu à explorer',
         proposal:
-          'Générez une carte de donjon (ou ruines) pour que la table ait un endroit concret où se déplacer et déclencher des combats.',
+          'Générez une carte de donjon (ou ruines) pour que la table ait un endroit concret où se déplacer pendant la session.',
         tip: 'Pas obligatoire pour un one-shot social — vous pouvez passer cette étape.',
         primaryLabel: 'Créer une carte',
         primaryAction: 'openMaps',
@@ -187,10 +187,10 @@ function describeStep(
     case 'encounters':
       return {
         id,
-        title: 'Composez les combats',
+        title: 'Composez les rencontres',
         proposal:
           input.creatureCount > 0
-            ? 'Regroupez vos créatures en rencontres (escarmouche, boss…). Vous pourrez les lancer d’un clic à la table.'
+            ? 'Regroupez vos créatures en rencontres (escarmouche, boss…). Vous pourrez les lancer d’un clic une fois en session.'
             : 'Il vous faut d’abord des créatures pour monter des rencontres.',
         tip: 'Vous pouvez générer automatiquement des groupes depuis le bestiaire.',
         primaryLabel:
@@ -212,8 +212,8 @@ function describeStep(
         title: 'Invitez la table',
         proposal:
           input.playerCount === 0
-            ? 'Invitez vos amis, puis approuvez leur personnage. Sans héros approuvé, le combat n’a personne à mettre du côté allié.'
-            : 'Des joueurs sont là — approuvez au moins un personnage pour pouvoir l’importer en combat.',
+            ? 'Invitez vos amis, puis approuvez leur personnage. Sans héros approuvé, la table n’aura personne du côté allié en session.'
+            : 'Des joueurs sont là — approuvez au moins un personnage pour pouvoir l’importer à la table.',
         tip: 'Vous pouvez aussi préparer des pré-tirés si quelqu’un n’a pas encore de fiche.',
         primaryLabel: 'Gérer les joueurs',
         primaryAction: 'openPlayers',

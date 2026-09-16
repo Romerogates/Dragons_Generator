@@ -94,6 +94,9 @@ export class GuideRulebookPage implements OnInit {
         this.prefs.setAudience('player');
         this.audience.set('player');
       }
+      if (b?.role === 'all') {
+        this.audience.set('all');
+      }
     });
   }
 

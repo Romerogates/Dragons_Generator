@@ -19,8 +19,6 @@ import { GuideSidebar } from './guide-sidebar/guide-sidebar';
 import { GuideRulebookPdfService } from '@core/services/guide-rulebook-pdf.service';
 import type { GuidePdfChapter } from '@core/services/guide-rulebook-pdf.service';
 
-const CHECKLIST_STORAGE_KEY = 'dg-guide-checklist';
-
 @Component({
   selector: 'app-guide-topic',
   standalone: true,
@@ -45,7 +43,6 @@ export class GuideTopicPage implements OnInit {
   readonly posting = signal(false);
   readonly navQuery = signal('');
   readonly audience = signal<GuideAudience | 'all'>('all');
-  readonly checklistDone = signal<Record<string, boolean>>(loadChecklistDone());
   readonly exportingPdf = signal(false);
   readonly confirmDialog = signal<{
     title: string;
@@ -138,17 +135,6 @@ export class GuideTopicPage implements OnInit {
           })),
         });
       }
-      if (t.checklist.length) {
-        chapters.push({
-          title: 'Checklist',
-          sections: [
-            {
-              title: 'À cocher',
-              bullets: t.checklist.map((c) => c.label),
-            },
-          ],
-        });
-      }
       await this.guidePdf.download({
         title: t.title,
         subtitle: t.summary,
@@ -166,19 +152,6 @@ export class GuideTopicPage implements OnInit {
   setAudience(a: GuideAudience | 'all'): void {
     this.audience.set(a);
     if (a === 'dm' || a === 'player') this.prefs.setAudience(a);
-  }
-
-  toggleChecklist(id: string): void {
-    this.checklistDone.update((m) => {
-      const next = { ...m, [id]: !m[id] };
-      persistChecklistDone(next);
-      return next;
-    });
-  }
-
-  checklistProgress(items: { id: string }[]): { done: number; total: number } {
-    const done = items.filter((i) => this.checklistDone()[i.id]).length;
-    return { done, total: items.length };
   }
 
   reload(): void {
@@ -270,24 +243,5 @@ export class GuideTopicPage implements OnInit {
     } catch {
       return iso;
     }
-  }
-}
-
-function loadChecklistDone(): Record<string, boolean> {
-  try {
-    const raw = localStorage.getItem(CHECKLIST_STORAGE_KEY);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw) as Record<string, boolean>;
-    return parsed && typeof parsed === 'object' ? parsed : {};
-  } catch {
-    return {};
-  }
-}
-
-function persistChecklistDone(map: Record<string, boolean>): void {
-  try {
-    localStorage.setItem(CHECKLIST_STORAGE_KEY, JSON.stringify(map));
-  } catch {
-    /* ignore */
   }
 }

@@ -17,11 +17,14 @@ import type { NotificationItem, NotificationType } from '@core/models/notificati
 type NotifFilter = 'all' | 'friends' | 'campaigns';
 
 const FRIEND_KINDS: NotificationType[] = ['friend_request', 'friend_message'];
-const CAMPAIGN_KINDS: NotificationType[] = [
+const CAMPAIGN_ACTION_KINDS: NotificationType[] = [
   'campaign_invite',
   'character_proposal',
   'character_pick_requested',
   'proposal_rejected',
+];
+const CAMPAIGN_KINDS: NotificationType[] = [
+  ...CAMPAIGN_ACTION_KINDS,
   'proposal_approved',
   'xp_awarded',
 ];
@@ -68,7 +71,7 @@ export class NotificationsPage implements OnInit {
     () =>
       this.notifications
         .items()
-        .filter((i) => CAMPAIGN_KINDS.includes(i.kind) && this.notifPrefs.isKindEnabled(i.kind))
+        .filter((i) => CAMPAIGN_ACTION_KINDS.includes(i.kind) && this.notifPrefs.isKindEnabled(i.kind))
         .filter((i) => !this.notifPrefs.isDismissed(i.key)).length,
   );
 

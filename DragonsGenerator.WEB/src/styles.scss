@@ -246,10 +246,7 @@
   border: 1px solid rgb(51 65 85 / 0.6);
 }
 
-/* Guide — impression fiche MJ / joueur (chrome masqué, article seul) */
-.guide-print-only {
-  display: none;
-}
+/* Guide — impression fiche (chrome masqué, article seul) */
 
 @media print {
   @page {
@@ -272,10 +269,6 @@
   app-friend-chat-dock,
   .guide-no-print {
     display: none !important;
-  }
-
-  .guide-print-only {
-    display: block !important;
   }
 
   .guide-shell,

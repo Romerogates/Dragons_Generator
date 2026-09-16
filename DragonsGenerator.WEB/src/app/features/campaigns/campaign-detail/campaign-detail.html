@@ -51,9 +51,13 @@
               · {{ c.isOwner ? 'MJ' : 'Joueur' }}
             </p>
             <p class="mt-2 text-[10px] text-slate-600">
-              <a routerLink="/guide/scenario" class="underline hover:text-violet-400">Guide — campagnes</a>
-              ·
-              <a routerLink="/guide/table" class="underline hover:text-violet-400">table de jeu</a>
+              @if (c.isOwner) {
+                <a routerLink="/guide/scenario" class="underline hover:text-violet-400">Guide — campagnes</a>
+                ·
+                <a routerLink="/guide/table" class="underline hover:text-violet-400">table de jeu</a>
+              } @else {
+                <a routerLink="/guide/joueur-table" class="underline hover:text-violet-400">Comment jouer</a>
+              }
             </p>
           </div>
           <div class="flex items-center gap-3 flex-wrap">
@@ -1063,12 +1067,24 @@
                         @if (isMemberCharacterLoading(me.id, 'approved')) { Chargement… }
                         @else { Voir ma fiche }
                       </button>
+                      <a
+                        routerLink="/guide/joueur-table"
+                        class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-sky-950/30 border border-sky-800/40 text-sky-300 hover:border-sky-500/50"
+                      >
+                        Comment jouer →
+                      </a>
                     </div>
                   } @else if (me.proposalStatus === 'pending') {
                     <p class="text-amber-400 text-sm">En attente d'approbation : {{ me.proposedCharacterName }}</p>
                   } @else if (me.proposalStatus === 'rejected') {
                     <div class="rounded-xl border border-amber-800/40 bg-amber-950/20 p-3 mb-4">
                       <p class="text-sm text-amber-200">Le MJ attend un nouveau personnage — choisissez un héros ou créez-en un.</p>
+                      <a
+                        routerLink="/guide/joueur-table"
+                        class="inline-block mt-2 text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline"
+                      >
+                        Comment jouer →
+                      </a>
                     </div>
                     <p class="text-red-400 text-sm mb-3">Proposition refusée. Choisissez un autre personnage :</p>
                     <div class="flex flex-wrap gap-2">
@@ -1093,6 +1109,12 @@
                           >créez-en un</a
                         >.
                       </p>
+                      <a
+                        routerLink="/guide/joueur-table"
+                        class="inline-block mt-2 text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline"
+                      >
+                        Comment jouer →
+                      </a>
                     </div>
                     <p class="text-sm text-slate-400 mb-3">Proposez un de vos personnages au MJ :</p>
                     <div class="flex flex-wrap gap-2">

@@ -38,9 +38,17 @@
         @if (nextSessionModeLabel()) {
           · {{ nextSessionModeLabel() }}
         }
-        — entrez en session pour ouvrir le panneau de table.
+        @if (isOwner()) {
+          — entrez en session pour ouvrir le panneau de table.
+        } @else {
+          — le MJ entrera en session pour ouvrir la table.
+        }
       } @else {
-        Préparez le monde dans Préparation, planifiez dans Sessions, puis jouez à la table.
+        @if (isOwner()) {
+          Préparez le monde dans Préparation, planifiez dans Sessions, puis jouez à la table.
+        } @else {
+          Consultez Sessions et Documents ; la table s'ouvre quand le MJ lance la session.
+        }
       }
     </p>
 

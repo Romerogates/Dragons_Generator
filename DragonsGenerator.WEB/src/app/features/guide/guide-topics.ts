@@ -6,7 +6,6 @@ import {
   GUIDE_CAMPAIGN_PLAYER_FLOW,
   GUIDE_CHARACTER_STEPS,
   GUIDE_COMBAT_FLOW,
-  GUIDE_DM_CHECKLIST,
   GUIDE_DUNGEON_GEN_STEPS,
   GUIDE_FEATURE_INDEX,
   GUIDE_FAQ_ITEMS,
@@ -15,7 +14,6 @@ import {
   GUIDE_NAV_GROUPS,
   GUIDE_NOTIFICATION_EVENTS,
   GUIDE_ONESHOT_STEPS,
-  GUIDE_PLAYER_CHECKLIST,
   GUIDE_PROPOSAL_FLOW,
   GUIDE_QUICK_CARDS,
   GUIDE_START_STEPS,
@@ -50,7 +48,6 @@ export interface GuideTopic {
   links: GuideTopicLink[];
   flow: string[];
   flashes: GuideTopicFlash[];
-  checklist: { id: string; label: string }[];
 }
 
 function groupOf(sectionId: string): GuideNavGroup | undefined {
@@ -72,7 +69,7 @@ function flashesFor(id: string, audience: GuideAudience): GuideTopicFlash[] {
 
 function contentFor(id: string): Pick<
   GuideTopic,
-  'paragraphs' | 'steps' | 'links' | 'flow' | 'checklist'
+  'paragraphs' | 'steps' | 'links' | 'flow'
 > {
   switch (id) {
     case 'demarrage':
@@ -91,7 +88,6 @@ function contentFor(id: string): Pick<
           { label: 'Paramètres / push', path: '/settings', hint: 'Notifications' },
         ],
         flow: ['Compte', 'Héros', 'Campagne', 'Session', 'Combat'],
-        checklist: [],
       };
     case 'parcours':
       return {
@@ -117,11 +113,9 @@ function contentFor(id: string): Pick<
         ],
         links: [
           { label: 'Guide one-shot', path: '/guide/oneshot' },
-          { label: 'Checklists', path: '/guide/checklists' },
           { label: 'Mes amis', path: '/friends' },
         ],
         flow: [...GUIDE_CAMPAIGN_MJ_FLOW.slice(0, 3), '…', ...GUIDE_CAMPAIGN_PLAYER_FLOW.slice(0, 3)],
-        checklist: [],
       };
     case 'oneshot':
       return {
@@ -140,7 +134,6 @@ function contentFor(id: string): Pick<
           { label: 'Notifications', path: '/settings?tab=notifications' },
         ],
         flow: GUIDE_ONESHOT_STEPS.map((s) => s.title),
-        checklist: [],
       };
     case 'actions':
       return {
@@ -160,7 +153,6 @@ function contentFor(id: string): Pick<
           { label: 'Création héros', path: '/create' },
         ],
         flow: [],
-        checklist: [],
       };
     case 'journal':
       return {
@@ -177,20 +169,6 @@ function contentFor(id: string): Pick<
           { label: 'Support', path: '/support' },
         ],
         flow: [],
-        checklist: [],
-      };
-    case 'checklists':
-      return {
-        paragraphs: [
-          'Listes de préparation avant une session. Cochez mentalement (ou dans vos calepins de session).',
-        ],
-        steps: [],
-        links: [
-          { label: 'Table MJ', path: '/guide/table' },
-          { label: 'Campagnes', path: '/campaigns' },
-        ],
-        flow: [],
-        checklist: [...GUIDE_DM_CHECKLIST, ...GUIDE_PLAYER_CHECKLIST],
       };
     case 'personnage':
       return {
@@ -210,7 +188,6 @@ function contentFor(id: string): Pick<
           { label: 'Classes', path: '/classes' },
         ],
         flow: GUIDE_CHARACTER_STEPS.map((s) => s.title),
-        checklist: [],
       };
     case 'scenario':
       return {
@@ -243,7 +220,6 @@ function contentFor(id: string): Pick<
           { label: 'Amis', path: '/friends' },
         ],
         flow: GUIDE_CAMPAIGN_MJ_FLOW,
-        checklist: [],
       };
     case 'table':
       return {
@@ -264,7 +240,6 @@ function contentFor(id: string): Pick<
           { label: 'Documents', path: '/guide/documents' },
         ],
         flow: GUIDE_TABLE_PLAY_STEPS.map((s) => s.label),
-        checklist: GUIDE_DM_CHECKLIST,
       };
     case 'donjons':
       return {
@@ -278,7 +253,6 @@ function contentFor(id: string): Pick<
           { label: 'Documents', path: '/guide/documents' },
         ],
         flow: GUIDE_DUNGEON_GEN_STEPS.map((s) => s.title),
-        checklist: [],
       };
     case 'initiative':
       return {
@@ -297,7 +271,6 @@ function contentFor(id: string): Pick<
           { label: 'Notifications', path: '/notifications' },
         ],
         flow: GUIDE_COMBAT_FLOW.map((s) => s.label),
-        checklist: [],
       };
     case 'documents':
       return {
@@ -320,7 +293,6 @@ function contentFor(id: string): Pick<
         ],
         links: [{ label: 'Campagnes', path: '/campaigns' }],
         flow: ['Créer', 'Publier', 'Push', 'Lecture'],
-        checklist: [],
       };
     case 'social':
       return {
@@ -338,7 +310,6 @@ function contentFor(id: string): Pick<
           { label: 'Profil', path: '/profile' },
         ],
         flow: ['Recherche', 'Demande', 'Chat', 'Invite campagne'],
-        checklist: [],
       };
     case 'notifications':
       return {
@@ -359,7 +330,6 @@ function contentFor(id: string): Pick<
           { label: 'Paramètres', path: '/settings' },
         ],
         flow: GUIDE_NOTIFICATION_EVENTS,
-        checklist: [],
       };
     case 'codex':
       return {
@@ -380,7 +350,6 @@ function contentFor(id: string): Pick<
           { label: 'Divinités', path: '/deities' },
         ],
         flow: [],
-        checklist: [],
       };
     case 'pdf':
       return {
@@ -400,7 +369,6 @@ function contentFor(id: string): Pick<
           { label: 'Mes héros', path: '/characters' },
         ],
         flow: ['Aperçu', 'Sauvegarder', 'PDF'],
-        checklist: [],
       };
     case 'faq':
       return {
@@ -415,7 +383,6 @@ function contentFor(id: string): Pick<
           { label: 'Glossaire', path: '/guide/glossaire' },
         ],
         flow: [],
-        checklist: [],
       };
     case 'glossaire':
       return {
@@ -426,7 +393,6 @@ function contentFor(id: string): Pick<
           { label: 'Index', path: '/guide/index' },
         ],
         flow: [],
-        checklist: [],
       };
     case 'index':
       return {
@@ -440,7 +406,6 @@ function contentFor(id: string): Pick<
         })),
         links: GUIDE_QUICK_CARDS.map((c) => ({ label: c.title, path: c.link, hint: c.description })),
         flow: [],
-        checklist: [],
       };
     case 'support':
       return {
@@ -461,7 +426,6 @@ function contentFor(id: string): Pick<
           { label: 'CGU', path: '/legal/terms' },
         ],
         flow: [],
-        checklist: [],
       };
     case 'compte':
       return {
@@ -488,7 +452,6 @@ function contentFor(id: string): Pick<
           { label: 'Inscription', path: '/register' },
         ],
         flow: [],
-        checklist: [],
       };
     case 'schemas':
       return {
@@ -510,7 +473,6 @@ function contentFor(id: string): Pick<
           { label: 'Combat', path: '/guide/initiative' },
         ],
         flow: GUIDE_PROPOSAL_FLOW.map((s) => s.label),
-        checklist: [],
       };
     case 'captures':
       return {
@@ -525,7 +487,6 @@ function contentFor(id: string): Pick<
           { label: 'Accueil', path: '/' },
         ],
         flow: [],
-        checklist: [],
       };
     default: {
       const idx = GUIDE_FEATURE_INDEX.filter((i) => i.sectionId === id);
@@ -539,7 +500,6 @@ function contentFor(id: string): Pick<
         steps: [],
         links: GUIDE_QUICK_CARDS.map((c) => ({ label: c.title, path: c.link })),
         flow: [],
-        checklist: [],
       };
     }
   }
@@ -567,7 +527,6 @@ export const GUIDE_TOPICS: GuideTopic[] = GUIDE_ALL_NAV.map((nav) => {
     links: content.links,
     flow: content.flow,
     flashes: flashesFor(nav.id, nav.audience),
-    checklist: content.checklist,
   };
 });
 

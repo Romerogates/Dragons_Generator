@@ -56,11 +56,6 @@ export interface GuideGlossaryItem {
   definition: string;
 }
 
-export interface GuideChecklistItem {
-  id: string;
-  label: string;
-}
-
 export interface GuideIndexItem {
   label: string;
   description: string;

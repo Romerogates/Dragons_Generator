@@ -122,6 +122,14 @@
                       }
                     </ol>
                   }
+                  @if (sec.diagram; as diagram) {
+                    @if (diagram.length) {
+                      <pre
+                        class="overflow-x-auto rounded-xl border border-slate-800 bg-[#0a0c10] px-3 py-3 text-[10px] sm:text-xs leading-snug text-amber-100/80 font-mono whitespace-pre"
+                        aria-label="Schéma"
+                      >{{ diagram.join('\n') }}</pre>
+                    }
+                  }
                 </div>
               }
             </section>

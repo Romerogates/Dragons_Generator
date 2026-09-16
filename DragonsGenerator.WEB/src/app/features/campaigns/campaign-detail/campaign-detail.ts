@@ -665,7 +665,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     }
     if (this.route.snapshot.queryParamMap.get('joined') === '1') {
       this.welcomeBanner.set(
-        'Bienvenue à la table — proposez un héros dans l’onglet Joueurs, ou forgez-en un.',
+        'Bienvenue dans la campagne — proposez un héros dans l’onglet Joueurs, ou forgez-en un.',
       );
       void this.router.navigate([], {
         relativeTo: this.route,
@@ -1943,6 +1943,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (!c) return;
     this.campaigns.approveProposal(c.id, member.id).subscribe({
       next: () => {
+        this.rosterFeedback.set(
+          `${member.proposedCharacterName ?? 'Personnage'} approuvé — le joueur peut lire « Comment jouer » dans le guide.`,
+        );
         this.reload();
         this.notifications.refresh();
         if (this.tab() === 'overview') this.loadActivity();

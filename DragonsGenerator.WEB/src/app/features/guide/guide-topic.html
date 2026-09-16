@@ -118,47 +118,6 @@
             </section>
           }
 
-          @if (t.checklist.length) {
-            <section class="space-y-3">
-              <div class="flex items-end justify-between gap-3 border-b border-slate-800 pb-2">
-                <h2 class="text-lg font-serif text-slate-100">Checklist</h2>
-                @if (checklistProgress(t.checklist); as prog) {
-                  <p class="guide-no-print text-[10px] font-black uppercase tracking-widest text-slate-500">
-                    {{ prog.done }} / {{ prog.total }}
-                  </p>
-                }
-              </div>
-              <ul class="space-y-2">
-                @for (item of t.checklist; track item.id) {
-                  <li>
-                    <button
-                      type="button"
-                      class="guide-no-print w-full flex items-start gap-3 text-left text-sm rounded-lg px-1 py-1.5 hover:bg-slate-800/40"
-                      role="checkbox"
-                      [attr.aria-checked]="!!checklistDone()[item.id]"
-                      (click)="toggleChecklist(item.id)"
-                    >
-                      <span
-                        class="mt-0.5 w-4 h-4 shrink-0 rounded border flex items-center justify-center text-[9px] font-black"
-                        [class]="
-                          checklistDone()[item.id]
-                            ? 'bg-emerald-500 border-emerald-400 text-slate-950'
-                            : 'border-slate-600 text-transparent'
-                        "
-                      >
-                        ✓
-                      </span>
-                      <span [class]="checklistDone()[item.id] ? 'text-slate-500 line-through' : 'text-slate-300'">
-                        {{ item.label }}
-                      </span>
-                    </button>
-                    <p class="guide-print-only hidden text-sm text-slate-300">☐ {{ item.label }}</p>
-                  </li>
-                }
-              </ul>
-            </section>
-          }
-
           @if (related().length) {
             <section class="guide-no-print space-y-2 pt-2 border-t border-slate-800">
               <h2 class="text-xs font-black uppercase tracking-widest text-slate-500">Voir aussi</h2>

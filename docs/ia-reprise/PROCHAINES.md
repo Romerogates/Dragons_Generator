@@ -15,16 +15,16 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
-### Guide (2026-09-16) — détail dans `GUIDE-REPRISE.md`
-1. ~~Relire contenu IRL + page « fiche annotée »~~ **fait** (+ glossaire, DD Eana, init≠toucher)
-2. ~~Étoffer guides classe (pièges, lien Codex, pack débutant)~~ **fait**
-3. Calibrer PDF parchemin après vrai print ; typo A4 ; sommaire / page de garde
-4. Découvrabilité (empty campagne, post-validation perso, home)
-5. ~~E2E hub → livret / classe Pack+Codex~~ **fait** (spec PDF mock optionnel)
-6. Commit vague Guide quand Anthony le demande
+### Guide (suite)
+1. ~~Découvrabilité + sans checklists~~ **fait**
+2. ~~One-shot 1 feuille + schéma initiative + libellés fiche~~ **fait**
+3. ~~Polish campagne P1 (copy setup, empty states, badges notifs)~~ **fait**
+4. Qualité PDF print — **basse prio** (Anthony imprime peu)
 
 ## Déjà livré (ne pas refaire)
 
+- **Guide oneshot + schéma + alignement fiche + polish campagne** (2026-09-16) — livret `/guide/oneshot` ; schéma initiative ; libellés Pv / Bonus de maîtrise / etc. ; empty states + setup-guide + compteur notifs aligné navbar.
+- **Guide découvrabilité + sans checklists** (2026-09-16) — bandeau home, empty campagnes, CTA post-approbation ; topic Checklists retiré.
 - **Guide contenu IRL + classe** (2026-09-16) — fiche annotée, glossaire, DD Eana, pièges classe, Pack débutant PDF, liens Codex. Voir `GUIDE-REPRISE.md`.
 - **Guide livrets PDF** (2026-09-16) — 4 livrets MJ/Joueur × table/en ligne ; stats + maîtrise ; guides par classe ; PDF parchemin lavé ; liens hub / forge / Codex. Voir `GUIDE-REPRISE.md`.
 - **Audit P2 excellence** (2026-09-15) — sticky CSS vars (`--dg-sticky-top`…) + hub tabs sticky ; forge scénario étapes cliquables ; grimoire Mode Livre ; tour MJ post-checklist → Prépa ; `FONCTIONNALITES` 5 onglets.
