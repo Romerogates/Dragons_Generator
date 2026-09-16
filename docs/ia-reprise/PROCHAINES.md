@@ -20,6 +20,10 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 2. ~~Codex sorts (OCR + sorts critiques restaurés)~~ **fait** (reste fiches vides secondaires)
 3. Première session MJ en 15 min — parcours guidé
 4. Mobile `/play` polish soirée
+5. Codex suite — remplir fiches vides / OCR depuis `source/` :
+   - **`source/Dragons_2_Livre_de_magie.md`** → sorts
+   - **`source/Dragons_3_Bestiaire_Créatures.md`** → bestiaire / créatures
+   - **`source/Dragons_1_Livre_de_base.md`** → le reste (classes, espèces, équipements, règles…)
 
 ### Guide (suite)
 1. ~~Découvrabilité + sans checklists~~ **fait**
