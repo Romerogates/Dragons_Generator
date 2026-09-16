@@ -2,10 +2,11 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { DataService } from '@core/services/data.service';
+import { GameIdLabelsPipe } from '@shared/pipes/game-id-label.pipe';
 
 @Component({
   selector: 'app-character-classes-summary',
-  imports: [RouterLink],
+  imports: [RouterLink, GameIdLabelsPipe],
   templateUrl: './character-classes-summary.html',
   styleUrl: './character-classes-summary.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

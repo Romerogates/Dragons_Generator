@@ -21,7 +21,7 @@
   "components": {
     "v": true,
     "s": true,
-    "m": "(un calice serti de pierres précieuses d'une valeur minimale de 1 000 po"
+    "m": "un calice serti de pierres précieuses d'une valeur minimale de 1 000 po, que le sort détruit"
   },
   "is_ritual": false,
   "is_concentration": false,
@@ -30,6 +30,7 @@
     "cls-druide",
     "cls-pretre"
   ],
-  "description": "Spell icons for 6th level invocation Vous faites apparaître un grand festin, avec mets et boissons de choix. Le repas s'étend sur 1 heure, au bout de laquelle il disparaît et ses effets se font ressentir. Jusqu'à douze créatures peuvent y participer. Une créature qui y prend part en tire plusieurs bénéfices : elle est débarrassée de toutes les maladies et de tous les poisons qui l'affectent, est immunisée contre le poison et l'état préjudiciable effrayé, et bénéficie d'un avantage aux",
+  "description": "Vous faites apparaître un grand festin, avec mets et boissons de choix. Le repas s'étend sur 1 heure, au bout de laquelle il disparaît et ses effets se font ressentir. Jusqu'à douze créatures peuvent y participer. Une créature qui y prend part en tire plusieurs bénéfices : elle est débarrassée de toutes les maladies et de tous les poisons qui l'affectent, est immunisée contre le poison et l'état préjudiciable effrayé, et bénéficie d'un avantage aux JS Sagesse. En outre, ses points de vie maximums augmentent de 2d10, et elle gagne autant de points de vie. Ces bénéfices persistent pendant 24 heures.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 7e niveau ou supérieur, vous pouvez inclure douze créatures supplémentaires par niveau d'emplacement au-dessus du 6e.",
   "modular_options": []
 }

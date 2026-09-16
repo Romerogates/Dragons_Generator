@@ -30,7 +30,7 @@
     "cls-ensorceleur",
     "cls-magicien"
   ],
-  "description": "Logo and icon Jous tendez les mains devant vous, les doigts écartés, pouce contre pouce, et un éventail de flammes en jaillit. Chaque créature prise dans un cône de 4,50 m doit effectuer un JS Dextérité et subit 3d6 dégâts de feu en cas d'échec, la moitié en cas de réussite. Les flammes embrasent dans la zone tout objet inflammable ni porté ni transporté.",
+  "description": "Logo Vous tendez les mains devant vous, les doigts écartés, pouce contre pouce, et un éventail de flammes en jaillit. Chaque créature prise dans un cône de 4,50 m doit effectuer un JS Dextérité et subit 3d6 dégâts de feu en cas d'échec, la moitié en cas de réussite. Les flammes embrasent dans la zone tout objet inflammable ni porté ni transporté.",
   "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, les dégâts augmentent de 1d6 par niveau d'emplacement au-dessus du 1er.",
   "modular_options": []
 }

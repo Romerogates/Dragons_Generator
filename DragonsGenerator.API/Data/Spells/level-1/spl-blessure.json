@@ -29,7 +29,7 @@
   "classes": [
     "cls-pretre"
   ],
-  "description": "Blessure icon Effectuez une attaque de sort au corps à corps contre une créature à portée d'allonge. En cas de réussite, la cible subit 3d10 dégâts nécrotiques.",
+  "description": "Effectuez une attaque de sort au corps à corps contre une créature à portée d'allonge. En cas de réussite, la cible subit 3d10 dégâts nécrotiques.",
   "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, les dégâts augmentent de 1d10 par niveau d'emplacement au-dessus du 1ᵉʳ.",
   "modular_options": []
 }

@@ -13,11 +13,13 @@ import { map } from 'rxjs/operators';
 import { DataService } from '@core/services/data.service';
 import { Spell } from '@core/models/Spells/spell';
 import { CommonModule } from '@angular/common';
+import { spellSchoolLabel } from '@core/utils/spell-display.util';
+import { GameIdLabelsPipe } from '@shared/pipes/game-id-label.pipe';
 
 @Component({
   selector: 'app-spells-by-level',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, GameIdLabelsPipe],
   templateUrl: './spells-by-level.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
@@ -27,6 +29,7 @@ export class SpellsByLevel {
   private route = inject(ActivatedRoute);
 
   protected readonly levels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+  protected readonly schoolLabel = spellSchoolLabel;
 
   protected error = signal<string | null>(null);
 

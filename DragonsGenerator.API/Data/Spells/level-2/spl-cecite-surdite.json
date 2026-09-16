@@ -32,7 +32,7 @@
     "cls-magicien",
     "cls-pretre"
   ],
-  "description": "D Vous pouvez aveugler ou assourdir un adversaire. Choisissez une créature que vous voyez à portée, qui doit effectuer un JS Constitution. En cas d'échec, elle est assourdie ou aveuglée (à votre convenance). À la fin de chacun de ses tours de jeu, la cible peut effectuer un JS Constitution. En cas de réussite, le sort prend fin.",
+  "description": "Vous pouvez aveugler ou assourdir un adversaire. Choisissez une créature que vous voyez à portée, qui doit effectuer un JS Constitution. En cas d'échec, elle est assourdie ou aveuglée (à votre convenance). À la fin de chacun de ses tours de jeu, la cible peut effectuer un JS Constitution. En cas de réussite, le sort prend fin.",
   "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 2e.",
   "modular_options": []
 }

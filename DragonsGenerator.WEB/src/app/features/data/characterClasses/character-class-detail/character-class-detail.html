@@ -46,8 +46,8 @@
                 class="block text-[9px] text-emerald-500/80 font-black uppercase tracking-widest"
                 >Caractéristiques clés</span
               >
-              <span class="text-emerald-400 font-bold text-sm uppercase tracking-wider">{{
-                c.data.primary_abilities.join(', ')
+              <span class="text-emerald-400 font-bold text-sm tracking-wider">{{
+                c.data.primary_abilities | gameIdLabels
               }}</span>
             </div>
           </div>
@@ -80,17 +80,24 @@
             <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">
               Jets de sauvegarde
             </p>
-            <p class="text-sm text-amber-400/90 font-bold uppercase tracking-wider">
-              {{ c.data.proficiencies.saving_throws.join(', ') }}
+            <p class="text-sm text-amber-400/90 font-bold tracking-wider">
+              {{ c.data.proficiencies.saving_throws | gameIdLabels }}
             </p>
           </div>
           <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-4">
             <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">
               Compétences ({{ c.data.proficiencies.skills.count }} au choix)
             </p>
-            <p class="text-sm text-slate-300 leading-relaxed">
-              {{ c.data.proficiencies.skills.options | gameIdLabels }}
-            </p>
+            <div class="flex flex-wrap gap-2">
+              @for (skillId of c.data.proficiencies.skills.options; track skillId) {
+                <a
+                  [routerLink]="['/skills', skillId]"
+                  class="bg-slate-900 text-sky-300/95 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold tracking-wider hover:border-sky-500/50 hover:text-sky-200 hover:underline underline-offset-2 transition-colors"
+                >
+                  {{ skillId | gameIdLabel }}
+                </a>
+              }
+            </div>
           </div>
         </div>
       </section>
@@ -109,7 +116,9 @@
               <p class="text-[10px] text-fuchsia-500/70 font-black uppercase tracking-widest mb-1">
                 Caractéristique
               </p>
-              <p class="text-sm text-fuchsia-300 uppercase tracking-wider font-bold">{{ sc.ability }}</p>
+              <p class="text-sm text-fuchsia-300 tracking-wider font-bold">
+                {{ sc.ability | gameIdLabel }}
+              </p>
             </div>
             @if (sc.focus) {
               <div>

@@ -12,11 +12,13 @@ import { map } from 'rxjs/operators';
 import { DataService } from '@core/services/data.service';
 import { Spell } from '@core/models/Spells/spell';
 import { CommonModule } from '@angular/common';
+import { spellSchoolLabel } from '@core/utils/spell-display.util';
+import { GameIdLabelsPipe } from '@shared/pipes/game-id-label.pipe';
 
 @Component({
   selector: 'app-spells-by-school',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, GameIdLabelsPipe],
   templateUrl: './spells-by-school.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
@@ -26,6 +28,7 @@ export class SpellsBySchool {
   private route = inject(ActivatedRoute);
 
   protected error = signal<string | null>(null);
+  protected readonly schoolLabel = spellSchoolLabel;
 
   protected school = toSignal(
     this.route.paramMap.pipe(map((params) => params.get('school') ?? '')),

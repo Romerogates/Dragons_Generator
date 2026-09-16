@@ -31,6 +31,6 @@
     "cls-ensorceleur",
     "cls-magicien"
   ],
-  "description": "Une explosion de lumière solaire aveuglante se produit dans un rayon de 18 m centré sur un point que vous choisissez à portée. Toute créature prise dans la zone doit effectuer un JS Constitution. En cas d'échec, elle subit 12d6 dégâts radiants et se retrouve aveuglée pendant 1 minute. En cas de réussite, les dégâts sont réduits de moitié et la cible n'est pas aveuglée. Les morts-vivants et les vases subissent un désavantage au jet de sauvegarde. Une créature aveuglée par ce sort effectue un nouveau JS Constitution à la fin de chacun de ses tours de jeu. En cas de réussite, elle n'est plus aveuglée. Cette évocation dissipe toute obscurité créée par un sort dans sa zone. Photograph of a sun stone Martin Romero",
+  "description": "Une explosion de lumière solaire aveuglante se produit dans un rayon de 18 m centré sur un point que vous choisissez à portée. Toute créature prise dans la zone doit effectuer un JS Constitution. En cas d'échec, elle subit 12d6 dégâts radiants et se retrouve aveuglée pendant 1 minute. En cas de réussite, les dégâts sont réduits de moitié et la cible n'est pas aveuglée. Les morts-vivants et les vases subissent un désavantage au jet de sauvegarde. Une créature aveuglée par ce sort effectue un nouveau JS Constitution à la fin de chacun de ses tours de jeu. En cas de réussite, elle n'est plus aveuglée. Cette évocation dissipe toute obscurité créée par un sort dans sa zone.",
   "modular_options": []
 }

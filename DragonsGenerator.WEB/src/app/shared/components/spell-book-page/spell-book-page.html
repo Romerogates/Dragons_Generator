@@ -2,7 +2,7 @@
   <article class="spell-book font-serif text-[#2a1c14]">
     <header class="mb-6 pb-4 border-b-2 border-[#9b6bb8]/45">
       <p class="text-[10px] font-sans font-black uppercase tracking-[0.2em] text-[#6b4a7a] mb-2">
-        Grimoire · {{ s.school }}
+        Grimoire · {{ schoolLabel(s.school) }}
       </p>
       <h1 class="text-3xl sm:text-4xl font-bold leading-tight text-[#1a1008]">{{ s.name }}</h1>
       <p class="mt-2 text-sm italic text-[#5c4030]">{{ levelLabel(s.level) }}</p>
@@ -68,7 +68,7 @@
 
     <section class="mb-8">
       <h2 class="text-lg font-bold mb-2 border-b border-[#9b6bb8]/35 pb-1">Description</h2>
-      <p class="text-sm leading-relaxed whitespace-pre-wrap">{{ s.description }}</p>
+      <p class="text-sm leading-relaxed whitespace-pre-wrap">{{ cleanDescription() }}</p>
     </section>
 
     @if (s.higherLevels) {

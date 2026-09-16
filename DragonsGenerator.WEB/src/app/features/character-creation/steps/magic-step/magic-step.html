@@ -261,7 +261,7 @@
             class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1 text-center"
             >Incantation</span
           >
-          <span class="text-xl font-serif text-amber-500">{{ spellcastingAbility() }}</span>
+          <span class="text-xl font-serif text-amber-500">{{ abilityDisplay(spellcastingAbility()) }}</span>
         </div>
         <div
           class="flex flex-col items-center justify-center border-r border-slate-800/50 last:border-0"
@@ -469,7 +469,7 @@
           <p class="text-xs text-slate-300 italic leading-relaxed font-serif">
             Vous connaissez toute la liste de sorts de votre classe. Préparez
             {{ spellsToChoose() }} sort(s) préparés pour aujourd'hui
-            (formule : modificateur de {{ spellcastingAbility() }} + niveau).
+            (formule : modificateur de {{ abilityDisplay(spellcastingAbility()) }} + niveau).
           </p>
           @if (domainSpells().length > 0) {
             <p class="text-[10px] uppercase tracking-widest text-amber-500/80 font-black">

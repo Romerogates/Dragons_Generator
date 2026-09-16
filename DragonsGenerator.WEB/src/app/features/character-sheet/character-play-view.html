@@ -121,7 +121,7 @@
             Incantation
           </h3>
           <p class="text-sm text-slate-300">
-            Caractéristique : {{ sc.ability }} · DD des sorts {{ sc.spellSaveDC }} · Attaque de sort
+            Caractéristique : {{ abilityDisplay(sc.ability) }} · DD des sorts {{ sc.spellSaveDC }} · Attaque de sort
             {{ sc.spellAttackBonus >= 0 ? '+' : '' }}{{ sc.spellAttackBonus }}
             @if (focusLabel()) {
               · Focaliseur : {{ focusLabel() }}

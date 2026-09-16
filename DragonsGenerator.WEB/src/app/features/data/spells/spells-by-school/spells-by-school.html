@@ -19,7 +19,7 @@
         <h1
           class="text-3xl md:text-5xl font-extrabold text-slate-100 font-serif tracking-widest uppercase drop-shadow-2xl text-center"
         >
-          École : <span class="text-fuchsia-500">{{ school() }}</span>
+          École : <span class="text-fuchsia-500">{{ schoolLabel(school()) }}</span>
         </h1>
         <div class="h-px flex-grow bg-gradient-to-l from-transparent to-slate-700"></div>
       </div>
@@ -37,7 +37,7 @@
               "
             >
               <span class="text-base"><iconify-icon [icon]="getSchoolIcon(s)"></iconify-icon></span>
-              {{ s }}
+              {{ schoolLabel(s) }}
             </a>
           }
         </nav>
@@ -164,8 +164,8 @@
                     class="text-[9px] font-black uppercase tracking-widest text-slate-600 block mb-1"
                     >Invocateurs</span
                   >
-                  <p class="text-[10px] text-slate-400 uppercase tracking-wider">
-                    {{ spell.classes.join(' · ') }}
+                  <p class="text-[10px] text-slate-400 tracking-wider">
+                    {{ spell.classes | gameIdLabels : ' · ' }}
                   </p>
                 </div>
               }

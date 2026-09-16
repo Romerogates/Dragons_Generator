@@ -12,6 +12,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 import { DataService } from '@core/services/data.service';
 import { Spell } from '@core/models/Spells/spell';
+import { spellSchoolLabel } from '@core/utils/spell-display.util';
 
 @Component({
   selector: 'app-spells',
@@ -25,6 +26,7 @@ export class Spells {
   private dataService = inject(DataService);
 
   protected error = signal<string | null>(null);
+  protected readonly schoolLabel = spellSchoolLabel;
 
   // Barre de recherche
   readonly search = signal('');
@@ -47,9 +49,14 @@ export class Spells {
     const term = this.search().trim().toLowerCase();
     if (!term) return list;
 
-    return list.filter(
-      (s) => s.name.toLowerCase().includes(term) || s.school.toLowerCase().includes(term),
-    );
+    return list.filter((s) => {
+      const schoolFr = spellSchoolLabel(s.school).toLowerCase();
+      return (
+        s.name.toLowerCase().includes(term) ||
+        s.school.toLowerCase().includes(term) ||
+        schoolFr.includes(term)
+      );
+    });
   });
 
   protected spellSummary(spell: Spell): string {
@@ -58,7 +65,7 @@ export class Spells {
       const short = desc.slice(0, 180);
       return short + (desc.length > 180 ? '…' : '');
     }
-    return `${spell.level === 0 ? 'Tour de magie' : 'Sort de niveau ' + spell.level} — ${spell.school}.`;
+    return `${spell.level === 0 ? 'Tour de magie' : 'Sort de niveau ' + spell.level} — ${spellSchoolLabel(spell.school)}.`;
   }
 
   onSearch(value: string): void {

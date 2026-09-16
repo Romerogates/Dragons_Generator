@@ -1,17 +1,19 @@
 @if (creature(); as c) {
-  <article class="creature-book font-serif text-[#2a1c14]">
-    <header class="mb-6 pb-4 border-b-2 border-[#c4a574]/60">
-      <p class="text-[10px] font-sans font-black uppercase tracking-[0.2em] text-[#8a6a4a] mb-2">
+  <article class="creature-book text-slate-300">
+    <header class="text-center mb-10">
+      <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-3">
         Bestiaire · {{ categoryLabel(c.category) }}
         @if (campaignRoleLabel()) {
           · {{ campaignRoleLabel() }}
         }
       </p>
       @if (campaignAlias(); as alias) {
-        <p class="text-sm font-sans font-semibold text-[#5c4030] mb-1">{{ alias }}</p>
+        <p class="text-sm font-semibold text-amber-300/90 mb-1">{{ alias }}</p>
       }
-      <h1 class="text-3xl sm:text-4xl font-bold leading-tight text-[#1a1008]">{{ c.name }}</h1>
-      <p class="mt-2 text-sm italic text-[#5c4030]">
+      <h1 class="text-3xl sm:text-5xl font-extrabold text-red-400 font-serif tracking-wide mb-3">
+        {{ c.name }}
+      </h1>
+      <p class="text-sm italic text-slate-400">
         {{ c.type }}
         @if (c.part) {
           · {{ c.part }}
@@ -20,98 +22,121 @@
           · {{ c.section }}
         }
       </p>
-      <p class="mt-3 text-xs font-sans font-black uppercase tracking-widest text-[#8a6a4a]">
+      <p class="mt-4 text-xs font-black uppercase tracking-widest text-red-300/80">
         {{ formatCr(c.challengeRating) }} · {{ c.xp }} PX
       </p>
     </header>
 
     @if (campaignBackstory(); as story) {
-      <section class="mb-8 rounded-lg border border-[#c4a574]/50 bg-[#fff8e7]/55 px-4 py-3">
-        <h2 class="text-sm font-bold mb-2">Histoire de campagne</h2>
-        <p class="text-sm leading-relaxed italic whitespace-pre-line">{{ story }}</p>
+      <section
+        class="mb-8 rounded-2xl border border-amber-900/40 bg-amber-950/20 px-5 py-4"
+      >
+        <h2 class="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-2">
+          Histoire de campagne
+        </h2>
+        <p class="text-sm leading-relaxed italic text-slate-300 whitespace-pre-line">{{ story }}</p>
       </section>
     }
 
-    <dl class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2 text-sm mb-6">
-      <div>
-        <dt class="text-[10px] font-sans font-black uppercase tracking-widest text-[#8a6a4a]">CA</dt>
-        <dd class="font-semibold">
-          {{ c.armorClass }}
-          @if (c.armorNote) {
-            <span class="font-normal text-[#5c4030]"> ({{ c.armorNote }})</span>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <section class="bg-[#1b2028] p-5 rounded-2xl border border-slate-800 lg:col-span-1">
+        <h2
+          class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-4"
+        >
+          Statistiques
+        </h2>
+        <dl class="space-y-3 text-sm">
+          <div>
+            <dt class="text-red-500 font-bold uppercase text-[10px] tracking-widest">CA</dt>
+            <dd>
+              {{ c.armorClass }}
+              @if (c.armorNote) {
+                <span class="text-slate-500"> ({{ c.armorNote }})</span>
+              }
+            </dd>
+          </div>
+          <div>
+            <dt class="text-red-500 font-bold uppercase text-[10px] tracking-widest">PV</dt>
+            <dd>
+              {{ c.hitPoints }}
+              @if (c.woundThreshold != null) {
+                · SB {{ c.woundThreshold }}
+              }
+            </dd>
+          </div>
+          <div>
+            <dt class="text-red-500 font-bold uppercase text-[10px] tracking-widest">Vitesse</dt>
+            <dd>{{ c.speed }}</dd>
+          </div>
+          @if (c.savingThrows) {
+            <div>
+              <dt class="text-red-500 font-bold uppercase text-[10px] tracking-widest">JS</dt>
+              <dd>{{ c.savingThrows }}</dd>
+            </div>
           }
-        </dd>
-      </div>
-      <div>
-        <dt class="text-[10px] font-sans font-black uppercase tracking-widest text-[#8a6a4a]">PV</dt>
-        <dd class="font-semibold">{{ c.hitPoints }}</dd>
-      </div>
-      @if (c.woundThreshold != null) {
-        <div>
-          <dt class="text-[10px] font-sans font-black uppercase tracking-widest text-[#8a6a4a]">
-            Seuil de blessure
-          </dt>
-          <dd class="font-semibold">{{ c.woundThreshold }}</dd>
-        </div>
-      }
-      <div class="col-span-2 sm:col-span-1">
-        <dt class="text-[10px] font-sans font-black uppercase tracking-widest text-[#8a6a4a]">
-          Vitesse
-        </dt>
-        <dd class="font-semibold">{{ c.speed }}</dd>
-      </div>
-      <div>
-        <dt class="text-[10px] font-sans font-black uppercase tracking-widest text-[#8a6a4a]">FP</dt>
-        <dd class="font-semibold">{{ c.challengeRating }}</dd>
-      </div>
-      <div>
-        <dt class="text-[10px] font-sans font-black uppercase tracking-widest text-[#8a6a4a]">XP</dt>
-        <dd class="font-semibold">{{ c.xp }}</dd>
-      </div>
-    </dl>
+          @if (c.skills) {
+            <div>
+              <dt class="text-red-500 font-bold uppercase text-[10px] tracking-widest">
+                Compétences
+              </dt>
+              <dd>{{ c.skills }}</dd>
+            </div>
+          }
+          @if (c.senses) {
+            <div>
+              <dt class="text-red-500 font-bold uppercase text-[10px] tracking-widest">Sens</dt>
+              <dd>{{ c.senses }}</dd>
+            </div>
+          }
+          @if (c.languages) {
+            <div>
+              <dt class="text-red-500 font-bold uppercase text-[10px] tracking-widest">Langues</dt>
+              <dd>{{ c.languages }}</dd>
+            </div>
+          }
+        </dl>
+      </section>
 
-    <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-6">
-      @for (key of abilityKeys(c); track key) {
-        <div class="rounded-lg border border-[#c4a574]/50 bg-[#fff8e7]/50 px-2 py-2 text-center">
-          <p class="text-[9px] font-sans font-black uppercase tracking-widest text-[#8a6a4a]">
-            {{ abilityLabels[key] }}
-          </p>
-          <p class="text-lg font-bold leading-none mt-1">{{ c.abilities[key].score }}</p>
-          <p class="text-xs text-[#5c4030]">{{ c.abilities[key].modifier }}</p>
+      <section class="bg-[#1b2028] p-5 rounded-2xl border border-slate-800 lg:col-span-2">
+        <h2
+          class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-4"
+        >
+          Caractéristiques
+        </h2>
+        <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
+          @for (key of abilityKeys(c); track key) {
+            <div class="text-center bg-[#171b22] rounded-xl p-3 border border-slate-800">
+              <div class="text-[10px] font-black text-red-500 uppercase">
+                {{ abilityLabels[key] }}
+              </div>
+              <div class="text-lg font-bold text-slate-100">{{ c.abilities[key].score }}</div>
+              <div class="text-xs text-slate-500">{{ c.abilities[key].modifier }}</div>
+            </div>
+          }
         </div>
-      }
-    </div>
-
-    <div class="space-y-2 text-sm mb-8">
-      @if (c.savingThrows) {
-        <p><span class="font-bold">Jets de sauvegarde.</span> {{ c.savingThrows }}</p>
-      }
-      @if (c.skills) {
-        <p><span class="font-bold">Compétences.</span> {{ c.skills }}</p>
-      }
-      @if (c.senses) {
-        <p><span class="font-bold">Sens.</span> {{ c.senses }}</p>
-      }
-      @if (c.languages) {
-        <p><span class="font-bold">Langues.</span> {{ c.languages }}</p>
-      }
+      </section>
     </div>
 
     @if (c.description) {
-      <section class="mb-8">
-        <h2 class="text-lg font-bold mb-2 border-b border-[#c4a574]/40 pb-1">Description</h2>
-        <p class="text-sm leading-relaxed whitespace-pre-line">{{ c.description }}</p>
+      <section class="bg-[#1b2028] p-6 rounded-2xl border border-slate-800 mb-6">
+        <p class="text-slate-300 leading-relaxed italic font-serif whitespace-pre-line">
+          {{ c.description }}
+        </p>
       </section>
     }
 
     @if (c.traits.length) {
-      <section class="mb-8">
-        <h2 class="text-lg font-bold mb-3 border-b border-[#c4a574]/40 pb-1">Particularités</h2>
-        <ul class="space-y-3">
+      <section class="bg-[#1b2028] p-6 rounded-2xl border border-slate-800 mb-6">
+        <h2
+          class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-4"
+        >
+          Particularités
+        </h2>
+        <ul class="space-y-4">
           @for (t of c.traits; track t.name) {
-            <li class="text-sm leading-relaxed">
-              <span class="font-bold italic">{{ t.name }}.</span>
-              {{ t.description }}
+            <li>
+              <h3 class="font-bold text-red-300 mb-1">{{ t.name }}</h3>
+              <p class="text-sm text-slate-400 leading-relaxed">{{ t.description }}</p>
             </li>
           }
         </ul>
@@ -119,13 +144,17 @@
     }
 
     @if (c.actions.length) {
-      <section class="mb-8">
-        <h2 class="text-lg font-bold mb-3 border-b border-[#c4a574]/40 pb-1">Actions</h2>
-        <ul class="space-y-3">
+      <section class="bg-[#1b2028] p-6 rounded-2xl border border-slate-800 mb-6">
+        <h2
+          class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-4"
+        >
+          Actions
+        </h2>
+        <ul class="space-y-4">
           @for (a of c.actions; track a.name) {
-            <li class="text-sm leading-relaxed">
-              <span class="font-bold italic">{{ a.name }}.</span>
-              {{ a.description }}
+            <li>
+              <h3 class="font-bold text-orange-300 mb-1">{{ a.name }}</h3>
+              <p class="text-sm text-slate-400 leading-relaxed">{{ a.description }}</p>
             </li>
           }
         </ul>
@@ -133,13 +162,17 @@
     }
 
     @if (c.reactions.length) {
-      <section class="mb-8">
-        <h2 class="text-lg font-bold mb-3 border-b border-[#c4a574]/40 pb-1">Réactions</h2>
-        <ul class="space-y-3">
+      <section class="bg-[#1b2028] p-6 rounded-2xl border border-slate-800 mb-6">
+        <h2
+          class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-4"
+        >
+          Réactions
+        </h2>
+        <ul class="space-y-4">
           @for (r of c.reactions; track r.name) {
-            <li class="text-sm leading-relaxed">
-              <span class="font-bold italic">{{ r.name }}.</span>
-              {{ r.description }}
+            <li>
+              <h3 class="font-bold text-amber-300 mb-1">{{ r.name }}</h3>
+              <p class="text-sm text-slate-400 leading-relaxed">{{ r.description }}</p>
             </li>
           }
         </ul>
@@ -147,15 +180,17 @@
     }
 
     @if (c.legendaryActions.length) {
-      <section class="mb-2">
-        <h2 class="text-lg font-bold mb-3 border-b border-[#c4a574]/40 pb-1">
+      <section class="bg-[#1b2028] p-6 rounded-2xl border border-slate-800">
+        <h2
+          class="text-sm font-black text-slate-500 uppercase tracking-widest border-b border-slate-800 pb-3 mb-4"
+        >
           Actions légendaires
         </h2>
-        <ul class="space-y-3">
+        <ul class="space-y-4">
           @for (l of c.legendaryActions; track l.name) {
-            <li class="text-sm leading-relaxed">
-              <span class="font-bold italic">{{ l.name }}.</span>
-              {{ l.description }}
+            <li>
+              <h3 class="font-bold text-yellow-300 mb-1">{{ l.name }}</h3>
+              <p class="text-sm text-slate-400 leading-relaxed">{{ l.description }}</p>
             </li>
           }
         </ul>

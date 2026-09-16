@@ -30,7 +30,7 @@
     "cls-ensorceleur",
     "cls-magicien"
   ],
-  "description": "Bille acide icon Vous fixez du regard une cible à portée en tendant un doigt vers elle, et une bille jaunâtre jaillit dans sa direction. Effectuez un jet d'attaque de sort à distance contre elle. En cas de réussite, elle subit 2d8 dégâts d'acide et doit réussir un JS Constitution sous peine de se retrouver aveuglée jusqu'à la fin de son tour de jeu suivant. Blessure icon",
+  "description": "Bille Vous fixez du regard une cible à portée en tendant un doigt vers elle, et une bille jaunâtre jaillit dans sa direction. Effectuez un jet d'attaque de sort à distance contre elle. En cas de réussite, elle subit 2d8 dégâts d'acide et doit réussir un JS Constitution sous peine de se retrouver aveuglée jusqu'à la fin de son tour de jeu suivant.",
   "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, les dégâts augmentent de 1d8 par niveau d'emplacement au-dessus du 1ᵉʳ.",
   "modular_options": []
 }

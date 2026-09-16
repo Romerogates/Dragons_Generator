@@ -30,7 +30,7 @@
     "cls-paladin",
     "cls-pretre"
   ],
-  "description": "Bénédiction icon Vous bénissez jusqu'à trois créatures de votre choix situées à portée. Chaque fois qu'une cible effectue un jet d'attaque ou de sauvegarde avant la fin du sort, elle peut lancer un d4 et ajouter le résultat au jet de sauvegarde ou d'attaque.",
+  "description": "Vous bénissez jusqu'à trois créatures de votre choix situées à portée. Chaque fois qu'une cible effectue un jet d'attaque ou de sauvegarde avant la fin du sort, elle peut lancer un d4 et ajouter le résultat au jet de sauvegarde ou d'attaque.",
   "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 2e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 1ᵉʳ.",
   "modular_options": []
 }

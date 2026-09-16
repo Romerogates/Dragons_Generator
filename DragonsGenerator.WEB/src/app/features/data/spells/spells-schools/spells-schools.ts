@@ -11,6 +11,7 @@ import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 import { DataService } from '@core/services/data.service';
+import { spellSchoolLabel } from '@core/utils/spell-display.util';
 
 @Component({
   selector: 'app-spell-schools',
@@ -24,6 +25,7 @@ export class SpellSchools {
   private dataService = inject(DataService);
 
   protected error = signal<string | null>(null);
+  protected readonly schoolLabel = spellSchoolLabel;
 
   protected schools = toSignal(
     this.dataService.getSpellSchools().pipe(

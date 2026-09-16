@@ -4,7 +4,7 @@
     [backLink]="backLink()"
     backLabel="Campagne"
   >
-    <p class="text-center text-sm text-red-800 py-16">{{ err }}</p>
+    <p class="text-center text-sm text-red-400 py-16">{{ err }}</p>
   </app-book-reader-shell>
 } @else if (bundle() === undefined) {
   <app-book-reader-shell
@@ -12,8 +12,8 @@
     [backLink]="backLink()"
     backLabel="Campagne"
   >
-    <p class="text-center text-sm font-serif uppercase tracking-widest text-[#5c4030] py-24 animate-pulse">
-      Ouverture du livre…
+    <p class="text-center text-sm font-serif uppercase tracking-widest text-slate-500 py-24 animate-pulse">
+      Chargement du bestiaire…
     </p>
   </app-book-reader-shell>
 } @else if (!entries().length) {
@@ -23,7 +23,7 @@
     [backLink]="backLink()"
     backLabel="Campagne"
   >
-    <p class="text-center text-sm text-[#5c4030] py-16">
+    <p class="text-center text-sm text-slate-500 py-16">
       Aucune créature dans cette campagne pour l’instant.
     </p>
   </app-book-reader-shell>
@@ -39,11 +39,11 @@
     (selectItem)="onSelectToc($event)"
   >
     @if (!creature() && !creatureError()) {
-      <p class="text-center text-sm font-serif uppercase tracking-widest text-[#5c4030] py-16 animate-pulse">
-        Tourner la page…
+      <p class="text-center text-sm font-serif uppercase tracking-widest text-slate-500 py-16 animate-pulse">
+        Chargement…
       </p>
     } @else if (creatureError(); as cerr) {
-      <p class="text-center text-sm text-red-800 py-12">{{ cerr }}</p>
+      <p class="text-center text-sm text-red-400 py-12">{{ cerr }}</p>
     } @else if (creature(); as c) {
       <app-creature-book-page
         [creature]="c"

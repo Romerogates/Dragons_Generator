@@ -33,7 +33,7 @@
     "cls-pretre",
     "cls-sorcier"
   ],
-  "description": "Logo icon stamp Ce sort confère à la créature que vous touchez le pouvoir de comprendre les langues qu'elle entend. En outre, quand la cible parle, les créatures qui l'entendent et connaissent au moins un langage la comprennent parfaitement.",
+  "description": "stamp Ce sort confère à la créature que vous touchez le pouvoir de comprendre les langues qu'elle entend. En outre, quand la cible parle, les créatures qui l'entendent et connaissent au moins un langage la comprennent parfaitement.",
   "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e niveau ou supérieur, la durée augmente de 1 heure par niveau d'emplacement au-dessus du 3e.",
   "modular_options": []
 }

@@ -100,7 +100,7 @@
               </header>
               <div class="mb-4 flex flex-wrap items-center gap-2">
                 <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">
-                  {{ spell.school }}
+                  {{ schoolLabel(spell.school) }}
                 </span>
               </div>
               <div class="flex flex-wrap gap-2 mb-6">
@@ -162,8 +162,8 @@
                     class="text-[9px] font-black uppercase tracking-widest text-slate-600 block mb-1"
                     >Invocateurs</span
                   >
-                  <p class="text-[10px] text-slate-400 uppercase tracking-wider">
-                    {{ spell.classes.join(' · ') }}
+                  <p class="text-[10px] text-slate-400 tracking-wider">
+                    {{ spell.classes | gameIdLabels : ' · ' }}
                   </p>
                 </div>
               }

@@ -32,7 +32,7 @@
           >
             <td>{{ spell.name }}</td>
             <td>{{ spell.level }}</td>
-            <td class="school">{{ spell.school }}</td>
+            <td class="school">{{ schoolLabel(spell.school) }}</td>
             <td>
               <ul class="badges">
                 @if (spell.isRitual) {

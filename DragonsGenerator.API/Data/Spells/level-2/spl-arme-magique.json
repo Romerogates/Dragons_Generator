@@ -30,7 +30,7 @@
     "cls-magicien",
     "cls-paladin"
   ],
-  "description": "Vous touchez une arme non magique. Tant que le sort persiste, cette arme devient une arme magique avec un bonus de +1 aux jets d'attaque et aux jets de dégâts. ### Meilleure arme magique Si vous utilisez cette variante, lorsque vous utilisez un emplacement de sort du 5e niveau ou supérieur, il n'est plus nécessaire de vous concentrer sur ce sort.",
+  "description": "Vous touchez une arme non magique. Tant que le sort persiste, cette arme devient une arme magique avec un bonus de +1 aux jets d'attaque et aux jets de dégâts. #\n\n## Meilleure arme magique Si vous utilisez cette variante, lorsque vous utilisez un emplacement de sort du 5e niveau ou supérieur, il n'est plus nécessaire de vous concentrer sur ce sort.",
   "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 4e ou 5e niveau, le bonus passe à +2. Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, le bonus passe à +3.",
   "modular_options": []
 }

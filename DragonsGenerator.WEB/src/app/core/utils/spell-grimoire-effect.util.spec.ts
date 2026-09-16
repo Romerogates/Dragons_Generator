@@ -42,6 +42,25 @@ describe('spell-grimoire-effect.util', () => {
     expect(normalizeSpellDescription('D Jous modifiez.')).toBe('Vous modifiez.');
   });
 
+  it('normalizeSpellDescription strips OCR decorative icons and splits headings', () => {
+    const raw =
+      'Decorative icon Decorative icon Vous murmurez. Decorative icon ## Prématuration corrompue Suite.';
+    expect(normalizeSpellDescription(raw)).toBe(
+      'Vous murmurez.\n\n## Prématuration corrompue Suite.',
+    );
+  });
+
+  it('normalizeSpellDescription strips decorative letter/border and Spell icons', () => {
+    expect(
+      normalizeSpellDescription(
+        'Spell icons for 6th level invocation Vous festoyez. Decorative letter D with floral elements',
+      ),
+    ).toBe('Vous festoyez.');
+    expect(normalizeSpellDescription('D Du moment de l’incantation.')).toBe(
+      'Du moment de l’incantation.',
+    );
+  });
+
   it('buildGrimoireEffectSummary uses Instantanée and first sentence', () => {
     const summary = buildGrimoireEffectSummary(mockSpell());
     expect(summary).toContain('V,S');

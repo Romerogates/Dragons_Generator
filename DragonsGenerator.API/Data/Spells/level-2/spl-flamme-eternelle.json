@@ -21,7 +21,7 @@
   "components": {
     "v": true,
     "s": true,
-    "m": "(de la poussière de rubis d'une valeur minimale de 50 po"
+    "m": "de la poussière de rubis d'une valeur minimale de 50 po, que le sort détruit"
   },
   "is_ritual": false,
   "is_concentration": false,
@@ -30,6 +30,6 @@
     "cls-magicien",
     "cls-pretre"
   ],
-  "description": "Spell icon for 2nd level evocation Une flamme apparaît brusquement sur un objet que vous touchez. Elle produit autant de lumière qu'une torche. Si elle ressemble à une flamme normale, elle ne dégage pas de chaleur et ne consomme pas d'oxygène. Une flamme éternelle peut être couverte ou cachée, mais pas étouffée ni éteinte. Eternal flame illustration",
+  "description": "Une flamme apparaît brusquement sur un objet que vous touchez. Elle produit autant de lumière qu'une torche. Si elle ressemble à une flamme normale, elle ne dégage pas de chaleur et ne consomme pas d'oxygène. Une flamme éternelle peut être couverte ou cachée, mais pas étouffée ni éteinte.",
   "modular_options": []
 }

@@ -18,7 +18,7 @@ export interface BookTocItem {
 }
 
 /**
- * Coquille « Mode Livre » — plein écran, parchemin, TOC optionnelle.
+ * Coquille plein écran Codex (sommaire optionnel) — thème sombre du site.
  */
 @Component({
   selector: 'app-book-reader-shell',

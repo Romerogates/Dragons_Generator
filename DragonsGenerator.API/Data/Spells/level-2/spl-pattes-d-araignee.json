@@ -32,7 +32,7 @@
     "cls-rodeur",
     "cls-sorcier"
   ],
-  "description": "Photograph icon other Tant que le sort persiste, une créature consentante ciblée peut se déplacer sur les surfaces verticales, et même sur les plafonds (la tête en bas), tout en gardant les mains libres. La cible gagne également une VD d'escalade égale à sa VD au sol.",
+  "description": "La cible gagne également une VD d'escalade égale à sa VD au sol.",
   "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 3e niveau ou supérieur, vous pouvez cibler une créature supplémentaire par niveau d'emplacement au-dessus du 2e.",
   "modular_options": []
 }

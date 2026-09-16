@@ -5,6 +5,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 import { DataService } from '@core/services/data.service';
 import { SpellSummary } from '@core/models/Spells/spell-summary';
+import { spellSchoolLabel } from '@core/utils/spell-display.util';
 
 @Component({
   selector: 'app-spells-summary',
@@ -15,6 +16,7 @@ import { SpellSummary } from '@core/models/Spells/spell-summary';
 })
 export class SpellsSummary {
   private dataService = inject(DataService);
+  protected readonly schoolLabel = spellSchoolLabel;
 
   protected error = signal<string | null>(null);
 

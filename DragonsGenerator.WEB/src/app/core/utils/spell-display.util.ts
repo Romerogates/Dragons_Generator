@@ -83,6 +83,9 @@ export function spellRangeLabel(s: Pick<Spell, 'range'>): string {
     return 'Personnel';
   }
   if (amountKey === 'contact' || unitKey === 'contact') return 'Contact';
+  if (amountKey === 'speciale' || unitKey === 'speciale' || amountKey === 'special') {
+    return 'Spéciale';
+  }
   if (unitKey === 'm' || unitKey === 'metre' || unitKey === 'metres') {
     return `${amount} m`.trim();
   }

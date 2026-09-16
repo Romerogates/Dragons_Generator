@@ -32,6 +32,6 @@
     "cls-magicien",
     "cls-sorcier"
   ],
-  "description": "Ce sort vous permet d'anticiper les difficultés d'une action que vous vous apprêtez à accomplir. Choisissez un effet parmi les suivants : ### Avantage à l'attaque Vous tendez le doigt vers une cible située à portée pour mieux saisir l'étendue de ses défenses, ne serait-ce que brièvement. Lors de votre tour de jeu suivant, vous bénéficiez d'un avantage à votre premier jet d'attaque contre la cible, pourvu que le sort n'ait pas déjà pris fin.",
+  "description": "Ce sort vous permet d'anticiper les difficultés d'une action que vous vous apprêtez à accomplir. Choisissez un effet parmi les suivants : #\n\n## Avantage à l'attaque Vous tendez le doigt vers une cible située à portée pour mieux saisir l'étendue de ses défenses, ne serait-ce que brièvement. Lors de votre tour de jeu suivant, vous bénéficiez d'un avantage à votre premier jet d'attaque contre la cible, pourvu que le sort n'ait pas déjà pris fin.",
   "modular_options": []
 }

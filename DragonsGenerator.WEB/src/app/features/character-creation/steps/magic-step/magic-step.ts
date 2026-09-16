@@ -469,8 +469,23 @@ export class MagicStep implements OnInit {
       int: 'Intelligence',
       wis: 'Sagesse',
       cha: 'Charisme',
+      str: 'Force',
+      dex: 'Dextérité',
+      con: 'Constitution',
+      Force: 'Force',
+      Dextérité: 'Dextérité',
+      Constitution: 'Constitution',
+      Intelligence: 'Intelligence',
+      Sagesse: 'Sagesse',
+      Charisme: 'Charisme',
     };
-    return map[code.toLowerCase()] ?? code;
+    return map[code] ?? map[code.toLowerCase()] ?? code;
+  }
+
+  /** Affiche toujours le libellé FR (codes wis/int/… ou labels). */
+  abilityDisplay(ability: string | null | undefined): string {
+    if (!ability) return '—';
+    return this.racialAbilityLabel(ability);
   }
 
   /** Niveaux de sorts préparables / connus (1 → max). */
@@ -1189,8 +1204,20 @@ export class MagicStep implements OnInit {
       Intelligence: 'intelligence',
       Sagesse: 'sagesse',
       Charisme: 'charisme',
+      str: 'force',
+      dex: 'dexterite',
+      con: 'constitution',
+      int: 'intelligence',
+      wis: 'sagesse',
+      cha: 'charisme',
+      force: 'force',
+      dexterite: 'dexterite',
+      constitution: 'constitution',
+      intelligence: 'intelligence',
+      sagesse: 'sagesse',
+      charisme: 'charisme',
     };
-    return map[ability] ?? null;
+    return map[ability] ?? map[ability.toLowerCase()] ?? null;
   }
 
   private restoreFromBuilder(): void {

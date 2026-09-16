@@ -2,13 +2,37 @@ import type { Spell } from '@core/models/Spells/spell';
 import type { SpellInstance } from '@core/models/Character/character';
 import { spellDurationLabel } from './spell-display.util';
 
-/** Corrige les descriptions tronquées (ex. « ous poussez » → « Vous poussez »). */
+/** Corrige OCR / artefacts de source (icônes décoratives, titres collés, « Vous » tronqué). */
 export function normalizeSpellDescription(description: string): string {
   let text = description.trim();
-  if (text.startsWith('ous ')) text = `V${text}`;
+
+  // Artefacts OCR des livres sources (alt text d’images).
+  text = text.replace(/\bDecorative icons?\b/gi, ' ');
+  text = text.replace(/\bSpell icons? for \d+\w*\s+level\s+\w+/gi, ' ');
+  text = text.replace(/\bDecorative letter [A-Z]\b[^\n.]*/gi, ' ');
+  text = text.replace(/\bDecorative border\b[^\n.]*/gi, ' ');
+  text = text.replace(/\bDecorative illustration[^\n.]*/gi, ' ');
+  text = text.replace(/\bIllustration of [^\n.]*/gi, ' ');
+  text = text.replace(/\bIllustration d['’][^\n.]*/gi, ' ');
+  text = text.replace(/\bDiagramme de glyphe\b/gi, ' ');
+  text = text.replace(/\bdecorative divider\b/gi, ' ');
+  text = text.replace(/Anthony Martin Romero\s*\(Order\s*#\d+\)/gi, ' ');
+  text = text.replace(/<page_number>.*?<\/page_number>/gi, ' ');
+
+  // Titres markdown collés au milieu d’un paragraphe.
+  text = text.replace(/\s*##\s+/g, '\n\n## ');
+  text = text.replace(/\s*###\s+/g, '\n\n### ');
+
   text = text.replace(/\.\s+D Jous\b/g, '. Vous');
   text = text.replace(/\bD Jous\b/g, 'Vous');
-  return text;
+  if (text.startsWith('ous ')) text = `V${text}`;
+  if (/^D\s+Du\b/.test(text)) text = text.replace(/^D\s+/, '');
+  if (/^D\s+Vous\b/.test(text)) text = text.replace(/^D\s+/, '');
+
+  text = text.replace(/[ \t]{2,}/g, ' ');
+  text = text.replace(/ *\n */g, '\n');
+  text = text.replace(/\n{3,}/g, '\n\n');
+  return text.trim();
 }
 
 function formatGrimoireComponents(components: Spell['components']): string {

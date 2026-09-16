@@ -43,6 +43,12 @@ export class CharacterPlayView {
   readonly abilityKeys = ABILITY_KEYS;
   readonly abilityLabel = ABILITY_KEY_TO_LABEL;
 
+  /** Libellé FR même si l’API / builder stocke un code (wis, int…). */
+  abilityDisplay(ability: string | null | undefined): string {
+    if (!ability) return '—';
+    return labelForGameId(ability);
+  }
+
   readonly classLine = computed(() => {
     const c = this.character();
     return (c.classes ?? [])

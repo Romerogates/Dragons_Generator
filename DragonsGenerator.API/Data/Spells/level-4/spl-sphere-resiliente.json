@@ -29,6 +29,6 @@
   "classes": [
     "cls-magicien"
   ],
-  "description": "Sphère résiliente icon Sphère résiliente photograph Une sphère de force scintillante se referme sur une créature ou un objet de taille G ou inférieure à portée. Une créature non consentante doit effectuer un JS Dextérité. En cas d'échec, la créature est enfermée pour toute la durée du sort. Rien - ni les objets physiques, ni l'énergie, ni d'autres effets de sort - ne peut franchir la barrière, dans un sens ou dans l'autre, bien qu'une créature qui y est prise puisse tout de même respirer. La sphère est immunisée contre tous les dégâts, et une créature ou un objet s'y trouvant ne peut pas être blessé par les attaques ou effets qui trouvent leur origine de l'autre côté du champ de force, et vice versa.",
+  "description": "Sphère Sphère résiliente Une créature non consentante doit effectuer un JS Dextérité. En cas d'échec, la créature est enfermée pour toute la durée du sort. Rien - ni les objets physiques, ni l'énergie, ni d'autres effets de sort - ne peut franchir la barrière, dans un sens ou dans l'autre, bien qu'une créature qui y est prise puisse tout de même respirer. La sphère est immunisée contre tous les dégâts, et une créature ou un objet s'y trouvant ne peut pas être blessé par les attaques ou effets qui trouvent leur origine de l'autre côté du champ de force, et vice versa.",
   "modular_options": []
 }
