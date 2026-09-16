@@ -56,7 +56,7 @@
     },
     {
       "name": "Arc composite",
-      "description": "Attaque d'arme à distance : +3 pour toucher, portée 48/150 m, une cible. Réussite : 7 (1d8 + 3) dégâts perforants.\nLogo cavalier orc"
+      "description": "Attaque d'arme à distance : +3 pour toucher, portée 48/150 m, une cible. Réussite : 7 (1d8 + 3) dégâts perforants."
     }
   ],
   "reactions": [],

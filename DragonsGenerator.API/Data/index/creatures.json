@@ -6,44 +6,44 @@
   ],
   "language": "fr",
   "stats": {
-    "total": 211,
+    "total": 219,
     "by_category": {
-      "clandestins": 25,
-      "croyants": 7,
-      "divers": 156,
+      "clandestins": 26,
+      "croyants": 8,
+      "divers": 162,
       "habitants": 3,
       "soldats": 20
     },
     "by_challenge_rating": {
       "0": 19,
       "1": 12,
-      "1/2": 27,
-      "1/4": 17,
-      "1/8": 19,
+      "2": 23,
+      "3": 15,
+      "4": 8,
+      "5": 14,
+      "6": 9,
+      "7": 7,
+      "8": 8,
+      "9": 5,
       "10": 2,
-      "11": 1,
+      "11": 2,
       "12": 4,
       "13": 4,
       "14": 3,
       "15": 3,
-      "16": 5,
+      "16": 6,
       "17": 1,
       "18": 1,
-      "2": 23,
       "20": 1,
-      "21": 1,
+      "21": 2,
       "22": 1,
       "23": 1,
       "24": 1,
       "25": 1,
-      "3": 15,
       "30": 1,
-      "4": 8,
-      "5": 14,
-      "6": 8,
-      "7": 7,
-      "8": 6,
-      "9": 5
+      "1/2": 28,
+      "1/4": 18,
+      "1/8": 19
     }
   },
   "creatures": [
@@ -235,6 +235,28 @@
       "file": "Creatures/clandestins/cre-jeune-dragon-d-agate.json"
     },
     {
+      "id": "cre-maitre-assassin",
+      "name": "Maître assassin",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "11",
+      "xp": 7200,
+      "armor_class": 16,
+      "file": "Creatures/clandestins/cre-maitre-assassin.json"
+    },
+    {
+      "id": "cre-meduse",
+      "name": "Méduse",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "6",
+      "xp": 2300,
+      "armor_class": 15,
+      "file": "Creatures/clandestins/cre-meduse.json"
+    },
+    {
       "id": "cre-mille-visages-sous-forme",
       "name": "Mille visages sous forme",
       "category": "clandestins",
@@ -277,17 +299,6 @@
       "xp": 100,
       "armor_class": 12,
       "file": "Creatures/clandestins/cre-molosse-feroce.json"
-    },
-    {
-      "id": "cre-meduse",
-      "name": "Méduse",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "6",
-      "xp": 2300,
-      "armor_class": 15,
-      "file": "Creatures/clandestins/cre-meduse.json"
     },
     {
       "id": "cre-rat",
@@ -400,6 +411,17 @@
       "file": "Creatures/croyants/cre-paladin.json"
     },
     {
+      "id": "cre-synthia-paladine",
+      "name": "Synthia (paladine)",
+      "category": "croyants",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": null,
+      "challenge_rating": "8",
+      "xp": 3900,
+      "armor_class": 20,
+      "file": "Creatures/croyants/cre-synthia-paladine.json"
+    },
+    {
       "id": "cre-aigle",
       "name": "Aigle",
       "category": "divers",
@@ -420,6 +442,28 @@
       "xp": 200,
       "armor_class": 13,
       "file": "Creatures/divers/cre-aigle-geant.json"
+    },
+    {
+      "id": "cre-ame-celeste-esprit-mortel",
+      "name": "Âme céleste, esprit mortel",
+      "category": "divers",
+      "part": "Troisième partie Rencontres dans le Grand Kaan",
+      "section": null,
+      "challenge_rating": "6",
+      "xp": 2300,
+      "armor_class": 16,
+      "file": "Creatures/divers/cre-ame-celeste-esprit-mortel.json"
+    },
+    {
+      "id": "cre-ame-en-peine",
+      "name": "Âme-en-peine",
+      "category": "divers",
+      "part": "Troisième partie Rencontres dans le Grand Kaan",
+      "section": null,
+      "challenge_rating": "5",
+      "xp": 1800,
+      "armor_class": 13,
+      "file": "Creatures/divers/cre-ame-en-peine.json"
     },
     {
       "id": "cre-anakedi",
@@ -475,6 +519,17 @@
       "xp": 200,
       "armor_class": 14,
       "file": "Creatures/divers/cre-araignee-geante.json"
+    },
+    {
+      "id": "cre-araignee-sauteuse-geante",
+      "name": "Araignée sauteuse géante",
+      "category": "divers",
+      "part": "Deuxième partie",
+      "section": null,
+      "challenge_rating": "1/2",
+      "xp": 100,
+      "armor_class": 14,
+      "file": "Creatures/divers/cre-araignee-sauteuse-geante.json"
     },
     {
       "id": "cre-araignees-nuee",
@@ -752,6 +807,17 @@
       "file": "Creatures/divers/cre-cavalier-orc.json"
     },
     {
+      "id": "cre-celeste-de-taille-g-neutre",
+      "name": "Céleste de taille G, neutre",
+      "category": "divers",
+      "part": "Troisième partie Rencontres dans le Grand Kaan",
+      "section": null,
+      "challenge_rating": "8",
+      "xp": 3900,
+      "armor_class": 15,
+      "file": "Creatures/divers/cre-celeste-de-taille-g-neutre.json"
+    },
+    {
       "id": "cre-chameau",
       "name": "Chameau",
       "category": "divers",
@@ -851,15 +917,15 @@
       "file": "Creatures/divers/cre-colonie-kheg.json"
     },
     {
-      "id": "cre-celeste-de-taille-g-neutre",
-      "name": "Céleste de taille G, neutre",
+      "id": "cre-delsednae",
+      "name": "Delsednae",
       "category": "divers",
       "part": "Troisième partie Rencontres dans le Grand Kaan",
       "section": null,
-      "challenge_rating": "8",
-      "xp": 3900,
-      "armor_class": 15,
-      "file": "Creatures/divers/cre-celeste-de-taille-g-neutre.json"
+      "challenge_rating": "6",
+      "xp": 2300,
+      "armor_class": 16,
+      "file": "Creatures/divers/cre-delsednae.json"
     },
     {
       "id": "cre-destrier",
@@ -906,6 +972,17 @@
       "file": "Creatures/divers/cre-dragon-d-argent-adulte.json"
     },
     {
+      "id": "cre-dragon-d-argent-venerable",
+      "name": "Dragon d’argent vénérable",
+      "category": "divers",
+      "part": "Deuxième partie",
+      "section": null,
+      "challenge_rating": "23",
+      "xp": 50000,
+      "armor_class": 22,
+      "file": "Creatures/divers/cre-dragon-d-argent-venerable.json"
+    },
+    {
       "id": "cre-dragon-de-cuivre-adulte",
       "name": "Dragon de cuivre adulte",
       "category": "divers",
@@ -917,15 +994,15 @@
       "file": "Creatures/divers/cre-dragon-de-cuivre-adulte.json"
     },
     {
-      "id": "cre-dragon-d-argent-venerable",
-      "name": "Dragon d’argent vénérable",
+      "id": "cre-dragon-de-cuivre-venerable",
+      "name": "Dragon de cuivre vénérable",
       "category": "divers",
-      "part": "Deuxième partie",
+      "part": "Troisième partie Rencontres dans le Grand Kaan",
       "section": null,
-      "challenge_rating": "23",
-      "xp": 50000,
-      "armor_class": 22,
-      "file": "Creatures/divers/cre-dragon-d-argent-venerable.json"
+      "challenge_rating": "21",
+      "xp": 33000,
+      "armor_class": 21,
+      "file": "Creatures/divers/cre-dragon-de-cuivre-venerable.json"
     },
     {
       "id": "cre-dragonnet-blanc",
@@ -939,17 +1016,6 @@
       "file": "Creatures/divers/cre-dragonnet-blanc.json"
     },
     {
-      "id": "cre-dragonnet-de-cuivre",
-      "name": "Dragonnet de cuivre",
-      "category": "divers",
-      "part": "Troisième partie Rencontres dans le Grand Kaan",
-      "section": null,
-      "challenge_rating": "1",
-      "xp": 200,
-      "armor_class": 16,
-      "file": "Creatures/divers/cre-dragonnet-de-cuivre.json"
-    },
-    {
       "id": "cre-dragonnet-d-argent",
       "name": "Dragonnet d’argent",
       "category": "divers",
@@ -959,6 +1025,17 @@
       "xp": 450,
       "armor_class": 17,
       "file": "Creatures/divers/cre-dragonnet-d-argent.json"
+    },
+    {
+      "id": "cre-dragonnet-de-cuivre",
+      "name": "Dragonnet de cuivre",
+      "category": "divers",
+      "part": "Troisième partie Rencontres dans le Grand Kaan",
+      "section": null,
+      "challenge_rating": "1",
+      "xp": 200,
+      "armor_class": 16,
+      "file": "Creatures/divers/cre-dragonnet-de-cuivre.json"
     },
     {
       "id": "cre-druide",
@@ -981,6 +1058,17 @@
       "xp": 1800,
       "armor_class": 15,
       "file": "Creatures/divers/cre-druide-geant-des-pierres.json"
+    },
+    {
+      "id": "cre-elan-geant",
+      "name": "Élan géant",
+      "category": "divers",
+      "part": "Troisième partie Rencontres dans le Grand Kaan",
+      "section": null,
+      "challenge_rating": "2",
+      "xp": 450,
+      "armor_class": 14,
+      "file": "Creatures/divers/cre-elan-geant.json"
     },
     {
       "id": "cre-ezen-champion-orc",
@@ -1049,6 +1137,28 @@
       "file": "Creatures/divers/cre-gargouille.json"
     },
     {
+      "id": "cre-geant-des-pierres-sentinelle",
+      "name": "Géant des pierres sentinelle",
+      "category": "divers",
+      "part": "Troisième partie Rencontres dans le Grand Kaan",
+      "section": null,
+      "challenge_rating": "7",
+      "xp": 2900,
+      "armor_class": 17,
+      "file": "Creatures/divers/cre-geant-des-pierres-sentinelle.json"
+    },
+    {
+      "id": "cre-geant-du-givre-sorcier-de-gegaor",
+      "name": "Géant du givre sorcier de Gegaôr",
+      "category": "divers",
+      "part": "Troisième partie Rencontres dans le Grand Kaan",
+      "section": null,
+      "challenge_rating": "5",
+      "xp": 1800,
+      "armor_class": 12,
+      "file": "Creatures/divers/cre-geant-du-givre-sorcier-de-gegaor.json"
+    },
+    {
       "id": "cre-gelee-ocre-cendreuse",
       "name": "Gelée ocre cendreuse",
       "category": "divers",
@@ -1058,6 +1168,17 @@
       "xp": 700,
       "armor_class": 12,
       "file": "Creatures/divers/cre-gelee-ocre-cendreuse.json"
+    },
+    {
+      "id": "cre-glacanglot",
+      "name": "Glaçanglot",
+      "category": "divers",
+      "part": "Troisième partie Rencontres dans le Grand Kaan",
+      "section": null,
+      "challenge_rating": "2",
+      "xp": 450,
+      "armor_class": 12,
+      "file": "Creatures/divers/cre-glacanglot.json"
     },
     {
       "id": "cre-glashurle",
@@ -1071,15 +1192,15 @@
       "file": "Creatures/divers/cre-glashurle.json"
     },
     {
-      "id": "cre-glacanglot",
-      "name": "Glaçanglot",
+      "id": "cre-golem-d-argile",
+      "name": "Golem d’argile",
       "category": "divers",
       "part": "Troisième partie Rencontres dans le Grand Kaan",
       "section": null,
-      "challenge_rating": "2",
-      "xp": 450,
-      "armor_class": 12,
-      "file": "Creatures/divers/cre-glacanglot.json"
+      "challenge_rating": "9",
+      "xp": 5000,
+      "armor_class": 14,
+      "file": "Creatures/divers/cre-golem-d-argile.json"
     },
     {
       "id": "cre-golem-de-chair",
@@ -1115,17 +1236,6 @@
       "file": "Creatures/divers/cre-golem-de-pierre.json"
     },
     {
-      "id": "cre-golem-d-argile",
-      "name": "Golem d’argile",
-      "category": "divers",
-      "part": "Troisième partie Rencontres dans le Grand Kaan",
-      "section": null,
-      "challenge_rating": "9",
-      "xp": 5000,
-      "armor_class": 14,
-      "file": "Creatures/divers/cre-golem-d-argile.json"
-    },
-    {
       "id": "cre-gorgone-taurine",
       "name": "Gorgone taurine",
       "category": "divers",
@@ -1159,17 +1269,6 @@
       "file": "Creatures/divers/cre-grand-gregaire.json"
     },
     {
-      "id": "cre-griffon",
-      "name": "Griffon",
-      "category": "divers",
-      "part": "Troisième partie Rencontres dans le Grand Kaan",
-      "section": null,
-      "challenge_rating": "2",
-      "xp": 450,
-      "armor_class": 12,
-      "file": "Creatures/divers/cre-griffon.json"
-    },
-    {
       "id": "cre-gregaire-massif",
       "name": "Grégaire massif",
       "category": "divers",
@@ -1192,6 +1291,17 @@
       "file": "Creatures/divers/cre-gregaire-moyen.json"
     },
     {
+      "id": "cre-griffon",
+      "name": "Griffon",
+      "category": "divers",
+      "part": "Troisième partie Rencontres dans le Grand Kaan",
+      "section": null,
+      "challenge_rating": "2",
+      "xp": 450,
+      "armor_class": 12,
+      "file": "Creatures/divers/cre-griffon.json"
+    },
+    {
       "id": "cre-guerrier-geant-du-givre",
       "name": "Guerrier géant du givre",
       "category": "divers",
@@ -1201,6 +1311,17 @@
       "xp": 3900,
       "armor_class": 15,
       "file": "Creatures/divers/cre-guerrier-geant-du-givre.json"
+    },
+    {
+      "id": "cre-guerrier-gobelin",
+      "name": "Guerrier gobelin",
+      "category": "divers",
+      "part": "Troisième partie Rencontres dans le Grand Kaan",
+      "section": null,
+      "challenge_rating": "1/4",
+      "xp": 50,
+      "armor_class": 15,
+      "file": "Creatures/divers/cre-guerrier-gobelin.json"
     },
     {
       "id": "cre-guerrier-orc",
@@ -1234,28 +1355,6 @@
       "xp": 100,
       "armor_class": 15,
       "file": "Creatures/divers/cre-guerrier-ulkan.json"
-    },
-    {
-      "id": "cre-geant-des-pierres-sentinelle",
-      "name": "Géant des pierres sentinelle",
-      "category": "divers",
-      "part": "Troisième partie Rencontres dans le Grand Kaan",
-      "section": null,
-      "challenge_rating": "7",
-      "xp": 2900,
-      "armor_class": 17,
-      "file": "Creatures/divers/cre-geant-des-pierres-sentinelle.json"
-    },
-    {
-      "id": "cre-geant-du-givre-sorcier-de-gegaor",
-      "name": "Géant du givre sorcier de Gegaôr",
-      "category": "divers",
-      "part": "Troisième partie Rencontres dans le Grand Kaan",
-      "section": null,
-      "challenge_rating": "5",
-      "xp": 1800,
-      "armor_class": 12,
-      "file": "Creatures/divers/cre-geant-du-givre-sorcier-de-gegaor.json"
     },
     {
       "id": "cre-hibou-et-chouette",
@@ -1324,6 +1423,17 @@
       "file": "Creatures/divers/cre-inane-tourmenteuse.json"
     },
     {
+      "id": "cre-itelgini-haut-chamane",
+      "name": "Itelgini (haut chamane)",
+      "category": "divers",
+      "part": "Troisième partie Rencontres dans le Grand Kaan",
+      "section": null,
+      "challenge_rating": "8",
+      "xp": 3900,
+      "armor_class": 16,
+      "file": "Creatures/divers/cre-itelgini-haut-chamane.json"
+    },
+    {
       "id": "cre-jeune-dragon-blanc",
       "name": "Jeune dragon blanc",
       "category": "divers",
@@ -1335,17 +1445,6 @@
       "file": "Creatures/divers/cre-jeune-dragon-blanc.json"
     },
     {
-      "id": "cre-jeune-dragon-de-cuivre",
-      "name": "Jeune dragon de cuivre",
-      "category": "divers",
-      "part": "Troisième partie Rencontres dans le Grand Kaan",
-      "section": null,
-      "challenge_rating": "7",
-      "xp": 2900,
-      "armor_class": 17,
-      "file": "Creatures/divers/cre-jeune-dragon-de-cuivre.json"
-    },
-    {
       "id": "cre-jeune-dragon-d-argent",
       "name": "Jeune dragon d’argent",
       "category": "divers",
@@ -1355,6 +1454,17 @@
       "xp": 5000,
       "armor_class": 18,
       "file": "Creatures/divers/cre-jeune-dragon-d-argent.json"
+    },
+    {
+      "id": "cre-jeune-dragon-de-cuivre",
+      "name": "Jeune dragon de cuivre",
+      "category": "divers",
+      "part": "Troisième partie Rencontres dans le Grand Kaan",
+      "section": null,
+      "challenge_rating": "7",
+      "xp": 2900,
+      "armor_class": 17,
+      "file": "Creatures/divers/cre-jeune-dragon-de-cuivre.json"
     },
     {
       "id": "cre-jeune-schatz",
@@ -1399,6 +1509,28 @@
       "xp": 1100,
       "armor_class": 15,
       "file": "Creatures/divers/cre-le-destrier-des-marchevents.json"
+    },
+    {
+      "id": "cre-lezard-cendreux",
+      "name": "Lézard cendreux",
+      "category": "divers",
+      "part": "Deuxième partie",
+      "section": null,
+      "challenge_rating": "1/8",
+      "xp": 25,
+      "armor_class": 15,
+      "file": "Creatures/divers/cre-lezard-cendreux.json"
+    },
+    {
+      "id": "cre-lezard-geant-cendreux",
+      "name": "Lézard géant cendreux",
+      "category": "divers",
+      "part": "Deuxième partie",
+      "section": null,
+      "challenge_rating": "1/2",
+      "xp": 100,
+      "armor_class": 14,
+      "file": "Creatures/divers/cre-lezard-geant-cendreux.json"
     },
     {
       "id": "cre-liche",
@@ -1478,28 +1610,6 @@
       "file": "Creatures/divers/cre-lycose-geante.json"
     },
     {
-      "id": "cre-lezard-cendreux",
-      "name": "Lézard cendreux",
-      "category": "divers",
-      "part": "Deuxième partie",
-      "section": null,
-      "challenge_rating": "1/8",
-      "xp": 25,
-      "armor_class": 15,
-      "file": "Creatures/divers/cre-lezard-cendreux.json"
-    },
-    {
-      "id": "cre-lezard-geant-cendreux",
-      "name": "Lézard géant cendreux",
-      "category": "divers",
-      "part": "Deuxième partie",
-      "section": null,
-      "challenge_rating": "1/2",
-      "xp": 100,
-      "armor_class": 14,
-      "file": "Creatures/divers/cre-lezard-geant-cendreux.json"
-    },
-    {
       "id": "cre-magmatique",
       "name": "Magmatique",
       "category": "divers",
@@ -1509,39 +1619,6 @@
       "xp": 100,
       "armor_class": 14,
       "file": "Creatures/divers/cre-magmatique.json"
-    },
-    {
-      "id": "cre-minotaure",
-      "name": "Minotaure",
-      "category": "divers",
-      "part": "Troisième partie Rencontres dans le Grand Kaan",
-      "section": null,
-      "challenge_rating": "3",
-      "xp": 700,
-      "armor_class": 14,
-      "file": "Creatures/divers/cre-minotaure.json"
-    },
-    {
-      "id": "cre-morhave",
-      "name": "Morhâve",
-      "category": "divers",
-      "part": "Troisième partie Rencontres dans le Grand Kaan",
-      "section": null,
-      "challenge_rating": "0",
-      "xp": 0,
-      "armor_class": 10,
-      "file": "Creatures/divers/cre-morhave.json"
-    },
-    {
-      "id": "cre-mule",
-      "name": "Mule",
-      "category": "divers",
-      "part": "Troisième partie Rencontres dans le Grand Kaan",
-      "section": null,
-      "challenge_rating": "1/8",
-      "xp": 25,
-      "armor_class": 10,
-      "file": "Creatures/divers/cre-mule.json"
     },
     {
       "id": "cre-mephite-gele",
@@ -1597,6 +1674,39 @@
       "xp": 50,
       "armor_class": 10,
       "file": "Creatures/divers/cre-mephite-vaporeux.json"
+    },
+    {
+      "id": "cre-minotaure",
+      "name": "Minotaure",
+      "category": "divers",
+      "part": "Troisième partie Rencontres dans le Grand Kaan",
+      "section": null,
+      "challenge_rating": "3",
+      "xp": 700,
+      "armor_class": 14,
+      "file": "Creatures/divers/cre-minotaure.json"
+    },
+    {
+      "id": "cre-morhave",
+      "name": "Morhâve",
+      "category": "divers",
+      "part": "Troisième partie Rencontres dans le Grand Kaan",
+      "section": null,
+      "challenge_rating": "0",
+      "xp": 0,
+      "armor_class": 10,
+      "file": "Creatures/divers/cre-morhave.json"
+    },
+    {
+      "id": "cre-mule",
+      "name": "Mule",
+      "category": "divers",
+      "part": "Troisième partie Rencontres dans le Grand Kaan",
+      "section": null,
+      "challenge_rating": "1/8",
+      "xp": 25,
+      "armor_class": 10,
+      "file": "Creatures/divers/cre-mule.json"
     },
     {
       "id": "cre-ours-brun",
@@ -1696,6 +1806,17 @@
       "xp": 2900,
       "armor_class": 16,
       "file": "Creatures/divers/cre-regikheg-cendreuse.json"
+    },
+    {
+      "id": "cre-reine-salamandre-tssikrreta",
+      "name": "Reine salamandre Tssikrreta",
+      "category": "divers",
+      "part": "Deuxième partie",
+      "section": null,
+      "challenge_rating": "16",
+      "xp": 15000,
+      "armor_class": 15,
+      "file": "Creatures/divers/cre-reine-salamandre-tssikrreta.json"
     },
     {
       "id": "cre-remorhaz",
@@ -1973,17 +2094,6 @@
       "file": "Creatures/divers/cre-tarasque.json"
     },
     {
-      "id": "cre-troupier-kobold",
-      "name": "Troupier kobold",
-      "category": "divers",
-      "part": "Troisième partie Rencontres dans le Grand Kaan",
-      "section": null,
-      "challenge_rating": "1/8",
-      "xp": 25,
-      "armor_class": 12,
-      "file": "Creatures/divers/cre-troupier-kobold.json"
-    },
-    {
       "id": "cre-tres-grand-gregaire",
       "name": "Très grand grégaire",
       "category": "divers",
@@ -1993,6 +2103,17 @@
       "xp": 700,
       "armor_class": 14,
       "file": "Creatures/divers/cre-tres-grand-gregaire.json"
+    },
+    {
+      "id": "cre-troupier-kobold",
+      "name": "Troupier kobold",
+      "category": "divers",
+      "part": "Troisième partie Rencontres dans le Grand Kaan",
+      "section": null,
+      "challenge_rating": "1/8",
+      "xp": 25,
+      "armor_class": 12,
+      "file": "Creatures/divers/cre-troupier-kobold.json"
     },
     {
       "id": "cre-un-familier-kaani",
@@ -2083,39 +2204,6 @@
       "file": "Creatures/divers/cre-zombie-ogre.json"
     },
     {
-      "id": "cre-ame-celeste-esprit-mortel",
-      "name": "Âme céleste, esprit mortel",
-      "category": "divers",
-      "part": "Troisième partie Rencontres dans le Grand Kaan",
-      "section": null,
-      "challenge_rating": "6",
-      "xp": 2300,
-      "armor_class": 16,
-      "file": "Creatures/divers/cre-ame-celeste-esprit-mortel.json"
-    },
-    {
-      "id": "cre-ame-en-peine",
-      "name": "Âme-en-peine",
-      "category": "divers",
-      "part": "Troisième partie Rencontres dans le Grand Kaan",
-      "section": null,
-      "challenge_rating": "5",
-      "xp": 1800,
-      "armor_class": 13,
-      "file": "Creatures/divers/cre-ame-en-peine.json"
-    },
-    {
-      "id": "cre-elan-geant",
-      "name": "Élan géant",
-      "category": "divers",
-      "part": "Troisième partie Rencontres dans le Grand Kaan",
-      "section": null,
-      "challenge_rating": "2",
-      "xp": 450,
-      "armor_class": 14,
-      "file": "Creatures/divers/cre-elan-geant.json"
-    },
-    {
       "id": "cre-aristocrate",
       "name": "Aristocrate",
       "category": "habitants",
@@ -2193,17 +2281,6 @@
       "file": "Creatures/soldats/cre-barde.json"
     },
     {
-      "id": "cre-champion",
-      "name": "Champion",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "12",
-      "xp": 8400,
-      "armor_class": 20,
-      "file": "Creatures/soldats/cre-champion.json"
-    },
-    {
       "id": "cre-chaine-animee",
       "name": "Chaîne animée",
       "category": "soldats",
@@ -2213,6 +2290,17 @@
       "xp": 25,
       "armor_class": 18,
       "file": "Creatures/soldats/cre-chaine-animee.json"
+    },
+    {
+      "id": "cre-champion",
+      "name": "Champion",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "12",
+      "xp": 8400,
+      "armor_class": 20,
+      "file": "Creatures/soldats/cre-champion.json"
     },
     {
       "id": "cre-chevalier",
@@ -2235,6 +2323,28 @@
       "xp": 450,
       "armor_class": 6,
       "file": "Creatures/soldats/cre-cube-gelatineux.json"
+    },
+    {
+      "id": "cre-eclaireur",
+      "name": "Éclaireur",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "1/2",
+      "xp": 100,
+      "armor_class": 13,
+      "file": "Creatures/soldats/cre-eclaireur.json"
+    },
+    {
+      "id": "cre-epee-volante",
+      "name": "Épée volante",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "1/4",
+      "xp": 50,
+      "armor_class": 17,
+      "file": "Creatures/soldats/cre-epee-volante.json"
     },
     {
       "id": "cre-garde",
@@ -2345,28 +2455,6 @@
       "xp": 700,
       "armor_class": 17,
       "file": "Creatures/soldats/cre-veteran.json"
-    },
-    {
-      "id": "cre-eclaireur",
-      "name": "Éclaireur",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "1/2",
-      "xp": 100,
-      "armor_class": 13,
-      "file": "Creatures/soldats/cre-eclaireur.json"
-    },
-    {
-      "id": "cre-epee-volante",
-      "name": "Épée volante",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "1/4",
-      "xp": 50,
-      "armor_class": 17,
-      "file": "Creatures/soldats/cre-epee-volante.json"
     }
   ]
 }
