@@ -86,6 +86,8 @@ function contentFor(id: string): Pick<
           { label: 'S’inscrire', path: '/register', hint: 'Compte cloud' },
           { label: 'Forger un héros', path: '/create', hint: 'Wizard' },
           { label: 'Mes campagnes', path: '/campaigns', hint: 'MJ & joueurs' },
+          { label: 'Règles MJ (table)', path: '/guide/mj-table', hint: 'PDF IRL' },
+          { label: 'Règles Joueur (table)', path: '/guide/joueur-table', hint: 'PDF IRL' },
           { label: 'Paramètres / push', path: '/settings', hint: 'Notifications' },
         ],
         flow: ['Compte', 'Héros', 'Campagne', 'Session', 'Combat'],

@@ -39,4 +39,16 @@ describe('species-mechanics.util', () => {
     expect(prettyOptionId('str')).toBe('Force');
     expect(prettyOptionId('drag-bleu', 'dragon_lineage')).toBe('Bleu');
   });
+
+  it('labels dragon_lineage resistance source in French', () => {
+    const blocks = buildMechanicsBlocks({
+      type: 'damage_resistance',
+      source_key: 'dragon_lineage',
+      resistances: ['from_lineage'],
+    });
+    expect(blocks[0]?.rows).toEqual([
+      { label: 'Source', value: 'Lignée draconique' },
+      { label: 'Types', value: 'Selon la lignée draconique' },
+    ]);
+  });
 });

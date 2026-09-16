@@ -146,13 +146,17 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
     if (!c) return;
     this.campaigns.get(c.id).subscribe({
       next: (updated) => {
-        if (c.isOwner) {
-          const merged = mergeRemoteLiveTable(c, updated);
+        // Toujours reprendre l’état local le plus récent (évite d’écraser un xpAwarded
+        // posé juste après le notify SignalR de award-xp).
+        const latest = this.campaign();
+        if (!latest) return;
+        if (latest.isOwner) {
+          const merged = mergeRemoteLiveTable(latest, updated);
           this.campaign.set(merged);
           this.sessionDock.patchLiveCampaign(merged);
           return;
         }
-        this.announcePlayerXpGain(c, updated);
+        this.announcePlayerXpGain(latest, updated);
         this.campaign.set(updated);
         this.sessionDock.patchLiveCampaign(updated);
       },

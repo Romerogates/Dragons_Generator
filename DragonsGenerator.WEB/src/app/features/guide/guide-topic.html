@@ -1,127 +1,49 @@
-<div class="min-h-screen bg-[#0e1117] text-slate-300">
-  <div class="flex flex-col lg:flex-row min-h-screen">
-    <!-- Wiki sidebar -->
-    <aside
-      class="lg:w-72 xl:w-80 shrink-0 border-b lg:border-b-0 lg:border-r border-slate-800/90 bg-[#141820] lg:sticky lg:top-0 lg:h-dvh lg:overflow-y-auto"
-    >
-      <div class="p-4 space-y-4">
-        <a
-          routerLink="/guide"
-          class="inline-flex text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-amber-400"
-        >
-          ← Hub du guide
-        </a>
-        <div>
-          <p class="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500/80">Guide</p>
-          <p class="text-lg font-serif text-slate-100 mt-1">Sommaire</p>
-        </div>
-        <input
-          type="search"
-          placeholder="Filtrer…"
-          class="w-full min-h-10 rounded-lg bg-[#0f1218] border border-slate-700 px-3 text-sm"
-          [ngModel]="navQuery()"
-          (ngModelChange)="navQuery.set($event)"
-        />
-        <div class="flex flex-wrap gap-1">
-          @for (a of [
-            { id: 'all', label: 'Tout' },
-            { id: 'dm', label: 'MJ' },
-            { id: 'player', label: 'Joueur' }
-          ]; track a.id) {
-            <button
-              type="button"
-              class="px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border"
-              [class]="
-                audience() === a.id
-                  ? 'border-amber-500/50 text-amber-200 bg-amber-950/30'
-                  : 'border-slate-700 text-slate-500'
-              "
-              (click)="setAudience($any(a.id))"
-            >
-              {{ a.label }}
-            </button>
-          }
-        </div>
+<div
+  class="guide-shell bg-[#0e1117] text-slate-300 overflow-hidden flex flex-col
+         h-[calc(100dvh-var(--dg-sticky-top))] max-h-[calc(100dvh-var(--dg-sticky-top))]"
+>
+  <div class="flex flex-col lg:flex-row flex-1 min-h-0">
+    <app-guide-sidebar
+      [(query)]="navQuery"
+      [(audience)]="audience"
+      [sections]="sidebarSections()"
+      [searchEmpty]="searchEmpty()"
+      [activeTopicId]="topicId()"
+    />
 
-        @if (searchEmpty()) {
-          <p class="text-xs text-slate-500 px-1 py-2">
-            Aucune fiche pour « {{ navQuery().trim() }} »
-          </p>
-        } @else {
-          @for (section of sidebarSections(); track section.groupId) {
-            <div class="space-y-1">
-              <p class="text-[9px] font-black uppercase tracking-widest text-slate-600 px-1">
-                {{ section.groupLabel }}
-              </p>
-              <ul class="space-y-0.5">
-                @for (t of section.topics; track t.id) {
-                  <li>
-                    <a
-                      [routerLink]="['/guide', t.id]"
-                      class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm transition-colors"
-                      [class]="
-                        topicId() === t.id
-                          ? 'bg-amber-950/40 text-amber-100 border border-amber-700/40'
-                          : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'
-                      "
-                    >
-                      <span class="text-base shrink-0"><iconify-icon [icon]="t.icon"></iconify-icon></span>
-                      <span class="truncate flex-1">{{ t.title }}</span>
-                      @if (isUnread(t.id)) {
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" title="Non lu"></span>
-                      }
-                    </a>
-                  </li>
-                }
-              </ul>
-            </div>
-          }
-        }
-      </div>
-    </aside>
-
-    <!-- Article -->
-    <div class="flex-1 min-w-0">
+    <div class="guide-print-root flex-1 min-w-0 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar">
       @if (topic(); as t) {
-        <header
-          class="relative border-b border-slate-800 overflow-hidden"
-          style="
-            background:
-              radial-gradient(ellipse 80% 100% at 0% 0%, rgba(245, 158, 11, 0.12), transparent 55%),
-              #141820;
-          "
-        >
-          <div class="max-w-3xl mx-auto px-4 md:px-8 py-10 md:py-14 space-y-4">
-            <nav class="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
-              <a routerLink="/guide" class="hover:text-amber-400">Guide</a>
-              <span aria-hidden="true">/</span>
-              <span class="text-slate-400">{{ t.groupLabel }}</span>
-              <span aria-hidden="true">/</span>
-              <span class="text-amber-400/90">{{ t.title }}</span>
-            </nav>
-            <div class="flex flex-wrap gap-1.5">
-              @for (tag of t.tags; track tag) {
-                <span
-                  class="px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border border-slate-700 text-slate-400"
-                  >{{ tag }}</span
-                >
-              }
+        <header class="guide-print-header border-b border-slate-800 bg-[#141820]">
+          <div class="max-w-2xl mx-auto px-4 md:px-8 py-6 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <nav
+                class="guide-no-print flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500"
+              >
+                <a routerLink="/guide" class="hover:text-amber-400">Guide</a>
+                <span aria-hidden="true">/</span>
+                <span class="text-amber-400/90">{{ t.title }}</span>
+              </nav>
+              <button
+                type="button"
+                class="guide-no-print min-h-9 px-3 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-600/50 hover:text-amber-200 disabled:opacity-40"
+                [disabled]="exportingPdf()"
+                (click)="downloadTopicPdf()"
+              >
+                {{ exportingPdf() ? 'PDF…' : 'Télécharger le PDF' }}
+              </button>
             </div>
-            <div class="flex items-start gap-4">
-              <span class="text-5xl shrink-0 drop-shadow-lg"><iconify-icon [icon]="t.icon"></iconify-icon></span>
-              <div>
-                <h1 class="text-4xl md:text-5xl font-serif text-slate-50 tracking-tight leading-tight">
-                  {{ t.title }}
-                </h1>
-                <p class="mt-4 text-lg text-slate-400 leading-relaxed max-w-2xl">{{ t.summary }}</p>
-              </div>
+            <div>
+              <h1 class="text-3xl md:text-4xl font-serif text-slate-50 tracking-tight leading-tight">
+                {{ t.title }}
+              </h1>
+              <p class="mt-2 text-base text-slate-400 leading-relaxed max-w-2xl">{{ t.summary }}</p>
             </div>
             @if (t.links.length) {
-              <div class="flex flex-wrap gap-2 pt-2">
+              <div class="guide-no-print flex flex-wrap gap-2 pt-1">
                 @for (link of t.links; track link.path + link.label) {
                   <a
                     [routerLink]="link.path"
-                    class="inline-flex items-center gap-2 min-h-10 px-4 rounded-full text-[10px] font-black uppercase tracking-widest border border-amber-700/40 bg-amber-950/20 text-amber-200 hover:border-amber-500/60 transition-colors"
+                    class="inline-flex items-center min-h-9 px-3 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-600/50 hover:text-amber-200 transition-colors"
                   >
                     {{ link.label }}
                   </a>
@@ -131,25 +53,19 @@
           </div>
         </header>
 
-        <article class="max-w-3xl mx-auto px-4 md:px-8 py-10 md:py-12 space-y-12">
-          <div class="space-y-5 prose-guide">
+        <article class="guide-print-article max-w-2xl mx-auto px-4 md:px-8 py-8 space-y-8 pb-16">
+          <div class="space-y-4">
             @for (p of t.paragraphs; track $index) {
-              <p class="text-base md:text-[1.05rem] text-slate-300 leading-[1.75]">{{ p }}</p>
+              <p class="text-base text-slate-300 leading-relaxed">{{ p }}</p>
             }
           </div>
 
           @if (t.flow.length) {
-            <section class="space-y-4">
-              <h2 class="text-xl font-serif text-slate-100 border-b border-slate-800 pb-2">Parcours</h2>
-              <ol class="space-y-2">
+            <section class="space-y-3">
+              <h2 class="text-lg font-serif text-slate-100 border-b border-slate-800 pb-2">Parcours</h2>
+              <ol class="space-y-2 list-decimal list-inside text-slate-300">
                 @for (step of t.flow; track $index) {
-                  <li class="flex gap-3 items-start">
-                    <span
-                      class="shrink-0 w-7 h-7 rounded-full bg-amber-950/50 border border-amber-700/40 text-amber-300 text-xs font-black flex items-center justify-center"
-                      >{{ $index + 1 }}</span
-                    >
-                    <span class="text-slate-300 pt-0.5">{{ step }}</span>
-                  </li>
+                  <li class="leading-relaxed pl-1">{{ step }}</li>
                 }
               </ol>
             </section>
@@ -157,24 +73,23 @@
 
           @if (t.steps.length) {
             <section class="space-y-4">
-              <h2 class="text-xl font-serif text-slate-100 border-b border-slate-800 pb-2">Étapes détaillées</h2>
-              <div class="space-y-4">
+              <h2 class="text-lg font-serif text-slate-100 border-b border-slate-800 pb-2">Étapes</h2>
+              <div class="space-y-5">
                 @for (step of t.steps; track step.title + $index) {
-                  <div class="rounded-xl border border-slate-800/90 bg-[#161b24]/80 p-5 space-y-2">
-                    <div class="flex flex-wrap items-center gap-2">
-                      <h3 class="text-lg font-serif text-slate-50">{{ step.title }}</h3>
+                  <div class="space-y-1.5">
+                    <h3 class="text-base font-serif text-slate-50">
+                      {{ $index + 1 }}. {{ step.title }}
                       @if (step.badge) {
-                        <span
-                          class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border border-violet-800/50 text-violet-300"
+                        <span class="guide-no-print ml-2 text-[10px] font-sans font-black uppercase tracking-widest text-slate-500"
                           >{{ step.badge }}</span
                         >
                       }
-                    </div>
+                    </h3>
                     <p class="text-sm text-slate-400 leading-relaxed">{{ step.body }}</p>
                     @if (step.link) {
                       <a
                         [routerLink]="step.link"
-                        class="inline-flex text-[10px] font-black uppercase tracking-widest text-emerald-400 hover:text-emerald-300"
+                        class="guide-no-print inline-flex text-[10px] font-black uppercase tracking-widest text-amber-400/90 hover:text-amber-300"
                       >
                         {{ step.linkLabel || 'Ouvrir' }} →
                       </a>
@@ -186,18 +101,15 @@
           }
 
           @if (t.flashes.length) {
-            <section class="space-y-4">
-              <h2 class="text-xl font-serif text-slate-100 border-b border-slate-800 pb-2">En bref</h2>
-              <div class="grid sm:grid-cols-2 gap-3">
+            <section class="space-y-3">
+              <h2 class="text-lg font-serif text-slate-100 border-b border-slate-800 pb-2">En bref</h2>
+              <div class="space-y-4">
                 @for (flash of t.flashes; track flash.title) {
-                  <div class="rounded-xl border border-slate-800 bg-[#161b24] p-4 space-y-2">
-                    <div class="flex items-center gap-2">
-                      <span class="text-xl"><iconify-icon [icon]="flash.icon"></iconify-icon></span>
-                      <h3 class="font-serif text-slate-100">{{ flash.title }}</h3>
-                    </div>
-                    <ul class="space-y-1 text-sm text-slate-400">
+                  <div>
+                    <h3 class="font-serif text-slate-100 mb-1">{{ flash.title }}</h3>
+                    <ul class="space-y-1 text-sm text-slate-400 list-disc list-inside">
                       @for (b of flash.bullets; track b) {
-                        <li>· {{ b }}</li>
+                        <li>{{ b }}</li>
                       }
                     </ul>
                   </div>
@@ -209,9 +121,9 @@
           @if (t.checklist.length) {
             <section class="space-y-3">
               <div class="flex items-end justify-between gap-3 border-b border-slate-800 pb-2">
-                <h2 class="text-xl font-serif text-slate-100">Checklist</h2>
+                <h2 class="text-lg font-serif text-slate-100">Checklist</h2>
                 @if (checklistProgress(t.checklist); as prog) {
-                  <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  <p class="guide-no-print text-[10px] font-black uppercase tracking-widest text-slate-500">
                     {{ prog.done }} / {{ prog.total }}
                   </p>
                 }
@@ -221,13 +133,13 @@
                   <li>
                     <button
                       type="button"
-                      class="w-full flex items-start gap-3 text-left text-sm rounded-lg px-2 py-2 hover:bg-slate-800/50"
+                      class="guide-no-print w-full flex items-start gap-3 text-left text-sm rounded-lg px-1 py-1.5 hover:bg-slate-800/40"
                       role="checkbox"
                       [attr.aria-checked]="!!checklistDone()[item.id]"
                       (click)="toggleChecklist(item.id)"
                     >
                       <span
-                        class="mt-0.5 w-5 h-5 shrink-0 rounded border flex items-center justify-center text-[10px] font-black"
+                        class="mt-0.5 w-4 h-4 shrink-0 rounded border flex items-center justify-center text-[9px] font-black"
                         [class]="
                           checklistDone()[item.id]
                             ? 'bg-emerald-500 border-emerald-400 text-slate-950'
@@ -240,6 +152,7 @@
                         {{ item.label }}
                       </span>
                     </button>
+                    <p class="guide-print-only hidden text-sm text-slate-300">☐ {{ item.label }}</p>
                   </li>
                 }
               </ul>
@@ -247,26 +160,27 @@
           }
 
           @if (related().length) {
-            <section class="space-y-3 pt-4 border-t border-slate-800">
-              <h2 class="text-sm font-black uppercase tracking-widest text-slate-500">Voir aussi</h2>
-              <div class="flex flex-wrap gap-2">
+            <section class="guide-no-print space-y-2 pt-2 border-t border-slate-800">
+              <h2 class="text-xs font-black uppercase tracking-widest text-slate-500">Voir aussi</h2>
+              <ul class="space-y-1">
                 @for (r of related(); track r.id) {
-                  <a
-                    [routerLink]="['/guide', r.id]"
-                    class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-800 text-sm text-slate-300 hover:border-amber-700/40 hover:text-amber-100"
-                  >
-                    <iconify-icon [icon]="r.icon"></iconify-icon> {{ r.title }}
-                  </a>
+                  <li>
+                    <a
+                      [routerLink]="['/guide', r.id]"
+                      class="text-sm text-slate-400 hover:text-amber-200"
+                    >
+                      {{ r.title }}
+                    </a>
+                  </li>
                 }
-              </div>
+              </ul>
             </section>
           }
 
-          <!-- Classic comments -->
-          <section class="space-y-5 pt-8 border-t border-slate-800">
+          <section class="guide-no-print space-y-5 pt-6 border-t border-slate-800">
             <div>
-              <h2 class="text-xl font-serif text-slate-100">Commentaires</h2>
-              <p class="text-xs text-slate-600 mt-1">Discussion de la communauté — triés par utilité</p>
+              <h2 class="text-lg font-serif text-slate-100">Commentaires</h2>
+              <p class="text-xs text-slate-600 mt-1">Discussion de la communauté</p>
             </div>
 
             <div class="rounded-xl border border-slate-800 bg-[#161b24]/70 p-4 space-y-3">
@@ -294,7 +208,10 @@
                 </button>
               } @else {
                 <p class="text-sm text-slate-400">
-                  <a routerLink="/login" [queryParams]="{ returnUrl: '/guide/' + topicId() }" class="text-amber-400 underline"
+                  <a
+                    routerLink="/login"
+                    [queryParams]="{ returnUrl: '/guide/' + topicId() }"
+                    class="text-amber-400 underline"
                     >Connectez-vous</a
                   >
                   pour commenter.
@@ -309,7 +226,7 @@
             @if (loading()) {
               <p class="text-sm text-slate-500 animate-pulse">Chargement…</p>
             } @else if (roots().length === 0) {
-              <p class="text-sm text-slate-500 italic text-center py-8">Aucun commentaire pour l’instant.</p>
+              <p class="text-sm text-slate-500 italic text-center py-6">Aucun commentaire pour l’instant.</p>
             } @else {
               <ul class="space-y-4">
                 @for (c of roots(); track c.id) {
@@ -376,7 +293,7 @@
           </section>
         </article>
       } @else {
-        <div class="max-w-lg mx-auto px-4 py-24 text-center space-y-4">
+        <div class="max-w-lg mx-auto px-4 py-16 text-center space-y-4">
           <p class="text-slate-400">Fiche introuvable.</p>
           <a routerLink="/guide" class="text-amber-400 text-sm font-bold uppercase tracking-widest"
             >Retour au hub</a

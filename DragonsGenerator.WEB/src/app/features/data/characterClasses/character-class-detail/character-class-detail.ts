@@ -20,6 +20,10 @@ import {
   GameIdLabelsPipe,
   GameItemLabelPipe,
 } from '@shared/pipes/game-id-label.pipe';
+import {
+  classPlaybookPath,
+  getGuideClassPlaybook,
+} from '../../../guide/guide-class-playbooks';
 
 @Component({
   selector: 'app-character-class-detail',
@@ -46,6 +50,10 @@ export class CharacterClassDetail {
 
   protected iconFor(classId: string): string {
     return getClassIcon(classId);
+  }
+
+  protected playGuidePath(classId: string): string | null {
+    return getGuideClassPlaybook(classId) ? classPlaybookPath(classId) : null;
   }
 
   protected resourceLines(resources: Record<string, unknown> | null | undefined) {

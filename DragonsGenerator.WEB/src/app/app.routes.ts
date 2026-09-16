@@ -45,6 +45,39 @@ export const routes: Routes = [
         path: '',
         loadComponent: () => import('./features/guide/guide-index').then((m) => m.GuideIndexPage),
       },
+      { path: 'mj-debut', redirectTo: 'mj-table', pathMatch: 'full' },
+      { path: 'joueur-debut', redirectTo: 'joueur-table', pathMatch: 'full' },
+      { path: 'mj', redirectTo: 'mj-table', pathMatch: 'full' },
+      { path: 'joueur', redirectTo: 'joueur-table', pathMatch: 'full' },
+      {
+        path: 'mj-table',
+        loadComponent: () =>
+          import('./features/guide/guide-rulebook').then((m) => m.GuideRulebookPage),
+        data: { rulebookId: 'mj-table' },
+      },
+      {
+        path: 'mj-en-ligne',
+        loadComponent: () =>
+          import('./features/guide/guide-rulebook').then((m) => m.GuideRulebookPage),
+        data: { rulebookId: 'mj-en-ligne' },
+      },
+      {
+        path: 'joueur-table',
+        loadComponent: () =>
+          import('./features/guide/guide-rulebook').then((m) => m.GuideRulebookPage),
+        data: { rulebookId: 'joueur-table' },
+      },
+      {
+        path: 'joueur-en-ligne',
+        loadComponent: () =>
+          import('./features/guide/guide-rulebook').then((m) => m.GuideRulebookPage),
+        data: { rulebookId: 'joueur-en-ligne' },
+      },
+      {
+        path: 'classe/:classId',
+        loadComponent: () =>
+          import('./features/guide/guide-rulebook').then((m) => m.GuideRulebookPage),
+      },
       {
         path: ':topicId',
         loadComponent: () => import('./features/guide/guide-topic').then((m) => m.GuideTopicPage),

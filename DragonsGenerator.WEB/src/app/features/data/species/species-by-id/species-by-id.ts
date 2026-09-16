@@ -11,6 +11,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DataService } from '@core/services/data.service';
 import { Species } from '@core/models/Species/species';
 import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
+import { formatApiAsiDisplay } from '@core/utils/ability-mapping';
 import { SpeciesMechanicsPanel } from '../species-mechanics-panel/species-mechanics-panel';
 
 @Component({
@@ -56,12 +57,9 @@ export class SpeciesById implements OnInit {
     });
   }
 
-  /** Formate les bonus de caractéristiques : { str:2, cha:1 } -> "FOR +2, CHA +1" */
+  /** Formate les bonus de caractéristiques : { str:2, cha:1 } -> "Force +2, Charisme +1" */
   formatAsi(asi: Record<string, number> | undefined | null): string {
-    if (!asi) return '—';
-    const entries = Object.entries(asi);
-    if (entries.length === 0) return '—';
-    return entries.map(([key, value]) => `${key.toUpperCase()} +${value}`).join(', ');
+    return formatApiAsiDisplay(asi);
   }
 
   hasMeasurements(sp: Species): boolean {

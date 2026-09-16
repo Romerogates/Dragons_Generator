@@ -15,10 +15,18 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
-_(File vide — vague audit P0–P2 livrée.)_
+### Guide (2026-09-16) — détail dans `GUIDE-REPRISE.md`
+1. ~~Relire contenu IRL + page « fiche annotée »~~ **fait** (+ glossaire, DD Eana, init≠toucher)
+2. ~~Étoffer guides classe (pièges, lien Codex, pack débutant)~~ **fait**
+3. Calibrer PDF parchemin après vrai print ; typo A4 ; sommaire / page de garde
+4. Découvrabilité (empty campagne, post-validation perso, home)
+5. ~~E2E hub → livret / classe Pack+Codex~~ **fait** (spec PDF mock optionnel)
+6. Commit vague Guide quand Anthony le demande
 
 ## Déjà livré (ne pas refaire)
 
+- **Guide contenu IRL + classe** (2026-09-16) — fiche annotée, glossaire, DD Eana, pièges classe, Pack débutant PDF, liens Codex. Voir `GUIDE-REPRISE.md`.
+- **Guide livrets PDF** (2026-09-16) — 4 livrets MJ/Joueur × table/en ligne ; stats + maîtrise ; guides par classe ; PDF parchemin lavé ; liens hub / forge / Codex. Voir `GUIDE-REPRISE.md`.
 - **Audit P2 excellence** (2026-09-15) — sticky CSS vars (`--dg-sticky-top`…) + hub tabs sticky ; forge scénario étapes cliquables ; grimoire Mode Livre ; tour MJ post-checklist → Prépa ; `FONCTIONNALITES` 5 onglets.
 - **Audit P1 Mode Livre** (2026-09-15) — bestiaire Codex + campagne (parchemin / TOC) ; pré-tirés déjà Illustrée.
 - **Audit P0 découvrabilité** (2026-09-15) — Guide public ; nav Forger/Scénario ; checklist 1ère session + Inviter ; empty Codex.

@@ -40,7 +40,7 @@ export const GUIDE_VERSION = '1.5';
 export const GUIDE_NAV_GROUPS: GuideNavGroup[] = [
   {
     id: 'discover',
-    label: 'Découverte',
+    label: 'Aide du site',
     sectionIds: ['parcours', 'oneshot', 'actions', 'journal', 'demarrage'],
   },
   {
@@ -50,7 +50,7 @@ export const GUIDE_NAV_GROUPS: GuideNavGroup[] = [
   },
   {
     id: 'table',
-    label: 'À la table',
+    label: 'Fonctions',
     sectionIds: ['compte', 'personnage', 'scenario', 'table', 'donjons', 'initiative', 'documents'],
   },
   {

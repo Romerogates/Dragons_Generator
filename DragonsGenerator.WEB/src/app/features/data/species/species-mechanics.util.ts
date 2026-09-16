@@ -30,6 +30,18 @@ const SHAPE_LABELS: Record<string, string> = {
   sphere: 'Sphère',
 };
 
+/** Types de choix / clés techniques → libellé FR Codex. */
+const CHOICE_TYPE_LABELS: Record<string, string> = {
+  dragon_lineage: 'Lignée draconique',
+  ability_score_increase: 'Amélioration de caractéristiques',
+  language: 'Langue',
+  skill: 'Compétence',
+  tool: 'Outil',
+  cantrip: 'Tour de magie',
+  spell: 'Sort',
+  feat: 'Don',
+};
+
 export function buildMechanicsBlocks(value: unknown): MechanicsBlock[] {
   if (value === null || value === undefined) return [];
   if (typeof value !== 'object') {
@@ -392,6 +404,8 @@ function abilityLabel(code: string): string {
 
 function refLabel(id: string): string {
   if (!id) return '—';
+  const choiceType = CHOICE_TYPE_LABELS[id] ?? CHOICE_TYPE_LABELS[id.toLowerCase()];
+  if (choiceType) return choiceType;
   if (id.startsWith('choice-')) return humanizeText(id.replace(/^choice-/, ''));
   if (id.startsWith('spl-')) return humanizeText(id.replace(/^spl-/, ''));
   if (id.startsWith('skill-') || id.startsWith('ski-')) return humanizeText(id.replace(/^(skill|ski)-/, ''));
@@ -401,6 +415,8 @@ function refLabel(id: string): string {
 }
 
 export function prettyOptionId(id: string, choiceType?: string): string {
+  const knownType = CHOICE_TYPE_LABELS[id] ?? CHOICE_TYPE_LABELS[id.toLowerCase()];
+  if (knownType) return knownType;
   const ability = apiCodeToAbilityKey(id);
   if (ability) return ABILITY_KEY_TO_LABEL[ability as AbilityKey];
   if (choiceType === 'dragon_lineage' && id.startsWith('drag-')) {
@@ -408,8 +424,9 @@ export function prettyOptionId(id: string, choiceType?: string): string {
   }
   return id
     .replace(/^(tl|lg|drag|gen|wp|ski|skill)-/, '')
-    .replace(/-/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+    .replace(/[_-]+/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+    .trim();
 }
 
 function humanizeDamage(id: string): string {

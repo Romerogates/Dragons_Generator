@@ -6,7 +6,9 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map, startWith } from 'rxjs';
 import { Navbar } from './shared/components/navbar/navbar';
 import { AppContextMenu } from './shared/components/app-context-menu/app-context-menu';
 import { AiRateLimitDialogComponent } from './shared/components/ai-rate-limit-dialog/ai-rate-limit-dialog';
@@ -53,6 +55,7 @@ export class App implements OnInit {
   private readonly connectivity = inject(ConnectivityService);
   private readonly pwa = inject(PwaLifecycleService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
 
   protected readonly title = signal('DragonsGenerator.WEB');
 
@@ -60,6 +63,16 @@ export class App implements OnInit {
   readonly pendingSyncCount = this.offlineSync.pendingCount;
   readonly updateReady = this.pwa.updateReady;
   readonly showReconnectBanner = signal(shouldShowReconnectBanner());
+
+  /** Guide : viewport verrouillé — pas de footer sous la page. */
+  readonly hideSiteChrome = toSignal(
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      map(() => this.router.url.startsWith('/guide')),
+      startWith(this.router.url.startsWith('/guide')),
+    ),
+    { initialValue: false },
+  );
 
   constructor() {
     effect(() => {

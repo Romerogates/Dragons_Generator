@@ -42,7 +42,7 @@ import { Router, RouterLink } from '@angular/router';
         <span class="min-w-11 w-11" aria-hidden="true"></span>
       </header>
 
-      <div class="flex-1 overflow-y-auto overscroll-contain">
+      <div class="flex-1 overflow-y-auto overscroll-contain custom-scrollbar">
         <div class="max-w-5xl mx-auto px-4 py-8 pb-24">
           <ng-content />
         </div>

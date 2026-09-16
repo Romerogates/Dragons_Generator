@@ -75,6 +75,7 @@ test.describe('Amis & invitations campagne (UI)', () => {
     await applyAuthSession(bPage, b, '/friends');
     await bPage.getByRole('button', { name: 'Demandes' }).click();
     await expect(bPage.getByText(a.user.displayName)).toBeVisible({ timeout: 20_000 });
+    bPage.once('dialog', (dialog) => dialog.accept());
     await bPage.getByRole('button', { name: 'Refuser' }).first().click();
     await expect(bPage.getByText(/Demande refusée/i)).toBeVisible({ timeout: 15_000 });
 

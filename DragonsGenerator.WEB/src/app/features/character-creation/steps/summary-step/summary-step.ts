@@ -38,11 +38,17 @@ import {
 } from '@core/utils/character-export-validation.util';
 import { MAX_CHARACTERS_PER_USER } from '@core/constants/character-limits';
 import { switchMap, of } from 'rxjs';
+import { RouterLink } from '@angular/router';
+import {
+  classPlaybookPath,
+  getGuideClassPlaybook,
+} from '../../../guide/guide-class-playbooks';
+import { GuideRulebookPdfService } from '@core/services/guide-rulebook-pdf.service';
 
 @Component({
   selector: 'app-summary-step',
   standalone: true,
-  imports: [CommonModule, ConfirmDialog, CharacterPlayView, PdfPagePreview],
+  imports: [CommonModule, ConfirmDialog, CharacterPlayView, PdfPagePreview, RouterLink],
   templateUrl: './summary-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -52,6 +58,7 @@ export class SummaryStep implements OnInit, OnDestroy {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private pdfService = inject(PdfGeneratorService);
+  private guidePdf = inject(GuideRulebookPdfService);
   private sanitizer = inject(DomSanitizer);
   private cloud = inject(CharacterCloudService);
   private campaigns = inject(CampaignCloudService);
@@ -71,6 +78,15 @@ export class SummaryStep implements OnInit, OnDestroy {
   readonly character = computed<Character>(() => this.builder.build());
   readonly isEditMode = computed(() => this.builder.isEditMode);
   readonly isLoggedIn = this.auth.isLoggedIn;
+
+  readonly classPlaybook = computed(() =>
+    getGuideClassPlaybook(this.builder.creation().classId),
+  );
+  readonly classPlaybookLink = computed(() => {
+    const id = this.builder.creation().classId;
+    return id ? classPlaybookPath(id) : null;
+  });
+  readonly exportingClassGuide = signal(false);
 
   /** Toutes les étapes sauf le récap — pour corriger sans remonter une à une. */
   readonly editableSteps = computed(() => {
@@ -242,6 +258,22 @@ export class SummaryStep implements OnInit, OnDestroy {
 
   async downloadPdf(): Promise<void> {
     this.pdfService.generatePdf(this.character());
+  }
+
+  async downloadClassGuidePdf(): Promise<void> {
+    const book = this.classPlaybook();
+    if (!book || this.exportingClassGuide()) return;
+    this.exportingClassGuide.set(true);
+    try {
+      await this.guidePdf.download({
+        title: book.title,
+        subtitle: book.subtitle,
+        pdfFilename: book.pdfFilename,
+        chapters: book.chapters,
+      });
+    } finally {
+      this.exportingClassGuide.set(false);
+    }
   }
 
   /** Demande confirmation : cette action efface la création en cours sans sauvegarder. */

@@ -52,6 +52,16 @@
             </div>
           </div>
         </div>
+        @if (playGuidePath(c.id); as guidePath) {
+          <p class="mt-6">
+            <a
+              [routerLink]="guidePath"
+              class="inline-flex items-center min-h-10 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest border border-amber-700/50 text-amber-200 hover:border-amber-500/70 hover:bg-amber-950/30 transition-colors"
+            >
+              Comment jouer cette classe →
+            </a>
+          </p>
+        }
       </header>
 
       <section

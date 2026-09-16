@@ -1,9 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  CUSTOM_ELEMENTS_SCHEMA,
   OnInit,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -14,24 +14,26 @@ import { GuideCommentsService, type GuideComment } from '@core/services/guide-co
 import { GuidePreferencesService } from '@core/services/guide-preferences.service';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import { GUIDE_TOPICS, getGuideTopic, guideTopicsByGroup, type GuideTopic } from './guide-topics';
-import { GUIDE_QUICK_CARDS } from './guide-content';
 import type { GuideAudience } from './guide.types';
+import { GuideSidebar } from './guide-sidebar/guide-sidebar';
+import { GuideRulebookPdfService } from '@core/services/guide-rulebook-pdf.service';
+import type { GuidePdfChapter } from '@core/services/guide-rulebook-pdf.service';
 
 const CHECKLIST_STORAGE_KEY = 'dg-guide-checklist';
 
 @Component({
   selector: 'app-guide-topic',
   standalone: true,
-  imports: [RouterLink, FormsModule, ConfirmDialog],
+  imports: [RouterLink, FormsModule, ConfirmDialog, GuideSidebar],
   templateUrl: './guide-topic.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class GuideTopicPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly commentsApi = inject(GuideCommentsService);
   private readonly prefs = inject(GuidePreferencesService);
   private readonly auth = inject(AuthService);
+  private readonly guidePdf = inject(GuideRulebookPdfService);
 
   readonly topicId = signal('');
   readonly topic = computed(() => getGuideTopic(this.topicId()));
@@ -44,6 +46,7 @@ export class GuideTopicPage implements OnInit {
   readonly navQuery = signal('');
   readonly audience = signal<GuideAudience | 'all'>('all');
   readonly checklistDone = signal<Record<string, boolean>>(loadChecklistDone());
+  readonly exportingPdf = signal(false);
   readonly confirmDialog = signal<{
     title: string;
     body: string;
@@ -51,7 +54,6 @@ export class GuideTopicPage implements OnInit {
     onConfirm: () => void;
   } | null>(null);
 
-  readonly quickCards = GUIDE_QUICK_CARDS;
   readonly allTopics = GUIDE_TOPICS;
 
   readonly sidebarSections = computed(() =>
@@ -91,6 +93,13 @@ export class GuideTopicPage implements OnInit {
   readonly meId = computed(() => this.auth.user()?.id ?? null);
   readonly isLoggedIn = computed(() => this.auth.isLoggedIn());
 
+  constructor() {
+    effect(() => {
+      const a = this.audience();
+      if (a === 'dm' || a === 'player') this.prefs.setAudience(a);
+    });
+  }
+
   ngOnInit(): void {
     const aud = this.prefs.audience();
     if (aud === 'dm' || aud === 'player') this.audience.set(aud);
@@ -102,8 +111,56 @@ export class GuideTopicPage implements OnInit {
     });
   }
 
-  isUnread(id: string): boolean {
-    return this.prefs.isSectionUnread(id);
+  async downloadTopicPdf(): Promise<void> {
+    const t = this.topic();
+    if (!t || this.exportingPdf()) return;
+    this.exportingPdf.set(true);
+    try {
+      const chapters: GuidePdfChapter[] = [];
+      if (t.paragraphs.length) {
+        chapters.push({
+          title: 'Présentation',
+          sections: [{ title: t.summary, paragraphs: t.paragraphs }],
+        });
+      }
+      if (t.flow.length) {
+        chapters.push({
+          title: 'Parcours',
+          sections: [{ title: 'Étapes', numbered: t.flow }],
+        });
+      }
+      if (t.steps.length) {
+        chapters.push({
+          title: 'Détail',
+          sections: t.steps.map((s) => ({
+            title: s.title,
+            paragraphs: [s.body],
+          })),
+        });
+      }
+      if (t.checklist.length) {
+        chapters.push({
+          title: 'Checklist',
+          sections: [
+            {
+              title: 'À cocher',
+              bullets: t.checklist.map((c) => c.label),
+            },
+          ],
+        });
+      }
+      await this.guidePdf.download({
+        title: t.title,
+        subtitle: t.summary,
+        pdfFilename: `dragons-guide-${t.id}.pdf`,
+        chapters:
+          chapters.length > 0
+            ? chapters
+            : [{ title: t.title, sections: [{ title: 'Contenu', paragraphs: [t.summary] }] }],
+      });
+    } finally {
+      this.exportingPdf.set(false);
+    }
   }
 
   setAudience(a: GuideAudience | 'all'): void {

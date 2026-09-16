@@ -123,6 +123,36 @@
     </button>
   </nav>
 
+  @if (classPlaybook(); as guide) {
+    <section
+      class="w-full max-w-4xl px-4 rounded-xl border border-slate-800 bg-[#0f1117] p-4 space-y-3"
+      aria-label="Guide de jeu de la classe"
+    >
+      <div>
+        <h3 class="text-sm font-serif text-slate-100">{{ guide.title }}</h3>
+        <p class="text-xs text-slate-500 mt-1 leading-relaxed">{{ guide.subtitle }}</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button
+          type="button"
+          class="min-h-10 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest bg-amber-600 text-slate-950 hover:bg-amber-500 disabled:opacity-40"
+          [disabled]="exportingClassGuide()"
+          (click)="downloadClassGuidePdf()"
+        >
+          {{ exportingClassGuide() ? 'PDF…' : 'PDF — comment jouer' }}
+        </button>
+        @if (classPlaybookLink(); as link) {
+          <a
+            [routerLink]="link"
+            class="inline-flex items-center min-h-10 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-600/50 hover:text-amber-200"
+          >
+            Lire le guide
+          </a>
+        }
+      </div>
+    </section>
+  }
+
   <div class="w-full max-w-4xl px-4 flex flex-col items-center gap-2">
     <button
       type="button"

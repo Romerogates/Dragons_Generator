@@ -6,6 +6,7 @@
 // Ce fichier fait le pont.
 
 import type { AbilityKey, AbilityScores } from '../models/Character/character';
+import { ABILITY_KEY_TO_LABEL } from '../models/Character/character';
 
 const API_CODE_TO_KEY: Record<string, AbilityKey> = {
   str: 'force',
@@ -68,4 +69,26 @@ export function mergePartialScores(...parts: Partial<AbilityScores>[]): Partial<
     }
   }
   return result;
+}
+
+/**
+ * Affiche un ASI API `{ str: 2, cha: 1 }` ou clés FR `{ force: 2 }` :
+ * `"Force +2, Charisme +1"`.
+ */
+export function formatApiAsiDisplay(
+  asi: Record<string, number> | null | undefined,
+  empty = '—',
+): string {
+  if (!asi) return empty;
+  const parts: string[] = [];
+  for (const [code, value] of Object.entries(asi)) {
+    if (!value) continue;
+    const fromApi = apiCodeToAbilityKey(code);
+    const label =
+      (fromApi ? ABILITY_KEY_TO_LABEL[fromApi] : undefined) ??
+      ABILITY_KEY_TO_LABEL[code as AbilityKey] ??
+      code.toUpperCase();
+    parts.push(`${label} ${value > 0 ? '+' : ''}${value}`);
+  }
+  return parts.length ? parts.join(', ') : empty;
 }

@@ -47,10 +47,13 @@ test.describe('Campagne — combat XP & initiative joueur', () => {
     await expect(distribute).toBeVisible({ timeout: 15_000 });
     await distribute.click();
 
-    await expect(page.getByText(/\+\d+ XP/)).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByRole('button', { name: /Distribuer \d+ XP/ })).toHaveCount(0, {
-      timeout: 10_000,
-    });
+    await expect(page.getByText(/\+\d+ XP ×/)).toBeVisible({ timeout: 15_000 });
+    // Laisser la persistance xpAwarded aboutir, puis vérifier après reload.
+    await expect
+      .poll(async () => page.getByRole('button', { name: /Distribuer \d+ XP/ }).count(), {
+        timeout: 20_000,
+      })
+      .toBe(0);
 
     await page.reload();
     await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({

@@ -59,11 +59,18 @@
 
   <app-navbar />
 
-  <main class="flex-grow relative min-w-0 overflow-x-clip">
+  <main
+    class="relative min-w-0 overflow-x-clip"
+    [class.flex-grow]="!hideSiteChrome()"
+    [class.flex-1]="hideSiteChrome()"
+    [class.min-h-0]="hideSiteChrome()"
+  >
     <router-outlet />
   </main>
 
-  <app-site-footer />
+  @if (!hideSiteChrome()) {
+    <app-site-footer />
+  }
 
   <app-context-menu />
   <app-ai-rate-limit-dialog />

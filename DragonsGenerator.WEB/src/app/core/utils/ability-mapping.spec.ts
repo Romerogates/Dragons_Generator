@@ -3,6 +3,7 @@ import {
   apiAsiToPartialScores,
   apiCodeToAbilityKey,
   abilityKeyToApiCode,
+  formatApiAsiDisplay,
   mergePartialScores,
 } from './ability-mapping';
 
@@ -33,5 +34,17 @@ describe('ability-mapping', () => {
     const merged = mergePartialScores({ force: 2 }, { force: 1, charisme: 1 });
     expect(merged.force).toBe(3);
     expect(merged.charisme).toBe(1);
+  });
+
+  it('formats API ASI for display in French', () => {
+    expect(formatApiAsiDisplay({ str: 2, cha: 1 })).toBe('Force +2, Charisme +1');
+    expect(formatApiAsiDisplay(null)).toBe('—');
+    expect(formatApiAsiDisplay(undefined)).toBe('—');
+    expect(formatApiAsiDisplay({})).toBe('—');
+    expect(formatApiAsiDisplay({ str: 0, cha: 1 })).toBe('Charisme +1');
+    expect(formatApiAsiDisplay({ force: 2 })).toBe('Force +2');
+    expect(formatApiAsiDisplay({ xyz: 1 })).toBe('XYZ +1');
+    expect(formatApiAsiDisplay({ str: -1 })).toBe('Force -1');
+    expect(formatApiAsiDisplay(null, 'aucun')).toBe('aucun');
   });
 });

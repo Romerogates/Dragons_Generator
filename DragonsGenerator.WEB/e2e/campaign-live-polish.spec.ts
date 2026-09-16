@@ -39,6 +39,7 @@ test.describe('Campagne — initiative joueur (jet)', () => {
     await expect(page.getByText(/Le MJ attend votre initiative/i)).toBeVisible({
       timeout: 20_000,
     });
+    await page.getByRole('button', { name: 'Encoder' }).click();
     await page.locator('input[type="number"]').fill('17');
     await page.getByRole('button', { name: 'Envoyer' }).click();
     // Le bandeau se ferme dès que le jet est pris en compte (le toast disparaît avec).
@@ -199,6 +200,10 @@ test.describe('Campagne — roster live joueur', () => {
     await applyAuthSession(player, pj, `/campaigns/${campaignId}`);
     await player.getByRole('button', { name: 'Session en cours' }).click();
     await player.getByRole('button', { name: 'Table', exact: true }).click();
+    await player.getByRole('button', { name: /Table plein écran/i }).click();
+    await expect(player).toHaveURL(new RegExp(`/campaigns/${campaignId}/play`), {
+      timeout: 15_000,
+    });
     const roster = player.locator('[aria-label="Ordre de combat en direct"]');
     await expect(roster.getByText(/Roster live/i)).toBeVisible({ timeout: 20_000 });
     await expect(roster.getByText('PV 20/20')).toBeVisible();
@@ -215,6 +220,7 @@ test.describe('Campagne — roster live joueur', () => {
     await lyraCard.getByRole('button', { name: '−5' }).click();
     await expect(lyraCard.getByText('PV 15/20')).toBeVisible({ timeout: 15_000 });
 
+    await player.bringToFront();
     await player.evaluate(() => window.dispatchEvent(new Event('focus')));
     await expect
       .poll(async () => roster.textContent(), { timeout: 30_000 })

@@ -43,11 +43,11 @@ import {
               </div>
             }
             @if (block.rows.length > 0) {
-              <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+              <dl class="space-y-2">
                 @for (r of block.rows; track r.label + r.value) {
                   <div class="min-w-0">
                     <dt class="text-[9px] font-black uppercase tracking-widest text-slate-500">{{ r.label }}</dt>
-                    <dd class="text-xs text-slate-300 mt-0.5 leading-snug">{{ r.value }}</dd>
+                    <dd class="text-xs text-slate-300 mt-0.5 leading-snug break-words">{{ r.value }}</dd>
                   </div>
                 }
               </dl>

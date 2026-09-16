@@ -35,12 +35,14 @@ test.describe('Campagne — table joueur', () => {
 
     await expect(page.getByText('Session live E2E').first()).toBeVisible({ timeout: 15_000 });
     await page.getByRole('button', { name: 'Table', exact: true }).click();
+    await page.getByRole('button', { name: /Table plein écran/i }).click();
 
+    await expect(page).toHaveURL(new RegExp(`/campaigns/${campaignId}/play`), { timeout: 15_000 });
     await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({
       timeout: 15_000,
     });
     await expect(page.getByRole('link', { name: 'Documents', exact: true })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Ma fiche', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Ma fiche', exact: true })).toBeVisible();
     await expect(page.getByText(/En attente que le MJ lance un combat/i)).toBeVisible();
   });
 });

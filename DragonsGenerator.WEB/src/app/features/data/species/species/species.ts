@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common'; // Ajout par sécurité
 import { RouterLink } from '@angular/router';
 import { DataService } from '@core/services/data.service';
 import { Species } from '@core/models/Species/species';
+import { formatApiAsiDisplay } from '@core/utils/ability-mapping';
 import { CodexEmptyState } from '@shared/components/codex-empty-state/codex-empty-state';
 
 @Component({
@@ -48,10 +49,8 @@ export class SpeciesList implements OnInit {
     });
   }
 
-  /** Formate les bonus de caractéristiques en chaîne lisible : "FOR +2, CHA +1" */
+  /** Formate les bonus de caractéristiques en chaîne lisible : "Force +2, Charisme +1" */
   formatAsi(asi: Record<string, number>): string {
-    return Object.entries(asi)
-      .map(([key, value]) => `${key.toUpperCase()} +${value}`)
-      .join(', ');
+    return formatApiAsiDisplay(asi, 'Aucun');
   }
 }

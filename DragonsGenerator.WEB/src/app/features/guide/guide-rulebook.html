@@ -1,0 +1,140 @@
+<div
+  class="guide-shell bg-[#0e1117] text-slate-300 overflow-hidden flex flex-col
+         h-[calc(100dvh-var(--dg-sticky-top))] max-h-[calc(100dvh-var(--dg-sticky-top))]"
+>
+  <div class="flex flex-col lg:flex-row flex-1 min-h-0">
+    <app-guide-sidebar
+      [(query)]="navQuery"
+      [(audience)]="audience"
+      [sections]="sidebarSections()"
+      [searchEmpty]="searchEmpty()"
+      [activeRulebookId]="activeRulebookId()"
+      [activeClassId]="classBook()?.classId ?? null"
+    />
+
+    <div class="flex-1 min-w-0 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar">
+      @if (displayTitle()) {
+        <header class="border-b border-slate-800 bg-[#141820]">
+          <div class="max-w-2xl mx-auto px-4 md:px-8 py-4 md:py-6 space-y-3 md:space-y-4">
+            <nav
+              class="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500"
+            >
+              <a routerLink="/guide" class="hover:text-amber-400 shrink-0">Guide</a>
+              <span aria-hidden="true">/</span>
+              <span class="text-amber-400/90 line-clamp-1 min-w-0">{{ displayTitle() }}</span>
+            </nav>
+
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div class="min-w-0">
+                <h1
+                  class="text-2xl sm:text-3xl md:text-4xl font-serif text-slate-50 tracking-tight leading-tight"
+                >
+                  {{ displayTitle() }}
+                </h1>
+                <p class="mt-2 text-sm md:text-base text-slate-400 leading-relaxed max-w-xl">
+                  {{ displaySubtitle() }}
+                </p>
+              </div>
+
+              <div class="flex flex-col gap-2 w-full lg:w-auto lg:shrink-0 lg:min-w-[11rem]">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
+                  <button
+                    type="button"
+                    class="min-h-11 lg:min-h-10 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest bg-amber-600 text-slate-950 hover:bg-amber-500 disabled:opacity-40"
+                    [disabled]="exporting()"
+                    (click)="downloadPdf()"
+                  >
+                    {{ exporting() ? 'PDF…' : 'Télécharger le PDF' }}
+                  </button>
+                  @if (showBeginnerPack()) {
+                    <button
+                      type="button"
+                      class="min-h-11 lg:min-h-10 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest border border-amber-700/60 text-amber-200/90 hover:bg-amber-950/40 disabled:opacity-40"
+                      [disabled]="exporting()"
+                      (click)="downloadBeginnerPack()"
+                    >
+                      Pack débutant (PDF)
+                    </button>
+                  }
+                </div>
+                @if (related().length) {
+                  <div class="flex flex-wrap gap-2">
+                    @for (r of related(); track r.path) {
+                      <a
+                        [routerLink]="r.path"
+                        class="inline-flex items-center min-h-9 px-3 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-600/50 hover:text-amber-200"
+                      >
+                        {{ r.label }} →
+                      </a>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+
+            @if (exportError(); as err) {
+              <p class="text-sm text-red-300">{{ err }}</p>
+            }
+
+            <nav
+              class="guide-sommaire -mx-4 px-4 md:mx-0 md:px-0 flex gap-2 overflow-x-auto overscroll-x-contain
+                     snap-x snap-mandatory md:flex-wrap md:overflow-visible
+                     text-xs text-slate-500 pt-0.5"
+              aria-label="Sommaire du livret"
+            >
+              @for (ch of displayChapters(); track ch.id) {
+                <a
+                  [href]="'#' + ch.id"
+                  class="snap-start shrink-0 inline-flex items-center min-h-9 px-3 rounded-lg
+                         border border-slate-800 bg-slate-900/40 text-slate-300
+                         hover:border-amber-700/50 hover:text-amber-200 whitespace-nowrap"
+                >
+                  {{ ch.title }}
+                </a>
+              }
+            </nav>
+          </div>
+        </header>
+
+        <article class="max-w-2xl mx-auto px-4 md:px-8 py-6 md:py-8 space-y-8 md:space-y-10 pb-20 safe-area-pb">
+          @for (ch of displayChapters(); track ch.id) {
+            <section [id]="ch.id" class="space-y-4 md:space-y-5 scroll-mt-20 md:scroll-mt-8">
+              <h2 class="text-lg md:text-xl font-serif text-slate-100 border-b border-slate-800 pb-2">
+                {{ ch.title }}
+              </h2>
+              @for (sec of ch.sections; track sec.id) {
+                <div class="space-y-2">
+                  <h3 class="text-base font-serif text-slate-50">{{ sec.title }}</h3>
+                  @for (p of sec.paragraphs ?? []; track $index) {
+                    <p class="text-sm md:text-base text-slate-300 leading-relaxed">{{ p }}</p>
+                  }
+                  @if (sec.bullets?.length) {
+                    <ul class="space-y-2 text-sm text-slate-400 list-disc list-outside pl-5">
+                      @for (item of sec.bullets; track item) {
+                        <li class="leading-relaxed pl-1">{{ item }}</li>
+                      }
+                    </ul>
+                  }
+                  @if (sec.numbered?.length) {
+                    <ol class="space-y-2 text-sm text-slate-400 list-decimal list-outside pl-5">
+                      @for (item of sec.numbered; track item) {
+                        <li class="leading-relaxed pl-1">{{ item }}</li>
+                      }
+                    </ol>
+                  }
+                </div>
+              }
+            </section>
+          }
+        </article>
+      } @else {
+        <div class="max-w-lg mx-auto px-4 py-16 text-center space-y-4">
+          <p class="text-slate-400">Livret introuvable.</p>
+          <a routerLink="/guide" class="text-amber-400 text-sm font-bold uppercase tracking-widest"
+            >Retour au guide</a
+          >
+        </div>
+      }
+    </div>
+  </div>
+</div>

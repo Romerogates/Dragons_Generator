@@ -2031,7 +2031,8 @@ export class CampaignPlayPanel implements OnDestroy {
           if (completed + failed === approved.length) {
             this.awardingXpId.set(null);
             if (failed === 0) {
-              const encounters = c.data.encounters.map((e) =>
+              const latest = this.campaign();
+              const encounters = (latest.data.encounters ?? []).map((e) =>
                 e.id === encounter.id ? { ...e, xpAwarded: true } : e,
               );
               this.saveData({ encounters });
@@ -2185,12 +2186,15 @@ export class CampaignPlayPanel implements OnDestroy {
       .then(async () => {
         try {
           const summary = await firstValueFrom(this.campaigns.update(campaignId, title, data));
+          // Ne pas réappliquer un persist périmé (une sauvegarde plus récente est déjà en cours / faite).
+          if (seq !== this.persistSeq) return;
           const current = this.campaign();
           this.campaignChange.emit({
             ...current,
+            data,
             updatedAt: summary.updatedAt,
           });
-          if (seq === this.persistSeq) this.saving.set(false);
+          this.saving.set(false);
           onSuccess?.();
         } catch {
           if (seq === this.persistSeq) {
