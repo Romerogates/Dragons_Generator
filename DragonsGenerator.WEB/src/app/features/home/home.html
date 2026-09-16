@@ -25,7 +25,7 @@
               <div
                 class="shrink-0 w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-2xl"
               >
-                <iconify-icon icon="fluent-emoji:compass"></iconify-icon>
+                <iconify-icon noobserver icon="fluent-emoji:compass"></iconify-icon>
               </div>
               <div class="min-w-0 pt-0.5">
                 <h2
@@ -47,7 +47,7 @@
                 (click)="chooseRole('dm')"
               >
                 <span class="text-2xl block mb-2"
-                  ><iconify-icon icon="fluent-emoji:performing-arts"></iconify-icon
+                  ><iconify-icon noobserver icon="fluent-emoji:performing-arts"></iconify-icon
                 ></span>
                 <span class="block text-sm font-bold text-violet-200">Je suis MJ</span>
                 <span class="block text-xs text-slate-500 mt-1 leading-relaxed"
@@ -60,7 +60,7 @@
                 (click)="chooseRole('player')"
               >
                 <span class="text-2xl block mb-2"
-                  ><iconify-icon icon="fluent-emoji:shield"></iconify-icon
+                  ><iconify-icon noobserver icon="fluent-emoji:shield"></iconify-icon
                 ></span>
                 <span class="block text-sm font-bold text-sky-200">Je suis joueur</span>
                 <span class="block text-xs text-slate-500 mt-1 leading-relaxed"
@@ -257,7 +257,7 @@
           >
             <div class="absolute inset-0 flex items-center justify-center">
               <span class="text-7xl md:text-8xl opacity-90 drop-shadow-lg"
-                ><iconify-icon [icon]="step.icon"></iconify-icon
+                ><iconify-icon noobserver [icon]="step.icon"></iconify-icon
               ></span>
             </div>
             <p
@@ -327,7 +327,7 @@
             class="group inline-flex items-center gap-2 px-3 py-2 text-slate-400 hover:text-amber-300 transition-colors"
           >
             <span class="text-lg opacity-80 group-hover:scale-110 transition-transform"
-              ><iconify-icon [icon]="link.icon"></iconify-icon
+              ><iconify-icon noobserver [icon]="link.icon"></iconify-icon
             ></span>
             <span class="text-sm font-serif tracking-wide">{{ link.label }}</span>
           </a>
