@@ -7,11 +7,13 @@
     --dg-nav-height: 4rem;
     --dg-banner-height: 0px;
     --dg-play-header-height: 3.25rem;
+    --dg-play-tabs-height: 2.75rem;
     --dg-wizard-chrome-height: 3.5rem;
     --dg-sticky-top: calc(
       var(--dg-nav-height) + var(--dg-banner-height) + env(safe-area-inset-top, 0px)
     );
     --dg-sticky-below-play: calc(var(--dg-sticky-top) + var(--dg-play-header-height));
+    --dg-sticky-below-play-tabs: calc(var(--dg-sticky-below-play) + var(--dg-play-tabs-height));
     --dg-sticky-below-wizard: calc(var(--dg-sticky-top) + var(--dg-wizard-chrome-height));
   }
 

@@ -156,13 +156,13 @@ export class CampaignPlayPanel implements OnDestroy {
 
   /** Vues exclusives de la table (plein écran = onglets ; dock = résumé compact). */
   readonly sessionView = signal<PlaySessionView>('resume');
-  readonly sessionTabs: { id: PlaySessionView; label: string }[] = [
-    { id: 'resume', label: 'Résumé' },
-    { id: 'notes', label: 'Notes' },
-    { id: 'combat', label: 'Combat' },
-    { id: 'encounters', label: 'Rencontres' },
-    { id: 'dungeon', label: 'Donjon' },
-    { id: 'history', label: 'Historique' },
+  readonly sessionTabs: { id: PlaySessionView; label: string; shortLabel: string }[] = [
+    { id: 'resume', label: 'Résumé', shortLabel: 'Résumé' },
+    { id: 'notes', label: 'Notes', shortLabel: 'Notes' },
+    { id: 'combat', label: 'Combat', shortLabel: 'Combat' },
+    { id: 'encounters', label: 'Rencontres', shortLabel: 'Renc.' },
+    { id: 'dungeon', label: 'Donjon', shortLabel: 'Donjon' },
+    { id: 'history', label: 'Historique', shortLabel: 'Hist.' },
   ];
   /** Sous-étapes du tour Pokémon. */
   readonly fightStep = signal<'menu' | 'pickAttack' | 'pickTarget' | 'toHit' | 'damage'>('menu');

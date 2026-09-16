@@ -1,39 +1,37 @@
 {
-    "schema_version":  "2.0",
-    "guid":  null,
-    "id":  "spl-tempete-en-marche",
-    "name":  "Tempete en marche",
-    "level":  6,
-    "school":  "evocation",
-    "casting_time":  {
-                         "value":  1,
-                         "unit":  "action"
-                     },
-    "range":  {
-                  "type":  "personnelle",
-                  "distance_m":  null,
-                  "area":  null
-              },
-    "duration":  {
-                     "type":  "instantane",
-                     "value":  null,
-                     "unit":  null
-                 },
-    "components":  {
-                       "v":  false,
-                       "s":  false,
-                       "m":  null
-                   },
-    "is_ritual":  false,
-    "is_concentration":  false,
-    "is_corrupted":  false,
-    "classes":  [
-                    "cls-druide",
-                    "cls-pretre"
-                ],
-    "description":  "",
-    "higher_levels":  null,
-    "modular_options":  [
-
-                        ]
+  "schema_version": "2.0",
+  "guid": null,
+  "id": "spl-tempete-en-marche",
+  "name": "Tempête en marche",
+  "level": 6,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "action"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 9,
+    "area": null
+  },
+  "duration": {
+    "type": "concentration",
+    "value": 1,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": true,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-pretre"
+  ],
+  "description": "Option modulaire du sort vent divin. Un groupe voyageant sous forme de nuée relativement compacte a l’aspect d’un souffle brumeux et tempétueux.\n\nFatigue — transformées en nuages, les cibles ne fournissent aucun effort pour se déplacer et peuvent voyager sous cette forme sans risque de fatigue.\n\nMutisme — en tant que nuages, les cibles ne peuvent pas communiquer verbalement. Elles peuvent tout au plus donner une forme approximative à leur nuée, de manière à s’exprimer par mime ou par rébus.",
+  "higher_levels": null,
+  "modular_options": []
 }

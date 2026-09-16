@@ -39,6 +39,7 @@
             [routerLink]="['/campaigns', c.id]"
             [queryParams]="{ tab: 'handouts' }"
             class="min-h-11 inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-300 hover:border-emerald-600/50"
+            title="Quitte la table pour l’onglet Documents du hub"
           >
             Documents
             @if (publishedHandoutsCount() > 0) {
@@ -151,20 +152,22 @@
 
     @if (isDm() && fullscreen()) {
       <nav
-        class="sticky z-20 -mx-1 mb-6 flex flex-wrap gap-1 rounded-xl border border-emerald-900/40 bg-[#141a16]/95 p-1 backdrop-blur-sm top-[var(--dg-sticky-below-play)]"
+        class="sticky z-20 -mx-1 mb-3 flex flex-nowrap gap-1 overflow-x-auto overscroll-x-contain rounded-xl border border-emerald-900/40 bg-[#141a16]/95 p-1 backdrop-blur-sm top-[var(--dg-sticky-below-play)]"
         aria-label="Sections de la session"
       >
         @for (tab of sessionTabs; track tab.id) {
           <button
             type="button"
-            class="min-h-10 flex-1 px-2.5 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-colors"
+            class="min-h-10 shrink-0 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors"
             [class.bg-emerald-900/50]="sessionView() === tab.id"
             [class.text-emerald-200]="sessionView() === tab.id"
             [class.text-slate-500]="sessionView() !== tab.id"
             [attr.aria-current]="sessionView() === tab.id ? 'page' : null"
+            [attr.title]="tab.label"
             (click)="setSessionView(tab.id)"
           >
-            {{ tab.label }}
+            <span class="sm:hidden">{{ tab.shortLabel }}</span>
+            <span class="hidden sm:inline">{{ tab.label }}</span>
           </button>
         }
       </nav>
@@ -467,7 +470,7 @@
               ·
               @switch (phase) {
                 @case ('setup') { préparation }
-                @case ('initiative') { initiative (ordre des tours) }
+                @case ('initiative') { ordre des tours }
                 @case ('fight') { combat }
               }
             </span>
@@ -637,11 +640,12 @@
 
         @if (currentTurn(); as turn) {
           <div
-            class="sticky z-20 space-y-3 rounded-xl border border-amber-800/40 bg-amber-950/90 px-4 py-3 backdrop-blur-sm shadow-lg shadow-black/20"
+            class="sticky z-30 space-y-3 rounded-xl border border-amber-800/40 bg-amber-950/90 px-4 py-3 backdrop-blur-sm shadow-lg shadow-black/20"
             [class.top-0]="!fullscreen()"
-            [class.top-[var(--dg-sticky-below-play)]]="fullscreen()"
+            [class.top-[var(--dg-sticky-below-play-tabs)]]="fullscreen() && isDm()"
+            [class.top-[var(--dg-sticky-below-play)]]="fullscreen() && !isDm()"
           >
-            <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
               <p [class]="fullscreen() ? 'text-base sm:text-lg font-serif text-amber-200' : 'font-serif text-amber-200'">
                 Tour de <strong>{{ turn.name || 'Sans nom' }}</strong>
                 @if (playerDisplayName(turn); as playerName) {
@@ -652,7 +656,7 @@
                 }
               </p>
               @if (isDm()) {
-                <div class="flex gap-2">
+                <div class="grid grid-cols-2 gap-2 w-full sm:w-auto sm:flex">
                   <button
                     type="button"
                     class="min-h-11 px-4 py-2 rounded-lg text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-300"
@@ -766,6 +770,23 @@
             @if (combatMissingHpCount()) {
               <span>{{ combatMissingHpCount() }} sans PV</span>
             }
+          </div>
+        }
+
+        @if (activeCombat()?.collectingInitiative && !isDm() && myCombatant()) {
+          <div class="rounded-xl border border-sky-800/40 bg-sky-950/25 px-4 py-3 space-y-2">
+            <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">
+              Initiative demandée
+            </p>
+            <p class="text-xs text-slate-400">
+              Le MJ collecte les jets — code {{ activeCombat()!.initiativeCode }}.
+            </p>
+            <a
+              [routerLink]="['/campaigns', campaign().id, 'init']"
+              class="inline-flex min-h-11 items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-sky-600 text-white hover:bg-sky-500"
+            >
+              Saisir mon initiative
+            </a>
           </div>
         }
 
@@ -889,9 +910,11 @@
                 <button
                   type="button"
                   class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white"
+                  aria-label="Continuer → Cible"
                   (click)="confirmAttackChoice()"
                 >
-                  Continuer → Cible
+                  <span class="sm:hidden">Cible →</span>
+                  <span class="hidden sm:inline">Continuer → Cible</span>
                 </button>
                 <button
                   type="button"
@@ -918,9 +941,11 @@
                   type="button"
                   class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white disabled:opacity-40"
                   [disabled]="!selectedTarget()"
+                  aria-label="Continuer → Jet pour toucher"
                   (click)="confirmTargetChoice()"
                 >
-                  Continuer → Jet pour toucher
+                  <span class="sm:hidden">Jet →</span>
+                  <span class="hidden sm:inline">Continuer → Jet pour toucher</span>
                 </button>
                 <button
                   type="button"

@@ -56,10 +56,10 @@
   "actions": [
     {
       "name": "Serres",
-      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 1,50 m, une cible. Réussite : 8 (2d6 + 1) dégâts tranchants.\nAvec leur envergure, les hiboux géants s'installent dans les arbres les plus massifs et anciens. Ils profitent de leur agilité pour se faufiler entre les troncs d'arbres et dans les prés où ils fondent sur leurs proies. Ce sont de redoutables prédateurs. Ils se lient souvent avec des fées et autres créatures sylvestres, pour devenir les gardiens de leurs royaumes forestiers."
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 1,50 m, une cible. Réussite : 8 (2d6 + 1) dégâts tranchants."
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": ""
+  "description": "Avec leur envergure, les hiboux géants s'installent dans les arbres les plus massifs et anciens. Ils profitent de leur agilité pour se faufiler entre les troncs et dans les prés où ils fondent sur leurs proies. Ce sont de redoutables prédateurs, souvent liés aux fées et créatures sylvestres dont ils gardent les royaumes forestiers."
 }

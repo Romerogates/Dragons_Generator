@@ -56,10 +56,10 @@
   "actions": [
     {
       "name": "Sabots",
-      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 11 (2d6 + 4) dégâts contondants.\n245"
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 11 (2d6 + 4) dégâts contondants."
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": ""
+  "description": "Les chevaux sont présents sur pratiquement tous les territoires où les humains, les orcs et les merosis se sont installés. Le destrier est une monture de guerre puissante et vaillante, dressée pour la charge et le combat. Ils sont si appréciés en tant que montures et compagnons fidèles qu'ils figurent dans de nombreux récits épiques."
 }

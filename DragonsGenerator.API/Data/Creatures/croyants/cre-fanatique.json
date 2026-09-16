@@ -47,10 +47,6 @@
     {
       "name": "Sombre ferveur",
       "description": "Le fanatique bénéficie d'un avantage aux jets de sauvegarde contre les états préjudiciables charmé et effrayé.\nSorts mineurs (à volonté) : flamme sacrée, lumière, thaumaturgie\n1<sup>er</sup> niveau (4 emplacements) : *blessure*, *bouclier de la foi*, *injonction*\n2<sup>e</sup> niveau (3 emplacements) : *arme spirituelle*, *immobilisation de personne*"
-    },
-    {
-      "name": "Sombre ferveur",
-      "description": "Le fanatique bénéficie d'un avantage aux jets de sauvegarde contre les états préjudiciables charmé et effrayé.\nSorts mineurs (à volonté) : flamme sacrée, lumière, thaumaturgie\n1<sup>er</sup> niveau (4 emplacements) : *blessure*, *bouclier de la foi*, *injonction*\n2<sup>e</sup> niveau (3 emplacements) : *arme spirituelle*, *immobilisation de personne*"
     }
   ],
   "actions": [
@@ -60,10 +56,10 @@
     },
     {
       "name": "Dague",
-      "description": "Attaque d'arme de corps à corps ou à distance : +4 pour toucher, allonge 1,50 m ou portée 6/18 m, une créature. Réussite : 4 (1d4 + 2) dégâts perforants.\nIcon"
+      "description": "Attaque d'arme de corps à corps ou à distance : +4 pour toucher, allonge 1,50 m ou portée 6/18 m, une créature. Réussite : 4 (1d4 + 2) dégâts perforants."
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": ""
+  "description": "Le profil de fanatique s'applique à un individu passionné, dogmatique et rigide. Ses certitudes sont inébranlables et il a dédié sa vie à l'accomplissement d'une œuvre, à la gloire de son seigneur ou mêlée d'ambitions personnelles. Il peut diriger un groupuscule religieux intolérant, éliminant les mécréants ou terrorisant les croyants insuffisamment zélés."
 }

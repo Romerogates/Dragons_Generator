@@ -61,14 +61,6 @@
     {
       "name": "Griffes",
       "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 11 (2d6 + 4) dégâts tranchants."
-    },
-    {
-      "name": "372",
-      "description": ""
-    },
-    {
-      "name": "Annexe",
-      "description": ""
     }
   ],
   "reactions": [],

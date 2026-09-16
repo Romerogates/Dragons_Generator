@@ -64,10 +64,10 @@
     },
     {
       "name": "Queue",
-      "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 3 m, une cible. Réussite : 11 (2d6 + 4) dégâts contondants plus 7 (2d6) dégâts de feu, et la cible est **agrippée** (DD 15 pour s'extraire). Tant que la lutte persiste, la cible est **entravée** et la salamandre peut la toucher automatiquement avec sa queue, mais le monstre ne peut plus effectuer d'attaques de queue contre d'autres cibles.\nG"
+      "description": "Attaque d'arme de corps à corps : +7 pour toucher, allonge 3 m, une cible. Réussite : 11 (2d6 + 4) dégâts contondants plus 7 (2d6) dégâts de feu, et la cible est **agrippée** (DD 15 pour s'extraire). Tant que la lutte persiste, la cible est **entravée** et la salamandre peut la toucher automatiquement avec sa queue, mais le monstre ne peut plus effectuer d'attaques de queue contre d'autres cibles."
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": ""
+  "description": "Élémentaires brûlants à la silhouette serpentine flamboyante, les salamandres sont nostalgiques des temps anciens où elles prospéraient dans le brasier primordial de la Fournaise. Après la Chute du Paradis, certaines se soumirent aux diables tandis que d'autres fuirent sur Eana, se réfugiant dans les volcans. Pour vivre, elles ont besoin de se baigner dans les flammes, leur manière de respirer et de se nourrir tout à la fois."
 }

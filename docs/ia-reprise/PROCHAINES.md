@@ -17,14 +17,15 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ### Table + Codex
 1. ~~Fiabilité table (persist / softReload / hints setup)~~ **fait**
-2. ~~Codex sorts (OCR + sorts critiques + batch vides)~~ **fait** (reste options modulaires / OCR fragmentés)
-3. ~~Première session MJ en 15 min~~ **fait** (rail Résumé + CTA unique + Entrer→/play)
-4. Mobile `/play` polish soirée
-5. Codex bestiaire suite — fiches vides / OCR depuis `source/Dragons_3_Bestiaire_Créatures.md`
+2. ~~Codex sorts (OCR + critiques + vides + modulaires)~~ **fait**
+3. ~~Première session MJ en 15 min~~ **fait**
+4. ~~Mobile `/play` polish soirée~~ **fait** (onglets scroll, bandeau sous tabs, CTA init joueur, boutons courts)
+5. ~~Codex bestiaire batch prioritaire~~ **fait** (15 fiches lore + nettoyage OCR actions)
 6. Sources Codex :
    - **`source/Dragons_2_Livre_de_magie.md`** → sorts
    - **`source/Dragons_3_Bestiaire_Créatures.md`** → bestiaire / créatures
    - **`source/Dragons_1_Livre_de_base.md`** → le reste (classes, espèces, équipements, règles…)
+7. Bestiaire suite (reste ~40 fiches description vide) + Livre de base si trous classes/équipement
 
 ### Guide (suite)
 1. ~~Découvrabilité + sans checklists~~ **fait**
@@ -34,6 +35,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## Déjà livré (ne pas refaire)
 
+- **Mobile `/play` + Codex batch 3** (2026-09-16) — onglets session scrollables ; bandeau tour sous tabs ; CTA init joueur ; boutons Cible/Jet courts ; 9 sorts modulaires ; 15 créatures lore/OCR.
 - **Première session MJ 15 min + Codex batch** (2026-09-16) — empty `/campaigns` CTA « Créer une table » ; template oneshot par défaut ; checklist Inviter→Table ; Entrer en session → `/play` ; session « Session 1 » ce soir ; 11 sorts vides restaurés (Livre de magie) ; doppelgänger + rat géant (Bestiaire).
 - **Fiabilité table + Codex sorts** (2026-09-16) — persist MJ ne réécrit plus `data` stale ; softReload skip pendant `saving` ; merge HP `??` ; adds alliés/adversaires `immediate` ; hints bouton setup/init ; OCR Logo/stamp/and icons ; restauration Vol/Aide/Arme spirituelle/Vision aveugle/Voie végétale/Esprits gardiens/État gazeux/Esprit impénétrable ; libellé Classes + conjuration→Invocation.
 - **Guide oneshot + schéma + alignement fiche + polish campagne** (2026-09-16) — livret `/guide/oneshot` ; schéma initiative ; libellés Pv / Bonus de maîtrise / etc. ; empty states + setup-guide + compteur notifs aligné navbar.

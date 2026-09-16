@@ -56,11 +56,7 @@
   "actions": [
     {
       "name": "Grande hache",
-      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 9 (1d12 + 3) dégâts tranchants.\nBaatir de pirate\nBaatir est un vétéran gobelin couturé de cicatrices. Jeune il a été tour à tour pirate, mercenaire, marchand, voleur, pilleur et héros. Il en a acquis un dédain pour la civilisation et les gras notables qui se cachent derrière de maigres gardes censés se sacrifier pour eux. La colère contre l'injustice du monde n'a jamais quitté Baatir. Aujourd'hui, sa rage se dirige contre Shüd'delkii et Kartaçöl, fédérant d'autres gobelins. Lui-même a un tempérament dur et peu conciliant, de sorte qu'en dépit de proximités évidentes de vues, il n'a pu s'associer aux résistants d'Ozodlik. Ces groupes se croisent sur certains coups de force, ils se connaissent, ils se respectent, parfois s'entraident, souvent se compliquent mutuellement la vie."
-    },
-    {
-      "name": "236",
-      "description": ""
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 9 (1d12 + 3) dégâts tranchants."
     }
   ],
   "reactions": [],

@@ -1,40 +1,38 @@
 {
-    "schema_version":  "2.0",
-    "guid":  null,
-    "id":  "spl-l-avant-poste-des-fees",
-    "name":  "L\u0027avant-poste des fees",
-    "level":  4,
-    "school":  "enchantement",
-    "casting_time":  {
-                         "value":  1,
-                         "unit":  "action"
-                     },
-    "range":  {
-                  "type":  "personnelle",
-                  "distance_m":  null,
-                  "area":  null
-              },
-    "duration":  {
-                     "type":  "instantane",
-                     "value":  null,
-                     "unit":  null
-                 },
-    "components":  {
-                       "v":  false,
-                       "s":  false,
-                       "m":  null
-                   },
-    "is_ritual":  false,
-    "is_concentration":  false,
-    "is_corrupted":  false,
-    "classes":  [
-                    "cls-druide",
-                    "cls-barde",
-                    "cls-magicien"
-                ],
-    "description":  "",
-    "higher_levels":  null,
-    "modular_options":  [
-
-                        ]
+  "schema_version": "2.0",
+  "guid": null,
+  "id": "spl-l-avant-poste-des-fees",
+  "name": "L'avant-poste des fées",
+  "level": 4,
+  "school": "invocation",
+  "casting_time": {
+    "value": 1,
+    "unit": "minute"
+  },
+  "range": {
+    "type": "normal",
+    "distance_m": 36,
+    "area": null
+  },
+  "duration": {
+    "type": "normal",
+    "value": 8,
+    "unit": "heure"
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-druide",
+    "cls-barde",
+    "cls-magicien"
+  ],
+  "description": "Option modulaire de l’abri du chasseur. Si vous lancez ce sort avec un emplacement de sort de 4e niveau ou supérieur, votre abri est un espace extradimensionnel de la même nature que les contrées enchantées.\n\nSi vous êtes allié avec des fées ou des djinns d’un royaume proche, votre abri comporte une issue menant à l’entrée de leur domaine. La distance en kilomètres qui sépare votre abri du royaume en question ne peut excéder le niveau de l’emplacement du sort. Les fées ou djinns du royaume peuvent librement emprunter l’issue et rejoindre votre abri. En revanche, vous ne pouvez pénétrer en leur domaine qu’avec leur accord.\n\nPar ailleurs, s’il y a de l’eau à proximité, votre abri en est pourvu (eau pure), et une lumière faible éclaire l’intérieur depuis les parois.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort de niveau supérieur, la durée et la taille de l’abri s’accroissent (2e : 8 h / 15 m² ; 3e : 24 h / 30 m² ; 4e : 1 semaine / 50 m² ; 5e : permanent jusqu’à dissipation).",
+  "modular_options": []
 }

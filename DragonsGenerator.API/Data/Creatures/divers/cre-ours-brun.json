@@ -60,14 +60,10 @@
     },
     {
       "name": "Griffes",
-      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 11 (2d6 + 4) dégâts tranchants.\nOurs"
-    },
-    {
-      "name": "117",
-      "description": ""
+      "description": "Attaque d'arme de corps à corps : +6 pour toucher, allonge 1,50 m, une cible. Réussite : 11 (2d6 + 4) dégâts tranchants."
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": ""
+  "description": "Dans les temps anciens, durant l'Ère du Renouveau, les cavernes dans lesquelles les ours des Drakenbergen hibernaient étaient l'objet de cultes. L'animal, qui paraissait mort en hiver et s'animait au printemps, était l'image du retour de la vie. Pour cette raison, il est aussi considéré comme sacré par les adeptes de Flore."
 }

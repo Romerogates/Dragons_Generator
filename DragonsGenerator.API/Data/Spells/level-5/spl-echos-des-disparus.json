@@ -1,40 +1,38 @@
 {
-    "schema_version":  "2.0",
-    "guid":  null,
-    "id":  "spl-echos-des-disparus",
-    "name":  "Echos des disparus",
-    "level":  5,
-    "school":  "divination",
-    "casting_time":  {
-                         "value":  1,
-                         "unit":  "action"
-                     },
-    "range":  {
-                  "type":  "personnelle",
-                  "distance_m":  null,
-                  "area":  null
-              },
-    "duration":  {
-                     "type":  "instantane",
-                     "value":  null,
-                     "unit":  null
-                 },
-    "components":  {
-                       "v":  false,
-                       "s":  false,
-                       "m":  null
-                   },
-    "is_ritual":  false,
-    "is_concentration":  false,
-    "is_corrupted":  false,
-    "classes":  [
-                    "cls-pretre",
-                    "cls-magicien",
-                    "cls-barde"
-                ],
-    "description":  "",
-    "higher_levels":  null,
-    "modular_options":  [
-
-                        ]
+  "schema_version": "2.0",
+  "guid": null,
+  "id": "spl-echos-des-disparus",
+  "name": "Échos des disparus",
+  "level": 5,
+  "school": "transmutation",
+  "casting_time": {
+    "value": 1,
+    "unit": "heure"
+  },
+  "range": {
+    "type": "contact",
+    "distance_m": null,
+    "area": null
+  },
+  "duration": {
+    "type": "instantane",
+    "value": null,
+    "unit": null
+  },
+  "components": {
+    "v": true,
+    "s": true,
+    "m": null
+  },
+  "is_ritual": false,
+  "is_concentration": false,
+  "is_corrupted": false,
+  "classes": [
+    "cls-pretre",
+    "cls-magicien",
+    "cls-barde"
+  ],
+  "description": "Option modulaire de réincarnation. Si cette variante est utilisée, la magie copie l’apparence d’une personne dont la mort a eu lieu dans la région. Le meneur détermine les détails : qui, où, comment, quand ?\n\nSi le décès est récent et que sa nouvelle ne s’est pas répandue, la nouvelle identité du réincarné risque de lui poser des problèmes : quiproquos, dettes, rancunes, réputation fâcheuse, etc.",
+  "higher_levels": "Quand vous jetez ce sort en utilisant un emplacement de sort du 6e niveau ou supérieur, la mort peut remonter à 5 jours supplémentaires par niveau d’emplacement au-dessus du 5e.",
+  "modular_options": []
 }
