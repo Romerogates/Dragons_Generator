@@ -403,7 +403,18 @@ export const GUIDE_RULEBOOK_MJ_TABLE: GuideRulebook = {
           ],
           bullets: [
             'One-shot = une soirée. Campagne = plusieurs sessions.',
-            'Oui si cool, jet si risqué, non si ça casse le jeu.',
+          ],
+        },
+        {
+          id: 'arbitrage',
+          title: 'Quand dire oui, demander un jet, ou non',
+          paragraphs: [
+            'Quand un joueur annonce une action, ne lancez pas les dés par réflexe. Choisissez vite parmi ces trois réponses :',
+          ],
+          bullets: [
+            'Oui, sans jet — l’action est cool, crédible, et un échec n’apporterait rien d’intéressant. Ex. : discuter avec un PNJ déjà amical, fouiller une pièce sans danger.',
+            'Jet — il y a un vrai risque, et réussite comme échec changent la scène. Ex. : grimper un mur glissant, bluffer un garde, désamorcer un piège.',
+            'Non (expliquez et proposez autre chose) — l’action casse l’équilibre, le ton ou le plaisir de la table. Ex. : « je tue le roi d’un claquement de doigts » dès le début d’un one-shot.',
           ],
         },
       ],
