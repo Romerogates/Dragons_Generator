@@ -65,6 +65,7 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
 
   @ViewChild('threadScroll') threadScroll?: ElementRef<HTMLDivElement>;
+  @ViewChild('composerInput') composerInput?: ElementRef<HTMLTextAreaElement>;
 
   readonly isLoggedIn = this.auth.isLoggedIn;
   readonly messages = signal<FriendMessage[]>([]);
@@ -80,18 +81,25 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
 
   private messagePollTimer: ReturnType<typeof setInterval> | null = null;
   private activeThreadId: string | null = null;
+  /** Garde synchrone anti double-Enter (avant le prochain CD). */
+  private sendLocked = false;
 
   constructor() {
     effect(() => {
       const id = this.dock.activeFriendId();
-      if (this.dock.view() === 'thread' && id) {
-        this.startThread(id);
+      const inThread = this.dock.view() === 'thread' && !!id;
+      if (inThread) {
+        const switched = this.activeThreadId !== id;
+        this.startThread(id!);
+        if (switched) this.focusComposer();
       } else if (!id) {
         this.stopThreadPoll();
         this.messages.set([]);
         this.draft.set('');
         this.threadError.set(null);
         this.shareMenuOpen.set(false);
+        this.sendLocked = false;
+        this.sending.set(false);
       }
     });
   }
@@ -283,30 +291,46 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
   send(): void {
     const id = this.dock.activeFriendId();
     const text = this.draft().trim();
-    if (!id || !text || this.sending()) return;
+    if (!id || !text || this.sending() || this.sendLocked) return;
+    this.sendLocked = true;
     this.sending.set(true);
+    this.draft.set('');
     this.threadError.set(null);
     this.chat.sendMessage(id, { body: text }).subscribe({
       next: (msg) => {
-        this.draft.set('');
         this.messages.update((list) => [...list, msg]);
         this.sending.set(false);
+        this.sendLocked = false;
         this.scrollThreadToBottom();
         this.dock.refreshSummaries();
         this.notifications.refresh();
+        this.focusComposer();
       },
       error: () => {
+        // Remet le texte si l’envoi a échoué.
+        this.draft.set(text);
         this.threadError.set('Envoi impossible.');
         this.sending.set(false);
+        this.sendLocked = false;
+        this.focusComposer();
       },
     });
   }
 
   onKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      this.send();
-    }
+    if (event.key !== 'Enter' || event.shiftKey) return;
+    event.preventDefault();
+    event.stopPropagation();
+    this.send();
+  }
+
+  private focusComposer(): void {
+    // Après le rendu du thread (textarea dans un @if).
+    setTimeout(() => {
+      const el = this.composerInput?.nativeElement;
+      if (!el || this.dock.view() !== 'thread') return;
+      el.focus();
+    }, 0);
   }
 
   parseAttachment(msg: FriendMessage): ParsedAttachment | null {

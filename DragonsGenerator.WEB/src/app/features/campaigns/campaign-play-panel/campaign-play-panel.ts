@@ -556,6 +556,17 @@ export class CampaignPlayPanel implements OnDestroy {
     }
   }
 
+  /** Toast après « Ajouter à la table » depuis une fiche Codex (?added=…). */
+  announceCodexImport(creatureName: string): void {
+    const name = creatureName.trim();
+    if (!name) return;
+    this.setFeedback(
+      'ok',
+      `${name} ajouté depuis le Codex — ouvrez Combattre pour le voir sur la table.`,
+      7000,
+    );
+  }
+
   private setFeedback(kind: 'ok' | 'err', text: string, ttlMs = 4500): void {
     this.feedback.set({ kind, text });
     if (this.feedbackTimer) clearTimeout(this.feedbackTimer);

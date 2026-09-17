@@ -1536,7 +1536,9 @@
                 }
               </button>
             } @empty {
-              <p class="text-xs text-slate-500 italic px-1">Aucun adversaire — + Adversaire (bestiaire / codex)</p>
+              <p class="text-xs text-slate-500 italic px-1">
+                Aucun adversaire — + Adversaire ici, ou « Ajouter à la table » depuis une fiche Codex
+              </p>
             }
           </div>
         </div>
@@ -2059,7 +2061,9 @@
           <div class="rounded-2xl border border-dashed border-violet-800/40 bg-violet-950/15 p-5 text-center space-y-2">
             <p class="text-[10px] font-black uppercase tracking-widest text-violet-400">Rencontres</p>
             <p class="text-sm text-slate-300">Aucune rencontre préparée.</p>
-            <p class="text-xs text-slate-500">Générez-en depuis Préparation → Rencontres.</p>
+            <p class="text-xs text-slate-500">
+              Générez-en depuis Préparation, ou « Ajouter à une rencontre » sur une fiche Codex.
+            </p>
             @if (isDm()) {
               <a
                 [routerLink]="['/campaigns', c.id]"

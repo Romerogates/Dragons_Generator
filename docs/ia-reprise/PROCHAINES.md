@@ -34,6 +34,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 13. ~~Smoke table Codex + verify + bleed UX~~ **fait** (e2e `/play` assassin+gobelin ; `verify_bestiary` recalibré ; bleed lore/actions ; traits Sorts lanceurs)
 14. ~~Variantes nommées + durcissement e2e joueur~~ **fait** (aliases verify Itelgini/Synthia ; whitespace PDF ; réactions/légendaires Mille-visages ; paladin traits ; e2e attaque joueur + `/init` + smoke hub→terminer)
 15. ~~Codex → table one-click~~ **fait** (CTA fiche créature ; mapper partagé ; sessionStorage dock)
+16. ~~Codex → rencontre + dock e2e + polish post-import~~ **fait** (CTA rencontre ; e2e persist dock ; toast `?added=` ; empty states)
 
 ### Guide (suite)
 1. ~~Découvrabilité + sans checklists~~ **fait**
@@ -43,6 +44,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## Déjà livré (ne pas refaire)
 
+- **Codex → rencontre + dock e2e + polish** (2026-09-17) — « Ajouter à une rencontre » (+ picker) ; `appendCreatureToEncounter` ; e2e dock `/play`→Codex ; toast table `?added=` ; empty adversaires/rencontres.
 - **Codex → table one-click** (2026-09-17) — « Ajouter à la table » sur fiche bestiaire ; `combat-creature-import.util` ; dock persiste l’id campagne ; e2e clic gobelin.
 - **Variantes + e2e joueur** (2026-09-17) — `verify_bestiary` 221/221 ; Mille-visages réactions + légendaires ; `cre-paladin` Sorts ; e2e `campaign-combat-player-attack`, `/init` submit, `campaign-play-smoke`.
 - **Smoke table + verify + bleed** (2026-09-17) — e2e `campaign-codex-table` (Maître assassin + Guerrier gobelin) ; `tools/verify_bestiary.py` (fenêtre CA proche du nom, traits entre CA/Actions) → 0 écarts de champs ; purge bleed OCR actions (~50 fiches) ; traits **Sorts** acolyte/barde/druide/mage/archidruide/garde sacré/sage ulkan.

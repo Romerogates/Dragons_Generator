@@ -3,6 +3,8 @@ import type {
   CampaignData,
   Combatant,
   CombatantAttack,
+  EncounterCreature,
+  EncounterGroup,
 } from '@core/models/Campaign/campaign';
 import { createActiveCombat, createCombatant } from '@core/utils/combat-tracker.util';
 
@@ -111,5 +113,72 @@ export function appendCreatureCombatantToSession(
     sessions: sessions.map((s) =>
       s.id === activeId ? { ...s, activeCombat: nextCombat } : s,
     ),
+  };
+}
+
+/** Ligne rencontre à partir d’une fiche Codex. */
+export function encounterCreatureFromCodex(creature: Creature): EncounterCreature {
+  return {
+    creatureId: creature.id,
+    creatureName: creature.name,
+    challengeRating: String(creature.challengeRating ?? ''),
+    xp: typeof creature.xp === 'number' ? creature.xp : 0,
+    quantity: 1,
+    defeated: 0,
+  };
+}
+
+export interface AppendCreatureToEncounterResult {
+  data: CampaignData;
+  encounterId: string;
+  encounterName: string;
+  created: boolean;
+}
+
+/**
+ * Ajoute une créature Codex à une rencontre (ou en crée une).
+ * Si la créature est déjà dans le groupe, incrémente `quantity`.
+ */
+export function appendCreatureToEncounter(
+  data: CampaignData,
+  creature: Creature,
+  options?: { encounterId?: string; newEncounterName?: string },
+): AppendCreatureToEncounterResult {
+  const line = encounterCreatureFromCodex(creature);
+  const encounters = [...(data.encounters ?? [])];
+  const targetId = options?.encounterId;
+  const existingIdx = targetId ? encounters.findIndex((e) => e.id === targetId) : -1;
+
+  if (existingIdx >= 0) {
+    const enc = encounters[existingIdx]!;
+    const creatures = [...(enc.creatures ?? [])];
+    const sameIdx = creatures.findIndex((c) => c.creatureId === creature.id);
+    if (sameIdx >= 0) {
+      const prev = creatures[sameIdx]!;
+      creatures[sameIdx] = { ...prev, quantity: (prev.quantity ?? 1) + 1 };
+    } else {
+      creatures.push(line);
+    }
+    const nextEnc: EncounterGroup = { ...enc, creatures };
+    encounters[existingIdx] = nextEnc;
+    return {
+      data: { ...data, encounters },
+      encounterId: nextEnc.id,
+      encounterName: nextEnc.name,
+      created: false,
+    };
+  }
+
+  const nextEnc: EncounterGroup = {
+    id: crypto.randomUUID?.() ?? `enc-${Date.now()}`,
+    name: options?.newEncounterName?.trim() || `Rencontre — ${creature.name}`,
+    creatures: [line],
+  };
+  encounters.push(nextEnc);
+  return {
+    data: { ...data, encounters },
+    encounterId: nextEnc.id,
+    encounterName: nextEnc.name,
+    created: true,
   };
 }

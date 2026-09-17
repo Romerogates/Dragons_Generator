@@ -32,17 +32,62 @@
           <span class="bg-red-950/40 text-red-300 border border-red-900/50 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider">
             {{ formatCr(c.challengeRating) }} · {{ c.xp }} PX
           </span>
-          @if (canAddToTable()) {
+          @if (canAddToCampaign()) {
             <button
               type="button"
               class="min-h-11 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-amber-700 text-white border border-amber-500 hover:bg-amber-600 disabled:opacity-50"
-              [disabled]="addingToTable()"
+              [disabled]="addingToTable() || addingToEncounter()"
               (click)="addToActiveTable()"
             >
               {{ addingToTable() ? 'Ajout…' : 'Ajouter à la table' }}
             </button>
+            <button
+              type="button"
+              class="min-h-11 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-[#1b2028] text-violet-200 border border-violet-800/60 hover:border-violet-500 disabled:opacity-50"
+              [disabled]="addingToTable() || addingToEncounter()"
+              (click)="beginAddToEncounter()"
+            >
+              {{ addingToEncounter() ? 'Ajout…' : 'Ajouter à une rencontre' }}
+            </button>
           }
         </div>
+        @if (encounterPickerOpen()) {
+          <div
+            class="mt-4 mx-auto max-w-md rounded-2xl border border-violet-800/50 bg-[#171b22] p-4 text-left space-y-2"
+            role="dialog"
+            aria-label="Choisir une rencontre"
+          >
+            <p class="text-[10px] font-black uppercase tracking-widest text-violet-400">
+              Choisir une rencontre
+            </p>
+            @for (enc of encounterChoices(); track enc.id) {
+              <button
+                type="button"
+                class="w-full min-h-11 px-3 py-2 rounded-xl text-sm text-left bg-[#1b2028] border border-slate-700 hover:border-violet-500 text-slate-200"
+                (click)="pickEncounter(enc.id)"
+              >
+                {{ enc.name }}
+                <span class="text-slate-500 text-xs ml-1"
+                  >({{ enc.creatures?.length ?? 0 }} créature(s))</span
+                >
+              </button>
+            }
+            <button
+              type="button"
+              class="w-full min-h-11 px-3 py-2 rounded-xl text-sm font-semibold bg-violet-900/40 border border-violet-700/50 text-violet-200"
+              (click)="pickEncounter('new')"
+            >
+              + Nouvelle rencontre
+            </button>
+            <button
+              type="button"
+              class="w-full min-h-10 text-xs text-slate-500 hover:text-slate-300"
+              (click)="cancelEncounterPicker()"
+            >
+              Annuler
+            </button>
+          </div>
+        }
         @if (tableFeedback(); as fb) {
           <p
             class="mt-4 text-sm text-center"
@@ -52,12 +97,23 @@
           >
             {{ fb.text }}
             @if (fb.kind === 'ok' && tableCampaignId(); as cid) {
-              <a
-                [routerLink]="['/campaigns', cid, 'play']"
-                class="ml-2 underline text-amber-300 hover:text-amber-200"
-              >
-                Voir la table
-              </a>
+              @if (fb.link === 'encounters') {
+                <a
+                  [routerLink]="['/campaigns', cid]"
+                  [queryParams]="{ tab: 'encounters' }"
+                  class="ml-2 underline text-violet-300 hover:text-violet-200"
+                >
+                  Voir les rencontres
+                </a>
+              } @else {
+                <a
+                  [routerLink]="['/campaigns', cid, 'play']"
+                  [queryParams]="{ added: creature()?.name ?? '' }"
+                  class="ml-2 underline text-amber-300 hover:text-amber-200"
+                >
+                  Voir la table
+                </a>
+              }
             }
           </p>
         }

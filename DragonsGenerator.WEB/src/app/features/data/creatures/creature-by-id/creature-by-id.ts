@@ -14,6 +14,7 @@ import { AuthService } from '@core/services/auth.service';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { CampaignSessionDockService } from '@core/services/campaign-session-dock.service';
 import { Creature } from '@core/models/Creatures/creature';
+import type { CampaignDetail, EncounterGroup } from '@core/models/Campaign/campaign';
 import {
   ABILITY_LABELS,
   formatChallengeRating,
@@ -21,6 +22,7 @@ import {
 } from '@core/utils/creature-display.util';
 import {
   appendCreatureCombatantToSession,
+  appendCreatureToEncounter,
   combatantFromCreature,
 } from '@core/utils/combat-creature-import.util';
 import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
@@ -43,7 +45,14 @@ export class CreatureById {
   protected error = signal<string | null>(null);
   protected notFound = signal(false);
   protected addingToTable = signal(false);
-  protected tableFeedback = signal<{ kind: 'ok' | 'err'; text: string } | null>(null);
+  protected addingToEncounter = signal(false);
+  protected tableFeedback = signal<{
+    kind: 'ok' | 'err';
+    text: string;
+    link?: 'play' | 'encounters';
+  } | null>(null);
+  protected encounterPickerOpen = signal(false);
+  protected encounterChoices = signal<EncounterGroup[]>([]);
 
   protected creature = toSignal(
     this.route.paramMap.pipe(
@@ -52,6 +61,8 @@ export class CreatureById {
         this.error.set(null);
         this.notFound.set(false);
         this.tableFeedback.set(null);
+        this.encounterPickerOpen.set(false);
+        this.encounterChoices.set([]);
         return this.dataService.getCreatureById(id).pipe(
           catchError((err) => {
             if (err?.status === 404) {
@@ -67,8 +78,8 @@ export class CreatureById {
     { initialValue: undefined },
   );
 
-  /** MJ connecté : le clic vérifie session active (dock ou sessionStorage). */
-  protected canAddToTable = computed(() => this.auth.isLoggedIn());
+  /** MJ connecté : le clic vérifie campagne / session. */
+  protected canAddToCampaign = computed(() => this.auth.isLoggedIn());
 
   protected tableCampaignId = computed(
     () => this.sessionDock.campaignId() ?? this.sessionDock.rememberedCampaignId(),
@@ -96,6 +107,7 @@ export class CreatureById {
 
     this.addingToTable.set(true);
     this.tableFeedback.set(null);
+    this.encounterPickerOpen.set(false);
 
     this.campaigns.get(campaignId).subscribe({
       next: (detail) => {
@@ -126,6 +138,7 @@ export class CreatureById {
             this.tableFeedback.set({
               kind: 'ok',
               text: `${creature.name} ajouté à la table.`,
+              link: 'play',
             });
           },
           error: () => {
@@ -142,6 +155,121 @@ export class CreatureById {
         this.tableFeedback.set({
           kind: 'err',
           text: 'Impossible de charger la campagne.',
+        });
+      },
+    });
+  }
+
+  /** Ouvre le sélecteur ou crée directement s’il n’y a aucune rencontre. */
+  protected beginAddToEncounter(): void {
+    const creature = this.creature();
+    const campaignId = this.sessionDock.rememberedCampaignId();
+    if (!creature || this.addingToEncounter()) return;
+    if (!campaignId) {
+      this.tableFeedback.set({
+        kind: 'err',
+        text: 'Ouvrez d’abord une campagne (dock session), puis réessayez.',
+      });
+      return;
+    }
+
+    this.tableFeedback.set(null);
+    this.addingToEncounter.set(true);
+
+    this.campaigns.get(campaignId).subscribe({
+      next: (detail) => {
+        if (!detail.isOwner) {
+          this.addingToEncounter.set(false);
+          this.tableFeedback.set({
+            kind: 'err',
+            text: 'Seul le MJ peut préparer une rencontre.',
+          });
+          return;
+        }
+        const list = detail.data.encounters ?? [];
+        if (!list.length) {
+          this.commitAddToEncounter(detail, undefined, creature);
+          return;
+        }
+        this.encounterChoices.set(list);
+        this.encounterPickerOpen.set(true);
+        this.addingToEncounter.set(false);
+      },
+      error: () => {
+        this.addingToEncounter.set(false);
+        this.tableFeedback.set({
+          kind: 'err',
+          text: 'Impossible de charger la campagne.',
+        });
+      },
+    });
+  }
+
+  protected cancelEncounterPicker(): void {
+    this.encounterPickerOpen.set(false);
+    this.encounterChoices.set([]);
+  }
+
+  protected pickEncounter(encounterId: string | 'new'): void {
+    const creature = this.creature();
+    const campaignId = this.sessionDock.rememberedCampaignId();
+    if (!creature || !campaignId || this.addingToEncounter()) return;
+
+    this.addingToEncounter.set(true);
+    this.campaigns.get(campaignId).subscribe({
+      next: (detail) => {
+        if (!detail.isOwner) {
+          this.addingToEncounter.set(false);
+          this.tableFeedback.set({
+            kind: 'err',
+            text: 'Seul le MJ peut préparer une rencontre.',
+          });
+          return;
+        }
+        this.commitAddToEncounter(
+          detail,
+          encounterId === 'new' ? undefined : encounterId,
+          creature,
+        );
+      },
+      error: () => {
+        this.addingToEncounter.set(false);
+        this.tableFeedback.set({
+          kind: 'err',
+          text: 'Impossible de charger la campagne.',
+        });
+      },
+    });
+  }
+
+  private commitAddToEncounter(
+    detail: CampaignDetail,
+    encounterId: string | undefined,
+    creature: Creature,
+  ): void {
+    const result = appendCreatureToEncounter(detail.data, creature, {
+      encounterId,
+      newEncounterName: encounterId ? undefined : `Rencontre — ${creature.name}`,
+    });
+    this.campaigns.update(detail.id, detail.title, result.data).subscribe({
+      next: () => {
+        this.addingToEncounter.set(false);
+        this.encounterPickerOpen.set(false);
+        this.encounterChoices.set([]);
+        this.sessionDock.patchLiveCampaign({ ...detail, data: result.data });
+        this.tableFeedback.set({
+          kind: 'ok',
+          text: result.created
+            ? `${creature.name} → nouvelle rencontre « ${result.encounterName} ».`
+            : `${creature.name} ajouté à « ${result.encounterName} ».`,
+          link: 'encounters',
+        });
+      },
+      error: () => {
+        this.addingToEncounter.set(false);
+        this.tableFeedback.set({
+          kind: 'err',
+          text: 'Impossible d’ajouter à la rencontre. Réessayez.',
         });
       },
     });

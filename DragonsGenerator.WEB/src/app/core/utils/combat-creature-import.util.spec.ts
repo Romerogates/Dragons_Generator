@@ -1,6 +1,8 @@
 import {
   appendCreatureCombatantToSession,
+  appendCreatureToEncounter,
   combatantFromCreature,
+  encounterCreatureFromCodex,
   isCreatureAttackAction,
   parseAbilityModifier,
   parseAttackBonusFromText,
@@ -191,5 +193,33 @@ describe('combat-creature-import.util', () => {
         combatant,
       ),
     ).toBeNull();
+  });
+
+  it('appendCreatureToEncounter crée ou enrichit une rencontre', () => {
+    const creature = goblinFixture();
+    const line = encounterCreatureFromCodex(creature);
+    expect(line.creatureId).toBe('cre-guerrier-gobelin');
+    expect(line.quantity).toBe(1);
+
+    const created = appendCreatureToEncounter(emptyCampaignData(), creature);
+    expect(created.created).toBeTrue();
+    expect(created.data.encounters.length).toBe(1);
+    expect(created.encounterName).toContain('Guerrier gobelin');
+
+    const bumped = appendCreatureToEncounter(created.data, creature, {
+      encounterId: created.encounterId,
+    });
+    expect(bumped.created).toBeFalse();
+    expect(bumped.data.encounters[0]?.creatures[0]?.quantity).toBe(2);
+
+    const other = appendCreatureToEncounter(created.data, goblinFixture({ id: 'cre-autre', name: 'Autre' }), {
+      encounterId: created.encounterId,
+    });
+    expect(other.data.encounters[0]?.creatures.length).toBe(2);
+
+    const named = appendCreatureToEncounter(emptyCampaignData(), creature, {
+      newEncounterName: 'Embuscade',
+    });
+    expect(named.encounterName).toBe('Embuscade');
   });
 });

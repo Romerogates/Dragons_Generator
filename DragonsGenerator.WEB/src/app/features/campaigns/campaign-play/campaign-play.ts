@@ -106,12 +106,26 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
         void this.live.watch(c.id);
         this.liveSub = this.live.updates(c.id).subscribe(() => this.softReload());
         this.startSoftPoll(c);
+        this.consumeCodexImportQuery();
       },
       error: () => {
         this.error.set('Campagne introuvable.');
         this.loading.set(false);
       },
     });
+  }
+
+  /** ?added=Nom depuis le CTA Codex « Voir la table ». */
+  private consumeCodexImportQuery(): void {
+    const added = this.route.snapshot.queryParamMap.get('added');
+    if (!added?.trim()) return;
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { added: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+    queueMicrotask(() => this.playPanel()?.announceCodexImport(added));
   }
 
   ngOnDestroy(): void {

@@ -72,4 +72,33 @@ describe('CampaignSessionDockService', () => {
     dock.bindCampaign(detail({ activeSessionId: null, sessions: [] }));
     expect(dock.isVisible()).toBe(false);
   });
+
+  it('persists campaign id in sessionStorage for Codex navigation', () => {
+    sessionStorage.clear();
+    dock.bindCampaign(
+      detail({
+        activeSessionId: 's1',
+        sessions: [
+          {
+            id: 's1',
+            title: 'Soirée',
+            scheduledAt: new Date().toISOString(),
+            status: 'planned',
+            mode: 'online',
+          },
+        ],
+      }),
+    );
+    expect(sessionStorage.getItem('dg-active-table-campaign')).toBe('c1');
+    expect(dock.rememberedCampaignId()).toBe('c1');
+
+    // Simule navigation hors /play : signal live vidé, storage conservé.
+    dock.campaignId.set(null);
+    expect(dock.rememberedCampaignId()).toBe('c1');
+
+    dock.campaignId.set('c1');
+    dock.clear();
+    expect(sessionStorage.getItem('dg-active-table-campaign')).toBeNull();
+    expect(dock.rememberedCampaignId()).toBeNull();
+  });
 });

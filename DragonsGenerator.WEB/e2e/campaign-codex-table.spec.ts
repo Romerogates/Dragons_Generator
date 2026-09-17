@@ -200,4 +200,74 @@ test.describe('Campagne — table avec créatures Codex', () => {
     await expect(page.getByText(/Guerrier gobelin/i).first()).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText(/PV 7\//)).toBeVisible();
   });
+
+  test('dock survit à /play → Codex → retour (sessionStorage)', async ({ page }) => {
+    test.setTimeout(120_000);
+
+    const owner = await loginSeedSession(page.request);
+    const campaignId = await createCampaignAs(page, owner, `E2E Dock Persist ${Date.now()}`);
+    await startActiveSessionAs(page, owner, campaignId);
+
+    await applyAuthSession(page, owner, `/campaigns/${campaignId}/play`);
+    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({
+      timeout: 30_000,
+    });
+
+    const storedId = await page.evaluate(() =>
+      sessionStorage.getItem('dg-active-table-campaign'),
+    );
+    expect(storedId).toBe(campaignId);
+
+    await page.goto('/creatures');
+    await expect(page.getByRole('heading', { name: /Bestiaire|Créatures/i }).first()).toBeVisible({
+      timeout: 20_000,
+    });
+    const stillStored = await page.evaluate(() =>
+      sessionStorage.getItem('dg-active-table-campaign'),
+    );
+    expect(stillStored).toBe(campaignId);
+
+    await page.goto(`/creatures/cre-guerrier-gobelin`);
+    await expect(page.getByRole('heading', { name: /Guerrier gobelin/i })).toBeVisible({
+      timeout: 20_000,
+    });
+    await page.getByRole('button', { name: /Ajouter à la table/i }).click();
+    await expect(page.getByText(/ajouté à la table/i)).toBeVisible({ timeout: 15_000 });
+  });
+
+  test('fiche Codex → Ajouter à une rencontre → groupe créé', async ({ page }) => {
+    test.setTimeout(120_000);
+
+    const owner = await loginSeedSession(page.request);
+    const campaignId = await createCampaignAs(page, owner, `E2E Codex Encounter ${Date.now()}`);
+    await startActiveSessionAs(page, owner, campaignId);
+
+    await applyAuthSession(page, owner, `/campaigns/${campaignId}`);
+    await expect(page.getByRole('button', { name: 'Session en cours' })).toBeVisible({
+      timeout: 30_000,
+    });
+
+    await page.goto(`/creatures/cre-guerrier-gobelin`);
+    await expect(page.getByRole('heading', { name: /Guerrier gobelin/i })).toBeVisible({
+      timeout: 20_000,
+    });
+    await page.getByRole('button', { name: /Ajouter à une rencontre/i }).click();
+    await expect(page.getByText(/nouvelle rencontre|ajouté à/i)).toBeVisible({
+      timeout: 15_000,
+    });
+
+    const getRes = await page.request.get(`/api/me/campaigns/${campaignId}`, {
+      headers: { Authorization: `Bearer ${owner.token}` },
+    });
+    expect(getRes.ok()).toBeTruthy();
+    const campaign = (await getRes.json()) as {
+      data: { encounters?: Array<{ name: string; creatures: Array<{ creatureId: string }> }> };
+    };
+    expect(campaign.data.encounters?.length).toBeGreaterThanOrEqual(1);
+    expect(
+      campaign.data.encounters?.some((e) =>
+        e.creatures.some((c) => c.creatureId === 'cre-guerrier-gobelin'),
+      ),
+    ).toBeTruthy();
+  });
 });
