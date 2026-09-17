@@ -43,8 +43,30 @@
   "languages": "—",
   "challenge_rating": "1/2",
   "xp": 100,
-  "traits": [],
-  "actions": [],
+  "traits": [
+    {
+      "name": "Pattes d'araignée",
+      "description": "La nuée peut parcourir les parois les plus difficiles à escalader, y compris les plafonds, sans devoir effectuer de test de caractéristique."
+    },
+    {
+      "name": "Perception des toiles",
+      "description": "Tant qu'elle est en contact avec une toile, la nuée connaît la position exacte de toutes les créatures qui touchent cette même toile."
+    },
+    {
+      "name": "Arpenteur de toiles",
+      "description": "La nuée n'est pas soumise aux contraintes de déplacement imposées par les toiles."
+    },
+    {
+      "name": "Nuée",
+      "description": "La nuée peut occuper l'espace d'une autre créature et réciproquement. La nuée peut se déplacer dans tout passage suffisant pour laisser passer un insecte de taille TP. La nuée ne peut pas récupérer de pv ni gagner de pv temporaires."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsures",
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 0 m, une créature occupant l'espace de la nuée. Réussite : 10 (4d4) dégâts perforants ou 5 (2d4) dégâts perforants si les pv actuels de la nuée sont inférieurs ou égaux à la moitié de son maximum. 147 Spider Araignée sauteuse géante Bête de taille M, non aligné * Classe d'armure 14 (armure naturelle) * Points de vie 16 (3d8 + 3) | Seuil de blessure 5 * Vitesse de déplacement 12 m, escalade 9 m | FOR | DEX | CON | INT | SAG | CHA | | ------- | ------- | ------- | ------ | ------- | ------ | | 14 (+2) | 16 (+3) | 13 (+1) | 3 (−4) | 13 (+1) | 4 (−3) | * Compétences Discrétion +7, Perception +5 * Sens perception des vibrations 6 m, vision dans le noir 18 m, Perception passive 15 * Langues — * Facteur de puissance 1/2 (100 PX)"
+    }
+  ],
   "reactions": [],
   "legendary_actions": [],
   "description": "Les araignées suffisamment grandes pour menacer les humanoïdes sont en général peu nombreuses, mais ces espèces sont sensibles à la géomagie et bénéficient du climat surnaturel particulier aux abords des ruines nombreuses des Drakenbergen.\n\nDépourvues de tympans et dotées d’une vue assez mauvaise (d’où leur immunité aux états assourdi et aveuglé), elles se guident surtout grâce aux vibrations, par l’intermédiaire de leurs toiles. Ces prédatrices sont connues pour être des solitaires chassant essentiellement à l’affût, c’est-à-dire qu’elles attendent qu’une proie soit prise au piège de leur toile pour l’assaillir. Elles la mordent pour la paralyser, puis l’enveloppent de soie pour la dévorer ultérieurement. Cette tactique, pour commune qu’elle soit, n’est pas universelle. En voici quelques variantes :"

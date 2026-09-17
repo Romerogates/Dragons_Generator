@@ -27,6 +27,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
    - **`source/Dragons_1_Livre_de_base.md`** → le reste (classes, espèces, équipements, règles…)
 7. ~~Bestiaire suite + Livre de base~~ **fait** (lore stubs → source ; Roublard/Yatagans ; ceste/propulseur ; kits gear + index ; grimoire dédoublonné)
 8. ~~Polish Codex OCR restant~~ **fait** (bleed actions ; renames Logo/Icon ; index 211→219 ; stubs OCR hors index)
+9. ~~Blocs combat créatures indexées vides~~ **fait** (17 fiches traits/actions depuis Dragons_3)
 
 ### Guide (suite)
 1. ~~Découvrabilité + sans checklists~~ **fait**
@@ -36,6 +37,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## Déjà livré (ne pas refaire)
 
+- **Blocs combat bestiaire** (2026-09-17) — 17 créatures indexées (assassin, Synthia, Kentigern, dragon cuivre, gobelins…) : traits/actions/réactions/légendaires depuis Dragons_3.
 - **Polish Codex OCR** (2026-09-16) — bleed actions (ours, süiri, orc, gorgone, familier kaani) ; renames Synthia/Itelgini/Maître assassin/araignée sauteuse ; index créatures 219 ; stubs OCR hors index.
 - **Bestiaire stubs + Livre de base** (2026-09-16) — lore créatures depuis Dragons_3 (stubs OCR honnêtes pour IDs cassés) ; flavor Roublard ; Yatagans ; ceste/propulseur spéciaux ; 19 objets de kits + index équipements ; grimoire unique `it-grimoire` ; matériels de jeu.
 - **Mobile `/play` + Codex batch 3** (2026-09-16) — onglets session scrollables ; bandeau tour sous tabs ; CTA init joueur ; boutons Cible/Jet courts ; 9 sorts modulaires ; 15 créatures lore/OCR.

@@ -43,8 +43,26 @@
   "languages": "commun, gobelin",
   "challenge_rating": "1",
   "xp": 200,
-  "traits": [],
-  "actions": [],
+  "traits": [
+    {
+      "name": "Attaque surprise",
+      "description": "Si le gobelours surprend une créature et la touche avec une attaque au cours du premier round de combat, cette attaque inflige 7 (2d6) dégâts supplémentaires à la cible."
+    },
+    {
+      "name": "Brute",
+      "description": "Le gobelours inflige un dé de dégâts d’arme supplémentaire quand il touche avec une arme de corps à corps (inclus dans l’attaque)."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morgenstern",
+      "description": "Attaque d’arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 11 (2d8 + 2) dégâts perforants."
+    },
+    {
+      "name": "Javeline",
+      "description": "Attaque d’arme de corps à corps ou à distance : +4 pour toucher, allonge 1,50 m ou portée 9/36 m, une cible. Réussite : 9 (2d6 + 2) dégâts perforants au corps à corps ou 5 (1d6 + 2) dégâts perforants à distance. Les troupes de base gobelourses sont surnommées « brutes » ou balmadaari dans le Grand Kaan, en raison de leur force de frappe et de l’allure rustre qu’elles se plaisent à afficher. Ce surnom est devenu péjoratif pour les exilés et descendants de la Horde mais ne l’est pas dans les terres du Grand Kaan. Les gobelours jouent de leur apparence et il est impossible de discerner d’un simple coup d’œil celui qui joue la comédie de celui qui est vraiment primaire. Dans de nombreuses régions du Cyfandir, les gobelours forment des bandes de brigands et de pillards redoutées."
+    }
+  ],
   "reactions": [],
   "legendary_actions": [],
   "description": "La quêteuse se distingue avant tout par sa grande astuce et ses aptitudes sociales expertes qui font d’elle une survivante. Si elle n’est pas pour autant sans défense, en cas d’hostilités, son premier réflexe sera de se soustraire à la mêlée, laissant le combat aux brutes dont toute quêteuse est immanquablement flanquée. Elle ne prendra les devants que s’il lui semble que son engagement serait déterminant."

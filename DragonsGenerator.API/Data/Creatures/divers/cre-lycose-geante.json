@@ -43,8 +43,26 @@
   "languages": "—",
   "challenge_rating": "1/4",
   "xp": 50,
-  "traits": [],
-  "actions": [],
+  "traits": [
+    {
+      "name": "Pattes d'araignée",
+      "description": "L'araignée peut parcourir les parois les plus difficiles à escalader, y compris les plafonds, sans devoir effectuer de test de caractéristique."
+    },
+    {
+      "name": "Perception des toiles",
+      "description": "Tant qu'elle est en contact avec une toile, l'araignée connaît la position exacte de toutes les créatures qui touchent cette même toile."
+    },
+    {
+      "name": "Arpenteur de toiles",
+      "description": "L'araignée n'est pas soumise aux contraintes de déplacement imposées par les toiles."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 1,50 m, une créature. Réussite : 4 (1d6 + 1) dégâts perforants, et la cible doit effectuer un JS Constitution DD 11. Elle subit 7 (2d6) dégâts de poison en cas de sauvegarde ratée et la moitié en cas de réussite. Si ces dégâts de poison font tomber la cible à 0 pv, celle-ci est en état stable mais se retrouve empoisonnée pendant 1 heure, même si elle récupère des pv. Elle reste également paralysée tant qu'elle est intoxiquée par ce venin. Plus petite que l'araignée géante, la lycose géante chasse à terrain découvert ou en se tapissant dans quelque crevasse, terrier ou cavité dissimulée par les décombres. Giant spider in a cave"
+    }
+  ],
   "reactions": [],
   "legendary_actions": [],
   "description": "Plus petite que l’araignée géante, la lycose géante chasse à terrain découvert ou en se tapissant dans quelque crevasse, terrier ou cavité dissimulée par les décombres. Son venin peut paralyser une proie tombée à 0 points de vie."

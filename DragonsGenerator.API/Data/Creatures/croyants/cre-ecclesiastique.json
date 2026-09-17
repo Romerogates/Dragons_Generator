@@ -46,10 +46,19 @@
   "traits": [
     {
       "name": "Éminence divine",
-      "description": "Au prix d'une action bonus, l'ecclésiastique peut dépenser un emplacement de sort pour que ses attaques de corps à corps infligent magiquement 10 (3d6) dégâts radiants supplémentaires aux cibles qu'elles touchent. Cet effet persiste jusqu'à la fin du tour de jeu. Si l'ecclésiastique dépense pour ce faire un emplacement de 2ᵉ niveau ou supérieur, les dégâts supplémentaires augmentent de 1d6 par niveau au-delà du premier.\nIcône de haut forgeur"
+      "description": "Au prix d’une action bonus, l’ecclésiastique peut dépenser un emplacement de sort pour que ses attaques de corps à corps infligent magiquement 10 (3d6) dégâts radiants supplémentaires aux cibles qu’elles touchent. Cet effet persiste jusqu’à la fin du tour de jeu. Si l’ecclésiastique dépense pour ce faire un emplacement de 2ᵉ niveau ou supérieur, les dégâts supplémentaires augmentent de 1d6 par niveau au-delà du premier. de haut forgeur"
+    },
+    {
+      "name": "Sorts",
+      "description": "L'ecclésiastique est un lanceur de sorts de niveau 5. Sa caractéristique magique est la Sagesse (DD de sauvegarde des sorts : 13, +5 pour toucher avec ses attaques de sort). Sorts mineurs (à volonté) : flamme sacrée, lumière, thaumaturgie. 1er niveau (4) : éclair traçant, sanctuaire, soins. 2e niveau (3) : arme spirituelle, restauration partielle. 3e niveau (2) : dissipation de la magie, esprits gardiens."
     }
   ],
-  "actions": [],
+  "actions": [
+    {
+      "name": "Masse d’armes",
+      "description": "Attaque d’arme de corps à corps : +2 pour toucher, allonge 1,50 m, une cible. Réussite : 3 (1d6) dégâts contondants."
+    }
+  ],
   "reactions": [],
   "legendary_actions": [],
   "description": "La qualité de l’équipement de l’ecclésiastique dépend de son rang dans la hiérarchie, de la richesse de son Église et de la mission qu’il a reçue. En période de guerre sainte, par exemple, il pourra être armé pour lutter contre le Chancre, tandis qu’en temps de paix, les moyens à sa disposition seront consacrés au développement de son culte plutôt qu’à du matériel militaire."

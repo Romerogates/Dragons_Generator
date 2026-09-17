@@ -46,23 +46,77 @@
   "traits": [
     {
       "name": "Élusif",
-      "description": "Au prix d'une action bonus, Dharka peut entreprendre l'action **Foncer**, **Se cacher** ou **Se dégager**."
+      "description": "Au prix d’une action bonus, Ez'Galwyn peut entreprendre l’action Foncer, Se cacher ou Se dégager."
     },
     {
       "name": "Héritage féerique",
-      "description": "Dharka bénéficie d'un avantage aux jets de sauvegarde contre l'état préjudiciable charmé, et aucune magie ne peut l'endormir."
+      "description": "Ez'Galwyn bénéficie d’un avantage aux jets de sauvegarde contre l’état préjudiciable charmé, et aucune magie ne peut l’endormir."
     },
     {
       "name": "Sensibilité à la lumière du jour",
-      "description": "Quand Dharka est exposée à la lumière du jour, elle subit un désavantage aux jets d'attaque ainsi qu'aux tests de Sagesse (Perception) basés sur la vue."
+      "description": "Quand Ez'Galwyn est exposée à la lumière du jour, elle subit un désavantage aux jets d’attaque ainsi qu’aux tests de Sagesse (Perception) basés sur la vue."
     },
     {
       "name": "Sorts innés",
-      "description": "La caractéristique magique de Dharka est le Charisme (DD de sauvegarde des sorts : 15). Dharka peut lancer les sorts suivants sans composantes matérielles :\nÀ volonté : lumières dansantes\n1/jour chacun : lueurs féeriques, ténèbres"
+      "description": "La caractéristique magique de Ez'Galwyn est le Charisme (DD de sauvegarde des sorts : 15). Ez'Galwyn peut lancer les sorts suivants sans composantes matérielles : • À volonté : lumières dansantes • 1/jour chacun : lueurs féeriques, ténèbres"
+    },
+    {
+      "name": "Fougue (recharge après un repos court ou long)",
+      "description": "Ez'Galwyn peut effectuer une action supplémentaire, en plus de son action normale et d'une éventuelle action bonus."
+    },
+    {
+      "name": "La balayette",
+      "description": "Quand Ez'Galwyn réussit un coup critique contre une créature qu'elle voit dans un rayon de 1,50 m d'elle, la créature doit réussir un JS Dextérité DD 15 sous peine de subir 1d8 dégâts supplémentaires et de se retrouver à terre."
+    },
+    {
+      "name": "L'entrecuisse",
+      "description": "Quand Ez'Galwyn entreprend l'action Attaquer contre un adversaire à terre qu'elle voit dans un rayon de 1,50 m d'elle, celui-ci doit réussir un JS Constitution DD 15 sous peine de subir 1d8 dégâts supplémentaires et d'être neutralisé. La cible peut réitérer le JS à la fin de chacun de ses tours et met fin à l'effet en cas de réussite."
+    },
+    {
+      "name": "Opportunisme aguerri",
+      "description": "Ez'Galwyn a l'avantage aux jets d'attaques associés à une attaque d'opportunité."
+    },
+    {
+      "name": "Style de combat des armes à deux mains",
+      "description": "Lorsque Ez'Galwyn obtient un 1 ou un 2 sur un dé de dégâts d'une attaque effectuée avec une arme de corps à corps tenue à deux mains, elle peut relancer le dé et conserve le nouveau résultat."
     }
   ],
-  "actions": [],
-  "reactions": [],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Ez'Galwyn effectue deux attaques d’épée longue ou deux attaques d’arbalète de poing."
+    },
+    {
+      "name": "Épée longue",
+      "description": "Attaque d’arme de corps à corps : +7 pour toucher, allonge 1,50 m, une cible. Réussite : 9 (1d10 + 4) dégâts tranchants. S Ez'Galwyn Shaan – ou simplement Ez'Galwyn – possède un FP 5 correspondant à un niveau 8 de guerrier ruffian. Ce niveau est susceptible d’évoluer par la suite, selon les besoins de la campagne la mettant en scène. Ez'Galwyn est une drow fière de ses origines, de sa maison et de son peuple. Elle porte haut le nom des sentinelles Ez’Galwyn, antique et noble lignée qui défendit à plusieurs reprises sa cité souterraine contre les périls des profondeurs de l’Inframonde. Sans le moindre scrupule, elle mène des raids esclavagistes vers la surface. Les choses sont ainsi faites : elle prend en haut ce qu’il faut pour vivre en bas, et survivre contre les horreurs qui reviennent sans cesse. Lorsque les aventuriers la rencontreront, elle sera peut-être la cause de leur captivité dans l’Inframonde. Rude et orgueilleuse, elle malmène, prend à rebrousse-poil et n’a aucune pitié envers ceux qu’elle perçoit comme faibles, lâches ou stupides. Elle fait actuellement face à la menace aboleth et doit en sortir victorieuse, sans quoi sa cité, et peut-être le monde au-delà, ne survivra pas. D’une certaine façon, c’est une idéaliste réaliste qui ne s’encombre surtout pas de sentimentalisme."
+    },
+    {
+      "name": "Arbalète de poing",
+      "description": "Attaque d’arme à distance : +5 pour toucher, portée 9/36 m, une cible. Réussite : 5 (1d6 + 2) dégâts perforants."
+    },
+    {
+      "name": "Second souffle (recharge après un repos court ou long)",
+      "description": "Ez'Galwyn regagne 1d10 + 8 pv. (Action bonus.)"
+    },
+    {
+      "name": "Menace déstabilisante (×4, recharge après un repos court ou long)",
+      "description": "Action bonus. Ez'Galwyn cible une créature qu'elle voit dans un rayon de 6 m. Celle-ci doit réussir un JS Sagesse opposé à un jet de Charisme (Intimidation) de Ez'Galwyn sous peine d'être effrayée jusqu'à la fin de son tour de jeu suivant."
+    }
+  ],
+  "reactions": [
+    {
+      "name": "Attaque d’opportunité du ruffian",
+      "description": "Attaque d’arme de corps à corps : +7 (avantage applicable) pour toucher, allonge 1,50 m, une cible. Réussite : 9 (1d10 + 4) dégâts tranchants. La créature doit réussir un JS Dextérité DD 15 sous peine de subir 1d8 dégâts supplémentaires et de voir sa VD réduite à 0 jusqu’au début de son tour de jeu suivant."
+    },
+    {
+      "name": "Le coup de latte",
+      "description": "Quand une créature dans un rayon de 1,50 m de Ez'Galwyn subit des dégâts infligés par un sort, Ez'Galwyn peut utiliser sa réaction pour la forcer à réussir un JS Sagesse DD 15 sous peine de subir 1d8 dégâts et de se retrouver <u>à terre</u>."
+    },
+    {
+      "name": "Le taquet",
+      "description": "Quand une créature dans un rayon de 1,50 m de Ez'Galwyn lance un sort, Ez'Galwyn peut utiliser sa réaction pour la forcer à réussir un JS Charisme DD 15 sous peine de subir 1d8 dégâts et de se retrouver muette. La cible peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l’effet en cas de réussite. La Cité Franche est une des plus grandes villes du monde. La surface déplaît à Ez'Galwyn, mais dans une métropole aussi immense, elle pourra passer inaperçue et trouver des informations, des remèdes, des objets magiques, des livres rares ou la piste de sectes agissant à la surface. Tantôt ennemie, tantôt alliée de circonstance, à l’occasion rivale, Ez'Galwyn Shaan est une némésis aussi redoutable qu’ambivalente et pragmatique. Si les plans des aventuriers sont incompatibles avec les objectifs de sa mission, elle leur mènera la vie dure, sans états d’âme. À l’inverse, s’ils se retrouvent confrontés à une menace commune, elle pourrait apporter un soutien décisif, constituant un atout (peut-être à double tranchant ?) à ne pas négliger. Illustration de Ez'Galwyn Shaan en plein combat"
+    }
+  ],
   "legendary_actions": [],
   "description": "Dharka Shaan porte haut le nom des sentinelles Ez’Galwyn, antique lignée drow qui défendit à plusieurs reprises sa cité souterraine contre les périls de l’Inframonde. Sans scrupule, elle mène des raids esclavagistes vers la surface : elle prend en haut ce qu’il faut pour vivre en bas. Rude et orgueilleuse, elle n’a aucune pitié pour ceux qu’elle juge faibles ; face à la menace aboleth, elle se bat pour sauver sa cité — et peut-être le monde au-delà."
 }

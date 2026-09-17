@@ -43,9 +43,44 @@
   "languages": "argot des voleurs et trois au choix",
   "challenge_rating": "11",
   "xp": 7200,
-  "traits": [],
-  "actions": [],
-  "reactions": [],
+  "traits": [
+    {
+      "name": "Assassinat",
+      "description": "À son premier tour de jeu, l’assassin bénéficie d’un avantage aux jets d’attaque contre toute créature qui n’a pas encore joué un tour. Toute attaque réussie par l’assassin contre une cible surprise est considérée comme un coup critique."
+    },
+    {
+      "name": "Attaque sournoise",
+      "description": "Une fois par tour de jeu, l’assassin inflige 21 (6d6) dégâts supplémentaires quand il touche une cible avec une attaque d’arme s’il a bénéficié d’un avantage au jet d’attaque ou si la cible est située à 1,50 m ou moins d’un de ses alliés non neutralisés. L’aptitude ne s’applique pas si l’assassin a subi un désavantage au jet d’attaque."
+    },
+    {
+      "name": "Esquive totale",
+      "description": "Lorsqu’il est soumis à un effet qui lui donne droit à un jet de sauvegarde de Dextérité pour réduire les dégâts de moitié, l’assassin ne subit en fait aucun dégât en cas de réussite et seulement la moitié en cas d’échec."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "L’assassin effectue deux attaques d’épée courte."
+    },
+    {
+      "name": "Épée courte",
+      "description": "Attaque d’arme de corps à corps : +8 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (1d6 + 4) dégâts perforants, et la cible doit effectuer un JS Constitution DD 17. Elle subit 31 (9d6) dégâts de poison en cas de sauvegarde ratée, et la moitié en cas de réussite."
+    },
+    {
+      "name": "Arbalète légère",
+      "description": "Attaque d’arme à distance : +8 pour toucher, portée 24/96 m, une cible. Réussite : 8 (1d8 + 4) dégâts perforants, et la cible doit effectuer un JS Constitution DD 17. Elle subit 31 (9d6) dégâts de poison en cas de sauvegarde ratée, et la moitié en cas de réussite."
+    }
+  ],
+  "reactions": [
+    {
+      "name": "Échappée (recharge après un repos court ou long)",
+      "description": "Lorsque l’assassin est sur le point de subir des dégâts de la part d’une créature qui devraient le réduire à 0 pv, il peut immédiatement se déplacer de 9 m jusqu’à un point de son choix qu’il peut voir. Si ce déplacement le met hors de portée de l’origine des dégâts, il ne les subit pas."
+    },
+    {
+      "name": "Esquive instinctive",
+      "description": "Lorsqu’un assaillant que l’assassin peut voir le touche avec une attaque, il peut réduire de moitié les dégâts que l’attaque lui inflige."
+    }
+  ],
   "legendary_actions": [],
-  "description": "meilleure arme d’un tueur expert est la préparation. Tout maître assassin aura soin de se renseigner sur sa cible et de s’équiper en conséquence, renonçant par exemple au poison si celle-ci y est immunisée. Son influence et ses moyens lui permettent généralement de se fournir en outils, même magiques."
+  "description": "Les assassins de ce calibre comptent parmi les tueurs les plus aguerris et redoutables qui soient. Le profil vaut pour un équipement par défaut, mais la meilleure arme d’un tueur expert est la préparation. Tout maître assassin aura soin de se renseigner sur sa cible et de s’équiper en conséquence, renonçant par exemple au poison si celle-ci y est immunisée. Son influence et ses moyens lui permettent généralement de se fournir en outils, même magiques."
 }

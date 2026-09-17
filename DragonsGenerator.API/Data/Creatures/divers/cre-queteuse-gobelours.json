@@ -43,8 +43,26 @@
   "languages": "commun, gobelin, kaani et une autre langue au choix",
   "challenge_rating": "1/2",
   "xp": 100,
-  "traits": [],
-  "actions": [],
+  "traits": [
+    {
+      "name": "Attaque surprise",
+      "description": "Si la quêteuse gobelours surprend une créature et la touche avec une attaque au cours du premier round de combat, cette attaque inflige 7 (2d6) dégâts supplémentaires à la cible."
+    },
+    {
+      "name": "Brute",
+      "description": "La quêteuse gobelours inflige un dé de dégâts d’arme supplémentaire quand elle touche avec une arme de corps à corps (inclus dans l’attaque)."
+    },
+    {
+      "name": "Sens du danger",
+      "description": "Lorsqu’il s’agit de déterminer son initiative, la quêteuse gobelours peut utiliser son modificateur aux tests de Sagesse (Intuition) plutôt que son modificateur de Dextérité."
+    }
+  ],
+  "actions": [
+    {
+      "name": "Pique",
+      "description": "Attaque d’arme de corps à corps : +3 pour toucher, allonge 3 m, une cible. Réussite : 12 (2d10 + 1) dégâts perforants. La quêteuse se distingue avant tout par sa grande astuce et ses aptitudes sociales expertes qui font d’elle une survivante. Si elle n’est pas pour autant sans défense, en cas d’hostilités, son premier réflexe sera de se soustraire à la mêlée, laissant le combat aux brutes dont toute quêteuse est immanquablement flanquée. Elle ne prendra les devants que s’il lui semble que son engagement serait déterminant."
+    }
+  ],
   "reactions": [],
   "legendary_actions": [],
   "description": "La quêteuse se distingue avant tout par sa grande astuce et ses aptitudes sociales expertes qui font d’elle une survivante. Si elle n’est pas sans défense, en cas d’hostilités son premier réflexe sera de se soustraire à la mêlée, laissant le combat aux brutes dont toute quêteuse est immanquablement flanquée. Elle ne prendra les devants que si son engagement paraît déterminant."

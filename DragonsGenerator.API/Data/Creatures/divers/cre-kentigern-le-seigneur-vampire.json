@@ -45,52 +45,98 @@
   "xp": 20000,
   "traits": [
     {
-      "name": "Brume d'évasion (3/jour)",
-      "description": "Quand il tombe à 0 pv hors de son lieu de repos, le vampire se transforme en nuage de brume (cf. trait **Métamorphe**) au lieu de tomber inconscient, à condition qu'il ne soit pas exposé à la lumière du soleil ni à l'eau vive. S'il ne peut pas se transformer, il est détruit.\nS'il est réduit à 0 pv sous forme de brume, il ne peut pas recouvrer sa forme de vampire et doit rejoindre son lieu de repos dans les 2 heures sous peine d'être détruit. Une fois dans son lieu de repos, il reprend sa forme de vampire. Il est alors **paralysé** jusqu'à ce qu'il récupère au moins 1 pv. Après avoir passé 1 heure dans son lieu de repos, il regagne 1 pv."
+      "name": "Brume d’évasion (3/jour)",
+      "description": "Quand il tombe à 0 pv hors de son lieu de repos, le vampire se transforme en nuage de brume (cf. trait Métamorphe) au lieu de tomber inconscient, à condition qu’il ne soit pas exposé à la lumière du soleil ni à l’eau vive. S’il ne peut pas se transformer, il est détruit.\nS’il est réduit à 0 pv sous forme de brume, il ne peut pas recouvrer sa forme de vampire et doit rejoindre son lieu de repos dans les 2 heures sous peine d’être détruit. Une fois dans son lieu de repos, il reprend sa forme de vampire. Il est alors paralysé jusqu’à ce qu’il récupère au moins 1 pv. Après avoir passé 1 heure dans son lieu de repos, il regagne 1 pv."
     },
     {
       "name": "Faiblesses des vampires",
-      "description": "Le vampire est affecté des handicaps suivants :"
-    },
-    {
-      "name": "Blessé par l'eau vive",
-      "description": "Le vampire subit 20 dégâts d'acide s'il termine son tour de jeu dans l'eau vive."
-    },
-    {
-      "name": "Hypersensibilité au soleil",
-      "description": "Le vampire subit 20 dégâts radiants lorsqu'il commence son tour de jeu au soleil. Tant qu'il y reste exposé, il subit un désavantage aux jets d'attaque et aux tests de caractéristique."
-    },
-    {
-      "name": "Interdiction d'entrer",
-      "description": "Le vampire ne peut pénétrer dans une résidence sans y avoir été invité par l'un de ses occupants."
-    },
-    {
-      "name": "Pieu dans le cœur",
-      "description": "Si une arme perforante en bois lui est plantée dans le cœur alors qu'il est neutralisé dans son lieu de repos, le vampire est **paralysé** jusqu'à ce qu'elle soit retirée."
+      "description": "Le vampire est affecté des handicaps suivants :\nBlessé par l’eau vive. Le vampire subit 20 dégâts d’acide s’il termine son tour de jeu dans l’eau vive.\nHypersensibilité au soleil. Le vampire subit 20 dégâts radiants lorsqu’il commence son tour de jeu au soleil. Tant qu’il y reste exposé, il subit un désavantage aux jets d’attaque et aux tests de caractéristique.\nInterdiction d’entrer. Le vampire ne peut pénétrer dans une résidence sans y avoir été invité par l’un de ses occupants.\nPieu dans le cœur. Si une arme perforante en bois lui est plantée dans le cœur alors qu’il est neutralisé dans son lieu de repos, le vampire est paralysé jusqu’à ce qu’elle soit retirée."
     },
     {
       "name": "Pacte de sang",
-      "description": "Les morts-vivants, les humanoïdes et les bêtes qui goûtent au sang de Kentigern doivent réussir un JS Sagesse DD 21 ou bien être sous l'emprise d'un sort de quête d'une durée de 1 an. Pour préparer un pacte de sang, Kentigern sacrifie 10 pv qu'il ne peut regagner qu'une fois son sang consommé par une cible. Le sang peut être transporté dans une fiole."
+      "description": "Les morts-vivants, les humanoïdes et les bêtes qui goûtent au sang de Kentigern doivent réussir un JS Sagesse DD 21 ou bien être sous l’emprise d’un sort de quête d’une durée de 1 an. Pour préparer un pacte de sang, Kentigern sacrifie 10 pv qu’il ne peut regagner qu’une fois son sang consommé par une cible. Le sang peut être transporté dans une fiole."
     },
     {
       "name": "Métamorphe",
-      "description": "Quand il n'est pas exposé au soleil ou à de l'eau vive, le vampire peut, au prix d'une action, se métamorphoser en chauve-souris de taille TP (VD 1,50 m ; vol 9 m) ou en un nuage de brume de taille M (vol 6 m), ou recouvrer sa véritable forme.\nSous forme de chauve-souris, il ne peut pas parler. Son profil est le même, exception faite de la taille et des VD indiquées. Ce qu'il porte directement sur lui se transforme avec lui, mais pas ce qu'il transporte. Enfin, il retrouve sa véritable forme s'il meurt.\nSous forme de brume, le vampire ne peut ni effectuer d'action, ni parler, ni manipuler d'objets. Il n'a aucun poids, peut rester en vol stationnaire, et peut pénétrer dans l'espace d'une créature hostile et s'y arrêter. En outre, il peut traverser n'importe quel espace où de l'air pourrait s'infiltrer, mais ne peut se déplacer dans l'eau. Il bénéficie d'un avantage aux jets de sauvegarde de Force, de Dextérité et de Constitution, et est immunisé contre tous les dégâts non magiques, exceptés ceux que lui inflige la lumière du jour."
+      "description": "Quand il n’est pas exposé au soleil ou à de l’eau vive, le vampire peut, au prix d’une action, se métamorphoser en chauve-souris de taille TP (VD 1,50 m ; vol 9 m) ou en un nuage de brume de taille M (vol 6 m), ou recouvrer sa véritable forme.\nSous forme de chauve-souris, il ne peut pas parler. Son profil est le même, exception faite de la taille et des VD indiquées. Ce qu’il porte directement sur lui se transforme avec lui, mais pas ce qu’il transporte. Enfin, il retrouve sa véritable forme s’il meurt.\nSous forme de brume, le vampire ne peut ni effectuer d’action, ni parler, ni manipuler d’objets. Il n’a aucun poids, peut rester en vol stationnaire, et peut pénétrer dans l’espace d’une créature hostile et s’y arrêter. En outre, il peut traverser n’importe quel espace où de l’air pourrait s’infiltrer, mais ne peut se déplacer dans l’eau. Il bénéficie d’un avantage aux jets de sauvegarde de Force, de Dextérité et de Constitution, et est immunisé contre tous les dégâts non magiques, exceptés ceux que lui inflige la lumière du jour."
     },
     {
-      "name": "Pattes d'araignée",
+      "name": "Pattes d’araignée",
       "description": "Le vampire peut parcourir les parois les plus difficiles à escalader, y compris les plafonds, sans devoir effectuer de test de caractéristique."
     },
     {
       "name": "Régénération",
-      "description": "Le vampire récupère 20 pv au début de son tour de jeu s'il lui reste au moins 1 pv et qu'il n'est exposé ni à la lumière du soleil ni à l'eau vive. S'il subit des dégâts radiants ou infligés par de l'eau bénite, ce trait ne fonctionne pas au début de son tour de jeu suivant."
+      "description": "Le vampire récupère 20 pv au début de son tour de jeu s’il lui reste au moins 1 pv et qu’il n’est exposé ni à la lumière du soleil ni à l’eau vive. S’il subit des dégâts radiants ou infligés par de l’eau bénite, ce trait ne fonctionne pas au début de son tour de jeu suivant."
     },
     {
       "name": "Résistance légendaire (3/jour)",
       "description": "Si le vampire rate un jet de sauvegarde, il peut décider de le réussir tout de même."
+    },
+    {
+      "name": "Spadassine",
+      "description": "Kentigern détient l’épée Spadassine (cf. encadré Spadassine, l’épée de Kentigern). Les bonus à l’attaque et aux dégâts sont intégrés plus bas."
+    },
+    {
+      "name": "Sceau du maître du domaine (3/jour)",
+      "description": "Kentigern est lié à un symbole que ses fidèles appellent le sceau du maître du domaine. Au prix d’une action, Kentigern peut bénéficier des effets du sort scrutation centré sur n’importe quel sceau du maître dessiné sur Eana. Il n’est nullement besoin que le dessinateur soit un élu, il suffit que le symbole soit fidèlement reproduit et intact. Les frontières éthérées et les interdits de Mort mettent cette aptitude en échec."
     }
   ],
-  "actions": [],
+  "actions": [
+    {
+      "name": "Attaques multiples (forme de vampire uniquement)",
+      "description": "Le vampire effectue trois attaques, dont une seule peut être une morsure."
+    },
+    {
+      "name": "Attaque à mains nues (forme de vampire uniquement)",
+      "description": "Attaque d’arme de corps à corps : +11 pour toucher, allonge 1,50 m, une créature. Réussite : 9 (1d8 + 5) dégâts contondants. Au lieu d’infliger des dégâts, le vampire peut agripper sa cible (DD 21 pour s’extraire)."
+    },
+    {
+      "name": "Spadassine l’épée longue (forme de vampire uniquement)",
+      "description": "Attaque d’arme de corps à corps : +13 pour toucher, allonge 1,50 m, une cible. Réussite : 11 (1d8 + 7) dégâts tranchants, ou 12 (1d10 + 7) dégâts tranchants si utilisée à deux mains, plus 10 (3d6) dégâts tranchants si la cible est un humanoïde."
+    },
+    {
+      "name": "Morsure (forme de chauve-souris ou de vampire uniquement)",
+      "description": "Attaque d’arme de corps à corps : +11 pour toucher, allonge 1,50 m, une créature consentante, agrippée par le vampire, neutralisée ou entravée. Réussite : 8 (1d6 + 5) dégâts perforants plus 10 (3d6) dégâts nécrotiques. Les pv maximums de la cible sont réduits d’un montant égal aux dégâts nécrotiques subis, et le vampire récupère autant de pv. La réduction persiste jusqu’à ce que la cible termine un repos long. La cible meurt si cet effet réduit ses pv maximums à 0. Un humanoïde tué de cette façon puis enterré se relève la nuit suivante en tant que vampirien sous le contrôle du vampire."
+    },
+    {
+      "name": "Charme",
+      "description": "Le vampire cible un humanoïde qu’il voit dans un rayon de 9 m. Si la cible voit le vampire, elle doit réussir un JS Sagesse DD 21 sous peine d’être magiquement charmée par le vampire. La cible charmée considère le vampire comme un ami qui mérite sa considération et sa protection. Bien qu’elle ne soit pas sous son contrôle, elle considère ses requêtes et ses actes sous le jour le plus favorable possible, et consent à être la cible de son attaque de morsure.\nChaque fois que le vampire ou l’un de ses compagnons nuit à la cible d’une façon ou d’une autre, elle peut réitérer le jet de sauvegarde et met un terme à l’effet sur elle-même en cas de réussite. Sinon, l’effet persiste pendant 24 heures ou jusqu’à ce que le vampire soit détruit, se retrouve sur un plan d’existence différent de celui de la cible ou y mette un terme au prix d’une action bonus."
+    },
+    {
+      "name": "Enfants de la nuit (1/jour)",
+      "description": "Le vampire appelle magiquement 2d6 nuées de chauves-souris ou de rats à condition que le soleil ne soit pas levé. Lorsqu’il se trouve à l’extérieur, il peut appeler 3d6 loups enragés à la place. Les créatures arrivent au bout de 1d4 rounds, se comportent comme les alliés du vampire et obéissent à ses ordres. Elles restent 1 heure, sauf si le vampire meurt avant ou qu’il les congédie au prix d’une action bonus."
+    }
+  ],
   "reactions": [],
-  "legendary_actions": [],
+  "legendary_actions": [
+    {
+      "name": "Attaque à mains nues",
+      "description": "Kentigern effectue une attaque à mains nues."
+    },
+    {
+      "name": "Attaque à l’épée",
+      "description": "Kentigern effectue une attaque à l’épée."
+    },
+    {
+      "name": "Déplacement",
+      "description": "Kentigern se déplace jusqu’à sa VD sans provoquer d’attaque d’opportunité."
+    },
+    {
+      "name": "Assaut compulsif (coûte 2 actions ; 3/jour)",
+      "description": "Kentigern lance le sort assaut compulsif avec un DD 19."
+    },
+    {
+      "name": "Morsure (coûte 2 actions)",
+      "description": "Kentigern effectue une attaque de morsure."
+    },
+    {
+      "name": "Terreur (coûte 3 actions ; 1/jour)",
+      "description": "Kentigern lance le sort terreur avec un DD 19, sans composante matérielle."
+    },
+    {
+      "name": "Tyrannie (coûte 3 actions ; 1/jour)",
+      "description": "Kentigern lance le sort tyrannie avec un DD 19, sans composante matérielle."
+    }
+  ],
   "description": "À l’heure actuelle, dans les Drakenbergen, Kentigern est assurément le vampire le plus célèbre et le plus dangereux. Il se pourrait même qu’il soit l’entité la plus terrible de toute la région, alliant une puissance immense à une ruse acérée et à des plans dépassant l’entendement de la plupart des mortels.\n\nEn -151 du calendrier républicain de la Cité Franche, Kentigern de Gleannceò hérita d’un petit royaume des Drakenbergen. Guerrier, chasseur, diplomate et stratège talentueux, il était déterminé à étendre l’emprise de son domaine, rêvant de créer un véritable empire."
 }

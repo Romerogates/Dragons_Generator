@@ -43,9 +43,56 @@
   "languages": "céleste, diabolique, originel, sylvestre",
   "challenge_rating": "16",
   "xp": 15000,
-  "traits": [],
-  "actions": [],
+  "traits": [
+    {
+      "name": "Armes brûlantes",
+      "description": "Quand Tssikrreta touche avec une arme de corps à corps en métal, elle inflige 7 (2d6) dégâts de feu supplémentaires (inclus dans l’attaque)."
+    },
+    {
+      "name": "Corps brûlant",
+      "description": "Une créature qui entre en contact avec Tssikrreta ou qui la touche avec une attaque de corps à corps alors qu’elle se situe dans un rayon de 1,50 m subit 10 (3d6) dégâts de feu."
+    },
+    {
+      "name": "Résistance légendaire (3/jour)",
+      "description": "Si Tssikrreta rate un jet de sauvegarde, elle peut décider de le réussir tout de même."
+    },
+    {
+      "name": "Sorts",
+      "description": "Tssikrreta est un lanceur de sorts de niveau 18. Sa caractéristique magique est la Sagesse (DD de sauvegarde des sorts : 17, +9 pour toucher avec ses attaques de sort). Tssikrreta a préparé les sorts de druide suivants :\nSorts mineurs (à volonté) : assistance divine, flammes, jet empoisonné, résistance\n1ᵉʳ niveau (4 emplacements) : détection de la magie, lueur féerique, soin, vague de tonnerre\n2ᵉ niveau (3 emplacements) : bourrasque, immobilisation de personne, métal brûlant, restauration partielle, sphère de feu\n3ᵉ niveau (3 emplacements) : dissipation de la magie, marche sur l’onde, protection contre l’énergie\n4ᵉ niveau (3 emplacements) : invocation d’élémentaires mineurs, liberté de mouvement, mur de feu\n5ᵉ niveau (3 emplacements) : assoupissement, restauration suprême, soins de groupe\n6ᵉ niveau (1 emplacement) : rayon de soleil\n7ᵉ niveau (1 emplacement) : changement de plan\n8ᵉ niveau (1 emplacement) : explosion de lumière\n9ᵉ niveau (1 emplacement) : prémonition"
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attaques multiples",
+      "description": "Tssikrreta effectue deux attaques : une de masse d’armes et une de queue."
+    },
+    {
+      "name": "Masse d’armes",
+      "description": "Attaque d’arme de corps à corps : +7 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (2d6) dégâts contondants, plus 7 (2d6) dégâts de feu."
+    },
+    {
+      "name": "Queue",
+      "description": "Attaque d’arme de corps à corps : +7 pour toucher, allonge 3 m, une cible. Réussite : 11 (2d6 + 2) dégâts contondants plus 7 (2d6) dégâts de feu, et la cible est agrippée (DD 15 pour s’extraire). Tant que la lutte persiste, la cible est entravée et Tssikrreta peut la toucher automatiquement avec sa queue, mais elle ne peut plus effectuer d’attaques de queue contre d’autres cibles."
+    }
+  ],
   "reactions": [],
-  "legendary_actions": [],
+  "legendary_actions": [
+    {
+      "name": "Attaque de queue",
+      "description": "Tssikrreta effectue une attaque de queue."
+    },
+    {
+      "name": "Halo ardent",
+      "description": "Toute créature dans un rayon de 3 m de Tssikrreta doit effectuer un JS Dextérité DD 15 ou subir 9 (2d8) dégâts de feu, la moitié en cas de réussite."
+    },
+    {
+      "name": "Sort mineur",
+      "description": "Tssikrreta lance un sort mineur."
+    },
+    {
+      "name": "Incandescence insoutenable (coûte 2 actions)",
+      "description": "Tssikrreta désigne une créature dans un rayon de 18 m qu’elle peut voir. Si la cible peut voir Tssikrreta, elle doit réussir un JS Constitution DD 17 ou être aveuglée jusqu’au début du prochain tour de Tssikrreta."
+    }
+  ],
   "description": "Élémentaires brûlants à la silhouette serpentine flamboyante, exprimant dans leurs mouvements à la fois force et grâce, les **salamandres** sont nostalgiques des temps anciens. Autrefois, elles prospéraient dans le brasier primordial de la Fournaise. Si les **éfrits** étaient présents, ils étaient surtout occupés par leurs guerres avec les **djinns** et ne contestaient pas la suprématie du peuple embrasé. Hélas, après l’événement funeste parfois appelé la Chute du Paradis, les **diables** investirent en masse la Fournaise et en firent l’enfer abominable qu’elle est désormais. Des **salamandres** s’accommodèrent de ce nouveau rapport de force et se soumirent, demeurant dans les profondeurs avec leurs nouveaux maîtres. Les autres combattirent et durent soit se dissimuler, soit fuir leur plan d’origine. Ces dernières se réfugièrent pour beaucoup sur Eana, dans les volcans. Il y avait là cependant beaucoup d’autres créatures liées au feu et bien peu d’espace pour s’épanouir."
 }

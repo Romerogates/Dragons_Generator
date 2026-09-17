@@ -43,8 +43,26 @@
   "languages": "commun, druidique, sylvestre, originel",
   "challenge_rating": "8",
   "xp": 3900,
-  "traits": [],
-  "actions": [],
+  "traits": [
+    {
+      "name": "Esprit solide",
+      "description": "Le haut chamane bénéficie d’un avantage aux jets de sauvegarde visant à résister à la folie, aux états charmé et effrayé, et à tout effet menaçant de dominer ou posséder son esprit, ou d’y semer le trouble (comme le sort confusion)."
+    },
+    {
+      "name": "Change-forme",
+      "description": "Au prix d’une action, le haut chamane se métamorphose magiquement en son animal totem (une bête de FP 3 ou inférieur), ou recouvre sa véritable forme. Il la retrouve aussi s’il tombe à 0 pv. L’équipement qu’il porte ou transporte est absorbé ou porté lui aussi par la nouvelle forme (à sa convenance). Sous sa nouvelle forme, le haut chamane conserve son alignement, ses pv, ses dés de vie, sa faculté de parole, ses maîtrises, ses valeurs d’Intelligence, de Sagesse et de Charisme, ainsi que sa capacité à utiliser cette aptitude. En dehors de ces éléments, ses caractéristiques et capacités sont remplacées par celles de sa nouvelle forme."
+    },
+    {
+      "name": "Sorts",
+      "description": "Le haut chamane est un lanceur de sorts de niveau 11. Sa caractéristique magique est la Sagesse (DD de sauvegarde des sorts : 15, +7 pour toucher avec ses attaques de sort). Le chamane a préparé les sorts de druide suivants :\nSorts mineurs (à volonté) : art druidique, assistance divine, flammes, gourdin magique\n1ᵉʳ niveau (4 emplacements) : enchevêtrement, soins, vague de tonnerre\n2ᵉ niveau (3 emplacements) : bourrasque, restauration partielle, sphère de feu\n3ᵉ niveau (3 emplacements) : dissipation de la magie, protection contre l’énergie, régression sauvage\n4ᵉ niveau (3 emplacements) : invocation de fées mineures, métamorphose, peau de pierre\n5ᵉ niveau (2 emplacements) : restauration suprême, voyage par les arbres\n6ᵉ niveau (1 emplacement) : rayon de soleil"
+    }
+  ],
+  "actions": [
+    {
+      "name": "Bâton",
+      "description": "Attaque d’arme de corps à corps : +3 pour toucher (+7 pour toucher avec gourdin magique), allonge 1,50 m, une cible. Réussite : 3 (1d6) dégâts contondants, 4 (1d8) dégâts contondants si utilisé à deux mains, ou 8 (1d8 + 4) dégâts contondants avec gourdin magique."
+    }
+  ],
   "reactions": [],
   "legendary_actions": [],
   "description": "Itelgini est un puissant ulkan qui a été formé dès l’enfance à écouter les esprits. Que l’on ait la forme d’un humanoïde, d’une bête, d’une plante, d’une source ou d’un rocher, la nature véritable de l’être est toujours celle d’un fragment d’Eana. Sa foi est profonde, mais il a déjà vu à l’œuvre les vilenies des sunsutaas. Il connait la corruption des puissants des rivages de la mer de Nulim. Il a vu les drogues détournées de leur usage traditionnel, ne servant plus à ouvrir l’esprit à l’immensité, mais à le fermer dans un cocon toxique. La détermination d’Itelgini est sans faille. Il prend son temps pour prendre des décisions, mais une fois qu’elles sont prises, il ne renonce jamais, peu importe les épreuves et les remises en question."
