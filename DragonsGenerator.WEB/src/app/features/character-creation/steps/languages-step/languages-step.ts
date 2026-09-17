@@ -15,6 +15,7 @@ import { CharacterBuilderService } from '@core/services/character-builder.servic
 import type { Language } from '@core/models/Languages/language';
 import type { CharacterClass } from '@core/models/CharacterClasses/character-class';
 import { subclassBonusProficiencies } from '@core/utils/progression-choices.util';
+import { labelForGameId, registerGameLabels } from '@core/utils/game-id-labels';
 
 const CLASS_GRANTED_LANGUAGES: Record<string, string> = {
   'cls-druide': 'Langue des druides',
@@ -54,7 +55,7 @@ export class LanguagesStep implements OnInit {
     if (!ids.length) return [];
     const idToName = new Map<string, string>();
     this.allLanguages().forEach((l) => idToName.set(l.id, l.name));
-    return ids.map((id) => idToName.get(id) ?? id).filter(Boolean);
+    return ids.map((id) => idToName.get(id) ?? labelForGameId(id)).filter(Boolean);
   });
 
   readonly lockedLanguages = computed<string[]>(() => {
@@ -249,8 +250,9 @@ export class LanguagesStep implements OnInit {
   private normalizeLanguageIds(langs: Language[]): void {
     const idToName = new Map<string, string>();
     langs.forEach((l) => idToName.set(l.id, l.name));
+    registerGameLabels(langs.map((l) => [l.id, l.name] as const));
 
-    const resolve = (s: string) => idToName.get(s) ?? s;
+    const resolve = (s: string) => idToName.get(s) ?? labelForGameId(s);
     const c = this.builder.creation();
 
     const newSpeciesLangs = c.speciesLanguages.map(resolve);

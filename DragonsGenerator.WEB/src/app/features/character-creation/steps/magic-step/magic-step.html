@@ -812,7 +812,7 @@
             ></div>
           </div>
           <p class="text-center text-[11px] text-slate-400 mb-6 max-w-xl mx-auto italic">
-            Choisissez parmi les sorts déjà dans votre grimoire. Maîtrise = à volonté · Attitrés =
+            Choisissez parmi les sorts déjà dans votre liste. Maîtrise = à volonté · Attitrés =
             toujours préparés (1× / repos court ou long chacun).
           </p>
 
@@ -828,7 +828,7 @@
                   </div>
                   @if (preparedSpellsOfLevel(lvl).length === 0) {
                     <p class="text-[11px] text-amber-500/80">
-                      Ajoutez d’abord un sort de niveau {{ lvl }} dans votre grimoire ci-dessus.
+                      Ajoutez d’abord un sort de niveau {{ lvl }} dans votre liste ci-dessus.
                     </p>
                   } @else {
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 magic-spell-grid">
@@ -865,7 +865,7 @@
               </p>
               @if (preparedSpellsOfLevel(3).length === 0) {
                 <p class="text-[11px] text-amber-500/80">
-                  Ajoutez d’abord des sorts de niveau 3 dans votre grimoire.
+                  Ajoutez d’abord des sorts de niveau 3 dans votre liste.
                 </p>
               } @else {
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 magic-spell-grid">

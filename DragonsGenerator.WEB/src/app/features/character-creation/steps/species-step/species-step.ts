@@ -31,6 +31,16 @@ import {
   speciesResistancesFromTraits,
   speciesTraitBonusProficiencies,
 } from '@core/utils/species-proficiencies.util';
+import { labelForGameId } from '@core/utils/game-id-labels';
+import { resistanceLabel } from '@core/utils/equipment-display.util';
+
+const BREATH_SHAPE_FR: Record<string, string> = {
+  cone: 'Cône',
+  line: 'Ligne',
+  ligne: 'Ligne',
+  sphere: 'Sphère',
+  sphère: 'Sphère',
+};
 
 interface CardOption {
   id: string;
@@ -251,7 +261,11 @@ export class SpeciesStep implements OnInit {
           stats: picked.has(opt.id)
             ? '✓ Sélectionné'
             : opt.damageType
-              ? `${opt.damageType}${opt.areaShape ? ` · ${opt.areaShape} ${opt.areaLengthM}m` : ''}`
+              ? `${resistanceLabel(opt.damageType)}${
+                  opt.areaShape
+                    ? ` · ${BREATH_SHAPE_FR[opt.areaShape.toLowerCase()] ?? opt.areaShape} ${opt.areaLengthM} m`
+                    : ''
+                }`
               : opt.note,
           icon: this.iconForChoiceOption(choice, opt.id),
           badge: picked.has(opt.id) ? 'OK' : '—',
@@ -935,12 +949,14 @@ export class SpeciesStep implements OnInit {
 
   /** Résout un id de langue (`lg-demoniaque`) en son nom affichable via le catalogue, avec repli sur le slug. */
   private languageDisplayName(id: string): string {
-    return this.languageIdToName().get(id) ?? this.prettyOptionId(id);
+    return this.languageIdToName().get(id) ?? labelForGameId(id);
   }
 
   private prettyOptionId(id: string): string {
     const ability = apiCodeToAbilityKey(id);
     if (ability) return ABILITY_KEY_TO_LABEL[ability];
+    const labeled = labelForGameId(id);
+    if (labeled && labeled !== id) return labeled;
     return id
       .replace(/^(tl|lg|drag|gen)-/, '')
       .replace(/-/g, ' ')

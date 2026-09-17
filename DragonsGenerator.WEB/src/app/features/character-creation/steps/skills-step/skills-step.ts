@@ -307,6 +307,7 @@ export class SkillsStep implements OnInit {
 
   toggleSecondaryClassSkill(skillId: string): void {
     const id = normalizeSkillId(skillId);
+    if (this.classBlockedBySubclass().has(id)) return;
     const current = this.selectedSecondaryClassSkills().map(normalizeSkillId);
     if (current.includes(id)) {
       this.selectedSecondaryClassSkills.update((arr) => arr.filter((x) => normalizeSkillId(x) !== id));
@@ -318,6 +319,17 @@ export class SkillsStep implements OnInit {
     ) {
       this.selectedSecondaryClassSkills.update((arr) => [...arr, id]);
     }
+  }
+
+  /** Compétence déjà prise ailleurs (classe / historique / espèce / sous-classe) — hors choix secondaire. */
+  isSecondarySkillBlocked(skillId: string): boolean {
+    const id = normalizeSkillId(skillId);
+    return (
+      this.classBlockedBySubclass().has(id) ||
+      this.selectedClassSkills().some((s) => normalizeSkillId(s) === id) ||
+      this.selectedBgSkills().some((s) => normalizeSkillId(s) === id) ||
+      this.selectedSpeciesSkills().some((s) => normalizeSkillId(s) === id)
+    );
   }
 
   /** Bonus fixes (armure/armes/compétences/expertise/outils/langues) accordés par le domaine/sous-classe. */
@@ -1029,16 +1041,24 @@ export class SkillsStep implements OnInit {
     this.expertiseChoices().reduce((sum, c) => sum + (c.count || 0), 0),
   );
 
-  /** Compétences déjà maîtrisées (classe + historique + espèce) pour l'expertise. */
+  /** Compétences déjà maîtrisées (classe + historique + espèce + sous-classe + multiclass) pour l'expertise. */
   readonly expertiseCandidates = computed(() => {
     const map = this.skillMap();
+    const nestedSkills = [...this.subclassSkillChoiceAnswers().values()]
+      .flat()
+      .filter((id) => !id.startsWith('tl-'))
+      .map(normalizeSkillId);
+    const alreadyExpert = new Set(this.subclassFixedExpertise().map(normalizeSkillId));
     const ids = [
       ...this.selectedClassSkills(),
       ...this.selectedBgSkills(),
       ...this.selectedSpeciesSkills(),
       ...this.builder.creation().backgroundSkills,
+      ...this.subclassFixedSkills(),
+      ...this.selectedSecondaryClassSkills(),
+      ...nestedSkills,
     ].map(normalizeSkillId);
-    const unique = [...new Set(ids)].filter(Boolean);
+    const unique = [...new Set(ids)].filter((id) => id && !alreadyExpert.has(id));
     return unique.map((id) => {
       const info = resolveSkillInfo(id, map);
       return {
@@ -1222,7 +1242,12 @@ export class SkillsStep implements OnInit {
     return (
       this.selectedClassSkills().some((s) => normalizeSkillId(s) === id) ||
       this.selectedBgSkills().some((s) => normalizeSkillId(s) === id) ||
-      this.selectedSpeciesSkills().some((s) => normalizeSkillId(s) === id)
+      this.selectedSpeciesSkills().some((s) => normalizeSkillId(s) === id) ||
+      this.selectedSecondaryClassSkills().some((s) => normalizeSkillId(s) === id) ||
+      this.classBlockedBySubclass().has(id) ||
+      [...this.subclassSkillChoiceAnswers().values()]
+        .flat()
+        .some((s) => !s.startsWith('tl-') && normalizeSkillId(s) === id)
     );
   }
   getSelectedConcreteToolLabel(category: string | null, fallback: string): string {
@@ -1237,9 +1262,14 @@ export class SkillsStep implements OnInit {
     const abilityKey = this.abilityLabelToKey(info.ability);
     if (!abilityKey) return '+0';
 
+    const id = normalizeSkillId(skillId);
+    const proficient = this.isSkillSelected(id);
+    const expert =
+      this.selectedExpertise().some((s) => normalizeSkillId(s) === id) ||
+      this.subclassFixedExpertise().some((s) => normalizeSkillId(s) === id);
+
     const mod = this.builder.abilityModifiers()[abilityKey] ?? 0;
-    const prof = this.isSkillSelected(skillId) ? 2 : 0;
-    const total = mod + prof;
+    const total = mod + (proficient ? 2 : 0) + (expert ? 2 : 0);
     return total >= 0 ? `+${total}` : `${total}`;
   }
 

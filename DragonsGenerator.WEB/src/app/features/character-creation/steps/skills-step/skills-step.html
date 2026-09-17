@@ -52,7 +52,7 @@
             "
             [attr.title]="
               classBlockedBySubclass().has(skill.id)
-                ? 'Déjà accordée par votre domaine / sous-classe'
+                ? 'Déjà accordée par votre sous-classe'
                 : null
             "
             (click)="toggleClassSkill(skill.id)"
@@ -60,7 +60,7 @@
             <iconify-icon [icon]="skill.icon"></iconify-icon>
             {{ skill.label }}
             @if (classBlockedBySubclass().has(skill.id)) {
-              <span class="text-[9px] uppercase tracking-widest text-emerald-500/80">Domaine</span>
+              <span class="text-[9px] uppercase tracking-widest text-emerald-500/80">Sous-classe</span>
             } @else {
               <span
                 class="text-[10px] ml-1 px-1.5 rounded transition-colors"
@@ -92,7 +92,8 @@
           </span>
         </div>
         <p class="text-xs text-slate-500 mb-5">
-          Compétence(s) supplémentaire(s) accordée(s) par vos classes de multiclassage (maîtrises réduites, RAW).
+          Compétence(s) supplémentaire(s) accordée(s) par vos classes de multiclassage (maîtrises
+          réduites).
         </p>
 
         <div class="flex flex-wrap gap-3">
@@ -102,11 +103,20 @@
               [ngClass]="
                 selectedSecondaryClassSkills().includes(skill.id)
                   ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
-                  : secondaryClassSkillsRemaining() === 0
-                    ? 'bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed opacity-40'
-                    : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
+                  : isSecondarySkillBlocked(skill.id)
+                    ? 'bg-emerald-950/30 border-emerald-800/50 text-emerald-400/50 cursor-not-allowed'
+                    : secondaryClassSkillsRemaining() === 0
+                      ? 'bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed opacity-40'
+                      : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 cursor-pointer'
               "
-              [disabled]="!selectedSecondaryClassSkills().includes(skill.id) && secondaryClassSkillsRemaining() === 0"
+              [disabled]="
+                (!selectedSecondaryClassSkills().includes(skill.id) &&
+                  secondaryClassSkillsRemaining() === 0) ||
+                isSecondarySkillBlocked(skill.id)
+              "
+              [attr.title]="
+                isSecondarySkillBlocked(skill.id) ? 'Déjà accordée ailleurs' : null
+              "
               (click)="toggleSecondaryClassSkill(skill.id)"
             >
               <iconify-icon [icon]="skill.icon"></iconify-icon>
@@ -123,7 +133,7 @@
           class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2 mb-2"
         >
           <iconify-icon icon="fluent-emoji:crystal-ball"></iconify-icon> Accordées par votre
-          domaine / sous-classe
+          sous-classe
         </h4>
         <p class="text-xs text-slate-500 mb-5">
           Automatiques — ne comptent pas dans vos choix de classe. L’expertise double le bonus de
@@ -140,8 +150,8 @@
               "
               [attr.title]="
                 chip.expertise
-                  ? 'Maîtrise + expertise (domaine) — non modifiable'
-                  : 'Maîtrise accordée par votre domaine — non modifiable'
+                  ? 'Maîtrise + expertise (sous-classe) — non modifiable'
+                  : 'Maîtrise accordée par votre sous-classe — non modifiable'
               "
             >
               <span class="text-[10px]" [class.text-amber-500]="chip.expertise" [class.text-slate-500]="!chip.expertise">

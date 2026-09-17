@@ -58,7 +58,7 @@
                     <span class="text-emerald-500"> +{{ getRacialBonus(ability.key) }} race</span>
                   }
                   @if (getAsiBonus(ability.key)) {
-                    <span class="text-sky-400"> +{{ getAsiBonus(ability.key) }} ASI</span>
+                    <span class="text-sky-400"> +{{ getAsiBonus(ability.key) }} paliers</span>
                   }
                   (Coût: {{ getCost(getBaseScore(ability.key)) }})
                 </span>
@@ -611,7 +611,7 @@
 
             @if (!asiComplete()) {
               <p class="text-[10px] text-amber-500/80 font-bold uppercase tracking-wider">
-                Complétez tous les paliers ASI pour continuer
+                Complétez tous les paliers de caractéristiques pour continuer
               </p>
             }
           </div>
@@ -670,7 +670,7 @@
           <p
             class="text-center text-[9px] text-sky-500 uppercase tracking-widest font-bold animate-pulse sm:hidden"
           >
-            Choisissez votre ASI
+            Choisissez votre augmentation
           </p>
         }
       </div>
@@ -683,7 +683,7 @@
         @if (builder.creation().pointsRemaining !== 0) {
           Dépensez tous vos points
         } @else if (needsAsi() && !asiComplete()) {
-          Choisissez votre ASI
+          Choisissez votre augmentation
         } @else {
           Complétez la sélection
         }

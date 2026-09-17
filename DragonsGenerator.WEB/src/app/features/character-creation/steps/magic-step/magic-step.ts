@@ -35,6 +35,7 @@ import {
   spellStatsLine,
   SPELL_SCHOOL_LABELS,
 } from '@core/utils/spell-display.util';
+import { labelForGameId } from '@core/utils/game-id-labels';
 
 // ============================================================================
 // TYPES
@@ -270,7 +271,7 @@ export class MagicStep implements OnInit {
   arcanumPickName(level: number): string {
     const id = this.arcanumPicks()[level];
     if (!id) return '';
-    return this.allSpells().find((s) => s.id === id)?.name ?? id;
+    return this.allSpells().find((s) => s.id === id)?.name ?? labelForGameId(id);
   }
 
   pickArcanum(spellLevel: number, spellId: string): void {
@@ -311,7 +312,7 @@ export class MagicStep implements OnInit {
   masteryPickName(level: number): string {
     const id = this.masteryPicks()[level];
     if (!id) return '';
-    return this.allSpells().find((s) => s.id === id)?.name ?? id;
+    return this.allSpells().find((s) => s.id === id)?.name ?? labelForGameId(id);
   }
 
   readonly bonusSpellsTitle = computed(() => {
@@ -931,7 +932,7 @@ export class MagicStep implements OnInit {
         const raw = allMap.get(id);
         return {
           refId: id,
-          name: raw?.name ?? id,
+          name: raw?.name ?? labelForGameId(id),
           level: 0,
           prepared: true,
           effectSummary: `${grant.label} · ${this.extractEffect(raw)}`,
@@ -945,7 +946,7 @@ export class MagicStep implements OnInit {
         const raw = allMap.get(id);
         return {
           refId: id,
-          name: raw?.name ?? id,
+          name: raw?.name ?? labelForGameId(id),
           level: 0,
           prepared: true,
           effectSummary: this.extractEffect(raw),
@@ -960,7 +961,7 @@ export class MagicStep implements OnInit {
       const isDomain = this.domainSpellIds().includes(id);
       return {
         refId: id,
-        name: raw?.name ?? id,
+        name: raw?.name ?? labelForGameId(id),
         level: raw?.level ?? 1,
         prepared: true,
         alwaysPrepared: isDomain,
@@ -974,7 +975,7 @@ export class MagicStep implements OnInit {
       return {
         spellLevel,
         spellId: spellId ?? '',
-        spellName: raw?.name ?? spellId ?? '',
+        spellName: raw?.name ?? (spellId ? labelForGameId(spellId) : ''),
       };
     }).filter((a) => !!a.spellId);
 
@@ -1000,14 +1001,14 @@ export class MagicStep implements OnInit {
         return {
           spellLevel,
           spellId,
-          spellName: raw?.name ?? spellId,
+          spellName: raw?.name ?? labelForGameId(spellId),
         };
       })
       .filter((x): x is NonNullable<typeof x> => !!x);
 
     const signatureSpells = this.signatureIds().slice(0, 2).map((spellId) => {
       const raw = allMap.get(spellId);
-      return { spellId, spellName: raw?.name ?? spellId };
+      return { spellId, spellName: raw?.name ?? labelForGameId(spellId) };
     });
 
     // Sorts attitrés : toujours préparés
@@ -1030,7 +1031,7 @@ export class MagicStep implements OnInit {
       .filter((g) => (g.level_unlocked ?? 99) <= this.builder.targetLevel())
       .map((g) => ({
         characterLevel: g.level_unlocked ?? 0,
-        spells: (g.spells ?? []).map((id) => allMap.get(id)?.name ?? id),
+        spells: (g.spells ?? []).map((id) => allMap.get(id)?.name ?? labelForGameId(id)),
       }))
       .filter((g) => g.spells.length > 0);
 

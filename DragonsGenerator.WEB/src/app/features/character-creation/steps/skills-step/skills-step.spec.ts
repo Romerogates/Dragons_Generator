@@ -651,4 +651,29 @@ describe('SkillsStep', () => {
     expect(c.expandedBgToolCategory()).toBe('gameSet');
     expect(c.selectedBgTools()).toContain('tl-des');
   });
+
+  it('includes secondary skills in expertise candidates', () => {
+    component.selectedClassSkills.set(['skill-acrobaties']);
+    component.selectedSecondaryClassSkills.set(['skill-perception']);
+    fixture.detectChanges();
+
+    const ids = component.expertiseCandidates().map((c) => c.id);
+    expect(ids).toContain('skill-acrobaties');
+    expect(ids).toContain('skill-perception');
+  });
+
+  it('counts proficiency and expertise once in skill modifier', () => {
+    component.selectedClassSkills.set(['skill-acrobaties']);
+    component.selectedExpertise.set(['skill-acrobaties']);
+    fixture.detectChanges();
+
+    // Acrobaties = Dex (+1) + maîtrise (+2) + expertise (+2) = +5
+    expect(component.getModifierForSkill('skill-acrobaties')).toBe('+5');
+  });
+
+  it('blocks secondary skill already granted by class', () => {
+    component.selectedClassSkills.set(['skill-acrobaties']);
+    expect(component.isSecondarySkillBlocked('skill-acrobaties')).toBeTrue();
+    expect(component.isSecondarySkillBlocked('skill-histoire')).toBeFalse();
+  });
 });

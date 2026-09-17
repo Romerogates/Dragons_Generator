@@ -11,6 +11,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { GameIdLabelsPipe } from '@shared/pipes/game-id-label.pipe';
 import { DataService } from '../../../../../core/services/data.service';
 import {
   CharacterBuilderService,
@@ -43,7 +44,7 @@ interface SecondaryClassRow {
 @Component({
   selector: 'app-multiclass-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, GameIdLabelsPipe],
   templateUrl: './multiclass-panel.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

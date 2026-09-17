@@ -428,7 +428,7 @@ export class ClassStep implements OnInit {
     return pool.pool.map((id) => {
       const feat = details.find((f) => f.id === id);
       const fallback = COMBAT_STYLE_FALLBACK[id];
-      const rawName = feat?.name ?? fallback?.name ?? id;
+      const rawName = feat?.name ?? fallback?.name ?? labelForGameId(id);
       const name = rawName.replace(/^Style de combat\s*:\s*/i, '').trim();
       return {
         id,
@@ -1158,7 +1158,7 @@ export class ClassStep implements OnInit {
                 if (opt) {
                   feat = {
                     id: pickId,
-                    name: opt.name ?? sc.option_labels?.[pickId] ?? pickId,
+                    name: opt.name ?? sc.option_labels?.[pickId] ?? labelForGameId(pickId),
                     desc: opt.description ?? opt.desc ?? '',
                     level: parent.level ?? sc.level_required,
                   };
@@ -1291,7 +1291,7 @@ export class ClassStep implements OnInit {
           const feat = this.resolveOptionFeature(pickId);
           extraFeatures.push({
             refId: pickId,
-            name: feat?.name ?? opt?.name ?? pickId,
+            name: feat?.name ?? opt?.name ?? labelForGameId(pickId),
             desc: feat?.desc ?? opt?.desc ?? '',
             source: 'class',
             sourceDetail: `${cls.name} · ${choice.label}`,
@@ -1305,7 +1305,7 @@ export class ClassStep implements OnInit {
           const feat = this.resolveOptionFeature(fid);
           extraFeatures.push({
             refId: fid,
-            name: feat?.name ?? fid,
+            name: feat?.name ?? labelForGameId(fid),
             desc: feat?.desc ?? '',
             source: 'class',
             sourceDetail: `${cls.name} · ${choice.label}`,
