@@ -416,12 +416,21 @@ export async function seedCollectingInitiativeAs(
 /**
  * Combat phase fight prêt pour le menu Attaquer (allié PNJ en tour 0 + monstre CA/PV).
  * Utiliser avec setSessionModeAs(..., 'in_person') pour des jets encode déterministes.
+ * Passer includePlayer + playerUserId pour placer le joueur en tour 0 (attaque joueur).
  */
 export async function seedFightCombatAs(
   page: Page,
   owner: AuthSession,
   campaignId: string,
-  opts?: { allyName?: string; monsterName?: string; monsterHp?: number; monsterAc?: number },
+  opts?: {
+    allyName?: string;
+    monsterName?: string;
+    monsterHp?: number;
+    monsterAc?: number;
+    includePlayer?: boolean;
+    playerUserId?: string;
+    characterName?: string;
+  },
 ): Promise<{ allyId: string; monsterId: string }> {
   const getRes = await page.request.get(`/api/me/campaigns/${campaignId}`, {
     headers: bearer(owner.token),
@@ -443,8 +452,32 @@ export async function seedFightCombatAs(
   const monsterId = `cb-gob-${Date.now()}`;
   const monsterHp = opts?.monsterHp ?? 7;
   const monsterAc = opts?.monsterAc ?? 12;
-  const combatants: Array<Record<string, unknown>> = [
+  const attacks = [
     {
+      name: 'Épée longue',
+      attackBonus: 5,
+      damageDice: '1d8+3',
+      damageBonus: 3,
+      damageType: 'tranchant',
+    },
+  ];
+
+  const combatants: Array<Record<string, unknown>> = [];
+  if (opts?.includePlayer && opts.playerUserId) {
+    combatants.push({
+      id: allyId,
+      name: opts.characterName ?? 'Héros E2E',
+      kind: 'player',
+      armorClass: 16,
+      maxHp: 20,
+      currentHp: 20,
+      initiativeBonus: 0,
+      initiativeRoll: 20,
+      memberUserId: opts.playerUserId,
+      attacks,
+    });
+  } else {
+    combatants.push({
       id: allyId,
       name: opts?.allyName ?? 'Garde E2E',
       kind: 'npc',
@@ -453,27 +486,19 @@ export async function seedFightCombatAs(
       currentHp: 20,
       initiativeBonus: 0,
       initiativeRoll: 20,
-      attacks: [
-        {
-          name: 'Épée longue',
-          attackBonus: 5,
-          damageDice: '1d8+3',
-          damageBonus: 3,
-          damageType: 'tranchant',
-        },
-      ],
-    },
-    {
-      id: monsterId,
-      name: opts?.monsterName ?? 'Gobelin',
-      kind: 'monster',
-      armorClass: monsterAc,
-      maxHp: monsterHp,
-      currentHp: monsterHp,
-      initiativeBonus: 0,
-      initiativeRoll: 5,
-    },
-  ];
+      attacks,
+    });
+  }
+  combatants.push({
+    id: monsterId,
+    name: opts?.monsterName ?? 'Gobelin',
+    kind: 'monster',
+    armorClass: monsterAc,
+    maxHp: monsterHp,
+    currentHp: monsterHp,
+    initiativeBonus: 0,
+    initiativeRoll: 5,
+  });
 
   const sessions = (campaign.data.sessions ?? []).map((s) =>
     s.id === activeId

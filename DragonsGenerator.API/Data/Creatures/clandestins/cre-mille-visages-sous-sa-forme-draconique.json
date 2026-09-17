@@ -103,7 +103,29 @@
       "description": "Mille visages crache un cône d'énergie étourdissante de 18 m. Chaque créature prise dans cette zone d'effet doit réussir un JS Intelligence DD 19 sous peine d'être **étourdie** durant 1 minute. Une cible peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet en cas de réussite."
     }
   ],
-  "reactions": [],
-  "legendary_actions": [],
+  "reactions": [
+    {
+      "name": "Adaptation instantanée (×3 par repos court ou long)",
+      "description": "Quand Mille visages est ciblé par une attaque d’arme ou de sort, il peut utiliser sa réaction pour renforcer son exosquelette chancreux sur la partie de son corps visée. Il bénéficie d’un bonus de +5 à la CA contre cette attaque."
+    },
+    {
+      "name": "Bond évasif",
+      "description": "Quand Mille visages est ciblé par un effet de zone, il peut jouer sa réaction pour effectuer un saut sans élan, en hauteur ou en longueur. Si son bond la resitue hors de la zone de l’effet, il n’est pas affecté. Le trajet de son saut doit être dégagé, c’est-à-dire dépourvu de créatures ou d’obstacles. Son déplacement suscite les attaques d’opportunité des créatures à portée."
+    }
+  ],
+  "legendary_actions": [
+    {
+      "name": "Attaque de queue",
+      "description": "Mille visages effectue une attaque de queue."
+    },
+    {
+      "name": "Détection",
+      "description": "Mille visages effectue un test de Sagesse (Perception)."
+    },
+    {
+      "name": "Attaque d’ailes (coûte 2 actions)",
+      "description": "Mille visages bat furieusement des ailes. Chaque créature située dans un rayon de 3 m de lui doit réussir un JS Dextérité DD 20 sous peine de subir 14 (2d6 + 7) dégâts contondants et de se retrouver **à terre**. Mille visages peut ensuite voler jusqu’à la moitié de sa VD en vol."
+    }
+  ],
   "description": "Autrefois un honorable **dragon d’agate**, aujourd’hui un monstre corrupteur et patient, **Mille visages** est l’un des plus redoutables périls que la Cité Franche ait aujourd’hui à affronter. Les aventuriers pourraient bien voir en lui d’abord un allié et un soutien, avant de comprendre qu’il est leur pire ennemi."
 }

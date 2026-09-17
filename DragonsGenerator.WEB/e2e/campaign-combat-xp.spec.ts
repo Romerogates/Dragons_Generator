@@ -152,4 +152,55 @@ test.describe('Campagne — combat XP & initiative joueur', () => {
       timeout: 20_000,
     });
   });
+
+  test('/init : Encoder + Envoyer enregistre le jet', async ({ page }) => {
+    test.setTimeout(120_000);
+
+    const owner = await loginSeedSession(page.request);
+    const player = await registerConfirmAndLogin(page.request, 'InitSub');
+    const { campaignId } = await createXpReadyCampaignAs(page, owner, `E2E InitSub ${Date.now()}`);
+    const characterId = await createCharacterAs(page, player, 'Lyra Submit');
+    await invitePlayerToCampaign(page, owner, player, campaignId);
+    await proposeCharacterAs(page, player, campaignId, characterId);
+    await approveCharacterAs(page, owner, campaignId);
+    await startActiveSessionAs(page, owner, campaignId);
+
+    const { code } = await seedCollectingInitiativeAs(page, owner, campaignId, {
+      includePlayer: true,
+      playerUserId: player.user.id,
+      characterName: 'Lyra Submit',
+    });
+
+    await applyAuthSession(page, player, `/campaigns/${campaignId}/init?code=${code}`);
+    await expect(page.getByRole('heading', { name: 'Saisie du jet' })).toBeVisible({
+      timeout: 20_000,
+    });
+
+    await page.locator('input[type="text"]').first().fill(code);
+    const select = page.locator('select');
+    const optionValue = await select.locator('option').filter({ hasText: /Lyra Submit/i }).getAttribute('value');
+    expect(optionValue).toBeTruthy();
+    await select.selectOption(optionValue!);
+
+    await page.getByRole('button', { name: 'Encoder' }).click();
+    await page.locator('input[type="number"]').fill('17');
+    await page.getByRole('button', { name: /Envoyer mon jet|Envoyer/i }).click();
+
+    await expect
+      .poll(
+        async () => {
+          const res = await page.request.get(`/api/me/campaigns/${campaignId}/initiative`, {
+            headers: { Authorization: `Bearer ${player.token}` },
+          });
+          if (!res.ok()) return false;
+          const body = (await res.json()) as {
+            combatants?: Array<{ memberUserId?: string; hasRoll?: boolean; initiativeRoll?: number }>;
+          };
+          const mine = (body.combatants ?? []).find((c) => c.memberUserId === player.user.id);
+          return !!(mine?.hasRoll || mine?.initiativeRoll != null);
+        },
+        { timeout: 20_000 },
+      )
+      .toBe(true);
+  });
 });

@@ -1,11 +1,7 @@
 {
   "json_total": 221,
   "pdf_ca_count": 219,
-  "found_in_pdf": 218,
-  "missing_in_pdf": [
-    "cre-itelgini-haut-chamane (Itelgini (haut chamane))",
-    "cre-mille-visages-sous-sa-forme-draconique (Mille visages sous sa forme draconique)",
-    "cre-synthia-paladine (Synthia (paladine))"
-  ],
+  "found_in_pdf": 221,
+  "missing_in_pdf": [],
   "issues": []
 }

@@ -33,6 +33,12 @@ KNOWN_NO_TRAITS = frozenset(
     }
 )
 
+# Named NPC index entries whose PDF/MD heading is the generic profile title.
+PDF_NAME_ALIASES: dict[str, str] = {
+    "cre-itelgini-haut-chamane": "Haut chamane",
+    "cre-synthia-paladine": "Paladin",
+}
+
 CA_RE = re.compile(r"Classe d[\u2019'´` ]armure\s*(\d+)", re.I)
 HP_RE = re.compile(
     r"Points de vie\s*([^\|]+?)\s*\|\s*Seuil de blessure\s*(\d+|N\.?\s*A\.?)",
@@ -80,14 +86,20 @@ def load_pdf_text() -> str:
     return text
 
 
+def collapse_ws(text: str) -> str:
+    """Collapse all whitespace (incl. PDF line wraps) to single spaces."""
+    return re.sub(r"\s+", " ", normalize_apostrophes(text)).strip()
+
+
 def find_stat_window(pdf_text: str, name: str, armor_class: int, cr: str) -> str | None:
     """Find the stat block window in PDF text for a creature.
 
     Prefer windows where CA appears soon after the name (real stat block),
     so short names (Rat, Squelette…) don’t latch onto TOC / nearby profiles.
+    Whitespace is collapsed so PDF line-wrapped titles still match.
     """
-    pdf_norm = normalize_apostrophes(pdf_text)
-    name_norm = normalize_apostrophes(name)
+    pdf_norm = collapse_ws(pdf_text)
+    name_norm = collapse_ws(name)
     candidates: list[tuple[int, str]] = []
     for match in re.finditer(re.escape(name_norm), pdf_norm, re.I):
         start = match.start()
@@ -130,7 +142,10 @@ def verify_creature(pdf_text: str, creature: dict) -> tuple[bool, list[Issue]]:
     issues: list[Issue] = []
     cid = creature["id"]
     name = creature["name"]
-    window = find_stat_window(pdf_text, name, creature["armor_class"], creature["challenge_rating"])
+    search_name = PDF_NAME_ALIASES.get(cid, name)
+    window = find_stat_window(
+        pdf_text, search_name, creature["armor_class"], creature["challenge_rating"]
+    )
     if not window:
         return False, issues
 

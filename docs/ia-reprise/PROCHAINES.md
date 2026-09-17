@@ -32,6 +32,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 11. ~~Doublons bestiaire~~ **fait** (`cre-231`→`cre-haut-chamane` générique + Itelgini nommé ; `cre-colonie-kheg` supprimé = titre de chapitre, stats = khegon)
 12. ~~Polish Codex restes~~ **fait** (4 sorts vides + bleed étourdissant/restauration ; 33 armes ; OCR 8 créatures ; apprenti/squelette)
 13. ~~Smoke table Codex + verify + bleed UX~~ **fait** (e2e `/play` assassin+gobelin ; `verify_bestiary` recalibré ; bleed lore/actions ; traits Sorts lanceurs)
+14. ~~Variantes nommées + durcissement e2e joueur~~ **fait** (aliases verify Itelgini/Synthia ; whitespace PDF ; réactions/légendaires Mille-visages ; paladin traits ; e2e attaque joueur + `/init` + smoke hub→terminer)
 
 ### Guide (suite)
 1. ~~Découvrabilité + sans checklists~~ **fait**
@@ -41,7 +42,8 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## Déjà livré (ne pas refaire)
 
-- **Smoke table + verify + bleed** (2026-09-17) — e2e `campaign-codex-table` (Maître assassin + Guerrier gobelin) ; `tools/verify_bestiary.py` (fenêtre CA proche du nom, traits entre CA/Actions) → 0 écarts de champs (3 noms absents PDF : Itelgini / Synthia / Mille-visages forme) ; purge bleed OCR actions (~50 fiches) ; traits **Sorts** acolyte/barde/druide/mage/archidruide/garde sacré/sage ulkan.
+- **Variantes + e2e joueur** (2026-09-17) — `verify_bestiary` 221/221 ; Mille-visages réactions + légendaires ; `cre-paladin` Sorts ; e2e `campaign-combat-player-attack`, `/init` submit, `campaign-play-smoke`.
+- **Smoke table + verify + bleed** (2026-09-17) — e2e `campaign-codex-table` (Maître assassin + Guerrier gobelin) ; `tools/verify_bestiary.py` (fenêtre CA proche du nom, traits entre CA/Actions) → 0 écarts de champs ; purge bleed OCR actions (~50 fiches) ; traits **Sorts** acolyte/barde/druide/mage/archidruide/garde sacré/sage ulkan.
 - **Qualité PDF Guide** (2026-09-17) — page de garde « Dragons Generator — Règles débutant » ; sommaire avec liens + signets PDF ; corps 11 pt ; voile parchemin 0.78.
 - **Polish Codex restes** (2026-09-17) — sorts Crampe / Restauration partielle / Mot mortel / Prémonition ; fix bleed Mot étourdissant + Restauration suprême ; 33 descriptions d’armes ; OCR 8 créatures ; Apprenti (Sorts + Int) + Squelette lore/vulns.
 - **Doublons bestiaire** (2026-09-17) — `cre-haut-chamane` (ex-`cre-231`) + Itelgini ; suppression `cre-colonie-kheg` (faux profil OCR).
