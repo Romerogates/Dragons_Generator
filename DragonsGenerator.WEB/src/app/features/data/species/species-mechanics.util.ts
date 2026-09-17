@@ -33,6 +33,10 @@ const SHAPE_LABELS: Record<string, string> = {
 /** Types de choix / clés techniques → libellé FR Codex. */
 const CHOICE_TYPE_LABELS: Record<string, string> = {
   dragon_lineage: 'Lignée draconique',
+  'lignee-draconique': 'Lignée draconique',
+  'choice-lignee-draconique': 'Lignée draconique',
+  'heritage-draconique': 'Héritage draconique',
+  'choice-heritage-draconique': 'Héritage draconique',
   ability_score_increase: 'Amélioration de caractéristiques',
   language: 'Langue',
   skill: 'Compétence',
@@ -404,12 +408,22 @@ function abilityLabel(code: string): string {
 
 function refLabel(id: string): string {
   if (!id) return '—';
-  const choiceType = CHOICE_TYPE_LABELS[id] ?? CHOICE_TYPE_LABELS[id.toLowerCase()];
+  const lower = id.toLowerCase();
+  const choiceType = CHOICE_TYPE_LABELS[id] ?? CHOICE_TYPE_LABELS[lower];
   if (choiceType) return choiceType;
-  if (id.startsWith('choice-')) return humanizeText(id.replace(/^choice-/, ''));
+  if (id.startsWith('choice-')) {
+    const slug = id.slice('choice-'.length);
+    return (
+      CHOICE_TYPE_LABELS[slug] ??
+      CHOICE_TYPE_LABELS[slug.toLowerCase()] ??
+      humanizeText(slug)
+    );
+  }
   if (id.startsWith('spl-')) return humanizeText(id.replace(/^spl-/, ''));
-  if (id.startsWith('skill-') || id.startsWith('ski-')) return humanizeText(id.replace(/^(skill|ski)-/, ''));
-  if (id.startsWith('lg-')) return humanizeText(id.replace(/^lg-/, '')) + ' (langue)';
+  if (id.startsWith('skill-') || id.startsWith('ski-')) {
+    return humanizeText(id.replace(/^(skill|ski)-/, ''));
+  }
+  if (id.startsWith('lg-')) return humanizeText(id.replace(/^lg-/, ''));
   if (id.startsWith('damage-')) return humanizeDamage(id);
   return prettyOptionId(id);
 }
@@ -445,5 +459,8 @@ function humanizeKey(key: string): string {
 
 function humanizeText(text: string): string {
   if (!text) return '—';
-  return text.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  return text
+    .replace(/[_-]+/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+    .trim();
 }

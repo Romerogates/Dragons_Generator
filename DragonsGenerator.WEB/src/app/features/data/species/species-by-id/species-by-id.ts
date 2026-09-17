@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   OnInit,
   signal,
@@ -8,10 +9,13 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { DataService } from '@core/services/data.service';
 import { Species } from '@core/models/Species/species';
 import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
 import { formatApiAsiDisplay } from '@core/utils/ability-mapping';
+import { normalizeLanguageName } from '@core/utils/character-languages.util';
 import { SpeciesMechanicsPanel } from '../species-mechanics-panel/species-mechanics-panel';
 
 @Component({
@@ -29,6 +33,13 @@ export class SpeciesById implements OnInit {
   species = signal<Species | null>(null);
   isLoading = signal<boolean>(true);
   error = signal<string | null>(null);
+  /** Catalogue langues : id → nom affichable. */
+  private readonly languageIdToName = signal<Map<string, string>>(new Map());
+
+  readonly nativeLanguageLabels = computed(() => {
+    const fixed = this.species()?.languages?.fixed ?? [];
+    return fixed.map((id) => this.languageLabel(id));
+  });
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -44,9 +55,15 @@ export class SpeciesById implements OnInit {
     this.isLoading.set(true);
     this.error.set(null);
 
-    this.dataService.getSpeciesById(id).subscribe({
-      next: (donnee: Species) => {
-        this.species.set(donnee);
+    forkJoin({
+      species: this.dataService.getSpeciesById(id),
+      languages: this.dataService.getLanguagesSummary().pipe(catchError(() => of([]))),
+    }).subscribe({
+      next: ({ species, languages }) => {
+        const map = new Map<string, string>();
+        for (const l of languages) map.set(l.id, l.name);
+        this.languageIdToName.set(map);
+        this.species.set(species);
         this.isLoading.set(false);
       },
       error: (erreur) => {
@@ -60,6 +77,10 @@ export class SpeciesById implements OnInit {
   /** Formate les bonus de caractéristiques : { str:2, cha:1 } -> "Force +2, Charisme +1" */
   formatAsi(asi: Record<string, number> | undefined | null): string {
     return formatApiAsiDisplay(asi);
+  }
+
+  languageLabel(idOrName: string): string {
+    return this.languageIdToName().get(idOrName) ?? normalizeLanguageName(idOrName);
   }
 
   hasMeasurements(sp: Species): boolean {

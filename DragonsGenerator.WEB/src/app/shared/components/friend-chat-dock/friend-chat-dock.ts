@@ -209,6 +209,14 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
       });
   }
 
+  /** Ferme le dock puis ouvre /join (évite le panneau au-dessus de la page). */
+  openInviteLink(token: string): void {
+    if (!token) return;
+    this.stopThreadPoll();
+    this.dock.dismissForNavigation();
+    void this.router.navigate(['/join', token]);
+  }
+
   openSharedCharacter(characterId: string, characterName?: string, isMine = false): void {
     if (!characterId || this.openingShared()) return;
     this.openingShared.set(true);
@@ -218,8 +226,14 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
       const character = { ...(res.data as object) } as Character;
       if (res.name) character.name = res.name;
       else if (characterName) character.name = characterName;
-      this.handoff.setCurrent(character, { mode: 'consult', sourceLabel: label });
+      this.handoff.setCurrent(character, {
+        mode: 'consult',
+        sourceLabel: label,
+        returnUrl: '/friends',
+      });
       this.openingShared.set(false);
+      this.stopThreadPoll();
+      this.dock.dismissForNavigation();
       void this.router.navigate(['/character-sheet']);
     };
 

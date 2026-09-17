@@ -925,8 +925,13 @@
                   </div>
                 </div>
                 <p class="text-xs text-slate-500">
-                  Partagez ce lien : les joueurs rejoignent sans être amis. Vous pouvez régénérer ou
-                  désactiver le lien à tout moment.
+                  @if (joinLink()?.enabled) {
+                    Lien actif : les joueurs rejoignent sans être amis. Vous pouvez régénérer ou
+                    désactiver le lien à tout moment.
+                  } @else {
+                    Aucun lien actif — « Copier le lien campagne » en crée un. Les joueurs rejoignent
+                    sans être amis.
+                  }
                 </p>
               </div>
 

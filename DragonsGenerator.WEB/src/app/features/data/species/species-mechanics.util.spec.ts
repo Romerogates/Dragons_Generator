@@ -51,4 +51,25 @@ describe('species-mechanics.util', () => {
       { label: 'Types', value: 'Selon la lignée draconique' },
     ]);
   });
+
+  it('humanizes choice-lignee-draconique and skill hyphen ids', () => {
+    const lineage = buildMechanicsBlocks({
+      type: 'lineage_selection',
+      resolved_by_choice: 'choice-lignee-draconique',
+    });
+    expect(lineage[0]?.rows[0]?.value).toBe('Lignée draconique');
+
+    const ctx = buildMechanicsBlocks({
+      type: 'context_check',
+      skill: 'skill-artefacts-des-anciens',
+      ability: 'int',
+      trigger: 'inspecting_relics',
+    });
+    expect(ctx[0]?.rows.find((r) => r.label === 'Compétence')?.value).toBe('Artefacts Des Anciens');
+  });
+
+  it('prettyOptionId maps lg- language ids without raw prefix', () => {
+    expect(prettyOptionId('lg-commun')).toBe('Commun');
+    expect(prettyOptionId('lg-draconique')).toBe('Draconique');
+  });
 });

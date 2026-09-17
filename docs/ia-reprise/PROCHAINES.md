@@ -36,6 +36,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 15. ~~Codex → table one-click~~ **fait** (CTA fiche créature ; mapper partagé ; sessionStorage dock)
 16. ~~Codex → rencontre + dock e2e + polish post-import~~ **fait** (CTA rencontre ; e2e persist dock ; toast `?added=` ; empty states)
 17. ~~Polish messages + smoke rencontre→combat + frictions soirée~~ **fait** (unread optimiste ; scroll collant ; safe-area ; e2e Lancer le combat ; hint Codex ; FAB session vs chat ; id campagne sans session)
+18. ~~Audit soirée + parcours social~~ **fait** (e2e hub→Codex→table ; dock close on navigate ; Inviter vs Ouvrir ; retour messages ; join guest ; empty lien hub)
 
 ### Guide (suite)
 1. ~~Découvrabilité + sans checklists~~ **fait**
@@ -45,6 +46,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## Déjà livré (ne pas refaire)
 
+- **Audit soirée + parcours social** (2026-09-17) — e2e `campaign-soiree-audit`, `friend-chat-share`, `campaign-join-guest` ; fermeture dock sur join/fiche ; libellés Inviter/Ouvrir ; retour « messages » ; empty lien hub ; hint join « proposer un héros ».
 - **Polish messages + rencontre→combat + frictions** (2026-09-17) — unread immédiat ; scroll thread stickiness ; safe-area headers ; preview « Pièce jointe » ; e2e Codex→rencontre→Lancer le combat ; id campagne mémorisé hors session ; hint fiche sans hub ; FAB session masqué si chat ouvert ; toast `?added=` retry ViewChild.
 - **Codex → rencontre + dock e2e + polish** (2026-09-17) — « Ajouter à une rencontre » (+ picker) ; `appendCreatureToEncounter` ; e2e dock `/play`→Codex ; toast table `?added=` ; empty adversaires/rencontres.
 - **Codex → table one-click** (2026-09-17) — « Ajouter à la table » sur fiche bestiaire ; `combat-creature-import.util` ; dock persiste l’id campagne ; e2e clic gobelin.

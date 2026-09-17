@@ -204,6 +204,10 @@ Avec un 2ᵉ compte membre de la campagne.
   - *E2E :* `friends-invites.spec.ts` (Rejoindre sur `/campaigns`).
 - [x] 🟠 Lien public `/join/{token}` → rejoindre sans amitié → révocation
   - *E2E :* `campaign-join-link.spec.ts`.
+- [x] 🟠 Chat Messages : partage fiche + « Inviter à rejoindre » → `/join`
+  - *E2E :* `friend-chat-share.spec.ts`.
+- [x] 🟠 Preview `/join` invité (login/register) + bannière Bienvenue
+  - *E2E :* `campaign-join-guest.spec.ts`.
 - [x] 🟢 Cas limites : non-ami, doublon, invitation déjà traitée (messages d’erreur OK)
 
 ---

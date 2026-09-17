@@ -193,29 +193,38 @@ export async function revokeJoinLinkAs(
 }
 
 /** Ami → invitation campagne → acceptation (API). */
-export async function invitePlayerToCampaign(
+/** Ami A → B via API (sans invitation campagne). */
+export async function becomeFriendsAs(
   page: Page,
-  owner: AuthSession,
-  player: AuthSession,
-  campaignId: string,
+  a: AuthSession,
+  b: AuthSession,
 ): Promise<void> {
   const friendReq = await page.request.post('/api/me/friends/request', {
-    headers: bearer(owner.token),
-    data: { userId: player.user.id },
+    headers: bearer(a.token),
+    data: { userId: b.user.id },
   });
   expect(friendReq.ok(), `Friend request failed: ${friendReq.status()} ${await friendReq.text()}`).toBeTruthy();
 
   const pendingRes = await page.request.get('/api/me/friends/requests', {
-    headers: bearer(player.token),
+    headers: bearer(b.token),
   });
   expect(pendingRes.ok()).toBeTruthy();
   const pending = (await pendingRes.json()) as Array<{ id: string }>;
   expect(pending.length).toBeGreaterThan(0);
 
   const acceptFriend = await page.request.post(`/api/me/friends/requests/${pending[0].id}/accept`, {
-    headers: bearer(player.token),
+    headers: bearer(b.token),
   });
   expect(acceptFriend.ok(), `Accept friend failed: ${acceptFriend.status()}`).toBeTruthy();
+}
+
+export async function invitePlayerToCampaign(
+  page: Page,
+  owner: AuthSession,
+  player: AuthSession,
+  campaignId: string,
+): Promise<void> {
+  await becomeFriendsAs(page, owner, player);
 
   const inviteRes = await page.request.post(`/api/me/campaigns/${campaignId}/invites`, {
     headers: bearer(owner.token),

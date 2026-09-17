@@ -302,7 +302,7 @@ export class SpeciesStep implements OnInit {
     if (!species) return [];
 
     const langMap = this.languageIdToName();
-    const resolve = (s: string) => langMap.get(s) ?? s;
+    const resolve = (s: string) => langMap.get(s) ?? this.languageDisplayName(s);
 
     // 1. Langues fixes de l'espèce (IDs dans le JSON → résoudre en noms)
     const langs = species.languages.fixed.map(resolve);

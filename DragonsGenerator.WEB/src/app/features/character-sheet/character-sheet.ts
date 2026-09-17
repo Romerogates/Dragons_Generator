@@ -74,6 +74,7 @@ export class CharacterSheet implements OnInit, OnDestroy {
     const url = this.consultReturnUrl();
     if (url?.includes('/play')) return '← Retour à la table';
     if (url?.includes('tab=players')) return '← Retour aux joueurs';
+    if (url?.includes('/friends')) return '← Retour aux messages';
     if (this.consultSourceLabel()) return '← Retour';
     return '← Retour';
   });

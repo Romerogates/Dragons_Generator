@@ -129,6 +129,19 @@ export class FriendChatDockService {
     this.disarmHistory();
   }
 
+  /**
+   * Ferme le dock avant une navigation Angular (fiche, /join…).
+   * N’appelle pas history.back() — sinon la navigation est annulée.
+   */
+  dismissForNavigation(): void {
+    if (!this.isOpen()) {
+      this.historyArmed = false;
+      return;
+    }
+    this.applyClose();
+    this.historyArmed = false;
+  }
+
   setExpanded(expanded: boolean): void {
     if (!this.isOpen()) return;
     this.expanded.set(expanded);

@@ -264,9 +264,10 @@
                                 <p class="text-[10px] mt-1 opacity-70">Consulter (sans appropriation)</p>
                               </button>
                             } @else if (att.kind === 'invite' && att.joinToken) {
-                              <a
-                                [routerLink]="['/join', att.joinToken]"
-                                class="block rounded-xl border border-violet-400/30 bg-black/20 px-3 py-2 hover:bg-black/30 transition-colors"
+                              <button
+                                type="button"
+                                class="block w-full text-left rounded-xl border border-violet-400/30 bg-black/20 px-3 py-2 hover:bg-black/30 transition-colors"
+                                (click)="openInviteLink(att.joinToken!)"
                               >
                                 <p class="text-[10px] font-black uppercase tracking-widest opacity-80">
                                   Invitation campagne
@@ -275,12 +276,13 @@
                                   {{ att.campaignTitle || 'Rejoindre la table' }}
                                 </p>
                                 <p class="text-[10px] mt-1 opacity-70">Ouvrir le lien →</p>
-                              </a>
+                              </button>
                             } @else if (att.kind === 'campaign' && att.campaignId) {
                               <a
                                 [routerLink]="['/campaigns', att.campaignId]"
                                 [queryParams]="{ tab: 'overview' }"
                                 class="block rounded-xl border border-white/10 bg-black/20 px-3 py-2 hover:bg-black/30 transition-colors"
+                                (click)="dock.dismissForNavigation()"
                               >
                                 <p class="text-[10px] font-black uppercase tracking-widest opacity-80">
                                   Campagne partagée
@@ -300,6 +302,7 @@
                                   <a
                                     [routerLink]="['/join', seg.token]"
                                     class="underline underline-offset-2 font-semibold break-all hover:opacity-90"
+                                    (click)="dock.dismissForNavigation()"
                                     >Rejoindre la campagne</a
                                   >
                                 } @else {
@@ -323,7 +326,9 @@
                         </div>
                       </div>
                     } @empty {
-                      <p class="text-center text-slate-500 text-xs italic py-8">Envoyez le premier message</p>
+                      <p class="text-center text-slate-500 text-xs italic py-8 px-4">
+                        Envoyez un message, ou utilisez le trombone pour partager une fiche ou une invitation.
+                      </p>
                     }
                   </div>
 
@@ -332,8 +337,8 @@
                     (ngSubmit)="$event.preventDefault(); send()"
                   >
                     @if (shareMenuOpen()) {
-                      <div class="rounded-xl border border-slate-700 bg-[#141820] p-3 max-h-48 overflow-y-auto">
-                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
+                      <div class="rounded-xl border border-slate-700 bg-[#141820] p-3 max-h-56 overflow-y-auto space-y-2">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
                           Partager
                         </p>
                         @if (shareLoading()) {
@@ -341,37 +346,50 @@
                         } @else {
                           @if (myCharacters().length) {
                             <p class="text-[9px] uppercase text-slate-600 mb-1">Personnages</p>
-                            <div class="flex flex-wrap gap-1 mb-2">
+                            <div class="flex flex-wrap gap-1.5 mb-2">
                               @for (ch of myCharacters(); track ch.id) {
                                 <button
                                   type="button"
-                                  class="px-2 py-1 rounded-lg text-[10px] border border-slate-700 text-slate-300 hover:border-violet-500/50"
+                                  class="min-h-11 px-3 py-2 rounded-lg text-[11px] border border-slate-700 text-slate-300 hover:border-violet-500/50"
                                   (click)="shareCharacter(ch)"
                                 >
                                   {{ ch.name }}
                                 </button>
                               }
                             </div>
+                          } @else {
+                            <p class="text-xs text-slate-500 mb-2">
+                              Aucun héros —
+                              <a
+                                routerLink="/character-creation"
+                                class="underline text-violet-400 hover:text-violet-300"
+                                (click)="dock.dismissForNavigation()"
+                                >Forger un héros</a
+                              >
+                            </p>
                           }
                           @if (myCampaigns().length) {
                             <p class="text-[9px] uppercase text-slate-600 mb-1">Campagnes</p>
+                            <p class="text-[10px] text-slate-600 mb-1.5">
+                              « Ouvrir » = membres · « Inviter » = lien public (pas besoin d’être ami)
+                            </p>
                             <div class="flex flex-col gap-1.5">
                               @for (c of myCampaigns(); track c.id) {
-                                <div class="flex flex-wrap gap-1">
+                                <div class="flex flex-wrap gap-1.5">
                                   <button
                                     type="button"
-                                    class="px-2 py-1 rounded-lg text-[10px] border border-slate-700 text-slate-300 hover:border-sky-500/50"
+                                    class="min-h-11 px-3 py-2 rounded-lg text-[11px] border border-slate-700 text-slate-300 hover:border-sky-500/50"
                                     (click)="shareCampaign(c)"
                                   >
-                                    {{ c.title }}
+                                    Ouvrir · {{ c.title }}
                                   </button>
                                   @if (c.role === 'dm') {
                                     <button
                                       type="button"
-                                      class="px-2 py-1 rounded-lg text-[10px] border border-violet-700/50 text-violet-300 hover:border-violet-400/60"
+                                      class="min-h-11 px-3 py-2 rounded-lg text-[11px] border border-violet-700/50 text-violet-300 hover:border-violet-400/60"
                                       (click)="shareCampaignInvite(c)"
                                     >
-                                      Lien invitation
+                                      Inviter à rejoindre
                                     </button>
                                   }
                                 </div>
