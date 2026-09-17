@@ -33,6 +33,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 12. ~~Polish Codex restes~~ **fait** (4 sorts vides + bleed étourdissant/restauration ; 33 armes ; OCR 8 créatures ; apprenti/squelette)
 13. ~~Smoke table Codex + verify + bleed UX~~ **fait** (e2e `/play` assassin+gobelin ; `verify_bestiary` recalibré ; bleed lore/actions ; traits Sorts lanceurs)
 14. ~~Variantes nommées + durcissement e2e joueur~~ **fait** (aliases verify Itelgini/Synthia ; whitespace PDF ; réactions/légendaires Mille-visages ; paladin traits ; e2e attaque joueur + `/init` + smoke hub→terminer)
+15. ~~Codex → table one-click~~ **fait** (CTA fiche créature ; mapper partagé ; sessionStorage dock)
 
 ### Guide (suite)
 1. ~~Découvrabilité + sans checklists~~ **fait**
@@ -42,6 +43,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## Déjà livré (ne pas refaire)
 
+- **Codex → table one-click** (2026-09-17) — « Ajouter à la table » sur fiche bestiaire ; `combat-creature-import.util` ; dock persiste l’id campagne ; e2e clic gobelin.
 - **Variantes + e2e joueur** (2026-09-17) — `verify_bestiary` 221/221 ; Mille-visages réactions + légendaires ; `cre-paladin` Sorts ; e2e `campaign-combat-player-attack`, `/init` submit, `campaign-play-smoke`.
 - **Smoke table + verify + bleed** (2026-09-17) — e2e `campaign-codex-table` (Maître assassin + Guerrier gobelin) ; `tools/verify_bestiary.py` (fenêtre CA proche du nom, traits entre CA/Actions) → 0 écarts de champs ; purge bleed OCR actions (~50 fiches) ; traits **Sorts** acolyte/barde/druide/mage/archidruide/garde sacré/sage ulkan.
 - **Qualité PDF Guide** (2026-09-17) — page de garde « Dragons Generator — Règles débutant » ; sommaire avec liens + signets PDF ; corps 11 pt ; voile parchemin 0.78.
