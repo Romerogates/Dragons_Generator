@@ -39,7 +39,7 @@
             [ngClass]="
               selectedClassSkills().includes(skill.id)
                 ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md scale-105'
-                : selectedBgSkills().includes(skill.id)
+                : selectedBgSkills().includes(skill.id) || classBlockedBySubclass().has(skill.id)
                   ? 'bg-emerald-950/30 border-emerald-800/50 text-emerald-400/50 cursor-not-allowed'
                   : classSkillsRemaining() === 0
                     ? 'bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed opacity-40'
@@ -47,22 +47,32 @@
             "
             [disabled]="
               (!selectedClassSkills().includes(skill.id) && classSkillsRemaining() === 0) ||
-              selectedBgSkills().includes(skill.id)
+              selectedBgSkills().includes(skill.id) ||
+              classBlockedBySubclass().has(skill.id)
+            "
+            [attr.title]="
+              classBlockedBySubclass().has(skill.id)
+                ? 'Déjà accordée par votre domaine / sous-classe'
+                : null
             "
             (click)="toggleClassSkill(skill.id)"
           >
             <iconify-icon [icon]="skill.icon"></iconify-icon>
             {{ skill.label }}
-            <span
-              class="text-[10px] ml-1 px-1.5 rounded transition-colors"
-              [ngClass]="
-                selectedClassSkills().includes(skill.id)
-                  ? 'bg-emerald-600 text-emerald-950'
-                  : 'bg-slate-800 text-slate-400'
-              "
-            >
-              {{ getModifierForSkill(skill.id) }}
-            </span>
+            @if (classBlockedBySubclass().has(skill.id)) {
+              <span class="text-[9px] uppercase tracking-widest text-emerald-500/80">Domaine</span>
+            } @else {
+              <span
+                class="text-[10px] ml-1 px-1.5 rounded transition-colors"
+                [ngClass]="
+                  selectedClassSkills().includes(skill.id)
+                    ? 'bg-emerald-600 text-emerald-950'
+                    : 'bg-slate-800 text-slate-400'
+                "
+              >
+                {{ getModifierForSkill(skill.id) }}
+              </span>
+            }
           </button>
         }
       </div>
@@ -107,39 +117,49 @@
       </div>
     }
 
-    @if (subclassFixedSkills().length > 0 || subclassFixedExpertise().length > 0) {
+    @if (subclassGrantedSkillChips().length > 0) {
       <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
         <h4
-          class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2 mb-5"
+          class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2 mb-2"
         >
           <iconify-icon icon="fluent-emoji:crystal-ball"></iconify-icon> Accordées par votre
           domaine / sous-classe
         </h4>
+        <p class="text-xs text-slate-500 mb-5">
+          Automatiques — ne comptent pas dans vos choix de classe. L’expertise double le bonus de
+          maîtrise.
+        </p>
         <div class="flex flex-wrap gap-2">
-          @for (id of subclassFixedSkills(); track id) {
+          @for (chip of subclassGrantedSkillChips(); track chip.id) {
             <span
-              class="px-3 py-2 rounded-xl border border-slate-600/80 bg-slate-900/70 text-slate-300 text-sm font-bold flex items-center gap-2 cursor-default"
-              title="Accordée par votre domaine — non modifiable"
+              class="px-3 py-2 rounded-xl border text-sm font-bold flex items-center gap-2 cursor-default"
+              [ngClass]="
+                chip.expertise
+                  ? 'border-amber-700/60 bg-amber-950/30 text-amber-300'
+                  : 'border-slate-600/80 bg-slate-900/70 text-slate-300'
+              "
+              [attr.title]="
+                chip.expertise
+                  ? 'Maîtrise + expertise (domaine) — non modifiable'
+                  : 'Maîtrise accordée par votre domaine — non modifiable'
+              "
             >
-              <span class="text-[10px] text-slate-500">🔒</span>
-              {{ prettifySkill(id) }}
-              <span
-                class="text-[9px] ml-0.5 px-1.5 rounded bg-slate-800 text-slate-400">
-                {{ getModifierForSkill(id) }}
+              <span class="text-[10px]" [class.text-amber-500]="chip.expertise" [class.text-slate-500]="!chip.expertise">
+                {{ chip.expertise ? '⭐' : '🔒' }}
               </span>
-            </span>
-          }
-          @for (id of subclassFixedExpertise(); track id) {
-            <span
-              class="px-3 py-2 rounded-xl border border-amber-700/60 bg-amber-950/30 text-amber-300 text-sm font-bold flex items-center gap-2 cursor-default"
-              title="Expertise accordée par votre domaine — non modifiable"
-            >
-              <span class="text-[10px] text-amber-500">⭐</span>
-              {{ prettifySkill(id) }}
+              {{ prettifySkill(chip.id) }}
               <span
-                class="text-[9px] uppercase tracking-widest text-amber-500 border border-amber-700/60 rounded px-1.5 py-0.5"
-                >Expertise</span
+                class="text-[9px] ml-0.5 px-1.5 rounded"
+                [ngClass]="chip.expertise ? 'bg-amber-900/40 text-amber-400' : 'bg-slate-800 text-slate-400'"
               >
+                {{ getModifierForSkill(chip.id) }}
+              </span>
+              @if (chip.expertise) {
+                <span
+                  class="text-[9px] uppercase tracking-widest text-amber-500 border border-amber-700/60 rounded px-1.5 py-0.5"
+                  >Expertise</span
+                >
+              }
             </span>
           }
         </div>

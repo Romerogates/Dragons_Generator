@@ -248,8 +248,33 @@ export class SkillsStep implements OnInit {
     Math.max(0, this.classSkillChooseCount() - this.selectedClassSkills().length),
   );
 
+  /** Compétences déjà accordées (domaine / sous-classe) — hors choix de classe. */
+  readonly classBlockedBySubclass = computed(() => {
+    const blocked = new Set<string>();
+    for (const id of this.subclassFixedSkills()) blocked.add(normalizeSkillId(id));
+    // Expertise domaine implique déjà la maîtrise.
+    for (const id of this.subclassFixedExpertise()) blocked.add(normalizeSkillId(id));
+    return blocked;
+  });
+
+  /** Une pastille par compétence domaine : maîtrise seule, ou maîtrise + expertise. */
+  readonly subclassGrantedSkillChips = computed(() => {
+    const skills = this.subclassFixedSkills().map(normalizeSkillId);
+    const expertise = new Set(this.subclassFixedExpertise().map(normalizeSkillId));
+    const chips = skills.map((id) => ({
+      id,
+      expertise: expertise.has(id),
+    }));
+    // Expertise sans ligne skills[] (rare) : afficher quand même.
+    for (const id of expertise) {
+      if (!skills.includes(id)) chips.push({ id, expertise: true });
+    }
+    return chips;
+  });
+
   toggleClassSkill(skillId: string): void {
     const id = normalizeSkillId(skillId);
+    if (this.classBlockedBySubclass().has(id)) return;
     const current = this.selectedClassSkills().map(normalizeSkillId);
     if (current.includes(id)) {
       this.selectedClassSkills.update((arr) => arr.filter((x) => normalizeSkillId(x) !== id));
@@ -434,12 +459,13 @@ export class SkillsStep implements OnInit {
     return list.filter((s) => !fixed.has(normalizeSkillId(s.id)));
   });
 
-  /** Compétences déjà maîtrisées hors historique (classe / espèce / multiclass). */
+  /** Compétences déjà maîtrisées hors historique (classe / espèce / multiclass / domaine). */
   readonly bgBlockedByOtherSources = computed(() => {
     const blocked = new Set<string>();
     for (const id of this.selectedClassSkills()) blocked.add(normalizeSkillId(id));
     for (const id of this.selectedSecondaryClassSkills()) blocked.add(normalizeSkillId(id));
     for (const id of this.selectedSpeciesSkills()) blocked.add(normalizeSkillId(id));
+    for (const id of this.classBlockedBySubclass()) blocked.add(id);
     return blocked;
   });
 
