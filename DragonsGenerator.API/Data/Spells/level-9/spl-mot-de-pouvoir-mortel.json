@@ -32,5 +32,6 @@
     "cls-magicien",
     "cls-sorcier"
   ],
-  "modular_options": []
+  "modular_options": [],
+  "description": "Vous murmurez un mot de pouvoir capable de tuer instantanément une créature que vous voyez à portée. Si la créature choisie a un nombre de points de vie égal ou inférieur à 100, elle meurt. Dans le cas contraire, le sort n’a aucun effet."
 }

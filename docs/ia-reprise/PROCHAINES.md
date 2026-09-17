@@ -28,15 +28,21 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 7. ~~Bestiaire suite + Livre de base~~ **fait** (lore stubs → source ; Roublard/Yatagans ; ceste/propulseur ; kits gear + index ; grimoire dédoublonné)
 8. ~~Polish Codex OCR restant~~ **fait** (bleed actions ; renames Logo/Icon ; index 211→219 ; stubs OCR hors index)
 9. ~~Blocs combat créatures indexées vides~~ **fait** (17 fiches traits/actions depuis Dragons_3)
+10. ~~Stubs OCR identifiés~~ **fait** (`cre-152`→élan enragé ; `cre-adulte` doublon blanc adulte ; khegon remplie + index)
+11. ~~Doublons bestiaire~~ **fait** (`cre-231`→`cre-haut-chamane` générique + Itelgini nommé ; `cre-colonie-kheg` supprimé = titre de chapitre, stats = khegon)
+12. ~~Polish Codex restes~~ **fait** (4 sorts vides + bleed étourdissant/restauration ; 33 armes ; OCR 8 créatures ; apprenti/squelette)
 
 ### Guide (suite)
 1. ~~Découvrabilité + sans checklists~~ **fait**
 2. ~~One-shot 1 feuille + schéma initiative + libellés fiche~~ **fait**
 3. ~~Polish campagne P1 (copy setup, empty states, badges notifs)~~ **fait**
-4. Qualité PDF print — **basse prio** (Anthony imprime peu)
+4. Qualité PDF print — ~~fait~~ (2026-09-17 : couverture, sommaire cliquable + outline, typo A4, parchemin ~78 %)
 
 ## Déjà livré (ne pas refaire)
 
+- **Qualité PDF Guide** (2026-09-17) — page de garde « Dragons Generator — Règles débutant » ; sommaire avec liens + signets PDF ; corps 11 pt ; voile parchemin 0.78.
+- **Polish Codex restes** (2026-09-17) — sorts Crampe / Restauration partielle / Mot mortel / Prémonition ; fix bleed Mot étourdissant + Restauration suprême ; 33 descriptions d’armes ; OCR 8 créatures ; Apprenti (Sorts + Int) + Squelette lore/vulns.
+- **Doublons bestiaire** (2026-09-17) — `cre-haut-chamane` (ex-`cre-231`) + Itelgini ; suppression `cre-colonie-kheg` (faux profil OCR).
 - **Blocs combat bestiaire** (2026-09-17) — 17 créatures indexées (assassin, Synthia, Kentigern, dragon cuivre, gobelins…) : traits/actions/réactions/légendaires depuis Dragons_3.
 - **Polish Codex OCR** (2026-09-16) — bleed actions (ours, süiri, orc, gorgone, familier kaani) ; renames Synthia/Itelgini/Maître assassin/araignée sauteuse ; index créatures 219 ; stubs OCR hors index.
 - **Bestiaire stubs + Livre de base** (2026-09-16) — lore créatures depuis Dragons_3 (stubs OCR honnêtes pour IDs cassés) ; flavor Roublard ; Yatagans ; ceste/propulseur spéciaux ; 19 objets de kits + index équipements ; grimoire unique `it-grimoire` ; matériels de jeu.

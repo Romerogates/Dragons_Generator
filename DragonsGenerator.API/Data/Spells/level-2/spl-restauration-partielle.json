@@ -33,5 +33,12 @@
     "cls-pretre",
     "cls-rodeur"
   ],
-  "modular_options": []
+  "modular_options": [
+    {
+      "name": "Chancre",
+      "description": "Le sort restauration partielle peut réprimer les effets négatifs dus au Chancre pendant 2 heures. Quand il est lancé avec un emplacement de sort de niveau supérieur, la durée augmente de 1 heure par niveau d’emplacement au-dessus du 2e. Lancé avant de dormir avec un emplacement de 8e niveau, il protège un individu de l’influence du Chancre pour la durée d’un repos long."
+    }
+  ],
+  "description": "Vous touchez une créature et mettez fin à une maladie ou un état préjudiciable l’affectant. L’état préjudiciable en question peut être assourdi, aveuglé, empoisonné ou paralysé.",
+  "higher_levels": null
 }

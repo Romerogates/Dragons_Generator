@@ -80,6 +80,19 @@
     }
   ],
   "reactions": [],
-  "legendary_actions": [],
+  "legendary_actions": [
+    {
+      "name": "Détection",
+      "description": "Le dragon effectue un test de Sagesse (Perception)."
+    },
+    {
+      "name": "Attaque de queue",
+      "description": "Le dragon effectue une attaque de queue."
+    },
+    {
+      "name": "Attaque d'ailes (coûte 2 actions)",
+      "description": "Le dragon bat furieusement des ailes. Chaque créature située dans un rayon de 3 m du dragon doit réussir un JS Dextérité DD 19 sous peine de subir 13 (2d6 + 6) dégâts contondants et de se retrouver à terre. Le dragon peut ensuite voler jusqu'à la moitié de sa VD en vol."
+    }
+  ],
   "description": "Après l’apprentissage et les expériences de la jeunesse, la personnalité du dragon blanc s’affirme. Beaucoup demeurent toutefois des prédateurs brutaux. Les ressources alimentaires limitées peuvent d’ailleurs les pousser à s’entretuer, voire à chasser les plus jeunes membres de leur espèce pour les dévorer. À la suite de rencontres fortuites, certains dragons blancs décident de devenir les seigneurs de communautés isolées. Quelques-uns s’impliquent dans des luttes d’influence ou des plans majeurs. D’autres deviennent les terrifiantes montures de héros assez rusés ou charismatiques pour apaiser ou dominer les humeurs d’un dragon blanc adulte. Similairement, longuement asservis et dressés depuis le plus jeune âge, quelques-uns se contentent du rôle de machine de guerre de géants du givre."
 }

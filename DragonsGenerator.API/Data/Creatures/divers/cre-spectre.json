@@ -56,7 +56,7 @@
   "actions": [
     {
       "name": "Absorption de vie",
-      "description": "Attaque de sort au corps à corps : +4 pour toucher, allonge 1,50 m, une créature. Réussite : 10 (3d6) dégâts nécrotiques. La cible doit réussir un JS Constitution DD 10 sous peine de voir ses pv maximums réduits d'un montant égal aux dégâts subis. Cette réduction persiste jusqu'à ce que la victime termine un repos long. La cible meurt si cet effet réduit ses pv maximums à 0.\n310\nIcône de dragon\nIcône de baguette"
+      "description": "Attaque de sort au corps à corps : +4 pour toucher, allonge 1,50 m, une créature. Réussite : 10 (3d6) dégâts nécrotiques. La cible doit réussir un JS Constitution DD 10 sous peine de voir ses pv maximums réduits d'un montant égal aux dégâts subis. Cette réduction persiste jusqu'à ce que la victime termine un repos long. La cible meurt si cet effet réduit ses pv maximums à 0."
     }
   ],
   "reactions": [],

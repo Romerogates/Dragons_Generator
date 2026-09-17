@@ -32,6 +32,6 @@
     "cls-magicien",
     "cls-sorcier"
   ],
-  "description": "Vous prononcez un mot de pouvoir capable de submerger l'esprit d'une créature que vous voyez à portée, qui est alors ébahie. Si la cible a un nombre de points de vie égal ou inférieur à 150, elle est étourdie. Dans le cas contraire, le sort n'a aucun effet. La cible étourdie effectue un JS Constitution à la fin de chacun de ses tours de jeu. En cas de réussite, cet état préjudiciable prend fin. Vous murmurez un mot de pouvoir capable de tuer instantanément une créature que vous voyez à portée. Si la créature choisie a un nombre de points de vie égal ou inférieur à 100, elle meurt. Dans le cas contraire, le sort n'a aucun effet.",
+  "description": "Vous prononcez un mot de pouvoir capable de submerger l’esprit d’une créature que vous voyez à portée, qui est alors ébahie. Si la cible a un nombre de points de vie égal ou inférieur à 150, elle est étourdie. Dans le cas contraire, le sort n’a aucun effet. La cible étourdie effectue un JS Constitution à la fin de chacun de ses tours de jeu. En cas de réussite, cet état préjudiciable prend fin.",
   "modular_options": []
 }

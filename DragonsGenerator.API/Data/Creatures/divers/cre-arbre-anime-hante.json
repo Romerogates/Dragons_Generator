@@ -56,10 +56,10 @@
   "actions": [
     {
       "name": "Coup",
-      "description": "Attaque d'arme de corps à corps : +8 pour toucher, allonge 3 m, une cible. Réussite : 16 (3d6 + 6) dégâts contondants et 3 (1d6) dégâts nécrotiques et l'arbre animé hanté récupère un nombre de pv équivalents aux dégâts nécrotiques infligés.\nLogo\n165"
+      "description": "Attaque d'arme de corps à corps : +8 pour toucher, allonge 3 m, une cible. Réussite : 16 (3d6 + 6) dégâts contondants et 3 (1d6) dégâts nécrotiques et l'arbre animé hanté récupère un nombre de pv équivalents aux dégâts nécrotiques infligés."
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": "Lorsque la proximité avec le Plan Éthéré ou les énergies nécrotiques devient trop longue ou trop forte, les êtres vivants (**plantes** et **bêtes**) se transforment en morts-vivants. Leur aspect devient plus terne, maladif, biscornu, tourmenté ou même vaporeux, comme laissant dans l’air une traînée d’ombre. En contraste avec cette apparence douloureuse, les créatures sont pénétrées d’une vigueur d’outre-tombe extraordinaire.\n\nDans les Drakenbergen, la présence de ruines chargées de magie et l’influence grandissante de Kentigern favorisent l’accroissement du nombre de créatures hantées."
+  "description": "Lorsque la proximité avec le Plan Éthéré ou les énergies nécrotiques devient trop longue ou trop forte, les êtres vivants (**plantes** et **bêtes**) se transforment en morts-vivants. Leur aspect devient plus terne, maladif, biscornu, tourmenté ou même vaporeux, comme laissant dans l’air une traînée d’ombre. En contraste avec cette apparence douloureuse, les créatures sont pénétrées d’une vigueur d’outre-tombe extraordinaire. Dans les Drakenbergen, la présence de ruines chargées de magie et l’influence grandissante de Kentigern favorisent l’accroissement du nombre de créatures hantées."
 }

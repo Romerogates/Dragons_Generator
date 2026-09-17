@@ -31,5 +31,16 @@
     "cls-magicien",
     "cls-sorcier"
   ],
-  "modular_options": []
+  "modular_options": [
+    {
+      "name": "Anticipation",
+      "description": "Vous tendez le doigt vers une difficulté à laquelle vous allez vous confronter lors d’un test de caractéristique contre un élément passif de votre environnement (pistage, escalade, natation, etc.). Lors de votre tour de jeu suivant, vous pouvez lancer 2d10 au lieu de 1d20 pour votre prochain test de caractéristique, pourvu que le sort n’ait pas déjà pris fin."
+    },
+    {
+      "name": "Contourner les abris",
+      "description": "Vous tendez le doigt vers une cible située à portée. Lors de votre tour de jeu suivant, les abris partiels et supérieurs ne confèrent aucun bonus à la CA de la cible contre votre premier jet d’attaque contre elle, pourvu que le sort n’ait pas déjà pris fin."
+    }
+  ],
+  "description": "Désignez une créature que vous voyez à portée. Une fois avant que le sort prenne fin, lorsque la créature ciblée effectue un jet d’attaque, un jet de sauvegarde ou un test de caractéristique alors que vous la voyez, vous pouvez jouer votre réaction pour lancer un d4 et soustraire le résultat du jet en question. Le d4 peut être lancé avant ou après le d20, mais avant que ses effets ne s’appliquent.",
+  "higher_levels": "La puissance de ce sort augmente quand vous atteignez les niveaux 5, 11 et 17. Au niveau 5, l’option Anticipation vous permet de lancer 3d6 ou 2d10 à votre convenance ; au niveau 11, vous pouvez ajouter un bonus d’appoint de +2 quand vous utilisez Anticipation ; au niveau 17, vous pouvez cumuler l’avantage à l’attaque et Contourner les abris."
 }

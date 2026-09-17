@@ -43,7 +43,16 @@
   "languages": "comprend toutes les langues pratiquées de son vivant mais ne peut pas parler",
   "challenge_rating": "1/4",
   "xp": 50,
-  "traits": [],
+  "traits": [
+    {
+      "name": "Vulnérabilités",
+      "description": "Dégâts contondants."
+    },
+    {
+      "name": "Immunités",
+      "description": "Dégâts de poison ; états empoisonné et fatigué."
+    }
+  ],
   "actions": [
     {
       "name": "Épée courte",
@@ -51,10 +60,10 @@
     },
     {
       "name": "Arc court",
-      "description": "Attaque d'arme à distance : +4 pour toucher, portée 24/96 m, une cible. Réussite : 5 (1d6 + 2) dégâts perforants.\n171"
+      "description": "Attaque d'arme à distance : +4 pour toucher, portée 24/96 m, une cible. Réussite : 5 (1d6 + 2) dégâts perforants."
     }
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": "Pour créer de nouveaux squelettes, adaptés aux besoins d’une campagne, il suffit de prendre comme base une créature dotée d’un squelette, qu’il s’agisse d’une **aberration**, d’une **bête**, d’un **humanoïde**, d’une **monstruosité** ou d’un **géant**, voire d’un **dragon**. Adaptez ensuite le profil comme suit :"
+  "description": "Mort-vivant créé par magie, le squelette est un serviteur favori des arcanistes qui veulent être obéis aveuglément. Animer un squelette consiste à happer une âme errante du Plan Éthéré et la soumettre à la volonté du nécromancien : procédure corrompue, le plus souvent via animation des morts. Obéissants mais obtus, les squelettes comprennent les ordres concrets mais ignorent métaphores et nouveauté ; sans instructions applicables, ils restent inertes ou répètent le dernier ordre — et en l’absence d’ordres, ils attaquent par défaut les êtres vivants proches."
 }

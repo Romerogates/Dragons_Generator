@@ -21,7 +21,7 @@
   "components": {
     "v": true,
     "s": true,
-    "m": "(de la poudre de diamant d'une valeur minimale de 100 po"
+    "m": "de la poudre de diamant d’une valeur minimale de 100 po, que le sort détruit"
   },
   "is_ritual": false,
   "is_concentration": false,
@@ -32,6 +32,6 @@
     "cls-pretre",
     "cls-rodeur"
   ],
-  "description": "Vous touchez une créature et mettez fin à une maladie ou un état préjudiciable l'affectant. L'état préjudiciable en question peut être assourdi, aveuglé, empoisonné ou paralysé. Vous inondez une créature que vous touchez d'énergie positive pour la débarrasser d'un effet néfaste. Vous pouvez réduire de 1 le niveau de fatigue de la cible, ou mettre fin à l'un des effets suivants la concernant : Un effet qui a charmé ou pétrifié la cible. Une malédiction, y compris l'affinité de la cible avec un objet magique maudit. Toute diminution affectant une valeur de caractéristique de la cible. Un effet réduisant les points de vie maximums de la cible.",
+  "description": "Vous inondez une créature que vous touchez d’énergie positive pour la débarrasser d’un effet néfaste. Vous pouvez réduire de 1 le niveau de fatigue de la cible, ou mettre fin à l’un des effets suivants la concernant : un effet qui a charmé ou pétrifié la cible ; une malédiction, y compris l’affinité de la cible avec un objet magique maudit ; toute diminution affectant une valeur de caractéristique de la cible ; un effet réduisant les points de vie maximums de la cible.",
   "modular_options": []
 }

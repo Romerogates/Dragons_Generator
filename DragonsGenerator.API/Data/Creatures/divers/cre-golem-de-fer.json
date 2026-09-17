@@ -72,7 +72,7 @@
     },
     {
       "name": "Souffle toxique (recharge 6)",
-      "description": "Le golem crache un cône de gaz toxique de 4,50 m. Chaque créature prise dans cette zone d'effet doit effectuer un JS Constitution DD 19 et subit 45 (10d8) dégâts de poison en cas d'échec, la moitié en cas de réussite.\nicon\nSi vous souhaitez rendre cette créature plus redoutable, vous pouvez utiliser l'option ci-dessous. Dans ce cas, son FP passera de 16 à 17. Notez que ce changement de FP fait passer son bonus de maîtrise de +5 à +6."
+      "description": "Le golem crache un cône de gaz toxique de 4,50 m. Chaque créature prise dans cette zone d'effet doit effectuer un JS Constitution DD 19 et subit 45 (10d8) dégâts de poison en cas d'échec, la moitié en cas de réussite."
     }
   ],
   "reactions": [],

@@ -37,13 +37,18 @@
       "modifier": "+0"
     }
   },
-  "saving_throws": "Cha +4",
-  "skills": "Tromperie +4",
+  "saving_throws": "Int +4",
+  "skills": "Arcanes +4",
   "senses": "Perception passive 11",
   "languages": "trois au choix",
   "challenge_rating": "1/2",
   "xp": 100,
-  "traits": [],
+  "traits": [
+    {
+      "name": "Sorts",
+      "description": "L’apprenti magicien est un lanceur de sorts de niveau 2. Sa caractéristique magique est l’Intelligence (DD de sauvegarde des sorts : 12, +4 pour toucher avec ses attaques de sort). L’apprenti magicien a préparé les sorts de magicien suivants : sorts mineurs (à volonté) : crampe soudaine, prestidigitation, rayon de givre ; 1er niveau (3 emplacements) : bouclier, graisse, repli expéditif, vague de tonnerre."
+    }
+  ],
   "actions": [
     {
       "name": "Dague",

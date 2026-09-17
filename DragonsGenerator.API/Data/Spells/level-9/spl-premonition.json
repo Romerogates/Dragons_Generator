@@ -32,5 +32,6 @@
     "cls-magicien",
     "cls-sorcier"
   ],
-  "modular_options": []
+  "modular_options": [],
+  "description": "Vous touchez une créature consentante et lui conférez une sorte de sixième sens. Pour toute la durée du sort, la cible ne peut pas être surprise et bénéficie d’un avantage aux jets d’attaque, tests de caractéristique et jets de sauvegarde. En outre, les autres créatures subissent un désavantage aux jets d’attaque contre la cible pendant toute la durée du sort.\n\nCe sort prend fin immédiatement si vous le relancez avant son terme."
 }

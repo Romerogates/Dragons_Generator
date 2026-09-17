@@ -11,7 +11,32 @@
   "hit_points": "28 (8d6)",
   "wound_threshold": 7,
   "speed": "6 m, fouissage 3 m",
-  "abilities": {},
+  "abilities": {
+    "str": {
+      "score": 14,
+      "modifier": "+2"
+    },
+    "dex": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "con": {
+      "score": 11,
+      "modifier": "+0"
+    },
+    "int": {
+      "score": 4,
+      "modifier": "-3"
+    },
+    "wis": {
+      "score": 10,
+      "modifier": "+0"
+    },
+    "cha": {
+      "score": 6,
+      "modifier": "-2"
+    }
+  },
   "saving_throws": null,
   "skills": "Perception +2, Survie +2",
   "senses": "vision dans le noir 18 m, perception des vibrations 18 m, Perception passive 12",
@@ -19,7 +44,16 @@
   "challenge_rating": "1/2",
   "xp": 100,
   "traits": [],
-  "actions": [],
+  "actions": [
+    {
+      "name": "Morsure",
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 4 (1d4+2) dégâts tranchants plus 2 (1d4) dégâts d'acide. Si la cible est une créature de taille P ou inférieure, elle est agrippée (DD 12 pour s'extraire). Tant que la lutte persiste, la khegon ne peut mordre que la créature agrippée et bénéficie d'un avantage aux jets d'attaque correspondants."
+    },
+    {
+      "name": "Jet d'acide (recharge 6)",
+      "description": "La khegon crache une ligne d'acide de 6 m de long et de 1,50 m de large, à condition qu'elle ne soit pas en train d'agripper une créature. Chaque créature prise dans la ligne doit effectuer un JS Dextérité DD 10 et subit 7 (2d6) dégâts d'acide en cas d'échec, la moitié en cas de réussite."
+    }
+  ],
   "reactions": [],
   "legendary_actions": [],
   "description": "Les khegs sont surtout connues à travers le monde pour être des ravageurs du Chancre. Il existe pourtant encore quelques variétés non corrompues de ces créatures, et celles qui évoluent au pied d’Askamor en font partie. Leur carapace de chitine, leurs pinces-crocs et leurs six pattes les rapprochent des petits arthropodes dont les khegs sont une version naturelle géante.\n\nAdaptées au volcan, les khegs forment des colonies dont le mode de vie n’est pas sans évoquer les fourmis ou les termites. Elles cultivent des champignons pour se nourrir, façonnent des tunnels à la température et l’humidité aussi constantes qu’agréables, tout en chassant et récoltant à la surface pour compléter leurs réserves. Pour assurer la survie du groupe, les vivres sont transformés en un miellat qui se conserve remarquablement bien et présente de très hautes qualités énergétiques."

@@ -53,7 +53,7 @@ Local : http://localhost:8081 (`docker compose -f docker-compose.local.yml` depu
 
 1. ~~Relire / étoffer contenu IRL~~ **fait**
 2. ~~Guides classe~~ **fait**
-3. **Qualité PDF** (basse prio — Anthony imprime peu)
+3. ~~Qualité PDF~~ **fait** (couverture + sommaire cliquable/signets ; typo A4 ↑ ; parchemin ~78 %)
 4. ~~Découvrabilité~~ **fait**
 5. ~~Checklists retirées~~ **fait**
 6. ~~One-shot 1 feuille + schéma initiative + alignement libellés fiche~~ **fait**

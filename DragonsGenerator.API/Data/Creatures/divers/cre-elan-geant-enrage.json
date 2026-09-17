@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "id": "cre-152",
-  "name": "Entrée OCR 152",
+  "id": "cre-elan-geant-enrage",
+  "name": "Élan géant enragé",
   "category": "divers",
   "part": "Deuxième partie",
   "section": null,
@@ -69,5 +69,5 @@
   ],
   "reactions": [],
   "legendary_actions": [],
-  "description": "Description absente du Bestiaire source (entrée OCR / incomplète)."
+  "description": "D'un herbivore territorial, un élan géant enragé devient un improbable super-prédateur, capable de venir à bout des chasseurs même les plus aguerris. Dans l'éventualité d'une telle calamité, les locaux s'abstiendront de s'aventurer dans les terres de la bête, priant Flore que la menace ne se répande pas jusqu'à eux d'ici à ce qu'elle s'éteigne d'elle-même."
 }

@@ -6,13 +6,13 @@
   ],
   "language": "fr",
   "stats": {
-    "total": 219,
+    "total": 221,
     "by_category": {
-      "clandestins": 26,
       "croyants": 8,
-      "divers": 162,
+      "divers": 164,
+      "soldats": 20,
       "habitants": 3,
-      "soldats": 20
+      "clandestins": 26
     },
     "by_challenge_rating": {
       "0": 19,
@@ -48,292 +48,6 @@
   },
   "creatures": [
     {
-      "id": "cre-assassin",
-      "name": "Assassin",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "8",
-      "xp": 3900,
-      "armor_class": 15,
-      "file": "Creatures/clandestins/cre-assassin.json"
-    },
-    {
-      "id": "cre-bandit",
-      "name": "Bandit",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "1/8",
-      "xp": 25,
-      "armor_class": 12,
-      "file": "Creatures/clandestins/cre-bandit.json"
-    },
-    {
-      "id": "cre-baron-du-crime",
-      "name": "Baron du crime",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "5",
-      "xp": 1800,
-      "armor_class": 16,
-      "file": "Creatures/clandestins/cre-baron-du-crime.json"
-    },
-    {
-      "id": "cre-brute",
-      "name": "Brute",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "1/2",
-      "xp": 100,
-      "armor_class": 11,
-      "file": "Creatures/clandestins/cre-brute.json"
-    },
-    {
-      "id": "cre-chat",
-      "name": "Chat",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "0",
-      "xp": 10,
-      "armor_class": 12,
-      "file": "Creatures/clandestins/cre-chat.json"
-    },
-    {
-      "id": "cre-chef-de-bande",
-      "name": "Chef de bande",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "2",
-      "xp": 450,
-      "armor_class": 15,
-      "file": "Creatures/clandestins/cre-chef-de-bande.json"
-    },
-    {
-      "id": "cre-chef-de-bande-rat-garou",
-      "name": "Chef de bande rat-garou",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "3",
-      "xp": 700,
-      "armor_class": 15,
-      "file": "Creatures/clandestins/cre-chef-de-bande-rat-garou.json"
-    },
-    {
-      "id": "cre-cocatrice",
-      "name": "Cocatrice",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "1/2",
-      "xp": 100,
-      "armor_class": 11,
-      "file": "Creatures/clandestins/cre-cocatrice.json"
-    },
-    {
-      "id": "cre-corbeau",
-      "name": "Corbeau",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "0",
-      "xp": 10,
-      "armor_class": 12,
-      "file": "Creatures/clandestins/cre-corbeau.json"
-    },
-    {
-      "id": "cre-corbeaux-nuee",
-      "name": "Corbeaux - Nuée",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "1/4",
-      "xp": 50,
-      "armor_class": 12,
-      "file": "Creatures/clandestins/cre-corbeaux-nuee.json"
-    },
-    {
-      "id": "cre-doppelganger",
-      "name": "Doppelgänger",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "3",
-      "xp": 700,
-      "armor_class": 14,
-      "file": "Creatures/clandestins/cre-doppelganger.json"
-    },
-    {
-      "id": "cre-dragon-d-agate-adulte",
-      "name": "Dragon d’agate adulte",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "15",
-      "xp": 13000,
-      "armor_class": 19,
-      "file": "Creatures/clandestins/cre-dragon-d-agate-adulte.json"
-    },
-    {
-      "id": "cre-dragon-d-agate-venerable",
-      "name": "Dragon d’agate vénérable",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "22",
-      "xp": 41000,
-      "armor_class": 22,
-      "file": "Creatures/clandestins/cre-dragon-d-agate-venerable.json"
-    },
-    {
-      "id": "cre-dragonnet-d-agate",
-      "name": "Dragonnet d’agate",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "2",
-      "xp": 450,
-      "armor_class": 17,
-      "file": "Creatures/clandestins/cre-dragonnet-d-agate.json"
-    },
-    {
-      "id": "cre-espion",
-      "name": "Espion",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "1",
-      "xp": 200,
-      "armor_class": 12,
-      "file": "Creatures/clandestins/cre-espion.json"
-    },
-    {
-      "id": "cre-ez-galwyn",
-      "name": "Ez’Galwyn",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "5",
-      "xp": 1800,
-      "armor_class": 17,
-      "file": "Creatures/clandestins/cre-ez-galwyn.json"
-    },
-    {
-      "id": "cre-jeune-dragon-d-agate",
-      "name": "Jeune dragon d’agate",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "8",
-      "xp": 3900,
-      "armor_class": 18,
-      "file": "Creatures/clandestins/cre-jeune-dragon-d-agate.json"
-    },
-    {
-      "id": "cre-maitre-assassin",
-      "name": "Maître assassin",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "11",
-      "xp": 7200,
-      "armor_class": 16,
-      "file": "Creatures/clandestins/cre-maitre-assassin.json"
-    },
-    {
-      "id": "cre-meduse",
-      "name": "Méduse",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "6",
-      "xp": 2300,
-      "armor_class": 15,
-      "file": "Creatures/clandestins/cre-meduse.json"
-    },
-    {
-      "id": "cre-mille-visages-sous-forme",
-      "name": "Mille visages sous forme",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "16",
-      "xp": 15000,
-      "armor_class": 20,
-      "file": "Creatures/clandestins/cre-mille-visages-sous-forme.json"
-    },
-    {
-      "id": "cre-mille-visages-sous-sa-forme-draconique",
-      "name": "Mille visages sous sa forme draconique",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "16",
-      "xp": 15000,
-      "armor_class": 22,
-      "file": "Creatures/clandestins/cre-mille-visages-sous-sa-forme-draconique.json"
-    },
-    {
-      "id": "cre-molosse",
-      "name": "Molosse",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "1/8",
-      "xp": 25,
-      "armor_class": 12,
-      "file": "Creatures/clandestins/cre-molosse.json"
-    },
-    {
-      "id": "cre-molosse-feroce",
-      "name": "Molosse féroce",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "1/2",
-      "xp": 100,
-      "armor_class": 12,
-      "file": "Creatures/clandestins/cre-molosse-feroce.json"
-    },
-    {
-      "id": "cre-rat",
-      "name": "Rat",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "0",
-      "xp": 10,
-      "armor_class": 10,
-      "file": "Creatures/clandestins/cre-rat.json"
-    },
-    {
-      "id": "cre-rat-geant",
-      "name": "Rat géant",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "1/8",
-      "xp": 25,
-      "armor_class": 12,
-      "file": "Creatures/clandestins/cre-rat-geant.json"
-    },
-    {
-      "id": "cre-rats-nuee",
-      "name": "Rats - Nuée",
-      "category": "clandestins",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Clandestins",
-      "challenge_rating": "1/4",
-      "xp": 50,
-      "armor_class": 10,
-      "file": "Creatures/clandestins/cre-rats-nuee.json"
-    },
-    {
       "id": "cre-acolyte",
       "name": "Acolyte",
       "category": "croyants",
@@ -354,72 +68,6 @@
       "xp": 25,
       "armor_class": 12,
       "file": "Creatures/croyants/cre-adorateur.json"
-    },
-    {
-      "id": "cre-archipretre",
-      "name": "Archiprêtre",
-      "category": "croyants",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": null,
-      "challenge_rating": "12",
-      "xp": 8400,
-      "armor_class": 17,
-      "file": "Creatures/croyants/cre-archipretre.json"
-    },
-    {
-      "id": "cre-ecclesiastique",
-      "name": "Ecclésiastique",
-      "category": "croyants",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": null,
-      "challenge_rating": "2",
-      "xp": 450,
-      "armor_class": 13,
-      "file": "Creatures/croyants/cre-ecclesiastique.json"
-    },
-    {
-      "id": "cre-fanatique",
-      "name": "Fanatique",
-      "category": "croyants",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": null,
-      "challenge_rating": "2",
-      "xp": 450,
-      "armor_class": 13,
-      "file": "Creatures/croyants/cre-fanatique.json"
-    },
-    {
-      "id": "cre-garde-sacre",
-      "name": "Garde sacré",
-      "category": "croyants",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": null,
-      "challenge_rating": "1/2",
-      "xp": 100,
-      "armor_class": 13,
-      "file": "Creatures/croyants/cre-garde-sacre.json"
-    },
-    {
-      "id": "cre-paladin",
-      "name": "Paladin",
-      "category": "croyants",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": null,
-      "challenge_rating": "8",
-      "xp": 3900,
-      "armor_class": 20,
-      "file": "Creatures/croyants/cre-paladin.json"
-    },
-    {
-      "id": "cre-synthia-paladine",
-      "name": "Synthia (paladine)",
-      "category": "croyants",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": null,
-      "challenge_rating": "8",
-      "xp": 3900,
-      "armor_class": 20,
-      "file": "Creatures/croyants/cre-synthia-paladine.json"
     },
     {
       "id": "cre-aigle",
@@ -499,6 +147,17 @@
       "file": "Creatures/divers/cre-ankheg-cendreuse-d-elite.json"
     },
     {
+      "id": "cre-apprenti-magicien",
+      "name": "Apprenti magicien",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "1/2",
+      "xp": 100,
+      "armor_class": 11,
+      "file": "Creatures/soldats/cre-apprenti-magicien.json"
+    },
+    {
       "id": "cre-araignee",
       "name": "Araignée",
       "category": "divers",
@@ -576,6 +235,50 @@
       "file": "Creatures/divers/cre-archidruide.json"
     },
     {
+      "id": "cre-archimage",
+      "name": "Archimage",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "12",
+      "xp": 8400,
+      "armor_class": 12,
+      "file": "Creatures/soldats/cre-archimage.json"
+    },
+    {
+      "id": "cre-archipretre",
+      "name": "Archiprêtre",
+      "category": "croyants",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": null,
+      "challenge_rating": "12",
+      "xp": 8400,
+      "armor_class": 17,
+      "file": "Creatures/croyants/cre-archipretre.json"
+    },
+    {
+      "id": "cre-aristocrate",
+      "name": "Aristocrate",
+      "category": "habitants",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Habitants",
+      "challenge_rating": "1/8",
+      "xp": 25,
+      "armor_class": 15,
+      "file": "Creatures/habitants/cre-aristocrate.json"
+    },
+    {
+      "id": "cre-armure-animee",
+      "name": "Armure animée",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "1",
+      "xp": 200,
+      "armor_class": 18,
+      "file": "Creatures/soldats/cre-armure-animee.json"
+    },
+    {
       "id": "cre-arpenteur-sauvage",
       "name": "Arpenteur sauvage",
       "category": "divers",
@@ -620,6 +323,17 @@
       "file": "Creatures/divers/cre-assangui.json"
     },
     {
+      "id": "cre-assassin",
+      "name": "Assassin",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "8",
+      "xp": 3900,
+      "armor_class": 15,
+      "file": "Creatures/clandestins/cre-assassin.json"
+    },
+    {
       "id": "cre-azer",
       "name": "Azer",
       "category": "divers",
@@ -629,6 +343,17 @@
       "xp": 450,
       "armor_class": 17,
       "file": "Creatures/divers/cre-azer.json"
+    },
+    {
+      "id": "cre-bandit",
+      "name": "Bandit",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "1/8",
+      "xp": 25,
+      "armor_class": 12,
+      "file": "Creatures/clandestins/cre-bandit.json"
     },
     {
       "id": "cre-bandit-vampirien",
@@ -651,6 +376,28 @@
       "xp": 18000,
       "armor_class": 20,
       "file": "Creatures/divers/cre-bantu-le-calice-de-douleur.json"
+    },
+    {
+      "id": "cre-barde",
+      "name": "Barde",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "4",
+      "xp": 1100,
+      "armor_class": 14,
+      "file": "Creatures/soldats/cre-barde.json"
+    },
+    {
+      "id": "cre-baron-du-crime",
+      "name": "Baron du crime",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "5",
+      "xp": 1800,
+      "armor_class": 16,
+      "file": "Creatures/clandestins/cre-baron-du-crime.json"
     },
     {
       "id": "cre-basilic",
@@ -752,6 +499,17 @@
       "file": "Creatures/divers/cre-bleme.json"
     },
     {
+      "id": "cre-brute",
+      "name": "Brute",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "1/2",
+      "xp": 100,
+      "armor_class": 11,
+      "file": "Creatures/clandestins/cre-brute.json"
+    },
+    {
       "id": "cre-brute-gobelourse",
       "name": "Brute gobelourse",
       "category": "divers",
@@ -818,6 +576,17 @@
       "file": "Creatures/divers/cre-celeste-de-taille-g-neutre.json"
     },
     {
+      "id": "cre-chaine-animee",
+      "name": "Chaîne animée",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "1/8",
+      "xp": 25,
+      "armor_class": 18,
+      "file": "Creatures/soldats/cre-chaine-animee.json"
+    },
+    {
       "id": "cre-chameau",
       "name": "Chameau",
       "category": "divers",
@@ -827,6 +596,28 @@
       "xp": 25,
       "armor_class": 11,
       "file": "Creatures/divers/cre-chameau.json"
+    },
+    {
+      "id": "cre-champion",
+      "name": "Champion",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "12",
+      "xp": 8400,
+      "armor_class": 20,
+      "file": "Creatures/soldats/cre-champion.json"
+    },
+    {
+      "id": "cre-chat",
+      "name": "Chat",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "0",
+      "xp": 10,
+      "armor_class": 12,
+      "file": "Creatures/clandestins/cre-chat.json"
     },
     {
       "id": "cre-chauve-souris",
@@ -862,6 +653,28 @@
       "file": "Creatures/divers/cre-chef-d-escouade-kobold.json"
     },
     {
+      "id": "cre-chef-de-bande",
+      "name": "Chef de bande",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "2",
+      "xp": 450,
+      "armor_class": 15,
+      "file": "Creatures/clandestins/cre-chef-de-bande.json"
+    },
+    {
+      "id": "cre-chef-de-bande-rat-garou",
+      "name": "Chef de bande rat-garou",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "3",
+      "xp": 700,
+      "armor_class": 15,
+      "file": "Creatures/clandestins/cre-chef-de-bande-rat-garou.json"
+    },
+    {
       "id": "cre-cheval-de-selle",
       "name": "Cheval de selle",
       "category": "divers",
@@ -882,6 +695,17 @@
       "xp": 50,
       "armor_class": 10,
       "file": "Creatures/divers/cre-cheval-de-trait.json"
+    },
+    {
+      "id": "cre-chevalier",
+      "name": "Chevalier",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "3",
+      "xp": 700,
+      "armor_class": 18,
+      "file": "Creatures/soldats/cre-chevalier.json"
     },
     {
       "id": "cre-chevalier-vampirien",
@@ -906,15 +730,48 @@
       "file": "Creatures/divers/cre-chevre.json"
     },
     {
-      "id": "cre-colonie-kheg",
-      "name": "Colonie kheg",
-      "category": "divers",
-      "part": "Deuxième partie",
-      "section": null,
+      "id": "cre-cocatrice",
+      "name": "Cocatrice",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
       "challenge_rating": "1/2",
       "xp": 100,
-      "armor_class": 14,
-      "file": "Creatures/divers/cre-colonie-kheg.json"
+      "armor_class": 11,
+      "file": "Creatures/clandestins/cre-cocatrice.json"
+    },
+    {
+      "id": "cre-corbeau",
+      "name": "Corbeau",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "0",
+      "xp": 10,
+      "armor_class": 12,
+      "file": "Creatures/clandestins/cre-corbeau.json"
+    },
+    {
+      "id": "cre-corbeaux-nuee",
+      "name": "Corbeaux - Nuée",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "1/4",
+      "xp": 50,
+      "armor_class": 12,
+      "file": "Creatures/clandestins/cre-corbeaux-nuee.json"
+    },
+    {
+      "id": "cre-cube-gelatineux",
+      "name": "Cube gélatineux",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "2",
+      "xp": 450,
+      "armor_class": 6,
+      "file": "Creatures/soldats/cre-cube-gelatineux.json"
     },
     {
       "id": "cre-delsednae",
@@ -939,6 +796,17 @@
       "file": "Creatures/divers/cre-destrier.json"
     },
     {
+      "id": "cre-doppelganger",
+      "name": "Doppelgänger",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "3",
+      "xp": 700,
+      "armor_class": 14,
+      "file": "Creatures/clandestins/cre-doppelganger.json"
+    },
+    {
       "id": "cre-dragon-blanc-adulte",
       "name": "Dragon blanc adulte",
       "category": "divers",
@@ -959,6 +827,28 @@
       "xp": 25000,
       "armor_class": 20,
       "file": "Creatures/divers/cre-dragon-blanc-venerable.json"
+    },
+    {
+      "id": "cre-dragon-d-agate-adulte",
+      "name": "Dragon d’agate adulte",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "15",
+      "xp": 13000,
+      "armor_class": 19,
+      "file": "Creatures/clandestins/cre-dragon-d-agate-adulte.json"
+    },
+    {
+      "id": "cre-dragon-d-agate-venerable",
+      "name": "Dragon d’agate vénérable",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "22",
+      "xp": 41000,
+      "armor_class": 22,
+      "file": "Creatures/clandestins/cre-dragon-d-agate-venerable.json"
     },
     {
       "id": "cre-dragon-d-argent-adulte",
@@ -1016,6 +906,17 @@
       "file": "Creatures/divers/cre-dragonnet-blanc.json"
     },
     {
+      "id": "cre-dragonnet-d-agate",
+      "name": "Dragonnet d’agate",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "2",
+      "xp": 450,
+      "armor_class": 17,
+      "file": "Creatures/clandestins/cre-dragonnet-d-agate.json"
+    },
+    {
       "id": "cre-dragonnet-d-argent",
       "name": "Dragonnet d’argent",
       "category": "divers",
@@ -1060,6 +961,28 @@
       "file": "Creatures/divers/cre-druide-geant-des-pierres.json"
     },
     {
+      "id": "cre-ecclesiastique",
+      "name": "Ecclésiastique",
+      "category": "croyants",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": null,
+      "challenge_rating": "2",
+      "xp": 450,
+      "armor_class": 13,
+      "file": "Creatures/croyants/cre-ecclesiastique.json"
+    },
+    {
+      "id": "cre-eclaireur",
+      "name": "Éclaireur",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "1/2",
+      "xp": 100,
+      "armor_class": 13,
+      "file": "Creatures/soldats/cre-eclaireur.json"
+    },
+    {
       "id": "cre-elan-geant",
       "name": "Élan géant",
       "category": "divers",
@@ -1071,6 +994,61 @@
       "file": "Creatures/divers/cre-elan-geant.json"
     },
     {
+      "id": "cre-elan-geant-enrage",
+      "name": "Élan géant enragé",
+      "category": "divers",
+      "part": "Deuxième partie",
+      "section": null,
+      "challenge_rating": "3",
+      "xp": 700,
+      "armor_class": 15,
+      "file": "Creatures/divers/cre-elan-geant-enrage.json"
+    },
+    {
+      "id": "cre-epee-volante",
+      "name": "Épée volante",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "1/4",
+      "xp": 50,
+      "armor_class": 17,
+      "file": "Creatures/soldats/cre-epee-volante.json"
+    },
+    {
+      "id": "cre-espion",
+      "name": "Espion",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "1",
+      "xp": 200,
+      "armor_class": 12,
+      "file": "Creatures/clandestins/cre-espion.json"
+    },
+    {
+      "id": "cre-expert",
+      "name": "Expert",
+      "category": "habitants",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Habitants",
+      "challenge_rating": "1/8",
+      "xp": 25,
+      "armor_class": 12,
+      "file": "Creatures/habitants/cre-expert.json"
+    },
+    {
+      "id": "cre-ez-galwyn",
+      "name": "Ez’Galwyn",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "5",
+      "xp": 1800,
+      "armor_class": 17,
+      "file": "Creatures/clandestins/cre-ez-galwyn.json"
+    },
+    {
       "id": "cre-ezen-champion-orc",
       "name": "Ezen champion orc",
       "category": "divers",
@@ -1080,6 +1058,17 @@
       "xp": 11500,
       "armor_class": 20,
       "file": "Creatures/divers/cre-ezen-champion-orc.json"
+    },
+    {
+      "id": "cre-fanatique",
+      "name": "Fanatique",
+      "category": "croyants",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": null,
+      "challenge_rating": "2",
+      "xp": 450,
+      "armor_class": 13,
+      "file": "Creatures/croyants/cre-fanatique.json"
     },
     {
       "id": "cre-fantome",
@@ -1124,6 +1113,28 @@
       "xp": 25,
       "armor_class": 12,
       "file": "Creatures/divers/cre-gadai-le-chacripaon.json"
+    },
+    {
+      "id": "cre-garde",
+      "name": "Garde",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "1/8",
+      "xp": 25,
+      "armor_class": 16,
+      "file": "Creatures/soldats/cre-garde.json"
+    },
+    {
+      "id": "cre-garde-sacre",
+      "name": "Garde sacré",
+      "category": "croyants",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": null,
+      "challenge_rating": "1/2",
+      "xp": 100,
+      "armor_class": 13,
+      "file": "Creatures/croyants/cre-garde-sacre.json"
     },
     {
       "id": "cre-gargouille",
@@ -1179,6 +1190,17 @@
       "xp": 450,
       "armor_class": 12,
       "file": "Creatures/divers/cre-glacanglot.json"
+    },
+    {
+      "id": "cre-gladiateur",
+      "name": "Gladiateur",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "5",
+      "xp": 1800,
+      "armor_class": 16,
+      "file": "Creatures/soldats/cre-gladiateur.json"
     },
     {
       "id": "cre-glashurle",
@@ -1357,6 +1379,17 @@
       "file": "Creatures/divers/cre-guerrier-ulkan.json"
     },
     {
+      "id": "cre-haut-chamane",
+      "name": "Haut chamane",
+      "category": "divers",
+      "part": "Troisième partie Rencontres dans le Grand Kaan",
+      "section": null,
+      "challenge_rating": "8",
+      "xp": 3900,
+      "armor_class": 16,
+      "file": "Creatures/divers/cre-haut-chamane.json"
+    },
+    {
       "id": "cre-hibou-et-chouette",
       "name": "Hibou et chouette",
       "category": "divers",
@@ -1388,6 +1421,17 @@
       "xp": 200,
       "armor_class": 11,
       "file": "Creatures/divers/cre-hippogriffe.json"
+    },
+    {
+      "id": "cre-homoncule",
+      "name": "Homoncule",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "0",
+      "xp": 10,
+      "armor_class": 13,
+      "file": "Creatures/soldats/cre-homoncule.json"
     },
     {
       "id": "cre-ikhworg",
@@ -1445,6 +1489,17 @@
       "file": "Creatures/divers/cre-jeune-dragon-blanc.json"
     },
     {
+      "id": "cre-jeune-dragon-d-agate",
+      "name": "Jeune dragon d’agate",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "8",
+      "xp": 3900,
+      "armor_class": 18,
+      "file": "Creatures/clandestins/cre-jeune-dragon-d-agate.json"
+    },
+    {
       "id": "cre-jeune-dragon-d-argent",
       "name": "Jeune dragon d’argent",
       "category": "divers",
@@ -1489,6 +1544,17 @@
       "file": "Creatures/divers/cre-kentigern-le-seigneur-vampire.json"
     },
     {
+      "id": "cre-khegon-cendreuse",
+      "name": "Khegon cendreuse",
+      "category": "divers",
+      "part": "Deuxième partie",
+      "section": null,
+      "challenge_rating": "1/2",
+      "xp": 100,
+      "armor_class": 14,
+      "file": "Creatures/divers/cre-khegon-cendreuse.json"
+    },
+    {
       "id": "cre-kushu-le-diable-gele",
       "name": "Kûshu, le diable gelé",
       "category": "divers",
@@ -1498,6 +1564,17 @@
       "xp": 11500,
       "armor_class": 18,
       "file": "Creatures/divers/cre-kushu-le-diable-gele.json"
+    },
+    {
+      "id": "cre-la-maison",
+      "name": "La Maison",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "15",
+      "xp": 13000,
+      "armor_class": 20,
+      "file": "Creatures/soldats/cre-la-maison.json"
     },
     {
       "id": "cre-le-destrier-des-marchevents",
@@ -1577,17 +1654,6 @@
       "file": "Creatures/divers/cre-loup-enrage.json"
     },
     {
-      "id": "cre-loup-sanguinaire",
-      "name": "Loup sanguinaire",
-      "category": "divers",
-      "part": "Troisième partie Rencontres dans le Grand Kaan",
-      "section": null,
-      "challenge_rating": "1",
-      "xp": 200,
-      "armor_class": 14,
-      "file": "Creatures/divers/cre-loup-sanguinaire.json"
-    },
-    {
       "id": "cre-loup-garou",
       "name": "Loup-garou",
       "category": "divers",
@@ -1597,6 +1663,17 @@
       "xp": 700,
       "armor_class": 10,
       "file": "Creatures/divers/cre-loup-garou.json"
+    },
+    {
+      "id": "cre-loup-sanguinaire",
+      "name": "Loup sanguinaire",
+      "category": "divers",
+      "part": "Troisième partie Rencontres dans le Grand Kaan",
+      "section": null,
+      "challenge_rating": "1",
+      "xp": 200,
+      "armor_class": 14,
+      "file": "Creatures/divers/cre-loup-sanguinaire.json"
     },
     {
       "id": "cre-lycose-geante",
@@ -1610,6 +1687,17 @@
       "file": "Creatures/divers/cre-lycose-geante.json"
     },
     {
+      "id": "cre-mage",
+      "name": "Mage",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "6",
+      "xp": 2300,
+      "armor_class": 12,
+      "file": "Creatures/soldats/cre-mage.json"
+    },
+    {
       "id": "cre-magmatique",
       "name": "Magmatique",
       "category": "divers",
@@ -1619,6 +1707,28 @@
       "xp": 100,
       "armor_class": 14,
       "file": "Creatures/divers/cre-magmatique.json"
+    },
+    {
+      "id": "cre-maitre-assassin",
+      "name": "Maître assassin",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "11",
+      "xp": 7200,
+      "armor_class": 16,
+      "file": "Creatures/clandestins/cre-maitre-assassin.json"
+    },
+    {
+      "id": "cre-meduse",
+      "name": "Méduse",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "6",
+      "xp": 2300,
+      "armor_class": 15,
+      "file": "Creatures/clandestins/cre-meduse.json"
     },
     {
       "id": "cre-mephite-gele",
@@ -1676,6 +1786,39 @@
       "file": "Creatures/divers/cre-mephite-vaporeux.json"
     },
     {
+      "id": "cre-mille-visages-sous-forme",
+      "name": "Mille visages sous forme",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "16",
+      "xp": 15000,
+      "armor_class": 20,
+      "file": "Creatures/clandestins/cre-mille-visages-sous-forme.json"
+    },
+    {
+      "id": "cre-mille-visages-sous-sa-forme-draconique",
+      "name": "Mille visages sous sa forme draconique",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "16",
+      "xp": 15000,
+      "armor_class": 22,
+      "file": "Creatures/clandestins/cre-mille-visages-sous-sa-forme-draconique.json"
+    },
+    {
+      "id": "cre-mimique",
+      "name": "Mimique",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "2",
+      "xp": 450,
+      "armor_class": 12,
+      "file": "Creatures/soldats/cre-mimique.json"
+    },
+    {
       "id": "cre-minotaure",
       "name": "Minotaure",
       "category": "divers",
@@ -1685,6 +1828,28 @@
       "xp": 700,
       "armor_class": 14,
       "file": "Creatures/divers/cre-minotaure.json"
+    },
+    {
+      "id": "cre-molosse",
+      "name": "Molosse",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "1/8",
+      "xp": 25,
+      "armor_class": 12,
+      "file": "Creatures/clandestins/cre-molosse.json"
+    },
+    {
+      "id": "cre-molosse-feroce",
+      "name": "Molosse féroce",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "1/2",
+      "xp": 100,
+      "armor_class": 12,
+      "file": "Creatures/clandestins/cre-molosse-feroce.json"
     },
     {
       "id": "cre-morhave",
@@ -1720,6 +1885,17 @@
       "file": "Creatures/divers/cre-ours-brun.json"
     },
     {
+      "id": "cre-ours-hibou",
+      "name": "Ours-hibou",
+      "category": "divers",
+      "part": "Deuxième partie",
+      "section": null,
+      "challenge_rating": "3",
+      "xp": 700,
+      "armor_class": 13,
+      "file": "Creatures/divers/cre-ours-hibou.json"
+    },
+    {
       "id": "cre-ours-noir",
       "name": "Ours noir",
       "category": "divers",
@@ -1742,15 +1918,15 @@
       "file": "Creatures/divers/cre-ours-polaire.json"
     },
     {
-      "id": "cre-ours-hibou",
-      "name": "Ours-hibou",
-      "category": "divers",
-      "part": "Deuxième partie",
+      "id": "cre-paladin",
+      "name": "Paladin",
+      "category": "croyants",
+      "part": "Première partie Rencontres dans la Cité Franche",
       "section": null,
-      "challenge_rating": "3",
-      "xp": 700,
-      "armor_class": 13,
-      "file": "Creatures/divers/cre-ours-hibou.json"
+      "challenge_rating": "8",
+      "xp": 3900,
+      "armor_class": 20,
+      "file": "Creatures/croyants/cre-paladin.json"
     },
     {
       "id": "cre-petit-gregaire",
@@ -1786,6 +1962,17 @@
       "file": "Creatures/divers/cre-poney.json"
     },
     {
+      "id": "cre-pseudo-dragon",
+      "name": "Pseudo-dragon",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "1/4",
+      "xp": 50,
+      "armor_class": 13,
+      "file": "Creatures/soldats/cre-pseudo-dragon.json"
+    },
+    {
       "id": "cre-queteuse-gobelours",
       "name": "Quêteuse gobelours",
       "category": "divers",
@@ -1795,6 +1982,39 @@
       "xp": 100,
       "armor_class": 14,
       "file": "Creatures/divers/cre-queteuse-gobelours.json"
+    },
+    {
+      "id": "cre-rat",
+      "name": "Rat",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "0",
+      "xp": 10,
+      "armor_class": 10,
+      "file": "Creatures/clandestins/cre-rat.json"
+    },
+    {
+      "id": "cre-rat-geant",
+      "name": "Rat géant",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "1/8",
+      "xp": 25,
+      "armor_class": 12,
+      "file": "Creatures/clandestins/cre-rat-geant.json"
+    },
+    {
+      "id": "cre-rats-nuee",
+      "name": "Rats - Nuée",
+      "category": "clandestins",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Clandestins",
+      "challenge_rating": "1/4",
+      "xp": 50,
+      "armor_class": 10,
+      "file": "Creatures/clandestins/cre-rats-nuee.json"
     },
     {
       "id": "cre-regikheg-cendreuse",
@@ -1861,6 +2081,17 @@
       "xp": 700,
       "armor_class": 14,
       "file": "Creatures/divers/cre-reprouve.json"
+    },
+    {
+      "id": "cre-roturier",
+      "name": "Roturier",
+      "category": "habitants",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Habitants",
+      "challenge_rating": "0",
+      "xp": 10,
+      "armor_class": 10,
+      "file": "Creatures/habitants/cre-roturier.json"
     },
     {
       "id": "cre-sage-ulkan",
@@ -1938,6 +2169,17 @@
       "xp": 450,
       "armor_class": 12,
       "file": "Creatures/divers/cre-smilodon.json"
+    },
+    {
+      "id": "cre-soldat-d-elite",
+      "name": "Soldat d’élite",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "7",
+      "xp": 2900,
+      "armor_class": 18,
+      "file": "Creatures/soldats/cre-soldat-d-elite.json"
     },
     {
       "id": "cre-soldat-hobgobelin",
@@ -2072,6 +2314,17 @@
       "file": "Creatures/divers/cre-sunsutaajijig.json"
     },
     {
+      "id": "cre-synthia-paladine",
+      "name": "Synthia (paladine)",
+      "category": "croyants",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": null,
+      "challenge_rating": "8",
+      "xp": 3900,
+      "armor_class": 20,
+      "file": "Creatures/croyants/cre-synthia-paladine.json"
+    },
+    {
       "id": "cre-talsednae",
       "name": "Talsednae",
       "category": "divers",
@@ -2081,6 +2334,17 @@
       "xp": 13000,
       "armor_class": 20,
       "file": "Creatures/divers/cre-talsednae.json"
+    },
+    {
+      "id": "cre-tapis-etouffant",
+      "name": "Tapis étouffant",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "2",
+      "xp": 450,
+      "armor_class": 12,
+      "file": "Creatures/soldats/cre-tapis-etouffant.json"
     },
     {
       "id": "cre-tarasque",
@@ -2149,6 +2413,17 @@
       "file": "Creatures/divers/cre-vautour.json"
     },
     {
+      "id": "cre-veteran",
+      "name": "Vétéran",
+      "category": "soldats",
+      "part": "Première partie Rencontres dans la Cité Franche",
+      "section": "Soldats",
+      "challenge_rating": "3",
+      "xp": 700,
+      "armor_class": 17,
+      "file": "Creatures/soldats/cre-veteran.json"
+    },
+    {
       "id": "cre-veteran-azer",
       "name": "Vétéran azer",
       "category": "divers",
@@ -2202,259 +2477,6 @@
       "xp": 450,
       "armor_class": 8,
       "file": "Creatures/divers/cre-zombie-ogre.json"
-    },
-    {
-      "id": "cre-aristocrate",
-      "name": "Aristocrate",
-      "category": "habitants",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Habitants",
-      "challenge_rating": "1/8",
-      "xp": 25,
-      "armor_class": 15,
-      "file": "Creatures/habitants/cre-aristocrate.json"
-    },
-    {
-      "id": "cre-expert",
-      "name": "Expert",
-      "category": "habitants",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Habitants",
-      "challenge_rating": "1/8",
-      "xp": 25,
-      "armor_class": 12,
-      "file": "Creatures/habitants/cre-expert.json"
-    },
-    {
-      "id": "cre-roturier",
-      "name": "Roturier",
-      "category": "habitants",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Habitants",
-      "challenge_rating": "0",
-      "xp": 10,
-      "armor_class": 10,
-      "file": "Creatures/habitants/cre-roturier.json"
-    },
-    {
-      "id": "cre-apprenti-magicien",
-      "name": "Apprenti magicien",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "1/2",
-      "xp": 100,
-      "armor_class": 11,
-      "file": "Creatures/soldats/cre-apprenti-magicien.json"
-    },
-    {
-      "id": "cre-archimage",
-      "name": "Archimage",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "12",
-      "xp": 8400,
-      "armor_class": 12,
-      "file": "Creatures/soldats/cre-archimage.json"
-    },
-    {
-      "id": "cre-armure-animee",
-      "name": "Armure animée",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "1",
-      "xp": 200,
-      "armor_class": 18,
-      "file": "Creatures/soldats/cre-armure-animee.json"
-    },
-    {
-      "id": "cre-barde",
-      "name": "Barde",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "4",
-      "xp": 1100,
-      "armor_class": 14,
-      "file": "Creatures/soldats/cre-barde.json"
-    },
-    {
-      "id": "cre-chaine-animee",
-      "name": "Chaîne animée",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "1/8",
-      "xp": 25,
-      "armor_class": 18,
-      "file": "Creatures/soldats/cre-chaine-animee.json"
-    },
-    {
-      "id": "cre-champion",
-      "name": "Champion",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "12",
-      "xp": 8400,
-      "armor_class": 20,
-      "file": "Creatures/soldats/cre-champion.json"
-    },
-    {
-      "id": "cre-chevalier",
-      "name": "Chevalier",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "3",
-      "xp": 700,
-      "armor_class": 18,
-      "file": "Creatures/soldats/cre-chevalier.json"
-    },
-    {
-      "id": "cre-cube-gelatineux",
-      "name": "Cube gélatineux",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "2",
-      "xp": 450,
-      "armor_class": 6,
-      "file": "Creatures/soldats/cre-cube-gelatineux.json"
-    },
-    {
-      "id": "cre-eclaireur",
-      "name": "Éclaireur",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "1/2",
-      "xp": 100,
-      "armor_class": 13,
-      "file": "Creatures/soldats/cre-eclaireur.json"
-    },
-    {
-      "id": "cre-epee-volante",
-      "name": "Épée volante",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "1/4",
-      "xp": 50,
-      "armor_class": 17,
-      "file": "Creatures/soldats/cre-epee-volante.json"
-    },
-    {
-      "id": "cre-garde",
-      "name": "Garde",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "1/8",
-      "xp": 25,
-      "armor_class": 16,
-      "file": "Creatures/soldats/cre-garde.json"
-    },
-    {
-      "id": "cre-gladiateur",
-      "name": "Gladiateur",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "5",
-      "xp": 1800,
-      "armor_class": 16,
-      "file": "Creatures/soldats/cre-gladiateur.json"
-    },
-    {
-      "id": "cre-homoncule",
-      "name": "Homoncule",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "0",
-      "xp": 10,
-      "armor_class": 13,
-      "file": "Creatures/soldats/cre-homoncule.json"
-    },
-    {
-      "id": "cre-la-maison",
-      "name": "La Maison",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "15",
-      "xp": 13000,
-      "armor_class": 20,
-      "file": "Creatures/soldats/cre-la-maison.json"
-    },
-    {
-      "id": "cre-mage",
-      "name": "Mage",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "6",
-      "xp": 2300,
-      "armor_class": 12,
-      "file": "Creatures/soldats/cre-mage.json"
-    },
-    {
-      "id": "cre-mimique",
-      "name": "Mimique",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "2",
-      "xp": 450,
-      "armor_class": 12,
-      "file": "Creatures/soldats/cre-mimique.json"
-    },
-    {
-      "id": "cre-pseudo-dragon",
-      "name": "Pseudo-dragon",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "1/4",
-      "xp": 50,
-      "armor_class": 13,
-      "file": "Creatures/soldats/cre-pseudo-dragon.json"
-    },
-    {
-      "id": "cre-soldat-d-elite",
-      "name": "Soldat d’élite",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "7",
-      "xp": 2900,
-      "armor_class": 18,
-      "file": "Creatures/soldats/cre-soldat-d-elite.json"
-    },
-    {
-      "id": "cre-tapis-etouffant",
-      "name": "Tapis étouffant",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "2",
-      "xp": 450,
-      "armor_class": 12,
-      "file": "Creatures/soldats/cre-tapis-etouffant.json"
-    },
-    {
-      "id": "cre-veteran",
-      "name": "Vétéran",
-      "category": "soldats",
-      "part": "Première partie Rencontres dans la Cité Franche",
-      "section": "Soldats",
-      "challenge_rating": "3",
-      "xp": 700,
-      "armor_class": 17,
-      "file": "Creatures/soldats/cre-veteran.json"
     }
   ]
 }
