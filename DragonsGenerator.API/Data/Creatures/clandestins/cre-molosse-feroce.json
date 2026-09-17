@@ -52,7 +52,7 @@
   "actions": [
     {
       "name": "Morsure",
-      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 5 (1d6 + 2) dégâts perforants. Si la cible est une créature de taille M ou inférieure, elle doit réussir un JS Force DD 12 sous peine d'être jetée **à terre** et **agrippée** (DD 12 pour se libérer). Tant que molosse féroce maintient une créature **agrippée**, il ne peut plus attaquer une autre cible.\nLes molosses féroces sont des bêtes sélectionnées et entraînées pour la guerre ou pour servir de gardes. En sus de leurs aptitudes, ils sont parfois pourvus de protections analogues à une armure.\n93"
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une cible. Réussite : 5 (1d6 + 2) dégâts perforants. Si la cible est une créature de taille M ou inférieure, elle doit réussir un JS Force DD 12 sous peine d'être jetée **à terre** et **agrippée** (DD 12 pour se libérer)."
     }
   ],
   "reactions": [],

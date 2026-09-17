@@ -59,7 +59,7 @@
     },
     {
       "name": "Souffle invalidant",
-      "description": "Le dragon crache un cône de gaz invalidant de 4,50 m. Chaque créature prise dans cette zone d'effet doit réussir un JS Constitution DD 11 sous peine de ne plus pouvoir jouer de réactions, de voir sa VD réduite de moitié et d'être limitée à une attaque à ses tours de jeu. En cas de sauvegarde ratée, elle ne peut en outre entreprendre à son tour de jeu qu'une action ou une action bonus, mais pas les deux. Ces effets persistent pendant 1 minute. Une créature peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet sur elle-même en cas de réussite.\n259"
+      "description": "Le dragon crache un cône de gaz invalidant de 4,50 m. Chaque créature prise dans cette zone d'effet doit réussir un JS Constitution DD 11 sous peine de ne plus pouvoir jouer de réactions, de voir sa VD réduite de moitié et d'être limitée à une attaque à ses tours de jeu. En cas de sauvegarde ratée, elle ne peut en outre entreprendre à son tour de jeu qu'une action ou une action bonus, mais pas les deux. Ces effets persistent pendant 1 minute. Une créature peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet sur elle-même en cas de réussite."
     }
   ],
   "reactions": [],

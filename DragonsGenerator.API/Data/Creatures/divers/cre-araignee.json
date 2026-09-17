@@ -60,7 +60,7 @@
   "actions": [
     {
       "name": "Morsure",
-      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une créature. Réussite : 1 dégât perforant, et la cible doit réussir un JS Constitution DD 9 sous peine de subir 2 (1d4) dégâts de poison.\n146"
+      "description": "Attaque d'arme de corps à corps : +4 pour toucher, allonge 1,50 m, une créature. Réussite : 1 dégât perforant, et la cible doit réussir un JS Constitution DD 9 sous peine de subir 2 (1d4) dégâts de poison."
     }
   ],
   "reactions": [],

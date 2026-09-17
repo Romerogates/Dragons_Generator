@@ -56,7 +56,7 @@
     },
     {
       "name": "Arc court",
-      "description": "Attaque d'arme à distance : +4 pour toucher, portée 24/96 m, une cible. *Réussite :* 5 (1d6 + 2) dégâts perforants. Ces individus forment le gros des troupes gobelines. Leur stratégie repose sur le surnombre et favorise la guérilla pour déborder et éliminer promptement leurs ennemis. Ils sont particulièrement redoutables s'ils sont convenablement dirigés ou habitués à œuvrer ensemble. 214 Cavalier gobelin"
+      "description": "Attaque d'arme à distance : +4 pour toucher, portée 24/96 m, une cible. *Réussite :* 5 (1d6 + 2) dégâts perforants."
     }
   ],
   "reactions": [],

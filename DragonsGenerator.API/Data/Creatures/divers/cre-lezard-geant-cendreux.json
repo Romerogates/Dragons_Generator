@@ -47,7 +47,7 @@
   "actions": [
     {
       "name": "Morsure",
-      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (1d8 + 3) dégâts perforants.\n135"
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 7 (1d8 + 3) dégâts perforants."
     }
   ],
   "reactions": [],

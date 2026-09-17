@@ -47,7 +47,7 @@
   "actions": [
     {
       "name": "Hachette",
-      "description": "Attaque au corps à corps ou à distance avec une arme : +5 au toucher, allonge 1,50 m ou portée 6/18 m, une cible. Réussite : 10 (2d6 + 3) dégâts tranchants.\nLes guerriers ulkani savent employer leur taille et leur force à bon escient, frappant bien et fort. Face à des créatures qu'ils estiment peu dangereuses, ils se contentent de repousser leurs adversaires dans l'espoir qu'ils auront retenu la leçon.\nSage ulkan"
+      "description": "Attaque au corps à corps ou à distance avec une arme : +5 au toucher, allonge 1,50 m ou portée 6/18 m, une cible. Réussite : 10 (2d6 + 3) dégâts tranchants."
     }
   ],
   "reactions": [],

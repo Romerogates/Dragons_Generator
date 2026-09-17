@@ -60,7 +60,7 @@
     },
     {
       "name": "Souffle pétrifiant (recharge 5-6)",
-      "description": "La gorgone souffle un cône de gaz pétrifiant de 9 m. Chaque créature prise dans la zone d'effet doit effectuer un JS Constitution DD 13. En cas d'échec, la cible commence à se pétrifier et se retrouve **entravée**. Ainsi affectée,\nelle doit réitérer le jet de sauvegarde à la fin de son tour de jeu suivant. En cas de réussite, l'effet prend fin. En cas d'échec, la créature est **pétrifiée** jusqu'à être libérée par le sort restauration suprême ou autre effet magique similaire.\nSi vous souhaitez rendre cette créature plus redoutable, vous pouvez utiliser l'option ci-dessous. Dans ce cas, son FP passera de 5 à 6."
+      "description": "La gorgone souffle un cône de gaz pétrifiant de 9 m. Chaque créature prise dans la zone d'effet doit effectuer un JS Constitution DD 13. En cas d'échec, la cible commence à se pétrifier et se retrouve **entravée**. Ainsi affectée,\nelle doit réitérer le jet de sauvegarde à la fin de son tour de jeu suivant. En cas de réussite, l'effet prend fin."
     }
   ],
   "reactions": [],

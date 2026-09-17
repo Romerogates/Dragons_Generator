@@ -56,7 +56,7 @@
   "actions": [
     {
       "name": "Dague",
-      "description": "Attaque d'arme de corps à corps ou à distance : +4 pour toucher, allonge 1,50 m ou portée 6/18 m, une créature. Réussite : 4 (1d4+2) dégâts perforants.\n21\nAristocrate"
+      "description": "Attaque d'arme de corps à corps ou à distance : +4 pour toucher, allonge 1,50 m ou portée 6/18 m, une créature. Réussite : 4 (1d4+2) dégâts perforants."
     }
   ],
   "reactions": [],

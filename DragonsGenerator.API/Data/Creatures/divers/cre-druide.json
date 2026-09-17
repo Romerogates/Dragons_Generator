@@ -43,7 +43,12 @@
   "languages": "druidique et deux autres au choix",
   "challenge_rating": "2",
   "xp": 450,
-  "traits": [],
+  "traits": [
+    {
+      "name": "Sorts",
+      "description": "Le druide est un lanceur de sorts de niveau 4. Sa caractéristique magique est la Sagesse (DD de sauvegarde des sorts : 12, +4 pour toucher avec ses attaques de sort). Le druide a préparé les sorts de druide suivants : * Sorts mineurs (à volonté) : art druidique, flammes, gourdin magique * 1ᵉʳ niveau (4 emplacements) : communication avec les animaux, enchevêtrement, soins, vague de tonnerre * 2ᵉ niveau (3 emplacements) : messager animal, peau d’écorce"
+    }
+  ],
   "actions": [
     {
       "name": "Bâton",

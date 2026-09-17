@@ -60,7 +60,7 @@
     },
     {
       "name": "Arc composite",
-      "description": "Attaque d'arme à distance : +3 pour toucher, portée 48/150 m, une cible. Réussite : 5 (1d8 + 1) dégâts perforants.\nFormés avec une discipline de fer dans une école mêlant l'enseignement des arcanes et du combat, les arcanistes hobgobelins sont sur le champ de bataille le présage de véritables désolations. Ils neutralisent, perturbent et déciment leurs ennemis, permettant aux guerriers de tailler en pièces des adversaires affaiblis.\n218"
+      "description": "Attaque d'arme à distance : +3 pour toucher, portée 48/150 m, une cible. Réussite : 5 (1d8 + 1) dégâts perforants."
     }
   ],
   "reactions": [],

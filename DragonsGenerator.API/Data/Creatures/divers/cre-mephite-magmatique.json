@@ -64,7 +64,7 @@
     },
     {
       "name": "Souffle enflammé (recharge 6)",
-      "description": "Le méphite crache un cône de feu de 4,50 m. Chaque créature prise dans cette zone d'effet doit effectuer un JS Dextérité DD 11 et subit 7 (2d6) dégâts de feu en cas d'échec, la moitié en cas de réussite.\n139"
+      "description": "Le méphite crache un cône de feu de 4,50 m. Chaque créature prise dans cette zone d'effet doit effectuer un JS Dextérité DD 11 et subit 7 (2d6) dégâts de feu en cas d'échec, la moitié en cas de réussite."
     }
   ],
   "reactions": [],

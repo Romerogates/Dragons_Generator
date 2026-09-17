@@ -43,7 +43,12 @@
   "languages": "quatre au choix",
   "challenge_rating": "4",
   "xp": 1100,
-  "traits": [],
+  "traits": [
+    {
+      "name": "Sorts",
+      "description": "Le barde est un lanceur de sorts de niveau 7. Sa caractéristique magique est le Charisme (DD de sauvegarde des sorts : 13, +5 pour toucher avec ses attaques de sort). Le barde connaît les sorts de barde suivants : * Sorts mineurs (à volonté) : illusion mineure, lumière, sarcasmes venimeux * 1ᵉʳ niveau (4 emplacements) : héroïsme, image silencieuse, mot de guérison, sommeil * 2ᵉ niveau (3 emplacements) : détection de l’invisibilité, fracassement, silence * 3ᵉ niveau (3 emplacements) : dissipation de la magie, image accomplie * 4ᵉ niveau (1 emplacement) : invisibilité suprême"
+    }
+  ],
   "actions": [
     {
       "name": "Rapière",

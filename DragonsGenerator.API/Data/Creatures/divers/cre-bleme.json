@@ -60,7 +60,7 @@
     },
     {
       "name": "Griffes",
-      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 10 (2d6 + 3) dégâts tranchants. Si la cible n'est pas un mort-vivant, elle doit réussir un JS Constitution DD 10 sous peine de se retrouver **paralysée** pendant 1 minute. La cible peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet en cas de réussite.\n163"
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 10 (2d6 + 3) dégâts tranchants. Si la cible n'est pas un mort-vivant, elle doit réussir un JS Constitution DD 10 sous peine de se retrouver **paralysée** pendant 1 minute. La cible peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet en cas de réussite."
     }
   ],
   "reactions": [],

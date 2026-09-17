@@ -52,7 +52,7 @@
   "actions": [
     {
       "name": "Serres",
-      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 1 dégât tranchant.\nAigle\nVautour\nVautour"
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 1 dégât tranchant."
     }
   ],
   "reactions": [],

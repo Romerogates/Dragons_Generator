@@ -43,7 +43,12 @@
   "languages": "une au choix (généralement le commun)",
   "challenge_rating": "1/2",
   "xp": 100,
-  "traits": [],
+  "traits": [
+    {
+      "name": "Sorts",
+      "description": "Le garde sacré est un lanceur de sorts de niveau 2. Sa caractéristique magique est la Sagesse (DD de sauvegarde des sorts : 12, +4 pour toucher avec ses attaques de sort). Le garde sacré a préparé les sorts de prêtre suivants : • Sorts mineurs (à volonté) : *cri de bataille*, *flamme sacrée*, *stabilisation* • 1ᵉʳ niveau (3 emplacements) : *bénédiction*, *bouclier de la foi*, *égide fugace*, *mot de guérison*"
+    }
+  ],
   "actions": [
     {
       "name": "Masse d'armes",

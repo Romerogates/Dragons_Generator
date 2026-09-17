@@ -59,7 +59,7 @@
     },
     {
       "name": "Souffle paralysant",
-      "description": "Le dragon crache un cône de gaz paralysant de 4,50 m. Chaque créature prise dans cette zone d'effet doit réussir un JS Constitution DD 13 sous peine d'être **paralysée** pendant 1 minute. Une créature peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet sur elle-même en cas de réussite.\n102"
+      "description": "Le dragon crache un cône de gaz paralysant de 4,50 m. Chaque créature prise dans cette zone d'effet doit réussir un JS Constitution DD 13 sous peine d'être **paralysée** pendant 1 minute. Une créature peut réitérer le JS à la fin de chacun de ses tours de jeu et met un terme à l'effet sur elle-même en cas de réussite."
     }
   ],
   "reactions": [],

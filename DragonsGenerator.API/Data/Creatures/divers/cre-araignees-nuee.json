@@ -64,7 +64,7 @@
   "actions": [
     {
       "name": "Morsures",
-      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 0 m, une créature occupant l'espace de la nuée. Réussite : 10 (4d4) dégâts perforants ou 5 (2d4) dégâts perforants si les pv actuels de la nuée sont inférieurs ou égaux à la moitié de son maximum. 147 Spider Araignée sauteuse géante Bête de taille M, non aligné * Classe d'armure 14 (armure naturelle) * Points de vie 16 (3d8 + 3) | Seuil de blessure 5 * Vitesse de déplacement 12 m, escalade 9 m | FOR | DEX | CON | INT | SAG | CHA | | ------- | ------- | ------- | ------ | ------- | ------ | | 14 (+2) | 16 (+3) | 13 (+1) | 3 (−4) | 13 (+1) | 4 (−3) | * Compétences Discrétion +7, Perception +5 * Sens perception des vibrations 6 m, vision dans le noir 18 m, Perception passive 15 * Langues — * Facteur de puissance 1/2 (100 PX)"
+      "description": "Attaque d'arme de corps à corps : +3 pour toucher, allonge 0 m, une créature occupant l'espace de la nuée. Réussite : 10 (4d4) dégâts perforants ou 5 (2d4) dégâts perforants si les pv actuels de la nuée sont inférieurs ou égaux à la moitié de son maximum."
     }
   ],
   "reactions": [],

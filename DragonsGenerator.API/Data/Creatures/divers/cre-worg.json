@@ -52,7 +52,7 @@
   "actions": [
     {
       "name": "Morsure",
-      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 10 (2d6 + 3) dégâts perforants. Si la cible est une créature, elle doit réussir un JS Force DD 13 sous peine de se retrouver **à terre**.\nIkhworg"
+      "description": "Attaque d'arme de corps à corps : +5 pour toucher, allonge 1,50 m, une cible. Réussite : 10 (2d6 + 3) dégâts perforants. Si la cible est une créature, elle doit réussir un JS Force DD 13 sous peine de se retrouver **à terre**."
     }
   ],
   "reactions": [],

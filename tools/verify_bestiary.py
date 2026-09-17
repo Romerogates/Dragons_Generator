@@ -18,6 +18,21 @@ INDEX_PATH = ROOT / "DragonsGenerator.API" / "Data" / "index" / "creatures.json"
 DATA_DIR = ROOT / "DragonsGenerator.API" / "Data"
 CACHE_PATH = ROOT / "tools" / ".bestiary_pdf_text.txt"
 
+# Creatures whose PDF window still matches a neighboring "Traits" block
+# but the source profile has none (verified against Dragons_3 MD).
+KNOWN_NO_TRAITS = frozenset(
+    {
+        "cre-guerrier-ulkan",
+        "cre-bandit",
+        "cre-chameau",
+        "cre-cheval-de-selle",
+        "cre-cheval-de-trait",
+        "cre-poney",
+        "cre-renne",
+        "cre-roturier",
+    }
+)
+
 CA_RE = re.compile(r"Classe d[\u2019'´` ]armure\s*(\d+)", re.I)
 HP_RE = re.compile(
     r"Points de vie\s*([^\|]+?)\s*\|\s*Seuil de blessure\s*(\d+|N\.?\s*A\.?)",
@@ -66,22 +81,32 @@ def load_pdf_text() -> str:
 
 
 def find_stat_window(pdf_text: str, name: str, armor_class: int, cr: str) -> str | None:
-    """Find the stat block window in PDF text for a creature."""
+    """Find the stat block window in PDF text for a creature.
+
+    Prefer windows where CA appears soon after the name (real stat block),
+    so short names (Rat, Squelette…) don’t latch onto TOC / nearby profiles.
+    """
     pdf_norm = normalize_apostrophes(pdf_text)
     name_norm = normalize_apostrophes(name)
+    candidates: list[tuple[int, str]] = []
     for match in re.finditer(re.escape(name_norm), pdf_norm, re.I):
         start = match.start()
         window = pdf_norm[start : start + 3000]
-        if not CA_RE.search(window):
+        ca_m = CA_RE.search(window)
+        if not ca_m:
             continue
-        ca = int(CA_RE.search(window).group(1))
+        ca = int(ca_m.group(1))
         if ca != armor_class:
             continue
         fp = FP_RE.search(window)
         if fp and fp.group(1) != cr:
             continue
-        return window
-    return None
+        # Distance name → CA: smaller is better (TOC hits have CA far away)
+        candidates.append((ca_m.start(), window))
+    if not candidates:
+        return None
+    candidates.sort(key=lambda x: x[0])
+    return candidates[0][1]
 
 
 @dataclass
@@ -146,7 +171,12 @@ def verify_creature(pdf_text: str, creature: dict) -> tuple[bool, list[Issue]]:
         if pdf_xp != creature.get("xp", 0):
             issues.append(Issue(cid, name, "xp", str(creature.get("xp")), str(pdf_xp)))
 
-    pdf_abilities = ABILITY_RE.findall(window)
+    # Prefer ability scores after a FOR/DEX/CON header when present (avoids TOC noise).
+    ability_region = window
+    header = re.search(r"\bFOR\b.{0,40}\bDEX\b.{0,40}\bCON\b", window, re.I | re.S)
+    if header:
+        ability_region = window[header.start() : header.start() + 400]
+    pdf_abilities = ABILITY_RE.findall(ability_region)
     json_abilities = creature.get("abilities", {})
     labels = ["str", "dex", "con", "int", "wis", "cha"]
     if len(pdf_abilities) >= 6 and json_abilities:
@@ -163,11 +193,29 @@ def verify_creature(pdf_text: str, creature: dict) -> tuple[bool, list[Issue]]:
                     Issue(cid, name, f"abilities.{label}.modifier", entry["modifier"], mod)
                 )
 
-    if not creature.get("traits") and re.search(r"\bTraits\b", window, re.I):
-        issues.append(Issue(cid, name, "traits", "missing", "present in PDF"))
+    # Only flag missing traits/actions when the section sits between CA and Actions
+    # (avoids neighboring blocks / TOC that merely contain the word "Traits").
+    ca_m = CA_RE.search(window)
+    ca_pos = ca_m.start() if ca_m else 0
+    actions_m = re.search(r"\bActions\b", window[ca_pos:], re.I)
+    mid = window[ca_pos : ca_pos + (actions_m.start() if actions_m else 1800)]
 
-    if not creature.get("actions") and re.search(r"\bActions\b", window, re.I):
-        issues.append(Issue(cid, name, "actions", "missing", "present in PDF"))
+    if not creature.get("traits") and cid not in KNOWN_NO_TRAITS:
+        tm = re.search(r"\bTraits\b(.{0,240})", mid, re.I | re.S)
+        # Traits must sit near the CA block (≤900 chars), not in a following profile.
+        if (
+            tm
+            and tm.start() <= 900
+            and re.search(r"[A-ZÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ*][^\n.]{2,50}[\.\:]", tm.group(1))
+        ):
+            issues.append(Issue(cid, name, "traits", "missing", "present in PDF"))
+
+    if not creature.get("actions"):
+        am = re.search(r"\bActions\b(.{0,240})", window[ca_pos:], re.I | re.S)
+        if am and re.search(
+            r"[A-ZÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ*][^\n.]{2,50}[\.\:]", am.group(1)
+        ):
+            issues.append(Issue(cid, name, "actions", "missing", "present in PDF"))
 
     if not creature.get("description"):
         issues.append(Issue(cid, name, "description", "empty", "should have flavor text"))

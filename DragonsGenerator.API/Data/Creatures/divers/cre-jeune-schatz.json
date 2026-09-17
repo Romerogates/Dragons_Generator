@@ -64,7 +64,7 @@
     },
     {
       "name": "Queue",
-      "description": "Attaque d'arme de corps à corps : +8 pour toucher, allonge 4,50 m, une cible. Réussite : 14 (2d8 + 5) dégâts contondants. Si la cible est une créature, elle doit réussir un JS Force DD 16 sous peine d'être repoussée jusqu'à 3 m et de se retrouver **à terre**.\nMalgré leur nature élémentaire, les schatz ne naissent pas entièrement formés. Ils prennent existence au sein des entrailles d'Eana, et connaissent ensuite une croissance lente qui se mesure en décennies. Cependant, même un jeune schatz reste une créature massive et redoutable. Comparés à leurs aînés, ils maîtrisent moins leurs pouvoirs, ne parlent pas de langue humanoïde et sont moins au fait des coutumes civilisées, ce qui les rend plus sauvages et imprévisibles. Ils sont plus curieux et moins sédentaires, et leurs vagabondages peuvent les confronter à des problèmes. Bien des schatz immatures ont connu une fin prématurée, que ce soit en s'attaquant à des ravageurs plus forts qu'eux, en étant pris pour de simples monstruosités et abattus, ou encore en étant traqués par des chasseurs de trésors avides.\nSchatz"
+      "description": "Attaque d'arme de corps à corps : +8 pour toucher, allonge 4,50 m, une cible. Réussite : 14 (2d8 + 5) dégâts contondants. Si la cible est une créature, elle doit réussir un JS Force DD 16 sous peine d'être repoussée jusqu'à 3 m et de se retrouver **à terre**."
     }
   ],
   "reactions": [],

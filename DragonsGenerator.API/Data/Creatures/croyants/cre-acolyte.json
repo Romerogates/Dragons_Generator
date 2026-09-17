@@ -43,11 +43,16 @@
   "languages": "une au choix (généralement le commun)",
   "challenge_rating": "1/4",
   "xp": 50,
-  "traits": [],
+  "traits": [
+    {
+      "name": "Sorts",
+      "description": "L’acolyte est un lanceur de sorts de niveau 1. Sa caractéristique magique est la Sagesse (DD de sauvegarde des sorts : 12, +4 pour toucher avec ses attaques de sort). L’acolyte a préparé les sorts de prêtre suivants : * • Sorts mineurs (à volonté) : lumière, flamme sacrée, thaumaturgie * • 1ᵉʳ niveau (2 emplacements) : bénédiction, injonction, soins"
+    }
+  ],
   "actions": [
     {
       "name": "Gourdin",
-      "description": "Attaque d'arme de corps à corps : +2 pour toucher, allonge 1,50 m, une cible. Réussite : 2 (1d4) dégâts contondants.\n13"
+      "description": "Attaque d'arme de corps à corps : +2 pour toucher, allonge 1,50 m, une cible. Réussite : 2 (1d4) dégâts contondants."
     }
   ],
   "reactions": [],

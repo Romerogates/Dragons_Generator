@@ -43,7 +43,12 @@
   "languages": "céleste, commun, kaani et une autre langue au choix",
   "challenge_rating": "4",
   "xp": 1100,
-  "traits": [],
+  "traits": [
+    {
+      "name": "Sorts",
+      "description": "Le sage ulkan est un lanceur de sorts de niveau 7. Sa caractéristique magique est la Sagesse (DD de sauvegarde des sorts : 13, +5 pour toucher avec ses attaques de sort). Le sage ulkan a préparé les sorts de prêtre suivants : * Sorts mineurs (à volonté) : assistance divine, lumière, résistance, thaumaturgie * 1<sup>er</sup> niveau (4 emplacements) : ajustement fatidique, injonction, mot de guérison, sanctuaire * 2<sup>e</sup> niveau (3 emplacements) : arme spirituelle, immobilisation de personne * 3<sup>e</sup> niveau (3 emplacements) : dissipation de la magie, invocation séraphique, mot de guérison de groupe * 4<sup>e</sup> niveau (1 emplacement) : bannissement"
+    }
+  ],
   "actions": [
     {
       "name": "Bâton",

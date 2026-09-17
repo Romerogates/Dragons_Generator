@@ -43,7 +43,12 @@
   "languages": "druidique et cinq au choix",
   "challenge_rating": "12",
   "xp": 8400,
-  "traits": [],
+  "traits": [
+    {
+      "name": "Sorts",
+      "description": "L’archidruide est un lanceur de sorts de niveau 18. Sa caractéristique magique est la Sagesse (DD de sauvegarde des sorts : 17, +9 pour toucher avec ses attaques de sort). L’archidruide a préparé les sorts de druide suivants : Sorts mineurs (à volonté) : assistance divine, gourdin magique, jet empoisonné, résistance ; 1er niveau (4) : enchevêtrement, grand pas, lueur féerique, mot de guérison, nappe de brouillard ; 2e (3) : métal brûlant, sphère de feu, vision dans le noir ; 3e (3) : dissipation de la magie, empire végétal, invocation d’animaux ; 4e (3) : liberté de mouvement, mur de feu, peau de pierre, vision aveugle ; 5e (3) : fléau d’insectes, mur de pierre, restauration suprême, voyage par les arbres ; 6e (1) : guérison ; 7e (1) : inversion de la gravité ; 8e (1) : explosion de lumière ; 9e (1) : changement de forme."
+    }
+  ],
   "actions": [
     {
       "name": "Protecteurs de la nature (1/jour)",
