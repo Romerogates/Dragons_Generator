@@ -270,4 +270,43 @@ test.describe('Campagne — table avec créatures Codex', () => {
       ),
     ).toBeTruthy();
   });
+
+  test('fiche Codex → rencontre → Lancer le combat sur /play', async ({ page }) => {
+    test.setTimeout(150_000);
+
+    const owner = await loginSeedSession(page.request);
+    const campaignId = await createCampaignAs(page, owner, `E2E Codex Launch ${Date.now()}`);
+    await startActiveSessionAs(page, owner, campaignId);
+
+    await applyAuthSession(page, owner, `/campaigns/${campaignId}`);
+    await expect(page.getByRole('button', { name: 'Session en cours' })).toBeVisible({
+      timeout: 30_000,
+    });
+
+    await page.goto(`/creatures/cre-guerrier-gobelin`);
+    await expect(page.getByRole('heading', { name: /Guerrier gobelin/i })).toBeVisible({
+      timeout: 20_000,
+    });
+    await page.getByRole('button', { name: /Ajouter à une rencontre/i }).click();
+    await expect(page.getByText(/nouvelle rencontre|ajouté à/i)).toBeVisible({
+      timeout: 15_000,
+    });
+
+    await page.goto(`/campaigns/${campaignId}/play`);
+    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({
+      timeout: 30_000,
+    });
+
+    const encountersTab = page.getByRole('button', { name: /Rencontres|Renc\.?/i }).first();
+    await expect(encountersTab).toBeVisible({ timeout: 15_000 });
+    await encountersTab.click();
+
+    await expect(page.getByRole('button', { name: /Lancer le combat/i })).toBeVisible({
+      timeout: 15_000,
+    });
+    await page.getByRole('button', { name: /Lancer le combat/i }).click();
+
+    await expect(page.getByText(/Guerrier gobelin/i).first()).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText(/PV 7\//)).toBeVisible({ timeout: 10_000 });
+  });
 });

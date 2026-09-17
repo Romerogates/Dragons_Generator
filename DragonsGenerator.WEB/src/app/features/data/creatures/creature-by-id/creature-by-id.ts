@@ -100,7 +100,7 @@ export class CreatureById {
     if (!campaignId) {
       this.tableFeedback.set({
         kind: 'err',
-        text: 'Ouvrez d’abord une campagne en session, puis réessayez.',
+        text: 'Ouvrez une campagne (hub), puis réessayez depuis le Codex.',
       });
       return;
     }
@@ -168,7 +168,7 @@ export class CreatureById {
     if (!campaignId) {
       this.tableFeedback.set({
         kind: 'err',
-        text: 'Ouvrez d’abord une campagne (dock session), puis réessayez.',
+        text: 'Ouvrez une campagne (hub) pour préparer une rencontre depuis le Codex.',
       });
       return;
     }

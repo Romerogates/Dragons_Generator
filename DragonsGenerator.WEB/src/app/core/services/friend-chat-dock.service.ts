@@ -44,15 +44,19 @@ export class FriendChatDockService {
     return this.friendsList()
       .map((f) => {
         const s = byId.get(f.id);
-        return {
-          friendUserId: f.id,
-          friendDisplayName: f.displayName,
-          friendAvatarEmoji: f.avatarEmoji,
-          friendAccentColor: f.accentColor,
-          lastMessagePreview: s?.lastMessagePreview?.trim() || 'Dites bonjour',
-          lastMessageAt: s?.lastMessageAt ?? null,
-          unreadCount: s?.unreadCount ?? 0,
-        };
+          return {
+            friendUserId: f.id,
+            friendDisplayName: f.displayName,
+            friendAvatarEmoji: f.avatarEmoji,
+            friendAccentColor: f.accentColor,
+            lastMessagePreview: s?.lastMessagePreview?.trim()
+              ? s.lastMessagePreview.trim()
+              : s?.lastMessageAt
+                ? 'Pièce jointe'
+                : 'Dites bonjour',
+            lastMessageAt: s?.lastMessageAt ?? null,
+            unreadCount: s?.unreadCount ?? 0,
+          };
       })
       .sort((a, b) => {
         const ta = a.lastMessageAt ? Date.parse(a.lastMessageAt) : 0;
@@ -152,9 +156,17 @@ export class FriendChatDockService {
     if (options?.expanded !== undefined) {
       this.expanded.set(options.expanded);
     }
+    this.clearUnreadLocal(friendUserId);
     this.armHistory();
     this.setBodyScrollLocked(true);
     this.refreshList();
+  }
+
+  /** Badge immédiat (avant la réponse markRead API). */
+  clearUnreadLocal(friendUserId: string): void {
+    this.summaries.update((list) =>
+      list.map((s) => (s.friendUserId === friendUserId ? { ...s, unreadCount: 0 } : s)),
+    );
   }
 
   backToList(): void {
@@ -180,7 +192,17 @@ export class FriendChatDockService {
       this.summaries.set([]);
       return;
     }
-    this.chat.listSummaries().subscribe((s) => this.summaries.set(s));
+    this.chat.listSummaries().subscribe((s) => {
+      const active = this.view() === 'thread' ? this.activeFriendId() : null;
+      if (!active) {
+        this.summaries.set(s);
+        return;
+      }
+      // Garde le badge à 0 tant que le fil est ouvert (évite le flash avant markRead).
+      this.summaries.set(
+        s.map((row) => (row.friendUserId === active ? { ...row, unreadCount: 0 } : row)),
+      );
+    });
   }
 
   /** Bouton retour système / geste : conversation → liste → fermer, sans quitter l'app. */

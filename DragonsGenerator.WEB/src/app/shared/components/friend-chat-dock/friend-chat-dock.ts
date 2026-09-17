@@ -83,6 +83,8 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
   private activeThreadId: string | null = null;
   /** Garde synchrone anti double-Enter (avant le prochain CD). */
   private sendLocked = false;
+  /** Ne force le scroll bas que si l’utilisateur est déjà près du bas. */
+  private stickToBottom = true;
 
   constructor() {
     effect(() => {
@@ -266,7 +268,7 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
         next: (msg) => {
           this.messages.update((list) => [...list, msg]);
           this.sending.set(false);
-          this.scrollThreadToBottom();
+          this.scrollThreadToBottom(true);
           this.dock.refreshSummaries();
           this.notifications.refresh();
         },
@@ -281,11 +283,18 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
     if (this.activeThreadId === friendId && this.messagePollTimer) return;
     this.stopThreadPoll();
     this.activeThreadId = friendId;
+    this.stickToBottom = true;
     this.messages.set([]);
     this.threadLoading.set(true);
     this.threadError.set(null);
     this.loadMessages(friendId, true);
     this.messagePollTimer = setInterval(() => this.loadMessages(friendId, false), 5000);
+  }
+
+  onThreadScroll(): void {
+    const el = this.threadScroll?.nativeElement;
+    if (!el) return;
+    this.stickToBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 96;
   }
 
   send(): void {
@@ -301,7 +310,7 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
         this.messages.update((list) => [...list, msg]);
         this.sending.set(false);
         this.sendLocked = false;
-        this.scrollThreadToBottom();
+        this.scrollThreadToBottom(true);
         this.dock.refreshSummaries();
         this.notifications.refresh();
         this.focusComposer();
@@ -406,26 +415,31 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
 
     this.chat.listMessages(friendId, after).subscribe({
       next: (batch) => {
+        if (this.activeThreadId !== friendId) return;
         if (initial) {
           this.messages.set(batch);
           this.threadLoading.set(false);
+          this.dock.clearUnreadLocal(friendId);
           this.chat.markRead(friendId).subscribe(() => {
             this.dock.refreshSummaries();
             this.notifications.refresh();
           });
+          this.scrollThreadToBottom(true);
         } else if (batch.length > 0) {
           this.messages.update((list) => {
             const ids = new Set(list.map((m) => m.id));
             return [...list, ...batch.filter((m) => !ids.has(m.id))];
           });
+          this.dock.clearUnreadLocal(friendId);
           this.chat.markRead(friendId).subscribe(() => {
             this.dock.refreshSummaries();
             this.notifications.refresh();
           });
+          this.scrollThreadToBottom();
         }
-        if (batch.length > 0) this.scrollThreadToBottom();
       },
       error: () => {
+        if (this.activeThreadId !== friendId) return;
         if (initial) {
           this.threadError.set('Conversation inaccessible.');
           this.threadLoading.set(false);
@@ -434,7 +448,8 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
     });
   }
 
-  private scrollThreadToBottom(): void {
+  private scrollThreadToBottom(force = false): void {
+    if (!force && !this.stickToBottom) return;
     setTimeout(() => {
       const el = this.threadScroll?.nativeElement;
       if (el) el.scrollTop = el.scrollHeight;

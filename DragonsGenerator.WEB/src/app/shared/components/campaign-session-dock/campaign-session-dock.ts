@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
 import { CampaignSessionDockService } from '@core/services/campaign-session-dock.service';
+import { FriendChatDockService } from '@core/services/friend-chat-dock.service';
 import { AuthService } from '@core/services/auth.service';
 import { DiceRollComponent } from '@shared/components/dice-roll/dice-roll';
 import { FullscreenEnterBtn } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-btn';
@@ -31,6 +32,7 @@ type DockTab = 'live' | 'table' | 'dice';
 })
 export class CampaignSessionDockComponent implements OnInit {
   readonly dock = inject(CampaignSessionDockService);
+  private readonly chatDock = inject(FriendChatDockService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
@@ -49,6 +51,7 @@ export class CampaignSessionDockComponent implements OnInit {
 
   readonly showFab = computed(() => {
     if (!this.dock.isVisible()) return false;
+    if (this.chatDock.isOpen()) return false;
     const id = this.dock.campaignId();
     const url = this.currentUrl();
     if (id && url.includes(`/campaigns/${id}/play`)) return false;

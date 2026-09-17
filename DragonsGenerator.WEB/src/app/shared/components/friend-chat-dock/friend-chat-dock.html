@@ -42,7 +42,9 @@
                 : 'w-full h-full'
             "
           >
-            <header class="shrink-0 flex items-center justify-between gap-2 px-4 py-3 border-b border-slate-800 bg-[#171b22]">
+            <header
+              class="shrink-0 flex items-center justify-between gap-2 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 border-b border-slate-800 bg-[#171b22]"
+            >
               <button
                 type="button"
                 class="lg:hidden w-9 h-9 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-800"
@@ -174,7 +176,9 @@
                 </p>
               </div>
             } @else {
-              <header class="shrink-0 flex items-center gap-2 px-3 py-3 border-b border-slate-800 bg-[#171b22]">
+              <header
+                class="shrink-0 flex items-center gap-2 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 border-b border-slate-800 bg-[#171b22]"
+              >
                 <button
                   type="button"
                   class="w-9 h-9 flex items-center justify-center rounded-full text-slate-300 hover:bg-slate-800"
@@ -231,6 +235,7 @@
                   <div
                     #threadScroll
                     class="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 sm:px-5 py-3 space-y-2 bg-[#141820]/50"
+                    (scroll)="onThreadScroll()"
                   >
                     @for (msg of messages(); track trackMessage($index, msg)) {
                       <div class="flex" [class.justify-end]="msg.isMine">

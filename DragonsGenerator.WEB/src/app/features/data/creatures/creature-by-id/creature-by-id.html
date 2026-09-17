@@ -51,6 +51,13 @@
             </button>
           }
         </div>
+        @if (canAddToCampaign() && !tableCampaignId()) {
+          <p class="mt-3 text-xs text-slate-500 text-center max-w-md mx-auto">
+            Astuce : ouvrez d’abord une
+            <a routerLink="/campaigns" class="underline text-violet-400 hover:text-violet-300">campagne</a>
+            pour lier table et rencontres.
+          </p>
+        }
         @if (encounterPickerOpen()) {
           <div
             class="mt-4 mx-auto max-w-md rounded-2xl border border-violet-800/50 bg-[#171b22] p-4 text-left space-y-2"

@@ -119,13 +119,22 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
   private consumeCodexImportQuery(): void {
     const added = this.route.snapshot.queryParamMap.get('added');
     if (!added?.trim()) return;
+    const name = added.trim();
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { added: null },
       queryParamsHandling: 'merge',
       replaceUrl: true,
     });
-    queueMicrotask(() => this.playPanel()?.announceCodexImport(added));
+    const tryAnnounce = (left: number) => {
+      const panel = this.playPanel();
+      if (panel) {
+        panel.announceCodexImport(name);
+        return;
+      }
+      if (left > 0) setTimeout(() => tryAnnounce(left - 1), 40);
+    };
+    setTimeout(() => tryAnnounce(12), 0);
   }
 
   ngOnDestroy(): void {

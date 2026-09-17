@@ -71,6 +71,17 @@ describe('CampaignSessionDockService', () => {
     );
     dock.bindCampaign(detail({ activeSessionId: null, sessions: [] }));
     expect(dock.isVisible()).toBe(false);
+    // Id mémorisé pour Codex → rencontre même sans session live.
+    expect(dock.rememberedCampaignId()).toBe('c1');
+  });
+
+  it('remembers campaign id without active session (Codex prep)', () => {
+    sessionStorage.clear();
+    dock.bindCampaign(detail({ activeSessionId: null, sessions: [] }));
+    expect(dock.isVisible()).toBe(false);
+    expect(dock.campaignId()).toBeNull();
+    expect(sessionStorage.getItem('dg-active-table-campaign')).toBe('c1');
+    expect(dock.rememberedCampaignId()).toBe('c1');
   });
 
   it('persists campaign id in sessionStorage for Codex navigation', () => {

@@ -44,13 +44,16 @@ export class CampaignSessionDockService {
       this.clear();
       return;
     }
+    // Toujours mémoriser la dernière campagne visitée (Codex → rencontre sans session live).
+    this.persistRememberedId(detail.id);
+
     if (!detail.data.activeSessionId) {
-      if (this.campaignId() === detail.id) this.clear();
+      if (this.campaignId() === detail.id) this.clearLiveState();
       return;
     }
     const session = detail.data.sessions.find((s) => s.id === detail.data.activeSessionId);
     if (!session) {
-      if (this.campaignId() === detail.id) this.clear();
+      if (this.campaignId() === detail.id) this.clearLiveState();
       return;
     }
     this.campaignId.set(detail.id);
@@ -60,23 +63,11 @@ export class CampaignSessionDockService {
     this.combatRound.set(session.activeCombat?.round ?? null);
     this.recentLog.set((session.combatLog ?? []).slice(-8).reverse());
     this.liveCampaign.set(detail);
-    try {
-      sessionStorage.setItem(ACTIVE_TABLE_CAMPAIGN_KEY, detail.id);
-    } catch {
-      /* ignore quota / private mode */
-    }
   }
 
   clear(): void {
     const previousId = this.campaignId();
-    this.campaignId.set(null);
-    this.campaignTitle.set('');
-    this.sessionTitle.set('');
-    this.hasActiveCombat.set(false);
-    this.combatRound.set(null);
-    this.recentLog.set([]);
-    this.liveCampaign.set(null);
-    this.isOpen.set(false);
+    this.clearLiveState();
     if (previousId) {
       try {
         if (sessionStorage.getItem(ACTIVE_TABLE_CAMPAIGN_KEY) === previousId) {
@@ -85,6 +76,25 @@ export class CampaignSessionDockService {
       } catch {
         /* ignore */
       }
+    }
+  }
+
+  private clearLiveState(): void {
+    this.campaignId.set(null);
+    this.campaignTitle.set('');
+    this.sessionTitle.set('');
+    this.hasActiveCombat.set(false);
+    this.combatRound.set(null);
+    this.recentLog.set([]);
+    this.liveCampaign.set(null);
+    this.isOpen.set(false);
+  }
+
+  private persistRememberedId(id: string): void {
+    try {
+      sessionStorage.setItem(ACTIVE_TABLE_CAMPAIGN_KEY, id);
+    } catch {
+      /* ignore quota / private mode */
     }
   }
 
