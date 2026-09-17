@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   signal,
   CUSTOM_ELEMENTS_SCHEMA,
@@ -9,12 +10,19 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of, switchMap } from 'rxjs';
 import { DataService } from '@core/services/data.service';
+import { AuthService } from '@core/services/auth.service';
+import { CampaignCloudService } from '@core/services/campaign-cloud.service';
+import { CampaignSessionDockService } from '@core/services/campaign-session-dock.service';
 import { Creature } from '@core/models/Creatures/creature';
 import {
   ABILITY_LABELS,
   formatChallengeRating,
   getCreatureCategoryLabel,
 } from '@core/utils/creature-display.util';
+import {
+  appendCreatureCombatantToSession,
+  combatantFromCreature,
+} from '@core/utils/combat-creature-import.util';
 import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-detail-shell';
 
 @Component({
@@ -28,9 +36,14 @@ import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-de
 export class CreatureById {
   private dataService = inject(DataService);
   private route = inject(ActivatedRoute);
+  private auth = inject(AuthService);
+  private campaigns = inject(CampaignCloudService);
+  private sessionDock = inject(CampaignSessionDockService);
 
   protected error = signal<string | null>(null);
   protected notFound = signal(false);
+  protected addingToTable = signal(false);
+  protected tableFeedback = signal<{ kind: 'ok' | 'err'; text: string } | null>(null);
 
   protected creature = toSignal(
     this.route.paramMap.pipe(
@@ -38,6 +51,7 @@ export class CreatureById {
         const id = params.get('id') ?? '';
         this.error.set(null);
         this.notFound.set(false);
+        this.tableFeedback.set(null);
         return this.dataService.getCreatureById(id).pipe(
           catchError((err) => {
             if (err?.status === 404) {
@@ -53,11 +67,83 @@ export class CreatureById {
     { initialValue: undefined },
   );
 
+  /** MJ connecté : le clic vérifie session active (dock ou sessionStorage). */
+  protected canAddToTable = computed(() => this.auth.isLoggedIn());
+
+  protected tableCampaignId = computed(
+    () => this.sessionDock.campaignId() ?? this.sessionDock.rememberedCampaignId(),
+  );
+
   protected abilityLabels = ABILITY_LABELS;
   protected categoryLabel = getCreatureCategoryLabel;
   protected formatCr = formatChallengeRating;
 
   protected abilityKeys(creature: Creature): string[] {
     return ['str', 'dex', 'con', 'int', 'wis', 'cha'].filter((k) => creature.abilities[k]);
+  }
+
+  protected addToActiveTable(): void {
+    const creature = this.creature();
+    const campaignId = this.sessionDock.rememberedCampaignId();
+    if (!creature || this.addingToTable()) return;
+    if (!campaignId) {
+      this.tableFeedback.set({
+        kind: 'err',
+        text: 'Ouvrez d’abord une campagne en session, puis réessayez.',
+      });
+      return;
+    }
+
+    this.addingToTable.set(true);
+    this.tableFeedback.set(null);
+
+    this.campaigns.get(campaignId).subscribe({
+      next: (detail) => {
+        if (!detail.isOwner || !detail.data.activeSessionId) {
+          this.addingToTable.set(false);
+          this.tableFeedback.set({
+            kind: 'err',
+            text: 'Entrez en session MJ pour envoyer à la table.',
+          });
+          return;
+        }
+        const combatant = combatantFromCreature(creature, creature.name, 'monster');
+        const nextData = appendCreatureCombatantToSession(detail.data, combatant, {
+          label: 'Combat',
+        });
+        if (!nextData) {
+          this.addingToTable.set(false);
+          this.tableFeedback.set({
+            kind: 'err',
+            text: 'Aucune session active sur cette campagne.',
+          });
+          return;
+        }
+        this.campaigns.update(detail.id, detail.title, nextData).subscribe({
+          next: () => {
+            this.addingToTable.set(false);
+            this.sessionDock.patchLiveCampaign({ ...detail, data: nextData });
+            this.tableFeedback.set({
+              kind: 'ok',
+              text: `${creature.name} ajouté à la table.`,
+            });
+          },
+          error: () => {
+            this.addingToTable.set(false);
+            this.tableFeedback.set({
+              kind: 'err',
+              text: 'Impossible d’ajouter à la table. Réessayez.',
+            });
+          },
+        });
+      },
+      error: () => {
+        this.addingToTable.set(false);
+        this.tableFeedback.set({
+          kind: 'err',
+          text: 'Impossible de charger la campagne.',
+        });
+      },
+    });
   }
 }

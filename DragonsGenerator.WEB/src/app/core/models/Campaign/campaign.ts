@@ -92,6 +92,8 @@ export interface Combatant {
   attacks?: CombatantAttack[];
   /** Perso cloud lié (PJ). */
   characterId?: string | null;
+  /** Id fiche Codex d’origine (bestiaire). */
+  sourceCreatureId?: string | null;
 }
 
 export interface ActiveCombat {

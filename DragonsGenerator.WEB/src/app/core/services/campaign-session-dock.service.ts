@@ -1,6 +1,8 @@
 import { Injectable, computed, signal } from '@angular/core';
 import type { CampaignDetail } from '@core/models/Campaign/campaign';
 
+const ACTIVE_TABLE_CAMPAIGN_KEY = 'dg-active-table-campaign';
+
 /**
  * Dock flottant « session active » (FAB à côté des messages).
  * Enregistre la campagne courante quand `activeSessionId` est posé.
@@ -26,6 +28,17 @@ export class CampaignSessionDockService {
     return (detail.data.sessions ?? []).some((s) => s.id === id);
   });
 
+  /** Id campagne persisté (survit à une navigation plein Codex / refresh). */
+  rememberedCampaignId(): string | null {
+    const live = this.campaignId();
+    if (live) return live;
+    try {
+      return sessionStorage.getItem(ACTIVE_TABLE_CAMPAIGN_KEY);
+    } catch {
+      return null;
+    }
+  }
+
   bindCampaign(detail: CampaignDetail | null): void {
     if (!detail) {
       this.clear();
@@ -47,9 +60,15 @@ export class CampaignSessionDockService {
     this.combatRound.set(session.activeCombat?.round ?? null);
     this.recentLog.set((session.combatLog ?? []).slice(-8).reverse());
     this.liveCampaign.set(detail);
+    try {
+      sessionStorage.setItem(ACTIVE_TABLE_CAMPAIGN_KEY, detail.id);
+    } catch {
+      /* ignore quota / private mode */
+    }
   }
 
   clear(): void {
+    const previousId = this.campaignId();
     this.campaignId.set(null);
     this.campaignTitle.set('');
     this.sessionTitle.set('');
@@ -58,6 +77,15 @@ export class CampaignSessionDockService {
     this.recentLog.set([]);
     this.liveCampaign.set(null);
     this.isOpen.set(false);
+    if (previousId) {
+      try {
+        if (sessionStorage.getItem(ACTIVE_TABLE_CAMPAIGN_KEY) === previousId) {
+          sessionStorage.removeItem(ACTIVE_TABLE_CAMPAIGN_KEY);
+        }
+      } catch {
+        /* ignore */
+      }
+    }
   }
 
   clearIfCampaign(id: string | null | undefined): void {
@@ -78,7 +106,7 @@ export class CampaignSessionDockService {
   }
 
   patchLiveCampaign(detail: CampaignDetail): void {
-    if (this.campaignId() !== detail.id) return;
+    if (this.campaignId() !== detail.id && this.rememberedCampaignId() !== detail.id) return;
     this.bindCampaign(detail);
   }
 }

@@ -65,6 +65,7 @@ import {
   syncEncountersFromCombatants,
   type CombatFlowPhase,
 } from '@core/utils/combat-tracker.util';
+import { combatantFromCreature } from '@core/utils/combat-creature-import.util';
 import {
   appendCombatLog,
   applyHpDelta,
@@ -1203,27 +1204,7 @@ export class CampaignPlayPanel implements OnDestroy {
     displayName: string,
     kind: Combatant['kind'] = 'monster',
   ): Combatant {
-    const maxHp = parseCreatureHitPoints(creature.hitPoints);
-    const abilities = creature.abilities ?? {};
-    const dexMod =
-      parseAbilityModifier(abilities['dex']?.modifier) ??
-      parseAbilityModifier(abilities['dexterite']?.modifier) ??
-      parseAbilityModifier(abilities['dexterity']?.modifier) ??
-      0;
-    const attacks: CombatantAttack[] = (creature.actions ?? []).slice(0, 5).map((a) => ({
-      name: a.name,
-      attackBonus: parseAttackBonusFromText(a.description),
-      damageDice: parseDamageDiceFromText(a.description),
-    }));
-    return createCombatant({
-      name: displayName,
-      kind,
-      armorClass: creature.armorClass || 10,
-      maxHp,
-      currentHp: maxHp,
-      initiativeBonus: dexMod,
-      attacks: attacks.length ? attacks : undefined,
-    });
+    return combatantFromCreature(creature, displayName, kind);
   }
 
   private importMembersIntoCombat(
@@ -2267,31 +2248,4 @@ export class CampaignPlayPanel implements OnDestroy {
       },
     });
   }
-}
-
-function parseCreatureHitPoints(raw: string | undefined | null): number | undefined {
-  if (!raw) return undefined;
-  const m = String(raw).trim().match(/^(\d+)/);
-  return m ? Number(m[1]) : undefined;
-}
-
-function parseAbilityModifier(raw: string | undefined | null): number | undefined {
-  if (!raw) return undefined;
-  const m = String(raw).trim().match(/^([+-]?\d+)/);
-  return m ? Number(m[1]) : undefined;
-}
-
-function parseAttackBonusFromText(text: string | undefined | null): number {
-  if (!text) return 0;
-  const m =
-    text.match(/\+\s*(\d+)\s*(?:au\s+jet\s+d['']attaque|pour\s+toucher|à\s+toucher)?/i) ??
-    text.match(/jet\s+d['']attaque\s+([+-]\d+)/i) ??
-    text.match(/([+-]\d+)\s*(?:pour\s+toucher|à\s+toucher)/i);
-  return m ? Number(m[1]) : 0;
-}
-
-function parseDamageDiceFromText(text: string | undefined | null): string | undefined {
-  if (!text) return undefined;
-  const m = text.match(/(\d+d\d+(?:\s*[+-]\s*\d+)?)/i);
-  return m ? m[1]!.replace(/\s+/g, '') : undefined;
 }

@@ -32,7 +32,35 @@
           <span class="bg-red-950/40 text-red-300 border border-red-900/50 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider">
             {{ formatCr(c.challengeRating) }} · {{ c.xp }} PX
           </span>
+          @if (canAddToTable()) {
+            <button
+              type="button"
+              class="min-h-11 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-amber-700 text-white border border-amber-500 hover:bg-amber-600 disabled:opacity-50"
+              [disabled]="addingToTable()"
+              (click)="addToActiveTable()"
+            >
+              {{ addingToTable() ? 'Ajout…' : 'Ajouter à la table' }}
+            </button>
+          }
         </div>
+        @if (tableFeedback(); as fb) {
+          <p
+            class="mt-4 text-sm text-center"
+            [class.text-emerald-300]="fb.kind === 'ok'"
+            [class.text-red-300]="fb.kind === 'err'"
+            role="status"
+          >
+            {{ fb.text }}
+            @if (fb.kind === 'ok' && tableCampaignId(); as cid) {
+              <a
+                [routerLink]="['/campaigns', cid, 'play']"
+                class="ml-2 underline text-amber-300 hover:text-amber-200"
+              >
+                Voir la table
+              </a>
+            }
+          </p>
+        }
       </header>
 
       @if (c.description) {
