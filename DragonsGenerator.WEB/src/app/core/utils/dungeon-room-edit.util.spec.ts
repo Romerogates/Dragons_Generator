@@ -50,9 +50,11 @@ describe('dungeon-room-edit.util', () => {
       room({ id: 'b', label: 'Salle 2', x: 10, y: 10, width: 3, height: 3 }),
     ];
 
-    it('prefers the selected room id', () => {
-      const rect: GridRect = { x: 10, y: 10, width: 2, height: 2 };
-      expect(findRoomToResize(rooms, rect, 'a')?.id).toBe('a');
+    it('uses preferred room only when the rect overlaps it', () => {
+      const onB: GridRect = { x: 10, y: 10, width: 2, height: 2 };
+      expect(findRoomToResize(rooms, onB, 'a')?.id).toBe('b');
+      const onA: GridRect = { x: 0, y: 0, width: 2, height: 2 };
+      expect(findRoomToResize(rooms, onA, 'a')?.id).toBe('a');
     });
 
     it('picks a majority-overlapping room when none preferred', () => {
@@ -60,8 +62,9 @@ describe('dungeon-room-edit.util', () => {
       expect(findRoomToResize(rooms, rect, null)?.id).toBe('b');
     });
 
-    it('returns null without enough overlap', () => {
+    it('returns null without enough overlap (new room)', () => {
       const rect: GridRect = { x: 20, y: 20, width: 2, height: 2 };
+      expect(findRoomToResize(rooms, rect, 'a')).toBeNull();
       expect(findRoomToResize(rooms, rect, null)).toBeNull();
     });
   });

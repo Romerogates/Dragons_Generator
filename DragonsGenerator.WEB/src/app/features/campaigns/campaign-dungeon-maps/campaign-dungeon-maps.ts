@@ -901,8 +901,13 @@ export class CampaignDungeonMaps implements OnDestroy {
     event.preventDefault();
     viewport.setPointerCapture(event.pointerId);
 
+    const tile = this.clientToTile(event.clientX, event.clientY);
+    // Clic hors salle (ou hors grille) → désélection, quel que soit l’outil.
+    if (!tile || !roomAt(map, tile.x, tile.y)) {
+      this.clearMapSelection();
+    }
+
     if (this.activeTool() === 'room') {
-      const tile = this.clientToTile(event.clientX, event.clientY);
       if (!tile) return;
       this.isDefiningRoom = true;
       this.isPainting.set(false);
@@ -917,7 +922,6 @@ export class CampaignDungeonMaps implements OnDestroy {
     this.strokeDragged = false;
     this.lastPaintKey = null;
     this.lastPaintTile = null;
-    const tile = this.clientToTile(event.clientX, event.clientY);
     if (tile) {
       this.lastPaintTile = tile;
       this.applyTileAt(tile.x, tile.y, true, false);
@@ -1087,6 +1091,11 @@ export class CampaignDungeonMaps implements OnDestroy {
       ...map,
       markers: map.markers.filter((m) => m.id !== markerId),
     });
+    this.selectedMarkerId.set(null);
+  }
+
+  clearMapSelection(): void {
+    this.selectedRoomId.set(null);
     this.selectedMarkerId.set(null);
   }
 
@@ -1459,6 +1468,12 @@ export class CampaignDungeonMaps implements OnDestroy {
     }
     if (event.key === 'Escape' && (this.exportMenuOpen() || this.docMenuOpen())) {
       this.closeActionMenus();
+      return;
+    }
+    if (event.key === 'Escape' && this.editingMap()) {
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
+      event.preventDefault();
+      this.clearMapSelection();
       return;
     }
     if (event.code === 'Space' && this.editingMap()) {

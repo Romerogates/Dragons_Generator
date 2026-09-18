@@ -54,8 +54,9 @@ function overlapArea(a: GridRect, b: GridRect): number {
 }
 
 /**
- * Salle à redimensionner : priorité à `preferredId`, sinon chevauchement > 50 %
- * de l’aire de la salle ou du rectangle tracé.
+ * Salle à redimensionner : si `preferredId` chevauche le rect → celle-ci ;
+ * sinon chevauchement > 50 % de l’aire de la salle ou du rectangle tracé.
+ * (Une sélection seule ne force plus le resize : on peut créer une salle ailleurs.)
  */
 export function findRoomToResize(
   rooms: DungeonRoom[],
@@ -64,7 +65,15 @@ export function findRoomToResize(
 ): DungeonRoom | null {
   if (preferredId) {
     const preferred = rooms.find((r) => r.id === preferredId);
-    if (preferred) return preferred;
+    if (preferred) {
+      const preferredRect: GridRect = {
+        x: preferred.x,
+        y: preferred.y,
+        width: preferred.width,
+        height: preferred.height,
+      };
+      if (overlapArea(rect, preferredRect) > 0) return preferred;
+    }
   }
 
   const rectA = rectArea(rect);
