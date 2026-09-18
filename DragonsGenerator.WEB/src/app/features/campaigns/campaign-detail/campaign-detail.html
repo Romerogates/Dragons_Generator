@@ -296,7 +296,7 @@
                     />
                     <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
                       <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Synopsis</h2>
-                      @if (c.data.adventure?.trim()) {
+                      @if (c.data.adventure.trim()) {
                         <div class="text-sm leading-relaxed whitespace-pre-wrap font-serif text-slate-300">{{ c.data.adventure }}</div>
                       } @else {
                         <div class="rounded-xl border border-dashed border-violet-800/50 bg-violet-950/15 p-6 text-center space-y-3">
