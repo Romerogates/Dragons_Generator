@@ -78,6 +78,14 @@ describe('dungeon-render helpers', () => {
     expect(themePalette('unknown').bg).toBe(themePalette('generic').bg);
   });
 
+  it('pads canvas with edge void so zoom is not a floating rectangle', () => {
+    const canvas = document.createElement('canvas');
+    const map = sampleMap();
+    drawDungeonToCanvas(map, canvas, 10, { edgePadCells: 2, vignette: false });
+    expect(canvas.width).toBe((map.gridWidth + 4) * 10);
+    expect(canvas.height).toBe((map.gridHeight + 4) * 10);
+  });
+
   it('draws canvas and exports png data url', () => {
     const map = sampleMap();
     const canvas = document.createElement('canvas');

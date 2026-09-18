@@ -19,6 +19,7 @@ import {
   NOTIFICATION_PREF_OPTIONS,
   type NotificationPrefOption,
 } from '@core/services/notification-preferences.service';
+import { UiBannerPreferencesService } from '@core/services/ui-banner-preferences.service';
 import { PwaLifecycleService } from '@core/services/pwa-lifecycle.service';
 import { PasswordFieldComponent } from '@shared/components/password-field/password-field';
 import {
@@ -45,6 +46,7 @@ export class SettingsPage implements OnInit {
   private readonly connectivity = inject(ConnectivityService);
   private readonly push = inject(PushNotificationService);
   private readonly notifPrefs = inject(NotificationPreferencesService);
+  private readonly banners = inject(UiBannerPreferencesService);
   private readonly pwa = inject(PwaLifecycleService);
   private readonly route = inject(ActivatedRoute);
 
@@ -60,6 +62,7 @@ export class SettingsPage implements OnInit {
   readonly accentOptions = PROFILE_ACCENTS;
   readonly prefOptions = NOTIFICATION_PREF_OPTIONS;
   readonly notifPreferences = this.notifPrefs.prefs;
+  readonly hideAllBanners = this.banners.hideAllBanners;
 
   currentPassword = '';
   newPassword = '';
@@ -163,6 +166,11 @@ export class SettingsPage implements OnInit {
 
   resetNotifPrefs(): void {
     this.notifPrefs.resetPrefs();
+  }
+
+  setHideAllBanners(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.banners.setHideAllBanners(checked);
   }
 
   async installPwa(): Promise<void> {

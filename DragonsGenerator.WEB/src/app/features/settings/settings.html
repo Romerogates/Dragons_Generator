@@ -268,6 +268,28 @@
       </section>
 
       <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
+        <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Aide & bannières</h2>
+        <p class="text-xs text-slate-400 mb-4">
+          Masque les guides de démarrage, toasts d’aide donjon et bandeaux coaching. Vous pouvez aussi
+          fermer chaque bannière avec ✕ (mémorisé sur le compte).
+        </p>
+        <label class="flex items-start gap-3 cursor-pointer rounded-xl border border-slate-800/80 px-3 py-2.5 hover:border-slate-700">
+          <input
+            type="checkbox"
+            class="mt-0.5 w-4 h-4 rounded border-slate-600 shrink-0"
+            [checked]="hideAllBanners()"
+            (change)="setHideAllBanners($event)"
+          />
+          <span class="min-w-0">
+            <span class="block text-sm text-slate-200">Masquer toutes les bannières d’aide</span>
+            <span class="block text-[11px] text-slate-500 mt-0.5"
+              >S’applique au guide campagne, toast donjon, bienvenue et checklist.</span
+            >
+          </span>
+        </label>
+      </section>
+
+      <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
         <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Mode hors ligne</h2>
         <p class="text-xs text-slate-400 mb-4">
           Télécharge le Codex pour forger un personnage sans connexion. Les éléments créés hors ligne seront

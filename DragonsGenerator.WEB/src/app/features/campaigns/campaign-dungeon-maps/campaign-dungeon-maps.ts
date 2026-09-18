@@ -6,6 +6,7 @@ import {
   effect,
   ElementRef,
   HostListener,
+  inject,
   input,
   OnDestroy,
   output,
@@ -36,6 +37,7 @@ import { generateDungeonMap } from '@core/utils/dungeon-generator.util';
 import {
   buildHandoutBody,
   drawDungeonToCanvas,
+  dungeonDrawOrigin,
   dungeonMapToPngDataUrl,
   exportDungeonPdf,
   exportDungeonPng,
@@ -47,6 +49,10 @@ import {
 import { rollRandomEncounter, suggestThemeFromRegion } from '@core/utils/dungeon-theme-pools';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import { FullscreenEnterBtn } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-btn';
+import {
+  UI_BANNER_IDS,
+  UiBannerPreferencesService,
+} from '@core/services/ui-banner-preferences.service';
 
 type EditorTool = 'select' | 'floor' | 'wall' | 'door' | 'trap' | 'chest' | 'stairs';
 type SizePresetId = 'compact' | 'standard' | 'large' | 'custom';
@@ -68,7 +74,9 @@ interface SizePreset {
 
 const MIN_SCALE = 0.35;
 const MAX_SCALE = 3;
+const FIT_MAX_SCALE = 1.75;
 const EDITOR_CELL = 12;
+const EDITOR_EDGE_PAD = 2;
 const PREVIEW_CELL = 4;
 const THUMB_CELL = 3;
 const MAX_UNDO = 40;
@@ -114,6 +122,8 @@ const SIZE_PRESETS: SizePreset[] = [
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class CampaignDungeonMaps implements OnDestroy {
+  private readonly banners = inject(UiBannerPreferencesService);
+
   readonly campaign = input.required<CampaignDetail>();
   readonly focusMapId = input<string | null>(null);
   readonly dataChange = output<Partial<CampaignData>>();
@@ -207,6 +217,15 @@ export class CampaignDungeonMaps implements OnDestroy {
     return this.maps().find((m) => m.id === id) ?? null;
   });
 
+  readonly selectedMarker = computed(() => {
+    const map = this.editingMap();
+    const mid = this.selectedMarkerId();
+    if (!map || !mid) return null;
+    return map.markers.find((m) => m.id === mid) ?? null;
+  });
+
+  readonly viewportBg = computed(() => themePalette(this.editingMap()?.theme ?? this.genTheme()).bg);
+
   readonly sortedMaps = computed(() =>
     [...this.maps()].sort(
       (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
@@ -223,6 +242,8 @@ export class CampaignDungeonMaps implements OnDestroy {
 
   private undoStack: UndoSnapshot[] = [];
   private previewTimer: ReturnType<typeof setTimeout> | null = null;
+  private messageTimer: ReturnType<typeof setTimeout> | null = null;
+  private messageIsCoaching = false;
   private saveTimer: ReturnType<typeof setTimeout> | null = null;
   private pendingMaps: CampaignDungeonMap[] | null = null;
   private panOrigin: { x: number; y: number; panX: number; panY: number } | null = null;
@@ -250,6 +271,7 @@ export class CampaignDungeonMaps implements OnDestroy {
         selectedRoomId: this.selectedRoomId(),
         vignette: true,
         revealedRoomIds: fogRevealSet(map),
+        edgePadCells: EDITOR_EDGE_PAD,
       });
     });
 
@@ -271,6 +293,7 @@ export class CampaignDungeonMaps implements OnDestroy {
       drawDungeonToCanvas(preview, canvas, PREVIEW_CELL, {
         showRoomNumbers: true,
         vignette: true,
+        edgePadCells: 1,
       });
     });
 
@@ -388,7 +411,7 @@ export class CampaignDungeonMaps implements OnDestroy {
     this.fitMapInView(named);
     this.generating.set(false);
     this.revealMap.set(true);
-    this.message.set('Donjon gravé — peignez, zoomez, exportez.');
+    this.setEditorMessage('Donjon gravé — peignez, zoomez, exportez.', { coaching: true });
     setTimeout(() => this.revealMap.set(false), 900);
   }
 
@@ -441,7 +464,7 @@ export class CampaignDungeonMaps implements OnDestroy {
         this.updateMap(merged);
         this.selectedRoomId.set(merged.rooms[0]?.id ?? null);
         this.fitMapInView(merged);
-        this.message.set('Donjon régénéré.');
+        this.setEditorMessage('Donjon régénéré.', { coaching: true });
       },
       'Régénérer',
     );
@@ -543,6 +566,64 @@ export class CampaignDungeonMaps implements OnDestroy {
     this.updateMap({ ...map, rooms });
   }
 
+  markersForRoom(room: CampaignDungeonMap['rooms'][0]): CampaignDungeonMap['markers'] {
+    const map = this.editingMap();
+    if (!map) return [];
+    return map.markers.filter((m) => {
+      if (m.kind === 'door') return false;
+      if (m.linkedRoomId === room.id) return true;
+      return (
+        m.x >= room.x &&
+        m.y >= room.y &&
+        m.x < room.x + room.width &&
+        m.y < room.y + room.height
+      );
+    });
+  }
+
+  patchMarker(markerId: string, patch: Partial<CampaignDungeonMap['markers'][0]>): void {
+    const map = this.editingMap();
+    if (!map) return;
+    const markers = map.markers.map((m) => (m.id === markerId ? { ...m, ...patch } : m));
+    this.updateMap({ ...map, markers });
+  }
+
+  selectMarker(markerId: string): void {
+    this.selectedMarkerId.set(markerId);
+    const map = this.editingMap();
+    const mk = map?.markers.find((m) => m.id === markerId);
+    if (mk) {
+      const rid = roomAt(map!, mk.x, mk.y);
+      if (rid) this.selectedRoomId.set(rid);
+    }
+  }
+
+  dismissMessage(): void {
+    if (this.messageIsCoaching) {
+      this.banners.dismiss(UI_BANNER_IDS.dungeonToast);
+    }
+    this.messageIsCoaching = false;
+    this.message.set(null);
+    this.lastHandoutNav.set(null);
+  }
+
+  private setEditorMessage(text: string, opts?: { coaching?: boolean }): void {
+    if (this.banners.hideAllBanners()) return;
+    if (opts?.coaching && !this.banners.isVisible(UI_BANNER_IDS.dungeonToast)) return;
+
+    this.messageIsCoaching = !!opts?.coaching;
+    this.message.set(text);
+    if (this.messageTimer) clearTimeout(this.messageTimer);
+    this.messageTimer = setTimeout(() => {
+      this.messageTimer = null;
+      if (this.message() === text) {
+        this.messageIsCoaching = false;
+        this.message.set(null);
+        this.lastHandoutNav.set(null);
+      }
+    }, 8_000);
+  }
+
   onEncounterChange(roomId: string, encounterId: string): void {
     const map = this.editingMap();
     if (!map) return;
@@ -580,8 +661,9 @@ export class CampaignDungeonMaps implements OnDestroy {
     const viewport = this.viewportRef()?.nativeElement;
     if (!viewport) return;
     const s = this.scale();
-    const cx = (room.x + room.width / 2) * EDITOR_CELL * s;
-    const cy = (room.y + room.height / 2) * EDITOR_CELL * s;
+    const origin = dungeonDrawOrigin(EDITOR_CELL, EDITOR_EDGE_PAD);
+    const cx = (origin + (room.x + room.width / 2) * EDITOR_CELL) * s;
+    const cy = (origin + (room.y + room.height / 2) * EDITOR_CELL) * s;
     this.panX.set(viewport.clientWidth / 2 - cx);
     this.panY.set(viewport.clientHeight / 2 - cy);
   }
@@ -734,7 +816,7 @@ export class CampaignDungeonMaps implements OnDestroy {
     if (!map || !snap) return;
     this.undoDepth.set(this.undoStack.length);
     this.updateMap({ ...map, tiles: snap.tiles, markers: snap.markers });
-    this.message.set('Annulé.');
+    this.setEditorMessage('Annulé.');
   }
 
   removeMarker(markerId: string): void {
@@ -786,7 +868,7 @@ export class CampaignDungeonMaps implements OnDestroy {
     this.exportBusy.set(true);
     try {
       await exportDungeonPng(map, `${map.name.replace(/\s+/g, '-')}.png`);
-      this.message.set('PNG exporté.');
+      this.setEditorMessage('PNG exporté.');
     } finally {
       this.exportBusy.set(false);
     }
@@ -804,10 +886,10 @@ export class CampaignDungeonMaps implements OnDestroy {
       const file = new File([blob], `${map.name.replace(/\s+/g, '-')}.png`, { type: 'image/png' });
       if (typeof navigator.share === 'function' && navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], title: map.name });
-        this.message.set('Carte partagée.');
+        this.setEditorMessage('Carte partagée.');
       } else {
         await exportDungeonPng(map, `${map.name.replace(/\s+/g, '-')}.png`);
-        this.message.set('PNG téléchargé (partage natif indisponible).');
+        this.setEditorMessage('PNG téléchargé (partage natif indisponible).');
       }
     } finally {
       this.exportBusy.set(false);
@@ -821,7 +903,7 @@ export class CampaignDungeonMaps implements OnDestroy {
     this.exportBusy.set(true);
     try {
       await exportDungeonPdf(map, this.encounters(), `${map.name.replace(/\s+/g, '-')}.pdf`);
-      this.message.set('PDF exporté.');
+      this.setEditorMessage('PDF exporté.');
     } finally {
       this.exportBusy.set(false);
     }
@@ -868,7 +950,7 @@ export class CampaignDungeonMaps implements OnDestroy {
     );
     this.dataChange.emit({ dungeonMaps: maps, handouts });
     this.lastHandoutNav.set({ handoutId: handoutId! });
-    this.message.set(
+    this.setEditorMessage(
       publish
         ? 'Document publié aux joueurs.'
         : 'Document brouillon enregistré — publiez pour les joueurs.',
@@ -886,7 +968,7 @@ export class CampaignDungeonMaps implements OnDestroy {
     a.download = `${map.name.replace(/\s+/g, '-')}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    this.message.set('JSON exporté.');
+    this.setEditorMessage('JSON exporté.');
   }
 
   formatDate(iso: string): string {
@@ -908,7 +990,7 @@ export class CampaignDungeonMaps implements OnDestroy {
       },
       true,
     );
-    this.message.set(
+    this.setEditorMessage(
       enabled
         ? 'Brouillard de guerre activé — révélez les salles une par une.'
         : 'Brouillard de guerre désactivé.',
@@ -935,14 +1017,14 @@ export class CampaignDungeonMaps implements OnDestroy {
     const map = this.editingMap();
     if (!map) return;
     this.patchEditingMap({ revealedRoomIds: map.rooms.map((r) => r.id) }, true);
-    this.message.set('Toutes les salles révélées.');
+    this.setEditorMessage('Toutes les salles révélées.');
   }
 
   hideAllRooms(): void {
     const map = this.editingMap();
     if (!map) return;
     this.patchEditingMap({ revealedRoomIds: [] }, true);
-    this.message.set('Salles masquées — la table live se met à jour ; régénérez le document PNG si besoin.');
+    this.setEditorMessage('Salles masquées — la table live se met à jour ; régénérez le document PNG si besoin.');
   }
 
   onThemeChange(raw: string): void {
@@ -1013,13 +1095,15 @@ export class CampaignDungeonMaps implements OnDestroy {
         this.panY.set(16);
         return;
       }
-      const pad = 48;
-      const sx = (viewport.clientWidth - pad) / (map.gridWidth * EDITOR_CELL);
-      const sy = (viewport.clientHeight - pad) / (map.gridHeight * EDITOR_CELL);
-      const next = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.min(sx, sy, 1.25)));
+      const pad = 24;
+      const drawW = (map.gridWidth + EDITOR_EDGE_PAD * 2) * EDITOR_CELL;
+      const drawH = (map.gridHeight + EDITOR_EDGE_PAD * 2) * EDITOR_CELL;
+      const sx = (viewport.clientWidth - pad) / drawW;
+      const sy = (viewport.clientHeight - pad) / drawH;
+      const next = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.min(sx, sy, FIT_MAX_SCALE)));
       this.scale.set(+next.toFixed(2));
-      const w = map.gridWidth * EDITOR_CELL * next;
-      const h = map.gridHeight * EDITOR_CELL * next;
+      const w = drawW * next;
+      const h = drawH * next;
       this.panX.set((viewport.clientWidth - w) / 2);
       this.panY.set((viewport.clientHeight - h) / 2);
     };
@@ -1032,8 +1116,9 @@ export class CampaignDungeonMaps implements OnDestroy {
     const map = this.editingMap();
     if (!viewport || !map) return null;
     const rect = viewport.getBoundingClientRect();
-    const localX = (clientX - rect.left - this.panX()) / this.scale();
-    const localY = (clientY - rect.top - this.panY()) / this.scale();
+    const origin = dungeonDrawOrigin(EDITOR_CELL, EDITOR_EDGE_PAD);
+    const localX = (clientX - rect.left - this.panX()) / this.scale() - origin;
+    const localY = (clientY - rect.top - this.panY()) / this.scale() - origin;
     const x = Math.floor(localX / EDITOR_CELL);
     const y = Math.floor(localY / EDITOR_CELL);
     if (x < 0 || y < 0 || x >= map.gridWidth || y >= map.gridHeight) return null;

@@ -1,14 +1,23 @@
-@if (view(); as g) {
+@if (visible() && view(); as g) {
   <section
-    class="rounded-2xl border overflow-hidden"
+    class="rounded-2xl border overflow-hidden relative"
     [class]="
       g.liveSession || g.allReady
         ? 'border-emerald-700/50 bg-emerald-950/20'
         : 'border-violet-800/40 bg-violet-950/20'
     "
   >
+    <button
+      type="button"
+      class="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-200 hover:bg-slate-800/60"
+      aria-label="Masquer ce guide"
+      (click)="dismiss()"
+    >
+      ✕
+    </button>
+
     @if (!g.allReady && !g.liveSession) {
-      <div class="px-5 pt-5 pb-3">
+      <div class="px-5 pt-5 pb-3 pr-12">
         <p class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-1">
           Préparer la campagne
         </p>
@@ -34,6 +43,7 @@
         [class.border-t]="!g.allReady && !g.liveSession"
         [class.border-slate-800/60]="!g.allReady && !g.liveSession"
         [class.pt-4]="!g.allReady && !g.liveSession"
+        [class.pr-12]="g.allReady || g.liveSession"
       >
         @if (g.allReady || g.liveSession) {
           <div>

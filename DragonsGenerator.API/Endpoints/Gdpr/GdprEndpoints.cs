@@ -137,6 +137,7 @@ public class ExportMyDataEndpoint(AppDbContext db) : EndpointWithoutRequest
                 user.LastLoginAt,
             user.AcceptedTermsAt,
             guidePreferences = UserPreferencesHelper.GetGuidePreferencesExport(user),
+            uiBannerPreferences = UserPreferencesHelper.GetUiBannerPreferencesExport(user),
         },
             characters,
             ownedCampaigns,

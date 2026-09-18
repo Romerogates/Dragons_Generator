@@ -24,6 +24,10 @@ import { AuthService } from '@core/services/auth.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import { NotificationService } from '@core/services/notification.service';
 import { DataService } from '@core/services/data.service';
+import {
+  UI_BANNER_IDS,
+  UiBannerPreferencesService,
+} from '@core/services/ui-banner-preferences.service';
 import { forkJoin, catchError, map, of, Observable, throwError, firstValueFrom, Subscription } from 'rxjs';
 import { getCampaignPdfService } from '@core/services/campaign-pdf.loader';
 import type { CreaturePrintEntry, PlayerGmSummary } from '@core/services/campaign-pdf.types';
@@ -142,6 +146,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   private characters = inject(CharacterCloudService);
   private auth = inject(AuthService);
   private notifications = inject(NotificationService);
+  private banners = inject(UiBannerPreferencesService);
   private data = inject(DataService);
   private injector = inject(Injector);
   private sanitizer = inject(DomSanitizer);
@@ -176,6 +181,12 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly pregenFeedback = signal<string | null>(null);
   /** Bannière one-shot après /join ou proposition depuis la forge. */
   readonly welcomeBanner = signal<string | null>(null);
+  readonly showWelcomeBanner = computed(
+    () =>
+      !!this.welcomeBanner() &&
+      this.banners.hydrated() &&
+      this.banners.isVisible(UI_BANNER_IDS.welcomeCampaign),
+  );
   readonly joinLink = signal<{ token: string | null; enabled: boolean } | null>(null);
   readonly joinLinkBusy = signal(false);
   /** Amis déjà invités (en attente d’acceptation) — masqués de la liste invitable. */
@@ -696,6 +707,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
   dismissWelcomeBanner(): void {
     this.welcomeBanner.set(null);
+    this.banners.dismiss(UI_BANNER_IDS.welcomeCampaign);
   }
 
   /** Deep-link `?tab=` → nav haute + sous-onglet Préparation si besoin. */

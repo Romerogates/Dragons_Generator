@@ -339,15 +339,21 @@
     </div>
 
     @if (message(); as msg) {
-      <p class="text-sm text-emerald-400/90">
-        {{ msg }}
+      <p class="text-sm text-emerald-400/90 flex flex-wrap items-center gap-2">
+        <span>{{ msg }}</span>
         @if (lastHandoutNav(); as nav) {
           <a
-            class="ml-2 underline underline-offset-2 text-sky-300 hover:text-sky-200"
+            class="underline underline-offset-2 text-sky-300 hover:text-sky-200"
             [routerLink]="['/campaigns', campaign().id]"
             [queryParams]="{ tab: 'handouts', handoutId: nav.handoutId }"
           >Voir dans Documents</a>
         }
+        <button
+          type="button"
+          class="ml-auto text-slate-500 hover:text-slate-200 w-7 h-7 rounded-lg hover:bg-slate-800/60"
+          aria-label="Fermer le message"
+          (click)="dismissMessage()"
+        >✕</button>
       </p>
     }
 
@@ -379,8 +385,9 @@
     >
       <div
         #viewport
-        class="dungeon-viewport relative rounded-2xl border border-slate-800 bg-[#080a0e] overflow-hidden touch-none select-none"
+        class="dungeon-viewport relative rounded-2xl border border-slate-800 overflow-hidden touch-none select-none"
         [ngClass]="cursorClass()"
+        [style.background]="viewportBg()"
         [class.h-[min(70vh,720px)]]="!editorFullscreen()"
         [class.h-full]="editorFullscreen()"
         [class.min-h-0]="editorFullscreen()"
@@ -421,10 +428,12 @@
               </div>
             }
             @for (mk of legendMarkers; track mk.label) {
-              <div class="flex items-center gap-2">
-                <span class="h-4 w-4 rounded-full shrink-0 flex items-center justify-center text-[8px] font-black text-[#0f1218]" [style.background]="mk.color">{{ mk.symbol }}</span>
-                <span class="text-[11px] text-slate-300">{{ mk.label }}</span>
-              </div>
+              @if (mk.symbol !== 'D') {
+                <div class="flex items-center gap-2">
+                  <span class="h-4 w-4 rounded-full shrink-0 flex items-center justify-center text-[8px] font-black text-[#0f1218]" [style.background]="mk.color">{{ mk.symbol }}</span>
+                  <span class="text-[11px] text-slate-300">{{ mk.label }}</span>
+                </div>
+              }
             }
           </div>
         </div>
@@ -475,6 +484,35 @@
                 />
                 <p class="text-[10px] text-slate-500 mt-1">{{ encounterLabel(room, encounters()) }}</p>
 
+                @if (markersForRoom(room); as roomMarkers) {
+                  @if (roomMarkers.length) {
+                    <div class="mt-2 space-y-1.5 border-t border-slate-800/80 pt-2">
+                      <p class="text-[9px] font-black uppercase tracking-widest text-slate-600">Éléments</p>
+                      @for (mk of roomMarkers; track mk.id) {
+                        <div
+                          class="rounded-md border px-2 py-1.5 space-y-1"
+                          [class.border-amber-700/50]="selectedMarkerId() === mk.id"
+                          [class.border-slate-800]="selectedMarkerId() !== mk.id"
+                          (click)="selectMarker(mk.id); $event.stopPropagation()"
+                        >
+                          <p class="text-[10px] text-slate-300 font-semibold">
+                            {{ markerLabels[mk.kind] }}
+                            <span class="text-slate-600 font-normal">({{ mk.x }},{{ mk.y }})</span>
+                          </p>
+                          <textarea
+                            rows="2"
+                            placeholder="Note sur cet élément…"
+                            class="w-full rounded bg-[#0f1218] border border-slate-700 text-[11px] px-2 py-1 resize-none text-slate-300"
+                            [ngModel]="mk.notes ?? ''"
+                            (ngModelChange)="patchMarker(mk.id, { notes: $event })"
+                            (click)="$event.stopPropagation()"
+                          ></textarea>
+                        </div>
+                      }
+                    </div>
+                  }
+                }
+
                 @if (map.fogOfWarEnabled) {
                   <button
                     type="button"
@@ -518,6 +556,23 @@
             }
           </div>
         </div>
+
+        @if (selectedMarker(); as selMk) {
+          @if (selMk.kind !== 'door') {
+            <div class="rounded-xl border border-amber-900/40 bg-amber-950/20 p-4 space-y-2">
+              <h4 class="text-[11px] font-bold uppercase tracking-widest text-amber-400/90">
+                {{ markerLabels[selMk.kind] }} sélectionné
+              </h4>
+              <textarea
+                rows="3"
+                placeholder="Commentaire sur cet élément…"
+                class="w-full rounded bg-[#0f1218] border border-slate-700 text-xs px-2 py-1.5 resize-none text-slate-300"
+                [ngModel]="selMk.notes ?? ''"
+                (ngModelChange)="patchMarker(selMk.id, { notes: $event })"
+              ></textarea>
+            </div>
+          }
+        }
 
         @if (map.markers.length) {
           <div class="rounded-xl border border-slate-800 bg-[#141820] p-4">

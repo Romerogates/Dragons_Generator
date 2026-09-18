@@ -15,6 +15,10 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
+### Donjons — suite
+1. ~~Vague A (rendu / zoom / notes / bannières)~~ **fait**
+2. **Vague B** — hub Donjons hors campagne (CRUD bibliothèque) + partage lien public / amis / rattacher à N campagnes
+
 ### Table + Codex
 1. ~~Fiabilité table (persist / softReload / hints setup)~~ **fait**
 2. ~~Codex sorts (OCR + critiques + vides + modulaires)~~ **fait**
@@ -42,6 +46,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 21. ~~Polish donjons + handouts + PDF fiche 2–4 + e2e forge save~~ **fait** (dock Donjon /play ; carte joueur open/empty ; Publier liste + empty CTA ; Document→Publier donjon ; maîtrises pack 2 lignes + ressources + features col2 ; équip. page 4 ; `lettre-save` CI)
 22. ~~Polish création donjons UX~~ **fait** (presets taille ; options avancées ; Gravure sans délai ; aperçu seed/debounce ; thumbs cache ; Fit rAF ; menus Exporter/Document)
+23. ~~Donjons Vague A~~ **fait** (icônes ; zoom/void ; notes marqueurs ; bannières dismiss + Paramètres)
 
 ### Guide (suite)
 1. ~~Découvrabilité + sans checklists~~ **fait**
@@ -51,6 +56,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## Déjà livré (ne pas refaire)
 
+- **Donjons Vague A** (2026-09-18) — rendu portes/marqueurs moins empietés ; viewport teinté + Fit ~1.75 + padding canvas ; notes marqueurs dans panneau Salles ; prefs compte `hideAllBanners` / `dismissedBannerIds` (setup-guide, toast donjon, welcome, checklist) + toggle Paramètres → Application.
 - **Polish création donjons UX** (2026-09-18) — presets Compact/Standard/Large ; options avancées repliées ; Gravure sans délai 420 ms ; aperçu seed + debounce au release slider ; cache thumbs `id:updatedAt` ; Fit double rAF + pixelated ; menus Exporter / Document.
 - **Polish donjons + handouts + PDF fiche 2–4 + e2e forge save** (2026-09-18) — `/play` dock Donjon + empty carte joueur ; sessions lien Donjons ; Documents Publier/Dépublier + empty CTA ; donjon Document/Publier + lien Documents ; PDF p.2 maîtrises/ressources/features col2 + p.4 équip. ; e2e `lettre-save` (créer→récap→cloud→fiche) dans `e2e:ci`.
 - **Polish création→fiche + pré-tirés + scénario + Atlas** (2026-09-18) — props `prop-*` FR ; erreurs export libellées ; équipement/savoirs wizard ; bandeau identité + armures/armes fiche ; grimoire selon kind ; empty/CTAs pré-tirés + feedback local ; edit scénario ouvre Aventure ; sticky steps ; Atlas Fermer + labels pins mobile.

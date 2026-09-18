@@ -169,6 +169,16 @@ export interface DrawDungeonOptions {
   vignette?: boolean;
   /** Si défini, masque les salles non révélées (fog of war joueur). */
   revealedRoomIds?: Set<string> | null;
+  /**
+   * Cellules de void/mur dessinées autour de la grille (anti « mer de noir » au zoom).
+   * Décalage origin = edgePadCells * cellSize.
+   */
+  edgePadCells?: number;
+}
+
+/** Offset en pixels pour une option edgePadCells donnée. */
+export function dungeonDrawOrigin(cellSize: number, edgePadCells = 0): number {
+  return Math.max(0, edgePadCells) * cellSize;
 }
 
 export function fogRevealSet(map: CampaignDungeonMap): Set<string> | null {
@@ -295,19 +305,30 @@ export function drawDungeonToCanvas(
   if (!ctx) return;
   const palette = themePalette(map.theme);
   const revealed = options?.revealedRoomIds ?? null;
-  const w = map.gridWidth * cellSize;
-  const h = map.gridHeight * cellSize;
+  const pad = Math.max(0, options?.edgePadCells ?? 0);
+  const origin = pad * cellSize;
+  const w = (map.gridWidth + pad * 2) * cellSize;
+  const h = (map.gridHeight + pad * 2) * cellSize;
   canvas.width = w;
   canvas.height = h;
 
   ctx.fillStyle = palette.bg;
   ctx.fillRect(0, 0, w, h);
 
+  if (pad > 0) {
+    ctx.fillStyle = palette.wall;
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = palette.bg;
+    ctx.globalAlpha = 0.55;
+    ctx.fillRect(0, 0, w, h);
+    ctx.globalAlpha = 1;
+  }
+
   for (let y = 0; y < map.gridHeight; y++) {
     for (let x = 0; x < map.gridWidth; x++) {
       const kind = tileAt(map, x, y);
-      const px = x * cellSize;
-      const py = y * cellSize;
+      const px = origin + x * cellSize;
+      const py = origin + y * cellSize;
 
       if (kind === 'wall') {
         ctx.fillStyle = palette.wall;
@@ -316,11 +337,14 @@ export function drawDungeonToCanvas(
         ctx.fillRect(px, py + cellSize - 1, cellSize, 1);
         ctx.fillRect(px + cellSize - 1, py, 1, cellSize);
       } else if (kind === 'door') {
-        ctx.fillStyle = palette.door;
+        ctx.fillStyle = (x + y) % 2 === 0 ? palette.floor : palette.floorAlt;
         ctx.fillRect(px, py, cellSize, cellSize);
+        const band = Math.max(2, Math.round(cellSize * 0.28));
+        ctx.fillStyle = palette.door;
+        ctx.fillRect(px, py + (cellSize - band) / 2, cellSize, band);
         ctx.strokeStyle = palette.doorEdge;
-        ctx.lineWidth = Math.max(1, cellSize * 0.12);
-        ctx.strokeRect(px + 1, py + 1, cellSize - 2, cellSize - 2);
+        ctx.lineWidth = Math.max(1, cellSize * 0.08);
+        ctx.strokeRect(px + 0.5, py + (cellSize - band) / 2 + 0.5, cellSize - 1, band - 1);
       } else {
         ctx.fillStyle = (x + y) % 2 === 0 ? palette.floor : palette.floorAlt;
         ctx.fillRect(px, py, cellSize, cellSize);
@@ -338,16 +362,16 @@ export function drawDungeonToCanvas(
     if (room) {
       ctx.fillStyle = palette.roomHighlight;
       ctx.fillRect(
-        room.x * cellSize,
-        room.y * cellSize,
+        origin + room.x * cellSize,
+        origin + room.y * cellSize,
         room.width * cellSize,
         room.height * cellSize,
       );
       ctx.strokeStyle = palette.roomTextSelected;
       ctx.lineWidth = Math.max(1, cellSize * 0.15);
       ctx.strokeRect(
-        room.x * cellSize + 1,
-        room.y * cellSize + 1,
+        origin + room.x * cellSize + 1,
+        origin + room.y * cellSize + 1,
         room.width * cellSize - 2,
         room.height * cellSize - 2,
       );
@@ -355,37 +379,45 @@ export function drawDungeonToCanvas(
   }
 
   if (options?.showRoomNumbers !== false) {
-    ctx.font = `bold ${Math.max(8, cellSize - 2)}px "Segoe UI", system-ui, sans-serif`;
+    const numSize = Math.max(7, Math.round(cellSize * 0.55));
+    ctx.font = `bold ${numSize}px "Segoe UI", system-ui, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     for (const room of map.rooms) {
-      const cx = (room.x + room.width / 2) * cellSize;
-      const cy = (room.y + room.height / 2) * cellSize;
+      const cx = origin + (room.x + room.width / 2) * cellSize;
+      const cy = origin + (room.y + room.height / 2) * cellSize;
       const num = room.label.replace(/\D/g, '') || '?';
       if (revealed && !revealed.has(room.id)) continue;
-      ctx.fillStyle = 'rgba(0,0,0,0.35)';
-      ctx.fillText(num, cx + 1, cy + 1);
+      const pr = Math.max(4, cellSize * 0.32);
+      ctx.beginPath();
+      ctx.arc(cx, cy, pr, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(15,18,24,0.55)';
+      ctx.fill();
       ctx.fillStyle =
         room.id === options?.selectedRoomId ? palette.roomTextSelected : palette.roomText;
-      ctx.fillText(num, cx, cy);
+      ctx.fillText(num, cx, cy + 0.5);
     }
   }
 
   for (const marker of map.markers) {
+    if (marker.kind === 'door') continue;
     if (revealed && !isCellRevealed(map, marker.x, marker.y, revealed)) continue;
-    const cx = marker.x * cellSize + cellSize / 2;
-    const cy = marker.y * cellSize + cellSize / 2;
-    const r = cellSize * 0.38;
+    const cx = origin + marker.x * cellSize + cellSize / 2;
+    const cy = origin + marker.y * cellSize + cellSize / 2;
+    const r = Math.max(3, cellSize * 0.28);
     ctx.beginPath();
-    ctx.arc(cx, cy, r + 1, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.arc(cx, cy + 0.5, r + 0.8, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
     ctx.fill();
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
     ctx.fillStyle = MARKER_COLORS[marker.kind];
     ctx.fill();
+    ctx.strokeStyle = 'rgba(15,18,24,0.35)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
     ctx.fillStyle = '#0f1218';
-    ctx.font = `bold ${Math.max(7, cellSize - 4)}px "Segoe UI", system-ui, sans-serif`;
+    ctx.font = `bold ${Math.max(6, Math.round(cellSize * 0.42))}px "Segoe UI", system-ui, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(MARKER_SYMBOLS[marker.kind], cx, cy + 0.5);
@@ -396,14 +428,21 @@ export function drawDungeonToCanvas(
       for (let x = 0; x < map.gridWidth; x++) {
         if (!isCellRevealed(map, x, y, revealed)) {
           ctx.fillStyle = '#06080c';
-          ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+          ctx.fillRect(origin + x * cellSize, origin + y * cellSize, cellSize, cellSize);
         }
       }
     }
   }
 
   if (options?.vignette !== false && cellSize >= 6) {
-    const g = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.25, w / 2, h / 2, Math.max(w, h) * 0.72);
+    const g = ctx.createRadialGradient(
+      w / 2,
+      h / 2,
+      Math.min(w, h) * 0.25,
+      w / 2,
+      h / 2,
+      Math.max(w, h) * 0.72,
+    );
     g.addColorStop(0, 'rgba(0,0,0,0)');
     g.addColorStop(1, 'rgba(0,0,0,0.35)');
     ctx.fillStyle = g;

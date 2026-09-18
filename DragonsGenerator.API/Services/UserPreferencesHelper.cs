@@ -18,6 +18,12 @@ public sealed class UserPreferences
     /// <summary>Dernier changement de pseudo (cooldown 7 jours).</summary>
     [JsonPropertyName("displayNameChangedAt")]
     public DateTimeOffset? DisplayNameChangedAt { get; set; }
+
+    [JsonPropertyName("hideAllBanners")]
+    public bool HideAllBanners { get; set; }
+
+    [JsonPropertyName("dismissedBannerIds")]
+    public List<string> DismissedBannerIds { get; set; } = [];
 }
 
 public static class UserPreferencesHelper
@@ -121,6 +127,53 @@ public static class UserPreferencesHelper
             readNewsIds = prefs.GuideReadNewsIds,
             readSectionIds = prefs.GuideReadSectionIds,
             audience = NormalizeGuideAudience(prefs.GuideAudience, out _),
+        };
+    }
+
+    public static bool GetHideAllBanners(AppUser user) => Parse(user.PreferencesJson).HideAllBanners;
+
+    public static string[] GetDismissedBannerIds(AppUser user) =>
+        Parse(user.PreferencesJson).DismissedBannerIds.ToArray();
+
+    public static string[] NormalizeDismissedBannerIds(IEnumerable<string>? raw, out string? error, int maxCount = 80)
+    {
+        error = null;
+        if (raw is null) return [];
+        var list = new List<string>();
+        foreach (var id in raw)
+        {
+            if (string.IsNullOrWhiteSpace(id)) continue;
+            var trimmed = id.Trim();
+            if (trimmed.Length > 64)
+            {
+                error = "Identifiant de bannière trop long.";
+                return [];
+            }
+            if (!list.Contains(trimmed, StringComparer.Ordinal)) list.Add(trimmed);
+            if (list.Count > maxCount)
+            {
+                error = $"Trop de bannières masquées (max {maxCount}).";
+                return [];
+            }
+        }
+        return list.ToArray();
+    }
+
+    public static void ApplyUiBannerPreferences(AppUser user, bool hideAllBanners, IEnumerable<string> dismissedIds)
+    {
+        var prefs = Parse(user.PreferencesJson);
+        prefs.HideAllBanners = hideAllBanners;
+        prefs.DismissedBannerIds = dismissedIds.Distinct(StringComparer.Ordinal).ToList();
+        user.PreferencesJson = Serialize(prefs);
+    }
+
+    public static object GetUiBannerPreferencesExport(AppUser user)
+    {
+        var prefs = Parse(user.PreferencesJson);
+        return new
+        {
+            hideAllBanners = prefs.HideAllBanners,
+            dismissedBannerIds = prefs.DismissedBannerIds,
         };
     }
 }
