@@ -40,6 +40,8 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 19. ~~Polish forge (IDs / doublons / copy)~~ **fait** (labels IDs langues/multiclass/espèce/magie/classe ; expertise candidats + modificateurs ; copy RAW/ASI/Domaine/grimoire)
 20. ~~Polish création→fiche + pré-tirés + scénario + Atlas~~ **fait** (props armes FR ; validation équipement/savoirs ; identité fiche ; feedback pré-tirés ; edit scénario→aventure ; Atlas Fermer + pins mobile)
 
+21. ~~Polish donjons + handouts + PDF fiche 2–4 + e2e forge save~~ **fait** (dock Donjon /play ; carte joueur open/empty ; Publier liste + empty CTA ; Document→Publier donjon ; maîtrises pack 2 lignes + ressources + features col2 ; équip. page 4 ; `lettre-save` CI)
+
 ### Guide (suite)
 1. ~~Découvrabilité + sans checklists~~ **fait**
 2. ~~One-shot 1 feuille + schéma initiative + libellés fiche~~ **fait**
@@ -48,6 +50,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## Déjà livré (ne pas refaire)
 
+- **Polish donjons + handouts + PDF fiche 2–4 + e2e forge save** (2026-09-18) — `/play` dock Donjon + empty carte joueur ; sessions lien Donjons ; Documents Publier/Dépublier + empty CTA ; donjon Document/Publier + lien Documents ; PDF p.2 maîtrises/ressources/features col2 + p.4 équip. ; e2e `lettre-save` (créer→récap→cloud→fiche) dans `e2e:ci`.
 - **Polish création→fiche + pré-tirés + scénario + Atlas** (2026-09-18) — props `prop-*` FR ; erreurs export libellées ; équipement/savoirs wizard ; bandeau identité + armures/armes fiche ; grimoire selon kind ; empty/CTAs pré-tirés + feedback local ; edit scénario ouvre Aventure ; sticky steps ; Atlas Fermer + labels pins mobile.
 - **Polish forge IDs / doublons / copy** (2026-09-17) — `labelForGameId` langues/magie/classe ; `gameIdLabels` multiclass ; `resistanceLabel` + formes de souffle ; expertise candidats (sous-classe + multiclass) + modificateurs ; copy sans RAW/ASI/Domaine/grimoire espèce.
 - **Audit soirée + parcours social** (2026-09-17) — e2e `campaign-soiree-audit`, `friend-chat-share`, `campaign-join-guest` ; fermeture dock sur join/fiche ; libellés Inviter/Ouvrir ; retour « messages » ; empty lien hub ; hint join « proposer un héros ».

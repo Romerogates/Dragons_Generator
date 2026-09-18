@@ -14,6 +14,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import {
   CampaignData,
   CampaignDetail,
@@ -64,7 +65,7 @@ const MAX_UNDO = 40;
 @Component({
   selector: 'app-campaign-dungeon-maps',
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmDialog, FullscreenEnterBtn],
+  imports: [CommonModule, FormsModule, RouterLink, ConfirmDialog, FullscreenEnterBtn],
   templateUrl: './campaign-dungeon-maps.html',
   styleUrl: './campaign-dungeon-maps.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -93,6 +94,8 @@ export class CampaignDungeonMaps implements OnDestroy {
   /** Éditeur carte en overlay plein viewport (canvas + outils). */
   readonly editorFullscreen = signal(false);
   readonly message = signal<string | null>(null);
+  /** Lien vers l’onglet Documents après création / publication d’un handout carte. */
+  readonly lastHandoutNav = signal<{ handoutId: string } | null>(null);
   readonly thumbUrls = signal<Record<string, string>>({});
 
   private previousBodyOverflow = '';
@@ -713,26 +716,37 @@ export class CampaignDungeonMaps implements OnDestroy {
     }
   }
 
-  createOrUpdateHandout(): void {
+  createOrUpdateHandout(opts?: { publish?: boolean }): void {
     const map = this.editingMap();
     if (!map) return;
     const c = this.campaign();
     const body = buildHandoutBody(map, this.encounters());
     const now = new Date().toISOString();
+    const publish = opts?.publish === true;
     let handouts = [...(c.data.handouts ?? [])];
     let handoutId = map.handoutId ?? null;
 
     if (handoutId) {
       handouts = handouts.map((h) =>
         h.id === handoutId
-          ? { ...h, title: map.name, body, kind: 'map' as const, updatedAt: now }
+          ? {
+              ...h,
+              title: map.name,
+              body,
+              kind: 'map' as const,
+              updatedAt: now,
+              ...(publish
+                ? { published: true, publishedAt: h.publishedAt ?? now }
+                : {}),
+            }
           : h,
       );
     } else {
       const handout = createCampaignHandout(map.name);
       handout.kind = 'map';
       handout.body = body;
-      handout.published = false;
+      handout.published = publish;
+      if (publish) handout.publishedAt = now;
       handoutId = handout.id;
       handouts.push(handout);
     }
@@ -741,7 +755,12 @@ export class CampaignDungeonMaps implements OnDestroy {
       m.id === map.id ? { ...m, handoutId, updatedAt: now } : m,
     );
     this.dataChange.emit({ dungeonMaps: maps, handouts });
-    this.message.set('Document brouillon enregistré (onglet Documents — publiez pour les joueurs).');
+    this.lastHandoutNav.set({ handoutId: handoutId! });
+    this.message.set(
+      publish
+        ? 'Document publié aux joueurs.'
+        : 'Document brouillon enregistré — publiez pour les joueurs.',
+    );
   }
 
   exportJson(): void {

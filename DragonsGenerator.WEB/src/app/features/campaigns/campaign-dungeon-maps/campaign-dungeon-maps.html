@@ -238,12 +238,36 @@
         <button type="button" class="editor-action" [disabled]="exportBusy()" (click)="sharePng()">Partager</button>
         <button type="button" class="editor-action" [disabled]="exportBusy()" (click)="exportPdf()">PDF</button>
         <button type="button" class="editor-action" (click)="exportJson()">JSON</button>
-        <button type="button" class="editor-action editor-action--accent" (click)="createOrUpdateHandout()">Document</button>
+        <button
+          type="button"
+          class="editor-action editor-action--accent"
+          title="Enregistrer un document brouillon (carte) pour les joueurs"
+          (click)="createOrUpdateHandout()"
+        >
+          Document
+        </button>
+        <button
+          type="button"
+          class="editor-action editor-action--accent"
+          title="Enregistrer et publier le document carte aux joueurs"
+          (click)="createOrUpdateHandout({ publish: true })"
+        >
+          Publier
+        </button>
       </div>
     </div>
 
     @if (message(); as msg) {
-      <p class="text-sm text-emerald-400/90">{{ msg }}</p>
+      <p class="text-sm text-emerald-400/90">
+        {{ msg }}
+        @if (lastHandoutNav(); as nav) {
+          <a
+            class="ml-2 underline underline-offset-2 text-sky-300 hover:text-sky-200"
+            [routerLink]="['/campaigns', campaign().id]"
+            [queryParams]="{ tab: 'handouts', handoutId: nav.handoutId }"
+          >Voir dans Documents</a>
+        }
+      </p>
     }
 
     <div class="flex flex-wrap items-center gap-1.5">

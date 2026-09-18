@@ -230,6 +230,7 @@
         @case ('sessions') {
           <app-campaign-detail-sessions
             [isOwner]="c.isOwner"
+            [campaignId]="c.id"
             [sortedSessions]="sortedSessions()"
             [upcomingSessions]="upcomingSessions()"
             [pastSessions]="pastSessions()"

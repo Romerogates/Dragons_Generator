@@ -606,17 +606,22 @@ export class PdfGeneratorService {
     const P = PAGE2;
     pdf.setFontSize(15);
 
-    this.prioritizeCategoryTokens(c.proficiencies.armor)
-      .slice(0, 2)
-      .forEach((a, i) => {
-        this.text(pdf, this.prettify(a), P.armorX, P.armorYs[i]);
-      });
+    const packTwoLines = (ids: string[]): [string, string] => {
+      const sorted = this.prioritizeCategoryTokens(ids);
+      if (sorted.length === 0) return ['', ''];
+      if (sorted.length === 1) return [this.prettify(sorted[0]!), ''];
+      const first = this.prettify(sorted[0]!);
+      const rest = sorted.slice(1).map((id) => this.prettify(id)).join(', ');
+      return [first, rest];
+    };
 
-    this.prioritizeCategoryTokens(c.proficiencies.weapons)
-      .slice(0, 2)
-      .forEach((w, i) => {
-        this.text(pdf, this.prettify(w), P.weaponX, P.weaponYs[i]);
-      });
+    const [armor0, armor1] = packTwoLines(c.proficiencies.armor ?? []);
+    if (armor0) this.text(pdf, armor0, P.armorX, P.armorYs[0]);
+    if (armor1) this.text(pdf, armor1, P.armorX, P.armorYs[1]);
+
+    const [weapon0, weapon1] = packTwoLines(c.proficiencies.weapons ?? []);
+    if (weapon0) this.text(pdf, weapon0, P.weaponX, P.weaponYs[0]);
+    if (weapon1) this.text(pdf, weapon1, P.weaponX, P.weaponYs[1]);
   }
 
   /**
@@ -752,6 +757,7 @@ export class PdfGeneratorService {
       P.shortRestStartY,
       P.shortRestLineH,
       P.shortRestMaxLines,
+      { nameX: P.shortRestCol2NameX, usesX: P.shortRestCol2UsesX },
     );
 
     // --- Section "Regain en repos long" ---
@@ -763,14 +769,25 @@ export class PdfGeneratorService {
       P.longRestStartY,
       P.longRestLineH,
       P.longRestMaxLines,
+      { nameX: P.longRestCol2NameX, usesX: P.longRestCol2UsesX },
     );
   }
 
-  /** Points d'astuce, rage, ki… (ressources de progression visibles). */
+  /** Points d'astuce, rage, ki, inspiration… (aligné sur la fiche UI). */
   private drawPage2ClassResources(pdf: jsPDF, c: Character): void {
-    const chips = visibleClassResources(c.classResources).filter(
-      (r) => r.key === 'points_astuce' || r.key === 'astuces_known' || r.key === 'rage' || r.key === 'ki' || r.key === 'ki_points' || r.key === 'arcane_points',
-    );
+    const spellDupes = new Set([
+      'cantrips_known',
+      'cantrips',
+      'spells_known',
+      'known_spells',
+      'spells_prepared',
+      'prepared_spells',
+      'spell_slots',
+      'pact_magic',
+      'pact_slots_count',
+      'pact_slot_level',
+    ]);
+    const chips = visibleClassResources(c.classResources).filter((r) => !spellDupes.has(r.key));
     if (!chips.length) return;
     const P = PAGE2;
     pdf.setFontSize(7);
@@ -781,6 +798,7 @@ export class PdfGeneratorService {
 
   /**
    * Dessine une liste de features avec nom + cercles d'utilisation.
+   * `col2` : débordement colonne droite (repos court / long).
    */
   private drawFeatureLines(
     pdf: jsPDF,
@@ -790,11 +808,17 @@ export class PdfGeneratorService {
     startY: number,
     lineH: number,
     maxLines: number,
+    col2?: { nameX: number; usesX: number },
   ): void {
     pdf.setFontSize(10);
 
-    features.slice(0, maxLines).forEach((feat, i) => {
-      const y = startY + i * lineH;
+    const capacity = col2 ? maxLines * 2 : maxLines;
+    features.slice(0, capacity).forEach((feat, i) => {
+      const inCol2 = !!col2 && i >= maxLines;
+      const xName = inCol2 ? col2!.nameX : nameX;
+      const xUses = inCol2 ? col2!.usesX : usesX;
+      const row = inCol2 ? i - maxLines : i;
+      const y = startY + row * lineH;
 
       // Nom de l'aptitude (+ portée d'aura si présente dans la desc)
       let label = feat.name;
@@ -808,14 +832,14 @@ export class PdfGeneratorService {
         label += ` (×${feat.uses.max})`;
       }
 
-      this.text(pdf, label, nameX, y);
+      this.text(pdf, label, xName, y);
 
       // Dessiner des cercles cochables si l'aptitude a un nombre d'utilisations
       if (feat.uses && feat.uses.max > 0 && feat.uses.max <= 10) {
         const circleRadius = 2;
         const circleSpacing = 11;
         for (let u = 0; u < feat.uses.max; u++) {
-          this.drawEmptyCircle(pdf, usesX + u * circleSpacing, y - 2, circleRadius);
+          this.drawEmptyCircle(pdf, xUses + u * circleSpacing, y - 2, circleRadius);
         }
       }
     });
@@ -895,14 +919,20 @@ export class PdfGeneratorService {
     pdf.setFontSize(10);
 
     const equipTops = [175, 197, 219, 242, 264, 287, 309, 333, 356, 375, 399, 421];
+    const equipRightYs = [168, 188, 208, 228, 248, 268, 288, 308];
+    const formatEq = (item: { name: string; qty: number }) =>
+      item.qty > 1 ? `${item.name} x${item.qty}` : item.name;
+
     c.equipment.forEach((item, i) => {
-      if (i < 12) {
-        const label = item.qty > 1 ? `${item.name} x${item.qty}` : item.name;
-        this.text(pdf, label, 66, equipTops[i]);
+      if (i < equipTops.length) {
+        this.text(pdf, formatEq(item), 66, equipTops[i]!);
+      } else {
+        const ri = i - equipTops.length;
+        if (ri < equipRightYs.length) {
+          this.text(pdf, formatEq(item), 222, equipRightYs[ri]!);
+        }
       }
     });
-    if (c.equipment[12]) this.text(pdf, c.equipment[12].name, 222, 168);
-    if (c.equipment[13]) this.text(pdf, c.equipment[13].name, 223, 188);
 
     this.text(pdf, `${c.currency.or} po`, 71, 486);
     this.text(pdf, `${c.currency.argent} pa`, 71, 507);

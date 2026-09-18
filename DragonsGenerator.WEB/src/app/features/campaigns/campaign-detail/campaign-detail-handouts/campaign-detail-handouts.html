@@ -316,6 +316,21 @@
               >
                 {{ pinnedHandoutId() === handout.id ? 'Épinglé' : 'Épingler' }}
               </button>
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:border-amber-700/50 hover:text-amber-300"
+                (click)="togglePublished.emit({ handoutId: handout.id, published: false })"
+              >
+                Dépublier
+              </button>
+            } @else {
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-emerald-800/50 text-emerald-300 bg-emerald-950/30 hover:bg-emerald-950/50"
+                (click)="togglePublished.emit({ handoutId: handout.id, published: true })"
+              >
+                Publier
+              </button>
             }
             <button
               type="button"
@@ -349,13 +364,24 @@
       }
     </article>
   } @empty {
-    <p class="text-slate-500 italic text-center py-12">
+    <div class="rounded-2xl border border-dashed border-slate-700/80 py-12 px-6 text-center space-y-4 bg-[#12161d]/40">
+      <p class="text-slate-500 italic">
+        @if (isOwner()) {
+          Aucun document — lettres, cartes ou résumés pour vos joueurs.
+        } @else {
+          Aucun document publié pour l'instant.
+        }
+      </p>
       @if (isOwner()) {
-        Aucun document — créez un document pour vos joueurs.
-      } @else {
-        Aucun document publié pour l'instant.
+        <button
+          type="button"
+          class="inline-flex min-h-11 items-center px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-sky-900/50 border border-sky-700/50 text-sky-200 hover:bg-sky-900/70"
+          (click)="addHandout.emit()"
+        >
+          + Document
+        </button>
       }
-    </p>
+    </div>
   }
 </section>
 

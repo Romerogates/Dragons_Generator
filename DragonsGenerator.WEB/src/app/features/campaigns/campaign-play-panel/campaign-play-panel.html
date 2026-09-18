@@ -211,6 +211,20 @@
             <span class="block text-[10px] font-black uppercase tracking-widest text-violet-300">Rencontres</span>
             <span class="text-xs text-slate-500 truncate">Lancer un groupe préparé</span>
           </button>
+          <button
+            type="button"
+            class="min-h-14 px-4 py-3 rounded-xl text-left border border-sky-800/50 bg-sky-950/20 hover:border-sky-600/50 flex flex-col gap-0.5"
+            (click)="openSessionDungeon()"
+          >
+            <span class="block text-[10px] font-black uppercase tracking-widest text-sky-300">Donjon</span>
+            <span class="text-xs text-slate-500 truncate">
+              @if (activeSessionMap(); as map) {
+                {{ map.name }}
+              } @else {
+                Aucun donjon attribué
+              }
+            </span>
+          </button>
         </div>
         <div>
           <button
@@ -541,32 +555,39 @@
         </div>
       }
 
-      @if (!isDm() && activeSessionMap(); as liveMap) {
-        <details class="rounded-xl border border-sky-900/40 bg-sky-950/20 p-3 group">
-          <summary
-            class="min-h-11 flex flex-wrap items-center justify-between gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden"
-          >
-            <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">
-              Carte · {{ liveMap.name }}
-            </p>
-            <span class="text-[10px] text-slate-500 group-open:hidden">Afficher</span>
-            <span class="text-[10px] text-slate-500 hidden group-open:inline">Masquer</span>
-          </summary>
-          <div class="mt-2 space-y-2">
-            @if (liveMap.fogOfWarEnabled) {
-              <p class="text-[10px] text-slate-500">Brouillard de guerre — révélations en direct</p>
-            }
-            <div
-              class="overflow-auto max-h-[min(42vh,22rem)] touch-pan-x touch-pan-y overscroll-contain rounded-lg border border-slate-800 bg-[#0a0d13]"
+      @if (!isDm()) {
+        @if (activeSessionMap(); as liveMap) {
+          <details open class="rounded-xl border border-sky-900/40 bg-sky-950/20 p-3 group">
+            <summary
+              class="min-h-11 flex flex-wrap items-center justify-between gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden"
             >
-              <canvas
-                #liveDungeonCanvas
-                class="block max-w-none"
-                aria-label="Carte de session"
-              ></canvas>
+              <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">
+                Carte · {{ liveMap.name }}
+              </p>
+              <span class="text-[10px] text-slate-500 group-open:hidden">Afficher</span>
+              <span class="text-[10px] text-slate-500 hidden group-open:inline">Masquer</span>
+            </summary>
+            <div class="mt-2 space-y-2">
+              @if (liveMap.fogOfWarEnabled) {
+                <p class="text-[10px] text-slate-500">Brouillard de guerre — révélations en direct</p>
+              }
+              <div
+                class="overflow-auto max-h-[min(42vh,22rem)] touch-pan-x touch-pan-y overscroll-contain rounded-lg border border-slate-800 bg-[#0a0d13]"
+              >
+                <canvas
+                  #liveDungeonCanvas
+                  class="block max-w-none"
+                  aria-label="Carte de session"
+                ></canvas>
+              </div>
             </div>
+          </details>
+        } @else {
+          <div class="rounded-xl border border-dashed border-slate-700 bg-[#1b2028]/50 p-4 text-center space-y-1">
+            <p class="text-sm text-slate-300">Pas de carte pour cette session</p>
+            <p class="text-xs text-slate-500">Le MJ peut en attribuer une dans Préparation → Donjons.</p>
           </div>
-        </details>
+        }
       }
 
       @if (activeCombat(); as combat) {

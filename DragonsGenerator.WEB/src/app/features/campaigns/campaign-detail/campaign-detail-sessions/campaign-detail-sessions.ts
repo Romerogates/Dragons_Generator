@@ -52,6 +52,8 @@ export class CampaignDetailSessions {
   readonly activeSessionId = input<string | null>(null);
   /** Cartes / donjons de la campagne (MJ) pour attribution. */
   readonly dungeonMaps = input<{ id: string; name: string }[]>([]);
+  /** Id campagne pour liens vers Préparation → Donjons. */
+  readonly campaignId = input.required<string>();
 
   readonly addSession = output<void>();
   readonly startEditSession = output<string>();

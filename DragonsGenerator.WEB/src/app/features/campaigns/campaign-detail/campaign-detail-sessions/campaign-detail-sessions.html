@@ -180,7 +180,13 @@
           </select>
           @if (!dungeonMaps().length) {
             <p class="mt-1 text-[10px] text-slate-500">
-              Créez un donjon dans Préparation → Donjons.
+              Créez un donjon dans
+              <a
+                [routerLink]="['/campaigns', campaignId()]"
+                [queryParams]="{ tab: 'maps' }"
+                class="text-sky-400 hover:text-sky-300 underline-offset-2 hover:underline"
+              >Préparation → Donjons</a
+              >.
             </p>
           }
         </label>
