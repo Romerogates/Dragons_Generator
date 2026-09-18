@@ -46,6 +46,7 @@ import {
   roomAt,
   themePalette,
 } from '@core/utils/dungeon-render.util';
+import { gridLine, setTileAt } from '@core/utils/dungeon-paint.util';
 import { rollRandomEncounter, suggestThemeFromRegion } from '@core/utils/dungeon-theme-pools';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import { FullscreenEnterBtn } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-btn';
@@ -141,6 +142,8 @@ export class CampaignDungeonMaps implements OnDestroy {
   readonly viewportRef = viewChild<ElementRef<HTMLDivElement>>('viewport');
 
   readonly editingMapId = signal<string | null>(null);
+  /** Copie de travail live (paint immédiat) — le save parent reste debounce. */
+  readonly draftMap = signal<CampaignDungeonMap | null>(null);
   readonly confirmDialog = signal<{
     title: string;
     body: string;
@@ -225,6 +228,8 @@ export class CampaignDungeonMaps implements OnDestroy {
   readonly editingMap = computed(() => {
     const id = this.editingMapId();
     if (!id) return null;
+    const draft = this.draftMap();
+    if (draft && draft.id === id) return draft;
     return this.maps().find((m) => m.id === id) ?? null;
   });
 
@@ -262,7 +267,10 @@ export class CampaignDungeonMaps implements OnDestroy {
   private pinchStartDistance = 0;
   private pinchStartScale = 1;
   private lastPaintKey: string | null = null;
+  private lastPaintTile: { x: number; y: number } | null = null;
   private strokeStarted = false;
+  /** true après le premier pointermove du stroke (pas de toggle-suppression marqueur). */
+  private strokeDragged = false;
 
   constructor() {
     effect(() => {
@@ -564,7 +572,7 @@ export class CampaignDungeonMaps implements OnDestroy {
           createdAt: current.createdAt,
           updatedAt: new Date().toISOString(),
         };
-        this.updateMap(merged);
+        this.updateMap(merged, false, true);
         this.selectedRoomId.set(merged.rooms[0]?.id ?? null);
         this.fitMapInView(merged);
         this.setEditorMessage('Donjon régénéré.', { coaching: true });
@@ -576,6 +584,7 @@ export class CampaignDungeonMaps implements OnDestroy {
   openEditor(mapId: string): void {
     this.closeActionMenus();
     this.editingMapId.set(mapId);
+    this.draftMap.set(null);
     this.selectedRoomId.set(null);
     this.selectedMarkerId.set(null);
     this.undoStack = [];
@@ -587,6 +596,8 @@ export class CampaignDungeonMaps implements OnDestroy {
   closeEditor(): void {
     this.closeActionMenus();
     this.setEditorFullscreen(false);
+    this.flushPendingSave();
+    this.draftMap.set(null);
     this.editingMapId.set(null);
     this.undoStack = [];
     this.undoDepth.set(0);
@@ -647,9 +658,15 @@ export class CampaignDungeonMaps implements OnDestroy {
     this.confirmDialog.set({ title, body, confirmLabel, onConfirm });
   }
 
-  updateMap(map: CampaignDungeonMap, immediate = false): void {
-    const now = new Date().toISOString();
-    const updated = { ...map, updatedAt: now };
+  /**
+   * Met à jour la carte de travail tout de suite (canvas live).
+   * `touchUpdatedAt` : horodatage pour thumbs / sync — à la fin de stroke ou save immédiat.
+   */
+  updateMap(map: CampaignDungeonMap, immediate = false, touchUpdatedAt = immediate): void {
+    const updated = touchUpdatedAt ? { ...map, updatedAt: new Date().toISOString() } : { ...map };
+    if (this.editingMapId() === map.id) {
+      this.draftMap.set(updated);
+    }
     const list = (this.campaign().data.dungeonMaps ?? []).map((m) =>
       m.id === map.id ? updated : m,
     );
@@ -659,7 +676,7 @@ export class CampaignDungeonMaps implements OnDestroy {
   patchEditingMap(patch: Partial<CampaignDungeonMap>, immediate = false): void {
     const current = this.editingMap();
     if (!current) return;
-    this.updateMap({ ...current, ...patch }, immediate);
+    this.updateMap({ ...current, ...patch }, immediate, immediate);
   }
 
   patchRoom(roomId: string, patch: Partial<CampaignDungeonMap['rooms'][0]>): void {
@@ -771,7 +788,7 @@ export class CampaignDungeonMaps implements OnDestroy {
     this.panY.set(viewport.clientHeight / 2 - cy);
   }
 
-  applyTileAt(x: number, y: number, recordUndo: boolean): void {
+  applyTileAt(x: number, y: number, recordUndo: boolean, fromStrokeMove = false): void {
     const map = this.editingMap();
     if (!map) return;
     if (x < 0 || y < 0 || x >= map.gridWidth || y >= map.gridHeight) return;
@@ -795,11 +812,10 @@ export class CampaignDungeonMaps implements OnDestroy {
     }
 
     if (tool === 'floor' || tool === 'wall' || tool === 'door') {
-      if (map.tiles[y][x] === tool) return;
-      const tiles = map.tiles.map((row, ry) =>
-        row.map((cell, rx) => (rx === x && ry === y ? (tool as DungeonTileKind) : cell)),
-      );
-      this.updateMap({ ...map, tiles });
+      if (map.tiles[y]?.[x] === tool) return;
+      const tiles = setTileAt(map.tiles, x, y, tool as DungeonTileKind);
+      if (tiles === map.tiles) return;
+      this.updateMap({ ...map, tiles }, false, false);
       return;
     }
 
@@ -809,6 +825,8 @@ export class CampaignDungeonMaps implements OnDestroy {
       const markers = [...map.markers];
       if (existing >= 0) {
         if (markers[existing].kind === markerKind) {
+          // Toggle suppression seulement au clic initial, pas pendant un glissé.
+          if (fromStrokeMove || this.strokeDragged) return;
           markers.splice(existing, 1);
         } else {
           markers[existing] = {
@@ -827,7 +845,7 @@ export class CampaignDungeonMaps implements OnDestroy {
           linkedRoomId: roomAt(map, x, y),
         });
       }
-      this.updateMap({ ...map, markers });
+      this.updateMap({ ...map, markers }, false, false);
     }
   }
 
@@ -867,10 +885,15 @@ export class CampaignDungeonMaps implements OnDestroy {
     event.preventDefault();
     this.isPainting.set(true);
     this.strokeStarted = false;
+    this.strokeDragged = false;
     this.lastPaintKey = null;
+    this.lastPaintTile = null;
     viewport.setPointerCapture(event.pointerId);
     const tile = this.clientToTile(event.clientX, event.clientY);
-    if (tile) this.applyTileAt(tile.x, tile.y, true);
+    if (tile) {
+      this.lastPaintTile = tile;
+      this.applyTileAt(tile.x, tile.y, true, false);
+    }
   }
 
   onPointerMove(event: PointerEvent): void {
@@ -897,7 +920,18 @@ export class CampaignDungeonMaps implements OnDestroy {
     if (!this.isPainting()) return;
     if (this.activeTool() === 'select') return;
     const tile = this.clientToTile(event.clientX, event.clientY);
-    if (tile) this.applyTileAt(tile.x, tile.y, true);
+    if (!tile) return;
+
+    this.strokeDragged = true;
+    const from = this.lastPaintTile;
+    if (from) {
+      for (const p of gridLine(from.x, from.y, tile.x, tile.y)) {
+        this.applyTileAt(p.x, p.y, true, true);
+      }
+    } else {
+      this.applyTileAt(tile.x, tile.y, true, true);
+    }
+    this.lastPaintTile = tile;
   }
 
   onPointerUp(event: PointerEvent): void {
@@ -907,11 +941,15 @@ export class CampaignDungeonMaps implements OnDestroy {
     if (viewport?.hasPointerCapture(event.pointerId)) {
       viewport.releasePointerCapture(event.pointerId);
     }
+    const wasPainting = this.isPainting();
     this.isPanning.set(false);
     this.isPainting.set(false);
     this.panOrigin = null;
     this.lastPaintKey = null;
+    this.lastPaintTile = null;
     this.strokeStarted = false;
+    this.strokeDragged = false;
+    if (wasPainting) this.commitDraftTimestamp();
   }
 
   undo(): void {
@@ -919,7 +957,7 @@ export class CampaignDungeonMaps implements OnDestroy {
     const snap = this.undoStack.pop();
     if (!map || !snap) return;
     this.undoDepth.set(this.undoStack.length);
-    this.updateMap({ ...map, tiles: snap.tiles, markers: snap.markers });
+    this.updateMap({ ...map, tiles: snap.tiles, markers: snap.markers }, false, true);
     this.setEditorMessage('Annulé.');
   }
 
@@ -1232,16 +1270,31 @@ export class CampaignDungeonMaps implements OnDestroy {
   ngOnDestroy(): void {
     this.unlockEditorBody();
     this.flushPendingSave();
+    this.draftMap.set(null);
   }
 
   /** Force l'émission d'un save debounce (changement d'onglet / navigation). */
   flushPendingSave(): void {
+    this.commitDraftTimestamp();
     if (!this.saveTimer && !this.pendingMaps) return;
     if (this.saveTimer) {
       clearTimeout(this.saveTimer);
       this.saveTimer = null;
     }
     this.emitPendingMaps();
+  }
+
+  /** Horodatage une fois en fin de stroke — évite de churn les thumbs à chaque case. */
+  private commitDraftTimestamp(): void {
+    const draft = this.draftMap();
+    const id = this.editingMapId();
+    if (!draft || !id || draft.id !== id) return;
+    const stamped = { ...draft, updatedAt: new Date().toISOString() };
+    this.draftMap.set(stamped);
+    const list = (this.campaign().data.dungeonMaps ?? []).map((m) =>
+      m.id === stamped.id ? stamped : m,
+    );
+    this.persistMaps(list, false);
   }
 
   private persistMaps(maps: CampaignDungeonMap[], immediate = false): void {
@@ -1263,8 +1316,14 @@ export class CampaignDungeonMaps implements OnDestroy {
 
   private emitPendingMaps(): void {
     if (!this.pendingMaps) return;
-    const maps = this.pendingMaps;
+    let maps = this.pendingMaps;
     this.pendingMaps = null;
+    const draft = this.draftMap();
+    if (draft) {
+      const now = new Date().toISOString();
+      maps = maps.map((m) => (m.id === draft.id ? { ...draft, updatedAt: now } : m));
+      this.draftMap.set({ ...draft, updatedAt: now });
+    }
     this.dataChange.emit({ dungeonMaps: maps });
   }
 
