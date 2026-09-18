@@ -49,10 +49,21 @@ import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog'
 import { FullscreenEnterBtn } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-btn';
 
 type EditorTool = 'select' | 'floor' | 'wall' | 'door' | 'trap' | 'chest' | 'stairs';
+type SizePresetId = 'compact' | 'standard' | 'large' | 'custom';
 
 interface UndoSnapshot {
   tiles: DungeonTileKind[][];
   markers: CampaignDungeonMap['markers'];
+}
+
+interface SizePreset {
+  id: Exclude<SizePresetId, 'custom'>;
+  label: string;
+  hint: string;
+  gridWidth: number;
+  gridHeight: number;
+  roomCount: number;
+  corridorDensity: number;
 }
 
 const MIN_SCALE = 0.35;
@@ -61,6 +72,37 @@ const EDITOR_CELL = 12;
 const PREVIEW_CELL = 4;
 const THUMB_CELL = 3;
 const MAX_UNDO = 40;
+const PREVIEW_DEBOUNCE_MS = 480;
+
+const SIZE_PRESETS: SizePreset[] = [
+  {
+    id: 'compact',
+    label: 'Compact',
+    hint: '36×36 · ~6 salles',
+    gridWidth: 36,
+    gridHeight: 36,
+    roomCount: 6,
+    corridorDensity: 45,
+  },
+  {
+    id: 'standard',
+    label: 'Standard',
+    hint: '48×48 · ~10 salles',
+    gridWidth: 48,
+    gridHeight: 48,
+    roomCount: 10,
+    corridorDensity: 50,
+  },
+  {
+    id: 'large',
+    label: 'Large',
+    hint: '64×64 · ~14 salles',
+    gridWidth: 64,
+    gridHeight: 64,
+    roomCount: 14,
+    corridorDensity: 55,
+  },
+];
 
 @Component({
   selector: 'app-campaign-dungeon-maps',
@@ -97,9 +139,16 @@ export class CampaignDungeonMaps implements OnDestroy {
   /** Lien vers l’onglet Documents après création / publication d’un handout carte. */
   readonly lastHandoutNav = signal<{ handoutId: string } | null>(null);
   readonly thumbUrls = signal<Record<string, string>>({});
+  readonly sizePreset = signal<SizePresetId>('standard');
+  readonly showAdvanced = signal(false);
+  readonly previewSeed = signal(1);
+  readonly exportMenuOpen = signal(false);
+  readonly docMenuOpen = signal(false);
 
   private previousBodyOverflow = '';
   private editorBodyLocked = false;
+  /** Cache vignettes : clé = `${id}:${updatedAt}` → dataURL. */
+  private thumbCache = new Map<string, string>();
 
   readonly scale = signal(1);
   readonly panX = signal(0);
@@ -113,12 +162,13 @@ export class CampaignDungeonMaps implements OnDestroy {
   readonly previewMap = signal<CampaignDungeonMap | null>(null);
 
   readonly genName = signal('Donjon');
-  readonly genGridW = signal(56);
-  readonly genGridH = signal(56);
+  readonly genGridW = signal(48);
+  readonly genGridH = signal(48);
   readonly genRoomCount = signal(10);
   readonly genCorridorDensity = signal(50);
   readonly genTheme = signal<DungeonTheme>('generic');
 
+  readonly sizePresets = SIZE_PRESETS;
   readonly themeLabels = DUNGEON_THEME_LABELS;
   readonly markerLabels = DUNGEON_MARKER_LABELS;
   readonly themes: DungeonTheme[] = ['crypt', 'cave', 'ruins', 'temple', 'sewer', 'forest', 'generic'];
@@ -143,10 +193,9 @@ export class CampaignDungeonMaps implements OnDestroy {
     { symbol: 'S', label: 'Escalier', desc: 'Étage, sortie ou fosse', color: '#8b5cf6' },
   ];
   readonly genParamHints: { label: string; desc: string }[] = [
-    { label: 'Grille', desc: 'Taille de la carte en cases (ex. 56×56)' },
+    { label: 'Grille', desc: 'Taille de la carte en cases' },
     { label: 'Salles', desc: 'Nombre de pièces avec rencontre possible' },
     { label: 'Couloirs', desc: 'Plus c’est haut, plus les salles sont reliées' },
-    { label: 'Thème', desc: 'Palette visuelle + créatures du pool thématique' },
   ];
 
   readonly maps = computed(() => this.campaign().data.dungeonMaps ?? []);
@@ -227,28 +276,31 @@ export class CampaignDungeonMaps implements OnDestroy {
 
     effect(() => {
       const maps = this.sortedMaps();
-      const next: Record<string, string> = {};
-      for (const map of maps) {
-        try {
-          next[map.id] = dungeonMapToPngDataUrl(map, THUMB_CELL, {
-            showRoomNumbers: false,
-            vignette: true,
-          });
-        } catch {
-          /* ignore thumb failures in SSR-like contexts */
-        }
-      }
-      this.thumbUrls.set(next);
-    });
+      const nextUrls: Record<string, string> = {};
+      const liveKeys = new Set<string>();
 
-    effect(() => {
-      if (!this.showGenerator()) return;
-      this.genGridW();
-      this.genGridH();
-      this.genRoomCount();
-      this.genCorridorDensity();
-      this.genTheme();
-      this.scheduleLivePreview();
+      for (const map of maps) {
+        const cacheKey = `${map.id}:${map.updatedAt}`;
+        liveKeys.add(cacheKey);
+        let url = this.thumbCache.get(cacheKey);
+        if (!url) {
+          try {
+            url = dungeonMapToPngDataUrl(map, THUMB_CELL, {
+              showRoomNumbers: false,
+              vignette: true,
+            });
+            this.thumbCache.set(cacheKey, url);
+          } catch {
+            continue;
+          }
+        }
+        nextUrls[map.id] = url;
+      }
+
+      for (const key of [...this.thumbCache.keys()]) {
+        if (!liveKeys.has(key)) this.thumbCache.delete(key);
+      }
+      this.thumbUrls.set(nextUrls);
     });
   }
 
@@ -256,6 +308,9 @@ export class CampaignDungeonMaps implements OnDestroy {
     const c = this.campaign();
     this.genName.set(`Donjon — ${c.title}`);
     this.genTheme.set(suggestThemeFromRegion(c.data.regionName));
+    this.applySizePreset('standard', false);
+    this.showAdvanced.set(false);
+    this.previewSeed.set((Date.now() ^ (Math.random() * 0x7fffffff)) >>> 0 || 1);
     this.showGenerator.set(true);
     this.scheduleLivePreview(true);
   }
@@ -263,13 +318,49 @@ export class CampaignDungeonMaps implements OnDestroy {
   closeGenerator(): void {
     this.showGenerator.set(false);
     this.previewMap.set(null);
+    if (this.previewTimer) {
+      clearTimeout(this.previewTimer);
+      this.previewTimer = null;
+    }
   }
 
-  async generateMap(): Promise<void> {
+  applySizePreset(id: Exclude<SizePresetId, 'custom'>, refreshPreview = true): void {
+    const preset = SIZE_PRESETS.find((p) => p.id === id);
+    if (!preset) return;
+    this.sizePreset.set(id);
+    this.genGridW.set(preset.gridWidth);
+    this.genGridH.set(preset.gridHeight);
+    this.genRoomCount.set(preset.roomCount);
+    this.genCorridorDensity.set(preset.corridorDensity);
+    if (refreshPreview) this.scheduleLivePreview();
+  }
+
+  toggleAdvanced(): void {
+    this.showAdvanced.update((v) => !v);
+  }
+
+  onAdvancedParamInput(kind: 'w' | 'h' | 'rooms' | 'corridors', value: number): void {
+    this.sizePreset.set('custom');
+    if (kind === 'w') this.genGridW.set(value);
+    else if (kind === 'h') this.genGridH.set(value);
+    else if (kind === 'rooms') this.genRoomCount.set(value);
+    else this.genCorridorDensity.set(value);
+  }
+
+  /** Regen aperçu uniquement au relâchement des sliders avancés. */
+  onAdvancedParamCommit(): void {
+    this.scheduleLivePreview();
+  }
+
+  reshufflePreview(): void {
+    this.previewSeed.set((this.previewSeed() + 0x9e3779b9) >>> 0 || 1);
+    this.scheduleLivePreview(true);
+  }
+
+  generateMap(): void {
     if (this.generating()) return;
     this.generating.set(true);
     this.revealMap.set(false);
-    await new Promise((r) => setTimeout(r, 420));
 
     const c = this.campaign();
     const map =
@@ -297,8 +388,23 @@ export class CampaignDungeonMaps implements OnDestroy {
     this.fitMapInView(named);
     this.generating.set(false);
     this.revealMap.set(true);
-    this.message.set('Donjon gravé — peignez, zoomez, partagez.');
+    this.message.set('Donjon gravé — peignez, zoomez, exportez.');
     setTimeout(() => this.revealMap.set(false), 900);
+  }
+
+  toggleExportMenu(): void {
+    this.docMenuOpen.set(false);
+    this.exportMenuOpen.update((v) => !v);
+  }
+
+  toggleDocMenu(): void {
+    this.exportMenuOpen.set(false);
+    this.docMenuOpen.update((v) => !v);
+  }
+
+  closeActionMenus(): void {
+    this.exportMenuOpen.set(false);
+    this.docMenuOpen.set(false);
   }
 
   regenerateEditingMap(): void {
@@ -342,6 +448,7 @@ export class CampaignDungeonMaps implements OnDestroy {
   }
 
   openEditor(mapId: string): void {
+    this.closeActionMenus();
     this.editingMapId.set(mapId);
     this.selectedRoomId.set(null);
     this.selectedMarkerId.set(null);
@@ -352,6 +459,7 @@ export class CampaignDungeonMaps implements OnDestroy {
   }
 
   closeEditor(): void {
+    this.closeActionMenus();
     this.setEditorFullscreen(false);
     this.editingMapId.set(null);
     this.undoStack = [];
@@ -672,6 +780,7 @@ export class CampaignDungeonMaps implements OnDestroy {
   }
 
   async exportPng(): Promise<void> {
+    this.closeActionMenus();
     const map = this.editingMap();
     if (!map || this.exportBusy()) return;
     this.exportBusy.set(true);
@@ -684,6 +793,7 @@ export class CampaignDungeonMaps implements OnDestroy {
   }
 
   async sharePng(): Promise<void> {
+    this.closeActionMenus();
     const map = this.editingMap();
     if (!map || this.exportBusy()) return;
     this.exportBusy.set(true);
@@ -705,6 +815,7 @@ export class CampaignDungeonMaps implements OnDestroy {
   }
 
   async exportPdf(): Promise<void> {
+    this.closeActionMenus();
     const map = this.editingMap();
     if (!map || this.exportBusy()) return;
     this.exportBusy.set(true);
@@ -717,6 +828,7 @@ export class CampaignDungeonMaps implements OnDestroy {
   }
 
   createOrUpdateHandout(opts?: { publish?: boolean }): void {
+    this.closeActionMenus();
     const map = this.editingMap();
     if (!map) return;
     const c = this.campaign();
@@ -764,6 +876,7 @@ export class CampaignDungeonMaps implements OnDestroy {
   }
 
   exportJson(): void {
+    this.closeActionMenus();
     const map = this.editingMap();
     if (!map) return;
     const blob = new Blob([JSON.stringify(map, null, 2)], { type: 'application/json' });
@@ -834,6 +947,7 @@ export class CampaignDungeonMaps implements OnDestroy {
 
   onThemeChange(raw: string): void {
     this.genTheme.set(normalizeDungeonTheme(raw));
+    this.scheduleLivePreview();
   }
 
   themeSwatch(theme: DungeonTheme): string {
@@ -860,6 +974,7 @@ export class CampaignDungeonMaps implements OnDestroy {
       roomCount: this.genRoomCount(),
       corridorDensity: this.genCorridorDensity(),
       theme: this.genTheme(),
+      seed: this.previewSeed(),
     };
   }
 
@@ -877,7 +992,7 @@ export class CampaignDungeonMaps implements OnDestroy {
       this.previewMap.set(map);
     };
     if (immediate) run();
-    else this.previewTimer = setTimeout(run, 280);
+    else this.previewTimer = setTimeout(run, PREVIEW_DEBOUNCE_MS);
   }
 
   private pushUndo(map: CampaignDungeonMap): void {
@@ -890,9 +1005,9 @@ export class CampaignDungeonMaps implements OnDestroy {
   }
 
   private fitMapInView(map: CampaignDungeonMap): void {
-    queueMicrotask(() => {
+    const apply = () => {
       const viewport = this.viewportRef()?.nativeElement;
-      if (!viewport) {
+      if (!viewport || viewport.clientWidth < 8 || viewport.clientHeight < 8) {
         this.scale.set(1);
         this.panX.set(16);
         this.panY.set(16);
@@ -907,7 +1022,9 @@ export class CampaignDungeonMaps implements OnDestroy {
       const h = map.gridHeight * EDITOR_CELL * next;
       this.panX.set((viewport.clientWidth - w) / 2);
       this.panY.set((viewport.clientHeight - h) / 2);
-    });
+    };
+    // Double rAF : le viewport a sa vraie taille après layout.
+    requestAnimationFrame(() => requestAnimationFrame(apply));
   }
 
   private clientToTile(clientX: number, clientY: number): { x: number; y: number } | null {
@@ -967,6 +1084,10 @@ export class CampaignDungeonMaps implements OnDestroy {
     if (event.key === 'Escape' && this.editorFullscreen()) {
       event.preventDefault();
       this.setEditorFullscreen(false);
+      return;
+    }
+    if (event.key === 'Escape' && (this.exportMenuOpen() || this.docMenuOpen())) {
+      this.closeActionMenus();
       return;
     }
     if (event.code === 'Space' && this.editingMap()) {

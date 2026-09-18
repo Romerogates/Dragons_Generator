@@ -4,7 +4,7 @@
       <div>
         <h2 class="font-serif text-2xl text-amber-200/90 tracking-tight">Cartes &amp; donjons</h2>
         <p class="text-sm text-slate-500 mt-1 max-w-xl">
-          Gravure procédurale, édition fluide au pinceau, export table-ready.
+          Thème, taille, gravure — puis peignez et partagez pour la table.
         </p>
       </div>
       @if (campaign().isOwner) {
@@ -28,6 +28,7 @@
         <div class="relative grid lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.9fr)] gap-6">
           <div class="space-y-4">
             <h3 class="font-serif text-lg text-amber-100/90">Forger la carte</h3>
+            <p class="text-xs text-slate-500">Choisissez un thème et une taille, puis gravez.</p>
 
             <label class="block text-[11px] uppercase tracking-widest text-slate-500 font-semibold">
               Nom
@@ -56,23 +57,96 @@
               </div>
             </div>
 
-            <div class="grid sm:grid-cols-2 gap-4">
-              <label class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">
-                Largeur · {{ genGridW() }}
-                <input type="range" min="32" max="80" [ngModel]="genGridW()" (ngModelChange)="genGridW.set(+$event)" class="w-full mt-2 accent-amber-600" />
-              </label>
-              <label class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">
-                Hauteur · {{ genGridH() }}
-                <input type="range" min="32" max="80" [ngModel]="genGridH()" (ngModelChange)="genGridH.set(+$event)" class="w-full mt-2 accent-amber-600" />
-              </label>
-              <label class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">
-                Salles · {{ genRoomCount() }}
-                <input type="range" min="4" max="20" [ngModel]="genRoomCount()" (ngModelChange)="genRoomCount.set(+$event)" class="w-full mt-2 accent-amber-600" />
-              </label>
-              <label class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">
-                Couloirs · {{ genCorridorDensity() }}%
-                <input type="range" min="20" max="100" [ngModel]="genCorridorDensity()" (ngModelChange)="genCorridorDensity.set(+$event)" class="w-full mt-2 accent-amber-600" />
-              </label>
+            <div>
+              <p class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold mb-2">Taille</p>
+              <div class="grid grid-cols-3 gap-2">
+                @for (p of sizePresets; track p.id) {
+                  <button
+                    type="button"
+                    class="theme-chip rounded-xl border px-2.5 py-2.5 text-left transition-all"
+                    [class.theme-chip--active]="sizePreset() === p.id"
+                    (click)="applySizePreset(p.id)"
+                  >
+                    <span class="block text-[11px] font-semibold text-slate-200">{{ p.label }}</span>
+                    <span class="block text-[10px] text-slate-500 mt-0.5">{{ p.hint }}</span>
+                  </button>
+                }
+              </div>
+              @if (sizePreset() === 'custom') {
+                <p class="mt-1.5 text-[10px] text-amber-400/80">Options avancées personnalisées</p>
+              }
+            </div>
+
+            <div class="rounded-xl border border-slate-800/80 bg-black/20">
+              <button
+                type="button"
+                class="w-full flex items-center justify-between px-3 py-2.5 text-[11px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-200"
+                (click)="toggleAdvanced()"
+              >
+                Options avancées
+                <span class="text-slate-600 normal-case tracking-normal">{{ showAdvanced() ? 'Masquer' : 'Afficher' }}</span>
+              </button>
+              @if (showAdvanced()) {
+                <div class="grid sm:grid-cols-2 gap-4 px-3 pb-3 border-t border-slate-800/80 pt-3">
+                  <label class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">
+                    Largeur · {{ genGridW() }}
+                    <input
+                      type="range"
+                      min="32"
+                      max="80"
+                      [ngModel]="genGridW()"
+                      (ngModelChange)="onAdvancedParamInput('w', +$event)"
+                      (change)="onAdvancedParamCommit()"
+                      (pointerup)="onAdvancedParamCommit()"
+                      class="w-full mt-2 accent-amber-600"
+                    />
+                  </label>
+                  <label class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">
+                    Hauteur · {{ genGridH() }}
+                    <input
+                      type="range"
+                      min="32"
+                      max="80"
+                      [ngModel]="genGridH()"
+                      (ngModelChange)="onAdvancedParamInput('h', +$event)"
+                      (change)="onAdvancedParamCommit()"
+                      (pointerup)="onAdvancedParamCommit()"
+                      class="w-full mt-2 accent-amber-600"
+                    />
+                  </label>
+                  <label class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">
+                    Salles · {{ genRoomCount() }}
+                    <input
+                      type="range"
+                      min="4"
+                      max="20"
+                      [ngModel]="genRoomCount()"
+                      (ngModelChange)="onAdvancedParamInput('rooms', +$event)"
+                      (change)="onAdvancedParamCommit()"
+                      (pointerup)="onAdvancedParamCommit()"
+                      class="w-full mt-2 accent-amber-600"
+                    />
+                  </label>
+                  <label class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">
+                    Couloirs · {{ genCorridorDensity() }}%
+                    <input
+                      type="range"
+                      min="20"
+                      max="100"
+                      [ngModel]="genCorridorDensity()"
+                      (ngModelChange)="onAdvancedParamInput('corridors', +$event)"
+                      (change)="onAdvancedParamCommit()"
+                      (pointerup)="onAdvancedParamCommit()"
+                      class="w-full mt-2 accent-amber-600"
+                    />
+                  </label>
+                  @for (hint of genParamHints; track hint.label) {
+                    <p class="text-[10px] text-slate-500 sm:col-span-2">
+                      <span class="font-bold text-slate-400">{{ hint.label }} :</span> {{ hint.desc }}
+                    </p>
+                  }
+                </div>
+              }
             </div>
 
             <div class="flex flex-wrap gap-2 pt-1">
@@ -88,6 +162,15 @@
                 type="button"
                 class="px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide border border-slate-700 text-slate-400 hover:text-slate-200"
                 [disabled]="generating()"
+                (click)="reshufflePreview()"
+                title="Nouveau tirage avec les mêmes paramètres"
+              >
+                Autre layout
+              </button>
+              <button
+                type="button"
+                class="px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide border border-slate-700 text-slate-400 hover:text-slate-200"
+                [disabled]="generating()"
                 (click)="closeGenerator()"
               >
                 Annuler
@@ -95,53 +178,29 @@
             </div>
           </div>
 
-          <div class="relative min-h-[240px] rounded-xl border border-slate-800/80 bg-black/40 overflow-hidden flex items-center justify-center">
+          <div class="relative min-h-[240px] rounded-xl border border-slate-800/80 bg-black/40 overflow-hidden flex flex-col items-center justify-center gap-2 p-3">
             @if (generating()) {
               <div class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-[#0a0c10]/75 backdrop-blur-[2px]">
                 <div class="dungeon-pulse h-16 w-16 rounded-full border border-amber-500/40"></div>
                 <p class="font-serif text-amber-100/90 text-lg">Gravure de la carte…</p>
               </div>
             }
-            <canvas #previewCanvas class="max-w-full max-h-[360px] dungeon-preview-canvas"></canvas>
+            <canvas #previewCanvas class="max-w-full max-h-[320px] dungeon-preview-canvas"></canvas>
             @if (!previewMap() && !generating()) {
-              <p class="absolute text-xs text-slate-600">Ajustez les paramètres pour l’aperçu</p>
+              <p class="absolute text-xs text-slate-600">Aperçu en cours…</p>
             }
-          </div>
-        </div>
-
-        <div class="relative mt-5 rounded-xl border border-slate-800/80 bg-black/25 p-4 space-y-4">
-          <h4 class="text-[11px] font-bold uppercase tracking-widest text-amber-400/90">Légende de la carte</h4>
-          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            @for (tile of legendTiles; track tile.kind) {
-              <div class="flex items-start gap-2.5">
-                <span class="mt-0.5 h-5 w-5 rounded shrink-0 ring-1 ring-black/40" [style.background]="legendTileColor(tile.kind)"></span>
-                <div>
-                  <p class="text-xs font-semibold text-slate-200">{{ tile.label }}</p>
-                  <p class="text-[10px] text-slate-500 leading-snug">{{ tile.desc }}</p>
-                </div>
-              </div>
-            }
-          </div>
-          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1 border-t border-slate-800/80">
-            @for (mk of legendMarkers; track mk.label) {
-              <div class="flex items-start gap-2.5">
-                <span
-                  class="mt-0.5 h-5 w-5 rounded-full shrink-0 flex items-center justify-center text-[9px] font-black text-[#0f1218]"
-                  [style.background]="mk.color"
-                >{{ mk.symbol }}</span>
-                <div>
-                  <p class="text-xs font-semibold text-slate-200">{{ mk.label }}</p>
-                  <p class="text-[10px] text-slate-500 leading-snug">{{ mk.desc }}</p>
-                </div>
-              </div>
-            }
-          </div>
-          <div class="grid sm:grid-cols-2 gap-2 pt-1 border-t border-slate-800/80">
-            @for (hint of genParamHints; track hint.label) {
-              <p class="text-[10px] text-slate-500">
-                <span class="font-bold text-slate-400">{{ hint.label }} :</span> {{ hint.desc }}
-              </p>
-            }
+            <div class="flex flex-wrap justify-center gap-3 pt-1">
+              @for (tile of legendTiles; track tile.kind) {
+                <span class="inline-flex items-center gap-1.5 text-[10px] text-slate-400">
+                  <span class="h-3 w-3 rounded shrink-0 ring-1 ring-black/40" [style.background]="legendTileColor(tile.kind)"></span>
+                  {{ tile.label }}
+                </span>
+              }
+              <span class="inline-flex items-center gap-1.5 text-[10px] text-slate-400">
+                <span class="h-3 w-3 rounded-full shrink-0 bg-slate-200 text-[7px] font-black text-[#0f1218] flex items-center justify-center">1</span>
+                Salle
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -234,26 +293,48 @@
         }
         <button type="button" class="editor-action" [disabled]="!canUndo()" (click)="undo()">Annuler</button>
         <button type="button" class="editor-action" (click)="regenerateEditingMap()">Régénérer</button>
-        <button type="button" class="editor-action" [disabled]="exportBusy()" (click)="exportPng()">PNG</button>
-        <button type="button" class="editor-action" [disabled]="exportBusy()" (click)="sharePng()">Partager</button>
-        <button type="button" class="editor-action" [disabled]="exportBusy()" (click)="exportPdf()">PDF</button>
-        <button type="button" class="editor-action" (click)="exportJson()">JSON</button>
-        <button
-          type="button"
-          class="editor-action editor-action--accent"
-          title="Enregistrer un document brouillon (carte) pour les joueurs"
-          (click)="createOrUpdateHandout()"
-        >
-          Document
-        </button>
-        <button
-          type="button"
-          class="editor-action editor-action--accent"
-          title="Enregistrer et publier le document carte aux joueurs"
-          (click)="createOrUpdateHandout({ publish: true })"
-        >
-          Publier
-        </button>
+
+        <div class="relative">
+          <button
+            type="button"
+            class="editor-action"
+            [class.editor-action--open]="exportMenuOpen()"
+            (click)="toggleExportMenu(); $event.stopPropagation()"
+          >
+            Exporter
+          </button>
+          @if (exportMenuOpen()) {
+            <div
+              class="editor-menu-panel absolute right-0 top-full mt-1 z-20 min-w-[9rem] rounded-xl border border-slate-700 bg-[#141820] p-1 shadow-xl"
+              (click)="$event.stopPropagation()"
+            >
+              <button type="button" class="editor-menu-item" [disabled]="exportBusy()" (click)="exportPng()">PNG</button>
+              <button type="button" class="editor-menu-item" [disabled]="exportBusy()" (click)="sharePng()">Partager</button>
+              <button type="button" class="editor-menu-item" [disabled]="exportBusy()" (click)="exportPdf()">PDF</button>
+              <button type="button" class="editor-menu-item" (click)="exportJson()">JSON</button>
+            </div>
+          }
+        </div>
+
+        <div class="relative">
+          <button
+            type="button"
+            class="editor-action editor-action--accent"
+            [class.editor-action--open]="docMenuOpen()"
+            (click)="toggleDocMenu(); $event.stopPropagation()"
+          >
+            Document
+          </button>
+          @if (docMenuOpen()) {
+            <div
+              class="editor-menu-panel absolute right-0 top-full mt-1 z-20 min-w-[11rem] rounded-xl border border-slate-700 bg-[#141820] p-1 shadow-xl"
+              (click)="$event.stopPropagation()"
+            >
+              <button type="button" class="editor-menu-item" (click)="createOrUpdateHandout()">Brouillon</button>
+              <button type="button" class="editor-menu-item" (click)="createOrUpdateHandout({ publish: true })">Publier aux joueurs</button>
+            </div>
+          }
+        </div>
       </div>
     </div>
 
@@ -288,6 +369,9 @@
       <button type="button" class="tool-btn" (click)="zoom(0.15)" title="Zoomer">+</button>
       <button type="button" class="tool-btn" (click)="resetView()" title="Recadrer">Fit</button>
     </div>
+    <p class="text-[10px] text-slate-600 -mt-1">
+      Clic-glisser pour peindre · Espace pour déplacer · Molette zoom
+    </p>
 
     <div
       class="grid gap-4 min-h-0"

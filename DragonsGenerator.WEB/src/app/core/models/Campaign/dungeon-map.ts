@@ -62,6 +62,8 @@ export interface DungeonGenParams {
   roomCount: number;
   corridorDensity: number;
   theme: DungeonTheme;
+  /** Seed optionnel — même seed + mêmes params = même layout (aperçu stable). */
+  seed?: number;
 }
 
 export const DUNGEON_THEME_LABELS: Record<DungeonTheme, string> = {

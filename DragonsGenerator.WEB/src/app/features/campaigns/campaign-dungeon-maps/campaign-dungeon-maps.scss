@@ -46,11 +46,16 @@
 }
 
 .dungeon-preview-canvas {
-  image-rendering: auto;
+  image-rendering: pixelated;
 }
 
 .dungeon-viewport canvas {
   image-rendering: pixelated;
+}
+
+.dungeon-viewport .absolute.origin-top-left {
+  /* Évite le flou CSS pendant pan/zoom */
+  backface-visibility: hidden;
 }
 
 .map-card img {
@@ -107,6 +112,36 @@
   border-color: rgb(180 83 9 / 0.55);
   color: rgb(253 230 138);
   background: rgb(120 53 15 / 0.35);
+}
+
+.editor-action--open {
+  border-color: rgb(148 163 184);
+  background: rgb(30 41 59 / 0.5);
+}
+
+.editor-menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(203 213 225);
+  background: transparent;
+  border: 0;
+}
+
+.editor-menu-item:hover:not(:disabled) {
+  background: rgb(30 41 59);
+  color: rgb(254 243 199);
+}
+
+.editor-menu-item:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 @keyframes dungeon-fade-in {

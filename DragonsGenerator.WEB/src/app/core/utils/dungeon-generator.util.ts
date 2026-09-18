@@ -14,8 +14,20 @@ interface Rect {
   h: number;
 }
 
-function randInt(min: number, max: number): number {
-  return min + Math.floor(Math.random() * (max - min + 1));
+type Rng = () => number;
+
+/** LCG simple — déterministe si `seed` fourni. */
+function createRng(seed?: number): Rng {
+  if (seed == null || !Number.isFinite(seed)) return Math.random;
+  let s = (seed >>> 0) || 1;
+  return () => {
+    s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
+    return s / 0x100000000;
+  };
+}
+
+function randInt(rng: Rng, min: number, max: number): number {
+  return min + Math.floor(rng() * (max - min + 1));
 }
 
 function overlaps(a: Rect, b: Rect, pad: number): boolean {
@@ -79,7 +91,7 @@ function center(rect: Rect): { x: number; y: number } {
   return { x: Math.floor(rect.x + rect.w / 2), y: Math.floor(rect.y + rect.h / 2) };
 }
 
-function placeDoors(tiles: DungeonTileKind[][], rooms: Rect[]): DungeonMarker[] {
+function placeDoors(tiles: DungeonTileKind[][], rooms: Rect[], rng: Rng): DungeonMarker[] {
   const markers: DungeonMarker[] = [];
   const h = tiles.length;
   const w = tiles[0]?.length ?? 0;
@@ -101,7 +113,7 @@ function placeDoors(tiles: DungeonTileKind[][], rooms: Rect[]): DungeonMarker[] 
       }
     }
     if (!candidates.length) continue;
-    const door = candidates[randInt(0, candidates.length - 1)];
+    const door = candidates[randInt(rng, 0, candidates.length - 1)];
     if (tiles[door.y][door.x] === 'floor') {
       tiles[door.y][door.x] = 'door';
       markers.push({
@@ -116,7 +128,12 @@ function placeDoors(tiles: DungeonTileKind[][], rooms: Rect[]): DungeonMarker[] 
   return markers;
 }
 
-function connectRooms(tiles: DungeonTileKind[][], rects: Rect[], corridorDensity: number): void {
+function connectRooms(
+  tiles: DungeonTileKind[][],
+  rects: Rect[],
+  corridorDensity: number,
+  rng: Rng,
+): void {
   if (rects.length < 2) return;
   const corridorWidth = corridorDensity >= 70 ? 2 : 1;
   for (let i = 1; i < rects.length; i++) {
@@ -127,8 +144,8 @@ function connectRooms(tiles: DungeonTileKind[][], rects: Rect[], corridorDensity
   if (corridorDensity >= 50 && rects.length > 3) {
     const extra = Math.floor((corridorDensity / 100) * (rects.length - 2));
     for (let i = 0; i < extra; i++) {
-      const a = rects[randInt(0, rects.length - 1)];
-      const b = rects[randInt(0, rects.length - 1)];
+      const a = rects[randInt(rng, 0, rects.length - 1)];
+      const b = rects[randInt(rng, 0, rects.length - 1)];
       if (a === b) continue;
       const ca = center(a);
       const cb = center(b);
@@ -141,7 +158,8 @@ export function generateDungeonMap(
   params: DungeonGenParams,
   meta: { name: string; regionId?: string | null; regionName?: string },
 ): CampaignDungeonMap {
-  const { gridWidth, gridHeight, roomCount, corridorDensity, theme } = params;
+  const { gridWidth, gridHeight, roomCount, corridorDensity, theme, seed } = params;
+  const rng = createRng(seed);
   const tiles = createWallGrid(gridWidth, gridHeight);
   const maxRoomW = Math.max(5, Math.floor(gridWidth / 5));
   const maxRoomH = Math.max(5, Math.floor(gridHeight / 5));
@@ -151,10 +169,10 @@ export function generateDungeonMap(
 
   while (rects.length < targetRooms && attempts < targetRooms * 60) {
     attempts++;
-    const w = randInt(4, maxRoomW);
-    const h = randInt(4, maxRoomH);
-    const x = randInt(1, gridWidth - w - 2);
-    const y = randInt(1, gridHeight - h - 2);
+    const w = randInt(rng, 4, maxRoomW);
+    const h = randInt(rng, 4, maxRoomH);
+    const x = randInt(rng, 1, gridWidth - w - 2);
+    const y = randInt(rng, 1, gridHeight - h - 2);
     const rect = { x, y, w, h };
     if (rects.every((r) => !overlaps(r, rect, 2))) {
       rects.push(rect);
@@ -162,8 +180,8 @@ export function generateDungeonMap(
     }
   }
 
-  connectRooms(tiles, rects, corridorDensity);
-  const doorMarkers = placeDoors(tiles, rects);
+  connectRooms(tiles, rects, corridorDensity, rng);
+  const doorMarkers = placeDoors(tiles, rects, rng);
 
   const rooms: DungeonRoom[] = rects.map((rect, index) => {
     const isBoss = index === rects.length - 1 && rects.length > 2;
