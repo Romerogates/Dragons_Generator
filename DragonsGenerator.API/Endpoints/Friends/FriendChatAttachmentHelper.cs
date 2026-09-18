@@ -7,6 +7,7 @@ public static class FriendChatAttachmentHelper
     public const string Character = "character";
     public const string Campaign = "campaign";
     public const string Invite = "invite";
+    public const string Dungeon = "dungeon";
 
     public static bool TryValidate(
         string? kind,
@@ -23,7 +24,7 @@ public static class FriendChatAttachmentHelper
             return true;
 
         normalizedKind = kind.Trim().ToLowerInvariant();
-        if (normalizedKind is not Character and not Campaign and not Invite)
+        if (normalizedKind is not Character and not Campaign and not Invite and not Dungeon)
         {
             error = "Type de pièce jointe invalide.";
             return false;
@@ -54,6 +55,15 @@ public static class FriendChatAttachmentHelper
                     !Guid.TryParse(campEl.GetString(), out _))
                 {
                     error = "Campagne invalide.";
+                    return false;
+                }
+            }
+            else if (normalizedKind == Dungeon)
+            {
+                if (!root.TryGetProperty("dungeonId", out var dungEl) ||
+                    !Guid.TryParse(dungEl.GetString(), out _))
+                {
+                    error = "Donjon invalide.";
                     return false;
                 }
             }
@@ -94,6 +104,7 @@ public static class FriendChatAttachmentHelper
                 Character => "📜 Fiche partagée",
                 Campaign => "🗺 Campagne partagée",
                 Invite => "📨 Invitation campagne",
+                Dungeon => "🗺 Donjon partagé",
                 _ => "📎 Pièce jointe",
             };
         }

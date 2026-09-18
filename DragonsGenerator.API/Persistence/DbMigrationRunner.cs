@@ -34,6 +34,7 @@ public static class DbMigrationRunner
         new("010_guide_comments", Apply010GuideCommentsAsync),
         new("011_guide_comment_widgets", Apply011GuideCommentWidgetsAsync),
         new("012_campaign_join_link", Apply012CampaignJoinLinkAsync),
+        new("013_user_dungeons", Apply013UserDungeonsAsync),
     ];
 
     private sealed record Migration(string Id, Func<AppDbContext, CancellationToken, Task> Apply);
@@ -300,6 +301,28 @@ public static class DbMigrationRunner
             CREATE UNIQUE INDEX IF NOT EXISTS "IX_Campaigns_JoinToken"
                 ON "Campaigns" ("JoinToken")
                 WHERE "JoinToken" IS NOT NULL;
+            """,
+            ct);
+    }
+
+    private static async Task Apply013UserDungeonsAsync(AppDbContext db, CancellationToken ct)
+    {
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            CREATE TABLE IF NOT EXISTS "Dungeons" (
+                "Id" TEXT NOT NULL CONSTRAINT "PK_Dungeons" PRIMARY KEY,
+                "UserId" TEXT NOT NULL,
+                "Name" TEXT NOT NULL,
+                "JsonData" TEXT NOT NULL,
+                "CreatedAt" TEXT NOT NULL,
+                "UpdatedAt" TEXT NOT NULL,
+                CONSTRAINT "FK_Dungeons_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE
+            );
+            """,
+            ct);
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            CREATE INDEX IF NOT EXISTS "IX_Dungeons_UserId" ON "Dungeons" ("UserId");
             """,
             ct);
     }

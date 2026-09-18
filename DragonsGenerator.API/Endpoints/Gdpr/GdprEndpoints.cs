@@ -41,6 +41,19 @@ public class ExportMyDataEndpoint(AppDbContext db) : EndpointWithoutRequest
             })
             .ToListAsync(ct);
 
+        var dungeons = await db.Dungeons
+            .AsNoTracking()
+            .Where(d => d.UserId == userId)
+            .Select(d => new
+            {
+                d.Id,
+                d.Name,
+                data = d.JsonData,
+                d.CreatedAt,
+                d.UpdatedAt,
+            })
+            .ToListAsync(ct);
+
         var ownedCampaigns = await db.Campaigns
             .AsNoTracking()
             .Where(c => c.OwnerUserId == userId)
@@ -140,6 +153,7 @@ public class ExportMyDataEndpoint(AppDbContext db) : EndpointWithoutRequest
             uiBannerPreferences = UserPreferencesHelper.GetUiBannerPreferencesExport(user),
         },
             characters,
+            dungeons,
             ownedCampaigns,
             campaignMemberships = memberships,
             friendships,

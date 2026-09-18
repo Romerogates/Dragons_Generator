@@ -53,6 +53,10 @@ import {
   UI_BANNER_IDS,
   UiBannerPreferencesService,
 } from '@core/services/ui-banner-preferences.service';
+import {
+  DungeonCloudService,
+  type CloudDungeonSummary,
+} from '@core/services/dungeon-cloud.service';
 
 type EditorTool = 'select' | 'floor' | 'wall' | 'door' | 'trap' | 'chest' | 'stairs';
 type SizePresetId = 'compact' | 'standard' | 'large' | 'custom';
@@ -123,9 +127,13 @@ const SIZE_PRESETS: SizePreset[] = [
 })
 export class CampaignDungeonMaps implements OnDestroy {
   private readonly banners = inject(UiBannerPreferencesService);
+  private readonly dungeonCloud = inject(DungeonCloudService);
 
   readonly campaign = input.required<CampaignDetail>();
   readonly focusMapId = input<string | null>(null);
+  /** Hub bibliothèque : pas de handouts campagne, une carte cloud. */
+  readonly libraryMode = input(false);
+  readonly readOnly = input(false);
   readonly dataChange = output<Partial<CampaignData>>();
 
   readonly editorCanvasRef = viewChild<ElementRef<HTMLCanvasElement>>('editorCanvas');
@@ -154,6 +162,9 @@ export class CampaignDungeonMaps implements OnDestroy {
   readonly previewSeed = signal(1);
   readonly exportMenuOpen = signal(false);
   readonly docMenuOpen = signal(false);
+  readonly libraryPickerOpen = signal(false);
+  readonly libraryList = signal<CloudDungeonSummary[]>([]);
+  readonly libraryBusy = signal(false);
 
   private previousBodyOverflow = '';
   private editorBodyLocked = false;
@@ -336,6 +347,98 @@ export class CampaignDungeonMaps implements OnDestroy {
     this.previewSeed.set((Date.now() ^ (Math.random() * 0x7fffffff)) >>> 0 || 1);
     this.showGenerator.set(true);
     this.scheduleLivePreview(true);
+  }
+
+  openLibraryPicker(): void {
+    if (this.libraryMode() || !this.campaign().isOwner) return;
+    this.libraryBusy.set(true);
+    this.libraryPickerOpen.set(true);
+    this.dungeonCloud.list().subscribe({
+      next: (list) => {
+        this.libraryList.set(list);
+        this.libraryBusy.set(false);
+      },
+      error: () => {
+        this.libraryBusy.set(false);
+        this.setEditorMessage('Impossible de charger la bibliothèque.');
+      },
+    });
+  }
+
+  closeLibraryPicker(): void {
+    this.libraryPickerOpen.set(false);
+  }
+
+  importFromLibrary(summary: CloudDungeonSummary): void {
+    if (this.libraryBusy()) return;
+    this.libraryBusy.set(true);
+    this.dungeonCloud.get(summary.id).subscribe({
+      next: (detail) => {
+        const copy = this.cloneMapForCampaign(detail.data, detail.name);
+        const c = this.campaign();
+        this.persistMaps([...(c.data.dungeonMaps ?? []), copy], true);
+        this.libraryBusy.set(false);
+        this.libraryPickerOpen.set(false);
+        this.setEditorMessage(`« ${copy.name} » importé (copie indépendante).`);
+        this.openEditor(copy.id);
+      },
+      error: () => {
+        this.libraryBusy.set(false);
+        this.setEditorMessage('Import bibliothèque impossible.');
+      },
+    });
+  }
+
+  saveEditingToLibrary(): void {
+    const map = this.editingMap();
+    if (!map || this.libraryMode() || this.libraryBusy()) return;
+    this.libraryBusy.set(true);
+    this.closeActionMenus();
+    const payload = {
+      ...map,
+      handoutId: null,
+      fogOfWarEnabled: false,
+      revealedRoomIds: [],
+      updatedAt: new Date().toISOString(),
+    };
+    this.dungeonCloud.create(payload, map.name).subscribe({
+      next: () => {
+        this.libraryBusy.set(false);
+        this.setEditorMessage('Copie enregistrée dans Mes Donjons.');
+      },
+      error: () => {
+        this.libraryBusy.set(false);
+        this.setEditorMessage('Enregistrement bibliothèque impossible.');
+      },
+    });
+  }
+
+  private cloneMapForCampaign(src: CampaignDungeonMap, name: string): CampaignDungeonMap {
+    const now = new Date().toISOString();
+    const id = crypto.randomUUID?.() ?? `map-${Date.now()}`;
+    const roomIdMap = new Map<string, string>();
+    const rooms = (src.rooms ?? []).map((r) => {
+      const nid = crypto.randomUUID?.() ?? `room-${Date.now()}-${Math.random()}`;
+      roomIdMap.set(r.id, nid);
+      return { ...r, id: nid, encounterId: null };
+    });
+    const markers = (src.markers ?? []).map((m) => ({
+      ...m,
+      id: crypto.randomUUID?.() ?? `mk-${Date.now()}-${Math.random()}`,
+      linkedRoomId: m.linkedRoomId ? (roomIdMap.get(m.linkedRoomId) ?? null) : m.linkedRoomId,
+    }));
+    return {
+      ...structuredClone(src),
+      id,
+      name: name || src.name || 'Donjon',
+      rooms,
+      markers,
+      handoutId: null,
+      fogOfWarEnabled: false,
+      revealedRoomIds: [],
+      createdAt: now,
+      updatedAt: now,
+    };
   }
 
   closeGenerator(): void {
@@ -760,6 +863,7 @@ export class CampaignDungeonMaps implements OnDestroy {
     }
 
     if (event.button !== 0) return;
+    if (this.readOnly() && this.activeTool() !== 'select') return;
     event.preventDefault();
     this.isPainting.set(true);
     this.strokeStarted = false;

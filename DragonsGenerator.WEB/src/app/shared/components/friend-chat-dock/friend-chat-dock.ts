@@ -24,6 +24,10 @@ import {
 } from '@core/services/friend-chat.service';
 import { CharacterCloudService, CloudCharacterSummary } from '@core/services/character-cloud.service';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
+import {
+  DungeonCloudService,
+  type CloudDungeonSummary,
+} from '@core/services/dungeon-cloud.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import { CampaignSummary } from '@core/models/Campaign/campaign';
 import { NotificationService } from '@core/services/notification.service';
@@ -43,6 +47,8 @@ interface ParsedAttachment {
   campaignId?: string;
   campaignTitle?: string;
   joinToken?: string;
+  dungeonId?: string;
+  dungeonName?: string;
 }
 
 @Component({
@@ -60,6 +66,7 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
   private readonly chat = inject(FriendChatService);
   private readonly characters = inject(CharacterCloudService);
   private readonly campaigns = inject(CampaignCloudService);
+  private readonly dungeons = inject(DungeonCloudService);
   private readonly notifications = inject(NotificationService);
   private readonly handoff = inject(CharacterHandoffService);
   private readonly router = inject(Router);
@@ -78,6 +85,7 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
   readonly openingShared = signal(false);
   readonly myCharacters = signal<CloudCharacterSummary[]>([]);
   readonly myCampaigns = signal<CampaignSummary[]>([]);
+  readonly myDungeons = signal<CloudDungeonSummary[]>([]);
 
   private messagePollTimer: ReturnType<typeof setInterval> | null = null;
   private activeThreadId: string | null = null;
@@ -155,7 +163,13 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
         this.campaigns.list().subscribe({
           next: (camps) => {
             this.myCampaigns.set(camps);
-            this.shareLoading.set(false);
+            this.dungeons.list().subscribe({
+              next: (dungs) => {
+                this.myDungeons.set(dungs);
+                this.shareLoading.set(false);
+              },
+              error: () => this.shareLoading.set(false),
+            });
           },
           error: () => this.shareLoading.set(false),
         });
@@ -166,6 +180,10 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
 
   shareCharacter(ch: CloudCharacterSummary): void {
     this.sendAttachment('character', { characterId: ch.id, characterName: ch.name });
+  }
+
+  shareDungeon(d: CloudDungeonSummary): void {
+    this.sendAttachment('dungeon', { dungeonId: d.id, dungeonName: d.name });
   }
 
   shareCampaign(c: CampaignSummary): void {
@@ -259,6 +277,21 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
         this.openingShared.set(false);
         this.threadError.set('Impossible d’ouvrir cette fiche partagée.');
       },
+    });
+  }
+
+  openSharedDungeon(dungeonId: string, isMine = false): void {
+    if (!dungeonId) return;
+    this.stopThreadPoll();
+    this.dock.dismissForNavigation();
+    if (isMine) {
+      void this.router.navigate(['/dungeons', dungeonId]);
+      return;
+    }
+    const friendId = this.dock.activeFriendId();
+    if (!friendId) return;
+    void this.router.navigate(['/dungeons', dungeonId], {
+      queryParams: { friend: friendId },
     });
   }
 
@@ -359,7 +392,9 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
   parseAttachment(msg: FriendMessage): ParsedAttachment | null {
     if (!msg.attachmentKind || !msg.attachmentPayload) return null;
     const kind = msg.attachmentKind as FriendMessageAttachmentKind;
-    if (kind !== 'character' && kind !== 'campaign' && kind !== 'invite') return null;
+    if (kind !== 'character' && kind !== 'campaign' && kind !== 'invite' && kind !== 'dungeon') {
+      return null;
+    }
     try {
       const data = JSON.parse(msg.attachmentPayload) as Record<string, string>;
       if (kind === 'character') {
@@ -367,6 +402,13 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
           kind,
           characterId: data['characterId'],
           characterName: data['characterName'],
+        };
+      }
+      if (kind === 'dungeon') {
+        return {
+          kind,
+          dungeonId: data['dungeonId'],
+          dungeonName: data['dungeonName'],
         };
       }
       if (kind === 'invite') {

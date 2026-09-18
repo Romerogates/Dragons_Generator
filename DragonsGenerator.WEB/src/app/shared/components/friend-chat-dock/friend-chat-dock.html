@@ -263,6 +263,20 @@
                                 </p>
                                 <p class="text-[10px] mt-1 opacity-70">Consulter (sans appropriation)</p>
                               </button>
+                            } @else if (att.kind === 'dungeon' && att.dungeonId) {
+                              <button
+                                type="button"
+                                class="block w-full text-left rounded-xl border border-amber-400/25 bg-black/20 px-3 py-2 hover:bg-black/30 transition-colors"
+                                (click)="openSharedDungeon(att.dungeonId!, msg.isMine)"
+                              >
+                                <p class="text-[10px] font-black uppercase tracking-widest opacity-80">
+                                  Donjon partagé
+                                </p>
+                                <p class="font-serif text-sm mt-0.5">
+                                  {{ att.dungeonName || 'Carte' }}
+                                </p>
+                                <p class="text-[10px] mt-1 opacity-70">Consulter (lecture seule)</p>
+                              </button>
                             } @else if (att.kind === 'invite' && att.joinToken) {
                               <button
                                 type="button"
@@ -368,6 +382,20 @@
                               >
                             </p>
                           }
+                          @if (myDungeons().length) {
+                            <p class="text-[9px] uppercase text-slate-600 mb-1 mt-2">Donjons</p>
+                            <div class="flex flex-wrap gap-1.5 mb-2">
+                              @for (d of myDungeons(); track d.id) {
+                                <button
+                                  type="button"
+                                  class="min-h-11 px-3 py-2 rounded-lg text-[11px] border border-slate-700 text-slate-300 hover:border-amber-500/50"
+                                  (click)="shareDungeon(d)"
+                                >
+                                  {{ d.name }}
+                                </button>
+                              }
+                            </div>
+                          }
                           @if (myCampaigns().length) {
                             <p class="text-[9px] uppercase text-slate-600 mb-1">Campagnes</p>
                             <p class="text-[10px] text-slate-600 mb-1.5">
@@ -396,7 +424,7 @@
                               }
                             </div>
                           }
-                          @if (!myCharacters().length && !myCampaigns().length) {
+                          @if (!myCharacters().length && !myCampaigns().length && !myDungeons().length) {
                             <p class="text-xs text-slate-500 italic">Aucun élément à partager.</p>
                           }
                         }

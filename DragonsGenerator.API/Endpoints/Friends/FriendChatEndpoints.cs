@@ -170,6 +170,19 @@ public class SendFriendMessageEndpoint(AppDbContext db, PushNotificationService 
             }
         }
 
+        if (kind == FriendChatAttachmentHelper.Dungeon && payload is not null)
+        {
+            using var doc = System.Text.Json.JsonDocument.Parse(payload);
+            var dungeonId = Guid.Parse(doc.RootElement.GetProperty("dungeonId").GetString()!);
+            var owns = await db.Dungeons.AnyAsync(d => d.Id == dungeonId && d.UserId == userId, ct);
+            if (!owns)
+            {
+                AddError("Donjon inaccessible.");
+                await Send.ErrorsAsync(StatusCodes.Status403Forbidden, ct);
+                return;
+            }
+        }
+
         var sender = await db.Users.AsNoTracking().FirstAsync(u => u.Id == userId, ct);
         var message = new FriendMessage
         {
@@ -383,5 +396,50 @@ public class GetFriendSharedCharacterEndpoint(AppDbContext db) : EndpointWithout
         await Send.OkAsync(
             new CharacterDto(character.Id, character.Name, doc.RootElement.Clone(), character.UpdatedAt),
             ct);
+    }
+}
+
+/// <summary>Consultation d'un donjon partagé en chat — amitié requise, sans appropriation.</summary>
+public class GetFriendSharedDungeonEndpoint(AppDbContext db)
+    : EndpointWithoutRequest<DragonsGenerator.API.Endpoints.Dungeons.DungeonDto>
+{
+    public override void Configure() => Get("/me/friends/{friendUserId}/dungeons/{dungeonId}");
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var userId = AuthHelpers.GetUserId(User);
+        if (userId is null)
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        var friendUserId = Route<Guid>("friendUserId");
+        var dungeonId = Route<Guid>("dungeonId");
+
+        if (!await FriendAccess.AreFriendsAsync(db, userId.Value, friendUserId, ct))
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        var dungeon = await db.Dungeons.AsNoTracking()
+            .FirstOrDefaultAsync(d => d.Id == dungeonId && d.UserId == friendUserId, ct);
+        if (dungeon is null)
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(dungeon.JsonData) ? "{}" : dungeon.JsonData);
+        await Send.OkAsync(
+            new DragonsGenerator.API.Endpoints.Dungeons.DungeonDto(
+                dungeon.Id,
+                dungeon.Name,
+                doc.RootElement.Clone(),
+                dungeon.UpdatedAt
+            ),
+            ct
+        );
     }
 }

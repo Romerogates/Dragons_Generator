@@ -27,6 +27,7 @@ public class AppUser
     public string PreferencesJson { get; set; } = "{}";
 
     public List<CharacterRecord> Characters { get; set; } = [];
+    public List<DungeonRecord> Dungeons { get; set; } = [];
     public List<SupportTicket> SupportTickets { get; set; } = [];
     public List<CampaignRecord> OwnedCampaigns { get; set; } = [];
     public List<CampaignMember> CampaignMemberships { get; set; } = [];
@@ -46,6 +47,19 @@ public class CharacterRecord
     public AppUser User { get; set; } = null!;
     public string Name { get; set; } = "";
     /// <summary>JSON complet du personnage (fiche).</summary>
+    public string JsonData { get; set; } = "{}";
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+}
+
+/// <summary>Donjon de bibliothèque perso (hors campagne) — JSON = CampaignDungeonMap.</summary>
+public class DungeonRecord
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid UserId { get; set; }
+    public AppUser User { get; set; } = null!;
+    public string Name { get; set; } = "";
+    /// <summary>JSON carte (même forme que dungeonMaps campagne).</summary>
     public string JsonData { get; set; } = "{}";
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;

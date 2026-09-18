@@ -245,6 +245,18 @@ export const routes: Routes = [
     loadComponent: () => import('@features/characters/characters').then((m) => m.Characters),
   },
   {
+    path: 'dungeons',
+    loadComponent: () =>
+      import('@features/library-dungeons/library-dungeons').then((m) => m.LibraryDungeons),
+  },
+  {
+    path: 'dungeons/:id',
+    loadComponent: () =>
+      import('@features/library-dungeons/library-dungeon-editor').then(
+        (m) => m.LibraryDungeonEditor,
+      ),
+  },
+  {
     path: 'character-sheet',
     loadComponent: () =>
       import('@features/character-sheet/character-sheet').then((m) => m.CharacterSheet),

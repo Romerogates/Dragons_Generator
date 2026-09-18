@@ -7,14 +7,23 @@
           Thème, taille, gravure — puis peignez et partagez pour la table.
         </p>
       </div>
-      @if (campaign().isOwner) {
-        <button
-          type="button"
-          class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide bg-amber-700 text-amber-50 shadow-lg shadow-amber-950/40 hover:bg-amber-600 transition-colors"
-          (click)="openGenerator()"
-        >
-          Nouveau donjon
-        </button>
+      @if (campaign().isOwner && !libraryMode()) {
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide bg-amber-700 text-amber-50 shadow-lg shadow-amber-950/40 hover:bg-amber-600 transition-colors"
+            (click)="openGenerator()"
+          >
+            Nouveau donjon
+          </button>
+          <button
+            type="button"
+            class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide border border-slate-600 text-slate-300 hover:border-amber-600/50 hover:text-amber-200 transition-colors"
+            (click)="openLibraryPicker()"
+          >
+            Depuis ma bibliothèque
+          </button>
+        </div>
       }
     </div>
 
@@ -312,10 +321,21 @@
               <button type="button" class="editor-menu-item" [disabled]="exportBusy()" (click)="sharePng()">Partager</button>
               <button type="button" class="editor-menu-item" [disabled]="exportBusy()" (click)="exportPdf()">PDF</button>
               <button type="button" class="editor-menu-item" (click)="exportJson()">JSON</button>
+              @if (!libraryMode() && campaign().isOwner) {
+                <button
+                  type="button"
+                  class="editor-menu-item"
+                  [disabled]="libraryBusy()"
+                  (click)="saveEditingToLibrary()"
+                >
+                  Dans Mes Donjons
+                </button>
+              }
             </div>
           }
         </div>
 
+        @if (!libraryMode()) {
         <div class="relative">
           <button
             type="button"
@@ -335,6 +355,7 @@
             </div>
           }
         </div>
+        }
       </div>
     </div>
 
@@ -590,6 +611,43 @@
       </aside>
     </div>
   </section>
+}
+
+@if (libraryPickerOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" role="dialog">
+    <div class="bg-[#1b2028] border border-slate-700 rounded-2xl p-5 max-w-md w-full max-h-[80vh] overflow-auto">
+      <div class="flex items-center justify-between gap-2 mb-3">
+        <h3 class="font-serif text-lg text-slate-100">Importer depuis Mes Donjons</h3>
+        <button type="button" class="text-slate-500 hover:text-slate-200" (click)="closeLibraryPicker()">✕</button>
+      </div>
+      <p class="text-xs text-slate-500 mb-4">
+        Une <strong class="text-slate-400 font-normal">copie</strong> est ajoutée à la campagne (indépendante de la biblio).
+      </p>
+      @if (libraryBusy() && libraryList().length === 0) {
+        <p class="text-sm text-amber-400 animate-pulse">Chargement…</p>
+      } @else if (libraryList().length === 0) {
+        <p class="text-sm text-slate-400">
+          Bibliothèque vide —
+          <a routerLink="/dungeons" class="text-amber-400 underline">créer un donjon</a>
+        </p>
+      } @else {
+        <ul class="space-y-2">
+          @for (d of libraryList(); track d.id) {
+            <li>
+              <button
+                type="button"
+                class="w-full text-left px-3 py-2.5 rounded-xl border border-slate-800 hover:border-amber-700/50 text-sm text-slate-200 disabled:opacity-50"
+                [disabled]="libraryBusy()"
+                (click)="importFromLibrary(d)"
+              >
+                {{ d.name }}
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
 }
 
 @if (confirmDialog(); as dialog) {

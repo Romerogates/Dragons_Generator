@@ -1,0 +1,121 @@
+<div class="max-w-5xl mx-auto px-4 py-10 animate-fade-in min-h-[80vh]">
+  <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10 border-b border-slate-800 pb-6">
+    <div>
+      <h1 class="text-3xl md:text-4xl font-extrabold text-slate-100 font-serif tracking-wide mb-1">
+        Mes <span class="text-amber-500">Donjons</span>
+      </h1>
+      <p class="text-slate-400 text-sm italic">
+        @if (!isLoggedIn()) {
+          Bibliothèque cloud — créez, éditez, importez en campagne.
+        } @else {
+          {{ dungeons().length }} / {{ maxDungeons }} carte{{ dungeons().length > 1 ? 's' : '' }}
+        }
+      </p>
+    </div>
+    @if (isLoggedIn() && canCreateMore()) {
+      <button
+        type="button"
+        class="px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-amber-500 text-slate-950 hover:bg-amber-400 disabled:opacity-50"
+        [disabled]="creating()"
+        (click)="createDungeon()"
+      >
+        {{ creating() ? 'Gravure…' : 'Nouveau donjon' }}
+      </button>
+    }
+  </header>
+
+  @if (error(); as err) {
+    <p class="mb-6 text-sm text-red-400" role="alert">{{ err }}</p>
+  }
+
+  @if (!isLoggedIn()) {
+    <div class="rounded-3xl border border-dashed border-slate-700 bg-[#1b2028] p-12 text-center">
+      <h2 class="text-xl font-serif text-slate-200 mb-3">Compte requis</h2>
+      <p class="text-slate-400 mb-6 text-sm">Connectez-vous pour stocker vos cartes hors campagne.</p>
+      <a
+        routerLink="/login"
+        [queryParams]="{ returnUrl: '/dungeons' }"
+        class="inline-block px-8 py-3 rounded-xl text-xs font-black uppercase bg-amber-500 text-slate-950"
+        >Se connecter</a
+      >
+    </div>
+  } @else if (loading()) {
+    <p class="text-center py-20 text-amber-400 animate-pulse">Chargement…</p>
+  } @else if (dungeons().length === 0) {
+    <div class="rounded-3xl border border-dashed border-slate-700 bg-[#1b2028] p-12 text-center">
+      <h2 class="text-xl font-serif text-slate-200 mb-3">Bibliothèque vide</h2>
+      <p class="text-slate-400 mb-6 text-sm max-w-md mx-auto">
+        Gravez une carte ici, puis importez-en une copie dans n’importe quelle campagne.
+      </p>
+      <button
+        type="button"
+        class="px-8 py-3 rounded-xl text-xs font-black uppercase bg-amber-500 text-slate-950 disabled:opacity-50"
+        [disabled]="creating()"
+        (click)="createDungeon()"
+      >
+        {{ creating() ? 'Gravure…' : 'Créer mon premier donjon' }}
+      </button>
+    </div>
+  } @else {
+    <ul class="grid gap-3 sm:grid-cols-2">
+      @for (d of dungeons(); track d.id) {
+        <li
+          class="rounded-2xl border border-slate-800 bg-[#1b2028] p-4 flex flex-col gap-3 hover:border-amber-700/40 transition-colors"
+        >
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <a
+                [routerLink]="['/dungeons', d.id]"
+                class="block font-serif text-lg text-slate-100 hover:text-amber-300 truncate"
+                >{{ d.name }}</a
+              >
+              <p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1">
+                Maj. {{ formatDate(d.updatedAt) }}
+              </p>
+            </div>
+            <button
+              type="button"
+              class="text-[10px] font-black uppercase text-slate-500 hover:text-red-400 shrink-0"
+              (click)="askDelete(d)"
+            >
+              Suppr.
+            </button>
+          </div>
+          <a
+            [routerLink]="['/dungeons', d.id]"
+            class="text-[10px] font-black uppercase tracking-widest text-amber-400 hover:text-amber-300"
+            >Ouvrir l’éditeur →</a
+          >
+        </li>
+      }
+    </ul>
+  }
+
+  @if (deleteTarget(); as target) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" role="dialog">
+      <div class="bg-[#1b2028] border border-slate-700 rounded-2xl p-6 max-w-sm w-full">
+        <h3 class="font-serif text-lg text-slate-100 mb-2">Supprimer « {{ target.name }} » ?</h3>
+        <p class="text-xs text-slate-400 mb-4">
+          Les copies déjà importées dans des campagnes ne sont pas affectées.
+        </p>
+        <div class="flex gap-2 justify-end">
+          <button
+            type="button"
+            class="px-3 py-2 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400"
+            (click)="cancelDelete()"
+          >
+            Annuler
+          </button>
+          <button
+            type="button"
+            class="px-3 py-2 rounded-lg text-[10px] font-black uppercase bg-red-900/60 text-red-200 disabled:opacity-50"
+            [disabled]="deleting()"
+            (click)="confirmDelete()"
+          >
+            {{ deleting() ? '…' : 'Supprimer' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

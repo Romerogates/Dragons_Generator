@@ -6,6 +6,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<AppUser> Users => Set<AppUser>();
     public DbSet<CharacterRecord> Characters => Set<CharacterRecord>();
+    public DbSet<DungeonRecord> Dungeons => Set<DungeonRecord>();
     public DbSet<SupportTicket> SupportTickets => Set<SupportTicket>();
     public DbSet<Friendship> Friendships => Set<Friendship>();
     public DbSet<CampaignRecord> Campaigns => Set<CampaignRecord>();
@@ -36,6 +37,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         {
             e.HasOne(x => x.User)
                 .WithMany(u => u.Characters)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            e.Property(x => x.Name).HasMaxLength(200);
+        });
+
+        modelBuilder.Entity<DungeonRecord>(e =>
+        {
+            e.HasOne(x => x.User)
+                .WithMany(u => u.Dungeons)
                 .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
             e.Property(x => x.Name).HasMaxLength(200);
