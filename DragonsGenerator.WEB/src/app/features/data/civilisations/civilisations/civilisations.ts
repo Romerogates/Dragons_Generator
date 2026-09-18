@@ -74,9 +74,13 @@ export class Civilisations implements OnInit, OnDestroy {
     });
   }
 
-  /** Entrée plein écran uniquement — sortie = Escape. */
+  /** Entrée plein écran — sortie = bouton Fermer ou Escape. */
   enterMapFullscreen(): void {
     this.setMapFullscreen(true);
+  }
+
+  exitMapFullscreen(): void {
+    this.setMapFullscreen(false);
   }
 
   /** Retourne l'identifiant Iconify correspondant à la civilisation */

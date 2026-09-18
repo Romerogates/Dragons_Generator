@@ -732,7 +732,7 @@ describe('character-wizard-validation.util', () => {
       selectedEquipment: [{ instanceId: '1', refId: 'wp-dagger', name: 'Dague', qty: 1 }] as never,
       startingEquipmentSlots: [{ slot: 1, alternatives: [[{ id: 'wp-dagger', qty: 1 }], [{ id: 'wp-club', qty: 1 }]] }],
     };
-    expect(isWizardStepValid(8, withSlots, { needsMagicStep: false })).toBeTrue();
+    expect(isWizardStepValid(8, withSlots, { needsMagicStep: false })).toBeFalse();
     expect(
       isWizardStepValid(
         8,
@@ -852,7 +852,7 @@ describe('character-wizard-validation.util', () => {
     ).toBeTrue();
   });
 
-  it('isWizardStepValid accepts equipment when choosable slots exist but wizard picks are omitted', () => {
+  it('isWizardStepValid rejects equipment when choosable slots exist but wizard picks are omitted', () => {
     expect(
       isWizardStepValid(
         8,
@@ -865,7 +865,7 @@ describe('character-wizard-validation.util', () => {
         } as CharacterCreation,
         { needsMagicStep: false },
       ),
-    ).toBeTrue();
+    ).toBeFalse();
   });
 
   it('isWizardStepValid accepts a complete secondary ensorceleur metamagic pick', () => {

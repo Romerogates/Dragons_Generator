@@ -74,6 +74,7 @@ export class CharacterSheet implements OnInit, OnDestroy {
     const url = this.consultReturnUrl();
     if (url?.includes('/play')) return '← Retour à la table';
     if (url?.includes('tab=players')) return '← Retour aux joueurs';
+    if (url?.includes('tab=pregens') || url?.includes('tab=prep')) return '← Retour aux pré-tirés';
     if (url?.includes('/friends')) return '← Retour aux messages';
     if (this.consultSourceLabel()) return '← Retour';
     return '← Retour';
@@ -171,16 +172,22 @@ export class CharacterSheet implements OnInit, OnDestroy {
 
   getSpecies(): string {
     const c = this.character();
-    return c?.species?.label || '';
+    const sp = c?.species;
+    if (!sp?.label) return '';
+    return sp.subspeciesLabel ? `${sp.label} (${sp.subspeciesLabel})` : sp.label;
   }
 
   getClass(): string {
     const c = this.character();
-    const cls = c?.classes?.[0];
-    if (!cls) return '';
-    return cls.subclassLabel
-      ? `${cls.classLabel} — ${cls.subclassLabel}`
-      : cls.classLabel || '';
+    const classes = c?.classes ?? [];
+    if (!classes.length) return '';
+    return classes
+      .map((cls) =>
+        cls.subclassLabel
+          ? `${cls.classLabel} — ${cls.subclassLabel} (niv. ${cls.level})`
+          : `${cls.classLabel} (niv. ${cls.level})`,
+      )
+      .join(' · ');
   }
 
   getLevel(): number {

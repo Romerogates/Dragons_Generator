@@ -296,7 +296,21 @@
                     />
                     <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
                       <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Synopsis</h2>
-                      <div class="text-sm leading-relaxed whitespace-pre-wrap font-serif text-slate-300">{{ c.data.adventure || '—' }}</div>
+                      @if (c.data.adventure?.trim()) {
+                        <div class="text-sm leading-relaxed whitespace-pre-wrap font-serif text-slate-300">{{ c.data.adventure }}</div>
+                      } @else {
+                        <div class="rounded-xl border border-dashed border-violet-800/50 bg-violet-950/15 p-6 text-center space-y-3">
+                          <p class="text-sm text-slate-300">Aucun synopsis pour l’instant.</p>
+                          <p class="text-xs text-slate-500">Écrivez ou générez l’aventure pour lancer la table.</p>
+                          <button
+                            type="button"
+                            class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white hover:bg-violet-500"
+                            (click)="editScenario()"
+                          >
+                            Écrire / générer le synopsis
+                          </button>
+                        </div>
+                      }
                     </div>
                   </div>
                 } @else {
@@ -457,6 +471,14 @@
 
               @case ('pregens') {
                 <section class="space-y-6">
+                  @if (pregenFeedback(); as pfb) {
+                    <div
+                      class="rounded-xl border border-sky-800/40 bg-sky-950/25 px-4 py-3 text-sm text-sky-100/90"
+                      role="status"
+                    >
+                      {{ pfb }}
+                    </div>
+                  }
                   @if (!c.isOwner && readyPregensForPlayers().length) {
                     <div class="bg-sky-950/20 border border-sky-800/40 rounded-2xl p-5">
                       <h3 class="text-[10px] font-black uppercase tracking-widest text-sky-400 mb-3">
@@ -472,6 +494,9 @@
                         >
                           <div>
                             <p class="font-serif text-sky-100">{{ p.characterName }}</p>
+                            <p class="text-[10px] uppercase tracking-widest text-slate-500 mt-1">
+                              {{ p.speciesLabel }} · {{ p.classLabel }}
+                            </p>
                             @if (p.publicHook) {
                               <p class="text-xs text-slate-400 mt-1 italic">« {{ p.publicHook }} »</p>
                             }
@@ -547,14 +572,16 @@
                             >
                               Utiliser à la table
                             </button>
-                            <button
-                              type="button"
-                              class="px-3 py-2 rounded-xl text-[10px] font-black uppercase border border-emerald-800/50 text-emerald-300 disabled:opacity-50"
-                              [disabled]="pregenPdfLoadingId() === p.id"
-                              (click)="claimPregen(p.id)"
-                            >
-                              Copier dans Mes héros
-                            </button>
+                            @if (p.status !== 'claimed') {
+                              <button
+                                type="button"
+                                class="px-3 py-2 rounded-xl text-[10px] font-black uppercase border border-emerald-800/50 text-emerald-300 disabled:opacity-50"
+                                [disabled]="pregenPdfLoadingId() === p.id"
+                                (click)="claimPregen(p.id)"
+                              >
+                                Copier dans Mes héros
+                              </button>
+                            }
                           </div>
                         </div>
                       }
@@ -567,7 +594,7 @@
                       <p class="text-xs text-slate-400 mb-4">
                         Génère un héros original niveau 1 (espèce, classe, équipement, sorts). Chaque pré-tiré apparaît ci-dessous et aussi dans
                         <a routerLink="/characters" class="text-violet-400 hover:underline">Mes héros</a>
-                        (nom « … (pré-tiré) »). Exports PDF : onglet Documents.
+                        (nom « … (pré-tiré) »). Pour une fiche PDF complète : bouton « Voir la fiche » puis télécharger.
                       </p>
                       <app-ai-generation-progress-bar class="block mb-4" />
                       <div class="flex flex-wrap gap-2 mb-4">
@@ -592,10 +619,10 @@
                         }
                         <a
                           routerLink="/create"
-                          [queryParams]="{ campaignId: c.id, returnUrl: '/campaigns/' + c.id + '?tab=players' }"
+                          [queryParams]="{ returnUrl: '/campaigns/' + c.id + '?tab=pregens' }"
                           class="px-3 py-2 rounded-xl text-xs border border-violet-800/50 text-violet-300 hover:border-violet-500/50"
                         >
-                          Créer un héros →
+                          Créer puis importer →
                         </a>
                       </div>
                     </div>
@@ -689,7 +716,11 @@
                         </p>
                       </div>
                     }
-                  } @else if (!myAssignedPregens().length) {
+                  } @else if (
+                    !c.isOwner &&
+                    !myAssignedPregens().length &&
+                    !readyPregensForPlayers().length
+                  ) {
                     <div class="rounded-2xl border border-dashed border-slate-700 bg-[#1b2028]/50 p-6 text-center space-y-2">
                       <p class="text-sm text-slate-300">Aucun pré-tiré publié pour vous.</p>
                       <p class="text-xs text-slate-500">Le MJ peut en préparer dans Préparation → Pré-tirés.</p>

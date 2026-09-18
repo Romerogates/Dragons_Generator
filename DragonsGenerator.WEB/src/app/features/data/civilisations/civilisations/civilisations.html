@@ -23,11 +23,11 @@
       </h2>
       <div class="h-px flex-grow bg-gradient-to-l from-transparent to-slate-700"></div>
     </div>
-    <p class="text-slate-400 text-sm max-w-xl mx-auto italic truncate">
+    <p class="text-slate-400 text-sm max-w-xl mx-auto italic">
       @if (mapFullscreen()) {
-        Cliquez une région pour les archives · Échap pour quitter
+        Tapez une région pour les archives · Fermer ou Échap pour quitter
       } @else {
-        Survolez les régions pour en apprendre plus et cliquez pour consulter les archives détaillées.
+        Cliquez ou tapez une région pour consulter les archives.
       }
     </p>
   </div>
@@ -60,17 +60,19 @@
         [style.max-height]="mapFullscreen() ? 'calc(100dvh - 5.5rem)' : null"
       >
         @if (!mapFullscreen()) {
-          <button
-            type="button"
-            class="absolute inset-0 z-0 cursor-zoom-in"
-            (click)="enterMapFullscreen()"
-            aria-label="Agrandir la carte"
-          ></button>
           <app-fullscreen-enter-btn
             class="absolute top-2.5 right-2.5 z-20"
             tone="amber"
             (enter)="enterMapFullscreen(); $event.stopPropagation()"
           />
+        } @else {
+          <button
+            type="button"
+            class="absolute top-2.5 left-2.5 z-20 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-[#1b2028]/95 border border-amber-700/60 text-amber-300 hover:border-amber-400"
+            (click)="exitMapFullscreen()"
+          >
+            Fermer
+          </button>
         }
 
         <img
@@ -98,9 +100,14 @@
             >
               <iconify-icon [icon]="getIconForCiv(civ.id)"></iconify-icon>
             </a>
+            <p
+              class="absolute left-1/2 -translate-x-1/2 top-full mt-1 max-w-[7rem] text-center text-[9px] font-bold uppercase tracking-wide text-amber-200/90 drop-shadow lg:hidden pointer-events-none"
+            >
+              {{ civ.name }}
+            </p>
 
             <div
-              class="absolute left-1/2 -translate-x-1/2 w-max max-w-[220px] bg-[#020617]/95 border border-amber-600/50 p-3 rounded-lg opacity-0 group-hover/pin:opacity-100 transition-[colors,transform,opacity,box-shadow] duration-200 pointer-events-none shadow-2xl backdrop-blur-md"
+              class="absolute left-1/2 -translate-x-1/2 w-max max-w-[220px] bg-[#020617]/95 border border-amber-600/50 p-3 rounded-lg opacity-0 group-hover/pin:opacity-100 transition-[colors,transform,opacity,box-shadow] duration-200 pointer-events-none shadow-2xl backdrop-blur-md hidden lg:block"
               [ngClass]="
                 getMapCoordinates(civ.id).y < 35
                   ? 'top-full mt-3 group-hover/pin:translate-y-1'

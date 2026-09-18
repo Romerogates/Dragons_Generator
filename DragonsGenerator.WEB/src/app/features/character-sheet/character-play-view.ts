@@ -13,7 +13,7 @@ import {
   spellcastingDisplayLines,
   spellcastingFocusLabel,
 } from '@core/utils/character-spellcasting-display.util';
-import { labelForGameId } from '@core/utils/game-id-labels';
+import { labelForGameId, formatGameIds } from '@core/utils/game-id-labels';
 import { normalizeSkillId } from '@core/utils/skill.utils';
 
 /** Clés déjà couvertes par le bloc Incantation — évite le doublon dans Ressources. */
@@ -58,6 +58,40 @@ export class CharacterPlayView {
           : `${cls.classLabel} (niv. ${cls.level})`,
       )
       .join(' · ');
+  });
+
+  readonly identityLine = computed(() => {
+    const c = this.character();
+    const species = c.species?.subspeciesLabel
+      ? `${c.species.label} (${c.species.subspeciesLabel})`
+      : (c.species?.label ?? '');
+    const bg = c.backgroundRef?.label ?? '';
+    return [species, bg].filter(Boolean).join(' · ');
+  });
+
+  readonly spellsSectionTitle = computed(() => {
+    const kind = this.character().spellcasting?.kind;
+    if (kind === 'wizard') return 'Grimoire';
+    if (
+      kind === 'cleric' ||
+      kind === 'druid' ||
+      kind === 'paladin' ||
+      kind === 'fighter_eldritch_knight'
+    ) {
+      return 'Sorts préparés';
+    }
+    if (kind === 'warlock' || kind === 'sorcerer' || kind === 'bard' || kind === 'ranger') {
+      return 'Sorts connus';
+    }
+    return 'Sorts';
+  });
+
+  readonly armorWeaponLine = computed(() => {
+    const p = this.character().proficiencies;
+    const parts: string[] = [];
+    if (p?.armor?.length) parts.push(`Armures : ${formatGameIds(p.armor)}`);
+    if (p?.weapons?.length) parts.push(`Armes : ${formatGameIds(p.weapons)}`);
+    return parts.join(' · ');
   });
 
   readonly resourceChips = computed(() => {

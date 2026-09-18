@@ -198,7 +198,24 @@
   </div>
 
   <div class="wizard-step-nav px-4 max-w-3xl mx-auto w-full">
-    <button type="button" class="wizard-nav-secondary" (click)="builder.previousStep()">← Aventure</button>
-    <a routerLink="/creatures" class="wizard-nav-primary text-center no-underline">Retour au bestiaire</a>
+    <button type="button" class="wizard-nav-secondary" (click)="builder.previousStep()">
+      @if (builder.isCreaturesOnlyEdit()) {
+        ← Personnages
+      } @else {
+        ← Aventure
+      }
+    </button>
+    @if (builder.isEditingCampaign() && builder.editingCampaignId(); as campId) {
+      <a
+        [routerLink]="['/campaigns', campId]"
+        [queryParams]="{ tab: 'prep' }"
+        class="wizard-nav-primary text-center no-underline"
+        >Retour à la campagne</a
+      >
+    } @else {
+      <a routerLink="/campaigns" class="wizard-nav-primary text-center no-underline"
+        >Mes campagnes</a
+      >
+    }
   </div>
 </div>

@@ -1,5 +1,16 @@
 @if (character(); as c) {
   <div class="space-y-4">
+    <header class="px-1">
+      <h2 class="text-xl sm:text-2xl font-serif text-slate-100 leading-tight">{{ c.name }}</h2>
+      <p class="text-sm text-slate-400 mt-0.5">
+        {{ identityLine() }}
+        @if (c.alignment) {
+          <span class="text-slate-600"> · </span>{{ c.alignment }}
+        }
+      </p>
+      <p class="text-sm text-slate-500 mt-0.5">{{ classLine() }} · Total niv. {{ c.totalLevel }}</p>
+    </header>
+
     <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
       <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-3 text-center">
         <div class="text-[9px] font-black uppercase tracking-widest text-red-500/80 mb-1">PV</div>
@@ -38,8 +49,6 @@
         <div class="text-lg font-serif text-slate-200">{{ c.movement.walk }} m</div>
       </div>
     </div>
-
-    <p class="text-sm text-slate-400">{{ classLine() }} · Total niv. {{ c.totalLevel }}</p>
 
     <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
       @for (key of abilityKeys; track key) {
@@ -182,7 +191,7 @@
           <div class="space-y-3 border-t border-slate-800 pt-3">
             <div class="flex flex-wrap items-baseline justify-between gap-2">
               <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-500">
-                Grimoire
+                {{ spellsSectionTitle() }}
               </h4>
               @if (preparedSpellCount() > 0) {
                 <span class="text-[11px] text-emerald-400/90"
@@ -223,7 +232,7 @@
           </div>
         } @else {
           <p class="text-xs text-slate-500 italic border-t border-slate-800 pt-3">
-            Aucun sort listé dans le grimoire pour l’instant.
+            Aucun sort listé pour l’instant.
           </p>
         }
       </section>
@@ -243,8 +252,16 @@
       </section>
     }
 
-    @if (skillList().length || toolLabels().length || languageLabels().length) {
+    @if (skillList().length || toolLabels().length || languageLabels().length || armorWeaponLine()) {
       <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-4 space-y-3">
+        @if (armorWeaponLine()) {
+          <div>
+            <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-2">
+              Armures & armes
+            </h3>
+            <p class="text-xs text-slate-300">{{ armorWeaponLine() }}</p>
+          </div>
+        }
         @if (skillList().length) {
           <div>
             <h3 class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-2">

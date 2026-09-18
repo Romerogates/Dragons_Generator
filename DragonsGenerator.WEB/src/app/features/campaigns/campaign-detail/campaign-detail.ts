@@ -172,6 +172,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly memberCharacterLoadingId = signal<string | null>(null);
   readonly characterRequestLoadingId = signal<string | null>(null);
   readonly rosterFeedback = signal<string | null>(null);
+  /** Erreurs / succès locaux Pré-tirés (ne démonte pas le hub). */
+  readonly pregenFeedback = signal<string | null>(null);
   /** Bannière one-shot après /join ou proposition depuis la forge. */
   readonly welcomeBanner = signal<string | null>(null);
   readonly joinLink = signal<{ token: string | null; enabled: boolean } | null>(null);
@@ -2257,7 +2259,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (!c?.isOwner || this.generatingAutoPregen()) return;
 
     this.generatingAutoPregen.set(true);
-    this.error.set(null);
+    this.pregenFeedback.set(null);
     try {
       const generated = await this.pregenGenerator.generateOriginalPlayable(c, true);
       const entry = createCampaignPregenEntry(
@@ -2273,7 +2275,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         pregenCharacters: [...(c.data.pregenCharacters ?? []), entry],
       });
     } catch {
-      this.error.set('Génération impossible. Réessayez dans quelques instants.');
+      this.pregenFeedback.set('Génération impossible. Réessayez dans quelques instants.');
     } finally {
       this.generatingAutoPregen.set(false);
     }
@@ -2283,7 +2285,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const c = this.campaign();
     if (!c?.isOwner || this.importingPregen()) return;
     this.importingPregen.set(true);
-    this.error.set(null);
+    this.pregenFeedback.set(null);
     try {
       const generated = await this.pregenGenerator.generatePlayableDuplicate(c, characterId, false);
       const entry = createCampaignPregenEntry(
@@ -2299,7 +2301,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         pregenCharacters: [...(c.data.pregenCharacters ?? []), entry],
       });
     } catch {
-      this.error.set('Impossible d\'importer ce personnage.');
+      this.pregenFeedback.set('Impossible d’importer ce personnage.');
     } finally {
       this.importingPregen.set(false);
     }
@@ -2347,27 +2349,26 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   claimPregen(pregenId: string): void {
     const c = this.campaign();
     if (!c) return;
+    this.pregenFeedback.set(null);
     this.campaigns.claimPregen(c.id, pregenId).subscribe({
       next: () => {
-        this.error.set(null);
-        this.rosterFeedback.set('Copie ajoutée dans Mes héros (la table n’a pas changé).');
+        this.pregenFeedback.set('Copie ajoutée dans Mes héros (la table n’a pas changé).');
         this.reload();
-        this.router.navigate(['/characters']);
       },
-      error: () => this.error.set('Impossible de copier ce personnage dans Mes héros.'),
+      error: () => this.pregenFeedback.set('Impossible de copier ce personnage dans Mes héros.'),
     });
   }
 
   usePregenAtTable(pregenId: string): void {
     const c = this.campaign();
     if (!c) return;
+    this.pregenFeedback.set(null);
     this.campaigns.usePregenAtTable(c.id, pregenId).subscribe({
       next: () => {
-        this.error.set(null);
-        this.rosterFeedback.set('Pré-tiré lié à la table — sans copie dans Mes héros.');
+        this.pregenFeedback.set('Pré-tiré lié à la table — sans copie dans Mes héros.');
         this.reload();
       },
-      error: () => this.error.set('Impossible d’utiliser ce pré-tiré à la table.'),
+      error: () => this.pregenFeedback.set('Impossible d’utiliser ce pré-tiré à la table.'),
     });
   }
 
@@ -2383,7 +2384,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   printPregenFullSheet(pregen: CampaignPregen): void {
     if (this.pregenPdfLoadingId()) return;
     this.pregenPdfLoadingId.set(pregen.id);
-    this.error.set(null);
+    this.pregenFeedback.set(null);
     this.loadPregenCharacter(pregen).subscribe({
       next: (character) => {
         void getCampaignPdfService(this.injector).then((pdf) =>
@@ -2394,7 +2395,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       },
       error: () => {
         this.pregenPdfLoadingId.set(null);
-        this.error.set('Impossible de générer la fiche PDF.');
+        this.pregenFeedback.set('Impossible de générer la fiche PDF.');
       },
     });
   }
@@ -2403,20 +2404,20 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const campaignId = this.campaign()?.id;
     if (!campaignId) return;
     this.pregenPdfLoadingId.set(pregen.id);
-    this.error.set(null);
+    this.pregenFeedback.set(null);
     this.loadPregenCharacter(pregen).subscribe({
       next: (character) => {
         this.handoff.setCurrent(character, {
           mode: 'consult',
           sourceLabel: 'Pré-tiré de campagne',
-          returnUrl: `/campaigns/${campaignId}?tab=prep`,
+          returnUrl: `/campaigns/${campaignId}?tab=pregens`,
         });
         this.pregenPdfLoadingId.set(null);
         this.router.navigate(['/character-sheet']);
       },
       error: () => {
         this.pregenPdfLoadingId.set(null);
-        this.error.set('Impossible d\'ouvrir la fiche.');
+        this.pregenFeedback.set('Impossible d’ouvrir la fiche.');
       },
     });
   }

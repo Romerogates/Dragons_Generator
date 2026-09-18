@@ -8,6 +8,16 @@ import type {
   SpellInstance,
 } from '@core/models/Character/character';
 import { ABILITY_LABEL_TO_KEY } from '@core/models/Character/character';
+import { labelForGameId } from './game-id-labels';
+
+function labelAttackProperty(raw: string): string {
+  if (!raw) return raw;
+  // Textes déjà FR (Arts martiaux, Attaques ×2…) — ne pas re-slugifier.
+  if (!/^prop-/i.test(raw) && /[A-ZÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ*]/.test(raw[0]!)) return raw;
+  const labeled = labelForGameId(raw);
+  // prop-lancer-6-18 → "Lancer 6 18" → "Lancer 6/18"
+  return labeled.replace(/\b(\d+)\s+(\d+)\b/g, '$1/$2');
+}
 
 export interface CombatBuildContext {
   spellAbility?: Ability | null;
@@ -92,7 +102,7 @@ export function buildCharacterAttacks(
         damageType: wd.damageType ?? (monkWeapon ? 'contondant' : ''),
         range: isRanged ? (rangeProp ?? 'Distance') : 'Corps à corps',
         properties: [
-          ...(wd.properties ?? []),
+          ...(wd.properties ?? []).map(labelAttackProperty),
           ...(extraAttacks > 0 ? [`Attaques ×${1 + extraAttacks}`] : []),
           ...(sneakDice && (isFinesse || isRanged) ? [`Attaque sournoise ${sneakDice}`] : []),
         ],

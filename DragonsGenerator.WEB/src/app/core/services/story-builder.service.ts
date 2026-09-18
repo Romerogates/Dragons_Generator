@@ -286,7 +286,14 @@ export class StoryBuilderService {
     this.creatures.set(structuredClone(campaign.data.creatures ?? []));
     this.adventure.set(campaign.data.adventure ?? '');
     this.selectionMode.set('manual');
-    this.currentStep.set(1);
+    if (scope === 'creatures-only') {
+      this.currentStep.set(1);
+    } else if (this.isStepValid(1) && this.isStepValid(2)) {
+      // Synopsis / créatures déjà là → ouvrir directement sur Aventure.
+      this.currentStep.set(3);
+    } else {
+      this.currentStep.set(1);
+    }
   }
 
   buildCampaignData(): CampaignData {

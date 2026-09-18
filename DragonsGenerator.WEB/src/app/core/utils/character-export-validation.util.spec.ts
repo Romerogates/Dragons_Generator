@@ -68,7 +68,7 @@ describe('character-export-validation.util', () => {
 
     const result = validateCharacterExport(broken);
     expect(result.valid).toBeFalse();
-    expect(result.errors.some((e) => e.includes('wp-mastered-choice'))).toBeTrue();
+    expect(result.errors.some((e) => e.includes('Maîtrise d\'arme non résolue'))).toBeTrue();
   });
 
   it('rejects category equipment ids', () => {
@@ -84,7 +84,8 @@ describe('character-export-validation.util', () => {
 
     const result = validateCharacterExport(broken);
     expect(result.valid).toBeFalse();
-    expect(result.errors.some((e) => e.includes('wp-cat-martial'))).toBeTrue();
+    expect(result.errors.some((e) => e.includes('Équipement non résolu'))).toBeTrue();
+    expect(result.errors.some((e) => e.includes('Armes de guerre'))).toBeTrue();
   });
 
   it('formats multiple errors for UI', () => {

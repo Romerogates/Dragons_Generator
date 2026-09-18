@@ -56,6 +56,7 @@ describe('StoryBuilderService', () => {
     expect(service.editingCampaignId()).toBe('camp-1');
     expect(service.title()).toBe('Les Ombres');
     expect(service.region()?.kind).toBe('civilization');
+    expect(service.currentStep()).toBe(3);
     expect(service.buildCampaignData().encounters).toEqual(sampleCampaign.data.encounters);
     expect(service.buildCampaignData().notes).toBe('Note MJ');
   });
@@ -129,6 +130,7 @@ describe('StoryBuilderService', () => {
 
   it('merges creatures when editing without replacing existing ones', () => {
     service.loadCampaignIntoBuilder(sampleCampaign, 'creatures-only');
+    expect(service.currentStep()).toBe(1);
     service.mergeCreatures([
       {
         creatureId: 'cre-new',

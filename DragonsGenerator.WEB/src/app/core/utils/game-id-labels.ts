@@ -166,6 +166,18 @@ export const GAME_ID_LABELS: Record<string, string> = {
   vehicle: 'Véhicule (au choix)',
   vehicule: 'Véhicule (au choix)',
 
+  // --- Propriétés d'armes ---
+  'prop-finesse': 'Finesse',
+  'prop-legere': 'Légère',
+  'prop-lourde': 'Lourde',
+  'prop-deux-mains': 'À deux mains',
+  'prop-polyvalente': 'Polyvalente',
+  'prop-munition': 'Munitions',
+  'prop-chargement': 'Chargement',
+  'prop-portee': 'Portée',
+  'prop-special': 'Spéciale',
+  'prop-allegee': 'Allégée',
+
   // --- Armes courantes fréquentes ---
   'wp-dague': 'Dague',
   'wp-gourdin': 'Gourdin',
@@ -228,7 +240,7 @@ const TOKEN_FIXES: Record<string, string> = {
 };
 
 const PREFIXES =
-  /^(skill|ski|wp|ar|gr|tl|eq|lg|ws|feat|cls|civ|spc|bg|spl|dmg|veh)-/i;
+  /^(skill|ski|wp|ar|gr|tl|eq|lg|ws|feat|cls|civ|spc|bg|spl|dmg|veh|prop)-/i;
 
 function slugToLabel(raw: string): string {
   let s = raw.trim();

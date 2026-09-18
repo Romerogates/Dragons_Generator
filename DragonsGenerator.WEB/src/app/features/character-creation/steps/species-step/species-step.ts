@@ -416,7 +416,7 @@ export class SpeciesStep implements OnInit {
 
         out.push({
           refId: spellId,
-          name: raw?.name ?? spellId.replace(/^spl-/, '').replace(/-/g, ' '),
+          name: raw?.name ?? labelForGameId(spellId),
           level: castLevel,
           prepared: true,
           alwaysPrepared: true,

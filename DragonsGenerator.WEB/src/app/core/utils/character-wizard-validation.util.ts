@@ -1,6 +1,7 @@
 import type { CharacterCreation } from '@core/models/Character/character';
 import type { ExtendedCharacterCreation } from '@core/models/Character/character-builder.types';
 import type { EquipmentSlot } from '@core/models/CharacterClasses/character-class';
+import { isMasteredProficiencyChoice } from './equipment.utils';
 
 export interface WizardStepValidationContext {
   needsMagicStep: boolean;
@@ -89,6 +90,14 @@ function skillsStepComplete(c: CharacterCreation): boolean {
   const ext = asExtended(c);
   const secondaryNeed = (ext.secondaryClasses ?? []).reduce((sum, sc) => sum + (sc.skillChooseCount ?? 0), 0);
   if ((ext.secondaryClassSelectedSkills?.length ?? 0) < secondaryNeed) return false;
+  const bgToolNeed =
+    ext.backgroundProficiencies?.tools?.choose?.reduce((sum, g) => sum + (g.chooseCount ?? 0), 0) ?? 0;
+  if (bgToolNeed > 0 && (c.backgroundTools?.length ?? 0) < bgToolNeed) return false;
+  // Placeholders non résolus (armes/outils « au choix ») → forcer le passage par Savoirs.
+  const unresolved = (id: string) =>
+    isMasteredProficiencyChoice(id) || id.endsWith('-any') || id === 'any';
+  if ((c.weaponProficiencies ?? []).some(unresolved)) return false;
+  if ((c.toolProficiencies ?? []).some(unresolved)) return false;
   return true;
 }
 
@@ -110,7 +119,7 @@ function equipmentStepComplete(c: CharacterCreation): boolean {
   }
   if (c.selectedEquipment.length === 0) return false;
   const picks = ext.equipmentWizardPicks;
-  if (!picks) return true;
+  if (!picks) return false;
   return choosable.every((slot) => picks.alt[String(slot.slot)] != null);
 }
 

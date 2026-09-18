@@ -508,7 +508,7 @@ export const PREGEN_STATUS_LABELS: Record<CampaignPregenStatus, string> = {
   draft: 'Brouillon',
   ready: 'Prêt',
   assigned: 'Assigné',
-  claimed: 'Revendiqué',
+  claimed: 'Copié dans Mes héros',
 };
 
 export type { CreatureRole };

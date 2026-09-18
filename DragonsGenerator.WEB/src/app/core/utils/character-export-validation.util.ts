@@ -8,6 +8,7 @@ import {
   isMasteredProficiencyChoice,
   resolveEquipmentRefId,
 } from './equipment.utils';
+import { labelForGameId } from './game-id-labels';
 
 export interface CharacterExportValidation {
   valid: boolean;
@@ -66,14 +67,18 @@ export function validateCharacterExport(character: Character): CharacterExportVa
   const weapons = character.proficiencies?.weapons ?? [];
   for (const id of weapons) {
     if (isUnresolvedProficiencyId(id, 'weapon')) {
-      errors.push(`Maîtrise d'arme non résolue : ${id}.`);
+      errors.push(
+        `Maîtrise d'arme non résolue : ${labelForGameId(id)}. Revenez à l’étape Compétences ou Équipement.`,
+      );
     }
   }
 
   const tools = character.proficiencies?.tools ?? [];
   for (const id of tools) {
     if (isUnresolvedProficiencyId(id, 'tool')) {
-      errors.push(`Maîtrise d'outil non résolue : ${id}.`);
+      errors.push(
+        `Maîtrise d'outil non résolue : ${labelForGameId(id)}. Revenez à l’étape Compétences.`,
+      );
     }
   }
 
@@ -84,7 +89,9 @@ export function validateCharacterExport(character: Character): CharacterExportVa
       continue;
     }
     if (isMasteredProficiencyChoice(refId) || isEquipmentCategoryId(refId)) {
-      errors.push(`Équipement non résolu : ${refId}.`);
+      errors.push(
+        `Équipement non résolu : ${labelForGameId(refId)}. Revenez à l’étape Équipement.`,
+      );
     }
   }
 
