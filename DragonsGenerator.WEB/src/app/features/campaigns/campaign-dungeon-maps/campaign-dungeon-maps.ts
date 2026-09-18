@@ -47,6 +47,13 @@ import {
   themePalette,
 } from '@core/utils/dungeon-render.util';
 import { gridLine, setTileAt } from '@core/utils/dungeon-paint.util';
+import {
+  fillRectFloor,
+  findRoomToResize,
+  nextRoomLabel,
+  normalizeGridRect,
+  type GridRect,
+} from '@core/utils/dungeon-room-edit.util';
 import { rollRandomEncounter, suggestThemeFromRegion } from '@core/utils/dungeon-theme-pools';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import { FullscreenEnterBtn } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-btn';
@@ -59,12 +66,13 @@ import {
   type CloudDungeonSummary,
 } from '@core/services/dungeon-cloud.service';
 
-type EditorTool = 'select' | 'floor' | 'wall' | 'door' | 'trap' | 'chest' | 'stairs';
+type EditorTool = 'select' | 'room' | 'floor' | 'wall' | 'door' | 'trap' | 'chest' | 'stairs';
 type SizePresetId = 'compact' | 'standard' | 'large' | 'custom';
 
 interface UndoSnapshot {
   tiles: DungeonTileKind[][];
   markers: CampaignDungeonMap['markers'];
+  rooms: CampaignDungeonMap['rooms'];
 }
 
 interface SizePreset {
@@ -184,6 +192,8 @@ export class CampaignDungeonMaps implements OnDestroy {
   readonly isPanning = signal(false);
   readonly isPainting = signal(false);
   readonly previewMap = signal<CampaignDungeonMap | null>(null);
+  /** Aperçu rectangle outil Salle pendant le drag. */
+  readonly roomDragRect = signal<GridRect | null>(null);
 
   readonly genName = signal('Donjon');
   readonly genGridW = signal(48);
@@ -198,6 +208,7 @@ export class CampaignDungeonMaps implements OnDestroy {
   readonly themes: DungeonTheme[] = ['crypt', 'cave', 'ruins', 'temple', 'sewer', 'forest', 'generic'];
   readonly tools: { id: EditorTool; label: string; hint: string }[] = [
     { id: 'select', label: 'Sélection', hint: 'Cliquer une salle' },
+    { id: 'room', label: 'Salle', hint: 'Clic-glisser pour définir une salle' },
     { id: 'floor', label: 'Sol', hint: 'Peindre le sol' },
     { id: 'wall', label: 'Mur', hint: 'Peindre des murs' },
     { id: 'door', label: 'Porte', hint: 'Poser une porte' },
@@ -271,6 +282,8 @@ export class CampaignDungeonMaps implements OnDestroy {
   private strokeStarted = false;
   /** true après le premier pointermove du stroke (pas de toggle-suppression marqueur). */
   private strokeDragged = false;
+  private roomDragStart: { x: number; y: number } | null = null;
+  private isDefiningRoom = false;
 
   constructor() {
     effect(() => {
@@ -288,6 +301,7 @@ export class CampaignDungeonMaps implements OnDestroy {
       drawDungeonToCanvas(map, canvas, EDITOR_CELL, {
         showRoomNumbers: true,
         selectedRoomId: this.selectedRoomId(),
+        previewRoomRect: this.roomDragRect(),
         vignette: true,
         revealedRoomIds: fogRevealSet(map),
         edgePadCells: EDITOR_EDGE_PAD,
@@ -858,6 +872,8 @@ export class CampaignDungeonMaps implements OnDestroy {
     if (this.touchPointers.size === 2) {
       this.isPainting.set(false);
       this.isPanning.set(false);
+      this.isDefiningRoom = false;
+      this.roomDragRect.set(null);
       const pts = [...this.touchPointers.values()];
       this.pinchStartDistance = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
       this.pinchStartScale = this.scale();
@@ -883,12 +899,24 @@ export class CampaignDungeonMaps implements OnDestroy {
     if (event.button !== 0) return;
     if (this.readOnly() && this.activeTool() !== 'select') return;
     event.preventDefault();
+    viewport.setPointerCapture(event.pointerId);
+
+    if (this.activeTool() === 'room') {
+      const tile = this.clientToTile(event.clientX, event.clientY);
+      if (!tile) return;
+      this.isDefiningRoom = true;
+      this.isPainting.set(false);
+      this.roomDragStart = tile;
+      const rect = normalizeGridRect(tile.x, tile.y, tile.x, tile.y, map.gridWidth, map.gridHeight);
+      this.roomDragRect.set(rect);
+      return;
+    }
+
     this.isPainting.set(true);
     this.strokeStarted = false;
     this.strokeDragged = false;
     this.lastPaintKey = null;
     this.lastPaintTile = null;
-    viewport.setPointerCapture(event.pointerId);
     const tile = this.clientToTile(event.clientX, event.clientY);
     if (tile) {
       this.lastPaintTile = tile;
@@ -917,8 +945,26 @@ export class CampaignDungeonMaps implements OnDestroy {
       this.panY.set(this.panOrigin.panY + dy);
       return;
     }
+
+    if (this.isDefiningRoom && this.roomDragStart) {
+      const map = this.editingMap();
+      const tile = this.clientToTile(event.clientX, event.clientY);
+      if (!map || !tile) return;
+      this.roomDragRect.set(
+        normalizeGridRect(
+          this.roomDragStart.x,
+          this.roomDragStart.y,
+          tile.x,
+          tile.y,
+          map.gridWidth,
+          map.gridHeight,
+        ),
+      );
+      return;
+    }
+
     if (!this.isPainting()) return;
-    if (this.activeTool() === 'select') return;
+    if (this.activeTool() === 'select' || this.activeTool() === 'room') return;
     const tile = this.clientToTile(event.clientX, event.clientY);
     if (!tile) return;
 
@@ -941,6 +987,17 @@ export class CampaignDungeonMaps implements OnDestroy {
     if (viewport?.hasPointerCapture(event.pointerId)) {
       viewport.releasePointerCapture(event.pointerId);
     }
+
+    if (this.isDefiningRoom) {
+      const rect = this.roomDragRect();
+      this.isDefiningRoom = false;
+      this.roomDragStart = null;
+      this.roomDragRect.set(null);
+      this.isPanning.set(false);
+      if (rect) this.commitRoomDefinition(rect);
+      return;
+    }
+
     const wasPainting = this.isPainting();
     this.isPanning.set(false);
     this.isPainting.set(false);
@@ -952,12 +1009,73 @@ export class CampaignDungeonMaps implements OnDestroy {
     if (wasPainting) this.commitDraftTimestamp();
   }
 
+  /** Crée ou redimensionne une salle depuis un rectangle grille. */
+  commitRoomDefinition(rect: GridRect): void {
+    const map = this.editingMap();
+    if (!map || this.readOnly()) return;
+
+    this.pushUndo(map);
+    const target = findRoomToResize(map.rooms, rect, this.selectedRoomId());
+    const tiles = fillRectFloor(map.tiles, rect);
+
+    if (target) {
+      const rooms = map.rooms.map((r) =>
+        r.id === target.id
+          ? { ...r, x: rect.x, y: rect.y, width: rect.width, height: rect.height }
+          : r,
+      );
+      this.updateMap({ ...map, tiles, rooms }, false, true);
+      this.selectedRoomId.set(target.id);
+      this.setEditorMessage(`Contours de « ${target.label} » mis à jour.`);
+    } else {
+      const label = nextRoomLabel(map.rooms);
+      const id = crypto.randomUUID?.() ?? `room-${Date.now()}`;
+      const room = {
+        id,
+        label,
+        x: rect.x,
+        y: rect.y,
+        width: rect.width,
+        height: rect.height,
+        encounterId: null,
+        randomEncounter: null,
+        notes: '',
+      };
+      this.updateMap({ ...map, tiles, rooms: [...map.rooms, room] }, false, true);
+      this.selectedRoomId.set(id);
+      this.setEditorMessage(`« ${label} » créée.`);
+    }
+    this.commitDraftTimestamp();
+  }
+
+  deleteRoom(roomId: string, event?: Event): void {
+    event?.stopPropagation();
+    const map = this.editingMap();
+    if (!map || this.readOnly()) return;
+    const room = map.rooms.find((r) => r.id === roomId);
+    if (!room) return;
+    this.pushUndo(map);
+    const rooms = map.rooms.filter((r) => r.id !== roomId);
+    const markers = map.markers.map((m) =>
+      m.linkedRoomId === roomId ? { ...m, linkedRoomId: null } : m,
+    );
+    const revealedRoomIds = (map.revealedRoomIds ?? []).filter((id) => id !== roomId);
+    this.updateMap({ ...map, rooms, markers, revealedRoomIds }, false, true);
+    if (this.selectedRoomId() === roomId) this.selectedRoomId.set(null);
+    this.setEditorMessage(`« ${room.label} » retirée (le dessin de la carte est conservé).`);
+    this.commitDraftTimestamp();
+  }
+
   undo(): void {
     const map = this.editingMap();
     const snap = this.undoStack.pop();
     if (!map || !snap) return;
     this.undoDepth.set(this.undoStack.length);
-    this.updateMap({ ...map, tiles: snap.tiles, markers: snap.markers }, false, true);
+    this.updateMap(
+      { ...map, tiles: snap.tiles, markers: snap.markers, rooms: snap.rooms },
+      false,
+      true,
+    );
     this.setEditorMessage('Annulé.');
   }
 
@@ -974,6 +1092,9 @@ export class CampaignDungeonMaps implements OnDestroy {
 
   setTool(tool: EditorTool): void {
     this.activeTool.set(tool);
+    this.isDefiningRoom = false;
+    this.roomDragStart = null;
+    this.roomDragRect.set(null);
   }
 
   zoom(delta: number): void {
@@ -1188,6 +1309,7 @@ export class CampaignDungeonMaps implements OnDestroy {
   cursorClass(): string {
     if (this.isPanning() || this.spaceHeld()) return 'cursor-grabbing';
     if (this.activeTool() === 'select') return 'cursor-default';
+    if (this.activeTool() === 'room') return 'cursor-crosshair';
     return 'cursor-crosshair';
   }
 
@@ -1223,6 +1345,7 @@ export class CampaignDungeonMaps implements OnDestroy {
     this.undoStack.push({
       tiles: map.tiles.map((row) => [...row]),
       markers: map.markers.map((m) => ({ ...m })),
+      rooms: map.rooms.map((r) => ({ ...r })),
     });
     if (this.undoStack.length > MAX_UNDO) this.undoStack.shift();
     this.undoDepth.set(this.undoStack.length);

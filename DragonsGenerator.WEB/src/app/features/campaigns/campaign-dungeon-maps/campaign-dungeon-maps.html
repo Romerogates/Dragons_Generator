@@ -404,7 +404,7 @@
       <button type="button" class="tool-btn" (click)="resetView()" title="Recadrer">Fit</button>
     </div>
     <p class="text-[10px] text-slate-600 -mt-1">
-      Clic-glisser pour peindre · Espace pour déplacer · Molette zoom
+      Clic-glisser pour peindre · Salle : glisser un rectangle · Sélection puis Salle pour recadrer · Espace pour déplacer · Molette zoom
     </p>
 
     <div
@@ -580,6 +580,16 @@
                   (ngModelChange)="patchRoom(room.id, { notes: $event })"
                   (click)="$event.stopPropagation()"
                 ></textarea>
+
+                @if (!readOnly() && selectedRoomId() === room.id) {
+                  <button
+                    type="button"
+                    class="mt-2 text-[10px] font-bold uppercase text-red-400/90 hover:text-red-300"
+                    (click)="deleteRoom(room.id, $event)"
+                  >
+                    Supprimer la salle
+                  </button>
+                }
               </div>
             }
           </div>

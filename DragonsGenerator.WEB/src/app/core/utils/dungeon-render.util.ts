@@ -165,6 +165,8 @@ export function roomLabelAt(map: CampaignDungeonMap, roomId: string): string {
 export interface DrawDungeonOptions {
   showRoomNumbers?: boolean;
   selectedRoomId?: string | null;
+  /** Rectangle temporaire (outil Salle) pendant le clic-glisser. */
+  previewRoomRect?: { x: number; y: number; width: number; height: number } | null;
   showGrid?: boolean;
   vignette?: boolean;
   /** Si défini, masque les salles non révélées (fog of war joueur). */
@@ -374,6 +376,27 @@ export function drawDungeonToCanvas(
         origin + room.y * cellSize + 1,
         room.width * cellSize - 2,
         room.height * cellSize - 2,
+      );
+    }
+  }
+
+  if (options?.previewRoomRect) {
+    const pr = options.previewRoomRect;
+    if (pr.width > 0 && pr.height > 0) {
+      ctx.fillStyle = 'rgba(251, 191, 36, 0.2)';
+      ctx.fillRect(
+        origin + pr.x * cellSize,
+        origin + pr.y * cellSize,
+        pr.width * cellSize,
+        pr.height * cellSize,
+      );
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = Math.max(1.5, cellSize * 0.18);
+      ctx.strokeRect(
+        origin + pr.x * cellSize + 1,
+        origin + pr.y * cellSize + 1,
+        pr.width * cellSize - 2,
+        pr.height * cellSize - 2,
       );
     }
   }
