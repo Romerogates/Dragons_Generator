@@ -33,9 +33,9 @@
     </section>
 
     <!-- Aventure -->
-    <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
-      <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-4">Aventure</h3>
-      <div class="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap font-serif">{{ builder.adventure() }}</div>
+    <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5 md:p-6">
+      <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-5">Aventure</h3>
+      <app-adventure-synopsis-view [text]="builder.adventure()" />
     </section>
 
     <!-- Aperçu pack MJ (synopsis + bestiaire + rencontres) -->

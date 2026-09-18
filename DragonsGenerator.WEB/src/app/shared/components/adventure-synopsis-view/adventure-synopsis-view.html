@@ -1,0 +1,28 @@
+@if (sections().length === 0) {
+  <p class="text-sm text-slate-500 italic">{{ emptyLabel() }}</p>
+} @else {
+  <div class="space-y-6">
+    @for (section of sections(); track section.title) {
+      <article class="rounded-xl border border-slate-800/80 bg-[#161b24]/50 px-4 py-5 md:px-5 md:py-6">
+        <h3 class="text-[10px] font-black uppercase tracking-[0.18em] text-violet-400 mb-4">
+          {{ section.title }}
+        </h3>
+        @if (section.body) {
+          <p class="text-sm md:text-base leading-relaxed font-serif text-slate-300/95 whitespace-pre-wrap">
+            {{ section.body }}
+          </p>
+        }
+        @if (section.bullets.length) {
+          <ul class="space-y-2.5" [class.mt-4]="!!section.body">
+            @for (item of section.bullets; track item) {
+              <li class="flex gap-2.5 text-sm text-slate-300 leading-snug">
+                <span class="text-violet-500/80 shrink-0 mt-0.5" aria-hidden="true">•</span>
+                <span class="font-serif">{{ item }}</span>
+              </li>
+            }
+          </ul>
+        }
+      </article>
+    }
+  </div>
+}

@@ -1,16 +1,16 @@
 @if (view(); as g) {
   @if (!g.allDone) {
     <section
-      class="rounded-2xl border border-amber-800/40 bg-amber-950/15 px-5 py-5 space-y-4"
+      class="rounded-2xl border border-amber-800/40 bg-amber-950/15 px-5 py-7 md:px-6 md:py-8 space-y-6"
       data-testid="first-session-checklist"
     >
-      <div class="flex flex-wrap items-start justify-between gap-3">
+      <div class="flex flex-wrap items-start justify-between gap-5">
         <div>
-          <p class="text-[10px] font-black uppercase tracking-widest text-amber-400/90 mb-1">
+          <p class="text-[10px] font-black uppercase tracking-widest text-amber-400/90 mb-2">
             Première session
           </p>
           <h2 class="text-lg font-serif text-slate-100">Inviter → Héros → Session → Table</h2>
-          <p class="mt-1 text-sm text-slate-400">
+          <p class="mt-3 text-sm text-slate-400">
             {{ g.doneCount }} / {{ g.steps.length }} étapes — le fil pour jouer ce soir.
           </p>
         </div>
@@ -21,16 +21,16 @@
               [style.width.%]="g.progressPct"
             ></div>
           </div>
-          <p class="mt-1 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">
+          <p class="mt-1.5 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">
             {{ g.progressPct }} %
           </p>
         </div>
       </div>
 
-      <ol class="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+      <ol class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         @for (step of g.steps; track step.id) {
           <li
-            class="rounded-xl border px-3 py-3"
+            class="rounded-xl border px-4 py-4"
             [class]="
               step.done
                 ? 'border-emerald-800/50 bg-emerald-950/20'
@@ -39,7 +39,7 @@
                   : 'border-slate-800 bg-[#161b24]/60'
             "
           >
-            <div class="flex items-center justify-between gap-2 mb-1">
+            <div class="flex items-center justify-between gap-2 mb-2">
               <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">{{
                 step.label
               }}</span>
@@ -47,11 +47,11 @@
                 <span class="text-[10px] font-black uppercase text-emerald-400">Fait</span>
               }
             </div>
-            <p class="text-xs text-slate-500 leading-snug min-h-[2.5rem]">{{ step.hint }}</p>
+            <p class="text-xs text-slate-500 leading-snug min-h-[2.75rem]">{{ step.hint }}</p>
             @if (!step.done && step.id === g.current?.id) {
               <button
                 type="button"
-                class="mt-2 min-h-10 w-full px-3 rounded-lg text-[10px] font-black uppercase tracking-widest bg-amber-500 text-slate-950 hover:bg-amber-400"
+                class="mt-4 min-h-10 w-full px-3 rounded-lg text-[10px] font-black uppercase tracking-widest bg-amber-500 text-slate-950 hover:bg-amber-400"
                 (click)="action.emit(step.action)"
               >
                 {{ step.actionLabel }}

@@ -23,6 +23,7 @@ import {
   CREATURE_ROLE_LABELS,
 } from '@core/models/Story/story';
 import { PdfPagePreview } from '@shared/components/pdf-page-preview/pdf-page-preview';
+import { AdventureSynopsisView } from '@shared/components/adventure-synopsis-view/adventure-synopsis-view';
 import { prefersNativePdfFallback } from '@core/utils/pdf-preview.util';
 import {
   storyLocationContext,
@@ -32,7 +33,7 @@ import {
 @Component({
   selector: 'app-story-summary-step',
   standalone: true,
-  imports: [CommonModule, RouterLink, PdfPagePreview],
+  imports: [CommonModule, RouterLink, PdfPagePreview, AdventureSynopsisView],
   templateUrl: './story-summary-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

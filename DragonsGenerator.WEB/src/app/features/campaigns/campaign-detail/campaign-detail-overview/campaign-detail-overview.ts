@@ -21,6 +21,7 @@ import {
   type FirstSessionAction,
   type FirstSessionChecklistInput,
 } from '../campaign-first-session-checklist.util';
+import { AdventureSynopsisView } from '@shared/components/adventure-synopsis-view/adventure-synopsis-view';
 
 @Component({
   selector: 'app-campaign-detail-overview',
@@ -31,6 +32,7 @@ import {
     CampaignDetailActivity,
     CampaignPlayerSheet,
     CampaignFirstSessionChecklist,
+    AdventureSynopsisView,
   ],
   templateUrl: './campaign-detail-overview.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,7 +57,7 @@ export class CampaignDetailOverview {
   readonly myXpEarned = input(0);
   readonly approvedCharacterName = input<string | null | undefined>(null);
 
-  readonly adventureExcerpt = input('');
+  readonly adventure = input('');
   readonly showRoster = input(false);
   readonly rosterFeedback = input<string | null>(null);
   readonly playersNeedingCharacter = input<CampaignMember[]>([]);

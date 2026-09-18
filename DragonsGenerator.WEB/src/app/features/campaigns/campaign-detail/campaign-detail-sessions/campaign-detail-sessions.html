@@ -326,7 +326,7 @@
         </div>
       </div>
     } @empty {
-      <div class="px-4 py-8 text-center space-y-3">
+      <div class="px-4 py-12 text-center flex flex-col items-center gap-6">
         <p class="text-sm text-slate-500 italic">
           @if (filter() === 'upcoming') {
             Aucune session à venir.
@@ -339,14 +339,14 @@
         @if (isOwner()) {
           <a
             routerLink="/guide/mj-table"
-            class="inline-block text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline"
+            class="text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline underline-offset-4"
           >
             Guide sessions →
           </a>
         } @else {
           <a
             routerLink="/guide/joueur-table"
-            class="inline-block text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline"
+            class="text-[10px] font-black uppercase tracking-widest text-sky-400 hover:text-sky-300 underline underline-offset-4"
           >
             Comment ça marche →
           </a>
@@ -354,7 +354,7 @@
         @if (isOwner() && filter() !== 'past') {
           <button
             type="button"
-            class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-violet-600 text-white hover:bg-violet-500"
+            class="mt-1 min-h-11 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-violet-600 text-white hover:bg-violet-500"
             (click)="addSession.emit()"
           >
             + Planifier une session

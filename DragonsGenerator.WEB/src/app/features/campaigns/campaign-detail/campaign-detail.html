@@ -197,7 +197,7 @@
             [totalXpAwarded]="totalXpAwarded()"
             [myXpEarned]="myXpEarned()"
             [approvedCharacterName]="myPlayerMember()?.approvedCharacterName"
-            [adventureExcerpt]="adventureExcerpt() ?? ''"
+            [adventure]="c.data.adventure ?? ''"
             [showRoster]="showOverviewRoster()"
             [rosterFeedback]="rosterFeedback()"
             [playersNeedingCharacter]="playersNeedingCharacter()"
@@ -297,17 +297,17 @@
                       [ngModel]="c.title"
                       (ngModelChange)="saveTitle($event)"
                     />
-                    <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
-                      <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-3">Synopsis</h2>
+                    <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5 md:p-6">
+                      <h2 class="text-[10px] font-black uppercase tracking-widest text-violet-500 mb-5">Synopsis</h2>
                       @if (c.data.adventure.trim()) {
-                        <div class="text-sm leading-relaxed whitespace-pre-wrap font-serif text-slate-300">{{ c.data.adventure }}</div>
+                        <app-adventure-synopsis-view [text]="c.data.adventure" />
                       } @else {
-                        <div class="rounded-xl border border-dashed border-violet-800/50 bg-violet-950/15 p-6 text-center space-y-3">
+                        <div class="rounded-xl border border-dashed border-violet-800/50 bg-violet-950/15 p-6 text-center space-y-4">
                           <p class="text-sm text-slate-300">Aucun synopsis pour l’instant.</p>
                           <p class="text-xs text-slate-500">Écrivez ou générez l’aventure pour lancer la table.</p>
                           <button
                             type="button"
-                            class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white hover:bg-violet-500"
+                            class="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white hover:bg-violet-500"
                             (click)="editScenario()"
                           >
                             Écrire / générer le synopsis

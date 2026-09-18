@@ -69,6 +69,7 @@ import { CampaignPregenGeneratorService } from '@core/services/campaign-pregen-g
 import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
 import { AiGenerationProgressBar } from '@shared/components/ai-generation-progress-bar/ai-generation-progress-bar';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
+import { AdventureSynopsisView } from '@shared/components/adventure-synopsis-view/adventure-synopsis-view';
 import { CampaignDungeonMaps } from '../campaign-dungeon-maps/campaign-dungeon-maps';
 import { CampaignDetailOverview } from './campaign-detail-overview/campaign-detail-overview';
 import { CampaignDetailRoster } from './campaign-detail-roster/campaign-detail-roster';
@@ -132,6 +133,7 @@ function isPrepSub(t: string): t is PrepSub {
     CampaignInitiativeInline,
     LightMarkdownPipe,
     ConfirmDialog,
+    AdventureSynopsisView,
   ],
   templateUrl: './campaign-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -479,13 +481,6 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (!c) return 0;
     if (c.isOwner) return (c.data.handouts ?? []).length;
     return (c.data.handouts ?? []).filter((h) => h.published).length;
-  });
-
-  readonly adventureExcerpt = computed(() => {
-    const text = (this.campaign()?.data.adventure ?? '').trim();
-    if (!text) return null;
-    if (text.length <= 280) return text;
-    return `${text.slice(0, 277).trimEnd()}…`;
   });
 
   readonly pinnedHandout = computed(() => {
