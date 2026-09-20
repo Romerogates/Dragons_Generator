@@ -30,18 +30,48 @@
         {{
           selectedCiv()
             ? 'Consultez les archives de la région sélectionnée.'
-            : 'Explorez la carte : pincez ou utilisez +/−, puis choisissez une civilisation.'
+            : 'Explorez la carte, ouvrez-la en plein écran pour tout voir, puis choisissez une civilisation.'
         }}
       </p>
     </div>
 
     @if (!selectedCiv()) {
-      <div class="w-full flex-1 flex flex-col min-h-0 pb-3 gap-3">
-        <!-- Map surface: bleed, no card chrome, cover fill -->
-        <div class="-mx-2 sm:-mx-4 lg:-mx-6 flex-1 flex flex-col min-h-0">
+      <div
+        class="w-full flex-1 flex flex-col min-h-0 gap-3"
+        [ngClass]="
+          mapFullscreen()
+            ? 'fixed inset-0 z-[90] bg-[#0f1318] pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))] px-2 sm:px-4'
+            : 'pb-3'
+        "
+      >
+        @if (mapFullscreen()) {
+          <div class="flex items-center justify-between gap-3 shrink-0 px-1 mb-1">
+            <p class="text-xs sm:text-sm text-slate-400 italic truncate">
+              Carte entière — tapez un pin ou une pill · Échap pour fermer
+            </p>
+            <button
+              type="button"
+              class="shrink-0 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-[#1b2028]/95 border border-amber-700/60 text-amber-300 hover:border-amber-400"
+              (click)="exitMapFullscreen()"
+              data-testid="wizard-civ-map-exit-fullscreen"
+            >
+              Fermer
+            </button>
+          </div>
+        }
+
+        <!-- Map surface: bleed inline / plein écran contain -->
+        <div
+          class="flex-1 flex flex-col min-h-0"
+          [class.-mx-2]="!mapFullscreen()"
+          [class.sm:-mx-4]="!mapFullscreen()"
+          [class.lg:-mx-6]="!mapFullscreen()"
+        >
           <div
             #mapViewport
-            class="eana-map-viewport eana-map-stage--flex relative bg-[#171b22] overflow-hidden cursor-grab"
+            class="eana-map-viewport relative bg-[#171b22] overflow-hidden cursor-grab"
+            [class.eana-map-stage--flex]="!mapFullscreen()"
+            [class.eana-map-stage--fullscreen]="mapFullscreen()"
             [class.cursor-grabbing]="isPanning()"
             (wheel)="onWheel($event)"
             (pointerdown)="onPointerDown($event)"
@@ -86,8 +116,8 @@
                 </button>
                 <span
                   class="absolute left-1/2 -translate-x-1/2 top-full mt-1 whitespace-nowrap px-2 py-0.5 rounded bg-[#020617]/90 border border-amber-700/40 text-[10px] font-bold uppercase tracking-wider text-amber-400 pointer-events-none shadow-lg max-lg:block"
-                  [class.hidden]="scale() < pinLabelMinScale()"
-                  [class.lg:block]="scale() >= 1.35"
+                  [class.hidden]="!mapFullscreen() && scale() < pinLabelMinScale()"
+                  [class.lg:block]="mapFullscreen() || scale() >= 1.35"
                 >
                   {{ civ.name }}
                 </span>
@@ -101,6 +131,15 @@
           <div
             class="pointer-events-none absolute inset-x-0 bottom-0 h-16 z-20 bg-gradient-to-t from-[#171b22] to-transparent"
           ></div>
+
+          @if (!mapFullscreen()) {
+            <app-fullscreen-enter-btn
+              class="absolute top-3 left-3 z-30"
+              tone="amber"
+              label="Carte en plein écran"
+              (enter)="enterMapFullscreen(); $event.stopPropagation()"
+            />
+          }
 
           <!-- Compact zoom -->
           <div
@@ -138,7 +177,7 @@
         </div>
 
         <!-- Pills : tous écrans (Android / iOS / tablette / desktop) -->
-        <div class="shrink-0 px-2 sm:px-4 lg:px-6">
+        <div class="shrink-0" [class.px-2]="!mapFullscreen()" [class.sm:px-4]="!mapFullscreen()" [class.lg:px-6]="!mapFullscreen()">
           <div
             class="flex gap-2 overflow-x-auto px-1 pb-1 custom-scrollbar snap-x snap-mandatory touch-pan-x"
           >
@@ -163,15 +202,17 @@
           </div>
         </div>
 
-        <nav class="wizard-step-nav px-2 sm:px-4 lg:px-6">
-          <p class="wizard-nav-hint">Choisissez une civilisation sur la carte</p>
-          <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
-            ← Étape précédente
-          </button>
-          <button type="button" class="wizard-nav-primary" disabled>
-            Continuer →
-          </button>
-        </nav>
+        @if (!mapFullscreen()) {
+          <nav class="wizard-step-nav px-2 sm:px-4 lg:px-6">
+            <p class="wizard-nav-hint">Choisissez une civilisation sur la carte</p>
+            <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
+              ← Étape précédente
+            </button>
+            <button type="button" class="wizard-nav-primary" disabled>
+              Continuer →
+            </button>
+          </nav>
+        }
       </div>
     }
 

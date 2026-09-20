@@ -221,6 +221,15 @@
     max-height: 58dvh;
   }
 
+  /* Plein écran : stage libre, fit contain géré en JS */
+  .eana-map-stage--fullscreen {
+    flex: 1 1 auto;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+  }
+
   @media (min-width: 640px) {
     .eana-map-stage--flex {
       min-height: 420px;

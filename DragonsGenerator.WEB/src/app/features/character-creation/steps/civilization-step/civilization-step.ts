@@ -25,6 +25,7 @@ import {
 } from '@core/services/character-builder.service';
 import type { Civilisation } from '@core/models/Civilisations/civilisations';
 import { EANA_MAP_RATIO, getEanaMapCoordinates } from '@core/utils/eana-map';
+import { FullscreenEnterBtn } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-btn';
 
 const MIN_SCALE = 1;
 const MAX_SCALE = 4;
@@ -34,7 +35,7 @@ const MOVE_THRESHOLD_PX = 10;
 @Component({
   selector: 'app-civilization-step',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FullscreenEnterBtn],
   templateUrl: './civilization-step.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -53,6 +54,8 @@ export class CivilizationStep implements OnInit, OnDestroy {
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly selectedCivId = signal<string | null>(null);
+  /** Plein écran : carte entière (contain) + pills pour choisir. */
+  readonly mapFullscreen = signal(false);
 
   /** Fitted map size inside viewport (cover — pin % stay on Carte.jpg). */
   readonly mapWidth = signal(0);
@@ -80,6 +83,8 @@ export class CivilizationStep implements OnInit, OnDestroy {
   private resizeObserver: ResizeObserver | null = null;
   private fitRetries = 0;
   private pinGesture: { pointerId: number; x: number; y: number } | null = null;
+  private bodyLocked = false;
+  private previousOverflow = '';
   private readonly onViewportResize = (): void => {
     this.refitMap(this.scale() <= MIN_SCALE + 0.01);
   };
@@ -88,11 +93,13 @@ export class CivilizationStep implements OnInit, OnDestroy {
     // Whenever the atlas map is shown, fit it after Angular paints the DOM.
     effect(() => {
       const showMap = !this.loading() && !this.error() && !this.selectedCivId();
+      const fullscreen = this.mapFullscreen();
       if (!showMap) {
         untracked(() => {
           this.mapReady.set(false);
           this.resizeObserver?.disconnect();
           this.resizeObserver = null;
+          if (fullscreen) this.setMapFullscreen(false);
         });
         return;
       }
@@ -155,6 +162,7 @@ export class CivilizationStep implements OnInit, OnDestroy {
     this.pointers.clear();
     this.resizeObserver?.disconnect();
     window.visualViewport?.removeEventListener('resize', this.onViewportResize);
+    this.unlockBody();
   }
 
   @HostListener('window:resize')
@@ -166,6 +174,22 @@ export class CivilizationStep implements OnInit, OnDestroy {
   onOrientationChange(): void {
     // Android / iOS : laisser le chrome se poser avant de re-mesurer
     setTimeout(() => this.refitMap(true), 180);
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onDocumentKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape' && this.mapFullscreen()) {
+      event.preventDefault();
+      this.exitMapFullscreen();
+    }
+  }
+
+  enterMapFullscreen(): void {
+    this.setMapFullscreen(true);
+  }
+
+  exitMapFullscreen(): void {
+    this.setMapFullscreen(false);
   }
 
   getIconForCiv(id: string): string {
@@ -213,6 +237,7 @@ export class CivilizationStep implements OnInit, OnDestroy {
   selectCiv(civId: string, event?: Event): void {
     event?.stopPropagation();
     if (this.moved) return;
+    if (this.mapFullscreen()) this.setMapFullscreen(false);
     if (this.selectedCivId() !== civId) {
       this.builder.clearCivilization();
     }
@@ -457,7 +482,11 @@ export class CivilizationStep implements OnInit, OnDestroy {
     requestAnimationFrame(() => this.bindViewport(resetScale));
   }
 
-  /** Cover: map fills the stage (crop via transform). Pin % unchanged. */
+  /**
+   * Cover (inline) : remplit le stage (crop).
+   * Contain (plein écran) : carte entière visible.
+   * Pin % inchangés dans les deux cas.
+   */
   private refitMap(center: boolean): boolean {
     const viewport = this.mapViewport()?.nativeElement;
     if (!viewport) return false;
@@ -467,12 +496,13 @@ export class CivilizationStep implements OnInit, OnDestroy {
 
     let w: number;
     let h: number;
-    if (vw / vh > EANA_MAP_RATIO) {
-      w = vw;
-      h = w / EANA_MAP_RATIO;
-    } else {
+    const contain = this.mapFullscreen();
+    if (contain ? vw / vh > EANA_MAP_RATIO : vw / vh <= EANA_MAP_RATIO) {
       h = vh;
       w = h * EANA_MAP_RATIO;
+    } else {
+      w = vw;
+      h = w / EANA_MAP_RATIO;
     }
 
     this.mapWidth.set(w);
@@ -486,6 +516,28 @@ export class CivilizationStep implements OnInit, OnDestroy {
       this.clampPan();
     }
     return true;
+  }
+
+  private setMapFullscreen(open: boolean): void {
+    if (this.mapFullscreen() === open) return;
+    this.mapFullscreen.set(open);
+    this.scale.set(MIN_SCALE);
+    if (open) this.lockBody();
+    else this.unlockBody();
+    if (!this.selectedCivId()) this.scheduleFit(true);
+  }
+
+  private lockBody(): void {
+    if (this.bodyLocked || typeof document === 'undefined') return;
+    this.previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    this.bodyLocked = true;
+  }
+
+  private unlockBody(): void {
+    if (!this.bodyLocked || typeof document === 'undefined') return;
+    document.body.style.overflow = this.previousOverflow;
+    this.bodyLocked = false;
   }
 
   private zoomAt(next: number, localX?: number, localY?: number): void {

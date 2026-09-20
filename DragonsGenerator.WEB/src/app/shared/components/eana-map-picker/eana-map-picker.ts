@@ -23,6 +23,7 @@ import type { Civilisation } from '@core/models/Civilisations/civilisations';
 import { StoryRegionChoice } from '@core/models/Story/story';
 import { EANA_MAP_RATIO, getEanaMapCoordinates } from '@core/utils/eana-map';
 import { storyRegionLabel } from '@core/utils/story-location.util';
+import { FullscreenEnterBtn } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-btn';
 
 /** Cover fit lives at scale 1 — do not remap pin % coords. */
 const MIN_SCALE = 1;
@@ -36,7 +37,7 @@ const FOCUS_SCALE = 2.15;
 @Component({
   selector: 'app-eana-map-picker',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FullscreenEnterBtn],
   templateUrl: './eana-map-picker.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -53,6 +54,7 @@ export class EanaMapPicker implements OnInit, OnDestroy {
   readonly civilizations = signal<Civilisation[]>([]);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
+  readonly mapFullscreen = signal(false);
 
   readonly mapWidth = signal(0);
   readonly mapHeight = signal(0);
@@ -88,6 +90,8 @@ export class EanaMapPicker implements OnInit, OnDestroy {
   private lastTapAt = 0;
   private lastTapX = 0;
   private lastTapY = 0;
+  private bodyLocked = false;
+  private previousOverflow = '';
   private readonly onViewportResize = (): void => {
     this.refitMap(this.scale() <= MIN_SCALE + 0.01);
   };
@@ -95,11 +99,13 @@ export class EanaMapPicker implements OnInit, OnDestroy {
   constructor() {
     effect(() => {
       const ready = !this.loading() && !this.error();
+      const fullscreen = this.mapFullscreen();
       if (!ready) {
         untracked(() => {
           this.mapReady.set(false);
           this.resizeObserver?.disconnect();
           this.resizeObserver = null;
+          if (fullscreen) this.setMapFullscreen(false);
         });
         return;
       }
@@ -125,6 +131,7 @@ export class EanaMapPicker implements OnInit, OnDestroy {
     this.pointers.clear();
     this.resizeObserver?.disconnect();
     window.visualViewport?.removeEventListener('resize', this.onViewportResize);
+    this.unlockBody();
   }
 
   @HostListener('window:resize')
@@ -135,6 +142,22 @@ export class EanaMapPicker implements OnInit, OnDestroy {
   @HostListener('window:orientationchange')
   onOrientationChange(): void {
     setTimeout(() => this.refitMap(true), 180);
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onDocumentKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape' && this.mapFullscreen()) {
+      event.preventDefault();
+      this.exitMapFullscreen();
+    }
+  }
+
+  enterMapFullscreen(): void {
+    this.setMapFullscreen(true);
+  }
+
+  exitMapFullscreen(): void {
+    this.setMapFullscreen(false);
   }
 
   isSelectedCiv(civId: string): boolean {
@@ -148,12 +171,17 @@ export class EanaMapPicker implements OnInit, OnDestroy {
 
   pickCivilizationFromList(civ: Civilisation): void {
     this.emitCivilization(civ);
+    if (this.mapFullscreen()) {
+      this.setMapFullscreen(false);
+      return;
+    }
     this.focusPin(civ.id);
   }
 
   pickUnknown(): void {
     this.regionChange.emit({ kind: 'unknown' });
-    this.resetView();
+    if (this.mapFullscreen()) this.setMapFullscreen(false);
+    else this.resetView();
   }
 
   onPinPointerDown(event: PointerEvent): void {
@@ -170,6 +198,7 @@ export class EanaMapPicker implements OnInit, OnDestroy {
     const dist = Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y);
     if (dist > MOVE_THRESHOLD_PX) return;
     this.emitCivilization(civ);
+    if (this.mapFullscreen()) this.setMapFullscreen(false);
   }
 
   getIconForCiv(id: string): string {
@@ -405,7 +434,7 @@ export class EanaMapPicker implements OnInit, OnDestroy {
     requestAnimationFrame(() => this.bindViewport(resetScale));
   }
 
-  /** Cover: map layer fills the stage (crop via transform). Pin % stay on Carte.jpg. */
+  /** Cover inline / contain plein écran — pin % inchangés. */
   private refitMap(center: boolean): boolean {
     const viewport = this.mapViewport()?.nativeElement;
     if (!viewport) return false;
@@ -415,12 +444,13 @@ export class EanaMapPicker implements OnInit, OnDestroy {
 
     let w: number;
     let h: number;
-    if (vw / vh > EANA_MAP_RATIO) {
-      w = vw;
-      h = w / EANA_MAP_RATIO;
-    } else {
+    const contain = this.mapFullscreen();
+    if (contain ? vw / vh > EANA_MAP_RATIO : vw / vh <= EANA_MAP_RATIO) {
       h = vh;
       w = h * EANA_MAP_RATIO;
+    } else {
+      w = vw;
+      h = w / EANA_MAP_RATIO;
     }
 
     this.mapWidth.set(w);
@@ -434,6 +464,28 @@ export class EanaMapPicker implements OnInit, OnDestroy {
       this.clampPan();
     }
     return true;
+  }
+
+  private setMapFullscreen(open: boolean): void {
+    if (this.mapFullscreen() === open) return;
+    this.mapFullscreen.set(open);
+    this.scale.set(MIN_SCALE);
+    if (open) this.lockBody();
+    else this.unlockBody();
+    this.scheduleFit(true);
+  }
+
+  private lockBody(): void {
+    if (this.bodyLocked || typeof document === 'undefined') return;
+    this.previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    this.bodyLocked = true;
+  }
+
+  private unlockBody(): void {
+    if (!this.bodyLocked || typeof document === 'undefined') return;
+    document.body.style.overflow = this.previousOverflow;
+    this.bodyLocked = false;
   }
 
   private zoomAt(next: number, localX?: number, localY?: number): void {
