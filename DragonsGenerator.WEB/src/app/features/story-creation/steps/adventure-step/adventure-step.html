@@ -44,14 +44,17 @@
         </select>
       </div>
     </div>
+  </div>
 
-    <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-4">
-      <app-eana-map-picker
-        [selectedRegion]="builder.region()"
-        (regionChange)="onRegionChange($event)"
-      />
-    </div>
+  <!-- Full-bleed map surface (breaks out of form column + parent padding) -->
+  <div class="w-full -mx-2 sm:-mx-4 lg:-mx-6">
+    <app-eana-map-picker
+      [selectedRegion]="builder.region()"
+      (regionChange)="onRegionChange($event)"
+    />
+  </div>
 
+  <div class="px-4 max-w-3xl mx-auto w-full space-y-5">
     <div>
       <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Ambiance / lieu précis (optionnel)</label>
       <input
@@ -63,7 +66,6 @@
       />
     </div>
 
-    <!-- Résumé des personnages -->
     <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-4">
       <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Personnages de l'histoire</p>
       <div class="flex flex-wrap gap-2">

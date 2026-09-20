@@ -36,20 +36,19 @@
     </div>
 
     @if (!selectedCiv()) {
-      <div
-        class="w-full flex-1 flex flex-col min-h-0 px-2 sm:px-4 lg:px-6 pb-3 gap-3 max-w-7xl mx-auto"
-      >
-        <!-- Map viewport: full map visible (contain) on PC + phone -->
-        <div
-          #mapViewport
-          class="eana-map-viewport relative w-full flex-1 min-h-[52dvh] sm:min-h-[480px] lg:min-h-[560px] max-h-[58dvh] lg:max-h-[min(70vh,720px)] bg-[#171b22] border-2 border-slate-700 rounded-xl shadow-2xl overflow-hidden touch-none cursor-grab"
-          [class.cursor-grabbing]="isPanning()"
-          (wheel)="onWheel($event)"
-          (pointerdown)="onPointerDown($event)"
-          (pointermove)="onPointerMove($event)"
-          (pointerup)="onPointerUp($event)"
-          (pointercancel)="onPointerUp($event)"
-        >
+      <div class="w-full flex-1 flex flex-col min-h-0 pb-3 gap-3">
+        <!-- Map surface: bleed, no card chrome, cover fill -->
+        <div class="-mx-2 sm:-mx-4 lg:-mx-6 flex-1 flex flex-col min-h-0">
+          <div
+            #mapViewport
+            class="eana-map-viewport eana-map-stage--flex relative bg-[#171b22] overflow-hidden cursor-grab"
+            [class.cursor-grabbing]="isPanning()"
+            (wheel)="onWheel($event)"
+            (pointerdown)="onPointerDown($event)"
+            (pointermove)="onPointerMove($event)"
+            (pointerup)="onPointerUp($event)"
+            (pointercancel)="onPointerUp($event)"
+          >
           <div
             class="absolute left-0 top-0 origin-top-left will-change-transform"
             [class.opacity-0]="!mapReady()"
@@ -60,7 +59,7 @@
             <img
               src="Carte.jpg"
               alt="Carte d'Eana"
-              class="eana-map-image absolute inset-0 w-full h-full object-fill lg:object-fill max-lg:object-contain opacity-85 pointer-events-none select-none"
+              class="absolute inset-0 w-full h-full object-fill opacity-90 pointer-events-none select-none"
               draggable="false"
             />
 
@@ -77,8 +76,10 @@
                 <button
                   type="button"
                   [attr.data-testid]="'wizard-civ-' + civ.id"
-                  class="relative w-11 h-11 sm:w-10 sm:h-10 flex items-center justify-center bg-[#1b2028]/95 border-2 border-amber-500/80 rounded-full text-lg shadow-sm active:scale-[1.02] hover:scale-[1.01] hover:border-amber-400 transition-transform"
-                  (click)="selectCiv(civ.id, $event)"
+                  class="relative min-w-11 min-h-11 w-11 h-11 flex items-center justify-center bg-[#1b2028]/95 border-2 border-amber-500/80 rounded-full text-lg shadow-sm active:scale-[1.02] hover:scale-[1.01] hover:border-amber-400 transition-transform"
+                  (pointerdown)="onPinPointerDown($event)"
+                  (pointerup)="onPinPointerUp(civ.id, $event)"
+                  (click)="$event.preventDefault(); $event.stopPropagation()"
                   [attr.aria-label]="civ.name"
                 >
                   <iconify-icon [icon]="getIconForCiv(civ.id)"></iconify-icon>
@@ -94,14 +95,21 @@
             }
           </div>
 
-          <!-- Zoom controls -->
           <div
-            class="absolute bottom-3 right-3 z-30 flex flex-col gap-1.5"
+            class="pointer-events-none absolute inset-x-0 top-0 h-10 z-20 bg-gradient-to-b from-[#171b22] to-transparent"
+          ></div>
+          <div
+            class="pointer-events-none absolute inset-x-0 bottom-0 h-16 z-20 bg-gradient-to-t from-[#171b22] to-transparent"
+          ></div>
+
+          <!-- Compact zoom -->
+          <div
+            class="absolute top-3 right-3 z-30 flex flex-col gap-1"
             (pointerdown)="$event.stopPropagation()"
           >
             <button
               type="button"
-              class="w-10 h-10 rounded-xl bg-[#1b2028]/95 border border-slate-600 text-amber-400 text-xl font-black disabled:opacity-30"
+              class="w-8 h-8 rounded-md bg-[#1b2028]/90 border border-slate-600/80 text-amber-400 text-base font-black leading-none disabled:opacity-30"
               [disabled]="!canZoomIn()"
               (click)="zoomIn()"
               aria-label="Zoomer"
@@ -110,7 +118,7 @@
             </button>
             <button
               type="button"
-              class="w-10 h-10 rounded-xl bg-[#1b2028]/95 border border-slate-600 text-amber-400 text-xl font-black disabled:opacity-30"
+              class="w-8 h-8 rounded-md bg-[#1b2028]/90 border border-slate-600/80 text-amber-400 text-base font-black leading-none disabled:opacity-30"
               [disabled]="!canZoomOut()"
               (click)="zoomOut()"
               aria-label="Dézoomer"
@@ -119,25 +127,20 @@
             </button>
             <button
               type="button"
-              class="w-10 h-10 rounded-xl bg-[#1b2028]/95 border border-slate-600 text-slate-300 text-[10px] font-black uppercase tracking-wider"
+              class="w-8 h-8 rounded-md bg-[#1b2028]/90 border border-slate-600/80 text-slate-300 text-[9px] font-black"
               (click)="resetView()"
               aria-label="Réinitialiser la vue"
             >
-              1:1
+              ◎
             </button>
           </div>
-
-          <p
-            class="absolute top-3 left-3 z-20 pointer-events-none text-[9px] sm:text-[10px] uppercase tracking-widest font-black text-slate-400 bg-[#020617]/70 border border-slate-700/60 rounded-full px-3 py-1"
-          >
-            {{ scale() | number: '1.1-1' }}× · glisser / pincer
-          </p>
+          </div>
         </div>
 
-        <!-- Mobile chips only — PC uses the map -->
-        <div class="shrink-0 -mx-1 lg:hidden">
+        <!-- Pills : tous écrans (Android / iOS / tablette / desktop) -->
+        <div class="shrink-0 px-2 sm:px-4 lg:px-6">
           <div
-            class="flex gap-2 overflow-x-auto px-1 pb-1 custom-scrollbar snap-x snap-mandatory"
+            class="flex gap-2 overflow-x-auto px-1 pb-1 custom-scrollbar snap-x snap-mandatory touch-pan-x"
           >
             @for (civ of allCivilizations(); track civ.id) {
               <button
@@ -159,7 +162,7 @@
           </div>
         </div>
 
-        <nav class="wizard-step-nav">
+        <nav class="wizard-step-nav px-2 sm:px-4 lg:px-6">
           <p class="wizard-nav-hint">Choisissez une civilisation sur la carte</p>
           <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
             ← Étape précédente

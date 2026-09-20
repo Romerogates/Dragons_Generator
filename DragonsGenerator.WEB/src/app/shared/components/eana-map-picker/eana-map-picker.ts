@@ -24,9 +24,14 @@ import { StoryRegionChoice } from '@core/models/Story/story';
 import { EANA_MAP_RATIO, getEanaMapCoordinates } from '@core/utils/eana-map';
 import { storyRegionLabel } from '@core/utils/story-location.util';
 
+/** Cover fit lives at scale 1 — do not remap pin % coords. */
 const MIN_SCALE = 1;
 const MAX_SCALE = 4;
 const ZOOM_STEP = 0.35;
+const MOVE_THRESHOLD_PX = 10;
+const DOUBLE_TAP_MS = 320;
+const DOUBLE_TAP_DIST_PX = 28;
+const FOCUS_SCALE = 2.15;
 
 @Component({
   selector: 'app-eana-map-picker',
@@ -79,6 +84,14 @@ export class EanaMapPicker implements OnInit, OnDestroy {
   private resizeObserver: ResizeObserver | null = null;
   private fitRetries = 0;
 
+  private pinGesture: { pointerId: number; x: number; y: number } | null = null;
+  private lastTapAt = 0;
+  private lastTapX = 0;
+  private lastTapY = 0;
+  private readonly onViewportResize = (): void => {
+    this.refitMap(this.scale() <= MIN_SCALE + 0.01);
+  };
+
   constructor() {
     effect(() => {
       const ready = !this.loading() && !this.error();
@@ -105,16 +118,23 @@ export class EanaMapPicker implements OnInit, OnDestroy {
         this.loading.set(false);
       },
     });
+    window.visualViewport?.addEventListener('resize', this.onViewportResize);
   }
 
   ngOnDestroy(): void {
     this.pointers.clear();
     this.resizeObserver?.disconnect();
+    window.visualViewport?.removeEventListener('resize', this.onViewportResize);
   }
 
   @HostListener('window:resize')
   onWindowResize(): void {
     this.refitMap(this.scale() <= MIN_SCALE + 0.01);
+  }
+
+  @HostListener('window:orientationchange')
+  onOrientationChange(): void {
+    setTimeout(() => this.refitMap(true), 180);
   }
 
   isSelectedCiv(civId: string): boolean {
@@ -126,14 +146,30 @@ export class EanaMapPicker implements OnInit, OnDestroy {
     return this.selectedRegion()?.kind === 'unknown';
   }
 
-  pickCivilization(civ: Civilisation, event?: Event): void {
-    event?.stopPropagation();
-    if (this.moved) return;
-    this.regionChange.emit({ kind: 'civilization', id: civ.id, name: civ.name });
+  pickCivilizationFromList(civ: Civilisation): void {
+    this.emitCivilization(civ);
+    this.focusPin(civ.id);
   }
 
   pickUnknown(): void {
     this.regionChange.emit({ kind: 'unknown' });
+    this.resetView();
+  }
+
+  onPinPointerDown(event: PointerEvent): void {
+    event.stopPropagation();
+    this.pinGesture = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+    this.moved = false;
+  }
+
+  onPinPointerUp(civ: Civilisation, event: PointerEvent): void {
+    event.stopPropagation();
+    const gesture = this.pinGesture;
+    this.pinGesture = null;
+    if (!gesture || gesture.pointerId !== event.pointerId) return;
+    const dist = Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y);
+    if (dist > MOVE_THRESHOLD_PX) return;
+    this.emitCivilization(civ);
   }
 
   getIconForCiv(id: string): string {
@@ -173,7 +209,7 @@ export class EanaMapPicker implements OnInit, OnDestroy {
   }
 
   resetView(): void {
-    this.scale.set(1);
+    this.scale.set(MIN_SCALE);
     this.refitMap(true);
   }
 
@@ -258,7 +294,7 @@ export class EanaMapPicker implements OnInit, OnDestroy {
     if (this.panOrigin && this.pointers.size === 1) {
       const dx = event.clientX - this.panOrigin.x;
       const dy = event.clientY - this.panOrigin.y;
-      if (Math.hypot(dx, dy) > 4) this.moved = true;
+      if (Math.hypot(dx, dy) > MOVE_THRESHOLD_PX) this.moved = true;
       this.panX.set(this.panOrigin.panX + dx);
       this.panY.set(this.panOrigin.panY + dy);
       this.clampPan();
@@ -266,11 +302,17 @@ export class EanaMapPicker implements OnInit, OnDestroy {
   }
 
   onPointerUp(event: PointerEvent): void {
+    const wasSinglePan =
+      this.pointers.size === 1 && this.pointers.has(event.pointerId) && !this.moved;
+
     this.pointers.delete(event.pointerId);
     if (this.pointers.size < 2) this.pinchOrigin = null;
     if (this.pointers.size === 0) {
       this.panOrigin = null;
       this.isPanning.set(false);
+      if (wasSinglePan) {
+        this.handleDoubleTap(event);
+      }
     } else if (this.pointers.size === 1) {
       const remaining = [...this.pointers.entries()][0];
       this.panOrigin = {
@@ -280,6 +322,51 @@ export class EanaMapPicker implements OnInit, OnDestroy {
         panY: this.panY(),
       };
     }
+  }
+
+  private emitCivilization(civ: Civilisation): void {
+    this.regionChange.emit({ kind: 'civilization', id: civ.id, name: civ.name });
+  }
+
+  private handleDoubleTap(event: PointerEvent): void {
+    const viewport = this.mapViewport()?.nativeElement;
+    if (!viewport) return;
+    const now = performance.now();
+    const dx = event.clientX - this.lastTapX;
+    const dy = event.clientY - this.lastTapY;
+    const isDouble =
+      now - this.lastTapAt < DOUBLE_TAP_MS && Math.hypot(dx, dy) < DOUBLE_TAP_DIST_PX;
+
+    this.lastTapAt = now;
+    this.lastTapX = event.clientX;
+    this.lastTapY = event.clientY;
+
+    if (!isDouble) return;
+
+    const rect = viewport.getBoundingClientRect();
+    const localX = event.clientX - rect.left;
+    const localY = event.clientY - rect.top;
+    if (this.scale() > MIN_SCALE + 0.05) {
+      this.resetView();
+    } else {
+      this.zoomAt(FOCUS_SCALE, localX, localY);
+    }
+    this.lastTapAt = 0;
+  }
+
+  private focusPin(civId: string): void {
+    const viewport = this.mapViewport()?.nativeElement;
+    if (!viewport || !this.mapReady()) return;
+    const coords = getEanaMapCoordinates(civId);
+    const pinX = (coords.x / 100) * this.mapWidth();
+    const pinY = (coords.y / 100) * this.mapHeight();
+    const nextScale = this.clampScale(FOCUS_SCALE);
+    const vw = viewport.clientWidth;
+    const vh = viewport.clientHeight;
+    this.scale.set(nextScale);
+    this.panX.set(vw / 2 - pinX * nextScale);
+    this.panY.set(vh / 2 - pinY * nextScale);
+    this.clampPan();
   }
 
   private scheduleFit(resetScale: boolean): void {
@@ -307,7 +394,7 @@ export class EanaMapPicker implements OnInit, OnDestroy {
     });
     this.resizeObserver.observe(el);
 
-    if (resetScale) this.scale.set(1);
+    if (resetScale) this.scale.set(MIN_SCALE);
     const ok = this.refitMap(true);
     if (!ok) this.retryFit(resetScale);
   }
@@ -318,6 +405,7 @@ export class EanaMapPicker implements OnInit, OnDestroy {
     requestAnimationFrame(() => this.bindViewport(resetScale));
   }
 
+  /** Cover: map layer fills the stage (crop via transform). Pin % stay on Carte.jpg. */
   private refitMap(center: boolean): boolean {
     const viewport = this.mapViewport()?.nativeElement;
     if (!viewport) return false;
@@ -328,11 +416,11 @@ export class EanaMapPicker implements OnInit, OnDestroy {
     let w: number;
     let h: number;
     if (vw / vh > EANA_MAP_RATIO) {
-      h = vh;
-      w = h * EANA_MAP_RATIO;
-    } else {
       w = vw;
       h = w / EANA_MAP_RATIO;
+    } else {
+      h = vh;
+      w = h * EANA_MAP_RATIO;
     }
 
     this.mapWidth.set(w);

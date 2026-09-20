@@ -171,14 +171,83 @@
     }
   }
 
-  /* Mobile / tablette — carte d'Eana */
-  @media (max-width: 1023px) {
-    .eana-map-viewport {
-      touch-action: none;
+  /* Carte d'Eana — gestes + stage cross-device (iOS / Android / tablette / desktop / paysage) */
+  .eana-map-viewport {
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    overscroll-behavior: none;
+  }
+
+  /* Hauteurs : vh puis dvh (Chrome Android barre d’URL) */
+  .eana-map-stage {
+    width: 100%;
+    height: 42vh;
+    height: 42dvh;
+    min-height: 220px;
+    max-height: 520px;
+  }
+
+  @media (min-width: 640px) {
+    .eana-map-stage {
+      height: 48vh;
+      height: 48dvh;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .eana-map-stage {
+      height: 52vh;
+      height: 52dvh;
+      max-height: 560px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .eana-map-stage {
+      height: 56vh;
+      height: 56dvh;
+      max-height: 600px;
+    }
+  }
+
+  .eana-map-stage--flex {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 220px;
+    min-height: 42vh;
+    min-height: 42dvh;
+    max-height: 58vh;
+    max-height: 58dvh;
+  }
+
+  @media (min-width: 640px) {
+    .eana-map-stage--flex {
+      min-height: 420px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .eana-map-stage--flex {
+      min-height: 520px;
+      max-height: 70vh;
+      max-height: min(70dvh, 720px);
+    }
+  }
+
+  /* Paysage téléphone / petite tablette : garder de la place pour nav + pills */
+  @media (orientation: landscape) and (max-height: 560px) {
+    .eana-map-stage {
+      height: 62vh;
+      height: 62dvh;
+      min-height: 160px;
+      max-height: none;
     }
 
-    .eana-map-viewport .eana-map-image {
-      object-fit: contain;
+    .eana-map-stage--flex {
+      min-height: 160px;
+      max-height: 70vh;
+      max-height: 70dvh;
     }
   }
 

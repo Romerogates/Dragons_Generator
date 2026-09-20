@@ -1,38 +1,18 @@
-<div class="flex flex-col gap-3 w-full">
-  <div class="flex flex-wrap items-center justify-between gap-2">
-    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
-      Région d'Eana
-    </p>
-    @if (selectedRegion(); as region) {
-      <span
-        class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border"
-        [class]="
-          region.kind === 'unknown'
-            ? 'bg-slate-900 text-slate-400 border-slate-700'
-            : 'bg-violet-950/40 text-violet-300 border-violet-800/50'
-        "
-      >
-        {{ regionLabel() }}
-      </span>
-    } @else {
-      <span class="text-[10px] text-slate-600 italic">Choisissez une région sur la carte</span>
-    }
-  </div>
-
+<div class="eana-map-picker relative w-full">
   @if (loading()) {
-    <div class="flex justify-center py-16 bg-[#171b22] border border-slate-700 rounded-xl">
+    <div class="flex justify-center items-center eana-map-stage bg-[#171b22]">
       <div
         class="w-8 h-8 border-4 border-violet-500/30 border-t-violet-500 rounded-full animate-spin"
       ></div>
     </div>
   } @else if (error(); as err) {
-    <div class="p-4 bg-red-950/40 border border-red-900/50 rounded-xl text-sm text-red-300">
+    <div class="mx-4 my-6 p-4 bg-red-950/40 border border-red-900/50 rounded-xl text-sm text-red-300">
       {{ err }}
     </div>
   } @else {
     <div
       #mapViewport
-      class="eana-map-viewport relative w-full min-h-[240px] sm:min-h-[320px] max-h-[min(50vh,420px)] bg-[#171b22] border-2 border-slate-700 rounded-xl shadow-inner overflow-hidden touch-none cursor-grab"
+      class="eana-map-viewport eana-map-stage relative bg-[#171b22] overflow-hidden cursor-grab select-none"
       [class.cursor-grabbing]="isPanning()"
       (wheel)="onWheel($event)"
       (pointerdown)="onPointerDown($event)"
@@ -50,7 +30,7 @@
         <img
           src="Carte.jpg"
           alt="Carte d'Eana"
-          class="absolute inset-0 w-full h-full object-fill opacity-85 pointer-events-none select-none"
+          class="absolute inset-0 w-full h-full object-fill opacity-90 pointer-events-none select-none"
           draggable="false"
         />
 
@@ -64,13 +44,15 @@
           >
             <button
               type="button"
-              class="relative w-10 h-10 flex items-center justify-center rounded-full text-base shadow-sm transition-transform hover:scale-[1.05]"
+              class="relative min-w-11 min-h-11 w-11 h-11 flex items-center justify-center rounded-full text-base shadow-sm transition-transform active:scale-[1.04]"
               [class]="
                 isSelectedCiv(civ.id)
                   ? 'bg-violet-600 border-2 border-violet-300 text-white'
                   : 'bg-[#1b2028]/95 border-2 border-amber-500/70 text-lg hover:border-amber-400'
               "
-              (click)="pickCivilization(civ, $event)"
+              (pointerdown)="onPinPointerDown($event)"
+              (pointerup)="onPinPointerUp(civ, $event)"
+              (click)="$event.preventDefault(); $event.stopPropagation()"
               [attr.aria-label]="civ.name"
               [attr.aria-pressed]="isSelectedCiv(civ.id)"
             >
@@ -80,10 +62,44 @@
         }
       </div>
 
-      <div class="absolute bottom-3 right-3 z-30 flex flex-col gap-1.5" (pointerdown)="$event.stopPropagation()">
+      <!-- Edge fades into wizard background -->
+      <div
+        class="pointer-events-none absolute inset-x-0 top-0 h-10 z-20 bg-gradient-to-b from-[#171b22] to-transparent"
+      ></div>
+      <div
+        class="pointer-events-none absolute inset-x-0 bottom-0 h-28 z-20 bg-gradient-to-t from-[#171b22] via-[#171b22]/85 to-transparent"
+      ></div>
+
+      <!-- Selected region chip -->
+      <div class="absolute top-3 left-3 z-30 pointer-events-none">
+        @if (selectedRegion(); as region) {
+          <span
+            class="inline-flex px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border backdrop-blur-sm"
+            [class]="
+              region.kind === 'unknown'
+                ? 'bg-slate-900/85 text-slate-300 border-slate-600'
+                : 'bg-violet-950/80 text-violet-200 border-violet-700/60'
+            "
+          >
+            {{ regionLabel() }}
+          </span>
+        } @else {
+          <span
+            class="inline-flex px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-slate-700/70 bg-[#171b22]/80 text-slate-400 backdrop-blur-sm"
+          >
+            Choisissez une région
+          </span>
+        }
+      </div>
+
+      <!-- Compact zoom -->
+      <div
+        class="absolute top-3 right-3 z-30 flex flex-col gap-1"
+        (pointerdown)="$event.stopPropagation()"
+      >
         <button
           type="button"
-          class="w-9 h-9 rounded-lg bg-[#1b2028]/95 border border-slate-600 text-violet-400 text-lg font-black disabled:opacity-30"
+          class="w-8 h-8 rounded-md bg-[#1b2028]/90 border border-slate-600/80 text-violet-300 text-base font-black leading-none disabled:opacity-30"
           [disabled]="!canZoomIn()"
           (click)="zoomIn()"
           aria-label="Zoomer"
@@ -92,7 +108,7 @@
         </button>
         <button
           type="button"
-          class="w-9 h-9 rounded-lg bg-[#1b2028]/95 border border-slate-600 text-violet-400 text-lg font-black disabled:opacity-30"
+          class="w-8 h-8 rounded-md bg-[#1b2028]/90 border border-slate-600/80 text-violet-300 text-base font-black leading-none disabled:opacity-30"
           [disabled]="!canZoomOut()"
           (click)="zoomOut()"
           aria-label="Dézoomer"
@@ -101,26 +117,54 @@
         </button>
         <button
           type="button"
-          class="w-9 h-9 rounded-lg bg-[#1b2028]/95 border border-slate-600 text-slate-400 text-[10px] font-black"
+          class="w-8 h-8 rounded-md bg-[#1b2028]/90 border border-slate-600/80 text-slate-400 text-[9px] font-black"
           (click)="resetView()"
           aria-label="Recentrer"
         >
           ◎
         </button>
       </div>
+
+      <!-- Region pills -->
+      <div
+        class="absolute inset-x-0 bottom-0 z-30 pt-1 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
+        (pointerdown)="$event.stopPropagation()"
+      >
+        <div
+          class="flex gap-2 overflow-x-auto px-3 pb-1 custom-scrollbar touch-pan-x"
+          style="scrollbar-width: none"
+        >
+          @for (civ of civilizations(); track civ.id) {
+            <button
+              type="button"
+              class="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-[11px] font-bold tracking-wide border transition-colors"
+              [class]="
+                isSelectedCiv(civ.id)
+                  ? 'bg-violet-600 text-white border-violet-400'
+                  : 'bg-[#1b2028]/90 text-slate-200 border-slate-600/80 active:bg-slate-800'
+              "
+              (click)="pickCivilizationFromList(civ)"
+            >
+              <iconify-icon class="text-sm" [icon]="getIconForCiv(civ.id)"></iconify-icon>
+              <span class="whitespace-nowrap">{{ civ.name }}</span>
+            </button>
+          }
+        </div>
+        <div class="px-3 pt-1">
+          <button
+            type="button"
+            class="text-[10px] font-black uppercase tracking-widest transition-colors"
+            [class]="
+              isUnknownSelected()
+                ? 'text-slate-200 underline underline-offset-2'
+                : 'text-slate-500 hover:text-slate-300'
+            "
+            (click)="pickUnknown()"
+          >
+            Région inconnue
+          </button>
+        </div>
+      </div>
     </div>
   }
-
-  <button
-    type="button"
-    class="w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors"
-    [class]="
-      isUnknownSelected()
-        ? 'bg-slate-800 text-slate-200 border-slate-600'
-        : 'bg-[#1b2028] text-slate-400 border-slate-700 hover:border-slate-500 hover:text-slate-300'
-    "
-    (click)="pickUnknown()"
-  >
-    Région inconnue
-  </button>
 </div>

@@ -29,6 +29,7 @@ import { EANA_MAP_RATIO, getEanaMapCoordinates } from '@core/utils/eana-map';
 const MIN_SCALE = 1;
 const MAX_SCALE = 4;
 const ZOOM_STEP = 0.35;
+const MOVE_THRESHOLD_PX = 10;
 
 @Component({
   selector: 'app-civilization-step',
@@ -53,7 +54,7 @@ export class CivilizationStep implements OnInit, OnDestroy {
   readonly error = signal<string | null>(null);
   readonly selectedCivId = signal<string | null>(null);
 
-  /** Fitted map size inside viewport (contain). */
+  /** Fitted map size inside viewport (cover — pin % stay on Carte.jpg). */
   readonly mapWidth = signal(0);
   readonly mapHeight = signal(0);
   /** True once measured — avoids native-size flash (looks mega-zoomed). */
@@ -78,6 +79,10 @@ export class CivilizationStep implements OnInit, OnDestroy {
   private moved = false;
   private resizeObserver: ResizeObserver | null = null;
   private fitRetries = 0;
+  private pinGesture: { pointerId: number; x: number; y: number } | null = null;
+  private readonly onViewportResize = (): void => {
+    this.refitMap(this.scale() <= MIN_SCALE + 0.01);
+  };
 
   constructor() {
     // Whenever the atlas map is shown, fit it after Angular paints the DOM.
@@ -143,16 +148,24 @@ export class CivilizationStep implements OnInit, OnDestroy {
     if (current.civilizationId) {
       this.selectedCivId.set(current.civilizationId);
     }
+    window.visualViewport?.addEventListener('resize', this.onViewportResize);
   }
 
   ngOnDestroy(): void {
     this.pointers.clear();
     this.resizeObserver?.disconnect();
+    window.visualViewport?.removeEventListener('resize', this.onViewportResize);
   }
 
   @HostListener('window:resize')
   onWindowResize(): void {
     this.refitMap(this.scale() <= MIN_SCALE + 0.01);
+  }
+
+  @HostListener('window:orientationchange')
+  onOrientationChange(): void {
+    // Android / iOS : laisser le chrome se poser avant de re-mesurer
+    setTimeout(() => this.refitMap(true), 180);
   }
 
   getIconForCiv(id: string): string {
@@ -210,6 +223,22 @@ export class CivilizationStep implements OnInit, OnDestroy {
       },
       { injector: this.injector },
     );
+  }
+
+  onPinPointerDown(event: PointerEvent): void {
+    event.stopPropagation();
+    this.pinGesture = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+    this.moved = false;
+  }
+
+  onPinPointerUp(civId: string, event: PointerEvent): void {
+    event.stopPropagation();
+    const gesture = this.pinGesture;
+    this.pinGesture = null;
+    if (!gesture || gesture.pointerId !== event.pointerId) return;
+    const dist = Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y);
+    if (dist > MOVE_THRESHOLD_PX) return;
+    this.selectCiv(civId);
   }
 
   focusCivOnMap(civId: string): void {
@@ -360,7 +389,7 @@ export class CivilizationStep implements OnInit, OnDestroy {
     if (this.panOrigin && this.pointers.size === 1) {
       const dx = event.clientX - this.panOrigin.x;
       const dy = event.clientY - this.panOrigin.y;
-      if (Math.hypot(dx, dy) > 4) this.moved = true;
+      if (Math.hypot(dx, dy) > MOVE_THRESHOLD_PX) this.moved = true;
       this.panX.set(this.panOrigin.panX + dx);
       this.panY.set(this.panOrigin.panY + dy);
       this.clampPan();
@@ -384,7 +413,7 @@ export class CivilizationStep implements OnInit, OnDestroy {
     }
   }
 
-  /** Wait for DOM + layout, then measure and contain-fit the map. */
+  /** Wait for DOM + layout, then measure and cover-fit the map. */
   private scheduleFit(resetScale: boolean): void {
     this.fitRetries = 0;
     afterNextRender(
@@ -428,7 +457,7 @@ export class CivilizationStep implements OnInit, OnDestroy {
     requestAnimationFrame(() => this.bindViewport(resetScale));
   }
 
-  /** @returns false if viewport not ready yet */
+  /** Cover: map fills the stage (crop via transform). Pin % unchanged. */
   private refitMap(center: boolean): boolean {
     const viewport = this.mapViewport()?.nativeElement;
     if (!viewport) return false;
@@ -439,11 +468,11 @@ export class CivilizationStep implements OnInit, OnDestroy {
     let w: number;
     let h: number;
     if (vw / vh > EANA_MAP_RATIO) {
-      h = vh;
-      w = h * EANA_MAP_RATIO;
-    } else {
       w = vw;
       h = w / EANA_MAP_RATIO;
+    } else {
+      h = vh;
+      w = h * EANA_MAP_RATIO;
     }
 
     this.mapWidth.set(w);
