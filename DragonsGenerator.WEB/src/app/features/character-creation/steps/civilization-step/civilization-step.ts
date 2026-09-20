@@ -340,7 +340,7 @@ export class CivilizationStep implements OnInit, OnDestroy {
 
   onPointerDown(event: PointerEvent): void {
     const target = event.target as HTMLElement;
-    if (target.closest('[data-map-pin]')) {
+    if (target.closest('[data-map-pin], [data-map-ui]')) {
       this.moved = false;
       return;
     }

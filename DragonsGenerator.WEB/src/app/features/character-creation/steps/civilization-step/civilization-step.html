@@ -133,17 +133,24 @@
           ></div>
 
           @if (!mapFullscreen()) {
-            <app-fullscreen-enter-btn
+            <div
               class="absolute top-3 left-3 z-30"
-              tone="amber"
-              label="Carte en plein écran"
-              (enter)="enterMapFullscreen(); $event.stopPropagation()"
-            />
+              data-map-ui
+              (pointerdown)="$event.stopPropagation()"
+              (pointerup)="$event.stopPropagation()"
+            >
+              <app-fullscreen-enter-btn
+                tone="amber"
+                label="Carte en plein écran"
+                (enter)="enterMapFullscreen()"
+              />
+            </div>
           }
 
           <!-- Compact zoom -->
           <div
             class="absolute top-3 right-3 z-30 flex flex-col gap-1"
+            data-map-ui
             (pointerdown)="$event.stopPropagation()"
           >
             <button

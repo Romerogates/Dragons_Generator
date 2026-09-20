@@ -103,14 +103,18 @@
         class="pointer-events-none absolute inset-x-0 bottom-0 h-28 z-20 bg-gradient-to-t from-[#171b22] via-[#171b22]/85 to-transparent"
       ></div>
 
-      <!-- Selected region chip -->
-      <div class="absolute top-3 left-3 z-30 flex items-start gap-2">
+      <!-- Selected region chip + plein écran -->
+      <div
+        class="absolute top-3 left-3 z-30 flex items-start gap-2"
+        data-map-ui
+        (pointerdown)="$event.stopPropagation()"
+        (pointerup)="$event.stopPropagation()"
+      >
         @if (!mapFullscreen()) {
           <app-fullscreen-enter-btn
-            class="pointer-events-auto"
             tone="violet"
             label="Carte en plein écran"
-            (enter)="enterMapFullscreen(); $event.stopPropagation()"
+            (enter)="enterMapFullscreen()"
           />
         }
         <div class="pointer-events-none">
@@ -138,6 +142,7 @@
       <!-- Compact zoom -->
       <div
         class="absolute top-3 right-3 z-30 flex flex-col gap-1"
+        data-map-ui
         (pointerdown)="$event.stopPropagation()"
       >
         <button
