@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -56,7 +56,7 @@ jobs:
 
   e2e:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -117,7 +117,7 @@ jobs:
 
   deploy:
     needs: [test, e2e]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.2.0
