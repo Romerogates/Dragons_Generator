@@ -672,10 +672,21 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     }
 
     const tab = this.route.snapshot.queryParamMap.get('tab');
-    const handoutId = this.route.snapshot.queryParamMap.get('handout');
-    if (tab) {
-      this.applyTabFromRoute(tab, handoutId);
+    const handoutId =
+      this.route.snapshot.queryParamMap.get('handout') ??
+      this.route.snapshot.queryParamMap.get('handoutId');
+    const mapId = this.route.snapshot.queryParamMap.get('map');
+    if (tab || mapId) {
+      this.applyTabFromRoute(tab ?? 'maps', handoutId, mapId);
     }
+    this.route.queryParamMap.subscribe((params) => {
+      const qTab = params.get('tab');
+      const qMap = params.get('map');
+      const qHandout = params.get('handout') ?? params.get('handoutId');
+      if (qMap) {
+        this.applyTabFromRoute(qTab ?? 'maps', qHandout, qMap);
+      }
+    });
     if (this.route.snapshot.queryParamMap.get('joined') === '1') {
       this.welcomeBanner.set(
         'Bienvenue dans la campagne — proposez un héros dans l’onglet Joueurs, ou forgez-en un.',
@@ -705,8 +716,17 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.banners.dismiss(UI_BANNER_IDS.welcomeCampaign);
   }
 
-  /** Deep-link `?tab=` → nav haute + sous-onglet Préparation si besoin. */
-  private applyTabFromRoute(tab: string, handoutId: string | null): void {
+  /** Deep-link `?tab=` / `?map=` → nav haute + sous-onglet Préparation si besoin. */
+  private applyTabFromRoute(
+    tab: string,
+    handoutId: string | null,
+    mapId: string | null = null,
+  ): void {
+    if (mapId) {
+      this.setTab('maps');
+      this.focusDungeonMapId.set(mapId);
+      return;
+    }
     if (tab === 'handouts' || tab === 'players' || tab === 'overview' || tab === 'sessions' || tab === 'prep') {
       this.setTab(tab as PrimaryTab);
       if (tab === 'handouts' && handoutId) this.focusHandoutId.set(handoutId);

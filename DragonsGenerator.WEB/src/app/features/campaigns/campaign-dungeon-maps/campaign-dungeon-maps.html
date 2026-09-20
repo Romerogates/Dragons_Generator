@@ -262,6 +262,14 @@
                 <button type="button" class="flex-1 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase bg-amber-800/50 text-amber-100 hover:bg-amber-700/60" (click)="openEditor(map.id)">
                   Éditer
                 </button>
+                <button
+                  type="button"
+                  class="px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase border border-slate-700 text-slate-300 hover:border-amber-700/50"
+                  title="Copier un lien pour les membres"
+                  (click)="copyMemberMapLink(map.id)"
+                >
+                  Lien
+                </button>
                 <button type="button" class="px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase border border-red-900/40 text-red-400/90 hover:bg-red-950/30" (click)="deleteMap(map.id)">
                   Suppr.
                 </button>
@@ -297,7 +305,7 @@
           [attr.aria-label]="'Nom du donjon'"
         />
         <p class="text-[11px] text-slate-500">
-          {{ themeLabels[map.theme] }} · molette zoom · espace + glisser · Ctrl+Z
+          {{ themeLabels[map.theme] }} · molette zoom · espace + glisser · Ctrl+Z / Ctrl+Y
           @if (editorFullscreen()) {
             · Échap pour quitter
           }
@@ -308,6 +316,17 @@
           <app-fullscreen-enter-btn tone="amber" (enter)="toggleEditorFullscreen()" />
         }
         <button type="button" class="editor-action" [disabled]="!canUndo()" (click)="undo()">Annuler</button>
+        <button type="button" class="editor-action" [disabled]="!canRedo()" (click)="redo()">Rétablir</button>
+        @if (!libraryMode()) {
+          <button
+            type="button"
+            class="editor-action"
+            title="Copier un lien pour les membres connectés de la campagne"
+            (click)="copyMemberMapLink()"
+          >
+            Copier le lien
+          </button>
+        }
         <button type="button" class="editor-action" (click)="regenerateEditingMap()">Régénérer</button>
 
         <div class="relative">
@@ -397,6 +416,39 @@
           {{ tool.label }}
         </button>
       }
+      @if (activeTool() === 'floor' || activeTool() === 'wall') {
+        <span class="text-[9px] font-black uppercase tracking-widest text-slate-600 ml-1">Brosse</span>
+        @for (size of brushSizes; track size) {
+          <button
+            type="button"
+            class="tool-btn"
+            [class.tool-btn--active]="brushSize() === size"
+            [title]="'Taille de brosse ' + size"
+            (click)="setBrushSize(size)"
+          >
+            {{ size }}
+          </button>
+        }
+      }
+      @if (activeTool() === 'fill') {
+        <span class="text-[9px] font-black uppercase tracking-widest text-slate-600 ml-1">Remplir en</span>
+        <button
+          type="button"
+          class="tool-btn"
+          [class.tool-btn--active]="fillKind() === 'floor'"
+          (click)="setFillKind('floor')"
+        >
+          Sol
+        </button>
+        <button
+          type="button"
+          class="tool-btn"
+          [class.tool-btn--active]="fillKind() === 'wall'"
+          (click)="setFillKind('wall')"
+        >
+          Mur
+        </button>
+      }
       <span class="mx-1 h-5 w-px bg-slate-700/80"></span>
       <button type="button" class="tool-btn" (click)="zoom(-0.15)" title="Dézoomer">−</button>
       <span class="text-[11px] text-slate-500 tabular-nums w-12 text-center">{{ (scale() * 100) | number: '1.0-0' }}%</span>
@@ -471,8 +523,9 @@
             <h4 class="text-[11px] font-bold uppercase tracking-widest text-violet-400/90">Brouillard de guerre</h4>
             <button
               type="button"
-              class="text-[10px] font-black uppercase px-2 py-1 rounded border transition-colors"
+              class="text-[10px] font-black uppercase px-2.5 py-1 rounded-lg border transition-colors"
               [class.border-violet-500]="map.fogOfWarEnabled"
+              [class.bg-violet-950/40]="map.fogOfWarEnabled"
               [class.text-violet-300]="map.fogOfWarEnabled"
               [class.border-slate-700]="!map.fogOfWarEnabled"
               [class.text-slate-500]="!map.fogOfWarEnabled"
@@ -483,11 +536,43 @@
           </div>
           @if (map.fogOfWarEnabled) {
             <div class="flex flex-wrap gap-2 mb-2">
-              <button type="button" class="text-[9px] font-bold uppercase text-emerald-400" (click)="revealAllRooms()">Tout révéler</button>
-              <button type="button" class="text-[9px] font-bold uppercase text-slate-500" (click)="hideAllRooms()">Tout masquer</button>
+              <button
+                type="button"
+                class="text-[9px] font-black uppercase tracking-wide px-2.5 py-1 rounded-lg border border-emerald-700/50 text-emerald-400 hover:bg-emerald-950/30"
+                (click)="revealAllRooms()"
+              >
+                Tout révéler
+              </button>
+              <button
+                type="button"
+                class="text-[9px] font-black uppercase tracking-wide px-2.5 py-1 rounded-lg border border-slate-700 text-slate-400 hover:bg-slate-800/50"
+                (click)="hideAllRooms()"
+              >
+                Tout masquer
+              </button>
+              @if (selectedRoomId()) {
+                <button
+                  type="button"
+                  class="text-[9px] font-black uppercase tracking-wide px-2.5 py-1 rounded-lg border border-violet-700/50 text-violet-300 hover:bg-violet-950/30"
+                  (click)="revealSelectedRoom()"
+                >
+                  Révéler sélection
+                </button>
+                <button
+                  type="button"
+                  class="text-[9px] font-black uppercase tracking-wide px-2.5 py-1 rounded-lg border border-slate-700 text-slate-400 hover:bg-slate-800/50"
+                  (click)="hideSelectedRoom()"
+                >
+                  Masquer sélection
+                </button>
+              }
             </div>
             <p class="text-[10px] text-slate-500 leading-relaxed">
-              En session, les joueurs voient les révélations en direct. Régénérez le document PNG seulement pour un handout figé.
+              Sélectionnez une salle puis révélez-la. En session, les joueurs voient les révélations en direct.
+            </p>
+          } @else {
+            <p class="text-[10px] text-slate-600 leading-relaxed">
+              Activez pour masquer les salles non révélées aux joueurs (handout / table).
             </p>
           }
         </div>

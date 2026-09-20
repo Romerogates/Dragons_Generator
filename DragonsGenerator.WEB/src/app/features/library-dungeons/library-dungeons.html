@@ -9,6 +9,7 @@
           Bibliothèque cloud — créez, éditez, importez en campagne.
         } @else {
           {{ dungeons().length }} / {{ maxDungeons }} carte{{ dungeons().length > 1 ? 's' : '' }}
+          · ouvrez l’éditeur, puis importez une copie dans une campagne
         }
       </p>
     </div>
@@ -45,7 +46,7 @@
     <div class="rounded-3xl border border-dashed border-slate-700 bg-[#1b2028] p-12 text-center">
       <h2 class="text-xl font-serif text-slate-200 mb-3">Bibliothèque vide</h2>
       <p class="text-slate-400 mb-6 text-sm max-w-md mx-auto">
-        Gravez une carte ici, puis importez-en une copie dans n’importe quelle campagne.
+        Gravez une carte ici, éditez-la, puis importez-en une copie dans n’importe quelle campagne (Préparation → Cartes).
       </p>
       <button
         type="button"
@@ -81,11 +82,16 @@
               Suppr.
             </button>
           </div>
-          <a
-            [routerLink]="['/dungeons', d.id]"
-            class="text-[10px] font-black uppercase tracking-widest text-amber-400 hover:text-amber-300"
-            >Ouvrir l’éditeur →</a
-          >
+          <div class="flex flex-wrap gap-2">
+            <a
+              [routerLink]="['/dungeons', d.id]"
+              class="inline-flex items-center px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest bg-amber-800/40 text-amber-200 hover:bg-amber-700/50"
+              >Ouvrir l’éditeur</a
+            >
+            <span class="inline-flex items-center text-[10px] text-slate-600 uppercase tracking-wide">
+              Puis importer depuis une campagne
+            </span>
+          </div>
         </li>
       }
     </ul>

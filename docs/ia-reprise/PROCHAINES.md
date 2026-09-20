@@ -18,6 +18,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 ### Donjons — suite
 1. ~~Vague A (rendu / zoom / notes / bannières)~~ **fait**
 2. ~~Vague B (hub + import copie + chat amis)~~ **fait** — lien public token = plus tard
+3. ~~Suite éditeur (flood-fill / brosse / redo / lien membres / FoW polish)~~ **fait** (2026-09-20) — token public anonyme toujours hors scope
 
 ### Table + Codex
 1. ~~Fiabilité table (persist / softReload / hints setup)~~ **fait**
@@ -57,6 +58,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## Déjà livré (ne pas refaire)
 
+- **Donjons suite éditeur** (2026-09-20) — flood-fill + brosse 1–3 ; redo (Ctrl+Y) ; FoW UX polish ; lien copiable `?tab=maps&map=` pour membres ; hub copy clarifiée. Token public anonyme reporté.
 - **Donjons Vague B** (2026-09-18) — biblio cloud `DungeonRecord` + `/me/dungeons` ; hub nav Donjons ; éditeur partagé ; import **copie** en campagne ; pièce jointe chat `dungeon` + lecture ami ; lien public hors scope.
 - **Donjons Vague A** (2026-09-18) — rendu portes/marqueurs moins empietés ; viewport teinté + Fit ~1.75 + padding canvas ; notes marqueurs dans panneau Salles ; prefs compte `hideAllBanners` / `dismissedBannerIds` (setup-guide, toast donjon, welcome, checklist) + toggle Paramètres → Application.
 - **Polish création donjons UX** (2026-09-18) — presets Compact/Standard/Large ; options avancées repliées ; Gravure sans délai 420 ms ; aperçu seed + debounce au release slider ; cache thumbs `id:updatedAt` ; Fit double rAF + pixelated ; menus Exporter / Document.
