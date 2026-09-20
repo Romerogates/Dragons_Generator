@@ -8,6 +8,11 @@ import {
 
 export { startFreshWizard, expectStepHeading, pickCarouselCard, incrementAbility };
 
+/** Pill Atlas (toujours visible ; évite strict mode pin+pill et le crop cover). */
+export async function pickCivilizationPin(page: Page, civId = 'civ-ajagar'): Promise<void> {
+  await page.getByTestId(`wizard-civ-pill-${civId}`).click();
+}
+
 /** Parcours commun : Humain → Ajagar → historique prédéfini. */
 export async function completeSpeciesCivilizationBackground(
   page: Page,
@@ -17,7 +22,7 @@ export async function completeSpeciesCivilizationBackground(
   await pickCarouselCard(page, 'sp-humain');
   await expectStepHeading(page, /L'Atlas d'Eana/i);
 
-  await page.getByRole('button', { name: 'Ajagar', exact: true }).click();
+  await pickCivilizationPin(page);
   await page.getByRole('button', { name: 'Forger ses origines' }).click();
 
   await expectStepHeading(page, /Historique/i);

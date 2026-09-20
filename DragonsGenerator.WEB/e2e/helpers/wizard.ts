@@ -21,15 +21,17 @@ export async function startFreshWizard(page: Page): Promise<void> {
   await page.evaluate(() => localStorage.removeItem('dragon_character_builder_v6'));
   await page.reload();
   const restart = page.getByTestId('wizard-draft-restart');
-  if (await restart.isVisible().catch(() => false)) {
+  if (await restart.isVisible({ timeout: 2_000 }).catch(() => false)) {
     await restart.click();
     await page.getByRole('button', { name: 'Effacer et recommencer' }).click();
   }
   // Étape 0 — Niveau : valide le niveau par défaut (1) pour atteindre l'étape Espèce.
   const levelContinue = page.getByTestId('level-step-continue');
-  if (await levelContinue.isVisible().catch(() => false)) {
-    await levelContinue.click();
-  }
+  await expect(levelContinue).toBeVisible({ timeout: 30_000 });
+  await levelContinue.click();
+  await expect(page.getByRole('heading', { name: /Choisissez votre peuple/i })).toBeVisible({
+    timeout: 30_000,
+  });
 }
 
 function visibleCarouselCard(page: Page, cardId: string) {

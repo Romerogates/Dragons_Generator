@@ -146,6 +146,7 @@
               <button
                 type="button"
                 class="snap-start shrink-0 flex items-center gap-2 px-3 py-2 rounded-full border text-xs font-semibold transition-colors"
+                [attr.data-testid]="'wizard-civ-pill-' + civ.id"
                 [ngClass]="
                   selectedCivId() === civ.id
                     ? 'bg-amber-950/40 border-amber-500 text-amber-300'

@@ -36,9 +36,9 @@ test.describe('Lettré L1 wizard', () => {
     await pickCarouselCard(page, 'sp-humain');
     await expectStepHeading(page, /L'Atlas d'Eana/i);
 
-    // 2 — Civilisation : Ajagar
+    // 2 — Civilisation : Ajagar (pill Atlas — testid stable, évite strict mode pin+pill)
     await expectStepHeading(page, /L'Atlas d'Eana/i);
-    await page.getByRole('button', { name: 'Ajagar', exact: true }).click();
+    await page.getByTestId('wizard-civ-pill-civ-ajagar').click();
     await page.getByRole('button', { name: 'Forger ses origines' }).click();
 
     // 3 — Historique : Érudit
