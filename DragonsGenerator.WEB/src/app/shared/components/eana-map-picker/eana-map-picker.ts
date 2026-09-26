@@ -434,7 +434,7 @@ export class EanaMapPicker implements OnInit, OnDestroy {
     requestAnimationFrame(() => this.bindViewport(resetScale));
   }
 
-  /** Cover inline / contain plein écran — pin % inchangés. */
+  /** Cover plein écran / contain inline (carte entière visible dans le wizard). */
   private refitMap(center: boolean): boolean {
     const viewport = this.mapViewport()?.nativeElement;
     if (!viewport) return false;
@@ -444,7 +444,8 @@ export class EanaMapPicker implements OnInit, OnDestroy {
 
     let w: number;
     let h: number;
-    const contain = this.mapFullscreen();
+    // Inline + plein écran : contain — toute la carte visible (pas de crop cover).
+    const contain = true;
     if (contain ? vw / vh > EANA_MAP_RATIO : vw / vh <= EANA_MAP_RATIO) {
       h = vh;
       w = h * EANA_MAP_RATIO;

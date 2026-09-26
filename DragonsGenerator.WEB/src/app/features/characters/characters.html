@@ -1,6 +1,6 @@
-<div class="max-w-7xl mx-auto px-4 py-10 animate-fade-in select-none min-h-[80vh] flex flex-col">
+<div class="max-w-7xl mx-auto px-4 py-10 animate-fade-in min-h-[80vh] flex flex-col">
   <header
-    class="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 border-b border-slate-800 pb-6"
+    class="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 border-b border-slate-800 pb-6 select-none"
   >
     <div>
       <h1
@@ -23,7 +23,7 @@
     @if (isLoggedIn() && characters().length > 0 && canCreateMore()) {
       <a
         routerLink="/create"
-        class="px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-emerald-600 text-white shadow-md hover:bg-emerald-500 hover:scale-[1.02] active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-200 flex items-center gap-2"
+        class="px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-amber-500 text-slate-950 shadow-md hover:bg-amber-400 hover:scale-[1.02] active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-200 flex items-center gap-2"
       >
         <span class="text-lg"><iconify-icon icon="fluent-emoji:sparkles"></iconify-icon></span>
         Forger un nouveau héros

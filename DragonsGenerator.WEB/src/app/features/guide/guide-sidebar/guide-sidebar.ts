@@ -26,9 +26,9 @@ export interface GuideSidebarSection {
   host: { class: 'contents' },
   template: `
     <aside
-      class="guide-no-print flex flex-col shrink-0 border-b lg:border-b-0 lg:border-r border-slate-800/90 bg-[#141820]
-             lg:max-h-none lg:h-full lg:w-56 xl:w-64"
-      [class.max-h-[42vh]]="navOpen()"
+      class="guide-no-print flex flex-col shrink-0 border-b lg:border-b-0 lg:border-r border-slate-800/90 bg-[var(--dg-surface-deep)]
+             lg:relative lg:max-h-none lg:h-full lg:w-56 xl:w-64"
+      [class.guide-sommaire-drawer-open]="navOpen()"
     >
       <div
         class="shrink-0 px-3 py-2.5 flex items-center gap-2 border-b border-slate-800/80 lg:flex-col lg:items-stretch lg:gap-3 lg:p-3"
@@ -59,7 +59,7 @@ export interface GuideSidebarSection {
       </div>
 
       <div
-        class="flex-col min-h-0 flex-1 lg:flex"
+        class="flex-col min-h-0 flex-1 overflow-y-auto overscroll-contain lg:flex"
         [class.flex]="navOpen()"
         [class.hidden]="!navOpen()"
       >

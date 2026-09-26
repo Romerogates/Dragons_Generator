@@ -59,9 +59,57 @@
   class="w-full mx-auto px-2 sm:px-4 lg:px-6 pb-6 pt-2 min-h-[calc(100dvh-4rem)] lg:min-h-[calc(100vh-4rem)] flex flex-col max-w-[90rem] overflow-x-clip"
   style="scroll-padding-bottom: 5.5rem"
 >
-  @if (!isOnline() && !codexReady()) {
-    <div class="mb-3 mx-1 px-4 py-3 rounded-xl border border-amber-800/40 bg-amber-950/20 text-xs text-amber-200">
-      Hors ligne : téléchargez le Codex dans <a routerLink="/settings" class="underline text-amber-300">Paramètres</a> pour forger un personnage sans connexion.
+  @if (!isLoggedIn()) {
+    <div
+      class="mb-3 mx-1 px-4 py-3 rounded-xl border border-sky-800/40 bg-sky-950/20 text-xs text-sky-100 flex flex-wrap items-center justify-between gap-2"
+      data-testid="forge-auth-banner"
+      role="status"
+    >
+      <span>
+        Connexion requise pour sauvegarder votre héros dans le cloud — vous pouvez forger maintenant,
+        le compte sera demandé à la fin.
+      </span>
+      <a
+        routerLink="/login"
+        [queryParams]="{ returnUrl: '/create' }"
+        class="shrink-0 min-h-9 inline-flex items-center px-3 rounded-lg text-[10px] font-black uppercase tracking-widest bg-sky-700 text-white hover:bg-sky-600"
+      >
+        Se connecter
+      </a>
+    </div>
+  }
+  @if (!codexReady()) {
+    <div
+      class="mb-3 mx-1 px-4 py-3 rounded-xl border border-amber-800/40 bg-amber-950/20 text-xs text-amber-200 flex flex-wrap items-center justify-between gap-2"
+      data-testid="forge-offline-codex-banner"
+      role="status"
+    >
+      <span>
+        @if (isOnline()) {
+          Téléchargez le Codex ici pour forger même hors ligne (pas besoin d’aller dans Paramètres).
+        } @else {
+          Hors ligne sans Codex local — reconnectez-vous un instant pour le télécharger ici.
+        }
+        @if (codexDownloadError(); as err) {
+          <span class="block text-red-300 mt-1">{{ err }}</span>
+        }
+      </span>
+      <button
+        type="button"
+        class="shrink-0 min-h-9 px-3 rounded-lg text-[10px] font-black uppercase tracking-widest bg-amber-500 text-slate-950 hover:bg-amber-400 disabled:opacity-50"
+        [disabled]="codexDownloading() || !isOnline()"
+        (click)="downloadCodexHere()"
+      >
+        @if (codexDownloading()) {
+          Téléchargement…
+        } @else {
+          Télécharger le Codex
+        }
+      </button>
+    </div>
+  } @else if (!isOnline()) {
+    <div class="mb-3 mx-1 px-4 py-3 rounded-xl border border-emerald-800/40 bg-emerald-950/20 text-xs text-emerald-200">
+      Hors ligne — Codex local prêt.
     </div>
   }
   <!-- Compact progress -->
@@ -88,7 +136,7 @@
       </div>
     </div>
     <div
-      class="flex gap-1 overflow-x-auto pb-0.5 custom-scrollbar"
+      class="flex gap-1.5 overflow-x-auto pb-0.5 custom-scrollbar"
       role="navigation"
       aria-label="Étapes de la forge"
     >
@@ -96,24 +144,33 @@
         @if (step.number < builder.currentStep()) {
           <button
             type="button"
-            class="h-2.5 sm:h-1.5 flex-1 min-w-[1.25rem] rounded-full bg-amber-600 hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-amber-400 transition-colors cursor-pointer"
+            class="shrink-0 min-w-[2.75rem] sm:min-w-[4.5rem] h-8 sm:h-9 px-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-amber-400 transition-colors cursor-pointer flex flex-col items-center justify-center gap-0.5"
             [attr.title]="'Revenir à : ' + step.title"
             [attr.aria-label]="'Revenir à l’étape ' + step.title"
             (click)="goToStep(step.number)"
-          ></button>
+          >
+            <span class="text-[9px] font-black text-slate-950 leading-none">{{ step.number }}</span>
+            <span class="hidden sm:block text-[8px] font-bold uppercase tracking-wide text-slate-950/80 truncate max-w-[4.25rem] leading-none">{{ step.title }}</span>
+          </button>
         } @else if (step.number === builder.currentStep()) {
           <div
-            class="h-2.5 sm:h-1.5 flex-1 min-w-[1.25rem] rounded-full bg-amber-400"
+            class="shrink-0 min-w-[2.75rem] sm:min-w-[4.5rem] h-8 sm:h-9 px-1.5 rounded-lg bg-amber-400 flex flex-col items-center justify-center gap-0.5"
             [attr.title]="step.title"
             [attr.aria-current]="'step'"
             [attr.aria-label]="'Étape en cours : ' + step.title"
-          ></div>
+          >
+            <span class="text-[9px] font-black text-slate-950 leading-none">{{ step.number }}</span>
+            <span class="hidden sm:block text-[8px] font-bold uppercase tracking-wide text-slate-950/80 truncate max-w-[4.25rem] leading-none">{{ step.title }}</span>
+          </div>
         } @else {
           <div
-            class="h-2.5 sm:h-1.5 flex-1 min-w-[1.25rem] rounded-full bg-slate-700"
+            class="shrink-0 min-w-[2.75rem] sm:min-w-[4.5rem] h-8 sm:h-9 px-1.5 rounded-lg bg-slate-700 flex flex-col items-center justify-center gap-0.5"
             [attr.title]="step.title"
             [attr.aria-label]="'Étape à venir : ' + step.title"
-          ></div>
+          >
+            <span class="text-[9px] font-black text-slate-400 leading-none">{{ step.number }}</span>
+            <span class="hidden sm:block text-[8px] font-bold uppercase tracking-wide text-slate-500 truncate max-w-[4.25rem] leading-none">{{ step.title }}</span>
+          </div>
         }
       }
     </div>

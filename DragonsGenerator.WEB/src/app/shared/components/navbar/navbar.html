@@ -1,5 +1,5 @@
 <nav
-  class="w-full bg-[#1b2028]/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 overflow-x-clip pt-[env(safe-area-inset-top)]"
+  class="w-full bg-[var(--dg-surface)]/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 overflow-x-clip pt-[env(safe-area-inset-top)]"
 >
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between gap-2 sm:gap-3 h-16 min-w-0">
@@ -19,7 +19,8 @@
           <span
             class="font-serif font-bold text-base sm:text-lg text-slate-100 group-hover:text-amber-400 transition-colors tracking-wide whitespace-nowrap"
           >
-            <span class="hidden sm:inline">Dragons </span><span class="text-amber-500">Generator</span>
+            <span class="sm:hidden text-amber-500">Dragons</span>
+            <span class="hidden sm:inline">Dragons <span class="text-amber-500">Generator</span></span>
           </span>
         </a>
 
@@ -27,7 +28,7 @@
           <a
             routerLink="/create"
             routerLinkActive="border-amber-500/50 text-amber-300"
-            class="h-10 flex items-center px-3 sm:px-3.5 rounded-full bg-[#171b22] border border-slate-700 hover:border-amber-500/50 transition-colors"
+            class="h-10 flex items-center px-3 sm:px-3.5 rounded-full bg-[var(--dg-bg)] border border-slate-700 hover:border-amber-500/50 transition-colors"
             (click)="closeMenus()"
           >
             <span class="text-[10px] font-black uppercase tracking-widest text-slate-200">Forger</span>
@@ -35,8 +36,8 @@
 
           <a
             routerLink="/story/create"
-            routerLinkActive="border-violet-500/50 text-violet-300"
-            class="h-10 flex items-center px-3 sm:px-3.5 rounded-full bg-[#171b22] border border-slate-700 hover:border-violet-500/50 transition-colors"
+            routerLinkActive="border-amber-500/50 text-amber-300"
+            class="h-10 flex items-center px-3 sm:px-3.5 rounded-full bg-[var(--dg-bg)] border border-slate-700 hover:border-amber-500/50 transition-colors"
             (click)="closeMenus()"
           >
             <span class="text-[10px] font-black uppercase tracking-widest text-slate-200"
@@ -46,8 +47,8 @@
 
           <a
             routerLink="/characters"
-            routerLinkActive="border-emerald-500/50 text-emerald-300"
-            class="h-10 flex items-center px-3 sm:px-3.5 rounded-full bg-[#171b22] border border-slate-700 hover:border-emerald-500/50 transition-colors"
+            routerLinkActive="border-amber-500/50 text-amber-300"
+            class="h-10 flex items-center px-3 sm:px-3.5 rounded-full bg-[var(--dg-bg)] border border-slate-700 hover:border-amber-500/50 transition-colors"
             (click)="closeMenus()"
           >
             <span class="text-[10px] font-black uppercase tracking-widest text-slate-200">Héros</span>
@@ -56,7 +57,7 @@
           <a
             routerLink="/dungeons"
             routerLinkActive="border-amber-500/50 text-amber-300"
-            class="h-10 flex items-center px-3 sm:px-3.5 rounded-full bg-[#171b22] border border-slate-700 hover:border-amber-500/50 transition-colors"
+            class="h-10 flex items-center px-3 sm:px-3.5 rounded-full bg-[var(--dg-bg)] border border-slate-700 hover:border-amber-500/50 transition-colors"
             (click)="closeMenus()"
           >
             <span class="text-[10px] font-black uppercase tracking-widest text-slate-200">Donjons</span>
@@ -64,14 +65,14 @@
 
           <a
             routerLink="/campaigns"
-            routerLinkActive="border-violet-500/50 text-violet-300"
-            class="relative h-10 flex items-center px-3 sm:px-3.5 rounded-full bg-[#171b22] border border-slate-700 hover:border-violet-500/50 transition-colors"
+            routerLinkActive="border-amber-500/50 text-amber-300"
+            class="relative h-10 flex items-center px-3 sm:px-3.5 rounded-full bg-[var(--dg-bg)] border border-slate-700 hover:border-amber-500/50 transition-colors"
             (click)="closeMenus()"
           >
             <span class="text-[10px] font-black uppercase tracking-widest text-slate-200">Campagnes</span>
             @if (auth.isLoggedIn() && campaignsActionCount() > 0) {
               <span
-                class="absolute -top-1.5 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none border-2 border-[#1b2028]"
+                class="absolute -top-1.5 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none border-2 border-[var(--dg-surface)]"
                 >{{ formatBadgeCount(campaignsActionCount()) }}</span
               >
             }
@@ -136,9 +137,20 @@
             @if (codexOpen()) {
               <div class="absolute top-full right-0 pt-2 z-50" role="menu">
                 <div
-                  class="w-80 rounded-2xl border border-slate-700/80 bg-[#171b22] shadow-[0_20px_50px_rgba(0,0,0,0.55)] p-2 grid grid-cols-1 gap-0.5"
+                  class="w-80 rounded-2xl border border-slate-700/80 bg-[var(--dg-bg)] shadow-[0_20px_50px_rgba(0,0,0,0.55)] p-2 grid grid-cols-1 gap-0.5"
                 >
-                  @for (link of codexLinks; track link.path) {
+                  <div class="px-1 pb-1.5">
+                    <input
+                      type="search"
+                      placeholder="Filtrer le grimoire…"
+                      class="w-full min-h-9 rounded-lg bg-[var(--dg-surface)] border border-slate-700 px-3 text-sm text-slate-200 placeholder:text-slate-500 focus:border-amber-600/50 outline-none"
+                      [value]="codexFilter()"
+                      (input)="codexFilter.set($any($event.target).value)"
+                      (click)="$event.stopPropagation()"
+                      data-testid="codex-filter"
+                    />
+                  </div>
+                  @for (link of filteredCodexLinks(); track link.path) {
                     <a
                       [routerLink]="link.path"
                       routerLinkActive="bg-amber-950/35 text-amber-400 border-amber-900/40"
@@ -151,6 +163,8 @@
                       ></span>
                       <span class="font-medium tracking-wide">{{ link.label }}</span>
                     </a>
+                  } @empty {
+                    <p class="px-3 py-2 text-xs text-slate-500">Aucun résultat.</p>
                   }
                 </div>
               </div>
@@ -305,7 +319,7 @@
 
         <button
           type="button"
-          class="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl border border-slate-700 text-slate-300 hover:text-amber-400 hover:border-amber-700/50 transition-colors"
+          class="lg:hidden relative inline-flex items-center justify-center w-10 h-10 rounded-xl border border-slate-700 text-slate-300 hover:text-amber-400 hover:border-amber-700/50 transition-colors"
           [attr.aria-expanded]="mobileOpen()"
           aria-label="Ouvrir le menu"
           (click)="toggleMobile()"
@@ -318,6 +332,12 @@
               <span class="block h-0.5 w-full bg-current rounded-full"></span>
               <span class="block h-0.5 w-full bg-current rounded-full"></span>
             </span>
+          }
+          @if (auth.isLoggedIn() && hamburgerBadgeCount() > 0) {
+            <span
+              class="absolute -top-1.5 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none border-2 border-[#1b2028]"
+              >{{ formatBadgeCount(hamburgerBadgeCount()) }}</span
+            >
           }
         </button>
       </div>
@@ -369,7 +389,7 @@
           (click)="closeMenus()"
         >
           <span class="text-xl"
-            ><iconify-icon noobserver icon="fluent-emoji:world-map"></iconify-icon
+            ><iconify-icon noobserver icon="fluent-emoji:japanese-castle"></iconify-icon
           ></span>
           <span class="text-sm font-bold tracking-wide">Donjons</span>
         </a>
@@ -381,7 +401,7 @@
         >
           <span class="flex items-center gap-3">
             <span class="text-xl"
-              ><iconify-icon noobserver icon="fluent-emoji:world-map"></iconify-icon
+              ><iconify-icon noobserver icon="fluent-emoji:crossed-swords"></iconify-icon
             ></span>
             <span class="text-sm font-bold tracking-wide">Campagnes</span>
           </span>
@@ -466,7 +486,16 @@
         }
 
         <p class="px-4 pt-3 pb-1 text-[10px] font-black uppercase tracking-widest text-slate-600">Codex</p>
-        @for (link of codexLinks; track link.path) {
+        <div class="px-4 pb-2">
+          <input
+            type="search"
+            placeholder="Filtrer le grimoire…"
+            class="w-full min-h-9 rounded-lg bg-[var(--dg-bg)] border border-slate-700 px-3 text-sm text-slate-200 placeholder:text-slate-500 outline-none"
+            [value]="codexFilter()"
+            (input)="codexFilter.set($any($event.target).value)"
+          />
+        </div>
+        @for (link of filteredCodexLinks(); track link.path) {
           <a
             [routerLink]="link.path"
             class="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-transparent text-slate-300 hover:bg-slate-800/70 transition-colors"
@@ -477,6 +506,8 @@
             ></span>
             <span class="text-sm tracking-wide">{{ link.label }}</span>
           </a>
+        } @empty {
+          <p class="px-4 py-2 text-xs text-slate-500">Aucun résultat.</p>
         }
 
         @if (auth.isLoggedIn()) {

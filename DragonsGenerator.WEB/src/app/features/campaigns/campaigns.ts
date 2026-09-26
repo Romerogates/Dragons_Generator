@@ -10,6 +10,7 @@ import { AuthService } from '@core/services/auth.service';
 import { CampaignData, CampaignInvite, CampaignSummary, emptyCampaignData } from '@core/models/Campaign/campaign';
 
 type RoleFilter = 'all' | 'dm' | 'player';
+type ListScope = 'active' | 'archived' | 'history';
 
 @Component({
   selector: 'app-campaigns',
@@ -34,6 +35,7 @@ export class Campaigns implements OnInit, OnDestroy {
   readonly list = signal<CampaignSummary[]>([]);
   readonly invites = signal<CampaignInvite[]>([]);
   readonly roleFilter = signal<RoleFilter>('all');
+  readonly listScope = signal<ListScope>('active');
   readonly loading = signal(true);
   readonly toDelete = signal<CampaignSummary | null>(null);
   readonly deleteConfirmName = signal('');
@@ -49,15 +51,36 @@ export class Campaigns implements OnInit, OnDestroy {
 
   private softPollTimer: ReturnType<typeof setInterval> | null = null;
 
+  readonly activeList = computed(() =>
+    this.list().filter((c) => !c.isHistory && !c.isArchived),
+  );
+  readonly archivedList = computed(() =>
+    this.list().filter((c) => !c.isHistory && !!c.isArchived),
+  );
+  readonly historyList = computed(() => this.list().filter((c) => !!c.isHistory));
+
+  readonly scopedList = computed(() => {
+    switch (this.listScope()) {
+      case 'archived':
+        return this.archivedList();
+      case 'history':
+        return this.historyList();
+      default:
+        return this.activeList();
+    }
+  });
+
   readonly filteredList = computed(() => {
     const filter = this.roleFilter();
-    const items = this.list();
+    const items = this.scopedList();
     if (filter === 'all') return items;
     return items.filter((c) => c.role === filter);
   });
 
-  readonly dmCount = computed(() => this.list().filter((c) => c.role === 'dm').length);
-  readonly playerCount = computed(() => this.list().filter((c) => c.role === 'player').length);
+  readonly dmCount = computed(() => this.scopedList().filter((c) => c.role === 'dm').length);
+  readonly playerCount = computed(() => this.scopedList().filter((c) => c.role === 'player').length);
+  readonly archivedCount = computed(() => this.archivedList().length);
+  readonly historyCount = computed(() => this.historyList().length);
 
   ngOnInit(): void {
     if (!this.auth.isLoggedIn()) {
@@ -85,6 +108,10 @@ export class Campaigns implements OnInit, OnDestroy {
 
   setRoleFilter(filter: RoleFilter): void {
     this.roleFilter.set(filter);
+  }
+
+  setListScope(scope: ListScope): void {
+    this.listScope.set(scope);
   }
 
   private refreshInvites(): void {
@@ -228,6 +255,44 @@ export class Campaigns implements OnInit, OnDestroy {
       error: () => {
         this.deleteError.set('Échec de la suppression cloud. Réessayez dans un instant.');
         this.deleting.set(false);
+      },
+    });
+  }
+
+  archiveCampaign(c: CampaignSummary, event: Event): void {
+    event.stopPropagation();
+    if (c.pendingSync || c.isHistory || this.isCardBusy(c)) return;
+    this.cardActionId.set(c.id);
+    this.actionError.set(null);
+    this.campaigns.setArchived(c.id, true).subscribe({
+      next: () => {
+        this.list.update((items) =>
+          items.map((item) => (item.id === c.id ? { ...item, isArchived: true } : item)),
+        );
+        this.cardActionId.set(null);
+      },
+      error: () => {
+        this.actionError.set('Impossible d’archiver cette campagne.');
+        this.cardActionId.set(null);
+      },
+    });
+  }
+
+  unarchiveCampaign(c: CampaignSummary, event: Event): void {
+    event.stopPropagation();
+    if (c.pendingSync || this.isCardBusy(c)) return;
+    this.cardActionId.set(c.id);
+    this.actionError.set(null);
+    this.campaigns.setArchived(c.id, false).subscribe({
+      next: () => {
+        this.list.update((items) =>
+          items.map((item) => (item.id === c.id ? { ...item, isArchived: false } : item)),
+        );
+        this.cardActionId.set(null);
+      },
+      error: () => {
+        this.actionError.set('Impossible de désarchiver cette campagne.');
+        this.cardActionId.set(null);
       },
     });
   }

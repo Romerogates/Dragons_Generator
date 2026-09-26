@@ -14,7 +14,12 @@ public record CampaignSummaryDto(
     string Role,
     DateTimeOffset UpdatedAt,
     int PlayerCount,
-    string? RegionName);
+    string? RegionName,
+    bool IsArchived = false,
+    bool IsClosed = false,
+    bool IsHistory = false,
+    string MembershipStatus = CampaignMembershipStatuses.Active,
+    bool HasPlayerHistory = false);
 public record CampaignMemberDto(
     Guid Id,
     Guid UserId,
@@ -35,7 +40,12 @@ public record CampaignDetailDto(
     string Role,
     bool IsOwner,
     DateTimeOffset UpdatedAt,
-    List<CampaignMemberDto> Members);
+    List<CampaignMemberDto> Members,
+    bool IsArchived = false,
+    bool IsClosed = false,
+    bool IsHistory = false,
+    string MembershipStatus = CampaignMembershipStatuses.Active,
+    bool HasPlayerHistory = false);
 public record UpsertCampaignRequest(string? Title, JsonElement Data);
 public record CampaignInviteDto(Guid Id, Guid CampaignId, string CampaignTitle, string InvitedByName, DateTimeOffset CreatedAt);
 public record SendCampaignInviteBody(Guid UserId);
@@ -63,18 +73,31 @@ public class ListMyCampaignsEndpoint(AppDbContext db) : EndpointWithoutRequest<L
                 c.Title,
                 c.UpdatedAt,
                 c.JsonData,
-                PlayerCount = c.Members.Count(m => m.Role == CampaignMemberRoles.Player),
+                c.ClosedAt,
+                PlayerCount = c.Members.Count(m =>
+                    m.Role == CampaignMemberRoles.Player && m.LeftAt == null && m.RemovedAt == null),
+                HasPlayerHistory = c.Members.Any(m => m.Role == CampaignMemberRoles.Player),
+                IsArchived = c.Members.Any(m => m.UserId == userId && m.ArchivedAt != null && m.LeftAt == null && m.RemovedAt == null),
             })
             .ToListAsync(ct);
 
         var owned = ownedRows
-            .Select(c => new CampaignSummaryDto(
-                c.Id,
-                c.Title,
-                CampaignMemberRoles.Dm,
-                c.UpdatedAt,
-                c.PlayerCount,
-                CampaignJsonHelpers.RegionNameFromJson(c.JsonData)))
+            .Select(c =>
+            {
+                var isClosed = c.ClosedAt != null;
+                return new CampaignSummaryDto(
+                    c.Id,
+                    c.Title,
+                    CampaignMemberRoles.Dm,
+                    c.UpdatedAt,
+                    c.PlayerCount,
+                    CampaignJsonHelpers.RegionNameFromJson(c.JsonData),
+                    c.IsArchived && !isClosed,
+                    isClosed,
+                    isClosed,
+                    isClosed ? CampaignMembershipStatuses.Closed : CampaignMembershipStatuses.Active,
+                    c.HasPlayerHistory);
+            })
             .ToList();
 
         var joinedRows = await db.CampaignMembers.AsNoTracking()
@@ -85,18 +108,41 @@ public class ListMyCampaignsEndpoint(AppDbContext db) : EndpointWithoutRequest<L
                 m.Campaign.Title,
                 m.Campaign.UpdatedAt,
                 m.Campaign.JsonData,
-                PlayerCount = m.Campaign.Members.Count(x => x.Role == CampaignMemberRoles.Player),
+                m.Campaign.ClosedAt,
+                m.ArchivedAt,
+                m.LeftAt,
+                m.RemovedAt,
+                PlayerCount = m.Campaign.Members.Count(x =>
+                    x.Role == CampaignMemberRoles.Player && x.LeftAt == null && x.RemovedAt == null),
+                HasPlayerHistory = m.Campaign.Members.Any(x => x.Role == CampaignMemberRoles.Player),
             })
             .ToListAsync(ct);
 
         var joined = joinedRows
-            .Select(m => new CampaignSummaryDto(
-                m.CampaignId,
-                m.Title,
-                CampaignMemberRoles.Player,
-                m.UpdatedAt,
-                m.PlayerCount,
-                CampaignJsonHelpers.RegionNameFromJson(m.JsonData)))
+            .Select(m =>
+            {
+                var isClosed = m.ClosedAt != null;
+                var isHistory = isClosed || m.LeftAt != null || m.RemovedAt != null;
+                var status = isClosed
+                    ? CampaignMembershipStatuses.Closed
+                    : m.RemovedAt != null
+                        ? CampaignMembershipStatuses.Removed
+                        : m.LeftAt != null
+                            ? CampaignMembershipStatuses.Left
+                            : CampaignMembershipStatuses.Active;
+                return new CampaignSummaryDto(
+                    m.CampaignId,
+                    m.Title,
+                    CampaignMemberRoles.Player,
+                    m.UpdatedAt,
+                    m.PlayerCount,
+                    CampaignJsonHelpers.RegionNameFromJson(m.JsonData),
+                    !isHistory && m.ArchivedAt != null,
+                    isClosed,
+                    isHistory,
+                    status,
+                    m.HasPlayerHistory);
+            })
             .ToList();
 
         var all = owned.Concat(joined).OrderByDescending(c => c.UpdatedAt).ToList();
@@ -127,9 +173,22 @@ public class GetMyCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest<Cam
 
         using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(campaign.JsonData) ? "{}" : campaign.JsonData);
         var role = isOwner ? CampaignMemberRoles.Dm : membership!.Role;
-        var data = isOwner
-            ? doc.RootElement.Clone()
-            : CampaignJsonHelpers.FilterForPlayerView(doc.RootElement, userId.Value);
+        var isHistory = CampaignHistoryHelpers.IsHistoryView(campaign, membership);
+        var membershipStatus = CampaignHistoryHelpers.ResolveMembershipStatus(campaign, membership, isOwner);
+
+        JsonElement data;
+        if (!isOwner && isHistory && !string.IsNullOrWhiteSpace(membership?.HistorySnapshotJson))
+        {
+            data = CampaignHistoryHelpers.ParseSnapshotOrEmpty(membership!.HistorySnapshotJson);
+        }
+        else if (isOwner)
+        {
+            data = doc.RootElement.Clone();
+        }
+        else
+        {
+            data = CampaignJsonHelpers.FilterForPlayerView(doc.RootElement, userId.Value);
+        }
 
         var membersNeedingLevel = campaign.Members
             .Where(m =>
@@ -176,14 +235,32 @@ public class GetMyCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest<Cam
                 await db.SaveChangesAsync(ct);
         }
 
-        var members = campaign.Members.Select(m => new CampaignMemberDto(
+        var memberSource = isHistory && isOwner
+            ? campaign.Members.AsEnumerable()
+            : campaign.Members.Where(m =>
+                m.Role != CampaignMemberRoles.Player || CampaignHistoryHelpers.IsActivePlayer(m));
+        if (!isOwner && isHistory)
+            memberSource = campaign.Members.Where(m => m.UserId == userId);
+
+        var members = memberSource.Select(m => new CampaignMemberDto(
             m.Id, m.UserId, m.User.DisplayName, m.Role, m.ProposalStatus,
             m.ApprovedCharacterId, m.ApprovedCharacterName, m.ApprovedCharacterLevel,
             m.ProposedCharacterId, m.ProposedCharacterName, m.ProposedCharacterLevel,
             m.XpEarnedInCampaign)).ToList();
 
         await Send.OkAsync(new CampaignDetailDto(
-            campaign.Id, campaign.Title, data, role, isOwner, campaign.UpdatedAt, members), ct);
+            campaign.Id,
+            campaign.Title,
+            data,
+            role,
+            isOwner,
+            campaign.UpdatedAt,
+            members,
+            !isHistory && membership?.ArchivedAt != null,
+            campaign.ClosedAt != null,
+            isHistory,
+            membershipStatus,
+            campaign.Members.Any(m => m.Role == CampaignMemberRoles.Player)), ct);
     }
 }
 
@@ -226,7 +303,8 @@ public class CreateCampaignEndpoint(AppDbContext db) : Endpoint<UpsertCampaignRe
             CampaignMemberRoles.Dm,
             campaign.UpdatedAt,
             0,
-            CampaignJsonHelpers.RegionNameFromJson(json)), ct);
+            CampaignJsonHelpers.RegionNameFromJson(json),
+            false), ct);
     }
 }
 
@@ -246,7 +324,7 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
 
         var id = Route<Guid>("id");
         var (campaign, membership, isOwner) = await CampaignAccess.LoadAsync(db, id, userId.Value, ct);
-        if (campaign is null || !CampaignAccess.CanEdit(isOwner, membership))
+        if (campaign is null || !CampaignAccess.CanEdit(isOwner, membership, campaign))
         {
             await Send.NotFoundAsync(ct);
             return;
@@ -398,18 +476,25 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
             initiativeChange is not null ? CampaignLiveReasons.Initiative : CampaignLiveReasons.Campaign,
             ct);
 
-        var playerCount = campaign.Members.Count(m => m.Role == CampaignMemberRoles.Player);
+        var playerCount = campaign.Members.Count(CampaignHistoryHelpers.IsActivePlayer);
+        var isArchived = campaign.Members.Any(m =>
+            m.UserId == userId.Value && m.ArchivedAt != null && m.LeftAt == null && m.RemovedAt == null);
+        var isClosed = campaign.ClosedAt != null;
         await Send.OkAsync(new CampaignSummaryDto(
             campaign.Id,
             campaign.Title,
             CampaignMemberRoles.Dm,
             campaign.UpdatedAt,
             playerCount,
-            CampaignJsonHelpers.RegionNameFromJson(campaign.JsonData)), ct);
+            CampaignJsonHelpers.RegionNameFromJson(campaign.JsonData),
+            isArchived && !isClosed,
+            isClosed,
+            isClosed,
+            isClosed ? CampaignMembershipStatuses.Closed : CampaignMembershipStatuses.Active), ct);
     }
 }
 
-public class DeleteCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest
+public class DeleteCampaignEndpoint(AppDbContext db, PushNotificationService push) : EndpointWithoutRequest
 {
     public override void Configure() => Delete("/me/campaigns/{id}");
 
@@ -423,14 +508,113 @@ public class DeleteCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest
         }
 
         var id = Route<Guid>("id");
-        var campaign = await db.Campaigns.FirstOrDefaultAsync(c => c.Id == id && c.OwnerUserId == userId, ct);
+        var campaign = await db.Campaigns
+            .Include(c => c.Members)
+            .FirstOrDefaultAsync(c => c.Id == id && c.OwnerUserId == userId, ct);
         if (campaign is null)
         {
             await Send.NotFoundAsync(ct);
             return;
         }
 
-        db.Campaigns.Remove(campaign);
+        var title = campaign.Title;
+        var playerMembers = campaign.Members
+            .Where(m => m.Role == CampaignMemberRoles.Player)
+            .ToList();
+
+        // Hard-delete seulement si aucun joueur n’a jamais été membre.
+        if (playerMembers.Count == 0)
+        {
+            db.Campaigns.Remove(campaign);
+            await db.SaveChangesAsync(ct);
+            await Send.NoContentAsync(ct);
+            return;
+        }
+
+        // Soft-close : historique conservé.
+        var now = DateTimeOffset.UtcNow;
+        campaign.ClosedAt = now;
+        campaign.JoinEnabled = false;
+        campaign.JoinToken = null;
+        campaign.UpdatedAt = now;
+
+        foreach (var m in playerMembers)
+            CampaignHistoryHelpers.SealForClosure(m, campaign.JsonData);
+
+        // Snapshot aussi pour le membership MJ (consultation figée optionnelle).
+        var dmMember = campaign.Members.FirstOrDefault(m => m.UserId == userId);
+        if (dmMember is not null)
+            CampaignHistoryHelpers.SealForClosure(dmMember, campaign.JsonData);
+
+        await db.SaveChangesAsync(ct);
+
+        foreach (var playerId in playerMembers.Select(m => m.UserId).Distinct())
+        {
+            await push.NotifyUserAsync(
+                playerId,
+                "Campagne fermée",
+                $"« {title} » a été fermée par le MJ. Votre historique reste accessible.",
+                "/campaigns",
+                ct);
+        }
+
+        await Send.NoContentAsync(ct);
+    }
+}
+
+public record SetCampaignArchivedRequest(bool Archived);
+
+public class SetCampaignArchivedEndpoint(AppDbContext db) : Endpoint<SetCampaignArchivedRequest>
+{
+    public override void Configure() => Put("/me/campaigns/{id}/archive");
+
+    public override async Task HandleAsync(SetCampaignArchivedRequest req, CancellationToken ct)
+    {
+        var userId = AuthHelpers.GetUserId(User);
+        if (userId is null)
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        var id = Route<Guid>("id");
+        var (campaign, membership, isOwner) = await CampaignAccess.LoadAsync(db, id, userId.Value, ct);
+        if (campaign is null || !CampaignAccess.CanView(isOwner, membership))
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        if (CampaignHistoryHelpers.IsHistoryView(campaign, membership))
+        {
+            AddError("Campagne en historique — archivage indisponible.");
+            await Send.ErrorsAsync(StatusCodes.Status400BadRequest, ct);
+            return;
+        }
+
+        var member = membership;
+        if (member is null && isOwner)
+        {
+            member = campaign.Members.FirstOrDefault(m => m.UserId == userId.Value);
+            if (member is null)
+            {
+                member = new CampaignMember
+                {
+                    UserId = userId.Value,
+                    Role = CampaignMemberRoles.Dm,
+                    ProposalStatus = CharacterProposalStatuses.None,
+                };
+                campaign.Members.Add(member);
+            }
+        }
+
+        if (member is null)
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        member.ArchivedAt = req.Archived ? DateTimeOffset.UtcNow : null;
         await db.SaveChangesAsync(ct);
         await Send.NoContentAsync(ct);
     }
@@ -528,6 +712,13 @@ public class SendCampaignInviteEndpoint(AppDbContext db, PushNotificationService
             return;
         }
 
+        if (campaign.ClosedAt is not null)
+        {
+            AddError("Cette campagne est fermée.");
+            await Send.ErrorsAsync(StatusCodes.Status400BadRequest, ct);
+            return;
+        }
+
         var areFriends = await db.Friendships.AnyAsync(f =>
             f.Status == FriendStatuses.Accepted &&
             ((f.RequesterId == userId && f.AddresseeId == req.UserId) ||
@@ -539,9 +730,11 @@ public class SendCampaignInviteEndpoint(AppDbContext db, PushNotificationService
             return;
         }
 
-        var alreadyMember = await db.CampaignMembers.AnyAsync(
+        var existingMember = await db.CampaignMembers.FirstOrDefaultAsync(
             m => m.CampaignId == campaignId && m.UserId == req.UserId, ct);
-        if (alreadyMember)
+        if (existingMember is not null
+            && existingMember.LeftAt is null
+            && existingMember.RemovedAt is null)
         {
             AddError("Ce joueur fait déjà partie de la campagne.");
             await Send.ErrorsAsync(StatusCodes.Status409Conflict, ct);
@@ -596,6 +789,7 @@ public class AcceptCampaignInviteEndpoint(AppDbContext db) : EndpointWithoutRequ
         var id = Route<Guid>("id");
         var invite = await db.CampaignInvites
             .Include(i => i.Campaign)
+            .ThenInclude(c => c.Members)
             .FirstOrDefaultAsync(i => i.Id == id && i.InvitedUserId == userId && i.Status == CampaignInviteStatuses.Pending, ct);
         if (invite is null)
         {
@@ -603,14 +797,29 @@ public class AcceptCampaignInviteEndpoint(AppDbContext db) : EndpointWithoutRequ
             return;
         }
 
-        invite.Status = CampaignInviteStatuses.Accepted;
-        db.CampaignMembers.Add(new CampaignMember
+        if (invite.Campaign.ClosedAt is not null)
         {
-            CampaignId = invite.CampaignId,
-            UserId = userId.Value,
-            Role = CampaignMemberRoles.Player,
-            ProposalStatus = CharacterProposalStatuses.None,
-        });
+            AddError("Cette campagne est fermée.");
+            await Send.ErrorsAsync(StatusCodes.Status400BadRequest, ct);
+            return;
+        }
+
+        invite.Status = CampaignInviteStatuses.Accepted;
+        var existing = invite.Campaign.Members.FirstOrDefault(m => m.UserId == userId);
+        if (existing is not null)
+        {
+            CampaignHistoryHelpers.Reactivate(existing);
+        }
+        else
+        {
+            db.CampaignMembers.Add(new CampaignMember
+            {
+                CampaignId = invite.CampaignId,
+                UserId = userId.Value,
+                Role = CampaignMemberRoles.Player,
+                ProposalStatus = CharacterProposalStatuses.None,
+            });
+        }
         invite.Campaign.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
 
@@ -671,6 +880,15 @@ public class ProposeCharacterEndpoint(AppDbContext db, PushNotificationService p
         if (member is null)
         {
             await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        if (member.Campaign.ClosedAt is not null
+            || member.LeftAt is not null
+            || member.RemovedAt is not null)
+        {
+            AddError("Campagne en historique — proposition impossible.");
+            await Send.ErrorsAsync(StatusCodes.Status400BadRequest, ct);
             return;
         }
 
@@ -959,6 +1177,12 @@ public class RemoveCampaignMemberEndpoint(AppDbContext db) : EndpointWithoutRequ
             return;
         }
 
+        if (member.LeftAt is not null || member.RemovedAt is not null)
+        {
+            await Send.NoContentAsync(ct);
+            return;
+        }
+
         var displayName = member.User?.DisplayName ?? "Joueur";
         var removedUserId = member.UserId;
 
@@ -978,7 +1202,7 @@ public class RemoveCampaignMemberEndpoint(AppDbContext db) : EndpointWithoutRequ
             campaign.JsonData = data.ToJsonString();
         }
 
-        db.CampaignMembers.Remove(member);
+        CampaignHistoryHelpers.SealRemoved(member, campaign.JsonData);
         campaign.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
 
@@ -1033,6 +1257,19 @@ public class LeaveCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest
             return;
         }
 
+        if (member.LeftAt is not null || member.RemovedAt is not null)
+        {
+            await Send.NoContentAsync(ct);
+            return;
+        }
+
+        if (campaign.ClosedAt is not null)
+        {
+            AddError("Cette campagne est déjà fermée — consultez l’historique.");
+            await Send.ErrorsAsync(StatusCodes.Status400BadRequest, ct);
+            return;
+        }
+
         var displayName = member.User?.DisplayName ?? "Joueur";
 
         var data = CampaignPregenHelpers.ParseDataObject(campaign.JsonData);
@@ -1051,7 +1288,7 @@ public class LeaveCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest
             campaign.JsonData = data.ToJsonString();
         }
 
-        db.CampaignMembers.Remove(member);
+        CampaignHistoryHelpers.SealLeft(member, campaign.JsonData);
         campaign.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
 
@@ -1090,7 +1327,7 @@ public class AwardCampaignXpEndpoint(AppDbContext db, PushNotificationService pu
 
         var campaignId = Route<Guid>("id");
         var (campaign, membership, isOwner) = await CampaignAccess.LoadAsync(db, campaignId, userId.Value, ct);
-        if (campaign is null || !CampaignAccess.CanEdit(isOwner, membership))
+        if (campaign is null || !CampaignAccess.CanEdit(isOwner, membership, campaign))
         {
             await Send.NotFoundAsync(ct);
             return;
@@ -1181,7 +1418,7 @@ public class AssignCampaignPregenEndpoint(AppDbContext db) : Endpoint<AssignPreg
         var campaignId = Route<Guid>("id");
         var pregenId = Route<Guid>("pregenId");
         var (campaign, membership, isOwner) = await CampaignAccess.LoadAsync(db, campaignId, userId.Value, ct);
-        if (campaign is null || !CampaignAccess.CanEdit(isOwner, membership))
+        if (campaign is null || !CampaignAccess.CanEdit(isOwner, membership, campaign))
         {
             await Send.NotFoundAsync(ct);
             return;

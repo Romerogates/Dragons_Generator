@@ -550,6 +550,11 @@ export class SpeciesStep implements OnInit {
     this.scrollToIndex((this.normalizedIndex() - 1 + total) % total);
   }
 
+  /** Dots sous le carrousel. */
+  scrollToCardIndex(index: number): void {
+    this.scrollToIndex(index);
+  }
+
   onCarouselScroll(): void {
     if (this.suppressScrollSync) return;
     cancelAnimationFrame(this.scrollRaf);

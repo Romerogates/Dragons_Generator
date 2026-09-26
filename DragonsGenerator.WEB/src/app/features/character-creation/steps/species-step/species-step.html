@@ -188,6 +188,24 @@
       </button>
     </div>
 
+    <div class="flex flex-col items-center gap-2 -mt-1 mb-2 px-4">
+      <p class="text-sm font-serif text-amber-400/90 text-center truncate max-w-full">
+        {{ currentCards()[normalizedIndex()]?.title }}
+      </p>
+      <div class="flex flex-wrap justify-center gap-1.5" role="tablist" aria-label="Espèces">
+        @for (card of currentCards(); track card.id; let i = $index) {
+          <button
+            type="button"
+            class="w-2 h-2 rounded-full transition-colors"
+            [class]="i === normalizedIndex() ? 'bg-amber-400 scale-125' : 'bg-slate-600 hover:bg-slate-500'"
+            [attr.aria-label]="card.title"
+            [attr.aria-current]="i === normalizedIndex() ? 'true' : null"
+            (click)="scrollToCardIndex(i)"
+          ></button>
+        }
+      </div>
+    </div>
+
     <nav class="wizard-step-nav">
       @if (currentPhase() !== 'species') {
         <button type="button" class="wizard-nav-secondary" (click)="clearSelection()">

@@ -74,6 +74,83 @@ export function parseAdventureSections(raw: string | null | undefined): Adventur
   });
 }
 
+/**
+ * Sections éditables dans le wizard : toujours les 7 titres IA,
+ * préremplies depuis le texte (ou Accroche si synopsis libre).
+ */
+export function adventureSectionsForEdit(raw: string | null | undefined): AdventureSection[] {
+  const parsed = parseAdventureSections(raw);
+  const byTitle = new Map(parsed.map((s) => [s.title, s]));
+
+  if (parsed.length === 1 && parsed[0]!.title === 'Synopsis') {
+    const syn = parsed[0]!;
+    return ADVENTURE_SECTION_TITLES.map((title, i) =>
+      i === 0
+        ? { title, body: syn.body, bullets: syn.bullets }
+        : { title, body: '', bullets: [] },
+    );
+  }
+
+  return ADVENTURE_SECTION_TITLES.map((title) => {
+    const s = byTitle.get(title);
+    return s ? { title, body: s.body, bullets: s.bullets } : { title, body: '', bullets: [] };
+  });
+}
+
+/** Recompose le blob markdown attendu par l’API / le stockage campagne. */
+export function serializeAdventureSections(sections: AdventureSection[]): string {
+  return sections
+    .map((s) => {
+      const title = s.title.trim();
+      const body = s.body.trim();
+      const bullets = s.bullets.map((b) => b.trim()).filter(Boolean);
+      if (!body && bullets.length === 0) return '';
+      const lines: string[] = [];
+      if (body) {
+        lines.push(`**${title}** — ${body}`);
+      } else {
+        lines.push(`**${title}**`);
+      }
+      for (const b of bullets) lines.push(`- ${b}`);
+      return lines.join('\n');
+    })
+    .filter(Boolean)
+    .join('\n\n');
+}
+
+/** Met à jour le corps (texte libre) d’une section ; les lignes « - » deviennent des bullets. */
+export function patchAdventureSection(
+  raw: string,
+  title: AdventureSectionTitle | string,
+  value: string,
+): string {
+  const sections = adventureSectionsForEdit(raw);
+  const idx = sections.findIndex((s) => s.title === title);
+  if (idx < 0) return raw;
+  const lines = value.replace(/\r\n/g, '\n').split('\n');
+  const bullets: string[] = [];
+  const prose: string[] = [];
+  for (const line of lines) {
+    const m = line.trim().match(/^[-*•]\s+(.+)$/);
+    if (m?.[1]) bullets.push(m[1].trim());
+    else if (line.trim()) prose.push(line);
+  }
+  sections[idx] = {
+    title,
+    body: prose.join('\n').trim(),
+    bullets,
+  };
+  return serializeAdventureSections(sections);
+}
+
+/** Valeur affichée dans le textarea d’édition (corps + bullets). */
+export function adventureSectionEditorValue(section: AdventureSection): string {
+  const parts: string[] = [];
+  if (section.body.trim()) parts.push(section.body.trim());
+  for (const b of section.bullets) parts.push(`- ${b}`);
+  return parts.join('\n');
+}
+
 function extractBullets(body: string): string[] {
   const lines = body.split('\n');
   const bullets: string[] = [];

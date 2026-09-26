@@ -299,10 +299,19 @@ export class SummaryStep implements OnInit, OnDestroy {
     this.builder.previousStep();
   }
 
-  /** Si forge lancée depuis une campagne : propose le héros puis retour hub. */
+  /** Si forge lancée depuis une campagne : propose le héros, ou l’ajoute en pré-tiré MJ. */
   private afterSaveNavigate(character: Character): void {
     const campaignId = this.route.snapshot.queryParamMap.get('campaignId')?.trim();
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl')?.trim();
+    const intent = this.route.snapshot.queryParamMap.get('intent')?.trim();
+
+    if (intent === 'pregen' && campaignId && character.id) {
+      void this.router.navigate(['/campaigns', campaignId], {
+        queryParams: { tab: 'pregens', addPregen: character.id },
+      });
+      return;
+    }
+
     if (campaignId && character.id) {
       this.campaigns.proposeCharacter(campaignId, character.id).subscribe({
         next: () => {
@@ -318,6 +327,12 @@ export class SummaryStep implements OnInit, OnDestroy {
       });
       return;
     }
+
+    if (returnUrl) {
+      void this.router.navigateByUrl(returnUrl);
+      return;
+    }
+
     void this.router.navigate(['/character-sheet']);
   }
 }

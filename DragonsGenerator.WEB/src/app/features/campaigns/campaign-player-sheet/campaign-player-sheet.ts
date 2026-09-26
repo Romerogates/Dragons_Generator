@@ -10,6 +10,7 @@ import type { CampaignMember, CampaignSession } from '@core/models/Campaign/camp
   templateUrl: './campaign-player-sheet.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  host: { class: 'block' },
 })
 export class CampaignPlayerSheet {
   readonly campaignId = input.required<string>();

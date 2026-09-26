@@ -95,12 +95,12 @@
         }
       </div>
 
-      <!-- Edge fades into wizard background -->
+      <!-- Soft edge fades (pills are below the stage — no heavy crop) -->
       <div
-        class="pointer-events-none absolute inset-x-0 top-0 h-10 z-20 bg-gradient-to-b from-[#171b22] to-transparent"
+        class="pointer-events-none absolute inset-x-0 top-0 h-6 z-20 bg-gradient-to-b from-[#171b22]/90 to-transparent"
       ></div>
       <div
-        class="pointer-events-none absolute inset-x-0 bottom-0 h-28 z-20 bg-gradient-to-t from-[#171b22] via-[#171b22]/85 to-transparent"
+        class="pointer-events-none absolute inset-x-0 bottom-0 h-6 z-20 bg-gradient-to-t from-[#171b22]/90 to-transparent"
       ></div>
 
       <!-- Selected region chip + plein écran -->
@@ -172,46 +172,47 @@
           ◎
         </button>
       </div>
+    </div>
 
-      <!-- Region pills -->
+    <!-- Region pills under the map (full map visible above) -->
+    <div
+      class="pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] bg-[#171b22]"
+      [class.shrink-0]="mapFullscreen()"
+      (pointerdown)="$event.stopPropagation()"
+    >
       <div
-        class="absolute inset-x-0 bottom-0 z-30 pt-1 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
-        (pointerdown)="$event.stopPropagation()"
+        class="flex gap-2 overflow-x-auto px-3 pb-1 custom-scrollbar touch-pan-x"
+        style="scrollbar-width: none"
       >
-        <div
-          class="flex gap-2 overflow-x-auto px-3 pb-1 custom-scrollbar touch-pan-x"
-          style="scrollbar-width: none"
-        >
-          @for (civ of civilizations(); track civ.id) {
-            <button
-              type="button"
-              class="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-[11px] font-bold tracking-wide border transition-colors"
-              [class]="
-                isSelectedCiv(civ.id)
-                  ? 'bg-violet-600 text-white border-violet-400'
-                  : 'bg-[#1b2028]/90 text-slate-200 border-slate-600/80 active:bg-slate-800'
-              "
-              (click)="pickCivilizationFromList(civ)"
-            >
-              <iconify-icon class="text-sm" [icon]="getIconForCiv(civ.id)"></iconify-icon>
-              <span class="whitespace-nowrap">{{ civ.name }}</span>
-            </button>
-          }
-        </div>
-        <div class="px-3 pt-1">
+        @for (civ of civilizations(); track civ.id) {
           <button
             type="button"
-            class="text-[10px] font-black uppercase tracking-widest transition-colors"
+            class="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-[11px] font-bold tracking-wide border transition-colors"
             [class]="
-              isUnknownSelected()
-                ? 'text-slate-200 underline underline-offset-2'
-                : 'text-slate-500 hover:text-slate-300'
+              isSelectedCiv(civ.id)
+                ? 'bg-violet-600 text-white border-violet-400'
+                : 'bg-[#1b2028]/90 text-slate-200 border-slate-600/80 active:bg-slate-800'
             "
-            (click)="pickUnknown()"
+            (click)="pickCivilizationFromList(civ)"
           >
-            Région inconnue
+            <iconify-icon class="text-sm" [icon]="getIconForCiv(civ.id)"></iconify-icon>
+            <span class="whitespace-nowrap">{{ civ.name }}</span>
           </button>
-        </div>
+        }
+      </div>
+      <div class="px-3 pt-1">
+        <button
+          type="button"
+          class="text-[10px] font-black uppercase tracking-widest transition-colors"
+          [class]="
+            isUnknownSelected()
+              ? 'text-slate-200 underline underline-offset-2'
+              : 'text-slate-500 hover:text-slate-300'
+          "
+          (click)="pickUnknown()"
+        >
+          Région inconnue
+        </button>
       </div>
     </div>
   }

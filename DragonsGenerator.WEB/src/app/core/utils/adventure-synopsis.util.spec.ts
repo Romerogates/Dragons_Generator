@@ -1,4 +1,4 @@
-import { parseAdventureSections } from './adventure-synopsis.util';
+import { parseAdventureSections, adventureSectionsForEdit, serializeAdventureSections, patchAdventureSection, ADVENTURE_SECTION_TITLES } from './adventure-synopsis.util';
 
 describe('parseAdventureSections', () => {
   const sample = `**Accroche** — La jungle de Kardel s’éveille.
@@ -61,5 +61,29 @@ describe('parseAdventureSections', () => {
   it('returns empty for blank input', () => {
     expect(parseAdventureSections('')).toEqual([]);
     expect(parseAdventureSections(null)).toEqual([]);
+  });
+
+  it('adventureSectionsForEdit always exposes the 7 IA titles', () => {
+    const edited = adventureSectionsForEdit(sample);
+    expect(edited.map((s) => s.title)).toEqual([...ADVENTURE_SECTION_TITLES]);
+    expect(edited[0]!.body).toContain('jungle');
+  });
+
+  it('round-trips serialize → parse for filled sections', () => {
+    const edited = adventureSectionsForEdit(sample);
+    const raw = serializeAdventureSections(edited);
+    const again = parseAdventureSections(raw);
+    expect(again.map((s) => s.title)).toEqual([
+      'Accroche',
+      'Contexte',
+      'Personnages clés',
+      'Acte 1',
+    ]);
+  });
+
+  it('patchAdventureSection updates one block without dropping others', () => {
+    const next = patchAdventureSection(sample, 'Accroche', 'Nouveau hook.');
+    expect(next).toContain('**Accroche** — Nouveau hook.');
+    expect(next).toContain('**Contexte**');
   });
 });

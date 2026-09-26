@@ -7,6 +7,7 @@ import type {
 } from '@core/models/Campaign/dungeon-map';
 import { DUNGEON_MARKER_LABELS, DUNGEON_THEME_LABELS } from '@core/models/Campaign/dungeon-map';
 import type { EncounterGroup } from '@core/models/Campaign/campaign';
+import type { CombatTokenDraw } from './dungeon-battle.util';
 
 export interface DungeonThemePalette {
   bg: string;
@@ -176,6 +177,8 @@ export interface DrawDungeonOptions {
    * Décalage origin = edgePadCells * cellSize.
    */
   edgePadCells?: number;
+  /** Jetons de combat (battle map). Dessinés après le fog ; masqués si case foguée. */
+  combatTokens?: CombatTokenDraw[];
 }
 
 /** Offset en pixels pour une option edgePadCells donnée. */
@@ -457,6 +460,8 @@ export function drawDungeonToCanvas(
     }
   }
 
+  drawCombatTokens(ctx, map, cellSize, origin, options?.combatTokens ?? [], revealed);
+
   if (options?.vignette !== false && cellSize >= 6) {
     const g = ctx.createRadialGradient(
       w / 2,
@@ -470,6 +475,60 @@ export function drawDungeonToCanvas(
     g.addColorStop(1, 'rgba(0,0,0,0.35)');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
+  }
+}
+
+function drawCombatTokens(
+  ctx: CanvasRenderingContext2D,
+  map: CampaignDungeonMap,
+  cellSize: number,
+  origin: number,
+  tokens: CombatTokenDraw[],
+  revealed: Set<string> | null,
+): void {
+  if (!tokens.length) return;
+  for (const token of tokens) {
+    if (token.x < 0 || token.y < 0 || token.x >= map.gridWidth || token.y >= map.gridHeight) {
+      continue;
+    }
+    if (revealed && !isCellRevealed(map, token.x, token.y, revealed)) continue;
+
+    const cx = origin + token.x * cellSize + cellSize / 2;
+    const cy = origin + token.y * cellSize + cellSize / 2;
+    const r = Math.max(5, cellSize * 0.38);
+    const fill =
+      token.kind === 'monster'
+        ? '#b91c1c'
+        : token.kind === 'npc'
+          ? '#7c3aed'
+          : '#059669';
+
+    ctx.beginPath();
+    ctx.arc(cx, cy + 1, r + 1, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = fill;
+    ctx.fill();
+
+    if (token.isCurrent || token.isSelected || token.isMine) {
+      ctx.strokeStyle = token.isCurrent ? '#fbbf24' : token.isSelected ? '#38bdf8' : '#a7f3d0';
+      ctx.lineWidth = Math.max(1.5, cellSize * 0.12);
+      ctx.stroke();
+    } else {
+      ctx.strokeStyle = 'rgba(15,18,24,0.5)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    const initial = (token.name.trim().charAt(0) || '?').toUpperCase();
+    ctx.fillStyle = '#f8fafc';
+    ctx.font = `bold ${Math.max(8, Math.round(cellSize * 0.48))}px "Segoe UI", system-ui, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(initial, cx, cy + 0.5);
   }
 }
 

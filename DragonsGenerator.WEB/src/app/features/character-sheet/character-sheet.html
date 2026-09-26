@@ -24,8 +24,9 @@
           [class]="
             viewMode() === 'illustrated'
               ? 'bg-amber-500 text-slate-950'
-              : 'bg-[#1b2028] text-slate-400 hover:text-amber-400'
+              : 'bg-[var(--dg-surface)] text-slate-400 hover:text-amber-400'
           "
+          title="Mise en page PDF / table — à imprimer ou projetée"
           (click)="setViewMode('illustrated')"
         >
           Illustrée
@@ -36,13 +37,18 @@
           [class]="
             viewMode() === 'ui'
               ? 'bg-amber-500 text-slate-950'
-              : 'bg-[#1b2028] text-slate-400 hover:text-amber-400'
+              : 'bg-[var(--dg-surface)] text-slate-400 hover:text-amber-400'
           "
+          title="Lecture écran — navigation et édition confortables"
           (click)="setViewMode('ui')"
         >
           Compacte
         </button>
       </div>
+      <p class="basis-full text-[10px] text-slate-500 sm:basis-auto sm:max-w-xs leading-relaxed">
+        <span class="text-amber-400/90">Illustrée</span> = PDF / table ·
+        <span class="text-amber-400/90">Compacte</span> = lecture écran
+      </p>
       @if (!isConsult()) {
         <button
           type="button"

@@ -44,31 +44,35 @@
           <label class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter ml-1"
             >Sexe</label
           >
-          <select
-            [ngModel]="c().sex"
-            (ngModelChange)="updateSex($event)"
-            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 cursor-pointer appearance-none"
-          >
-            <option value="X">Indéfini</option>
-            <option value="M">Masculin</option>
-            <option value="F">Féminin</option>
-          </select>
+          <div class="relative">
+            <select
+              [ngModel]="c().sex"
+              (ngModelChange)="updateSex($event)"
+              class="dg-select w-full bg-[var(--dg-bg)] border border-slate-700 rounded-xl px-4 py-3 pr-10 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 cursor-pointer"
+            >
+              <option value="X">Indéfini</option>
+              <option value="M">Masculin</option>
+              <option value="F">Féminin</option>
+            </select>
+          </div>
         </div>
 
         <div class="space-y-2">
           <label class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter ml-1"
             >Alignement</label
           >
-          <select
-            [ngModel]="c().alignment"
-            (ngModelChange)="updateIdentity('alignment', $event)"
-            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 cursor-pointer appearance-none"
-          >
-            <option value="">Choisir un alignement...</option>
-            @for (align of alignments; track align) {
-              <option [value]="align">{{ align }}</option>
-            }
-          </select>
+          <div class="relative">
+            <select
+              [ngModel]="c().alignment"
+              (ngModelChange)="updateIdentity('alignment', $event)"
+              class="dg-select w-full bg-[var(--dg-bg)] border border-slate-700 rounded-xl px-4 py-3 pr-10 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 cursor-pointer"
+            >
+              <option value="">Choisir un alignement...</option>
+              @for (align of alignments; track align) {
+                <option [value]="align">{{ align }}</option>
+              }
+            </select>
+          </div>
         </div>
       </div>
     </div>

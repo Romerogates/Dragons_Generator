@@ -135,6 +135,8 @@ public class CampaignRecord
     public bool JoinEnabled { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+    /// <summary>Fermeture soft par le MJ — historique conservé pour les membres.</summary>
+    public DateTimeOffset? ClosedAt { get; set; }
     public List<CampaignMember> Members { get; set; } = [];
     public List<CampaignInvite> Invites { get; set; } = [];
     public List<CampaignActivity> Activities { get; set; } = [];
@@ -171,6 +173,14 @@ public class CampaignMember
     public string ProposalStatus { get; set; } = CharacterProposalStatuses.None;
     public int XpEarnedInCampaign { get; set; }
     public DateTimeOffset JoinedAt { get; set; } = DateTimeOffset.UtcNow;
+    /// <summary>Archivage personnel (masque la campagne pour ce membre sans quitter).</summary>
+    public DateTimeOffset? ArchivedAt { get; set; }
+    /// <summary>Le joueur a quitté volontairement — historique conservé.</summary>
+    public DateTimeOffset? LeftAt { get; set; }
+    /// <summary>Le MJ a retiré le joueur — historique conservé.</summary>
+    public DateTimeOffset? RemovedAt { get; set; }
+    /// <summary>Vue joueur figée au moment du départ / retrait / fermeture.</summary>
+    public string? HistorySnapshotJson { get; set; }
 }
 
 public static class CampaignInviteStatuses

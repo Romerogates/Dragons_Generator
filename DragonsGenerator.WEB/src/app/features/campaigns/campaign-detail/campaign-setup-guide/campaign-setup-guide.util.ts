@@ -14,6 +14,7 @@ export type CampaignSetupAction =
   | 'openEncounters'
   | 'generateEncounters'
   | 'openPlayers'
+  | 'openPregens'
   | 'addSession'
   | 'openSessions'
   | 'startNextSession'
@@ -28,6 +29,8 @@ export interface CampaignSetupGuideInput {
   encounterCount: number;
   approvedPlayerCount: number;
   playerCount: number;
+  /** Pré-tirés prêts — permettent de valider l’étape Héros sans joueurs. */
+  readyPregenCount: number;
   hasPlannedSession: boolean;
   hasActiveSession: boolean;
   nextSessionTitle: string | null;
@@ -66,7 +69,7 @@ export function buildCampaignSetupGuide(input: CampaignSetupGuideInput): Campaig
   const creaturesDone = input.creatureCount > 0;
   const mapsDone = input.mapCount > 0 || input.mapsSkipped;
   const encountersDone = input.encounterCount > 0;
-  const playersDone = input.approvedPlayerCount > 0;
+  const playersDone = input.approvedPlayerCount > 0 || input.readyPregenCount > 0;
   const sessionDone = input.hasPlannedSession || input.hasActiveSession;
 
   const steps: CampaignSetupStepView[] = [
@@ -209,14 +212,26 @@ function describeStep(
     case 'players':
       return {
         id,
-        title: 'Invitez la table',
+        title: 'Héros pour la table',
         proposal:
-          input.playerCount === 0
-            ? 'Invitez vos amis, puis approuvez leur personnage. Sans héros approuvé, la table n’aura personne du côté allié en session.'
-            : 'Des joueurs sont là — approuvez au moins un personnage pour pouvoir l’importer à la table.',
-        tip: 'Vous pouvez aussi préparer des pré-tirés si quelqu’un n’a pas encore de fiche.',
-        primaryLabel: 'Gérer les joueurs',
-        primaryAction: 'openPlayers',
+          input.readyPregenCount > 0 && input.approvedPlayerCount === 0
+            ? 'Des pré-tirés sont prêts. Invitez quand vous voulez — vos joueurs les trouveront à l’arrivée.'
+            : input.playerCount === 0
+              ? 'Préparez des pré-tirés dès maintenant, même si personne n’a encore l’app. Vous inviterez plus tard.'
+              : 'Des joueurs sont là — approuvez au moins un personnage, ou publiez un pré-tiré prêt.',
+        tip: 'Générer / importer dans Préparation → Pré-tirés. L’assignation se fait quand les joueurs rejoignent.',
+        primaryLabel:
+          input.playerCount === 0 || input.readyPregenCount === 0
+            ? 'Préparer des pré-tirés'
+            : 'Gérer les joueurs',
+        primaryAction:
+          input.playerCount === 0 || input.readyPregenCount === 0 ? 'openPregens' : 'openPlayers',
+        secondaryLabel:
+          input.playerCount === 0 || input.readyPregenCount === 0
+            ? 'Gérer les joueurs'
+            : 'Voir les pré-tirés',
+        secondaryAction:
+          input.playerCount === 0 || input.readyPregenCount === 0 ? 'openPlayers' : 'openPregens',
       };
     case 'session':
       return {

@@ -99,18 +99,53 @@
       }
     </button>
 
-    <div>
-      <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
-        {{ builder.adventure() ? 'Aventure (modifiable)' : 'Rédiger l\'aventure à la main' }}
-      </label>
+    <div class="flex items-center justify-between gap-3">
+      <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+        {{ builder.adventure().trim() ? 'Aventure (par sections)' : 'Rédiger par sections' }}
+      </p>
+      <button
+        type="button"
+        class="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-violet-300"
+        (click)="toggleRawEdit()"
+      >
+        {{ rawEdit() ? 'Vue sections' : 'Texte brut' }}
+      </button>
+    </div>
+
+    @if (rawEdit()) {
       <textarea
         rows="16"
-        placeholder="Décrivez votre intrigue, les lieux clés, les rencontres… (obligatoire hors ligne)"
+        placeholder="Décrivez votre intrigue… (balises **Accroche**, **Contexte**, etc.)"
         [ngModel]="builder.adventure()"
         (ngModelChange)="builder.setAdventure($event)"
         class="w-full bg-[#171b22] border border-slate-700 rounded-xl py-4 px-4 text-sm text-slate-300 leading-relaxed focus:outline-none focus:border-violet-500/50 resize-y font-serif"
       ></textarea>
-    </div>
+    } @else {
+      <div class="space-y-4" data-testid="adventure-sections-editor">
+        @for (section of adventureSections(); track section.title) {
+          <article class="rounded-xl border border-slate-800 bg-[#161b24]/60 overflow-hidden">
+            <label
+              class="block px-4 pt-3 pb-1 text-[10px] font-black uppercase tracking-[0.18em] text-violet-400"
+              [attr.for]="'adv-sec-' + section.title"
+            >
+              {{ section.title }}
+            </label>
+            <textarea
+              [id]="'adv-sec-' + section.title"
+              [attr.rows]="sectionRows(section.title)"
+              [placeholder]="
+                section.title === 'Personnages clés'
+                  ? 'Une ligne par personnage, préfixe « - » optionnel…'
+                  : 'Texte de la section…'
+              "
+              [ngModel]="sectionEditorValue(section.title)"
+              (ngModelChange)="onSectionChange(section.title, $event)"
+              class="w-full bg-transparent border-0 px-4 pb-4 text-sm text-slate-300 leading-relaxed focus:outline-none focus:ring-0 resize-y font-serif"
+            ></textarea>
+          </article>
+        }
+      </div>
+    }
   </div>
 
   <div class="wizard-step-nav px-4 max-w-3xl mx-auto w-full">

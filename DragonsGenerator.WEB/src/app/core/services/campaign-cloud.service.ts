@@ -41,6 +41,11 @@ export class CampaignCloudService {
       isOwner: boolean;
       updatedAt: string;
       members: CampaignDetail['members'];
+      isArchived?: boolean;
+      isClosed?: boolean;
+      isHistory?: boolean;
+      membershipStatus?: CampaignDetail['membershipStatus'];
+      hasPlayerHistory?: boolean;
     }>(`${this.api}/me/campaigns/${id}`).pipe(
       map((r) => ({
         id: r.id,
@@ -50,6 +55,11 @@ export class CampaignCloudService {
         isOwner: r.isOwner,
         updatedAt: r.updatedAt,
         members: r.members,
+        isArchived: !!r.isArchived,
+        isClosed: !!r.isClosed,
+        isHistory: !!r.isHistory,
+        membershipStatus: r.membershipStatus ?? (r.isHistory ? 'closed' : 'active'),
+        hasPlayerHistory: !!r.hasPlayerHistory,
       })),
     );
   }
@@ -70,6 +80,11 @@ export class CampaignCloudService {
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.api}/me/campaigns/${id}`);
+  }
+
+  /** Archivage personnel (masquer sans quitter). */
+  setArchived(id: string, archived: boolean): Observable<void> {
+    return this.http.put<void>(`${this.api}/me/campaigns/${id}/archive`, { archived });
   }
 
   invitePlayer(campaignId: string, userId: string): Observable<void> {
@@ -246,6 +261,10 @@ export class CampaignCloudService {
     },
   ): Observable<void> {
     return this.http.post<void>(`${this.api}/me/campaigns/${campaignId}/combat/resolve-attack`, body);
+  }
+
+  postTableChat(campaignId: string, body: { sessionId: string; body: string }): Observable<void> {
+    return this.http.post<void>(`${this.api}/me/campaigns/${campaignId}/table-chat`, body);
   }
 }
 

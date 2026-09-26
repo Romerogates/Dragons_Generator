@@ -289,6 +289,20 @@ describe('dungeon-render helpers', () => {
     expect(canvas.width).toBe(32);
   });
 
+  it('drawDungeonToCanvas draws combat tokens on revealed cells', () => {
+    const map = sampleMap({ fogOfWarEnabled: true, revealedRoomIds: ['r1'] });
+    const canvas = document.createElement('canvas');
+    drawDungeonToCanvas(map, canvas, 10, {
+      revealedRoomIds: fogRevealSet(map),
+      combatTokens: [
+        { id: 't1', name: 'Hero', kind: 'player', x: 1, y: 1, isCurrent: true },
+        { id: 't2', name: 'Hidden', kind: 'monster', x: 0, y: 0 },
+      ],
+    });
+    expect(canvas.width).toBeGreaterThan(0);
+    expect(canvas.height).toBeGreaterThan(0);
+  });
+
   /** Petite carte dédiée : 2 salles reliées par un couloir de 3 cases (x=1,2,3). */
   function corridorMap(): CampaignDungeonMap {
     return sampleMap({

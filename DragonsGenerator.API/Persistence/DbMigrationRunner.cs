@@ -35,6 +35,8 @@ public static class DbMigrationRunner
         new("011_guide_comment_widgets", Apply011GuideCommentWidgetsAsync),
         new("012_campaign_join_link", Apply012CampaignJoinLinkAsync),
         new("013_user_dungeons", Apply013UserDungeonsAsync),
+        new("014_campaign_member_archived", Apply014CampaignMemberArchivedAsync),
+        new("015_campaign_history", Apply015CampaignHistoryAsync),
     ];
 
     private sealed record Migration(string Id, Func<AppDbContext, CancellationToken, Task> Apply);
@@ -325,6 +327,19 @@ public static class DbMigrationRunner
             CREATE INDEX IF NOT EXISTS "IX_Dungeons_UserId" ON "Dungeons" ("UserId");
             """,
             ct);
+    }
+
+    private static async Task Apply014CampaignMemberArchivedAsync(AppDbContext db, CancellationToken ct)
+    {
+        await TryAddColumnAsync(db, "CampaignMembers", "ArchivedAt", "TEXT NULL", ct);
+    }
+
+    private static async Task Apply015CampaignHistoryAsync(AppDbContext db, CancellationToken ct)
+    {
+        await TryAddColumnAsync(db, "Campaigns", "ClosedAt", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "CampaignMembers", "LeftAt", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "CampaignMembers", "RemovedAt", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "CampaignMembers", "HistorySnapshotJson", "TEXT NULL", ct);
     }
 
     private static async Task TryAddColumnAsync(

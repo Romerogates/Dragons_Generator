@@ -1,7 +1,7 @@
-<div class="w-full flex flex-col animate-fade-in select-none">
+<div class="w-full flex flex-col animate-fade-in">
   @if (showRoleOnboarding()) {
     <div
-      class="fixed inset-0 z-[120] flex items-end sm:items-center justify-center p-4 sm:p-6"
+      class="fixed inset-0 z-[120] flex items-end sm:items-center justify-center p-4 sm:p-6 select-none"
       role="presentation"
     >
       <button
@@ -40,44 +40,98 @@
               </div>
             </div>
 
-            <div class="grid sm:grid-cols-2 gap-3">
-              <button
-                type="button"
-                class="text-left p-4 rounded-xl border border-violet-800/50 bg-violet-950/25 hover:border-violet-500/50 hover:bg-violet-950/40 transition-colors"
-                (click)="chooseRole('dm')"
-              >
-                <span class="text-2xl block mb-2"
-                  ><iconify-icon noobserver icon="fluent-emoji:performing-arts"></iconify-icon
-                ></span>
-                <span class="block text-sm font-bold text-violet-200">Je suis MJ</span>
-                <span class="block text-xs text-slate-500 mt-1 leading-relaxed"
-                  >Campagnes, table, validation des persos</span
+            @if (roleOnboardingChoice(); as role) {
+              <div class="space-y-4">
+                <p class="text-sm text-slate-300 leading-relaxed">
+                  @if (role === 'dm') {
+                    Parfait — commencez par une table, ou ouvrez le livret MJ.
+                  } @else {
+                    Parfait — forgez un héros, ou rejoignez une table qui vous attend.
+                  }
+                </p>
+                <div class="flex flex-col gap-2">
+                  @if (role === 'dm') {
+                    <button
+                      type="button"
+                      class="w-full min-h-11 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-violet-600 text-white hover:bg-violet-500"
+                      (click)="finishRoleOnboarding('/campaigns')"
+                    >
+                      Créer / ouvrir une table
+                    </button>
+                    <button
+                      type="button"
+                      class="w-full min-h-11 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest border border-slate-600 text-slate-200 hover:border-violet-500/50"
+                      (click)="finishRoleOnboarding('/guide/mj-table')"
+                    >
+                      Guide MJ
+                    </button>
+                  } @else {
+                    <button
+                      type="button"
+                      class="w-full min-h-11 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-amber-500 text-slate-950 hover:bg-amber-400"
+                      (click)="finishRoleOnboarding('/create')"
+                    >
+                      Forger un héros
+                    </button>
+                    <button
+                      type="button"
+                      class="w-full min-h-11 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest border border-slate-600 text-slate-200 hover:border-sky-500/50"
+                      (click)="finishRoleOnboarding('/campaigns')"
+                    >
+                      Voir les campagnes
+                    </button>
+                  }
+                </div>
+                <div class="flex justify-end">
+                  <button
+                    type="button"
+                    class="px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-300"
+                    (click)="finishRoleOnboarding()"
+                  >
+                    Rester sur l’accueil
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <div class="grid sm:grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  class="text-left p-4 rounded-xl border border-violet-800/50 bg-violet-950/25 hover:border-violet-500/50 hover:bg-violet-950/40 transition-colors"
+                  (click)="chooseRole('dm')"
                 >
-              </button>
-              <button
-                type="button"
-                class="text-left p-4 rounded-xl border border-sky-800/50 bg-sky-950/25 hover:border-sky-500/50 hover:bg-sky-950/40 transition-colors"
-                (click)="chooseRole('player')"
-              >
-                <span class="text-2xl block mb-2"
-                  ><iconify-icon noobserver icon="fluent-emoji:shield"></iconify-icon
-                ></span>
-                <span class="block text-sm font-bold text-sky-200">Je suis joueur</span>
-                <span class="block text-xs text-slate-500 mt-1 leading-relaxed"
-                  >Forger un héros, rejoindre, initiative</span
+                  <span class="text-2xl block mb-2"
+                    ><iconify-icon noobserver icon="fluent-emoji:performing-arts"></iconify-icon
+                  ></span>
+                  <span class="block text-sm font-bold text-violet-200">Je suis MJ</span>
+                  <span class="block text-xs text-slate-500 mt-1 leading-relaxed"
+                    >Campagnes, table, validation des persos</span
+                  >
+                </button>
+                <button
+                  type="button"
+                  class="text-left p-4 rounded-xl border border-sky-800/50 bg-sky-950/25 hover:border-sky-500/50 hover:bg-sky-950/40 transition-colors"
+                  (click)="chooseRole('player')"
                 >
-              </button>
-            </div>
+                  <span class="text-2xl block mb-2"
+                    ><iconify-icon noobserver icon="fluent-emoji:shield"></iconify-icon
+                  ></span>
+                  <span class="block text-sm font-bold text-sky-200">Je suis joueur</span>
+                  <span class="block text-xs text-slate-500 mt-1 leading-relaxed"
+                    >Forger un héros, rejoindre, initiative</span
+                  >
+                </button>
+              </div>
 
-            <div class="flex justify-end">
-              <button
-                type="button"
-                class="px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-300"
-                (click)="skipRoleOnboarding()"
-              >
-                Plus tard
-              </button>
-            </div>
+              <div class="flex justify-end">
+                <button
+                  type="button"
+                  class="px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-300"
+                  (click)="skipRoleOnboarding()"
+                >
+                  Plus tard
+                </button>
+              </div>
+            }
           </div>
         </div>
       </div>
@@ -213,7 +267,7 @@
           >
         }
         @if (s.pendingCampaignInvites > 0) {
-          <a routerLink="/friends" class="hover:text-sky-300 transition-colors"
+          <a routerLink="/campaigns" class="hover:text-sky-300 transition-colors"
             >{{ s.pendingCampaignInvites }} invite(s)</a
           >
         }

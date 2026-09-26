@@ -78,6 +78,10 @@ export class Navbar implements OnInit, OnDestroy {
     () => this.friendsActionCount() + this.campaignsActionCount(),
   );
   readonly guideNewsCount = this.guidePrefs.unreadNewsCount;
+  /** Badge hamburger (md–lg) : notifs + demandes + campagnes + guide. */
+  readonly hamburgerBadgeCount = computed(
+    () => this.notificationCount() + this.guideNewsCount(),
+  );
 
   private savedScrollY = 0;
   private bodyScrollLocked = false;
@@ -95,6 +99,15 @@ export class Navbar implements OnInit, OnDestroy {
     { label: 'Actions de combat', path: '/combat-actions', icon: 'fluent-emoji:collision' },
     { label: 'Divinités', path: '/deities', icon: 'fluent-emoji:glowing-star' },
   ];
+
+  readonly codexFilter = signal('');
+  readonly filteredCodexLinks = computed(() => {
+    const q = this.codexFilter().trim().toLowerCase();
+    if (!q) return this.codexLinks;
+    return this.codexLinks.filter(
+      (l) => l.label.toLowerCase().includes(q) || l.path.toLowerCase().includes(q),
+    );
+  });
 
   private readonly router = inject(Router);
 
@@ -151,6 +164,7 @@ export class Navbar implements OnInit, OnDestroy {
     this.mobileOpen.set(false);
     this.codexOpen.set(false);
     this.accountOpen.set(false);
+    this.codexFilter.set('');
     this.syncBodyScrollLock();
   }
 

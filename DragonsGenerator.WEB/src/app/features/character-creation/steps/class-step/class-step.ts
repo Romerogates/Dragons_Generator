@@ -866,6 +866,10 @@ export class ClassStep implements OnInit {
     this.currentIndex.update((i) => i - 1);
   }
 
+  scrollToCardIndex(index: number): void {
+    this.scrollToIndex(index);
+  }
+
   onRightClick(event: Event, cardId: string): void {
     event.preventDefault();
     event.stopPropagation();

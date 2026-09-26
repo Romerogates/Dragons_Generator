@@ -21,6 +21,15 @@
     @if (generationError(); as err) {
       <div class="mb-4 p-3 bg-red-950/40 border border-red-900/50 rounded-xl text-sm text-red-300">{{ err }}</div>
     }
+    @if (fallbackNotice(); as notice) {
+      <div
+        class="mb-4 p-3 bg-amber-950/30 border border-amber-800/40 rounded-xl text-sm text-amber-200"
+        role="status"
+        data-testid="creature-gen-fallback-notice"
+      >
+        {{ notice }}
+      </div>
+    }
 
     <app-ai-generation-progress-bar class="block mb-4" />
 

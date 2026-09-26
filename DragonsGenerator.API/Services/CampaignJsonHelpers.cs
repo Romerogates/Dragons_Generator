@@ -925,6 +925,7 @@ public static class CampaignJsonHelpers
                     session["activeCombat"] as JsonObject,
                     storedSession["activeCombat"] as JsonObject);
                 MergeCombatLog(session, storedSession);
+                MergeTableChat(session, storedSession);
             }
 
             return incoming.ToJsonString();
@@ -1007,6 +1008,85 @@ public static class CampaignJsonHelpers
         if (stLog is null || stLog.Count == 0) return;
         if (inLog is null || stLog.Count > inLog.Count)
             incomingSession["combatLog"] = stLog.DeepClone();
+    }
+
+    private static void MergeTableChat(JsonObject incomingSession, JsonObject storedSession)
+    {
+        var inChat = incomingSession["tableChat"] as JsonArray;
+        var stChat = storedSession["tableChat"] as JsonArray;
+        if (stChat is null || stChat.Count == 0) return;
+        if (inChat is null || stChat.Count > inChat.Count)
+            incomingSession["tableChat"] = stChat.DeepClone();
+    }
+
+    /// <summary>Ajoute un message au fil de table de la session (cap 100).</summary>
+    public static string? TryAppendTableChat(
+        string json,
+        string sessionId,
+        string authorUserId,
+        string authorName,
+        string body,
+        out string? error)
+    {
+        error = null;
+        var trimmed = (body ?? "").Trim();
+        if (string.IsNullOrWhiteSpace(trimmed))
+        {
+            error = "Message vide.";
+            return null;
+        }
+        if (trimmed.Length > 500)
+        {
+            error = "Message trop long (500 caractères max).";
+            return null;
+        }
+
+        try
+        {
+            var root = JsonNode.Parse(string.IsNullOrWhiteSpace(json) ? "{}" : json) as JsonObject
+                ?? new JsonObject();
+            if (root["sessions"] is not JsonArray sessions)
+            {
+                error = "Aucune session.";
+                return null;
+            }
+
+            JsonObject? target = null;
+            foreach (var item in sessions)
+            {
+                if (item is not JsonObject session) continue;
+                if (session["id"]?.GetValue<string>() == sessionId)
+                {
+                    target = session;
+                    break;
+                }
+            }
+
+            if (target is null)
+            {
+                error = "Session introuvable.";
+                return null;
+            }
+
+            var chat = target["tableChat"] as JsonArray ?? new JsonArray();
+            chat.Add(new JsonObject
+            {
+                ["id"] = Guid.NewGuid().ToString("N"),
+                ["at"] = DateTimeOffset.UtcNow.ToString("O"),
+                ["authorUserId"] = authorUserId,
+                ["authorName"] = string.IsNullOrWhiteSpace(authorName) ? "Joueur" : authorName.Trim(),
+                ["body"] = trimmed,
+            });
+            while (chat.Count > 100)
+                chat.RemoveAt(0);
+            target["tableChat"] = chat;
+            return root.ToJsonString();
+        }
+        catch
+        {
+            error = "JSON campagne invalide.";
+            return null;
+        }
     }
 
     private static int? ReadNullableInt(JsonObject obj, string prop)

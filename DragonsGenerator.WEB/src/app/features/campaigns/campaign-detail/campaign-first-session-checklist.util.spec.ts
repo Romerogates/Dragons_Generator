@@ -1,22 +1,38 @@
 import { buildFirstSessionChecklist } from './campaign-first-session-checklist.util';
 
 describe('buildFirstSessionChecklist', () => {
-  it('starts on invite and labels session as tonight', () => {
+  it('starts on heroes so the DM can prep pregens before invites', () => {
     const g = buildFirstSessionChecklist({
       hasInviteActivity: false,
       approvedPlayerCount: 0,
+      readyPregenCount: 0,
       hasPlannedSession: false,
       hasActiveSession: false,
       playedSessionCount: 0,
     });
-    expect(g.current?.id).toBe('invite');
+    expect(g.current?.id).toBe('heroes');
+    expect(g.current?.action).toBe('openPregens');
     expect(g.allDone).toBe(false);
+  });
+
+  it('treats ready pregens as heroes done without players', () => {
+    const g = buildFirstSessionChecklist({
+      hasInviteActivity: false,
+      approvedPlayerCount: 0,
+      readyPregenCount: 2,
+      hasPlannedSession: false,
+      hasActiveSession: false,
+      playedSessionCount: 0,
+    });
+    expect(g.steps.find((s) => s.id === 'heroes')?.done).toBe(true);
+    expect(g.current?.id).toBe('invite');
   });
 
   it('uses Planifier ce soir then Entrer en session', () => {
     const afterInvite = buildFirstSessionChecklist({
       hasInviteActivity: true,
       approvedPlayerCount: 1,
+      readyPregenCount: 0,
       hasPlannedSession: false,
       hasActiveSession: false,
       playedSessionCount: 0,
@@ -27,6 +43,7 @@ describe('buildFirstSessionChecklist', () => {
     const withSession = buildFirstSessionChecklist({
       hasInviteActivity: true,
       approvedPlayerCount: 1,
+      readyPregenCount: 0,
       hasPlannedSession: true,
       hasActiveSession: false,
       playedSessionCount: 0,
@@ -39,6 +56,7 @@ describe('buildFirstSessionChecklist', () => {
     const g = buildFirstSessionChecklist({
       hasInviteActivity: true,
       approvedPlayerCount: 1,
+      readyPregenCount: 0,
       hasPlannedSession: true,
       hasActiveSession: true,
       playedSessionCount: 0,

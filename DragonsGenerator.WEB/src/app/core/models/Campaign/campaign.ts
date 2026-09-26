@@ -94,6 +94,9 @@ export interface Combatant {
   characterId?: string | null;
   /** Id fiche Codex d’origine (bestiaire). */
   sourceCreatureId?: string | null;
+  /** Position sur la carte de session (grille 0-based). */
+  mapX?: number;
+  mapY?: number;
 }
 
 export interface ActiveCombat {
@@ -128,6 +131,15 @@ export interface SessionTimelineItem {
   durationMin?: number;
 }
 
+/** Message du fil de table (session live). */
+export interface TableChatMessage {
+  id: string;
+  at: string;
+  authorUserId: string;
+  authorName: string;
+  body: string;
+}
+
 export interface CampaignSession {
   id: string;
   title: string;
@@ -156,6 +168,8 @@ export interface CampaignSession {
   combatLog?: string[];
   /** Donjon de campagne consulté pendant cette session (id dans data.dungeonMaps). */
   activeMapId?: string | null;
+  /** Fil de table minimal (MJ + joueurs) — sync live via blob campagne. */
+  tableChat?: TableChatMessage[];
   /** Run sheet MJ — objectifs de la soirée. */
   objectives?: string;
   /** Run sheet MJ — scènes / actes prévus. */
@@ -223,6 +237,14 @@ export interface CampaignSummary {
   updatedAt: string;
   playerCount: number;
   regionName?: string | null;
+  /** Archivage personnel : masquée de la liste active, toujours accessible. */
+  isArchived?: boolean;
+  /** Fermée par le MJ — historique lecture seule. */
+  isClosed?: boolean;
+  /** Quitter / viré / fermée — consultation historique. */
+  isHistory?: boolean;
+  membershipStatus?: 'active' | 'left' | 'removed' | 'closed';
+  hasPlayerHistory?: boolean;
   /** Campagne créée hors ligne, en attente de sync cloud. */
   pendingSync?: boolean;
   /** Id local tant que la campagne n'est pas synchronisée. */
@@ -237,6 +259,12 @@ export interface CampaignDetail {
   isOwner: boolean;
   updatedAt: string;
   members: CampaignMember[];
+  /** Archivage personnel pour l’utilisateur courant. */
+  isArchived?: boolean;
+  isClosed?: boolean;
+  isHistory?: boolean;
+  membershipStatus?: 'active' | 'left' | 'removed' | 'closed';
+  hasPlayerHistory?: boolean;
 }
 
 export interface FriendUser {

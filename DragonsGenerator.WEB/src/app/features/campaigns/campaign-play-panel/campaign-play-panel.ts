@@ -30,6 +30,7 @@ import { CREATURE_ROLE_LABELS, type CreatureRole, type StoryCreatureSelection } 
 import {
   ActiveCombat,
   CampaignData,
+  CampaignHandout,
   CampaignMember,
   CampaignSession,
   CampaignSessionMode,
@@ -39,9 +40,12 @@ import {
   encounterPendingXp,
   encounterTotalXp,
   EncounterGroup,
+  HANDOUT_KIND_LABELS,
   SessionTimelineItem,
   type CampaignDetail as CampaignDetailModel,
 } from '@core/models/Campaign/campaign';
+import { CharacterCloudService } from '@core/services/character-cloud.service';
+import { NotificationService } from '@core/services/notification.service';
 import {
   COMBATANT_KIND_LABELS,
   advanceTurn,
@@ -100,10 +104,20 @@ import {
   ensureSessionPlayPads,
   sessionPlayPadsPreview,
 } from '@core/utils/notebook.util';
+import { drawDungeonToCanvas, fogRevealSet } from '@core/utils/dungeon-render.util';
 import {
-  drawDungeonToCanvas,
-  playerExportDrawOptions,
-} from '@core/utils/dungeon-render.util';
+  clampTokenToFloor,
+  combatantsToTokens,
+  findCombatantAtTile,
+  pixelToTile,
+} from '@core/utils/dungeon-battle.util';
+import {
+  isRoomRevealedOnMap,
+  withAllRoomsRevealed,
+  withFogToggled,
+  withNoRoomsRevealed,
+  withRoomRevealed,
+} from '@core/utils/dungeon-fog.util';
 
 export type PlaySessionView =
   | 'resume'
@@ -132,6 +146,8 @@ export type PlaySessionView =
 })
 export class CampaignPlayPanel implements OnDestroy {
   private readonly campaigns = inject(CampaignCloudService);
+  private readonly characters = inject(CharacterCloudService);
+  private readonly notifications = inject(NotificationService);
   private readonly live = inject(CampaignLiveService);
   private readonly data = inject(DataService);
   private readonly router = inject(Router);
@@ -269,6 +285,15 @@ export class CampaignPlayPanel implements OnDestroy {
 
   readonly campaignDungeonMaps = computed(() => this.campaign().data.dungeonMaps ?? []);
 
+  /** Carte visible pendant combat (ou toujours pour joueur si map attribuée). */
+  readonly showBattleMap = computed(() => {
+    if (!this.activeSessionMap()) return false;
+    if (!this.isDm()) return true;
+    return this.sessionView() === 'combat' || !!this.activeCombat();
+  });
+
+  readonly tableChatMessages = computed(() => this.activeSession()?.tableChat ?? []);
+
   readonly combatLogLines = computed(() =>
     [...(this.activeSession()?.combatLog ?? [])].slice().reverse().slice(0, 12),
   );
@@ -284,6 +309,14 @@ export class CampaignPlayPanel implements OnDestroy {
     if (!userId) return null;
     return this.combatTurnOrder().find((c) => c.memberUserId === userId) ?? null;
   });
+
+  readonly battleMapTokens = computed(() =>
+    combatantsToTokens(this.combatTurnOrder(), {
+      currentId: this.currentTurn()?.id ?? null,
+      myId: this.myCombatant()?.id ?? null,
+      selectedId: this.selectedTokenCombatantId(),
+    }),
+  );
 
   readonly isMyTurn = computed(() => {
     const turn = this.currentTurn();
@@ -328,13 +361,46 @@ export class CampaignPlayPanel implements OnDestroy {
     this.players().filter((p) => p.proposalStatus === 'approved' && p.approvedCharacterId),
   );
 
-  /** Membre joueur courant (si héros approuvé). */
-  readonly myApprovedMember = computed(() => {
+  /** Membre joueur courant (toute proposition). */
+  readonly myPlayerMember = computed(() => {
     const userId = this.auth.user()?.id;
     if (!userId) return null;
-    return (
-      this.approvedPlayers().find((p) => p.userId === userId) ?? null
-    );
+    return this.players().find((p) => p.userId === userId) ?? null;
+  });
+
+  /** Membre joueur courant (si héros approuvé). */
+  readonly myApprovedMember = computed(() => {
+    const mine = this.myPlayerMember();
+    if (!mine || mine.proposalStatus !== 'approved' || !mine.approvedCharacterId) return null;
+    return mine;
+  });
+
+  /** Statut proposition héros pour CTAs table. */
+  readonly myHeroProposalStatus = computed((): 'none' | 'pending' | 'rejected' | 'approved' => {
+    const mine = this.myPlayerMember();
+    if (!mine) return 'none';
+    if (mine.proposalStatus === 'approved' && mine.approvedCharacterId) return 'approved';
+    if (mine.proposalStatus === 'pending') return 'pending';
+    if (mine.proposalStatus === 'rejected') return 'rejected';
+    return 'none';
+  });
+
+  /** Overlay joueur : documents publiés ou proposition de héros (reste sur /play). */
+  readonly playerOverlay = signal<'handouts' | 'propose' | null>(null);
+  readonly selectedHandoutId = signal<string | null>(null);
+  readonly myCharacters = signal<{ id: string; name: string }[]>([]);
+  readonly myCharactersLoading = signal(false);
+  readonly proposeBusyId = signal<string | null>(null);
+  readonly handoutKindLabels = HANDOUT_KIND_LABELS;
+
+  readonly publishedHandouts = computed((): CampaignHandout[] =>
+    (this.campaign().data.handouts ?? []).filter((h) => h.published),
+  );
+
+  readonly selectedHandout = computed((): CampaignHandout | null => {
+    const id = this.selectedHandoutId();
+    if (!id) return null;
+    return this.publishedHandouts().find((h) => h.id === id) ?? null;
   });
 
   readonly sheetLoadingId = signal<string | null>(null);
@@ -358,9 +424,21 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly codexCreatureSearch = signal('');
   readonly codexCreaturesLoading = signal(false);
 
-  /** Canvas carte live (vue joueur). */
+  /** Canvas carte live (MJ + joueurs). */
   private readonly liveDungeonCanvas = viewChild<ElementRef<HTMLCanvasElement>>('liveDungeonCanvas');
   private mapResizeObserver: ResizeObserver | null = null;
+  private liveMapCellSize = 10;
+
+  /** Jeton sélectionné pour placement (MJ). */
+  readonly selectedTokenCombatantId = signal<string | null>(null);
+  private tokenDrag:
+    | { combatantId: string; pointerId: number; moved: boolean }
+    | null = null;
+
+  /** Fil de table. */
+  readonly tableChatDraft = signal('');
+  readonly tableChatSending = signal(false);
+  readonly tableChatOpen = signal(true);
 
   /** Réinitialise la vue table si on change / quitte la session (dock réutilisé). */
   private lastBoundSessionId: string | null | undefined = undefined;
@@ -385,7 +463,11 @@ export class CampaignPlayPanel implements OnDestroy {
       const map = this.activeSessionMap();
       const canvasRef = this.liveDungeonCanvas();
       const isDm = this.isDm();
-      untracked(() => this.bindLiveDungeonCanvas(map, canvasRef?.nativeElement ?? null, isDm));
+      const tokens = this.battleMapTokens();
+      const show = this.showBattleMap();
+      untracked(() =>
+        this.bindLiveDungeonCanvas(map, canvasRef?.nativeElement ?? null, isDm, tokens, show),
+      );
     });
     effect(() => {
       const sessionId = this.campaign().data.activeSessionId ?? null;
@@ -531,7 +613,61 @@ export class CampaignPlayPanel implements OnDestroy {
   }
 
   publishedHandoutsCount(): number {
-    return (this.campaign().data.handouts ?? []).filter((h) => h.published).length;
+    return this.publishedHandouts().length;
+  }
+
+  openHandoutsOverlay(): void {
+    this.selectedHandoutId.set(null);
+    this.playerOverlay.set('handouts');
+  }
+
+  openProposeOverlay(): void {
+    this.playerOverlay.set('propose');
+    this.myCharactersLoading.set(true);
+    this.characters.list().subscribe({
+      next: (chars) => {
+        this.myCharacters.set(chars.map((c) => ({ id: c.id, name: c.name })));
+        this.myCharactersLoading.set(false);
+      },
+      error: () => {
+        this.myCharacters.set([]);
+        this.myCharactersLoading.set(false);
+        this.setFeedback('err', 'Impossible de charger vos personnages.');
+      },
+    });
+  }
+
+  closePlayerOverlay(): void {
+    this.playerOverlay.set(null);
+    this.selectedHandoutId.set(null);
+    this.proposeBusyId.set(null);
+  }
+
+  selectHandout(id: string): void {
+    this.selectedHandoutId.set(id);
+  }
+
+  clearSelectedHandout(): void {
+    this.selectedHandoutId.set(null);
+  }
+
+  proposeCharacterFromPlay(characterId: string): void {
+    if (this.proposeBusyId()) return;
+    const c = this.campaign();
+    this.proposeBusyId.set(characterId);
+    this.campaigns.proposeCharacter(c.id, characterId).subscribe({
+      next: () => {
+        this.proposeBusyId.set(null);
+        this.closePlayerOverlay();
+        this.setFeedback('ok', 'Héros proposé — en attente de l’approbation du MJ.');
+        this.notifications.refresh();
+        this.reload();
+      },
+      error: () => {
+        this.proposeBusyId.set(null);
+        this.setFeedback('err', 'Impossible de proposer ce personnage.');
+      },
+    });
   }
 
   private askConfirm(
@@ -775,14 +911,16 @@ export class CampaignPlayPanel implements OnDestroy {
     map: CampaignDungeonMap | null,
     canvas: HTMLCanvasElement | null,
     isDm: boolean,
+    tokens: ReturnType<typeof combatantsToTokens>,
+    show: boolean,
   ): void {
     this.teardownMapResize();
-    this.paintLiveDungeon(map, canvas, isDm);
-    if (isDm || !map || !canvas?.parentElement) return;
-    if (typeof ResizeObserver === 'undefined') return;
+    if (!show || !map || !canvas) return;
+    this.paintLiveDungeon(map, canvas, isDm, tokens);
     const host = canvas.parentElement;
+    if (!host || typeof ResizeObserver === 'undefined') return;
     this.mapResizeObserver = new ResizeObserver(() => {
-      this.paintLiveDungeon(this.activeSessionMap(), canvas, this.isDm());
+      this.paintLiveDungeon(this.activeSessionMap(), canvas, this.isDm(), this.battleMapTokens());
     });
     this.mapResizeObserver.observe(host);
   }
@@ -796,12 +934,165 @@ export class CampaignPlayPanel implements OnDestroy {
     map: CampaignDungeonMap | null,
     canvas: HTMLCanvasElement | null,
     isDm: boolean,
+    tokens: ReturnType<typeof combatantsToTokens>,
   ): void {
-    if (isDm || !map || !canvas) return;
+    if (!map || !canvas) return;
     const hostW = canvas.parentElement?.clientWidth ?? 0;
     const width = Math.max(280, hostW || 360);
     const cell = Math.max(6, Math.min(20, Math.floor(width / Math.max(1, map.gridWidth))));
-    drawDungeonToCanvas(map, canvas, cell, playerExportDrawOptions(map));
+    this.liveMapCellSize = cell;
+    drawDungeonToCanvas(map, canvas, cell, {
+      showRoomNumbers: true,
+      vignette: true,
+      revealedRoomIds: isDm ? null : fogRevealSet(map),
+      combatTokens: tokens,
+    });
+  }
+
+  selectTokenForPlacement(combatantId: string): void {
+    if (!this.isDm()) return;
+    this.selectedTokenCombatantId.update((id) => (id === combatantId ? null : combatantId));
+  }
+
+  onBattleMapPointerDown(event: PointerEvent): void {
+    if (!this.isDm()) return;
+    const map = this.activeSessionMap();
+    const canvas = this.liveDungeonCanvas()?.nativeElement;
+    const combat = this.activeCombat();
+    if (!map || !canvas || !combat) return;
+
+    const tile = this.tileFromCanvasEvent(event, canvas);
+    if (!tile) return;
+    const occupant = findCombatantAtTile(combat.combatants, tile.x, tile.y);
+    if (occupant) {
+      this.selectedTokenCombatantId.set(occupant.id);
+      this.tokenDrag = { combatantId: occupant.id, pointerId: event.pointerId, moved: false };
+      canvas.setPointerCapture(event.pointerId);
+      event.preventDefault();
+      return;
+    }
+
+    const placeId = this.selectedTokenCombatantId() ?? this.currentTurn()?.id ?? null;
+    if (!placeId) return;
+    const clamped = clampTokenToFloor(map, tile.x, tile.y);
+    if (!clamped) return;
+    this.placeCombatantOnMap(placeId, clamped.x, clamped.y);
+  }
+
+  onBattleMapPointerMove(event: PointerEvent): void {
+    if (!this.isDm() || !this.tokenDrag || this.tokenDrag.pointerId !== event.pointerId) return;
+    const map = this.activeSessionMap();
+    const canvas = this.liveDungeonCanvas()?.nativeElement;
+    if (!map || !canvas) return;
+    const tile = this.tileFromCanvasEvent(event, canvas);
+    if (!tile) return;
+    const clamped = clampTokenToFloor(map, tile.x, tile.y);
+    if (!clamped) return;
+    this.tokenDrag = { ...this.tokenDrag, moved: true };
+    this.placeCombatantOnMap(this.tokenDrag.combatantId, clamped.x, clamped.y, { immediate: false });
+  }
+
+  onBattleMapPointerUp(event: PointerEvent): void {
+    if (!this.tokenDrag || this.tokenDrag.pointerId !== event.pointerId) return;
+    const drag = this.tokenDrag;
+    this.tokenDrag = null;
+    if (drag.moved) {
+      const combat = this.activeCombat();
+      const c = combat?.combatants.find((x) => x.id === drag.combatantId);
+      if (c && typeof c.mapX === 'number' && typeof c.mapY === 'number') {
+        this.placeCombatantOnMap(drag.combatantId, c.mapX, c.mapY, { immediate: true });
+      }
+    }
+  }
+
+  private tileFromCanvasEvent(
+    event: PointerEvent,
+    canvas: HTMLCanvasElement,
+  ): { x: number; y: number } | null {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width < 1 || rect.height < 1) return null;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const ox = (event.clientX - rect.left) * scaleX;
+    const oy = (event.clientY - rect.top) * scaleY;
+    return pixelToTile(ox, oy, this.liveMapCellSize, 0);
+  }
+
+  placeCombatantOnMap(
+    combatantId: string,
+    x: number,
+    y: number,
+    options?: { immediate?: boolean },
+  ): void {
+    const combat = this.activeCombat();
+    if (!combat || !this.isDm()) return;
+    const combatants = combat.combatants.map((c) =>
+      c.id === combatantId ? { ...c, mapX: x, mapY: y } : c,
+    );
+    this.patchCombat({ ...combat, combatants }, { immediate: options?.immediate !== false });
+  }
+
+  patchSessionDungeonMap(partial: Partial<CampaignDungeonMap>): void {
+    if (!this.isDm()) return;
+    const map = this.activeSessionMap();
+    if (!map) return;
+    const dungeonMaps = (this.campaign().data.dungeonMaps ?? []).map((m) =>
+      m.id === map.id ? { ...m, ...partial, updatedAt: new Date().toISOString() } : m,
+    );
+    this.saveData({ dungeonMaps });
+  }
+
+  toggleSessionFog(): void {
+    const map = this.activeSessionMap();
+    if (!map) return;
+    this.patchSessionDungeonMap(withFogToggled(map));
+  }
+
+  isSessionRoomRevealed(roomId: string): boolean {
+    const map = this.activeSessionMap();
+    return map ? isRoomRevealedOnMap(map, roomId) : true;
+  }
+
+  toggleSessionRoomReveal(roomId: string): void {
+    const map = this.activeSessionMap();
+    if (!map?.fogOfWarEnabled) return;
+    const revealed = isRoomRevealedOnMap(map, roomId);
+    this.patchSessionDungeonMap(withRoomRevealed(map, roomId, !revealed));
+  }
+
+  revealAllSessionRooms(): void {
+    const map = this.activeSessionMap();
+    if (!map) return;
+    this.patchSessionDungeonMap(withAllRoomsRevealed(map));
+  }
+
+  hideAllSessionRooms(): void {
+    this.patchSessionDungeonMap(withNoRoomsRevealed());
+  }
+
+  sendTableChat(): void {
+    const session = this.activeSession();
+    const body = this.tableChatDraft().trim();
+    if (!session || !body || this.tableChatSending()) return;
+    this.tableChatSending.set(true);
+    this.campaigns.postTableChat(this.campaign().id, { sessionId: session.id, body }).subscribe({
+      next: () => {
+        this.tableChatDraft.set('');
+        this.tableChatSending.set(false);
+      },
+      error: () => {
+        this.tableChatSending.set(false);
+        this.setFeedback('err', 'Impossible d’envoyer le message.');
+      },
+    });
+  }
+
+  formatTableChatTime(iso: string): string {
+    try {
+      return new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    } catch {
+      return '';
+    }
   }
 
   togglePlayerRoster(): void {

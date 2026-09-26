@@ -35,44 +35,71 @@
       </div>
       <div class="flex flex-wrap gap-2">
         @if (!isDm()) {
-          <a
-            [routerLink]="['/campaigns', c.id]"
-            [queryParams]="{ tab: 'handouts' }"
+          <button
+            type="button"
             class="min-h-11 inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-slate-700 text-slate-300 hover:border-emerald-600/50"
-            title="Quitte la table pour l’onglet Documents du hub"
+            title="Documents publiés par le MJ"
+            (click)="openHandoutsOverlay()"
+            data-testid="play-documents-btn"
           >
             Documents
             @if (publishedHandoutsCount() > 0) {
               <span class="text-emerald-400">({{ publishedHandoutsCount() }})</span>
             }
-          </a>
-          <button
-            type="button"
-            class="min-h-11 inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-sky-800/50 text-sky-300 hover:border-sky-500/50 disabled:opacity-40"
-            [disabled]="!myApprovedMember() || sheetLoadingId() === myApprovedMember()?.id"
-            [attr.title]="
-              !myApprovedMember()
-                ? 'Proposez un héros depuis le hub (onglet Joueurs), puis attendez l’approbation du MJ.'
-                : null
-            "
-            (click)="openMySheet()"
-          >
-            @if (sheetLoadingId() === myApprovedMember()?.id) {
-              Fiche…
-            } @else {
-              Ma fiche
-            }
           </button>
-          @if (!myApprovedMember()) {
-            <p class="basis-full text-[10px] text-slate-500 sm:basis-auto sm:max-w-[14rem]">
-              Aucun héros approuvé —
-              <a
-                [routerLink]="['/campaigns', c.id]"
-                [queryParams]="{ tab: 'players' }"
-                class="text-sky-400 underline hover:text-sky-300"
-                >proposer un héros</a
-              >.
-            </p>
+          @if (myHeroProposalStatus() === 'approved') {
+            <button
+              type="button"
+              class="min-h-11 inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-[#1b2028] border border-sky-800/50 text-sky-300 hover:border-sky-500/50 disabled:opacity-40"
+              [disabled]="sheetLoadingId() === myApprovedMember()?.id"
+              (click)="openMySheet()"
+              data-testid="play-my-sheet-btn"
+            >
+              @if (sheetLoadingId() === myApprovedMember()?.id) {
+                Fiche…
+              } @else {
+                Ma fiche
+              }
+            </button>
+          } @else if (myHeroProposalStatus() === 'pending') {
+            <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+              <span
+                class="min-h-11 inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-amber-800/50 bg-amber-950/25 text-amber-200"
+                data-testid="play-hero-pending"
+              >
+                En attente du MJ
+                @if (myPlayerMember()?.proposedCharacterName; as n) {
+                  <span class="ml-1 font-serif normal-case tracking-normal text-amber-100/80"
+                    >({{ n }})</span
+                  >
+                }
+              </span>
+              <button
+                type="button"
+                class="text-[10px] text-sky-400 underline hover:text-sky-300"
+                (click)="openProposeOverlay()"
+              >
+                Changer
+              </button>
+            </div>
+          } @else {
+            <button
+              type="button"
+              class="min-h-11 inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-sky-700 text-white hover:bg-sky-600"
+              (click)="openProposeOverlay()"
+              data-testid="play-propose-hero-cta"
+            >
+              @if (myHeroProposalStatus() === 'rejected') {
+                Envoyer un autre héros
+              } @else {
+                Envoyer un héros
+              }
+            </button>
+            @if (myHeroProposalStatus() === 'rejected') {
+              <p class="basis-full text-[10px] text-red-400/90 sm:basis-auto">
+                Proposition refusée — choisissez un autre personnage.
+              </p>
+            }
           }
         }
         @if (isDm() && !fullscreen()) {
@@ -555,7 +582,7 @@
         </div>
       }
 
-      @if (!isDm()) {
+      @if (showBattleMap()) {
         @if (activeSessionMap(); as liveMap) {
           <details open class="rounded-xl border border-sky-900/40 bg-sky-950/20 p-3 group">
             <summary
@@ -567,28 +594,165 @@
               <span class="text-[10px] text-slate-500 group-open:hidden">Afficher</span>
               <span class="text-[10px] text-slate-500 hidden group-open:inline">Masquer</span>
             </summary>
-            <div class="mt-2 space-y-2">
-              @if (liveMap.fogOfWarEnabled) {
+            <div class="mt-2 space-y-3">
+              @if (isDm() && activeCombat()) {
+                <p class="text-[10px] text-slate-400">
+                  Sélectionnez un combattant puis cliquez une case · glissez un jeton pour le déplacer
+                </p>
+                <div class="flex flex-wrap gap-1.5">
+                  @for (cb of combatTurnOrder(); track cb.id) {
+                    @if (!isCombatantDefeated(cb)) {
+                      <button
+                        type="button"
+                        class="min-h-9 px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-colors"
+                        [class.border-sky-400]="selectedTokenCombatantId() === cb.id"
+                        [class.bg-sky-950/50]="selectedTokenCombatantId() === cb.id"
+                        [class.text-sky-200]="selectedTokenCombatantId() === cb.id"
+                        [class.border-slate-700]="selectedTokenCombatantId() !== cb.id"
+                        [class.text-slate-300]="selectedTokenCombatantId() !== cb.id"
+                        (click)="selectTokenForPlacement(cb.id)"
+                      >
+                        {{ cb.name || 'Sans nom' }}
+                        @if (cb.mapX != null && cb.mapY != null) {
+                          <span class="text-slate-500">· {{ cb.mapX }},{{ cb.mapY }}</span>
+                        }
+                      </button>
+                    }
+                  }
+                </div>
+              }
+              @if (liveMap.fogOfWarEnabled && !isDm()) {
                 <p class="text-[10px] text-slate-500">Brouillard de guerre — révélations en direct</p>
               }
               <div
-                class="overflow-auto max-h-[min(42vh,22rem)] touch-pan-x touch-pan-y overscroll-contain rounded-lg border border-slate-800 bg-[#0a0d13]"
+                class="overflow-auto max-h-[min(48vh,28rem)] touch-pan-x touch-pan-y overscroll-contain rounded-lg border border-slate-800 bg-[#0a0d13]"
               >
                 <canvas
                   #liveDungeonCanvas
                   class="block max-w-none"
+                  [class.cursor-crosshair]="isDm() && !!activeCombat()"
                   aria-label="Carte de session"
+                  (pointerdown)="onBattleMapPointerDown($event)"
+                  (pointermove)="onBattleMapPointerMove($event)"
+                  (pointerup)="onBattleMapPointerUp($event)"
+                  (pointercancel)="onBattleMapPointerUp($event)"
                 ></canvas>
               </div>
+              @if (isDm()) {
+                <div class="space-y-2 rounded-lg border border-violet-900/40 bg-violet-950/20 p-2.5">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-violet-300">FoW</p>
+                    <button
+                      type="button"
+                      class="min-h-9 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border"
+                      [class.border-violet-500]="liveMap.fogOfWarEnabled"
+                      [class.text-violet-200]="liveMap.fogOfWarEnabled"
+                      [class.border-slate-700]="!liveMap.fogOfWarEnabled"
+                      [class.text-slate-400]="!liveMap.fogOfWarEnabled"
+                      (click)="toggleSessionFog()"
+                    >
+                      {{ liveMap.fogOfWarEnabled ? 'Activé' : 'Désactivé' }}
+                    </button>
+                    @if (liveMap.fogOfWarEnabled) {
+                      <button
+                        type="button"
+                        class="min-h-9 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300"
+                        (click)="revealAllSessionRooms()"
+                      >
+                        Tout
+                      </button>
+                      <button
+                        type="button"
+                        class="min-h-9 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300"
+                        (click)="hideAllSessionRooms()"
+                      >
+                        Rien
+                      </button>
+                    }
+                  </div>
+                  @if (liveMap.fogOfWarEnabled && liveMap.rooms.length) {
+                    <div class="flex flex-wrap gap-1.5">
+                      @for (room of liveMap.rooms; track room.id) {
+                        <button
+                          type="button"
+                          class="min-h-9 px-2 py-1 rounded-lg text-[10px] font-bold border"
+                          [class.border-emerald-600]="isSessionRoomRevealed(room.id)"
+                          [class.bg-emerald-950/40]="isSessionRoomRevealed(room.id)"
+                          [class.text-emerald-200]="isSessionRoomRevealed(room.id)"
+                          [class.border-slate-700]="!isSessionRoomRevealed(room.id)"
+                          [class.text-slate-400]="!isSessionRoomRevealed(room.id)"
+                          (click)="toggleSessionRoomReveal(room.id)"
+                        >
+                          {{ room.label }}
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              }
             </div>
           </details>
-        } @else {
+        } @else if (!isDm()) {
           <div class="rounded-xl border border-dashed border-slate-700 bg-[#1b2028]/50 p-4 text-center space-y-1">
             <p class="text-sm text-slate-300">Pas de carte pour cette session</p>
             <p class="text-xs text-slate-500">Le MJ peut en attribuer une dans Préparation → Donjons.</p>
           </div>
         }
       }
+
+      <details
+        class="rounded-xl border border-slate-700/60 bg-[#1b2028]/60 p-3 group"
+        [open]="tableChatOpen()"
+        (toggle)="tableChatOpen.set($any($event.target).open)"
+      >
+        <summary
+          class="min-h-11 flex flex-wrap items-center justify-between gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden"
+        >
+          <p class="text-[10px] font-black uppercase tracking-widest text-slate-300">
+            Fil de table
+            @if (tableChatMessages().length) {
+              <span class="text-slate-500">· {{ tableChatMessages().length }}</span>
+            }
+          </p>
+          <span class="text-[10px] text-slate-500 group-open:hidden">Afficher</span>
+          <span class="text-[10px] text-slate-500 hidden group-open:inline">Masquer</span>
+        </summary>
+        <div class="mt-2 space-y-2">
+          <div
+            class="max-h-40 overflow-y-auto space-y-1.5 rounded-lg border border-slate-800 bg-[#0a0d13]/80 p-2 custom-scrollbar"
+          >
+            @if (!tableChatMessages().length) {
+              <p class="text-xs text-slate-500 italic px-1 py-2">Aucun message — dites bonjour à la table.</p>
+            }
+            @for (msg of tableChatMessages(); track msg.id) {
+              <div class="text-xs leading-snug">
+                <span class="font-bold text-amber-200/90">{{ msg.authorName }}</span>
+                <span class="text-slate-600"> · {{ formatTableChatTime(msg.at) }}</span>
+                <p class="text-slate-200 whitespace-pre-wrap break-words">{{ msg.body }}</p>
+              </div>
+            }
+          </div>
+          <div class="flex gap-2">
+            <input
+              type="text"
+              class="flex-1 min-h-11 rounded-lg border border-slate-700 bg-[#171b22] px-3 text-sm text-slate-100"
+              maxlength="500"
+              placeholder="Écrire à la table…"
+              [ngModel]="tableChatDraft()"
+              (ngModelChange)="tableChatDraft.set($event)"
+              (keydown.enter)="$event.preventDefault(); sendTableChat()"
+            />
+            <button
+              type="button"
+              class="min-h-11 px-4 rounded-lg text-[10px] font-black uppercase bg-amber-900/40 border border-amber-700/50 text-amber-200 disabled:opacity-40"
+              [disabled]="tableChatSending() || !tableChatDraft().trim()"
+              (click)="sendTableChat()"
+            >
+              Envoyer
+            </button>
+          </div>
+        </div>
+      </details>
 
       @if (activeCombat(); as combat) {
         @if (!isDm() && combatTurnOrder().length) {
@@ -1973,12 +2137,13 @@
           @if (!isDm()) {
             <p class="text-xs text-slate-600">
               En attendant, ouvrez vos
-              <a
-                [routerLink]="['/campaigns', c.id]"
-                [queryParams]="{ tab: 'handouts' }"
+              <button
+                type="button"
                 class="text-emerald-400 hover:text-emerald-300 underline-offset-2 hover:underline"
-                >documents</a
+                (click)="openHandoutsOverlay()"
               >
+                documents
+              </button>
               @if (myApprovedMember()) {
                 ou
                 <button
@@ -1988,6 +2153,15 @@
                   (click)="openMySheet()"
                 >
                   votre fiche
+                </button>
+              } @else {
+                ou
+                <button
+                  type="button"
+                  class="text-sky-400 hover:text-sky-300 underline-offset-2 hover:underline"
+                  (click)="openProposeOverlay()"
+                >
+                  proposez un héros
                 </button>
               }
               .
@@ -2272,6 +2446,123 @@
           {{ dialog.confirmLabel }}
         </button>
       </div>
+    </div>
+  </div>
+}
+
+@if (playerOverlay(); as overlay) {
+  <div
+    class="fixed inset-0 z-[96] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm"
+    (click)="closePlayerOverlay()"
+    data-testid="play-player-overlay"
+  >
+    <div
+      class="w-full sm:max-w-lg max-h-[85vh] overflow-hidden rounded-t-2xl sm:rounded-2xl border border-emerald-900/40 bg-[#1b2028] shadow-2xl flex flex-col"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-modal="true"
+    >
+      @if (overlay === 'handouts') {
+        <div class="flex items-center justify-between gap-3 px-5 py-4 border-b border-slate-800">
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400">Documents</p>
+            <h3 class="text-lg font-serif text-slate-100">
+              @if (selectedHandout(); as h) {
+                {{ h.title }}
+              } @else {
+                Publiés par le MJ
+              }
+            </h3>
+          </div>
+          <button
+            type="button"
+            class="min-h-10 px-3 rounded-xl text-[10px] font-black uppercase text-slate-400 hover:text-slate-200 border border-slate-700"
+            (click)="selectedHandout() ? clearSelectedHandout() : closePlayerOverlay()"
+          >
+            {{ selectedHandout() ? 'Retour' : 'Fermer' }}
+          </button>
+        </div>
+        <div class="overflow-y-auto p-5 space-y-3 flex-1">
+          @if (selectedHandout(); as h) {
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+              {{ handoutKindLabels[h.kind] }}
+            </p>
+            <div class="text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">
+              {{ h.body || 'Document vide.' }}
+            </div>
+          } @else if (publishedHandouts().length === 0) {
+            <p class="text-sm text-slate-500 italic">Aucun document publié pour l’instant.</p>
+          } @else {
+            @for (h of publishedHandouts(); track h.id) {
+              <button
+                type="button"
+                class="w-full text-left px-4 py-3 rounded-xl border border-slate-700 hover:border-emerald-600/50 bg-[#171b22]"
+                (click)="selectHandout(h.id)"
+              >
+                <span class="font-serif text-slate-100 block">{{ h.title }}</span>
+                <span class="text-[10px] text-slate-500 uppercase tracking-widest">
+                  {{ handoutKindLabels[h.kind] }}
+                </span>
+              </button>
+            }
+          }
+        </div>
+      } @else {
+        <div class="flex items-center justify-between gap-3 px-5 py-4 border-b border-slate-800">
+          <div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">Table</p>
+            <h3 class="text-lg font-serif text-slate-100">Proposer un héros</h3>
+          </div>
+          <button
+            type="button"
+            class="min-h-10 px-3 rounded-xl text-[10px] font-black uppercase text-slate-400 hover:text-slate-200 border border-slate-700"
+            (click)="closePlayerOverlay()"
+          >
+            Fermer
+          </button>
+        </div>
+        <div class="overflow-y-auto p-5 space-y-3 flex-1">
+          <p class="text-xs text-slate-500 mb-2">
+            Choisissez un personnage. Le MJ devra l’approuver avant la fiche à la table.
+          </p>
+          @if (myCharactersLoading()) {
+            <p class="text-sm text-slate-500 animate-pulse">Chargement…</p>
+          } @else if (myCharacters().length === 0) {
+            <p class="text-sm text-slate-400 mb-3">Aucun personnage dans votre grimoire.</p>
+            <a
+              routerLink="/create"
+              [queryParams]="{ campaignId: campaign().id, returnUrl: '/campaigns/' + campaign().id + '/play' }"
+              class="inline-flex min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-sky-700 text-white hover:bg-sky-600"
+            >
+              Créer un personnage
+            </a>
+          } @else {
+            <div class="flex flex-col gap-2">
+              @for (ch of myCharacters(); track ch.id) {
+                <button
+                  type="button"
+                  class="w-full text-left px-4 py-3 rounded-xl border border-slate-700 hover:border-sky-500/50 text-sm text-slate-200 disabled:opacity-50"
+                  [disabled]="proposeBusyId() !== null"
+                  (click)="proposeCharacterFromPlay(ch.id)"
+                >
+                  @if (proposeBusyId() === ch.id) {
+                    Proposition…
+                  } @else {
+                    {{ ch.name }}
+                  }
+                </button>
+              }
+            </div>
+            <a
+              routerLink="/create"
+              [queryParams]="{ campaignId: campaign().id, returnUrl: '/campaigns/' + campaign().id + '/play' }"
+              class="inline-flex mt-2 text-[10px] font-black uppercase tracking-widest text-sky-400 underline"
+            >
+              Créer un autre personnage →
+            </a>
+          }
+        </div>
+      }
     </div>
   </div>
 }

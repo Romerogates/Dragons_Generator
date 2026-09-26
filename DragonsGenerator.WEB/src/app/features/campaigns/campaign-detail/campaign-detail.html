@@ -61,9 +61,23 @@
                 <a routerLink="/guide/joueur-table" class="underline hover:text-violet-400">Comment jouer</a>
               }
             </p>
+            @if (c.isArchived && !c.isHistory) {
+              <p class="mt-2 text-[11px] text-amber-300/90">
+                Archivée pour vous — toujours accessible ; vous n’avez pas quitté la table.
+              </p>
+            }
+            @if (c.isHistory) {
+              <p class="mt-2 text-[11px] text-amber-200/90">
+                Historique — lecture seule
+                @if (c.membershipStatus === 'left') { (vous avez quitté) }
+                @else if (c.membershipStatus === 'removed') { (retiré par le MJ) }
+                @else if (c.isClosed) { (campagne fermée) }
+                .
+              </p>
+            }
           </div>
           <div class="flex items-center gap-3 flex-wrap">
-            @if (c.isOwner) {
+            @if (c.isOwner && !c.isHistory) {
               <button
                 type="button"
                 class="min-h-10 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-500 text-slate-950 hover:bg-amber-400"
@@ -108,7 +122,39 @@
                 }
               </div>
             }
-            @if (!c.isOwner) {
+            @if (!c.isHistory) {
+              @if (c.isArchived) {
+                <button
+                  type="button"
+                  class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-emerald-800/40 text-emerald-300 hover:border-emerald-500/50 disabled:opacity-50"
+                  [disabled]="archiving()"
+                  (click)="setCampaignArchived(false)"
+                >
+                  {{ archiving() ? '…' : 'Désarchiver' }}
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:border-amber-500/50 hover:text-amber-200 disabled:opacity-50"
+                  [disabled]="archiving()"
+                  (click)="setCampaignArchived(true)"
+                  title="Masquer de votre liste sans quitter"
+                >
+                  {{ archiving() ? '…' : 'Archiver' }}
+                </button>
+              }
+            }
+            @if (c.isOwner && !c.isHistory) {
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40 disabled:opacity-50"
+                [disabled]="deletingCampaign()"
+                (click)="requestDeleteCampaign()"
+              >
+                {{ (c.hasPlayerHistory || players().length > 0) ? 'Fermer' : 'Supprimer' }}
+              </button>
+            }
+            @if (!c.isOwner && !c.isHistory) {
               <button
                 type="button"
                 class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 text-red-300 border border-red-900/40 disabled:opacity-50"
@@ -122,13 +168,13 @@
         </div>
 
         <nav
-          class="sticky z-20 flex flex-wrap gap-2 mt-6 -mx-1 px-1 py-2 rounded-xl bg-[#171b22]/95 backdrop-blur-md border border-slate-800/60 top-[var(--dg-sticky-top)]"
+          class="sticky z-20 flex flex-nowrap gap-2 mt-6 -mx-1 px-1 py-2 rounded-xl bg-[var(--dg-bg)]/95 backdrop-blur-md border border-slate-800/60 top-[var(--dg-sticky-top)] overflow-x-auto overscroll-x-contain custom-scrollbar"
           aria-label="Sections de la campagne"
         >
           @for (t of visibleTabs(); track t.id) {
             <button
               type="button"
-              class="relative inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors"
+              class="relative inline-flex shrink-0 items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors"
               [class]="tab() === t.id ? 'border-violet-500 text-violet-300 bg-violet-950/30' : 'border-slate-700 text-slate-500'"
               [attr.aria-label]="
                 t.id === 'players' && playersTabBadgeCount() > 0
@@ -152,7 +198,7 @@
               <span>{{ t.label }}</span>
               @if (t.id === 'players' && playersTabBadgeCount() > 0) {
                 <span
-                  class="absolute -top-1.5 -right-1.5 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none border-2 border-[#1b2028]"
+                  class="absolute -top-1.5 -right-1.5 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-amber-500 text-[9px] font-black text-slate-950 leading-none border-2 border-[var(--dg-surface)]"
                   aria-hidden="true"
                 >{{ playersTabBadgeCount() }}</span>
               }
@@ -595,9 +641,11 @@
                     <div class="bg-violet-950/20 border border-violet-800/40 rounded-2xl p-5">
                       <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-3">Pool MJ</h3>
                       <p class="text-xs text-slate-400 mb-4">
-                        Génère un héros original niveau 1 (espèce, classe, équipement, sorts). Chaque pré-tiré apparaît ci-dessous et aussi dans
-                        <a routerLink="/characters" class="text-violet-400 hover:underline">Mes héros</a>
-                        (nom « … (pré-tiré) »). Pour une fiche PDF complète : bouton « Voir la fiche » puis télécharger.
+                        Préparez des héros <span class="text-violet-300">avant même d’inviter</span> —
+                        vos joueurs les trouveront dès qu’ils rejoignent. Générez un original niveau 1,
+                        importez depuis
+                        <a routerLink="/characters" class="text-violet-400 hover:underline">Mes héros</a>,
+                        ou forgez-en un (ajouté automatiquement au pool).
                       </p>
                       <app-ai-generation-progress-bar class="block mb-4" />
                       <div class="flex flex-wrap gap-2 mb-4">
@@ -622,12 +670,22 @@
                         }
                         <a
                           routerLink="/create"
-                          [queryParams]="{ returnUrl: '/campaigns/' + c.id + '?tab=pregens' }"
+                          [queryParams]="{
+                            campaignId: c.id,
+                            intent: 'pregen',
+                            returnUrl: '/campaigns/' + c.id + '?tab=pregens'
+                          }"
                           class="px-3 py-2 rounded-xl text-xs border border-violet-800/50 text-violet-300 hover:border-violet-500/50"
                         >
-                          Créer puis importer →
+                          Créer puis ajouter →
                         </a>
                       </div>
+                      @if (!players().length) {
+                        <p class="text-[11px] text-slate-500 leading-relaxed">
+                          Aucun joueur pour l’instant — parfait pour peaufiner le pool. L’assignation
+                          apparaîtra dès qu’ils auront rejoint.
+                        </p>
+                      }
                     </div>
 
                     @for (p of c.data.pregenCharacters; track p.id) {
@@ -698,6 +756,11 @@
                           @if (p.status === 'draft') {
                             <button type="button" class="px-3 py-2 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white" (click)="markPregenReady(p.id)">Marquer prêt</button>
                           }
+                          @if (!players().length && p.status !== 'claimed') {
+                            <p class="w-full text-[11px] text-slate-500">
+                              Assignation dispo dès qu’un joueur rejoint la campagne.
+                            </p>
+                          }
                           @for (pl of players(); track pl.id) {
                             @if (p.status !== 'claimed') {
                               <button
@@ -715,7 +778,8 @@
                       <div class="rounded-2xl border border-dashed border-violet-800/50 bg-violet-950/15 p-6 text-center space-y-3">
                         <p class="text-[10px] font-black uppercase tracking-widest text-violet-400">Pré-tirés</p>
                         <p class="text-sm text-slate-300 max-w-md mx-auto">
-                          Aucun héros pré-tiré. Importez un personnage depuis vos héros ou générez-en un ci-dessus.
+                          Aucun héros pré-tiré. Générez-en un ci-dessus — pas besoin d’avoir des joueurs
+                          sur l’app pour commencer.
                         </p>
                       </div>
                     }
@@ -921,7 +985,11 @@
         @case ('players') {
           <section class="space-y-6">
             @if (c.isOwner && rosterFeedback(); as fb) {
-              <p class="text-sm text-emerald-400">{{ fb }}</p>
+              <p
+                class="text-sm text-emerald-400 rounded-xl border border-emerald-800/40 bg-emerald-950/20 px-4 py-3"
+                data-testid="players-invite-feedback"
+                role="status"
+              >{{ fb }}</p>
             }
             @if (c.isOwner) {
               <div class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5 space-y-4">
@@ -935,9 +1003,21 @@
                       class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-violet-700/50 text-violet-300 hover:border-violet-400 disabled:opacity-50"
                       [disabled]="joinLinkBusy()"
                       (click)="copyCampaignJoinLink()"
+                      data-testid="copy-join-link"
                     >
-                      Copier le lien campagne
+                      Copier le lien
                     </button>
+                    @if (canNativeShare()) {
+                      <button
+                        type="button"
+                        class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-emerald-800/50 text-emerald-300 hover:border-emerald-500/50 disabled:opacity-50"
+                        [disabled]="joinLinkBusy()"
+                        (click)="shareCampaignJoinLink()"
+                        data-testid="share-join-link"
+                      >
+                        Partager
+                      </button>
+                    }
                     <button
                       type="button"
                       class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-400 hover:text-violet-300 disabled:opacity-50"
@@ -1209,7 +1289,8 @@
         <div class="max-w-md w-full rounded-2xl border border-red-900/40 bg-[#1b2028] shadow-2xl p-5" (click)="$event.stopPropagation()">
           <p class="text-[10px] font-black uppercase tracking-widest text-red-400 mb-2">Quitter la campagne</p>
           <p class="text-sm text-slate-300 mb-4">
-            Cette action est irréversible sans nouvelle invitation. Pour confirmer, retapez le nom de la campagne :
+            Vous quittez le roster actif, mais un <span class="text-amber-200">historique en lecture seule</span>
+            reste disponible. Pour confirmer, retapez :
             <span class="font-bold text-slate-100">« {{ c.title }} »</span>
           </p>
           <input
@@ -1231,6 +1312,58 @@
               (click)="leaveCampaign()"
             >
               {{ leaving() ? 'Départ…' : 'Quitter définitivement' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (showDeleteConfirm()) {
+      <div class="fixed inset-0 z-[95] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" (click)="cancelDeleteCampaign()">
+        <div class="max-w-md w-full rounded-2xl border border-red-900/40 bg-[#1b2028] shadow-2xl p-5" (click)="$event.stopPropagation()">
+          <p class="text-[10px] font-black uppercase tracking-widest text-red-400 mb-2">
+            {{ (c.hasPlayerHistory || players().length > 0) ? 'Fermer la campagne' : 'Supprimer la campagne' }}
+          </p>
+          @if (c.hasPlayerHistory || players().length > 0) {
+            <p class="text-sm text-slate-300 mb-2">
+              Fermeture : plus de jeu, mais chaque joueur conserve un historique en lecture seule.
+            </p>
+            <p class="text-xs text-slate-500 mb-4">
+              Suppression définitive seulement si aucun joueur n’a jamais rejoint. Préférez Archiver pour masquer sans fermer.
+            </p>
+          } @else {
+            <p class="text-sm text-slate-300 mb-2">
+              Aucun joueur n’a jamais rejoint : suppression définitive.
+            </p>
+            <p class="text-xs text-slate-500 mb-4">
+              Préférez Archiver pour masquer sans effacer.
+            </p>
+          }
+          <p class="text-sm text-slate-400 mb-2">
+            Retapez <span class="font-bold text-slate-100">« {{ c.title }} »</span> pour confirmer.
+          </p>
+          <input
+            type="text"
+            [value]="deleteConfirmInput()"
+            (input)="deleteConfirmInput.set($any($event.target).value)"
+            [placeholder]="c.title"
+            class="w-full rounded-xl border border-slate-700 bg-[#12151b] px-3 py-2 text-sm text-slate-100 mb-4 focus:outline-none focus:border-red-500/60"
+            autofocus
+          />
+          @if (deleteCampaignError(); as derr) {
+            <p class="text-sm text-red-400 mb-3">{{ derr }}</p>
+          }
+          <div class="flex justify-end gap-3">
+            <button type="button" class="px-3 py-2 rounded-xl text-xs font-black uppercase text-slate-400 hover:text-slate-200" (click)="cancelDeleteCampaign()">
+              Annuler
+            </button>
+            <button
+              type="button"
+              class="px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-600 text-white disabled:opacity-40 disabled:cursor-not-allowed"
+              [disabled]="!canConfirmDeleteCampaign() || deletingCampaign()"
+              (click)="deleteCampaignFromDetail()"
+            >
+              {{ deletingCampaign() ? 'Suppression…' : 'Supprimer définitivement' }}
             </button>
           </div>
         </div>

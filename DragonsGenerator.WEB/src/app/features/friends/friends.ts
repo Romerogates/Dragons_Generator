@@ -67,6 +67,7 @@ export class FriendsPage implements OnInit, OnDestroy {
   readonly friendToRemove = signal<FriendUser | null>(null);
   readonly removing = signal(false);
   readonly activeTab = signal<FriendsTab>('discover');
+  private didAutoOpenRequests = false;
   readonly isLoggedIn = this.auth.isLoggedIn;
   readonly myDisplayName = computed(() => this.auth.user()?.displayName ?? '');
 
@@ -119,10 +120,27 @@ export class FriendsPage implements OnInit, OnDestroy {
   reload(): void {
     this.friends.listFriends().subscribe((f) => this.friendsList.set(f));
     this.chat.listSummaries().subscribe((s) => this.chatSummaries.set(s));
-    this.friends.listIncomingRequests().subscribe((r) => this.requests.set(r));
-    this.friends.listSentRequests().subscribe((r) => this.sentRequests.set(r));
-    this.friends.listCampaignInvites().subscribe((i) => this.campaignInvites.set(i));
+    this.friends.listIncomingRequests().subscribe((r) => {
+      this.requests.set(r);
+      this.maybeOpenRequestsTab();
+    });
+    this.friends.listSentRequests().subscribe((r) => {
+      this.sentRequests.set(r);
+      this.maybeOpenRequestsTab();
+    });
+    this.friends.listCampaignInvites().subscribe((i) => {
+      this.campaignInvites.set(i);
+      this.maybeOpenRequestsTab();
+    });
     this.notifications.refresh();
+  }
+
+  private maybeOpenRequestsTab(): void {
+    if (this.didAutoOpenRequests) return;
+    if (this.pendingRequestsCount() > 0) {
+      this.didAutoOpenRequests = true;
+      this.activeTab.set('requests');
+    }
   }
 
   loadSuggestions(): void {

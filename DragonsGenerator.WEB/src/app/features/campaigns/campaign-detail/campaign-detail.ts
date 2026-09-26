@@ -408,6 +408,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly setupGuideState = computed((): CampaignSetupGuideInput => {
     const c = this.campaign();
     const data = c?.data;
+    const readyPregenCount = (data?.pregenCharacters ?? []).filter((p) => p.status === 'ready').length;
     return {
       hasAdventure: !!(data?.adventure?.trim()),
       creatureCount: data?.creatures?.length ?? 0,
@@ -415,6 +416,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       encounterCount: data?.encounters?.length ?? 0,
       approvedPlayerCount: this.approvedPlayersWithCharacter().length,
       playerCount: this.players().length,
+      readyPregenCount,
       hasPlannedSession: !!(data?.sessions ?? []).some((s) => s.status === 'planned'),
       hasActiveSession: !!this.activePlaySession(),
       nextSessionTitle: this.nextPlannedSession()?.title ?? null,
@@ -425,12 +427,14 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly firstSessionChecklist = computed((): FirstSessionChecklistInput => {
     const data = this.campaign()?.data;
     const link = this.joinLink();
+    const readyPregenCount = (data?.pregenCharacters ?? []).filter((p) => p.status === 'ready').length;
     return {
       hasInviteActivity:
         this.pendingInvites().length > 0 ||
         this.players().length > 1 ||
         !!(link?.enabled && link.token),
       approvedPlayerCount: this.approvedPlayersWithCharacter().length,
+      readyPregenCount,
       hasPlannedSession: !!(data?.sessions ?? []).some((s) => s.status === 'planned'),
       hasActiveSession: !!this.activePlaySession(),
       playedSessionCount: this.playedSessionCount(),
@@ -708,6 +712,25 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         queryParamsHandling: 'merge',
         replaceUrl: true,
       });
+    }
+    const addPregenId = this.route.snapshot.queryParamMap.get('addPregen')?.trim();
+    if (addPregenId) {
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { addPregen: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
+      // Attendre le premier reload campagne avant d’attacher.
+      const waitOwner = setInterval(() => {
+        const c = this.campaign();
+        if (!c) return;
+        clearInterval(waitOwner);
+        if (c.isOwner) {
+          void this.attachCharacterAsPregen(addPregenId);
+        }
+      }, 50);
+      setTimeout(() => clearInterval(waitOwner), 8_000);
     }
   }
 
@@ -1013,13 +1036,13 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     });
   }
 
+  /** Web Share API dispo (souvent mobile). */
+  canNativeShare(): boolean {
+    return typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+  }
+
   copyCampaignJoinLink(): void {
-    const c = this.campaign();
-    if (!c?.isOwner || this.joinLinkBusy()) return;
-    const existing = this.joinLink();
-    const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const write = (token: string) => {
-      const url = `${origin}/join/${token}`;
+    this.withJoinLinkUrl((url) => {
       if (!navigator.clipboard?.writeText) {
         this.rosterFeedback.set('Presse-papiers indisponible.');
         return;
@@ -1031,10 +1054,48 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
           ),
         () => this.rosterFeedback.set('Impossible de copier le lien.'),
       );
-    };
+    });
+  }
+
+  /** Partage natif (OS) ; repli copie presse-papiers. */
+  shareCampaignJoinLink(): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    this.withJoinLinkUrl((url) => {
+      if (this.canNativeShare()) {
+        void navigator
+          .share({
+            title: c.title,
+            text: `Rejoins la table « ${c.title} » sur Dragons Generator`,
+            url,
+          })
+          .then(() => this.rosterFeedback.set('Invitation partagée.'))
+          .catch(() => undefined);
+        return;
+      }
+      if (!navigator.clipboard?.writeText) {
+        this.rosterFeedback.set('Partage indisponible sur cet appareil.');
+        return;
+      }
+      void navigator.clipboard.writeText(url).then(
+        () =>
+          this.rosterFeedback.set(
+            'Lien d’invitation copié — vos invités rejoignent sans être amis.',
+          ),
+        () => this.rosterFeedback.set('Impossible de copier le lien.'),
+      );
+    });
+  }
+
+  private withJoinLinkUrl(use: (url: string) => void): void {
+    const c = this.campaign();
+    if (!c?.isOwner || this.joinLinkBusy()) return;
+    const existing = this.joinLink();
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const deliver = (token: string) => use(`${origin}/join/${token}`);
 
     if (existing?.enabled && existing.token) {
-      write(existing.token);
+      deliver(existing.token);
       return;
     }
 
@@ -1043,7 +1104,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       next: (link) => {
         this.joinLink.set({ token: link.token, enabled: link.enabled });
         this.joinLinkBusy.set(false);
-        if (link.token) write(link.token);
+        if (link.token) deliver(link.token);
       },
       error: () => {
         this.joinLinkBusy.set(false);
@@ -1199,6 +1260,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       case 'openPlayers':
         this.setTab('players');
         break;
+      case 'openPregens':
+        this.setTab('pregens');
+        break;
       case 'addSession':
         this.addSession();
         break;
@@ -1237,6 +1301,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         break;
       case 'openPlayers':
         this.setTab('players');
+        break;
+      case 'openPregens':
+        this.setTab('pregens');
         break;
       case 'openSessions':
         this.setTab('sessions');
@@ -1764,7 +1831,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
   saveData(patch: Partial<CampaignData>): void {
     const c = this.campaign();
-    if (!c) return;
+    if (!c || c.isHistory) return;
     const data = { ...c.data, ...patch };
     this.campaign.update((prev) => (prev ? { ...prev, data } : prev));
 
@@ -2058,6 +2125,11 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly leaving = signal(false);
   readonly showLeaveConfirm = signal(false);
   readonly leaveConfirmInput = signal('');
+  readonly archiving = signal(false);
+  readonly deletingCampaign = signal(false);
+  readonly showDeleteConfirm = signal(false);
+  readonly deleteConfirmInput = signal('');
+  readonly deleteCampaignError = signal<string | null>(null);
 
   /** Ouvre la boîte de confirmation (retaper le nom de la campagne pour la quitter). */
   requestLeaveCampaign(): void {
@@ -2092,6 +2164,68 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       error: () => {
         this.leaving.set(false);
         this.error.set('Impossible de quitter la campagne.');
+      },
+    });
+  }
+
+  setCampaignArchived(archived: boolean): void {
+    const c = this.campaign();
+    if (!c || c.isHistory || this.archiving()) return;
+    this.archiving.set(true);
+    this.campaigns.setArchived(c.id, archived).subscribe({
+      next: () => {
+        this.campaign.update((cur) => (cur ? { ...cur, isArchived: archived } : cur));
+        this.archiving.set(false);
+        this.syncNotice.set(
+          archived
+            ? 'Campagne archivée — toujours accessible depuis Archives.'
+            : 'Campagne désarchivée — de retour dans Actives.',
+        );
+        window.setTimeout(() => {
+          const n = this.syncNotice();
+          if (n?.includes('archiv')) this.syncNotice.set(null);
+        }, 4_000);
+      },
+      error: () => {
+        this.archiving.set(false);
+        this.error.set(archived ? 'Impossible d’archiver.' : 'Impossible de désarchiver.');
+      },
+    });
+  }
+
+  requestDeleteCampaign(): void {
+    const c = this.campaign();
+    if (!c?.isOwner || this.deletingCampaign()) return;
+    this.deleteConfirmInput.set('');
+    this.deleteCampaignError.set(null);
+    this.showDeleteConfirm.set(true);
+  }
+
+  cancelDeleteCampaign(): void {
+    this.showDeleteConfirm.set(false);
+    this.deleteConfirmInput.set('');
+    this.deleteCampaignError.set(null);
+  }
+
+  readonly canConfirmDeleteCampaign = computed(() => {
+    const c = this.campaign();
+    return !!c && this.deleteConfirmInput().trim() === c.title.trim();
+  });
+
+  deleteCampaignFromDetail(): void {
+    const c = this.campaign();
+    if (!c?.isOwner || !this.canConfirmDeleteCampaign() || this.deletingCampaign()) return;
+    this.deletingCampaign.set(true);
+    this.deleteCampaignError.set(null);
+    this.campaigns.delete(c.id).subscribe({
+      next: () => {
+        this.deletingCampaign.set(false);
+        this.showDeleteConfirm.set(false);
+        this.router.navigate(['/campaigns']);
+      },
+      error: () => {
+        this.deletingCampaign.set(false);
+        this.deleteCampaignError.set('Échec de la suppression. Réessayez.');
       },
     });
   }
@@ -2329,6 +2463,48 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       });
     } catch {
       this.pregenFeedback.set('Impossible d’importer ce personnage.');
+    } finally {
+      this.importingPregen.set(false);
+    }
+  }
+
+  /**
+   * Attache un héros déjà créé (forge « intent=pregen ») au pool sans le re-cloner.
+   * Utile pour préparer la table avant l’arrivée des joueurs.
+   */
+  async attachCharacterAsPregen(characterId: string): Promise<void> {
+    const c = this.campaign();
+    if (!c?.isOwner || !characterId || this.importingPregen()) return;
+
+    const existing = (c.data.pregenCharacters ?? []).some((p) => p.characterId === characterId);
+    if (existing) {
+      this.setTab('pregens');
+      this.pregenFeedback.set('Ce héros est déjà dans le pool de pré-tirés.');
+      return;
+    }
+
+    this.importingPregen.set(true);
+    this.pregenFeedback.set(null);
+    try {
+      const res = await firstValueFrom(this.characters.get(characterId));
+      const ch = res.data as Character;
+      const speciesLabel = ch.species?.subspeciesLabel
+        ? `${ch.species.label} (${ch.species.subspeciesLabel})`
+        : (ch.species?.label ?? '—');
+      const classLabel = (ch.classes ?? []).map((cl) => cl.classLabel).join(' / ') || '—';
+      const entry = createCampaignPregenEntry(ch.id, ch.name || 'Héros', speciesLabel, classLabel);
+      const story = ch.personality?.story?.trim() ?? '';
+      entry.publicHook = story.split(/[.!?]/)[0]?.trim() || story.slice(0, 140);
+      entry.dmBackstory = story;
+      entry.status = 'ready';
+      this.saveData({
+        pregenCharacters: [...(c.data.pregenCharacters ?? []), entry],
+      });
+      this.setTab('pregens');
+      this.pregenFeedback.set(`${ch.name} ajouté aux pré-tirés — prêt pour la table.`);
+    } catch {
+      this.pregenFeedback.set('Impossible d’ajouter ce personnage aux pré-tirés.');
+      this.setTab('pregens');
     } finally {
       this.importingPregen.set(false);
     }

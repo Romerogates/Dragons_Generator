@@ -1,16 +1,30 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  input,
+  output,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-codex-empty-state',
   standalone: true,
   imports: [RouterLink],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `
     <div
-      class="col-span-full flex flex-col items-center justify-center gap-3 py-16 px-4 text-center"
+      class="col-span-full flex flex-col items-center justify-center gap-3 py-12 px-6 text-center bg-[#1b2028] border border-dashed border-slate-700 rounded-3xl shadow-inner"
       role="status"
     >
-      <p class="text-slate-300 font-serif text-lg">{{ title() }}</p>
+      @if (icon()) {
+        <span class="text-5xl mb-2 opacity-80 drop-shadow-lg" aria-hidden="true">
+          <iconify-icon [attr.icon]="icon()"></iconify-icon>
+        </span>
+      }
+      <h2 class="text-xl font-bold text-slate-200 font-serif tracking-widest uppercase">
+        {{ title() }}
+      </h2>
       <p class="text-slate-500 text-sm max-w-md leading-relaxed">{{ message() }}</p>
       @if (ctaLabel() && ctaRoute()) {
         <a
@@ -38,6 +52,8 @@ export class CodexEmptyState {
   readonly message = input(
     'Aucun élément ne correspond. Essayez d’autres filtres, ou ouvrez le Guide pour démarrer.',
   );
+  /** Iconify id (ex. fluent-emoji:scroll) — même langage que Pages / Parchemins vierges. */
+  readonly icon = input<string | null>('fluent-emoji:scroll');
   readonly ctaLabel = input<string | null>(null);
   readonly ctaRoute = input<string | null>(null);
   readonly clearFiltersLabel = input<string | null>(null);

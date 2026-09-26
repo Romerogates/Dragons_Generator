@@ -11,6 +11,7 @@ function base(overrides: Partial<CampaignSetupGuideInput> = {}): CampaignSetupGu
     encounterCount: 0,
     approvedPlayerCount: 0,
     playerCount: 0,
+    readyPregenCount: 0,
     hasPlannedSession: false,
     hasActiveSession: false,
     nextSessionTitle: null,
@@ -103,9 +104,8 @@ describe('buildCampaignSetupGuide', () => {
         encounterCount: 1,
       }),
     );
-    expect(playersEmpty.current?.proposal).toContain(
-      'la table n’aura personne du côté allié en session',
-    );
+    expect(playersEmpty.current?.proposal).toContain('même si personne n’a encore l’app');
+    expect(playersEmpty.current?.primaryAction).toBe('openPregens');
 
     const playersReady = buildCampaignSetupGuide(
       base({
@@ -116,7 +116,21 @@ describe('buildCampaignSetupGuide', () => {
         playerCount: 2,
       }),
     );
-    expect(playersReady.current?.proposal).toContain('importer à la table');
+    expect(playersReady.current?.id).toBe('players');
+    expect(playersReady.current?.proposal).toContain('approuvez');
+    expect(playersReady.current?.primaryAction).toBe('openPregens');
+
+    const pregensOnly = buildCampaignSetupGuide(
+      base({
+        hasAdventure: true,
+        creatureCount: 1,
+        mapsSkipped: true,
+        encounterCount: 1,
+        readyPregenCount: 2,
+      }),
+    );
+    expect(pregensOnly.steps.find((s) => s.id === 'players')?.done).toBe(true);
+    expect(pregensOnly.current?.id).toBe('session');
   });
 
   it('session step explains prep vs play', () => {

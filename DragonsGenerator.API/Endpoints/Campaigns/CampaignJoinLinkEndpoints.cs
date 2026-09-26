@@ -186,6 +186,13 @@ public class JoinCampaignByTokenEndpoint(AppDbContext db) : EndpointWithoutReque
             return;
         }
 
+        if (campaign.ClosedAt is not null)
+        {
+            AddError("Cette campagne est fermée.");
+            await Send.ErrorsAsync(StatusCodes.Status400BadRequest, ct);
+            return;
+        }
+
         if (campaign.OwnerUserId == userId)
         {
             await Send.OkAsync(
@@ -194,7 +201,7 @@ public class JoinCampaignByTokenEndpoint(AppDbContext db) : EndpointWithoutReque
                     campaign.Title,
                     CampaignMemberRoles.Dm,
                     campaign.UpdatedAt,
-                    campaign.Members.Count(m => m.Role == CampaignMemberRoles.Player),
+                    campaign.Members.Count(CampaignHistoryHelpers.IsActivePlayer),
                     CampaignJsonHelpers.RegionNameFromJson(campaign.JsonData)),
                 ct);
             return;
@@ -217,9 +224,18 @@ public class JoinCampaignByTokenEndpoint(AppDbContext db) : EndpointWithoutReque
                 db, campaign.Id, userId.Value, CampaignActivityKinds.InviteAccepted,
                 new { via = "join-link", campaignTitle = campaign.Title }, ct);
         }
+        else if (existing.LeftAt is not null || existing.RemovedAt is not null)
+        {
+            CampaignHistoryHelpers.Reactivate(existing);
+            campaign.UpdatedAt = DateTimeOffset.UtcNow;
+            await db.SaveChangesAsync(ct);
 
-        var playerCount = await db.CampaignMembers.AsNoTracking()
-            .CountAsync(m => m.CampaignId == campaign.Id && m.Role == CampaignMemberRoles.Player, ct);
+            await CampaignActivityService.LogAsync(
+                db, campaign.Id, userId.Value, CampaignActivityKinds.InviteAccepted,
+                new { via = "join-link-rejoin", campaignTitle = campaign.Title }, ct);
+        }
+
+        var playerCount = campaign.Members.Count(CampaignHistoryHelpers.IsActivePlayer);
 
         await Send.OkAsync(
             new CampaignSummaryDto(

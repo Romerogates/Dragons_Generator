@@ -4,6 +4,11 @@
 
 @layer base {
   :root {
+    --dg-bg: #171b22;
+    --dg-surface: #1b2028;
+    --dg-surface-deep: #141820;
+    --dg-ink: #0e1117;
+    --dg-ink-deep: #0a0d13;
     --dg-nav-height: 4rem;
     --dg-banner-height: 0px;
     --dg-play-header-height: 3.25rem;
@@ -52,16 +57,58 @@
   /* Wizard creation — common bottom-centered nav */
   .wizard-step-nav {
     @apply mt-auto shrink-0 w-full flex flex-wrap justify-center items-center gap-2.5 sm:gap-3 pt-3 px-2
-      sticky bottom-0 z-20 bg-[#171b22]/95 backdrop-blur-md border-t border-slate-800/70;
+      sticky bottom-0 z-20 backdrop-blur-md border-t border-slate-800/70;
+    background-color: color-mix(in srgb, var(--dg-bg) 95%, transparent);
     padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
   }
 
   .wizard-nav-hint {
-    @apply w-full text-center text-[9px] font-bold uppercase tracking-widest text-amber-500/80 animate-pulse order-first basis-full;
+    @apply w-full text-center text-[9px] font-bold uppercase tracking-widest text-amber-500/80 order-first basis-full;
+    animation: dg-hint-pulse 1.6s ease-out 1;
   }
 
   .wizard-nav-secondary {
-    @apply text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-400 transition-colors bg-[#1b2028] px-5 sm:px-6 py-2.5 rounded-full border border-slate-700 shadow-lg;
+    @apply text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-400 transition-colors px-5 sm:px-6 py-2.5 rounded-full border border-slate-700 shadow-lg;
+    background-color: var(--dg-surface);
+  }
+
+  /* Selects forge / formulaires — chevron custom après appearance-none */
+  .dg-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.9rem center;
+    background-size: 12px 8px;
+  }
+
+  /* Dock chrome partagé (messages + session) */
+  .dg-dock-panel {
+    @apply border border-slate-700/80 shadow-[0_12px_48px_rgba(0,0,0,0.55)] overflow-hidden;
+    background-color: var(--dg-surface);
+  }
+
+  .dg-dock-header {
+    @apply shrink-0 flex items-center justify-between gap-2 px-4 border-b border-slate-800;
+    background-color: var(--dg-bg);
+    padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+    padding-bottom: 0.75rem;
+  }
+
+  .dg-dock-fab {
+    @apply w-14 h-14 rounded-full flex items-center justify-center shadow-[0_8px_28px_rgba(0,0,0,0.45)] border transition-transform active:scale-95;
+  }
+
+  /* Guide mobile : sommaire plein écran (drawer) */
+  @media (max-width: 1023px) {
+    .guide-sommaire-drawer-open {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      height: 100dvh;
+      max-height: 100dvh;
+      padding-top: env(safe-area-inset-top, 0px);
+      background-color: var(--dg-surface-deep);
+    }
   }
 
   .wizard-nav-primary {
@@ -179,35 +226,36 @@
     overscroll-behavior: none;
   }
 
-  /* Hauteurs : vh puis dvh (Chrome Android barre d’URL) */
+  /* Hauteurs : carte quasi visible dans le wizard (contain + stage haut) */
   .eana-map-stage {
     width: 100%;
-    height: 42vh;
-    height: 42dvh;
-    min-height: 220px;
-    max-height: 520px;
+    height: 58vh;
+    height: 58dvh;
+    min-height: 280px;
+    max-height: 640px;
   }
 
   @media (min-width: 640px) {
     .eana-map-stage {
-      height: 48vh;
-      height: 48dvh;
+      height: 62vh;
+      height: 62dvh;
+      min-height: 360px;
     }
   }
 
   @media (min-width: 768px) {
     .eana-map-stage {
-      height: 52vh;
-      height: 52dvh;
-      max-height: 560px;
+      height: 64vh;
+      height: 64dvh;
+      max-height: 700px;
     }
   }
 
   @media (min-width: 1024px) {
     .eana-map-stage {
-      height: 56vh;
-      height: 56dvh;
-      max-height: 600px;
+      height: 68vh;
+      height: 68dvh;
+      max-height: 760px;
     }
   }
 
@@ -389,5 +437,18 @@
   .guide-print-article a {
     color: #000 !important;
     text-decoration: none !important;
+  }
+}
+
+@keyframes dg-hint-pulse {
+  0%,
+  40% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.45;
+  }
+  100% {
+    opacity: 1;
   }
 }

@@ -38,6 +38,8 @@ export class Home implements OnInit {
   readonly summaryLoading = signal(false);
   readonly summaryError = signal(false);
   readonly showRoleOnboarding = signal(false);
+  /** Après choix de rôle : CTAs adaptés (pas encore fermé). */
+  readonly roleOnboardingChoice = signal<'dm' | 'player' | null>(null);
 
   readonly hasPulse = computed(() => {
     const s = this.summary();
@@ -103,13 +105,19 @@ export class Home implements OnInit {
 
   chooseRole(role: 'dm' | 'player'): void {
     this.guidePrefs.setAudience(role);
+    this.roleOnboardingChoice.set(role);
+  }
+
+  finishRoleOnboarding(path?: string): void {
     this.showRoleOnboarding.set(false);
-    void this.router.navigate(['/guide']);
+    this.roleOnboardingChoice.set(null);
+    if (path) void this.router.navigateByUrl(path);
   }
 
   skipRoleOnboarding(): void {
     this.guidePrefs.setAudience('all');
     this.showRoleOnboarding.set(false);
+    this.roleOnboardingChoice.set(null);
   }
 
   formatSessionDate(iso: string): string {

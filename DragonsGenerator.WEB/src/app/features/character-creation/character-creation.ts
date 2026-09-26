@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '@core/services/auth.service';
 import { CharacterBuilderService } from '../../core/services/character-builder.service';
 import { ConnectivityService } from '@core/services/connectivity.service';
 import { OfflineCodexService } from '@core/services/offline-codex.service';
@@ -60,9 +61,13 @@ export class CharacterCreation implements OnInit {
   private readonly connectivity = inject(ConnectivityService);
   private readonly offlineCodex = inject(OfflineCodexService);
   private readonly handoff = inject(CharacterHandoffService);
+  private readonly auth = inject(AuthService);
 
   readonly isOnline = this.connectivity.isOnline;
+  readonly isLoggedIn = this.auth.isLoggedIn;
   readonly codexReady = signal(this.offlineCodex.isDownloaded());
+  readonly codexDownloading = this.offlineCodex.downloading;
+  readonly codexDownloadError = this.offlineCodex.downloadError;
 
   /** Affiche l'overlay de choix brouillon. */
   readonly showDraftPrompt = signal(false);
@@ -110,6 +115,14 @@ export class CharacterCreation implements OnInit {
   /** Raccourci après correction depuis le récap. */
   goToSummary(): void {
     this.builder.goToSummary();
+  }
+
+  downloadCodexHere(): void {
+    this.offlineCodex.downloadCodex().subscribe({
+      next: (ok) => {
+        if (ok) this.codexReady.set(true);
+      },
+    });
   }
 
   onReset(): void {

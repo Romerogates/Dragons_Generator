@@ -23,7 +23,7 @@
     >
       @if (dock.isOpen()) {
         <div
-          class="friend-chat-panel pointer-events-auto flex overflow-hidden animate-dock-in bg-[#1b2028] border border-slate-700/80 shadow-[0_12px_48px_rgba(0,0,0,0.55)]"
+          class="friend-chat-panel dg-dock-panel pointer-events-auto flex overflow-hidden animate-dock-in"
           [ngClass]="
             dock.expanded()
               ? 'flex-col lg:flex-row w-full h-[100dvh] max-h-[100dvh] lg:h-full lg:max-h-none lg:w-full lg:max-w-6xl lg:mx-auto lg:rounded-2xl rounded-none'
@@ -33,7 +33,7 @@
         >
           <!-- Liste conversations -->
           <div
-            class="flex flex-col min-h-0 bg-[#1b2028]"
+            class="flex flex-col min-h-0 bg-[var(--dg-surface)]"
             [class.hidden]="dock.view() === 'thread' && !dock.expanded()"
             [class.max-lg:hidden]="dock.view() === 'thread' && dock.expanded()"
             [ngClass]="
@@ -42,9 +42,7 @@
                 : 'w-full h-full'
             "
           >
-            <header
-              class="shrink-0 flex items-center justify-between gap-2 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 border-b border-slate-800 bg-[#171b22]"
-            >
+            <header class="dg-dock-header">
               <button
                 type="button"
                 class="lg:hidden w-9 h-9 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-800"
@@ -473,7 +471,7 @@
       } @else {
         <button
           type="button"
-          class="friend-chat-fab pointer-events-auto relative w-14 h-14 rounded-full text-white shadow-[0_8px_28px_rgba(124,58,237,0.45)] flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+          class="friend-chat-fab dg-dock-fab pointer-events-auto relative text-white border-violet-500/40"
           [ngClass]="fabGradient()"
           aria-label="Messages"
           (click)="toggle()"
@@ -481,7 +479,7 @@
           <iconify-icon icon="mdi:message-text" class="text-2xl"></iconify-icon>
           @if (dock.totalUnread() > 0) {
             <span
-              class="absolute -top-0.5 -right-0.5 min-w-[1.25rem] h-5 px-1 flex items-center justify-center rounded-full bg-red-500 text-[10px] font-black text-white ring-2 ring-[#171b22]"
+              class="absolute -top-0.5 -right-0.5 min-w-[1.25rem] h-5 px-1 flex items-center justify-center rounded-full bg-red-500 text-[10px] font-black text-white ring-2 ring-[var(--dg-bg)]"
               >{{ dock.totalUnread() > 9 ? '9+' : dock.totalUnread() }}</span
             >
           }

@@ -602,7 +602,14 @@ export const GUIDE_FAQ_ITEMS: GuideFaqItem[] = [
       id: 'faq-pretire',
       question: 'À quoi servent les personnages pré-tirés ?',
       answer:
-        'Le MJ prépare des héros pour l’aventure. Les joueurs peuvent les consulter en lecture seule, les utiliser à la table (sans les ajouter à Mes héros), ou en faire une copie optionnelle dans leur bibliothèque.',
+        'Le MJ peut les préparer avant même que les joueurs aient l’app (Préparation → Pré-tirés). Les joueurs consultent en lecture seule, utilisent à la table, ou en font une copie optionnelle dans Mes héros.',
+      audience: 'all',
+    },
+    {
+      id: 'faq-archive-delete',
+      question: 'Archiver, historique, fermer, supprimer ou quitter — quelle différence ?',
+      answer:
+        'Archiver masque la campagne de vos Actives sans quitter. Quitter / être retiré vous place en Historique (lecture seule, snapshot). Fermer (MJ, s’il y a eu des joueurs) arrête la table mais conserve l’historique pour tous. Supprimer définitivement n’arrive que si le MJ est seul (aucun joueur n’a jamais rejoint).',
       audience: 'all',
     },
   ];
@@ -610,6 +617,16 @@ export const GUIDE_FAQ_ITEMS: GuideFaqItem[] = [
 export const GUIDE_GLOSSARY: GuideGlossaryItem[] = [
     { term: 'Table', definition: 'Espace de jeu en direct du MJ : notes, rencontres, tracker de combat.' },
     { term: 'Pré-tiré', definition: 'Personnage préparé par le MJ pour l’aventure ; consultation / usage table sans appropriation obligatoire.' },
+    {
+      term: 'Archive (campagne)',
+      definition:
+        'Masque une campagne de votre liste Actives sans quitter : toujours dans Archives, URL inchangée.',
+    },
+    {
+      term: 'Historique (campagne)',
+      definition:
+        'Campagne quittée, dont vous avez été retiré, ou fermée par le MJ — consultation lecture seule (snapshot figé).',
+    },
     { term: 'Lien d’invitation', definition: 'URL /join/… que le MJ partage pour faire rejoindre une campagne sans être ami.' },
     { term: 'Document', definition: 'Fiche publiée aux joueurs (lettre, carte, résumé…) en markdown léger ; les cartes embarquent une image PNG.' },
     {

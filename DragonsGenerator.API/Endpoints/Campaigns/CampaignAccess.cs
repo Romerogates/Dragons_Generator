@@ -21,6 +21,18 @@ public static class CampaignAccess
     public static bool CanView(bool isOwner, CampaignMember? membership) =>
         isOwner || membership is not null;
 
-    public static bool CanEdit(bool isOwner, CampaignMember? membership) =>
-        isOwner || membership?.Role == CampaignMemberRoles.Dm;
+    /// <summary>Édition live : owner/DM actif, campagne non fermée, membership non scellé.</summary>
+    public static bool CanEdit(bool isOwner, CampaignMember? membership, CampaignRecord? campaign = null)
+    {
+        if (campaign?.ClosedAt is not null) return false;
+        if (membership is not null && CampaignHistoryHelpers.IsFormerOrHistory(membership)) return false;
+        return isOwner || membership?.Role == CampaignMemberRoles.Dm;
+    }
+
+    public static bool CanPlay(bool isOwner, CampaignMember? membership, CampaignRecord campaign)
+    {
+        if (campaign.ClosedAt is not null) return false;
+        if (membership is not null && CampaignHistoryHelpers.IsFormerOrHistory(membership)) return false;
+        return isOwner || (membership is not null && membership.Role == CampaignMemberRoles.Player);
+    }
 }

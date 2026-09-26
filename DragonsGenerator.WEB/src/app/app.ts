@@ -2,6 +2,7 @@ import {
   Component,
   DestroyRef,
   effect,
+  ElementRef,
   inject,
   OnInit,
   signal,
@@ -28,8 +29,8 @@ import {
   shouldShowReconnectBanner,
 } from '@core/utils/legacy-auth-migration.util';
 
-/** Hauteur approximative d’une bannière sticky (py-2 + texte). */
-const BANNER_ROW_PX = 40;
+/** Hauteur de repli si mesure DOM indisponible. */
+const BANNER_ROW_PX_FALLBACK = 40;
 
 @Component({
   selector: 'app-root',
@@ -56,6 +57,7 @@ export class App implements OnInit {
   private readonly pwa = inject(PwaLifecycleService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
+  private readonly host = inject(ElementRef<HTMLElement>);
 
   protected readonly title = signal('DragonsGenerator.WEB');
 
@@ -64,32 +66,57 @@ export class App implements OnInit {
   readonly updateReady = this.pwa.updateReady;
   readonly showReconnectBanner = signal(shouldShowReconnectBanner());
 
-  /** Guide : viewport verrouillé — pas de footer sous la page. */
+  /** Guide + table /play : pas de nav/footer site (chrome dédié). */
   readonly hideSiteChrome = toSignal(
     this.router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
-      map(() => this.router.url.startsWith('/guide')),
-      startWith(this.router.url.startsWith('/guide')),
+      map(() => this.shouldHideSiteChrome(this.router.url)),
+      startWith(this.shouldHideSiteChrome(this.router.url)),
     ),
     { initialValue: false },
   );
 
+  private shouldHideSiteChrome(url: string): boolean {
+    const path = url.split('?')[0] ?? url;
+    return path.startsWith('/guide') || /\/campaigns\/[^/]+\/play\/?$/.test(path);
+  }
+
   constructor() {
     effect(() => {
-      let rows = 0;
-      if (this.showReconnectBanner()) rows += 1;
-      if (!this.isOnline()) rows += 1;
-      if (this.updateReady()) rows += 1;
-      const px = rows * BANNER_ROW_PX;
-      if (typeof document !== 'undefined') {
-        document.documentElement.style.setProperty('--dg-banner-height', `${px}px`);
-      }
+      // Dépendances signal : recalcule quand une bannière apparaît/disparaît.
+      void this.showReconnectBanner();
+      void this.isOnline();
+      void this.updateReady();
+      queueMicrotask(() => this.measureBannerHeight());
     });
     this.destroyRef.onDestroy(() => {
       if (typeof document !== 'undefined') {
         document.documentElement.style.removeProperty('--dg-banner-height');
       }
     });
+    if (typeof window !== 'undefined') {
+      const onResize = (): void => this.measureBannerHeight();
+      window.addEventListener('resize', onResize);
+      this.destroyRef.onDestroy(() => window.removeEventListener('resize', onResize));
+    }
+  }
+
+  private measureBannerHeight(): void {
+    if (typeof document === 'undefined') return;
+    const root = this.host.nativeElement as HTMLElement;
+    const banners = root.querySelectorAll<HTMLElement>('[data-dg-banner]');
+    let total = 0;
+    banners.forEach((el) => {
+      total += el.getBoundingClientRect().height;
+    });
+    if (total <= 0) {
+      let rows = 0;
+      if (this.showReconnectBanner()) rows += 1;
+      if (!this.isOnline()) rows += 1;
+      if (this.updateReady()) rows += 1;
+      total = rows * BANNER_ROW_PX_FALLBACK;
+    }
+    document.documentElement.style.setProperty('--dg-banner-height', `${Math.round(total)}px`);
   }
 
   ngOnInit(): void {

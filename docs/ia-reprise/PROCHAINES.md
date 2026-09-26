@@ -19,6 +19,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 1. ~~Vague A (rendu / zoom / notes / bannières)~~ **fait**
 2. ~~Vague B (hub + import copie + chat amis)~~ **fait** — lien public token = plus tard
 3. ~~Suite éditeur (flood-fill / brosse / redo / lien membres / FoW polish)~~ **fait** (2026-09-20) — token public anonyme toujours hors scope
+4. ~~Sprint A battle map~~ **fait** (2026-09-23) — jetons `mapX`/`mapY` ; FoW depuis Combat ; fil de table `tableChat` + `POST …/table-chat`
 
 ### Table + Codex
 1. ~~Fiabilité table (persist / softReload / hints setup)~~ **fait**
@@ -58,6 +59,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## Déjà livré (ne pas refaire)
 
+- **Sprint A battle map** (2026-09-23) — positions jetons sur `Combatant` ; canvas live MJ+joueur ; placement/drag MJ ; barre FoW salles en Combat ; fil de table `CampaignSession.tableChat` + endpoint `POST /me/campaigns/{id}/table-chat` ; utils `dungeon-battle` / `dungeon-fog`.
 - **Donjons suite éditeur** (2026-09-20) — flood-fill + brosse 1–3 ; redo (Ctrl+Y) ; FoW UX polish ; lien copiable `?tab=maps&map=` pour membres ; hub copy clarifiée. Token public anonyme reporté.
 - **Donjons Vague B** (2026-09-18) — biblio cloud `DungeonRecord` + `/me/dungeons` ; hub nav Donjons ; éditeur partagé ; import **copie** en campagne ; pièce jointe chat `dungeon` + lecture ami ; lien public hors scope.
 - **Donjons Vague A** (2026-09-18) — rendu portes/marqueurs moins empietés ; viewport teinté + Fit ~1.75 + padding canvas ; notes marqueurs dans panneau Salles ; prefs compte `hideAllBanners` / `dismissedBannerIds` (setup-guide, toast donjon, welcome, checklist) + toggle Paramètres → Application.

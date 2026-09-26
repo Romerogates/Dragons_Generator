@@ -38,6 +38,8 @@ export class CustomizeCreaturesStep implements OnInit {
 
   readonly generatingId = signal<string | null>(null);
   readonly generationError = signal<string | null>(null);
+  /** Info non bloquante (ex. secours après échec du lot). */
+  readonly fallbackNotice = signal<string | null>(null);
 
   readonly roles = Object.entries(CREATURE_ROLE_LABELS) as [CreatureRole, string][];
 
@@ -101,6 +103,7 @@ export class CustomizeCreaturesStep implements OnInit {
     if (this.aiRateLimit.showIfBlocked()) return;
 
     this.generationError.set(null);
+    this.fallbackNotice.set(null);
     this.generatingId.set('batch');
 
     if (pending.length === 1) {
@@ -130,16 +133,27 @@ export class CustomizeCreaturesStep implements OnInit {
           }
           const missing = pending.filter((c) => !generated.has(c.creatureId));
           if (missing.length) {
+            this.generationError.set(null);
+            this.fallbackNotice.set(
+              'Certaines vies manquaient dans le lot — génération une par une…',
+            );
             void this.generateBackstoriesSequentially(missing);
           } else {
+            this.fallbackNotice.set(null);
             this.generatingId.set(null);
           }
         },
         error: (err) => {
           if (isAiRateLimitHttpError(err)) {
             this.generatingId.set(null);
+            this.fallbackNotice.set(null);
             return;
           }
+          // 502/504 lot (proxy / Ollama lent / JSON invalide) → secours séquentiel.
+          this.generationError.set(null);
+          this.fallbackNotice.set(
+            'Le lot IA a échoué (délai ou service) — on continue une créature à la fois…',
+          );
           void this.generateBackstoriesSequentially(pending);
         },
       });
@@ -149,6 +163,7 @@ export class CustomizeCreaturesStep implements OnInit {
     this.generatingId.set('batch');
     this.generationError.set(null);
     let failed = 0;
+    let ok = 0;
 
     await this.aiProgress.begin('creature-batch', { batchIndex: 0, batchTotal: pending.length });
 
@@ -165,6 +180,7 @@ export class CustomizeCreaturesStep implements OnInit {
           }),
         );
         this.builder.updateCreature(creature.creatureId, { backstory: res.backstory });
+        ok++;
       } catch {
         failed++;
       }
@@ -172,11 +188,12 @@ export class CustomizeCreaturesStep implements OnInit {
 
     this.aiProgress.complete();
     this.generatingId.set(null);
+    this.fallbackNotice.set(null);
     if (failed > 0) {
       this.generationError.set(
         failed === pending.length
-          ? "L'inspiration cosmique est momentanément indisponible."
-          : `${failed} créature(s) n'ont pas pu être générées. Réessayez individuellement.`,
+          ? "L'inspiration cosmique est momentanément indisponible (délai ou service IA)."
+          : `${ok} vie(s) générée(s), ${failed} échec(s). Réessayez individuellement sur les cartes restantes.`,
       );
     }
   }
@@ -202,8 +219,8 @@ export class CustomizeCreaturesStep implements OnInit {
     const detail = e?.['detail'] as string | undefined;
     const apiMsg = general || detail || (e?.['message'] as string) || null;
     if (apiMsg && apiMsg !== 'One or more errors occurred!') return apiMsg;
-    if (http.status === 502)
-      return 'Le service de génération IA est indisponible. Vérifiez la clé Groq ou réessayez dans quelques instants.';
+    if (http.status === 502 || http.status === 503 || http.status === 504)
+      return 'Le service de génération IA a dépassé le délai (Ollama local lent ou proxy). Réessayez, ou générez carte par carte.';
     return "L'inspiration cosmique est momentanément indisponible.";
   }
 }

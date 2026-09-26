@@ -59,12 +59,26 @@ public class GetHomeSummaryEndpoint(AppDbContext db, ILogger<GetHomeSummaryEndpo
             i => i.InvitedUserId == userId && i.Status == CampaignInviteStatuses.Pending, ct);
 
         var owned = await db.Campaigns.AsNoTracking()
-            .Where(c => c.OwnerUserId == userId)
-            .Select(c => new { c.Id, c.Title, c.UpdatedAt, c.JsonData, Role = CampaignMemberRoles.Dm })
+            .Where(c => c.OwnerUserId == userId && c.ClosedAt == null)
+            .Select(c => new
+            {
+                c.Id,
+                c.Title,
+                c.UpdatedAt,
+                c.JsonData,
+                Role = CampaignMemberRoles.Dm,
+                IsArchived = c.Members.Any(m =>
+                    m.UserId == userId && m.ArchivedAt != null && m.LeftAt == null && m.RemovedAt == null),
+            })
             .ToListAsync(ct);
 
         var joined = await db.CampaignMembers.AsNoTracking()
-            .Where(m => m.UserId == userId && m.Role == CampaignMemberRoles.Player)
+            .Where(m =>
+                m.UserId == userId
+                && m.Role == CampaignMemberRoles.Player
+                && m.LeftAt == null
+                && m.RemovedAt == null
+                && m.Campaign.ClosedAt == null)
             .Select(m => new
             {
                 m.CampaignId,
@@ -72,12 +86,16 @@ public class GetHomeSummaryEndpoint(AppDbContext db, ILogger<GetHomeSummaryEndpo
                 m.Campaign.UpdatedAt,
                 m.Campaign.JsonData,
                 Role = CampaignMemberRoles.Player,
+                IsArchived = m.ArchivedAt != null,
             })
             .ToListAsync(ct);
 
         var allCampaigns = owned
+            .Where(c => !c.IsArchived)
             .Select(c => new { c.Id, c.Title, c.UpdatedAt, c.JsonData, c.Role })
-            .Concat(joined.Select(c => new { Id = c.CampaignId, c.Title, c.UpdatedAt, c.JsonData, c.Role }))
+            .Concat(joined
+                .Where(c => !c.IsArchived)
+                .Select(c => new { Id = c.CampaignId, c.Title, c.UpdatedAt, c.JsonData, c.Role }))
             .OrderByDescending(c => c.UpdatedAt)
             .ToList();
 
