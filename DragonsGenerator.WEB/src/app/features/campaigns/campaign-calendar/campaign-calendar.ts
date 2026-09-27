@@ -146,7 +146,7 @@ export class CampaignCalendar {
       title,
       tableEventsToIcsInputs(title, this.sessions(), this.scheduleEvents()),
     );
-    const safe = title.replace(/[^\w\-]+/g, '_').slice(0, 40) || 'campagne';
+    const safe = title.replace(/[^\w-]+/g, '_').slice(0, 40) || 'campagne';
     downloadIcsFile(`${safe}-calendrier.ics`, ics);
   }
 
