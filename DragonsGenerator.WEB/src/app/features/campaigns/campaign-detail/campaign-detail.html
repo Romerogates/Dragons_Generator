@@ -6,6 +6,44 @@
     </div>
   } @else if (loading()) {
     <p class="text-center py-24 text-violet-400 animate-pulse">Chargement de la campagne...</p>
+  } @else if (offlineSnapshot(); as snap) {
+    <div class="max-w-2xl mx-auto px-4 py-12 space-y-6" data-testid="campaign-offline-snapshot">
+      <a routerLink="/campaigns" class="text-xs font-black uppercase tracking-widest text-slate-500 hover:text-violet-400">← Campagnes</a>
+      <div class="rounded-2xl border border-amber-900/40 bg-amber-950/20 p-4">
+        <p class="text-[10px] font-black uppercase tracking-widest text-amber-400">Hors ligne — lecture seule</p>
+        <h1 class="text-2xl font-serif text-amber-100 mt-1">{{ snap.title }}</h1>
+        <p class="text-[11px] text-slate-500 mt-1">Cache du {{ snap.cachedAt | date: 'short' }}</p>
+      </div>
+      @if (snap.regionName) {
+        <p class="text-sm text-slate-400">Région : {{ snap.regionName }}</p>
+      }
+      @if (snap.nextSessionTitle) {
+        <div class="rounded-xl border border-slate-800 bg-[#1b2028] p-4">
+          <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Prochaine table</p>
+          <p class="text-slate-200 mt-1">{{ snap.nextSessionTitle }}</p>
+          @if (snap.nextSessionAt) {
+            <p class="text-xs text-slate-500">{{ snap.nextSessionAt | date: 'short' }}</p>
+          }
+        </div>
+      }
+      @if (snap.lastRecap) {
+        <div class="rounded-xl border border-emerald-900/40 bg-emerald-950/15 p-4">
+          <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400">Dernier récap</p>
+          <pre class="mt-2 whitespace-pre-wrap text-sm text-slate-300 font-sans">{{ snap.lastRecap }}</pre>
+        </div>
+      }
+      @if (snap.handouts.length) {
+        <div class="space-y-3">
+          <p class="text-[10px] font-black uppercase tracking-widest text-violet-400">Documents publiés</p>
+          @for (h of snap.handouts; track h.id) {
+            <article class="rounded-xl border border-slate-800 bg-[#1b2028] p-4">
+              <h2 class="font-serif text-violet-200">{{ h.title }}</h2>
+              <pre class="mt-2 whitespace-pre-wrap text-sm text-slate-400 font-sans max-h-40 overflow-y-auto">{{ h.body }}</pre>
+            </article>
+          }
+        </div>
+      }
+    </div>
   } @else if (error(); as err) {
     <div class="max-w-lg mx-auto px-4 py-24 text-center">
       <p class="text-red-400 mb-4">{{ err }}</p>
@@ -50,8 +88,34 @@
               Niv. {{ c.data.partyLevel }} · {{ toneLabels[c.data.tone] }}
               @if (c.data.regionName) { · {{ c.data.regionName }} }
               @if (c.data.setting) { · {{ c.data.setting }} }
-              · {{ c.isOwner ? 'MJ' : 'Joueur' }}
+              · {{ c.isOwner ? 'MJ' : c.role === 'spectator' ? 'Spectateur' : 'Joueur' }}
             </p>
+            @if ((c.data.atlasPins?.length ?? 0) > 0 || c.isOwner) {
+              <div class="mt-3 flex flex-wrap items-center gap-2" data-testid="campaign-atlas-pins">
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Atlas</span>
+                @for (pin of c.data.atlasPins ?? []; track pin.id) {
+                  <span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] border border-slate-700 text-slate-300">
+                    @if (pin.civId) {
+                      <a [routerLink]="['/civilisations', pin.civId]" class="hover:text-violet-300">{{ pin.name }}</a>
+                    } @else {
+                      {{ pin.name }}
+                    }
+                    @if (c.isOwner) {
+                      <button type="button" class="text-slate-600 hover:text-red-400" (click)="removeAtlasPin(pin.id)" aria-label="Retirer">×</button>
+                    }
+                  </span>
+                }
+                @if (c.isOwner) {
+                  <button
+                    type="button"
+                    class="px-2 py-1 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:text-violet-300"
+                    (click)="addAtlasPin()"
+                  >
+                    + Lieu
+                  </button>
+                }
+              </div>
+            }
             <p class="mt-2 text-[10px] text-slate-600">
               @if (c.isOwner) {
                 <a routerLink="/guide/scenario" class="underline hover:text-violet-400">Guide — campagnes</a>
@@ -104,6 +168,16 @@
                   [class.text-amber-300]="!notice.includes('XP reçue')"
                   [class.text-emerald-300]="notice.includes('XP reçue')"
                 >{{ notice }}</span>
+                @if (xpLevelUpAvailable() && notice.includes('XP reçue')) {
+                  <button
+                    type="button"
+                    class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase bg-emerald-700 text-white hover:bg-emerald-600"
+                    (click)="openLevelUpFromXp()"
+                    data-testid="xp-level-up-cta"
+                  >
+                    Monter de niveau
+                  </button>
+                }
                 @if (staleRemote()) {
                   <button
                     type="button"
@@ -298,17 +372,21 @@
             (sessionPatch)="onSessionPatch($event)"
             (sessionPatchImmediate)="onSessionPatchImmediate($event)"
             (sessionDateChange)="onSessionDateChangeEvent($event)"
+            (exportEveningPdf)="exportSessionEveningPdf($event)"
           />
         }
 
         @case ('calendar') {
           <app-campaign-calendar
             [isOwner]="c.isOwner"
+            [campaignId]="c.id"
             [campaignTitle]="c.title"
             [sessions]="c.data.sessions ?? []"
             [scheduleEvents]="c.data.scheduleEvents ?? []"
             [heroOptions]="calendarHeroOptions()"
+            [currentUserId]="currentUserId()"
             (scheduleEventsChange)="onScheduleEventsChange($event)"
+            (rsvpChange)="onScheduleRsvp($event)"
             (openSession)="openSessionFromCalendar($event)"
             (convertToSession)="convertScheduleEventToSession($event)"
           />
@@ -822,6 +900,22 @@
               @case ('encounters') {
                 @if (c.isOwner) {
                 <section class="space-y-6">
+                  <div class="rounded-2xl border border-slate-800 bg-[#1b2028]/60 p-4 space-y-3">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-violet-400">Packs rencontres</p>
+                    <div class="flex flex-wrap gap-2">
+                      @for (pack of encounterPacks; track pack.id) {
+                        <button
+                          type="button"
+                          class="px-3 py-2 rounded-xl text-[10px] font-black uppercase border border-violet-800/50 text-violet-300 hover:bg-violet-950/40"
+                          (click)="insertEncounterPack(pack.id)"
+                          [attr.data-testid]="'encounter-pack-' + pack.id"
+                        >
+                          {{ pack.label }}
+                        </button>
+                      }
+                    </div>
+                    <p class="text-[11px] text-slate-500">Injecte des groupes prêts (Cité Franche / oneshot).</p>
+                  </div>
                   @if (c.isOwner && c.data.creatures.length && !c.data.encounters.length) {
                     <button
                       type="button"
@@ -982,6 +1076,7 @@
             [pregenPdfLoadingId]="pregenPdfLoadingId()"
             [memberSheetLoadingKey]="memberCharacterLoadingId()"
             (addHandout)="addHandout()"
+            (insertHandoutPack)="insertHandoutPack($event)"
             (kindFilterChange)="setHandoutKindFilter($event)"
             (startEdit)="startEditHandout($event)"
             (stopEdit)="stopEditHandout()"
@@ -1182,16 +1277,50 @@
                         </div>
                       }
                     </div>
-                    <button
-                      type="button"
-                      class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase shrink-0 bg-red-950/30 border border-red-900/40 text-red-300 hover:bg-red-950/50"
-                      (click)="removeMember(m)"
-                      title="Retirer de la campagne"
-                    >
-                      Retirer
-                    </button>
+                    <div class="flex flex-col gap-2 shrink-0">
+                      <button
+                        type="button"
+                        class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-slate-900/40 border border-slate-700 text-slate-300 hover:border-sky-700/50"
+                        (click)="setMemberAsSpectator(m)"
+                        title="Passer en spectateur (lecture seule)"
+                        data-testid="set-spectator"
+                      >
+                        Spectateur
+                      </button>
+                      <button
+                        type="button"
+                        class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 border border-red-900/40 text-red-300 hover:bg-red-950/50"
+                        (click)="removeMember(m)"
+                        title="Retirer de la campagne"
+                      >
+                        Retirer
+                      </button>
+                    </div>
                   </div>
                 </article>
+              }
+
+              @if (spectators().length) {
+                <div class="pt-2 space-y-3">
+                  <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                    Spectateurs
+                  </p>
+                  @for (m of spectators(); track m.id) {
+                    <article class="bg-[#1b2028] border border-slate-800/80 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <p class="font-bold text-slate-200">{{ m.displayName }}</p>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Lecture seule</p>
+                      </div>
+                      <button
+                        type="button"
+                        class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase bg-red-950/30 border border-red-900/40 text-red-300"
+                        (click)="removeMember(m)"
+                      >
+                        Retirer
+                      </button>
+                    </article>
+                  }
+                </div>
               }
             } @else {
               @if (isMyPlayerMember(); as me) {

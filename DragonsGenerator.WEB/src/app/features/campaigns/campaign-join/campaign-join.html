@@ -65,6 +65,15 @@
             Rejoindre la campagne
           }
         </button>
+        <button
+          type="button"
+          class="w-full min-h-11 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-sky-500/50 disabled:opacity-50"
+          [disabled]="joining()"
+          (click)="joinAsSpectator()"
+          data-testid="join-as-spectator"
+        >
+          Regarder en spectateur
+        </button>
       }
     }
   </div>

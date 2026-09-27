@@ -7,6 +7,14 @@
       <a routerLink="/campaigns" class="text-violet-400 text-sm">← Retour aux campagnes</a>
     </div>
   } @else if (campaign(); as c) {
+    @if (c.role === 'spectator') {
+      <div
+        class="sticky z-20 top-[calc(var(--dg-sticky-top)+var(--dg-play-header-height))] border-b border-sky-900/40 bg-sky-950/40 px-3 py-2 text-center text-[10px] font-black uppercase tracking-widest text-sky-300"
+        data-testid="play-spectator-banner"
+      >
+        Mode spectateur — lecture seule (pas d’attaque ni d’initiative)
+      </div>
+    }
     <header
       class="sticky z-30 border-b border-emerald-900/40 bg-[#171b22]/95 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-3 top-[var(--dg-sticky-top)] min-h-[var(--dg-play-header-height)]"
     >
@@ -31,11 +39,18 @@
               data-testid="play-xp-notice"
             >
               {{ notice }}
+              <button
+                type="button"
+                class="ml-2 underline text-emerald-200"
+                (click)="openLevelUp()"
+              >
+                Monter de niveau
+              </button>
             </p>
           }
         </div>
         <span class="text-[10px] font-black uppercase tracking-widest text-slate-600 shrink-0">
-          {{ c.isOwner ? 'MJ' : 'Joueur' }}
+          {{ c.isOwner ? 'MJ' : c.role === 'spectator' ? 'Spectateur' : 'Joueur' }}
         </span>
       </div>
     </header>

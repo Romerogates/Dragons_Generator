@@ -66,6 +66,17 @@
       >
         + Page
       </button>
+      @for (tpl of notebookTemplates; track tpl.id) {
+        <button
+          type="button"
+          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:border-amber-600/50 disabled:opacity-40"
+          [disabled]="listPages().length >= maxPages()"
+          (click)="addPageFromTemplate(tpl.id)"
+          [title]="tpl.label"
+        >
+          {{ tpl.label }}
+        </button>
+      }
       @if (listPages().length > 1) {
         <button
           type="button"

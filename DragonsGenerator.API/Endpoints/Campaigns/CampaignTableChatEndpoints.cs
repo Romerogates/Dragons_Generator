@@ -36,6 +36,11 @@ public class PostTableChatEndpoint(AppDbContext db, CampaignLivePublisher live)
                 await Send.NotFoundAsync(ct);
                 return;
             }
+            if (!CampaignAccess.CanPlay(isOwner, membership, campaign))
+            {
+                await Send.ForbiddenAsync(ct);
+                return;
+            }
 
             var author =
                 membership?.User?.DisplayName

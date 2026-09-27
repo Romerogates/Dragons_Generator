@@ -119,6 +119,8 @@ export class NotificationPreferencesService {
         return p.characterResults;
       case 'xp_awarded':
         return p.xpAwards;
+      case 'schedule_rsvp':
+        return p.sessionReminders;
     }
   }
 

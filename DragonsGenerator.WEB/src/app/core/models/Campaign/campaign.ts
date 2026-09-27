@@ -190,6 +190,16 @@ export interface CampaignSession {
   playerRecap?: string;
 }
 
+/** Réponse d’un joueur à une date de table. */
+export type ScheduleRsvpStatus = 'yes' | 'no' | 'maybe';
+
+export interface ScheduleRsvp {
+  userId: string;
+  displayName?: string;
+  status: ScheduleRsvpStatus;
+  at: string;
+}
+
 /** Date libre du calendrier de table (pas forcément une session de play). */
 export interface CampaignScheduleEvent {
   id: string;
@@ -210,6 +220,8 @@ export interface CampaignScheduleEvent {
    * Absent / vide = ponctuel.
    */
   rrule?: string | null;
+  /** Confirmations joueurs (oui / non / peut-être). */
+  rsvps?: ScheduleRsvp[];
 }
 
 /** Presets RRULE pour l’UI calendrier. */
@@ -256,13 +268,23 @@ export interface CampaignData {
   pinnedHandoutId?: string | null;
   /** Cartes / donjons générés (MJ uniquement). */
   dungeonMaps?: CampaignDungeonMap[];
+  /** Pins Atlas Eana liés à la campagne (en plus de regionId primaire). */
+  atlasPins?: CampaignAtlasPin[];
+}
+
+/** Point d’intérêt Atlas rattaché à une campagne. */
+export interface CampaignAtlasPin {
+  id: string;
+  name: string;
+  civId?: string | null;
+  note?: string;
 }
 
 export interface CampaignMember {
   id: string;
   userId: string;
   displayName: string;
-  role: 'dm' | 'player';
+  role: 'dm' | 'player' | 'spectator';
   proposalStatus: 'none' | 'pending' | 'approved' | 'rejected';
   approvedCharacterId?: string | null;
   approvedCharacterName?: string | null;
@@ -276,7 +298,7 @@ export interface CampaignMember {
 export interface CampaignSummary {
   id: string;
   title: string;
-  role: 'dm' | 'player';
+  role: 'dm' | 'player' | 'spectator';
   updatedAt: string;
   playerCount: number;
   regionName?: string | null;
@@ -298,7 +320,7 @@ export interface CampaignDetail {
   id: string;
   title: string;
   data: CampaignData;
-  role: 'dm' | 'player';
+  role: 'dm' | 'player' | 'spectator';
   isOwner: boolean;
   updatedAt: string;
   members: CampaignMember[];
@@ -433,6 +455,7 @@ export function createCampaignScheduleEvent(
     linkedSessionId: partial?.linkedSessionId ?? null,
     createdByUserId: partial?.createdByUserId,
     rrule: partial?.rrule?.trim() || null,
+    rsvps: partial?.rsvps ? [...partial.rsvps] : [],
   };
 }
 

@@ -205,6 +205,31 @@ export class CampaignCloudService {
     return this.http.post<CampaignSummary>(`${this.api}/me/join/${encodeURIComponent(token)}`, {});
   }
 
+  joinAsSpectator(token: string): Observable<CampaignSummary> {
+    return this.http.post<CampaignSummary>(
+      `${this.api}/me/join/${encodeURIComponent(token)}/spectator`,
+      {},
+    );
+  }
+
+  setMemberSpectator(campaignId: string, memberId: string): Observable<void> {
+    return this.http.post<void>(
+      `${this.api}/me/campaigns/${campaignId}/members/${memberId}/spectator`,
+      {},
+    );
+  }
+
+  setScheduleRsvp(
+    campaignId: string,
+    eventId: string,
+    status: 'yes' | 'no' | 'maybe',
+  ): Observable<{ userId: string; displayName?: string; status: string; at: string }[]> {
+    return this.http.post<{ userId: string; displayName?: string; status: string; at: string }[]>(
+      `${this.api}/me/campaigns/${campaignId}/schedule/${encodeURIComponent(eventId)}/rsvp`,
+      { status },
+    );
+  }
+
   getPregenCharacter(
     campaignId: string,
     pregenId: string,
@@ -238,8 +263,11 @@ export class CampaignCloudService {
       creatures: Array.isArray(raw.creatures) ? raw.creatures : [],
       encounters: Array.isArray(raw.encounters) ? raw.encounters : [],
       notes: raw.notes ?? base.notes,
+      notebookPages: Array.isArray(raw.notebookPages) ? raw.notebookPages : base.notebookPages,
+      sessionResume: raw.sessionResume ?? base.sessionResume,
       pregenCharacters: Array.isArray(raw.pregenCharacters) ? raw.pregenCharacters : [],
       sessions: Array.isArray(raw.sessions) ? raw.sessions : [],
+      scheduleEvents: Array.isArray(raw.scheduleEvents) ? raw.scheduleEvents : [],
       handouts: Array.isArray(raw.handouts)
         ? raw.handouts.map((h) => ({
             ...h,
@@ -249,6 +277,7 @@ export class CampaignCloudService {
       activeSessionId: raw.activeSessionId ?? null,
       pinnedHandoutId: raw.pinnedHandoutId ?? null,
       dungeonMaps: Array.isArray(raw.dungeonMaps) ? raw.dungeonMaps : [],
+      atlasPins: Array.isArray(raw.atlasPins) ? raw.atlasPins : [],
     };
   }
 

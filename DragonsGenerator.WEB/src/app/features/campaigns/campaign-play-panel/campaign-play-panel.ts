@@ -118,6 +118,7 @@ import {
   withNoRoomsRevealed,
   withRoomRevealed,
 } from '@core/utils/dungeon-fog.util';
+import { buildPlayerRecapTemplate } from '@core/utils/player-recap-template.util';
 
 export type PlaySessionView =
   | 'resume'
@@ -207,6 +208,7 @@ export class CampaignPlayPanel implements OnDestroy {
   private seenInitiativeSubmissions = new Set<string>();
 
   readonly isDm = computed(() => this.campaign().isOwner === true);
+  readonly isSpectator = computed(() => this.campaign().role === 'spectator');
 
   readonly activeSession = computed(() => {
     const c = this.campaign();
@@ -325,6 +327,7 @@ export class CampaignPlayPanel implements OnDestroy {
   });
 
   readonly canActOnTurn = computed(() => {
+    if (this.isSpectator()) return false;
     if (this.isDm()) return !!this.currentTurn();
     return this.isMyTurn();
   });
@@ -761,7 +764,16 @@ export class CampaignPlayPanel implements OnDestroy {
     const c = this.campaign();
     const session = this.activeSession();
     if (!c.isOwner || !session) return;
-    this.endSessionDialog.set({ recap: session.playerRecap ?? '' });
+    const existing = session.playerRecap?.trim() ?? '';
+    this.endSessionDialog.set({
+      recap: existing || buildPlayerRecapTemplate(session),
+    });
+  }
+
+  fillEndSessionRecapDraft(): void {
+    const session = this.activeSession();
+    if (!session) return;
+    this.endSessionDialog.set({ recap: buildPlayerRecapTemplate(session) });
   }
 
   cancelEndSessionDialog(): void {
@@ -1071,6 +1083,7 @@ export class CampaignPlayPanel implements OnDestroy {
   }
 
   sendTableChat(): void {
+    if (this.isSpectator()) return;
     const session = this.activeSession();
     const body = this.tableChatDraft().trim();
     if (!session || !body || this.tableChatSending()) return;
@@ -1085,6 +1098,23 @@ export class CampaignPlayPanel implements OnDestroy {
         this.setFeedback('err', 'Impossible d’envoyer le message.');
       },
     });
+  }
+
+  /** Partage un jet dans le fil de table (visible party). */
+  shareDiceRoll(faces: number, result: number, label?: string): void {
+    if (this.isSpectator()) return;
+    const session = this.activeSession();
+    if (!session) return;
+    const who = this.auth.user()?.displayName?.trim() || 'Joueur';
+    const tag = label?.trim() ? ` (${label.trim()})` : '';
+    const body = `🎲 ${who}${tag} : d${faces} → ${result}`;
+    this.campaigns.postTableChat(this.campaign().id, { sessionId: session.id, body }).subscribe({
+      error: () => this.setFeedback('err', 'Jet non partagé (fil de table).'),
+    });
+  }
+
+  onSharedTableDie(result: number): void {
+    this.shareDiceRoll(20, result, 'table');
   }
 
   formatTableChatTime(iso: string): string {
@@ -1942,6 +1972,7 @@ export class CampaignPlayPanel implements OnDestroy {
     const target = this.selectedTarget();
     if (!turn || !target || !this.canActOnTurn()) return;
     if (this.fightStep() !== 'toHit' && this.combatFlowPhase() === 'fight') return;
+    this.shareDiceRoll(20, d20, turn.name || 'attaque');
 
     const attacks = turn.attacks ?? [];
     const atk = attacks[this.selectedAttackIndex()] ?? {

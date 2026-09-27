@@ -64,6 +64,7 @@ export class CampaignDetailSessions {
   readonly sessionPatch = output<SessionPatchEvent>();
   readonly sessionPatchImmediate = output<SessionPatchEvent>();
   readonly sessionDateChange = output<SessionDateChangeEvent>();
+  readonly exportEveningPdf = output<string>();
 
   readonly filter = signal<SessionListFilter>('upcoming');
   readonly viewingSessionId = signal<string | null>(null);

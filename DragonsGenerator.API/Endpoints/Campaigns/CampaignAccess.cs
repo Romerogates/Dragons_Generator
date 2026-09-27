@@ -33,6 +33,10 @@ public static class CampaignAccess
     {
         if (campaign.ClosedAt is not null) return false;
         if (membership is not null && CampaignHistoryHelpers.IsFormerOrHistory(membership)) return false;
+        if (membership?.Role == CampaignMemberRoles.Spectator) return false;
         return isOwner || (membership is not null && membership.Role == CampaignMemberRoles.Player);
     }
+
+    public static bool IsSpectator(bool isOwner, CampaignMember? membership) =>
+        !isOwner && membership?.Role == CampaignMemberRoles.Spectator;
 }

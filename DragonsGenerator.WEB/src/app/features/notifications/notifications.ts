@@ -27,6 +27,7 @@ const CAMPAIGN_KINDS: NotificationType[] = [
   ...CAMPAIGN_ACTION_KINDS,
   'proposal_approved',
   'xp_awarded',
+  'schedule_rsvp',
 ];
 
 @Component({
@@ -117,6 +118,8 @@ export class NotificationsPage implements OnInit {
         return 'fluent-emoji:check-mark-button';
       case 'xp_awarded':
         return 'fluent-emoji:sparkles';
+      case 'schedule_rsvp':
+        return 'fluent-emoji:spiral-calendar';
     }
   }
 

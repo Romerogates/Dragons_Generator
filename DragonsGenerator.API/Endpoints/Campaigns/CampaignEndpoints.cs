@@ -101,7 +101,9 @@ public class ListMyCampaignsEndpoint(AppDbContext db) : EndpointWithoutRequest<L
             .ToList();
 
         var joinedRows = await db.CampaignMembers.AsNoTracking()
-            .Where(m => m.UserId == userId && m.Role == CampaignMemberRoles.Player)
+            .Where(m =>
+                m.UserId == userId
+                && (m.Role == CampaignMemberRoles.Player || m.Role == CampaignMemberRoles.Spectator))
             .Select(m => new
             {
                 m.CampaignId,
@@ -112,6 +114,7 @@ public class ListMyCampaignsEndpoint(AppDbContext db) : EndpointWithoutRequest<L
                 m.ArchivedAt,
                 m.LeftAt,
                 m.RemovedAt,
+                m.Role,
                 PlayerCount = m.Campaign.Members.Count(x =>
                     x.Role == CampaignMemberRoles.Player && x.LeftAt == null && x.RemovedAt == null),
                 HasPlayerHistory = m.Campaign.Members.Any(x => x.Role == CampaignMemberRoles.Player),
@@ -133,7 +136,7 @@ public class ListMyCampaignsEndpoint(AppDbContext db) : EndpointWithoutRequest<L
                 return new CampaignSummaryDto(
                     m.CampaignId,
                     m.Title,
-                    CampaignMemberRoles.Player,
+                    m.Role,
                     m.UpdatedAt,
                     m.PlayerCount,
                     CampaignJsonHelpers.RegionNameFromJson(m.JsonData),
@@ -1363,7 +1366,9 @@ public class AwardCampaignXpEndpoint(AppDbContext db, PushNotificationService pu
             member.UserId,
             "XP attribuée",
             message,
-            $"/campaigns/{campaign.Id}",
+            member.ApprovedCharacterId is Guid charId
+                ? $"/campaigns/{campaign.Id}?tab=players&levelUp=1&characterId={charId}"
+                : $"/campaigns/{campaign.Id}?tab=players&levelUp=1",
             ct);
         await live.NotifyAsync(campaign.Id, campaign.UpdatedAt, CampaignLiveReasons.Xp, ct);
         await Send.OkAsync(new { member.XpEarnedInCampaign }, ct);

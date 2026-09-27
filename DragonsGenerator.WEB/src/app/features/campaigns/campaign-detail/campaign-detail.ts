@@ -80,6 +80,12 @@ import { CampaignDetailHandouts } from './campaign-detail-handouts/campaign-deta
 import { CampaignNotebook } from '../campaign-notebook/campaign-notebook';
 import { CampaignCalendar } from '../campaign-calendar/campaign-calendar';
 import { nextScheduleOccurrenceAt } from '@core/utils/schedule-ics.util';
+import {
+  buildEncountersFromPack,
+  buildHandoutsFromPack,
+  ENCOUNTER_PACK_PRESETS,
+} from '@core/utils/campaign-content-presets.util';
+import { exportEveningPdf } from '@core/utils/evening-pdf.util';
 import type { MemberCharacterAction } from './campaign-detail-roster/campaign-detail-roster';
 import type { SessionDateChangeEvent, SessionPatchEvent } from './campaign-detail-sessions/campaign-detail-sessions';
 import type { HandoutPatchEvent, HandoutPublishEvent } from './campaign-detail-handouts/campaign-detail-handouts';
@@ -153,6 +159,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   private friends = inject(FriendsService);
   private characters = inject(CharacterCloudService);
   private auth = inject(AuthService);
+  readonly currentUserId = computed(() => this.auth.user()?.id ?? null);
+  readonly isSpectator = computed(() => this.campaign()?.role === 'spectator');
   private notifications = inject(NotificationService);
   private banners = inject(UiBannerPreferencesService);
   private data = inject(DataService);
@@ -168,8 +176,11 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly loading = signal(true);
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
+  readonly offlineSnapshot = signal<import('@core/services/campaign-session-cache.service').SessionCachePayload | null>(null);
   /** Bannière sync multi-onglets MJ. */
   readonly syncNotice = signal<string | null>(null);
+  /** CTA « Monter de niveau » après XP reçue. */
+  readonly xpLevelUpAvailable = signal(false);
   /** Version distante plus récente (MJ) — à appliquer manuellement. */
   readonly staleRemote = signal<CampaignDetailModel | null>(null);
   readonly tab = signal<PrimaryTab>('overview');
@@ -297,6 +308,10 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
 
   readonly players = computed(() =>
     (this.campaign()?.members ?? []).filter((m) => m.role === 'player'),
+  );
+
+  readonly spectators = computed(() =>
+    (this.campaign()?.members ?? []).filter((m) => m.role === 'spectator'),
   );
 
   readonly approvedPlayersWithCharacter = computed(() =>
@@ -762,15 +777,17 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       this.route.snapshot.queryParamMap.get('handout') ??
       this.route.snapshot.queryParamMap.get('handoutId');
     const mapId = this.route.snapshot.queryParamMap.get('map');
-    if (tab || mapId) {
-      this.applyTabFromRoute(tab ?? 'maps', handoutId, mapId);
+    const sessionId = this.route.snapshot.queryParamMap.get('session');
+    if (tab || mapId || sessionId) {
+      this.applyTabFromRoute(tab ?? (sessionId ? 'sessions' : 'maps'), handoutId, mapId, sessionId);
     }
     this.route.queryParamMap.subscribe((params) => {
       const qTab = params.get('tab');
       const qMap = params.get('map');
       const qHandout = params.get('handout') ?? params.get('handoutId');
-      if (qMap) {
-        this.applyTabFromRoute(qTab ?? 'maps', qHandout, qMap);
+      const qSession = params.get('session');
+      if (qMap || qSession) {
+        this.applyTabFromRoute(qTab ?? (qSession ? 'sessions' : 'maps'), qHandout, qMap, qSession);
       }
     });
     if (this.route.snapshot.queryParamMap.get('joined') === '1') {
@@ -780,6 +797,15 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       void this.router.navigate([], {
         relativeTo: this.route,
         queryParams: { joined: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
+    }
+    if (this.route.snapshot.queryParamMap.get('levelUp') === '1') {
+      this.openLevelUpFromXp();
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { levelUp: null, characterId: null },
         queryParamsHandling: 'merge',
         replaceUrl: true,
       });
@@ -821,15 +847,27 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.banners.dismiss(UI_BANNER_IDS.welcomeCampaign);
   }
 
-  /** Deep-link `?tab=` / `?map=` → nav haute + sous-onglet Préparation si besoin. */
+  /** Deep-link `?tab=` / `?map=` / `?session=` → nav haute + sous-onglet Préparation si besoin. */
   private applyTabFromRoute(
     tab: string,
     handoutId: string | null,
     mapId: string | null = null,
+    sessionId: string | null = null,
   ): void {
     if (mapId) {
       this.setTab('maps');
       this.focusDungeonMapId.set(mapId);
+      return;
+    }
+    if (sessionId) {
+      this.setTab('sessions');
+      this.editingSessionId.set(sessionId);
+      setTimeout(() => {
+        document.getElementById('session-edit-panel')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }, 120);
       return;
     }
     if (tab === 'handouts' || tab === 'players' || tab === 'overview' || tab === 'sessions' || tab === 'calendar' || tab === 'prep') {
@@ -993,11 +1031,15 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (delta <= 0) return;
     this.staleRemote.set(null);
     this.syncNotice.set(`+${delta} XP reçue — total campagne ${after}`);
+    this.xpLevelUpAvailable.set(
+      !!next.members.find((m) => m.userId === userId && m.role === 'player')?.approvedCharacterId,
+    );
     window.setTimeout(() => {
       if (this.syncNotice()?.startsWith('+') && this.syncNotice()?.includes('XP reçue')) {
         this.syncNotice.set(null);
+        this.xpLevelUpAvailable.set(false);
       }
-    }, 6_000);
+    }, 12_000);
   }
 
   applyStaleRemote(): void {
@@ -1084,7 +1126,14 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         }
       },
       error: () => {
-        this.error.set('Campagne introuvable.');
+        const id = this.route.snapshot.paramMap.get('id');
+        const cached = id ? this.sessionCache.read(id) : null;
+        if (cached) {
+          this.offlineSnapshot.set(cached);
+          this.error.set(null);
+        } else {
+          this.error.set('Campagne introuvable.');
+        }
         this.loading.set(false);
       },
     });
@@ -1512,6 +1561,83 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.saveData({ handouts: [...(c.data.handouts ?? []), handout] });
   }
 
+  insertHandoutPack(packId: string): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    const added = buildHandoutsFromPack(packId);
+    if (!added.length) return;
+    this.flushHandoutSave();
+    this.saveData({ handouts: [...(c.data.handouts ?? []), ...added] });
+  }
+
+  readonly encounterPacks = ENCOUNTER_PACK_PRESETS;
+
+  insertEncounterPack(packId: string): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    const added = buildEncountersFromPack(packId);
+    if (!added.length) return;
+    this.saveData({ encounters: [...(c.data.encounters ?? []), ...added] });
+    this.rosterFeedback.set(`${added.length} rencontre(s) ajoutée(s).`);
+  }
+
+  addAtlasPin(): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    const name = (window.prompt('Nom du lieu (Atlas)') || '').trim();
+    if (!name) return;
+    const pin = {
+      id: crypto.randomUUID?.() ?? `pin-${Date.now()}`,
+      name,
+      civId: c.data.regionId,
+      note: '',
+    };
+    this.saveData({ atlasPins: [...(c.data.atlasPins ?? []), pin] });
+  }
+
+  removeAtlasPin(pinId: string): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    this.saveData({ atlasPins: (c.data.atlasPins ?? []).filter((p) => p.id !== pinId) });
+  }
+
+  async exportSessionEveningPdf(sessionId: string): Promise<void> {
+    const c = this.campaign();
+    if (!c) return;
+    const session = (c.data.sessions ?? []).find((s) => s.id === sessionId);
+    if (!session) return;
+    try {
+      await exportEveningPdf(
+        c.title,
+        session,
+        (c.data.handouts ?? []).filter((h) => h.published),
+      );
+    } catch {
+      this.error.set('Impossible d’exporter le PDF soirée.');
+    }
+  }
+
+  openLevelUpFromXp(): void {
+    const me = this.myPlayerMember();
+    const charId = me?.approvedCharacterId;
+    if (!charId) {
+      this.setTab('players');
+      return;
+    }
+    this.characters.get(charId).subscribe({
+      next: (row) => {
+        const character = {
+          id: row.id,
+          name: row.name,
+          ...(typeof row.data === 'object' && row.data ? row.data : {}),
+        } as import('@core/models/Character/character').Character;
+        this.handoff.stashEdit(character);
+        void this.router.navigate(['/create'], { queryParams: { levelUp: '1' } });
+      },
+      error: () => this.error.set('Impossible d’ouvrir la fiche pour monter de niveau.'),
+    });
+  }
+
   startEditHandout(handoutId: string): void {
     const c = this.campaign();
     const handout = c?.data.handouts?.find((h) => h.id === handoutId);
@@ -1694,6 +1820,27 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   onScheduleEventsChange(events: CampaignScheduleEvent[]): void {
     if (!this.campaign()?.isOwner) return;
     this.saveData({ scheduleEvents: events });
+  }
+
+  onScheduleRsvp(ev: { eventId: string; status: 'yes' | 'no' | 'maybe' }): void {
+    const c = this.campaign();
+    if (!c) return;
+    this.campaigns.setScheduleRsvp(c.id, ev.eventId, ev.status).subscribe({
+      next: (rsvps) => {
+        const mapped = rsvps.map((r) => ({
+          userId: r.userId,
+          displayName: r.displayName,
+          status: r.status as 'yes' | 'no' | 'maybe',
+          at: r.at,
+        }));
+        const next = (c.data.scheduleEvents ?? []).map((e) =>
+          e.id === ev.eventId ? { ...e, rsvps: mapped } : e,
+        );
+        this.campaign.update((cur) =>
+          cur ? { ...cur, data: { ...cur.data, scheduleEvents: next } } : cur,
+        );
+      },
+    });
   }
 
   convertScheduleEventToSession(ev: CampaignScheduleEvent): void {
@@ -2239,6 +2386,25 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         });
       },
       'Retirer',
+    );
+  }
+
+  setMemberAsSpectator(member: CampaignMember): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    this.askConfirm(
+      'Passer en spectateur',
+      `${member.displayName} ne pourra plus jouer (lecture seule sur /play). Continuer ?`,
+      () => {
+        this.campaigns.setMemberSpectator(c.id, member.id).subscribe({
+          next: () => {
+            this.rosterFeedback.set(`${member.displayName} est maintenant spectateur.`);
+            this.reload();
+          },
+          error: () => this.error.set('Impossible de passer ce membre en spectateur.'),
+        });
+      },
+      'Spectateur',
     );
   }
 

@@ -2,9 +2,11 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   input,
   output,
   signal,
+  untracked,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -62,20 +64,39 @@ export type ScheduleEventsChange = CampaignScheduleEvent[];
 })
 export class CampaignCalendar {
   readonly isOwner = input(false);
+  readonly campaignId = input<string | null>(null);
   readonly campaignTitle = input('Campagne');
   readonly sessions = input<CampaignSession[]>([]);
   readonly scheduleEvents = input<CampaignScheduleEvent[]>([]);
   readonly heroOptions = input<CalendarHeroOption[]>([]);
+  readonly currentUserId = input<string | null>(null);
 
   readonly scheduleEventsChange = output<ScheduleEventsChange>();
   readonly openSession = output<string>();
   readonly convertToSession = output<CampaignScheduleEvent>();
+  readonly rsvpChange = output<{ eventId: string; status: 'yes' | 'no' | 'maybe' }>();
 
   readonly kinds = Object.entries(CAMPAIGN_SCHEDULE_KIND_LABELS) as [CampaignScheduleKind, string][];
   readonly rrulePresets = CAMPAIGN_SCHEDULE_RRULE_PRESETS;
   readonly editing = signal<TableCalendarEventView | null>(null);
   readonly draft = signal<CampaignScheduleEvent | null>(null);
   readonly panelOpen = signal(false);
+
+  constructor() {
+    effect(() => {
+      const events = this.scheduleEvents();
+      const d = untracked(() => this.draft());
+      if (!d) return;
+      const fresh = events.find((e) => e.id === d.id);
+      if (!fresh) return;
+      const next = fresh.rsvps ?? [];
+      const cur = d.rsvps ?? [];
+      if (JSON.stringify(next) === JSON.stringify(cur)) return;
+      untracked(() =>
+        this.draft.update((prev) => (prev ? { ...prev, rsvps: next.map((r) => ({ ...r })) } : prev)),
+      );
+    });
+  }
 
   readonly calendarEvents = computed(() =>
     buildTableCalendarEvents(this.sessions(), this.scheduleEvents(), this.isOwner()),
@@ -245,6 +266,37 @@ export class CampaignCalendar {
 
   heroSelected(id: string): boolean {
     return (this.draft()?.characterIds ?? []).includes(id);
+  }
+
+  myRsvpStatus(): 'yes' | 'no' | 'maybe' | null {
+    const uid = this.currentUserId();
+    const d = this.draft();
+    if (!uid || !d?.rsvps?.length) return null;
+    return (d.rsvps.find((r) => r.userId === uid)?.status as 'yes' | 'no' | 'maybe') ?? null;
+  }
+
+  setRsvp(status: 'yes' | 'no' | 'maybe'): void {
+    const d = this.draft();
+    const uid = this.currentUserId();
+    if (!d || !uid) return;
+    const others = (d.rsvps ?? []).filter((r) => r.userId !== uid);
+    this.draft.set({
+      ...d,
+      rsvps: [
+        ...others,
+        { userId: uid, status, at: new Date().toISOString() },
+      ],
+    });
+    this.rsvpChange.emit({ eventId: d.id, status });
+  }
+
+  rsvpSummary(): string {
+    const list = this.draft()?.rsvps ?? [];
+    if (!list.length) return 'Aucune réponse';
+    const yes = list.filter((r) => r.status === 'yes').length;
+    const no = list.filter((r) => r.status === 'no').length;
+    const maybe = list.filter((r) => r.status === 'maybe').length;
+    return `${yes} oui · ${maybe} peut-être · ${no} non`;
   }
 
   startsLocal(): string {

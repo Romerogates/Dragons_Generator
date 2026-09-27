@@ -74,6 +74,11 @@ public class SubmitInitiativeEndpoint(AppDbContext db, CampaignLivePublisher liv
                 await Send.NotFoundAsync(ct);
                 return;
             }
+            if (!CampaignAccess.CanPlay(isOwner, membership, campaign))
+            {
+                await Send.ForbiddenAsync(ct);
+                return;
+            }
 
             var newJson = CampaignJsonHelpers.TryApplyInitiativeRoll(
                 campaign.JsonData,

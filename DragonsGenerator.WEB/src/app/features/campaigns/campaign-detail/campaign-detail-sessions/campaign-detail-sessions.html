@@ -202,6 +202,14 @@
             (ngModelChange)="sessionPatch.emit({ sessionId: session.id, patch: { playerRecap: $event || undefined } })"
           ></textarea>
         </label>
+        <button
+          type="button"
+          class="w-full py-2 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:border-amber-600/50 hover:text-amber-200"
+          (click)="exportEveningPdf.emit(session.id)"
+          data-testid="export-evening-pdf"
+        >
+          PDF soirée (run sheet + docs publiés)
+        </button>
       </div>
 
       @if (isActive(session)) {

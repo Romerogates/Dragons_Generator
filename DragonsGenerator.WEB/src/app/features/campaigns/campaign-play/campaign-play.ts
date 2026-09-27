@@ -205,6 +205,21 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
     const delta = after - before;
     if (delta <= 0) return;
     this.xpNotice.set(`+${delta} XP reçue — total campagne ${after}`);
-    window.setTimeout(() => this.xpNotice.set(null), 6_000);
+    window.setTimeout(() => this.xpNotice.set(null), 12_000);
+  }
+
+  openLevelUp(): void {
+    const c = this.campaign();
+    const userId = this.auth.user()?.id;
+    if (!c || !userId) return;
+    const me = c.members.find((m) => m.userId === userId && m.role === 'player');
+    const charId = me?.approvedCharacterId;
+    if (!charId) {
+      void this.router.navigate(['/campaigns', c.id], { queryParams: { tab: 'players' } });
+      return;
+    }
+    void this.router.navigate(['/campaigns', c.id], {
+      queryParams: { tab: 'players', levelUp: '1', characterId: charId },
+    });
   }
 }

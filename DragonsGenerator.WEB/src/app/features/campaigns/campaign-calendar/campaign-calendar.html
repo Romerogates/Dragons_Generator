@@ -228,6 +228,52 @@
             </div>
           }
 
+          <div class="rounded-xl border border-slate-800 bg-[#141820]/80 p-3 space-y-2">
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+              Présence — {{ rsvpSummary() }}
+            </p>
+            @if (draft()?.rsvps?.length) {
+              <ul class="text-xs text-slate-400 space-y-1 max-h-28 overflow-y-auto">
+                @for (r of draft()!.rsvps!; track r.userId) {
+                  <li>
+                    <span class="text-slate-300">{{ r.displayName || r.userId }}</span>
+                    —
+                    {{ r.status === 'yes' ? 'oui' : r.status === 'no' ? 'non' : 'peut-être' }}
+                  </li>
+                }
+              </ul>
+            }
+            @if (currentUserId()) {
+              <div class="flex flex-wrap gap-2 pt-1">
+                <button
+                  type="button"
+                  class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border"
+                  [class]="myRsvpStatus() === 'yes' ? 'border-emerald-500 text-emerald-300' : 'border-slate-700 text-slate-400'"
+                  (click)="setRsvp('yes')"
+                  data-testid="rsvp-yes"
+                >
+                  Oui
+                </button>
+                <button
+                  type="button"
+                  class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border"
+                  [class]="myRsvpStatus() === 'maybe' ? 'border-amber-500 text-amber-300' : 'border-slate-700 text-slate-400'"
+                  (click)="setRsvp('maybe')"
+                >
+                  Peut-être
+                </button>
+                <button
+                  type="button"
+                  class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border"
+                  [class]="myRsvpStatus() === 'no' ? 'border-red-500 text-red-300' : 'border-slate-700 text-slate-400'"
+                  (click)="setRsvp('no')"
+                >
+                  Non
+                </button>
+              </div>
+            }
+          </div>
+
           <div class="flex flex-wrap gap-2 pt-2">
             <button
               type="button"

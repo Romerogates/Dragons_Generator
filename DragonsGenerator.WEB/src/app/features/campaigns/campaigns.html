@@ -492,7 +492,7 @@
             </button>
           }
         </div>
-        <label class="w-full text-left mb-8 block">
+        <label class="w-full text-left mb-4 block">
           <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">
             Titre de la campagne
           </span>
@@ -504,6 +504,18 @@
             (keydown.enter)="createEmptyCampaign()"
             placeholder="Nouvelle campagne"
             autocomplete="off"
+          />
+        </label>
+        <label class="w-full text-left mb-8 block">
+          <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">
+            Première date (optionnel)
+          </span>
+          <input
+            type="datetime-local"
+            class="w-full bg-[#171b22] border border-slate-700 rounded-xl py-3 px-4 text-slate-200 focus:border-violet-500/50 focus:outline-none"
+            [value]="emptyFirstSessionLocal()"
+            (input)="emptyFirstSessionLocal.set($any($event.target).value)"
+            data-testid="create-table-first-date"
           />
         </label>
         <div class="flex gap-4 w-full">

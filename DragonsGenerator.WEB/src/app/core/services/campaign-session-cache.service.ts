@@ -11,6 +11,8 @@ export interface SessionCachePayload {
   pinnedHandout: CampaignHandout | null;
   nextSessionTitle?: string;
   nextSessionAt?: string;
+  lastRecap?: string;
+  regionName?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -24,6 +26,9 @@ export class CampaignSessionCacheService {
     const next = (data.sessions ?? [])
       .filter((s) => s.status === 'planned')
       .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())[0];
+    const lastPlayed = (data.sessions ?? [])
+      .filter((s) => s.status === 'played' && s.playerRecap?.trim())
+      .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime())[0];
     const payload: SessionCachePayload = {
       campaignId,
       cachedAt: new Date().toISOString(),
@@ -32,12 +37,24 @@ export class CampaignSessionCacheService {
       pinnedHandout: pinned,
       nextSessionTitle: next?.title,
       nextSessionAt: next?.scheduledAt,
+      lastRecap: lastPlayed?.playerRecap?.trim(),
+      regionName: data.regionName || undefined,
     };
     try {
       localStorage.setItem(`${CACHE_PREFIX}${campaignId}`, JSON.stringify(payload));
     } catch {
       /* ignore quota */
     }
+  }
+
+  listCachedIds(): string[] {
+    if (typeof localStorage === 'undefined') return [];
+    const ids: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith(CACHE_PREFIX)) ids.push(key.slice(CACHE_PREFIX.length));
+    }
+    return ids;
   }
 
   read(campaignId: string): SessionCachePayload | null {

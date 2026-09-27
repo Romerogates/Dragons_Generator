@@ -257,3 +257,36 @@ public class ImportDungeonFromShareEndpoint(AppDbContext db) : EndpointWithoutRe
         await Send.OkAsync(new DungeonSummaryDto(copy.Id, copy.Name, copy.UpdatedAt), ct);
     }
 }
+
+public record DungeonGalleryItemDto(
+    string Token,
+    string Name,
+    string OwnerDisplayName,
+    DateTimeOffset UpdatedAt);
+
+/// <summary>Galerie publique : donjons avec lien de partage actif.</summary>
+public class ListDungeonGalleryEndpoint(AppDbContext db) : EndpointWithoutRequest<List<DungeonGalleryItemDto>>
+{
+    public override void Configure()
+    {
+        Get("/dungeons/gallery");
+        AllowAnonymous();
+    }
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        // SQLite cannot ORDER BY DateTimeOffset in SQL — sort in memory after project.
+        var rows = await db.Dungeons.AsNoTracking()
+            .Where(d => d.ShareEnabled && d.ShareToken != null && d.ShareToken != "")
+            .Select(d => new DungeonGalleryItemDto(
+                d.ShareToken!,
+                d.Name,
+                d.User.DisplayName,
+                d.UpdatedAt))
+            .ToListAsync(ct);
+
+        await Send.OkAsync(
+            rows.OrderByDescending(r => r.UpdatedAt).Take(60).ToList(),
+            ct);
+    }
+}

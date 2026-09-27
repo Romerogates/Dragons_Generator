@@ -20,6 +20,10 @@ import {
   createNotebookPage,
 } from '@core/models/Campaign/campaign';
 import { exportInkDataUrl, redrawInkStrokes } from '@core/utils/notebook.util';
+import {
+  NOTEBOOK_TEMPLATE_PRESETS,
+  buildNotebookPageFromTemplate,
+} from '@core/utils/campaign-content-presets.util';
 import { DataService } from '@core/services/data.service';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 
@@ -177,6 +181,18 @@ export class CampaignNotebook implements OnDestroy {
     this.pagesChange.emit(list);
     this.pageChange.emit(page);
   }
+
+  addPageFromTemplate(templateId: string): void {
+    const list = [...(this.pages() ?? [])];
+    if (list.length >= this.maxPages()) return;
+    const page = buildNotebookPageFromTemplate(templateId);
+    if (!page) return;
+    list.push(page);
+    this.pagesChange.emit(list);
+    this.pageChange.emit(page);
+  }
+
+  readonly notebookTemplates = NOTEBOOK_TEMPLATE_PRESETS;
 
   removePage(id: string): void {
     const list = this.pages();

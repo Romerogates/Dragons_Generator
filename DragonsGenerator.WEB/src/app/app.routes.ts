@@ -1,5 +1,6 @@
 // app.routes.ts
-import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { Router, Routes } from '@angular/router';
 import { authGuard, adminGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
@@ -174,10 +175,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('@features/agenda/global-agenda').then((m) => m.GlobalAgendaPage),
   },
+  // More specific /campaigns/:id/* routes MUST come before campaigns/:id
   {
-    path: 'campaigns/:id',
-    loadComponent: () =>
-      import('@features/campaigns/campaign-detail/campaign-detail').then((m) => m.CampaignDetailPage),
+    path: 'campaigns/:id/sessions/:sessionId',
+    // redirectTo cannot be combined with canActivate (NG04014 — kills Router in dev)
+    redirectTo: ({ params }) =>
+      inject(Router).createUrlTree(['/campaigns', params['id']], {
+        queryParams: { tab: 'sessions', session: params['sessionId'] },
+      }),
   },
   {
     path: 'campaigns/:id/bestiary',
@@ -200,6 +205,11 @@ export const routes: Routes = [
       import('@features/campaigns/campaign-initiative/campaign-initiative').then(
         (m) => m.CampaignInitiativePage,
       ),
+  },
+  {
+    path: 'campaigns/:id',
+    loadComponent: () =>
+      import('@features/campaigns/campaign-detail/campaign-detail').then((m) => m.CampaignDetailPage),
   },
   {
     path: 'friends',
@@ -251,9 +261,11 @@ export const routes: Routes = [
     loadComponent: () => import('@features/characters/characters').then((m) => m.Characters),
   },
   {
-    path: 'dungeons',
+    path: 'dungeons/gallery',
     loadComponent: () =>
-      import('@features/library-dungeons/library-dungeons').then((m) => m.LibraryDungeons),
+      import('@features/library-dungeons/dungeon-gallery/dungeon-gallery').then(
+        (m) => m.DungeonGalleryPage,
+      ),
   },
   {
     path: 'dungeons/shared/:token',
@@ -268,6 +280,12 @@ export const routes: Routes = [
       import('@features/library-dungeons/library-dungeon-editor').then(
         (m) => m.LibraryDungeonEditor,
       ),
+  },
+  {
+    path: 'dungeons',
+    pathMatch: 'full',
+    loadComponent: () =>
+      import('@features/library-dungeons/library-dungeons').then((m) => m.LibraryDungeons),
   },
   {
     path: 'character-sheet',

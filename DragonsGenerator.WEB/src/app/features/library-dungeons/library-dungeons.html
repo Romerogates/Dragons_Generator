@@ -10,6 +10,10 @@
         } @else {
           {{ dungeons().length }} / {{ maxDungeons }} carte{{ dungeons().length > 1 ? 's' : '' }}
           · ouvrez l’éditeur, puis importez une copie dans une campagne
+          ·
+          <a routerLink="/dungeons/gallery" class="text-amber-400 hover:underline not-italic font-medium"
+            >Galerie publique</a
+          >
         }
       </p>
     </div>

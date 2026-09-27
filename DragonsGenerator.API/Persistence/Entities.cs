@@ -149,6 +149,8 @@ public static class CampaignMemberRoles
 {
     public const string Dm = "dm";
     public const string Player = "player";
+    /// <summary>Lecture table sans siège combat / initiative.</summary>
+    public const string Spectator = "spectator";
 }
 
 public static class CharacterProposalStatuses

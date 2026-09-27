@@ -48,11 +48,22 @@ export class CampaignInitiativePage implements OnInit, OnDestroy {
   readonly selectedId = signal('');
   readonly roll = signal<number | null>(null);
   readonly useDice = signal(true);
+  /** Mode TV / tablette : lecture seule, grosse typo. */
+  readonly displayMode = signal(false);
 
   private pollTimer: ReturnType<typeof setInterval> | null = null;
   private liveSub: Subscription | null = null;
 
   readonly combatants = computed(() => this.board()?.combatants ?? []);
+
+  readonly sortedDisplayCombatants = computed(() => {
+    const list = [...this.combatants()];
+    return list.sort((a, b) => {
+      if (a.hasRoll !== b.hasRoll) return a.hasRoll ? -1 : 1;
+      if (a.initiativeBonus !== b.initiativeBonus) return b.initiativeBonus - a.initiativeBonus;
+      return (a.name || '').localeCompare(b.name || '', 'fr');
+    });
+  });
 
   readonly myCombatants = computed(() => {
     const userId = this.auth.user()?.id;
@@ -83,6 +94,7 @@ export class CampaignInitiativePage implements OnInit, OnDestroy {
 
     const qCode = this.route.snapshot.queryParamMap.get('code');
     if (qCode) this.code.set(qCode.toUpperCase());
+    this.displayMode.set(this.route.snapshot.queryParamMap.get('display') === '1');
 
     this.refresh();
     void this.live.watch(id);

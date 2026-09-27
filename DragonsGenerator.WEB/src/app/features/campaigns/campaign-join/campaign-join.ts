@@ -66,6 +66,28 @@ export class CampaignJoinPage implements OnInit {
     void this.router.navigate(['/login'], { queryParams: { returnUrl } });
   }
 
+  joinAsSpectator(): void {
+    if (!this.auth.isLoggedIn()) {
+      this.goLogin();
+      return;
+    }
+    if (this.joining()) return;
+    this.joining.set(true);
+    this.error.set(null);
+    this.campaigns.joinAsSpectator(this.token()).subscribe({
+      next: (summary) => {
+        this.joining.set(false);
+        void this.router.navigate(['/campaigns', summary.id], {
+          queryParams: { tab: 'overview', joined: '1' },
+        });
+      },
+      error: () => {
+        this.joining.set(false);
+        this.error.set('Impossible de rejoindre en spectateur.');
+      },
+    });
+  }
+
   join(): void {
     if (!this.auth.isLoggedIn()) {
       this.goLogin();

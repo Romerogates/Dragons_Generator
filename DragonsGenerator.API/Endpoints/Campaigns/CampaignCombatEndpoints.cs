@@ -45,6 +45,11 @@ public class ResolveCombatAttackEndpoint(AppDbContext db, CampaignLivePublisher 
                 await Send.NotFoundAsync(ct);
                 return;
             }
+            if (!CampaignAccess.CanPlay(isOwner, membership, campaign))
+            {
+                await Send.ForbiddenAsync(ct);
+                return;
+            }
 
             var newJson = CampaignJsonHelpers.TryApplyPlayerCombatAttack(
                 campaign.JsonData,

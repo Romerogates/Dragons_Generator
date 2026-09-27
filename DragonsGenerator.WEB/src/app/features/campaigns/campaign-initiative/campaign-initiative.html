@@ -1,16 +1,74 @@
-<div class="min-h-screen bg-[#0f1117] text-slate-200 px-4 py-8">
+<div
+  class="min-h-screen bg-[#0f1117] text-slate-200 px-4 py-8"
+  [class.py-4]="displayMode()"
+>
+  @if (displayMode()) {
+    <div class="max-w-3xl mx-auto space-y-6" data-testid="initiative-display-board">
+      <div class="text-center">
+        <p class="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-1">Initiative · écran table</p>
+        <h1 class="text-3xl sm:text-4xl font-serif text-amber-100">
+          {{ board()?.label || 'Collecte d’initiative' }}
+        </h1>
+        @if (!board()?.open) {
+          <p class="mt-4 text-slate-500">En attente de l’ouverture par le MJ…</p>
+        }
+      </div>
+      @if (loading()) {
+        <p class="text-center text-amber-400/80 animate-pulse">Chargement…</p>
+      } @else if (board()?.open) {
+        <ol class="space-y-3">
+          @for (cb of sortedDisplayCombatants(); track cb.id; let i = $index) {
+            <li
+              class="rounded-2xl border px-5 py-4 flex items-center justify-between gap-4"
+              [class.border-amber-500]="cb.hasRoll"
+              [class.bg-amber-950/30]="cb.hasRoll"
+              [class.border-slate-800]="!cb.hasRoll"
+              [class.bg-[#1b2028]]="!cb.hasRoll"
+            >
+              <div class="flex items-center gap-4 min-w-0">
+                <span class="text-2xl font-black text-slate-600 tabular-nums w-8">{{ i + 1 }}</span>
+                <span class="text-xl sm:text-2xl font-serif text-slate-100 truncate">{{ cb.name }}</span>
+              </div>
+              <span class="text-lg font-mono shrink-0" [class.text-emerald-300]="cb.hasRoll" [class.text-slate-600]="!cb.hasRoll">
+                @if (cb.hasRoll) { ✓ }
+                @else { … }
+                <span class="text-slate-500 text-sm ml-2">{{ cb.initiativeBonus >= 0 ? '+' : '' }}{{ cb.initiativeBonus }}</span>
+              </span>
+            </li>
+          }
+        </ol>
+      }
+      <p class="text-center">
+        <a
+          [routerLink]="['/campaigns', campaignId(), 'init']"
+          class="text-[10px] font-black uppercase tracking-widest text-slate-600 hover:text-amber-400"
+          >Quitter le mode écran</a
+        >
+      </p>
+    </div>
+  } @else {
   <div class="max-w-lg mx-auto space-y-6">
     <div class="flex items-center justify-between gap-3">
       <div>
         <p class="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-1">Initiative</p>
         <h1 class="text-2xl font-serif text-amber-100">Saisie du jet</h1>
       </div>
-      <a
-        [routerLink]="['/campaigns', campaignId(), 'play']"
-        class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400"
-      >
-        Table
-      </a>
+      <div class="flex flex-col items-end gap-1">
+        <a
+          [routerLink]="['/campaigns', campaignId(), 'play']"
+          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400"
+        >
+          Table
+        </a>
+        <a
+          [routerLink]="['/campaigns', campaignId(), 'init']"
+          [queryParams]="{ display: '1' }"
+          class="text-[10px] font-black uppercase tracking-widest text-sky-500 hover:text-sky-300"
+          data-testid="open-init-display"
+        >
+          Écran table
+        </a>
+      </div>
     </div>
 
     @if (loading()) {
@@ -132,4 +190,5 @@
       </div>
     }
   </div>
+  }
 </div>

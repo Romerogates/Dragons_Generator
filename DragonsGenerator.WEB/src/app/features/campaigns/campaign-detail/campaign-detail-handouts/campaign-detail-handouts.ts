@@ -13,6 +13,7 @@ import { LightMarkdownPipe } from '@shared/pipes/light-markdown.pipe';
 import { PdfPagePreview } from '@shared/components/pdf-page-preview/pdf-page-preview';
 import { FullscreenEnterBtn } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-btn';
 import { prefersNativePdfFallback } from '@core/utils/pdf-preview.util';
+import { HANDOUT_PACK_PRESETS } from '@core/utils/campaign-content-presets.util';
 
 export interface HandoutPatchEvent {
   handoutId: string;
@@ -67,8 +68,10 @@ export class CampaignDetailHandouts {
 
   readonly handoutKinds: HandoutKind[] = ['letter', 'map', 'summary', 'other'];
   readonly handoutKindLabels = HANDOUT_KIND_LABELS;
+  readonly handoutPacks = HANDOUT_PACK_PRESETS;
 
   readonly addHandout = output<void>();
+  readonly insertHandoutPack = output<string>();
   readonly kindFilterChange = output<HandoutKind | 'all'>();
   readonly startEdit = output<string>();
   readonly stopEdit = output<void>();

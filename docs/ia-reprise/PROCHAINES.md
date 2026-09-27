@@ -11,9 +11,49 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 - UI touchée → vérifier dans le navigateur (pas juste un screenshot).
 - PowerShell : `;` pas `&&`.
 - Couverture Angular : **branches ≥ 90%** (karma) — si le seuil casse, ajouter des tests, ne pas baisser le seuil.
-- **Pas de nouvelle feature** dans la passe polish : pas d’idle / Métiers / Bivouac, pas de routes session dédiées.
+- **Pas de nouvelle feature** dans la passe polish : pas d’idle / Métiers / Bivouac. Routes session = deep-link redirect OK.
+
+### Suite lot « 10 features » (2026-09-27)
+1. ~~Level-up depuis XP~~ **fait** (CTA + `/create?levelUp=1`)
+2. ~~Notif MJ RSVP~~ **fait** (push + activité `schedule_rsvp`)
+3. ~~Récap fin session template~~ **fait**
+4. ~~Packs rencontres~~ **fait** (Cité Franche / oneshot)
+5. ~~Écran initiative TV~~ **fait** (`/init?display=1`)
+6. ~~PDF soirée~~ **fait**
+7. ~~Pins Atlas campagne~~ **fait**
+8. ~~Galerie donjons publics~~ **fait** (`/dungeons/gallery`)
+9. ~~Dés partagés live~~ **fait** (fil de table)
+10. ~~Snapshot campagne offline~~ **fait** (lecture seule)
+
+### Polish e2e lot (2026-09-27)
+1. ~~Smoke RSVP / init display / galerie / PDF~~ **fait** (`e2e/campaign-lot-smoke.spec.ts`)
+2. ~~Fix calendrier vide après reload~~ **fait** — `normalizeData` gardait pas `scheduleEvents` / `atlasPins` / carnet
+
+### Suite proposée (prioriser)
+1. Synthèse RSVP sur hub / agenda global (compteurs Oui/Non/Peut-être)
+2. Convertir date agenda → session en 1 clic (déjà partiel) + inviter auto
+3. Timeline activité campagne filtrable (RSVP / handouts / XP / combat)
+4. Jetons custom / portraits sur battle map
+5. Multi-cartes session (changer `activeMapId` live sans quitter /play)
+6. Handouts « révélation progressive » (pages / spoiler MJ)
+7. Export PDF fiche perso polish print (déjà partiel) + pack soirée unifié
+8. Amis : partager une date agenda / lien RSVP
+9. Codex → pré-remplir run sheet session (scènes / checklist)
+10. Mode « table IRL » renforcé (QR init + écran TV + dés encodés)
 
 ## À faire (priorité)
+
+### Suite priorisée (2026-09-27) — lot RSVP / spectateur / wizard / packs / PWA
+1. ~~RSVP confirmation joueurs sur dates agenda~~ **fait**
+2. ~~FoW / jetons côté joueur (légende + canvas live)~~ **fait**
+3. ~~Mode spectateur `/play` lecture seule~~ **fait** (join, roster MJ, CanPlay API, chat/init/attaque bloqués)
+4. ~~Wizard campagne V2~~ **fait** (titre + 1ère date → session + scheduleEvent)
+5. ~~Routes `/campaigns/:id/sessions/:sessionId`~~ **fait** (redirect `?tab=sessions&session=`)
+6. ~~Packs handouts / templates carnet~~ **fait**
+7. ~~PWA / Codex offline checklist~~ **fait** (Paramètres → Application)
+8. **Level-up depuis XP table** → parcours fiche *(reporté — hors lot priorisé)*
+9. ~~Assistant IA table~~ **hors scope** (pas d’abo IA pour l’instant)
+10. ~~Idle Métiers / Bivouac~~ **hors scope** (pas de bivouac entre sessions)
 
 ### Agenda / calendrier
 1. ~~Calendrier campagne + Agenda global~~ **fait** (2026-09-27) — FullCalendar, ICS, Google, `/agenda`, thème dark 12h–22h
@@ -67,6 +107,8 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## Déjà livré (ne pas refaire)
 
+- **Lot 10 features** (2026-09-27) — level-up CTA XP ; notif MJ RSVP ; récap template ; packs rencontres ; init `?display=1` ; PDF soirée ; pins Atlas ; galerie `/dungeons/gallery` ; dés fil de table ; snapshot offline RO.
+- **RSVP + spectateur + wizard V2 + packs + PWA checklist** (2026-09-27) — RSVP Oui/Peut-être/Non sur dates agenda ; mode spectateur join + roster + CanPlay (chat/init/attaque) ; create table 1ère date ; deep-link sessions ; packs handouts / templates carnet ; checklist soirée Paramètres.
 - **Agenda V2 + lien public donjon + navbar Création** (2026-09-27) — rappels push `scheduleEvents` (24h/1h) ; RRULE + export ICS ; hub prochaine table calendrier ; `ShareToken` donjons `/dungeons/shared/{token}` + import copie ; navbar Campagnes / Création / Agenda / Guide / Amis / Codex.
 - **Calendrier campagne + Agenda global** (2026-09-27) — FullCalendar breezy dark ; `GET /me/agenda` ; onglet Calendrier hub ; ICS + Google ; plage 12h–22h.
 - **BYOK IA perso** (2026-09-27) — Paramètres → IA : OpenAI / Groq / xAI Grok / OpenRouter (Claude…) ; clé chiffrée Data Protection ; `GET|PUT|DELETE /me/ai-settings` ; routage aventure / vies / backstory si connecté + activé.

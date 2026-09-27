@@ -21,6 +21,7 @@ public static class CampaignActivityKinds
     public const string PregenAssigned = "pregen_assigned";
     public const string HandoutPublished = "handout_published";
     public const string InitiativeCollectionOpened = "initiative_collection_opened";
+    public const string ScheduleRsvp = "schedule_rsvp";
 }
 
 public static class CampaignActivityService

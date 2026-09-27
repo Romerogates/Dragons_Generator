@@ -260,7 +260,41 @@ public class ListNotificationsEndpoint(AppDbContext db) : EndpointWithoutRequest
                     "xp_awarded",
                     "XP attribuée",
                     $"{xpLabel} dans « {campaignTitle} ».",
-                    $"/campaigns/{act.CampaignId}",
+                    $"/campaigns/{act.CampaignId}?tab=players&levelUp=1",
+                    act.CreatedAt
+                )
+            );
+        }
+
+        var ownedIdsForRsvp = await db.Campaigns.AsNoTracking()
+            .Where(c => c.OwnerUserId == userId)
+            .Select(c => c.Id)
+            .ToListAsync(ct);
+        var ownedSet = ownedIdsForRsvp.ToHashSet();
+        var rsvpSince = DateTimeOffset.UtcNow - TimeSpan.FromDays(14);
+        var rsvpActs = (await db.CampaignActivities.AsNoTracking()
+                .Where(a => a.Kind == CampaignActivityKinds.ScheduleRsvp)
+                .ToListAsync(ct))
+            .Where(a => a.CreatedAt >= rsvpSince && ownedSet.Contains(a.CampaignId))
+            .OrderByDescending(a => a.CreatedAt)
+            .Take(40)
+            .ToList();
+
+        foreach (var act in rsvpActs)
+        {
+            var msg = TryGetString(act.PayloadJson, "message") ?? "Nouvelle réponse RSVP";
+            var campaignTitle = await db.Campaigns.AsNoTracking()
+                .Where(c => c.Id == act.CampaignId)
+                .Select(c => c.Title)
+                .FirstOrDefaultAsync(ct) ?? "campagne";
+
+            items.Add(
+                new NotificationItemDto(
+                    $"rsvp-{act.Id}",
+                    "schedule_rsvp",
+                    "RSVP agenda",
+                    $"{msg} (« {campaignTitle} »).",
+                    $"/campaigns/{act.CampaignId}?tab=calendar",
                     act.CreatedAt
                 )
             );

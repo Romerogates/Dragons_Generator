@@ -79,6 +79,9 @@ export class CharacterCreation implements OnInit {
     const hasEditData = this.handoff.hasEditPending();
     if (hasEditData) {
       this.builder.checkForEditMode();
+      if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('levelUp') === '1') {
+        this.builder.goToStep(1);
+      }
       return;
     }
 

@@ -326,6 +326,140 @@ export async function startActiveSessionAs(
   return sessionId;
 }
 
+/** Ajoute une date agenda avec RSVPs vides (API PUT). */
+export async function seedScheduleEventAs(
+  page: Page,
+  owner: AuthSession,
+  campaignId: string,
+  title = 'Soirée RSVP E2E',
+): Promise<string> {
+  const getRes = await page.request.get(`/api/me/campaigns/${campaignId}`, {
+    headers: bearer(owner.token),
+  });
+  expect(getRes.ok(), `Get campaign failed: ${getRes.status()}`).toBeTruthy();
+  const campaign = (await getRes.json()) as {
+    title: string;
+    data: { scheduleEvents?: Array<Record<string, unknown>>; [key: string]: unknown };
+  };
+  const eventId = `sched-e2e-${Date.now()}`;
+  const startsAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
+  const endsAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000 + 3 * 60 * 60 * 1000).toISOString();
+  const scheduleEvents = [
+    ...(campaign.data.scheduleEvents ?? []),
+    {
+      id: eventId,
+      title,
+      startsAt,
+      endsAt,
+      allDay: false,
+      kind: 'game',
+      location: '',
+      notes: '',
+      characterIds: [],
+      linkedSessionId: null,
+      rrule: null,
+      rsvps: [],
+    },
+  ];
+  const putRes = await page.request.put(`/api/me/campaigns/${campaignId}`, {
+    headers: bearer(owner.token),
+    data: {
+      title: campaign.title,
+      data: { ...campaign.data, scheduleEvents },
+    },
+  });
+  expect(putRes.ok(), `Seed schedule failed: ${putRes.status()} ${await putRes.text()}`).toBeTruthy();
+  return eventId;
+}
+
+/** Session planifiée + handout publié pour PDF soirée. */
+export async function seedEveningExportSessionAs(
+  page: Page,
+  owner: AuthSession,
+  campaignId: string,
+): Promise<string> {
+  const getRes = await page.request.get(`/api/me/campaigns/${campaignId}`, {
+    headers: bearer(owner.token),
+  });
+  expect(getRes.ok()).toBeTruthy();
+  const campaign = (await getRes.json()) as {
+    title: string;
+    data: {
+      sessions?: Array<Record<string, unknown>>;
+      handouts?: Array<Record<string, unknown>>;
+      [key: string]: unknown;
+    };
+  };
+  const sessionId = `ses-pdf-${Date.now()}`;
+  const sessions = [
+    ...(campaign.data.sessions ?? []),
+    {
+      id: sessionId,
+      title: 'Session PDF E2E',
+      scheduledAt: new Date().toISOString(),
+      status: 'planned',
+      objectives: 'Sécuriser le quai',
+      scenes: '1. Arrivée\n2. Embuscade',
+      prepChecklist: '- [ ] Init',
+    },
+  ];
+  const handouts = [
+    ...(campaign.data.handouts ?? []),
+    {
+      id: `ho-pdf-${Date.now()}`,
+      title: 'Brief E2E',
+      body: 'Contenu publié pour le PDF.',
+      kind: 'letter',
+      published: true,
+      createdAt: new Date().toISOString(),
+    },
+  ];
+  const putRes = await page.request.put(`/api/me/campaigns/${campaignId}`, {
+    headers: bearer(owner.token),
+    data: {
+      title: campaign.title,
+      data: { ...campaign.data, sessions, handouts },
+    },
+  });
+  expect(putRes.ok(), `Seed evening session failed: ${putRes.status()}`).toBeTruthy();
+  return sessionId;
+}
+
+/** Crée un donjon cloud + active le lien public (pour la galerie). */
+export async function createSharedDungeonAs(
+  page: Page,
+  owner: AuthSession,
+  name = `Galerie E2E ${Date.now()}`,
+): Promise<{ dungeonId: string; token: string }> {
+  const createRes = await page.request.post('/api/me/dungeons', {
+    headers: bearer(owner.token),
+    data: {
+      name,
+      data: {
+        id: `map-e2e-${Date.now()}`,
+        name,
+        theme: 'generic',
+        gridWidth: 8,
+        gridHeight: 8,
+        tiles: [],
+        rooms: [],
+        markers: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    },
+  });
+  expect(createRes.ok(), `Create dungeon failed: ${createRes.status()} ${await createRes.text()}`).toBeTruthy();
+  const created = (await createRes.json()) as { id: string };
+  const shareRes = await page.request.post(`/api/me/dungeons/${created.id}/share-link`, {
+    headers: bearer(owner.token),
+  });
+  expect(shareRes.ok(), `Share link failed: ${shareRes.status()} ${await shareRes.text()}`).toBeTruthy();
+  const share = (await shareRes.json()) as { token: string | null; enabled: boolean };
+  expect(share.enabled && share.token).toBeTruthy();
+  return { dungeonId: created.id, token: share.token! };
+}
+
 type SeedCombatOpts = {
   /** Si true, le PJ est dans le roster combat (banner init). Sinon absents → pas de faux prompt. */
   includePlayer: boolean;

@@ -100,4 +100,12 @@ export class DungeonCloudService {
       {},
     );
   }
+
+  listGallery(): Observable<
+    { token: string; name: string; ownerDisplayName: string; updatedAt: string }[]
+  > {
+    return this.http.get<{ token: string; name: string; ownerDisplayName: string; updatedAt: string }[]>(
+      `${this.api}/dungeons/gallery`,
+    );
+  }
 }

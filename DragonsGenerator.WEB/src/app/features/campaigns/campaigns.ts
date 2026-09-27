@@ -7,7 +7,7 @@ import { ConnectivityService } from '@core/services/connectivity.service';
 import { FriendsService } from '@core/services/friends.service';
 import { NotificationService } from '@core/services/notification.service';
 import { AuthService } from '@core/services/auth.service';
-import { CampaignData, CampaignInvite, CampaignSummary, emptyCampaignData } from '@core/models/Campaign/campaign';
+import { CampaignData, CampaignInvite, CampaignSummary, createCampaignScheduleEvent, emptyCampaignData } from '@core/models/Campaign/campaign';
 
 type RoleFilter = 'all' | 'dm' | 'player';
 type ListScope = 'active' | 'archived' | 'history';
@@ -47,6 +47,8 @@ export class Campaigns implements OnInit, OnDestroy {
   readonly showEmptyCampaignModal = signal(false);
   readonly emptyCampaignTitle = signal('Nouvelle campagne');
   readonly emptyCampaignTemplate = signal<'blank' | 'oneshot-classic' | 'oneshot-dungeon' | 'oneshot-intrigue'>('blank');
+  /** Optionnel : première date de table (datetime-local). */
+  readonly emptyFirstSessionLocal = signal('');
   readonly isLoggedIn = this.auth.isLoggedIn;
 
   private softPollTimer: ReturnType<typeof setInterval> | null = null;
@@ -177,7 +179,9 @@ export class Campaigns implements OnInit, OnDestroy {
     this.showEmptyCampaignModal.set(false);
     this.creatingEmpty.set(true);
     this.actionError.set(null);
-    const data = this.buildEmptyCampaignData(this.emptyCampaignTemplate());
+    let data = this.buildEmptyCampaignData(this.emptyCampaignTemplate());
+    data = this.applyOptionalFirstDate(data, this.emptyFirstSessionLocal());
+    this.emptyFirstSessionLocal.set('');
 
     if (!this.connectivity.isOnline()) {
       const local = this.offlineSync.queueCampaignCreate(title, data);
@@ -409,5 +413,36 @@ export class Campaigns implements OnInit, OnDestroy {
         },
       ],
     };
+  }
+
+  private applyOptionalFirstDate(data: CampaignData, localDatetime: string): CampaignData {
+    const raw = localDatetime.trim();
+    if (!raw) return data;
+    const dt = new Date(raw);
+    if (Number.isNaN(dt.getTime())) return data;
+    const iso = dt.toISOString();
+    const sessionId = `ses-${Date.now().toString(36)}`;
+    const sessions =
+      data.sessions.length > 0
+        ? data.sessions.map((s, i) => (i === 0 ? { ...s, scheduledAt: iso } : s))
+        : [
+            {
+              id: sessionId,
+              title: 'Première session',
+              scheduledAt: iso,
+              status: 'planned' as const,
+              timeline: [],
+            },
+          ];
+    const scheduleEvents = [
+      ...(data.scheduleEvents ?? []),
+      createCampaignScheduleEvent({
+        title: sessions[0]?.title || 'Première session',
+        startsAt: iso,
+        endsAt: new Date(dt.getTime() + 3 * 60 * 60 * 1000).toISOString(),
+        linkedSessionId: sessions[0]?.id,
+      }),
+    ];
+    return { ...data, sessions, scheduleEvents };
   }
 }

@@ -6,7 +6,8 @@ export type NotificationType =
   | 'character_pick_requested'
   | 'proposal_rejected'
   | 'proposal_approved'
-  | 'xp_awarded';
+  | 'xp_awarded'
+  | 'schedule_rsvp';
 
 export interface NotificationItem {
   key: string;
