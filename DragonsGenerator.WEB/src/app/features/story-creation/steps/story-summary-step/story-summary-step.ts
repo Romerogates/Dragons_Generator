@@ -165,9 +165,19 @@ export class StorySummaryStep implements OnInit, OnDestroy {
           this.router.navigate(['/campaigns', summary.id]);
         }
       },
-      error: () => {
+      error: (err: { status?: number }) => {
+        // 504/502 = passerelle / IA lente — ne pas masquer en « rédigez un résumé ».
+        if (err?.status === 504 || err?.status === 502) {
+          this.saving.set(false);
+          this.saveError.set(
+            'Le serveur a mis trop longtemps à répondre (délai dépassé). Réessayez sans générer d’IA, ou dans quelques secondes.',
+          );
+          return;
+        }
         if (!b.adventure().trim()) {
-          this.saveError.set('Rédigez un résumé d\'aventure avant la sauvegarde locale.');
+          this.saveError.set(
+            'Impossible de sauvegarder. Ajoutez un résumé d’aventure (même court, sans IA) puis réessayez.',
+          );
           this.saving.set(false);
           return;
         }

@@ -195,9 +195,15 @@ export class Campaigns implements OnInit, OnDestroy {
         this.creatingEmpty.set(false);
         this.router.navigate(['/campaigns', created.id], { queryParams: { tab: 'overview' } });
       },
-      error: () => {
-        this.actionError.set('Impossible de créer la campagne vide.');
+      error: (err: { status?: number }) => {
         this.creatingEmpty.set(false);
+        if (err?.status === 504 || err?.status === 502) {
+          this.actionError.set(
+            'Le serveur a mis trop longtemps à répondre. Réessayez dans quelques secondes (aucune IA n’est requise pour créer une table).',
+          );
+          return;
+        }
+        this.actionError.set('Impossible de créer la campagne. Vérifiez votre connexion et réessayez.');
       },
     });
   }

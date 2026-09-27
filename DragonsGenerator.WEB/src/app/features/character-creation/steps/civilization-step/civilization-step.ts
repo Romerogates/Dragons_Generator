@@ -134,17 +134,19 @@ export class CivilizationStep implements OnInit, OnDestroy {
     return builderId === this.selectedCivId() && builderId !== null;
   });
 
+  /** Pan seulement — le zoom agrandit width/height (rééchantillonnage JPEG, moins flou que scale()). */
   readonly mapTransform = computed(
-    () => `translate(${this.panX()}px, ${this.panY()}px) scale(${this.scale()})`,
+    () => `translate3d(${this.panX()}px, ${this.panY()}px, 0)`,
   );
+
+  readonly displayMapWidth = computed(() => this.mapWidth() * this.scale());
+  readonly displayMapHeight = computed(() => this.mapHeight() * this.scale());
 
   /** Seuil d'affichage des noms sur la carte (plus bas sur mobile). */
   pinLabelMinScale(): number {
     if (typeof window === 'undefined') return 1.35;
     return window.matchMedia('(max-width: 1023px)').matches ? 1 : 1.35;
   }
-
-  readonly pinCounterScale = computed(() => 1 / this.scale());
 
   readonly canZoomOut = computed(() => this.scale() > MIN_SCALE + 0.01);
   readonly canZoomIn = computed(() => this.scale() < MAX_SCALE - 0.01);

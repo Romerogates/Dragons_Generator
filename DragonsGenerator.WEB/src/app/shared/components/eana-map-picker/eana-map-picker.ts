@@ -67,10 +67,12 @@ export class EanaMapPicker implements OnInit, OnDestroy {
     const label = this.regionLabel() || 'Région inconnue';
     return `Région : ${label}`;
   });
+  /** Pan seulement — zoom via width/height (moins flou que transform scale). */
   readonly mapTransform = computed(
-    () => `translate(${this.panX()}px, ${this.panY()}px) scale(${this.scale()})`,
+    () => `translate3d(${this.panX()}px, ${this.panY()}px, 0)`,
   );
-  readonly pinCounterScale = computed(() => 1 / this.scale());
+  readonly displayMapWidth = computed(() => this.mapWidth() * this.scale());
+  readonly displayMapHeight = computed(() => this.mapHeight() * this.scale());
   readonly canZoomOut = computed(() => this.scale() > MIN_SCALE + 0.01);
   readonly canZoomIn = computed(() => this.scale() < MAX_SCALE - 0.01);
 

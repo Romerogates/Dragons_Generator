@@ -45,16 +45,16 @@
         (pointercancel)="onPointerUp($event)"
       >
         <div
-          class="absolute left-0 top-0 origin-top-left will-change-transform"
+          class="absolute left-0 top-0 origin-top-left eana-map-layer"
           [class.opacity-0]="!mapReady()"
-          [style.width.px]="mapWidth()"
-          [style.height.px]="mapHeight()"
+          [style.width.px]="displayMapWidth()"
+          [style.height.px]="displayMapHeight()"
           [style.transform]="mapTransform()"
         >
           <img
             src="Carte.jpg"
             alt="Carte d'Eana"
-            class="absolute inset-0 w-full h-full object-fill opacity-90 pointer-events-none select-none"
+            class="absolute inset-0 w-full h-full object-fill opacity-90 pointer-events-none select-none eana-map-img"
             draggable="false"
           />
 
@@ -64,7 +64,7 @@
               class="absolute z-10"
               [style.top.%]="getMapCoordinates(civ.id).y"
               [style.left.%]="getMapCoordinates(civ.id).x"
-              [style.transform]="'translate(-50%, -50%) scale(' + pinCounterScale() + ')'"
+              style="transform: translate(-50%, -50%)"
             >
               <button
                 type="button"

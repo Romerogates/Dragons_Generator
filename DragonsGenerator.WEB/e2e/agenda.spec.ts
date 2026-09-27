@@ -15,5 +15,11 @@ test.describe('Agenda global', () => {
     await expect(page.getByTestId('agenda-export-ics')).toBeVisible({ timeout: 15_000 });
     // Calendrier visible une fois le chargement terminé (liste ou mois).
     await expect(page.getByTestId('global-agenda-calendar')).toBeVisible({ timeout: 20_000 });
+
+    await page.getByTestId('agenda-add-date').click();
+    await expect(page.getByTestId('agenda-add-panel')).toBeVisible();
+    await expect(page.getByTestId('agenda-campaign-select')).toBeVisible();
+    await page.getByTestId('agenda-save-date').click();
+    await expect(page.getByTestId('agenda-add-panel')).toHaveCount(0, { timeout: 20_000 });
   });
 });

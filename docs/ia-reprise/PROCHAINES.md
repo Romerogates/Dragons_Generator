@@ -28,6 +28,9 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 ### Polish e2e lot (2026-09-27)
 1. ~~Smoke RSVP / init display / galerie / PDF~~ **fait** (`e2e/campaign-lot-smoke.spec.ts`)
 2. ~~Fix calendrier vide après reload~~ **fait** — `normalizeData` gardait pas `scheduleEvents` / `atlasPins` / carnet
+3. ~~Agenda global : clic → ajouter date (campagne + héros)~~ **fait**
+4. ~~Carte Eana moins floue au zoom~~ **fait** (width/height au lieu de `scale()`, tooltip sans backdrop-blur)
+5. ~~Prod IA : Ollama off~~ **fait** (`LocalLlm__Enabled=false` — évite 504 sur générations courtes)
 
 ### Suite proposée (prioriser)
 1. Synthèse RSVP sur hub / agenda global (compteurs Oui/Non/Peut-être)

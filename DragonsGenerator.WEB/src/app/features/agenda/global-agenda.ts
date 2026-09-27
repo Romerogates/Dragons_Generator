@@ -7,11 +7,18 @@ import {
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { FullCalendarModule } from '@fullcalendar/angular';
-import type { CalendarOptions, EventClickInfo, EventInput } from 'fullcalendar';
+import type {
+  CalendarOptions,
+  DateSelectInfo,
+  EventClickInfo,
+  EventInput,
+} from 'fullcalendar';
 import dayGridPlugin from '@fullcalendar/angular/daygrid';
 import timeGridPlugin from '@fullcalendar/angular/timegrid';
+import interactionPlugin from '@fullcalendar/angular/interaction';
 import listPlugin from '@fullcalendar/angular/list';
 import breezyThemePlugin from '@fullcalendar/angular/themes/breezy';
 import frLocale from 'fullcalendar/locales/fr';
@@ -21,27 +28,64 @@ import {
   AgendaEventDto,
   CampaignCloudService,
 } from '@core/services/campaign-cloud.service';
+import { CharacterCloudService, CloudCharacterSummary } from '@core/services/character-cloud.service';
+import {
+  createCampaignScheduleEvent,
+  type CampaignScheduleKind,
+  type CampaignSummary,
+  CAMPAIGN_SCHEDULE_KIND_LABELS,
+} from '@core/models/Campaign/campaign';
 import {
   buildIcsCalendar,
+  datetimeLocalValue,
   downloadIcsFile,
+  fromDatetimeLocalValue,
   type IcsEventInput,
 } from '@core/utils/schedule-ics.util';
 
 @Component({
   selector: 'app-global-agenda',
   standalone: true,
-  imports: [CommonModule, RouterLink, FullCalendarModule],
+  imports: [CommonModule, FormsModule, RouterLink, FullCalendarModule],
   templateUrl: './global-agenda.html',
   styleUrl: './global-agenda.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GlobalAgendaPage implements OnInit {
-  private readonly campaigns = inject(CampaignCloudService);
+  private readonly campaignsApi = inject(CampaignCloudService);
+  private readonly charactersApi = inject(CharacterCloudService);
   private readonly router = inject(Router);
 
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly events = signal<AgendaEventDto[]>([]);
+  readonly ownedCampaigns = signal<CampaignSummary[]>([]);
+  readonly heroes = signal<CloudCharacterSummary[]>([]);
+
+  readonly panelOpen = signal(false);
+  readonly saving = signal(false);
+  readonly saveError = signal<string | null>(null);
+
+  readonly draftTitle = signal('Soirée de table');
+  readonly draftKind = signal<CampaignScheduleKind>('game');
+  readonly draftStartsLocal = signal('');
+  readonly draftEndsLocal = signal('');
+  readonly draftCampaignId = signal('');
+  readonly draftHeroId = signal('');
+  readonly draftNotes = signal('');
+
+  readonly kinds = Object.entries(CAMPAIGN_SCHEDULE_KIND_LABELS) as [
+    CampaignScheduleKind,
+    string,
+  ][];
+
+  readonly canSave = computed(
+    () =>
+      !!this.draftCampaignId() &&
+      !!this.draftStartsLocal() &&
+      !!this.draftTitle().trim() &&
+      !this.saving(),
+  );
 
   readonly fcEvents = computed((): EventInput[] =>
     this.events().map((e) => {
@@ -66,9 +110,9 @@ export class GlobalAgendaPage implements OnInit {
   );
 
   readonly options = computed((): CalendarOptions => ({
-    plugins: [breezyThemePlugin, dayGridPlugin, timeGridPlugin, listPlugin],
+    plugins: [breezyThemePlugin, dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin],
     locale: frLocale,
-    initialView: 'listMonth',
+    initialView: 'dayGridMonth',
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
@@ -80,20 +124,34 @@ export class GlobalAgendaPage implements OnInit {
     scrollTime: '18:00:00',
     slotDuration: '00:30:00',
     editable: false,
-    selectable: false,
+    selectable: true,
+    selectMirror: true,
     dayMaxEvents: true,
     nowIndicator: true,
+    select: (arg) => this.onSelect(arg),
     eventClick: (arg) => this.onEventClick(arg),
   }));
 
   ngOnInit(): void {
     this.reload();
+    this.campaignsApi.list().subscribe({
+      next: (list) => {
+        this.ownedCampaigns.set((list ?? []).filter((c) => c.role === 'dm' && !c.isClosed));
+        if (!this.draftCampaignId() && this.ownedCampaigns().length) {
+          this.draftCampaignId.set(this.ownedCampaigns()[0].id);
+        }
+      },
+    });
+    this.charactersApi.list().subscribe({
+      next: (list) => this.heroes.set(list ?? []),
+      error: () => this.heroes.set([]),
+    });
   }
 
   reload(): void {
     this.loading.set(true);
     this.error.set(null);
-    this.campaigns.listAgenda().subscribe({
+    this.campaignsApi.listAgenda().subscribe({
       next: (list) => {
         this.events.set(list ?? []);
         this.loading.set(false);
@@ -101,6 +159,74 @@ export class GlobalAgendaPage implements OnInit {
       error: () => {
         this.error.set('Impossible de charger l’agenda.');
         this.loading.set(false);
+      },
+    });
+  }
+
+  openAddPanel(startsAt?: Date): void {
+    const start = startsAt ?? defaultTableStartsAt();
+    const end = new Date(start.getTime() + 3 * 60 * 60 * 1000);
+    this.draftTitle.set('Soirée de table');
+    this.draftKind.set('game');
+    this.draftStartsLocal.set(datetimeLocalValue(start.toISOString()));
+    this.draftEndsLocal.set(datetimeLocalValue(end.toISOString()));
+    this.draftHeroId.set('');
+    this.draftNotes.set('');
+    this.saveError.set(null);
+    if (!this.draftCampaignId() && this.ownedCampaigns().length) {
+      this.draftCampaignId.set(this.ownedCampaigns()[0].id);
+    }
+    this.panelOpen.set(true);
+  }
+
+  closePanel(): void {
+    this.panelOpen.set(false);
+    this.saveError.set(null);
+  }
+
+  saveDraft(): void {
+    if (!this.canSave()) return;
+    const campaignId = this.draftCampaignId();
+    const startsAt = fromDatetimeLocalValue(this.draftStartsLocal());
+    const endsAt = this.draftEndsLocal()
+      ? fromDatetimeLocalValue(this.draftEndsLocal())
+      : new Date(new Date(startsAt).getTime() + 3 * 60 * 60 * 1000).toISOString();
+    const heroId = this.draftHeroId().trim();
+    const hero = this.heroes().find((h) => h.id === heroId);
+    const notesParts = [
+      this.draftNotes().trim(),
+      hero ? `Héros : ${hero.name}` : '',
+    ].filter(Boolean);
+
+    this.saving.set(true);
+    this.saveError.set(null);
+
+    this.campaignsApi.get(campaignId).subscribe({
+      next: (detail) => {
+        const created = createCampaignScheduleEvent({
+          title: this.draftTitle().trim() || 'Soirée de table',
+          kind: this.draftKind(),
+          startsAt,
+          endsAt,
+          characterIds: heroId ? [heroId] : [],
+          notes: notesParts.join('\n'),
+        });
+        const scheduleEvents = [...(detail.data.scheduleEvents ?? []), created];
+        this.campaignsApi.update(campaignId, detail.title, { ...detail.data, scheduleEvents }).subscribe({
+          next: () => {
+            this.saving.set(false);
+            this.panelOpen.set(false);
+            this.reload();
+          },
+          error: () => {
+            this.saving.set(false);
+            this.saveError.set('Impossible d’enregistrer la date. Réessayez.');
+          },
+        });
+      },
+      error: () => {
+        this.saving.set(false);
+        this.saveError.set('Impossible de charger la campagne choisie.');
       },
     });
   }
@@ -121,6 +247,19 @@ export class GlobalAgendaPage implements OnInit {
     downloadIcsFile('agenda-dragons.ics', ics);
   }
 
+  private onSelect(arg: DateSelectInfo): void {
+    arg.view.calendar.unselect();
+    const start = arg.start;
+    // Clic jour (mois) : proposer 19h locales.
+    if (arg.allDay) {
+      const d = new Date(start);
+      d.setHours(19, 0, 0, 0);
+      this.openAddPanel(d);
+      return;
+    }
+    this.openAddPanel(start);
+  }
+
   private onEventClick(arg: EventClickInfo): void {
     const campaignId = arg.event.extendedProps['campaignId'] as string | undefined;
     const source = arg.event.extendedProps['source'] as string | undefined;
@@ -128,6 +267,13 @@ export class GlobalAgendaPage implements OnInit {
     const tab = source === 'session' ? 'sessions' : 'calendar';
     void this.router.navigate(['/campaigns', campaignId], { queryParams: { tab } });
   }
+}
+
+function defaultTableStartsAt(): Date {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  d.setHours(19, 0, 0, 0);
+  return d;
 }
 
 function eventColors(e: AgendaEventDto): { bg: string; border: string } {

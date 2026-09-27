@@ -226,6 +226,17 @@
     overscroll-behavior: none;
   }
 
+  .eana-map-viewport .eana-map-layer {
+    backface-visibility: hidden;
+  }
+
+  .eana-map-viewport .eana-map-img {
+    /* JPEG illustré : pas de pixelated ; évite le voile GPU au redimensionnement */
+    image-rendering: auto;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
   /* Hauteurs : carte visible + barre zoom / pills sous le stage */
   .eana-map-stage {
     width: 100%;
