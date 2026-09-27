@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@use './styles/fullcalendar-dark';
-
 @layer base {
   :root {
     --dg-bg: #171b22;

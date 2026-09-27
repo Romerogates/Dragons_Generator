@@ -42,7 +42,8 @@
               "@fullcalendar/angular/skeleton.css",
               "@fullcalendar/angular/themes/breezy/theme.css",
               "@fullcalendar/angular/themes/breezy/palettes/amber.css",
-              "src/styles.scss"
+              "src/styles.scss",
+              "src/styles/_fullcalendar-dark.scss"
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
@@ -162,7 +163,8 @@
               "@fullcalendar/angular/skeleton.css",
               "@fullcalendar/angular/themes/breezy/theme.css",
               "@fullcalendar/angular/themes/breezy/palettes/amber.css",
-              "src/styles.scss"
+              "src/styles.scss",
+              "src/styles/_fullcalendar-dark.scss"
             ]
           }
         },
