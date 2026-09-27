@@ -1,0 +1,126 @@
+/* FullCalendar breezy — dark slate / amber (site Dragons Generator) */
+.dg-fc-dark {
+  color-scheme: dark;
+  --fc-breezy-background: #141820;
+  --fc-breezy-faint: rgb(255 255 255 / 0.03);
+  --fc-breezy-muted: rgb(255 255 255 / 0.06);
+  --fc-breezy-strong: rgb(255 255 255 / 0.1);
+  --fc-breezy-stronger: rgb(255 255 255 / 0.14);
+  --fc-breezy-strongest: rgb(255 255 255 / 0.18);
+
+  --fc-breezy-foreground: #e2e8f0;
+  --fc-breezy-faint-foreground: #64748b;
+  --fc-breezy-muted-foreground: #94a3b8;
+  --fc-breezy-strong-foreground: #f8fafc;
+
+  --fc-breezy-border: #1e293b;
+  --fc-breezy-muted-border: #1e293b;
+  --fc-breezy-strong-border: #334155;
+
+  --fc-breezy-primary: #fbbf24;
+  --fc-breezy-primary-over: #fcd34d;
+  --fc-breezy-primary-foreground: #1c1917;
+
+  --fc-breezy-secondary: #1b2028;
+  --fc-breezy-secondary-over: #292524;
+  --fc-breezy-secondary-border: #334155;
+  --fc-breezy-secondary-foreground: #cbd5e1;
+  --fc-breezy-secondary-icon: #94a3b8;
+  --fc-breezy-secondary-icon-over: #e2e8f0;
+
+  --fc-breezy-event: #b45309;
+  --fc-breezy-event-contrast: #fff;
+  --fc-breezy-background-event: #78350f;
+  --fc-breezy-highlight: rgb(245 158 11 / 0.12);
+  --fc-breezy-now: #f59e0b;
+
+  --fc-breezy-selected: rgb(245 158 11 / 0.18);
+  --fc-breezy-popover: #1b2028;
+  --fc-breezy-popover-border: #334155;
+
+  --fc-border-color: #1e293b;
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: rgb(15 23 42 / 0.55);
+  --fc-list-event-hover-bg-color: rgb(30 41 59 / 0.9);
+  --fc-today-bg-color: rgb(245 158 11 / 0.1);
+  --fc-button-bg-color: #1b2028;
+  --fc-button-border-color: #334155;
+  --fc-button-text-color: #cbd5e1;
+  --fc-button-hover-bg-color: #292524;
+  --fc-button-hover-border-color: rgb(180 83 9 / 0.55);
+  --fc-button-active-bg-color: #78350f;
+  --fc-button-active-border-color: rgb(245 158 11 / 0.5);
+  --fc-event-border-color: transparent;
+  --fc-event-text-color: #fff;
+  --fc-neutral-text-color: #94a3b8;
+}
+
+.dg-fc-dark .fc {
+  color: #e2e8f0;
+  font-size: 0.875rem;
+  background: transparent;
+}
+
+.dg-fc-dark .fc .fc-toolbar-title {
+  font-size: 1.1rem;
+  font-family: var(--font-serif, Georgia, serif);
+  color: #fbbf24;
+}
+
+.dg-fc-dark .fc .fc-button {
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.65rem;
+}
+
+.dg-fc-dark .fc .fc-col-header-cell-cushion,
+.dg-fc-dark .fc .fc-daygrid-day-number,
+.dg-fc-dark .fc .fc-list-day-text,
+.dg-fc-dark .fc .fc-list-day-side-text {
+  color: #94a3b8;
+  text-decoration: none;
+}
+
+.dg-fc-dark .fc .fc-scrollgrid,
+.dg-fc-dark .fc .fc-theme-standard td,
+.dg-fc-dark .fc .fc-theme-standard th,
+.dg-fc-dark .fc td,
+.dg-fc-dark .fc th {
+  border-color: #1e293b;
+}
+
+.dg-fc-dark .fc .fc-daygrid-day,
+.dg-fc-dark .fc .fc-timegrid-col {
+  background: transparent;
+}
+
+.dg-fc-dark .fc .fc-day-other {
+  background: rgb(15 23 42 / 0.35);
+}
+
+.dg-fc-dark .fc .fc-list,
+.dg-fc-dark .fc .fc-list-table td,
+.dg-fc-dark .fc .fc-list-day-cushion {
+  background: transparent;
+  border-color: #1e293b;
+  color: #cbd5e1;
+}
+
+.dg-fc-dark .fc .fc-list-event:hover td {
+  background: rgb(30 41 59 / 0.9);
+}
+
+.dg-fc-dark .fc .fc-event {
+  border-radius: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dg-fc-dark .fc .fc-timegrid-slot-label {
+  color: #64748b;
+  font-size: 0.7rem;
+}

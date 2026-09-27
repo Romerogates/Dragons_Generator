@@ -103,6 +103,11 @@ export class CampaignCalendar {
       right: 'dayGridMonth,timeGridWeek,listMonth',
     },
     height: 'auto',
+    // Soirées de table : pas de grille 24h
+    slotMinTime: '12:00:00',
+    slotMaxTime: '22:00:00',
+    scrollTime: '18:00:00',
+    slotDuration: '00:30:00',
     selectable: this.isOwner(),
     editable: this.isOwner(),
     eventStartEditable: this.isOwner(),
@@ -123,6 +128,7 @@ export class CampaignCalendar {
     const created = createCampaignScheduleEvent({
       title: 'Nouvelle date',
       kind: 'game',
+      startsAt: defaultTableStartsAt().toISOString(),
     });
     this.editing.set({
       id: `schedule:${created.id}`,
@@ -334,4 +340,18 @@ export class CampaignCalendar {
     // Sessions stay date-edited in the Sessions tab for V1.
     arg.revert();
   }
+}
+
+/** Prochaine soirée typique (18h), jamais le matin. */
+function defaultTableStartsAt(): Date {
+  const d = new Date();
+  d.setSeconds(0, 0);
+  d.setMinutes(0);
+  if (d.getHours() >= 22) {
+    d.setDate(d.getDate() + 1);
+    d.setHours(18);
+  } else if (d.getHours() < 18) {
+    d.setHours(18);
+  }
+  return d;
 }
