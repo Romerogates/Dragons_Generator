@@ -25,12 +25,11 @@ public record GenerateAdventureRequest
 
 public record GenerateAdventureResponse(string Adventure);
 
-public class GenerateAdventureEndpoint : Endpoint<GenerateAdventureRequest, GenerateAdventureResponse>
+public class GenerateAdventureEndpoint(
+    HybridAiService ai,
+    UserAiCredentialResolver userAi
+) : Endpoint<GenerateAdventureRequest, GenerateAdventureResponse>
 {
-    private readonly HybridAiService _ai;
-
-    public GenerateAdventureEndpoint(HybridAiService ai) => _ai = ai;
-
     public override void Configure()
     {
         Post("/generate-adventure");
@@ -105,11 +104,13 @@ public class GenerateAdventureEndpoint : Endpoint<GenerateAdventureRequest, Gene
             {string.Join('\n', creatureBlocks)}
             """;
 
-        var result = await _ai.SendAdventureGenerationAsync(
+        var userCreds = await userAi.ResolveAsync(AuthHelpers.GetUserId(User), ct);
+        var result = await ai.SendAdventureGenerationAsync(
             prompt,
             "Tu es un maître du jeu expert en jeux de rôle fantasy francophones. Tu livres uniquement l'aventure finale en français, prête à lire aux joueurs.",
             2500,
-            ct);
+            ct,
+            userCreds);
 
         if (!result.Ok)
         {

@@ -78,7 +78,13 @@
     </div>
 
     @if (generationError(); as err) {
-      <div class="p-3 bg-red-950/40 border border-red-900/50 rounded-xl text-sm text-red-300">{{ err }}</div>
+      <div
+        class="p-3 bg-red-950/40 border border-red-900/50 rounded-xl text-sm text-red-300"
+        data-testid="adventure-generation-error"
+        role="alert"
+      >
+        {{ err }}
+      </div>
     }
 
     <app-ai-generation-progress-bar />

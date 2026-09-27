@@ -24,6 +24,20 @@ public sealed class UserPreferences
 
     [JsonPropertyName("dismissedBannerIds")]
     public List<string> DismissedBannerIds { get; set; } = [];
+
+    /// <summary>BYOK : utiliser la clé API de l’utilisateur.</summary>
+    [JsonPropertyName("aiEnabled")]
+    public bool AiEnabled { get; set; }
+
+    [JsonPropertyName("aiProvider")]
+    public string? AiProvider { get; set; }
+
+    [JsonPropertyName("aiModel")]
+    public string? AiModel { get; set; }
+
+    /// <summary>Clé API chiffrée (Data Protection) — jamais renvoyée en clair.</summary>
+    [JsonPropertyName("aiApiKeyProtected")]
+    public string? AiApiKeyProtected { get; set; }
 }
 
 public static class UserPreferencesHelper
@@ -175,5 +189,47 @@ public static class UserPreferencesHelper
             hideAllBanners = prefs.HideAllBanners,
             dismissedBannerIds = prefs.DismissedBannerIds,
         };
+    }
+
+    public static object GetAiSettingsExport(AppUser user)
+    {
+        var prefs = Parse(user.PreferencesJson);
+        return new
+        {
+            enabled = prefs.AiEnabled,
+            provider = prefs.AiProvider,
+            model = prefs.AiModel,
+            hasApiKey = !string.IsNullOrWhiteSpace(prefs.AiApiKeyProtected),
+        };
+    }
+
+    public static void ApplyAiSettings(
+        AppUser user,
+        bool enabled,
+        string? provider,
+        string? model,
+        string? apiKeyProtectedOrNullToKeep,
+        bool clearApiKey
+    )
+    {
+        var prefs = Parse(user.PreferencesJson);
+        prefs.AiEnabled = enabled;
+        prefs.AiProvider = provider;
+        prefs.AiModel = model;
+        if (clearApiKey)
+            prefs.AiApiKeyProtected = null;
+        else if (apiKeyProtectedOrNullToKeep is not null)
+            prefs.AiApiKeyProtected = apiKeyProtectedOrNullToKeep;
+        user.PreferencesJson = Serialize(prefs);
+    }
+
+    public static void ClearAiSettings(AppUser user)
+    {
+        var prefs = Parse(user.PreferencesJson);
+        prefs.AiEnabled = false;
+        prefs.AiProvider = null;
+        prefs.AiModel = null;
+        prefs.AiApiKeyProtected = null;
+        user.PreferencesJson = Serialize(prefs);
     }
 }

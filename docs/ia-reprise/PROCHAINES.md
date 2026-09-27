@@ -51,6 +51,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 23. ~~Donjons Vague A~~ **fait** (icônes ; zoom/void ; notes marqueurs ; bannières dismiss + Paramètres)
 24. ~~Donjons Vague B~~ **fait** (hub `/dungeons` ; CRUD cloud ; import copie campagne ; partage chat amis ; lien public reporté)
 25. ~~Fiabilité lot vies créatures scénario~~ **fait** (2026-09-27 — chunks 3 ; Groq si JSON local invalide ; fill une-par-une API ; front secours HTTP)
+26. ~~BYOK IA perso~~ **fait** (2026-09-27 — Paramètres → IA : OpenAI / Groq / xAI / OpenRouter ; clé chiffrée ; routage generate-*)
 
 ### Guide (suite)
 1. ~~Découvrabilité + sans checklists~~ **fait**
@@ -60,6 +61,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## Déjà livré (ne pas refaire)
 
+- **BYOK IA perso** (2026-09-27) — Paramètres → IA : OpenAI / Groq / xAI Grok / OpenRouter (Claude…) ; clé chiffrée Data Protection ; `GET|PUT|DELETE /me/ai-settings` ; routage aventure / vies / backstory si connecté + activé.
 - **Fiabilité lot vies créatures** (2026-09-27) — `generate-creature-stories-batch` : chunks de 3 ; parse JSON (fence/virgules) ; bascule Groq si Ollama renvoie du non-JSON ; fill une-par-une dans l’API ; 502 seulement si 0 résultat ; front garde secours HTTP + bandeau ambre.
 - **Sprint A battle map** (2026-09-23) — positions jetons sur `Combatant` ; canvas live MJ+joueur ; placement/drag MJ ; barre FoW salles en Combat ; fil de table `CampaignSession.tableChat` + endpoint `POST /me/campaigns/{id}/table-chat` ; utils `dungeon-battle` / `dungeon-fog`.
 - **Donjons suite éditeur** (2026-09-20) — flood-fill + brosse 1–3 ; redo (Ctrl+Y) ; FoW UX polish ; lien copiable `?tab=maps&map=` pour membres ; hub copy clarifiée. Token public anonyme reporté.

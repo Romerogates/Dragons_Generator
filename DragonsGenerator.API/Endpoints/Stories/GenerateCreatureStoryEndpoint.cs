@@ -1,5 +1,4 @@
 using DragonsGenerator.API.Common;
-using DragonsGenerator.API.Models;
 using DragonsGenerator.API.Services;
 using FastEndpoints;
 using Microsoft.AspNetCore.RateLimiting;
@@ -16,17 +15,12 @@ public record GenerateCreatureStoryRequest
 
 public record GenerateCreatureStoryResponse(string Backstory);
 
-public class GenerateCreatureStoryEndpoint : Endpoint<GenerateCreatureStoryRequest, GenerateCreatureStoryResponse>
+public class GenerateCreatureStoryEndpoint(
+    GameDataRepository repo,
+    HybridAiService ai,
+    UserAiCredentialResolver userAi
+) : Endpoint<GenerateCreatureStoryRequest, GenerateCreatureStoryResponse>
 {
-    private readonly GameDataRepository _repo;
-    private readonly HybridAiService _ai;
-
-    public GenerateCreatureStoryEndpoint(GameDataRepository repo, HybridAiService ai)
-    {
-        _repo = repo;
-        _ai = ai;
-    }
-
     public override void Configure()
     {
         Post("/generate-creature-story");
@@ -36,7 +30,7 @@ public class GenerateCreatureStoryEndpoint : Endpoint<GenerateCreatureStoryReque
 
     public override async Task HandleAsync(GenerateCreatureStoryRequest req, CancellationToken ct)
     {
-        var creature = await _repo.GetCreatureByIdAsync(req.CreatureId, ct);
+        var creature = await repo.GetCreatureByIdAsync(req.CreatureId, ct);
         if (creature is null)
         {
             await Send.NotFoundAsync(ct);
@@ -75,11 +69,13 @@ public class GenerateCreatureStoryEndpoint : Endpoint<GenerateCreatureStoryReque
             {(actionsSummary.Length > 0 ? $"- Capacités marquantes: {actionsSummary}" : "")}
             """;
 
-        var result = await _ai.SendShortGenerationAsync(
+        var userCreds = await userAi.ResolveAsync(AuthHelpers.GetUserId(User), ct);
+        var result = await ai.SendShortGenerationAsync(
             prompt,
             "Tu es un maître du jeu expert en jeux de rôle fantasy francophones.",
             500,
-            ct);
+            ct,
+            userCredentials: userCreds);
 
         if (!result.Ok)
         {

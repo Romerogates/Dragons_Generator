@@ -151,6 +151,7 @@ public class ExportMyDataEndpoint(AppDbContext db) : EndpointWithoutRequest
             user.AcceptedTermsAt,
             guidePreferences = UserPreferencesHelper.GetGuidePreferencesExport(user),
             uiBannerPreferences = UserPreferencesHelper.GetUiBannerPreferencesExport(user),
+            aiSettings = UserPreferencesHelper.GetAiSettingsExport(user),
         },
             characters,
             dungeons,

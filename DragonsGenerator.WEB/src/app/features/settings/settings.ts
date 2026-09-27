@@ -22,6 +22,7 @@ import {
 import { UiBannerPreferencesService } from '@core/services/ui-banner-preferences.service';
 import { PwaLifecycleService } from '@core/services/pwa-lifecycle.service';
 import { PasswordFieldComponent } from '@shared/components/password-field/password-field';
+import { AiSettingsService, type AiProviderOption, type AiSettingsDto } from '@core/services/ai-settings.service';
 import {
   PROFILE_ACCENTS,
   PROFILE_AVATAR_OPTIONS,
@@ -29,7 +30,7 @@ import {
   profileInitial,
 } from '@core/utils/profile.util';
 
-type SettingsTab = 'account' | 'notifications' | 'app' | 'security' | 'data';
+type SettingsTab = 'account' | 'ai' | 'notifications' | 'app' | 'security' | 'data';
 
 @Component({
   selector: 'app-settings',
@@ -48,6 +49,7 @@ export class SettingsPage implements OnInit {
   private readonly notifPrefs = inject(NotificationPreferencesService);
   private readonly banners = inject(UiBannerPreferencesService);
   private readonly pwa = inject(PwaLifecycleService);
+  private readonly aiSettingsApi = inject(AiSettingsService);
   private readonly route = inject(ActivatedRoute);
 
   readonly activeTab = signal<SettingsTab>('account');
@@ -63,6 +65,17 @@ export class SettingsPage implements OnInit {
   readonly prefOptions = NOTIFICATION_PREF_OPTIONS;
   readonly notifPreferences = this.notifPrefs.prefs;
   readonly hideAllBanners = this.banners.hideAllBanners;
+
+  aiEnabled = false;
+  aiProvider = 'openai';
+  aiModel = '';
+  aiApiKey = '';
+  readonly aiProviders = signal<AiProviderOption[]>([]);
+  readonly aiHasKey = signal(false);
+  readonly aiLoading = signal(false);
+  readonly aiSaving = signal(false);
+  readonly aiMsg = signal<string | null>(null);
+  readonly aiError = signal<string | null>(null);
 
   currentPassword = '';
   newPassword = '';
@@ -111,6 +124,7 @@ export class SettingsPage implements OnInit {
 
   readonly tabs: { id: SettingsTab; label: string; icon: string }[] = [
     { id: 'account', label: 'Compte', icon: 'fluent-emoji:bust-in-silhouette' },
+    { id: 'ai', label: 'IA', icon: 'fluent-emoji:robot' },
     { id: 'notifications', label: 'Notifications', icon: 'fluent-emoji:bell' },
     { id: 'app', label: 'Application', icon: 'fluent-emoji:mobile-phone' },
     { id: 'security', label: 'Sécurité', icon: 'fluent-emoji:locked' },
@@ -128,13 +142,118 @@ export class SettingsPage implements OnInit {
     this.offlineSync.refreshPendingCount();
 
     const tab = this.route.snapshot.queryParamMap.get('tab');
-    if (tab === 'notifications' || tab === 'app' || tab === 'security' || tab === 'data') {
+    if (
+      tab === 'ai' ||
+      tab === 'notifications' ||
+      tab === 'app' ||
+      tab === 'security' ||
+      tab === 'data'
+    ) {
       this.activeTab.set(tab);
+    }
+    if (this.activeTab() === 'ai' || tab === 'ai') {
+      this.loadAiSettings();
     }
   }
 
   setTab(tab: SettingsTab): void {
     this.activeTab.set(tab);
+    if (tab === 'ai' && this.aiProviders().length === 0) {
+      this.loadAiSettings();
+    }
+  }
+
+  loadAiSettings(): void {
+    this.aiLoading.set(true);
+    this.aiError.set(null);
+    this.aiSettingsApi.get().subscribe({
+      next: (dto) => {
+        this.applyAiDto(dto);
+        this.aiLoading.set(false);
+      },
+      error: (err) => {
+        this.aiLoading.set(false);
+        this.aiError.set(this.extractError(err) || 'Impossible de charger les réglages IA.');
+      },
+    });
+  }
+
+  onAiProviderChange(providerId: string): void {
+    this.aiProvider = providerId;
+    const p = this.aiProviders().find((x) => x.id === providerId);
+    if (p && (!this.aiModel.trim() || this.isDefaultModelOfOtherProvider())) {
+      this.aiModel = p.defaultModel;
+    }
+  }
+
+  private isDefaultModelOfOtherProvider(): boolean {
+    return this.aiProviders().some(
+      (p) => p.id !== this.aiProvider && p.defaultModel === this.aiModel.trim(),
+    );
+  }
+
+  saveAiSettings(): void {
+    this.aiMsg.set(null);
+    this.aiError.set(null);
+    if (this.aiEnabled && !this.aiHasKey() && !this.aiApiKey.trim()) {
+      this.aiError.set('Collez votre clé API pour activer votre IA.');
+      return;
+    }
+    this.aiSaving.set(true);
+    this.aiSettingsApi
+      .save({
+        enabled: this.aiEnabled,
+        provider: this.aiProvider,
+        model: this.aiModel.trim() || null,
+        apiKey: this.aiApiKey.trim() || null,
+      })
+      .subscribe({
+        next: (dto) => {
+          this.aiSaving.set(false);
+          this.aiApiKey = '';
+          this.applyAiDto(dto);
+          this.aiMsg.set(
+            dto.enabled
+              ? 'Votre IA est active pour les générations (aventure, vies, historique).'
+              : 'Réglages enregistrés — IA du site utilisée.',
+          );
+        },
+        error: (err) => {
+          this.aiSaving.set(false);
+          this.aiError.set(this.extractError(err) || 'Échec de l’enregistrement.');
+        },
+      });
+  }
+
+  clearAiSettings(): void {
+    this.aiMsg.set(null);
+    this.aiError.set(null);
+    this.aiSaving.set(true);
+    this.aiSettingsApi.clear().subscribe({
+      next: () => {
+        this.aiSaving.set(false);
+        this.aiEnabled = false;
+        this.aiApiKey = '';
+        this.aiHasKey.set(false);
+        this.aiMsg.set('Clé API effacée. Retour à l’IA Dragons Generator.');
+        this.loadAiSettings();
+      },
+      error: (err) => {
+        this.aiSaving.set(false);
+        this.aiError.set(this.extractError(err) || 'Impossible d’effacer la clé.');
+      },
+    });
+  }
+
+  private applyAiDto(dto: AiSettingsDto): void {
+    this.aiProviders.set(dto.providers ?? []);
+    this.aiEnabled = dto.enabled;
+    this.aiProvider = dto.provider || dto.providers?.[0]?.id || 'openai';
+    this.aiModel =
+      dto.model ||
+      dto.providers?.find((p) => p.id === this.aiProvider)?.defaultModel ||
+      '';
+    this.aiHasKey.set(dto.hasApiKey);
   }
 
   togglePasswordForm(): void {

@@ -1,11 +1,4 @@
-<div
-  class="eana-map-picker relative w-full"
-  [ngClass]="
-    mapFullscreen()
-      ? 'fixed inset-0 z-[90] bg-[#0f1318] flex flex-col p-2 sm:p-3 pt-[max(0.5rem,env(safe-area-inset-top))] pb-[max(0.5rem,env(safe-area-inset-bottom))]'
-      : ''
-  "
->
+<div class="eana-map-picker relative w-full">
   @if (loading()) {
     <div class="flex justify-center items-center eana-map-stage bg-[#171b22]">
       <div
@@ -17,114 +10,96 @@
       {{ err }}
     </div>
   } @else {
-    @if (mapFullscreen()) {
-      <div class="flex items-center justify-between gap-3 shrink-0 mb-2 px-1">
-        <div class="min-w-0">
-          <p class="text-sm font-serif text-violet-200 truncate">Explorer Eana</p>
-          <p class="text-[11px] text-slate-400 italic truncate">
-            Pincez pour zoomer · touchez un pin
-          </p>
-        </div>
-        <button
-          type="button"
-          class="shrink-0 min-h-11 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-[#1b2028] border border-violet-700/60 text-violet-300 hover:border-violet-400"
-          (click)="exitMapFullscreen()"
-        >
-          Fermer
-        </button>
-      </div>
-    }
-
     <div
-      #mapViewport
-      class="eana-map-viewport relative bg-[#171b22] overflow-hidden cursor-grab select-none"
-      [class.eana-map-stage]="!mapFullscreen()"
-      [class.eana-map-stage--fullscreen]="mapFullscreen()"
-      [class.flex-1]="mapFullscreen()"
-      [class.min-h-0]="mapFullscreen()"
-      [class.cursor-grabbing]="isPanning()"
-      (wheel)="onWheel($event)"
-      (pointerdown)="onPointerDown($event)"
-      (pointermove)="onPointerMove($event)"
-      (pointerup)="onPointerUp($event)"
-      (pointercancel)="onPointerUp($event)"
+      class="bg-[#171b22] space-y-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
+      data-map-ui
+      (pointerdown)="$event.stopPropagation()"
     >
-      <div
-        class="absolute left-0 top-0 origin-top-left will-change-transform"
-        [class.opacity-0]="!mapReady()"
-        [style.width.px]="mapWidth()"
-        [style.height.px]="mapHeight()"
-        [style.transform]="mapTransform()"
-      >
-        <img
-          src="Carte.jpg"
-          alt="Carte d'Eana"
-          class="absolute inset-0 w-full h-full object-fill opacity-90 pointer-events-none select-none"
-          draggable="false"
-        />
-
-        @for (civ of civilizations(); track civ.id) {
-          <div
-            data-map-pin
-            class="absolute z-10"
-            [style.top.%]="getMapCoordinates(civ.id).y"
-            [style.left.%]="getMapCoordinates(civ.id).x"
-            [style.transform]="'translate(-50%, -50%) scale(' + pinCounterScale() + ')'"
+      <!-- Pills — moitié haute -->
+      <div class="flex flex-wrap justify-center gap-2 px-3 pt-2">
+        @for (civ of civilizationsTop(); track civ.id) {
+          <button
+            type="button"
+            class="inline-flex items-center gap-1.5 min-h-10 px-2.5 py-1.5 rounded-full text-[11px] font-bold tracking-wide border transition-colors"
+            [class]="
+              isSelectedCiv(civ.id)
+                ? 'bg-violet-600 text-white border-violet-400'
+                : 'bg-[#1b2028] text-slate-200 border-slate-600/80 active:bg-slate-800'
+            "
+            (click)="pickCivilizationFromList(civ)"
           >
-            <button
-              type="button"
-              class="relative min-w-11 min-h-11 w-11 h-11 flex items-center justify-center rounded-full text-base shadow-sm transition-transform active:scale-[1.04]"
-              [class]="
-                isSelectedCiv(civ.id)
-                  ? 'bg-violet-600 border-2 border-violet-300 text-white'
-                  : 'bg-[#1b2028]/95 border-2 border-amber-500/70 text-lg hover:border-amber-400'
-              "
-              (pointerdown)="onPinPointerDown($event)"
-              (pointerup)="onPinPointerUp(civ, $event)"
-              (click)="$event.preventDefault(); $event.stopPropagation()"
-              [attr.aria-label]="civ.name"
-              [attr.aria-pressed]="isSelectedCiv(civ.id)"
-            >
-              <iconify-icon [icon]="getIconForCiv(civ.id)"></iconify-icon>
-            </button>
-            @if (mapFullscreen()) {
-              <span
-                class="absolute left-1/2 -translate-x-1/2 top-full mt-1 whitespace-nowrap px-2 py-0.5 rounded bg-[#020617]/90 border border-violet-700/40 text-[10px] font-bold uppercase tracking-wider text-violet-200 pointer-events-none shadow-lg"
-              >
-                {{ civ.name }}
-              </span>
-            }
-          </div>
+            <iconify-icon class="text-sm shrink-0" [icon]="getIconForCiv(civ.id)"></iconify-icon>
+            <span>{{ civ.name }}</span>
+          </button>
         }
       </div>
 
       <div
-        class="pointer-events-none absolute inset-x-0 top-0 h-5 z-20 bg-gradient-to-b from-[#171b22]/80 to-transparent"
-      ></div>
-      <div
-        class="pointer-events-none absolute inset-x-0 bottom-0 h-5 z-20 bg-gradient-to-t from-[#171b22]/80 to-transparent"
-      ></div>
-    </div>
+        #mapViewport
+        class="eana-map-viewport eana-map-stage relative bg-[#171b22] overflow-hidden cursor-grab select-none"
+        [class.cursor-grabbing]="isPanning()"
+        (wheel)="onWheel($event)"
+        (pointerdown)="onPointerDown($event)"
+        (pointermove)="onPointerMove($event)"
+        (pointerup)="onPointerUp($event)"
+        (pointercancel)="onPointerUp($event)"
+      >
+        <div
+          class="absolute left-0 top-0 origin-top-left will-change-transform"
+          [class.opacity-0]="!mapReady()"
+          [style.width.px]="mapWidth()"
+          [style.height.px]="mapHeight()"
+          [style.transform]="mapTransform()"
+        >
+          <img
+            src="Carte.jpg"
+            alt="Carte d'Eana"
+            class="absolute inset-0 w-full h-full object-fill opacity-90 pointer-events-none select-none"
+            draggable="false"
+          />
 
-    <!-- Chrome sous la carte : CTA / zoom / région / pills -->
-    <div
-      class="pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] bg-[#171b22] space-y-2"
-      [class.shrink-0]="mapFullscreen()"
-      data-map-ui
-      (pointerdown)="$event.stopPropagation()"
-    >
-      @if (!mapFullscreen()) {
-        <div class="px-3">
-          <button
-            type="button"
-            class="w-full min-h-11 inline-flex items-center justify-center gap-2 rounded-xl text-[11px] font-black uppercase tracking-widest bg-violet-950/40 border border-violet-700/50 text-violet-200 hover:border-violet-400 hover:bg-violet-950/60 transition-colors"
-            (click)="enterMapFullscreen()"
-          >
-            <iconify-icon icon="fluent:map-24-regular" class="text-lg"></iconify-icon>
-            Explorer la carte
-          </button>
+          @for (civ of civilizations(); track civ.id) {
+            <div
+              data-map-pin
+              class="absolute z-10"
+              [style.top.%]="getMapCoordinates(civ.id).y"
+              [style.left.%]="getMapCoordinates(civ.id).x"
+              [style.transform]="'translate(-50%, -50%) scale(' + pinCounterScale() + ')'"
+            >
+              <button
+                type="button"
+                class="relative min-w-11 min-h-11 w-11 h-11 flex items-center justify-center rounded-full text-base shadow-sm transition-transform active:scale-[1.04]"
+                [class]="
+                  isSelectedCiv(civ.id)
+                    ? 'bg-violet-600 border-2 border-violet-300 text-white'
+                    : 'bg-[#1b2028]/95 border-2 border-amber-500/70 text-lg hover:border-amber-400'
+                "
+                (pointerdown)="onPinPointerDown($event)"
+                (pointerup)="onPinPointerUp(civ, $event)"
+                (click)="$event.preventDefault(); $event.stopPropagation()"
+                [attr.aria-label]="civ.name"
+                [attr.aria-pressed]="isSelectedCiv(civ.id)"
+              >
+                <iconify-icon [icon]="getIconForCiv(civ.id)"></iconify-icon>
+              </button>
+              @if (isSelectedCiv(civ.id)) {
+                <span
+                  class="absolute left-1/2 -translate-x-1/2 top-full mt-1 whitespace-nowrap px-2 py-0.5 rounded bg-[#020617]/90 border border-violet-700/40 text-[10px] font-bold uppercase tracking-wider text-violet-200 pointer-events-none shadow-lg"
+                >
+                  {{ civ.name }}
+                </span>
+              }
+            </div>
+          }
         </div>
-      }
+
+        <div
+          class="pointer-events-none absolute inset-x-0 top-0 h-5 z-20 bg-gradient-to-b from-[#171b22]/80 to-transparent"
+        ></div>
+        <div
+          class="pointer-events-none absolute inset-x-0 bottom-0 h-5 z-20 bg-gradient-to-t from-[#171b22]/80 to-transparent"
+        ></div>
+      </div>
 
       <div class="flex items-center gap-2 px-3">
         <p class="flex-1 min-w-0 text-sm text-slate-300 truncate" data-testid="eana-region-status">
@@ -160,38 +135,35 @@
         </div>
       </div>
 
-      <div
-        class="flex gap-2 overflow-x-auto px-3 pb-1 custom-scrollbar touch-pan-x"
-        style="scrollbar-width: none"
-      >
-        @for (civ of civilizations(); track civ.id) {
+      <!-- Pills — moitié basse + région inconnue -->
+      <div class="flex flex-wrap justify-center gap-2 px-3">
+        @for (civ of civilizationsBottom(); track civ.id) {
           <button
             type="button"
-            class="shrink-0 inline-flex items-center gap-1.5 min-h-11 px-3 py-2 rounded-full text-[11px] font-bold tracking-wide border transition-colors"
+            class="inline-flex items-center gap-1.5 min-h-10 px-2.5 py-1.5 rounded-full text-[11px] font-bold tracking-wide border transition-colors"
             [class]="
               isSelectedCiv(civ.id)
                 ? 'bg-violet-600 text-white border-violet-400'
-                : 'bg-[#1b2028]/90 text-slate-200 border-slate-600/80 active:bg-slate-800'
+                : 'bg-[#1b2028] text-slate-200 border-slate-600/80 active:bg-slate-800'
             "
             (click)="pickCivilizationFromList(civ)"
           >
-            <iconify-icon class="text-sm" [icon]="getIconForCiv(civ.id)"></iconify-icon>
-            <span class="whitespace-nowrap">{{ civ.name }}</span>
+            <iconify-icon class="text-sm shrink-0" [icon]="getIconForCiv(civ.id)"></iconify-icon>
+            <span>{{ civ.name }}</span>
           </button>
         }
-      </div>
-      <div class="px-3">
         <button
           type="button"
-          class="min-h-10 text-[10px] font-black uppercase tracking-widest transition-colors"
+          class="inline-flex items-center gap-1.5 min-h-10 px-2.5 py-1.5 rounded-full text-[11px] font-bold tracking-wide border transition-colors"
           [class]="
             isUnknownSelected()
-              ? 'text-slate-200 underline underline-offset-2'
-              : 'text-slate-500 hover:text-slate-300'
+              ? 'bg-slate-600 text-white border-slate-400'
+              : 'bg-[#1b2028] text-slate-300 border-slate-600/80 active:bg-slate-800'
           "
           (click)="pickUnknown()"
         >
-          Région inconnue
+          <iconify-icon class="text-sm shrink-0" icon="fluent:question-circle-24-regular"></iconify-icon>
+          <span>Région inconnue</span>
         </button>
       </div>
     </div>

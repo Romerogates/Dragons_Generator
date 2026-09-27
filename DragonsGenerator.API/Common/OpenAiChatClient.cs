@@ -49,6 +49,36 @@ public sealed class OpenAiChatClient
             temperature: 0.8);
     }
 
+    /// <summary>Appel unique avec credentials utilisateur (BYOK), sans chaîne de modèles site.</summary>
+    public async Task<GroqChatResult> SendChatWithUserCredentialsAsync(
+        string userPrompt,
+        string systemPrompt,
+        int maxTokens,
+        UserLlmCredentials credentials,
+        CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(credentials.ApiKey))
+            return new GroqChatResult(false, null, "Clé API manquante.");
+
+        // 2 tentatives max — la clé est à eux, pas de fenêtre de retry longue.
+        GroqChatResult? last = null;
+        for (var attempt = 1; attempt <= 2; attempt++)
+        {
+            last = await SendChatOnceWithCredentialsAsync(
+                BuildTextUserContent(userPrompt),
+                systemPrompt,
+                maxTokens,
+                credentials,
+                temperature: 0.8,
+                ct);
+            if (last.Ok || !last.Retryable || attempt >= 2)
+                return last;
+            await Task.Delay(800 * attempt, ct);
+        }
+
+        return last ?? new GroqChatResult(false, null, "La génération IA a échoué.");
+    }
+
     /// <summary>OCR / vision : image data URL (jpeg/png) + prompt texte.</summary>
     public async Task<GroqChatResult> SendVisionChatAsync(
         string imageDataUrl,
@@ -157,6 +187,90 @@ public sealed class OpenAiChatClient
             return [primary];
 
         return [primary, fallback];
+    }
+
+    private async Task<GroqChatResult> SendChatOnceWithCredentialsAsync(
+        object userContent,
+        string systemPrompt,
+        int maxTokens,
+        UserLlmCredentials credentials,
+        double temperature,
+        CancellationToken ct)
+    {
+        var client = _httpClientFactory.CreateClient("UserLlm");
+        var endpoint = credentials.BaseUrl.TrimEnd('/') + "/chat/completions";
+        var groqRequest = new
+        {
+            model = credentials.Model,
+            messages = new object[]
+            {
+                new { role = "system", content = systemPrompt.Trim() + FrenchSystemSuffix },
+                new { role = "user", content = userContent },
+            },
+            temperature,
+            max_tokens = maxTokens,
+        };
+
+        var httpRequest = new HttpRequestMessage(HttpMethod.Post, endpoint);
+        httpRequest.Headers.Add("Authorization", $"Bearer {credentials.ApiKey}");
+        if (string.Equals(credentials.Provider, UserAiProviders.OpenRouter, StringComparison.OrdinalIgnoreCase))
+        {
+            httpRequest.Headers.TryAddWithoutValidation("HTTP-Referer", "https://dragons-generator.top");
+            httpRequest.Headers.TryAddWithoutValidation("X-Title", "Dragons Generator");
+        }
+
+        httpRequest.Content = JsonContent.Create(groqRequest);
+
+        HttpResponseMessage response;
+        try
+        {
+            response = await client.SendAsync(httpRequest, ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Échec d'appel LLM utilisateur ({Provider}, {Endpoint})", credentials.Provider, endpoint);
+            return new GroqChatResult(false, null, "Impossible de joindre votre fournisseur IA. Vérifiez la clé et le modèle.");
+        }
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync(ct);
+            _logger.LogWarning(
+                "LLM utilisateur {Provider} a répondu {Status}: {Body}",
+                credentials.Provider,
+                (int)response.StatusCode,
+                body.Length > 400 ? body[..400] : body
+            );
+
+            var status = (int)response.StatusCode;
+            var rateLimited = status == 429;
+            var retryable = rateLimited || status is 502 or 503;
+            var message = status switch
+            {
+                401 or 403 => "Clé API invalide ou refusée par le fournisseur. Vérifiez-la dans Paramètres → IA.",
+                404 => "Modèle introuvable chez ce fournisseur. Choisissez un autre modèle.",
+                429 => "Quota de votre fournisseur IA dépassé. Réessayez plus tard ou changez de clé.",
+                502 or 503 => "Votre fournisseur IA est temporairement surchargé. Réessayez dans une minute.",
+                >= 500 => "Erreur temporaire chez votre fournisseur IA.",
+                _ => "Votre fournisseur IA a renvoyé une erreur.",
+            };
+            return new GroqChatResult(false, null, message, rateLimited, retryable, ParseRetryAfterMs(response));
+        }
+
+        var result = await response.Content.ReadFromJsonAsync<GroqResponse>(ct);
+        var groqMessage = result?.Choices?.FirstOrDefault()?.Message;
+        var text = ExtractMessageText(groqMessage);
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return new GroqChatResult(
+                false,
+                null,
+                "Votre IA n'a renvoyé aucun texte exploitable.",
+                Retryable: true
+            );
+        }
+
+        return new GroqChatResult(true, text, null);
     }
 
     private async Task<GroqChatResult> SendChatOnceAsync(

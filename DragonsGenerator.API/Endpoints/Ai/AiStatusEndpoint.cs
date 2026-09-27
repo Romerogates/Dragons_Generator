@@ -41,9 +41,9 @@ public class AiStatusEndpoint(IConfiguration config) : EndpointWithoutRequest
                     localEnabled ? "Groq (cloud)" : null),
                 new AiRouteInfo(
                     "groq",
-                    localEnabled ? "ollama" : null,
+                    null,
                     "Groq (cloud)",
-                    localEnabled ? "Ollama (local)" : null)),
+                    null)),
             ct);
     }
 }

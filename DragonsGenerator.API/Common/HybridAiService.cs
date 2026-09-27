@@ -48,8 +48,20 @@ public sealed class HybridAiService
         string systemPrompt,
         int maxTokens,
         CancellationToken ct,
-        Func<string, bool>? acceptText = null)
+        Func<string, bool>? acceptText = null,
+        UserLlmCredentials? userCredentials = null)
     {
+        if (userCredentials is not null)
+        {
+            _logger.LogInformation("Génération courte via BYOK ({Provider}/{Model})", userCredentials.Provider, userCredentials.Model);
+            return await _remote.SendChatWithUserCredentialsAsync(
+                userPrompt,
+                systemPrompt,
+                maxTokens,
+                userCredentials,
+                ct);
+        }
+
         if (_local is not null)
         {
             var local = await _local.SendChatAsync(userPrompt, systemPrompt, maxTokens, ct);
@@ -72,57 +84,85 @@ public sealed class HybridAiService
         return await _remote.SendChatAsync(userPrompt, systemPrompt, maxTokens, ct);
     }
 
-    /// <summary>Aventure structurée — essaie chaque modèle Groq puis Ollama local.</summary>
+    /// <summary>
+    /// Aventure structurée — BYOK si fourni, sinon modèles Groq site (pas Ollama : trop lent → 504 proxy).
+    /// Budget global ~85 s pour répondre avant le timeout passerelle.
+    /// </summary>
     public async Task<GroqChatResult> SendAdventureGenerationAsync(
         string userPrompt,
         string systemPrompt,
         int maxTokens,
-        CancellationToken ct)
+        CancellationToken ct,
+        UserLlmCredentials? userCredentials = null)
     {
-        GroqChatResult? last = null;
-        foreach (var model in GetAdventureModelChain())
+        if (userCredentials is not null)
         {
-            var attempt = await _remote.SendChatAsync(
-                userPrompt,
-                systemPrompt,
-                maxTokens,
-                ct,
-                [model]);
-
-            last = attempt;
-            if (!attempt.Ok)
-                continue;
-
-            var finalized = FinalizeAdventure(attempt);
-            if (finalized.Ok)
+            _logger.LogInformation("Aventure via BYOK ({Provider}/{Model})", userCredentials.Provider, userCredentials.Model);
+            using var budget = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            budget.CancelAfter(TimeSpan.FromSeconds(85));
+            try
             {
-                _logger.LogInformation("Aventure Groq servie par {Model}", model);
-                return finalized;
+                var attempt = await _remote.SendChatWithUserCredentialsAsync(
+                    userPrompt,
+                    systemPrompt,
+                    maxTokens,
+                    userCredentials,
+                    budget.Token);
+                if (!attempt.Ok) return attempt;
+                var finalized = FinalizeAdventure(attempt);
+                return finalized.Ok ? finalized : finalized;
             }
-
-            _logger.LogWarning("Réponse aventure rejetée après nettoyage ({Model})", model);
+            catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+            {
+                return new GroqChatResult(
+                    false,
+                    null,
+                    "La génération d'aventure a dépassé le délai. Réessayez, ou vérifiez votre fournisseur IA.",
+                    true);
+            }
         }
 
-        if (_local is not null)
+        using var siteBudget = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        siteBudget.CancelAfter(TimeSpan.FromSeconds(85));
+        var budgetCt = siteBudget.Token;
+
+        GroqChatResult? last = null;
+        try
         {
-            _logger.LogWarning("Groq aventure insatisfaisante — bascule Ollama local");
-            var localMaxTokens = Math.Max(maxTokens, 3500);
-            var local = await _local.SendChatAsync(userPrompt, systemPrompt, localMaxTokens, ct);
-            if (local.Ok)
+            foreach (var model in GetAdventureModelChain())
             {
-                var finalized = FinalizeAdventure(local);
+                budgetCt.ThrowIfCancellationRequested();
+
+                var attempt = await _remote.SendChatAsync(
+                    userPrompt,
+                    systemPrompt,
+                    maxTokens,
+                    budgetCt,
+                    [model]);
+
+                last = attempt;
+                if (!attempt.Ok)
+                    continue;
+
+                var finalized = FinalizeAdventure(attempt);
                 if (finalized.Ok)
                 {
-                    _logger.LogInformation("Aventure servie par Ollama local (secours)");
+                    _logger.LogInformation("Aventure Groq servie par {Model}", model);
                     return finalized;
                 }
 
+                _logger.LogWarning("Réponse aventure rejetée après nettoyage ({Model})", model);
                 last = finalized;
             }
-            else
-            {
-                last = local;
-            }
+        }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            _logger.LogWarning("Aventure interrompue : budget 85 s dépassé (évite 504 proxy)");
+            return new GroqChatResult(
+                false,
+                null,
+                "La génération d'aventure a dépassé le délai. Réessayez dans une minute, ou rédigez manuellement.",
+                true);
         }
 
         return last ?? new GroqChatResult(false, null, "La génération IA a échoué.", false);
@@ -156,7 +196,7 @@ public sealed class HybridAiService
     {
         var primary = _config["Groq:AdventureModel"];
         if (string.IsNullOrWhiteSpace(primary))
-            primary = "qwen/qwen3.6-27b";
+            primary = "groq/compound";
 
         var secondary = _config["Groq:FallbackModel"];
         var tertiary = _config["Groq:Model"] ?? "groq/compound";

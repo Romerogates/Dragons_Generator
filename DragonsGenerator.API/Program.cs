@@ -5,6 +5,7 @@ using DragonsGenerator.API.Services;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -116,11 +117,19 @@ builder.Services.AddSingleton<CampaignLivePublisher>();
 
 builder.Services.AddDragonsRateLimiting(builder.Configuration, builder.Environment);
 
+var dpKeysPath = Path.Combine(AppContext.BaseDirectory, "data", "dp-keys");
+Directory.CreateDirectory(dpKeysPath);
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(dpKeysPath))
+    .SetApplicationName("DragonsGenerator");
+
 // --- Game data ---
 builder.Services.AddSingleton<IndexedDataStore>();
 builder.Services.AddSingleton<GameDataRepository>();
 builder.Services.AddSingleton<GroqRequestCoordinator>();
 builder.Services.AddSingleton<HybridAiService>();
+builder.Services.AddSingleton<UserAiSecretProtector>();
+builder.Services.AddScoped<UserAiCredentialResolver>();
 builder.Services.AddScoped<PushNotificationService>();
 builder.Services.AddHostedService<SessionReminderWorker>();
 builder.Services.AddHttpClient("Groq", client =>
@@ -130,6 +139,10 @@ builder.Services.AddHttpClient("Groq", client =>
 builder.Services.AddHttpClient("LocalLlm", client =>
 {
     client.Timeout = TimeSpan.FromMinutes(5);
+});
+builder.Services.AddHttpClient("UserLlm", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(120);
 });
 
 var fastEndpoints = builder.Services.AddFastEndpoints();

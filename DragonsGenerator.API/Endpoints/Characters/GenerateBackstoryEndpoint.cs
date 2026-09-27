@@ -23,12 +23,9 @@ public record GenerateBackstoryRequest
 
 public record GenerateBackstoryResponse(string Story);
 
-public class GenerateBackstoryEndpoint : Endpoint<GenerateBackstoryRequest, GenerateBackstoryResponse>
+public class GenerateBackstoryEndpoint(HybridAiService ai, UserAiCredentialResolver userAi)
+    : Endpoint<GenerateBackstoryRequest, GenerateBackstoryResponse>
 {
-    private readonly HybridAiService _ai;
-
-    public GenerateBackstoryEndpoint(HybridAiService ai) => _ai = ai;
-
     public override void Configure()
     {
         Post("/generate-backstory");
@@ -63,11 +60,13 @@ public class GenerateBackstoryEndpoint : Endpoint<GenerateBackstoryRequest, Gene
             {(req.Flaws != null ? $"- Défauts: {req.Flaws}" : "")}
             """;
 
-        var result = await _ai.SendShortGenerationAsync(
+        var userCreds = await userAi.ResolveAsync(AuthHelpers.GetUserId(User), ct);
+        var result = await ai.SendShortGenerationAsync(
             prompt,
             "Tu es un maître du jeu expert en jeux de rôle fantasy francophones, spécialisé dans l'univers d'Eana (Dragons).",
             400,
-            ct);
+            ct,
+            userCredentials: userCreds);
 
         if (!result.Ok)
         {

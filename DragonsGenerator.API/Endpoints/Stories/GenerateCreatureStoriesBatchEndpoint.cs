@@ -32,15 +32,19 @@ public class GenerateCreatureStoriesBatchEndpoint
 
     private readonly GameDataRepository _repo;
     private readonly HybridAiService _ai;
+    private readonly UserAiCredentialResolver _userAi;
     private readonly ILogger<GenerateCreatureStoriesBatchEndpoint> _logger;
+    private UserLlmCredentials? _userCreds;
 
     public GenerateCreatureStoriesBatchEndpoint(
         GameDataRepository repo,
         HybridAiService ai,
+        UserAiCredentialResolver userAi,
         ILogger<GenerateCreatureStoriesBatchEndpoint> logger)
     {
         _repo = repo;
         _ai = ai;
+        _userAi = userAi;
         _logger = logger;
     }
 
@@ -53,6 +57,7 @@ public class GenerateCreatureStoriesBatchEndpoint
 
     public override async Task HandleAsync(GenerateCreatureStoriesBatchRequest req, CancellationToken ct)
     {
+        _userCreds = await _userAi.ResolveAsync(AuthHelpers.GetUserId(User), ct);
         var items = req.Creatures
             .Where(c => !string.IsNullOrWhiteSpace(c.CreatureId) && !string.IsNullOrWhiteSpace(c.CustomName))
             .ToList();
@@ -160,7 +165,8 @@ public class GenerateCreatureStoriesBatchEndpoint
             "Tu es un maître du jeu expert en jeux de rôle fantasy francophones. Réponds uniquement en JSON valide.",
             maxTokens,
             ct,
-            text => CreatureStoriesBatchJson.LooksLikeBatchJson(text, expectedIds));
+            text => CreatureStoriesBatchJson.LooksLikeBatchJson(text, expectedIds),
+            _userCreds);
 
         if (!result.Ok || string.IsNullOrWhiteSpace(result.Text))
             return false;
@@ -202,7 +208,8 @@ public class GenerateCreatureStoriesBatchEndpoint
             prompt,
             "Tu es un maître du jeu expert en jeux de rôle fantasy francophones.",
             500,
-            ct);
+            ct,
+            userCredentials: _userCreds);
 
         return result.Ok ? result.Text : null;
     }

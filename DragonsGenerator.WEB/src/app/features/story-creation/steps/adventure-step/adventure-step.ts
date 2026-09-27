@@ -107,10 +107,16 @@ export class AdventureStep implements OnInit {
         next: (res) => {
           this.builder.setAdventure(res.adventure);
           this.rawEdit.set(false);
+          this.generationError.set(null);
         },
         error: (err) => {
           if (isAiRateLimitHttpError(err)) return;
           this.generationError.set(this.extractError(err));
+          queueMicrotask(() =>
+            document
+              .querySelector<HTMLElement>('[data-testid="adventure-generation-error"]')
+              ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }),
+          );
         },
       });
   }
@@ -142,7 +148,7 @@ export class AdventureStep implements OnInit {
     const apiMsg = general || detail || title || (e?.['message'] as string) || null;
     if (apiMsg && apiMsg !== 'One or more errors occurred!') return apiMsg;
     if (http.status === 502 || http.status === 503 || http.status === 504)
-      return 'Le service de génération IA est temporairement indisponible (quota ou surcharge Groq). Attendez une minute et réessayez.';
+      return "Délai dépassé côté serveur (génération trop longue). Réessayez — ou rédigez l'aventure par sections ci-dessous.";
     return "L'inspiration cosmique est momentanément indisponible.";
   }
 }

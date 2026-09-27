@@ -44,6 +44,7 @@ export class AiGenerationProgressService {
       }),
       finalize(() => {
         if (succeeded) this.complete();
+        else if (this.active()) this.cancel();
       }),
     );
   }
@@ -145,15 +146,14 @@ function buildProfile(kind: AiGenerationKind, status: AiStatusResponse): AiProgr
     case 'adventure':
       return {
         providerLabel: status.adventureGeneration.primaryLabel,
-        estimatedMs: status.adventureGeneration.fallback ? 45000 : 32000,
+        // Aligné sur budget API ~85 s (évite barre « coincée » puis 504).
+        estimatedMs: 75000,
         stages: [
           { at: 0, label: 'Préparation du contexte narratif…' },
-          { at: 0.12, label: 'Appel Groq (cloud) — rédaction…' },
-          { at: 0.45, label: 'Tissage de l\'intrigue et des lieux…' },
-          { at: 0.72, label: 'Mise en forme de l\'aventure…' },
-          ...(status.adventureGeneration.fallback
-            ? [{ at: 0.88, label: 'Secours Ollama (local) si besoin…' }]
-            : []),
+          { at: 0.08, label: 'Appel Groq (cloud) — rédaction…' },
+          { at: 0.35, label: 'Tissage de l\'intrigue et des lieux…' },
+          { at: 0.6, label: 'Mise en forme de l\'aventure…' },
+          { at: 0.82, label: 'Dernière passe — encore un instant…' },
         ],
       };
     case 'creature-batch':
