@@ -13,7 +13,7 @@ test.describe('Campagne — calendrier de table', () => {
 
     await expect(page.getByTestId('campaign-calendar-root')).toBeVisible({ timeout: 30_000 });
     await expect(page.getByTestId('calendar-export-ics')).toBeVisible();
-    await expect(page.getByRole('heading', { name: /Calendrier de table/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Calendrier de cette campagne/i })).toBeVisible();
 
     await page.getByTestId('calendar-add-date').click();
     const panel = page.getByTestId('calendar-event-panel');

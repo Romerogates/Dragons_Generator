@@ -39,6 +39,9 @@
               }
             ],
             "styles": [
+              "@fullcalendar/angular/skeleton.css",
+              "@fullcalendar/angular/themes/breezy/theme.css",
+              "@fullcalendar/angular/themes/breezy/palettes/amber.css",
               "src/styles.scss"
             ],
             "stylePreprocessorOptions": {
@@ -156,6 +159,9 @@
               }
             ],
             "styles": [
+              "@fullcalendar/angular/skeleton.css",
+              "@fullcalendar/angular/themes/breezy/theme.css",
+              "@fullcalendar/angular/themes/breezy/palettes/amber.css",
               "src/styles.scss"
             ]
           }

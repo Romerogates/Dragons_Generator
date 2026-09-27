@@ -315,6 +315,98 @@ public static class CampaignJsonHelpers
         }
     }
 
+    /// <summary>
+    /// Agrège sessions + scheduleEvents pour l’agenda global.
+    /// Joueurs : sessions non annulées uniquement ; MJ : tout.
+    /// </summary>
+    public static IReadOnlyList<CampaignAgendaEventInfo> ExtractAgendaEvents(
+        string json,
+        Guid campaignId,
+        string campaignTitle,
+        bool isOwner)
+    {
+        var list = new List<CampaignAgendaEventInfo>();
+        try
+        {
+            using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(json) ? "{}" : json);
+            var root = doc.RootElement;
+
+            if (root.TryGetProperty("scheduleEvents", out var schedule) && schedule.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var ev in schedule.EnumerateArray())
+                {
+                    var id = ev.TryGetProperty("id", out var idEl) ? idEl.GetString() : null;
+                    if (string.IsNullOrWhiteSpace(id)) continue;
+                    if (!ev.TryGetProperty("startsAt", out var startsEl)
+                        || !DateTimeOffset.TryParse(startsEl.GetString(), out var starts))
+                        continue;
+
+                    DateTimeOffset? ends = null;
+                    if (ev.TryGetProperty("endsAt", out var endsEl)
+                        && endsEl.ValueKind != JsonValueKind.Null
+                        && DateTimeOffset.TryParse(endsEl.GetString(), out var endsParsed))
+                        ends = endsParsed;
+
+                    var allDay = ev.TryGetProperty("allDay", out var allDayEl)
+                        && allDayEl.ValueKind == JsonValueKind.True;
+                    var title = ev.TryGetProperty("title", out var t) ? t.GetString() : null;
+                    var kind = ev.TryGetProperty("kind", out var k) ? k.GetString() : null;
+                    var location = ev.TryGetProperty("location", out var loc) ? loc.GetString() : null;
+
+                    list.Add(new CampaignAgendaEventInfo(
+                        Id: $"{campaignId}:schedule:{id}",
+                        CampaignId: campaignId,
+                        CampaignTitle: campaignTitle,
+                        Source: "schedule",
+                        Title: string.IsNullOrWhiteSpace(title) ? "Date" : title!,
+                        StartsAt: starts,
+                        EndsAt: ends,
+                        AllDay: allDay,
+                        Kind: kind,
+                        Status: null,
+                        Location: location));
+                }
+            }
+
+            if (root.TryGetProperty("sessions", out var sessions) && sessions.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var session in sessions.EnumerateArray())
+                {
+                    var id = session.TryGetProperty("id", out var idEl) ? idEl.GetString() : null;
+                    if (string.IsNullOrWhiteSpace(id)) continue;
+                    var status = session.TryGetProperty("status", out var st) ? st.GetString() ?? "planned" : "planned";
+                    if (!isOwner && status == "cancelled") continue;
+                    if (!session.TryGetProperty("scheduledAt", out var at)
+                        || !DateTimeOffset.TryParse(at.GetString(), out var starts))
+                        continue;
+
+                    var title = session.TryGetProperty("title", out var t) ? t.GetString() : null;
+                    var location = session.TryGetProperty("location", out var loc) ? loc.GetString() : null;
+                    var ends = starts.AddHours(3);
+
+                    list.Add(new CampaignAgendaEventInfo(
+                        Id: $"{campaignId}:session:{id}",
+                        CampaignId: campaignId,
+                        CampaignTitle: campaignTitle,
+                        Source: "session",
+                        Title: string.IsNullOrWhiteSpace(title) ? "Session" : title!,
+                        StartsAt: starts,
+                        EndsAt: ends,
+                        AllDay: false,
+                        Kind: null,
+                        Status: status,
+                        Location: location));
+                }
+            }
+        }
+        catch
+        {
+            return list;
+        }
+
+        return list;
+    }
+
     public static bool HasSessionChanges(string oldJson, string newJson) =>
         AnalyzeSessionChanges(oldJson, newJson).Changed;
 
@@ -1153,4 +1245,18 @@ public sealed record PlannedSessionInfo(
     string Id,
     string Title,
     DateTimeOffset ScheduledAt,
+    string? Location);
+
+/// <summary>Événement d’agenda agrégé (sessions + dates libres) pour une campagne.</summary>
+public sealed record CampaignAgendaEventInfo(
+    string Id,
+    Guid CampaignId,
+    string CampaignTitle,
+    string Source,
+    string Title,
+    DateTimeOffset StartsAt,
+    DateTimeOffset? EndsAt,
+    bool AllDay,
+    string? Kind,
+    string? Status,
     string? Location);

@@ -6,6 +6,9 @@ test.describe('Guide wiki', () => {
     test.setTimeout(90_000);
     await loginViaUi(page, '/guide');
 
+    await expect(page.getByRole('navigation').or(page.locator('app-navbar')).first()).toBeVisible({
+      timeout: 30_000,
+    });
     await expect(page.getByRole('heading', { name: /^Guide$/i }).first()).toBeVisible({
       timeout: 30_000,
     });

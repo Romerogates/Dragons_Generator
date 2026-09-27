@@ -77,6 +77,18 @@
               >
             }
           </a>
+
+          @if (auth.isLoggedIn()) {
+            <a
+              routerLink="/agenda"
+              routerLinkActive="border-amber-500/50 text-amber-300"
+              class="h-10 flex items-center px-3 sm:px-3.5 rounded-full bg-[var(--dg-bg)] border border-slate-700 hover:border-amber-500/50 transition-colors"
+              (click)="closeMenus()"
+              data-testid="nav-agenda"
+            >
+              <span class="text-[10px] font-black uppercase tracking-widest text-slate-200">Agenda</span>
+            </a>
+          }
         </div>
       </div>
 
@@ -412,6 +424,20 @@
             >
           }
         </a>
+
+        @if (auth.isLoggedIn()) {
+          <a
+            routerLink="/agenda"
+            routerLinkActive="bg-amber-950/30 text-amber-300 border-amber-900/40"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-transparent text-slate-200 hover:bg-slate-800/70 transition-colors"
+            (click)="closeMenus()"
+          >
+            <span class="text-xl"
+              ><iconify-icon noobserver icon="fluent-emoji:spiral-calendar"></iconify-icon
+            ></span>
+            <span class="text-sm font-bold tracking-wide">Agenda</span>
+          </a>
+        }
 
         <div class="my-2 border-t border-slate-800"></div>
 

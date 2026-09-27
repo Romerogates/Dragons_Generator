@@ -1,4 +1,7 @@
-<div class="min-h-screen bg-[var(--dg-bg)] text-slate-200 font-sans antialiased flex flex-col overflow-x-clip">
+<div
+  class="min-h-screen bg-[var(--dg-bg)] text-slate-200 font-sans antialiased flex flex-col overflow-x-clip"
+  [style.--dg-nav-height]="hideSiteChrome() ? '0px' : null"
+>
   @if (showReconnectBanner()) {
     <div
       data-dg-banner

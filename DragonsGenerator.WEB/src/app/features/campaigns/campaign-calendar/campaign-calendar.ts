@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import type {
   CalendarOptions,
@@ -21,9 +22,9 @@ import dayGridPlugin from '@fullcalendar/angular/daygrid';
 import timeGridPlugin from '@fullcalendar/angular/timegrid';
 import interactionPlugin from '@fullcalendar/angular/interaction';
 import listPlugin from '@fullcalendar/angular/list';
+import breezyThemePlugin from '@fullcalendar/angular/themes/breezy';
 import frLocale from 'fullcalendar/locales/fr';
 import 'temporal-polyfill/global';
-import 'fullcalendar/skeleton.css';
 
 import type {
   CampaignScheduleEvent,
@@ -53,7 +54,7 @@ export type ScheduleEventsChange = CampaignScheduleEvent[];
 @Component({
   selector: 'app-campaign-calendar',
   standalone: true,
-  imports: [CommonModule, FormsModule, FullCalendarModule],
+  imports: [CommonModule, FormsModule, RouterLink, FullCalendarModule],
   templateUrl: './campaign-calendar.html',
   styleUrl: './campaign-calendar.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -93,7 +94,7 @@ export class CampaignCalendar {
   );
 
   readonly options = computed((): CalendarOptions => ({
-    plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin],
+    plugins: [breezyThemePlugin, dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin],
     locale: frLocale,
     initialView: 'dayGridMonth',
     headerToolbar: {

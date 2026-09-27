@@ -68,7 +68,7 @@ export class App implements OnInit {
   readonly updateReady = this.pwa.updateReady;
   readonly showReconnectBanner = signal(shouldShowReconnectBanner());
 
-  /** Guide + table /play : pas de nav/footer site (chrome dédié). */
+  /** Table /play : plein écran (chrome dédié). Le guide garde navbar + footer. */
   readonly hideSiteChrome = toSignal(
     this.router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
@@ -80,7 +80,7 @@ export class App implements OnInit {
 
   private shouldHideSiteChrome(url: string): boolean {
     const path = url.split('?')[0] ?? url;
-    return path.startsWith('/guide') || /\/campaigns\/[^/]+\/play\/?$/.test(path);
+    return /\/campaigns\/[^/]+\/play\/?$/.test(path);
   }
 
   constructor() {

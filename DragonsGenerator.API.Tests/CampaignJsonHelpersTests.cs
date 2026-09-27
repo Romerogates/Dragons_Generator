@@ -229,4 +229,67 @@ public class CampaignJsonHelpersTests
         var filtered = CampaignJsonHelpers.FilterForPlayerView(doc.RootElement, Guid.NewGuid());
         Assert.Equal(0, filtered.GetProperty("dungeonMaps").GetArrayLength());
     }
+
+    [Fact]
+    public void ExtractAgendaEvents_includes_schedule_and_sessions_for_owner()
+    {
+        const string json = """
+            {
+              "scheduleEvents": [
+                {
+                  "id": "e1",
+                  "title": "Prep",
+                  "startsAt": "2026-10-05T19:00:00Z",
+                  "endsAt": "2026-10-05T21:00:00Z",
+                  "allDay": false,
+                  "kind": "prep"
+                }
+              ],
+              "sessions": [
+                {
+                  "id": "s1",
+                  "title": "Soirée 1",
+                  "scheduledAt": "2026-10-01T18:00:00Z",
+                  "status": "planned"
+                },
+                {
+                  "id": "s2",
+                  "title": "Annulée",
+                  "scheduledAt": "2026-10-02T18:00:00Z",
+                  "status": "cancelled"
+                }
+              ]
+            }
+            """;
+
+        var campaignId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var events = CampaignJsonHelpers.ExtractAgendaEvents(json, campaignId, "Ma Campagne", isOwner: true);
+
+        Assert.Equal(3, events.Count);
+        Assert.Contains(events, e => e.Id.EndsWith(":schedule:e1") && e.Kind == "prep");
+        Assert.Contains(events, e => e.Id.EndsWith(":session:s1") && e.Status == "planned");
+        Assert.Contains(events, e => e.Id.EndsWith(":session:s2") && e.Status == "cancelled");
+    }
+
+    [Fact]
+    public void ExtractAgendaEvents_hides_cancelled_sessions_for_players()
+    {
+        const string json = """
+            {
+              "sessions": [
+                { "id": "ok", "title": "OK", "scheduledAt": "2026-10-01T18:00:00Z", "status": "planned" },
+                { "id": "no", "title": "NO", "scheduledAt": "2026-10-02T18:00:00Z", "status": "cancelled" }
+              ]
+            }
+            """;
+
+        var events = CampaignJsonHelpers.ExtractAgendaEvents(
+            json,
+            Guid.NewGuid(),
+            "C",
+            isOwner: false);
+
+        Assert.Single(events);
+        Assert.EndsWith(":session:ok", events[0].Id);
+    }
 }

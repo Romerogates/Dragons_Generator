@@ -169,6 +169,12 @@ export const routes: Routes = [
     loadComponent: () => import('@features/campaigns/campaigns').then((m) => m.Campaigns),
   },
   {
+    path: 'agenda',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('@features/agenda/global-agenda').then((m) => m.GlobalAgendaPage),
+  },
+  {
     path: 'campaigns/:id',
     loadComponent: () =>
       import('@features/campaigns/campaign-detail/campaign-detail').then((m) => m.CampaignDetailPage),

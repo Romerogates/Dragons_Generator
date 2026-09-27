@@ -21,6 +21,20 @@ export interface CampaignActivityItem {
   createdAt: string;
 }
 
+export interface AgendaEventDto {
+  id: string;
+  campaignId: string;
+  campaignTitle: string;
+  source: 'schedule' | 'session' | string;
+  title: string;
+  startsAt: string;
+  endsAt?: string | null;
+  allDay: boolean;
+  kind?: string | null;
+  status?: string | null;
+  location?: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class CampaignCloudService {
   private readonly http = inject(HttpClient);
@@ -30,6 +44,12 @@ export class CampaignCloudService {
   list(): Observable<CampaignSummary[]> {
     if (!this.auth.isLoggedIn()) return of([]);
     return this.http.get<CampaignSummary[]>(`${this.api}/me/campaigns`);
+  }
+
+  /** Agenda global : dates + sessions de toutes les campagnes actives. */
+  listAgenda(): Observable<AgendaEventDto[]> {
+    if (!this.auth.isLoggedIn()) return of([]);
+    return this.http.get<AgendaEventDto[]>(`${this.api}/me/agenda`);
   }
 
   get(id: string): Observable<CampaignDetail> {

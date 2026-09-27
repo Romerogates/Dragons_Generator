@@ -1,9 +1,16 @@
 <section class="space-y-4 campaign-calendar">
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
-      <h2 class="text-[10px] font-black uppercase tracking-widest text-amber-500">Calendrier de table</h2>
+      <h2 class="text-[10px] font-black uppercase tracking-widest text-amber-500">
+        Calendrier de cette campagne
+      </h2>
       <p class="text-xs text-slate-500 mt-1">
-        Dates de jeu, prep ou hors-jeu. Les sessions planifiées apparaissent aussi ici.
+        Dates et sessions de
+        <span class="text-slate-400">{{ campaignTitle() }}</span>
+        uniquement.
+        <a routerLink="/agenda" class="text-amber-400/90 underline hover:text-amber-300 ml-1"
+          >Agenda global →</a
+        >
       </p>
     </div>
     <div class="flex flex-wrap gap-2">

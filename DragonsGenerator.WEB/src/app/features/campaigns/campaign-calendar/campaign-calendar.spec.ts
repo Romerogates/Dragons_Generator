@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { zonelessTestProviders } from '@testing/zoneless-test-providers';
 import { CampaignCalendar } from './campaign-calendar';
 import { createCampaignScheduleEvent } from '@core/models/Campaign/campaign';
@@ -10,7 +11,7 @@ describe('CampaignCalendar', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [CampaignCalendar],
-      providers: [...zonelessTestProviders],
+      providers: [...zonelessTestProviders, provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CampaignCalendar);
