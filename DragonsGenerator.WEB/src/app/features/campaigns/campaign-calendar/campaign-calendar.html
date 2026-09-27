@@ -1,0 +1,248 @@
+<section class="space-y-4 campaign-calendar">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h2 class="text-[10px] font-black uppercase tracking-widest text-amber-500">Calendrier de table</h2>
+      <p class="text-xs text-slate-500 mt-1">
+        Dates de jeu, prep ou hors-jeu. Les sessions planifiées apparaissent aussi ici.
+      </p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <button
+        type="button"
+        class="min-h-10 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-600/50"
+        (click)="exportIcs()"
+        data-testid="calendar-export-ics"
+      >
+        Exporter .ics
+      </button>
+      @if (isOwner()) {
+        <button
+          type="button"
+          class="min-h-10 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-600 text-white hover:bg-amber-500"
+          (click)="addBlankDate()"
+          data-testid="calendar-add-date"
+        >
+          + Ajouter une date
+        </button>
+      }
+    </div>
+  </div>
+
+  <div
+    class="rounded-2xl border border-slate-800 bg-[#1b2028]/40 p-2 sm:p-3 overflow-x-auto"
+    data-testid="campaign-calendar-root"
+  >
+    <full-calendar [options]="options()" [events]="fcEvents()" />
+  </div>
+
+  <div class="flex flex-wrap gap-3 text-[10px] text-slate-500">
+    <span class="inline-flex items-center gap-1.5"
+      ><span class="w-2.5 h-2.5 rounded-sm bg-amber-700"></span> Date libre</span
+    >
+    <span class="inline-flex items-center gap-1.5"
+      ><span class="w-2.5 h-2.5 rounded-sm bg-violet-600"></span> Session planifiée</span
+    >
+    <span class="inline-flex items-center gap-1.5"
+      ><span class="w-2.5 h-2.5 rounded-sm bg-emerald-700"></span> Session jouée</span
+    >
+  </div>
+
+  @if (panelOpen()) {
+    <div
+      class="fixed inset-0 z-40 bg-black/50"
+      (click)="closePanel()"
+      aria-hidden="true"
+    ></div>
+    <aside
+      class="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-[var(--dg-surface)] border-l border-slate-800 shadow-xl flex flex-col"
+      role="dialog"
+      aria-label="Détail de la date"
+      data-testid="calendar-event-panel"
+    >
+      <div class="flex items-center justify-between gap-2 px-4 py-3 border-b border-slate-800">
+        <p class="text-[10px] font-black uppercase tracking-widest text-amber-400">
+          @if (editing()?.source === 'session') {
+            Session
+          } @else {
+            Date de table
+          }
+        </p>
+        <button
+          type="button"
+          class="px-2 py-1 text-[10px] font-black uppercase text-slate-400 hover:text-slate-200"
+          (click)="closePanel()"
+        >
+          Fermer
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4 space-y-3">
+        @if (editing()?.source === 'session') {
+          <p class="text-lg font-serif text-violet-200">{{ editing()?.title }}</p>
+          <p class="text-xs text-slate-400">
+            {{ editing()?.start | date: 'medium' }}
+            @if (editing()?.status) {
+              · {{ editing()?.status }}
+            }
+          </p>
+          @if (editing()?.location) {
+            <p class="text-sm text-slate-300">{{ editing()?.location }}</p>
+          }
+          @if (editing()?.notes) {
+            <p class="text-sm text-slate-400 whitespace-pre-wrap">{{ editing()?.notes }}</p>
+          }
+          <button
+            type="button"
+            class="w-full py-2.5 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white"
+            (click)="openLinkedSession()"
+          >
+            Ouvrir dans Sessions
+          </button>
+        } @else if (draft(); as d) {
+          <label class="block">
+            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Titre</span>
+            <input
+              type="text"
+              class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200"
+              [ngModel]="d.title"
+              (ngModelChange)="patchDraft({ title: $event })"
+              [disabled]="!isOwner()"
+            />
+          </label>
+
+          <label class="block">
+            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Type</span>
+            <select
+              class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-2 py-2 text-sm text-slate-300"
+              [ngModel]="d.kind"
+              (ngModelChange)="patchDraft({ kind: $event })"
+              [disabled]="!isOwner()"
+            >
+              @for (k of kinds; track k[0]) {
+                <option [value]="k[0]">{{ k[1] }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="inline-flex items-center gap-2 text-xs text-slate-300">
+            <input
+              type="checkbox"
+              class="rounded border-slate-600"
+              [ngModel]="!!d.allDay"
+              (ngModelChange)="patchDraft({ allDay: $event })"
+              [disabled]="!isOwner()"
+            />
+            Journée entière
+          </label>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <label class="block">
+              <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Début</span>
+              <input
+                type="datetime-local"
+                class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-2 py-2 text-sm text-slate-200"
+                [ngModel]="startsLocal()"
+                (ngModelChange)="setStartsLocal($event)"
+                [disabled]="!isOwner()"
+              />
+            </label>
+            <label class="block">
+              <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Fin</span>
+              <input
+                type="datetime-local"
+                class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-2 py-2 text-sm text-slate-200"
+                [ngModel]="endsLocal()"
+                (ngModelChange)="setEndsLocal($event)"
+                [disabled]="!isOwner()"
+              />
+            </label>
+          </div>
+
+          <label class="block">
+            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Lieu</span>
+            <input
+              type="text"
+              class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200"
+              [ngModel]="d.location"
+              (ngModelChange)="patchDraft({ location: $event })"
+              [disabled]="!isOwner()"
+              placeholder="Discord, salon, café…"
+            />
+          </label>
+
+          <label class="block">
+            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Notes</span>
+            <textarea
+              rows="3"
+              class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 resize-y"
+              [ngModel]="d.notes"
+              (ngModelChange)="patchDraft({ notes: $event })"
+              [disabled]="!isOwner()"
+            ></textarea>
+          </label>
+
+          @if (heroOptions().length) {
+            <div>
+              <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
+                Héros liés
+              </p>
+              <div class="flex flex-col gap-1.5 max-h-40 overflow-y-auto">
+                @for (h of heroOptions(); track h.id) {
+                  <label class="inline-flex items-center gap-2 text-xs text-slate-300">
+                    <input
+                      type="checkbox"
+                      class="rounded border-slate-600"
+                      [checked]="heroSelected(h.id)"
+                      (change)="toggleHero(h.id)"
+                      [disabled]="!isOwner()"
+                    />
+                    {{ h.label }}
+                  </label>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="flex flex-wrap gap-2 pt-2">
+            <button
+              type="button"
+              class="flex-1 min-w-[8rem] py-2.5 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-300 hover:border-sky-600/50"
+              (click)="openGoogleForDraft()"
+            >
+              Google Agenda
+            </button>
+            @if (isOwner()) {
+              <button
+                type="button"
+                class="flex-1 min-w-[8rem] py-2.5 rounded-xl text-[10px] font-black uppercase border border-violet-800/50 text-violet-300"
+                (click)="convertDraftToSession()"
+              >
+                → Session de play
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      @if (isOwner() && draft()) {
+        <div class="flex gap-2 p-4 border-t border-slate-800">
+          <button
+            type="button"
+            class="flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase border border-red-900/40 text-red-400"
+            (click)="deleteDraft()"
+          >
+            Supprimer
+          </button>
+          <button
+            type="button"
+            class="flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase bg-amber-600 text-white"
+            (click)="saveDraft()"
+            data-testid="calendar-save-event"
+          >
+            Enregistrer
+          </button>
+        </div>
+      }
+    </aside>
+  }
+</section>

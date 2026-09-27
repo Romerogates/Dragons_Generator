@@ -40,6 +40,7 @@ import {
   CampaignMember,
   CampaignPregen,
   CampaignSession,
+  CampaignScheduleEvent,
   CREATURE_ROLE_LABELS,
   NOTEBOOK_MAX_PAGES,
   PREGEN_STATUS_LABELS,
@@ -77,9 +78,11 @@ import { CampaignDetailRoster } from './campaign-detail-roster/campaign-detail-r
 import { CampaignDetailSessions } from './campaign-detail-sessions/campaign-detail-sessions';
 import { CampaignDetailHandouts } from './campaign-detail-handouts/campaign-detail-handouts';
 import { CampaignNotebook } from '../campaign-notebook/campaign-notebook';
+import { CampaignCalendar } from '../campaign-calendar/campaign-calendar';
 import type { MemberCharacterAction } from './campaign-detail-roster/campaign-detail-roster';
 import type { SessionDateChangeEvent, SessionPatchEvent } from './campaign-detail-sessions/campaign-detail-sessions';
 import type { HandoutPatchEvent, HandoutPublishEvent } from './campaign-detail-handouts/campaign-detail-handouts';
+import type { CalendarHeroOption } from '@core/utils/schedule-ics.util';
 import { handoutIdFromActivity } from './campaign-activity.util';
 import { CampaignSessionCacheService } from '@core/services/campaign-session-cache.service';
 import { CampaignSessionDockService } from '@core/services/campaign-session-dock.service';
@@ -100,8 +103,8 @@ import {
 } from './campaign-session.util';
 import { LightMarkdownPipe } from '@shared/pipes/light-markdown.pipe';
 
-/** Onglets de la nav haute (max 5). */
-type PrimaryTab = 'overview' | 'sessions' | 'handouts' | 'prep' | 'players';
+/** Onglets de la nav haute. */
+type PrimaryTab = 'overview' | 'sessions' | 'calendar' | 'handouts' | 'prep' | 'players';
 /** Sous-onglets de Préparation. */
 type PrepSub = 'scenario' | 'creatures' | 'maps' | 'pregens' | 'encounters' | 'notebook';
 /** Cibles acceptées par setTab (compat deep-links / guide / stats). */
@@ -127,6 +130,7 @@ function isPrepSub(t: string): t is PrepSub {
     CampaignDetailOverview,
     CampaignDetailRoster,
     CampaignDetailSessions,
+    CampaignCalendar,
     CampaignDetailHandouts,
     CampaignNotebook,
     CampaignSetupGuide,
@@ -446,6 +450,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const tabs: TabDef[] = [
       { id: 'overview', label: 'Résumé', icon: 'fluent-emoji:clipboard' },
       { id: 'sessions', label: 'Sessions', icon: 'fluent-emoji:calendar' },
+      { id: 'calendar', label: 'Calendrier', icon: 'fluent-emoji:spiral-calendar' },
       { id: 'handouts', label: 'Documents', icon: 'fluent-emoji:page-facing-up' },
     ];
     const c = this.campaign();
@@ -562,9 +567,37 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       this.tab() === 'handouts' ||
       this.tab() === 'overview' ||
       this.tab() === 'sessions' ||
+      this.tab() === 'calendar' ||
       this.tab() === 'prep' ||
       this.tab() === 'players',
   );
+
+  /** Héros proposés pour le lien calendrier (membres + pré-tirés). */
+  readonly calendarHeroOptions = computed((): CalendarHeroOption[] => {
+    const c = this.campaign();
+    if (!c) return [];
+    const options: CalendarHeroOption[] = [];
+    const seen = new Set<string>();
+    for (const m of c.members ?? []) {
+      const id = m.approvedCharacterId || m.proposedCharacterId;
+      const name = m.approvedCharacterName || m.proposedCharacterName || m.displayName;
+      if (!id || seen.has(id)) continue;
+      seen.add(id);
+      options.push({
+        id,
+        label: `${name}${m.role === 'dm' ? ' (MJ)' : ''}`,
+      });
+    }
+    for (const p of c.data.pregenCharacters ?? []) {
+      if (seen.has(p.characterId)) continue;
+      seen.add(p.characterId);
+      options.push({
+        id: p.characterId,
+        label: `${p.characterName || p.label || 'Pré-tiré'} (pré-tiré)`,
+      });
+    }
+    return options;
+  });
 
   readonly publishedHandoutsCount = computed(
     () => (this.campaign()?.data.handouts ?? []).filter((h) => h.published).length,
@@ -751,7 +784,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       this.focusDungeonMapId.set(mapId);
       return;
     }
-    if (tab === 'handouts' || tab === 'players' || tab === 'overview' || tab === 'sessions' || tab === 'prep') {
+    if (tab === 'handouts' || tab === 'players' || tab === 'overview' || tab === 'sessions' || tab === 'calendar' || tab === 'prep') {
       this.setTab(tab as PrimaryTab);
       if (tab === 'handouts' && handoutId) this.focusHandoutId.set(handoutId);
       return;
@@ -786,6 +819,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const icons = [
       'fluent-emoji:clipboard',
       'fluent-emoji:calendar',
+      'fluent-emoji:spiral-calendar',
       'fluent-emoji:page-facing-up',
       'fluent-emoji:hammer-and-wrench',
       'fluent-emoji:busts-in-silhouette',
@@ -1607,6 +1641,43 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         block: 'start',
       });
     }, 80);
+  }
+
+  onScheduleEventsChange(events: CampaignScheduleEvent[]): void {
+    if (!this.campaign()?.isOwner) return;
+    this.saveData({ scheduleEvents: events });
+  }
+
+  convertScheduleEventToSession(ev: CampaignScheduleEvent): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    this.flushSessionSave();
+    const session: CampaignSession = {
+      id: crypto.randomUUID?.() ?? `session-${Date.now()}`,
+      title: ev.title?.trim() || 'Session',
+      scheduledAt: ev.startsAt || new Date().toISOString(),
+      status: 'planned',
+      mode: 'online',
+      location: ev.location || undefined,
+      notes: ev.notes || undefined,
+    };
+    const remaining = (c.data.scheduleEvents ?? []).filter((e) => e.id !== ev.id);
+    this.editingSessionId.set(session.id);
+    this.setTab('sessions');
+    this.saveData({
+      sessions: [session, ...(c.data.sessions ?? [])],
+      scheduleEvents: remaining,
+    });
+    setTimeout(() => {
+      document.getElementById('session-edit-panel')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }, 80);
+  }
+
+  openSessionFromCalendar(sessionId: string): void {
+    this.startEditSession(sessionId);
   }
 
   startEditSession(sessionId: string): void {

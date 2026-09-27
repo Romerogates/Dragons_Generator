@@ -298,6 +298,19 @@
           />
         }
 
+        @case ('calendar') {
+          <app-campaign-calendar
+            [isOwner]="c.isOwner"
+            [campaignTitle]="c.title"
+            [sessions]="c.data.sessions ?? []"
+            [scheduleEvents]="c.data.scheduleEvents ?? []"
+            [heroOptions]="calendarHeroOptions()"
+            (scheduleEventsChange)="onScheduleEventsChange($event)"
+            (openSession)="openSessionFromCalendar($event)"
+            (convertToSession)="convertScheduleEventToSession($event)"
+          />
+        }
+
         @case ('prep') {
           <section class="space-y-5">
             @if (c.isOwner) {
@@ -1402,6 +1415,7 @@
         <div class="flex justify-around gap-1 max-w-lg mx-auto pb-1">
           <button type="button" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors" [class.text-violet-300]="tab() === 'overview'" [class.bg-violet-950/40]="tab() === 'overview'" [class.text-slate-400]="tab() !== 'overview'" (click)="openOverviewTab()">Résumé</button>
           <button type="button" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors" [class.text-amber-300]="tab() === 'sessions'" [class.bg-amber-950/40]="tab() === 'sessions'" [class.text-slate-400]="tab() !== 'sessions'" (click)="setTab('sessions')">Sessions</button>
+          <button type="button" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors" [class.text-amber-300]="tab() === 'calendar'" [class.bg-amber-950/40]="tab() === 'calendar'" [class.text-slate-400]="tab() !== 'calendar'" (click)="setTab('calendar')">Cal.</button>
           <button type="button" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors" [class.text-sky-300]="tab() === 'handouts'" [class.bg-sky-950/40]="tab() === 'handouts'" [class.text-slate-400]="tab() !== 'handouts'" (click)="openHandoutTab()">Docs</button>
           <button type="button" class="flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase transition-colors" [class.text-violet-300]="tab() === 'prep'" [class.bg-violet-950/40]="tab() === 'prep'" [class.text-slate-400]="tab() !== 'prep'" (click)="setTab('prep')">Prépa</button>
           <button

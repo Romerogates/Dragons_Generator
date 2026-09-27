@@ -50,6 +50,16 @@ export type CampaignSessionStatus = 'planned' | 'played' | 'cancelled';
 /** Mode de table pour la session (jets dés vs encodage MJ). */
 export type CampaignSessionMode = 'online' | 'in_person' | 'other';
 
+/** Type d’entrée du calendrier de table (hors / autour du play). */
+export type CampaignScheduleKind = 'game' | 'prep' | 'social' | 'other';
+
+export const CAMPAIGN_SCHEDULE_KIND_LABELS: Record<CampaignScheduleKind, string> = {
+  game: 'Soirée de jeu',
+  prep: 'Préparation',
+  social: 'Social / hors jeu',
+  other: 'Autre',
+};
+
 export type CombatantKind = 'player' | 'monster' | 'npc';
 
 export interface CombatantEncounterLink {
@@ -180,6 +190,23 @@ export interface CampaignSession {
   playerRecap?: string;
 }
 
+/** Date libre du calendrier de table (pas forcément une session de play). */
+export interface CampaignScheduleEvent {
+  id: string;
+  title: string;
+  startsAt: string;
+  endsAt?: string | null;
+  allDay?: boolean;
+  kind: CampaignScheduleKind;
+  location?: string;
+  notes?: string;
+  /** Héros liés (ids personnages cloud / pré-tirés). */
+  characterIds?: string[];
+  /** Optionnel : lier une vraie session de play. */
+  linkedSessionId?: string | null;
+  createdByUserId?: string;
+}
+
 export interface CombatHistoryEntry {
   id: string;
   endedAt: string;
@@ -205,6 +232,8 @@ export interface CampaignData {
   sessionResume?: NotebookPage;
   pregenCharacters: CampaignPregen[];
   sessions: CampaignSession[];
+  /** Dates libres du calendrier de table (réunions, hors-jeu, etc.). */
+  scheduleEvents?: CampaignScheduleEvent[];
   /** Documents distribuables aux joueurs (MJ publie, joueurs voient published uniquement). */
   handouts: CampaignHandout[];
   /** Session en cours côté table de jeu MJ. */
@@ -362,9 +391,33 @@ export function emptyCampaignData(partyLevel = 3): CampaignData {
     notebookPages: [],
     pregenCharacters: [],
     sessions: [],
+    scheduleEvents: [],
     handouts: [],
     activeSessionId: null,
     dungeonMaps: [],
+  };
+}
+
+export function createCampaignScheduleEvent(
+  partial?: Partial<CampaignScheduleEvent>,
+): CampaignScheduleEvent {
+  const starts = partial?.startsAt ? new Date(partial.startsAt) : new Date();
+  const ends =
+    partial?.endsAt != null
+      ? partial.endsAt
+      : new Date(starts.getTime() + 3 * 60 * 60 * 1000).toISOString();
+  return {
+    id: partial?.id ?? crypto.randomUUID?.() ?? `sched-${Date.now()}`,
+    title: partial?.title?.trim() || 'Soirée de table',
+    startsAt: starts.toISOString(),
+    endsAt: ends,
+    allDay: partial?.allDay ?? false,
+    kind: partial?.kind ?? 'game',
+    location: partial?.location ?? '',
+    notes: partial?.notes ?? '',
+    characterIds: partial?.characterIds ? [...partial.characterIds] : [],
+    linkedSessionId: partial?.linkedSessionId ?? null,
+    createdByUserId: partial?.createdByUserId,
   };
 }
 
