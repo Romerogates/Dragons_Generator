@@ -71,6 +71,6 @@ export async function exportEveningPdf(
     writeWrapped(h.body?.trim() || '(vide)', 10);
   }
 
-  const safe = (campaignTitle || 'campagne').replace(/[^\w\-]+/g, '_').slice(0, 40);
+  const safe = (campaignTitle || 'campagne').replace(/[^\w-]+/g, '_').slice(0, 40);
   doc.save(`${safe}-soiree.pdf`);
 }
