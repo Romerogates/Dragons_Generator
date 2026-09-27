@@ -24,6 +24,7 @@ import {
   adventureSectionsForEdit,
   patchAdventureSection,
 } from '@core/utils/adventure-synopsis.util';
+import { AI_GENERATION_BUSY } from '@core/models/ai-generation.model';
 
 @Component({
   selector: 'app-adventure-step',
@@ -83,42 +84,54 @@ export class AdventureStep implements OnInit {
       this.generationError.set("Donnez un titre à l'aventure.");
       return;
     }
+    if (this.aiProgress.active()) {
+      this.generationError.set(this.aiProgress.busyMessage());
+      return;
+    }
     if (this.aiRateLimit.showIfBlocked()) return;
 
     this.generationError.set(null);
 
     this.aiProgress
-      .run('adventure', () =>
-        this.dataService.generateAdventure({
-          title: this.builder.title().trim(),
-          setting: storyLocationContext(this.builder.region(), this.builder.setting()),
-          partyLevel: this.builder.partyLevel(),
-          tone: this.builder.tone(),
-          creatures: this.builder.creatures().map((c) => ({
-            creatureId: c.creatureId,
-            creatureName: c.creatureName,
-            customName: c.customName.trim(),
-            role: c.role,
-            backstory: c.backstory.trim() || null,
-          })),
-        }),
+      .run(
+        'adventure',
+        () =>
+          this.dataService.generateAdventure({
+            title: this.builder.title().trim(),
+            setting: storyLocationContext(this.builder.region(), this.builder.setting()),
+            partyLevel: this.builder.partyLevel(),
+            tone: this.builder.tone(),
+            creatures: this.builder.creatures().map((c) => ({
+              creatureId: c.creatureId,
+              creatureName: c.creatureName,
+              customName: c.customName.trim(),
+              role: c.role,
+              backstory: c.backstory.trim() || null,
+            })),
+          }),
+        {
+          onSuccess: (res) => {
+            this.builder.setAdventure(res.adventure);
+            this.rawEdit.set(false);
+            this.generationError.set(null);
+          },
+          onError: (err) => {
+            if (isAiRateLimitHttpError(err)) return;
+            const busy = err as { code?: string; message?: string };
+            if (busy.code === AI_GENERATION_BUSY) {
+              this.generationError.set(busy.message ?? this.aiProgress.busyMessage());
+              return;
+            }
+            this.generationError.set(this.extractError(err));
+            queueMicrotask(() =>
+              document
+                .querySelector<HTMLElement>('[data-testid="adventure-generation-error"]')
+                ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }),
+            );
+          },
+        },
       )
-      .subscribe({
-        next: (res) => {
-          this.builder.setAdventure(res.adventure);
-          this.rawEdit.set(false);
-          this.generationError.set(null);
-        },
-        error: (err) => {
-          if (isAiRateLimitHttpError(err)) return;
-          this.generationError.set(this.extractError(err));
-          queueMicrotask(() =>
-            document
-              .querySelector<HTMLElement>('[data-testid="adventure-generation-error"]')
-              ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }),
-          );
-        },
-      });
+      .subscribe({ error: () => undefined });
   }
 
   prevStep(): void {

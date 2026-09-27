@@ -38,7 +38,20 @@ describe('IdentityStep', () => {
     showIfBlockedSpy = jasmine.createSpy('showIfBlocked').and.returnValue(false);
     aiRunSpy = jasmine
       .createSpy('run')
-      .and.callFake((_kind: string, work: () => ReturnType<typeof of>) => work());
+      .and.callFake(
+        (
+          _kind: string,
+          work: () => ReturnType<typeof of>,
+          options?: { onSuccess?: (v: unknown) => void; onError?: (e: unknown) => void },
+        ) => {
+          const result$ = work();
+          result$.subscribe({
+            next: (v) => options?.onSuccess?.(v),
+            error: (e) => options?.onError?.(e),
+          });
+          return result$;
+        },
+      );
 
     spyOn(window, 'scrollTo');
 
@@ -68,10 +81,15 @@ describe('IdentityStep', () => {
           useValue: {
             run: aiRunSpy,
             active: signal(false),
+            background: signal(false),
+            foregroundActive: signal(false),
             progress: signal(0),
             stageLabel: signal(''),
             providerLabel: signal(''),
             detail: signal<string | null>(null),
+            busyMessage: () => 'busy',
+            stop: jasmine.createSpy('stop'),
+            sendToBackground: jasmine.createSpy('sendToBackground'),
           },
         },
       ],

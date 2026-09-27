@@ -652,11 +652,18 @@
                         <button
                           type="button"
                           class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white hover:bg-violet-500 disabled:opacity-50"
-                          [disabled]="generatingAutoPregen() || importingPregen() || aiProgress.active()"
+                          [disabled]="importingPregen() || aiProgress.foregroundActive()"
                           (click)="generateAutoPregen()"
                         >
-                          @if (generatingAutoPregen() || aiProgress.active()) { Génération… }
-                          @else { Générer un héros original }
+                          @if (aiProgress.foregroundActive()) {
+                            Génération…
+                          } @else if (aiProgress.active() && aiProgress.background()) {
+                            En arrière-plan…
+                          } @else if (generatingAutoPregen()) {
+                            Génération…
+                          } @else {
+                            Générer un héros original
+                          }
                         </button>
                         @for (ch of dmCharacters(); track ch.id) {
                           <button

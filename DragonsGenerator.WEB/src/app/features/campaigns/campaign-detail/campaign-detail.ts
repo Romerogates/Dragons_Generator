@@ -67,6 +67,7 @@ import {
 import { StoryBuilderService } from '@core/services/story-builder.service';
 import { CampaignPregenGeneratorService } from '@core/services/campaign-pregen-generator.service';
 import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
+import { isAiGenerationAborted } from '@core/models/ai-generation.model';
 import { AiGenerationProgressBar } from '@shared/components/ai-generation-progress-bar/ai-generation-progress-bar';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import { AdventureSynopsisView } from '@shared/components/adventure-synopsis-view/adventure-synopsis-view';
@@ -2418,11 +2419,18 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   async generateAutoPregen(): Promise<void> {
     const c = this.campaign();
     if (!c?.isOwner || this.generatingAutoPregen()) return;
+    if (this.aiProgress.active()) {
+      this.pregenFeedback.set(this.aiProgress.busyMessage());
+      return;
+    }
 
     this.generatingAutoPregen.set(true);
     this.pregenFeedback.set(null);
+    const campaignId = c.id;
     try {
       const generated = await this.pregenGenerator.generateOriginalPlayable(c, true);
+      const latest = this.campaign();
+      if (!latest || latest.id !== campaignId) return;
       const entry = createCampaignPregenEntry(
         generated.characterId,
         generated.characterName,
@@ -2433,9 +2441,10 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       entry.dmBackstory = generated.dmBackstory;
       entry.status = 'ready';
       this.saveData({
-        pregenCharacters: [...(c.data.pregenCharacters ?? []), entry],
+        pregenCharacters: [...(latest.data.pregenCharacters ?? []), entry],
       });
-    } catch {
+    } catch (err) {
+      if (isAiGenerationAborted(err)) return;
       this.pregenFeedback.set('Génération impossible. Réessayez dans quelques instants.');
     } finally {
       this.generatingAutoPregen.set(false);

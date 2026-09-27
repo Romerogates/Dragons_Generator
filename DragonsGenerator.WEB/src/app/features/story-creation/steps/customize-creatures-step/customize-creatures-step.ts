@@ -21,6 +21,7 @@ import {
 import { formatChallengeRating } from '@core/utils/creature-display.util';
 import { AiGenerationProgressBar } from '@shared/components/ai-generation-progress-bar/ai-generation-progress-bar';
 import { firstValueFrom } from 'rxjs';
+import { AI_GENERATION_BUSY } from '@core/models/ai-generation.model';
 
 @Component({
   selector: 'app-customize-creatures-step',
@@ -65,33 +66,45 @@ export class CustomizeCreaturesStep implements OnInit {
       this.generationError.set('Donnez un nom à la créature avant de générer sa vie.');
       return;
     }
+    if (this.aiProgress.active()) {
+      this.generationError.set(this.aiProgress.busyMessage());
+      return;
+    }
     if (this.aiRateLimit.showIfBlocked()) return;
 
     this.generatingId.set(creatureId);
     this.generationError.set(null);
 
     this.aiProgress
-      .run('creature-backstory', () =>
-        this.dataService.generateCreatureStory({
-          creatureId: creature.creatureId,
-          customName: creature.customName.trim(),
-          role: creature.role,
-          setting: this.builder.setting().trim() || null,
-        }),
+      .run(
+        'creature-backstory',
+        () =>
+          this.dataService.generateCreatureStory({
+            creatureId: creature.creatureId,
+            customName: creature.customName.trim(),
+            role: creature.role,
+            setting: this.builder.setting().trim() || null,
+          }),
+        {
+          onSuccess: (res) => {
+            this.builder.updateCreature(creatureId, { backstory: res.backstory });
+            this.generatingId.set(null);
+          },
+          onError: (err) => {
+            this.generatingId.set(null);
+            if (isAiRateLimitHttpError(err)) return;
+            const busy = err as { code?: string; message?: string };
+            if (busy.code === AI_GENERATION_BUSY) {
+              this.generationError.set(busy.message ?? this.aiProgress.busyMessage());
+              return;
+            }
+            this.generationError.set(this.extractError(err));
+          },
+        },
       )
       .subscribe({
-        next: (res) => {
-          this.builder.updateCreature(creatureId, { backstory: res.backstory });
-          this.generatingId.set(null);
-        },
-        error: (err) => {
-          if (isAiRateLimitHttpError(err)) {
-            this.generatingId.set(null);
-            return;
-          }
-          this.generationError.set(this.extractError(err));
-          this.generatingId.set(null);
-        },
+        error: () => undefined,
+        complete: () => this.generatingId.set(null),
       });
   }
 
@@ -100,6 +113,10 @@ export class CustomizeCreaturesStep implements OnInit {
       .creatures()
       .filter((c) => !c.backstory.trim() && c.customName.trim());
     if (pending.length === 0) return;
+    if (this.aiProgress.active()) {
+      this.generationError.set(this.aiProgress.busyMessage());
+      return;
+    }
     if (this.aiRateLimit.showIfBlocked()) return;
 
     this.generationError.set(null);
@@ -123,38 +140,51 @@ export class CustomizeCreaturesStep implements OnInit {
               role: c.role,
             })),
           }),
-        { batchTotal: pending.length },
-      )
-      .subscribe({
-        next: (res) => {
-          const generated = new Set(res.backstories.map((item) => item.creatureId));
-          for (const item of res.backstories) {
-            this.builder.updateCreature(item.creatureId, { backstory: item.backstory });
-          }
-          const missing = pending.filter((c) => !generated.has(c.creatureId));
-          if (missing.length) {
+        {
+          batchTotal: pending.length,
+          onSuccess: (res) => {
+            const generated = new Set(res.backstories.map((item) => item.creatureId));
+            for (const item of res.backstories) {
+              this.builder.updateCreature(item.creatureId, { backstory: item.backstory });
+            }
+            const missing = pending.filter((c) => !generated.has(c.creatureId));
+            if (missing.length) {
+              this.generationError.set(null);
+              this.fallbackNotice.set(
+                'Certaines vies manquaient dans le lot — génération une par une…',
+              );
+              // Après complete()/reset du lot `run()`, sinon le hideTimer écrase le begin séquentiel.
+              queueMicrotask(() => void this.generateBackstoriesSequentially(missing));
+            } else {
+              this.fallbackNotice.set(null);
+              this.generatingId.set(null);
+            }
+          },
+          onError: (err) => {
+            if (isAiRateLimitHttpError(err)) {
+              this.generatingId.set(null);
+              this.fallbackNotice.set(null);
+              return;
+            }
+            const busy = err as { code?: string; message?: string };
+            if (busy.code === AI_GENERATION_BUSY) {
+              this.generatingId.set(null);
+              this.generationError.set(busy.message ?? this.aiProgress.busyMessage());
+              return;
+            }
+            // 502/504 lot (proxy / Ollama lent / JSON invalide) → secours séquentiel.
             this.generationError.set(null);
             this.fallbackNotice.set(
-              'Certaines vies manquaient dans le lot — génération une par une…',
+              'Le lot IA a échoué (délai ou service) — on continue une créature à la fois…',
             );
-            void this.generateBackstoriesSequentially(missing);
-          } else {
-            this.fallbackNotice.set(null);
-            this.generatingId.set(null);
-          }
+            queueMicrotask(() => void this.generateBackstoriesSequentially(pending));
+          },
         },
-        error: (err) => {
-          if (isAiRateLimitHttpError(err)) {
-            this.generatingId.set(null);
-            this.fallbackNotice.set(null);
-            return;
-          }
-          // 502/504 lot (proxy / Ollama lent / JSON invalide) → secours séquentiel.
-          this.generationError.set(null);
-          this.fallbackNotice.set(
-            'Le lot IA a échoué (délai ou service) — on continue une créature à la fois…',
-          );
-          void this.generateBackstoriesSequentially(pending);
+      )
+      .subscribe({
+        error: () => undefined,
+        complete: () => {
+          if (!this.fallbackNotice()) this.generatingId.set(null);
         },
       });
   }
@@ -168,6 +198,7 @@ export class CustomizeCreaturesStep implements OnInit {
     await this.aiProgress.begin('creature-batch', { batchIndex: 0, batchTotal: pending.length });
 
     for (let i = 0; i < pending.length; i++) {
+      if (this.aiProgress.isAborted()) break;
       const creature = pending[i];
       this.aiProgress.setBatchProgress(i, pending.length);
       try {
@@ -179,11 +210,19 @@ export class CustomizeCreaturesStep implements OnInit {
             setting: this.builder.setting().trim() || null,
           }),
         );
+        if (this.aiProgress.isAborted()) break;
         this.builder.updateCreature(creature.creatureId, { backstory: res.backstory });
         ok++;
       } catch {
+        if (this.aiProgress.isAborted()) break;
         failed++;
       }
+    }
+
+    if (this.aiProgress.isAborted()) {
+      this.generatingId.set(null);
+      this.fallbackNotice.set(null);
+      return;
     }
 
     this.aiProgress.complete();

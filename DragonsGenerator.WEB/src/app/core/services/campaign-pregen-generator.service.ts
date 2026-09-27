@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, type Observable } from 'rxjs';
 import { DataService } from './data.service';
 import { CharacterCloudService } from './character-cloud.service';
 import { CharacterAutoGeneratorService } from './character-auto-generator.service';
@@ -8,6 +8,7 @@ import type { Character } from '@core/models/Character/character';
 import { pickRandom } from '@core/utils/pregen-random.util';
 import { buildPregenPhysicalDescription } from '@core/utils/pregen-narrative.util';
 import { AiGenerationProgressService } from './ai-generation-progress.service';
+import { isAiGenerationAborted } from '@core/models/ai-generation.model';
 
 export interface GeneratedPregenCharacter {
   characterId: string;
@@ -37,16 +38,21 @@ export class CampaignPregenGeneratorService {
     withAiStory = true,
   ): Promise<GeneratedPregenCharacter> {
     if (withAiStory) {
+      if (this.aiProgress.active()) {
+        throw { code: 'AI_GENERATION_BUSY', message: this.aiProgress.busyMessage() };
+      }
       await this.aiProgress.begin('pregen-story');
       this.aiProgress.setStageLabel('Copie du personnage…');
     }
     try {
       return await this.generatePlayableDuplicateInner(campaign, sourceCharacterId, withAiStory);
     } catch (err) {
-      if (withAiStory) this.aiProgress.cancel();
+      if (withAiStory) {
+        if (!isAiGenerationAborted(err)) this.aiProgress.cancel();
+      }
       throw err;
     } finally {
-      if (withAiStory && this.aiProgress.active()) {
+      if (withAiStory && this.aiProgress.active() && !this.aiProgress.isAborted()) {
         this.aiProgress.complete();
       }
     }
@@ -57,14 +63,19 @@ export class CampaignPregenGeneratorService {
     sourceCharacterId: string,
     withAiStory: boolean,
   ): Promise<GeneratedPregenCharacter> {
-    const res = await firstValueFrom(this.characters.get(sourceCharacterId));
+    const wait = <T>(source: Observable<T>) =>
+      withAiStory ? this.aiProgress.awaitWhileActive(source) : firstValueFrom(source);
+
+    const res = await wait(this.characters.get(sourceCharacterId));
+    if (withAiStory) this.aiProgress.throwIfAborted();
     const source = structuredClone(res.data as Character);
     const copy = structuredClone(source) as Character;
     copy.id = '';
     copy.cloudSynced = false;
     copy.name = `${source.name || 'Héros'} (pré-tiré)`;
 
-    const newId = await firstValueFrom(this.characters.save(copy));
+    const newId = await wait(this.characters.save(copy));
+    if (withAiStory) this.aiProgress.throwIfAborted();
 
     const speciesLabel = source.species.subspeciesLabel
       ? `${source.species.label} (${source.species.subspeciesLabel})`
@@ -77,7 +88,7 @@ export class CampaignPregenGeneratorService {
     if (withAiStory) {
       try {
         this.aiProgress.setStageLabel('Génération IA du récit…');
-        const storyRes = await firstValueFrom(
+        const storyRes = await this.aiProgress.awaitWhileActive(
           this.data.generateBackstory({
             name: copy.name,
             sex: source.personality?.sex ?? 'X',
@@ -94,7 +105,8 @@ export class CampaignPregenGeneratorService {
         );
         dmBackstory = storyRes.story.trim();
         publicHook = dmBackstory.split(/[.!?]/)[0]?.trim() ?? dmBackstory.slice(0, 140);
-      } catch {
+      } catch (err) {
+        if (isAiGenerationAborted(err)) throw err;
         if (!publicHook) {
           publicHook = `${copy.name}, ${speciesLabel} ${classLabel}, prêt pour ${campaign.data.regionName || 'l\'aventure'}.`;
           dmBackstory = publicHook;
@@ -116,7 +128,8 @@ export class CampaignPregenGeneratorService {
         copy.personality?.description?.trim() ||
         buildPregenPhysicalDescription(copy, speciesLabel, classLabel),
     };
-    await firstValueFrom(this.characters.save(copy, { updateExisting: true }));
+    if (withAiStory) this.aiProgress.throwIfAborted();
+    await wait(this.characters.save(copy, { updateExisting: true }));
 
     return {
       characterId: newId,

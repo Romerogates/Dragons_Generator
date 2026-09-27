@@ -23,6 +23,7 @@ import { ConnectivityService } from '@core/services/connectivity.service';
 import { PwaLifecycleService } from '@core/services/pwa-lifecycle.service';
 import { FriendChatDockComponent } from './shared/components/friend-chat-dock/friend-chat-dock';
 import { CampaignSessionDockComponent } from './shared/components/campaign-session-dock/campaign-session-dock';
+import { AiGenerationDock } from './shared/components/ai-generation-dock/ai-generation-dock';
 import { clearPersistedAiRateLimit } from '@core/utils/ai-rate-limit.util';
 import {
   dismissAuthCookieMigrationBanner,
@@ -43,6 +44,7 @@ const BANNER_ROW_PX_FALLBACK = 40;
     AiRateLimitDialogComponent,
     FriendChatDockComponent,
     CampaignSessionDockComponent,
+    AiGenerationDock,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss',

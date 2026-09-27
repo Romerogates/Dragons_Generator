@@ -168,10 +168,12 @@
         <button
           class="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-500 text-[10px] font-black uppercase tracking-widest hover:bg-amber-500/20 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-50"
           (click)="generateStory()"
-          [disabled]="aiProgress.active() || !c().name.trim()"
+          [disabled]="aiProgress.foregroundActive() || !c().name.trim()"
         >
-          @if (aiProgress.active()) {
+          @if (aiProgress.foregroundActive()) {
             Inspiration…
+          } @else if (aiProgress.active() && aiProgress.background()) {
+            En arrière-plan…
           } @else {
             <iconify-icon icon="fluent-emoji:sparkles"></iconify-icon> Générer avec l'IA
           }

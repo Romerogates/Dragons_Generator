@@ -39,6 +39,7 @@ import { normalizeSkillId, type SkillInfo } from '@core/utils/skill.utils';
 import type { GeneratedPregenCharacter } from './campaign-pregen-generator.service';
 import { buildPregenPhysicalDescription } from '@core/utils/pregen-narrative.util';
 import { AiGenerationProgressService } from './ai-generation-progress.service';
+import { isAiGenerationAborted } from '@core/models/ai-generation.model';
 
 interface GameCatalogs {
   species: Species[];
@@ -63,15 +64,24 @@ export class CharacterAutoGeneratorService {
     withAiStory = true,
   ): Promise<GeneratedPregenCharacter> {
     if (withAiStory) {
+      if (this.aiProgress.active()) {
+        throw { code: 'AI_GENERATION_BUSY', message: this.aiProgress.busyMessage() };
+      }
       await this.aiProgress.begin('pregen-hero');
     }
     try {
       return await this.generateOriginalPlayableInner(campaign, withAiStory);
     } catch (err) {
-      if (withAiStory) this.aiProgress.cancel();
+      if (withAiStory) {
+        if (isAiGenerationAborted(err)) {
+          // stop() already reset the bar
+        } else {
+          this.aiProgress.cancel();
+        }
+      }
       throw err;
     } finally {
-      if (withAiStory && this.aiProgress.active()) {
+      if (withAiStory && this.aiProgress.active() && !this.aiProgress.isAborted()) {
         this.aiProgress.complete();
       }
     }
@@ -83,10 +93,12 @@ export class CharacterAutoGeneratorService {
   ): Promise<GeneratedPregenCharacter> {
     this.aiProgress.setStageLabel('Chargement du codex…');
     const catalogs = await this.loadCatalogs();
+    this.aiProgress.throwIfAborted();
     const maxAttempts = 12;
     let lastErrors: string[] = [];
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      this.aiProgress.throwIfAborted();
       try {
         this.aiProgress.setStageLabel('Tirage aléatoire — espèce, classe, équipement…');
         const character = this.buildRandomLevel1(catalogs);
@@ -101,7 +113,8 @@ export class CharacterAutoGeneratorService {
         copy.cloudSynced = false;
         copy.name = `${character.name} (pré-tiré)`;
         this.aiProgress.setStageLabel('Enregistrement de la fiche…');
-        const newId = await firstValueFrom(this.characters.save(copy));
+        this.aiProgress.throwIfAborted();
+        const newId = await this.aiProgress.awaitWhileActive(this.characters.save(copy));
 
         const speciesLabel = character.species.subspeciesLabel
           ? `${character.species.label} (${character.species.subspeciesLabel})`
@@ -114,7 +127,7 @@ export class CharacterAutoGeneratorService {
         if (withAiStory) {
           try {
             this.aiProgress.setStageLabel('Génération IA du récit…');
-            const storyRes = await firstValueFrom(
+            const storyRes = await this.aiProgress.awaitWhileActive(
               this.data.generateBackstory({
                 name: copy.name,
                 sex: character.personality?.sex ?? 'X',
@@ -131,7 +144,8 @@ export class CharacterAutoGeneratorService {
             );
             dmBackstory = storyRes.story.trim();
             publicHook = dmBackstory.split(/[.!?]/)[0]?.trim() ?? dmBackstory.slice(0, 140);
-          } catch {
+          } catch (err) {
+            if (isAiGenerationAborted(err)) throw err;
             if (!publicHook) {
               publicHook = `${copy.name}, ${speciesLabel} ${classLabel}, prêt pour ${campaign.data.regionName || "l'aventure"}.`;
               dmBackstory = publicHook;
@@ -147,6 +161,7 @@ export class CharacterAutoGeneratorService {
         copy.id = newId;
         copy.cloudSynced = true;
         this.aiProgress.setStageLabel('Finalisation du pré-tiré…');
+        this.aiProgress.throwIfAborted();
         copy.personality = {
           ...copy.personality,
           story: dmBackstory,
@@ -154,7 +169,7 @@ export class CharacterAutoGeneratorService {
             copy.personality?.description?.trim() ||
             buildPregenPhysicalDescription(copy, speciesLabel, classLabel),
         };
-        await firstValueFrom(this.characters.save(copy, { updateExisting: true }));
+        await this.aiProgress.awaitWhileActive(this.characters.save(copy, { updateExisting: true }));
 
         return {
           characterId: newId,
@@ -164,7 +179,8 @@ export class CharacterAutoGeneratorService {
           publicHook,
           dmBackstory,
         };
-      } catch {
+      } catch (err) {
+        if (isAiGenerationAborted(err)) throw err;
         continue;
       }
     }

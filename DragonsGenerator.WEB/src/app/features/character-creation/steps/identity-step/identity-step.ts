@@ -21,6 +21,7 @@ import { AiRateLimitDialogService } from '@core/services/ai-rate-limit-dialog.se
 import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
 import { isAiRateLimitHttpError } from '@core/utils/ai-rate-limit.util';
 import { AiGenerationProgressBar } from '@shared/components/ai-generation-progress-bar/ai-generation-progress-bar';
+import { AI_GENERATION_BUSY } from '@core/models/ai-generation.model';
 
 @Component({
   selector: 'app-identity-step',
@@ -95,44 +96,56 @@ export class IdentityStep implements OnInit {
       this.generationError.set("L'espèce et la classe sont nécessaires.");
       return;
     }
+    if (this.aiProgress.active()) {
+      this.generationError.set(this.aiProgress.busyMessage());
+      return;
+    }
     if (this.aiRateLimit.showIfBlocked()) return;
 
     this.generationError.set(null);
 
     this.aiProgress
-      .run('character-backstory', () =>
-        this.dataService.generateBackstory({
-          name: char.name,
-          sex: char.sex || 'X',
-          speciesName: char.speciesName!,
-          subspeciesName: char.subspeciesName,
-          civilizationName: char.civilizationName ?? 'Inconnue',
-          className: char.className!,
-          alignment: char.alignment || null,
-          traits: char.traits || null,
-          bonds: char.bonds || null,
-          flaws: char.flaws || null,
-          background: char.background || null,
-        }),
+      .run(
+        'character-backstory',
+        () =>
+          this.dataService.generateBackstory({
+            name: char.name,
+            sex: char.sex || 'X',
+            speciesName: char.speciesName!,
+            subspeciesName: char.subspeciesName,
+            civilizationName: char.civilizationName ?? 'Inconnue',
+            className: char.className!,
+            alignment: char.alignment || null,
+            traits: char.traits || null,
+            bonds: char.bonds || null,
+            flaws: char.flaws || null,
+            background: char.background || null,
+          }),
+        {
+          onSuccess: (response) => {
+            this.builder.setIdentity({ story: response.story });
+          },
+          onError: (err) => {
+            if (isAiRateLimitHttpError(err)) return;
+            const busy = err as { code?: string; message?: string };
+            if (busy.code === AI_GENERATION_BUSY) {
+              this.generationError.set(busy.message ?? this.aiProgress.busyMessage());
+              return;
+            }
+            const e = (err as { error?: Record<string, unknown>; status?: number })?.error;
+            const apiMsg =
+              (e?.['errors'] as { generalErrors?: string[] })?.generalErrors?.[0] ||
+              (e?.['errors'] as { reason?: string }[])?.[0]?.reason ||
+              (e?.['message'] as string) ||
+              null;
+            this.generationError.set(
+              apiMsg && apiMsg !== 'One or more errors occurred!'
+                ? apiMsg
+                : "L'inspiration cosmique est momentanément indisponible. Vérifiez la clé Groq côté API.",
+            );
+          },
+        },
       )
-      .subscribe({
-        next: (response) => {
-          this.builder.setIdentity({ story: response.story });
-        },
-        error: (err) => {
-          if (isAiRateLimitHttpError(err)) return;
-          const e = (err as { error?: Record<string, unknown>; status?: number })?.error;
-          const apiMsg =
-            (e?.['errors'] as { generalErrors?: string[] })?.generalErrors?.[0] ||
-            (e?.['errors'] as { reason?: string }[])?.[0]?.reason ||
-            (e?.['message'] as string) ||
-            null;
-          this.generationError.set(
-            apiMsg && apiMsg !== 'One or more errors occurred!'
-              ? apiMsg
-              : "L'inspiration cosmique est momentanément indisponible. Vérifiez la clé Groq côté API.",
-          );
-        },
-      });
+      .subscribe({ error: () => undefined });
   }
 }

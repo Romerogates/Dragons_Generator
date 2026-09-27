@@ -1,12 +1,29 @@
-import { Injectable, inject, signal } from '@angular/core';
-import { Observable, finalize, firstValueFrom, from, tap, throwError } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import {
+  EMPTY,
+  EmptyError,
+  Observable,
+  Subject,
+  Subscription,
+  finalize,
+  firstValueFrom,
+  from,
+  share,
+  tap,
+  throwError,
+} from 'rxjs';
+import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 import type {
   AiGenerationKind,
   AiProgressOptions,
   AiProgressProfile,
   AiProgressStage,
   AiStatusResponse,
+} from '@core/models/ai-generation.model';
+import {
+  AI_GENERATION_ABORTED,
+  AI_GENERATION_BUSY,
+  readyMessageForKind,
 } from '@core/models/ai-generation.model';
 import { AiStatusService } from './ai-status.service';
 
@@ -15,6 +32,8 @@ interface ActiveRun {
   startedAt: number;
   batchIndex: number;
   batchTotal: number;
+  kind: AiGenerationKind;
+  readyMessage: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -22,49 +41,155 @@ export class AiGenerationProgressService {
   private readonly aiStatus = inject(AiStatusService);
 
   readonly active = signal(false);
+  /** True when the user hid the full bar but the request keeps running. */
+  readonly background = signal(false);
   readonly progress = signal(0);
   readonly stageLabel = signal('');
   readonly providerLabel = signal('');
   readonly detail = signal<string | null>(null);
+  readonly kind = signal<AiGenerationKind | null>(null);
+  /** Ephemeral toast after a background run completes. */
+  readonly toastMessage = signal<string | null>(null);
+
+  /** Full progress UI (not background pill). */
+  readonly foregroundActive = computed(() => this.active() && !this.background());
 
   private timer: ReturnType<typeof setInterval> | null = null;
   private hideTimer: ReturnType<typeof setTimeout> | null = null;
+  private toastTimer: ReturnType<typeof setTimeout> | null = null;
   private activeRun: ActiveRun | null = null;
+  private runSub: Subscription | null = null;
+  private readonly cancel$ = new Subject<void>();
+  private aborted = false;
 
-  run<T>(kind: AiGenerationKind, work: () => Observable<T>, options?: AiProgressOptions): Observable<T> {
+  /**
+   * Starts a tracked generation. Keeps an internal subscription so
+   * « Continuer en arrière-plan » can hide the UI without aborting HTTP.
+   * Callers should prefer `onSuccess` / `onError` in options; a returned
+   * Observable may still be subscribed for local UI.
+   */
+  run<T>(kind: AiGenerationKind, work: () => Observable<T>, options?: AiProgressOptions<T>): Observable<T> {
+    if (this.active()) {
+      return throwError(() => ({ code: AI_GENERATION_BUSY, message: this.busyMessage() }));
+    }
+
+    // Claim immediately so a second run() cannot start during async begin().
+    this.aborted = false;
+    this.active.set(true);
+    this.background.set(false);
+    this.kind.set(kind);
+
     let succeeded = false;
-    return from(this.begin(kind, options)).pipe(
-      switchMap(() => work()),
-      tap(() => {
+
+    const shared = from(this.begin(kind, options as AiProgressOptions | undefined)).pipe(
+      switchMap(() => {
+        if (this.aborted) return EMPTY;
+        return work();
+      }),
+      takeUntil(this.cancel$),
+      tap((value) => {
         succeeded = true;
+        options?.onSuccess?.(value);
       }),
       catchError((err) => {
-        this.cancel();
+        options?.onError?.(err);
+        this.clearRunSubscription();
+        this.reset();
         return throwError(() => err);
       }),
       finalize(() => {
+        this.clearRunSubscription();
         if (succeeded) this.complete();
-        else if (this.active()) this.cancel();
+        else if (this.active()) this.reset();
       }),
+      share(),
     );
+
+    this.runSub = shared.subscribe({
+      error: () => {
+        /* surfaced via returned Observable / onError */
+      },
+    });
+
+    return shared;
   }
 
   async begin(kind: AiGenerationKind, options?: AiProgressOptions): Promise<void> {
     this.clearTimers();
+    if (!this.active()) {
+      this.aborted = false;
+    }
     const status = await firstValueFrom(this.aiStatus.getStatus());
+    if (this.aborted) return;
+
     const profile = buildProfile(kind, status);
     this.activeRun = {
       profile,
       startedAt: Date.now(),
       batchIndex: options?.batchIndex ?? 0,
       batchTotal: options?.batchTotal ?? 1,
+      kind,
+      readyMessage: options?.readyMessage ?? readyMessageForKind(kind),
     };
+    this.kind.set(kind);
+    this.background.set(false);
     this.active.set(true);
     this.progress.set(0);
     this.providerLabel.set(profile.providerLabel);
     this.detail.set(buildDetail(options));
     this.applyStage(profile.stages, 0);
     this.timer = setInterval(() => this.tick(), 150);
+  }
+
+  /** Abort in-flight HTTP (when tracked via `run`) and reset UI. */
+  stop(): void {
+    this.aborted = true;
+    this.clearRunSubscription();
+    this.reset();
+    this.cancel$.next();
+  }
+
+  /** Hide the full bar; keep the request alive. */
+  sendToBackground(): void {
+    if (!this.active()) return;
+    this.background.set(true);
+  }
+
+  /** Show the full bar again while the request is still running. */
+  restoreForeground(): void {
+    if (!this.active()) return;
+    this.background.set(false);
+  }
+
+  /** For sequential / begin()-based loops. */
+  isAborted(): boolean {
+    return this.aborted;
+  }
+
+  busyMessage(): string {
+    return 'Une génération est déjà en cours — elle s’affichera ici quand elle sera prête. Vous pouvez l’arrêter via la pastille.';
+  }
+
+  /** Throws `{ code: AI_GENERATION_ABORTED }` when the user stopped mid-flight. */
+  throwIfAborted(): void {
+    if (this.aborted) {
+      throw { code: AI_GENERATION_ABORTED, message: 'Génération annulée.' };
+    }
+  }
+
+  /**
+   * Awaits an HTTP (or other) observable, aborting when `stop()` is called
+   * (used by pré-tiré / begin()-based flows).
+   */
+  async awaitWhileActive<T>(source: Observable<T>): Promise<T> {
+    try {
+      return await firstValueFrom(source.pipe(takeUntil(this.cancel$)));
+    } catch (err) {
+      if (this.aborted || err instanceof EmptyError) {
+        throw { code: AI_GENERATION_ABORTED, message: 'Génération annulée.' };
+      }
+      throw err;
+    }
   }
 
   setBatchProgress(index: number, total: number): void {
@@ -84,11 +209,31 @@ export class AiGenerationProgressService {
     this.clearTimers();
     this.progress.set(100);
     this.stageLabel.set('Terminé !');
-    this.hideTimer = setTimeout(() => this.reset(), 700);
+    const wasBackground = this.background();
+    const msg = this.activeRun?.readyMessage;
+    this.hideTimer = setTimeout(() => {
+      this.reset();
+      if (wasBackground && msg) this.showToast(msg);
+    }, wasBackground ? 0 : 700);
   }
 
+  /** @deprecated Prefer `stop()` — kept for existing begin()/cancel callers. */
   cancel(): void {
-    this.reset();
+    this.stop();
+  }
+
+  dismissToast(): void {
+    if (this.toastTimer) {
+      clearTimeout(this.toastTimer);
+      this.toastTimer = null;
+    }
+    this.toastMessage.set(null);
+  }
+
+  private showToast(message: string): void {
+    this.dismissToast();
+    this.toastMessage.set(message);
+    this.toastTimer = setTimeout(() => this.dismissToast(), 4500);
   }
 
   private tick(): void {
@@ -117,10 +262,19 @@ export class AiGenerationProgressService {
     this.clearTimers();
     this.activeRun = null;
     this.active.set(false);
+    this.background.set(false);
+    this.kind.set(null);
     this.progress.set(0);
     this.stageLabel.set('');
     this.providerLabel.set('');
     this.detail.set(null);
+  }
+
+  private clearRunSubscription(): void {
+    if (this.runSub) {
+      this.runSub.unsubscribe();
+      this.runSub = null;
+    }
   }
 
   private clearTimers(): void {
