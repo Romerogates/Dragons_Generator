@@ -132,6 +132,23 @@
             </select>
           </label>
 
+          <label class="block">
+            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500"
+              >Récurrence</span
+            >
+            <select
+              class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-2 py-2 text-sm text-slate-300"
+              [ngModel]="d.rrule ?? ''"
+              (ngModelChange)="patchDraft({ rrule: $event || null })"
+              [disabled]="!isOwner()"
+              data-testid="calendar-rrule"
+            >
+              @for (p of rrulePresets; track p.value) {
+                <option [value]="p.value">{{ p.label }}</option>
+              }
+            </select>
+          </label>
+
           <label class="inline-flex items-center gap-2 text-xs text-slate-300">
             <input
               type="checkbox"

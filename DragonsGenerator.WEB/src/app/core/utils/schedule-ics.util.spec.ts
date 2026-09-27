@@ -53,8 +53,32 @@ describe('schedule-ics.util', () => {
 
   it('parses calendar event ids', () => {
     expect(parseCalendarEventId('schedule:abc')).toEqual({ source: 'schedule', entityId: 'abc' });
+    expect(parseCalendarEventId('schedule:abc@2026-10-12T19:00:00.000Z')).toEqual({
+      source: 'schedule',
+      entityId: 'abc',
+    });
     expect(parseCalendarEventId('session:xyz')).toEqual({ source: 'session', entityId: 'xyz' });
     expect(parseCalendarEventId('other')).toBeNull();
+  });
+
+  it('expands weekly rrule and emits RRULE in ICS', () => {
+    const weekly = schedule({
+      id: 'w1',
+      title: 'Hebdo',
+      startsAt: '2026-09-20T18:00:00.000Z',
+      endsAt: '2026-09-20T22:00:00.000Z',
+      rrule: 'FREQ=WEEKLY;INTERVAL=1',
+    });
+    const events = buildTableCalendarEvents([], [weekly], true);
+    expect(events.length).toBeGreaterThan(1);
+    expect(events[0].id.startsWith('schedule:w1')).toBe(true);
+
+    const ics = buildIcsCalendar(
+      'Campagne',
+      tableEventsToIcsInputs('Campagne', [], [weekly]),
+      new Date('2026-09-27T10:00:00.000Z'),
+    );
+    expect(ics).toContain('RRULE:FREQ=WEEKLY;INTERVAL=1');
   });
 
   it('builds a minimal ICS with VEVENT blocks', () => {

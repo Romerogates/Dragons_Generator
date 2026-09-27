@@ -49,6 +49,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
             e.Property(x => x.Name).HasMaxLength(200);
+            e.Property(x => x.ShareToken).HasMaxLength(64);
+            e.HasIndex(x => x.ShareToken).IsUnique();
         });
 
         modelBuilder.Entity<SupportTicket>(e =>

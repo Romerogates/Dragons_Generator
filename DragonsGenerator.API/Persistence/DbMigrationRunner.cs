@@ -37,6 +37,7 @@ public static class DbMigrationRunner
         new("013_user_dungeons", Apply013UserDungeonsAsync),
         new("014_campaign_member_archived", Apply014CampaignMemberArchivedAsync),
         new("015_campaign_history", Apply015CampaignHistoryAsync),
+        new("016_dungeon_share_link", Apply016DungeonShareLinkAsync),
     ];
 
     private sealed record Migration(string Id, Func<AppDbContext, CancellationToken, Task> Apply);
@@ -340,6 +341,20 @@ public static class DbMigrationRunner
         await TryAddColumnAsync(db, "CampaignMembers", "LeftAt", "TEXT NULL", ct);
         await TryAddColumnAsync(db, "CampaignMembers", "RemovedAt", "TEXT NULL", ct);
         await TryAddColumnAsync(db, "CampaignMembers", "HistorySnapshotJson", "TEXT NULL", ct);
+    }
+
+    private static async Task Apply016DungeonShareLinkAsync(AppDbContext db, CancellationToken ct)
+    {
+        await TryAddColumnAsync(db, "Dungeons", "ShareToken", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "Dungeons", "ShareTokenCreatedAt", "TEXT NULL", ct);
+        await TryAddColumnAsync(db, "Dungeons", "ShareEnabled", "INTEGER NOT NULL DEFAULT 0", ct);
+        await db.Database.ExecuteSqlRawAsync(
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS "IX_Dungeons_ShareToken"
+                ON "Dungeons" ("ShareToken")
+                WHERE "ShareToken" IS NOT NULL;
+            """,
+            ct);
     }
 
     private static async Task TryAddColumnAsync(

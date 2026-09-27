@@ -42,10 +42,13 @@ export class CampaignDetailOverview {
   readonly isOwner = input.required<boolean>();
   readonly liveSession = input<CampaignSession | null>(null);
   readonly nextSession = input<CampaignSession | null>(null);
+  /** Date calendrier (si plus tôt qu’une session, ou seule prochaine table). */
+  readonly nextSchedule = input<{ title: string; startsAt: string } | null>(null);
   readonly liveSessionDateLabel = input('');
   readonly liveSessionModeLabel = input('');
   readonly nextSessionDateLabel = input('');
   readonly nextSessionModeLabel = input('');
+  readonly nextScheduleDateLabel = input('');
 
   readonly creatureCount = input(0);
   readonly encounterCount = input(0);
@@ -85,6 +88,7 @@ export class CampaignDetailOverview {
   readonly openPlayFullscreen = output<void>();
   readonly startPlaySession = output<string>();
   readonly goSessions = output<void>();
+  readonly goCalendar = output<void>();
   readonly openPrepScenario = output<void>();
   readonly statsNavigate = output<CampaignStatsNav>();
   readonly requestCharacterPick = output<CampaignMember>();

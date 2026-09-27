@@ -15,11 +15,17 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## À faire (priorité)
 
+### Agenda / calendrier
+1. ~~Calendrier campagne + Agenda global~~ **fait** (2026-09-27) — FullCalendar, ICS, Google, `/agenda`, thème dark 12h–22h
+2. ~~Navbar Création + Guide~~ **fait** (2026-09-27) — pastilles Campagnes / Création / Agenda ; Guide·Amis·Codex dès `md`
+3. ~~Agenda V2~~ **fait** (2026-09-27) — rappels push dates `scheduleEvents` ; RRULE hebdo/bihebdo/mensuel + ICS ; hub « Prochaine table » (session ou calendrier)
+
 ### Donjons — suite
 1. ~~Vague A (rendu / zoom / notes / bannières)~~ **fait**
-2. ~~Vague B (hub + import copie + chat amis)~~ **fait** — lien public token = plus tard
-3. ~~Suite éditeur (flood-fill / brosse / redo / lien membres / FoW polish)~~ **fait** (2026-09-20) — token public anonyme toujours hors scope
+2. ~~Vague B (hub + import copie + chat amis)~~ **fait**
+3. ~~Suite éditeur (flood-fill / brosse / redo / lien membres / FoW polish)~~ **fait** (2026-09-20)
 4. ~~Sprint A battle map~~ **fait** (2026-09-23) — jetons `mapX`/`mapY` ; FoW depuis Combat ; fil de table `tableChat` + `POST …/table-chat`
+5. ~~Lien public anonyme donjon~~ **fait** (2026-09-27) — `ShareToken` ; `/dungeons/shared/{token}` ; copie « Mes donjons »
 
 ### Table + Codex
 1. ~~Fiabilité table (persist / softReload / hints setup)~~ **fait**
@@ -61,6 +67,8 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 ## Déjà livré (ne pas refaire)
 
+- **Agenda V2 + lien public donjon + navbar Création** (2026-09-27) — rappels push `scheduleEvents` (24h/1h) ; RRULE + export ICS ; hub prochaine table calendrier ; `ShareToken` donjons `/dungeons/shared/{token}` + import copie ; navbar Campagnes / Création / Agenda / Guide / Amis / Codex.
+- **Calendrier campagne + Agenda global** (2026-09-27) — FullCalendar breezy dark ; `GET /me/agenda` ; onglet Calendrier hub ; ICS + Google ; plage 12h–22h.
 - **BYOK IA perso** (2026-09-27) — Paramètres → IA : OpenAI / Groq / xAI Grok / OpenRouter (Claude…) ; clé chiffrée Data Protection ; `GET|PUT|DELETE /me/ai-settings` ; routage aventure / vies / backstory si connecté + activé.
 - **Fiabilité lot vies créatures** (2026-09-27) — `generate-creature-stories-batch` : chunks de 3 ; parse JSON (fence/virgules) ; bascule Groq si Ollama renvoie du non-JSON ; fill une-par-une dans l’API ; 502 seulement si 0 résultat ; front garde secours HTTP + bandeau ambre.
 - **Sprint A battle map** (2026-09-23) — positions jetons sur `Combatant` ; canvas live MJ+joueur ; placement/drag MJ ; barre FoW salles en Combat ; fil de table `CampaignSession.tableChat` + endpoint `POST /me/campaigns/{id}/table-chat` ; utils `dungeon-battle` / `dungeon-fog`.

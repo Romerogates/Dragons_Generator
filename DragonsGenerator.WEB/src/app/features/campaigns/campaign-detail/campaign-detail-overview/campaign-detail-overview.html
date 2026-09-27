@@ -18,6 +18,8 @@
         Session en cours — {{ live.title }}
       } @else if (nextSession(); as next) {
         Prochaine table — {{ next.title }}
+      } @else if (nextSchedule(); as sched) {
+        Prochaine table — {{ sched.title }}
       } @else {
         Bienvenue sur le hub de campagne
       }
@@ -42,6 +44,14 @@
           — entrez en session pour ouvrir le panneau de table.
         } @else {
           — le MJ entrera en session pour ouvrir la table.
+        }
+      } @else if (nextSchedule(); as sched) {
+        {{ nextScheduleDateLabel() }}
+        — date du calendrier de table
+        @if (isOwner()) {
+          (ouvrez le calendrier pour convertir en session de play).
+        } @else {
+          .
         }
       } @else {
         @if (isOwner()) {
@@ -82,6 +92,22 @@
             Entrer en session
           </button>
         }
+        <button
+          type="button"
+          class="min-h-11 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-violet-700/50 text-violet-200 hover:border-violet-500/60"
+          (click)="goSessions.emit()"
+        >
+          Voir les sessions
+        </button>
+      } @else if (nextSchedule()) {
+        <button
+          type="button"
+          class="min-h-11 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-600 text-white hover:bg-amber-500 shadow-lg shadow-amber-950/40"
+          (click)="goCalendar.emit()"
+          data-testid="hub-next-calendar"
+        >
+          Voir le calendrier
+        </button>
         <button
           type="button"
           class="min-h-11 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-violet-700/50 text-violet-200 hover:border-violet-500/60"

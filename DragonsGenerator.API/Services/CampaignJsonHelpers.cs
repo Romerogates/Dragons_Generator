@@ -254,23 +254,31 @@ public static class CampaignJsonHelpers
     {
         try
         {
-            using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(json) ? "{}" : json);
-            if (!doc.RootElement.TryGetProperty("sessions", out var sessions) || sessions.ValueKind != JsonValueKind.Array)
-                return null;
-
+            var now = DateTimeOffset.UtcNow;
             DateTimeOffset? next = null;
-            foreach (var session in sessions.EnumerateArray())
+
+            using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(json) ? "{}" : json);
+            if (doc.RootElement.TryGetProperty("sessions", out var sessions) && sessions.ValueKind == JsonValueKind.Array)
             {
-                if (!session.TryGetProperty("status", out var st) || st.GetString() != "planned")
-                    continue;
-                if (!session.TryGetProperty("scheduledAt", out var at))
-                    continue;
-                if (!DateTimeOffset.TryParse(at.GetString(), out var when))
-                    continue;
-                if (when < DateTimeOffset.UtcNow)
-                    continue;
-                if (next is null || when < next)
-                    next = when;
+                foreach (var session in sessions.EnumerateArray())
+                {
+                    if (!session.TryGetProperty("status", out var st) || st.GetString() != "planned")
+                        continue;
+                    if (!session.TryGetProperty("scheduledAt", out var at))
+                        continue;
+                    if (!DateTimeOffset.TryParse(at.GetString(), out var when))
+                        continue;
+                    if (when < now)
+                        continue;
+                    if (next is null || when < next)
+                        next = when;
+                }
+            }
+
+            foreach (var ev in ListUpcomingScheduleEvents(json, now))
+            {
+                if (next is null || ev.ScheduledAt < next)
+                    next = ev.ScheduledAt;
             }
 
             return next;
@@ -314,6 +322,107 @@ public static class CampaignJsonHelpers
             return [];
         }
     }
+
+    /// <summary>
+    /// Prochaines dates libres (scheduleEvents), y compris occurrences RRULE simples
+    /// (FREQ=WEEKLY|MONTHLY). Ids préfixés <c>sched:</c> pour la dédup des rappels.
+    /// </summary>
+    public static IReadOnlyList<PlannedSessionInfo> ListUpcomingScheduleEvents(string json, DateTimeOffset now)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(json) ? "{}" : json);
+            if (!doc.RootElement.TryGetProperty("scheduleEvents", out var schedule)
+                || schedule.ValueKind != JsonValueKind.Array)
+                return [];
+
+            var list = new List<PlannedSessionInfo>();
+            var horizon = now.AddMonths(6);
+
+            foreach (var ev in schedule.EnumerateArray())
+            {
+                var id = ev.TryGetProperty("id", out var idEl) ? idEl.GetString() : null;
+                if (string.IsNullOrWhiteSpace(id)) continue;
+                if (!ev.TryGetProperty("startsAt", out var startsEl)
+                    || !DateTimeOffset.TryParse(startsEl.GetString(), out var starts))
+                    continue;
+
+                var title = ev.TryGetProperty("title", out var t) ? t.GetString() ?? "Date" : "Date";
+                var location = ev.TryGetProperty("location", out var loc) ? loc.GetString() : null;
+                var rrule = ev.TryGetProperty("rrule", out var rr) ? rr.GetString() : null;
+
+                foreach (var when in EnumerateScheduleOccurrences(starts, rrule, now, horizon))
+                {
+                    list.Add(new PlannedSessionInfo($"sched:{id}", title, when, location));
+                }
+            }
+
+            return list;
+        }
+        catch
+        {
+            return [];
+        }
+    }
+
+    private static IEnumerable<DateTimeOffset> EnumerateScheduleOccurrences(
+        DateTimeOffset seed,
+        string? rrule,
+        DateTimeOffset from,
+        DateTimeOffset until)
+    {
+        if (string.IsNullOrWhiteSpace(rrule))
+        {
+            if (seed > from) yield return seed;
+            yield break;
+        }
+
+        var parts = rrule.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(p => p.Split('=', 2))
+            .Where(p => p.Length == 2)
+            .ToDictionary(p => p[0].ToUpperInvariant(), p => p[1], StringComparer.OrdinalIgnoreCase);
+
+        if (!parts.TryGetValue("FREQ", out var freqRaw))
+        {
+            if (seed > from) yield return seed;
+            yield break;
+        }
+
+        var freq = freqRaw.ToUpperInvariant();
+        if (freq is not ("WEEKLY" or "MONTHLY"))
+        {
+            if (seed > from) yield return seed;
+            yield break;
+        }
+
+        var interval = 1;
+        if (parts.TryGetValue("INTERVAL", out var intervalRaw)
+            && int.TryParse(intervalRaw, out var parsedInterval)
+            && parsedInterval > 0)
+            interval = parsedInterval;
+
+        var cursor = seed;
+        var guard = 0;
+        while (cursor < from.AddDays(-7) && guard++ < 500)
+        {
+            var next = AdvanceSchedule(cursor, freq, interval);
+            if (next <= cursor) yield break;
+            cursor = next;
+            if (cursor > until) yield break;
+        }
+
+        for (var i = 0; i < 80; i++)
+        {
+            if (cursor > until) yield break;
+            if (cursor > from) yield return cursor;
+            var advanced = AdvanceSchedule(cursor, freq, interval);
+            if (advanced <= cursor) yield break;
+            cursor = advanced;
+        }
+    }
+
+    private static DateTimeOffset AdvanceSchedule(DateTimeOffset from, string freq, int interval) =>
+        freq == "WEEKLY" ? from.AddDays(7 * interval) : from.AddMonths(interval);
 
     /// <summary>
     /// Agrège sessions + scheduleEvents pour l’agenda global.

@@ -4,15 +4,45 @@
       <a routerLink="/dungeons" class="text-xs font-black uppercase tracking-widest text-slate-500 hover:text-amber-400"
         >← Bibliothèque</a
       >
-      <div class="flex items-center gap-3 text-[10px] font-black uppercase tracking-wider">
+      <div class="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-wider">
         @if (readOnly()) {
           <span class="text-sky-400">Consultation (ami)</span>
-        } @else if (saveState() === 'saving') {
-          <span class="text-slate-500">Enregistrement…</span>
-        } @else if (saveState() === 'saved') {
-          <span class="text-emerald-400">Enregistré</span>
-        } @else if (saveState() === 'error') {
-          <span class="text-red-400">Échec sync</span>
+        } @else {
+          @if (shareUrl(); as url) {
+            <button
+              type="button"
+              class="min-h-9 px-3 rounded-lg border border-emerald-800/50 text-emerald-300 hover:border-emerald-500/50"
+              (click)="copyShareLink()"
+              data-testid="dungeon-share-copy"
+            >
+              {{ shareCopied() ? 'Copié !' : 'Copier le lien public' }}
+            </button>
+            <button
+              type="button"
+              class="min-h-9 px-3 rounded-lg border border-red-900/40 text-red-400 hover:border-red-600/50"
+              (click)="revokeShareLink()"
+              [disabled]="shareBusy()"
+            >
+              Révoquer
+            </button>
+          } @else {
+            <button
+              type="button"
+              class="min-h-9 px-3 rounded-lg border border-slate-700 text-slate-300 hover:border-amber-600/50"
+              (click)="enableShareLink()"
+              [disabled]="shareBusy()"
+              data-testid="dungeon-share-enable"
+            >
+              Lien public
+            </button>
+          }
+          @if (saveState() === 'saving') {
+            <span class="text-slate-500">Enregistrement…</span>
+          } @else if (saveState() === 'saved') {
+            <span class="text-emerald-400">Enregistré</span>
+          } @else if (saveState() === 'error') {
+            <span class="text-red-400">Échec sync</span>
+          }
         }
       </div>
     </div>

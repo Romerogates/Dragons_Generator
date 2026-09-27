@@ -74,26 +74,150 @@ export function mapSessionsToCalendarEvents(
 export function mapScheduleToCalendarEvents(
   events: CampaignScheduleEvent[],
   editable: boolean,
+  horizonMonths = 6,
 ): TableCalendarEventView[] {
-  return events.map((e) => {
+  const horizon = new Date();
+  horizon.setMonth(horizon.getMonth() + horizonMonths);
+  const out: TableCalendarEventView[] = [];
+
+  for (const e of events) {
     const colors = KIND_COLORS[e.kind] ?? KIND_COLORS.other;
-    return {
-      id: `schedule:${e.id}`,
-      source: 'schedule',
-      title: e.title || 'Date',
-      start: e.startsAt,
-      end: e.endsAt ?? null,
-      allDay: !!e.allDay,
-      kind: e.kind,
-      location: e.location,
-      notes: e.notes,
-      characterIds: e.characterIds ?? [],
-      linkedSessionId: e.linkedSessionId ?? null,
-      backgroundColor: colors.bg,
-      borderColor: colors.border,
-      editable,
-    };
-  });
+    const occurrences = expandScheduleOccurrences(e, horizon);
+    for (const occ of occurrences) {
+      out.push({
+        id: occ.occurrenceId,
+        source: 'schedule',
+        title: e.title || 'Date',
+        start: occ.startsAt,
+        end: occ.endsAt,
+        allDay: !!e.allDay,
+        kind: e.kind,
+        location: e.location,
+        notes: e.notes,
+        characterIds: e.characterIds ?? [],
+        linkedSessionId: e.linkedSessionId ?? null,
+        backgroundColor: colors.bg,
+        borderColor: colors.border,
+        editable,
+      });
+    }
+  }
+  return out;
+}
+
+export interface ScheduleOccurrence {
+  /** `schedule:{id}` or `schedule:{id}@{iso}` for recurring instances. */
+  occurrenceId: string;
+  startsAt: string;
+  endsAt: string | null;
+}
+
+/** Développe les prochaines occurrences (sous-ensemble RRULE) jusqu’à `until`. */
+export function expandScheduleOccurrences(
+  event: CampaignScheduleEvent,
+  until: Date,
+  from = new Date(),
+): ScheduleOccurrence[] {
+  const durationMs =
+    event.endsAt != null
+      ? Math.max(0, new Date(event.endsAt).getTime() - new Date(event.startsAt).getTime())
+      : (event.allDay ? 24 : 3) * 60 * 60 * 1000;
+
+  const seed = new Date(event.startsAt);
+  const rrule = event.rrule?.trim();
+  if (!rrule) {
+    if (seed.getTime() + durationMs < from.getTime() - 24 * 60 * 60 * 1000) return [];
+    return [
+      {
+        occurrenceId: `schedule:${event.id}`,
+        startsAt: event.startsAt,
+        endsAt: event.endsAt ?? null,
+      },
+    ];
+  }
+
+  const parsed = parseSimpleRrule(rrule);
+  if (!parsed) {
+    return [
+      {
+        occurrenceId: `schedule:${event.id}`,
+        startsAt: event.startsAt,
+        endsAt: event.endsAt ?? null,
+      },
+    ];
+  }
+
+  const results: ScheduleOccurrence[] = [];
+  let cursor = new Date(seed);
+  // Remonter jusqu’à proximité de `from` pour les séries anciennes
+  while (cursor.getTime() + durationMs < from.getTime() - 7 * 24 * 60 * 60 * 1000) {
+    const next = advanceByRrule(cursor, parsed);
+    if (next.getTime() <= cursor.getTime()) break;
+    cursor = next;
+    if (cursor.getTime() > until.getTime()) return results;
+  }
+
+  for (let i = 0; i < 80; i++) {
+    if (cursor.getTime() > until.getTime()) break;
+    if (cursor.getTime() + durationMs >= from.getTime() - 12 * 60 * 60 * 1000) {
+      const startsAt = cursor.toISOString();
+      const endsAt = new Date(cursor.getTime() + durationMs).toISOString();
+      const isSeed = startsAt === new Date(event.startsAt).toISOString();
+      results.push({
+        occurrenceId: isSeed ? `schedule:${event.id}` : `schedule:${event.id}@${startsAt}`,
+        startsAt,
+        endsAt,
+      });
+    }
+    const next = advanceByRrule(cursor, parsed);
+    if (next.getTime() <= cursor.getTime()) break;
+    cursor = next;
+  }
+  return results;
+}
+
+export interface SimpleRrule {
+  freq: 'WEEKLY' | 'MONTHLY';
+  interval: number;
+}
+
+export function parseSimpleRrule(rrule: string): SimpleRrule | null {
+  const parts = Object.fromEntries(
+    rrule
+      .split(';')
+      .map((p) => p.trim())
+      .filter(Boolean)
+      .map((p) => {
+        const i = p.indexOf('=');
+        return i < 0 ? [p, ''] : [p.slice(0, i).toUpperCase(), p.slice(i + 1)];
+      }),
+  ) as Record<string, string>;
+
+  const freq = parts['FREQ']?.toUpperCase();
+  if (freq !== 'WEEKLY' && freq !== 'MONTHLY') return null;
+  const interval = Math.max(1, Number.parseInt(parts['INTERVAL'] || '1', 10) || 1);
+  return { freq, interval };
+}
+
+function advanceByRrule(from: Date, rule: SimpleRrule): Date {
+  const d = new Date(from);
+  if (rule.freq === 'WEEKLY') {
+    d.setDate(d.getDate() + 7 * rule.interval);
+  } else {
+    d.setMonth(d.getMonth() + rule.interval);
+  }
+  return d;
+}
+
+/** Prochaine occurrence future (rappels / hub). */
+export function nextScheduleOccurrenceAt(
+  event: CampaignScheduleEvent,
+  from = new Date(),
+): string | null {
+  const until = new Date(from);
+  until.setMonth(until.getMonth() + 12);
+  const occ = expandScheduleOccurrences(event, until, from);
+  return occ[0]?.startsAt ?? null;
 }
 
 export function buildTableCalendarEvents(
@@ -114,7 +238,11 @@ export function buildTableCalendarEvents(
 export function parseCalendarEventId(
   id: string,
 ): { source: CalendarEventSource; entityId: string } | null {
-  if (id.startsWith('schedule:')) return { source: 'schedule', entityId: id.slice('schedule:'.length) };
+  if (id.startsWith('schedule:')) {
+    const rest = id.slice('schedule:'.length);
+    const at = rest.indexOf('@');
+    return { source: 'schedule', entityId: at >= 0 ? rest.slice(0, at) : rest };
+  }
   if (id.startsWith('session:')) return { source: 'session', entityId: id.slice('session:'.length) };
   return null;
 }
@@ -171,6 +299,8 @@ export interface IcsEventInput {
   allDay?: boolean;
   location?: string;
   description?: string;
+  /** Ligne RRULE sans le préfixe `RRULE:` (ex. FREQ=WEEKLY;INTERVAL=1). */
+  rrule?: string | null;
 }
 
 export function buildIcsCalendar(
@@ -207,6 +337,7 @@ export function buildIcsCalendar(
     lines.push(`SUMMARY:${icsEscape(ev.title)}`);
     if (ev.location?.trim()) lines.push(`LOCATION:${icsEscape(ev.location.trim())}`);
     if (ev.description?.trim()) lines.push(`DESCRIPTION:${icsEscape(ev.description.trim())}`);
+    if (ev.rrule?.trim()) lines.push(`RRULE:${ev.rrule.trim()}`);
     lines.push('END:VEVENT');
   }
 
@@ -227,6 +358,7 @@ export function tableEventsToIcsInputs(
     allDay: e.allDay,
     location: e.location,
     description: [scheduleKindLabel(e.kind), e.notes].filter(Boolean).join('\n'),
+    rrule: e.rrule?.trim() || null,
   }));
   const fromSessions = sessions
     .filter((s) => s.status !== 'cancelled')

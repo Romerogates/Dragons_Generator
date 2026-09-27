@@ -205,7 +205,21 @@ export interface CampaignScheduleEvent {
   /** Optionnel : lier une vraie session de play. */
   linkedSessionId?: string | null;
   createdByUserId?: string;
+  /**
+   * Récurrence iCalendar (sous-ensemble) — ex. `FREQ=WEEKLY;INTERVAL=1`.
+   * Absent / vide = ponctuel.
+   */
+  rrule?: string | null;
 }
+
+/** Presets RRULE pour l’UI calendrier. */
+export const CAMPAIGN_SCHEDULE_RRULE_PRESETS: { value: string; label: string }[] = [
+  { value: '', label: 'Une seule fois' },
+  { value: 'FREQ=WEEKLY;INTERVAL=1', label: 'Chaque semaine' },
+  { value: 'FREQ=WEEKLY;INTERVAL=2', label: 'Toutes les 2 semaines' },
+  { value: 'FREQ=MONTHLY;INTERVAL=1', label: 'Chaque mois' },
+];
+
 
 export interface CombatHistoryEntry {
   id: string;
@@ -418,6 +432,7 @@ export function createCampaignScheduleEvent(
     characterIds: partial?.characterIds ? [...partial.characterIds] : [],
     linkedSessionId: partial?.linkedSessionId ?? null,
     createdByUserId: partial?.createdByUserId,
+    rrule: partial?.rrule?.trim() || null,
   };
 }
 

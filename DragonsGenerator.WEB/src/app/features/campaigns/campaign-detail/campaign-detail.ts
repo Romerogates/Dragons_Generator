@@ -79,6 +79,7 @@ import { CampaignDetailSessions } from './campaign-detail-sessions/campaign-deta
 import { CampaignDetailHandouts } from './campaign-detail-handouts/campaign-detail-handouts';
 import { CampaignNotebook } from '../campaign-notebook/campaign-notebook';
 import { CampaignCalendar } from '../campaign-calendar/campaign-calendar';
+import { nextScheduleOccurrenceAt } from '@core/utils/schedule-ics.util';
 import type { MemberCharacterAction } from './campaign-detail-roster/campaign-detail-roster';
 import type { SessionDateChangeEvent, SessionPatchEvent } from './campaign-detail-sessions/campaign-detail-sessions';
 import type { HandoutPatchEvent, HandoutPublishEvent } from './campaign-detail-handouts/campaign-detail-handouts';
@@ -407,6 +408,53 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       ?? null;
   });
 
+  /** Prochaine date libre « game » (calendrier), hors sessions de play. */
+  readonly nextScheduleGame = computed(() => {
+    const now = Date.now();
+    const events = this.campaign()?.data.scheduleEvents ?? [];
+    let best: { id: string; title: string; startsAt: string } | null = null;
+    for (const e of events) {
+      if (e.kind && e.kind !== 'game') continue;
+      const at = nextScheduleOccurrenceAt(e);
+      if (!at) continue;
+      const t = new Date(at).getTime();
+      if (t < now) continue;
+      if (!best || t < new Date(best.startsAt).getTime()) {
+        best = { id: e.id, title: e.title || 'Soirée de table', startsAt: at };
+      }
+    }
+    return best;
+  });
+
+  /**
+   * Slot hub : session planifiée ou date calendrier, le plus tôt des deux.
+   * Source schedule → CTA calendrier ; session → entrer en session.
+   */
+  readonly nextHubTable = computed((): {
+    source: 'session' | 'schedule';
+    title: string;
+    at: string;
+    sessionId?: string;
+  } | null => {
+    const session = this.nextPlannedSession();
+    const schedule = this.nextScheduleGame();
+    const sessionAt = session ? new Date(session.scheduledAt).getTime() : Number.POSITIVE_INFINITY;
+    const scheduleAt = schedule ? new Date(schedule.startsAt).getTime() : Number.POSITIVE_INFINITY;
+    if (!Number.isFinite(sessionAt) && !Number.isFinite(scheduleAt)) return null;
+    if (session && sessionAt <= scheduleAt) {
+      return {
+        source: 'session',
+        title: session.title,
+        at: session.scheduledAt,
+        sessionId: session.id,
+      };
+    }
+    if (schedule) {
+      return { source: 'schedule', title: schedule.title, at: schedule.startsAt };
+    }
+    return null;
+  });
+
   /** Skip optionnel de l’étape carte (local, par campagne). */
   readonly mapsStepSkipped = signal(false);
 
@@ -424,7 +472,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       readyPregenCount,
       hasPlannedSession: !!(data?.sessions ?? []).some((s) => s.status === 'planned'),
       hasActiveSession: !!this.activePlaySession(),
-      nextSessionTitle: this.nextPlannedSession()?.title ?? null,
+      nextSessionTitle: this.nextHubTable()?.title ?? null,
       mapsSkipped: this.mapsStepSkipped(),
     };
   });

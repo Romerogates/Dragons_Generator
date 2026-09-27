@@ -61,6 +61,9 @@ public class DungeonRecord
     public string Name { get; set; } = "";
     /// <summary>JSON carte (même forme que dungeonMaps campagne).</summary>
     public string JsonData { get; set; } = "{}";
+    public string? ShareToken { get; set; }
+    public DateTimeOffset? ShareTokenCreatedAt { get; set; }
+    public bool ShareEnabled { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
 }

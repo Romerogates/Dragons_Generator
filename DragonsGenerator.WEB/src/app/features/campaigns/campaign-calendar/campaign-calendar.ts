@@ -33,6 +33,7 @@ import type {
 } from '@core/models/Campaign/campaign';
 import {
   CAMPAIGN_SCHEDULE_KIND_LABELS,
+  CAMPAIGN_SCHEDULE_RRULE_PRESETS,
   createCampaignScheduleEvent,
 } from '@core/models/Campaign/campaign';
 import {
@@ -71,6 +72,7 @@ export class CampaignCalendar {
   readonly convertToSession = output<CampaignScheduleEvent>();
 
   readonly kinds = Object.entries(CAMPAIGN_SCHEDULE_KIND_LABELS) as [CampaignScheduleKind, string][];
+  readonly rrulePresets = CAMPAIGN_SCHEDULE_RRULE_PRESETS;
   readonly editing = signal<TableCalendarEventView | null>(null);
   readonly draft = signal<CampaignScheduleEvent | null>(null);
   readonly panelOpen = signal(false);

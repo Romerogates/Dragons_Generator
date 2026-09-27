@@ -256,6 +256,13 @@ export const routes: Routes = [
       import('@features/library-dungeons/library-dungeons').then((m) => m.LibraryDungeons),
   },
   {
+    path: 'dungeons/shared/:token',
+    loadComponent: () =>
+      import('@features/library-dungeons/dungeon-shared/dungeon-shared').then(
+        (m) => m.DungeonSharedPage,
+      ),
+  },
+  {
     path: 'dungeons/:id',
     loadComponent: () =>
       import('@features/library-dungeons/library-dungeon-editor').then(

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DragonsGenerator.API.Services;
 
-/// <summary>Rappels push 24 h et 1 h avant les sessions planifiées.</summary>
+/// <summary>Rappels push 24 h et 1 h avant sessions planifiées et dates de calendrier.</summary>
 public sealed class SessionReminderWorker(
     IServiceScopeFactory scopeFactory,
     ILogger<SessionReminderWorker> logger) : BackgroundService
@@ -43,38 +43,43 @@ public sealed class SessionReminderWorker(
 
         foreach (var campaign in campaigns)
         {
-            var sessions = CampaignJsonHelpers.ListUpcomingPlannedSessions(campaign.JsonData, now);
-            if (sessions.Count == 0) continue;
+            var upcoming = CampaignJsonHelpers.ListUpcomingPlannedSessions(campaign.JsonData, now)
+                .Concat(CampaignJsonHelpers.ListUpcomingScheduleEvents(campaign.JsonData, now))
+                .ToList();
+            if (upcoming.Count == 0) continue;
 
             var memberIds = campaign.Members.Select(m => m.UserId).Distinct().ToList();
             if (!memberIds.Contains(campaign.OwnerUserId))
                 memberIds.Add(campaign.OwnerUserId);
 
-            foreach (var session in sessions)
+            foreach (var item in upcoming)
             {
+                var isSchedule = item.Id.StartsWith("sched:", StringComparison.Ordinal);
                 foreach (var kind in new[] { SessionReminderRules.Kind24Hours, SessionReminderRules.Kind1Hour })
                 {
-                    if (!SessionReminderRules.ShouldSend(session.ScheduledAt, now, kind)) continue;
+                    if (!SessionReminderRules.ShouldSend(item.ScheduledAt, now, kind)) continue;
 
                     foreach (var userId in memberIds)
                     {
                         var alreadySent = await db.SessionReminderLogs.AsNoTracking()
                             .AnyAsync(
                                 l => l.CampaignId == campaign.Id
-                                    && l.SessionId == session.Id
+                                    && l.SessionId == item.Id
                                     && l.UserId == userId
                                     && l.ReminderKind == kind,
                                 ct);
                         if (alreadySent) continue;
 
-                        var (title, body) = SessionReminderRules.BuildMessage(session, kind);
-                        var url = $"/campaigns/{campaign.Id}";
+                        var (title, body) = SessionReminderRules.BuildMessage(item, kind, isSchedule);
+                        var url = isSchedule
+                            ? $"/campaigns/{campaign.Id}?tab=calendar"
+                            : $"/campaigns/{campaign.Id}?tab=sessions";
                         await push.NotifyUserAsync(userId, title, body, url, ct);
 
                         pendingLogs.Add(new SessionReminderLog
                         {
                             CampaignId = campaign.Id,
-                            SessionId = session.Id,
+                            SessionId = item.Id,
                             UserId = userId,
                             ReminderKind = kind,
                             SentAt = now,

@@ -40,4 +40,49 @@ public class SessionReminderRulesTests
         Assert.Equal("ok", list[0].Id);
         Assert.Equal("Taverne", list[0].Location);
     }
+
+    [Fact]
+    public void ListUpcomingScheduleEvents_includes_weekly_rrule()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var seed = now.AddHours(-24 * 8); // week ago-ish
+        var json = $$"""
+        {
+          "scheduleEvents": [
+            {
+              "id": "weekly",
+              "title": "Soirée",
+              "startsAt": "{{seed:O}}",
+              "kind": "game",
+              "rrule": "FREQ=WEEKLY;INTERVAL=1"
+            }
+          ]
+        }
+        """;
+
+        var list = CampaignJsonHelpers.ListUpcomingScheduleEvents(json, now);
+        Assert.NotEmpty(list);
+        Assert.StartsWith("sched:weekly", list[0].Id);
+        Assert.True(list[0].ScheduledAt > now);
+    }
+
+    [Fact]
+    public void NextSessionFromJson_prefers_earliest_session_or_schedule()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var json = $$"""
+        {
+          "sessions": [
+            { "id": "s1", "title": "Session", "scheduledAt": "{{now.AddDays(5):O}}", "status": "planned" }
+          ],
+          "scheduleEvents": [
+            { "id": "e1", "title": "Date", "startsAt": "{{now.AddDays(2):O}}", "kind": "game" }
+          ]
+        }
+        """;
+
+        var next = CampaignJsonHelpers.NextSessionFromJson(json);
+        Assert.NotNull(next);
+        Assert.True(next!.Value < now.AddDays(3));
+    }
 }

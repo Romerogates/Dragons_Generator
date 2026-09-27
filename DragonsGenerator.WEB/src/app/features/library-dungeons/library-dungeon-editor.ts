@@ -37,6 +37,9 @@ export class LibraryDungeonEditor implements OnInit {
   readonly shellCampaign = signal<CampaignDetail | null>(null);
   readonly focusMapId = signal<string | null>(null);
   readonly readOnly = signal(false);
+  readonly shareUrl = signal<string | null>(null);
+  readonly shareBusy = signal(false);
+  readonly shareCopied = signal(false);
 
   private cloudId = '';
   private save$ = new Subject<CampaignDungeonMap>();
@@ -89,12 +92,66 @@ export class LibraryDungeonEditor implements OnInit {
     }
 
     this.cloud.get(id).subscribe({
-      next: (detail) => this.applyDetail(detail.id, detail.name, detail.data),
+      next: (detail) => {
+        this.applyDetail(detail.id, detail.name, detail.data);
+        this.refreshShareLink();
+      },
       error: () => {
         this.error.set('Donjon introuvable.');
         this.loading.set(false);
       },
     });
+  }
+
+  enableShareLink(): void {
+    if (this.readOnly() || !this.cloudId) return;
+    this.shareBusy.set(true);
+    this.cloud.createShareLink(this.cloudId).subscribe({
+      next: (link) => {
+        this.shareUrl.set(link.token ? this.buildShareUrl(link.token) : null);
+        this.shareBusy.set(false);
+      },
+      error: () => this.shareBusy.set(false),
+    });
+  }
+
+  revokeShareLink(): void {
+    if (this.readOnly() || !this.cloudId) return;
+    this.shareBusy.set(true);
+    this.cloud.revokeShareLink(this.cloudId).subscribe({
+      next: () => {
+        this.shareUrl.set(null);
+        this.shareBusy.set(false);
+        this.shareCopied.set(false);
+      },
+      error: () => this.shareBusy.set(false),
+    });
+  }
+
+  async copyShareLink(): Promise<void> {
+    const url = this.shareUrl();
+    if (!url) return;
+    try {
+      await navigator.clipboard.writeText(url);
+      this.shareCopied.set(true);
+      setTimeout(() => this.shareCopied.set(false), 2000);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  private refreshShareLink(): void {
+    if (this.readOnly() || !this.cloudId) return;
+    this.cloud.getShareLink(this.cloudId).subscribe({
+      next: (link) => {
+        this.shareUrl.set(link.enabled && link.token ? this.buildShareUrl(link.token) : null);
+      },
+      error: () => this.shareUrl.set(null),
+    });
+  }
+
+  private buildShareUrl(token: string): string {
+    return `${window.location.origin}/dungeons/shared/${token}`;
   }
 
   private applyDetail(id: string, name: string, raw: CampaignDungeonMap): void {

@@ -60,4 +60,44 @@ export class DungeonCloudService {
       `${this.api}/me/friends/${friendUserId}/dungeons/${dungeonId}`,
     );
   }
+
+  getShareLink(id: string): Observable<{ token: string | null; enabled: boolean; createdAt: string | null }> {
+    return this.http.get<{ token: string | null; enabled: boolean; createdAt: string | null }>(
+      `${this.api}/me/dungeons/${id}/share-link`,
+    );
+  }
+
+  createShareLink(id: string): Observable<{ token: string | null; enabled: boolean; createdAt: string | null }> {
+    return this.http.post<{ token: string | null; enabled: boolean; createdAt: string | null }>(
+      `${this.api}/me/dungeons/${id}/share-link`,
+      {},
+    );
+  }
+
+  revokeShareLink(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.api}/me/dungeons/${id}/share-link`);
+  }
+
+  getSharedDungeon(token: string): Observable<{
+    id: string;
+    name: string;
+    ownerDisplayName: string;
+    data: CampaignDungeonMap;
+    updatedAt: string;
+  }> {
+    return this.http.get<{
+      id: string;
+      name: string;
+      ownerDisplayName: string;
+      data: CampaignDungeonMap;
+      updatedAt: string;
+    }>(`${this.api}/dungeons/shared/${encodeURIComponent(token)}/data`);
+  }
+
+  importFromShare(token: string): Observable<CloudDungeonSummary> {
+    return this.http.post<CloudDungeonSummary>(
+      `${this.api}/me/dungeons/from-share/${encodeURIComponent(token)}`,
+      {},
+    );
+  }
 }
