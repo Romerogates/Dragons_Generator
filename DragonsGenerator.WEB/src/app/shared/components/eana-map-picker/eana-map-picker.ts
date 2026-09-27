@@ -23,7 +23,6 @@ import type { Civilisation } from '@core/models/Civilisations/civilisations';
 import { StoryRegionChoice } from '@core/models/Story/story';
 import { EANA_MAP_RATIO, getEanaMapCoordinates } from '@core/utils/eana-map';
 import { storyRegionLabel } from '@core/utils/story-location.util';
-import { FullscreenEnterBtn } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-btn';
 
 /** Cover fit lives at scale 1 — do not remap pin % coords. */
 const MIN_SCALE = 1;
@@ -37,7 +36,7 @@ const FOCUS_SCALE = 2.15;
 @Component({
   selector: 'app-eana-map-picker',
   standalone: true,
-  imports: [CommonModule, FullscreenEnterBtn],
+  imports: [CommonModule],
   templateUrl: './eana-map-picker.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -54,6 +53,7 @@ export class EanaMapPicker implements OnInit, OnDestroy {
   readonly civilizations = signal<Civilisation[]>([]);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
+  /** Mode explorer immersif (plein viewport). */
   readonly mapFullscreen = signal(false);
 
   readonly mapWidth = signal(0);
@@ -65,6 +65,11 @@ export class EanaMapPicker implements OnInit, OnDestroy {
   readonly isPanning = signal(false);
 
   readonly regionLabel = computed(() => storyRegionLabel(this.selectedRegion()));
+  /** Libellé hors overlay ; null traité comme région inconnue. */
+  readonly regionStatusLabel = computed(() => {
+    const label = this.regionLabel() || 'Région inconnue';
+    return `Région : ${label}`;
+  });
   readonly mapTransform = computed(
     () => `translate(${this.panX()}px, ${this.panY()}px) scale(${this.scale()})`,
   );
@@ -166,7 +171,8 @@ export class EanaMapPicker implements OnInit, OnDestroy {
   }
 
   isUnknownSelected(): boolean {
-    return this.selectedRegion()?.kind === 'unknown';
+    const region = this.selectedRegion();
+    return !region || region.kind === 'unknown';
   }
 
   pickCivilizationFromList(civ: Civilisation): void {

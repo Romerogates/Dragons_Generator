@@ -39,7 +39,8 @@ export class StoryBuilderService {
 
   readonly title = signal('');
   readonly setting = signal('');
-  readonly region = signal<StoryRegionChoice | null>(null);
+  /** Défaut : région inconnue (pas de sélection obligatoire). */
+  readonly region = signal<StoryRegionChoice>({ kind: 'unknown' });
   readonly partyLevel = signal(3);
   readonly tone = signal<AdventureTone>('classic');
   readonly creatures = signal<StoryCreatureSelection[]>([]);
@@ -121,11 +122,7 @@ export class StoryBuilderService {
       case 2:
         return this.creatures().every((c) => c.customName.trim().length >= 2);
       case 3:
-        return (
-          this.title().trim().length >= 3 &&
-          !!this.adventure().trim() &&
-          this.region() !== null
-        );
+        return this.title().trim().length >= 3 && !!this.adventure().trim();
       case 4:
         return true;
       default:
@@ -280,7 +277,11 @@ export class StoryBuilderService {
     this.preservedPinnedHandoutId.set(campaign.data.pinnedHandoutId ?? null);
     this.title.set(campaign.title);
     this.setting.set(campaign.data.setting ?? '');
-    this.region.set(campaignRegionFromData(campaign.data.regionId, campaign.data.regionName));
+    this.region.set(
+      campaignRegionFromData(campaign.data.regionId, campaign.data.regionName) ?? {
+        kind: 'unknown',
+      },
+    );
     this.partyLevel.set(campaign.data.partyLevel);
     this.tone.set(campaign.data.tone);
     this.creatures.set(structuredClone(campaign.data.creatures ?? []));
@@ -321,7 +322,7 @@ export class StoryBuilderService {
     this.currentStep.set(1);
     this.title.set('');
     this.setting.set('');
-    this.region.set(null);
+    this.region.set({ kind: 'unknown' });
     this.partyLevel.set(3);
     this.tone.set('classic');
     this.creatures.set([]);

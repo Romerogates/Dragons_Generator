@@ -38,23 +38,35 @@ public sealed class HybridAiService
         }
     }
 
-    /// <summary>Backstory personnage, vie de créature, batch court.</summary>
+    /// <summary>
+    /// Backstory personnage, vie de créature, batch court.
+    /// Si <paramref name="acceptText"/> est fourni et que Ollama local répond OK mais
+    /// le texte est rejeté (ex. JSON invalide), bascule Groq avant d’échouer.
+    /// </summary>
     public async Task<GroqChatResult> SendShortGenerationAsync(
         string userPrompt,
         string systemPrompt,
         int maxTokens,
-        CancellationToken ct)
+        CancellationToken ct,
+        Func<string, bool>? acceptText = null)
     {
         if (_local is not null)
         {
             var local = await _local.SendChatAsync(userPrompt, systemPrompt, maxTokens, ct);
-            if (local.Ok)
+            if (local.Ok && !string.IsNullOrWhiteSpace(local.Text))
             {
-                _logger.LogInformation("Génération courte servie par Ollama local");
-                return local;
-            }
+                if (acceptText is null || acceptText(local.Text))
+                {
+                    _logger.LogInformation("Génération courte servie par Ollama local");
+                    return local;
+                }
 
-            _logger.LogWarning("Ollama local indisponible ({Error}) — bascule Groq", local.Error);
+                _logger.LogWarning("Ollama local réponse rejetée (format) — bascule Groq");
+            }
+            else
+            {
+                _logger.LogWarning("Ollama local indisponible ({Error}) — bascule Groq", local.Error);
+            }
         }
 
         return await _remote.SendChatAsync(userPrompt, systemPrompt, maxTokens, ct);

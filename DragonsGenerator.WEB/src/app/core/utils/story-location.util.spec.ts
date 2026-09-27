@@ -22,6 +22,10 @@ describe('story-location.util', () => {
       regionId: null,
       regionName: UNKNOWN_REGION_LABEL,
     });
+    expect(campaignRegionFields(null)).toEqual({
+      regionId: null,
+      regionName: UNKNOWN_REGION_LABEL,
+    });
   });
 
   it('restores region from campaign data', () => {

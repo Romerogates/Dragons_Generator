@@ -33,8 +33,7 @@ export function campaignRegionFields(region: StoryRegionChoice | null): {
   regionId: string | null;
   regionName: string;
 } {
-  if (!region) return { regionId: null, regionName: '' };
-  if (region.kind === 'unknown') {
+  if (!region || region.kind === 'unknown') {
     return { regionId: null, regionName: UNKNOWN_REGION_LABEL };
   }
   return { regionId: region.id, regionName: region.name };

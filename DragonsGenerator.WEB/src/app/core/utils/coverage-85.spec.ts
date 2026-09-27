@@ -335,7 +335,7 @@ describe('coverage 85 — story-location branches', () => {
       regionId: 'civ-a',
       regionName: 'Ajagar',
     });
-    expect(campaignRegionFields(null)).toEqual({ regionId: null, regionName: '' });
+    expect(campaignRegionFields(null)).toEqual({ regionId: null, regionName: 'Région inconnue' });
   });
 });
 

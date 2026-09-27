@@ -83,10 +83,6 @@ export class AdventureStep implements OnInit {
       this.generationError.set("Donnez un titre à l'aventure.");
       return;
     }
-    if (!this.builder.region()) {
-      this.generationError.set('Choisissez une région sur la carte ou « Région inconnue ».');
-      return;
-    }
     if (this.aiRateLimit.showIfBlocked()) return;
 
     this.generationError.set(null);

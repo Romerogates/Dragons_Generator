@@ -613,7 +613,7 @@
                         (click)="selectTokenForPlacement(cb.id)"
                       >
                         {{ cb.name || 'Sans nom' }}
-                        @if (cb.mapX != null && cb.mapY != null) {
+                        @if (cb.mapX !== null && cb.mapY !== null) {
                           <span class="text-slate-500">· {{ cb.mapX }},{{ cb.mapY }}</span>
                         }
                       </button>

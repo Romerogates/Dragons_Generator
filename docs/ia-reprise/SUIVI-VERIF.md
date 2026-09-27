@@ -95,5 +95,5 @@ Dernière MAJ agent : 2026-09-27 — carte Eana contain + aventure par sections 
 
 ## Notes / bugs trouvés en vérif
 
-- **2026-09-27 — Scénario / vies créatures** : console `401 auth/me` (session, sans lien avec l’IA) + `502 generate-creature-stories-batch` + éventuel `504`. Comportement : le lot échoue → le front bascule en génération **une par une** ; les vies déjà remplies sont OK. Correctif UX : bandeau ambre « on continue une à la fois » + message partiel « X ok / Y échecs ».
+- **2026-09-27 — Scénario / vies créatures** : console `401 auth/me` (session, sans lien avec l’IA). Lot `generate-creature-stories-batch` durci (chunks 3, fallback Groq si JSON local invalide, remplissage une-par-une côté API, 502 seulement si 0 résultat). Front : bandeau ambre + secours séquentiel si le lot HTTP échoue encore ; message partiel « X ok / Y échecs ».
 - **2026-09-27 — Scénario / carte + aventure** : carte en **contain** (quasi entière), pills sous la carte, fades réduits ; aventure éditée en **7 sections** (Accroche… Pistes MJ) + bascule « Texte brut ».

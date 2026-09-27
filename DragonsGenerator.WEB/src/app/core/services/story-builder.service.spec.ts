@@ -50,6 +50,13 @@ describe('StoryBuilderService', () => {
     service.reset();
   });
 
+  it('defaults region to unknown after reset', () => {
+    service.setRegion({ kind: 'civilization', id: 'civ-kaan', name: 'Grand Kaan' });
+    service.reset();
+    expect(service.region()).toEqual({ kind: 'unknown' });
+    expect(service.buildCampaignData().regionName).toBe(UNKNOWN_REGION_LABEL);
+  });
+
   it('loads a campaign for editing and preserves encounters/notes', () => {
     service.loadCampaignIntoBuilder(sampleCampaign);
 

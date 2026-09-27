@@ -1,4 +1,3 @@
-using System.Text.Json;
 using DragonsGenerator.API.Common;
 using DragonsGenerator.API.Services;
 using FastEndpoints;
@@ -28,15 +27,21 @@ public record GenerateCreatureStoriesBatchResponse(
 public class GenerateCreatureStoriesBatchEndpoint
     : Endpoint<GenerateCreatureStoriesBatchRequest, GenerateCreatureStoriesBatchResponse>
 {
-    private const int ChunkSize = 5;
+    /// <summary>Lots trop gros → JSON tronqué / 502. 3 = bon compromis fiabilité / latence.</summary>
+    private const int ChunkSize = 3;
 
     private readonly GameDataRepository _repo;
     private readonly HybridAiService _ai;
+    private readonly ILogger<GenerateCreatureStoriesBatchEndpoint> _logger;
 
-    public GenerateCreatureStoriesBatchEndpoint(GameDataRepository repo, HybridAiService ai)
+    public GenerateCreatureStoriesBatchEndpoint(
+        GameDataRepository repo,
+        HybridAiService ai,
+        ILogger<GenerateCreatureStoriesBatchEndpoint> logger)
     {
         _repo = repo;
         _ai = ai;
+        _logger = logger;
     }
 
     public override void Configure()
@@ -63,8 +68,15 @@ public class GenerateCreatureStoriesBatchEndpoint
         {
             var chunkResults = await GenerateChunkAsync(chunk, req.Setting, ct);
             if (chunkResults is null)
-                return;
+                return; // 404 déjà envoyé (créature introuvable)
             results.AddRange(chunkResults);
+        }
+
+        if (results.Count == 0)
+        {
+            AddError("La génération IA n'a renvoyé aucune vie exploitable.");
+            await Send.ErrorsAsync(StatusCodes.Status502BadGateway, ct);
+            return;
         }
 
         await Send.OkAsync(new GenerateCreatureStoriesBatchResponse(results), ct);
@@ -75,7 +87,7 @@ public class GenerateCreatureStoriesBatchEndpoint
         string? setting,
         CancellationToken ct)
     {
-        var blocks = new List<string>();
+        var prepared = new List<(GenerateCreatureStoriesBatchItem Item, string Type, string Description)>();
         foreach (var item in chunk)
         {
             var creature = await _repo.GetCreatureByIdAsync(item.CreatureId, ct);
@@ -86,17 +98,48 @@ public class GenerateCreatureStoriesBatchEndpoint
                 return null;
             }
 
-            var roleLabel = RoleLabel(item.Role);
-            blocks.Add(
-                $"""
-                - creatureId: {item.CreatureId}
-                  nom: {item.CustomName.Trim()}
-                  type: {creature.Type}
-                  rôle: {roleLabel}
-                  description: {(string.IsNullOrWhiteSpace(creature.Description) ? "—" : creature.Description[..Math.Min(creature.Description.Length, 200)])}
-                """
-            );
+            var desc = string.IsNullOrWhiteSpace(creature.Description)
+                ? "—"
+                : creature.Description[..Math.Min(creature.Description.Length, 200)];
+            prepared.Add((item, creature.Type, desc));
         }
+
+        var expectedIds = chunk.Select(c => c.CreatureId).ToHashSet(StringComparer.Ordinal);
+        var byId = new Dictionary<string, string>(StringComparer.Ordinal);
+
+        var batchOk = await TryGenerateBatchJsonAsync(prepared, setting, expectedIds, byId, ct);
+        if (!batchOk)
+            _logger.LogWarning("Lot JSON créatures échoué — secours une par une ({Count})", chunk.Length);
+
+        var missing = chunk.Where(c => !byId.ContainsKey(c.CreatureId)).ToArray();
+        foreach (var item in missing)
+        {
+            var prep = prepared.First(p => p.Item.CreatureId == item.CreatureId);
+            var story = await GenerateSingleAsync(item, prep.Type, prep.Description, setting, ct);
+            if (!string.IsNullOrWhiteSpace(story))
+                byId[item.CreatureId] = story.Trim();
+        }
+
+        return byId
+            .Select(kv => new GenerateCreatureStoriesBatchResponseItem(kv.Key, kv.Value))
+            .ToList();
+    }
+
+    private async Task<bool> TryGenerateBatchJsonAsync(
+        List<(GenerateCreatureStoriesBatchItem Item, string Type, string Description)> prepared,
+        string? setting,
+        HashSet<string> expectedIds,
+        Dictionary<string, string> byId,
+        CancellationToken ct)
+    {
+        var blocks = prepared.Select(p =>
+            $"""
+            - creatureId: {p.Item.CreatureId}
+              nom: {p.Item.CustomName.Trim()}
+              type: {p.Type}
+              rôle: {RoleLabel(p.Item.Role)}
+              description: {p.Description}
+            """);
 
         var prompt =
             $"""
@@ -111,69 +154,57 @@ public class GenerateCreatureStoriesBatchEndpoint
             """
             + "[{\"creatureId\":\"id\",\"backstory\":\"texte en français\"}]";
 
-        var maxTokens = Math.Min(4096, 220 * chunk.Length + 200);
+        var maxTokens = Math.Min(4096, 280 * prepared.Count + 200);
+        var result = await _ai.SendShortGenerationAsync(
+            prompt,
+            "Tu es un maître du jeu expert en jeux de rôle fantasy francophones. Réponds uniquement en JSON valide.",
+            maxTokens,
+            ct,
+            text => CreatureStoriesBatchJson.LooksLikeBatchJson(text, expectedIds));
+
+        if (!result.Ok || string.IsNullOrWhiteSpace(result.Text))
+            return false;
+
+        var parsed = CreatureStoriesBatchJson.TryParse(result.Text, expectedIds);
+        if (parsed is null)
+            return false;
+
+        foreach (var (id, story) in parsed)
+            byId[id] = story;
+
+        return byId.Count > 0;
+    }
+
+    private async Task<string?> GenerateSingleAsync(
+        GenerateCreatureStoriesBatchItem item,
+        string type,
+        string description,
+        string? setting,
+        CancellationToken ct)
+    {
+        var prompt =
+            $"""
+            Tu es un maître du jeu expert en jeux de rôle fantasy francophones, spécialisé dans l'univers d'Eana (Dragons).
+            Génère la VIE et l'HISTOIRE PERSONNELLE (background) d'une créature du bestiaire, sous le nom qu'on lui a donné.
+            Maximum 120 mots, un seul paragraphe dense et immersif.
+            L'histoire doit expliquer qui il/elle est, son passé, ses motivations, et un hook pour une aventure.
+            Réponds uniquement avec l'histoire, sans introduction ni commentaire.
+
+            CRÉATURE:
+            - Nom dans l'histoire: {item.CustomName.Trim()}
+            - Type: {type}
+            - Rôle narratif: {RoleLabel(item.Role)}
+            {(setting != null ? $"- Contexte de l'aventure: {setting}" : "")}
+            - Description: {description}
+            """;
+
         var result = await _ai.SendShortGenerationAsync(
             prompt,
             "Tu es un maître du jeu expert en jeux de rôle fantasy francophones.",
-            maxTokens,
+            500,
             ct);
 
-        if (!result.Ok)
-        {
-            AddError(result.Error!);
-            await Send.ErrorsAsync(AiEndpointResponses.StatusCodeFor(result), ct);
-            return null;
-        }
-
-        var parsed = TryParseBatchJson(result.Text!, chunk.Select(c => c.CreatureId).ToHashSet());
-        if (parsed is null)
-        {
-            AddError("La génération IA n'a pas renvoyé un JSON exploitable.");
-            await Send.ErrorsAsync(StatusCodes.Status502BadGateway, ct);
-            return null;
-        }
-
-        return parsed;
-    }
-
-    private static List<GenerateCreatureStoriesBatchResponseItem>? TryParseBatchJson(
-        string text,
-        HashSet<string> expectedIds)
-    {
-        var json = ExtractJsonArray(text);
-        if (json is null) return null;
-
-        try
-        {
-            using var doc = JsonDocument.Parse(json);
-            if (doc.RootElement.ValueKind != JsonValueKind.Array) return null;
-
-            var list = new List<GenerateCreatureStoriesBatchResponseItem>();
-            foreach (var el in doc.RootElement.EnumerateArray())
-            {
-                if (el.ValueKind != JsonValueKind.Object) continue;
-                var id = el.TryGetProperty("creatureId", out var idEl) ? idEl.GetString() : null;
-                var story = el.TryGetProperty("backstory", out var sEl) ? sEl.GetString()?.Trim() : null;
-                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(story)) continue;
-                if (!expectedIds.Contains(id)) continue;
-                list.Add(new GenerateCreatureStoriesBatchResponseItem(id, story));
-            }
-
-            return list.Count > 0 ? list : null;
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    private static string? ExtractJsonArray(string text)
-    {
-        text = text.Trim();
-        var start = text.IndexOf('[');
-        var end = text.LastIndexOf(']');
-        if (start < 0 || end <= start) return null;
-        return text[start..(end + 1)];
+        return result.Ok ? result.Text : null;
     }
 
     private static string RoleLabel(string? role) => role switch
