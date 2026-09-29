@@ -49,6 +49,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 > **Lot A+B+C (2026-09-29)** — RSVP hub/agenda, convert+invite, share, timeline RSVP, tokens image URL, map switcher, handouts progressifs, QR/TV, run sheet prépa, pack soirée unifié.
 > **Suite polish (2026-09-29)** — portraits fichier + PDF fiche (âme/overflow/GRP sorts).
 > **Lot D (2026-09-29)** — level-up XP table→forge ; partage « Date RSVP » chat amis ; e2e `campaign-abc-lot`.
+> **Feed + coverage (2026-09-29)** — activité `combat_ended` (API analyze + timeline filtre combat) ; specs karma RSVP / run-sheet / image-data-url / handoutPlayerBody + tests API AnalyzeCombatEnded.
 
 > **Demain (Anthony 2026-09-27 soir)** — priorités 1+2 **faites**.
 

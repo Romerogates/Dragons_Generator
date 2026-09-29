@@ -75,7 +75,11 @@ export class CampaignDetailActivity {
       case 'sessions':
         return kind === 'session_scheduled' || kind === 'session_updated';
       case 'combat':
-        return kind === 'xp_awarded' || kind === 'initiative_collection_opened';
+        return (
+          kind === 'xp_awarded' ||
+          kind === 'initiative_collection_opened' ||
+          kind === 'combat_ended'
+        );
       default:
         return true;
     }

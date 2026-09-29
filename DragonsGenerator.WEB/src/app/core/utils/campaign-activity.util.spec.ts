@@ -22,14 +22,24 @@ describe('campaign-activity.util', () => {
   it('maps known labels and icons', () => {
     expect(activityLabel('handout_published')).toBe('Document publié');
     expect(activityLabel('schedule_rsvp')).toBe('RSVP agenda');
+    expect(activityLabel('combat_ended')).toBe('Combat terminé');
     expect(activityLabel('unknown_event')).toBe('unknown event');
     expect(activityIcon('xp_awarded')).toContain('sparkles');
     expect(activityIcon('schedule_rsvp')).toContain('raising-hands');
+    expect(activityIcon('combat_ended')).toContain('crossed-swords');
     expect(activityIcon('zzz')).toContain('memo');
   });
 
   it('parses activity detail payloads', () => {
     expect(activityDetail(item({ kind: 'xp_awarded', payloadJson: '{"message":" +50 XP "}' }))).toBe('+50 XP');
+    expect(
+      activityDetail(
+        item({
+          kind: 'combat_ended',
+          payloadJson: '{"message":"Combat terminé — Embuscade · tour 4"}',
+        }),
+      ),
+    ).toBe('Combat terminé — Embuscade · tour 4');
     expect(
       activityDetail(
         item({
@@ -39,10 +49,16 @@ describe('campaign-activity.util', () => {
       ),
     ).toBe('Ana · Elara');
     expect(
+      activityDetail(item({ kind: 'character_proposed', payloadJson: '{"characterName":"Solo"}' })),
+    ).toBe('Solo');
+    expect(
       activityDetail(item({ kind: 'session_scheduled', payloadJson: '{"title":"S1","location":"Discord"}' })),
     ).toBe('S1 · Discord');
+    expect(activityDetail(item({ kind: 'session_scheduled', payloadJson: '{"title":"S2"}' }))).toBe('S2');
     expect(activityDetail(item({ kind: 'invite_sent', payloadJson: '{"campaignTitle":"Camp"}' }))).toBe('Camp');
+    expect(activityDetail(item({ kind: 'invite_sent', payloadJson: '{}' }))).toBeNull();
     expect(activityDetail(item({ kind: 'invite_sent', payloadJson: 'not-json' }))).toBeNull();
+    expect(activityDetail(item({ kind: 'invite_sent', payloadJson: '' }))).toBeNull();
   });
 
   it('extracts handout id from published activity', () => {

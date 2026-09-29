@@ -18,6 +18,7 @@ export function activityLabel(kind: string): string {
     handout_published: 'Document publié',
     initiative_collection_opened: "Collecte d'initiative",
     schedule_rsvp: 'RSVP agenda',
+    combat_ended: 'Combat terminé',
   };
   return labels[kind] ?? kind.replace(/_/g, ' ');
 }
@@ -40,6 +41,7 @@ export function activityIcon(kind: string): string {
     handout_published: 'fluent-emoji:scroll',
     initiative_collection_opened: 'fluent-emoji:dart',
     schedule_rsvp: 'fluent-emoji:raising-hands',
+    combat_ended: 'fluent-emoji:crossed-swords',
   };
   return icons[kind] ?? 'fluent-emoji:memo';
 }

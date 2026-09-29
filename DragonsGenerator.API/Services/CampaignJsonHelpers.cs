@@ -1087,6 +1087,87 @@ public static class CampaignJsonHelpers
         }
     }
 
+    /// <summary>
+    /// Détecte la fin d’un combat : activeCombat passé à null + nouvelle entrée combatHistory.
+    /// </summary>
+    public static CombatEndedChangeInfo AnalyzeCombatEnded(string oldJson, string newJson)
+    {
+        try
+        {
+            using var oldDoc = JsonDocument.Parse(string.IsNullOrWhiteSpace(oldJson) ? "{}" : oldJson);
+            using var newDoc = JsonDocument.Parse(string.IsNullOrWhiteSpace(newJson) ? "{}" : newJson);
+            var oldSessions = IndexSessionCombatSnapshots(oldDoc.RootElement);
+            var newSessions = IndexSessionCombatSnapshots(newDoc.RootElement);
+
+            foreach (var (sessionId, neu) in newSessions)
+            {
+                if (!oldSessions.TryGetValue(sessionId, out var old))
+                    continue;
+                if (!old.HadActiveCombat || neu.HadActiveCombat)
+                    continue;
+                if (neu.HistoryCount <= old.HistoryCount)
+                    continue;
+
+                var label = string.IsNullOrWhiteSpace(neu.LastHistoryLabel)
+                    ? "Combat"
+                    : neu.LastHistoryLabel!;
+                var roundPart = neu.LastHistoryRound is int r && r > 0 ? $" · tour {r}" : "";
+                return new CombatEndedChangeInfo(
+                    Changed: true,
+                    SessionId: sessionId,
+                    HistoryId: neu.LastHistoryId,
+                    Label: label,
+                    Round: neu.LastHistoryRound,
+                    Message: $"Combat terminé — {label}{roundPart}");
+            }
+
+            return CombatEndedChangeInfo.None;
+        }
+        catch
+        {
+            return CombatEndedChangeInfo.None;
+        }
+    }
+
+    private static Dictionary<string, SessionCombatSnapshot> IndexSessionCombatSnapshots(JsonElement root)
+    {
+        var map = new Dictionary<string, SessionCombatSnapshot>(StringComparer.Ordinal);
+        if (!root.TryGetProperty("sessions", out var sessions) || sessions.ValueKind != JsonValueKind.Array)
+            return map;
+        foreach (var session in sessions.EnumerateArray())
+        {
+            var sid = session.TryGetProperty("id", out var idEl) ? idEl.GetString() : null;
+            if (string.IsNullOrWhiteSpace(sid)) continue;
+            var hadCombat = session.TryGetProperty("activeCombat", out var combat)
+                && combat.ValueKind == JsonValueKind.Object;
+            var historyCount = 0;
+            string? lastId = null;
+            string? lastLabel = null;
+            int? lastRound = null;
+            if (session.TryGetProperty("combatHistory", out var hist) && hist.ValueKind == JsonValueKind.Array)
+            {
+                historyCount = hist.GetArrayLength();
+                if (historyCount > 0)
+                {
+                    var last = hist[historyCount - 1];
+                    lastId = last.TryGetProperty("id", out var hid) ? hid.GetString() : null;
+                    lastLabel = last.TryGetProperty("label", out var lab) ? lab.GetString() : null;
+                    if (last.TryGetProperty("round", out var rnd) && rnd.TryGetInt32(out var rv))
+                        lastRound = rv;
+                }
+            }
+            map[sid!] = new SessionCombatSnapshot(hadCombat, historyCount, lastId, lastLabel, lastRound);
+        }
+        return map;
+    }
+
+    private sealed record SessionCombatSnapshot(
+        bool HadActiveCombat,
+        int HistoryCount,
+        string? LastHistoryId,
+        string? LastHistoryLabel,
+        int? LastHistoryRound);
+
     private static ActiveCombatInitiativeState ReadActiveCombatInitiativeState(string json)
     {
         using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(json) ? "{}" : json);
@@ -1388,6 +1469,17 @@ public sealed record InitiativeCollectionChangeInfo(
     string Message)
 {
     public static InitiativeCollectionChangeInfo None { get; } = new(false, null, null, "");
+}
+
+public sealed record CombatEndedChangeInfo(
+    bool Changed,
+    string? SessionId,
+    string? HistoryId,
+    string? Label,
+    int? Round,
+    string Message)
+{
+    public static CombatEndedChangeInfo None { get; } = new(false, null, null, null, null, "");
 }
 
 public sealed record InitiativeBoardInfo(

@@ -292,4 +292,76 @@ public class CampaignJsonHelpersTests
         Assert.Single(events);
         Assert.EndsWith(":session:ok", events[0].Id);
     }
+
+    [Fact]
+    public void AnalyzeCombatEnded_detects_cleared_active_combat_with_new_history()
+    {
+        const string oldJson = """
+            {
+              "sessions": [{
+                "id": "ses-1",
+                "activeCombat": { "id": "c1", "label": "Embuscade", "round": 3 },
+                "combatHistory": []
+              }]
+            }
+            """;
+        const string newJson = """
+            {
+              "sessions": [{
+                "id": "ses-1",
+                "activeCombat": null,
+                "combatHistory": [{
+                  "id": "h1",
+                  "label": "Embuscade",
+                  "round": 4,
+                  "endedAt": "2026-09-29T20:00:00Z"
+                }]
+              }]
+            }
+            """;
+
+        var info = CampaignJsonHelpers.AnalyzeCombatEnded(oldJson, newJson);
+        Assert.True(info.Changed);
+        Assert.Equal("ses-1", info.SessionId);
+        Assert.Equal("h1", info.HistoryId);
+        Assert.Equal("Embuscade", info.Label);
+        Assert.Equal(4, info.Round);
+        Assert.Contains("Combat terminé", info.Message);
+        Assert.Contains("tour 4", info.Message);
+    }
+
+    [Fact]
+    public void AnalyzeCombatEnded_ignores_clear_without_history_growth()
+    {
+        const string oldJson = """
+            { "sessions": [{ "id": "ses-1", "activeCombat": { "id": "c1" }, "combatHistory": [] }] }
+            """;
+        const string newJson = """
+            { "sessions": [{ "id": "ses-1", "activeCombat": null, "combatHistory": [] }] }
+            """;
+
+        Assert.False(CampaignJsonHelpers.AnalyzeCombatEnded(oldJson, newJson).Changed);
+    }
+
+    [Fact]
+    public void AnalyzeCombatEnded_defaults_label_when_history_unnamed()
+    {
+        const string oldJson = """
+            { "sessions": [{ "id": "ses-1", "activeCombat": { "id": "c1" }, "combatHistory": [] }] }
+            """;
+        const string newJson = """
+            {
+              "sessions": [{
+                "id": "ses-1",
+                "activeCombat": null,
+                "combatHistory": [{ "id": "h2", "label": "  " }]
+              }]
+            }
+            """;
+
+        var info = CampaignJsonHelpers.AnalyzeCombatEnded(oldJson, newJson);
+        Assert.True(info.Changed);
+        Assert.Equal("Combat", info.Label);
+        Assert.Equal("Combat terminé — Combat", info.Message);
+    }
 }

@@ -391,6 +391,21 @@ public class UpdateCampaignEndpoint(AppDbContext db, PushNotificationService pus
                             label = initiative.Label,
                         }, ct);
                 }
+
+                var combatEnded = CampaignJsonHelpers.AnalyzeCombatEnded(campaign.JsonData, newJson);
+                if (combatEnded.Changed)
+                {
+                    await CampaignActivityService.LogAsync(
+                        db, campaign.Id, userId.Value, CampaignActivityKinds.CombatEnded,
+                        new
+                        {
+                            message = combatEnded.Message,
+                            label = combatEnded.Label,
+                            round = combatEnded.Round,
+                            sessionId = combatEnded.SessionId,
+                            historyId = combatEnded.HistoryId,
+                        }, ct);
+                }
             }
             campaign.JsonData = newJson;
         }

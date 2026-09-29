@@ -22,6 +22,7 @@ public static class CampaignActivityKinds
     public const string HandoutPublished = "handout_published";
     public const string InitiativeCollectionOpened = "initiative_collection_opened";
     public const string ScheduleRsvp = "schedule_rsvp";
+    public const string CombatEnded = "combat_ended";
 }
 
 public static class CampaignActivityService
