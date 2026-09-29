@@ -38,6 +38,43 @@ public sealed class UserPreferences
     /// <summary>Clé API chiffrée (Data Protection) — jamais renvoyée en clair.</summary>
     [JsonPropertyName("aiApiKeyProtected")]
     public string? AiApiKeyProtected { get; set; }
+
+    /// <summary>Dates agenda personnelles (hors campagne) — liées à un héros ou libres.</summary>
+    [JsonPropertyName("personalScheduleEvents")]
+    public List<PersonalScheduleEvent> PersonalScheduleEvents { get; set; } = [];
+}
+
+public sealed class PersonalScheduleEvent
+{
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = "";
+
+    [JsonPropertyName("title")]
+    public string Title { get; set; } = "";
+
+    [JsonPropertyName("startsAt")]
+    public string StartsAt { get; set; } = "";
+
+    [JsonPropertyName("endsAt")]
+    public string? EndsAt { get; set; }
+
+    [JsonPropertyName("allDay")]
+    public bool AllDay { get; set; }
+
+    [JsonPropertyName("kind")]
+    public string Kind { get; set; } = "game";
+
+    [JsonPropertyName("location")]
+    public string? Location { get; set; }
+
+    [JsonPropertyName("notes")]
+    public string? Notes { get; set; }
+
+    [JsonPropertyName("characterId")]
+    public string? CharacterId { get; set; }
+
+    [JsonPropertyName("characterName")]
+    public string? CharacterName { get; set; }
 }
 
 public static class UserPreferencesHelper

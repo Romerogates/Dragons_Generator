@@ -3,8 +3,9 @@
     <div>
       <h1 class="text-2xl sm:text-3xl font-serif text-amber-200">Agenda</h1>
       <p class="text-sm text-slate-400 mt-1 max-w-xl">
-        Tous vos rendez-vous de table. Cliquez un créneau pour ajouter une date à une de vos
-        campagnes (et lier un héros si besoin).
+        Dates de table : liez une <strong class="font-semibold text-slate-300">campagne</strong> et/ou un
+        <strong class="font-semibold text-slate-300">héros</strong>. Sans campagne, la date reste perso
+        (utile hors table cloud).
       </p>
     </div>
     <div class="flex flex-wrap gap-2">
@@ -12,7 +13,7 @@
         type="button"
         class="min-h-10 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-600 text-white hover:bg-amber-500 disabled:opacity-40"
         (click)="openAddPanel()"
-        [disabled]="!ownedCampaigns().length"
+        [disabled]="!canAddDate()"
         data-testid="agenda-add-date"
       >
         + Ajouter une date
@@ -35,9 +36,9 @@
     </div>
   </header>
 
-  @if (!ownedCampaigns().length && !loading()) {
+  @if (!canAddDate() && !loading()) {
     <p class="text-xs text-slate-500 rounded-xl border border-slate-800 bg-[#141820] px-4 py-3">
-      Créez une campagne (rôle MJ) pour pouvoir ajouter des dates depuis cet agenda.
+      Créez une campagne (MJ) ou un héros pour pouvoir ajouter des dates.
     </p>
   }
 
@@ -65,7 +66,10 @@
 
     <div class="flex flex-wrap gap-3 text-[10px] text-slate-500">
       <span class="inline-flex items-center gap-1.5"
-        ><span class="w-2.5 h-2.5 rounded-sm bg-amber-700"></span> Date libre</span
+        ><span class="w-2.5 h-2.5 rounded-sm bg-amber-700"></span> Date libre (campagne)</span
+      >
+      <span class="inline-flex items-center gap-1.5"
+        ><span class="w-2.5 h-2.5 rounded-sm bg-cyan-700"></span> Date perso / héros</span
       >
       <span class="inline-flex items-center gap-1.5"
         ><span class="w-2.5 h-2.5 rounded-sm bg-violet-600"></span> Session planifiée</span
@@ -98,7 +102,7 @@
       <div class="flex-1 overflow-y-auto p-4 space-y-3">
         <label class="block">
           <span class="text-[10px] font-black uppercase tracking-widest text-slate-500"
-            >Campagne</span
+            >Campagne (optionnel)</span
           >
           <select
             class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-2 py-2 text-sm text-slate-200"
@@ -106,8 +110,26 @@
             (ngModelChange)="draftCampaignId.set($event)"
             data-testid="agenda-campaign-select"
           >
+            <option value="">— Aucune (date perso) —</option>
             @for (c of ownedCampaigns(); track c.id) {
               <option [value]="c.id">{{ c.title }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="block">
+          <span class="text-[10px] font-black uppercase tracking-widest text-slate-500"
+            >Héros {{ draftCampaignId() ? '(optionnel)' : '(requis si pas de campagne)' }}</span
+          >
+          <select
+            class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-2 py-2 text-sm text-slate-300"
+            [ngModel]="draftHeroId()"
+            (ngModelChange)="draftHeroId.set($event)"
+            data-testid="agenda-hero-select"
+          >
+            <option value="">— Aucun —</option>
+            @for (h of heroes(); track h.id) {
+              <option [value]="h.id">{{ h.name }}</option>
             }
           </select>
         </label>
@@ -157,23 +179,6 @@
             />
           </label>
         </div>
-
-        <label class="block">
-          <span class="text-[10px] font-black uppercase tracking-widest text-slate-500"
-            >Héros (optionnel)</span
-          >
-          <select
-            class="mt-1 w-full bg-[#1b2028] border border-slate-700 rounded-lg px-2 py-2 text-sm text-slate-300"
-            [ngModel]="draftHeroId()"
-            (ngModelChange)="draftHeroId.set($event)"
-            data-testid="agenda-hero-select"
-          >
-            <option value="">— Aucun —</option>
-            @for (h of heroes(); track h.id) {
-              <option [value]="h.id">{{ h.name }}</option>
-            }
-          </select>
-        </label>
 
         <label class="block">
           <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Notes</span>

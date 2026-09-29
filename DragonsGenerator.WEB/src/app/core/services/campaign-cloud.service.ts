@@ -23,9 +23,10 @@ export interface CampaignActivityItem {
 
 export interface AgendaEventDto {
   id: string;
-  campaignId: string;
+  /** Null = date personnelle (hors campagne). */
+  campaignId: string | null;
   campaignTitle: string;
-  source: 'schedule' | 'session' | string;
+  source: 'schedule' | 'session' | 'personal' | string;
   title: string;
   startsAt: string;
   endsAt?: string | null;
@@ -33,6 +34,8 @@ export interface AgendaEventDto {
   kind?: string | null;
   status?: string | null;
   location?: string | null;
+  characterId?: string | null;
+  characterName?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -50,6 +53,24 @@ export class CampaignCloudService {
   listAgenda(): Observable<AgendaEventDto[]> {
     if (!this.auth.isLoggedIn()) return of([]);
     return this.http.get<AgendaEventDto[]>(`${this.api}/me/agenda`);
+  }
+
+  /** Date perso (héros / hors campagne). */
+  createPersonalAgendaEvent(body: {
+    title: string;
+    startsAt: string;
+    endsAt?: string | null;
+    allDay?: boolean;
+    kind?: string;
+    location?: string;
+    notes?: string;
+    characterId?: string | null;
+  }): Observable<AgendaEventDto> {
+    return this.http.post<AgendaEventDto>(`${this.api}/me/agenda/personal`, body);
+  }
+
+  deletePersonalAgendaEvent(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.api}/me/agenda/personal/${encodeURIComponent(id)}`);
   }
 
   get(id: string): Observable<CampaignDetail> {

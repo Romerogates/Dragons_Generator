@@ -34,8 +34,8 @@ services:
       Groq__FallbackModel: llama-3.3-70b-versatile
       Groq__MaxAttempts: "3"
       Groq__MaxRetryWindowMs: "60000"
-      # Ollama en prod = requêtes courtes trop lentes → 504 nginx. Groq seul pour l’IA.
-      LocalLlm__Enabled: "false"
+      # Ollama d’abord (budget court), puis Groq — évite 504 tout en économisant Groq.
+      LocalLlm__Enabled: "true"
       LocalLlm__BaseUrl: http://ollama:11434/v1
       LocalLlm__Model: qwen2.5:3b
     volumes:

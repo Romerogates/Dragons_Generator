@@ -70,6 +70,7 @@ export class GlobalAgendaPage implements OnInit {
   readonly draftKind = signal<CampaignScheduleKind>('game');
   readonly draftStartsLocal = signal('');
   readonly draftEndsLocal = signal('');
+  /** Vide = date perso (héros / hors campagne). */
   readonly draftCampaignId = signal('');
   readonly draftHeroId = signal('');
   readonly draftNotes = signal('');
@@ -79,20 +80,29 @@ export class GlobalAgendaPage implements OnInit {
     string,
   ][];
 
-  readonly canSave = computed(
-    () =>
-      !!this.draftCampaignId() &&
+  /** Campagne MJ **ou** héros (date perso) suffisent. */
+  readonly canSave = computed(() => {
+    const hasCampaign = !!this.draftCampaignId();
+    const hasHero = !!this.draftHeroId().trim();
+    return (
+      (hasCampaign || hasHero) &&
       !!this.draftStartsLocal() &&
       !!this.draftTitle().trim() &&
-      !this.saving(),
+      !this.saving()
+    );
+  });
+
+  readonly canAddDate = computed(
+    () => this.ownedCampaigns().length > 0 || this.heroes().length > 0,
   );
 
   readonly fcEvents = computed((): EventInput[] =>
     this.events().map((e) => {
       const colors = eventColors(e);
+      const prefix = e.source === 'personal' ? e.campaignTitle || 'Perso' : e.campaignTitle;
       return {
         id: e.id,
-        title: `${e.campaignTitle} · ${e.title}`,
+        title: `${prefix} · ${e.title}`,
         start: e.startsAt,
         end: e.endsAt ?? undefined,
         allDay: e.allDay,
@@ -101,6 +111,7 @@ export class GlobalAgendaPage implements OnInit {
         editable: false,
         extendedProps: {
           campaignId: e.campaignId,
+          characterId: e.characterId,
           source: e.source,
           status: e.status,
           kind: e.kind,
@@ -137,9 +148,6 @@ export class GlobalAgendaPage implements OnInit {
     this.campaignsApi.list().subscribe({
       next: (list) => {
         this.ownedCampaigns.set((list ?? []).filter((c) => c.role === 'dm' && !c.isClosed));
-        if (!this.draftCampaignId() && this.ownedCampaigns().length) {
-          this.draftCampaignId.set(this.ownedCampaigns()[0].id);
-        }
       },
     });
     this.charactersApi.list().subscribe({
@@ -170,11 +178,18 @@ export class GlobalAgendaPage implements OnInit {
     this.draftKind.set('game');
     this.draftStartsLocal.set(datetimeLocalValue(start.toISOString()));
     this.draftEndsLocal.set(datetimeLocalValue(end.toISOString()));
-    this.draftHeroId.set('');
     this.draftNotes.set('');
     this.saveError.set(null);
-    if (!this.draftCampaignId() && this.ownedCampaigns().length) {
+    // MJ : préselection campagne (parcours courant). Sans campagne : premier héros → date perso.
+    if (this.ownedCampaigns().length) {
       this.draftCampaignId.set(this.ownedCampaigns()[0].id);
+      this.draftHeroId.set('');
+    } else if (this.heroes().length) {
+      this.draftCampaignId.set('');
+      this.draftHeroId.set(this.heroes()[0].id);
+    } else {
+      this.draftCampaignId.set('');
+      this.draftHeroId.set('');
     }
     this.panelOpen.set(true);
   }
@@ -186,25 +201,49 @@ export class GlobalAgendaPage implements OnInit {
 
   saveDraft(): void {
     if (!this.canSave()) return;
-    const campaignId = this.draftCampaignId();
+    const campaignId = this.draftCampaignId().trim();
     const startsAt = fromDatetimeLocalValue(this.draftStartsLocal());
     const endsAt = this.draftEndsLocal()
       ? fromDatetimeLocalValue(this.draftEndsLocal())
       : new Date(new Date(startsAt).getTime() + 3 * 60 * 60 * 1000).toISOString();
     const heroId = this.draftHeroId().trim();
     const hero = this.heroes().find((h) => h.id === heroId);
-    const notesParts = [
-      this.draftNotes().trim(),
-      hero ? `Héros : ${hero.name}` : '',
-    ].filter(Boolean);
+    const title = this.draftTitle().trim() || 'Soirée de table';
+    const notes = this.draftNotes().trim();
 
     this.saving.set(true);
     this.saveError.set(null);
 
+    // Sans campagne → date perso (héros optionnel mais recommandé côté UI).
+    if (!campaignId) {
+      this.campaignsApi
+        .createPersonalAgendaEvent({
+          title,
+          startsAt,
+          endsAt,
+          kind: this.draftKind(),
+          notes: notes || undefined,
+          characterId: heroId || null,
+        })
+        .subscribe({
+          next: () => {
+            this.saving.set(false);
+            this.panelOpen.set(false);
+            this.reload();
+          },
+          error: () => {
+            this.saving.set(false);
+            this.saveError.set('Impossible d’enregistrer la date perso. Réessayez.');
+          },
+        });
+      return;
+    }
+
+    const notesParts = [notes, hero ? `Héros : ${hero.name}` : ''].filter(Boolean);
     this.campaignsApi.get(campaignId).subscribe({
       next: (detail) => {
         const created = createCampaignScheduleEvent({
-          title: this.draftTitle().trim() || 'Soirée de table',
+          title,
           kind: this.draftKind(),
           startsAt,
           endsAt,
@@ -239,7 +278,10 @@ export class GlobalAgendaPage implements OnInit {
       endsAt: e.endsAt,
       allDay: e.allDay,
       location: e.location ?? undefined,
-      description: [e.source === 'session' ? `Session (${e.status ?? ''})` : e.kind, e.campaignTitle]
+      description: [
+        e.source === 'session' ? `Session (${e.status ?? ''})` : e.source === 'personal' ? 'Perso' : e.kind,
+        e.campaignTitle,
+      ]
         .filter(Boolean)
         .join('\n'),
     }));
@@ -250,7 +292,6 @@ export class GlobalAgendaPage implements OnInit {
   private onSelect(arg: DateSelectInfo): void {
     arg.view.calendar.unselect();
     const start = arg.start;
-    // Clic jour (mois) : proposer 19h locales.
     if (arg.allDay) {
       const d = new Date(start);
       d.setHours(19, 0, 0, 0);
@@ -261,8 +302,12 @@ export class GlobalAgendaPage implements OnInit {
   }
 
   private onEventClick(arg: EventClickInfo): void {
-    const campaignId = arg.event.extendedProps['campaignId'] as string | undefined;
+    const campaignId = arg.event.extendedProps['campaignId'] as string | null | undefined;
     const source = arg.event.extendedProps['source'] as string | undefined;
+    if (source === 'personal') {
+      void this.router.navigate(['/characters']);
+      return;
+    }
     if (!campaignId) return;
     const tab = source === 'session' ? 'sessions' : 'calendar';
     void this.router.navigate(['/campaigns', campaignId], { queryParams: { tab } });
@@ -277,6 +322,9 @@ function defaultTableStartsAt(): Date {
 }
 
 function eventColors(e: AgendaEventDto): { bg: string; border: string } {
+  if (e.source === 'personal') {
+    return { bg: '#0e7490', border: '#22d3ee' };
+  }
   if (e.source === 'session') {
     if (e.status === 'played') return { bg: '#047857', border: '#34d399' };
     if (e.status === 'cancelled') return { bg: '#57534e', border: '#78716c' };

@@ -19,6 +19,36 @@ test.describe('Agenda global', () => {
     await page.getByTestId('agenda-add-date').click();
     await expect(page.getByTestId('agenda-add-panel')).toBeVisible();
     await expect(page.getByTestId('agenda-campaign-select')).toBeVisible();
+    // Campagne présélectionnée → enregistrement campagne.
+    await page.getByTestId('agenda-save-date').click();
+    await expect(page.getByTestId('agenda-add-panel')).toHaveCount(0, { timeout: 20_000 });
+  });
+
+  test('date perso sans campagne (héros seul)', async ({ page }) => {
+    test.setTimeout(90_000);
+
+    const owner = await loginSeedSession(page.request);
+    await createCampaignAs(page, owner, `E2E Agenda Perso ${Date.now()}`);
+    await applyAuthSession(page, owner, '/agenda');
+
+    await expect(page.getByTestId('global-agenda-calendar')).toBeVisible({ timeout: 20_000 });
+    await page.getByTestId('agenda-add-date').click();
+    await expect(page.getByTestId('agenda-add-panel')).toBeVisible();
+
+    // Aucune campagne → chemin perso ; héros requis si présent.
+    await page.getByTestId('agenda-campaign-select').selectOption({ value: '' });
+    const heroSelect = page.getByTestId('agenda-hero-select');
+    const heroOptions = heroSelect.locator('option');
+    const heroCount = await heroOptions.count();
+    if (heroCount > 1) {
+      const firstHeroValue = await heroOptions.nth(1).getAttribute('value');
+      if (firstHeroValue) await heroSelect.selectOption(firstHeroValue);
+    } else {
+      // Pas de héros cloud : le save doit rester désactivé sans campagne.
+      await expect(page.getByTestId('agenda-save-date')).toBeDisabled();
+      return;
+    }
+
     await page.getByTestId('agenda-save-date').click();
     await expect(page.getByTestId('agenda-add-panel')).toHaveCount(0, { timeout: 20_000 });
   });

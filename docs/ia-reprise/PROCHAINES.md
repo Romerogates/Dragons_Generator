@@ -30,19 +30,23 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 2. ~~Fix calendrier vide après reload~~ **fait** — `normalizeData` gardait pas `scheduleEvents` / `atlasPins` / carnet
 3. ~~Agenda global : clic → ajouter date (campagne + héros)~~ **fait**
 4. ~~Carte Eana moins floue au zoom~~ **fait** (width/height au lieu de `scale()`, tooltip sans backdrop-blur)
-5. ~~Prod IA : Ollama off~~ **fait** (`LocalLlm__Enabled=false` — évite 504 sur générations courtes)
+5. ~~Prod IA : Ollama off~~ **fait** puis **revenu** (`LocalLlm__Enabled=true` + budget HybridAi ~85s / Ollama court 45s)
 
 ### Suite proposée (prioriser)
-1. Synthèse RSVP sur hub / agenda global (compteurs Oui/Non/Peut-être)
-2. Convertir date agenda → session en 1 clic (déjà partiel) + inviter auto
-3. Timeline activité campagne filtrable (RSVP / handouts / XP / combat)
-4. Jetons custom / portraits sur battle map
-5. Multi-cartes session (changer `activeMapId` live sans quitter /play)
-6. Handouts « révélation progressive » (pages / spoiler MJ)
-7. Export PDF fiche perso polish print (déjà partiel) + pack soirée unifié
-8. Amis : partager une date agenda / lien RSVP
-9. Codex → pré-remplir run sheet session (scènes / checklist)
-10. Mode « table IRL » renforcé (QR init + écran TV + dés encodés)
+1. ~~**Agenda : date liée à un héros seul**~~ **fait** — `POST/DELETE /me/agenda/personal` + prefs `personalScheduleEvents` ; UI Agenda campagne optionnelle
+2. ~~**IA prod : remettre Ollama**~~ **fait** — `docker-compose.prod.yml` `LocalLlm__Enabled=true` ; fallback Groq si timeout / échec local
+3. Synthèse RSVP sur hub / agenda global (compteurs Oui/Non/Peut-être)
+4. Convertir date agenda → session en 1 clic (déjà partiel) + inviter auto
+5. Timeline activité campagne filtrable (RSVP / handouts / XP / combat)
+6. Jetons custom / portraits sur battle map
+7. Multi-cartes session (changer `activeMapId` live sans quitter /play)
+8. Handouts « révélation progressive » (pages / spoiler MJ)
+9. Export PDF fiche perso polish print (déjà partiel) + pack soirée unifié
+10. Amis : partager une date agenda / lien RSVP
+11. Codex → pré-remplir run sheet session (scènes / checklist)
+12. Mode « table IRL » renforcé (QR init + écran TV + dés encodés)
+
+> **Demain (Anthony 2026-09-27 soir)** — priorités 1+2 **faites**.
 
 ## À faire (priorité)
 
