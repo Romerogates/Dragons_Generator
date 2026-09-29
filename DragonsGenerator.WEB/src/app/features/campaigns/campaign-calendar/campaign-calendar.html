@@ -282,6 +282,14 @@
             >
               Google Agenda
             </button>
+            <button
+              type="button"
+              class="flex-1 min-w-[8rem] py-2.5 rounded-xl text-[10px] font-black uppercase border border-cyan-800/50 text-cyan-300"
+              (click)="copyRsvpLink()"
+              data-testid="calendar-copy-rsvp-link"
+            >
+              Copier lien RSVP
+            </button>
             @if (isOwner()) {
               <button
                 type="button"
@@ -292,6 +300,9 @@
               </button>
             }
           </div>
+          @if (shareFeedback()) {
+            <p class="text-[10px] text-cyan-400/90 break-all">{{ shareFeedback() }}</p>
+          }
         }
       </div>
 

@@ -119,7 +119,32 @@ public static class CampaignJsonHelpers
             {
                 if (item is not JsonObject handout) continue;
                 if (handout["published"]?.GetValue<bool>() != true) continue;
-                visibleHandouts.Add(handout.DeepClone());
+                var clone = handout.DeepClone()!.AsObject();
+                clone.Remove("dmNotes");
+                if (clone["pages"] is JsonArray pages)
+                {
+                    var visiblePages = new JsonArray();
+                    foreach (var pageItem in pages)
+                    {
+                        if (pageItem is not JsonObject page) continue;
+                        if (page["published"]?.GetValue<bool>() != true) continue;
+                        visiblePages.Add(page.DeepClone());
+                    }
+                    clone["pages"] = visiblePages;
+                    if (visiblePages.Count > 0)
+                    {
+                        var bodies = new List<string>();
+                        foreach (var pageItem in visiblePages)
+                        {
+                            if (pageItem is not JsonObject page) continue;
+                            var title = page["title"]?.GetValue<string>();
+                            var body = page["body"]?.GetValue<string>() ?? "";
+                            bodies.Add(string.IsNullOrWhiteSpace(title) ? body : $"## {title}\n\n{body}");
+                        }
+                        clone["body"] = string.Join("\n\n---\n\n", bodies);
+                    }
+                }
+                visibleHandouts.Add(clone);
             }
 
             node["handouts"] = visibleHandouts;
@@ -461,6 +486,7 @@ public static class CampaignJsonHelpers
                     var title = ev.TryGetProperty("title", out var t) ? t.GetString() : null;
                     var kind = ev.TryGetProperty("kind", out var k) ? k.GetString() : null;
                     var location = ev.TryGetProperty("location", out var loc) ? loc.GetString() : null;
+                    CountScheduleRsvps(ev, out var rsvpYes, out var rsvpNo, out var rsvpMaybe);
 
                     list.Add(new CampaignAgendaEventInfo(
                         Id: $"{campaignId}:schedule:{id}",
@@ -473,7 +499,10 @@ public static class CampaignJsonHelpers
                         AllDay: allDay,
                         Kind: kind,
                         Status: null,
-                        Location: location));
+                        Location: location,
+                        RsvpYes: rsvpYes,
+                        RsvpNo: rsvpNo,
+                        RsvpMaybe: rsvpMaybe));
                 }
             }
 
@@ -514,6 +543,31 @@ public static class CampaignJsonHelpers
         }
 
         return list;
+    }
+
+    private static void CountScheduleRsvps(JsonElement ev, out int yes, out int no, out int maybe)
+    {
+        yes = 0;
+        no = 0;
+        maybe = 0;
+        if (!ev.TryGetProperty("rsvps", out var rsvps) || rsvps.ValueKind != JsonValueKind.Array)
+            return;
+        foreach (var r in rsvps.EnumerateArray())
+        {
+            var status = r.TryGetProperty("status", out var st) ? st.GetString() : null;
+            switch (status)
+            {
+                case "yes":
+                    yes++;
+                    break;
+                case "no":
+                    no++;
+                    break;
+                case "maybe":
+                    maybe++;
+                    break;
+            }
+        }
     }
 
     public static bool HasSessionChanges(string oldJson, string newJson) =>
@@ -1368,4 +1422,7 @@ public sealed record CampaignAgendaEventInfo(
     bool AllDay,
     string? Kind,
     string? Status,
-    string? Location);
+    string? Location,
+    int RsvpYes = 0,
+    int RsvpNo = 0,
+    int RsvpMaybe = 0);

@@ -43,7 +43,11 @@ export class CampaignDetailOverview {
   readonly liveSession = input<CampaignSession | null>(null);
   readonly nextSession = input<CampaignSession | null>(null);
   /** Date calendrier (si plus tôt qu’une session, ou seule prochaine table). */
-  readonly nextSchedule = input<{ title: string; startsAt: string } | null>(null);
+  readonly nextSchedule = input<{
+    title: string;
+    startsAt: string;
+    rsvpSummary?: string | null;
+  } | null>(null);
   readonly liveSessionDateLabel = input('');
   readonly liveSessionModeLabel = input('');
   readonly nextSessionDateLabel = input('');
@@ -89,6 +93,7 @@ export class CampaignDetailOverview {
   readonly startPlaySession = output<string>();
   readonly goSessions = output<void>();
   readonly goCalendar = output<void>();
+  readonly convertNextSchedule = output<void>();
   readonly openPrepScenario = output<void>();
   readonly statsNavigate = output<CampaignStatsNav>();
   readonly requestCharacterPick = output<CampaignMember>();

@@ -4,10 +4,13 @@ import { CommonModule } from '@angular/common';
 import type { SafeResourceUrl } from '@angular/platform-browser';
 import {
   CampaignHandout,
+  CampaignHandoutPage,
   CampaignMember,
   CampaignPregen,
   HandoutKind,
   HANDOUT_KIND_LABELS,
+  createHandoutPage,
+  handoutPlayerBody,
 } from '@core/models/Campaign/campaign';
 import { LightMarkdownPipe } from '@shared/pipes/light-markdown.pipe';
 import { PdfPagePreview } from '@shared/components/pdf-page-preview/pdf-page-preview';
@@ -138,5 +141,28 @@ export class CampaignDetailHandouts {
 
   memberLoadingKey(m: CampaignMember): string {
     return `${m.id}-${this.memberSheetScope(m)}`;
+  }
+
+  addPage(handout: CampaignHandout): void {
+    const pages = [...(handout.pages ?? []), createHandoutPage(`Page ${(handout.pages?.length ?? 0) + 1}`)];
+    this.handoutPatchImmediate.emit({ handoutId: handout.id, patch: { pages } });
+  }
+
+  patchPage(
+    handout: CampaignHandout,
+    pageId: string,
+    patch: Partial<CampaignHandoutPage>,
+  ): void {
+    const pages = (handout.pages ?? []).map((p) => (p.id === pageId ? { ...p, ...patch } : p));
+    this.handoutPatch.emit({ handoutId: handout.id, patch: { pages } });
+  }
+
+  removePage(handout: CampaignHandout, pageId: string): void {
+    const pages = (handout.pages ?? []).filter((p) => p.id !== pageId);
+    this.handoutPatchImmediate.emit({ handoutId: handout.id, patch: { pages } });
+  }
+
+  playerBody(handout: CampaignHandout): string {
+    return handoutPlayerBody(handout);
   }
 }

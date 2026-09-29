@@ -143,7 +143,7 @@ public class UpsertScheduleRsvpEndpoint(AppDbContext db, CampaignLivePublisher l
                 campaign.OwnerUserId,
                 "RSVP agenda",
                 $"{displayName} a répondu « {statusLabel} » pour « {eventTitle} ».",
-                $"/campaigns/{campaign.Id}?tab=calendar",
+                $"/campaigns/{campaign.Id}?tab=calendar&event={Uri.EscapeDataString(eventId)}",
                 ct);
         }
 

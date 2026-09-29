@@ -33,18 +33,20 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 5. ~~Prod IA : Ollama off~~ **fait** puis **revenu** (`LocalLlm__Enabled=true` + budget HybridAi ~85s / Ollama court 45s)
 
 ### Suite proposée (prioriser)
-1. ~~**Agenda : date liée à un héros seul**~~ **fait** — `POST/DELETE /me/agenda/personal` + prefs `personalScheduleEvents` ; UI Agenda campagne optionnelle
-2. ~~**IA prod : remettre Ollama**~~ **fait** — `docker-compose.prod.yml` `LocalLlm__Enabled=true` ; fallback Groq si timeout / échec local
-3. Synthèse RSVP sur hub / agenda global (compteurs Oui/Non/Peut-être)
-4. Convertir date agenda → session en 1 clic (déjà partiel) + inviter auto
-5. Timeline activité campagne filtrable (RSVP / handouts / XP / combat)
-6. Jetons custom / portraits sur battle map
-7. Multi-cartes session (changer `activeMapId` live sans quitter /play)
-8. Handouts « révélation progressive » (pages / spoiler MJ)
-9. Export PDF fiche perso polish print (déjà partiel) + pack soirée unifié
-10. Amis : partager une date agenda / lien RSVP
-11. Codex → pré-remplir run sheet session (scènes / checklist)
-12. Mode « table IRL » renforcé (QR init + écran TV + dés encodés)
+1. ~~**Agenda : date liée à un héros seul**~~ **fait**
+2. ~~**IA prod : remettre Ollama**~~ **fait**
+3. ~~Synthèse RSVP hub / agenda~~ **fait**
+4. ~~Date → session + invite auto~~ **fait**
+5. ~~Partage lien RSVP / PJ chat schedule~~ **fait**
+6. ~~Timeline filtrable (+ filtre RSVP)~~ **fait**
+7. ~~Jetons portraits (`tokenImageUrl`)~~ **fait**
+8. ~~Multi-cartes session (switcher chips)~~ **fait**
+9. ~~Handouts pages + notes MJ~~ **fait**
+10. ~~Pack soirée unifié + préremplir run sheet~~ **fait**
+11. ~~Mode table IRL (QR init + Écran TV)~~ **fait**
+12. (suite) polish PDF fiche perso print / portraits assets natifs
+
+> **Lot A+B+C (2026-09-29)** — RSVP hub/agenda, convert+invite, share, timeline RSVP, tokens image URL, map switcher, handouts progressifs, QR/TV, run sheet prépa, pack soirée unifié.
 
 > **Demain (Anthony 2026-09-27 soir)** — priorités 1+2 **faites**.
 

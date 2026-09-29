@@ -18,7 +18,10 @@ public record AgendaEventDto(
     string? Status,
     string? Location,
     string? CharacterId = null,
-    string? CharacterName = null);
+    string? CharacterName = null,
+    int RsvpYes = 0,
+    int RsvpNo = 0,
+    int RsvpMaybe = 0);
 
 public record UpsertPersonalAgendaRequest
 {
@@ -92,7 +95,12 @@ public class GetMyAgendaEndpoint(AppDbContext db) : EndpointWithoutRequest<List<
                     e.AllDay,
                     e.Kind,
                     e.Status,
-                    e.Location));
+                    e.Location,
+                    null,
+                    null,
+                    e.RsvpYes,
+                    e.RsvpNo,
+                    e.RsvpMaybe));
             }
         }
 

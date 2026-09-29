@@ -183,6 +183,19 @@ public class SendFriendMessageEndpoint(AppDbContext db, PushNotificationService 
             }
         }
 
+        if (kind == FriendChatAttachmentHelper.Schedule && payload is not null)
+        {
+            using var doc = System.Text.Json.JsonDocument.Parse(payload);
+            var campId = Guid.Parse(doc.RootElement.GetProperty("campaignId").GetString()!);
+            var (campaign, membership, isOwner) = await CampaignAccess.LoadAsync(db, campId, userId.Value, ct);
+            if (campaign is null || !CampaignAccess.CanView(isOwner, membership))
+            {
+                AddError("Campagne inaccessible.");
+                await Send.ErrorsAsync(StatusCodes.Status403Forbidden, ct);
+                return;
+            }
+        }
+
         var sender = await db.Users.AsNoTracking().FirstAsync(u => u.Id == userId, ct);
         var message = new FriendMessage
         {

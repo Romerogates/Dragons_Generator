@@ -16,7 +16,7 @@ import {
   relativeActivityTime,
 } from '../campaign-activity.util';
 
-export type ActivityFilter = 'all' | 'handouts' | 'social' | 'sessions' | 'combat';
+export type ActivityFilter = 'all' | 'handouts' | 'social' | 'sessions' | 'combat' | 'rsvp';
 
 @Component({
   selector: 'app-campaign-detail-activity',
@@ -37,6 +37,7 @@ export class CampaignDetailActivity {
     { id: 'all', label: 'Tout' },
     { id: 'handouts', label: 'Documents' },
     { id: 'social', label: 'Social' },
+    { id: 'rsvp', label: 'RSVP' },
     { id: 'sessions', label: 'Sessions' },
     { id: 'combat', label: 'Combat / XP' },
   ];
@@ -69,6 +70,8 @@ export class CampaignDetailActivity {
           'character_approved',
           'character_rejected',
         ].includes(kind);
+      case 'rsvp':
+        return kind === 'schedule_rsvp';
       case 'sessions':
         return kind === 'session_scheduled' || kind === 'session_updated';
       case 'combat':

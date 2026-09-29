@@ -1,10 +1,19 @@
 import type { CampaignHandout, CampaignSession } from '@core/models/Campaign/campaign';
+import { handoutPlayerBody } from '@core/models/Campaign/campaign';
 
-/** Export PDF « soirée » : run sheet + documents publiés. */
+export interface EveningPackExtras {
+  adventureSynopsis?: string;
+  encounterNames?: string[];
+  creatureNames?: string[];
+  playerNames?: string[];
+}
+
+/** Export PDF « soirée » : run sheet + documents publiés (+ prépa optionnelle). */
 export async function exportEveningPdf(
   campaignTitle: string,
   session: CampaignSession,
   handouts: CampaignHandout[],
+  extras?: EveningPackExtras,
 ): Promise<void> {
   const { jsPDF } = await import('jspdf');
   const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
@@ -62,15 +71,58 @@ export async function exportEveningPdf(
     writeWrapped(session.playerRecap.trim(), 10);
   }
 
+  if (
+    extras &&
+    (extras.adventureSynopsis?.trim() ||
+      extras.encounterNames?.length ||
+      extras.creatureNames?.length ||
+      extras.playerNames?.length)
+  ) {
+    doc.addPage();
+    y = margin;
+    writeWrapped('Pack table (prépa)', 14, 'bold');
+    y += 4;
+    if (extras.playerNames?.length) {
+      writeWrapped('Joueurs', 12, 'bold');
+      writeWrapped(extras.playerNames.join(', '), 10);
+      y += 4;
+    }
+    if (extras.adventureSynopsis?.trim()) {
+      writeWrapped('Synopsis', 12, 'bold');
+      writeWrapped(extras.adventureSynopsis.trim().slice(0, 1200), 10);
+      y += 4;
+    }
+    if (extras.encounterNames?.length) {
+      writeWrapped('Rencontres', 12, 'bold');
+      writeWrapped(extras.encounterNames.map((n, i) => `${i + 1}. ${n}`).join('\n'), 10);
+      y += 4;
+    }
+    if (extras.creatureNames?.length) {
+      writeWrapped('Créatures', 12, 'bold');
+      writeWrapped(extras.creatureNames.join(', '), 10);
+    }
+  }
+
   const published = handouts.filter((h) => h.published);
   for (const h of published) {
     doc.addPage();
     y = margin;
     writeWrapped(h.title?.trim() || 'Document', 14, 'bold');
     y += 4;
-    writeWrapped(h.body?.trim() || '(vide)', 10);
+    writeWrapped(handoutPlayerBody(h).trim() || '(vide)', 10);
   }
 
   const safe = (campaignTitle || 'campagne').replace(/[^\w-]+/g, '_').slice(0, 40);
-  doc.save(`${safe}-soiree.pdf`);
+  const suffix = extras ? 'pack-soiree' : 'soiree';
+  doc.save(`${safe}-${suffix}.pdf`);
+}
+
+/** Pack soirée unifié = run sheet + prépa + docs publiés. */
+export async function exportUnifiedEveningPack(
+  campaignTitle: string,
+  session: CampaignSession,
+  handouts: CampaignHandout[],
+  extras: EveningPackExtras,
+): Promise<void> {
+  await exportEveningPdf(campaignTitle, session, handouts, extras);
 }

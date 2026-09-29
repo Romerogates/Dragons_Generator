@@ -303,6 +303,23 @@
                                   {{ att.campaignTitle || 'Campagne' }}
                                 </p>
                               </a>
+                            } @else if (att.kind === 'schedule' && att.campaignId && att.eventId) {
+                              <a
+                                [routerLink]="['/campaigns', att.campaignId]"
+                                [queryParams]="{ tab: 'calendar', event: att.eventId }"
+                                class="block rounded-xl border border-cyan-400/25 bg-black/20 px-3 py-2 hover:bg-black/30 transition-colors"
+                                (click)="dock.dismissForNavigation()"
+                              >
+                                <p class="text-[10px] font-black uppercase tracking-widest opacity-80">
+                                  Date agenda · RSVP
+                                </p>
+                                <p class="font-serif text-sm mt-0.5">
+                                  {{ att.eventTitle || 'Soirée de table' }}
+                                </p>
+                                @if (att.campaignTitle) {
+                                  <p class="text-[10px] mt-1 opacity-70">{{ att.campaignTitle }}</p>
+                                }
+                              </a>
                             }
                           }
                           @if (msg.body) {

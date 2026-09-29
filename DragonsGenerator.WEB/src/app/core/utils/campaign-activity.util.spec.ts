@@ -21,8 +21,10 @@ function item(partial: Partial<CampaignActivityItem> & Pick<CampaignActivityItem
 describe('campaign-activity.util', () => {
   it('maps known labels and icons', () => {
     expect(activityLabel('handout_published')).toBe('Document publié');
+    expect(activityLabel('schedule_rsvp')).toBe('RSVP agenda');
     expect(activityLabel('unknown_event')).toBe('unknown event');
     expect(activityIcon('xp_awarded')).toContain('sparkles');
+    expect(activityIcon('schedule_rsvp')).toContain('raising-hands');
     expect(activityIcon('zzz')).toContain('memo');
   });
 

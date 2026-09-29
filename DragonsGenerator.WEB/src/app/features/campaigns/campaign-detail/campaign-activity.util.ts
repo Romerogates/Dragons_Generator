@@ -17,6 +17,7 @@ export function activityLabel(kind: string): string {
     pregen_assigned: 'Pré-tiré assigné',
     handout_published: 'Document publié',
     initiative_collection_opened: "Collecte d'initiative",
+    schedule_rsvp: 'RSVP agenda',
   };
   return labels[kind] ?? kind.replace(/_/g, ' ');
 }
@@ -38,6 +39,7 @@ export function activityIcon(kind: string): string {
     pregen_assigned: 'fluent-emoji:bust-in-silhouette',
     handout_published: 'fluent-emoji:scroll',
     initiative_collection_opened: 'fluent-emoji:dart',
+    schedule_rsvp: 'fluent-emoji:raising-hands',
   };
   return icons[kind] ?? 'fluent-emoji:memo';
 }

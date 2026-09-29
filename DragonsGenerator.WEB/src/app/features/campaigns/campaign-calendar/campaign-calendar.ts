@@ -51,6 +51,10 @@ import {
   type CalendarHeroOption,
   type TableCalendarEventView,
 } from '@core/utils/schedule-ics.util';
+import {
+  campaignScheduleEventUrl,
+  formatRsvpSummary,
+} from '@core/utils/schedule-rsvp.util';
 
 export type ScheduleEventsChange = CampaignScheduleEvent[];
 
@@ -70,14 +74,18 @@ export class CampaignCalendar {
   readonly scheduleEvents = input<CampaignScheduleEvent[]>([]);
   readonly heroOptions = input<CalendarHeroOption[]>([]);
   readonly currentUserId = input<string | null>(null);
+  /** Deep-link `?event=` — ouvre le panneau de la date. */
+  readonly focusEventId = input<string | null>(null);
 
   readonly scheduleEventsChange = output<ScheduleEventsChange>();
   readonly openSession = output<string>();
   readonly convertToSession = output<CampaignScheduleEvent>();
   readonly rsvpChange = output<{ eventId: string; status: 'yes' | 'no' | 'maybe' }>();
+  readonly focusEventConsumed = output<void>();
 
   readonly kinds = Object.entries(CAMPAIGN_SCHEDULE_KIND_LABELS) as [CampaignScheduleKind, string][];
   readonly rrulePresets = CAMPAIGN_SCHEDULE_RRULE_PRESETS;
+  readonly shareFeedback = signal<string | null>(null);
   readonly editing = signal<TableCalendarEventView | null>(null);
   readonly draft = signal<CampaignScheduleEvent | null>(null);
   readonly panelOpen = signal(false);
@@ -95,6 +103,21 @@ export class CampaignCalendar {
       untracked(() =>
         this.draft.update((prev) => (prev ? { ...prev, rsvps: next.map((r) => ({ ...r })) } : prev)),
       );
+    });
+
+    effect(() => {
+      const focusId = this.focusEventId();
+      if (!focusId) return;
+      const ev = this.scheduleEvents().find((e) => e.id === focusId);
+      if (!ev) return;
+      untracked(() => {
+        const view = buildTableCalendarEvents([], [ev], this.isOwner())[0] ?? null;
+        this.editing.set(view);
+        this.draft.set({ ...ev, characterIds: [...(ev.characterIds ?? [])] });
+        this.panelOpen.set(true);
+        this.shareFeedback.set(null);
+        this.focusEventConsumed.emit();
+      });
     });
   }
 
@@ -291,12 +314,31 @@ export class CampaignCalendar {
   }
 
   rsvpSummary(): string {
-    const list = this.draft()?.rsvps ?? [];
-    if (!list.length) return 'Aucune réponse';
-    const yes = list.filter((r) => r.status === 'yes').length;
-    const no = list.filter((r) => r.status === 'no').length;
-    const maybe = list.filter((r) => r.status === 'maybe').length;
-    return `${yes} oui · ${maybe} peut-être · ${no} non`;
+    return formatRsvpSummary(this.draft()?.rsvps);
+  }
+
+  async copyRsvpLink(): Promise<void> {
+    const d = this.draft();
+    const campaignId = this.campaignId();
+    if (!d || !campaignId) return;
+    const url = campaignScheduleEventUrl(campaignId, d.id);
+    try {
+      await navigator.clipboard.writeText(url);
+      this.shareFeedback.set('Lien RSVP copié');
+    } catch {
+      this.shareFeedback.set(url);
+    }
+    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+      try {
+        await navigator.share({
+          title: d.title || 'Date de table',
+          text: `RSVP — ${d.title || 'soirée'}`,
+          url,
+        });
+      } catch {
+        /* ignore cancel */
+      }
+    }
   }
 
   startsLocal(): string {

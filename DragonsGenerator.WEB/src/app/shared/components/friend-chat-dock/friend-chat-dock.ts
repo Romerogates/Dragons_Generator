@@ -49,6 +49,9 @@ interface ParsedAttachment {
   joinToken?: string;
   dungeonId?: string;
   dungeonName?: string;
+  eventId?: string;
+  eventTitle?: string;
+  startsAt?: string;
 }
 
 @Component({
@@ -392,7 +395,13 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
   parseAttachment(msg: FriendMessage): ParsedAttachment | null {
     if (!msg.attachmentKind || !msg.attachmentPayload) return null;
     const kind = msg.attachmentKind as FriendMessageAttachmentKind;
-    if (kind !== 'character' && kind !== 'campaign' && kind !== 'invite' && kind !== 'dungeon') {
+    if (
+      kind !== 'character' &&
+      kind !== 'campaign' &&
+      kind !== 'invite' &&
+      kind !== 'dungeon' &&
+      kind !== 'schedule'
+    ) {
       return null;
     }
     try {
@@ -417,6 +426,16 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
           joinToken: data['joinToken'],
           campaignId: data['campaignId'],
           campaignTitle: data['campaignTitle'],
+        };
+      }
+      if (kind === 'schedule') {
+        return {
+          kind,
+          campaignId: data['campaignId'],
+          campaignTitle: data['campaignTitle'],
+          eventId: data['eventId'],
+          eventTitle: data['eventTitle'],
+          startsAt: data['startsAt'],
         };
       }
       return {

@@ -478,6 +478,22 @@ export function drawDungeonToCanvas(
   }
 }
 
+const tokenImageCache = new Map<string, HTMLImageElement | 'loading' | 'error'>();
+
+function ensureTokenImage(url: string): HTMLImageElement | null {
+  const cached = tokenImageCache.get(url);
+  if (cached === 'loading' || cached === 'error') return null;
+  if (cached) return cached;
+  if (typeof Image === 'undefined') return null;
+  tokenImageCache.set(url, 'loading');
+  const img = new Image();
+  img.decoding = 'async';
+  img.onload = () => tokenImageCache.set(url, img);
+  img.onerror = () => tokenImageCache.set(url, 'error');
+  img.src = url;
+  return null;
+}
+
 function drawCombatTokens(
   ctx: CanvasRenderingContext2D,
   map: CampaignDungeonMap,
@@ -508,27 +524,41 @@ function drawCombatTokens(
     ctx.fillStyle = 'rgba(0,0,0,0.45)';
     ctx.fill();
 
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fillStyle = fill;
-    ctx.fill();
+    const img = token.imageUrl ? ensureTokenImage(token.imageUrl) : null;
+    if (img) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(img, cx - r, cy - r, r * 2, r * 2);
+      ctx.restore();
+    } else {
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fillStyle = fill;
+      ctx.fill();
+
+      const initial = (token.name.trim().charAt(0) || '?').toUpperCase();
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = `bold ${Math.max(8, Math.round(cellSize * 0.48))}px "Segoe UI", system-ui, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(initial, cx, cy + 0.5);
+    }
 
     if (token.isCurrent || token.isSelected || token.isMine) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
       ctx.strokeStyle = token.isCurrent ? '#fbbf24' : token.isSelected ? '#38bdf8' : '#a7f3d0';
       ctx.lineWidth = Math.max(1.5, cellSize * 0.12);
       ctx.stroke();
     } else {
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
       ctx.strokeStyle = 'rgba(15,18,24,0.5)';
       ctx.lineWidth = 1;
       ctx.stroke();
     }
-
-    const initial = (token.name.trim().charAt(0) || '?').toUpperCase();
-    ctx.fillStyle = '#f8fafc';
-    ctx.font = `bold ${Math.max(8, Math.round(cellSize * 0.48))}px "Segoe UI", system-ui, sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(initial, cx, cy + 0.5);
   }
 }
 

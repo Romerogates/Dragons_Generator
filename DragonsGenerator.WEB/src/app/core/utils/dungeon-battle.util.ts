@@ -13,6 +13,7 @@ export interface CombatTokenDraw {
   isCurrent?: boolean;
   isMine?: boolean;
   isSelected?: boolean;
+  imageUrl?: string | null;
 }
 
 /** Convertit un offset pixel (relatif au canvas, hors CSS scale) en case grille. */
@@ -64,6 +65,7 @@ export function combatantsToTokens(
       isCurrent: opts?.currentId === c.id,
       isMine: opts?.myId === c.id,
       isSelected: opts?.selectedId === c.id,
+      imageUrl: c.tokenImageUrl?.trim() || null,
     });
   }
   return tokens;

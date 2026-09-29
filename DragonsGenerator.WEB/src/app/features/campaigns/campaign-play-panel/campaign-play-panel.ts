@@ -434,6 +434,11 @@ export class CampaignPlayPanel implements OnDestroy {
 
   /** Jeton sélectionné pour placement (MJ). */
   readonly selectedTokenCombatantId = signal<string | null>(null);
+  readonly selectedTokenCombatant = computed(() => {
+    const id = this.selectedTokenCombatantId();
+    if (!id) return null;
+    return this.activeCombat()?.combatants.find((c) => c.id === id) ?? null;
+  });
   private tokenDrag:
     | { combatantId: string; pointerId: number; moved: boolean }
     | null = null;
@@ -2206,6 +2211,13 @@ export class CampaignPlayPanel implements OnDestroy {
     if (!combat?.initiativeCode) return '';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     return `${origin}/campaigns/${c.id}/init?code=${combat.initiativeCode}`;
+  }
+
+  /** QR via service public (soirée IRL / téléphone joueurs). */
+  initiativeQrUrl(): string {
+    const url = this.initiativeShareUrl();
+    if (!url) return '';
+    return `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(url)}`;
   }
 
   copyInitiativeLink(): void {

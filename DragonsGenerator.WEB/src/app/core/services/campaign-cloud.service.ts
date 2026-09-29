@@ -36,6 +36,9 @@ export interface AgendaEventDto {
   location?: string | null;
   characterId?: string | null;
   characterName?: string | null;
+  rsvpYes?: number;
+  rsvpNo?: number;
+  rsvpMaybe?: number;
 }
 
 @Injectable({ providedIn: 'root' })

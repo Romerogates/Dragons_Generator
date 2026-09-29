@@ -100,9 +100,13 @@ export class GlobalAgendaPage implements OnInit {
     this.events().map((e) => {
       const colors = eventColors(e);
       const prefix = e.source === 'personal' ? e.campaignTitle || 'Perso' : e.campaignTitle;
+      const rsvpBits =
+        e.source === 'schedule' && (e.rsvpYes || e.rsvpNo || e.rsvpMaybe)
+          ? ` · ${e.rsvpYes ?? 0}✓/${e.rsvpMaybe ?? 0}?/${e.rsvpNo ?? 0}✗`
+          : '';
       return {
         id: e.id,
-        title: `${prefix} · ${e.title}`,
+        title: `${prefix} · ${e.title}${rsvpBits}`,
         start: e.startsAt,
         end: e.endsAt ?? undefined,
         allDay: e.allDay,
@@ -115,6 +119,10 @@ export class GlobalAgendaPage implements OnInit {
           source: e.source,
           status: e.status,
           kind: e.kind,
+          scheduleEventId: scheduleEventIdFromAgendaId(e.id, e.source),
+          rsvpYes: e.rsvpYes ?? 0,
+          rsvpNo: e.rsvpNo ?? 0,
+          rsvpMaybe: e.rsvpMaybe ?? 0,
         },
       };
     }),
@@ -309,6 +317,16 @@ export class GlobalAgendaPage implements OnInit {
       return;
     }
     if (!campaignId) return;
+    if (source === 'schedule') {
+      const scheduleEventId = arg.event.extendedProps['scheduleEventId'] as string | undefined;
+      void this.router.navigate(['/campaigns', campaignId], {
+        queryParams: {
+          tab: 'calendar',
+          ...(scheduleEventId ? { event: scheduleEventId } : {}),
+        },
+      });
+      return;
+    }
     const tab = source === 'session' ? 'sessions' : 'calendar';
     void this.router.navigate(['/campaigns', campaignId], { queryParams: { tab } });
   }
@@ -319,6 +337,13 @@ function defaultTableStartsAt(): Date {
   d.setDate(d.getDate() + 1);
   d.setHours(19, 0, 0, 0);
   return d;
+}
+
+/** Id agenda = `{campaignId}:schedule:{eventId}` → eventId brut. */
+function scheduleEventIdFromAgendaId(agendaId: string, source: string | undefined): string | null {
+  if (source !== 'schedule') return null;
+  const parts = agendaId.split(':schedule:');
+  return parts.length === 2 ? parts[1] : null;
 }
 
 function eventColors(e: AgendaEventDto): { bg: string; border: string } {

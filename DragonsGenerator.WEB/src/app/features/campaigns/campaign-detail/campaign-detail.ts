@@ -80,12 +80,14 @@ import { CampaignDetailHandouts } from './campaign-detail-handouts/campaign-deta
 import { CampaignNotebook } from '../campaign-notebook/campaign-notebook';
 import { CampaignCalendar } from '../campaign-calendar/campaign-calendar';
 import { nextScheduleOccurrenceAt } from '@core/utils/schedule-ics.util';
+import { formatRsvpSummary } from '@core/utils/schedule-rsvp.util';
 import {
   buildEncountersFromPack,
   buildHandoutsFromPack,
   ENCOUNTER_PACK_PRESETS,
 } from '@core/utils/campaign-content-presets.util';
-import { exportEveningPdf } from '@core/utils/evening-pdf.util';
+import { exportEveningPdf, exportUnifiedEveningPack } from '@core/utils/evening-pdf.util';
+import { prefillRunSheetFromCampaign } from '@core/utils/run-sheet-prefill.util';
 import type { MemberCharacterAction } from './campaign-detail-roster/campaign-detail-roster';
 import type { SessionDateChangeEvent, SessionPatchEvent } from './campaign-detail-sessions/campaign-detail-sessions';
 import type { HandoutPatchEvent, HandoutPublishEvent } from './campaign-detail-handouts/campaign-detail-handouts';
@@ -222,6 +224,8 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly editingHandoutId = signal<string | null>(null);
   readonly previewHandoutId = signal<string | null>(null);
   readonly focusHandoutId = signal<string | null>(null);
+  /** Deep-link `?event=` → ouvrir le panneau date calendrier. */
+  readonly focusScheduleEventId = signal<string | null>(null);
   readonly focusDungeonMapId = signal<string | null>(null);
   readonly handoutKindFilter = signal<HandoutKind | 'all'>('all');
   readonly initiativeBoard = signal<InitiativeBoard | null>(null);
@@ -427,7 +431,12 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly nextScheduleGame = computed(() => {
     const now = Date.now();
     const events = this.campaign()?.data.scheduleEvents ?? [];
-    let best: { id: string; title: string; startsAt: string } | null = null;
+    let best: {
+      id: string;
+      title: string;
+      startsAt: string;
+      rsvpSummary: string;
+    } | null = null;
     for (const e of events) {
       if (e.kind && e.kind !== 'game') continue;
       const at = nextScheduleOccurrenceAt(e);
@@ -435,7 +444,12 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       const t = new Date(at).getTime();
       if (t < now) continue;
       if (!best || t < new Date(best.startsAt).getTime()) {
-        best = { id: e.id, title: e.title || 'Soirée de table', startsAt: at };
+        best = {
+          id: e.id,
+          title: e.title || 'Soirée de table',
+          startsAt: at,
+          rsvpSummary: formatRsvpSummary(e.rsvps),
+        };
       }
     }
     return best;
@@ -450,6 +464,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     title: string;
     at: string;
     sessionId?: string;
+    rsvpSummary?: string;
   } | null => {
     const session = this.nextPlannedSession();
     const schedule = this.nextScheduleGame();
@@ -465,7 +480,12 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       };
     }
     if (schedule) {
-      return { source: 'schedule', title: schedule.title, at: schedule.startsAt };
+      return {
+        source: 'schedule',
+        title: schedule.title,
+        at: schedule.startsAt,
+        rsvpSummary: schedule.rsvpSummary,
+      };
     }
     return null;
   });
@@ -778,16 +798,30 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       this.route.snapshot.queryParamMap.get('handoutId');
     const mapId = this.route.snapshot.queryParamMap.get('map');
     const sessionId = this.route.snapshot.queryParamMap.get('session');
-    if (tab || mapId || sessionId) {
-      this.applyTabFromRoute(tab ?? (sessionId ? 'sessions' : 'maps'), handoutId, mapId, sessionId);
+    const scheduleEventId = this.route.snapshot.queryParamMap.get('event');
+    if (tab || mapId || sessionId || scheduleEventId) {
+      this.applyTabFromRoute(
+        tab ?? (sessionId ? 'sessions' : scheduleEventId ? 'calendar' : 'maps'),
+        handoutId,
+        mapId,
+        sessionId,
+        scheduleEventId,
+      );
     }
     this.route.queryParamMap.subscribe((params) => {
       const qTab = params.get('tab');
       const qMap = params.get('map');
       const qHandout = params.get('handout') ?? params.get('handoutId');
       const qSession = params.get('session');
-      if (qMap || qSession) {
-        this.applyTabFromRoute(qTab ?? (qSession ? 'sessions' : 'maps'), qHandout, qMap, qSession);
+      const qEvent = params.get('event');
+      if (qMap || qSession || qEvent) {
+        this.applyTabFromRoute(
+          qTab ?? (qSession ? 'sessions' : qEvent ? 'calendar' : 'maps'),
+          qHandout,
+          qMap,
+          qSession,
+          qEvent,
+        );
       }
     });
     if (this.route.snapshot.queryParamMap.get('joined') === '1') {
@@ -847,12 +881,13 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.banners.dismiss(UI_BANNER_IDS.welcomeCampaign);
   }
 
-  /** Deep-link `?tab=` / `?map=` / `?session=` → nav haute + sous-onglet Préparation si besoin. */
+  /** Deep-link `?tab=` / `?map=` / `?session=` / `?event=` → nav haute + sous-onglet Préparation si besoin. */
   private applyTabFromRoute(
     tab: string,
     handoutId: string | null,
     mapId: string | null = null,
     sessionId: string | null = null,
+    scheduleEventId: string | null = null,
   ): void {
     if (mapId) {
       this.setTab('maps');
@@ -868,6 +903,11 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
           block: 'start',
         });
       }, 120);
+      return;
+    }
+    if (scheduleEventId) {
+      this.setTab('calendar');
+      this.focusScheduleEventId.set(scheduleEventId);
       return;
     }
     if (tab === 'handouts' || tab === 'players' || tab === 'overview' || tab === 'sessions' || tab === 'calendar' || tab === 'prep') {
@@ -1617,6 +1657,44 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     }
   }
 
+  async exportSessionUnifiedPack(sessionId: string): Promise<void> {
+    const c = this.campaign();
+    if (!c) return;
+    const session = (c.data.sessions ?? []).find((s) => s.id === sessionId);
+    if (!session) return;
+    try {
+      await exportUnifiedEveningPack(
+        c.title,
+        session,
+        (c.data.handouts ?? []).filter((h) => h.published),
+        {
+          adventureSynopsis: c.data.adventure,
+          encounterNames: (c.data.encounters ?? []).map((e) => e.name || 'Rencontre'),
+          creatureNames: (c.data.creatures ?? [])
+            .map((cr) => cr.customName?.trim() || cr.creatureName || '')
+            .filter(Boolean)
+            .slice(0, 40),
+          playerNames: this.players()
+            .map((p) => p.displayName || p.approvedCharacterName || '')
+            .filter(Boolean),
+        },
+      );
+    } catch {
+      this.error.set('Impossible d’exporter le pack soirée.');
+    }
+  }
+
+  prefillSessionRunSheet(sessionId: string): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    const session = (c.data.sessions ?? []).find((s) => s.id === sessionId);
+    if (!session) return;
+    const patch = prefillRunSheetFromCampaign(c.data, session);
+    if (!Object.keys(patch).length) return;
+    this.updateSession(sessionId, patch, { immediate: true });
+    this.rosterFeedback.set('Run sheet prérempli depuis la prépa.');
+  }
+
   openLevelUpFromXp(): void {
     const me = this.myPlayerMember();
     const charId = me?.approvedCharacterId;
@@ -1843,6 +1921,15 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     });
   }
 
+  /** Hub : convertir la prochaine date calendrier en session. */
+  convertNextHubSchedule(): void {
+    const next = this.nextScheduleGame();
+    if (!next) return;
+    const ev = (this.campaign()?.data.scheduleEvents ?? []).find((e) => e.id === next.id);
+    if (!ev) return;
+    this.convertScheduleEventToSession(ev);
+  }
+
   convertScheduleEventToSession(ev: CampaignScheduleEvent): void {
     const c = this.campaign();
     if (!c?.isOwner) return;
@@ -1856,13 +1943,54 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       location: ev.location || undefined,
       notes: ev.notes || undefined,
     };
-    const remaining = (c.data.scheduleEvents ?? []).filter((e) => e.id !== ev.id);
+    // Garder la date calendrier liée (RSVP visibles) plutôt que la supprimer.
+    const scheduleEvents = (c.data.scheduleEvents ?? []).map((e) =>
+      e.id === ev.id ? { ...e, linkedSessionId: session.id } : e,
+    );
     this.editingSessionId.set(session.id);
     this.setTab('sessions');
     this.saveData({
       sessions: [session, ...(c.data.sessions ?? [])],
-      scheduleEvents: remaining,
+      scheduleEvents,
     });
+
+    // Inviter auto les RSVP « oui » pas encore membres de la campagne.
+    const memberIds = new Set(this.players().map((m) => m.userId));
+    const toInvite = (ev.rsvps ?? [])
+      .filter((r) => r.status === 'yes' && r.userId && !memberIds.has(r.userId))
+      .map((r) => r.userId);
+    let invited = 0;
+    let inviteFails = 0;
+    const finishInviteFeedback = () => {
+      const yesAlready = (ev.rsvps ?? []).filter(
+        (r) => r.status === 'yes' && memberIds.has(r.userId),
+      ).length;
+      const parts = [
+        `Session « ${session.title} » créée`,
+        yesAlready ? `${yesAlready} déjà à la table` : null,
+        invited ? `${invited} invitation(s) envoyée(s)` : null,
+        inviteFails ? `${inviteFails} invitation(s) en échec` : null,
+      ].filter(Boolean);
+      this.rosterFeedback.set(parts.join(' · '));
+    };
+    if (!toInvite.length) {
+      finishInviteFeedback();
+    } else {
+      for (const userId of toInvite) {
+        this.campaigns.invitePlayer(c.id, userId).subscribe({
+          next: () => {
+            invited++;
+            this.pendingInviteUserIds.update((prev) => new Set([...prev, userId]));
+            if (invited + inviteFails === toInvite.length) finishInviteFeedback();
+          },
+          error: () => {
+            inviteFails++;
+            if (invited + inviteFails === toInvite.length) finishInviteFeedback();
+          },
+        });
+      }
+    }
+
     setTimeout(() => {
       document.getElementById('session-edit-panel')?.scrollIntoView({
         behavior: 'smooth',

@@ -304,7 +304,7 @@
             [isOwner]="c.isOwner"
             [liveSession]="activePlaySession() ?? null"
             [nextSession]="nextHubTable()?.source === 'session' ? nextPlannedSession() : null"
-            [nextSchedule]="nextHubTable()?.source === 'schedule' ? { title: nextHubTable()!.title, startsAt: nextHubTable()!.at } : null"
+            [nextSchedule]="nextHubTable()?.source === 'schedule' ? { title: nextHubTable()!.title, startsAt: nextHubTable()!.at, rsvpSummary: nextHubTable()!.rsvpSummary } : null"
             [liveSessionDateLabel]="activePlaySession() ? formatSessionDate(activePlaySession()!.scheduledAt) : ''"
             [liveSessionModeLabel]="activePlaySession() ? sessionModeLabel(activePlaySession()!.mode) : ''"
             [nextSessionDateLabel]="nextHubTable()?.source === 'session' ? formatSessionDate(nextHubTable()!.at) : ''"
@@ -338,6 +338,7 @@
             (startPlaySession)="startPlaySession($event)"
             (goSessions)="setTab('sessions')"
             (goCalendar)="setTab('calendar')"
+            (convertNextSchedule)="convertNextHubSchedule()"
             (openPrepScenario)="openPrepScenario()"
             (statsNavigate)="onStatsNavigate($event)"
             (requestCharacterPick)="requestCharacterPick($event)"
@@ -373,6 +374,8 @@
             (sessionPatchImmediate)="onSessionPatchImmediate($event)"
             (sessionDateChange)="onSessionDateChangeEvent($event)"
             (exportEveningPdf)="exportSessionEveningPdf($event)"
+            (exportUnifiedPack)="exportSessionUnifiedPack($event)"
+            (prefillRunSheet)="prefillSessionRunSheet($event)"
           />
         }
 
@@ -385,10 +388,12 @@
             [scheduleEvents]="c.data.scheduleEvents ?? []"
             [heroOptions]="calendarHeroOptions()"
             [currentUserId]="currentUserId()"
+            [focusEventId]="focusScheduleEventId()"
             (scheduleEventsChange)="onScheduleEventsChange($event)"
             (rsvpChange)="onScheduleRsvp($event)"
             (openSession)="openSessionFromCalendar($event)"
             (convertToSession)="convertScheduleEventToSession($event)"
+            (focusEventConsumed)="focusScheduleEventId.set(null)"
           />
         }
 

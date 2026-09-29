@@ -8,6 +8,7 @@ public static class FriendChatAttachmentHelper
     public const string Campaign = "campaign";
     public const string Invite = "invite";
     public const string Dungeon = "dungeon";
+    public const string Schedule = "schedule";
 
     public static bool TryValidate(
         string? kind,
@@ -24,7 +25,7 @@ public static class FriendChatAttachmentHelper
             return true;
 
         normalizedKind = kind.Trim().ToLowerInvariant();
-        if (normalizedKind is not Character and not Campaign and not Invite and not Dungeon)
+        if (normalizedKind is not Character and not Campaign and not Invite and not Dungeon and not Schedule)
         {
             error = "Type de pièce jointe invalide.";
             return false;
@@ -67,6 +68,22 @@ public static class FriendChatAttachmentHelper
                     return false;
                 }
             }
+            else if (normalizedKind == Schedule)
+            {
+                if (!root.TryGetProperty("campaignId", out var campEl) ||
+                    !Guid.TryParse(campEl.GetString(), out _))
+                {
+                    error = "Campagne invalide.";
+                    return false;
+                }
+
+                var eventId = root.TryGetProperty("eventId", out var evEl) ? evEl.GetString() : null;
+                if (string.IsNullOrWhiteSpace(eventId) || eventId.Length > 80)
+                {
+                    error = "Date agenda invalide.";
+                    return false;
+                }
+            }
             else
             {
                 var token = root.TryGetProperty("joinToken", out var tokEl) ? tokEl.GetString() : null;
@@ -105,6 +122,7 @@ public static class FriendChatAttachmentHelper
                 Campaign => "🗺 Campagne partagée",
                 Invite => "📨 Invitation campagne",
                 Dungeon => "🗺 Donjon partagé",
+                Schedule => "📅 Date agenda / RSVP",
                 _ => "📎 Pièce jointe",
             };
         }
