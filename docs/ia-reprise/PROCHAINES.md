@@ -51,6 +51,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 > **Lot D (2026-09-29)** — level-up XP table→forge ; partage « Date RSVP » chat amis ; e2e `campaign-abc-lot`.
 > **Feed + coverage (2026-09-29)** — activité `combat_ended` (API analyze + timeline filtre combat) ; specs karma RSVP / run-sheet / image-data-url / handoutPlayerBody + tests API AnalyzeCombatEnded.
 > **Quick wins MJ (2026-09-29)** — raccourcis table (Espace/N/D/F) ; fiches PNJ one-screen ; prêt joueurs ; undo 10s fog/pré-tiré/calepin ; feedback soft crit/tour/XP.
+> **Table live #6+#3 (2026-09-30)** — ordre des tours figé libre (↑↓ + drag pointeur) ; panneau secret MJ coulissant (PNJ voix/désir/peur/secret + calepins) · raccourci `S`.
 
 > **Demain (Anthony 2026-09-27 soir)** — priorités 1+2 **faites**.
 

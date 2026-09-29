@@ -105,7 +105,7 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
       }
       return;
     }
-    if (key === 'n' || key === 'd' || key === 'f') {
+    if (key === 'n' || key === 'd' || key === 'f' || key === 's') {
       if (panel.handleMjShortcut(key)) {
         event.preventDefault();
       }

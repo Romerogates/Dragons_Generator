@@ -34,16 +34,19 @@ export function createCombatant(
 
 export function createActiveCombat(
   combatants: Combatant[],
-  options?: { label?: string; encounterId?: string },
+  options?: Partial<
+    Pick<ActiveCombat, 'label' | 'encounterId' | 'turnOrderIds' | 'turnIndex' | 'round' | 'flowPhase'>
+  >,
 ): ActiveCombat {
   return {
     id: createCombatantId(),
     label: options?.label,
     encounterId: options?.encounterId,
-    round: 1,
-    turnIndex: 0,
+    round: options?.round ?? 1,
+    turnIndex: options?.turnIndex ?? 0,
     combatants,
-    flowPhase: 'setup',
+    flowPhase: options?.flowPhase ?? 'setup',
+    ...(options?.turnOrderIds?.length ? { turnOrderIds: options.turnOrderIds } : {}),
   };
 }
 
@@ -120,12 +123,49 @@ export function sortCombatants(combatants: Combatant[], turnOrderIds?: string[])
   });
 }
 
-/** Déplace un combattant dans l'ordre de tour (égalité d'initiative uniquement). */
+/**
+ * Ordre de tour affiché / avancé.
+ * Si `turnOrderIds` est figé (combat ouvert), il prime — le MJ peut réordonner librement.
+ * Les combattants absents de la liste sont ajoutés en fin (tri initiative).
+ */
+export function sortedTurnOrder(combat: ActiveCombat): Combatant[] {
+  const ids = combat.turnOrderIds;
+  if (ids?.length) {
+    const byId = new Map(combat.combatants.map((c) => [c.id, c] as const));
+    const ordered: Combatant[] = [];
+    const seen = new Set<string>();
+    for (const id of ids) {
+      const c = byId.get(id);
+      if (c) {
+        ordered.push(c);
+        seen.add(id);
+      }
+    }
+    const extras = combat.combatants.filter((c) => !seen.has(c.id));
+    if (extras.length) ordered.push(...sortCombatants(extras));
+    return ordered;
+  }
+  return sortCombatants(combat.combatants);
+}
+
+function patchTurnOrderPreservingTurn(
+  combat: ActiveCombat,
+  turnOrderIds: string[],
+): Partial<Pick<ActiveCombat, 'turnOrderIds' | 'turnIndex'>> {
+  const current = currentTurnCombatant(combat);
+  const nextCombat = { ...combat, turnOrderIds };
+  if (!current) return { turnOrderIds };
+  const active = activeTurnOrder(nextCombat);
+  const turnIndex = active.findIndex((c) => c.id === current.id);
+  return turnIndex >= 0 ? { turnOrderIds, turnIndex } : { turnOrderIds };
+}
+
+/** Déplace un combattant d’une place dans l’ordre de tour (libre). */
 export function reorderCombatantInTurnOrder(
   combat: ActiveCombat,
   combatantId: string,
   direction: -1 | 1,
-): Partial<Pick<ActiveCombat, 'turnOrderIds'>> {
+): Partial<Pick<ActiveCombat, 'turnOrderIds' | 'turnIndex'>> {
   const order = sortedTurnOrder(combat);
   const idx = order.findIndex((c) => c.id === combatantId);
   if (idx < 0) return {};
@@ -133,16 +173,11 @@ export function reorderCombatantInTurnOrder(
   const swapIdx = idx + direction;
   if (swapIdx < 0 || swapIdx >= order.length) return {};
 
-  const a = order[idx];
-  const b = order[swapIdx];
-  const ta = combatantInitiativeTotal(a);
-  const tb = combatantInitiativeTotal(b);
-  if (ta === null || tb === null || ta !== tb) return {};
-
   const ids = order.map((c) => c.id);
-  ids[idx] = b.id;
-  ids[swapIdx] = a.id;
-  return { turnOrderIds: ids };
+  const tmp = ids[idx]!;
+  ids[idx] = ids[swapIdx]!;
+  ids[swapIdx] = tmp;
+  return patchTurnOrderPreservingTurn(combat, ids);
 }
 
 export function canReorderCombatantInTurnOrder(
@@ -151,6 +186,22 @@ export function canReorderCombatantInTurnOrder(
   direction: -1 | 1,
 ): boolean {
   return reorderCombatantInTurnOrder(combat, combatantId, direction).turnOrderIds !== undefined;
+}
+
+/** Drop / saut direct vers un index dans l’ordre de tour. */
+export function moveCombatantToTurnIndex(
+  combat: ActiveCombat,
+  combatantId: string,
+  toIndex: number,
+): Partial<Pick<ActiveCombat, 'turnOrderIds' | 'turnIndex'>> {
+  const order = sortedTurnOrder(combat).map((c) => c.id);
+  const from = order.indexOf(combatantId);
+  if (from < 0) return {};
+  const clamped = Math.max(0, Math.min(toIndex, order.length - 1));
+  if (from === clamped) return {};
+  order.splice(from, 1);
+  order.splice(clamped, 0, combatantId);
+  return patchTurnOrderPreservingTurn(combat, order);
 }
 
 /** Une ligne par unité (Gobelin ×3 → Gobelin 1, 2, 3), liée à la rencontre. */
@@ -198,13 +249,9 @@ export function syncEncountersFromCombatants(
   }));
 }
 
-export function sortedTurnOrder(combat: ActiveCombat): Combatant[] {
-  return sortCombatants(combat.combatants, combat.turnOrderIds);
-}
-
 /** Figé l’ordre des tours d’après les jets (appelé en fin de collecte / ouverture du combat). */
 export function freezeTurnOrderIds(combat: ActiveCombat): string[] {
-  return sortCombatants(combat.combatants).map((c) => c.id);
+  return sortCombatants(combat.combatants, combat.turnOrderIds).map((c) => c.id);
 }
 
 /** Ordre de combat sans les unités mortes (suiv./préc.). */

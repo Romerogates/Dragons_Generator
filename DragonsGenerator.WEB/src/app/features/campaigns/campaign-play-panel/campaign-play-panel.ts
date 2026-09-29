@@ -63,6 +63,7 @@ import {
   formatCombatArchiveSummary,
   freezeTurnOrderIds,
   isCombatantDefeated,
+  moveCombatantToTurnIndex,
   reorderCombatantInTurnOrder,
   resolveCombatFlowPhase,
   sortedTurnOrder,
@@ -201,6 +202,10 @@ export class CampaignPlayPanel implements OnDestroy {
   } | null>(null);
   /** Dialogue Terminer : récap joueurs optionnel. */
   readonly endSessionDialog = signal<{ recap: string } | null>(null);
+  /** Panneau secret MJ (PNJ / calepins) — coulissant. */
+  readonly secretPanelOpen = signal(false);
+  /** Drag ordre des tours (pointeur). */
+  private turnOrderDrag: { combatantId: string; fromIndex: number } | null = null;
 
   private sessionSaveTimer: ReturnType<typeof setTimeout> | null = null;
   private initiativePollTimer: ReturnType<typeof setInterval> | null = null;
@@ -269,6 +274,33 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly combatTurnOrder = computed(() => {
     const combat = this.activeCombat();
     return combat ? sortedTurnOrder(combat) : [];
+  });
+
+  /** Réordonner librement seulement une fois l’ordre figé (combat ouvert). */
+  readonly canEditTurnOrder = computed(() => {
+    const combat = this.activeCombat();
+    return (
+      this.isDm() &&
+      this.combatFlowPhase() === 'fight' &&
+      !!combat?.turnOrderIds?.length &&
+      this.combatTurnOrder().length > 1
+    );
+  });
+
+  /** PNJ campagne avec champs secret / voix / désir / peur. */
+  readonly secretCreatureCards = computed(() => {
+    const creatures = this.campaign().data.creatures ?? [];
+    return creatures.filter(
+      (cr) =>
+        !!(
+          cr.voice?.trim() ||
+          cr.desire?.trim() ||
+          cr.fear?.trim() ||
+          cr.secret?.trim() ||
+          cr.noteStats?.trim() ||
+          cr.backstory?.trim()
+        ),
+    );
   });
 
   readonly allyCombatants = computed(() =>
@@ -745,10 +777,10 @@ export class CampaignPlayPanel implements OnDestroy {
   }
 
   /**
-   * Raccourcis MJ table : Space = tour suivant, N = notes, D = d20 table, F = fog.
+   * Raccourcis MJ table : Space = tour suivant, N = notes, S = secrets, D = d20 table, F = fog.
    * @returns true si le raccourci a été consommé.
    */
-  handleMjShortcut(key: 'space' | 'n' | 'd' | 'f'): boolean {
+  handleMjShortcut(key: 'space' | 'n' | 'd' | 'f' | 's'): boolean {
     if (!this.isDm() || this.isSpectator()) return false;
     if (key === 'space') {
       if (!this.activeCombat() || this.combatFlowPhase() !== 'fight') return false;
@@ -757,6 +789,11 @@ export class CampaignPlayPanel implements OnDestroy {
     }
     if (key === 'n') {
       this.openSessionNotes();
+      softTablePulse('dice');
+      return true;
+    }
+    if (key === 's') {
+      this.toggleSecretPanel();
       softTablePulse('dice');
       return true;
     }
@@ -951,6 +988,18 @@ export class CampaignPlayPanel implements OnDestroy {
       this.updateSession(session.id, { playPads: pads }, { immediate: true });
     }
     this.sessionView.set('notes');
+  }
+
+  toggleSecretPanel(): void {
+    this.secretPanelOpen.update((open) => !open);
+  }
+
+  openSecretPanel(): void {
+    this.secretPanelOpen.set(true);
+  }
+
+  closeSecretPanel(): void {
+    this.secretPanelOpen.set(false);
   }
 
   /** Aperçu lecture seule dérivé des calepins (pas d’édition via playNotes). */
@@ -2377,17 +2426,56 @@ export class CampaignPlayPanel implements OnDestroy {
   }
 
   canMoveCombatantTurn(combatantId: string, direction: -1 | 1): boolean {
+    if (!this.canEditTurnOrder()) return false;
     const combat = this.activeCombat();
     if (!combat) return false;
     return canReorderCombatantInTurnOrder(combat, combatantId, direction);
   }
 
   moveCombatantTurn(combatantId: string, direction: -1 | 1): void {
+    if (!this.canEditTurnOrder()) return;
     const combat = this.activeCombat();
     if (!combat) return;
     const patch = reorderCombatantInTurnOrder(combat, combatantId, direction);
     if (!patch.turnOrderIds) return;
     this.patchCombat({ ...combat, ...patch }, { immediate: true });
+  }
+
+  dropCombatantAtTurnIndex(combatantId: string, toIndex: number): void {
+    if (!this.canEditTurnOrder()) return;
+    const combat = this.activeCombat();
+    if (!combat) return;
+    const patch = moveCombatantToTurnIndex(combat, combatantId, toIndex);
+    if (!patch.turnOrderIds) return;
+    this.patchCombat({ ...combat, ...patch }, { immediate: true });
+  }
+
+  onTurnOrderDragStart(ev: PointerEvent, combatantId: string, fromIndex: number): void {
+    if (!this.canEditTurnOrder() || ev.button !== 0) return;
+    ev.preventDefault();
+    const target = ev.currentTarget as HTMLElement | null;
+    target?.setPointerCapture?.(ev.pointerId);
+    this.turnOrderDrag = { combatantId, fromIndex };
+  }
+
+  onTurnOrderDragMove(ev: PointerEvent): void {
+    const drag = this.turnOrderDrag;
+    if (!drag) return;
+    const el = document.elementFromPoint(ev.clientX, ev.clientY);
+    const row = el?.closest?.('[data-turn-order-index]') as HTMLElement | null;
+    if (!row) return;
+    const toIndex = Number(row.dataset['turnOrderIndex']);
+    if (!Number.isFinite(toIndex) || toIndex === drag.fromIndex) return;
+    this.dropCombatantAtTurnIndex(drag.combatantId, toIndex);
+    this.turnOrderDrag = { combatantId: drag.combatantId, fromIndex: toIndex };
+  }
+
+  onTurnOrderDragEnd(): void {
+    this.turnOrderDrag = null;
+  }
+
+  isTurnOrderDragging(combatantId: string): boolean {
+    return this.turnOrderDrag?.combatantId === combatantId;
   }
 
   markDefeated(encounterId: string, creatureIndex: number): void {

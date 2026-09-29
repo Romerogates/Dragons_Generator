@@ -12,7 +12,9 @@ import {
   formatCombatArchiveSummary,
   freezeTurnOrderIds,
   isCombatantDefeated,
+  moveCombatantToTurnIndex,
   sortCombatants,
+  sortedTurnOrder,
   syncEncountersFromCombatants,
   activeTurnOrder,
   reorderCombatantInTurnOrder,
@@ -144,17 +146,32 @@ describe('combat-tracker.util', () => {
     expect(combatantInitiativeTotal(a)).toBe(12);
   });
 
-  it('reorderCombatantInTurnOrder swaps tied initiative totals', () => {
+  it('reorderCombatantInTurnOrder swaps freely and preserves current turn', () => {
     const a = createCombatant({ name: 'A', kind: 'player', initiativeRoll: 15, initiativeBonus: 0 });
     const b = createCombatant({ name: 'B', kind: 'player', initiativeRoll: 15, initiativeBonus: 0 });
     const c = createCombatant({ name: 'C', kind: 'monster', initiativeRoll: 10, initiativeBonus: 0 });
-    let combat = createActiveCombat([a, b, c]);
-    expect(sortCombatants(combat.combatants).map((x) => x.name)).toEqual(['A', 'B', 'C']);
+    let combat = createActiveCombat([a, b, c], { turnOrderIds: [a.id, b.id, c.id], turnIndex: 0 });
+    expect(sortedTurnOrder(combat).map((x) => x.name)).toEqual(['A', 'B', 'C']);
 
     const patch = reorderCombatantInTurnOrder(combat, b.id, -1);
     expect(patch.turnOrderIds).toEqual([b.id, a.id, c.id]);
     combat = { ...combat, ...patch };
-    expect(sortCombatants(combat.combatants, combat.turnOrderIds).map((x) => x.name)).toEqual(['B', 'A', 'C']);
+    expect(sortedTurnOrder(combat).map((x) => x.name)).toEqual(['B', 'A', 'C']);
+    expect(currentTurnCombatant(combat)?.id).toBe(a.id);
+  });
+
+  it('moveCombatantToTurnIndex relocates across different initiatives', () => {
+    const high = createCombatant({ name: 'High', kind: 'player', initiativeRoll: 18, initiativeBonus: 0 });
+    const low = createCombatant({ name: 'Low', kind: 'player', initiativeRoll: 8, initiativeBonus: 0 });
+    const mid = createCombatant({ name: 'Mid', kind: 'monster', initiativeRoll: 12, initiativeBonus: 0 });
+    let combat = createActiveCombat([high, mid, low], {
+      turnOrderIds: [high.id, mid.id, low.id],
+      turnIndex: 0,
+    });
+    const patch = moveCombatantToTurnIndex(combat, low.id, 0);
+    combat = { ...combat, ...patch };
+    expect(sortedTurnOrder(combat).map((x) => x.name)).toEqual(['Low', 'High', 'Mid']);
+    expect(currentTurnCombatant(combat)?.id).toBe(high.id);
   });
 
   it('createCombatHistoryEntry captures combat snapshot', () => {
@@ -205,13 +222,14 @@ describe('combat-tracker.util', () => {
     expect(freezeTurnOrderIds(combat)).toEqual([high.id, low.id]);
   });
 
-  it('reorderCombatantInTurnOrder rejects invalid or mismatched swaps', () => {
+  it('reorderCombatantInTurnOrder rejects missing id or out-of-bounds moves', () => {
     const high = createCombatant({ name: 'High', kind: 'player', initiativeRoll: 18, initiativeBonus: 0 });
     const low = createCombatant({ name: 'Low', kind: 'player', initiativeRoll: 8, initiativeBonus: 0 });
-    const combat = createActiveCombat([high, low]);
+    const combat = createActiveCombat([high, low], { turnOrderIds: [high.id, low.id] });
     expect(reorderCombatantInTurnOrder(combat, 'missing', 1)).toEqual({});
-    expect(reorderCombatantInTurnOrder(combat, high.id, 1)).toEqual({});
-    expect(canReorderCombatantInTurnOrder(combat, high.id, 1)).toBeFalse();
+    expect(reorderCombatantInTurnOrder(combat, high.id, -1)).toEqual({});
+    expect(canReorderCombatantInTurnOrder(combat, high.id, -1)).toBeFalse();
+    expect(canReorderCombatantInTurnOrder(combat, high.id, 1)).toBeTrue();
   });
 
   it('advanceTurn moves backward and never drops below round 1', () => {
