@@ -48,6 +48,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 
 > **Lot A+B+C (2026-09-29)** — RSVP hub/agenda, convert+invite, share, timeline RSVP, tokens image URL, map switcher, handouts progressifs, QR/TV, run sheet prépa, pack soirée unifié.
 > **Suite polish (2026-09-29)** — portraits fichier + PDF fiche (âme/overflow/GRP sorts).
+> **Lot D (2026-09-29)** — level-up XP table→forge ; partage « Date RSVP » chat amis ; e2e `campaign-abc-lot`.
 
 > **Demain (Anthony 2026-09-27 soir)** — priorités 1+2 **faites**.
 
@@ -61,7 +62,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 5. ~~Routes `/campaigns/:id/sessions/:sessionId`~~ **fait** (redirect `?tab=sessions&session=`)
 6. ~~Packs handouts / templates carnet~~ **fait**
 7. ~~PWA / Codex offline checklist~~ **fait** (Paramètres → Application)
-8. **Level-up depuis XP table** → parcours fiche *(reporté — hors lot priorisé)*
+8. **Level-up depuis XP table** → parcours fiche **fait** (CTA fiche joueur hub + `/play` stash→`/create?levelUp=1`)
 9. ~~Assistant IA table~~ **hors scope** (pas d’abo IA pour l’instant)
 10. ~~Idle Métiers / Bivouac~~ **hors scope** (pas de bivouac entre sessions)
 

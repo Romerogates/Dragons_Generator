@@ -193,6 +193,46 @@ export class FriendChatDockComponent implements OnInit, OnDestroy {
     this.sendAttachment('campaign', { campaignId: c.id, campaignTitle: c.title });
   }
 
+  /** Prochaine date « game » de la campagne → PJ RSVP. */
+  shareCampaignNextSchedule(c: CampaignSummary): void {
+    if (this.sending()) return;
+    this.sending.set(true);
+    this.threadError.set(null);
+    this.shareMenuOpen.set(false);
+    this.campaigns.get(c.id).subscribe({
+      next: (detail) => {
+        const now = Date.now();
+        const next = [...(detail.data.scheduleEvents ?? [])]
+          .filter((e) => !e.kind || e.kind === 'game')
+          .filter((e) => {
+            const t = new Date(e.startsAt).getTime();
+            return Number.isFinite(t) && t >= now - 60_000;
+          })
+          .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())[0];
+        if (!next) {
+          this.sending.set(false);
+          this.threadError.set('Aucune date à venir sur cette campagne.');
+          return;
+        }
+        this.sendAttachment(
+          'schedule',
+          {
+            campaignId: c.id,
+            campaignTitle: c.title,
+            eventId: next.id,
+            eventTitle: next.title || 'Soirée de table',
+            startsAt: next.startsAt,
+          },
+          true,
+        );
+      },
+      error: () => {
+        this.sending.set(false);
+        this.threadError.set('Impossible de charger les dates de la campagne.');
+      },
+    });
+  }
+
   /** Partage un deep-link /join (MJ seulement). */
   shareCampaignInvite(c: CampaignSummary): void {
     if (c.role !== 'dm' || this.sending()) return;

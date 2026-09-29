@@ -14,6 +14,16 @@
       <div>
         <p class="text-[10px] uppercase tracking-wider text-slate-500 mb-1">XP campagne</p>
         <p class="text-amber-300 font-bold text-lg">{{ xpEarned() }}</p>
+        @if (member()?.approvedCharacterId) {
+          <button
+            type="button"
+            class="mt-2 min-h-10 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border border-emerald-800/50 text-emerald-300 hover:border-emerald-500/60"
+            (click)="levelUp.emit()"
+            data-testid="player-sheet-level-up"
+          >
+            Monter de niveau
+          </button>
+        }
       </div>
     </div>
     @if (nextSession(); as s) {

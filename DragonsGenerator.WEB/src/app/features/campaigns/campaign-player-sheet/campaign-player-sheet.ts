@@ -1,5 +1,11 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  input,
+  output,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import type { CampaignMember, CampaignSession } from '@core/models/Campaign/campaign';
 
@@ -18,4 +24,5 @@ export class CampaignPlayerSheet {
   readonly xpEarned = input(0);
   readonly nextSession = input<CampaignSession | null>(null);
   readonly lastHandoutTitle = input<string | null>(null);
+  readonly levelUp = output<void>();
 }

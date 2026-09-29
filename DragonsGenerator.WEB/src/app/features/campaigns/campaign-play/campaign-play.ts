@@ -17,10 +17,13 @@ import { Subscription } from 'rxjs';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { CampaignLiveService } from '@core/services/campaign-live.service';
 import { AuthService } from '@core/services/auth.service';
+import { CharacterCloudService } from '@core/services/character-cloud.service';
+import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import { CampaignSessionDockService } from '@core/services/campaign-session-dock.service';
 import { mergeRemoteLiveTable } from '@core/utils/campaign-persist.util';
 import { CampaignPlayPanel } from '../campaign-play-panel/campaign-play-panel';
 import type { CampaignDetail as CampaignDetailModel } from '@core/models/Campaign/campaign';
+import type { Character } from '@core/models/Character/character';
 
 @Component({
   selector: 'app-campaign-play',
@@ -36,6 +39,8 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
   private readonly campaigns = inject(CampaignCloudService);
   private readonly live = inject(CampaignLiveService);
   private readonly auth = inject(AuthService);
+  private readonly characters = inject(CharacterCloudService);
+  private readonly handoff = inject(CharacterHandoffService);
   private readonly sessionDock = inject(CampaignSessionDockService);
   private readonly playPanel = viewChild(CampaignPlayPanel);
 
@@ -218,8 +223,23 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
       void this.router.navigate(['/campaigns', c.id], { queryParams: { tab: 'players' } });
       return;
     }
-    void this.router.navigate(['/campaigns', c.id], {
-      queryParams: { tab: 'players', levelUp: '1', characterId: charId },
+    this.characters.get(charId).subscribe({
+      next: (row) => {
+        const character = {
+          id: row.id,
+          name: row.name,
+          ...(typeof row.data === 'object' && row.data ? row.data : {}),
+        } as Character;
+        this.handoff.stashEdit(character);
+        void this.router.navigate(['/create'], {
+          queryParams: { levelUp: '1', returnUrl: `/campaigns/${c.id}/play` },
+        });
+      },
+      error: () => {
+        void this.router.navigate(['/campaigns', c.id], {
+          queryParams: { tab: 'players', levelUp: '1', characterId: charId },
+        });
+      },
     });
   }
 }

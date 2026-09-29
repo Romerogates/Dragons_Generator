@@ -426,6 +426,14 @@
                                   >
                                     Ouvrir · {{ c.title }}
                                   </button>
+                                  <button
+                                    type="button"
+                                    class="min-h-11 px-3 py-2 rounded-lg text-[11px] border border-cyan-800/50 text-cyan-300 hover:border-cyan-500/60"
+                                    (click)="shareCampaignNextSchedule(c)"
+                                    data-testid="share-campaign-schedule"
+                                  >
+                                    Date RSVP
+                                  </button>
                                   @if (c.role === 'dm') {
                                     <button
                                       type="button"

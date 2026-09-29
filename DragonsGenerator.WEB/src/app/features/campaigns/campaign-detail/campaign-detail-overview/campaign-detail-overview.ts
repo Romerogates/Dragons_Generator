@@ -105,4 +105,5 @@ export class CampaignDetailOverview {
   readonly activityItemClick = output<CampaignActivityItem>();
   readonly goHandouts = output<void>();
   readonly firstSessionAction = output<FirstSessionAction>();
+  readonly levelUp = output<void>();
 }
