@@ -174,6 +174,51 @@ describe('combat-tracker.util', () => {
     expect(currentTurnCombatant(combat)?.id).toBe(high.id);
   });
 
+  it('sortedTurnOrder appends extras and ignores stale ids', () => {
+    const a = createCombatant({ name: 'A', kind: 'player', initiativeRoll: 12, initiativeBonus: 0 });
+    const b = createCombatant({ name: 'B', kind: 'monster', initiativeRoll: 8, initiativeBonus: 0 });
+    const combat = createActiveCombat([a, b], { turnOrderIds: [a.id, 'ghost', b.id] });
+    expect(sortedTurnOrder(combat).map((c) => c.name)).toEqual(['A', 'B']);
+
+    const late = createCombatant({ name: 'Late', kind: 'npc', initiativeRoll: 20, initiativeBonus: 0 });
+    const withExtra = createActiveCombat([a, b, late], { turnOrderIds: [a.id, b.id] });
+    expect(sortedTurnOrder(withExtra).map((c) => c.name)).toEqual(['A', 'B', 'Late']);
+  });
+
+  it('moveCombatantToTurnIndex rejects no-ops and clamps index', () => {
+    const a = createCombatant({ name: 'A', kind: 'player', initiativeRoll: 15, initiativeBonus: 0 });
+    const b = createCombatant({ name: 'B', kind: 'player', initiativeRoll: 10, initiativeBonus: 0 });
+    const combat = createActiveCombat([a, b], { turnOrderIds: [a.id, b.id], turnIndex: 0 });
+    expect(moveCombatantToTurnIndex(combat, 'missing', 0)).toEqual({});
+    expect(moveCombatantToTurnIndex(combat, a.id, 0)).toEqual({});
+    const toEnd = moveCombatantToTurnIndex(combat, a.id, 99);
+    expect(toEnd.turnOrderIds).toEqual([b.id, a.id]);
+  });
+
+  it('reorder preserves turnIndex when current fighter stays active', () => {
+    const a = createCombatant({
+      name: 'A',
+      kind: 'player',
+      initiativeRoll: 15,
+      initiativeBonus: 0,
+      currentHp: 0,
+      defeated: true,
+    });
+    const b = createCombatant({ name: 'B', kind: 'player', initiativeRoll: 10, initiativeBonus: 0 });
+    const c = createCombatant({ name: 'C', kind: 'monster', initiativeRoll: 8, initiativeBonus: 0 });
+    // Active order is B, C — turnIndex 0 = B
+    let combat = createActiveCombat([a, b, c], {
+      turnOrderIds: [a.id, b.id, c.id],
+      turnIndex: 0,
+      flowPhase: 'fight',
+    });
+    expect(currentTurnCombatant(combat)?.id).toBe(b.id);
+    const patch = reorderCombatantInTurnOrder(combat, c.id, -1);
+    combat = { ...combat, ...patch };
+    expect(sortedTurnOrder(combat).map((x) => x.name)).toEqual(['A', 'C', 'B']);
+    expect(currentTurnCombatant(combat)?.id).toBe(b.id);
+  });
+
   it('createCombatHistoryEntry captures combat snapshot', () => {
     const a = createCombatant({ name: 'Théo', kind: 'player', initiativeRoll: 18, initiativeBonus: 2 });
     const combat = createActiveCombat([a], { label: 'Grotte' });

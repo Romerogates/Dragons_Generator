@@ -112,6 +112,21 @@
         @if (isDm()) {
           <button
             type="button"
+            class="px-4 py-2 rounded-xl text-[10px] font-black uppercase border text-slate-300 hover:border-emerald-600/50"
+            [class]="
+              zenMode()
+                ? 'bg-emerald-900/40 border-emerald-700/50 text-emerald-300'
+                : 'bg-[#1b2028] border-slate-700'
+            "
+            (click)="toggleZenMode()"
+            data-testid="toggle-zen-mode"
+            [attr.aria-pressed]="zenMode()"
+            [attr.title]="zenMode() ? 'Afficher le chrome complet' : 'Mode zen — chrome minimal'"
+          >
+            {{ zenMode() ? 'Zen ON' : 'Zen' }}
+          </button>
+          <button
+            type="button"
             class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-rose-900/40 border border-rose-700/50 text-rose-200 hover:bg-rose-800/50"
             (click)="toggleSecretPanel()"
             data-testid="open-secret-panel"
@@ -120,27 +135,80 @@
           >
             Secrets MJ
           </button>
-          <button
-            type="button"
-            class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-900/40 border border-emerald-700/50 text-emerald-300 hover:bg-emerald-800/50"
-            (click)="endPlaySession()"
-            data-testid="end-play-session"
-          >
-            Terminer la session
-          </button>
+          @if (!zenMode()) {
+            <button
+              type="button"
+              class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-900/40 border border-emerald-700/50 text-emerald-300 hover:bg-emerald-800/50"
+              (click)="endPlaySession()"
+              data-testid="end-play-session"
+            >
+              Terminer la session
+            </button>
+          }
         }
       </div>
     </div>
 
-    @if (isDm() && fullscreen()) {
+    @if (isDm() && fullscreen() && !zenMode()) {
       <p class="text-[10px] text-slate-500 mb-2">
         Raccourcis :
         <kbd class="text-slate-400">Espace</kbd> tour ·
         <kbd class="text-slate-400">N</kbd> notes ·
         <kbd class="text-slate-400">S</kbd> secrets ·
         <kbd class="text-slate-400">D</kbd> d20 ·
-        <kbd class="text-slate-400">F</kbd> fog
+        <kbd class="text-slate-400">F</kbd> fog ·
+        <kbd class="text-slate-400">Z</kbd> zen
       </p>
+    }
+
+    @if (nextAction(); as next) {
+      <div
+        class="rounded-xl border px-4 py-3 flex flex-wrap items-center justify-between gap-3"
+        role="status"
+        data-testid="play-next-action"
+        [class]="
+          next.tone === 'sky'
+            ? 'border-sky-800/50 bg-sky-950/30'
+            : next.tone === 'amber'
+              ? 'border-amber-800/50 bg-amber-950/30'
+              : next.tone === 'emerald'
+                ? 'border-emerald-800/50 bg-emerald-950/30'
+                : next.tone === 'rose'
+                  ? 'border-rose-800/50 bg-rose-950/30'
+                  : 'border-slate-700 bg-[#1b2028]/80'
+        "
+      >
+        <div class="min-w-0">
+          <p
+            class="text-[10px] font-black uppercase tracking-widest"
+            [class]="
+              next.tone === 'sky'
+                ? 'text-sky-400'
+                : next.tone === 'amber'
+                  ? 'text-amber-400'
+                  : next.tone === 'emerald'
+                    ? 'text-emerald-400'
+                    : next.tone === 'rose'
+                      ? 'text-rose-400'
+                      : 'text-slate-400'
+            "
+          >
+            Prochaine action
+          </p>
+          <p class="text-sm font-serif text-slate-100 mt-0.5">{{ next.title }}</p>
+          <p class="text-xs text-slate-400 mt-0.5">{{ next.detail }}</p>
+        </div>
+        @if (next.ctaLabel && next.cta) {
+          <button
+            type="button"
+            class="shrink-0 min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
+            (click)="runNextActionCta()"
+            data-testid="play-next-action-cta"
+          >
+            {{ next.ctaLabel }}
+          </button>
+        }
+      </div>
     }
 
     @if (saving()) {
@@ -149,7 +217,7 @@
       </p>
     }
 
-    @if (approvedPlayers().length) {
+    @if (approvedPlayers().length && !zenMode()) {
       <div class="rounded-xl border border-sky-800/35 bg-sky-950/15 p-3 space-y-2">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">
@@ -238,7 +306,7 @@
       </div>
     }
 
-    @if (isDm() && fullscreen()) {
+    @if (isDm() && fullscreen() && !zenMode()) {
       <nav
         class="sticky z-20 -mx-1 mb-3 flex flex-nowrap gap-1 overflow-x-auto overscroll-x-contain rounded-xl border border-emerald-900/40 bg-[#141a16]/95 p-1 backdrop-blur-sm top-[var(--dg-sticky-below-play)]"
         aria-label="Sections de la session"
@@ -1001,9 +1069,10 @@
         @if (currentTurn(); as turn) {
           <div
             class="sticky z-30 space-y-3 rounded-xl border border-amber-800/40 bg-amber-950/90 px-4 py-3 backdrop-blur-sm shadow-lg shadow-black/20"
+            data-testid="play-turn-banner"
             [class.top-0]="!fullscreen()"
-            [class.top-[var(--dg-sticky-below-play-tabs)]]="fullscreen() && isDm()"
-            [class.top-[var(--dg-sticky-below-play)]]="fullscreen() && !isDm()"
+            [class.top-[var(--dg-sticky-below-play-tabs)]]="fullscreen() && isDm() && !zenMode()"
+            [class.top-[var(--dg-sticky-below-play)]]="fullscreen() && (!isDm() || zenMode())"
           >
             <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
               <p [class]="fullscreen() ? 'text-base sm:text-lg font-serif text-amber-200' : 'font-serif text-amber-200'">
@@ -1156,19 +1225,13 @@
               type="button"
               class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-amber-600 text-white disabled:opacity-40"
               [disabled]="!canContinueToInitiative()"
-              [attr.title]="
-                canContinueToInitiative()
-                  ? null
-                  : 'Ajoutez au moins un allié et un adversaire'
-              "
+              [attr.title]="continueInitiativeHint()"
               (click)="continueToInitiativePhase()"
             >
               Continuer → Initiative
             </button>
-            @if (!canContinueToInitiative()) {
-              <p class="text-xs text-amber-200/80">
-                Bouton gris : il manque encore un allié ou un adversaire.
-              </p>
+            @if (continueInitiativeHint(); as hint) {
+              <p class="text-xs text-amber-200/80">Bouton gris : {{ hint }}</p>
             }
           </div>
         }
@@ -1183,17 +1246,13 @@
               type="button"
               class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-sky-600 text-white disabled:opacity-40"
               [disabled]="!canEnterFight()"
-              [attr.title]="
-                canEnterFight() ? null : 'Tous les combattants actifs doivent avoir une initiative'
-              "
+              [attr.title]="openFightHint()"
               (click)="openFightPhase()"
             >
               Ouvrir le combat
             </button>
-            @if (!canEnterFight()) {
-              <p class="text-xs text-sky-200/80">
-                Encore des jets manquants — ouverts pour les PJ, ou encodez côté MJ.
-              </p>
+            @if (openFightHint(); as hint) {
+              <p class="text-xs text-sky-200/80">Bouton gris : {{ hint }}</p>
             }
           </div>
         }
@@ -1398,12 +1457,16 @@
                   type="button"
                   class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white disabled:opacity-40"
                   [disabled]="!selectedTarget()"
+                  [attr.title]="selectedTarget() ? null : 'Choisissez d’abord une cible adversaire'"
                   aria-label="Continuer → Jet pour toucher"
                   (click)="confirmTargetChoice()"
                 >
                   <span class="sm:hidden">Jet →</span>
                   <span class="hidden sm:inline">Continuer → Jet pour toucher</span>
                 </button>
+                @if (!selectedTarget()) {
+                  <p class="basis-full text-xs text-violet-200/80">Bouton gris : choisissez une cible.</p>
+                }
                 <button
                   type="button"
                   class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-400"
@@ -1709,7 +1772,10 @@
                 }
               </button>
             } @empty {
-              <p class="text-xs text-slate-500 italic px-1">Aucun allié — + Allié joueur, campagne ou PNJ</p>
+              <p class="text-xs text-slate-500 italic px-1">
+                Aucun allié — ajoutez un PJ approuvé, un PNJ campagne, ou un allié manuel.
+              </p>
+              <p class="text-[10px] text-amber-200/80 px-1">Prochaine action : peupler le camp allié.</p>
             }
           </div>
 
@@ -1994,8 +2060,9 @@
               </button>
             } @empty {
               <p class="text-xs text-slate-500 italic px-1">
-                Aucun adversaire — + Adversaire ici, ou « Ajouter à la table » depuis une fiche Codex
+                Aucun adversaire — ajoutez un monstre ici, ou depuis une fiche Codex (« Ajouter à la table »).
               </p>
+              <p class="text-[10px] text-amber-200/80 px-1">Prochaine action : peupler le camp adverse.</p>
             }
           </div>
         </div>
@@ -2544,6 +2611,55 @@
         }
       </div>
     }
+
+    @if (!isDm() && !isSpectator()) {
+      <nav
+        class="fixed bottom-0 inset-x-0 z-40 border-t border-emerald-900/50 bg-[#0f1318]/95 backdrop-blur-md pb-[env(safe-area-inset-bottom,0px)] sm:hidden"
+        aria-label="Actions joueur"
+        data-testid="player-mobile-nav"
+      >
+        <div class="max-w-5xl mx-auto grid grid-cols-3 gap-1 px-2 py-2">
+          <a
+            [routerLink]="['/campaigns', c.id, 'init']"
+            [queryParams]="
+              activeCombat()?.initiativeCode ? { code: activeCombat()!.initiativeCode } : {}
+            "
+            class="min-h-12 flex flex-col items-center justify-center gap-0.5 rounded-xl text-[10px] font-black uppercase tracking-widest"
+            [class]="
+              activeCombat()?.collectingInitiative
+                ? 'bg-sky-900/50 text-sky-200'
+                : 'text-slate-400'
+            "
+            data-testid="player-mobile-init"
+          >
+            Init
+          </a>
+          <button
+            type="button"
+            class="min-h-12 flex flex-col items-center justify-center gap-0.5 rounded-xl text-[10px] font-black uppercase tracking-widest"
+            [class]="isMyTurn() ? 'bg-amber-900/50 text-amber-200' : 'text-slate-400'"
+            (click)="scrollToTurnBanner()"
+            data-testid="player-mobile-turn"
+          >
+            Tour
+          </button>
+          <button
+            type="button"
+            class="min-h-12 flex flex-col items-center justify-center gap-0.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400"
+            (click)="openHandoutsOverlay()"
+            data-testid="player-mobile-docs"
+          >
+            Docs
+            @if (publishedHandoutsCount() > 0) {
+              <span class="text-[9px] text-emerald-400 normal-case tracking-normal"
+                >({{ publishedHandoutsCount() }})</span
+              >
+            }
+          </button>
+        </div>
+      </nav>
+      <div class="h-16 sm:hidden" aria-hidden="true"></div>
+    }
   </div>
 } @else if (nextPlannedSession(); as nextSession) {
   <div
@@ -2600,7 +2716,11 @@
     <p class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Aucune session active</p>
     <p class="text-sm text-slate-300 font-serif">Planifiez une session pour jouer.</p>
     <p class="text-xs text-slate-500 max-w-sm mx-auto">
-      La préparation reste dans le hub ; le combat n’est accessible qu’après être entré en session.
+      {{
+        isDm()
+          ? 'Créez une session dans le hub, puis « Entrer en session » pour ouvrir la table.'
+          : 'Le MJ doit ouvrir une session — en attendant, proposez votre héros depuis le hub.'
+      }}
     </p>
     @if (isDm()) {
       <a
@@ -2944,7 +3064,8 @@
           </ul>
         } @else {
           <p class="text-xs text-slate-500 italic">
-            Remplissez voix / désir / peur / secret sur les créatures de la campagne (onglet Histoire).
+            Remplissez voix / désir / peur / secret sur les créatures (hub → Histoire).
+            Ensuite elles apparaissent ici pendant la table.
           </p>
         }
       </section>

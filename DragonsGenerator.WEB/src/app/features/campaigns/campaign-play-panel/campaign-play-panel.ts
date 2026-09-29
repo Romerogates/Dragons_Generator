@@ -89,6 +89,10 @@ import {
 import { mergeRemoteLiveTable } from '@core/utils/campaign-persist.util';
 import { softTablePulse } from '@core/utils/table-feedback.util';
 import {
+  resolvePlayNextAction,
+  type PlayNextAction,
+} from '@core/utils/play-next-action.util';
+import {
   normalizeSessionMode,
   sessionModeHint,
   sessionModeLabel,
@@ -204,6 +208,8 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly endSessionDialog = signal<{ recap: string } | null>(null);
   /** Panneau secret MJ (PNJ / calepins) — coulissant. */
   readonly secretPanelOpen = signal(false);
+  /** Mode zen : chrome minimal (onglets / dock secondaires repliés). */
+  readonly zenMode = signal(readZenMode());
   /** Drag ordre des tours (pointeur). */
   private turnOrderDrag: { combatantId: string; fromIndex: number } | null = null;
 
@@ -301,6 +307,54 @@ export class CampaignPlayPanel implements OnDestroy {
           cr.backstory?.trim()
         ),
     );
+  });
+
+  /** Une seule consigne claire (MJ + joueur). */
+  readonly nextAction = computed((): PlayNextAction | null => {
+    const combat = this.activeCombat();
+    const phase = this.combatFlowPhase();
+    const me = this.auth.user()?.id;
+    return resolvePlayNextAction({
+      isDm: this.isDm(),
+      isSpectator: this.isSpectator(),
+      hasActiveSession: !!this.activeSession(),
+      heroStatus: this.myHeroProposalStatus(),
+      tableReady: me ? this.isPlayerTableReady(me) : false,
+      approvedPlayerCount: this.approvedPlayers().length,
+      tableReadyCount: this.tableReadyCount(),
+      combatPhase: phase,
+      collectingInitiative: !!combat?.collectingInitiative,
+      missingInitCount: this.combatMissingInitCount(),
+      hasAlly: this.allyCombatants().length > 0,
+      hasEnemy: this.enemyCombatants().length > 0,
+      canOpenFight: this.canEnterFight(),
+      isMyTurn: this.isMyTurn(),
+      myCombatantInFight: !!this.myCombatant(),
+      playerNeedsInit: (() => {
+        const mine = this.myCombatant();
+        if (!mine) return false;
+        return combatantInitiativeTotal(mine) == null && !mine.playerSubmitted;
+      })(),
+      currentTurnName: this.currentTurn()?.name?.trim() || null,
+      publishedHandoutCount: this.publishedHandouts().length,
+    });
+  });
+
+  readonly continueInitiativeHint = computed(() => {
+    if (this.canContinueToInitiative()) return null;
+    const allies = this.allyCombatants().length;
+    const enemies = this.enemyCombatants().length;
+    if (!allies && !enemies) return 'Ajoutez au moins un allié et un adversaire.';
+    if (!allies) return 'Il manque encore un allié (PJ ou PNJ).';
+    if (!enemies) return 'Il manque encore un adversaire.';
+    return 'Ajoutez au moins un allié et un adversaire.';
+  });
+
+  readonly openFightHint = computed(() => {
+    if (this.canEnterFight()) return null;
+    const n = this.combatMissingInitCount();
+    if (n > 0) return `Encore ${n} combattant(s) sans initiative.`;
+    return 'Tous les combattants actifs doivent avoir une initiative.';
   });
 
   readonly allyCombatants = computed(() =>
@@ -780,7 +834,7 @@ export class CampaignPlayPanel implements OnDestroy {
    * Raccourcis MJ table : Space = tour suivant, N = notes, S = secrets, D = d20 table, F = fog.
    * @returns true si le raccourci a été consommé.
    */
-  handleMjShortcut(key: 'space' | 'n' | 'd' | 'f' | 's'): boolean {
+  handleMjShortcut(key: 'space' | 'n' | 'd' | 'f' | 's' | 'z'): boolean {
     if (!this.isDm() || this.isSpectator()) return false;
     if (key === 'space') {
       if (!this.activeCombat() || this.combatFlowPhase() !== 'fight') return false;
@@ -795,6 +849,10 @@ export class CampaignPlayPanel implements OnDestroy {
     if (key === 's') {
       this.toggleSecretPanel();
       softTablePulse('dice');
+      return true;
+    }
+    if (key === 'z') {
+      this.toggleZenMode();
       return true;
     }
     if (key === 'd') {
@@ -1326,7 +1384,7 @@ export class CampaignPlayPanel implements OnDestroy {
       combat.combatants.filter((c) => c.kind === 'player' && c.playerSubmitted).map((c) => c.id),
     );
     this.startInitiativePoll();
-    this.setFeedback('ok', 'Initiative : ces jets fixent l’ordre des tours.');
+    this.setFeedback('ok', 'Initiative ouverte — partagez le QR ou encodez les jets manquants.');
   }
 
   openFightPhase(): void {
@@ -1347,7 +1405,7 @@ export class CampaignPlayPanel implements OnDestroy {
     );
     this.stopInitiativePoll();
     this.resetFightStep();
-    this.setFeedback('ok', 'Combat ouvert — suivez l’ordre d’initiative.');
+    this.setFeedback('ok', 'Combat ouvert — suivez l’ordre des tours (Espace = suivant).');
   }
 
   toggleAdvancedTools(): void {
@@ -2760,7 +2818,7 @@ export class CampaignPlayPanel implements OnDestroy {
         this.notifyNewInitiativeRolls(combat);
         const players = combat.combatants.filter((cb) => cb.kind === 'player');
         if (players.length > 0 && players.every((cb) => cb.playerSubmitted)) {
-          this.setFeedback('ok', 'Tous les jets d’initiative reçus — ordre des tours prêt.');
+          this.setFeedback('ok', 'Tous les jets d’initiative reçus — vous pouvez ouvrir le combat.');
           this.closeInitiativeCollection();
         }
       },
@@ -2780,8 +2838,8 @@ export class CampaignPlayPanel implements OnDestroy {
       this.setFeedback(
         'ok',
         total != null
-          ? `${who} : ${cb.initiativeRoll}${bonusLabel} = ${total}`
-          : `${who} a envoyé son jet.`,
+          ? `${who} a envoyé son init : ${cb.initiativeRoll}${bonusLabel} = ${total}`
+          : `${who} a envoyé son jet d’initiative.`,
       );
     }
   }
@@ -2799,10 +2857,100 @@ export class CampaignPlayPanel implements OnDestroy {
         this.notifyNewInitiativeRolls(combat);
         const players = combat.combatants.filter((cb) => cb.kind === 'player');
         if (players.length > 0 && players.every((cb) => cb.playerSubmitted)) {
-          this.setFeedback('ok', 'Tous les jets d’initiative reçus — ordre des tours prêt.');
+          this.setFeedback('ok', 'Tous les jets d’initiative reçus — vous pouvez ouvrir le combat.');
           this.closeInitiativeCollection();
         }
       },
     });
+  }
+
+  toggleZenMode(): void {
+    this.zenMode.update((z) => {
+      const next = !z;
+      writeZenMode(next);
+      if (next && this.sessionView() === 'resume') {
+        this.sessionView.set('combat');
+      }
+      return next;
+    });
+    this.setFeedback(
+      'ok',
+      this.zenMode()
+        ? 'Mode zen — chrome minimal (Z pour sortir).'
+        : 'Chrome complet rétabli.',
+      { ttlMs: 2200 },
+    );
+    softTablePulse('dice');
+  }
+
+  runNextActionCta(): void {
+    const action = this.nextAction();
+    if (!action?.cta) return;
+    switch (action.cta) {
+      case 'propose':
+        this.openProposeOverlay();
+        break;
+      case 'ready':
+        this.markMyselfReady();
+        break;
+      case 'init':
+        void this.router.navigate(['/campaigns', this.campaign().id, 'init'], {
+          queryParams: this.activeCombat()?.initiativeCode
+            ? { code: this.activeCombat()!.initiativeCode }
+            : undefined,
+        });
+        break;
+      case 'handouts':
+        this.openHandoutsOverlay();
+        break;
+      case 'combat':
+        if (action.kind === 'open_combat' && this.canEnterFight()) {
+          this.openFightPhase();
+        } else if (action.kind === 'continue_initiative' && this.canContinueToInitiative()) {
+          this.continueToInitiativePhase();
+        } else {
+          this.enterCombatFlow();
+        }
+        break;
+      case 'secrets':
+        this.openSecretPanel();
+        break;
+      case 'notes':
+        this.openSessionNotes();
+        break;
+    }
+  }
+
+  markMyselfReady(): void {
+    const me = this.auth.user()?.id;
+    if (!me || this.isPlayerTableReady(me)) return;
+    this.togglePlayerTableReady(me);
+    this.setFeedback('ok', 'Vous êtes marqué prêt à la table.');
+  }
+
+  scrollToTurnBanner(): void {
+    if (typeof document === 'undefined') return;
+    const el = document.querySelector('[data-testid="play-turn-banner"]');
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+const ZEN_STORAGE_KEY = 'dragons_play_zen_mode';
+
+function readZenMode(): boolean {
+  try {
+    return typeof localStorage !== 'undefined' && localStorage.getItem(ZEN_STORAGE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function writeZenMode(on: boolean): void {
+  try {
+    if (typeof localStorage === 'undefined') return;
+    if (on) localStorage.setItem(ZEN_STORAGE_KEY, '1');
+    else localStorage.removeItem(ZEN_STORAGE_KEY);
+  } catch {
+    /* ignore */
   }
 }
