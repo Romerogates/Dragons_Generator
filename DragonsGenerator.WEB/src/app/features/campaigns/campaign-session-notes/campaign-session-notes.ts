@@ -83,6 +83,9 @@ export class CampaignSessionNotes {
   readonly dragPreview = signal<Record<string, SessionPlayPadLayout>>({});
   readonly padToRemove = signal<string | null>(null);
   readonly padNotice = signal<string | null>(null);
+  readonly padUndoAvailable = signal(false);
+  private padUndo: (() => void) | null = null;
+  private padUndoTimer: ReturnType<typeof setTimeout> | null = null;
   readonly padMax = SESSION_PLAY_PAD_MAX;
   readonly gridCols = PAD_GRID_COLS;
   readonly rowPx = PAD_GRID_ROW_PX;
@@ -189,12 +192,43 @@ export class CampaignSessionNotes {
   confirmRemovePad(): void {
     const id = this.padToRemove();
     if (!id) return;
+    const previous = this.pads().map((p) => ({ ...p }));
     this.padToRemove.set(null);
     this.emitPads(this.pads().filter((p) => p.id !== id).map((p, i) => ({ ...p, order: i })));
+    this.padNotice.set('Calepin retiré — Annuler dans 10 s.');
+    if (this.padUndoTimer) clearTimeout(this.padUndoTimer);
+    this.padUndo = () => {
+      this.emitPads(previous.map((p, i) => ({ ...p, order: i })));
+      this.padNotice.set('Calepin restauré.');
+      this.padUndo = null;
+      this.padUndoAvailable.set(false);
+    };
+    this.padUndoAvailable.set(true);
+    this.padUndoTimer = setTimeout(() => {
+      this.padUndo = null;
+      this.padUndoAvailable.set(false);
+      this.padNotice.set(null);
+      this.padUndoTimer = null;
+    }, 10_000);
+  }
+
+  runPadUndo(): void {
+    this.padUndo?.();
+    this.padUndoAvailable.set(false);
+    if (this.padUndoTimer) {
+      clearTimeout(this.padUndoTimer);
+      this.padUndoTimer = null;
+    }
   }
 
   dismissPadNotice(): void {
     this.padNotice.set(null);
+    this.padUndoAvailable.set(false);
+    this.padUndo = null;
+    if (this.padUndoTimer) {
+      clearTimeout(this.padUndoTimer);
+      this.padUndoTimer = null;
+    }
   }
 
   onPadPageChange(id: string, page: NotebookPage): void {

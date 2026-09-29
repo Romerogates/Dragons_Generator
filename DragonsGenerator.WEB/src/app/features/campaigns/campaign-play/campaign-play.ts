@@ -21,6 +21,7 @@ import { CharacterCloudService } from '@core/services/character-cloud.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import { CampaignSessionDockService } from '@core/services/campaign-session-dock.service';
 import { mergeRemoteLiveTable } from '@core/utils/campaign-persist.util';
+import { softTablePulse } from '@core/utils/table-feedback.util';
 import { CampaignPlayPanel } from '../campaign-play-panel/campaign-play-panel';
 import type { CampaignDetail as CampaignDetailModel } from '@core/models/Campaign/campaign';
 import type { Character } from '@core/models/Character/character';
@@ -69,16 +70,15 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
 
   @HostListener('document:keydown', ['$event'])
   onDocumentKeydown(event: KeyboardEvent): void {
-    if (event.key !== 'Escape' || event.defaultPrevented) return;
     const target = event.target as HTMLElement | null;
     if (
       target instanceof HTMLInputElement ||
       target instanceof HTMLTextAreaElement ||
+      target instanceof HTMLSelectElement ||
       target?.isContentEditable
     ) {
       return;
     }
-    // Sous-overlays (donjon / carnet Main) gèrent Escape en premier.
     if (
       typeof document !== 'undefined' &&
       (document.querySelector('.dungeon-shell--fullscreen') ||
@@ -86,10 +86,30 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
     ) {
       return;
     }
-    const c = this.campaign();
-    if (!c) return;
-    event.preventDefault();
-    void this.router.navigate(['/campaigns', c.id]);
+
+    if (event.key === 'Escape' && !event.defaultPrevented) {
+      const c = this.campaign();
+      if (!c) return;
+      event.preventDefault();
+      void this.router.navigate(['/campaigns', c.id]);
+      return;
+    }
+
+    if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return;
+    const panel = this.playPanel();
+    if (!panel) return;
+    const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+    if (key === ' ' || key === 'Spacebar') {
+      if (panel.handleMjShortcut('space')) {
+        event.preventDefault();
+      }
+      return;
+    }
+    if (key === 'n' || key === 'd' || key === 'f') {
+      if (panel.handleMjShortcut(key)) {
+        event.preventDefault();
+      }
+    }
   }
 
   ngOnInit(): void {
@@ -210,6 +230,7 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
     const delta = after - before;
     if (delta <= 0) return;
     this.xpNotice.set(`+${delta} XP reçue — total campagne ${after}`);
+    softTablePulse('xp');
     window.setTimeout(() => this.xpNotice.set(null), 12_000);
   }
 

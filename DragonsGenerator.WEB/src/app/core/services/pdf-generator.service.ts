@@ -624,7 +624,8 @@ export class PdfGeneratorService {
     if (armor0) this.text(pdf, armor0, P.armorX, P.armorYs[0]);
     if (armor1) this.text(pdf, armor1, P.armorX, P.armorYs[1]);
 
-    const [weapon0, weapon1] = packTwoLines(c.proficiencies.weapons ?? []);
+    // Armes : uniquement catégories / spécialisations (pas chaque wp-* — déjà en équip. / attaques).
+    const [weapon0, weapon1] = packTwoLines(this.weaponSpecializationIds(c.proficiencies.weapons ?? []));
     if (weapon0) this.text(pdf, weapon0, P.weaponX, P.weaponYs[0]);
     if (weapon1) this.text(pdf, weapon1, P.weaponX, P.weaponYs[1]);
   }
@@ -638,8 +639,17 @@ export class PdfGeneratorService {
    * (tri stable : l'ordre relatif du reste est conservé).
    */
   private prioritizeCategoryTokens(ids: string[]): string[] {
-    const isCategory = (id: string) => /^(wp-cat-|category-)/.test(id);
+    const isCategory = (id: string) => this.isWeaponOrArmorCategoryId(id);
     return [...ids].sort((a, b) => Number(isCategory(b)) - Number(isCategory(a)));
+  }
+
+  /** Catégories d'armes (courantes / guerre…) — pas les armes nommées une à une. */
+  private isWeaponOrArmorCategoryId(id: string): boolean {
+    return /^(wp-cat-|category-|ar-cat-)/.test(id);
+  }
+
+  private weaponSpecializationIds(ids: string[]): string[] {
+    return this.prioritizeCategoryTokens(ids.filter((id) => this.isWeaponOrArmorCategoryId(id)));
   }
 
   /**
@@ -921,17 +931,13 @@ export class PdfGeneratorService {
       this.textWrapped(pdf, cleanedStory, 72, 441, 97, 8.4);
     }
 
-    // Bas de page 3 : sexe / éveil / folies / corruption (souvent absents du PDF avant).
+    // Bas de page 3 : éveil / folies / corruption (pas le sexe — hors gabarit « Épopée »).
     pdf.setFontSize(8);
-    const metaBits = [
-      p.sex ? `Sexe : ${p.sex}` : '',
-      p.awakened ? 'Éveil : oui' : '',
-    ].filter(Boolean);
-    if (metaBits.length) {
-      this.text(pdf, metaBits.join(' · '), 38, 560);
+    if (p.awakened) {
+      this.text(pdf, 'Éveil : oui', 38, 560);
     }
     if (p.madness?.trim()) {
-      this.textWrapped(pdf, `Folies : ${p.madness.trim()}`, 38, 575, 120, 7, 2);
+      this.textWrapped(pdf, `Folies : ${p.madness.trim()}`, 38, 570, 120, 7, 2);
     }
     const corr = p.corruption;
     if (corr) {

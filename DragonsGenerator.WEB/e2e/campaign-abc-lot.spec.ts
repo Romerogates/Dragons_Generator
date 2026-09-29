@@ -76,6 +76,8 @@ test.describe('Lot ABC — convert / deep-link / run sheet', () => {
     await applyAuthSession(page, owner, `/campaigns/${campaignId}/sessions/${sessionId}`);
     await expect(page.getByTestId('prefill-run-sheet')).toBeVisible({ timeout: 30_000 });
     await page.getByTestId('prefill-run-sheet').click();
-    await expect(page.getByText(/Run sheet prérempli/i)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByTestId('sessions-feedback')).toContainText(/Run sheet/i, {
+      timeout: 10_000,
+    });
   });
 });

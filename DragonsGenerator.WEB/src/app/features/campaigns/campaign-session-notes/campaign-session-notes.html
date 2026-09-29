@@ -77,13 +77,24 @@
       role="status"
     >
       <span>{{ notice }}</span>
-      <button
-        type="button"
-        class="text-[10px] font-black uppercase tracking-widest text-amber-300/80 hover:text-amber-200"
-        (click)="dismissPadNotice()"
-      >
-        OK
-      </button>
+      <div class="flex items-center gap-2">
+        @if (padUndoAvailable()) {
+          <button
+            type="button"
+            class="text-[10px] font-black uppercase tracking-widest text-amber-200 hover:text-white"
+            (click)="runPadUndo()"
+          >
+            Annuler
+          </button>
+        }
+        <button
+          type="button"
+          class="text-[10px] font-black uppercase tracking-widest text-amber-300/80 hover:text-amber-200"
+          (click)="dismissPadNotice()"
+        >
+          OK
+        </button>
+      </div>
     </div>
   }
 

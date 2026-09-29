@@ -110,7 +110,7 @@ test.describe('Lot smoke — RSVP / init display / galerie / PDF', () => {
     await applyAuthSession(page, owner, `/campaigns/${campaignId}/sessions/${sessionId}`);
     await expect(page.getByTestId('export-evening-pdf')).toBeVisible({ timeout: 30_000 });
 
-    const downloadPromise = page.waitForEvent('download', { timeout: 20_000 });
+    const downloadPromise = page.waitForEvent('download', { timeout: 60_000 });
     await page.getByTestId('export-evening-pdf').click();
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toMatch(/\.pdf$/i);

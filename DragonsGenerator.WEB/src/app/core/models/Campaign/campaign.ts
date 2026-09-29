@@ -190,6 +190,8 @@ export interface CampaignSession {
   prepChecklist?: string;
   /** Récap publié aux joueurs après la session. */
   playerRecap?: string;
+  /** UserIds des joueurs « prêts » avant combat (table live). */
+  tableReadyUserIds?: string[];
 }
 
 /** Réponse d’un joueur à une date de table. */

@@ -365,6 +365,7 @@
             [hasActiveSession]="!!activePlaySession()"
             [activeSessionId]="c.data.activeSessionId ?? null"
             [dungeonMaps]="c.data.dungeonMaps ?? []"
+            [feedback]="rosterFeedback()"
             (addSession)="addSession()"
             (startEditSession)="startEditSession($event)"
             (stopEditSession)="stopEditSession()"
@@ -597,6 +598,58 @@
                                 }
                               </select>
                             </label>
+                            <div class="grid gap-2 sm:grid-cols-2 mb-3">
+                              <label class="block">
+                                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Voix</span>
+                                <input
+                                  type="text"
+                                  class="mt-1 w-full bg-[#171b22] border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200"
+                                  [ngModel]="cr.voice ?? ''"
+                                  (ngModelChange)="updateCreatureCardField(cr, 'voice', $event)"
+                                  placeholder="Grave, pressé…"
+                                />
+                              </label>
+                              <label class="block">
+                                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Désir</span>
+                                <input
+                                  type="text"
+                                  class="mt-1 w-full bg-[#171b22] border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200"
+                                  [ngModel]="cr.desire ?? ''"
+                                  (ngModelChange)="updateCreatureCardField(cr, 'desire', $event)"
+                                  placeholder="Ce qu’il veut ce soir"
+                                />
+                              </label>
+                              <label class="block">
+                                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Peur</span>
+                                <input
+                                  type="text"
+                                  class="mt-1 w-full bg-[#171b22] border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200"
+                                  [ngModel]="cr.fear ?? ''"
+                                  (ngModelChange)="updateCreatureCardField(cr, 'fear', $event)"
+                                  placeholder="Ce qu’il évite"
+                                />
+                              </label>
+                              <label class="block">
+                                <span class="text-[10px] font-black uppercase tracking-widest text-amber-500/80">Secret MJ</span>
+                                <input
+                                  type="text"
+                                  class="mt-1 w-full bg-[#171b22] border border-amber-900/40 rounded-lg px-2 py-1.5 text-xs text-amber-100/90"
+                                  [ngModel]="cr.secret ?? ''"
+                                  (ngModelChange)="updateCreatureCardField(cr, 'secret', $event)"
+                                  placeholder="Invisible aux joueurs"
+                                />
+                              </label>
+                            </div>
+                            <label class="block mb-3">
+                              <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Mini-stats</span>
+                              <input
+                                type="text"
+                                class="mt-1 w-full bg-[#171b22] border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200 font-mono"
+                                [ngModel]="cr.noteStats ?? ''"
+                                (ngModelChange)="updateCreatureCardField(cr, 'noteStats', $event)"
+                                placeholder="CA 15 · 45 PV · +5 att"
+                              />
+                            </label>
                             @if (cr.backstory) {
                               <p class="text-sm text-slate-400 italic">{{ cr.backstory }}</p>
                             }
@@ -622,10 +675,19 @@
                 <section class="space-y-6">
                   @if (pregenFeedback(); as pfb) {
                     <div
-                      class="rounded-xl border border-sky-800/40 bg-sky-950/25 px-4 py-3 text-sm text-sky-100/90"
+                      class="rounded-xl border border-sky-800/40 bg-sky-950/25 px-4 py-3 text-sm text-sky-100/90 flex flex-wrap items-center justify-between gap-2"
                       role="status"
                     >
-                      {{ pfb }}
+                      <span>{{ pfb }}</span>
+                      @if (pregenUndoAvailable()) {
+                        <button
+                          type="button"
+                          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-sky-600/50 text-sky-200 hover:bg-sky-900/40"
+                          (click)="runPregenUndo()"
+                        >
+                          Annuler
+                        </button>
+                      }
                     </div>
                   }
                   @if (!c.isOwner && readyPregensForPlayers().length) {

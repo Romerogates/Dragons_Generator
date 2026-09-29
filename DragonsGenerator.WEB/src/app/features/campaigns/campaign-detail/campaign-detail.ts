@@ -200,6 +200,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly rosterFeedback = signal<string | null>(null);
   /** Erreurs / succès locaux Pré-tirés (ne démonte pas le hub). */
   readonly pregenFeedback = signal<string | null>(null);
+  readonly pregenUndoAvailable = signal(false);
+  private pregenUndo: (() => void) | null = null;
+  private pregenUndoTimer: ReturnType<typeof setTimeout> | null = null;
   /** Bannière one-shot après /join ou proposition depuis la forge. */
   readonly welcomeBanner = signal<string | null>(null);
   readonly showWelcomeBanner = computed(
@@ -1690,7 +1693,10 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const session = (c.data.sessions ?? []).find((s) => s.id === sessionId);
     if (!session) return;
     const patch = prefillRunSheetFromCampaign(c.data, session);
-    if (!Object.keys(patch).length) return;
+    if (!Object.keys(patch).length) {
+      this.rosterFeedback.set('Run sheet déjà rempli — rien à préremplir.');
+      return;
+    }
     this.updateSession(sessionId, patch, { immediate: true });
     this.rosterFeedback.set('Run sheet prérempli depuis la prépa.');
   }
@@ -2780,6 +2786,22 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.saveData({ creatures });
   }
 
+  updateCreatureCardField(
+    cr: StoryCreatureSelection,
+    field: 'voice' | 'desire' | 'fear' | 'secret' | 'noteStats',
+    value: string,
+  ): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    const trimmed = value.trim();
+    const creatures = (c.data.creatures ?? []).map((entry) =>
+      entry.creatureId === cr.creatureId && entry.customName === cr.customName
+        ? { ...entry, [field]: trimmed || undefined }
+        : entry,
+    );
+    this.saveData({ creatures });
+  }
+
   bulkClassifyUnsorted(role: 'ally' | 'antagonist'): void {
     const c = this.campaign();
     if (!c?.isOwner) return;
@@ -2948,18 +2970,42 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   removePregen(pregenId: string): void {
     const c = this.campaign();
     if (!c) return;
-    const name =
-      (c.data.pregenCharacters ?? []).find((p) => p.id === pregenId)?.characterName ??
-      'ce pré-tiré';
+    const removed = (c.data.pregenCharacters ?? []).find((p) => p.id === pregenId);
+    const name = removed?.characterName ?? 'ce pré-tiré';
     this.askConfirm(
       'Supprimer le pré-tiré',
       `Supprimer « ${name} » de la campagne ?`,
       () => {
+        const previous = [...(c.data.pregenCharacters ?? [])];
         this.saveData({
-          pregenCharacters: (c.data.pregenCharacters ?? []).filter((p) => p.id !== pregenId),
+          pregenCharacters: previous.filter((p) => p.id !== pregenId),
         });
+        this.pregenFeedback.set(`« ${name} » retiré — Annuler dans les 10 s.`);
+        if (this.pregenUndoTimer) clearTimeout(this.pregenUndoTimer);
+        this.pregenUndo = () => {
+          this.saveData({ pregenCharacters: previous });
+          this.pregenFeedback.set('Pré-tiré restauré.');
+          this.pregenUndo = null;
+          this.pregenUndoAvailable.set(false);
+        };
+        this.pregenUndoAvailable.set(true);
+        this.pregenUndoTimer = setTimeout(() => {
+          this.pregenUndo = null;
+          this.pregenUndoAvailable.set(false);
+          this.pregenFeedback.set(null);
+          this.pregenUndoTimer = null;
+        }, 10_000);
       },
     );
+  }
+
+  runPregenUndo(): void {
+    this.pregenUndo?.();
+    this.pregenUndoAvailable.set(false);
+    if (this.pregenUndoTimer) {
+      clearTimeout(this.pregenUndoTimer);
+      this.pregenUndoTimer = null;
+    }
   }
 
   assignPregen(pregen: CampaignPregen, member: CampaignMember): void {

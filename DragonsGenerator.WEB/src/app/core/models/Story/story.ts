@@ -14,6 +14,13 @@ export interface StoryCreatureSelection {
   customName: string;
   role: CreatureRole;
   backstory: string;
+  /** Carte PNJ one-screen — improvisation MJ. */
+  voice?: string;
+  desire?: string;
+  fear?: string;
+  secret?: string;
+  /** Mini-stats libres (ex. « CA 15 · 45 PV · +5 att »). */
+  noteStats?: string;
 }
 
 export interface GenerateCreatureStoryRequest {

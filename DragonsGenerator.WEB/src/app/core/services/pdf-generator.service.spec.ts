@@ -95,11 +95,15 @@ describe('PdfGeneratorService', () => {
 
   describe('prioritizeCategoryTokens', () => {
     let prioritize: (ids: string[]) => string[];
+    let weaponSpecs: (ids: string[]) => string[];
 
     beforeEach(() => {
-      prioritize = (
-        service as unknown as { prioritizeCategoryTokens: (ids: string[]) => string[] }
-      ).prioritizeCategoryTokens.bind(service);
+      const svc = service as unknown as {
+        prioritizeCategoryTokens: (ids: string[]) => string[];
+        weaponSpecializationIds: (ids: string[]) => string[];
+      };
+      prioritize = svc.prioritizeCategoryTokens.bind(service);
+      weaponSpecs = svc.weaponSpecializationIds.bind(service);
     });
 
     it('moves weapon category tokens to the front while keeping relative order', () => {
@@ -114,6 +118,19 @@ describe('PdfGeneratorService', () => {
 
     it('handles an empty list', () => {
       expect(prioritize([])).toEqual([]);
+    });
+
+    it('keeps only weapon category specializations for the PDF aptitude box', () => {
+      expect(
+        weaponSpecs([
+          'wp-dague',
+          'wp-baton-de-combat',
+          'wp-cat-simple',
+          'category-martial-weapons',
+          'wp-lance',
+        ]),
+      ).toEqual(['wp-cat-simple', 'category-martial-weapons']);
+      expect(weaponSpecs(['wp-dague', 'wp-cimeterre'])).toEqual([]);
     });
   });
 });

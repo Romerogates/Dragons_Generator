@@ -122,6 +122,16 @@
       </div>
     </div>
 
+    @if (isDm() && fullscreen()) {
+      <p class="text-[10px] text-slate-500 mb-2">
+        Raccourcis :
+        <kbd class="text-slate-400">Espace</kbd> tour ·
+        <kbd class="text-slate-400">N</kbd> notes ·
+        <kbd class="text-slate-400">D</kbd> d20 ·
+        <kbd class="text-slate-400">F</kbd> fog
+      </p>
+    }
+
     @if (saving()) {
       <p class="text-[10px] font-black uppercase tracking-widest text-emerald-500/80 animate-pulse">
         Sauvegarde…
@@ -130,27 +140,55 @@
 
     @if (approvedPlayers().length) {
       <div class="rounded-xl border border-sky-800/35 bg-sky-950/15 p-3 space-y-2">
-        <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">
-          Héros à la table
-        </p>
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">
+            Héros à la table
+          </p>
+          <p class="text-[10px] text-slate-500">
+            {{ tableReadyCount() }}/{{ approvedPlayers().length }} prêt(s)
+          </p>
+        </div>
         <div class="flex flex-wrap gap-2">
           @for (p of approvedPlayers(); track p.id) {
-            <button
-              type="button"
-              class="px-3 py-2 rounded-xl text-left text-xs border border-sky-800/50 text-sky-100 hover:border-sky-500/60 hover:bg-sky-950/40 disabled:opacity-50"
-              [disabled]="sheetLoadingId() === p.id"
-              (click)="openMemberSheet(p, p.approvedCharacterName || p.displayName)"
+            <div
+              class="flex items-stretch rounded-xl border text-xs overflow-hidden"
+              [class]="
+                isPlayerTableReady(p.userId)
+                  ? 'border-emerald-600/60 bg-emerald-950/25'
+                  : 'border-sky-800/50 bg-sky-950/20'
+              "
             >
-              <span class="font-serif block">{{ p.approvedCharacterName }}</span>
-              <span class="text-[10px] text-slate-500">
-                {{ p.displayName }}
-                @if (sheetLoadingId() === p.id) {
-                  · …
-                } @else {
-                  · Consulter
-                }
-              </span>
-            </button>
+              <button
+                type="button"
+                class="px-3 py-2 text-left text-sky-100 hover:bg-sky-950/40 disabled:opacity-50"
+                [disabled]="sheetLoadingId() === p.id"
+                (click)="openMemberSheet(p, p.approvedCharacterName || p.displayName)"
+              >
+                <span class="font-serif block">{{ p.approvedCharacterName }}</span>
+                <span class="text-[10px] text-slate-500">
+                  {{ p.displayName }}
+                  @if (sheetLoadingId() === p.id) {
+                    · …
+                  } @else {
+                    · Consulter
+                  }
+                </span>
+              </button>
+              <button
+                type="button"
+                class="px-2.5 border-l text-[9px] font-black uppercase tracking-widest min-w-14"
+                [class]="
+                  isPlayerTableReady(p.userId)
+                    ? 'border-emerald-700/50 text-emerald-300'
+                    : 'border-sky-800/50 text-slate-400 hover:text-emerald-300'
+                "
+                [attr.aria-pressed]="isPlayerTableReady(p.userId)"
+                [attr.title]="isPlayerTableReady(p.userId) ? 'Marquer pas prêt' : 'Marquer prêt'"
+                (click)="togglePlayerTableReady(p.userId)"
+              >
+                {{ isPlayerTableReady(p.userId) ? 'Prêt' : '…' }}
+              </button>
+            </div>
           }
         </div>
       </div>
@@ -167,14 +205,25 @@
         "
       >
         <p class="leading-snug">{{ fb.text }}</p>
-        <button
-          type="button"
-          class="shrink-0 min-h-11 min-w-11 rounded-lg text-xs font-black uppercase opacity-70 hover:opacity-100"
-          aria-label="Fermer le message"
-          (click)="clearFeedback()"
-        >
-          ✕
-        </button>
+        <div class="flex shrink-0 items-center gap-1">
+          @if (fb.undo) {
+            <button
+              type="button"
+              class="min-h-11 px-3 rounded-lg text-[10px] font-black uppercase tracking-widest opacity-90 hover:opacity-100 border border-current/30"
+              (click)="runFeedbackUndo()"
+            >
+              Annuler
+            </button>
+          }
+          <button
+            type="button"
+            class="shrink-0 min-h-11 min-w-11 rounded-lg text-xs font-black uppercase opacity-70 hover:opacity-100"
+            aria-label="Fermer le message"
+            (click)="clearFeedback()"
+          >
+            ✕
+          </button>
+        </div>
       </div>
     }
 

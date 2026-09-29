@@ -86,6 +86,7 @@ import {
   type RollChoice,
 } from '@core/utils/combat-roll.util';
 import { mergeRemoteLiveTable } from '@core/utils/campaign-persist.util';
+import { softTablePulse } from '@core/utils/table-feedback.util';
 import {
   normalizeSessionMode,
   sessionModeHint,
@@ -164,7 +165,11 @@ export class CampaignPlayPanel implements OnDestroy {
 
   readonly saving = signal(false);
   readonly importingParty = signal(false);
-  readonly feedback = signal<{ kind: 'ok' | 'err'; text: string } | null>(null);
+  readonly feedback = signal<{
+    kind: 'ok' | 'err';
+    text: string;
+    undo?: () => void;
+  } | null>(null);
   /** Mode « Autre » : choix ponctuel dés / encode. */
   readonly rollChoice = signal<RollChoice>('dice');
   readonly selectedTargetId = signal<string | null>(null);
@@ -363,6 +368,11 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly approvedPlayers = computed(() =>
     this.players().filter((p) => p.proposalStatus === 'approved' && p.approvedCharacterId),
   );
+
+  readonly tableReadyCount = computed(() => {
+    const ready = new Set(this.activeSession()?.tableReadyUserIds ?? []);
+    return this.approvedPlayers().filter((p) => ready.has(p.userId)).length;
+  });
 
   /** Membre joueur courant (toute proposition). */
   readonly myPlayerMember = computed(() => {
@@ -712,13 +722,77 @@ export class CampaignPlayPanel implements OnDestroy {
     );
   }
 
-  private setFeedback(kind: 'ok' | 'err', text: string, ttlMs = 4500): void {
-    this.feedback.set({ kind, text });
+  private setFeedback(
+    kind: 'ok' | 'err',
+    text: string,
+    ttlMsOrOpts: number | { ttlMs?: number; undo?: () => void } = 4500,
+  ): void {
+    const opts =
+      typeof ttlMsOrOpts === 'number' ? { ttlMs: ttlMsOrOpts } : (ttlMsOrOpts ?? {});
+    const ttlMs = opts.ttlMs ?? (opts.undo ? 10_000 : 4500);
+    this.feedback.set({ kind, text, undo: opts.undo });
     if (this.feedbackTimer) clearTimeout(this.feedbackTimer);
     this.feedbackTimer = setTimeout(() => {
       this.feedback.set(null);
       this.feedbackTimer = null;
     }, ttlMs);
+  }
+
+  runFeedbackUndo(): void {
+    const undo = this.feedback()?.undo;
+    this.clearFeedback();
+    undo?.();
+  }
+
+  /**
+   * Raccourcis MJ table : Space = tour suivant, N = notes, D = d20 table, F = fog.
+   * @returns true si le raccourci a été consommé.
+   */
+  handleMjShortcut(key: 'space' | 'n' | 'd' | 'f'): boolean {
+    if (!this.isDm() || this.isSpectator()) return false;
+    if (key === 'space') {
+      if (!this.activeCombat() || this.combatFlowPhase() !== 'fight') return false;
+      this.nextTurn();
+      return true;
+    }
+    if (key === 'n') {
+      this.openSessionNotes();
+      softTablePulse('dice');
+      return true;
+    }
+    if (key === 'd') {
+      const r = rollDie(20);
+      this.shareDiceRoll(20, r, 'table');
+      this.setFeedback('ok', `d20 → ${r}`);
+      softTablePulse('dice');
+      return true;
+    }
+    if (key === 'f') {
+      if (!this.activeSessionMap()) {
+        this.setFeedback('err', 'Aucune carte de session pour le fog.');
+        return true;
+      }
+      this.toggleSessionFog();
+      return true;
+    }
+    return false;
+  }
+
+  isPlayerTableReady(userId: string): boolean {
+    return (this.activeSession()?.tableReadyUserIds ?? []).includes(userId);
+  }
+
+  togglePlayerTableReady(userId: string): void {
+    if (this.isSpectator()) return;
+    const session = this.activeSession();
+    if (!session) return;
+    const me = this.auth.user()?.id;
+    if (!this.isDm() && me !== userId) return;
+    const cur = new Set(session.tableReadyUserIds ?? []);
+    if (cur.has(userId)) cur.delete(userId);
+    else cur.add(userId);
+    this.patchSession({ tableReadyUserIds: [...cur] }, { immediate: true });
+    softTablePulse('ready');
   }
 
   setHpAdjustAmount(raw: string | number): void {
@@ -1080,7 +1154,15 @@ export class CampaignPlayPanel implements OnDestroy {
   toggleSessionFog(): void {
     const map = this.activeSessionMap();
     if (!map) return;
+    const prev = {
+      fogOfWarEnabled: map.fogOfWarEnabled,
+      revealedRoomIds: [...(map.revealedRoomIds ?? [])],
+    };
     this.patchSessionDungeonMap(withFogToggled(map));
+    const on = !prev.fogOfWarEnabled;
+    this.setFeedback('ok', on ? 'Fog activé.' : 'Fog désactivé.', {
+      undo: () => this.patchSessionDungeonMap(prev),
+    });
   }
 
   isSessionRoomRevealed(roomId: string): boolean {
@@ -1091,18 +1173,31 @@ export class CampaignPlayPanel implements OnDestroy {
   toggleSessionRoomReveal(roomId: string): void {
     const map = this.activeSessionMap();
     if (!map?.fogOfWarEnabled) return;
+    const prevIds = [...(map.revealedRoomIds ?? [])];
     const revealed = isRoomRevealedOnMap(map, roomId);
     this.patchSessionDungeonMap(withRoomRevealed(map, roomId, !revealed));
+    this.setFeedback('ok', revealed ? 'Salle masquée.' : 'Salle révélée.', {
+      undo: () => this.patchSessionDungeonMap({ revealedRoomIds: prevIds }),
+    });
   }
 
   revealAllSessionRooms(): void {
     const map = this.activeSessionMap();
     if (!map) return;
+    const prevIds = [...(map.revealedRoomIds ?? [])];
     this.patchSessionDungeonMap(withAllRoomsRevealed(map));
+    this.setFeedback('ok', 'Toutes les salles révélées.', {
+      undo: () => this.patchSessionDungeonMap({ revealedRoomIds: prevIds }),
+    });
   }
 
   hideAllSessionRooms(): void {
+    const map = this.activeSessionMap();
+    const prevIds = [...(map?.revealedRoomIds ?? [])];
     this.patchSessionDungeonMap(withNoRoomsRevealed());
+    this.setFeedback('ok', 'Fog tout masqué.', {
+      undo: () => this.patchSessionDungeonMap({ revealedRoomIds: prevIds }),
+    });
   }
 
   sendTableChat(): void {
@@ -2026,11 +2121,13 @@ export class CampaignPlayPanel implements OnDestroy {
           logLine: line,
         });
       }
-      const hitMsg =
-        resolution.hit === false
+      const hitMsg = resolution.fumble
+        ? 'Échec critique'
+        : resolution.hit === false
           ? 'Raté'
           : `Jet ${resolution.total} (pas de CA cible)`;
       this.setFeedback('ok', `${turn.name} → ${target.name} : ${hitMsg}`);
+      if (resolution.fumble) softTablePulse('fumble');
       this.resetFightStep();
       return;
     }
@@ -2039,10 +2136,14 @@ export class CampaignPlayPanel implements OnDestroy {
     const dice = atk.damageDice?.trim() || '1d6';
     this.pendingDamageDice.set(dice);
     this.fightStep.set('damage');
+    const touchLabel = resolution.critical
+      ? `Critique ! touche ${target.name}`
+      : `touche ${target.name}`;
     this.setFeedback(
       'ok',
-      `${turn.name} touche ${target.name} (${resolution.total} vs CA ${resolution.targetAc ?? '?'}) — lancez les dégâts.`,
+      `${turn.name} ${touchLabel} (${resolution.total} vs CA ${resolution.targetAc ?? '?'}) — lancez les dégâts.`,
     );
+    if (resolution.critical) softTablePulse('crit');
   }
 
   resolveDamageWithDie(_ignored?: number): void {
@@ -2154,6 +2255,11 @@ export class CampaignPlayPanel implements OnDestroy {
     this.selectedTargetId.set(null);
     const patch = advanceTurn(combat, 1);
     this.patchCombat({ ...combat, ...patch }, { immediate: true });
+    const next = currentTurnCombatant({ ...combat, ...patch });
+    if (next?.name) {
+      this.setFeedback('ok', `Tour de ${next.name}`, { ttlMs: 2200 });
+      softTablePulse('turn');
+    }
   }
 
   prevTurn(): void {
