@@ -320,11 +320,16 @@ export class PdfGeneratorService {
     maxLines?: number, // <-- Ajout du paramètre optionnel
   ): void {
     if (!text) return;
-    let lines = pdf.splitTextToSize(text, maxWidthMm);
+    let lines = pdf.splitTextToSize(text, maxWidthMm) as string[];
+    const truncated = !!(maxLines && maxLines > 0 && lines.length > maxLines);
 
     // Si une limite de lignes est définie, on coupe le tableau
     if (maxLines && maxLines > 0) {
       lines = lines.slice(0, maxLines);
+      if (truncated && lines.length) {
+        const last = lines[lines.length - 1]!;
+        lines[lines.length - 1] = last.length > 3 ? `${last.slice(0, -1)}…` : `${last}…`;
+      }
     }
 
     let currentY = pxToMmY(yPx);
@@ -813,6 +818,7 @@ export class PdfGeneratorService {
     pdf.setFontSize(10);
 
     const capacity = col2 ? maxLines * 2 : maxLines;
+    const overflow = features.length > capacity;
     features.slice(0, capacity).forEach((feat, i) => {
       const inCol2 = !!col2 && i >= maxLines;
       const xName = inCol2 ? col2!.nameX : nameX;
@@ -843,6 +849,13 @@ export class PdfGeneratorService {
         }
       }
     });
+    if (overflow) {
+      pdf.setFontSize(8);
+      const lastRow = maxLines - 1;
+      const y = startY + lastRow * lineH + Math.round(lineH * 0.55);
+      this.text(pdf, `… +${features.length - capacity} aptitude(s)`, nameX, y);
+      pdf.setFontSize(10);
+    }
   }
 
   /**
@@ -906,6 +919,26 @@ export class PdfGeneratorService {
         .replace(/\s+/g, ' ')
         .trim();
       this.textWrapped(pdf, cleanedStory, 72, 441, 97, 8.4);
+    }
+
+    // Bas de page 3 : sexe / éveil / folies / corruption (souvent absents du PDF avant).
+    pdf.setFontSize(8);
+    const metaBits = [
+      p.sex ? `Sexe : ${p.sex}` : '',
+      p.awakened ? 'Éveil : oui' : '',
+    ].filter(Boolean);
+    if (metaBits.length) {
+      this.text(pdf, metaBits.join(' · '), 38, 560);
+    }
+    if (p.madness?.trim()) {
+      this.textWrapped(pdf, `Folies : ${p.madness.trim()}`, 38, 575, 120, 7, 2);
+    }
+    const corr = p.corruption;
+    if (corr) {
+      const stages = [corr.stage1, corr.stage2, corr.stage3, corr.stage4]
+        .map((n, i) => `P${i + 1}:${n ?? 0}`)
+        .join(' ');
+      this.text(pdf, `Corruption ${stages}`, 402, 560);
     }
   }
 
@@ -1555,6 +1588,24 @@ export class PdfGeneratorService {
         this.text(pdf, fmt(sc.spellAttackBonus), G.guerrierAttackModX, G.guerrierAttackModY);
         break;
       }
+    }
+
+    // Liste compacte des sorts connus (la table GRP n’a pas de grille de sorts).
+    const known = (c.knownSpells ?? [])
+      .map((s) => s.name)
+      .filter(Boolean)
+      .slice(0, 18);
+    if (known.length) {
+      pdf.setFontSize(8);
+      this.textWrapped(
+        pdf,
+        `Sorts connus : ${known.join(', ')}${(c.knownSpells?.length ?? 0) > 18 ? '…' : ''}`,
+        G.nameX,
+        320,
+        160,
+        7,
+        4,
+      );
     }
   }
 }

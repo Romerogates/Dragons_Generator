@@ -434,6 +434,7 @@ export class CampaignPlayPanel implements OnDestroy {
 
   /** Jeton sélectionné pour placement (MJ). */
   readonly selectedTokenCombatantId = signal<string | null>(null);
+  readonly tokenImageError = signal<string | null>(null);
   readonly selectedTokenCombatant = computed(() => {
     const id = this.selectedTokenCombatantId();
     if (!id) return null;
@@ -968,7 +969,24 @@ export class CampaignPlayPanel implements OnDestroy {
 
   selectTokenForPlacement(combatantId: string): void {
     if (!this.isDm()) return;
+    this.tokenImageError.set(null);
     this.selectedTokenCombatantId.update((id) => (id === combatantId ? null : combatantId));
+  }
+
+  async onTokenImageFile(event: Event, combatantId: string): Promise<void> {
+    if (!this.isDm()) return;
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0];
+    if (input) input.value = '';
+    if (!file) return;
+    this.tokenImageError.set(null);
+    try {
+      const { fileToSquareJpegDataUrl } = await import('@core/utils/image-data-url.util');
+      const dataUrl = await fileToSquareJpegDataUrl(file, 192);
+      this.updateCombatant(combatantId, { tokenImageUrl: dataUrl }, { immediate: true });
+    } catch {
+      this.tokenImageError.set('Image illisible — essayez un PNG/JPEG plus léger.');
+    }
   }
 
   onBattleMapPointerDown(event: PointerEvent): void {

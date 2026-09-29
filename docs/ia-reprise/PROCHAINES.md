@@ -44,9 +44,10 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 9. ~~Handouts pages + notes MJ~~ **fait**
 10. ~~Pack soirée unifié + préremplir run sheet~~ **fait**
 11. ~~Mode table IRL (QR init + Écran TV)~~ **fait**
-12. (suite) polish PDF fiche perso print / portraits assets natifs
+12. ~~polish PDF fiche / portraits jetons natifs~~ **fait** — file→JPEG dataURL jetons ; page 3 folies/corruption/sexe ; ellipses truncations ; sorts connus GRP
 
 > **Lot A+B+C (2026-09-29)** — RSVP hub/agenda, convert+invite, share, timeline RSVP, tokens image URL, map switcher, handouts progressifs, QR/TV, run sheet prépa, pack soirée unifié.
+> **Suite polish (2026-09-29)** — portraits fichier + PDF fiche (âme/overflow/GRP sorts).
 
 > **Demain (Anthony 2026-09-27 soir)** — priorités 1+2 **faites**.
 

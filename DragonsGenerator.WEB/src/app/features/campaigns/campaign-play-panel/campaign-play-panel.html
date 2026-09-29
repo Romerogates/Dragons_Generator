@@ -645,19 +645,53 @@
                   }
                 </div>
                 @if (selectedTokenCombatant(); as selTok) {
-                  <label class="block text-[10px] text-slate-400 space-y-1">
-                    <span class="font-black uppercase tracking-widest text-slate-500"
-                      >Portrait jeton (URL)</span
-                    >
-                    <input
-                      type="url"
-                      class="w-full bg-[#0a0d13] border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200"
-                      placeholder="https://… ou data:image/…"
-                      [ngModel]="selTok.tokenImageUrl || ''"
-                      (ngModelChange)="updateCombatant(selTok.id, { tokenImageUrl: $event || null })"
-                      data-testid="token-image-url"
-                    />
-                  </label>
+                  <div class="space-y-2 rounded-lg border border-slate-800 bg-[#0a0d13]/50 p-2.5">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                      Portrait jeton
+                    </p>
+                    <div class="flex flex-wrap gap-2 items-center">
+                      <label
+                        class="min-h-9 px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase border border-sky-800/50 text-sky-300 cursor-pointer hover:border-sky-500/60"
+                      >
+                        Choisir une image
+                        <input
+                          type="file"
+                          accept="image/*"
+                          class="sr-only"
+                          data-testid="token-image-file"
+                          (change)="onTokenImageFile($event, selTok.id)"
+                        />
+                      </label>
+                      @if (selTok.tokenImageUrl) {
+                        <button
+                          type="button"
+                          class="min-h-9 px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-400"
+                          (click)="updateCombatant(selTok.id, { tokenImageUrl: null }, { immediate: true })"
+                        >
+                          Retirer
+                        </button>
+                        <img
+                          [src]="selTok.tokenImageUrl"
+                          alt=""
+                          class="w-10 h-10 rounded-full object-cover border border-slate-600"
+                        />
+                      }
+                    </div>
+                    <label class="block text-[10px] text-slate-500 space-y-1">
+                      <span>Ou coller une URL</span>
+                      <input
+                        type="url"
+                        class="w-full bg-[#0a0d13] border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200"
+                        placeholder="https://… ou data:image/…"
+                        [ngModel]="selTok.tokenImageUrl || ''"
+                        (ngModelChange)="updateCombatant(selTok.id, { tokenImageUrl: $event || null })"
+                        data-testid="token-image-url"
+                      />
+                    </label>
+                    @if (tokenImageError()) {
+                      <p class="text-[10px] text-red-400">{{ tokenImageError() }}</p>
+                    }
+                  </div>
                 }
               }
               @if (liveMap.fogOfWarEnabled && !isDm()) {
