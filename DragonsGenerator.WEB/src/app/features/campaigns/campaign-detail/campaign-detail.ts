@@ -60,6 +60,7 @@ import { formatChallengeRating, getCreatureCategoryLabel } from '@core/utils/cre
 import { shouldShowPlayerInitiativePrompt } from '@core/utils/campaign-initiative.util';
 import { resolveHubNextAction, type HubNextAction } from '@core/utils/hub-next-action.util';
 import { mergeRemoteLiveTable } from '@core/utils/campaign-persist.util';
+import { isRemoteNewer } from '@core/utils/campaign-remote-newer.util';
 import { seedNotebookFromLegacyNotes } from '@core/utils/notebook.util';
 import {
   downloadBlobUrl,
@@ -1094,10 +1095,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   }
 
   private isRemoteNewer(remoteIso: string, localIso: string): boolean {
-    const remote = Date.parse(remoteIso);
-    const local = Date.parse(localIso);
-    if (Number.isNaN(remote) || Number.isNaN(local)) return remoteIso > localIso;
-    return remote > local;
+    return isRemoteNewer(remoteIso, localIso);
   }
 
   private announcePlayerXpGain(

@@ -46,7 +46,7 @@ describe('character-export-validation.util', () => {
         weapons: ['wp-cat-simple', 'wp-cat-martial', 'wp-bouclier'],
         tools: [],
         armor: [],
-        languages: [],
+        languages: ['Commun'],
       },
       equipment: [{ refId: 'wp-epee-longue', name: 'Épée longue', qty: 1 }],
     } as unknown as Character;
@@ -62,7 +62,7 @@ describe('character-export-validation.util', () => {
       species: { id: 'spc-humain', label: 'Humain' },
       classes: [{ classId: 'cls-lettre', classLabel: 'Lettré', level: 1, hitDie: 8 }],
       totalLevel: 1,
-      proficiencies: { weapons: ['wp-mastered-choice'], tools: [], armor: [], languages: [] },
+      proficiencies: { weapons: ['wp-mastered-choice'], tools: [], armor: [], languages: ['Commun'] },
       equipment: [{ refId: 'wp-dague', name: 'Dague', qty: 1 }],
     } as unknown as Character;
 
@@ -78,7 +78,7 @@ describe('character-export-validation.util', () => {
       species: { id: 'spc-humain', label: 'Humain' },
       classes: [{ classId: 'cls-guerrier', classLabel: 'Guerrier', level: 1, hitDie: 10 }],
       totalLevel: 1,
-      proficiencies: { weapons: ['wp-epee-longue'], tools: [], armor: [], languages: [] },
+      proficiencies: { weapons: ['wp-epee-longue'], tools: [], armor: [], languages: ['Commun'] },
       equipment: [{ refId: 'wp-cat-martial', name: 'Arme', qty: 1 }],
     } as unknown as Character;
 

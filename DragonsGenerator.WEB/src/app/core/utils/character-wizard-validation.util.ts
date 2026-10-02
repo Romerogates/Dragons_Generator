@@ -2,6 +2,7 @@ import type { CharacterCreation } from '@core/models/Character/character';
 import type { ExtendedCharacterCreation } from '@core/models/Character/character-builder.types';
 import type { EquipmentSlot } from '@core/models/CharacterClasses/character-class';
 import { isMasteredProficiencyChoice } from './equipment.utils';
+import { resolveSpellQuota, spellPickCount } from './spell-quota.util';
 
 export interface WizardStepValidationContext {
   needsMagicStep: boolean;
@@ -152,7 +153,15 @@ function wizardHighLevelPicksComplete(c: CharacterCreation): boolean {
   );
 }
 
-function magicDetailsComplete(c: CharacterCreation): boolean {
+function countSpellInstances(raw: unknown): number {
+  return Array.isArray(raw) ? raw.length : 0;
+}
+
+/**
+ * Vérifie les quotas de sorts (repli kind si JSON classe absent).
+ * Exposée pour les tests ; utilisée par l’étape Magie via isWizardStepValid.
+ */
+export function magicDetailsComplete(c: CharacterCreation): boolean {
   if (!racialSpellsComplete(c)) return false;
   const details = c.spellcastingDetails as
     | {
@@ -160,21 +169,52 @@ function magicDetailsComplete(c: CharacterCreation): boolean {
         spells?: unknown[];
         deityId?: string;
         deity?: string;
+        mysticArcanum?: { spellId?: string }[];
       }
     | undefined;
   const hasSecondaryCaster = (asExtended(c).secondaryClasses ?? []).some((sc) => sc.hasSpellcasting);
   if (!c.hasSpellcasting && !hasSecondaryCaster) {
-    return !!(details?.cantrips?.length);
+    // Uniquement sorts raciaux — déjà couverts par racialSpellsComplete.
+    return true;
   }
   if (!details) return false;
-  const cantrips = Array.isArray(details.cantrips) ? details.cantrips : null;
-  const spells = Array.isArray(details.spells) ? details.spells : null;
-  if (cantrips && cantrips.length === 0 && (!spells || spells.length === 0) && !details.deityId && !details.deity) {
-    return false;
+
+  const cantripCount = countSpellInstances(details.cantrips);
+  const spellCount = countSpellInstances(details.spells);
+
+  if (c.hasSpellcasting && c.spellcastingKind) {
+    const bonusCantrips = c.subclassId === 'subcls-cercle-de-la-terre' ? 1 : 0;
+    const quota = resolveSpellQuota({
+      cls: null,
+      kind: c.spellcastingKind,
+      classLevel: c.targetLevel || 1,
+      bonusCantrips,
+    });
+    if (quota) {
+      if (cantripCount < quota.cantrips) return false;
+      const needSpells = spellPickCount(quota);
+      // Prepared full-list (prêtre / druide…) : pas d’obligation de liste « connus » au wizard.
+      if (needSpells > 0 && !quota.hasFullListAccess && spellCount < needSpells) return false;
+    }
+    if (c.spellcastingKind === 'cleric' && !(details.deityId || details.deity)) return false;
+    if (c.spellcastingKind === 'warlock') {
+      const level = c.targetLevel || 1;
+      const arcanumLevels = [11, 13, 15, 17].filter((l) => level >= l);
+      if (arcanumLevels.length) {
+        const picks = Array.isArray(details.mysticArcanum) ? details.mysticArcanum : [];
+        if (picks.filter((p) => !!p?.spellId).length < arcanumLevels.length) return false;
+      }
+    }
   }
-  if (c.spellcastingKind === 'cleric' && !(details.deityId || details.deity)) return false;
+
   if (!wizardHighLevelPicksComplete(c)) return false;
-  return !!(cantrips?.length || spells?.length || details.deityId || details.deity);
+
+  // Secondaire lanceur : au minimum un détail magique scellé (cantrips ou sorts).
+  if (hasSecondaryCaster && !c.hasSpellcasting) {
+    return cantripCount > 0 || spellCount > 0;
+  }
+
+  return cantripCount > 0 || spellCount > 0 || !!(details.deityId || details.deity);
 }
 
 function backgroundStepComplete(c: CharacterCreation): boolean {

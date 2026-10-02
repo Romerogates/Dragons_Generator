@@ -73,6 +73,8 @@ export class CharacterCreation implements OnInit {
   readonly showDraftPrompt = signal(false);
   /** Confirm avant d’effacer le brouillon (Recommencer). */
   readonly showDraftDiscardConfirm = signal(false);
+  /** Parcours level-up depuis la table (XP). */
+  readonly levelUpMode = signal(false);
 
   ngOnInit(): void {
     // 1. Mode édition depuis /characters → priorité absolue
@@ -80,7 +82,7 @@ export class CharacterCreation implements OnInit {
     if (hasEditData) {
       this.builder.checkForEditMode();
       if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('levelUp') === '1') {
-        this.builder.goToStep(1);
+        this.beginLevelUpFlow();
       }
       return;
     }
@@ -89,6 +91,24 @@ export class CharacterCreation implements OnInit {
     if (this.builder.hasPendingDraft() && !this.builder.isEditMode) {
       this.showDraftPrompt.set(true);
     }
+  }
+
+  /**
+   * Level-up dédié : +1 niveau, reste sur Niveau pour valider, puis entrée ASI.
+   * (Le niveau est verrouillé après l’étape Classe — d’où le passage par step 1.)
+   */
+  private beginLevelUpFlow(): void {
+    this.levelUpMode.set(true);
+    this.builder.goToStep(1);
+    const cur = this.builder.targetLevel();
+    if (cur < 20) {
+      this.builder.setTargetLevel(cur + 1);
+    }
+  }
+
+  /** Raccourci : aller aux caractéristiques (ASI / dons du nouveau niveau). */
+  jumpToAbilitiesForLevelUp(): void {
+    this.builder.goToStep(6);
   }
 
   resumeDraft(): void {

@@ -679,9 +679,20 @@ export class MagicStep implements OnInit {
   }
 
   readonly isConfirmed = computed(() => {
-    const details = this.builder.creation().spellcastingDetails as SpellcastingDetailsDraft;
-    return !!details?.cantrips;
+    const details = this.builder.creation().spellcastingDetails as SpellcastingDetailsDraft & {
+      confirmed?: boolean;
+    };
+    return details?.confirmed === true;
   });
+
+  continueAfterConfirm(): void {
+    if (!this.selectionComplete()) return;
+    if (!this.isConfirmed()) {
+      this.confirm();
+      return;
+    }
+    this.builder.nextStep();
+  }
 
   // === Lifecycle ===
 
@@ -1038,6 +1049,7 @@ export class MagicStep implements OnInit {
     const deity = this.deities().find((d) => d.id === this.selectedDeityId());
 
     const details = {
+      confirmed: true,
       cantrips: cantripInstances,
       spells: spellInstances,
       deity: deity?.name ?? '',

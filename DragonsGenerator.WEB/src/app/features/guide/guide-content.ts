@@ -40,7 +40,7 @@ export const GUIDE_NAV_GROUPS: GuideNavGroup[] = [
   {
     id: 'discover',
     label: 'Aide du site',
-    sectionIds: ['parcours', 'oneshot', 'actions', 'journal', 'demarrage'],
+    sectionIds: ['parcours', 'oneshot-parcours', 'actions', 'journal', 'demarrage'],
   },
   {
     id: 'tools',
@@ -61,7 +61,7 @@ export const GUIDE_NAV_GROUPS: GuideNavGroup[] = [
 
 export const GUIDE_ALL_NAV: GuideNavItem[] = [
     { id: 'parcours', label: 'Parcours', icon: 'fluent-emoji:compass', accent: 'text-amber-400', audience: 'all' },
-    { id: 'oneshot', label: 'One-shot', icon: 'fluent-emoji:film-frames', accent: 'text-pink-400', audience: 'all' },
+    { id: 'oneshot-parcours', label: 'One-shot', icon: 'fluent-emoji:film-frames', accent: 'text-pink-400', audience: 'all' },
     { id: 'actions', label: '30 secondes', icon: 'fluent-emoji:high-voltage', accent: 'text-amber-400', audience: 'all' },
     { id: 'journal', label: 'Journal', icon: 'fluent-emoji:newspaper', accent: 'text-violet-400', audience: 'all' },
     { id: 'demarrage', label: 'Premiers pas', icon: 'fluent-emoji:rocket', accent: 'text-amber-400', audience: 'all' },
@@ -105,7 +105,7 @@ export const GUIDE_QUICK_CARDS: GuideQuickCard[] = [
       title: 'Codex',
       description: 'Règles, classes, bestiaire…',
       icon: 'fluent-emoji:books',
-      link: '/species',
+      link: '/codex',
       accent: 'border-emerald-500/40 hover:border-emerald-400 bg-emerald-950/20',
       prefetch: 'species',
     },
@@ -669,7 +669,7 @@ export const GUIDE_FEATURE_INDEX: GuideIndexItem[] = [
     { label: 'Historique des combats', description: 'Résumé après combat', sectionId: 'initiative', audience: 'dm' },
     { label: 'Import party', description: 'PJ approuvés dans le tracker', sectionId: 'table', audience: 'dm' },
     { label: 'Notifications push', description: 'Sessions, init, propositions, messages', sectionId: 'notifications', audience: 'all' },
-    { label: 'One-shot type', description: 'Scénario de session complète', sectionId: 'oneshot', audience: 'all' },
+    { label: 'One-shot type', description: 'Scénario de session complète', sectionId: 'oneshot-parcours', audience: 'all' },
     { label: 'Pré-tirés', description: 'Héros assignables', sectionId: 'scenario', audience: 'all' },
     { label: 'Proposition de personnage', description: 'Propose → push → valider', sectionId: 'scenario', audience: 'all' },
     { label: 'Table de jeu', description: 'Session live MJ + feedback', sectionId: 'table', audience: 'dm' },

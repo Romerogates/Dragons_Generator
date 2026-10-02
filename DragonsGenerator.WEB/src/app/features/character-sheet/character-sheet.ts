@@ -9,10 +9,13 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { PdfGeneratorService } from '@core/services/pdf-generator.service';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
 import { NotificationService } from '@core/services/notification.service';
+import { CharacterCloudService } from '@core/services/character-cloud.service';
+import { formatCharacterCloudLoadError } from '@core/utils/character-cloud-sync.util';
 import type { Character } from '@core/models/Character/character';
 import {
   CharacterHandoffService,
@@ -48,8 +51,10 @@ function readStoredViewMode(): SheetViewMode {
 })
 export class CharacterSheet implements OnInit, OnDestroy {
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly pdfService = inject(PdfGeneratorService);
   private readonly handoff = inject(CharacterHandoffService);
+  private readonly cloud = inject(CharacterCloudService);
   private readonly campaigns = inject(CampaignCloudService);
   private readonly notifications = inject(NotificationService);
 
@@ -100,7 +105,30 @@ export class CharacterSheet implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     try {
-      const character = this.handoff.peekCurrent();
+      const id = this.route.snapshot.paramMap.get('id');
+      let character = this.handoff.peekCurrent();
+
+      if (id) {
+        const fromHandoff = character?.id === id ? character : null;
+        if (fromHandoff) {
+          character = fromHandoff;
+        } else {
+          try {
+            const row = await firstValueFrom(this.cloud.get(id));
+            character = {
+              id: row.id,
+              name: row.name,
+              ...(typeof row.data === 'object' && row.data ? row.data : {}),
+            } as Character;
+            this.handoff.setCurrent(character);
+          } catch (err) {
+            this.error.set(formatCharacterCloudLoadError(err));
+            this.loading.set(false);
+            return;
+          }
+        }
+      }
+
       if (!character) {
         this.error.set('Aucun personnage sélectionné.');
         this.loading.set(false);

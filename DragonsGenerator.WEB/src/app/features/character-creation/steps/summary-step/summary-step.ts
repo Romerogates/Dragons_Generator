@@ -333,6 +333,10 @@ export class SummaryStep implements OnInit, OnDestroy {
       return;
     }
 
-    void this.router.navigate(['/character-sheet']);
+    if (character.id) {
+      void this.router.navigate(['/character-sheet', character.id]);
+    } else {
+      void this.router.navigate(['/character-sheet']);
+    }
   }
 }

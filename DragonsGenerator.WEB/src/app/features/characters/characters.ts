@@ -227,7 +227,11 @@ export class Characters implements OnInit {
 
   viewCharacter(character: Character): void {
     this.handoff.setCurrent(character);
-    this.router.navigate(['/character-sheet']);
+    if (character.id) {
+      void this.router.navigate(['/character-sheet', character.id]);
+    } else {
+      void this.router.navigate(['/character-sheet']);
+    }
   }
 
   editCharacter(character: Character, event: Event): void {

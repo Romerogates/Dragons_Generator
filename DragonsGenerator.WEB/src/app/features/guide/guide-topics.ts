@@ -112,16 +112,17 @@ function contentFor(id: string): Pick<
           },
         ],
         links: [
-          { label: 'Guide one-shot', path: '/guide/oneshot' },
+          { label: 'Feuille one-shot (PDF)', path: '/guide/oneshot' },
           { label: 'Mes amis', path: '/friends' },
         ],
         flow: [...GUIDE_CAMPAIGN_MJ_FLOW.slice(0, 3), '…', ...GUIDE_CAMPAIGN_PLAYER_FLOW.slice(0, 3)],
       };
-    case 'oneshot':
+    case 'oneshot-parcours':
       return {
         paragraphs: [
           'Objectif : une table prête en une soirée, de l’invitation à la fin de session.',
           'Suivez l’ordre MJ / Joueur ci-dessous ; activez les push pour ne rien rater.',
+          'La feuille PDF « 1 feuille » reste sur /guide/oneshot.',
         ],
         steps: GUIDE_ONESHOT_STEPS.map((s) => ({
           title: s.title,
@@ -129,6 +130,7 @@ function contentFor(id: string): Pick<
           badge: s.role === 'MJ' ? 'MJ' : s.role === 'Joueur' ? 'Joueur' : 'Tous',
         })),
         links: [
+          { label: 'Feuille 1 page (PDF)', path: '/guide/oneshot' },
           { label: 'Campagnes', path: '/campaigns' },
           { label: 'Amis & invites', path: '/friends' },
           { label: 'Notifications', path: '/settings?tab=notifications' },
@@ -334,12 +336,14 @@ function contentFor(id: string): Pick<
     case 'codex':
       return {
         paragraphs: [
-          'Le grimoire d’Eana : espèces, classes, sorts, bestiaire, équipements, compétences, dons, historiques, combat, divinités.',
+          'Le grimoire d’Eana : hub Codex, puis espèces, classes, sorts, bestiaire, équipements, compétences, dons, historiques, civilisations, combat, divinités.',
         ],
         steps: [],
         links: [
+          { label: 'Hub Codex', path: '/codex' },
           { label: 'Espèces', path: '/species' },
           { label: 'Classes', path: '/classes' },
+          { label: 'Civilisations', path: '/civilisations' },
           { label: 'Sorts', path: '/spells' },
           { label: 'Bestiaire', path: '/creatures' },
           { label: 'Équipements', path: '/equipments' },

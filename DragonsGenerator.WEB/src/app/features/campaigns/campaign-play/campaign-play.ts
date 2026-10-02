@@ -21,6 +21,7 @@ import { CharacterCloudService } from '@core/services/character-cloud.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import { CampaignSessionDockService } from '@core/services/campaign-session-dock.service';
 import { mergeRemoteLiveTable } from '@core/utils/campaign-persist.util';
+import { isRemoteNewer } from '@core/utils/campaign-remote-newer.util';
 import { softTablePulse } from '@core/utils/table-feedback.util';
 import { CampaignPlayPanel } from '../campaign-play-panel/campaign-play-panel';
 import type { CampaignDetail as CampaignDetailModel } from '@core/models/Campaign/campaign';
@@ -49,6 +50,9 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
   readonly error = signal<string | null>(null);
   readonly campaign = signal<CampaignDetailModel | null>(null);
   readonly xpNotice = signal<string | null>(null);
+  /** Version distante plus récente que l’état local (conflit multi-onglet / autre client). */
+  readonly staleRemote = signal<CampaignDetailModel | null>(null);
+  readonly syncNotice = signal<string | null>(null);
 
   private softPollTimer: ReturnType<typeof setInterval> | null = null;
   private liveSub: Subscription | null = null;
@@ -204,6 +208,15 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
         if (!latest) return;
         if (latest.isOwner) {
           if (this.playPanel()?.saving()) return;
+          if (
+            isRemoteNewer(updated.updatedAt, latest.updatedAt) &&
+            !this.staleRemote()
+          ) {
+            this.staleRemote.set(updated);
+            this.syncNotice.set(
+              'La table a une version plus récente (autre onglet ou appareil).',
+            );
+          }
           const merged = mergeRemoteLiveTable(latest, updated);
           this.campaign.set(merged);
           this.sessionDock.patchLiveCampaign(merged);
@@ -217,6 +230,23 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
         /* ignore poll errors */
       },
     });
+  }
+
+  applyStaleRemote(): void {
+    const remote = this.staleRemote();
+    if (!remote) return;
+    this.campaign.set(remote);
+    this.sessionDock.patchLiveCampaign(remote);
+    this.staleRemote.set(null);
+    this.syncNotice.set('Table rechargée depuis l’autre client.');
+    window.setTimeout(() => this.syncNotice.set(null), 4_000);
+  }
+
+  dismissStaleRemote(): void {
+    this.staleRemote.set(null);
+    if (this.syncNotice()?.includes('version plus récente')) {
+      this.syncNotice.set(null);
+    }
   }
 
   private announcePlayerXpGain(previous: CampaignDetailModel, next: CampaignDetailModel): void {

@@ -373,7 +373,7 @@ describe('Characters', () => {
 
       component.viewCharacter(c);
       expect(handoffSetCurrentSpy).toHaveBeenCalledWith(c);
-      expect(router.navigate).toHaveBeenCalledWith(['/character-sheet']);
+      expect(router.navigate).toHaveBeenCalledWith(['/character-sheet', 'char-1']);
 
       component.editCharacter(c, ev);
       expect(ev.stopPropagation).toHaveBeenCalled();

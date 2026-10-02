@@ -958,7 +958,12 @@
             <button type="button" class="wizard-nav-secondary" (click)="clearSelection()">
               Modifier les sorts
             </button>
-            <button type="button" class="wizard-nav-primary" (click)="builder.nextStep()">
+            <button
+              type="button"
+              class="wizard-nav-primary"
+              [disabled]="!selectionComplete()"
+              (click)="continueAfterConfirm()"
+            >
               Continuer →
             </button>
           }

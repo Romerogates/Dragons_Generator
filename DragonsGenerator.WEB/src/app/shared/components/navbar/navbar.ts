@@ -18,6 +18,7 @@ import { NotificationPreferencesService } from '@core/services/notification-pref
 import { NotificationService } from '@core/services/notification.service';
 import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
 import type { NotificationType } from '@core/models/notification.model';
+import { CODEX_NAV_LINKS, filterCodexNavLinks } from '@core/config/codex-nav';
 
 export interface NavLink {
   label: string;
@@ -95,25 +96,21 @@ export class Navbar implements OnInit, OnDestroy {
   ];
 
   readonly codexLinks: NavLink[] = [
-    { label: 'Espèces', path: '/species', icon: 'fluent-emoji:dna' },
-    { label: 'Classes', path: '/classes', icon: 'fluent-emoji:crossed-swords' },
-    { label: 'Civilisations', path: '/civilisations', icon: 'fluent-emoji:classical-building' },
-    { label: 'Équipements', path: '/equipments', icon: 'fluent-emoji:shield' },
-    { label: 'Sortilèges', path: '/spells', icon: 'fluent-emoji:sparkles' },
-    { label: 'Bestiaire', path: '/creatures', icon: 'fluent-emoji:dragon' },
-    { label: 'Compétences', path: '/skills', icon: 'fluent-emoji:bookmark-tabs' },
-    { label: 'Dons', path: '/feats', icon: 'fluent-emoji:trophy' },
-    { label: 'Historiques', path: '/backgrounds', icon: 'fluent-emoji:scroll' },
-    { label: 'Actions de combat', path: '/combat-actions', icon: 'fluent-emoji:collision' },
-    { label: 'Divinités', path: '/deities', icon: 'fluent-emoji:glowing-star' },
+    { label: 'Accueil Codex', path: '/codex', icon: 'fluent-emoji:books' },
+    ...CODEX_NAV_LINKS.map((l) => ({ label: l.label, path: l.path, icon: l.icon })),
   ];
 
   readonly codexFilter = signal('');
   readonly filteredCodexLinks = computed(() => {
     const q = this.codexFilter().trim().toLowerCase();
     if (!q) return this.codexLinks;
+    const matched = new Set(filterCodexNavLinks(q).map((l) => l.path));
     return this.codexLinks.filter(
-      (l) => l.label.toLowerCase().includes(q) || l.path.toLowerCase().includes(q),
+      (l) =>
+        l.path === '/codex' ||
+        matched.has(l.path) ||
+        l.label.toLowerCase().includes(q) ||
+        l.path.toLowerCase().includes(q),
     );
   });
 

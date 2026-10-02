@@ -7,6 +7,10 @@ import {
 
 const base = INITIAL_CREATION_STATE as CharacterCreation;
 
+const WIZARD_CANTRIPS = ['sp-c1', 'sp-c2', 'sp-c3'];
+const WIZARD_SPELLS = ['sp-s1', 'sp-s2', 'sp-s3', 'sp-s4', 'sp-s5', 'sp-s6'];
+const CLERIC_CANTRIPS = ['sp-c1', 'sp-c2', 'sp-c3'];
+
 describe('character-wizard-validation.util', () => {
   it('racialSpellsComplete requires each grant to be picked', () => {
     const c = {
@@ -70,12 +74,27 @@ describe('character-wizard-validation.util', () => {
       ...base,
       speciesId: 'sp-elf',
       hasSpellcasting: true,
-      spellcastingDetails: { cantrips: ['sp-light'] },
+      spellcastingKind: 'bard' as const,
+      spellcastingDetails: {
+        cantrips: ['sp-a', 'sp-b'],
+        spells: ['sp-1', 'sp-2', 'sp-3', 'sp-4'],
+      },
       name: 'Aldric',
     };
     expect(isWizardStepValid(10, withMagic, { needsMagicStep: true })).toBeTrue();
     expect(
       isWizardStepValid(10, { ...withMagic, spellcastingDetails: {} }, { needsMagicStep: true }),
+    ).toBeFalse();
+    expect(
+      isWizardStepValid(
+        10,
+        {
+          ...withMagic,
+          spellcastingKind: 'wizard' as const,
+          spellcastingDetails: { cantrips: ['sp-light'], spells: [] },
+        },
+        { needsMagicStep: true },
+      ),
     ).toBeFalse();
     expect(
       isWizardStepValid(10, { ...base, name: 'Aldric' }, { needsMagicStep: false }),
@@ -89,7 +108,21 @@ describe('character-wizard-validation.util', () => {
       spellcastingKind: 'wizard' as const,
       hasSpellcasting: true,
       speciesId: 'sp-humain',
-      spellcastingDetails: { cantrips: [{ refId: 'spl-light' }], spells: [{ refId: 'spl-shield' }] },
+      spellcastingDetails: {
+        cantrips: [
+          { refId: 'spl-light' },
+          { refId: 'spl-mage-hand' },
+          { refId: 'spl-prestidigitation' },
+        ],
+        spells: [
+          { refId: 'spl-shield' },
+          { refId: 'spl-magic-missile' },
+          { refId: 'spl-detect-magic' },
+          { refId: 'spl-mage-armor' },
+          { refId: 'spl-sleep' },
+          { refId: 'spl-burning-hands' },
+        ],
+      },
     };
     expect(
       isWizardStepValid(10, { ...wizardBase, targetLevel: 17 }, { needsMagicStep: true }),
@@ -301,25 +334,26 @@ describe('character-wizard-validation.util', () => {
     ).toBeTrue();
   });
 
-  it('isWizardStepValid case 10 (magic step) falls back to cantrips when hasSpellcasting is false', () => {
-    expect(
-      isWizardStepValid(
-        10,
-        { ...base, hasSpellcasting: false, spellcastingDetails: { cantrips: ['sp-light'] } },
-        { needsMagicStep: true },
-      ),
-    ).toBeTrue();
+  it('isWizardStepValid case 10 (magic step) racial-only needs grants complete', () => {
     expect(
       isWizardStepValid(
         10,
         { ...base, hasSpellcasting: false, spellcastingDetails: { cantrips: [] } },
         { needsMagicStep: true },
       ),
-    ).toBeFalse();
+    ).toBeTrue();
     expect(
       isWizardStepValid(
         10,
-        { ...base, hasSpellcasting: false, spellcastingDetails: undefined as never },
+        {
+          ...base,
+          hasSpellcasting: false,
+          racialSpellGrants: [
+            { choiceId: 'elf-cantrip', label: '', desc: '', pool: [], spellLevel: 0, spellcastingAbility: 'INT' },
+          ],
+          speciesChoiceAnswers: {},
+          spellcastingDetails: {},
+        },
         { needsMagicStep: true },
       ),
     ).toBeFalse();
@@ -450,8 +484,8 @@ describe('character-wizard-validation.util', () => {
       hasSpellcasting: true,
       spellcastingKind: 'wizard' as const,
       spellcastingDetails: {
-        cantrips: ['sp-a'],
-        spells: ['sp-b'],
+        cantrips: WIZARD_CANTRIPS,
+        spells: WIZARD_SPELLS,
         spellMastery: [{ spellId: 'x' }],
       },
     };
@@ -462,8 +496,8 @@ describe('character-wizard-validation.util', () => {
         {
           ...wizard17,
           spellcastingDetails: {
-            cantrips: ['sp-a'],
-            spells: ['sp-b'],
+            cantrips: WIZARD_CANTRIPS,
+            spells: WIZARD_SPELLS,
             spellMastery: [{ spellId: '1' }, { spellId: '2' }],
           },
         },
@@ -475,8 +509,8 @@ describe('character-wizard-validation.util', () => {
       ...wizard17,
       targetLevel: 19,
       spellcastingDetails: {
-        cantrips: ['sp-a'],
-        spells: ['sp-b'],
+        cantrips: WIZARD_CANTRIPS,
+        spells: WIZARD_SPELLS,
         spellMastery: [{ spellId: '1' }, { spellId: '2' }],
         signatureSpells: [{ spellId: 's1' }],
       },
@@ -489,7 +523,7 @@ describe('character-wizard-validation.util', () => {
           ...wizard19,
           spellMasteryPicks: { '1': 'a', '2': 'b' },
           signatureSpellIds: ['s1', 's2'],
-          spellcastingDetails: { cantrips: ['sp-a'], spells: ['sp-b'] },
+          spellcastingDetails: { cantrips: WIZARD_CANTRIPS, spells: WIZARD_SPELLS },
         },
         { needsMagicStep: true },
       ),
@@ -569,7 +603,7 @@ describe('character-wizard-validation.util', () => {
           ...base,
           hasSpellcasting: true,
           spellcastingKind: 'cleric',
-          spellcastingDetails: { cantrips: ['sp-light'], spells: ['sp-shield'] },
+          spellcastingDetails: { cantrips: CLERIC_CANTRIPS, spells: ['sp-shield'] },
         },
         { needsMagicStep: true },
       ),
@@ -581,7 +615,11 @@ describe('character-wizard-validation.util', () => {
           ...base,
           hasSpellcasting: true,
           spellcastingKind: 'cleric',
-          spellcastingDetails: { cantrips: ['sp-light'], spells: ['sp-shield'], deityId: 'deity-life' },
+          spellcastingDetails: {
+            cantrips: CLERIC_CANTRIPS,
+            spells: ['sp-shield'],
+            deityId: 'deity-life',
+          },
         },
         { needsMagicStep: true },
       ),
@@ -1063,7 +1101,7 @@ describe('character-wizard-validation.util', () => {
     ).toBeTrue();
   });
 
-  it('isWizardStepValid accepts magic details via deity-only cleric setup', () => {
+  it('isWizardStepValid requires cleric cantrips plus deity', () => {
     expect(
       isWizardStepValid(
         10,
@@ -1072,6 +1110,18 @@ describe('character-wizard-validation.util', () => {
           hasSpellcasting: true,
           spellcastingKind: 'cleric',
           spellcastingDetails: { cantrips: [], spells: [], deity: 'Pelor' },
+        },
+        { needsMagicStep: true },
+      ),
+    ).toBeFalse();
+    expect(
+      isWizardStepValid(
+        10,
+        {
+          ...base,
+          hasSpellcasting: true,
+          spellcastingKind: 'cleric',
+          spellcastingDetails: { cantrips: CLERIC_CANTRIPS, spells: [], deity: 'Pelor' },
         },
         { needsMagicStep: true },
       ),
@@ -1131,8 +1181,8 @@ describe('character-wizard-validation.util', () => {
           targetLevel: 19,
           hasSpellcasting: true,
           spellcastingDetails: {
-            cantrips: ['sp-a'],
-            spells: ['sp-b'],
+            cantrips: WIZARD_CANTRIPS,
+            spells: WIZARD_SPELLS,
             spellMastery: [{ spellId: '1' }, { spellId: '2' }],
             signatureSpells: [{ spellId: 's1' }, { spellId: 's2' }],
           },
@@ -1285,8 +1335,8 @@ describe('character-wizard-validation.util', () => {
           targetLevel: 19,
           hasSpellcasting: true,
           spellcastingDetails: {
-            cantrips: ['sp-a'],
-            spells: ['sp-b'],
+            cantrips: WIZARD_CANTRIPS,
+            spells: WIZARD_SPELLS,
             spellMastery: [{ spellId: '1' }, { spellId: '2' }],
             signatureSpells: [{ spellId: 's1' }, { spellId: 's2' }],
           },

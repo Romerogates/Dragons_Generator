@@ -246,7 +246,7 @@ describe('SummaryStep', () => {
     component.saveCharacter();
     expect(cloudSaveSpy).toHaveBeenCalled();
     expect(resetSpy).toHaveBeenCalled();
-    expect(router.navigate).toHaveBeenCalledWith(['/character-sheet']);
+    expect(router.navigate).toHaveBeenCalledWith(['/character-sheet', 'server-id']);
   });
 
   it('asks for confirmation before discarding an unsaved hero', () => {

@@ -48,6 +48,30 @@
               </button>
             </p>
           }
+          @if (syncNotice(); as notice) {
+            <p
+              class="mt-0.5 text-[10px] font-semibold text-amber-300 flex flex-wrap items-center justify-center gap-2"
+              data-testid="play-stale-notice"
+            >
+              <span>{{ notice }}</span>
+              @if (staleRemote()) {
+                <button
+                  type="button"
+                  class="underline text-amber-200"
+                  (click)="applyStaleRemote()"
+                >
+                  Recharger
+                </button>
+                <button
+                  type="button"
+                  class="underline text-slate-400"
+                  (click)="dismissStaleRemote()"
+                >
+                  Garder
+                </button>
+              }
+            </p>
+          }
         </div>
         <span class="text-[10px] font-black uppercase tracking-widest text-slate-600 shrink-0">
           {{ c.isOwner ? 'MJ' : c.role === 'spectator' ? 'Spectateur' : 'Joueur' }}

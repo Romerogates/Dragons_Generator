@@ -288,9 +288,18 @@ export const routes: Routes = [
       import('@features/library-dungeons/library-dungeons').then((m) => m.LibraryDungeons),
   },
   {
+    path: 'character-sheet/:id',
+    loadComponent: () =>
+      import('@features/character-sheet/character-sheet').then((m) => m.CharacterSheet),
+  },
+  {
     path: 'character-sheet',
     loadComponent: () =>
       import('@features/character-sheet/character-sheet').then((m) => m.CharacterSheet),
+  },
+  {
+    path: 'codex',
+    loadComponent: () => import('@features/codex/codex-hub').then((m) => m.CodexHubPage),
   },
   { path: '**', redirectTo: '' },
 ];

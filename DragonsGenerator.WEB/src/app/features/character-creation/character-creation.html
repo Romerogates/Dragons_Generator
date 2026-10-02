@@ -78,6 +78,26 @@
       </a>
     </div>
   }
+  @if (levelUpMode()) {
+    <div
+      class="mb-3 mx-1 px-4 py-3 rounded-xl border border-violet-800/40 bg-violet-950/25 text-xs text-violet-100 flex flex-wrap items-center justify-between gap-2"
+      data-testid="forge-level-up-banner"
+      role="status"
+    >
+      <span>
+        Level-up — niveau passé à
+        <strong class="text-violet-200">{{ builder.targetLevel() }}</strong>.
+        Validez le niveau, puis complétez ASI / sous-classe / sorts si besoin.
+      </span>
+      <button
+        type="button"
+        class="shrink-0 min-h-9 px-3 rounded-lg text-[10px] font-black uppercase tracking-widest bg-violet-600 text-white hover:bg-violet-500"
+        (click)="jumpToAbilitiesForLevelUp()"
+      >
+        Caractéristiques
+      </button>
+    </div>
+  }
   @if (!codexReady()) {
     <div
       class="mb-3 mx-1 px-4 py-3 rounded-xl border border-amber-800/40 bg-amber-950/20 text-xs text-amber-200 flex flex-wrap items-center justify-between gap-2"
