@@ -72,6 +72,7 @@ export class CampaignPregenGeneratorService {
     const copy = structuredClone(source) as Character;
     copy.id = '';
     copy.cloudSynced = false;
+    copy.isPregenPool = true;
     copy.name = `${source.name || 'Héros'} (pré-tiré)`;
 
     const newId = await wait(this.characters.save(copy));
@@ -121,6 +122,7 @@ export class CampaignPregenGeneratorService {
 
     copy.id = newId;
     copy.cloudSynced = true;
+    copy.isPregenPool = true;
     copy.personality = {
       ...copy.personality,
       story: dmBackstory,

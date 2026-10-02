@@ -135,6 +135,12 @@ export class CharacterCloudService {
   }
 
   private createCharacter(body: { name: string; data: Character }): Observable<string> {
+    const isPregenPool = body.data.isPregenPool === true;
+    if (isPregenPool) {
+      return this.http
+        .post<{ id: string }>(`${this.api}/me/characters`, body)
+        .pipe(map((r) => r.id));
+    }
     return this.list().pipe(
       map((summaries) => summaries.length),
       catchError(() => of(-1)),

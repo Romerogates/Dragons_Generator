@@ -598,6 +598,11 @@ export interface Character {
   id: string;
   /** true si le personnage est enregistré sur le serveur (id cloud valide). */
   cloudSynced?: boolean;
+  /**
+   * Fiche du pool pré-tirés campagne (MJ) — hors « Mes héros », hors plafond 10.
+   * « Copier dans Mes héros » crée une copie sans ce flag.
+   */
+  isPregenPool?: boolean;
   createdAt: string; // ISO 8601
   updatedAt: string;
   schemaVersion: number;

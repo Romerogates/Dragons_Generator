@@ -1550,7 +1550,11 @@ public class ClaimCampaignPregenEndpoint(AppDbContext db) : EndpointWithoutReque
             return;
         }
 
-        var ownedCount = await db.Characters.CountAsync(c => c.UserId == userId, ct);
+        var ownedJson = await db.Characters.AsNoTracking()
+            .Where(c => c.UserId == userId)
+            .Select(c => c.JsonData)
+            .ToListAsync(ct);
+        var ownedCount = ownedJson.Count(j => !CharacterPregenPool.IsPoolRecord(j));
         if (ownedCount >= CreateMyCharacterEndpoint.MaxCharactersPerUser)
         {
             AddError($"Limite atteinte : maximum {CreateMyCharacterEndpoint.MaxCharactersPerUser} personnages par compte.");
@@ -1563,7 +1567,7 @@ public class ClaimCampaignPregenEndpoint(AppDbContext db) : EndpointWithoutReque
         {
             UserId = userId.Value,
             Name = $"{copyName} (copie)",
-            JsonData = source.JsonData,
+            JsonData = CharacterPregenPool.StripPoolFlag(source.JsonData),
         };
         db.Characters.Add(copy);
 

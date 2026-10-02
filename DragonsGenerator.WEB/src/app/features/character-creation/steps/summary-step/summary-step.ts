@@ -190,11 +190,14 @@ export class SummaryStep implements OnInit, OnDestroy {
 
   private persistToCloud(character: Character): void {
     this.saving.set(true);
+    const intent = this.route.snapshot.queryParamMap.get('intent')?.trim();
+    const asPregenPool = intent === 'pregen';
+    const toSave: Character = asPregenPool ? { ...character, isPregenPool: true } : character;
 
     if (!this.connectivity.isOnline()) {
       const withId = {
-        ...character,
-        id: character.id ?? crypto.randomUUID(),
+        ...toSave,
+        id: toSave.id ?? crypto.randomUUID(),
         cloudSynced: false,
       };
       this.offlineSync.queueCharacterSave(withId, this.isEditMode());
@@ -210,26 +213,28 @@ export class SummaryStep implements OnInit, OnDestroy {
     }
 
     const save$ = this.isEditMode()
-      ? this.cloud.save(character as Character, { updateExisting: true })
-      : this.cloud.list().pipe(
-          switchMap((list) => {
-            if (list.length >= MAX_CHARACTERS_PER_USER) {
-              this.saving.set(false);
-              this.saveError.set(
-                `Limite atteinte : maximum ${MAX_CHARACTERS_PER_USER} personnages par compte. Supprimez un héros avant d’en créer un autre.`,
-              );
-              return of(null);
-            }
-            return this.cloud.save(character as Character);
-          }),
-        );
+      ? this.cloud.save(toSave, { updateExisting: true })
+      : asPregenPool
+        ? this.cloud.save(toSave)
+        : this.cloud.list().pipe(
+            switchMap((list) => {
+              if (list.length >= MAX_CHARACTERS_PER_USER) {
+                this.saving.set(false);
+                this.saveError.set(
+                  `Limite atteinte : maximum ${MAX_CHARACTERS_PER_USER} personnages par compte. Supprimez un héros avant d’en créer un autre.`,
+                );
+                return of(null);
+              }
+              return this.cloud.save(toSave);
+            }),
+          );
 
     save$.subscribe({
       next: (serverId) => {
         if (serverId == null) return;
         const updated = {
-          ...character,
-          id: serverId || character.id,
+          ...toSave,
+          id: serverId || toSave.id,
           cloudSynced: true,
         };
         this.handoff.setCurrent(updated);
@@ -249,8 +254,8 @@ export class SummaryStep implements OnInit, OnDestroy {
           return;
         }
         const withId = {
-          ...character,
-          id: character.id ?? crypto.randomUUID(),
+          ...toSave,
+          id: toSave.id ?? crypto.randomUUID(),
           cloudSynced: false,
         };
         this.offlineSync.queueCharacterSave(withId, this.isEditMode());

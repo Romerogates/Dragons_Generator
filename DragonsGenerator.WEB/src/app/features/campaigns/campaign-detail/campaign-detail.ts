@@ -69,6 +69,7 @@ import {
 } from '@core/utils/pdf-preview.util';
 import { StoryBuilderService } from '@core/services/story-builder.service';
 import { CampaignPregenGeneratorService } from '@core/services/campaign-pregen-generator.service';
+import { maxCampaignPregens } from '@core/constants/character-limits';
 import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
 import { isAiGenerationAborted } from '@core/models/ai-generation.model';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
@@ -3025,6 +3026,10 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   async generateAutoPregen(): Promise<void> {
     const c = this.campaign();
     if (!c?.isOwner || this.generatingAutoPregen()) return;
+    if (!this.canAddPregen()) {
+      this.pregenFeedback.set(this.pregenCapMessage());
+      return;
+    }
     if (this.aiProgress.active()) {
       this.pregenFeedback.set(this.aiProgress.busyMessage());
       return;
@@ -3060,6 +3065,10 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   async importPregenFromCharacter(characterId: string): Promise<void> {
     const c = this.campaign();
     if (!c?.isOwner || this.importingPregen()) return;
+    if (!this.canAddPregen()) {
+      this.pregenFeedback.set(this.pregenCapMessage());
+      return;
+    }
     this.importingPregen.set(true);
     this.pregenFeedback.set(null);
     try {
@@ -3097,12 +3106,18 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       this.pregenFeedback.set('Ce héros est déjà dans le pool de pré-tirés.');
       return;
     }
+    if (!this.canAddPregen()) {
+      this.setTab('pregens');
+      this.pregenFeedback.set(this.pregenCapMessage());
+      return;
+    }
 
     this.importingPregen.set(true);
     this.pregenFeedback.set(null);
     try {
       const res = await firstValueFrom(this.characters.get(characterId));
-      const ch = res.data as Character;
+      const ch = { ...(res.data as Character), id: characterId, isPregenPool: true };
+      await firstValueFrom(this.characters.save(ch, { updateExisting: true }));
       const speciesLabel = ch.species?.subspeciesLabel
         ? `${ch.species.label} (${ch.species.subspeciesLabel})`
         : (ch.species?.label ?? '—');
@@ -3123,6 +3138,26 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     } finally {
       this.importingPregen.set(false);
     }
+  }
+
+  /** Plafond pool = 10 + nombre de joueurs. */
+  canAddPregen(): boolean {
+    const c = this.campaign();
+    if (!c) return false;
+    const count = c.data.pregenCharacters?.length ?? 0;
+    return count < maxCampaignPregens(this.players().length);
+  }
+
+  pregenCapMessage(): string {
+    const cap = maxCampaignPregens(this.players().length);
+    return `Plafond atteint : ${cap} pré-tirés max (10 + ${this.players().length} joueur(s)).`;
+  }
+
+  pregenCapLabel(): string {
+    const c = this.campaign();
+    const count = c?.data.pregenCharacters?.length ?? 0;
+    const cap = maxCampaignPregens(this.players().length);
+    return `${count} / ${cap}`;
   }
 
   updatePregen(pregenId: string, patch: Partial<CampaignPregen>): void {

@@ -111,6 +111,7 @@ export class CharacterAutoGeneratorService {
         const copy = structuredClone(character) as Character;
         copy.id = '';
         copy.cloudSynced = false;
+        copy.isPregenPool = true;
         copy.name = `${character.name} (pré-tiré)`;
         this.aiProgress.setStageLabel('Enregistrement de la fiche…');
         this.aiProgress.throwIfAborted();
@@ -160,6 +161,7 @@ export class CharacterAutoGeneratorService {
 
         copy.id = newId;
         copy.cloudSynced = true;
+        copy.isPregenPool = true;
         this.aiProgress.setStageLabel('Finalisation du pré-tiré…');
         this.aiProgress.throwIfAborted();
         copy.personality = {
@@ -185,6 +187,35 @@ export class CharacterAutoGeneratorService {
       }
     }
 
+    throw new Error(
+      lastErrors.length
+        ? `Génération impossible : ${lastErrors.join(' · ')}`
+        : 'Génération impossible après plusieurs tentatives.',
+    );
+  }
+
+  /**
+   * Remplit la forge locale avec un héros L1 aléatoire valide (sans save cloud).
+   * Utilise le même builder que `/create` — appeler depuis l’écran de création.
+   */
+  async populateWizardWithRandomLevel1(): Promise<Character> {
+    const catalogs = await this.loadCatalogs();
+    const maxAttempts = 12;
+    let lastErrors: string[] = [];
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        const character = this.buildRandomLevel1(catalogs);
+        const validation = validateCharacterExport(character);
+        if (!validation.valid) {
+          lastErrors = validation.errors;
+          continue;
+        }
+        this.builder.goToStep(this.builder.summaryStep());
+        return character;
+      } catch {
+        continue;
+      }
+    }
     throw new Error(
       lastErrors.length
         ? `Génération impossible : ${lastErrors.join(' · ')}`

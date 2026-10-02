@@ -208,12 +208,23 @@
       <a routerLink="/guide/personnage" class="text-[9px] text-slate-600 underline hover:text-amber-400/80"
         >Guide — forger un héros</a
       >
+      @if (!builder.isEditMode) {
+        <button
+          type="button"
+          data-testid="forge-quick-generate"
+          class="min-h-8 px-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest border border-amber-800/50 text-amber-300 hover:border-amber-500/60 hover:bg-amber-950/30 disabled:opacity-50"
+          [disabled]="quickGenerateBusy() || autoCompleteBusy()"
+          (click)="generateQuickHero()"
+        >
+          {{ quickGenerateBusy() ? 'Génération…' : 'Générer un héros' }}
+        </button>
+      }
       @if (builder.currentStep() < builder.summaryStep()) {
         <button
           type="button"
           data-testid="forge-auto-complete"
           class="min-h-8 px-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 disabled:opacity-50"
-          [disabled]="autoCompleteBusy()"
+          [disabled]="autoCompleteBusy() || quickGenerateBusy()"
           (click)="autoCompleteRemaining()"
         >
           {{ autoCompleteBusy() ? 'Complétion…' : 'Compléter le reste' }}

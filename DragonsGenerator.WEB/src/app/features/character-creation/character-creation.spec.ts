@@ -9,6 +9,7 @@ import { ConnectivityService } from '@core/services/connectivity.service';
 import { OfflineCodexService } from '@core/services/offline-codex.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import { DataService } from '@core/services/data.service';
+import { CharacterAutoGeneratorService } from '@core/services/character-auto-generator.service';
 import { CharacterCreation } from './character-creation';
 
 describe('CharacterCreation host', () => {
@@ -80,6 +81,14 @@ describe('CharacterCreation host', () => {
             getLanguages: () => of([]),
             getSpells: () => of([]),
             getClasses: () => of([]),
+          },
+        },
+        {
+          provide: CharacterAutoGeneratorService,
+          useValue: {
+            populateWizardWithRandomLevel1: jasmine
+              .createSpy('populateWizardWithRandomLevel1')
+              .and.resolveTo({}),
           },
         },
       ],

@@ -18,6 +18,7 @@ import { OfflineCodexService } from '@core/services/offline-codex.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import { DataService } from '@core/services/data.service';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
+import { CharacterAutoGeneratorService } from '@core/services/character-auto-generator.service';
 import { autoCompleteRemainingCreation } from '@core/utils/character-auto-complete.util';
 import { normalizeCharacterClasses } from '@core/utils/class-data.adapter';
 import type { CharacterCreation as CreationState } from '@core/models/Character/character';
@@ -68,6 +69,7 @@ export class CharacterCreation implements OnInit {
   private readonly handoff = inject(CharacterHandoffService);
   private readonly auth = inject(AuthService);
   private readonly data = inject(DataService);
+  private readonly autoGenerator = inject(CharacterAutoGeneratorService);
 
   readonly isOnline = this.connectivity.isOnline;
   readonly isLoggedIn = this.auth.isLoggedIn;
@@ -86,6 +88,9 @@ export class CharacterCreation implements OnInit {
   readonly autoCompleteHint = signal<string | null>(null);
   readonly canUndoAutoComplete = signal(false);
   private autoCompleteUndo: CreationState | null = null;
+  private autoCompleteUndoStep: number | null = null;
+
+  readonly quickGenerateBusy = signal(false);
 
   ngOnInit(): void {
     // 1. Mode édition depuis /characters → priorité absolue
@@ -197,12 +202,43 @@ export class CharacterCreation implements OnInit {
     }
   }
 
+  /**
+   * Génère un héros L1 complet dans la forge (espèce → récap) pour jouer vite.
+   * L’utilisateur revoit le récap puis sauvegarde — compte dans « Mes héros ».
+   */
+  async generateQuickHero(): Promise<void> {
+    if (this.quickGenerateBusy() || this.builder.isEditMode) return;
+    this.quickGenerateBusy.set(true);
+    this.autoCompleteHint.set(null);
+    this.showDraftPrompt.set(false);
+    this.showDraftDiscardConfirm.set(false);
+    try {
+      const before = structuredClone(this.builder.creation()) as CreationState;
+      const beforeStep = this.builder.currentStep();
+      await this.autoGenerator.populateWizardWithRandomLevel1();
+      this.autoCompleteUndo = before;
+      this.autoCompleteUndoStep = beforeStep;
+      this.canUndoAutoComplete.set(true);
+      this.autoCompleteHint.set('Héros généré — vérifiez le récap puis sauvegardez.');
+    } catch (err) {
+      this.autoCompleteHint.set(
+        err instanceof Error ? err.message : 'Impossible de générer un héros.',
+      );
+    } finally {
+      this.quickGenerateBusy.set(false);
+    }
+  }
+
   undoAutoComplete(): void {
     if (!this.autoCompleteUndo) return;
     this.builder.replaceCreation(this.autoCompleteUndo);
+    if (this.autoCompleteUndoStep != null) {
+      this.builder.goToStep(this.autoCompleteUndoStep);
+      this.autoCompleteUndoStep = null;
+    }
     this.autoCompleteUndo = null;
     this.canUndoAutoComplete.set(false);
-    this.autoCompleteHint.set('Auto-complétion annulée.');
+    this.autoCompleteHint.set('Génération / auto-complétion annulée.');
   }
 
   onReset(): void {

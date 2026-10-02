@@ -127,11 +127,17 @@
 
   @if (isOwner()) {
     <div class="bg-violet-950/20 border border-violet-800/40 rounded-2xl p-5">
-      <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-3">Pool MJ</h3>
+      <h3 class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-3">
+        Pool MJ
+        <span class="ml-2 text-slate-500 normal-case tracking-normal font-bold"
+          >{{ capLabel() }}</span
+        >
+      </h3>
       <p class="text-xs text-slate-400 mb-4">
         Préparez des héros <span class="text-violet-300">avant même d’inviter</span> —
-        vos joueurs les trouveront dès qu’ils rejoignent. Générez un original niveau 1,
-        importez depuis
+        vos joueurs les trouveront dès qu’ils rejoignent. Les pré-tirés
+        <span class="text-violet-300">ne comptent pas</span> dans « Mes héros »
+        (plafond 10 + nb de joueurs ici). Générez un original niveau 1, importez depuis
         <a routerLink="/characters" class="text-violet-400 hover:underline">Mes héros</a>,
         ou forgez-en un (ajouté automatiquement au pool).
       </p>
@@ -140,7 +146,7 @@
         <button
           type="button"
           class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white hover:bg-violet-500 disabled:opacity-50"
-          [disabled]="importing() || aiForegroundActive()"
+          [disabled]="importing() || aiForegroundActive() || !canAdd()"
           (click)="generateAuto.emit()"
         >
           @if (aiForegroundActive()) {
@@ -157,7 +163,7 @@
           <button
             type="button"
             class="px-3 py-2 rounded-xl text-xs border border-slate-700 text-slate-300 hover:border-violet-500/50 disabled:opacity-40"
-            [disabled]="importing() || aiActive()"
+            [disabled]="importing() || aiActive() || !canAdd()"
             (click)="importFromCharacter.emit(ch.id)"
           >
             Importer {{ ch.name }}
@@ -171,10 +177,17 @@
             returnUrl: '/campaigns/' + campaignId() + '?tab=pregens'
           }"
           class="px-3 py-2 rounded-xl text-xs border border-violet-800/50 text-violet-300 hover:border-violet-500/50"
+          [class.pointer-events-none]="!canAdd()"
+          [class.opacity-40]="!canAdd()"
         >
           Créer puis ajouter →
         </a>
       </div>
+      @if (!canAdd()) {
+        <p class="text-[11px] text-amber-400/90 mb-3" role="status">
+          Plafond atteint (10 + joueurs). Retirez un pré-tiré ou invitez plus de joueurs.
+        </p>
+      }
       @if (!players().length) {
         <p class="text-[11px] text-slate-500 leading-relaxed">
           Aucun joueur pour l’instant — parfait pour peaufiner le pool. L’assignation

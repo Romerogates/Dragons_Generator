@@ -25,10 +25,16 @@ public class ListMyCharactersEndpoint(AppDbContext db) : EndpointWithoutRequest<
 
         var list = await db.Characters.AsNoTracking()
             .Where(c => c.UserId == userId)
-            .Select(c => new CharacterSummaryDto(c.Id, c.Name, c.UpdatedAt))
+            .Select(c => new { c.Id, c.Name, c.UpdatedAt, c.JsonData })
             .ToListAsync(ct);
 
-        await Send.OkAsync(list.OrderByDescending(c => c.UpdatedAt).ToList(), ct);
+        var visible = list
+            .Where(c => !CharacterPregenPool.IsPoolRecord(c.JsonData))
+            .Select(c => new CharacterSummaryDto(c.Id, c.Name, c.UpdatedAt))
+            .OrderByDescending(c => c.UpdatedAt)
+            .ToList();
+
+        await Send.OkAsync(visible, ct);
     }
 }
 
@@ -73,17 +79,26 @@ public class CreateMyCharacterEndpoint(AppDbContext db) : Endpoint<UpsertCharact
             return;
         }
 
-        var count = await db.Characters.CountAsync(c => c.UserId == userId.Value, ct);
-        if (count >= MaxCharactersPerUser)
-        {
-            AddError($"Limite atteinte : maximum {MaxCharactersPerUser} personnages par compte.");
-            await Send.ErrorsAsync(StatusCodes.Status400BadRequest, ct);
-            return;
-        }
-
         var json = req.Data.ValueKind == JsonValueKind.Undefined
             ? "{}"
             : req.Data.GetRawText();
+        var isPregenPool = CharacterPregenPool.IsPoolRecord(json);
+
+        if (!isPregenPool)
+        {
+            var owned = await db.Characters.AsNoTracking()
+                .Where(c => c.UserId == userId.Value)
+                .Select(c => c.JsonData)
+                .ToListAsync(ct);
+            var count = owned.Count(j => !CharacterPregenPool.IsPoolRecord(j));
+            if (count >= MaxCharactersPerUser)
+            {
+                AddError($"Limite atteinte : maximum {MaxCharactersPerUser} personnages par compte.");
+                await Send.ErrorsAsync(StatusCodes.Status400BadRequest, ct);
+                return;
+            }
+        }
+
         var name = string.IsNullOrWhiteSpace(req.Name)
             ? TryExtractName(json) ?? "Sans nom"
             : req.Name.Trim();

@@ -42,6 +42,9 @@ export class CampaignDetailPrepPregens {
   readonly aiForegroundActive = input(false);
   readonly aiActive = input(false);
   readonly aiBackground = input(false);
+  /** Ex. "3 / 13" */
+  readonly capLabel = input('0 / 10');
+  readonly canAdd = input(true);
 
   readonly runUndo = output<void>();
   readonly viewCharacter = output<CampaignPregen>();

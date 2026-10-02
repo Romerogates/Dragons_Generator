@@ -523,6 +523,8 @@
                   [aiForegroundActive]="aiProgress.foregroundActive()"
                   [aiActive]="aiProgress.active()"
                   [aiBackground]="aiProgress.background()"
+                  [capLabel]="pregenCapLabel()"
+                  [canAdd]="canAddPregen()"
                   (runUndo)="runPregenUndo()"
                   (viewCharacter)="viewPregenCharacter($event)"
                   (useAtTable)="usePregenAtTable($event)"
