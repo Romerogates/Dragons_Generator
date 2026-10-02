@@ -22,12 +22,21 @@ export async function startFreshWizard(
   opts: { level?: number } = {},
 ): Promise<void> {
   await page.goto('/create');
-  await page.evaluate(() => localStorage.removeItem('dragon_character_builder_v6'));
+  await page.evaluate(() => {
+    localStorage.removeItem('dragon_character_builder_v6');
+    // Évite le dialog pré-tiré / manuel ajouté à l’entrée forge.
+    localStorage.setItem('dragons-forge-skip-mode-prompt', '1');
+  });
   await page.reload();
   const restart = page.getByTestId('wizard-draft-restart');
   if (await restart.isVisible({ timeout: 2_000 }).catch(() => false)) {
     await restart.click();
     await page.getByRole('button', { name: 'Effacer et recommencer' }).click();
+  }
+  // Si le dialog mode apparaît quand même, choisir manuel.
+  const modeManual = page.getByTestId('forge-mode-manual');
+  if (await modeManual.isVisible({ timeout: 1_500 }).catch(() => false)) {
+    await modeManual.click();
   }
   // Étape 0 — Niveau : optionnel override, sinon défaut 1.
   const levelContinue = page.getByTestId('level-step-continue');

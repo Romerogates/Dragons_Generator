@@ -33,13 +33,14 @@ import {
   type EquipmentCatalogItem,
 } from '@core/utils/character-auto-build.util';
 import { pickRandom, randomHeroName } from '@core/utils/pregen-random.util';
-import { subclassBonusProficiencies } from '@core/utils/progression-choices.util';
+import { asiLevelsForClass, subclassBonusProficiencies } from '@core/utils/progression-choices.util';
 import { validateCharacterExport } from '@core/utils/character-export-validation.util';
 import { normalizeSkillId, type SkillInfo } from '@core/utils/skill.utils';
 import type { GeneratedPregenCharacter } from './campaign-pregen-generator.service';
 import { buildPregenPhysicalDescription } from '@core/utils/pregen-narrative.util';
 import { AiGenerationProgressService } from './ai-generation-progress.service';
 import { isAiGenerationAborted } from '@core/models/ai-generation.model';
+import type { AbilityKey, AsiChoiceSlot } from '@core/models/Character/character';
 
 interface GameCatalogs {
   species: Species[];
@@ -101,7 +102,7 @@ export class CharacterAutoGeneratorService {
       this.aiProgress.throwIfAborted();
       try {
         this.aiProgress.setStageLabel('Tirage aléatoire — espèce, classe, équipement…');
-        const character = this.buildRandomLevel1(catalogs);
+        const character = this.buildRandomHero(catalogs, 1);
         const validation = validateCharacterExport(character);
         if (!validation.valid) {
           lastErrors = validation.errors;
@@ -195,22 +196,24 @@ export class CharacterAutoGeneratorService {
   }
 
   /**
-   * Remplit la forge locale avec un héros L1 aléatoire valide (sans save cloud).
+   * Remplit la forge locale avec un héros aléatoire valide au niveau demandé (sans save cloud).
    * Utilise le même builder que `/create` — appeler depuis l’écran de création.
    */
-  async populateWizardWithRandomLevel1(): Promise<Character> {
+  async populateWizardWithRandomHero(level?: number): Promise<Character> {
     const catalogs = await this.loadCatalogs();
+    const target = Math.min(20, Math.max(1, Math.floor(Number(level ?? this.builder.targetLevel()) || 1)));
     const maxAttempts = 12;
     let lastErrors: string[] = [];
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       try {
-        const character = this.buildRandomLevel1(catalogs);
+        const character = this.buildRandomHero(catalogs, target);
         const validation = validateCharacterExport(character);
         if (!validation.valid) {
           lastErrors = validation.errors;
           continue;
         }
-        this.builder.goToStep(this.builder.summaryStep());
+        this.builder.acknowledgeLevel();
+        this.builder.jumpToSummaryForced();
         return character;
       } catch {
         continue;
@@ -221,6 +224,11 @@ export class CharacterAutoGeneratorService {
         ? `Génération impossible : ${lastErrors.join(' · ')}`
         : 'Génération impossible après plusieurs tentatives.',
     );
+  }
+
+  /** @deprecated Préférer `populateWizardWithRandomHero`. */
+  async populateWizardWithRandomLevel1(): Promise<Character> {
+    return this.populateWizardWithRandomHero(1);
   }
 
   private async loadCatalogs(): Promise<GameCatalogs> {
@@ -248,9 +256,10 @@ export class CharacterAutoGeneratorService {
     };
   }
 
-  private buildRandomLevel1(catalogs: GameCatalogs): Character {
+  private buildRandomHero(catalogs: GameCatalogs, level: number): Character {
+    const targetLevel = Math.min(20, Math.max(1, Math.floor(level) || 1));
     this.builder.reset();
-    this.builder.setTargetLevel(1);
+    this.builder.setTargetLevel(targetLevel);
 
     const species = pickRandom(catalogs.species);
     const cls = pickRandom(catalogs.classes);
@@ -260,14 +269,14 @@ export class CharacterAutoGeneratorService {
       throw new Error('Catalogue incomplet');
     }
 
-    const speciesSel = buildAutoSpeciesSelection(species, 1, catalogs.spells);
+    const speciesSel = buildAutoSpeciesSelection(species, targetLevel, catalogs.spells);
     this.builder.setSpecies(speciesSel);
     this.builder.setCivilization(buildAutoCivilizationSelection(civ));
 
     const bgSel = buildAutoBackgroundSelection(bg, catalogs.skills);
     this.builder.setBackground(bgSel);
 
-    const { selection, classChoiceAnswers, extraFeatures } = buildAutoClassSelection(cls, 1);
+    const { selection, classChoiceAnswers, extraFeatures } = buildAutoClassSelection(cls, targetLevel);
     this.builder.setClass(selection);
     this.builder.setClassProgressionChoices({
       classChoiceAnswers,
@@ -304,7 +313,7 @@ export class CharacterAutoGeneratorService {
 
     // Compétences/expertise fixes accordées automatiquement par la sous-classe (ex. Prêtre, Roublard
     // Espion) : non un choix, doivent apparaître sur la fiche sans compter dans les quotas ci-dessus.
-    const subBonus = subclassBonusProficiencies(cls, selection.subclassId, 1);
+    const subBonus = subclassBonusProficiencies(cls, selection.subclassId, targetLevel);
     if (subBonus.expertise.length) this.builder.setExpertiseSkills(subBonus.expertise);
 
     const weaponCatalog = catalogs.equipments
@@ -336,9 +345,21 @@ export class CharacterAutoGeneratorService {
       bgToolSlots,
     );
 
-    const abilities = buildStandardAbilityScores(primaryAbilityKeys(cls));
-    for (const [key, value] of Object.entries(abilities)) {
-      this.builder.setAbilityScore(key as keyof typeof abilities, value);
+    const primaryKeys = primaryAbilityKeys(cls);
+    const abilities = buildStandardAbilityScores(primaryKeys);
+    this.builder.setAbilityScoresBulk(abilities, 0);
+
+    const asiLevels = asiLevelsForClass(cls, targetLevel);
+    if (asiLevels.length) {
+      const primary = (primaryKeys[0] ?? 'force') as AbilityKey;
+      const slots: AsiChoiceSlot[] = asiLevels.map((lvl) => ({
+        level: lvl,
+        mode: 'plus2',
+        primary,
+        secondary: null,
+        featId: null,
+      }));
+      this.builder.setAsiChoices(slots);
     }
 
     const c = this.builder.creation();
@@ -367,7 +388,7 @@ export class CharacterAutoGeneratorService {
       speciesSel.racialSpellGrants,
       speciesSel.choiceAnswers,
       this.builder.abilityModifiers(),
-      { level: 1, subclassId: selection.subclassId },
+      { level: targetLevel, subclassId: selection.subclassId },
     );
     if (spellDetails) {
       this.builder.setSpellcastingDetails(spellDetails);

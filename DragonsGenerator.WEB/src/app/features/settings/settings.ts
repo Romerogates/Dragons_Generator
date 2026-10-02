@@ -20,6 +20,7 @@ import {
   type NotificationPrefOption,
 } from '@core/services/notification-preferences.service';
 import { UiBannerPreferencesService } from '@core/services/ui-banner-preferences.service';
+import { ForgePreferencesService } from '@core/services/forge-preferences.service';
 import { PwaLifecycleService } from '@core/services/pwa-lifecycle.service';
 import { PasswordFieldComponent } from '@shared/components/password-field/password-field';
 import { AiSettingsService, type AiProviderOption, type AiSettingsDto } from '@core/services/ai-settings.service';
@@ -48,6 +49,7 @@ export class SettingsPage implements OnInit {
   private readonly push = inject(PushNotificationService);
   private readonly notifPrefs = inject(NotificationPreferencesService);
   private readonly banners = inject(UiBannerPreferencesService);
+  private readonly forgePrefs = inject(ForgePreferencesService);
   private readonly pwa = inject(PwaLifecycleService);
   private readonly aiSettingsApi = inject(AiSettingsService);
   private readonly route = inject(ActivatedRoute);
@@ -65,6 +67,7 @@ export class SettingsPage implements OnInit {
   readonly prefOptions = NOTIFICATION_PREF_OPTIONS;
   readonly notifPreferences = this.notifPrefs.prefs;
   readonly hideAllBanners = this.banners.hideAllBanners;
+  readonly skipForgeModePrompt = this.forgePrefs.skipModePrompt;
 
   aiEnabled = false;
   aiProvider = 'openai';
@@ -290,6 +293,11 @@ export class SettingsPage implements OnInit {
   setHideAllBanners(event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
     this.banners.setHideAllBanners(checked);
+  }
+
+  setSkipForgeModePrompt(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.forgePrefs.setSkipModePrompt(checked);
   }
 
   async installPwa(): Promise<void> {

@@ -10,6 +10,7 @@ import { OfflineCodexService } from '@core/services/offline-codex.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
 import { DataService } from '@core/services/data.service';
 import { CharacterAutoGeneratorService } from '@core/services/character-auto-generator.service';
+import { ForgePreferencesService } from '@core/services/forge-preferences.service';
 import { CharacterCreation } from './character-creation';
 
 describe('CharacterCreation host', () => {
@@ -38,12 +39,15 @@ describe('CharacterCreation host', () => {
             reset: jasmine.createSpy('reset'),
             goToStep: jasmine.createSpy('goToStep'),
             goToSummary: jasmine.createSpy('goToSummary'),
+            jumpToSummaryForced: jasmine.createSpy('jumpToSummaryForced'),
             summaryStep: signal(11),
             returnToSummary: signal(false),
             stepJumpBlocked: signal(null),
             clearStepJumpBlocked: jasmine.createSpy('clearStepJumpBlocked'),
             needsMagicStep: signal(false),
             isLevelLocked: signal(false),
+            levelAcknowledged: signal(false),
+            acknowledgeLevel: jasmine.createSpy('acknowledgeLevel'),
             replaceCreation: jasmine.createSpy('replaceCreation'),
             abilityModifiers: signal({}),
             build: jasmine.createSpy('build'),
@@ -86,9 +90,19 @@ describe('CharacterCreation host', () => {
         {
           provide: CharacterAutoGeneratorService,
           useValue: {
+            populateWizardWithRandomHero: jasmine
+              .createSpy('populateWizardWithRandomHero')
+              .and.resolveTo({}),
             populateWizardWithRandomLevel1: jasmine
               .createSpy('populateWizardWithRandomLevel1')
               .and.resolveTo({}),
+          },
+        },
+        {
+          provide: ForgePreferencesService,
+          useValue: {
+            skipModePrompt: signal(true),
+            setSkipModePrompt: jasmine.createSpy('setSkipModePrompt'),
           },
         },
       ],
@@ -114,5 +128,22 @@ describe('CharacterCreation host', () => {
     component.showDraftPrompt.set(true);
     component.resumeDraft();
     expect(component.showDraftPrompt()).toBeFalse();
+  });
+
+  it('shows level required prompt when generating without acknowledged level', async () => {
+    fixture.detectChanges();
+    component.ngOnInit();
+    await component.generateQuickHero();
+    expect(component.showLevelRequiredPrompt()).toBeTrue();
+  });
+
+  it('shows forge mode prompt when skipModePrompt is false and no draft', () => {
+    const forge = TestBed.inject(ForgePreferencesService) as {
+      skipModePrompt: ReturnType<typeof signal<boolean>>;
+    };
+    forge.skipModePrompt.set(false);
+    hasPendingDraft.set(false);
+    component.ngOnInit();
+    expect(component.showForgeModePrompt()).toBeTrue();
   });
 });

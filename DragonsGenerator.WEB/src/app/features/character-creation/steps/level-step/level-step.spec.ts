@@ -9,6 +9,7 @@ describe('LevelStep', () => {
   let fixture: ComponentFixture<LevelStep>;
   let setTargetLevelSpy: jasmine.Spy;
   let nextStepSpy: jasmine.Spy;
+  let acknowledgeLevelSpy: jasmine.Spy;
   let targetLevelSignal: ReturnType<typeof signal<number>>;
 
   beforeEach(async () => {
@@ -17,6 +18,7 @@ describe('LevelStep', () => {
       targetLevelSignal.set(lvl);
     });
     nextStepSpy = jasmine.createSpy('nextStep');
+    acknowledgeLevelSpy = jasmine.createSpy('acknowledgeLevel');
 
     await TestBed.configureTestingModule({
       imports: [LevelStep],
@@ -28,6 +30,7 @@ describe('LevelStep', () => {
             targetLevel: targetLevelSignal,
             setTargetLevel: setTargetLevelSpy,
             nextStep: nextStepSpy,
+            acknowledgeLevel: acknowledgeLevelSpy,
           },
         },
       ],
@@ -51,6 +54,7 @@ describe('LevelStep', () => {
 
   it('advances to the next step on continue', () => {
     component.continueToNextStep();
+    expect(acknowledgeLevelSpy).toHaveBeenCalled();
     expect(nextStepSpy).toHaveBeenCalled();
   });
 });

@@ -19,6 +19,7 @@ import { CharacterHandoffService } from '@core/services/character-handoff.servic
 import { DataService } from '@core/services/data.service';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import { CharacterAutoGeneratorService } from '@core/services/character-auto-generator.service';
+import { ForgePreferencesService } from '@core/services/forge-preferences.service';
 import { autoCompleteRemainingCreation } from '@core/utils/character-auto-complete.util';
 import { normalizeCharacterClasses } from '@core/utils/class-data.adapter';
 import type { CharacterCreation as CreationState } from '@core/models/Character/character';
@@ -36,6 +37,8 @@ import { IdentityStep } from './steps/identity-step/identity-step';
 import { SummaryStep } from './steps/summary-step/summary-step';
 import { MagicStep } from './steps/magic-step/magic-step';
 import { BackgroundStep } from './steps/background-step/background-step';
+
+type PendingForgeAction = 'generate' | 'complete' | null;
 
 @Component({
   selector: 'app-character-creation',
@@ -70,6 +73,7 @@ export class CharacterCreation implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly data = inject(DataService);
   private readonly autoGenerator = inject(CharacterAutoGeneratorService);
+  private readonly forgePrefs = inject(ForgePreferencesService);
 
   readonly isOnline = this.connectivity.isOnline;
   readonly isLoggedIn = this.auth.isLoggedIn;
@@ -83,6 +87,12 @@ export class CharacterCreation implements OnInit {
   readonly showDraftDiscardConfirm = signal(false);
   /** Parcours level-up depuis la table (XP). */
   readonly levelUpMode = signal(false);
+
+  /** Entrée forge : pré-tiré vs manuel (désactivable dans Paramètres). */
+  readonly showForgeModePrompt = signal(false);
+  /** Rappeler de choisir un niveau avant Générer / Compléter. */
+  readonly showLevelRequiredPrompt = signal(false);
+  private pendingForgeAction: PendingForgeAction = null;
 
   readonly autoCompleteBusy = signal(false);
   readonly autoCompleteHint = signal<string | null>(null);
@@ -106,6 +116,12 @@ export class CharacterCreation implements OnInit {
     // 2. Brouillon détecté → demander à l'utilisateur
     if (this.builder.hasPendingDraft() && !this.builder.isEditMode) {
       this.showDraftPrompt.set(true);
+      return;
+    }
+
+    // 3. Forge vierge → proposer pré-tiré vs manuel (sauf préférence / level-up)
+    if (!this.forgePrefs.skipModePrompt() && !this.builder.isEditMode) {
+      this.showForgeModePrompt.set(true);
     }
   }
 
@@ -144,6 +160,33 @@ export class CharacterCreation implements OnInit {
     this.showDraftDiscardConfirm.set(false);
     this.showDraftPrompt.set(false);
     this.builder.reset();
+    if (!this.forgePrefs.skipModePrompt()) {
+      this.showForgeModePrompt.set(true);
+    }
+  }
+
+  chooseForgeManual(): void {
+    this.showForgeModePrompt.set(false);
+  }
+
+  chooseForgePregen(): void {
+    this.showForgeModePrompt.set(false);
+    void this.generateQuickHero();
+  }
+
+  dismissLevelRequired(): void {
+    this.showLevelRequiredPrompt.set(false);
+    this.pendingForgeAction = null;
+  }
+
+  /** L’utilisateur a choisi un niveau dans le popup → enchaîne l’action en attente. */
+  confirmLevelAndContinue(): void {
+    this.builder.acknowledgeLevel();
+    this.showLevelRequiredPrompt.set(false);
+    const action = this.pendingForgeAction;
+    this.pendingForgeAction = null;
+    if (action === 'generate') void this.runQuickGenerate();
+    else if (action === 'complete') void this.runAutoComplete();
   }
 
   /** Revenir à une étape déjà validée (barre de progression). */
@@ -164,13 +207,70 @@ export class CharacterCreation implements OnInit {
     });
   }
 
-  /** Complète aléatoirement les choix encore ouverts (langues / magie / compétences). */
+  /** Complète le reste au niveau choisi (plein autofill si vide, gaps sinon) → récap. */
   async autoCompleteRemaining(): Promise<void> {
-    if (this.autoCompleteBusy() || this.builder.currentStep() >= this.builder.summaryStep()) return;
+    if (this.autoCompleteBusy() || this.quickGenerateBusy()) return;
+    if (this.builder.currentStep() >= this.builder.summaryStep()) return;
+    if (!this.ensureLevelChosen('complete')) return;
+    await this.runAutoComplete();
+  }
+
+  /**
+   * Génère un héros complet dans la forge au niveau choisi → récap.
+   * L’utilisateur revoit le récap puis sauvegarde — compte dans « Mes héros ».
+   */
+  async generateQuickHero(): Promise<void> {
+    if (this.quickGenerateBusy() || this.autoCompleteBusy() || this.builder.isEditMode) return;
+    if (!this.ensureLevelChosen('generate')) return;
+    await this.runQuickGenerate();
+  }
+
+  private ensureLevelChosen(action: Exclude<PendingForgeAction, null>): boolean {
+    if (this.builder.levelAcknowledged()) return true;
+    this.pendingForgeAction = action;
+    this.showLevelRequiredPrompt.set(true);
+    this.autoCompleteHint.set(null);
+    return false;
+  }
+
+  private async runQuickGenerate(): Promise<void> {
+    this.quickGenerateBusy.set(true);
+    this.autoCompleteHint.set(null);
+    this.showDraftPrompt.set(false);
+    this.showDraftDiscardConfirm.set(false);
+    this.showForgeModePrompt.set(false);
+    try {
+      const before = structuredClone(this.builder.creation()) as CreationState;
+      const beforeStep = this.builder.currentStep();
+      const level = this.builder.targetLevel();
+      await this.autoGenerator.populateWizardWithRandomHero(level);
+      this.autoCompleteUndo = before;
+      this.autoCompleteUndoStep = beforeStep;
+      this.canUndoAutoComplete.set(true);
+      this.autoCompleteHint.set(
+        `Héros généré (niveau ${level}) — vérifiez le récap puis sauvegardez.`,
+      );
+    } catch (err) {
+      this.autoCompleteHint.set(
+        err instanceof Error ? err.message : 'Impossible de générer un héros.',
+      );
+    } finally {
+      this.quickGenerateBusy.set(false);
+    }
+  }
+
+  private async runAutoComplete(): Promise<void> {
     this.autoCompleteBusy.set(true);
     this.autoCompleteHint.set(null);
     try {
       const c = this.builder.creation();
+      // Rien de structurant choisi → même pipeline que « Générer un héros » au niveau courant.
+      if (!c.speciesId || !c.classId) {
+        this.autoCompleteBusy.set(false);
+        await this.runQuickGenerate();
+        return;
+      }
+
       const catalogs = await firstValueFrom(
         forkJoin({
           languages: this.data.getLanguages(),
@@ -181,6 +281,7 @@ export class CharacterCreation implements OnInit {
       const classes = normalizeCharacterClasses(catalogs.classes);
       const cls = c.classId ? (classes.find((x) => x.id === c.classId) ?? null) : null;
       const before = structuredClone(c) as CreationState;
+      const beforeStep = this.builder.currentStep();
       const { creation, filled } = autoCompleteRemainingCreation(c, {
         languages: catalogs.languages,
         spells: catalogs.spells,
@@ -188,13 +289,16 @@ export class CharacterCreation implements OnInit {
         abilityModifiers: this.builder.abilityModifiers(),
       });
       if (!filled.length) {
-        this.autoCompleteHint.set('Rien à compléter pour l’instant.');
+        this.builder.jumpToSummaryForced();
+        this.autoCompleteHint.set('Rien de plus à auto-compléter — récap ouvert pour vérification.');
         return;
       }
       this.autoCompleteUndo = before;
+      this.autoCompleteUndoStep = beforeStep;
       this.canUndoAutoComplete.set(true);
       this.builder.replaceCreation(creation);
-      this.autoCompleteHint.set(`Complété : ${filled.join(', ')}.`);
+      this.builder.jumpToSummaryForced();
+      this.autoCompleteHint.set(`Complété : ${filled.join(', ')}. Vérifiez le récap.`);
     } catch {
       this.autoCompleteHint.set('Impossible de compléter automatiquement.');
     } finally {
@@ -202,38 +306,11 @@ export class CharacterCreation implements OnInit {
     }
   }
 
-  /**
-   * Génère un héros L1 complet dans la forge (espèce → récap) pour jouer vite.
-   * L’utilisateur revoit le récap puis sauvegarde — compte dans « Mes héros ».
-   */
-  async generateQuickHero(): Promise<void> {
-    if (this.quickGenerateBusy() || this.builder.isEditMode) return;
-    this.quickGenerateBusy.set(true);
-    this.autoCompleteHint.set(null);
-    this.showDraftPrompt.set(false);
-    this.showDraftDiscardConfirm.set(false);
-    try {
-      const before = structuredClone(this.builder.creation()) as CreationState;
-      const beforeStep = this.builder.currentStep();
-      await this.autoGenerator.populateWizardWithRandomLevel1();
-      this.autoCompleteUndo = before;
-      this.autoCompleteUndoStep = beforeStep;
-      this.canUndoAutoComplete.set(true);
-      this.autoCompleteHint.set('Héros généré — vérifiez le récap puis sauvegardez.');
-    } catch (err) {
-      this.autoCompleteHint.set(
-        err instanceof Error ? err.message : 'Impossible de générer un héros.',
-      );
-    } finally {
-      this.quickGenerateBusy.set(false);
-    }
-  }
-
   undoAutoComplete(): void {
     if (!this.autoCompleteUndo) return;
     this.builder.replaceCreation(this.autoCompleteUndo);
     if (this.autoCompleteUndoStep != null) {
-      this.builder.goToStep(this.autoCompleteUndoStep);
+      this.builder.goToStep(this.autoCompleteUndoStep, { force: true });
       this.autoCompleteUndoStep = null;
     }
     this.autoCompleteUndo = null;

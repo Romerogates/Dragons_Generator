@@ -23,6 +23,7 @@ export class LevelStep {
   }
 
   continueToNextStep(): void {
+    this.builder.acknowledgeLevel();
     this.builder.nextStep();
   }
 }

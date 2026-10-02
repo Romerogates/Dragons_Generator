@@ -389,6 +389,32 @@
       </section>
 
       <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
+        <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Forge</h2>
+        <p class="text-xs text-slate-400 mb-4">
+          Options à l’ouverture de la création de personnage.
+        </p>
+        <label
+          class="flex items-start gap-3 cursor-pointer rounded-xl border border-slate-800/80 px-3 py-2.5 hover:border-slate-700"
+          data-testid="settings-forge-skip-mode"
+        >
+          <input
+            type="checkbox"
+            class="mt-0.5 w-4 h-4 rounded border-slate-600 shrink-0"
+            [checked]="skipForgeModePrompt()"
+            (change)="setSkipForgeModePrompt($event)"
+          />
+          <span class="min-w-0">
+            <span class="block text-sm text-slate-200"
+              >Ne plus demander pré-tiré / forge manuelle</span
+            >
+            <span class="block text-[11px] text-slate-500 mt-0.5"
+              >À l’entrée de Création, aller directement à l’étape Niveau.</span
+            >
+          </span>
+        </label>
+      </section>
+
+      <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
         <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Prêt pour la soirée</h2>
         <p class="text-[11px] text-slate-500 mb-4">Checklist hors ligne / install — utile si le wifi de la table est capricieux.</p>
         <ul class="space-y-2.5 text-sm" data-testid="pwa-readiness-checklist">

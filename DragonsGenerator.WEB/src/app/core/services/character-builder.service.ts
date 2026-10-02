@@ -89,6 +89,11 @@ export class CharacterBuilderService {
   private readonly handoff = inject(CharacterHandoffService);
   readonly creation = signal<ExtendedCharacterCreation>(structuredClone(INITIAL_CREATION_STATE));
   readonly currentStep = signal<number>(1);
+  /**
+   * True dès qu’un niveau a été choisi explicitement (clic grille / Continuer).
+   * Empêche Générer / Compléter de partir sans confirmation du niveau (défaut UI = 1).
+   */
+  readonly levelAcknowledged = signal(false);
   /** Après « Corriger une étape » depuis le récap — affiche un raccourci pour y revenir. */
   readonly returnToSummary = signal(false);
   /** Message si un saut d’étape avant est bloqué (validation). */
@@ -440,12 +445,18 @@ export class CharacterBuilderService {
   setTargetLevel(level: number): void {
     if (this.isLevelLocked()) return;
     const targetLevel = Math.min(20, Math.max(1, Math.floor(Number(level)) || 1));
+    this.levelAcknowledged.set(true);
     this.creation.update((c) => ({
       ...c,
       targetLevel,
       classFeatures: (c.classFeatures ?? []).filter((f) => (f.level ?? 1) <= targetLevel),
     }));
     this.refreshClassFeaturesForLevel(targetLevel);
+  }
+
+  /** Confirme le niveau courant sans le changer (ex. Continuer à l’étape Niveau). */
+  acknowledgeLevel(): void {
+    this.levelAcknowledged.set(true);
   }
 
   /**
@@ -786,6 +797,33 @@ export class CharacterBuilderService {
     }));
   }
 
+  /**
+   * Applique un tableau de scores d’un coup (ex. standard array auto-gén).
+   * Évite les no-op silencieux de `setAbilityScore` quand l’ordre d’assignation
+   * dépasse le budget point-buy intermédiaire.
+   */
+  setAbilityScoresBulk(scores: AbilityScores, pointsRemaining = 0): void {
+    const next: AbilityScores = {
+      force: scores.force,
+      dexterite: scores.dexterite,
+      constitution: scores.constitution,
+      intelligence: scores.intelligence,
+      sagesse: scores.sagesse,
+      charisme: scores.charisme,
+    };
+    for (const key of Object.keys(next) as AbilityKey[]) {
+      const v = next[key];
+      if (v < MIN_ABILITY_SCORE || v > MAX_ABILITY_SCORE) {
+        next[key] = DEFAULT_ABILITY_SCORE;
+      }
+    }
+    this.creation.update((c) => ({
+      ...c,
+      baseAbilities: next,
+      pointsRemaining: Math.max(0, Math.floor(pointsRemaining)),
+    }));
+  }
+
   incrementAbility(key: AbilityKey): void {
     const current = this.creation().baseAbilities[key];
     if (current < MAX_ABILITY_SCORE) this.setAbilityScore(key, current + 1);
@@ -898,10 +936,10 @@ export class CharacterBuilderService {
     }
   }
 
-  goToStep(step: number): boolean {
+  goToStep(step: number, opts?: { force?: boolean }): boolean {
     const total = this.totalSteps();
     if (step < 1 || step > total) return false;
-    if (step > this.currentStep()) {
+    if (!opts?.force && step > this.currentStep()) {
       for (let s = this.currentStep(); s < step; s++) {
         if (!this.isStepValid(s)) {
           const title = this.steps()[s - 1]?.title ?? `étape ${s}`;
@@ -925,6 +963,11 @@ export class CharacterBuilderService {
   /** Raccourci : revenir au récapitulatif (toutes les étapes intermédiaires doivent être valides). */
   goToSummary(): boolean {
     return this.goToStep(this.summaryStep());
+  }
+
+  /** Saut forcé vers le récap (auto-génération / édition) — sans revalider les étapes. */
+  jumpToSummaryForced(): void {
+    this.goToStep(this.summaryStep(), { force: true });
   }
 
   clearStepJumpBlocked(): void {
@@ -954,6 +997,7 @@ export class CharacterBuilderService {
     const { creation, editing } = mapCharacterToEditState(savedCharacter);
     this.editingRef.set(editing);
     this.creation.set(creation);
+    this.levelAcknowledged.set(true);
     this.currentStep.set(this.summaryStep());
 
     // On recharge ensuite avec le contexte complet (dons + sorts) pour recalculer fidèlement
@@ -1001,6 +1045,7 @@ export class CharacterBuilderService {
   reset(): void {
     this.creation.set(structuredClone(INITIAL_CREATION_STATE));
     this.currentStep.set(1);
+    this.levelAcknowledged.set(false);
     this.editingRef.set(null);
     this.returnToSummary.set(false);
     this.stepJumpBlocked.set(null);
@@ -1075,6 +1120,8 @@ export class CharacterBuilderService {
       }
       this.creation.set(creation);
       this.currentStep.set(Math.max(1, Math.min(step, 20)));
+      // Brouillon restauré ⇒ le niveau était déjà choisi / en cours.
+      this.levelAcknowledged.set(true);
       if (parsed.editing?.id) {
         this.editingRef.set(parsed.editing);
       }
