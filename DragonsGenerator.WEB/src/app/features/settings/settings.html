@@ -1,17 +1,23 @@
-<div class="max-w-3xl mx-auto px-4 py-10">
-  <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
-    <div class="flex items-center gap-3">
-      <span class="text-2xl"><iconify-icon icon="mdi:cog-outline"></iconify-icon></span>
-      <div>
-        <h1 class="font-serif text-2xl font-bold text-amber-500">Paramètres</h1>
-        <p class="text-xs text-slate-500 mt-0.5">Compte, IA, notifications, application et données.</p>
+<div class="settings-shell">
+  <div class="settings-hero">
+    <div class="flex flex-wrap items-center justify-between gap-3 relative z-[1]">
+      <div class="flex items-center gap-3 min-w-0">
+        <span
+          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-amber-800/40 bg-amber-950/30 text-xl text-amber-400"
+        >
+          <iconify-icon icon="mdi:cog-outline"></iconify-icon>
+        </span>
+        <div class="min-w-0">
+          <h1 class="font-serif text-2xl sm:text-3xl font-bold text-amber-400 tracking-wide">Paramètres</h1>
+          <p class="text-xs text-slate-400 mt-0.5">Compte, IA, notifications, application et données.</p>
+        </div>
       </div>
+      <a
+        routerLink="/profile"
+        class="shrink-0 text-[10px] font-black uppercase tracking-wider text-violet-400 hover:text-violet-300"
+        >Voir mon profil →</a
+      >
     </div>
-    <a
-      routerLink="/profile"
-      class="text-[10px] font-black uppercase tracking-wider text-violet-400 hover:text-violet-300"
-      >Voir mon profil →</a
-    >
   </div>
 
   @if (user() && !user()!.emailConfirmed) {
@@ -39,16 +45,13 @@
     </section>
   }
 
-  <nav class="flex gap-1 overflow-x-auto pb-1 mb-6 scrollbar-thin" aria-label="Sections des paramètres">
+  <nav class="settings-tabs" aria-label="Sections des paramètres">
     @for (tab of tabs; track tab.id) {
       <button
         type="button"
-        class="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider border transition-colors"
-        [class]="
-          activeTab() === tab.id
-            ? 'border-amber-500/50 bg-amber-950/30 text-amber-300'
-            : 'border-slate-800 bg-[#1b2028] text-slate-500 hover:text-slate-300'
-        "
+        class="settings-tab"
+        [class.settings-tab-active]="activeTab() === tab.id"
+        [class.settings-tab-idle]="activeTab() !== tab.id"
         [attr.aria-current]="activeTab() === tab.id ? 'page' : null"
         (click)="setTab(tab.id)"
       >
@@ -59,10 +62,10 @@
   </nav>
 
   @if (activeTab() === 'ai') {
-    <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6 space-y-5">
-      <div>
-        <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Votre propre IA</h2>
-        <p class="text-xs text-slate-400">
+    <section class="settings-panel space-y-5">
+      <div class="settings-panel-head !mb-0">
+        <h2 class="settings-panel-title">Votre propre IA</h2>
+        <p class="settings-panel-desc">
           Utilisez votre clé ChatGPT, Groq, Grok (xAI) ou OpenRouter (Claude, etc.). La clé est chiffrée sur
           le serveur et ne quitte jamais votre compte. Sans clé, l’IA Dragons Generator reste utilisée.
         </p>
@@ -71,16 +74,16 @@
       @if (aiLoading()) {
         <p class="text-sm text-slate-500">Chargement…</p>
       } @else {
-        <label class="flex items-start gap-3 cursor-pointer rounded-xl border border-slate-800/80 px-3 py-2.5 hover:border-slate-700">
+        <label class="settings-row">
           <input
             type="checkbox"
-            class="mt-0.5 w-4 h-4 rounded border-slate-600 shrink-0"
+            class="settings-check"
             [(ngModel)]="aiEnabled"
             name="aiEnabled"
           />
           <span class="min-w-0">
-            <span class="block text-sm text-slate-200">Utiliser mon IA pour les générations</span>
-            <span class="block text-[11px] text-slate-500 mt-0.5"
+            <span class="block text-sm text-slate-100 font-medium">Utiliser mon IA pour les générations</span>
+            <span class="block text-[11px] text-slate-500 mt-1"
               >Aventure, vies de créatures, historique de personnage.</span
             >
           </span>
@@ -158,7 +161,7 @@
   }
 
   @if (activeTab() === 'account') {
-    <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
+    <section class="settings-panel">
       <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Profil public</h2>
       <p class="text-xs text-slate-400 mb-4">{{ user()?.email }}</p>
 
@@ -263,7 +266,7 @@
 
   @if (activeTab() === 'notifications') {
     <div class="space-y-4">
-      <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
+      <section class="settings-panel">
         <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
           Notifications push
         </h2>
@@ -273,15 +276,15 @@
         @if (!pushSupported()) {
           <p class="text-sm text-amber-300">Indisponible ici (service worker requis).</p>
         } @else {
-          <label class="flex items-center gap-3 cursor-pointer">
+          <label class="settings-row">
             <input
               type="checkbox"
-              class="w-4 h-4 rounded border-slate-600"
+              class="settings-check"
               [checked]="pushEnabled()"
               [disabled]="pushBusy()"
               (change)="togglePushNotifications($event)"
             />
-            <span class="text-sm text-slate-300">Activer les notifications push</span>
+            <span class="text-sm text-slate-200 leading-snug">Activer les notifications push</span>
           </label>
           @if (pushError(); as err) {
             <p class="text-sm text-red-400 mt-3">{{ err }}</p>
@@ -289,7 +292,7 @@
         }
       </section>
 
-      <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
+      <section class="settings-panel">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
           <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500">
             Préférences par type
@@ -315,16 +318,16 @@
             <div class="space-y-3">
               @for (opt of prefOptions; track opt.id) {
                 @if (opt.group === group) {
-                  <label class="flex items-start gap-3 cursor-pointer rounded-xl border border-slate-800/80 px-3 py-2.5 hover:border-slate-700">
+                  <label class="settings-row">
                     <input
                       type="checkbox"
-                      class="mt-0.5 w-4 h-4 rounded border-slate-600 shrink-0"
+                      class="settings-check"
                       [checked]="notifPreferences()[opt.id]"
                       (change)="setNotifPref(opt.id, $event)"
                     />
                     <span class="min-w-0">
-                      <span class="block text-sm text-slate-200">{{ opt.label }}</span>
-                      <span class="block text-[11px] text-slate-500 mt-0.5">{{ opt.hint }}</span>
+                      <span class="block text-sm text-slate-200 leading-snug">{{ opt.label }}</span>
+                      <span class="block text-[11px] text-slate-500 mt-0.5 leading-relaxed">{{ opt.hint }}</span>
                     </span>
                   </label>
                 }
@@ -342,107 +345,130 @@
 
   @if (activeTab() === 'app') {
     <div class="space-y-4">
-      <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Application (PWA)</h2>
-        <p class="text-xs text-slate-400 mb-4">
-          Installez Dragons Generator sur l’écran d’accueil pour un accès rapide et les notifications.
-        </p>
+      <section class="settings-panel">
+        <div class="settings-panel-head">
+          <h2 class="settings-panel-title">Application (PWA)</h2>
+          <p class="settings-panel-desc">
+            Installez Dragons Generator sur l’écran d’accueil pour un accès rapide et les notifications.
+          </p>
+        </div>
         @if (isPwaStandalone()) {
-          <p class="text-sm text-emerald-400">Application déjà installée.</p>
+          <div class="settings-status-row pl-2">
+            <span class="settings-status-dot settings-status-dot-ok">✓</span>
+            <span class="text-sm text-emerald-300">Application déjà installée.</span>
+          </div>
         } @else if (canInstallPwa()) {
           <button
             type="button"
-            class="wizard-nav-primary"
+            class="settings-btn-primary ml-2"
             [disabled]="installBusy()"
             (click)="installPwa()"
           >
             {{ installBusy() ? 'Installation…' : 'Installer l’app' }}
           </button>
         } @else {
-          <p class="text-sm text-slate-500">
+          <p class="text-sm text-slate-500 pl-2 leading-relaxed">
             Sur mobile : menu du navigateur → « Ajouter à l’écran d’accueil ». Sur desktop Chrome : icône
             d’installation dans la barre d’adresse.
           </p>
         }
       </section>
 
-      <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Aide & bannières</h2>
-        <p class="text-xs text-slate-400 mb-4">
-          Masque les guides de démarrage, toasts d’aide donjon et bandeaux coaching. Vous pouvez aussi
-          fermer chaque bannière avec ✕ (mémorisé sur le compte).
-        </p>
-        <label class="flex items-start gap-3 cursor-pointer rounded-xl border border-slate-800/80 px-3 py-2.5 hover:border-slate-700">
+      <section class="settings-panel">
+        <div class="settings-panel-head">
+          <h2 class="settings-panel-title">Aide & bannières</h2>
+          <p class="settings-panel-desc">
+            Masque les guides de démarrage, liens « Guide — … », toasts donjon et bandeaux coaching. Chaque
+            bannière se ferme aussi avec ✕ (mémorisé sur le compte).
+          </p>
+        </div>
+        <label class="settings-row ml-1">
           <input
             type="checkbox"
-            class="mt-0.5 w-4 h-4 rounded border-slate-600 shrink-0"
+            class="settings-check"
             [checked]="hideAllBanners()"
             (change)="setHideAllBanners($event)"
           />
           <span class="min-w-0">
-            <span class="block text-sm text-slate-200">Masquer toutes les bannières d’aide</span>
-            <span class="block text-[11px] text-slate-500 mt-0.5"
-              >S’applique au guide campagne, toast donjon, bienvenue et checklist.</span
+            <span class="block text-sm text-slate-100 font-medium">Masquer toutes les bannières d’aide</span>
+            <span class="block text-[11px] text-slate-500 mt-1 leading-snug"
+              >Liens guide (forge, campagnes…), toast donjon, bienvenue et checklist.</span
             >
           </span>
         </label>
       </section>
 
-      <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Forge</h2>
-        <p class="text-xs text-slate-400 mb-4">
-          Options à l’ouverture de la création de personnage.
-        </p>
-        <label
-          class="flex items-start gap-3 cursor-pointer rounded-xl border border-slate-800/80 px-3 py-2.5 hover:border-slate-700"
-          data-testid="settings-forge-skip-mode"
-        >
+      <section class="settings-panel">
+        <div class="settings-panel-head">
+          <h2 class="settings-panel-title">Forge</h2>
+          <p class="settings-panel-desc">Options à l’ouverture de la création de personnage.</p>
+        </div>
+        <label class="settings-row ml-1" data-testid="settings-forge-skip-mode">
           <input
             type="checkbox"
-            class="mt-0.5 w-4 h-4 rounded border-slate-600 shrink-0"
+            class="settings-check"
             [checked]="skipForgeModePrompt()"
             (change)="setSkipForgeModePrompt($event)"
           />
           <span class="min-w-0">
-            <span class="block text-sm text-slate-200"
+            <span class="block text-sm text-slate-100 font-medium"
               >Ne plus demander pré-tiré / forge manuelle</span
             >
-            <span class="block text-[11px] text-slate-500 mt-0.5"
+            <span class="block text-[11px] text-slate-500 mt-1 leading-snug"
               >À l’entrée de Création, aller directement à l’étape Niveau.</span
             >
           </span>
         </label>
       </section>
 
-      <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Prêt pour la soirée</h2>
-        <p class="text-[11px] text-slate-500 mb-4">Checklist hors ligne / install — utile si le wifi de la table est capricieux.</p>
-        <ul class="space-y-2.5 text-sm" data-testid="pwa-readiness-checklist">
-          <li class="flex items-start gap-2">
-            <span class="mt-0.5 shrink-0" [class.text-emerald-400]="isPwaStandalone()" [class.text-slate-600]="!isPwaStandalone()">
-              {{ isPwaStandalone() ? '✓' : '○' }}
-            </span>
-            <span [class.text-slate-200]="isPwaStandalone()" [class.text-slate-500]="!isPwaStandalone()">
-              App installée (PWA)
-            </span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="mt-0.5 shrink-0" [class.text-emerald-400]="codexDownloaded()" [class.text-slate-600]="!codexDownloaded()">
-              {{ codexDownloaded() ? '✓' : '○' }}
-            </span>
-            <span [class.text-slate-200]="codexDownloaded()" [class.text-slate-500]="!codexDownloaded()">
-              Codex téléchargé hors ligne
-            </span>
-          </li>
-          <li class="flex items-start gap-2">
+      <section class="settings-panel">
+        <div class="settings-panel-head">
+          <h2 class="settings-panel-title">Prêt pour la soirée</h2>
+          <p class="settings-panel-desc">
+            Checklist hors ligne / install — utile si le wifi de la table est capricieux.
+          </p>
+        </div>
+        <ul class="space-y-2 pl-1" data-testid="pwa-readiness-checklist">
+          <li class="settings-status-row">
             <span
-              class="mt-0.5 shrink-0"
-              [class.text-emerald-400]="pendingSyncCount() === 0"
-              [class.text-amber-400]="pendingSyncCount() > 0"
+              class="settings-status-dot"
+              [class.settings-status-dot-ok]="isPwaStandalone()"
+              [class.settings-status-dot-idle]="!isPwaStandalone()"
+              >{{ isPwaStandalone() ? '✓' : '○' }}</span
             >
-              {{ pendingSyncCount() === 0 ? '✓' : '○' }}
-            </span>
-            <span [class.text-slate-200]="pendingSyncCount() === 0" [class.text-amber-200/90]="pendingSyncCount() > 0">
+            <span
+              class="text-sm"
+              [class.text-slate-200]="isPwaStandalone()"
+              [class.text-slate-500]="!isPwaStandalone()"
+              >App installée (PWA)</span
+            >
+          </li>
+          <li class="settings-status-row">
+            <span
+              class="settings-status-dot"
+              [class.settings-status-dot-ok]="codexDownloaded()"
+              [class.settings-status-dot-idle]="!codexDownloaded()"
+              >{{ codexDownloaded() ? '✓' : '○' }}</span
+            >
+            <span
+              class="text-sm"
+              [class.text-slate-200]="codexDownloaded()"
+              [class.text-slate-500]="!codexDownloaded()"
+              >Codex téléchargé hors ligne</span
+            >
+          </li>
+          <li class="settings-status-row">
+            <span
+              class="settings-status-dot"
+              [class.settings-status-dot-ok]="pendingSyncCount() === 0"
+              [class.settings-status-dot-warn]="pendingSyncCount() > 0"
+              >{{ pendingSyncCount() === 0 ? '✓' : '○' }}</span
+            >
+            <span
+              class="text-sm"
+              [class.text-slate-200]="pendingSyncCount() === 0"
+              [class.text-amber-200/90]="pendingSyncCount() > 0"
+            >
               @if (pendingSyncCount() === 0) {
                 Rien en attente de sync
               } @else {
@@ -453,53 +479,65 @@
         </ul>
       </section>
 
-      <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Mode hors ligne</h2>
-        <p class="text-xs text-slate-400 mb-4">
-          Télécharge le Codex pour forger un personnage sans connexion. Les éléments créés hors ligne seront
-          synchronisés à la reconnexion.
-        </p>
+      <section class="settings-panel">
+        <div class="settings-panel-head">
+          <h2 class="settings-panel-title">Mode hors ligne</h2>
+          <p class="settings-panel-desc">
+            Télécharge le Codex pour forger sans connexion. Les créations hors ligne se synchronisent à la
+            reconnexion.
+          </p>
+        </div>
 
         @if (codexDownloaded()) {
-          <p class="text-sm text-emerald-400 mb-3">
-            Codex disponible hors ligne
-            @if (codexDownloadedAt(); as at) {
-              <span class="text-slate-500"> · {{ at | date: 'short' }}</span>
-            }
-          </p>
+          <div class="settings-status-row mb-4 ml-1">
+            <span class="settings-status-dot settings-status-dot-ok">✓</span>
+            <span class="text-sm text-emerald-300 min-w-0">
+              Codex disponible hors ligne
+              @if (codexDownloadedAt(); as at) {
+                <span class="text-slate-500"> · {{ at | date: 'short' }}</span>
+              }
+            </span>
+          </div>
         } @else {
-          <p class="text-sm text-amber-300 mb-3">Codex non téléchargé.</p>
+          <div class="settings-status-row mb-4 ml-1">
+            <span class="settings-status-dot settings-status-dot-warn">!</span>
+            <span class="text-sm text-amber-300">Codex non téléchargé.</span>
+          </div>
         }
 
         @if (codexDownloadError(); as err) {
-          <p class="text-sm text-red-400 mb-3">{{ err }}</p>
+          <p class="text-sm text-red-400 mb-3 pl-2">{{ err }}</p>
         }
 
-        <div class="flex flex-wrap gap-2 mb-4">
+        <div class="flex flex-wrap gap-2 mb-4 pl-1">
           <button
             type="button"
-            class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white disabled:opacity-50"
+            class="settings-btn-primary"
             [disabled]="codexDownloading() || !isOnline()"
             (click)="downloadCodex()"
           >
-            {{ codexDownloading() ? 'Téléchargement…' : (codexDownloaded() ? 'Mettre à jour le Codex' : 'Télécharger le Codex') }}
+            {{
+              codexDownloading()
+                ? 'Téléchargement…'
+                : codexDownloaded()
+                  ? 'Mettre à jour le Codex'
+                  : 'Télécharger le Codex'
+            }}
           </button>
           @if (codexDownloaded()) {
-            <button
-              type="button"
-              class="px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-slate-700 text-slate-400"
-              (click)="clearCodexDownload()"
-            >
+            <button type="button" class="settings-btn-secondary" (click)="clearCodexDownload()">
               Supprimer le cache
             </button>
           }
         </div>
 
         @if (pendingSyncCount() > 0) {
-          <p class="text-sm text-sky-300 mb-2">{{ pendingSyncCount() }} élément(s) en attente de synchronisation.</p>
+          <p class="text-sm text-sky-300 mb-2 pl-2">
+            {{ pendingSyncCount() }} élément(s) en attente de synchronisation.
+          </p>
           <button
             type="button"
-            class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-sky-900/40 border border-sky-700/50 text-sky-300 disabled:opacity-50"
+            class="settings-btn-secondary border-sky-800/60 text-sky-300 hover:border-sky-600 ml-1"
             [disabled]="!isOnline()"
             (click)="syncNow()"
           >
@@ -507,17 +545,17 @@
           </button>
         }
         @if (syncError()) {
-          <p class="text-sm text-amber-400 mt-3">{{ syncError() }}</p>
+          <p class="text-sm text-amber-400 mt-3 pl-2">{{ syncError() }}</p>
         }
         @if (syncMessage()) {
-          <p class="text-sm text-emerald-400 mt-3">{{ syncMessage() }}</p>
+          <p class="text-sm text-emerald-400 mt-3 pl-2">{{ syncMessage() }}</p>
         }
       </section>
     </div>
   }
 
   @if (activeTab() === 'security') {
-    <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
+    <section class="settings-panel">
       <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Mot de passe</h2>
       <p class="text-xs text-slate-400 mb-4">
         Modifiez votre mot de passe uniquement si nécessaire — 8 caractères minimum.
@@ -577,7 +615,7 @@
   }
 
   @if (activeTab() === 'data') {
-    <section class="bg-[#1b2028] border border-slate-800 rounded-2xl p-6">
+    <section class="settings-panel">
       <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
         Données personnelles (RGPD)
       </h2>

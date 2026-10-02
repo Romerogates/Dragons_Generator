@@ -5,6 +5,10 @@ import {
   OnInit,
   inject,
   signal,
+  computed,
+  effect,
+  viewChild,
+  ElementRef,
   ChangeDetectionStrategy,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
@@ -20,6 +24,10 @@ import { DataService } from '@core/services/data.service';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
 import { CharacterAutoGeneratorService } from '@core/services/character-auto-generator.service';
 import { ForgePreferencesService } from '@core/services/forge-preferences.service';
+import {
+  UI_BANNER_IDS,
+  UiBannerPreferencesService,
+} from '@core/services/ui-banner-preferences.service';
 import { autoCompleteRemainingCreation } from '@core/utils/character-auto-complete.util';
 import { normalizeCharacterClasses } from '@core/utils/class-data.adapter';
 import type { CharacterCreation as CreationState } from '@core/models/Character/character';
@@ -63,6 +71,9 @@ type PendingForgeAction = 'generate' | 'complete' | null;
   templateUrl: './character-creation.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
+  host: {
+    class: 'forge-route block',
+  },
 })
 export class CharacterCreation implements OnInit {
   readonly builder = inject(CharacterBuilderService);
@@ -74,9 +85,14 @@ export class CharacterCreation implements OnInit {
   private readonly data = inject(DataService);
   private readonly autoGenerator = inject(CharacterAutoGeneratorService);
   private readonly forgePrefs = inject(ForgePreferencesService);
+  private readonly banners = inject(UiBannerPreferencesService);
 
   readonly isOnline = this.connectivity.isOnline;
   readonly isLoggedIn = this.auth.isLoggedIn;
+  /** Liens guide contextuels (masquables dans Paramètres → Aide & bannières). */
+  readonly showGuideLinks = computed(() =>
+    this.banners.isVisible(UI_BANNER_IDS.contextualGuideLinks),
+  );
   readonly codexReady = signal(this.offlineCodex.isDownloaded());
   readonly codexDownloading = this.offlineCodex.downloading;
   readonly codexDownloadError = this.offlineCodex.downloadError;
@@ -101,6 +117,28 @@ export class CharacterCreation implements OnInit {
   private autoCompleteUndoStep: number | null = null;
 
   readonly quickGenerateBusy = signal(false);
+  private readonly forgeStepper = viewChild<ElementRef<HTMLElement>>('forgeStepper');
+
+  constructor() {
+    effect(() => {
+      const step = this.builder.currentStep();
+      queueMicrotask(() => this.scrollActiveForgeStepIntoView(step));
+    });
+  }
+
+  /** Flèches ‹ › du stepper. */
+  scrollForgeStepsBy(delta: number): void {
+    const el = this.forgeStepper()?.nativeElement;
+    if (!el) return;
+    el.scrollBy({ left: delta, behavior: 'smooth' });
+  }
+
+  /** Garde l’étape active visible dans le stepper (ex. 12 Récap hors écran). */
+  private scrollActiveForgeStepIntoView(step: number): void {
+    const root = this.forgeStepper()?.nativeElement;
+    const el = root?.querySelector<HTMLElement>(`[data-forge-step="${step}"]`);
+    el?.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+  }
 
   ngOnInit(): void {
     // 1. Mode édition depuis /characters → priorité absolue

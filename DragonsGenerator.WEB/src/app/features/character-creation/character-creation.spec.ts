@@ -11,6 +11,7 @@ import { CharacterHandoffService } from '@core/services/character-handoff.servic
 import { DataService } from '@core/services/data.service';
 import { CharacterAutoGeneratorService } from '@core/services/character-auto-generator.service';
 import { ForgePreferencesService } from '@core/services/forge-preferences.service';
+import { UiBannerPreferencesService } from '@core/services/ui-banner-preferences.service';
 import { CharacterCreation } from './character-creation';
 
 describe('CharacterCreation host', () => {
@@ -103,6 +104,14 @@ describe('CharacterCreation host', () => {
           useValue: {
             skipModePrompt: signal(true),
             setSkipModePrompt: jasmine.createSpy('setSkipModePrompt'),
+          },
+        },
+        {
+          provide: UiBannerPreferencesService,
+          useValue: {
+            hideAllBanners: signal(false),
+            isVisible: () => true,
+            hydrated: signal(true),
           },
         },
       ],

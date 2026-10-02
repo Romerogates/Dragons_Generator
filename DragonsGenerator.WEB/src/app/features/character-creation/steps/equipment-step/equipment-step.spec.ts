@@ -281,6 +281,39 @@ describe('EquipmentStep', () => {
     expect(component.selectionComplete()).toBeTrue();
   });
 
+  it('blocks nextSlot until the current choice is selected', () => {
+    expectCatalogLoaded();
+    component.activeSlotIndex.set(1);
+    fixture.detectChanges();
+
+    expect(component.isCurrentSlotSatisfied()).toBeFalse();
+    component.nextSlot();
+    expect(component.activeSlotIndex()).toBe(1);
+
+    component.selectAlternative(0);
+    // alternative 0 is tool category — still incomplete
+    expect(component.isCurrentSlotSatisfied()).toBeFalse();
+    component.nextSlot();
+    expect(component.activeSlotIndex()).toBe(1);
+  });
+
+  it('invalidate on prevSlot forces reselect', () => {
+    expectCatalogLoaded();
+    component.activeSlotIndex.set(1);
+    component.selectAlternative(1);
+    component.pickedCategory.update((m) => new Map(m).set('2-1-0', ['wp-dague']));
+    component.activeSlotIndex.set(2);
+    component.selectAlternative(0);
+    fixture.detectChanges();
+
+    expect(component.pickedAlt().has(2)).toBeTrue();
+    component.prevSlot();
+    expect(component.activeSlotIndex()).toBe(1);
+    expect(component.pickedAlt().has(2)).toBeFalse();
+    expect(component.pickedCategory().has('2-1-0')).toBeFalse();
+    expect(component.isCurrentSlotSatisfied()).toBeFalse();
+  });
+
   it('resolves acolyte background prayer item alternatives by catalog name', () => {
     creationSignal.set(
       lettreCreation({
@@ -383,6 +416,69 @@ describe('EquipmentStep', () => {
       'wp-epee-longue',
       'wp-hache-bataille',
     ]);
+  });
+
+  it('recovers class slots when startingEquipmentSlots is raw API object', () => {
+    creationSignal.set(
+      lettreCreation({
+        classId: 'cls-ensorceleur',
+        className: 'Ensorceleur',
+        startingEquipmentSlots: {
+          fixed: [{ id: 'wp-dague', qty: 2 }],
+          choice_pools: [
+            {
+              name: 'Arme à distance ou arme courante au choix',
+              options: [
+                {
+                  option_id: 'A',
+                  items: [
+                    { id: 'wp-arbalete-legere', qty: 1 },
+                    { id: 'it-carreaux', qty: 20 },
+                  ],
+                },
+                { option_id: 'B', items: [{ id: 'category-arme-courante', qty: 1 }] },
+              ],
+            },
+          ],
+        },
+        backgroundEquipmentSlots: [
+          {
+            slot: 100,
+            description: 'Livre de prières ou moulin à prières',
+            alternatives: [
+              [{ id: 'gr-livre-de-prieres', qty: 1 }],
+              [{ id: 'gr-moulin-a-prieres', qty: 1 }],
+            ],
+          },
+        ],
+      }),
+    );
+    fixture.detectChanges();
+
+    expect(component.resolvedSlots().length).toBe(3);
+    expect(component.resolvedSlots()[0].isFixed).toBeTrue();
+    expect(component.itemName(component.resolvedSlots()[0].fixedItems[0])).toBe('Dague');
+    expect(component.resolvedSlots()[1].description).toContain('Arme à distance');
+    expect(component.selectionComplete()).toBeFalse();
+  });
+
+  it('includes toolEquipmentSlots from species/background tool mastery', () => {
+    creationSignal.set(
+      lettreCreation({
+        startingEquipmentSlots: [{ slot: 1, fixed: [{ id: 'wp-dague', qty: 1 }] }],
+        toolEquipmentSlots: [
+          {
+            slot: 200,
+            description: 'Instrument de musique (Maîtrise)',
+            alternatives: [[{ id: 'category-musical-instruments', qty: 1 }]],
+          },
+        ],
+      }),
+    );
+    fixture.detectChanges();
+
+    expect(component.resolvedSlots().length).toBe(2);
+    expect(component.resolvedSlots()[1].description).toContain('Instrument');
   });
 
   it('shows load error when catalog request fails', async () => {

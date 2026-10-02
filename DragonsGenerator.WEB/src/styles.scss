@@ -22,6 +22,15 @@
     --dg-sticky-below-wizard: calc(var(--dg-sticky-top) + var(--dg-wizard-chrome-height));
   }
 
+  /* Forge : navbar non-sticky → étapes collées en haut d’écran (+ flèches + raccourcis). */
+  .forge-route {
+    --dg-wizard-chrome-height: 7.25rem;
+    --dg-sticky-top: env(safe-area-inset-top, 0px);
+    --dg-sticky-below-wizard: calc(
+      env(safe-area-inset-top, 0px) + var(--dg-wizard-chrome-height)
+    );
+  }
+
   html,
   body {
     overflow-x: clip;
@@ -68,7 +77,7 @@
   }
 
   .wizard-nav-secondary {
-    @apply text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-400 transition-colors px-5 sm:px-6 py-2.5 rounded-full border border-slate-700 shadow-lg;
+    @apply min-h-11 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-amber-400 transition-colors px-5 sm:px-6 py-2.5 rounded-full border border-slate-700 shadow-lg;
     background-color: var(--dg-surface);
   }
 
@@ -98,6 +107,318 @@
     @apply w-14 h-14 rounded-full flex items-center justify-center shadow-[0_8px_28px_rgba(0,0,0,0.45)] border transition-transform active:scale-95;
   }
 
+  /* Surfaces partagées (Paramètres, Campagnes…) */
+  .dg-hero {
+    @apply relative overflow-hidden rounded-2xl border px-5 py-5 sm:px-6 sm:py-6;
+    background: linear-gradient(145deg, #1c222c 0%, #141820 100%);
+  }
+
+  .dg-hero-amber {
+    @apply border-amber-900/25;
+    background:
+      radial-gradient(ellipse 80% 120% at 0% 0%, rgba(245, 158, 11, 0.12), transparent 55%),
+      linear-gradient(145deg, #1c222c 0%, #141820 100%);
+  }
+
+  .dg-hero-violet {
+    @apply border-violet-900/30;
+    background:
+      radial-gradient(ellipse 80% 120% at 0% 0%, rgba(139, 92, 246, 0.14), transparent 55%),
+      linear-gradient(145deg, #1c222c 0%, #141820 100%);
+  }
+
+  .dg-card {
+    @apply relative flex flex-col overflow-hidden rounded-2xl border border-slate-800/90
+      transition-[colors,transform,opacity,box-shadow] duration-200;
+    background: linear-gradient(165deg, #1e2430 0%, #171b22 72%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.035),
+      0 12px 28px rgba(0, 0, 0, 0.22);
+  }
+
+  .dg-card-violet {
+    @apply cursor-pointer;
+  }
+
+  .dg-card-violet:hover {
+    @apply border-violet-500/45;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 0 28px rgba(139, 92, 246, 0.12),
+      0 14px 32px rgba(0, 0, 0, 0.28);
+  }
+
+  .dg-card-head {
+    @apply px-5 py-3 flex justify-between items-center border-b border-slate-800/80;
+    background: rgba(12, 16, 22, 0.45);
+  }
+
+  .dg-card-foot {
+    @apply px-5 py-3 border-t border-slate-800/80 flex justify-between items-center;
+    background: rgba(12, 16, 22, 0.35);
+  }
+
+  .dg-chip-bar {
+    @apply flex flex-wrap gap-1.5 mb-4 rounded-2xl border border-slate-800/80 bg-[#141820]/80 p-1.5;
+  }
+
+  .dg-chip {
+    @apply px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-colors;
+  }
+
+  .dg-chip-idle {
+    @apply border-transparent text-slate-500 hover:text-slate-300 hover:bg-slate-800/40;
+  }
+
+  .dg-empty {
+    @apply flex flex-col items-center justify-center flex-grow rounded-3xl border border-dashed
+      border-slate-700/80 p-12 text-center;
+    background:
+      radial-gradient(ellipse 70% 80% at 50% 0%, rgba(139, 92, 246, 0.08), transparent 55%),
+      linear-gradient(165deg, #1e2430 0%, #171b22 72%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  }
+
+  /* Paramètres — panneaux & rangées */
+  .settings-shell {
+    @apply max-w-3xl mx-auto px-4 py-8 sm:py-10;
+  }
+
+  .settings-hero {
+    @apply relative mb-7 overflow-hidden rounded-2xl border border-amber-900/25 px-5 py-5 sm:px-6 sm:py-6;
+    background:
+      radial-gradient(ellipse 80% 120% at 0% 0%, rgba(245, 158, 11, 0.12), transparent 55%),
+      linear-gradient(145deg, #1c222c 0%, #141820 100%);
+  }
+
+  .dg-panel {
+    @apply relative overflow-hidden rounded-2xl border border-slate-800/90 p-6 sm:p-8;
+    background: linear-gradient(165deg, #1e2430 0%, #171b22 72%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.035),
+      0 12px 28px rgba(0, 0, 0, 0.18);
+  }
+
+  .dg-panel::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, rgba(245, 158, 11, 0.75), rgba(245, 158, 11, 0.12));
+    pointer-events: none;
+  }
+
+  .dg-panel-compact {
+    @apply p-5 sm:p-6;
+  }
+
+  .dg-step-title {
+    @apply text-2xl sm:text-3xl font-extrabold text-amber-500 mb-1 tracking-wide font-serif;
+  }
+
+  .dg-step-sub {
+    @apply text-slate-400 text-xs max-w-xl mx-auto leading-relaxed;
+  }
+
+  .settings-panel {
+    @apply relative overflow-hidden rounded-2xl border border-slate-800/90 p-5 sm:p-6;
+    background: linear-gradient(165deg, #1e2430 0%, #171b22 72%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+  }
+
+  .settings-panel::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, rgba(245, 158, 11, 0.75), rgba(245, 158, 11, 0.12));
+  }
+
+  .settings-panel-head {
+    @apply mb-4 pl-2;
+  }
+
+  .settings-panel-title {
+    @apply font-serif text-[15px] sm:text-base text-amber-400/95 tracking-wide;
+  }
+
+  .settings-panel-desc {
+    @apply mt-1.5 text-xs text-slate-400 leading-relaxed max-w-prose;
+  }
+
+  /* Contrôles partagés — .settings-* = alias compat Paramètres */
+  .dg-check,
+  .settings-check {
+    @apply relative mt-0.5 h-[1.125rem] w-[1.125rem] shrink-0 appearance-none rounded-[5px]
+      border border-slate-500/90 bg-[#0c1016] cursor-pointer
+      transition-[border-color,background-color,box-shadow,transform] duration-150;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45);
+  }
+
+  .dg-check:hover:not(:disabled),
+  .settings-check:hover:not(:disabled) {
+    @apply border-amber-600/55;
+  }
+
+  .dg-check:focus-visible,
+  .settings-check:focus-visible {
+    @apply outline-none ring-2 ring-amber-500/45 ring-offset-2 ring-offset-[#171b22];
+  }
+
+  .dg-check:checked,
+  .settings-check:checked {
+    @apply border-amber-500 bg-amber-500;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.5 8.2 6.4 11.1 12.5 4.5' stroke='%23141418' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-size: 0.85rem 0.85rem;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-shadow:
+      0 0 0 1px rgba(245, 158, 11, 0.25),
+      0 4px 12px rgba(245, 158, 11, 0.22);
+  }
+
+  .dg-check:checked:hover:not(:disabled),
+  .settings-check:checked:hover:not(:disabled) {
+    @apply border-amber-400 bg-amber-400;
+  }
+
+  .dg-check:disabled,
+  .settings-check:disabled {
+    @apply opacity-40 cursor-not-allowed;
+  }
+
+  .dg-check-row,
+  .settings-row {
+    @apply flex items-start gap-3 cursor-pointer rounded-xl border border-slate-800/70 bg-[#12161d]/70 px-3.5 py-3 transition-colors;
+  }
+
+  .dg-check-row:hover,
+  .settings-row:hover {
+    @apply border-amber-900/35 bg-[#151a22];
+  }
+
+  .dg-check-row:has(.dg-check:checked),
+  .dg-check-row:has(.settings-check:checked),
+  .settings-row:has(.dg-check:checked),
+  .settings-row:has(.settings-check:checked) {
+    @apply border-amber-800/40 bg-amber-950/15;
+  }
+
+  .dg-range {
+    @apply w-full h-2 mt-2 appearance-none rounded-full cursor-pointer;
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.55), rgba(245, 158, 11, 0.2)),
+      #0c1016;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45);
+  }
+
+  .dg-range:focus-visible {
+    @apply outline-none ring-2 ring-amber-500/40 ring-offset-2 ring-offset-[#171b22];
+  }
+
+  .dg-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1.05rem;
+    height: 1.05rem;
+    border-radius: 9999px;
+    background: #f59e0b;
+    border: 2px solid #141418;
+    box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.35), 0 3px 10px rgba(245, 158, 11, 0.35);
+    cursor: pointer;
+    transition: transform 0.12s ease, background-color 0.12s ease;
+  }
+
+  .dg-range:hover::-webkit-slider-thumb {
+    background: #fbbf24;
+    transform: scale(1.08);
+  }
+
+  .dg-range::-moz-range-thumb {
+    width: 1.05rem;
+    height: 1.05rem;
+    border-radius: 9999px;
+    background: #f59e0b;
+    border: 2px solid #141418;
+    box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.35), 0 3px 10px rgba(245, 158, 11, 0.35);
+    cursor: pointer;
+  }
+
+  .dg-range::-moz-range-track {
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: #0c1016;
+  }
+
+  .dg-input {
+    @apply w-full rounded-xl border border-slate-700/90 bg-[#12161d] px-4 py-3 text-sm text-slate-200
+      placeholder:text-slate-600 transition-[border-color,box-shadow,background-color] duration-150
+      focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/40;
+  }
+
+  .dg-textarea {
+    @apply w-full rounded-xl border border-slate-700/90 bg-[#12161d] px-4 py-3 text-sm text-slate-200
+      placeholder:text-slate-600 transition-[border-color,box-shadow,background-color] duration-150
+      focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/40
+      resize-none custom-scrollbar leading-relaxed;
+  }
+
+  .dg-field-label {
+    @apply text-[10px] font-bold text-slate-500 uppercase tracking-tighter ml-1;
+  }
+
+  .dg-range-field {
+    @apply rounded-xl border border-slate-800/70 bg-[#12161d]/70 px-3.5 py-3
+      text-[11px] uppercase tracking-widest text-slate-500 font-semibold;
+  }
+
+  .settings-status-row {
+    @apply flex items-center gap-3 rounded-xl border border-slate-800/60 bg-[#12161d]/55 px-3.5 py-2.5;
+  }
+
+  .settings-status-dot {
+    @apply flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-black;
+  }
+
+  .settings-status-dot-ok {
+    @apply bg-emerald-950/50 text-emerald-400 border border-emerald-800/50;
+  }
+
+  .settings-status-dot-warn {
+    @apply bg-amber-950/40 text-amber-400 border border-amber-800/45;
+  }
+
+  .settings-status-dot-idle {
+    @apply bg-slate-900 text-slate-600 border border-slate-700/80;
+  }
+
+  .settings-btn-primary {
+    @apply min-h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-500 text-slate-950 hover:bg-amber-400 disabled:opacity-50 transition-colors;
+  }
+
+  .settings-btn-secondary {
+    @apply min-h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-slate-500 hover:text-slate-100 disabled:opacity-50 transition-colors;
+  }
+
+  .settings-tabs {
+    @apply flex gap-1 overflow-x-auto pb-1 mb-6 rounded-2xl border border-slate-800/80 bg-[#141820]/80 p-1.5;
+  }
+
+  .settings-tab {
+    @apply shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider border transition-colors;
+  }
+
+  .settings-tab-active {
+    @apply border-amber-500/45 bg-amber-950/35 text-amber-300 shadow-[0_0_0_1px_rgba(245,158,11,0.12)];
+  }
+
+  .settings-tab-idle {
+    @apply border-transparent text-slate-500 hover:text-slate-300 hover:bg-slate-800/40;
+  }
+
   /* Guide mobile : sommaire plein écran (drawer) */
   @media (max-width: 1023px) {
     .guide-sommaire-drawer-open {
@@ -112,7 +433,7 @@
   }
 
   .wizard-nav-primary {
-    @apply px-7 sm:px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-amber-500 text-slate-900 hover:bg-amber-400 shadow-sm transition-[colors,transform,opacity,box-shadow] duration-200 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-amber-500;
+    @apply min-h-11 px-7 sm:px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-amber-500 text-slate-900 hover:bg-amber-400 shadow-sm transition-[colors,transform,opacity,box-shadow] duration-200 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-amber-500;
   }
 
   .wizard-nav-status {

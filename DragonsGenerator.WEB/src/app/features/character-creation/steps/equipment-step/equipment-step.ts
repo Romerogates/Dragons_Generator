@@ -17,6 +17,7 @@ import {
   isMasteredProficiencyChoice,
   masteredProficiencyChoiceLabel,
 } from '@core/utils/equipment.utils';
+import { coerceEquipmentSlots } from '@core/utils/class-data.adapter';
 import {
   equipmentDescription,
   equipmentSummaryText,
@@ -24,6 +25,7 @@ import {
 } from '@core/utils/equipment-display.util';
 import { registerGameLabels } from '@core/utils/game-id-labels';
 import type { EquipmentInstance } from '../../../../core/models/Character/character';
+import type { EquipmentSlot } from '../../../../core/models/Character/character';
 
 export interface EquipmentRaw {
   id: string;
@@ -100,13 +102,20 @@ export class EquipmentStep implements OnInit {
     if (map.size === 0) return [];
 
     const c = this.builder.creation();
+    // coerce : un objet API `{fixed, choice_pools}` stocké par erreur (brouillon / setClass)
+    // n'est pas itérable → crash silencieux de l'étape (écran vide + Forger actif).
     const rawSlots: RawSlot[] = [
-      ...(c.startingEquipmentSlots ?? []),
-      ...(c.backgroundEquipmentSlots ?? []),
+      ...coerceEquipmentSlots(c.startingEquipmentSlots),
+      ...coerceEquipmentSlots(c.backgroundEquipmentSlots as EquipmentSlot[] | unknown),
+      ...coerceEquipmentSlots(
+        (c as { toolEquipmentSlots?: EquipmentSlot[] }).toolEquipmentSlots,
+      ),
     ];
 
     return rawSlots.map((raw) => {
-      const isFixed = !!raw.fixed && (!raw.alternatives || raw.alternatives.length === 0);
+      const hasFixed = Array.isArray(raw.fixed) && raw.fixed.length > 0;
+      const hasAlts = Array.isArray(raw.alternatives) && raw.alternatives.length > 0;
+      const isFixed = hasFixed && !hasAlts;
       return {
         slotNumber: raw.slot,
         description: raw.description ?? '',
@@ -126,9 +135,18 @@ export class EquipmentStep implements OnInit {
   readonly categoryChoices = computed(() => this.pickedCategory());
 
   readonly selectionComplete = computed(() => {
+    const slots = this.resolvedSlots();
+    // Classe choisie mais aucun slot résolu → ne pas valider (évite de forger à vide).
+    if (
+      slots.length === 0 &&
+      !!this.builder.creation().classId &&
+      this.catalog().length > 0
+    ) {
+      return false;
+    }
     const alts = this.pickedAlt();
     const cats = this.pickedCategory();
-    for (const slot of this.resolvedSlots()) {
+    for (const slot of slots) {
       // Vérifier les catégories dans les items fixes
       for (let i = 0; i < slot.fixedItems.length; i++) {
         const item = slot.fixedItems[i];
@@ -143,6 +161,7 @@ export class EquipmentStep implements OnInit {
       const altIdx = alts.get(slot.slotNumber);
       if (altIdx === undefined) return false;
       const alt = slot.alternatives[altIdx];
+      if (!alt) return false;
       for (let i = 0; i < alt.items.length; i++) {
         const item = alt.items[i];
         if (item.isCategory) {
@@ -192,13 +211,89 @@ export class EquipmentStep implements OnInit {
   }
 
   nextSlot(): void {
-    if (this.activeSlotIndex() < this.resolvedSlots().length - 1) {
-      this.activeSlotIndex.update((i) => i + 1);
-    }
+    const slots = this.resolvedSlots();
+    const i = this.activeSlotIndex();
+    const slot = slots[i];
+    if (!slot || !this.isSlotSatisfied(slot)) return;
+    if (i < slots.length - 1) this.activeSlotIndex.set(i + 1);
   }
 
   prevSlot(): void {
-    if (this.activeSlotIndex() > 0) this.activeSlotIndex.update((i) => i - 1);
+    const i = this.activeSlotIndex();
+    if (i <= 0) return;
+    const target = i - 1;
+    this.invalidateFromSlotIndex(target);
+    this.activeSlotIndex.set(target);
+  }
+
+  /** Navigation via les points de progression. */
+  activateSlot(index: number): void {
+    const slots = this.resolvedSlots();
+    if (index < 0 || index >= slots.length) return;
+    const cur = this.activeSlotIndex();
+    if (index === cur) return;
+
+    if (index > cur) {
+      for (let j = cur; j < index; j++) {
+        if (!this.isSlotSatisfied(slots[j])) return;
+      }
+    } else {
+      this.invalidateFromSlotIndex(index);
+    }
+    this.activeSlotIndex.set(index);
+  }
+
+  isSlotSatisfied(slot: ResolvedSlot): boolean {
+    const cats = this.pickedCategory();
+    for (let i = 0; i < slot.fixedItems.length; i++) {
+      const item = slot.fixedItems[i];
+      if (item.isCategory) {
+        const key = `${slot.slotNumber}-fixed-${i}`;
+        if ((cats.get(key)?.length ?? 0) < this.neededCategoryPicks(item)) return false;
+      }
+    }
+    if (slot.isFixed) return true;
+
+    const altIdx = this.pickedAlt().get(slot.slotNumber);
+    if (altIdx === undefined) return false;
+    const alt = slot.alternatives[altIdx];
+    if (!alt) return false;
+    for (let i = 0; i < alt.items.length; i++) {
+      const item = alt.items[i];
+      if (item.isCategory) {
+        const key = `${slot.slotNumber}-${altIdx}-${i}`;
+        if ((cats.get(key)?.length ?? 0) < this.neededCategoryPicks(item)) return false;
+      }
+    }
+    return true;
+  }
+
+  isCurrentSlotSatisfied(): boolean {
+    const slot = this.currentSlot();
+    return !!slot && this.isSlotSatisfied(slot);
+  }
+
+  private clearSlotPick(slotNumber: number): void {
+    this.pickedAlt.update((m) => {
+      const n = new Map(m);
+      n.delete(slotNumber);
+      return n;
+    });
+    this.pickedCategory.update((m) => {
+      const n = new Map(m);
+      for (const k of [...n.keys()]) {
+        if (k.startsWith(`${slotNumber}-`)) n.delete(k);
+      }
+      return n;
+    });
+  }
+
+  /** Efface le choix du slot cible et de tous ceux qui suivent (force une resélection). */
+  private invalidateFromSlotIndex(fromIndex: number): void {
+    const slots = this.resolvedSlots();
+    for (let j = fromIndex; j < slots.length; j++) {
+      this.clearSlotPick(slots[j].slotNumber);
+    }
   }
 
   selectAlternative(altIdx: number): void {
@@ -212,8 +307,9 @@ export class EquipmentStep implements OnInit {
       return n;
     });
 
+    // Comme les autres choix d'objets : clic → avance dès que le slot est complet.
     if (!slot.alternatives[altIdx].items.some((i) => i.isCategory)) {
-      setTimeout(() => this.nextSlot(), 300);
+      setTimeout(() => this.nextSlot(), 180);
     }
   }
 
@@ -227,8 +323,8 @@ export class EquipmentStep implements OnInit {
     const needed = this.neededCategoryPicks(item);
     this.toggleCategoryPick(key, eqId, needed);
 
-    if (this.getCategoryPicks(key).length >= needed) {
-      setTimeout(() => this.nextSlot(), 300);
+    if (this.isCurrentSlotSatisfied()) {
+      setTimeout(() => this.nextSlot(), 180);
     }
   }
 
@@ -484,5 +580,9 @@ export class EquipmentStep implements OnInit {
     const key = `${slotNumber}-fixed-${itemIdx}`;
     const needed = this.neededCategoryPicks(item);
     this.toggleCategoryPick(key, eqId, needed);
+
+    if (slot && this.isSlotSatisfied(slot)) {
+      setTimeout(() => this.nextSlot(), 180);
+    }
   }
 }

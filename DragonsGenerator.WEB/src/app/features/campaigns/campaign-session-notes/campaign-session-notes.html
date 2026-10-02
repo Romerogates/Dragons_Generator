@@ -178,14 +178,14 @@
                 <li class="flex items-start gap-2">
                   <input
                     type="checkbox"
-                    class="mt-2.5 accent-emerald-500"
+                    class="dg-check mt-2.5"
                     [ngModel]="!!item.done"
                     (ngModelChange)="updateChecklistItem(pad.id, item.id, { done: $event })"
                   />
                   <input
                     type="text"
                     placeholder="Élément…"
-                    class="flex-1 bg-[#171b22] border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200"
+                    class="dg-input flex-1 !py-2 !px-3"
                     [class.line-through]="item.done"
                     [class.text-slate-500]="item.done"
                     [ngModel]="item.text"

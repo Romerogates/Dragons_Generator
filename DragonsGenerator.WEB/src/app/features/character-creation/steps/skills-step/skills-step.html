@@ -2,19 +2,17 @@
   class="relative w-full flex flex-col items-center animate-fade-in pb-8 select-none min-h-[65vh] justify-center"
 >
   <div class="text-center mb-8 w-full px-4 mt-2">
-    <h2
-      class="text-3xl font-extrabold text-amber-500 mb-1 drop-shadow-md tracking-wide font-serif flex justify-center items-center gap-3"
-    >
+    <h2 class="dg-step-title flex justify-center items-center gap-3">
       <iconify-icon icon="fluent-emoji:direct-hit"></iconify-icon> Savoirs & Maîtrises
     </h2>
-    <p class="text-slate-400 text-xs max-w-xl mx-auto italic">
+    <p class="dg-step-sub">
       Enchâssez les talents et les maîtrises que votre héros a développés au cours de sa formation
       et de son passé.
     </p>
   </div>
 
   <div class="w-full max-w-4xl px-4 flex flex-col gap-8">
-    <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+    <div class="dg-panel" data-testid="wizard-class-skills">
       <div class="flex justify-between items-center mb-2">
         <h4
           class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
@@ -79,7 +77,7 @@
     </div>
 
     @if (secondaryClassSkillChooseCount() > 0) {
-      <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+      <div class="dg-panel">
         <div class="flex justify-between items-center mb-2">
           <h4 class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2">
             <iconify-icon icon="fluent-emoji:crossed-swords"></iconify-icon> Compétences de Multiclassage
@@ -128,7 +126,7 @@
     }
 
     @if (subclassGrantedSkillChips().length > 0) {
-      <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+      <div class="dg-panel">
         <h4
           class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2 mb-2"
         >
@@ -176,7 +174,7 @@
       </div>
     }
 
-    <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+    <div class="dg-panel" data-testid="wizard-bg-skills">
       <div class="flex justify-between items-center mb-2">
         <h4
           class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
@@ -394,7 +392,7 @@
     </div>
 
     @if (bgToolChoiceGroups().length > 0 || isCustomBg()) {
-      <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+      <div class="dg-panel">
         <div class="flex justify-between items-center mb-2">
           <h4
             class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
@@ -529,7 +527,7 @@
     }
 
     @if (speciesBonusSkillCount() > 0) {
-      <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+      <div class="dg-panel">
         <div class="flex justify-between items-center mb-2">
           <h4
             class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
@@ -575,7 +573,7 @@
     }
 
     @if (speciesBonusToolCount() > 0) {
-      <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+      <div class="dg-panel">
         <div class="flex justify-between items-center mb-2">
           <h4
             class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"
@@ -628,7 +626,7 @@
 
     @if (classWeaponsNeeded() > 0) {
       <div
-        class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl"
+        class="dg-panel"
         data-testid="wizard-class-weapons"
       >
         <div class="flex justify-between items-center mb-2">
@@ -668,7 +666,7 @@
 
     @if (classToolsNeeded() > 0) {
       <div
-        class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl"
+        class="dg-panel"
         data-testid="wizard-class-tools"
       >
         <div class="flex justify-between items-center mb-2">
@@ -708,7 +706,7 @@
 
     @for (pool of subclassSkillChoicePools(); track pool.id) {
       <div
-        class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl"
+        class="dg-panel"
         data-testid="wizard-subclass-skill-choice"
       >
         <div class="flex justify-between items-center mb-2">
@@ -760,7 +758,7 @@
     }
 
     @if (expertiseNeeded() > 0) {
-      <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-violet-900/50 shadow-xl">
+      <div class="dg-panel border-violet-900/50">
         <div class="flex justify-between items-center mb-2">
           <h4
             class="text-[10px] font-black uppercase tracking-widest text-violet-400 flex items-center gap-2"

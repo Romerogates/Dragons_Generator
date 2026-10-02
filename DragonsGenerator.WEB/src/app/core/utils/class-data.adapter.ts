@@ -1,5 +1,6 @@
 import type {
   CharacterClass,
+  EquipmentSlot,
   FeatureDetail,
   Subclass,
   SubclassCatalog,
@@ -164,10 +165,16 @@ function mapOptionItems(opt: unknown): { id: string; qty: number }[] {
   return [];
 }
 
-function normalizeStartingEquipment(se: unknown, topLevelPools: RawChoicePool[] = []): unknown[] {
-  if (Array.isArray(se)) return se;
+/**
+ * Convertit `starting_equipment` API (objet fixed/choice_pools) ou une liste de slots
+ * wizard déjà normalisée en `EquipmentSlot[]`.
+ * Tolère aussi un objet brut stocké par erreur dans le brouillon (évite un spread qui crashe l'étape).
+ */
+export function coerceEquipmentSlots(se: unknown, topLevelPools: RawChoicePool[] = []): EquipmentSlot[] {
+  // Déjà une liste de slots wizard.
+  if (Array.isArray(se)) return se as EquipmentSlot[];
 
-  const slots: unknown[] = [];
+  const slots: EquipmentSlot[] = [];
   let slotNum = 1;
 
   const obj = se && typeof se === 'object' ? (se as Record<string, unknown>) : {};
@@ -205,6 +212,10 @@ function normalizeStartingEquipment(se: unknown, topLevelPools: RawChoicePool[] 
   }
 
   return slots;
+}
+
+function normalizeStartingEquipment(se: unknown, topLevelPools: RawChoicePool[] = []): EquipmentSlot[] {
+  return coerceEquipmentSlots(se, topLevelPools);
 }
 
 function extractChoiceLevel(pool: RawChoicePool): number {

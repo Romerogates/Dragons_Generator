@@ -64,13 +64,9 @@ test.describe('Lettré L1 wizard', () => {
 
     // 6 — Savoirs & Maîtrises
     await expectStepHeading(page, /Savoirs & Maîtrises/i);
-    const bgSkills = page
-      .locator('div.rounded-2xl')
-      .filter({ hasText: '1 compétence(s) fixe(s) + 1 au choix' });
+    const bgSkills = page.getByTestId('wizard-bg-skills');
     await bgSkills.getByRole('button', { name: /^Arcanes\b/ }).click();
-    const classSkills = page
-      .locator('div.rounded-2xl')
-      .filter({ hasText: 'Choisissez 3 compétence(s) liées à votre vocation' });
+    const classSkills = page.getByTestId('wizard-class-skills');
     await classSkills.getByRole('button', { name: /^Investigation\b/ }).click();
     await classSkills.getByRole('button', { name: /^Perception\b/ }).click();
     await classSkills.getByRole('button', { name: /^Persuasion\b/ }).click();

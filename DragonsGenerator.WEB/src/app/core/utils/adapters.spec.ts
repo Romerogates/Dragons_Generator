@@ -1,5 +1,5 @@
 import { normalizeBackground } from './background-data.adapter';
-import { normalizeCharacterClass } from './class-data.adapter';
+import { coerceEquipmentSlots, normalizeCharacterClass } from './class-data.adapter';
 import { getClassIcon } from './class-icons';
 import { equipmentSummaryText, equipmentStatLines, equipmentTypeLabel, equipmentSubtypeLabel } from './equipment-display.util';
 
@@ -380,6 +380,32 @@ describe('class-data.adapter', () => {
 
     expect(normalized.data.starting_equipment.length).toBe(1);
     expect(normalized.data.starting_equipment[0].alternatives?.length).toBe(2);
+  });
+
+  it('coerceEquipmentSlots recovers raw ensorceleur starting_equipment object', () => {
+    const slots = coerceEquipmentSlots({
+      fixed: [{ id: 'wp-dague', qty: 2 }],
+      choice_pools: [
+        {
+          name: 'Arme à distance ou arme courante au choix',
+          options: [
+            { option_id: 'A', items: [{ id: 'wp-arbalete-legere', qty: 1 }] },
+            { option_id: 'B', items: [{ id: 'category-arme-courante', qty: 1 }] },
+          ],
+        },
+        {
+          name: 'Focaliseur arcanique ou sacoche à composantes',
+          options: [
+            { option_id: 'A', items: [{ id: 'it-sacoche-a-composantes', qty: 1 }] },
+            { option_id: 'B', items: [{ id: 'tl-focaliseur-arcanique', qty: 1 }] },
+          ],
+        },
+      ],
+    });
+    expect(slots.length).toBe(3);
+    expect(slots[0].fixed?.[0].id).toBe('wp-dague');
+    expect(slots[1].alternatives?.length).toBe(2);
+    expect(slots[2].description).toContain('Focaliseur');
   });
 });
 

@@ -1,11 +1,11 @@
 <div
-  class="relative w-full flex flex-col items-center pb-8 select-none min-h-[65vh] justify-center"
+  class="relative w-full flex flex-col items-center pb-6 select-none min-h-[50vh] justify-start"
 >
-  <div class="text-center mb-5 w-full px-4 mt-2">
-    <h2 class="text-2xl font-extrabold text-amber-500 mb-1 drop-shadow-md tracking-wide font-serif">
+  <div class="text-center mb-3 w-full px-4 mt-1">
+    <h2 class="text-xl sm:text-2xl font-extrabold text-amber-500 mb-0.5 drop-shadow-md tracking-wide font-serif">
       Arsenal de Départ
     </h2>
-    <p class="text-slate-400 text-xs max-w-xl mx-auto italic">
+    <p class="text-slate-400 text-[11px] max-w-xl mx-auto italic">
       Forgez votre paquetage en choisissant les reliques de votre destin.
     </p>
   </div>
@@ -41,7 +41,7 @@
             Équipement automatique reçu via votre historique
           </p>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            @for (item of backgroundFixedItems(); track item.instanceId) {
+            @for (item of backgroundFixedItems(); track item.instanceId || item.refId + '-' + $index) {
               <div
                 class="flex items-center gap-3 bg-[#1b2028] rounded-xl px-4 py-3 border border-slate-800"
               >
@@ -52,7 +52,7 @@
                 </div>
                 <div class="flex flex-col overflow-hidden">
                   <span class="text-sm font-bold text-slate-200 leading-tight truncate">
-                    {{ item.name }}
+                    {{ item.name || item.refId || 'Objet' }}
                   </span>
                   @if (item.qty > 1) {
                     <span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
@@ -75,32 +75,41 @@
       </div>
     }
 
-    <div
-      class="flex items-center gap-2 mb-7 bg-[#1b2028] px-4 py-2 rounded-full border border-slate-700 shadow-lg"
-    >
-      @for (s of resolvedSlots(); track s.slotNumber; let i = $index) {
-        <button
-          class="w-8 h-2 rounded-full transition-[colors,transform,opacity,box-shadow] duration-200 cursor-pointer"
-          [ngClass]="{
-            'bg-amber-500 shadow-sm scale-[1.02]':
-              i === activeSlotIndex(),
-            'bg-emerald-500':
-              (selectedAlternatives().has(s.slotNumber) || s.isFixed) && i !== activeSlotIndex(),
-            'bg-slate-700':
-              i > activeSlotIndex() && !selectedAlternatives().has(s.slotNumber) && !s.isFixed,
-          }"
-          (click)="activeSlotIndex.set(i)"
-        ></button>
-      }
-    </div>
+    @if (resolvedSlots().length > 0) {
+      <div
+        class="flex items-center gap-2 mb-4 bg-[#1b2028] px-3 py-1.5 rounded-full border border-slate-700 shadow-lg"
+      >
+        @for (s of resolvedSlots(); track s.slotNumber; let i = $index) {
+          <button
+            type="button"
+            class="w-7 h-1.5 rounded-full transition-[colors,transform,opacity,box-shadow] duration-200 cursor-pointer"
+            [ngClass]="{
+              'bg-amber-500 shadow-sm scale-[1.02]':
+                i === activeSlotIndex(),
+              'bg-emerald-500':
+                i < activeSlotIndex() && isSlotSatisfied(s),
+              'bg-slate-700':
+                i > activeSlotIndex() || (i < activeSlotIndex() && !isSlotSatisfied(s)),
+            }"
+            [attr.aria-label]="'Choix ' + (i + 1)"
+            (click)="activateSlot(i)"
+          ></button>
+        }
+      </div>
+    } @else if (!loading() && builder.creation().classId) {
+      <p class="text-amber-500/80 text-xs text-center px-4 mb-4 max-w-md">
+        Aucun choix d'équipement de classe chargé. Revenez à l'étape Classe et validez à nouveau
+        votre vocation.
+      </p>
+    }
 
     <div class="w-full max-w-5xl px-4 flex flex-col items-center">
       @if (currentSlot(); as slot) {
         <div class="w-full flex flex-col items-center animate-fade-in">
-          <div class="flex items-center gap-4 mb-7 w-full max-w-3xl">
+          <div class="flex items-center gap-4 mb-4 w-full max-w-3xl">
             <div class="h-px flex-grow bg-gradient-to-r from-transparent to-slate-700"></div>
             <h3
-              class="text-xs font-black uppercase tracking-[0.3em] text-amber-600/80 text-center whitespace-nowrap"
+              class="text-[10px] sm:text-xs font-black uppercase tracking-[0.25em] text-amber-600/80 text-center whitespace-nowrap"
             >
               {{ slot.description || 'Choix ' + slot.slotNumber }}
             </h3>
@@ -109,7 +118,7 @@
 
           @if (slot.isFixed) {
             <div
-              class="bg-[#171b22] border-2 border-emerald-500/30 p-7 rounded-2xl text-center shadow-2xl max-w-md w-full"
+              class="bg-[#171b22] border-2 border-emerald-500/30 p-4 sm:p-5 rounded-2xl text-center shadow-2xl max-w-md w-full"
             >
               <p class="text-emerald-400 font-bold mb-4 uppercase tracking-widest text-[10px]">
                 Équipement automatique reçu
@@ -191,10 +200,11 @@
                 }
               </div>
 
-              @if (activeSlotIndex() < resolvedSlots().length - 1) {
+              @if (activeSlotIndex() < resolvedSlots().length - 1 && isCurrentSlotSatisfied()) {
                 <button
+                  type="button"
                   (click)="nextSlot()"
-                  class="mt-7 px-8 py-2.5 bg-amber-500 text-slate-900 font-black rounded-lg hover:bg-amber-400 transition-[colors,transform,opacity,box-shadow] duration-200 uppercase tracking-widest text-xs shadow-lg flex items-center justify-center gap-2 mx-auto"
+                  class="mt-5 px-6 py-2 bg-amber-500 text-slate-900 font-black rounded-lg hover:bg-amber-400 transition-[colors,transform,opacity,box-shadow] duration-200 uppercase tracking-widest text-xs shadow-lg flex items-center justify-center gap-2 mx-auto"
                 >
                   <span>Choix suivant</span>
                   <span class="text-lg leading-none">➔</span>
@@ -204,10 +214,10 @@
           }
 
           @if (!slot.isFixed && slot.alternatives.length > 0) {
-            <div class="flex flex-wrap justify-center gap-6 w-full">
+            <div class="flex flex-wrap justify-center gap-3 sm:gap-4 w-full">
               @for (alt of slot.alternatives; track alt.index) {
                 <div
-                  class="perf-card relative flex flex-col w-full sm:w-[320px] p-5 rounded-2xl border-2 transition-[colors,transform,opacity,box-shadow] duration-200 bg-[#171b22] group cursor-pointer"
+                  class="perf-card relative flex flex-col w-full sm:w-[280px] p-3.5 sm:p-4 rounded-xl border-2 transition-[colors,transform,opacity,box-shadow] duration-200 bg-[#171b22] group cursor-pointer"
                   [ngClass]="{
                     'border-emerald-500 bg-emerald-950/20 shadow-md scale-[1.01] z-20':
                       selectedAlternatives().get(slot.slotNumber) === alt.index,
@@ -216,7 +226,7 @@
                   }"
                   (click)="selectAlternative(alt.index)"
                 >
-                  <div class="flex flex-col gap-4 mb-6">
+                  <div class="flex flex-col gap-3 mb-3">
                     @for (item of alt.items; track item.ref.id; let itemIdx = $index) {
                       <div class="flex flex-col gap-2">
                         <div class="flex items-center gap-3">
@@ -345,7 +355,7 @@
         </div>
       }
 
-      <div class="mt-12 flex flex-col items-center gap-4 w-full">
+      <div class="mt-6 flex flex-col items-center gap-3 w-full">
         <nav class="wizard-step-nav">
           @if (!selectionComplete()) {
             <p class="wizard-nav-hint">

@@ -1,6 +1,7 @@
 import type { CharacterCreation } from '@core/models/Character/character';
 import type { ExtendedCharacterCreation } from '@core/models/Character/character-builder.types';
 import type { EquipmentSlot } from '@core/models/CharacterClasses/character-class';
+import { coerceEquipmentSlots } from './class-data.adapter';
 import { isMasteredProficiencyChoice } from './equipment.utils';
 import {
   isTalentSpendComplete,
@@ -141,9 +142,9 @@ function slotNeedsPick(slot: EquipmentSlot): boolean {
 function equipmentStepComplete(c: CharacterCreation): boolean {
   const ext = asExtended(c);
   const slots: EquipmentSlot[] = [
-    ...(c.startingEquipmentSlots ?? []),
-    ...(ext.backgroundEquipmentSlots ?? []),
-    ...(ext.toolEquipmentSlots ?? []),
+    ...coerceEquipmentSlots(c.startingEquipmentSlots),
+    ...coerceEquipmentSlots(ext.backgroundEquipmentSlots),
+    ...coerceEquipmentSlots(ext.toolEquipmentSlots),
   ];
   const choosable = slots.filter(slotNeedsPick);
   if (choosable.length === 0) {

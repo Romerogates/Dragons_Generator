@@ -29,6 +29,16 @@
       <p class="text-slate-400 text-xs sm:text-sm max-w-xl mx-auto italic px-1">
         {{ phaseSubtitle() }}
       </p>
+      @if (canGoPrevPhase()) {
+        <button
+          type="button"
+          class="mt-3 text-[11px] sm:text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-amber-400 transition-colors"
+          data-testid="class-prev-phase-header"
+          (click)="prevPhase()"
+        >
+          ← Choix précédent
+        </button>
+      }
       @if (currentPhase() === 'prog_choice' && activeProgChoices().length > 1) {
         <div class="flex flex-wrap justify-center gap-2 mt-3 max-w-2xl mx-auto px-2">
           @for (pc of activeProgChoices(); track pc.id) {
@@ -77,15 +87,15 @@
             [attr.data-card-id]="card.id"
             [attr.data-carousel-index]="i"
             [ngClass]="{
-              'z-30 opacity-100 scale-100': i === currentIndex(),
-              'z-10 opacity-45 scale-[0.92] grayscale-[0.2]': i !== currentIndex(),
+              'z-30 opacity-100 scale-100': i === normalizedIndex(),
+              'z-10 opacity-45 scale-[0.92] grayscale-[0.2]': i !== normalizedIndex(),
             }"
             style="perspective: 1000px"
             (contextmenu)="onRightClick($event, card.id)"
             (click)="pickCard(card.id)"
           >
             <ng-container
-              *ngTemplateOutlet="classCardInner; context: { card: card, i: i, centered: i === currentIndex() }"
+              *ngTemplateOutlet="classCardInner; context: { card: card, i: i, centered: i === normalizedIndex() }"
             ></ng-container>
           </div>
         }
@@ -286,14 +296,19 @@
       @if (!selectionComplete()) {
         <p class="wizard-nav-hint">Complétez les choix de vocation</p>
       }
-      <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
-        ← Étape précédente
-      </button>
       @if (canGoPrevPhase()) {
-        <button type="button" class="wizard-nav-secondary" (click)="prevPhase()">
+        <button
+          type="button"
+          class="wizard-nav-secondary"
+          data-testid="class-prev-phase"
+          (click)="prevPhase()"
+        >
           ← Choix précédent
         </button>
       }
+      <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
+        ← Étape précédente
+      </button>
       @if (currentPhase() !== 'class') {
         <button type="button" class="wizard-nav-secondary" (click)="clearSelection()">
           ← Réinitialiser la classe

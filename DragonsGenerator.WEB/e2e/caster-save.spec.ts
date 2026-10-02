@@ -41,15 +41,12 @@ test.describe('Caster forge — Magie + save', () => {
     await page.getByRole('button', { name: 'Valider et continuer' }).click();
 
     await expectStepHeading(page, /Savoirs & Maîtrises/i);
-    const bgSkills = page
-      .locator('div.rounded-2xl')
-      .filter({ hasText: '1 compétence(s) fixe(s) + 1 au choix' });
+    const bgSkills = page.getByTestId('wizard-bg-skills');
     if (await bgSkills.isVisible().catch(() => false)) {
-      await bgSkills.getByRole('button').first().click();
+      const chooseBtn = bgSkills.getByRole('button').first();
+      if (await chooseBtn.isVisible().catch(() => false)) await chooseBtn.click();
     }
-    const classSkills = page
-      .locator('div.rounded-2xl')
-      .filter({ hasText: /Choisissez \d+ compétence/i });
+    const classSkills = page.getByTestId('wizard-class-skills');
     if (await classSkills.isVisible().catch(() => false)) {
       const btns = classSkills.getByRole('button');
       const need = Number(((await classSkills.textContent()) ?? '').match(/Choisissez (\d+)/)?.[1] ?? 2);
@@ -115,9 +112,7 @@ test.describe('Caster forge — Magie + save', () => {
     await page.getByRole('button', { name: 'Valider et continuer' }).click();
 
     await expectStepHeading(page, /Savoirs & Maîtrises/i);
-    const classSkills = page
-      .locator('div.rounded-2xl')
-      .filter({ hasText: /Choisissez \d+ compétence/i });
+    const classSkills = page.getByTestId('wizard-class-skills');
     if (await classSkills.isVisible().catch(() => false)) {
       const btns = classSkills.getByRole('button');
       const need = Number(((await classSkills.textContent()) ?? '').match(/Choisissez (\d+)/)?.[1] ?? 2);

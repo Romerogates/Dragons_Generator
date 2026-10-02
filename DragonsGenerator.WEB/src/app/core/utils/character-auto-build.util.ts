@@ -24,6 +24,7 @@ import type {
 } from '@core/services/character-builder.service';
 import { apiAsiToPartialScores, apiCodeToAbilityKey, mergePartialScores } from '@core/utils/ability-mapping';
 import { annotateAuraDesc } from '@core/utils/aura-range.util';
+import { coerceEquipmentSlots } from '@core/utils/class-data.adapter';
 import {
   CATEGORY_FILTERS,
   isMasteredProficiencyChoice,
@@ -656,7 +657,7 @@ export function buildAutoClassSelection(cls: CharacterClass, level = 1): {
     skillOptions: Array.isArray(prof.skills?.options) ? prof.skills.options : [],
     skillChooseCount: prof.skills?.count ?? 0,
     classFeatures: features,
-    startingEquipmentSlots: cls.data.starting_equipment ?? [],
+    startingEquipmentSlots: coerceEquipmentSlots(cls.data.starting_equipment),
     classProgressionResources: extractScalarResources(progAtLevel?.resources),
     classBonusLanguageCount: classBonusLanguageCount(cls, level, undefined, sub?.id) + subBonus.bonusLanguages,
     classRequiredExoticLanguageCount:

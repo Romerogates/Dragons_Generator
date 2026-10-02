@@ -97,7 +97,7 @@
               </button>
               @if (showAdvanced()) {
                 <div class="grid sm:grid-cols-2 gap-4 px-3 pb-3 border-t border-slate-800/80 pt-3">
-                  <label class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">
+                  <label class="dg-range-field">
                     Largeur · {{ genGridW() }}
                     <input
                       type="range"
@@ -107,10 +107,10 @@
                       (ngModelChange)="onAdvancedParamInput('w', +$event)"
                       (change)="onAdvancedParamCommit()"
                       (pointerup)="onAdvancedParamCommit()"
-                      class="w-full mt-2 accent-amber-600"
+                      class="dg-range"
                     />
                   </label>
-                  <label class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">
+                  <label class="dg-range-field">
                     Hauteur · {{ genGridH() }}
                     <input
                       type="range"
@@ -120,10 +120,10 @@
                       (ngModelChange)="onAdvancedParamInput('h', +$event)"
                       (change)="onAdvancedParamCommit()"
                       (pointerup)="onAdvancedParamCommit()"
-                      class="w-full mt-2 accent-amber-600"
+                      class="dg-range"
                     />
                   </label>
-                  <label class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">
+                  <label class="dg-range-field">
                     Salles · {{ genRoomCount() }}
                     <input
                       type="range"
@@ -133,10 +133,10 @@
                       (ngModelChange)="onAdvancedParamInput('rooms', +$event)"
                       (change)="onAdvancedParamCommit()"
                       (pointerup)="onAdvancedParamCommit()"
-                      class="w-full mt-2 accent-amber-600"
+                      class="dg-range"
                     />
                   </label>
-                  <label class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">
+                  <label class="dg-range-field">
                     Couloirs · {{ genCorridorDensity() }}%
                     <input
                       type="range"
@@ -146,7 +146,7 @@
                       (ngModelChange)="onAdvancedParamInput('corridors', +$event)"
                       (change)="onAdvancedParamCommit()"
                       (pointerup)="onAdvancedParamCommit()"
-                      class="w-full mt-2 accent-amber-600"
+                      class="dg-range"
                     />
                   </label>
                   @for (hint of genParamHints; track hint.label) {

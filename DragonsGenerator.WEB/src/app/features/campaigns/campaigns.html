@@ -1,14 +1,14 @@
 <div class="max-w-7xl mx-auto px-4 py-10 animate-fade-in min-h-[80vh] flex flex-col">
   <header
-    class="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 border-b border-slate-800 pb-6 select-none"
+    class="dg-hero dg-hero-violet mb-8 flex flex-col md:flex-row justify-between items-center gap-6 select-none"
   >
     <div>
       <h1
-        class="text-4xl font-extrabold text-slate-100 font-serif tracking-wide drop-shadow-md mb-2"
+        class="text-3xl sm:text-4xl font-extrabold text-slate-100 font-serif tracking-wide mb-2"
       >
-        Mes <span class="text-violet-400">Campagnes</span>
+        Mes <span class="text-violet-300">Campagnes</span>
       </h1>
-      <p class="text-slate-400 text-sm italic">
+      <p class="text-slate-400 text-sm leading-relaxed max-w-xl">
         @if (!isLoggedIn()) {
           Préparez vos campagnes cloud, puis jouez en session.
         } @else if (listScope() === 'archived') {
@@ -25,17 +25,17 @@
     </div>
 
     @if (isLoggedIn() && list().length > 0) {
-      <div class="flex flex-col sm:flex-row gap-3">
+      <div class="flex flex-col sm:flex-row gap-3 shrink-0">
         <a
           routerLink="/story/create"
-          class="px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-violet-600 text-white shadow-md hover:bg-violet-500 hover:scale-[1.02] active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-200 flex items-center justify-center gap-2"
+          class="px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest bg-violet-600 text-white shadow-md hover:bg-violet-500 hover:scale-[1.02] active:scale-[0.99] transition-[colors,transform,opacity,box-shadow] duration-200 flex items-center justify-center gap-2"
         >
           <span class="text-lg"><iconify-icon icon="fluent-emoji:sparkles"></iconify-icon></span>
           Nouveau scénario
         </a>
         <button
           type="button"
-          class="px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest border border-slate-600 text-slate-200 hover:border-violet-500/50 hover:text-violet-300 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-50"
+          class="px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-600 text-slate-200 hover:border-violet-500/50 hover:text-violet-300 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-50"
           [disabled]="creatingEmpty() || !canCreateCampaign()"
           (click)="openEmptyCampaignModal()"
           data-testid="create-table-cta-header"
@@ -53,9 +53,7 @@
   }
 
   @if (!isLoggedIn()) {
-    <div
-      class="flex flex-col items-center justify-center flex-grow bg-[#1b2028] border border-dashed border-slate-700 rounded-3xl p-12 text-center shadow-inner"
-    >
+    <div class="dg-empty">
       <span class="text-6xl mb-6 opacity-80 drop-shadow-lg"
         ><iconify-icon icon="fluent-emoji:locked-with-key"></iconify-icon
       ></span>
@@ -125,77 +123,71 @@
     }
 
     @if (list().length > 0) {
-      <div class="mb-4 flex flex-wrap gap-2">
+      <div class="dg-chip-bar">
         <button
           type="button"
-          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-colors"
+          class="dg-chip"
           [class.bg-slate-200]="listScope() === 'active'"
           [class.text-slate-900]="listScope() === 'active'"
           [class.border-slate-200]="listScope() === 'active'"
-          [class.border-slate-700]="listScope() !== 'active'"
-          [class.text-slate-400]="listScope() !== 'active'"
+          [class.dg-chip-idle]="listScope() !== 'active'"
           (click)="setListScope('active')"
         >
           Actives ({{ activeList().length }})
         </button>
         <button
           type="button"
-          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-colors"
+          class="dg-chip"
           [class.bg-slate-600]="listScope() === 'archived'"
           [class.text-white]="listScope() === 'archived'"
           [class.border-slate-500]="listScope() === 'archived'"
-          [class.border-slate-700]="listScope() !== 'archived'"
-          [class.text-slate-400]="listScope() !== 'archived'"
+          [class.dg-chip-idle]="listScope() !== 'archived'"
           (click)="setListScope('archived')"
         >
           Archives ({{ archivedCount() }})
         </button>
         <button
           type="button"
-          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-colors"
+          class="dg-chip"
           [class.bg-amber-900/80]="listScope() === 'history'"
           [class.text-amber-100]="listScope() === 'history'"
           [class.border-amber-700]="listScope() === 'history'"
-          [class.border-slate-700]="listScope() !== 'history'"
-          [class.text-slate-400]="listScope() !== 'history'"
+          [class.dg-chip-idle]="listScope() !== 'history'"
           (click)="setListScope('history')"
         >
           Historique ({{ historyCount() }})
         </button>
       </div>
-      <div class="mb-6 flex flex-wrap gap-2">
+      <div class="dg-chip-bar mb-6">
         <button
           type="button"
-          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-colors"
+          class="dg-chip"
           [class.bg-violet-600]="roleFilter() === 'all'"
           [class.text-white]="roleFilter() === 'all'"
           [class.border-violet-500]="roleFilter() === 'all'"
-          [class.border-slate-700]="roleFilter() !== 'all'"
-          [class.text-slate-400]="roleFilter() !== 'all'"
+          [class.dg-chip-idle]="roleFilter() !== 'all'"
           (click)="setRoleFilter('all')"
         >
           Toutes ({{ scopedList().length }})
         </button>
         <button
           type="button"
-          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-colors"
+          class="dg-chip"
           [class.bg-amber-700]="roleFilter() === 'dm'"
           [class.text-white]="roleFilter() === 'dm'"
           [class.border-amber-500]="roleFilter() === 'dm'"
-          [class.border-slate-700]="roleFilter() !== 'dm'"
-          [class.text-slate-400]="roleFilter() !== 'dm'"
+          [class.dg-chip-idle]="roleFilter() !== 'dm'"
           (click)="setRoleFilter('dm')"
         >
           MJ ({{ dmCount() }})
         </button>
         <button
           type="button"
-          class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-colors"
+          class="dg-chip"
           [class.bg-sky-700]="roleFilter() === 'player'"
           [class.text-white]="roleFilter() === 'player'"
           [class.border-sky-500]="roleFilter() === 'player'"
-          [class.border-slate-700]="roleFilter() !== 'player'"
-          [class.text-slate-400]="roleFilter() !== 'player'"
+          [class.dg-chip-idle]="roleFilter() !== 'player'"
           (click)="setRoleFilter('player')"
         >
           Joueur ({{ playerCount() }})
@@ -204,9 +196,7 @@
     }
 
     @if (list().length === 0) {
-      <div
-        class="flex flex-col items-center justify-center flex-grow bg-[#1b2028] border border-dashed border-slate-700 rounded-3xl p-12 text-center shadow-inner"
-      >
+      <div class="dg-empty">
         <span class="text-6xl mb-6 opacity-80 drop-shadow-lg"
           ><iconify-icon icon="fluent-emoji:scroll"></iconify-icon
         ></span>
@@ -219,18 +209,20 @@
           <strong class="text-slate-200">entrer en session</strong>. Le bandeau « prochaine action »
           vous guide ensuite à la table.
         </p>
-        <p class="text-sm text-slate-500 mb-6">
-          Première partie ?
-          <a routerLink="/guide/scenario" class="text-violet-300 underline hover:text-violet-200"
-            >Guide — campagnes</a
-          >
-          ·
-          <a routerLink="/guide/mj-table" class="text-violet-300 underline hover:text-violet-200"
-            >livret MJ</a
-          >
-          ou
-          <a routerLink="/guide" class="text-slate-400 underline hover:text-slate-200">ouvrir le guide</a>.
-        </p>
+        @if (showGuideLinks()) {
+          <p class="text-sm text-slate-500 mb-6">
+            Première partie ?
+            <a routerLink="/guide/scenario" class="text-violet-300 underline hover:text-violet-200"
+              >Guide — campagnes</a
+            >
+            ·
+            <a routerLink="/guide/mj-table" class="text-violet-300 underline hover:text-violet-200"
+              >livret MJ</a
+            >
+            ou
+            <a routerLink="/guide" class="text-slate-400 underline hover:text-slate-200">ouvrir le guide</a>.
+          </p>
+        }
         <div class="flex flex-col sm:flex-row gap-3">
           <button
             type="button"
@@ -253,12 +245,10 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @for (c of filteredList(); track c.id) {
           <div
-            class="perf-card flex flex-col bg-[#1b2028] rounded-2xl border border-slate-800 shadow-xl overflow-hidden group hover:border-violet-500/50 hover:shadow-[0_0_30px_rgba(139,92,246,0.1)] transition-[colors,transform,opacity,box-shadow] duration-200 cursor-pointer"
+            class="perf-card dg-card dg-card-violet group"
             (click)="open(c)"
           >
-            <div
-              class="bg-[#171b22] px-5 py-3 flex justify-between items-center border-b border-slate-800"
-            >
+            <div class="dg-card-head">
               <div class="flex gap-2 text-2xl drop-shadow-md">
                 <iconify-icon icon="fluent-emoji:world-map"></iconify-icon>
                 @if (c.role === 'dm') {
@@ -267,21 +257,21 @@
                   <iconify-icon icon="fluent-emoji:crossed-swords"></iconify-icon>
                 }
               </div>
-              <div class="bg-slate-900 border border-slate-700 px-3 py-1 rounded-full">
-                <span class="text-[10px] font-black uppercase tracking-widest text-violet-400">{{
+              <div class="bg-[#0c1016]/80 border border-violet-800/40 px-3 py-1 rounded-lg">
+                <span class="text-[10px] font-black uppercase tracking-widest text-violet-300">{{
                   c.role === 'dm' ? 'MJ' : 'Joueur'
                 }}</span>
               </div>
             </div>
 
-            <div class="p-6 flex-grow flex flex-col">
-              <h2 class="text-2xl font-bold text-violet-400 font-serif mb-1 truncate">
+            <div class="p-5 sm:p-6 flex-grow flex flex-col">
+              <h2 class="text-xl sm:text-2xl font-bold text-violet-300 font-serif mb-1 truncate">
                 {{ c.title }}
                 @if (c.pendingSync) {
                   <span class="ml-2 text-[9px] font-black uppercase tracking-widest text-sky-400 align-middle">· En attente</span>
                 }
               </h2>
-              <p class="text-xs font-black uppercase tracking-widest text-slate-500 mb-6 truncate">
+              <p class="text-xs font-black uppercase tracking-widest text-slate-500 mb-5 truncate">
                 @if (c.regionName) {
                   {{ c.regionName }} ·
                 }
@@ -289,9 +279,9 @@
                 {{ c.role === 'dm' ? 'MJ' : 'Joueur' }}
               </p>
 
-              <div class="flex gap-4 mt-auto">
+              <div class="flex gap-3 mt-auto">
                 <div
-                  class="flex flex-col items-center bg-[#171b22] border border-slate-700/50 rounded-xl p-3 flex-1 shadow-inner"
+                  class="flex flex-col items-center rounded-xl border border-slate-800/70 bg-[#12161d]/70 p-3 flex-1"
                 >
                   <span class="text-[9px] font-black uppercase tracking-widest text-violet-500/80 mb-1"
                     >Région</span
@@ -306,7 +296,7 @@
                   </div>
                 </div>
                 <div
-                  class="flex flex-col items-center bg-[#171b22] border border-slate-700/50 rounded-xl p-3 flex-1 shadow-inner"
+                  class="flex flex-col items-center rounded-xl border border-slate-800/70 bg-[#12161d]/70 p-3 flex-1"
                 >
                   <span class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1"
                     >Joueurs</span
@@ -321,9 +311,7 @@
               </div>
             </div>
 
-            <div
-              class="px-5 py-3 border-t border-slate-800 bg-[#171b22]/50 flex justify-between items-center"
-            >
+            <div class="dg-card-foot">
               <span class="text-[9px] font-bold uppercase tracking-widest text-slate-600">
                 Modifiée le {{ formatDate(c.updatedAt) }}
               </span>

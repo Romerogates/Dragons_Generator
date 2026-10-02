@@ -7,6 +7,10 @@ import { ConnectivityService } from '@core/services/connectivity.service';
 import { FriendsService } from '@core/services/friends.service';
 import { NotificationService } from '@core/services/notification.service';
 import { AuthService } from '@core/services/auth.service';
+import {
+  UI_BANNER_IDS,
+  UiBannerPreferencesService,
+} from '@core/services/ui-banner-preferences.service';
 import { CampaignData, CampaignInvite, CampaignSummary, createCampaignScheduleEvent, emptyCampaignData } from '@core/models/Campaign/campaign';
 
 type RoleFilter = 'all' | 'dm' | 'player';
@@ -28,9 +32,13 @@ export class Campaigns implements OnInit, OnDestroy {
   private router = inject(Router);
   private readonly offlineSync = inject(OfflineSyncService);
   private readonly connectivity = inject(ConnectivityService);
+  private readonly banners = inject(UiBannerPreferencesService);
 
   readonly isOnline = this.connectivity.isOnline;
   readonly pendingSyncCount = this.offlineSync.pendingCount;
+  readonly showGuideLinks = computed(() =>
+    this.banners.isVisible(UI_BANNER_IDS.contextualGuideLinks),
+  );
 
   readonly list = signal<CampaignSummary[]>([]);
   readonly invites = signal<CampaignInvite[]>([]);

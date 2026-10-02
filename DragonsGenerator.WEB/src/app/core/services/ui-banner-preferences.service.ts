@@ -10,6 +10,8 @@ export const UI_BANNER_IDS = {
   dungeonToast: 'dungeon-toast',
   welcomeCampaign: 'welcome-campaign',
   firstSessionComplete: 'first-session-complete',
+  /** Liens « Guide — … » contextuels (forge, campagnes, etc.). */
+  contextualGuideLinks: 'contextual-guide-links',
 } as const;
 
 export type UiBannerId = (typeof UI_BANNER_IDS)[keyof typeof UI_BANNER_IDS] | string;

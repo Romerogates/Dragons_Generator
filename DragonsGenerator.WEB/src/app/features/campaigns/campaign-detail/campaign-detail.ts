@@ -219,6 +219,9 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       this.banners.hydrated() &&
       this.banners.isVisible(UI_BANNER_IDS.welcomeCampaign),
   );
+  readonly showGuideLinks = computed(() =>
+    this.banners.isVisible(UI_BANNER_IDS.contextualGuideLinks),
+  );
   readonly joinLink = signal<{ token: string | null; enabled: boolean } | null>(null);
   readonly joinLinkBusy = signal(false);
   /** Amis déjà invités (en attente d’acceptation) — masqués de la liste invitable. */

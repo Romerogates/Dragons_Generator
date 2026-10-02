@@ -59,7 +59,7 @@
             [(ngModel)]="displayName"
             name="displayName"
             placeholder="Nom affiché (unique)"
-            class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 outline-none"
+            class="dg-input mt-1 !py-2.5 !px-3"
           />
         </label>
         <label class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
@@ -71,7 +71,7 @@
             inputmode="email"
             [(ngModel)]="email"
             name="email"
-            class="mt-1 w-full rounded-lg bg-[#171b22] border border-slate-700 px-3 py-2.5 text-sm text-slate-100 focus:border-amber-500 outline-none"
+            class="dg-input mt-1 !py-2.5 !px-3"
           />
         </label>
         <app-password-field
@@ -93,13 +93,13 @@
         @if (error()) {
           <p class="text-sm text-red-400">{{ error() }}</p>
         }
-        <label class="flex items-start gap-2 text-xs text-slate-400 cursor-pointer">
+        <label class="dg-check-row text-xs text-slate-400">
           <input
             type="checkbox"
             required
             [(ngModel)]="acceptedTerms"
             name="acceptedTerms"
-            class="mt-0.5 rounded border-slate-600 bg-[#171b22] text-amber-500 focus:ring-amber-500"
+            class="dg-check"
           />
           <span>
             J’accepte les

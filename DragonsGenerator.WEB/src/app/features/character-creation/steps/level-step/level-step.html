@@ -1,19 +1,24 @@
-<div class="w-full max-w-3xl mx-auto flex-1 flex flex-col gap-6 py-4">
-  <div class="text-center">
-    <h2 class="text-2xl font-serif text-amber-500 mb-2">Quel est le niveau de votre personnage ?</h2>
-    <p class="text-sm text-slate-400 max-w-xl mx-auto">
-      Niveau de la classe primaire (PV, sorts, capacités). En multiclassage, les classes
-      secondaires ajoutent leurs niveaux par-dessus (total max. 20). Modifiable jusqu’à la fin
-      de l’étape « Classe », puis verrouillé.
+<div class="w-full max-w-3xl mx-auto flex-1 flex flex-col gap-4 sm:gap-6 py-3 sm:py-4 px-1">
+  <div class="text-center px-1">
+    <h2 class="text-xl sm:text-2xl font-serif text-amber-500 mb-1.5 sm:mb-2">
+      Quel est le niveau de votre personnage ?
+    </h2>
+    <p class="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto leading-relaxed">
+      <span class="sm:hidden">Niveau de la classe primaire (max. 20 avec le multiclassage).</span>
+      <span class="hidden sm:inline">
+        Niveau de la classe primaire (PV, sorts, capacités). En multiclassage, les classes
+        secondaires ajoutent leurs niveaux par-dessus (total max. 20). Modifiable jusqu’à la fin
+        de l’étape « Classe », puis verrouillé.
+      </span>
     </p>
   </div>
 
-  <div class="grid grid-cols-5 sm:grid-cols-10 gap-2 max-w-2xl mx-auto w-full">
+  <div class="grid grid-cols-5 sm:grid-cols-10 gap-1.5 sm:gap-2 max-w-2xl mx-auto w-full">
     @for (lvl of levels; track lvl) {
       <button
         type="button"
         data-testid="level-step-option"
-        class="aspect-square rounded-xl border-2 flex items-center justify-center text-lg font-black tabular-nums transition-[colors,transform] duration-150"
+        class="min-h-11 sm:min-h-0 aspect-square rounded-xl border-2 flex items-center justify-center text-base sm:text-lg font-black tabular-nums transition-[colors,transform] duration-150 touch-manipulation"
         [class]="
           lvl === builder.targetLevel()
             ? 'bg-amber-500 border-amber-400 text-slate-900 scale-105 shadow-lg'
@@ -33,7 +38,7 @@
   <nav class="wizard-step-nav justify-center">
     <button
       type="button"
-      class="wizard-nav-primary"
+      class="wizard-nav-primary w-full max-w-xs sm:w-auto"
       data-testid="level-step-continue"
       (click)="continueToNextStep()"
     >

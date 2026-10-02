@@ -12,7 +12,10 @@ import type { Language } from '@core/models/Languages/language';
 import type { Species } from '@core/models/Species/species';
 import type { Spell } from '@core/models/Spells/spell';
 import { normalizeBackgrounds } from '@core/utils/background-data.adapter';
-import { normalizeCharacterClasses } from '@core/utils/class-data.adapter';
+import {
+  coerceEquipmentSlots,
+  normalizeCharacterClasses,
+} from '@core/utils/class-data.adapter';
 import {
   buildAutoBackgroundSelection,
   buildAutoClassSelection,
@@ -368,9 +371,9 @@ export class CharacterAutoGeneratorService {
       toolEquipmentSlots?: EquipmentSlot[];
     };
     const allSlots: EquipmentSlot[] = [
-      ...(c.startingEquipmentSlots ?? []),
-      ...(cAny.backgroundEquipmentSlots ?? []),
-      ...(cAny.toolEquipmentSlots ?? []),
+      ...coerceEquipmentSlots(c.startingEquipmentSlots),
+      ...coerceEquipmentSlots(cAny.backgroundEquipmentSlots),
+      ...coerceEquipmentSlots(cAny.toolEquipmentSlots),
     ];
     const weaponProfs = this.builder.creation().weaponProficiencies ?? [];
     const toolProfs = [

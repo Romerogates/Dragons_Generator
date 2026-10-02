@@ -3,7 +3,7 @@
 >
   <div class="text-center mb-10 w-full px-4">
     <h2
-      class="text-4xl font-extrabold text-amber-500 mb-4 drop-shadow-md tracking-wide font-serif flex items-center justify-center gap-3"
+      class="text-2xl sm:text-4xl font-extrabold text-amber-500 mb-3 sm:mb-4 drop-shadow-md tracking-wide font-serif flex items-center justify-center gap-2 sm:gap-3"
     >
       <iconify-icon icon="fluent-emoji:scroll"></iconify-icon> Historique
     </h2>
@@ -86,7 +86,7 @@
   @if (!loading() && !error() && phase() === 'configure' && selectedBg(); as bg) {
     <div class="w-full max-w-4xl px-4 flex flex-col gap-8 pb-8 animate-fade-in">
       <!-- ═══ EN-TÊTE ═══ -->
-      <div class="perf-card bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+      <div class="perf-card dg-panel">
         <div class="flex items-start gap-5 mb-6">
           <div
             class="w-14 h-14 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-3xl shrink-0"
@@ -131,7 +131,7 @@
       <!-- ═══ SAVOIRS & ÉQUIPEMENT (2 colonnes) ═══ -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div
-          class="perf-card bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl flex flex-col"
+          class="perf-card dg-panel flex flex-col"
         >
           <h4
             class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-4 flex items-center gap-2"
@@ -161,10 +161,10 @@
               }
             </ul>
             @if (isCustom()) {
-              <label class="mt-1 mb-3 flex items-start gap-2 cursor-pointer text-xs text-slate-300">
+              <label class="dg-check-row mt-1 mb-3 text-xs text-slate-300">
                 <input
                   type="checkbox"
-                  class="mt-0.5 accent-amber-500 shrink-0"
+                  class="dg-check"
                   [ngModel]="customExtraSkill()"
                   (ngModelChange)="customExtraSkill.set($event)"
                 />
@@ -185,7 +185,7 @@
         </div>
 
         <div
-          class="perf-card bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl flex flex-col"
+          class="perf-card dg-panel flex flex-col"
         >
           <h4
             class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-4 flex items-center gap-2"
@@ -252,7 +252,7 @@
 
       <!-- ═══ PRIVILÈGE PERSONNALISÉ (custom only) ═══ -->
       @if (isCustom()) {
-        <div class="perf-card bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+        <div class="perf-card dg-panel">
           <h4
             class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-1 flex items-center gap-2"
           >
@@ -323,7 +323,7 @@
 
       <!-- ═══ PERSONNALITÉ — Tables pour presets ═══ -->
       @if (!isCustom() && hasPersonalityTables()) {
-        <div class="perf-card bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+        <div class="perf-card dg-panel">
           <h4
             class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-1 flex items-center gap-2"
           >
@@ -380,7 +380,7 @@
 
       <!-- ═══ PERSONNALITÉ — Texte libre pour custom ═══ -->
       @if (isCustom()) {
-        <div class="perf-card bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+        <div class="perf-card dg-panel">
           <h4
             class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-1 flex items-center gap-2"
           >

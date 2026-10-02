@@ -1,41 +1,28 @@
-<div class="relative w-full flex flex-col items-center animate-fade-in pb-8 select-none gap-6">
+<div
+  class="relative w-full flex flex-col items-center animate-fade-in pb-28 sm:pb-8 select-none gap-5 sm:gap-6"
+>
   <div class="text-center w-full px-4 mt-2">
-    <h2 class="text-3xl font-extrabold text-amber-500 mb-1 drop-shadow-md tracking-wide font-serif">
+    <h2 class="text-2xl sm:text-3xl font-extrabold text-amber-500 mb-1 drop-shadow-md tracking-wide font-serif">
       Le Destin Scellé
     </h2>
-    <p class="text-slate-400 text-xs max-w-xl mx-auto italic">
-      Vérifiez la fiche, puis sauvegardez votre héros pour le conserver. Le PDF reste téléchargeable
-      à tout moment.
+    <p class="text-slate-400 text-xs max-w-xl mx-auto leading-relaxed">
+      Voici l’aperçu de votre fiche. Vérifiez, sauvegardez — la feuille complète s’ouvre ensuite
+      (mode Compacte sur téléphone).
     </p>
   </div>
 
-  <section class="w-full max-w-4xl px-4 flex flex-col gap-2" aria-label="Corriger une étape">
-    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center sm:text-left">
-      Corriger une étape
-    </h3>
-    <p class="text-[11px] text-slate-500 text-center sm:text-left">
-      Un détail à ajuster ? Revenez directement à l’étape concernée, puis revenez ici.
-    </p>
-    <div class="flex flex-wrap justify-center sm:justify-start gap-2">
-      @for (step of editableSteps(); track step.number) {
-        <button
-          type="button"
-          class="px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-500/60 hover:text-amber-400 transition-colors"
-          (click)="goToStep(step.number)"
-        >
-          {{ step.title }}
-        </button>
-      }
-    </div>
-  </section>
-
   <!-- === APERÇU : fiche UI mobile, PDF desktop === -->
-  <div class="w-full max-w-4xl px-4 flex flex-col gap-3">
+  <div class="w-full max-w-4xl px-3 sm:px-4 flex flex-col gap-3">
     <div class="sm:hidden rounded-2xl border border-slate-800 bg-[#0f1117] overflow-hidden">
-      <p class="px-3 py-2 text-[10px] font-black uppercase tracking-widest text-slate-500 border-b border-slate-800">
-        Aperçu fiche
-      </p>
-      <div class="max-h-[48vh] overflow-y-auto p-2">
+      <div
+        class="px-3 py-2.5 border-b border-slate-800 flex items-center justify-between gap-2"
+      >
+        <p class="text-[10px] font-black uppercase tracking-widest text-amber-500/90">
+          Aperçu — feuille
+        </p>
+        <p class="text-[9px] text-slate-600 shrink-0">Faites défiler ↓</p>
+      </div>
+      <div class="max-h-[min(68dvh,36rem)] overflow-y-auto overscroll-contain p-3">
         <app-character-play-view [character]="character()" />
       </div>
     </div>
@@ -95,7 +82,31 @@
     }
   </div>
 
-  <nav class="wizard-step-nav flex-col sm:flex-row sm:flex-wrap">
+  <section class="w-full max-w-4xl px-3 sm:px-4 flex flex-col gap-2" aria-label="Corriger une étape">
+    <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-500 text-center sm:text-left">
+      Corriger une étape
+    </h3>
+    <p class="text-[11px] text-slate-500 text-center sm:text-left">
+      Un détail à ajuster ? Revenez à l’étape, puis revenez ici.
+    </p>
+    <div
+      class="-mx-1 px-1 flex gap-2 overflow-x-auto pb-1 custom-scrollbar sm:flex-wrap sm:overflow-visible sm:justify-start justify-start"
+    >
+      @for (step of editableSteps(); track step.number) {
+        <button
+          type="button"
+          class="shrink-0 min-h-10 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-500/60 hover:text-amber-400 transition-colors inline-flex items-center gap-1.5"
+          (click)="goToStep(step.number)"
+        >
+          <span class="text-amber-500/90 tabular-nums">{{ step.number }}</span>
+          <span>{{ step.title }}</span>
+        </button>
+      }
+    </div>
+  </section>
+
+  <!-- Actions desktop (nav classique) -->
+  <nav class="hidden sm:flex wizard-step-nav flex-row flex-wrap w-full max-w-4xl px-4">
     <button type="button" class="wizard-nav-secondary" (click)="prevStep()">
       ← Étape précédente
     </button>
@@ -109,7 +120,7 @@
     </button>
     <button
       type="button"
-      class="px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-emerald-600 text-white shadow-md hover:bg-emerald-500 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-50 sm:ml-auto"
+      class="px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-emerald-600 text-white shadow-md hover:bg-emerald-500 transition-[colors,transform,opacity,box-shadow] duration-200 disabled:opacity-50 ml-auto"
       (click)="saveCharacter()"
       [disabled]="saving()"
     >
@@ -123,9 +134,47 @@
     </button>
   </nav>
 
+  <!-- Barre sticky mobile : toujours visible pour sauvegarder -->
+  <nav
+    class="sm:hidden fixed bottom-0 inset-x-0 z-40 border-t border-slate-800 bg-[#0f1117]/95 backdrop-blur-md px-3 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+    aria-label="Actions récapitulatif"
+  >
+    <div class="flex gap-2 max-w-4xl mx-auto">
+      <button
+        type="button"
+        class="shrink-0 min-h-11 px-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300"
+        (click)="prevStep()"
+      >
+        ←
+      </button>
+      <button
+        type="button"
+        class="shrink-0 min-h-11 px-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 disabled:opacity-50"
+        [disabled]="isLoadingPreview()"
+        (click)="downloadPdf()"
+      >
+        PDF
+      </button>
+      <button
+        type="button"
+        class="flex-1 min-h-11 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white disabled:opacity-50"
+        (click)="saveCharacter()"
+        [disabled]="saving()"
+      >
+        @if (saving()) {
+          Sauvegarde…
+        } @else if (isEditMode()) {
+          Mettre à jour
+        } @else {
+          Sauvegarder le héros
+        }
+      </button>
+    </div>
+  </nav>
+
   @if (classPlaybook(); as guide) {
     <section
-      class="w-full max-w-4xl px-4 rounded-xl border border-slate-800 bg-[#0f1117] p-4 space-y-3"
+      class="w-full max-w-4xl px-3 sm:px-4 rounded-xl border border-slate-800 bg-[#0f1117] p-4 space-y-3"
       aria-label="Guide de jeu de la classe"
     >
       <div>

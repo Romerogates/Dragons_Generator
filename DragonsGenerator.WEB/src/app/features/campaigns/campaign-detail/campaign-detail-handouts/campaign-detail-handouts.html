@@ -294,10 +294,10 @@
                     (ngModelChange)="patchPage(handout, page.id, { title: $event })"
                     placeholder="Titre page"
                   />
-                  <label class="inline-flex items-center gap-1.5 text-[10px] text-slate-400">
+                  <label class="inline-flex items-center gap-1.5 text-[10px] text-slate-400 cursor-pointer">
                     <input
                       type="checkbox"
-                      class="rounded border-slate-600"
+                      class="dg-check mt-0"
                       [ngModel]="page.published"
                       (ngModelChange)="patchPage(handout, page.id, { published: $event })"
                     />
@@ -322,10 +322,10 @@
             }
           </div>
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <label class="flex items-center gap-2 text-xs text-slate-400 cursor-pointer">
+            <label class="inline-flex items-center gap-2 text-xs text-slate-400 cursor-pointer">
               <input
                 type="checkbox"
-                class="rounded border-slate-600"
+                class="dg-check mt-0"
                 [ngModel]="handout.published"
                 (ngModelChange)="togglePublished.emit({ handoutId: handout.id, published: $event })"
               />

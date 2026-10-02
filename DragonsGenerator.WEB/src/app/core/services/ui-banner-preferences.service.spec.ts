@@ -6,5 +6,6 @@ describe('UiBannerPreferencesService constants', () => {
     expect(UI_BANNER_IDS.dungeonToast).toBe('dungeon-toast');
     expect(UI_BANNER_IDS.welcomeCampaign).toBe('welcome-campaign');
     expect(UI_BANNER_IDS.firstSessionComplete).toBe('first-session-complete');
+    expect(UI_BANNER_IDS.contextualGuideLinks).toBe('contextual-guide-links');
   });
 });

@@ -33,6 +33,7 @@ import { proficiencyBonusForLevel } from '../utils/character-progression.util';
 import type { RawFeatData } from '../utils/feat-benefits.util';
 import type { Spell } from '../models/Spells/spell';
 import { isWizardStepValid } from '../utils/character-wizard-validation.util';
+import { coerceEquipmentSlots } from '../utils/class-data.adapter';
 import { creationNeedsMagicStep } from '../utils/class-spellcasting.util';
 import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { forkJoin } from 'rxjs';
@@ -523,7 +524,7 @@ export class CharacterBuilderService {
       skillOptions: selection.skillOptions,
       skillChooseCount: selection.skillChooseCount,
       classFeatures: selection.classFeatures,
-      startingEquipmentSlots: selection.startingEquipmentSlots,
+      startingEquipmentSlots: coerceEquipmentSlots(selection.startingEquipmentSlots),
       classProgressionResources: selection.classProgressionResources ?? {},
       classBonusLanguageCount: newClassLang,
       classSpellSlots: selection.classSpellSlots ?? [],

@@ -50,6 +50,11 @@ export class Navbar implements OnInit, OnDestroy {
   private routerSub?: Subscription;
 
   readonly mobileOpen = signal(false);
+  /**
+   * Une fois ouvert, le panneau mobile reste monté (CSS hide) pour ne pas
+   * recharger les iconify-icon à chaque ouverture du burger.
+   */
+  readonly mobileMenuMounted = signal(false);
   readonly codexOpen = signal(false);
   readonly creationOpen = signal(false);
   readonly accountOpen = signal(false);
@@ -116,11 +121,23 @@ export class Navbar implements OnInit, OnDestroy {
 
   private readonly router = inject(Router);
 
+  /** Sur la forge, la navbar défile pour laisser les étapes collées en haut. */
+  readonly forgeRoute = signal(false);
+
   ngOnInit(): void {
     this.preloadNavbarIcons();
+    this.syncForgeRoute(this.router.url);
     this.routerSub = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
-      .subscribe(() => this.closeMenus());
+      .subscribe((e) => {
+        this.closeMenus();
+        this.syncForgeRoute(e.urlAfterRedirects);
+      });
+  }
+
+  private syncForgeRoute(url: string): void {
+    const path = url.split('?')[0] ?? url;
+    this.forgeRoute.set(path === '/create' || path.startsWith('/create/'));
   }
 
   ngOnDestroy(): void {
@@ -167,9 +184,11 @@ export class Navbar implements OnInit, OnDestroy {
   }
 
   toggleMobile(): void {
-    this.mobileOpen.update((v) => !v);
+    const opening = !this.mobileOpen();
+    this.mobileOpen.set(opening);
+    if (opening) this.mobileMenuMounted.set(true);
     this.syncBodyScrollLock();
-    if (!this.mobileOpen()) {
+    if (!opening) {
       this.creationOpen.set(false);
       this.codexOpen.set(false);
       this.accountOpen.set(false);
@@ -199,13 +218,14 @@ export class Navbar implements OnInit, OnDestroy {
   }
 
   private preloadNavbarIcons(): void {
-    if (typeof customElements === 'undefined') return;
+    if (typeof customElements === 'undefined' || typeof document === 'undefined') return;
 
     const icons = [
       'mdi:bell-outline',
       'mdi:cog-outline',
       'fluent-emoji:hammer-and-pick',
       'fluent-emoji:busts-in-silhouette',
+      'fluent-emoji:bust-in-silhouette',
       'fluent-emoji:world-map',
       'fluent-emoji:scroll',
       'fluent-emoji:japanese-castle',
@@ -218,12 +238,36 @@ export class Navbar implements OnInit, OnDestroy {
       ...this.creationLinks.map((l) => l.icon),
       ...this.codexLinks.map((l) => l.icon),
     ];
+    const unique = [...new Set(icons)];
 
     customElements.whenDefined('iconify-icon').then(() => {
       const IconifyIcon = customElements.get('iconify-icon') as
         | { loadIcons?: (names: string[]) => void }
         | undefined;
-      IconifyIcon?.loadIcons?.([...new Set(icons)]);
+      IconifyIcon?.loadIcons?.(unique);
+
+      // Chauffe le cache Iconify via un hôte hors écran (fiable avec le CDN).
+      // Les icônes restent en mémoire → réouverture burger sans flash réseau.
+      let host = document.getElementById('dg-iconify-preload');
+      if (!host) {
+        host = document.createElement('div');
+        host.id = 'dg-iconify-preload';
+        host.setAttribute('aria-hidden', 'true');
+        host.style.cssText =
+          'position:fixed;left:-9999px;top:0;width:0;height:0;overflow:hidden;pointer-events:none;opacity:0';
+        document.body.appendChild(host);
+      }
+      for (const name of unique) {
+        const already = Array.from(host.children).some(
+          (el) => el.getAttribute('data-dg-icon') === name,
+        );
+        if (already) continue;
+        const ic = document.createElement('iconify-icon');
+        ic.setAttribute('icon', name);
+        ic.setAttribute('noobserver', '');
+        ic.setAttribute('data-dg-icon', name);
+        host.appendChild(ic);
+      }
     });
   }
 

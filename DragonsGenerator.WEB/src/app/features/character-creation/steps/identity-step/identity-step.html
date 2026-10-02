@@ -1,9 +1,9 @@
 <div
   class="relative w-full flex flex-col items-center animate-fade-in py-6 sm:py-10 select-none justify-center min-h-[65vh]"
 >
-  <div class="text-center mb-10 w-full px-4">
+  <div class="text-center mb-6 sm:mb-10 w-full px-4">
     <h2
-      class="text-4xl font-extrabold text-amber-500 mb-4 drop-shadow-md tracking-wide font-serif flex items-center justify-center gap-3"
+      class="dg-step-title !text-2xl sm:!text-4xl !mb-3 sm:!mb-4 flex items-center justify-center gap-2 sm:gap-3"
     >
       <iconify-icon icon="fluent-emoji:identification-card"></iconify-icon> Identité & Personnalité
     </h2>
@@ -19,7 +19,7 @@
   </div>
 
   <div class="w-full max-w-4xl px-4 flex flex-col gap-10 pb-8">
-    <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+    <div class="dg-panel">
       <h4
         class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-6 flex items-center gap-2"
       >
@@ -28,27 +28,23 @@
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="space-y-2">
-          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter ml-1"
-            >Nom du personnage</label
-          >
+          <label class="dg-field-label">Nom du personnage</label>
           <input
             type="text"
             data-testid="wizard-identity-name"
             [ngModel]="c().name"
             (ngModelChange)="updateIdentity('name', $event)"
             placeholder="Ex: Valerius l'Audacieux"
-            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200"
+            class="dg-input"
           />
         </div>
         <div class="space-y-2">
-          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter ml-1"
-            >Sexe</label
-          >
+          <label class="dg-field-label">Sexe</label>
           <div class="relative">
             <select
               [ngModel]="c().sex"
               (ngModelChange)="updateSex($event)"
-              class="dg-select w-full bg-[var(--dg-bg)] border border-slate-700 rounded-xl px-4 py-3 pr-10 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 cursor-pointer"
+              class="dg-select dg-input pr-10 cursor-pointer"
             >
               <option value="X">Indéfini</option>
               <option value="M">Masculin</option>
@@ -58,14 +54,12 @@
         </div>
 
         <div class="space-y-2">
-          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter ml-1"
-            >Alignement</label
-          >
+          <label class="dg-field-label">Alignement</label>
           <div class="relative">
             <select
               [ngModel]="c().alignment"
               (ngModelChange)="updateIdentity('alignment', $event)"
-              class="dg-select w-full bg-[var(--dg-bg)] border border-slate-700 rounded-xl px-4 py-3 pr-10 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 cursor-pointer"
+              class="dg-select dg-input pr-10 cursor-pointer"
             >
               <option value="">Choisir un alignement...</option>
               @for (align of alignments; track align) {
@@ -77,14 +71,14 @@
       </div>
     </div>
 
-    <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+    <div class="dg-panel">
       <h4
         class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-6 flex items-center gap-2"
       >
-        <iconify-icon icon="fluent-emoji:framed-picture"></iconify-icon> Portrait / jeton
+        <iconify-icon icon="fluent-emoji:framed-picture"></iconify-icon> Portrait
       </h4>
       <p class="text-[11px] text-slate-500 mb-4">
-        Optionnel — affiché sur la fiche PDF (page 1) et réutilisable comme jeton de table.
+        Optionnel — pion sur la carte de combat en session (pas sur la fiche PDF).
       </p>
       <div class="flex flex-wrap items-center gap-4">
         @if (c().portraitImageUrl; as url) {
@@ -130,7 +124,7 @@
       }
     </div>
 
-    <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+    <div class="dg-panel">
       <h4
         class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-6 flex items-center gap-2"
       >
@@ -143,12 +137,12 @@
           (ngModelChange)="updateIdentity('description', $event)"
           rows="3"
           placeholder="Décrivez l'apparence de votre personnage (taille, yeux, signes distinctifs...)"
-          class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-4 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 resize-none custom-scrollbar leading-relaxed"
+          class="dg-textarea py-4"
         ></textarea>
       </div>
     </div>
 
-    <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+    <div class="dg-panel">
       <h4
         class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-6 flex items-center gap-2"
       >
@@ -157,7 +151,7 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div class="space-y-2">
-          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter ml-1"
+          <label class="dg-field-label"
             >Traits de personnalité</label
           >
           <textarea
@@ -165,12 +159,12 @@
             (ngModelChange)="updateIdentity('traits', $event)"
             rows="3"
             placeholder="Ex. : franc, curieux, loyal envers ses compagnons…"
-            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 resize-none text-xs leading-relaxed"
+            class="dg-textarea text-xs"
           ></textarea>
         </div>
 
         <div class="space-y-2">
-          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter ml-1"
+          <label class="dg-field-label"
             >Idéal</label
           >
           <textarea
@@ -178,12 +172,12 @@
             (ngModelChange)="updateIdentity('ideal', $event)"
             rows="3"
             placeholder="Ex. : la liberté, la connaissance, la justice…"
-            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 resize-none text-xs leading-relaxed"
+            class="dg-textarea text-xs"
           ></textarea>
         </div>
 
         <div class="space-y-2">
-          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter ml-1"
+          <label class="dg-field-label"
             >Liens</label
           >
           <textarea
@@ -191,12 +185,12 @@
             (ngModelChange)="updateIdentity('bonds', $event)"
             rows="3"
             placeholder="Ex. : ma famille, mon mentor, mon village natal…"
-            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 resize-none text-xs leading-relaxed"
+            class="dg-textarea text-xs"
           ></textarea>
         </div>
 
         <div class="space-y-2">
-          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter ml-1"
+          <label class="dg-field-label"
             >Failles</label
           >
           <textarea
@@ -204,13 +198,13 @@
             (ngModelChange)="updateIdentity('flaws', $event)"
             rows="3"
             placeholder="Ex. : trop confiant, cupide, impulsif…"
-            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-amber-500/50 transition-[colors,transform,opacity,box-shadow] duration-200 resize-none text-xs leading-relaxed"
+            class="dg-textarea text-xs"
           ></textarea>
         </div>
       </div>
     </div>
 
-    <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+    <div class="dg-panel">
       <div class="flex items-center justify-between mb-6">
         <h4
           class="text-[10px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-2"

@@ -21,7 +21,10 @@ import {
   ClassSelection,
 } from '../../../../core/services/character-builder.service';
 import type { CharacterClass } from '../../../../core/models/CharacterClasses/character-class';
-import { normalizeCharacterClasses } from '@core/utils/class-data.adapter';
+import {
+  coerceEquipmentSlots,
+  normalizeCharacterClasses,
+} from '@core/utils/class-data.adapter';
 import { getClassIcon } from '@core/utils/class-icons';
 import { formatGameIds, labelForGameId } from '@core/utils/game-id-labels';
 import { metamagicLabel } from '@core/data/metamagic-labels.data';
@@ -730,11 +733,17 @@ export class ClassStep implements OnInit {
 
   private syncCarouselIndexFromSelection(): void {
     const cards = this.currentCards();
-    if (!cards.length) return;
+    if (!cards.length) {
+      this.currentIndex.set(0);
+      return;
+    }
     const targetId = this.resolveCarouselTargetId();
-    if (!targetId) return;
+    if (!targetId) {
+      this.currentIndex.set(0);
+      return;
+    }
     const idx = cards.findIndex((c) => c.id === targetId);
-    if (idx >= 0) this.currentIndex.set(idx);
+    this.currentIndex.set(idx >= 0 ? idx : 0);
   }
 
   private resolveCarouselTargetId(): string | null {
@@ -829,9 +838,12 @@ export class ClassStep implements OnInit {
     );
   }
 
+  /** Recale index + scroll mobile après changement de phase / choix précédent. */
   private scheduleCarouselRestore(): void {
-    if (!this.useScrollCarousel()) return;
     this.syncCarouselIndexFromSelection();
+    // Évite un currentIndex hors plage (desktop nextCard incrémente sans modulo).
+    this.currentIndex.set(this.normalizedIndex());
+    if (!this.useScrollCarousel()) return;
     afterNextRender(
       () => this.scrollToIndex(this.normalizedIndex(), 'instant'),
       { injector: this.injector },
@@ -1019,7 +1031,7 @@ export class ClassStep implements OnInit {
       }
       this.lastAppliedLevel = this.targetLevel();
     } else if (phaseBeforeClick !== this.currentPhase()) {
-      this.currentIndex.set(0);
+      this.scheduleCarouselRestore();
     }
   }
 
@@ -1071,59 +1083,80 @@ export class ClassStep implements OnInit {
 
   private doClearSelection(): void {
     this.holdPhase.set(null);
-    this.focusedProgChoiceId.set(null);
-    this.selectedClassId.set(null);
-    this.selectedSubclassId.set(null);
-    this.selectedCombatStyleIds.set([]);
-    this.subChoiceAnswers.set(new Map());
-    this.progChoiceAnswers.set(new Map());
-    this.lastAppliedLevel = null;
-    this.builder.clearClass();
     this.flippedCards.set(new Set());
     this.currentIndex.set(0);
+    this.clearClassSelectionLocal();
   }
 
   prevStep(): void {
     this.builder.previousStep();
   }
 
-  /** Revient au sous-choix précédent (atavisme, dragon, métamagie…) sans quitter l'étape classe. */
+  /**
+   * Remonte d’un cran dans la pile de choix (prog → sous-choix → sous-classe → style → classe).
+   * Sur Atavisme / voie sans sélection, doit bien revenir au carrousel des classes
+   * (sinon le bouton « Choix précédent » ne faisait rien pour l’Ensorceleur).
+   */
   prevPhase(): void {
     this.holdPhase.set(null);
     this.flippedCards.set(new Set());
-    const phase = this.currentPhase();
+    this.focusedProgChoiceId.set(null);
+    if (this.currentPhase() === 'class') return;
 
-    if (phase === 'prog_choice') {
-      const choice = this.nextUnresolvedProgChoice() ?? this.activeProgChoices().at(-1);
-      if (choice) {
-        this.progChoiceAnswers.update((m) => {
-          const next = new Map(m);
-          next.delete(choice.id);
-          return this.trimInvalidProgPicks(next);
-        });
-      }
-      this.syncCarouselIndexFromSelection();
+    // 1) Progression (métamagie, invocations…) : annuler le pool affiché / le dernier rempli.
+    const progChoice = this.displayedProgChoice() ?? this.activeProgChoices().at(-1);
+    if (progChoice && this.progChoiceAnswers().has(progChoice.id)) {
+      this.progChoiceAnswers.update((m) => {
+        const next = new Map(m);
+        next.delete(progChoice.id);
+        return this.trimInvalidProgPicks(next);
+      });
+      this.scheduleCarouselRestore();
       return;
     }
 
-    if (phase === 'sub_choice' || (phase === 'subclass' && this.subChoiceAnswers().size > 0)) {
+    // 2) Sous-choix de sous-classe (ancestralité draconique, totem…)
+    //    ou phase sub_choice en cours → revenir au carrousel de voie.
+    if (this.subChoiceAnswers().size > 0 || this.currentPhase() === 'sub_choice') {
       this.subChoiceAnswers.set(new Map());
+      this.progChoiceAnswers.set(new Map());
       this.selectedSubclassId.set(null);
-      this.syncCarouselIndexFromSelection();
+      this.scheduleCarouselRestore();
       return;
     }
 
-    if (phase === 'subclass') {
+    // 3) Sous-classe / voie déjà sélectionnée → la retirer.
+    if (this.selectedSubclassId()) {
       this.selectedSubclassId.set(null);
       this.subChoiceAnswers.set(new Map());
-      this.syncCarouselIndexFromSelection();
+      this.progChoiceAnswers.set(new Map());
+      this.scheduleCarouselRestore();
       return;
     }
 
-    if (phase === 'combat_style') {
-      this.selectedCombatStyleIds.set([]);
-      this.syncCarouselIndexFromSelection();
+    // 4) Styles de combat (du plus récent au plus ancien).
+    const styles = this.selectedCombatStyleIds();
+    if (styles.length > 0) {
+      this.selectedCombatStyleIds.set(styles.slice(0, -1));
+      this.scheduleCarouselRestore();
+      return;
     }
+
+    // 5) Dernier cran (ex. Atavisme Ensorceleur / Domaine Prêtre sans choix) → classes.
+    this.clearClassSelectionLocal();
+    this.scheduleCarouselRestore();
+  }
+
+  /** Efface la sélection de classe locale + builder (sans dialogue aval). */
+  private clearClassSelectionLocal(): void {
+    this.selectedClassId.set(null);
+    this.selectedSubclassId.set(null);
+    this.selectedCombatStyleIds.set([]);
+    this.subChoiceAnswers.set(new Map());
+    this.progChoiceAnswers.set(new Map());
+    this.focusedProgChoiceId.set(null);
+    this.lastAppliedLevel = null;
+    this.builder.clearClass();
   }
 
   readonly canGoPrevPhase = computed(
@@ -1320,7 +1353,7 @@ export class ClassStep implements OnInit {
         skillOptions: Array.isArray(prof.skills?.options) ? prof.skills.options : [],
         skillChooseCount: prof.skills?.count ?? 0,
         classFeatures: features,
-        startingEquipmentSlots: cls.data.starting_equipment ?? [],
+        startingEquipmentSlots: coerceEquipmentSlots(cls.data.starting_equipment),
         classProgressionResources,
         classBonusLanguageCount: langBonus,
         classRequiredExoticLanguageCount:

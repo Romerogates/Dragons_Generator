@@ -38,6 +38,10 @@ function readStoredViewMode(): SheetViewMode {
   } catch {
     /* ignore */
   }
+  // Mobile : Compacte par défaut (lisible au doigt). Desktop : Illustrée.
+  if (typeof window !== 'undefined' && window.matchMedia('(max-width: 639px)').matches) {
+    return 'ui';
+  }
   return 'illustrated';
 }
 
