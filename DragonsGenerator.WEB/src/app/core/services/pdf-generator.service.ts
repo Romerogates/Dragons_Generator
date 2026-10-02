@@ -4,6 +4,7 @@ import type { jsPDF } from 'jspdf';
 import { firstValueFrom } from 'rxjs';
 import { labelForGameId } from '@core/utils/game-id-labels';
 import { resistanceLabel } from '@core/utils/equipment-display.util';
+import { EQUIPMENT_CATEGORY_ALIASES } from '@core/utils/equipment.utils';
 import {
   GRIMOIRE_BASE_COORDS as BASE_COORDS,
   GRIMOIRE_IMAGES,
@@ -645,13 +646,34 @@ export class PdfGeneratorService {
     return [...ids].sort((a, b) => Number(isCategory(b)) - Number(isCategory(a)));
   }
 
-  /** Catégories d'armes (courantes / guerre…) — pas les armes nommées une à une. */
+  /**
+   * Catégories d'armes/armures (courantes / guerre…) — pas les armes nommées une à une.
+   * Couvre les IDs canoniques (`wp-cat-*`, `category-*`) et les alias classes
+   * (`wp-simple`, `wp-martial`, `wp-category-simple`…).
+   */
   private isWeaponOrArmorCategoryId(id: string): boolean {
-    return /^(wp-cat-|category-|ar-cat-)/.test(id);
+    if (/^(wp-cat-|wp-category-|ar-cat-|category-)/.test(id)) return true;
+    const aliased = EQUIPMENT_CATEGORY_ALIASES[id];
+    return (
+      !!aliased &&
+      /^category-(simple|martial|light|medium|heavy|shield|all)-?/.test(aliased)
+    );
   }
 
   private weaponSpecializationIds(ids: string[]): string[] {
-    return this.prioritizeCategoryTokens(ids.filter((id) => this.isWeaponOrArmorCategoryId(id)));
+    const cats = this.prioritizeCategoryTokens(
+      ids.filter((id) => this.isWeaponOrArmorCategoryId(id)),
+    );
+    // Dédupliquer les alias équivalents (wp-simple ≡ wp-cat-simple ≡ category-simple-weapons)
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const id of cats) {
+      const key = EQUIPMENT_CATEGORY_ALIASES[id] ?? id;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(id);
+    }
+    return out;
   }
 
   /**

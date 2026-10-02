@@ -11,8 +11,8 @@
     </p>
   </div>
 
-  <!-- === APERÇU : fiche UI mobile, PDF desktop === -->
-  <div class="w-full max-w-4xl px-3 sm:px-4 flex flex-col gap-3">
+  <!-- === APERÇU : fiche UI mobile, PDF desktop (pleine largeur utile PC) === -->
+  <div class="w-full max-w-[96rem] px-3 sm:px-6 lg:px-8 flex flex-col gap-3">
     <div class="sm:hidden rounded-2xl border border-slate-800 bg-[#0f1117] overflow-hidden">
       <div
         class="px-3 py-2.5 border-b border-slate-800 flex items-center justify-between gap-2"
@@ -27,7 +27,7 @@
       </div>
     </div>
 
-    <div class="relative hidden sm:block w-full mx-auto max-w-5xl">
+    <div class="relative hidden sm:block w-full mx-auto">
       @if (isLoadingPreview()) {
         <div class="flex flex-col items-center justify-center gap-4 py-16">
           <div

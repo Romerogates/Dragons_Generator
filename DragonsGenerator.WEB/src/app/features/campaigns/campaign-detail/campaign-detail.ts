@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   effect,
+  HostListener,
   inject,
   Injector,
   OnDestroy,
@@ -34,6 +35,7 @@ import type { CreaturePrintEntry, PlayerGmSummary } from '@core/services/campaig
 import { ProfileAvatarComponent } from '@shared/components/profile-avatar/profile-avatar';
 import { Character } from '@core/models/Character/character';
 import {
+  CampaignAtlasPin,
   CampaignData,
   CampaignHandout,
   HandoutKind,
@@ -206,6 +208,40 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   readonly memberCharacterLoadingId = signal<string | null>(null);
   readonly characterRequestLoadingId = signal<string | null>(null);
   readonly rosterFeedback = signal<string | null>(null);
+
+  /** Picker Atlas (+ Lieu) : civilisations Codex + Autre. */
+  readonly atlasPinPickerOpen = signal(false);
+  readonly atlasCivOptions = signal<{ id: string; name: string }[]>([]);
+  readonly atlasCivsLoading = signal(false);
+  readonly atlasPinFilter = signal('');
+  readonly atlasCustomName = signal('');
+  readonly atlasShowCustom = signal(false);
+
+  readonly atlasRegionOption = computed(() => {
+    const c = this.campaign();
+    if (!c) return null;
+    const id = c.data.regionId?.trim();
+    const name = c.data.regionName?.trim();
+    if (!id || !name) return null;
+    const pinned = (c.data.atlasPins ?? []).some((p) => p.civId === id);
+    if (pinned) return null;
+    return { id, name };
+  });
+
+  readonly atlasFilteredCivs = computed(() => {
+    const q = this.atlasPinFilter().trim().toLowerCase();
+    const regionId = this.campaign()?.data.regionId ?? null;
+    const pinned = new Set(
+      (this.campaign()?.data.atlasPins ?? [])
+        .map((p) => p.civId)
+        .filter((id): id is string => !!id),
+    );
+    return this.atlasCivOptions()
+      .filter((civ) => civ.id !== regionId && !pinned.has(civ.id))
+      .filter((civ) => !q || civ.name.toLowerCase().includes(q))
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+  });
   /** Erreurs / succès locaux Pré-tirés (ne démonte pas le hub). */
   readonly pregenFeedback = signal<string | null>(null);
   readonly pregenUndoAvailable = signal(false);
@@ -1762,17 +1798,98 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.rosterFeedback.set(`${added.length} rencontre(s) ajoutée(s).`);
   }
 
-  addAtlasPin(): void {
+  @HostListener('document:click')
+  onDocumentClickCloseAtlasPicker(): void {
+    if (this.atlasPinPickerOpen()) this.closeAtlasPinPicker();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapeCloseAtlasPicker(): void {
+    if (this.atlasPinPickerOpen()) this.closeAtlasPinPicker();
+  }
+
+  toggleAtlasPinPicker(ev: Event): void {
+    ev.stopPropagation();
+    if (this.atlasPinPickerOpen()) {
+      this.closeAtlasPinPicker();
+      return;
+    }
+    this.atlasPinPickerOpen.set(true);
+    this.atlasPinFilter.set('');
+    this.atlasCustomName.set('');
+    this.atlasShowCustom.set(false);
+    this.ensureAtlasCivsLoaded();
+  }
+
+  closeAtlasPinPicker(): void {
+    this.atlasPinPickerOpen.set(false);
+    this.atlasShowCustom.set(false);
+    this.atlasCustomName.set('');
+    this.atlasPinFilter.set('');
+  }
+
+  private ensureAtlasCivsLoaded(): void {
+    if (this.atlasCivOptions().length || this.atlasCivsLoading()) return;
+    this.atlasCivsLoading.set(true);
+    this.data.getCivilisationsSummary().subscribe({
+      next: (list) => {
+        this.atlasCivOptions.set(
+          (list ?? [])
+            .filter((civ) => !!civ?.id && !!civ?.name)
+            .map((civ) => ({ id: civ.id, name: civ.name })),
+        );
+        this.atlasCivsLoading.set(false);
+      },
+      error: () => {
+        this.atlasCivOptions.set([]);
+        this.atlasCivsLoading.set(false);
+      },
+    });
+  }
+
+  addAtlasPinFromCiv(civId: string, name: string): void {
     const c = this.campaign();
     if (!c?.isOwner) return;
-    const name = (window.prompt('Nom du lieu (Atlas)') || '').trim();
+    const id = civId.trim();
+    const label = name.trim();
+    if (!id || !label) return;
+    if ((c.data.atlasPins ?? []).some((p) => p.civId === id)) {
+      this.closeAtlasPinPicker();
+      return;
+    }
+    this.pushAtlasPin({
+      id: crypto.randomUUID?.() ?? `pin-${Date.now()}`,
+      name: label,
+      civId: id,
+      note: '',
+    });
+    this.closeAtlasPinPicker();
+  }
+
+  addAtlasPinCustom(): void {
+    const c = this.campaign();
+    if (!c?.isOwner) return;
+    const name = this.atlasCustomName().trim();
     if (!name) return;
-    const pin = {
+    const existing = (c.data.atlasPins ?? []).some(
+      (p) => p.name.trim().toLowerCase() === name.toLowerCase(),
+    );
+    if (existing) {
+      this.closeAtlasPinPicker();
+      return;
+    }
+    this.pushAtlasPin({
       id: crypto.randomUUID?.() ?? `pin-${Date.now()}`,
       name,
-      civId: c.data.regionId,
+      civId: c.data.regionId ?? null,
       note: '',
-    };
+    });
+    this.closeAtlasPinPicker();
+  }
+
+  private pushAtlasPin(pin: CampaignAtlasPin): void {
+    const c = this.campaign();
+    if (!c) return;
     this.saveData({ atlasPins: [...(c.data.atlasPins ?? []), pin] });
   }
 

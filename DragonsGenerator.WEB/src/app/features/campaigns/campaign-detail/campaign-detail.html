@@ -140,13 +140,108 @@
                   </span>
                 }
                 @if (c.isOwner) {
-                  <button
-                    type="button"
-                    class="px-2 py-1 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:text-violet-300"
-                    (click)="addAtlasPin()"
-                  >
-                    + Lieu
-                  </button>
+                  <div class="relative" data-testid="campaign-atlas-add-wrap">
+                    <button
+                      type="button"
+                      class="px-2 py-1 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400 hover:text-violet-300"
+                      data-testid="campaign-atlas-add"
+                      [attr.aria-expanded]="atlasPinPickerOpen()"
+                      aria-haspopup="dialog"
+                      (click)="toggleAtlasPinPicker($event)"
+                    >
+                      + Lieu
+                    </button>
+                    @if (atlasPinPickerOpen()) {
+                      <div
+                        class="absolute left-0 top-full z-40 mt-1 w-72 max-w-[min(18rem,calc(100vw-2rem))] rounded-xl border border-slate-700 bg-[#1b2028] shadow-2xl p-2 flex flex-col gap-2"
+                        data-testid="campaign-atlas-picker"
+                        role="dialog"
+                        aria-label="Ajouter un lieu Atlas"
+                        (click)="$event.stopPropagation()"
+                      >
+                        @if (atlasRegionOption(); as region) {
+                          <div>
+                            <p class="px-1 mb-1 text-[9px] font-black uppercase tracking-widest text-slate-500">
+                              Région de campagne
+                            </p>
+                            <button
+                              type="button"
+                              class="w-full text-left px-2 py-1.5 rounded-lg text-[11px] text-violet-200 hover:bg-violet-950/40 border border-violet-800/40"
+                              (click)="addAtlasPinFromCiv(region.id, region.name)"
+                            >
+                              {{ region.name }}
+                            </button>
+                          </div>
+                        }
+
+                        <div>
+                          <p class="px-1 mb-1 text-[9px] font-black uppercase tracking-widest text-slate-500">
+                            Eana
+                          </p>
+                          <input
+                            type="search"
+                            class="w-full mb-1 px-2 py-1.5 rounded-lg bg-[#12151b] border border-slate-700 text-[11px] text-slate-200 placeholder:text-slate-600"
+                            placeholder="Filtrer…"
+                            [ngModel]="atlasPinFilter()"
+                            (ngModelChange)="atlasPinFilter.set($event)"
+                            data-testid="campaign-atlas-filter"
+                          />
+                          <div class="max-h-40 overflow-y-auto custom-scrollbar flex flex-col gap-0.5">
+                            @for (civ of atlasFilteredCivs(); track civ.id) {
+                              <button
+                                type="button"
+                                class="w-full text-left px-2 py-1.5 rounded-lg text-[11px] text-slate-300 hover:bg-slate-800/80 hover:text-violet-200"
+                                (click)="addAtlasPinFromCiv(civ.id, civ.name)"
+                              >
+                                {{ civ.name }}
+                              </button>
+                            } @empty {
+                              <p class="px-2 py-2 text-[10px] text-slate-600">
+                                {{ atlasCivsLoading() ? 'Chargement…' : 'Aucune civilisation disponible.' }}
+                              </p>
+                            }
+                          </div>
+                        </div>
+
+                        <div class="border-t border-slate-800 pt-2">
+                          @if (!atlasShowCustom()) {
+                            <button
+                              type="button"
+                              class="w-full text-left px-2 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-widest text-slate-400 hover:text-amber-300 hover:bg-slate-800/60"
+                              data-testid="campaign-atlas-custom-toggle"
+                              (click)="atlasShowCustom.set(true)"
+                            >
+                              Autre…
+                            </button>
+                          } @else {
+                            <p class="px-1 mb-1 text-[9px] font-black uppercase tracking-widest text-slate-500">
+                              Autre lieu
+                            </p>
+                            <div class="flex gap-1">
+                              <input
+                                type="text"
+                                class="min-w-0 flex-1 px-2 py-1.5 rounded-lg bg-[#12151b] border border-slate-700 text-[11px] text-slate-200"
+                                placeholder="Nom du lieu"
+                                [ngModel]="atlasCustomName()"
+                                (ngModelChange)="atlasCustomName.set($event)"
+                                (keydown.enter)="addAtlasPinCustom()"
+                                data-testid="campaign-atlas-custom-name"
+                              />
+                              <button
+                                type="button"
+                                class="shrink-0 px-2 py-1.5 rounded-lg text-[10px] font-black uppercase bg-amber-500 text-slate-950 hover:bg-amber-400 disabled:opacity-40"
+                                [disabled]="!atlasCustomName().trim()"
+                                data-testid="campaign-atlas-custom-submit"
+                                (click)="addAtlasPinCustom()"
+                              >
+                                OK
+                              </button>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
                 }
               </div>
             }

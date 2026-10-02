@@ -52,6 +52,8 @@ export class CharacterPlayView {
   readonly character = input.required<Character>();
   /** Fiche compacte live : PV / slots / inspiration éditables (hors consultation). */
   readonly editable = input(false);
+  /** Masquer le bandeau nom/espèce si le parent l’affiche déjà (fiche héros). */
+  readonly showIdentity = input(true);
   readonly liveChange = output<CharacterLivePatch>();
 
   readonly abilityKeys = ABILITY_KEYS;

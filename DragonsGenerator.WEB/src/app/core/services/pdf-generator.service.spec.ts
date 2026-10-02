@@ -132,5 +132,11 @@ describe('PdfGeneratorService', () => {
       ).toEqual(['wp-cat-simple', 'category-martial-weapons']);
       expect(weaponSpecs(['wp-dague', 'wp-cimeterre'])).toEqual([]);
     });
+
+    it('recognizes class alias categories (barbare / rodeur / paladin)', () => {
+      expect(weaponSpecs(['wp-simple', 'wp-martial'])).toEqual(['wp-simple', 'wp-martial']);
+      expect(weaponSpecs(['wp-category-simple', 'wp-epee-courte'])).toEqual(['wp-category-simple']);
+      expect(weaponSpecs(['wp-simple', 'wp-cat-simple', 'wp-dague'])).toEqual(['wp-simple']);
+    });
   });
 });

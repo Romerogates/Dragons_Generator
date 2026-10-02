@@ -1,15 +1,17 @@
 @if (character(); as c) {
   <div class="space-y-4">
-    <header class="px-1">
-      <h2 class="text-xl sm:text-2xl font-serif text-slate-100 leading-tight">{{ c.name }}</h2>
-      <p class="text-sm text-slate-400 mt-0.5">
-        {{ identityLine() }}
-        @if (c.personality?.alignment) {
-          <span class="text-slate-600"> · </span>{{ c.personality.alignment }}
-        }
-      </p>
-      <p class="text-sm text-slate-500 mt-0.5">{{ classLine() }} · Total niv. {{ c.totalLevel }}</p>
-    </header>
+    @if (showIdentity()) {
+      <header class="px-1">
+        <h2 class="text-xl sm:text-2xl font-serif text-slate-100 leading-tight">{{ c.name }}</h2>
+        <p class="text-sm text-slate-400 mt-0.5">
+          {{ identityLine() }}
+          @if (c.personality?.alignment) {
+            <span class="text-slate-600"> · </span>{{ c.personality.alignment }}
+          }
+        </p>
+        <p class="text-sm text-slate-500 mt-0.5">{{ classLine() }} · Total niv. {{ c.totalLevel }}</p>
+      </header>
+    }
 
     <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
       <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-3 text-center" data-testid="compact-hp">

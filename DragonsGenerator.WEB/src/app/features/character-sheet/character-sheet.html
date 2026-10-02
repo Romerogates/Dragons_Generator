@@ -1,10 +1,16 @@
-<div class="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8 animate-fade-in min-h-[80vh] select-none">
-  <div class="flex flex-col gap-4 mb-6">
-    <div>
-      <h1 class="text-2xl sm:text-3xl font-extrabold text-amber-500 font-serif tracking-wide">
+<div
+  class="max-w-[96rem] mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-6 animate-fade-in min-h-[80vh] select-none"
+>
+  <header
+    class="mb-5 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between lg:gap-4"
+  >
+    <div class="min-w-0">
+      <h1
+        class="text-2xl sm:text-3xl font-extrabold text-amber-500 font-serif tracking-wide truncate"
+      >
         {{ getName() }}
       </h1>
-      <p class="text-slate-400 text-sm mt-1">
+      <p class="text-slate-400 text-sm mt-1 truncate">
         {{ getSpecies() }}
         @if (getClass()) {
           · {{ getClass() }}
@@ -13,55 +19,53 @@
       </p>
     </div>
 
-    <div
-      class="inline-flex w-full sm:w-auto rounded-xl border border-slate-700 overflow-hidden"
-      role="group"
-      aria-label="Mode d'affichage"
-    >
-      <button
-        type="button"
-        class="flex-1 sm:flex-none min-h-11 px-3 py-2 text-[10px] font-black uppercase tracking-widest transition-colors"
-        [class]="
-          viewMode() === 'ui'
-            ? 'bg-amber-500 text-slate-950'
-            : 'bg-[var(--dg-surface)] text-slate-400 hover:text-amber-400'
-        "
-        title="Lecture écran — navigation et édition confortables"
-        (click)="setViewMode('ui')"
+    <div class="flex flex-wrap items-center gap-2 lg:justify-end">
+      <div
+        class="inline-flex shrink-0 rounded-lg border border-slate-700/80 bg-[#12151b] p-0.5"
+        role="group"
+        aria-label="Mode d'affichage"
       >
-        Compacte
-      </button>
-      <button
-        type="button"
-        class="flex-1 sm:flex-none min-h-11 px-3 py-2 text-[10px] font-black uppercase tracking-widest transition-colors border-l border-slate-700"
-        [class]="
-          viewMode() === 'illustrated'
-            ? 'bg-amber-500 text-slate-950'
-            : 'bg-[var(--dg-surface)] text-slate-400 hover:text-amber-400'
-        "
-        title="Mise en page PDF / table — à imprimer ou projetée"
-        (click)="setViewMode('illustrated')"
-      >
-        Illustrée
-      </button>
-    </div>
-    <p class="text-[10px] text-slate-500 leading-relaxed">
-      <span class="text-amber-400/90">Compacte</span> = lecture écran ·
-      <span class="text-amber-400/90">Illustrée</span> = PDF / table
-    </p>
+        <button
+          type="button"
+          class="min-h-10 px-3.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-colors"
+          [class]="
+            viewMode() === 'ui'
+              ? 'bg-amber-500 text-slate-950 shadow-sm'
+              : 'text-slate-400 hover:text-amber-300'
+          "
+          title="Lecture écran"
+          (click)="setViewMode('ui')"
+        >
+          Compacte
+        </button>
+        <button
+          type="button"
+          class="min-h-10 px-3.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-colors"
+          [class]="
+            viewMode() === 'illustrated'
+              ? 'bg-amber-500 text-slate-950 shadow-sm'
+              : 'text-slate-400 hover:text-amber-300'
+          "
+          title="PDF / table"
+          (click)="setViewMode('illustrated')"
+        >
+          Illustrée
+        </button>
+      </div>
 
-    <div class="flex flex-wrap gap-2 items-center">
+      <span class="hidden sm:block w-px h-7 bg-slate-700/80 mx-0.5" aria-hidden="true"></span>
+
       @if (!isConsult()) {
         <button
           type="button"
-          class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 transition-colors"
+          class="min-h-10 px-3.5 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 transition-colors"
           (click)="backToList()"
         >
           ← Mes héros
         </button>
         <button
           type="button"
-          class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 transition-colors"
+          class="min-h-10 px-3.5 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 transition-colors"
           (click)="editCharacter()"
         >
           Modifier
@@ -69,7 +73,7 @@
       } @else {
         <button
           type="button"
-          class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 transition-colors"
+          class="min-h-10 px-3.5 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 transition-colors"
           (click)="backToList()"
         >
           {{ consultBackLabel() }}
@@ -77,14 +81,14 @@
       }
       <button
         type="button"
-        class="min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-500 text-slate-950 hover:bg-amber-400 transition-colors"
+        class="min-h-10 px-3.5 rounded-lg text-[10px] font-black uppercase tracking-widest bg-amber-500 text-slate-950 hover:bg-amber-400 transition-colors"
         (click)="downloadPdf()"
         [disabled]="!character()"
       >
-        Télécharger PDF
+        PDF
       </button>
     </div>
-  </div>
+  </header>
 
   @if (isConsult()) {
     <div
@@ -232,6 +236,7 @@
       <app-character-play-view
         [character]="hero"
         [editable]="compactEditable()"
+        [showIdentity]="false"
         (liveChange)="onLivePatch($event)"
       />
     }

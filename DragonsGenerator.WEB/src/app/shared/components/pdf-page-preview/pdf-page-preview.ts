@@ -322,7 +322,8 @@ export class PdfPagePreview implements OnDestroy {
       cssW = Math.floor(unscaled.width * cssScale);
       cssH = Math.floor(unscaled.height * cssScale);
     } else {
-      const cssScale = Math.min(2.4, Math.max(0.45, parentW / unscaled.width));
+      // Sur grand écran, monter jusqu’à ~3× pour remplir la largeur utile (A4 ~595pt).
+      const cssScale = Math.min(3, Math.max(0.45, parentW / unscaled.width));
       cssW = Math.floor(unscaled.width * cssScale);
       cssH = Math.floor(unscaled.height * cssScale);
     }

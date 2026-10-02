@@ -77,7 +77,7 @@
 
 .pdf-book {
   width: 100%;
-  max-width: 56rem;
+  max-width: min(100%, 90rem);
   margin-inline: auto;
   display: flex;
   justify-content: center;
