@@ -1,8 +1,21 @@
 import type {
+  CampaignData,
   CampaignDetail,
   CampaignSession,
   Combatant,
 } from '@core/models/Campaign/campaign';
+
+/**
+ * Retire `tableChat` des sessions avant PUT — le serveur MergeTableChat
+ * conserve le fil quand le client omet le champ.
+ */
+export function stripTableChatForPersist(data: CampaignData): CampaignData {
+  const sessions = (data.sessions ?? []).map((s) => {
+    const { tableChat: _omit, ...rest } = s;
+    return rest;
+  });
+  return { ...data, sessions };
+}
 
 /**
  * Fusionne uniquement les jets d'initiative distants dans l'état local.

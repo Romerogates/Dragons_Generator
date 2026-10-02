@@ -1,5 +1,5 @@
-import { mergeRemoteInitiativeRolls, mergeRemoteLiveTable } from './campaign-persist.util';
-import type { CampaignDetail } from '@core/models/Campaign/campaign';
+import { mergeRemoteInitiativeRolls, mergeRemoteLiveTable, stripTableChatForPersist } from './campaign-persist.util';
+import type { CampaignData, CampaignDetail } from '@core/models/Campaign/campaign';
 
 function baseCampaign(overrides: Partial<CampaignDetail['data']> = {}): CampaignDetail {
   return {
@@ -423,5 +423,49 @@ describe('mergeRemoteLiveTable', () => {
     expect(merged.data.sessions!.find((s) => s.id === 'other')?.title).toBe('Autre');
     expect(merged.data.sessions!.find((s) => s.id === 's1')?.combatLog).toEqual(['local']);
     expect(merged.data.sessions!.find((s) => s.id === 's1')?.activeCombat?.round).toBe(3);
+  });
+});
+
+describe('stripTableChatForPersist', () => {
+  it('omits tableChat from sessions while keeping other fields', () => {
+    const data = {
+      setting: '',
+      regionId: null,
+      regionName: '',
+      partyLevel: 1,
+      tone: 'classic' as const,
+      adventure: '',
+      creatures: [],
+      encounters: [],
+      notes: '',
+      pregenCharacters: [],
+      sessions: [
+        {
+          id: 's1',
+          title: 'S',
+          scheduledAt: '2026-01-01T20:00:00Z',
+          status: 'planned' as const,
+          tableChat: [
+            {
+              id: 'm1',
+              at: '2026-01-01T20:00:00Z',
+              authorUserId: 'u',
+              authorName: 'A',
+              body: 'hi',
+            },
+          ],
+          playNotes: 'keep',
+        },
+      ],
+      handouts: [],
+      dungeonMaps: [],
+      scheduleEvents: [],
+      notebookPages: [],
+    } satisfies CampaignData;
+
+    const stripped = stripTableChatForPersist(data);
+    expect(stripped.sessions[0].playNotes).toBe('keep');
+    expect(stripped.sessions[0].tableChat).toBeUndefined();
+    expect(data.sessions[0].tableChat?.length).toBe(1);
   });
 });

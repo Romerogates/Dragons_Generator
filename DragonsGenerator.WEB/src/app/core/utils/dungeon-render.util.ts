@@ -278,7 +278,7 @@ function connectingCorridorsFor(map: CampaignDungeonMap, revealed: Set<string>):
   return lastConnectingCorridors;
 }
 
-function isCellRevealed(
+export function isCellRevealed(
   map: CampaignDungeonMap,
   x: number,
   y: number,
@@ -289,6 +289,7 @@ function isCellRevealed(
   if (roomId) return revealed.has(roomId);
   const kind = tileAt(map, x, y);
   if (kind === 'wall') return false;
+  if ((map.revealedCorridorCells ?? []).includes(`${x},${y}`)) return true;
   if (connectingCorridorsFor(map, revealed).has(`${x},${y}`)) return true;
   for (const [dx, dy] of NEIGHBOR_DIRS) {
     const nx = x + dx;
@@ -308,12 +309,17 @@ export function drawDungeonToCanvas(
 ): void {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
+  const gridW = map.gridWidth;
+  const gridH = map.gridHeight;
+  if (gridW <= 0 || gridH <= 0 || !map.tiles.length) return;
+  const rooms = map.rooms;
+  const markers = map.markers;
   const palette = themePalette(map.theme);
   const revealed = options?.revealedRoomIds ?? null;
   const pad = Math.max(0, options?.edgePadCells ?? 0);
   const origin = pad * cellSize;
-  const w = (map.gridWidth + pad * 2) * cellSize;
-  const h = (map.gridHeight + pad * 2) * cellSize;
+  const w = (gridW + pad * 2) * cellSize;
+  const h = (gridH + pad * 2) * cellSize;
   canvas.width = w;
   canvas.height = h;
 
@@ -329,8 +335,8 @@ export function drawDungeonToCanvas(
     ctx.globalAlpha = 1;
   }
 
-  for (let y = 0; y < map.gridHeight; y++) {
-    for (let x = 0; x < map.gridWidth; x++) {
+  for (let y = 0; y < gridH; y++) {
+    for (let x = 0; x < gridW; x++) {
       const kind = tileAt(map, x, y);
       const px = origin + x * cellSize;
       const py = origin + y * cellSize;
@@ -363,7 +369,7 @@ export function drawDungeonToCanvas(
   }
 
   if (options?.selectedRoomId) {
-    const room = map.rooms.find((r) => r.id === options.selectedRoomId);
+    const room = rooms.find((r) => r.id === options.selectedRoomId);
     if (room) {
       ctx.fillStyle = palette.roomHighlight;
       ctx.fillRect(
@@ -409,7 +415,7 @@ export function drawDungeonToCanvas(
     ctx.font = `bold ${numSize}px "Segoe UI", system-ui, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    for (const room of map.rooms) {
+    for (const room of rooms) {
       const cx = origin + (room.x + room.width / 2) * cellSize;
       const cy = origin + (room.y + room.height / 2) * cellSize;
       const num = room.label.replace(/\D/g, '') || '?';

@@ -13,6 +13,7 @@ import { AuthService } from '@core/services/auth.service';
 import { CharacterCloudService } from '@core/services/character-cloud.service';
 import { HomeSummary, HomeSummaryService } from '@core/services/home-summary.service';
 import { GuidePreferencesService } from '@core/services/guide-preferences.service';
+import { CODEX_NAV_LINKS } from '@core/config/codex-nav';
 
 @Component({
   selector: 'app-home',
@@ -83,19 +84,9 @@ export class Home implements OnInit {
     },
   ] as const;
 
-  readonly grimoireLinks: { label: string; path: string; icon: string }[] = [
-    { label: 'Espèces', path: '/species', icon: 'fluent-emoji:dna' },
-    { label: 'Classes', path: '/classes', icon: 'fluent-emoji:crossed-swords' },
-    { label: 'Civilisations', path: '/civilisations', icon: 'fluent-emoji:japanese-castle' },
-    { label: 'Sorts', path: '/spells', icon: 'fluent-emoji:magic-wand' },
-    { label: 'Bestiaire', path: '/creatures', icon: 'fluent-emoji:dragon' },
-    { label: 'Équipements', path: '/equipments', icon: 'fluent-emoji:shield' },
-    { label: 'Compétences', path: '/skills', icon: 'fluent-emoji:bookmark-tabs' },
-    { label: 'Dons', path: '/feats', icon: 'fluent-emoji:trophy' },
-    { label: 'Historiques', path: '/backgrounds', icon: 'fluent-emoji:scroll' },
-    { label: 'Combat', path: '/combat-actions', icon: 'fluent-emoji:collision' },
-    { label: 'Divinités', path: '/deities', icon: 'fluent-emoji:glowing-star' },
-  ];
+  readonly grimoireLinks: { label: string; path: string; icon: string }[] = CODEX_NAV_LINKS.map(
+    (l) => ({ label: l.label, path: l.path, icon: l.icon }),
+  );
 
   ngOnInit(): void {
     this.refreshHeroStats();

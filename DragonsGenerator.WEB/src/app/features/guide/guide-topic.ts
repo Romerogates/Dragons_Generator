@@ -53,6 +53,24 @@ export class GuideTopicPage implements OnInit {
 
   readonly allTopics = GUIDE_TOPICS;
 
+  /** Pagination index des fonctionnalités (évite une liste interminable). */
+  readonly indexPage = signal(0);
+  private static readonly INDEX_PAGE_SIZE = 10;
+
+  readonly pagedSteps = computed(() => {
+    const t = this.topic();
+    if (!t || t.id !== 'index') return t?.steps ?? [];
+    const size = GuideTopicPage.INDEX_PAGE_SIZE;
+    const start = this.indexPage() * size;
+    return t.steps.slice(start, start + size);
+  });
+
+  readonly indexPageCount = computed(() => {
+    const t = this.topic();
+    if (!t || t.id !== 'index') return 1;
+    return Math.max(1, Math.ceil(t.steps.length / GuideTopicPage.INDEX_PAGE_SIZE));
+  });
+
   readonly sidebarSections = computed(() =>
     guideTopicsByGroup(this.audience(), this.navQuery(), 'all'),
   );
@@ -103,6 +121,7 @@ export class GuideTopicPage implements OnInit {
     this.route.paramMap.subscribe((p) => {
       const id = p.get('topicId') ?? '';
       this.topicId.set(id);
+      this.indexPage.set(0);
       if (id) this.prefs.markSectionRead(id);
       this.reload();
     });

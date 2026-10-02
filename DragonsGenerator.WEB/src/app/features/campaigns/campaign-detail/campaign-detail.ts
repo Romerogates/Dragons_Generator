@@ -59,7 +59,7 @@ import { ADVENTURE_TONE_LABELS, CreatureRole, StoryCreatureSelection } from '@co
 import { formatChallengeRating, getCreatureCategoryLabel } from '@core/utils/creature-display.util';
 import { shouldShowPlayerInitiativePrompt } from '@core/utils/campaign-initiative.util';
 import { resolveHubNextAction, type HubNextAction } from '@core/utils/hub-next-action.util';
-import { mergeRemoteLiveTable } from '@core/utils/campaign-persist.util';
+import { mergeRemoteLiveTable, stripTableChatForPersist } from '@core/utils/campaign-persist.util';
 import { isRemoteNewer } from '@core/utils/campaign-remote-newer.util';
 import { seedNotebookFromLegacyNotes } from '@core/utils/notebook.util';
 import {
@@ -71,14 +71,18 @@ import { StoryBuilderService } from '@core/services/story-builder.service';
 import { CampaignPregenGeneratorService } from '@core/services/campaign-pregen-generator.service';
 import { AiGenerationProgressService } from '@core/services/ai-generation-progress.service';
 import { isAiGenerationAborted } from '@core/models/ai-generation.model';
-import { AiGenerationProgressBar } from '@shared/components/ai-generation-progress-bar/ai-generation-progress-bar';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
-import { AdventureSynopsisView } from '@shared/components/adventure-synopsis-view/adventure-synopsis-view';
 import { CampaignDungeonMaps } from '../campaign-dungeon-maps/campaign-dungeon-maps';
 import { CampaignDetailOverview } from './campaign-detail-overview/campaign-detail-overview';
 import { CampaignDetailRoster } from './campaign-detail-roster/campaign-detail-roster';
 import { CampaignDetailSessions } from './campaign-detail-sessions/campaign-detail-sessions';
 import { CampaignDetailHandouts } from './campaign-detail-handouts/campaign-detail-handouts';
+import { CampaignDetailPrepScenario } from './campaign-detail-prep-scenario/campaign-detail-prep-scenario';
+import { CampaignDetailPrepCreatures } from './campaign-detail-prep-creatures/campaign-detail-prep-creatures';
+import type { CreatureCardFieldEvent } from './campaign-detail-prep-creatures/campaign-detail-prep-creatures';
+import { CampaignDetailPrepEncounters } from './campaign-detail-prep-encounters/campaign-detail-prep-encounters';
+import { CampaignDetailPrepPregens } from './campaign-detail-prep-pregens/campaign-detail-prep-pregens';
+import type { PregenPatchEvent } from './campaign-detail-prep-pregens/campaign-detail-prep-pregens';
 import { CampaignNotebook } from '../campaign-notebook/campaign-notebook';
 import { CampaignCalendar } from '../campaign-calendar/campaign-calendar';
 import { nextScheduleOccurrenceAt } from '@core/utils/schedule-ics.util';
@@ -86,7 +90,6 @@ import { formatRsvpSummary } from '@core/utils/schedule-rsvp.util';
 import {
   buildEncountersFromPack,
   buildHandoutsFromPack,
-  ENCOUNTER_PACK_PRESETS,
 } from '@core/utils/campaign-content-presets.util';
 import { exportEveningPdf, exportUnifiedEveningPack } from '@core/utils/evening-pdf.util';
 import { prefillRunSheetFromCampaign } from '@core/utils/run-sheet-prefill.util';
@@ -143,13 +146,15 @@ function isPrepSub(t: string): t is PrepSub {
     CampaignDetailSessions,
     CampaignCalendar,
     CampaignDetailHandouts,
+    CampaignDetailPrepScenario,
+    CampaignDetailPrepCreatures,
+    CampaignDetailPrepEncounters,
+    CampaignDetailPrepPregens,
     CampaignNotebook,
     CampaignSetupGuide,
-    AiGenerationProgressBar,
     CampaignInitiativeInline,
     LightMarkdownPipe,
     ConfirmDialog,
-    AdventureSynopsisView,
   ],
   templateUrl: './campaign-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -232,6 +237,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   /** Deep-link `?event=` → ouvrir le panneau date calendrier. */
   readonly focusScheduleEventId = signal<string | null>(null);
   readonly focusDungeonMapId = signal<string | null>(null);
+  readonly mapsAutoAction = signal<'generate' | 'import' | null>(null);
   readonly handoutKindFilter = signal<HandoutKind | 'all'>('all');
   readonly initiativeBoard = signal<InitiativeBoard | null>(null);
   readonly rosterSheetOpen = signal(false);
@@ -249,6 +255,19 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   private softPollTimer: ReturnType<typeof setInterval> | null = null;
   private softPollIntervalMs = 12_000;
   private liveSub: Subscription | null = null;
+  /** Menu « Plus » de la barre mobile (Docs / Joueurs). */
+  readonly mobileMoreOpen = signal(false);
+
+  toggleMobileMore(): void {
+    this.mobileMoreOpen.update((v) => !v);
+  }
+  /** returnUrl soft-gate login → URL campagne courante. */
+  readonly loginReturnUrl = computed(() => {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) return `/campaigns/${id}`;
+    const url = this.router.url;
+    return url && url !== '/' ? url : '/campaigns';
+  });
 
   readonly creatureXpMap = signal<Record<string, number>>({});
   readonly isLoadingPreview = signal(false);
@@ -275,6 +294,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       const c = this.campaign();
       untracked(() => {
         if (c) this.tuneSoftPollInterval(c);
+        else if (this.live.connected()) this.clearSoftPollTimer();
       });
     });
     effect(() => {
@@ -809,42 +829,54 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       }
     });
 
-    this.softPollTimer = setInterval(() => this.softReload(), 12_000);
+    if (!this.live.connected()) {
+      this.softPollTimer = setInterval(() => this.softReload(), 12_000);
+    }
     if (typeof window !== 'undefined') {
       window.addEventListener('focus', this.onWindowFocus);
       this.preloadCampaignTabIcons();
     }
 
     const tab = this.route.snapshot.queryParamMap.get('tab');
+    const sub = this.route.snapshot.queryParamMap.get('sub');
     const handoutId =
       this.route.snapshot.queryParamMap.get('handout') ??
       this.route.snapshot.queryParamMap.get('handoutId');
     const mapId = this.route.snapshot.queryParamMap.get('map');
     const sessionId = this.route.snapshot.queryParamMap.get('session');
     const scheduleEventId = this.route.snapshot.queryParamMap.get('event');
-    if (tab || mapId || sessionId || scheduleEventId) {
+    const mapsAction = this.route.snapshot.queryParamMap.get('mapsAction');
+    if (tab || sub || mapId || sessionId || scheduleEventId || mapsAction) {
       this.applyTabFromRoute(
         tab ?? (sessionId ? 'sessions' : scheduleEventId ? 'calendar' : 'maps'),
         handoutId,
         mapId,
         sessionId,
         scheduleEventId,
+        mapsAction,
+        sub,
       );
     }
     this.route.queryParamMap.subscribe((params) => {
       const qTab = params.get('tab');
+      const qSub = params.get('sub');
       const qMap = params.get('map');
       const qHandout = params.get('handout') ?? params.get('handoutId');
       const qSession = params.get('session');
       const qEvent = params.get('event');
-      if (qMap || qSession || qEvent) {
+      const qMapsAction = params.get('mapsAction');
+      if (qMap || qSession || qEvent || qMapsAction || (qTab && isPrepSub(qTab))) {
         this.applyTabFromRoute(
           qTab ?? (qSession ? 'sessions' : qEvent ? 'calendar' : 'maps'),
           qHandout,
           qMap,
           qSession,
           qEvent,
+          qMapsAction,
+          qSub,
         );
+      } else if (qTab === 'prep' && qSub && isPrepSub(qSub)) {
+        this.applyTabFromRoute('prep', qHandout, null, null, null, null, qSub);
       }
     });
     if (this.route.snapshot.queryParamMap.get('joined') === '1') {
@@ -926,13 +958,15 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     }
   }
 
-  /** Deep-link `?tab=` / `?map=` / `?session=` / `?event=` → nav haute + sous-onglet Préparation si besoin. */
+  /** Deep-link `?tab=` / `?sub=` / `?map=` / `?session=` / `?event=` / `?mapsAction=` → nav haute + sous-onglet Préparation si besoin. */
   private applyTabFromRoute(
     tab: string,
     handoutId: string | null,
     mapId: string | null = null,
     sessionId: string | null = null,
     scheduleEventId: string | null = null,
+    mapsAction: string | null = null,
+    sub: string | null = null,
   ): void {
     if (mapId) {
       this.setTab('maps');
@@ -955,15 +989,37 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       this.focusScheduleEventId.set(scheduleEventId);
       return;
     }
-    if (tab === 'handouts' || tab === 'players' || tab === 'overview' || tab === 'sessions' || tab === 'calendar' || tab === 'prep') {
+    if (mapsAction === 'generate' || mapsAction === 'import') {
+      this.setTab('maps');
+      this.mapsAutoAction.set(mapsAction);
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { mapsAction: null, tab: 'prep', sub: 'maps' },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
+      // One-shot : évite de rouvrir le générateur / picker au prochain passage.
+      setTimeout(() => this.mapsAutoAction.set(null), 1500);
+      return;
+    }
+    if (tab === 'handouts' || tab === 'players' || tab === 'overview' || tab === 'sessions' || tab === 'calendar') {
       this.setTab(tab as PrimaryTab);
       if (tab === 'handouts' && handoutId) this.focusHandoutId.set(handoutId);
+      return;
+    }
+    if (tab === 'prep') {
+      if (sub && isPrepSub(sub)) {
+        this.setTab(sub);
+      } else {
+        this.setTab('prep');
+      }
       return;
     }
     if (tab === 'activity') {
       this.setTab('overview');
       return;
     }
+    // Legacy `?tab=maps|encounters|…` → rewrite `?tab=prep&sub=…`
     if (isPrepSub(tab)) {
       this.setTab(tab);
       return;
@@ -976,7 +1032,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.flushHandoutSave();
     this.dungeonMapsComp()?.flushPendingSave();
     this.stopInitiativeBannerPoll();
-    if (this.softPollTimer) clearInterval(this.softPollTimer);
+    this.clearSoftPollTimer();
     this.liveSub?.unsubscribe();
     void this.live.unwatch();
     if (typeof window !== 'undefined') {
@@ -1142,19 +1198,30 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     }
   }
 
-  /** Poll plus fréquent pour les joueurs pendant une session / combat live. */
+  private clearSoftPollTimer(): void {
+    if (this.softPollTimer) {
+      clearInterval(this.softPollTimer);
+      this.softPollTimer = null;
+    }
+  }
+
+  /** Poll de secours uniquement si hub déconnecté — sinon SignalR suffit. */
   private tuneSoftPollInterval(c: CampaignDetailModel): void {
+    if (this.live.connected()) {
+      this.clearSoftPollTimer();
+      this.softPollIntervalMs = 0;
+      return;
+    }
     const sessionId = c.data.activeSessionId;
     const session = sessionId
       ? (c.data.sessions ?? []).find((s) => s.id === sessionId)
       : undefined;
     const liveTable =
       !c.isOwner && !!(sessionId || session?.activeCombat?.combatants?.length);
-    const aggressive = liveTable ? 4_000 : 12_000;
-    const nextMs = this.live.fallbackPollMs(aggressive);
-    if (this.softPollIntervalMs === nextMs) return;
+    const nextMs = liveTable ? 4_000 : 12_000;
+    if (this.softPollIntervalMs === nextMs && this.softPollTimer) return;
     this.softPollIntervalMs = nextMs;
-    if (this.softPollTimer) clearInterval(this.softPollTimer);
+    this.clearSoftPollTimer();
     this.softPollTimer = setInterval(() => this.softReload(), nextMs);
   }
 
@@ -1392,6 +1459,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   setPrepSub(sub: PrepSub): void {
     if (!this.campaign()?.isOwner && sub !== 'pregens') {
       this.prepSub.set('pregens');
+      this.syncTabQueryParams();
       return;
     }
     if (this.isOnMapsView() && sub !== 'maps') {
@@ -1401,6 +1469,31 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     if (sub === 'notebook') {
       this.ensureNotebookPages();
     }
+    this.syncTabQueryParams();
+  }
+
+  /** Normalise l’URL : prep → `?tab=prep&sub=…` ; legacy `?tab=maps` réécrit. */
+  private syncTabQueryParams(): void {
+    const tab = this.tab();
+    const queryParams: Record<string, string | null> =
+      tab === 'prep'
+        ? { tab: 'prep', sub: this.prepSub() }
+        : { tab, sub: null };
+    const cur = this.route.snapshot.queryParamMap;
+    if (
+      cur.get('tab') === queryParams['tab'] &&
+      (queryParams['sub'] == null
+        ? !cur.get('sub')
+        : cur.get('sub') === queryParams['sub'])
+    ) {
+      return;
+    }
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams,
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 
   setTab(t: Tab): void {
@@ -1410,12 +1503,14 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       if (this.isOnMapsView()) this.dungeonMapsComp()?.flushPendingSave();
       this.tab.set('overview');
       this.loadActivity();
+      this.syncTabQueryParams();
       return;
     }
 
     if (isPrepSub(t) || t === 'prep') {
       if (!owner && (this.campaign()?.data.pregenCharacters?.length ?? 0) === 0) {
         this.tab.set('overview');
+        this.syncTabQueryParams();
         return;
       }
       const finalSub: PrepSub = (() => {
@@ -1433,6 +1528,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       this.tab.set('prep');
       this.prepSub.set(finalSub);
       if (finalSub === 'notebook') this.ensureNotebookPages();
+      this.syncTabQueryParams();
       return;
     }
 
@@ -1440,6 +1536,7 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       this.dungeonMapsComp()?.flushPendingSave();
     }
     this.tab.set(t as PrimaryTab);
+    this.syncTabQueryParams();
     if (t === 'handouts' && owner) {
       if (this.pdfPreviewKind() === 'bestiary' && this.campaign()!.data.creatures.length) {
         this.loadBestiaryPreview();
@@ -1651,8 +1748,6 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     this.flushHandoutSave();
     this.saveData({ handouts: [...(c.data.handouts ?? []), ...added] });
   }
-
-  readonly encounterPacks = ENCOUNTER_PACK_PRESETS;
 
   insertEncounterPack(packId: string): void {
     const c = this.campaign();
@@ -2325,12 +2420,13 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
     const seq = ++this.persistSeq;
     this.saving.set(true);
     this.error.set(null);
+    const payload = stripTableChatForPersist(data);
 
     this.persistTail = this.persistTail
       .catch(() => undefined)
       .then(async () => {
         try {
-          const summary = await firstValueFrom(this.campaigns.update(campaignId, title, data));
+          const summary = await firstValueFrom(this.campaigns.update(campaignId, title, payload));
           this.campaign.update((prev) => {
             if (!prev || prev.id !== campaignId) return prev;
             // Ne jamais réappliquer le blob envoyé : l'état local est la source de vérité.
@@ -2839,6 +2935,18 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
         : entry,
     );
     this.saveData({ creatures });
+  }
+
+  onCreatureCardField(event: CreatureCardFieldEvent): void {
+    this.updateCreatureCardField(event.creature, event.field, event.value);
+  }
+
+  onPregenPatch(event: PregenPatchEvent): void {
+    this.updatePregen(event.pregenId, event.patch);
+  }
+
+  dungeonMapOptions(): { id: string; name: string }[] {
+    return (this.campaign()?.data.dungeonMaps ?? []).map((m) => ({ id: m.id, name: m.name }));
   }
 
   bulkClassifyUnsorted(role: 'ally' | 'antagonist'): void {

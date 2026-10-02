@@ -22,7 +22,7 @@ import {
   type CharacterProposalReview,
 } from '@core/services/character-handoff.service';
 import { PdfPagePreview } from '@shared/components/pdf-page-preview/pdf-page-preview';
-import { CharacterPlayView } from './character-play-view';
+import { CharacterPlayView, type CharacterLivePatch } from './character-play-view';
 import { IllustratedCharacterSheet } from './illustrated-character-sheet';
 
 type SheetViewMode = 'illustrated' | 'ui';
@@ -93,6 +93,12 @@ export class CharacterSheet implements OnInit, OnDestroy {
     return 'Retour à la liste';
   });
 
+  /** Compacte live éditable hors consultation. */
+  readonly compactEditable = computed(() => !this.isConsult());
+
+  readonly liveSaveHint = signal<string | null>(null);
+  private liveSaveTimer: ReturnType<typeof setTimeout> | null = null;
+
   readonly auraFeatures = computed(() => {
     const feats = this.character()?.features ?? [];
     return feats
@@ -122,7 +128,7 @@ export class CharacterSheet implements OnInit, OnDestroy {
             } as Character;
             this.handoff.setCurrent(character);
           } catch (err) {
-            this.error.set(formatCharacterCloudLoadError(err));
+            this.error.set(formatCharacterCloudLoadError(character?.name ?? 'Personnage', err));
             this.loading.set(false);
             return;
           }
@@ -163,6 +169,59 @@ export class CharacterSheet implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     const url = this.pdfRawUrl();
     if (url) URL.revokeObjectURL(url);
+    if (this.liveSaveTimer) clearTimeout(this.liveSaveTimer);
+  }
+
+  onLivePatch(patch: CharacterLivePatch): void {
+    if (this.isConsult()) return;
+    const current = this.character();
+    if (!current) return;
+
+    let next: Character = { ...current, vitality: { ...current.vitality } };
+    if (patch.hitPointsCurrent != null) {
+      next.vitality.hitPointsCurrent = patch.hitPointsCurrent;
+    }
+    if (patch.hitPointsTemporary != null) {
+      next.vitality.hitPointsTemporary = patch.hitPointsTemporary;
+    }
+    if (patch.inspiration != null) {
+      next.vitality.inspiration = patch.inspiration;
+    }
+    if (patch.spellSlotUsed && next.spellcasting) {
+      const sc = { ...next.spellcasting };
+      const listKey = patch.spellSlotUsed.pact ? 'pactSlots' : 'spellSlots';
+      const slots = [...(sc[listKey] ?? [])];
+      const idx = slots.findIndex((s) => s.level === patch.spellSlotUsed!.level);
+      if (idx >= 0) {
+        const slot = slots[idx]!;
+        slots[idx] = {
+          ...slot,
+          used: Math.max(0, Math.min(slot.max, patch.spellSlotUsed.used)),
+        };
+        sc[listKey] = slots;
+        next = { ...next, spellcasting: sc };
+      }
+    }
+
+    next = { ...next, updatedAt: new Date().toISOString() };
+    this.character.set(next);
+    this.handoff.setCurrent(next);
+    this.scheduleLivePersist(next);
+  }
+
+  private scheduleLivePersist(character: Character): void {
+    if (!character.id || !character.cloudSynced) {
+      this.liveSaveHint.set('Modifications locales (non synchronisées).');
+      return;
+    }
+    if (this.liveSaveTimer) clearTimeout(this.liveSaveTimer);
+    this.liveSaveHint.set('Enregistrement…');
+    this.liveSaveTimer = setTimeout(() => {
+      this.cloud.save(character, { updateExisting: true }).subscribe({
+        next: () => this.liveSaveHint.set('Enregistré.'),
+        error: () => this.liveSaveHint.set('Échec cloud — valeurs gardées localement.'),
+      });
+    }, 450);
   }
 
   setViewMode(mode: SheetViewMode): void {

@@ -225,6 +225,8 @@ export function buildCharacterFromCreation(input: CharacterBuildInput): Characte
     schemaVersion: CURRENT_SCHEMA_VERSION,
 
     name: c.name,
+    ...(c.portraitImageUrl ? { portraitImageUrl: c.portraitImageUrl } : {}),
+    ...(c.tokenImageUrl ? { tokenImageUrl: c.tokenImageUrl } : {}),
     species: {
       id: c.speciesId!,
       label: c.speciesName!,

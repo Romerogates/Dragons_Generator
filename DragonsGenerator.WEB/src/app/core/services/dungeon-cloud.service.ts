@@ -19,7 +19,7 @@ export interface CloudDungeonDetail {
 }
 
 /** Limite serveur CreateMyDungeonEndpoint.MaxDungeonsPerUser */
-export const MAX_DUNGEONS_PER_USER = 40;
+export const MAX_DUNGEONS_PER_USER = 50;
 
 @Injectable({ providedIn: 'root' })
 export class DungeonCloudService {

@@ -224,7 +224,14 @@
     }
   } @else if (viewMode() === 'ui') {
     @if (character(); as hero) {
-      <app-character-play-view [character]="hero" />
+      @if (liveSaveHint(); as hint) {
+        <p class="mb-2 text-[10px] text-slate-500" role="status">{{ hint }}</p>
+      }
+      <app-character-play-view
+        [character]="hero"
+        [editable]="compactEditable()"
+        (liveChange)="onLivePatch($event)"
+      />
     }
   }
 </div>

@@ -103,6 +103,8 @@ export class SummaryStep implements OnInit, OnDestroy {
   readonly showDiscardConfirm = signal(false);
   readonly saving = signal(false);
   readonly saveError = signal<string | null>(null);
+  /** Succès file d’attente offline (pas une erreur). */
+  readonly saveQueuedNotice = signal<string | null>(null);
 
   async ngOnInit(): Promise<void> {
     try {
@@ -151,6 +153,7 @@ export class SummaryStep implements OnInit, OnDestroy {
   /** Sauvegarde cloud obligatoire (compte requis). */
   saveCharacter(): void {
     this.saveError.set(null);
+    this.saveQueuedNotice.set(null);
     const character = this.character();
     const validation = validateCharacterExport(character);
     if (!validation.valid) {
@@ -198,6 +201,9 @@ export class SummaryStep implements OnInit, OnDestroy {
       this.handoff.setCurrent(withId);
       this.pendingSave.clear();
       this.saving.set(false);
+      this.saveQueuedNotice.set(
+        'Héros mis en file d’attente — synchronisation dès la reconnexion.',
+      );
       this.builder.reset();
       this.afterSaveNavigate(withId);
       return;
@@ -249,9 +255,14 @@ export class SummaryStep implements OnInit, OnDestroy {
         };
         this.offlineSync.queueCharacterSave(withId, this.isEditMode());
         this.saving.set(false);
-        this.saveError.set(
-          'La sauvegarde cloud a échoué. Une copie locale est en file d’attente — réessayez, ou téléchargez le PDF en attendant.',
+        this.saveError.set(null);
+        this.saveQueuedNotice.set(
+          'Cloud indisponible — héros mis en file d’attente. Synchronisation dès la reconnexion.',
         );
+        this.handoff.setCurrent(withId);
+        this.pendingSave.clear();
+        this.builder.reset();
+        this.afterSaveNavigate(withId);
       },
     });
   }

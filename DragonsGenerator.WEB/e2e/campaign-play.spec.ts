@@ -1,6 +1,10 @@
-import { test, expect, type Page } from '@playwright/test';
-import { loginViaUi } from './helpers/auth';
-import { createPlayableCampaign } from './helpers/campaign';
+﻿import { test, expect, type Page } from '@playwright/test';
+import { loginViaUi, applyAuthSession, loginSeedSession } from './helpers/auth';
+import {
+  createPlayableCampaign,
+  createCampaignAs,
+  seedCampaignDungeonMapAs,
+} from './helpers/campaign';
 
 async function confirmInApp(page: Page, title: string): Promise<void> {
   const dialog = page.getByRole('dialog').filter({ hasText: title });
@@ -86,5 +90,27 @@ test.describe('Mode table MJ', () => {
       .getByRole('button', { name: 'Notes' })
       .click();
     await expect(notesField).toHaveValue(marker, { timeout: 15_000 });
+  });
+
+  test('prep map → session → onglet Donjon montre la carte', async ({ page }) => {
+    test.setTimeout(120_000);
+
+    const owner = await loginSeedSession(page.request);
+    const campaignId = await createCampaignAs(page, owner, `E2E Donjon tab ${Date.now()}`);
+    const { mapName } = await seedCampaignDungeonMapAs(page, owner, campaignId);
+
+    await applyAuthSession(page, owner, `/campaigns/${campaignId}/play`);
+    await expect(page.getByText('Table de jeu — session en cours')).toBeVisible({ timeout: 30_000 });
+
+    await page
+      .getByRole('navigation', { name: 'Sections de la session' })
+      .getByRole('button', { name: 'Donjon' })
+      .click();
+
+    await expect(page.getByText(/Donjon de session/i)).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: mapName })).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator('app-campaign-dungeon-maps canvas').first()).toBeVisible({
+      timeout: 15_000,
+    });
   });
 });

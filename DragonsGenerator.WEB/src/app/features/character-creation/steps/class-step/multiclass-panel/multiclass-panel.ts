@@ -69,10 +69,19 @@ export class MulticlassPanel implements OnInit {
     });
   }
 
-  /** Niveau total déjà engagé (classe primaire + classes secondaires ajoutées). */
-  readonly usedLevels = computed(
-    () => this.builder.targetLevel() + this.builder.secondaryClassesTotalLevel(),
-  );
+  /**
+   * Modèle de budget (additif, max 20) :
+   * - niveau étape 1 = niveau de la classe PRIMAIRE (`targetLevel`)
+   * - chaque secondaire ajoute ses propres niveaux
+   * - total personnage = primaire + secondaires (plafonné à 20)
+   */
+  readonly primaryLevel = computed(() => this.builder.targetLevel());
+
+  readonly secondaryLevels = computed(() => this.builder.secondaryClassesTotalLevel());
+
+  readonly usedLevels = computed(() => this.primaryLevel() + this.secondaryLevels());
+
+  readonly totalCharacterLevel = computed(() => Math.min(20, this.usedLevels()));
 
   readonly remainingLevels = computed(() => Math.max(0, 20 - this.usedLevels()));
 

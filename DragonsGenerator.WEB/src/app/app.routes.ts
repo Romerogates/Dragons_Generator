@@ -51,6 +51,7 @@ export const routes: Routes = [
       { path: 'mj', redirectTo: 'mj-table', pathMatch: 'full' },
       { path: 'joueur', redirectTo: 'joueur-table', pathMatch: 'full' },
       { path: 'checklists', redirectTo: 'parcours', pathMatch: 'full' },
+      { path: 'captures', redirectTo: 'schemas', pathMatch: 'full' },
       {
         path: 'mj-table',
         loadComponent: () =>

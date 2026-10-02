@@ -431,6 +431,12 @@ export async function createSharedDungeonAs(
   owner: AuthSession,
   name = `Galerie E2E ${Date.now()}`,
 ): Promise<{ dungeonId: string; token: string }> {
+  const now = new Date().toISOString();
+  const tiles = Array.from({ length: 8 }, (_, y) =>
+    Array.from({ length: 8 }, (_, x) =>
+      x === 0 || y === 0 || x === 7 || y === 7 ? 'wall' : 'floor',
+    ),
+  );
   const createRes = await page.request.post('/api/me/dungeons', {
     headers: bearer(owner.token),
     data: {
@@ -441,11 +447,11 @@ export async function createSharedDungeonAs(
         theme: 'generic',
         gridWidth: 8,
         gridHeight: 8,
-        tiles: [],
-        rooms: [],
+        tiles,
+        rooms: [{ id: 'r1', label: 'Salle', x: 2, y: 2, width: 3, height: 3 }],
         markers: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: now,
+        updatedAt: now,
       },
     },
   });
@@ -458,6 +464,91 @@ export async function createSharedDungeonAs(
   const share = (await shareRes.json()) as { token: string | null; enabled: boolean };
   expect(share.enabled && share.token).toBeTruthy();
   return { dungeonId: created.id, token: share.token! };
+}
+
+/**
+ * Seed une carte de donjon dans la campagne + l’attribue à la session active
+ * (ou crée / démarre une session si besoin).
+ */
+export async function seedCampaignDungeonMapAs(
+  page: Page,
+  owner: AuthSession,
+  campaignId: string,
+  opts?: { mapName?: string; startSession?: boolean },
+): Promise<{ mapId: string; sessionId: string; mapName: string }> {
+  const getRes = await page.request.get(`/api/me/campaigns/${campaignId}`, {
+    headers: bearer(owner.token),
+  });
+  expect(getRes.ok(), `Get campaign failed: ${getRes.status()}`).toBeTruthy();
+  const campaign = (await getRes.json()) as {
+    title: string;
+    data: {
+      activeSessionId?: string | null;
+      sessions?: Array<Record<string, unknown> & { id: string }>;
+      dungeonMaps?: unknown[];
+      [key: string]: unknown;
+    };
+  };
+
+  const mapName = opts?.mapName ?? `Donjon E2E ${Date.now()}`;
+  const mapId = `map-e2e-${Date.now()}`;
+  const now = new Date().toISOString();
+  const tiles = Array.from({ length: 12 }, (_, y) =>
+    Array.from({ length: 12 }, (_, x) =>
+      x === 0 || y === 0 || x === 11 || y === 11 ? 'wall' : 'floor',
+    ),
+  );
+  const dungeonMap = {
+    id: mapId,
+    name: mapName,
+    theme: 'crypt',
+    gridWidth: 12,
+    gridHeight: 12,
+    tiles,
+    rooms: [{ id: 'r1', label: 'Crypte', x: 3, y: 3, width: 4, height: 4 }],
+    markers: [],
+    fogOfWarEnabled: false,
+    revealedRoomIds: [],
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  let sessionId = campaign.data.activeSessionId ?? null;
+  let sessions = [...(campaign.data.sessions ?? [])];
+  if (!sessionId || opts?.startSession !== false) {
+    if (!sessionId) {
+      sessionId = `e2e-sess-map-${Date.now()}`;
+      sessions = [
+        ...sessions,
+        {
+          id: sessionId,
+          title: 'Session donjon E2E',
+          scheduledAt: now,
+          status: 'planned',
+          activeMapId: mapId,
+        },
+      ];
+    } else {
+      sessions = sessions.map((s) =>
+        s.id === sessionId ? { ...s, activeMapId: mapId } : s,
+      );
+    }
+  }
+
+  const putRes = await page.request.put(`/api/me/campaigns/${campaignId}`, {
+    headers: bearer(owner.token),
+    data: {
+      title: campaign.title,
+      data: {
+        ...campaign.data,
+        dungeonMaps: [...(campaign.data.dungeonMaps ?? []), dungeonMap],
+        sessions,
+        activeSessionId: sessionId,
+      },
+    },
+  });
+  expect(putRes.ok(), `Seed dungeon map failed: ${putRes.status()} ${await putRes.text()}`).toBeTruthy();
+  return { mapId, sessionId: sessionId!, mapName };
 }
 
 type SeedCombatOpts = {

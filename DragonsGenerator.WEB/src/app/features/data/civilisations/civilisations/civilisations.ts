@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   HostListener,
+  computed,
   inject,
   OnDestroy,
   OnInit,
@@ -15,11 +16,12 @@ import { DataService } from '@core/services/data.service';
 import { Civilisation } from '@core/models/Civilisations/civilisations';
 import { EANA_MAP_ASPECT, EANA_MAP_RATIO, getEanaMapCoordinates } from '@core/utils/eana-map';
 import { FullscreenEnterBtn } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-btn';
+import { CodexEmptyState } from '@shared/components/codex-empty-state/codex-empty-state';
 
 @Component({
   selector: 'app-civilisations',
   standalone: true,
-  imports: [CommonModule, RouterLink, FullscreenEnterBtn],
+  imports: [CommonModule, RouterLink, FullscreenEnterBtn, CodexEmptyState],
   templateUrl: './civilisations.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -36,6 +38,19 @@ export class Civilisations implements OnInit, OnDestroy {
   isLoading = signal<boolean>(true);
   error = signal<string | null>(null);
   mapFullscreen = signal(false);
+  readonly search = signal('');
+
+  readonly filtered = computed(() => {
+    const term = this.search().trim().toLowerCase();
+    const list = this.civilisations();
+    if (!term) return list;
+    return list.filter(
+      (civ) =>
+        civ.name.toLowerCase().includes(term) ||
+        (civ.lore?.fullDescription ?? '').toLowerCase().includes(term) ||
+        (civ.lore?.geographyTags ?? []).some((t) => t.toLowerCase().includes(term)),
+    );
+  });
 
   private previousOverflow = '';
   private bodyLocked = false;
@@ -72,6 +87,10 @@ export class Civilisations implements OnInit, OnDestroy {
         this.isLoading.set(false);
       },
     });
+  }
+
+  onSearch(value: string): void {
+    this.search.set(value);
   }
 
   /** Entrée plein écran — sortie = bouton Fermer ou Escape. */

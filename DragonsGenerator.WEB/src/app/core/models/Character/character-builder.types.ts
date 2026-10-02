@@ -173,6 +173,8 @@ export interface IdentitySelection {
   name?: string;
   sex?: 'M' | 'F' | 'X';
   description?: string;
+  portraitImageUrl?: string | null;
+  tokenImageUrl?: string | null;
   background?: string;
   alignment?: string;
   traits?: string;
@@ -362,6 +364,8 @@ export const INITIAL_CREATION_STATE: ExtendedCharacterCreation = {
   sex: 'X' as const,
 
   description: '',
+  portraitImageUrl: null,
+  tokenImageUrl: null,
   background: '',
   alignment: '',
   traits: '',

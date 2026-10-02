@@ -1,0 +1,146 @@
+@if (isOwner()) {
+  <section class="space-y-6">
+    <div class="rounded-2xl border border-slate-800 bg-[#1b2028]/60 p-4 space-y-3">
+      <p class="text-[10px] font-black uppercase tracking-widest text-violet-400">Packs rencontres</p>
+      <div class="flex flex-wrap gap-2">
+        @for (pack of encounterPacks; track pack.id) {
+          <button
+            type="button"
+            class="px-3 py-2 rounded-xl text-[10px] font-black uppercase border border-violet-800/50 text-violet-300 hover:bg-violet-950/40"
+            (click)="insertEncounterPack.emit(pack.id)"
+            [attr.data-testid]="'encounter-pack-' + pack.id"
+          >
+            {{ pack.label }}
+          </button>
+        }
+      </div>
+      <p class="text-[11px] text-slate-500">Injecte des groupes prêts (Cité Franche / oneshot).</p>
+    </div>
+    @if (creaturesCount() && !encounters().length) {
+      <button
+        type="button"
+        class="w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest bg-violet-950/30 border border-violet-800/50 text-violet-300"
+        (click)="generateEncounters.emit()"
+      >
+        Générer des groupes de rencontre depuis les créatures
+      </button>
+    }
+
+    @for (enc of encounters(); track enc.id) {
+      <article class="bg-[#1b2028] border border-slate-800 rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-violet-300 font-serif">{{ enc.name }}</h3>
+          <div class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+            XP vaincus : {{ encounterTotalXp(enc) }}
+            @if (encounterPendingXp(enc) > 0) {
+              <span class="text-amber-400/80 ml-2">{{ encounterPendingXp(enc) }} restants</span>
+            }
+            @if (enc.xpAwarded) {
+              <span class="text-emerald-400 ml-2">✓ Distribué</span>
+            }
+          </div>
+        </div>
+        <div class="mt-4 space-y-2 border-t border-slate-800 pt-4">
+          <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500">Résumé joueur (sans spoiler)</label>
+          <textarea
+            rows="2"
+            class="w-full bg-[#171b22] border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-300"
+            placeholder="Ce que les joueurs savent de cette scène…"
+            [ngModel]="enc.playerSummary ?? ''"
+            (ngModelChange)="encounterPatch.emit({ encounterId: enc.id, patch: { playerSummary: $event || undefined } })"
+          ></textarea>
+          <div class="flex flex-wrap gap-2 items-center">
+            <select
+              class="bg-[#171b22] border border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-400"
+              [ngModel]="enc.dungeonMapId ?? ''"
+              (ngModelChange)="encounterPatch.emit({ encounterId: enc.id, patch: { dungeonMapId: $event || undefined } })"
+            >
+              <option value="">— Carte donjon —</option>
+              @for (map of dungeonMaps(); track map.id) {
+                <option [value]="map.id">{{ map.name }}</option>
+              }
+            </select>
+            @if (enc.dungeonMapId) {
+              <button type="button" class="text-[10px] font-black uppercase text-violet-400" (click)="openDungeon.emit(enc)">Ouvrir la carte →</button>
+            }
+          </div>
+        </div>
+        <div class="space-y-3">
+          @for (cr of enc.creatures; track $index) {
+            <div class="flex flex-wrap items-center justify-between gap-3 py-2 border-b border-slate-800/60 last:border-0">
+              <div>
+                <span class="font-serif text-slate-200">{{ cr.customName || cr.creatureName }}</span>
+                <span class="text-[10px] text-slate-500 ml-2">×{{ cr.quantity }} · {{ cr.xp }} XP/u</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-xs text-slate-400">{{ cr.defeated }}/{{ cr.quantity }} vaincus</span>
+                @if (cr.defeated > 0) {
+                  <button
+                    type="button"
+                    class="px-2 py-1 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-400"
+                    (click)="undoDefeated.emit({ encounterId: enc.id, creatureIndex: $index })"
+                  >
+                    −1
+                  </button>
+                }
+                @if (cr.defeated < cr.quantity) {
+                  <button
+                    type="button"
+                    class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-red-950/30 border border-red-900/40 text-red-300"
+                    (click)="markDefeated.emit({ encounterId: enc.id, creatureIndex: $index })"
+                  >
+                    +1 vaincu
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+        @if (encounterTotalXp(enc) > 0 && !enc.xpAwarded) {
+          <button
+            type="button"
+            class="mt-4 w-full py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-950/30 border border-emerald-800/40 text-emerald-300 disabled:opacity-50"
+            [disabled]="awardingXpId() === enc.id"
+            (click)="distributeXp.emit(enc)"
+          >
+            @if (awardingXpId() === enc.id) {
+              Distribution…
+            } @else {
+              Distribuer {{ encounterTotalXp(enc) }} XP aux joueurs
+            }
+          </button>
+        }
+      </article>
+    } @empty {
+      <div class="rounded-2xl border border-dashed border-violet-800/50 bg-violet-950/15 p-6 text-center space-y-4">
+        <div>
+          <p class="text-[10px] font-black uppercase tracking-widest text-violet-400 mb-2">Rencontres</p>
+          <p class="text-sm text-slate-300 max-w-md mx-auto">
+            @if (creaturesCount()) {
+              Aucune rencontre pour l’instant. Générez des groupes ici, ou « Ajouter à une rencontre » depuis une fiche Codex.
+            } @else {
+              Ajoutez des créatures (hub ou Codex), puis générez des rencontres ici.
+            }
+          </p>
+        </div>
+        @if (creaturesCount()) {
+          <button
+            type="button"
+            class="min-h-11 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase bg-violet-600 text-white hover:bg-violet-500"
+            (click)="generateEncounters.emit()"
+          >
+            Générer des rencontres
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="min-h-11 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase border border-amber-700/50 text-amber-300"
+            (click)="goCreatures.emit()"
+          >
+            Aller aux créatures
+          </button>
+        }
+      </div>
+    }
+  </section>
+}

@@ -57,7 +57,10 @@ public static class CampaignJsonHelpers
         return null;
     }
 
-    public static JsonElement FilterForPlayerView(JsonElement data, Guid playerUserId)
+    public static JsonElement FilterForPlayerView(
+        JsonElement data,
+        Guid playerUserId,
+        IReadOnlyDictionary<Guid, JsonObject>? libraryGeometries = null)
     {
         var node = JsonNode.Parse(data.GetRawText()) as JsonObject ?? new JsonObject();
         node["adventure"] = "";
@@ -151,13 +154,37 @@ public static class CampaignJsonHelpers
         }
 
         // Carte live de la session active seulement (fog), sans spoilers MJ.
-        node["dungeonMaps"] = BuildPlayerLiveDungeonMaps(node);
+        node["dungeonMaps"] = BuildPlayerLiveDungeonMaps(node, libraryGeometries);
 
         using var doc = JsonDocument.Parse(node.ToJsonString());
         return doc.RootElement.Clone();
     }
 
-    private static JsonArray BuildPlayerLiveDungeonMaps(JsonObject node)
+    /// <summary>Collecte les libraryDungeonId de la carte active (sans tiles) pour hydrate joueur.</summary>
+    public static List<Guid> CollectActiveLibraryDungeonIds(JsonElement data)
+    {
+        var node = JsonNode.Parse(data.GetRawText()) as JsonObject ?? new JsonObject();
+        var liveMapId = ResolveActiveSessionMapId(node);
+        if (string.IsNullOrWhiteSpace(liveMapId) || node["dungeonMaps"] is not JsonArray maps)
+            return [];
+
+        foreach (var item in maps)
+        {
+            if (item is not JsonObject map) continue;
+            var id = map["id"]?.GetValue<string>();
+            if (!string.Equals(id, liveMapId, StringComparison.Ordinal)) continue;
+            if (map["tiles"] is JsonArray { Count: > 0 }) return [];
+            var libRaw = map["libraryDungeonId"]?.GetValue<string>();
+            if (Guid.TryParse(libRaw, out var libId)) return [libId];
+            return [];
+        }
+
+        return [];
+    }
+
+    private static JsonArray BuildPlayerLiveDungeonMaps(
+        JsonObject node,
+        IReadOnlyDictionary<Guid, JsonObject>? libraryGeometries)
     {
         var liveMapId = ResolveActiveSessionMapId(node);
         if (string.IsNullOrWhiteSpace(liveMapId) || node["dungeonMaps"] is not JsonArray maps)
@@ -168,10 +195,57 @@ public static class CampaignJsonHelpers
             if (item is not JsonObject map) continue;
             var id = map["id"]?.GetValue<string>();
             if (!string.Equals(id, liveMapId, StringComparison.Ordinal)) continue;
-            return new JsonArray { SanitizeDungeonMapForPlayer(map) };
+            var hydrated = HydrateMapFromLibraryIfNeeded(map, libraryGeometries);
+            return new JsonArray { SanitizeDungeonMapForPlayer(hydrated) };
         }
 
         return new JsonArray();
+    }
+
+    private static JsonObject HydrateMapFromLibraryIfNeeded(
+        JsonObject map,
+        IReadOnlyDictionary<Guid, JsonObject>? libraryGeometries)
+    {
+        if (map["tiles"] is JsonArray { Count: > 0 })
+            return map.DeepClone()!.AsObject();
+
+        var libRaw = map["libraryDungeonId"]?.GetValue<string>();
+        if (!Guid.TryParse(libRaw, out var libId)
+            || libraryGeometries is null
+            || !libraryGeometries.TryGetValue(libId, out var lib))
+        {
+            return map.DeepClone()!.AsObject();
+        }
+
+        var merged = lib.DeepClone()!.AsObject();
+        merged["id"] = map["id"]?.DeepClone();
+        merged["libraryDungeonId"] = map["libraryDungeonId"]?.DeepClone();
+        if (map["name"] is JsonNode nameNode) merged["name"] = nameNode.DeepClone();
+        if (map["handoutId"] is JsonNode handout) merged["handoutId"] = handout.DeepClone();
+        if (map["fogOfWarEnabled"] is JsonNode fog) merged["fogOfWarEnabled"] = fog.DeepClone();
+        if (map["revealedRoomIds"] is JsonNode revealed) merged["revealedRoomIds"] = revealed.DeepClone();
+
+        if (map["rooms"] is JsonArray overlayRooms && merged["rooms"] is JsonArray libRooms)
+        {
+            var overlayById = new Dictionary<string, JsonObject>(StringComparer.Ordinal);
+            foreach (var r in overlayRooms)
+            {
+                if (r is not JsonObject ro) continue;
+                var rid = ro["id"]?.GetValue<string>();
+                if (!string.IsNullOrWhiteSpace(rid)) overlayById[rid] = ro;
+            }
+
+            foreach (var r in libRooms)
+            {
+                if (r is not JsonObject room) continue;
+                var rid = room["id"]?.GetValue<string>();
+                if (rid is null || !overlayById.TryGetValue(rid, out var ov)) continue;
+                if (ov["encounterId"] is JsonNode enc) room["encounterId"] = enc.DeepClone();
+                if (ov["notes"] is JsonNode notes) room["notes"] = notes.DeepClone();
+            }
+        }
+
+        return merged;
     }
 
     private static string? ResolveActiveSessionMapId(JsonObject node)

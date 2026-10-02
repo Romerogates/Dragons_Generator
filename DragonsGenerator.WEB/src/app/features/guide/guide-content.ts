@@ -14,6 +14,8 @@ import type {
   GuideStep,
 } from './guide.types';
 
+export type { GuideBlogPost };
+
 export const GUIDE_TIPS: string[] = [
       'Activez les notifications push avant une session pour les rappels 24 h et 1 h.',
       'Quand un joueur propose un perso, le MJ reçoit une push + une entrée Activité.',
@@ -45,7 +47,7 @@ export const GUIDE_NAV_GROUPS: GuideNavGroup[] = [
   {
     id: 'tools',
     label: 'Outils',
-    sectionIds: ['schemas', 'captures'],
+    sectionIds: ['schemas'],
   },
   {
     id: 'table',
@@ -66,7 +68,6 @@ export const GUIDE_ALL_NAV: GuideNavItem[] = [
     { id: 'journal', label: 'Journal', icon: 'fluent-emoji:newspaper', accent: 'text-violet-400', audience: 'all' },
     { id: 'demarrage', label: 'Premiers pas', icon: 'fluent-emoji:rocket', accent: 'text-amber-400', audience: 'all' },
     { id: 'schemas', label: 'Schémas', icon: 'fluent-emoji:world-map', accent: 'text-sky-400', audience: 'all' },
-    { id: 'captures', label: 'Aperçus UI', icon: 'fluent-emoji:framed-picture', accent: 'text-emerald-400', audience: 'all' },
     { id: 'compte', label: 'Compte', icon: 'fluent-emoji:bust-in-silhouette', accent: 'text-sky-400', audience: 'all' },
     { id: 'personnage', label: 'Personnage', icon: 'fluent-emoji:shield', accent: 'text-emerald-400', audience: 'all' },
     { id: 'scenario', label: 'Campagnes', icon: 'fluent-emoji:globe-showing-europe-africa', accent: 'text-violet-400', audience: 'all' },
@@ -118,6 +119,44 @@ export const GUIDE_QUICK_CARDS: GuideQuickCard[] = [
       prefetch: 'support',
     },
   ];
+
+/** Durée d’affichage « Nouveau » pour les posts journal (ms). */
+export const GUIDE_NEWS_TTL_MS = 14 * 86_400_000;
+
+const GUIDE_FR_MONTHS: Record<string, number> = {
+  janvier: 0,
+  février: 1,
+  mars: 2,
+  avril: 3,
+  mai: 4,
+  juin: 5,
+  juillet: 6,
+  août: 7,
+  septembre: 8,
+  octobre: 9,
+  novembre: 10,
+  décembre: 11,
+};
+
+/** Parse « 31 août 2026 » → epoch UTC (minuit). */
+export function parseGuideBlogDate(date: string): number | null {
+  const m = /^(\d{1,2})\s+([a-zéûô]+)\s+(\d{4})$/i.exec(date.trim());
+  if (!m) return null;
+  const month = GUIDE_FR_MONTHS[m[2].toLowerCase()];
+  if (month == null) return null;
+  return Date.UTC(+m[3], month, +m[1]);
+}
+
+/**
+ * « Nouveau » si le post est marqué isNew et daté depuis moins de 14 j.
+ * La lecture (prefs) retire le badge navbar séparément.
+ */
+export function isGuideBlogPostNew(post: GuideBlogPost, now = Date.now()): boolean {
+  if (!post.isNew) return false;
+  const t = parseGuideBlogDate(post.date);
+  if (t == null) return true;
+  return now - t <= GUIDE_NEWS_TTL_MS;
+}
 
 export const GUIDE_BLOG_POSTS: GuideBlogPost[] = [
     {

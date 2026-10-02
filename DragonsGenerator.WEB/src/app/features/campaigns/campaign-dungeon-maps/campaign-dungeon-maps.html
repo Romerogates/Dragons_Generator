@@ -243,7 +243,16 @@
                 <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#141820] to-transparent"></div>
               </div>
               <div class="p-4 pt-2">
-                <h3 class="font-serif text-lg text-slate-100 truncate">{{ map.name }}</h3>
+                <div class="flex flex-wrap items-center gap-2">
+                  <h3 class="font-serif text-lg text-slate-100 truncate">{{ map.name }}</h3>
+                  @if (map.libraryDungeonId) {
+                    <span
+                      class="shrink-0 text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border border-emerald-700/60 text-emerald-300 bg-emerald-950/40"
+                      title="Lien live vers Mes Donjons"
+                      >Live</span
+                    >
+                  }
+                </div>
                 <p class="text-[11px] text-slate-500 mt-1">
                   {{ themeLabels[map.theme] }}
                   · {{ map.rooms.length }} salles
@@ -354,7 +363,16 @@
                   [disabled]="libraryBusy()"
                   (click)="saveEditingToLibrary()"
                 >
-                  Dans Mes Donjons
+                  @if (map.libraryDungeonId) { Sync Mes Donjons } @else { Lier (live) Mes Donjons }
+                </button>
+                <button
+                  type="button"
+                  class="editor-menu-item"
+                  [disabled]="libraryBusy()"
+                  (click)="duplicateLinkedToLibrary()"
+                  title="Crée une variante isolée dans Mes Donjons (plus de sync live)"
+                >
+                  Dupliquer (variante isolée)
                 </button>
               }
             </div>
@@ -568,7 +586,7 @@
               }
             </div>
             <p class="text-[10px] text-slate-500 leading-relaxed">
-              Sélectionnez une salle puis révélez-la. En session, les joueurs voient les révélations en direct.
+              Sélectionnez une salle puis révélez-la. En session, cliquez un couloir pour le FoW case par case.
             </p>
           } @else {
             <p class="text-[10px] text-slate-600 leading-relaxed">
@@ -723,7 +741,8 @@
         <button type="button" class="text-slate-500 hover:text-slate-200" (click)="closeLibraryPicker()">✕</button>
       </div>
       <p class="text-xs text-slate-500 mb-4">
-        Une <strong class="text-slate-400 font-normal">copie</strong> est ajoutée à la campagne (indépendante de la biblio).
+        Lien <strong class="text-emerald-400/90 font-semibold">live</strong> vers Mes Donjons
+        (même géométrie — les edits se synchronisent).
       </p>
       @if (libraryBusy() && libraryList().length === 0) {
         <p class="text-sm text-amber-400 animate-pulse">Chargement…</p>

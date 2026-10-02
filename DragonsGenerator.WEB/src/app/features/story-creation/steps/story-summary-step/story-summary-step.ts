@@ -174,6 +174,11 @@ export class StorySummaryStep implements OnInit, OnDestroy {
           );
           return;
         }
+        if (err?.status === 400 && !editId) {
+          this.saving.set(false);
+          this.saveError.set('Limite atteinte : maximum 20 campagnes par compte.');
+          return;
+        }
         if (!b.adventure().trim()) {
           this.saveError.set(
             'Impossible de sauvegarder. Ajoutez un résumé d’aventure (même court, sans IA) puis réessayez.',

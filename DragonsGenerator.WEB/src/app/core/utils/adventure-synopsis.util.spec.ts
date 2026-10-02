@@ -1,4 +1,4 @@
-import { parseAdventureSections, adventureSectionsForEdit, serializeAdventureSections, patchAdventureSection, ADVENTURE_SECTION_TITLES } from './adventure-synopsis.util';
+import { parseAdventureSections, adventureSectionsForEdit, serializeAdventureSections, patchAdventureSection, adventureSectionEditorValue, ADVENTURE_SECTION_TITLES } from './adventure-synopsis.util';
 
 describe('parseAdventureSections', () => {
   const sample = `**Accroche** — La jungle de Kardel s’éveille.
@@ -85,5 +85,50 @@ describe('parseAdventureSections', () => {
     const next = patchAdventureSection(sample, 'Accroche', 'Nouveau hook.');
     expect(next).toContain('**Accroche** — Nouveau hook.');
     expect(next).toContain('**Contexte**');
+  });
+
+  it('accepts italic headers and skips empty / duplicate titles', () => {
+    const italic = `*Accroche*: Hook en ligne.
+
+*Accroche*: Doublon ignoré.
+
+*Contexte*: Monde.`;
+    const sections = parseAdventureSections(italic);
+    expect(sections.map((s) => s.title)).toEqual(['Accroche', 'Contexte']);
+    expect(sections[0]!.body).toContain('Hook');
+  });
+
+  it('adventureSectionsForEdit puts synopsis-only text into Accroche', () => {
+    const edited = adventureSectionsForEdit('Texte libre seul.');
+    expect(edited[0]!.title).toBe('Accroche');
+    expect(edited[0]!.body).toContain('Texte libre');
+    expect(edited.slice(1).every((s) => !s.body && !s.bullets.length)).toBeTrue();
+  });
+
+  it('serializeAdventureSections omits empty sections and formats bullets-only', () => {
+    const raw = serializeAdventureSections([
+      { title: 'Accroche', body: 'Hook', bullets: [] },
+      { title: 'Contexte', body: '', bullets: [] },
+      { title: 'Personnages clés', body: '', bullets: ['A', 'B'] },
+    ]);
+    expect(raw).toContain('**Accroche** — Hook');
+    expect(raw).not.toContain('**Contexte**');
+    expect(raw).toContain('**Personnages clés**');
+    expect(raw).toContain('- A');
+  });
+
+  it('patchAdventureSection parses bullets and ignores unknown title', () => {
+    expect(patchAdventureSection(sample, 'Inconnu', 'x')).toBe(sample);
+    const next = patchAdventureSection(sample, 'Personnages clés', 'Intro\n- Un\n* Deux\n• Trois');
+    expect(next).toContain('- Un');
+    expect(next).toContain('- Deux');
+    expect(next).toContain('- Trois');
+  });
+
+  it('adventureSectionEditorValue joins body and bullets', () => {
+    expect(
+      adventureSectionEditorValue({ title: 'Accroche', body: 'Hook', bullets: ['A', 'B'] }),
+    ).toBe('Hook\n- A\n- B');
+    expect(adventureSectionEditorValue({ title: 'X', body: '  ', bullets: [] })).toBe('');
   });
 });

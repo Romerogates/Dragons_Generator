@@ -16,8 +16,18 @@ import { GUIDE_TOPICS, guideTopicsByGroup } from './guide-topics';
 import { GuideSidebar } from './guide-sidebar/guide-sidebar';
 import { GUIDE_CLASS_PLAYBOOKS } from './guide-class-playbooks';
 
-/** Chapitres secondaires du hub (les tutos débutants sont en avant). */
-const FEATURED_TOPIC_IDS = ['parcours', 'personnage', 'scenario', 'table', 'initiative', 'faq'] as const;
+/** Chapitres secondaires du hub — rôle via audience (donjons / table = MJ). */
+const FEATURED_TOPIC_IDS = [
+  'demarrage',
+  'journal',
+  'parcours',
+  'personnage',
+  'scenario',
+  'donjons',
+  'table',
+  'initiative',
+  'faq',
+] as const;
 
 @Component({
   selector: 'app-guide-index',

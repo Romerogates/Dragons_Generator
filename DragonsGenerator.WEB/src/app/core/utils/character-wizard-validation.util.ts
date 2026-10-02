@@ -2,7 +2,14 @@ import type { CharacterCreation } from '@core/models/Character/character';
 import type { ExtendedCharacterCreation } from '@core/models/Character/character-builder.types';
 import type { EquipmentSlot } from '@core/models/CharacterClasses/character-class';
 import { isMasteredProficiencyChoice } from './equipment.utils';
+import {
+  isTalentSpendComplete,
+  talentSpendsTotalCost,
+} from './feat-benefits.util';
 import { resolveSpellQuota, spellPickCount } from './spell-quota.util';
+
+/** Points flexibles du don Talent (aligné sur abilities-step / JSON feat). */
+const TALENT_FLEXIBLE_POINTS = 4;
 
 export interface WizardStepValidationContext {
   needsMagicStep: boolean;
@@ -25,6 +32,11 @@ export function racialSpellsComplete(
   });
 }
 
+/**
+ * Aligné sur `abilities-step.asiComplete` : Talent exige 4 pts dépensés + sous-choix
+ * complets ; ASI +2 / +1+1 inchangés. Sans catalogue de dons, on ne peut pas exiger
+ * featAbilityChoice / featResistanceChoice pour les autres dons (validés dans l’UI).
+ */
 function asiChoicesComplete(c: CharacterCreation): boolean {
   const slots = c.asiChoices ?? [];
   if (slots.length === 0) return true;
@@ -32,9 +44,12 @@ function asiChoicesComplete(c: CharacterCreation): boolean {
     if (s.mode === 'feat') {
       if (!s.featId) return false;
       const spends = s.featTalentSpends ?? [];
-      if (s.featId === 'feat-talent' && spends.length === 0 && (s.featAbilityChoice || s.featResistanceChoice)) {
-        return true;
+      if (s.featId === 'feat-talent') {
+        if (talentSpendsTotalCost(spends) !== TALENT_FLEXIBLE_POINTS) return false;
+        return spends.every((sp) => isTalentSpendComplete(sp));
       }
+      // Autres dons : id requis ; si des dépenses Talent ont été saisies, elles doivent être OK.
+      if (spends.length > 0) return spends.every((sp) => isTalentSpendComplete(sp));
       return true;
     }
     if (s.mode === 'plus2') return !!s.primary;
@@ -80,6 +95,10 @@ function classStepComplete(c: CharacterCreation): boolean {
   if (c.classId === 'cls-sorcier') {
     if (level >= 3 && !c.pactBoon) return false;
     if (level >= 2 && !(c.eldritchInvocations?.length)) return false;
+  }
+  // Ensorceleur primaire niv. 3+ : métamagie obligatoire (miroir secondaire).
+  if (c.classId === 'cls-ensorceleur' && level >= 3 && !(c.metamagicOptions?.length)) {
+    return false;
   }
   return secondaryProgressionComplete(c);
 }

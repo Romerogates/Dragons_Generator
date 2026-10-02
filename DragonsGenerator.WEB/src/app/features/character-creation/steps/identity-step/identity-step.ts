@@ -39,6 +39,7 @@ export class IdentityStep implements OnInit {
   readonly alignments = ALIGNMENTS;
 
   readonly generationError = signal<string | null>(null);
+  readonly portraitError = signal<string | null>(null);
 
   /** Raccourci vers l'état actuel de la création. */
   readonly c = computed(() => this.builder.creation());
@@ -67,6 +68,26 @@ export class IdentityStep implements OnInit {
   updateSex(value: string): void {
     const sex = value === 'M' || value === 'F' || value === 'X' ? value : 'X';
     this.builder.setIdentity({ sex });
+  }
+
+  async onPortraitFile(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0];
+    if (input) input.value = '';
+    if (!file) return;
+    this.portraitError.set(null);
+    try {
+      const { fileToSquareJpegDataUrl } = await import('@core/utils/image-data-url.util');
+      const dataUrl = await fileToSquareJpegDataUrl(file, 256);
+      this.builder.setIdentity({ portraitImageUrl: dataUrl, tokenImageUrl: dataUrl });
+    } catch {
+      this.portraitError.set('Image illisible — essayez un PNG/JPEG plus léger.');
+    }
+  }
+
+  clearPortrait(): void {
+    this.builder.setIdentity({ portraitImageUrl: null, tokenImageUrl: null });
+    this.portraitError.set(null);
   }
 
   /** Navigation vers l'étape suivante (Récapitulatif). */

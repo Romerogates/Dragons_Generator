@@ -5,6 +5,15 @@ import {
   classBeginnerPackFilename,
   getGuideClassPlaybook,
 } from './guide-class-playbooks';
+import {
+  GUIDE_BLOG_POSTS,
+  GUIDE_FAQ_ITEMS,
+  GUIDE_FEATURE_INDEX,
+  GUIDE_GLOSSARY,
+  GUIDE_NEWS_TTL_MS,
+  isGuideBlogPostNew,
+  parseGuideBlogDate,
+} from './guide-content';
 
 describe('guide-topics', () => {
   it('maps nav sections to rich forum topics', () => {
@@ -12,7 +21,23 @@ describe('guide-topics', () => {
     const faq = getGuideTopic('faq');
     expect(faq?.title).toContain('FAQ');
     expect(faq?.paragraphs.length).toBeGreaterThan(0);
-    expect(faq?.steps.length).toBeGreaterThan(0);
+    expect(faq?.steps.length).toBe(GUIDE_FAQ_ITEMS.length);
+  });
+
+  it('exposes full glossaire and index without truncation', () => {
+    expect(getGuideTopic('glossaire')?.steps.length).toBe(GUIDE_GLOSSARY.length);
+    expect(getGuideTopic('index')?.steps.length).toBe(GUIDE_FEATURE_INDEX.length);
+  });
+
+  it('lists every journal post and marks Nouveau only within TTL', () => {
+    const journal = getGuideTopic('journal');
+    expect(journal?.steps.length).toBe(GUIDE_BLOG_POSTS.length);
+    const fresh = GUIDE_BLOG_POSTS.filter((p) => isGuideBlogPostNew(p));
+    expect(journal?.steps.filter((s) => s.badge === 'Nouveau').length).toBe(fresh.length);
+  });
+
+  it('no longer ships empty captures topic', () => {
+    expect(getGuideTopic('captures')).toBeUndefined();
   });
 
   it('exposes deep links for demarrage', () => {
@@ -20,6 +45,14 @@ describe('guide-topics', () => {
     expect(t?.links.some((l) => l.path === '/create')).toBe(true);
     expect(t?.links.some((l) => l.path === '/guide/mj-table')).toBe(true);
     expect(t?.steps.length).toBeGreaterThan(0);
+  });
+
+  it('codex topic links come from CODEX_NAV_LINKS', () => {
+    const t = getGuideTopic('codex');
+    expect(t?.links.some((l) => l.path === '/codex')).toBe(true);
+    expect(t?.links.some((l) => l.path === '/backgrounds')).toBe(true);
+    expect(t?.links.some((l) => l.path === '/civilisations')).toBe(true);
+    expect(t?.links.some((l) => l.path === '/species')).toBe(true);
   });
 
   it('no longer ships beginner topics as wiki articles', () => {
@@ -41,6 +74,21 @@ describe('guide-topics', () => {
   });
 });
 
+describe('guide blog isNew TTL', () => {
+  it('parses French dates and expires after 14 days', () => {
+    expect(parseGuideBlogDate('31 août 2026')).toBe(Date.UTC(2026, 7, 31));
+    const post = {
+      ...GUIDE_BLOG_POSTS[0],
+      date: '20 septembre 2026',
+      isNew: true,
+    };
+    const day0 = Date.UTC(2026, 8, 20);
+    expect(isGuideBlogPostNew(post, day0)).toBe(true);
+    expect(isGuideBlogPostNew(post, day0 + GUIDE_NEWS_TTL_MS + 1)).toBe(false);
+    expect(isGuideBlogPostNew({ ...post, isNew: false }, day0)).toBe(false);
+  });
+});
+
 describe('guide-rulebooks', () => {
   it('exposes table/online rulebooks plus oneshot sheet', () => {
     expect(GUIDE_RULEBOOKS.length).toBe(5);
@@ -49,6 +97,18 @@ describe('guide-rulebooks', () => {
     expect(getGuideRulebook('oneshot')?.mode).toBe('oneshot');
     expect(getGuideRulebook('joueur-table')?.chapters.some((c) => c.id === 'combat')).toBe(true);
     expect(getGuideRulebook('mj-table')?.chapters.some((c) => c.id === 'stats')).toBe(true);
+  });
+
+  it('enrichit les livrets en ligne avec aperçus Table / init (liens, pas fake screenshots)', () => {
+    for (const id of ['mj-en-ligne', 'joueur-en-ligne'] as const) {
+      const book = getGuideRulebook(id);
+      expect(book?.chapters.some((c) => c.id === 'apercus')).toBe(true);
+      expect(book?.related.some((r) => r.path === '/campaigns')).toBe(true);
+      const captions = book?.chapters.find((c) => c.id === 'apercus')?.sections ?? [];
+      expect(
+        captions.some((s) => s.id.includes('init') || s.title.toLowerCase().includes('initiative')),
+      ).toBe(true);
+    }
   });
 
   it('includes fiche annotée, glossaire and init≠toucher on table books', () => {

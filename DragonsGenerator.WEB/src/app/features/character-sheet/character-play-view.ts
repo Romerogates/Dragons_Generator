@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ABILITY_KEY_TO_LABEL,
@@ -30,6 +30,13 @@ const SPELLCASTING_RESOURCE_DUPES = new Set([
   'pact_slot_level',
 ]);
 
+export type CharacterLivePatch = {
+  hitPointsCurrent?: number;
+  hitPointsTemporary?: number;
+  inspiration?: boolean;
+  spellSlotUsed?: { level: number; used: number; pact?: boolean };
+};
+
 @Component({
   selector: 'app-character-play-view',
   standalone: true,
@@ -39,6 +46,9 @@ const SPELLCASTING_RESOURCE_DUPES = new Set([
 })
 export class CharacterPlayView {
   readonly character = input.required<Character>();
+  /** Fiche compacte live : PV / slots / inspiration éditables (hors consultation). */
+  readonly editable = input(false);
+  readonly liveChange = output<CharacterLivePatch>();
 
   readonly abilityKeys = ABILITY_KEYS;
   readonly abilityLabel = ABILITY_KEY_TO_LABEL;
@@ -165,5 +175,37 @@ export class CharacterPlayView {
 
   slotRemaining(max: number, used: number): number {
     return Math.max(0, max - used);
+  }
+
+  adjustHp(delta: number): void {
+    if (!this.editable()) return;
+    const c = this.character();
+    const next = Math.max(0, Math.min(c.vitality.hitPointsMax, c.vitality.hitPointsCurrent + delta));
+    if (next === c.vitality.hitPointsCurrent) return;
+    this.liveChange.emit({ hitPointsCurrent: next });
+  }
+
+  setHpFromInput(raw: string): void {
+    if (!this.editable()) return;
+    const c = this.character();
+    const n = Math.floor(Number(raw));
+    if (!Number.isFinite(n)) return;
+    const next = Math.max(0, Math.min(c.vitality.hitPointsMax, n));
+    this.liveChange.emit({ hitPointsCurrent: next });
+  }
+
+  toggleInspiration(): void {
+    if (!this.editable()) return;
+    this.liveChange.emit({ inspiration: !this.character().vitality.inspiration });
+  }
+
+  spendSpellSlot(level: number, max: number, used: number, pact = false): void {
+    if (!this.editable() || used >= max) return;
+    this.liveChange.emit({ spellSlotUsed: { level, used: used + 1, pact } });
+  }
+
+  restoreSpellSlot(level: number, used: number, pact = false): void {
+    if (!this.editable() || used <= 0) return;
+    this.liveChange.emit({ spellSlotUsed: { level, used: used - 1, pact } });
   }
 }

@@ -204,9 +204,35 @@
         {{ blocked }}
       </p>
     }
-    <p class="mt-1 text-[9px] text-slate-600 text-center sm:text-left">
-      <a routerLink="/guide/personnage" class="underline hover:text-amber-400/80">Guide — forger un héros</a>
-    </p>
+    <div class="mt-1.5 flex flex-wrap items-center gap-2 justify-center sm:justify-start">
+      <a routerLink="/guide/personnage" class="text-[9px] text-slate-600 underline hover:text-amber-400/80"
+        >Guide — forger un héros</a
+      >
+      @if (builder.currentStep() < builder.summaryStep()) {
+        <button
+          type="button"
+          data-testid="forge-auto-complete"
+          class="min-h-8 px-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 hover:border-amber-500/50 hover:text-amber-400 disabled:opacity-50"
+          [disabled]="autoCompleteBusy()"
+          (click)="autoCompleteRemaining()"
+        >
+          {{ autoCompleteBusy() ? 'Complétion…' : 'Compléter le reste' }}
+        </button>
+        @if (canUndoAutoComplete()) {
+          <button
+            type="button"
+            data-testid="forge-auto-complete-undo"
+            class="min-h-8 px-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest border border-slate-700 text-slate-400 hover:text-amber-300"
+            (click)="undoAutoComplete()"
+          >
+            Annuler
+          </button>
+        }
+      }
+    </div>
+    @if (autoCompleteHint(); as hint) {
+      <p class="mt-1 text-[10px] text-amber-400/90 text-center sm:text-left" role="status">{{ hint }}</p>
+    }
   </div>
 
   <div class="w-full flex-1 flex flex-col min-h-0">

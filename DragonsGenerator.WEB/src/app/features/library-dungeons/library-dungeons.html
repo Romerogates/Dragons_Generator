@@ -9,7 +9,7 @@
           Bibliothèque cloud — créez, éditez, importez en campagne.
         } @else {
           {{ dungeons().length }} / {{ maxDungeons }} carte{{ dungeons().length > 1 ? 's' : '' }}
-          · ouvrez l’éditeur, puis importez une copie dans une campagne
+          · liez-les en <strong class="text-emerald-400/90 not-italic font-semibold">live</strong> dans une campagne
           ·
           <a routerLink="/dungeons/gallery" class="text-amber-400 hover:underline not-italic font-medium"
             >Galerie publique</a
@@ -50,7 +50,8 @@
     <div class="rounded-3xl border border-dashed border-slate-700 bg-[#1b2028] p-12 text-center">
       <h2 class="text-xl font-serif text-slate-200 mb-3">Bibliothèque vide</h2>
       <p class="text-slate-400 mb-6 text-sm max-w-md mx-auto">
-        Gravez une carte ici, éditez-la, puis importez-en une copie dans n’importe quelle campagne (Préparation → Cartes).
+        Gravez une carte ici, éditez-la, puis liez-la en live dans n’importe quelle campagne
+        (Préparation → Donjons).
       </p>
       <button
         type="button"

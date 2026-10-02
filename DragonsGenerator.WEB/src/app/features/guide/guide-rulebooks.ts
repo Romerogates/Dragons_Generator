@@ -463,6 +463,7 @@ export const GUIDE_RULEBOOK_MJ_ONLINE: GuideRulebook = {
   related: [
     { label: 'MJ à la table (règles dés)', path: '/guide/mj-table' },
     { label: 'Joueur en ligne', path: '/guide/joueur-en-ligne' },
+    { label: 'Mes campagnes (Table / init)', path: '/campaigns' },
   ],
   chapters: [
     {
@@ -504,8 +505,35 @@ export const GUIDE_RULEBOOK_MJ_ONLINE: GuideRulebook = {
       ],
     },
     {
+      id: 'apercus',
+      title: '3. Où le voir dans l’app',
+      sections: [
+        {
+          id: 'caption-table',
+          title: 'Table MJ (pas de capture figée)',
+          paragraphs: [
+            'Aucune capture d’écran figée ici — l’UI évolue. Pour voir la vraie Table : Campagnes → votre campagne → Entrer en session → onglet Table (notes, party, tracker).',
+          ],
+          bullets: [
+            'Lien direct : /campaigns → ouvrir la campagne active.',
+          ],
+        },
+        {
+          id: 'caption-init',
+          title: 'Initiative & combat',
+          paragraphs: [
+            'Collecte d’initiative et tours : depuis la Table en session (Collecter), ou l’écran TV optionnel /init?display=1.',
+          ],
+          bullets: [
+            'Aide détaillée : /guide/initiative',
+            'Écran TV : /init?display=1 (session déjà ouverte).',
+          ],
+        },
+      ],
+    },
+    {
       id: 'rappel',
-      title: '3. Rappel — comment on compte',
+      title: '4. Rappel — comment on compte',
       sections: [
         {
           id: 'jets',
@@ -583,6 +611,7 @@ export const GUIDE_RULEBOOK_JOUEUR_ONLINE: GuideRulebook = {
   related: [
     { label: 'Joueur à la table (règles dés)', path: '/guide/joueur-table' },
     { label: 'MJ en ligne', path: '/guide/mj-en-ligne' },
+    { label: 'Mes campagnes (session / init)', path: '/campaigns' },
   ],
   chapters: [
     {
@@ -615,6 +644,32 @@ export const GUIDE_RULEBOOK_JOUEUR_ONLINE: GuideRulebook = {
             'À votre tour : action → d20 + bonus d’attaque (mod + maîtrise) → dégâts si touché.',
             'Compétences : annoncer « 15 + 3 + 2 = 20 » (d20 + mod + maîtrise si entraîné).',
             'Détail complet + fiche annotée + glossaire : livret Joueur à la table.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'apercus',
+      title: '3. Où le voir dans l’app',
+      sections: [
+        {
+          id: 'caption-session',
+          title: 'Session & bandeau (pas de capture figée)',
+          paragraphs: [
+            'Pas d’image figée ici. Pour la vraie UI joueur : Campagnes → votre campagne → Entrer en session (bandeau initiative, documents, table).',
+          ],
+          bullets: [
+            'Lien : /campaigns → ouvrir la campagne.',
+          ],
+        },
+        {
+          id: 'caption-init',
+          title: 'Saisir l’initiative',
+          paragraphs: [
+            'Quand le MJ ouvre la collecte, un bandeau apparaît sur la campagne (et une notification). Utilisez ce bouton — ce n’est pas le jet pour toucher.',
+          ],
+          bullets: [
+            'Aide : /guide/initiative',
           ],
         },
       ],

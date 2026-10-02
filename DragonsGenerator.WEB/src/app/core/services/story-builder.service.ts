@@ -22,6 +22,7 @@ import {
   pickCreaturesForLevelRange,
 } from '../utils/story-creature-picker.util';
 import { campaignRegionFields, campaignRegionFromData } from '../utils/story-location.util';
+import { mapsForCampaignPersist } from '../utils/campaign-dungeon-map-ref.util';
 
 export type CreatureSelectionMode = 'manual' | 'auto';
 export type CampaignEditScope = 'full' | 'creatures-only';
@@ -312,7 +313,7 @@ export class StoryBuilderService {
       pregenCharacters: structuredClone(this.preservedPregens()),
       sessions: structuredClone(this.preservedSessions()),
       handouts: structuredClone(this.preservedHandouts()),
-      dungeonMaps: structuredClone(this.preservedDungeonMaps()),
+      dungeonMaps: mapsForCampaignPersist(structuredClone(this.preservedDungeonMaps())),
       activeSessionId: this.preservedActiveSessionId(),
       pinnedHandoutId: this.preservedPinnedHandoutId(),
     };

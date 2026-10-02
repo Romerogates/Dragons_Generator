@@ -100,6 +100,36 @@ test.describe('Lot smoke — RSVP / init display / galerie / PDF', () => {
     await expect(page.getByRole('link', { name: /Voir \/ copier/i }).first()).toBeVisible();
   });
 
+  test('create → share → gallery → copy → Mes donjons', async ({ page }) => {
+    test.setTimeout(120_000);
+
+    const owner = await loginSeedSession(page.request);
+    const name = `Copie Galerie E2E ${Date.now()}`;
+    const { token } = await createSharedDungeonAs(page, owner, name);
+
+    await applyAuthSession(page, owner, '/dungeons/gallery');
+    await expect(page.getByRole('heading', { name: /Galerie de donjons/i })).toBeVisible({
+      timeout: 20_000,
+    });
+    await expect(page.getByText(name).first()).toBeVisible({ timeout: 15_000 });
+
+    const card = page.getByTestId('gallery-card').filter({ hasText: name });
+    await expect(card).toBeVisible();
+    await card.getByRole('link', { name: /Voir \/ copier/i }).click();
+    await expect(page).toHaveURL(new RegExp(`/dungeons/shared/${token}`), { timeout: 15_000 });
+    await expect(page.getByTestId('dungeon-shared')).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByRole('heading', { name })).toBeVisible({ timeout: 15_000 });
+
+    await page.getByTestId('dungeon-shared-import').click();
+    await expect(page).toHaveURL(/\/dungeons\/[^/]+$/, { timeout: 20_000 });
+
+    await page.goto('/dungeons');
+    await expect(page.getByRole('heading', { name: /Mes\s+Donjons/i })).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByRole('link', { name }).first()).toBeVisible({ timeout: 15_000 });
+  });
+
   test('session : PDF soirée + brouillon récap sur /play', async ({ page }) => {
     test.setTimeout(120_000);
 

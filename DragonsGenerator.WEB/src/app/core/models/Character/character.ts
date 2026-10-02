@@ -604,6 +604,10 @@ export interface Character {
 
   // === Identité ===
   name: string;
+  /** Portrait / photo (data-URL ou https) — optionnel, PDF page 1. */
+  portraitImageUrl?: string | null;
+  /** Jeton de table (carré) — optionnel, réutilisable en combat. */
+  tokenImageUrl?: string | null;
   species: SpeciesRef;
   size: Size;
   civilization: CatalogRef;
@@ -835,6 +839,10 @@ export interface CharacterCreation {
   name: string;
   sex: 'M' | 'F' | 'X';
   description: string;
+  /** Portrait (data-URL JPEG) — optionnel. */
+  portraitImageUrl?: string | null;
+  /** Jeton de table carré (data-URL) — optionnel. */
+  tokenImageUrl?: string | null;
   background: string; // texte libre (résumé affiché sur la fiche)
   alignment: string;
   traits: string;

@@ -62,6 +62,17 @@
             </a>
           </p>
         }
+        @if (c.data.spellcasting) {
+          <p class="mt-3">
+            <a
+              [routerLink]="['/spells']"
+              [queryParams]="{ class: c.id }"
+              class="inline-flex items-center min-h-10 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest border border-fuchsia-700/50 text-fuchsia-200 hover:border-fuchsia-500/70 hover:bg-fuchsia-950/30 transition-colors"
+            >
+              Sorts de cette classe →
+            </a>
+          </p>
+        }
       </header>
 
       <section

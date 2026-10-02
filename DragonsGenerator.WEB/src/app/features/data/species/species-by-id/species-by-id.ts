@@ -17,11 +17,12 @@ import { CodexDetailShell } from '@shared/components/codex-detail-shell/codex-de
 import { formatApiAsiDisplay } from '@core/utils/ability-mapping';
 import { normalizeLanguageName } from '@core/utils/character-languages.util';
 import { SpeciesMechanicsPanel } from '../species-mechanics-panel/species-mechanics-panel';
+import { GameIdLabelPipe } from '@shared/pipes/game-id-label.pipe';
 
 @Component({
   selector: 'app-species-by-id',
   standalone: true,
-  imports: [CommonModule, RouterLink, SpeciesMechanicsPanel, CodexDetailShell],
+  imports: [CommonModule, RouterLink, SpeciesMechanicsPanel, CodexDetailShell, GameIdLabelPipe],
   templateUrl: './species-by-id.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>

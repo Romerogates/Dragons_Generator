@@ -7,29 +7,33 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 import { DataService } from '@core/services/data.service';
 import { Spell } from '@core/models/Spells/spell';
 import { spellSchoolLabel } from '@core/utils/spell-display.util';
+import { CodexEmptyState } from '@shared/components/codex-empty-state/codex-empty-state';
+import { labelForGameId } from '@core/utils/game-id-labels';
 
 @Component({
   selector: 'app-spells',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, CodexEmptyState],
   templateUrl: './spells.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class Spells {
   private dataService = inject(DataService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   protected error = signal<string | null>(null);
   protected readonly schoolLabel = spellSchoolLabel;
 
-  // Barre de recherche
   readonly search = signal('');
+  readonly classFilter = signal('');
 
   protected spells = toSignal(
     this.dataService.getSpells().pipe(
@@ -41,15 +45,28 @@ export class Spells {
     { initialValue: null },
   );
 
-  // Liste filtrée dynamiquement
+  protected readonly classOptions = toSignal(
+    this.dataService.getClassesSummary().pipe(catchError(() => of([]))),
+    { initialValue: [] },
+  );
+
+  readonly castingClasses = computed(() =>
+    this.classOptions()
+      .filter((c) => c.hasSpellcasting)
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name, 'fr')),
+  );
+
   readonly filteredSpells = computed(() => {
     const list = this.spells();
     if (!list) return [];
 
     const term = this.search().trim().toLowerCase();
-    if (!term) return list;
+    const classId = this.classFilter().trim();
 
     return list.filter((s) => {
+      if (classId && !(s.classes ?? []).includes(classId)) return false;
+      if (!term) return true;
       const schoolFr = spellSchoolLabel(s.school).toLowerCase();
       return (
         s.name.toLowerCase().includes(term) ||
@@ -58,6 +75,11 @@ export class Spells {
       );
     });
   });
+
+  constructor() {
+    const fromQuery = this.route.snapshot.queryParamMap.get('class') ?? '';
+    if (fromQuery) this.classFilter.set(fromQuery);
+  }
 
   protected spellSummary(spell: Spell): string {
     const desc = spell.description?.trim();
@@ -70,6 +92,26 @@ export class Spells {
 
   onSearch(value: string): void {
     this.search.set(value);
+  }
+
+  onClassFilter(value: string): void {
+    this.classFilter.set(value);
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: value ? { class: value } : { class: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
+
+  clearFilters(): void {
+    this.search.set('');
+    this.onClassFilter('');
+  }
+
+  classLabel(id: string): string {
+    const found = this.classOptions().find((c) => c.id === id);
+    return found?.name ?? labelForGameId(id);
   }
 
   protected formatMeta(meta: { amount: number | string | null; unit: string | null }): string {

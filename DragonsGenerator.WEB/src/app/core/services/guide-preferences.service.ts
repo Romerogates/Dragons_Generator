@@ -2,7 +2,7 @@ import { Injectable, computed, effect, inject, signal, untracked } from '@angula
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '@env/environment';
-import { GUIDE_ALL_NAV, GUIDE_BLOG_POSTS } from '@features/guide/guide-content';
+import { GUIDE_ALL_NAV, GUIDE_BLOG_POSTS, isGuideBlogPostNew } from '@features/guide/guide-content';
 import { AuthService } from './auth.service';
 
 export type GuideAudiencePref = 'all' | 'dm' | 'player';
@@ -45,7 +45,7 @@ export class GuidePreferencesService {
   readonly unreadNewsCount = computed(() => {
     if (!this.hydrated()) return 0;
     const read = this.readNewsIds();
-    return GUIDE_BLOG_POSTS.filter((p) => p.isNew && !read[p.id]).length;
+    return GUIDE_BLOG_POSTS.filter((p) => isGuideBlogPostNew(p) && !read[p.id]).length;
   });
 
   readonly unreadSectionCount = computed(() => {

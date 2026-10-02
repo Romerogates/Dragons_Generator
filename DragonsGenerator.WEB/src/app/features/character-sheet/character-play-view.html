@@ -11,12 +11,43 @@
       <p class="text-sm text-slate-500 mt-0.5">{{ classLine() }} · Total niv. {{ c.totalLevel }}</p>
     </header>
 
-    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
-      <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-3 text-center">
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+      <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-3 text-center" data-testid="compact-hp">
         <div class="text-[9px] font-black uppercase tracking-widest text-red-500/80 mb-1">PV</div>
-        <div class="text-lg font-serif text-red-400">
-          {{ c.vitality.hitPointsCurrent }}/{{ c.vitality.hitPointsMax }}
-        </div>
+        @if (editable()) {
+          <div class="flex items-center justify-center gap-1">
+            <button
+              type="button"
+              class="min-h-9 min-w-9 rounded-lg border border-slate-600 text-slate-300 hover:border-red-500/50"
+              aria-label="Retirer 1 PV"
+              (click)="adjustHp(-1)"
+            >
+              −
+            </button>
+            <input
+              type="number"
+              class="w-14 bg-slate-900 border border-slate-600 rounded-lg px-1 py-1 text-center text-lg font-serif text-red-400"
+              [value]="c.vitality.hitPointsCurrent"
+              (change)="setHpFromInput($any($event.target).value)"
+              [attr.max]="c.vitality.hitPointsMax"
+              min="0"
+              aria-label="Points de vie actuels"
+            />
+            <button
+              type="button"
+              class="min-h-9 min-w-9 rounded-lg border border-slate-600 text-slate-300 hover:border-emerald-500/50"
+              aria-label="Ajouter 1 PV"
+              (click)="adjustHp(1)"
+            >
+              +
+            </button>
+          </div>
+          <div class="text-[10px] text-slate-500 mt-1">/ {{ c.vitality.hitPointsMax }}</div>
+        } @else {
+          <div class="text-lg font-serif text-red-400">
+            {{ c.vitality.hitPointsCurrent }}/{{ c.vitality.hitPointsMax }}
+          </div>
+        }
         @if (c.vitality.hitPointsTemporary) {
           <div class="text-[10px] text-sky-400">
             +{{ c.vitality.hitPointsTemporary }} temporaires
@@ -47,6 +78,32 @@
       <div class="bg-[#171b22] border border-slate-700/50 rounded-xl p-3 text-center">
         <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">VD</div>
         <div class="text-lg font-serif text-slate-200">{{ c.movement.walk }} m</div>
+      </div>
+      <div
+        class="bg-[#171b22] border border-slate-700/50 rounded-xl p-3 text-center"
+        data-testid="compact-inspiration"
+      >
+        <div class="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">
+          Inspiration
+        </div>
+        @if (editable()) {
+          <button
+            type="button"
+            class="min-h-9 px-3 rounded-lg text-sm font-bold border transition-colors"
+            [class]="
+              c.vitality.inspiration
+                ? 'border-amber-500/60 bg-amber-950/40 text-amber-300'
+                : 'border-slate-600 text-slate-400 hover:border-amber-500/40'
+            "
+            (click)="toggleInspiration()"
+          >
+            {{ c.vitality.inspiration ? 'Oui' : 'Non' }}
+          </button>
+        } @else {
+          <div class="text-lg font-serif text-slate-200">
+            {{ c.vitality.inspiration ? 'Oui' : 'Non' }}
+          </div>
+        }
       </div>
     </div>
 
@@ -148,21 +205,43 @@
         }
 
         @if (sc.spellSlots.length) {
-          <div>
+          <div data-testid="compact-spell-slots">
             <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
               Emplacements de sorts
             </h4>
             <div class="flex flex-wrap gap-2">
               @for (slot of sc.spellSlots; track slot.level) {
-                <span
-                  class="text-[11px] px-2.5 py-1.5 rounded-lg bg-[#171b22] border border-slate-700 text-slate-300"
+                <div
+                  class="text-[11px] px-2.5 py-1.5 rounded-lg bg-[#171b22] border border-slate-700 text-slate-300 flex items-center gap-2"
                 >
-                  Niv. {{ slot.level }} —
-                  <span class="text-amber-300 font-semibold">{{
-                    slotRemaining(slot.max, slot.used)
-                  }}</span>
-                  / {{ slot.max }} restants
-                </span>
+                  <span>
+                    Niv. {{ slot.level }} —
+                    <span class="text-amber-300 font-semibold">{{
+                      slotRemaining(slot.max, slot.used)
+                    }}</span>
+                    / {{ slot.max }} restants
+                  </span>
+                  @if (editable()) {
+                    <button
+                      type="button"
+                      class="min-h-8 min-w-8 rounded border border-slate-600 text-slate-300 disabled:opacity-40"
+                      [disabled]="slot.used <= 0"
+                      aria-label="Restaurer un emplacement"
+                      (click)="restoreSpellSlot(slot.level, slot.used)"
+                    >
+                      +
+                    </button>
+                    <button
+                      type="button"
+                      class="min-h-8 min-w-8 rounded border border-slate-600 text-slate-300 disabled:opacity-40"
+                      [disabled]="slot.used >= slot.max"
+                      aria-label="Dépenser un emplacement"
+                      (click)="spendSpellSlot(slot.level, slot.max, slot.used)"
+                    >
+                      −
+                    </button>
+                  }
+                </div>
               }
             </div>
           </div>
@@ -175,13 +254,35 @@
             </h4>
             <div class="flex flex-wrap gap-2">
               @for (slot of sc.pactSlots!; track slot.level) {
-                <span
-                  class="text-[11px] px-2.5 py-1.5 rounded-lg bg-violet-950/40 border border-violet-800/50 text-violet-200"
+                <div
+                  class="text-[11px] px-2.5 py-1.5 rounded-lg bg-violet-950/40 border border-violet-800/50 text-violet-200 flex items-center gap-2"
                 >
-                  Emplacement niv. {{ slot.level }} —
-                  <span class="font-semibold">{{ slotRemaining(slot.max, slot.used) }}</span>
-                  / {{ slot.max }}
-                </span>
+                  <span>
+                    Emplacement niv. {{ slot.level }} —
+                    <span class="font-semibold">{{ slotRemaining(slot.max, slot.used) }}</span>
+                    / {{ slot.max }}
+                  </span>
+                  @if (editable()) {
+                    <button
+                      type="button"
+                      class="min-h-8 min-w-8 rounded border border-violet-700 text-violet-200 disabled:opacity-40"
+                      [disabled]="slot.used <= 0"
+                      aria-label="Restaurer un emplacement de pacte"
+                      (click)="restoreSpellSlot(slot.level, slot.used, true)"
+                    >
+                      +
+                    </button>
+                    <button
+                      type="button"
+                      class="min-h-8 min-w-8 rounded border border-violet-700 text-violet-200 disabled:opacity-40"
+                      [disabled]="slot.used >= slot.max"
+                      aria-label="Dépenser un emplacement de pacte"
+                      (click)="spendSpellSlot(slot.level, slot.max, slot.used, true)"
+                    >
+                      −
+                    </button>
+                  }
+                </div>
               }
             </div>
           </div>

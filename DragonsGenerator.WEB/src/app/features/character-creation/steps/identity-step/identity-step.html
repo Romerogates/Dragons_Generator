@@ -81,6 +81,59 @@
       <h4
         class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-6 flex items-center gap-2"
       >
+        <iconify-icon icon="fluent-emoji:framed-picture"></iconify-icon> Portrait / jeton
+      </h4>
+      <p class="text-[11px] text-slate-500 mb-4">
+        Optionnel — affiché sur la fiche PDF (page 1) et réutilisable comme jeton de table.
+      </p>
+      <div class="flex flex-wrap items-center gap-4">
+        @if (c().portraitImageUrl; as url) {
+          <img
+            [src]="url"
+            alt="Portrait du personnage"
+            class="w-24 h-24 rounded-xl object-cover border border-slate-700"
+            data-testid="wizard-identity-portrait-preview"
+          />
+        } @else {
+          <div
+            class="w-24 h-24 rounded-xl border border-dashed border-slate-600 bg-[#171b22] flex items-center justify-center text-slate-600 text-[10px] text-center px-2"
+          >
+            Aucun portrait
+          </div>
+        }
+        <div class="flex flex-col gap-2">
+          <label
+            class="min-h-11 inline-flex items-center justify-center px-4 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-500 text-slate-950 hover:bg-amber-400 cursor-pointer"
+          >
+            Choisir une image
+            <input
+              type="file"
+              accept="image/*"
+              class="sr-only"
+              data-testid="wizard-identity-portrait-file"
+              (change)="onPortraitFile($event)"
+            />
+          </label>
+          @if (c().portraitImageUrl) {
+            <button
+              type="button"
+              class="min-h-9 px-3 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-400 hover:text-red-300"
+              (click)="clearPortrait()"
+            >
+              Retirer
+            </button>
+          }
+        </div>
+      </div>
+      @if (portraitError(); as err) {
+        <p class="mt-2 text-[11px] text-red-400">{{ err }}</p>
+      }
+    </div>
+
+    <div class="bg-[#1b2028] p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xl">
+      <h4
+        class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-6 flex items-center gap-2"
+      >
         <iconify-icon icon="fluent-emoji:bust-in-silhouette"></iconify-icon> Description Physique
       </h4>
 

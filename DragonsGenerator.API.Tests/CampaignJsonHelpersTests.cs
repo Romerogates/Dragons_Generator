@@ -173,6 +173,68 @@ public class CampaignJsonHelpersTests
     }
 
     [Fact]
+    public void FilterForPlayerView_hydrates_library_linked_active_map()
+    {
+        var libId = Guid.Parse("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+        const string raw = """
+            {
+              "activeSessionId": "ses-1",
+              "sessions": [{ "id": "ses-1", "activeMapId": "map-live" }],
+              "dungeonMaps": [
+                {
+                  "id": "map-live",
+                  "libraryDungeonId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                  "name": "Crypte linked",
+                  "fogOfWarEnabled": true,
+                  "revealedRoomIds": ["r1"],
+                  "rooms": [{ "id": "r1", "label": "A", "encounterId": "enc-1", "notes": "camp" }]
+                }
+              ]
+            }
+            """;
+        using var doc = System.Text.Json.JsonDocument.Parse(raw);
+        var libJson = System.Text.Json.Nodes.JsonNode.Parse("""
+            {
+              "id": "lib-inner",
+              "name": "Lib Crypte",
+              "gridWidth": 4,
+              "gridHeight": 4,
+              "tiles": [["floor","floor","floor","floor"],["floor","floor","floor","floor"],["floor","floor","floor","floor"],["floor","floor","floor","floor"]],
+              "rooms": [{ "id": "r1", "label": "A", "x": 0, "y": 0, "width": 2, "height": 2, "notes": "lib-secret", "encounterId": "enc-lib" }],
+              "markers": [{ "id": "m1", "kind": "trap", "x": 1, "y": 1, "notes": "piège" }]
+            }
+            """)!.AsObject();
+        var geometries = new Dictionary<Guid, System.Text.Json.Nodes.JsonObject> { [libId] = libJson };
+        var filtered = CampaignJsonHelpers.FilterForPlayerView(doc.RootElement, Guid.NewGuid(), geometries);
+        var map = filtered.GetProperty("dungeonMaps")[0];
+        Assert.Equal("map-live", map.GetProperty("id").GetString());
+        Assert.Equal(4, map.GetProperty("gridWidth").GetInt32());
+        Assert.True(map.GetProperty("fogOfWarEnabled").GetBoolean());
+        Assert.Equal("", map.GetProperty("rooms")[0].GetProperty("notes").GetString());
+        Assert.Equal(System.Text.Json.JsonValueKind.Null, map.GetProperty("rooms")[0].GetProperty("encounterId").ValueKind);
+        Assert.Equal("", map.GetProperty("markers")[0].GetProperty("notes").GetString());
+    }
+
+    [Fact]
+    public void CollectActiveLibraryDungeonIds_returns_id_when_no_tiles()
+    {
+        var libId = Guid.Parse("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+        const string raw = """
+            {
+              "activeSessionId": "ses-1",
+              "sessions": [{ "id": "ses-1", "activeMapId": "map-live" }],
+              "dungeonMaps": [
+                { "id": "map-live", "libraryDungeonId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "name": "X" }
+              ]
+            }
+            """;
+        using var doc = System.Text.Json.JsonDocument.Parse(raw);
+        var ids = CampaignJsonHelpers.CollectActiveLibraryDungeonIds(doc.RootElement);
+        Assert.Single(ids);
+        Assert.Equal(libId, ids[0]);
+    }
+
+    [Fact]
     public void FilterForPlayerView_keeps_active_session_map_with_fog_strips_spoilers()
     {
         const string raw = """
@@ -363,5 +425,66 @@ public class CampaignJsonHelpersTests
         Assert.True(info.Changed);
         Assert.Equal("Combat", info.Label);
         Assert.Equal("Combat terminé — Combat", info.Message);
+    }
+
+    [Fact]
+    public void MergeLiveCombatIntoIncoming_preserves_tableChat_when_client_omits()
+    {
+        const string stored = """
+            {
+              "sessions": [{
+                "id": "ses-1",
+                "tableChat": [
+                  { "id": "m1", "at": "2026-01-01T12:00:00Z", "authorUserId": "u1", "authorName": "A", "body": "salut" },
+                  { "id": "m2", "at": "2026-01-01T12:01:00Z", "authorUserId": "u2", "authorName": "B", "body": "ok" }
+                ],
+                "activeCombat": null
+              }]
+            }
+            """;
+        const string incoming = """
+            {
+              "sessions": [{
+                "id": "ses-1",
+                "activeCombat": null
+              }]
+            }
+            """;
+
+        var merged = CampaignJsonHelpers.MergeLiveCombatIntoIncoming(incoming, stored);
+        var chat = JsonNode.Parse(merged)!["sessions"]![0]!["tableChat"]!.AsArray();
+        Assert.Equal(2, chat.Count);
+        Assert.Equal("m2", chat[1]!["id"]!.GetValue<string>());
+    }
+
+    [Fact]
+    public void MergeLiveCombatIntoIncoming_keeps_longer_incoming_tableChat()
+    {
+        const string stored = """
+            {
+              "sessions": [{
+                "id": "ses-1",
+                "tableChat": [
+                  { "id": "m1", "body": "old" }
+                ]
+              }]
+            }
+            """;
+        const string incoming = """
+            {
+              "sessions": [{
+                "id": "ses-1",
+                "tableChat": [
+                  { "id": "m1", "body": "old" },
+                  { "id": "m2", "body": "new" }
+                ]
+              }]
+            }
+            """;
+
+        var merged = CampaignJsonHelpers.MergeLiveCombatIntoIncoming(incoming, stored);
+        var chat = JsonNode.Parse(merged)!["sessions"]![0]!["tableChat"]!.AsArray();
+        Assert.Equal(2, chat.Count);
+        Assert.Equal("m2", chat[1]!["id"]!.GetValue<string>());
     }
 }

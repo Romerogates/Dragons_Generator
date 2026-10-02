@@ -168,6 +168,12 @@
     </p>
   </div>
 
+  @if (saveQueuedNotice(); as notice) {
+    <p class="text-center text-sm text-emerald-400 px-4" data-testid="save-queued-notice" role="status">
+      {{ notice }}
+    </p>
+  }
+
   @if (saveError(); as err) {
     <p class="text-center text-sm text-red-400 px-4">{{ err }}</p>
   }

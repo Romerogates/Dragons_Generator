@@ -178,14 +178,14 @@ export class CampaignPlayPage implements OnInit, OnDestroy {
   }
 
   /**
-   * Poll de secours : 4 s si hub down ; 30 s si SignalR connecté.
+   * Poll de secours uniquement si hub déconnecté.
    * MJ : pas de poll (écrit déjà) mais reste abonné au hub pour jets d’init joueurs.
    */
   private startSoftPoll(c: CampaignDetailModel): void {
     this.stopSoftPoll();
     if (c.isOwner) return;
-    const ms = this.live.fallbackPollMs(4_000);
-    this.softPollTimer = setInterval(() => this.softReload(), ms);
+    if (this.live.connected()) return;
+    this.softPollTimer = setInterval(() => this.softReload(), 4_000);
   }
 
   private stopSoftPoll(): void {

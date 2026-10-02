@@ -19,6 +19,7 @@ import { Router, RouterLink } from '@angular/router';
 import { forkJoin, of, firstValueFrom, Subscription } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { CampaignCloudService } from '@core/services/campaign-cloud.service';
+import type { InitiativeBoard } from '@core/services/campaign-cloud.service';
 import { CampaignLiveService } from '@core/services/campaign-live.service';
 import { AuthService } from '@core/services/auth.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
@@ -86,7 +87,7 @@ import {
   rollDie,
   type RollChoice,
 } from '@core/utils/combat-roll.util';
-import { mergeRemoteLiveTable } from '@core/utils/campaign-persist.util';
+import { mergeRemoteLiveTable, stripTableChatForPersist } from '@core/utils/campaign-persist.util';
 import { softTablePulse } from '@core/utils/table-feedback.util';
 import {
   resolvePlayNextAction,
@@ -100,7 +101,6 @@ import {
 import { CampaignSessionTimeline } from '../campaign-session-timeline/campaign-session-timeline';
 import { CampaignSessionNotes } from '../campaign-session-notes/campaign-session-notes';
 import { CampaignDungeonMaps } from '../campaign-dungeon-maps/campaign-dungeon-maps';
-import { DiceRollComponent } from '@shared/components/dice-roll/dice-roll';
 import { FullscreenEnterLink } from '@shared/components/fullscreen-enter-btn/fullscreen-enter-link';
 import type { NotebookPage, SessionPlayPad } from '@core/models/Campaign/campaign';
 import type { CampaignDungeonMap } from '@core/models/Campaign/dungeon-map';
@@ -115,6 +115,7 @@ import {
   clampTokenToFloor,
   combatantsToTokens,
   findCombatantAtTile,
+  isTileOccupied,
   pixelToTile,
 } from '@core/utils/dungeon-battle.util';
 import {
@@ -125,6 +126,10 @@ import {
   withRoomRevealed,
 } from '@core/utils/dungeon-fog.util';
 import { buildPlayerRecapTemplate } from '@core/utils/player-recap-template.util';
+import { CampaignPlaySessionStore } from '../campaign-play-session-store/campaign-play-session.store';
+import { PlayTableChat } from '../play-table-chat/play-table-chat';
+import { PlayBattleMap } from '../play-battle-map/play-battle-map';
+import { PlayCombatFlow } from '../play-combat-flow/play-combat-flow';
 
 export type PlaySessionView =
   | 'resume'
@@ -144,9 +149,12 @@ export type PlaySessionView =
     CampaignSessionTimeline,
     CampaignSessionNotes,
     CampaignDungeonMaps,
-    DiceRollComponent,
     FullscreenEnterLink,
+    PlayTableChat,
+    PlayBattleMap,
+    PlayCombatFlow,
   ],
+  providers: [CampaignPlaySessionStore],
   templateUrl: './campaign-play-panel.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -160,6 +168,15 @@ export class CampaignPlayPanel implements OnDestroy {
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
   private readonly handoff = inject(CharacterHandoffService);
+  private readonly playStore = inject(CampaignPlaySessionStore);
+  private readonly playTableChat = viewChild(PlayTableChat);
+  private readonly playBattleMap = viewChild(PlayBattleMap);
+  private storeSub: Subscription | null = null;
+
+  /** Self-ref for `app-play-combat-flow` host binding (template). */
+  asCombatHost(): CampaignPlayPanel {
+    return this;
+  }
 
   readonly campaign = input.required<CampaignDetailModel>();
   readonly fullscreen = input(false);
@@ -214,6 +231,8 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly sceneTimerSeconds = signal<number | null>(null);
   readonly sceneTimerPaused = signal(false);
   readonly sceneTimerLabel = signal('Scène');
+  /** Tick murale pour recalculer le timer depuis endsAtIso. */
+  private readonly sceneTimerTick = signal(0);
   private sceneTimerHandle: ReturnType<typeof setInterval> | null = null;
   /** Drag ordre des tours (pointeur). */
   private turnOrderDrag: { combatantId: string; fromIndex: number } | null = null;
@@ -390,7 +409,28 @@ export class CampaignPlayPanel implements OnDestroy {
     return this.sessionView() === 'combat' || !!this.activeCombat();
   });
 
-  readonly tableChatMessages = computed(() => this.activeSession()?.tableChat ?? []);
+  readonly tableChatMessages = computed(() =>
+    (this.activeSession()?.tableChat ?? []).slice(-40),
+  );
+
+  /** Board d’init embarqué (saisie joueur sur /play, sans quitter la table). */
+  readonly playerInitBoard = computed((): InitiativeBoard | null => {
+    const combat = this.activeCombat();
+    if (!combat?.collectingInitiative || !combat.initiativeCode) return null;
+    return {
+      open: true,
+      code: combat.initiativeCode,
+      label: combat.label ?? null,
+      combatants: combat.combatants.map((c) => ({
+        id: c.id,
+        name: c.name || 'Sans nom',
+        kind: c.kind,
+        initiativeBonus: c.initiativeBonus ?? 0,
+        hasRoll: !!c.playerSubmitted,
+        memberUserId: c.memberUserId ?? null,
+      })),
+    };
+  });
 
   readonly combatLogLines = computed(() =>
     [...(this.activeSession()?.combatLog ?? [])].slice().reverse().slice(0, 12),
@@ -566,6 +606,7 @@ export class CampaignPlayPanel implements OnDestroy {
   });
 
   readonly sceneTimerDisplay = computed(() => {
+    this.sceneTimerTick();
     const s = this.sceneTimerSeconds();
     if (s == null) return null;
     const m = Math.floor(s / 60);
@@ -577,6 +618,17 @@ export class CampaignPlayPanel implements OnDestroy {
     if (typeof window !== 'undefined') {
       window.addEventListener('pagehide', this.onPageHide);
     }
+    this.storeSub = this.playStore.campaignChanged$.subscribe((next) => {
+      this.campaignChange.emit(next);
+    });
+    effect(() => {
+      const fb = this.playStore.feedback();
+      untracked(() => this.feedback.set(fb));
+    });
+    effect(() => {
+      const c = this.campaign();
+      untracked(() => this.playStore.bindCampaign(c));
+    });
     effect(() => {
       const map = this.activeSessionMap();
       const canvasRef = this.liveDungeonCanvas();
@@ -613,6 +665,11 @@ export class CampaignPlayPanel implements OnDestroy {
         if (collecting) this.startInitiativePoll();
         else this.stopInitiativePoll();
       });
+    });
+    effect(() => {
+      const timer = this.activeSession()?.sceneTimer ?? null;
+      this.sceneTimerTick();
+      untracked(() => this.hydrateSceneTimer(timer));
     });
   }
 
@@ -702,17 +759,20 @@ export class CampaignPlayPanel implements OnDestroy {
 
   protected encounterTotalXp = encounterTotalXp;
   protected encounterPendingXp = encounterPendingXp;
-  protected combatantInitiativeTotal = combatantInitiativeTotal;
-  protected combatantKindLabels = COMBATANT_KIND_LABELS;
-  protected roleLabels = CREATURE_ROLE_LABELS;
-  protected isCombatantDefeated = isCombatantDefeated;
-  protected sessionModeLabel = sessionModeLabel;
+  /** Public: template play-combat-flow via host. */
+  readonly combatantInitiativeTotal = combatantInitiativeTotal;
+  readonly combatantKindLabels = COMBATANT_KIND_LABELS;
+  readonly roleLabels = CREATURE_ROLE_LABELS;
+  readonly isCombatantDefeated = isCombatantDefeated;
+  readonly sessionModeLabel = sessionModeLabel;
   protected sessionModeHint = sessionModeHint;
 
   ngOnDestroy(): void {
     if (typeof window !== 'undefined') {
       window.removeEventListener('pagehide', this.onPageHide);
     }
+    this.storeSub?.unsubscribe();
+    this.playStore.destroy();
     this.flushPendingSessionWork();
     this.stopInitiativePoll();
     this.teardownMapResize();
@@ -827,6 +887,8 @@ export class CampaignPlayPanel implements OnDestroy {
     text: string,
     ttlMsOrOpts: number | { ttlMs?: number; undo?: () => void } = 4500,
   ): void {
+    this.playStore.setFeedback(kind, text, ttlMsOrOpts);
+    // Miroir local pour le toast du shell (data-testid / undo).
     const opts =
       typeof ttlMsOrOpts === 'number' ? { ttlMs: ttlMsOrOpts } : (ttlMsOrOpts ?? {});
     const ttlMs = opts.ttlMs ?? (opts.undo ? 10_000 : 4500);
@@ -871,7 +933,7 @@ export class CampaignPlayPanel implements OnDestroy {
     }
     if (key === 'd') {
       const r = rollDie(20);
-      this.shareDiceRoll(20, r, 'table');
+      this.playTableChat()?.shareTableD20(r) ?? this.shareDiceRoll(20, r, 'table');
       this.setFeedback('ok', `d20 → ${r}`);
       softTablePulse('dice');
       return true;
@@ -881,7 +943,7 @@ export class CampaignPlayPanel implements OnDestroy {
         this.setFeedback('err', 'Aucune carte de session pour le fog.');
         return true;
       }
-      this.toggleSessionFog();
+      this.playBattleMap()?.toggleSessionFog() ?? this.toggleSessionFog();
       return true;
     }
     return false;
@@ -1152,7 +1214,7 @@ export class CampaignPlayPanel implements OnDestroy {
     if (!map || !canvas) return;
     const hostW = canvas.parentElement?.clientWidth ?? 0;
     const width = Math.max(280, hostW || 360);
-    const cell = Math.max(6, Math.min(20, Math.floor(width / Math.max(1, map.gridWidth))));
+    const cell = Math.max(6, Math.min(20, Math.floor(width / Math.max(1, map.gridWidth ?? 48))));
     this.liveMapCellSize = cell;
     drawDungeonToCanvas(map, canvas, cell, {
       showRoomNumbers: true,
@@ -1176,8 +1238,15 @@ export class CampaignPlayPanel implements OnDestroy {
     if (!file) return;
     this.tokenImageError.set(null);
     try {
-      const { fileToSquareJpegDataUrl } = await import('@core/utils/image-data-url.util');
-      const dataUrl = await fileToSquareJpegDataUrl(file, 192);
+      const { fileToSquareJpegDataUrl, sanitizeTokenImageUrl } = await import(
+        '@core/utils/image-data-url.util'
+      );
+      const raw = await fileToSquareJpegDataUrl(file, 192);
+      const dataUrl = await sanitizeTokenImageUrl(raw, 192);
+      if (!dataUrl) {
+        this.tokenImageError.set('Image trop lourde — essayez un PNG/JPEG plus léger.');
+        return;
+      }
       this.updateCombatant(combatantId, { tokenImageUrl: dataUrl }, { immediate: true });
     } catch {
       this.tokenImageError.set('Image illisible — essayez un PNG/JPEG plus léger.');
@@ -1219,7 +1288,10 @@ export class CampaignPlayPanel implements OnDestroy {
     const clamped = clampTokenToFloor(map, tile.x, tile.y);
     if (!clamped) return;
     this.tokenDrag = { ...this.tokenDrag, moved: true };
-    this.placeCombatantOnMap(this.tokenDrag.combatantId, clamped.x, clamped.y, { immediate: false });
+    this.placeCombatantOnMap(this.tokenDrag.combatantId, clamped.x, clamped.y, {
+      immediate: false,
+      silentOccupancy: true,
+    });
   }
 
   onBattleMapPointerUp(event: PointerEvent): void {
@@ -1252,10 +1324,16 @@ export class CampaignPlayPanel implements OnDestroy {
     combatantId: string,
     x: number,
     y: number,
-    options?: { immediate?: boolean },
+    options?: { immediate?: boolean; silentOccupancy?: boolean },
   ): void {
     const combat = this.activeCombat();
     if (!combat || !this.isDm()) return;
+    if (isTileOccupied(combat.combatants, x, y, combatantId)) {
+      if (!options?.silentOccupancy) {
+        this.setFeedback('err', 'Case déjà occupée.');
+      }
+      return;
+    }
     const combatants = combat.combatants.map((c) =>
       c.id === combatantId ? { ...c, mapX: x, mapY: y } : c,
     );
@@ -1278,6 +1356,7 @@ export class CampaignPlayPanel implements OnDestroy {
     const prev = {
       fogOfWarEnabled: map.fogOfWarEnabled,
       revealedRoomIds: [...(map.revealedRoomIds ?? [])],
+      revealedCorridorCells: [...(map.revealedCorridorCells ?? [])],
     };
     this.patchSessionDungeonMap(withFogToggled(map));
     const on = !prev.fogOfWarEnabled;
@@ -1314,10 +1393,13 @@ export class CampaignPlayPanel implements OnDestroy {
 
   hideAllSessionRooms(): void {
     const map = this.activeSessionMap();
-    const prevIds = [...(map?.revealedRoomIds ?? [])];
+    const prev = {
+      revealedRoomIds: [...(map?.revealedRoomIds ?? [])],
+      revealedCorridorCells: [...(map?.revealedCorridorCells ?? [])],
+    };
     this.patchSessionDungeonMap(withNoRoomsRevealed());
     this.setFeedback('ok', 'Fog tout masqué.', {
-      undo: () => this.patchSessionDungeonMap({ revealedRoomIds: prevIds }),
+      undo: () => this.patchSessionDungeonMap(prev),
     });
   }
 
@@ -1462,9 +1544,32 @@ export class CampaignPlayPanel implements OnDestroy {
       return;
     }
     this.withReplaceCombatConfirm(() => {
-      const combatants = expandEncounterToCombatants(encounter);
-      this.setActiveCombat(
-        createActiveCombat(combatants, { label: encounter.name, encounterId: encounter.id }),
+      let combatants = expandEncounterToCombatants(encounter);
+      const sessionPatch: Partial<CampaignSession> = {};
+      if (encounter.dungeonMapId) {
+        sessionPatch.activeMapId = encounter.dungeonMapId;
+        const map = (this.campaign().data.dungeonMaps ?? []).find(
+          (m) => m.id === encounter.dungeonMapId,
+        );
+        const room = map?.rooms?.find((r) => r.encounterId === encounter.id);
+        if (map && room) {
+          combatants = combatants.map((c, i) => {
+            const clamped =
+              clampTokenToFloor(map, room.x + i, room.y) ??
+              clampTokenToFloor(map, room.x, room.y);
+            return clamped ? { ...c, mapX: clamped.x, mapY: clamped.y } : c;
+          });
+        }
+      }
+      this.patchSession(
+        {
+          ...sessionPatch,
+          activeCombat: createActiveCombat(combatants, {
+            label: encounter.name,
+            encounterId: encounter.id,
+          }),
+        },
+        { immediate: true },
       );
       this.sessionView.set('combat');
       this.resetFightStep();
@@ -2778,7 +2883,9 @@ export class CampaignPlayPanel implements OnDestroy {
 
   private patchCampaign(data: CampaignData): void {
     const c = this.campaign();
-    this.campaignChange.emit({ ...c, data });
+    const next = { ...c, data };
+    this.playStore.bindCampaign(next);
+    this.campaignChange.emit(next);
   }
 
   private saveData(patch: Partial<CampaignData>, onSuccess?: () => void): void {
@@ -2793,12 +2900,13 @@ export class CampaignPlayPanel implements OnDestroy {
     const campaignId = c.id;
     const seq = ++this.persistSeq;
     this.saving.set(true);
+    const payload = stripTableChatForPersist(data);
 
     this.persistTail = this.persistTail
       .catch(() => undefined)
       .then(async () => {
         try {
-          const summary = await firstValueFrom(this.campaigns.update(campaignId, title, data));
+          const summary = await firstValueFrom(this.campaigns.update(campaignId, title, payload));
           // Ne pas réappliquer un persist périmé (une sauvegarde plus récente est déjà en cours / faite).
           if (seq !== this.persistSeq) return;
           // Ne jamais réécrire `data` depuis le payload en vol : le MJ local est source de vérité
@@ -2948,6 +3056,17 @@ export class CampaignPlayPanel implements OnDestroy {
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
+  /** Mobile : une seule surface d’init — scroll vers le bloc embarqué (pas /init). */
+  scrollToEmbeddedInitiative(): void {
+    if (typeof document === 'undefined') return;
+    if (this.isDm()) this.sessionView.set('combat');
+    const el = document.getElementById('play-embedded-initiative');
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (el instanceof HTMLElement) {
+      el.focus({ preventScroll: true });
+    }
+  }
+
   pinTableMessage(body: string): void {
     if (!this.isDm()) return;
     const text = body.trim().slice(0, 280);
@@ -2963,34 +3082,88 @@ export class CampaignPlayPanel implements OnDestroy {
 
   startSceneTimer(minutes: number, label = 'Scène'): void {
     if (!this.isDm()) return;
-    this.clearSceneTimerTick();
-    this.sceneTimerLabel.set(label);
-    this.sceneTimerPaused.set(false);
-    this.sceneTimerSeconds.set(Math.max(1, Math.round(minutes * 60)));
-    this.sceneTimerHandle = setInterval(() => {
-      if (this.sceneTimerPaused()) return;
-      const cur = this.sceneTimerSeconds();
-      if (cur == null) return;
-      if (cur <= 1) {
-        this.sceneTimerSeconds.set(0);
-        this.clearSceneTimerTick();
-        this.setFeedback('ok', `Timer « ${this.sceneTimerLabel()} » terminé.`);
-        softTablePulse('turn');
-        return;
-      }
-      this.sceneTimerSeconds.set(cur - 1);
-    }, 1000);
+    const sec = Math.max(1, Math.round(minutes * 60));
+    const endsAtIso = new Date(Date.now() + sec * 1000).toISOString();
+    this.patchSession(
+      { sceneTimer: { label, endsAtIso, pausedRemainingSec: null } },
+      { immediate: true },
+    );
+    this.ensureSceneTimerTick();
   }
 
   toggleSceneTimerPause(): void {
-    if (this.sceneTimerSeconds() == null) return;
-    this.sceneTimerPaused.update((p) => !p);
+    if (!this.isDm()) return;
+    const t = this.activeSession()?.sceneTimer;
+    if (!t) return;
+    if (t.pausedRemainingSec != null && t.pausedRemainingSec >= 0) {
+      const endsAtIso = new Date(Date.now() + t.pausedRemainingSec * 1000).toISOString();
+      this.patchSession(
+        { sceneTimer: { label: t.label, endsAtIso, pausedRemainingSec: null } },
+        { immediate: true },
+      );
+    } else {
+      const rem = Math.max(0, Math.ceil((Date.parse(t.endsAtIso) - Date.now()) / 1000));
+      this.patchSession(
+        {
+          sceneTimer: {
+            label: t.label,
+            endsAtIso: t.endsAtIso,
+            pausedRemainingSec: rem,
+          },
+        },
+        { immediate: true },
+      );
+    }
   }
 
   stopSceneTimer(): void {
+    if (!this.isDm()) return;
     this.clearSceneTimerTick();
+    this.patchSession({ sceneTimer: null }, { immediate: true });
     this.sceneTimerSeconds.set(null);
     this.sceneTimerPaused.set(false);
+  }
+
+  private hydrateSceneTimer(
+    timer: CampaignSession['sceneTimer'] | null | undefined,
+  ): void {
+    if (!timer?.endsAtIso && timer?.pausedRemainingSec == null) {
+      this.clearSceneTimerTick();
+      this.sceneTimerSeconds.set(null);
+      this.sceneTimerPaused.set(false);
+      return;
+    }
+    this.sceneTimerLabel.set(timer.label || 'Scène');
+    if (timer.pausedRemainingSec != null) {
+      this.sceneTimerPaused.set(true);
+      this.sceneTimerSeconds.set(Math.max(0, timer.pausedRemainingSec));
+      this.clearSceneTimerTick();
+      return;
+    }
+    this.sceneTimerPaused.set(false);
+    const rem = Math.max(0, Math.ceil((Date.parse(timer.endsAtIso) - Date.now()) / 1000));
+    this.sceneTimerSeconds.set(rem);
+    if (rem <= 0) {
+      this.clearSceneTimerTick();
+      return;
+    }
+    this.ensureSceneTimerTick();
+  }
+
+  private ensureSceneTimerTick(): void {
+    if (this.sceneTimerHandle) return;
+    this.sceneTimerHandle = setInterval(() => {
+      this.sceneTimerTick.update((n) => n + 1);
+      const t = this.activeSession()?.sceneTimer;
+      if (!t || t.pausedRemainingSec != null) return;
+      const rem = Math.max(0, Math.ceil((Date.parse(t.endsAtIso) - Date.now()) / 1000));
+      this.sceneTimerSeconds.set(rem);
+      if (rem <= 0) {
+        this.clearSceneTimerTick();
+        this.setFeedback('ok', `Timer « ${t.label || 'Scène'} » terminé.`);
+        softTablePulse('turn');
+      }
+    }, 1000);
   }
 
   private clearSceneTimerTick(): void {

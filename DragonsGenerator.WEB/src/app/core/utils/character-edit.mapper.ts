@@ -191,6 +191,8 @@ export function mapCharacterToEditState(
   creation.name = saved.name;
   creation.sex = saved.personality.sex ?? 'X';
   creation.description = saved.personality.description;
+  creation.portraitImageUrl = saved.portraitImageUrl ?? null;
+  creation.tokenImageUrl = saved.tokenImageUrl ?? null;
   creation.background = saved.personality.background;
   creation.alignment = saved.personality.alignment;
   creation.traits = saved.personality.traits;

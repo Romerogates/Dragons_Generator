@@ -1,34 +1,41 @@
 import { test, expect } from '@playwright/test';
 
+/** Paths Codex navbar (hors hub /codex) — alignés sur CODEX_NAV_LINKS. */
+const CODEX_CATALOGS: { path: string; heading: RegExp; rowHref: string }[] = [
+  { path: '/species', heading: /Registre des/i, rowHref: '/species/' },
+  { path: '/classes', heading: /Classes de/i, rowHref: '/classes/' },
+  { path: '/civilisations', heading: /Atlas/i, rowHref: '/civilisations/' },
+  { path: '/equipments', heading: /Arsenal/i, rowHref: '/equipments/' },
+  { path: '/spells', heading: /Grimoire/i, rowHref: '/spells/' },
+  { path: '/creatures', heading: /Bestiaire/i, rowHref: '/creatures/' },
+  { path: '/skills', heading: /Compétences/i, rowHref: '/skills/' },
+  { path: '/feats', heading: /Dons/i, rowHref: '/feats/' },
+  { path: '/backgrounds', heading: /Historiques/i, rowHref: '/backgrounds/' },
+  { path: '/combat-actions', heading: /Actions de combat/i, rowHref: '/combat-actions/' },
+  { path: '/deities', heading: /Divinités/i, rowHref: '/deities/' },
+];
+
 test.describe('Catalogues (smoke)', () => {
-  test('species list loads readable entries', async ({ page }) => {
+  for (const catalog of CODEX_CATALOGS) {
+    test(`${catalog.path} → heading + ≥1 row`, async ({ page }) => {
+      await page.goto(catalog.path);
+      await expect(page.getByRole('heading', { name: catalog.heading }).first()).toBeVisible({
+        timeout: 45_000,
+      });
+      await expect(page.locator(`a[href^="${catalog.rowHref}"]`).first()).toBeVisible({
+        timeout: 30_000,
+      });
+    });
+  }
+
+  test('species list has search', async ({ page }) => {
     await page.goto('/species');
-    await expect(page.getByText(/Registre des/i)).toBeVisible({ timeout: 30_000 });
-    await expect(page.getByText(/espèces recensées/i)).toBeVisible({ timeout: 30_000 });
-    await expect(page.locator('a[href^="/species/"]').first()).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByPlaceholder(/Rechercher une espèce/i)).toBeVisible({ timeout: 30_000 });
   });
 
-  test('classes list loads', async ({ page }) => {
-    await page.goto('/classes');
-    await expect(page.getByRole('heading', { name: /Classes de/i })).toBeVisible({
-      timeout: 45_000,
-    });
-    await expect(page.getByPlaceholder(/Rechercher une classe/i)).toBeVisible();
-  });
-
-  test('backgrounds list loads', async ({ page }) => {
-    await page.goto('/backgrounds');
-    await expect(page.getByRole('heading', { name: /Historiques/i })).toBeVisible({
-      timeout: 45_000,
-    });
-    await expect(page.locator('a[href^="/backgrounds/"]').first()).toBeVisible({
-      timeout: 30_000,
-    });
-  });
-
-  test('combat actions list loads', async ({ page }) => {
-    await page.goto('/combat-actions');
-    await expect(page.getByRole('heading', { name: /Actions de combat/i })).toBeVisible({
+  test('spells list has class filter', async ({ page }) => {
+    await page.goto('/spells');
+    await expect(page.getByRole('combobox').or(page.locator('select')).first()).toBeVisible({
       timeout: 45_000,
     });
   });

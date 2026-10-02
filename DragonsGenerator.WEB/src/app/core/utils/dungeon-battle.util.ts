@@ -30,7 +30,7 @@ export function pixelToTile(
 }
 
 export function isWalkableTile(map: CampaignDungeonMap, x: number, y: number): boolean {
-  if (x < 0 || y < 0 || x >= map.gridWidth || y >= map.gridHeight) return false;
+  if (x < 0 || y < 0 || x >= (map.gridWidth ?? 0) || y >= (map.gridHeight ?? 0)) return false;
   const kind: DungeonTileKind = tileAt(map, x, y);
   return kind === 'floor' || kind === 'door';
 }
@@ -80,5 +80,22 @@ export function findCombatantAtTile(
     combatants.find(
       (c) => !c.defeated && combatantHasMapPosition(c) && c.mapX === x && c.mapY === y,
     ) ?? null
+  );
+}
+
+/** True if another non-defeated combatant already occupies the tile. */
+export function isTileOccupied(
+  combatants: Combatant[],
+  x: number,
+  y: number,
+  exceptId?: string | null,
+): boolean {
+  return combatants.some(
+    (c) =>
+      !c.defeated &&
+      combatantHasMapPosition(c) &&
+      c.mapX === x &&
+      c.mapY === y &&
+      c.id !== exceptId,
   );
 }

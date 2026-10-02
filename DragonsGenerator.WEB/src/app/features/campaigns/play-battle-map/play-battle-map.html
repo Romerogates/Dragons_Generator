@@ -1,0 +1,181 @@
+      @if (showBattleMap()) {
+        @if (activeSessionMap(); as liveMap) {
+          <details open class="rounded-xl border border-sky-900/40 bg-sky-950/20 p-3 group">
+            <summary
+              class="min-h-11 flex flex-wrap items-center justify-between gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden"
+            >
+              <p class="text-[10px] font-black uppercase tracking-widest text-sky-400">
+                Carte · {{ liveMap.name }}
+              </p>
+              <span class="text-[10px] text-slate-500 group-open:hidden">Afficher</span>
+              <span class="text-[10px] text-slate-500 hidden group-open:inline">Masquer</span>
+            </summary>
+            <div class="mt-2 space-y-3">
+              @if (isDm() && activeCombat()) {
+                <p class="text-[10px] text-slate-400">
+                  Sélectionnez un combattant puis cliquez une case · glissez un jeton pour le déplacer
+                </p>
+                <div class="flex flex-wrap gap-1.5">
+                  @for (cb of combatTurnOrder(); track cb.id) {
+                    @if (!isCombatantDefeated(cb)) {
+                      <button
+                        type="button"
+                        class="min-h-9 px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-colors"
+                        [class.border-sky-400]="selectedTokenCombatantId() === cb.id"
+                        [class.bg-sky-950/50]="selectedTokenCombatantId() === cb.id"
+                        [class.text-sky-200]="selectedTokenCombatantId() === cb.id"
+                        [class.border-slate-700]="selectedTokenCombatantId() !== cb.id"
+                        [class.text-slate-300]="selectedTokenCombatantId() !== cb.id"
+                        (click)="selectTokenForPlacement(cb.id)"
+                      >
+                        {{ cb.name || 'Sans nom' }}
+                        @if (cb.mapX !== null && cb.mapY !== null) {
+                          <span class="text-slate-500">· {{ cb.mapX }},{{ cb.mapY }}</span>
+                        }
+                      </button>
+                    }
+                  }
+                </div>
+                @if (selectedTokenCombatant(); as selTok) {
+                  <div class="space-y-2 rounded-lg border border-slate-800 bg-[#0a0d13]/50 p-2.5">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                      Portrait jeton
+                    </p>
+                    <div class="flex flex-wrap gap-2 items-center">
+                      <label
+                        class="min-h-9 px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase border border-sky-800/50 text-sky-300 cursor-pointer hover:border-sky-500/60"
+                      >
+                        Choisir une image
+                        <input
+                          type="file"
+                          accept="image/*"
+                          class="sr-only"
+                          data-testid="token-image-file"
+                          (change)="onTokenImageFile($event, selTok.id)"
+                        />
+                      </label>
+                      @if (selTok.tokenImageUrl) {
+                        <button
+                          type="button"
+                          class="min-h-9 px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase border border-slate-700 text-slate-400"
+                          (click)="updateTokenImageUrl(selTok.id, null)"
+                        >
+                          Retirer
+                        </button>
+                        <img
+                          [src]="selTok.tokenImageUrl"
+                          alt=""
+                          class="w-10 h-10 rounded-full object-cover border border-slate-600"
+                        />
+                      }
+                    </div>
+                    <label class="block text-[10px] text-slate-500 space-y-1">
+                      <span>Ou coller une URL</span>
+                      <input
+                        type="url"
+                        class="w-full bg-[#0a0d13] border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200"
+                        placeholder="https://… ou data:image/…"
+                        [ngModel]="selTok.tokenImageUrl || ''"
+                        (ngModelChange)="updateTokenImageUrl(selTok.id, $event || null)"
+                        data-testid="token-image-url"
+                      />
+                    </label>
+                    @if (tokenImageError()) {
+                      <p class="text-[10px] text-red-400">{{ tokenImageError() }}</p>
+                    }
+                  </div>
+                }
+              }
+              @if (liveMap.fogOfWarEnabled && !isDm()) {
+                <p class="text-[10px] text-slate-500">Brouillard de guerre — révélations en direct</p>
+              }
+              @if (!isDm() && playerVisibleTokens().length) {
+                <div class="flex flex-wrap gap-1.5" data-testid="player-token-legend">
+                  @for (tok of playerVisibleTokens(); track tok.id) {
+                    <span
+                      class="min-h-8 px-2 py-0.5 rounded-lg text-[10px] font-bold border border-slate-700 text-slate-300 bg-[#0a0d13]/60"
+                    >
+                      {{ tok.name }}
+                      <span class="text-slate-500">· {{ tok.x }},{{ tok.y }}</span>
+                    </span>
+                  }
+                </div>
+              }
+              <div
+                class="overflow-auto max-h-[min(48vh,28rem)] touch-pan-x touch-pan-y overscroll-contain rounded-lg border border-slate-800 bg-[#0a0d13]"
+              >
+                <canvas
+                  #liveDungeonCanvas
+                  class="block max-w-none"
+                  [class.cursor-crosshair]="isDm() && !!activeCombat()"
+                  aria-label="Carte de session"
+                  (pointerdown)="onBattleMapPointerDown($event)"
+                  (pointermove)="onBattleMapPointerMove($event)"
+                  (pointerup)="onBattleMapPointerUp($event)"
+                  (pointercancel)="onBattleMapPointerUp($event)"
+                ></canvas>
+              </div>
+              @if (isDm()) {
+                <div class="space-y-2 rounded-lg border border-violet-900/40 bg-violet-950/20 p-2.5">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-violet-300">FoW</p>
+                    <button
+                      type="button"
+                      class="min-h-9 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border"
+                      [class.border-violet-500]="liveMap.fogOfWarEnabled"
+                      [class.text-violet-200]="liveMap.fogOfWarEnabled"
+                      [class.border-slate-700]="!liveMap.fogOfWarEnabled"
+                      [class.text-slate-400]="!liveMap.fogOfWarEnabled"
+                      (click)="toggleSessionFog()"
+                    >
+                      {{ liveMap.fogOfWarEnabled ? 'Activé' : 'Désactivé' }}
+                    </button>
+                    @if (liveMap.fogOfWarEnabled) {
+                      <button
+                        type="button"
+                        class="min-h-9 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300"
+                        (click)="revealAllSessionRooms()"
+                      >
+                        Tout
+                      </button>
+                      <button
+                        type="button"
+                        class="min-h-9 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border border-slate-700 text-slate-300"
+                        (click)="hideAllSessionRooms()"
+                      >
+                        Rien
+                      </button>
+                      <p class="w-full text-[9px] text-slate-500">
+                        Cliquez un couloir / porte hors salle pour révéler case par case.
+                      </p>
+                    }
+                  </div>
+                  @if (liveMap.fogOfWarEnabled && (liveMap.rooms ?? []).length) {
+                    <div class="flex flex-wrap gap-1.5">
+                      @for (room of (liveMap.rooms ?? []); track room.id) {
+                        <button
+                          type="button"
+                          class="min-h-9 px-2 py-1 rounded-lg text-[10px] font-bold border"
+                          [class.border-emerald-600]="isSessionRoomRevealed(room.id)"
+                          [class.bg-emerald-950/40]="isSessionRoomRevealed(room.id)"
+                          [class.text-emerald-200]="isSessionRoomRevealed(room.id)"
+                          [class.border-slate-700]="!isSessionRoomRevealed(room.id)"
+                          [class.text-slate-400]="!isSessionRoomRevealed(room.id)"
+                          (click)="toggleSessionRoomReveal(room.id)"
+                        >
+                          {{ room.label }}
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </details>
+        } @else if (!isDm()) {
+          <div class="rounded-xl border border-dashed border-slate-700 bg-[#1b2028]/50 p-4 text-center space-y-1">
+            <p class="text-sm text-slate-300">Pas de carte pour cette session</p>
+            <p class="text-xs text-slate-500">Le MJ peut en attribuer une dans Préparation → Donjons.</p>
+          </div>
+        }
+      }

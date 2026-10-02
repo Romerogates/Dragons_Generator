@@ -40,6 +40,7 @@ import { DataService } from './data.service';
 import { CharacterHandoffService } from './character-handoff.service';
 import {
   Character,
+  CharacterCreation,
   AbilityKey,
   AbilityScores,
   AsiChoiceSlot,
@@ -155,15 +156,17 @@ export class CharacterBuilderService {
   );
 
   /**
-   * Somme des niveaux de toutes les classes de multiclassage (0 si aucun multiclassage). Le
-   * niveau de la classe PRIMAIRE reste `targetLevel` (comportement inchangé pour un personnage
-   * mono-classe) ; chaque classe secondaire a son propre compteur de niveau indépendant.
+   * Budget multiclasse (additif) :
+   * - `targetLevel` = niveau de la classe PRIMAIRE (étape 1)
+   * - secondaires = niveaux ajoutés en plus
+   * - total personnage = primaire + secondaires (≤ 20)
+   * Mono-classe : total === targetLevel (inchangé).
    */
   readonly secondaryClassesTotalLevel = computed<number>(() =>
     (this.creation().secondaryClasses ?? []).reduce((sum, sc) => sum + (sc.level || 0), 0),
   );
 
-  /** Niveau TOTAL du personnage (primaire + multiclassage), utilisé pour le bonus de maîtrise et l'affichage. */
+  /** Niveau TOTAL du personnage (primaire + multiclassage), pour bonus de maîtrise et affichage. */
   readonly totalCharacterLevel = computed<number>(() =>
     Math.min(20, (this.creation().targetLevel || 1) + this.secondaryClassesTotalLevel()),
   );
@@ -867,6 +870,11 @@ export class CharacterBuilderService {
 
   setIdentity(identity: IdentitySelection): void {
     this.creation.update((c) => ({ ...c, ...identity }));
+  }
+
+  /** Remplace l’état de création (auto-complète / undo). */
+  replaceCreation(snapshot: CharacterCreation): void {
+    this.creation.set(structuredClone(snapshot) as ExtendedCharacterCreation);
   }
 
   setSpellcastingDetails(details: Record<string, unknown>): void {

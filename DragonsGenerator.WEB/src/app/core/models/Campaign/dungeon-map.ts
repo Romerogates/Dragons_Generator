@@ -39,6 +39,8 @@ export interface DungeonMarker {
 
 export interface CampaignDungeonMap {
   id: string;
+  /** Lien live vers Mes Donjons — géométrie lue depuis la bibliothèque. */
+  libraryDungeonId?: string | null;
   name: string;
   theme: DungeonTheme;
   regionId?: string | null;
@@ -52,6 +54,8 @@ export interface CampaignDungeonMap {
   /** Révélation progressive des salles pour les joueurs (handout / fog). */
   fogOfWarEnabled?: boolean;
   revealedRoomIds?: string[];
+  /** Couloirs / portes hors salle révélés case par case (`"x,y"`). */
+  revealedCorridorCells?: string[];
   createdAt: string;
   updatedAt: string;
 }

@@ -194,6 +194,12 @@ export interface CampaignSession {
   playerRecap?: string;
   /** UserIds des joueurs « prêts » avant combat (table live). */
   tableReadyUserIds?: string[];
+  /** Timer de scène partagé (horloge murale) — sync via blob session. */
+  sceneTimer?: {
+    label: string;
+    endsAtIso: string;
+    pausedRemainingSec?: number | null;
+  } | null;
 }
 
 /** Réponse d’un joueur à une date de table. */

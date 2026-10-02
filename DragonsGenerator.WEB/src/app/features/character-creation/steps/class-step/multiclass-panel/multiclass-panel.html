@@ -1,10 +1,22 @@
 @if (builder.creation().classId) {
   <div class="w-full max-w-3xl mx-auto mt-6 mb-2 p-4 bg-[#1b2028] border border-slate-700 rounded-xl text-left">
     <h3 class="text-amber-500 font-bold text-sm uppercase tracking-wide mb-1">⚔️ Multiclassage (optionnel)</h3>
-    <p class="text-slate-400 text-[11px] italic mb-3">
-      Ajoutez une classe supplémentaire. Chaque classe secondaire a son propre niveau et
-      n'accorde que des maîtrises réduites (jamais les maîtrises de départ complètes).
-      Les prérequis de caractéristiques sont vérifiés à l'étape Caractéristiques.
+    <p class="text-slate-400 text-[11px] italic mb-2">
+      Le niveau choisi à l’étape 1 est celui de la classe <strong class="text-slate-300 not-italic">primaire</strong>.
+      Chaque classe secondaire <strong class="text-slate-300 not-italic">ajoute</strong> des niveaux
+      (total max. 20). Maîtrises réduites uniquement — prérequis vérifiés à Caractéristiques.
+    </p>
+    <p
+      class="text-[11px] text-amber-200/90 mb-3 px-2.5 py-1.5 rounded-lg bg-amber-950/30 border border-amber-800/40"
+      data-testid="multiclass-level-budget"
+    >
+      Budget :
+      primaire {{ primaryLevel() }}
+      + secondaires {{ secondaryLevels() }}
+      = total {{ totalCharacterLevel() }} / 20
+      @if (remainingLevels() > 0) {
+        <span class="text-slate-400"> · {{ remainingLevels() }} restant(s)</span>
+      }
     </p>
 
     @for (row of secondaryRows(); track row.entry.classId) {

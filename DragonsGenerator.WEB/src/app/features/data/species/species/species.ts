@@ -1,12 +1,13 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   OnInit,
   signal,
   CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
-import { CommonModule } from '@angular/common'; // Ajout par sécurité
+import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DataService } from '@core/services/data.service';
 import { Species } from '@core/models/Species/species';
@@ -15,11 +16,11 @@ import { CodexEmptyState } from '@shared/components/codex-empty-state/codex-empt
 
 @Component({
   selector: 'app-species',
-  standalone: true, // Si tu es en standalone components (fortement probable avec Angular 17+)
+  standalone: true,
   imports: [CommonModule, RouterLink, CodexEmptyState],
   templateUrl: './species.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // <-- Autorise la balise <iconify-icon>
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class SpeciesList implements OnInit {
   private dataService = inject(DataService);
@@ -27,6 +28,19 @@ export class SpeciesList implements OnInit {
   species = signal<Species[]>([]);
   isLoading = signal<boolean>(true);
   error = signal<string | null>(null);
+  readonly search = signal('');
+
+  readonly filtered = computed(() => {
+    const term = this.search().trim().toLowerCase();
+    const list = this.species();
+    if (!term) return list;
+    return list.filter(
+      (sp) =>
+        sp.name.toLowerCase().includes(term) ||
+        (sp.nameAlt ?? []).some((a) => a.toLowerCase().includes(term)) ||
+        (sp.flavor?.summary ?? '').toLowerCase().includes(term),
+    );
+  });
 
   ngOnInit(): void {
     this.loadSpecies();
@@ -47,6 +61,10 @@ export class SpeciesList implements OnInit {
         this.isLoading.set(false);
       },
     });
+  }
+
+  onSearch(value: string): void {
+    this.search.set(value);
   }
 
   /** Formate les bonus de caractéristiques en chaîne lisible : "Force +2, Charisme +1" */

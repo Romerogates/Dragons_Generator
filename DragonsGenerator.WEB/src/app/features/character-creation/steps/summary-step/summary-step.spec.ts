@@ -236,10 +236,20 @@ describe('SummaryStep', () => {
     cloudSaveSpy.and.returnValue(throwError(() => new Error('network')));
     component.saveCharacter();
     expect(queueSaveSpy).toHaveBeenCalled();
-    expect(component.saveError()).toContain('sauvegarde cloud a échoué');
-    expect(resetSpy).not.toHaveBeenCalled();
-    expect(router.navigate).not.toHaveBeenCalled();
+    expect(component.saveQueuedNotice()).toContain('mis en file');
+    expect(component.saveError()).toBeNull();
+    expect(resetSpy).toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalled();
     expect(component.saving()).toBeFalse();
+  });
+
+  it('queues offline with a success notice (not a raw error)', () => {
+    isOnlineSignal.set(false);
+    component.saveCharacter();
+    expect(queueSaveSpy).toHaveBeenCalled();
+    expect(component.saveQueuedNotice()).toContain('mis en file');
+    expect(component.saveError()).toBeNull();
+    expect(resetSpy).toHaveBeenCalled();
   });
 
   it('navigates to the sheet after a successful cloud save', () => {

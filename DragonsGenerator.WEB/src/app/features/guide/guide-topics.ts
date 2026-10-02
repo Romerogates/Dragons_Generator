@@ -19,7 +19,9 @@ import {
   GUIDE_START_STEPS,
   GUIDE_TABLE_PLAY_STEPS,
   GUIDE_TIPS,
+  isGuideBlogPostNew,
 } from './guide-content';
+import { CODEX_NAV_LINKS } from '@core/config/codex-nav';
 
 export interface GuideTopicLink {
   label: string;
@@ -159,12 +161,13 @@ function contentFor(id: string): Pick<
     case 'journal':
       return {
         paragraphs: [
-          'Journal des nouveautés produit — lisez les mises à jour, puis discutez en commentaires.',
+          'Journal des nouveautés produit — tous les posts, du plus récent au plus ancien. Le badge Nouveau expire après 14 jours ou dès que vous ouvrez cette page.',
           ...GUIDE_TIPS.slice(0, 2),
         ],
-        steps: GUIDE_BLOG_POSTS.filter((p) => p.isNew).map((p) => ({
+        steps: GUIDE_BLOG_POSTS.map((p) => ({
           title: p.title,
-          body: `${p.date} · ${p.summary}`,
+          body: `${p.date} · ${p.tag} · ${p.summary}`,
+          badge: isGuideBlogPostNew(p) ? ('Nouveau' as const) : undefined,
         })),
         links: [
           { label: 'Sommaire du guide', path: '/guide' },
@@ -341,17 +344,7 @@ function contentFor(id: string): Pick<
         steps: [],
         links: [
           { label: 'Hub Codex', path: '/codex' },
-          { label: 'Espèces', path: '/species' },
-          { label: 'Classes', path: '/classes' },
-          { label: 'Civilisations', path: '/civilisations' },
-          { label: 'Sorts', path: '/spells' },
-          { label: 'Bestiaire', path: '/creatures' },
-          { label: 'Équipements', path: '/equipments' },
-          { label: 'Compétences', path: '/skills' },
-          { label: 'Dons', path: '/feats' },
-          { label: 'Historiques', path: '/backgrounds' },
-          { label: 'Combat', path: '/combat-actions' },
-          { label: 'Divinités', path: '/deities' },
+          ...CODEX_NAV_LINKS.map((l) => ({ label: l.label, path: l.path })),
         ],
         flow: [],
       };
@@ -376,8 +369,10 @@ function contentFor(id: string): Pick<
       };
     case 'faq':
       return {
-        paragraphs: ['Questions fréquentes — ouvrez aussi le support si besoin.'],
-        steps: GUIDE_FAQ_ITEMS.slice(0, 10).map((f) => ({
+        paragraphs: [
+          'Questions fréquentes — ouvrez une entrée pour la réponse complète. Support si besoin.',
+        ],
+        steps: GUIDE_FAQ_ITEMS.map((f) => ({
           title: f.question,
           body: f.answer,
           badge: f.audience === 'dm' ? 'MJ' : f.audience === 'player' ? 'Joueur' : 'Tous',
@@ -390,8 +385,11 @@ function contentFor(id: string): Pick<
       };
     case 'glossaire':
       return {
-        paragraphs: GUIDE_GLOSSARY.slice(0, 14).map((g) => `${g.term} — ${g.definition}`),
-        steps: [],
+        paragraphs: ['Termes du site — ouvrez une entrée pour la définition.'],
+        steps: GUIDE_GLOSSARY.map((g) => ({
+          title: g.term,
+          body: g.definition,
+        })),
         links: [
           { label: 'FAQ', path: '/guide/faq' },
           { label: 'Index', path: '/guide/index' },
@@ -401,7 +399,7 @@ function contentFor(id: string): Pick<
     case 'index':
       return {
         paragraphs: ['Index des fonctionnalités : chaque entrée mène à la fiche concernée.'],
-        steps: GUIDE_FEATURE_INDEX.slice(0, 16).map((i) => ({
+        steps: GUIDE_FEATURE_INDEX.map((i) => ({
           title: i.label,
           body: i.description,
           badge: i.audience === 'dm' ? 'MJ' : i.audience === 'player' ? 'Joueur' : 'Tous',
@@ -477,20 +475,6 @@ function contentFor(id: string): Pick<
           { label: 'Combat', path: '/guide/initiative' },
         ],
         flow: GUIDE_PROPOSAL_FLOW.map((s) => s.label),
-      };
-    case 'captures':
-      return {
-        paragraphs: [
-          'Aperçus UI : explorez l’app directement — création, campagnes, table, codex.',
-        ],
-        steps: [],
-        links: [
-          { label: 'Création', path: '/create' },
-          { label: 'Campagnes', path: '/campaigns' },
-          { label: 'Codex', path: '/species' },
-          { label: 'Accueil', path: '/' },
-        ],
-        flow: [],
       };
     default: {
       const idx = GUIDE_FEATURE_INDEX.filter((i) => i.sectionId === id);

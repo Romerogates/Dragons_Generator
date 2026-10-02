@@ -1,0 +1,175 @@
+@if (isOwner()) {
+  <section class="space-y-6">
+    @if (!creatures().length) {
+      <div class="rounded-2xl border border-dashed border-amber-800/50 bg-amber-950/15 p-6 text-center space-y-4">
+        <div>
+          <p class="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-2">Bestiaire de campagne</p>
+          <h2 class="text-xl font-serif text-slate-100 mb-2">Alliés et adversaires</h2>
+          <p class="text-sm text-slate-400 max-w-md mx-auto">
+            Créez d’abord vos créatures ici, en les marquant allié ou adversaire. Vous pourrez ensuite les choisir rapidement en combat.
+          </p>
+        </div>
+        <button
+          type="button"
+          class="min-h-11 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase bg-amber-600 text-white hover:bg-amber-500"
+          (click)="addCreatures.emit()"
+        >
+          Ajouter des créatures
+        </button>
+      </div>
+    } @else {
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p class="text-[10px] font-black uppercase tracking-widest text-amber-400">Bestiaire</p>
+          <p class="text-sm text-slate-400">
+            {{ allyCreatures().length }} allié(s) · {{ adversaryCreatures().length }} adversaire(s)
+            @if (otherCreatures().length) {
+              · {{ otherCreatures().length }} autre(s)
+            }
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            class="px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-amber-800/50 text-amber-200/90 hover:border-amber-500/50"
+            (click)="openBestiary.emit()"
+          >
+            Consulter
+          </button>
+          <button
+            type="button"
+            class="px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-amber-900/30 border border-amber-700/50 text-amber-300 hover:bg-amber-900/50"
+            (click)="addCreatures.emit()"
+          >
+            Ajouter / modifier
+          </button>
+        </div>
+      </div>
+
+      @for (group of creatureGroups(); track group.id) {
+        <div class="space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 px-1">
+            <h3
+              class="text-[10px] font-black uppercase tracking-widest"
+              [class.text-sky-400]="group.id === 'ally'"
+              [class.text-red-400]="group.id === 'adversary'"
+              [class.text-slate-500]="group.id === 'other'"
+            >
+              {{ group.label }}
+            </h3>
+            @if (group.id === 'other') {
+              <div class="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase border border-sky-800/50 text-sky-300"
+                  (click)="bulkClassify.emit('ally')"
+                >
+                  Tous → Alliés
+                </button>
+                <button
+                  type="button"
+                  class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase border border-red-900/50 text-red-300"
+                  (click)="bulkClassify.emit('antagonist')"
+                >
+                  Tous → Adversaires
+                </button>
+              </div>
+            }
+          </div>
+          @for (cr of group.items; track creatureTrackKey(cr)) {
+            <article
+              class="bg-[#1b2028] border rounded-2xl p-5"
+              [class.border-sky-800/40]="cr.role === 'ally'"
+              [class.border-red-900/40]="cr.role === 'antagonist'"
+              [class.border-slate-800]="cr.role !== 'ally' && cr.role !== 'antagonist'"
+            >
+              <div class="flex flex-wrap items-baseline gap-2 mb-2">
+                <h3 class="font-bold text-slate-100 font-serif">{{ cr.customName }}</h3>
+                <span class="text-[10px] text-red-400/80">{{ formatCr(cr.challengeRating) }}</span>
+              </div>
+              <p class="text-[10px] text-slate-600 mb-3">
+                {{ cr.creatureName }} · {{ categoryLabel(cr.category) }}
+              </p>
+              <label class="block max-w-xs mb-3">
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Camp</span>
+                <select
+                  class="mt-1 w-full bg-[#171b22] border border-slate-700 rounded-lg px-2 py-2 text-[10px] font-black uppercase text-slate-300"
+                  [ngModel]="cr.role"
+                  (ngModelChange)="roleChange.emit({ creature: cr, role: $event })"
+                >
+                  @for (opt of creatureRoleOptions; track opt[0]) {
+                    <option [value]="opt[0]">{{ opt[1] }}</option>
+                  }
+                </select>
+              </label>
+              <div class="grid gap-2 sm:grid-cols-2 mb-3">
+                <label class="block">
+                  <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Voix</span>
+                  <input
+                    type="text"
+                    class="mt-1 w-full bg-[#171b22] border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200"
+                    [ngModel]="cr.voice ?? ''"
+                    (ngModelChange)="cardFieldChange.emit({ creature: cr, field: 'voice', value: $event })"
+                    placeholder="Grave, pressé…"
+                  />
+                </label>
+                <label class="block">
+                  <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Désir</span>
+                  <input
+                    type="text"
+                    class="mt-1 w-full bg-[#171b22] border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200"
+                    [ngModel]="cr.desire ?? ''"
+                    (ngModelChange)="cardFieldChange.emit({ creature: cr, field: 'desire', value: $event })"
+                    placeholder="Ce qu’il veut ce soir"
+                  />
+                </label>
+                <label class="block">
+                  <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Peur</span>
+                  <input
+                    type="text"
+                    class="mt-1 w-full bg-[#171b22] border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200"
+                    [ngModel]="cr.fear ?? ''"
+                    (ngModelChange)="cardFieldChange.emit({ creature: cr, field: 'fear', value: $event })"
+                    placeholder="Ce qu’il évite"
+                  />
+                </label>
+                <label class="block">
+                  <span class="text-[10px] font-black uppercase tracking-widest text-amber-500/80">Secret MJ</span>
+                  <input
+                    type="text"
+                    class="mt-1 w-full bg-[#171b22] border border-amber-900/40 rounded-lg px-2 py-1.5 text-xs text-amber-100/90"
+                    [ngModel]="cr.secret ?? ''"
+                    (ngModelChange)="cardFieldChange.emit({ creature: cr, field: 'secret', value: $event })"
+                    placeholder="Invisible aux joueurs"
+                  />
+                </label>
+              </div>
+              <label class="block mb-3">
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Mini-stats</span>
+                <input
+                  type="text"
+                  class="mt-1 w-full bg-[#171b22] border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200 font-mono"
+                  [ngModel]="cr.noteStats ?? ''"
+                  (ngModelChange)="cardFieldChange.emit({ creature: cr, field: 'noteStats', value: $event })"
+                  placeholder="CA 15 · 45 PV · +5 att"
+                />
+              </label>
+              @if (cr.backstory) {
+                <p class="text-sm text-slate-400 italic">{{ cr.backstory }}</p>
+              }
+              <div class="mt-4">
+                <button
+                  type="button"
+                  class="px-3 py-2 rounded-xl text-[10px] font-black uppercase border border-amber-800/50 text-amber-200/90 hover:border-amber-500/60"
+                  (click)="openCreatureInBook.emit(cr)"
+                >
+                  Consulter
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    }
+  </section>
+}

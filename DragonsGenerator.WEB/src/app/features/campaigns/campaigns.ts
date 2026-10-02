@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal, computed, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { CampaignCloudService } from '@core/services/campaign-cloud.service';
+import { CampaignCloudService, MAX_CAMPAIGNS_PER_USER } from '@core/services/campaign-cloud.service';
 import { OfflineSyncService } from '@core/services/offline-sync.service';
 import { ConnectivityService } from '@core/services/connectivity.service';
 import { FriendsService } from '@core/services/friends.service';
@@ -50,6 +50,14 @@ export class Campaigns implements OnInit, OnDestroy {
   /** Optionnel : première date de table (datetime-local). */
   readonly emptyFirstSessionLocal = signal('');
   readonly isLoggedIn = this.auth.isLoggedIn;
+
+  readonly maxCampaigns = MAX_CAMPAIGNS_PER_USER;
+  readonly ownedCampaignCount = computed(
+    () => this.list().filter((c) => c.role === 'dm' && !c.isHistory).length,
+  );
+  readonly canCreateCampaign = computed(
+    () => this.ownedCampaignCount() < MAX_CAMPAIGNS_PER_USER,
+  );
 
   private softPollTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -163,6 +171,12 @@ export class Campaigns implements OnInit, OnDestroy {
 
   openEmptyCampaignModal(): void {
     if (!this.auth.isLoggedIn() || this.creatingEmpty()) return;
+    if (!this.canCreateCampaign()) {
+      this.actionError.set(
+        `Limite atteinte : maximum ${MAX_CAMPAIGNS_PER_USER} campagnes par compte.`,
+      );
+      return;
+    }
     this.emptyCampaignTitle.set('Nouvelle campagne');
     this.emptyCampaignTemplate.set('oneshot-classic');
     this.showEmptyCampaignModal.set(true);
@@ -195,11 +209,17 @@ export class Campaigns implements OnInit, OnDestroy {
         this.creatingEmpty.set(false);
         this.router.navigate(['/campaigns', created.id], { queryParams: { tab: 'overview' } });
       },
-      error: (err: { status?: number }) => {
+      error: (err: { status?: number; error?: { errors?: string[] } | string }) => {
         this.creatingEmpty.set(false);
         if (err?.status === 504 || err?.status === 502) {
           this.actionError.set(
             'Le serveur a mis trop longtemps à répondre. Réessayez dans quelques secondes (aucune IA n’est requise pour créer une table).',
+          );
+          return;
+        }
+        if (err?.status === 400) {
+          this.actionError.set(
+            `Limite atteinte : maximum ${MAX_CAMPAIGNS_PER_USER} campagnes par compte.`,
           );
           return;
         }

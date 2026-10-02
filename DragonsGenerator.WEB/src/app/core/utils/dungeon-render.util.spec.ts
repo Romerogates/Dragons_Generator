@@ -82,8 +82,8 @@ describe('dungeon-render helpers', () => {
     const canvas = document.createElement('canvas');
     const map = sampleMap();
     drawDungeonToCanvas(map, canvas, 10, { edgePadCells: 2, vignette: false });
-    expect(canvas.width).toBe((map.gridWidth + 4) * 10);
-    expect(canvas.height).toBe((map.gridHeight + 4) * 10);
+    expect(canvas.width).toBe(((map.gridWidth ?? 0) + 4) * 10);
+    expect(canvas.height).toBe(((map.gridHeight ?? 0) + 4) * 10);
   });
 
   it('draws canvas and exports png data url', () => {

@@ -73,30 +73,132 @@
 
           @if (t.steps.length) {
             <section class="space-y-4">
-              <h2 class="text-lg font-serif text-slate-100 border-b border-slate-800 pb-2">Étapes</h2>
-              <div class="space-y-5">
-                @for (step of t.steps; track step.title + $index) {
-                  <div class="space-y-1.5">
-                    <h3 class="text-base font-serif text-slate-50">
-                      {{ $index + 1 }}. {{ step.title }}
-                      @if (step.badge) {
-                        <span class="guide-no-print ml-2 text-[10px] font-sans font-black uppercase tracking-widest text-slate-500"
-                          >{{ step.badge }}</span
-                        >
-                      }
-                    </h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">{{ step.body }}</p>
-                    @if (step.link) {
-                      <a
-                        [routerLink]="step.link"
-                        class="guide-no-print inline-flex text-[10px] font-black uppercase tracking-widest text-amber-400/90 hover:text-amber-300"
+              <h2 class="text-lg font-serif text-slate-100 border-b border-slate-800 pb-2">
+                {{ t.id === 'faq' || t.id === 'glossaire' ? 'Entrées' : t.id === 'journal' ? 'Posts' : 'Étapes' }}
+              </h2>
+
+              @if (t.id === 'faq' || t.id === 'glossaire') {
+                <div class="space-y-2">
+                  @for (step of t.steps; track step.title + $index) {
+                    <details
+                      class="group rounded-xl border border-slate-800 bg-[#161b24]/50 overflow-hidden"
+                    >
+                      <summary
+                        class="flex cursor-pointer list-none items-start gap-2 px-4 py-3 min-h-11
+                               [&::-webkit-details-marker]:hidden hover:bg-slate-800/40"
                       >
-                        {{ step.linkLabel || 'Ouvrir' }} →
-                      </a>
-                    }
+                        <span
+                          class="mt-0.5 text-xs text-slate-500 group-open:rotate-90 transition-transform shrink-0"
+                          aria-hidden="true"
+                          >▸</span
+                        >
+                        <span class="min-w-0 flex-1">
+                          <span class="font-serif text-slate-50 text-base leading-snug">{{
+                            step.title
+                          }}</span>
+                          @if (step.badge) {
+                            <span
+                              class="ml-2 text-[10px] font-sans font-black uppercase tracking-widest text-slate-500"
+                              >{{ step.badge }}</span
+                            >
+                          }
+                        </span>
+                      </summary>
+                      <div class="px-4 pb-4 pl-9 space-y-2">
+                        <p class="text-sm text-slate-400 leading-relaxed whitespace-pre-wrap">
+                          {{ step.body }}
+                        </p>
+                        @if (step.link) {
+                          <a
+                            [routerLink]="step.link"
+                            class="inline-flex text-[10px] font-black uppercase tracking-widest text-amber-400/90 hover:text-amber-300"
+                          >
+                            {{ step.linkLabel || 'Ouvrir' }} →
+                          </a>
+                        }
+                      </div>
+                    </details>
+                  }
+                </div>
+              } @else if (t.id === 'index') {
+                <div class="space-y-5">
+                  @for (step of pagedSteps(); track step.title + $index) {
+                    <div class="space-y-1.5">
+                      <h3 class="text-base font-serif text-slate-50">
+                        {{ step.title }}
+                        @if (step.badge) {
+                          <span
+                            class="guide-no-print ml-2 text-[10px] font-sans font-black uppercase tracking-widest text-slate-500"
+                            >{{ step.badge }}</span
+                          >
+                        }
+                      </h3>
+                      <p class="text-sm text-slate-400 leading-relaxed">{{ step.body }}</p>
+                      @if (step.link) {
+                        <a
+                          [routerLink]="step.link"
+                          class="guide-no-print inline-flex text-[10px] font-black uppercase tracking-widest text-amber-400/90 hover:text-amber-300"
+                        >
+                          {{ step.linkLabel || 'Ouvrir' }} →
+                        </a>
+                      }
+                    </div>
+                  }
+                </div>
+                @if (indexPageCount() > 1) {
+                  <div class="guide-no-print flex flex-wrap items-center justify-between gap-2 pt-2">
+                    <button
+                      type="button"
+                      class="min-h-9 px-3 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 disabled:opacity-40"
+                      [disabled]="indexPage() <= 0"
+                      (click)="indexPage.set(indexPage() - 1)"
+                    >
+                      Précédent
+                    </button>
+                    <span class="text-xs text-slate-500">
+                      {{ indexPage() + 1 }} / {{ indexPageCount() }}
+                    </span>
+                    <button
+                      type="button"
+                      class="min-h-9 px-3 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-700 text-slate-300 disabled:opacity-40"
+                      [disabled]="indexPage() >= indexPageCount() - 1"
+                      (click)="indexPage.set(indexPage() + 1)"
+                    >
+                      Suivant
+                    </button>
                   </div>
                 }
-              </div>
+              } @else {
+                <div class="space-y-5">
+                  @for (step of t.steps; track step.title + $index) {
+                    <div class="space-y-1.5">
+                      <h3 class="text-base font-serif text-slate-50">
+                        {{ $index + 1 }}. {{ step.title }}
+                        @if (step.badge) {
+                          <span
+                            class="guide-no-print ml-2 text-[10px] font-sans font-black uppercase tracking-widest"
+                            [class]="
+                              step.badge === 'Nouveau'
+                                ? 'text-amber-400'
+                                : 'text-slate-500'
+                            "
+                            >{{ step.badge }}</span
+                          >
+                        }
+                      </h3>
+                      <p class="text-sm text-slate-400 leading-relaxed">{{ step.body }}</p>
+                      @if (step.link) {
+                        <a
+                          [routerLink]="step.link"
+                          class="guide-no-print inline-flex text-[10px] font-black uppercase tracking-widest text-amber-400/90 hover:text-amber-300"
+                        >
+                          {{ step.linkLabel || 'Ouvrir' }} →
+                        </a>
+                      }
+                    </div>
+                  }
+                </div>
+              }
             </section>
           }
 

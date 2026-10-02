@@ -12,6 +12,9 @@ import {
   normalizeHandoutKind,
 } from '../models/Campaign/campaign';
 
+/** Limite serveur CreateCampaignEndpoint.MaxCampaignsPerUser */
+export const MAX_CAMPAIGNS_PER_USER = 20;
+
 export interface CampaignActivityItem {
   id: string;
   actorUserId: string;

@@ -63,8 +63,17 @@ import {
 } from '@core/services/ui-banner-preferences.service';
 import {
   DungeonCloudService,
+  MAX_DUNGEONS_PER_USER,
   type CloudDungeonSummary,
 } from '@core/services/dungeon-cloud.service';
+import {
+  geometryPayloadForLibrary,
+  hasEmbeddedGeometry,
+  linkLibraryDungeon,
+  mapsForCampaignPersist,
+  mergeLibraryGeometry,
+  needsLibraryHydration,
+} from '@core/utils/campaign-dungeon-map-ref.util';
 
 type EditorTool =
   | 'select'
@@ -153,6 +162,8 @@ export class CampaignDungeonMaps implements OnDestroy {
   /** Hub bibliothèque : pas de handouts campagne, une carte cloud. */
   readonly libraryMode = input(false);
   readonly readOnly = input(false);
+  /** Ouvre automatiquement le générateur ou le picker (liens depuis /play). */
+  readonly autoAction = input<'generate' | 'import' | null>(null);
   readonly dataChange = output<Partial<CampaignData>>();
 
   readonly editorCanvasRef = viewChild<ElementRef<HTMLCanvasElement>>('editorCanvas');
@@ -252,19 +263,28 @@ export class CampaignDungeonMaps implements OnDestroy {
   readonly maps = computed(() => this.campaign().data.dungeonMaps ?? []);
   readonly encounters = computed(() => this.campaign().data.encounters ?? []);
 
+  /** Géométries bibliothèque hydratées (libraryDungeonId → data). */
+  readonly libraryGeometryCache = signal(new Map<string, CampaignDungeonMap>());
+  readonly hydratingEditor = signal(false);
+
   readonly editingMap = computed(() => {
     const id = this.editingMapId();
     if (!id) return null;
     const draft = this.draftMap();
     if (draft && draft.id === id) return draft;
-    return this.maps().find((m) => m.id === id) ?? null;
+    const base = this.maps().find((m) => m.id === id) ?? null;
+    if (!base) return null;
+    if (!needsLibraryHydration(base)) return base;
+    const libId = base.libraryDungeonId!;
+    const cached = this.libraryGeometryCache().get(libId);
+    return cached ? mergeLibraryGeometry(base, cached) : base;
   });
 
   readonly selectedMarker = computed(() => {
     const map = this.editingMap();
     const mid = this.selectedMarkerId();
     if (!map || !mid) return null;
-    return map.markers.find((m) => m.id === mid) ?? null;
+    return (map.markers ?? []).find((m) => m.id === mid) ?? null;
   });
 
   readonly viewportBg = computed(() => themePalette(this.editingMap()?.theme ?? this.genTheme()).bg);
@@ -303,6 +323,7 @@ export class CampaignDungeonMaps implements OnDestroy {
   private strokeDragged = false;
   private roomDragStart: { x: number; y: number } | null = null;
   private isDefiningRoom = false;
+  private autoActionConsumed = false;
 
   constructor() {
     effect(() => {
@@ -311,6 +332,17 @@ export class CampaignDungeonMaps implements OnDestroy {
       if (!this.maps().some((m) => m.id === id)) return;
       if (this.editingMapId() === id) return;
       this.openEditor(id);
+    });
+
+    effect(() => {
+      const action = this.autoAction();
+      if (!action || this.autoActionConsumed || this.libraryMode() || this.readOnly()) return;
+      if (!this.campaign().isOwner) return;
+      this.autoActionConsumed = true;
+      queueMicrotask(() => {
+        if (action === 'generate') this.openGenerator();
+        else if (action === 'import') this.openLibraryPicker();
+      });
     });
 
     effect(() => {
@@ -415,13 +447,14 @@ export class CampaignDungeonMaps implements OnDestroy {
     this.libraryBusy.set(true);
     this.dungeonCloud.get(summary.id).subscribe({
       next: (detail) => {
-        const copy = this.cloneMapForCampaign(detail.data, detail.name);
+        const linked = linkLibraryDungeon(detail.data, detail.id, detail.name);
         const c = this.campaign();
-        this.persistMaps([...(c.data.dungeonMaps ?? []), copy], true);
+        this.cacheLibraryGeometry(detail.id, detail.data);
+        this.persistMaps([...(c.data.dungeonMaps ?? []), linked], true);
         this.libraryBusy.set(false);
         this.libraryPickerOpen.set(false);
-        this.setEditorMessage(`« ${copy.name} » importé (copie indépendante).`);
-        this.openEditor(copy.id);
+        this.setEditorMessage(`« ${linked.name} » lié (live) depuis Mes Donjons.`);
+        this.openEditor(linked.id);
       },
       error: () => {
         this.libraryBusy.set(false);
@@ -435,26 +468,72 @@ export class CampaignDungeonMaps implements OnDestroy {
     if (!map || this.libraryMode() || this.libraryBusy()) return;
     this.libraryBusy.set(true);
     this.closeActionMenus();
-    const payload = {
-      ...map,
-      handoutId: null,
-      fogOfWarEnabled: false,
-      revealedRoomIds: [],
-      updatedAt: new Date().toISOString(),
-    };
-    this.dungeonCloud.create(payload, map.name).subscribe({
-      next: () => {
+    const payload = geometryPayloadForLibrary(map);
+    const existingLibId = map.libraryDungeonId;
+    const req$ = existingLibId
+      ? this.dungeonCloud.update(existingLibId, payload, map.name)
+      : this.dungeonCloud.create(payload, map.name);
+    req$.subscribe({
+      next: (summary) => {
         this.libraryBusy.set(false);
-        this.setEditorMessage('Copie enregistrée dans Mes Donjons.');
+        this.cacheLibraryGeometry(summary.id, payload);
+        if (!existingLibId) {
+          const linked = { ...map, libraryDungeonId: summary.id, updatedAt: new Date().toISOString() };
+          this.commitMapPatch(linked, true);
+          this.setEditorMessage('Lié à Mes Donjons (live).');
+        } else {
+          this.setEditorMessage('Mes Donjons mis à jour.');
+        }
       },
       error: () => {
         this.libraryBusy.set(false);
-        this.setEditorMessage('Enregistrement bibliothèque impossible.');
+        this.setEditorMessage('Enregistrement bibliothèque impossible (quota ?).');
+      },
+    });
+  }
+
+  /** Variante isolée : copie bibliothèque + re-link campagne. */
+  duplicateLinkedToLibrary(): void {
+    const map = this.editingMap();
+    if (!map || this.libraryMode() || this.libraryBusy() || !hasEmbeddedGeometry(map)) return;
+    this.libraryBusy.set(true);
+    this.closeActionMenus();
+    const payload = geometryPayloadForLibrary({
+      ...map,
+      name: `${map.name} (copie)`,
+      id: crypto.randomUUID?.() ?? `map-${Date.now()}`,
+    });
+    this.dungeonCloud.create(payload, payload.name).subscribe({
+      next: (summary) => {
+        const linked = linkLibraryDungeon(payload, summary.id, payload.name);
+        this.cacheLibraryGeometry(summary.id, payload);
+        const list = (this.campaign().data.dungeonMaps ?? []).map((m) =>
+          m.id === map.id
+            ? {
+                ...linked,
+                id: map.id,
+                handoutId: map.handoutId,
+                fogOfWarEnabled: map.fogOfWarEnabled,
+                revealedRoomIds: map.revealedRoomIds,
+                revealedCorridorCells: map.revealedCorridorCells,
+              }
+            : m,
+        );
+        this.persistMaps(list, true);
+        this.draftMap.set(null);
+        this.libraryBusy.set(false);
+        this.setEditorMessage('Copie isolée dans Mes Donjons — cette table pointe dessus.');
+        this.openEditor(map.id);
+      },
+      error: () => {
+        this.libraryBusy.set(false);
+        this.setEditorMessage(`Dupliquer impossible (max ${MAX_DUNGEONS_PER_USER} donjons).`);
       },
     });
   }
 
   private cloneMapForCampaign(src: CampaignDungeonMap, name: string): CampaignDungeonMap {
+    // Legacy helper kept for regenerate paths that still need a full embedded map.
     const now = new Date().toISOString();
     const id = crypto.randomUUID?.() ?? `map-${Date.now()}`;
     const roomIdMap = new Map<string, string>();
@@ -474,6 +553,7 @@ export class CampaignDungeonMaps implements OnDestroy {
       name: name || src.name || 'Donjon',
       rooms,
       markers,
+      libraryDungeonId: undefined,
       handoutId: null,
       fogOfWarEnabled: false,
       revealedRoomIds: [],
@@ -545,11 +625,34 @@ export class CampaignDungeonMaps implements OnDestroy {
       updatedAt: new Date().toISOString(),
     };
 
-    this.persistMaps([...(c.data.dungeonMaps ?? []), named], true);
+    if (this.libraryMode()) {
+      this.persistMaps([...(c.data.dungeonMaps ?? []), named], true);
+      this.finishGenerateUi(named);
+      return;
+    }
+
+    const payload = geometryPayloadForLibrary(named);
+    this.dungeonCloud.create(payload, named.name).subscribe({
+      next: (summary) => {
+        const linked = linkLibraryDungeon(payload, summary.id, named.name);
+        this.cacheLibraryGeometry(summary.id, payload);
+        this.persistMaps([...(this.campaign().data.dungeonMaps ?? []), linked], true);
+        this.finishGenerateUi(linked);
+      },
+      error: () => {
+        this.generating.set(false);
+        this.setEditorMessage(
+          `Impossible de créer dans Mes Donjons (max ${MAX_DUNGEONS_PER_USER}). Génération annulée.`,
+        );
+      },
+    });
+  }
+
+  private finishGenerateUi(named: CampaignDungeonMap): void {
     this.showGenerator.set(false);
     this.previewMap.set(null);
     this.editingMapId.set(named.id);
-    this.selectedRoomId.set(named.rooms[0]?.id ?? null);
+    this.selectedRoomId.set(named.rooms?.[0]?.id ?? null);
     this.clearHistory();
     this.fitMapInView(named);
     this.generating.set(false);
@@ -621,7 +724,46 @@ export class CampaignDungeonMaps implements OnDestroy {
     this.selectedMarkerId.set(null);
     this.clearHistory();
     const map = this.maps().find((m) => m.id === mapId);
-    if (map) this.fitMapInView(map);
+    if (!map) return;
+    if (needsLibraryHydration(map) && map.libraryDungeonId) {
+      this.ensureLibraryHydrated(map.libraryDungeonId, () => {
+        const hydrated = this.editingMap();
+        if (hydrated) this.fitMapInView(hydrated);
+      });
+      return;
+    }
+    this.fitMapInView(map);
+  }
+
+  private ensureLibraryHydrated(libraryId: string, then?: () => void): void {
+    if (this.libraryGeometryCache().has(libraryId)) {
+      then?.();
+      return;
+    }
+    this.hydratingEditor.set(true);
+    this.dungeonCloud.get(libraryId).subscribe({
+      next: (detail) => {
+        this.cacheLibraryGeometry(libraryId, detail.data);
+        this.hydratingEditor.set(false);
+        then?.();
+      },
+      error: () => {
+        this.hydratingEditor.set(false);
+        this.setEditorMessage('Impossible de charger la géométrie depuis Mes Donjons.');
+      },
+    });
+  }
+
+  private cacheLibraryGeometry(libraryId: string, data: CampaignDungeonMap): void {
+    const next = new Map(this.libraryGeometryCache());
+    next.set(libraryId, structuredClone(data));
+    this.libraryGeometryCache.set(next);
+  }
+
+  private commitMapPatch(map: CampaignDungeonMap, immediate = false): void {
+    const list = (this.campaign().data.dungeonMaps ?? []).map((m) => (m.id === map.id ? map : m));
+    this.draftMap.set(map);
+    this.persistMaps(list, immediate);
   }
 
   closeEditor(): void {
@@ -1155,7 +1297,7 @@ export class CampaignDungeonMaps implements OnDestroy {
     const c = this.campaign();
     const id = mapId ?? this.editingMap()?.id;
     if (!c || !id) return;
-    const url = `${window.location.origin}/campaigns/${c.id}?tab=maps&map=${encodeURIComponent(id)}`;
+    const url = `${window.location.origin}/campaigns/${c.id}?tab=prep&sub=maps&map=${encodeURIComponent(id)}`;
     try {
       await navigator.clipboard.writeText(url);
       this.setEditorMessage('Lien copié — accessible aux membres de la campagne.');
@@ -1362,12 +1504,13 @@ export class CampaignDungeonMaps implements OnDestroy {
       {
         fogOfWarEnabled: enabled,
         revealedRoomIds: enabled ? (map.revealedRoomIds ?? []) : [],
+        revealedCorridorCells: enabled ? (map.revealedCorridorCells ?? []) : [],
       },
       true,
     );
     this.setEditorMessage(
       enabled
-        ? 'Brouillard de guerre activé — révélez les salles une par une.'
+        ? 'Brouillard de guerre activé — révélez les salles (et couloirs case par case en session).'
         : 'Brouillard de guerre désactivé.',
     );
   }
@@ -1398,7 +1541,7 @@ export class CampaignDungeonMaps implements OnDestroy {
   hideAllRooms(): void {
     const map = this.editingMap();
     if (!map) return;
-    this.patchEditingMap({ revealedRoomIds: [] }, true);
+    this.patchEditingMap({ revealedRoomIds: [], revealedCorridorCells: [] }, true);
     this.setEditorMessage('Salles masquées — la table live se met à jour ; régénérez le document PNG si besoin.');
   }
 
@@ -1572,7 +1715,58 @@ export class CampaignDungeonMaps implements OnDestroy {
       maps = maps.map((m) => (m.id === draft.id ? { ...draft, updatedAt: now } : m));
       this.draftMap.set({ ...draft, updatedAt: now });
     }
-    this.dataChange.emit({ dungeonMaps: maps });
+
+    // Sync géométrie live vers la bibliothèque pour les cartes liées.
+    for (const m of maps) {
+      if (!m.libraryDungeonId || !hasEmbeddedGeometry(m) || this.libraryMode()) continue;
+      const payload = geometryPayloadForLibrary(m);
+      this.cacheLibraryGeometry(m.libraryDungeonId, payload);
+      this.dungeonCloud.update(m.libraryDungeonId, payload, m.name).subscribe({
+        error: () => {
+          /* soft-fail : overlay campagne déjà persisté */
+        },
+      });
+    }
+
+    // Legacy : upsert bibliothèque puis strip si possible (cap 50).
+    const migrated = maps.map((m) => {
+      if (m.libraryDungeonId || !hasEmbeddedGeometry(m) || this.libraryMode()) return m;
+      // Keep embedded until async migrate completes; kick off once.
+      this.tryMigrateLegacyMap(m);
+      return m;
+    });
+
+    this.dataChange.emit({ dungeonMaps: mapsForCampaignPersist(migrated) });
+  }
+
+  private migratingIds = new Set<string>();
+
+  private tryMigrateLegacyMap(map: CampaignDungeonMap): void {
+    if (this.migratingIds.has(map.id) || !hasEmbeddedGeometry(map)) return;
+    this.migratingIds.add(map.id);
+    const payload = geometryPayloadForLibrary(map);
+    this.dungeonCloud.create(payload, map.name).subscribe({
+      next: (summary) => {
+        this.cacheLibraryGeometry(summary.id, payload);
+        const linked = {
+          ...linkLibraryDungeon(payload, summary.id, map.name),
+          id: map.id,
+          handoutId: map.handoutId,
+          fogOfWarEnabled: map.fogOfWarEnabled,
+          revealedRoomIds: map.revealedRoomIds,
+          rooms: map.rooms,
+        };
+        const list = (this.campaign().data.dungeonMaps ?? []).map((m) =>
+          m.id === map.id ? linked : m,
+        );
+        this.migratingIds.delete(map.id);
+        this.dataChange.emit({ dungeonMaps: mapsForCampaignPersist(list) });
+      },
+      error: () => {
+        this.migratingIds.delete(map.id);
+        // Cap atteint : laisser embedded.
+      },
+    });
   }
 
   @HostListener('document:keydown', ['$event'])

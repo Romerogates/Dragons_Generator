@@ -190,7 +190,32 @@ public class GetMyCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest<Cam
         }
         else
         {
-            data = CampaignJsonHelpers.FilterForPlayerView(doc.RootElement, userId.Value);
+            var libIds = CampaignJsonHelpers.CollectActiveLibraryDungeonIds(doc.RootElement);
+            Dictionary<Guid, JsonObject>? libraryGeometries = null;
+            if (libIds.Count > 0)
+            {
+                var ownerId = campaign.OwnerUserId;
+                var rows = await db.Dungeons.AsNoTracking()
+                    .Where(d => d.UserId == ownerId && libIds.Contains(d.Id))
+                    .Select(d => new { d.Id, d.JsonData })
+                    .ToListAsync(ct);
+                libraryGeometries = new Dictionary<Guid, JsonObject>();
+                foreach (var row in rows)
+                {
+                    try
+                    {
+                        var parsed = JsonNode.Parse(
+                            string.IsNullOrWhiteSpace(row.JsonData) ? "{}" : row.JsonData) as JsonObject;
+                        if (parsed is not null) libraryGeometries[row.Id] = parsed;
+                    }
+                    catch
+                    {
+                        /* ignore malformed library JSON */
+                    }
+                }
+            }
+
+            data = CampaignJsonHelpers.FilterForPlayerView(doc.RootElement, userId.Value, libraryGeometries);
         }
 
         var membersNeedingLevel = campaign.Members
@@ -269,6 +294,8 @@ public class GetMyCampaignEndpoint(AppDbContext db) : EndpointWithoutRequest<Cam
 
 public class CreateCampaignEndpoint(AppDbContext db) : Endpoint<UpsertCampaignRequest, CampaignSummaryDto>
 {
+    public const int MaxCampaignsPerUser = 20;
+
     public override void Configure() => Post("/me/campaigns");
 
     public override async Task HandleAsync(UpsertCampaignRequest req, CancellationToken ct)
@@ -277,6 +304,14 @@ public class CreateCampaignEndpoint(AppDbContext db) : Endpoint<UpsertCampaignRe
         if (userId is null)
         {
             await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        var ownedCount = await db.Campaigns.CountAsync(c => c.OwnerUserId == userId.Value, ct);
+        if (ownedCount >= MaxCampaignsPerUser)
+        {
+            AddError($"Limite atteinte : maximum {MaxCampaignsPerUser} campagnes par compte.");
+            await Send.ErrorsAsync(StatusCodes.Status400BadRequest, ct);
             return;
         }
 

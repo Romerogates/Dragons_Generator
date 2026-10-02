@@ -63,7 +63,7 @@ public class GetMyDungeonEndpoint(AppDbContext db) : EndpointWithoutRequest<Dung
 
 public class CreateMyDungeonEndpoint(AppDbContext db) : Endpoint<UpsertDungeonRequest, DungeonSummaryDto>
 {
-    public const int MaxDungeonsPerUser = 40;
+    public const int MaxDungeonsPerUser = 50;
 
     public override void Configure() => Post("/me/dungeons");
 

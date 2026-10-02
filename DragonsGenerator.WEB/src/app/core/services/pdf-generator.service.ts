@@ -456,6 +456,17 @@ export class PdfGeneratorService {
     pdf.setFontSize(15);
     this.text(pdf, String(c.defense.armorClass), 360, 220);
 
+    // Portrait / jeton (coin haut-droit de la fiche page 1, si fourni).
+    const portrait = c.portraitImageUrl?.trim() || c.tokenImageUrl?.trim();
+    if (portrait) {
+      try {
+        const fmt = portrait.startsWith('data:image/png') ? 'PNG' : 'JPEG';
+        pdf.addImage(portrait, fmt, pxToMmX(488), pxToMmY(28), pxToMmX(88), pxToMmY(88));
+      } catch {
+        /* image illisible — ignorer silencieusement */
+      }
+    }
+
     pdf.setFontSize(15);
     this.text(pdf, String(c.abilities.force), 118, 225);
     this.text(pdf, String(c.abilities.dexterite), 118, 291);

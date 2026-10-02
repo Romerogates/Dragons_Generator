@@ -17,6 +17,7 @@ export interface GuideNavItem {
 
 export interface GuideBlogPost {
   id: string;
+  /** Date FR affichée (ex. « 31 août 2026 ») — sert aussi à l’expiration isNew (14 j). */
   date: string;
   tag: string;
   title: string;
@@ -24,6 +25,7 @@ export interface GuideBlogPost {
   icon: string;
   border: string;
   tagColor: string;
+  /** Intention éditoriale ; l’affichage « Nouveau » expire aussi à 14 j / après lecture. */
   isNew?: boolean;
 }
 
@@ -39,7 +41,7 @@ export interface GuideQuickCard {
 export interface GuideStep {
   title: string;
   body: string;
-  badge?: 'MJ' | 'Joueur' | 'Tous';
+  badge?: 'MJ' | 'Joueur' | 'Tous' | 'Nouveau';
   link?: string;
   linkLabel?: string;
 }

@@ -10,12 +10,17 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { firstValueFrom, forkJoin } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
 import { CharacterBuilderService } from '../../core/services/character-builder.service';
 import { ConnectivityService } from '@core/services/connectivity.service';
 import { OfflineCodexService } from '@core/services/offline-codex.service';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';
+import { DataService } from '@core/services/data.service';
 import { ConfirmDialog } from '@shared/components/confirm-dialog/confirm-dialog';
+import { autoCompleteRemainingCreation } from '@core/utils/character-auto-complete.util';
+import { normalizeCharacterClasses } from '@core/utils/class-data.adapter';
+import type { CharacterCreation as CreationState } from '@core/models/Character/character';
 
 // Steps
 import { LevelStep } from './steps/level-step/level-step';
@@ -62,6 +67,7 @@ export class CharacterCreation implements OnInit {
   private readonly offlineCodex = inject(OfflineCodexService);
   private readonly handoff = inject(CharacterHandoffService);
   private readonly auth = inject(AuthService);
+  private readonly data = inject(DataService);
 
   readonly isOnline = this.connectivity.isOnline;
   readonly isLoggedIn = this.auth.isLoggedIn;
@@ -75,6 +81,11 @@ export class CharacterCreation implements OnInit {
   readonly showDraftDiscardConfirm = signal(false);
   /** Parcours level-up depuis la table (XP). */
   readonly levelUpMode = signal(false);
+
+  readonly autoCompleteBusy = signal(false);
+  readonly autoCompleteHint = signal<string | null>(null);
+  readonly canUndoAutoComplete = signal(false);
+  private autoCompleteUndo: CreationState | null = null;
 
   ngOnInit(): void {
     // 1. Mode édition depuis /characters → priorité absolue
@@ -146,6 +157,52 @@ export class CharacterCreation implements OnInit {
         if (ok) this.codexReady.set(true);
       },
     });
+  }
+
+  /** Complète aléatoirement les choix encore ouverts (langues / magie / compétences). */
+  async autoCompleteRemaining(): Promise<void> {
+    if (this.autoCompleteBusy() || this.builder.currentStep() >= this.builder.summaryStep()) return;
+    this.autoCompleteBusy.set(true);
+    this.autoCompleteHint.set(null);
+    try {
+      const c = this.builder.creation();
+      const catalogs = await firstValueFrom(
+        forkJoin({
+          languages: this.data.getLanguages(),
+          spells: this.data.getSpells(),
+          classes: this.data.getClasses(),
+        }),
+      );
+      const classes = normalizeCharacterClasses(catalogs.classes);
+      const cls = c.classId ? (classes.find((x) => x.id === c.classId) ?? null) : null;
+      const before = structuredClone(c) as CreationState;
+      const { creation, filled } = autoCompleteRemainingCreation(c, {
+        languages: catalogs.languages,
+        spells: catalogs.spells,
+        classJson: cls,
+        abilityModifiers: this.builder.abilityModifiers(),
+      });
+      if (!filled.length) {
+        this.autoCompleteHint.set('Rien à compléter pour l’instant.');
+        return;
+      }
+      this.autoCompleteUndo = before;
+      this.canUndoAutoComplete.set(true);
+      this.builder.replaceCreation(creation);
+      this.autoCompleteHint.set(`Complété : ${filled.join(', ')}.`);
+    } catch {
+      this.autoCompleteHint.set('Impossible de compléter automatiquement.');
+    } finally {
+      this.autoCompleteBusy.set(false);
+    }
+  }
+
+  undoAutoComplete(): void {
+    if (!this.autoCompleteUndo) return;
+    this.builder.replaceCreation(this.autoCompleteUndo);
+    this.autoCompleteUndo = null;
+    this.canUndoAutoComplete.set(false);
+    this.autoCompleteHint.set('Auto-complétion annulée.');
   }
 
   onReset(): void {
