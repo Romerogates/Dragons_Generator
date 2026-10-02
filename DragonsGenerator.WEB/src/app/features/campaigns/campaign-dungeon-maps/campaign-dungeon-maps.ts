@@ -1059,20 +1059,17 @@ export class CampaignDungeonMaps implements OnDestroy {
     if (markerKind === 'trap' || markerKind === 'chest' || markerKind === 'stairs') {
       const existing = map.markers.findIndex((m) => m.x === x && m.y === y);
       const markers = [...map.markers];
-      let changed = false;
       if (existing >= 0) {
         if (markers[existing].kind === markerKind) {
           // Toggle suppression seulement au clic initial, pas pendant un glissé.
           if (fromStrokeMove || this.strokeDragged) return;
           markers.splice(existing, 1);
-          changed = true;
         } else {
           markers[existing] = {
             ...markers[existing],
             kind: markerKind,
             label: DUNGEON_MARKER_LABELS[markerKind],
           };
-          changed = true;
         }
       } else {
         markers.push({
@@ -1083,9 +1080,7 @@ export class CampaignDungeonMaps implements OnDestroy {
           label: DUNGEON_MARKER_LABELS[markerKind],
           linkedRoomId: roomAt(map, x, y),
         });
-        changed = true;
       }
-      if (!changed) return;
       if (recordUndo && !this.strokeStarted) {
         this.pushUndo(map);
         this.strokeStarted = true;

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, ActivatedRoute } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { of } from 'rxjs';
 import { zonelessTestProviders } from '@testing/zoneless-test-providers';
 import { CURRENT_SCHEMA_VERSION, type Character } from '@core/models/Character/character';
 import { CharacterHandoffService } from '@core/services/character-handoff.service';

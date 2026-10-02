@@ -11,7 +11,8 @@ import type {
  */
 export function stripTableChatForPersist(data: CampaignData): CampaignData {
   const sessions = (data.sessions ?? []).map((s) => {
-    const { tableChat: _omit, ...rest } = s;
+    const { tableChat, ...rest } = s;
+    void tableChat;
     return rest;
   });
   return { ...data, sessions };

@@ -313,7 +313,6 @@ export function drawDungeonToCanvas(
   const gridH = map.gridHeight;
   if (gridW <= 0 || gridH <= 0 || !map.tiles.length) return;
   const rooms = map.rooms;
-  const markers = map.markers;
   const palette = themePalette(map.theme);
   const revealed = options?.revealedRoomIds ?? null;
   const pad = Math.max(0, options?.edgePadCells ?? 0);

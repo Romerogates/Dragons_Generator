@@ -941,7 +941,9 @@ export class CampaignPlayPanel implements OnDestroy {
     }
     if (key === 'd') {
       const r = rollDie(20);
-      this.playTableChat()?.shareTableD20(r) ?? this.shareDiceRoll(20, r, 'table');
+      const chat = this.playTableChat();
+      if (chat) chat.shareTableD20(r);
+      else this.shareDiceRoll(20, r, 'table');
       this.setFeedback('ok', `d20 → ${r}`);
       softTablePulse('dice');
       return true;
@@ -951,7 +953,9 @@ export class CampaignPlayPanel implements OnDestroy {
         this.setFeedback('err', 'Aucune carte de session pour le fog.');
         return true;
       }
-      this.playBattleMap()?.toggleSessionFog() ?? this.toggleSessionFog();
+      const mapView = this.playBattleMap();
+      if (mapView) mapView.toggleSessionFog();
+      else this.toggleSessionFog();
       return true;
     }
     return false;
