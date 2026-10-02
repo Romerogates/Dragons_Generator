@@ -210,6 +210,11 @@ export class CampaignPlayPanel implements OnDestroy {
   readonly secretPanelOpen = signal(false);
   /** Mode zen : chrome minimal (onglets / dock secondaires repliés). */
   readonly zenMode = signal(readZenMode());
+  /** Timer de scène (local, MJ) — secondes restantes. */
+  readonly sceneTimerSeconds = signal<number | null>(null);
+  readonly sceneTimerPaused = signal(false);
+  readonly sceneTimerLabel = signal('Scène');
+  private sceneTimerHandle: ReturnType<typeof setInterval> | null = null;
   /** Drag ordre des tours (pointeur). */
   private turnOrderDrag: { combatantId: string; fromIndex: number } | null = null;
 
@@ -560,6 +565,14 @@ export class CampaignPlayPanel implements OnDestroy {
     return compact.length ? compact : order.slice(0, 2);
   });
 
+  readonly sceneTimerDisplay = computed(() => {
+    const s = this.sceneTimerSeconds();
+    if (s == null) return null;
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return `${m}:${r.toString().padStart(2, '0')}`;
+  });
+
   constructor() {
     if (typeof window !== 'undefined') {
       window.addEventListener('pagehide', this.onPageHide);
@@ -703,6 +716,7 @@ export class CampaignPlayPanel implements OnDestroy {
     this.flushPendingSessionWork();
     this.stopInitiativePoll();
     this.teardownMapResize();
+    this.clearSceneTimerTick();
     if (this.feedbackTimer) clearTimeout(this.feedbackTimer);
   }
 
@@ -2932,6 +2946,85 @@ export class CampaignPlayPanel implements OnDestroy {
     if (typeof document === 'undefined') return;
     const el = document.querySelector('[data-testid="play-turn-banner"]');
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  pinTableMessage(body: string): void {
+    if (!this.isDm()) return;
+    const text = body.trim().slice(0, 280);
+    if (!text) return;
+    this.patchSession({ tablePin: text }, { immediate: true });
+    this.setFeedback('ok', 'Message épinglé en haut du fil.');
+  }
+
+  clearTablePin(): void {
+    if (!this.isDm()) return;
+    this.patchSession({ tablePin: '' }, { immediate: true });
+  }
+
+  startSceneTimer(minutes: number, label = 'Scène'): void {
+    if (!this.isDm()) return;
+    this.clearSceneTimerTick();
+    this.sceneTimerLabel.set(label);
+    this.sceneTimerPaused.set(false);
+    this.sceneTimerSeconds.set(Math.max(1, Math.round(minutes * 60)));
+    this.sceneTimerHandle = setInterval(() => {
+      if (this.sceneTimerPaused()) return;
+      const cur = this.sceneTimerSeconds();
+      if (cur == null) return;
+      if (cur <= 1) {
+        this.sceneTimerSeconds.set(0);
+        this.clearSceneTimerTick();
+        this.setFeedback('ok', `Timer « ${this.sceneTimerLabel()} » terminé.`);
+        softTablePulse('turn');
+        return;
+      }
+      this.sceneTimerSeconds.set(cur - 1);
+    }, 1000);
+  }
+
+  toggleSceneTimerPause(): void {
+    if (this.sceneTimerSeconds() == null) return;
+    this.sceneTimerPaused.update((p) => !p);
+  }
+
+  stopSceneTimer(): void {
+    this.clearSceneTimerTick();
+    this.sceneTimerSeconds.set(null);
+    this.sceneTimerPaused.set(false);
+  }
+
+  private clearSceneTimerTick(): void {
+    if (this.sceneTimerHandle) {
+      clearInterval(this.sceneTimerHandle);
+      this.sceneTimerHandle = null;
+    }
+  }
+
+  /** Macros MJ 1 clic (#10). */
+  runTableMacro(kind: 'perception' | 'next_turn' | 'end_combat'): void {
+    if (!this.isDm()) return;
+    if (kind === 'perception') {
+      const r = rollDie(20);
+      this.shareDiceRoll(20, r, 'perception groupe');
+      this.setFeedback('ok', `Perception groupe — d20 → ${r}`);
+      softTablePulse('dice');
+      return;
+    }
+    if (kind === 'next_turn') {
+      if (this.combatFlowPhase() !== 'fight') {
+        this.setFeedback('err', 'Ouvrez d’abord le combat pour avancer le tour.');
+        return;
+      }
+      this.nextTurn();
+      return;
+    }
+    if (kind === 'end_combat') {
+      if (!this.activeCombat()) {
+        this.setFeedback('err', 'Aucun combat actif.');
+        return;
+      }
+      this.endCombat();
+    }
   }
 }
 

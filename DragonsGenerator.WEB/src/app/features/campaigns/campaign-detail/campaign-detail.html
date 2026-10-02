@@ -81,6 +81,40 @@
           </div>
           }
         }
+        @if (hubNextAction(); as hub) {
+          <div
+            class="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3"
+            role="status"
+            data-testid="hub-next-action"
+            [class]="
+              hub.tone === 'sky'
+                ? 'border-sky-800/50 bg-sky-950/30'
+                : hub.tone === 'amber'
+                  ? 'border-amber-800/50 bg-amber-950/30'
+                  : hub.tone === 'emerald'
+                    ? 'border-emerald-800/50 bg-emerald-950/30'
+                    : hub.tone === 'rose'
+                      ? 'border-rose-800/50 bg-rose-950/30'
+                      : 'border-slate-700 bg-[#1b2028]/80'
+            "
+          >
+            <div class="min-w-0">
+              <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Prochaine action</p>
+              <p class="text-sm font-serif text-slate-100 mt-0.5">{{ hub.title }}</p>
+              <p class="text-xs text-slate-400 mt-0.5">{{ hub.detail }}</p>
+            </div>
+            @if (hub.ctaLabel && hub.cta) {
+              <button
+                type="button"
+                class="shrink-0 min-h-11 px-4 py-2 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-500"
+                (click)="runHubNextActionCta()"
+                data-testid="hub-next-action-cta"
+              >
+                {{ hub.ctaLabel }}
+              </button>
+            }
+          </div>
+        }
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 class="text-3xl md:text-4xl font-bold text-violet-400 font-serif">{{ c.title }}</h1>

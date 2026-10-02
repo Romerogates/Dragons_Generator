@@ -182,6 +182,8 @@ export interface CampaignSession {
   activeMapId?: string | null;
   /** Fil de table minimal (MJ + joueurs) — sync live via blob campagne. */
   tableChat?: TableChatMessage[];
+  /** Message épinglé en haut du fil (objectif de scène / indice). */
+  tablePin?: string;
   /** Run sheet MJ — objectifs de la soirée. */
   objectives?: string;
   /** Run sheet MJ — scènes / actes prévus. */

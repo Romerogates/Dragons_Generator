@@ -58,6 +58,7 @@ import {
 import { ADVENTURE_TONE_LABELS, CreatureRole, StoryCreatureSelection } from '@core/models/Story/story';
 import { formatChallengeRating, getCreatureCategoryLabel } from '@core/utils/creature-display.util';
 import { shouldShowPlayerInitiativePrompt } from '@core/utils/campaign-initiative.util';
+import { resolveHubNextAction, type HubNextAction } from '@core/utils/hub-next-action.util';
 import { mergeRemoteLiveTable } from '@core/utils/campaign-persist.util';
 import { seedNotebookFromLegacyNotes } from '@core/utils/notebook.util';
 import {
@@ -428,6 +429,24 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
       .find((s) => new Date(s.scheduledAt).getTime() >= now)
       ?? (this.campaign()?.data.sessions ?? []).find((s) => s.status === 'planned')
       ?? null;
+  });
+
+  /** Bandeau coercitif joueur (hub) — une prochaine action claire. */
+  readonly hubNextAction = computed((): HubNextAction | null => {
+    const c = this.campaign();
+    if (!c || c.isOwner) return null;
+    const mine = this.myPlayerMember();
+    let heroStatus: 'none' | 'pending' | 'rejected' | 'approved' = 'none';
+    if (mine?.proposalStatus === 'approved' && mine.approvedCharacterId) heroStatus = 'approved';
+    else if (mine?.proposalStatus === 'pending') heroStatus = 'pending';
+    else if (mine?.proposalStatus === 'rejected') heroStatus = 'rejected';
+    return resolveHubNextAction({
+      isOwner: false,
+      isSpectator: c.role === 'spectator',
+      heroStatus,
+      hasActiveSession: !!c.data.activeSessionId,
+      hasPlannedSession: !!this.nextPlannedSession(),
+    });
   });
 
   /** Prochaine date libre « game » (calendrier), hors sessions de play. */
@@ -882,6 +901,28 @@ export class CampaignDetailPage implements OnInit, OnDestroy {
   dismissWelcomeBanner(): void {
     this.welcomeBanner.set(null);
     this.banners.dismiss(UI_BANNER_IDS.welcomeCampaign);
+  }
+
+  runHubNextActionCta(): void {
+    const action = this.hubNextAction();
+    const c = this.campaign();
+    if (!action?.cta || !c) return;
+    switch (action.cta) {
+      case 'players':
+        this.setTab('players');
+        break;
+      case 'sessions':
+        this.setTab('sessions');
+        break;
+      case 'play':
+        this.openPlayFullscreen();
+        break;
+      case 'create_hero':
+        void this.router.navigate(['/create'], {
+          queryParams: { campaignId: c.id, returnUrl: `/campaigns/${c.id}` },
+        });
+        break;
+    }
   }
 
   /** Deep-link `?tab=` / `?map=` / `?session=` / `?event=` → nav haute + sous-onglet Préparation si besoin. */

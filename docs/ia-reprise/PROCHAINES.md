@@ -53,6 +53,7 @@ Ordre = impact joueur. Ne pas relire tout le git : partir d’ici, puis ouvrir l
 > **Quick wins MJ (2026-09-29)** — raccourcis table (Espace/N/D/F) ; fiches PNJ one-screen ; prêt joueurs ; undo 10s fog/pré-tiré/calepin ; feedback soft crit/tour/XP.
 > **Table live #6+#3 (2026-09-30)** — ordre des tours figé libre (↑↓ + drag pointeur) ; panneau secret MJ coulissant (PNJ voix/désir/peur/secret + calepins) · raccourci `S`.
 > **UX friendly 7 axes (2026-09-30)** — bandeau prochaine action ; hints boutons gris ; onboarding joueur 3 étapes ; mode zen (`Z`) ; feedback humain ; nav mobile Init/Tour/Docs ; empty states coachants.
+> **Suite UX (2026-10-02)** — hub next-action joueur ; hints party/chat ; timer scène + macros table ; pin fil de table (#4/#10/#15).
 
 > **Demain (Anthony 2026-09-27 soir)** — priorités 1+2 **faites**.
 
